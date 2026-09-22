@@ -24,9 +24,9 @@
 /// ```csharp
 /// var loaded = Wav.FromFile("chime.wav");
 /// if (loaded.Ok)
-///     Audio.Play(loaded.Value);
+///     Audio.PlayClip(loaded.Value);
 ///
-/// var heard = Audio.Record(AudioFormat.Voice, 3.0);   // three seconds
+/// var heard = Audio.RecordClip(AudioFormat.Voice, 3.0);   // three seconds
 /// if (heard.Ok)
 ///     Wav.Save(heard.Value, "heard.wav");
 /// ```
@@ -41,7 +41,7 @@
 /// are reached by name the first time a device is opened, which is what lets
 /// this live in the standard library: a program that makes no sound pays
 /// nothing, and a machine with no ALSA answers `AudioError.NoBackend` -- a
-/// value to print, rather than a link error. `Audio.Available` asks before
+/// value to print, rather than a link error. `Audio.IsAvailable` asks before
 /// anything is tried.
 ///
 /// **WASAPI rather than waveOut.** `winmm`'s `waveOut` is four calls and is
@@ -107,7 +107,7 @@ public struct AudioFormat
     public ushort BitsPerSample;
 
     /// A format written out.
-    public static AudioFormat Of(uint sampleRate, ushort channels, ushort bits)
+    public static AudioFormat Create(uint sampleRate, ushort channels, ushort bits)
     {
         AudioFormat format;
         format.SampleRate = sampleRate;
@@ -118,15 +118,15 @@ public struct AudioFormat
 
     /// 44.1 kHz, sixteen bits, stereo: what a CD is and what a WAV file
     /// usually holds.
-    public static AudioFormat Cd => AudioFormat.Of(44100u, (ushort)2, (ushort)16);
+    public static AudioFormat Cd => AudioFormat.Create(44100u, (ushort)2, (ushort)16);
 
     /// 48 kHz, sixteen bits, stereo: what most sound hardware runs at without
     /// resampling, and what to prefer when nothing else decides.
-    public static AudioFormat Studio => AudioFormat.Of(48000u, (ushort)2, (ushort)16);
+    public static AudioFormat Studio => AudioFormat.Create(48000u, (ushort)2, (ushort)16);
 
     /// 16 kHz, sixteen bits, mono: enough for speech and a quarter of the
     /// bytes.
-    public static AudioFormat Voice => AudioFormat.Of(16000u, (ushort)1, (ushort)16);
+    public static AudioFormat Voice => AudioFormat.Create(16000u, (ushort)1, (ushort)16);
 
     /// How many bytes one frame takes -- one sample on every channel. This is
     /// the unit everything below counts in, because a buffer cut in the middle
@@ -150,7 +150,7 @@ public struct AudioFormat
 public enum AudioError
 {
     /// There is no audio library on this machine: no winmm, or no
-    /// libasound. `Audio.Available` is how to ask before trying.
+    /// libasound. `Audio.IsAvailable` is how to ask before trying.
     NoBackend,
 
     /// The format is not one this module handles, or not one the device
@@ -177,10 +177,10 @@ public enum AudioError
 
 /// Samples in memory, and what they are.
 ///
-/// The unit `Wav` reads and writes and `Audio.Play` takes. It is bytes rather
+/// The unit `Wav` reads and writes and `Audio.PlayClip` takes. It is bytes rather
 /// than a typed sample array deliberately: the width is in the format, a
 /// conversion on the way in would cost a copy of every sound a program loads,
-/// and the platform wants bytes at the end of it anyway. `SampleAt` and
+/// and the platform wants bytes at the end of it anyway. `GetSample` and
 /// `SetSample` are there for a program that does want to look.
 public sealed class AudioClip
 {
@@ -202,7 +202,7 @@ public sealed class AudioClip
     /// ones, so this fills with 128 there -- which is what silence is in an
     /// unsigned format, and the kind of detail that otherwise shows up as a
     /// click.
-    public static AudioClip Silence(AudioFormat format, nuint frames)
+    public static AudioClip CreateSilence(AudioFormat format, nuint frames)
     {
         byte[] samples = new byte[frames * format.BytesPerFrame];
         if (format.BitsPerSample == 8u)
@@ -246,9 +246,9 @@ public sealed class AudioClip
     /// sixteen bits answers its top sixteen. Out of range answers
     /// zero rather than aborting: a program walking a waveform runs off the
     /// end at the end, and that is not a mistake in it.
-    public int SampleAt(nuint frame, nuint channel)
+    public int GetSample(nuint frame, nuint channel)
     {
-        nuint at = Offset(frame, channel);
+        nuint at = FindSampleOffset(frame, channel);
         if (at == _samples.Length)
             return 0;
 
@@ -267,12 +267,12 @@ public sealed class AudioClip
         return value >= 32768 ? value - 65536 : value;
     }
 
-    /// One sample written, taking the same range `SampleAt` answers in and
+    /// One sample written, taking the same range `GetSample` answers in and
     /// clamping to it. A sample wider than sixteen bits has its top sixteen
     /// set and the bits below them cleared. Out of range does nothing.
     public void SetSample(nuint frame, nuint channel, int value)
     {
-        nuint at = Offset(frame, channel);
+        nuint at = FindSampleOffset(frame, channel);
         if (at == _samples.Length)
             return;
 
@@ -301,7 +301,7 @@ public sealed class AudioClip
 
     /// Where a sample sits, or `_samples.Length` when it is not in the clip --
     /// a value no index can be, which is what the two callers check.
-    nuint Offset(nuint frame, nuint channel)
+    nuint FindSampleOffset(nuint frame, nuint channel)
     {
         if (channel >= (nuint)_format.Channels)
             return _samples.Length;
@@ -332,10 +332,10 @@ public static class Wav
         if (bytes.Length < 44u)
             return Fail(AudioError.Malformed);
 
-        if (!Marks(bytes, 0u, "RIFF") || !Marks(bytes, 8u, "WAVE"))
+        if (!HasMarkAt(bytes, 0u, "RIFF") || !HasMarkAt(bytes, 8u, "WAVE"))
             return Fail(AudioError.Malformed);
 
-        AudioFormat format = AudioFormat.Of(0u, (ushort)0, (ushort)0);
+        AudioFormat format = AudioFormat.Create(0u, (ushort)0, (ushort)0);
         bool described = false;
         nuint at = 12u;
 
@@ -351,7 +351,7 @@ public static class Wav
             if (size > bytes.Length - body)
                 size = bytes.Length - body;
 
-            if (Marks(bytes, at, "fmt ") && size >= 16u)
+            if (HasMarkAt(bytes, at, "fmt ") && size >= 16u)
             {
                 ushort tag = ReadUShort(bytes, body);
                 format.Channels = ReadUShort(bytes, body + 2u);
@@ -369,7 +369,7 @@ public static class Wav
 
                 described = true;
             }
-            else if (Marks(bytes, at, "data"))
+            else if (HasMarkAt(bytes, at, "data"))
             {
                 if (!described)
                     return Fail(AudioError.Malformed);
@@ -443,7 +443,7 @@ public static class Wav
         return Ok(true);
     }
 
-    static bool Marks(byte[] bytes, nuint at, String mark)
+    static bool HasMarkAt(byte[] bytes, nuint at, String mark)
     {
         if (at + 4u > bytes.Length)
             return false;
@@ -683,14 +683,14 @@ threadsafe sealed class Backend
             return;
 
         bool complete = true;
-        _initialize = (CoInitializeExFn)Find(ole, "CoInitializeEx", &complete);
-        _uninitialize = (CoUninitializeFn)Find(ole, "CoUninitialize", &complete);
-        _create = (CoCreateInstanceFn)Find(ole, "CoCreateInstance", &complete);
+        _initialize = (CoInitializeExFn)FindSymbol(ole, "CoInitializeEx", &complete);
+        _uninitialize = (CoUninitializeFn)FindSymbol(ole, "CoUninitialize", &complete);
+        _create = (CoCreateInstanceFn)FindSymbol(ole, "CoCreateInstance", &complete);
 
         Ready = complete;
     }
 
-    void* Find(void* library, String name, bool* complete)
+    void* FindSymbol(void* library, String name, bool* complete)
     {
         void* symbol = GetProcAddress(library, name.ToPointer());
         if (symbol == null)
@@ -741,7 +741,7 @@ threadsafe sealed class Backend
     }
 
     /// The device enumerator, or null.
-    public IMMDeviceEnumerator? Enumerator()
+    public IMMDeviceEnumerator? CreateDeviceEnumerator()
     {
         Guid classId = EnumeratorClassId();
         byte* raw = null;
@@ -757,9 +757,9 @@ threadsafe sealed class Backend
     }
 
     /// The default endpoint in that direction, or null.
-    public IMMDevice? DefaultEndpoint(int flow)
+    public IMMDevice? GetDefaultEndpoint(int flow)
     {
-        var enumerator = Enumerator();
+        var enumerator = CreateDeviceEnumerator();
         if (enumerator == null)
             return null;
 
@@ -790,7 +790,7 @@ threadsafe sealed class Backend
         if (!EnterApartment(&owned))
             return false;
 
-        bool found = DefaultEndpoint(flow) != null;
+        bool found = GetDefaultEndpoint(flow) != null;
 
         if (owned)
             LeaveApartment();
@@ -799,7 +799,7 @@ threadsafe sealed class Backend
 }
 
 /// A format filled in for WASAPI.
-WaveFormatEx Describe(AudioFormat format)
+WaveFormatEx CreateWaveFormat(AudioFormat format)
 {
     WaveFormatEx described;
     described.FormatTag = FormatPcm;
@@ -813,7 +813,7 @@ WaveFormatEx Describe(AudioFormat format)
 }
 
 /// What an `HRESULT` from WASAPI means here.
-AudioError Translate(int code)
+AudioError ToAudioError(int code)
 {
     if (code == DeviceInUse)
         return AudioError.Busy;
@@ -828,23 +828,23 @@ AudioError Translate(int code)
 /// which service they take out, so opening one is written once.
 Result<IAudioClient, AudioError> OpenStream(Backend found, AudioFormat format, int flow)
 {
-    var endpoint = found.DefaultEndpoint(flow);
+    var endpoint = found.GetDefaultEndpoint(flow);
     if (endpoint == null)
         return Fail(AudioError.Device);
 
     byte* raw = null;
     int code = ((IMMDevice)endpoint).Activate(iidof(IAudioClient), AllContexts, null, &raw);
     if (code < 0 || raw == null)
-        return Fail(Translate(code));
+        return Fail(ToAudioError(code));
 
     var client = (IAudioClient)raw;
-    var described = Describe(format);
+    var described = CreateWaveFormat(format);
 
     code = client.Initialize(ShareModeShared, AutoConvert,
                              (long)BufferMilliseconds * TicksPerMillisecond, 0,
                              &described, null);
     if (code < 0)
-        return Fail(Translate(code));
+        return Fail(ToAudioError(code));
 
     return Ok(client);
 }
@@ -918,21 +918,21 @@ threadsafe sealed class Backend
 
         bool complete = true;
 
-        _open = (PcmOpenFn)Find(alsa, "snd_pcm_open", &complete);
-        _setParams = (PcmSetParamsFn)Find(alsa, "snd_pcm_set_params", &complete);
-        _writeFrames = (PcmTransferFn)Find(alsa, "snd_pcm_writei", &complete);
-        _readFrames = (PcmTransferFn)Find(alsa, "snd_pcm_readi", &complete);
-        _drain = (PcmCommandFn)Find(alsa, "snd_pcm_drain", &complete);
-        _drop = (PcmCommandFn)Find(alsa, "snd_pcm_drop", &complete);
-        _prepare = (PcmCommandFn)Find(alsa, "snd_pcm_prepare", &complete);
-        _start = (PcmCommandFn)Find(alsa, "snd_pcm_start", &complete);
-        _close = (PcmCommandFn)Find(alsa, "snd_pcm_close", &complete);
-        _recover = (PcmRecoverFn)Find(alsa, "snd_pcm_recover", &complete);
+        _open = (PcmOpenFn)FindSymbol(alsa, "snd_pcm_open", &complete);
+        _setParams = (PcmSetParamsFn)FindSymbol(alsa, "snd_pcm_set_params", &complete);
+        _writeFrames = (PcmTransferFn)FindSymbol(alsa, "snd_pcm_writei", &complete);
+        _readFrames = (PcmTransferFn)FindSymbol(alsa, "snd_pcm_readi", &complete);
+        _drain = (PcmCommandFn)FindSymbol(alsa, "snd_pcm_drain", &complete);
+        _drop = (PcmCommandFn)FindSymbol(alsa, "snd_pcm_drop", &complete);
+        _prepare = (PcmCommandFn)FindSymbol(alsa, "snd_pcm_prepare", &complete);
+        _start = (PcmCommandFn)FindSymbol(alsa, "snd_pcm_start", &complete);
+        _close = (PcmCommandFn)FindSymbol(alsa, "snd_pcm_close", &complete);
+        _recover = (PcmRecoverFn)FindSymbol(alsa, "snd_pcm_recover", &complete);
 
         Ready = complete;
     }
 
-    void* Find(void* library, String name, bool* complete)
+    void* FindSymbol(void* library, String name, bool* complete)
     {
         void* symbol = dlsym(library, name.ToPointer());
         if (symbol == null)
@@ -1032,7 +1032,7 @@ static class Devices
 ///
 /// **Ask before trying.** A game wants to say "no audio device" at startup
 /// rather than in the middle of a level, and this is how it finds out.
-public bool Available() => Devices.Current != null;
+public bool IsAvailable() => Devices.Current != null;
 
 /// Whether anything can play. False on a machine that has the library and no
 /// device, which is what a headless server is.
@@ -1068,7 +1068,7 @@ public String BackendName()
 /// writes the samples, waits for them, and closes. A program playing many
 /// sounds should keep an `AudioPlayer` instead, because opening a device takes
 /// tens of milliseconds and this does it every time.
-public Result<bool, AudioError> Play(AudioClip clip)
+public Result<bool, AudioError> PlayClip(AudioClip clip)
 {
     var opened = AudioPlayer.Open(clip.Format);
     if (!opened.Ok)
@@ -1082,7 +1082,7 @@ public Result<bool, AudioError> Play(AudioClip clip)
         return Fail(written.Error);
     }
 
-    player.Drain();
+    player.DrainBuffer();
     player.Close();
     return Ok(true);
 }
@@ -1091,7 +1091,7 @@ public Result<bool, AudioError> Play(AudioClip clip)
 ///
 /// Blocks for that long. A program that wants to stop early, or to see the
 /// sound as it arrives, wants an `AudioRecorder`.
-public Result<AudioClip, AudioError> Record(AudioFormat format, double seconds)
+public Result<AudioClip, AudioError> RecordClip(AudioFormat format, double seconds)
 {
     var opened = AudioRecorder.Open(format);
     if (!opened.Ok)
@@ -1153,7 +1153,7 @@ public Result<AudioClip, AudioError> Record(AudioFormat format, double seconds)
 /// var player = opened.Value;
 /// player.Write(first);
 /// player.Write(second);        // returns when the device has taken them
-/// player.Drain();              // and this when it has played them
+/// player.DrainBuffer();       // and this when it has played them
 /// player.Close();
 /// ```
 ///
@@ -1279,7 +1279,7 @@ public sealed class AudioPlayer
     /// Samples queued, blocking until the device has room for them.
     ///
     /// Returns when the bytes have been handed over, which is not when they
-    /// have been heard -- `Drain` is what waits for that. A length that is not
+    /// have been heard -- `DrainBuffer` is what waits for that. A length that is not
     /// a whole number of frames is refused rather than truncated, because
     /// truncating swaps the channels for the rest of the stream.
     public Result<bool, AudioError> Write(byte[] samples)
@@ -1315,7 +1315,7 @@ public sealed class AudioPlayer
             uint padding = 0u;
             int code = client.GetCurrentPadding(&padding);
             if (code < 0)
-                return Fail(Translate(code));
+                return Fail(ToAudioError(code));
 
             uint room = _bufferFrames - padding;
             if (room == 0u)
@@ -1341,7 +1341,7 @@ public sealed class AudioPlayer
             byte* buffer = null;
             code = render.GetBuffer(take, &buffer);
             if (code < 0 || buffer == null)
-                return Fail(Translate(code));
+                return Fail(ToAudioError(code));
 
             memcpy(buffer, &samples[at], (nuint)take * frameSize);
 
@@ -1386,7 +1386,7 @@ public sealed class AudioPlayer
     }
 
     /// Waits until everything written has been played.
-    public void Drain()
+    public void DrainBuffer()
     {
         if (_closed)
             return;
@@ -1638,7 +1638,7 @@ public sealed class AudioRecorder
 
         int code = ((IAudioClient)held).Start();
         if (code < 0)
-            return Fail(Translate(code));
+            return Fail(ToAudioError(code));
 #else
         // Started here rather than left to the first read, which is when a
         // prepared capture stream would otherwise begin.
@@ -1824,10 +1824,10 @@ public static class Tone
 {
     /// A sine wave: `frequency` hertz for `seconds`, at `amplitude` from 0.0
     /// to 1.0. On every channel.
-    public static AudioClip Sine(AudioFormat format, double frequency,
+    public static AudioClip CreateSine(AudioFormat format, double frequency,
                                  double seconds, double amplitude)
     {
-        var clip = AudioClip.Silence(format, (nuint)(seconds * (double)format.SampleRate));
+        var clip = AudioClip.CreateSilence(format, (nuint)(seconds * (double)format.SampleRate));
         double step = frequency * 6.28318530717958623200 / (double)format.SampleRate;
 
         for (nuint frame = 0u; frame < clip.FrameCount; frame++)
@@ -1842,10 +1842,10 @@ public static class Tone
 
     /// A square wave, which is louder than a sine of the same amplitude and is
     /// what a beep traditionally is.
-    public static AudioClip Square(AudioFormat format, double frequency,
+    public static AudioClip CreateSquare(AudioFormat format, double frequency,
                                    double seconds, double amplitude)
     {
-        var clip = AudioClip.Silence(format, (nuint)(seconds * (double)format.SampleRate));
+        var clip = AudioClip.CreateSilence(format, (nuint)(seconds * (double)format.SampleRate));
         double period = (double)format.SampleRate / frequency;
         int level = (int)(amplitude * 32767.0);
 
@@ -1862,6 +1862,6 @@ public static class Tone
 
     /// Silence, which is the third thing a test needs: a gap between two
     /// tones, and something to compare against.
-    public static AudioClip Rest(AudioFormat format, double seconds) =>
-        AudioClip.Silence(format, (nuint)(seconds * (double)format.SampleRate));
+    public static AudioClip CreateRest(AudioFormat format, double seconds) =>
+        AudioClip.CreateSilence(format, (nuint)(seconds * (double)format.SampleRate));
 }

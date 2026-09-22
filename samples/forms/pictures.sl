@@ -46,17 +46,17 @@ Standard.Drawing.Image? Draw(int width, int height)
         return null;
 
     var picture = made.Value;
-    picture.Clear(Standard.Drawing.Rgba.Rgb((byte)32, (byte)32, (byte)40));
+    picture.Clear(Standard.Drawing.Rgba.FromRgb((byte)32, (byte)32, (byte)40));
 
-    picture.FillRectangle(Standard.Drawing.Rgba.Rgb((byte)220, (byte)40, (byte)40),
+    picture.FillRectangle(Standard.Drawing.Rgba.FromRgb((byte)220, (byte)40, (byte)40),
                           0, 0, width, 10);
-    picture.FillRectangle(Standard.Drawing.Rgba.Rgb((byte)40, (byte)80, (byte)220),
+    picture.FillRectangle(Standard.Drawing.Rgba.FromRgb((byte)40, (byte)80, (byte)220),
                           0, 0, 10, height);
 
     for (int y = 12; y < height; y++)
     {
         int wide = ((y - 12) * (width - 14)) / (height - 12);
-        picture.FillRectangle(Standard.Drawing.Rgba.Rgb((byte)60, (byte)180, (byte)90),
+        picture.FillRectangle(Standard.Drawing.Rgba.FromRgb((byte)60, (byte)180, (byte)90),
                               12, y, wide, 1);
     }
 
@@ -72,7 +72,7 @@ Standard.Drawing.Image? Draw(int width, int height)
     for (int y = height - 46; y < height - 6; y++)
     {
         for (int x = width - 46; x < width - 6; x++)
-            picture.SetPixel(x, y, Standard.Drawing.Rgba.Argb((byte)128, (byte)255,
+            picture.SetPixel(x, y, Standard.Drawing.Rgba.FromArgb((byte)128, (byte)255,
                                                               (byte)220, (byte)0));
     }
 

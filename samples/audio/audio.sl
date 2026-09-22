@@ -45,7 +45,7 @@ int PlayScale()
 
     foreach (int step in GetMajorScale())
     {
-        var tone = Tone.Sine(format, ComputeNoteFrequency(step), 0.18, 0.25);
+        var tone = Tone.CreateSine(format, ComputeNoteFrequency(step), 0.18, 0.25);
         var written = player.Write(tone.Samples);
         if (!written.Ok)
         {
@@ -57,7 +57,7 @@ int PlayScale()
 
     // Without this the program would end -- and the destructor would close the
     // device -- while the last few notes were still queued.
-    player.Drain();
+    player.DrainBuffer();
     player.Close();
     Console.WriteLine("done");
     return 0;
@@ -68,7 +68,7 @@ int RecordAndPlayBack()
     var format = AudioFormat.Voice;
     Console.WriteLine("recording three seconds through " + Audio.BackendName() + "...");
 
-    var heard = Audio.Record(format, 3.0);
+    var heard = Audio.RecordClip(format, 3.0);
     if (!heard.Ok)
     {
         Console.WriteLine("could not record: " + DescribeAudioError(heard.Error));
@@ -83,7 +83,7 @@ int RecordAndPlayBack()
     int peak = 0;
     for (nuint frame = 0u; frame < clip.FrameCount; frame++)
     {
-        int value = clip.SampleAt(frame, 0u);
+        int value = clip.GetSample(frame, 0u);
         if (value < 0)
             value = -value;
         if (value > peak)
@@ -101,7 +101,7 @@ int RecordAndPlayBack()
     }
 
     Console.WriteLine("wrote heard.wav; playing it back");
-    var played = Audio.Play(clip);
+    var played = Audio.PlayClip(clip);
     if (!played.Ok)
     {
         Console.WriteLine("playback failed: " + DescribeAudioError(played.Error));
@@ -129,7 +129,7 @@ String DescribeAudioError(AudioError error)
 
 int Main()
 {
-    if (!Audio.Available())
+    if (!Audio.IsAvailable())
     {
         Console.WriteLine("no audio library here; nothing to do");
         return 1;

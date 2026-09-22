@@ -26,7 +26,7 @@
 /// if (!loaded.Ok) { return; }
 ///
 /// var logo = loaded.Value;
-/// logo.FillRectangle(Rgba.Rgb(200, 30, 30), 8, 8, 64, 24);
+/// logo.FillRectangle(Rgba.FromRgb(200, 30, 30), 8, 8, 64, 24);
 /// logo.DrawLine(Rgba.Black, 0, 0, logo.Width, logo.Height, 2);
 /// logo.Save("out.png", ImageFormat.Png);
 /// ```
@@ -87,7 +87,7 @@ public struct Rgba
     public byte A;
 
     /// An opaque colour.
-    public static Rgba Rgb(byte red, byte green, byte blue)
+    public static Rgba FromRgb(byte red, byte green, byte blue)
     {
         Rgba colour;
         colour.R = red;
@@ -98,7 +98,7 @@ public struct Rgba
     }
 
     /// A colour with an alpha, where 0 is invisible and 255 is opaque.
-    public static Rgba Argb(byte alpha, byte red, byte green, byte blue)
+    public static Rgba FromArgb(byte alpha, byte red, byte green, byte blue)
     {
         Rgba colour;
         colour.R = red;
@@ -112,7 +112,7 @@ public struct Rgba
     /// written as a hex literal in a program usually is.
     public static Rgba FromPacked(uint packed)
     {
-        return Rgba.Argb((byte)((packed >> 24) & 0xFFu), (byte)((packed >> 16) & 0xFFu),
+        return Rgba.FromArgb((byte)((packed >> 24) & 0xFFu), (byte)((packed >> 16) & 0xFFu),
                          (byte)((packed >> 8) & 0xFFu), (byte)(packed & 0xFFu));
     }
 
@@ -131,12 +131,12 @@ public struct Rgba
     /// every program, including every shared library anybody builds. A property
     /// is a function, so there is nothing to initialize and nothing to go
     /// wrong; the six of them fold to four bytes each.
-    public static Rgba Transparent => Rgba.Argb((byte)0, (byte)0, (byte)0, (byte)0);
-    public static Rgba Black       => Rgba.Rgb((byte)0, (byte)0, (byte)0);
-    public static Rgba White       => Rgba.Rgb((byte)255, (byte)255, (byte)255);
-    public static Rgba Red         => Rgba.Rgb((byte)255, (byte)0, (byte)0);
-    public static Rgba Green       => Rgba.Rgb((byte)0, (byte)128, (byte)0);
-    public static Rgba Blue        => Rgba.Rgb((byte)0, (byte)0, (byte)255);
+    public static Rgba Transparent => Rgba.FromArgb((byte)0, (byte)0, (byte)0, (byte)0);
+    public static Rgba Black       => Rgba.FromRgb((byte)0, (byte)0, (byte)0);
+    public static Rgba White       => Rgba.FromRgb((byte)255, (byte)255, (byte)255);
+    public static Rgba Red         => Rgba.FromRgb((byte)255, (byte)0, (byte)0);
+    public static Rgba Green       => Rgba.FromRgb((byte)0, (byte)128, (byte)0);
+    public static Rgba Blue        => Rgba.FromRgb((byte)0, (byte)0, (byte)255);
 }
 
 /// The formats both backends read and write.
@@ -354,39 +354,39 @@ threadsafe sealed class Backend
 
         bool complete = true;
 
-        _startup = (GdiplusStartupFn)Find(gdiplus, "GdiplusStartup", &complete);
-        _fromStream = (GdipCreateBitmapFromStreamFn)Find(gdiplus, "GdipCreateBitmapFromStream", &complete);
-        _fromScan0 = (GdipCreateBitmapFromScan0Fn)Find(gdiplus, "GdipCreateBitmapFromScan0", &complete);
-        _dispose = (GdipDisposeImageFn)Find(gdiplus, "GdipDisposeImage", &complete);
-        _imageWidth = (GdipGetImageWidthFn)Find(gdiplus, "GdipGetImageWidth", &complete);
-        _imageHeight = (GdipGetImageHeightFn)Find(gdiplus, "GdipGetImageHeight", &complete);
-        _getPixel = (GdipBitmapGetPixelFn)Find(gdiplus, "GdipBitmapGetPixel", &complete);
-        _setPixel = (GdipBitmapSetPixelFn)Find(gdiplus, "GdipBitmapSetPixel", &complete);
-        _context = (GdipGetImageGraphicsContextFn)Find(gdiplus, "GdipGetImageGraphicsContext", &complete);
-        _deleteGraphics = (GdipDeleteGraphicsFn)Find(gdiplus, "GdipDeleteGraphics", &complete);
-        _smoothing = (GdipSetSmoothingModeFn)Find(gdiplus, "GdipSetSmoothingMode", &complete);
-        _pixelOffset = (GdipSetPixelOffsetModeFn)Find(gdiplus, "GdipSetPixelOffsetMode", &complete);
-        _makeAttributes = (GdipCreateImageAttributesFn)Find(gdiplus, "GdipCreateImageAttributes", &complete);
-        _wrapAttributes = (GdipSetImageAttributesWrapModeFn)Find(gdiplus, "GdipSetImageAttributesWrapMode", &complete);
-        _dropAttributes = (GdipDisposeImageAttributesFn)Find(gdiplus, "GdipDisposeImageAttributes", &complete);
-        _clear = (GdipGraphicsClearFn)Find(gdiplus, "GdipGraphicsClear", &complete);
-        _makePen = (GdipCreatePen1Fn)Find(gdiplus, "GdipCreatePen1", &complete);
-        _dropPen = (GdipDeletePenFn)Find(gdiplus, "GdipDeletePen", &complete);
-        _makeBrush = (GdipCreateSolidFillFn)Find(gdiplus, "GdipCreateSolidFill", &complete);
-        _dropBrush = (GdipDeleteBrushFn)Find(gdiplus, "GdipDeleteBrush", &complete);
-        _drawLine = (GdipDrawLineIFn)Find(gdiplus, "GdipDrawLineI", &complete);
-        _drawRectangle = (GdipRectangleIFn)Find(gdiplus, "GdipDrawRectangleI", &complete);
-        _fillRectangle = (GdipRectangleIFn)Find(gdiplus, "GdipFillRectangleI", &complete);
-        _drawEllipse = (GdipRectangleIFn)Find(gdiplus, "GdipDrawEllipseI", &complete);
-        _fillEllipse = (GdipRectangleIFn)Find(gdiplus, "GdipFillEllipseI", &complete);
-        _drawPolygon = (GdipDrawPolygonIFn)Find(gdiplus, "GdipDrawPolygonI", &complete);
-        _fillPolygon = (GdipFillPolygonIFn)Find(gdiplus, "GdipFillPolygonI", &complete);
-        _blit = (GdipDrawImageRectRectIFn)Find(gdiplus, "GdipDrawImageRectRectI", &complete);
-        _toStream = (GdipSaveImageToStreamFn)Find(gdiplus, "GdipSaveImageToStream", &complete);
-        _lock = (GdipBitmapLockBitsFn)Find(gdiplus, "GdipBitmapLockBits", &complete);
-        _unlock = (GdipBitmapUnlockBitsFn)Find(gdiplus, "GdipBitmapUnlockBits", &complete);
-        _makeStream = (CreateStreamOnHGlobalFn)Find(ole, "CreateStreamOnHGlobal", &complete);
-        _memoryOf = (GetHGlobalFromStreamFn)Find(ole, "GetHGlobalFromStream", &complete);
+        _startup = (GdiplusStartupFn)FindSymbol(gdiplus, "GdiplusStartup", &complete);
+        _fromStream = (GdipCreateBitmapFromStreamFn)FindSymbol(gdiplus, "GdipCreateBitmapFromStream", &complete);
+        _fromScan0 = (GdipCreateBitmapFromScan0Fn)FindSymbol(gdiplus, "GdipCreateBitmapFromScan0", &complete);
+        _dispose = (GdipDisposeImageFn)FindSymbol(gdiplus, "GdipDisposeImage", &complete);
+        _imageWidth = (GdipGetImageWidthFn)FindSymbol(gdiplus, "GdipGetImageWidth", &complete);
+        _imageHeight = (GdipGetImageHeightFn)FindSymbol(gdiplus, "GdipGetImageHeight", &complete);
+        _getPixel = (GdipBitmapGetPixelFn)FindSymbol(gdiplus, "GdipBitmapGetPixel", &complete);
+        _setPixel = (GdipBitmapSetPixelFn)FindSymbol(gdiplus, "GdipBitmapSetPixel", &complete);
+        _context = (GdipGetImageGraphicsContextFn)FindSymbol(gdiplus, "GdipGetImageGraphicsContext", &complete);
+        _deleteGraphics = (GdipDeleteGraphicsFn)FindSymbol(gdiplus, "GdipDeleteGraphics", &complete);
+        _smoothing = (GdipSetSmoothingModeFn)FindSymbol(gdiplus, "GdipSetSmoothingMode", &complete);
+        _pixelOffset = (GdipSetPixelOffsetModeFn)FindSymbol(gdiplus, "GdipSetPixelOffsetMode", &complete);
+        _makeAttributes = (GdipCreateImageAttributesFn)FindSymbol(gdiplus, "GdipCreateImageAttributes", &complete);
+        _wrapAttributes = (GdipSetImageAttributesWrapModeFn)FindSymbol(gdiplus, "GdipSetImageAttributesWrapMode", &complete);
+        _dropAttributes = (GdipDisposeImageAttributesFn)FindSymbol(gdiplus, "GdipDisposeImageAttributes", &complete);
+        _clear = (GdipGraphicsClearFn)FindSymbol(gdiplus, "GdipGraphicsClear", &complete);
+        _makePen = (GdipCreatePen1Fn)FindSymbol(gdiplus, "GdipCreatePen1", &complete);
+        _dropPen = (GdipDeletePenFn)FindSymbol(gdiplus, "GdipDeletePen", &complete);
+        _makeBrush = (GdipCreateSolidFillFn)FindSymbol(gdiplus, "GdipCreateSolidFill", &complete);
+        _dropBrush = (GdipDeleteBrushFn)FindSymbol(gdiplus, "GdipDeleteBrush", &complete);
+        _drawLine = (GdipDrawLineIFn)FindSymbol(gdiplus, "GdipDrawLineI", &complete);
+        _drawRectangle = (GdipRectangleIFn)FindSymbol(gdiplus, "GdipDrawRectangleI", &complete);
+        _fillRectangle = (GdipRectangleIFn)FindSymbol(gdiplus, "GdipFillRectangleI", &complete);
+        _drawEllipse = (GdipRectangleIFn)FindSymbol(gdiplus, "GdipDrawEllipseI", &complete);
+        _fillEllipse = (GdipRectangleIFn)FindSymbol(gdiplus, "GdipFillEllipseI", &complete);
+        _drawPolygon = (GdipDrawPolygonIFn)FindSymbol(gdiplus, "GdipDrawPolygonI", &complete);
+        _fillPolygon = (GdipFillPolygonIFn)FindSymbol(gdiplus, "GdipFillPolygonI", &complete);
+        _blit = (GdipDrawImageRectRectIFn)FindSymbol(gdiplus, "GdipDrawImageRectRectI", &complete);
+        _toStream = (GdipSaveImageToStreamFn)FindSymbol(gdiplus, "GdipSaveImageToStream", &complete);
+        _lock = (GdipBitmapLockBitsFn)FindSymbol(gdiplus, "GdipBitmapLockBits", &complete);
+        _unlock = (GdipBitmapUnlockBitsFn)FindSymbol(gdiplus, "GdipBitmapUnlockBits", &complete);
+        _makeStream = (CreateStreamOnHGlobalFn)FindSymbol(ole, "CreateStreamOnHGlobal", &complete);
+        _memoryOf = (GetHGlobalFromStreamFn)FindSymbol(ole, "GetHGlobalFromStream", &complete);
 
         if (!complete)
             return;
@@ -409,7 +409,7 @@ threadsafe sealed class Backend
     /// The flag is passed rather than returned because a missing symbol means
     /// the whole backend is unusable, and twenty-seven separate tests at the
     /// call site would say the same thing twenty-seven times.
-    void* Find(void* library, String name, bool* complete)
+    void* FindSymbol(void* library, String name, bool* complete)
     {
         void* symbol = GetProcAddress(library, name.ToPointer());
         if (symbol == null)
@@ -419,7 +419,7 @@ threadsafe sealed class Backend
 
     // ------------------------------------------------------------- lifetime
 
-    public void* Create(int width, int height)
+    public void* CreateImage(int width, int height)
     {
         void* bitmap = null;
         if (_fromScan0(width, height, 0, PixelFormat32bppArgb, null, &bitmap) != 0)
@@ -429,9 +429,9 @@ threadsafe sealed class Backend
         return bitmap;
     }
 
-    public void* Decode(byte[] data)
+    public void* DecodeImage(byte[] data)
     {
-        var stream = StreamOver(data);
+        var stream = CreateStreamOver(data);
         if (stream == null)
             return null;
 
@@ -445,18 +445,18 @@ threadsafe sealed class Backend
     }
 
     /// Whether GDI+ decodes the format at all, which it does for all four.
-    public bool Reads(ImageFormat format) => true;
+    public bool CanDecode(ImageFormat format) => true;
 
-    public void Destroy(void* image) => _dispose(image);
+    public void DestroyImage(void* image) => _dispose(image);
 
-    public int Width(void* image)
+    public int GetWidth(void* image)
     {
         uint value = 0u;
         _imageWidth(image, &value);
         return (int)value;
     }
 
-    public int Height(void* image)
+    public int GetHeight(void* image)
     {
         uint value = 0u;
         _imageHeight(image, &value);
@@ -546,7 +546,7 @@ threadsafe sealed class Backend
     /// outline wants exactly that, because a one-pixel pen on an integer
     /// coordinate then covers one pixel; a fill wants pixel `i` to be the square
     /// from `i` to `i + 1`, which is what libgd fills.
-    void* Context(void* image, bool areas)
+    void* CreateGraphics(void* image, bool areas)
     {
         void* graphics = null;
         if (_context(image, &graphics) != 0)
@@ -557,18 +557,18 @@ threadsafe sealed class Backend
         return graphics;
     }
 
-    public void Clear(void* image, uint colour)
+    public void ClearImage(void* image, uint colour)
     {
-        void* graphics = Context(image, true);
+        void* graphics = CreateGraphics(image, true);
         if (graphics == null)
             return;
         _clear(graphics, colour);
         _deleteGraphics(graphics);
     }
 
-    public void Line(void* image, int x1, int y1, int x2, int y2, uint colour, int thickness)
+    public void DrawLine(void* image, int x1, int y1, int x2, int y2, uint colour, int thickness)
     {
-        void* graphics = Context(image, false);
+        void* graphics = CreateGraphics(image, false);
         if (graphics == null)
             return;
 
@@ -583,10 +583,10 @@ threadsafe sealed class Backend
 
     /// A rectangle or an ellipse, outlined or filled, which is four calls that
     /// differ only in which GDI+ function they reach.
-    public void Shape(void* image, bool ellipse, int x, int y, int width, int height,
+    public void DrawShape(void* image, bool ellipse, int x, int y, int width, int height,
                       uint colour, int thickness, bool filled)
     {
-        void* graphics = Context(image, filled);
+        void* graphics = CreateGraphics(image, filled);
         if (graphics == null)
             return;
 
@@ -629,9 +629,9 @@ threadsafe sealed class Backend
         _deleteGraphics(graphics);
     }
 
-    public void Polygon(void* image, int[] points, uint colour, int thickness, bool filled)
+    public void DrawPolygon(void* image, int[] points, uint colour, int thickness, bool filled)
     {
-        void* graphics = Context(image, filled);
+        void* graphics = CreateGraphics(image, filled);
         if (graphics == null)
             return;
 
@@ -658,10 +658,10 @@ threadsafe sealed class Backend
         _deleteGraphics(graphics);
     }
 
-    public void Blit(void* destination, void* source,
+    public void BlitImage(void* destination, void* source,
                      int dx, int dy, int dw, int dh, int sx, int sy, int sw, int sh)
     {
-        void* graphics = Context(destination, true);
+        void* graphics = CreateGraphics(destination, true);
         if (graphics == null)
             return;
 
@@ -687,7 +687,7 @@ threadsafe sealed class Backend
     /// variable-sized array of `ImageCodecInfo` and a match on a MIME string.
     /// These four have been the same since GDI+ shipped and are documented as
     /// constants; the lookup buys nothing but a failure mode.
-    Guid EncoderFor(ImageFormat format)
+    Guid FindEncoder(ImageFormat format)
     {
         // The four differ only in the last byte of the first field, which is
         // why they are built rather than written out four times.
@@ -728,7 +728,7 @@ threadsafe sealed class Backend
     ///
     /// The `1` is `fDeleteOnRelease`: the memory goes when the stream does,
     /// which is what makes this one thing to keep track of rather than two.
-    IUnknown? EmptyStream()
+    IUnknown? CreateEmptyStream()
     {
         void* stream = null;
         if (_makeStream(null, 1, &stream) != 0)
@@ -737,7 +737,7 @@ threadsafe sealed class Backend
     }
 
     /// A stream over a copy of a buffer.
-    IUnknown? StreamOver(byte[] data)
+    IUnknown? CreateStreamOver(byte[] data)
     {
         nuint size = data.Length;
         void* block = GlobalAlloc(GlobalMoveable, size);
@@ -767,16 +767,16 @@ threadsafe sealed class Backend
     /// **Empty rather than null**, because an array is a value in this
     /// language and never null (SL0271). A zero-length encode is not a thing
     /// either backend produces, so the two cannot be confused.
-    public byte[] Encode(void* image, ImageFormat format, int quality)
+    public byte[] EncodeImage(void* image, ImageFormat format, int quality)
     {
         var nothing = new byte[0u];
 
-        var stream = EmptyStream();
+        var stream = CreateEmptyStream();
         if (stream == null)
             return nothing;
         void* raw = (void*)(IUnknown)stream;
 
-        var encoder = EncoderFor(format);
+        var encoder = FindEncoder(format);
         // No encoder parameters, so no quality for a JPEG: GDI+ writes one at
         // its own default of 75. Saying so is better than an `EncoderParameters`
         // this would have to lay out by hand for the one format that reads it,
@@ -891,44 +891,44 @@ threadsafe sealed class Backend
         // The versioned runtime library first, which is what a machine with the
         // package installed has; then the development symlink; then the older
         // soname, and the macOS spellings of both.
-        void* library = Open("libgd.so.3");
+        void* library = OpenLibrary("libgd.so.3");
         if (library == null)
-            library = Open("libgd.so");
+            library = OpenLibrary("libgd.so");
         if (library == null)
-            library = Open("libgd.so.2");
+            library = OpenLibrary("libgd.so.2");
         if (library == null)
-            library = Open("libgd.3.dylib");
+            library = OpenLibrary("libgd.3.dylib");
         if (library == null)
-            library = Open("libgd.dylib");
+            library = OpenLibrary("libgd.dylib");
         if (library == null)
             return;
 
         bool complete = true;
 
-        _createTrueColor = (GdImageCreateTrueColorFn)Find(library, "gdImageCreateTrueColor", &complete);
-        _destroy = (GdImageDestroyFn)Find(library, "gdImageDestroy", &complete);
-        _fromPng = (GdImageCreateFromPtrFn)Find(library, "gdImageCreateFromPngPtr", &complete);
-        _fromJpeg = (GdImageCreateFromPtrFn)Find(library, "gdImageCreateFromJpegPtr", &complete);
-        _fromGif = (GdImageCreateFromPtrFn)Find(library, "gdImageCreateFromGifPtr", &complete);
-        _toPng = (GdImageToPtrFn)Find(library, "gdImagePngPtr", &complete);
-        _toJpeg = (GdImageToPtrQualityFn)Find(library, "gdImageJpegPtr", &complete);
-        _toGif = (GdImageToPtrFn)Find(library, "gdImageGifPtr", &complete);
-        _release = (GdFreeFn)Find(library, "gdFree", &complete);
-        _getClip = (GdImageGetClipFn)Find(library, "gdImageGetClip", &complete);
-        _setPixel = (GdImageSetPixelFn)Find(library, "gdImageSetPixel", &complete);
-        _getPixel = (GdImageGetPixelFn)Find(library, "gdImageGetPixel", &complete);
-        _line = (GdImageLineFn)Find(library, "gdImageLine", &complete);
-        _rectangle = (GdImageRectFn)Find(library, "gdImageRectangle", &complete);
-        _fillRectangle = (GdImageRectFn)Find(library, "gdImageFilledRectangle", &complete);
-        _ellipse = (GdImageEllipseFn)Find(library, "gdImageEllipse", &complete);
-        _fillEllipse = (GdImageEllipseFn)Find(library, "gdImageFilledEllipse", &complete);
-        _polygon = (GdImagePolygonFn)Find(library, "gdImagePolygon", &complete);
-        _fillPolygon = (GdImagePolygonFn)Find(library, "gdImageFilledPolygon", &complete);
-        _thickness = (GdImageSetThicknessFn)Find(library, "gdImageSetThickness", &complete);
-        _blending = (GdImageFlagFn)Find(library, "gdImageAlphaBlending", &complete);
-        _saveAlpha = (GdImageFlagFn)Find(library, "gdImageSaveAlpha", &complete);
-        _resample = (GdImageCopyResampledFn)Find(library, "gdImageCopyResampled", &complete);
-        _copy = (GdImageCopyFn)Find(library, "gdImageCopy", &complete);
+        _createTrueColor = (GdImageCreateTrueColorFn)FindSymbol(library, "gdImageCreateTrueColor", &complete);
+        _destroy = (GdImageDestroyFn)FindSymbol(library, "gdImageDestroy", &complete);
+        _fromPng = (GdImageCreateFromPtrFn)FindSymbol(library, "gdImageCreateFromPngPtr", &complete);
+        _fromJpeg = (GdImageCreateFromPtrFn)FindSymbol(library, "gdImageCreateFromJpegPtr", &complete);
+        _fromGif = (GdImageCreateFromPtrFn)FindSymbol(library, "gdImageCreateFromGifPtr", &complete);
+        _toPng = (GdImageToPtrFn)FindSymbol(library, "gdImagePngPtr", &complete);
+        _toJpeg = (GdImageToPtrQualityFn)FindSymbol(library, "gdImageJpegPtr", &complete);
+        _toGif = (GdImageToPtrFn)FindSymbol(library, "gdImageGifPtr", &complete);
+        _release = (GdFreeFn)FindSymbol(library, "gdFree", &complete);
+        _getClip = (GdImageGetClipFn)FindSymbol(library, "gdImageGetClip", &complete);
+        _setPixel = (GdImageSetPixelFn)FindSymbol(library, "gdImageSetPixel", &complete);
+        _getPixel = (GdImageGetPixelFn)FindSymbol(library, "gdImageGetPixel", &complete);
+        _line = (GdImageLineFn)FindSymbol(library, "gdImageLine", &complete);
+        _rectangle = (GdImageRectFn)FindSymbol(library, "gdImageRectangle", &complete);
+        _fillRectangle = (GdImageRectFn)FindSymbol(library, "gdImageFilledRectangle", &complete);
+        _ellipse = (GdImageEllipseFn)FindSymbol(library, "gdImageEllipse", &complete);
+        _fillEllipse = (GdImageEllipseFn)FindSymbol(library, "gdImageFilledEllipse", &complete);
+        _polygon = (GdImagePolygonFn)FindSymbol(library, "gdImagePolygon", &complete);
+        _fillPolygon = (GdImagePolygonFn)FindSymbol(library, "gdImageFilledPolygon", &complete);
+        _thickness = (GdImageSetThicknessFn)FindSymbol(library, "gdImageSetThickness", &complete);
+        _blending = (GdImageFlagFn)FindSymbol(library, "gdImageAlphaBlending", &complete);
+        _saveAlpha = (GdImageFlagFn)FindSymbol(library, "gdImageSaveAlpha", &complete);
+        _resample = (GdImageCopyResampledFn)FindSymbol(library, "gdImageCopyResampled", &complete);
+        _copy = (GdImageCopyFn)FindSymbol(library, "gdImageCopy", &complete);
 
         // 2.1.0 and later. Without it every decoded image is copied onto a
         // true colour one instead, which costs a second image for the length
@@ -950,9 +950,9 @@ threadsafe sealed class Backend
         Ready = complete;
     }
 
-    void* Open(String name) => dlopen(name.ToPointer(), RtldLazyLocal);
+    void* OpenLibrary(String name) => dlopen(name.ToPointer(), RtldLazyLocal);
 
-    void* Find(void* library, String name, bool* complete)
+    void* FindSymbol(void* library, String name, bool* complete)
     {
         void* symbol = dlsym(library, name.ToPointer());
         if (symbol == null)
@@ -984,7 +984,7 @@ threadsafe sealed class Backend
 
     // ------------------------------------------------------------- lifetime
 
-    public void* Create(int width, int height)
+    public void* CreateImage(int width, int height)
     {
         void* image = _createTrueColor(width, height);
         if (image == null)
@@ -1000,14 +1000,14 @@ threadsafe sealed class Backend
         return image;
     }
 
-    public void* Decode(byte[] data)
+    public void* DecodeImage(byte[] data)
     {
         int size = (int)data.Length;
         void* raw = (void*)&data[0u];
         void* image = null;
 
         ImageFormat format = ImageFormat.Png;
-        if (!Sniff(data, &format))
+        if (!SniffFormat(data, &format))
             return null;
 
         if (format == ImageFormat.Png)
@@ -1021,11 +1021,11 @@ threadsafe sealed class Backend
 
         if (image == null)
             return null;
-        return AsTrueColor(image);
+        return ConvertToTrueColor(image);
     }
 
     /// Whether this libgd decodes the format at all.
-    public bool Reads(ImageFormat format) => format != ImageFormat.Bmp || _fromBmp != null;
+    public bool CanDecode(ImageFormat format) => format != ImageFormat.Bmp || _fromBmp != null;
 
     /// A decoded image as true colour, which is what everything else here
     /// assumes.
@@ -1034,7 +1034,7 @@ threadsafe sealed class Backend
     /// pixels are indices: `gdImageGetPixel` answers the index, and a drawing
     /// call stores the low byte of a colour as one. The image is taken, and
     /// the one answered may be another.
-    void* AsTrueColor(void* image)
+    void* ConvertToTrueColor(void* image)
     {
         if (_toTrueColor != null)
         {
@@ -1050,10 +1050,10 @@ threadsafe sealed class Backend
 
         // `gdImageCopy` converts a palette entry, and its alpha, to the colour
         // it stands for. It skips the transparent index, which leaves the
-        // transparent pixel `Create` put there.
-        int width = Width(image);
-        int height = Height(image);
-        void* copy = Create(width, height);
+        // transparent pixel `CreateImage` put there.
+        int width = GetWidth(image);
+        int height = GetHeight(image);
+        void* copy = CreateImage(width, height);
         if (copy != null)
         {
             _blending(copy, 0);
@@ -1064,21 +1064,21 @@ threadsafe sealed class Backend
         return copy;
     }
 
-    public void Destroy(void* image) => _destroy(image);
+    public void DestroyImage(void* image) => _destroy(image);
 
     /// **The size comes from the clipping rectangle and not from `gdImageSX`.**
     /// SX and SY are macros over the structure's fields, so using them would
     /// mean declaring `gdImageStruct` and depending on its layout. A fresh
     /// image's clip is the whole image, which is the same two numbers through a
     /// real function.
-    public int Width(void* image)
+    public int GetWidth(void* image)
     {
         int left = 0; int top = 0; int right = 0; int bottom = 0;
         _getClip(image, &left, &top, &right, &bottom);
         return right - left + 1;
     }
 
-    public int Height(void* image)
+    public int GetHeight(void* image)
     {
         int left = 0; int top = 0; int right = 0; int bottom = 0;
         _getClip(image, &left, &top, &right, &bottom);
@@ -1148,14 +1148,14 @@ threadsafe sealed class Backend
 
     // -------------------------------------------------------------- drawing
 
-    public void Clear(void* image, uint colour)
+    public void ClearImage(void* image, uint colour)
     {
         _blending(image, 0);
-        _fillRectangle(image, 0, 0, Width(image) - 1, Height(image) - 1, ToGd(colour));
+        _fillRectangle(image, 0, 0, GetWidth(image) - 1, GetHeight(image) - 1, ToGd(colour));
         _blending(image, 1);
     }
 
-    public void Line(void* image, int x1, int y1, int x2, int y2, uint colour, int width)
+    public void DrawLine(void* image, int x1, int y1, int x2, int y2, uint colour, int width)
     {
         _thickness(image, width < 1 ? 1 : width);
         _line(image, x1, y1, x2, y2, ToGd(colour));
@@ -1167,7 +1167,7 @@ threadsafe sealed class Backend
     /// given, which is one pixel more than the size, so it is given one less:
     /// an odd width then fills its rectangle, and an even one, which has no
     /// middle pixel to centre on, stops a pixel short of one side.
-    public void Shape(void* image, bool isEllipse, int x, int y, int width, int height,
+    public void DrawShape(void* image, bool isEllipse, int x, int y, int width, int height,
                       uint colour, int stroke, bool filled)
     {
         int ink = ToGd(colour);
@@ -1197,7 +1197,7 @@ threadsafe sealed class Backend
         _thickness(image, 1);
     }
 
-    public void Polygon(void* image, int[] points, uint colour, int stroke, bool filled)
+    public void DrawPolygon(void* image, int[] points, uint colour, int stroke, bool filled)
     {
         int count = (int)(points.Length / 2u);
         int ink = ToGd(colour);
@@ -1213,7 +1213,7 @@ threadsafe sealed class Backend
         _thickness(image, 1);
     }
 
-    public void Blit(void* destination, void* source,
+    public void BlitImage(void* destination, void* source,
                      int dx, int dy, int dw, int dh, int sx, int sy, int sw, int sh)
     {
         // Resampled even when the sizes match, so that the alpha composes the
@@ -1225,8 +1225,8 @@ threadsafe sealed class Backend
     // -------------------------------------------------------------- codecs
 
     /// The encoded bytes, or an empty array for a failure. See the note on
-    /// the Windows backend's `Encode` for why empty rather than null.
-    public byte[] Encode(void* image, ImageFormat format, int quality)
+    /// the Windows backend's `EncodeImage` for why empty rather than null.
+    public byte[] EncodeImage(void* image, ImageFormat format, int quality)
     {
         int size = 0;
         void* raw = null;
@@ -1265,7 +1265,7 @@ threadsafe sealed class Backend
 ///
 /// An out pointer rather than an `ImageFormat?`, because an enum is a value and
 /// only a class reference may be optional (SL0271).
-bool Sniff(byte[] data, ImageFormat* found)
+bool SniffFormat(byte[] data, ImageFormat* found)
 {
     nuint size = data.Length;
 
@@ -1360,7 +1360,7 @@ public static class Imaging
 
     /// The one accessor `Image` uses. Not public: a `Backend` is this
     /// module's own vocabulary and nothing outside could do anything with one.
-    static Backend? Use() => Current;
+    static Backend? CurrentBackend => Current;
 }
 
 // ==================================================================== image
@@ -1389,9 +1389,9 @@ public sealed class Image
     {
         if (_handle == null)
             return;
-        var backend = Imaging.Use();
+        var backend = Imaging.CurrentBackend;
         if (backend != null)
-            ((Backend)backend).Destroy(_handle);
+            ((Backend)backend).DestroyImage(_handle);
         _handle = null;
     }
 
@@ -1403,11 +1403,11 @@ public sealed class Image
         if (width <= 0 || height <= 0)
             return Fail(ImageError.Invalid);
 
-        var backend = Imaging.Use();
+        var backend = Imaging.CurrentBackend;
         if (backend == null)
             return Fail(ImageError.NoBackend);
 
-        void* made = ((Backend)backend).Create(width, height);
+        void* made = ((Backend)backend).CreateImage(width, height);
         if (made == null)
             return Fail(ImageError.OutOfMemory);
         return Ok(new Image(made, width, height));
@@ -1419,20 +1419,20 @@ public sealed class Image
         if (data.Length == 0u)
             return Fail(ImageError.Invalid);
 
-        var backend = Imaging.Use();
+        var backend = Imaging.CurrentBackend;
         if (backend == null)
             return Fail(ImageError.NoBackend);
 
         ImageFormat format = ImageFormat.Png;
-        if (!Sniff(data, &format) || !((Backend)backend).Reads(format))
+        if (!SniffFormat(data, &format) || !((Backend)backend).CanDecode(format))
             return Fail(ImageError.Unsupported);
 
-        void* made = ((Backend)backend).Decode(data);
+        void* made = ((Backend)backend).DecodeImage(data);
         if (made == null)
             return Fail(ImageError.Unreadable);
 
         var found = (Backend)backend;
-        return Ok(new Image(made, found.Width(made), found.Height(made)));
+        return Ok(new Image(made, found.GetWidth(made), found.GetHeight(made)));
     }
 
     /// A picture read from a file.
@@ -1468,7 +1468,7 @@ public sealed class Image
             return made;
 
         var picture = made.Value;
-        var backend = (Backend)Imaging.Use();
+        var backend = (Backend)Imaging.CurrentBackend;
         if (!backend.WritePixels(picture._handle, width, height, &pixels[0u]))
             return Fail(ImageError.OutOfMemory);
         return Ok(picture);
@@ -1492,9 +1492,9 @@ public sealed class Image
     /// otherwise be made of.
     public Rgba GetPixel(int x, int y)
     {
-        if (!Inside(x, y))
+        if (!ContainsPoint(x, y))
             return Rgba.Transparent;
-        var backend = Imaging.Use();
+        var backend = Imaging.CurrentBackend;
         if (backend == null)
             return Rgba.Transparent;
         return Rgba.FromPacked(((Backend)backend).GetPixel(_handle, x, y));
@@ -1503,9 +1503,9 @@ public sealed class Image
     /// Writes one pixel, replacing whatever was there rather than blending.
     public void SetPixel(int x, int y, Rgba colour)
     {
-        if (!Inside(x, y))
+        if (!ContainsPoint(x, y))
             return;
-        var backend = Imaging.Use();
+        var backend = Imaging.CurrentBackend;
         if (backend != null)
             ((Backend)backend).SetPixel(_handle, x, y, colour.Packed);
     }
@@ -1538,7 +1538,7 @@ public sealed class Image
         if (_handle == null || into.Length < PixelByteLength)
             return false;
 
-        var backend = Imaging.Use();
+        var backend = Imaging.CurrentBackend;
         if (backend == null)
             return false;
 
@@ -1559,7 +1559,7 @@ public sealed class Image
         return pixels;
     }
 
-    bool Inside(int x, int y)
+    bool ContainsPoint(int x, int y)
     {
         return _handle != null && x >= 0 && y >= 0 && x < _wide && y < _high;
     }
@@ -1574,28 +1574,28 @@ public sealed class Image
     /// Fills the whole picture with one colour.
     public void Clear(Rgba colour)
     {
-        var backend = Imaging.Use();
+        var backend = Imaging.CurrentBackend;
         if (backend != null && _handle != null)
-            ((Backend)backend).Clear(_handle, colour.Packed);
+            ((Backend)backend).ClearImage(_handle, colour.Packed);
     }
 
     public void DrawLine(Rgba colour, int x1, int y1, int x2, int y2, int thickness = 1)
     {
-        var backend = Imaging.Use();
+        var backend = Imaging.CurrentBackend;
         if (backend == null || _handle == null)
             return;
-        ((Backend)backend).Line(_handle, x1, y1, x2, y2, colour.Packed, thickness);
+        ((Backend)backend).DrawLine(_handle, x1, y1, x2, y2, colour.Packed, thickness);
     }
 
     public void DrawRectangle(Rgba colour, int x, int y, int width, int height,
                               int thickness = 1)
     {
-        Shape(false, colour, x, y, width, height, thickness, false);
+        RenderShape(false, colour, x, y, width, height, thickness, false);
     }
 
     public void FillRectangle(Rgba colour, int x, int y, int width, int height)
     {
-        Shape(false, colour, x, y, width, height, 1, true);
+        RenderShape(false, colour, x, y, width, height, 1, true);
     }
 
     /// An ellipse inside the rectangle given, which is how every other API here
@@ -1604,23 +1604,23 @@ public sealed class Image
     public void DrawEllipse(Rgba colour, int x, int y, int width, int height,
                             int thickness = 1)
     {
-        Shape(true, colour, x, y, width, height, thickness, false);
+        RenderShape(true, colour, x, y, width, height, thickness, false);
     }
 
     public void FillEllipse(Rgba colour, int x, int y, int width, int height)
     {
-        Shape(true, colour, x, y, width, height, 1, true);
+        RenderShape(true, colour, x, y, width, height, 1, true);
     }
 
-    void Shape(bool ellipse, Rgba colour, int x, int y, int width, int height,
+    void RenderShape(bool ellipse, Rgba colour, int x, int y, int width, int height,
                int thickness, bool filled)
     {
         if (width <= 0 || height <= 0 || _handle == null)
             return;
-        var backend = Imaging.Use();
+        var backend = Imaging.CurrentBackend;
         if (backend == null)
             return;
-        ((Backend)backend).Shape(_handle, ellipse, x, y, width, height,
+        ((Backend)backend).DrawShape(_handle, ellipse, x, y, width, height,
                                  colour.Packed, thickness, filled);
     }
 
@@ -1634,34 +1634,34 @@ public sealed class Image
     /// geometry at all.
     public void DrawPolygon(Rgba colour, int[] points, int thickness = 1)
     {
-        Polygon(colour, points, thickness, false);
+        RenderPolygon(colour, points, thickness, false);
     }
 
     public void FillPolygon(Rgba colour, int[] points)
     {
-        Polygon(colour, points, 1, true);
+        RenderPolygon(colour, points, 1, true);
     }
 
-    void Polygon(Rgba colour, int[] points, int thickness, bool filled)
+    void RenderPolygon(Rgba colour, int[] points, int thickness, bool filled)
     {
         if (points.Length < 6u || points.Length % 2u != 0u || _handle == null)
             return;
-        var backend = Imaging.Use();
+        var backend = Imaging.CurrentBackend;
         if (backend == null)
             return;
-        ((Backend)backend).Polygon(_handle, points, colour.Packed, thickness, filled);
+        ((Backend)backend).DrawPolygon(_handle, points, colour.Packed, thickness, filled);
     }
 
     /// Draws another picture on this one, at its own size.
-    public void Draw(Image source, int x, int y)
+    public void DrawImage(Image source, int x, int y)
     {
-        DrawScaled(source, x, y, source.Width, source.Height,
+        DrawImageScaled(source, x, y, source.Width, source.Height,
                    0, 0, source.Width, source.Height);
     }
 
     /// Draws part of another picture into a rectangle of this one, scaling to
     /// fit. What a thumbnail and a sprite sheet are both made of.
-    public void DrawScaled(Image source, int x, int y, int width, int height,
+    public void DrawImageScaled(Image source, int x, int y, int width, int height,
                            int sourceX, int sourceY, int sourceWidth, int sourceHeight)
     {
         if (_handle == null || source._handle == null)
@@ -1669,10 +1669,10 @@ public sealed class Image
         if (width <= 0 || height <= 0 || sourceWidth <= 0 || sourceHeight <= 0)
             return;
 
-        var backend = Imaging.Use();
+        var backend = Imaging.CurrentBackend;
         if (backend == null)
             return;
-        ((Backend)backend).Blit(_handle, source._handle, x, y, width, height,
+        ((Backend)backend).BlitImage(_handle, source._handle, x, y, width, height,
                                 sourceX, sourceY, sourceWidth, sourceHeight);
     }
 
@@ -1683,7 +1683,7 @@ public sealed class Image
         if (!made.Ok)
             return made;
 
-        made.Value.DrawScaled(this, 0, 0, width, height, 0, 0, _wide, _high);
+        made.Value.DrawImageScaled(this, 0, 0, width, height, 0, 0, _wide, _high);
         return made;
     }
 
@@ -1700,11 +1700,11 @@ public sealed class Image
         if (_handle == null)
             return Fail(ImageError.Invalid);
 
-        var backend = Imaging.Use();
+        var backend = Imaging.CurrentBackend;
         if (backend == null)
             return Fail(ImageError.NoBackend);
 
-        var data = ((Backend)backend).Encode(_handle, format, quality);
+        var data = ((Backend)backend).EncodeImage(_handle, format, quality);
         if (data.Length == 0u)
             return Fail(ImageError.Unsupported);
         return Ok(data);

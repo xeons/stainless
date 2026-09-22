@@ -71,9 +71,9 @@ void Digests()
           "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1");
 
     var incremental = new Sha256();
-    incremental.Append(Bytes("abcdbcdecdefdefgefghfghi"));
-    incremental.Append(Bytes("ghijhijkijkl"));
-    incremental.Append(Bytes("jklmklmnlmnomnopnopq"));
+    incremental.AppendData(Bytes("abcdbcdecdefdefgefghfghi"));
+    incremental.AppendData(Bytes("ghijhijkijkl"));
+    incremental.AppendData(Bytes("jklmklmnlmnomnopnopq"));
     Check("sha256-incremental", Convert.ToHex(incremental.GetHashAndReset()),
           "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1");
 

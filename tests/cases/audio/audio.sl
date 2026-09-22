@@ -41,53 +41,53 @@ void Formats()
     Check("voice-frame", Number((long)voice.BytesPerFrame), "2");
     Check("voice-second", Number((long)voice.BytesPerSecond), "32000");
 
-    var eight = AudioFormat.Of(8000u, (ushort)1, (ushort)8);
+    var eight = AudioFormat.Create(8000u, (ushort)1, (ushort)8);
     Check("telephone-frame", Number((long)eight.BytesPerFrame), "1");
 
     // Five channels and twenty-four bits are both real formats and neither is
     // one this module handles; saying so is what `IsSupported` is for.
-    var wide = AudioFormat.Of(48000u, (ushort)6, (ushort)24);
+    var wide = AudioFormat.Create(48000u, (ushort)6, (ushort)24);
     Check("surround-supported", wide.IsSupported ? "yes" : "no", "no");
-    Check("equal", cd.Equals(AudioFormat.Of(44100u, (ushort)2, (ushort)16)) ? "yes" : "no", "yes");
+    Check("equal", cd.Equals(AudioFormat.Create(44100u, (ushort)2, (ushort)16)) ? "yes" : "no", "yes");
 }
 
 void Clips()
 {
-    var format = AudioFormat.Of(8000u, (ushort)2, (ushort)16);
-    var clip = AudioClip.Silence(format, 100u);
+    var format = AudioFormat.Create(8000u, (ushort)2, (ushort)16);
+    var clip = AudioClip.CreateSilence(format, 100u);
 
     Check("silence-frames", Number((long)clip.FrameCount), "100");
     Check("silence-bytes", Number((long)clip.Samples.Length), "400");
-    Check("silence-sample", Number((long)clip.SampleAt(0u, 0u)), "0");
+    Check("silence-sample", Number((long)clip.GetSample(0u, 0u)), "0");
 
     // Sixteen-bit samples are signed and little-endian, and the accessors are
     // what a caller uses rather than reaching for the bytes.
     clip.SetSample(3u, 0u, 1000);
     clip.SetSample(3u, 1u, -1000);
-    Check("set-left", Number((long)clip.SampleAt(3u, 0u)), "1000");
-    Check("set-right", Number((long)clip.SampleAt(3u, 1u)), "-1000");
+    Check("set-left", Number((long)clip.GetSample(3u, 0u)), "1000");
+    Check("set-right", Number((long)clip.GetSample(3u, 1u)), "-1000");
     Check("set-bytes", Convert.ToHex(clip.Samples).Substring(24u, 8u), "e80318fc");
 
     // Clamped rather than wrapped: a sample that wrapped would be a loud click
     // at the opposite polarity, which is the worst possible failure.
     clip.SetSample(4u, 0u, 40000);
     clip.SetSample(4u, 1u, -40000);
-    Check("clamp-high", Number((long)clip.SampleAt(4u, 0u)), "32767");
-    Check("clamp-low", Number((long)clip.SampleAt(4u, 1u)), "-32768");
+    Check("clamp-high", Number((long)clip.GetSample(4u, 0u)), "32767");
+    Check("clamp-low", Number((long)clip.GetSample(4u, 1u)), "-32768");
 
     // Out of range is answered rather than aborted, because walking off the
     // end of a waveform is what a loop over one does at the end.
-    Check("past-end", Number((long)clip.SampleAt(500u, 0u)), "0");
-    Check("no-channel", Number((long)clip.SampleAt(0u, 7u)), "0");
+    Check("past-end", Number((long)clip.GetSample(500u, 0u)), "0");
+    Check("no-channel", Number((long)clip.GetSample(0u, 7u)), "0");
 
     // Eight-bit samples are unsigned and centred on 128, and the accessors
     // hide that: the same numbers go in and come back, to within the width.
-    var narrow = AudioClip.Silence(AudioFormat.Of(8000u, (ushort)1, (ushort)8), 4u);
+    var narrow = AudioClip.CreateSilence(AudioFormat.Create(8000u, (ushort)1, (ushort)8), 4u);
     Check("eight-silence", Number((long)narrow.Samples[0u]), "128");
-    Check("eight-zero", Number((long)narrow.SampleAt(0u, 0u)), "0");
+    Check("eight-zero", Number((long)narrow.GetSample(0u, 0u)), "0");
     narrow.SetSample(1u, 0u, 25600);
     Check("eight-set", Number((long)narrow.Samples[1u]), "228");
-    Check("eight-read", Number((long)narrow.SampleAt(1u, 0u)), "25600");
+    Check("eight-read", Number((long)narrow.GetSample(1u, 0u)), "25600");
 
     // Narrowing floors, so a small negative sample lands below the centre and
     // a small positive one on it.
@@ -100,38 +100,38 @@ void Clips()
     byte[] wide = new byte[3u];
     wide[1u] = 0x34;
     wide[2u] = 0x12;
-    var deep = new AudioClip(AudioFormat.Of(8000u, (ushort)1, (ushort)24), wide);
-    Check("deep-read", Number((long)deep.SampleAt(0u, 0u)), "4660");
+    var deep = new AudioClip(AudioFormat.Create(8000u, (ushort)1, (ushort)24), wide);
+    Check("deep-read", Number((long)deep.GetSample(0u, 0u)), "4660");
     deep.SetSample(0u, 0u, -2);
     Check("deep-set", Convert.ToHex(deep.Samples), "00feff");
-    Check("deep-back", Number((long)deep.SampleAt(0u, 0u)), "-2");
+    Check("deep-back", Number((long)deep.GetSample(0u, 0u)), "-2");
 }
 
 void Tones()
 {
-    var format = AudioFormat.Of(8000u, (ushort)1, (ushort)16);
+    var format = AudioFormat.Create(8000u, (ushort)1, (ushort)16);
 
-    var sine = Tone.Sine(format, 1000.0, 0.25, 1.0);
+    var sine = Tone.CreateSine(format, 1000.0, 0.25, 1.0);
     Check("sine-frames", Number((long)sine.FrameCount), "2000");
-    Check("sine-start", Number((long)sine.SampleAt(0u, 0u)), "0");
+    Check("sine-start", Number((long)sine.GetSample(0u, 0u)), "0");
 
     // 1 kHz at 8 kHz is eight samples a cycle, so the quarter-cycle peak lands
     // exactly on frame two -- which is what makes this checkable at all.
-    Check("sine-peak", Number((long)sine.SampleAt(2u, 0u)), "32767");
+    Check("sine-peak", Number((long)sine.GetSample(2u, 0u)), "32767");
 
-    var square = Tone.Square(format, 1000.0, 0.25, 0.5);
-    Check("square-high", Number((long)square.SampleAt(0u, 0u)), "16383");
-    Check("square-low", Number((long)square.SampleAt(5u, 0u)), "-16383");
+    var square = Tone.CreateSquare(format, 1000.0, 0.25, 0.5);
+    Check("square-high", Number((long)square.GetSample(0u, 0u)), "16383");
+    Check("square-low", Number((long)square.GetSample(5u, 0u)), "-16383");
 
-    var rest = Tone.Rest(format, 0.125);
+    var rest = Tone.CreateRest(format, 0.125);
     Check("rest-frames", Number((long)rest.FrameCount), "1000");
-    Check("rest-sample", Number((long)rest.SampleAt(500u, 0u)), "0");
+    Check("rest-sample", Number((long)rest.GetSample(500u, 0u)), "0");
 }
 
 void Container()
 {
-    var format = AudioFormat.Of(22050u, (ushort)2, (ushort)16);
-    var original = Tone.Sine(format, 440.0, 0.05, 0.5);
+    var format = AudioFormat.Create(22050u, (ushort)2, (ushort)16);
+    var original = Tone.CreateSine(format, 440.0, 0.05, 0.5);
 
     byte[] file = Wav.Encode(original);
     Check("wav-size", Number((long)file.Length),
@@ -178,7 +178,7 @@ void Container()
 
     // An odd-length data chunk is followed by a pad byte, and the RIFF size
     // counts it.
-    var odd = AudioClip.Silence(AudioFormat.Of(8000u, (ushort)1, (ushort)8), 3u);
+    var odd = AudioClip.CreateSilence(AudioFormat.Create(8000u, (ushort)1, (ushort)8), 3u);
     byte[] padded = Wav.Encode(odd);
     Check("wav-odd-size", Number((long)padded.Length), "48");
     Check("wav-odd-riff", Convert.ToHex(padded).Substring(8u, 8u), "28000000");
@@ -188,7 +188,7 @@ void Container()
     Check("wav-odd-frames", oddBack.Ok ? Number((long)oddBack.Value.FrameCount) : "refused", "3");
 
     // A file cut off inside a frame keeps the whole frames before the cut.
-    var mono = AudioClip.Silence(AudioFormat.Of(8000u, (ushort)1, (ushort)16), 4u);
+    var mono = AudioClip.CreateSilence(AudioFormat.Create(8000u, (ushort)1, (ushort)16), 4u);
     byte[] whole = Wav.Encode(mono);
     byte[] cut = new byte[whole.Length - 1u];
     for (nuint i = 0u; i < cut.Length; i++)

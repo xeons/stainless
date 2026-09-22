@@ -11,7 +11,7 @@ import Standard.Net;
 
 void Report(String label, nuint count, SocketError error)
 {
-    Console.WriteLine($"{label} {count} {Net.Describe(error)}");
+    Console.WriteLine($"{label} {count} {Net.DescribeSocketError(error)}");
 }
 
 // Leaves a stack frame full of text where the next call's locals will sit.
@@ -34,7 +34,7 @@ void CheckDatagrams()
 
     var socket = bound.Value;
     ushort port = socket.LocalEndPoint.Port;
-    var from = EndPoint.At("", 0u);
+    var from = EndPoint.Create("", 0u);
 
     socket.Send(new byte[0], "127.0.0.1", port);
     Report("sent empty", 0u, socket.Error);
@@ -48,7 +48,7 @@ void CheckDatagrams()
         oversized[i] = (byte)(65u + i);
     socket.Send(oversized, "127.0.0.1", port);
     var small = new byte[4];
-    from = EndPoint.At("", 0u);
+    from = EndPoint.Create("", 0u);
     got = socket.Receive(small, ref from);
     Report("truncated", got, socket.Error);
     Console.WriteLine($"  first {(char32)small[0]} last {(char32)small[3]} from {from.Host}");
@@ -59,7 +59,7 @@ void CheckDatagrams()
 
     socket.SetReceiveTimeout(50);
     DirtyTheStack();
-    from = EndPoint.At("stale", 7u);
+    from = EndPoint.Create("stale", 7u);
     got = socket.Receive(new byte[16], ref from);
     Report("timed out", got, socket.Error);
     Console.WriteLine($"  from '{from.Host}' {from.Port}");
@@ -122,7 +122,7 @@ void CheckFailedConnect()
     Console.WriteLine($"connect started {started == SocketError.WouldBlock || started == SocketError.Refused}");
 
     bool writable = connecting.WaitToWrite(10000);
-    Console.WriteLine($"writable {writable} {Net.Describe(connecting.Error)}");
+    Console.WriteLine($"writable {writable} {Net.DescribeSocketError(connecting.Error)}");
 }
 
 public int Main()

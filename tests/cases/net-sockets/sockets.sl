@@ -34,7 +34,7 @@ void SayBool(String label, bool value)
 int Main()
 {
     // ---------------------------------------------------------------- names
-    var local = Net.Resolve("localhost");
+    var local = Net.ResolveHost("localhost");
     switch (local)
     {
         case Ok:   SayBool("resolve-localhost", true); break;
@@ -43,14 +43,14 @@ int Main()
 
     // A literal address resolves to itself, which is the property that lets
     // one code path take both a name and an address.
-    var literal = Net.Resolve("127.0.0.1");
+    var literal = Net.ResolveHost("127.0.0.1");
     switch (literal)
     {
         case Ok ok:  Say("resolve-literal", ok.Value); break;
         case Fail:   Say("resolve-literal", "failed"); break;
     }
 
-    var nowhere = Net.Resolve("this.name.does.not.exist.invalid");
+    var nowhere = Net.ResolveHost("this.name.does.not.exist.invalid");
     SayBool("resolve-nowhere", nowhere.Ok);
 
     // ------------------------------------------------------------------ TCP
@@ -104,7 +104,7 @@ int Main()
 
     // An IPv6 address goes in brackets, because a bare one already contains
     // colons and the port would be indistinguishable from another group.
-    Say("formatted-v6", EndPoint.At("::1", 80u).Format());
+    Say("formatted-v6", EndPoint.Create("::1", 80u).Format());
 
     var seen = accepted.RemoteEndPoint;
     SayBool("mirror", seen.Port == here.Port);
@@ -159,7 +159,7 @@ int Main()
     var inbox = listener.LocalEndPoint;
     SayBool("udp-port", inbox.Port != 0u);
 
-    var made = UdpSocket.Datagram();
+    var made = UdpSocket.Create();
     if (!made.Ok)
         return 1;
 
@@ -167,7 +167,7 @@ int Main()
     nuint sent = sender.SendText("a datagram", "127.0.0.1", inbox.Port);
     SayNumber("udp-sent", (long)sent);
 
-    var from = EndPoint.At("", 0u);
+    var from = EndPoint.Create("", 0u);
     var packet = new byte[64];
     nuint received = listener.Receive(packet, ref from);
     SayNumber("udp-received", (long)received);

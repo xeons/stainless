@@ -754,7 +754,7 @@ thing out loud.
 ### 11.2 What was not added, and why
 
 **`Volatile.Read` / `Volatile.Write`.** Every atomic here is sequentially
-consistent, so `Volatile.Read` would be `AtomicLong.Load` under a second name
+consistent, so `Volatile.Read` would be `AtomicLong.Read` under a second name
 that suggests a weaker guarantee than it gives. Two spellings for one operation
 is worse than one.
 

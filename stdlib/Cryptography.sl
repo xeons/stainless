@@ -22,7 +22,7 @@
 /// Hashes, message authentication codes, key derivation and block ciphers.
 ///
 /// ```csharp
-/// var digest = Sha256.HashData(Encoding.Utf8().GetBytes("hello"));
+/// var digest = Sha256.HashData(Encoding.CreateUtf8().GetBytes("hello"));
 /// Console.WriteLine(Convert.ToHex(digest));
 ///
 /// var cipher = try Aes.FromKey(key);
@@ -124,29 +124,29 @@ public enum CryptoError
 
 /// Four bytes of `block` as a big-endian word, which is how every SHA
 /// reads its input.
-uint BigWord(byte[] block, nuint at)
+uint ReadBigWord(byte[] block, nuint at)
 {
     return ((uint)block[at] << 24) | ((uint)block[at + 1u] << 16) |
            ((uint)block[at + 2u] << 8) | (uint)block[at + 3u];
 }
 
 /// Four bytes as a little-endian word, which is how MD5 reads its input.
-uint LittleWord(byte[] block, nuint at)
+uint ReadLittleWord(byte[] block, nuint at)
 {
     return ((uint)block[at + 3u] << 24) | ((uint)block[at + 2u] << 16) |
            ((uint)block[at + 1u] << 8) | (uint)block[at];
 }
 
 /// Eight bytes as a big-endian doubleword, for SHA-384 and SHA-512.
-ulong BigDoubleWord(byte[] block, nuint at)
+ulong ReadBigDoubleWord(byte[] block, nuint at)
 {
-    ulong high = (ulong)BigWord(block, at);
-    ulong low = (ulong)BigWord(block, at + 4u);
+    ulong high = (ulong)ReadBigWord(block, at);
+    ulong low = (ulong)ReadBigWord(block, at + 4u);
     return (high << 32) | low;
 }
 
 /// A word into four big-endian bytes of `into`.
-void PutBigWord(byte[] into, nuint at, uint value)
+void WriteBigWord(byte[] into, nuint at, uint value)
 {
     into[at] = (byte)((value >> 24) & 0xFFu);
     into[at + 1u] = (byte)((value >> 16) & 0xFFu);
@@ -155,7 +155,7 @@ void PutBigWord(byte[] into, nuint at, uint value)
 }
 
 /// A word into four little-endian bytes of `into`.
-void PutLittleWord(byte[] into, nuint at, uint value)
+void WriteLittleWord(byte[] into, nuint at, uint value)
 {
     into[at] = (byte)(value & 0xFFu);
     into[at + 1u] = (byte)((value >> 8) & 0xFFu);
@@ -164,10 +164,10 @@ void PutLittleWord(byte[] into, nuint at, uint value)
 }
 
 /// A doubleword into eight big-endian bytes of `into`.
-void PutBigDoubleWord(byte[] into, nuint at, ulong value)
+void WriteBigDoubleWord(byte[] into, nuint at, ulong value)
 {
-    PutBigWord(into, at, (uint)((value >> 32) & 0xFFFFFFFFu));
-    PutBigWord(into, at + 4u, (uint)(value & 0xFFFFFFFFu));
+    WriteBigWord(into, at, (uint)((value >> 32) & 0xFFFFFFFFu));
+    WriteBigWord(into, at + 4u, (uint)(value & 0xFFFFFFFFu));
 }
 
 // ================================================================== hashing
@@ -196,7 +196,7 @@ public interface IHashAlgorithm
     nuint BlockSizeInBytes { get; }
 
     /// Adds bytes to what is being hashed.
-    void Append(byte[:] data);
+    void AppendData(byte[:] data);
 
     /// The digest of everything appended since the last reset, and a reset.
     /// Calling it twice in a row gives the digest of the empty input the
@@ -214,12 +214,12 @@ public interface IHashAlgorithm
 /// message is written big-endian -- and agree about everything else: fill a
 /// block, compress it, and finish by appending a one bit, zeros, and the
 /// length in bits. That is what is here, so a new algorithm of this family is
-/// `Compress`, `Digest` and `StartOver` and nothing else.
+/// `CompressBlock`, `ComputeDigest` and `InitializeState` and nothing else.
 public abstract class HashAlgorithm : IHashAlgorithm
 {
     /// The block being filled. `BlockSizeInBytes` long, and never full on
-    /// return from `Append` -- a block that fills is compressed at once, which
-    /// is what lets `Finish` assume there is room for the one bit.
+    /// return from `AppendData` -- a block that fills is compressed at once, which
+    /// is what lets `FinishHash` assume there is room for the one bit.
     protected byte[] _block;
 
     /// How much of `_block` is filled.
@@ -250,7 +250,7 @@ public abstract class HashAlgorithm : IHashAlgorithm
 
     public nuint BlockSizeInBytes => _block.Length;
 
-    public void Append(byte[:] data)
+    public void AppendData(byte[:] data)
     {
         nuint at = 0u;
         while (at < data.Length)
@@ -269,7 +269,7 @@ public abstract class HashAlgorithm : IHashAlgorithm
 
             if (_used == _block.Length)
             {
-                Compress(_block);
+                CompressBlock(_block);
                 _used = 0u;
             }
         }
@@ -277,7 +277,7 @@ public abstract class HashAlgorithm : IHashAlgorithm
 
     public byte[] GetHashAndReset()
     {
-        byte[] digest = Finish();
+        byte[] digest = FinishHash();
         Reset();
         return digest;
     }
@@ -289,7 +289,7 @@ public abstract class HashAlgorithm : IHashAlgorithm
 
         _used = 0u;
         _byteCount = 0u;
-        StartOver();
+        InitializeState();
     }
 
     /// The digest of `data` on its own. Resets first, so an object that has
@@ -297,21 +297,21 @@ public abstract class HashAlgorithm : IHashAlgorithm
     public byte[] ComputeHash(byte[:] data)
     {
         Reset();
-        Append(data);
+        AppendData(data);
         return GetHashAndReset();
     }
 
     /// One block into the state.
-    protected abstract void Compress(byte[] block);
+    protected abstract void CompressBlock(byte[] block);
 
     /// The state as bytes, once the last block has been compressed.
-    protected abstract byte[] Digest();
+    protected abstract byte[] ComputeDigest();
 
     /// The state as a fresh hash has it.
-    protected abstract void StartOver();
+    protected abstract void InitializeState();
 
     /// The one bit, the zeros and the length, then the digest.
-    byte[] Finish()
+    byte[] FinishHash()
     {
         ulong bits = _byteCount * 8u;
 
@@ -328,7 +328,7 @@ public abstract class HashAlgorithm : IHashAlgorithm
                 _used++;
             }
 
-            Compress(_block);
+            CompressBlock(_block);
             _used = 0u;
         }
 
@@ -353,8 +353,8 @@ public abstract class HashAlgorithm : IHashAlgorithm
                 _block[field + i] = octet;
         }
 
-        Compress(_block);
-        return Digest();
+        CompressBlock(_block);
+        return ComputeDigest();
     }
 }
 
@@ -416,7 +416,7 @@ public sealed class Md5 : HashAlgorithm
             6u, 10u, 15u, 21u, 6u, 10u, 15u, 21u,
         ];
 
-        StartOver();
+        InitializeState();
     }
 
     public override String Name => "MD5";
@@ -426,7 +426,7 @@ public sealed class Md5 : HashAlgorithm
     /// The digest of `data`, with no object to keep.
     public static byte[] HashData(byte[:] data) => new Md5().ComputeHash(data);
 
-    protected override void StartOver()
+    protected override void InitializeState()
     {
         _a = 0x67452301u;
         _b = 0xEFCDAB89u;
@@ -434,11 +434,11 @@ public sealed class Md5 : HashAlgorithm
         _d = 0x10325476u;
     }
 
-    protected override void Compress(byte[] block)
+    protected override void CompressBlock(byte[] block)
     {
         uint[] words = new uint[16u];
         for (nuint i = 0u; i < 16u; i++)
-            words[i] = LittleWord(block, i * 4u);
+            words[i] = ReadLittleWord(block, i * 4u);
 
         uint a = _a;
         uint b = _b;
@@ -484,13 +484,13 @@ public sealed class Md5 : HashAlgorithm
         _d += d;
     }
 
-    protected override byte[] Digest()
+    protected override byte[] ComputeDigest()
     {
         byte[] digest = new byte[16u];
-        PutLittleWord(digest, 0u, _a);
-        PutLittleWord(digest, 4u, _b);
-        PutLittleWord(digest, 8u, _c);
-        PutLittleWord(digest, 12u, _d);
+        WriteLittleWord(digest, 0u, _a);
+        WriteLittleWord(digest, 4u, _b);
+        WriteLittleWord(digest, 8u, _c);
+        WriteLittleWord(digest, 12u, _d);
         return digest;
     }
 }
@@ -513,7 +513,7 @@ public sealed class Sha1 : HashAlgorithm
     {
         base(64u, 8u, true);
         _state = new uint[5u];
-        StartOver();
+        InitializeState();
     }
 
     public override String Name => "SHA-1";
@@ -523,7 +523,7 @@ public sealed class Sha1 : HashAlgorithm
     /// The digest of `data`, with no object to keep.
     public static byte[] HashData(byte[:] data) => new Sha1().ComputeHash(data);
 
-    protected override void StartOver()
+    protected override void InitializeState()
     {
         _state[0u] = 0x67452301u;
         _state[1u] = 0xEFCDAB89u;
@@ -532,11 +532,11 @@ public sealed class Sha1 : HashAlgorithm
         _state[4u] = 0xC3D2E1F0u;
     }
 
-    protected override void Compress(byte[] block)
+    protected override void CompressBlock(byte[] block)
     {
         uint[] schedule = new uint[80u];
         for (nuint i = 0u; i < 16u; i++)
-            schedule[i] = BigWord(block, i * 4u);
+            schedule[i] = ReadBigWord(block, i * 4u);
 
         for (nuint i = 16u; i < 80u; i++)
         {
@@ -592,11 +592,11 @@ public sealed class Sha1 : HashAlgorithm
         _state[4u] += e;
     }
 
-    protected override byte[] Digest()
+    protected override byte[] ComputeDigest()
     {
         byte[] digest = new byte[20u];
         for (nuint i = 0u; i < 5u; i++)
-            PutBigWord(digest, i * 4u, _state[i]);
+            WriteBigWord(digest, i * 4u, _state[i]);
         return digest;
     }
 }
@@ -633,7 +633,7 @@ public sealed class Sha256 : HashAlgorithm
             0x90BEFFFAu, 0xA4506CEBu, 0xBEF9A3F7u, 0xC67178F2u,
         ];
 
-        StartOver();
+        InitializeState();
     }
 
     public override String Name => "SHA-256";
@@ -643,7 +643,7 @@ public sealed class Sha256 : HashAlgorithm
     /// The digest of `data`, with no object to keep.
     public static byte[] HashData(byte[:] data) => new Sha256().ComputeHash(data);
 
-    protected override void StartOver()
+    protected override void InitializeState()
     {
         _state[0u] = 0x6A09E667u;
         _state[1u] = 0xBB67AE85u;
@@ -655,11 +655,11 @@ public sealed class Sha256 : HashAlgorithm
         _state[7u] = 0x5BE0CD19u;
     }
 
-    protected override void Compress(byte[] block)
+    protected override void CompressBlock(byte[] block)
     {
         uint[] schedule = new uint[64u];
         for (nuint i = 0u; i < 16u; i++)
-            schedule[i] = BigWord(block, i * 4u);
+            schedule[i] = ReadBigWord(block, i * 4u);
 
         for (nuint i = 16u; i < 64u; i++)
         {
@@ -708,11 +708,11 @@ public sealed class Sha256 : HashAlgorithm
         _state[7u] += h;
     }
 
-    protected override byte[] Digest()
+    protected override byte[] ComputeDigest()
     {
         byte[] digest = new byte[32u];
         for (nuint i = 0u; i < 8u; i++)
-            PutBigWord(digest, i * 4u, _state[i]);
+            WriteBigWord(digest, i * 4u, _state[i]);
         return digest;
     }
 }
@@ -762,11 +762,11 @@ public abstract class Sha2Wide : HashAlgorithm
         ];
     }
 
-    protected override void Compress(byte[] block)
+    protected override void CompressBlock(byte[] block)
     {
         ulong[] schedule = new ulong[80u];
         for (nuint i = 0u; i < 16u; i++)
-            schedule[i] = BigDoubleWord(block, i * 8u);
+            schedule[i] = ReadBigDoubleWord(block, i * 8u);
 
         for (nuint i = 16u; i < 80u; i++)
         {
@@ -815,11 +815,11 @@ public abstract class Sha2Wide : HashAlgorithm
         _state[7u] += h;
     }
 
-    protected override byte[] Digest()
+    protected override byte[] ComputeDigest()
     {
         byte[] whole = new byte[64u];
         for (nuint i = 0u; i < 8u; i++)
-            PutBigDoubleWord(whole, i * 8u, _state[i]);
+            WriteBigDoubleWord(whole, i * 8u, _state[i]);
 
         if (HashSizeInBytes == 64u)
             return whole;
@@ -838,7 +838,7 @@ public sealed class Sha512 : Sha2Wide
     public Sha512()
     {
         base();
-        StartOver();
+        InitializeState();
     }
 
     public override String Name => "SHA-512";
@@ -848,7 +848,7 @@ public sealed class Sha512 : Sha2Wide
     /// The digest of `data`, with no object to keep.
     public static byte[] HashData(byte[:] data) => new Sha512().ComputeHash(data);
 
-    protected override void StartOver()
+    protected override void InitializeState()
     {
         _state[0u] = 0x6A09E667F3BCC908u;
         _state[1u] = 0xBB67AE8584CAA73Bu;
@@ -871,7 +871,7 @@ public sealed class Sha384 : Sha2Wide
     public Sha384()
     {
         base();
-        StartOver();
+        InitializeState();
     }
 
     public override String Name => "SHA-384";
@@ -881,7 +881,7 @@ public sealed class Sha384 : Sha2Wide
     /// The digest of `data`, with no object to keep.
     public static byte[] HashData(byte[:] data) => new Sha384().ComputeHash(data);
 
-    protected override void StartOver()
+    protected override void InitializeState()
     {
         _state[0u] = 0xCBBB9D5DC1059ED8u;
         _state[1u] = 0x629A292A367CD507u;
@@ -926,7 +926,7 @@ public sealed class Hmac : IHashAlgorithm
         if (key.Length > blockSize)
         {
             hash.Reset();
-            hash.Append(key);
+            hash.AppendData(key);
             byte[] digest = hash.GetHashAndReset();
             for (nuint i = 0u; i < digest.Length; i++)
                 shortened[i] = digest[i];
@@ -955,13 +955,13 @@ public sealed class Hmac : IHashAlgorithm
 
     public nuint BlockSizeInBytes => _inner.BlockSizeInBytes;
 
-    public void Append(byte[:] data) => _inner.Append(data);
+    public void AppendData(byte[:] data) => _inner.AppendData(data);
 
     public byte[] GetHashAndReset()
     {
         byte[] first = _inner.GetHashAndReset();
-        _inner.Append(_outerPad);
-        _inner.Append(first);
+        _inner.AppendData(_outerPad);
+        _inner.AppendData(first);
         byte[] mac = _inner.GetHashAndReset();
         Reset();
         return mac;
@@ -970,14 +970,14 @@ public sealed class Hmac : IHashAlgorithm
     public void Reset()
     {
         _inner.Reset();
-        _inner.Append(_innerPad);
+        _inner.AppendData(_innerPad);
     }
 
     /// The MAC of `data` under `key`, with no object to keep.
     public byte[] ComputeHash(byte[:] data)
     {
         Reset();
-        Append(data);
+        AppendData(data);
         return GetHashAndReset();
     }
 }
@@ -1084,8 +1084,8 @@ public static class Rfc2898DeriveBytes
             counter[3u] = (byte)(index & 0xFFu);
 
             mac.Reset();
-            mac.Append(salt);
-            mac.Append(counter);
+            mac.AppendData(salt);
+            mac.AppendData(counter);
             byte[] block = mac.GetHashAndReset();
 
             byte[] running = new byte[macSize];
@@ -1155,9 +1155,9 @@ public static class Hkdf
         {
             counter[0u] = (byte)index;
             mac.Reset();
-            mac.Append(previous);
-            mac.Append(info);
-            mac.Append(counter);
+            mac.AppendData(previous);
+            mac.AppendData(info);
+            mac.AppendData(counter);
             previous = mac.GetHashAndReset();
 
             nuint take = length - filled;
@@ -1277,7 +1277,7 @@ public sealed class Aes
 
     Aes(byte[:] key)
     {
-        _forward = BuildSubstitution();
+        _forward = BuildSubstitutionBox();
         _reverse = new byte[256u];
         for (nuint i = 0u; i < 256u; i++)
             _reverse[(nuint)_forward[i]] = (byte)i;
@@ -1332,13 +1332,13 @@ public sealed class Aes
 
         for (nuint round = 1u; round < _rounds; round++)
         {
-            Substitute(block, offset, _forward);
+            SubstituteBytes(block, offset, _forward);
             ShiftRows(block, offset);
             MixColumns(block, offset);
             AddRoundKey(block, offset, round);
         }
 
-        Substitute(block, offset, _forward);
+        SubstituteBytes(block, offset, _forward);
         ShiftRows(block, offset);
         AddRoundKey(block, offset, _rounds);
     }
@@ -1351,13 +1351,13 @@ public sealed class Aes
         for (nuint round = _rounds - 1u; round > 0u; round--)
         {
             UnshiftRows(block, offset);
-            Substitute(block, offset, _reverse);
+            SubstituteBytes(block, offset, _reverse);
             AddRoundKey(block, offset, round);
             UnmixColumns(block, offset);
         }
 
         UnshiftRows(block, offset);
-        Substitute(block, offset, _reverse);
+        SubstituteBytes(block, offset, _reverse);
         AddRoundKey(block, offset, 0u);
     }
 
@@ -1367,7 +1367,7 @@ public sealed class Aes
     /// always the wrong answer.
     public Result<byte[], CryptoError> EncryptEcb(byte[:] plaintext, PaddingMode padding)
     {
-        var padded = Pad(plaintext, padding);
+        var padded = AddPadding(plaintext, padding);
         if (!padded.Ok)
             return Fail(padded.Error);
 
@@ -1384,11 +1384,11 @@ public sealed class Aes
         if (ciphertext.Length == 0u || ciphertext.Length % BlockSize != 0u)
             return Fail(CryptoError.BlockLength);
 
-        byte[] output = Copy(ciphertext);
+        byte[] output = CopyBytes(ciphertext);
         for (nuint at = 0u; at < output.Length; at += BlockSize)
             DecryptBlock(output, at);
 
-        return Unpad(output, padding);
+        return RemovePadding(output, padding);
     }
 
     // ------------------------------------------------------------------ CBC
@@ -1402,12 +1402,12 @@ public sealed class Aes
         if (iv.Length != BlockSize)
             return Fail(CryptoError.IvLength);
 
-        var padded = Pad(plaintext, padding);
+        var padded = AddPadding(plaintext, padding);
         if (!padded.Ok)
             return Fail(padded.Error);
 
         byte[] output = padded.Value;
-        byte[] chain = Copy(iv);
+        byte[] chain = CopyBytes(iv);
 
         for (nuint at = 0u; at < output.Length; at += BlockSize)
         {
@@ -1436,8 +1436,8 @@ public sealed class Aes
         if (ciphertext.Length == 0u || ciphertext.Length % BlockSize != 0u)
             return Fail(CryptoError.BlockLength);
 
-        byte[] output = Copy(ciphertext);
-        byte[] chain = Copy(iv);
+        byte[] output = CopyBytes(ciphertext);
+        byte[] chain = CopyBytes(iv);
         byte[] carry = new byte[BlockSize];
 
         for (nuint at = 0u; at < output.Length; at += BlockSize)
@@ -1454,7 +1454,7 @@ public sealed class Aes
             }
         }
 
-        return Unpad(output, padding);
+        return RemovePadding(output, padding);
     }
 
     // ------------------------------------------------------------------ CFB
@@ -1466,8 +1466,8 @@ public sealed class Aes
         if (iv.Length != BlockSize)
             return Fail(CryptoError.IvLength);
 
-        byte[] output = Copy(plaintext);
-        byte[] chain = Copy(iv);
+        byte[] output = CopyBytes(plaintext);
+        byte[] chain = CopyBytes(iv);
 
         for (nuint at = 0u; at < output.Length; at += BlockSize)
         {
@@ -1493,8 +1493,8 @@ public sealed class Aes
         if (iv.Length != BlockSize)
             return Fail(CryptoError.IvLength);
 
-        byte[] output = Copy(ciphertext);
-        byte[] chain = Copy(iv);
+        byte[] output = CopyBytes(ciphertext);
+        byte[] chain = CopyBytes(iv);
 
         for (nuint at = 0u; at < output.Length; at += BlockSize)
         {
@@ -1539,8 +1539,8 @@ public sealed class Aes
         if (counter.Length != BlockSize)
             return Fail(CryptoError.IvLength);
 
-        byte[] output = Copy(data);
-        byte[] position = Copy(counter);
+        byte[] output = CopyBytes(data);
+        byte[] position = CopyBytes(counter);
         byte[] keystream = new byte[BlockSize];
 
         for (nuint at = 0u; at < output.Length; at += BlockSize)
@@ -1557,7 +1557,7 @@ public sealed class Aes
             for (nuint i = 0u; i < span; i++)
                 output[at + i] = (byte)(output[at + i] ^ keystream[i]);
 
-            Increment(position, from);
+            IncrementCounter(position, from);
         }
 
         CryptographicOperations.ZeroMemory(keystream);
@@ -1567,7 +1567,7 @@ public sealed class Aes
     /// One added to a big-endian counter in `block`, from byte `from` to the
     /// end. GCM increments only the last four bytes, which is what `from` is
     /// for.
-    static void Increment(byte[] block, nuint from)
+    static void IncrementCounter(byte[] block, nuint from)
     {
         nuint at = block.Length;
         while (at > from)
@@ -1581,7 +1581,7 @@ public sealed class Aes
 
     // -------------------------------------------------------------- padding
 
-    Result<byte[], CryptoError> Pad(byte[:] data, PaddingMode padding)
+    Result<byte[], CryptoError> AddPadding(byte[:] data, PaddingMode padding)
     {
         nuint remainder = data.Length % BlockSize;
 
@@ -1590,7 +1590,7 @@ public sealed class Aes
             case PaddingMode.None:
                 if (remainder != 0u)
                     return Fail(CryptoError.BlockLength);
-                return Ok(Copy(data));
+                return Ok(CopyBytes(data));
 
             case PaddingMode.Pkcs7:
             {
@@ -1633,7 +1633,7 @@ public sealed class Aes
         return Fail(CryptoError.Parameter);
     }
 
-    Result<byte[], CryptoError> Unpad(byte[] data, PaddingMode padding)
+    Result<byte[], CryptoError> RemovePadding(byte[] data, PaddingMode padding)
     {
         if (padding == PaddingMode.None || padding == PaddingMode.Zeros)
             return Ok(data);
@@ -1674,7 +1674,7 @@ public sealed class Aes
             block[offset + i] = (byte)(block[offset + i] ^ _schedule[at + i]);
     }
 
-    static void Substitute(byte[] block, nuint offset, byte[] box)
+    static void SubstituteBytes(byte[] block, nuint offset, byte[] box)
     {
         for (nuint i = 0u; i < BlockSize; i++)
             block[offset + i] = box[(nuint)block[offset + i]];
@@ -1735,10 +1735,10 @@ public sealed class Aes
             byte a2 = s[c + 2u];
             byte a3 = s[c + 3u];
 
-            s[c] = (byte)(Double(a0) ^ Double(a1) ^ a1 ^ a2 ^ a3);
-            s[c + 1u] = (byte)(a0 ^ Double(a1) ^ Double(a2) ^ a2 ^ a3);
-            s[c + 2u] = (byte)(a0 ^ a1 ^ Double(a2) ^ Double(a3) ^ a3);
-            s[c + 3u] = (byte)(Double(a0) ^ a0 ^ a1 ^ a2 ^ Double(a3));
+            s[c] = (byte)(MultiplyByTwo(a0) ^ MultiplyByTwo(a1) ^ a1 ^ a2 ^ a3);
+            s[c + 1u] = (byte)(a0 ^ MultiplyByTwo(a1) ^ MultiplyByTwo(a2) ^ a2 ^ a3);
+            s[c + 2u] = (byte)(a0 ^ a1 ^ MultiplyByTwo(a2) ^ MultiplyByTwo(a3) ^ a3);
+            s[c + 3u] = (byte)(MultiplyByTwo(a0) ^ a0 ^ a1 ^ a2 ^ MultiplyByTwo(a3));
         }
     }
 
@@ -1752,14 +1752,14 @@ public sealed class Aes
             byte a2 = s[c + 2u];
             byte a3 = s[c + 3u];
 
-            s[c] = (byte)(Multiply(a0, 14) ^ Multiply(a1, 11) ^
-                          Multiply(a2, 13) ^ Multiply(a3, 9));
-            s[c + 1u] = (byte)(Multiply(a0, 9) ^ Multiply(a1, 14) ^
-                               Multiply(a2, 11) ^ Multiply(a3, 13));
-            s[c + 2u] = (byte)(Multiply(a0, 13) ^ Multiply(a1, 9) ^
-                               Multiply(a2, 14) ^ Multiply(a3, 11));
-            s[c + 3u] = (byte)(Multiply(a0, 11) ^ Multiply(a1, 13) ^
-                               Multiply(a2, 9) ^ Multiply(a3, 14));
+            s[c] = (byte)(MultiplyInField(a0, 14) ^ MultiplyInField(a1, 11) ^
+                          MultiplyInField(a2, 13) ^ MultiplyInField(a3, 9));
+            s[c + 1u] = (byte)(MultiplyInField(a0, 9) ^ MultiplyInField(a1, 14) ^
+                               MultiplyInField(a2, 11) ^ MultiplyInField(a3, 13));
+            s[c + 2u] = (byte)(MultiplyInField(a0, 13) ^ MultiplyInField(a1, 9) ^
+                               MultiplyInField(a2, 14) ^ MultiplyInField(a3, 11));
+            s[c + 3u] = (byte)(MultiplyInField(a0, 11) ^ MultiplyInField(a1, 13) ^
+                               MultiplyInField(a2, 9) ^ MultiplyInField(a3, 14));
         }
     }
 
@@ -1792,7 +1792,7 @@ public sealed class Aes
                 t3 = _forward[(nuint)carry];
 
                 t0 = (byte)(t0 ^ constant);
-                constant = Double(constant);
+                constant = MultiplyByTwo(constant);
             }
             else if (keyWords > 6u && i % keyWords == 4u)
             {
@@ -1821,14 +1821,14 @@ public sealed class Aes
     /// 256 hex constants that nothing would catch a typo in. The cost is a
     /// table built per cipher object, which is a few thousand instructions
     /// once.
-    static byte[] BuildSubstitution()
+    static byte[] BuildSubstitutionBox()
     {
         byte[] box = new byte[256u];
         box[0u] = 0x63;
 
         for (nuint i = 1u; i < 256u; i++)
         {
-            uint inverse = (uint)Invert((byte)i);
+            uint inverse = (uint)InvertInField((byte)i);
             uint folded = inverse ^ RotateOctet(inverse, 1u) ^ RotateOctet(inverse, 2u) ^
                           RotateOctet(inverse, 3u) ^ RotateOctet(inverse, 4u) ^ 0x63u;
             box[i] = (byte)(folded & 0xFFu);
@@ -1842,7 +1842,7 @@ public sealed class Aes
 
     /// x times 2 in GF(2^8) with the AES polynomial, which is the only
     /// multiplication the forward direction needs.
-    static byte Double(byte value)
+    static byte MultiplyByTwo(byte value)
     {
         uint doubled = (uint)value << 1;
         if ((value & 0x80u) != 0u)
@@ -1851,7 +1851,7 @@ public sealed class Aes
     }
 
     /// A full GF(2^8) multiply, for the inverse mix columns.
-    static byte Multiply(byte left, byte right)
+    static byte MultiplyInField(byte left, byte right)
     {
         uint result = 0u;
         uint a = (uint)left;
@@ -1875,7 +1875,7 @@ public sealed class Aes
 
     /// The multiplicative inverse, as a^254 -- which it is, because the group
     /// has 255 elements.
-    static byte Invert(byte value)
+    static byte InvertInField(byte value)
     {
         if (value == 0)
             return 0;
@@ -1885,14 +1885,14 @@ public sealed class Aes
 
         for (nuint bit = 1u; bit < 8u; bit++)
         {
-            power = Multiply(power, power);
-            result = Multiply(result, power);
+            power = MultiplyInField(power, power);
+            result = MultiplyInField(result, power);
         }
 
         return result;
     }
 
-    static byte[] Copy(byte[:] data)
+    static byte[] CopyBytes(byte[:] data)
     {
         byte[] copy = new byte[data.Length];
         for (nuint i = 0u; i < data.Length; i++)
@@ -1965,18 +1965,18 @@ public sealed class AesGcm
         if (tag.Length != TagSize)
             return Fail(CryptoError.TagLength);
 
-        byte[] counter = InitialCounter(nonce);
+        byte[] counter = ComputeInitialCounter(nonce);
         byte[] keystream = new byte[16u];
         for (nuint i = 0u; i < 16u; i++)
             keystream[i] = counter[i];
 
-        Aes.Increment(counter, 12u);
+        Aes.IncrementCounter(counter, 12u);
         var enciphered = _cipher.ApplyCounter(plaintext, counter, 12u);
         if (!enciphered.Ok)
             return Fail(enciphered.Error);
 
         byte[] ciphertext = enciphered.Value;
-        byte[] computed = Authenticate(associatedData, ciphertext, keystream);
+        byte[] computed = ComputeTag(associatedData, ciphertext, keystream);
         for (nuint i = 0u; i < TagSize; i++)
             tag[i] = computed[i];
 
@@ -1992,16 +1992,16 @@ public sealed class AesGcm
         if (tag.Length != TagSize)
             return Fail(CryptoError.TagLength);
 
-        byte[] counter = InitialCounter(nonce);
+        byte[] counter = ComputeInitialCounter(nonce);
         byte[] keystream = new byte[16u];
         for (nuint i = 0u; i < 16u; i++)
             keystream[i] = counter[i];
 
-        byte[] expected = Authenticate(associatedData, ciphertext, keystream);
+        byte[] expected = ComputeTag(associatedData, ciphertext, keystream);
         if (!CryptographicOperations.FixedTimeEquals(expected, tag))
             return Fail(CryptoError.AuthenticationFailed);
 
-        Aes.Increment(counter, 12u);
+        Aes.IncrementCounter(counter, 12u);
         var deciphered = _cipher.ApplyCounter(ciphertext, counter, 12u);
         if (!deciphered.Ok)
             return Fail(deciphered.Error);
@@ -2012,7 +2012,7 @@ public sealed class AesGcm
     /// J0: the nonce and a one when the nonce is twelve bytes, and GHASH of
     /// the nonce otherwise -- which is the standard's rule and the reason
     /// twelve is the length everything uses.
-    byte[] InitialCounter(byte[:] nonce)
+    byte[] ComputeInitialCounter(byte[:] nonce)
     {
         byte[] counter = new byte[16u];
 
@@ -2024,26 +2024,26 @@ public sealed class AesGcm
             return counter;
         }
 
-        GhashUpdate(counter, nonce);
+        UpdateGhash(counter, nonce);
         byte[] lengths = new byte[16u];
-        PutLength(lengths, 8u, (ulong)nonce.Length * 8u);
-        GhashUpdate(counter, lengths);
+        WriteLength(lengths, 8u, (ulong)nonce.Length * 8u);
+        UpdateGhash(counter, lengths);
         return counter;
     }
 
     /// GHASH over the associated data and the ciphertext, enciphered under the
     /// first counter block. That last step is what stops GHASH -- which is a
     /// keyed hash and not a MAC on its own -- from being invertible.
-    byte[] Authenticate(byte[:] associatedData, byte[:] ciphertext, byte[] keystream)
+    byte[] ComputeTag(byte[:] associatedData, byte[:] ciphertext, byte[] keystream)
     {
         byte[] accumulator = new byte[16u];
-        GhashUpdate(accumulator, associatedData);
-        GhashUpdate(accumulator, ciphertext);
+        UpdateGhash(accumulator, associatedData);
+        UpdateGhash(accumulator, ciphertext);
 
         byte[] lengths = new byte[16u];
-        PutLength(lengths, 0u, (ulong)associatedData.Length * 8u);
-        PutLength(lengths, 8u, (ulong)ciphertext.Length * 8u);
-        GhashUpdate(accumulator, lengths);
+        WriteLength(lengths, 0u, (ulong)associatedData.Length * 8u);
+        WriteLength(lengths, 8u, (ulong)ciphertext.Length * 8u);
+        UpdateGhash(accumulator, lengths);
 
         byte[] mask = new byte[16u];
         for (nuint i = 0u; i < 16u; i++)
@@ -2058,7 +2058,7 @@ public sealed class AesGcm
     }
 
     /// `data` folded into the accumulator, a block at a time and zero-padded.
-    void GhashUpdate(byte[] accumulator, byte[:] data)
+    void UpdateGhash(byte[] accumulator, byte[:] data)
     {
         byte[] block = new byte[16u];
 
@@ -2077,7 +2077,7 @@ public sealed class AesGcm
             for (nuint i = 0u; i < 16u; i++)
                 accumulator[i] = (byte)(accumulator[i] ^ block[i]);
 
-            GhashMultiply(accumulator, _hashKey);
+            MultiplyGhash(accumulator, _hashKey);
         }
     }
 
@@ -2087,7 +2087,7 @@ public sealed class AesGcm
     /// the way an AES table does; this one is the shift-and-add definition,
     /// which is what a reference implementation should be. 128 iterations per
     /// block is the price.
-    static void GhashMultiply(byte[] left, byte[] right)
+    static void MultiplyGhash(byte[] left, byte[] right)
     {
         byte[] product = new byte[16u];
         byte[] running = new byte[16u];
@@ -2125,7 +2125,7 @@ public sealed class AesGcm
             left[i] = product[i];
     }
 
-    static void PutLength(byte[] into, nuint at, ulong bits)
+    static void WriteLength(byte[] into, nuint at, ulong bits)
     {
         for (nuint i = 0u; i < 8u; i++)
             into[at + i] = (byte)((bits >> (uint)(8u * (7u - i))) & 0xFFu);

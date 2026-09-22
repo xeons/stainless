@@ -259,7 +259,7 @@ do stays a method. They can coexist.
 
 - **A module-level function stays a function.** A property is a pair of
   accessors reached through an instance and a module has none, so
-  `Env.ArgumentCount()`, `Threading.ProcessorCount()` and `Random.Seed()` keep
+  `Env.ArgumentCount()`, `Threading.ProcessorCount()` and `Env.CurrentDirectory()` keep
   their parentheses however much they read like facts. Writing one as a
   property is SL0400.
 - **`IsEmpty` is a property**, including on `String` and `StringBuilder`. It

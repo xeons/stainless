@@ -156,12 +156,13 @@ public interface IEquatable<T>     { bool EqualTo(T other); }
 public interface IComparable<T>    { int CompareTo(T other); }
 public interface IHashable         { nuint HashCode(); }
 
-public interface IReadOnlyList<T>  { nuint Count { get; } T At(nuint index); }
+public interface IReadOnlyList<T>  { nuint Count { get; } T this[nuint index] { get; } }
 
 public interface IList<T> : IReadOnlyList<T>
 {
+    T this[nuint index] { get; set; }
     void Add(T item);
-    void Set(nuint index, T item);
+    void RemoveAt(nuint index);
     void Clear();
 }
 ```
@@ -209,9 +210,7 @@ the built-in one.
 | `SortedList<TKey, TValue>` | two sorted arrays | `TKey : IComparable<TKey>`; binary search, ordered iteration |
 
 `List<T>` carries an indexer ([§7.5](07-functions-members.md#75-indexers)), so `list[i] += 1` reads and writes the
-way an array does. `At` and `Set` remain, because an interface has no indexers
-and `IReadOnlyList<T>` declares them; the brackets are what to reach for where
-the type is known.
+way an array does, and `IReadOnlyList<T>` and `IList<T>` declare the same
 
 **A dictionary's indexer answers `Optional<TValue>`**, which is Swift's design and
 right for the same reason. An index is a position the caller worked out, so
@@ -370,8 +369,8 @@ Sort(people, (a, b) => a.Age - b.Age);
 `Select`, `Where`, `Aggregate`, `Any`, `All`, `Count`, `Find`, `FirstOrDefault`,
 `FindIndex`, `ForEach`, `Take`, `Skip`, `Distinct`, `OrderBy`, `ToList` and
 `ToArray`, each over a `T[:]` — which an array converts to — and over any
-`IEnumerable<T>`. `Select`, `Where` and `Aggregate` are `Map`, `Filter` and
-`Reduce` spelled as LINQ spells them.
+`IEnumerable<T>`. They are named as LINQ names them, so a reader arriving from
+C# has nothing to translate.
 
 **`Find` and `FindIndex` answer with an `Optional`** ([§2.8.1](02-types.md#281-optionalt--a-value-or-none)), and so does
 `Collections.IndexOf`: a length standing in for "not there" is the sentinel
@@ -434,7 +433,7 @@ reads a **monotonic** counter that only goes forward:
 ```csharp
 var clock = new Clock();
 DoTheWork();
-Console.WriteLine(clock.Elapsed().Format());
+Console.WriteLine(clock.Elapsed.Format());
 ```
 
 Subtracting two `Instant`s to measure something is the thing not to do, and is
@@ -764,7 +763,7 @@ if (!loaded.Ok)
     return;
 
 var logo = loaded.Value;
-logo.FillRectangle(Rgba.Rgb(200, 30, 30), 8, 8, 64, 24);
+logo.FillRectangle(Rgba.FromRgb(200, 30, 30), 8, 8, 64, 24);
 logo.DrawEllipse(Rgba.Black, 4, 4, 72, 32, 2);
 logo.Save("out.png", ImageFormat.Png);
 ```
@@ -833,9 +832,9 @@ does not have; [TODO.md](../../TODO.md) carries the shape that would take.
 
 ```csharp
 var clip = try Wav.FromFile("chime.wav");
-Audio.Play(clip);
+Audio.PlayClip(clip);
 
-var heard = try Audio.Record(AudioFormat.Voice, 3.0);
+var heard = try Audio.RecordClip(AudioFormat.Voice, 3.0);
 Wav.Save(heard, "heard.wav");
 ```
 

@@ -44,7 +44,7 @@ int Main()
                cleared.R == (byte)255 && cleared.G == (byte)255
                && cleared.B == (byte)255 && cleared.A == (byte)255);
 
-    picture.FillRectangle(Rgba.Rgb((byte)200, (byte)30, (byte)30), 8, 8, 24, 16);
+    picture.FillRectangle(Rgba.FromRgb((byte)200, (byte)30, (byte)30), 8, 8, 24, 16);
     var inside = picture.GetPixel(20, 16);
     ok = Check(ok, "a filled rectangle is filled",
                inside.R == (byte)200 && inside.G == (byte)30 && inside.B == (byte)30);
@@ -74,7 +74,7 @@ int Main()
                picture.GetPixel(0, 0).R == (byte)255);
 
     // ---- pixels.
-    picture.SetPixel(2, 2, Rgba.Argb((byte)128, (byte)10, (byte)20, (byte)30));
+    picture.SetPixel(2, 2, Rgba.FromArgb((byte)128, (byte)10, (byte)20, (byte)30));
     var written = picture.GetPixel(2, 2);
     ok = Check(ok, "a written pixel reads back",
                written.R == (byte)10 && written.G == (byte)20 && written.B == (byte)30);
@@ -124,7 +124,7 @@ int Main()
     if (sheet.Ok)
     {
         sheet.Value.Clear(Rgba.Black);
-        sheet.Value.Draw(picture, 0, 0);
+        sheet.Value.DrawImage(picture, 0, 0);
         var copied = sheet.Value.GetPixel(20, 16);
         ok = Check(ok, "one picture draws on another",
                    copied.R == (byte)200 && copied.G == (byte)30 && copied.B == (byte)30);
@@ -273,7 +273,7 @@ bool Scaling(bool ok)
                shrunk.Ok && IsOpaqueRed(shrunk.Value.GetPixel(4, 4)));
 
     var target = (Image)MakeBlankPicture(30, 30);
-    target.Draw(small, 5, 5);
+    target.DrawImage(small, 5, 5);
     ok = Check(ok, "a picture drawn at its own size lands where it was put",
                IsOpaqueRed(target.GetPixel(5, 5)) && IsOpaqueRed(target.GetPixel(14, 14))
                && target.GetPixel(4, 4).IsInvisible && target.GetPixel(15, 15).IsInvisible);
@@ -304,7 +304,7 @@ bool Palettes(bool ok)
     // Four by four and eight-bit grey, left half 0x80 and right half 0xFF.
     ok = CheckIndexed(ok, "a grey PNG", Bytes(
         "89504e470d0a1a0a0000000d49484452000000040000000408000000008c9ac1a2000000104944415478da636868f8ff9f0195000073cc0bf9fbdca06e0000000049454e44ae426082"),
-        Rgba.Rgb((byte)128, (byte)128, (byte)128), Rgba.White);
+        Rgba.FromRgb((byte)128, (byte)128, (byte)128), Rgba.White);
     return ok;
 }
 
@@ -338,12 +338,12 @@ bool CheckIndexed(bool ok, String what, byte[] data, Rgba left, Rgba right)
                pixels.Length == 64u && pixels[20u] == left.B && pixels[21u] == left.G
                && pixels[22u] == left.R && pixels[23u] == left.A);
 
-    var green = Rgba.Rgb((byte)10, (byte)200, (byte)30);
+    var green = Rgba.FromRgb((byte)10, (byte)200, (byte)30);
     picture.FillRectangle(green, 0, 0, 2, 2);
     ok = Check(ok, what + " takes a colour it has no entry for",
                IsColour(picture.GetPixel(1, 1), green));
 
-    var dark = Rgba.Rgb((byte)1, (byte)2, (byte)3);
+    var dark = Rgba.FromRgb((byte)1, (byte)2, (byte)3);
     picture.SetPixel(3, 3, dark);
     ok = Check(ok, what + " takes one pixel at a time",
                IsColour(picture.GetPixel(3, 3), dark));

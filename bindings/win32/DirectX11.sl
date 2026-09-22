@@ -772,7 +772,7 @@ public sealed class Graphics
             {
                 nuint at = (nuint)x * 4u;
                 image.SetPixel((int)x, (int)y,
-                               Rgba.Rgb(row[at], row[at + 1u], row[at + 2u]));
+                               Rgba.FromRgb(row[at], row[at + 1u], row[at + 2u]));
             }
         }
 
