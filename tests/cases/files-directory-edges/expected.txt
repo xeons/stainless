@@ -1,0 +1,8 @@
+create all: no error
+made: true
+again: no error
+file delete of a directory failed: true
+still there: true
+trailing separator: 1 true
+current: 1 'a.txt'
+cleaned: true

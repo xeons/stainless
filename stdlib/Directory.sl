@@ -55,8 +55,20 @@ public IOError Create(String path)
 }
 
 /// Creates the directory and every parent that is missing.
+///
+/// A trailing separator is allowed, and a directory that appears while this
+/// runs -- made by another process, say -- is success rather than a failure.
 public IOError CreateAll(String path)
 {
+    // `a/b/` names `a/b`. Stop at a root, which is its own directory name.
+    while (Path.FileName(path).ByteLength() == 0)
+    {
+        var trimmed = Path.DirectoryName(path);
+        if (trimmed.ByteLength() == 0 || trimmed.ByteLength() >= path.ByteLength())
+            break;
+        path = trimmed;
+    }
+
     if (Exists(path))
         return IOError.None;
 
@@ -68,7 +80,10 @@ public IOError CreateAll(String path)
             return failed;
     }
 
-    return Create(path);
+    var made = Create(path);
+    if (made == IOError.AlreadyExists && Exists(path))
+        return IOError.None;
+    return made;
 }
 
 /// Removes one empty directory.

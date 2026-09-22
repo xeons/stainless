@@ -1,0 +1,5 @@
+loop is a directory: false
+all files: 2
+delete link: no error
+target still there: true
+cleaned: true

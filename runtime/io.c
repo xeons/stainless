@@ -51,6 +51,7 @@
 #  include <io.h>
 #else
 #  include <dirent.h>
+#  include <fcntl.h>
 #  include <unistd.h>
 #endif
 
@@ -433,9 +434,23 @@ int32_t sl_file_delete(const uint8_t *path)
     if (wide == NULL) return SL_IO_INVALID;
 
     int result = _wremove(wide);
+
+    /* A junction or a directory link is listed as not a directory, so it is
+     * deleted as a file is. Windows wants RemoveDirectory for it, which
+     * removes the link and leaves what it points at. */
+    if (result != 0) {
+        DWORD attributes = GetFileAttributesW(wide);
+        if (attributes != INVALID_FILE_ATTRIBUTES
+            && (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0
+            && (attributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0
+            && RemoveDirectoryW(wide)) {
+            result = 0;
+        }
+    }
     free(wide);
 #else
-    int result = remove((const char *)path);
+    /* unlink rather than remove, which would take an empty directory too. */
+    int result = unlink((const char *)path);
 #endif
     return result == 0 ? SL_IO_OK : from_errno(errno);
 }
@@ -515,16 +530,24 @@ void *sl_directory_open(const uint8_t *path)
     SlDirectory *cursor = (SlDirectory *)calloc(1, sizeof(SlDirectory));
     if (cursor == NULL) sl_fail("out of memory");
 
+    /* The empty path is the current directory, as it is to every other call. */
+    if (path[0] == '\0') path = (const uint8_t *)".";
+
 #ifdef _WIN32
-    /* FindFirstFile wants a pattern, not a directory. */
+    /*
+     * FindFirstFile wants a pattern, not a directory. A path that already ends
+     * in a separator, or in a drive's colon, takes the `*` without another
+     * separator: `C:` is that drive's current directory and `C:\*` its root.
+     */
     size_t   length = strlen((const char *)path);
     char    *pattern = (char *)malloc(length + 3);
     if (pattern == NULL) sl_fail("out of memory");
 
     memcpy(pattern, path, length);
-    pattern[length] = '\\';
-    pattern[length + 1] = '*';
-    pattern[length + 2] = '\0';
+    char last = (char)path[length - 1];
+    if (last != '\\' && last != '/' && last != ':') pattern[length++] = '\\';
+    pattern[length] = '*';
+    pattern[length + 1] = '\0';
 
     wchar_t *wide = sl_widen(pattern);
     free(pattern);
@@ -578,8 +601,11 @@ const uint8_t *sl_directory_next(void *handle, _Bool *isDirectory)
         cursor->name = sl_narrow(found);
         if (cursor->name == NULL) continue;
 
-        cursor->isDirectory =
-            (cursor->entry.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+        /* A junction or a directory symbolic link carries the directory bit
+         * too, and a walk that followed one to an ancestor would not end. */
+        DWORD attributes = cursor->entry.dwFileAttributes;
+        cursor->isDirectory = (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0
+                           && (attributes & FILE_ATTRIBUTE_REPARSE_POINT) == 0;
         break;
     }
 #else
@@ -596,6 +622,14 @@ const uint8_t *sl_directory_next(void *handle, _Bool *isDirectory)
         memcpy(cursor->name, found->d_name, length + 1);
 
         cursor->isDirectory = found->d_type == DT_DIR;
+
+        /* A file system MAY leave the type out, and then only asking says. */
+        if (found->d_type == DT_UNKNOWN) {
+            struct stat info;
+            cursor->isDirectory =
+                fstatat(dirfd(cursor->handle), found->d_name, &info, AT_SYMLINK_NOFOLLOW) == 0
+                && S_ISDIR(info.st_mode);
+        }
         break;
     }
 #endif
