@@ -84,7 +84,7 @@ void PutFloat(byte[] into, nuint at, float value)
 
 // --------------------------------------------------------------- the window
 
-long Procedure(HWND window, uint message, ulong wParam, long lParam)
+nint Procedure(HWND window, uint message, nuint wParam, nint lParam)
 {
     if (message == WmDestroy)
     {

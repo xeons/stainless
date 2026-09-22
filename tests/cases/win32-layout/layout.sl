@@ -10,6 +10,7 @@ import Standard.Console;
 import Win32.Kernel32;
 import Win32.User32;
 import Win32.ComDlg32;
+import Win32.ComCtl32;
 
 void Check(String name, nuint measured, nuint wanted)
 {
@@ -45,6 +46,13 @@ int Main()
     Check("STARTUPINFOW", sizeof(StartupInfo), 104u);
     Check("PROCESS_INFORMATION", sizeof(ProcessInformation), 24u);
     Check("OPENFILENAMEW", sizeof(OpenFileName), 152u);
+    Check("CHOOSECOLORW", sizeof(ChooseColor), 72u);
+    Check("CHOOSEFONTW", sizeof(ChooseFont), 104u);
+
+    Check("TBBUTTON", sizeof(ToolBarButton), 32u);
+    Check("TOOLINFOW", sizeof(ToolInfo), 72u);
+    Check("TTTOOLINFOW_V1_SIZE", (nuint)ToolInfoV1Size, 56u);
+    Check("NMCUSTOMDRAW", sizeof(CustomDraw), 80u);
 
     // A delegate is one function pointer, which is what makes a WNDPROC an
     // ordinary Stainless value.

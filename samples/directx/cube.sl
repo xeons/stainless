@@ -749,7 +749,7 @@ double Pulse(double cycles, double duty)
 
 // =================================================================== window
 
-long Procedure(HWND window, uint message, ulong wParam, long lParam)
+nint Procedure(HWND window, uint message, nuint wParam, nint lParam)
 {
     if (message == WmDestroy)
     {

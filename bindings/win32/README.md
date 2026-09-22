@@ -290,7 +290,7 @@ A `delegate` captures nothing, so a `WNDPROC` is an ordinary module-level
 function and per-window state goes where Win32 has always kept it:
 
 ```csharp
-long Procedure(HWND window, uint message, ulong wParam, long lParam) {
+nint Procedure(HWND window, uint message, nuint wParam, nint lParam) {
     State* state = (State*)(nuint)GetWindowLongPtrW(window, GwlpUserData);
     switch (message) {
         case WmDestroy: PostQuitMessage(0); return 0;
@@ -408,5 +408,6 @@ out of an executable this program did not build.
   class factory and `DllGetClassObject`, which is what would let another
   process ask for one.
 - **GDI+**, Direct3D 12, WMI, the event log.
-- **32-bit Windows.** `LRESULT` and `LPARAM` are written `long` and `WPARAM`
-  `ulong` because Windows is 64-bit; a 32-bit target would want `nint`/`nuint`.
+- **32-bit Windows.** The types and structures are the right width on both,
+  but the declarations name no calling convention, and every Win32 function
+  on x86 is `__stdcall` — so a 32-bit program links against none of them.

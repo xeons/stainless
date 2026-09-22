@@ -55,7 +55,7 @@ public struct OpenFileName
     public ushort FileOffset;
     public ushort ExtensionOffset;
     public char16* DefaultExtension;
-    public long CustomData;
+    public nint CustomData;
     public void* Hook;
     public char16* TemplateName;
     public void* Reserved1;
@@ -94,7 +94,7 @@ public struct ChooseColor
     /// mixed is still there next time. The caller owns the array.
     public uint* CustomColors;
     public uint Flags;
-    public long CustomData;
+    public nint CustomData;
     public void* Hook;
     public char16* TemplateName;
 }
@@ -137,7 +137,7 @@ public struct ChooseFont
     public int PointSize;
     public uint Flags;
     public uint Colors;
-    public long CustomData;
+    public nint CustomData;
     public void* Hook;
     public char16* TemplateName;
     public HINSTANCE Instance;

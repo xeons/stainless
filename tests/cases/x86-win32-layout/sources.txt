@@ -1,0 +1,2 @@
+# The declarations alone: the wrappers call into DLLs this case never links.
+bindings/win32/api

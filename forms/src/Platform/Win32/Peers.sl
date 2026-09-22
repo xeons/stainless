@@ -236,7 +236,7 @@ ControlPeer? PeerOf(HWND window)
 /// function, so its address is a plain C function pointer with no thunk
 /// anywhere; which window it is for is answered by the property, and what to do
 /// is answered by the peer's own `Dispatch`.
-long StainlessProc(HWND window, uint message, ulong wParam, long lParam)
+nint StainlessProc(HWND window, uint message, nuint wParam, nint lParam)
 {
     var peer = PeerOf(window);
     if (peer == null)

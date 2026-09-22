@@ -96,7 +96,7 @@ static bool wakeClassRegistered = false;
 
 /// Drains the queue, and answers anything else the way a window with no
 /// opinions should.
-long WakeProc(HWND window, uint message, ulong wParam, long lParam)
+nint WakeProc(HWND window, uint message, nuint wParam, nint lParam)
 {
     if (message == WmApp)
     {
@@ -279,7 +279,7 @@ bool DialogKey(Msg* message)
 
 /// `EnumWindows`' callback for `WindowPeer.ShowModal`. `parameter` is the
 /// dialog's peer, borrowed for the length of the enumeration.
-int NoteWindowForModal(HWND window, long parameter)
+int NoteWindowForModal(HWND window, nint parameter)
 {
     var dialog = (WindowPeer)(void*)(nuint)parameter;
     dialog.Consider(window);
@@ -740,7 +740,7 @@ public class WindowPeer : ControlPeer, IWindowPeer
     void DisableOthers()
     {
         _disabled.Clear();
-        EnumWindows(NoteWindowForModal, (long)(nuint)(void*)this);
+        EnumWindows(NoteWindowForModal, (nint)(void*)this);
         foreach (var handle in _disabled)
             EnableWindow((HWND)(void*)handle, 0);
     }

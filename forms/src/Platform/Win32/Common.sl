@@ -115,10 +115,12 @@ public class ToolBarPeer : ControlPeer, IToolBarPeer
         }
         button.Reserved0 = 0u;
         button.Reserved1 = 0u;
+#if !X86
         button.Reserved2 = 0u;
         button.Reserved3 = 0u;
         button.Reserved4 = 0u;
         button.Reserved5 = 0u;
+#endif
         button.Data = 0u;
 
         // The caption is a pointer to text the toolbar reads while the message

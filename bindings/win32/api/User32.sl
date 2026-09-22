@@ -66,13 +66,13 @@ public struct Rect
 
 // ================================================================= messages
 
-/// `MSG`. `sizeof` is 48, as it is in C.
+/// `MSG`. `sizeof` is 48 on x64 and 28 on x86, as it is in C.
 public struct Msg
 {
     public HWND Window;
     public uint Message;
-    public ulong WParam;
-    public long LParam;
+    public nuint WParam;
+    public nint LParam;
     public uint Time;
     public Point Cursor;
 }
@@ -80,15 +80,15 @@ public struct Msg
 /// `WNDPROC`: what Windows calls for every message a window receives.
 ///
 /// `LRESULT` and `LPARAM` are signed pointer-width, `WPARAM` unsigned
-/// pointer-width. They are written `long` and `ulong` here because Windows is
-/// 64-bit; a 32-bit target would want `nint` and `nuint`.
-public delegate long WindowProcedure(HWND window, uint message, ulong wParam, long lParam);
+/// pointer-width, so they are `nint` and `nuint` here and wherever else a
+/// message is passed.
+public delegate nint WindowProcedure(HWND window, uint message, nuint wParam, nint lParam);
 
 /// `WNDENUMPROC`: return zero to stop the walk, non-zero to continue.
-public delegate int WindowEnumerator(HWND window, long parameter);
+public delegate int WindowEnumerator(HWND window, nint parameter);
 
 /// `TIMERPROC`, for a `SetTimer` that calls back rather than posting `WM_TIMER`.
-public delegate void TimerProcedure(HWND window, uint message, ulong id, uint ticks);
+public delegate void TimerProcedure(HWND window, uint message, nuint id, uint ticks);
 
 public const uint WmNull             = 0x0000u;
 public const uint WmCreate           = 0x0001u;
@@ -148,12 +148,12 @@ public extern "C"
     int  GetMessageW(Msg* message, HWND window, uint first, uint last);
     int  PeekMessageW(Msg* message, HWND window, uint first, uint last, uint remove);
     int  TranslateMessage(Msg* message);
-    long DispatchMessageW(Msg* message);
+    nint DispatchMessageW(Msg* message);
     void PostQuitMessage(int code);
-    long DefWindowProcW(HWND window, uint message, ulong wParam, long lParam);
-    long SendMessageW(HWND window, uint message, ulong wParam, long lParam);
-    int  PostMessageW(HWND window, uint message, ulong wParam, long lParam);
-    int  PostThreadMessageW(uint thread, uint message, ulong wParam, long lParam);
+    nint DefWindowProcW(HWND window, uint message, nuint wParam, nint lParam);
+    nint SendMessageW(HWND window, uint message, nuint wParam, nint lParam);
+    int  PostMessageW(HWND window, uint message, nuint wParam, nint lParam);
+    int  PostThreadMessageW(uint thread, uint message, nuint wParam, nint lParam);
     int  MessageBeep(uint kind);
 }
 
@@ -222,10 +222,10 @@ public extern "C"
     int  IsWindowVisible(HWND window);
     int  IsIconic(HWND window);
     int  IsZoomed(HWND window);
-    int  EnumWindows(WindowEnumerator callback, long parameter);
-    int  EnumChildWindows(HWND parent, WindowEnumerator callback, long parameter);
-    long GetWindowLongPtrW(HWND window, int index);
-    long SetWindowLongPtrW(HWND window, int index, long value);
+    int  EnumWindows(WindowEnumerator callback, nint parameter);
+    int  EnumChildWindows(HWND parent, WindowEnumerator callback, nint parameter);
+    nint GetWindowLongPtrW(HWND window, int index);
+    nint SetWindowLongPtrW(HWND window, int index, nint value);
     uint GetWindowThreadProcessId(HWND window, uint* processId);
 
     int  SetWindowTextW(HWND window, char16* text);
@@ -480,7 +480,7 @@ public extern "C"
     short GetKeyState(int key);
     int   GetKeyboardState(byte* state);
     uint  MapVirtualKeyW(uint code, uint mapping);
-    int   GetKeyNameTextW(long lParam, char16* buffer, int size);
+    int   GetKeyNameTextW(int lParam, char16* buffer, int size);
     short VkKeyScanW(ushort character);
 }
 
@@ -570,8 +570,8 @@ public const uint WmPaste = 0x0302u;
 
 public extern "C"
 {
-    ulong SetTimer(HWND window, ulong id, uint milliseconds, TimerProcedure callback);
-    int   KillTimer(HWND window, ulong id);
+    nuint SetTimer(HWND window, nuint id, uint milliseconds, TimerProcedure callback);
+    int   KillTimer(HWND window, nuint id);
 }
 
 // ================================================================== metrics
@@ -648,8 +648,8 @@ public extern "C"
 
     /// Calls a window procedure directly. What a subclassed control calls to
     /// reach the procedure it replaced, in place of `DefWindowProcW`.
-    long  CallWindowProcW(WindowProcedure previous, HWND window, uint message,
-                          ulong wParam, long lParam);
+    nint  CallWindowProcW(WindowProcedure previous, HWND window, uint message,
+                          nuint wParam, nint lParam);
 
     int   EnableWindow(HWND window, int enable);
     int   IsWindowEnabled(HWND window);
@@ -1139,8 +1139,8 @@ public char16* RtManifest() => (char16*)(nuint)24u;
 /// small one is what the title bar draws, and a window given only the large
 /// one gets a downscaled blur in its corner.
 public const uint WmSetIcon = 0x0080u;
-public const ulong IconSmallSize = 0u;
-public const ulong IconBigSize   = 1u;
+public const nuint IconSmallSize = 0u;
+public const nuint IconBigSize   = 1u;
 
 /// The name Windows expects an executable's manifest to be filed under.
 /// `CREATEPROCESS_MANIFEST_RESOURCE_ID`: it is the loader that reads this one,
@@ -1181,12 +1181,12 @@ public extern "C"
     /// A modeless dialog from an `RT_DIALOG` template: it is returned, and the
     /// program's own message loop drives it.
     HWND   CreateDialogParamW(HINSTANCE instance, char16* name, HWND parent,
-                              DialogProcedure procedure, long parameter);
+                              DialogProcedure procedure, nint parameter);
 
     /// A modal one. This does not return until the dialog ends itself with
     /// `EndDialog`, because it runs a message loop of its own.
     nint   DialogBoxParamW(HINSTANCE instance, char16* name, HWND parent,
-                           DialogProcedure procedure, long parameter);
+                           DialogProcedure procedure, nint parameter);
 
     /// Ends a modal dialog, and decides what `DialogBoxParamW` answers.
     int    EndDialog(HWND dialog, nint result);
@@ -1202,7 +1202,7 @@ public extern "C"
 /// What a dialog procedure is. It answers true when it handled the message,
 /// which is the opposite convention to a window procedure -- a window
 /// procedure passes on what it did not want, and a dialog procedure says so.
-public delegate nint DialogProcedure(HWND dialog, uint message, ulong wParam, long lParam);
+public delegate nint DialogProcedure(HWND dialog, uint message, nuint wParam, nint lParam);
 
 /// Sent to a dialog procedure once, before it is shown, with `wParam` holding
 /// the control that would get the keyboard. Answering true takes the default.

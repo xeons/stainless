@@ -54,7 +54,7 @@ public struct State
 
 // ------------------------------------------------------------ the procedure
 
-long Procedure(HWND window, uint message, ulong wParam, long lParam)
+nint Procedure(HWND window, uint message, nuint wParam, nint lParam)
 {
     State* state = (State*)(nuint)GetWindowLongPtrW(window, GwlpUserData);
 

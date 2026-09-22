@@ -845,7 +845,7 @@ the declarations**, spelled as Windows spells them:
 ```csharp
 import Win32.User32;
 
-long Procedure(HWND window, uint message, ulong wParam, long lParam)
+nint Procedure(HWND window, uint message, nuint wParam, nint lParam)
 {
     if (message == WmDestroy) { PostQuitMessage(0); return 0; }
     return DefWindowProcW(window, message, wParam, lParam);

@@ -147,7 +147,7 @@ public struct CustomDraw
     /// index, so a caller has to map it back the same way `WM_COMMAND` does.
     public nuint Item;
     public uint State;
-    public long Data;
+    public nint Data;
 }
 
 // Which stage of the paint the control is asking about. `Item` is the bit that
@@ -267,6 +267,9 @@ public const uint ButtonImageListAlignCenter = 4u;
 // =================================================================== toolbar
 
 /// `TBBUTTON`: one button in a toolbar.
+///
+/// `bReserved` pads `Style` out to a pointer's alignment, so it is six bytes
+/// on x64 and two on x86: 32 bytes in all on the one, 20 on the other.
 public struct ToolBarButton
 {
     public int Bitmap;
@@ -275,10 +278,12 @@ public struct ToolBarButton
     public byte Style;
     public byte Reserved0;
     public byte Reserved1;
+#if !X86
     public byte Reserved2;
     public byte Reserved3;
     public byte Reserved4;
     public byte Reserved5;
+#endif
     public nuint Data;
     public nuint Text;
 }
@@ -397,7 +402,11 @@ public struct ToolInfo
 
 /// Up to and including `Text`, which is the last field a version 5 library
 /// knows about.
+#if X86
+public const uint ToolInfoV1Size = 40u;
+#else
 public const uint ToolInfoV1Size = 56u;
+#endif
 
 // ================================================================ status bar
 
