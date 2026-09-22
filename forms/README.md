@@ -338,7 +338,7 @@ nothing — so it wants a connector of its own and does not have one yet.
 **Z-order and the pointer are asked for, not waited for.** `Control` carries
 two small methods that exist because a *docked* window needs them and nothing
 else in the library did: `BringToFront`, which raises a control above the
-siblings it overlaps, and `PointerPosition`, which answers where the pointer is
+siblings it overlaps, and `GetPointerPosition`, which answers where the pointer is
 in this control's own coordinates.
 
 The second is the interesting one. Enter and leave events answer "is the pointer
@@ -428,7 +428,7 @@ letting the platform control paint itself.
 is the one its parent's `draw` handler is given. Only `CustomControl` connected
 that signal, so a `PaintBox` on a `Panel`, a `Bevel` on a tab page and a
 `SpeedButton` anywhere were laid out, hit-tested, clickable and invisible --
-for months, with every self-test passing. `GtkContainerPeer.ReportPaints` is
+for months, with every self-test passing. `GtkContainerPeer.ConnectPaintReports` is
 now called by the panel, the group box and the window, and answers false so
 that GTK still draws the real children over what the program painted.
 
@@ -579,7 +579,7 @@ before reading the code. A menu item is *owner-drawn*: Windows is given
 answers both. A toolbar button is *custom-drawn*: comctl32 has no such flag and
 instead asks its parent through `WM_NOTIFY`, several times per paint, how much
 of its own drawing to keep -- so the answer is the return value of the parent's
-window procedure, which is why `ControlPeer.NotifiedBy` carries one.
+window procedure, which is why `ControlPeer.OnNotify` carries one.
 
 **The toolbar keeps its native layout and borrows only the paint.** comctl32
 knows the picture size, the caption, whether captions are shown and how a
@@ -788,7 +788,7 @@ here because the *shape* of it recurs.
   the well does not land where the pointer is -- and the pointer still does
   not change shape over one. Neither is understood: `RefreshCursor` now
   pushes the hovered child's cursor to the peer, the peer answers
-  `WM_SETCURSOR` with it, `CursorFor` maps `SizeWestEast`, and none of that
+  `WM_SETCURSOR` with it, `LoadCursorFor` maps `SizeWestEast`, and none of that
   is enough. Whatever is wrong is in the routing between the panel's window
   and the windowless child, and finding it needs a pointer rather than a
   reading.
@@ -836,7 +836,7 @@ here because the *shape* of it recurs.
   peer answers from its own bounds -- which is why controls placed straight on
   a form always looked right and containers never did.
 - **A page's content was parented before its page existed.** `TabPage` builds
-  its panel, which reaches `AddChild`, and only then calls `Register`, which
+  its panel, which reaches `AddChild`, and only then calls `RegisterPage`, which
   reaches `AddTab`. A notebook cannot answer `AddChild` when it is asked, so it
   holds the child until it has a page for it.
 - **A page area of 1x1, for ever**, because the control layer asks for it
@@ -920,7 +920,7 @@ here at all. Where one is a backend's rather than the library's, it says so.
   compiler carries the compiled `.res` in a section of its own and
   `Standard.Resources` walks it, so a bitmap compiled into the program is read
   the same way on both backends. What is genuinely different is
-  `Form.UseIconResource`, which still answers false: an `RT_GROUP_ICON` becomes
+  `Form.SetIconResource`, which still answers false: an `RT_GROUP_ICON` becomes
   a window's icon because *Windows* reads it, and a GTK program's icon comes
   from the desktop's icon theme, keyed by the name in its `.desktop` file.
 - **A size request is a minimum.** A control in a `GtkFixed` is given its
