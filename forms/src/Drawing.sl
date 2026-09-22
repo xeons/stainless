@@ -214,8 +214,10 @@ public struct Rectangle
     /// less than that to shrink.
     public Rectangle Deflate(int amount)
     {
+        int width = Width - amount * 2;
+        int height = Height - amount * 2;
         return Rectangle.Of(X + amount, Y + amount,
-                            Width - amount * 2, Height - amount * 2);
+                            width < 0 ? 0 : width, height < 0 ? 0 : height);
     }
 
     /// The part both rectangles cover, which may be empty.

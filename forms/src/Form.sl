@@ -181,6 +181,14 @@ public class Form : WindowedControl, IWindowNotify
             x = x + here.Left;
             y = y + here.Top;
             walk = here.Parent;
+            // A parent's children start at its client origin, which is not its
+            // corner under a group box.
+            if (walk != null)
+            {
+                var origin = ((WindowedControl)walk).ClientOrigin;
+                x = x + origin.X;
+                y = y + origin.Y;
+            }
         }
         var frame = Bounds;
         var client = ClientBounds;

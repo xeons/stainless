@@ -731,9 +731,9 @@ public class TabControl : WindowedControl
     /// have shown up as renaming the wrong tab, long after the close that
     /// caused it.
     ///
-    /// The page is hidden rather than destroyed: a control's lifetime is its
-    /// parent's, and what a caller does with the page afterwards is its
-    /// business. Dropping the last reference to it is what destroys it.
+    /// The page leaves this control's children as well, and its window is
+    /// destroyed; see `RemoveControl`. Dropping the last reference to it is
+    /// what frees it.
     public bool RemovePage(TabPage page)
     {
         nuint at = 0u;
@@ -753,7 +753,7 @@ public class TabControl : WindowedControl
         var showing = SelectedPage;
         _native.RemoveTab((int)at);
         _pages.RemoveAt(at);
-        page.Visible = false;
+        RemoveControl(page);
 
         for (nuint i = at; i < _pages.Count; i++)
             _pages[i].Renumber((int)i);

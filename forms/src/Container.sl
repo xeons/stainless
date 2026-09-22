@@ -98,6 +98,16 @@ public abstract class GraphicControl : Control
             ((WindowedControl)parent).InvalidateRegion(Bounds);
     }
 
+    // Nothing here tells a platform anything, so every change that alters how
+    // the control looks MUST ask its parent to paint it again. A hidden one is
+    // repainted over where it was.
+    protected override void ApplyVisible()   => Invalidate();
+    protected override void ApplyEnabled()   => Invalidate();
+    protected override void ApplyText()      => Invalidate();
+    protected override void ApplyFont()      => Invalidate();
+    protected override void ApplyForeColor() => Invalidate();
+    protected override void ApplyBackColor() => Invalidate();
+
     /// Draws this control on its parent's surface.
     ///
     /// Called only by `WindowedControl.OnPaint`, which is the one thing that
@@ -108,9 +118,14 @@ public abstract class GraphicControl : Control
     /// *form's* corner rather than its own, and could draw over its siblings --
     /// the protection a real window gets from the platform for nothing. The
     /// clip and the origin are pushed together and put back together.
-    void PaintOn(Graphics surface)
+    ///
+    /// The surface is the parent widget's, which starts at the widget's corner
+    /// rather than at its client area; under a group box the two differ.
+    void PaintOn(Graphics surface, Point origin)
     {
-        int layer = surface.PushLayer(Bounds);
+        var at = Bounds;
+        int layer = surface.PushLayer(Rectangle.Of(at.X + origin.X, at.Y + origin.Y,
+                                                   at.Width, at.Height));
         OnPaint(PaintEventArgs.Of(surface, Rectangle.Of(0, 0, Width, Height)));
         surface.PopLayer(layer);
     }
@@ -140,6 +155,7 @@ public abstract class WindowedControl : Control
     /// by calling `AttachContainerPeer` instead of `AttachPeer`.
     IContainerPeer? _asContainer;
     List<Control> _inside;
+    ControlList _view;
     bool _laying;
 
     protected WindowedControl(WindowedControl? parent)
@@ -148,10 +164,11 @@ public abstract class WindowedControl : Control
         _platform = null;
         _asContainer = null;
         _inside = new List<Control>();
+        _view = new ControlList(_inside);
         _laying = false;
         _grabbed = null;
         _hovered = null;
-        _lastClient = Size.Empty;
+        _pressed = null;
         if (parent != null)
             ((WindowedControl)parent).Add(this);
     }
@@ -215,8 +232,24 @@ public abstract class WindowedControl : Control
         made.SetBackColor(BackColor);
         if (StoredText.ByteLength() > 0u)
             made.SetText(StoredText);
-        made.SetEnabled(Enabled);
+        made.SetEnabled(IsEnabled);
         made.SetVisible(Visible);
+    }
+
+    /// Lets go of the platform widget, and of every one inside it: the
+    /// control stays an object, with nothing on screen behind it.
+    void ReleasePeer()
+    {
+        foreach (var child in _inside)
+        {
+            if (child is WindowedControl windowed)
+                windowed.ReleasePeer();
+        }
+        var mine = _platform;
+        if (mine != null)
+            ((IControlPeer)mine).Destroy();
+        _platform = null;
+        _asContainer = null;
     }
 
     /// The platform handle, for reaching an API this layer does not wrap: an
@@ -236,7 +269,10 @@ public abstract class WindowedControl : Control
 
     /// The controls inside this one, in the order they were added -- which is
     /// also the order the layout pass gives them the client area in.
-    public List<Control> Controls => _inside;
+    ///
+    /// A view, not a copy, and not a list to change: a control joins by being
+    /// made with this as its parent and leaves by `RemoveControl`.
+    public ControlList Controls => _view;
 
     /// Takes a control in. Called by the child's own constructor, which is why
     /// it is not public: a control chooses its parent once, at birth.
@@ -245,6 +281,48 @@ public abstract class WindowedControl : Control
         _inside.Add(child);
         child.Adopt(this);
         PerformLayout();
+    }
+
+    /// Takes a child out, and answers whether it was one.
+    ///
+    /// **Its platform widget is destroyed**, and those of everything inside
+    /// it: a control cannot be given another parent, so the widget has nowhere
+    /// left to be. The object lives on while something holds it, with `Parent`
+    /// null and nothing on screen; dropping the last reference frees it.
+    public bool RemoveControl(Control child)
+    {
+        nuint count = _inside.Count;
+        for (nuint i = 0u; i < count; i++)
+        {
+            if (_inside[i] != child)
+                continue;
+
+            _inside.RemoveAt(i);
+            ForgetGraphic(child);
+            child.Orphan();
+            if (child is WindowedControl windowed)
+                windowed.ReleasePeer();
+            Invalidate();
+            PerformLayout();
+            return true;
+        }
+        return false;
+    }
+
+    /// Drops every reference the mouse routing holds to a child that is going.
+    void ForgetGraphic(Control child)
+    {
+        if (_grabbed == child)
+        {
+            _grabbed = null;
+            var mine = _platform;
+            if (mine != null)
+                ((IControlPeer)mine).SetCapture(false);
+        }
+        if (_hovered == child)
+            _hovered = null;
+        if (_pressed == child)
+            _pressed = null;
     }
 
     /// Every control inside this one, and inside those, and so on.
@@ -335,11 +413,25 @@ public abstract class WindowedControl : Control
             ((IControlPeer)mine).SetVisible(Visible);
     }
 
+    /// Tells the platform whether this control can be used, which a disabled
+    /// parent decides as well; see `IsEnabled`. Every child is told again,
+    /// because its answer has just changed too.
     protected override void ApplyEnabled()
     {
         var mine = _platform;
         if (mine != null)
-            ((IControlPeer)mine).SetEnabled(Enabled);
+            ((IControlPeer)mine).SetEnabled(IsEnabled);
+        foreach (var child in _inside)
+        {
+            if (child is WindowedControl windowed)
+            {
+                windowed.ApplyEnabled();
+            }
+            else
+            {
+                child.Invalidate();
+            }
+        }
     }
 
     protected override void ApplyText()
@@ -363,11 +455,18 @@ public abstract class WindowedControl : Control
         }
     }
 
+    /// A child with no colour of its own inherits this one, so it has just
+    /// changed too -- and only this control knows that happened.
     protected override void ApplyForeColor()
     {
         var mine = _platform;
         if (mine != null)
             ((IControlPeer)mine).SetForeColor(ForeColor);
+        foreach (var child in _inside)
+        {
+            if (!child.HasOwnForeColor)
+                child.ApplyForeColor();
+        }
     }
 
     protected override void ApplyBackColor()
@@ -375,6 +474,11 @@ public abstract class WindowedControl : Control
         var mine = _platform;
         if (mine != null)
             ((IControlPeer)mine).SetBackColor(BackColor);
+        foreach (var child in _inside)
+        {
+            if (!child.HasOwnBackColor)
+                child.ApplyBackColor();
+        }
     }
 
     protected override void ApplyCursor()
@@ -425,13 +529,18 @@ public abstract class WindowedControl : Control
     /// Which one the pointer was last over, so that entering and leaving can be
     /// reported at all -- Windows says nothing about a control it cannot see.
     GraphicControl? _hovered;
+    /// Which one took the last press, or null for this control itself.
+    GraphicControl? _pressed;
 
-    /// The topmost graphic child at a point in this control's coordinates.
+    /// The topmost graphic child at a point the platform reported, which is
+    /// measured from this widget's corner rather than its client area.
     ///
     /// Backwards, because a later child is drawn on top of an earlier one, and
     /// what is on top is what the mouse should find.
-    GraphicControl? GraphicAt(Point at)
+    GraphicControl? GraphicAt(Point reported)
     {
+        var origin = ClientOrigin;
+        var at = Point.At(reported.X - origin.X, reported.Y - origin.Y);
         nuint count = _inside.Count;
         for (nuint i = count; i > 0u; i--)
         {
@@ -474,10 +583,12 @@ public abstract class WindowedControl : Control
                                        ? Cursor : ((Control)over).Cursor);
     }
 
-    /// Where a point in this control's coordinates is in a child's.
-    Point Within(Control child, Point at)
+    /// Where a point the platform reported is in a child's coordinates.
+    Point Within(Control child, Point reported)
     {
-        return Point.At(at.X - child.Left, at.Y - child.Top);
+        var origin = ClientOrigin;
+        return Point.At(reported.X - origin.X - child.Left,
+                        reported.Y - origin.Y - child.Top);
     }
 
     /// Whichever graphic child a mouse message belongs to: the one holding the
@@ -494,6 +605,7 @@ public abstract class WindowedControl : Control
                                              ModifierKeys modifiers)
     {
         var target = MouseTarget(at);
+        _pressed = target;
         if (target != null)
         {
             var child = (GraphicControl)target;
@@ -545,6 +657,49 @@ public abstract class WindowedControl : Control
             return;
         }
         base.OnPlatformMouseMove(at, modifiers);
+    }
+
+    /// The second click of a double-click has already been reported as a
+    /// press, so the child that took that press takes this.
+    public override void OnPlatformDoubleClick()
+    {
+        var pressed = _pressed;
+        if (pressed != null)
+        {
+            ((GraphicControl)pressed).OnPlatformDoubleClick();
+            return;
+        }
+        base.OnPlatformDoubleClick();
+    }
+
+    public override void OnPlatformMouseWheel(int delta, Point at, ModifierKeys modifiers)
+    {
+        var target = MouseTarget(at);
+        if (target != null)
+        {
+            var child = (GraphicControl)target;
+            child.OnPlatformMouseWheel(delta, Within(child, at), modifiers);
+            return;
+        }
+        base.OnPlatformMouseWheel(delta, at, modifiers);
+    }
+
+    /// A menu asked for over a graphic child is offered to it first, and to
+    /// this control when it shows none. One asked for from the keyboard has no
+    /// pointer, so it is this control's.
+    public override bool OnPlatformContextMenu(Point at, bool fromKeyboard)
+    {
+        if (!fromKeyboard)
+        {
+            var target = MouseTarget(at);
+            if (target != null)
+            {
+                var child = (GraphicControl)target;
+                if (child.OnPlatformContextMenu(Within(child, at), false))
+                    return true;
+            }
+        }
+        return base.OnPlatformContextMenu(at, fromKeyboard);
     }
 
     /// The pointer left this control's window, so it has left any graphic child
@@ -601,6 +756,18 @@ public abstract class WindowedControl : Control
 
     // -------------------------------------------------------------- layout
 
+    /// The room children are laid out in, or empty when there is none: no
+    /// peer yet, or a window minimised to its icon.
+    Size LayoutClient
+    {
+        get
+        {
+            if (_platform == null)
+                return Size.Empty;
+            return ClientBounds.Extent;
+        }
+    }
+
     /// Arranges the children: docked ones first, in order, then anchored ones
     /// in what is left.
     ///
@@ -611,6 +778,13 @@ public abstract class WindowedControl : Control
     /// passes, or sorting the docked ones by anything but insertion order, is
     /// what makes a toolbar end up underneath a filled editor.
     ///
+    /// **Everything is computed from what was asked for.** A docked control
+    /// is sized from its request, and an anchored one from the request its
+    /// anchors were measured against, so a layout never reads back what an
+    /// earlier layout squeezed. An area with no room at all lays out nothing,
+    /// since a minimised window reports one, and the next layout with room
+    /// puts every control back.
+    ///
     /// **Re-entrant by one flag.** Setting a child's bounds raises its resize,
     /// which a handler may answer by changing something that lays out again;
     /// without the guard that is unbounded recursion the first time anyone
@@ -619,8 +793,8 @@ public abstract class WindowedControl : Control
     {
         if (_laying)
             return;
-        var mine = _platform;
-        if (mine == null)
+        var client = LayoutClient;
+        if (client.IsEmpty)
             return;
 
         _laying = true;
@@ -631,41 +805,48 @@ public abstract class WindowedControl : Control
         {
             if (!child.Visible)
                 continue;
-            var how = child.Dock;
-            if (how == DockStyle.None)
-                continue;
+            var asked = child.RequestedBounds;
 
-            if (how == DockStyle.Top)
+            switch (child.Dock)
             {
-                int height = child.Height;
-                if (height > free.Height)
-                    height = free.Height;
-                child.SetBounds(free.X, free.Y, free.Width, height);
-                free = Rectangle.Of(free.X, free.Y + height, free.Width, free.Height - height);
-            }
-            else if (how == DockStyle.Bottom)
-            {
-                int height = child.Height;
-                if (height > free.Height)
-                    height = free.Height;
-                child.SetBounds(free.X, free.Bottom - height, free.Width, height);
-                free = Rectangle.Of(free.X, free.Y, free.Width, free.Height - height);
-            }
-            else if (how == DockStyle.Left)
-            {
-                int width = child.Width;
-                if (width > free.Width)
-                    width = free.Width;
-                child.SetBounds(free.X, free.Y, width, free.Height);
-                free = Rectangle.Of(free.X + width, free.Y, free.Width - width, free.Height);
-            }
-            else if (how == DockStyle.Right)
-            {
-                int width = child.Width;
-                if (width > free.Width)
-                    width = free.Width;
-                child.SetBounds(free.Right - width, free.Y, width, free.Height);
-                free = Rectangle.Of(free.X, free.Y, free.Width - width, free.Height);
+                case DockStyle.Top:
+                {
+                    child.Place(Rectangle.Of(free.X, free.Y, free.Width,
+                                             Clamped(asked.Height, free.Height)));
+                    int took = Clamped(child.Height, free.Height);
+                    free = Rectangle.Of(free.X, free.Y + took, free.Width, free.Height - took);
+                    break;
+                }
+
+                case DockStyle.Bottom:
+                {
+                    int height = Clamped(asked.Height, free.Height);
+                    child.Place(Rectangle.Of(free.X, free.Bottom - height, free.Width, height));
+                    int took = Clamped(child.Height, free.Height);
+                    free = Rectangle.Of(free.X, free.Y, free.Width, free.Height - took);
+                    break;
+                }
+
+                case DockStyle.Left:
+                {
+                    child.Place(Rectangle.Of(free.X, free.Y,
+                                             Clamped(asked.Width, free.Width), free.Height));
+                    int took = Clamped(child.Width, free.Width);
+                    free = Rectangle.Of(free.X + took, free.Y, free.Width - took, free.Height);
+                    break;
+                }
+
+                case DockStyle.Right:
+                {
+                    int width = Clamped(asked.Width, free.Width);
+                    child.Place(Rectangle.Of(free.Right - width, free.Y, width, free.Height));
+                    int took = Clamped(child.Width, free.Width);
+                    free = Rectangle.Of(free.X, free.Y, free.Width - took, free.Height);
+                    break;
+                }
+
+                default:
+                    break;
             }
         }
 
@@ -677,101 +858,31 @@ public abstract class WindowedControl : Control
             if (!child.Visible)
                 continue;
             if (child.Dock == DockStyle.Fill)
-            {
-                child.SetBounds(free.X, free.Y, free.Width, free.Height);
-            }
+                child.Place(free);
+        }
+
+        foreach (var child in _inside)
+        {
+            if (child.Dock == DockStyle.None)
+                child.Place(child.AnchoredBounds(client));
         }
 
         _laying = false;
     }
 
-    /// Re-anchors the undocked children after this control changed size.
+    /// A size, held between zero and what is left.
     ///
-    /// Separate from `PerformLayout` because it needs the *previous* client
-    /// size to work out what each edge distance was, and only the resize
-    /// notification knows that. An anchor is a distance held constant: a
-    /// control anchored left and right keeps both gaps and therefore stretches;
-    /// one anchored left only keeps its left gap and its width.
-    void ReAnchor(Size wasClient, Size nowClient)
+    /// The platform MAY make a control larger than it was given -- GTK keeps a
+    /// widget at its minimum -- so what a docked control took is read back from
+    /// it, and held to the room there was.
+    static int Clamped(int wanted, int room)
     {
-        int growX = nowClient.Width - wasClient.Width;
-        int growY = nowClient.Height - wasClient.Height;
-        if (growX == 0 && growY == 0)
-            return;
-
-        foreach (var child in _inside)
-        {
-            if (child.Dock != DockStyle.None)
-                continue;
-
-            var at = child.Bounds;
-            var how = child.Anchors;
-
-            int x = at.X;
-            int width = at.Width;
-            bool left = how.HasFlag(AnchorStyles.Left);
-            bool right = how.HasFlag(AnchorStyles.Right);
-            if (left && right)
-            {
-                width = width + growX;
-            }
-            else if (right)
-            {
-                x = x + growX;
-            }
-            else if (!left)   // neither: stay centred
-            {
-                x = x + growX / 2;
-            }
-
-            int y = at.Y;
-            int height = at.Height;
-            bool top = how.HasFlag(AnchorStyles.Top);
-            bool bottom = how.HasFlag(AnchorStyles.Bottom);
-            if (top && bottom)
-            {
-                height = height + growY;
-            }
-            else if (bottom)
-            {
-                y = y + growY;
-            }
-            else if (!top)
-            {
-                y = y + growY / 2;
-            }
-
-            if (width < 0)
-                width = 0;
-            if (height < 0)
-                height = 0;
-
-            child.SetBounds(x, y, width, height);
-        }
+        if (wanted > room)
+            wanted = room;
+        if (wanted < 0)
+            wanted = 0;
+        return wanted;
     }
-
-    /// A resize is where both layout rules run: the anchored children move by
-    /// how much the client area grew, and the docked ones are laid out afresh.
-    protected override void OnResize()
-    {
-        var mine = _platform;
-        if (mine != null && !_laying)
-        {
-            var now = ClientBounds.Extent;
-            var was = _lastClient;
-            _lastClient = now;
-            if (!was.Equals(Size.Empty))
-            {
-                _laying = true;
-                ReAnchor(was, now);
-                _laying = false;
-            }
-        }
-        base.OnResize();
-        PerformLayout();
-    }
-
-    Size _lastClient;
 
     // --------------------------------------------------- painting children
 
@@ -785,14 +896,34 @@ public abstract class WindowedControl : Control
     protected override void OnPaint(PaintEventArgs args)
     {
         base.OnPaint(args);
+        var origin = ClientOrigin;
         foreach (var child in _inside)
         {
             if (!child.Visible)
                 continue;
             if (child is GraphicControl drawn)
             {
-                drawn.PaintOn(args.Graphics);
+                drawn.PaintOn(args.Graphics, origin);
             }
         }
     }
+}
+
+// ============================================================== the children
+
+/// The controls inside a `WindowedControl`, to read and not to change.
+///
+/// A view of the live list rather than a copy, so it is always current and
+/// costs nothing to ask for. `RemoveControl` is how a child leaves.
+public class ControlList : IReadOnlyList<Control>
+{
+    List<Control> _items;
+
+    ControlList(List<Control> items) => _items = items;
+
+    public nuint Count => _items.Count;
+    public bool IsEmpty => _items.IsEmpty;
+    public Control this[nuint index] { get => _items[index]; }
+
+    public IEnumerator<Control> GetEnumerator() => new ListEnumerator<Control>(this);
 }

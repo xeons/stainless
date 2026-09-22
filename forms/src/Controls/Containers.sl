@@ -442,9 +442,8 @@ public class Notebook : Panel
 
     /// Takes a page out and answers whether it was there.
     ///
-    /// The page is hidden rather than destroyed, as `TabControl.RemovePage`
-    /// does it and for the same reason: a control's lifetime is its parent's,
-    /// and dropping the last reference to it is what destroys it.
+    /// The page leaves this control's children as well, and its window is
+    /// destroyed, as `TabControl.RemovePage` does it; see `RemoveControl`.
     public bool RemovePage(NotebookPage page)
     {
         var list = Pages;
@@ -464,7 +463,7 @@ public class Notebook : Panel
 
         var showing = SelectedPage;
         list.RemoveAt(at);
-        page.Visible = false;
+        RemoveControl(page);
         for (nuint i = at; i < list.Count; i++)
             list[i].Renumber((int)i);
 

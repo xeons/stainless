@@ -565,11 +565,12 @@ public class WindowPeer : ControlPeer, IWindowPeer
         }
         DrawMenuBar(window);
         // The bar takes a row out of the client area, so everything laid out
-        // against it has moved.
+        // against it has moved. The report is of the window's own size, which
+        // is what `Bounds` holds; the layout reads the client area itself.
         var owner = Owner;
         if (owner != null)
         {
-            ((IControlNotify)owner).OnPlatformResized(ClientBounds.Extent);
+            ((IControlNotify)owner).OnPlatformResized(BoundsInParent.Extent);
         }
     }
 
