@@ -66,8 +66,16 @@ _Bool sl_random_bytes(void *buffer, size_t length)
     if (buffer == NULL || length == 0) return length == 0;
 
 #ifdef _WIN32
-    return BCryptGenRandom(NULL, (PUCHAR)buffer, (ULONG)length,
-                           BCRYPT_USE_SYSTEM_PREFERRED_RNG) == 0;
+    /* The count is a ULONG, which is 32 bits even on 64-bit Windows. */
+    unsigned char *at = (unsigned char *)buffer;
+    while (length > 0) {
+        ULONG step = length > 0x80000000u ? 0x80000000u : (ULONG)length;
+        if (BCryptGenRandom(NULL, at, step, BCRYPT_USE_SYSTEM_PREFERRED_RNG) != 0)
+            return 0;
+        at += step;
+        length -= step;
+    }
+    return 1;
 #elif defined(__linux__)
     unsigned char *at = (unsigned char *)buffer;
     size_t left = length;
