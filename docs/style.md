@@ -138,13 +138,35 @@ because it does not say which answer means what.
 [forms/src/Control.sl](../forms/src/Control.sl) and is the shape every event in
 this tree has.
 
-**A single word is fine when the word is right.** `Take`, `Skip`, `Map`,
-`Filter`, `Find` are not sloppy — they are the pipeline vocabulary that
-[§7.1.1](spec/07-functions-members.md#711-xfy-is-fx-y) exists to serve, and
-`names.Filter(keep).Map(Upper)` reads as well as LINQ does because the words are
-short. What a single word must not be is *vague*: `Update`, `Process`,
-`Handle`, `Do`, `Run` name nothing a caller can predict, and each should say
-what it updates or what it handles.
+**A method says what it acts on.** Microsoft's guidelines are the rule here:
+a method is a verb phrase whose object is named — `BuildMenuBar`,
+`ReleasePlatformItems`, `MeasureMenuItem`, `FindForm` — so that a call site
+reads without the declaration beside it. `Build`, `Forget`, `Measure`, `Place`
+and `Fire` name nothing a caller can predict.
+
+**A single word is allowed only where .NET uses that word for the same
+operation on the same kind of type.** It is .NET's vocabulary, not a
+judgement about which words are clear enough:
+
+| Kind of type | The single words that stay |
+|---|---|
+| a collection | `Add`, `Insert`, `Remove`, `RemoveAt`, `Clear`, `Contains`, `IndexOf`, `Sort`, `Reverse`, `Find` |
+| a sequence, as LINQ | `Select`, `Where`, `Aggregate`, `Any`, `All`, `First`, `Last`, `Take`, `Skip`, `Count`, `Sum`, `Min`, `Max`, `Distinct`, `Concat`, `Zip` |
+| a stream, file or socket | `Read`, `Write`, `Flush`, `Seek`, `Close`, `Open`, `Connect`, `Send`, `Receive`, `Accept`, `Listen`, `Bind` |
+| a window or control | `Show`, `Hide`, `Close`, `Focus`, `Invalidate`, `Update`, `Refresh`, `Activate` |
+| a lock, thread, timer or task | `Start`, `Stop`, `Wait`, `Join`, `Signal`, `Set`, `Reset`, `Release`, `Enter`, `Exit`, `Dispose` |
+| any value | `Equals`, `CompareTo`, `Parse`, `TryParse` |
+
+A word from the table is still wrong on a type it does not belong to: `Close`
+on a stream is .NET's, `Close` on a tree node is not.
+
+**A method is never past tense, an adjective or a noun.** `Clicked`, `Chosen`
+and `Notified` are an `OnXxx` raiser or handler, or a real verb. `Font()`,
+`Backend()` and `Separator()` are a property, a `CreateXxx` factory or a
+constructor; `Size.Of` and `Point.At` are constructors or `FromXxx`.
+
+**A field is named for the property it backs**: `_text` behind `Text`,
+`_checked` behind `Checked`, never `_caption` or `_ticked`.
 
 ### 1.4a A name at module level carries no context, so it must supply its own
 
