@@ -1,0 +1,52 @@
+text-and-child = <a>hello<b/></a> (stable)
+children = <a>\n  <b>1</b>\n  <c>\n    <d/>\n  </c>\n</a> (stable)
+deep-text = <a>\n  <b>x<c>y</c></b>\n  <e/>\n</a> (stable)
+indentation = []
+leaf-spaces = [  ]
+mixed = [x ]
+cdata-space = [ ]
+reference-space = [ ]
+crlf = [1\n2\n3\n4]
+cr-reference = [1\r2]
+cr-written = <a>1&#13;2</a>
+cdata-crlf = [1\n2]
+crlf-document = <a><b>x</b></a>
+attribute-whitespace = [1 2 3 4]
+attribute-references = [1\t2\n3\r4]
+attribute-written = <a x="1&#9;2&#10;3"/>
+lt-in-attribute = unexpected character
+attributes-touching = unexpected character
+reference-zero = unknown entity
+reference-control = unknown entity
+reference-surrogate = unknown entity
+reference-fffe = unknown entity
+reference-too-big = unknown entity
+reference-huge = unknown entity
+reference-upper-x = unknown entity
+cdata-end-in-text = unexpected character
+double-hyphen = unexpected character
+comment-hyphen-end = unexpected character
+doctype-after-root = content after the root element
+doctype-twice = unexpected character
+doctype-inside = malformed name
+declaration-after-root = unexpected character
+declaration-late = unexpected character
+declaration-inside = unexpected character
+raw-control = unexpected character
+leading-zeros-hex = <a>A</a>
+leading-zeros-decimal = <a>A</a>
+brackets-in-text = <a>]] ]&gt;</a>
+subset-literal = <a/>
+subset-apostrophe = <a/>
+subset-comment = <a/>
+system-literal = <a/>
+stylesheet = <a/>
+empty-comment = <a/>
+byte-order-mark = <a/>
+populate = no error
+trimmed = <Service Weight="3"><Port>8080</Port><Enabled>true</Enabled><Ratio>0.5</Ratio><Count>7</Count></Service>
+infinite = <Service Weight="0"><Port>0</Port><Enabled>false</Enabled><Ratio>-INF</Ratio><Count>0</Count></Service>
+infinite-back = <Service Weight="0"><Port>0</Port><Enabled>false</Enabled><Ratio>-INF</Ratio><Count>0</Count></Service>
+nan = <Service Weight="0"><Port>0</Port><Enabled>false</Enabled><Ratio>NaN</Ratio><Count>0</Count></Service>
+nan-back = NaN
+overflow = <Service Weight="0"><Port>0</Port><Enabled>false</Enabled><Ratio>2</Ratio><Count>0</Count></Service>

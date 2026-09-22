@@ -38,6 +38,7 @@ module Standard.Xml;
 import Standard.Collections;
 import Standard.Reflection;
 import Standard.Convert;
+import Standard.Math;
 
 // ------------------------------------------------------------------- errors
 
@@ -66,7 +67,8 @@ public enum XmlError
     BadName,
 
     /// An `&` that is not an entity this reads. The five XML entities and
-    /// numeric character references are what it reads; a DTD's own are not.
+    /// numeric character references are what it reads; a DTD's own are not,
+    /// and nor is a reference to a character XML does not allow.
     BadEntity,
 
     /// Nothing but whitespace and comments -- no root element.
@@ -166,6 +168,12 @@ public class XmlAttributes
 /// a paragraph with `<em>` inside it -- and the right one for the data XML is
 /// mostly used to carry. `Children` and `Text` together are what a
 /// configuration file has.
+///
+/// **Whitespace between elements is formatting.** In an element with child
+/// elements, a run of text that is only whitespace in the source is dropped:
+/// it is the indentation a person or `WriteIndented` put there. A run with
+/// anything else in it is kept whole, as is a CDATA section or a character
+/// reference, and an element with no children keeps all of its text.
 public class XmlNode
 {
     /// The tag name, without any namespace prefix being separated out -- a
@@ -353,56 +361,144 @@ String ParseName(Cursor cursor)
     return cursor.Source.Substring(start, cursor.At - start);
 }
 
-/// Skips a comment, a processing instruction, a CDATA section or a doctype,
-/// answering whether it found one. CDATA is the one that produces text, so it
-/// is handled by the caller instead.
+/// Skips a comment or a processing instruction, answering whether it found
+/// one. These are what may appear anywhere; a CDATA section produces text and
+/// a doctype has one place, so their callers handle them.
 bool SkipAside(Cursor cursor)
 {
     if (cursor.Take("<!--"))
     {
-        if (!cursor.SkipPast("-->"))
-            cursor.Reject(XmlError.UnclosedTag);
+        SkipComment(cursor);
         return true;
     }
 
     if (cursor.Take("<?"))
     {
-        if (!cursor.SkipPast("?>"))
-            cursor.Reject(XmlError.UnclosedTag);
-        return true;
-    }
-
-    if (cursor.Take("<!DOCTYPE"))
-    {
-        // An internal subset is bracketed; skipping to the first '>' would
-        // stop inside it, so the brackets are counted.
-        nuint depth = 0u;
-
-        while (!cursor.AtEnd)
-        {
-            byte c = cursor.Peek();
-            cursor.Skip();
-
-            if (c == (byte)'[')
-            {
-                depth = depth + 1u;
-            }
-            else if (c == (byte)']')
-            {
-                if (depth > 0u)
-                    depth = depth - 1u;
-            }
-            else if (c == (byte)'>' && depth == 0u)
-            {
-                return true;
-            }
-        }
-
-        cursor.Reject(XmlError.UnclosedTag);
+        SkipInstruction(cursor);
         return true;
     }
 
     return false;
+}
+
+/// The rest of a comment, which MUST NOT contain `--` before its end.
+void SkipComment(Cursor cursor)
+{
+    while (!cursor.AtEnd)
+    {
+        if (cursor.Take("--"))
+        {
+            if (cursor.Peek() != (byte)'>')
+            {
+                cursor.Reject(XmlError.Unexpected);
+                return;
+            }
+            cursor.Skip();
+            return;
+        }
+        cursor.Skip();
+    }
+
+    cursor.Reject(XmlError.UnclosedTag);
+}
+
+/// The rest of a processing instruction. Its target MUST be a name and MUST
+/// NOT be `xml` in any case: that is the declaration, which `Parse` reads
+/// only at the very start.
+void SkipInstruction(Cursor cursor)
+{
+    var target = ParseName(cursor);
+    if (cursor.Failed)
+        return;
+
+    if (IsReservedTarget(target))
+    {
+        cursor.Reject(XmlError.Unexpected);
+        return;
+    }
+
+    if (!IsSpace(cursor.Peek()) && !(cursor.Peek() == (byte)'?' && cursor.PeekAt(1u) == (byte)'>'))
+    {
+        cursor.Reject(XmlError.Unexpected);
+        return;
+    }
+
+    if (!cursor.SkipPast("?>"))
+        cursor.Reject(XmlError.UnclosedTag);
+}
+
+/// Whether a processing instruction's target spells `xml`, which the
+/// specification reserves whatever its case.
+bool IsReservedTarget(String target)
+{
+    if (target.ByteLength() != 3u)
+        return false;
+    return (target.ByteAt(0u) | 0x20u) == (byte)'x'
+        && (target.ByteAt(1u) | 0x20u) == (byte)'m'
+        && (target.ByteAt(2u) | 0x20u) == (byte)'l';
+}
+
+/// The rest of a doctype, after `<!DOCTYPE`.
+///
+/// An internal subset is bracketed, and a literal, a comment or a processing
+/// instruction inside one may hold a `]` or a `>` of its own, so each is
+/// stepped over whole.
+void SkipDoctype(Cursor cursor)
+{
+    nuint depth = 0u;
+
+    while (!cursor.AtEnd)
+    {
+        if (depth > 0u && cursor.Take("<!--"))
+        {
+            SkipComment(cursor);
+            if (cursor.Failed)
+                return;
+            continue;
+        }
+
+        if (depth > 0u && cursor.Take("<?"))
+        {
+            SkipInstruction(cursor);
+            if (cursor.Failed)
+                return;
+            continue;
+        }
+
+        byte c = cursor.Peek();
+        cursor.Skip();
+
+        switch (c)
+        {
+            case (byte)'"':
+            case (byte)'\'':
+                while (!cursor.AtEnd && cursor.Peek() != c)
+                    cursor.Skip();
+                if (cursor.AtEnd)
+                {
+                    cursor.Reject(XmlError.UnclosedText);
+                    return;
+                }
+                cursor.Skip();
+                break;
+
+            case (byte)'[':
+                depth++;
+                break;
+
+            case (byte)']':
+                if (depth > 0u)
+                    depth--;
+                break;
+
+            case (byte)'>':
+                if (depth == 0u)
+                    return;
+                break;
+        }
+    }
+
+    cursor.Reject(XmlError.UnclosedTag);
 }
 
 /// One element, its attributes and everything inside it.
@@ -425,6 +521,8 @@ XmlNode ParseElement(Cursor cursor)
     // --- attributes
     while (true)
     {
+        // Whitespace MUST separate one attribute from what comes before it.
+        bool spaced = IsSpace(cursor.Peek());
         SkipSpace(cursor);
 
         if (cursor.AtEnd)
@@ -451,6 +549,12 @@ XmlNode ParseElement(Cursor cursor)
             }
             cursor.Skip();
             return node;                        // <name ... /> has no content
+        }
+
+        if (!spaced)
+        {
+            cursor.Reject(XmlError.Unexpected);
+            return node;
         }
 
         var key = ParseName(cursor);
@@ -492,7 +596,12 @@ XmlNode ParseElement(Cursor cursor)
 
     // --- content
     cursor.Depth++;
+
+    // Every run of text, and every run but the ones that are only whitespace
+    // in the source. Which one the node keeps depends on whether it turns out
+    // to have children -- see the note on XmlNode.
     var text = new StringBuilder();
+    var kept = new StringBuilder();
 
     while (true)
     {
@@ -541,7 +650,9 @@ XmlNode ParseElement(Cursor cursor)
 
                 // Everything between, with no entities expanded, which is what
                 // a CDATA section is for.
-                text.Append(cursor.Source.Substring(start, cursor.At - start - 3u));
+                var section = cursor.Source.Substring(start, cursor.At - start - 3u);
+                text.Append(section);
+                kept.Append(section);
                 continue;
             }
 
@@ -560,21 +671,42 @@ XmlNode ParseElement(Cursor cursor)
             continue;
         }
 
-        text.Append(ParseUntil(cursor, (byte)'<'));
+        nuint from = cursor.At;
+        var run = ParseUntil(cursor, (byte)'<');
         if (cursor.Failed)
             break;
+
+        text.Append(run);
+        if (!IsBlankSource(cursor.Source, from, cursor.At))
+            kept.Append(run);
     }
 
     cursor.Depth--;
-    node.Text = text.ToText();
+    node.Text = node.Children.Count > 0u ? kept.ToText() : text.ToText();
     return node;
+}
+
+/// Whether the source between two offsets is only whitespace.
+bool IsBlankSource(String source, nuint from, nuint to)
+{
+    for (nuint i = from; i < to; i++)
+    {
+        if (!IsSpace(source.ByteAt(i)))
+            return false;
+    }
+    return true;
 }
 
 /// Reads text up to `stop`, expanding entities. The stop character is consumed
 /// when it is a quote and left when it is `<`, because the caller needs to see
 /// which tag follows.
+///
+/// Inside a quoted value `<` is refused, and a literal tab or line end is read
+/// as a space (§3.3.3); a character reference keeps its character. In content
+/// `]]>` is refused, since only a CDATA section may end with it.
 String ParseUntil(Cursor cursor, byte stop)
 {
+    bool quoted = stop != (byte)'<';
     var text = new StringBuilder();
     nuint run = cursor.At;
 
@@ -584,7 +716,7 @@ String ParseUntil(Cursor cursor, byte stop)
         {
             // Running out inside a quoted value is an error; running out of
             // content is the caller's to notice.
-            if (stop != (byte)'<')
+            if (quoted)
                 cursor.Reject(XmlError.UnclosedText);
             break;
         }
@@ -597,8 +729,32 @@ String ParseUntil(Cursor cursor, byte stop)
             {
                 text.Append(cursor.Source.Substring(run, cursor.At - run));
             }
-            if (stop != (byte)'<')
+            if (quoted)
                 cursor.Skip();
+            break;
+        }
+
+        if (quoted && c == (byte)'<')
+        {
+            cursor.Reject(XmlError.Unexpected);
+            break;
+        }
+
+        if (quoted && IsSpace(c) && c != (byte)' ')
+        {
+            if (cursor.At > run)
+            {
+                text.Append(cursor.Source.Substring(run, cursor.At - run));
+            }
+            text.Append(" ");
+            cursor.Skip();
+            run = cursor.At;
+            continue;
+        }
+
+        if (!quoted && c == (byte)']' && cursor.PeekAt(1u) == (byte)']' && cursor.PeekAt(2u) == (byte)'>')
+        {
+            cursor.Reject(XmlError.Unexpected);
             break;
         }
 
@@ -637,7 +793,8 @@ String ParseEntity(Cursor cursor)
     if (cursor.Take("&apos;"))
         return "'";
 
-    if (cursor.Take("&#x") || cursor.Take("&#X"))
+    // The hexadecimal form is spelled with a lower-case `x` only.
+    if (cursor.Take("&#x"))
         return ParseCharacterReference(cursor, 16u);
     if (cursor.Take("&#"))
         return ParseCharacterReference(cursor, 10u);
@@ -676,15 +833,13 @@ String ParseCharacterReference(Cursor cursor, uint radix)
             break;
         }
 
-        value = value * radix + digit;
+        // Leading zeros are allowed however many there are, so the digits
+        // are not counted; a value past the last code point stops growing,
+        // which keeps it from wrapping back into range.
+        if (value <= 0x10FFFFu)
+            value = value * radix + digit;
         digits++;
         cursor.Skip();
-
-        if (digits > 8u)
-        {
-            cursor.Reject(XmlError.BadEntity);
-            return "";
-        }
     }
 
     if (digits == 0u || cursor.Peek() != (byte)';')
@@ -694,19 +849,114 @@ String ParseCharacterReference(Cursor cursor, uint radix)
     }
     cursor.Skip();
 
-    // Anything that is not a scalar becomes U+FFFD, as everywhere else.
-    if (value > 0x10FFFFu || (value >= 0xD800u && value <= 0xDFFFu))
-        value = 0xFFFDu;
+    // A reference MUST name a character XML allows, which a reference is not
+    // a way around.
+    if (!IsXmlChar(value))
+    {
+        cursor.Reject(XmlError.BadEntity);
+        return "";
+    }
 
     return Text.FromChar((char32)value);
 }
 
+/// Whether a code point is one XML 1.0 allows in a document at all (§2.2).
+bool IsXmlChar(uint value)
+{
+    if (value < 0x20u)
+        return value == 0x9u || value == 0xAu || value == 0xDu;
+    if (value <= 0xD7FFu)
+        return true;
+    if (value >= 0xE000u && value <= 0xFFFDu)
+        return true;
+    return value >= 0x10000u && value <= 0x10FFFFu;
+}
+
+/// Whether the source holds a control character other than tab, LF and CR,
+/// none of which XML 1.0 allows even by reference.
+bool ContainsForbiddenControl(String source)
+{
+    for (nuint i = 0u; i < source.ByteLength(); i++)
+    {
+        byte c = source.ByteAt(i);
+        if (c < 0x20u && c != (byte)'\t' && c != (byte)'\n' && c != (byte)'\r')
+            return true;
+    }
+    return false;
+}
+
+/// The source with every CR LF pair and every lone CR made LF. A source with
+/// no CR in it is answered as it is.
+String NormalizeLineEnds(String source)
+{
+    var text = new StringBuilder();
+    nuint run = 0u;
+    nuint size = source.ByteLength();
+
+    for (nuint i = 0u; i < size; i++)
+    {
+        if (source.ByteAt(i) != (byte)'\r')
+            continue;
+
+        if (i > run)
+            text.Append(source.Substring(run, i - run));
+        text.Append("\n");
+
+        if (i + 1u < size && source.ByteAt(i + 1u) == (byte)'\n')
+            i++;
+        run = i + 1u;
+    }
+
+    if (run == 0u)
+        return source;
+    if (size > run)
+        text.Append(source.Substring(run, size - run));
+    return text.ToText();
+}
+
+/// Steps over a UTF-8 byte order mark at the very start, which Appendix F
+/// allows in front of the declaration.
+void SkipByteOrderMark(Cursor cursor)
+{
+    if (cursor.Source.ByteLength() < 3u)
+        return;
+    if (cursor.Source.ByteAt(0u) == 0xEFu
+     && cursor.Source.ByteAt(1u) == 0xBBu
+     && cursor.Source.ByteAt(2u) == 0xBFu)
+    {
+        cursor.At = 3u;
+    }
+}
+
 /// Reads a whole document and answers with its root element.
+///
+/// Line ends are normalized first (§2.11): a CR LF pair or a lone CR is read
+/// as LF everywhere, CDATA included. A control character XML does not allow
+/// is refused wherever it is. A UTF-8 byte order mark at the start is skipped.
 public Result<XmlNode, XmlError> Parse(String source)
 {
-    var cursor = new Cursor(source);
+    if (ContainsForbiddenControl(source))
+        return Fail(XmlError.Unexpected);
 
-    // Anything before the root: a declaration, a doctype, comments.
+    var cursor = new Cursor(NormalizeLineEnds(source));
+    SkipByteOrderMark(cursor);
+
+    // The declaration, which MUST be the very first thing when it is there.
+    // Anything else spelled `<?xml` is an instruction, read as one below.
+    if (cursor.Take("<?xml"))
+    {
+        if (!IsSpace(cursor.Peek()))
+        {
+            cursor.At = cursor.At - 5u;
+        }
+        else if (!cursor.SkipPast("?>"))
+        {
+            return Fail(XmlError.UnclosedTag);
+        }
+    }
+
+    // Anything else before the root: comments, instructions, one doctype.
+    bool doctype = false;
     while (true)
     {
         SkipSpace(cursor);
@@ -715,6 +965,19 @@ public Result<XmlNode, XmlError> Parse(String source)
 
         if (cursor.Peek() != (byte)'<')
             return Fail(XmlError.Unexpected);
+
+        if (cursor.Take("<!DOCTYPE"))
+        {
+            if (doctype)
+                return Fail(XmlError.Unexpected);
+            doctype = true;
+
+            SkipDoctype(cursor);
+            if (cursor.Failed)
+                return Fail(cursor.Failure);
+            continue;
+        }
+
         if (!SkipAside(cursor))
             break;
         if (cursor.Failed)
@@ -757,8 +1020,10 @@ public String Write(XmlNode node)
 }
 
 /// The same, indented two spaces a level. An element with text in it is still
-/// written on one line, because the whitespace an indent adds would become
-/// part of that text when it was read back.
+/// written on one line, children and all, because the whitespace an indent
+/// adds would become part of that text when it was read back. The indentation
+/// between the children of any other element is dropped by the reader -- see
+/// the note on XmlNode -- so writing what was read back gives the same text.
 public String WriteIndented(XmlNode node)
 {
     var text = new StringBuilder();
@@ -805,14 +1070,17 @@ void WriteInto(StringBuilder text, XmlNode node, nuint depth, bool pretty)
     // represent -- see the note on XmlNode.
     WriteEscaped(text, node.Text, false);
 
+    // Indentation beside text would become part of it when read back.
+    bool indent = pretty && node.Text.ByteLength() == 0u;
+
     for (nuint i = 0u; i < node.Children.Count; i++)
     {
-        if (pretty)
+        if (indent)
             text.Append("\n");
-        WriteInto(text, node.Children[i], depth + 1u, pretty);
+        WriteInto(text, node.Children[i], depth + 1u, indent);
     }
 
-    if (pretty && node.Children.Count > 0u)
+    if (indent && node.Children.Count > 0u)
     {
         text.Append("\n");
         for (nuint i = 0u; i < depth; i++)
@@ -1045,7 +1313,7 @@ String TextOfElement(byte* at, Field field)
         return Text.FromBool(Reflection.ReadBoolAt(at));
     if (kind == KindFloat || kind == KindDouble)
     {
-        return Text.FromDouble(Reflection.ReadDoubleAt(at, field));
+        return FormatXmlDouble(Reflection.ReadDoubleAt(at, field));
     }
     return Text.FromInteger(Reflection.ReadIntegerAt(at, field));
 }
@@ -1057,7 +1325,7 @@ String TextOfField(byte* instance, Field field)
     if (field.Kind == KindBool)
         return Text.FromBool(Reflection.ReadBool(instance, field));
     if (field.IsFloating)
-        return Text.FromDouble(Reflection.ReadDouble(instance, field));
+        return FormatXmlDouble(Reflection.ReadDouble(instance, field));
     if (field.IsInteger)
         return Text.FromInteger(Reflection.ReadInteger(instance, field));
     return "";
@@ -1184,21 +1452,24 @@ void FillElement(byte* at, Field field, String written)
         return;
     }
 
+    // Anything but a String is read without the whitespace around it, which
+    // is where an indented document puts its line ends.
+    var value = written.Trim();
+
     if (kind == KindBool)
     {
-        Reflection.WriteBoolAt(at, written == "true" || written == "1");
+        Reflection.WriteBoolAt(at, IsXmlTrue(value));
         return;
     }
 
     if (kind == KindFloat || kind == KindDouble)
     {
-        var parsed = Convert.ToDouble(written);
-        if (parsed.Ok)
+        if (ParseXmlDouble(value) is Some parsed)
             Reflection.WriteDoubleAt(at, field, parsed.Value);
         return;
     }
 
-    var whole = Convert.ToLong(written);
+    var whole = Convert.ToLong(value);
     if (whole.Ok)
         Reflection.WriteIntegerAt(at, field, whole.Value);
 }
@@ -1211,26 +1482,59 @@ void FillField(byte* instance, Field field, String written)
         return;
     }
 
+    // As in FillElement: a value that is not text is read trimmed.
+    var value = written.Trim();
+
     if (field.Kind == KindBool)
     {
-        // `true` and `1` both, which is what documents in the wild contain.
-        Reflection.WriteBool(instance, field, written == "true" || written == "1");
+        Reflection.WriteBool(instance, field, IsXmlTrue(value));
         return;
     }
 
     if (field.IsFloating)
     {
-        var parsed = Convert.ToDouble(written);
-        if (parsed.Ok)
+        if (ParseXmlDouble(value) is Some parsed)
             Reflection.WriteDouble(instance, field, parsed.Value);
         return;
     }
 
     if (field.IsInteger)
     {
-        var parsed = Convert.ToLong(written);
+        var parsed = Convert.ToLong(value);
         if (parsed.Ok)
             Reflection.WriteInteger(instance, field, parsed.Value);
         return;
     }
+}
+
+/// `true` and `1` both, which is what documents in the wild contain.
+bool IsXmlTrue(String value) => value == "true" || value == "1";
+
+/// A double as text, with XML Schema's spellings for the three values that
+/// have no digits: `INF`, `-INF` and `NaN`. `ParseXmlDouble` reads them back.
+String FormatXmlDouble(double value)
+{
+    if (Math.IsNaN(value))
+        return "NaN";
+    if (Math.IsInfinite(value))
+        return value > 0.0 ? "INF" : "-INF";
+    return Text.FromDouble(value);
+}
+
+/// A double from text: a finite numeral, or one of the spellings
+/// `FormatXmlDouble` writes. A numeral too large for a double is refused
+/// rather than read as an infinity nobody wrote.
+Optional<double> ParseXmlDouble(String value)
+{
+    switch (value)
+    {
+        case "INF": return Some(1.0 / 0.0);
+        case "-INF": return Some(-1.0 / 0.0);
+        case "NaN": return Some(0.0 / 0.0);
+    }
+
+    var parsed = Convert.ToDouble(value);
+    if (!parsed.Ok || !Math.IsFinite(parsed.Value))
+        return None;
+    return Some(parsed.Value);
 }
