@@ -436,8 +436,7 @@ public class ControlPeer : IControlPeer
                 // the left half of an `&&`.
                 if (bar is ScrollBarPeer scroller)
                 {
-                    scroller.Scrolled((uint)(wParam & 0xFFFFu),
-                                      (int)((wParam >> 16) & 0xFFFFu));
+                    scroller.Scrolled((uint)(wParam & 0xFFFFu));
                     return 0;
                 }
                 // A slider reports the same way, and says nothing about how far

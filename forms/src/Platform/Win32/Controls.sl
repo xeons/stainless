@@ -932,33 +932,61 @@ public class ScrollBarPeer : ControlPeer, IScrollBarPeer
     }
 
     /// Told what the user did, by the parent that was told.
-    public void Scrolled(uint action, int thumb)
+    ///
+    /// The thumb is read with `SIF_TRACKPOS` rather than from the message,
+    /// whose sixteen bits cannot carry a position past 65535.
+    public void Scrolled(uint action)
     {
-        int now = GetValue();
-        if (action == SbLineUp)
+        ScrollInfo info;
+        info.Size = (uint)sizeof(ScrollInfo);
+        info.Mask = SifAll;
+        info.Minimum = 0;
+        info.Maximum = 0;
+        info.Page = 0u;
+        info.Position = 0;
+        info.TrackPosition = 0;
+        GetScrollInfo(window, ScrollBarControl, &info);
+
+        // The last position is the one that shows the last page whole.
+        int page = info.Page > 0u ? (int)info.Page : 1;
+        int highest = info.Maximum - page + 1;
+        if (highest < info.Minimum)
+            highest = info.Minimum;
+
+        int now = info.Position;
+        switch (action)
         {
-            now = now - 1;
+            case SbLineUp:
+                now--;
+                break;
+            case SbLineDown:
+                now++;
+                break;
+            case SbPageUp:
+                now -= page;
+                break;
+            case SbPageDown:
+                now += page;
+                break;
+            case SbThumbTrack:
+            case SbThumbPosition:
+                now = info.TrackPosition;
+                break;
+            case SbTop:
+                now = info.Minimum;
+                break;
+            case SbBottom:
+                now = highest;
+                break;
+            default:
+                return;
         }
-        else if (action == SbLineDown)
-        {
-            now = now + 1;
-        }
-        else if (action == SbPageUp)
-        {
-            now = now - 10;
-        }
-        else if (action == SbPageDown)
-        {
-            now = now + 10;
-        }
-        else if (action == SbThumbTrack || action == SbThumbPosition)
-        {
-            now = thumb;
-        }
-        else
-        {
+        if (now < info.Minimum)
+            now = info.Minimum;
+        if (now > highest)
+            now = highest;
+        if (now == info.Position)
             return;
-        }
 
         SetValue(now);
         var owner = Owner;
