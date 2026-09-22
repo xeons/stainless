@@ -496,6 +496,13 @@ public interface ITextEntryPeer : IControlPeer
     /// The lines, for a multiline entry. One entry for a single-line one.
     String[] GetLines();
     void SetLines(String[] lines);
+
+    /// What Ctrl+X, Ctrl+C and Ctrl+V do, done by the platform's own entry so
+    /// that it converts text and moves the caret exactly as a keystroke would.
+    /// A cut or a paste into a read-only entry does nothing.
+    void CutToClipboard();
+    void CopyToClipboard();
+    void PasteFromClipboard();
 }
 
 /// A list of items the user chooses from: a list box or a combo box.
@@ -946,6 +953,95 @@ public interface ITimerPeer
     void Stop();
 }
 
+// ---------------------------------------------------------------- clipboard
+
+/// The formats both platforms name and convert for themselves.
+public enum ClipboardKind
+{
+    Text,
+    Html,
+    Image,
+    Files,
+}
+
+/// A picture on its way to or from the clipboard.
+///
+/// Pixels rather than an `IBitmapBackend`, because a toolkit's picture can be
+/// drawn and not read back, and a clipboard has to be read back.
+public sealed class ClipboardImage
+{
+    public int Width { get; }
+    public int Height { get; }
+
+    /// Blue, green, red and straight alpha, rows top to bottom, `Width * 4`
+    /// bytes to a row: `CreateBitmap`'s order.
+    public byte[] Pixels { get; }
+
+    public ClipboardImage(int width, int height, byte[] pixels)
+    {
+        Width = width;
+        Height = height;
+        Pixels = pixels;
+    }
+}
+
+/// One format a program named for itself, and its bytes.
+public sealed class ClipboardEntry
+{
+    public String Name { get; }
+    public byte[] Data { get; }
+
+    public ClipboardEntry(String name, byte[] data)
+    {
+        Name = name;
+        Data = data;
+    }
+}
+
+/// Everything one copy offers, which a backend puts on the clipboard at once.
+///
+/// Each format is absent until set. A backend offers every one that is
+/// present and no other.
+public sealed class ClipboardContent
+{
+    public String? Text;
+    public String? Html;
+    public ClipboardImage? Image;
+
+    /// Absolute paths. Empty for none.
+    public String[] Files;
+
+    public List<ClipboardEntry> Custom;
+
+    public ClipboardContent()
+    {
+        Text = null;
+        Html = null;
+        Image = null;
+        Files = new String[0u];
+        Custom = new List<ClipboardEntry>();
+    }
+
+    public bool IsEmpty => Text == null && Html == null && Image == null
+                           && Files.Length == 0u && Custom.Count == 0u;
+}
+
+/// What a clipboard watch tells the program.
+public interface IClipboardNotify
+{
+    void OnPlatformClipboardChanged();
+}
+
+/// A subscription to the clipboard's changes.
+///
+/// Released with the peer: the destructor MUST stop it, so that a watch
+/// nobody holds reports to nobody.
+public interface IClipboardWatchPeer
+{
+    void Start();
+    void Stop();
+}
+
 /// The platform's font, once it has been made. Opaque: only the backend that
 /// made it knows what is inside, and `Font` holds one so the handle is made
 /// once however many controls share the font.
@@ -1088,25 +1184,49 @@ public interface IWidgetSet
     ITimerPeer CreateTimer(ITimerNotify owner);
 
     // ------------------------------------------------------------ clipboard
+    //
+    // Every read answers something empty when the format is absent or the
+    // platform refused, and every write fails silently. See `Forms.Clipboard`
+    // for why.
 
-    /// What the clipboard holds as text, or `""` when it holds none.
+    /// Replaces everything on the clipboard with `content`, every format in
+    /// one operation. Empty content empties the clipboard.
     ///
-    /// **Text and nothing else, for now.** A clipboard carries any number of
-    /// formats at once and negotiates which one a paste wants, which is a
-    /// design of its own; what an editor needs is the one format both platforms
-    /// agree about and every program offers.
-    ///
-    /// Answering `""` for an empty clipboard rather than a null: a paste of
-    /// nothing and a paste of an empty string do the same thing, so a caller
-    /// that had to tell them apart would only be writing the test twice.
+    /// **One call, not one per format**, because a clipboard is replaced as a
+    /// whole: a second `SetClipboardData` after `EmptyClipboard` adds a
+    /// format, but a second `gtk_clipboard_set_with_data` discards the first.
+    void SetClipboard(ClipboardContent content);
+
+    /// The text, or `""`.
     String GetClipboardText();
 
-    /// Puts text on the clipboard, replacing whatever was there.
-    void SetClipboardText(String text);
+    /// The HTML fragment, or `""`. The fragment only: Windows wraps what was
+    /// copied in a document and a header, and those are taken off.
+    String GetClipboardHtml();
 
-    /// Whether there is text to be had. What a paste command greys itself out
-    /// on, and cheaper than fetching the text to find out.
-    bool ClipboardHasText { get; }
+    /// The picture, or null.
+    ClipboardImage? GetClipboardImage();
+
+    /// The absolute paths of the files copied, or an empty array.
+    String[] GetClipboardFiles();
+
+    /// The bytes of a format named by `RegisterClipboardFormatW` or a MIME
+    /// type, or an empty array.
+    byte[] GetClipboardFormat(String name);
+
+    /// Whether a standard format is on offer. Cheaper than reading it, and on
+    /// X11 much cheaper: the owner is asked what it has rather than for it.
+    bool ClipboardHas(ClipboardKind kind);
+
+    /// Whether a named format is on offer.
+    bool ClipboardHasFormat(String name);
+
+    /// The names of every format on offer, in the platform's own spelling.
+    String[] ClipboardFormatNames();
+
+    /// A peer that reports every change to the clipboard's contents, by this
+    /// program or any other, until it is stopped or released.
+    IClipboardWatchPeer CreateClipboardWatch(IClipboardNotify owner);
 
     // ------------------------------------------------------------ dialogs
     //

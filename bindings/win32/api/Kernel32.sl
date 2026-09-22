@@ -237,6 +237,8 @@ public extern "C"
     void*   GlobalLock(HGLOBAL block);
     int     GlobalUnlock(HGLOBAL block);
     HGLOBAL GlobalFree(HGLOBAL block);
+    /// The size of the block, which MAY be more than was asked for.
+    nuint   GlobalSize(HGLOBAL block);
 }
 
 public const uint MemCommit   = 0x00001000u;

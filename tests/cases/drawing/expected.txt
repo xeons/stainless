@@ -27,6 +27,9 @@
   ok   in blue, green, red, alpha order
   ok   and the same the other way
   ok   a buffer too small is refused
+  ok   a picture is made from pixels
+  ok   and gives the same ones back
+  ok   too few pixels are refused
   ok   a missing file says so
   ok   and bytes that are not a picture say so
   ok   and no bytes at all

@@ -118,6 +118,22 @@ public extern "C"
     /// A copy of a NUL-terminated string, owned by the caller. Free it with
     /// `g_free`.
     gchar* g_strdup(gchar* text);
+
+    /// Frees a null-terminated array of strings and every string in it.
+    void g_strfreev(gchar** strings);
+}
+
+// ============================================================ file names
+
+public extern "C"
+{
+    /// `file:///...` for an absolute path, owned by the caller. Null, with
+    /// `error` filled in, for a relative path. `hostname` MAY be null.
+    gchar* g_filename_to_uri(gchar* filename, gchar* hostname, GError** error);
+
+    /// The path a `file:` URI names, owned by the caller. Null for any other
+    /// scheme. `hostname` MAY be null.
+    gchar* g_filename_from_uri(gchar* uri, gchar** hostname, GError** error);
 }
 
 // ================================================================== the list

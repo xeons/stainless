@@ -241,14 +241,30 @@ long StainlessProc(HWND window, uint message, ulong wParam, long lParam)
     var peer = PeerOf(window);
     if (peer == null)
     {
-        // A timer's window is of this class too, and has no control behind it.
-        if (message == WmTimer)
+        // A timer's window and a clipboard watch's are of this class too, and
+        // have no control behind them.
+        switch (message)
         {
-            var timer = TimerOf(window);
-            if (timer != null)
+            case WmTimer:
             {
-                ((TimerPeer)timer).Fire();
-                return 0;
+                var timer = TimerOf(window);
+                if (timer != null)
+                {
+                    ((TimerPeer)timer).Fire();
+                    return 0;
+                }
+                break;
+            }
+
+            case WmClipboardUpdate:
+            {
+                var watch = ClipboardWatchOf(window);
+                if (watch != null)
+                {
+                    ((ClipboardWatchPeer)watch).Fire();
+                    return 0;
+                }
+                break;
             }
         }
         return DefWindowProcW(window, message, wParam, lParam);

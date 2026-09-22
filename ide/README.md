@@ -317,10 +317,10 @@ one being drawn.
 
 ### What this needed from Forms
 
-**A clipboard.** `Forms.Clipboard` — `GetText`, `SetText`, `HasText` — over a
-new seam on the widgetset: `CF_UNICODETEXT` through `GlobalAlloc` on Win32,
-`gtk_clipboard_*` on GTK. Text only so far; a clipboard carries any number of
-formats at once and negotiating between them is a design rather than a method.
+**A clipboard.** `Forms.Clipboard` over a seam on the widget set, of which the
+editor uses `GetText`, `SetText` and `HasText`. The same class carries HTML,
+pictures, files and a program's own formats, several at once through
+`ClipboardData`.
 
 **A way to close a tab.** `TabControl` could add pages and never remove one, so
 `RemovePage` is new. The interesting part is that every page after the removed

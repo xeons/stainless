@@ -157,6 +157,21 @@ public abstract class TextBoxBase : WindowedControl
     /// wants.
     public void SelectAll() => Entry.SetSelection(0, Text.ByteLength() > 0u ? 1000000 : 0);
 
+    /// Moves the selection to the clipboard, as Ctrl+X does. Nothing happens
+    /// when nothing is selected or the box is read-only.
+    public void CutToClipboard() => Entry.CutToClipboard();
+
+    /// Copies the selection to the clipboard, as Ctrl+C does.
+    public void CopyToClipboard() => Entry.CopyToClipboard();
+
+    /// Replaces the selection with the clipboard's text, as Ctrl+V does.
+    ///
+    /// `UserTextChanged` is raised, since this is the user's paste performed
+    /// on their behalf. On GTK the text arrives from the main loop rather than
+    /// before this returns, because the clipboard may belong to another
+    /// process that has to be asked for it.
+    public void PasteFromClipboard() => Entry.PasteFromClipboard();
+
     /// The text the platform holds, rather than the last value set -- the user
     /// has been typing, and the field would be stale.
     protected override String GetTextValue()

@@ -284,8 +284,9 @@ const int FillAlternate = 0;
 const int UnitPixel = 2;
 /// `GMEM_MOVEABLE`, which is what a stream over an `HGLOBAL` requires.
 const uint GlobalMoveable = 0x0002u;
-/// `ImageLockModeRead`. Nothing here locks for writing.
+/// `ImageLockModeRead` and `ImageLockModeWrite`.
 const uint LockModeRead = 0x0001u;
+const uint LockModeWrite = 0x0002u;
 
 /// GDI+, resolved once.
 ///
@@ -479,6 +480,30 @@ threadsafe sealed class Backend
         {
             byte* source = (byte*)locked.Scan0 + (nint)y * (nint)locked.Stride;
             memcpy((void*)(into + (nuint)y * row), (void*)source, row);
+        }
+
+        _unlock(image, &locked);
+        return true;
+    }
+
+    /// The reverse of `CopyPixels`: every pixel at once, from the same order.
+    public bool WritePixels(void* image, int width, int height, byte* from)
+    {
+        GpRect area;
+        area.X = 0;
+        area.Y = 0;
+        area.Width = width;
+        area.Height = height;
+
+        BitmapData locked;
+        if (_lock(image, &area, LockModeWrite, PixelFormat32bppArgb, &locked) != 0)
+            return false;
+
+        nuint row = (nuint)width * 4u;
+        for (int y = 0; y < height; y++)
+        {
+            byte* target = (byte*)locked.Scan0 + (nint)y * (nint)locked.Stride;
+            memcpy((void*)target, (void*)(from + (nuint)y * row), row);
         }
 
         _unlock(image, &locked);
@@ -1006,6 +1031,26 @@ threadsafe sealed class Backend
         return true;
     }
 
+    /// The reverse of `CopyPixels`, a call per pixel for the reason given there.
+    public bool WritePixels(void* image, int width, int height, byte* from)
+    {
+        // Replace rather than blend, as `SetPixel` does.
+        _blending(image, 0);
+        nuint at = 0u;
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                uint colour = (uint)from[at] | ((uint)from[at + 1u] << 8)
+                            | ((uint)from[at + 2u] << 16) | ((uint)from[at + 3u] << 24);
+                _setPixel(image, x, y, ToGd(colour));
+                at += 4u;
+            }
+        }
+        _blending(image, 1);
+        return true;
+    }
+
     // -------------------------------------------------------------- drawing
 
     public void Clear(void* image, uint colour)
@@ -1306,6 +1351,29 @@ public sealed class Image
                         ? ImageError.NotFound : ImageError.Unreadable);
         }
         return FromBytes(read.Value);
+    }
+
+    /// A picture made from pixels in `CopyPixels`' order: blue, green, red and
+    /// straight alpha, rows top to bottom, `width * 4` bytes to a row.
+    ///
+    /// What a clipboard or a capture hands back. The bytes are copied, so the
+    /// array may change afterwards without changing the picture.
+    public static Result<Image, ImageError> FromBgra(int width, int height, byte[] pixels)
+    {
+        if (width <= 0 || height <= 0)
+            return Fail(ImageError.Invalid);
+        if (pixels.Length < (nuint)width * (nuint)height * 4u)
+            return Fail(ImageError.Invalid);
+
+        var made = Create(width, height);
+        if (!made.Ok)
+            return made;
+
+        var picture = made.Value;
+        var backend = (Backend)Imaging.Use();
+        if (!backend.WritePixels(picture._handle, width, height, &pixels[0u]))
+            return Fail(ImageError.OutOfMemory);
+        return Ok(picture);
     }
 
     // ------------------------------------------------------------ what it is

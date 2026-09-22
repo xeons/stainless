@@ -848,17 +848,37 @@ public class GtkEntryPeer : GtkPeer, ITextEntryPeer
         gtk_entry_set_visibility(widget, mask == 0u ? 1 : 0);
     }
 
+    /// In characters on both kinds. An offset past the end is the end, which is
+    /// what `SelectAll`'s large length relies on.
     public void SetSelection(int start, int length)
     {
-        if (_multiline)
+        if (!_multiline)
+        {
+            gtk_editable_select_region(widget, start, start + length);
             return;
-        gtk_editable_select_region(widget, start, start + length);
+        }
+
+        // The insertion point at the far end, as `EM_SETSEL` leaves it.
+        GtkTextIter from;
+        GtkTextIter to;
+        gtk_text_buffer_get_iter_at_offset(_buffer, &from, start);
+        gtk_text_buffer_get_iter_at_offset(_buffer, &to, start + length);
+        gtk_text_buffer_select_range(_buffer, &to, &from);
+        gtk_text_view_scroll_mark_onscreen(inner, gtk_text_buffer_get_insert(_buffer));
     }
 
     public (int, int) GetSelection()
     {
         if (_multiline)
-            return (0, 0);
+        {
+            // With nothing selected both ends are the insertion point, which
+            // is the empty selection a caller wants.
+            GtkTextIter first;
+            GtkTextIter last;
+            gtk_text_buffer_get_selection_bounds(_buffer, &first, &last);
+            int start = gtk_text_iter_get_offset(&first);
+            return (start, gtk_text_iter_get_offset(&last) - start);
+        }
 
         gint from = 0;
         gint to = 0;
@@ -893,6 +913,44 @@ public class GtkEntryPeer : GtkPeer, ITextEntryPeer
             joined = joined + lines[i];
         }
         SetText(joined);
+    }
+
+    public void CutToClipboard()
+    {
+        if (_multiline)
+        {
+            gtk_text_buffer_cut_clipboard(_buffer, DefaultClipboard(),
+                                          gtk_text_view_get_editable(inner));
+        }
+        else
+        {
+            gtk_editable_cut_clipboard(widget);
+        }
+    }
+
+    public void CopyToClipboard()
+    {
+        if (_multiline)
+        {
+            gtk_text_buffer_copy_clipboard(_buffer, DefaultClipboard());
+        }
+        else
+        {
+            gtk_editable_copy_clipboard(widget);
+        }
+    }
+
+    public void PasteFromClipboard()
+    {
+        if (_multiline)
+        {
+            gtk_text_buffer_paste_clipboard(_buffer, DefaultClipboard(), null,
+                                            gtk_text_view_get_editable(inner));
+        }
+        else
+        {
+            gtk_editable_paste_clipboard(widget);
+        }
     }
 }
 

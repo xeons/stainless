@@ -538,6 +538,10 @@ public class TextEntryPeer : ControlPeer, ITextEntryPeer
         SetText(joined.ToText());
     }
 
+    public void CutToClipboard() => SendMessageW(window, WmCut, 0u, 0);
+    public void CopyToClipboard() => SendMessageW(window, WmCopy, 0u, 0);
+    public void PasteFromClipboard() => SendMessageW(window, WmPaste, 0u, 0);
+
     public override FSize PreferredSize
     {
         get

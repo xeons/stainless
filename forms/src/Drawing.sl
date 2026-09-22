@@ -642,8 +642,18 @@ public sealed class Bitmap
         var pixels = picture.ToBgra();
         if (pixels.Length == 0u)
             return Fail("could not read the picture's pixels");
+        return FromPixels(picture.Width, picture.Height, pixels);
+    }
 
-        var made = WidgetSet.Current.CreateBitmap(picture.Width, picture.Height, pixels);
+    /// A picture from pixels the program already has, in `CopyPixels`' order:
+    /// blue, green, red and straight alpha, rows top to bottom, `width * 4`
+    /// bytes to a row.
+    ///
+    /// The one way in that needs no imaging library, which is what a picture
+    /// pasted from the clipboard arrives through.
+    public static Result<Bitmap, String> FromPixels(int width, int height, byte[] pixels)
+    {
+        var made = WidgetSet.Current.CreateBitmap(width, height, pixels);
         if (!made.Ok)
             return Fail(made.Error);
         return Ok(new Bitmap(made.Value));

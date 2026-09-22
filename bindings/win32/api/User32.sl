@@ -528,12 +528,40 @@ public extern "C"
     HANDLE GetClipboardData(uint format);
     HANDLE SetClipboardData(uint format, HANDLE handle);
     int    IsClipboardFormatAvailable(uint format);
+
+    /// The id of a format by name, the same in every process for the session.
+    /// Zero on failure. Registering a name twice answers the same id.
+    uint   RegisterClipboardFormatW(char16* name);
+
+    /// The format after `format` on the open clipboard, starting from zero.
+    /// Zero at the end, and zero when the clipboard is not open.
+    uint   EnumClipboardFormats(uint format);
+
+    /// A registered format's name, in units written without the terminator.
+    /// Zero for a predefined format, which has no name to give.
+    int    GetClipboardFormatNameW(uint format, char16* name, int capacity);
+
+    /// Asks for `WM_CLIPBOARDUPDATE` whenever the contents change. Since Vista.
+    int    AddClipboardFormatListener(HWND window);
+    int    RemoveClipboardFormatListener(HWND window);
 }
 
 public const uint ClipboardText        = 1u;
 public const uint ClipboardBitmap      = 2u;
+public const uint ClipboardOemText     = 7u;
+public const uint ClipboardDib         = 8u;
 public const uint ClipboardUnicodeText = 13u;
 public const uint ClipboardHDrop       = 15u;
+public const uint ClipboardLocale      = 16u;
+public const uint ClipboardDibV5       = 17u;
+
+/// Sent to every window that called `AddClipboardFormatListener`.
+public const uint WmClipboardUpdate = 0x031Du;
+
+/// What an `EDIT` does with its selection when sent one of these.
+public const uint WmCut   = 0x0300u;
+public const uint WmCopy  = 0x0301u;
+public const uint WmPaste = 0x0302u;
 
 // =================================================================== timers
 

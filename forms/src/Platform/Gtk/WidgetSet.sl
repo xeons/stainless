@@ -76,6 +76,7 @@ public class GtkWidgetSet : IWidgetSet
     {
         _started = false;
         _themeFont = null;
+        _selfReported = new List<ClipboardRelay>();
     }
 
     public String Name { get { return "GTK3"; } }
@@ -279,32 +280,109 @@ public class GtkWidgetSet : IWidgetSet
     }
 
     // ------------------------------------------------------------ clipboard
+    //
+    // The work is in `Clipboard.sl` beside this file. Each starts GTK first,
+    // because a clipboard belongs to a display and a program may copy before
+    // it opens a window.
+
+    public void SetClipboard(ClipboardContent content)
+    {
+        Start();
+        WriteClipboard(content);
+        ReportOwnClipboardChange();
+    }
+
+    /// The watches this widget set reports its own copies to, on a display
+    /// that cannot report them. Empty everywhere else.
+    ///
+    /// Posted rather than raised, as Windows posts `WM_CLIPBOARDUPDATE`: a
+    /// handler that copies would otherwise be re-entered from inside its own
+    /// copy.
+    List<ClipboardRelay> _selfReported;
+
+    void ReportOwnClipboardChange()
+    {
+        for (nuint i = _selfReported.Count; i > 0u; i--)
+        {
+            if (!_selfReported[i - 1u].IsAlive)
+                _selfReported.RemoveAt(i - 1u);
+        }
+
+        for (nuint i = 0u; i < _selfReported.Count; i++)
+        {
+            var relay = _selfReported[i];
+            if (relay.Listening)
+                Application.Post(() => { relay.Raise(); });
+        }
+    }
 
     public String GetClipboardText()
     {
-        gchar* text = gtk_clipboard_wait_for_text(gtk_clipboard_get(ClipboardSelection()));
-        if (text == null)
-            return "";
-        // Owned by us, unlike almost everything else GTK answers, so it is
-        // copied into a String and then freed.
-        String answer = Standard.Text.FromNullTerminated((byte*)text);
-        g_free((gpointer)text);
-        return answer;
+        Start();
+        return ReadClipboardText();
     }
 
-    public void SetClipboardText(String text)
+    public String GetClipboardHtml()
     {
-        gtk_clipboard_set_text(gtk_clipboard_get(ClipboardSelection()),
-                               (gchar*)text.ToPointer(), -1);
+        Start();
+        return ReadClipboardHtml();
     }
 
-    public bool ClipboardHasText
+    public ClipboardImage? GetClipboardImage()
     {
-        get
+        Start();
+        return ReadClipboardImage();
+    }
+
+    public String[] GetClipboardFiles()
+    {
+        Start();
+        return ReadClipboardFiles();
+    }
+
+    public byte[] GetClipboardFormat(String name)
+    {
+        Start();
+        return ReadClipboardTarget(name);
+    }
+
+    public bool ClipboardHas(ClipboardKind kind)
+    {
+        Start();
+        gpointer clipboard = DefaultClipboard();
+        switch (kind)
         {
-            return gtk_clipboard_wait_is_text_available(
-                gtk_clipboard_get(ClipboardSelection())) != 0;
+            case ClipboardKind.Text:
+                return gtk_clipboard_wait_is_text_available(clipboard) != 0;
+            case ClipboardKind.Html:
+                return gtk_clipboard_wait_is_target_available(clipboard, AtomNamed(HtmlTarget)) != 0;
+            case ClipboardKind.Image:
+                return gtk_clipboard_wait_is_image_available(clipboard) != 0;
+            case ClipboardKind.Files:
+                return gtk_clipboard_wait_is_uris_available(clipboard) != 0;
         }
+        return false;
+    }
+
+    public bool ClipboardHasFormat(String name)
+    {
+        Start();
+        return gtk_clipboard_wait_is_target_available(DefaultClipboard(), AtomNamed(name)) != 0;
+    }
+
+    public String[] ClipboardFormatNames()
+    {
+        Start();
+        return ReadClipboardTargetNames();
+    }
+
+    public IClipboardWatchPeer CreateClipboardWatch(IClipboardNotify owner)
+    {
+        Start();
+        var relay = new ClipboardRelay(owner);
+        if (!DisplayReportsClipboardOwner())
+            _selfReported.Add(relay);
+        return new GtkClipboardWatchPeer(relay);
     }
 
     // ------------------------------------------------------------- dialogs
@@ -407,27 +485,9 @@ public class GtkWidgetSet : IWidgetSet
                         + Text.FromInteger((long)pixels.Length));
         }
 
-        GdkPixbuf* made = gdk_pixbuf_new(0, 1, 8, width, height);
+        GdkPixbuf* made = PixbufFromBgra(width, height, pixels);
         if (made == null)
             return Fail("gdk-pixbuf would not make a bitmap of that size");
-
-        byte* into = gdk_pixbuf_get_pixels(made);
-        nuint stride = (nuint)gdk_pixbuf_get_rowstride(made);
-        nuint row = (nuint)width * 4u;
-
-        for (nuint y = 0u; y < (nuint)height; y++)
-        {
-            nuint source = y * row;
-            nuint target = y * stride;
-            for (nuint x = 0u; x < row; x = x + 4u)
-            {
-                into[target + x]      = pixels[source + x + 2u];   // red
-                into[target + x + 1u] = pixels[source + x + 1u];   // green
-                into[target + x + 2u] = pixels[source + x];        // blue
-                into[target + x + 3u] = pixels[source + x + 3u];   // alpha
-            }
-        }
-
         return Ok(new GtkBitmapBackend((gpointer)made));
     }
 

@@ -522,6 +522,12 @@ public extern "C"
                                                gint* start, gint* end);
     gint gtk_editable_get_position(GtkWidget* editable);
     void gtk_editable_set_position(GtkWidget* editable, gint at);
+
+    /// The selection to or from `GDK_SELECTION_CLIPBOARD`, as Ctrl+X, Ctrl+C
+    /// and Ctrl+V would. A cut or paste on a read-only entry does nothing.
+    void gtk_editable_cut_clipboard(GtkWidget* editable);
+    void gtk_editable_copy_clipboard(GtkWidget* editable);
+    void gtk_editable_paste_clipboard(GtkWidget* editable);
 }
 
 // ================================================================= notebook

@@ -148,6 +148,20 @@ int Main()
     ok = Check(ok, "a buffer too small is refused",
                !picture.CopyPixels(new byte[16u]));
 
+    // ---- and back in.
+    var rebuilt = Image.FromBgra(64, 48, pixels);
+    ok = Check(ok, "a picture is made from pixels", rebuilt.Ok);
+    if (rebuilt.Ok)
+    {
+        var out = rebuilt.Value.ToBgra();
+        ok = Check(ok, "and gives the same ones back",
+                   out.Length == pixels.Length && out[at] == (byte)30
+                   && out[at + 2u] == (byte)200 && out[at + 3u] == (byte)255);
+    }
+
+    ok = Check(ok, "too few pixels are refused",
+               Image.FromBgra(64, 48, new byte[16u]).Fail);
+
     // ---- what goes wrong.
     var missing = Image.FromFile("no-such-picture-anywhere.png");
     ok = Check(ok, "a missing file says so",

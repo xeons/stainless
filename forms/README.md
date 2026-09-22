@@ -111,7 +111,8 @@ src/Controls/Text.sl        Label, TextBox                  (lcl/stdctrls.pp)
 src/Controls/Lists.sl       ListBox, ComboBox
 src/Controls/Containers.sl  Panel, GroupBox, ScrollBar, CustomControl,
                             Notebook, NotebookPage
-src/Clipboard.sl            Clipboard                        (lcl/clipbrd.pp)
+src/Clipboard.sl            Clipboard, ClipboardData,
+                            ClipboardWatcher                 (lcl/clipbrd.pp)
 src/Controls/Menus.sl       MainMenu, PopupMenu, MenuItem      (lcl/menus.pp)
 src/Controls/Common.sl      ToolBar, StatusBar, ProgressBar, TrackBar,
                             TabControl, TreeView, ListView, ImageList,
@@ -528,7 +529,7 @@ grouped by how much work it is rather than by where it lives.
 | `ImageList` | `imglist.pp` |
 | `PaintBox`, `Shape`, `Bevel`, `Splitter`, `Notebook` | `extctrls.pp` |
 | `CustomControl` | `customcontrol` in `controls.pp` |
-| `Clipboard`, text only | `clipbrd.pp` |
+| `Clipboard`, `ClipboardData`, `ClipboardWatcher`: text, HTML, pictures, files and a program's own formats | `clipbrd.pp` |
 | `OpenDialog`, `SaveDialog`, `FolderDialog`, `ColorDialog`, `FontDialog` | `dialogs.pp` |
 | `InputDialog` | `InputQuery` in `dialogs.pp` |
 | `Timer` | `customtimer.pas` |

@@ -293,6 +293,27 @@ public extern "C"
     void gdk_monitor_get_workarea(gpointer monitor, GdkRectangle* into);
 }
 
+// ==================================================================== atoms
+
+/// `GdkAtom`: an interned string, compared by address. Opaque, and never
+/// freed.
+public using GdkAtom = byte*;
+
+public extern "C"
+{
+    /// The atom for a name. With `onlyIfExists` set, null for a name nothing
+    /// has interned yet.
+    GdkAtom gdk_atom_intern(gchar* name, gboolean onlyIfExists);
+
+    /// The name, **owned by the caller**: `g_free` it.
+    gchar* gdk_atom_name(GdkAtom atom);
+
+    /// Whether the display reports a change of selection owner, which is what
+    /// makes `owner-change` fire. X11 with XFixes and Wayland do; Broadway
+    /// does not.
+    gboolean gdk_display_supports_selection_notification(gpointer display);
+}
+
 // ================================================================== pixbufs
 
 /// `GdkPixbuf*`: an image in memory, and a `GObject` rather than a widget --
@@ -336,6 +357,12 @@ public extern "C"
 
     /// Whether there is a fourth byte per pixel. Non-zero for yes.
     gboolean gdk_pixbuf_get_has_alpha(GdkPixbuf* pixbuf);
+
+    /// Bytes per pixel: 3 without alpha, 4 with.
+    gint gdk_pixbuf_get_n_channels(GdkPixbuf* pixbuf);
+
+    /// Bits per channel. 8 for every pixbuf gdk-pixbuf makes.
+    gint gdk_pixbuf_get_bits_per_sample(GdkPixbuf* pixbuf);
 
     /// A new pixbuf at another size. `GDK_INTERP_BILINEAR` is 2.
     GdkPixbuf* gdk_pixbuf_scale_simple(GdkPixbuf* pixbuf, gint width, gint height,

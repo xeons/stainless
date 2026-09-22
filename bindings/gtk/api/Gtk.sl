@@ -444,6 +444,39 @@ public extern "C"
                                     GtkTextIter* end, gboolean hidden);
 
     gint gtk_text_buffer_get_char_count(GtkWidget* buffer);
+
+    /// The selection, in characters. False when nothing is selected, and then
+    /// both iterators are at the insertion point.
+    gboolean gtk_text_buffer_get_selection_bounds(GtkWidget* buffer, GtkTextIter* start,
+                                                  GtkTextIter* end);
+
+    void gtk_text_buffer_get_iter_at_offset(GtkWidget* buffer, GtkTextIter* into,
+                                            gint offset);
+
+    /// Moves the insertion point to `insert` and the other end to `bound`.
+    void gtk_text_buffer_select_range(GtkWidget* buffer, GtkTextIter* insert,
+                                      GtkTextIter* bound);
+
+    /// The insertion point's mark, **borrowed**.
+    gpointer gtk_text_buffer_get_insert(GtkWidget* buffer);
+
+    /// Scrolls the view so that a mark is on screen.
+    void gtk_text_view_scroll_mark_onscreen(GtkWidget* view, gpointer mark);
+
+    /// The offset in characters, not bytes.
+    gint gtk_text_iter_get_offset(GtkTextIter* iter);
+
+    /// The buffer's own clipboard commands. `editable` is what a paste or a
+    /// cut honours, and SHOULD be the view's.
+    void gtk_text_buffer_cut_clipboard(GtkWidget* buffer, gpointer clipboard,
+                                       gboolean editable);
+    void gtk_text_buffer_copy_clipboard(GtkWidget* buffer, gpointer clipboard);
+
+    /// Pastes at `at`, or at the insertion point when that is null.
+    void gtk_text_buffer_paste_clipboard(GtkWidget* buffer, gpointer clipboard,
+                                         GtkTextIter* at, gboolean editable);
+
+    gboolean gtk_text_view_get_editable(GtkWidget* view);
 }
 
 /// `GtkWrapMode`.
@@ -781,6 +814,112 @@ public extern "C"
     gchar* gtk_clipboard_wait_for_text(gpointer clipboard);
 
     gboolean gtk_clipboard_wait_is_text_available(gpointer clipboard);
+
+    /// The picture on the clipboard, converted from whichever image target
+    /// was offered, or null. **Owned by the caller**: `g_object_unref` it.
+    GdkPixbuf* gtk_clipboard_wait_for_image(gpointer clipboard);
+    gboolean gtk_clipboard_wait_is_image_available(gpointer clipboard);
+
+    /// The `text/uri-list` on the clipboard as a null-terminated array, or
+    /// null. **Owned by the caller**: `g_strfreev` it. Since 3.4.
+    gchar** gtk_clipboard_wait_for_uris(gpointer clipboard);
+    gboolean gtk_clipboard_wait_is_uris_available(gpointer clipboard);
+
+    /// One target's bytes, or null when it is not offered. **Owned by the
+    /// caller**: `gtk_selection_data_free` it.
+    gpointer gtk_clipboard_wait_for_contents(gpointer clipboard, GdkAtom target);
+    gboolean gtk_clipboard_wait_is_target_available(gpointer clipboard, GdkAtom target);
+
+    /// Every target on offer. `targets` is **owned by the caller** and freed
+    /// with `g_free`; the atoms in it are not freed.
+    gboolean gtk_clipboard_wait_for_targets(gpointer clipboard, GdkAtom** targets,
+                                            gint* count);
+
+    /// Takes the clipboard, offering `targets`. Nothing is copied now: `get`
+    /// is called each time another program pastes one of them, and `clear`
+    /// once, when something else takes the clipboard.
+    ///
+    /// `clear` is called for the *previous* owner from inside this call when
+    /// that owner was this same program, which is why `data` should say which
+    /// offer it belongs to.
+    gboolean gtk_clipboard_set_with_data(gpointer clipboard, GtkTargetEntry* targets,
+                                         guint count, ClipboardGetCallback get,
+                                         ClipboardClearCallback clear, gpointer data);
+
+    /// Empties the clipboard, if this program owns it.
+    void gtk_clipboard_clear(gpointer clipboard);
+
+    /// Asks a clipboard manager to copy `targets` -- all of them when null --
+    /// when this program exits, so a copy outlives the program that made it.
+    void gtk_clipboard_set_can_store(gpointer clipboard, GtkTargetEntry* targets,
+                                     gint count);
+
+    /// The clipboard for a selection atom on a display, **borrowed**.
+    gpointer gtk_clipboard_get_for_display(gpointer display, GdkAtom selection);
+}
+
+/// What `gtk_clipboard_set_with_data` calls when a paste asks for a target.
+/// `info` is the number the target was added to the list with.
+public delegate void ClipboardGetCallback(gpointer clipboard, gpointer selection,
+                                          guint info, gpointer data);
+
+/// What it calls once the offer is withdrawn.
+public delegate void ClipboardClearCallback(gpointer clipboard, gpointer data);
+
+// ========================================================== selection data
+
+/// `GtkTargetEntry`. Opaque: a table is only ever made from a target list.
+public using GtkTargetEntry = byte;
+
+public extern "C"
+{
+    /// The bytes, **borrowed** from the selection data. GTK adds a NUL past
+    /// the end that `gtk_selection_data_get_length` does not count.
+    byte* gtk_selection_data_get_data(gpointer selection);
+
+    /// -1 when the other program refused.
+    gint gtk_selection_data_get_length(gpointer selection);
+
+    /// The target this data was asked for as.
+    GdkAtom gtk_selection_data_get_target(gpointer selection);
+
+    /// Answers a request with bytes. `format` is the bits per unit, 8 for
+    /// every format that is not an X11 relic.
+    void gtk_selection_data_set(gpointer selection, GdkAtom type, gint format,
+                                byte* data, gint length);
+
+    /// Answers with text, converted to whichever text target was asked for.
+    gboolean gtk_selection_data_set_text(gpointer selection, gchar* text, gint length);
+
+    /// Answers with a picture, encoded as whichever image target was asked for.
+    gboolean gtk_selection_data_set_pixbuf(gpointer selection, GdkPixbuf* pixbuf);
+
+    /// Answers with a null-terminated array of URIs.
+    gboolean gtk_selection_data_set_uris(gpointer selection, gchar** uris);
+
+    void gtk_selection_data_free(gpointer selection);
+
+    /// An empty list when `targets` is null and `count` zero. Freed with
+    /// `gtk_target_list_unref`.
+    gpointer gtk_target_list_new(GtkTargetEntry* targets, guint count);
+    void gtk_target_list_unref(gpointer list);
+
+    void gtk_target_list_add(gpointer list, GdkAtom target, guint flags, guint info);
+
+    /// Every text target GTK knows, all under one `info`.
+    void gtk_target_list_add_text_targets(gpointer list, guint info);
+
+    /// Every image format gdk-pixbuf can write when `writable`, all under one
+    /// `info`.
+    void gtk_target_list_add_image_targets(gpointer list, guint info, gboolean writable);
+
+    /// `text/uri-list`.
+    void gtk_target_list_add_uri_targets(gpointer list, guint info);
+
+    /// The list as the flat table `gtk_clipboard_set_with_data` takes. Freed
+    /// with `gtk_target_table_free`.
+    GtkTargetEntry* gtk_target_table_new_from_list(gpointer list, gint* count);
+    void gtk_target_table_free(GtkTargetEntry* targets, gint count);
 }
 
 /// `GDK_SELECTION_CLIPBOARD`, which is an interned atom rather than a number.
