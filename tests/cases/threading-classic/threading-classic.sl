@@ -41,8 +41,8 @@ void Producer(byte* argument)
 {
     Threading.Sleep(5u);
 
-    var held = Handoff.Lock();
-    held.Set(42);
+    var held = Handoff.Enter();
+    held.SetValue(42);
     held.Pulse();
 }
 
@@ -60,12 +60,12 @@ void Limited(byte* argument)
 
     // Raise the high-water mark, and keep trying if another thread moved it
     // first. This is the shape every lock-free update has.
-    long seen = Peak.Load();
+    long seen = Peak.Read();
     while (now > seen)
     {
         if (Peak.CompareExchange(seen, now))
             break;
-        seen = Peak.Load();
+        seen = Peak.Read();
     }
 
     Threading.Sleep(2u);
@@ -127,7 +127,7 @@ void ReadIt(byte* argument)
 {
     for (int i = 0; i < 100; i++)
     {
-        var view = Shared.Read();
+        var view = Shared.EnterReadLock();
         ReadSum.Add(view.Value);
     }
 }
@@ -139,7 +139,7 @@ static readonly AtomicBool Ready = new AtomicBool(false);
 void SetReady(byte* argument)
 {
     Threading.Sleep(5u);
-    Ready.Store(true);
+    Ready.Write(true);
 }
 
 // ------------------------------------------------------------------- driving
@@ -168,13 +168,13 @@ int Main()
     printf("joinable      = %d\n", single.IsJoinable);
     single.Join();
     printf("afterJoin     = %d\n", single.IsJoinable);
-    printf("oneWorker     = %lld\n", Total.Load());
+    printf("oneWorker     = %lld\n", Total.Read());
 
     // ------------------------------------------------------------ counting
 
     JoinAll(StartAll(CountUp, Workers));
-    printf("counted       = %lld\n", Total.Load());
-    printf("narrow        = %d\n", Narrow.Load());
+    printf("counted       = %lld\n", Total.Read());
+    printf("narrow        = %d\n", Narrow.Read());
 
     // ------------------------------------------------------- wait and pulse
 
@@ -184,7 +184,7 @@ int Main()
     // is no way to put it down early: assigning null to a non-nullable
     // reference is what the compiler refuses, and rightly.
     {
-        var held = Handoff.Lock();
+        var held = Handoff.Enter();
         while (held.Value == 0)
             held.Wait();
         printf("handedOver    = %lld\n", held.Value);
@@ -195,17 +195,17 @@ int Main()
     // ------------------------------------------------------------ the limit
 
     JoinAll(StartAll(Limited, Workers));
-    printf("everyoneRan   = %lld\n", Live.Load());
-    printf("neverOverTwo  = %d\n", Peak.Load() <= 2);
-    printf("reachedTwo    = %d\n", Peak.Load() >= 1);
+    printf("everyoneRan   = %lld\n", Live.Read());
+    printf("neverOverTwo  = %d\n", Peak.Read() <= 2);
+    printf("reachedTwo    = %d\n", Peak.Read() >= 1);
 
     // -------------------------------------------------------------- events
 
     var waiters = StartAll(WaitForGate, Workers);
-    printf("noneYet       = %lld\n", Passed.Load());
+    printf("noneYet       = %lld\n", Passed.Read());
     Opened.Set();
     JoinAll(waiters);
-    printf("allPassed     = %lld\n", Passed.Load());
+    printf("allPassed     = %lld\n", Passed.Read());
     printf("stillOpen     = %d\n", Opened.IsSet);
 
     Opened.Reset();
@@ -218,12 +218,12 @@ int Main()
     var first = new Thread(PassTurnstile, null);
     Turnstile.Set();
     first.Join();
-    printf("oneThrough    = %lld\n", Through.Load());
+    printf("oneThrough    = %lld\n", Through.Read());
 
     var second = new Thread(PassTurnstile, null);
     Turnstile.Set();
     second.Join();
-    printf("twoThrough    = %lld\n", Through.Load());
+    printf("twoThrough    = %lld\n", Through.Read());
 
     // A signal with nobody waiting is remembered, so this passes immediately.
     Turnstile.Set();
@@ -242,38 +242,38 @@ int Main()
     // ------------------------------------------------------------- barrier
 
     JoinAll(StartAll(Marching, 4));
-    printf("phaseSum      = %lld\n", PhaseSum.Load());
+    printf("phaseSum      = %lld\n", PhaseSum.Read());
     printf("participants  = %llu\n", (ulong)Round.ParticipantCount);
 
     // -------------------------------------------------------- reader/writer
 
     JoinAll(StartAll(ReadIt, 4));
-    printf("readSum       = %lld\n", ReadSum.Load());
+    printf("readSum       = %lld\n", ReadSum.Read());
 
     // A read guard is held here, so a writer cannot get in and says so rather
     // than blocking forever.
     {
-        var view = Shared.Read();
-        printf("readerBlocks  = %d\n", Shared.TryWrite() == null);
+        var view = Shared.EnterReadLock();
+        printf("readerBlocks  = %d\n", Shared.TryEnterWriteLock() == null);
     }
 
     {
-        var writer = Shared.Write();
-        writer.Set(7);
+        var writer = Shared.EnterWriteLock();
+        writer.SetValue(7);
     }
 
-    printf("written       = %lld\n", Shared.Read().Value);
+    printf("written       = %lld\n", Shared.EnterReadLock().Value);
 
     // ------------------------------------------------------------- spinning
 
     var setter = new Thread(SetReady, null);
 
     var spin = new SpinWait();
-    while (!Ready.Load())
-        spin.Once();
+    while (!Ready.Read())
+        spin.SpinOnce();
 
     setter.Join();
-    printf("spunUntilSet  = %d\n", Ready.Load());
+    printf("spunUntilSet  = %d\n", Ready.Read());
     printf("spunAtAll     = %d\n", spin.Count > 0u);
 
     // ------------------------------------------------------------- detached

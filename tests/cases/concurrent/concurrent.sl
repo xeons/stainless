@@ -121,7 +121,7 @@ int Main()
     }
     // 1 + 2 + ... + 600, and each item taken exactly once.
     printf("channel=%lld items=%lld closed=%d\n",
-        total.Load(), seen.Load(), channel.IsClosed ? 1 : 0);
+        total.Read(), seen.Read(), channel.IsClosed ? 1 : 0);
     printf("after-close=%d drained=%d\n",
         channel.Send(1) ? 1 : 0, channel.Take().Ok ? 1 : 0);
 

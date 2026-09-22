@@ -240,7 +240,7 @@ public class DebugSession
 
     void QueueCommand(DebugCommand command, String expression, nuint row)
     {
-        var held = _commands.Lock();
+        var held = _commands.Enter();
         if (held.Value.IsClosed)
             return;
         held.Value.Pending.Add(new PendingCommand(command, expression, row));
@@ -249,7 +249,7 @@ public class DebugSession
 
     void ReopenQueue()
     {
-        var held = _commands.Lock();
+        var held = _commands.Enter();
         held.Value.Pending.Clear();
         held.Value.IsClosed = false;
     }
@@ -405,7 +405,7 @@ public class DebugSession
     /// Blocks until the window asks for something.
     PendingCommand TakeCommand()
     {
-        var held = _commands.Lock();
+        var held = _commands.Enter();
 
         // In a loop: both platforms permit a spurious wake, and a pulse says
         // only that something changed.
@@ -499,7 +499,7 @@ public class DebugSession
     /// Stops anything further being queued, and wakes anyone waiting.
     void CloseQueue()
     {
-        var held = _commands.Lock();
+        var held = _commands.Enter();
         held.Value.IsClosed = true;
         held.PulseAll();
     }

@@ -19,7 +19,7 @@ const int PerJob = 20000;
 
 AtomicLong Grab(Mutex<AtomicLong> held)
 {
-    var guard = held.Lock();
+    var guard = held.Enter();
     return guard.Value;
 }
 
@@ -48,8 +48,8 @@ int Main()
 
     // Alive, and counted exactly: had the count drifted, this would be reading
     // freed memory rather than reporting a total.
-    printf("total=%lld\n", counter.Load());
-    printf("guarded=%lld\n", Grab(held).Load());
+    printf("total=%lld\n", counter.Read());
+    printf("guarded=%lld\n", Grab(held).Read());
     printf("done\n");
     return 0;
 }

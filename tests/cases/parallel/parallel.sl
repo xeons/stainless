@@ -93,7 +93,7 @@ int Main()
         }
     }
 
-    printf("accumulated=%lld\n", running.Load());
+    printf("accumulated=%lld\n", running.Read());
 
     // for parallel: the array is captured by address and written through.
     var pixels = new int[1000];

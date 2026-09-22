@@ -214,15 +214,15 @@ public class BackgroundForm : Form
         // class reference is copied too, and a copy of a reference still names
         // the one object.
         var posted = new AtomicBool(false);
-        Application.Post(() => posted.Store(true));
-        if (posted.Load())
+        Application.Post(() => posted.Write(true));
+        if (posted.Read())
         {
             Console.WriteLine("FAIL: Post ran its work before the loop turned");
             ok = false;
         }
 
         Application.DoEvents();
-        if (!posted.Load())
+        if (!posted.Read())
         {
             Console.WriteLine("FAIL: Post never ran its work");
             ok = false;
@@ -235,8 +235,8 @@ public class BackgroundForm : Form
         // Send from the UI thread runs inline rather than deadlocking against
         // a loop it is itself blocking.
         var sent = new AtomicBool(false);
-        Application.Send(() => sent.Store(true));
-        if (!sent.Load())
+        Application.Send(() => sent.Write(true));
+        if (!sent.Read())
         {
             Console.WriteLine("FAIL: Send from the UI thread did not run inline");
             ok = false;

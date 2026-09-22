@@ -221,14 +221,14 @@ public static class Application
 
     static void Enqueue(Action work)
     {
-        var guard = s_posted.Lock();
+        var guard = s_posted.Enter();
         guard.Value.Add(work);
     }                                   // ~Guard() unlocks before the wake
 
     static List<Action> TakePosted()
     {
         var taken = new List<Action>();
-        var guard = s_posted.Lock();
+        var guard = s_posted.Enter();
         var pending = guard.Value;
 
         for (nuint i = 0u; i < pending.Count; i++)

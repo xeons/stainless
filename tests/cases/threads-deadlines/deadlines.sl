@@ -5,14 +5,14 @@ import Standard.Console;
 import Standard.Threading;
 import Standard.Time;
 
-// ReleaseMany(0) broadcasts with no permit to take, which is a wake the
+// Release(0) broadcasts with no permit to take, which is a wake the
 // waiter MUST NOT treat as a fresh start of its timeout.
 void Nudge(byte* argument)
 {
     var permits = (Semaphore)argument;
     for (int i = 0; i < 150; i++)
     {
-        permits.ReleaseMany(0);
+        permits.Release(0);
         Sleep(10);
     }
 }
@@ -43,7 +43,7 @@ void CheckSemaphore()
 
     var clock = new Clock();
     bool took = permits.WaitFor(100);
-    long spent = clock.Elapsed().TotalMilliseconds;
+    long spent = clock.Elapsed.TotalMilliseconds;
     Console.WriteLine($"semaphore took {took}, bounded {spent < 1000}");
     nudger.Join();
 }
@@ -55,7 +55,7 @@ void CheckManualReset()
 
     var clock = new Clock();
     latch.WaitFor(100);
-    long spent = clock.Elapsed().TotalMilliseconds;
+    long spent = clock.Elapsed.TotalMilliseconds;
     Console.WriteLine($"manual reset bounded {spent < 1000}");
     flicker.Join();
 }
@@ -82,7 +82,7 @@ void CheckCountdown()
     var drainer = new Thread(Drain, (byte*)draining);
     var clock = new Clock();
     bool drained = draining.WaitFor(5000);
-    long spent = clock.Elapsed().TotalMilliseconds;
+    long spent = clock.Elapsed.TotalMilliseconds;
     Console.WriteLine($"drained by a negative count {drained}, woken {spent < 2500}");
     drainer.Join();
     Console.WriteLine($"remaining {draining.CurrentCount}");

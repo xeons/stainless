@@ -78,8 +78,8 @@ public static class Background
     {
         var worker = new Thread(() =>
         {
-            var value = work.Produce();
-            Application.Post(() => then.Consume(value));
+            var value = work.Invoke();
+            Application.Post(() => then.Invoke(value));
         });
         worker.Detach();
     }

@@ -20,8 +20,8 @@ void BumpGuarded(byte* argument)
 
     for (int i = 0; i < PerJob; i = i + 1)
     {
-        var guard = counter.Lock();
-        guard.Set(guard.Value + 1);
+        var guard = counter.Enter();
+        guard.SetValue(guard.Value + 1);
     }
 }
 
@@ -55,38 +55,38 @@ int Main()
     printf("workers>0=%d\n", WorkerCount() > 0 ? 1 : 0);
 
     {
-        var guard = guarded.Lock();
+        var guard = guarded.Enter();
         printf("guarded=%lld\n", guard.Value);
     }
 
-    printf("counted=%lld\n", counted.Load());
+    printf("counted=%lld\n", counted.Read());
 
     // The lock is free again, which is only true if every guard above unlocked.
     {
-        var free = guarded.TryLock();
+        var free = guarded.TryEnter();
         printf("tryWhenFree=%d\n", free != null ? 1 : 0);
     }
 
     var flag = new AtomicBool(false);
-    printf("flagStart=%d\n", flag.Load() ? 1 : 0);
+    printf("flagStart=%d\n", flag.Read() ? 1 : 0);
     printf("flagWon=%d\n", flag.Exchange(true) ? 1 : 0);
-    printf("flagNow=%d\n", flag.Load() ? 1 : 0);
+    printf("flagNow=%d\n", flag.Read() ? 1 : 0);
 
     var swap = new AtomicLong(10);
     printf("casOk=%d\n", swap.CompareExchange(10, 20) ? 1 : 0);
     printf("casNo=%d\n", swap.CompareExchange(10, 30) ? 1 : 0);
-    printf("casValue=%lld\n", swap.Load());
+    printf("casValue=%lld\n", swap.Read());
 
     // A mutex over a reference type: the guard hands out the object, and it is
     // mutated through the lock rather than replaced.
     var shared = new Mutex<AtomicLong>(new AtomicLong(7));
     {
-        var guard = shared.Lock();
+        var guard = shared.Enter();
         guard.Value.Add(35);
     }
     {
-        var guard = shared.Lock();
-        printf("shared=%lld\n", guard.Value.Load());
+        var guard = shared.Enter();
+        printf("shared=%lld\n", guard.Value.Read());
     }
 
     printf("done\n");

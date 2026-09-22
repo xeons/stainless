@@ -115,12 +115,12 @@ int Main(String[] args)
 
     // The wall clock is somewhere in this century, and the monotonic one does
     // not go backwards. Neither is a value that can be written down.
-    var now = Instant.Now().ToUtc();
+    var now = Instant.Now.ToUtc();
     printf("thisEra   = %d\n", now.Year >= 2020 && now.Year < 2200);
 
     var clock = new Clock();
-    var first = clock.Elapsed();
-    var second = clock.Elapsed();
+    var first = clock.Elapsed;
+    var second = clock.Elapsed;
     printf("forwards  = %d\n", second >= first);
 
     // -------------------------------------------------------------- random
@@ -185,7 +185,7 @@ int Main(String[] args)
     // Bytes from the platform, which cannot be predicted and can only be
     // checked for having arrived at all.
     var noise = new byte[32];
-    printf("entropy   = %d\n", Random.Bytes(noise));
+    printf("entropy   = %d\n", Random.FillSecureBytes(noise));
 
     // ---------------------------------------------------------------- stdin
 

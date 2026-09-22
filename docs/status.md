@@ -205,7 +205,7 @@ last person to edit it -- the suite is the authority.
   `parallel` alone always means the scope
 - `Thread` and `Future<T>` for work no lexical scope brackets — a listener, a
   background writer, a result returned from the function that started it. Both
-  take a lambda, and `Future<T>.Get` blocks, which needs no `async` anywhere
+  take a lambda, and `Future<T>.GetResult` blocks, which needs no `async` anywhere
 - `static` as C# means it: fields, methods, properties, static constructors and
   `static class`, on a module or on a type, mutable or `readonly`. Storage is
   initialized before `Main` in an order the compiler computes from the
@@ -495,7 +495,7 @@ last person to edit it -- the suite is the authority.
 - `Standard.Random`: xoshiro256**, seeded by you for a reproducible run or by
   the operating system for an unpredictable one. A class rather than free
   functions, because the state has to live somewhere and a hidden global one
-  is what makes a program impossible to replay. `Random.Bytes` goes straight to
+  is what makes a program impossible to replay. `Random.FillSecureBytes` goes straight to
   the platform's cryptographic source, which is what a key or a token wants
 - `Standard.IO`, `Standard.File`, `Standard.Directory`, `Standard.Path`:
   `IStream` with `FileStream` and `MemoryStream`, whole-file reads and writes,

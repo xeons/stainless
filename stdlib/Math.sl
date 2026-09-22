@@ -106,7 +106,7 @@ public double Log2(double x) => log2(x);
 /// The base-ten logarithm, with the same edges as `Log`.
 public double Log10(double x) => log10(x);
 
-/// The sine of `x` in radians. Use `Radians` on an angle in degrees; a very
+/// The sine of `x` in radians. Use `ToRadians` on an angle in degrees; a very
 /// large `x` loses accuracy, since the reduction is done in the same double.
 public double Sin(double x) => sin(x);
 
@@ -216,7 +216,7 @@ public bool IsFinite(double x) => !IsNaN(x) && !IsInfinite(x);
 
 /// True when the two are within `tolerance` of each other. Comparing floats
 /// with `==` is almost always a mistake, and this is what to write instead.
-public bool Near(double a, double b, double tolerance)
+public bool IsNear(double a, double b, double tolerance)
 {
     return Abs(a - b) <= tolerance;
 }
@@ -228,11 +228,11 @@ public double Lerp(double from, double to, double at)
 }
 
 /// An angle in radians, as degrees.
-public double Degrees(double radians) => radians * 180.0 / Pi;
+public double ToDegrees(double radians) => radians * 180.0 / Pi;
 
 /// An angle in degrees, as radians. Every trigonometric function here takes
 /// radians, so this is what goes between a human's number and `Sin`.
-public double Radians(double degrees) => degrees * Pi / 180.0;
+public double ToRadians(double degrees) => degrees * Pi / 180.0;
 
 // ---------------------------------------------------------------- integers
 
@@ -335,8 +335,8 @@ public nuint DivideCeiling(nuint a, nuint b)
 /// so it answers `MinLong`, whose magnitude it is, as `Abs` does.
 public long GreatestCommonDivisor(long a, long b)
 {
-    ulong left = LongMagnitude(a);
-    ulong right = LongMagnitude(b);
+    ulong left = GetMagnitude(a);
+    ulong right = GetMagnitude(b);
 
     while (right != 0)
     {
@@ -348,7 +348,7 @@ public long GreatestCommonDivisor(long a, long b)
 }
 
 /// The magnitude of a `long` as a `ulong`, which holds every one.
-ulong LongMagnitude(long x) => x < 0 ? (ulong)0 - (ulong)x : (ulong)x;
+ulong GetMagnitude(long x) => x < 0 ? (ulong)0 - (ulong)x : (ulong)x;
 
 /// The least common multiple. Zero when either argument is zero.
 ///
@@ -377,7 +377,7 @@ public int PopCount(ulong value)
 }
 
 /// How many zero bits sit above the highest set bit. 64 for zero.
-public int LeadingZeros(ulong value)
+public int LeadingZeroCount(ulong value)
 {
     if (value == 0)
         return 64;
@@ -392,7 +392,7 @@ public int LeadingZeros(ulong value)
 }
 
 /// How many zero bits sit below the lowest set bit. 64 for zero.
-public int TrailingZeros(ulong value)
+public int TrailingZeroCount(ulong value)
 {
     if (value == 0)
         return 64;
@@ -415,7 +415,7 @@ public bool IsPowerOfTwo(ulong value)
 
 /// The smallest power of two that is at least `value`. Zero and one both give
 /// one; a value above 2^63 has no answer and gives zero.
-public ulong NextPowerOfTwo(ulong value)
+public ulong RoundUpToPowerOfTwo(ulong value)
 {
     if (value <= 1)
         return 1;

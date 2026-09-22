@@ -305,7 +305,7 @@ void ShowLibrary()
     long spun = 0;
     for (int i = 0; i < 100000; i++)
         spun += i;
-    var taken = clock.Elapsed();
+    var taken = clock.Elapsed;
     PrintValue("monotonic", taken.Nanoseconds >= 0);
     PrintValue("a duration", Duration.FromSeconds(90).TotalMinutes);
 
@@ -557,8 +557,8 @@ void ShowConcurrency()
         spawn ContributeToBoth(tally, guarded, 32);
     }
 
-    PrintValue("atomic", counter.Load());
-    PrintValue("mutex", guarded.Lock().Value);
+    PrintValue("atomic", counter.Read());
+    PrintValue("mutex", guarded.Enter().Value);
 
     // A queue that several threads may hold at once.
     var pending = new ConcurrentQueue<long>();
@@ -575,13 +575,13 @@ void ShowConcurrency()
     var ticks = new AtomicLong(0);
     var worker = new Thread(() => ticks.Add(7));
     worker.Join();
-    PrintValue("thread", ticks.Load());
+    PrintValue("thread", ticks.Read());
 
     // A future is the same idea with a result. `Get` blocks, which is what
     // having real threads buys: no `async`, no state machine, and nothing in
     // any signature changes colour.
     var later = new Future<long>(() => SumRange(values, 0, 100));
-    PrintValue("future", later.Get());
+    PrintValue("future", later.GetResult());
 }
 
 /// A newline, written as an escape rather than embedded, so the file the tour
@@ -591,6 +591,6 @@ String GetNewline() => Text.FromChar((char32)10);
 void ContributeToBoth(Tally tally, Mutex<long> guarded, long amount)
 {
     tally.Add(amount);
-    var guard = guarded.Lock();
-    guard.Set(guard.Value + amount);
+    var guard = guarded.Enter();
+    guard.SetValue(guard.Value + amount);
 }

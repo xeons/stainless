@@ -336,7 +336,7 @@ static readonly Mutex<List<String>> Registry = new Mutex<List<String>>(new List<
 
 void Record(String name)
 {
-    var guard = Registry.Lock();      // Guard<List<String>>
+    var guard = Registry.Enter();     // Guard<List<String>>
     guard.Value.Add(name);
 }                                     // ~Guard() unlocks
 ```
@@ -366,7 +366,7 @@ has the same hole and worse; Rust closes it with lifetimes. Stainless closes it
 later, when the move and sendability analysis of §1 lands, and not before. It is
 written down here so it is a known gap rather than a discovered one.
 
-**A second hole, smaller and sharper:** `registry.Lock();` as a statement locks
+**A second hole, smaller and sharper:** `registry.Enter();` as a statement locks
 and immediately unlocks, because the guard is a temporary that dies at the end
 of the statement. The result has to be kept in a variable. A warning for a
 discarded `Guard` would catch it, and is worth adding.
@@ -646,11 +646,11 @@ unstructured set, and it is deliberately second rather than absent.
 | | |
 |---|---|
 | `Thread` | one OS thread, started with an `Action` closure or with a `Job` and a `byte*`; `Join`, `Detach`, `IsJoinable` |
-| `Future<T>` | a value another thread is still computing; `Get` blocks, `IsReady` asks |
+| `Future<T>` | a value another thread is still computing; `GetResult` blocks, `IsReady` asks |
 | `Threading.Sleep` / `Yield` / `CurrentId` | the free functions a thread needs about itself |
 | `Monitor<T>` / `MonitorGuard<T>` | a `Mutex<T>` that can be waited on: `Wait`, `WaitFor`, `Pulse`, `PulseAll` |
-| `RwLock<T>` / `ReadGuard<T>` / `WriteGuard<T>` | many readers or one writer, with `TryRead` and `TryWrite` |
-| `Semaphore` | a permit count: `Wait`, `TryWait`, `WaitFor`, `Release`, `ReleaseMany` |
+| `RwLock<T>` / `ReadGuard<T>` / `WriteGuard<T>` | many readers or one writer, with `EnterReadLock`, `EnterWriteLock` and their `TryEnter` forms |
+| `Semaphore` | a permit count: `Wait`, `TryWait`, `WaitFor`, and `Release` of one or of several |
 | `ManualResetEvent` | a latch that stays open until `Reset` |
 | `AutoResetEvent` | a turnstile: one `Set`, one passage |
 | `CountdownEvent` | counts down to zero and opens |
@@ -688,7 +688,7 @@ a detached thread's box outlives the handle that started it.
 
 **`Future<T>` is a future with no `async` anywhere near it.** This is the one
 concept the language was actually missing, and it costs nothing precisely
-because blocking is allowed: `Get` is a condition wait, not a coroutine
+because blocking is allowed: `GetResult` is a condition wait, not a coroutine
 suspension, so no signature changes colour and there is no transform (§12). It
 is a box, a mutex and a condition variable.
 

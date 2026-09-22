@@ -29,7 +29,7 @@
 /// **This is not cryptographic.** xoshiro256** is fast and well-distributed,
 /// and its entire future is computable from 256 bits of state -- which is what
 /// makes a seeded run reproducible and what makes it unfit for a key, a token
-/// or a password. `Bytes` from the platform is what that needs; `sl_random_bytes`
+/// or a password. `FillSecureBytes` from the platform is what that needs; `sl_random_bytes`
 /// is what this seeds from and is right there.
 module Standard.Random;
 
@@ -53,16 +53,16 @@ public class Random
 
     /// A generator seeded from a number you chose. The same seed gives the
     /// same sequence, on every platform and every run -- which is the point.
-    public Random(long seed) => Seed((ulong)seed);
+    public Random(long seed) => SeedState((ulong)seed);
 
     /// A generator seeded by the operating system, so two runs differ.
     ///
     /// Aborts if the platform will not supply any entropy at all, which is a
     /// broken machine rather than an outcome a caller can plan around -- and a
     /// constructor has nowhere to report one anyway (§2.9). Where that has to
-    /// be survivable, `Random.Bytes` says whether it managed, and
+    /// be survivable, `Random.FillSecureBytes` says whether it managed, and
     /// `new Random(seed)` takes the number it produced.
-    public Random() => Seed((ulong)sl_random_seed());
+    public Random() => SeedState((ulong)sl_random_seed());
 
     /// SplitMix64 spreads one word into four.
     ///
@@ -70,19 +70,19 @@ public class Random
     /// corner of the state space, and xoshiro takes a while to escape one --
     /// `new Random(1)` would produce a poor first few numbers. This is the
     /// remedy its authors specify.
-    void Seed(ulong seed)
+    void SeedState(ulong seed)
     {
-        _a = Mix(&seed);
-        _b = Mix(&seed);
-        _c = Mix(&seed);
-        _d = Mix(&seed);
+        _a = MixSplit(&seed);
+        _b = MixSplit(&seed);
+        _c = MixSplit(&seed);
+        _d = MixSplit(&seed);
 
         // All-zero state is the one xoshiro cannot leave.
         if ((_a | _b | _c | _d) == 0u)
             _a = 0x9E3779B97F4A7C15u;
     }
 
-    ulong Mix(ulong* state)
+    ulong MixSplit(ulong* state)
     {
         *state = *state + 0x9E3779B97F4A7C15u;
 
@@ -92,7 +92,7 @@ public class Random
         return z ^ (z >> 31);
     }
 
-    ulong Rotate(ulong value, uint by)
+    ulong RotateBitsLeft(ulong value, uint by)
     {
         return (value << by) | (value >> (64u - by));
     }
@@ -100,7 +100,7 @@ public class Random
     /// The next 64 bits. Every other method here is built on this one.
     public ulong NextULong()
     {
-        ulong result = Rotate(_b * 5u, 7u) * 9u;
+        ulong result = RotateBitsLeft(_b * 5u, 7u) * 9u;
         ulong t = _b << 17;
 
         _c = _c ^ _a;
@@ -108,7 +108,7 @@ public class Random
         _b = _b ^ _c;
         _a = _a ^ _d;
         _c = _c ^ t;
-        _d = Rotate(_d, 45u);
+        _d = RotateBitsLeft(_d, 45u);
 
         return result;
     }
@@ -201,7 +201,7 @@ public class Random
 /// Bytes straight from the operating system's cryptographic source, which is
 /// what a key or a token wants. Reports whether it managed; a false is not a
 /// reason to fall back on the clock.
-public bool Bytes(byte[] buffer)
+public bool FillSecureBytes(byte[] buffer)
 {
     if (buffer.Length == 0u)
         return true;
@@ -209,6 +209,6 @@ public bool Bytes(byte[] buffer)
 }
 
 /// One unpredictable 64-bit value from the platform, for seeding something
-/// else deliberately. Aborts if the platform supplies none; `Bytes` is the
+/// else deliberately. Aborts if the platform supplies none; `FillSecureBytes` is the
 /// form that reports instead.
-public long Seed() => sl_random_seed();
+public long GenerateSeed() => sl_random_seed();

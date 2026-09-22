@@ -25,34 +25,34 @@ int Main()
     int input = 21;
     var answer = new Future<int>(() => Doubled(input));
     Console.WriteLine("started");
-    Console.WriteLine(Text.FromInteger(answer.Get()));
+    Console.WriteLine(Text.FromInteger(answer.GetResult()));
 
     // Filled once, read as often as you like.
-    Console.WriteLine(Text.FromInteger(answer.Get()));
+    Console.WriteLine(Text.FromInteger(answer.GetResult()));
 
     // The starting frame is long gone by the time this is asked.
     var escaped = Later(50);
-    Console.WriteLine(Text.FromInteger(escaped.Get()));
+    Console.WriteLine(Text.FromInteger(escaped.GetResult()));
     Console.WriteLine(escaped.IsReady ? "ready" : "not ready");
 
     // Several at once, each on its own thread.
     var first = new Future<int>(() => Doubled(1));
     var second = new Future<int>(() => Doubled(2));
     var third = new Future<int>(() => Doubled(3));
-    Console.WriteLine(Text.FromInteger(first.Get() + second.Get() + third.Get()));
+    Console.WriteLine(Text.FromInteger(first.GetResult() + second.GetResult() + third.GetResult()));
 
     // A thread from a closure: it carries what it captured, so there is no
     // frame for it to outlive and no `byte*` to keep alive by hand.
     var tally = new AtomicLong(0);
     var worker = new Thread(() => tally.Add(7));
     worker.Join();
-    Console.WriteLine(Text.FromInteger((int)tally.Load()));
+    Console.WriteLine(Text.FromInteger((int)tally.Read()));
 
     // The raw form still works. It owns nothing, so what it touches has to
     // outlive it on its own -- here a static, which outlives everything.
     var raw = new Thread(Bump, null);
     raw.Join();
-    Console.WriteLine(Text.FromInteger((int)Counted.Load()));
+    Console.WriteLine(Text.FromInteger((int)Counted.Read()));
 
     return 0;
 }

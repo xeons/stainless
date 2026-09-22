@@ -23,6 +23,6 @@ int Main()
     for parallel (int i = 0; i < 10; i = i + 1)
         total.Add((long)items[(nuint)i]);
 
-    printf("total=%lld\n", total.Load());
+    printf("total=%lld\n", total.Read());
     return 0;
 }

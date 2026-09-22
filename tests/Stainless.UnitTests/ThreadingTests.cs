@@ -142,7 +142,7 @@ public class ThreadingTests
     [InlineData("var b = new Barrier(2u); long phase = b.SignalAndWait(); nuint n = b.ParticipantCount;")]
     [InlineData("var a = new AtomicLong(0); a.And(1); a.Or(2); a.Xor(3); a.Exchange(4);")]
     [InlineData("var a = new AtomicInt(0); a.Increment(); a.Decrement(); a.Add(2); bool ok = a.CompareExchange(0, 1);")]
-    [InlineData("var s = new SpinWait(); s.Once(); nuint n = s.Count; s.Reset();")]
+    [InlineData("var s = new SpinWait(); s.SpinOnce(); nuint n = s.Count; s.Reset();")]
     [InlineData("Threading.Sleep(1u); Threading.Yield(); nuint id = Threading.CurrentId();")]
     public void TheSurfaceResolves(string body)
     {
@@ -180,7 +180,7 @@ public class ThreadingTests
     {
         Assert.Contains("SL0265", Body("""
             var mutex = new Mutex<long>(0);
-            var guard = mutex.Lock();
+            var guard = mutex.Enter();
             guard = null;
             """));
     }

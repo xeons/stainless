@@ -96,7 +96,7 @@ extern "C"
 
 // A deadline `milliseconds` from now on the monotonic clock, in nanoseconds.
 // A span too long to represent saturates.
-long MonotonicDeadlineAfter(ulong milliseconds)
+long ComputeDeadlineAfter(ulong milliseconds)
 {
     long now = sl_time_monotonic();
     ulong limit = (ulong)(9223372036854775807 - now) / 1000000u;
@@ -107,7 +107,7 @@ long MonotonicDeadlineAfter(ulong milliseconds)
 
 // Whole milliseconds left before `deadline`, rounded up so a wait does not end
 // early. Zero once it has passed.
-ulong MillisecondsBeforeDeadline(long deadline)
+ulong GetMillisecondsBeforeDeadline(long deadline)
 {
     long left = deadline - sl_time_monotonic();
     if (left <= 0)
@@ -120,7 +120,7 @@ ulong MillisecondsBeforeDeadline(long deadline)
 // a wake and the deadline can arrive together.
 bool WaitBeforeDeadline(byte* signal, byte* mutex, long deadline)
 {
-    ulong left = MillisecondsBeforeDeadline(deadline);
+    ulong left = GetMillisecondsBeforeDeadline(deadline);
     if (left == 0u)
         return false;
     sl_condition_wait_for(signal, mutex, left);
@@ -142,7 +142,7 @@ bool WaitBeforeDeadline(byte* signal, byte* mutex, long deadline)
 /// `return`, and including when a `Guard` is dropped in a branch you forgot
 /// about.
 ///
-///     var guard = registry.Lock();
+///     var guard = registry.Enter();
 ///     guard.Value.Add(name);
 ///     // ~Guard() unlocks here
 ///
@@ -175,17 +175,17 @@ public threadsafe class Mutex<T>
 
     /// Blocks until the lock is free, then returns the guard that holds it.
     ///
-    /// Keep the result in a variable. `registry.Lock();` on its own locks and
+    /// Keep the result in a variable. `registry.Enter();` on its own locks and
     /// then immediately unlocks, because the guard is a temporary and dies at
     /// the end of the statement.
-    public Guard<T> Lock()
+    public Guard<T> Enter()
     {
         sl_mutex_lock(_handle);
         return new Guard<T>(this);
     }
 
     /// Takes the lock only if it is free. Returns null rather than blocking.
-    public Guard<T>? TryLock()
+    public Guard<T>? TryEnter()
     {
         if (sl_mutex_try_lock(_handle))
             return new Guard<T>(this);
@@ -193,32 +193,32 @@ public threadsafe class Mutex<T>
     }
 
     // Reached through a Guard, which is the only thing that holds the lock.
-    T Read() => _value;
-    void Write(T updated) => _value = updated;
-    void Unlock() => sl_mutex_unlock(_handle);
+    T ReadValue() => _value;
+    void WriteValue(T updated) => _value = updated;
+    void Exit() => sl_mutex_unlock(_handle);
 }
 
 /// Proof that a lock is held, and the only route to what it guards.
 ///
 /// A guard keeps its mutex alive, so the lock cannot be freed while it is
-/// held. Releasing is the destructor's job; there is no `Unlock` to forget.
+/// held. Releasing is the destructor's job; there is no `Exit` to forget.
 public class Guard<T>
 {
     Mutex<T> _owner;
 
     Guard(Mutex<T> held) => _owner = held;
 
-    ~Guard() { _owner.Unlock(); }
+    ~Guard() { _owner.Exit(); }
 
     /// What the lock guards.
     ///
     /// See the hole described on `Mutex`: what this hands back must not
     /// outlive the guard, and nothing yet enforces it.
-    public T Value => _owner.Read();
+    public T Value => _owner.ReadValue();
 
     /// Replaces the guarded value. For a class `T` this swaps which object is
     /// guarded; mutating the one `Value` gave back is the usual thing.
-    public void Set(T updated) => _owner.Write(updated);
+    public void SetValue(T updated) => _owner.WriteValue(updated);
 }
 
 // ----------------------------------------------------------------- monitors
@@ -235,7 +235,7 @@ public class Guard<T>
 /// **Always wait in a loop.** Both platforms permit a spurious wake, and the
 /// pulse says only "the value changed", never "it changed the way you want":
 ///
-///     var held = queue.Lock();
+///     var held = queue.Enter();
 ///     while (held.Value.IsEmpty) { held.Wait(); }
 ///     var item = held.Value.Take();
 public threadsafe class Monitor<T>
@@ -260,23 +260,23 @@ public threadsafe class Monitor<T>
 
     /// Blocks until the lock is free. Keep the result in a variable -- a
     /// temporary unlocks at the end of the statement.
-    public MonitorGuard<T> Lock()
+    public MonitorGuard<T> Enter()
     {
         sl_mutex_lock(_handle);
         return new MonitorGuard<T>(this);
     }
 
     // Reached through a MonitorGuard, which is the only thing holding the lock.
-    T Read() => _value;
-    void Write(T updated) => _value = updated;
-    void Unlock() => sl_mutex_unlock(_handle);
-    void Sleep() => sl_condition_wait(_signal, _handle);
-    bool SleepFor(ulong milliseconds)
+    T ReadValue() => _value;
+    void WriteValue(T updated) => _value = updated;
+    void Exit() => sl_mutex_unlock(_handle);
+    void WaitForSignal() => sl_condition_wait(_signal, _handle);
+    bool WaitForSignalFor(ulong milliseconds)
     {
         return sl_condition_wait_for(_signal, _handle, milliseconds);
     }
-    void Wake() => sl_condition_signal(_signal);
-    void WakeAll() => sl_condition_broadcast(_signal);
+    void SignalOne() => sl_condition_signal(_signal);
+    void SignalAll() => sl_condition_broadcast(_signal);
 }
 
 /// Proof that a monitor is held, and the only route to what it guards.
@@ -286,29 +286,29 @@ public class MonitorGuard<T>
 
     MonitorGuard(Monitor<T> held) => _owner = held;
 
-    ~MonitorGuard() { _owner.Unlock(); }
+    ~MonitorGuard() { _owner.Exit(); }
 
     /// What the monitor guards, with the same lifetime caveat as `Guard`.
-    public T Value => _owner.Read();
+    public T Value => _owner.ReadValue();
 
     /// Replaces the guarded value. Pulse afterwards if anyone is waiting on a
     /// condition this changed -- nothing wakes on its own.
-    public void Set(T updated) => _owner.Write(updated);
+    public void SetValue(T updated) => _owner.WriteValue(updated);
 
     /// Releases the lock, waits for a pulse, and takes the lock again. Call it
     /// in a loop that re-checks what you are waiting for.
-    public void Wait() => _owner.Sleep();
+    public void Wait() => _owner.WaitForSignal();
 
     /// The same with a deadline. Returns false if the time ran out -- and the
     /// lock is held either way, because the predicate still has to be checked.
-    public bool WaitFor(ulong milliseconds) => _owner.SleepFor(milliseconds);
+    public bool WaitFor(ulong milliseconds) => _owner.WaitForSignalFor(milliseconds);
 
     /// Wakes one waiter. It cannot run until this guard is dropped.
-    public void Pulse() => _owner.Wake();
+    public void Pulse() => _owner.SignalOne();
 
     /// Wakes every waiter. Use it when more than one could make progress, or
     /// when waiters are waiting for different conditions on the same value.
-    public void PulseAll() => _owner.WakeAll();
+    public void PulseAll() => _owner.SignalAll();
 }
 
 // ------------------------------------------------------- reader/writer locks
@@ -339,7 +339,7 @@ public threadsafe class RwLock<T>
     ~RwLock() { sl_rwlock_free(_handle); }
 
     /// Blocks until no writer holds the lock. Other readers are welcome.
-    public ReadGuard<T> Read()
+    public ReadGuard<T> EnterReadLock()
     {
         sl_rwlock_read_lock(_handle);
         return new ReadGuard<T>(this);
@@ -347,7 +347,7 @@ public threadsafe class RwLock<T>
 
     /// Takes a read guard only if no writer holds the lock. Answers null
     /// rather than blocking.
-    public ReadGuard<T>? TryRead()
+    public ReadGuard<T>? TryEnterReadLock()
     {
         if (sl_rwlock_try_read_lock(_handle))
             return new ReadGuard<T>(this);
@@ -355,7 +355,7 @@ public threadsafe class RwLock<T>
     }
 
     /// Blocks until nothing holds the lock at all.
-    public WriteGuard<T> Write()
+    public WriteGuard<T> EnterWriteLock()
     {
         sl_rwlock_write_lock(_handle);
         return new WriteGuard<T>(this);
@@ -363,7 +363,7 @@ public threadsafe class RwLock<T>
 
     /// Takes a write guard only if nothing holds the lock at all. Answers
     /// null rather than blocking.
-    public WriteGuard<T>? TryWrite()
+    public WriteGuard<T>? TryEnterWriteLock()
     {
         if (sl_rwlock_try_write_lock(_handle))
             return new WriteGuard<T>(this);
@@ -371,19 +371,19 @@ public threadsafe class RwLock<T>
     }
 
     T Held => _value;
-    void Store(T updated) => _value = updated;
-    void ReadUnlock() => sl_rwlock_read_unlock(_handle);
-    void WriteUnlock() => sl_rwlock_write_unlock(_handle);
+    void StoreValue(T updated) => _value = updated;
+    void ExitReadLock() => sl_rwlock_read_unlock(_handle);
+    void ExitWriteLock() => sl_rwlock_write_unlock(_handle);
 }
 
-/// Shared access. There is no `Set`, which is the point.
+/// Shared access. There is no `SetValue`, which is the point.
 public class ReadGuard<T>
 {
     RwLock<T> _owner;
 
     ReadGuard(RwLock<T> held) => _owner = held;
 
-    ~ReadGuard() { _owner.ReadUnlock(); }
+    ~ReadGuard() { _owner.ExitReadLock(); }
 
     /// What the lock guards, shared with every other reader. Treat it as
     /// read-only: nothing stops a `T` with mutating methods being mutated
@@ -398,13 +398,13 @@ public class WriteGuard<T>
 
     WriteGuard(RwLock<T> held) => _owner = held;
 
-    ~WriteGuard() { _owner.WriteUnlock(); }
+    ~WriteGuard() { _owner.ExitWriteLock(); }
 
     /// What the lock guards, exclusively. Safe to mutate through.
     public T Value => _owner.Held;
 
     /// Replaces the guarded value.
-    public void Set(T updated) => _owner.Store(updated);
+    public void SetValue(T updated) => _owner.StoreValue(updated);
 }
 
 // ------------------------------------------------------------------ atomics
@@ -428,11 +428,11 @@ public threadsafe class AtomicLong
     /// The value now. A read of a moving counter is stale the moment it is
     /// returned, so this is for reporting; `Add` and `CompareExchange` are
     /// what a decision is built on.
-    public long Load() => sl_atomic_load(&_cell);
+    public long Read() => sl_atomic_load(&_cell);
 
     /// Overwrites the value, losing whatever was there. `Exchange` is the one
     /// that tells you what it replaced.
-    public void Store(long value) => sl_atomic_store(&_cell, value);
+    public void Write(long value) => sl_atomic_store(&_cell, value);
 
     /// Adds and returns the new value, so two threads never see the same result.
     public long Add(long delta) => sl_atomic_add(&_cell, delta);
@@ -479,10 +479,10 @@ public threadsafe class AtomicInt
     public AtomicInt(int initial) => _cell = initial;
 
     /// The value now, stale the moment it is returned.
-    public int Load() => sl_atomic_load32(&_cell);
+    public int Read() => sl_atomic_load32(&_cell);
 
     /// Overwrites the value, losing whatever was there.
-    public void Store(int value) => sl_atomic_store32(&_cell, value);
+    public void Write(int value) => sl_atomic_store32(&_cell, value);
 
     /// Adds and returns the new value. Wraps at 32 bits, silently, which is
     /// the reason to prefer `AtomicLong` where the width is a free choice.
@@ -522,11 +522,11 @@ public threadsafe class AtomicBool
     }
 
     /// The flag now. Cheap enough to read in a spin loop's condition.
-    public bool Load() => sl_atomic_load(&_cell) != 0;
+    public bool Read() => sl_atomic_load(&_cell) != 0;
 
     /// Sets the flag, losing whatever it was. `Exchange` is the one to use
     /// when exactly one thread must win.
-    public void Store(bool value)
+    public void Write(bool value)
     {
         long raw = 0;
         if (value)
@@ -599,7 +599,7 @@ public threadsafe class Semaphore
     /// Blocks for at most `milliseconds`. Returns whether it got a permit.
     public bool WaitFor(ulong milliseconds)
     {
-        long deadline = MonotonicDeadlineAfter(milliseconds);
+        long deadline = ComputeDeadlineAfter(milliseconds);
         sl_mutex_lock(_handle);
 
         // Re-checked in a loop because a spurious wake and a real one look the
@@ -621,10 +621,10 @@ public threadsafe class Semaphore
     }
 
     /// Puts one permit back and wakes a waiter.
-    public void Release() => ReleaseMany(1);
+    public void Release() => Release(1);
 
     /// Puts several back at once, waking as many waiters as could proceed.
-    public void ReleaseMany(long count)
+    public void Release(long count)
     {
         sl_mutex_lock(_handle);
         _permits += count;
@@ -640,12 +640,15 @@ public threadsafe class Semaphore
     }
 
     /// How many permits are free. A snapshot, and stale the moment you have it.
-    public long Available()
+    public long CurrentCount
     {
-        sl_mutex_lock(_handle);
-        long count = _permits;
-        sl_mutex_unlock(_handle);
-        return count;
+        get
+        {
+            sl_mutex_lock(_handle);
+            long count = _permits;
+            sl_mutex_unlock(_handle);
+            return count;
+        }
     }
 }
 
@@ -688,7 +691,7 @@ public threadsafe class ManualResetEvent
     /// false means the time ran out.
     public bool WaitFor(ulong milliseconds)
     {
-        long deadline = MonotonicDeadlineAfter(milliseconds);
+        long deadline = ComputeDeadlineAfter(milliseconds);
         sl_mutex_lock(_handle);
         while (!_open)
         {
@@ -775,7 +778,7 @@ public threadsafe class AutoResetEvent
     /// leaves the turnstile as it found it.
     public bool WaitFor(ulong milliseconds)
     {
-        long deadline = MonotonicDeadlineAfter(milliseconds);
+        long deadline = ComputeDeadlineAfter(milliseconds);
         sl_mutex_lock(_handle);
         while (!_ready)
         {
@@ -886,7 +889,7 @@ public threadsafe class CountdownEvent
     /// The same with a deadline. Answers whether the count reached zero.
     public bool WaitFor(ulong milliseconds)
     {
-        long deadline = MonotonicDeadlineAfter(milliseconds);
+        long deadline = ComputeDeadlineAfter(milliseconds);
         sl_mutex_lock(_handle);
         while (_remaining > 0)
         {
@@ -1179,7 +1182,7 @@ public nuint CurrentId() => sl_thread_current_id();
 /// same way it reaches `Action`.
 public interface IProduce<T>
 {
-    T Produce();
+    T Invoke();
 }
 
 /// Work that takes a value: the other half of a handoff, and what a
@@ -1189,16 +1192,16 @@ public interface IProduce<T>
 /// cannot be generic -- and a lambda reaches it the same way.
 public interface IConsume<T>
 {
-    void Consume(T value);
+    void Invoke(T value);
 }
 
 /// A value another thread is still computing.
 ///
 ///     var answer = new Future<int>(() => Compute(input));
 ///     // ... do something else ...
-///     int value = answer.Get();       // blocks until it is there
+///     int value = answer.GetResult(); // blocks until it is there
 ///
-/// **This is a future without `async`.** `Get` blocks, which costs nothing here
+/// **This is a future without `async`.** `GetResult` blocks, which costs nothing here
 /// that it does not cost anywhere else: Stainless has real OS threads and
 /// permits blocking, so waiting needs no coroutine transform and no colour in
 /// any signature. See §12 of docs/concurrency.md for why that is the whole of
@@ -1242,7 +1245,7 @@ public threadsafe class Future<T>
     /// The value, waiting for it if it is not there yet. Asking twice is
     /// harmless and the second ask does not block: a future is filled once and
     /// then read as often as you like, by as many threads as you like.
-    public T Get()
+    public T GetResult()
     {
         sl_mutex_lock(_mutex);
         while (!_filled)
@@ -1268,8 +1271,8 @@ public threadsafe class Future<T>
 
     /// Stores the result and wakes everyone waiting. Called by the worker, and
     /// visible to this module only: a future is filled by its own body once,
-    /// and filling one from outside would make `Get` a lie.
-    void Fill(T value)
+    /// and filling one from outside would make `GetResult` a lie.
+    void SetResult(T value)
     {
         sl_mutex_lock(_mutex);
         _value = value;
@@ -1299,7 +1302,7 @@ class Pending<T> : Boxed
         _target = target;
     }
 
-    public override void Run() => _target.Fill(_body.Produce());
+    public override void Run() => _target.SetResult(_body.Invoke());
 }
 
 /// Backs off in a loop that is waiting for something another core will do very
@@ -1312,7 +1315,7 @@ class Pending<T> : Boxed
 /// scheduler have the core back.
 ///
 ///     var spin = new SpinWait();
-///     while (!ready.Load()) { spin.Once(); }
+///     while (!ready.Read()) { spin.SpinOnce(); }
 public class SpinWait
 {
     nuint _spins;
@@ -1321,7 +1324,7 @@ public class SpinWait
     public SpinWait() => _spins = 0u;
 
     /// One step of backing off.
-    public void Once()
+    public void SpinOnce()
     {
         _spins++;
 
@@ -1337,7 +1340,7 @@ public class SpinWait
         sl_thread_yield();
     }
 
-    /// How many times `Once` has been called.
+    /// How many times `SpinOnce` has been called.
     public nuint Count => _spins;
 
     /// Starts over, for a loop that is being reused.

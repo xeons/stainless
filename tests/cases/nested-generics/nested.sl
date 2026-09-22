@@ -50,7 +50,7 @@ int Main()
     printf("five=%d\n", five.Get().Get().Get().Get().Get());
 
     var guarded = new Mutex<List<Box<int>>>(boxes);
-    { var g = guarded.Lock(); printf("guarded=%d\n", (int)g.Value.Count); }
+    { var g = guarded.Enter(); printf("guarded=%d\n", (int)g.Value.Count); }
 
     // Two templates that name each other. `Twig<T>` is asked for while
     // `Sprig<T>` is still declaring its members, so laying either one out at

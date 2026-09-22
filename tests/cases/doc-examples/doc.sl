@@ -23,7 +23,7 @@ static readonly Mutex<List<String>> Registry =
 
 void Record(String name)
 {
-    var guard = Registry.Lock();
+    var guard = Registry.Enter();
     guard.Value.Add(name);
 }
 
@@ -48,11 +48,11 @@ int Search(int[] data, int from, int upto, AtomicBool stop)
 {
     for (int i = from; i < upto; i = i + 1)
     {
-        if (stop.Load())
+        if (stop.Read())
             return -1;
         if (data[i] == 42)
         {
-            stop.Store(true);
+            stop.Write(true);
             return i;
         }
     }
@@ -626,7 +626,7 @@ String Lowercase()
 int Main()
 {
     Record("first");
-    { var g = Registry.Lock(); printf("recorded=%d\n", (int)g.Value.Count); }
+    { var g = Registry.Enter(); printf("recorded=%d\n", (int)g.Value.Count); }
 
     Transform t = Double;
     printf("delegate=%d\n", t(21));

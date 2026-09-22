@@ -182,7 +182,7 @@ void Kinds()
     Console.WriteLine("related=" + Louder(new Dog(), new Animal()));
 
     var cell = new AtomicLong(4);
-    Console.WriteLine("threadsafe=" + Text.FromInteger(Counted(cell, cell.Load())));
+    Console.WriteLine("threadsafe=" + Text.FromInteger(Counted(cell, cell.Read())));
 }
 
 int Main()

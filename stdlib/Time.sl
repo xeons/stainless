@@ -270,15 +270,15 @@ String FormatDuration(Duration span)
     {
         text.AppendInteger(hours);
         text.Append("h");
-        text.Append(Pad(minutes, 2u));
+        text.Append(PadNumber(minutes, 2u));
         text.Append("m");
-        text.Append(Pad(seconds, 2u));
+        text.Append(PadNumber(seconds, 2u));
     }
     else if (minutes > 0)
     {
         text.AppendInteger(minutes);
         text.Append("m");
-        text.Append(Pad(seconds, 2u));
+        text.Append(PadNumber(seconds, 2u));
     }
     else
     {
@@ -286,7 +286,7 @@ String FormatDuration(Duration span)
     }
 
     text.Append(".");
-    text.Append(Pad(millis, 3u));
+    text.Append(PadNumber(millis, 3u));
     text.Append("s");
     return text.ToText();
 }
@@ -295,8 +295,8 @@ String FormatDuration(Duration span)
 
 /// A point on the wall clock, as nanoseconds since 1970-01-01 UTC.
 ///
-///     var started = Instant.Now();
-///     var waited = Instant.Now() - started;
+///     var started = Instant.Now;
+///     var waited = Instant.Now - started;
 ///
 /// Subtracting two instants gives a `Duration`, and adding a `Duration` to one
 /// gives another instant. Adding two instants is not defined, because the sum
@@ -310,11 +310,14 @@ public struct Instant
 
     /// What time it is now. It can go backwards between two calls; use `Clock`
     /// to measure how long something took.
-    public static Instant Now()
+    public static Instant Now
     {
-        Instant at;
-        at.Nanoseconds = sl_time_now();
-        return at;
+        get
+        {
+            Instant at;
+            at.Nanoseconds = sl_time_now();
+            return at;
+        }
     }
 
     /// 1970-01-01 00:00:00 UTC, which is where the count starts.
@@ -376,11 +379,11 @@ public struct Instant
     public long ToUnixMilliseconds() => Nanoseconds / NanosecondsPerMillisecond;
 
     /// This instant as a date and time in UTC.
-    public DateTime ToUtc() => Broken(this, false);
+    public DateTime ToUtc() => BreakDownInstant(this, false);
 
     /// The same in the machine's local zone, with whatever the platform
     /// believes about daylight saving.
-    public DateTime ToLocal() => Broken(this, true);
+    public DateTime ToLocal() => BreakDownInstant(this, true);
 
     /// ISO 8601, to the second: `2026-09-05T14:30:00Z`.
     public String FormatIso() => FormatInstantIso(this);
@@ -516,11 +519,11 @@ public struct DateTime
     public String FormatDate()
     {
         var text = new StringBuilder();
-        text.Append(Pad((long)Year, 4u));
+        text.Append(PadNumber((long)Year, 4u));
         text.Append("-");
-        text.Append(Pad((long)Month, 2u));
+        text.Append(PadNumber((long)Month, 2u));
         text.Append("-");
-        text.Append(Pad((long)Day, 2u));
+        text.Append(PadNumber((long)Day, 2u));
         return text.ToText();
     }
 
@@ -528,16 +531,16 @@ public struct DateTime
     public String FormatTime()
     {
         var text = new StringBuilder();
-        text.Append(Pad((long)Hour, 2u));
+        text.Append(PadNumber((long)Hour, 2u));
         text.Append(":");
-        text.Append(Pad((long)Minute, 2u));
+        text.Append(PadNumber((long)Minute, 2u));
         text.Append(":");
-        text.Append(Pad((long)Second, 2u));
+        text.Append(PadNumber((long)Second, 2u));
         return text.ToText();
     }
 }
 
-DateTime Broken(Instant at, bool local)
+DateTime BreakDownInstant(Instant at, bool local)
 {
     long[9] parts;
     DateTime when;
@@ -598,7 +601,7 @@ public int DaysInMonth(int year, int month)
 
 // --------------------------------------------------------------- formatting
 
-String Pad(long value, nuint width)
+String PadNumber(long value, nuint width)
 {
     return Text.FromInteger(value).PadLeft(width, "0");
 }
@@ -614,17 +617,17 @@ String FormatInstantIso(Instant at)
     var when = at.ToUtc();
     var text = new StringBuilder();
 
-    text.Append(Pad((long)when.Year, 4u));
+    text.Append(PadNumber((long)when.Year, 4u));
     text.Append("-");
-    text.Append(Pad((long)when.Month, 2u));
+    text.Append(PadNumber((long)when.Month, 2u));
     text.Append("-");
-    text.Append(Pad((long)when.Day, 2u));
+    text.Append(PadNumber((long)when.Day, 2u));
     text.Append("T");
-    text.Append(Pad((long)when.Hour, 2u));
+    text.Append(PadNumber((long)when.Hour, 2u));
     text.Append(":");
-    text.Append(Pad((long)when.Minute, 2u));
+    text.Append(PadNumber((long)when.Minute, 2u));
     text.Append(":");
-    text.Append(Pad((long)when.Second, 2u));
+    text.Append(PadNumber((long)when.Second, 2u));
     text.Append("Z");
     return text.ToText();
 }
@@ -662,12 +665,12 @@ Result<Instant, TimeError> ParseInstantIso(String text)
         return Fail(TimeError.Malformed);
     }
 
-    int year = Digits(text, 0u, 4u);
-    int month = Digits(text, 5u, 2u);
-    int day = Digits(text, 8u, 2u);
-    int hour = Digits(text, 11u, 2u);
-    int minute = Digits(text, 14u, 2u);
-    int second = Digits(text, 17u, 2u);
+    int year = ParseDigits(text, 0u, 4u);
+    int month = ParseDigits(text, 5u, 2u);
+    int day = ParseDigits(text, 8u, 2u);
+    int hour = ParseDigits(text, 11u, 2u);
+    int minute = ParseDigits(text, 14u, 2u);
+    int second = ParseDigits(text, 17u, 2u);
 
     if (year < 0 || month < 0 || day < 0 || hour < 0 || minute < 0 || second < 0)
     {
@@ -687,7 +690,7 @@ Result<Instant, TimeError> ParseInstantIso(String text)
 }
 
 /// `count` digits from `start`, or -1 if any of them is not a digit.
-int Digits(String text, nuint start, nuint count)
+int ParseDigits(String text, nuint start, nuint count)
 {
     int value = 0;
     for (nuint i = 0u; i < count; i++)
@@ -710,7 +713,7 @@ int Digits(String text, nuint start, nuint count)
 ///
 ///     var clock = new Clock();
 ///     DoTheWork();
-///     Console.WriteLine(clock.Elapsed().Format());
+///     Console.WriteLine(clock.Elapsed.Format());
 public class Clock
 {
     long _started;
@@ -720,10 +723,7 @@ public class Clock
     public Clock() => _started = sl_time_monotonic();
 
     /// How long since it was made, or since `Restart`.
-    public Duration Elapsed()
-    {
-        return Duration.FromNanoseconds(sl_time_monotonic() - _started);
-    }
+    public Duration Elapsed => Duration.FromNanoseconds(sl_time_monotonic() - _started);
 
     /// Starts again from now, returning what had passed until this moment.
     public Duration Restart()
@@ -736,7 +736,7 @@ public class Clock
 
     /// A reading of the monotonic counter, for code that would rather keep
     /// the number than an object. Meaningless on its own; subtract two.
-    public static Duration Monotonic()
+    public static Duration GetTimestamp()
     {
         return Duration.FromNanoseconds(sl_time_monotonic());
     }

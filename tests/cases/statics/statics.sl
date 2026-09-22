@@ -36,8 +36,8 @@ void Bump(byte* argument)
 {
     Hits.Increment();
 
-    var guard = Guarded.Lock();
-    guard.Set(guard.Value + 1);
+    var guard = Guarded.Enter();
+    guard.SetValue(guard.Value + 1);
 }
 
 int Main()
@@ -56,10 +56,10 @@ int Main()
         scope.Join();
     }
 
-    printf("hits=%lld\n", Hits.Load());
+    printf("hits=%lld\n", Hits.Read());
 
     {
-        var guard = Guarded.Lock();
+        var guard = Guarded.Enter();
         printf("guarded=%d\n", guard.Value);
     }
 
@@ -67,7 +67,7 @@ int Main()
     // are not locals, so there is nothing to capture.
     for parallel (int i = 0; i < 100; i = i + 1)
         Hits.Add(Base);
-    printf("after=%lld\n", Hits.Load());
+    printf("after=%lld\n", Hits.Read());
 
     printf("done\n");
     return 0;

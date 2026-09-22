@@ -77,7 +77,7 @@ static readonly Mutex<List<String>> Registry =
 
 void Record(String name)
 {
-    var guard = Registry.Lock();
+    var guard = Registry.Enter();
     guard.Value.Add(name);
 }                                   // ~Guard() unlocks, including on a return
 ```
@@ -114,10 +114,10 @@ var writer = new Thread(() => Drain(queue));    // ~Thread() joins; Detach() let
 
 var answer = new Future<int>(() => Compute(input));
 // ... something else worth doing ...
-int value = answer.Get();           // blocks until the value is there
+int value = answer.GetResult();     // blocks until the value is there
 ```
 
-A `Future<T>` is a future with no `async` in sight. `Get` is a condition wait
+A `Future<T>` is a future with no `async` in sight. `GetResult` is a condition wait
 rather than a coroutine suspension, so no signature changes colour and there is
 no state machine — which is what blocking being permitted buys. It costs one
 detached thread per future, since there is no scope to pool against, and it is
@@ -462,7 +462,7 @@ put such a thing in, and that is the reason not to.)
 
 It is **not cryptographic** — xoshiro256** is fast and its whole future
 follows from its state, which is what makes a seeded run reproducible and what
-makes it unfit for a key. `Random.Bytes` goes straight to the platform's
+makes it unfit for a key. `Random.FillSecureBytes` goes straight to the platform's
 source for that.
 
 ## 5.7 `Standard.Math`
@@ -483,9 +483,10 @@ because a Stainless `double` *is* a C `double`.
 `Abs`, `Min`, `Max`, `Clamp` and `Sign` are overloaded across `int`, `long`,
 `nuint` and `double`, resolved by argument type. Alongside them are the usual
 transcendentals, `Floor`/`Ceiling`/`Round`/`Truncate`, `IsNaN`/`IsInfinite`/
-`IsFinite`, `Lerp` and `Near`, the integer `GreatestCommonDivisor`,
-`LeastCommonMultiple` and `DivideCeiling`, and the bit functions `PopCount`, `LeadingZeros`,
-`TrailingZeros`, `IsPowerOfTwo` and `NextPowerOfTwo`.
+`IsFinite`, `Lerp` and `IsNear`, `ToDegrees` and `ToRadians`, the integer
+`GreatestCommonDivisor`, `LeastCommonMultiple` and `DivideCeiling`, and the bit
+functions `PopCount`, `LeadingZeroCount`, `TrailingZeroCount`, `IsPowerOfTwo` and
+`RoundUpToPowerOfTwo`.
 
 `Round` takes halves away from zero, which is C's rule rather than the banker's
 rounding C# uses by default.
