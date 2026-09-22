@@ -56,7 +56,12 @@ public extern "C"
     HGDIOBJ SelectObject(HDC dc, HGDIOBJ object);
     int     DeleteObject(HGDIOBJ object);
     int     GetObjectW(HGDIOBJ object, int size, void* buffer);
+    /// What a device context has selected of one kind, `ObjPen` or `ObjBrush`.
+    HGDIOBJ GetCurrentObject(HDC dc, uint kind);
 }
+
+public const uint ObjPen   = 1u;
+public const uint ObjBrush = 2u;
 
 public const int PenSolid       = 0;
 public const int PenDash        = 1;

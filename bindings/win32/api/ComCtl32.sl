@@ -677,6 +677,8 @@ public const uint LvmSetItemState  = 0x102Bu;
 public const uint LvmSetImageList  = 0x1003u;
 public const uint LvmSetExtendedStyle = 0x1036u;
 public const uint LvmEnsureVisible = 0x1013u;
+public const uint LvmGetHeader     = 0x101Fu;
+public const uint LvmGetSelectedCount = 0x1032u;
 
 public const uint LvifText    = 0x0001u;
 public const uint LvifImage   = 0x0002u;
@@ -724,6 +726,7 @@ public const uint UdmSetRange32 = 0x046Fu;
 public const uint UdmGetPos32   = 0x0472u;
 public const uint UdmSetPos32   = 0x0471u;
 public const uint UdmSetBuddy   = 0x0469u;
+public const uint UdmGetBuddy   = 0x046Au;
 
 public const uint UdsWrap        = 0x0001u;
 public const uint UdsSetBuddyInt = 0x0002u;

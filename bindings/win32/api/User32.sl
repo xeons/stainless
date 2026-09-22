@@ -585,7 +585,14 @@ public extern "C"
     HICON LoadIconW(HINSTANCE instance, char16* name);
     int   SetProcessDPIAware();
     uint  GetDpiForWindow(HWND window);
+
+    /// How many GDI or user objects a process holds, by `GrGdiObjects` or
+    /// `GrUserObjects`. What a handle leak shows up in first.
+    uint  GetGuiResources(HANDLE process, uint flags);
 }
+
+public const uint GrGdiObjects  = 0u;
+public const uint GrUserObjects = 1u;
 
 public const int SmScreenWidth            = 0;
 public const int SmScreenHeight           = 1;

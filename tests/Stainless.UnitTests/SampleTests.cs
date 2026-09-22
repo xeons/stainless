@@ -135,6 +135,7 @@ public class SampleTests
         new("win32/resources", ["samples/win32/resources.sl"]) { WindowsOnly = true },
 
         new("forms/background", ["samples/forms/background.sl"]) { NeedsForms = true },
+        new("forms/backend", ["samples/forms/backend.sl"]) { NeedsForms = true },
         new("forms/demo", ["samples/forms/demo.sl"]) { NeedsForms = true },
         new("forms/common", ["samples/forms/common.sl"]) { NeedsForms = true },
         new("forms/drawn", ["samples/forms/drawn.sl"]) { NeedsForms = true },
