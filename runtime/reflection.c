@@ -141,9 +141,15 @@ const char *sl_attribute_value_text(const void *attribute, size_t index)
 
 /* --------------------------------------------------------------- instances */
 
+int64_t sl_read_at_integer(const void *address, uint32_t kind);
+double  sl_read_at_double(const void *address, uint32_t kind);
+_Bool   sl_read_at_bool(const void *address);
+void    sl_write_at_integer(void *address, uint32_t kind, int64_t value);
+void    sl_write_at_double(void *address, uint32_t kind, double value);
+
 /*
- * Reading a field is address arithmetic and a load of the recorded width. The
- * caller is expected to have checked the kind first; Standard.Reflection does.
+ * Reading a field is address arithmetic and a load of the recorded width. A
+ * kind that does not match the reader answers zero.
  */
 static const void *sl_field_address(const void *instance, const void *field)
 {
@@ -152,38 +158,20 @@ static const void *sl_field_address(const void *instance, const void *field)
 
 int64_t sl_read_integer(const void *instance, const void *field)
 {
-    const void *address = sl_field_address(instance, field);
-
-    switch (((const SlFieldInfo *)field)->kind) {
-        case SL_KIND_SBYTE:  return *(const int8_t   *)address;
-        case SL_KIND_SHORT:  return *(const int16_t  *)address;
-        case SL_KIND_INT:    return *(const int32_t  *)address;
-        case SL_KIND_LONG:
-        case SL_KIND_NINT:   return *(const int64_t  *)address;
-        case SL_KIND_CHAR:
-        case SL_KIND_BYTE:   return *(const uint8_t  *)address;
-        case SL_KIND_USHORT: return *(const uint16_t *)address;
-        case SL_KIND_UINT:   return *(const uint32_t *)address;
-        case SL_KIND_ULONG:
-        case SL_KIND_NUINT:  return (int64_t)*(const uint64_t *)address;
-        default:             return 0;
-    }
+    return sl_read_at_integer(sl_field_address(instance, field),
+                              ((const SlFieldInfo *)field)->kind);
 }
 
 double sl_read_double(const void *instance, const void *field)
 {
-    const void *address = sl_field_address(instance, field);
-
-    switch (((const SlFieldInfo *)field)->kind) {
-        case SL_KIND_FLOAT:  return *(const float  *)address;
-        case SL_KIND_DOUBLE: return *(const double *)address;
-        default:             return 0.0;
-    }
+    return sl_read_at_double(sl_field_address(instance, field),
+                             ((const SlFieldInfo *)field)->kind);
 }
 
 _Bool sl_read_bool(const void *instance, const void *field)
 {
-    return *(const _Bool *)sl_field_address(instance, field);
+    if (((const SlFieldInfo *)field)->kind != SL_KIND_BOOL) return 0;
+    return sl_read_at_bool(sl_field_address(instance, field));
 }
 
 /* Borrowed: the instance still owns it, so the caller must retain to keep it. */
@@ -207,35 +195,14 @@ static void *sl_field_slot(void *instance, const void *field)
  */
 void sl_write_integer(void *instance, const void *field, int64_t value)
 {
-    void *address = sl_field_slot(instance, field);
-
-    switch (((const SlFieldInfo *)field)->kind) {
-        case SL_KIND_SBYTE:  *(int8_t   *)address = (int8_t)value;   break;
-        case SL_KIND_SHORT:  *(int16_t  *)address = (int16_t)value;  break;
-        case SL_KIND_INT:    *(int32_t  *)address = (int32_t)value;  break;
-        case SL_KIND_LONG:
-        case SL_KIND_NINT:   *(int64_t  *)address = value;           break;
-        case SL_KIND_CHAR:
-        case SL_KIND_BYTE:   *(uint8_t  *)address = (uint8_t)value;  break;
-        case SL_KIND_CHAR16:
-        case SL_KIND_USHORT: *(uint16_t *)address = (uint16_t)value; break;
-        case SL_KIND_CHAR32:
-        case SL_KIND_UINT:   *(uint32_t *)address = (uint32_t)value; break;
-        case SL_KIND_ULONG:
-        case SL_KIND_NUINT:  *(uint64_t *)address = (uint64_t)value; break;
-        default:                                                     break;
-    }
+    sl_write_at_integer(sl_field_slot(instance, field),
+                        ((const SlFieldInfo *)field)->kind, value);
 }
 
 void sl_write_double(void *instance, const void *field, double value)
 {
-    void *address = sl_field_slot(instance, field);
-
-    switch (((const SlFieldInfo *)field)->kind) {
-        case SL_KIND_FLOAT:  *(float  *)address = (float)value; break;
-        case SL_KIND_DOUBLE: *(double *)address = value;        break;
-        default:                                                break;
-    }
+    sl_write_at_double(sl_field_slot(instance, field),
+                       ((const SlFieldInfo *)field)->kind, value);
 }
 
 void sl_write_bool(void *instance, const void *field, _Bool value)
@@ -350,16 +317,16 @@ int64_t sl_read_at_integer(const void *address, uint32_t kind)
         case SL_KIND_SBYTE:  return *(const int8_t   *)address;
         case SL_KIND_SHORT:  return *(const int16_t  *)address;
         case SL_KIND_INT:    return *(const int32_t  *)address;
-        case SL_KIND_LONG:
-        case SL_KIND_NINT:   return *(const int64_t  *)address;
+        case SL_KIND_LONG:   return *(const int64_t  *)address;
+        case SL_KIND_NINT:   return *(const intptr_t *)address;
         case SL_KIND_CHAR:
         case SL_KIND_BYTE:   return *(const uint8_t  *)address;
         case SL_KIND_CHAR16:
         case SL_KIND_USHORT: return *(const uint16_t *)address;
         case SL_KIND_CHAR32:
         case SL_KIND_UINT:   return *(const uint32_t *)address;
-        case SL_KIND_ULONG:
-        case SL_KIND_NUINT:  return (int64_t)*(const uint64_t *)address;
+        case SL_KIND_ULONG:  return (int64_t)*(const uint64_t *)address;
+        case SL_KIND_NUINT:  return (int64_t)*(const uintptr_t *)address;
         default:             return 0;
     }
 }
@@ -373,9 +340,10 @@ double sl_read_at_double(const void *address, uint32_t kind)
     }
 }
 
+/* Read as a byte, so storage holding neither 0 nor 1 is not loaded as a _Bool. */
 _Bool sl_read_at_bool(const void *address)
 {
-    return *(const _Bool *)address;
+    return *(const uint8_t *)address != 0;
 }
 
 void *sl_read_at_reference(const void *address)
@@ -389,17 +357,17 @@ void sl_write_at_integer(void *address, uint32_t kind, int64_t value)
         case SL_KIND_SBYTE:  *(int8_t   *)address = (int8_t)value;   break;
         case SL_KIND_SHORT:  *(int16_t  *)address = (int16_t)value;  break;
         case SL_KIND_INT:    *(int32_t  *)address = (int32_t)value;  break;
-        case SL_KIND_LONG:
-        case SL_KIND_NINT:   *(int64_t  *)address = value;           break;
+        case SL_KIND_LONG:   *(int64_t   *)address = value;            break;
+        case SL_KIND_NINT:   *(intptr_t  *)address = (intptr_t)value;  break;
         case SL_KIND_CHAR:
-        case SL_KIND_BYTE:   *(uint8_t  *)address = (uint8_t)value;  break;
+        case SL_KIND_BYTE:   *(uint8_t   *)address = (uint8_t)value;   break;
         case SL_KIND_CHAR16:
-        case SL_KIND_USHORT: *(uint16_t *)address = (uint16_t)value; break;
+        case SL_KIND_USHORT: *(uint16_t  *)address = (uint16_t)value;  break;
         case SL_KIND_CHAR32:
-        case SL_KIND_UINT:   *(uint32_t *)address = (uint32_t)value; break;
-        case SL_KIND_ULONG:
-        case SL_KIND_NUINT:  *(uint64_t *)address = (uint64_t)value; break;
-        default:                                                     break;
+        case SL_KIND_UINT:   *(uint32_t  *)address = (uint32_t)value;  break;
+        case SL_KIND_ULONG:  *(uint64_t  *)address = (uint64_t)value;  break;
+        case SL_KIND_NUINT:  *(uintptr_t *)address = (uintptr_t)value; break;
+        default:                                                       break;
     }
 }
 
@@ -417,7 +385,7 @@ void sl_write_at_bool(void *address, _Bool value)
     *(_Bool *)address = value;
 }
 
-/* Retain before release, as sl_write_reference does and for the same reason. */
+/* The new String is +1 and the slot takes that count. */
 void sl_write_at_text(void *address, const void *bytes, size_t length)
 {
     void **slot = (void **)address;
@@ -501,16 +469,16 @@ int64_t sl_property_get_integer(void *instance, const void *property)
         case SL_KIND_SBYTE:  return ((int8_t   (*)(void *))getter)(instance);
         case SL_KIND_SHORT:  return ((int16_t  (*)(void *))getter)(instance);
         case SL_KIND_INT:    return ((int32_t  (*)(void *))getter)(instance);
-        case SL_KIND_LONG:
-        case SL_KIND_NINT:   return ((int64_t  (*)(void *))getter)(instance);
+        case SL_KIND_LONG:   return ((int64_t  (*)(void *))getter)(instance);
+        case SL_KIND_NINT:   return ((intptr_t (*)(void *))getter)(instance);
         case SL_KIND_CHAR:
         case SL_KIND_BYTE:   return ((uint8_t  (*)(void *))getter)(instance);
         case SL_KIND_CHAR16:
         case SL_KIND_USHORT: return ((uint16_t (*)(void *))getter)(instance);
         case SL_KIND_CHAR32:
         case SL_KIND_UINT:   return ((uint32_t (*)(void *))getter)(instance);
-        case SL_KIND_ULONG:
-        case SL_KIND_NUINT:  return (int64_t)((uint64_t (*)(void *))getter)(instance);
+        case SL_KIND_ULONG:  return (int64_t)((uint64_t  (*)(void *))getter)(instance);
+        case SL_KIND_NUINT:  return (int64_t)((uintptr_t (*)(void *))getter)(instance);
         default:             return 0;
     }
 }
@@ -537,9 +505,9 @@ _Bool sl_property_get_bool(void *instance, const void *property)
 }
 
 /*
- * A String, a class, an interface or an array. The reference comes back
- * borrowed: the getter answered with the object the property holds and did not
- * add a count, so a caller keeping it must retain it.
+ * A String, a class, an interface, an array or a raw pointer. A getter returns
+ * owned, as every function does, so a counted reference comes back +1 and the
+ * caller MUST release it. A raw pointer carries no count.
  */
 void *sl_property_get_reference(void *instance, const void *property)
 {
@@ -568,17 +536,17 @@ void sl_property_set_integer(void *instance, const void *property, int64_t value
         case SL_KIND_SBYTE:  ((void (*)(void *, int8_t  ))setter)(instance, (int8_t  )value); break;
         case SL_KIND_SHORT:  ((void (*)(void *, int16_t ))setter)(instance, (int16_t )value); break;
         case SL_KIND_INT:    ((void (*)(void *, int32_t ))setter)(instance, (int32_t )value); break;
-        case SL_KIND_LONG:
-        case SL_KIND_NINT:   ((void (*)(void *, int64_t ))setter)(instance, value);           break;
+        case SL_KIND_LONG:   ((void (*)(void *, int64_t ))setter)(instance, value);           break;
+        case SL_KIND_NINT:   ((void (*)(void *, intptr_t))setter)(instance, (intptr_t)value); break;
         case SL_KIND_CHAR:
         case SL_KIND_BYTE:   ((void (*)(void *, uint8_t ))setter)(instance, (uint8_t )value); break;
         case SL_KIND_CHAR16:
         case SL_KIND_USHORT: ((void (*)(void *, uint16_t))setter)(instance, (uint16_t)value); break;
         case SL_KIND_CHAR32:
         case SL_KIND_UINT:   ((void (*)(void *, uint32_t))setter)(instance, (uint32_t)value); break;
-        case SL_KIND_ULONG:
-        case SL_KIND_NUINT:  ((void (*)(void *, uint64_t))setter)(instance, (uint64_t)value); break;
-        default:                                                                              break;
+        case SL_KIND_ULONG:  ((void (*)(void *, uint64_t ))setter)(instance, (uint64_t)value);  break;
+        case SL_KIND_NUINT:  ((void (*)(void *, uintptr_t))setter)(instance, (uintptr_t)value); break;
+        default:                                                                                break;
     }
 }
 
@@ -604,9 +572,8 @@ void sl_property_set_bool(void *instance, const void *property, _Bool value)
 }
 
 /*
- * Retained before the call, because a setter takes a reference of its own --
- * it releases what the property held and keeps what it was given. Without this
- * the caller's reference would be the one consumed.
+ * A setter borrows its argument, as every function does, and retains what it
+ * stores. So nothing is retained here, and the caller still owns `value`.
  */
 void sl_property_set_reference(void *instance, const void *property, void *value)
 {
@@ -619,7 +586,6 @@ void sl_property_set_reference(void *instance, const void *property, void *value
         case SL_KIND_CLASS:
         case SL_KIND_INTERFACE:
         case SL_KIND_ARRAY:
-            sl_retain(value);
             ((void (*)(void *, void *))setter)(instance, value);
             break;
 

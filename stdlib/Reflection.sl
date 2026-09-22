@@ -71,6 +71,9 @@ extern "C"
     byte*  sl_type_make(byte* type);
     void   sl_release(byte* object);
 
+    byte*  sl_string_data(byte* text);
+    nuint  sl_string_byte_length(byte* text);
+
     uint   sl_field_element_kind(byte* field);
     byte*  sl_field_element_type(byte* field);
     nuint  sl_field_element_size(byte* field);
@@ -482,20 +485,38 @@ public bool GetBool(byte* instance, Property property)
     return sl_property_get_bool(instance, property.Handle);
 }
 
-/// Calls the getter of a String property. The instance still owns the answer.
+/// Calls the getter of a String property, and answers a copy of what it gave.
+/// Empty when the property cannot be read or its kind is not `KindString`.
 public String GetText(byte* instance, Property property)
 {
+    if (property.Kind != KindString)
+        return "";
+
     var raw = sl_property_get_reference(instance, property.Handle);
     if (raw == null)
         return "";
-    return Text.FromNullTerminated(raw + 32);
+
+    var copy = CopyCountedText(raw);
+    sl_release(raw);
+    return copy;
 }
 
 /// The object a class or interface property holds, for walking into it.
 /// Null where it holds nothing, which a caller has to check.
+///
+/// The answer is borrowed from the instance, as `ReadAggregate`'s is. The
+/// property MUST be one that holds its object: a getter that makes a new
+/// object on each call answers one nothing else owns, and it is freed before
+/// this returns.
 public byte* GetAggregate(byte* instance, Property property)
 {
-    return sl_property_get_reference(instance, property.Handle);
+    var kind = property.Kind;
+    if (kind != KindClass && kind != KindInterface && kind != KindArray)
+        return null;
+
+    var raw = sl_property_get_reference(instance, property.Handle);
+    sl_release(raw);
+    return raw;
 }
 
 /// Calls the setter, narrowing to the property's own width. Does nothing when
@@ -521,9 +542,8 @@ public void SetBool(byte* instance, Property property, bool value)
 
 /// Calls the setter of a String property.
 ///
-/// The runtime retains before the call, because a setter takes a reference of
-/// its own -- it releases what the property held and keeps what it was given.
-/// So the caller still owns `value` afterwards.
+/// The setter retains what it stores, so the caller still owns `value`
+/// afterwards.
 public void SetText(byte* instance, Property property, String value)
 {
     sl_property_set_reference(instance, property.Handle, (byte*)value);
@@ -667,13 +687,24 @@ public bool ReadBool(byte* instance, Field field)
     return sl_read_bool(instance, field.Handle);
 }
 
-/// Reads a String field. The instance still owns it.
+/// Reads a String field, as a copy of all its bytes. Empty when the field's
+/// kind is not `KindString`.
 public String ReadText(byte* instance, Field field)
 {
+    if (field.Kind != KindString)
+        return "";
+
     var raw = sl_read_reference(instance, field.Handle);
     if (raw == null)
         return "";
-    return Text.FromNullTerminated(raw + 32);
+    return CopyCountedText(raw);
+}
+
+// A copy of a String reached as a raw pointer. Its length is the byte length
+// the String records, so an embedded NUL does not end it.
+String CopyCountedText(byte* raw)
+{
+    return Text.FromBytes(sl_string_data(raw), sl_string_byte_length(raw));
 }
 
 /// The address of a field that holds an aggregate, for walking into it.
@@ -886,13 +917,13 @@ public double ReadDoubleAt(byte* address, Field field)
 /// whatever array it is in.
 public bool ReadBoolAt(byte* address) => sl_read_at_bool(address);
 
-/// Reads a String element. The array still owns it.
+/// Reads a String element, as a copy of all its bytes.
 public String ReadTextAt(byte* address)
 {
     var raw = sl_read_at_reference(address);
     if (raw == null)
         return "";
-    return Text.FromNullTerminated(raw + 32);
+    return CopyCountedText(raw);
 }
 
 /// The address of an aggregate element: what a class element points at, or

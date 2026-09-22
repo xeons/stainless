@@ -1,0 +1,22 @@
+aggregate
+  read back true
+  dropped first
+  replaced
+  dropped second
+  cleared
+fields
+  nint -5 -5
+  nuint 123456 123456
+  neighbours 7 9
+  char16 9786
+  char32 128512
+  bool true
+  bool of int false
+  text hello
+  text length 3
+properties
+  get text world
+  get text length 3
+  set text length 3
+  nint property -3 -3 11
+done
