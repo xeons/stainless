@@ -225,12 +225,19 @@ nuint SkipName(byte* blob, nuint at, nuint size, out bool isId, out int id, out 
     return cursor + 2u;
 }
 
+/// Whether a name in the blob is `expected`, without regard to ASCII case.
+///
+/// The resource compiler files a name in upper case and `FindResourceW`
+/// upper-cases the one it is asked for, so on Windows `greeting` finds
+/// `GREETING`. This answers the same.
 bool TextEquals(byte* blob, nuint at, String expected)
 {
     nuint units = 0u;
     while (ReadU16(blob, at + units * 2u) != 0u)
         units = units + 1u;
-    return Text.FromUtf16((char16*)(void*)(blob + at), units) == expected;
+
+    var found = Text.FromUtf16((char16*)(void*)(blob + at), units);
+    return found.ToUpperAscii() == expected.ToUpperAscii();
 }
 
 /// Walks the blob for one resource. A match is by number or by text on each
@@ -277,9 +284,11 @@ byte* Walk(int type, String typeName, int id, String name,
             ? foundNameIsId && foundNameId == id
             : !foundNameIsId && TextEquals(blob, nameAt, name);
 
-        // A null marker matches nothing, because its type and name are zero and
-        // no resource is filed under either.
-        if (typeMatches && nameMatches && dataSize > 0u)
+        // A null marker matches nothing, because its type is zero and no
+        // resource is filed under it. An empty resource is still found, as
+        // `FindResourceW` finds one.
+        bool isMarker = foundTypeIsId && foundTypeId == 0;
+        if (typeMatches && nameMatches && !isMarker)
         {
             if (byteCount != null)
                 *byteCount = dataSize;
@@ -412,30 +421,54 @@ public String Text(uint id)
 /// The pixel offset is not guesswork: the DIB header says how long it is, and
 /// the palette between it and the pixels is `biClrUsed` entries of four bytes,
 /// or the full `2^depth` when that field is zero and the depth is 8 or fewer.
+/// A 40-byte header with `BI_BITFIELDS` is followed by its three colour masks
+/// first; the 12-byte `BITMAPCOREHEADER` has no `biClrUsed`, and its palette
+/// entries are three bytes each.
 ///
 /// Empty when there is no such bitmap.
 public byte[] BitmapFile(int id)
 {
     var stored = Bytes(Bitmap, id);
-    if (stored.Length < 40)
+    if (stored.Length < 12u)
         return new byte[0];
 
-    nuint dibSize = (nuint)stored[0u]
-                  | ((nuint)stored[1u] << 8)
-                  | ((nuint)stored[2u] << 16)
-                  | ((nuint)stored[3u] << 24);
+    nuint dibSize = ReadDibField(stored, 0u, 4u);
+    nuint depth;
+    nuint palette;
+    nuint entrySize;
+    nuint masks = 0u;
 
-    nuint depth = (nuint)stored[14u] | ((nuint)stored[15u] << 8);
-    nuint used  = (nuint)stored[32u]
-                | ((nuint)stored[33u] << 8)
-                | ((nuint)stored[34u] << 16)
-                | ((nuint)stored[35u] << 24);
+    if (dibSize == 12u)
+    {
+        depth = ReadDibField(stored, 10u, 2u);
+        palette = depth <= 8u ? (nuint)1u << (int)depth : 0u;
+        entrySize = 3u;
+    }
+    else
+    {
+        if (stored.Length < 40u)
+            return new byte[0];
 
-    nuint palette = used;
-    if (palette == 0u && depth <= 8u)
-        palette = (nuint)1u << (int)depth;
+        depth = ReadDibField(stored, 14u, 2u);
+        nuint compression = ReadDibField(stored, 16u, 4u);
+        palette = ReadDibField(stored, 32u, 4u);
+        if (palette == 0u && depth > 0u && depth <= 8u)
+            palette = (nuint)1u << (int)depth;
+        entrySize = 4u;
 
-    nuint offset = 14u + dibSize + palette * 4u;
+        // A longer header carries its masks inside itself.
+        if (dibSize == 40u)
+        {
+            switch (compression)
+            {
+                case 3u: masks = 12u; break;        // BI_BITFIELDS
+                case 6u: masks = 16u; break;        // BI_ALPHABITFIELDS
+                default: break;
+            }
+        }
+    }
+
+    nuint offset = 14u + dibSize + masks + palette * entrySize;
     nuint total  = 14u + (nuint)stored.Length;
 
     var file = new byte[total];
@@ -455,4 +488,13 @@ public byte[] BitmapFile(int id)
         file[14u + i] = stored[i];
     }
     return file;
+}
+
+/// A little-endian field of `width` bytes in a DIB header.
+nuint ReadDibField(byte[] data, nuint at, nuint width)
+{
+    nuint value = 0u;
+    for (nuint i = 0u; i < width; i++)
+        value = value | ((nuint)data[at + i] << (int)(i * 8u));
+    return value;
 }

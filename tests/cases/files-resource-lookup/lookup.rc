@@ -1,0 +1,29 @@
+// Resources that the two routes used to disagree about.
+
+// Filed in lower case. The resource compiler stores a name in upper case, and
+// Windows matches one without regard to case.
+greeting TextBlob { "hello\0" }
+
+// Nothing inside, which is still a resource.
+302 RCDATA { }
+
+// Bitmaps written out a field at a time, so no binary file is needed. A
+// number as the type is RT_BITMAP itself; `L` makes a field four bytes.
+//
+// 16 bits per pixel with BI_BITFIELDS: the three masks follow the 40-byte
+// header, and the pixels follow the masks.
+401 2
+{
+    40L, 1L, 1L, 1, 16, 3L, 4L, 0L, 0L, 0L, 0L,
+    0xF800L, 0x07E0L, 0x001FL,
+    0xFFFFL
+}
+
+// The old 12-byte BITMAPCOREHEADER at one bit per pixel: two palette entries
+// of three bytes each, then one row.
+402 2
+{
+    12L, 1, 1, 1, 1,
+    0, 0xFF00, 0xFFFF,
+    0L
+}

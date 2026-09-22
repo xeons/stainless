@@ -1,0 +1,8 @@
+as filed true
+as written true
+lower 6 bytes
+other name false
+empty exists true
+empty size 0
+bitfields: 70 bytes, pixels at 66
+core: 36 bytes, pixels at 32
