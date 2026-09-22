@@ -238,4 +238,24 @@ public extern "C"
     gboolean g_source_remove(guint tag);
 }
 
+// ================================================================== logging
+
+/// `GLogFunc`: what GLib calls with a message. `level` is `GLogLevelFlags`.
+public delegate void GLogFunc(gchar* domain, gint level, gchar* message, gpointer data);
+
+/// `G_LOG_LEVEL_*`. A critical is a broken precondition -- a bad cast, a
+/// removed source removed again -- and GLib carries on after reporting it.
+public const gint G_LOG_LEVEL_ERROR    = 4;
+public const gint G_LOG_LEVEL_CRITICAL = 8;
+public const gint G_LOG_LEVEL_WARNING  = 16;
+
+public extern "C"
+{
+    /// Routes every message no domain handler takes to `handler`, and answers
+    /// the one it replaces. `g_log_default_handler` is GLib's own, which
+    /// prints to stderr.
+    GLogFunc g_log_set_default_handler(GLogFunc handler, gpointer data);
+    void g_log_default_handler(gchar* domain, gint level, gchar* message, gpointer data);
+}
+
 #endif

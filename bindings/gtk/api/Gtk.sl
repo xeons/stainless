@@ -290,6 +290,10 @@ public extern "C"
     /// The title, **borrowed**, or null when none was set.
     gchar* gtk_window_get_title(GtkWidget* window);
 
+    /// Every top-level window, dialogs included. The caller owns the list and
+    /// not the windows: `g_list_free` it.
+    GList* gtk_window_list_toplevels();
+
     void gtk_window_set_default_size(GtkWidget* window, gint width, gint height);
     void gtk_window_resize(GtkWidget* window, gint width, gint height);
     void gtk_window_move(GtkWidget* window, gint x, gint y);
@@ -349,6 +353,9 @@ public extern "C"
 
     gboolean gtk_toggle_button_get_active(GtkWidget* button);
     void     gtk_toggle_button_set_active(GtkWidget* button, gboolean active);
+
+    /// Presses the button as a click would, signals and all.
+    void gtk_button_clicked(GtkWidget* button);
 
     /// A radio button joined to `group`, which is another radio button or null
     /// to start a new group. GTK's grouping is by widget, not by container.
@@ -594,6 +601,9 @@ public extern "C"
     void gtk_menu_item_set_use_underline(GtkWidget* item, gboolean uses);
 
     void gtk_menu_item_set_submenu(GtkWidget* item, GtkWidget* submenu);
+
+    /// Chooses the item as the user would, signals and all.
+    void gtk_menu_item_activate(GtkWidget* item);
     void gtk_menu_shell_append(GtkWidget* shell, GtkWidget* child);
 }
 

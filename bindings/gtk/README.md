@@ -215,3 +215,11 @@ An `Xvfb` works too, and is what a GTK build without broadway would need:
 Xvfb :9 -screen 0 1024x768x24 &
 DISPLAY=:9 ./YourProgram
 ```
+
+**Simulated input needs core events.** `gdk_test_simulate_button` and
+`gdk_test_simulate_key` send core X events, and GDK reading XInput 2 drops
+them without a word; a program that uses them calls `gdk_disable_multidevice`
+before the display opens, as `samples/forms/reports.sl` does. They warp the
+pointer and send a real event through GDK's own routing, which is what makes
+them a test of where a click lands. Broadway simulates nothing and answers
+false.

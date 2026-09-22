@@ -82,6 +82,11 @@ public const guint GDK_SHIFT_MASK   = 1u;
 public const guint GDK_LOCK_MASK    = 2u;
 public const guint GDK_CONTROL_MASK = 4u;
 public const guint GDK_MOD1_MASK    = 8u;
+/// Num Lock on every X server anyone runs.
+public const guint GDK_MOD2_MASK    = 16u;
+/// AltGr on most layouts, which reach the third level through it rather than
+/// through Alt.
+public const guint GDK_MOD5_MASK    = 128u;
 public const guint GDK_BUTTON1_MASK = 256u;
 public const guint GDK_BUTTON2_MASK = 512u;
 public const guint GDK_BUTTON3_MASK = 1024u;
@@ -144,6 +149,68 @@ public const guint GDK_KEY_F10       = 0xffc7u;
 public const guint GDK_KEY_F11       = 0xffc8u;
 public const guint GDK_KEY_F12       = 0xffc9u;
 public const guint GDK_KEY_space     = 0x020u;
+
+/// Shift+Tab, which X reports as a keyval of its own.
+public const guint GDK_KEY_ISO_Left_Tab     = 0xfe20u;
+public const guint GDK_KEY_ISO_Level3_Shift = 0xfe03u;
+public const guint GDK_KEY_Clear            = 0xff0bu;
+public const guint GDK_KEY_Pause            = 0xff13u;
+public const guint GDK_KEY_Scroll_Lock      = 0xff14u;
+public const guint GDK_KEY_Print            = 0xff61u;
+public const guint GDK_KEY_Menu             = 0xff67u;
+public const guint GDK_KEY_Num_Lock         = 0xff7fu;
+public const guint GDK_KEY_Shift_L          = 0xffe1u;
+public const guint GDK_KEY_Shift_R          = 0xffe2u;
+public const guint GDK_KEY_Control_L        = 0xffe3u;
+public const guint GDK_KEY_Control_R        = 0xffe4u;
+public const guint GDK_KEY_Caps_Lock        = 0xffe5u;
+public const guint GDK_KEY_Meta_L           = 0xffe7u;
+public const guint GDK_KEY_Meta_R           = 0xffe8u;
+public const guint GDK_KEY_Alt_L            = 0xffe9u;
+public const guint GDK_KEY_Alt_R            = 0xffeau;
+public const guint GDK_KEY_Super_L          = 0xffebu;
+public const guint GDK_KEY_Super_R          = 0xffecu;
+
+/// The keypad. The digits are consecutive from `KP_0`, and each navigation
+/// key is what the same key sends with Num Lock off.
+public const guint GDK_KEY_KP_Enter     = 0xff8du;
+public const guint GDK_KEY_KP_Home      = 0xff95u;
+public const guint GDK_KEY_KP_Left      = 0xff96u;
+public const guint GDK_KEY_KP_Up        = 0xff97u;
+public const guint GDK_KEY_KP_Right     = 0xff98u;
+public const guint GDK_KEY_KP_Down      = 0xff99u;
+public const guint GDK_KEY_KP_Page_Up   = 0xff9au;
+public const guint GDK_KEY_KP_Page_Down = 0xff9bu;
+public const guint GDK_KEY_KP_End       = 0xff9cu;
+public const guint GDK_KEY_KP_Begin     = 0xff9du;
+public const guint GDK_KEY_KP_Insert    = 0xff9eu;
+public const guint GDK_KEY_KP_Delete    = 0xff9fu;
+public const guint GDK_KEY_KP_Multiply  = 0xffaau;
+public const guint GDK_KEY_KP_Add       = 0xffabu;
+public const guint GDK_KEY_KP_Separator = 0xffacu;
+public const guint GDK_KEY_KP_Subtract  = 0xffadu;
+public const guint GDK_KEY_KP_Decimal   = 0xffaeu;
+public const guint GDK_KEY_KP_Divide    = 0xffafu;
+public const guint GDK_KEY_KP_0         = 0xffb0u;
+public const guint GDK_KEY_KP_9         = 0xffb9u;
+
+// ================================================================== keymaps
+
+public extern "C"
+{
+    /// The hardware keycode of a key event. False for any other event.
+    gboolean gdk_event_get_keycode(GdkEvent* event, guint16* keycode);
+
+    /// **Borrowed.** The display's keyboard map.
+    gpointer gdk_keymap_get_for_display(gpointer display);
+
+    /// The keyval a keycode gives with `state` held, and which of `state`'s
+    /// modifiers went into choosing it. Any out-parameter may be null.
+    gboolean gdk_keymap_translate_keyboard_state(gpointer keymap, guint hardwareKeycode,
+                                                 guint state, gint group, guint* keyval,
+                                                 gint* effectiveGroup, gint* level,
+                                                 guint* consumed);
+}
 
 // ============================================================== the accessors
 
@@ -255,6 +322,27 @@ public extern "C"
     /// synchronous repaint, which is not available to a seam that has one on
     /// the other side.
     void gdk_window_process_updates(GdkWindow* window, gboolean children);
+
+    /// **Borrowed.** The window an event was delivered to.
+    GdkWindow* gdk_event_get_window(GdkEvent* event);
+
+    /// Sends a button or key event to `window` as though the user had, with the
+    /// pointer moved to (`x`, `y`) in that window first. `pressRelease` is
+    /// `GDK_BUTTON_PRESS` or `GDK_BUTTON_RELEASE`, `GDK_KEY_PRESS` or
+    /// `GDK_KEY_RELEASE`.
+    ///
+    /// For tests. X11 implements it; Broadway answers false and sends nothing.
+    gboolean gdk_test_simulate_button(GdkWindow* window, gint x, gint y, guint button,
+                                      guint modifiers, gint pressRelease);
+    gboolean gdk_test_simulate_key(GdkWindow* window, gint x, gint y, guint keyval,
+                                   guint modifiers, gint pressRelease);
+
+    /// Reads the pointer and keyboard as core X events rather than through
+    /// XInput 2, which is what makes the two calls above reach a widget: they
+    /// send core events, and GDK reading XInput 2 drops them. MUST be called
+    /// before the display is opened, which `gtk_test_init` does for the same
+    /// reason.
+    void gdk_disable_multidevice();
 }
 
 // `gtk_widget_get_window` is the way to one of these, and it is a GTK call
@@ -284,6 +372,9 @@ public extern "C"
     gpointer gdk_display_get_primary_monitor(gpointer display);
     gpointer gdk_display_get_monitor(gpointer display, gint number);
     gint     gdk_display_get_n_monitors(gpointer display);
+
+    /// **Borrowed.** The monitor most of `window` is on.
+    gpointer gdk_display_get_monitor_at_window(gpointer display, GdkWindow* window);
 
     void gdk_monitor_get_geometry(gpointer monitor, GdkRectangle* into);
 

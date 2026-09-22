@@ -389,6 +389,23 @@ public extern "C"
     gboolean gtk_widget_translate_coordinates(GtkWidget* from, GtkWidget* to,
                                               gint x, gint y, gint* intoX, gint* intoY);
 
+    /// Whether the widget has a `GdkWindow` of its own. A widget that has none
+    /// is drawn on its parent's, offset by its allocation.
+    gboolean gtk_widget_get_has_window(GtkWidget* widget);
+
+    /// Where the widget sits in its parent's window, and its size.
+    /// `GtkAllocation` is `GdkRectangle` under another name.
+    void gtk_widget_get_allocation(GtkWidget* widget, GdkRectangle* allocation);
+
+    /// **Borrowed.** The widget GTK delivered an event to first, before any
+    /// propagation to its ancestors.
+    GtkWidget* gtk_get_event_widget(GdkEvent* event);
+
+    /// A tree view's point as its rows see it, below the column headers.
+    void gtk_tree_view_convert_widget_to_bin_window_coords(GtkWidget* view,
+                                                           gint widgetX, gint widgetY,
+                                                           gint* binX, gint* binY);
+
     gboolean gtk_widget_has_focus(GtkWidget* widget);
     gboolean gtk_widget_get_realized(GtkWidget* widget);
     void     gtk_widget_realize(GtkWidget* widget);

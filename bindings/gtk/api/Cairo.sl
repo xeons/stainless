@@ -198,6 +198,39 @@ public extern "C"
     /// draws what it has to asks this first.
     void cairo_clip_extents(cairo_t* cr, gdouble* x1, gdouble* y1,
                             gdouble* x2, gdouble* y2);
+
+    /// `CAIRO_STATUS_SUCCESS`, or the error that has stopped the context.
+    ///
+    /// **An error is sticky.** A context that fails once -- a scale by zero
+    /// is `CAIRO_STATUS_INVALID_MATRIX` -- ignores every call after it until
+    /// it is destroyed, so one bad shape blanks the rest of a paint.
+    gint cairo_status(cairo_t* cr);
+}
+
+public const gint CAIRO_STATUS_SUCCESS = 0;
+
+// ============================================================ image surfaces
+
+/// `cairo_surface_t*`. Opaque.
+public using cairo_surface_t = byte;
+
+/// `CAIRO_FORMAT_ARGB32`: four bytes a pixel, premultiplied, in native byte
+/// order -- blue first on a little-endian machine.
+public const gint CAIRO_FORMAT_ARGB32 = 0;
+
+public extern "C"
+{
+    /// Pixels in memory, **owned**: `cairo_surface_destroy` it.
+    cairo_surface_t* cairo_image_surface_create(gint format, gint width, gint height);
+    void cairo_surface_destroy(cairo_surface_t* surface);
+
+    /// Finishes any drawing still pending, which reading the pixels needs.
+    void cairo_surface_flush(cairo_surface_t* surface);
+    byte* cairo_image_surface_get_data(cairo_surface_t* surface);
+    gint cairo_image_surface_get_stride(cairo_surface_t* surface);
+
+    /// A context drawing on `target`, **owned**: `cairo_destroy` it.
+    cairo_t* cairo_create(cairo_surface_t* target);
 }
 
 #endif
