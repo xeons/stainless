@@ -1,0 +1,10 @@
+semaphore took false, bounded true
+manual reset bounded true
+auto reset false
+auto reset armed true
+countdown false
+semaphore zero wait false
+signal last true
+signal extra false
+drained by a negative count true, woken true
+remaining 0

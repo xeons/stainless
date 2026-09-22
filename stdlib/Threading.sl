@@ -90,6 +90,41 @@ extern "C"
     void  sl_pool_start(nuint workers);
     nuint sl_pool_worker_count();
     nuint sl_cpu_count();
+
+    long  sl_time_monotonic();
+}
+
+// A deadline `milliseconds` from now on the monotonic clock, in nanoseconds.
+// A span too long to represent saturates.
+long MonotonicDeadlineAfter(ulong milliseconds)
+{
+    long now = sl_time_monotonic();
+    ulong limit = (ulong)(9223372036854775807 - now) / 1000000u;
+    if (milliseconds >= limit)
+        return 9223372036854775807;
+    return now + (long)milliseconds * 1000000;
+}
+
+// Whole milliseconds left before `deadline`, rounded up so a wait does not end
+// early. Zero once it has passed.
+ulong MillisecondsBeforeDeadline(long deadline)
+{
+    long left = deadline - sl_time_monotonic();
+    if (left <= 0)
+        return 0u;
+    return ((ulong)left + 999999u) / 1000000u;
+}
+
+// One timed wait toward `deadline`. False when the deadline has passed; the
+// caller MUST re-check its condition before treating that as a timeout, since
+// a wake and the deadline can arrive together.
+bool WaitBeforeDeadline(byte* signal, byte* mutex, long deadline)
+{
+    ulong left = MillisecondsBeforeDeadline(deadline);
+    if (left == 0u)
+        return false;
+    sl_condition_wait_for(signal, mutex, left);
+    return true;
 }
 
 // ------------------------------------------------------------------ sharing
@@ -564,13 +599,16 @@ public threadsafe class Semaphore
     /// Blocks for at most `milliseconds`. Returns whether it got a permit.
     public bool WaitFor(ulong milliseconds)
     {
+        long deadline = MonotonicDeadlineAfter(milliseconds);
         sl_mutex_lock(_handle);
 
         // Re-checked in a loop because a spurious wake and a real one look the
-        // same, and because another thread may take the permit first.
+        // same, and because another thread may take the permit first. A waiter
+        // whose time is up still takes a permit that is there, so a wake sent
+        // to it is not lost.
         while (_permits <= 0)
         {
-            if (!sl_condition_wait_for(_signal, _handle, milliseconds))
+            if (!WaitBeforeDeadline(_signal, _handle, deadline))
             {
                 sl_mutex_unlock(_handle);
                 return false;
@@ -650,14 +688,14 @@ public threadsafe class ManualResetEvent
     /// false means the time ran out.
     public bool WaitFor(ulong milliseconds)
     {
+        long deadline = MonotonicDeadlineAfter(milliseconds);
         sl_mutex_lock(_handle);
         while (!_open)
         {
-            if (!sl_condition_wait_for(_signal, _handle, milliseconds))
+            if (!WaitBeforeDeadline(_signal, _handle, deadline))
             {
-                bool passed = _open;
                 sl_mutex_unlock(_handle);
-                return passed;
+                return false;
             }
         }
         sl_mutex_unlock(_handle);
@@ -737,16 +775,14 @@ public threadsafe class AutoResetEvent
     /// leaves the turnstile as it found it.
     public bool WaitFor(ulong milliseconds)
     {
+        long deadline = MonotonicDeadlineAfter(milliseconds);
         sl_mutex_lock(_handle);
         while (!_ready)
         {
-            if (!sl_condition_wait_for(_signal, _handle, milliseconds))
+            if (!WaitBeforeDeadline(_signal, _handle, deadline))
             {
-                if (!_ready)
-                {
-                    sl_mutex_unlock(_handle);
-                    return false;
-                }
+                sl_mutex_unlock(_handle);
+                return false;
             }
         }
         _ready = false;
@@ -790,16 +826,20 @@ public threadsafe class CountdownEvent
         sl_mutex_free(_handle);
     }
 
-    /// Counts one off. Returns true if that was the last one.
+    /// Counts one off. Returns true if that was the last one, and false for a
+    /// signal after the count had already reached zero.
     public bool Signal()
     {
         sl_mutex_lock(_handle);
 
+        bool done = false;
         if (_remaining > 0)
+        {
             _remaining--;
-        bool done = _remaining == 0;
-        if (done)
-            sl_condition_broadcast(_signal);
+            done = _remaining == 0;
+            if (done)
+                sl_condition_broadcast(_signal);
+        }
 
         sl_mutex_unlock(_handle);
         return done;
@@ -807,12 +847,25 @@ public threadsafe class CountdownEvent
 
     /// Adds work before it is started. Adding after the count reaches zero is
     /// a race nobody wins, so it is refused rather than reopening the latch.
+    ///
+    /// A negative `count` counts that many off at once, stopping at zero and
+    /// opening the latch there as `Signal` would.
     public bool TryAddCount(long count)
     {
         sl_mutex_lock(_handle);
         bool added = _remaining > 0;
         if (added)
-            _remaining += count;
+        {
+            if (count < 0 && count <= -_remaining)
+            {
+                _remaining = 0;
+                sl_condition_broadcast(_signal);
+            }
+            else
+            {
+                _remaining += count;
+            }
+        }
         sl_mutex_unlock(_handle);
         return added;
     }
@@ -833,14 +886,14 @@ public threadsafe class CountdownEvent
     /// The same with a deadline. Answers whether the count reached zero.
     public bool WaitFor(ulong milliseconds)
     {
+        long deadline = MonotonicDeadlineAfter(milliseconds);
         sl_mutex_lock(_handle);
         while (_remaining > 0)
         {
-            if (!sl_condition_wait_for(_signal, _handle, milliseconds))
+            if (!WaitBeforeDeadline(_signal, _handle, deadline))
             {
-                bool done = _remaining == 0;
                 sl_mutex_unlock(_handle);
-                return done;
+                return false;
             }
         }
         sl_mutex_unlock(_handle);
