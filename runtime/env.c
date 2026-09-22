@@ -35,6 +35,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef _WIN32
+#  define WIN32_LEAN_AND_MEAN
+#  include <windows.h>
+#  include <shellapi.h>
+#  pragma comment(lib, "shell32")
+#endif
+
 /* --------------------------------------------------------------- arguments */
 
 /*
@@ -43,12 +50,48 @@
  * The entry point stores these before anything else, and the strings are the
  * ones the C runtime owns -- they outlive the program's use of them, so no
  * copy is needed and none is made.
+ *
+ * Except on Windows, where a narrow main() is handed its arguments in the
+ * active code page and a character outside it arrives as a question mark.
+ * There they are split again from the wide command line and kept as UTF-8,
+ * for the whole run and so never freed.
  */
 static int    argumentCount;
 static char **argumentValues;
 
+#ifdef _WIN32
+static char **argumentsFromCommandLine(int *count)
+{
+    int wideCount = 0;
+    wchar_t **wide = CommandLineToArgvW(GetCommandLineW(), &wideCount);
+    if (wide == NULL) return NULL;
+
+    char **values = (char **)calloc((size_t)wideCount + 1, sizeof(char *));
+    if (values == NULL) sl_fail("out of memory");
+
+    for (int i = 0; i < wideCount; i++) {
+        values[i] = sl_narrow(wide[i]);
+        if (values[i] == NULL) values[i] = "";
+    }
+
+    LocalFree(wide);
+    *count = wideCount;
+    return values;
+}
+#endif
+
 void sl_args_set(int count, char **values)
 {
+#ifdef _WIN32
+    int wideCount = 0;
+    char **utf8 = argumentsFromCommandLine(&wideCount);
+
+    if (utf8 != NULL) {
+        count  = wideCount;
+        values = utf8;
+    }
+#endif
+
     argumentCount  = count;
     argumentValues = values;
 }

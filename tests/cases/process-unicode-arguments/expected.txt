@@ -1,0 +1,3 @@
+main   cafe=true japan=true spaced=true
+child  cafe=true japan=true spaced=true
+env    cafe=true japan=true spaced=true
