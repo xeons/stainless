@@ -276,8 +276,8 @@ public class GtkWindowPeer : GtkContainerPeer, IWindowPeer
         // **Written down before it is reported**, which is the whole of the
         // ordering and was got wrong once. `OnPlatformResized` lays the form
         // out again, and a layout asks this peer for `ClientBounds` -- which
-        // reads `LastBounds`. Reporting first meant every relayout used the size
-        // before the one being reported, so a window that opened at its
+        // reads `LastBounds`. Reporting first meant every relayout used the
+        // size before the one being reported, so a window that opened at its
         // natural size and was then resized to the one it was asked for laid
         // its controls out against the natural one and never corrected them.
         LastBounds = CreateRectangle(x, y, width, height);
@@ -1155,7 +1155,8 @@ public class GtkScrollBarPeer : GtkPeer, IScrollBarPeer
                                         : GTK_ORIENTATION_HORIZONTAL, null),
              owner);
         _adjustment = gtk_range_get_adjustment(Widget);
-        ConnectPeerSignal(Widget, "value-changed", (peer) => { ((GtkScrollBarPeer)peer).OnValueChanged(); });
+        ConnectPeerSignal(Widget, "value-changed",
+                          (peer) => { ((GtkScrollBarPeer)peer).OnValueChanged(); });
     }
 
     void OnValueChanged()
@@ -1282,7 +1283,8 @@ public class GtkSpinPeer : GtkPeer, ISpinPeer
     {
         base(gtk_spin_button_new_with_range(0.0, 100.0, 1.0), owner);
         gtk_spin_button_set_digits(Widget, 0);
-        ConnectPeerSignal(Widget, "value-changed", (peer) => { ((GtkSpinPeer)peer).OnValueChanged(); });
+        ConnectPeerSignal(Widget, "value-changed",
+                          (peer) => { ((GtkSpinPeer)peer).OnValueChanged(); });
     }
 
     void OnValueChanged()
@@ -1430,7 +1432,8 @@ public class GtkTrackBarPeer : GtkPeer, ITrackBarPeer
         _maximum = 100;
         gtk_scale_set_draw_value(Widget, 0);
         gtk_scale_set_digits(Widget, 0);
-        ConnectPeerSignal(Widget, "value-changed", (peer) => { ((GtkTrackBarPeer)peer).OnValueChanged(); });
+        ConnectPeerSignal(Widget, "value-changed",
+                          (peer) => { ((GtkTrackBarPeer)peer).OnValueChanged(); });
     }
 
     void OnValueChanged()
@@ -1498,8 +1501,8 @@ public class GtkTabControlPeer : GtkContainerPeer, ITabControlPeer
     ///
     /// **The control layer parents a page's content before it makes the page.**
     /// `TabPage`'s constructor builds its panel -- which is what reaches
-    /// `AddChild` -- and only then calls `TabControl.RegisterPage`, which is what
-    /// reaches `AddTab`. Every other container can answer `AddChild`
+    /// `AddChild` -- and only then calls `TabControl.RegisterPage`, which is
+    /// what reaches `AddTab`. Every other container can answer `AddChild`
     /// immediately because it has somewhere to put the child; a notebook does
     /// not, because the page is what `AddTab` is about to create.
     ///
@@ -1600,7 +1603,10 @@ public class GtkTabControlPeer : GtkContainerPeer, ITabControlPeer
         // reports that as a change of page.
         int index = (int)_pages.Count;
         var book = Widget;
-        RunQuietly(() => { gtk_notebook_append_page(book, page, gtk_label_new(text.ToPointer())); });
+        RunQuietly(() =>
+        {
+            gtk_notebook_append_page(book, page, gtk_label_new(text.ToPointer()));
+        });
         _pages.Add(page);
         if (_pages.Count == 1u)
             Content = page;
@@ -1889,7 +1895,8 @@ public class GtkToolBarPeer : GtkPeer, IToolBarPeer
 
         if (kind != ToolButtonKind.Separator)
         {
-            ConnectPeerSignal(item, "clicked", (peer) => { ((GtkToolBarPeer)peer).OnToolClicked(index); });
+            ConnectPeerSignal(item, "clicked",
+                              (peer) => { ((GtkToolBarPeer)peer).OnToolClicked(index); });
         }
         return index;
     }
@@ -1932,7 +1939,8 @@ public class GtkToolBarPeer : GtkPeer, IToolBarPeer
             return;
 
         // Quiet, because this is the program speaking and not the user. The
-        // click that comes back out of this call is the one `OnToolClicked` drops.
+        // click that comes back out of this call is the one
+        // `OnToolClicked` drops.
         var item = _items[(nuint)index];
         RunQuietly(() => { gtk_toggle_tool_button_set_active(item, checked ? 1 : 0); });
     }
@@ -2212,8 +2220,8 @@ public class GtkCustomPeer : GtkContainerPeer, ICustomPeer
 
     /// Starts or stops the blink.
     ///
-    /// The source is not held and never removed: `OnBlinkTick` answers false as soon
-    /// as it is not the live run, the control is unfocused or the peer has
+    /// The source is not held and never removed: `OnBlinkTick` answers false as
+    /// soon as it is not the live run, the control is unfocused or the peer has
     /// gone, and a GLib source that answers false takes itself off the loop.
     /// Holding the tag would mean removing it from a destructor that may run
     /// after the loop has stopped.

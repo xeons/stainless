@@ -103,14 +103,14 @@ public abstract class ChromeRenderer
 /// The platform's own drawing, which is what a menu has unless asked
 /// otherwise.
 ///
-/// `MeasureMenuItem` and `DrawMenuItem` are never called: `IsOwnerDrawn` is false, so nothing is
-/// ever handed over. They are here because the base class declares them and an
-/// abstract method with no body is not a thing.
+/// `MeasureMenuItem` and `DrawMenuItem` are never called: `IsOwnerDrawn` is
+/// false, so nothing is ever handed over. They are here because the base class
+/// declares them and an abstract method with no body is not a thing.
 public sealed class SystemChromeRenderer : ChromeRenderer
 {
     public override bool IsOwnerDrawn => false;
 
-    public override Size MeasureMenuItem(Graphics surface, MenuItem item) => Size.FromDimensions(0, 0);
+    public override Size MeasureMenuItem(Graphics surface, MenuItem item) => Size.Empty;
 
     public override void DrawMenuItem(Graphics surface, MenuItem item,
                               Rectangle bounds, MenuItemState state)
@@ -192,7 +192,8 @@ public class OfficeXpRenderer : ChromeRenderer
     /// nobody can see, which is a gutter that is not there. A quarter of the
     /// shadow colour mixed in gives it an edge that reads on every scheme
     /// without naming a colour of its own.
-    public virtual Color GutterFrom => BlendColors(SystemColors.ControlDark, SystemColors.Control, 25);
+    public virtual Color GutterFrom =>
+        BlendColors(SystemColors.ControlDark, SystemColors.Control, 25);
     public virtual Color GutterTo => SystemColors.Control;
 
     public virtual Color Background => SystemColors.Window;
@@ -377,7 +378,8 @@ public class OfficeXpRenderer : ChromeRenderer
     public virtual Color ToolBackground => BarBackground;
 
     /// A button held down, and a ticked one under the pointer.
-    public virtual Color PressedFill => BlendColors(SystemColors.Highlight, SystemColors.Window, 45);
+    public virtual Color PressedFill =>
+        BlendColors(SystemColors.Highlight, SystemColors.Window, 45);
 
     /// A toggle that is on while the pointer is somewhere else.
     ///
@@ -393,11 +395,13 @@ public class OfficeXpRenderer : ChromeRenderer
     /// pressed is how a flat toolbar has spelled that since Office XP. Hot
     /// stays where it is, because the menu shares it and the menu was
     /// measured.
-    public virtual Color CheckedFill => BlendColors(SystemColors.Highlight, SystemColors.Window, 32);
+    public virtual Color CheckedFill =>
+        BlendColors(SystemColors.Highlight, SystemColors.Window, 32);
 
     /// The line between groups of buttons, well short of the full contrast:
     /// `ControlDark` at full strength is a rule that shouts.
-    public virtual Color SeparatorInk => BlendColors(SystemColors.ControlDark, SystemColors.Control, 60);
+    public virtual Color SeparatorInk =>
+        BlendColors(SystemColors.ControlDark, SystemColors.Control, 60);
 
     public override void DrawToolBackground(Graphics surface, Rectangle bounds)
     {

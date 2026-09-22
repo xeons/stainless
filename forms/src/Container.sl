@@ -820,14 +820,16 @@ public abstract class WindowedControl : Control
                     child.SetBoundsCore(Rectangle.FromBounds(free.X, free.Y, free.Width,
                                              ClampToRoom(asked.Height, free.Height)));
                     int took = ClampToRoom(child.Height, free.Height);
-                    free = Rectangle.FromBounds(free.X, free.Y + took, free.Width, free.Height - took);
+                    free = Rectangle.FromBounds(free.X, free.Y + took,
+                                                free.Width, free.Height - took);
                     break;
                 }
 
                 case DockStyle.Bottom:
                 {
                     int height = ClampToRoom(asked.Height, free.Height);
-                    child.SetBoundsCore(Rectangle.FromBounds(free.X, free.Bottom - height, free.Width, height));
+                    child.SetBoundsCore(Rectangle.FromBounds(free.X, free.Bottom - height,
+                                                             free.Width, height));
                     int took = ClampToRoom(child.Height, free.Height);
                     free = Rectangle.FromBounds(free.X, free.Y, free.Width, free.Height - took);
                     break;
@@ -838,14 +840,16 @@ public abstract class WindowedControl : Control
                     child.SetBoundsCore(Rectangle.FromBounds(free.X, free.Y,
                                              ClampToRoom(asked.Width, free.Width), free.Height));
                     int took = ClampToRoom(child.Width, free.Width);
-                    free = Rectangle.FromBounds(free.X + took, free.Y, free.Width - took, free.Height);
+                    free = Rectangle.FromBounds(free.X + took, free.Y,
+                                                free.Width - took, free.Height);
                     break;
                 }
 
                 case DockStyle.Right:
                 {
                     int width = ClampToRoom(asked.Width, free.Width);
-                    child.SetBoundsCore(Rectangle.FromBounds(free.Right - width, free.Y, width, free.Height));
+                    child.SetBoundsCore(Rectangle.FromBounds(free.Right - width, free.Y,
+                                                             width, free.Height));
                     int took = ClampToRoom(child.Width, free.Width);
                     free = Rectangle.FromBounds(free.X, free.Y, free.Width - took, free.Height);
                     break;

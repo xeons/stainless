@@ -1434,9 +1434,10 @@ public class GtkPeer : IControlPeer
     /// box -- overrides this.
     public virtual FPoint ClientOrigin => CreatePoint(0, 0);
 
-    /// What GTK thinks the widget ought to be, which is what `ResizeToPreferredSize` wants.
-    /// The natural size rather than the minimum: the minimum is what it can be
-    /// squeezed to, and a button squeezed to its minimum has no padding left.
+    /// What GTK thinks the widget ought to be, which is what
+    /// `ResizeToPreferredSize` wants. The natural size rather than the minimum:
+    /// the minimum is what it can be squeezed to, and a button squeezed to its
+    /// minimum has no padding left.
     public virtual FSize PreferredSize
     {
         get

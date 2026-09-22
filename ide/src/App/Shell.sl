@@ -2171,9 +2171,10 @@ public class Shell : Form
     /// **The node under the pointer, not the selected one.** Neither platform
     /// moves the selection on a right-click, so a menu built from
     /// `SelectedNode` would act on whatever was selected beforehand -- a
-    /// Delete that removes a file nobody pointed at. `TreeView.GetNodeAt` answers
-    /// what was actually clicked, and the selection is moved to follow it, so
-    /// that what the menu is about is also what is highlighted while it is up.
+    /// Delete that removes a file nobody pointed at. `TreeView.GetNodeAt`
+    /// answers what was actually clicked, and the selection is moved to follow
+    /// it, so that what the menu is about is also what is highlighted while it
+    /// is up.
     ///
     /// **Not `MouseUp` with the right button, which is what this was first
     /// written as and did not work.** A Win32 tree captures the mouse on the

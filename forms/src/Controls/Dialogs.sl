@@ -351,8 +351,8 @@ public class InputDialog : Form
     String _answer;
     bool _accepted;
 
-    /// Made by `PromptForText` alone: a dialog whose answer is read through a field
-    /// should not be one a caller can hold and read at the wrong moment.
+    /// Made by `PromptForText` alone: a dialog whose answer is read through a
+    /// field should not be one a caller can hold and read at the wrong moment.
     InputDialog(String caption, String question, String initial)
     {
         base(WindowBorder.Fixed);

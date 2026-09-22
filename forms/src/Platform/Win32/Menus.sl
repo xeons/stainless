@@ -387,10 +387,10 @@ public class MenuPeer : IMenuPeer
 
     /// The item with this command id, heading or not.
     ///
-    /// **The other question, and `FindCommand` above can only answer one of them.**
-    /// That one is asked by `WM_COMMAND` routing, where a heading must *not*
-    /// match: an item with a submenu raises no command, and letting its id
-    /// match would run a handler nothing could have raised.
+    /// **The other question, and `FindCommand` above can only answer one of
+    /// them.** That one is asked by `WM_COMMAND` routing, where a heading must
+    /// *not* match: an item with a submenu raises no command, and letting its
+    /// id match would run a handler nothing could have raised.
     ///
     /// Drawing asks the opposite. `WM_DRAWITEM` for a heading is Windows
     /// asking the program to draw that very item, and a lookup that skipped it

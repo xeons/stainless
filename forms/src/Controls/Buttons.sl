@@ -673,8 +673,9 @@ public class SpeedButton : GraphicControl
             // **The caption is not measured here**, because measuring needs a
             // surface and there is none outside a paint. This is the picture
             // plus its margins, floored at a Windows button's smallest size,
-            // which is what a palette button wants and all `ResizeToPreferredSize` can
-            // honestly promise for one that also has text.
+            // which is what a palette button wants and all
+            // `ResizeToPreferredSize` can honestly promise for one that also
+            // has text.
             int room = _margin < 0 ? 4 : _margin;
             int wide = glyphWide + room * 2;
             int high = glyphHigh + room * 2;

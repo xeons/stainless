@@ -381,7 +381,8 @@ public class BackendForm : Form
     {
         var font = new Font("Segoe UI", 12);
         var canvas = new Canvas(120, 30);
-        var surface = new GraphicsBackend(canvas.Dc, Forms.Drawing.Rectangle.FromBounds(0, 0, 120, 30));
+        var surface = new GraphicsBackend(canvas.Dc,
+                                          Forms.Drawing.Rectangle.FromBounds(0, 0, 120, 30));
         surface.DrawString("A&&B&C", font, Colors.Black, 0, 0);
         var literal = canvas.Pixels();
 

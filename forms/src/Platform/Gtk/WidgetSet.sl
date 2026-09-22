@@ -50,10 +50,10 @@ import Gtk.Cairo;
 import Gtk.Signals;
 import Gtk.Events;
 
-/// The idle source `WakeEventLoop` adds: runs what other threads posted, and removes
-/// itself. `G_SOURCE_REMOVE` is zero, so one wake is one drain -- and a drain
-/// that finds an empty queue is the harmless case, since two wakes can arrive
-/// before either source runs.
+/// The idle source `WakeEventLoop` adds: runs what other threads posted, and
+/// removes itself. `G_SOURCE_REMOVE` is zero, so one wake is one drain -- and a
+/// drain that finds an empty queue is the harmless case, since two wakes can
+/// arrive before either source runs.
 gboolean OnWakeIdle(gpointer data)
 {
     Application.RunPostedWork();
@@ -394,7 +394,8 @@ public class GtkWidgetSet : IWidgetSet
             case ClipboardKind.Text:
                 return gtk_clipboard_wait_is_text_available(clipboard) != 0;
             case ClipboardKind.Html:
-                return gtk_clipboard_wait_is_target_available(clipboard, InternAtom(HtmlTarget)) != 0;
+                return gtk_clipboard_wait_is_target_available(clipboard,
+                                                              InternAtom(HtmlTarget)) != 0;
             case ClipboardKind.Image:
                 return gtk_clipboard_wait_is_image_available(clipboard) != 0;
             case ClipboardKind.Files:

@@ -97,7 +97,8 @@ public class ButtonPeer : ControlPeer, IPushButtonPeer
 
     public ButtonPeer(IControlNotify owner, IContainerPeer parent)
     {
-        base(CreateChildWindow("BUTTON", GetContainerWindow(parent), GetChildStyle() | BsPushButton, 0u),
+        base(CreateChildWindow("BUTTON", GetContainerWindow(parent),
+                               GetChildStyle() | BsPushButton, 0u),
              owner, true);
         _imageList = null;
         _imageSize = CreateSize(0, 0);
@@ -311,7 +312,8 @@ public class CheckPeer : ControlPeer, ICheckPeer
 
     public CheckPeer(IControlNotify owner, IContainerPeer parent, CheckKind kind)
     {
-        base(CreateChildWindow("BUTTON", GetContainerWindow(parent), GetChildStyle() | GetCheckStyle(kind), 0u),
+        base(CreateChildWindow("BUTTON", GetContainerWindow(parent),
+                               GetChildStyle() | GetCheckStyle(kind), 0u),
              owner, true);
         _kind = kind;
     }
@@ -1139,18 +1141,19 @@ public class CustomPeer : ControlPeer, ICustomPeer
     }
 
     /// Nothing erases it. The class brush is null and `WndProc` answers the
-    /// message itself, so the only thing that ever fills the client area is the
-    /// buffer in `PaintDoubleBuffered` -- filled in one go and copied in one go.
+    /// message itself, so the only thing that ever fills the client area is
+    /// the buffer in `PaintDoubleBuffered` -- filled in one go and copied in
+    /// one go.
     protected override bool ErasesBackground => false;
 
     public override long WndProc(uint message, ulong wParam, long lParam)
     {
         // **Our own erase does nothing, and a child's is not ours to refuse.**
-        // `PaintDoubleBuffered` fills every pixel of the client area, so a background
-        // painted before it is painted twice -- which is the flicker the buffer
-        // exists to remove. A transparent child forwarding *its* background to
-        // us is a different message wearing the same number, and the base peer
-        // answers that one; see the note there.
+        // `PaintDoubleBuffered` fills every pixel of the client area, so a
+        // background painted before it is painted twice -- which is the flicker
+        // the buffer exists to remove. A transparent child forwarding *its*
+        // background to us is a different message wearing the same number, and
+        // the base peer answers that one; see the note there.
         if (message == WmEraseBackground)
         {
             HDC given = (HDC)(void*)(nuint)wParam;

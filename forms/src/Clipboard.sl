@@ -217,7 +217,8 @@ public class Clipboard
     }
 
     /// Whether something is on offer under `format`.
-    public static bool HasFormat(String format) => WidgetSet.Current.ContainsClipboardFormat(format);
+    public static bool HasFormat(String format) =>
+        WidgetSet.Current.ContainsClipboardFormat(format);
 
     // ------------------------------------------------------------ everything
 
@@ -230,7 +231,8 @@ public class Clipboard
     /// data.SetData("application/x-shapes", Serialise(selection));
     /// Clipboard.SetDataObject(data);
     /// ```
-    public static void SetDataObject(ClipboardData data) => WidgetSet.Current.SetClipboard(data.ToContent());
+    public static void SetDataObject(ClipboardData data) =>
+        WidgetSet.Current.SetClipboard(data.ToContent());
 
     /// Empties the clipboard, whichever program filled it.
     public static void Clear() => WidgetSet.Current.SetClipboard(new ClipboardContent());
@@ -247,9 +249,9 @@ public class Clipboard
 
 /// Several formats for one copy.
 ///
-/// Each is absent until set, and `Clipboard.SetDataObject` puts on every one that is
-/// present. The data is copied out when it is set on the clipboard, so a
-/// `ClipboardData` may be reused or changed afterwards.
+/// Each is absent until set, and `Clipboard.SetDataObject` puts on every one
+/// that is present. The data is copied out when it is set on the clipboard, so
+/// a `ClipboardData` may be reused or changed afterwards.
 public sealed class ClipboardData
 {
     List<ClipboardEntry> _custom;

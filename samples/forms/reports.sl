@@ -566,7 +566,8 @@ bool CheckDrawing()
 
     cairo_set_source_rgb(context, 1.0, 1.0, 1.0);
     cairo_paint(context);
-    canvas.DrawRectangle(new Pen(Colors.Black, 1, PenStyle.Solid), Rectangle.FromBounds(2, 2, 10, 10));
+    canvas.DrawRectangle(new Pen(Colors.Black, 1, PenStyle.Solid),
+                         Rectangle.FromBounds(2, 2, 10, 10));
     cairo_surface_flush(surface);
     byte* pixels = cairo_image_surface_get_data(surface);
     nuint stride = (nuint)cairo_image_surface_get_stride(surface);

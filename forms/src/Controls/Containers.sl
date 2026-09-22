@@ -482,9 +482,9 @@ public class Notebook : Panel
 
     /// Shows the chosen page filling the client area and hides the rest.
     ///
-    /// The same job `TabControl.ShowOnlyPage` does, minus the platform: there is no
-    /// tab control underneath to ask where the page area is, so it is the whole
-    /// of the client area.
+    /// The same job `TabControl.ShowOnlyPage` does, minus the platform: there
+    /// is no tab control underneath to ask where the page area is, so it is the
+    /// whole of the client area.
     void ShowOnlySelectedPage()
     {
         var held = _pages;

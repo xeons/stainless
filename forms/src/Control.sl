@@ -241,8 +241,9 @@ public abstract class Control : IControlNotify
     Rectangle _anchorBase;
     Size _anchorClient;
     bool _anchorKnown;
-    /// Set while `SetBoundsCore` pushes bounds at the platform, so the report the
-    /// platform sends back raises nothing: `SetBoundsCore` raises once for the change.
+    /// Set while `SetBoundsCore` pushes bounds at the platform, so the report
+    /// the platform sends back raises nothing: `SetBoundsCore` raises once for
+    /// the change.
     bool _isPlacing;
     DockStyle _dock;
     AnchorStyles _anchors;
@@ -482,10 +483,29 @@ public abstract class Control : IControlNotify
         return -((1 - value) / 2);
     }
 
-    public int Left   { get => _bounds.X;      set { Bounds = Rectangle.FromBounds(value, _bounds.Y, _bounds.Width, _bounds.Height); } }
-    public int Top    { get => _bounds.Y;      set { Bounds = Rectangle.FromBounds(_bounds.X, value, _bounds.Width, _bounds.Height); } }
-    public int Width  { get => _bounds.Width;  set { Bounds = Rectangle.FromBounds(_bounds.X, _bounds.Y, value, _bounds.Height); } }
-    public int Height { get => _bounds.Height; set { Bounds = Rectangle.FromBounds(_bounds.X, _bounds.Y, _bounds.Width, value); } }
+    public int Left
+    {
+        get => _bounds.X;
+        set => Bounds = Rectangle.FromBounds(value, _bounds.Y, _bounds.Width, _bounds.Height);
+    }
+
+    public int Top
+    {
+        get => _bounds.Y;
+        set => Bounds = Rectangle.FromBounds(_bounds.X, value, _bounds.Width, _bounds.Height);
+    }
+
+    public int Width
+    {
+        get => _bounds.Width;
+        set => Bounds = Rectangle.FromBounds(_bounds.X, _bounds.Y, value, _bounds.Height);
+    }
+
+    public int Height
+    {
+        get => _bounds.Height;
+        set => Bounds = Rectangle.FromBounds(_bounds.X, _bounds.Y, _bounds.Width, value);
+    }
 
     /// The far edges, which a layout calculation wants far more often than it
     /// wants the width. Read-only: setting `Right` could mean moving or
@@ -531,7 +551,8 @@ public abstract class Control : IControlNotify
 
     /// How large the control would like to be, given its text and font. Zero
     /// means "no opinion", which is what the base says and what stops
-    /// `ResizeToPreferredSize` doing anything to a control that has not overridden it.
+    /// `ResizeToPreferredSize` doing anything to a control that has not
+    /// overridden it.
     public virtual Size PreferredSize => Size.Empty;
 
     /// Resizes to `PreferredSize`, keeping the top-left corner. Does nothing
@@ -953,10 +974,10 @@ public abstract class Control : IControlNotify
 
     /// The platform says what size the control is.
     ///
-    /// **An echo of `SetBoundsCore` raises nothing**, since `Place` raises once itself.
-    /// Anything else is the platform resizing on its own -- the user dragging a
-    /// window's frame, a toolbar fitting itself to its buttons -- and becomes
-    /// what was asked for.
+    /// **An echo of `SetBoundsCore` raises nothing**, since `SetBoundsCore`
+    /// raises once itself. Anything else is the platform resizing on its own --
+    /// the user dragging a window's frame, a toolbar fitting itself to its
+    /// buttons -- and becomes what was asked for.
     public void OnPlatformResized(Size extent)
     {
         if (IsMinimizedWindow)
@@ -966,7 +987,8 @@ public abstract class Control : IControlNotify
         if (_isPlacing)
             return;
 
-        _requestedBounds = Rectangle.FromBounds(_requestedBounds.X, _requestedBounds.Y, extent.Width, extent.Height);
+        _requestedBounds = Rectangle.FromBounds(_requestedBounds.X, _requestedBounds.Y,
+                                                extent.Width, extent.Height);
         RememberAnchor();
         // Laid out whether or not the size changed: a window's first report is
         // where it learns the room it was actually given.
@@ -996,7 +1018,8 @@ public abstract class Control : IControlNotify
         if (_isPlacing)
             return;
 
-        _requestedBounds = Rectangle.FromBounds(placed.X, placed.Y, _requestedBounds.Width, _requestedBounds.Height);
+        _requestedBounds = Rectangle.FromBounds(placed.X, placed.Y,
+                                                _requestedBounds.Width, _requestedBounds.Height);
         RememberAnchor();
         if (!was.Location.Equals(placed))
             OnMove();

@@ -1090,8 +1090,8 @@ public class ButtonPanel : Panel
         return wanted > best ? wanted : best;
     }
 
-    /// See the note on `RadioGroup.ArrangeButtons`: the base constructor resizes, and
-    /// this override runs before this class's own fields exist.
+    /// See the note on `RadioGroup.ArrangeButtons`: the base constructor
+    /// resizes, and this override runs before this class's own fields exist.
     protected override void OnResize()
     {
         base.OnResize();

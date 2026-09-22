@@ -673,7 +673,8 @@ ClipboardImage? ReadClipboardImage()
 {
     if (ClipboardOffersFormat(GetPngClipboardFormat()) && Standard.Drawing.Imaging.Available)
     {
-        var decoded = Standard.Drawing.Image.FromBytes(ReadClipboardFormat(GetPngClipboardFormat()));
+        var png = ReadClipboardFormat(GetPngClipboardFormat());
+        var decoded = Standard.Drawing.Image.FromBytes(png);
         if (decoded.Ok)
         {
             var pixels = decoded.Value.ToBgra();

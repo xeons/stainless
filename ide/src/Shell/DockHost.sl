@@ -1014,10 +1014,10 @@ public class DockHost : Panel
     /// The pointer left the slid-out pane, so it goes away.
     ///
     /// **A poll rather than a leave event**, and the seam carries
-    /// `GetPointerPosition` for this reason. A container is told the pointer left
-    /// the moment it moves onto one of that container's own children -- so a
-    /// well would slide shut as soon as the pointer reached the tree inside it,
-    /// which is the one place it is certainly meant to stay open.
+    /// `GetPointerPosition` for this reason. A container is told the pointer
+    /// left the moment it moves onto one of that container's own children -- so
+    /// a well would slide shut as soon as the pointer reached the tree inside
+    /// it, which is the one place it is certainly meant to stay open.
     void OnPointerTimerTick(Timer sender)
     {
         var flying = _flyout;

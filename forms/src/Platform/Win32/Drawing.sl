@@ -131,9 +131,9 @@ public class GraphicsBackend : IGraphicsBackend
         DeleteObject((HGDIOBJ)(void*)brush);
     }
 
-    /// Selects a pen made for this call. `RestoreSelection` puts back what was there and
-    /// deletes it; every outline call goes through the two, so that none of
-    /// them can forget the second half.
+    /// Selects a pen made for this call. `RestoreSelection` puts back what was
+    /// there and deletes it; every outline call goes through the two, so that
+    /// none of them can forget the second half.
     ///
     /// **What was there, not a stock object.** The context is lent by whoever
     /// is painting, and a caller that selected a pen of its own gets it back.
@@ -380,8 +380,8 @@ public class GraphicsBackend : IGraphicsBackend
     }
 
     /// **The blend is used even for a picture with no alpha channel**, which
-    /// is the one case `BlitBitmap` would have sent through `BitBlt`. `AlphaFormat`
-    /// is what says whether the *source* carries per-pixel alpha;
+    /// is the one case `BlitBitmap` would have sent through `BitBlt`.
+    /// `AlphaFormat` is what says whether the *source* carries per-pixel alpha;
     /// `SourceConstantAlpha` applies either way, so a 24-bit bitmap fades
     /// correctly with the format left at zero.
     public void DrawBitmapFaded(IBitmapBackend picture, FPoint at, int opacity)

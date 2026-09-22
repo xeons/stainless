@@ -76,7 +76,8 @@ public class Spot : GraphicControl
 
     protected override void OnPaint(PaintEventArgs args)
     {
-        args.Graphics.FillRectangle(new Brush(ForeColor), Rectangle.FromBounds(0, 0, Width, Height));
+        args.Graphics.FillRectangle(new Brush(ForeColor),
+                                    Rectangle.FromBounds(0, 0, Width, Height));
         base.OnPaint(args);
     }
 }
@@ -329,7 +330,8 @@ public class CoreForm : Form
                    _host.BackColors > pushed);
 
         var origin = _group.ClientOrigin;
-        var framedAt = Drawing.Point.FromXY(origin.X + _framed.Left + 5, origin.Y + _framed.Top + 5);
+        var framedAt = Drawing.Point.FromXY(origin.X + _framed.Left + 5,
+                                            origin.Y + _framed.Top + 5);
         _group.OnPlatformMouseDown(MouseButton.Left, framedAt, ModifierKeys.None);
         _group.OnPlatformMouseUp(MouseButton.Left, framedAt, ModifierKeys.None);
         ok = Check(ok, "a click in a group box reaches the graphic control under it",

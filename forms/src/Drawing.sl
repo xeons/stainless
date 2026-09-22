@@ -702,13 +702,30 @@ public sealed class Bitmap
 /// exactly that reason: a field is read once, before `Main`, and then wrong.
 public static class SystemColors
 {
-    public static Color Control          => WidgetSet.Current.GetSystemColor(SystemColorId.Control);
-    public static Color ControlText      => WidgetSet.Current.GetSystemColor(SystemColorId.ControlText);
-    public static Color Window           => WidgetSet.Current.GetSystemColor(SystemColorId.Window);
-    public static Color WindowText       => WidgetSet.Current.GetSystemColor(SystemColorId.WindowText);
-    public static Color Highlight        => WidgetSet.Current.GetSystemColor(SystemColorId.Highlight);
-    public static Color HighlightText    => WidgetSet.Current.GetSystemColor(SystemColorId.HighlightText);
-    public static Color GrayText         => WidgetSet.Current.GetSystemColor(SystemColorId.GrayText);
-    public static Color ControlDark      => WidgetSet.Current.GetSystemColor(SystemColorId.ControlDark);
-    public static Color ControlLight     => WidgetSet.Current.GetSystemColor(SystemColorId.ControlLight);
+    public static Color Control =>
+        WidgetSet.Current.GetSystemColor(SystemColorId.Control);
+
+    public static Color ControlText =>
+        WidgetSet.Current.GetSystemColor(SystemColorId.ControlText);
+
+    public static Color Window =>
+        WidgetSet.Current.GetSystemColor(SystemColorId.Window);
+
+    public static Color WindowText =>
+        WidgetSet.Current.GetSystemColor(SystemColorId.WindowText);
+
+    public static Color Highlight =>
+        WidgetSet.Current.GetSystemColor(SystemColorId.Highlight);
+
+    public static Color HighlightText =>
+        WidgetSet.Current.GetSystemColor(SystemColorId.HighlightText);
+
+    public static Color GrayText =>
+        WidgetSet.Current.GetSystemColor(SystemColorId.GrayText);
+
+    public static Color ControlDark =>
+        WidgetSet.Current.GetSystemColor(SystemColorId.ControlDark);
+
+    public static Color ControlLight =>
+        WidgetSet.Current.GetSystemColor(SystemColorId.ControlLight);
 }

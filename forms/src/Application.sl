@@ -203,9 +203,9 @@ public static class Application
         done.Wait();
     }
 
-    /// Runs everything posted so far. Called by the backend when `WakeEventLoop` has
-    /// had its effect, and by `Run` and `DoEvents` so that work posted before
-    /// a loop started is not left sitting.
+    /// Runs everything posted so far. Called by the backend when
+    /// `WakeEventLoop` has had its effect, and by `Run` and `DoEvents` so that
+    /// work posted before a loop started is not left sitting.
     ///
     /// **The queue is taken whole and run outside the lock.** An action that
     /// posts another would otherwise deadlock on a lock this call still holds,

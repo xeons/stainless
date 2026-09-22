@@ -290,11 +290,11 @@ public enum CursorKind
 
 /// What every control's peer can do.
 ///
-/// **`DestroyHandle` is here and is not a destructor.** A peer is destroyed when its
-/// control is, and ARC would do that on its own -- but a control can also be
-/// asked to give up its platform window and make a new one, which is what
-/// changing a border style costs on Windows. So the release is a method, and
-/// the destructor calls it if nothing else has.
+/// **`DestroyHandle` is here and is not a destructor.** A peer is destroyed
+/// when its control is, and ARC would do that on its own -- but a control can
+/// also be asked to give up its platform window and make a new one, which is
+/// what changing a border style costs on Windows. So the release is a method,
+/// and the destructor calls it if nothing else has.
 public interface IControlPeer
 {
     void SetBounds(Rectangle bounds);
@@ -381,8 +381,8 @@ public interface IControlPeer
     Point ClientOrigin { get; }
 
     /// What the platform thinks this control ought to be, given its text and
-    /// font. What `ResizeToPreferredSize` uses, and the reason a button sized to its caption
-    /// looks native rather than merely close.
+    /// font. What `ResizeToPreferredSize` uses, and the reason a button sized
+    /// to its caption looks native rather than merely close.
     Size PreferredSize { get; }
 
     /// The platform's handle, as an integer. For reaching an API this layer

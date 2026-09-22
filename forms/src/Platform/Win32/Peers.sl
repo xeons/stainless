@@ -67,8 +67,8 @@ import Win32.ComCtl32;
 // `Point`, `Size` and `Rectangle` are each declared twice within reach: once by
 // `Forms.Drawing` and once by the Win32 headers, which mean different things by
 // them. An alias settles a *type* name; it does not settle a static member
-// access, so `FPoint.FromXY(...)` does not resolve where `FPoint x` does. Hence the
-// three makers below, which say the qualified name once each.
+// access, so `FPoint.FromXY(...)` does not resolve where `FPoint x` does. Hence
+// the three makers below, which say the qualified name once each.
 using FPoint = Forms.Drawing.Point;
 using FSize  = Forms.Drawing.Size;
 using FRect  = Forms.Drawing.Rectangle;
@@ -153,8 +153,8 @@ public ModifierKeys GetCurrentModifiers()
 ///
 /// Win32 reports a mouse entering a window only by the moves it sends, and
 /// reports it leaving not at all until asked -- once, per window, per leave. So
-/// this is called again on every enter, which is what the `IsTracking` flag on a
-/// peer is counting.
+/// this is called again on every enter, which is what the `IsTracking` flag on
+/// a peer is counting.
 ///
 /// Here rather than in `Win32.User32` because that layer is declarations only:
 /// a function with a body there would make the raw bindings need `-l user32`
@@ -575,12 +575,14 @@ public class ControlPeer : IControlPeer
 
         if (message == WmLeftButtonDown)
         {
-            control.OnPlatformMouseDown(MouseButton.Left, GetPointFromLParam(lParam), GetCurrentModifiers());
+            control.OnPlatformMouseDown(MouseButton.Left, GetPointFromLParam(lParam),
+                                        GetCurrentModifiers());
             return DefWndProc(message, wParam, lParam);
         }
         if (message == WmLeftButtonUp)
         {
-            control.OnPlatformMouseUp(MouseButton.Left, GetPointFromLParam(lParam), GetCurrentModifiers());
+            control.OnPlatformMouseUp(MouseButton.Left, GetPointFromLParam(lParam),
+                                      GetCurrentModifiers());
             return DefWndProc(message, wParam, lParam);
         }
         if (message == WmLeftDoubleClick)
@@ -597,22 +599,26 @@ public class ControlPeer : IControlPeer
         }
         if (message == WmRightButtonDown)
         {
-            control.OnPlatformMouseDown(MouseButton.Right, GetPointFromLParam(lParam), GetCurrentModifiers());
+            control.OnPlatformMouseDown(MouseButton.Right, GetPointFromLParam(lParam),
+                                        GetCurrentModifiers());
             return DefWndProc(message, wParam, lParam);
         }
         if (message == WmRightButtonUp)
         {
-            control.OnPlatformMouseUp(MouseButton.Right, GetPointFromLParam(lParam), GetCurrentModifiers());
+            control.OnPlatformMouseUp(MouseButton.Right, GetPointFromLParam(lParam),
+                                      GetCurrentModifiers());
             return DefWndProc(message, wParam, lParam);
         }
         if (message == WmMiddleButtonDown)
         {
-            control.OnPlatformMouseDown(MouseButton.Middle, GetPointFromLParam(lParam), GetCurrentModifiers());
+            control.OnPlatformMouseDown(MouseButton.Middle, GetPointFromLParam(lParam),
+                                        GetCurrentModifiers());
             return DefWndProc(message, wParam, lParam);
         }
         if (message == WmMiddleButtonUp)
         {
-            control.OnPlatformMouseUp(MouseButton.Middle, GetPointFromLParam(lParam), GetCurrentModifiers());
+            control.OnPlatformMouseUp(MouseButton.Middle, GetPointFromLParam(lParam),
+                                      GetCurrentModifiers());
             return DefWndProc(message, wParam, lParam);
         }
 
@@ -651,7 +657,8 @@ public class ControlPeer : IControlPeer
             screen.X = (int)(short)(lParam & 0xFFFF);
             screen.Y = (int)(short)((lParam >> 16) & 0xFFFF);
             ScreenToClient(Window, &screen);
-            control.OnPlatformMouseWheel(notches, CreatePoint(screen.X, screen.Y), GetCurrentModifiers());
+            control.OnPlatformMouseWheel(notches, CreatePoint(screen.X, screen.Y),
+                                         GetCurrentModifiers());
             // Likewise: a multiline text box and a list scroll themselves, and
             // only if the wheel reaches them.
             return DefWndProc(message, wParam, lParam);

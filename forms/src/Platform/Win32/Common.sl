@@ -570,7 +570,7 @@ public class TabControlPeer : ControlPeer, ITabControlPeer
             Rect area;
             GetClientRect(Window, &area);
             SendMessageW(Window, TcmAdjustRect, 0u, (long)(nuint)&area);
-            return CreateRectangle(area.Left, area.Top, area.Right - area.Left, area.Bottom - area.Top);
+            return CreateRectangleFromEdges(area.Left, area.Top, area.Right, area.Bottom);
         }
     }
 

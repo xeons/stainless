@@ -77,7 +77,8 @@ void EnsureFormClass()
 
 // ------------------------------------------------------------ the wake window
 
-/// The window `WakeEventLoop` posts to, so that the loop turns and the queue is drained.
+/// The window `WakeEventLoop` posts to, so that the loop turns and the queue is
+/// drained.
 ///
 /// **A window rather than `PostThreadMessageW`**, which is the obvious answer
 /// and the wrong one. A thread message has no window to be routed to, so any
@@ -827,10 +828,10 @@ public class Win32WidgetSet : IWidgetSet
                        | IccStandardClasses;
         InitCommonControlsEx(&wanted);
 
-        // **Here, and not lazily in `WakeEventLoop`.** A window belongs to the thread
-        // that created it: one made on a worker has its messages queued to that
-        // worker, where nothing ever dispatches them, so the post is accepted
-        // and silently never arrives. This constructor runs inside
+        // **Here, and not lazily in `WakeEventLoop`.** A window belongs to the
+        // thread that created it: one made on a worker has its messages queued
+        // to that worker, where nothing ever dispatches them, so the post is
+        // accepted and silently never arrives. This constructor runs inside
         // `Application.Initialize`, which is the UI thread by definition -- it
         // is the one that defines it.
         //
@@ -987,7 +988,8 @@ public class Win32WidgetSet : IWidgetSet
 
     public String GetClipboardText() => ReadClipboardText();
 
-    public String GetClipboardHtml() => DecodeHtmlFormat(ReadClipboardFormat(GetHtmlClipboardFormat()));
+    public String GetClipboardHtml() =>
+        DecodeHtmlFormat(ReadClipboardFormat(GetHtmlClipboardFormat()));
 
     public ClipboardImage? GetClipboardImage() => ReadClipboardImage();
 
@@ -1017,7 +1019,8 @@ public class Win32WidgetSet : IWidgetSet
         return false;
     }
 
-    public bool ContainsClipboardFormat(String name) => ClipboardOffersFormat(RegisterFormatNamed(name));
+    public bool ContainsClipboardFormat(String name) =>
+        ClipboardOffersFormat(RegisterFormatNamed(name));
 
     public String[] GetClipboardFormatNames() => ReadClipboardFormatNames();
 
@@ -1169,9 +1172,9 @@ public class Win32WidgetSet : IWidgetSet
     /// the message was handled and must not be dispatched again; dispatching it
     /// anyway is what makes Tab type a tab character into the text box it just
     /// left.
-    /// **The body is `HandleDialogKey`, at module level**, because `ShowModal` runs a
-    /// loop of its own and needs the same pre-processing -- and it is not a
-    /// method of this class.
+    /// **The body is `HandleDialogKey`, at module level**, because `ShowModal`
+    /// runs a loop of its own and needs the same pre-processing -- and it is
+    /// not a method of this class.
     bool HandleNavigation(Msg* message) => HandleDialogKey(message);
 
     public void QuitEventLoop() => PostQuitMessage(0);
