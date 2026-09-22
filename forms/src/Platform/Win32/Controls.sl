@@ -473,6 +473,8 @@ public class TextEntryPeer : ControlPeer, ITextEntryPeer
     {
         if (code != EnChange)
             return false;
+        if (Echoing)
+            return true;
         var owner = Owner;
         if (owner == null)
             return false;
@@ -642,7 +644,8 @@ public class ComboPeer : ControlPeer, IComboPeer
             return false;
         if (code == CbnSelChange || code == CbnEditChange)
         {
-            ((IControlNotify)owner).OnPlatformValueChanged();
+            if (!Echoing)
+                ((IControlNotify)owner).OnPlatformValueChanged();
             return true;
         }
         return false;

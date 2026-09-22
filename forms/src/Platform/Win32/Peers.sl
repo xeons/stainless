@@ -317,6 +317,8 @@ public class ControlPeer : IControlPeer
     /// which matters, because the caller is a pointer moving over text and
     /// asks on every pixel.
     protected String tipText;
+    /// How deep this peer is in messages of its own sending. See `Echoing`.
+    private int _echo;
 
     protected ControlPeer(HWND made, IControlNotify owner, bool subclass)
     {
@@ -336,6 +338,7 @@ public class ControlPeer : IControlPeer
         shape = CursorKind.Default;
         tip = null;
         tipText = "";
+        _echo = 0;
 
         BindPeer(made, this);
         if (subclass)
@@ -371,6 +374,32 @@ public class ControlPeer : IControlPeer
             IControlNotify? held = target;
             return held;
         }
+    }
+
+    /// Whether the notification now arriving is this peer's own doing.
+    ///
+    /// A control told to change reports the change back: an `EDIT` sends
+    /// `EN_CHANGE` for `WM_SETTEXT`, a list view `LVN_ITEMCHANGED` for
+    /// `LVM_SETITEMSTATE`. The seam promises `OnPlatformValueChanged` only for
+    /// the user's changes, so a peer MUST swallow what arrives while this is
+    /// true.
+    protected bool Echoing => _echo > 0;
+
+    /// `SendMessageW` to this peer's window, with what it provokes marked as
+    /// the program's own. See `Echoing`.
+    protected long SendQuietly(uint message, ulong wParam, long lParam)
+    {
+        return SendQuietly(window, message, wParam, lParam);
+    }
+
+    /// The same, to another window whose notifications this peer reports --
+    /// a spin control's arrows, which rewrite its edit.
+    protected long SendQuietly(HWND to, uint message, ulong wParam, long lParam)
+    {
+        _echo++;
+        long answer = SendMessageW(to, message, wParam, lParam);
+        _echo--;
+        return answer;
     }
 
     // ------------------------------------------------------- the dispatch
@@ -875,9 +904,12 @@ public class ControlPeer : IControlPeer
 
     public void SetEnabled(bool enabled) => EnableWindow(window, enabled ? 1 : 0);
 
+    /// Quiet, because an `EDIT` answers `WM_SETTEXT` with `EN_CHANGE`.
     public void SetText(String text)
     {
+        _echo++;
         SetWindowTextW(window, text.ToUtf16().ToPointer());
+        _echo--;
     }
 
     public String GetText()

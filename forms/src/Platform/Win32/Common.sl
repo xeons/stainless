@@ -661,9 +661,10 @@ public class TreeViewPeer : ControlPeer, ITreeViewPeer
         return null;
     }
 
+    /// Quiet, because removing the selected node moves the selection.
     public void RemoveNode(ITreeNodeHandle node)
     {
-        SendMessageW(window, TvmDeleteItem, 0u, (long)(nuint)(void*)NativeOf(node));
+        SendQuietly(TvmDeleteItem, 0u, (long)(nuint)(void*)NativeOf(node));
     }
 
     public void SetNodeText(ITreeNodeHandle node, String text)
@@ -710,8 +711,7 @@ public class TreeViewPeer : ControlPeer, ITreeViewPeer
 
     public void SelectNode(ITreeNodeHandle node)
     {
-        SendMessageW(window, TvmSelectItem, TvgnCaret,
-                     (long)(nuint)(void*)NativeOf(node));
+        SendQuietly(TvmSelectItem, TvgnCaret, (long)(nuint)(void*)NativeOf(node));
     }
 
     public ITreeNodeHandle? GetSelectedNode()
@@ -744,7 +744,7 @@ public class TreeViewPeer : ControlPeer, ITreeViewPeer
 
     public void Clear()
     {
-        SendMessageW(window, TvmDeleteItem, 0u, (long)(nuint)(void*)TreeRoot());
+        SendQuietly(TvmDeleteItem, 0u, (long)(nuint)(void*)TreeRoot());
     }
 
     public void SetImages(IImageListBackend? images)
@@ -756,6 +756,8 @@ public class TreeViewPeer : ControlPeer, ITreeViewPeer
     {
         if (code != TvnSelChangedW)
             return false;
+        if (Echoing)
+            return true;
         IControlNotify? held = owning;
         if (held == null)
             return false;
@@ -1022,14 +1024,15 @@ public class SpinPeer : ControlPeer, ISpinPeer
         }
     }
 
+    /// Both quiet: the arrows write the edit's text, and the edit reports it.
     public void SetRange(int minimum, int maximum)
     {
-        SendMessageW(_arrows, UdmSetRange32, (ulong)minimum, (long)maximum);
+        SendQuietly(_arrows, UdmSetRange32, (ulong)minimum, (long)maximum);
     }
 
     public void SetValue(int value)
     {
-        SendMessageW(_arrows, UdmSetPos32, 0u, (long)value);
+        SendQuietly(_arrows, UdmSetPos32, 0u, (long)value);
     }
 
     public int GetValue()
@@ -1043,6 +1046,8 @@ public class SpinPeer : ControlPeer, ISpinPeer
     {
         if (code != EnChange)
             return false;
+        if (Echoing)
+            return true;
         IControlNotify? held = owning;
         if (held == null)
             return false;
@@ -1277,8 +1282,7 @@ public class HeaderPeer : ControlPeer, IHeaderPeer
         item.FilterData = null;
         item.State = 0u;
 
-        int at = (int)SendMessageW(window, HdmInsertItemW, (ulong)_sections,
-                                   (long)(nuint)&item);
+        int at = (int)SendQuietly(HdmInsertItemW, (ulong)_sections, (long)(nuint)&item);
         if (at >= 0)
             _sections = _sections + 1;
         return at;
@@ -1299,7 +1303,8 @@ public class HeaderPeer : ControlPeer, IHeaderPeer
         item.Type = 0u;
         item.FilterData = null;
         item.State = 0u;
-        SendMessageW(window, HdmSetItemW, (ulong)index, (long)(nuint)&item);
+        // Quiet: a header reports `HDN_ITEMCHANGED` for this as for a drag.
+        SendQuietly(HdmSetItemW, (ulong)index, (long)(nuint)&item);
     }
 
     public int GetSectionWidth(int index)
@@ -1337,6 +1342,8 @@ public class HeaderPeer : ControlPeer, IHeaderPeer
     {
         if (code != HdnItemChangedW)
             return false;
+        if (Echoing)
+            return true;
         IControlNotify? held = owning;
         if (held == null)
             return false;
