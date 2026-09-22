@@ -310,7 +310,7 @@ public class FileStream : IStream
         }
         if (count == 0)
             return 0;
-        if (offset + count > buffer.Length)
+        if (offset > buffer.Length || count > buffer.Length - offset)
         {
             _error = IOError.Invalid;
             return 0;
@@ -337,7 +337,7 @@ public class FileStream : IStream
         }
         if (count == 0)
             return 0;
-        if (offset + count > buffer.Length)
+        if (offset > buffer.Length || count > buffer.Length - offset)
         {
             _error = IOError.Invalid;
             return 0;
@@ -484,7 +484,7 @@ public class MemoryStream : IStream
     /// failure to distinguish it from.
     public nuint Read(byte[] buffer, nuint offset, nuint count)
     {
-        if (offset + count > buffer.Length)
+        if (offset > buffer.Length || count > buffer.Length - offset)
             return 0;
 
         nuint available = _length - _at;
@@ -503,7 +503,7 @@ public class MemoryStream : IStream
     /// the length only grows when the position passes the old end.
     public nuint Write(byte[] buffer, nuint offset, nuint count)
     {
-        if (offset + count > buffer.Length)
+        if (offset > buffer.Length || count > buffer.Length - offset)
             return 0;
 
         Reserve(_at + count);

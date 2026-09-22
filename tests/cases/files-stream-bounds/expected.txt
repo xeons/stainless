@@ -1,0 +1,7 @@
+memory read: 0
+memory write: 0
+memory length: 8
+file read: 0 the request made no sense
+file write: 0 the request made no sense
+file read past: 0
+file length: 8
