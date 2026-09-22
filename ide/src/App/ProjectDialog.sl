@@ -73,17 +73,18 @@ public class ProjectDialog : Form
     /// Whether OK was pressed. `Form.ShowModal` answers nothing by design --
     /// `forms/Form.sl` argues that a dialog with an answer should carry it as a
     /// property typed as whatever the answer actually is -- so this is it.
-    public bool Accepted;
+    public bool WasAccepted;
 
-    /// The project `Load` was given, so that OK can read the controls back into
-    /// it **before** the window goes away.
+    /// The project `LoadProject` was given, so that OK can read the controls
+    /// back into it **before** the window goes away.
     ///
     /// **This is not a convenience.** A `TextBox`'s text lives in the native
     /// control, not in the object, so reading `.Text` after the window has
     /// closed answers the empty string -- and the first version of this dialog
-    /// called `Store` after `ShowModal` returned and wrote a project with no
-    /// name, no version and no sources over a perfectly good file. Reading has
-    /// to happen while the controls still exist, which means inside the click.
+    /// called `StoreProject` after `ShowModal` returned and wrote a project
+    /// with no name, no version and no sources over a perfectly good file.
+    /// Reading has to happen while the controls still exist, which means
+    /// inside the click.
     ProjectFile? _editing;
 
     public ProjectDialog()
@@ -91,7 +92,7 @@ public class ProjectDialog : Form
         base(WindowBorder.Fixed);
         Title = "Project properties";
         SetBounds(0, 0, 520, 420);
-        Accepted = false;
+        WasAccepted = false;
         _editing = null;
 
         _pages = new TabControl(this);
@@ -100,17 +101,17 @@ public class ProjectDialog : Form
                        | AnchorStyles.Right | AnchorStyles.Bottom;
 
         var general = new TabPage(_pages, "General");
-        _name = Field(general, "Name:", 0);
-        _version = Field(general, "Version:", 1);
-        _kind = Choice(general, "Kind:", 2, ["executable", "library"]);
-        _output = Field(general, "Output file:", 3);
+        _name = AddTextRow(general, "Name:", 0);
+        _version = AddTextRow(general, "Version:", 1);
+        _kind = AddChoiceRow(general, "Kind:", 2, ["executable", "library"]);
+        _output = AddTextRow(general, "Output file:", 3);
 
         var build = new TabPage(_pages, "Build");
-        _optimize = Choice(build, "Optimize:", 0,
+        _optimize = AddChoiceRow(build, "Optimize:", 0,
                            ["0 - none", "1 - some", "2 - default", "3 - most"]);
-        _abi = Choice(build, "ABI:", 1, ["", "c", "stainless"]);
-        _runtime = Choice(build, "Runtime:", 2, ["", "static", "shared"]);
-        _defines = Field(build, "Defines:", 3);
+        _abi = AddChoiceRow(build, "ABI:", 1, ["", "c", "stainless"]);
+        _runtime = AddChoiceRow(build, "Runtime:", 2, ["", "static", "shared"]);
+        _defines = AddTextRow(build, "Defines:", 3);
         _debug = new CheckBox(build);
         _debug.Text = "Debug information";
         _debug.SetBounds(120, 4 * RowHeight + 14, 220, 22);
@@ -120,13 +121,13 @@ public class ProjectDialog : Form
         _references.SetBounds(12, 12, 460, 180);
         _references.Anchors = AnchorStyles.Top | AnchorStyles.Left
                             | AnchorStyles.Right | AnchorStyles.Bottom;
-        _libraries = Field(references, "Libraries:", 6);
+        _libraries = AddTextRow(references, "Libraries:", 6);
 
         var paths = new TabPage(_pages, "Paths");
-        _sources = Field(paths, "Sources:", 0);
-        _buildDirectory = Field(paths, "Build:", 1);
-        _objectDirectory = Field(paths, "Objects:", 2);
-        _header = Field(paths, "Header:", 3);
+        _sources = AddTextRow(paths, "Sources:", 0);
+        _buildDirectory = AddTextRow(paths, "Build:", 1);
+        _objectDirectory = AddTextRow(paths, "Objects:", 2);
+        _header = AddTextRow(paths, "Header:", 3);
 
         _ok = new Button(this);
         _ok.Text = "OK";
@@ -149,7 +150,7 @@ public class ProjectDialog : Form
     /// A helper rather than sixteen near-identical four-line blocks, because
     /// this dialog is mostly rows and the only thing that differs between them
     /// is the caption and which field it is bound to.
-    TextBox Field(WindowedControl page, String caption, int row)
+    TextBox AddTextRow(WindowedControl page, String caption, int row)
     {
         var label = new Label(page);
         label.Text = caption;
@@ -162,7 +163,7 @@ public class ProjectDialog : Form
     }
 
     /// The same, with a drop-down of the values the format allows.
-    ComboBox Choice(WindowedControl page, String caption, int row, String[] values)
+    ComboBox AddChoiceRow(WindowedControl page, String caption, int row, String[] values)
     {
         var label = new Label(page);
         label.Text = caption;
@@ -188,20 +189,20 @@ public class ProjectDialog : Form
     /// which three buttons around a list box does not. Anything with spaces in
     /// it would need quoting, and a path with a space in it is the one real
     /// limit here; it is named in `ide/README.md` rather than half-solved.
-    public void Load(ProjectFile project)
+    public void LoadProject(ProjectFile project)
     {
         _editing = project;
         _name.Text = project.Name;
         _version.Text = project.Version;
-        Select(_kind, project.Kind == "" ? "executable" : project.Kind);
+        SelectValue(_kind, project.Kind == "" ? "executable" : project.Kind);
         _output.Text = project.Output;
 
         int level = project.Optimize;
         _optimize.SelectedIndex = (level < 0 || level > 3) ? 2 : level;
         _debug.Checked = project.Debug;
-        _defines.Text = Joined(project.Defines);
-        Select(_abi, project.Abi);
-        Select(_runtime, project.Runtime);
+        _defines.Text = JoinWords(project.Defines);
+        SelectValue(_abi, project.Abi);
+        SelectValue(_runtime, project.Runtime);
 
         _references.Clear();
         foreach (var dependency in project.Dependencies)
@@ -210,9 +211,9 @@ public class ProjectDialog : Form
         }
         if (project.Dependencies.IsEmpty)
             _references.Add("(no dependencies)");
-        _libraries.Text = Joined(project.Libraries);
+        _libraries.Text = JoinWords(project.Libraries);
 
-        _sources.Text = Joined(project.Sources);
+        _sources.Text = JoinWords(project.Sources);
         _buildDirectory.Text = project.BuildDirectory;
         _objectDirectory.Text = project.ObjectDirectory;
         _header.Text = project.Header;
@@ -227,23 +228,23 @@ public class ProjectDialog : Form
     /// a version requirement and a link mode, and editing one properly is its
     /// own dialog. Showing them read-only is honest; a half-editor that dropped
     /// the fields it did not show would not be.
-    void Store(ProjectFile project)
+    void StoreProject(ProjectFile project)
     {
         project.Name = _name.Text;
         project.Version = _version.Text;
-        project.Kind = Chosen(_kind);
+        project.Kind = GetChosenText(_kind);
         project.Output = _output.Text;
 
         int level = _optimize.SelectedIndex;
         project.Optimize = (level < 0) ? 2 : level;
         project.Debug = _debug.Checked;
-        project.Defines = Split(_defines.Text);
-        project.Abi = Chosen(_abi);
-        project.Runtime = Chosen(_runtime);
+        project.Defines = SplitWords(_defines.Text);
+        project.Abi = GetChosenText(_abi);
+        project.Runtime = GetChosenText(_runtime);
 
-        project.Libraries = Split(_libraries.Text);
+        project.Libraries = SplitWords(_libraries.Text);
 
-        project.Sources = Split(_sources.Text);
+        project.Sources = SplitWords(_sources.Text);
         project.BuildDirectory = _buildDirectory.Text;
         project.ObjectDirectory = _objectDirectory.Text;
         project.Header = _header.Text;
@@ -255,13 +256,13 @@ public class ProjectDialog : Form
     ///
     /// The `optimize` list is read by index instead, because its entries say
     /// `2 - default` and the number is what the file holds.
-    String Chosen(ComboBox list)
+    String GetChosenText(ComboBox list)
     {
         var chosen = list.SelectedItem;
         return chosen == null ? "" : (String)chosen;
     }
 
-    void Select(ComboBox list, String value)
+    void SelectValue(ComboBox list, String value)
     {
         for (nuint i = 0u; i < list.Count; i++)
         {
@@ -276,7 +277,7 @@ public class ProjectDialog : Form
 
     /// An array as one line. Public and static-shaped so that the self test can
     /// check the round trip without a window.
-    public static String Joined(String[] values)
+    public static String JoinWords(String[] values)
     {
         var text = new StringBuilder();
         for (nuint i = 0u; i < values.Length; i++)
@@ -291,7 +292,7 @@ public class ProjectDialog : Form
     /// And back, dropping the empty pieces that runs of spaces produce -- so
     /// that a trailing space does not become an entry that names nothing and
     /// makes the compiler look for a directory called "".
-    public static String[] Split(String text)
+    public static String[] SplitWords(String text)
     {
         var kept = new List<String>();
         foreach (var piece in text.Split(" "))
@@ -316,14 +317,14 @@ public class ProjectDialog : Form
         if (project == null)
             return;
 
-        Store((ProjectFile)project);
-        Accepted = true;
+        StoreProject((ProjectFile)project);
+        WasAccepted = true;
         Close();
     }
 
     void OnCancel(Control sender)
     {
-        Accepted = false;
+        WasAccepted = false;
         Close();
     }
 }

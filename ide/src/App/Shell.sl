@@ -1165,7 +1165,7 @@ public class Shell : Form
     /// invalid JSON would be unusable.
     public bool OpenProject(String path)
     {
-        var read = Project.Read(path);
+        var read = Project.ReadProjectFile(path);
         if (!read.Ok)
         {
             Show(read.Error);
@@ -1195,11 +1195,11 @@ public class Shell : Form
         if (_project != null || path.ByteLength() == 0u)
             return;
 
-        String found = Project.Find(Path.DirectoryName(path));
+        String found = Project.FindProjectFile(Path.DirectoryName(path));
         if (found == "")
             return;
 
-        var read = Project.Read(found);
+        var read = Project.ReadProjectFile(found);
         if (!read.Ok)
             return;
 
@@ -1301,7 +1301,7 @@ public class Shell : Form
         // next build do all the work again. Removed here rather than by asking
         // for a flag that does not exist.
         var project = (ProjectFile)_project;
-        String rubbish = project.Resolve(project.ObjectDirectory);
+        String rubbish = project.ResolvePath(project.ObjectDirectory);
 
         if (!IsInsideProject(project, rubbish))
         {
@@ -1848,10 +1848,10 @@ public class Shell : Form
 
         var project = (ProjectFile)_project;
         var dialog = new ProjectDialog();
-        dialog.Load(project);
+        dialog.LoadProject(project);
         dialog.ShowModal();
 
-        if (!dialog.Accepted)
+        if (!dialog.WasAccepted)
         {
             Say("Properties unchanged.");
             return;
@@ -1871,7 +1871,7 @@ public class Shell : Form
             return;
         }
 
-        var written = Project.Write(project, _projectPath);
+        var written = Project.WriteProjectFile(project, _projectPath);
         if (!written.Ok)
         {
             Show(written.Error);
@@ -2060,9 +2060,9 @@ public class Shell : Form
         var project = (ProjectFile)_project;
         var root = _tree.Add(project.Name + " (" + project.Version + ")");
 
-        foreach (var source in project.SourcesFor(ProjectFile.ThisPlatform))
+        foreach (var source in project.GetSourcesFor(ProjectFile.ThisPlatform))
         {
-            String resolved = project.Resolve(source);
+            String resolved = project.ResolvePath(source);
             var branch = root.Add(source);
 
             if (Directory.Exists(resolved))
@@ -2084,7 +2084,7 @@ public class Shell : Form
         {
             references.Add(dependency.Name + " -- " + dependency.ToDisplayText());
         }
-        foreach (var library in project.LibrariesFor(ProjectFile.ThisPlatform))
+        foreach (var library in project.GetLibrariesFor(ProjectFile.ThisPlatform))
         {
             references.Add(library);
         }
@@ -3054,7 +3054,7 @@ public class Shell : Form
     {
         if (_project == null)
             return "";
-        return ((ProjectFile)_project).OutputPath();
+        return ((ProjectFile)_project).OutputPath;
     }
 
     // ------------------------------------------- what comes back from a stop
@@ -3948,8 +3948,8 @@ public class Shell : Form
         // A trailing space must not become an entry that names nothing, which
         // is what would send the compiler looking for a directory called "".
         {
-            String[] round = ProjectDialog.Split(
-                ProjectDialog.Joined(["src", "../forms/src", "vendor"]));
+            String[] round = ProjectDialog.SplitWords(
+                ProjectDialog.JoinWords(["src", "../forms/src", "vendor"]));
             if (round.Length != 3u || round[0u] != "src"
                 || round[1u] != "../forms/src" || round[2u] != "vendor")
             {
@@ -3957,17 +3957,17 @@ public class Shell : Form
                 ok = false;
             }
 
-            if (ProjectDialog.Split("  a   b  ").Length != 2u)
+            if (ProjectDialog.SplitWords("  a   b  ").Length != 2u)
             {
                 Console.WriteLine("FAIL: runs of spaces made empty entries");
                 ok = false;
             }
-            if (ProjectDialog.Split("   ").Length != 0u)
+            if (ProjectDialog.SplitWords("   ").Length != 0u)
             {
                 Console.WriteLine("FAIL: a field of spaces was not empty");
                 ok = false;
             }
-            if (ProjectDialog.Joined([]) != "")
+            if (ProjectDialog.JoinWords([]) != "")
             {
                 Console.WriteLine("FAIL: an empty list did not join to nothing");
                 ok = false;

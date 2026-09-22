@@ -137,7 +137,7 @@ public class PlatformOverlay
 ///
 /// **Every path is relative to the file's own directory**, never to the
 /// working directory, which is what makes a build mean the same thing from
-/// anywhere. `Resolve` is the only thing that should turn one into a real
+/// anywhere. `ResolvePath` is the only thing that should turn one into a real
 /// path.
 [Reflect]
 public class ProjectFile
@@ -219,14 +219,14 @@ public class ProjectFile
     public bool IsLibrary => Kind == "library";
 
     /// The file itself, for a message that can name it.
-    public String FilePath => Combine(Directory, FileName);
+    public String FilePath => CombinePath(Directory, FileName);
 
     /// A path written in the file, against the file's own directory.
-    public String Resolve(String path) => Combine(Directory, path);
+    public String ResolvePath(String path) => CombinePath(Directory, path);
 
     /// The overlay for a platform. `"windows"`, `"linux"` or `"macos"`;
     /// anything else answers an empty one.
-    public PlatformOverlay OverlayFor(String platform)
+    public PlatformOverlay GetPlatformOverlay(String platform)
     {
         if (platform == "windows")
             return Windows;
@@ -243,11 +243,14 @@ public class ProjectFile
     /// looks like -- a program is mostly the same everywhere and needs one
     /// binding directory more on each -- and it means this list can be read
     /// without checking three overlays for a removal.
-    public String[] SourcesFor(String platform) => Both(Sources, OverlayFor(platform).Sources);
+    public String[] GetSourcesFor(String platform)
+        => ConcatTextArrays(Sources, GetPlatformOverlay(platform).Sources);
 
-    public String[] LibrariesFor(String platform) => Both(Libraries, OverlayFor(platform).Libraries);
+    public String[] GetLibrariesFor(String platform)
+        => ConcatTextArrays(Libraries, GetPlatformOverlay(platform).Libraries);
 
-    public String[] DefinesFor(String platform) => Both(Defines, OverlayFor(platform).Defines);
+    public String[] GetDefinesFor(String platform)
+        => ConcatTextArrays(Defines, GetPlatformOverlay(platform).Defines);
 
     /// The platform this program was built for, which is the one whose overlay
     /// a window showing "what will be compiled" should show.
@@ -270,28 +273,31 @@ public class ProjectFile
     /// Mirrors `ProjectFile.OutputPath` in the compiler's driver. The two MUST
     /// agree: this is what the debugger launches, and a debugger launching a
     /// different file from the one just built finds stale code.
-    public String OutputPath()
+    public String OutputPath
     {
-        if (Output.ByteLength() != 0u)
-            return Resolve(Output);
+        get
+        {
+            if (Output.ByteLength() != 0u)
+                return ResolvePath(Output);
 
-        String name = IsLibrary ? SharedLibraryFileName(Name)
-                                : Name + ExecutableExtension;
-        return Combine(Resolve(BuildDirectory), name);
+            String name = IsLibrary ? GetSharedLibraryFileName(Name)
+                                    : Name + ExecutableExtension;
+            return CombinePath(ResolvePath(BuildDirectory), name);
+        }
     }
 
     #if WINDOWS
     static String ExecutableExtension => ".exe";
-    static String SharedLibraryFileName(String name) => name + ".dll";
+    static String GetSharedLibraryFileName(String name) => name + ".dll";
     #elif MACOS
     static String ExecutableExtension => "";
-    static String SharedLibraryFileName(String name) => "lib" + name + ".dylib";
+    static String GetSharedLibraryFileName(String name) => "lib" + name + ".dylib";
     #else
     static String ExecutableExtension => "";
-    static String SharedLibraryFileName(String name) => "lib" + name + ".so";
+    static String GetSharedLibraryFileName(String name) => "lib" + name + ".so";
     #endif
 
-    String[] Both(String[] shared, String[] extra)
+    String[] ConcatTextArrays(String[] shared, String[] extra)
     {
         if (extra.Length == 0u)
             return shared;
@@ -328,13 +334,13 @@ public const int CurrentFormat = 1;
 /// calls this has an absolute path already -- a file chooser's answer, or a
 /// command line the shell expanded -- so the limit is stated rather than
 /// worked around.
-public String Find(String startingAt)
+public String FindProjectFile(String startingAt)
 {
     String directory = startingAt;
 
     while (directory != "")
     {
-        String candidate = Combine(directory, FileName);
+        String candidate = CombinePath(directory, FileName);
         if (File.Exists(candidate))
             return candidate;
 
@@ -354,18 +360,18 @@ public String Find(String startingAt)
 /// The failures are the compiler's, phrased the compiler's way, because a
 /// reader seeing two different complaints about one file learns that one of
 /// the two tools is wrong about it.
-public Result<ProjectFile, String> Read(String path)
+public Result<ProjectFile, String> ReadProjectFile(String path)
 {
     var read = File.ReadAllText(path);
     if (!read.Ok)
         return Fail("could not read '" + path + "'");
 
-    return Parse(read.Value, path);
+    return ParseProjectFile(read.Value, path);
 }
 
 /// The same, from text already in hand -- which is what the editor has when
 /// the file is open and unsaved.
-public Result<ProjectFile, String> Parse(String text, String path)
+public Result<ProjectFile, String> ParseProjectFile(String text, String path)
 {
     var parsed = Json.Parse(text);
     if (!parsed.Ok)
@@ -380,7 +386,7 @@ public Result<ProjectFile, String> Parse(String text, String path)
     // Before anything is read, so a file with a typo in it is refused rather
     // than half-loaded. A field that silently did nothing is the failure a
     // readable project file exists to prevent.
-    var unknown = FirstUnknown(members, KnownFields(), "a project file", path);
+    var unknown = ReportUnknownField(members, ListKnownFields(), "a project file", path);
     if (unknown != "")
         return Fail(unknown);
 
@@ -413,17 +419,17 @@ public Result<ProjectFile, String> Parse(String text, String path)
         return Fail(defines.Error);
     project.Defines = defines.Value;
 
-    var windows = ReadOverlay(members, "windows", path);
+    var windows = ReadPlatformOverlay(members, "windows", path);
     if (!windows.Ok)
         return Fail(windows.Error);
     project.Windows = windows.Value;
 
-    var linux = ReadOverlay(members, "linux", path);
+    var linux = ReadPlatformOverlay(members, "linux", path);
     if (!linux.Ok)
         return Fail(linux.Error);
     project.Linux = linux.Value;
 
-    var macos = ReadOverlay(members, "macos", path);
+    var macos = ReadPlatformOverlay(members, "macos", path);
     if (!macos.Ok)
         return Fail(macos.Error);
     project.Macos = macos.Value;
@@ -478,7 +484,8 @@ Result<String[], String> ReadTextArray(JsonObject members, String name, String p
 }
 
 /// One platform's section, or an empty one when the file names none.
-Result<PlatformOverlay, String> ReadOverlay(JsonObject members, String platform, String path)
+Result<PlatformOverlay, String> ReadPlatformOverlay(JsonObject members, String platform,
+                                                    String path)
 {
     var made = new PlatformOverlay();
 
@@ -492,7 +499,8 @@ Result<PlatformOverlay, String> ReadOverlay(JsonObject members, String platform,
         }
 
         var inside = value.Members;
-        var unknown = FirstUnknown(inside, KnownOverlayFields(), "a platform section", path);
+        var unknown = ReportUnknownField(inside, ListKnownOverlayFields(),
+                                         "a platform section", path);
         if (unknown != "")
             return Fail(unknown);
 
@@ -541,7 +549,7 @@ Result<List<Dependency>, String> ReadDependencies(JsonObject members, String pat
                             + "comes from, as in { \"path\": \"../" + name + "\" }");
             }
 
-            var unknown = FirstUnknown(entry.Members, KnownDependencyFields(),
+            var unknown = ReportUnknownField(entry.Members, ListKnownDependencyFields(),
                                        "a dependency", path);
             if (unknown != "")
                 return Fail(unknown);
@@ -560,19 +568,19 @@ Result<List<Dependency>, String> ReadDependencies(JsonObject members, String pat
 
 /// The first member of `members` that `known` does not name, phrased the way
 /// the compiler phrases it -- or empty when every one of them is known.
-String FirstUnknown(JsonObject members, List<String> known, String kind, String path)
+String ReportUnknownField(JsonObject members, List<String> known, String kind, String path)
 {
     for (nuint i = 0u; i < members.Count; i++)
     {
         String wrote = members.NameAt(i);
-        if (Names(known, wrote))
+        if (IsKnownName(known, wrote))
             continue;
 
-        String meant = Nearest(wrote, known);
+        String meant = FindNearestName(wrote, known);
         if (meant == "")
         {
             return "'" + path + "': '" + wrote + "' is not a field of " + kind
-                   + ". The fields are: " + Join(known);
+                   + ". The fields are: " + JoinNames(known);
         }
 
         return "'" + path + "': '" + wrote + "' is not a field of " + kind
@@ -582,7 +590,7 @@ String FirstUnknown(JsonObject members, List<String> known, String kind, String 
     return "";
 }
 
-bool Names(List<String> known, String wanted)
+bool IsKnownName(List<String> known, String wanted)
 {
     for (nuint i = 0u; i < known.Count; i++)
     {
@@ -592,7 +600,7 @@ bool Names(List<String> known, String wanted)
     return false;
 }
 
-String Join(List<String> names)
+String JoinNames(List<String> names)
 {
     var built = new StringBuilder();
     for (nuint i = 0u; i < names.Count; i++)
@@ -609,7 +617,7 @@ String Join(List<String> names)
 /// Two edits on a short name is a typo; four is a different word, and guessing
 /// at that point is worse than listing what there is. The same threshold the
 /// compiler uses, so the two suggest the same thing about the same mistake.
-String Nearest(String wrote, List<String> known)
+String FindNearestName(String wrote, List<String> known)
 {
     String best = "";
     nuint closest = 0xFFFFFFFFu;
@@ -617,7 +625,7 @@ String Nearest(String wrote, List<String> known)
 
     for (nuint i = 0u; i < known.Count; i++)
     {
-        nuint distance = Distance(lowered, known[i].ToLowerAscii());
+        nuint distance = ComputeEditDistance(lowered, known[i].ToLowerAscii());
         if (distance >= closest)
             continue;
         closest = distance;
@@ -632,7 +640,7 @@ String Nearest(String wrote, List<String> known)
 }
 
 /// Levenshtein distance, one row at a time.
-nuint Distance(String from, String to)
+nuint ComputeEditDistance(String from, String to)
 {
     nuint wide = to.ByteLength();
     var row = new nuint[wide + 1u];
@@ -664,7 +672,7 @@ nuint Distance(String from, String to)
 /// The field names as the file spells them, read off the type rather than
 /// written out again -- so a field added above is refused-or-accepted without
 /// this list being the thing that was forgotten.
-List<String> KnownFields()
+List<String> ListKnownFields()
 {
     var type = typeof(ProjectFile);
     var names = new List<String>();
@@ -687,7 +695,7 @@ List<String> KnownFields()
     return names;
 }
 
-List<String> KnownOverlayFields()
+List<String> ListKnownOverlayFields()
 {
     var names = new List<String>();
     names.Add("sources");
@@ -696,7 +704,7 @@ List<String> KnownOverlayFields()
     return names;
 }
 
-List<String> KnownDependencyFields()
+List<String> ListKnownDependencyFields()
 {
     var type = typeof(Dependency);
     var names = new List<String>();
@@ -721,7 +729,7 @@ List<String> KnownDependencyFields()
 /// all of it matters, and the first edit is somebody deleting lines to find out
 /// which. What a project cannot do without is what it is called, what it is,
 /// and where its source is.
-public String ToJson(ProjectFile project)
+public String SerializeProjectFile(ProjectFile project)
 {
     // The object is built and then wrapped, rather than made and reached
     // into: a variant's payload is not readable until something has
@@ -737,69 +745,69 @@ public String ToJson(ProjectFile project)
     members.Add("name", JsonValue.Text(project.Name));
     members.Add("version", JsonValue.Text(project.Version));
     members.Add("kind", JsonValue.Text(project.Kind));
-    members.Add("sources", TextArray(project.Sources));
+    members.Add("sources", CreateTextArray(project.Sources));
 
-    AddText(members, "output", project.Output, fresh.Output);
-    AddText(members, "buildDirectory", project.BuildDirectory, fresh.BuildDirectory);
-    AddText(members, "objectDirectory", project.ObjectDirectory, fresh.ObjectDirectory);
-    AddText(members, "header", project.Header, fresh.Header);
+    AddTextMember(members, "output", project.Output, fresh.Output);
+    AddTextMember(members, "buildDirectory", project.BuildDirectory, fresh.BuildDirectory);
+    AddTextMember(members, "objectDirectory", project.ObjectDirectory, fresh.ObjectDirectory);
+    AddTextMember(members, "header", project.Header, fresh.Header);
 
     if (project.Dependencies.Count > 0u)
-        members.Add("dependencies", DependencyObject(project.Dependencies));
+        members.Add("dependencies", CreateDependencyObject(project.Dependencies));
 
-    AddOverlay(members, "windows", project.Windows);
-    AddOverlay(members, "linux", project.Linux);
-    AddOverlay(members, "macos", project.Macos);
+    AddOverlayMember(members, "windows", project.Windows);
+    AddOverlayMember(members, "linux", project.Linux);
+    AddOverlayMember(members, "macos", project.Macos);
 
     if (project.Libraries.Length > 0u)
-        members.Add("libraries", TextArray(project.Libraries));
+        members.Add("libraries", CreateTextArray(project.Libraries));
     if (project.Defines.Length > 0u)
-        members.Add("defines", TextArray(project.Defines));
+        members.Add("defines", CreateTextArray(project.Defines));
 
     if (project.Optimize != fresh.Optimize)
         members.Add("optimize", Json.NumberOf((long)project.Optimize));
     if (project.Debug != fresh.Debug)
         members.Add("debug", JsonValue.Bool(project.Debug));
 
-    AddText(members, "abi", project.Abi, fresh.Abi);
-    AddText(members, "runtime", project.Runtime, fresh.Runtime);
+    AddTextMember(members, "abi", project.Abi, fresh.Abi);
+    AddTextMember(members, "runtime", project.Runtime, fresh.Runtime);
 
     return Json.WriteIndented(JsonValue.Object(members));
 }
 
 /// Writes the project back where it came from.
-public Result<bool, String> Write(ProjectFile project, String path)
+public Result<bool, String> WriteProjectFile(ProjectFile project, String path)
 {
-    var failed = File.WriteAllText(path, ToJson(project) + "\n");
+    var failed = File.WriteAllText(path, SerializeProjectFile(project) + "\n");
     if (failed != IOError.None)
         return Fail("could not write '" + path + "'");
     return Ok(true);
 }
 
-void AddText(JsonObject members, String name, String value, String fallback)
+void AddTextMember(JsonObject members, String name, String value, String fallback)
 {
     if (value == fallback || value == "")
         return;
     members.Add(name, JsonValue.Text(value));
 }
 
-void AddOverlay(JsonObject members, String name, PlatformOverlay overlay)
+void AddOverlayMember(JsonObject members, String name, PlatformOverlay overlay)
 {
     if (overlay.IsEmpty)
         return;
 
     var inside = new JsonObject();
     if (overlay.Sources.Length > 0u)
-        inside.Add("sources", TextArray(overlay.Sources));
+        inside.Add("sources", CreateTextArray(overlay.Sources));
     if (overlay.Libraries.Length > 0u)
-        inside.Add("libraries", TextArray(overlay.Libraries));
+        inside.Add("libraries", CreateTextArray(overlay.Libraries));
     if (overlay.Defines.Length > 0u)
-        inside.Add("defines", TextArray(overlay.Defines));
+        inside.Add("defines", CreateTextArray(overlay.Defines));
 
     members.Add(name, JsonValue.Object(inside));
 }
 
-JsonValue TextArray(String[] values)
+JsonValue CreateTextArray(String[] values)
 {
     var items = new List<JsonValue>();
     for (nuint i = 0u; i < values.Length; i++)
@@ -807,7 +815,7 @@ JsonValue TextArray(String[] values)
     return JsonValue.Array(items);
 }
 
-JsonValue DependencyObject(List<Dependency> dependencies)
+JsonValue CreateDependencyObject(List<Dependency> dependencies)
 {
     var members = new JsonObject();
 
@@ -816,14 +824,14 @@ JsonValue DependencyObject(List<Dependency> dependencies)
         var dependency = dependencies[i];
         var inside = new JsonObject();
 
-        AddText(inside, "path", dependency.Path, "");
-        AddText(inside, "git", dependency.Git, "");
-        AddText(inside, "tag", dependency.Tag, "");
-        AddText(inside, "branch", dependency.Branch, "");
-        AddText(inside, "rev", dependency.Rev, "");
-        AddText(inside, "subdirectory", dependency.Subdirectory, "");
-        AddText(inside, "version", dependency.Version, "");
-        AddText(inside, "link", dependency.Link, "");
+        AddTextMember(inside, "path", dependency.Path, "");
+        AddTextMember(inside, "git", dependency.Git, "");
+        AddTextMember(inside, "tag", dependency.Tag, "");
+        AddTextMember(inside, "branch", dependency.Branch, "");
+        AddTextMember(inside, "rev", dependency.Rev, "");
+        AddTextMember(inside, "subdirectory", dependency.Subdirectory, "");
+        AddTextMember(inside, "version", dependency.Version, "");
+        AddTextMember(inside, "link", dependency.Link, "");
 
         members.Add(dependency.Name, JsonValue.Object(inside));
     }
@@ -835,7 +843,7 @@ JsonValue DependencyObject(List<Dependency> dependencies)
 
 /// Joins two path pieces with the platform's separator, without pulling in a
 /// dependency on how `Standard.Path` spells a combine that does not exist.
-String Combine(String directory, String name)
+String CombinePath(String directory, String name)
 {
     if (directory == "" || directory == ".")
         return name;

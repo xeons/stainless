@@ -86,7 +86,7 @@ void Reads(Harness harness)
         + "  \"json\": { \"git\": \"https://example/json.git\", \"tag\": \"v2.1.0\" }"
         + "}}";
 
-    var read = Project.Parse(whole, "whole.json");
+    var read = Project.ParseProjectFile(whole, "whole.json");
     harness.Check("a whole project reads", read.Ok);
     if (!read.Ok)
     {
@@ -139,7 +139,7 @@ void Reads(Harness harness)
 
     // What a starter file actually looks like: four fields, everything else
     // defaulted. `stainless init` writes exactly this.
-    var starter = Project.Parse(
+    var starter = Project.ParseProjectFile(
         "{\"name\":\"hello\",\"version\":\"0.1.0\",\"kind\":\"executable\","
         + "\"sources\":[\"src\"]}", "starter.json");
     harness.Check("a starter file reads", starter.Ok);
@@ -160,7 +160,7 @@ void Refuses(Harness harness)
     // The whole reason the format refuses an unknown field rather than
     // ignoring it: a typo that silently does nothing is the failure a readable
     // project file exists to prevent.
-    var typo = Project.Parse("{\"name\":\"a\",\"optimise\":2}", "p.json");
+    var typo = Project.ParseProjectFile("{\"name\":\"a\",\"optimise\":2}", "p.json");
     harness.Check("a near miss is refused", typo.Fail);
     if (typo.Fail)
     {
@@ -168,7 +168,7 @@ void Refuses(Harness harness)
                       typo.Error.Contains("did you mean 'optimize'"));
     }
 
-    var stranger = Project.Parse("{\"name\":\"a\",\"wibble\":2}", "p.json");
+    var stranger = Project.ParseProjectFile("{\"name\":\"a\",\"wibble\":2}", "p.json");
     harness.Check("a name near nothing is refused", stranger.Fail);
     if (stranger.Fail)
     {
@@ -177,19 +177,19 @@ void Refuses(Harness harness)
                       && stranger.Error.Contains("dependencies"));
     }
 
-    var inside = Project.Parse(
+    var inside = Project.ParseProjectFile(
         "{\"name\":\"a\",\"dependencies\":{\"x\":{\"pat\":\"../x\"}}}", "p.json");
     harness.Check("an unknown field inside a dependency is refused too", inside.Fail);
     if (inside.Fail)
         harness.Check("and says it is a dependency", inside.Error.Contains("a dependency"));
 
-    var notObject = Project.Parse("[1, 2]", "p.json");
+    var notObject = Project.ParseProjectFile("[1, 2]", "p.json");
     harness.Check("a document that is not an object is refused", notObject.Fail);
 
-    var broken = Project.Parse("{", "p.json");
+    var broken = Project.ParseProjectFile("{", "p.json");
     harness.Check("text that is not JSON is refused", broken.Fail);
 
-    var future = Project.Parse("{\"name\":\"a\",\"format\":99}", "p.json");
+    var future = Project.ParseProjectFile("{\"name\":\"a\",\"format\":99}", "p.json");
     harness.Check("a format from the future is refused", future.Fail);
     if (future.Fail)
         harness.Check("and says which", future.Error.Contains("format 99"));
@@ -206,7 +206,7 @@ void Writes(Harness harness)
     // rewrite.
     var fresh = new ProjectFile();
     fresh.Name = "hello";
-    String written = Project.ToJson(fresh);
+    String written = Project.SerializeProjectFile(fresh);
 
     harness.Check("a default project writes its four fields",
                   written.Contains("\"name\": \"hello\"")
@@ -238,7 +238,7 @@ void Writes(Harness harness)
     dependency.Path = "../shapes";
     changed.Dependencies.Add(dependency);
 
-    var back = Project.Parse(Project.ToJson(changed), "round.json");
+    var back = Project.ParseProjectFile(Project.SerializeProjectFile(changed), "round.json");
     harness.Check("a written project reads back", back.Ok);
     if (back.Ok)
     {
@@ -267,15 +267,15 @@ void Finds(Harness harness)
     // and the project it belongs to is found by walking up from it.
     //
     // The path is relative to the repository root, which is where the test is
-    // run from -- and `Find` does not make a path absolute, so this also shows
-    // what that limit does and does not stop.
-    String found = Project.Find("ide/tests/fixture/src");
+    // run from -- and `FindProjectFile` does not make a path absolute, so this
+    // also shows what that limit does and does not stop.
+    String found = Project.FindProjectFile("ide/tests/fixture/src");
     harness.Check("a project is found from a file beside it", found != "");
 
     if (found == "")
         return;
 
-    var read = Project.Read(found);
+    var read = Project.ReadProjectFile(found);
     harness.Check("and reads", read.Ok);
     if (!read.Ok)
     {
@@ -292,10 +292,10 @@ void Finds(Harness harness)
     // against, so a project read from a path is useless without it.
     harness.Check("and knows where it was read from", project.Directory != ".");
     harness.Check("so a source root resolves under it",
-                  project.Resolve("src").Contains("fixture"));
+                  project.ResolvePath("src").Contains("fixture"));
 
     harness.Check("and a directory with no project above it finds none",
-                  Project.Find("stainless-nowhere-at-all") == "");
+                  Project.FindProjectFile("stainless-nowhere-at-all") == "");
 }
 
 void Platforms(Harness harness)
@@ -314,7 +314,7 @@ void Platforms(Harness harness)
         + "              \"libraries\": [\":libgtk-3.so.0\"] }"
         + "}";
 
-    var read = Project.Parse(text, "p.json");
+    var read = Project.ParseProjectFile(text, "p.json");
     harness.Check("a project with platform sections reads", read.Ok);
     if (!read.Ok)
     {
@@ -324,32 +324,32 @@ void Platforms(Harness harness)
 
     var project = read.Value;
 
-    var windows = project.SourcesFor("windows");
+    var windows = project.GetSourcesFor("windows");
     harness.Check("windows adds to the sources",
                   windows.Length == 2u && windows[0u] == "src"
                   && windows[1u] == "bindings/win32");
 
-    var linux = project.SourcesFor("linux");
+    var linux = project.GetSourcesFor("linux");
     harness.Check("and linux adds its own",
                   linux.Length == 2u && linux[1u] == "bindings/gtk");
 
     harness.Check("libraries the same way",
-                  project.LibrariesFor("windows").Length == 2u
-                  && project.LibrariesFor("linux")[1u] == ":libgtk-3.so.0");
+                  project.GetLibrariesFor("windows").Length == 2u
+                  && project.GetLibrariesFor("linux")[1u] == ":libgtk-3.so.0");
 
     // Adding and not replacing is the whole rule: a platform naming no defines
     // keeps the base one rather than clearing it.
     harness.Check("an overlay adds rather than replaces",
-                  project.DefinesFor("windows").Length == 2u
-                  && project.DefinesFor("linux").Length == 1u
-                  && project.DefinesFor("linux")[0u] == "SHARED");
+                  project.GetDefinesFor("windows").Length == 2u
+                  && project.GetDefinesFor("linux").Length == 1u
+                  && project.GetDefinesFor("linux")[0u] == "SHARED");
 
     harness.Check("a platform named by nothing adds nothing",
-                  project.SourcesFor("macos").Length == 1u);
+                  project.GetSourcesFor("macos").Length == 1u);
 
     // A typo inside a section is refused like one anywhere else. This is the
     // half a second reader is most likely to quietly accept.
-    var typo = Project.Parse(
+    var typo = Project.ParseProjectFile(
         "{\"name\":\"a\",\"windows\":{\"libaries\":[\"user32\"]}}", "p.json");
     harness.Check("a typo inside a section is refused", typo.Fail);
     if (typo.Fail)
@@ -359,22 +359,22 @@ void Platforms(Harness harness)
                       && typo.Error.Contains("did you mean 'libraries'"));
     }
 
-    var wrong = Project.Parse("{\"name\":\"a\",\"windows\":[1]}", "p.json");
+    var wrong = Project.ParseProjectFile("{\"name\":\"a\",\"windows\":[1]}", "p.json");
     harness.Check("a section that is not an object is refused", wrong.Fail);
 
     // Round-tripping, so the writer and the reader cannot disagree about a name.
-    var back = Project.Parse(Project.ToJson(project), "round.json");
+    var back = Project.ParseProjectFile(Project.SerializeProjectFile(project), "round.json");
     harness.Check("platform sections round-trip", back.Ok);
     if (back.Ok)
     {
         harness.Check("with what they added still there",
-                      back.Value.SourcesFor("windows").Length == 2u
-                      && back.Value.LibrariesFor("linux").Length == 2u
-                      && back.Value.DefinesFor("windows").Length == 2u);
+                      back.Value.GetSourcesFor("windows").Length == 2u
+                      && back.Value.GetLibrariesFor("linux").Length == 2u
+                      && back.Value.GetDefinesFor("windows").Length == 2u);
     }
 
     // And the real file this whole feature exists for.
-    var mine = Project.Read("ide/stainless.json");
+    var mine = Project.ReadProjectFile("ide/stainless.json");
     harness.Check("the IDE's own project reads", mine.Ok);
     if (mine.Ok)
     {
@@ -385,15 +385,15 @@ void Platforms(Harness harness)
         // exists to do is add the right binding directory, and a count says
         // nothing about which one arrived.
         harness.Check("and names the Windows bindings",
-                      Names(mine.Value.SourcesFor("windows"), "../bindings/win32"));
+                      Names(mine.Value.GetSourcesFor("windows"), "../bindings/win32"));
         harness.Check("and the GTK ones on Linux",
-                      Names(mine.Value.SourcesFor("linux"), "../bindings/gtk"));
+                      Names(mine.Value.GetSourcesFor("linux"), "../bindings/gtk"));
 
         // Neither platform's list may carry the other's, which is the half a
         // merge can get wrong without anything else noticing.
         harness.Check("and neither carries the other's",
-                      !Names(mine.Value.SourcesFor("windows"), "../bindings/gtk")
-                      && !Names(mine.Value.SourcesFor("linux"), "../bindings/win32"));
+                      !Names(mine.Value.GetSourcesFor("windows"), "../bindings/gtk")
+                      && !Names(mine.Value.GetSourcesFor("linux"), "../bindings/win32"));
     }
 }
 
