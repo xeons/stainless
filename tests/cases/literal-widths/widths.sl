@@ -17,6 +17,7 @@ const float Tenth = 0.1;        // a double literal suits a float constant
 const float Negative = -2.5f;
 const double Widened = 1.5f;    // and a float literal suits a double one
 const sbyte Floor = -128;
+const int Limit = 64;
 
 String Show(sbyte v) => "sbyte";
 String Show(int v) => "int";
@@ -82,5 +83,28 @@ int Main()
 
     // The suffix decides an overload, and an unsuffixed literal is unmoved.
     printf("%s %s\n", Which(20u).ToPointer(), Which(20).ToPointer());
+
+    // A conditional and a switch expression are the values they choose
+    // between, so a literal arm takes its width from where the whole
+    // expression is going, as a lone literal does. Without that, each of
+    // these needed a suffix or a cast that said nothing.
+    bool flag = size > 4u;
+    nuint chosen = flag ? 1 : 2;
+    byte narrow = flag ? 200 : 100;
+    sbyte belowZero = flag ? -100 : 100;
+    nuint switched = flags switch { 0 => 1, _ => 2 };
+    nuint mixed = flag ? chosen : 0;
+    printf("%llu %d %d %llu %llu\n", (ulong)chosen, narrow, belowZero, (ulong)switched,
+        (ulong)mixed);
+
+    // A `const` is a value inlined at every use, so it answers the same
+    // question a literal does and needs no cast to reach a type that holds it.
+    nuint limit = Limit;
+    byte narrowLimit = Limit;
+    ulong wideLimit = Limit;
+    sbyte constFloor = Floor;
+    double limitAsDouble = Limit;
+    printf("%llu %d %llu %d %.1f\n", (ulong)limit, narrowLimit, wideLimit, constFloor,
+        limitAsDouble);
     return 0;
 }

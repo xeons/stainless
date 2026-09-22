@@ -720,11 +720,37 @@ cast: `(byte)x`.
 
 An integer literal converts implicitly to any integer type that can hold its
 value, as in C#: `byte level = 200;` and `nuint size = 64;` need no cast, while
-anything computed still does. A minus in front of one does not take that away:
+anything computed still does. **A `const` answers here as well as a literal**,
+because a constant is a value inlined at every use — `const int Limit = 64;`
+makes `nuint size = Limit;` as plain as `nuint size = 64;`, which is C#'s rule
+too. An enum member does not, since its type is the enum rather than a number. A minus in front of one does not take that away:
 `sbyte low = -100;` fits, `-128` fits an `sbyte` where `-129` does not, and
 `byte b = -1;` is refused because nothing unsigned holds it. One that fits
 nothing is refused too, under a code of its own (SL0266), because no cast makes
 300 a `byte` and the value is what is wrong.
+
+**A conditional and a `switch` expression are the values they choose between**,
+so a literal arm takes its width from where the whole expression is going:
+
+```csharp
+nuint chosen = flag ? 1 : 2;                 // both arms are nuint
+byte narrow = flag ? 200 : 100;
+nuint switched = which switch { 0 => 1, _ => 2 };
+```
+
+The choice has no value of its own for a conversion to act on — what reaches
+the target is whichever arm ran — so the conversion is of the arms. It applies
+only where every arm is written out as a number: an arm that is computed needs
+the cast any other computed value needs, and an arm that fits nothing says so
+where it is written, `flag ? 1 : -1` against a `nuint` reporting the `-1`.
+
+**This is where the rule departs from C#.** There a conditional whose arms are
+both `int` has a natural type of `int`, and the conversion is then attempted
+from that `int` rather than from the constants — so `byte b = flag ? 200 : 100;`
+is CS0266 in C# and is accepted here. The departure is deliberate: every value
+the expression can produce is written in the source, so the compiler can see
+that each one fits, and the alternative is a suffix or a cast that says nothing
+a reader did not already know.
 
 Left to itself a literal is the narrowest of `int`, `uint`, `long` and `ulong`
 that holds it, again as in C#. That matters where it meets another operand

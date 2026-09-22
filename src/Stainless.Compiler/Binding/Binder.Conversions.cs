@@ -84,14 +84,26 @@ public sealed partial class Binder
         // leaves it out, where the ordinary argument conversion runs over it
         // again -- so `int quality = -1` was an error at every such call and
         // `int quality = 1` was fine.
-        if (expression is BoundLiteral && expression.Type.Equals(target)) return expression;
+        if (expression is BoundLiteral or BoundConstantAccess && expression.Type.Equals(target))
+            return expression;
 
         // A literal that fits simply adopts the target type; there is nothing to
         // convert at run time.
         if (ConstantFits(expression, target) || CharacterFits(expression, target))
             return new BoundLiteral(span, target, FoldedConstant(expression, target));
 
-        // A literal that does not fit is a mistake, not a conversion.
+        // A conditional and a switch expression are the values they choose
+        // between, so a conversion of one is a conversion of its arms:
+        // `nuint n = flag ? 1 : 2` gives each literal the width a lone one
+        // would have taken. Only where every arm is a literal -- an arm that is
+        // computed needs the cast the author writes, here as anywhere else --
+        // and an arm that does not fit then says so where it is written.
+        if (target is PrimitiveTypeSymbol { IsNumeric: true } &&
+            expression is BoundConditional or BoundLet &&
+            ArmsAreLiterals(expression))
+            return ConvertArms(expression, target, span);
+
+        // A value written out that does not fit is a mistake, not a conversion.
         //
         // Checked here rather than left to the widening: `int` to `long` has
         // nothing to complain about, so a literal too large for a target at
@@ -102,8 +114,8 @@ public sealed partial class Binder
         {
             string written = tooLarge.Negative ? "-" + tooLarge.Magnitude : $"{tooLarge.Magnitude}";
             diagnostics.Error("SL0266", span,
-                $"{written} does not fit in '{target.Name}', so it cannot be one; the literal " +
-                "is outside the range of that type rather than in need of a conversion");
+                $"{written} does not fit in '{target.Name}', so it cannot be one; the value is " +
+                "outside the range of that type rather than in need of a conversion");
             return new BoundErrorExpression(span);
         }
 
@@ -412,9 +424,40 @@ public sealed partial class Binder
     private readonly Dictionary<FunctionSymbol, FunctionSymbol> _thunks = [];
 
     /// <summary>
-    /// Returns how to get from <paramref name="from"/> to <paramref name="to"/>,
-    /// or null when no such conversion exists.
+    /// Whether every value this could produce is written out as a number.
+    ///
+    /// A conditional produces one of its arms and a switch expression is a
+    /// chain of conditionals held in a name, so neither has a value of its own
+    /// for a conversion to act on. Asking the arms is what makes
+    /// <c>nuint n = flag ? 1 : 2</c> mean what <c>nuint n = 1</c> means.
     /// </summary>
+    private static bool ArmsAreLiterals(BoundExpression expression) => expression switch
+    {
+        BoundConditional choice =>
+            ArmsAreLiterals(choice.WhenTrue) && ArmsAreLiterals(choice.WhenFalse),
+        BoundLet held => ArmsAreLiterals(held.Body),
+        _ => IntegerLiteral(expression) is not null ||
+             expression is BoundLiteral { Type: PrimitiveTypeSymbol { IsNumeric: true } },
+    };
+
+    /// <summary>
+    /// The same expression with each arm converted, which is where an arm that
+    /// does not fit reports it.
+    /// </summary>
+    private BoundExpression ConvertArms(
+        BoundExpression expression, TypeSymbol target, SourceSpan span) => expression switch
+    {
+        BoundConditional choice => new BoundConditional(
+            choice.Span, target, choice.Condition,
+            ConvertArms(choice.WhenTrue, target, choice.WhenTrue.Span),
+            ConvertArms(choice.WhenFalse, target, choice.WhenFalse.Span)),
+
+        BoundLet held => new BoundLet(
+            held.Span, held.Local, held.Value, ConvertArms(held.Body, target, span)),
+
+        _ => BindConversion(expression, target, span),
+    };
+
     /// <summary>
     /// Whether an integer literal fits the target type exactly, as in C#, where
     /// <c>byte b = 200;</c> and <c>nuint n = 5;</c> need no cast because the
@@ -462,9 +505,43 @@ public sealed partial class Binder
     {
         if (NegatedLiteral(expression) is { } magnitude) return (magnitude, true);
 
-        return expression is BoundLiteral { Value: ulong value } &&
-               expression.Type is PrimitiveTypeSymbol { IsInteger: true }
-            ? (value, false)
+        if (InlinedInteger(expression) is not { } inlined) return null;
+
+        // A negative value is held as its two's complement, sign-extended to a
+        // word, and the type is what says the top bit is a sign. Read as a
+        // magnitude it would be a number every unsigned type holds, so `-1`
+        // would fit a `nuint`.
+        return inlined.Written.IsSigned && (inlined.Bits & (1UL << 63)) != 0
+            ? (unchecked(0UL - inlined.Bits), true)
+            : (inlined.Bits, false);
+    }
+
+    /// <summary>
+    /// The bits of a value written out in the source, with the type it was
+    /// written as, or null for anything computed.
+    ///
+    /// A <c>const</c> answers here as well as a literal, because a constant is
+    /// a value inlined at every use: <c>const int Limit = 64;</c> makes
+    /// <c>nuint size = Limit;</c> as plain as <c>nuint size = 64;</c>, and C#
+    /// reads one the same way. An enum member does not, since its type is the
+    /// enum rather than a number.
+    /// </summary>
+    private static (ulong Bits, PrimitiveTypeSymbol Written)? InlinedInteger(
+        BoundExpression expression)
+    {
+        (object? value, TypeSymbol? type) = expression switch
+        {
+            BoundLiteral literal => (literal.Value, literal.Type),
+            BoundConstantAccess named => (named.Constant.Value, named.Constant.Type),
+            _ => ((object?)null, null),
+        };
+
+        // A code unit is held as a scalar rather than as a width, and the three
+        // encodings are kept apart by SL0527 rather than by whether a number
+        // fits. Reading one here would answer that question first and with the
+        // wrong code.
+        return type is PrimitiveTypeSymbol { IsInteger: true } written && value is ulong bits
+            ? (bits, written)
             : null;
     }
 
@@ -530,8 +607,10 @@ public sealed partial class Binder
             return number.Kind == PrimitiveKind.Float ? (float)value : value;
         }
 
-        return NegatedLiteral(expression) is { } magnitude
-            ? unchecked(0UL - magnitude)
+        if (NegatedLiteral(expression) is { } magnitude) return unchecked(0UL - magnitude);
+
+        return InlinedInteger(expression) is { } inlined
+            ? inlined.Bits
             : ((BoundLiteral)expression).Value;
     }
 
@@ -611,6 +690,10 @@ public sealed partial class Binder
     private static bool CouldImplement(ClassTypeSymbol candidate, InterfaceTypeSymbol wanted) =>
         candidate.AllInterfaces().Contains(wanted) || !candidate.IsSealed;
 
+    /// <summary>
+    /// Returns how to get from <paramref name="from"/> to <paramref name="to"/>,
+    /// or null when no such conversion exists.
+    /// </summary>
     private ConversionKind? ClassifyConversion(TypeSymbol from, TypeSymbol to, bool explicitCast)
     {
         if (from.Equals(to)) return ConversionKind.Identity;
