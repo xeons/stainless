@@ -452,14 +452,23 @@ public class SpeedButton : GraphicControl
     /// Setting this on a button with a `GroupIndex` raises the others in its
     /// group, exactly as ticking a radio button unticks its siblings -- and for
     /// the same reason, which is that a group with two down is not a group.
+    ///
+    /// As in `TSpeedButton.SetDown`, a button with no group is never down, and
+    /// the down button of a group that does not `AllowAllUp` is raised only by
+    /// pressing another.
     public bool Down
     {
         get => _down;
         set
         {
-            if (_group != 0 && value)
+            bool wanted = _group != 0 && value;
+            if (wanted == _down)
+                return;
+            if (_down && !_allowAllUp)
+                return;
+            if (wanted)
                 RaiseGroup();
-            _down = value;
+            _down = wanted;
             Invalidate();
         }
     }
