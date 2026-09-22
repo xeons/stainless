@@ -204,6 +204,11 @@ delegate __stdcall int GdipBitmapSetPixelFn(void* bitmap, int x, int y, uint col
 delegate __stdcall int GdipGetImageGraphicsContextFn(void* image, void** graphics);
 delegate __stdcall int GdipDeleteGraphicsFn(void* graphics);
 delegate __stdcall int GdipSetSmoothingModeFn(void* graphics, int mode);
+delegate __stdcall int GdipSetPixelOffsetModeFn(void* graphics, int mode);
+delegate __stdcall int GdipCreateImageAttributesFn(void** attributes);
+delegate __stdcall int GdipSetImageAttributesWrapModeFn(void* attributes, int wrap,
+                                                        uint colour, int clamp);
+delegate __stdcall int GdipDisposeImageAttributesFn(void* attributes);
 delegate __stdcall int GdipGraphicsClearFn(void* graphics, uint colour);
 delegate __stdcall int GdipCreatePen1Fn(uint colour, float width, int unit, void** pen);
 delegate __stdcall int GdipDeletePenFn(void* pen);
@@ -277,6 +282,12 @@ extern "C" __stdcall
 const int PixelFormat32bppArgb = 0x0026200A;
 /// `SmoothingModeAntiAlias`.
 const int SmoothingAntiAlias = 4;
+/// `PixelOffsetModeHalf`: pixel `i` covers `i` to `i + 1` rather than being
+/// centred on `i`, so an integer rectangle covers whole pixels.
+const int PixelOffsetHalf = 4;
+/// `WrapModeTileFlipXY`, which samples past an image's edge from its mirror
+/// rather than from transparency.
+const int WrapTileFlipXY = 3;
 /// `FillModeAlternate`, the even-odd rule, which is also what libgd's polygon
 /// fill does.
 const int FillAlternate = 0;
@@ -306,6 +317,10 @@ threadsafe sealed class Backend
     GdipGetImageGraphicsContextFn _context;
     GdipDeleteGraphicsFn _deleteGraphics;
     GdipSetSmoothingModeFn _smoothing;
+    GdipSetPixelOffsetModeFn _pixelOffset;
+    GdipCreateImageAttributesFn _makeAttributes;
+    GdipSetImageAttributesWrapModeFn _wrapAttributes;
+    GdipDisposeImageAttributesFn _dropAttributes;
     GdipGraphicsClearFn _clear;
     GdipCreatePen1Fn _makePen;
     GdipDeletePenFn _dropPen;
@@ -350,6 +365,10 @@ threadsafe sealed class Backend
         _context = (GdipGetImageGraphicsContextFn)Find(gdiplus, "GdipGetImageGraphicsContext", &complete);
         _deleteGraphics = (GdipDeleteGraphicsFn)Find(gdiplus, "GdipDeleteGraphics", &complete);
         _smoothing = (GdipSetSmoothingModeFn)Find(gdiplus, "GdipSetSmoothingMode", &complete);
+        _pixelOffset = (GdipSetPixelOffsetModeFn)Find(gdiplus, "GdipSetPixelOffsetMode", &complete);
+        _makeAttributes = (GdipCreateImageAttributesFn)Find(gdiplus, "GdipCreateImageAttributes", &complete);
+        _wrapAttributes = (GdipSetImageAttributesWrapModeFn)Find(gdiplus, "GdipSetImageAttributesWrapMode", &complete);
+        _dropAttributes = (GdipDisposeImageAttributesFn)Find(gdiplus, "GdipDisposeImageAttributes", &complete);
         _clear = (GdipGraphicsClearFn)Find(gdiplus, "GdipGraphicsClear", &complete);
         _makePen = (GdipCreatePen1Fn)Find(gdiplus, "GdipCreatePen1", &complete);
         _dropPen = (GdipDeletePenFn)Find(gdiplus, "GdipDeletePen", &complete);
@@ -517,18 +536,27 @@ threadsafe sealed class Backend
     /// GDI+ would rather one were kept, and keeping one would mean a field that
     /// has to be disposed before the bitmap it belongs to. A context is cheap
     /// and every call that makes one then does real rasterising.
-    void* Context(void* image)
+    ///
+    /// **`areas` is for fills and copies, and is false for outlines.** GDI+
+    /// centres a pixel on its integer coordinate by default, so a filled
+    /// rectangle's edges fall half across the pixels either side of it. An
+    /// outline wants exactly that, because a one-pixel pen on an integer
+    /// coordinate then covers one pixel; a fill wants pixel `i` to be the square
+    /// from `i` to `i + 1`, which is what libgd fills.
+    void* Context(void* image, bool areas)
     {
         void* graphics = null;
         if (_context(image, &graphics) != 0)
             return null;
         _smoothing(graphics, SmoothingAntiAlias);
+        if (areas)
+            _pixelOffset(graphics, PixelOffsetHalf);
         return graphics;
     }
 
     public void Clear(void* image, uint colour)
     {
-        void* graphics = Context(image);
+        void* graphics = Context(image, true);
         if (graphics == null)
             return;
         _clear(graphics, colour);
@@ -537,7 +565,7 @@ threadsafe sealed class Backend
 
     public void Line(void* image, int x1, int y1, int x2, int y2, uint colour, int thickness)
     {
-        void* graphics = Context(image);
+        void* graphics = Context(image, false);
         if (graphics == null)
             return;
 
@@ -555,7 +583,7 @@ threadsafe sealed class Backend
     public void Shape(void* image, bool ellipse, int x, int y, int width, int height,
                       uint colour, int thickness, bool filled)
     {
-        void* graphics = Context(image);
+        void* graphics = Context(image, filled);
         if (graphics == null)
             return;
 
@@ -600,7 +628,7 @@ threadsafe sealed class Backend
 
     public void Polygon(void* image, int[] points, uint colour, int thickness, bool filled)
     {
-        void* graphics = Context(image);
+        void* graphics = Context(image, filled);
         if (graphics == null)
             return;
 
@@ -630,10 +658,21 @@ threadsafe sealed class Backend
     public void Blit(void* destination, void* source,
                      int dx, int dy, int dw, int dh, int sx, int sy, int sw, int sh)
     {
-        void* graphics = Context(destination);
+        void* graphics = Context(destination, true);
         if (graphics == null)
             return;
-        _blit(graphics, source, dx, dy, dw, dh, sx, sy, sw, sh, UnitPixel, null, null, null);
+
+        // Scaling samples past the source's last row and column, and GDI+
+        // reads transparency there unless told to mirror the edge instead.
+        void* attributes = null;
+        if (_makeAttributes(&attributes) == 0)
+            _wrapAttributes(attributes, WrapTileFlipXY, 0u, 0);
+
+        _blit(graphics, source, dx, dy, dw, dh, sx, sy, sw, sh, UnitPixel, attributes,
+              null, null);
+
+        if (attributes != null)
+            _dropAttributes(attributes);
         _deleteGraphics(graphics);
     }
 
@@ -1067,6 +1106,11 @@ threadsafe sealed class Backend
         _thickness(image, 1);
     }
 
+    /// libgd's ellipse is a centre and a size, where every other API here gives
+    /// the bounding box. It spans the centre plus and minus half the size
+    /// given, which is one pixel more than the size, so it is given one less:
+    /// an odd width then fills its rectangle, and an even one, which has no
+    /// middle pixel to centre on, stops a pixel short of one side.
     public void Shape(void* image, bool isEllipse, int x, int y, int width, int height,
                       uint colour, int stroke, bool filled)
     {
@@ -1076,9 +1120,7 @@ threadsafe sealed class Backend
         {
             if (isEllipse)
             {
-                // libgd's ellipse is a centre and a size, where every other API
-                // here gives the bounding box.
-                _fillEllipse(image, x + width / 2, y + height / 2, width, height, ink);
+                _fillEllipse(image, x + width / 2, y + height / 2, width - 1, height - 1, ink);
             }
             else
             {
@@ -1090,7 +1132,7 @@ threadsafe sealed class Backend
         _thickness(image, stroke < 1 ? 1 : stroke);
         if (isEllipse)
         {
-            _ellipse(image, x + width / 2, y + height / 2, width, height, ink);
+            _ellipse(image, x + width / 2, y + height / 2, width - 1, height - 1, ink);
         }
         else
         {

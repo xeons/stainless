@@ -30,6 +30,18 @@
   ok   a picture is made from pixels
   ok   and gives the same ones back
   ok   too few pixels are refused
+  ok   a fill covers its first row and column
+  ok   and its last
+  ok   and nothing either side
+  ok   an outline is on its first and last pixels
+  ok   and nowhere beside them
+  ok   an even ellipse stays inside its rectangle
+  ok   an odd ellipse reaches every side of it
+  ok   and no further
+  ok   an outlined ellipse stays inside its rectangle
+  ok   a resize keeps its corners
+  ok   and so does a shrink
+  ok   a picture drawn at its own size lands where it was put
   ok   a missing file says so
   ok   and bytes that are not a picture say so
   ok   and no bytes at all

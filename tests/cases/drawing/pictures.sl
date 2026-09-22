@@ -4,10 +4,11 @@
 // without it fails this case rather than skipping it, which is the honest
 // outcome for a suite that is meant to notice.
 //
-// Nothing here asserts an antialiased pixel. GDI+ and libgd are two rasterisers
-// and their edges differ by a shade, which is a real difference and not one a
-// test should pin; what both agree about exactly is a pixel well inside a
-// filled shape, a size, a round trip and an error.
+// Nothing here asserts the shade of an antialiased pixel. GDI+ and libgd are
+// two rasterisers and a curved edge differs between them by a shade, which is a
+// real difference and not one a test should pin. What both MUST agree about
+// exactly is which pixels a shape touches at all, a pixel well inside it, a
+// size, a round trip and an error.
 module Pictures;
 
 import Standard.Console;
@@ -162,6 +163,9 @@ int Main()
     ok = Check(ok, "too few pixels are refused",
                Image.FromBgra(64, 48, new byte[16u]).Fail);
 
+    ok = Edges(ok);
+    ok = Scaling(ok);
+
     // ---- what goes wrong.
     var missing = Image.FromFile("no-such-picture-anywhere.png");
     ok = Check(ok, "a missing file says so",
@@ -177,6 +181,101 @@ int Main()
                empty.Fail && empty.Error == ImageError.Invalid);
 
     return Done(ok);
+}
+
+/// A fresh transparent picture, or null when one cannot be made.
+Image? MakeBlankPicture(int width, int height)
+{
+    var made = Image.Create(width, height);
+    if (!made.Ok)
+        return null;
+    return made.Value;
+}
+
+bool IsOpaqueRed(Rgba colour)
+{
+    return colour.R == (byte)255 && colour.G == (byte)0 && colour.B == (byte)0
+           && colour.A == (byte)255;
+}
+
+// ---- edges. A fill covers exactly the pixels it was given, and a one-pixel
+// outline sits on its first and last, on both backends.
+bool Edges(bool ok)
+{
+    var held = MakeBlankPicture(20, 20);
+    if (held == null)
+        return Check(ok, "a picture for the edges", false);
+    var box = (Image)held;
+
+    box.FillRectangle(Rgba.Red, 5, 5, 10, 10);
+    ok = Check(ok, "a fill covers its first row and column",
+               IsOpaqueRed(box.GetPixel(5, 7)) && IsOpaqueRed(box.GetPixel(7, 5)));
+    ok = Check(ok, "and its last",
+               IsOpaqueRed(box.GetPixel(14, 7)) && IsOpaqueRed(box.GetPixel(7, 14)));
+    ok = Check(ok, "and nothing either side",
+               box.GetPixel(4, 7).IsInvisible && box.GetPixel(15, 7).IsInvisible
+               && box.GetPixel(7, 4).IsInvisible && box.GetPixel(7, 15).IsInvisible);
+
+    var line = (Image)MakeBlankPicture(20, 20);
+    line.DrawRectangle(Rgba.Red, 2, 2, 6, 6);
+    ok = Check(ok, "an outline is on its first and last pixels",
+               IsOpaqueRed(line.GetPixel(2, 4)) && IsOpaqueRed(line.GetPixel(7, 4))
+               && IsOpaqueRed(line.GetPixel(4, 2)) && IsOpaqueRed(line.GetPixel(4, 7)));
+    ok = Check(ok, "and nowhere beside them",
+               line.GetPixel(1, 4).IsInvisible && line.GetPixel(8, 4).IsInvisible
+               && line.GetPixel(3, 4).IsInvisible && line.GetPixel(4, 8).IsInvisible);
+
+    // Only an odd size has a middle pixel, so only an odd ellipse can reach
+    // both sides of its rectangle. An even one MUST still stay inside it.
+    var even = (Image)MakeBlankPicture(20, 20);
+    even.FillEllipse(Rgba.Red, 0, 0, 10, 10);
+    ok = Check(ok, "an even ellipse stays inside its rectangle",
+               IsOpaqueRed(even.GetPixel(5, 5))
+               && even.GetPixel(10, 5).IsInvisible && even.GetPixel(5, 10).IsInvisible);
+
+    var odd = (Image)MakeBlankPicture(20, 20);
+    odd.FillEllipse(Rgba.Red, 0, 0, 11, 11);
+    ok = Check(ok, "an odd ellipse reaches every side of it",
+               !odd.GetPixel(0, 5).IsInvisible && !odd.GetPixel(10, 5).IsInvisible
+               && !odd.GetPixel(5, 0).IsInvisible && !odd.GetPixel(5, 10).IsInvisible);
+    ok = Check(ok, "and no further",
+               odd.GetPixel(11, 5).IsInvisible && odd.GetPixel(5, 11).IsInvisible);
+
+    var ring = (Image)MakeBlankPicture(20, 20);
+    ring.DrawEllipse(Rgba.Red, 0, 0, 10, 10);
+    ok = Check(ok, "an outlined ellipse stays inside its rectangle",
+               ring.GetPixel(10, 5).IsInvisible && ring.GetPixel(5, 10).IsInvisible
+               && ring.GetPixel(5, 5).IsInvisible);
+    return ok;
+}
+
+// ---- scaling. The last row and column come from the source's last, rather
+// than from a blend with whatever lies past it.
+bool Scaling(bool ok)
+{
+    var held = MakeBlankPicture(10, 10);
+    if (held == null)
+        return Check(ok, "a picture to scale", false);
+    var small = (Image)held;
+    small.Clear(Rgba.Red);
+
+    var grown = small.Resize(20, 20);
+    ok = Check(ok, "a resize keeps its corners",
+               grown.Ok && IsOpaqueRed(grown.Value.GetPixel(0, 0))
+               && IsOpaqueRed(grown.Value.GetPixel(19, 0))
+               && IsOpaqueRed(grown.Value.GetPixel(0, 19))
+               && IsOpaqueRed(grown.Value.GetPixel(19, 19)));
+
+    var shrunk = small.Resize(5, 5);
+    ok = Check(ok, "and so does a shrink",
+               shrunk.Ok && IsOpaqueRed(shrunk.Value.GetPixel(4, 4)));
+
+    var target = (Image)MakeBlankPicture(30, 30);
+    target.Draw(small, 5, 5);
+    ok = Check(ok, "a picture drawn at its own size lands where it was put",
+               IsOpaqueRed(target.GetPixel(5, 5)) && IsOpaqueRed(target.GetPixel(14, 14))
+               && target.GetPixel(4, 4).IsInvisible && target.GetPixel(15, 15).IsInvisible);
+    return ok;
 }
 
 int Done(bool ok)
