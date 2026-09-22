@@ -185,53 +185,155 @@ public Result<Color, DialogOutcome> PickColor(IWindowPeer? owner, Color start)
 
 /// **A Pango name has to be read back apart.** The chooser answers
 /// `"Cantarell Bold Italic 11"` -- a family, then any number of style words,
-/// then a size -- and a `Font` wants the three separately. The size is the
-/// last word when it is a number, the style words are whichever of `Bold` and
-/// `Italic` appear, and what is left is the family.
+/// then a size -- and a `Font` wants the three separately.
+///
+/// Read as Pango reads it: the size is the last word when it is a number, in
+/// points unless it ends in `px`, and may have a fraction; the style words are
+/// the run of them before it, whichever they are; the family is what is left
+/// in front. A weight from semi-bold up is bold, since `Font` has no other.
 public Font ParsePango(String description, Font fallback)
 {
-    var words = description.Trim().Split(' ');
-    if (words.Length == 0u)
+    var words = new List<String>();
+    foreach (var word in description.Trim().Split(' '))
+    {
+        if (!word.IsEmpty)
+            words.Add(word);
+    }
+    if (words.IsEmpty)
         return fallback;
 
     int size = fallback.Size;
-    nuint end = words.Length;
-
-    var last = Convert.ToInt(words[end - 1u]);
-    if (last.Ok)
+    nuint end = words.Count;
+    int measured = PangoSizeInPoints(words[end - 1u]);
+    if (measured > 0)
     {
-        size = last.Value;
-        end = end - 1u;
+        size = measured;
+        end--;
     }
 
     var style = FontStyle.Regular;
+    while (end > 0u)
+    {
+        var word = words[end - 1u].ToLowerAscii();
+        if (!IsPangoStyleWord(word))
+            break;
+        if (IsPangoBoldWord(word))
+            style = style | FontStyle.Bold;
+        if (word == "italic" || word == "oblique")
+            style = style | FontStyle.Italic;
+        end--;
+    }
+
     var family = "";
     for (nuint i = 0u; i < end; i++)
     {
-        var word = words[i];
-        if (word == "Bold")
-        {
-            style = style | FontStyle.Bold;
-        }
-        else if (word == "Italic")
-        {
-            style = style | FontStyle.Italic;
-        }
-        else if (word == "Oblique")
-        {
-            style = style | FontStyle.Italic;
-        }
-        else
-        {
-            if (!family.IsEmpty)
-                family = family + " ";
-            family = family + word;
-        }
+        if (!family.IsEmpty)
+            family = family + " ";
+        family = family + words[i];
     }
+    if (family.EndsWith(","))
+        family = family.Substring(0u, family.ByteLength() - 1u);
 
     if (family.IsEmpty)
         family = fallback.Family;
     return new Font(family, size, style);
+}
+
+/// A Pango size word in whole points, rounded, or zero for a word that is not
+/// a size.
+int PangoSizeInPoints(String word)
+{
+    bool pixels = word.EndsWith("px");
+    var number = pixels ? word.Substring(0u, word.ByteLength() - 2u) : word;
+    var parsed = Convert.ToDouble(number);
+    if (!parsed.Ok || parsed.Value <= 0.0)
+        return 0;
+
+    // Pixels at the 96 DPI the rest of this backend assumes.
+    double points = pixels ? parsed.Value * 72.0 / 96.0 : parsed.Value;
+    return (int)(points + 0.5);
+}
+
+/// Whether a lower-cased word is one Pango reads as a style rather than as
+/// part of a family: a weight, a slant, a variant, a stretch or a gravity.
+bool IsPangoStyleWord(String word)
+{
+    if (word.ByteLength() > 0u && word.ByteAt(0u) == (byte)'@')
+        return true;
+    if (IsPangoBoldWord(word))
+        return true;
+
+    switch (word)
+    {
+        case "thin":
+        case "ultra-light":
+        case "ultralight":
+        case "extra-light":
+        case "extralight":
+        case "light":
+        case "semi-light":
+        case "semilight":
+        case "demi-light":
+        case "demilight":
+        case "book":
+        case "regular":
+        case "normal":
+        case "medium":
+        case "roman":
+        case "italic":
+        case "oblique":
+        case "small-caps":
+        case "all-small-caps":
+        case "petite-caps":
+        case "all-petite-caps":
+        case "unicase":
+        case "title-caps":
+        case "ultra-condensed":
+        case "extra-condensed":
+        case "condensed":
+        case "semi-condensed":
+        case "semi-expanded":
+        case "expanded":
+        case "extra-expanded":
+        case "ultra-expanded":
+        case "not-rotated":
+        case "south":
+        case "upside-down":
+        case "north":
+        case "rotated-left":
+        case "east":
+        case "rotated-right":
+        case "west":
+            return true;
+    }
+    return false;
+}
+
+/// Whether a lower-cased word is a Pango weight of semi-bold or heavier.
+bool IsPangoBoldWord(String word)
+{
+    switch (word)
+    {
+        case "semi-bold":
+        case "semibold":
+        case "demi-bold":
+        case "demibold":
+        case "bold":
+        case "ultra-bold":
+        case "ultrabold":
+        case "extra-bold":
+        case "extrabold":
+        case "heavy":
+        case "ultra-heavy":
+        case "ultraheavy":
+        case "black":
+        case "ultra-black":
+        case "ultrablack":
+        case "extra-black":
+        case "extrablack":
+            return true;
+    }
+    return false;
 }
 
 public Result<Font, DialogOutcome> PickFont(IWindowPeer? owner, Font start)
@@ -315,8 +417,16 @@ public DialogResult ShowMessageBox(IWindowPeer? owner, String text, String capti
         gtk_dialog_add_button(dialog, "_Retry".ToPointer(), GTK_RESPONSE_ACCEPT);
     }
 
-    gint answer = RunAndClose(dialog);
+    return MessageAnswer(RunAndClose(dialog), buttons);
+}
 
+/// What a message box's response means.
+///
+/// Cancel, Escape and the title bar's close all mean Cancel -- except on a box
+/// with only an OK button, where Windows answers OK to all three, because OK
+/// is the only answer it has.
+public DialogResult MessageAnswer(gint answer, MessageButtons buttons)
+{
     if (answer == GTK_RESPONSE_OK)
         return DialogResult.Ok;
     if (answer == GTK_RESPONSE_YES)
@@ -325,9 +435,8 @@ public DialogResult ShowMessageBox(IWindowPeer? owner, String text, String capti
         return DialogResult.No;
     if (answer == GTK_RESPONSE_ACCEPT)
         return DialogResult.Retry;
-
-    // Cancel, Escape and the title bar's close all arrive here, which is what
-    // every one of them means.
+    if (buttons == MessageButtons.Ok)
+        return DialogResult.Ok;
     return DialogResult.Cancel;
 }
 
