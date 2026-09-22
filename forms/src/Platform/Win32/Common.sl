@@ -27,7 +27,7 @@
 //
 // **They report through `WM_NOTIFY`.** A pointer to a structure whose first
 // field says which longer structure it really is, so a peer recognises the code
-// before it casts. `NotifiedBy` is where that happens.
+// before it casts. `OnNotify` is where that happens.
 //
 // **They position themselves unless told not to.** A toolbar and a status bar
 // read their parent's size and move to an edge on their own, which is exactly
@@ -55,11 +55,11 @@ import Win32.ComCtl32;
 
 /// The styles a common control needs so that the layout pass, rather than the
 /// control, decides where it goes.
-uint StaysPut() => CcsNoResize | CcsNoParentAlign | CcsNoDivider;
+uint GetFixedBarStyle() => CcsNoResize | CcsNoParentAlign | CcsNoDivider;
 
 /// An image list's handle, or null for none, which every `*_SETIMAGELIST`
 /// takes as "no pictures".
-nuint ImageListHandle(IImageListBackend? images) =>
+nuint GetImageListHandle(IImageListBackend? images) =>
     images == null ? 0u : ((IImageListBackend)images).Handle;
 
 // ================================================================== toolbar
@@ -69,23 +69,23 @@ public class ToolBarPeer : ControlPeer, IToolBarPeer
     /// The command id of each button, in the order they were added, so that an
     /// index can be turned into an id and back.
     List<int> _commands;
-    weak IControlNotify? owning;
-    bool _ownerDrawn;
+    weak IControlNotify? _owner;
+    bool _isOwnerDrawn;
 
     public ToolBarPeer(IControlNotify owner, IContainerPeer parent)
     {
-        base(MakeChild("ToolbarWindow32", WindowOf(parent),
-                       ChildStyle() | StaysPut() | TbStyleFlat | TbStyleList, 0u),
+        base(CreateChildWindow("ToolbarWindow32", GetContainerWindow(parent),
+                       GetChildStyle() | GetFixedBarStyle() | TbStyleFlat | TbStyleList, 0u),
              owner, true);
-        owning = owner;
+        _owner = owner;
         _commands = new List<int>();
-        _ownerDrawn = false;
+        _isOwnerDrawn = false;
 
         // Windows needs to be told how wide a `TBBUTTON` is before any is
         // added, because the structure grew between versions and this is how it
         // knows which one it has been handed.
-        SendMessageW(window, TbButtonStructSize, (ulong)sizeof(ToolBarButton), 0);
-        SendMessageW(window, TbSetMaxTextRows, 1u, 0);
+        SendMessageW(Window, TbButtonStructSize, (ulong)sizeof(ToolBarButton), 0);
+        SendMessageW(Window, TbSetMaxTextRows, 1u, 0);
     }
 
     ~ToolBarPeer()
@@ -104,7 +104,7 @@ public class ToolBarPeer : ControlPeer, IToolBarPeer
         // answers that, so every text-only button carried a blank gap where
         // its picture would have gone.
         button.Bitmap = image >= 0 ? image : IImageNone;
-        button.Command = NewCommandId();
+        button.Command = AllocateCommandId();
         button.State = TbStateEnabled;
         button.Style = BtnsButton;
         if (kind == ToolButtonKind.Separator)
@@ -134,13 +134,13 @@ public class ToolBarPeer : ControlPeer, IToolBarPeer
         var wide = text.ToUtf16();
         button.Text = (nuint)(void*)wide.ToPointer();
 
-        SendMessageW(window, TbAddButtonsW, 1u, (long)(nuint)&button);
+        SendMessageW(Window, TbAddButtonsW, 1u, (long)(nuint)&button);
         _commands.Add(button.Command);
         return (int)_commands.Count - 1;
     }
 
     /// Which button a command id belongs to, or -1.
-    int IndexOf(int command)
+    int IndexOfCommand(int command)
     {
         for (nuint i = 0u; i < _commands.Count; i++)
         {
@@ -150,7 +150,7 @@ public class ToolBarPeer : ControlPeer, IToolBarPeer
         return -1;
     }
 
-    int CommandAt(int index)
+    int GetCommandAt(int index)
     {
         if (index < 0 || (nuint)index >= _commands.Count)
             return -1;
@@ -160,12 +160,12 @@ public class ToolBarPeer : ControlPeer, IToolBarPeer
     /// A toolbar's buttons all report through the toolbar's own window, so the
     /// notification says *which* button in its low word rather than naming a
     /// control of its own.
-    protected override bool Notified(uint code, int id)
+    protected override bool OnCommand(uint code, int id)
     {
-        int at = IndexOf(id);
+        int at = IndexOfCommand(id);
         if (at < 0)
             return false;
-        IControlNotify? held = owning;
+        IControlNotify? held = _owner;
         if (held == null)
             return false;
         ((IControlNotify)held).OnPlatformToolClicked(at);
@@ -184,7 +184,7 @@ public class ToolBarPeer : ControlPeer, IToolBarPeer
     /// the answer is now yes.
     public bool SetOwnerDrawn(bool drawn)
     {
-        _ownerDrawn = drawn;
+        _isOwnerDrawn = drawn;
         Invalidate();
         return drawn;
     }
@@ -197,12 +197,12 @@ public class ToolBarPeer : ControlPeer, IToolBarPeer
     /// particular, and draws every button natively -- which looks exactly like
     /// a renderer that was never set, and is the one mistake this mechanism
     /// invites.
-    protected override bool NotifiedBy(int code, void* raw, long* answer)
+    protected override bool OnNotify(int code, void* raw, long* answer)
     {
-        if (!_ownerDrawn || code != NmCustomDraw)
+        if (!_isOwnerDrawn || code != NmCustomDraw)
             return false;
 
-        IControlNotify? held = owning;
+        IControlNotify? held = _owner;
         if (held == null)
             return false;
         var asked = (CustomDraw*)raw;
@@ -216,7 +216,7 @@ public class ToolBarPeer : ControlPeer, IToolBarPeer
             // in whatever colour it happened to have. The background is the
             // whole bar or it is a patch.
             Rect client;
-            GetClientRect(window, &client);
+            GetClientRect(Window, &client);
             var bounds = FromRect(client);
             var surface = new Graphics(new GraphicsBackend(asked->Surface, bounds));
             if (!((IControlNotify)held).OnPlatformDrawToolBackground(surface, bounds))
@@ -231,14 +231,14 @@ public class ToolBarPeer : ControlPeer, IToolBarPeer
             // A toolbar names a button by its command id here, not by its
             // position -- the same numbering `WM_COMMAND` uses and the same
             // map back.
-            int at = IndexOf((int)asked->Item);
+            int at = IndexOfCommand((int)asked->Item);
             if (at < 0)
                 return false;
 
             var bounds = FromRect(asked->Box);
             var surface = new Graphics(new GraphicsBackend(asked->Surface, bounds));
             if (!((IControlNotify)held).OnPlatformDrawTool(surface, bounds, at,
-                                                           ToolStateOf(asked->State)))
+                                                           ToToolItemState(asked->State)))
             {
                 // Handing one button back is allowed, and costs nothing: the
                 // answer is zero, which is `CDRF_DODEFAULT`.
@@ -257,7 +257,7 @@ public class ToolBarPeer : ControlPeer, IToolBarPeer
     /// `CDIS_GRAYED` and `CDIS_DISABLED` both mean unavailable and a toolbar
     /// sets them together, so either one is taken as the answer -- reading only
     /// one of them is a disabled button drawn as though it could be pressed.
-    static ToolItemState ToolStateOf(uint reported)
+    static ToolItemState ToToolItemState(uint reported)
     {
         var state = ToolItemState.None;
         if ((reported & CdisHot) != 0u)
@@ -273,7 +273,7 @@ public class ToolBarPeer : ControlPeer, IToolBarPeer
 
     public nuint GetButtonId(int index)
     {
-        int command = CommandAt(index);
+        int command = GetCommandAt(index);
         if (command < 0)
             return 0u;
         return (nuint)command;
@@ -281,31 +281,31 @@ public class ToolBarPeer : ControlPeer, IToolBarPeer
 
     public void SetButtonEnabled(int index, bool enabled)
     {
-        int command = CommandAt(index);
+        int command = GetCommandAt(index);
         if (command < 0)
             return;
-        SendMessageW(window, TbEnableButton, (ulong)command, (long)(enabled ? 1 : 0));
+        SendMessageW(Window, TbEnableButton, (ulong)command, (long)(enabled ? 1 : 0));
     }
 
     public void SetButtonChecked(int index, bool checked)
     {
-        int command = CommandAt(index);
+        int command = GetCommandAt(index);
         if (command < 0)
             return;
-        SendMessageW(window, TbCheckButton, (ulong)command, (long)(checked ? 1 : 0));
+        SendMessageW(Window, TbCheckButton, (ulong)command, (long)(checked ? 1 : 0));
     }
 
     public bool GetButtonChecked(int index)
     {
-        int command = CommandAt(index);
+        int command = GetCommandAt(index);
         if (command < 0)
             return false;
-        return SendMessageW(window, TbIsButtonChecked, (ulong)command, 0) != 0;
+        return SendMessageW(Window, TbIsButtonChecked, (ulong)command, 0) != 0;
     }
 
     public void SetImages(IImageListBackend? images)
     {
-        SendMessageW(window, TbSetImageList, 0u, (long)ImageListHandle(images));
+        SendMessageW(Window, TbSetImageList, 0u, (long)GetImageListHandle(images));
     }
 
     /// `TBSTYLE_LIST` puts the caption beside the picture; without it there is
@@ -313,7 +313,7 @@ public class ToolBarPeer : ControlPeer, IToolBarPeer
     /// asks the bar to lay itself out again.
     public void SetTextVisible(bool visible)
     {
-        long style = Win32.User32.GetWindowLongPtrW(window, GwlStyle);
+        long style = Win32.User32.GetWindowLongPtrW(Window, GwlStyle);
         if (visible)
         {
             style = style | (long)TbStyleList;
@@ -322,22 +322,22 @@ public class ToolBarPeer : ControlPeer, IToolBarPeer
         {
             style = style & ~(long)TbStyleList;
         }
-        Win32.User32.SetWindowLongPtrW(window, GwlStyle, style);
+        Win32.User32.SetWindowLongPtrW(Window, GwlStyle, style);
         ResizeToFit();
     }
 
-    public void ResizeToFit() => SendMessageW(window, TbAutoSize, 0u, 0);
+    public void ResizeToFit() => SendMessageW(Window, TbAutoSize, 0u, 0);
 
     /// As tall as the bar makes itself, and as wide as it is given.
     public override FSize PreferredSize
     {
         get
         {
-            long packed = SendMessageW(window, TbGetButtonSize, 0u, 0);
+            long packed = SendMessageW(Window, TbGetButtonSize, 0u, 0);
             int height = (int)((packed >> 16) & 0xFFFFu);
             if (height <= 0)
                 height = 24;
-            return Extent(0, height + 8);
+            return CreateSize(0, height + 8);
         }
     }
 }
@@ -348,8 +348,8 @@ public class StatusBarPeer : ControlPeer, IStatusBarPeer
 {
     public StatusBarPeer(IControlNotify owner, IContainerPeer parent)
     {
-        base(MakeChild("msctls_statusbar32", WindowOf(parent),
-                       (ChildStyle() & ~WsTabStop) | StaysPut(), 0u),
+        base(CreateChildWindow("msctls_statusbar32", GetContainerWindow(parent),
+                       (GetChildStyle() & ~WsTabStop) | GetFixedBarStyle(), 0u),
              owner, true);
     }
 
@@ -357,12 +357,12 @@ public class StatusBarPeer : ControlPeer, IStatusBarPeer
     {
         if (edges.Length == 0u)
             return;
-        SendMessageW(window, SbSetParts, (ulong)edges.Length, (long)(nuint)&edges[0u]);
+        SendMessageW(Window, SbSetParts, (ulong)edges.Length, (long)(nuint)&edges[0u]);
     }
 
     public void SetPanelText(int index, String text)
     {
-        SendMessageW(window, SbSetTextW, (ulong)index,
+        SendMessageW(Window, SbSetTextW, (ulong)index,
                      (long)(nuint)text.ToUtf16().ToPointer());
     }
 
@@ -372,11 +372,11 @@ public class StatusBarPeer : ControlPeer, IStatusBarPeer
         get
         {
             Rect frame;
-            GetWindowRect(window, &frame);
+            GetWindowRect(Window, &frame);
             int height = frame.Bottom - frame.Top;
             if (height <= 0)
                 height = 22;
-            return Extent(0, height);
+            return CreateSize(0, height);
         }
     }
 }
@@ -387,30 +387,30 @@ public class ProgressPeer : ControlPeer, IProgressPeer
 {
     public ProgressPeer(IControlNotify owner, IContainerPeer parent)
     {
-        base(MakeChild("msctls_progress32", WindowOf(parent),
-                       (ChildStyle() & ~WsTabStop) | PbsSmooth, 0u),
+        base(CreateChildWindow("msctls_progress32", GetContainerWindow(parent),
+                       (GetChildStyle() & ~WsTabStop) | PbsSmooth, 0u),
              owner, true);
-        SendMessageW(window, PbmSetRange32, 0u, 100);
+        SendMessageW(Window, PbmSetRange32, 0u, 100);
     }
 
     public void SetRange(int minimum, int maximum)
     {
-        SendMessageW(window, PbmSetRange32, (ulong)minimum, (long)maximum);
+        SendMessageW(Window, PbmSetRange32, (ulong)minimum, (long)maximum);
     }
 
     public void SetValue(int value)
     {
-        SendMessageW(window, PbmSetPos, (ulong)value, 0);
+        SendMessageW(Window, PbmSetPos, (ulong)value, 0);
     }
 
-    public int GetValue() => (int)SendMessageW(window, PbmGetPos, 0u, 0);
+    public int GetValue() => (int)SendMessageW(Window, PbmGetPos, 0u, 0);
 
     /// A bar with no value that simply moves. The style is read at creation, so
     /// it is set here and the marquee then started or stopped -- which is why
     /// this is two calls rather than one.
     public void SetIndeterminate(bool indeterminate)
     {
-        long style = Win32.User32.GetWindowLongPtrW(window, GwlStyle);
+        long style = Win32.User32.GetWindowLongPtrW(Window, GwlStyle);
         if (indeterminate)
         {
             style = style | (long)PbsMarquee;
@@ -419,8 +419,8 @@ public class ProgressPeer : ControlPeer, IProgressPeer
         {
             style = style & ~(long)PbsMarquee;
         }
-        Win32.User32.SetWindowLongPtrW(window, GwlStyle, style);
-        SendMessageW(window, PbmSetMarquee, (ulong)(indeterminate ? 1 : 0), 30);
+        Win32.User32.SetWindowLongPtrW(Window, GwlStyle, style);
+        SendMessageW(Window, PbmSetMarquee, (ulong)(indeterminate ? 1 : 0), 30);
     }
 }
 
@@ -428,41 +428,41 @@ public class ProgressPeer : ControlPeer, IProgressPeer
 
 public class TrackBarPeer : ControlPeer, ITrackBarPeer
 {
-    weak IControlNotify? owning;
+    weak IControlNotify? _owner;
 
     public TrackBarPeer(IControlNotify owner, IContainerPeer parent, bool vertical)
     {
-        base(MakeChild("msctls_trackbar32", WindowOf(parent),
-                       ChildStyle() | TbsAutoTicks
+        base(CreateChildWindow("msctls_trackbar32", GetContainerWindow(parent),
+                       GetChildStyle() | TbsAutoTicks
                                     | (vertical ? TbsVertical : TbsHorizontal), 0u),
              owner, true);
-        owning = owner;
-        SendMessageW(window, TbmSetRange, 1u, (long)((100 << 16) | 0));
+        _owner = owner;
+        SendMessageW(Window, TbmSetRange, 1u, (long)((100 << 16) | 0));
     }
 
     public void SetRange(int minimum, int maximum)
     {
-        SendMessageW(window, TbmSetRangeMin, 1u, (long)minimum);
-        SendMessageW(window, TbmSetRangeMax, 1u, (long)maximum);
+        SendMessageW(Window, TbmSetRangeMin, 1u, (long)minimum);
+        SendMessageW(Window, TbmSetRangeMax, 1u, (long)maximum);
     }
 
     public void SetValue(int value)
     {
-        SendMessageW(window, TbmSetPos, 1u, (long)value);
+        SendMessageW(Window, TbmSetPos, 1u, (long)value);
     }
 
-    public int GetValue() => (int)SendMessageW(window, TbmGetPos, 0u, 0);
+    public int GetValue() => (int)SendMessageW(Window, TbmGetPos, 0u, 0);
 
     public void SetTickFrequency(int every)
     {
-        SendMessageW(window, TbmSetTicFreq, (ulong)every, 0);
+        SendMessageW(Window, TbmSetTicFreq, (ulong)every, 0);
     }
 
     /// The slider moved. Like a scroll bar, it tells its *parent* rather than
     /// itself, so the parent hands it back here.
-    public void Scrolled()
+    public void OnScroll()
     {
-        IControlNotify? held = owning;
+        IControlNotify? held = _owner;
         if (held == null)
             return;
         ((IControlNotify)held).OnPlatformValueChanged();
@@ -473,22 +473,22 @@ public class TrackBarPeer : ControlPeer, ITrackBarPeer
 
 public class TabControlPeer : ControlPeer, ITabControlPeer
 {
-    weak IControlNotify? owning;
+    weak IControlNotify? _owner;
     int _tabs;
 
     public TabControlPeer(IControlNotify owner, IContainerPeer parent)
     {
-        base(MakeChild("SysTabControl32", WindowOf(parent),
-                       ChildStyle() | WsClipChildren, 0u),
+        base(CreateChildWindow("SysTabControl32", GetContainerWindow(parent),
+                       GetChildStyle() | WsClipChildren, 0u),
              owner, true);
-        owning = owner;
+        _owner = owner;
         _tabs = 0;
     }
 
     /// A tab control is a container, so a page's controls are children of it.
     public void AddChild(IControlPeer child)
     {
-        SetParent((HWND)(void*)child.Handle, window);
+        SetParent((HWND)(void*)child.Handle, Window);
     }
 
     public void RemoveChild(IControlPeer child)
@@ -513,7 +513,7 @@ public class TabControlPeer : ControlPeer, ITabControlPeer
             item.Image = image;
         }
 
-        int at = (int)SendMessageW(window, TcmInsertItemW, (ulong)_tabs,
+        int at = (int)SendMessageW(Window, TcmInsertItemW, (ulong)_tabs,
                                    (long)(nuint)&item);
         _tabs = _tabs + 1;
         return at;
@@ -521,7 +521,7 @@ public class TabControlPeer : ControlPeer, ITabControlPeer
 
     public void RemoveTab(int index)
     {
-        SendMessageW(window, TcmDeleteItem, (ulong)index, 0);
+        SendMessageW(Window, TcmDeleteItem, (ulong)index, 0);
         if (_tabs > 0)
             _tabs = _tabs - 1;
     }
@@ -537,24 +537,24 @@ public class TabControlPeer : ControlPeer, ITabControlPeer
         item.TextLength = 0;
         item.Image = -1;
         item.Param = 0u;
-        SendMessageW(window, TcmSetItemW, (ulong)index, (long)(nuint)&item);
+        SendMessageW(Window, TcmSetItemW, (ulong)index, (long)(nuint)&item);
     }
 
     public void SetSelectedTab(int index)
     {
-        SendMessageW(window, TcmSetCurSel, (ulong)index, 0);
+        SendMessageW(Window, TcmSetCurSel, (ulong)index, 0);
     }
 
     public int GetSelectedTab()
     {
-        return (int)SendMessageW(window, TcmGetCurSel, 0u, 0);
+        return (int)SendMessageW(Window, TcmGetCurSel, 0u, 0);
     }
 
     public int TabCount
     {
         get
         {
-            return (int)SendMessageW(window, TcmGetItemCount, 0u, 0);
+            return (int)SendMessageW(Window, TcmGetItemCount, 0u, 0);
         }
     }
 
@@ -568,22 +568,22 @@ public class TabControlPeer : ControlPeer, ITabControlPeer
         get
         {
             Rect area;
-            GetClientRect(window, &area);
-            SendMessageW(window, TcmAdjustRect, 0u, (long)(nuint)&area);
-            return Area(area.Left, area.Top, area.Right - area.Left, area.Bottom - area.Top);
+            GetClientRect(Window, &area);
+            SendMessageW(Window, TcmAdjustRect, 0u, (long)(nuint)&area);
+            return CreateRectangle(area.Left, area.Top, area.Right - area.Left, area.Bottom - area.Top);
         }
     }
 
     public void SetImages(IImageListBackend? images)
     {
-        SendMessageW(window, TcmSetImageList, 0u, (long)ImageListHandle(images));
+        SendMessageW(Window, TcmSetImageList, 0u, (long)GetImageListHandle(images));
     }
 
-    protected override bool NotifiedBy(int code, void* raw, long* answer)
+    protected override bool OnNotify(int code, void* raw, long* answer)
     {
         if (code != TcnSelChange)
             return false;
-        IControlNotify? held = owning;
+        IControlNotify? held = _owner;
         if (held == null)
             return false;
         ((IControlNotify)held).OnPlatformValueChanged();
@@ -606,16 +606,16 @@ public class TreeNodeHandle : ITreeNodeHandle
 
 public class TreeViewPeer : ControlPeer, ITreeViewPeer
 {
-    weak IControlNotify? owning;
+    weak IControlNotify? _owner;
 
     public TreeViewPeer(IControlNotify owner, IContainerPeer parent)
     {
-        base(MakeChild("SysTreeView32", WindowOf(parent),
-                       ChildStyle() | TvsHasButtons | TvsHasLines
+        base(CreateChildWindow("SysTreeView32", GetContainerWindow(parent),
+                       GetChildStyle() | TvsHasButtons | TvsHasLines
                                     | TvsLinesAtRoot | TvsShowSelAlways,
                        WsExClientEdge),
              owner, true);
-        owning = owner;
+        _owner = owner;
     }
 
     public ITreeNodeHandle AddNode(ITreeNodeHandle? parent, ITreeNodeHandle? previous,
@@ -656,11 +656,11 @@ public class TreeViewPeer : ControlPeer, ITreeViewPeer
             insert.Item.SelectedImage = image;
         }
 
-        long made = SendMessageW(window, TvmInsertItemW, 0u, (long)(nuint)&insert);
+        long made = SendMessageW(Window, TvmInsertItemW, 0u, (long)(nuint)&insert);
         return new TreeNodeHandle((HTREEITEM)(void*)(nuint)made);
     }
 
-    HTREEITEM NativeOf(ITreeNodeHandle node)
+    HTREEITEM ToNativeItem(ITreeNodeHandle node)
     {
         if (node is TreeNodeHandle real)
             return real.Native;
@@ -670,7 +670,7 @@ public class TreeViewPeer : ControlPeer, ITreeViewPeer
     /// Quiet, because removing the selected node moves the selection.
     public void RemoveNode(ITreeNodeHandle node)
     {
-        SendQuietly(TvmDeleteItem, 0u, (long)(nuint)(void*)NativeOf(node));
+        SendMessageQuietly(TvmDeleteItem, 0u, (long)(nuint)(void*)ToNativeItem(node));
     }
 
     public void SetNodeText(ITreeNodeHandle node, String text)
@@ -678,7 +678,7 @@ public class TreeViewPeer : ControlPeer, ITreeViewPeer
         TreeItem item;
         var wide = text.ToUtf16();
         item.Mask = TvifText | TvifHandle;
-        item.Item = NativeOf(node);
+        item.Item = ToNativeItem(node);
         item.State = 0u;
         item.StateMask = 0u;
         item.Text = wide.ToPointer();
@@ -687,7 +687,7 @@ public class TreeViewPeer : ControlPeer, ITreeViewPeer
         item.SelectedImage = -1;
         item.Children = 0;
         item.Param = 0u;
-        SendMessageW(window, TvmSetItemW, 0u, (long)(nuint)&item);
+        SendMessageW(Window, TvmSetItemW, 0u, (long)(nuint)&item);
     }
 
     public String GetNodeText(ITreeNodeHandle node)
@@ -695,7 +695,7 @@ public class TreeViewPeer : ControlPeer, ITreeViewPeer
         var buffer = new char16[512u];
         TreeItem item;
         item.Mask = TvifText | TvifHandle;
-        item.Item = NativeOf(node);
+        item.Item = ToNativeItem(node);
         item.State = 0u;
         item.StateMask = 0u;
         item.Text = &buffer[0u];
@@ -704,25 +704,25 @@ public class TreeViewPeer : ControlPeer, ITreeViewPeer
         item.SelectedImage = 0;
         item.Children = 0;
         item.Param = 0u;
-        if (SendMessageW(window, TvmGetItemW, 0u, (long)(nuint)&item) == 0)
+        if (SendMessageW(Window, TvmGetItemW, 0u, (long)(nuint)&item) == 0)
             return "";
         return Text.FromNullTerminatedUtf16(&buffer[0u]);
     }
 
     public void SetNodeExpanded(ITreeNodeHandle node, bool expanded)
     {
-        SendMessageW(window, TvmExpand, expanded ? TveExpand : TveCollapse,
-                     (long)(nuint)(void*)NativeOf(node));
+        SendMessageW(Window, TvmExpand, expanded ? TveExpand : TveCollapse,
+                     (long)(nuint)(void*)ToNativeItem(node));
     }
 
     public void SelectNode(ITreeNodeHandle node)
     {
-        SendQuietly(TvmSelectItem, TvgnCaret, (long)(nuint)(void*)NativeOf(node));
+        SendMessageQuietly(TvmSelectItem, TvgnCaret, (long)(nuint)(void*)ToNativeItem(node));
     }
 
     public ITreeNodeHandle? GetSelectedNode()
     {
-        long chosen = SendMessageW(window, TvmGetNextItem, TvgnCaret, 0);
+        long chosen = SendMessageW(Window, TvmGetNextItem, TvgnCaret, 0);
         if (chosen == 0)
             return null;
         return new TreeNodeHandle((HTREEITEM)(void*)(nuint)chosen);
@@ -739,7 +739,7 @@ public class TreeViewPeer : ControlPeer, ITreeViewPeer
         // The item comes back in the structure rather than in the return
         // value, and it is filled even for a hit on the expand button or the
         // indent -- so the flags decide, not whether `Item` is set.
-        SendMessageW(window, TvmHitTest, 0u, (long)(nuint)&probe);
+        SendMessageW(Window, TvmHitTest, 0u, (long)(nuint)&probe);
 
         if ((probe.Flags & TvhtOnItem) == 0u)
             return null;
@@ -750,22 +750,22 @@ public class TreeViewPeer : ControlPeer, ITreeViewPeer
 
     public void Clear()
     {
-        SendQuietly(TvmDeleteItem, 0u, (long)(nuint)(void*)TreeRoot());
+        SendMessageQuietly(TvmDeleteItem, 0u, (long)(nuint)(void*)TreeRoot());
     }
 
     /// A tree view never destroys the image list it is given.
     public void SetImages(IImageListBackend? images)
     {
-        SendMessageW(window, TvmSetImageList, 0u, (long)ImageListHandle(images));
+        SendMessageW(Window, TvmSetImageList, 0u, (long)GetImageListHandle(images));
     }
 
-    protected override bool NotifiedBy(int code, void* raw, long* answer)
+    protected override bool OnNotify(int code, void* raw, long* answer)
     {
         if (code != TvnSelChangedW)
             return false;
         if (Echoing)
             return true;
-        IControlNotify? held = owning;
+        IControlNotify? held = _owner;
         if (held == null)
             return false;
         ((IControlNotify)held).OnPlatformValueChanged();
@@ -780,7 +780,7 @@ public class TreeViewPeer : ControlPeer, ITreeViewPeer
 const uint WmSelectionSettled = 0x8001u;   // WM_APP + 1
 
 /// An `LVITEMW` that sets the state bits in `mask` to `state`.
-ListItem ListItemSettingState(uint state, uint mask)
+ListItem CreateListItemState(uint state, uint mask)
 {
     ListItem item;
     item.Mask = LvifState;
@@ -822,7 +822,7 @@ public class ReportListPeer : ControlPeer
     {
         get
         {
-            return (int)SendMessageW(window, LvmGetNextItem, (ulong)(nuint)(nint)(-1),
+            return (int)SendMessageW(Window, LvmGetNextItem, (ulong)(nuint)(nint)(-1),
                                      (long)LvniSelected);
         }
     }
@@ -833,32 +833,32 @@ public class ReportListPeer : ControlPeer
     /// selection rather than moving it there.
     protected void SelectRow(int row)
     {
-        var item = ListItemSettingState(0u, LvisSelected);
-        SendQuietly(LvmSetItemState, (ulong)(nuint)(nint)(-1), (long)(nuint)&item);
+        var item = CreateListItemState(0u, LvisSelected);
+        SendMessageQuietly(LvmSetItemState, (ulong)(nuint)(nint)(-1), (long)(nuint)&item);
         if (row >= 0)
         {
-            item = ListItemSettingState(LvisSelected | LvisFocused, LvisSelected | LvisFocused);
-            SendQuietly(LvmSetItemState, (ulong)row, (long)(nuint)&item);
-            SendMessageW(window, LvmEnsureVisible, (ulong)row, 0);
+            item = CreateListItemState(LvisSelected | LvisFocused, LvisSelected | LvisFocused);
+            SendMessageQuietly(LvmSetItemState, (ulong)row, (long)(nuint)&item);
+            SendMessageW(Window, LvmEnsureVisible, (ulong)row, 0);
         }
-        SelectionSettled();
+        MarkSelectionReported();
     }
 
     /// Takes the selection as it now is, after the program changed it.
-    protected void SelectionSettled() => _reported = SelectedRow;
+    protected void MarkSelectionReported() => _reported = SelectedRow;
 
     /// Whether a change to a row's state bits, other than its selection, is
     /// the control's value changing. A tick is, in a check list.
-    protected virtual bool ChangesValue(uint flipped) => false;
+    protected virtual bool IsValueChange(uint flipped) => false;
 
-    void Report()
+    void ReportSelectionChange()
     {
         var owner = Owner;
         if (owner != null)
             ((IControlNotify)owner).OnPlatformValueChanged();
     }
 
-    protected override bool NotifiedBy(int code, void* raw, long* answer)
+    protected override bool OnNotify(int code, void* raw, long* answer)
     {
         if (code != LvnItemChanged)
             return false;
@@ -872,26 +872,26 @@ public class ReportListPeer : ControlPeer
         bool moved = (flipped & LvisSelected) != 0u;
         bool gained = moved && (details->NewState & LvisSelected) != 0u;
         if (moved && !gained)
-            PostMessageW(window, WmSelectionSettled, 0u, 0);
+            PostMessageW(Window, WmSelectionSettled, 0u, 0);
         if (gained)
             _reported = details->Item;
-        if (gained || ChangesValue(flipped))
-            Report();
+        if (gained || IsValueChange(flipped))
+            ReportSelectionChange();
         return true;
     }
 
-    public override long Dispatch(uint message, ulong wParam, long lParam)
+    public override long WndProc(uint message, ulong wParam, long lParam)
     {
         if (message == WmSelectionSettled)
         {
             if (_reported >= 0 && SelectedRow < 0)
             {
                 _reported = -1;
-                Report();
+                ReportSelectionChange();
             }
             return 0;
         }
-        return base.Dispatch(message, wParam, lParam);
+        return base.WndProc(message, wParam, lParam);
     }
 }
 
@@ -908,8 +908,8 @@ public class ListViewPeer : ReportListPeer, IListViewPeer
 
     public ListViewPeer(IControlNotify owner, IContainerPeer parent)
     {
-        base(MakeChild("SysListView32", WindowOf(parent),
-                       ChildStyle() | LvsReport | LvsShowSelAlways | LvsSingleSel
+        base(CreateChildWindow("SysListView32", GetContainerWindow(parent),
+                       GetChildStyle() | LvsReport | LvsShowSelAlways | LvsSingleSel
                                     | LvsShareImageLists,
                        WsExClientEdge),
              owner);
@@ -919,7 +919,7 @@ public class ListViewPeer : ReportListPeer, IListViewPeer
 
     public void SetStyle(ListViewStyle style)
     {
-        long was = Win32.User32.GetWindowLongPtrW(window, GwlStyle);
+        long was = Win32.User32.GetWindowLongPtrW(Window, GwlStyle);
         was = was & ~(long)(LvsReport | LvsList | LvsSmallIcon | LvsIcon);
         if (style == ListViewStyle.Details)
         {
@@ -933,7 +933,7 @@ public class ListViewPeer : ReportListPeer, IListViewPeer
         {
             was = was | (long)LvsSmallIcon;
         }
-        Win32.User32.SetWindowLongPtrW(window, GwlStyle, was);
+        Win32.User32.SetWindowLongPtrW(Window, GwlStyle, was);
         Invalidate();
     }
 
@@ -958,7 +958,7 @@ public class ListViewPeer : ReportListPeer, IListViewPeer
         column.Image = 0;
         column.Order = 0;
 
-        int at = (int)SendMessageW(window, LvmInsertColumnW, (ulong)_columns,
+        int at = (int)SendMessageW(Window, LvmInsertColumnW, (ulong)_columns,
                                    (long)(nuint)&column);
         _columns = _columns + 1;
         return at;
@@ -966,7 +966,7 @@ public class ListViewPeer : ReportListPeer, IListViewPeer
 
     public void SetColumnWidth(int column, int width)
     {
-        SendMessageW(window, LvmSetColumnWidth, (ulong)column, (long)width);
+        SendMessageW(Window, LvmSetColumnWidth, (ulong)column, (long)width);
     }
 
     public int AddRow(String text, int image)
@@ -992,7 +992,7 @@ public class ListViewPeer : ReportListPeer, IListViewPeer
             item.Image = image;
         }
 
-        int at = (int)SendQuietly(LvmInsertItemW, 0u, (long)(nuint)&item);
+        int at = (int)SendMessageQuietly(LvmInsertItemW, 0u, (long)(nuint)&item);
         if (at >= 0)
             _rows = _rows + 1;
         return at;
@@ -1017,7 +1017,7 @@ public class ListViewPeer : ReportListPeer, IListViewPeer
         item.GroupId = 0;
         item.Columns = 0u;
         item.ColumnFormat = null;
-        SendMessageW(window, LvmSetItemW, 0u, (long)(nuint)&item);
+        SendMessageW(Window, LvmSetItemW, 0u, (long)(nuint)&item);
     }
 
     public String GetCell(int row, int column)
@@ -1037,27 +1037,27 @@ public class ListViewPeer : ReportListPeer, IListViewPeer
         item.GroupId = 0;
         item.Columns = 0u;
         item.ColumnFormat = null;
-        SendMessageW(window, LvmGetItemW, 0u, (long)(nuint)&item);
+        SendMessageW(Window, LvmGetItemW, 0u, (long)(nuint)&item);
         return Text.FromNullTerminatedUtf16(&buffer[0u]);
     }
 
     public void RemoveRow(int row)
     {
-        if (SendQuietly(LvmDeleteItem, (ulong)row, 0) != 0 && _rows > 0)
+        if (SendMessageQuietly(LvmDeleteItem, (ulong)row, 0) != 0 && _rows > 0)
         {
             _rows = _rows - 1;
         }
-        SelectionSettled();
+        MarkSelectionReported();
     }
 
     public void Clear()
     {
-        SendQuietly(LvmDeleteAllItems, 0u, 0);
+        SendMessageQuietly(LvmDeleteAllItems, 0u, 0);
         _rows = 0;
-        SelectionSettled();
+        MarkSelectionReported();
     }
 
-    public int RowCount => (int)SendMessageW(window, LvmGetItemCount, 0u, 0);
+    public int RowCount => (int)SendMessageW(Window, LvmGetItemCount, 0u, 0);
 
     public int GetSelectedRow() => SelectedRow;
 
@@ -1065,7 +1065,7 @@ public class ListViewPeer : ReportListPeer, IListViewPeer
 
     public void SetImages(IImageListBackend? images)
     {
-        SendMessageW(window, LvmSetImageList, 1u, (long)ImageListHandle(images));
+        SendMessageW(Window, LvmSetImageList, 1u, (long)GetImageListHandle(images));
     }
 
     public void SetFullRowSelect(bool full, bool gridLines)
@@ -1075,7 +1075,7 @@ public class ListViewPeer : ReportListPeer, IListViewPeer
             wanted = wanted | LvsExFullRowSelect;
         if (gridLines)
             wanted = wanted | LvsExGridLines;
-        SendMessageW(window, LvmSetExtendedStyle,
+        SendMessageW(Window, LvmSetExtendedStyle,
                      (ulong)(LvsExFullRowSelect | LvsExGridLines), (long)wanted);
     }
 }
@@ -1092,19 +1092,19 @@ public class ListViewPeer : ReportListPeer, IListViewPeer
 public class SpinPeer : ControlPeer, ISpinPeer
 {
     HWND _arrows;
-    weak IControlNotify? owning;
+    weak IControlNotify? _owner;
 
     public SpinPeer(IControlNotify owner, IContainerPeer parent)
     {
-        base(MakeChild("EDIT", WindowOf(parent),
-                       ChildStyle() | EsAutoHScroll | EsRight, WsExClientEdge),
+        base(CreateChildWindow("EDIT", GetContainerWindow(parent),
+                       GetChildStyle() | EsAutoHScroll | EsRight, WsExClientEdge),
              owner, true);
-        owning = owner;
+        _owner = owner;
 
-        _arrows = MakeChild("msctls_updown32", WindowOf(parent),
-                           ChildStyle() | UdsSetBuddyInt | UdsAlignRight
+        _arrows = CreateChildWindow("msctls_updown32", GetContainerWindow(parent),
+                           GetChildStyle() | UdsSetBuddyInt | UdsAlignRight
                                         | UdsArrowKeys | UdsAutoBuddy, 0u);
-        SendMessageW(_arrows, UdmSetBuddy, (ulong)(nuint)(void*)window, 0);
+        SendMessageW(_arrows, UdmSetBuddy, (ulong)(nuint)(void*)Window, 0);
         SetRange(0, 100);
     }
 
@@ -1120,12 +1120,12 @@ public class SpinPeer : ControlPeer, ISpinPeer
     /// Both quiet: the arrows write the edit's text, and the edit reports it.
     public void SetRange(int minimum, int maximum)
     {
-        SendQuietly(_arrows, UdmSetRange32, (ulong)minimum, (long)maximum);
+        SendMessageQuietly(_arrows, UdmSetRange32, (ulong)minimum, (long)maximum);
     }
 
     public void SetValue(int value)
     {
-        SendQuietly(_arrows, UdmSetPos32, 0u, (long)value);
+        SendMessageQuietly(_arrows, UdmSetPos32, 0u, (long)value);
     }
 
     public int GetValue()
@@ -1135,13 +1135,13 @@ public class SpinPeer : ControlPeer, ISpinPeer
 
     /// The edit reports its own changes, which is what makes typing a number
     /// count as well as clicking the arrows.
-    protected override bool Notified(uint code, int id)
+    protected override bool OnCommand(uint code, int id)
     {
         if (code != EnChange)
             return false;
         if (Echoing)
             return true;
-        IControlNotify? held = owning;
+        IControlNotify? held = _owner;
         if (held == null)
             return false;
         ((IControlNotify)held).OnPlatformValueChanged();
@@ -1152,20 +1152,20 @@ public class SpinPeer : ControlPeer, ISpinPeer
     /// as one control -- which is the whole illusion.
     public override void SetBounds(FRect bounds)
     {
-        MoveWindow(window, bounds.X, bounds.Y, bounds.Width, bounds.Height, 1);
+        MoveWindow(Window, bounds.X, bounds.Y, bounds.Width, bounds.Height, 1);
         // `UDM_SETBUDDY` re-docks the arrows against whatever the buddy now is.
-        SendMessageW(_arrows, UdmSetBuddy, (ulong)(nuint)(void*)window, 0);
+        SendMessageW(_arrows, UdmSetBuddy, (ulong)(nuint)(void*)Window, 0);
     }
 
     public override void SetVisible(bool visible)
     {
-        ShowWindow(window, visible ? SwShowNoActivate : SwHide);
+        ShowWindow(Window, visible ? SwShowNoActivate : SwHide);
         ShowWindow(_arrows, visible ? SwShowNoActivate : SwHide);
     }
 
     public override void SetEnabled(bool enabled)
     {
-        EnableWindow(window, enabled ? 1 : 0);
+        EnableWindow(Window, enabled ? 1 : 0);
         EnableWindow(_arrows, enabled ? 1 : 0);
     }
 }
@@ -1187,13 +1187,13 @@ public class CheckListPeer : ReportListPeer, ICheckListPeer
     /// has no heading to show.
     public CheckListPeer(IControlNotify owner, IContainerPeer parent)
     {
-        base(MakeChild("SysListView32", WindowOf(parent),
-                       ChildStyle() | LvsReport | LvsShowSelAlways | LvsSingleSel
+        base(CreateChildWindow("SysListView32", GetContainerWindow(parent),
+                       GetChildStyle() | LvsReport | LvsShowSelAlways | LvsSingleSel
                                     | LvsNoColumnHeader,
                        WsExClientEdge),
              owner);
         _rows = 0;
-        SendMessageW(window, LvmSetExtendedStyle,
+        SendMessageW(Window, LvmSetExtendedStyle,
                      (ulong)(LvsExCheckBoxes | LvsExFullRowSelect),
                      (long)(LvsExCheckBoxes | LvsExFullRowSelect));
 
@@ -1210,20 +1210,20 @@ public class CheckListPeer : ReportListPeer, ICheckListPeer
         column.SubItem = 0;
         column.Image = 0;
         column.Order = 0;
-        SendMessageW(window, LvmInsertColumnW, 0u, (long)(nuint)&column);
+        SendMessageW(Window, LvmInsertColumnW, 0u, (long)(nuint)&column);
     }
 
     /// The one column follows the control, so the text fills it and no
     /// horizontal scroll bar appears.
     public override void SetBounds(FRect bounds)
     {
-        MoveWindow(window, bounds.X, bounds.Y, bounds.Width, bounds.Height, 1);
+        MoveWindow(Window, bounds.X, bounds.Y, bounds.Width, bounds.Height, 1);
         Rect client;
-        GetClientRect(window, &client);
+        GetClientRect(Window, &client);
         int width = client.Right - client.Left;
         if (width > 0)
         {
-            SendMessageW(window, LvmSetColumnWidth, 0u, (long)width);
+            SendMessageW(Window, LvmSetColumnWidth, 0u, (long)width);
         }
     }
 
@@ -1245,7 +1245,7 @@ public class CheckListPeer : ReportListPeer, ICheckListPeer
         item.GroupId = 0;
         item.Columns = 0u;
         item.ColumnFormat = null;
-        if (SendQuietly(LvmInsertItemW, 0u, (long)(nuint)&item) >= 0)
+        if (SendMessageQuietly(LvmInsertItemW, 0u, (long)(nuint)&item) >= 0)
         {
             _rows = _rows + 1;
         }
@@ -1253,21 +1253,21 @@ public class CheckListPeer : ReportListPeer, ICheckListPeer
 
     public void RemoveItem(int index)
     {
-        if (SendQuietly(LvmDeleteItem, (ulong)index, 0) != 0 && _rows > 0)
+        if (SendMessageQuietly(LvmDeleteItem, (ulong)index, 0) != 0 && _rows > 0)
         {
             _rows = _rows - 1;
         }
-        SelectionSettled();
+        MarkSelectionReported();
     }
 
     public void ClearItems()
     {
-        SendQuietly(LvmDeleteAllItems, 0u, 0);
+        SendMessageQuietly(LvmDeleteAllItems, 0u, 0);
         _rows = 0;
-        SelectionSettled();
+        MarkSelectionReported();
     }
 
-    public int ItemCount => (int)SendMessageW(window, LvmGetItemCount, 0u, 0);
+    public int ItemCount => (int)SendMessageW(Window, LvmGetItemCount, 0u, 0);
 
     public void SetSelectedIndex(int index) => SelectRow(index);
 
@@ -1276,20 +1276,20 @@ public class CheckListPeer : ReportListPeer, ICheckListPeer
     /// The tick is the *state image*, one-based: 1 is empty and 2 is ticked.
     public void SetItemChecked(int index, bool checked)
     {
-        var item = ListItemSettingState(GetCheckedStateMask(checked), LvisStateImageMask);
-        SendQuietly(LvmSetItemState, (ulong)index, (long)(nuint)&item);
+        var item = CreateListItemState(GetCheckedStateMask(checked), LvisStateImageMask);
+        SendMessageQuietly(LvmSetItemState, (ulong)index, (long)(nuint)&item);
     }
 
     public bool GetItemChecked(int index)
     {
-        var item = ListItemSettingState(0u, LvisStateImageMask);
+        var item = CreateListItemState(0u, LvisStateImageMask);
         item.Item = index;
-        SendMessageW(window, LvmGetItemW, 0u, (long)(nuint)&item);
+        SendMessageW(Window, LvmGetItemW, 0u, (long)(nuint)&item);
         return ((item.State & LvisStateImageMask) >> 12) == 2u;
     }
 
     /// A tick is a change of value as much as a selection is.
-    protected override bool ChangesValue(uint flipped)
+    protected override bool IsValueChange(uint flipped)
     {
         return (flipped & LvisStateImageMask) != 0u;
     }
@@ -1300,15 +1300,15 @@ public class CheckListPeer : ReportListPeer, ICheckListPeer
 /// A row of column headings that can be dragged wider.
 public class HeaderPeer : ControlPeer, IHeaderPeer
 {
-    weak IControlNotify? owning;
+    weak IControlNotify? _owner;
     int _sections;
 
     public HeaderPeer(IControlNotify owner, IContainerPeer parent)
     {
-        base(MakeChild("SysHeader32", WindowOf(parent),
-                       ChildStyle() | HdsButtons | HdsHorizontal, 0u),
+        base(CreateChildWindow("SysHeader32", GetContainerWindow(parent),
+                       GetChildStyle() | HdsButtons | HdsHorizontal, 0u),
              owner, true);
-        owning = owner;
+        _owner = owner;
         _sections = 0;
     }
 
@@ -1329,7 +1329,7 @@ public class HeaderPeer : ControlPeer, IHeaderPeer
         item.FilterData = null;
         item.State = 0u;
 
-        int at = (int)SendQuietly(HdmInsertItemW, (ulong)_sections, (long)(nuint)&item);
+        int at = (int)SendMessageQuietly(HdmInsertItemW, (ulong)_sections, (long)(nuint)&item);
         if (at >= 0)
             _sections = _sections + 1;
         return at;
@@ -1351,7 +1351,7 @@ public class HeaderPeer : ControlPeer, IHeaderPeer
         item.FilterData = null;
         item.State = 0u;
         // Quiet: a header reports `HDN_ITEMCHANGED` for this as for a drag.
-        SendQuietly(HdmSetItemW, (ulong)index, (long)(nuint)&item);
+        SendMessageQuietly(HdmSetItemW, (ulong)index, (long)(nuint)&item);
     }
 
     public int GetSectionWidth(int index)
@@ -1369,7 +1369,7 @@ public class HeaderPeer : ControlPeer, IHeaderPeer
         item.Type = 0u;
         item.FilterData = null;
         item.State = 0u;
-        if (SendMessageW(window, HdmGetItemW, (ulong)index, (long)(nuint)&item) == 0)
+        if (SendMessageW(Window, HdmGetItemW, (ulong)index, (long)(nuint)&item) == 0)
         {
             return 0;
         }
@@ -1380,18 +1380,18 @@ public class HeaderPeer : ControlPeer, IHeaderPeer
     {
         get
         {
-            return (int)SendMessageW(window, HdmGetItemCount, 0u, 0);
+            return (int)SendMessageW(Window, HdmGetItemCount, 0u, 0);
         }
     }
 
     /// A section was dragged wider or narrower.
-    protected override bool NotifiedBy(int code, void* raw, long* answer)
+    protected override bool OnNotify(int code, void* raw, long* answer)
     {
         if (code != HdnItemChangedW)
             return false;
         if (Echoing)
             return true;
-        IControlNotify? held = owning;
+        IControlNotify? held = _owner;
         if (held == null)
             return false;
         ((IControlNotify)held).OnPlatformValueChanged();

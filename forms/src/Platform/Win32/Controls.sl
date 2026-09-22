@@ -22,7 +22,7 @@
 // One peer per native widget.
 //
 // Every one of these is the same three things: a `CreateWindowExW` with the
-// right class and style bits, an override of `Notified` saying what this
+// right class and style bits, an override of `OnCommand` saying what this
 // control's notification codes mean, and the handful of messages that are its
 // own API. That is the whole of a Windows control, and it is why the LCL needs
 // a `TWSxxx` class for each and why this needs a peer for each.
@@ -50,7 +50,7 @@ import Win32.ComCtl32;
 ///
 /// A function rather than a `const`, because a module-level constant must be
 /// initialized with a literal and this is four of them combined.
-uint ChildStyle() => WsChild | WsVisible | WsClipSiblings | WsTabStop;
+uint GetChildStyle() => WsChild | WsVisible | WsClipSiblings | WsTabStop;
 
 /// The width of a check box's box, which `GetSystemMetrics` reports under an
 /// index `Win32.User32` does not yet name.
@@ -64,7 +64,7 @@ const uint WsExStaticEdge = 0x00020000u;
 /// The bounds are zero because the control layer sets them immediately
 /// afterwards through `SetBounds`, and creating at a real position would put
 /// the widget on screen at a size nothing had decided yet.
-HWND MakeChild(String className, HWND parent, uint style, uint extended)
+HWND CreateChildWindow(String className, HWND parent, uint style, uint extended)
 {
     return CreateWindowExW(extended,
                            className.ToUtf16().ToPointer(),
@@ -74,7 +74,7 @@ HWND MakeChild(String className, HWND parent, uint style, uint extended)
 }
 
 /// The peer of whatever a widget set was handed as a parent, as a window.
-HWND WindowOf(IContainerPeer parent)
+HWND GetContainerWindow(IContainerPeer parent)
 {
     return (HWND)(void*)parent.Handle;
 }
@@ -88,29 +88,29 @@ public class ButtonPeer : ControlPeer, IPushButtonPeer
     /// button with none. Owned here: `BCM_SETIMAGELIST` takes a handle and
     /// never a copy, so the list has to outlive the call and be destroyed by
     /// whoever made it.
-    HIMAGELIST _glyph;
+    HIMAGELIST _imageList;
     /// The picture's size, kept because `PreferredSize` needs it and asking an
     /// image list for one entry's extent costs more than remembering it.
-    FSize _glyphExtent;
-    ImageAlignment _placed;
-    int _gap;
+    FSize _imageSize;
+    ImageAlignment _imageAlign;
+    int _imageSpacing;
 
     public ButtonPeer(IControlNotify owner, IContainerPeer parent)
     {
-        base(MakeChild("BUTTON", WindowOf(parent), ChildStyle() | BsPushButton, 0u),
+        base(CreateChildWindow("BUTTON", GetContainerWindow(parent), GetChildStyle() | BsPushButton, 0u),
              owner, true);
-        _glyph = null;
-        _glyphExtent = Extent(0, 0);
-        _placed = ImageAlignment.Left;
-        _gap = 4;
+        _imageList = null;
+        _imageSize = CreateSize(0, 0);
+        _imageAlign = ImageAlignment.Left;
+        _imageSpacing = 4;
     }
 
     ~ButtonPeer()
     {
-        if (_glyph != null)
+        if (_imageList != null)
         {
-            ImageList_Destroy(_glyph);
-            _glyph = null;
+            ImageList_Destroy(_imageList);
+            _imageList = null;
         }
     }
 
@@ -128,22 +128,22 @@ public class ButtonPeer : ControlPeer, IPushButtonPeer
     /// has used to say "transparent".
     public void SetImage(IBitmapBackend? picture)
     {
-        if (_glyph != null)
+        if (_imageList != null)
         {
-            ImageList_Destroy(_glyph);
-            _glyph = null;
+            ImageList_Destroy(_imageList);
+            _imageList = null;
         }
-        _glyphExtent = Extent(0, 0);
+        _imageSize = CreateSize(0, 0);
 
         if (picture != null)
         {
             var source = (IBitmapBackend)picture;
             if (source is BitmapBackend gdi)
             {
-                _glyph = ImageList_Create(gdi.Width, gdi.Height,
+                _imageList = ImageList_Create(gdi.Width, gdi.Height,
                                          IlcColor32 | IlcMask, 1, 0);
-                ImageList_AddMasked(_glyph, gdi.Native, 0x00FF00FFu);
-                _glyphExtent = Extent(gdi.Width, gdi.Height);
+                ImageList_AddMasked(_imageList, gdi.Native, 0x00FF00FFu);
+                _imageSize = CreateSize(gdi.Width, gdi.Height);
             }
         }
 
@@ -152,13 +152,13 @@ public class ButtonPeer : ControlPeer, IPushButtonPeer
 
     public void SetImageAlign(ImageAlignment place)
     {
-        _placed = place;
+        _imageAlign = place;
         ApplyImage();
     }
 
     public void SetImageSpacing(int pixels)
     {
-        _gap = pixels;
+        _imageSpacing = pixels;
         ApplyImage();
     }
 
@@ -170,42 +170,42 @@ public class ButtonPeer : ControlPeer, IPushButtonPeer
     void ApplyImage()
     {
         ButtonImageList wanted;
-        wanted.Images = _glyph;
+        wanted.Images = _imageList;
         wanted.Margin.Left = 0;
         wanted.Margin.Top = 0;
         wanted.Margin.Right = 0;
         wanted.Margin.Bottom = 0;
 
-        if (_placed == ImageAlignment.Right)
+        if (_imageAlign == ImageAlignment.Right)
         {
             wanted.Align = ButtonImageListAlignRight;
-            wanted.Margin.Left = _gap;
+            wanted.Margin.Left = _imageSpacing;
         }
-        else if (_placed == ImageAlignment.Top)
+        else if (_imageAlign == ImageAlignment.Top)
         {
             wanted.Align = ButtonImageListAlignTop;
-            wanted.Margin.Bottom = _gap;
+            wanted.Margin.Bottom = _imageSpacing;
         }
-        else if (_placed == ImageAlignment.Bottom)
+        else if (_imageAlign == ImageAlignment.Bottom)
         {
             wanted.Align = ButtonImageListAlignBottom;
-            wanted.Margin.Top = _gap;
+            wanted.Margin.Top = _imageSpacing;
         }
         else
         {
             wanted.Align = ButtonImageListAlignLeft;
-            wanted.Margin.Right = _gap;
+            wanted.Margin.Right = _imageSpacing;
         }
 
         // A null list is how the message says "no picture", so this call is
         // both the set and the clear.
-        SendMessageW(window, BcmSetImageList, 0u, (long)(nuint)&wanted);
+        SendMessageW(Window, BcmSetImageList, 0u, (long)(nuint)&wanted);
         Invalidate();
     }
 
     /// `BN_CLICKED` arrives whether the button was clicked or pressed with the
     /// keyboard, which is exactly what `OnPlatformActivated` means.
-    protected override bool Notified(uint code, int id)
+    protected override bool OnCommand(uint code, int id)
     {
         if (code != BnClicked)
             return false;
@@ -222,7 +222,7 @@ public class ButtonPeer : ControlPeer, IPushButtonPeer
     /// heavier border from the style bit and does not notice it changed.
     public void SetDefault(bool isDefault)
     {
-        SendMessageW(window, BmSetStyle,
+        SendMessageW(Window, BmSetStyle,
                      (ulong)(isDefault ? BsDefPushButton : BsPushButton), 1);
     }
 
@@ -233,27 +233,27 @@ public class ButtonPeer : ControlPeer, IPushButtonPeer
     {
         get
         {
-            var measured = MeasureNative();
+            var measured = MeasureNativeSize();
             int width = measured.Width;
             int height = measured.Height;
 
             // The picture is beside the caption or above it, so it adds to one
             // axis and takes the larger of the two on the other.
-            if (_glyphExtent.Width > 0)
+            if (_imageSize.Width > 0)
             {
-                if (_placed == ImageAlignment.Top || _placed == ImageAlignment.Bottom)
+                if (_imageAlign == ImageAlignment.Top || _imageAlign == ImageAlignment.Bottom)
                 {
-                    height = height + _gap + _glyphExtent.Height;
-                    if (width < _glyphExtent.Width)
+                    height = height + _imageSpacing + _imageSize.Height;
+                    if (width < _imageSize.Width)
                     {
-                        width = _glyphExtent.Width;
+                        width = _imageSize.Width;
                     }
                 }
                 else
                 {
-                    width = width + _gap + _glyphExtent.Width;
-                    if (height < _glyphExtent.Height)
-                        height = _glyphExtent.Height;
+                    width = width + _imageSpacing + _imageSize.Width;
+                    if (height < _imageSize.Height)
+                        height = _imageSize.Height;
                 }
             }
 
@@ -263,21 +263,21 @@ public class ButtonPeer : ControlPeer, IPushButtonPeer
                 width = 75;
             if (height < 23)
                 height = 23;
-            return Extent(width, height);
+            return CreateSize(width, height);
         }
     }
 
     /// The text this widget holds, measured in the font it is set to.
-    protected FSize MeasureNative()
+    protected FSize MeasureNativeSize()
     {
-        HDC dc = GetDC(window);
-        HGDIOBJ wasFont = SelectObject(dc, (HGDIOBJ)(nuint)(ulong)SendMessageW(window, WmGetFont, 0u, 0));
+        HDC dc = GetDC(Window);
+        HGDIOBJ wasFont = SelectObject(dc, (HGDIOBJ)(nuint)(ulong)SendMessageW(Window, WmGetFont, 0u, 0));
         var wide = GetText().ToUtf16();
         Win32.User32.Size measured;
         GetTextExtentPoint32W(dc, wide.ToPointer(), (int)wide.UnitCount(), &measured);
         SelectObject(dc, wasFont);
-        ReleaseDC(window, dc);
-        return Extent(measured.Width, measured.Height);
+        ReleaseDC(Window, dc);
+        return CreateSize(measured.Width, measured.Height);
     }
 }
 
@@ -298,9 +298,9 @@ public class ButtonPeer : ControlPeer, IPushButtonPeer
 /// `TCustomCheckBox` in the LCL and `ToggleButton` from `CheckBox` here.
 public class CheckPeer : ControlPeer, ICheckPeer
 {
-    CheckKind _sort;
+    CheckKind _kind;
 
-    static uint StyleFor(CheckKind kind)
+    static uint GetCheckStyle(CheckKind kind)
     {
         if (kind == CheckKind.Radio)
             return BsAutoRadioButton;
@@ -311,12 +311,12 @@ public class CheckPeer : ControlPeer, ICheckPeer
 
     public CheckPeer(IControlNotify owner, IContainerPeer parent, CheckKind kind)
     {
-        base(MakeChild("BUTTON", WindowOf(parent), ChildStyle() | StyleFor(kind), 0u),
+        base(CreateChildWindow("BUTTON", GetContainerWindow(parent), GetChildStyle() | GetCheckStyle(kind), 0u),
              owner, true);
-        _sort = kind;
+        _kind = kind;
     }
 
-    protected override bool Notified(uint code, int id)
+    protected override bool OnCommand(uint code, int id)
     {
         if (code != BnClicked)
             return false;
@@ -335,12 +335,12 @@ public class CheckPeer : ControlPeer, ICheckPeer
 
     public void SetChecked(bool checked)
     {
-        SendMessageW(window, BmSetCheck, checked ? (ulong)BstChecked : (ulong)BstUnchecked, 0);
+        SendMessageW(Window, BmSetCheck, checked ? (ulong)BstChecked : (ulong)BstUnchecked, 0);
     }
 
     public bool GetChecked()
     {
-        return SendMessageW(window, BmGetCheck, 0u, 0) == (long)BstChecked;
+        return SendMessageW(Window, BmGetCheck, 0u, 0) == (long)BstChecked;
     }
 
     /// The box or the dot, plus a gap, plus the caption -- or, for a toggle
@@ -350,15 +350,15 @@ public class CheckPeer : ControlPeer, ICheckPeer
     {
         get
         {
-            HDC dc = GetDC(window);
-            HGDIOBJ wasFont = SelectObject(dc, (HGDIOBJ)(nuint)(ulong)SendMessageW(window, WmGetFont, 0u, 0));
+            HDC dc = GetDC(Window);
+            HGDIOBJ wasFont = SelectObject(dc, (HGDIOBJ)(nuint)(ulong)SendMessageW(Window, WmGetFont, 0u, 0));
             var wide = GetText().ToUtf16();
             Win32.User32.Size measured;
             GetTextExtentPoint32W(dc, wide.ToPointer(), (int)wide.UnitCount(), &measured);
             SelectObject(dc, wasFont);
-            ReleaseDC(window, dc);
+            ReleaseDC(Window, dc);
 
-            if (_sort == CheckKind.Toggle)
+            if (_kind == CheckKind.Toggle)
             {
                 int width = measured.Width + 20;
                 int high = measured.Height + 10;
@@ -366,7 +366,7 @@ public class CheckPeer : ControlPeer, ICheckPeer
                     width = 75;
                 if (high < 23)
                     high = 23;
-                return Extent(width, high);
+                return CreateSize(width, high);
             }
 
             int box = GetSystemMetrics(SmCheckBoxWidth);
@@ -375,7 +375,7 @@ public class CheckPeer : ControlPeer, ICheckPeer
             int height = measured.Height;
             if (height < box)
                 height = box;
-            return Extent(measured.Width + box + 8, height + 4);
+            return CreateSize(measured.Width + box + 8, height + 4);
         }
     }
 }
@@ -389,27 +389,27 @@ public class CheckPeer : ControlPeer, ICheckPeer
 /// `WM_COMMAND` to the parent like any other control's.
 public class LabelPeer : ControlPeer, ILabelPeer
 {
-    HorizontalAlignment _aligned;
-    bool _wraps;
+    HorizontalAlignment _alignment;
+    bool _wordWrap;
 
     public LabelPeer(IControlNotify owner, IContainerPeer parent)
     {
-        base(MakeChild("STATIC", WindowOf(parent),
-                       (ChildStyle() & ~WsTabStop) | SsNotify | SsLeft, 0u),
+        base(CreateChildWindow("STATIC", GetContainerWindow(parent),
+                       (GetChildStyle() & ~WsTabStop) | SsNotify | SsLeft, 0u),
              owner, true);
-        _aligned = HorizontalAlignment.Left;
-        _wraps = true;
+        _alignment = HorizontalAlignment.Left;
+        _wordWrap = true;
     }
 
     public void SetAlignment(HorizontalAlignment alignment)
     {
-        _aligned = alignment;
+        _alignment = alignment;
         ApplyTextStyle();
     }
 
     public void SetWordWrap(bool wrap)
     {
-        _wraps = wrap;
+        _wordWrap = wrap;
         ApplyTextStyle();
     }
 
@@ -422,8 +422,8 @@ public class LabelPeer : ControlPeer, ILabelPeer
     /// ellipsis on one line instead, as GTK ends a label that does not wrap.
     void ApplyTextStyle()
     {
-        uint kind = _wraps ? SsLeft : SsLeftNoWordWrap;
-        switch (_aligned)
+        uint kind = _wordWrap ? SsLeft : SsLeftNoWordWrap;
+        switch (_alignment)
         {
             case HorizontalAlignment.Center:
                 kind = SsCenter;
@@ -434,12 +434,12 @@ public class LabelPeer : ControlPeer, ILabelPeer
             default:
                 break;
         }
-        if (!_wraps && _aligned != HorizontalAlignment.Left)
+        if (!_wordWrap && _alignment != HorizontalAlignment.Left)
             kind = kind | SsEndEllipsis;
 
-        long style = Win32.User32.GetWindowLongPtrW(window, GwlStyle);
+        long style = Win32.User32.GetWindowLongPtrW(Window, GwlStyle);
         style = (style & ~(long)(SsTypeMask | SsEllipsisMask)) | (long)kind;
-        Win32.User32.SetWindowLongPtrW(window, GwlStyle, style);
+        Win32.User32.SetWindowLongPtrW(Window, GwlStyle, style);
         // Windows reads the style when it paints and does not notice it change.
         Invalidate();
     }
@@ -448,14 +448,14 @@ public class LabelPeer : ControlPeer, ILabelPeer
     {
         get
         {
-            HDC dc = GetDC(window);
-            HGDIOBJ wasFont = SelectObject(dc, (HGDIOBJ)(nuint)(ulong)SendMessageW(window, WmGetFont, 0u, 0));
+            HDC dc = GetDC(Window);
+            HGDIOBJ wasFont = SelectObject(dc, (HGDIOBJ)(nuint)(ulong)SendMessageW(Window, WmGetFont, 0u, 0));
             var wide = GetText().ToUtf16();
             Win32.User32.Size measured;
             GetTextExtentPoint32W(dc, wide.ToPointer(), (int)wide.UnitCount(), &measured);
             SelectObject(dc, wasFont);
-            ReleaseDC(window, dc);
-            return Extent(measured.Width, measured.Height);
+            ReleaseDC(Window, dc);
+            return CreateSize(measured.Width, measured.Height);
         }
     }
 }
@@ -470,20 +470,20 @@ public class LabelPeer : ControlPeer, ILabelPeer
 /// honest about doing nothing, and a control that must change re-creates.
 public class TextEntryPeer : ControlPeer, ITextEntryPeer
 {
-    bool _multi;
+    bool _multiline;
 
     public TextEntryPeer(IControlNotify owner, IContainerPeer parent, bool multiline)
     {
-        base(MakeChild("EDIT", WindowOf(parent),
-                       ChildStyle() | (multiline
+        base(CreateChildWindow("EDIT", GetContainerWindow(parent),
+                       GetChildStyle() | (multiline
                            ? (EsMultiline | EsAutoVScroll | EsWantReturn | WsVerticalScroll)
                            : EsAutoHScroll),
                        WsExClientEdge),
              owner, true);
-        _multi = multiline;
+        _multiline = multiline;
     }
 
-    protected override bool Notified(uint code, int id)
+    protected override bool OnCommand(uint code, int id)
     {
         if (code != EnChange)
             return false;
@@ -498,31 +498,31 @@ public class TextEntryPeer : ControlPeer, ITextEntryPeer
 
     public void SetReadOnly(bool readOnly)
     {
-        SendMessageW(window, EmSetReadOnly, (ulong)(readOnly ? 1 : 0), 0);
+        SendMessageW(Window, EmSetReadOnly, (ulong)(readOnly ? 1 : 0), 0);
     }
 
     public void SetMaxLength(int length)
     {
-        SendMessageW(window, EmSetLimitText, (ulong)length, 0);
+        SendMessageW(Window, EmSetLimitText, (ulong)length, 0);
     }
 
     public void SetPasswordChar(char mask)
     {
-        SendMessageW(window, EmSetPasswordChar, (ulong)(uint)mask, 0);
+        SendMessageW(Window, EmSetPasswordChar, (ulong)(uint)mask, 0);
         Invalidate();
     }
 
     public void SetSelection(int start, int length)
     {
-        SendMessageW(window, EmSetSel, (ulong)start, (long)(start + length));
-        SendMessageW(window, EmScrollCaret, 0u, 0);
+        SendMessageW(Window, EmSetSel, (ulong)start, (long)(start + length));
+        SendMessageW(Window, EmScrollCaret, 0u, 0);
     }
 
     public (int, int) GetSelection()
     {
         uint first = 0u;
         uint last = 0u;
-        SendMessageW(window, EmGetSel, (ulong)(nuint)&first, (long)(nuint)&last);
+        SendMessageW(Window, EmGetSel, (ulong)(nuint)&first, (long)(nuint)&last);
         return ((int)first, (int)(last - first));
     }
 
@@ -554,22 +554,22 @@ public class TextEntryPeer : ControlPeer, ITextEntryPeer
         SetText(joined.ToText());
     }
 
-    public void CutToClipboard() => SendMessageW(window, WmCut, 0u, 0);
-    public void CopyToClipboard() => SendMessageW(window, WmCopy, 0u, 0);
-    public void PasteFromClipboard() => SendMessageW(window, WmPaste, 0u, 0);
+    public void CutToClipboard() => SendMessageW(Window, WmCut, 0u, 0);
+    public void CopyToClipboard() => SendMessageW(Window, WmCopy, 0u, 0);
+    public void PasteFromClipboard() => SendMessageW(Window, WmPaste, 0u, 0);
 
     public override FSize PreferredSize
     {
         get
         {
-            HDC dc = GetDC(window);
-            HGDIOBJ wasFont = SelectObject(dc, (HGDIOBJ)(nuint)(ulong)SendMessageW(window, WmGetFont, 0u, 0));
+            HDC dc = GetDC(Window);
+            HGDIOBJ wasFont = SelectObject(dc, (HGDIOBJ)(nuint)(ulong)SendMessageW(Window, WmGetFont, 0u, 0));
             var wide = "Wg".ToUtf16();
             Win32.User32.Size measured;
             GetTextExtentPoint32W(dc, wide.ToPointer(), (int)wide.UnitCount(), &measured);
             SelectObject(dc, wasFont);
-            ReleaseDC(window, dc);
-            return Extent(120, measured.Height + 8);
+            ReleaseDC(Window, dc);
+            return CreateSize(120, measured.Height + 8);
         }
     }
 }
@@ -581,14 +581,14 @@ public class ListPeer : ControlPeer, IListPeer
 {
     public ListPeer(IControlNotify owner, IContainerPeer parent)
     {
-        base(MakeChild("LISTBOX", WindowOf(parent),
-                       ChildStyle() | LbsNotify | LbsHasStrings
+        base(CreateChildWindow("LISTBOX", GetContainerWindow(parent),
+                       GetChildStyle() | LbsNotify | LbsHasStrings
                                     | LbsNoIntegralHeight | WsVerticalScroll,
                        WsExClientEdge),
              owner, true);
     }
 
-    protected override bool Notified(uint code, int id)
+    protected override bool OnCommand(uint code, int id)
     {
         var owner = Owner;
         if (owner == null)
@@ -608,27 +608,27 @@ public class ListPeer : ControlPeer, IListPeer
 
     public void InsertItem(int index, String text)
     {
-        SendMessageW(window, LbInsertString, (ulong)index,
+        SendMessageW(Window, LbInsertString, (ulong)index,
                      (long)(nuint)text.ToUtf16().ToPointer());
     }
 
     public void RemoveItem(int index)
     {
-        SendMessageW(window, LbDeleteString, (ulong)index, 0);
+        SendMessageW(Window, LbDeleteString, (ulong)index, 0);
     }
 
-    public void ClearItems() => SendMessageW(window, LbResetContent, 0u, 0);
+    public void ClearItems() => SendMessageW(Window, LbResetContent, 0u, 0);
 
-    public int ItemCount => (int)SendMessageW(window, LbGetCount, 0u, 0);
+    public int ItemCount => (int)SendMessageW(Window, LbGetCount, 0u, 0);
 
     public void SetSelectedIndex(int index)
     {
-        SendMessageW(window, LbSetCurSel, (ulong)index, 0);
+        SendMessageW(Window, LbSetCurSel, (ulong)index, 0);
     }
 
     public int GetSelectedIndex()
     {
-        return (int)SendMessageW(window, LbGetCurSel, 0u, 0);
+        return (int)SendMessageW(Window, LbGetCurSel, 0u, 0);
     }
 }
 
@@ -654,35 +654,35 @@ public class ComboPeer : ControlPeer, IComboPeer
 
     public ComboPeer(IControlNotify owner, IContainerPeer parent)
     {
-        base(MakeChild("COMBOBOX", WindowOf(parent),
-                       ChildStyle() | CbsDropDownList | CbsHasStrings | WsVerticalScroll,
+        base(CreateChildWindow("COMBOBOX", GetContainerWindow(parent),
+                       GetChildStyle() | CbsDropDownList | CbsHasStrings | WsVerticalScroll,
                        0u),
              owner, true);
-        _placed = Area(0, 0, 0, 0);
+        _placed = CreateRectangle(0, 0, 0, 0);
     }
 
     public override void SetBounds(FRect bounds)
     {
         _placed = bounds;
-        Refit();
+        RefitDropDown();
     }
 
     /// The closed field, and a row for each item up to `VisibleRows`.
-    void Refit()
+    void RefitDropDown()
     {
         Rect closed;
-        GetClientRect(window, &closed);
+        GetClientRect(Window, &closed);
         int rows = ItemCount;
         if (rows < 1)
             rows = 1;
         if (rows > VisibleRows)
             rows = VisibleRows;
-        int row = (int)SendMessageW(window, CbGetItemHeight, 0u, 0);
+        int row = (int)SendMessageW(Window, CbGetItemHeight, 0u, 0);
         int dropped = closed.Bottom - closed.Top + rows * row + 2;
-        MoveWindow(window, _placed.X, _placed.Y, _placed.Width, dropped, 1);
+        MoveWindow(Window, _placed.X, _placed.Y, _placed.Width, dropped, 1);
     }
 
-    protected override bool Notified(uint code, int id)
+    protected override bool OnCommand(uint code, int id)
     {
         var owner = Owner;
         if (owner == null)
@@ -698,33 +698,33 @@ public class ComboPeer : ControlPeer, IComboPeer
 
     public void InsertItem(int index, String text)
     {
-        SendMessageW(window, CbInsertString, (ulong)index,
+        SendMessageW(Window, CbInsertString, (ulong)index,
                      (long)(nuint)text.ToUtf16().ToPointer());
-        Refit();
+        RefitDropDown();
     }
 
     public void RemoveItem(int index)
     {
-        SendMessageW(window, CbDeleteString, (ulong)index, 0);
-        Refit();
+        SendMessageW(Window, CbDeleteString, (ulong)index, 0);
+        RefitDropDown();
     }
 
     public void ClearItems()
     {
-        SendMessageW(window, CbResetContent, 0u, 0);
-        Refit();
+        SendMessageW(Window, CbResetContent, 0u, 0);
+        RefitDropDown();
     }
 
-    public int ItemCount => (int)SendMessageW(window, CbGetCount, 0u, 0);
+    public int ItemCount => (int)SendMessageW(Window, CbGetCount, 0u, 0);
 
     public void SetSelectedIndex(int index)
     {
-        SendMessageW(window, CbSetCurSel, (ulong)index, 0);
+        SendMessageW(Window, CbSetCurSel, (ulong)index, 0);
     }
 
     public int GetSelectedIndex()
     {
-        return (int)SendMessageW(window, CbGetCurSel, 0u, 0);
+        return (int)SendMessageW(Window, CbGetCurSel, 0u, 0);
     }
 
     /// Editable or not is a creation-time style, as multiline is on an edit.
@@ -748,14 +748,14 @@ public class GroupPeer : ControlPeer, IGroupPeer
 {
     public GroupPeer(IControlNotify owner, IContainerPeer parent)
     {
-        base(MakeChild("BUTTON", WindowOf(parent),
-                       (ChildStyle() & ~WsTabStop) | BsGroupBox | WsClipChildren, 0u),
+        base(CreateChildWindow("BUTTON", GetContainerWindow(parent),
+                       (GetChildStyle() & ~WsTabStop) | BsGroupBox | WsClipChildren, 0u),
              owner, true);
     }
 
     public void AddChild(IControlPeer child)
     {
-        SetParent((HWND)(void*)child.Handle, window);
+        SetParent((HWND)(void*)child.Handle, Window);
     }
 
     public void RemoveChild(IControlPeer child)
@@ -764,12 +764,12 @@ public class GroupPeer : ControlPeer, IGroupPeer
     }
 
     /// The frame is the `BUTTON`'s to draw and the children are this peer's;
-    /// see `PaintOver`.
-    public override long Dispatch(uint message, ulong wParam, long lParam)
+    /// see `PaintOverInherited`.
+    public override long WndProc(uint message, ulong wParam, long lParam)
     {
         if (message == WmPaint)
-            return PaintOver(message, wParam, lParam);
-        return base.Dispatch(message, wParam, lParam);
+            return PaintOverInherited(message, wParam, lParam);
+        return base.WndProc(message, wParam, lParam);
     }
 
     /// **A group box has to erase itself, alone among the subclassed ones.**
@@ -795,14 +795,14 @@ public class GroupPeer : ControlPeer, IGroupPeer
         get
         {
             Rect r;
-            GetClientRect(window, &r);
+            GetClientRect(Window, &r);
             int width = r.Right - r.Left;
             int height = r.Bottom - r.Top;
-            return Area(0, 0, width - 16, height - CaptionHeight - 8);
+            return CreateRectangle(0, 0, width - 16, height - CaptionHeight - 8);
         }
     }
 
-    public override FPoint ClientOrigin => At(8, CaptionHeight);
+    public override FPoint ClientOrigin => CreatePoint(8, CaptionHeight);
 }
 
 // =================================================================== panel
@@ -823,23 +823,23 @@ public class PanelPeer : ControlPeer, IPanelPeer
     /// found from, and a `STATIC` hands them to its parent.
     public PanelPeer(IControlNotify owner, IContainerPeer parent)
     {
-        base(MakePanel(WindowOf(parent)), owner, false);
+        base(CreatePanelWindow(GetContainerWindow(parent)), owner, false);
     }
 
     /// Made before `base(...)`, which needs the window to bind its peer to.
-    static HWND MakePanel(HWND parent)
+    static HWND CreatePanelWindow(HWND parent)
     {
         EnsurePanelClass();
         return CreateWindowExW(0u, PanelClassName.ToUtf16().ToPointer(),
                                "".ToUtf16().ToPointer(),
-                               (ChildStyle() & ~WsTabStop) | WsClipChildren,
+                               (GetChildStyle() & ~WsTabStop) | WsClipChildren,
                                0, 0, 0, 0, parent, null,
                                GetModuleHandleW(null), null);
     }
 
     public void AddChild(IControlPeer child)
     {
-        SetParent((HWND)(void*)child.Handle, window);
+        SetParent((HWND)(void*)child.Handle, Window);
     }
 
     public void RemoveChild(IControlPeer child)
@@ -848,16 +848,16 @@ public class PanelPeer : ControlPeer, IPanelPeer
     }
 
     /// A panel is a container, so anything windowless on it is its to draw.
-    public override long Dispatch(uint message, ulong wParam, long lParam)
+    public override long WndProc(uint message, ulong wParam, long lParam)
     {
         if (message == WmPaint)
-            return PaintOver(message, wParam, lParam);
-        return base.Dispatch(message, wParam, lParam);
+            return PaintOverInherited(message, wParam, lParam);
+        return base.WndProc(message, wParam, lParam);
     }
 
     public void SetBorder(ControlBorder border)
     {
-        long extended = Win32.User32.GetWindowLongPtrW(window, GwlExtendedStyle);
+        long extended = Win32.User32.GetWindowLongPtrW(Window, GwlExtendedStyle);
         extended = extended & ~(long)(WsExClientEdge | WsExStaticEdge);
         if (border == ControlBorder.Single)
         {
@@ -867,10 +867,10 @@ public class PanelPeer : ControlPeer, IPanelPeer
         {
             extended = extended | (long)WsExClientEdge;
         }
-        Win32.User32.SetWindowLongPtrW(window, GwlExtendedStyle, extended);
+        Win32.User32.SetWindowLongPtrW(Window, GwlExtendedStyle, extended);
         // The frame is not part of the client area, so changing it changes the
         // layout; `SWP_FRAMECHANGED` is what makes Windows recompute that.
-        SetWindowPos(window, null, 0, 0, 0, 0,
+        SetWindowPos(Window, null, 0, 0, 0, 0,
                      SwpNoMove | SwpNoSize | SwpNoZOrder | SwpFrameChanged);
     }
 }
@@ -886,8 +886,8 @@ public class ScrollBarPeer : ControlPeer, IScrollBarPeer
 {
     public ScrollBarPeer(IControlNotify owner, IContainerPeer parent, bool vertical)
     {
-        base(MakeChild("SCROLLBAR", WindowOf(parent),
-                       ChildStyle() | (vertical ? SbsVertical : SbsHorizontal), 0u),
+        base(CreateChildWindow("SCROLLBAR", GetContainerWindow(parent),
+                       GetChildStyle() | (vertical ? SbsVertical : SbsHorizontal), 0u),
              owner, true);
     }
 
@@ -901,7 +901,7 @@ public class ScrollBarPeer : ControlPeer, IScrollBarPeer
         info.Page = (uint)pageSize;
         info.Position = 0;
         info.TrackPosition = 0;
-        SetScrollInfo(window, ScrollBarControl, &info, 1);
+        SetScrollInfo(Window, ScrollBarControl, &info, 1);
     }
 
     public void SetValue(int value)
@@ -914,7 +914,7 @@ public class ScrollBarPeer : ControlPeer, IScrollBarPeer
         info.Page = 0u;
         info.Position = value;
         info.TrackPosition = 0;
-        SetScrollInfo(window, ScrollBarControl, &info, 1);
+        SetScrollInfo(Window, ScrollBarControl, &info, 1);
     }
 
     public int GetValue()
@@ -927,7 +927,7 @@ public class ScrollBarPeer : ControlPeer, IScrollBarPeer
         info.Page = 0u;
         info.Position = 0;
         info.TrackPosition = 0;
-        GetScrollInfo(window, ScrollBarControl, &info);
+        GetScrollInfo(Window, ScrollBarControl, &info);
         return info.Position;
     }
 
@@ -935,7 +935,7 @@ public class ScrollBarPeer : ControlPeer, IScrollBarPeer
     ///
     /// The thumb is read with `SIF_TRACKPOS` rather than from the message,
     /// whose sixteen bits cannot carry a position past 65535.
-    public void Scrolled(uint action)
+    public void OnScroll(uint action)
     {
         ScrollInfo info;
         info.Size = (uint)sizeof(ScrollInfo);
@@ -945,7 +945,7 @@ public class ScrollBarPeer : ControlPeer, IScrollBarPeer
         info.Page = 0u;
         info.Position = 0;
         info.TrackPosition = 0;
-        GetScrollInfo(window, ScrollBarControl, &info);
+        GetScrollInfo(Window, ScrollBarControl, &info);
 
         // The last position is the one that shows the last page whole.
         int page = info.Page > 0u ? (int)info.Page : 1;
@@ -1031,25 +1031,25 @@ public class CustomPeer : ControlPeer, ICustomPeer
 
     public CustomPeer(IControlNotify owner, IContainerPeer parent)
     {
-        base(MakeCustom(WindowOf(parent)), owner, false);
-        _caret = Area(0, 0, 0, 0);
+        base(CreateCustomWindow(GetContainerWindow(parent)), owner, false);
+        _caret = CreateRectangle(0, 0, 0, 0);
         _focusable = true;
     }
 
     /// Made before `base(...)`, which needs the window to bind its peer to.
-    static HWND MakeCustom(HWND parent)
+    static HWND CreateCustomWindow(HWND parent)
     {
         EnsureCustomClass();
         return CreateWindowExW(0u, CustomClassName.ToUtf16().ToPointer(),
                                "".ToUtf16().ToPointer(),
-                               ChildStyle() | WsClipChildren,
+                               GetChildStyle() | WsClipChildren,
                                0, 0, 0, 0, parent, null,
                                GetModuleHandleW(null), null);
     }
 
     public void AddChild(IControlPeer child)
     {
-        SetParent((HWND)(void*)child.Handle, window);
+        SetParent((HWND)(void*)child.Handle, Window);
     }
 
     public void RemoveChild(IControlPeer child)
@@ -1059,7 +1059,7 @@ public class CustomPeer : ControlPeer, ICustomPeer
 
     public void SetBorder(ControlBorder border)
     {
-        long extended = Win32.User32.GetWindowLongPtrW(window, GwlExtendedStyle);
+        long extended = Win32.User32.GetWindowLongPtrW(Window, GwlExtendedStyle);
         extended = extended & ~(long)(WsExClientEdge | WsExStaticEdge);
         if (border == ControlBorder.Single)
         {
@@ -1069,17 +1069,17 @@ public class CustomPeer : ControlPeer, ICustomPeer
         {
             extended = extended | (long)WsExClientEdge;
         }
-        Win32.User32.SetWindowLongPtrW(window, GwlExtendedStyle, extended);
+        Win32.User32.SetWindowLongPtrW(Window, GwlExtendedStyle, extended);
         // The frame is outside the client area, so the window has to be told
         // its size again before anything recalculates it.
-        SetWindowPos(window, null, 0, 0, 0, 0,
+        SetWindowPos(Window, null, 0, 0, 0, 0,
                      SwpNoMove | SwpNoSize | SwpNoZOrder | SwpFrameChanged);
     }
 
     public void SetFocusable(bool wanted)
     {
         _focusable = wanted;
-        long style = Win32.User32.GetWindowLongPtrW(window, GwlStyle);
+        long style = Win32.User32.GetWindowLongPtrW(Window, GwlStyle);
         if (wanted)
         {
             style = style | (long)WsTabStop;
@@ -1088,7 +1088,7 @@ public class CustomPeer : ControlPeer, ICustomPeer
         {
             style = style & ~(long)WsTabStop;
         }
-        Win32.User32.SetWindowLongPtrW(window, GwlStyle, style);
+        Win32.User32.SetWindowLongPtrW(Window, GwlStyle, style);
     }
 
     /// The caret is remembered, and applied now only if this window is the one
@@ -1121,7 +1121,7 @@ public class CustomPeer : ControlPeer, ICustomPeer
         // again; moving it does not.
         if (sized)
         {
-            MakeCaret();
+            ShowSystemCaret();
         }
         else
         {
@@ -1129,24 +1129,24 @@ public class CustomPeer : ControlPeer, ICustomPeer
         }
     }
 
-    void MakeCaret()
+    void ShowSystemCaret()
     {
         if (_caret.IsEmpty)
             return;
-        CreateCaret(window, null, _caret.Width, _caret.Height);
+        CreateCaret(Window, null, _caret.Width, _caret.Height);
         SetCaretPos(_caret.X, _caret.Y);
-        Win32.User32.ShowCaret(window);
+        Win32.User32.ShowCaret(Window);
     }
 
-    /// Nothing erases it. The class brush is null and `Dispatch` answers the
+    /// Nothing erases it. The class brush is null and `WndProc` answers the
     /// message itself, so the only thing that ever fills the client area is the
-    /// buffer in `PaintBuffered` -- filled in one go and copied in one go.
+    /// buffer in `PaintDoubleBuffered` -- filled in one go and copied in one go.
     protected override bool ErasesBackground => false;
 
-    public override long Dispatch(uint message, ulong wParam, long lParam)
+    public override long WndProc(uint message, ulong wParam, long lParam)
     {
         // **Our own erase does nothing, and a child's is not ours to refuse.**
-        // `PaintBuffered` fills every pixel of the client area, so a background
+        // `PaintDoubleBuffered` fills every pixel of the client area, so a background
         // painted before it is painted twice -- which is the flicker the buffer
         // exists to remove. A transparent child forwarding *its* background to
         // us is a different message wearing the same number, and the base peer
@@ -1154,12 +1154,12 @@ public class CustomPeer : ControlPeer, ICustomPeer
         if (message == WmEraseBackground)
         {
             HDC given = (HDC)(void*)(nuint)wParam;
-            if (given == null || WindowFromDC(given) == window)
+            if (given == null || WindowFromDC(given) == Window)
                 return 1;
         }
 
         if (message == WmPaint)
-            return PaintBuffered();
+            return PaintDoubleBuffered();
 
         // Every key, and the characters too. Without this the message loop's
         // `IsDialogMessageW` takes Tab, the arrows, Return and Escape before
@@ -1177,18 +1177,18 @@ public class CustomPeer : ControlPeer, ICustomPeer
         if (message == WmLeftButtonDown || message == WmRightButtonDown
             || message == WmMiddleButtonDown)
         {
-            if (_focusable && GetFocus() != window)
-                SetFocus(window);
+            if (_focusable && GetFocus() != Window)
+                SetFocus(Window);
         }
 
         // The caret is the focused window's, so it is made and destroyed with
         // the focus rather than with the control.
         if (message == WmSetFocus)
-            MakeCaret();
+            ShowSystemCaret();
         if (message == WmKillFocus)
             DestroyCaret();
 
-        return base.Dispatch(message, wParam, lParam);
+        return base.WndProc(message, wParam, lParam);
     }
 
     /// Paints into a bitmap, and copies the bitmap to the screen.
@@ -1197,15 +1197,15 @@ public class CustomPeer : ControlPeer, ICustomPeer
     /// update region -- without it the same `WM_PAINT` arrives for ever and the
     /// program spins. It also hides the caret for the duration and puts it back
     /// at `EndPaint`, which is why nothing here has to.
-    long PaintBuffered()
+    long PaintDoubleBuffered()
     {
         PaintStruct paint;
-        HDC screen = BeginPaint(window, &paint);
+        HDC screen = BeginPaint(Window, &paint);
         if (screen == null)
             return 0;
 
         Rect client;
-        GetClientRect(window, &client);
+        GetClientRect(Window, &client);
         int width = client.Right - client.Left;
         int height = client.Bottom - client.Top;
 
@@ -1216,7 +1216,7 @@ public class CustomPeer : ControlPeer, ICustomPeer
             HBITMAP sheet  = CreateCompatibleBitmap(screen, width, height);
             HGDIOBJ was    = SelectObject(buffer, (HGDIOBJ)sheet);
 
-            FillRect(buffer, &client, BackgroundBrush());
+            FillRect(buffer, &client, GetBackgroundBrush());
             var surface = new GraphicsBackend(buffer, FromRect(client));
             ((IControlNotify)owner).OnPlatformPaint(new Graphics(surface));
 
@@ -1227,7 +1227,7 @@ public class CustomPeer : ControlPeer, ICustomPeer
             DeleteDC(buffer);
         }
 
-        EndPaint(window, &paint);
+        EndPaint(Window, &paint);
         return 0;
     }
 }

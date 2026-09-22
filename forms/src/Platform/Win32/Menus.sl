@@ -64,7 +64,7 @@ static ulong[] s_commandIdsHeld = new ulong[512];
 /// already queued for it then finds nothing rather than someone else.
 static int s_commandIdCursor = 0;
 
-int NewCommandId()
+int AllocateCommandId()
 {
     for (int tried = 0; tried < CommandIdCount; tried++)
     {
@@ -121,9 +121,9 @@ public class MenuItemPeer : IMenuItemPeer
     /// empties everything.
     int _at;
 
-    weak IMenuItemNotify? target;
+    weak IMenuItemNotify? _target;
     /// The menu underneath it, kept so that a search for an id can descend.
-    IMenuPeer? _below;
+    IMenuPeer? _submenu;
 
     public MenuItemPeer(HMENU menu, int command, int position,
                         IMenuItemNotify? notify, IMenuPeer? submenu)
@@ -131,8 +131,8 @@ public class MenuItemPeer : IMenuItemPeer
         _owner = menu;
         _id = command;
         _at = position;
-        target = notify;
-        _below = submenu;
+        _target = notify;
+        _submenu = submenu;
     }
 
     ~MenuItemPeer()
@@ -146,12 +146,12 @@ public class MenuItemPeer : IMenuItemPeer
     public nuint Id => (nuint)_id;
 
     /// The menu under this item, if it is a heading rather than a command.
-    public IMenuPeer? Submenu => _below;
+    public IMenuPeer? Submenu => _submenu;
 
     /// Runs the handler. Called by whichever window resolved the id.
-    public void Raise()
+    public void RaiseClick()
     {
-        IMenuItemNotify? held = target;
+        IMenuItemNotify? held = _target;
         if (held == null)
             return;
         ((IMenuItemNotify)held).OnPlatformMenuClicked();
@@ -160,7 +160,7 @@ public class MenuItemPeer : IMenuItemPeer
     public void SetText(String text)
     {
         MenuItemInfo info;
-        Blank(&info);
+        ClearMenuItemInfo(&info);
         info.Mask = MiimString;
         var wide = text.ToUtf16();
         info.TypeData = wide.ToPointer();
@@ -190,7 +190,7 @@ public class MenuItemPeer : IMenuItemPeer
     public bool SetOwnerDrawn(bool drawn)
     {
         MenuItemInfo info;
-        Blank(&info);
+        ClearMenuItemInfo(&info);
         info.Mask = MiimFType;
 
         // Read what the type is now, so that a separator does not quietly
@@ -219,12 +219,12 @@ public class MenuItemPeer : IMenuItemPeer
 
     /// What the item is notified through, for a window that has resolved an id
     /// and needs to ask it to draw.
-    public IMenuItemNotify? Notify => target;
+    public IMenuItemNotify? Notify => _target;
 
     public void SetDefault(bool isDefault)
     {
         MenuItemInfo info;
-        Blank(&info);
+        ClearMenuItemInfo(&info);
         info.Mask = MiimState;
         info.State = isDefault ? MfsDefault : MfsEnabled;
         SetMenuItemInfoW(_owner, (uint)_at, 1, &info);
@@ -234,7 +234,7 @@ public class MenuItemPeer : IMenuItemPeer
 /// A `MENUITEMINFO` with its size filled in and everything else zeroed, because
 /// Windows reads the whole structure and a field left as whatever was on the
 /// stack is a field it will act on.
-void Blank(MenuItemInfo* info)
+void ClearMenuItemInfo(MenuItemInfo* info)
 {
     info->Size = (uint)sizeof(MenuItemInfo);
     info->Mask = 0u;
@@ -259,22 +259,22 @@ public class MenuPeer : IMenuPeer
     List<MenuItemPeer> _items;
     /// Whether this menu is a bar. A bar and a popup are created by different
     /// calls and drawn differently, and cannot be exchanged afterwards.
-    bool _asBar;
+    bool _isMenuBar;
     /// True once a window has taken this menu, because a window destroys the
     /// menu it holds and destroying it twice is a crash.
-    bool _attached;
+    bool _isAttached;
 
     public MenuPeer(bool bar)
     {
-        _asBar = bar;
-        _attached = false;
+        _isMenuBar = bar;
+        _isAttached = false;
         _items = new List<MenuItemPeer>();
         _menu = bar ? CreateMenu() : CreatePopupMenu();
     }
 
     ~MenuPeer()
     {
-        if (_menu != null && !_attached)
+        if (_menu != null && !_isAttached)
         {
             DestroyMenu(_menu);
             _menu = null;
@@ -292,14 +292,14 @@ public class MenuPeer : IMenuPeer
     /// Not on `IMenuPeer`. It is this backend talking to itself, reached by
     /// narrowing the interface back to the class behind it -- which is what the
     /// seam should be spared.
-    public void OwnedByParent() => _attached = true;
+    public void MarkOwnedByParent() => _isAttached = true;
 
     /// Says that whatever held it has let go, so this destroys it again.
-    public void ReleasedByParent() => _attached = false;
+    public void MarkReleasedByParent() => _isAttached = false;
 
     public IMenuItemPeer AddItem(IMenuItemNotify owner, String text, IMenuPeer? submenu)
     {
-        int id = NewCommandId();
+        int id = AllocateCommandId();
 
         // Read before the append, so it is this item's index rather than the
         // count afterwards. Separators are appended too and take a position,
@@ -316,7 +316,7 @@ public class MenuPeer : IMenuPeer
             {
                 // A submenu is freed with the menu that holds it, so it must
                 // stop freeing itself.
-                under.OwnedByParent();
+                under.MarkOwnedByParent();
                 AppendMenuW(_menu, MfString | MfPopup, (nuint)(void*)under.Native,
                             text.ToUtf16().ToPointer());
             }
@@ -348,7 +348,7 @@ public class MenuPeer : IMenuPeer
             {
                 IMenuPeer held = (IMenuPeer)under;
                 if (held is MenuPeer below)
-                    below.ReleasedByParent();
+                    below.MarkReleasedByParent();
             }
         }
         _items.Clear();
@@ -359,7 +359,7 @@ public class MenuPeer : IMenuPeer
     /// Depth first, because a menu is a tree and the id could be at any level.
     /// Linear, because a menu with enough items for that to matter is a menu
     /// nobody can use.
-    public MenuItemPeer? Find(int id)
+    public MenuItemPeer? FindCommand(int id)
     {
         foreach (var item in _items)
         {
@@ -376,7 +376,7 @@ public class MenuPeer : IMenuPeer
                 IMenuPeer held = (IMenuPeer)under;
                 if (held is MenuPeer below)
                 {
-                    var deeper = below.Find(id);
+                    var deeper = below.FindCommand(id);
                     if (deeper != null)
                         return deeper;
                 }
@@ -387,7 +387,7 @@ public class MenuPeer : IMenuPeer
 
     /// The item with this command id, heading or not.
     ///
-    /// **The other question, and `Find` above can only answer one of them.**
+    /// **The other question, and `FindCommand` above can only answer one of them.**
     /// That one is asked by `WM_COMMAND` routing, where a heading must *not*
     /// match: an item with a submenu raises no command, and letting its id
     /// match would run a handler nothing could have raised.
@@ -398,7 +398,7 @@ public class MenuPeer : IMenuPeer
     /// heading came out no pixels wide, and a menu bar made only of headings
     /// disappeared. One method was answering two questions and could only be
     /// right about one.
-    public MenuItemPeer? FindAny(int id)
+    public MenuItemPeer? FindItem(int id)
     {
         foreach (var item in _items)
         {
@@ -411,7 +411,7 @@ public class MenuPeer : IMenuPeer
                 IMenuPeer held = (IMenuPeer)under;
                 if (held is MenuPeer below)
                 {
-                    var deeper = below.FindAny(id);
+                    var deeper = below.FindItem(id);
                     if (deeper != null)
                         return deeper;
                 }
@@ -442,7 +442,7 @@ public class MenuPeer : IMenuPeer
         if (owner is WindowPeer named)
             host = named;
         if (host != null)
-            ((WindowPeer)host).PoppedUp(this);
+            ((WindowPeer)host).SetPoppedUpMenu(this);
 
         int chosen = TrackPopupMenu(_menu, TpmLeftAlign | TpmTopAlign
                                         | TpmRightButton | TpmReturnCmd,
@@ -452,13 +452,13 @@ public class MenuPeer : IMenuPeer
         PostMessageW(window, WmNull, 0u, 0);
 
         if (host != null)
-            ((WindowPeer)host).PoppedUp(null);
+            ((WindowPeer)host).SetPoppedUpMenu(null);
 
         if (chosen == 0)
             return;
-        var item = Find(chosen);
+        var item = FindCommand(chosen);
         if (item != null)
-            ((MenuItemPeer)item).Raise();
+            ((MenuItemPeer)item).RaiseClick();
     }
 }
 
@@ -468,16 +468,16 @@ public class MenuPeer : IMenuPeer
 public class BitmapBackend : IBitmapBackend
 {
     HBITMAP _bitmap;
-    int _wide;
-    int _high;
-    bool _alpha;
+    int _width;
+    int _height;
+    bool _hasAlpha;
 
     public BitmapBackend(HBITMAP handle, int width, int height)
     {
         _bitmap = handle;
-        _wide = width;
-        _high = height;
-        _alpha = false;
+        _width = width;
+        _height = height;
+        _hasAlpha = false;
     }
 
     /// The same, for a bitmap whose alpha channel means something -- which is
@@ -485,9 +485,9 @@ public class BitmapBackend : IBitmapBackend
     public BitmapBackend(HBITMAP handle, int width, int height, bool alpha)
     {
         _bitmap = handle;
-        _wide = width;
-        _high = height;
-        _alpha = alpha;
+        _width = width;
+        _height = height;
+        _hasAlpha = alpha;
     }
 
     ~BitmapBackend()
@@ -499,10 +499,10 @@ public class BitmapBackend : IBitmapBackend
         }
     }
 
-    public int Width => _wide;
-    public int Height => _high;
+    public int Width => _width;
+    public int Height => _height;
     public nuint Handle => (nuint)(void*)_bitmap;
-    public bool HasAlpha => _alpha;
+    public bool HasAlpha => _hasAlpha;
     public HBITMAP Native => _bitmap;
 }
 
@@ -629,13 +629,13 @@ public Result<IBitmapBackend, String> LoadResourceBitmap(int id)
 public class ImageListBackend : IImageListBackend
 {
     HIMAGELIST _list;
-    FSize _each;
-    int _held;
+    FSize _imageSize;
+    int _addedCount;
 
     public ImageListBackend(FSize size)
     {
-        _each = size;
-        _held = 0;
+        _imageSize = size;
+        _addedCount = 0;
         _list = ImageList_Create(size.Width, size.Height,
                                 IlcColor32 | IlcMask, 4, 4);
     }
@@ -670,7 +670,7 @@ public class ImageListBackend : IImageListBackend
                    ? ImageList_Add(_list, native.Native, null)
                    : ImageList_AddMasked(_list, native.Native, 0x00FF00FFu);
             if (at >= 0)
-                _held = _held + 1;
+                _addedCount = _addedCount + 1;
             return at;
         }
         return -1;
@@ -678,10 +678,10 @@ public class ImageListBackend : IImageListBackend
 
     /// How many have been added, for a caller that wants the number without
     /// asking the platform.
-    public int Added() => _held;
+    public int AddedCount => _addedCount;
 
     public int Count => ImageList_GetImageCount(_list);
-    public FSize ImageSize => _each;
+    public FSize ImageSize => _imageSize;
     public nuint Handle => (nuint)(void*)_list;
     public HIMAGELIST Native => _list;
 }

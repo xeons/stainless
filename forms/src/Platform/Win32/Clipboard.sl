@@ -84,7 +84,7 @@ uint RegisterFormatNamed(String name)
 }
 
 /// `"HTML Format"`, which is what every browser and word processor reads.
-uint HtmlFormat()
+uint GetHtmlClipboardFormat()
 {
     if (s_htmlFormat == 0u)
         s_htmlFormat = RegisterFormatNamed("HTML Format");
@@ -92,14 +92,14 @@ uint HtmlFormat()
 }
 
 /// `"PNG"`, the unofficial and universal way to carry transparency.
-uint PngFormat()
+uint GetPngClipboardFormat()
 {
     if (s_pngFormat == 0u)
         s_pngFormat = RegisterFormatNamed("PNG");
     return s_pngFormat;
 }
 
-uint DropEffectFormat()
+uint GetDropEffectClipboardFormat()
 {
     if (s_dropEffectFormat == 0u)
         s_dropEffectFormat = RegisterFormatNamed("Preferred DropEffect");
@@ -108,7 +108,7 @@ uint DropEffectFormat()
 
 /// What a format is called: its registered name, or the constant's name for a
 /// predefined one, which has no name of its own to ask for.
-String NameOfClipboardFormat(uint format)
+String GetClipboardFormatName(uint format)
 {
     switch (format)
     {
@@ -163,7 +163,7 @@ bool OpenClipboardPatiently()
 }
 
 /// Whether a format is on offer. Needs no lock.
-bool ClipboardOffers(uint format)
+bool ClipboardOffersFormat(uint format)
 {
     return format != 0u && IsClipboardFormatAvailable(format) != 0;
 }
@@ -175,7 +175,7 @@ bool ClipboardOffers(uint format)
 /// Moveable because the clipboard requires it. At least one byte, because a
 /// zero-byte `GlobalAlloc` answers a handle to discarded memory that
 /// `GlobalLock` refuses.
-HGLOBAL BlockHolding(byte* data, nuint length)
+HGLOBAL AllocateGlobalBlock(byte* data, nuint length)
 {
     HGLOBAL block = GlobalAlloc(GlobalMoveable | GlobalZeroInit, length == 0u ? 1u : length);
     if (block == null)
@@ -193,15 +193,15 @@ HGLOBAL BlockHolding(byte* data, nuint length)
     return block;
 }
 
-HGLOBAL BlockHoldingBytes(byte[] data)
+HGLOBAL AllocateGlobalBlockFromBytes(byte[] data)
 {
     if (data.Length == 0u)
-        return BlockHolding(null, 0u);
-    return BlockHolding(&data[0u], data.Length);
+        return AllocateGlobalBlock(null, 0u);
+    return AllocateGlobalBlock(&data[0u], data.Length);
 }
 
 /// Text as `CF_UNICODETEXT` wants it: UTF-16, with a terminator.
-HGLOBAL BlockHoldingUtf16(String text)
+HGLOBAL AllocateGlobalBlockFromUtf16(String text)
 {
     var wide = text.ToUtf16();
     nuint units = wide.UnitCount();
@@ -228,7 +228,7 @@ HGLOBAL BlockHoldingUtf16(String text)
 /// The handle is the clipboard's: locked to read, unlocked after, and never
 /// freed. Freeing it is what empties somebody else's clipboard from inside a
 /// paste.
-byte[] BytesOfOpenFormat(uint format)
+byte[] ReadOpenClipboardFormat(uint format)
 {
     HANDLE block = GetClipboardData(format);
     if (block == null)
@@ -249,27 +249,27 @@ byte[] BytesOfOpenFormat(uint format)
 /// A copy of one format's bytes, or an empty array.
 byte[] ReadClipboardFormat(uint format)
 {
-    if (!ClipboardOffers(format))
+    if (!ClipboardOffersFormat(format))
         return new byte[0u];
     if (!OpenClipboardPatiently())
         return new byte[0u];
 
-    var bytes = BytesOfOpenFormat(format);
+    var bytes = ReadOpenClipboardFormat(format);
     CloseClipboard();
     return bytes;
 }
 
 // ============================================================ little-endian
 
-uint UIntAt(byte[] data, nuint at)
+uint ReadUIntAt(byte[] data, nuint at)
 {
     return (uint)data[at] | ((uint)data[at + 1u] << 8)
          | ((uint)data[at + 2u] << 16) | ((uint)data[at + 3u] << 24);
 }
 
-uint UShortAt(byte[] data, nuint at) => (uint)data[at] | ((uint)data[at + 1u] << 8);
+uint ReadUShortAt(byte[] data, nuint at) => (uint)data[at] | ((uint)data[at + 1u] << 8);
 
-void PutUInt(byte[] data, nuint at, uint value)
+void WriteUIntAt(byte[] data, nuint at, uint value)
 {
     data[at] = (byte)(value & 0xFFu);
     data[at + 1u] = (byte)((value >> 8) & 0xFFu);
@@ -277,7 +277,7 @@ void PutUInt(byte[] data, nuint at, uint value)
     data[at + 3u] = (byte)((value >> 24) & 0xFFu);
 }
 
-void PutUShort(byte[] data, nuint at, uint value)
+void WriteUShortAt(byte[] data, nuint at, uint value)
 {
     data[at] = (byte)(value & 0xFFu);
     data[at + 1u] = (byte)((value >> 8) & 0xFFu);
@@ -287,7 +287,7 @@ void PutUShort(byte[] data, nuint at, uint value)
 
 String ReadClipboardText()
 {
-    if (!ClipboardOffers(ClipboardUnicodeText))
+    if (!ClipboardOffersFormat(ClipboardUnicodeText))
         return "";
     if (!OpenClipboardPatiently())
         return "";
@@ -332,26 +332,26 @@ String ReadClipboardText()
 static readonly String HtmlPrefix = "<html>\r\n<body>\r\n<!--StartFragment-->";
 static readonly String HtmlSuffix = "<!--EndFragment-->\r\n</body>\r\n</html>";
 
-String HtmlOffset(nuint value) => Text.FromInteger(value).PadLeft(10u, "0");
+String FormatHtmlOffset(nuint value) => Text.FromInteger(value).PadLeft(10u, "0");
 
-String HtmlHeader(nuint startHtml, nuint endHtml, nuint startFragment, nuint endFragment)
+String FormatHtmlHeader(nuint startHtml, nuint endHtml, nuint startFragment, nuint endFragment)
 {
     return "Version:0.9\r\n"
-         + "StartHTML:" + HtmlOffset(startHtml) + "\r\n"
-         + "EndHTML:" + HtmlOffset(endHtml) + "\r\n"
-         + "StartFragment:" + HtmlOffset(startFragment) + "\r\n"
-         + "EndFragment:" + HtmlOffset(endFragment) + "\r\n";
+         + "StartHTML:" + FormatHtmlOffset(startHtml) + "\r\n"
+         + "EndHTML:" + FormatHtmlOffset(endHtml) + "\r\n"
+         + "StartFragment:" + FormatHtmlOffset(startFragment) + "\r\n"
+         + "EndFragment:" + FormatHtmlOffset(endFragment) + "\r\n";
 }
 
 /// A fragment as `CF_HTML`, NUL-terminated.
 byte[] EncodeHtmlFormat(String fragment)
 {
-    nuint header = HtmlHeader(0u, 0u, 0u, 0u).ByteLength();
+    nuint header = FormatHtmlHeader(0u, 0u, 0u, 0u).ByteLength();
     nuint startFragment = header + HtmlPrefix.ByteLength();
     nuint endFragment = startFragment + fragment.ByteLength();
     nuint endHtml = endFragment + HtmlSuffix.ByteLength();
 
-    var whole = HtmlHeader(header, endHtml, startFragment, endFragment)
+    var whole = FormatHtmlHeader(header, endHtml, startFragment, endFragment)
               + HtmlPrefix + fragment + HtmlSuffix;
 
     nuint size = whole.ByteLength();
@@ -363,7 +363,7 @@ byte[] EncodeHtmlFormat(String fragment)
 }
 
 /// A header field's number, or -1 when it is missing or malformed.
-long HtmlHeaderNumber(String whole, String key)
+long ParseHtmlHeaderNumber(String whole, String key)
 {
     long at = whole.IndexOf(key);
     if (at < 0)
@@ -394,13 +394,13 @@ String DecodeHtmlFormat(byte[] data)
 
     var whole = Text.FromBytes(&data[0u], length);
 
-    long start = HtmlHeaderNumber(whole, "StartFragment:");
-    long end = HtmlHeaderNumber(whole, "EndFragment:");
+    long start = ParseHtmlHeaderNumber(whole, "StartFragment:");
+    long end = ParseHtmlHeaderNumber(whole, "EndFragment:");
     if (start >= 0 && end >= start && (nuint)end <= length)
         return Text.FromBytes(&data[(nuint)start], (nuint)(end - start));
 
-    start = HtmlHeaderNumber(whole, "StartHTML:");
-    end = HtmlHeaderNumber(whole, "EndHTML:");
+    start = ParseHtmlHeaderNumber(whole, "StartHTML:");
+    end = ParseHtmlHeaderNumber(whole, "EndHTML:");
     if (start >= 0 && end >= start && (nuint)end <= length)
         return Text.FromBytes(&data[(nuint)start], (nuint)(end - start));
 
@@ -422,22 +422,22 @@ byte[] EncodeDib(ClipboardImage picture, bool withAlphaHeader)
     nuint bits = row * (nuint)picture.Height;
     var dib = new byte[header + bits];
 
-    PutUInt(dib, 0u, (uint)header);
-    PutUInt(dib, 4u, (uint)picture.Width);
-    PutUInt(dib, 8u, (uint)picture.Height);
-    PutUShort(dib, 12u, 1u);
-    PutUShort(dib, 14u, 32u);
-    PutUInt(dib, 16u, withAlphaHeader ? DibBitFields : DibRgb);
-    PutUInt(dib, 20u, (uint)bits);
+    WriteUIntAt(dib, 0u, (uint)header);
+    WriteUIntAt(dib, 4u, (uint)picture.Width);
+    WriteUIntAt(dib, 8u, (uint)picture.Height);
+    WriteUShortAt(dib, 12u, 1u);
+    WriteUShortAt(dib, 14u, 32u);
+    WriteUIntAt(dib, 16u, withAlphaHeader ? DibBitFields : DibRgb);
+    WriteUIntAt(dib, 20u, (uint)bits);
 
     if (withAlphaHeader)
     {
-        PutUInt(dib, 40u, 0x00FF0000u);
-        PutUInt(dib, 44u, 0x0000FF00u);
-        PutUInt(dib, 48u, 0x000000FFu);
-        PutUInt(dib, 52u, 0xFF000000u);
-        PutUInt(dib, 56u, ColourSpaceSrgb);
-        PutUInt(dib, 108u, IntentImages);
+        WriteUIntAt(dib, 40u, 0x00FF0000u);
+        WriteUIntAt(dib, 44u, 0x0000FF00u);
+        WriteUIntAt(dib, 48u, 0x000000FFu);
+        WriteUIntAt(dib, 52u, 0xFF000000u);
+        WriteUIntAt(dib, 56u, ColourSpaceSrgb);
+        WriteUIntAt(dib, 108u, IntentImages);
     }
 
     var pixels = picture.Pixels;
@@ -452,7 +452,7 @@ byte[] EncodeDib(ClipboardImage picture, bool withAlphaHeader)
 }
 
 /// One channel of a pixel read through a mask, scaled to eight bits.
-uint MaskedChannel(uint value, uint mask)
+uint ExtractMaskedChannel(uint value, uint mask)
 {
     if (mask == 0u)
         return 0u;
@@ -485,15 +485,15 @@ public ClipboardImage? DecodeDib(byte[] dib)
     if (dib.Length < 40u)
         return null;
 
-    nuint header = (nuint)UIntAt(dib, 0u);
+    nuint header = (nuint)ReadUIntAt(dib, 0u);
     if (header < 40u || header > dib.Length)
         return null;
 
-    int width = (int)UIntAt(dib, 4u);
-    int height = (int)UIntAt(dib, 8u);
-    uint depth = UShortAt(dib, 14u);
-    uint compression = UIntAt(dib, 16u);
-    uint coloursUsed = UIntAt(dib, 32u);
+    int width = (int)ReadUIntAt(dib, 4u);
+    int height = (int)ReadUIntAt(dib, 8u);
+    uint depth = ReadUShortAt(dib, 14u);
+    uint compression = ReadUIntAt(dib, 16u);
+    uint coloursUsed = ReadUIntAt(dib, 32u);
 
     bool topDown = height < 0;
     if (topDown)
@@ -517,11 +517,11 @@ public ClipboardImage? DecodeDib(byte[] dib)
             maskBytes = compression == DibAlphaBitFields ? 16u : 12u;
         if (at + 12u > dib.Length)
             return null;
-        red = UIntAt(dib, at);
-        green = UIntAt(dib, at + 4u);
-        blue = UIntAt(dib, at + 8u);
+        red = ReadUIntAt(dib, at);
+        green = ReadUIntAt(dib, at + 4u);
+        blue = ReadUIntAt(dib, at + 8u);
         if ((header >= 56u || compression == DibAlphaBitFields) && at + 16u <= dib.Length)
-            alpha = UIntAt(dib, at + 12u);
+            alpha = ReadUIntAt(dib, at + 12u);
     }
     else if (compression != DibRgb)
     {
@@ -559,8 +559,8 @@ public ClipboardImage? DecodeDib(byte[] dib)
     // header were the short one. Taken as such only when they repeat and there
     // is room for them, since a pixel could happen to look like a mask.
     if (masked && header > 40u && header + 12u + bits <= dib.Length
-        && UIntAt(dib, header) == red && UIntAt(dib, header + 4u) == green
-        && UIntAt(dib, header + 8u) == blue)
+        && ReadUIntAt(dib, header) == red && ReadUIntAt(dib, header + 4u) == green
+        && ReadUIntAt(dib, header + 8u) == blue)
     {
         maskBytes = 12u;
     }
@@ -617,20 +617,20 @@ public ClipboardImage? DecodeDib(byte[] dib)
             }
             else if (depth == 16u)
             {
-                uint value = UShortAt(dib, source + x * 2u);
-                r = MaskedChannel(value, red);
-                g = MaskedChannel(value, green);
-                b = MaskedChannel(value, blue);
+                uint value = ReadUShortAt(dib, source + x * 2u);
+                r = ExtractMaskedChannel(value, red);
+                g = ExtractMaskedChannel(value, green);
+                b = ExtractMaskedChannel(value, blue);
             }
             else if (masked)
             {
-                uint value = UIntAt(dib, source + x * 4u);
-                r = MaskedChannel(value, red);
-                g = MaskedChannel(value, green);
-                b = MaskedChannel(value, blue);
+                uint value = ReadUIntAt(dib, source + x * 4u);
+                r = ExtractMaskedChannel(value, red);
+                g = ExtractMaskedChannel(value, green);
+                b = ExtractMaskedChannel(value, blue);
                 if (alpha != 0u)
                 {
-                    a = MaskedChannel(value, alpha);
+                    a = ExtractMaskedChannel(value, alpha);
                     anyAlpha = anyAlpha || a != 0u;
                 }
             }
@@ -671,9 +671,9 @@ public ClipboardImage? DecodeDib(byte[] dib)
 /// and from `CF_BITMAP`, so a screenshot arrives as either.
 ClipboardImage? ReadClipboardImage()
 {
-    if (ClipboardOffers(PngFormat()) && Standard.Drawing.Imaging.Available)
+    if (ClipboardOffersFormat(GetPngClipboardFormat()) && Standard.Drawing.Imaging.Available)
     {
-        var decoded = Standard.Drawing.Image.FromBytes(ReadClipboardFormat(PngFormat()));
+        var decoded = Standard.Drawing.Image.FromBytes(ReadClipboardFormat(GetPngClipboardFormat()));
         if (decoded.Ok)
         {
             var pixels = decoded.Value.ToBgra();
@@ -682,14 +682,14 @@ ClipboardImage? ReadClipboardImage()
         }
     }
 
-    if (ClipboardOffers(ClipboardDibV5))
+    if (ClipboardOffersFormat(ClipboardDibV5))
     {
         var found = DecodeDib(ReadClipboardFormat(ClipboardDibV5));
         if (found != null)
             return found;
     }
 
-    if (ClipboardOffers(ClipboardDib))
+    if (ClipboardOffersFormat(ClipboardDib))
         return DecodeDib(ReadClipboardFormat(ClipboardDib));
     return null;
 }
@@ -728,9 +728,9 @@ byte[] EncodeDropFiles(String[] paths)
     }
 
     var bytes = new byte[header + units * 2u];
-    PutUInt(bytes, 0u, (uint)header);
+    WriteUIntAt(bytes, 0u, (uint)header);
     // `fWide`: the names are UTF-16. The point and `fNC` stay zero.
-    PutUInt(bytes, 16u, 1u);
+    WriteUIntAt(bytes, 16u, 1u);
 
     nuint at = header;
     for (nuint i = 0u; i < wide.Count; i++)
@@ -739,7 +739,7 @@ byte[] EncodeDropFiles(String[] paths)
         char16* from = path.ToPointer();
         for (nuint unit = 0u; unit < path.UnitCount(); unit++)
         {
-            PutUShort(bytes, at, (uint)from[unit]);
+            WriteUShortAt(bytes, at, (uint)from[unit]);
             at = at + 2u;
         }
         at = at + 2u;
@@ -753,7 +753,7 @@ byte[] EncodeDropFiles(String[] paths)
 /// `DROPFILES`. Never `DragFinish`: the block is the clipboard's.
 String[] ReadClipboardFiles()
 {
-    if (!ClipboardOffers(ClipboardHDrop))
+    if (!ClipboardOffersFormat(ClipboardHDrop))
         return new String[0u];
     if (!OpenClipboardPatiently())
         return new String[0u];
@@ -792,14 +792,14 @@ void WriteClipboard(ClipboardContent content)
     if (text != null)
     {
         formats.Add(ClipboardUnicodeText);
-        blocks.Add((nuint)(void*)BlockHoldingUtf16((String)text));
+        blocks.Add((nuint)(void*)AllocateGlobalBlockFromUtf16((String)text));
     }
 
     var html = content.Html;
     if (html != null)
     {
-        formats.Add(HtmlFormat());
-        blocks.Add((nuint)(void*)BlockHoldingBytes(EncodeHtmlFormat((String)html)));
+        formats.Add(GetHtmlClipboardFormat());
+        blocks.Add((nuint)(void*)AllocateGlobalBlockFromBytes(EncodeHtmlFormat((String)html)));
     }
 
     var image = content.Image;
@@ -807,36 +807,36 @@ void WriteClipboard(ClipboardContent content)
     {
         var picture = (ClipboardImage)image;
         formats.Add(ClipboardDib);
-        blocks.Add((nuint)(void*)BlockHoldingBytes(EncodeDib(picture, false)));
+        blocks.Add((nuint)(void*)AllocateGlobalBlockFromBytes(EncodeDib(picture, false)));
         formats.Add(ClipboardDibV5);
-        blocks.Add((nuint)(void*)BlockHoldingBytes(EncodeDib(picture, true)));
+        blocks.Add((nuint)(void*)AllocateGlobalBlockFromBytes(EncodeDib(picture, true)));
 
         var png = EncodePng(picture);
         if (png.Length != 0u)
         {
-            formats.Add(PngFormat());
-            blocks.Add((nuint)(void*)BlockHoldingBytes(png));
+            formats.Add(GetPngClipboardFormat());
+            blocks.Add((nuint)(void*)AllocateGlobalBlockFromBytes(png));
         }
     }
 
     if (content.Files.Length != 0u)
     {
         formats.Add(ClipboardHDrop);
-        blocks.Add((nuint)(void*)BlockHoldingBytes(EncodeDropFiles(content.Files)));
+        blocks.Add((nuint)(void*)AllocateGlobalBlockFromBytes(EncodeDropFiles(content.Files)));
 
         // Explorer pastes as a copy unless told otherwise, so this changes
         // nothing there; it is for the file managers that ask.
         var effect = new byte[4u];
-        PutUInt(effect, 0u, DropEffectCopy);
-        formats.Add(DropEffectFormat());
-        blocks.Add((nuint)(void*)BlockHoldingBytes(effect));
+        WriteUIntAt(effect, 0u, DropEffectCopy);
+        formats.Add(GetDropEffectClipboardFormat());
+        blocks.Add((nuint)(void*)AllocateGlobalBlockFromBytes(effect));
     }
 
     for (nuint i = 0u; i < content.Custom.Count; i++)
     {
         var entry = content.Custom[i];
         formats.Add(RegisterFormatNamed(entry.Name));
-        blocks.Add((nuint)(void*)BlockHoldingBytes(entry.Data));
+        blocks.Add((nuint)(void*)AllocateGlobalBlockFromBytes(entry.Data));
     }
 
     if (!OpenClipboardPatiently())
@@ -871,7 +871,7 @@ String[] ReadClipboardFormatNames()
     uint format = EnumClipboardFormats(0u);
     while (format != 0u)
     {
-        names.Add(NameOfClipboardFormat(format));
+        names.Add(GetClipboardFormatName(format));
         format = EnumClipboardFormats(format);
     }
 
@@ -894,16 +894,16 @@ public class ClipboardWatchPeer : IClipboardWatchPeer
 {
     HWND _window;
     weak IClipboardNotify? _target;
-    bool _listening;
+    bool _isListening;
 
     public ClipboardWatchPeer(IClipboardNotify owner)
     {
         _target = owner;
-        _listening = false;
+        _isListening = false;
         EnsureFormClass();
         _window = CreateWindowExW(0u, FormClassName.ToUtf16().ToPointer(),
                                   "".ToUtf16().ToPointer(), 0u, 0, 0, 0, 0,
-                                  MessageOnlyParent(), null,
+                                  GetMessageOnlyParent(), null,
                                   GetModuleHandleW(null), null);
         SetPropW(_window, ClipboardWatchProperty.ToUtf16().ToPointer(), (void*)this);
     }
@@ -921,21 +921,21 @@ public class ClipboardWatchPeer : IClipboardWatchPeer
 
     public void Start()
     {
-        if (_listening || _window == null)
+        if (_isListening || _window == null)
             return;
-        _listening = AddClipboardFormatListener(_window) != 0;
+        _isListening = AddClipboardFormatListener(_window) != 0;
     }
 
     public void Stop()
     {
-        if (!_listening)
+        if (!_isListening)
             return;
         RemoveClipboardFormatListener(_window);
-        _listening = false;
+        _isListening = false;
     }
 
     /// Called by the window procedure when `WM_CLIPBOARDUPDATE` arrives.
-    public void Fire()
+    public void RaiseClipboardChanged()
     {
         IClipboardNotify? held = _target;
         if (held == null)
@@ -945,7 +945,7 @@ public class ClipboardWatchPeer : IClipboardWatchPeer
 }
 
 /// The watch behind a window, or null for a window that is not one.
-ClipboardWatchPeer? ClipboardWatchOf(HWND window)
+ClipboardWatchPeer? FindClipboardWatch(HWND window)
 {
     if (window == null)
         return null;

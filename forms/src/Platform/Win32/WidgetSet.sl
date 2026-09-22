@@ -44,11 +44,11 @@ import Win32.Resources;
 /// once, on the first form, because `RegisterClassExW` fails the second time
 /// and the failure is indistinguishable from a real one.
 static readonly String FormClassName = "StainlessFormsWindow";
-static bool formClassRegistered = false;
+static bool s_formClassRegistered = false;
 
 void EnsureFormClass()
 {
-    if (formClassRegistered)
+    if (s_formClassRegistered)
         return;
 
     var name = FormClassName.ToUtf16();
@@ -72,12 +72,12 @@ void EnsureFormClass()
     windowClass.SmallIcon = null;
 
     RegisterClassExW(&windowClass);
-    formClassRegistered = true;
+    s_formClassRegistered = true;
 }
 
 // ------------------------------------------------------------ the wake window
 
-/// The window `Wake` posts to, so that the loop turns and the queue is drained.
+/// The window `WakeEventLoop` posts to, so that the loop turns and the queue is drained.
 ///
 /// **A window rather than `PostThreadMessageW`**, which is the obvious answer
 /// and the wrong one. A thread message has no window to be routed to, so any
@@ -92,7 +92,7 @@ void EnsureFormClass()
 static readonly String WakeClassName = "StainlessFormsWake";
 
 static HWND s_wake = null;
-static bool wakeClassRegistered = false;
+static bool s_wakeClassRegistered = false;
 
 /// Drains the queue, and answers anything else the way a window with no
 /// opinions should.
@@ -111,7 +111,7 @@ void EnsureWakeWindow()
     if (s_wake != null)
         return;
 
-    if (!wakeClassRegistered)
+    if (!s_wakeClassRegistered)
     {
         var name = WakeClassName.ToUtf16();
         WindowClass windowClass;
@@ -129,12 +129,12 @@ void EnsureWakeWindow()
         windowClass.SmallIcon = null;
 
         RegisterClassExW(&windowClass);
-        wakeClassRegistered = true;
+        s_wakeClassRegistered = true;
     }
 
     s_wake = CreateWindowExW(0u, WakeClassName.ToUtf16().ToPointer(), null,
                              0u, 0, 0, 0, 0,
-                             MessageOnlyParent(), null, GetModuleHandleW(null), null);
+                             GetMessageOnlyParent(), null, GetModuleHandleW(null), null);
 }
 
 /// The window class a `CustomControl` is an instance of, registered on the
@@ -147,11 +147,11 @@ void EnsureWakeWindow()
 /// a form, the back colour it was given; for this, nothing at all, because it
 /// draws into a buffer and copies the buffer over every pixel it owns.
 static readonly String CustomClassName = "StainlessFormsCustom";
-static bool customClassRegistered = false;
+static bool s_customClassRegistered = false;
 
 void EnsureCustomClass()
 {
-    if (customClassRegistered)
+    if (s_customClassRegistered)
         return;
 
     var name = CustomClassName.ToUtf16();
@@ -175,7 +175,7 @@ void EnsureCustomClass()
     windowClass.SmallIcon = null;
 
     RegisterClassExW(&windowClass);
-    customClassRegistered = true;
+    s_customClassRegistered = true;
 }
 
 /// The window class a `Panel` is an instance of.
@@ -199,11 +199,11 @@ void EnsureCustomClass()
 /// cursor can win; null background, so `WM_ERASEBKGND` reaches it and the
 /// panel's own back colour decides.
 static readonly String PanelClassName = "StainlessFormsPanel";
-static bool panelClassRegistered = false;
+static bool s_panelClassRegistered = false;
 
 void EnsurePanelClass()
 {
-    if (panelClassRegistered)
+    if (s_panelClassRegistered)
         return;
 
     var name = PanelClassName.ToUtf16();
@@ -222,14 +222,14 @@ void EnsurePanelClass()
     windowClass.SmallIcon = null;
 
     RegisterClassExW(&windowClass);
-    panelClassRegistered = true;
+    s_panelClassRegistered = true;
 }
 
 /// `SPI_GETWORKAREA`: the screen minus the task bar.
 const uint SpiGetWorkArea = 0x0030u;
 
 /// The style bits for each way a window can be framed.
-uint StyleForBorder(WindowBorder border)
+uint GetStyleForBorder(WindowBorder border)
 {
     if (border == WindowBorder.None)
         return WsPopup;
@@ -244,7 +244,7 @@ uint StyleForBorder(WindowBorder border)
     return WsOverlappedWindow;
 }
 
-uint ExtendedStyleForBorder(WindowBorder border)
+uint GetExtendedStyleForBorder(WindowBorder border)
 {
     if (border == WindowBorder.Tool)
         return WsExToolWindow;
@@ -262,7 +262,7 @@ uint ExtendedStyleForBorder(WindowBorder border)
 /// radio group and no Escape to cancel -- the three things that make a dialog
 /// feel like a dialog. The widget set keeps a method of the old name that
 /// forwards here, since that is where the reasoning is documented.
-bool DialogKey(Msg* message)
+bool HandleDialogKey(Msg* message)
 {
     if (message->Message < WmKeyFirst || message->Message > WmKeyLast)
         return false;
@@ -272,24 +272,24 @@ bool DialogKey(Msg* message)
     // Only windows of this library's own class, so a message bound for a
     // dialog Windows is running -- a message box, a file chooser -- is left
     // entirely alone.
-    if (PeerOf(top) == null)
+    if (FindControlPeer(top) == null)
         return false;
     return IsDialogMessageW(top, message) != 0;
 }
 
 /// `EnumWindows`' callback for `WindowPeer.ShowModal`. `parameter` is the
 /// dialog's peer, borrowed for the length of the enumeration.
-int NoteWindowForModal(HWND window, nint parameter)
+int CollectWindowForModal(HWND window, nint parameter)
 {
     var dialog = (WindowPeer)(void*)(nuint)parameter;
-    dialog.Consider(window);
+    dialog.ConsiderDisabling(window);
     return 1;
 }
 
 /// Whether the keyboard is in a combo box whose list is showing: its edit, or
 /// the combo itself. `CB_GETDROPPEDSTATE` is below `WM_USER`, so no window but
 /// a combo box answers it with anything but zero.
-bool ComboIsDropped(HWND focused)
+bool IsComboDroppedDown(HWND focused)
 {
     if (SendMessageW(focused, CbGetDroppedState, 0u, 0) != 0)
         return true;
@@ -301,7 +301,7 @@ bool ComboIsDropped(HWND focused)
 
 public class WindowPeer : ControlPeer, IWindowPeer
 {
-    weak IWindowNotify? owningWindow;
+    weak IWindowNotify? _owner;
     bool _running;
     bool _quitOnClose;
     /// The windows `ShowModal` disabled, as handles, to be enabled again when
@@ -313,8 +313,8 @@ public class WindowPeer : ControlPeer, IWindowPeer
 
     public WindowPeer(IWindowNotify owner, WindowBorder border)
     {
-        base(MakeTopLevel(border), owner, false);
-        owningWindow = owner;
+        base(CreateTopLevelWindow(border), owner, false);
+        _owner = owner;
         _running = false;
         _quitOnClose = false;
         _disabled = new List<nuint>();
@@ -323,20 +323,20 @@ public class WindowPeer : ControlPeer, IWindowPeer
 
     /// Made before `base(...)` can run, because the base constructor needs the
     /// window to bind its peer to.
-    static HWND MakeTopLevel(WindowBorder border)
+    static HWND CreateTopLevelWindow(WindowBorder border)
     {
         EnsureFormClass();
-        return CreateWindowExW(ExtendedStyleForBorder(border),
+        return CreateWindowExW(GetExtendedStyleForBorder(border),
                                FormClassName.ToUtf16().ToPointer(),
                                "".ToUtf16().ToPointer(),
-                               StyleForBorder(border) | WsClipChildren,
+                               GetStyleForBorder(border) | WsClipChildren,
                                UseDefault, UseDefault, 640, 480,
                                null, null, GetModuleHandleW(null), null);
     }
 
-    public override long Dispatch(uint message, ulong wParam, long lParam)
+    public override long WndProc(uint message, ulong wParam, long lParam)
     {
-        IWindowNotify? held = owningWindow;
+        IWindowNotify? held = _owner;
 
         if (message == WmClose)
         {
@@ -349,8 +349,8 @@ public class WindowPeer : ControlPeer, IWindowPeer
             }
             // Before the window goes, or Windows activates whatever window of
             // any program is next in line rather than the owner.
-            EnableOthers();
-            DestroyWindow(window);
+            EnableOtherWindows();
+            DestroyWindow(Window);
             return 0;
         }
 
@@ -389,10 +389,10 @@ public class WindowPeer : ControlPeer, IWindowPeer
             {
                 if (bar is MenuPeer tree)
                 {
-                    var item = tree.Find((int)(wParam & 0xFFFFu));
+                    var item = tree.FindCommand((int)(wParam & 0xFFFFu));
                     if (item != null)
                     {
-                        ((MenuItemPeer)item).Raise();
+                        ((MenuItemPeer)item).RaiseClick();
                         return 0;
                     }
                 }
@@ -410,17 +410,17 @@ public class WindowPeer : ControlPeer, IWindowPeer
         {
             MeasureItemStruct* asked = (MeasureItemStruct*)(void*)(nuint)lParam;
             if (asked->ControlType != OdtMenu)
-                return Inherited(message, wParam, lParam);
+                return DefWndProc(message, wParam, lParam);
 
-            var item = MenuItemFor((int)asked->ItemData);
+            var item = FindMenuItem((int)asked->ItemData);
             if (item == null)
-                return Inherited(message, wParam, lParam);
+                return DefWndProc(message, wParam, lParam);
 
             // The menu's own device context, for measuring in the font the
             // menu will draw with. `null` as the window is what asks for the
             // screen's, which is what a menu is drawn against.
             HDC screen = GetDC(null);
-            var surface = new Graphics(new GraphicsBackend(screen, Area(0, 0, 0, 0)));
+            var surface = new Graphics(new GraphicsBackend(screen, CreateRectangle(0, 0, 0, 0)));
             var wanted = ((IMenuItemNotify)item).OnPlatformMeasureItem(surface);
             ReleaseDC(null, screen);
 
@@ -433,17 +433,17 @@ public class WindowPeer : ControlPeer, IWindowPeer
         {
             DrawItemStruct* asked = (DrawItemStruct*)(void*)(nuint)lParam;
             if (asked->ControlType != OdtMenu)
-                return Inherited(message, wParam, lParam);
+                return DefWndProc(message, wParam, lParam);
 
-            var item = MenuItemFor((int)asked->ItemData);
+            var item = FindMenuItem((int)asked->ItemData);
             if (item == null)
-                return Inherited(message, wParam, lParam);
+                return DefWndProc(message, wParam, lParam);
 
             // The context is the menu's and is already set up, so the wrapper
             // owns nothing and releases nothing.
             var surface = new Graphics(new GraphicsBackend(asked->Dc, FromRect(asked->Item)));
             ((IMenuItemNotify)item).OnPlatformDrawItem(
-                surface, FromRect(asked->Item), StateOf(asked->ItemState));
+                surface, FromRect(asked->Item), ToMenuItemState(asked->ItemState));
             return 1;
         }
 
@@ -462,24 +462,24 @@ public class WindowPeer : ControlPeer, IWindowPeer
                     ((IWindowNotify)held).OnPlatformActivatedWindow();
                 }
             }
-            return Inherited(message, wParam, lParam);
+            return DefWndProc(message, wParam, lParam);
         }
 
         if (message == WmPaint)
         {
             PaintStruct paint;
-            HDC dc = BeginPaint(window, &paint);
+            HDC dc = BeginPaint(Window, &paint);
             var owner = Owner;
             if (owner != null)
             {
                 var surface = new GraphicsBackend(dc, FromRect(paint.Paint));
                 ((IControlNotify)owner).OnPlatformPaint(new Graphics(surface));
             }
-            EndPaint(window, &paint);
+            EndPaint(Window, &paint);
             return 0;
         }
 
-        return base.Dispatch(message, wParam, lParam);
+        return base.WndProc(message, wParam, lParam);
     }
 
     // ------------------------------------------------------- IWindowPeer
@@ -508,9 +508,9 @@ public class WindowPeer : ControlPeer, IWindowPeer
             return false;
 
         if (large != null)
-            SendMessageW(window, WmSetIcon, IconBigSize, (long)(nuint)large);
+            SendMessageW(Window, WmSetIcon, IconBigSize, (long)(nuint)large);
         if (small != null)
-            SendMessageW(window, WmSetIcon, IconSmallSize, (long)(nuint)small);
+            SendMessageW(Window, WmSetIcon, IconSmallSize, (long)(nuint)small);
         return true;
     }
 
@@ -521,19 +521,19 @@ public class WindowPeer : ControlPeer, IWindowPeer
     /// from an id -- see the note there.
     IMenuPeer? _poppedUp;
 
-    public void PoppedUp(IMenuPeer? menu) => _poppedUp = menu;
+    public void SetPoppedUpMenu(IMenuPeer? menu) => _poppedUp = menu;
 
     /// The item a command id names, looked for in the bar and then in whatever
     /// is popped up over it.
     ///
     /// Ids come from one counter for the whole program, so the two cannot
     /// disagree about which item a number means.
-    IMenuItemNotify? MenuItemFor(int id)
+    IMenuItemNotify? FindMenuItem(int id)
     {
         var bar = _menuBar;
         if (bar is MenuPeer tree)
         {
-            var found = tree.FindAny(id);
+            var found = tree.FindItem(id);
             if (found != null)
                 return ((MenuItemPeer)found).Notify;
         }
@@ -541,7 +541,7 @@ public class WindowPeer : ControlPeer, IWindowPeer
         var over = _poppedUp;
         if (over is MenuPeer popup)
         {
-            var found = popup.FindAny(id);
+            var found = popup.FindItem(id);
             if (found != null)
                 return ((MenuItemPeer)found).Notify;
         }
@@ -553,7 +553,7 @@ public class WindowPeer : ControlPeer, IWindowPeer
     /// `ODS_GRAYED` and `ODS_DISABLED` both mean unusable and a menu sets the
     /// first, so both map to the one flag rather than the seam carrying a
     /// distinction only one platform makes.
-    static MenuItemState StateOf(uint reported)
+    static MenuItemState ToMenuItemState(uint reported)
     {
         var state = MenuItemState.None;
         if ((reported & OdsSelected) != 0u)
@@ -583,13 +583,13 @@ public class WindowPeer : ControlPeer, IWindowPeer
         {
             IMenuPeer was = (IMenuPeer)previous;
             if (was is MenuPeer replaced)
-                replaced.ReleasedByParent();
+                replaced.MarkReleasedByParent();
         }
 
         _menuBar = menu;
         if (menu == null)
         {
-            Win32.User32.SetMenu(window, null);
+            Win32.User32.SetMenu(Window, null);
         }
         else
         {
@@ -598,11 +598,11 @@ public class WindowPeer : ControlPeer, IWindowPeer
             {
                 // The window frees the menu it holds, so the menu must stop
                 // freeing itself.
-                bar.OwnedByParent();
-                Win32.User32.SetMenu(window, bar.Native);
+                bar.MarkOwnedByParent();
+                Win32.User32.SetMenu(Window, bar.Native);
             }
         }
-        DrawMenuBar(window);
+        DrawMenuBar(Window);
         // The bar takes a row out of the client area, so everything laid out
         // against it has moved. The report is of the window's own size, which
         // is what `Bounds` holds; the layout reads the client area itself.
@@ -624,15 +624,15 @@ public class WindowPeer : ControlPeer, IWindowPeer
     {
         uint frame = WsPopup | WsCaption | WsThickFrame | WsSystemMenu
                    | WsMinimizeBox | WsMaximizeBox;
-        long style = Win32.User32.GetWindowLongPtrW(window, GwlStyle);
-        style = (style & ~(long)frame) | (long)StyleForBorder(border);
-        Win32.User32.SetWindowLongPtrW(window, GwlStyle, style);
+        long style = Win32.User32.GetWindowLongPtrW(Window, GwlStyle);
+        style = (style & ~(long)frame) | (long)GetStyleForBorder(border);
+        Win32.User32.SetWindowLongPtrW(Window, GwlStyle, style);
 
-        long extended = Win32.User32.GetWindowLongPtrW(window, GwlExtendedStyle);
-        extended = (extended & ~(long)WsExToolWindow) | (long)ExtendedStyleForBorder(border);
-        Win32.User32.SetWindowLongPtrW(window, GwlExtendedStyle, extended);
+        long extended = Win32.User32.GetWindowLongPtrW(Window, GwlExtendedStyle);
+        extended = (extended & ~(long)WsExToolWindow) | (long)GetExtendedStyleForBorder(border);
+        Win32.User32.SetWindowLongPtrW(Window, GwlExtendedStyle, extended);
 
-        SetWindowPos(window, null, 0, 0, 0, 0,
+        SetWindowPos(Window, null, 0, 0, 0, 0,
                      SwpNoMove | SwpNoSize | SwpNoZOrder | SwpFrameChanged);
     }
 
@@ -640,40 +640,40 @@ public class WindowPeer : ControlPeer, IWindowPeer
     {
         if (state == WindowState.Minimized)
         {
-            ShowWindow(window, SwShowMinimized);
+            ShowWindow(Window, SwShowMinimized);
         }
         else if (state == WindowState.Maximized)
         {
-            ShowWindow(window, SwShowMaximized);
+            ShowWindow(Window, SwShowMaximized);
         }
         else
         {
-            ShowWindow(window, SwRestore);
+            ShowWindow(Window, SwRestore);
         }
     }
 
     public WindowState GetState()
     {
-        if (IsIconic(window) != 0)
+        if (IsIconic(Window) != 0)
             return WindowState.Minimized;
-        if (IsZoomed(window) != 0)
+        if (IsZoomed(Window) != 0)
             return WindowState.Maximized;
         return WindowState.Normal;
     }
 
     public void Activate()
     {
-        ShowWindow(window, SwShow);
-        SetForegroundWindow(window);
-        UpdateWindow(window);
+        ShowWindow(Window, SwShow);
+        SetForegroundWindow(Window);
+        UpdateWindow(Window);
     }
 
-    public void Close() => SendMessageW(window, WmClose, 0u, 0);
+    public void Close() => SendMessageW(Window, WmClose, 0u, 0);
 
     public void CenterOnScreen()
     {
         Rect frame;
-        GetWindowRect(window, &frame);
+        GetWindowRect(Window, &frame);
         int width = frame.Right - frame.Left;
         int height = frame.Bottom - frame.Top;
 
@@ -682,7 +682,7 @@ public class WindowPeer : ControlPeer, IWindowPeer
         int x = work.Left + ((work.Right - work.Left) - width) / 2;
         int y = work.Top + ((work.Bottom - work.Top) - height) / 2;
 
-        SetWindowPos(window, null, x, y, 0, 0, SwpNoSize | SwpNoZOrder);
+        SetWindowPos(Window, null, x, y, 0, 0, SwpNoSize | SwpNoZOrder);
     }
 
     /// A loop of its own, which is what modal means.
@@ -700,10 +700,10 @@ public class WindowPeer : ControlPeer, IWindowPeer
     {
         if (owner != null)
         {
-            Win32.User32.SetWindowLongPtrW(window, GwlpHwndParent,
+            Win32.User32.SetWindowLongPtrW(Window, GwlpHwndParent,
                                            (long)((IWindowPeer)owner).Handle);
         }
-        DisableOthers();
+        DisableOtherWindows();
 
         Activate();
         _running = true;
@@ -734,10 +734,10 @@ public class WindowPeer : ControlPeer, IWindowPeer
             //
             // Not while a combo box's list is dropped: Escape closes the list.
             if (message.Message == WmKeyDown && (int)message.WParam == VkEscape
-                && GetAncestor(message.Window, GaRoot) == window
-                && !ComboIsDropped(message.Window))
+                && GetAncestor(message.Window, GaRoot) == Window
+                && !IsComboDroppedDown(message.Window))
             {
-                SendMessageW(window, WmClose, 0u, 0);
+                SendMessageW(Window, WmClose, 0u, 0);
                 continue;
             }
 
@@ -745,7 +745,7 @@ public class WindowPeer : ControlPeer, IWindowPeer
             // loop did not -- so Tab and the arrows move between the controls
             // of a dialog instead of being dispatched raw at whatever happens
             // to have the focus.
-            if (DialogKey(&message))
+            if (HandleDialogKey(&message))
                 continue;
             TranslateMessage(&message);
             DispatchMessageW(&message);
@@ -753,34 +753,34 @@ public class WindowPeer : ControlPeer, IWindowPeer
 
         // Already done by `WM_CLOSE` when the dialog closed; this is for the
         // loop that ended on a quit.
-        EnableOthers();
+        EnableOtherWindows();
     }
 
     /// Disables every visible, enabled top-level window this library made on
     /// this thread, other than this one, and remembers which.
-    void DisableOthers()
+    void DisableOtherWindows()
     {
         _disabled.Clear();
-        EnumWindows(NoteWindowForModal, (nint)(void*)this);
+        EnumWindows(CollectWindowForModal, (nint)(void*)this);
         foreach (var handle in _disabled)
             EnableWindow((HWND)(void*)handle, 0);
     }
 
     /// One window `EnumWindows` found, considered for disabling.
-    void Consider(HWND other)
+    void ConsiderDisabling(HWND other)
     {
-        if (other == window)
+        if (other == Window)
             return;
         if (GetWindowThreadProcessId(other, null) != GetCurrentThreadId())
             return;
-        if (PeerOf(other) == null)
+        if (FindControlPeer(other) == null)
             return;
         if (IsWindowVisible(other) == 0 || IsWindowEnabled(other) == 0)
             return;
         _disabled.Add((nuint)(void*)other);
     }
 
-    void EnableOthers()
+    void EnableOtherWindows()
     {
         foreach (var handle in _disabled)
             EnableWindow((HWND)(void*)handle, 1);
@@ -791,7 +791,7 @@ public class WindowPeer : ControlPeer, IWindowPeer
 
     public void AddChild(IControlPeer child)
     {
-        SetParent((HWND)(void*)child.Handle, window);
+        SetParent((HWND)(void*)child.Handle, Window);
     }
 
     public void RemoveChild(IControlPeer child)
@@ -827,7 +827,7 @@ public class Win32WidgetSet : IWidgetSet
                        | IccStandardClasses;
         InitCommonControlsEx(&wanted);
 
-        // **Here, and not lazily in `Wake`.** A window belongs to the thread
+        // **Here, and not lazily in `WakeEventLoop`.** A window belongs to the thread
         // that created it: one made on a worker has its messages queued to that
         // worker, where nothing ever dispatches them, so the post is accepted
         // and silently never arrives. This constructor runs inside
@@ -987,7 +987,7 @@ public class Win32WidgetSet : IWidgetSet
 
     public String GetClipboardText() => ReadClipboardText();
 
-    public String GetClipboardHtml() => DecodeHtmlFormat(ReadClipboardFormat(HtmlFormat()));
+    public String GetClipboardHtml() => DecodeHtmlFormat(ReadClipboardFormat(GetHtmlClipboardFormat()));
 
     public ClipboardImage? GetClipboardImage() => ReadClipboardImage();
 
@@ -1005,19 +1005,19 @@ public class Win32WidgetSet : IWidgetSet
         switch (kind)
         {
             case ClipboardKind.Text:
-                return ClipboardOffers(ClipboardUnicodeText);
+                return ClipboardOffersFormat(ClipboardUnicodeText);
             case ClipboardKind.Html:
-                return ClipboardOffers(HtmlFormat());
+                return ClipboardOffersFormat(GetHtmlClipboardFormat());
             case ClipboardKind.Image:
-                return ClipboardOffers(ClipboardDib) || ClipboardOffers(ClipboardDibV5)
-                    || ClipboardOffers(PngFormat());
+                return ClipboardOffersFormat(ClipboardDib) || ClipboardOffersFormat(ClipboardDibV5)
+                    || ClipboardOffersFormat(GetPngClipboardFormat());
             case ClipboardKind.Files:
-                return ClipboardOffers(ClipboardHDrop);
+                return ClipboardOffersFormat(ClipboardHDrop);
         }
         return false;
     }
 
-    public bool ContainsClipboardFormat(String name) => ClipboardOffers(RegisterFormatNamed(name));
+    public bool ContainsClipboardFormat(String name) => ClipboardOffersFormat(RegisterFormatNamed(name));
 
     public String[] GetClipboardFormatNames() => ReadClipboardFormatNames();
 
@@ -1029,38 +1029,38 @@ public class Win32WidgetSet : IWidgetSet
     public Result<String, DialogOutcome> ChooseFileToOpen(IWindowPeer? owner, String title,
                                                           String start, String[] filters)
     {
-        return OpenFileDialog(owner, title, start, filters);
+        return ShowOpenFileDialog(owner, title, start, filters);
     }
 
     public Result<String, DialogOutcome> ChooseFileToSave(IWindowPeer? owner, String title,
                                                           String start, String[] filters)
     {
-        return SaveFileDialog(owner, title, start, filters);
+        return ShowSaveFileDialog(owner, title, start, filters);
     }
 
     public Result<String, DialogOutcome> ChooseFolder(IWindowPeer? owner, String title)
     {
-        return FolderDialogFor(owner, title);
+        return ShowFolderDialog(owner, title);
     }
 
     public Result<Color, DialogOutcome> ChooseColor(IWindowPeer? owner, Color start)
     {
-        return ColorDialogFor(owner, start);
+        return ShowColorDialog(owner, start);
     }
 
     public Result<Font, DialogOutcome> ChooseFont(IWindowPeer? owner, Font start)
     {
-        return FontDialogFor(owner, start);
+        return ShowFontDialog(owner, start);
     }
 
     public IFontBackend CreateFont(Font font) => new FontBackend(font);
 
     public Color GetSystemColor(SystemColorId which)
     {
-        return FromColorRef(GetSysColor(IndexOfColor(which)));
+        return FromColorRef(GetSysColor(ToSysColorIndex(which)));
     }
 
-    int IndexOfColor(SystemColorId which)
+    int ToSysColorIndex(SystemColorId which)
     {
         if (which == SystemColorId.Control)
             return ColorBtnFace;
@@ -1103,7 +1103,7 @@ public class Win32WidgetSet : IWidgetSet
     {
         get
         {
-            return Extent(GetSystemMetrics(SmScreenWidth), GetSystemMetrics(SmScreenHeight));
+            return CreateSize(GetSystemMetrics(SmScreenWidth), GetSystemMetrics(SmScreenHeight));
         }
     }
 
@@ -1132,7 +1132,7 @@ public class Win32WidgetSet : IWidgetSet
                 return;
             if (got < 0)
                 return;
-            if (Navigated(&message))
+            if (HandleNavigation(&message))
                 continue;
             TranslateMessage(&message);
             DispatchMessageW(&message);
@@ -1146,7 +1146,7 @@ public class Win32WidgetSet : IWidgetSet
         {
             if (message.Message == WmQuit)
                 return false;
-            if (Navigated(&message))
+            if (HandleNavigation(&message))
                 continue;
             TranslateMessage(&message);
             DispatchMessageW(&message);
@@ -1169,10 +1169,10 @@ public class Win32WidgetSet : IWidgetSet
     /// the message was handled and must not be dispatched again; dispatching it
     /// anyway is what makes Tab type a tab character into the text box it just
     /// left.
-    /// **The body is `DialogKey`, at module level**, because `ShowModal` runs a
+    /// **The body is `HandleDialogKey`, at module level**, because `ShowModal` runs a
     /// loop of its own and needs the same pre-processing -- and it is not a
     /// method of this class.
-    bool Navigated(Msg* message) => DialogKey(message);
+    bool HandleNavigation(Msg* message) => HandleDialogKey(message);
 
     public void QuitEventLoop() => PostQuitMessage(0);
 
@@ -1198,13 +1198,13 @@ public class Win32WidgetSet : IWidgetSet
         if (owner != null)
             parent = (HWND)(void*)((IWindowPeer)owner).Handle;
 
-        uint style = ButtonsOf(buttons) | IconOf(icon);
+        uint style = ToMessageBoxButtons(buttons) | ToMessageBoxIcon(icon);
         int answer = MessageBoxW(parent, text.ToUtf16().ToPointer(),
                                  caption.ToUtf16().ToPointer(), style);
-        return ResultOf(answer);
+        return ToDialogResult(answer);
     }
 
-    uint ButtonsOf(MessageButtons buttons)
+    uint ToMessageBoxButtons(MessageButtons buttons)
     {
         if (buttons == MessageButtons.OkCancel)
             return MbOkCancel;
@@ -1217,7 +1217,7 @@ public class Win32WidgetSet : IWidgetSet
         return MbOk;
     }
 
-    uint IconOf(MessageIcon icon)
+    uint ToMessageBoxIcon(MessageIcon icon)
     {
         if (icon == MessageIcon.Information)
             return MbIconInformation;
@@ -1230,7 +1230,7 @@ public class Win32WidgetSet : IWidgetSet
         return 0u;
     }
 
-    DialogResult ResultOf(int answer)
+    DialogResult ToDialogResult(int answer)
     {
         if (answer == IdOk)
             return DialogResult.Ok;

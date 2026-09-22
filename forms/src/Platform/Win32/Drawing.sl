@@ -131,7 +131,7 @@ public class GraphicsBackend : IGraphicsBackend
         DeleteObject((HGDIOBJ)(void*)brush);
     }
 
-    /// Selects a pen made for this call. `Drop` puts back what was there and
+    /// Selects a pen made for this call. `RestoreSelection` puts back what was there and
     /// deletes it; every outline call goes through the two, so that none of
     /// them can forget the second half.
     ///
@@ -139,7 +139,7 @@ public class GraphicsBackend : IGraphicsBackend
     /// is painting, and a caller that selected a pen of its own gets it back.
     (HGDIOBJ, HGDIOBJ) UsePen(Pen pen)
     {
-        int style = PenStyleOf(pen.Style);
+        int style = ToNativePenStyle(pen.Style);
         HPEN made = CreatePen(style, pen.Width, ToColorRef(pen.Color));
         HGDIOBJ was = SelectObject(_dc, (HGDIOBJ)(void*)made);
         return ((HGDIOBJ)(void*)made, was);
@@ -154,14 +154,14 @@ public class GraphicsBackend : IGraphicsBackend
     }
 
     /// Puts back what `UsePen` or `UseBrush` displaced, and deletes what it made.
-    void Drop((HGDIOBJ, HGDIOBJ) selected)
+    void RestoreSelection((HGDIOBJ, HGDIOBJ) selected)
     {
         var (made, was) = selected;
         SelectObject(_dc, was);
         DeleteObject(made);
     }
 
-    int PenStyleOf(PenStyle style)
+    int ToNativePenStyle(PenStyle style)
     {
         if (style == PenStyle.Dash)
             return PenDash;
@@ -179,7 +179,7 @@ public class GraphicsBackend : IGraphicsBackend
         var line = UsePen(pen);
         MoveToEx(_dc, x1, y1, null);
         LineTo(_dc, x2, y2);
-        Drop(line);
+        RestoreSelection(line);
     }
 
     public void DrawRectangle(Pen pen, FRect bounds)
@@ -190,7 +190,7 @@ public class GraphicsBackend : IGraphicsBackend
         HGDIOBJ wasBrush = SelectObject(_dc, GetStockObject(NullBrush));
         Rectangle(_dc, bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
         SelectObject(_dc, wasBrush);
-        Drop(outline);
+        RestoreSelection(outline);
     }
 
     public void FillRectangle(Brush brush, FRect bounds)
@@ -215,8 +215,8 @@ public class GraphicsBackend : IGraphicsBackend
     void FillGradient(Brush brush, FRect bounds)
     {
         TriVertex[2] corners;
-        corners[0u] = Corner(bounds.Left, bounds.Top, brush.Color);
-        corners[1u] = Corner(bounds.Right, bounds.Bottom, brush.EndColor);
+        corners[0u] = CreateTriVertex(bounds.Left, bounds.Top, brush.Color);
+        corners[1u] = CreateTriVertex(bounds.Right, bounds.Bottom, brush.EndColor);
 
         GradientRect mesh;
         mesh.UpperLeft = 0u;
@@ -231,7 +231,7 @@ public class GraphicsBackend : IGraphicsBackend
 
     /// One corner, with an 8-bit colour widened to the sixteen bits a
     /// `TRIVERTEX` holds -- see the note where it is declared.
-    static TriVertex Corner(int x, int y, Color colour)
+    static TriVertex CreateTriVertex(int x, int y, Color colour)
     {
         TriVertex made;
         made.X = x;
@@ -249,7 +249,7 @@ public class GraphicsBackend : IGraphicsBackend
         HGDIOBJ wasBrush = SelectObject(_dc, GetStockObject(NullBrush));
         Ellipse(_dc, bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
         SelectObject(_dc, wasBrush);
-        Drop(outline);
+        RestoreSelection(outline);
     }
 
     /// Outlined in the fill's own colour, since GDI's shape calls always draw
@@ -259,14 +259,14 @@ public class GraphicsBackend : IGraphicsBackend
         var fill = UseBrush(brush);
         var edge = UsePen(new Pen(brush.Color));
         Ellipse(_dc, bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
-        Drop(edge);
-        Drop(fill);
+        RestoreSelection(edge);
+        RestoreSelection(fill);
     }
 
     /// Copies the points into the shape GDI wants. Two structures called
     /// `Point` that differ only in which module declared them, so the copy is
     /// a loop rather than a cast.
-    Win32.User32.Point[] Native(FPoint[] points)
+    Win32.User32.Point[] ToNativePoints(FPoint[] points)
     {
         var native = new Win32.User32.Point[points.Length];
         for (nuint i = 0u; i < points.Length; i++)
@@ -281,31 +281,31 @@ public class GraphicsBackend : IGraphicsBackend
 
     public void DrawPolygon(Pen pen, FPoint[] points)
     {
-        var native = Native(points);
+        var native = ToNativePoints(points);
         var outline = UsePen(pen);
         HGDIOBJ wasBrush = SelectObject(_dc, GetStockObject(NullBrush));
         Polygon(_dc, &native[0u], (int)points.Length);
         SelectObject(_dc, wasBrush);
-        Drop(outline);
+        RestoreSelection(outline);
     }
 
     /// Outlined in the fill's own colour, as `FillEllipse` is.
     public void FillPolygon(Brush brush, FPoint[] points)
     {
-        var native = Native(points);
+        var native = ToNativePoints(points);
         var fill = UseBrush(brush);
         var edge = UsePen(new Pen(brush.Color));
         Polygon(_dc, &native[0u], (int)points.Length);
-        Drop(edge);
-        Drop(fill);
+        RestoreSelection(edge);
+        RestoreSelection(fill);
     }
 
     public void DrawPolyline(Pen pen, FPoint[] points)
     {
-        var native = Native(points);
+        var native = ToNativePoints(points);
         var line = UsePen(pen);
         Polyline(_dc, &native[0u], (int)points.Length);
-        Drop(line);
+        RestoreSelection(line);
     }
 
     public void DrawString(String text, Font font, Color colour, int x, int y)
@@ -371,16 +371,16 @@ public class GraphicsBackend : IGraphicsBackend
     /// draw, it is something selected into a second `HDC` and blitted from.
     public void DrawBitmap(IBitmapBackend picture, FPoint at)
     {
-        Blit(picture, Area(at.X, at.Y, picture.Width, picture.Height), false);
+        BlitBitmap(picture, CreateRectangle(at.X, at.Y, picture.Width, picture.Height), false);
     }
 
     public void DrawBitmapIn(IBitmapBackend picture, FRect into)
     {
-        Blit(picture, into, true);
+        BlitBitmap(picture, into, true);
     }
 
     /// **The blend is used even for a picture with no alpha channel**, which
-    /// is the one case `Blit` would have sent through `BitBlt`. `AlphaFormat`
+    /// is the one case `BlitBitmap` would have sent through `BitBlt`. `AlphaFormat`
     /// is what says whether the *source* carries per-pixel alpha;
     /// `SourceConstantAlpha` applies either way, so a 24-bit bitmap fades
     /// correctly with the format left at zero.
@@ -408,7 +408,7 @@ public class GraphicsBackend : IGraphicsBackend
         DeleteDC(memory);
     }
 
-    void Blit(IBitmapBackend picture, FRect into, bool scaled)
+    void BlitBitmap(IBitmapBackend picture, FRect into, bool scaled)
     {
         HBITMAP bitmap = (HBITMAP)(void*)picture.Handle;
         if (bitmap == null)
@@ -454,7 +454,7 @@ public class GraphicsBackend : IGraphicsBackend
         Win32.User32.Size measured;
         GetTextExtentPoint32W(_dc, wide.ToPointer(), (int)wide.UnitCount(), &measured);
         SelectObject(_dc, wasFont);
-        return Extent(measured.Width, measured.Height);
+        return CreateSize(measured.Width, measured.Height);
     }
 }
 
@@ -464,10 +464,10 @@ public class GraphicsBackend : IGraphicsBackend
 /// answer, and the screen's own device context is what every Windows program
 /// uses for that. Released immediately, because a screen DC comes from a pool
 /// of five and a program that keeps them stops being able to draw.
-public FSize MeasureWithFont(String text, Font font)
+public FSize MeasureStringWithFont(String text, Font font)
 {
     HDC screen = GetDC(null);
-    var surface = new GraphicsBackend(screen, Area(0, 0, 0, 0));
+    var surface = new GraphicsBackend(screen, CreateRectangle(0, 0, 0, 0));
     var measured = surface.MeasureString(text, font);
     ReleaseDC(null, screen);
     return measured;
