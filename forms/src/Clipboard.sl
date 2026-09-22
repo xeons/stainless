@@ -32,7 +32,7 @@ import Forms.Platform;
 /// ```
 /// Clipboard.SetText(editor.SelectedText);
 /// if (Clipboard.HasText)
-///     editor.Type(Clipboard.GetText());
+///     editor.TypeText(Clipboard.GetText());
 /// ```
 ///
 /// **Four formats both platforms convert for themselves, and any a program

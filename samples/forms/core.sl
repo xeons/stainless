@@ -109,6 +109,25 @@ public class Host : Panel
 }
 
 /// Something that watches an object without keeping it.
+/// A form that subscribes to its own button, by method and by lambda: the
+/// shape of every form, and a cycle unless the subscriptions are weak.
+public class HandledForm : Form
+{
+    Button _save;
+    int _presses;
+
+    public HandledForm()
+    {
+        base(WindowBorder.Sizable);
+        _presses = 0;
+        _save = new Button(this);
+        _save.Click += this.OnSaveClick;
+        _save.Click += (sender) => { _presses++; };
+    }
+
+    void OnSaveClick(Control sender) => _presses++;
+}
+
 public class Watch
 {
     public weak Control? Target;
@@ -403,7 +422,21 @@ public class CoreForm : Form
         ShowAndClose(watch);
         Settle();
         ok = Check(ok, "a closed form with controls on it is freed", watch.IsGone);
+
+        var handledWatch = new Watch();
+        ShowAndCloseHandled(handledWatch);
+        Settle();
+        ok = Check(ok, "and so is one subscribed to its own button", handledWatch.IsGone);
         return ok;
+    }
+
+    static void ShowAndCloseHandled(Watch watch)
+    {
+        var passing = new HandledForm();
+        watch.Target = (Control)passing;
+        passing.Show();
+        Settle();
+        passing.Close();
     }
 
     /// A form this method alone ever holds, so nothing but the library can
