@@ -62,9 +62,9 @@ static readonly String FileManagerTarget = "x-special/gnome-copied-files";
 static readonly String HtmlTarget = "text/html";
 
 /// The clipboard Ctrl+C and Ctrl+V use, **borrowed**.
-gpointer DefaultClipboard() => gtk_clipboard_get(ClipboardSelection());
+gpointer GetDefaultClipboard() => gtk_clipboard_get(ClipboardSelection());
 
-GdkAtom AtomNamed(String name) => gdk_atom_intern((gchar*)name.ToPointer(), 0);
+GdkAtom InternAtom(String name) => gdk_atom_intern((gchar*)name.ToPointer(), 0);
 
 // ============================================================== pixel order
 
@@ -73,7 +73,7 @@ GdkAtom AtomNamed(String name) => gdk_atom_intern((gchar*)name.ToPointer(), 0);
 /// gdk-pixbuf wants red first where the seam hands over blue first, so two
 /// bytes of each pixel swap on the way in. The alpha stays straight: cairo
 /// composites premultiplied, and `gdk_cairo_set_source_pixbuf` converts.
-GdkPixbuf* PixbufFromBgra(int width, int height, byte[] pixels)
+GdkPixbuf* CreatePixbufFromBgra(int width, int height, byte[] pixels)
 {
     GdkPixbuf* made = gdk_pixbuf_new(0, 1, 8, width, height);
     if (made == null)
@@ -100,7 +100,7 @@ GdkPixbuf* PixbufFromBgra(int width, int height, byte[] pixels)
 
 /// A pixbuf's pixels in the seam's order. A pixbuf with no alpha channel is
 /// three bytes a pixel and opaque.
-ClipboardImage? BgraFromPixbuf(GdkPixbuf* pixbuf)
+ClipboardImage? ReadBgraFromPixbuf(GdkPixbuf* pixbuf)
 {
     int width = gdk_pixbuf_get_width(pixbuf);
     int height = gdk_pixbuf_get_height(pixbuf);
@@ -169,7 +169,7 @@ void AnswerPaste(gpointer clipboard, gpointer selection, guint info, gpointer da
             if (image == null)
                 return;
             var picture = (ClipboardImage)image;
-            GdkPixbuf* pixbuf = PixbufFromBgra(picture.Width, picture.Height, picture.Pixels);
+            GdkPixbuf* pixbuf = CreatePixbufFromBgra(picture.Width, picture.Height, picture.Pixels);
             if (pixbuf == null)
                 return;
             gtk_selection_data_set_pixbuf(selection, pixbuf);
@@ -206,7 +206,7 @@ void AnswerWithText(gpointer selection, String text)
 
 /// A `file:` URI for each path GLib can make one of, which is every absolute
 /// one.
-List<String> UrisOf(String[] paths)
+List<String> ToUris(String[] paths)
 {
     var uris = new List<String>();
     for (nuint i = 0u; i < paths.Length; i++)
@@ -222,7 +222,7 @@ List<String> UrisOf(String[] paths)
 
 String JoinUris(String[] paths)
 {
-    var uris = UrisOf(paths);
+    var uris = ToUris(paths);
     var joined = new StringBuilder();
     for (nuint i = 0u; i < uris.Count; i++)
     {
@@ -237,7 +237,7 @@ String JoinUris(String[] paths)
 /// can free it and every string in it.
 void AnswerWithUris(gpointer selection, String[] paths)
 {
-    var uris = UrisOf(paths);
+    var uris = ToUris(paths);
     gchar** list = (gchar**)g_malloc0((gsize)((uris.Count + 1u) * sizeof(nuint)));
     for (nuint i = 0u; i < uris.Count; i++)
         list[i] = g_strdup((gchar*)uris[i].ToPointer());
@@ -255,7 +255,7 @@ void WithdrawOffer(gpointer clipboard, gpointer data)
 
 /// A copy of `content` that shares no array with it, since a paste may come
 /// long after the caller has reused its own.
-ClipboardContent SnapshotOfContent(ClipboardContent content)
+ClipboardContent SnapshotContent(ClipboardContent content)
 {
     var copy = new ClipboardContent();
     copy.Text = content.Text;
@@ -266,7 +266,7 @@ ClipboardContent SnapshotOfContent(ClipboardContent content)
     {
         var picture = (ClipboardImage)image;
         copy.Image = new ClipboardImage(picture.Width, picture.Height,
-                                        CopyOfBytes(picture.Pixels));
+                                        CopyBytes(picture.Pixels));
     }
 
     var files = new String[content.Files.Length];
@@ -277,12 +277,12 @@ ClipboardContent SnapshotOfContent(ClipboardContent content)
     for (nuint i = 0u; i < content.Custom.Count; i++)
     {
         var entry = content.Custom[i];
-        copy.Custom.Add(new ClipboardEntry(entry.Name, CopyOfBytes(entry.Data)));
+        copy.Custom.Add(new ClipboardEntry(entry.Name, CopyBytes(entry.Data)));
     }
     return copy;
 }
 
-byte[] CopyOfBytes(byte[] bytes)
+byte[] CopyBytes(byte[] bytes)
 {
     var copy = new byte[bytes.Length];
     for (nuint i = 0u; i < bytes.Length; i++)
@@ -297,30 +297,30 @@ byte[] CopyOfBytes(byte[] bytes)
 /// emptying a clipboard another program filled means owning it first.
 void WriteClipboard(ClipboardContent given)
 {
-    var content = SnapshotOfContent(given);
-    gpointer clipboard = DefaultClipboard();
+    var content = SnapshotContent(given);
+    gpointer clipboard = GetDefaultClipboard();
     gpointer list = gtk_target_list_new(null, 0u);
 
     if (content.Text != null)
         gtk_target_list_add_text_targets(list, OfferText);
     if (content.Html != null)
-        gtk_target_list_add(list, AtomNamed(HtmlTarget), 0u, OfferHtml);
+        gtk_target_list_add(list, InternAtom(HtmlTarget), 0u, OfferHtml);
     if (content.Image != null)
         gtk_target_list_add_image_targets(list, OfferImage, 1);
     if (content.Files.Length != 0u)
     {
         gtk_target_list_add_uri_targets(list, OfferFiles);
-        gtk_target_list_add(list, AtomNamed(FileManagerTarget), 0u, OfferFileManager);
+        gtk_target_list_add(list, InternAtom(FileManagerTarget), 0u, OfferFileManager);
     }
     for (nuint i = 0u; i < content.Custom.Count; i++)
     {
-        gtk_target_list_add(list, AtomNamed(content.Custom[i].Name), 0u,
+        gtk_target_list_add(list, InternAtom(content.Custom[i].Name), 0u,
                             OfferCustom + (guint)i);
     }
 
     bool empty = content.IsEmpty;
     if (empty)
-        gtk_target_list_add(list, AtomNamed("application/x-stainless-nothing"), 0u, 0u);
+        gtk_target_list_add(list, InternAtom("application/x-stainless-nothing"), 0u, 0u);
 
     gint count = 0;
     GtkTargetEntry* table = gtk_target_table_new_from_list(list, &count);
@@ -353,7 +353,7 @@ void WriteClipboard(ClipboardContent given)
 
 String ReadClipboardText()
 {
-    gchar* text = gtk_clipboard_wait_for_text(DefaultClipboard());
+    gchar* text = gtk_clipboard_wait_for_text(GetDefaultClipboard());
     if (text == null)
         return "";
     // Owned by the caller, unlike almost everything else GTK answers.
@@ -365,7 +365,7 @@ String ReadClipboardText()
 /// One target's bytes, or an empty array.
 byte[] ReadClipboardTarget(String name)
 {
-    gpointer selection = gtk_clipboard_wait_for_contents(DefaultClipboard(), AtomNamed(name));
+    gpointer selection = gtk_clipboard_wait_for_contents(GetDefaultClipboard(), InternAtom(name));
     if (selection == null)
         return new byte[0u];
 
@@ -411,10 +411,10 @@ String ReadClipboardHtml()
 
 ClipboardImage? ReadClipboardImage()
 {
-    GdkPixbuf* pixbuf = gtk_clipboard_wait_for_image(DefaultClipboard());
+    GdkPixbuf* pixbuf = gtk_clipboard_wait_for_image(GetDefaultClipboard());
     if (pixbuf == null)
         return null;
-    var picture = BgraFromPixbuf(pixbuf);
+    var picture = ReadBgraFromPixbuf(pixbuf);
     g_object_unref((gpointer)pixbuf);
     return picture;
 }
@@ -423,7 +423,7 @@ ClipboardImage? ReadClipboardImage()
 /// `https:`, an `sftp:` mount GVfs has not mapped -- is left out.
 String[] ReadClipboardFiles()
 {
-    gchar** uris = gtk_clipboard_wait_for_uris(DefaultClipboard());
+    gchar** uris = gtk_clipboard_wait_for_uris(GetDefaultClipboard());
     if (uris == null)
         return new String[0u];
 
@@ -444,7 +444,7 @@ String[] ReadClipboardTargetNames()
 {
     GdkAtom* targets = null;
     gint count = 0;
-    if (gtk_clipboard_wait_for_targets(DefaultClipboard(), &targets, &count) == 0)
+    if (gtk_clipboard_wait_for_targets(GetDefaultClipboard(), &targets, &count) == 0)
         return new String[0u];
 
     var names = new List<String>();
@@ -472,17 +472,17 @@ class ClipboardRelay
     public ClipboardRelay(IClipboardNotify owner)
     {
         _target = owner;
-        Listening = false;
+        IsListening = false;
     }
 
     /// Whether the watch is started. Only the widget set's own reports read
     /// it; a connected signal handler is itself the answer.
-    public bool Listening;
+    public bool IsListening;
 
     /// Whether the watcher it reports to still exists.
     public bool IsAlive => _target != null;
 
-    public void Raise()
+    public void RaiseChanged()
     {
         IClipboardNotify? held = _target;
         if (held != null)
@@ -493,7 +493,7 @@ class ClipboardRelay
 /// Whether the display can say when the clipboard changes hands. Where it
 /// cannot, `owner-change` never fires and the widget set reports this
 /// program's own copies itself.
-bool DisplayReportsClipboardOwner()
+bool CanDisplayReportClipboardOwner()
 {
     gpointer display = gdk_display_get_default();
     return display != null && gdk_display_supports_selection_notification(display) != 0;
@@ -517,24 +517,24 @@ public class GtkClipboardWatchPeer : IClipboardWatchPeer
 
     public void Start()
     {
-        _relay.Listening = true;
+        _relay.IsListening = true;
         if (_handler != 0u)
             return;
         var relay = _relay;
-        _handler = ConnectEvent((GtkWidget*)DefaultClipboard(), "owner-change",
+        _handler = ConnectEvent((GtkWidget*)GetDefaultClipboard(), "owner-change",
                                 (sender, carried) =>
                                 {
-                                    relay.Raise();
+                                    relay.RaiseChanged();
                                     return false;
                                 });
     }
 
     public void Stop()
     {
-        _relay.Listening = false;
+        _relay.IsListening = false;
         if (_handler == 0u)
             return;
-        DisconnectHandler((GtkWidget*)DefaultClipboard(), _handler);
+        DisconnectHandler((GtkWidget*)GetDefaultClipboard(), _handler);
         _handler = 0u;
     }
 }

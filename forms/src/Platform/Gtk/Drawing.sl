@@ -68,12 +68,12 @@ import Gtk.Cairo;
 public class GtkFontBackend : IFontBackend
 {
     public String Name { get; }
-    public Font   Of   { get; }
+    public Font   Font   { get; }
 
     public GtkFontBackend(Font font)
     {
-        Of = font;
-        Name = PangoName(font);
+        Font = font;
+        Name = ToPangoName(font);
     }
 
     public nuint Handle => 0u;
@@ -151,20 +151,20 @@ public class GtkBitmapBackend : IBitmapBackend
 /// list says it is.
 public class GtkImageListBackend : IImageListBackend
 {
-    List<gpointer> _pictures;
-    FSize _extent;
+    List<gpointer> _pixbufs;
+    FSize _imageSize;
 
     public GtkImageListBackend(FSize imageSize)
     {
-        _pictures = new List<gpointer>();
-        _extent = imageSize;
+        _pixbufs = new List<gpointer>();
+        _imageSize = imageSize;
     }
 
     ~GtkImageListBackend()
     {
-        for (nuint i = 0u; i < _pictures.Count; i++)
-            g_object_unref(_pictures[i]);
-        _pictures.Clear();
+        for (nuint i = 0u; i < _pixbufs.Count; i++)
+            g_object_unref(_pixbufs[i]);
+        _pixbufs.Clear();
     }
 
     public int Add(IBitmapBackend picture)
@@ -175,23 +175,23 @@ public class GtkImageListBackend : IImageListBackend
         // Scaled only when it has to be, and the copy is owned either way --
         // so an entry is unreffed once in the destructor whichever branch it
         // came from.
-        if (gdk_pixbuf_get_width((GdkPixbuf*)source) != _extent.Width ||
-            gdk_pixbuf_get_height((GdkPixbuf*)source) != _extent.Height)
+        if (gdk_pixbuf_get_width((GdkPixbuf*)source) != _imageSize.Width ||
+            gdk_pixbuf_get_height((GdkPixbuf*)source) != _imageSize.Height)
         {
-            scaled = gdk_pixbuf_scale_simple((GdkPixbuf*)source, _extent.Width,
-                                             _extent.Height, GDK_INTERP_BILINEAR);
+            scaled = gdk_pixbuf_scale_simple((GdkPixbuf*)source, _imageSize.Width,
+                                             _imageSize.Height, GDK_INTERP_BILINEAR);
         }
         else
         {
             g_object_ref(source);
         }
 
-        _pictures.Add(scaled);
-        return (int)_pictures.Count - 1;
+        _pixbufs.Add(scaled);
+        return (int)_pixbufs.Count - 1;
     }
 
-    public int Count => (int)_pictures.Count;
-    public FSize ImageSize => _extent;
+    public int Count => (int)_pixbufs.Count;
+    public FSize ImageSize => _imageSize;
 
     /// **Borrowed.** A list has no handle of its own -- there is no such GTK
     /// object -- so this answers the address of the list itself, which is
@@ -200,11 +200,11 @@ public class GtkImageListBackend : IImageListBackend
 
     /// One picture, for a toolbar button or a tree row. Null for an index
     /// nothing was added at, which is what a control passing -1 means.
-    public gpointer Pixbuf(int index)
+    public gpointer GetPixbuf(int index)
     {
-        if (index < 0 || (nuint)index >= _pictures.Count)
+        if (index < 0 || (nuint)index >= _pixbufs.Count)
             return null;
-        return _pictures[(nuint)index];
+        return _pixbufs[(nuint)index];
     }
 }
 
@@ -260,13 +260,13 @@ public class GtkGraphicsBackend : IGraphicsBackend
             gdouble x2 = 0.0;
             gdouble y2 = 0.0;
             cairo_clip_extents(_cairo, &x1, &y1, &x2, &y2);
-            return Area((int)x1, (int)y1, (int)(x2 - x1), (int)(y2 - y1));
+            return CreateRectangle((int)x1, (int)y1, (int)(x2 - x1), (int)(y2 - y1));
         }
     }
 
     // -------------------------------------------------------------- paint
 
-    void Source(Color colour)
+    void SetSourceColor(Color colour)
     {
         cairo_set_source_rgb(_cairo, (double)(int)colour.R / 255.0,
                                     (double)(int)colour.G / 255.0,
@@ -280,9 +280,9 @@ public class GtkGraphicsBackend : IGraphicsBackend
     /// pixel and is drawn as two grey ones. Offsetting the path by half puts
     /// it between pixels, where a one-pixel line lands on exactly one. Only
     /// odd widths need it, which is what the test is.
-    double Ready(Pen pen)
+    double ApplyPen(Pen pen)
     {
-        Source(pen.Color);
+        SetSourceColor(pen.Color);
         cairo_set_line_width(_cairo, (double)pen.Width);
 
         // A dash pattern in user units. The lengths are the ones GDI uses for
@@ -313,7 +313,7 @@ public class GtkGraphicsBackend : IGraphicsBackend
 
     public void Clear(Color colour)
     {
-        Source(colour);
+        SetSourceColor(colour);
         cairo_paint(_cairo);
     }
 
@@ -321,7 +321,7 @@ public class GtkGraphicsBackend : IGraphicsBackend
     {
         if (pen.Style == PenStyle.None)
             return;
-        double half = Ready(pen);
+        double half = ApplyPen(pen);
         cairo_new_path(_cairo);
         cairo_move_to(_cairo, (double)x1 + half, (double)y1 + half);
         cairo_line_to(_cairo, (double)x2 + half, (double)y2 + half);
@@ -336,7 +336,7 @@ public class GtkGraphicsBackend : IGraphicsBackend
     {
         if (pen.Style == PenStyle.None || bounds.Width <= 0 || bounds.Height <= 0)
             return;
-        double half = Ready(pen);
+        double half = ApplyPen(pen);
         cairo_new_path(_cairo);
         cairo_rectangle(_cairo, (double)bounds.X + half, (double)bounds.Y + half,
                         (double)(bounds.Width - 1), (double)(bounds.Height - 1));
@@ -349,12 +349,12 @@ public class GtkGraphicsBackend : IGraphicsBackend
 
         if (brush.IsGradient)
         {
-            ramp = RampOver(brush, bounds);
+            ramp = CreateGradient(brush, bounds);
             cairo_set_source(_cairo, ramp);
         }
         else
         {
-            Source(brush.Color);
+            SetSourceColor(brush.Color);
         }
 
         cairo_new_path(_cairo);
@@ -370,7 +370,7 @@ public class GtkGraphicsBackend : IGraphicsBackend
     }
 
     /// A linear pattern spanning the rectangle, down or across.
-    cairo_pattern_t* RampOver(Brush brush, Rectangle bounds)
+    cairo_pattern_t* CreateGradient(Brush brush, Rectangle bounds)
     {
         double left = (double)bounds.X;
         double top = (double)bounds.Y;
@@ -381,14 +381,14 @@ public class GtkGraphicsBackend : IGraphicsBackend
                  ? cairo_pattern_create_linear(left, top, right, top)
                  : cairo_pattern_create_linear(left, top, left, bottom);
 
-        AddStop(ramp, 0.0, brush.Color);
-        AddStop(ramp, 1.0, brush.EndColor);
+        AddColorStop(ramp, 0.0, brush.Color);
+        AddColorStop(ramp, 1.0, brush.EndColor);
         return ramp;
     }
 
     /// One end of the ramp. Cairo takes components as 0 to 1, which is the
     /// thing this file's header warns about.
-    static void AddStop(cairo_pattern_t* ramp, double at, Color colour)
+    static void AddColorStop(cairo_pattern_t* ramp, double at, Color colour)
     {
         cairo_pattern_add_color_stop_rgb(ramp, at,
                                          (double)colour.R / 255.0,
@@ -404,7 +404,7 @@ public class GtkGraphicsBackend : IGraphicsBackend
     /// leaves cairo in `CAIRO_STATUS_INVALID_MATRIX`, which is sticky: every
     /// call after it in the same paint is ignored, so one empty shape would
     /// blank the rest of the control.
-    bool Ellipse(Rectangle bounds)
+    bool TraceEllipse(Rectangle bounds)
     {
         cairo_new_path(_cairo);
         if (bounds.Width <= 0 || bounds.Height <= 0)
@@ -422,19 +422,19 @@ public class GtkGraphicsBackend : IGraphicsBackend
     {
         if (pen.Style == PenStyle.None)
             return;
-        Ready(pen);
-        if (Ellipse(bounds))
+        ApplyPen(pen);
+        if (TraceEllipse(bounds))
             cairo_stroke(_cairo);
     }
 
     public void FillEllipse(Brush brush, Rectangle bounds)
     {
-        Source(brush.Color);
-        if (Ellipse(bounds))
+        SetSourceColor(brush.Color);
+        if (TraceEllipse(bounds))
             cairo_fill(_cairo);
     }
 
-    void Path(Point[] points, double half, bool close)
+    void TracePath(Point[] points, double half, bool close)
     {
         cairo_new_path(_cairo);
         if (points.Length == 0u)
@@ -453,15 +453,15 @@ public class GtkGraphicsBackend : IGraphicsBackend
     {
         if (pen.Style == PenStyle.None)
             return;
-        double half = Ready(pen);
-        Path(points, half, true);
+        double half = ApplyPen(pen);
+        TracePath(points, half, true);
         cairo_stroke(_cairo);
     }
 
     public void FillPolygon(Brush brush, Point[] points)
     {
-        Source(brush.Color);
-        Path(points, 0.0, true);
+        SetSourceColor(brush.Color);
+        TracePath(points, 0.0, true);
         cairo_fill(_cairo);
     }
 
@@ -469,8 +469,8 @@ public class GtkGraphicsBackend : IGraphicsBackend
     {
         if (pen.Style == PenStyle.None)
             return;
-        double half = Ready(pen);
-        Path(points, half, false);
+        double half = ApplyPen(pen);
+        TracePath(points, half, false);
         cairo_stroke(_cairo);
     }
 
@@ -484,14 +484,14 @@ public class GtkGraphicsBackend : IGraphicsBackend
         if (text.IsEmpty)
             return;
         SelectFont(_cairo, font);
-        Source(colour);
+        SetSourceColor(colour);
 
         cairo_font_extents_t metrics;
         cairo_font_extents(_cairo, &metrics);
 
         cairo_move_to(_cairo, (double)x, (double)y + metrics.Ascent);
         cairo_show_text(_cairo, text.ToPointer());
-        Decorate(text, font, x, y, metrics);
+        DrawTextDecorations(text, font, x, y, metrics);
     }
 
     public void DrawStringIn(String text, Font font, Color colour,
@@ -500,7 +500,7 @@ public class GtkGraphicsBackend : IGraphicsBackend
         if (text.IsEmpty)
             return;
         SelectFont(_cairo, font);
-        Source(colour);
+        SetSourceColor(colour);
 
         cairo_font_extents_t metrics;
         cairo_font_extents(_cairo, &metrics);
@@ -537,14 +537,14 @@ public class GtkGraphicsBackend : IGraphicsBackend
 
         cairo_move_to(_cairo, (double)x, (double)y + metrics.Ascent);
         cairo_show_text(_cairo, text.ToPointer());
-        Decorate(text, font, x, y, metrics);
+        DrawTextDecorations(text, font, x, y, metrics);
         cairo_restore(_cairo);
     }
 
     /// Underline and strikeout, which cairo's toy text API does not draw: they
     /// are lines, and their positions are the ones every toolkit uses -- just
     /// under the baseline, and a third of the ascent above it.
-    void Decorate(String text, Font font, int x, int y, cairo_font_extents_t metrics)
+    void DrawTextDecorations(String text, Font font, int x, int y, cairo_font_extents_t metrics)
     {
         if (!font.Underline && !font.Strikeout)
             return;
@@ -584,11 +584,11 @@ public class GtkGraphicsBackend : IGraphicsBackend
         cairo_font_extents_t metrics;
         cairo_font_extents(_cairo, &metrics);
         if (text.IsEmpty)
-            return Extent(0, (int)metrics.Height);
+            return CreateSize(0, (int)metrics.Height);
 
         cairo_text_extents_t ink;
         cairo_text_extents(_cairo, text.ToPointer(), &ink);
-        return Extent((int)(ink.XAdvance + 0.5), (int)(metrics.Height + 0.5));
+        return CreateSize((int)(ink.XAdvance + 0.5), (int)(metrics.Height + 0.5));
     }
 
     // ------------------------------------------------------------ pictures
@@ -622,7 +622,7 @@ public class GtkGraphicsBackend : IGraphicsBackend
         int width = gdk_pixbuf_get_width(pixbuf);
         int height = gdk_pixbuf_get_height(pixbuf);
         // Nothing to draw into, and a scale by zero would stop the context:
-        // see `Ellipse`.
+        // see `TraceEllipse`.
         if (width <= 0 || height <= 0 || into.Width <= 0 || into.Height <= 0)
             return;
 

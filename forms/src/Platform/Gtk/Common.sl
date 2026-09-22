@@ -75,10 +75,10 @@ using FPoint = Forms.Drawing.Point;
 using FSize  = Forms.Drawing.Size;
 using FRect  = Forms.Drawing.Rectangle;
 
-public FPoint At(int x, int y) => Forms.Drawing.Point.FromXY(x, y);
-public FSize  Extent(int width, int height) => Forms.Drawing.Size.FromDimensions(width, height);
-public FSize  NoSize() => Forms.Drawing.Size.Empty;
-public FRect  Area(int x, int y, int width, int height)
+public FPoint CreatePoint(int x, int y) => Forms.Drawing.Point.FromXY(x, y);
+public FSize  CreateSize(int width, int height) => Forms.Drawing.Size.FromDimensions(width, height);
+public FSize  CreateEmptySize() => Forms.Drawing.Size.Empty;
+public FRect  CreateRectangle(int x, int y, int width, int height)
 {
     return Forms.Drawing.Rectangle.FromBounds(x, y, width, height);
 }
@@ -95,7 +95,7 @@ extern "C"
 /// sign of one; this stops at the first call and says which control it was.
 /// The list of names this is called with is the list of what is left to do,
 /// and it lives in `WidgetSet.sl` where a reader will find it.
-public void NotYet(String what)
+public void FailNotImplemented(String what)
 {
     sl_fail(("the GTK backend has no " + what + " peer yet").ToPointer());
 }
@@ -134,13 +134,13 @@ class BoxedTicker
 
 /// The C entry point, one for every timer rather than one per timer: a
 /// module-level function, so its address is a plain C function pointer.
-gboolean RunTicker(gpointer data)
+gboolean InvokeTicker(gpointer data)
 {
     var boxed = (BoxedTicker)data;
     return boxed.Body() ? 1 : 0;
 }
 
-void ForgetTicker(gpointer data) => sl_release(data);
+void ReleaseTicker(gpointer data) => sl_release(data);
 
 extern "C"
 {
@@ -154,25 +154,25 @@ extern "C"
 /// **Two things use this and they are not both timers.** `TTimer` is one; an
 /// indeterminate progress bar is the other, because a GTK bar with no value
 /// does not move unless something keeps pulsing it.
-public gulong Tick(int milliseconds, Ticker body)
+public gulong StartTicker(int milliseconds, Ticker body)
 {
     var boxed = new BoxedTicker(body);
     sl_retain((gpointer)boxed);
 
     return (gulong)g_timeout_add_full(G_PRIORITY_DEFAULT, (guint)milliseconds,
-                                      RunTicker, (gpointer)boxed, ForgetTicker);
+                                      InvokeTicker, (gpointer)boxed, ReleaseTicker);
 }
 
 // ================================================================ colours
 
 /// A `Color` as CSS writes one. Alpha is dropped: every colour the seam
 /// carries is opaque, and `rgba()` would only invite one that is not.
-public String ToCss(Color colour)
+public String ToCssColor(Color colour)
 {
-    return "#" + Hex2(colour.R) + Hex2(colour.G) + Hex2(colour.B);
+    return "#" + FormatHexByte(colour.R) + FormatHexByte(colour.G) + FormatHexByte(colour.B);
 }
 
-String Hex2(byte value)
+String FormatHexByte(byte value)
 {
     var digits = "0123456789abcdef";
     return digits.Substring((nuint)(value >> 4), 1u) +
@@ -184,11 +184,11 @@ String Hex2(byte value)
 /// truncated, so that 1.0 is 255 and not 254.
 public Color FromRgba(GdkRGBA colour)
 {
-    return Color.FromRgb(Component(colour.Red), Component(colour.Green),
-                         Component(colour.Blue));
+    return Color.FromRgb(ToColorComponent(colour.Red), ToColorComponent(colour.Green),
+                         ToColorComponent(colour.Blue));
 }
 
-byte Component(double value)
+byte ToColorComponent(double value)
 {
     double scaled = value * 255.0 + 0.5;
     if (scaled < 0.0)
@@ -215,7 +215,7 @@ public GdkRGBA ToRgba(Color colour)
 /// **In points, because the seam is in points** and CSS understands `pt`
 /// directly -- which is the one place GTK is easier than Win32, where a point
 /// size has to be turned into logical units against the screen's DPI first.
-public String FontCss(Font font)
+public String ToFontCss(Font font)
 {
     var css = "font-family: \"" + font.Family + "\"; font-size: " +
               Text.FromInteger((long)font.Size) + "pt;";
@@ -245,7 +245,7 @@ public String FontCss(Font font)
 
 /// The same font as Pango writes one -- `"Sans Bold Italic 10"` -- which is
 /// what a font chooser answers with and what cairo's toy text API takes.
-public String PangoName(Font font)
+public String ToPangoName(Font font)
 {
     var name = font.Family;
     if (font.Bold)
@@ -264,7 +264,7 @@ public String PangoName(Font font)
 /// null, and a null cursor means "inherit the parent's" -- which is a
 /// reasonable thing for an unknown shape to do and is why there is no test
 /// here for one.
-public String CursorName(CursorKind shape)
+public String GetCursorName(CursorKind shape)
 {
     if (shape == CursorKind.Hand)
         return "pointer";
@@ -293,7 +293,7 @@ public String CursorName(CursorKind shape)
 /// what the Win32 backend does and is the better answer: GDK reports the state
 /// as it was when the event happened, so a handler that runs late still sees
 /// what the user was holding.
-public ModifierKeys ModifiersOf(GdkEvent* event)
+public ModifierKeys GetModifiers(GdkEvent* event)
 {
     guint state = 0u;
     gdk_event_get_state(event, &state);
@@ -311,7 +311,7 @@ public ModifierKeys ModifiersOf(GdkEvent* event)
 /// Which button an event carries. GDK numbers from one and has more than
 /// three; anything past the third is `None`, which is what a control that
 /// only knows about three should be told.
-public MouseButton ButtonOf(GdkEvent* event)
+public MouseButton GetMouseButton(GdkEvent* event)
 {
     guint which = 0u;
     if (gdk_event_get_button(event, &which) == 0)
@@ -345,7 +345,7 @@ int FloorToInt(gdouble value)
 /// Shift+1 is `!` and Shift+Tab is `ISO_Left_Tab`; Windows names the key, so
 /// both are the unshifted key. The keycode is looked up again with nothing
 /// held but Num Lock, which is what makes the answer the key's.
-public Key KeyOf(GdkEvent* event)
+public Key GetKey(GdkEvent* event)
 {
     guint keyval = 0u;
     gdk_event_get_keyval(event, &keyval);
@@ -353,7 +353,7 @@ public Key KeyOf(GdkEvent* event)
     guint16 keycode = 0u;
     gpointer keymap = gdk_keymap_get_for_display(gdk_display_get_default());
     if (keymap == null || gdk_event_get_keycode(event, &keycode) == 0)
-        return KeyOfKeyval(keyval);
+        return ConvertKeyval(keyval);
 
     guint state = 0u;
     gdk_event_get_state(event, &state);
@@ -363,7 +363,7 @@ public Key KeyOf(GdkEvent* event)
     if (gdk_keymap_translate_keyboard_state(keymap, (guint)keycode, numLock, 0,
                                             &plain, null, null, null) != 0)
     {
-        var key = KeyOfKeyval(plain);
+        var key = ConvertKeyval(plain);
         if (key != Key.None)
             return key;
     }
@@ -378,7 +378,7 @@ public Key KeyOf(GdkEvent* event)
     {
         return (Key)(int)shifted;
     }
-    return KeyOfKeyval(keyval);
+    return ConvertKeyval(keyval);
 }
 
 /// Whether a key press is a shortcut rather than typing: Control or Alt held,
@@ -414,7 +414,7 @@ public bool IsShortcut(GdkEvent* event)
 /// and `Key.A` is 65, and folding case is the whole of the conversion. The
 /// digits, the function keys and the keypad digits are consecutive in both
 /// numberings.
-public Key KeyOfKeyval(guint keyval)
+public Key ConvertKeyval(guint keyval)
 {
     if (keyval >= 0x61u && keyval <= 0x7Au)
         return (Key)(int)(keyval - 0x20u);
@@ -602,52 +602,52 @@ static readonly String PeerMark = "forms-peer";
 
 /// What every GTK control's peer is.
 ///
-/// **`widget` is what the parent places and `inner` is what does the work**,
+/// **`Widget` is what the parent places and `Inner` is what does the work**,
 /// and they differ whenever a control needs a scrolled window around it: a
-/// list's `widget` is the `GtkScrolledWindow` that goes into the parent's
-/// `GtkFixed`, and its `inner` is the `GtkTreeView` that carries the signals,
+/// list's `Widget` is the `GtkScrolledWindow` that goes into the parent's
+/// `GtkFixed`, and its `Inner` is the `GtkTreeView` that carries the signals,
 /// the style and the text. For everything else the two are the same widget,
 /// and saying so once here is what keeps every subclass from having to ask.
 public class GtkPeer : IControlPeer
 {
     /// The widget the parent places. Owned: one reference, sunk at
-    /// construction and dropped by `Destroy`.
-    protected GtkWidget* widget;
+    /// construction and dropped by `DestroyHandle`.
+    public GtkWidget* Widget { get; protected set; }
     /// The widget that carries the text, the signals and the style.
-    protected GtkWidget* inner;
+    public GtkWidget* Inner { get; protected set; }
 
     /// The `GtkFixed` this peer was put into, so that `SetBounds` has
     /// something to move it within. Null until a container adopts it, which a
     /// top-level window never is.
-    protected GtkWidget* placedIn;
+    protected GtkWidget* PlacedIn;
 
-    /// Whether `placedIn` is a `GtkLayout` rather than a `GtkFixed`. The two
+    /// Whether `PlacedIn` is a `GtkLayout` rather than a `GtkFixed`. The two
     /// take different calls to move a child and each rejects the other's.
-    protected bool placedInLayout;
+    protected bool IsPlacedInLayout;
 
-    protected weak IControlNotify? target;
+    protected weak IControlNotify? Target;
 
     /// Where the control layer last put it. Kept because GTK has no
     /// `GetWindowRect` for a child of a `GtkFixed` -- the position is the
     /// container's business and is not readable from the child.
-    protected FRect bounds;
+    protected FRect LastBounds;
 
     /// The style provider this peer owns, made the first time a colour or a
     /// font is set and replaced wholesale each time after. Null until then,
     /// because until then the theme's answer is the right one.
-    protected gpointer styling;
-    protected String foreCss;
-    protected String backCss;
-    protected String fontCss;
+    protected gpointer CssProvider;
+    protected String ForeCss;
+    protected String BackCss;
+    protected String FontCss;
 
-    protected bool destroyed;
-    protected CursorKind shape;
+    protected bool IsDestroyed;
+    protected CursorKind CursorShape;
 
     /// True while the *program* is setting a value, so that the signal GTK
     /// raises for it is not reported back as the user's doing. The seam is
     /// explicit that `OnPlatformValueChanged` is never raised for a change the
-    /// program made, and this is what keeps that true. Raised by `Quietly`.
-    protected bool echoing;
+    /// program made, and this is what keeps that true. Raised by `RunQuietly`.
+    protected bool IsEchoing;
 
     /// What this peer's handlers hold instead of the peer. See `PeerRelay`.
     PeerRelay _relay;
@@ -661,19 +661,19 @@ public class GtkPeer : IControlPeer
 
     public GtkPeer(GtkWidget* made, IControlNotify? owner)
     {
-        widget = (GtkWidget*)g_object_ref_sink((gpointer)made);
-        inner = made;
-        placedIn = null;
-        placedInLayout = false;
-        target = owner;
-        bounds = Area(0, 0, 0, 0);
-        styling = null;
-        foreCss = "";
-        backCss = "";
-        fontCss = "";
-        destroyed = false;
-        shape = CursorKind.Default;
-        echoing = false;
+        Widget = (GtkWidget*)g_object_ref_sink((gpointer)made);
+        Inner = made;
+        PlacedIn = null;
+        IsPlacedInLayout = false;
+        Target = owner;
+        LastBounds = CreateRectangle(0, 0, 0, 0);
+        CssProvider = null;
+        ForeCss = "";
+        BackCss = "";
+        FontCss = "";
+        IsDestroyed = false;
+        CursorShape = CursorKind.Default;
+        IsEchoing = false;
         _captured = false;
         _cursorWatched = false;
         _relay = new PeerRelay(this, owner);
@@ -687,12 +687,12 @@ public class GtkPeer : IControlPeer
     /// a side effect: a range narrowed past the value clamps it, removing the
     /// selected row changes the selection. The guard is restored rather than
     /// lowered, so a change made inside another does not lower it early.
-    protected void Quietly(Handler change)
+    protected void RunQuietly(Handler change)
     {
-        bool was = echoing;
-        echoing = true;
+        bool was = IsEchoing;
+        IsEchoing = true;
         change();
-        echoing = was;
+        IsEchoing = was;
     }
 
     ~GtkPeer() { DestroyHandle(); }
@@ -704,7 +704,7 @@ public class GtkPeer : IControlPeer
     {
         get
         {
-            IControlNotify? held = target;
+            IControlNotify? held = Target;
             return held;
         }
     }
@@ -717,7 +717,7 @@ public class GtkPeer : IControlPeer
     ///
     /// **`handler` MUST NOT capture the peer**: it reaches it through its
     /// argument, which is the point.
-    protected gulong WhenSignal(GtkWidget* instance, String signal, PeerSignal handler)
+    protected gulong ConnectPeerSignal(GtkWidget* instance, String signal, PeerSignal handler)
     {
         var relay = _relay;
         return ConnectPlainSignal(instance, signal, () =>
@@ -729,7 +729,7 @@ public class GtkPeer : IControlPeer
     }
 
     /// The same, for a signal that carries one pointer and answers.
-    protected gulong WhenEvent(GtkWidget* instance, String signal, PeerEvent handler)
+    protected gulong ConnectPeerEvent(GtkWidget* instance, String signal, PeerEvent handler)
     {
         var relay = _relay;
         return ConnectEvent(instance, signal, (sender, carried) =>
@@ -744,32 +744,32 @@ public class GtkPeer : IControlPeer
     /// Says which widget carries the signals and the style, for a peer whose
     /// outer widget is a scrolled window or a frame. Called by a subclass's
     /// constructor, before anything is connected.
-    protected void SetInner(GtkWidget* actual) => inner = actual;
+    protected void SetInner(GtkWidget* actual) => Inner = actual;
 
     /// Remembers the container that placed this peer. Called by
     /// `GtkContainerPeer.AddChild` and by nothing else.
-    public void PlacedInto(GtkWidget* container, bool isLayout)
+    public void RecordPlacement(GtkWidget* container, bool isLayout)
     {
-        placedIn = container;
-        placedInLayout = isLayout;
+        PlacedIn = container;
+        IsPlacedInLayout = isLayout;
     }
 
     // ---------------------------------------------------------- the input
 
     /// The widget this peer reports the mouse from, and in whose coordinates.
     ///
-    /// `inner` for everything but a window, whose surface is its client area:
+    /// `Inner` for everything but a window, whose surface is its client area:
     /// Win32 reports a form's mouse in client coordinates, below the menu bar,
     /// and does not report a click on the menu bar to the form at all.
-    protected virtual GtkWidget* Surface => inner;
+    protected virtual GtkWidget* Surface => Inner;
 
-    /// Marks this peer's widgets as its own, so that `IsFor` can trace an
+    /// Marks this peer's widgets as its own, so that `OwnsEvent` can trace an
     /// event from the widget GTK gave it to back to this peer.
-    protected virtual void Mark()
+    protected virtual void MarkWidgets()
     {
         gpointer surface = (gpointer)Surface;
-        g_object_set_data((gpointer)widget, PeerMark.ToPointer(), surface);
-        g_object_set_data((gpointer)inner, PeerMark.ToPointer(), surface);
+        g_object_set_data((gpointer)Widget, PeerMark.ToPointer(), surface);
+        g_object_set_data((gpointer)Inner, PeerMark.ToPointer(), surface);
     }
 
     /// Whether a mouse event is this peer's to report.
@@ -780,7 +780,7 @@ public class GtkPeer : IControlPeer
     /// GTK gave it to is its own. A widget with no window of its own -- a label
     /// -- has its events given to its parent, which is also where a `STATIC`
     /// sends them on Windows.
-    bool IsFor(GdkEvent* event)
+    bool OwnsEvent(GdkEvent* event)
     {
         if (_captured)
             return true;
@@ -800,12 +800,12 @@ public class GtkPeer : IControlPeer
     ///
     /// A widget with no window of its own is drawn on its parent's, and its
     /// allocation says where on it.
-    FPoint SurfaceOrigin()
+    FPoint GetSurfaceOrigin()
     {
         GtkWidget* surface = Surface;
         gpointer window = gtk_widget_get_window(surface);
         if (window == null)
-            return At(0, 0);
+            return CreatePoint(0, 0);
 
         gint x = 0;
         gint y = 0;
@@ -817,7 +817,7 @@ public class GtkPeer : IControlPeer
             x += allocation.X;
             y += allocation.Y;
         }
-        return At(x, y);
+        return CreatePoint(x, y);
     }
 
     /// Where a mouse event happened, in this peer's own coordinates.
@@ -825,33 +825,33 @@ public class GtkPeer : IControlPeer
     /// **Not the event's coordinates**, which are in whichever window GTK
     /// delivered it to -- a child's, or a parent's for a widget with no window.
     /// The position on the screen is the same whoever receives it.
-    FPoint LocalPointOf(GdkEvent* event)
+    FPoint GetLocalPoint(GdkEvent* event)
     {
         gdouble x = 0.0;
         gdouble y = 0.0;
         gdk_event_get_root_coords(event, &x, &y);
-        var origin = SurfaceOrigin();
-        return At(FloorToInt(x) - origin.X, FloorToInt(y) - origin.Y);
+        var origin = GetSurfaceOrigin();
+        return CreatePoint(FloorToInt(x) - origin.X, FloorToInt(y) - origin.Y);
     }
 
     /// Subscribes to everything `IControlNotify` reports.
     ///
     /// **Not in the constructor**, because a subclass may not have settled
-    /// which widget is `inner` yet, and because a peer with no notification
+    /// which widget is `Inner` yet, and because a peer with no notification
     /// target -- a menu's, a timer's -- has nothing to subscribe on behalf of.
     /// Every `Create` in `WidgetSet.sl` calls it once.
     ///
-    /// The mouse is heard on `Surface` and the keyboard on `inner`, which
+    /// The mouse is heard on `Surface` and the keyboard on `Inner`, which
     /// differ only for a window: its keys arrive at the window, and its mouse
     /// at the client area.
     ///
     /// Every handler answers false, so that the widget's own handling still
     /// runs: GTK calls a handler connected here *before* the widget's class
     /// handler, and answering true would stop a button being pressed or an
-    /// entry placing its cursor. `IsFor` is what keeps an ancestor quiet.
-    public void Listen()
+    /// entry placing its cursor. `OwnsEvent` is what keeps an ancestor quiet.
+    public void ConnectEvents()
     {
-        Mark();
+        MarkWidgets();
         if (Owner == null)
             return;
 
@@ -860,21 +860,21 @@ public class GtkPeer : IControlPeer
             GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
             GDK_POINTER_MOTION_MASK | GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK |
             GDK_SCROLL_MASK);
-        gtk_widget_add_events(inner,
+        gtk_widget_add_events(Inner,
             GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK | GDK_FOCUS_CHANGE_MASK);
 
-        WhenEvent(mouse, "button-press-event", (peer, carried) =>
+        ConnectPeerEvent(mouse, "button-press-event", (peer, carried) =>
         {
-            return peer.Pressed((GdkEvent*)carried);
+            return peer.OnButtonPress((GdkEvent*)carried);
         });
-        WhenEvent(mouse, "button-release-event", (peer, carried) =>
+        ConnectPeerEvent(mouse, "button-release-event", (peer, carried) =>
         {
-            peer.Released((GdkEvent*)carried);
+            peer.OnButtonRelease((GdkEvent*)carried);
             return false;
         });
-        WhenEvent(mouse, "motion-notify-event", (peer, carried) =>
+        ConnectPeerEvent(mouse, "motion-notify-event", (peer, carried) =>
         {
-            peer.Moved((GdkEvent*)carried);
+            peer.OnMotion((GdkEvent*)carried);
             return false;
         });
 
@@ -883,24 +883,24 @@ public class GtkPeer : IControlPeer
         // The detail field says which, and it is not one the accessors reach;
         // a control that only highlights on enter and unhighlights on leave
         // ends in the correct state either way.
-        WhenEvent(mouse, "enter-notify-event", (peer, carried) =>
+        ConnectPeerEvent(mouse, "enter-notify-event", (peer, carried) =>
         {
-            peer.Crossed(true);
+            peer.OnCrossing(true);
             return false;
         });
-        WhenEvent(mouse, "leave-notify-event", (peer, carried) =>
+        ConnectPeerEvent(mouse, "leave-notify-event", (peer, carried) =>
         {
-            peer.Crossed(false);
+            peer.OnCrossing(false);
             return false;
         });
-        WhenEvent(mouse, "scroll-event", (peer, carried) =>
+        ConnectPeerEvent(mouse, "scroll-event", (peer, carried) =>
         {
-            peer.Scrolled((GdkEvent*)carried);
+            peer.OnScrollEvent((GdkEvent*)carried);
             return false;
         });
 
         var relay = _relay;
-        ConnectEvent(inner, "key-press-event", (sender, carried) =>
+        ConnectEvent(Inner, "key-press-event", (sender, carried) =>
         {
             var owner = relay.Owner;
             if (owner == null)
@@ -909,8 +909,8 @@ public class GtkPeer : IControlPeer
 
             guint keyval = 0u;
             gdk_event_get_keyval(event, &keyval);
-            var modifiers = ModifiersOf(event);
-            ((IControlNotify)owner).OnPlatformKeyDown(KeyOf(event), modifiers);
+            var modifiers = GetModifiers(event);
+            ((IControlNotify)owner).OnPlatformKeyDown(GetKey(event), modifiers);
 
             // The typed character, which the seam keeps separate from the key
             // for the reason it says: the layout and any dead keys have been
@@ -923,34 +923,34 @@ public class GtkPeer : IControlPeer
             return false;
         });
 
-        ConnectEvent(inner, "key-release-event", (sender, carried) =>
+        ConnectEvent(Inner, "key-release-event", (sender, carried) =>
         {
             var owner = relay.Owner;
             if (owner == null)
                 return false;
             var event = (GdkEvent*)carried;
-            ((IControlNotify)owner).OnPlatformKeyUp(KeyOf(event), ModifiersOf(event));
+            ((IControlNotify)owner).OnPlatformKeyUp(GetKey(event), GetModifiers(event));
             return false;
         });
 
-        WhenEvent(inner, "focus-in-event", (peer, carried) =>
+        ConnectPeerEvent(Inner, "focus-in-event", (peer, carried) =>
         {
-            peer.Focused(true);
+            peer.OnFocusChange(true);
             return false;
         });
-        WhenEvent(inner, "focus-out-event", (peer, carried) =>
+        ConnectPeerEvent(Inner, "focus-out-event", (peer, carried) =>
         {
-            peer.Focused(false);
+            peer.OnFocusChange(false);
             return false;
         });
     }
 
     /// True when a context menu was shown, which is the one press a handler
     /// claims.
-    bool Pressed(GdkEvent* event)
+    bool OnButtonPress(GdkEvent* event)
     {
         var owner = Owner;
-        if (owner == null || !IsFor(event))
+        if (owner == null || !OwnsEvent(event))
             return false;
 
         // GTK sends a plain press, then a second plain press, then a
@@ -966,8 +966,8 @@ public class GtkPeer : IControlPeer
         if (EventType(event) == GDK_3BUTTON_PRESS)
             return false;
 
-        var at = LocalPointOf(event);
-        ((IControlNotify)owner).OnPlatformMouseDown(ButtonOf(event), at, ModifiersOf(event));
+        var at = GetLocalPoint(event);
+        ((IControlNotify)owner).OnPlatformMouseDown(GetMouseButton(event), at, GetModifiers(event));
 
         // **On the press, which is where a GTK program shows a menu** --
         // and unlike Win32 this needs no special message, because a GTK
@@ -980,29 +980,29 @@ public class GtkPeer : IControlPeer
         // plain connector in this file returns nothing -- so wiring it
         // would put a garbage answer in the return register. It wants a
         // connector of its own and does not have one yet.
-        if (ButtonOf(event) == MouseButton.Right)
+        if (GetMouseButton(event) == MouseButton.Right)
             return ((IControlNotify)owner).OnPlatformContextMenu(at, false);
         return false;
     }
 
-    void Released(GdkEvent* event)
+    void OnButtonRelease(GdkEvent* event)
     {
         var owner = Owner;
-        if (owner == null || !IsFor(event))
+        if (owner == null || !OwnsEvent(event))
             return;
-        ((IControlNotify)owner).OnPlatformMouseUp(ButtonOf(event), LocalPointOf(event),
-                                                  ModifiersOf(event));
+        ((IControlNotify)owner).OnPlatformMouseUp(GetMouseButton(event), GetLocalPoint(event),
+                                                  GetModifiers(event));
     }
 
-    void Moved(GdkEvent* event)
+    void OnMotion(GdkEvent* event)
     {
         var owner = Owner;
-        if (owner == null || !IsFor(event))
+        if (owner == null || !OwnsEvent(event))
             return;
-        ((IControlNotify)owner).OnPlatformMouseMove(LocalPointOf(event), ModifiersOf(event));
+        ((IControlNotify)owner).OnPlatformMouseMove(GetLocalPoint(event), GetModifiers(event));
     }
 
-    void Crossed(bool entered)
+    void OnCrossing(bool entered)
     {
         var owner = Owner;
         if (owner == null)
@@ -1017,10 +1017,10 @@ public class GtkPeer : IControlPeer
         }
     }
 
-    void Scrolled(GdkEvent* event)
+    void OnScrollEvent(GdkEvent* event)
     {
         var owner = Owner;
-        if (owner == null || !IsFor(event))
+        if (owner == null || !OwnsEvent(event))
             return;
 
         // GDK reports a direction rather than an amount. Win32's wheel delta
@@ -1037,11 +1037,11 @@ public class GtkPeer : IControlPeer
         if (delta == 0)
             return;
 
-        ((IControlNotify)owner).OnPlatformMouseWheel(delta, LocalPointOf(event),
-                                                     ModifiersOf(event));
+        ((IControlNotify)owner).OnPlatformMouseWheel(delta, GetLocalPoint(event),
+                                                     GetModifiers(event));
     }
 
-    void Focused(bool gained)
+    void OnFocusChange(bool gained)
     {
         var owner = Owner;
         if (owner == null)
@@ -1064,29 +1064,29 @@ public class GtkPeer : IControlPeer
     /// declaration, so the provider is replaced -- which is also why each
     /// setter remembers its own fragment rather than appending to a string:
     /// setting a colour twice must not leave the first one in the sheet.
-    protected void Restyle()
+    protected void ApplyCss()
     {
-        var body = foreCss + backCss + fontCss;
+        var body = ForeCss + BackCss + FontCss;
 
-        if (styling != null)
+        if (CssProvider != null)
         {
-            gtk_style_context_remove_provider(gtk_widget_get_style_context(inner), styling);
-            g_object_unref(styling);
-            styling = null;
+            gtk_style_context_remove_provider(gtk_widget_get_style_context(Inner), CssProvider);
+            g_object_unref(CssProvider);
+            CssProvider = null;
         }
         if (body.IsEmpty)
             return;
 
-        styling = gtk_css_provider_new();
+        CssProvider = gtk_css_provider_new();
         GError* failed = null;
-        gtk_css_provider_load_from_data(styling, ("* { " + body + " }").ToPointer(),
+        gtk_css_provider_load_from_data(CssProvider, ("* { " + body + " }").ToPointer(),
                                         -1, &failed);
         // Bad CSS is otherwise silent, and a typo in a colour would leave the
         // control looking untouched with nothing to read.
         if (failed != null)
             g_clear_error(&failed);
 
-        gtk_style_context_add_provider(gtk_widget_get_style_context(inner), styling,
+        gtk_style_context_add_provider(gtk_widget_get_style_context(Inner), CssProvider,
                                        GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
     }
 
@@ -1130,16 +1130,16 @@ public class GtkPeer : IControlPeer
     /// there reads "fixes gtk3 assertion".
     public virtual void SetBounds(FRect wanted)
     {
-        bool moved = wanted.X != bounds.X || wanted.Y != bounds.Y;
-        bool sized = wanted.Width != bounds.Width || wanted.Height != bounds.Height;
-        bounds = wanted;
+        bool moved = wanted.X != LastBounds.X || wanted.Y != LastBounds.Y;
+        bool sized = wanted.Width != LastBounds.Width || wanted.Height != LastBounds.Height;
+        LastBounds = wanted;
 
-        if (placedIn != null)
+        if (PlacedIn != null)
         {
-            if (placedInLayout)
-                gtk_layout_move(placedIn, widget, wanted.X, wanted.Y);
+            if (IsPlacedInLayout)
+                gtk_layout_move(PlacedIn, Widget, wanted.X, wanted.Y);
             else
-                gtk_fixed_move(placedIn, widget, wanted.X, wanted.Y);
+                gtk_fixed_move(PlacedIn, Widget, wanted.X, wanted.Y);
         }
 
         // Clamped, because a layout can compute a negative height for a
@@ -1150,7 +1150,7 @@ public class GtkPeer : IControlPeer
         int wide = wanted.Width < 0 ? 0 : wanted.Width;
         int high = wanted.Height < 0 ? 0 : wanted.Height;
 
-        gtk_widget_set_size_request(widget, wide, high);
+        gtk_widget_set_size_request(Widget, wide, high);
 
         // Reported from here rather than from a `size-allocate` handler,
         // because for a child the layout is what decided and GTK would only
@@ -1160,9 +1160,9 @@ public class GtkPeer : IControlPeer
         if (owner != null)
         {
             if (moved)
-                ((IControlNotify)owner).OnPlatformMoved(At(wanted.X, wanted.Y));
+                ((IControlNotify)owner).OnPlatformMoved(CreatePoint(wanted.X, wanted.Y));
             if (sized)
-                ((IControlNotify)owner).OnPlatformResized(Insisted(wide, high));
+                ((IControlNotify)owner).OnPlatformResized(GetSettledSize(wide, high));
         }
     }
 
@@ -1173,17 +1173,17 @@ public class GtkPeer : IControlPeer
     /// size requested, so a layout reading `Control.Height` afterwards MUST be
     /// told what the widget settled on. Nothing else can tell it: a child's
     /// allocation is decided by the call above, so GTK raises no event.
-    FSize Insisted(int wide, int high)
+    FSize GetSettledSize(int wide, int high)
     {
         gint leastWide = 0;
         gint wantsWide = 0;
-        gtk_widget_get_preferred_width(widget, &leastWide, &wantsWide);
+        gtk_widget_get_preferred_width(Widget, &leastWide, &wantsWide);
 
         gint leastHigh = 0;
         gint wantsHigh = 0;
-        gtk_widget_get_preferred_height(widget, &leastHigh, &wantsHigh);
+        gtk_widget_get_preferred_height(Widget, &leastHigh, &wantsHigh);
 
-        return Extent(wide < leastWide ? leastWide : wide,
+        return CreateSize(wide < leastWide ? leastWide : wide,
                       high < leastHigh ? leastHigh : high);
     }
 
@@ -1191,17 +1191,17 @@ public class GtkPeer : IControlPeer
     {
         if (visible)
         {
-            gtk_widget_show(widget);
+            gtk_widget_show(Widget);
         }
         else
         {
-            gtk_widget_hide(widget);
+            gtk_widget_hide(Widget);
         }
     }
 
     public void SetEnabled(bool enabled)
     {
-        gtk_widget_set_sensitive(widget, enabled ? 1 : 0);
+        gtk_widget_set_sensitive(Widget, enabled ? 1 : 0);
     }
 
     /// Nothing, for a control with no caption of its own. Every control that
@@ -1212,25 +1212,25 @@ public class GtkPeer : IControlPeer
 
     public void SetFont(Font font)
     {
-        fontCss = " " + FontCss(font);
-        Restyle();
+        FontCss = " " + ToFontCss(font);
+        ApplyCss();
     }
 
     public void SetForeColor(Color colour)
     {
-        foreCss = " color: " + ToCss(colour) + ";";
-        Restyle();
+        ForeCss = " color: " + ToCssColor(colour) + ";";
+        ApplyCss();
     }
 
     public void SetBackColor(Color colour)
     {
         // `background-image: none` as well, because a theme paints most
         // widgets with a gradient and a colour alone would sit under it.
-        backCss = " background-image: none; background-color: " + ToCss(colour) + ";";
-        Restyle();
+        BackCss = " background-image: none; background-color: " + ToCssColor(colour) + ";";
+        ApplyCss();
     }
 
-    public void Invalidate() => gtk_widget_queue_draw(widget);
+    public void Invalidate() => gtk_widget_queue_draw(Widget);
 
     /// Paints it now, which on GTK takes more than letting the loop run.
     ///
@@ -1246,9 +1246,9 @@ public class GtkPeer : IControlPeer
     /// may raise work of its own.
     public void Update()
     {
-        gtk_widget_queue_draw(widget);
+        gtk_widget_queue_draw(Widget);
 
-        GdkWindow* surface = (GdkWindow*)gtk_widget_get_window(widget);
+        GdkWindow* surface = (GdkWindow*)gtk_widget_get_window(Widget);
         if (surface != null)
             gdk_window_process_updates(surface, 1);
 
@@ -1256,8 +1256,8 @@ public class GtkPeer : IControlPeer
             gtk_main_iteration_do(0);
     }
 
-    public void Focus() => gtk_widget_grab_focus(inner);
-    public bool HasFocus => gtk_widget_has_focus(inner) != 0;
+    public void Focus() => gtk_widget_grab_focus(Inner);
+    public bool HasFocus => gtk_widget_has_focus(Inner) != 0;
 
     /// **A cursor needs a `GdkWindow` and a widget may not have one yet.**
     /// A control is given its cursor when it is made, long before it is shown,
@@ -1266,34 +1266,34 @@ public class GtkPeer : IControlPeer
     /// handler serves every later change of shape.
     public void SetCursor(CursorKind wanted)
     {
-        shape = wanted;
+        CursorShape = wanted;
         ApplyCursor();
 
         if (!_cursorWatched)
         {
             _cursorWatched = true;
-            WhenSignal(CursorTarget, "realize", (peer) => { peer.ApplyCursor(); });
+            ConnectPeerSignal(CursorTarget, "realize", (peer) => { peer.ApplyCursor(); });
         }
     }
 
     /// The widget whose window the cursor is set on. A container whose
     /// interior has a window of its own overrides this, so that its cursor
     /// does not reach the window it sits on.
-    protected virtual GtkWidget* CursorTarget => inner;
+    protected virtual GtkWidget* CursorTarget => Inner;
 
     /// GTK keeps the text on the widget and shows it itself, delays and
     /// placement included. A null takes the tip away; an empty string would
     /// leave an empty one that still pops up.
     public void SetToolTip(String text)
     {
-        gtk_widget_set_tooltip_text(inner,
+        gtk_widget_set_tooltip_text(Inner,
             text.ByteLength() == 0u ? null : text.ToPointer());
 
         // A tip already on screen keeps saying what it said until the pointer
         // leaves. Asking for it again is what refreshes one whose text has
         // just changed, which is what a caller answering per word needs.
-        if (text.ByteLength() != 0u && gtk_widget_get_realized(inner) != 0)
-            gtk_widget_trigger_tooltip_query(inner);
+        if (text.ByteLength() != 0u && gtk_widget_get_realized(Inner) != 0)
+            gtk_widget_trigger_tooltip_query(Inner);
     }
 
     /// The window takes a reference of its own, so the one the cursor was
@@ -1304,7 +1304,7 @@ public class GtkPeer : IControlPeer
         if (window == null)
             return;
         gpointer cursor = gdk_cursor_new_from_name(gdk_display_get_default(),
-                                                   CursorName(shape).ToPointer());
+                                                   GetCursorName(CursorShape).ToPointer());
         gdk_window_set_cursor((GdkWindow*)window, cursor);
         if (cursor != null)
             g_object_unref(cursor);
@@ -1315,11 +1315,11 @@ public class GtkPeer : IControlPeer
         _captured = captured;
         if (captured)
         {
-            gtk_grab_add(inner);
+            gtk_grab_add(Inner);
         }
         else
         {
-            gtk_grab_remove(inner);
+            gtk_grab_remove(Inner);
         }
     }
 
@@ -1365,31 +1365,31 @@ public class GtkPeer : IControlPeer
     /// again on top of its siblings'. The focus is given back if it had it.
     public void BringToFront()
     {
-        if (placedIn == null)
+        if (PlacedIn == null)
             return;
 
-        GList* children = gtk_container_get_children(placedIn);
+        GList* children = gtk_container_get_children(PlacedIn);
         GtkWidget* last = null;
         for (GList* at = children; at != null; at = at->Next)
             last = (GtkWidget*)at->Data;
         g_list_free(children);
-        if (last == widget)
+        if (last == Widget)
             return;
 
-        bool focused = gtk_widget_has_focus(inner) != 0;
-        g_object_ref((gpointer)widget);
-        gtk_container_remove(placedIn, widget);
-        if (placedInLayout)
+        bool focused = gtk_widget_has_focus(Inner) != 0;
+        g_object_ref((gpointer)Widget);
+        gtk_container_remove(PlacedIn, Widget);
+        if (IsPlacedInLayout)
         {
-            gtk_layout_put(placedIn, widget, bounds.X, bounds.Y);
+            gtk_layout_put(PlacedIn, Widget, LastBounds.X, LastBounds.Y);
         }
         else
         {
-            gtk_fixed_put(placedIn, widget, bounds.X, bounds.Y);
+            gtk_fixed_put(PlacedIn, Widget, LastBounds.X, LastBounds.Y);
         }
-        g_object_unref((gpointer)widget);
+        g_object_unref((gpointer)Widget);
         if (focused)
-            gtk_widget_grab_focus(inner);
+            gtk_widget_grab_focus(Inner);
     }
 
     /// What the layout gave the widget, at the origin.
@@ -1408,7 +1408,7 @@ public class GtkPeer : IControlPeer
     /// Reading it here is what made every control inside a container invisible
     /// on this backend: the container was sized correctly, its client area
     /// answered 1x1, and every child docked into one pixel. It went unnoticed
-    /// because a form answers from its own `bounds` -- `GtkWindowPeer`
+    /// because a form answers from its own `LastBounds` -- `GtkWindowPeer`
     /// overrides this -- so a control placed straight on a form was laid out
     /// correctly and a control inside a panel or a tab page was not.
     ///
@@ -1420,21 +1420,21 @@ public class GtkPeer : IControlPeer
     {
         get
         {
-            if (bounds.Width > 0 && bounds.Height > 0)
+            if (LastBounds.Width > 0 && LastBounds.Height > 0)
             {
-                return Area(0, 0, bounds.Width, bounds.Height);
+                return CreateRectangle(0, 0, LastBounds.Width, LastBounds.Height);
             }
-            return Area(0, 0, gtk_widget_get_allocated_width(widget),
-                              gtk_widget_get_allocated_height(widget));
+            return CreateRectangle(0, 0, gtk_widget_get_allocated_width(Widget),
+                              gtk_widget_get_allocated_height(Widget));
         }
     }
 
     /// Zero, because a child of a `GtkFixed` is positioned from the fixed's
     /// own corner. Only a peer whose frame eats into that space -- a group
     /// box -- overrides this.
-    public virtual FPoint ClientOrigin => At(0, 0);
+    public virtual FPoint ClientOrigin => CreatePoint(0, 0);
 
-    /// What GTK thinks the widget ought to be, which is what `AutoSize` wants.
+    /// What GTK thinks the widget ought to be, which is what `ResizeToPreferredSize` wants.
     /// The natural size rather than the minimum: the minimum is what it can be
     /// squeezed to, and a button squeezed to its minimum has no padding left.
     public virtual FSize PreferredSize
@@ -1443,54 +1443,50 @@ public class GtkPeer : IControlPeer
         {
             GtkRequisition minimum;
             GtkRequisition natural;
-            gtk_widget_get_preferred_size(widget, &minimum, &natural);
-            return Extent(natural.Width, natural.Height);
+            gtk_widget_get_preferred_size(Widget, &minimum, &natural);
+            return CreateSize(natural.Width, natural.Height);
         }
     }
 
-    public nuint Handle => (nuint)(void*)widget;
+    public nuint Handle => (nuint)(void*)Widget;
 
     public void DestroyHandle()
     {
-        if (destroyed)
+        if (IsDestroyed)
             return;
-        destroyed = true;
+        IsDestroyed = true;
 
-        if (styling != null)
+        if (CssProvider != null)
         {
-            g_object_unref(styling);
-            styling = null;
+            g_object_unref(CssProvider);
+            CssProvider = null;
         }
-        if (widget != null)
+        if (Widget != null)
         {
-            gtk_widget_destroy(widget);
-            g_object_unref((gpointer)widget);
-            widget = null;
-            inner = null;
+            gtk_widget_destroy(Widget);
+            g_object_unref((gpointer)Widget);
+            Widget = null;
+            Inner = null;
         }
     }
-
-    /// The widget, for the widget set that makes children inside it and for a
-    /// peer that has to reach one it was given.
-    public GtkWidget* Widget => widget;
-    public GtkWidget* Inner => inner;
 }
 
 // ========================================================== containers
 
 /// A peer other controls can be put inside.
 ///
-/// **The `GtkFixed` is the whole of it.** `content` is where children go, and
-/// it is a different widget from `widget` whenever the container has a frame
-/// of its own: a group box's `widget` is the `GtkFrame` and its `content` is
+/// **The `GtkFixed` is the whole of it.** `Content` is where children go, and
+/// it is a different widget from `Widget` whenever the container has a frame
+/// of its own: a group box's `Widget` is the `GtkFrame` and its `Content` is
 /// the fixed inside it.
 public class GtkContainerPeer : GtkPeer, IContainerPeer
 {
-    protected GtkWidget* content;
+    /// The fixed children are placed in, for a peer that has to reach it.
+    public GtkWidget* Content { get; protected set; }
 
-    /// Whether `content` is a `GtkLayout`. A form's client area is one; every
+    /// Whether `Content` is a `GtkLayout`. A form's client area is one; every
     /// other container here is a `GtkFixed`. See `GtkWindowPeer`.
-    protected bool contentIsLayout;
+    protected bool IsContentLayout;
 
     /// The hidden radio button every radio put in this container joins, and
     /// the one that is ticked while none of them is. Owned: one reference,
@@ -1500,7 +1496,7 @@ public class GtkContainerPeer : GtkPeer, IContainerPeer
     public GtkContainerPeer(GtkWidget* made, IControlNotify? owner, GtkWidget* inside)
     {
         base(made, owner);
-        content = inside;
+        Content = inside;
         _radios = null;
     }
 
@@ -1513,15 +1509,12 @@ public class GtkContainerPeer : GtkPeer, IContainerPeer
         }
     }
 
-    /// The fixed children are placed in, for a peer that has to reach it.
-    public GtkWidget* Content => content;
-
     /// The interior too, which is what GTK gives an event to when the
     /// interior has a window of its own.
-    protected override void Mark()
+    protected override void MarkWidgets()
     {
-        base.Mark();
-        g_object_set_data((gpointer)content, PeerMark.ToPointer(), (gpointer)Surface);
+        base.MarkWidgets();
+        g_object_set_data((gpointer)Content, PeerMark.ToPointer(), (gpointer)Surface);
     }
 
     /// The interior, when it has a window of its own: a cursor set on the
@@ -1530,9 +1523,9 @@ public class GtkContainerPeer : GtkPeer, IContainerPeer
     {
         get
         {
-            if (gtk_widget_get_has_window(content) != 0)
-                return content;
-            return inner;
+            if (gtk_widget_get_has_window(Content) != 0)
+                return Content;
+            return Inner;
         }
     }
 
@@ -1559,11 +1552,11 @@ public class GtkContainerPeer : GtkPeer, IContainerPeer
     /// `WS_CLIPCHILDREN` for nothing.
     ///
     /// The handler clips to the widget it was connected to, which a tab
-    /// control's later change of `content` MUST NOT move.
-    protected void ReportPaints()
+    /// control's later change of `Content` MUST NOT move.
+    protected void ConnectPaintReports()
     {
-        var drawn = content;
-        WhenEvent(drawn, "draw", (peer, carried) =>
+        var drawn = Content;
+        ConnectPeerEvent(drawn, "draw", (peer, carried) =>
         {
             ((GtkContainerPeer)peer).PaintInterior((cairo_t*)carried, drawn);
             return false;
@@ -1587,11 +1580,11 @@ public class GtkContainerPeer : GtkPeer, IContainerPeer
     public virtual void AddChild(IControlPeer child)
     {
         var peer = (GtkPeer)child;
-        if (contentIsLayout)
-            gtk_layout_put(content, peer.Widget, 0, 0);
+        if (IsContentLayout)
+            gtk_layout_put(Content, peer.Widget, 0, 0);
         else
-            gtk_fixed_put(content, peer.Widget, 0, 0);
-        peer.PlacedInto(content, contentIsLayout);
+            gtk_fixed_put(Content, peer.Widget, 0, 0);
+        peer.RecordPlacement(Content, IsContentLayout);
 
         // **Radio buttons are grouped by their container**, which is where the
         // seam leaves the question: `CreateCheck(owner, parent, radio)` says a
@@ -1625,8 +1618,8 @@ public class GtkContainerPeer : GtkPeer, IContainerPeer
     public void RemoveChild(IControlPeer child)
     {
         var peer = (GtkPeer)child;
-        gtk_container_remove(content, peer.Widget);
-        peer.PlacedInto(null, false);
+        gtk_container_remove(Content, peer.Widget);
+        peer.RecordPlacement(null, false);
     }
 }
 

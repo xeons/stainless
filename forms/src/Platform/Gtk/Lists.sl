@@ -66,7 +66,7 @@ import Gtk.Events;
 /// The `GValue` is initialised, set, written and unset every time rather than
 /// kept: it owns a copy of the string while it holds one, and a reused value
 /// would have to be unset between types anyway.
-void PutText(gpointer store, GtkTreeIter* row, int column, String text, bool tree)
+void SetStoreText(gpointer store, GtkTreeIter* row, int column, String text, bool tree)
 {
     GValue value;
     g_value_init(&value, G_TYPE_STRING);
@@ -82,7 +82,7 @@ void PutText(gpointer store, GtkTreeIter* row, int column, String text, bool tre
     g_value_unset(&value);
 }
 
-void PutFlag(gpointer store, GtkTreeIter* row, int column, bool state)
+void SetStoreFlag(gpointer store, GtkTreeIter* row, int column, bool state)
 {
     GValue value;
     g_value_init(&value, G_TYPE_BOOLEAN);
@@ -91,7 +91,7 @@ void PutFlag(gpointer store, GtkTreeIter* row, int column, bool state)
     g_value_unset(&value);
 }
 
-void PutPicture(gpointer store, GtkTreeIter* row, int column, gpointer picture,
+void SetStorePicture(gpointer store, GtkTreeIter* row, int column, gpointer picture,
                 bool tree)
 {
     GValue value;
@@ -110,7 +110,7 @@ void PutPicture(gpointer store, GtkTreeIter* row, int column, gpointer picture,
 
 /// Reads one string out of one cell. The value owns the string it hands back,
 /// so it is copied before the value is unset.
-String TakeText(gpointer model, GtkTreeIter* row, int column)
+String GetModelText(gpointer model, GtkTreeIter* row, int column)
 {
     GValue value;
     gtk_tree_model_get_value(model, row, column, &value);
@@ -120,7 +120,7 @@ String TakeText(gpointer model, GtkTreeIter* row, int column)
     return text;
 }
 
-bool TakeFlag(gpointer model, GtkTreeIter* row, int column)
+bool GetModelFlag(gpointer model, GtkTreeIter* row, int column)
 {
     GValue value;
     gtk_tree_model_get_value(model, row, column, &value);
@@ -131,7 +131,7 @@ bool TakeFlag(gpointer model, GtkTreeIter* row, int column)
 
 /// A text column, built in three calls because `new_with_attributes` is
 /// variadic. `title` may be empty, for a control whose headers are hidden.
-gpointer TextColumn(String title, int modelColumn)
+gpointer CreateTextColumn(String title, int modelColumn)
 {
     gpointer column = gtk_tree_view_column_new();
     gpointer renderer = gtk_cell_renderer_text_new();
@@ -146,30 +146,30 @@ gpointer TextColumn(String title, int modelColumn)
 /// What the four scrolling controls share: a scrolled window around a tree
 /// view, and the model behind it.
 ///
-/// **`widget` is the scrolled window and `inner` is the view**, which is the
+/// **`Widget` is the scrolled window and `Inner` is the view**, which is the
 /// arrangement `GtkPeer` was built to allow: the parent places the scroller,
 /// and the signals, the style and the focus all belong to the view.
 public class GtkModelPeer : GtkPeer
 {
-    protected gpointer model;
-    protected gpointer selection;
+    protected gpointer Model;
+    protected gpointer Selection;
 
     public GtkModelPeer(IControlNotify owner)
     {
         base(gtk_scrolled_window_new(null, null), owner);
 
         GtkWidget* view = gtk_tree_view_new();
-        gtk_container_add(widget, view);
+        gtk_container_add(Widget, view);
         gtk_widget_show(view);
         SetInner(view);
 
-        gtk_scrolled_window_set_policy(widget, GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-        selection = gtk_tree_view_get_selection(view);
-        gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
+        gtk_scrolled_window_set_policy(Widget, GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+        Selection = gtk_tree_view_get_selection(view);
+        gtk_tree_selection_set_mode(Selection, GTK_SELECTION_SINGLE);
 
-        WhenSignal((GtkWidget*)selection, "changed", (peer) =>
+        ConnectPeerSignal((GtkWidget*)Selection, "changed", (peer) =>
         {
-            ((GtkModelPeer)peer).SelectionChanged();
+            ((GtkModelPeer)peer).OnSelectionChanged();
         });
 
         // **A double click rather than `row-activated`, for the same reason
@@ -178,23 +178,23 @@ public class GtkModelPeer : GtkPeer
         // boxed closure out of the column pointer. The click count is already
         // on the event, so this is the same notification from a signal that
         // fits.
-        WhenEvent(view, "button-press-event", (peer, carried) =>
+        ConnectPeerEvent(view, "button-press-event", (peer, carried) =>
         {
-            ((GtkModelPeer)peer).RowPressed((GdkEvent*)carried);
+            ((GtkModelPeer)peer).OnRowPressed((GdkEvent*)carried);
             return false;
         });
     }
 
-    void SelectionChanged()
+    void OnSelectionChanged()
     {
-        if (echoing)
+        if (IsEchoing)
             return;
         var target2 = Owner;
         if (target2 != null)
             ((IControlNotify)target2).OnPlatformValueChanged();
     }
 
-    void RowPressed(GdkEvent* event)
+    void OnRowPressed(GdkEvent* event)
     {
         guint clicks = 0u;
         if (gdk_event_get_click_count(event, &clicks) == 0 || clicks != 2u)
@@ -205,16 +205,16 @@ public class GtkModelPeer : GtkPeer
     }
 
     /// The row at `index` among the roots, or false when there is none.
-    protected bool RowAt(int index, GtkTreeIter* into)
+    protected bool TryGetRow(int index, GtkTreeIter* into)
     {
         if (index < 0)
             return false;
-        return gtk_tree_model_iter_nth_child(model, into, null, index) != 0;
+        return gtk_tree_model_iter_nth_child(Model, into, null, index) != 0;
     }
 
-    protected int RowCountOf()
+    protected int CountRows()
     {
-        return gtk_tree_model_iter_n_children(model, null);
+        return gtk_tree_model_iter_n_children(Model, null);
     }
 
     /// Which root row is selected, or -1.
@@ -228,10 +228,10 @@ public class GtkModelPeer : GtkPeer
         get
         {
             GtkTreeIter row;
-            if (gtk_tree_selection_get_selected(selection, null, &row) == 0)
+            if (gtk_tree_selection_get_selected(Selection, null, &row) == 0)
                 return -1;
 
-            gpointer path = gtk_tree_model_get_path(model, &row);
+            gpointer path = gtk_tree_model_get_path(Model, &row);
             if (path == null)
                 return -1;
 
@@ -249,18 +249,18 @@ public class GtkModelPeer : GtkPeer
 
     protected void SelectRow(int index)
     {
-        var chosen = selection;
+        var chosen = Selection;
         if (index < 0)
         {
-            Quietly(() => { gtk_tree_selection_unselect_all(chosen); });
+            RunQuietly(() => { gtk_tree_selection_unselect_all(chosen); });
             return;
         }
 
         GtkTreeIter row;
-        if (!RowAt(index, &row))
+        if (!TryGetRow(index, &row))
             return;
         var at = row;
-        Quietly(() => { gtk_tree_selection_select_iter(chosen, &at); });
+        RunQuietly(() => { gtk_tree_selection_select_iter(chosen, &at); });
     }
 
     /// Removes a row of a flat model, quietly: removing the selected row
@@ -268,18 +268,18 @@ public class GtkModelPeer : GtkPeer
     protected void RemoveListRow(int index)
     {
         GtkTreeIter row;
-        if (!RowAt(index, &row))
+        if (!TryGetRow(index, &row))
             return;
-        var store = model;
+        var store = Model;
         var at = row;
-        Quietly(() => { gtk_list_store_remove(store, &at); });
+        RunQuietly(() => { gtk_list_store_remove(store, &at); });
     }
 
     /// Empties a flat model, quietly, for the same reason.
     protected void ClearList()
     {
-        var store = model;
-        Quietly(() => { gtk_list_store_clear(store); });
+        var store = Model;
+        RunQuietly(() => { gtk_list_store_clear(store); });
     }
 }
 
@@ -292,31 +292,31 @@ public class GtkListPeer : GtkModelPeer, IListPeer
         base(owner);
 
         GType[1] types = [G_TYPE_STRING];
-        model = gtk_list_store_newv(1, &types[0u]);
-        gtk_tree_view_set_model(inner, model);
-        gtk_tree_view_set_headers_visible(inner, 0);
-        gtk_tree_view_append_column(inner, TextColumn("", 0));
+        Model = gtk_list_store_newv(1, &types[0u]);
+        gtk_tree_view_set_model(Inner, Model);
+        gtk_tree_view_set_headers_visible(Inner, 0);
+        gtk_tree_view_append_column(Inner, CreateTextColumn("", 0));
     }
 
     ~GtkListPeer()
     {
-        if (model != null)
+        if (Model != null)
         {
-            g_object_unref(model);
-            model = null;
+            g_object_unref(Model);
+            Model = null;
         }
     }
 
     public void InsertItem(int index, String text)
     {
         GtkTreeIter row;
-        gtk_list_store_insert(model, &row, index);
-        PutText(model, &row, 0, text, false);
+        gtk_list_store_insert(Model, &row, index);
+        SetStoreText(Model, &row, 0, text, false);
     }
 
     public void RemoveItem(int index) => RemoveListRow(index);
     public void ClearItems() => ClearList();
-    public int ItemCount => RowCountOf();
+    public int ItemCount => CountRows();
 
     public void SetSelectedIndex(int index) => SelectRow(index);
     public int  GetSelectedIndex() => SelectedRow;
@@ -338,20 +338,20 @@ public class GtkCheckListPeer : GtkModelPeer, ICheckListPeer
         base(owner);
 
         GType[2] types = [G_TYPE_BOOLEAN, G_TYPE_STRING];
-        model = gtk_list_store_newv(2, &types[0u]);
-        gtk_tree_view_set_model(inner, model);
-        gtk_tree_view_set_headers_visible(inner, 0);
+        Model = gtk_list_store_newv(2, &types[0u]);
+        gtk_tree_view_set_model(Inner, Model);
+        gtk_tree_view_set_headers_visible(Inner, 0);
 
         gpointer column = gtk_tree_view_column_new();
         gpointer toggle = gtk_cell_renderer_toggle_new();
         gtk_tree_view_column_pack_start(column, toggle, 0);
         gtk_tree_view_column_add_attribute(column, toggle, "active".ToPointer(), 0);
-        gtk_tree_view_append_column(inner, column);
-        gtk_tree_view_append_column(inner, TextColumn("", 1));
+        gtk_tree_view_append_column(Inner, column);
+        gtk_tree_view_append_column(Inner, CreateTextColumn("", 1));
 
-        WhenEvent((GtkWidget*)toggle, "toggled", (peer, carried) =>
+        ConnectPeerEvent((GtkWidget*)toggle, "toggled", (peer, carried) =>
         {
-            ((GtkCheckListPeer)peer).Flip(Text.FromNullTerminated((gchar*)carried));
+            ((GtkCheckListPeer)peer).ToggleRowChecked(Text.FromNullTerminated((gchar*)carried));
             return false;
         });
     }
@@ -362,14 +362,14 @@ public class GtkCheckListPeer : GtkModelPeer, ICheckListPeer
     /// and reports a click by path; updating the model is the program's
     /// business, which is the one thing about a cell renderer that surprises
     /// everyone once.
-    void Flip(String path)
+    void ToggleRowChecked(String path)
     {
         GtkTreeIter row;
-        if (gtk_tree_model_get_iter_from_string(model, &row, path.ToPointer()) == 0)
+        if (gtk_tree_model_get_iter_from_string(Model, &row, path.ToPointer()) == 0)
         {
             return;
         }
-        PutFlag(model, &row, 0, !TakeFlag(model, &row, 0));
+        SetStoreFlag(Model, &row, 0, !GetModelFlag(Model, &row, 0));
 
         var target2 = Owner;
         if (target2 != null)
@@ -378,24 +378,24 @@ public class GtkCheckListPeer : GtkModelPeer, ICheckListPeer
 
     ~GtkCheckListPeer()
     {
-        if (model != null)
+        if (Model != null)
         {
-            g_object_unref(model);
-            model = null;
+            g_object_unref(Model);
+            Model = null;
         }
     }
 
     public void InsertItem(int index, String text)
     {
         GtkTreeIter row;
-        gtk_list_store_insert(model, &row, index);
-        PutFlag(model, &row, 0, false);
-        PutText(model, &row, 1, text, false);
+        gtk_list_store_insert(Model, &row, index);
+        SetStoreFlag(Model, &row, 0, false);
+        SetStoreText(Model, &row, 1, text, false);
     }
 
     public void RemoveItem(int index) => RemoveListRow(index);
     public void ClearItems() => ClearList();
-    public int ItemCount => RowCountOf();
+    public int ItemCount => CountRows();
 
     public void SetSelectedIndex(int index) => SelectRow(index);
     public int  GetSelectedIndex() => SelectedRow;
@@ -403,16 +403,16 @@ public class GtkCheckListPeer : GtkModelPeer, ICheckListPeer
     public void SetItemChecked(int index, bool checked)
     {
         GtkTreeIter row;
-        if (RowAt(index, &row))
-            PutFlag(model, &row, 0, checked);
+        if (TryGetRow(index, &row))
+            SetStoreFlag(Model, &row, 0, checked);
     }
 
     public bool GetItemChecked(int index)
     {
         GtkTreeIter row;
-        if (!RowAt(index, &row))
+        if (!TryGetRow(index, &row))
             return false;
-        return TakeFlag(model, &row, 0);
+        return GetModelFlag(Model, &row, 0);
     }
 }
 
@@ -441,16 +441,16 @@ public class GtkHeaderPeer : GtkPeer, IHeaderPeer
         base(gtk_tree_view_new(), owner);
         _sections = new List<gpointer>();
         _widths = new List<int>();
-        gtk_tree_view_set_headers_visible(widget, 1);
+        gtk_tree_view_set_headers_visible(Widget, 1);
     }
 
     public int AddSection(String text, int width)
     {
-        gpointer column = TextColumn(text, 0);
+        gpointer column = CreateTextColumn(text, 0);
         gtk_tree_view_column_set_resizable(column, 1);
         gtk_tree_view_column_set_sizing(column, GTK_TREE_VIEW_COLUMN_FIXED);
         gtk_tree_view_column_set_fixed_width(column, width);
-        gtk_tree_view_append_column(widget, column);
+        gtk_tree_view_append_column(Widget, column);
         _sections.Add(column);
         _widths.Add(width);
         return (int)_sections.Count - 1;
@@ -495,19 +495,19 @@ public class GtkTreePeer : GtkModelPeer, ITreeViewPeer
     /// Every live node's row reference, by the number handed out for it.
     Dictionary<nuint, gpointer> _nodes;
     nuint _nextId;
-    GtkImageListBackend? _pictures;
+    GtkImageListBackend? _images;
 
     public GtkTreePeer(IControlNotify owner)
     {
         base(owner);
         _nodes = new Dictionary<nuint, gpointer>();
         _nextId = 1u;
-        _pictures = null;
+        _images = null;
 
         GType[2] types = [gdk_pixbuf_get_type(), G_TYPE_STRING];
-        model = gtk_tree_store_newv(2, &types[0u]);
-        gtk_tree_view_set_model(inner, model);
-        gtk_tree_view_set_headers_visible(inner, 0);
+        Model = gtk_tree_store_newv(2, &types[0u]);
+        gtk_tree_view_set_model(Inner, Model);
+        gtk_tree_view_set_headers_visible(Inner, 0);
 
         gpointer column = gtk_tree_view_column_new();
         gpointer icon = gtk_cell_renderer_pixbuf_new();
@@ -516,20 +516,20 @@ public class GtkTreePeer : GtkModelPeer, ITreeViewPeer
         gtk_tree_view_column_add_attribute(column, icon, "pixbuf".ToPointer(), 0);
         gtk_tree_view_column_pack_start(column, text, 1);
         gtk_tree_view_column_add_attribute(column, text, "text".ToPointer(), 1);
-        gtk_tree_view_append_column(inner, column);
+        gtk_tree_view_append_column(Inner, column);
     }
 
     ~GtkTreePeer()
     {
-        ForgetAll();
-        if (model != null)
+        ReleaseAllNodes();
+        if (Model != null)
         {
-            g_object_unref(model);
-            model = null;
+            g_object_unref(Model);
+            Model = null;
         }
     }
 
-    void ForgetAll()
+    void ReleaseAllNodes()
     {
         foreach (var pair in _nodes)
             gtk_tree_row_reference_free(pair.Value);
@@ -538,7 +538,7 @@ public class GtkTreePeer : GtkModelPeer, ITreeViewPeer
 
     /// The iter for a handle, or false when the node has been removed --
     /// which a program holding an old handle genuinely can ask for.
-    bool IterFor(ITreeNodeHandle? node, GtkTreeIter* into)
+    bool TryGetIter(ITreeNodeHandle? node, GtkTreeIter* into)
     {
         if (node == null)
             return false;
@@ -550,17 +550,17 @@ public class GtkTreePeer : GtkModelPeer, ITreeViewPeer
             if (path == null)
                 return false;
 
-            bool ok = gtk_tree_model_get_iter(model, into, path) != 0;
+            bool ok = gtk_tree_model_get_iter(Model, into, path) != 0;
             gtk_tree_path_free(path);
             return ok;
         }
         return false;
     }
 
-    nuint Remember(GtkTreeIter* row)
+    nuint RememberRow(GtkTreeIter* row)
     {
-        gpointer path = gtk_tree_model_get_path(model, row);
-        gpointer reference = gtk_tree_row_reference_new(model, path);
+        gpointer path = gtk_tree_model_get_path(Model, row);
+        gpointer reference = gtk_tree_row_reference_new(Model, path);
         gtk_tree_path_free(path);
 
         nuint id = _nextId;
@@ -576,19 +576,19 @@ public class GtkTreePeer : GtkModelPeer, ITreeViewPeer
         GtkTreeIter after;
         GtkTreeIter made;
 
-        bool hasParent = IterFor(parent, &under);
-        bool hasPrevious = IterFor(previous, &after);
+        bool hasParent = TryGetIter(parent, &under);
+        bool hasPrevious = TryGetIter(previous, &after);
 
-        gtk_tree_store_insert_after(model, &made,
+        gtk_tree_store_insert_after(Model, &made,
                                     hasParent ? &under : null,
                                     hasPrevious ? &after : null);
-        PutText(model, &made, 1, text, true);
-        if (image >= 0 && _pictures != null)
+        SetStoreText(Model, &made, 1, text, true);
+        if (image >= 0 && _images != null)
         {
-            PutPicture(model, &made, 0,
-                       ((GtkImageListBackend)_pictures).Pixbuf(image), true);
+            SetStorePicture(Model, &made, 0,
+                       ((GtkImageListBackend)_images).GetPixbuf(image), true);
         }
-        return new GtkTreeNode(Remember(&made));
+        return new GtkTreeNode(RememberRow(&made));
     }
 
     /// Quietly, because removing the selected node changes the selection.
@@ -600,11 +600,11 @@ public class GtkTreePeer : GtkModelPeer, ITreeViewPeer
     public void RemoveNode(ITreeNodeHandle node)
     {
         GtkTreeIter row;
-        if (IterFor(node, &row))
+        if (TryGetIter(node, &row))
         {
-            var store = model;
+            var store = Model;
             var at = row;
-            Quietly(() => { gtk_tree_store_remove(store, &at); });
+            RunQuietly(() => { gtk_tree_store_remove(store, &at); });
         }
 
         var gone = new List<nuint>();
@@ -625,34 +625,34 @@ public class GtkTreePeer : GtkModelPeer, ITreeViewPeer
     public void SetNodeText(ITreeNodeHandle node, String text)
     {
         GtkTreeIter row;
-        if (IterFor(node, &row))
-            PutText(model, &row, 1, text, true);
+        if (TryGetIter(node, &row))
+            SetStoreText(Model, &row, 1, text, true);
     }
 
     public String GetNodeText(ITreeNodeHandle node)
     {
         GtkTreeIter row;
-        if (!IterFor(node, &row))
+        if (!TryGetIter(node, &row))
             return "";
-        return TakeText(model, &row, 1);
+        return GetModelText(Model, &row, 1);
     }
 
     public void SetNodeExpanded(ITreeNodeHandle node, bool expanded)
     {
         GtkTreeIter row;
-        if (!IterFor(node, &row))
+        if (!TryGetIter(node, &row))
             return;
 
-        gpointer path = gtk_tree_model_get_path(model, &row);
+        gpointer path = gtk_tree_model_get_path(Model, &row);
         if (path == null)
             return;
         if (expanded)
         {
-            gtk_tree_view_expand_row(inner, path, 0);
+            gtk_tree_view_expand_row(Inner, path, 0);
         }
         else
         {
-            gtk_tree_view_collapse_row(inner, path);
+            gtk_tree_view_collapse_row(Inner, path);
         }
         gtk_tree_path_free(path);
     }
@@ -660,11 +660,11 @@ public class GtkTreePeer : GtkModelPeer, ITreeViewPeer
     public void SelectNode(ITreeNodeHandle node)
     {
         GtkTreeIter row;
-        if (!IterFor(node, &row))
+        if (!TryGetIter(node, &row))
             return;
-        var chosen = selection;
+        var chosen = Selection;
         var at = row;
-        Quietly(() => { gtk_tree_selection_select_iter(chosen, &at); });
+        RunQuietly(() => { gtk_tree_selection_select_iter(chosen, &at); });
     }
 
     /// A *fresh* handle for the node at a row path, which is why the seam says
@@ -678,7 +678,7 @@ public class GtkTreePeer : GtkModelPeer, ITreeViewPeer
     /// because each reference has to be turned into a path to be looked at
     /// either way, so the comparison is the cheap half of the loop whichever
     /// way it is done.
-    ITreeNodeHandle? HandleForPath(gpointer path)
+    ITreeNodeHandle? FindHandleForPath(gpointer path)
     {
         if (path == null)
             return null;
@@ -708,14 +708,14 @@ public class GtkTreePeer : GtkModelPeer, ITreeViewPeer
     public ITreeNodeHandle? GetSelectedNode()
     {
         GtkTreeIter row;
-        if (gtk_tree_selection_get_selected(selection, null, &row) == 0)
+        if (gtk_tree_selection_get_selected(Selection, null, &row) == 0)
             return null;
 
-        gpointer path = gtk_tree_model_get_path(model, &row);
+        gpointer path = gtk_tree_model_get_path(Model, &row);
         if (path == null)
             return null;
 
-        var found = HandleForPath(path);
+        var found = FindHandleForPath(path);
         gtk_tree_path_free(path);
         return found;
     }
@@ -733,29 +733,29 @@ public class GtkTreePeer : GtkModelPeer, ITreeViewPeer
     {
         gint x = 0;
         gint y = 0;
-        gtk_tree_view_convert_widget_to_bin_window_coords(inner, at.X, at.Y, &x, &y);
+        gtk_tree_view_convert_widget_to_bin_window_coords(Inner, at.X, at.Y, &x, &y);
 
         gpointer path = null;
-        if (gtk_tree_view_get_path_at_pos(inner, x, y, &path, null, null, null) == 0)
+        if (gtk_tree_view_get_path_at_pos(Inner, x, y, &path, null, null, null) == 0)
             return null;
         if (path == null)
             return null;
 
-        var found = HandleForPath(path);
+        var found = FindHandleForPath(path);
         gtk_tree_path_free(path);
         return found;
     }
 
     public void Clear()
     {
-        ForgetAll();
-        var store = model;
-        Quietly(() => { gtk_tree_store_clear(store); });
+        ReleaseAllNodes();
+        var store = Model;
+        RunQuietly(() => { gtk_tree_store_clear(store); });
     }
 
     public void SetImages(IImageListBackend? images)
     {
-        _pictures = images == null ? null : (GtkImageListBackend)images;
+        _images = images == null ? null : (GtkImageListBackend)images;
     }
 }
 
@@ -767,13 +767,13 @@ public class GtkListViewPeer : GtkModelPeer, IListViewPeer
     /// so a cell in column `n` is model column `n + 1`.
     int _columns;
     List<gpointer> _headings;
-    GtkImageListBackend? _pictures;
+    GtkImageListBackend? _images;
 
     public GtkListViewPeer(IControlNotify owner)
     {
         base(owner);
         _headings = new List<gpointer>();
-        _pictures = null;
+        _images = null;
 
         // **The column count is fixed when the store is made**, and a
         // `GtkListStore` cannot grow one afterwards. Sixteen is what a details
@@ -786,17 +786,17 @@ public class GtkListViewPeer : GtkModelPeer, IListViewPeer
                            G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING,
                            G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING,
                            G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING];
-        model = gtk_list_store_newv(17, &types[0u]);
-        gtk_tree_view_set_model(inner, model);
-        gtk_tree_view_set_headers_visible(inner, 1);
+        Model = gtk_list_store_newv(17, &types[0u]);
+        gtk_tree_view_set_model(Inner, Model);
+        gtk_tree_view_set_headers_visible(Inner, 1);
     }
 
     ~GtkListViewPeer()
     {
-        if (model != null)
+        if (Model != null)
         {
-            g_object_unref(model);
-            model = null;
+            g_object_unref(Model);
+            Model = null;
         }
     }
 
@@ -807,7 +807,7 @@ public class GtkListViewPeer : GtkModelPeer, IListViewPeer
     /// anyway, and is stated rather than silently approximated.
     public void SetStyle(ListViewStyle style)
     {
-        gtk_tree_view_set_headers_visible(inner, style == ListViewStyle.Details ? 1 : 0);
+        gtk_tree_view_set_headers_visible(Inner, style == ListViewStyle.Details ? 1 : 0);
     }
 
     public int AddColumn(String text, int width, HorizontalAlignment alignment)
@@ -839,7 +839,7 @@ public class GtkListViewPeer : GtkModelPeer, IListViewPeer
             alignment == HorizontalAlignment.Center ? 0.5f
             : alignment == HorizontalAlignment.Right ? 1.0f : 0.0f);
 
-        gtk_tree_view_append_column(inner, column);
+        gtk_tree_view_append_column(Inner, column);
         _headings.Add(column);
         return index;
     }
@@ -854,14 +854,14 @@ public class GtkListViewPeer : GtkModelPeer, IListViewPeer
     public int AddRow(String text, int image)
     {
         GtkTreeIter row;
-        gtk_list_store_append(model, &row, null);
-        PutText(model, &row, 1, text, false);
-        if (image >= 0 && _pictures != null)
+        gtk_list_store_append(Model, &row, null);
+        SetStoreText(Model, &row, 1, text, false);
+        if (image >= 0 && _images != null)
         {
-            PutPicture(model, &row, 0,
-                       ((GtkImageListBackend)_pictures).Pixbuf(image), false);
+            SetStorePicture(Model, &row, 0,
+                       ((GtkImageListBackend)_images).GetPixbuf(image), false);
         }
-        return RowCountOf() - 1;
+        return CountRows() - 1;
     }
 
     public void SetCell(int row, int column, String text)
@@ -869,8 +869,8 @@ public class GtkListViewPeer : GtkModelPeer, IListViewPeer
         if (column < 0 || column >= _columns)
             return;
         GtkTreeIter at;
-        if (RowAt(row, &at))
-            PutText(model, &at, column + 1, text, false);
+        if (TryGetRow(row, &at))
+            SetStoreText(Model, &at, column + 1, text, false);
     }
 
     public String GetCell(int row, int column)
@@ -878,28 +878,28 @@ public class GtkListViewPeer : GtkModelPeer, IListViewPeer
         if (column < 0 || column >= _columns)
             return "";
         GtkTreeIter at;
-        if (!RowAt(row, &at))
+        if (!TryGetRow(row, &at))
             return "";
-        return TakeText(model, &at, column + 1);
+        return GetModelText(Model, &at, column + 1);
     }
 
     public void RemoveRow(int row) => RemoveListRow(row);
     public void Clear() => ClearList();
-    public int RowCount => RowCountOf();
+    public int RowCount => CountRows();
 
     public int  GetSelectedRow() => SelectedRow;
     public void SetSelectedRow(int row) => SelectRow(row);
 
     public void SetImages(IImageListBackend? images)
     {
-        _pictures = images == null ? null : (GtkImageListBackend)images;
+        _images = images == null ? null : (GtkImageListBackend)images;
     }
 
     /// **A GTK row is always selected whole**, so the first half of this is
     /// what GTK does anyway and cannot be turned off. The grid lines are real.
     public void SetFullRowSelect(bool full, bool gridLines)
     {
-        gtk_tree_view_set_grid_lines(inner,
+        gtk_tree_view_set_grid_lines(Inner,
             gridLines ? GTK_TREE_VIEW_GRID_LINES_BOTH : GTK_TREE_VIEW_GRID_LINES_NONE);
     }
 }

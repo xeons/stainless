@@ -140,7 +140,7 @@ public class GtkMenuItemPeer : IMenuItemPeer
         {
             if (this.Echoing)
                 return;
-            this.KeepTick();
+            this.RestoreCheckState();
             owner.OnPlatformMenuClicked();
         });
     }
@@ -148,7 +148,7 @@ public class GtkMenuItemPeer : IMenuItemPeer
     /// Puts the tick back after GTK's own `activate` handler, which runs first
     /// and flips it. Choosing an item on Windows changes no tick, and a
     /// program that wants one flipped says so through `Checked`.
-    void KeepTick()
+    void RestoreCheckState()
     {
         if (!_checkable)
             return;

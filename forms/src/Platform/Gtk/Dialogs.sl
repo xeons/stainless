@@ -50,7 +50,7 @@ import Gtk.Api;
 /// The window a dialog is transient for, or null. A dialog with no parent is
 /// placed by the window manager wherever it likes, which is why every one of
 /// these is given one when the caller has one.
-GtkWidget* ParentOf(IWindowPeer? owner)
+GtkWidget* GetParentWindow(IWindowPeer? owner)
 {
     if (owner == null)
         return null;
@@ -58,7 +58,7 @@ GtkWidget* ParentOf(IWindowPeer? owner)
 }
 
 /// Runs a dialog and answers its response, destroying it either way.
-gint RunAndClose(GtkWidget* dialog)
+gint RunDialogAndClose(GtkWidget* dialog)
 {
     gint answer = gtk_dialog_run(dialog);
     gtk_widget_destroy(dialog);
@@ -69,7 +69,7 @@ gint RunAndClose(GtkWidget* dialog)
 
 /// `filters` as the seam gives them: a description and a pattern alternating,
 /// which is how every platform's filter list is written.
-void AddFilters(GtkWidget* chooser, String[] filters)
+void AddFileFilters(GtkWidget* chooser, String[] filters)
 {
     nuint i = 0u;
     while (i + 1u < filters.Length)
@@ -93,7 +93,7 @@ void AddFilters(GtkWidget* chooser, String[] filters)
 }
 
 /// What a chooser chose, or why it did not.
-Result<String, DialogOutcome> Chosen(GtkWidget* chooser, gint answer)
+Result<String, DialogOutcome> GetChosenPath(GtkWidget* chooser, gint answer)
 {
     if (answer != GTK_RESPONSE_ACCEPT)
     {
@@ -111,26 +111,26 @@ Result<String, DialogOutcome> Chosen(GtkWidget* chooser, gint answer)
     return Ok(path);
 }
 
-public Result<String, DialogOutcome> OpenFile(IWindowPeer? owner, String title,
+public Result<String, DialogOutcome> ShowOpenFileDialog(IWindowPeer? owner, String title,
                                               String start, String[] filters)
 {
     GtkWidget* chooser = gtk_file_chooser_dialog_new(
-        title.ToPointer(), ParentOf(owner), GTK_FILE_CHOOSER_ACTION_OPEN, null);
+        title.ToPointer(), GetParentWindow(owner), GTK_FILE_CHOOSER_ACTION_OPEN, null);
     gtk_dialog_add_button(chooser, "_Cancel".ToPointer(), GTK_RESPONSE_CANCEL);
     gtk_dialog_add_button(chooser, "_Open".ToPointer(), GTK_RESPONSE_ACCEPT);
 
     if (!start.IsEmpty)
         gtk_file_chooser_set_filename(chooser, start.ToPointer());
-    AddFilters(chooser, filters);
+    AddFileFilters(chooser, filters);
 
-    return Chosen(chooser, gtk_dialog_run(chooser));
+    return GetChosenPath(chooser, gtk_dialog_run(chooser));
 }
 
-public Result<String, DialogOutcome> SaveFile(IWindowPeer? owner, String title,
+public Result<String, DialogOutcome> ShowSaveFileDialog(IWindowPeer? owner, String title,
                                               String start, String[] filters)
 {
     GtkWidget* chooser = gtk_file_chooser_dialog_new(
-        title.ToPointer(), ParentOf(owner), GTK_FILE_CHOOSER_ACTION_SAVE, null);
+        title.ToPointer(), GetParentWindow(owner), GTK_FILE_CHOOSER_ACTION_SAVE, null);
     gtk_dialog_add_button(chooser, "_Cancel".ToPointer(), GTK_RESPONSE_CANCEL);
     gtk_dialog_add_button(chooser, "_Save".ToPointer(), GTK_RESPONSE_ACCEPT);
     gtk_file_chooser_set_do_overwrite_confirmation(chooser, 1);
@@ -142,28 +142,28 @@ public Result<String, DialogOutcome> SaveFile(IWindowPeer? owner, String title,
     {
         gtk_file_chooser_set_current_name(chooser, start.ToPointer());
     }
-    AddFilters(chooser, filters);
+    AddFileFilters(chooser, filters);
 
-    return Chosen(chooser, gtk_dialog_run(chooser));
+    return GetChosenPath(chooser, gtk_dialog_run(chooser));
 }
 
-public Result<String, DialogOutcome> PickFolder(IWindowPeer? owner, String title)
+public Result<String, DialogOutcome> ShowFolderDialog(IWindowPeer? owner, String title)
 {
     GtkWidget* chooser = gtk_file_chooser_dialog_new(
-        title.ToPointer(), ParentOf(owner),
+        title.ToPointer(), GetParentWindow(owner),
         GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER, null);
     gtk_dialog_add_button(chooser, "_Cancel".ToPointer(), GTK_RESPONSE_CANCEL);
     gtk_dialog_add_button(chooser, "_Select".ToPointer(), GTK_RESPONSE_ACCEPT);
 
-    return Chosen(chooser, gtk_dialog_run(chooser));
+    return GetChosenPath(chooser, gtk_dialog_run(chooser));
 }
 
 // =================================================================== colour
 
-public Result<Color, DialogOutcome> PickColor(IWindowPeer? owner, Color start)
+public Result<Color, DialogOutcome> ShowColorDialog(IWindowPeer? owner, Color start)
 {
     GtkWidget* chooser = gtk_color_chooser_dialog_new(
-        "Choose a colour".ToPointer(), ParentOf(owner));
+        "Choose a colour".ToPointer(), GetParentWindow(owner));
 
     GdkRGBA from = ToRgba(start);
     gtk_color_chooser_set_rgba(chooser, &from);
@@ -191,7 +191,7 @@ public Result<Color, DialogOutcome> PickColor(IWindowPeer? owner, Color start)
 /// points unless it ends in `px`, and may have a fraction; the style words are
 /// the run of them before it, whichever they are; the family is what is left
 /// in front. A weight from semi-bold up is bold, since `Font` has no other.
-public Font ParsePango(String description, Font fallback)
+public Font ParsePangoFont(String description, Font fallback)
 {
     var words = new List<String>();
     foreach (var word in description.Trim().Split(' '))
@@ -204,7 +204,7 @@ public Font ParsePango(String description, Font fallback)
 
     int size = fallback.Size;
     nuint end = words.Count;
-    int measured = PangoSizeInPoints(words[end - 1u]);
+    int measured = ParsePangoSizeInPoints(words[end - 1u]);
     if (measured > 0)
     {
         size = measured;
@@ -241,7 +241,7 @@ public Font ParsePango(String description, Font fallback)
 
 /// A Pango size word in whole points, rounded, or zero for a word that is not
 /// a size.
-int PangoSizeInPoints(String word)
+int ParsePangoSizeInPoints(String word)
 {
     bool pixels = word.EndsWith("px");
     var number = pixels ? word.Substring(0u, word.ByteLength() - 2u) : word;
@@ -336,11 +336,11 @@ bool IsPangoBoldWord(String word)
     return false;
 }
 
-public Result<Font, DialogOutcome> PickFont(IWindowPeer? owner, Font start)
+public Result<Font, DialogOutcome> ShowFontDialog(IWindowPeer? owner, Font start)
 {
     GtkWidget* chooser = gtk_font_chooser_dialog_new(
-        "Choose a font".ToPointer(), ParentOf(owner));
-    gtk_font_chooser_set_font(chooser, PangoName(start).ToPointer());
+        "Choose a font".ToPointer(), GetParentWindow(owner));
+    gtk_font_chooser_set_font(chooser, ToPangoName(start).ToPointer());
 
     gint answer = gtk_dialog_run(chooser);
     if (answer != GTK_RESPONSE_OK)
@@ -356,13 +356,13 @@ public Result<Font, DialogOutcome> PickFont(IWindowPeer? owner, Font start)
 
     var described = Text.FromNullTerminated(raw);
     g_free((gpointer)raw);
-    return Ok(ParsePango(described, start));
+    return Ok(ParsePangoFont(described, start));
 }
 
 // ============================================================== message box
 
 /// `GtkMessageType`, which is what the seam's icon becomes.
-gint MessageTypeOf(MessageIcon icon)
+gint ToMessageType(MessageIcon icon)
 {
     if (icon == MessageIcon.Information)
         return GTK_MESSAGE_INFO;
@@ -386,7 +386,7 @@ public DialogResult ShowMessageBox(IWindowPeer? owner, String text, String capti
                                    MessageButtons buttons, MessageIcon icon)
 {
     GtkWidget* dialog = gtk_message_dialog_new(
-        ParentOf(owner), GTK_DIALOG_MODAL, MessageTypeOf(icon),
+        GetParentWindow(owner), GTK_DIALOG_MODAL, ToMessageType(icon),
         GTK_BUTTONS_NONE, "%s".ToPointer(), text.ToPointer());
 
     gtk_window_set_title(dialog, caption.ToPointer());
@@ -417,7 +417,7 @@ public DialogResult ShowMessageBox(IWindowPeer? owner, String text, String capti
         gtk_dialog_add_button(dialog, "_Retry".ToPointer(), GTK_RESPONSE_ACCEPT);
     }
 
-    return MessageAnswer(RunAndClose(dialog), buttons);
+    return ToDialogResult(RunDialogAndClose(dialog), buttons);
 }
 
 /// What a message box's response means.
@@ -425,7 +425,7 @@ public DialogResult ShowMessageBox(IWindowPeer? owner, String text, String capti
 /// Cancel, Escape and the title bar's close all mean Cancel -- except on a box
 /// with only an OK button, where Windows answers OK to all three, because OK
 /// is the only answer it has.
-public DialogResult MessageAnswer(gint answer, MessageButtons buttons)
+public DialogResult ToDialogResult(gint answer, MessageButtons buttons)
 {
     if (answer == GTK_RESPONSE_OK)
         return DialogResult.Ok;

@@ -602,16 +602,16 @@ bool CheckFontNames()
     bool ok = true;
     var fallback = new Font("Sans", 10, FontStyle.Regular);
 
-    var half = ParsePango("Ubuntu 11.5", fallback);
+    var half = ParsePangoFont("Ubuntu 11.5", fallback);
     ok = ReportCheck(ok, "a fractional size is a size: " + half.Family + " "
                          + Standard.Text.FromInteger((long)half.Size),
                      half.Family == "Ubuntu" && half.Size == 12);
 
-    var light = ParsePango("Ubuntu Light 10", fallback);
+    var light = ParsePangoFont("Ubuntu Light 10", fallback);
     ok = ReportCheck(ok, "a weight is not part of the family: " + light.Family,
                      light.Family == "Ubuntu" && light.Size == 10 && !light.Bold);
 
-    var heavy = ParsePango("Noto Sans Semi-Bold Condensed Italic 9", fallback);
+    var heavy = ParsePangoFont("Noto Sans Semi-Bold Condensed Italic 9", fallback);
     ok = ReportCheck(ok, "a heavier weight is bold, and a stretch is dropped: " + heavy.Family,
                      heavy.Family == "Noto Sans" && heavy.Size == 9 && heavy.Bold && heavy.Italic);
     return ok;
