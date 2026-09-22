@@ -137,7 +137,8 @@ public abstract class ListControl : WindowedControl
         }
     }
 
-    /// The choice changed, whoever changed it.
+    /// The user changed the choice. Setting `SelectedIndex` raises nothing, as
+    /// the seam's `OnPlatformValueChanged` says.
     public event EventHandler SelectedIndexChanged;
 
     protected virtual void OnSelectedIndexChanged() => SelectedIndexChanged(this);

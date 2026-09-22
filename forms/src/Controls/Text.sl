@@ -82,9 +82,8 @@ public class Label : WindowedControl
 
     public override Size PreferredSize => _native.PreferredSize;
 
-    /// Sizes the label to its text. What a label almost always wants, and the
-    /// reason this is a method here rather than an `AutoSize` flag that has to
-    /// be re-applied every time the text changes.
+    /// Repaints. The label keeps its size: `AutoSize()` fits it to the text,
+    /// and a program that wants that after every change calls it.
     protected override void OnTextChanged()
     {
         base.OnTextChanged();

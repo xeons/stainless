@@ -248,7 +248,7 @@ public class CheckBox : ButtonBase
     /// has more to do around it.
     protected void SetCheckedOnly(bool ticked) => _native.SetChecked(ticked);
 
-    /// The tick changed, whoever changed it.
+    /// The user changed the tick. Setting `Checked` raises nothing.
     public event EventHandler CheckedChanged;
 
     protected virtual void OnCheckedChanged() => CheckedChanged(this);
