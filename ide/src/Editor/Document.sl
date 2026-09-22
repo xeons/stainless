@@ -150,7 +150,6 @@ public class Document
     List<Line> _lines;
     Scanner _scanner;
     String _location;
-    bool _edited;
     LineEnding _endings;
 
     /// What has been done, and what has been undone.
@@ -168,7 +167,7 @@ public class Document
 
     /// How many edits had been done when the file was last read or written.
     ///
-    /// **`_edited` is derived from this rather than latched**, so undoing back
+    /// **`Edited` is derived from this rather than latched**, so undoing back
     /// to the last save clears the asterisk -- which is what a person means by
     /// "I put it back". A latched flag says a file is modified after it has
     /// been returned to exactly what is on disk.
@@ -182,7 +181,6 @@ public class Document
         _lines = new List<Line>();
         _scanner = new Scanner();
         _location = "";
-        _edited = false;
         _endings = LineEnding.Lf;
         _done = new List<Edit>();
         _undone = new List<Edit>();
@@ -236,7 +234,6 @@ public class Document
     /// the writing itself.
     public void MarkSaved()
     {
-        _edited = false;
         _savedAt = (long)_done.Count;
     }
 
@@ -260,7 +257,6 @@ public class Document
             _lines.Add(new Line(""));
 
         RescanFrom(0u);
-        _edited = false;
     }
 
     /// Everything, as one string, with the line endings it came with.
@@ -297,7 +293,6 @@ public class Document
         if (error != IOError.None)
             return false;
         _location = path;
-        _edited = false;
         return true;
     }
 
@@ -323,7 +318,6 @@ public class Document
         {
             ReplaceLine(row, before + parts[0] + after);
             RescanFrom(row);
-            _edited = true;
 
             var landedHere = Position.Create(row, column + parts[0].ByteLength());
             RecordEdit(true, Position.Create(row, column), landedHere, text);
@@ -344,7 +338,6 @@ public class Document
         }
 
         RescanFrom(row);
-        _edited = true;
 
         var ended = Position.Create(landed, parts[parts.Length - 1u].ByteLength());
         RecordEdit(true, Position.Create(row, column), ended, text);
@@ -388,7 +381,6 @@ public class Document
         ReplaceLine(firstRow, head + tail);
 
         RescanFrom(firstRow);
-        _edited = true;
 
         RecordEdit(false, startAt, endAt, removed);
 

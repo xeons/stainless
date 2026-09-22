@@ -372,13 +372,13 @@ class AutoHideStrip : CustomControl
 
     public List<ToolWindow> Panes => _panes;
 
-    public void Clear()
+    public void ClearPanes()
     {
         _panes.Clear();
         _hotLabel = -1;
     }
 
-    public void Add(ToolWindow pane) => _panes.Add(pane);
+    public void AddPane(ToolWindow pane) => _panes.Add(pane);
 
     /// A side strip has to be wide enough for the longest label, since the text
     /// runs across it rather than along it. Measured from the font rather than
@@ -838,7 +838,7 @@ public class DockHost : Panel
         var strip = GetStripOn(well.Edge);
         var split = GetSplitterOn(well.Edge);
 
-        strip.Clear();
+        strip.ClearPanes();
 
         if (CountOpenPanes(well) == 0u)
         {
@@ -869,7 +869,7 @@ public class DockHost : Panel
         foreach (var pane in well.Panes)
         {
             if (pane.Visible)
-                strip.Add(pane);
+                strip.AddPane(pane);
         }
         strip.Visible = true;
     }
