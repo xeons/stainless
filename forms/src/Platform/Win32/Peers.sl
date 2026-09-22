@@ -782,8 +782,11 @@ public class ControlPeer : IControlPeer
             int width = frame.Right - frame.Left;
             int height = frame.Bottom - frame.Top;
 
+            // Not `GetParent` alone, which answers a popup's owner: an owned
+            // dialog is still measured from the screen.
             HWND parent = GetParent(window);
-            if (parent == null)
+            long style = GetWindowLongPtrW(window, GwlStyle);
+            if (parent == null || ((ulong)style & (ulong)WsChild) == 0u)
                 return Area(frame.Left, frame.Top, width, height);
 
             Win32.User32.Point corner;

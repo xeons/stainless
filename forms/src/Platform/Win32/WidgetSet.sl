@@ -277,11 +277,36 @@ bool DialogKey(Msg* message)
     return IsDialogMessageW(top, message) != 0;
 }
 
+/// `EnumWindows`' callback for `WindowPeer.ShowModal`. `parameter` is the
+/// dialog's peer, borrowed for the length of the enumeration.
+int NoteWindowForModal(HWND window, long parameter)
+{
+    var dialog = (WindowPeer)(void*)(nuint)parameter;
+    dialog.Consider(window);
+    return 1;
+}
+
+/// Whether the keyboard is in a combo box whose list is showing: its edit, or
+/// the combo itself. `CB_GETDROPPEDSTATE` is below `WM_USER`, so no window but
+/// a combo box answers it with anything but zero.
+bool ComboIsDropped(HWND focused)
+{
+    if (SendMessageW(focused, CbGetDroppedState, 0u, 0) != 0)
+        return true;
+    HWND parent = GetParent(focused);
+    if (parent == null)
+        return false;
+    return SendMessageW(parent, CbGetDroppedState, 0u, 0) != 0;
+}
+
 public class WindowPeer : ControlPeer, IWindowPeer
 {
     weak IWindowNotify? owningWindow;
     bool _running;
     bool _quitOnClose;
+    /// The windows `ShowModal` disabled, as handles, to be enabled again when
+    /// it ends. Empty when nothing is modal.
+    List<nuint> _disabled;
     /// Held, not merely handed to Windows: a menu command names an id, and this
     /// is what turns one back into the item that was chosen.
     IMenuPeer? _menuBar;
@@ -292,6 +317,7 @@ public class WindowPeer : ControlPeer, IWindowPeer
         owningWindow = owner;
         _running = false;
         _quitOnClose = false;
+        _disabled = new List<nuint>();
         _menuBar = null;
     }
 
@@ -321,6 +347,9 @@ public class WindowPeer : ControlPeer, IWindowPeer
                 if (!((IWindowNotify)held).OnPlatformClosing())
                     return 0;
             }
+            // Before the window goes, or Windows activates whatever window of
+            // any program is next in line rather than the owner.
+            EnableOthers();
             DestroyWindow(window);
             return 0;
         }
@@ -637,15 +666,23 @@ public class WindowPeer : ControlPeer, IWindowPeer
 
     /// A loop of its own, which is what modal means.
     ///
-    /// **The owner is disabled for the duration**, which is the whole of what
-    /// makes a dialog modal on Windows: there is no modal flag, only the fact
-    /// that everything else refuses input. Re-enabling it before the window is
-    /// destroyed is what stops another window coming to the front at the end.
-    public void ShowModal()
+    /// **Every other window of the program is disabled for the duration**,
+    /// which is the whole of what makes a dialog modal on Windows: there is no
+    /// modal flag, only the fact that everything else refuses input. The LCL's
+    /// `Screen.DisableForms` does the same. Re-enabling them before the window
+    /// is destroyed is what stops another program's window coming to the front
+    /// at the end; `WM_CLOSE` does that.
+    ///
+    /// **Owned**, so the dialog stays in front of its owner and Windows gives
+    /// the owner the activation back when the dialog goes.
+    public void ShowModal(IWindowPeer? owner)
     {
-        HWND owner = GetWindow(window, GwOwner);
         if (owner != null)
-            EnableWindow(owner, 0);
+        {
+            Win32.User32.SetWindowLongPtrW(window, GwlpHwndParent,
+                                           (long)((IWindowPeer)owner).Handle);
+        }
+        DisableOthers();
 
         Activate();
         _running = true;
@@ -654,8 +691,15 @@ public class WindowPeer : ControlPeer, IWindowPeer
         while (_running)
         {
             int got = GetMessageW(&message, null, 0u, 0u);
-            if (got <= 0)
+            if (got < 0)
                 break;
+            // The quit was for the program, not for this loop: put it back for
+            // the loop outside.
+            if (got == 0)
+            {
+                PostQuitMessage((int)message.WParam);
+                break;
+            }
             // **Escape closes a modal window**, which nothing else would do.
             // `IsDialogMessageW` turns Escape into a `WM_COMMAND` carrying
             // `IDCANCEL`, and that only means anything to a real dialog box
@@ -666,8 +710,11 @@ public class WindowPeer : ControlPeer, IWindowPeer
             //
             // Through `WM_CLOSE` rather than `DestroyWindow`, so that a window
             // which refuses to close still refuses when asked this way.
+            //
+            // Not while a combo box's list is dropped: Escape closes the list.
             if (message.Message == WmKeyDown && (int)message.WParam == VkEscape
-                && GetAncestor(message.Window, GaRoot) == window)
+                && GetAncestor(message.Window, GaRoot) == window
+                && !ComboIsDropped(message.Window))
             {
                 SendMessageW(window, WmClose, 0u, 0);
                 continue;
@@ -683,11 +730,40 @@ public class WindowPeer : ControlPeer, IWindowPeer
             DispatchMessageW(&message);
         }
 
-        if (owner != null)
-        {
-            EnableWindow(owner, 1);
-            SetForegroundWindow(owner);
-        }
+        // Already done by `WM_CLOSE` when the dialog closed; this is for the
+        // loop that ended on a quit.
+        EnableOthers();
+    }
+
+    /// Disables every visible, enabled top-level window this library made on
+    /// this thread, other than this one, and remembers which.
+    void DisableOthers()
+    {
+        _disabled.Clear();
+        EnumWindows(NoteWindowForModal, (long)(nuint)(void*)this);
+        foreach (var handle in _disabled)
+            EnableWindow((HWND)(void*)handle, 0);
+    }
+
+    /// One window `EnumWindows` found, considered for disabling.
+    void Consider(HWND other)
+    {
+        if (other == window)
+            return;
+        if (GetWindowThreadProcessId(other, null) != GetCurrentThreadId())
+            return;
+        if (PeerOf(other) == null)
+            return;
+        if (IsWindowVisible(other) == 0 || IsWindowEnabled(other) == 0)
+            return;
+        _disabled.Add((nuint)(void*)other);
+    }
+
+    void EnableOthers()
+    {
+        foreach (var handle in _disabled)
+            EnableWindow((HWND)(void*)handle, 1);
+        _disabled.Clear();
     }
 
     // --------------------------------------------------- IContainerPeer

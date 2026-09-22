@@ -70,13 +70,27 @@ public enum CloseReason { User, Program, ApplicationExit }
 /// built in a local and shown being destroyed the moment the function returns,
 /// which under ARC it otherwise would be -- the platform holds a window, but
 /// nothing here would hold the object that answers for it.
+///
+/// **A form is hidden until `Show` or `ShowModal`**, so everything its
+/// constructor sets up is in place before anyone sees it.
+///
+/// **A closed form stays closed.** Its window is gone, and showing it again
+/// is a mistake that stops the program; make a new one instead.
 public class Form : WindowedControl, IWindowNotify
 {
     IWindowPeer _window;
     MainMenu? _bar;
     WindowBorder _framing;
-    bool _closing;
+    /// Set while `Closing` is being raised, so a handler calling `Close` does
+    /// not ask the question a second time inside the first.
+    bool _asking;
+    bool _closed;
     bool _registered;
+    bool _modal;
+    bool _everShown;
+    /// When this form last became active, in `Application`'s count; zero for
+    /// never.
+    int _activation;
 
     /// Builds a form with the given frame.
     ///
@@ -89,8 +103,13 @@ public class Form : WindowedControl, IWindowNotify
         base(null);
         _framing = border;
         _bar = null;
-        _closing = false;
+        _asking = false;
+        _closed = false;
         _registered = false;
+        _modal = false;
+        _everShown = false;
+        _activation = 0;
+        Visible = false;
         _window = WidgetSet.Current.CreateWindow(this, border);
         AttachContainerPeer(_window);
         SetBounds(0, 0, 640, 480);
@@ -133,6 +152,19 @@ public class Form : WindowedControl, IWindowNotify
         get => _window.GetState();
         set => _window.SetState(value);
     }
+
+    /// A minimised window's size and position are its icon's, and a form that
+    /// took them would lay itself out for nothing and forget where it was.
+    protected override bool IsMinimizedWindow => !_closed && State == WindowState.Minimized;
+
+    /// Whether `ShowModal` is showing this form and has not yet returned.
+    public bool IsModal => _modal;
+
+    /// Whether the window has closed. A closed form cannot be shown again.
+    public bool IsClosed => _closed;
+
+    int Activation => _activation;
+    void MarkActivated(int count) => _activation = count;
 
     /// Centres the window on the work area of the screen it is on.
     public void CenterOnScreen() => _window.CenterOnScreen();
@@ -202,6 +234,7 @@ public class Form : WindowedControl, IWindowNotify
     /// Shows the window and registers it with the `Application`.
     public override void Show()
     {
+        RequireOpen();
         if (!_registered)
         {
             Application.Register(this);
@@ -209,9 +242,17 @@ public class Form : WindowedControl, IWindowNotify
         }
         Visible = true;
         _window.Activate();
+        RaiseShownOnce();
     }
 
     /// Shows it and does not return until it is closed.
+    ///
+    /// **Every other window of the program refuses input meanwhile**, which is
+    /// what modal means. The dialog is owned by the window the user was in --
+    /// the active form, or else the main one -- so it stays in front of it.
+    ///
+    /// **Closing a modal form never ends the program**, even when it is the
+    /// only one open: a login dialog shown before the main window needs that.
     ///
     /// **Answers nothing.** C#'s `ShowDialog` returns a `DialogResult`, which
     /// works because every C# dialog sets one; here a form that has an answer
@@ -221,27 +262,51 @@ public class Form : WindowedControl, IWindowNotify
     /// `DialogResult` property and loses nothing.
     public void ShowModal()
     {
+        RequireOpen();
+        var owner = Application.OwnerFor(this);
+        _modal = true;
         if (!_registered)
         {
             Application.Register(this);
             _registered = true;
         }
         Visible = true;
-        _window.ShowModal();
+        RaiseShownOnce();
+
+        if (owner == null)
+        {
+            _window.ShowModal(null);
+        }
+        else
+        {
+            _window.ShowModal(((Form)owner).WindowPeer());
+        }
+        _modal = false;
     }
 
-    /// Asks the window to close, running `OnClosing` first so a handler may
-    /// refuse -- exactly as though the user had clicked the close box.
+    /// Asks the window to close, exactly as though the user had clicked the
+    /// close box: `Closing` is raised once, and a handler may refuse.
     public void Close()
     {
-        if (_closing)
+        if (_closed || _asking)
             return;
-        var asked = new CancelEventArgs();
-        OnClosing(asked);
-        if (asked.Cancel)
-            return;
-        _closing = true;
         _window.Close();
+    }
+
+    void RequireOpen()
+    {
+        if (_closed)
+        {
+            sl_fail("this form has closed and cannot be shown again; make a new one".ToPointer());
+        }
+    }
+
+    void RaiseShownOnce()
+    {
+        if (_everShown)
+            return;
+        _everShown = true;
+        OnShown();
     }
 
     // ------------------------------------------------------------- events
@@ -254,8 +319,8 @@ public class Form : WindowedControl, IWindowNotify
     public event EventHandler Activated;
     /// It stopped being the active window.
     public event EventHandler Deactivated;
-    /// Raised once, after the window exists and before the user sees it. Where
-    /// a form does work that needs its final size.
+    /// Raised once, the first time the window is shown. Where a form does work
+    /// that needs its final size.
     public event EventHandler Shown;
 
     protected virtual void OnClosing(CancelEventArgs args) => Closing(this, args);
@@ -273,23 +338,34 @@ public class Form : WindowedControl, IWindowNotify
     /// that returns anything.
     public bool OnPlatformClosing()
     {
+        if (_closed)
+            return true;
         var asked = new CancelEventArgs();
+        _asking = true;
         OnClosing(asked);
+        _asking = false;
         return !asked.Cancel;
     }
 
     public void OnPlatformClosed()
     {
-        _closing = true;
+        if (_closed)
+            return;
+        _closed = true;
+        ForgetShown();
         OnClosed();
         if (_registered)
         {
-            Application.Unregister(this);
             _registered = false;
+            Application.Unregister(this, _modal);
         }
     }
 
-    public void OnPlatformActivatedWindow() => OnActivated();
+    public void OnPlatformActivatedWindow()
+    {
+        Application.NoteActivated(this);
+        OnActivated();
+    }
     public void OnPlatformDeactivated() => OnDeactivated();
 }
 

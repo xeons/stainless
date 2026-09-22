@@ -471,14 +471,31 @@ public class GtkWindowPeer : GtkContainerPeer, IWindowPeer
     /// and there is nothing for a plain window, so the loop is nested here and
     /// the `delete-event` handler above ends it. GTK supports nesting, which
     /// is what makes a modal window possible at all without a second thread.
-    public void ShowModal()
+    ///
+    /// A modal window takes input from every other window of the program, so
+    /// nothing needs disabling. Transient for its owner, so the window manager
+    /// keeps it in front of that and centres it there.
+    public void ShowModal(IWindowPeer? owner)
     {
+        if (owner != null)
+        {
+            var above = (GtkWindowPeer)owner;
+            gtk_window_set_transient_for(widget, above.Widget);
+        }
         gtk_window_set_modal(widget, 1);
         gtk_widget_show(widget);
         _modal = true;
         gtk_main();
-        _modal = false;
-        gtk_window_set_modal(widget, 0);
+
+        // Still set means a quit ended the loop rather than the close. It was
+        // meant for the program's loop, which is further out.
+        if (_modal)
+        {
+            _modal = false;
+            gtk_window_set_modal(widget, 0);
+            if (gtk_main_level() > 0u)
+                gtk_main_quit();
+        }
     }
 }
 

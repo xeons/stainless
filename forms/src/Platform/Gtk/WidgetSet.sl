@@ -703,20 +703,25 @@ public class GtkWidgetSet : IWidgetSet
     /// `gtk_main_iteration_do(0)` is one turn that does not block, so this
     /// drains the queue and returns -- which is what a program driving its own
     /// loop wants, and the reason `RunEventLoop` is not the only way in.
-    /// Answers whether anything was handled.
+    ///
+    /// Always true: GTK has no quit message to meet here, and `Application`
+    /// remembers a quit asked for through it.
     public bool PumpEvents()
     {
         Start();
-        bool any = false;
         while (gtk_events_pending() != 0)
-        {
             gtk_main_iteration_do(0);
-            any = true;
-        }
-        return any;
+        return true;
     }
 
-    public void QuitEventLoop() => gtk_main_quit();
+    /// Outside every loop there is nothing to end, and `gtk_main_quit` there
+    /// is a critical warning. `Application` remembers the quit, so a `Run`
+    /// that follows returns at once.
+    public void QuitEventLoop()
+    {
+        if (gtk_main_level() > 0u)
+            gtk_main_quit();
+    }
 
     /// Adds a one-shot idle source, which the main loop runs on its own thread.
     ///

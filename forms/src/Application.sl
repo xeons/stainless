@@ -63,6 +63,15 @@ public static class Application
 
     static bool s_started = false;
 
+    /// Set once the program has been asked to quit, and never cleared: the
+    /// platform's quit message is consumed by whichever loop sees it first,
+    /// and every later question MUST still get the same answer.
+    static bool s_quitting = false;
+
+    /// Counts window activations, so the register can tell which form the user
+    /// was in most recently.
+    static int s_activations = 0;
+
     /// Which thread `Initialize` ran on, and so which one owns every widget.
     static nuint s_uiThread = 0u;
 
@@ -102,9 +111,12 @@ public static class Application
 
     // ----------------------------------------------------------- the loop
 
-    /// Runs until the last window closes.
+    /// Runs until the last window closes. Returns at once if the program has
+    /// already been asked to quit.
     public static void Run()
     {
+        if (s_quitting)
+            return;
         // Anything posted before the loop existed is run first rather than
         // waiting for the next wake, which may never come in a program that
         // does its setup on a thread and then shows a window.
@@ -113,18 +125,25 @@ public static class Application
     }
 
     /// Handles everything already queued and returns, for a program driving its
-    /// own loop. False once the program has been asked to quit.
+    /// own loop. False once the program has been asked to quit, and on every
+    /// call after that.
     public static bool DoEvents()
     {
         Drain();
-        return WidgetSet.Current.PumpEvents();
+        if (!WidgetSet.Current.PumpEvents())
+            s_quitting = true;
+        return !s_quitting;
     }
 
     /// Makes `Run` return, whether or not any window is still open.
     public static void Quit()
     {
+        s_quitting = true;
         WidgetSet.Current.QuitEventLoop();
     }
+
+    /// Whether the program has been asked to quit.
+    public static bool IsQuitting => s_quitting;
 
     // ------------------------------------------------------- the UI thread
 
@@ -164,9 +183,12 @@ public static class Application
     /// Prefer `Post` unless the answer is needed before this thread goes on.
     /// A worker that waits on the UI thread is a worker that has given up the
     /// thing it went to another thread for.
+    ///
+    /// **Before `Initialize` it also runs inline.** No thread owns the widgets
+    /// yet, so there is no loop to wait for, and waiting would never end.
     public static void Send(Action work)
     {
-        if (OnUiThread)
+        if (OnUiThread || s_uiThread == 0u)
         {
             work();
             return;
@@ -226,11 +248,43 @@ public static class Application
 
     /// Called when a form has closed. The last one out stops the loop, which is
     /// what makes a one-window program need no `Quit` call at all.
-    static void Unregister(Form form)
+    ///
+    /// **A modal form is never the last one out.** It is a question asked on
+    /// the way somewhere, and a login dialog closing before the main window
+    /// opens MUST NOT end the program.
+    static void Unregister(Form form, bool wasModal)
     {
         Remove(form);
-        if (s_open.IsEmpty)
-            Quit();
+        if (wasModal)
+            return;
+        foreach (var open in s_open)
+        {
+            if (!open.IsModal)
+                return;
+        }
+        Quit();
+    }
+
+    /// Called by a form that became the active window.
+    static void NoteActivated(Form form)
+    {
+        s_activations++;
+        form.MarkActivated(s_activations);
+    }
+
+    /// The form a modal dialog belongs to: the one the user was in most
+    /// recently, or the main one, or null when nothing else is showing.
+    static Form? OwnerFor(Form dialog)
+    {
+        Form? chosen = null;
+        foreach (var form in s_open)
+        {
+            if (form == dialog || form.IsClosed || !form.Visible)
+                continue;
+            if (chosen == null || form.Activation > ((Form)chosen).Activation)
+                chosen = form;
+        }
+        return chosen;
     }
 
     /// Drops one form from the register, keeping the order of the rest.
@@ -251,15 +305,19 @@ public static class Application
     /// The windows currently open.
     public static List<Form> OpenForms => s_open;
 
-    /// The first window shown, which is the one a program usually means by
-    /// "the main window". Null before anything has been shown.
+    /// The first window shown and still open, which is the one a program
+    /// usually means by "the main window". A modal dialog is never it. Null
+    /// before anything else has been shown.
     public static Form? MainForm
     {
         get
         {
-            if (s_open.IsEmpty)
-                return null;
-            return s_open[0u];
+            foreach (var form in s_open)
+            {
+                if (!form.IsModal)
+                    return form;
+            }
+            return null;
         }
     }
 

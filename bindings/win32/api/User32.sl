@@ -313,6 +313,9 @@ public const int GwlpUserData     = -21;
 public const int GwlpWindowProc   = -4;
 public const int GwlpInstance     = -6;
 public const int GwlpId           = -12;
+/// The owner of a top-level window, which is not its parent: an owned window
+/// stays in front of its owner and is not given a task-bar button.
+public const int GwlpHwndParent   = -8;
 public const int GwlStyle         = -16;
 public const int GwlExtendedStyle = -20;
 
@@ -841,6 +844,7 @@ public const uint CbGetLbTextLen  = 0x0149u;
 public const uint CbInsertString  = 0x014Au;
 public const uint CbResetContent  = 0x014Bu;
 public const uint CbSetCurSel     = 0x014Eu;
+public const uint CbGetDroppedState = 0x0157u;
 
 public const uint CbsSimple         = 0x0001u;
 public const uint CbsDropDown       = 0x0002u;

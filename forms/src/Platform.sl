@@ -430,7 +430,16 @@ public interface IWindowPeer : IContainerPeer
     void CenterOnScreen();
     /// Shows it and does not return until it is closed, which is what a dialog
     /// is. Answers nothing: what the dialog decided is the dialog's business.
-    void ShowModal();
+    ///
+    /// Meanwhile no other window of the program MAY take input. `owner` is the
+    /// window the dialog belongs to and stays in front of, or null for none.
+    /// The other windows MUST take input again before this one is destroyed,
+    /// so the platform hands activation back to the owner and not to another
+    /// program.
+    ///
+    /// **A quit asked for meanwhile ends this loop and then the program's**,
+    /// so a backend whose quit is a message MUST NOT swallow it here.
+    void ShowModal(IWindowPeer? owner);
 }
 
 /// A button, a checkbox or a radio button: something that is pressed.
@@ -1304,6 +1313,10 @@ public interface IWidgetSet
     /// Handles everything already queued and returns. For a program driving its
     /// own loop -- a game, an animation -- and the reason `RunEventLoop` is not
     /// the only way in.
+    ///
+    /// Answers false when it met a quit the platform queued, and true
+    /// otherwise -- including when there was nothing to do. `Application`
+    /// remembers the quit, so a backend need not.
     bool PumpEvents();
     /// Makes `RunEventLoop` return.
     void QuitEventLoop();

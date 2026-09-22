@@ -173,6 +173,10 @@ public extern "C"
     /// so this is a stack rather than a switch.
     void gtk_main_quit();
 
+    /// How many `gtk_main` calls are running, nested. Zero outside them all,
+    /// where `gtk_main_quit` is an error.
+    guint gtk_main_level();
+
     /// Handles one pending event, or blocks for one. Answers true if the loop
     /// should stop.
     gboolean gtk_main_iteration();
@@ -295,6 +299,9 @@ public extern "C"
     void gtk_window_set_resizable(GtkWidget* window, gboolean resizable);
     void gtk_window_set_modal(GtkWidget* window, gboolean modal);
     void gtk_window_set_transient_for(GtkWidget* window, GtkWidget* parent);
+    gboolean gtk_window_get_modal(GtkWidget* window);
+    /// The window this one is transient for, **borrowed**, or null.
+    GtkWidget* gtk_window_get_transient_for(GtkWidget* window);
     void gtk_window_set_position(GtkWidget* window, gint position);
     void gtk_window_set_decorated(GtkWidget* window, gboolean decorated);
 

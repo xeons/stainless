@@ -279,15 +279,16 @@ thread that is allowed to, and the answer arrives through the message loop the
 program already has. Nothing changes colour and there is no state machine, which
 is what real threads buy — [docs/concurrency.md §12](../docs/concurrency.md).
 
-**A modal window no longer takes the program down with it.** `ShowModal` runs a
-loop of its own, and `WM_DESTROY` ended it by calling `PostQuitMessage` — which
-puts `WM_QUIT` on the *thread's* queue rather than a window's. The modal loop
-leaves on its own flag without ever dequeuing it, so the message sat there until
-the application's loop picked it up and exited. Closing any dialog closed the
-whole program, and nothing about the dialog was wrong by then, which is what
-made it hard to see. Clearing the flag is sufficient: `WM_DESTROY` arrives inside
-the modal loop's own `DispatchMessageW`, so the `while` re-reads it the moment
-that returns.
+**A modal window blocks the others and takes nothing down with it.**
+`ShowModal` runs a loop of its own. On Windows every other window of the
+program is disabled for its length, as the LCL's `Screen.DisableForms` does,
+and enabled again before the dialog is destroyed so that activation returns to
+its owner rather than to another program. On GTK the window is modal and
+transient for its owner, which blocks the rest by itself. The owner is the form
+the user was last in. Closing a modal form never ends the program, so a login
+dialog can be shown before the main window. A quit asked for during the dialog
+ends its loop and then the program's: the Win32 loop posts `WM_QUIT` back rather
+than consuming it, and `Application` remembers the quit either way.
 
 **The modal loop also does the keyboard pre-processing the main loop always
 did.** `IsDialogMessageW` is what makes Tab move between controls and the arrows
