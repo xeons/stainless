@@ -294,6 +294,9 @@ public class MenuPeer : IMenuPeer
     /// seam should be spared.
     public void OwnedByParent() => _attached = true;
 
+    /// Says that whatever held it has let go, so this destroys it again.
+    public void ReleasedByParent() => _attached = false;
+
     public IMenuItemPeer AddItem(IMenuItemNotify owner, String text, IMenuPeer? submenu)
     {
         int id = NewCommandId();
@@ -329,11 +332,24 @@ public class MenuPeer : IMenuPeer
         AppendMenuW(_menu, MfSeparator, 0u, null);
     }
 
+    /// `RemoveMenu` rather than `DeleteMenu`, which would destroy each submenu
+    /// while its own `MenuPeer` still holds the handle. A submenu let go of is
+    /// its peer's to destroy again.
     public void Clear()
     {
         while (GetMenuItemCount(_menu) > 0)
         {
-            DeleteMenu(_menu, 0u, MfByPosition);
+            RemoveMenu(_menu, 0u, MfByPosition);
+        }
+        foreach (var item in _items)
+        {
+            var under = item.Submenu;
+            if (under != null)
+            {
+                IMenuPeer held = (IMenuPeer)under;
+                if (held is MenuPeer below)
+                    below.ReleasedByParent();
+            }
         }
         _items.Clear();
     }
@@ -431,6 +447,9 @@ public class MenuPeer : IMenuPeer
         int chosen = TrackPopupMenu(_menu, TpmLeftAlign | TpmTopAlign
                                         | TpmRightButton | TpmReturnCmd,
                                     atScreen.X, atScreen.Y, 0, window, null);
+        // Documented for `TrackPopupMenu`: without a message after it, the
+        // next time the menu is shown it can close again at once.
+        PostMessageW(window, WmNull, 0u, 0);
 
         if (host != null)
             ((WindowPeer)host).PoppedUp(null);

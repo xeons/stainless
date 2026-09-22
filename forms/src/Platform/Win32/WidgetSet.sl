@@ -576,6 +576,16 @@ public class WindowPeer : ControlPeer, IWindowPeer
 
     public void SetMenu(IMenuPeer? menu)
     {
+        // Windows destroys only the bar a window holds when it goes, so one it
+        // is made to let go of is its peer's to destroy again.
+        var previous = _menuBar;
+        if (previous != null && previous != menu)
+        {
+            IMenuPeer was = (IMenuPeer)previous;
+            if (was is MenuPeer replaced)
+                replaced.ReleasedByParent();
+        }
+
         _menuBar = menu;
         if (menu == null)
         {

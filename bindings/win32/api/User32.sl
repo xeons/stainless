@@ -958,8 +958,12 @@ public extern "C"
     int   InsertMenuItemW(HMENU menu, uint item, int byPosition, MenuItemInfo* info);
     int   SetMenuItemInfoW(HMENU menu, uint item, int byPosition, MenuItemInfo* info);
     int   GetMenuItemInfoW(HMENU menu, uint item, int byPosition, MenuItemInfo* info);
+    /// Destroys the item and, for a heading, the submenu under it.
     int   DeleteMenu(HMENU menu, uint item, uint flags);
+    /// Takes the item out and leaves a submenu under it alive, for its owner.
+    int   RemoveMenu(HMENU menu, uint item, uint flags);
     int   GetMenuItemCount(HMENU menu);
+    int   IsMenu(HMENU menu);
 
     int   EnableMenuItem(HMENU menu, uint item, uint enable);
     int   CheckMenuItem(HMENU menu, uint item, uint check);
