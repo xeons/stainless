@@ -131,34 +131,34 @@ public class GraphicsBackend : IGraphicsBackend
         DeleteObject((HGDIOBJ)(void*)brush);
     }
 
-    /// Selects a pen made for this call, runs the body, and puts back what was
-    /// there. Every outline call goes through here so that none of them can
-    /// forget the second half.
-    HPEN UsePen(Pen pen)
+    /// Selects a pen made for this call. `Drop` puts back what was there and
+    /// deletes it; every outline call goes through the two, so that none of
+    /// them can forget the second half.
+    ///
+    /// **What was there, not a stock object.** The context is lent by whoever
+    /// is painting, and a caller that selected a pen of its own gets it back.
+    (HGDIOBJ, HGDIOBJ) UsePen(Pen pen)
     {
         int style = PenStyleOf(pen.Style);
         HPEN made = CreatePen(style, pen.Width, ToColorRef(pen.Color));
-        SelectObject(_dc, (HGDIOBJ)(void*)made);
-        return made;
+        HGDIOBJ was = SelectObject(_dc, (HGDIOBJ)(void*)made);
+        return ((HGDIOBJ)(void*)made, was);
     }
 
-    void DropPen(HPEN made)
-    {
-        SelectObject(_dc, GetStockObject(BlackPen));
-        DeleteObject((HGDIOBJ)(void*)made);
-    }
-
-    HBRUSH UseBrush(Brush brush)
+    /// A brush of `brush`'s colour, selected as `UsePen` selects a pen.
+    (HGDIOBJ, HGDIOBJ) UseBrush(Brush brush)
     {
         HBRUSH made = CreateSolidBrush(ToColorRef(brush.Color));
-        SelectObject(_dc, (HGDIOBJ)(void*)made);
-        return made;
+        HGDIOBJ was = SelectObject(_dc, (HGDIOBJ)(void*)made);
+        return ((HGDIOBJ)(void*)made, was);
     }
 
-    void DropBrush(HBRUSH made)
+    /// Puts back what `UsePen` or `UseBrush` displaced, and deletes what it made.
+    void Drop((HGDIOBJ, HGDIOBJ) selected)
     {
-        SelectObject(_dc, GetStockObject(WhiteBrush));
-        DeleteObject((HGDIOBJ)(void*)made);
+        var (made, was) = selected;
+        SelectObject(_dc, was);
+        DeleteObject(made);
     }
 
     int PenStyleOf(PenStyle style)
@@ -176,21 +176,21 @@ public class GraphicsBackend : IGraphicsBackend
 
     public void DrawLine(Pen pen, int x1, int y1, int x2, int y2)
     {
-        HPEN made = UsePen(pen);
+        var line = UsePen(pen);
         MoveToEx(_dc, x1, y1, null);
         LineTo(_dc, x2, y2);
-        DropPen(made);
+        Drop(line);
     }
 
     public void DrawRectangle(Pen pen, FRect bounds)
     {
-        HPEN made = UsePen(pen);
+        var outline = UsePen(pen);
         // A hollow brush, so `Rectangle` outlines rather than filling: GDI's
         // shape calls always do both, and this is how "outline only" is said.
         HGDIOBJ wasBrush = SelectObject(_dc, GetStockObject(NullBrush));
         Rectangle(_dc, bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
         SelectObject(_dc, wasBrush);
-        DropPen(made);
+        Drop(outline);
     }
 
     public void FillRectangle(Brush brush, FRect bounds)
@@ -245,22 +245,22 @@ public class GraphicsBackend : IGraphicsBackend
 
     public void DrawEllipse(Pen pen, FRect bounds)
     {
-        HPEN made = UsePen(pen);
+        var outline = UsePen(pen);
         HGDIOBJ wasBrush = SelectObject(_dc, GetStockObject(NullBrush));
         Ellipse(_dc, bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
         SelectObject(_dc, wasBrush);
-        DropPen(made);
+        Drop(outline);
     }
 
+    /// Outlined in the fill's own colour, since GDI's shape calls always draw
+    /// an outline and the context's pen is whatever was left there.
     public void FillEllipse(Brush brush, FRect bounds)
     {
-        HBRUSH made = UseBrush(brush);
-        HPEN pen = CreatePen(PenSolid, 1, ToColorRef(brush.Color));
-        HGDIOBJ wasPen = SelectObject(_dc, (HGDIOBJ)(void*)pen);
+        var fill = UseBrush(brush);
+        var edge = UsePen(new Pen(brush.Color));
         Ellipse(_dc, bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
-        SelectObject(_dc, wasPen);
-        DeleteObject((HGDIOBJ)(void*)pen);
-        DropBrush(made);
+        Drop(edge);
+        Drop(fill);
     }
 
     /// Copies the points into the shape GDI wants. Two structures called
@@ -282,27 +282,30 @@ public class GraphicsBackend : IGraphicsBackend
     public void DrawPolygon(Pen pen, FPoint[] points)
     {
         var native = Native(points);
-        HPEN made = UsePen(pen);
+        var outline = UsePen(pen);
         HGDIOBJ wasBrush = SelectObject(_dc, GetStockObject(NullBrush));
         Polygon(_dc, &native[0u], (int)points.Length);
         SelectObject(_dc, wasBrush);
-        DropPen(made);
+        Drop(outline);
     }
 
+    /// Outlined in the fill's own colour, as `FillEllipse` is.
     public void FillPolygon(Brush brush, FPoint[] points)
     {
         var native = Native(points);
-        HBRUSH made = UseBrush(brush);
+        var fill = UseBrush(brush);
+        var edge = UsePen(new Pen(brush.Color));
         Polygon(_dc, &native[0u], (int)points.Length);
-        DropBrush(made);
+        Drop(edge);
+        Drop(fill);
     }
 
     public void DrawPolyline(Pen pen, FPoint[] points)
     {
         var native = Native(points);
-        HPEN made = UsePen(pen);
+        var line = UsePen(pen);
         Polyline(_dc, &native[0u], (int)points.Length);
-        DropPen(made);
+        Drop(line);
     }
 
     public void DrawString(String text, Font font, Color colour, int x, int y)
@@ -323,7 +326,9 @@ public class GraphicsBackend : IGraphicsBackend
         var wide = text.ToUtf16();
         Rect r = ToRect(bounds);
 
-        uint flags = 0u;
+        // `DT_NOPREFIX`, or an ampersand underlines the letter after it and
+        // is not drawn -- which `DrawString` and GTK do not do.
+        uint flags = DtNoPrefix;
         if (format.Horizontal == HorizontalAlignment.Center)
         {
             flags = flags | DtCenter;

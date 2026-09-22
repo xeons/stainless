@@ -401,6 +401,8 @@ public const uint DtWordBreak      = 0x00000010u;
 public const uint DtSingleLine     = 0x00000020u;
 public const uint DtNoClip         = 0x00000100u;
 public const uint DtCalculateOnly  = 0x00000400u;
+/// Draws `&` as itself rather than underlining the character after it.
+public const uint DtNoPrefix       = 0x00000800u;
 
 // ============================================================== message box
 
