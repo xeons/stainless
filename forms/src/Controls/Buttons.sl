@@ -119,20 +119,41 @@ public class Button : ButtonBase
         AttachPeer(_native);
     }
 
-    /// Whether Enter presses this button. At most one per window, and the
-    /// platform is what enforces that -- so setting it on a second button is
-    /// enough, and the first need not be unset.
+    /// Whether Enter presses this button. At most one per window: setting it
+    /// clears it on every other button of the form, so the first need not be
+    /// unset.
     public bool IsDefault
     {
         get => _isDefault;
         set
         {
+            if (value)
+            {
+                var form = FindForm();
+                if (form != null)
+                    ClearDefaultIn((WindowedControl)form);
+            }
             _isDefault = value;
             _native.SetDefault(value);
         }
     }
 
     bool _isDefault;
+
+    /// Clears `IsDefault` on every button under `holder` but this one.
+    void ClearDefaultIn(WindowedControl holder)
+    {
+        foreach (var child in holder.Controls)
+        {
+            if (child is Button other)
+            {
+                if (other != this && other._isDefault)
+                    other.IsDefault = false;
+            }
+            if (child is WindowedControl inner)
+                ClearDefaultIn(inner);
+        }
+    }
 
     /// The picture drawn beside the caption, or null for none.
     ///
