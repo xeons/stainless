@@ -444,6 +444,9 @@ threadsafe sealed class Backend
         return bitmap;
     }
 
+    /// Whether GDI+ decodes the format at all, which it does for all four.
+    public bool Reads(ImageFormat format) => true;
+
     public void Destroy(void* image) => _dispose(image);
 
     public int Width(void* image)
@@ -833,6 +836,9 @@ delegate void  GdImageFlagFn(void* image, int on);
 delegate void  GdImageCopyResampledFn(void* destination, void* source,
                                       int dx, int dy, int sx, int sy,
                                       int dw, int dh, int sw, int sh);
+delegate void  GdImageCopyFn(void* destination, void* source,
+                             int dx, int dy, int sx, int sy, int w, int h);
+delegate int   GdImagePaletteToTrueColorFn(void* image);
 
 extern "C"
 {
@@ -873,6 +879,8 @@ threadsafe sealed class Backend
     GdImageFlagFn _blending;
     GdImageFlagFn _saveAlpha;
     GdImageCopyResampledFn _resample;
+    GdImageCopyFn _copy;
+    GdImagePaletteToTrueColorFn _toTrueColor;
 
     public bool Ready;
 
@@ -920,6 +928,14 @@ threadsafe sealed class Backend
         _blending = (GdImageFlagFn)Find(library, "gdImageAlphaBlending", &complete);
         _saveAlpha = (GdImageFlagFn)Find(library, "gdImageSaveAlpha", &complete);
         _resample = (GdImageCopyResampledFn)Find(library, "gdImageCopyResampled", &complete);
+        _copy = (GdImageCopyFn)Find(library, "gdImageCopy", &complete);
+
+        // 2.1.0 and later. Without it every decoded image is copied onto a
+        // true colour one instead, which costs a second image for the length
+        // of the copy.
+        void* toTrueColor = dlsym(library, "gdImagePaletteToTrueColor".ToPointer());
+        if (toTrueColor != null)
+            _toTrueColor = (GdImagePaletteToTrueColorFn)toTrueColor;
 
         // BMP arrived in libgd 2.1.1 and a distribution may predate it, so
         // these two are allowed to be missing and the format is refused when
@@ -1003,9 +1019,49 @@ threadsafe sealed class Backend
         if (format == ImageFormat.Bmp && _fromBmp != null)
             image = _fromBmp(size, raw);
 
-        if (image != null)
+        if (image == null)
+            return null;
+        return AsTrueColor(image);
+    }
+
+    /// Whether this libgd decodes the format at all.
+    public bool Reads(ImageFormat format) => format != ImageFormat.Bmp || _fromBmp != null;
+
+    /// A decoded image as true colour, which is what everything else here
+    /// assumes.
+    ///
+    /// A GIF, a palette PNG and a grey PNG decode to palette images, whose
+    /// pixels are indices: `gdImageGetPixel` answers the index, and a drawing
+    /// call stores the low byte of a colour as one. The image is taken, and
+    /// the one answered may be another.
+    void* AsTrueColor(void* image)
+    {
+        if (_toTrueColor != null)
+        {
+            if (_toTrueColor(image) == 0)
+            {
+                _destroy(image);
+                return null;
+            }
+            _blending(image, 1);
             _saveAlpha(image, 1);
-        return image;
+            return image;
+        }
+
+        // `gdImageCopy` converts a palette entry, and its alpha, to the colour
+        // it stands for. It skips the transparent index, which leaves the
+        // transparent pixel `Create` put there.
+        int width = Width(image);
+        int height = Height(image);
+        void* copy = Create(width, height);
+        if (copy != null)
+        {
+            _blending(copy, 0);
+            _copy(copy, image, 0, 0, 0, 0, width, height);
+            _blending(copy, 1);
+        }
+        _destroy(image);
+        return copy;
     }
 
     public void Destroy(void* image) => _destroy(image);
@@ -1368,7 +1424,7 @@ public sealed class Image
             return Fail(ImageError.NoBackend);
 
         ImageFormat format = ImageFormat.Png;
-        if (!Sniff(data, &format))
+        if (!Sniff(data, &format) || !((Backend)backend).Reads(format))
             return Fail(ImageError.Unsupported);
 
         void* made = ((Backend)backend).Decode(data);

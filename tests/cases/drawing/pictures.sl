@@ -12,6 +12,7 @@
 module Pictures;
 
 import Standard.Console;
+import Standard.Convert;
 import Standard.Drawing;
 
 int Main()
@@ -165,6 +166,7 @@ int Main()
 
     ok = Edges(ok);
     ok = Scaling(ok);
+    ok = Palettes(ok);
 
     // ---- what goes wrong.
     var missing = Image.FromFile("no-such-picture-anywhere.png");
@@ -275,6 +277,76 @@ bool Scaling(bool ok)
     ok = Check(ok, "a picture drawn at its own size lands where it was put",
                IsOpaqueRed(target.GetPixel(5, 5)) && IsOpaqueRed(target.GetPixel(14, 14))
                && target.GetPixel(4, 4).IsInvisible && target.GetPixel(15, 15).IsInvisible);
+    return ok;
+}
+
+// ---- palettes. A GIF, a palette PNG and a grey PNG are all indexed, and what
+// each decodes to MUST answer and take colours rather than indices.
+bool Palettes(bool ok)
+{
+    var held = MakeBlankPicture(4, 4);
+    if (held == null)
+        return Check(ok, "a picture for a GIF", false);
+    var flag = (Image)held;
+    flag.Clear(Rgba.White);
+    flag.FillRectangle(Rgba.Red, 0, 0, 2, 4);
+
+    var encoded = flag.Encode(ImageFormat.Gif);
+    ok = Check(ok, "a GIF encodes", encoded.Ok);
+    if (encoded.Ok)
+        ok = CheckIndexed(ok, "a GIF", encoded.Value, Rgba.Red, Rgba.White);
+
+    // Four by four, left half index 0 (red) and right half index 1 (white).
+    ok = CheckIndexed(ok, "a palette PNG", Bytes(
+        "89504e470d0a1a0a0000000d49484452000000040000000408030000009e2f6e4c00000006504c5445ff0000ffffff411d34110000000f4944415478da636060606464402500005c0009c11265d20000000049454e44ae426082"),
+        Rgba.Red, Rgba.White);
+
+    // Four by four and eight-bit grey, left half 0x80 and right half 0xFF.
+    ok = CheckIndexed(ok, "a grey PNG", Bytes(
+        "89504e470d0a1a0a0000000d49484452000000040000000408000000008c9ac1a2000000104944415478da636868f8ff9f0195000073cc0bf9fbdca06e0000000049454e44ae426082"),
+        Rgba.Rgb((byte)128, (byte)128, (byte)128), Rgba.White);
+    return ok;
+}
+
+byte[] Bytes(String hex)
+{
+    var decoded = Convert.FromHex(hex);
+    return decoded.Ok ? decoded.Value : new byte[0u];
+}
+
+bool IsColour(Rgba actual, Rgba expected)
+{
+    return actual.R == expected.R && actual.G == expected.G && actual.B == expected.B
+           && actual.A == expected.A;
+}
+
+/// A four-by-four picture whose left half is `left` and right half `right`.
+bool CheckIndexed(bool ok, String what, byte[] data, Rgba left, Rgba right)
+{
+    var decoded = Image.FromBytes(data);
+    ok = Check(ok, what + " decodes", decoded.Ok && decoded.Value.Width == 4);
+    if (!decoded.Ok)
+        return ok;
+
+    var picture = decoded.Value;
+    ok = Check(ok, what + " answers its colours",
+               IsColour(picture.GetPixel(1, 1), left) && IsColour(picture.GetPixel(3, 1), right));
+
+    // Pixel (1, 1) is bytes 20 to 23.
+    var pixels = picture.ToBgra();
+    ok = Check(ok, what + " copies out its colours",
+               pixels.Length == 64u && pixels[20u] == left.B && pixels[21u] == left.G
+               && pixels[22u] == left.R && pixels[23u] == left.A);
+
+    var green = Rgba.Rgb((byte)10, (byte)200, (byte)30);
+    picture.FillRectangle(green, 0, 0, 2, 2);
+    ok = Check(ok, what + " takes a colour it has no entry for",
+               IsColour(picture.GetPixel(1, 1), green));
+
+    var dark = Rgba.Rgb((byte)1, (byte)2, (byte)3);
+    picture.SetPixel(3, 3, dark);
+    ok = Check(ok, what + " takes one pixel at a time",
+               IsColour(picture.GetPixel(3, 3), dark));
     return ok;
 }
 

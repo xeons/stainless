@@ -42,6 +42,22 @@
   ok   a resize keeps its corners
   ok   and so does a shrink
   ok   a picture drawn at its own size lands where it was put
+  ok   a GIF encodes
+  ok   a GIF decodes
+  ok   a GIF answers its colours
+  ok   a GIF copies out its colours
+  ok   a GIF takes a colour it has no entry for
+  ok   a GIF takes one pixel at a time
+  ok   a palette PNG decodes
+  ok   a palette PNG answers its colours
+  ok   a palette PNG copies out its colours
+  ok   a palette PNG takes a colour it has no entry for
+  ok   a palette PNG takes one pixel at a time
+  ok   a grey PNG decodes
+  ok   a grey PNG answers its colours
+  ok   a grey PNG copies out its colours
+  ok   a grey PNG takes a colour it has no entry for
+  ok   a grey PNG takes one pixel at a time
   ok   a missing file says so
   ok   and bytes that are not a picture say so
   ok   and no bytes at all
