@@ -66,7 +66,7 @@ void Defaults(Harness harness)
 {
     Console.WriteLine("the arrangement a first run gets");
 
-    var layout = DockLayout.Default();
+    var layout = DockLayout.CreateDefault();
     harness.SameNumber("three panes are placed", 3, (long)layout.Places.Count);
     harness.SameNumber("one on the left", 1, (long)layout.Count(DockEdge.Left));
     harness.SameNumber("two at the bottom", 2, (long)layout.Count(DockEdge.Bottom));
@@ -82,7 +82,7 @@ void Defaults(Harness harness)
     var solution = layout.Find(Panes.Solution);
     harness.Check("the tree is on the left", solution != null
                   && ((DockPlacement)solution).Edge == DockEdge.Left);
-    harness.Check("and pinned open", solution != null && ((DockPlacement)solution).Pinned);
+    harness.Check("and pinned open", solution != null && ((DockPlacement)solution).IsPinned);
 
     // A name no build uses. The answer must be null rather than a placement,
     // or a pane added later cannot tell "the file predates me" from "the file
@@ -94,15 +94,15 @@ void Placing(Harness harness)
 {
     Console.WriteLine("moving a pane");
 
-    var layout = DockLayout.Default();
-    layout.Place(Panes.Solution, DockEdge.Bottom, false);
+    var layout = DockLayout.CreateDefault();
+    layout.PlacePane(Panes.Solution, DockEdge.Bottom, false);
 
     harness.SameNumber("still three panes", 3, (long)layout.Places.Count);
     harness.SameNumber("the left well is empty", 0, (long)layout.Count(DockEdge.Left));
     harness.SameNumber("and the bottom has three", 3, (long)layout.Count(DockEdge.Bottom));
 
     var moved = layout.Find(Panes.Solution);
-    harness.Check("unpinned where it was put", moved != null && !((DockPlacement)moved).Pinned);
+    harness.Check("unpinned where it was put", moved != null && !((DockPlacement)moved).IsPinned);
 }
 
 void Ordering(Harness harness)
@@ -110,9 +110,9 @@ void Ordering(Harness harness)
     Console.WriteLine("the order within a well");
 
     var layout = new DockLayout();
-    var first = layout.Place("a", DockEdge.Bottom, true);
-    var second = layout.Place("b", DockEdge.Bottom, true);
-    var third = layout.Place("c", DockEdge.Bottom, true);
+    var first = layout.PlacePane("a", DockEdge.Bottom, true);
+    var second = layout.PlacePane("b", DockEdge.Bottom, true);
+    var third = layout.PlacePane("c", DockEdge.Bottom, true);
 
     // Deliberately reversed, and `b` left where it is: that makes two entries
     // share an order, which is the case a sort that is not stable gets wrong
@@ -121,7 +121,7 @@ void Ordering(Harness harness)
     third.Order = 0u;
     second.Order = 0u;
 
-    var ordered = layout.On(DockEdge.Bottom);
+    var ordered = layout.GetPlacementsOn(DockEdge.Bottom);
     harness.SameNumber("three on the edge", 3, (long)ordered.Count);
     harness.Same("the low order leads", "b", ordered[0u].Name);
     harness.Same("the tie keeps the order it was read in", "c", ordered[1u].Name);
@@ -132,13 +132,13 @@ void RoundTrips(Harness harness)
 {
     Console.WriteLine("written and read back");
 
-    var layout = DockLayout.Default();
+    var layout = DockLayout.CreateDefault();
     layout.LeftWidth = 300;
     layout.RightWidth = 200;
     layout.BottomHeight = 120;
-    layout.Place(Panes.Properties, DockEdge.Left, false);
+    layout.PlacePane(Panes.Properties, DockEdge.Left, false);
 
-    var again = ParseLayout(WriteLayout(layout));
+    var again = ParseLayout(SerializeLayout(layout));
 
     harness.SameNumber("the left width came back", 300, (long)again.LeftWidth);
     harness.SameNumber("the right width came back", 200, (long)again.RightWidth);
@@ -148,18 +148,18 @@ void RoundTrips(Harness harness)
     var moved = again.Find(Panes.Properties);
     harness.Check("the moved pane kept its edge", moved != null
                   && ((DockPlacement)moved).Edge == DockEdge.Left);
-    harness.Check("and kept being unpinned", moved != null && !((DockPlacement)moved).Pinned);
+    harness.Check("and kept being unpinned", moved != null && !((DockPlacement)moved).IsPinned);
 
     // Two panes on one edge must come back in the order they went out, which
     // is what makes the tab order of the bottom well stay put between runs.
-    var bottom = again.On(DockEdge.Bottom);
+    var bottom = again.GetPlacementsOn(DockEdge.Bottom);
     harness.SameNumber("the bottom well still has two", 2, (long)bottom.Count);
     harness.Same("in the order they were written", Panes.Errors, bottom[0u].Name);
     harness.Same("and the second stayed second", Panes.Output, bottom[1u].Name);
 
     // The text itself, not merely what it parses to: a file a person is
     // expected to be able to edit is a file that has to be readable.
-    harness.Check("it is written indented", WriteLayout(layout).Contains("\n  \"left\""));
+    harness.Check("it is written indented", SerializeLayout(layout).Contains("\n  \"left\""));
 }
 
 void Refuses(Harness harness)
@@ -236,5 +236,5 @@ void Survives(Harness harness)
                        (long)wrong.Places.Count);
     harness.Check("and a pinned that is not a bool reads as pinned",
                   wrong.Find(Panes.Output) != null
-                  && ((DockPlacement)wrong.Find(Panes.Output)).Pinned);
+                  && ((DockPlacement)wrong.Find(Panes.Output)).IsPinned);
 }

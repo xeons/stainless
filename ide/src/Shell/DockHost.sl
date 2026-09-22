@@ -87,7 +87,7 @@ class CaptionBar : CustomControl
     /// Which glyph the pointer is over: 0 for neither, 1 for the pin, 2 for
     /// the close box. One field rather than two bools, because the two states
     /// are exclusive and two bools can represent a state that is not real.
-    int _hot;
+    int _hotGlyph;
 
     public event EventHandler CloseClicked;
     public event EventHandler PinClicked;
@@ -98,7 +98,7 @@ class CaptionBar : CustomControl
         _title = "";
         _pinned = true;
         _active = false;
-        _hot = 0;
+        _hotGlyph = 0;
         // It is chrome. Taking the focus would move the caret out of the editor
         // every time someone pinned a pane.
         Focusable = false;
@@ -141,11 +141,11 @@ class CaptionBar : CustomControl
         }
     }
 
-    Rectangle CloseBox() =>
+    Rectangle CloseBox =>
         Rectangle.Of(Width - GlyphBox - GlyphInset, (CaptionHeight - GlyphBox) / 2,
                      GlyphBox, GlyphBox);
 
-    Rectangle PinBox() =>
+    Rectangle PinBox =>
         Rectangle.Of(Width - (GlyphBox * 2) - GlyphInset - 2,
                      (CaptionHeight - GlyphBox) / 2, GlyphBox, GlyphBox);
 
@@ -168,13 +168,13 @@ class CaptionBar : CustomControl
         canvas.DrawString(_title, Font, ink, GlyphInset + 2,
                           (Height - canvas.MeasureString("M", Font).Height) / 2);
 
-        DrawPin(canvas, PinBox(), ink);
-        DrawClose(canvas, CloseBox(), ink);
+        DrawPinGlyph(canvas, PinBox, ink);
+        DrawCloseGlyph(canvas, CloseBox, ink);
     }
 
     /// The pointer being over a glyph is drawn as a box around it, which is
     /// what Office XP does and what Phase 2 will do everywhere.
-    void Highlight(Graphics canvas, Rectangle box)
+    void DrawHighlight(Graphics canvas, Rectangle box)
     {
         canvas.FillRectangle(new Brush(SystemColors.ControlLight), box);
         canvas.DrawRectangle(new Pen(SystemColors.ControlDark), box);
@@ -183,10 +183,10 @@ class CaptionBar : CustomControl
     /// A pushpin: a head, a shaft, and a point. Pinned it faces down the way a
     /// pin pushed into a board does; unpinned it lies on its side, which is how
     /// every IDE since Visual Studio 2002 has drawn the difference.
-    void DrawPin(Graphics canvas, Rectangle box, Color ink)
+    void DrawPinGlyph(Graphics canvas, Rectangle box, Color ink)
     {
-        if (_hot == 1)
-            Highlight(canvas, box);
+        if (_hotGlyph == 1)
+            DrawHighlight(canvas, box);
 
         var pen = new Pen(ink);
         var fill = new Brush(ink);
@@ -212,10 +212,10 @@ class CaptionBar : CustomControl
     /// An X, drawn twice a pixel apart so that it reads as a stroke rather than
     /// as a hairline -- there is no line width above one that is not also a
     /// different shape, and no antialiasing to lean on.
-    void DrawClose(Graphics canvas, Rectangle box, Color ink)
+    void DrawCloseGlyph(Graphics canvas, Rectangle box, Color ink)
     {
-        if (_hot == 2)
-            Highlight(canvas, box);
+        if (_hotGlyph == 2)
+            DrawHighlight(canvas, box);
 
         var pen = new Pen(ink);
         int left = box.X + 4;
@@ -229,12 +229,12 @@ class CaptionBar : CustomControl
         canvas.DrawLine(pen, right - 1, top, left - 1, bottom);
     }
 
-    int GlyphAt(int x, int y)
+    int GetGlyphAt(int x, int y)
     {
         var point = Point.At(x, y);
-        if (PinBox().Contains(point))
+        if (PinBox.Contains(point))
             return 1;
-        if (CloseBox().Contains(point))
+        if (CloseBox.Contains(point))
             return 2;
         return 0;
     }
@@ -242,19 +242,19 @@ class CaptionBar : CustomControl
     protected override void OnMouseMove(MouseEventArgs args)
     {
         base.OnMouseMove(args);
-        int now = GlyphAt(args.X, args.Y);
-        if (now == _hot)
+        int now = GetGlyphAt(args.X, args.Y);
+        if (now == _hotGlyph)
             return;
-        _hot = now;
+        _hotGlyph = now;
         Invalidate();
     }
 
     protected override void OnMouseLeave()
     {
         base.OnMouseLeave();
-        if (_hot == 0)
+        if (_hotGlyph == 0)
             return;
-        _hot = 0;
+        _hotGlyph = 0;
         Invalidate();
     }
 
@@ -266,7 +266,7 @@ class CaptionBar : CustomControl
 
         // On the release and over the same glyph, which is what every button
         // on every platform does: pressing one and sliding off must cancel.
-        int which = GlyphAt(args.X, args.Y);
+        int which = GetGlyphAt(args.X, args.Y);
         if (which == 1)
             PinClicked(this);
         else if (which == 2)
@@ -286,18 +286,18 @@ class CaptionBar : CustomControl
 ///
 /// **A control belongs to the parent it was constructed with**, and `forms/`
 /// cannot move it afterwards. So a tool window cannot be handed a finished
-/// control; it has to exist first and be built into. `host.Add(...)` answers
-/// one, and the caller does `new TreeView(pane)` against it.
+/// control; it has to exist first and be built into. `host.AddPane(...)`
+/// answers one, and the caller does `new TreeView(pane)` against it.
 public class ToolWindow : Panel
 {
-    String _name;
+    String _paneName;
     String _title;
     weak TabPage? _tab;
 
     public ToolWindow(TabPage parent, String name, String title)
     {
         base(parent);
-        _name = name;
+        _paneName = name;
         _title = title;
         _tab = parent;
         Dock = DockStyle.Fill;
@@ -309,7 +309,7 @@ public class ToolWindow : Panel
     /// `PaneName` rather than `Name`, because `Control.Name` already exists and
     /// is not virtual -- and shadowing it would leave two spellings of "what is
     /// this called" on one object, which is worse than a slightly longer name.
-    public String PaneName => _name;
+    public String PaneName => _paneName;
 
     /// What the caption and the tab both say.
     public String Title
@@ -338,9 +338,9 @@ public class ToolWindow : Panel
 class AutoHideStrip : CustomControl
 {
     List<ToolWindow> _panes;
-    List<Rectangle> _boxes;
+    List<Rectangle> _labelBounds;
     DockEdge _edge;
-    int _hot;
+    int _hotLabel;
 
     /// Which pane was clicked, by index into `Panes`.
     public event EventHandler Chosen;
@@ -350,9 +350,9 @@ class AutoHideStrip : CustomControl
     {
         base(parent);
         _panes = new List<ToolWindow>();
-        _boxes = new List<Rectangle>();
+        _labelBounds = new List<Rectangle>();
         _edge = edge;
-        _hot = -1;
+        _hotLabel = -1;
         ChosenIndex = 0u;
         Focusable = false;
 
@@ -375,7 +375,7 @@ class AutoHideStrip : CustomControl
     public void Clear()
     {
         _panes.Clear();
-        _hot = -1;
+        _hotLabel = -1;
     }
 
     public void Add(ToolWindow pane) => _panes.Add(pane);
@@ -390,7 +390,7 @@ class AutoHideStrip : CustomControl
     /// where the measurement now agrees and nothing changes. So it settles
     /// after one extra pass rather than looping, and the `!=` is what
     /// guarantees that.
-    bool Remeasure(Graphics canvas)
+    bool ResizeToLabels(Graphics canvas)
     {
         if (_panes.IsEmpty || _edge == DockEdge.Bottom)
             return false;
@@ -413,9 +413,9 @@ class AutoHideStrip : CustomControl
     /// Where each label sits. Rebuilt on every paint and every hit test rather
     /// than cached, because the two must agree and the cheapest way to
     /// guarantee that is for there to be one answer.
-    void Reflow(Graphics canvas)
+    void LayOutLabels(Graphics canvas)
     {
-        _boxes.Clear();
+        _labelBounds.Clear();
         int line = canvas.MeasureString("M", Font).Height;
 
         if (_edge == DockEdge.Bottom)
@@ -424,7 +424,7 @@ class AutoHideStrip : CustomControl
             foreach (var pane in _panes)
             {
                 int wide = canvas.MeasureString(pane.Title, Font).Width + StripLabelGap;
-                _boxes.Add(Rectangle.Of(x, 1, wide, StripThickness - 2));
+                _labelBounds.Add(Rectangle.Of(x, 1, wide, StripThickness - 2));
                 x = x + wide + 2;
             }
         }
@@ -434,7 +434,7 @@ class AutoHideStrip : CustomControl
             int tall = line + 8;
             foreach (var pane in _panes)
             {
-                _boxes.Add(Rectangle.Of(1, y, Width - 2, tall));
+                _labelBounds.Add(Rectangle.Of(1, y, Width - 2, tall));
                 y = y + tall + 2;
             }
         }
@@ -444,7 +444,7 @@ class AutoHideStrip : CustomControl
     {
         var canvas = args.Graphics;
 
-        if (Remeasure(canvas))
+        if (ResizeToLabels(canvas))
         {
             var parent = Parent;
             if (parent != null)
@@ -453,12 +453,12 @@ class AutoHideStrip : CustomControl
 
         canvas.FillRectangle(new Brush(SystemColors.Control),
                              Rectangle.Of(0, 0, Width, Height));
-        Reflow(canvas);
+        LayOutLabels(canvas);
 
-        for (nuint i = 0u; i < _boxes.Count && i < _panes.Count; i++)
+        for (nuint i = 0u; i < _labelBounds.Count && i < _panes.Count; i++)
         {
-            var box = _boxes[i];
-            bool hot = (int)i == _hot;
+            var box = _labelBounds[i];
+            bool hot = (int)i == _hotLabel;
 
             canvas.FillRectangle(new Brush(hot ? SystemColors.ControlLight
                                               : SystemColors.Control), box);
@@ -472,12 +472,12 @@ class AutoHideStrip : CustomControl
         }
     }
 
-    int LabelAt(int x, int y)
+    int GetLabelAt(int x, int y)
     {
         var point = Point.At(x, y);
-        for (nuint i = 0u; i < _boxes.Count; i++)
+        for (nuint i = 0u; i < _labelBounds.Count; i++)
         {
-            if (_boxes[i].Contains(point))
+            if (_labelBounds[i].Contains(point))
                 return (int)i;
         }
         return -1;
@@ -486,10 +486,10 @@ class AutoHideStrip : CustomControl
     protected override void OnMouseMove(MouseEventArgs args)
     {
         base.OnMouseMove(args);
-        int now = LabelAt(args.X, args.Y);
-        if (now == _hot)
+        int now = GetLabelAt(args.X, args.Y);
+        if (now == _hotLabel)
             return;
-        _hot = now;
+        _hotLabel = now;
         Invalidate();
 
         // Hovering is what opens it, as it is in Visual Studio -- a pane you
@@ -504,9 +504,9 @@ class AutoHideStrip : CustomControl
     protected override void OnMouseLeave()
     {
         base.OnMouseLeave();
-        if (_hot < 0)
+        if (_hotLabel < 0)
             return;
-        _hot = -1;
+        _hotLabel = -1;
         Invalidate();
     }
 }
@@ -522,7 +522,7 @@ class AutoHideStrip : CustomControl
 public class DockWell : Panel
 {
     CaptionBar _caption;
-    TabControl _book;
+    TabControl _tabs;
     List<ToolWindow> _panes;
     DockEdge _edge;
 
@@ -540,9 +540,9 @@ public class DockWell : Panel
         // The book first so the caption, made second, stacks in front of it.
         // The layout would put them in different places anyway; this is about
         // the one pixel of overlap a border can produce.
-        _book = new TabControl(this);
-        _book.Dock = DockStyle.Fill;
-        _book.SelectedIndexChanged += this.OnPageChanged;
+        _tabs = new TabControl(this);
+        _tabs.Dock = DockStyle.Fill;
+        _tabs.SelectedIndexChanged += this.OnPageChanged;
 
         _caption = new CaptionBar(this);
         _caption.CloseClicked += this.OnCloseClicked;
@@ -573,12 +573,12 @@ public class DockWell : Panel
     }
 
     /// Makes a pane in this well and answers it, ready to be built into.
-    public ToolWindow Add(String name, String title)
+    public ToolWindow AddPane(String name, String title)
     {
-        var page = new TabPage(_book, title);
+        var page = new TabPage(_tabs, title);
         var pane = new ToolWindow(page, name, title);
         _panes.Add(pane);
-        Retitle();
+        UpdateCaption();
         Visible = true;
         return pane;
     }
@@ -588,7 +588,7 @@ public class DockWell : Panel
     {
         get
         {
-            int at = _book.SelectedIndex;
+            int at = _tabs.SelectedIndex;
             if (at < 0 || (nuint)at >= _panes.Count)
                 return null;
             return _panes[(nuint)at];
@@ -596,21 +596,21 @@ public class DockWell : Panel
     }
 
     /// Brings a pane to the front of its well. Answers whether it is here.
-    public bool Reveal(String name)
+    public bool SelectPane(String name)
     {
         for (nuint i = 0u; i < _panes.Count; i++)
         {
             if (_panes[i].PaneName == name)
             {
-                _book.SelectedIndex = (int)i;
-                Retitle();
+                _tabs.SelectedIndex = (int)i;
+                UpdateCaption();
                 return true;
             }
         }
         return false;
     }
 
-    public ToolWindow? Find(String name)
+    public ToolWindow? FindPane(String name)
     {
         foreach (var pane in _panes)
         {
@@ -621,13 +621,13 @@ public class DockWell : Panel
     }
 
     /// The caption says what the front tab says.
-    void Retitle()
+    void UpdateCaption()
     {
         var now = Current;
         _caption.Title = now == null ? "" : ((ToolWindow)now).Title;
     }
 
-    void OnPageChanged(Control sender) => Retitle();
+    void OnPageChanged(Control sender) => UpdateCaption();
     void OnCloseClicked(Control sender) => CloseRequested(this);
     void OnPinClicked(Control sender) => PinToggled(this);
 }
@@ -666,9 +666,9 @@ public class DockHost : Panel
     Panel _documents;
 
     /// The well currently slid out over the documents, or null.
-    DockWell? _flying;
+    DockWell? _flyout;
     /// Polls the pointer while a pane is slid out, so that it can slide back.
-    Timer _watch;
+    Timer _pointerTimer;
 
     /// A pane was closed. The shell may want to update a menu tick.
     public event EventHandler PaneClosed;
@@ -677,7 +677,7 @@ public class DockHost : Panel
     {
         base(parent);
         _layout = layout;
-        _flying = null;
+        _flyout = null;
 
         _leftStrip = new AutoHideStrip(this, DockEdge.Left);
         _leftWell = new DockWell(this, DockEdge.Left);
@@ -724,8 +724,8 @@ public class DockHost : Panel
         _rightStrip.Chosen += this.OnStripChosen;
         _bottomStrip.Chosen += this.OnStripChosen;
 
-        _watch = new Timer(250);
-        _watch.Tick += this.OnWatchTick;
+        _pointerTimer = new Timer(250);
+        _pointerTimer.Tick += this.OnPointerTimerTick;
     }
 
     /// Where the editors go.
@@ -742,42 +742,42 @@ public class DockHost : Panel
     /// A pane the layout has never heard of goes where the caller says, which
     /// is what makes adding one to a later build work without anybody having to
     /// migrate a settings file.
-    public ToolWindow Add(String name, String title, DockEdge fallback)
+    public ToolWindow AddPane(String name, String title, DockEdge fallback)
     {
         var placed = _layout.Find(name);
         DockEdge edge = placed == null ? fallback : ((DockPlacement)placed).Edge;
-        bool pinned = placed == null ? true : ((DockPlacement)placed).Pinned;
+        bool pinned = placed == null ? true : ((DockPlacement)placed).IsPinned;
 
         if (placed == null)
-            _layout.Place(name, edge, pinned);
+            _layout.PlacePane(name, edge, pinned);
 
-        return WellFor(edge).Add(name, title);
+        return GetWellOn(edge).AddPane(name, title);
     }
 
-    public ToolWindow Add(String name, String title) =>
-        Add(name, title, DockEdge.Left);
+    public ToolWindow AddPane(String name, String title) =>
+        AddPane(name, title, DockEdge.Left);
 
     /// Brings a pane to the front of whatever well it is in, sliding that well
     /// out first if it is hidden. Answers whether the pane exists at all.
-    public bool Reveal(String name)
+    public bool ShowPane(String name)
     {
-        var well = WellHolding(name);
+        var well = FindWellHolding(name);
         if (well == null)
             return false;
 
         var found = (DockWell)well;
-        var pane = found.Find(name);
+        var pane = found.FindPane(name);
         if (pane != null)
             ((ToolWindow)pane).Visible = true;
 
         if (!found.Visible)
-            SlideOut(found);
+            SlideOutWell(found);
 
-        found.Reveal(name);
+        found.SelectPane(name);
         return true;
     }
 
-    DockWell WellFor(DockEdge edge)
+    DockWell GetWellOn(DockEdge edge)
     {
         if (edge == DockEdge.Right)
             return _rightWell;
@@ -788,18 +788,18 @@ public class DockHost : Panel
         return _leftWell;
     }
 
-    DockWell? WellHolding(String name)
+    DockWell? FindWellHolding(String name)
     {
-        if (_leftWell.Find(name) != null)
+        if (_leftWell.FindPane(name) != null)
             return _leftWell;
-        if (_rightWell.Find(name) != null)
+        if (_rightWell.FindPane(name) != null)
             return _rightWell;
-        if (_bottomWell.Find(name) != null)
+        if (_bottomWell.FindPane(name) != null)
             return _bottomWell;
         return null;
     }
 
-    AutoHideStrip StripFor(DockEdge edge)
+    AutoHideStrip GetStripOn(DockEdge edge)
     {
         if (edge == DockEdge.Right)
             return _rightStrip;
@@ -808,7 +808,7 @@ public class DockHost : Panel
         return _leftStrip;
     }
 
-    Splitter SplitFor(DockEdge edge)
+    Splitter GetSplitterOn(DockEdge edge)
     {
         if (edge == DockEdge.Right)
             return _rightSplit;
@@ -822,25 +822,25 @@ public class DockHost : Panel
     /// Puts every well where the layout says, after the panes have been made.
     ///
     /// Called once, by the shell, when it has finished adding panes -- rather
-    /// than on each `Add`, which would lay the window out four times and show
-    /// each pane appearing.
-    public void Arrange()
+    /// than on each `AddPane`, which would lay the window out four times and
+    /// show each pane appearing.
+    public void ArrangeWells()
     {
-        Settle(_leftWell);
-        Settle(_rightWell);
-        Settle(_bottomWell);
+        ArrangeWell(_leftWell);
+        ArrangeWell(_rightWell);
+        ArrangeWell(_bottomWell);
         PerformLayout();
     }
 
     /// One well, shown pinned, or hidden behind its strip.
-    void Settle(DockWell well)
+    void ArrangeWell(DockWell well)
     {
-        var strip = StripFor(well.Edge);
-        var split = SplitFor(well.Edge);
+        var strip = GetStripOn(well.Edge);
+        var split = GetSplitterOn(well.Edge);
 
         strip.Clear();
 
-        if (Living(well) == 0u)
+        if (CountOpenPanes(well) == 0u)
         {
             well.Visible = false;
             split.Visible = false;
@@ -848,12 +848,12 @@ public class DockHost : Panel
             return;
         }
 
-        bool pinned = AnyPinned(well);
+        bool pinned = IsAnyPanePinned(well);
         well.Pinned = pinned;
 
         if (pinned)
         {
-            Dock(well, well.Edge);
+            DockWellToEdge(well, well.Edge);
             well.Visible = true;
             split.Visible = true;
             strip.Visible = false;
@@ -875,7 +875,7 @@ public class DockHost : Panel
     }
 
     /// How many panes in a well have not been closed.
-    nuint Living(DockWell well)
+    nuint CountOpenPanes(DockWell well)
     {
         nuint alive = 0u;
         foreach (var pane in well.Panes)
@@ -892,20 +892,20 @@ public class DockHost : Panel
     /// a property of the well as far as the screen is concerned. The layout
     /// records it per pane because that is what the file has always meant and
     /// what a later build with draggable panes will need.
-    bool AnyPinned(DockWell well)
+    bool IsAnyPanePinned(DockWell well)
     {
         foreach (var pane in well.Panes)
         {
             if (!pane.Visible)
                 continue;
             var placed = _layout.Find(pane.PaneName);
-            if (placed == null || ((DockPlacement)placed).Pinned)
+            if (placed == null || ((DockPlacement)placed).IsPinned)
                 return true;
         }
         return false;
     }
 
-    void Dock(DockWell well, DockEdge edge)
+    void DockWellToEdge(DockWell well, DockEdge edge)
     {
         if (edge == DockEdge.Bottom)
         {
@@ -933,45 +933,45 @@ public class DockHost : Panel
     /// host, so it can only cover this host's client area -- which is exactly
     /// the area the documents occupy, and is why the flyout looks right without
     /// anything being reparented or floated.
-    void SlideOut(DockWell well)
+    void SlideOutWell(DockWell well)
     {
-        if (_flying == well)
+        if (_flyout == well)
             return;
 
-        SlideBack();
+        SlideBackWell();
 
         var room = ClientBounds;
         var over = _documents.Bounds;
 
         if (well.Edge == DockEdge.Bottom)
         {
-            int tall = Fits(_layout.BottomHeight, room.Height);
+            int tall = ClampFlyoutSize(_layout.BottomHeight, room.Height);
             well.Dock = DockStyle.None;
             well.SetBounds(over.X, over.Bottom - tall, over.Width, tall);
         }
         else if (well.Edge == DockEdge.Right)
         {
-            int wide = Fits(_layout.RightWidth, room.Width);
+            int wide = ClampFlyoutSize(_layout.RightWidth, room.Width);
             well.Dock = DockStyle.None;
             well.SetBounds(over.Right - wide, over.Y, wide, over.Height);
         }
         else
         {
-            int wide = Fits(_layout.LeftWidth, room.Width);
+            int wide = ClampFlyoutSize(_layout.LeftWidth, room.Width);
             well.Dock = DockStyle.None;
             well.SetBounds(over.X, over.Y, wide, over.Height);
         }
 
         well.Visible = true;
         well.BringToFront();
-        _flying = well;
-        _watch.Start();
+        _flyout = well;
+        _pointerTimer.Start();
     }
 
     /// How far a slid-out pane may come over the documents. Never more than
     /// half: a pane covering everything has nothing left to slide back over,
     /// and reads as having docked itself rather than as being temporary.
-    int Fits(int wanted, int available)
+    int ClampFlyoutSize(int wanted, int available)
     {
         int most = available / FlyoutMostOfWindow;
         if (most < SmallestWell)
@@ -980,21 +980,21 @@ public class DockHost : Panel
     }
 
     /// Puts a slid-out well away again.
-    void SlideBack()
+    void SlideBackWell()
     {
-        var flying = _flying;
+        var flying = _flyout;
         if (flying == null)
             return;
 
-        _watch.Stop();
-        _flying = null;
+        _pointerTimer.Stop();
+        _flyout = null;
 
         var well = (DockWell)flying;
         well.Visible = false;
         // Back to a docked style even though it is hidden, so that pinning it
         // again is one flag rather than a rebuild -- and so that a well left in
         // `None` can never be laid out as an overlay it no longer is.
-        Dock(well, well.Edge);
+        DockWellToEdge(well, well.Edge);
         PerformLayout();
     }
 
@@ -1005,12 +1005,12 @@ public class DockHost : Panel
     /// the moment it moves onto one of that container's own children -- so a
     /// well would slide shut as soon as the pointer reached the tree inside it,
     /// which is the one place it is certainly meant to stay open.
-    void OnWatchTick(Timer sender)
+    void OnPointerTimerTick(Timer sender)
     {
-        var flying = _flying;
+        var flying = _flyout;
         if (flying == null)
         {
-            _watch.Stop();
+            _pointerTimer.Stop();
             return;
         }
 
@@ -1020,10 +1020,10 @@ public class DockHost : Panel
         // The strip counts as inside: the pointer travelling from the label
         // that opened the pane to the pane itself crosses it, and a pane that
         // shut on the way to being used would be unusable.
-        if (well.Bounds.Contains(here) || StripFor(well.Edge).Bounds.Contains(here))
+        if (well.Bounds.Contains(here) || GetStripOn(well.Edge).Bounds.Contains(here))
             return;
 
-        SlideBack();
+        SlideBackWell();
     }
 
     void OnStripChosen(Control sender)
@@ -1033,12 +1033,12 @@ public class DockHost : Panel
             return;
 
         var pane = strip.Panes[strip.ChosenIndex];
-        var well = WellHolding(pane.PaneName);
+        var well = FindWellHolding(pane.PaneName);
         if (well == null)
             return;
 
-        SlideOut((DockWell)well);
-        ((DockWell)well).Reveal(pane.PaneName);
+        SlideOutWell((DockWell)well);
+        ((DockWell)well).SelectPane(pane.PaneName);
     }
 
     // ----------------------------------------------------- pinning, closing
@@ -1048,17 +1048,17 @@ public class DockHost : Panel
     void OnPinToggled(Control sender)
     {
         var well = (DockWell)sender;
-        bool pinned = !AnyPinned(well);
+        bool pinned = !IsAnyPanePinned(well);
 
         // Every pane in the well, because the well is what is being pinned --
-        // see `AnyPinned` for why the file still records it per pane.
+        // see `IsAnyPanePinned` for why the file still records it per pane.
         foreach (var pane in well.Panes)
         {
-            _layout.Place(pane.PaneName, well.Edge, pinned);
+            _layout.PlacePane(pane.PaneName, well.Edge, pinned);
         }
 
-        SlideBack();
-        Settle(well);
+        SlideBackWell();
+        ArrangeWell(well);
         PerformLayout();
     }
 
@@ -1069,39 +1069,39 @@ public class DockHost : Panel
         var well = (DockWell)sender;
         var pane = well.Current;
         if (pane != null)
-            Close(((ToolWindow)pane).PaneName);
+            ClosePane(((ToolWindow)pane).PaneName);
     }
 
     /// Hides one pane. It is hidden rather than destroyed -- what is inside it
     /// is live and the IDE still holds it -- and the layout remembers, so a
     /// closed pane stays closed between runs.
-    public bool Close(String name)
+    public bool ClosePane(String name)
     {
-        var well = WellHolding(name);
+        var well = FindWellHolding(name);
         if (well == null)
             return false;
 
         var found = (DockWell)well;
-        var pane = found.Find(name);
+        var pane = found.FindPane(name);
         if (pane == null)
             return false;
 
         ((ToolWindow)pane).Visible = false;
 
-        SlideBack();
-        Settle(found);
+        SlideBackWell();
+        ArrangeWell(found);
         PerformLayout();
         PaneClosed(this);
         return true;
     }
 
     /// Whether a pane is on the screen at all, as opposed to merely existing.
-    public bool Showing(String name)
+    public bool IsPaneShowing(String name)
     {
-        var well = WellHolding(name);
+        var well = FindWellHolding(name);
         if (well == null)
             return false;
-        var pane = ((DockWell)well).Find(name);
+        var pane = ((DockWell)well).FindPane(name);
         return pane != null && ((ToolWindow)pane).Visible;
     }
 
@@ -1115,7 +1115,7 @@ public class DockHost : Panel
     /// directly and raises nothing, so there is no drag-finished event to
     /// listen for. Asking at the point the answer is wanted is both simpler and
     /// impossible to miss.
-    public void Remember()
+    public void RememberWellSizes()
     {
         if (_leftWell.Visible && _leftWell.Dock == DockStyle.Left)
             _layout.LeftWidth = _leftWell.Width;
@@ -1134,7 +1134,7 @@ public class DockHost : Panel
     public nuint PaneCount =>
         _leftWell.Panes.Count + _rightWell.Panes.Count + _bottomWell.Panes.Count;
 
-    public bool Holds(String name) => WellHolding(name) != null;
+    public bool HasPane(String name) => FindWellHolding(name) != null;
 
     /// The rectangle the splitter for an edge occupies, in this host's own
     /// coordinates.
@@ -1143,19 +1143,19 @@ public class DockHost : Panel
     /// platform: whether it can be grabbed is entirely whether this rectangle
     /// is where the pointer is. An empty one is a divider nobody can drag and
     /// a cursor that never changes, which is invisible to every other check.
-    public Rectangle SplitterBounds(DockEdge edge) => SplitFor(edge).Bounds;
+    public Rectangle GetSplitterBounds(DockEdge edge) => GetSplitterOn(edge).Bounds;
 
-    public bool SplitterShowing(DockEdge edge) => SplitFor(edge).Visible;
+    public bool IsSplitterShowing(DockEdge edge) => GetSplitterOn(edge).Visible;
 
     /// Which edge a pane is actually on, as opposed to what the file asked for.
-    public DockEdge EdgeOf(String name)
+    public DockEdge GetEdgeOf(String name)
     {
-        var well = WellHolding(name);
+        var well = FindWellHolding(name);
         if (well == null)
             return DockEdge.Document;
         return ((DockWell)well).Edge;
     }
 
-    public bool WellShowing(DockEdge edge) => WellFor(edge).Visible;
-    public bool StripShowing(DockEdge edge) => StripFor(edge).Visible;
+    public bool IsWellShowing(DockEdge edge) => GetWellOn(edge).Visible;
+    public bool IsStripShowing(DockEdge edge) => GetStripOn(edge).Visible;
 }

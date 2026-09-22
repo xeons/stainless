@@ -61,7 +61,7 @@ public class DockPlacement
 {
     public String Name;
     public DockEdge Edge;
-    public bool Pinned;
+    public bool IsPinned;
     /// Position within the well, low first. Ties keep the order they were read.
     public nuint Order;
 
@@ -69,7 +69,7 @@ public class DockPlacement
     {
         Name = name;
         Edge = edge;
-        Pinned = pinned;
+        IsPinned = pinned;
         Order = order;
     }
 }
@@ -90,16 +90,16 @@ public const int LargestWell = 1200;
 public class DockLayout
 {
     List<DockPlacement> _places;
-    int _left;
-    int _right;
-    int _bottom;
+    int _leftWidth;
+    int _rightWidth;
+    int _bottomHeight;
 
     public DockLayout()
     {
         _places = new List<DockPlacement>();
-        _left = 240;
-        _right = 260;
-        _bottom = 180;
+        _leftWidth = 240;
+        _rightWidth = 260;
+        _bottomHeight = 180;
     }
 
     public List<DockPlacement> Places => _places;
@@ -111,23 +111,23 @@ public class DockLayout
     /// and there is one place that knows it.
     public int LeftWidth
     {
-        get => _left;
-        set => _left = Clamp(value);
+        get => _leftWidth;
+        set => _leftWidth = ClampWellSize(value);
     }
 
     public int RightWidth
     {
-        get => _right;
-        set => _right = Clamp(value);
+        get => _rightWidth;
+        set => _rightWidth = ClampWellSize(value);
     }
 
     public int BottomHeight
     {
-        get => _bottom;
-        set => _bottom = Clamp(value);
+        get => _bottomHeight;
+        set => _bottomHeight = ClampWellSize(value);
     }
 
-    static int Clamp(int size)
+    static int ClampWellSize(int size)
     {
         if (size < SmallestWell)
             return SmallestWell;
@@ -152,14 +152,14 @@ public class DockLayout
     }
 
     /// Puts a pane somewhere, replacing wherever it was.
-    public DockPlacement Place(String name, DockEdge edge, bool pinned)
+    public DockPlacement PlacePane(String name, DockEdge edge, bool pinned)
     {
         var already = Find(name);
         if (already != null)
         {
             var found = (DockPlacement)already;
             found.Edge = edge;
-            found.Pinned = pinned;
+            found.IsPinned = pinned;
             return found;
         }
 
@@ -187,7 +187,7 @@ public class DockLayout
     /// IDE has. Insertion rather than selection because it is **stable**: two
     /// panes written with the same order keep the order the file had, instead
     /// of swapping about between runs for no reason a reader could see.
-    public List<DockPlacement> On(DockEdge edge)
+    public List<DockPlacement> GetPlacementsOn(DockEdge edge)
     {
         var chosen = new List<DockPlacement>();
         foreach (var place in _places)
@@ -218,18 +218,20 @@ public class DockLayout
     /// point of the exercise is that someone who knows that window knows this
     /// one. What is deliberately different is that nothing floats -- see
     /// `DockHost.sl` for why that is a decision and not an omission.
+    ///
     /// **Only panes that exist.** `Panes.Properties` is named here in the
-    /// constant list and deliberately not placed: the pane is not built yet, and
-    /// a default layout describing one the window never makes would put a line
-    /// in everyone's settings file for something they cannot see. When the pane
-    /// arrives it is placed by `DockHost.Add`'s fallback, which is the same path
-    /// that handles a settings file written before any later pane existed.
-    public static DockLayout Default()
+    /// constant list and deliberately not placed: the pane is not built yet,
+    /// and a default layout describing one the window never makes would put a
+    /// line in everyone's settings file for something they cannot see. When
+    /// the pane arrives it is placed by `DockHost.AddPane`'s fallback, which is
+    /// the same path that handles a settings file written before any later
+    /// pane existed.
+    public static DockLayout CreateDefault()
     {
         var layout = new DockLayout();
-        layout.Place(Panes.Solution, DockEdge.Left, true);
-        layout.Place(Panes.Errors, DockEdge.Bottom, true);
-        layout.Place(Panes.Output, DockEdge.Bottom, true);
+        layout.PlacePane(Panes.Solution, DockEdge.Left, true);
+        layout.PlacePane(Panes.Errors, DockEdge.Bottom, true);
+        layout.PlacePane(Panes.Output, DockEdge.Bottom, true);
         return layout;
     }
 }
@@ -258,7 +260,7 @@ public static class Panes
 // ===================================================================== naming
 
 /// The edge an enum member is written as in the file.
-public String EdgeName(DockEdge edge)
+public String FormatEdgeName(DockEdge edge)
 {
     if (edge == DockEdge.Left)
         return "left";
@@ -272,7 +274,7 @@ public String EdgeName(DockEdge edge)
 /// And back. An unrecognised edge is the document well, which is the one that
 /// always exists -- so a file naming an edge this build does not have puts the
 /// pane somewhere visible rather than nowhere.
-public DockEdge EdgeFrom(String name)
+public DockEdge ParseEdgeName(String name)
 {
     if (name == "left")
         return DockEdge.Left;
@@ -301,11 +303,11 @@ public DockEdge EdgeFrom(String name)
 public DockLayout ReadLayout(String path)
 {
     if (!File.Exists(path))
-        return DockLayout.Default();
+        return DockLayout.CreateDefault();
 
     var text = File.ReadAllText(path);
     if (!text.Ok)
-        return DockLayout.Default();
+        return DockLayout.CreateDefault();
 
     return ParseLayout(text.Value);
 }
@@ -315,11 +317,11 @@ public DockLayout ParseLayout(String text)
 {
     var parsed = Json.Parse(text);
     if (!parsed.Ok)
-        return DockLayout.Default();
+        return DockLayout.CreateDefault();
 
     var document = parsed.Value;
     if (!document.Object)
-        return DockLayout.Default();
+        return DockLayout.CreateDefault();
 
     var members = document.Members;
     var layout = new DockLayout();
@@ -352,13 +354,13 @@ public DockLayout ParseLayout(String text)
 
                     DockEdge edge = DockEdge.Document;
                     if (inside.IndexOf("edge") is Some where)
-                        edge = EdgeFrom(Json.TextOr(inside.ValueAt(where.Value), "document"));
+                        edge = ParseEdgeName(Json.TextOr(inside.ValueAt(where.Value), "document"));
 
                     bool pinned = true;
                     if (inside.IndexOf("pinned") is Some held)
                         pinned = Json.BoolOr(inside.ValueAt(held.Value), true);
 
-                    var place = layout.Place(name, edge, pinned);
+                    var place = layout.PlacePane(name, edge, pinned);
                     place.Order = i;
                 }
             }
@@ -370,13 +372,13 @@ public DockLayout ParseLayout(String text)
     // read as the panes having failed to appear. The default arrangement is
     // the honest answer, and the next save overwrites the file.
     if (layout.Places.IsEmpty)
-        return DockLayout.Default();
+        return DockLayout.CreateDefault();
 
     return layout;
 }
 
 /// What the layout is written as.
-public String WriteLayout(DockLayout layout)
+public String SerializeLayout(DockLayout layout)
 {
     var members = new JsonObject();
     members.Add("left", Json.NumberOf((long)layout.LeftWidth));
@@ -384,10 +386,10 @@ public String WriteLayout(DockLayout layout)
     members.Add("bottom", Json.NumberOf((long)layout.BottomHeight));
 
     var panes = new List<JsonValue>();
-    AppendEdge(panes, layout, DockEdge.Left);
-    AppendEdge(panes, layout, DockEdge.Right);
-    AppendEdge(panes, layout, DockEdge.Bottom);
-    AppendEdge(panes, layout, DockEdge.Document);
+    AppendEdgePlacements(panes, layout, DockEdge.Left);
+    AppendEdgePlacements(panes, layout, DockEdge.Right);
+    AppendEdgePlacements(panes, layout, DockEdge.Bottom);
+    AppendEdgePlacements(panes, layout, DockEdge.Document);
 
     members.Add("panes", JsonValue.Array(panes));
     return Json.WriteIndented(JsonValue.Object(members));
@@ -397,14 +399,14 @@ public String WriteLayout(DockLayout layout)
 /// the file groups the way the window does and a person reading it can see the
 /// arrangement. The order within the array is what `Order` is read back from,
 /// which is why this is also what makes the round trip stable.
-void AppendEdge(List<JsonValue> panes, DockLayout layout, DockEdge edge)
+void AppendEdgePlacements(List<JsonValue> panes, DockLayout layout, DockEdge edge)
 {
-    foreach (var place in layout.On(edge))
+    foreach (var place in layout.GetPlacementsOn(edge))
     {
         var inside = new JsonObject();
         inside.Add("name", JsonValue.Text(place.Name));
-        inside.Add("edge", JsonValue.Text(EdgeName(place.Edge)));
-        inside.Add("pinned", JsonValue.Bool(place.Pinned));
+        inside.Add("edge", JsonValue.Text(FormatEdgeName(place.Edge)));
+        inside.Add("pinned", JsonValue.Bool(place.IsPinned));
         panes.Add(JsonValue.Object(inside));
     }
 }
@@ -421,7 +423,7 @@ public bool SaveLayout(DockLayout layout, String path)
             return false;
     }
 
-    return File.WriteAllText(path, WriteLayout(layout)) == IOError.None;
+    return File.WriteAllText(path, SerializeLayout(layout)) == IOError.None;
 }
 
 /// Where the settings live: `%APPDATA%/Stainless/ide` on Windows, and
@@ -432,7 +434,7 @@ public bool SaveLayout(DockLayout layout, String path)
 /// oversight: each matches what the rest of that system does, and a directory
 /// called `Stainless` in `~/.config` would be the odd one out there in exactly
 /// the way `stainless` would be under `%APPDATA%`.
-public String SettingsDirectory()
+public String GetSettingsDirectory()
 {
 #if WINDOWS
     String roaming = Env.GetOr("APPDATA", "");
@@ -457,4 +459,4 @@ public String SettingsDirectory()
 }
 
 /// The layout file itself.
-public String LayoutPath() => Path.Join(SettingsDirectory(), "layout.json");
+public String GetLayoutPath() => Path.Join(GetSettingsDirectory(), "layout.json");

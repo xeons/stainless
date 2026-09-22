@@ -427,17 +427,17 @@ public class Shell : Form
         // The layout is read before anything is built, because where a pane
         // goes is decided as it is made -- a control's parent is fixed at
         // construction and `forms/` cannot move it afterwards.
-        _arrangement = ReadLayout(LayoutPath());
+        _arrangement = ReadLayout(GetLayoutPath());
         _dock = new DockHost(this, _arrangement);
         _dock.Dock = DockStyle.Fill;
 
-        var solution = _dock.Add(Panes.Solution, "Solution Explorer", DockEdge.Left);
+        var solution = _dock.AddPane(Panes.Solution, "Solution Explorer", DockEdge.Left);
         _tree = new TreeView(solution);
         _tree.Dock = DockStyle.Fill;
         _tree.DoubleClick += this.OnTreeChosen;
         _tree.ContextMenu += this.OnTreeContextMenu;
 
-        var errors = _dock.Add(Panes.Errors, "Error List", DockEdge.Bottom);
+        var errors = _dock.AddPane(Panes.Errors, "Error List", DockEdge.Bottom);
         _errors = new ListView(errors);
         _errors.Dock = DockStyle.Fill;
         _errors.View = ListViewStyle.Details;
@@ -453,12 +453,12 @@ public class Shell : Form
         _errors.AddColumn("Line", 50, HorizontalAlignment.Right);
         _errors.DoubleClick += this.OnErrorChosen;
 
-        var output = _dock.Add(Panes.Output, "Output", DockEdge.Bottom);
+        var output = _dock.AddPane(Panes.Output, "Output", DockEdge.Bottom);
         _output = new ListBox(output);
         _output.Dock = DockStyle.Fill;
         _output.DoubleClick += this.OnOutputChosen;
 
-        var locals = _dock.Add(Panes.Locals, "Locals", DockEdge.Bottom);
+        var locals = _dock.AddPane(Panes.Locals, "Locals", DockEdge.Bottom);
         _locals = new ListView(locals);
         _locals.Dock = DockStyle.Fill;
         _locals.View = ListViewStyle.Details;
@@ -467,7 +467,7 @@ public class Shell : Form
         _locals.AddColumn("Value", 260);
         _locals.AddColumn("Type", 170);
 
-        var watches = _dock.Add(Panes.Watch, "Watch", DockEdge.Bottom);
+        var watches = _dock.AddPane(Panes.Watch, "Watch", DockEdge.Bottom);
         _watchList = new ListView(watches);
         _watchList.Dock = DockStyle.Fill;
         _watchList.View = ListViewStyle.Details;
@@ -478,7 +478,7 @@ public class Shell : Form
         _watchList.ContextMenu += this.OnWatchContextMenu;
         _watchList.DoubleClick += this.OnWatchChosen;
 
-        var stack = _dock.Add(Panes.CallStack, "Call Stack", DockEdge.Bottom);
+        var stack = _dock.AddPane(Panes.CallStack, "Call Stack", DockEdge.Bottom);
         _stack = new ListView(stack);
         _stack.Dock = DockStyle.Fill;
         _stack.View = ListViewStyle.Details;
@@ -488,7 +488,7 @@ public class Shell : Form
         _stack.AddColumn("Line", 320);
         _stack.DoubleClick += this.OnFrameChosen;
 
-        var threads = _dock.Add(Panes.Threads, "Threads", DockEdge.Bottom);
+        var threads = _dock.AddPane(Panes.Threads, "Threads", DockEdge.Bottom);
         _threadList = new ListView(threads);
         _threadList.Dock = DockStyle.Fill;
         _threadList.View = ListViewStyle.Details;
@@ -499,7 +499,7 @@ public class Shell : Form
         _threadList.AddColumn("Location", 240);
         _threadList.DoubleClick += this.OnThreadChosen;
 
-        var points = _dock.Add(Panes.Breakpoints, "Breakpoints", DockEdge.Bottom);
+        var points = _dock.AddPane(Panes.Breakpoints, "Breakpoints", DockEdge.Bottom);
         _breakList = new ListView(points);
         _breakList.Dock = DockStyle.Fill;
         _breakList.View = ListViewStyle.Details;
@@ -510,7 +510,7 @@ public class Shell : Form
         _breakList.DoubleClick += this.OnBreakpointChosen;
         _breakList.ContextMenu += this.OnBreakpointContextMenu;
 
-        var trace = _dock.Add(Panes.DebugOutput, "Debug Output", DockEdge.Bottom);
+        var trace = _dock.AddPane(Panes.DebugOutput, "Debug Output", DockEdge.Bottom);
         _debugOutput = new ListBox(trace);
         _debugOutput.Dock = DockStyle.Fill;
 
@@ -519,8 +519,8 @@ public class Shell : Form
         _book.SelectedIndexChanged += this.OnTabChanged;
 
         // Once, after every pane exists, rather than after each -- see
-        // `DockHost.Arrange`.
-        _dock.Arrange();
+        // `DockHost.ArrangeWells`.
+        _dock.ArrangeWells();
 
         BuildMenu();
         NewFile();
@@ -1965,7 +1965,7 @@ public class Shell : Form
     /// after this.
     public bool ShowPaneNamed(String name)
     {
-        if (!_dock.Reveal(name))
+        if (!_dock.ShowPane(name))
         {
             Say("There is no pane called '" + name + "'.");
             return false;
@@ -1980,7 +1980,7 @@ public class Shell : Form
 
     void ShowPane(String name, String title)
     {
-        if (_dock.Reveal(name))
+        if (_dock.ShowPane(name))
             Say(title + ".");
     }
 
@@ -1993,19 +1993,19 @@ public class Shell : Form
     /// item that silently does three quarters of what it says.
     void OnResetLayout(MenuItem sender)
     {
-        _arrangement = DockLayout.Default();
-        if (SaveLayout(_arrangement, LayoutPath()))
+        _arrangement = DockLayout.CreateDefault();
+        if (SaveLayout(_arrangement, GetLayoutPath()))
             Say("Layout reset. It takes effect next time this starts.");
         else
-            Say("Could not write " + LayoutPath() + ".");
+            Say("Could not write " + GetLayoutPath() + ".");
     }
 
     /// Saves where everything is, on the way out.
     ///
-    /// **`Remember` first**, because a splitter drag sets its neighbour's width
-    /// on the control and tells nobody -- there is no drag-finished event to
-    /// have listened for, so the sizes are read back off the controls at the
-    /// one moment they are wanted.
+    /// **`RememberWellSizes` first**, because a splitter drag sets its
+    /// neighbour's width on the control and tells nobody -- there is no
+    /// drag-finished event to have listened for, so the sizes are read back off
+    /// the controls at the one moment they are wanted.
     ///
     /// A failure to write is deliberately silent. The window is closing; there
     /// is nowhere to put the message that anyone would see, and losing a pane
@@ -2026,8 +2026,8 @@ public class Shell : Form
             return;
         }
 
-        _dock.Remember();
-        SaveLayout(_arrangement, LayoutPath());
+        _dock.RememberWellSizes();
+        SaveLayout(_arrangement, GetLayoutPath());
     }
 
     // ------------------------------------------------------ the project tree
@@ -3042,7 +3042,7 @@ public class Shell : Form
 
         ShowTrace("Starting " + program);
         ShowRunning("Debugging...");
-        _dock.Reveal(Panes.DebugOutput);
+        _dock.ShowPane(Panes.DebugOutput);
         return true;
     }
 
@@ -3106,7 +3106,7 @@ public class Shell : Form
         if (_firstStop)
         {
             _firstStop = false;
-            _dock.Reveal(_preferredPane.ByteLength() != 0u
+            _dock.ShowPane(_preferredPane.ByteLength() != 0u
                          ? _preferredPane
                          : (_watches.IsEmpty ? Panes.Locals : Panes.Watch));
         }
@@ -3235,7 +3235,7 @@ public class Shell : Form
         else
             ShowWatchNames();
 
-        _dock.Reveal(Panes.Watch);
+        _dock.ShowPane(Panes.Watch);
         return "";
     }
 
@@ -4112,24 +4112,24 @@ public class Shell : Form
                 ok = false;
             }
 
-            if (_dock.EdgeOf(Panes.Solution) != DockEdge.Left)
+            if (_dock.GetEdgeOf(Panes.Solution) != DockEdge.Left)
             {
                 Console.WriteLine("FAIL: the tree is not in the left well");
                 ok = false;
             }
-            if (_dock.EdgeOf(Panes.Errors) != DockEdge.Bottom
-                || _dock.EdgeOf(Panes.Output) != DockEdge.Bottom)
+            if (_dock.GetEdgeOf(Panes.Errors) != DockEdge.Bottom
+                || _dock.GetEdgeOf(Panes.Output) != DockEdge.Bottom)
             {
                 Console.WriteLine("FAIL: the build's panes are not in the bottom well");
                 ok = false;
             }
 
-            if (_dock.EdgeOf(Panes.Locals) != DockEdge.Bottom
-                || _dock.EdgeOf(Panes.Watch) != DockEdge.Bottom
-                || _dock.EdgeOf(Panes.CallStack) != DockEdge.Bottom
-                || _dock.EdgeOf(Panes.Threads) != DockEdge.Bottom
-                || _dock.EdgeOf(Panes.Breakpoints) != DockEdge.Bottom
-                || _dock.EdgeOf(Panes.DebugOutput) != DockEdge.Bottom)
+            if (_dock.GetEdgeOf(Panes.Locals) != DockEdge.Bottom
+                || _dock.GetEdgeOf(Panes.Watch) != DockEdge.Bottom
+                || _dock.GetEdgeOf(Panes.CallStack) != DockEdge.Bottom
+                || _dock.GetEdgeOf(Panes.Threads) != DockEdge.Bottom
+                || _dock.GetEdgeOf(Panes.Breakpoints) != DockEdge.Bottom
+                || _dock.GetEdgeOf(Panes.DebugOutput) != DockEdge.Bottom)
             {
                 Console.WriteLine("FAIL: the debugger's panes are not in the bottom well");
                 ok = false;
@@ -4139,8 +4139,8 @@ public class Shell : Form
             // is windowless, so whether it can be dragged is entirely whether
             // its rectangle covers real pixels between the well and the
             // documents -- and nothing else here would notice an empty one.
-            var leftSplit = _dock.SplitterBounds(DockEdge.Left);
-            if (!_dock.SplitterShowing(DockEdge.Left)
+            var leftSplit = _dock.GetSplitterBounds(DockEdge.Left);
+            if (!_dock.IsSplitterShowing(DockEdge.Left)
                 || leftSplit.Width <= 0 || leftSplit.Height <= 0)
             {
                 Console.WriteLine("FAIL: the left divider is "
@@ -4149,13 +4149,13 @@ public class Shell : Form
                                   + Standard.Text.FromInteger((long)leftSplit.Height)
                                   + " at " + Standard.Text.FromInteger((long)leftSplit.X)
                                   + "," + Standard.Text.FromInteger((long)leftSplit.Y)
-                                  + (_dock.SplitterShowing(DockEdge.Left)
+                                  + (_dock.IsSplitterShowing(DockEdge.Left)
                                      ? "" : " and is not showing"));
                 ok = false;
             }
 
-            var bottomSplit = _dock.SplitterBounds(DockEdge.Bottom);
-            if (!_dock.SplitterShowing(DockEdge.Bottom)
+            var bottomSplit = _dock.GetSplitterBounds(DockEdge.Bottom);
+            if (!_dock.IsSplitterShowing(DockEdge.Bottom)
                 || bottomSplit.Width <= 0 || bottomSplit.Height <= 0)
             {
                 Console.WriteLine("FAIL: the bottom divider is "
@@ -4166,8 +4166,8 @@ public class Shell : Form
             }
 
             // A pane nobody has heard of is not held, which is what makes
-            // `Reveal` safe to call from a menu that outlives a pane.
-            if (_dock.Holds("toolbox") || _dock.Reveal("toolbox"))
+            // `ShowPane` safe to call from a menu that outlives a pane.
+            if (_dock.HasPane("toolbox") || _dock.ShowPane("toolbox"))
             {
                 Console.WriteLine("FAIL: a pane that does not exist was found");
                 ok = false;
@@ -4177,32 +4177,32 @@ public class Shell : Form
             // live and the IDE is still holding it, so what comes back must be
             // the same one -- with the project still in it.
             nuint rooted = _tree.Nodes.Count;
-            if (!_dock.Close(Panes.Solution))
+            if (!_dock.ClosePane(Panes.Solution))
             {
                 Console.WriteLine("FAIL: closing the tree pane did nothing");
                 ok = false;
             }
             Application.DoEvents();
 
-            if (_dock.Showing(Panes.Solution))
+            if (_dock.IsPaneShowing(Panes.Solution))
             {
                 Console.WriteLine("FAIL: a closed pane is still showing");
                 ok = false;
             }
-            if (!_dock.Holds(Panes.Solution))
+            if (!_dock.HasPane(Panes.Solution))
             {
                 Console.WriteLine("FAIL: a closed pane was destroyed rather than hidden");
                 ok = false;
             }
 
-            if (!_dock.Reveal(Panes.Solution))
+            if (!_dock.ShowPane(Panes.Solution))
             {
                 Console.WriteLine("FAIL: a closed pane could not be reopened");
                 ok = false;
             }
             Application.DoEvents();
 
-            if (!_dock.Showing(Panes.Solution))
+            if (!_dock.IsPaneShowing(Panes.Solution))
             {
                 Console.WriteLine("FAIL: reopening the tree pane did not show it");
                 ok = false;
@@ -4214,10 +4214,11 @@ public class Shell : Form
             }
 
             // What is about to be written is what is on the screen, which is
-            // the one thing `Remember` exists to guarantee -- a splitter drag
-            // raises nothing, so the sizes are read back off the controls.
-            _dock.Remember();
-            var written = ParseLayout(WriteLayout(_dock.Layout));
+            // the one thing `RememberWellSizes` exists to guarantee -- a
+            // splitter drag raises nothing, so the sizes are read back off the
+            // controls.
+            _dock.RememberWellSizes();
+            var written = ParseLayout(SerializeLayout(_dock.Layout));
             if (written.Find(Panes.Solution) == null
                 || written.Find(Panes.Errors) == null
                 || written.Find(Panes.Output) == null)
