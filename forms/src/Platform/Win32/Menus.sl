@@ -127,7 +127,8 @@ public class MenuItemPeer : IMenuItemPeer
         MenuItemInfo info;
         Blank(&info);
         info.Mask = MiimString;
-        info.TypeData = text.ToUtf16().ToPointer();
+        var wide = text.ToUtf16();
+        info.TypeData = wide.ToPointer();
         SetMenuItemInfoW(_owner, (uint)_at, 1, &info);
     }
 

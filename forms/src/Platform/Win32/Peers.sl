@@ -958,7 +958,8 @@ public class ControlPeer : IControlPeer
                 return;
         }
 
-        var info = ToolFor(tipText);
+        var wide = tipText.ToUtf16();
+        var info = ToolFor(wide);
         SendMessageW(tip, TtmUpdateTipTextW, 0u, (nint)(void*)&info);
 
         if (text.ByteLength() == 0u)
@@ -989,7 +990,8 @@ public class ControlPeer : IControlPeer
         if (tip == null)
             return false;
 
-        var info = ToolFor(tipText);
+        var wide = tipText.ToUtf16();
+        var info = ToolFor(wide);
         if (SendMessageW(tip, TtmAddToolW, 0u, (nint)(void*)&info) == 0)
         {
             DestroyWindow(tip);
@@ -1010,7 +1012,10 @@ public class ControlPeer : IControlPeer
     /// whole control and its rectangle is ignored -- which is right here:
     /// what the tip says is decided by the caller, not by where in the control
     /// the pointer is.
-    ToolInfo ToolFor(String text)
+    ///
+    /// `Text` points into `text`, which the caller MUST keep alive until the
+    /// message that reads the tool has returned.
+    ToolInfo ToolFor(Utf16String text)
     {
         ToolInfo info;
         info.Size = ToolInfoV1Size;
@@ -1022,7 +1027,7 @@ public class ControlPeer : IControlPeer
         info.Bounds.Right = 0;
         info.Bounds.Bottom = 0;
         info.Instance = null;
-        info.Text = text.ToUtf16().ToPointer();
+        info.Text = text.ToPointer();
         info.Parameter = 0;
         info.Reserved = null;
         return info;
