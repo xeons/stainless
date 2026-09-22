@@ -132,11 +132,11 @@ public class Shape : GraphicControl
         // A square and a circle are the same shapes fitted to the shorter side,
         // which is what makes them worth having as separate kinds rather than
         // leaving a caller to keep the bounds square by hand.
-        var area = Rectangle.Of(0, 0, Width, Height);
+        var area = Rectangle.FromBounds(0, 0, Width, Height);
         if (_kind == ShapeKind.Circle || _kind == ShapeKind.Square)
         {
             int side = area.Width < area.Height ? area.Width : area.Height;
-            area = Rectangle.Of((area.Width - side) / 2, (area.Height - side) / 2,
+            area = Rectangle.FromBounds((area.Width - side) / 2, (area.Height - side) / 2,
                                 side, side);
         }
 
@@ -365,7 +365,7 @@ public class Splitter : GraphicControl
         _dragging = true;
         // In the *parent's* coordinates, because that is the space the drag is
         // measured in and the splitter itself is about to move underneath it.
-        _grabbed = Point.At(Left + args.X, Top + args.Y);
+        _grabbed = Point.FromXY(Left + args.X, Top + args.Y);
         _startedAt = _Horizontal ? ((Control)beside).Width : ((Control)beside).Height;
         CaptureMouse(true);
     }
@@ -379,7 +379,7 @@ public class Splitter : GraphicControl
         if (beside == null)
             return;
 
-        var now = Point.At(Left + args.X, Top + args.Y);
+        var now = Point.FromXY(Left + args.X, Top + args.Y);
         int moved = _Horizontal ? now.X - _grabbed.X : now.Y - _grabbed.Y;
         // Dragging a right- or bottom-docked splitter grows its neighbour the
         // other way, since the neighbour's far edge is the one that is fixed.

@@ -76,7 +76,7 @@ public class Spot : GraphicControl
 
     protected override void OnPaint(PaintEventArgs args)
     {
-        args.Graphics.FillRectangle(new Brush(ForeColor), Rectangle.Of(0, 0, Width, Height));
+        args.Graphics.FillRectangle(new Brush(ForeColor), Rectangle.FromBounds(0, 0, Width, Height));
         base.OnPaint(args);
     }
 }
@@ -292,7 +292,7 @@ public class CoreForm : Form
 
         // ------------------------------------------------- graphic controls
 
-        var onSpot = Drawing.Point.At(_spot.Left + 5, _spot.Top + 5);
+        var onSpot = Drawing.Point.FromXY(_spot.Left + 5, _spot.Top + 5);
         _host.OnPlatformMouseDown(MouseButton.Left, onSpot, ModifierKeys.None);
         _host.OnPlatformMouseUp(MouseButton.Left, onSpot, ModifierKeys.None);
         _host.OnPlatformDoubleClick();
@@ -329,7 +329,7 @@ public class CoreForm : Form
                    _host.BackColours > pushed);
 
         var origin = _group.ClientOrigin;
-        var framedAt = Drawing.Point.At(origin.X + _framed.Left + 5, origin.Y + _framed.Top + 5);
+        var framedAt = Drawing.Point.FromXY(origin.X + _framed.Left + 5, origin.Y + _framed.Top + 5);
         _group.OnPlatformMouseDown(MouseButton.Left, framedAt, ModifierKeys.None);
         _group.OnPlatformMouseUp(MouseButton.Left, framedAt, ModifierKeys.None);
         ok = Check(ok, "a click in a group box reaches the graphic control under it",
@@ -360,7 +360,7 @@ public class CoreForm : Form
         ok = WindowChecks(ok);
         ok = ModalChecks(ok);
 
-        var squeezed = Rectangle.Of(0, 0, 10, 10).Deflate(6);
+        var squeezed = Rectangle.FromBounds(0, 0, 10, 10).Deflate(6);
         ok = Check(ok, "deflating past nothing gives an empty rectangle",
                    squeezed.Width == 0 && squeezed.Height == 0);
         return ok;

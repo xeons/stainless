@@ -110,7 +110,7 @@ public sealed class SystemChromeRenderer : ChromeRenderer
 {
     public override bool OwnerDrawn => false;
 
-    public override Size Measure(Graphics surface, MenuItem item) => Size.Of(0, 0);
+    public override Size Measure(Graphics surface, MenuItem item) => Size.FromDimensions(0, 0);
 
     public override void Draw(Graphics surface, MenuItem item,
                               Rectangle bounds, MenuItemState state)
@@ -214,7 +214,7 @@ public class OfficeXpRenderer : ChromeRenderer
     public override Size Measure(Graphics surface, MenuItem item)
     {
         if (item.IsSeparator)
-            return Size.Of(GutterWidth + 32, 3 + Padding);
+            return Size.FromDimensions(GutterWidth + 32, 3 + Padding);
 
         var text = surface.MeasureString(Spoken(item.Text), Font);
 
@@ -231,7 +231,7 @@ public class OfficeXpRenderer : ChromeRenderer
         // whatever an item asks for, which is why `File` came back nineteen
         // when this asked for twenty-three.
         if (item.OnMenuBar)
-            return Size.Of(text.Width, text.Height);
+            return Size.FromDimensions(text.Width, text.Height);
 
         // Room for the caption, the gutter it sits beside, and a margin on the
         // right for the arrow.
@@ -245,7 +245,7 @@ public class OfficeXpRenderer : ChromeRenderer
         // check-mark column to what is reported here, the same way it adds a
         // margin to a bar item. That cannot be measured from a menu nobody has
         // opened, so unlike the bar above this is proportioned by eye.
-        return Size.Of(GutterWidth + text.Width + 18, text.Height + Padding * 2);
+        return Size.FromDimensions(GutterWidth + text.Width + 18, text.Height + Padding * 2);
     }
 
     public override void Draw(Graphics surface, MenuItem item,
@@ -273,7 +273,7 @@ public class OfficeXpRenderer : ChromeRenderer
 
         surface.FillRectangle(new Brush(Background), bounds);
 
-        var gutter = Rectangle.Of(bounds.X, bounds.Y, GutterWidth, bounds.Height);
+        var gutter = Rectangle.FromBounds(bounds.X, bounds.Y, GutterWidth, bounds.Height);
         surface.FillRectangle(new Brush(GutterFrom, GutterTo,
                                         BrushStyle.HorizontalGradient), gutter);
 
@@ -297,7 +297,7 @@ public class OfficeXpRenderer : ChromeRenderer
         if (state.HasFlag(MenuItemState.Checked))
             DrawTick(surface, gutter, disabled);
 
-        var text = Rectangle.Of(bounds.X + GutterWidth + 8, bounds.Y,
+        var text = Rectangle.FromBounds(bounds.X + GutterWidth + 8, bounds.Y,
                                 bounds.Width - GutterWidth - 16, bounds.Height);
 
         TextFormat format;
@@ -463,7 +463,7 @@ public class OfficeXpRenderer : ChromeRenderer
         }
 
         String caption = button.ShowsText ? button.Text : "";
-        var text = caption.IsEmpty ? Size.Of(0, 0)
+        var text = caption.IsEmpty ? Size.FromDimensions(0, 0)
                                    : surface.MeasureString(Spoken(caption), Font);
 
         int gap = pictureWidth > 0 && text.Width > 0 ? ToolGap : 0;
@@ -473,7 +473,7 @@ public class OfficeXpRenderer : ChromeRenderer
         if (picture != null)
         {
             surface.DrawBitmap((Bitmap)picture,
-                               Point.At(at, middle - pictureHeight / 2),
+                               Point.FromXY(at, middle - pictureHeight / 2),
                                disabled ? DisabledOpacity : 100);
             at = at + pictureWidth + gap;
         }
@@ -489,7 +489,7 @@ public class OfficeXpRenderer : ChromeRenderer
         // The caption as written, not as measured: `DrawTextW` eats the
         // ampersand, and `Spoken` above is what keeps the two in step.
         surface.DrawString(caption, Font, disabled ? DisabledText : TextColor,
-                           Rectangle.Of(at, bounds.Y, text.Width, bounds.Height),
+                           Rectangle.FromBounds(at, bounds.Y, text.Width, bounds.Height),
                            format);
     }
 

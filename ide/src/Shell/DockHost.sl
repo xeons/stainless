@@ -141,18 +141,18 @@ class CaptionBar : CustomControl
         }
     }
 
-    Rectangle CloseBox =>
-        Rectangle.Of(Width - GlyphBox - GlyphInset, (CaptionHeight - GlyphBox) / 2,
+    Rectangle CloseBox() =>
+        Rectangle.FromBounds(Width - GlyphBox - GlyphInset, (CaptionHeight - GlyphBox) / 2,
                      GlyphBox, GlyphBox);
 
-    Rectangle PinBox =>
-        Rectangle.Of(Width - (GlyphBox * 2) - GlyphInset - 2,
+    Rectangle PinBox() =>
+        Rectangle.FromBounds(Width - (GlyphBox * 2) - GlyphInset - 2,
                      (CaptionHeight - GlyphBox) / 2, GlyphBox, GlyphBox);
 
     protected override void OnPaint(PaintEventArgs args)
     {
         var canvas = args.Graphics;
-        var whole = Rectangle.Of(0, 0, Width, Height);
+        var whole = Rectangle.FromBounds(0, 0, Width, Height);
 
         Color back = _active ? SystemColors.Highlight : SystemColors.Control;
         Color ink = _active ? SystemColors.HighlightText : SystemColors.ControlText;
@@ -195,14 +195,14 @@ class CaptionBar : CustomControl
 
         if (_pinned)
         {
-            canvas.FillRectangle(fill, Rectangle.Of(midX - 3, box.Y + 3, 6, 4));
+            canvas.FillRectangle(fill, Rectangle.FromBounds(midX - 3, box.Y + 3, 6, 4));
             canvas.DrawLine(pen, midX, box.Y + 7, midX, box.Y + 11);
             canvas.DrawLine(pen, midX - 4, box.Y + 11, midX + 4, box.Y + 11);
             canvas.DrawLine(pen, midX, box.Y + 11, midX, box.Bottom - 2);
         }
         else
         {
-            canvas.FillRectangle(fill, Rectangle.Of(box.Right - 7, midY - 3, 4, 6));
+            canvas.FillRectangle(fill, Rectangle.FromBounds(box.Right - 7, midY - 3, 4, 6));
             canvas.DrawLine(pen, box.Right - 8, midY, box.Right - 11, midY);
             canvas.DrawLine(pen, box.Right - 11, midY - 4, box.Right - 11, midY + 4);
             canvas.DrawLine(pen, box.Right - 11, midY, box.X + 2, midY);
@@ -231,8 +231,8 @@ class CaptionBar : CustomControl
 
     int GetGlyphAt(int x, int y)
     {
-        var point = Point.At(x, y);
-        if (PinBox.Contains(point))
+        var point = Point.FromXY(x, y);
+        if (PinBox().Contains(point))
             return 1;
         if (CloseBox.Contains(point))
             return 2;
@@ -424,7 +424,7 @@ class AutoHideStrip : CustomControl
             foreach (var pane in _panes)
             {
                 int wide = canvas.MeasureString(pane.Title, Font).Width + StripLabelGap;
-                _labelBounds.Add(Rectangle.Of(x, 1, wide, StripThickness - 2));
+                _labelBounds.Add(Rectangle.FromBounds(x, 1, wide, StripThickness - 2));
                 x = x + wide + 2;
             }
         }
@@ -434,7 +434,7 @@ class AutoHideStrip : CustomControl
             int tall = line + 8;
             foreach (var pane in _panes)
             {
-                _labelBounds.Add(Rectangle.Of(1, y, Width - 2, tall));
+                _labelBounds.Add(Rectangle.FromBounds(1, y, Width - 2, tall));
                 y = y + tall + 2;
             }
         }
@@ -452,7 +452,7 @@ class AutoHideStrip : CustomControl
         }
 
         canvas.FillRectangle(new Brush(SystemColors.Control),
-                             Rectangle.Of(0, 0, Width, Height));
+                             Rectangle.FromBounds(0, 0, Width, Height));
         LayOutLabels(canvas);
 
         for (nuint i = 0u; i < _labelBounds.Count && i < _panes.Count; i++)
@@ -474,7 +474,7 @@ class AutoHideStrip : CustomControl
 
     int GetLabelAt(int x, int y)
     {
-        var point = Point.At(x, y);
+        var point = Point.FromXY(x, y);
         for (nuint i = 0u; i < _labelBounds.Count; i++)
         {
             if (_labelBounds[i].Contains(point))

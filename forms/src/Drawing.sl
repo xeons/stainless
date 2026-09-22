@@ -120,7 +120,7 @@ public struct Point
     public int X;
     public int Y;
 
-    public static Point At(int x, int y)
+    public static Point FromXY(int x, int y)
     {
         Point point;
         point.X = x;
@@ -128,7 +128,7 @@ public struct Point
         return point;
     }
 
-    public static readonly Point Empty = Point.At(0, 0);
+    public static readonly Point Empty = Point.FromXY(0, 0);
 
     public bool Equals(Point other) => X == other.X && Y == other.Y;
 }
@@ -141,7 +141,7 @@ public struct Size
     public int Width;
     public int Height;
 
-    public static Size Of(int width, int height)
+    public static Size FromDimensions(int width, int height)
     {
         Size size;
         size.Width = width;
@@ -149,7 +149,7 @@ public struct Size
         return size;
     }
 
-    public static readonly Size Empty = Size.Of(0, 0);
+    public static readonly Size Empty = Size.FromDimensions(0, 0);
 
     public bool IsEmpty => Width <= 0 || Height <= 0;
 
@@ -174,7 +174,7 @@ public struct Rectangle
     public int Width;
     public int Height;
 
-    public static Rectangle Of(int x, int y, int width, int height)
+    public static Rectangle FromBounds(int x, int y, int width, int height)
     {
         Rectangle rectangle;
         rectangle.X = x;
@@ -186,18 +186,18 @@ public struct Rectangle
 
     public static Rectangle FromEdges(int left, int top, int right, int bottom)
     {
-        return Rectangle.Of(left, top, right - left, bottom - top);
+        return Rectangle.FromBounds(left, top, right - left, bottom - top);
     }
 
-    public static readonly Rectangle Empty = Rectangle.Of(0, 0, 0, 0);
+    public static readonly Rectangle Empty = Rectangle.FromBounds(0, 0, 0, 0);
 
     public int Left   => X;
     public int Top    => Y;
     public int Right  => X + Width;
     public int Bottom => Y + Height;
 
-    public Point Location => Point.At(X, Y);
-    public Size Extent   => Size.Of(Width, Height);
+    public Point Location => Point.FromXY(X, Y);
+    public Size Extent   => Size.FromDimensions(Width, Height);
 
     public bool IsEmpty => Width <= 0 || Height <= 0;
 
@@ -216,7 +216,7 @@ public struct Rectangle
     {
         int width = Width - amount * 2;
         int height = Height - amount * 2;
-        return Rectangle.Of(X + amount, Y + amount,
+        return Rectangle.FromBounds(X + amount, Y + amount,
                             width < 0 ? 0 : width, height < 0 ? 0 : height);
     }
 
@@ -412,7 +412,7 @@ public struct TextFormat
     /// Whether a line too long for the rectangle wraps rather than being cut.
     public bool Wrap;
 
-    public static TextFormat Of(HorizontalAlignment horizontal,
+    public static TextFormat FromAlignment(HorizontalAlignment horizontal,
                                 VerticalAlignment vertical, bool wrap)
     {
         TextFormat format;
@@ -423,10 +423,10 @@ public struct TextFormat
     }
 
     public static readonly TextFormat Default =
-        TextFormat.Of(HorizontalAlignment.Left, VerticalAlignment.Top, false);
+        TextFormat.FromAlignment(HorizontalAlignment.Left, VerticalAlignment.Top, false);
 
     public static readonly TextFormat Centered =
-        TextFormat.Of(HorizontalAlignment.Center, VerticalAlignment.Middle, false);
+        TextFormat.FromAlignment(HorizontalAlignment.Center, VerticalAlignment.Middle, false);
 }
 
 /// A surface to paint on: the LCL's `TCanvas`, named as C# names it.
@@ -686,7 +686,7 @@ public sealed class Bitmap
 
     public int Width  => _backend.Width;
     public int Height => _backend.Height;
-    public Size Extent => Size.Of(_backend.Width, _backend.Height);
+    public Size Extent => Size.FromDimensions(_backend.Width, _backend.Height);
 
     /// The platform's picture, for the things that take one.
     public IBitmapBackend Backend() => _backend;

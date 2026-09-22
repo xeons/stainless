@@ -619,7 +619,7 @@ public class CodeEditor : CustomControl
         var area = ClientBounds;
         canvas.Clear(_palette.Background);
         canvas.FillRectangle(new Brush(_palette.GutterBack),
-                             Rectangle.Of(0, 0, _gutterWidth, area.Height));
+                             Rectangle.FromBounds(0, 0, _gutterWidth, area.Height));
 
         // The rule at column 80, drawn under the text rather than over it.
         int rule = _gutterWidth + (int)(RightMargin - _leftColumn) * _cellWidth;
@@ -671,13 +671,13 @@ public class CodeEditor : CustomControl
             canvas.FillRectangle(new Brush(_statementIsTop
                                            ? _palette.CurrentStatement
                                            : _palette.CalledFrom),
-                                 Rectangle.Of(_gutterWidth, y, width - _gutterWidth,
+                                 Rectangle.FromBounds(_gutterWidth, y, width - _gutterWidth,
                                               _lineHeight));
         }
         else if (current && !HasSelection)
         {
             canvas.FillRectangle(new Brush(_palette.CurrentLine),
-                                 Rectangle.Of(_gutterWidth, y, width - _gutterWidth, _lineHeight));
+                                 Rectangle.FromBounds(_gutterWidth, y, width - _gutterWidth, _lineHeight));
         }
 
         PaintSelection(canvas, row, y, width);
@@ -734,7 +734,7 @@ public class CodeEditor : CustomControl
         int size = _lineHeight - inset * 2;
         if (size < 4)
             size = 4;
-        var disc = Rectangle.Of((_marginWidth - size) / 2, y + inset, size, size);
+        var disc = Rectangle.FromBounds((_marginWidth - size) / 2, y + inset, size, size);
 
         switch (mark)
         {
@@ -761,13 +761,13 @@ public class CodeEditor : CustomControl
         int stem = left + (right - left) / 2;
 
         var arrow = new Point[7];
-        arrow[0u] = Point.At(left, middle - high / 2);
-        arrow[1u] = Point.At(stem, middle - high / 2);
-        arrow[2u] = Point.At(stem, middle - high);
-        arrow[3u] = Point.At(right, middle);
-        arrow[4u] = Point.At(stem, middle + high);
-        arrow[5u] = Point.At(stem, middle + high / 2);
-        arrow[6u] = Point.At(left, middle + high / 2);
+        arrow[0u] = Point.FromXY(left, middle - high / 2);
+        arrow[1u] = Point.FromXY(stem, middle - high / 2);
+        arrow[2u] = Point.FromXY(stem, middle - high);
+        arrow[3u] = Point.FromXY(right, middle);
+        arrow[4u] = Point.FromXY(stem, middle + high);
+        arrow[5u] = Point.FromXY(stem, middle + high / 2);
+        arrow[6u] = Point.FromXY(left, middle + high / 2);
 
         canvas.FillPolygon(new Brush(_palette.CurrentStatementArrow), arrow);
     }
@@ -807,7 +807,7 @@ public class CodeEditor : CustomControl
             return;
 
         canvas.FillRectangle(new Brush(_palette.Selection),
-                             Rectangle.Of(x, y, span, _lineHeight));
+                             Rectangle.FromBounds(x, y, span, _lineHeight));
     }
 
     /// Puts the platform's caret where the text caret is, or takes it away when
@@ -828,7 +828,7 @@ public class CodeEditor : CustomControl
         }
         int x = _gutterWidth + (int)(column - _leftColumn) * _cellWidth;
         int y = (int)(_caretPosition.Row - _topLine) * _lineHeight;
-        Caret = Rectangle.Of(x, y, 2, _lineHeight);
+        Caret = Rectangle.FromBounds(x, y, 2, _lineHeight);
     }
 
     // --------------------------------------------------------- find, replace

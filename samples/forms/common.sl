@@ -483,13 +483,13 @@ public class CommonForm : Form
         // window boundary for a control that has no window.
         int wasClicked = _clicks;
         _gaugePage.OnPlatformMouseDown(MouseButton.Left,
-                                      Point.At(Canvas.Left + 5, Canvas.Top + 5),
+                                      Point.FromXY(Canvas.Left + 5, Canvas.Top + 5),
                                       ModifierKeys.None);
         ok = Check(ok, "the parent routes the mouse to a graphic child",
                    _clicks == wasClicked + 1);
 
         // And a point outside it reaches no graphic child at all.
-        _gaugePage.OnPlatformMouseDown(MouseButton.Left, Point.At(2, 2),
+        _gaugePage.OnPlatformMouseDown(MouseButton.Left, Point.FromXY(2, 2),
                                       ModifierKeys.None);
         ok = Check(ok, "and not to one the pointer is not over",
                    _clicks == wasClicked + 1);

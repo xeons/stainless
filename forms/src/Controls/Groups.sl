@@ -567,17 +567,17 @@ public class Image : GraphicControl
         int high = shown.Height;
 
         if (wide <= 0 || high <= 0)
-            return Rectangle.Of(0, 0, Width, Height);
+            return Rectangle.FromBounds(0, 0, Width, Height);
 
         if (!_stretched)
         {
             if (!_centred)
-                return Rectangle.Of(0, 0, wide, high);
-            return Rectangle.Of((Width - wide) / 2, (Height - high) / 2, wide, high);
+                return Rectangle.FromBounds(0, 0, wide, high);
+            return Rectangle.FromBounds((Width - wide) / 2, (Height - high) / 2, wide, high);
         }
 
         if (!_proportional)
-            return Rectangle.Of(0, 0, Width, Height);
+            return Rectangle.FromBounds(0, 0, Width, Height);
 
         // The smaller of the two ratios is the one that fits, and it is
         // computed in whole numbers rather than as a double: a control and a
@@ -592,7 +592,7 @@ public class Image : GraphicControl
         // Proportional stretching centres what is left over. Filling from the
         // corner instead would put a wide picture against the top of a tall
         // control, which is never what was meant.
-        return Rectangle.Of((Width - shownWide) / 2, (Height - shownHigh) / 2,
+        return Rectangle.FromBounds((Width - shownWide) / 2, (Height - shownHigh) / 2,
                             shownWide, shownHigh);
     }
 }
@@ -1078,7 +1078,7 @@ public class ButtonPanel : Panel
             tallest = Taller(tallest, _cancel);
             tallest = Taller(tallest, _close);
             tallest = Taller(tallest, _help);
-            return Size.Of(0, tallest + _gap + _gap / 2 + (_rule ? 2 : 0));
+            return Size.FromDimensions(0, tallest + _gap + _gap / 2 + (_rule ? 2 : 0));
         }
     }
 

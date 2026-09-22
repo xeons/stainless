@@ -49,7 +49,7 @@ public class ImageList
 
     public ImageList(int width, int height)
     {
-        _backend = WidgetSet.Current.CreateImageList(Size.Of(width, height));
+        _backend = WidgetSet.Current.CreateImageList(Size.FromDimensions(width, height));
         _kept = new List<Bitmap>();
     }
 
@@ -1642,7 +1642,7 @@ public class CoolBar : CustomControl
 
     /// How tall the bar came out: every row's height, plus the dividers between
     /// them. What a program assigns to `Height` after building the bands.
-    public override Size PreferredSize => Size.Of(0, _rowsHigh);
+    public override Size PreferredSize => Size.FromDimensions(0, _rowsHigh);
 
     /// Where a band's control begins, measured from the band's left edge: past
     /// the handle, the caption and the gaps between them.
@@ -1865,13 +1865,13 @@ public class CoolBar : CustomControl
         for (nuint i = 0u; i < showing.Count; i++)
         {
             var band = showing[i];
-            var whole = Rectangle.Of(band.Left, band.Top, band.DrawnWidth, band.Height);
+            var whole = Rectangle.FromBounds(band.Left, band.Top, band.DrawnWidth, band.Height);
 
             if (band.HasColor)
                 surface.FillRectangle(new Brush(band.Color), whole);
 
             PaintGrabber(surface, light, dark,
-                         Rectangle.Of(band.Left + CoolGrabIndent, band.Top + 2,
+                         Rectangle.FromBounds(band.Left + CoolGrabIndent, band.Top + 2,
                                       _grabWide - 1, band.Height - 5));
 
             if (_text && !band.Text.IsEmpty)
@@ -2001,7 +2001,7 @@ public class CoolBar : CustomControl
         for (nuint i = 0u; i < showing.Count; i++)
         {
             var band = showing[i];
-            var whole = Rectangle.Of(band.Left, band.Top, band.DrawnWidth, band.Height);
+            var whole = Rectangle.FromBounds(band.Left, band.Top, band.DrawnWidth, band.Height);
             if (!whole.Contains(at))
                 continue;
             return ((int)i, at.X <= band.Left + _grabWide + 1);

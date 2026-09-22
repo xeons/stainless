@@ -350,10 +350,10 @@ public class ButtonsForm : Form
         // window boundary for a control that has no window.
         wasPressed = Presses;
         SecondPage.OnPlatformMouseDown(MouseButton.Left,
-                                       Point.At(Eraser.Left + 5, Eraser.Top + 5),
+                                       Point.FromXY(Eraser.Left + 5, Eraser.Top + 5),
                                        ModifierKeys.None);
         SecondPage.OnPlatformMouseUp(MouseButton.Left,
-                                     Point.At(Eraser.Left + 5, Eraser.Top + 5),
+                                     Point.FromXY(Eraser.Left + 5, Eraser.Top + 5),
                                      ModifierKeys.None);
         ok = Check(ok, "a real press on a speed button reaches its handler",
                    Presses == wasPressed + 1);

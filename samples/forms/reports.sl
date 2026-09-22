@@ -303,8 +303,8 @@ bool CheckPortable(ReportsForm form)
     int awayX = other.Left - wantX;
     int awayY = other.Top - wantY;
     ok = ReportCheck(ok, "a form placed and then centred is centred, at "
-                         + FormatPoint(Point.At(other.Left, other.Top)) + " for "
-                         + FormatPoint(Point.At(wantX, wantY)),
+                         + FormatPoint(Point.FromXY(other.Left, other.Top)) + " for "
+                         + FormatPoint(Point.FromXY(wantX, wantY)),
                      awayX >= -1 && awayX <= 1 && awayY >= -1 && awayY <= 1);
 
     // Placed twice before it is shown, a window is configured at interim
@@ -346,7 +346,7 @@ Point PointInForm(Form form, WindowedControl control, int x, int y)
     gint intoY = 0;
     gtk_widget_translate_coordinates(WidgetOfControl(control), WidgetOfControl(form), x, y,
                                      &intoX, &intoY);
-    return Point.At(intoX, intoY);
+    return Point.FromXY(intoX, intoY);
 }
 
 /// A left click at a point in the form's window. False where the display
@@ -457,9 +457,9 @@ bool CheckMouse(ReportsForm form)
 
     // The client area's corner in the form's window: the menu bar is above it.
     var paneCorner = PointInForm(form, form.Pane, 0, 0);
-    var client = Point.At(paneCorner.X - form.Pane.Left, paneCorner.Y - form.Pane.Top);
+    var client = Point.FromXY(paneCorner.X - form.Pane.Left, paneCorner.Y - form.Pane.Top);
 
-    if (!ClickFormAt(form, Point.At(client.X + 600, client.Y + 400)))
+    if (!ClickFormAt(form, Point.FromXY(client.X + 600, client.Y + 400)))
     {
         ReportSkipped("where clicks go: this display cannot simulate input");
         return ok;
@@ -566,7 +566,7 @@ bool CheckDrawing()
 
     cairo_set_source_rgb(context, 1.0, 1.0, 1.0);
     cairo_paint(context);
-    canvas.DrawRectangle(new Pen(Colors.Black, 1, PenStyle.Solid), Rectangle.Of(2, 2, 10, 10));
+    canvas.DrawRectangle(new Pen(Colors.Black, 1, PenStyle.Solid), Rectangle.FromBounds(2, 2, 10, 10));
     cairo_surface_flush(surface);
     byte* pixels = cairo_image_surface_get_data(surface);
     nuint stride = (nuint)cairo_image_surface_get_stride(surface);
@@ -578,15 +578,15 @@ bool CheckDrawing()
                      pixels[11u * stride + 5u * 4u] == 0u
                      && pixels[12u * stride + 5u * 4u] == 255u);
 
-    canvas.FillEllipse(new Brush(Colors.Red), Rectangle.Of(4, 4, 0, 10));
-    canvas.DrawEllipse(new Pen(Colors.Red, 1, PenStyle.Solid), Rectangle.Of(4, 4, 10, 0));
+    canvas.FillEllipse(new Brush(Colors.Red), Rectangle.FromBounds(4, 4, 0, 10));
+    canvas.DrawEllipse(new Pen(Colors.Red, 1, PenStyle.Solid), Rectangle.FromBounds(4, 4, 10, 0));
     ok = ReportCheck(ok, "an ellipse with no width leaves cairo drawing",
                      cairo_status(context) == CAIRO_STATUS_SUCCESS);
 
     GdkPixbuf* made = gdk_pixbuf_new(0, 1, 8, 4, 4);
     g_object_ref((gpointer)made);
     var picture = new GtkBitmapBackend((gpointer)made);
-    canvas.DrawBitmapIn(picture, Rectangle.Of(0, 0, 0, 8));
+    canvas.DrawBitmapIn(picture, Rectangle.FromBounds(0, 0, 0, 8));
     ok = ReportCheck(ok, "and so does a picture scaled to nothing",
                      cairo_status(context) == CAIRO_STATUS_SUCCESS);
     g_object_unref((gpointer)made);

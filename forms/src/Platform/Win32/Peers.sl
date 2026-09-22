@@ -67,18 +67,18 @@ import Win32.ComCtl32;
 // `Point`, `Size` and `Rectangle` are each declared twice within reach: once by
 // `Forms.Drawing` and once by the Win32 headers, which mean different things by
 // them. An alias settles a *type* name; it does not settle a static member
-// access, so `FPoint.At(...)` does not resolve where `FPoint x` does. Hence the
+// access, so `FPoint.FromXY(...)` does not resolve where `FPoint x` does. Hence the
 // three makers below, which say the qualified name once each.
 using FPoint = Forms.Drawing.Point;
 using FSize  = Forms.Drawing.Size;
 using FRect  = Forms.Drawing.Rectangle;
 
-FPoint At(int x, int y) => Forms.Drawing.Point.At(x, y);
-FSize  Extent(int width, int height) => Forms.Drawing.Size.Of(width, height);
+FPoint At(int x, int y) => Forms.Drawing.Point.FromXY(x, y);
+FSize  Extent(int width, int height) => Forms.Drawing.Size.FromDimensions(width, height);
 FSize  NoSize() => Forms.Drawing.Size.Empty;
 FRect  Area(int x, int y, int width, int height)
 {
-    return Forms.Drawing.Rectangle.Of(x, y, width, height);
+    return Forms.Drawing.Rectangle.FromBounds(x, y, width, height);
 }
 FRect  AreaFromEdges(int left, int top, int right, int bottom)
 {

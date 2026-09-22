@@ -92,7 +92,7 @@ public class Scratch : CustomControl
         // The caret goes after whatever is behind it, so what has to be
         // measured is the text up to the position rather than all of it.
         var behind = canvas.MeasureString(_text.Substring(0u, _at), Font);
-        Caret = Rectangle.Of(inset + behind.Width, line, 1, height);
+        Caret = Rectangle.FromBounds(inset + behind.Width, line, 1, height);
     }
 
     /// The keys that mean a movement or a deletion.

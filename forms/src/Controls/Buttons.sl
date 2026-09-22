@@ -682,14 +682,14 @@ public class SpeedButton : GraphicControl
                 wide = 23;
             if (high < 22)
                 high = 22;
-            return Size.Of(wide, high);
+            return Size.FromDimensions(wide, high);
         }
     }
 
     protected override void OnPaint(PaintEventArgs args)
     {
         var surface = args.Graphics;
-        var whole = Rectangle.Of(0, 0, Width, Height);
+        var whole = Rectangle.FromBounds(0, 0, Width, Height);
         var state = State;
 
         // **A flat button that is neither hot nor down draws nothing at all**,
@@ -799,7 +799,7 @@ public class SpeedButton : GraphicControl
 
         if (picture != null)
         {
-            surface.DrawBitmap((Bitmap)picture, Point.At(glyphX, glyphY));
+            surface.DrawBitmap((Bitmap)picture, Point.FromXY(glyphX, glyphY));
         }
 
         if (!caption.IsEmpty)

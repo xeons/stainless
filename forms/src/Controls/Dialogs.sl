@@ -44,15 +44,15 @@ import Forms.Platform;
 /// What a file dialog filters by: a description and the patterns it covers.
 ///
 /// ```
-/// var filters = [FileFilter.Of("Text files", "*.txt;*.md"),
-///                FileFilter.Of("All files", "*.*")];
+/// var filters = [FileFilter.FromPatterns("Text files", "*.txt;*.md"),
+///                FileFilter.FromPatterns("All files", "*.*")];
 /// ```
 public struct FileFilter
 {
     public String Description;
     public String Patterns;
 
-    public static FileFilter Of(String description, String patterns)
+    public static FileFilter FromPatterns(String description, String patterns)
     {
         FileFilter filter;
         filter.Description = description;
@@ -83,7 +83,7 @@ public abstract class FileDialog
     /// Adds a kind of file the dialog offers to filter by.
     public FileDialog AddFilter(String description, String patterns)
     {
-        filters.Add(FileFilter.Of(description, patterns));
+        filters.Add(FileFilter.FromPatterns(description, patterns));
         return this;
     }
 

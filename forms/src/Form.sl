@@ -226,7 +226,7 @@ public class Form : WindowedControl, IWindowNotify
         var client = ClientBounds;
         // The client area starts inside the frame, and the difference is what
         // the border and caption cost -- which only the two rectangles know.
-        return Point.At(frame.X + (frame.Width - client.Width) / 2 + x,
+        return Point.FromXY(frame.X + (frame.Width - client.Width) / 2 + x,
                         frame.Y + (frame.Height - client.Height) - 
                         (frame.Width - client.Width) / 2 + y);
     }

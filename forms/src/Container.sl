@@ -124,9 +124,9 @@ public abstract class GraphicControl : Control
     void PaintOn(Graphics surface, Point origin)
     {
         var at = Bounds;
-        int layer = surface.PushLayer(Rectangle.Of(at.X + origin.X, at.Y + origin.Y,
+        int layer = surface.PushLayer(Rectangle.FromBounds(at.X + origin.X, at.Y + origin.Y,
                                                    at.Width, at.Height));
-        OnPaint(PaintEventArgs.Of(surface, Rectangle.Of(0, 0, Width, Height)));
+        OnPaint(PaintEventArgs.FromGraphics(surface, Rectangle.FromBounds(0, 0, Width, Height)));
         surface.PopLayer(layer);
     }
 }
@@ -402,7 +402,7 @@ public abstract class WindowedControl : Control
         var origin = ((WindowedControl)parent).ClientOrigin;
         if (origin.X == 0 && origin.Y == 0)
             return bounds;
-        return Rectangle.Of(bounds.X + origin.X, bounds.Y + origin.Y,
+        return Rectangle.FromBounds(bounds.X + origin.X, bounds.Y + origin.Y,
                             bounds.Width, bounds.Height);
     }
 
@@ -540,7 +540,7 @@ public abstract class WindowedControl : Control
     GraphicControl? GraphicAt(Point reported)
     {
         var origin = ClientOrigin;
-        var at = Point.At(reported.X - origin.X, reported.Y - origin.Y);
+        var at = Point.FromXY(reported.X - origin.X, reported.Y - origin.Y);
         nuint count = _inside.Count;
         for (nuint i = count; i > 0u; i--)
         {
@@ -587,7 +587,7 @@ public abstract class WindowedControl : Control
     Point Within(Control child, Point reported)
     {
         var origin = ClientOrigin;
-        return Point.At(reported.X - origin.X - child.Left,
+        return Point.FromXY(reported.X - origin.X - child.Left,
                         reported.Y - origin.Y - child.Top);
     }
 
@@ -811,37 +811,37 @@ public abstract class WindowedControl : Control
             {
                 case DockStyle.Top:
                 {
-                    child.Place(Rectangle.Of(free.X, free.Y, free.Width,
+                    child.Place(Rectangle.FromBounds(free.X, free.Y, free.Width,
                                              Clamped(asked.Height, free.Height)));
                     int took = Clamped(child.Height, free.Height);
-                    free = Rectangle.Of(free.X, free.Y + took, free.Width, free.Height - took);
+                    free = Rectangle.FromBounds(free.X, free.Y + took, free.Width, free.Height - took);
                     break;
                 }
 
                 case DockStyle.Bottom:
                 {
                     int height = Clamped(asked.Height, free.Height);
-                    child.Place(Rectangle.Of(free.X, free.Bottom - height, free.Width, height));
+                    child.Place(Rectangle.FromBounds(free.X, free.Bottom - height, free.Width, height));
                     int took = Clamped(child.Height, free.Height);
-                    free = Rectangle.Of(free.X, free.Y, free.Width, free.Height - took);
+                    free = Rectangle.FromBounds(free.X, free.Y, free.Width, free.Height - took);
                     break;
                 }
 
                 case DockStyle.Left:
                 {
-                    child.Place(Rectangle.Of(free.X, free.Y,
+                    child.Place(Rectangle.FromBounds(free.X, free.Y,
                                              Clamped(asked.Width, free.Width), free.Height));
                     int took = Clamped(child.Width, free.Width);
-                    free = Rectangle.Of(free.X + took, free.Y, free.Width - took, free.Height);
+                    free = Rectangle.FromBounds(free.X + took, free.Y, free.Width - took, free.Height);
                     break;
                 }
 
                 case DockStyle.Right:
                 {
                     int width = Clamped(asked.Width, free.Width);
-                    child.Place(Rectangle.Of(free.Right - width, free.Y, width, free.Height));
+                    child.Place(Rectangle.FromBounds(free.Right - width, free.Y, width, free.Height));
                     int took = Clamped(child.Width, free.Width);
-                    free = Rectangle.Of(free.X, free.Y, free.Width - took, free.Height);
+                    free = Rectangle.FromBounds(free.X, free.Y, free.Width - took, free.Height);
                     break;
                 }
 

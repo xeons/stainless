@@ -233,7 +233,7 @@ public class MenuItem : IMenuItemNotify
     {
         var drawing = _renderer;
         if (drawing == null)
-            return Size.Of(0, 0);
+            return Size.FromDimensions(0, 0);
         return ((ChromeRenderer)drawing).Measure(surface, this);
     }
 

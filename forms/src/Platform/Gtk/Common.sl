@@ -75,12 +75,12 @@ using FPoint = Forms.Drawing.Point;
 using FSize  = Forms.Drawing.Size;
 using FRect  = Forms.Drawing.Rectangle;
 
-public FPoint At(int x, int y) => Forms.Drawing.Point.At(x, y);
-public FSize  Extent(int width, int height) => Forms.Drawing.Size.Of(width, height);
+public FPoint At(int x, int y) => Forms.Drawing.Point.FromXY(x, y);
+public FSize  Extent(int width, int height) => Forms.Drawing.Size.FromDimensions(width, height);
 public FSize  NoSize() => Forms.Drawing.Size.Empty;
 public FRect  Area(int x, int y, int width, int height)
 {
-    return Forms.Drawing.Rectangle.Of(x, y, width, height);
+    return Forms.Drawing.Rectangle.FromBounds(x, y, width, height);
 }
 
 extern "C"
@@ -1352,7 +1352,7 @@ public class GtkPeer : IControlPeer
             x -= allocation.X;
             y -= allocation.Y;
         }
-        return Point.At((int)x, (int)y);
+        return Point.FromXY((int)x, (int)y);
     }
 
     /// Puts the widget last among its container's children.

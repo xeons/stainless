@@ -381,20 +381,20 @@ public class BackendForm : Form
     {
         var font = new Font("Segoe UI", 12);
         var canvas = new Canvas(120, 30);
-        var surface = new GraphicsBackend(canvas.Dc, Forms.Drawing.Rectangle.Of(0, 0, 120, 30));
+        var surface = new GraphicsBackend(canvas.Dc, Forms.Drawing.Rectangle.FromBounds(0, 0, 120, 30));
         surface.DrawString("A&&B&C", font, Colors.Black, 0, 0);
         var literal = canvas.Pixels();
 
         canvas.Clear();
         surface.DrawStringIn("A&&B&C", font, Colors.Black,
-                             Forms.Drawing.Rectangle.Of(0, 0, 120, 30), TextFormat.Default);
+                             Forms.Drawing.Rectangle.FromBounds(0, 0, 120, 30), TextFormat.Default);
         var laidOut = canvas.Pixels();
         ok = Check(ok, "text in a rectangle draws an ampersand as itself",
                    SamePixels(literal, laidOut));
 
         canvas.Clear();
-        FPoint[] triangle = [Forms.Drawing.Point.At(10, 5), Forms.Drawing.Point.At(100, 5),
-                              Forms.Drawing.Point.At(55, 25)];
+        FPoint[] triangle = [Forms.Drawing.Point.FromXY(10, 5), Forms.Drawing.Point.FromXY(100, 5),
+                              Forms.Drawing.Point.FromXY(55, 25)];
         surface.FillPolygon(new Brush(Colors.Red), triangle);
         var filled = canvas.Pixels();
         ok = Check(ok, "a filled polygon is not outlined in black",

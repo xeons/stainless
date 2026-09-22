@@ -357,7 +357,7 @@ public class ChecksForm : Form
         // The pointer leaves and comes back, which is when the platform asks.
         Divide.Dock = DockStyle.Top;
         Split.OnPlatformMouseLeave();
-        Split.OnPlatformMouseMove(Forms.Drawing.Point.At(Divide.Left + 2, Divide.Top + 2),
+        Split.OnPlatformMouseMove(Forms.Drawing.Point.FromXY(Divide.Left + 2, Divide.Top + 2),
                                   ModifierKeys.None);
         ok = Check(ok, "a top splitter sizes north to south",
                    Divide.Cursor == CursorKind.SizeNorthSouth);
@@ -368,7 +368,7 @@ public class ChecksForm : Form
 #endif
 
         // A press on the first band's handle that goes nowhere moves nothing.
-        var handle = Forms.Drawing.Point.At(First.Left + 4, First.Top + First.Height / 2);
+        var handle = Forms.Drawing.Point.FromXY(First.Left + 4, First.Top + First.Height / 2);
         Cool.OnPlatformMouseDown(MouseButton.Left, handle, ModifierKeys.None);
         Cool.OnPlatformMouseUp(MouseButton.Left, handle, ModifierKeys.None);
         ok = Check(ok, "a click on a band's handle keeps its row",
@@ -417,8 +417,8 @@ public class ChecksForm : Form
     /// lets go, through its parent as the platform would.
     void DragSplitter(int by)
     {
-        var from = Forms.Drawing.Point.At(Divide.Left + 2, Divide.Top + 10);
-        var to = Forms.Drawing.Point.At(from.X + by, from.Y);
+        var from = Forms.Drawing.Point.FromXY(Divide.Left + 2, Divide.Top + 10);
+        var to = Forms.Drawing.Point.FromXY(from.X + by, from.Y);
         Split.OnPlatformMouseMove(from, ModifierKeys.None);
         Split.OnPlatformMouseDown(MouseButton.Left, from, ModifierKeys.None);
         Split.OnPlatformMouseMove(to, ModifierKeys.None);

@@ -65,7 +65,7 @@ public struct MouseEventArgs
     public int X => Location.X;
     public int Y => Location.Y;
 
-    public static MouseEventArgs Of(MouseButton button, Point at,
+    public static MouseEventArgs FromButton(MouseButton button, Point at,
                                     ModifierKeys modifiers, int delta)
     {
         MouseEventArgs args;
@@ -87,7 +87,7 @@ public struct KeyEventArgs
     public bool Control => Modifiers.HasFlag(ModifierKeys.Control);
     public bool Alt     => Modifiers.HasFlag(ModifierKeys.Alt);
 
-    public static KeyEventArgs Of(Key key, ModifierKeys modifiers)
+    public static KeyEventArgs FromKey(Key key, ModifierKeys modifiers)
     {
         KeyEventArgs args;
         args.Key = key;
@@ -103,7 +103,7 @@ public struct KeyPressEventArgs
     /// `Standard.Text.FromChar` turns it into the UTF-8 a `String` holds.
     public char32 KeyChar;
 
-    public static KeyPressEventArgs Of(char32 typed)
+    public static KeyPressEventArgs FromChar(char32 typed)
     {
         KeyPressEventArgs args;
         args.KeyChar = typed;
@@ -120,7 +120,7 @@ public struct PaintEventArgs
     /// clipped away, so only a handler with expensive drawing needs to look.
     public Rectangle ClipRectangle;
 
-    public static PaintEventArgs Of(Graphics surface, Rectangle clip)
+    public static PaintEventArgs FromGraphics(Graphics surface, Rectangle clip)
     {
         PaintEventArgs args;
         args.Graphics = surface;
@@ -264,7 +264,7 @@ public abstract class Control : IControlNotify
     protected Control()
     {
         _owner = null;
-        _area = Rectangle.Of(0, 0, 100, 24);
+        _area = Rectangle.FromBounds(0, 0, 100, 24);
         _requested = _area;
         _anchorBase = _area;
         _anchorClient = Size.Empty;
@@ -470,7 +470,7 @@ public abstract class Control : IControlNotify
             width = 0;
         if (height < 0)
             height = 0;
-        return Rectangle.Of(x, y, width, height);
+        return Rectangle.FromBounds(x, y, width, height);
     }
 
     /// Half, rounded down rather than towards zero, so a centred control
@@ -482,10 +482,10 @@ public abstract class Control : IControlNotify
         return -((1 - value) / 2);
     }
 
-    public int Left   { get => _area.X;      set { Bounds = Rectangle.Of(value, _area.Y, _area.Width, _area.Height); } }
-    public int Top    { get => _area.Y;      set { Bounds = Rectangle.Of(_area.X, value, _area.Width, _area.Height); } }
-    public int Width  { get => _area.Width;  set { Bounds = Rectangle.Of(_area.X, _area.Y, value, _area.Height); } }
-    public int Height { get => _area.Height; set { Bounds = Rectangle.Of(_area.X, _area.Y, _area.Width, value); } }
+    public int Left   { get => _area.X;      set { Bounds = Rectangle.FromBounds(value, _area.Y, _area.Width, _area.Height); } }
+    public int Top    { get => _area.Y;      set { Bounds = Rectangle.FromBounds(_area.X, value, _area.Width, _area.Height); } }
+    public int Width  { get => _area.Width;  set { Bounds = Rectangle.FromBounds(_area.X, _area.Y, value, _area.Height); } }
+    public int Height { get => _area.Height; set { Bounds = Rectangle.FromBounds(_area.X, _area.Y, _area.Width, value); } }
 
     /// The far edges, which a layout calculation wants far more often than it
     /// wants the width. Read-only: setting `Right` could mean moving or
@@ -496,27 +496,27 @@ public abstract class Control : IControlNotify
     public Point Location
     {
         get => _area.Location;
-        set => Bounds = Rectangle.Of(value.X, value.Y, _area.Width, _area.Height);
+        set => Bounds = Rectangle.FromBounds(value.X, value.Y, _area.Width, _area.Height);
     }
 
     public Size Extent
     {
         get => _area.Extent;
-        set => Bounds = Rectangle.Of(_area.X, _area.Y, value.Width, value.Height);
+        set => Bounds = Rectangle.FromBounds(_area.X, _area.Y, value.Width, value.Height);
     }
 
     /// The area inside this control that its own children use. The same as the
     /// bounds at the origin for anything without a frame, and overridden by
     /// what has one.
     public virtual Rectangle ClientBounds =>
-        Rectangle.Of(0, 0, _area.Width, _area.Height);
+        Rectangle.FromBounds(0, 0, _area.Width, _area.Height);
 
     /// Moves and sizes in one step, which is what a layout pass wants: two
     /// assignments would lay the children out twice and paint an intermediate
     /// position.
     public void SetBounds(int x, int y, int width, int height)
     {
-        Bounds = Rectangle.Of(x, y, width, height);
+        Bounds = Rectangle.FromBounds(x, y, width, height);
     }
 
     /// Pushes the current bounds at the platform. Overridden by
@@ -541,7 +541,7 @@ public abstract class Control : IControlNotify
         var wanted = PreferredSize;
         if (wanted.IsEmpty)
             return;
-        Bounds = Rectangle.Of(_area.X, _area.Y, wanted.Width, wanted.Height);
+        Bounds = Rectangle.FromBounds(_area.X, _area.Y, wanted.Width, wanted.Height);
     }
 
     // -------------------------------------------------------------- layout
@@ -864,7 +864,7 @@ public abstract class Control : IControlNotify
         var container = (WindowedControl)parent;
         var outer = container.PointerPosition();
         var origin = container.ClientOrigin;
-        return Point.At(outer.X - origin.X - Left, outer.Y - origin.Y - Top);
+        return Point.FromXY(outer.X - origin.X - Left, outer.Y - origin.Y - Top);
     }
 
     /// Marks the control as needing repainting.
@@ -944,7 +944,7 @@ public abstract class Control : IControlNotify
 
     public void OnPlatformPaint(Graphics surface)
     {
-        OnPaint(PaintEventArgs.Of(surface, surface.ClipBounds));
+        OnPaint(PaintEventArgs.FromGraphics(surface, surface.ClipBounds));
     }
 
     /// Whether the platform's reports of size and position are to be ignored,
@@ -962,11 +962,11 @@ public abstract class Control : IControlNotify
         if (IsMinimizedWindow)
             return;
         var was = _area;
-        _area = Rectangle.Of(_area.X, _area.Y, extent.Width, extent.Height);
+        _area = Rectangle.FromBounds(_area.X, _area.Y, extent.Width, extent.Height);
         if (_placing)
             return;
 
-        _requested = Rectangle.Of(_requested.X, _requested.Y, extent.Width, extent.Height);
+        _requested = Rectangle.FromBounds(_requested.X, _requested.Y, extent.Width, extent.Height);
         RememberAnchor();
         // Laid out whether or not the size changed: a window's first report is
         // where it learns the room it was actually given.
@@ -989,14 +989,14 @@ public abstract class Control : IControlNotify
         if (parent != null)
         {
             var origin = ((WindowedControl)parent).ClientOrigin;
-            placed = Point.At(position.X - origin.X, position.Y - origin.Y);
+            placed = Point.FromXY(position.X - origin.X, position.Y - origin.Y);
         }
         var was = _area;
-        _area = Rectangle.Of(placed.X, placed.Y, _area.Width, _area.Height);
+        _area = Rectangle.FromBounds(placed.X, placed.Y, _area.Width, _area.Height);
         if (_placing)
             return;
 
-        _requested = Rectangle.Of(placed.X, placed.Y, _requested.Width, _requested.Height);
+        _requested = Rectangle.FromBounds(placed.X, placed.Y, _requested.Width, _requested.Height);
         RememberAnchor();
         if (!was.Location.Equals(placed))
             OnMove();
@@ -1004,17 +1004,17 @@ public abstract class Control : IControlNotify
 
     public virtual void OnPlatformMouseDown(MouseButton button, Point at, ModifierKeys modifiers)
     {
-        OnMouseDown(MouseEventArgs.Of(button, at, modifiers, 0));
+        OnMouseDown(MouseEventArgs.FromButton(button, at, modifiers, 0));
     }
 
     public virtual void OnPlatformMouseUp(MouseButton button, Point at, ModifierKeys modifiers)
     {
-        OnMouseUp(MouseEventArgs.Of(button, at, modifiers, 0));
+        OnMouseUp(MouseEventArgs.FromButton(button, at, modifiers, 0));
     }
 
     public virtual void OnPlatformMouseMove(Point at, ModifierKeys modifiers)
     {
-        OnMouseMove(MouseEventArgs.Of(MouseButton.None, at, modifiers, 0));
+        OnMouseMove(MouseEventArgs.FromButton(MouseButton.None, at, modifiers, 0));
     }
 
     public void OnPlatformMouseEnter() => OnMouseEnter();
@@ -1029,22 +1029,22 @@ public abstract class Control : IControlNotify
 
     public virtual void OnPlatformMouseWheel(int delta, Point at, ModifierKeys modifiers)
     {
-        OnMouseWheel(MouseEventArgs.Of(MouseButton.None, at, modifiers, delta));
+        OnMouseWheel(MouseEventArgs.FromButton(MouseButton.None, at, modifiers, delta));
     }
 
     public void OnPlatformKeyDown(Key key, ModifierKeys modifiers)
     {
-        OnKeyDown(KeyEventArgs.Of(key, modifiers));
+        OnKeyDown(KeyEventArgs.FromKey(key, modifiers));
     }
 
     public void OnPlatformKeyUp(Key key, ModifierKeys modifiers)
     {
-        OnKeyUp(KeyEventArgs.Of(key, modifiers));
+        OnKeyUp(KeyEventArgs.FromKey(key, modifiers));
     }
 
     public void OnPlatformKeyPress(char32 typed)
     {
-        OnKeyPress(KeyPressEventArgs.Of(typed));
+        OnKeyPress(KeyPressEventArgs.FromChar(typed));
     }
 
     public void OnPlatformGotFocus() => OnGotFocus();
