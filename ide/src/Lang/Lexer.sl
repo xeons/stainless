@@ -259,7 +259,7 @@ public class Scanner
                     // it as an ordinary comment.
                     bool doc = at + 2u < size && line.GetByteAt(at + 2u) == (byte)'/'
                             && !(at + 3u < size && line.GetByteAt(at + 3u) == (byte)'/');
-                    into.Add(Token.Of(doc ? TokenKind.DocComment : TokenKind.Comment,
+                    into.Add(Token.Create(doc ? TokenKind.DocComment : TokenKind.Comment,
                                       at, size - at));
                     return state;
                 }
