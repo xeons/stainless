@@ -128,13 +128,13 @@ void Reads(Harness harness)
         var shapes = project.Dependencies[0u];
         harness.Same("a dependency keeps its name", "shapes", shapes.Name);
         harness.Check("and knows it is a path", shapes.IsPath && !shapes.IsGit);
-        harness.Same("and reads as its directory", "../shapes", shapes.Describe());
+        harness.Same("and reads as its directory", "../shapes", shapes.ToDisplayText());
         harness.Same("with a version", "^1.0", shapes.Version);
 
         var json = project.Dependencies[1u];
         harness.Check("a git dependency knows it", json.IsGit && !json.IsPath);
         harness.Same("and reads as its repository and tag",
-                     "https://example/json.git#v2.1.0", json.Describe());
+                     "https://example/json.git#v2.1.0", json.ToDisplayText());
     }
 
     // What a starter file actually looks like: four fields, everything else

@@ -206,7 +206,7 @@ public class ProjectDialog : Form
         _references.Clear();
         foreach (var dependency in project.Dependencies)
         {
-            _references.Add(dependency.Name + "  --  " + dependency.Describe());
+            _references.Add(dependency.Name + "  --  " + dependency.ToDisplayText());
         }
         if (project.Dependencies.IsEmpty)
             _references.Add("(no dependencies)");

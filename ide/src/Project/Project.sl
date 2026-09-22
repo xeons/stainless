@@ -86,7 +86,7 @@ public class Dependency
 
     /// How it reads in a tree: the directory, or the repository and what pins
     /// it. The same spelling `Dependency.ToString` uses on the compiler side.
-    public String Describe()
+    public String ToDisplayText()
     {
         if (IsPath)
             return Path;

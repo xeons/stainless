@@ -60,7 +60,7 @@ public struct BuildMessage
     /// **Not `None`**, which is `Optional`'s case constructor and in scope
     /// everywhere -- a static of that name here resolves to the variant case
     /// and the error lands nowhere near the cause.
-    public static BuildMessage Plain()
+    public static BuildMessage CreateEmpty()
     {
         BuildMessage made;
         made.File = "";
@@ -84,7 +84,7 @@ public struct BuildMessage
     /// reason to stop.
     public static BuildMessage Parse(String line)
     {
-        var made = Plain();
+        var made = CreateEmpty();
 
         String trimmed = line.Trim();
         if (!trimmed.StartsWith("{"))
@@ -130,7 +130,7 @@ public struct BuildMessage
     /// The place goes last. A list of diagnostics is read for what is wrong,
     /// and putting the path first buries every message behind the part they
     /// all have in common.
-    public String Describe()
+    public String ToDisplayText()
     {
         if (!IsDiagnostic)
             return Message;
@@ -149,7 +149,7 @@ public struct BuildMessage
         if (HasPlace)
         {
             built.Append("   ");
-            built.Append(NameOnly(File));
+            built.Append(GetFileName(File));
             built.Append(":");
             built.Append(Standard.Text.FromInteger((long)Line));
             built.Append(":");
@@ -161,7 +161,7 @@ public struct BuildMessage
 
     /// The last component of a path, since the directory is the same on every
     /// line and the file is not.
-    static String NameOnly(String path)
+    static String GetFileName(String path)
     {
         long cut = path.LastIndexOf("\\");
         long other = path.LastIndexOf("/");

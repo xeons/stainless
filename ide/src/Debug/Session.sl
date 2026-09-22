@@ -28,7 +28,7 @@
 //     window  -> session     a command in a queue
 //     session -> window      a `Snapshot`, through `Application.Post`
 //
-// `Pause`, and the waking half of `Stop`, are the exception: they call
+// `RequestBreak`, and the waking half of `Stop`, are the exception: they call
 // `Engine.RequestBreak` from the window's thread, because the session's thread
 // is blocked inside `Continue` and cannot be asked for anything. That call is
 // safe for the reason `ITarget.RequestBreak` gives.
@@ -64,19 +64,19 @@ public enum DebugCommand
 /// nowhere to put it.
 class PendingCommand
 {
-    public DebugCommand What;
+    public DebugCommand Command;
 
     /// The expression, for `AddWatch`.
-    public String Text;
+    public String Expression;
 
     /// The row, for `RemoveWatch`.
-    public nuint Which;
+    public nuint Row;
 
-    public PendingCommand(DebugCommand what, String text, nuint which)
+    public PendingCommand(DebugCommand command, String expression, nuint row)
     {
-        What = what;
-        Text = text;
-        Which = which;
+        Command = command;
+        Expression = expression;
+        Row = row;
     }
 }
 
@@ -97,12 +97,12 @@ class CommandQueue
     public List<PendingCommand> Pending;
 
     /// True once the session has finished. Nothing more is accepted.
-    public bool Closed;
+    public bool IsClosed;
 
     public CommandQueue()
     {
         Pending = new List<PendingCommand>();
-        Closed = false;
+        IsClosed = false;
     }
 }
 
@@ -180,9 +180,9 @@ public class DebugSession
 
         _state = RunState.Running;
         _engine = null;
-        Reopen();
+        ReopenQueue();
 
-        var worker = new Thread(() => Session(path, files, lines, conditions,
+        var worker = new Thread(() => RunSession(path, files, lines, conditions,
                                               wanted));
         worker.Detach();
         return true;
@@ -190,10 +190,10 @@ public class DebugSession
 
     // ------------------------------------------------- what the window asks for
 
-    public void Resume() => Ask(DebugCommand.Continue);
-    public void StepIn() => Ask(DebugCommand.StepIn);
-    public void StepOver() => Ask(DebugCommand.StepOver);
-    public void StepOut() => Ask(DebugCommand.StepOut);
+    public void ContinueExecution() => QueueCommand(DebugCommand.Continue);
+    public void StepIn() => QueueCommand(DebugCommand.StepIn);
+    public void StepOver() => QueueCommand(DebugCommand.StepOver);
+    public void StepOut() => QueueCommand(DebugCommand.StepOut);
 
     /// Starts watching an expression, from the next snapshot on.
     ///
@@ -201,17 +201,18 @@ public class DebugSession
     /// thread, and a watch that is refused is refused there. A stopped session
     /// answers with a fresh snapshot without moving the program, so the row
     /// appears at once.
-    public void Watch(String expression) => Ask2(DebugCommand.AddWatch,
+    public void AddWatch(String expression) => QueueCommand(DebugCommand.AddWatch,
                                                  expression, 0u);
 
-    public void Unwatch(nuint which) => Ask2(DebugCommand.RemoveWatch, "", which);
+    public void RemoveWatchAt(nuint row)
+        => QueueCommand(DebugCommand.RemoveWatch, "", row);
 
     /// Interrupts a running program.
     ///
     /// Nothing is queued. The session's thread is waiting for an event, and
     /// the stop this produces is that event; it arrives as an ordinary
     /// snapshot.
-    public bool Pause()
+    public bool RequestBreak()
     {
         var engine = _engine;
         if (engine == null || _state != RunState.Running)
@@ -230,34 +231,34 @@ public class DebugSession
         if (!IsActive)
             return;
         bool wasRunning = _state == RunState.Running;
-        Ask(DebugCommand.Stop);
+        QueueCommand(DebugCommand.Stop);
         if (wasRunning)
-            Pause();
+            RequestBreak();
     }
 
-    void Ask(DebugCommand what) => Ask2(what, "", 0u);
+    void QueueCommand(DebugCommand command) => QueueCommand(command, "", 0u);
 
-    void Ask2(DebugCommand what, String text, nuint which)
+    void QueueCommand(DebugCommand command, String expression, nuint row)
     {
         var held = _commands.Lock();
-        if (held.Value.Closed)
+        if (held.Value.IsClosed)
             return;
-        held.Value.Pending.Add(new PendingCommand(what, text, which));
+        held.Value.Pending.Add(new PendingCommand(command, expression, row));
         held.Pulse();
     }
 
-    void Reopen()
+    void ReopenQueue()
     {
         var held = _commands.Lock();
         held.Value.Pending.Clear();
-        held.Value.Closed = false;
+        held.Value.IsClosed = false;
     }
 
     // ------------------------------------------ arriving on the window's thread
 
     /// Each snapshot, before the window's own handler sees it, so `State` is
     /// already right when that handler reads it.
-    void Arrived(Snapshot taken)
+    void OnSnapshotArrived(Snapshot taken)
     {
         _state = taken.State;
         if (taken.State == RunState.Ended)
@@ -265,24 +266,24 @@ public class DebugSession
         _onSnapshot(taken);
     }
 
-    void Holding(Engine engine) => _engine = engine;
+    void OnEngineCreated(Engine engine) => _engine = engine;
 
-    void Wrote(String line) => _onOutput(line);
+    void OnOutputWritten(String line) => _onOutput(line);
 
-    void BoundTo(String file, uint line, uint chosen)
+    void OnBreakpointBound(String file, uint line, uint chosen)
         => _onBinding(file, line, chosen);
 
     // ---------------------------------------------- the session's own thread
 
     /// Everything below here runs on the session's thread, and nothing above
     /// it does.
-    void Session(String path, List<String> files, List<uint> lines,
+    void RunSession(String path, List<String> files, List<uint> lines,
                  List<String> conditions, List<String> watches)
     {
         var made = MakeTarget();
         if (!made.Ok)
         {
-            Fell("could not start a debugger: " + made.Error);
+            AbandonSession("could not start a debugger: " + made.Error);
             return;
         }
 
@@ -291,7 +292,7 @@ public class DebugSession
         var read = Debugger.Image.FromFile(path);
         if (!read.Ok)
         {
-            Fell("could not read " + path + ": " + read.Error);
+            AbandonSession("could not read " + path + ": " + read.Error);
             return;
         }
 
@@ -300,64 +301,64 @@ public class DebugSession
         String bad = info.Read();
         if (bad.ByteLength() != 0u)
         {
-            Fell("could not read the debug information: " + bad);
+            AbandonSession("could not read the debug information: " + bad);
             return;
         }
 
         var target = made.Value;
         var tables = ReadEveryLineTable(info);
         var engine = new Engine(target, image, info, tables);
-        Application.Post(() => Holding(engine));
+        Application.Post(() => OnEngineCreated(engine));
 
         // A program with no DWARF still runs, stopping at addresses rather
         // than lines. On Windows an ordinary `-g` build writes CodeView into a
         // .pdb and carries no DWARF, which is a misconfigured build rather
         // than a broken debugger.
         if (info.IsEmpty)
-            Say("this binary carries no DWARF, so there are no lines."
+            PostOutput("this binary carries no DWARF, so there are no lines."
                 + " Build it with --debug-format dwarf.");
 
-        PlantEach(engine, tables, files, lines, conditions);
+        PlantBreakpoints(engine, tables, files, lines, conditions);
 
         for (nuint i = 0u; i < watches.Count; i++)
         {
             String problem = engine.AddWatch(watches[i]);
             if (problem.ByteLength() != 0u)
-                Say(watches[i] + ": " + problem);
+                PostOutput(watches[i] + ": " + problem);
         }
 
         var started = engine.Start(path, "");
         if (!started.Ok)
         {
-            Fell("could not launch " + path + ": " + started.Error);
+            AbandonSession("could not launch " + path + ": " + started.Error);
             return;
         }
 
         if (engine.SlideKnown && engine.Slide != 0u)
-            Say("image slid by 0x" + FormatHexadecimal((ulong)engine.Slide));
+            PostOutput("image slid by 0x" + FormatHexadecimal((ulong)engine.Slide));
 
         var stop = started.Value;
         while (true)
         {
-            Drain(engine);
-            Report(engine, target, stop);
+            DrainOutput(engine);
+            SendSnapshot(engine, target, stop);
 
             if (stop.Kind == StopKind.Exited || stop.Kind == StopKind.NotRunning)
                 break;
 
             var next = TakeCommand();
-            if (next.What == DebugCommand.Stop)
+            if (next.Command == DebugCommand.Stop)
             {
                 engine.Terminate();
-                Say("Debugging stopped.");
-                Ended(0);
+                PostOutput("Debugging stopped.");
+                ReportExit(0);
                 break;
             }
 
-            stop = Perform(engine, next, stop);
+            stop = PerformCommand(engine, next, stop);
         }
 
-        Close();
+        CloseQueue();
     }
 
     /// Does one command, and answers where the program ended up.
@@ -366,9 +367,9 @@ public class DebugSession
     /// given, so that the loop re-reports the same place: a watch added while
     /// stopped fills its row without the caret moving. A fresh `Paused` carries
     /// no address, and a snapshot taken at one empties every pane.
-    Stop Perform(Engine engine, PendingCommand next, Stop stop)
+    Stop PerformCommand(Engine engine, PendingCommand next, Stop stop)
     {
-        switch (next.What)
+        switch (next.Command)
         {
             case DebugCommand.StepIn:
                 return engine.StepIn(stop.Thread);
@@ -384,14 +385,14 @@ public class DebugSession
 
             case DebugCommand.AddWatch:
             {
-                String problem = engine.AddWatch(next.Text);
+                String problem = engine.AddWatch(next.Expression);
                 if (problem.ByteLength() != 0u)
-                    Say(next.Text + ": " + problem);
+                    PostOutput(next.Expression + ": " + problem);
                 return stop;
             }
 
             case DebugCommand.RemoveWatch:
-                engine.RemoveWatchAt(next.Which);
+                engine.RemoveWatchAt(next.Row);
                 return stop;
 
             default:
@@ -408,7 +409,7 @@ public class DebugSession
 
         // In a loop: both platforms permit a spurious wake, and a pulse says
         // only that something changed.
-        while (held.Value.Pending.IsEmpty && !held.Value.Closed)
+        while (held.Value.Pending.IsEmpty && !held.Value.IsClosed)
             held.Wait();
 
         if (held.Value.Pending.IsEmpty)
@@ -420,7 +421,7 @@ public class DebugSession
     }
 
     /// Finds code for each breakpoint, plants it, and reports where it landed.
-    void PlantEach(Engine engine, List<LineTable> tables, List<String> files,
+    void PlantBreakpoints(Engine engine, List<LineTable> tables, List<String> files,
                    List<uint> lines, List<String> conditions)
     {
         for (nuint i = 0u; i < files.Count; i++)
@@ -433,10 +434,10 @@ public class DebugSession
             uint chosen = 0u;
             if (!FindLineAddress(tables, file, line, &at, &chosen))
             {
-                Say("no code for " + Standard.Path.FileName(file) + ":"
+                PostOutput("no code for " + Standard.Path.FileName(file) + ":"
                     + Standard.Text.FromInteger((long)line)
                     + ", so it will not be hit.");
-                Application.Post(() => BoundTo(file, line, 0u));
+                Application.Post(() => OnBreakpointBound(file, line, 0u));
                 continue;
             }
 
@@ -446,60 +447,60 @@ public class DebugSession
             String problem = engine.Condition(planted, condition);
             if (problem.ByteLength() != 0u)
             {
-                Say(Standard.Path.FileName(file) + ":"
+                PostOutput(Standard.Path.FileName(file) + ":"
                     + Standard.Text.FromInteger((long)line) + ": " + condition
                     + ": " + problem + " -- it will stop every time.");
             }
 
-            Application.Post(() => BoundTo(file, line, chosen));
+            Application.Post(() => OnBreakpointBound(file, line, chosen));
         }
     }
 
     /// What the program has written, one line at a time.
-    void Drain(Engine engine)
+    void DrainOutput(Engine engine)
     {
         var wrote = engine.TakeOutput();
         for (nuint i = 0u; i < wrote.Count; i++)
         {
             // Taken into a local so each post carries its own copy.
             String line = wrote[i];
-            Application.Post(() => Wrote(line));
+            Application.Post(() => OnOutputWritten(line));
         }
     }
 
     /// Takes a snapshot and sends it across.
-    void Report(Engine engine, ITarget target, Stop stop)
+    void SendSnapshot(Engine engine, ITarget target, Stop stop)
     {
         var taken = TakeSnapshot(engine, target, stop);
-        Application.Post(() => Arrived(taken));
+        Application.Post(() => OnSnapshotArrived(taken));
     }
 
     /// The session could not be set up at all.
-    void Fell(String why)
+    void AbandonSession(String why)
     {
-        Say(why);
-        Ended(-1);
-        Close();
+        PostOutput(why);
+        ReportExit(-1);
+        CloseQueue();
     }
 
-    void Ended(int code)
+    void ReportExit(int code)
     {
         var over = new Snapshot(RunState.Ended);
         over.Kind = StopKind.Exited;
         over.ExitCode = code;
-        Application.Post(() => Arrived(over));
+        Application.Post(() => OnSnapshotArrived(over));
     }
 
-    void Say(String line)
+    void PostOutput(String line)
     {
-        Application.Post(() => Wrote(line));
+        Application.Post(() => OnOutputWritten(line));
     }
 
     /// Stops anything further being queued, and wakes anyone waiting.
-    void Close()
+    void CloseQueue()
     {
         var held = _commands.Lock();
-        held.Value.Closed = true;
+        held.Value.IsClosed = true;
         held.PulseAll();
     }
 }

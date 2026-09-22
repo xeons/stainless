@@ -105,7 +105,7 @@ void NotDiagnostics(Harness harness)
     var linker = BuildMessage.Parse("lld-link: error: could not open 'x.lib'");
     harness.Check("a linker line is not a diagnostic", !linker.IsDiagnostic);
     harness.Same("and is kept as it came",
-                 "lld-link: error: could not open 'x.lib'", linker.Describe());
+                 "lld-link: error: could not open 'x.lib'", linker.ToDisplayText());
 
     var empty = BuildMessage.Parse("");
     harness.Check("an empty line is harmless", !empty.IsDiagnostic);
@@ -114,7 +114,7 @@ void NotDiagnostics(Harness harness)
     // reachable: a program under `run` may print either.
     var broken = BuildMessage.Parse("{not json at all");
     harness.Check("a broken object is kept as text", !broken.IsDiagnostic);
-    harness.Same("and not swallowed", "{not json at all", broken.Describe());
+    harness.Same("and not swallowed", "{not json at all", broken.ToDisplayText());
 
     var other = BuildMessage.Parse("{\"hello\":1}");
     harness.Check("an object that is not a diagnostic is kept as text",
@@ -134,7 +134,7 @@ void Describes(Harness harness)
     // every one of them behind the part they all share.
     harness.Same("a diagnostic reads as one line",
                  "error[SL0265]: cannot convert 'String' to 'int'   main.sl:5:13",
-                 BuildMessage.Parse(line).Describe());
+                 BuildMessage.Parse(line).ToDisplayText());
 
     String warning = "{\"severity\":\"warning\",\"code\":\"SL0222\","
         + "\"message\":\"no effect\",\"file\":\"/home/b/a.sl\",\"line\":2,"
@@ -142,10 +142,10 @@ void Describes(Harness harness)
 
     harness.Same("and a warning says so, with a unix path",
                  "warning[SL0222]: no effect   a.sl:2:1",
-                 BuildMessage.Parse(warning).Describe());
+                 BuildMessage.Parse(warning).ToDisplayText());
 
     String placeless = "{\"severity\":\"error\",\"code\":\"\",\"message\":\"the linker refused\"}";
     harness.Same("one with no place says only what happened",
                  "error: the linker refused",
-                 BuildMessage.Parse(placeless).Describe());
+                 BuildMessage.Parse(placeless).ToDisplayText());
 }

@@ -44,7 +44,7 @@ public class SourceBreakpoint
     public bool Enabled;
 
     /// Whether the last session found code for it.
-    public bool Bound;
+    public bool IsBound;
 
     /// The line the engine chose, once it bound.
     ///
@@ -65,20 +65,20 @@ public class SourceBreakpoint
         File = file;
         Line = line;
         Enabled = true;
-        Bound = false;
+        IsBound = false;
         BoundLine = line;
         Condition = "";
     }
 
     /// Where the glyph goes: the bound line once there is one.
-    public uint ShownLine => Bound ? BoundLine : Line;
+    public uint ShownLine => IsBound ? BoundLine : Line;
 
     /// What the Breakpoints pane shows in its text column.
-    public String Describe()
+    public String ToDisplayText()
     {
         String where = Standard.Path.FileName(File) + ", line "
                      + Standard.Text.FromInteger((long)ShownLine);
-        if (Bound && BoundLine != Line)
+        if (IsBound && BoundLine != Line)
             where = where + " (asked for "
                   + Standard.Text.FromInteger((long)Line) + ")";
         if (Condition.ByteLength() != 0u)
@@ -102,7 +102,7 @@ public class BreakpointStore
     ///
     /// Matched on the line asked for rather than the bound one. This answers a
     /// question about the editor: the caret is on line 12 and F9 was pressed.
-    public SourceBreakpoint? At(String file, uint line)
+    public SourceBreakpoint? FindAtLine(String file, uint line)
     {
         for (nuint i = 0u; i < _all.Count; i++)
         {
@@ -114,10 +114,10 @@ public class BreakpointStore
 
     /// The breakpoint whose glyph is drawn on a line, or null.
     ///
-    /// Distinct from `At`, because a bound breakpoint has moved: asked for on
-    /// line 12 and drawn on 14. Painting line 14 MUST find it and toggling
-    /// line 14 MUST NOT.
-    public SourceBreakpoint? ShownAt(String file, uint line)
+    /// Distinct from `FindAtLine`, because a bound breakpoint has moved: asked
+    /// for on line 12 and drawn on 14. Painting line 14 MUST find it and
+    /// toggling line 14 MUST NOT.
+    public SourceBreakpoint? FindShownAtLine(String file, uint line)
     {
         for (nuint i = 0u; i < _all.Count; i++)
         {
@@ -129,9 +129,9 @@ public class BreakpointStore
 
     /// Adds one if there is none there, removes it if there is. Answers what is
     /// there afterwards, or null when it was removed.
-    public SourceBreakpoint? Toggle(String file, uint line)
+    public SourceBreakpoint? ToggleBreakpoint(String file, uint line)
     {
-        var already = At(file, line);
+        var already = FindAtLine(file, line);
         if (already != null)
         {
             Remove((SourceBreakpoint)already);
@@ -159,7 +159,7 @@ public class BreakpointStore
 
     /// Whether any line of a file has one. Tells the editor whether it need
     /// look at the lines it paints at all.
-    public bool Touches(String file)
+    public bool HasBreakpointsIn(String file)
     {
         for (nuint i = 0u; i < _all.Count; i++)
         {
@@ -174,24 +174,24 @@ public class BreakpointStore
     /// MUST be called when a session ends. A glyph left on the line the
     /// previous build bound it to is a claim about a program that may since
     /// have been edited. Asked-for lines are untouched.
-    public void Unbind()
+    public void ClearBindings()
     {
         for (nuint i = 0u; i < _all.Count; i++)
         {
-            _all[i].Bound = false;
+            _all[i].IsBound = false;
             _all[i].BoundLine = _all[i].Line;
         }
     }
 
     /// Records where a session bound one. A `boundLine` of zero means no code
     /// was found for it.
-    public void Bind(String file, uint line, uint boundLine)
+    public void RecordBinding(String file, uint line, uint boundLine)
     {
-        var found = At(file, line);
+        var found = FindAtLine(file, line);
         if (found == null)
             return;
         var one = (SourceBreakpoint)found;
-        one.Bound = boundLine != 0u;
+        one.IsBound = boundLine != 0u;
         one.BoundLine = boundLine != 0u ? boundLine : line;
     }
 
@@ -205,7 +205,7 @@ public class BreakpointStore
     /// Losing it silently would be worse.
     ///
     /// Anything moved is unbound: it was bound against text that has changed.
-    public void Shift(String file, uint at, int by)
+    public void ShiftBreakpoints(String file, uint at, int by)
     {
         if (by == 0)
             return;
@@ -220,7 +220,7 @@ public class BreakpointStore
 
             long moved = (long)one.Line + (long)by;
             one.Line = moved < (long)floor ? floor : (uint)moved;
-            one.Bound = false;
+            one.IsBound = false;
             one.BoundLine = one.Line;
         }
     }

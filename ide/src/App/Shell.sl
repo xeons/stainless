@@ -1724,7 +1724,7 @@ public class Shell : Form
     void Show(String line)
     {
         var message = BuildMessage.Parse(line);
-        _output.Add(message.Describe());
+        _output.Add(message.ToDisplayText());
         _messages.Add(message);
 
         if (message.IsDiagnostic)
@@ -1763,7 +1763,7 @@ public class Shell : Form
     void ShowRaw(String line)
     {
         _output.Add(line);
-        _messages.Add(BuildMessage.Plain());
+        _messages.Add(BuildMessage.CreateEmpty());
     }
 
     String CountErrors()
@@ -2082,7 +2082,7 @@ public class Shell : Form
         var references = root.Add("References");
         foreach (var dependency in project.Dependencies)
         {
-            references.Add(dependency.Name + " -- " + dependency.Describe());
+            references.Add(dependency.Name + " -- " + dependency.ToDisplayText());
         }
         foreach (var library in project.LibrariesFor(ProjectFile.ThisPlatform))
         {
@@ -2621,7 +2621,7 @@ public class Shell : Form
         var tab = TabMatching(file);
         String path = tab == null ? file
                                   : ((EditorTab)tab).Editor.Contents.Location;
-        var made = _breakpoints.Toggle(path, line);
+        var made = _breakpoints.ToggleBreakpoint(path, line);
         if (made != null && condition.ByteLength() != 0u)
             ((SourceBreakpoint)made).Condition = condition;
 
@@ -2647,7 +2647,7 @@ public class Shell : Form
         }
 
         uint line = (uint)(editor.CaretPosition.Row + 1u);
-        var made = _breakpoints.Toggle(path, line);
+        var made = _breakpoints.ToggleBreakpoint(path, line);
         Say(made == null
             ? "Breakpoint removed from line "
               + Standard.Text.FromInteger((long)line) + "."
@@ -2676,11 +2676,11 @@ public class Shell : Form
             // A click on a bound breakpoint's glyph removes that breakpoint,
             // not whatever was asked for on the line clicked: the glyph may
             // have moved.
-            var shown = _breakpoints.ShownAt(path, (uint)(args.Row + 1u));
+            var shown = _breakpoints.FindShownAtLine(path, (uint)(args.Row + 1u));
             if (shown != null)
                 _breakpoints.Remove((SourceBreakpoint)shown);
             else
-                _breakpoints.Toggle(path, (uint)(args.Row + 1u));
+                _breakpoints.ToggleBreakpoint(path, (uint)(args.Row + 1u));
 
             ShowBreakpointList();
             editor.Invalidate();
@@ -2691,10 +2691,10 @@ public class Shell : Form
     void ShiftBreakpoints(CodeEditor editor, nuint first, int delta)
     {
         String path = editor.Contents.Location;
-        if (path.ByteLength() == 0u || !_breakpoints.Touches(path))
+        if (path.ByteLength() == 0u || !_breakpoints.HasBreakpointsIn(path))
             return;
 
-        _breakpoints.Shift(path, (uint)(first + 1u), delta);
+        _breakpoints.ShiftBreakpoints(path, (uint)(first + 1u), delta);
         ShowBreakpointList();
         editor.Invalidate();
     }
@@ -2706,7 +2706,7 @@ public class Shell : Form
         if (path.ByteLength() == 0u || _breakpoints.IsEmpty)
             return LineMark.None;
 
-        var found = _breakpoints.ShownAt(path, (uint)(row + 1u));
+        var found = _breakpoints.FindShownAtLine(path, (uint)(row + 1u));
         if (found == null)
             return LineMark.None;
 
@@ -2717,7 +2717,7 @@ public class Shell : Form
         // Unbound only once a session has had the chance to bind it. Before
         // that, hollow would say the build found no code when nothing has been
         // built.
-        if (_session != null && !one.Bound)
+        if (_session != null && !one.IsBound)
             return LineMark.BreakpointUnbound;
         return LineMark.Breakpoint;
     }
@@ -2849,7 +2849,7 @@ public class Shell : Form
             return;
 
         var one = _breakpoints.All[(nuint)row];
-        _breakpoints.Toggle(one.File, one.Line);
+        _breakpoints.ToggleBreakpoint(one.File, one.Line);
         ShowBreakpointList();
         RepaintEditors();
     }
@@ -2861,7 +2861,7 @@ public class Shell : Form
         {
             var one = _breakpoints.All[i];
             int row = _breakList.AddRow(one.Enabled ? "*" : "o");
-            _breakList.SetCell(row, 1, one.Describe());
+            _breakList.SetCell(row, 1, one.ToDisplayText());
             _breakList.SetCell(row, 2, StateOf(one));
         }
     }
@@ -2872,7 +2872,7 @@ public class Shell : Form
             return "disabled";
         if (_session == null)
             return "pending";
-        return one.Bound ? "bound" : "no code";
+        return one.IsBound ? "bound" : "no code";
     }
 
     // --------------------------------------------------------- run control
@@ -2908,7 +2908,7 @@ public class Shell : Form
             return;
         }
         ClearStopMarks();
-        ((DebugSession)running).Resume();
+        ((DebugSession)running).ContinueExecution();
         ShowRunning("Running...");
     }
 
@@ -2951,7 +2951,7 @@ public class Shell : Form
             Say("Nothing is running.");
             return;
         }
-        if (((DebugSession)running).Pause())
+        if (((DebugSession)running).RequestBreak())
             Say("Breaking...");
         else
             Say("It could not be interrupted.");
@@ -3020,7 +3020,7 @@ public class Shell : Form
             ShowTrace("note: Release is optimised and has no debug information."
                       + " Switch to Debug and rebuild to step through it.");
 
-        _breakpoints.Unbind();
+        _breakpoints.ClearBindings();
         _stopped = null;
         _frame = 0u;
         _firstStop = true;
@@ -3070,7 +3070,7 @@ public class Shell : Form
     /// A breakpoint's binding, once a session has looked for code for it.
     void BoundBreakpoint(String file, uint line, uint bound)
     {
-        _breakpoints.Bind(file, line, bound);
+        _breakpoints.RecordBinding(file, line, bound);
         ShowBreakpointList();
         RepaintEditors();
     }
@@ -3151,7 +3151,7 @@ public class Shell : Form
 
         _session = null;
         _stopped = null;
-        _breakpoints.Unbind();
+        _breakpoints.ClearBindings();
         ClearDebugPanes();
         ClearStopMarks();
         ShowBreakpointList();
@@ -3231,7 +3231,7 @@ public class Shell : Form
 
         var running = _session;
         if (running != null && ((DebugSession)running).IsStopped)
-            ((DebugSession)running).Watch(wanted);
+            ((DebugSession)running).AddWatch(wanted);
         else
             ShowWatchNames();
 
@@ -3332,7 +3332,7 @@ public class Shell : Form
 
         var running = _session;
         if (running != null && ((DebugSession)running).IsStopped)
-            ((DebugSession)running).Unwatch(row);
+            ((DebugSession)running).RemoveWatchAt(row);
         else
             ShowWatchNames();
     }
@@ -4297,7 +4297,7 @@ public class Shell : Form
             pad.Editor.MoveCaretTo(2u, 0u);
             ToggleBreakpointAtCaret();
 
-            if (_breakpoints.At("selftest-breakpoints.sl", 3u) == null)
+            if (_breakpoints.FindAtLine("selftest-breakpoints.sl", 3u) == null)
             {
                 Console.WriteLine("FAIL: F9 did not set a breakpoint on line 3");
                 ok = false;
@@ -4318,7 +4318,7 @@ public class Shell : Form
             pad.Editor.TypeText("a" + Newline() + "b" + Newline());
             Application.DoEvents();
 
-            if (_breakpoints.At("selftest-breakpoints.sl", 5u) == null)
+            if (_breakpoints.FindAtLine("selftest-breakpoints.sl", 5u) == null)
             {
                 Console.WriteLine("FAIL: typing above a breakpoint did not move it");
                 ok = false;
@@ -4337,7 +4337,7 @@ public class Shell : Form
             pad.Editor.MoveCaretTo(0u, 0u);
             Application.DoEvents();
 
-            if (_breakpoints.At("selftest-breakpoints.sl", 3u) == null)
+            if (_breakpoints.FindAtLine("selftest-breakpoints.sl", 3u) == null)
             {
                 Console.WriteLine("FAIL: deleting above a breakpoint did not move it back");
                 ok = false;
@@ -4350,7 +4350,7 @@ public class Shell : Form
             Application.DoEvents();
 
             if (_breakpoints.Count != 1u
-                || _breakpoints.At("selftest-breakpoints.sl", 2u) == null)
+                || _breakpoints.FindAtLine("selftest-breakpoints.sl", 2u) == null)
             {
                 Console.WriteLine("FAIL: a breakpoint inside a deletion was lost");
                 ok = false;
