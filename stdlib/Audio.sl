@@ -1186,6 +1186,27 @@ public sealed class AudioPlayer
         _ownsApartment = ownsApartment;
         _closed = false;
     }
+
+    /// The stream and its render service, on a thread whose apartment is up.
+    static Result<AudioPlayer, AudioError> OpenInApartment(Backend found, AudioFormat format,
+                                                           bool owned)
+    {
+        var opened = OpenStream(found, format, FlowRender);
+        if (!opened.Ok)
+            return Fail(opened.Error);
+
+        var client = opened.Value;
+
+        uint frames = 0u;
+        if (client.GetBufferSize(&frames) < 0)
+            return Fail(AudioError.Device);
+
+        byte* raw = null;
+        if (client.GetService(iidof(IAudioRenderClient), &raw) < 0 || raw == null)
+            return Fail(AudioError.Device);
+
+        return Ok(new AudioPlayer(client, (IAudioRenderClient)raw, frames, format, owned));
+    }
 #else
     void* _device;
 
@@ -1225,33 +1246,12 @@ public sealed class AudioPlayer
         if (!found.EnterApartment(&owned))
             return Fail(AudioError.Device);
 
-        var opened = OpenStream(found, format, FlowRender);
-        if (!opened.Ok)
-        {
-            if (owned)
-                found.LeaveApartment();
-            return Fail(opened.Error);
-        }
-
-        var client = opened.Value;
-
-        uint frames = 0u;
-        if (client.GetBufferSize(&frames) < 0)
-        {
-            if (owned)
-                found.LeaveApartment();
-            return Fail(AudioError.Device);
-        }
-
-        byte* raw = null;
-        if (client.GetService(iidof(IAudioRenderClient), &raw) < 0 || raw == null)
-        {
-            if (owned)
-                found.LeaveApartment();
-            return Fail(AudioError.Device);
-        }
-
-        return Ok(new AudioPlayer(client, (IAudioRenderClient)raw, frames, format, owned));
+        // The references are taken in a function of their own so that a
+        // failure has released them before the apartment goes.
+        var opened = OpenInApartment(found, format, owned);
+        if (!opened.Ok && owned)
+            found.LeaveApartment();
+        return opened;
 #else
         void* device = null;
         int code = found.Open(&device, format, false);
@@ -1532,6 +1532,23 @@ public sealed class AudioRecorder
         _closed = false;
         _running = false;
     }
+
+    /// The stream and its capture service, on a thread whose apartment is up.
+    static Result<AudioRecorder, AudioError> OpenInApartment(Backend found, AudioFormat format,
+                                                             bool owned)
+    {
+        var opened = OpenStream(found, format, FlowCapture);
+        if (!opened.Ok)
+            return Fail(opened.Error);
+
+        var client = opened.Value;
+
+        byte* raw = null;
+        if (client.GetService(iidof(IAudioCaptureClient), &raw) < 0 || raw == null)
+            return Fail(AudioError.Device);
+
+        return Ok(new AudioRecorder(client, (IAudioCaptureClient)raw, format, owned));
+    }
 #else
     void* _device;
 
@@ -1566,25 +1583,12 @@ public sealed class AudioRecorder
         if (!found.EnterApartment(&owned))
             return Fail(AudioError.Device);
 
-        var opened = OpenStream(found, format, FlowCapture);
-        if (!opened.Ok)
-        {
-            if (owned)
-                found.LeaveApartment();
-            return Fail(opened.Error);
-        }
-
-        var client = opened.Value;
-
-        byte* raw = null;
-        if (client.GetService(iidof(IAudioCaptureClient), &raw) < 0 || raw == null)
-        {
-            if (owned)
-                found.LeaveApartment();
-            return Fail(AudioError.Device);
-        }
-
-        return Ok(new AudioRecorder(client, (IAudioCaptureClient)raw, format, owned));
+        // As in `AudioPlayer.Open`: a failure has released its references
+        // before the apartment goes.
+        var opened = OpenInApartment(found, format, owned);
+        if (!opened.Ok && owned)
+            found.LeaveApartment();
+        return opened;
 #else
         void* device = null;
         int code = found.Open(&device, format, true);
