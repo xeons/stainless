@@ -4395,7 +4395,7 @@ public class Shell : Form
 
             // A chunk that stops mid-line shows the whole lines and keeps the
             // rest. Nothing of "second ha" may reach the pane.
-            String left = ShowCompleteLines("first line" + Newline() + "second ha", false);
+            String left = ShowCompleteLines("first line" + Newline + "second ha", false);
             if (left != "second ha" || _outputList.Count != 1u
                 || _outputList.GetItemAt(0u) != "first line")
             {
@@ -4406,7 +4406,7 @@ public class Shell : Form
             }
 
             // And the rest of it completes the line rather than starting one.
-            left = ShowCompleteLines(left + "lf" + Newline(), false);
+            left = ShowCompleteLines(left + "lf" + Newline, false);
             if (left != "" || _outputList.Count != 2u
                 || _outputList.GetItemAt(1u) != "second half")
             {

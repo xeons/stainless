@@ -141,11 +141,11 @@ class CaptionBar : CustomControl
         }
     }
 
-    Rectangle CloseBox() =>
+    Rectangle CloseBox =>
         Rectangle.FromBounds(Width - GlyphBox - GlyphInset, (CaptionHeight - GlyphBox) / 2,
                      GlyphBox, GlyphBox);
 
-    Rectangle PinBox() =>
+    Rectangle PinBox =>
         Rectangle.FromBounds(Width - (GlyphBox * 2) - GlyphInset - 2,
                      (CaptionHeight - GlyphBox) / 2, GlyphBox, GlyphBox);
 
@@ -232,7 +232,7 @@ class CaptionBar : CustomControl
     int GetGlyphAt(int x, int y)
     {
         var point = Point.FromXY(x, y);
-        if (PinBox().Contains(point))
+        if (PinBox.Contains(point))
             return 1;
         if (CloseBox.Contains(point))
             return 2;
