@@ -40,7 +40,7 @@ public class BackendForm : Form
     public SpinEdit Quantity;
     public HeaderControl Headings;
     public ScrollBar Bar;
-    public Label Centred;
+    public Label Centered;
     public Label Righted;
     public ComboBox Choice;
     public MenuItem FileItem;
@@ -105,11 +105,11 @@ public class BackendForm : Form
         Bar.ValueChanged += this.OnBarChange;
 
         // Aligned and not wrapping: the combination with no kind of its own.
-        Centred = new Label(this);
-        Centred.SetBounds(12, 216, 300, 20);
-        Centred.Text = "Centred, and cut short with an ellipsis: far too long for its label";
-        Centred.TextAlign = HorizontalAlignment.Center;
-        Centred.WordWrap = false;
+        Centered = new Label(this);
+        Centered.SetBounds(12, 216, 300, 20);
+        Centered.Text = "Centred, and cut short with an ellipsis: far too long for its label";
+        Centered.TextAlign = HorizontalAlignment.Center;
+        Centered.WordWrap = false;
 
         Righted = new Label(this);
         Righted.SetBounds(12, 240, 300, 20);
@@ -261,9 +261,9 @@ public class BackendForm : Form
     /// What the windows hold, rather than what the controls were told.
     bool CheckNativeState(bool ok)
     {
-        long centredStyle = GetWindowLongPtrW(WindowOf(Centred), GwlStyle);
+        long centeredStyle = GetWindowLongPtrW(WindowOf(Centered), GwlStyle);
         ok = Check(ok, "a centred label that does not wrap is still a text label",
-                   ((uint)centredStyle & SsTypeMask) == SsCenter);
+                   ((uint)centeredStyle & SsTypeMask) == SsCenter);
         long rightStyle = GetWindowLongPtrW(WindowOf(Righted), GwlStyle);
         ok = Check(ok, "and so is a right-aligned one",
                    ((uint)rightStyle & SsTypeMask) == SsRight);
@@ -342,7 +342,7 @@ public class BackendForm : Form
         HANDLE self = GetCurrentProcess();
         uint before = GetGuiResources(self, GrGdiObjects);
         for (int i = 0; i < 40; i++)
-            LoseColouredPanel(ghost);
+            LoseColoredPanel(ghost);
         uint after = GetGuiResources(self, GrGdiObjects);
         ok = Check(ok, "a control that outlives its window frees its brush",
                    after < before + 10u);
@@ -474,7 +474,7 @@ String ClassNameOf(HWND window)
 }
 
 /// A coloured panel whose window is destroyed under it, and then the panel.
-void LoseColouredPanel(Form host)
+void LoseColoredPanel(Form host)
 {
     var panel = WidgetSet.Current.CreatePanel(host, host.WindowPeer);
     panel.SetBackColor(Colors.Red);

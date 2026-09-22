@@ -65,19 +65,19 @@ public struct Color
 
     public static Color FromRgb(byte red, byte green, byte blue)
     {
-        Color colour;
-        colour.R = red;
-        colour.G = green;
-        colour.B = blue;
-        colour.A = 255;
-        return colour;
+        Color color;
+        color.R = red;
+        color.G = green;
+        color.B = blue;
+        color.A = 255;
+        return color;
     }
 
     public static Color FromArgb(byte alpha, byte red, byte green, byte blue)
     {
-        Color colour = Color.FromRgb(red, green, blue);
-        colour.A = alpha;
-        return colour;
+        Color color = Color.FromRgb(red, green, blue);
+        color.A = alpha;
+        return color;
     }
 
     /// Whether two colours are the same in every channel.
@@ -327,14 +327,14 @@ public sealed class Pen
     public int      Width { get; }
     public PenStyle Style { get; }
 
-    public Pen(Color colour, int width, PenStyle style)
+    public Pen(Color color, int width, PenStyle style)
     {
-        Color = colour;
+        Color = color;
         Width = width;
         Style = style;
     }
 
-    public Pen(Color colour) => this(colour, 1, PenStyle.Solid);
+    public Pen(Color color) => this(color, 1, PenStyle.Solid);
 }
 
 /// How a `Brush` fills: one colour, or two with a ramp between them.
@@ -371,10 +371,10 @@ public sealed class Brush
 
     public BrushStyle Style { get; }
 
-    public Brush(Color colour)
+    public Brush(Color color)
     {
-        Color = colour;
-        EndColor = colour;
+        Color = color;
+        EndColor = color;
         Style = BrushStyle.Solid;
     }
 
@@ -516,19 +516,19 @@ public sealed class Graphics
 
     /// Fills the whole clip with one colour. What a paint handler usually does
     /// first, and the reason `OnPaintBackground` need not exist.
-    public void Clear(Color colour) => _backend.Clear(colour);
+    public void Clear(Color color) => _backend.Clear(color);
 
     /// Draws text at a point, with no wrapping and no alignment.
-    public void DrawString(String text, Font font, Color colour, int x, int y)
+    public void DrawString(String text, Font font, Color color, int x, int y)
     {
-        _backend.DrawString(text, font, colour, x, y);
+        _backend.DrawString(text, font, color, x, y);
     }
 
     /// Draws text inside a rectangle, aligned and wrapped as the format says.
-    public void DrawString(String text, Font font, Color colour,
+    public void DrawString(String text, Font font, Color color,
                            Rectangle bounds, TextFormat format)
     {
-        _backend.DrawStringIn(text, font, colour, bounds, format);
+        _backend.DrawStringIn(text, font, color, bounds, format);
     }
 
     /// Draws a picture with its top-left corner at a point.

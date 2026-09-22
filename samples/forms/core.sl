@@ -85,13 +85,13 @@ public class Spot : GraphicControl
 public class Host : Panel
 {
     public int Paints;
-    public int BackColours;
+    public int BackColors;
 
     public Host(WindowedControl parent)
     {
         base(parent);
         Paints = 0;
-        BackColours = 0;
+        BackColors = 0;
     }
 
     protected override void OnPaint(PaintEventArgs args)
@@ -102,7 +102,7 @@ public class Host : Panel
 
     protected override void ApplyBackColor()
     {
-        BackColours++;
+        BackColors++;
         base.ApplyBackColor();
     }
 }
@@ -130,7 +130,7 @@ public class CoreForm : Form
     Panel _below;
     Button _corner;
     Button _stretch;
-    Button _centre;
+    Button _center;
     Host _host;
     Button _inner;
     Spot _spot;
@@ -166,10 +166,10 @@ public class CoreForm : Form
         _stretch.SetBounds(20, 200, 300, 24);
         _stretch.Anchors = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top;
 
-        _centre = new Button(this);
-        _centre.Text = "Centre";
-        _centre.SetBounds(200, 150, 80, 24);
-        _centre.Anchors = AnchorStyles.None;
+        _center = new Button(this);
+        _center.Text = "Centre";
+        _center.SetBounds(200, 150, 80, 24);
+        _center.Anchors = AnchorStyles.None;
 
         _host = new Host(this);
         _host.SetBounds(20, 340, 120, 60);
@@ -227,7 +227,7 @@ public class CoreForm : Form
         all[1u] = _below.Bounds;
         all[2u] = _corner.Bounds;
         all[3u] = _stretch.Bounds;
-        all[4u] = _centre.Bounds;
+        all[4u] = _center.Bounds;
         return all;
     }
 
@@ -267,14 +267,14 @@ public class CoreForm : Form
         ok = Check(ok, "squeezing the form and growing it back does too",
                    Same(before, Snapshot()));
 
-        int centred = _centre.Left;
+        int centered = _center.Left;
         for (int i = 1; i <= 10; i++)
             SetBounds(frame.X, frame.Y, frame.Width + i, frame.Height);
         ok = Check(ok, "a centred control follows a form grown a pixel at a time",
-                   _centre.Left == centred + 5);
+                   _center.Left == centered + 5);
         for (int i = 9; i >= 0; i--)
             SetBounds(frame.X, frame.Y, frame.Width + i, frame.Height);
-        ok = Check(ok, "and comes back to where it was", _centre.Left == centred);
+        ok = Check(ok, "and comes back to where it was", _center.Left == centered);
         Settle();
 
         _header.Height = 120;
@@ -323,10 +323,10 @@ public class CoreForm : Form
         Settle();
         ok = Check(ok, "and changing its text", _host.Paints > painted);
 
-        int pushed = _host.BackColours;
+        int pushed = _host.BackColors;
         BackColor = Colors.LightGray;
         ok = Check(ok, "a form's colour reaches a child that inherits it",
-                   _host.BackColours > pushed);
+                   _host.BackColors > pushed);
 
         var origin = _group.ClientOrigin;
         var framedAt = Drawing.Point.FromXY(origin.X + _framed.Left + 5, origin.Y + _framed.Top + 5);

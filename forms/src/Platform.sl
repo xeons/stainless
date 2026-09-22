@@ -303,8 +303,8 @@ public interface IControlPeer
     void SetText(String text);
     String GetText();
     void SetFont(Font font);
-    void SetForeColor(Color colour);
-    void SetBackColor(Color colour);
+    void SetForeColor(Color color);
+    void SetBackColor(Color color);
 
     /// Marks the control as needing repainting. Does not paint: the platform
     /// decides when, and coalesces several of these into one paint.
@@ -1077,7 +1077,7 @@ public interface IGraphicsBackend
     /// gets from the platform for nothing.
     int PushLayer(Rectangle bounds);
     void PopLayer(int token);
-    void Clear(Color colour);
+    void Clear(Color color);
     void DrawLine(Pen pen, int x1, int y1, int x2, int y2);
     void DrawRectangle(Pen pen, Rectangle bounds);
     void FillRectangle(Brush brush, Rectangle bounds);
@@ -1086,8 +1086,8 @@ public interface IGraphicsBackend
     void DrawPolygon(Pen pen, Point[] points);
     void FillPolygon(Brush brush, Point[] points);
     void DrawPolyline(Pen pen, Point[] points);
-    void DrawString(String text, Font font, Color colour, int x, int y);
-    void DrawStringIn(String text, Font font, Color colour,
+    void DrawString(String text, Font font, Color color, int x, int y);
+    void DrawStringIn(String text, Font font, Color color,
                       Rectangle bounds, TextFormat format);
     Size MeasureString(String text, Font font);
 

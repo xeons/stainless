@@ -167,9 +167,9 @@ public gulong StartTicker(int milliseconds, Ticker body)
 
 /// A `Color` as CSS writes one. Alpha is dropped: every colour the seam
 /// carries is opaque, and `rgba()` would only invite one that is not.
-public String ToCssColor(Color colour)
+public String ToCssColor(Color color)
 {
-    return "#" + FormatHexByte(colour.R) + FormatHexByte(colour.G) + FormatHexByte(colour.B);
+    return "#" + FormatHexByte(color.R) + FormatHexByte(color.G) + FormatHexByte(color.B);
 }
 
 String FormatHexByte(byte value)
@@ -182,10 +182,10 @@ String FormatHexByte(byte value)
 /// A `GdkRGBA` as a `Color`, which is where a colour chooser's answer comes
 /// back from. The components are 0.0 to 1.0 and are rounded rather than
 /// truncated, so that 1.0 is 255 and not 254.
-public Color FromRgba(GdkRGBA colour)
+public Color FromRgba(GdkRGBA color)
 {
-    return Color.FromRgb(ToColorComponent(colour.Red), ToColorComponent(colour.Green),
-                         ToColorComponent(colour.Blue));
+    return Color.FromRgb(ToColorComponent(color.Red), ToColorComponent(color.Green),
+                         ToColorComponent(color.Blue));
 }
 
 byte ToColorComponent(double value)
@@ -198,12 +198,12 @@ byte ToColorComponent(double value)
     return (byte)(int)scaled;
 }
 
-public GdkRGBA ToRgba(Color colour)
+public GdkRGBA ToRgba(Color color)
 {
     GdkRGBA rgba;
-    rgba.Red   = (double)(int)colour.R / 255.0;
-    rgba.Green = (double)(int)colour.G / 255.0;
-    rgba.Blue  = (double)(int)colour.B / 255.0;
+    rgba.Red   = (double)(int)color.R / 255.0;
+    rgba.Green = (double)(int)color.G / 255.0;
+    rgba.Blue  = (double)(int)color.B / 255.0;
     rgba.Alpha = 1.0;
     return rgba;
 }
@@ -1216,17 +1216,17 @@ public class GtkPeer : IControlPeer
         ApplyCss();
     }
 
-    public void SetForeColor(Color colour)
+    public void SetForeColor(Color color)
     {
-        ForeCss = " color: " + ToCssColor(colour) + ";";
+        ForeCss = " color: " + ToCssColor(color) + ";";
         ApplyCss();
     }
 
-    public void SetBackColor(Color colour)
+    public void SetBackColor(Color color)
     {
         // `background-image: none` as well, because a theme paints most
         // widgets with a gradient and a colour alone would sit under it.
-        BackCss = " background-image: none; background-color: " + ToCssColor(colour) + ";";
+        BackCss = " background-image: none; background-color: " + ToCssColor(color) + ";";
         ApplyCss();
     }
 

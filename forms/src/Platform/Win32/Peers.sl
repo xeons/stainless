@@ -105,9 +105,9 @@ extern "C"
 
 /// A `Color` as a COLORREF, which is 0x00BBGGRR -- blue in the high byte,
 /// which is the one thing about GDI colours everyone gets wrong once.
-public uint ToColorRef(Color colour)
+public uint ToColorRef(Color color)
 {
-    return (uint)colour.R | ((uint)colour.G << 8) | ((uint)colour.B << 16);
+    return (uint)color.R | ((uint)color.G << 8) | ((uint)color.B << 16);
 }
 
 /// The other way, dropping alpha because a COLORREF has none.
@@ -949,20 +949,20 @@ public class ControlPeer : IControlPeer
         SendMessageW(Window, WmSetFont, (ulong)font.Resource.Handle, 1);
     }
 
-    public void SetForeColor(Color colour)
+    public void SetForeColor(Color color)
     {
-        ForeColor = colour;
+        ForeColor = color;
         IsForeColorSet = true;
         Invalidate();
     }
 
-    public void SetBackColor(Color colour)
+    public void SetBackColor(Color color)
     {
-        BackColor = colour;
+        BackColor = color;
         IsBackColorSet = true;
         if (BackBrush != null)
             DeleteObject((HGDIOBJ)(void*)BackBrush);
-        BackBrush = CreateSolidBrush(ToColorRef(colour));
+        BackBrush = CreateSolidBrush(ToColorRef(color));
         Invalidate();
     }
 

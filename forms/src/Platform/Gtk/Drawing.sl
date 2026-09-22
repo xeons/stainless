@@ -266,11 +266,11 @@ public class GtkGraphicsBackend : IGraphicsBackend
 
     // -------------------------------------------------------------- paint
 
-    void SetSourceColor(Color colour)
+    void SetSourceColor(Color color)
     {
-        cairo_set_source_rgb(_cairo, (double)(int)colour.R / 255.0,
-                                    (double)(int)colour.G / 255.0,
-                                    (double)(int)colour.B / 255.0);
+        cairo_set_source_rgb(_cairo, (double)(int)color.R / 255.0,
+                                    (double)(int)color.G / 255.0,
+                                    (double)(int)color.B / 255.0);
     }
 
     /// Everything a pen decides, before the stroke that uses it.
@@ -311,9 +311,9 @@ public class GtkGraphicsBackend : IGraphicsBackend
         return (pen.Width % 2) == 1 ? 0.5 : 0.0;
     }
 
-    public void Clear(Color colour)
+    public void Clear(Color color)
     {
-        SetSourceColor(colour);
+        SetSourceColor(color);
         cairo_paint(_cairo);
     }
 
@@ -388,12 +388,12 @@ public class GtkGraphicsBackend : IGraphicsBackend
 
     /// One end of the ramp. Cairo takes components as 0 to 1, which is the
     /// thing this file's header warns about.
-    static void AddColorStop(cairo_pattern_t* ramp, double at, Color colour)
+    static void AddColorStop(cairo_pattern_t* ramp, double at, Color color)
     {
         cairo_pattern_add_color_stop_rgb(ramp, at,
-                                         (double)colour.R / 255.0,
-                                         (double)colour.G / 255.0,
-                                         (double)colour.B / 255.0);
+                                         (double)color.R / 255.0,
+                                         (double)color.G / 255.0,
+                                         (double)color.B / 255.0);
     }
 
     /// An ellipse is a scaled circle, which is the only way cairo draws one.
@@ -479,12 +479,12 @@ public class GtkGraphicsBackend : IGraphicsBackend
     /// Draws from the top-left, which is what every other API in this project
     /// means by a text position -- so the ascent is added to reach the
     /// baseline cairo draws from.
-    public void DrawString(String text, Font font, Color colour, int x, int y)
+    public void DrawString(String text, Font font, Color color, int x, int y)
     {
         if (text.IsEmpty)
             return;
         SelectFont(_cairo, font);
-        SetSourceColor(colour);
+        SetSourceColor(color);
 
         cairo_font_extents_t metrics;
         cairo_font_extents(_cairo, &metrics);
@@ -494,13 +494,13 @@ public class GtkGraphicsBackend : IGraphicsBackend
         DrawTextDecorations(text, font, x, y, metrics);
     }
 
-    public void DrawStringIn(String text, Font font, Color colour,
+    public void DrawStringIn(String text, Font font, Color color,
                              Rectangle bounds, TextFormat format)
     {
         if (text.IsEmpty)
             return;
         SelectFont(_cairo, font);
-        SetSourceColor(colour);
+        SetSourceColor(color);
 
         cairo_font_extents_t metrics;
         cairo_font_extents(_cairo, &metrics);

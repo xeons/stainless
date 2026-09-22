@@ -57,7 +57,7 @@ const uint DibBitFields = 3u;
 const uint DibAlphaBitFields = 6u;
 
 /// `LCS_sRGB`, the colour space a `BITMAPV5HEADER` says it is in.
-const uint ColourSpaceSrgb = 0x73524742u;
+const uint ColorSpaceSrgb = 0x73524742u;
 
 /// `LCS_GM_IMAGES`, the rendering intent for a photograph.
 const uint IntentImages = 4u;
@@ -436,7 +436,7 @@ byte[] EncodeDib(ClipboardImage picture, bool withAlphaHeader)
         WriteUIntAt(dib, 44u, 0x0000FF00u);
         WriteUIntAt(dib, 48u, 0x000000FFu);
         WriteUIntAt(dib, 52u, 0xFF000000u);
-        WriteUIntAt(dib, 56u, ColourSpaceSrgb);
+        WriteUIntAt(dib, 56u, ColorSpaceSrgb);
         WriteUIntAt(dib, 108u, IntentImages);
     }
 
@@ -493,7 +493,7 @@ public ClipboardImage? DecodeDib(byte[] dib)
     int height = (int)ReadUIntAt(dib, 8u);
     uint depth = ReadUShortAt(dib, 14u);
     uint compression = ReadUIntAt(dib, 16u);
-    uint coloursUsed = ReadUIntAt(dib, 32u);
+    uint colorsUsed = ReadUIntAt(dib, 32u);
 
     bool topDown = height < 0;
     if (topDown)
@@ -568,7 +568,7 @@ public ClipboardImage? DecodeDib(byte[] dib)
     // A colour table always comes before the pixels when `biClrUsed` says it
     // is there -- above eight bits too, where it is only a hint for a palette
     // display and the pixels do not index it.
-    nuint paletteSize = (nuint)coloursUsed;
+    nuint paletteSize = (nuint)colorsUsed;
     if (depth <= 8u && paletteSize == 0u)
         paletteSize = (nuint)1u << (nuint)depth;
     nuint palette = header + maskBytes;

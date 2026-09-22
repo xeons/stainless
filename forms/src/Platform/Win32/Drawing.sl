@@ -123,10 +123,10 @@ public class GraphicsBackend : IGraphicsBackend
 
     public void PopLayer(int token) => RestoreDC(_dc, token);
 
-    public void Clear(Color colour)
+    public void Clear(Color color)
     {
         Rect whole = ToRect(_clip);
-        HBRUSH brush = CreateSolidBrush(ToColorRef(colour));
+        HBRUSH brush = CreateSolidBrush(ToColorRef(color));
         FillRect(_dc, &whole, brush);
         DeleteObject((HGDIOBJ)(void*)brush);
     }
@@ -231,14 +231,14 @@ public class GraphicsBackend : IGraphicsBackend
 
     /// One corner, with an 8-bit colour widened to the sixteen bits a
     /// `TRIVERTEX` holds -- see the note where it is declared.
-    static TriVertex CreateTriVertex(int x, int y, Color colour)
+    static TriVertex CreateTriVertex(int x, int y, Color color)
     {
         TriVertex made;
         made.X = x;
         made.Y = y;
-        made.Red   = (ushort)((uint)colour.R << 8);
-        made.Green = (ushort)((uint)colour.G << 8);
-        made.Blue  = (ushort)((uint)colour.B << 8);
+        made.Red   = (ushort)((uint)color.R << 8);
+        made.Green = (ushort)((uint)color.G << 8);
+        made.Blue  = (ushort)((uint)color.B << 8);
         made.Alpha = (ushort)0;
         return made;
     }
@@ -308,19 +308,19 @@ public class GraphicsBackend : IGraphicsBackend
         RestoreSelection(line);
     }
 
-    public void DrawString(String text, Font font, Color colour, int x, int y)
+    public void DrawString(String text, Font font, Color color, int x, int y)
     {
         var wide = text.ToUtf16();
         HGDIOBJ wasFont = SelectObject(_dc, (HGDIOBJ)(nuint)font.Resource.Handle);
-        uint wasColour = SetTextColor(_dc, ToColorRef(colour));
+        uint wasColor = SetTextColor(_dc, ToColorRef(color));
         int wasMode = SetBkMode(_dc, TransparentBackground);
         TextOutW(_dc, x, y, wide.ToPointer(), (int)wide.UnitCount());
         SetBkMode(_dc, wasMode);
-        SetTextColor(_dc, wasColour);
+        SetTextColor(_dc, wasColor);
         SelectObject(_dc, wasFont);
     }
 
-    public void DrawStringIn(String text, Font font, Color colour,
+    public void DrawStringIn(String text, Font font, Color color,
                              FRect bounds, TextFormat format)
     {
         var wide = text.ToUtf16();
@@ -358,11 +358,11 @@ public class GraphicsBackend : IGraphicsBackend
         }
 
         HGDIOBJ wasFont = SelectObject(_dc, (HGDIOBJ)(nuint)font.Resource.Handle);
-        uint wasColour = SetTextColor(_dc, ToColorRef(colour));
+        uint wasColor = SetTextColor(_dc, ToColorRef(color));
         int wasMode = SetBkMode(_dc, TransparentBackground);
         DrawTextW(_dc, wide.ToPointer(), (int)wide.UnitCount(), &r, flags);
         SetBkMode(_dc, wasMode);
-        SetTextColor(_dc, wasColour);
+        SetTextColor(_dc, wasColor);
         SelectObject(_dc, wasFont);
     }
 
