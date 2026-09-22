@@ -500,9 +500,7 @@ public class OfficeXpRenderer : ChromeRenderer
     void Wash(Graphics surface, Rectangle bounds, Color fill)
     {
         surface.FillRectangle(new Brush(fill), bounds);
-        surface.DrawRectangle(new Pen(HotBorder),
-                              Rectangle.Of(bounds.X, bounds.Y,
-                                           bounds.Width - 1, bounds.Height - 1));
+        surface.DrawRectangle(new Pen(HotBorder), bounds);
     }
 
     /// A caption with its accelerator markers taken out, which is the string

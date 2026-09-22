@@ -132,7 +132,7 @@ public class Shape : GraphicControl
         // A square and a circle are the same shapes fitted to the shorter side,
         // which is what makes them worth having as separate kinds rather than
         // leaving a caller to keep the bounds square by hand.
-        var area = Rectangle.Of(0, 0, Width - 1, Height - 1);
+        var area = Rectangle.Of(0, 0, Width, Height);
         if (_kind == ShapeKind.Circle || _kind == ShapeKind.Square)
         {
             int side = area.Width < area.Height ? area.Width : area.Height;
