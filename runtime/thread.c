@@ -24,12 +24,10 @@
 /*
  * Threads, locks and the job pool.
  *
- * This is the foundation for docs/concurrency.md, and deliberately nothing
- * more: the language cannot reach any of it yet. Reference counting stays
- * non-atomic, which is only correct because the model above this layer never
- * lets two threads touch one object. The barrier that makes the handoff safe
- * is the scope mutex -- everything a job did happens-before the sl_scope_end
- * that observed its completion.
+ * This is the foundation for docs/concurrency.md and Standard.Threading.
+ * Reference counts are atomic, so the counts themselves are safe to share; the
+ * scope mutex is what publishes everything else a job wrote. Everything a job
+ * did happens-before the sl_scope_end that observed its completion.
  *
  * The pool is one shared queue behind one mutex. Work stealing would scale
  * further under contention, and is the obvious next change if a benchmark ever
@@ -48,6 +46,7 @@
 #  include <errno.h>
 #  include <pthread.h>
 #  include <sched.h>
+#  include <limits.h>
 #  include <time.h>
 #  include <unistd.h>
 #endif
@@ -165,12 +164,31 @@ void sl_mutex_unlock(SlMutex *mutex)
 #endif
 }
 
+/*
+ * A timed wait measures its deadline on the monotonic clock where the platform
+ * lets a condition say so, so setting the wall clock neither cuts a wait short
+ * nor stretches it. macOS has no pthread_condattr_setclock.
+ */
+#if !defined(_WIN32) && !defined(__APPLE__)
+#  define SL_CONDITION_CLOCK CLOCK_MONOTONIC
+#elif !defined(_WIN32)
+#  define SL_CONDITION_CLOCK CLOCK_REALTIME
+#endif
+
 void sl_condition_init(SlCondition *condition)
 {
 #ifdef _WIN32
     InitializeConditionVariable(AS_CONDITION(condition));
 #else
-    if (pthread_cond_init(AS_CONDITION(condition), NULL) != 0)
+    pthread_condattr_t attributes;
+    if (pthread_condattr_init(&attributes) != 0)
+        sl_fail("could not create a condition variable");
+#  ifndef __APPLE__
+    pthread_condattr_setclock(&attributes, SL_CONDITION_CLOCK);
+#  endif
+    int failed = pthread_cond_init(AS_CONDITION(condition), &attributes);
+    pthread_condattr_destroy(&attributes);
+    if (failed != 0)
         sl_fail("could not create a condition variable");
 #endif
 }
@@ -227,17 +245,28 @@ _Bool sl_condition_wait_for(SlCondition *condition, SlMutex *mutex,
     return GetLastError() != ERROR_TIMEOUT;
 #else
     /*
-     * pthread_cond_timedwait takes an absolute deadline on CLOCK_REALTIME,
-     * which is what a default-initialised condition uses.
+     * An absolute deadline on the clock sl_condition_init chose. One past what
+     * time_t can hold is clamped to its largest value, so a very long wait
+     * waits a very long time rather than none.
      */
     struct timespec deadline;
-    clock_gettime(CLOCK_REALTIME, &deadline);
+    clock_gettime(SL_CONDITION_CLOCK, &deadline);
 
-    deadline.tv_sec  += (time_t)(milliseconds / 1000ULL);
-    deadline.tv_nsec += (long)((milliseconds % 1000ULL) * 1000000ULL);
-    if (deadline.tv_nsec >= 1000000000L) {
-        deadline.tv_sec  += 1;
-        deadline.tv_nsec -= 1000000000L;
+    unsigned long long seconds = milliseconds / 1000ULL;
+    long nanoseconds = deadline.tv_nsec + (long)((milliseconds % 1000ULL) * 1000000ULL);
+    if (nanoseconds >= 1000000000L) {
+        seconds += 1;
+        nanoseconds -= 1000000000L;
+    }
+
+    /* time_t is signed, and 32 bits on some 32-bit targets. */
+    const time_t latest = sizeof(time_t) == 4 ? (time_t)INT32_MAX : (time_t)INT64_MAX;
+    if (deadline.tv_sec < 0 || seconds > (unsigned long long)(latest - deadline.tv_sec)) {
+        deadline.tv_sec  = latest;
+        deadline.tv_nsec = 999999999L;
+    } else {
+        deadline.tv_sec += (time_t)seconds;
+        deadline.tv_nsec = nanoseconds;
     }
 
     return pthread_cond_timedwait(AS_CONDITION(condition), AS_MUTEX(mutex),
@@ -606,12 +635,25 @@ void sl_thread_sleep(unsigned long long milliseconds)
     }
     Sleep((DWORD)milliseconds);
 #else
+    /* In spans time_t can hold, which on some 32-bit targets is 68 years. */
+    const unsigned long long longest = 0x7FFFFFFFULL;
+    unsigned long long seconds = milliseconds / 1000ULL;
+
     struct timespec span;
-    span.tv_sec  = (time_t)(milliseconds / 1000ULL);
     span.tv_nsec = (long)((milliseconds % 1000ULL) * 1000000ULL);
 
-    /* A signal cuts the sleep short and says how much was left. */
-    while (nanosleep(&span, &span) != 0 && errno == EINTR) { }
+    for (;;) {
+        unsigned long long step = seconds > longest ? longest : seconds;
+        span.tv_sec = (time_t)step;
+        seconds -= step;
+
+        /* A signal cuts the sleep short and says how much was left. */
+        while (nanosleep(&span, &span) != 0 && errno == EINTR) { }
+
+        if (seconds == 0)
+            break;
+        span.tv_nsec = 0;
+    }
 #endif
 }
 
@@ -731,8 +773,7 @@ static void run_task(SlTask task)
 
     /*
      * Completing under the scope lock is what publishes the job's writes to
-     * whoever is waiting in sl_scope_end. This is the barrier the non-atomic
-     * reference counts depend on.
+     * whoever is waiting in sl_scope_end.
      */
     SlScope *scope = task.scope;
     sl_mutex_lock(&scope->mutex);
@@ -859,6 +900,8 @@ SlScope *sl_scope_begin(void)
 
 void sl_scope_submit(SlScope *scope, SlJob job, void *argument)
 {
+    if (scope == NULL) sl_fail("a job was submitted to a TaskScope that has already joined");
+
     sl_mutex_lock(&scope->mutex);
     scope->pending += 1;
     sl_mutex_unlock(&scope->mutex);

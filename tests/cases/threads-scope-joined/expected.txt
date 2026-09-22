@@ -1,0 +1,2 @@
+joined
+stainless: a job was submitted to a TaskScope that has already joined
