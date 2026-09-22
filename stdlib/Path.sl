@@ -125,47 +125,75 @@ public String FileName(String path)
 
 /// Everything before the last part, without its trailing separator. A path
 /// with no separator gives the empty string.
+///
+/// A root keeps its separator, because without it the answer names somewhere
+/// else: `/foo` gives `/`, and on Windows `C:\foo` gives `C:\`, where `C:`
+/// alone would be that drive's current directory.
 public String DirectoryName(String path)
 {
     nuint at = AfterLastSeparator(path);
     if (at == 0)
         return "";
 
-    // Keep a lone leading separator, which is the root rather than nothing.
-    if (at == 1)
-        return path.Substring(0, 1);
+    if (at == 1 || IsDriveRoot(path, at))
+        return path.Substring(0, at);
     return path.Substring(0, at - 1);
 }
 
-/// The extension, with its dot: `notes.txt` gives `.txt`. No dot in the last
-/// part, or a dot that starts it, gives the empty string.
-public String Extension(String path)
+#if WINDOWS
+
+/// Whether the first `length` bytes are a drive letter's root, as in `C:\`.
+bool IsDriveRoot(String path, nuint length)
 {
-    var name = FileName(path);
+    return length == 3 && path.ToPointer()[1] == 58;
+}
+
+#else
+
+/// A drive letter is an ordinary name outside Windows.
+bool IsDriveRoot(String path, nuint length) => false;
+
+#endif
+
+/// Where the extension's dot is in the last part `name`, or the length of
+/// `name` when there is no dot. A dot that starts the name is not one.
+nuint ExtensionDotAt(String name)
+{
     var bytes = name.ToPointer();
     nuint size = name.ByteLength();
 
     for (nuint i = size; i > 1; i--)
     {
         if (bytes[i - 1] == 46)
-            return name.Substring(i - 1, size - i + 1);
+            return i - 1;
     }
-    return "";
+    return size;
 }
 
-/// The last part with its extension removed.
+/// The extension, with its dot: `notes.txt` gives `.txt`. No dot in the last
+/// part, a dot that starts it, or a dot that ends it gives the empty string.
+public String Extension(String path)
+{
+    var name = FileName(path);
+    nuint dot = ExtensionDotAt(name);
+    nuint size = name.ByteLength();
+    if (dot + 1 >= size)
+        return "";
+    return name.Substring(dot, size - dot);
+}
+
+/// The last part with its extension removed. A trailing dot goes with it.
 public String WithoutExtension(String path)
 {
     var name = FileName(path);
-    var suffix = Extension(name);
-    return name.Substring(0, name.ByteLength() - suffix.ByteLength());
+    return name.Substring(0, ExtensionDotAt(name));
 }
 
 /// The path with a different extension. `with` may be written with or without
-/// its leading dot.
+/// its leading dot. Nothing before the last part is touched.
 public String WithExtension(String path, String with)
 {
-    var stem = Join(DirectoryName(path), WithoutExtension(path));
+    var stem = path.Substring(0, AfterLastSeparator(path)) + WithoutExtension(path);
     if (with.ByteLength() == 0)
         return stem;
     if (with.ToPointer()[0] == 46)

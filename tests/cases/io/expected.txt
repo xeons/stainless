@@ -1,6 +1,6 @@
 join=a\b a/b a/b
 name=notes.txt dir=x/y
-ext=.txt stem=notes with=x\notes.md
+ext=.txt stem=notes with=x/notes.md
 noext= dotfile=
 rooted=1 1 0 parts=3
 memory=hello world length=11 position=11
