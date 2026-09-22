@@ -282,6 +282,10 @@ public extern "C"
     GtkWidget* gtk_window_new(gint type);
 
     void gtk_window_set_title(GtkWidget* window, gchar* title);
+
+    /// The title, **borrowed**, or null when none was set.
+    gchar* gtk_window_get_title(GtkWidget* window);
+
     void gtk_window_set_default_size(GtkWidget* window, gint width, gint height);
     void gtk_window_resize(GtkWidget* window, gint width, gint height);
     void gtk_window_move(GtkWidget* window, gint x, gint y);

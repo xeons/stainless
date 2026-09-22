@@ -343,6 +343,18 @@ public class GtkWindowPeer : GtkContainerPeer, IWindowPeer
 
     public void SetTitle(String title) => gtk_window_set_title(widget, title.ToPointer());
 
+    /// A window's text is its title, as it is on Win32, which is the route a
+    /// form's `Text` arrives by.
+    public override void SetText(String text) => SetTitle(text);
+
+    public override String GetText()
+    {
+        gchar* title = gtk_window_get_title(widget);
+        if (title == null)
+            return "";
+        return Text.FromNullTerminated(title);
+    }
+
     /// There is no resource section to read an icon out of; see
     /// `LoadBitmapResource` on the widget set for why this is a difference in
     /// the binary format rather than a gap in this backend. GTK takes an icon
