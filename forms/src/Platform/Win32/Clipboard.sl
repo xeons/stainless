@@ -477,7 +477,10 @@ uint MaskedChannel(uint value, uint mask)
 /// defaults, and 24 directly. Not the compressed forms: run-length encoding
 /// has not been put on a clipboard this century, and a DIB holding a PNG or a
 /// JPEG is something only a printer driver writes.
-ClipboardImage? DecodeDib(byte[] dib)
+///
+/// Public because it is what another program's bytes meet first, and so what
+/// a test has to be able to hand bytes to without going through a clipboard.
+public ClipboardImage? DecodeDib(byte[] dib)
 {
     if (dib.Length < 40u)
         return null;
@@ -531,25 +534,6 @@ ClipboardImage? DecodeDib(byte[] dib)
         blue = 0x001Fu;
     }
 
-    nuint stride = (((nuint)width * (nuint)depth + 31u) / 32u) * 4u;
-
-    // A `CF_DIBV5` that Windows synthesised from a bit-fields `CF_DIB` carries
-    // the masks twice: inside the header, and again after it, as though the
-    // header were the short one. Taken as such only when they repeat and there
-    // is room for them, since a pixel could happen to look like a mask.
-    if (masked && header > 40u && header + 12u + stride * (nuint)height <= dib.Length
-        && UIntAt(dib, header) == red && UIntAt(dib, header + 4u) == green
-        && UIntAt(dib, header + 8u) == blue)
-    {
-        maskBytes = 12u;
-    }
-
-    nuint paletteSize = 0u;
-    if (depth <= 8u)
-        paletteSize = coloursUsed != 0u ? (nuint)coloursUsed : (nuint)1u << (nuint)depth;
-    nuint palette = header + maskBytes;
-    nuint offset = palette + paletteSize * 4u;
-
     switch (depth)
     {
         case 1u:
@@ -563,7 +547,36 @@ ClipboardImage? DecodeDib(byte[] dib)
             return null;
     }
 
-    if (offset + stride * (nuint)height > dib.Length)
+    // Every size below is checked by division against what is there, so a
+    // header claiming more rows than the data holds cannot wrap a product.
+    nuint stride = (((nuint)width * (nuint)depth + 31u) / 32u) * 4u;
+    if ((nuint)height > dib.Length / stride)
+        return null;
+    nuint bits = stride * (nuint)height;
+
+    // A `CF_DIBV5` that Windows synthesised from a bit-fields `CF_DIB` carries
+    // the masks twice: inside the header, and again after it, as though the
+    // header were the short one. Taken as such only when they repeat and there
+    // is room for them, since a pixel could happen to look like a mask.
+    if (masked && header > 40u && header + 12u + bits <= dib.Length
+        && UIntAt(dib, header) == red && UIntAt(dib, header + 4u) == green
+        && UIntAt(dib, header + 8u) == blue)
+    {
+        maskBytes = 12u;
+    }
+
+    // A colour table always comes before the pixels when `biClrUsed` says it
+    // is there -- above eight bits too, where it is only a hint for a palette
+    // display and the pixels do not index it.
+    nuint paletteSize = (nuint)coloursUsed;
+    if (depth <= 8u && paletteSize == 0u)
+        paletteSize = (nuint)1u << (nuint)depth;
+    nuint palette = header + maskBytes;
+    if (palette > dib.Length || paletteSize > (dib.Length - palette) / 4u)
+        return null;
+    nuint offset = palette + paletteSize * 4u;
+
+    if (bits > dib.Length - offset)
         return null;
 
     var pixels = new byte[(nuint)width * (nuint)height * 4u];
