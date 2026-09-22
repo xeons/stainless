@@ -868,6 +868,14 @@ here at all. Where one is a backend's rather than the library's, it says so.
   call, which cannot leak and is slower than it needs to be.
 - **`BorderSpacing` and `ChildSizing` are absent.** The LCL's finer layout
   controls; only `Dock` and `Anchors` are here.
+- **A handler that names its form keeps the form alive.** A parent holds its
+  children and a child holds its parent weakly, so a form is freed with
+  everything on it once it has closed — unless a control's event holds a
+  closure over the form, as `button.Click += this.OnClick` does. That is a
+  cycle through the form's own child, and it stands until the handler is
+  removed with `-=`. Breaking it from here needs a way for a class to drop its
+  own event's subscribers, which the language does not have: `=` on an event is
+  SL0556 even inside the declaring class.
 - **`Application` and `WidgetSet` hold static state and warn (SL0377).** A GUI
   toolkit is *thread-affine* — one thread owns the widgets — which is true of
   WinForms, WPF, GTK and Cocoa alike. Stainless can say `threadsafe`, which

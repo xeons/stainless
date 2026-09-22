@@ -255,6 +255,7 @@ public static class Application
     static void Unregister(Form form, bool wasModal)
     {
         Remove(form);
+        ReleaseLater(form);
         if (wasModal)
             return;
         foreach (var open in s_open)
@@ -264,6 +265,19 @@ public static class Application
         }
         Quit();
     }
+
+    /// Keeps a closed form alive until the loop's next turn.
+    ///
+    /// The register may hold its last reference, and the close is reported
+    /// from inside the handlers of its own window. Freeing it there would
+    /// destroy that window a second time while the platform is still
+    /// destroying it.
+    static void ReleaseLater(Form form)
+    {
+        Post(() => { Application.KeepUntilDrained(form); });
+    }
+
+    static void KeepUntilDrained(Form form) { }
 
     /// Called by a form that became the active window.
     static void NoteActivated(Form form)

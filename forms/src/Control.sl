@@ -222,9 +222,15 @@ public enum AnchorStyles
 /// Reading `Bounds` answers where it is. The request is kept apart from the
 /// answer, so a parent squeezed to nothing and grown again gives every child
 /// back the size it asked for.
+///
+/// **The parent is held weakly** and the children strongly, so a form and
+/// everything on it are freed together once nothing else holds the form.
+/// An event handler is a closure, and one that names the form -- the usual
+/// `child.Click += this.OnClick` -- holds the form from inside its own child.
+/// That form is not freed until the handler is removed with `-=`.
 public abstract class Control : IControlNotify
 {
-    WindowedControl? _owner;
+    weak WindowedControl? _owner;
     /// Where the control is.
     Rectangle _area;
     /// Where the program asked for it to be. The layout reads this and writes
