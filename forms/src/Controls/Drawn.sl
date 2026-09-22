@@ -277,7 +277,7 @@ public class Splitter : GraphicControl
         Dock = DockStyle.Left;
         Width = 5;
         Height = 5;
-        Cursor = CursorKind.SizeWestEast;
+        ChooseCursor();
     }
 
     /// The smallest the neighbour may be dragged to.
@@ -287,8 +287,8 @@ public class Splitter : GraphicControl
         set => _smallest = value;
     }
 
-    /// Which control this splitter resizes: the one docked to the same edge
-    /// immediately before it.
+    /// Which control this splitter resizes: the visible one docked to the same
+    /// edge immediately before it.
     Control? Neighbour()
     {
         var parent = Parent;
@@ -300,13 +300,59 @@ public class Splitter : GraphicControl
         {
             if (child == this)
                 return previous;
-            if (child.Dock == Dock)
+            if (child.Dock == Dock && child.Visible)
                 previous = child;
         }
         return null;
     }
 
     bool _Horizontal => Dock == DockStyle.Left || Dock == DockStyle.Right;
+
+    /// The largest the neighbour may be dragged to: the parent's extent less
+    /// every other visible control docked on the same axis, this one included.
+    /// Beyond it the neighbour would push the splitter out of the parent.
+    int LargestFor(Control beside)
+    {
+        var parent = Parent;
+        if (parent == null)
+            return _smallest;
+        var holder = (WindowedControl)parent;
+        var room = holder.ClientBounds;
+        int most = _Horizontal ? room.Width : room.Height;
+        foreach (var child in holder.Controls)
+        {
+            if (child == beside || !child.Visible)
+                continue;
+            var edge = child.Dock;
+            if (_Horizontal && (edge == DockStyle.Left || edge == DockStyle.Right))
+                most -= child.Width;
+            if (!_Horizontal && (edge == DockStyle.Top || edge == DockStyle.Bottom))
+                most -= child.Height;
+        }
+        return most;
+    }
+
+    /// The cursor follows the axis, which follows `Dock`. Asked on a resize
+    /// and when the pointer arrives: `Dock` tells nothing it changed, and
+    /// changing it need not change this control's size.
+    void ChooseCursor()
+    {
+        var wanted = _Horizontal ? CursorKind.SizeWestEast : CursorKind.SizeNorthSouth;
+        if (Cursor != wanted)
+            Cursor = wanted;
+    }
+
+    protected override void OnResize()
+    {
+        base.OnResize();
+        ChooseCursor();
+    }
+
+    protected override void OnMouseEnter()
+    {
+        ChooseCursor();
+        base.OnMouseEnter();
+    }
 
     protected override void OnMouseDown(MouseEventArgs args)
     {
@@ -340,11 +386,14 @@ public class Splitter : GraphicControl
         if (Dock == DockStyle.Right || Dock == DockStyle.Bottom)
             moved = -moved;
 
+        var control = (Control)beside;
         int wanted = _startedAt + moved;
+        int most = LargestFor(control);
+        if (wanted > most)
+            wanted = most;
         if (wanted < _smallest)
             wanted = _smallest;
 
-        var control = (Control)beside;
         if (_Horizontal)
         {
             control.Width = wanted;
