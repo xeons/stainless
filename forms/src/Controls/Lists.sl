@@ -92,17 +92,19 @@ public abstract class ListControl : WindowedControl
     }
 
     /// Puts one in at a position, moving the rest along.
+    ///
+    /// The list here goes first: it is the one that checks the index.
     public void Insert(nuint index, String text)
     {
-        List.InsertItem((int)index, text);
         _entries.Insert(index, text);
+        List.InsertItem((int)index, text);
     }
 
     /// Removes one.
     public void RemoveAt(nuint index)
     {
-        List.RemoveItem((int)index);
         _entries.RemoveAt(index);
+        List.RemoveItem((int)index);
     }
 
     /// Removes them all.
