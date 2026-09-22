@@ -164,6 +164,47 @@ static const char *mode_string(int32_t mode, int32_t access)
     }
 }
 
+/*
+ * An open file. C lets one FILE* read and write, but a read MUST NOT follow a
+ * write, nor a write a read, without a flush or a seek between them; without
+ * one the second operation silently does nothing. `last` is which direction
+ * the stream moved last, so the switch can be made for the caller.
+ */
+enum { SL_MOVED_NONE = 0, SL_MOVED_READ = 1, SL_MOVED_WRITE = 2 };
+
+typedef struct SlFile {
+    FILE *file;
+    int   last;
+} SlFile;
+
+static int seek_file(FILE *file, int64_t offset, int whence)
+{
+#ifdef _WIN32
+    return _fseeki64(file, offset, whence);
+#else
+    return fseeko(file, (off_t)offset, whence);
+#endif
+}
+
+static int64_t tell_file(FILE *file)
+{
+#ifdef _WIN32
+    return _ftelli64(file);
+#else
+    return (int64_t)ftello(file);
+#endif
+}
+
+/* Makes the stream ready to move in `direction`. False when it cannot be. */
+static _Bool turn_file(SlFile *stream, int direction)
+{
+    if (stream->last != SL_MOVED_NONE && stream->last != direction) {
+        if (seek_file(stream->file, 0, SEEK_CUR) != 0) return 0;
+    }
+    stream->last = direction;
+    return 1;
+}
+
 void *sl_file_open(const uint8_t *path, int32_t mode, int32_t access, int32_t *error)
 {
     const char *modes = mode_string(mode, access);
@@ -195,13 +236,32 @@ void *sl_file_open(const uint8_t *path, int32_t mode, int32_t access, int32_t *e
         return NULL;
     }
 
+    SlFile *stream = (SlFile *)malloc(sizeof(SlFile));
+    if (stream == NULL) sl_fail("out of memory");
+    stream->file = file;
+    stream->last = SL_MOVED_NONE;
+
     report(error, SL_IO_OK);
-    return file;
+    return stream;
 }
 
-void sl_file_close(void *handle)
+/*
+ * Closes the file and reports how that went. A write the system accepted into
+ * a buffer can still fail here -- a full disk, a network share gone away -- so
+ * the answer is the last word on whether the data arrived.
+ */
+int32_t sl_file_close(void *handle)
 {
-    if (handle != NULL) fclose((FILE *)handle);
+    if (handle == NULL) return SL_IO_CLOSED;
+
+    SlFile *stream = (SlFile *)handle;
+    errno = 0;
+    int result = fclose(stream->file);
+    int code = errno;
+    free(stream);
+
+    if (result == 0) return SL_IO_OK;
+    return code == 0 ? SL_IO_UNKNOWN : from_errno(code);
 }
 
 size_t sl_file_read(void *handle, uint8_t *buffer, size_t count, int32_t *error)
@@ -211,12 +271,18 @@ size_t sl_file_read(void *handle, uint8_t *buffer, size_t count, int32_t *error)
         return 0;
     }
 
-    FILE  *file = (FILE *)handle;
-    size_t read = fread(buffer, 1, count, file);
+    SlFile *stream = (SlFile *)handle;
+    errno = 0;
+    if (!turn_file(stream, SL_MOVED_READ)) {
+        report(error, errno == 0 ? SL_IO_UNKNOWN : from_errno(errno));
+        return 0;
+    }
 
-    if (read < count && ferror(file)) {
-        report(error, SL_IO_UNKNOWN);
-        clearerr(file);
+    size_t read = fread(buffer, 1, count, stream->file);
+
+    if (read < count && ferror(stream->file)) {
+        report(error, errno == 0 ? SL_IO_UNKNOWN : from_errno(errno));
+        clearerr(stream->file);
         return read;
     }
 
@@ -224,6 +290,7 @@ size_t sl_file_read(void *handle, uint8_t *buffer, size_t count, int32_t *error)
     return read;
 }
 
+/* Fewer bytes than asked for is always a failure, and says why when C does. */
 size_t sl_file_write(void *handle, const uint8_t *buffer, size_t count, int32_t *error)
 {
     if (handle == NULL) {
@@ -231,12 +298,18 @@ size_t sl_file_write(void *handle, const uint8_t *buffer, size_t count, int32_t 
         return 0;
     }
 
-    FILE  *file = (FILE *)handle;
-    size_t written = fwrite(buffer, 1, count, file);
+    SlFile *stream = (SlFile *)handle;
+    errno = 0;
+    if (!turn_file(stream, SL_MOVED_WRITE)) {
+        report(error, errno == 0 ? SL_IO_UNKNOWN : from_errno(errno));
+        return 0;
+    }
+
+    size_t written = fwrite(buffer, 1, count, stream->file);
 
     if (written < count) {
-        report(error, ferror(file) ? SL_IO_UNKNOWN : SL_IO_OK);
-        clearerr(file);
+        report(error, errno == 0 ? SL_IO_UNKNOWN : from_errno(errno));
+        clearerr(stream->file);
         return written;
     }
 
@@ -252,33 +325,24 @@ int64_t sl_file_seek(void *handle, int64_t offset, int32_t origin, int32_t *erro
         return -1;
     }
 
+    SlFile *stream = (SlFile *)handle;
     int whence = origin == 1 ? SEEK_CUR : origin == 2 ? SEEK_END : SEEK_SET;
 
-#ifdef _WIN32
-    if (_fseeki64((FILE *)handle, offset, whence) != 0) {
+    if (seek_file(stream->file, offset, whence) != 0) {
         report(error, SL_IO_INVALID);
         return -1;
     }
+
+    /* A seek is the separation C asks for, so either direction may follow. */
+    stream->last = SL_MOVED_NONE;
     report(error, SL_IO_OK);
-    return _ftelli64((FILE *)handle);
-#else
-    if (fseeko((FILE *)handle, (off_t)offset, whence) != 0) {
-        report(error, SL_IO_INVALID);
-        return -1;
-    }
-    report(error, SL_IO_OK);
-    return (int64_t)ftello((FILE *)handle);
-#endif
+    return tell_file(stream->file);
 }
 
 int64_t sl_file_position(void *handle)
 {
     if (handle == NULL) return -1;
-#ifdef _WIN32
-    return _ftelli64((FILE *)handle);
-#else
-    return (int64_t)ftello((FILE *)handle);
-#endif
+    return tell_file(((SlFile *)handle)->file);
 }
 
 /* The length, found by seeking to the end and back. */
@@ -295,9 +359,14 @@ int64_t sl_file_length(void *handle)
     return length;
 }
 
-void sl_file_flush(void *handle)
+/* Pushes buffered writes to the system, and reports whether it took them. */
+int32_t sl_file_flush(void *handle)
 {
-    if (handle != NULL) fflush((FILE *)handle);
+    if (handle == NULL) return SL_IO_CLOSED;
+
+    errno = 0;
+    if (fflush(((SlFile *)handle)->file) == 0) return SL_IO_OK;
+    return errno == 0 ? SL_IO_UNKNOWN : from_errno(errno);
 }
 
 /* ------------------------------------------------------------------ paths */

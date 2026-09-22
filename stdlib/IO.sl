@@ -41,13 +41,13 @@ import Standard.Collections;
 extern "C"
 {
     byte* sl_file_open(byte* path, int mode, int access, int* error);
-    void  sl_file_close(byte* handle);
+    int   sl_file_close(byte* handle);
     nuint sl_file_read(byte* handle, byte* buffer, nuint count, int* error);
     nuint sl_file_write(byte* handle, byte* buffer, nuint count, int* error);
     long  sl_file_seek(byte* handle, long offset, int origin, int* error);
     long  sl_file_position(byte* handle);
     long  sl_file_length(byte* handle);
-    void  sl_file_flush(byte* handle);
+    int   sl_file_flush(byte* handle);
 }
 
 // ------------------------------------------------------------------ errors
@@ -413,20 +413,24 @@ public class FileStream : IStream
     /// Pushes buffered bytes to the system. Not the same as reaching the
     /// disk -- the system's own cache is still in front of it -- so this is
     /// what makes a write visible to other processes, not what makes it
-    /// survive a power cut.
+    /// survive a power cut. `Error` says whether the system took them.
     public void Flush()
     {
         if (!_closed)
-            sl_file_flush(_handle);
+            _error = (IOError)sl_file_flush(_handle);
     }
 
     /// Closes the file. Calling it twice is harmless, which matters because the
     /// destructor calls it too.
+    ///
+    /// Bytes still buffered are written here, so a write can fail here: a
+    /// caller that needs to know its data arrived MUST read `Error` after the
+    /// first `Close`. A second call leaves it alone.
     public void Close()
     {
         if (_closed)
             return;
-        sl_file_close(_handle);
+        _error = (IOError)sl_file_close(_handle);
         _handle = null;
         _closed = true;
     }

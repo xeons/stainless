@@ -575,13 +575,13 @@ SL_API char    *sl_narrow(const wchar_t *wide);
  * declares, rather than as errno.
  */
 SL_API void   *sl_file_open(const uint8_t *path, int32_t mode, int32_t access, int32_t *error);
-SL_API void    sl_file_close(void *handle);
+SL_API int32_t sl_file_close(void *handle);
 SL_API size_t  sl_file_read(void *handle, uint8_t *buffer, size_t count, int32_t *error);
 SL_API size_t  sl_file_write(void *handle, const uint8_t *buffer, size_t count, int32_t *error);
 SL_API int64_t sl_file_seek(void *handle, int64_t offset, int32_t origin, int32_t *error);
 SL_API int64_t sl_file_position(void *handle);
 SL_API int64_t sl_file_length(void *handle);
-SL_API void    sl_file_flush(void *handle);
+SL_API int32_t sl_file_flush(void *handle);
 
 SL_API _Bool   sl_path_exists(const uint8_t *path);
 SL_API _Bool   sl_path_is_directory(const uint8_t *path);

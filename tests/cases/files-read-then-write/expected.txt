@@ -1,0 +1,4 @@
+read 2
+wrote 2, error no error
+read 2 EF
+file ABxyEFGH

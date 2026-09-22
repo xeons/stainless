@@ -151,6 +151,18 @@ public Result<List<String>, IOError> ReadAllLines(String path)
 
 // ------------------------------------------------------------------ writing
 
+/// Closes a file that was written, and answers the first thing that went wrong:
+/// the write's own error, or else the close's, which is where a full disk
+/// shows up for bytes that were still buffered.
+IOError CloseWrittenFile(FileStream file)
+{
+    var failure = file.Error;
+    file.Close();
+    if (failure != IOError.None)
+        return failure;
+    return file.Error;
+}
+
 /// Replaces the file with `data`, creating it if needed.
 public IOError WriteAllBytes(String path, byte[] data)
 {
@@ -159,11 +171,8 @@ public IOError WriteAllBytes(String path, byte[] data)
         return opened.Error;
 
     var file = opened.Value;
-
     file.Write(data, 0, data.Length);
-    var failure = file.Error;
-    file.Close();
-    return failure;
+    return CloseWrittenFile(file);
 }
 
 /// Replaces the file with `text`, written as UTF-8.
@@ -174,14 +183,12 @@ public IOError WriteAllText(String path, String text)
         return opened.Error;
 
     var file = opened.Value;
-
     file.WriteText(text);
-    var failure = file.Error;
-    file.Close();
-    return failure;
+    return CloseWrittenFile(file);
 }
 
-/// Writes the lines, each followed by a newline.
+/// Writes the lines, each followed by a newline. Stops at the first write that
+/// fails.
 public IOError WriteAllLines(String path, IReadOnlyList<String> lines)
 {
     var opened = FileStream.Create(path);
@@ -189,16 +196,17 @@ public IOError WriteAllLines(String path, IReadOnlyList<String> lines)
         return opened.Error;
 
     var file = opened.Value;
-
     for (nuint i = 0; i < lines.Count; i++)
     {
         file.WriteText(lines[i]);
-        file.WriteText("\n");
-    }
+        if (file.Error != IOError.None)
+            break;
 
-    var failure = file.Error;
-    file.Close();
-    return failure;
+        file.WriteText("\n");
+        if (file.Error != IOError.None)
+            break;
+    }
+    return CloseWrittenFile(file);
 }
 
 /// Adds `text` to the end, creating the file if it is not there.
@@ -209,11 +217,8 @@ public IOError AppendText(String path, String text)
         return opened.Error;
 
     var file = opened.Value;
-
     file.WriteText(text);
-    var failure = file.Error;
-    file.Close();
-    return failure;
+    return CloseWrittenFile(file);
 }
 
 /// Copies a file. Reads it whole, so this is for ordinary files rather than
