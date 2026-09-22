@@ -446,17 +446,22 @@ public class Notebook : Panel
         if (!found)
             return false;
 
+        var showing = SelectedPage;
         list.RemoveAt(at);
         page.Visible = false;
         for (nuint i = at; i < list.Count; i++)
             list[i].Renumber((int)i);
 
-        // Removing the page that was showing moves the selection to whatever
-        // took its place, or to the last page when it was the last.
+        // A page in front of the one showing moves it down by one. Removing
+        // the one showing selects whatever took its place, or the last page
+        // when it was the last.
+        if ((int)at < _chosen)
+            _chosen--;
         if (_chosen >= (int)list.Count)
             _chosen = (int)list.Count - 1;
         ShowOnly();
-        OnSelectedIndexChanged();
+        if (showing == page)
+            OnSelectedIndexChanged();
         return true;
     }
 

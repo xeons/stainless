@@ -703,6 +703,7 @@ public class TabControl : WindowedControl
         if (!found)
             return false;
 
+        var showing = SelectedPage;
         _native.RemoveTab((int)at);
         _pages.RemoveAt(at);
         page.Visible = false;
@@ -719,7 +720,8 @@ public class TabControl : WindowedControl
             _native.SetSelectedTab(chosen);
         }
         ShowOnly(_native.GetSelectedTab());
-        OnSelectedIndexChanged();
+        if (showing == page)
+            OnSelectedIndexChanged();
         return true;
     }
 
