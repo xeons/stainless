@@ -22,7 +22,7 @@ String ArgumentAt(nuint index)
 
 One argument, counting from zero. Aborts past the end, as an array does.
 
-<sub>[stdlib/Env.sl:86](../../stdlib/Env.sl#L86)</sub>
+<sub>[stdlib/Env.sl:89](../../stdlib/Env.sl#L89)</sub>
 
 ### ArgumentCount *function*
 
@@ -32,7 +32,7 @@ nuint ArgumentCount()
 
 How many arguments the program was given, not counting its own name.
 
-<sub>[stdlib/Env.sl:83](../../stdlib/Env.sl#L83)</sub>
+<sub>[stdlib/Env.sl:86](../../stdlib/Env.sl#L86)</sub>
 
 ### Arguments *function*
 
@@ -42,7 +42,7 @@ String[] Arguments()
 
 Every argument, as an array. The same thing `Main(String[] args)` receives.
 
-<sub>[stdlib/Env.sl:94](../../stdlib/Env.sl#L94)</sub>
+<sub>[stdlib/Env.sl:97](../../stdlib/Env.sl#L97)</sub>
 
 ### CurrentDirectory *function*
 
@@ -52,7 +52,7 @@ String CurrentDirectory()
 
 The directory relative paths are resolved against.
 
-<sub>[stdlib/Env.sl:272](../../stdlib/Env.sl#L272)</sub>
+<sub>[stdlib/Env.sl:282](../../stdlib/Env.sl#L282)</sub>
 
 ### Get *function*
 
@@ -66,7 +66,7 @@ Null rather than empty, because "not set" and "set to nothing" are
 different states and both platforms can tell them apart. `GetOr` is what
 most callers want.
 
-<sub>[stdlib/Env.sl:116](../../stdlib/Env.sl#L116)</sub>
+<sub>[stdlib/Env.sl:119](../../stdlib/Env.sl#L119)</sub>
 
 ### GetOr *function*
 
@@ -76,7 +76,7 @@ String GetOr(String name, String fallback)
 
 A variable's value, or `fallback` when it is not set.
 
-<sub>[stdlib/Env.sl:144](../../stdlib/Env.sl#L144)</sub>
+<sub>[stdlib/Env.sl:158](../../stdlib/Env.sl#L158)</sub>
 
 ### Has *function*
 
@@ -86,7 +86,7 @@ bool Has(String name)
 
 Whether a variable is set, whatever it is set to.
 
-<sub>[stdlib/Env.sl:153](../../stdlib/Env.sl#L153)</sub>
+<sub>[stdlib/Env.sl:167](../../stdlib/Env.sl#L167)</sub>
 
 ### Names *function*
 
@@ -100,7 +100,7 @@ The block is one run of NUL-terminated wide strings ending in an empty one.
 A name beginning with `=` is Windows' per-drive working directory (`=C:`),
 which is not a variable anybody set.
 
-<sub>[stdlib/Env.sl:196](../../stdlib/Env.sl#L196)</sub>
+<sub>[stdlib/Env.sl:206](../../stdlib/Env.sl#L206)</sub>
 
 ### Program *function*
 
@@ -112,7 +112,7 @@ The program's own path, as the operating system gave it. That is not
 necessarily where the executable is: a shell may pass a bare name, and on
 Linux nothing guarantees any relationship at all.
 
-<sub>[stdlib/Env.sl:106](../../stdlib/Env.sl#L106)</sub>
+<sub>[stdlib/Env.sl:109](../../stdlib/Env.sl#L109)</sub>
 
 ### Remove *function*
 
@@ -123,7 +123,7 @@ bool Remove(String name)
 Removes a variable, reporting whether the platform accepted it. Removing
 one that was never set is not a failure.
 
-<sub>[stdlib/Env.sl:171](../../stdlib/Env.sl#L171)</sub>
+<sub>[stdlib/Env.sl:181](../../stdlib/Env.sl#L181)</sub>
 
 ### Set *function*
 
@@ -137,14 +137,10 @@ It does not reach the shell that started this program: a process's
 environment is its own, and a child gets a copy. Reports whether the
 platform accepted it.
 
-**An empty value is not portable.** On Windows, setting a variable to the
-empty string removes it -- `SetEnvironmentVariable` defines it that way,
-and there is no way around it. On Unix the variable exists and is empty.
-A program that needs the distinction should not encode it in a variable's
-value; a program that reads one should use `GetOr` and treat empty and
-unset alike.
+An empty value leaves the variable set and empty, on both platforms, and
+`Get` answers with the empty string rather than null.
 
-<sub>[stdlib/Env.sl:167](../../stdlib/Env.sl#L167)</sub>
+<sub>[stdlib/Env.sl:177](../../stdlib/Env.sl#L177)</sub>
 
 ### SetCurrentDirectory *function*
 
@@ -155,5 +151,5 @@ bool SetCurrentDirectory(String path)
 Changes it, reporting whether the platform accepted it. It fails when the
 path is not a directory, or is not reachable.
 
-<sub>[stdlib/Env.sl:290](../../stdlib/Env.sl#L290)</sub>
+<sub>[stdlib/Env.sl:300](../../stdlib/Env.sl#L300)</sub>
 

@@ -13,6 +13,7 @@ gone      = 1
 fallback  = <missing>
 emptyOk   = 1
 emptyRead = 0
+emptyHas  = 1
 names     = 1
 cwd       = 1
 moon      = 1969-07-20T20:17:40Z

@@ -42,13 +42,10 @@ int Main(String[] args)
     printf("gone      = %d\n", !Env.Has("SL_TEST_VARIABLE"));
     printf("fallback  = %s\n", Env.GetOr("SL_TEST_VARIABLE", "<missing>").ToPointer());
 
-    // An empty value is where the platforms part company: Windows treats
-    // setting one as removal, Unix keeps an empty variable. So what is checked
-    // is the part both agree on -- that it is accepted, and that reading it
-    // back gives nothing either way, which is why the library says to treat
-    // empty and unset alike.
+    // Set to nothing is still set, on both platforms.
     printf("emptyOk   = %d\n", Env.Set("SL_TEST_EMPTY", ""));
-    printf("emptyRead = %llu\n", (ulong)Env.GetOr("SL_TEST_EMPTY", "").ByteLength());
+    printf("emptyRead = %llu\n", (ulong)Env.GetOr("SL_TEST_EMPTY", "<missing>").ByteLength());
+    printf("emptyHas  = %d\n", Env.Has("SL_TEST_EMPTY"));
     Env.Remove("SL_TEST_EMPTY");
 
     printf("names     = %d\n", Env.Names().Length > 0u);

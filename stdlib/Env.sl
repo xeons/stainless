@@ -52,6 +52,9 @@ extern "C" __stdcall
     uint GetEnvironmentVariableW(char16* name, char16* buffer, uint size);
     int  SetEnvironmentVariableW(char16* name, char16* value);
 
+    uint GetLastError();
+    void SetLastError(uint code);
+
     char16* GetEnvironmentStringsW();
     int     FreeEnvironmentStringsW(char16* block);
 
@@ -117,19 +120,30 @@ public String? Get(String name)
 {
     var wanted = name.ToUtf16();
 
-    // Asked twice: once for the size, once for the value. A variable that grew
-    // in between would be truncated, so the second call's own answer decides.
+    // The size, terminator included, and then the value. A variable that grew
+    // in between answers with the size it needs now, and is asked again. One
+    // set to nothing has a size of 1 and reads as 0 units with no error.
     uint units = GetEnvironmentVariableW(wanted.ToPointer(), null, 0u);
-    if (units == 0u)
-        return null;
+    while (units != 0u)
+    {
+        var buffer = new char16[(nuint)units];
+        SetLastError(0u);
+        uint written = GetEnvironmentVariableW(wanted.ToPointer(), &buffer[0], units);
 
-    var buffer = new char16[(nuint)units];
-    uint written = GetEnvironmentVariableW(wanted.ToPointer(), &buffer[0], units);
-    if (written == 0u || written >= units)
-        return null;
+        if (written < units)
+        {
+            if (written == 0u && GetLastError() == ErrorVariableNotFound)
+                return null;
+            return FromUtf16(&buffer[0], (nuint)written);
+        }
 
-    return FromUtf16(&buffer[0], (nuint)written);
+        units = written;
+    }
+    return null;
 }
+
+/// ERROR_ENVVAR_NOT_FOUND.
+const uint ErrorVariableNotFound = 203u;
 #else
 public String? Get(String name)
 {
@@ -158,12 +172,8 @@ public bool Has(String name) => Get(name) != null;
 /// environment is its own, and a child gets a copy. Reports whether the
 /// platform accepted it.
 ///
-/// **An empty value is not portable.** On Windows, setting a variable to the
-/// empty string removes it -- `SetEnvironmentVariable` defines it that way,
-/// and there is no way around it. On Unix the variable exists and is empty.
-/// A program that needs the distinction should not encode it in a variable's
-/// value; a program that reads one should use `GetOr` and treat empty and
-/// unset alike.
+/// An empty value leaves the variable set and empty, on both platforms, and
+/// `Get` answers with the empty string rather than null.
 public bool Set(String name, String value) => Store(name, value);
 
 /// Removes a variable, reporting whether the platform accepted it. Removing
