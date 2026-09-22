@@ -29,7 +29,7 @@ class Harness
             Failures++;
     }
 
-    public void Same(String what, String expected, String actual)
+    public void CheckSame(String what, String expected, String actual)
     {
         bool passed = expected == actual;
         Console.WriteLine((passed ? "  ok   " : "  FAIL ") + what);
@@ -41,9 +41,9 @@ class Harness
         }
     }
 
-    public void SameNumber(String what, long expected, long actual)
+    public void CheckSameNumber(String what, long expected, long actual)
     {
-        Same(what, Standard.Text.FromInteger(expected), Standard.Text.FromInteger(actual));
+        CheckSame(what, Standard.Text.FromInteger(expected), Standard.Text.FromInteger(actual));
     }
 }
 
@@ -51,33 +51,33 @@ int Main()
 {
     var harness = new Harness();
 
-    Defaults(harness);
-    Placing(harness);
-    Ordering(harness);
-    RoundTrips(harness);
-    Refuses(harness);
-    Survives(harness);
+    TestDefaults(harness);
+    TestPlacing(harness);
+    TestOrdering(harness);
+    TestRoundTrip(harness);
+    TestRefusing(harness);
+    TestSurviving(harness);
 
     Console.WriteLine(harness.Failures == 0u ? "all checks passed" : "checks FAILED");
     return harness.Failures == 0u ? 0 : 1;
 }
 
-void Defaults(Harness harness)
+void TestDefaults(Harness harness)
 {
     Console.WriteLine("the arrangement a first run gets");
 
     var layout = DockLayout.CreateDefault();
-    harness.SameNumber("three panes are placed", 3, (long)layout.Places.Count);
-    harness.SameNumber("one on the left", 1, (long)layout.Count(DockEdge.Left));
-    harness.SameNumber("two at the bottom", 2, (long)layout.Count(DockEdge.Bottom));
+    harness.CheckSameNumber("three panes are placed", 3, (long)layout.Places.Count);
+    harness.CheckSameNumber("one on the left", 1, (long)layout.Count(DockEdge.Left));
+    harness.CheckSameNumber("two at the bottom", 2, (long)layout.Count(DockEdge.Bottom));
 
     // The default names only panes the window actually builds. Properties has
     // a constant but no place, so nobody's settings file carries a line for a
     // pane they cannot see.
     harness.Check("and a pane that does not exist yet is not placed",
                   layout.Find(Panes.Properties) == null);
-    harness.SameNumber("so the right well is empty", 0,
-                       (long)layout.Count(DockEdge.Right));
+    harness.CheckSameNumber("so the right well is empty", 0,
+                            (long)layout.Count(DockEdge.Right));
 
     var solution = layout.Find(Panes.Solution);
     harness.Check("the tree is on the left", solution != null
@@ -90,22 +90,22 @@ void Defaults(Harness harness)
     harness.Check("a pane nobody placed is not found", layout.Find("toolbox") == null);
 }
 
-void Placing(Harness harness)
+void TestPlacing(Harness harness)
 {
     Console.WriteLine("moving a pane");
 
     var layout = DockLayout.CreateDefault();
     layout.PlacePane(Panes.Solution, DockEdge.Bottom, false);
 
-    harness.SameNumber("still three panes", 3, (long)layout.Places.Count);
-    harness.SameNumber("the left well is empty", 0, (long)layout.Count(DockEdge.Left));
-    harness.SameNumber("and the bottom has three", 3, (long)layout.Count(DockEdge.Bottom));
+    harness.CheckSameNumber("still three panes", 3, (long)layout.Places.Count);
+    harness.CheckSameNumber("the left well is empty", 0, (long)layout.Count(DockEdge.Left));
+    harness.CheckSameNumber("and the bottom has three", 3, (long)layout.Count(DockEdge.Bottom));
 
     var moved = layout.Find(Panes.Solution);
     harness.Check("unpinned where it was put", moved != null && !((DockPlacement)moved).IsPinned);
 }
 
-void Ordering(Harness harness)
+void TestOrdering(Harness harness)
 {
     Console.WriteLine("the order within a well");
 
@@ -122,13 +122,13 @@ void Ordering(Harness harness)
     second.Order = 0u;
 
     var ordered = layout.GetPlacementsOn(DockEdge.Bottom);
-    harness.SameNumber("three on the edge", 3, (long)ordered.Count);
-    harness.Same("the low order leads", "b", ordered[0u].Name);
-    harness.Same("the tie keeps the order it was read in", "c", ordered[1u].Name);
-    harness.Same("and the high order trails", "a", ordered[2u].Name);
+    harness.CheckSameNumber("three on the edge", 3, (long)ordered.Count);
+    harness.CheckSame("the low order leads", "b", ordered[0u].Name);
+    harness.CheckSame("the tie keeps the order it was read in", "c", ordered[1u].Name);
+    harness.CheckSame("and the high order trails", "a", ordered[2u].Name);
 }
 
-void RoundTrips(Harness harness)
+void TestRoundTrip(Harness harness)
 {
     Console.WriteLine("written and read back");
 
@@ -140,10 +140,10 @@ void RoundTrips(Harness harness)
 
     var again = ParseLayout(SerializeLayout(layout));
 
-    harness.SameNumber("the left width came back", 300, (long)again.LeftWidth);
-    harness.SameNumber("the right width came back", 200, (long)again.RightWidth);
-    harness.SameNumber("the bottom height came back", 120, (long)again.BottomHeight);
-    harness.SameNumber("every pane came back", 4, (long)again.Places.Count);
+    harness.CheckSameNumber("the left width came back", 300, (long)again.LeftWidth);
+    harness.CheckSameNumber("the right width came back", 200, (long)again.RightWidth);
+    harness.CheckSameNumber("the bottom height came back", 120, (long)again.BottomHeight);
+    harness.CheckSameNumber("every pane came back", 4, (long)again.Places.Count);
 
     var moved = again.Find(Panes.Properties);
     harness.Check("the moved pane kept its edge", moved != null
@@ -153,39 +153,39 @@ void RoundTrips(Harness harness)
     // Two panes on one edge must come back in the order they went out, which
     // is what makes the tab order of the bottom well stay put between runs.
     var bottom = again.GetPlacementsOn(DockEdge.Bottom);
-    harness.SameNumber("the bottom well still has two", 2, (long)bottom.Count);
-    harness.Same("in the order they were written", Panes.Errors, bottom[0u].Name);
-    harness.Same("and the second stayed second", Panes.Output, bottom[1u].Name);
+    harness.CheckSameNumber("the bottom well still has two", 2, (long)bottom.Count);
+    harness.CheckSame("in the order they were written", Panes.Errors, bottom[0u].Name);
+    harness.CheckSame("and the second stayed second", Panes.Output, bottom[1u].Name);
 
     // The text itself, not merely what it parses to: a file a person is
     // expected to be able to edit is a file that has to be readable.
     harness.Check("it is written indented", SerializeLayout(layout).Contains("\n  \"left\""));
 }
 
-void Refuses(Harness harness)
+void TestRefusing(Harness harness)
 {
     Console.WriteLine("sizes that would hide the editor");
 
     var layout = new DockLayout();
     layout.LeftWidth = 9000;
-    harness.SameNumber("a width past the screen is capped", (long)LargestWell,
-                       (long)layout.LeftWidth);
+    harness.CheckSameNumber("a width past the screen is capped", (long)LargestWell,
+                            (long)layout.LeftWidth);
 
     layout.BottomHeight = 2;
-    harness.SameNumber("and one dragged shut is floored", (long)SmallestWell,
-                       (long)layout.BottomHeight);
+    harness.CheckSameNumber("and one dragged shut is floored", (long)SmallestWell,
+                            (long)layout.BottomHeight);
 
     // Through the file, which is the path that matters: the drag is guarded by
     // the control, and the file is guarded by nothing else.
     var read = ParseLayout("{\"left\":40000,\"bottom\":-5,"
                            + "\"panes\":[{\"name\":\"solution\",\"edge\":\"left\"}]}");
-    harness.SameNumber("a file saying 40000 is capped too", (long)LargestWell,
-                       (long)read.LeftWidth);
-    harness.SameNumber("and a negative height is floored", (long)SmallestWell,
-                       (long)read.BottomHeight);
+    harness.CheckSameNumber("a file saying 40000 is capped too", (long)LargestWell,
+                            (long)read.LeftWidth);
+    harness.CheckSameNumber("and a negative height is floored", (long)SmallestWell,
+                            (long)read.BottomHeight);
 }
 
-void Survives(Harness harness)
+void TestSurviving(Harness harness)
 {
     Console.WriteLine("files that are not what this build writes");
 
@@ -193,23 +193,23 @@ void Survives(Harness harness)
     // not refuse to open, which is the difference between this reader and
     // every other one in the tree and is argued for where it is written.
     var broken = ParseLayout("{not json");
-    harness.SameNumber("a broken file gives the default", 3, (long)broken.Places.Count);
+    harness.CheckSameNumber("a broken file gives the default", 3, (long)broken.Places.Count);
     harness.Check("with the tree on the left", broken.Find(Panes.Solution) != null);
 
     var empty = ParseLayout("");
-    harness.SameNumber("so does an empty one", 3, (long)empty.Places.Count);
+    harness.CheckSameNumber("so does an empty one", 3, (long)empty.Places.Count);
 
     var array = ParseLayout("[1,2,3]");
-    harness.SameNumber("so does JSON that is not an object", 3, (long)array.Places.Count);
+    harness.CheckSameNumber("so does JSON that is not an object", 3, (long)array.Places.Count);
 
     // A byte order mark in front of it, which is what Notepad and PowerShell
     // 5.1 write. This one is not hypothetical: it is how the first hand-edited
     // layout file silently did nothing, and the fix is in `Standard.Json`.
     var marked = ParseLayout("﻿{\"left\":320,\"panes\":["
                              + "{\"name\":\"solution\",\"edge\":\"left\"}]}");
-    harness.SameNumber("a file with a byte order mark is read", 1,
-                       (long)marked.Places.Count);
-    harness.SameNumber("and its widths arrive", 320, (long)marked.LeftWidth);
+    harness.CheckSameNumber("a file with a byte order mark is read", 1,
+                            (long)marked.Places.Count);
+    harness.CheckSameNumber("and its widths arrive", 320, (long)marked.LeftWidth);
 
     // A file from a build that had panes this one does not. The unknown pane
     // is kept -- it costs nothing and a downgrade followed by an upgrade
@@ -217,11 +217,11 @@ void Survives(Harness harness)
     var newer = ParseLayout("{\"left\":250,\"panes\":["
                             + "{\"name\":\"toolbox\",\"edge\":\"left\",\"pinned\":true},"
                             + "{\"name\":\"solution\",\"edge\":\"right\",\"pinned\":false}]}");
-    harness.SameNumber("a newer file keeps both panes", 2, (long)newer.Places.Count);
+    harness.CheckSameNumber("a newer file keeps both panes", 2, (long)newer.Places.Count);
     harness.Check("the pane this build knows moved", newer.Find(Panes.Solution) != null
                   && ((DockPlacement)newer.Find(Panes.Solution)).Edge == DockEdge.Right);
     harness.Check("and the one it does not is kept", newer.Find("toolbox") != null);
-    harness.SameNumber("the width came through", 250, (long)newer.LeftWidth);
+    harness.CheckSameNumber("the width came through", 250, (long)newer.LeftWidth);
 
     // An edge name from a build with a fourth well. It must land somewhere
     // visible rather than nowhere, so it lands in the document well.
@@ -232,8 +232,8 @@ void Survives(Harness harness)
 
     // A pane whose fields are the wrong shape entirely. Dropped, not fatal.
     var wrong = ParseLayout("{\"panes\":[{\"name\":5},{\"name\":\"output\",\"pinned\":\"yes\"}]}");
-    harness.SameNumber("a pane with no usable name is dropped", 1,
-                       (long)wrong.Places.Count);
+    harness.CheckSameNumber("a pane with no usable name is dropped", 1,
+                            (long)wrong.Places.Count);
     harness.Check("and a pinned that is not a bool reads as pinned",
                   wrong.Find(Panes.Output) != null
                   && ((DockPlacement)wrong.Find(Panes.Output)).IsPinned);

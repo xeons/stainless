@@ -70,7 +70,7 @@ public class Harness
         {
             if (token.Kind == TokenKind.Whitespace)
                 continue;
-            Console.Write(Name(token.Kind) + "('"
+            Console.Write(GetKindName(token.Kind) + "('"
                           + line.Substring(token.Start, token.Length) + "') ");
         }
         Console.WriteLine("");
@@ -89,7 +89,7 @@ public class Harness
         {
             if (token.Start != at)
             {
-                Failed(what + ": a token starts at " + Standard.Text.FromInteger(token.Start)
+                ReportFailure(what + ": a token starts at " + Standard.Text.FromInteger(token.Start)
                      + " where " + Standard.Text.FromInteger(at) + " was expected");
                 return;
             }
@@ -97,7 +97,7 @@ public class Harness
         }
         if (at != line.ByteLength())
         {
-            Failed(what + ": the tokens stop at " + Standard.Text.FromInteger(at)
+            ReportFailure(what + ": the tokens stop at " + Standard.Text.FromInteger(at)
                  + " of " + Standard.Text.FromInteger(line.ByteLength()));
             return;
         }
@@ -111,7 +111,7 @@ public class Harness
         var after = _scanner.ScanLine(line, entry, tokens);
         if (after != expected)
         {
-            Failed(what);
+            ReportFailure(what);
             return;
         }
         Console.WriteLine("  ok    " + what);
@@ -120,13 +120,13 @@ public class Harness
     /// Not `Fail`. An unqualified `Fail(x)` is the `Result` variant's own case
     /// constructor, which builds a value and discards it -- so the count never
     /// moved and every check passed. SL0222 is what caught it.
-    public void Failed(String why)
+    public void ReportFailure(String why)
     {
         _failures++;
         Console.WriteLine("  FAIL  " + why);
     }
 
-    String Name(TokenKind kind)
+    String GetKindName(TokenKind kind)
     {
         if (kind == TokenKind.Whitespace)
             return "space";

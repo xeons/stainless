@@ -4,4 +4,4 @@
 // project says `sources` is `src`, which is the whole point.
 module Fixture;
 
-String Greeting() => "the fixture built";
+String FormatGreeting() => "the fixture built";

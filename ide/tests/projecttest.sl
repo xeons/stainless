@@ -31,7 +31,7 @@ class Harness
 
     /// A check that shows what it got when it fails, which is most of what
     /// makes a failing string comparison worth reading.
-    public void Same(String what, String expected, String actual)
+    public void CheckSame(String what, String expected, String actual)
     {
         bool passed = expected == actual;
         Console.WriteLine((passed ? "  ok   " : "  FAIL ") + what);
@@ -48,11 +48,11 @@ int Main()
 {
     var harness = new Harness();
 
-    Reads(harness);
-    Refuses(harness);
-    Writes(harness);
-    Finds(harness);
-    Platforms(harness);
+    TestReading(harness);
+    TestRefusing(harness);
+    TestWriting(harness);
+    TestFinding(harness);
+    TestPlatforms(harness);
 
     Console.WriteLine(harness.Failures == 0u
                       ? "all checks passed"
@@ -60,7 +60,7 @@ int Main()
     return harness.Failures == 0u ? 0 : 1;
 }
 
-void Reads(Harness harness)
+void TestReading(Harness harness)
 {
     Console.WriteLine("reading");
 
@@ -95,18 +95,18 @@ void Reads(Harness harness)
     }
 
     var project = read.Value;
-    harness.Same("name", "app", project.Name);
-    harness.Same("version", "1.2.3", project.Version);
-    harness.Same("kind", "library", project.Kind);
+    harness.CheckSame("name", "app", project.Name);
+    harness.CheckSame("version", "1.2.3", project.Version);
+    harness.CheckSame("kind", "library", project.Kind);
     harness.Check("it knows it is a library", project.IsLibrary);
 
     harness.Check("sources", project.Sources.Length == 2u
                              && project.Sources[0u] == "src"
                              && project.Sources[1u] == "extra");
-    harness.Same("output", "build/app.dll", project.Output);
-    harness.Same("buildDirectory", "out", project.BuildDirectory);
-    harness.Same("objectDirectory", "tmp", project.ObjectDirectory);
-    harness.Same("header", "build/app.h", project.Header);
+    harness.CheckSame("output", "build/app.dll", project.Output);
+    harness.CheckSame("buildDirectory", "out", project.BuildDirectory);
+    harness.CheckSame("objectDirectory", "tmp", project.ObjectDirectory);
+    harness.CheckSame("header", "build/app.h", project.Header);
 
     harness.Check("libraries", project.Libraries.Length == 2u
                                && project.Libraries[1u] == "gdi32");
@@ -115,8 +115,8 @@ void Reads(Harness harness)
 
     harness.Check("optimize", project.Optimize == 0);
     harness.Check("debug", project.Debug);
-    harness.Same("abi", "itanium", project.Abi);
-    harness.Same("runtime", "shared", project.Runtime);
+    harness.CheckSame("abi", "itanium", project.Abi);
+    harness.CheckSame("runtime", "shared", project.Runtime);
 
     // The arrays are the half that reflection could not fill until the runtime
     // learned to make one, so they are worth their own line: a reader that
@@ -126,15 +126,15 @@ void Reads(Harness harness)
     if (project.Dependencies.Count == 2u)
     {
         var shapes = project.Dependencies[0u];
-        harness.Same("a dependency keeps its name", "shapes", shapes.Name);
+        harness.CheckSame("a dependency keeps its name", "shapes", shapes.Name);
         harness.Check("and knows it is a path", shapes.IsPath && !shapes.IsGit);
-        harness.Same("and reads as its directory", "../shapes", shapes.ToDisplayText());
-        harness.Same("with a version", "^1.0", shapes.Version);
+        harness.CheckSame("and reads as its directory", "../shapes", shapes.ToDisplayText());
+        harness.CheckSame("with a version", "^1.0", shapes.Version);
 
         var json = project.Dependencies[1u];
         harness.Check("a git dependency knows it", json.IsGit && !json.IsPath);
-        harness.Same("and reads as its repository and tag",
-                     "https://example/json.git#v2.1.0", json.ToDisplayText());
+        harness.CheckSame("and reads as its repository and tag",
+                          "https://example/json.git#v2.1.0", json.ToDisplayText());
     }
 
     // What a starter file actually looks like: four fields, everything else
@@ -153,7 +153,7 @@ void Reads(Harness harness)
     }
 }
 
-void Refuses(Harness harness)
+void TestRefusing(Harness harness)
 {
     Console.WriteLine("refusing");
 
@@ -195,7 +195,7 @@ void Refuses(Harness harness)
         harness.Check("and says which", future.Error.Contains("format 99"));
 }
 
-void Writes(Harness harness)
+void TestWriting(Harness harness)
 {
     Console.WriteLine("writing");
 
@@ -243,14 +243,14 @@ void Writes(Harness harness)
     if (back.Ok)
     {
         var again = back.Value;
-        harness.Same("round-tripped name", "app", again.Name);
-        harness.Same("round-tripped kind", "library", again.Kind);
+        harness.CheckSame("round-tripped name", "app", again.Name);
+        harness.CheckSame("round-tripped kind", "library", again.Kind);
         harness.Check("round-tripped sources",
                       again.Sources.Length == 2u && again.Sources[1u] == "shared");
         harness.Check("round-tripped build settings",
                       again.Optimize == 0 && again.Debug
                       && again.Libraries.Length == 1u && again.Defines.Length == 1u);
-        harness.Same("round-tripped header", "build/app.h", again.Header);
+        harness.CheckSame("round-tripped header", "build/app.h", again.Header);
         harness.Check("round-tripped dependency",
                       again.Dependencies.Count == 1u
                       && again.Dependencies[0u].Name == "shapes"
@@ -258,7 +258,7 @@ void Writes(Harness harness)
     }
 }
 
-void Finds(Harness harness)
+void TestFinding(Harness harness)
 {
     Console.WriteLine("finding");
 
@@ -284,7 +284,7 @@ void Finds(Harness harness)
     }
 
     var project = read.Value;
-    harness.Same("with the name the file gives", "fixture", project.Name);
+    harness.CheckSame("with the name the file gives", "fixture", project.Name);
     harness.Check("and one source root",
                   project.Sources.Length == 1u && project.Sources[0u] == "src");
 
@@ -298,7 +298,7 @@ void Finds(Harness harness)
                   Project.FindProjectFile("stainless-nowhere-at-all") == "");
 }
 
-void Platforms(Harness harness)
+void TestPlatforms(Harness harness)
 {
     Console.WriteLine("platforms");
 
@@ -385,20 +385,20 @@ void Platforms(Harness harness)
         // exists to do is add the right binding directory, and a count says
         // nothing about which one arrived.
         harness.Check("and names the Windows bindings",
-                      Names(mine.Value.GetSourcesFor("windows"), "../bindings/win32"));
+                      ContainsName(mine.Value.GetSourcesFor("windows"), "../bindings/win32"));
         harness.Check("and the GTK ones on Linux",
-                      Names(mine.Value.GetSourcesFor("linux"), "../bindings/gtk"));
+                      ContainsName(mine.Value.GetSourcesFor("linux"), "../bindings/gtk"));
 
         // Neither platform's list may carry the other's, which is the half a
         // merge can get wrong without anything else noticing.
         harness.Check("and neither carries the other's",
-                      !Names(mine.Value.GetSourcesFor("windows"), "../bindings/gtk")
-                      && !Names(mine.Value.GetSourcesFor("linux"), "../bindings/win32"));
+                      !ContainsName(mine.Value.GetSourcesFor("windows"), "../bindings/gtk")
+                      && !ContainsName(mine.Value.GetSourcesFor("linux"), "../bindings/win32"));
     }
 }
 
 /// Whether a list holds exactly this entry.
-bool Names(String[] all, String wanted)
+bool ContainsName(String[] all, String wanted)
 {
     foreach (var one in all)
     {

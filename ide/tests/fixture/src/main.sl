@@ -9,6 +9,6 @@ import Standard.Console;
 
 int Main()
 {
-    Console.WriteLine(Greeting());
+    Console.WriteLine(FormatGreeting());
     return 0;
 }

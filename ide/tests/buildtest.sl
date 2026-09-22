@@ -30,7 +30,7 @@ class Harness
             Failures++;
     }
 
-    public void Same(String what, String expected, String actual)
+    public void CheckSame(String what, String expected, String actual)
     {
         bool passed = expected == actual;
         Console.WriteLine((passed ? "  ok   " : "  FAIL ") + what);
@@ -47,15 +47,15 @@ int Main()
 {
     var harness = new Harness();
 
-    Diagnostics(harness);
-    NotDiagnostics(harness);
-    Describes(harness);
+    TestDiagnostics(harness);
+    TestNonDiagnostics(harness);
+    TestDisplayText(harness);
 
     Console.WriteLine(harness.Failures == 0u ? "all checks passed" : "checks FAILED");
     return harness.Failures == 0u ? 0 : 1;
 }
 
-void Diagnostics(Harness harness)
+void TestDiagnostics(Harness harness)
 {
     Console.WriteLine("diagnostics");
 
@@ -66,8 +66,8 @@ void Diagnostics(Harness harness)
     var message = BuildMessage.Parse(line);
     harness.Check("a diagnostic is recognised", message.IsDiagnostic);
     harness.Check("and is an error", message.IsError);
-    harness.Same("with its code", "SL0265", message.Code);
-    harness.Same("and its message", "cannot convert 'String' to 'int'", message.Message);
+    harness.CheckSame("with its code", "SL0265", message.Code);
+    harness.CheckSame("and its message", "cannot convert 'String' to 'int'", message.Message);
     harness.Check("and its place", message.Line == 5u && message.Column == 13u);
     harness.Check("and something to underline", message.Length == 14u);
     harness.Check("and it has a place", message.HasPlace);
@@ -75,7 +75,7 @@ void Diagnostics(Harness harness)
     // The escaped backslashes are the half that decides whether this works on
     // Windows at all: read wrongly, every path is mangled and every
     // double-click opens nothing.
-    harness.Same("with the path unescaped", "C:\\Code\\src\\main.sl", message.File);
+    harness.CheckSame("with the path unescaped", "C:\\Code\\src\\main.sl", message.File);
 
     String warning = "{\"severity\":\"warning\",\"code\":\"SL0222\","
         + "\"message\":\"this expression has no effect\","
@@ -95,7 +95,7 @@ void Diagnostics(Harness harness)
     harness.Check("and says it has no place", !third.HasPlace && third.File == "");
 }
 
-void NotDiagnostics(Harness harness)
+void TestNonDiagnostics(Harness harness)
 {
     Console.WriteLine("everything else");
 
@@ -104,8 +104,8 @@ void NotDiagnostics(Harness harness)
     // compiler's is a line to show, not a reason to stop.
     var linker = BuildMessage.Parse("lld-link: error: could not open 'x.lib'");
     harness.Check("a linker line is not a diagnostic", !linker.IsDiagnostic);
-    harness.Same("and is kept as it came",
-                 "lld-link: error: could not open 'x.lib'", linker.ToDisplayText());
+    harness.CheckSame("and is kept as it came",
+                      "lld-link: error: could not open 'x.lib'", linker.ToDisplayText());
 
     var empty = BuildMessage.Parse("");
     harness.Check("an empty line is harmless", !empty.IsDiagnostic);
@@ -114,14 +114,14 @@ void NotDiagnostics(Harness harness)
     // reachable: a program under `run` may print either.
     var broken = BuildMessage.Parse("{not json at all");
     harness.Check("a broken object is kept as text", !broken.IsDiagnostic);
-    harness.Same("and not swallowed", "{not json at all", broken.ToDisplayText());
+    harness.CheckSame("and not swallowed", "{not json at all", broken.ToDisplayText());
 
     var other = BuildMessage.Parse("{\"hello\":1}");
     harness.Check("an object that is not a diagnostic is kept as text",
                   !other.IsDiagnostic);
 }
 
-void Describes(Harness harness)
+void TestDisplayText(Harness harness)
 {
     Console.WriteLine("describing");
 
@@ -132,20 +132,20 @@ void Describes(Harness harness)
     // What the output pane shows. The message leads and the place trails: a
     // list of diagnostics is read for what is wrong, and a path first buries
     // every one of them behind the part they all share.
-    harness.Same("a diagnostic reads as one line",
-                 "error[SL0265]: cannot convert 'String' to 'int'   main.sl:5:13",
-                 BuildMessage.Parse(line).ToDisplayText());
+    harness.CheckSame("a diagnostic reads as one line",
+                      "error[SL0265]: cannot convert 'String' to 'int'   main.sl:5:13",
+                      BuildMessage.Parse(line).ToDisplayText());
 
     String warning = "{\"severity\":\"warning\",\"code\":\"SL0222\","
         + "\"message\":\"no effect\",\"file\":\"/home/b/a.sl\",\"line\":2,"
         + "\"column\":1,\"length\":3}";
 
-    harness.Same("and a warning says so, with a unix path",
-                 "warning[SL0222]: no effect   a.sl:2:1",
-                 BuildMessage.Parse(warning).ToDisplayText());
+    harness.CheckSame("and a warning says so, with a unix path",
+                      "warning[SL0222]: no effect   a.sl:2:1",
+                      BuildMessage.Parse(warning).ToDisplayText());
 
     String placeless = "{\"severity\":\"error\",\"code\":\"\",\"message\":\"the linker refused\"}";
-    harness.Same("one with no place says only what happened",
-                 "error: the linker refused",
-                 BuildMessage.Parse(placeless).ToDisplayText());
+    harness.CheckSame("one with no place says only what happened",
+                      "error: the linker refused",
+                      BuildMessage.Parse(placeless).ToDisplayText());
 }

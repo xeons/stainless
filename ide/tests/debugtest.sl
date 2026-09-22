@@ -32,7 +32,7 @@ class Harness
             Failures++;
     }
 
-    public void SameNumber(String what, long expected, long actual)
+    public void CheckSameNumber(String what, long expected, long actual)
     {
         bool passed = expected == actual;
         Console.WriteLine((passed ? "  ok   " : "  FAIL ") + what);
@@ -51,10 +51,10 @@ int Main()
 {
     var harness = new Harness();
 
-    Toggling(harness);
-    Matching(harness);
-    Binding(harness);
-    Shifting(harness);
+    TestToggling(harness);
+    TestMatching(harness);
+    TestBinding(harness);
+    TestShifting(harness);
 
     Console.WriteLine("");
     if (harness.Failures == 0u)
@@ -67,7 +67,7 @@ int Main()
     return 1;
 }
 
-void Toggling(Harness harness)
+void TestToggling(Harness harness)
 {
     Console.WriteLine("toggling");
     var store = new BreakpointStore();
@@ -86,8 +86,8 @@ void Toggling(Harness harness)
 
     store.ToggleBreakpoint("src/Main.sl", 3u);
     store.ToggleBreakpoint("src/Other.sl", 3u);
-    harness.SameNumber("one line of two files is two breakpoints",
-                       2, (long)store.Count);
+    harness.CheckSameNumber("one line of two files is two breakpoints",
+                            2, (long)store.Count);
     harness.Check("a file with one is touched", store.HasBreakpointsIn("src/Main.sl"));
     harness.Check("a file with none is not", !store.HasBreakpointsIn("src/Third.sl"));
 
@@ -95,7 +95,7 @@ void Toggling(Harness harness)
     harness.Check("clearing empties it", store.IsEmpty);
 }
 
-void Matching(Harness harness)
+void TestMatching(Harness harness)
 {
     Console.WriteLine("paths, on either system");
     var store = new BreakpointStore();
@@ -112,7 +112,7 @@ void Matching(Harness harness)
     harness.Check("and neither is the same name elsewhere",
                   store.FindAtLine("tests/Main.sl", 5u) == null);
 
-    Separators(harness);
+    TestSeparators(harness);
 }
 
 #if WINDOWS
@@ -120,7 +120,7 @@ void Matching(Harness harness)
 /// Windows accepts both separators and ignores case, so one file has many
 /// spellings -- and the compiler's own debug information mixes them, writing
 /// one separator from the directory and one from the join.
-void Separators(Harness harness)
+void TestSeparators(Harness harness)
 {
     Console.WriteLine("paths, as Windows spells them");
     var store = new BreakpointStore();
@@ -140,7 +140,7 @@ void Separators(Harness harness)
 /// On Linux a backslash is an ordinary character in a filename and case
 /// matters, so none of the Windows spellings names the same file. Asserted
 /// rather than skipped: getting this wrong would silently merge two files.
-void Separators(Harness harness)
+void TestSeparators(Harness harness)
 {
     Console.WriteLine("paths, as Linux spells them");
     var store = new BreakpointStore();
@@ -156,7 +156,7 @@ void Separators(Harness harness)
 
 #endif
 
-void Binding(Harness harness)
+void TestBinding(Harness harness)
 {
     Console.WriteLine("binding");
     var store = new BreakpointStore();
@@ -165,13 +165,13 @@ void Binding(Harness harness)
     var found = store.FindAtLine("src/Main.sl", 10u);
     harness.Check("it starts unbound",
                   found != null && !((SourceBreakpoint)found).IsBound);
-    harness.SameNumber("and is shown on the line asked for",
-                       10, (long)((SourceBreakpoint)found).ShownLine);
+    harness.CheckSameNumber("and is shown on the line asked for",
+                            10, (long)((SourceBreakpoint)found).ShownLine);
 
     // A blank line resolves to the first statement after it.
     store.RecordBinding("src/Main.sl", 10u, 14u);
-    harness.SameNumber("binding moves where it is shown",
-                       14, (long)((SourceBreakpoint)found).ShownLine);
+    harness.CheckSameNumber("binding moves where it is shown",
+                            14, (long)((SourceBreakpoint)found).ShownLine);
     harness.Check("the glyph is found on the bound line",
                   store.FindShownAtLine("src/Main.sl", 14u) != null);
     harness.Check("and toggling still answers the line asked for",
@@ -184,8 +184,8 @@ void Binding(Harness harness)
     store.RecordBinding("src/Main.sl", 10u, 0u);
     harness.Check("binding to nothing leaves it unbound",
                   !((SourceBreakpoint)found).IsBound);
-    harness.SameNumber("and back on the line asked for",
-                       10, (long)((SourceBreakpoint)found).ShownLine);
+    harness.CheckSameNumber("and back on the line asked for",
+                            10, (long)((SourceBreakpoint)found).ShownLine);
 
     store.RecordBinding("src/Main.sl", 10u, 14u);
     store.ClearBindings();
@@ -193,7 +193,7 @@ void Binding(Harness harness)
                   !((SourceBreakpoint)found).IsBound);
 }
 
-void Shifting(Harness harness)
+void TestShifting(Harness harness)
 {
     Console.WriteLine("editing around one");
     var store = new BreakpointStore();
@@ -223,7 +223,7 @@ void Shifting(Harness harness)
     store.ShiftBreakpoints("src/Main.sl", 15u, -40);
     harness.Check("deleting across it leaves it on the line above the cut",
                   store.FindAtLine("src/Main.sl", 14u) != null);
-    harness.SameNumber("and there is still exactly one", 1, (long)store.Count);
+    harness.CheckSameNumber("and there is still exactly one", 1, (long)store.Count);
 
     // The same at the top of a file, where there is no line above.
     var top = new BreakpointStore();
