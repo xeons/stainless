@@ -28,41 +28,42 @@ int Main()
 {
     // The Unix epoch, whose distance from Windows's own 1601 epoch is the one
     // constant everything else here depends on.
-    ulong epoch = Clock.FromCalendar(At(1970u, 1u, 1u, 0u, 0u, 0u));
+    ulong epoch = Clock.SystemTimeToTicks(At(1970u, 1u, 1u, 0u, 0u, 0u));
     Console.WriteLine("unix epoch in ticks: " + Text.FromInteger((long)epoch));
     Console.WriteLine("matches the constant: "
         + Text.FromBool(epoch == Clock.UnixEpochTicks));
-    Console.WriteLine("as unix seconds: " + Text.FromInteger(Clock.ToUnixSeconds(epoch)));
+    Console.WriteLine("as unix seconds: " + Text.FromInteger(Clock.TicksToUnixSeconds(epoch)));
 
     // A calendar date through ticks and back.
     var moment = At(2026u, 9u, 3u, 21u, 47u, 12u);
-    ulong ticks = Clock.FromCalendar(moment);
-    Console.WriteLine("formatted: " + Clock.Format(moment));
-    Console.WriteLine("round trip: " + Clock.Format(Clock.ToCalendar(ticks)));
-    Console.WriteLine("unix seconds: " + Text.FromInteger(Clock.ToUnixSeconds(ticks)));
-    Console.WriteLine("and back: "
-        + Clock.Format(Clock.ToCalendar(Clock.FromUnixSeconds(Clock.ToUnixSeconds(ticks)))));
+    ulong ticks = Clock.SystemTimeToTicks(moment);
+    Console.WriteLine("formatted: " + Clock.FormatSystemTime(moment));
+    Console.WriteLine("round trip: " + Clock.FormatSystemTime(Clock.TicksToSystemTime(ticks)));
+    Console.WriteLine("unix seconds: " + Text.FromInteger(Clock.TicksToUnixSeconds(ticks)));
+    ulong whole = Clock.UnixSecondsToTicks(Clock.TicksToUnixSeconds(ticks));
+    Console.WriteLine("and back: " + Clock.FormatSystemTime(Clock.TicksToSystemTime(whole)));
 
     // The two halves of a FILETIME, joined and split.
-    var file = Clock.FromTicks(ticks);
-    Console.WriteLine("halves rejoin: " + Text.FromBool(Clock.Ticks(file) == ticks));
+    var file = Clock.TicksToFileTime(ticks);
+    Console.WriteLine("halves rejoin: " + Text.FromBool(Clock.FileTimeToTicks(file) == ticks));
 
     // Padding, which is what makes a formatted time sort as text.
-    Console.WriteLine("padded: " + Clock.Format(At(2001u, 2u, 3u, 4u, 5u, 6u)));
+    Console.WriteLine("padded: " + Clock.FormatSystemTime(At(2001u, 2u, 3u, 4u, 5u, 6u)));
 
     // A date Windows will not accept: month 13.
     Console.WriteLine("month 13 is refused: "
-        + Text.FromBool(Clock.FromCalendar(At(2026u, 13u, 1u, 0u, 0u, 0u)) == 0u));
+        + Text.FromBool(Clock.SystemTimeToTicks(At(2026u, 13u, 1u, 0u, 0u, 0u)) == 0u));
 
     // The counter is monotonic, and its frequency is fixed while the machine
     // runs. Neither number is printed, because both are machine-specific.
-    Console.WriteLine("frequency is positive: " + Text.FromBool(Clock.Frequency() > 0));
-    long first = Clock.Counter();
-    long second = Clock.Counter();
+    Console.WriteLine("frequency is positive: "
+        + Text.FromBool(Clock.ReadPerformanceFrequency() > 0));
+    long first = Clock.ReadPerformanceCounter();
+    long second = Clock.ReadPerformanceCounter();
     Console.WriteLine("counter does not go backwards: " + Text.FromBool(second >= first));
 
     var watch = new Stopwatch();
     Console.WriteLine("a fresh stopwatch reads under a second: "
-        + Text.FromBool(watch.Seconds() < 1.0));
+        + Text.FromBool(watch.GetElapsedSeconds() < 1.0));
     return 0;
 }

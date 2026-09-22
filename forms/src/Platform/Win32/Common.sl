@@ -1276,7 +1276,7 @@ public class CheckListPeer : ReportListPeer, ICheckListPeer
     /// The tick is the *state image*, one-based: 1 is empty and 2 is ticked.
     public void SetItemChecked(int index, bool checked)
     {
-        var item = ListItemSettingState(CheckedState(checked), LvisStateImageMask);
+        var item = ListItemSettingState(GetCheckedStateMask(checked), LvisStateImageMask);
         SendQuietly(LvmSetItemState, (ulong)index, (long)(nuint)&item);
     }
 

@@ -606,7 +606,7 @@ public Result<IBitmapBackend, String> LoadBitmapFile(String path)
 /// palette on load.
 public Result<IBitmapBackend, String> LoadResourceBitmap(int id)
 {
-    var handle = LoadImageW((HINSTANCE)GetModuleHandleW(null), Resources.Id(id),
+    var handle = LoadImageW((HINSTANCE)GetModuleHandleW(null), Resources.MakeIntResource(id),
                             ImageBitmap, 0, 0, LrCreateDibSection);
     if (handle == null)
     {

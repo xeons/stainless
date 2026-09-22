@@ -88,34 +88,34 @@ class Boxed
 /// The C entry point. **One per signal shape, not one per handler**: a
 /// module-level function, so its address is a plain C function pointer and
 /// there is no thunk anywhere in this file.
-void Dispatch(GtkWidget* sender, gpointer data)
+void DispatchPlainSignal(GtkWidget* sender, gpointer data)
 {
     var boxed = (Boxed)data;
     boxed.Body();
 }
 
 /// The release half of every connection here.
-void Forget(gpointer data, gpointer closure)
+void ReleasePlainHandler(gpointer data, gpointer closure)
 {
     sl_release(data);
 }
 
 /// Connects a handler to a signal that carries nothing.
 ///
-/// Answers the handler id, which `Disconnect` takes and almost nothing needs:
-/// a handler normally lives exactly as long as the widget it is on.
-public gulong ConnectPlain(GtkWidget* instance, String signal, Handler handler)
+/// Answers the handler id, which `DisconnectHandler` takes and almost nothing
+/// needs: a handler normally lives exactly as long as the widget it is on.
+public gulong ConnectPlainSignal(GtkWidget* instance, String signal, Handler handler)
 {
     var boxed = new Boxed(handler);
     sl_retain((gpointer)boxed);
 
     return g_signal_connect_data(instance, signal.ToPointer(),
-        Dispatch, (gpointer)boxed, Forget, G_CONNECT_DEFAULT);
+        DispatchPlainSignal, (gpointer)boxed, ReleasePlainHandler, G_CONNECT_DEFAULT);
 }
 
-/// Drops a connection early. The release happens in `Forget`, exactly as it
-/// would have on the widget's destruction.
-public void Disconnect(GtkWidget* instance, gulong handler)
+/// Drops a connection early. The release happens in `ReleasePlainHandler`,
+/// exactly as it would have on the widget's destruction.
+public void DisconnectHandler(GtkWidget* instance, gulong handler)
 {
     g_signal_handler_disconnect(instance, handler);
 }

@@ -136,7 +136,7 @@ public class GtkMenuItemPeer : IMenuItemPeer
         _checkable = checkable;
         _checked = false;
 
-        ConnectPlain(_item, "activate", () =>
+        ConnectPlainSignal(_item, "activate", () =>
         {
             if (this.Echoing)
                 return;
@@ -286,7 +286,7 @@ public class GtkMenuPeer : IMenuPeer
     /// uses, and for the same reason: GTK pops a menu up and returns.
     public void ShowPopup(IWindowPeer owner, Point atScreen)
     {
-        var id = ConnectPlain(_menu, "deactivate", () => { gtk_main_quit(); });
+        var id = ConnectPlainSignal(_menu, "deactivate", () => { gtk_main_quit(); });
 
         gtk_menu_popup_at_pointer(_menu, null);
         gtk_main();
@@ -294,7 +294,7 @@ public class GtkMenuPeer : IMenuPeer
         // Disconnected rather than left in place: the menu may be shown again,
         // and a second `deactivate` reaching a loop that has already returned
         // would quit the application's.
-        Disconnect(_menu, id);
+        DisconnectHandler(_menu, id);
     }
 
     public GtkWidget* Widget => _menu;

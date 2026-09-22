@@ -38,7 +38,7 @@ public int Main()
     // before writing an escape sequence anywhere.
     Console.WriteLine($"tty      {IsTerminal(Terminal.Output)}");
 
-    var mode = Mode.Raw(Terminal.Input);
+    var mode = Mode.EnterRawMode(Terminal.Input);
     Console.WriteLine($"raw      refused {!mode.Ok}");
 
     var (rows, columns) = Size(Terminal.Output);
@@ -94,7 +94,7 @@ public int Main()
     // Nothing has changed, and the descriptor was asked not to wait.
     byte[64] buffer;
     nint got = read(watcher, (void*)&buffer[0], 64u);
-    Console.WriteLine($"nothing  {got < 0 && Events.Errno() == EAGAIN}");
+    Console.WriteLine($"nothing  {got < 0 && Events.GetErrno() == EAGAIN}");
 
     close(watcher);
     close(timer);

@@ -209,7 +209,7 @@ int Exchange()
     int server = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (server < 0)
     {
-        Console.WriteLine("WRONG socket failed: " + Text.FromInteger((long)Errno()));
+        Console.WriteLine("WRONG socket failed: " + Text.FromInteger((long)GetErrno()));
         return 1;
     }
 
@@ -220,13 +220,13 @@ int Exchange()
 
     if (bind(server, (sockaddr*)&address, (uint)sizeof(sockaddr_in)) < 0)
     {
-        Console.WriteLine("WRONG bind failed: " + Text.FromInteger((long)Errno()));
+        Console.WriteLine("WRONG bind failed: " + Text.FromInteger((long)GetErrno()));
         return 1;
     }
 
     if (listen(server, 4) < 0)
     {
-        Console.WriteLine("WRONG listen failed: " + Text.FromInteger((long)Errno()));
+        Console.WriteLine("WRONG listen failed: " + Text.FromInteger((long)GetErrno()));
         return 1;
     }
 
@@ -243,7 +243,7 @@ int Exchange()
     int client = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (connect(client, (sockaddr*)&bound, (uint)sizeof(sockaddr_in)) < 0)
     {
-        Console.WriteLine("WRONG connect failed: " + Text.FromInteger((long)Errno()));
+        Console.WriteLine("WRONG connect failed: " + Text.FromInteger((long)GetErrno()));
         return 1;
     }
 
@@ -280,7 +280,7 @@ int Exchange()
 
     int failed = connect(doomed, (sockaddr*)&nothing, (uint)sizeof(sockaddr_in));
     Console.WriteLine("refused " + Text.FromBool(failed < 0));
-    Console.WriteLine("refused-code " + Text.FromBool(Errno() == ECONNREFUSED));
+    Console.WriteLine("refused-code " + Text.FromBool(GetErrno() == ECONNREFUSED));
     close(doomed);
 
     return 0;

@@ -21,9 +21,9 @@
 
 // The open and save dialogs, in both generations.
 //
-// `AskToOpen` and `AskToSave` are `GetOpenFileNameW`, which still works
-// everywhere and needs no COM. `ChooseFile` and the rest are `IFileDialog`,
-// which is what Windows has actually shown since Vista: the places bar,
+// `ShowOpenDialog` and `ShowSaveDialog` are `GetOpenFileNameW`, which still
+// works everywhere and needs no COM. `ChooseFile` and the rest are
+// `IFileDialog`, which is what Windows has actually shown since Vista: the places bar,
 // libraries, a shell namespace rather than a path, and folder picking that is
 // the same dialog rather than the old tree.
 //
@@ -59,8 +59,8 @@ import Win32.Handles;
 /// embedded NUL, so the buffer is filled unit by unit; the caller keeps it
 /// alive for as long as the dialog is up.
 ///
-/// `IFileDialog` wants the same pairs in a different shape; `BuildSpecs` is
-/// that one, and is simpler because it needs no buffer at all.
+/// `IFileDialog` wants the same pairs in a different shape; `BuildFilterSpecs`
+/// is that one, and is simpler because it needs no buffer at all.
 public WideBuffer BuildFilter(String[] pairs)
 {
     // Every entry, its terminator, and the extra terminator that ends the list.
@@ -71,7 +71,7 @@ public WideBuffer BuildFilter(String[] pairs)
     }
 
     var buffer = new WideBuffer((uint)units);
-    char16* target = buffer.Pointer();
+    char16* target = buffer.Pointer;
 
     nuint at = 0u;
     for (nuint i = 0u; i < pairs.Length; i++)
@@ -91,7 +91,7 @@ public WideBuffer BuildFilter(String[] pairs)
 }
 
 /// An `OPENFILENAMEW` with its size set and everything else zeroed.
-public OpenFileName NewOpenFileName()
+public OpenFileName CreateOpenFileName()
 {
     OpenFileName dialog;
     dialog.Size = (uint)sizeof(OpenFileName);
@@ -122,38 +122,38 @@ public OpenFileName NewOpenFileName()
 
 /// Shows the open dialog and returns the chosen path, or an empty string if
 /// the user cancelled.
-public String AskToOpen(HWND owner, String title, String[] filterPairs)
+public String ShowOpenDialog(HWND owner, String title, String[] filterPairs)
 {
     var filter = BuildFilter(filterPairs);
     var chosen = new WideBuffer(32768u);
 
-    var dialog = NewOpenFileName();
+    var dialog = CreateOpenFileName();
     dialog.Owner = owner;
-    dialog.Filter = filter.Pointer();
+    dialog.Filter = filter.Pointer;
     dialog.FilterIndex = 1u;
-    dialog.File = chosen.Pointer();
+    dialog.File = chosen.Pointer;
     dialog.FileMax = chosen.Capacity;
     var wideTitle = title.ToUtf16();
     dialog.Title = wideTitle.ToPointer();
     dialog.Flags = OfnExplorer | OfnFileMustExist | OfnPathMustExist | OfnHideReadOnly;
 
-    if (!Win32.Succeeded(GetOpenFileNameW(&dialog)))
+    if (!Win32.IsBoolSuccess(GetOpenFileNameW(&dialog)))
         return "";
-    return chosen.Text();
+    return chosen.ReadText();
 }
 
 /// Shows the save dialog and returns the chosen path, or an empty string.
-public String AskToSave(HWND owner, String title, String[] filterPairs,
-                        String defaultExtension)
+public String ShowSaveDialog(HWND owner, String title, String[] filterPairs,
+                             String defaultExtension)
 {
     var filter = BuildFilter(filterPairs);
     var chosen = new WideBuffer(32768u);
 
-    var dialog = NewOpenFileName();
+    var dialog = CreateOpenFileName();
     dialog.Owner = owner;
-    dialog.Filter = filter.Pointer();
+    dialog.Filter = filter.Pointer;
     dialog.FilterIndex = 1u;
-    dialog.File = chosen.Pointer();
+    dialog.File = chosen.Pointer;
     dialog.FileMax = chosen.Capacity;
     var wideTitle = title.ToUtf16();
     var wideExtension = defaultExtension.ToUtf16();
@@ -161,9 +161,9 @@ public String AskToSave(HWND owner, String title, String[] filterPairs,
     dialog.DefaultExtension = wideExtension.ToPointer();
     dialog.Flags = OfnExplorer | OfnOverwritePrompt | OfnPathMustExist | OfnHideReadOnly;
 
-    if (!Win32.Succeeded(GetSaveFileNameW(&dialog)))
+    if (!Win32.IsBoolSuccess(GetSaveFileNameW(&dialog)))
         return "";
-    return chosen.Text();
+    return chosen.ReadText();
 }
 
 // ======================================================= the Vista dialogs
@@ -183,10 +183,10 @@ public enum DialogError : uint
 }
 
 /// `CLSID_FileOpenDialog`.
-public Guid FileOpenDialogId() => Com.Parse("DC1C5A9C-E88A-4DDE-A5A1-60F82A20AEF7");
+public Guid FileOpenDialogId() => Com.ParseGuid("DC1C5A9C-E88A-4DDE-A5A1-60F82A20AEF7");
 
 /// `CLSID_FileSaveDialog`.
-public Guid FileSaveDialogId() => Com.Parse("C0B4E2F3-BA21-4773-8DBA-335EC946EB8B");
+public Guid FileSaveDialogId() => Com.ParseGuid("C0B4E2F3-BA21-4773-8DBA-335EC946EB8B");
 
 /// The `FilterSpec` array an `IFileDialog` wants, built from the same
 /// label-and-pattern pairs `BuildFilter` takes.
@@ -195,7 +195,7 @@ public Guid FileSaveDialogId() => Com.Parse("C0B4E2F3-BA21-4773-8DBA-335EC946EB8
 /// rather than one buffer of NUL-separated text with a double NUL at the end.
 /// The `Utf16String`s go in `held` because the specs point into them, and the
 /// caller keeps that alive for as long as it uses the specs.
-public FilterSpec[] BuildSpecs(String[] pairs, Utf16String[] held)
+public FilterSpec[] BuildFilterSpecs(String[] pairs, Utf16String[] held)
 {
     nuint count = pairs.Length / 2u;
     var specs = new FilterSpec[count];
@@ -215,7 +215,7 @@ public FilterSpec[] BuildSpecs(String[] pairs, Utf16String[] held)
 ///
 /// Split out because the open and save paths differ only in which interface
 /// they hold and what they read out of it afterwards.
-int Prepare(IFileDialog dialog, HWND owner, String title,
+int PrepareDialog(IFileDialog dialog, HWND owner, String title,
             String[] filterPairs, uint options)
 {
     if (!title.IsEmpty)
@@ -228,7 +228,7 @@ int Prepare(IFileDialog dialog, HWND owner, String title,
     if (filterPairs.Length >= 2u)
     {
         var held = new Utf16String[filterPairs.Length];
-        var specs = BuildSpecs(filterPairs, held);
+        var specs = BuildFilterSpecs(filterPairs, held);
         dialog.SetFileTypes((uint)specs.Length, &specs[0]);
     }
 
@@ -236,7 +236,7 @@ int Prepare(IFileDialog dialog, HWND owner, String title,
 }
 
 /// The chosen item's path, or the reason there was not one.
-Result<String, DialogError> Chosen(IFileDialog dialog, int shown)
+Result<String, DialogError> ReadChosenPath(IFileDialog dialog, int shown)
 {
     if (Com.WasCancelled(shown))
         return Fail(DialogError.Cancelled);
@@ -249,7 +249,7 @@ Result<String, DialogError> Chosen(IFileDialog dialog, int shown)
 
     // ARC releases the item at the end of this function; the path is a copy.
     IShellItem item = (IShellItem)raw;
-    String path = Shell.PathOf(item);
+    String path = Shell.GetItemPath(item);
 
     if (path.IsEmpty)
         return Fail(DialogError.Other);
@@ -269,26 +269,26 @@ Result<String, DialogError> Chosen(IFileDialog dialog, int shown)
 public Result<String, DialogError> ChooseFile(HWND owner, String title,
                                               String[] filterPairs)
 {
-    var made = Com.Create(FileOpenDialogId(), iidof(IFileOpenDialog));
+    var made = Com.CreateInstance(FileOpenDialogId(), iidof(IFileOpenDialog));
     if (!made.Ok)
         return Fail(DialogError.NotAvailable);
 
     IFileOpenDialog dialog = (IFileOpenDialog)made.Value;
-    int shown = Prepare(dialog, owner, title, filterPairs,
+    int shown = PrepareDialog(dialog, owner, title, filterPairs,
                         OptionFileMustExist | OptionPathMustExist);
-    return Chosen(dialog, shown);
+    return ReadChosenPath(dialog, shown);
 }
 
 /// Asks the user for one or more existing files.
 public Result<String[], DialogError> ChooseFiles(HWND owner, String title,
                                                  String[] filterPairs)
 {
-    var made = Com.Create(FileOpenDialogId(), iidof(IFileOpenDialog));
+    var made = Com.CreateInstance(FileOpenDialogId(), iidof(IFileOpenDialog));
     if (!made.Ok)
         return Fail(DialogError.NotAvailable);
 
     IFileOpenDialog dialog = (IFileOpenDialog)made.Value;
-    int shown = Prepare(dialog, owner, title, filterPairs,
+    int shown = PrepareDialog(dialog, owner, title, filterPairs,
                         OptionFileMustExist | OptionPathMustExist |
                         OptionAllowMultiselect);
 
@@ -302,7 +302,7 @@ public Result<String[], DialogError> ChooseFiles(HWND owner, String title,
         return Fail(DialogError.Other);
 
     IShellItemArray items = (IShellItemArray)raw;
-    return Ok(Shell.PathsOf(items));
+    return Ok(Shell.GetArrayPaths(items));
 }
 
 /// Asks the user for a folder.
@@ -311,15 +311,15 @@ public Result<String[], DialogError> ChooseFiles(HWND owner, String title,
 /// a different, worse dialog with none of the places bar -- is not bound.
 public Result<String, DialogError> ChooseFolder(HWND owner, String title)
 {
-    var made = Com.Create(FileOpenDialogId(), iidof(IFileOpenDialog));
+    var made = Com.CreateInstance(FileOpenDialogId(), iidof(IFileOpenDialog));
     if (!made.Ok)
         return Fail(DialogError.NotAvailable);
 
     IFileOpenDialog dialog = (IFileOpenDialog)made.Value;
     var empty = new String[0u];
-    int shown = Prepare(dialog, owner, title, empty,
+    int shown = PrepareDialog(dialog, owner, title, empty,
                         OptionPickFolders | OptionPathMustExist);
-    return Chosen(dialog, shown);
+    return ReadChosenPath(dialog, shown);
 }
 
 /// Asks the user where to save, warning before an overwrite.
@@ -331,7 +331,7 @@ public Result<String, DialogError> ChooseSaveFile(HWND owner, String title,
                                                   String suggestedName,
                                                   String defaultExtension)
 {
-    var made = Com.Create(FileSaveDialogId(), iidof(IFileSaveDialog));
+    var made = Com.CreateInstance(FileSaveDialogId(), iidof(IFileSaveDialog));
     if (!made.Ok)
         return Fail(DialogError.NotAvailable);
 
@@ -346,30 +346,30 @@ public Result<String, DialogError> ChooseSaveFile(HWND owner, String title,
         dialog.SetDefaultExtension(defaultExtension.ToUtf16().ToPointer());
     }
 
-    int shown = Prepare(dialog, owner, title, filterPairs,
+    int shown = PrepareDialog(dialog, owner, title, filterPairs,
                         OptionOverwritePrompt | OptionPathMustExist);
-    return Chosen(dialog, shown);
+    return ReadChosenPath(dialog, shown);
 }
 
 /// Opens a dialog already showing a folder, for the callers that want to start
 /// somewhere in particular.
-public Result<String, DialogError> ChooseFileIn(HWND owner, String title,
-                                                String[] filterPairs,
-                                                String startingFolder)
+public Result<String, DialogError> ChooseFileInFolder(HWND owner, String title,
+                                                      String[] filterPairs,
+                                                      String startingFolder)
 {
-    var made = Com.Create(FileOpenDialogId(), iidof(IFileOpenDialog));
+    var made = Com.CreateInstance(FileOpenDialogId(), iidof(IFileOpenDialog));
     if (!made.Ok)
         return Fail(DialogError.NotAvailable);
 
     IFileOpenDialog dialog = (IFileOpenDialog)made.Value;
 
-    var folder = Shell.ItemFromPath(startingFolder);
+    var folder = Shell.CreateItemFromPath(startingFolder);
     if (folder.Ok)
         dialog.SetFolder((byte*)folder.Value);
 
-    int shown = Prepare(dialog, owner, title, filterPairs,
+    int shown = PrepareDialog(dialog, owner, title, filterPairs,
                         OptionFileMustExist | OptionPathMustExist);
-    return Chosen(dialog, shown);
+    return ReadChosenPath(dialog, shown);
 }
 
 #endif

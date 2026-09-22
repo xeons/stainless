@@ -331,7 +331,7 @@ public extern "C"
 ///
 /// Each callback answers non-zero to continue and zero to stop. `type` and
 /// `name` are `MAKEINTRESOURCE` integers as often as they are strings, which
-/// is what `Win32.Resources.NameOf` is for.
+/// is what `Win32.Resources.FormatResourceName` is for.
 public delegate int EnumResTypeProc(HMODULE library, char16* type, nint parameter);
 public delegate int EnumResNameProc(HMODULE library, char16* type, char16* name, nint parameter);
 public delegate int EnumResLangProc(HMODULE library, char16* type, char16* name,

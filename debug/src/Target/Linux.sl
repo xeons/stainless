@@ -180,20 +180,20 @@ public class LinuxTarget : ITarget
 
         _stopped = true;
 
-        if (ExitedNormally(status))
+        if (HasExitedNormally(status))
         {
             _running = false;
-            return Exited(ExitStatusOf(status));
+            return Exited(GetExitStatus(status));
         }
 
-        if (!StoppedBySignal(status))
+        if (!IsStoppedBySignal(status))
         {
             // Killed by a signal rather than stopped by one.
             _running = false;
             return Exited(-1);
         }
 
-        int signal = StopSignalOf(status);
+        int signal = GetStopSignal(status);
 
         UserRegisters registers;
         if (ptrace(PtraceGetRegs, _pid, null, (void*)&registers) < 0)

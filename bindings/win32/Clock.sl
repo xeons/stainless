@@ -40,13 +40,13 @@ import Win32.Kernel32;
 
 /// A `FILETIME`'s two halves as the number they represent: 100-nanosecond
 /// ticks since 1 January 1601, UTC.
-public ulong Ticks(FileTime time)
+public ulong FileTimeToTicks(FileTime time)
 {
     return ((ulong)time.High << 32) | (ulong)time.Low;
 }
 
 /// The number back into the pair Windows wants.
-public FileTime FromTicks(ulong ticks)
+public FileTime TicksToFileTime(ulong ticks)
 {
     FileTime time;
     time.Low = (uint)(ticks & 0xFFFFFFFFu);
@@ -55,7 +55,7 @@ public FileTime FromTicks(ulong ticks)
 }
 
 /// Now, in UTC.
-public SystemTime UtcNow()
+public SystemTime GetUtcNow()
 {
     SystemTime time;
     GetSystemTime(&time);
@@ -63,7 +63,7 @@ public SystemTime UtcNow()
 }
 
 /// Now, in the machine's own time zone.
-public SystemTime Now()
+public SystemTime GetLocalNow()
 {
     SystemTime time;
     GetLocalTime(&time);
@@ -71,42 +71,42 @@ public SystemTime Now()
 }
 
 /// Now as ticks, which is the form to store and to subtract.
-public ulong NowTicks()
+public ulong GetUtcNowTicks()
 {
     FileTime time;
     GetSystemTimeAsFileTime(&time);
-    return Ticks(time);
+    return FileTimeToTicks(time);
 }
 
 /// A `FILETIME` as a calendar date, or a zeroed one if Windows refuses it.
-public SystemTime ToCalendar(ulong ticks)
+public SystemTime TicksToSystemTime(ulong ticks)
 {
-    FileTime file = FromTicks(ticks);
+    FileTime file = TicksToFileTime(ticks);
     SystemTime time;
     time.Year = 0u;
-    if (!Win32.Succeeded(FileTimeToSystemTime(&file, &time)))
+    if (!Win32.IsBoolSuccess(FileTimeToSystemTime(&file, &time)))
         time.Year = 0u;
     return time;
 }
 
 /// A calendar date as ticks, or 0 if Windows refuses it.
-public ulong FromCalendar(SystemTime time)
+public ulong SystemTimeToTicks(SystemTime time)
 {
     SystemTime input = time;
     FileTime file;
-    if (!Win32.Succeeded(SystemTimeToFileTime(&input, &file)))
+    if (!Win32.IsBoolSuccess(SystemTimeToFileTime(&input, &file)))
         return 0u;
-    return Ticks(file);
+    return FileTimeToTicks(file);
 }
 
 /// The same instant, expressed in the machine's time zone.
-public ulong ToLocal(ulong ticks)
+public ulong TicksToLocalTicks(ulong ticks)
 {
-    FileTime utc = FromTicks(ticks);
+    FileTime utc = TicksToFileTime(ticks);
     FileTime local;
-    if (!Win32.Succeeded(FileTimeToLocalFileTime(&utc, &local)))
+    if (!Win32.IsBoolSuccess(FileTimeToLocalFileTime(&utc, &local)))
         return ticks;
-    return Ticks(local);
+    return FileTimeToTicks(local);
 }
 
 /// The Unix epoch as Windows ticks: 1 January 1970 is this far after 1601.
@@ -114,31 +114,32 @@ public const ulong UnixEpochTicks = 116444736000000000u;
 
 /// Windows ticks as seconds since the Unix epoch, which is what every other
 /// system in the world means by a timestamp.
-public long ToUnixSeconds(ulong ticks)
+public long TicksToUnixSeconds(ulong ticks)
 {
     return (long)((ticks - UnixEpochTicks) / 10000000u);
 }
 
-public ulong FromUnixSeconds(long seconds)
+public ulong UnixSecondsToTicks(long seconds)
 {
     return UnixEpochTicks + (ulong)seconds * 10000000u;
 }
 
 /// `2026-09-03 21:47:12`, which sorts correctly as text.
-public String Format(SystemTime time)
+public String FormatSystemTime(SystemTime time)
 {
-    return Pad(time.Year, 4u) + "-" + Pad(time.Month, 2u) + "-" + Pad(time.Day, 2u)
-        + " " + Pad(time.Hour, 2u) + ":" + Pad(time.Minute, 2u)
-        + ":" + Pad(time.Second, 2u);
+    return FormatSystemDate(time)
+        + " " + PadNumber(time.Hour, 2u) + ":" + PadNumber(time.Minute, 2u)
+        + ":" + PadNumber(time.Second, 2u);
 }
 
 /// `2026-09-03`, without the time of day.
-public String FormatDate(SystemTime time)
+public String FormatSystemDate(SystemTime time)
 {
-    return Pad(time.Year, 4u) + "-" + Pad(time.Month, 2u) + "-" + Pad(time.Day, 2u);
+    return PadNumber(time.Year, 4u) + "-" + PadNumber(time.Month, 2u)
+        + "-" + PadNumber(time.Day, 2u);
 }
 
-String Pad(ushort value, nuint width)
+String PadNumber(ushort value, nuint width)
 {
     String text = Text.FromInteger((long)value);
     while (text.ByteLength() < width)
@@ -150,11 +151,11 @@ String Pad(ushort value, nuint width)
 
 /// Milliseconds since the machine booted. Cheap, monotonic, and about 15ms
 /// granular, which is the scheduler's tick rather than a limit of the call.
-public ulong Uptime() => GetTickCount64();
+public ulong GetUptimeMilliseconds() => GetTickCount64();
 
 /// The performance counter, in its own units. Meaningless on its own;
-/// `Frequency()` is what turns a difference into seconds.
-public long Counter()
+/// `ReadPerformanceFrequency()` is what turns a difference into seconds.
+public long ReadPerformanceCounter()
 {
     long count = 0;
     QueryPerformanceCounter(&count);
@@ -163,7 +164,7 @@ public long Counter()
 
 /// How many counter units there are in a second. Fixed while the machine runs,
 /// so it is worth asking once.
-public long Frequency()
+public long ReadPerformanceFrequency()
 {
     long frequency = 0;
     QueryPerformanceFrequency(&frequency);
@@ -171,9 +172,9 @@ public long Frequency()
 }
 
 /// Measures how long something took, in seconds, from two counter readings.
-public double Elapsed(long from, long to)
+public double MeasureSecondsBetween(long from, long to)
 {
-    long frequency = Frequency();
+    long frequency = ReadPerformanceFrequency();
     if (frequency == 0)
         return 0.0;
     return (double)(to - from) / (double)frequency;
@@ -187,22 +188,22 @@ public class Stopwatch
 
     public Stopwatch()
     {
-        _frequency = Frequency();
-        _start = Counter();
+        _frequency = ReadPerformanceFrequency();
+        _start = ReadPerformanceCounter();
     }
 
     /// Starts again from now.
-    public void Restart() => _start = Counter();
+    public void Restart() => _start = ReadPerformanceCounter();
 
     /// Seconds since the last start.
-    public double Seconds()
+    public double GetElapsedSeconds()
     {
         if (_frequency == 0)
             return 0.0;
-        return (double)(Counter() - _start) / (double)_frequency;
+        return (double)(ReadPerformanceCounter() - _start) / (double)_frequency;
     }
 
-    public double Milliseconds() => Seconds() * 1000.0;
+    public double GetElapsedMilliseconds() => GetElapsedSeconds() * 1000.0;
 }
 
 #endif

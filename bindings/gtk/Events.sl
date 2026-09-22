@@ -78,13 +78,13 @@ class Boxed
     public Boxed(EventHandler body) => Body = body;
 }
 
-gboolean Dispatch(GtkWidget* sender, gpointer carried, gpointer data)
+gboolean DispatchEventSignal(GtkWidget* sender, gpointer carried, gpointer data)
 {
     var boxed = (Boxed)data;
     return boxed.Body(sender, carried) ? 1 : 0;
 }
 
-void Forget(gpointer data, gpointer closure)
+void ReleaseEventHandler(gpointer data, gpointer closure)
 {
     sl_release(data);
 }
@@ -96,7 +96,7 @@ public gulong ConnectEvent(GtkWidget* instance, String signal, EventHandler hand
     sl_retain((gpointer)boxed);
 
     return g_signal_connect_data(instance, signal.ToPointer(),
-        Dispatch, (gpointer)boxed, Forget, G_CONNECT_DEFAULT);
+        DispatchEventSignal, (gpointer)boxed, ReleaseEventHandler, G_CONNECT_DEFAULT);
 }
 
 #endif

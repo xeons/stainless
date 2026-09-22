@@ -56,8 +56,8 @@
 // release live, and why the arrangement is leak-free with no bookkeeping here.
 //
 // **The names read as a toolkit rather than as GTK.** `new Box(true, 6)` is
-// a column, `Grid.Attach` takes a cell and a span, and a `ScrollView` has a
-// minimum content size. This layer is what `forms/`'s GTK backend is written
+// a column, `Grid.AttachChild` takes a cell and a span, and a `ScrollView` has
+// a minimum content size. This layer is what `forms/`'s GTK backend is written
 // against, so it is shaped by what a widget set behind a seam needs rather
 // than by what the C header happens to be called.
 module Gtk;
@@ -172,7 +172,7 @@ public class Widget
 
     /// Asks for a repaint. The only correct way: drawing outside a paint
     /// handler is not something GTK supports.
-    public void Redraw() => gtk_widget_queue_draw(handle);
+    public void Invalidate() => gtk_widget_queue_draw(handle);
 
     /// Space outside the widget, on all four sides.
     ///
@@ -199,20 +199,20 @@ public class Widget
     /// Destroys the widget and everything in it, breaking it out of its
     /// container. The wrapper stays valid and its calls stop doing anything,
     /// which is what GTK does with a destroyed widget too.
-    public void Destroy() => gtk_widget_destroy(handle);
+    public void DestroyWidget() => gtk_widget_destroy(handle);
 
     /// Runs when the widget is destroyed.
     public void OnDestroyed(Handler handler)
     {
-        ConnectPlain(handle, "destroy", handler);
+        ConnectPlainSignal(handle, "destroy", handler);
     }
 
     // The input events. `Pointer`, `Key` and their handler interfaces are in
     // `Drawing.sl`, which is the same module: a widget that paints itself is
     // the one that usually wants these, and they read better next to it.
     //
-    // **A `DrawingArea` receives none of these until `WantInput` is called.**
-    // Most other widgets receive the mouse and not the keyboard, and a widget
+    // **A `DrawingArea` receives none of these until `EnableInputEvents` is
+    // called.** Most other widgets receive the mouse and not the keyboard, and a widget
     // that cannot take focus never sees a key at all.
 
     public void OnMouseDown(PointerHandler handler)
@@ -277,7 +277,7 @@ public class Box : Container
     /// argument worth understanding: a column of five labels and one expanding
     /// text area puts all the slack in the text area, which is almost always
     /// what a form wants.
-    public void Pack(Widget child, bool expand)
+    public void PackStart(Widget child, bool expand)
     {
         gtk_box_pack_start(handle, child.Handle, expand ? 1 : 0, 1, 0u);
     }
@@ -302,7 +302,7 @@ public class Box : Container
 
 /// A table of cells.
 ///
-/// **`Attach` takes a cell and a span on both versions**, which is the one
+/// **`AttachChild` takes a cell and a span on both versions**, which is the one
 /// place this layer does arithmetic rather than just renaming. `GtkGrid` is
 /// already described that way; `GtkTable` wants the grid *lines* a child sits
 /// between, so a single cell at column 2 is `left=2, right=3`. Passing a grid's
@@ -316,15 +316,15 @@ public class Grid : Container
     }
 
     /// Puts a child at a cell, spanning `columns` by `rows` of them.
-    public void Attach(Widget child, int column, int row, int columns, int rows)
+    public void AttachChild(Widget child, int column, int row, int columns, int rows)
     {
         gtk_grid_attach(handle, child.Handle, column, row, columns, rows);
     }
 
     /// One cell at one place, which is what most calls want.
-    public void Place(Widget child, int column, int row)
+    public void PlaceChild(Widget child, int column, int row)
     {
-        Attach(child, column, row, 1, 1);
+        AttachChild(child, column, row, 1, 1);
     }
 
     public void SetSpacing(int columns, int rows)
@@ -357,7 +357,7 @@ public class Window : Container
     }
 
     /// The size right now, whatever it was opened at.
-    public void Resize(int width, int height)
+    public void ResizeWindow(int width, int height)
     {
         gtk_window_resize(handle, width, height);
     }
@@ -368,7 +368,7 @@ public class Window : Container
     }
 
     /// Centres the window on the screen, or on its parent if it has one.
-    public void Center()
+    public void CenterWindow()
     {
         gtk_window_set_position(handle, GTK_WIN_POS_CENTER_ON_PARENT);
     }
@@ -381,10 +381,10 @@ public class Window : Container
     }
 
     /// Shows the window and brings it to the front.
-    public void Present() => gtk_window_present(handle);
+    public void Activate() => gtk_window_present(handle);
 
-    public void Maximize() => gtk_window_maximize(handle);
-    public void Fullscreen() => gtk_window_fullscreen(handle);
+    public void MaximizeWindow() => gtk_window_maximize(handle);
+    public void EnterFullscreen() => gtk_window_fullscreen(handle);
 
     /// Runs when the user tries to close the window. **Answering true keeps it
     /// open**, which is how an "unsaved changes" prompt works:
@@ -407,7 +407,7 @@ public class Label : Widget
 
     public void SetText(String text) => gtk_label_set_text(handle, text.ToPointer());
 
-    public String Text() => Text.FromNullTerminated(gtk_label_get_text(handle));
+    public String GetText() => Text.FromNullTerminated(gtk_label_get_text(handle));
 
     /// Pango markup: `<b>`, `<i>`, `<span foreground="red">`. The closest
     /// thing GTK has to rich text in a label.
@@ -440,7 +440,7 @@ public class Entry : Widget
 
     /// A copy of what is in the entry. GTK's own answer is borrowed and stops
     /// being valid the next time the entry changes, so this copies it.
-    public String Text() => Text.FromNullTerminated(gtk_entry_get_text(handle));
+    public String GetText() => Text.FromNullTerminated(gtk_entry_get_text(handle));
 
     /// Turns the entry into a password field.
     public void SetMasked(bool masked)
@@ -467,13 +467,13 @@ public class Entry : Widget
     /// Runs on every keystroke.
     public void OnChanged(Handler handler)
     {
-        ConnectPlain(handle, "changed", handler);
+        ConnectPlainSignal(handle, "changed", handler);
     }
 
     /// Runs when the user presses Enter.
     public void OnEntered(Handler handler)
     {
-        ConnectPlain(handle, "activate", handler);
+        ConnectPlainSignal(handle, "activate", handler);
     }
 }
 
@@ -489,11 +489,11 @@ public class Button : Container
 
     public void SetLabel(String label) => gtk_button_set_label(handle, label.ToPointer());
 
-    public String Label() => Text.FromNullTerminated(gtk_button_get_label(handle));
+    public String GetLabel() => Text.FromNullTerminated(gtk_button_get_label(handle));
 
     public void OnClicked(Handler handler)
     {
-        ConnectPlain(handle, "clicked", handler);
+        ConnectPlainSignal(handle, "clicked", handler);
     }
 }
 
@@ -516,7 +516,7 @@ public class CheckBox : Button
 
     public void OnToggled(Handler handler)
     {
-        ConnectPlain(handle, "toggled", handler);
+        ConnectPlainSignal(handle, "toggled", handler);
     }
 }
 
@@ -569,7 +569,7 @@ public class TextArea : Widget
     /// GTK allocates the answer and the caller frees it, which is what the
     /// `g_free` is doing: it is one of the few places in this binding where
     /// ownership crosses in that direction.
-    public String Text()
+    public String GetText()
     {
         GtkTextIter start;
         GtkTextIter stop;
@@ -595,7 +595,7 @@ public class TextArea : Widget
     /// is what changes -- the view is only a window onto it.
     public void OnChanged(Handler handler)
     {
-        ConnectPlain(_buffer, "changed", handler);
+        ConnectPlainSignal(_buffer, "changed", handler);
     }
 }
 
@@ -657,14 +657,14 @@ public class ComboBox : Widget
     }
 
     /// The index of what is chosen, or -1 for nothing.
-    public int SelectedIndex() => gtk_combo_box_get_active(handle);
+    public int GetSelectedIndex() => gtk_combo_box_get_active(handle);
 
     public void SetSelectedIndex(int index) => gtk_combo_box_set_active(handle, index);
 
     /// The text of what is chosen, or "" for nothing.
     ///
     /// GTK allocates this one too, so it is freed here.
-    public String Selected()
+    public String GetSelectedText()
     {
         gchar* raw = gtk_combo_box_text_get_active_text(handle);
         if (raw == null)
@@ -677,7 +677,7 @@ public class ComboBox : Widget
 
     public void OnChanged(Handler handler)
     {
-        ConnectPlain(handle, "changed", handler);
+        ConnectPlainSignal(handle, "changed", handler);
     }
 }
 
@@ -693,10 +693,10 @@ public class ProgressBar : Widget
         gtk_progress_bar_set_fraction(handle, fraction);
     }
 
-    public double Fraction() => gtk_progress_bar_get_fraction(handle);
+    public double GetFraction() => gtk_progress_bar_get_fraction(handle);
 
     /// One step of the back-and-forth a bar shows when the total is unknown.
-    public void Pulse() => gtk_progress_bar_pulse(handle);
+    public void PulseProgress() => gtk_progress_bar_pulse(handle);
 
     /// Text drawn over the bar.
     ///
@@ -720,7 +720,7 @@ public class SpinBox : Widget
     }
 
     public double Value => gtk_spin_button_get_value(handle);
-    public int    IntegerValue() => gtk_spin_button_get_value_as_int(handle);
+    public int    GetIntegerValue() => gtk_spin_button_get_value_as_int(handle);
 
     public void SetValue(double value) => gtk_spin_button_set_value(handle, value);
 
@@ -729,7 +729,7 @@ public class SpinBox : Widget
 
     public void OnChanged(Handler handler)
     {
-        ConnectPlain(handle, "value-changed", handler);
+        ConnectPlainSignal(handle, "value-changed", handler);
     }
 }
 
@@ -750,7 +750,7 @@ public class Slider : Widget
 
     public void OnChanged(Handler handler)
     {
-        ConnectPlain(handle, "value-changed", handler);
+        ConnectPlainSignal(handle, "value-changed", handler);
     }
 }
 
@@ -780,13 +780,13 @@ public class Notebook : Container
         return gtk_notebook_append_page(handle, page.Handle, label.Handle);
     }
 
-    public int  CurrentPage() => gtk_notebook_get_current_page(handle);
+    public int  GetCurrentPage() => gtk_notebook_get_current_page(handle);
     public void SetCurrentPage(int index) => gtk_notebook_set_current_page(handle, index);
-    public int  PageCount() => gtk_notebook_get_n_pages(handle);
+    public int  GetPageCount() => gtk_notebook_get_n_pages(handle);
 
     public void OnPageChanged(Handler handler)
     {
-        ConnectPlain(handle, "switch-page", handler);
+        ConnectPlainSignal(handle, "switch-page", handler);
     }
 }
 
@@ -831,7 +831,7 @@ public class MenuItem : Container
     /// Not called `Separator`, because that is the name of the widget between
     /// two things in a box and this is a different GTK type with a different
     /// parent.
-    public static MenuItem Divider()
+    public static MenuItem CreateDivider()
     {
         return new MenuItem(gtk_separator_menu_item_new());
     }
@@ -846,7 +846,7 @@ public class MenuItem : Container
 
     public void OnChosen(Handler handler)
     {
-        ConnectPlain(handle, "activate", handler);
+        ConnectPlainSignal(handle, "activate", handler);
     }
 }
 
@@ -857,7 +857,7 @@ public class Menu : Container
 
     protected Menu(GtkWidget* raw) => base(raw);
 
-    public void Append(MenuItem item) => gtk_menu_shell_append(handle, item.Handle);
+    public void AppendItem(MenuItem item) => gtk_menu_shell_append(handle, item.Handle);
 }
 
 /// The bar across the top of a window.
@@ -892,26 +892,27 @@ public static class Dialogs
 {
 
     /// Shows a message and waits for OK.
-    public static void Inform(Window parent, String title, String message)
+    public static void ShowInformation(Window parent, String title, String message)
     {
-        Show(parent, GTK_MESSAGE_INFO, GTK_BUTTONS_OK, title, message);
+        ShowMessageDialog(parent, GTK_MESSAGE_INFO, GTK_BUTTONS_OK, title, message);
     }
 
-    public static void Warn(Window parent, String title, String message)
+    public static void ShowWarning(Window parent, String title, String message)
     {
-        Show(parent, GTK_MESSAGE_WARNING, GTK_BUTTONS_OK, title, message);
+        ShowMessageDialog(parent, GTK_MESSAGE_WARNING, GTK_BUTTONS_OK, title, message);
     }
 
-    public static void Complain(Window parent, String title, String message)
+    public static void ShowError(Window parent, String title, String message)
     {
-        Show(parent, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, title, message);
+        ShowMessageDialog(parent, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, title, message);
     }
 
     /// Asks a yes-or-no question. `Cancelled` is what closing the dialog
     /// gives, which is not the same as No and should not be treated as one.
-    public static Answer Ask(Window parent, String title, String message)
+    public static Answer AskQuestion(Window parent, String title, String message)
     {
-        int response = Show(parent, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, title, message);
+        int response = ShowMessageDialog(parent, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
+            title, message);
         if (response == GTK_RESPONSE_YES)
             return Yes;
         if (response == GTK_RESPONSE_NO)
@@ -926,7 +927,7 @@ public static class Dialogs
     /// in it read the stack -- the oldest bug in C, and it would arrive here
     /// through something as ordinary as a filename. So the format is `"%s"`
     /// and the text is data.
-    static int Show(Window parent, int kind, int buttons, String title, String message)
+    static int ShowMessageDialog(Window parent, int kind, int buttons, String title, String message)
     {
         var dialog = gtk_message_dialog_new(parent.Handle,
             GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -963,7 +964,7 @@ public class Application
     /// outcome over ssh and in a container, and the reason this is
     /// `gtk_init_check` rather than `gtk_init`: the latter ends the program
     /// before `Main` has a chance to say anything.
-    public bool Start()
+    public bool StartToolkit()
     {
         _started = gtk_init_check(null, null) != 0;
         return _started;
@@ -979,16 +980,16 @@ public class Application
     public void AddWindow(Window window)
     {
         _windows.Add(window);
-        window.OnDestroyed(() => { Quit(); });
+        window.OnDestroyed(() => { Exit(); });
     }
 
-    /// Whether `Start` found a display.
-    public bool IsStarted() => _started;
+    /// Whether `StartToolkit` found a display.
+    public bool IsStarted => _started;
 
-    /// Runs until `Quit`. Everything a GUI program does happens inside here.
+    /// Runs until `Exit`. Everything a GUI program does happens inside here.
     public void Run() => gtk_main();
 
-    public void Quit() => gtk_main_quit();
+    public void Exit() => gtk_main_quit();
 
     /// Handles everything waiting and returns, for a long computation that
     /// wants to keep its window painting without a thread.
@@ -996,7 +997,7 @@ public class Application
     /// **This re-enters every handler**, so a button that starts the
     /// computation can be pressed again in the middle of it. Disable it first;
     /// that is what `SetEnabled` is for.
-    public void Pump()
+    public void DoEvents()
     {
         while (gtk_events_pending() != 0)
             gtk_main_iteration();
@@ -1007,9 +1008,9 @@ public class Application
     ///
     /// The only correct way to do something later in a GUI program: a sleep in
     /// a handler stops the loop, and the loop is what repaints.
-    public void Every(int milliseconds, Question body)
+    public void RepeatEvery(int milliseconds, Question body)
     {
-        Repeat((uint)milliseconds, body);
+        ScheduleTicker((uint)milliseconds, body);
     }
 }
 
@@ -1022,21 +1023,21 @@ class Ticker
     public Ticker(Question body) => Body = body;
 }
 
-gboolean TickOnce(gpointer data)
+gboolean InvokeTicker(gpointer data)
 {
     var ticker = (Ticker)data;
     return ticker.Body() ? 1 : 0;
 }
 
-void ForgetTicker(gpointer data) => sl_release(data);
+void ReleaseTicker(gpointer data) => sl_release(data);
 
-void Repeat(uint milliseconds, Question body)
+void ScheduleTicker(uint milliseconds, Question body)
 {
     var ticker = new Ticker(body);
     sl_retain((gpointer)ticker);
 
-    g_timeout_add_full(G_PRIORITY_DEFAULT, milliseconds, TickOnce,
-        (gpointer)ticker, ForgetTicker);
+    g_timeout_add_full(G_PRIORITY_DEFAULT, milliseconds, InvokeTicker,
+        (gpointer)ticker, ReleaseTicker);
 }
 
 #endif

@@ -62,21 +62,21 @@ class Face
 
         // A dial that fills as the progress does.
         canvas.SetHexColor(0x2E2E3E);
-        canvas.Circle(middleX, middleY, radius);
-        canvas.Fill();
+        canvas.AddCircle(middleX, middleY, radius);
+        canvas.FillPath();
 
         canvas.SetHexColor(0x6EA8FE);
         canvas.SetLineWidth(8.0);
         canvas.SetRoundEnds(true);
-        canvas.Arc(middleX, middleY, radius - 6.0,
+        canvas.AddArc(middleX, middleY, radius - 6.0,
             -1.5707963, -1.5707963 + 6.283185 * _state.Fraction);
-        canvas.Stroke();
+        canvas.StrokePath();
 
         // Text is drawn from its baseline, which is the one thing to remember.
         var count = Text.FromInteger((long)_state.Clicks);
         canvas.SetHexColor(0xE8E8F0);
         canvas.SetFont("Sans", radius / 2.0, true);
-        canvas.DrawText(count, middleX - canvas.TextWidth(count) / 2.0,
+        canvas.DrawText(count, middleX - canvas.MeasureTextWidth(count) / 2.0,
                         middleY + radius / 6.0);
     }
 }
@@ -89,7 +89,7 @@ public int Main()
     // outcome over ssh and in a container, and a toolkit that ends the program
     // before Main gets to speak is not a good citizen of a language with no
     // exceptions.
-    if (!app.Start())
+    if (!app.StartToolkit())
     {
         Console.WriteLine("no display; set DISPLAY or run this on a desktop");
         return 1;
@@ -110,29 +110,29 @@ public int Main()
 
     var file = new Menu();
     var quit = new MenuItem("_Quit");
-    quit.OnChosen(() => { app.Quit(); });
-    file.Append(quit);
+    quit.OnChosen(() => { app.Exit(); });
+    file.AppendItem(quit);
     bar.AddMenu("_File", file);
 
     var help = new Menu();
     var about = new MenuItem("_About");
     about.OnChosen(() =>
     {
-        Dialogs.Inform(window, "About",
+        Dialogs.ShowInformation(window, "About",
             "A GTK program written in Stainless.\n" +
             "Widgets, layout, events, a menu, a timer and custom drawing.");
     });
-    help.Append(about);
-    help.Append(MenuItem.Divider());
+    help.AppendItem(about);
+    help.AppendItem(MenuItem.CreateDivider());
     bar.AddMenu("_Help", help);
 
-    root.Pack(bar, false);
+    root.PackStart(bar, false);
 
     // ------------------------------------------------------------ the body
 
     var body = new Box(false, 12);
     body.SetPadding(12);
-    root.Pack(body, true);
+    root.PackStart(body, true);
 
     // The drawing on the left, taking the slack.
     // A bound method as the painter: two words, the method and the object.
@@ -141,73 +141,73 @@ public int Main()
     var face = new DrawingArea();
     face.OnPaint(painting.Paint);
     face.SetSize(220, 220);
-    body.Pack(face, true);
+    body.PackStart(face, true);
 
     // The controls on the right.
     var side = new Box(true, 8);
-    body.Pack(side, false);
+    body.PackStart(side, false);
 
     var greeting = new Label("Hello, world");
     greeting.SetMarkup("<b>Hello, world</b>");
-    side.Pack(greeting, false);
+    side.PackStart(greeting, false);
 
     var name = new Entry();
     name.SetPlaceholder("your name");
     name.OnChanged(() =>
     {
-        var typed = name.Text();
+        var typed = name.GetText();
         state.Name = typed.ByteLength() == 0u ? "world" : typed;
         greeting.SetText("Hello, " + state.Name);
     });
-    side.Pack(name, false);
+    side.PackStart(name, false);
 
     var bump = new Button("Click me");
     bump.OnClicked(() =>
     {
         state.Clicks = state.Clicks + 1;
-        face.Redraw();
+        face.Invalidate();
     });
-    side.Pack(bump, false);
+    side.PackStart(bump, false);
 
-    side.Pack(new Separator(false), false);
+    side.PackStart(new Separator(false), false);
 
     // A grid: a child goes at a cell with a span, rather than between the
     // four grid lines an older toolkit would have wanted.
     var grid = new Grid();
     grid.SetSpacing(8, 4);
-    side.Pack(grid, false);
+    side.PackStart(grid, false);
 
-    grid.Place(new Label("Speed"), 0, 0);
+    grid.PlaceChild(new Label("Speed"), 0, 0);
     var speed = new SpinBox(1.0, 20.0, 1.0);
     speed.SetValue(5.0);
-    grid.Place(speed, 1, 0);
+    grid.PlaceChild(speed, 1, 0);
 
-    grid.Place(new Label("Style"), 0, 1);
+    grid.PlaceChild(new Label("Style"), 0, 1);
     var style = new ComboBox();
     style.Add("Dial");
     style.Add("Ring");
     style.SetSelectedIndex(0);
-    grid.Place(style, 1, 1);
+    grid.PlaceChild(style, 1, 1);
 
     var animate = new CheckBox("Animate");
     animate.SetChecked(true);
-    side.Pack(animate, false);
+    side.PackStart(animate, false);
 
     var progress = new ProgressBar();
     progress.SetText("idle");
-    side.Pack(progress, false);
+    side.PackStart(progress, false);
 
     // ---------------------------------------------------------- the status
 
     var status = new StatusBar();
     status.SetText("ready");
-    root.Pack(status, false);
+    root.PackStart(status, false);
 
     // ----------------------------------------------------------- the timer
 
     // The only correct way to do something later in a GUI program: sleeping in
     // a handler stops the loop, and the loop is what repaints.
-    app.Every(40, () =>
+    app.RepeatEvery(40, () =>
     {
         if (animate.IsChecked())
         {
@@ -217,7 +217,7 @@ public int Main()
 
             progress.SetFraction(state.Fraction);
             progress.SetText(Text.FromInteger((long)(state.Fraction * 100.0)) + "%");
-            face.Redraw();
+            face.Invalidate();
         }
 
         status.SetText("clicks: " + Text.FromInteger((long)state.Clicks)
@@ -233,7 +233,7 @@ public int Main()
         if (state.Clicks == 0)
             return false;
 
-        switch (Dialogs.Ask(window, "Close", "Close after "
+        switch (Dialogs.AskQuestion(window, "Close", "Close after "
                 + Text.FromInteger((long)state.Clicks) + " clicks?"))
         {
             case Yes:       return false;

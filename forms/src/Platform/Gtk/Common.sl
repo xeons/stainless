@@ -720,7 +720,7 @@ public class GtkPeer : IControlPeer
     protected gulong WhenSignal(GtkWidget* instance, String signal, PeerSignal handler)
     {
         var relay = _relay;
-        return ConnectPlain(instance, signal, () =>
+        return ConnectPlainSignal(instance, signal, () =>
         {
             var peer = relay.Peer;
             if (peer != null)

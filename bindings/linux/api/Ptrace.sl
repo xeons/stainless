@@ -141,9 +141,9 @@ public const int OpenReadWrite = 2;
 
 /// `WIFEXITED`, `WEXITSTATUS` and the rest, which are macros in C and so have
 /// to be written out once here rather than guessed at each use.
-public bool ExitedNormally(int status) => (status & 0x7F) == 0;
-public int  ExitStatusOf(int status)   => (status >> 8) & 0xFF;
-public bool StoppedBySignal(int status) => (status & 0xFF) == 0x7F;
-public int  StopSignalOf(int status)    => (status >> 8) & 0xFF;
+public bool HasExitedNormally(int status) => (status & 0x7F) == 0;
+public int  GetExitStatus(int status)   => (status >> 8) & 0xFF;
+public bool IsStoppedBySignal(int status) => (status & 0xFF) == 0x7F;
+public int  GetStopSignal(int status)    => (status >> 8) & 0xFF;
 
 #endif

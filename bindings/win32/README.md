@@ -142,7 +142,7 @@ parameter is never passed; the slot has to exist.
 reference and nothing there can leak one. The one thing to know is that ARC
 releases at the end of a scope and `CoUninitialize` is a call in the middle of
 one — so an object must go out of scope before the apartment does. `Win32.Com`'s
-`Uninitialize` says so at greater length.
+`UninitializeApartment` says so at greater length.
 
 An out-parameter is `byte**` rather than the interface, because that is what
 `void**` is, and the caller adopts what comes back with a cast:
@@ -268,21 +268,21 @@ harder half — a wide API writes into a buffer the caller owns — so
 
 ```csharp
 var buffer = new WideBuffer(32768u);
-uint units = GetModuleFileNameW(null, buffer.Pointer(), buffer.Capacity);
-String path = buffer.Text(units);
+uint units = GetModuleFileNameW(null, buffer.Pointer, buffer.Capacity);
+String path = buffer.ReadText(units);
 ```
 
-`Machine.ExecutablePath()` is that, once, with a name.
+`Machine.GetExecutablePath()` is that, once, with a name.
 
 **The failure conventions**, which are three and are not interchangeable.
 `CreateFileW` returns `INVALID_HANDLE_VALUE`; `CreateWindowExW` returns null;
 `RegOpenKeyExW` returns the error code itself and never touches
-`GetLastError`. `Win32.IsInvalid` covers the first two, `Win32.Succeeded` reads
-a `BOOL`, and `Win32.Registry` returns a `Result` so that a value that was never
-read cannot be used.
+`GetLastError`. `Win32.IsInvalidHandle` covers the first two,
+`Win32.IsBoolSuccess` reads a `BOOL`, and `Win32.Registry` returns a `Result`
+so that a value that was never read cannot be used.
 
-**`Win32.LastErrorMessage()`**, which is `FormatMessageW` into a buffer with the
-trailing CR LF trimmed — the thing every program writes once.
+**`Win32.GetLastErrorMessage()`**, which is `FormatMessageW` into a buffer with
+the trailing CR LF trimmed — the thing every program writes once.
 
 ## The window procedure
 
@@ -319,8 +319,8 @@ the same for the parts with no window.
   a stock object from `GetStockObject` must never be deleted at all.
   `Drawing.OffScreen` is the one place that pairing is done for you.
 - **`CreateProcessW` may write to the command line it is given**, so it cannot
-  be a literal. `Tasks.Run` copies with `Win32.Copy` first; a caller using the
-  declaration directly has to do the same.
+  be a literal. `Tasks.RunProcess` copies with `Win32.CopyToWideBuffer` first;
+  a caller using the declaration directly has to do the same.
 - **An inline array cannot be passed by value.** `WIN32_FIND_DATAW` is a
   `struct` with the two `WCHAR` arrays the header gives it, so it is a plain
   local — but C decays an array parameter to a pointer, and copying 592 bytes
@@ -358,18 +358,19 @@ makes naming one bearable:
 import Win32.Resources;
 import Win32.User32;
 
-String ready = Resources.Text(201u);                        // RT_STRING
-byte[] data  = Resources.Bytes(Resources.Id(301), RtRcData());
-HICON  icon  = Resources.Icon(Resources.Id(1));             // RT_GROUP_ICON
-HMENU  menu  = Resources.Menu(Resources.Id(1));             // RT_MENU
+String ready = Resources.LoadString(201u);                  // RT_STRING
+byte[] data  = Resources.ReadResourceBytes(Resources.MakeIntResource(301), RtRcData());
+HICON  icon  = Resources.LoadIcon(Resources.MakeIntResource(1));   // RT_GROUP_ICON
+HMENU  menu  = Resources.LoadMenu(Resources.MakeIntResource(1));   // RT_MENU
 
-foreach (var name in Resources.Names(RtBitmap())) { ... }   // what is in there
+foreach (var name in Resources.GetResourceNames(RtBitmap())) { ... }   // what is in there
 ```
 
 **A name is a string or an integer, through the same parameter.** Windows
 reserves the bottom 64K of the pointer range for the second and calls the cast
-`MAKEINTRESOURCE`; `Resources.Id` is that cast, and `IsId`, `IdOf` and `NameOf`
-are the other direction, for a callback that has to ask which it was given.
+`MAKEINTRESOURCE`; `Resources.MakeIntResource` is that cast, and
+`IsIntResource`, `GetIntResourceId` and `FormatResourceName` are the other
+direction, for a callback that has to ask which it was given.
 The `RT_` types are functions rather than constants for the same reason the
 standard cursors are — they are integers pretending to be strings, and
 Stainless has no `const char16*`.
@@ -377,19 +378,20 @@ Stainless has no `const char16*`.
 **Nothing here is freed.** A resource lives in the mapped image, so
 `LoadResource` hands back a pointer into memory that is already there and
 `LockResource` is a cast. `FreeResource` has done nothing since Win32 and is
-deliberately not declared. `Resources.Pointer` gives that pointer straight out
-— read-only, valid as long as the module is — and `Resources.Bytes` copies for
-anything that outlives the call.
+deliberately not declared. `Resources.GetResourcePointer` gives that pointer
+straight out — read-only, valid as long as the module is — and
+`Resources.ReadResourceBytes` copies for anything that outlives the call.
 
 **`RT_VERSION` is the odd one out** and lives in `Win32.Version`, over
 `version.dll`. It is not a value but a small tree -- a fixed block of numbers
 plus per-language string tables -- so it is read with `VerQueryValueW` rather
 than by locking bytes, and it is read from a *file* rather than from a loaded
-module. `Resources.Version()` finds this program's own path and unpacks the
-four-part number; `Resources.VersionOf(path)` asks about anything else.
+module. `Resources.ReadProgramVersion()` finds this program's own path and
+unpacks the four-part number; `Resources.ReadFileVersion(path)` asks about
+anything else.
 
 **Reading another binary's resources** goes through
-`Resources.OpenForResources`, which is `LoadLibraryExW` with
+`Resources.OpenModuleForResources`, which is `LoadLibraryExW` with
 `LOAD_LIBRARY_AS_DATAFILE`: the file is mapped without `DllMain` running and
 without its imports being resolved, which is the only safe way to pull an icon
 out of an executable this program did not build.

@@ -805,7 +805,7 @@ int Main()
 
     HMODULE instance = GetModuleHandleW(null);
 
-    var windowClass = NewWindowClass();
+    var windowClass = CreateWindowClass();
     windowClass.Procedure = Procedure;
     windowClass.Instance = instance;
     windowClass.Cursor = LoadCursorW(null, CursorArrow());
@@ -813,19 +813,19 @@ int Main()
 
     if (RegisterClassExW(&windowClass) == 0u)
     {
-        Console.WriteError("could not register the class: " + Win32.LastErrorMessage());
+        Console.WriteError("could not register the class: " + Win32.GetLastErrorMessage());
         return 1;
     }
 
-    Rect wanted = Rectangle(0, 0, 800, 600);
-    Rect outer = AdjustForFrame(wanted, WsOverlappedWindow, 0u);
+    Rect wanted = CreateRect(0, 0, 800, 600);
+    Rect outer = AdjustRectForFrame(wanted, WsOverlappedWindow, 0u);
 
     HWND window = CreateWindow("StainlessCube", "Stainless: a cube, a light and a shadow",
                                WsOverlappedWindow, UseDefault, UseDefault,
-                               Width(outer), Height(outer), instance);
+                               GetRectWidth(outer), GetRectHeight(outer), instance);
     if (window == null)
     {
-        Console.WriteError("could not create the window: " + Win32.LastErrorMessage());
+        Console.WriteError("could not create the window: " + Win32.GetLastErrorMessage());
         return 1;
     }
 
@@ -838,7 +838,7 @@ int Main()
 
     // ------------------------------------------------------------ the device
 
-    var started = Graphics.ForWindow((void*)window, 800u, 600u);
+    var started = Graphics.CreateForWindow((void*)window, 800u, 600u);
     if (!started.Ok)
     {
         Console.WriteError("no Direct3D device");
@@ -848,23 +848,23 @@ int Main()
     var graphics = started.Value;
     Console.WriteLine("Direct3D feature level " + DescribeFeatureLevel(graphics.FeatureLevel));
 
-    var adapters = Adapters();
+    var adapters = EnumerateAdapters();
     if (adapters.Count > 0u)
-        Console.WriteLine("adapter: " + AdapterName(adapters[0u]));
+        Console.WriteLine("adapter: " + GetAdapterName(adapters[0u]));
 
     // ----------------------------------------------------------- the shaders
 
     // Row-major, so the matrices above reach the GPU as they are written.
     uint flags = D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | D3DCOMPILE_OPTIMIZATION_LEVEL3;
 
-    var vertexCode = Hlsl.Compile(Source(), "VertexMain", "vs_5_0", flags);
+    var vertexCode = Hlsl.CompileShader(Source(), "VertexMain", "vs_5_0", flags);
     if (!vertexCode.Ok)
     {
         Console.WriteError("vertex shader:\n" + vertexCode.Error);
         return 1;
     }
 
-    var pixelCode = Hlsl.Compile(Source(), "PixelMain", "ps_5_0", flags);
+    var pixelCode = Hlsl.CompileShader(Source(), "PixelMain", "ps_5_0", flags);
     if (!pixelCode.Ok)
     {
         Console.WriteError("pixel shader:\n" + pixelCode.Error);
@@ -872,9 +872,9 @@ int Main()
     }
 
     VertexField[] fields = [
-        VertexField.Of("POSITION", DXGI_FORMAT_R32G32B32_FLOAT),
-        VertexField.Of("NORMAL", DXGI_FORMAT_R32G32B32_FLOAT),
-        VertexField.Of("COLOR", DXGI_FORMAT_R32G32B32_FLOAT),
+        VertexField.FromSemantic("POSITION", DXGI_FORMAT_R32G32B32_FLOAT),
+        VertexField.FromSemantic("NORMAL", DXGI_FORMAT_R32G32B32_FLOAT),
+        VertexField.FromSemantic("COLOR", DXGI_FORMAT_R32G32B32_FLOAT),
     ];
 
     var made = graphics.CreateMaterial(vertexCode.Value, pixelCode.Value, fields);
@@ -911,7 +911,7 @@ int Main()
     var word = builtWord.Value;
     Console.WriteLine("letters: " + Text.FromInteger((long)wordQuads) + " squares");
 
-    var reserved = graphics.CreateConstants(96u);
+    var reserved = graphics.CreateConstantBuffer(96u);
     if (!reserved.Ok)
     {
         Console.WriteError("could not make the constant buffer");
@@ -919,7 +919,7 @@ int Main()
     }
 
     var constants = reserved.Value;
-    graphics.SetConstants(constants, 0u);
+    graphics.SetConstantBuffer(constants, 0u);
 
     // -------------------------------------------------------------- the music
 
@@ -928,7 +928,7 @@ int Main()
 
     if (!quiet)
     {
-        var engine = Mixer.Start();
+        var engine = Mixer.CreateDefault();
         if (!engine.Ok)
         {
             Console.WriteLine("no audio device; drawing in silence");
@@ -938,11 +938,11 @@ int Main()
             mixer = engine.Value;
 
             var tune = Load(songPath);
-            var loaded = engine.Value.Load(tune.Samples, tune.Rate, tune.Channels);
+            var loaded = engine.Value.CreateSound(tune.Samples, tune.Rate, tune.Channels);
             if (loaded.Ok)
             {
                 music = loaded.Value;
-                loaded.Value.Loop(0.7f);
+                loaded.Value.PlayLooping(0.7f);
                 Console.WriteLine("music: " + tune.Source + ", " +
                                   Text.FromDouble(loaded.Value.Duration) +
                                   " seconds, looping");
@@ -990,25 +990,25 @@ int Main()
 
         // The floor, lit by the same light as everything else.
         graphics.SetAlphaBlend(false);
-        graphics.UpdateConstants(constants,
+        graphics.UpdateConstantBuffer(constants,
             FrameConstants(viewProjection, lightX, lightY, lightZ, 0.0, 0.0, 0.0, 0.0));
-        graphics.Draw(material, ground);
+        graphics.DrawMesh(material, ground);
 
         // The shadow: the cube's own geometry, flattened onto the floor by the
         // light and drawn flat and translucent, so it darkens the floor rather
         // than replacing it.
         graphics.SetAlphaBlend(true);
-        graphics.UpdateConstants(constants,
+        graphics.UpdateConstantBuffer(constants,
             FrameConstants(Multiply(Multiply(model, flatten), viewProjection),
                            lightX, lightY, lightZ, 0.04, 0.04, 0.08, 0.55));
-        graphics.Draw(material, cube);
+        graphics.DrawMesh(material, cube);
 
         // The cube itself, on top of its shadow.
         graphics.SetAlphaBlend(false);
-        graphics.UpdateConstants(constants,
+        graphics.UpdateConstantBuffer(constants,
             FrameConstants(Multiply(model, viewProjection),
                            lightX, lightY, lightZ, 0.0, 0.0, 0.0, 0.0));
-        graphics.Draw(material, cube);
+        graphics.DrawMesh(material, cube);
 
         // The overlay. Its z is zero in clip space, which is the near plane,
         // so it wins the depth test against anything in the scene without
@@ -1032,23 +1032,23 @@ int Main()
         // Twice: a dark copy a little down and to the right, then the bright
         // one over it. A drop shadow is two draws and makes text readable over
         // anything.
-        graphics.UpdateConstants(constants,
+        graphics.UpdateConstantBuffer(constants,
             FrameConstants(Multiply(Scale(letterScale, letterScaleY, 1.0),
                                     Translation(wordX + 0.008, wordY - wordHigh - 0.008, 0.0)),
                            lightX, lightY, lightZ, 0.02, 0.02, 0.04, 1.0));
-        graphics.Draw(material, word);
+        graphics.DrawMesh(material, word);
 
-        graphics.UpdateConstants(constants,
+        graphics.UpdateConstantBuffer(constants,
             FrameConstants(letters, lightX, lightY, lightZ, 1.0, 0.86, 0.22, 1.0));
-        graphics.Draw(material, word);
+        graphics.DrawMesh(material, word);
 
         if (shot && drawn == 90)
             graphics.SaveFrame("cube.png");
 
-        int shown = graphics.Present(true);
+        int shown = graphics.PresentFrame(true);
         if (IsDeviceLost(shown))
         {
-            Console.WriteError("the device was lost: " + Describe(shown));
+            Console.WriteError("the device was lost: " + DescribeHResult(shown));
             return 1;
         }
 
@@ -1060,10 +1060,10 @@ int Main()
     Console.WriteLine("drew " + Text.FromInteger(drawn) + " frames");
 
     if (music != null)
-        ((Sound)music).Close();
+        ((Sound)music).Dispose();
     if (mixer != null)
-        ((Mixer)mixer).Close();
+        ((Mixer)mixer).Dispose();
 
-    graphics.Close();
+    graphics.Dispose();
     return 0;
 }

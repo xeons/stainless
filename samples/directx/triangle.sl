@@ -99,7 +99,7 @@ int Main()
 {
     HMODULE instance = GetModuleHandleW(null);
 
-    var windowClass = NewWindowClass();
+    var windowClass = CreateWindowClass();
     windowClass.Procedure = Procedure;
     windowClass.Instance = instance;
     windowClass.Cursor = LoadCursorW(null, CursorArrow());
@@ -107,19 +107,19 @@ int Main()
 
     if (RegisterClassExW(&windowClass) == 0u)
     {
-        Console.WriteError("could not register the class: " + Win32.LastErrorMessage());
+        Console.WriteError("could not register the class: " + Win32.GetLastErrorMessage());
         return 1;
     }
 
-    Rect wanted = Rectangle(0, 0, 640, 480);
-    Rect outer = AdjustForFrame(wanted, WsOverlappedWindow, 0u);
+    Rect wanted = CreateRect(0, 0, 640, 480);
+    Rect outer = AdjustRectForFrame(wanted, WsOverlappedWindow, 0u);
 
     HWND window = CreateWindow("StainlessDirectX", "Stainless on Direct3D 11",
                                WsOverlappedWindow, UseDefault, UseDefault,
-                               Width(outer), Height(outer), instance);
+                               GetRectWidth(outer), GetRectHeight(outer), instance);
     if (window == null)
     {
-        Console.WriteError("could not create the window: " + Win32.LastErrorMessage());
+        Console.WriteError("could not create the window: " + Win32.GetLastErrorMessage());
         return 1;
     }
 
@@ -132,7 +132,7 @@ int Main()
 
     // ------------------------------------------------------------ the device
 
-    var started = Graphics.ForWindow((void*)window, 640u, 480u);
+    var started = Graphics.CreateForWindow((void*)window, 640u, 480u);
     if (!started.Ok)
     {
         Console.WriteError("no Direct3D device");
@@ -142,20 +142,20 @@ int Main()
     var graphics = started.Value;
     Console.WriteLine("feature level " + DescribeFeatureLevel(graphics.FeatureLevel));
 
-    var adapters = Adapters();
+    var adapters = EnumerateAdapters();
     if (adapters.Count > 0u)
-        Console.WriteLine("adapter: " + AdapterName(adapters[0u]));
+        Console.WriteLine("adapter: " + GetAdapterName(adapters[0u]));
 
     // ----------------------------------------------------------- the shaders
 
-    var vertexCode = Hlsl.Compile(Source(), "VertexMain", "vs_5_0");
+    var vertexCode = Hlsl.CompileShader(Source(), "VertexMain", "vs_5_0");
     if (!vertexCode.Ok)
     {
         Console.WriteError("vertex shader:\n" + vertexCode.Error);
         return 1;
     }
 
-    var pixelCode = Hlsl.Compile(Source(), "PixelMain", "ps_5_0");
+    var pixelCode = Hlsl.CompileShader(Source(), "PixelMain", "ps_5_0");
     if (!pixelCode.Ok)
     {
         Console.WriteError("pixel shader:\n" + pixelCode.Error);
@@ -163,8 +163,8 @@ int Main()
     }
 
     VertexField[] fields = [
-        VertexField.Of("POSITION", DXGI_FORMAT_R32G32B32_FLOAT),
-        VertexField.Of("COLOR", DXGI_FORMAT_R32G32B32_FLOAT),
+        VertexField.FromSemantic("POSITION", DXGI_FORMAT_R32G32B32_FLOAT),
+        VertexField.FromSemantic("COLOR", DXGI_FORMAT_R32G32B32_FLOAT),
     ];
 
     var made = graphics.CreateMaterial(vertexCode.Value, pixelCode.Value, fields);
@@ -197,7 +197,7 @@ int Main()
     while (PumpMessages())
     {
         graphics.Clear(0.06f, 0.07f, 0.12f, 1.0f);
-        graphics.Draw(material, mesh);
+        graphics.DrawMesh(material, mesh);
 
         // The frame, read back before it is presented -- a flip-model swap
         // chain leaves the buffer undefined afterwards.
@@ -210,10 +210,10 @@ int Main()
         if (drawn == 1)
             graphics.SaveFrame("triangle.png");
 
-        int shown = graphics.Present(true);
+        int shown = graphics.PresentFrame(true);
         if (IsDeviceLost(shown))
         {
-            Console.WriteError("the device was lost: " + Describe(shown));
+            Console.WriteError("the device was lost: " + DescribeHResult(shown));
             return 1;
         }
 
@@ -223,6 +223,6 @@ int Main()
     }
 
     Console.WriteLine("drew " + Text.FromInteger(drawn) + " frames");
-    graphics.Close();
+    graphics.Dispose();
     return 0;
 }

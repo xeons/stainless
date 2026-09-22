@@ -44,10 +44,10 @@ import Win32.Handles;
 
 // ================================================================= geometry
 
-public int Width(Rect rectangle) => rectangle.Right - rectangle.Left;
-public int Height(Rect rectangle) => rectangle.Bottom - rectangle.Top;
+public int GetRectWidth(Rect rectangle) => rectangle.Right - rectangle.Left;
+public int GetRectHeight(Rect rectangle) => rectangle.Bottom - rectangle.Top;
 
-public Rect Rectangle(int left, int top, int right, int bottom)
+public Rect CreateRect(int left, int top, int right, int bottom)
 {
     Rect rectangle;
     rectangle.Left = left;
@@ -57,7 +57,7 @@ public Rect Rectangle(int left, int top, int right, int bottom)
     return rectangle;
 }
 
-public Point At(int x, int y)
+public Point CreatePoint(int x, int y)
 {
     Point point;
     point.X = x;
@@ -69,9 +69,9 @@ public Point At(int x, int y)
 
 /// The standard message loop, which is the same in every program that has one.
 ///
-/// `GetMessageW` is the call `Win32.Succeeded` must not be used on: it returns
-/// 0 for `WM_QUIT` and **-1** for an error, so the loop tests for greater than
-/// zero and the caller gets the quit code back.
+/// `GetMessageW` is the call `Win32.IsBoolSuccess` must not be used on: it
+/// returns 0 for `WM_QUIT` and **-1** for an error, so the loop tests for
+/// greater than zero and the caller gets the quit code back.
 public int RunMessageLoop()
 {
     Msg message;
@@ -95,7 +95,7 @@ public int RunMessageLoop()
 public bool PumpMessages()
 {
     Msg message;
-    while (Win32.Succeeded(PeekMessageW(&message, null, 0u, 0u, PeekRemove)))
+    while (Win32.IsBoolSuccess(PeekMessageW(&message, null, 0u, 0u, PeekRemove)))
     {
         if (message.Message == WmQuit)
             return false;
@@ -108,16 +108,16 @@ public bool PumpMessages()
 /// The low and high words of an `LPARAM` that carries a point, both signed —
 /// a drag can leave the window to the left, and an unsigned read would make
 /// that a very large positive number.
-public Point PointOf(long lParam)
+public Point UnpackPoint(long lParam)
 {
-    return At((int)(short)(lParam & 0xFFFF), (int)(short)((lParam >> 16) & 0xFFFF));
+    return CreatePoint((int)(short)(lParam & 0xFFFF), (int)(short)((lParam >> 16) & 0xFFFF));
 }
 
 // ============================================================ window classes
 
 /// A `WNDCLASSEXW` with `cbSize` filled in and everything else zeroed, so the
 /// caller sets only what it cares about.
-public WindowClass NewWindowClass()
+public WindowClass CreateWindowClass()
 {
     WindowClass windowClass;
     windowClass.Size = (uint)sizeof(WindowClass);
@@ -147,27 +147,27 @@ public HWND CreateWindow(String className, String title, uint style,
 }
 
 /// The window's title, or a control's text.
-public String WindowText(HWND window)
+public String GetWindowText(HWND window)
 {
     int length = GetWindowTextLengthW(window);
     if (length <= 0)
         return "";
 
     var buffer = new WideBuffer((uint)length);
-    int units = GetWindowTextW(window, buffer.Pointer(), length + 1);
+    int units = GetWindowTextW(window, buffer.Pointer, length + 1);
     if (units <= 0)
         return "";
-    return buffer.Text((uint)units);
+    return buffer.ReadText((uint)units);
 }
 
 public bool SetWindowText(HWND window, String text)
 {
-    return Win32.Succeeded(SetWindowTextW(window, text.ToUtf16().ToPointer()));
+    return Win32.IsBoolSuccess(SetWindowTextW(window, text.ToUtf16().ToPointer()));
 }
 
 /// The client area, whose left and top are always zero — it is a size wearing
 /// the shape of a rectangle.
-public Rect ClientRect(HWND window)
+public Rect QueryClientRect(HWND window)
 {
     Rect rectangle;
     GetClientRect(window, &rectangle);
@@ -175,7 +175,7 @@ public Rect ClientRect(HWND window)
 }
 
 /// The window's outer rectangle in screen coordinates, frame included.
-public Rect WindowRect(HWND window)
+public Rect QueryWindowRect(HWND window)
 {
     Rect rectangle;
     GetWindowRect(window, &rectangle);
@@ -184,7 +184,7 @@ public Rect WindowRect(HWND window)
 
 /// Grows a wanted *client* rectangle into the window rectangle that would
 /// contain it, which is how a window ends up the size the caller asked for.
-public Rect AdjustForFrame(Rect client, uint style, uint extendedStyle)
+public Rect AdjustRectForFrame(Rect client, uint style, uint extendedStyle)
 {
     Rect rectangle = client;
     AdjustWindowRectEx(&rectangle, style, 0, extendedStyle);
@@ -192,9 +192,9 @@ public Rect AdjustForFrame(Rect client, uint style, uint extendedStyle)
 }
 
 /// Marks the whole window as needing repainting, which produces a `WM_PAINT`.
-public bool Invalidate(HWND window, bool erase)
+public bool InvalidateWindow(HWND window, bool erase)
 {
-    return Win32.Succeeded(InvalidateRect(window, null, erase ? 1 : 0));
+    return Win32.IsBoolSuccess(InvalidateRect(window, null, erase ? 1 : 0));
 }
 
 /// Draws text into a rectangle. `-1` for the length means "up to the NUL",
@@ -215,14 +215,14 @@ public int MessageBox(HWND owner, String text, String caption, uint style)
 
 /// A message box with one OK button, for a program that just needs to say
 /// something. Returns nothing worth reading.
-public void Say(String text, String caption)
+public void ShowOkMessage(String text, String caption)
 {
     MessageBoxW(null, text.ToUtf16().ToPointer(), caption.ToUtf16().ToPointer(),
                 MbOk | MbIconInformation);
 }
 
 /// Yes or no, as a `bool`.
-public bool Ask(String text, String caption)
+public bool AskYesNo(String text, String caption)
 {
     return MessageBoxW(null, text.ToUtf16().ToPointer(), caption.ToUtf16().ToPointer(),
                        MbYesNo | MbIconQuestion) == IdYes;
@@ -231,7 +231,7 @@ public bool Ask(String text, String caption)
 // ==================================================================== input
 
 /// Where the mouse is, in screen coordinates.
-public Point CursorPosition()
+public Point GetCursorPosition()
 {
     Point point;
     GetCursorPos(&point);
@@ -240,13 +240,13 @@ public Point CursorPosition()
 
 /// True while the key is physically down, asked of the hardware rather than of
 /// the message queue. The high bit is the one that means "down".
-public bool KeyDown(int key)
+public bool IsKeyDown(int key)
 {
     return (GetAsyncKeyState(key) & 0x8000) != 0;
 }
 
 /// True when a toggle key — Caps Lock, Num Lock — is currently on.
-public bool KeyToggled(int key)
+public bool IsKeyToggled(int key)
 {
     return (GetKeyState(key) & 0x0001) != 0;
 }
@@ -256,15 +256,15 @@ public bool KeyToggled(int key)
 /// True when the clipboard currently holds Unicode text.
 public bool IsClipboardAvailable()
 {
-    return Win32.Succeeded(IsClipboardFormatAvailable(ClipboardUnicodeText));
+    return Win32.IsBoolSuccess(IsClipboardFormatAvailable(ClipboardUnicodeText));
 }
 
 /// What is on the clipboard as text, or an empty string when there is none.
-public String ClipboardString()
+public String GetClipboardString()
 {
     if (!IsClipboardAvailable())
         return "";
-    if (!Win32.Succeeded(OpenClipboard(null)))
+    if (!Win32.IsBoolSuccess(OpenClipboard(null)))
         return "";
 
     HANDLE handle = GetClipboardData(ClipboardUnicodeText);
@@ -308,7 +308,7 @@ public bool SetClipboardString(String text)
     target[wide.UnitCount()] = 0u;
     GlobalUnlock(block);
 
-    if (!Win32.Succeeded(OpenClipboard(null)))
+    if (!Win32.IsBoolSuccess(OpenClipboard(null)))
     {
         GlobalFree(block);
         return false;
@@ -326,7 +326,7 @@ public bool SetClipboardString(String text)
 // ================================================================== metrics
 
 /// The primary monitor's size in pixels.
-public Size ScreenSize()
+public Size GetScreenSize()
 {
     Size size;
     size.Width = GetSystemMetrics(SmScreenWidth);
@@ -335,11 +335,11 @@ public Size ScreenSize()
 }
 
 /// The whole virtual desktop, which is what a multi-monitor program wants.
-public Rect VirtualScreen()
+public Rect GetVirtualScreenRect()
 {
     int x = GetSystemMetrics(SmVirtualScreenX);
     int y = GetSystemMetrics(SmVirtualScreenY);
-    return Rectangle(x, y,
+    return CreateRect(x, y,
                      x + GetSystemMetrics(SmVirtualScreenWidth),
                      y + GetSystemMetrics(SmVirtualScreenHeight));
 }

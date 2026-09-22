@@ -72,11 +72,11 @@ DialogOutcome OutcomeOf(DialogError why)
 public Result<String, DialogOutcome> OpenFileDialog(IWindowPeer? owner, String title,
                                                     String start, String[] filters)
 {
-    // `ChooseFileIn` takes a folder to open in; `start` here is a whole path,
-    // so the folder is what it sits in and the file name is the suggestion the
-    // open dialog has no use for.
+    // `ChooseFileInFolder` takes a folder to open in; `start` here is a whole
+    // path, so the folder is what it sits in and the file name is the
+    // suggestion the open dialog has no use for.
     var chosen = start.ByteLength() > 0u
-        ? Dialogs.ChooseFileIn(OwnerWindowOf(owner), title, filters,
+        ? Dialogs.ChooseFileInFolder(OwnerWindowOf(owner), title, filters,
                                Standard.Path.DirectoryName(start))
         : Dialogs.ChooseFile(OwnerWindowOf(owner), title, filters);
     if (!chosen.Ok)

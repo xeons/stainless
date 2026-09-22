@@ -22,7 +22,7 @@
 // Direct3D 11, as a program wants it.
 //
 // ```csharp
-// var graphics = try Graphics.ForWindow(window, 800u, 600u);
+// var graphics = try Graphics.CreateForWindow(window, 800u, 600u);
 // graphics.Clear(0.1f, 0.1f, 0.15f, 1.0f);
 // graphics.Draw(material, mesh);
 // graphics.Present(true);
@@ -70,7 +70,7 @@ public struct VertexField
     public int Format;
 
     /// A field, laid out straight after the one before it.
-    public static VertexField Of(String semantic, int format)
+    public static VertexField FromSemantic(String semantic, int format)
     {
         VertexField field;
         field.Semantic = semantic;
@@ -80,7 +80,7 @@ public struct VertexField
     }
 
     /// The same, where a shader has `TEXCOORD0` and `TEXCOORD1`.
-    public static VertexField At(String semantic, uint index, int format)
+    public static VertexField FromSemantic(String semantic, uint index, int format)
     {
         VertexField field;
         field.Semantic = semantic;
@@ -111,7 +111,7 @@ public sealed class Mesh
     }
 
     /// How many vertices, or how many indices when there are any -- either
-    /// way, how many `Draw` will send.
+    /// way, how many `DrawMesh` will send.
     public uint Count => _count;
 
     /// How many bytes one vertex is.
@@ -128,7 +128,7 @@ public sealed class Mesh
     public ID3D11Buffer Vertices => _vertices;
 
     /// The index buffer, or null. Not public: an indexed mesh is drawn
-    /// through `Graphics.Draw`, which is the only thing that needs to know.
+    /// through `Graphics.DrawMesh`, which is the only thing that needs to know.
     ID3D11Buffer? Indices => _indices;
 }
 
@@ -161,8 +161,8 @@ public sealed class Material
 /// a light, a time.
 ///
 /// Dynamic, because that is what a buffer written once a frame should be --
-/// `Graphics.UpdateConstants` maps it with `WRITE_DISCARD`, which hands back
-/// fresh memory rather than waiting for the GPU to finish with the old.
+/// `Graphics.UpdateConstantBuffer` maps it with `WRITE_DISCARD`, which hands
+/// back fresh memory rather than waiting for the GPU to finish with the old.
 ///
 /// **The size is rounded up to a multiple of sixteen**, which Direct3D
 /// requires and does not say when it refuses.
@@ -171,7 +171,7 @@ public sealed class ConstantBuffer
     ID3D11Buffer _buffer;
     nuint _size;
 
-    /// Made by `Graphics.CreateConstants`.
+    /// Made by `Graphics.CreateConstantBuffer`.
     ConstantBuffer(ID3D11Buffer buffer, nuint size)
     {
         _buffer = buffer;
@@ -232,7 +232,7 @@ public sealed class Graphics
 
     ~Graphics()
     {
-        Close();
+        Dispose();
     }
 
     /// A device and a swap chain on `window`, which is an `HWND`.
@@ -242,18 +242,18 @@ public sealed class Graphics
     /// which it got. The swap chain is flip-discard with two buffers and no
     /// multisampling, which is what Windows 10 wants and what the compositor
     /// can present without copying.
-    public static Result<Graphics, GraphicsError> ForWindow(void* window, uint width,
-                                                            uint height)
+    public static Result<Graphics, GraphicsError> CreateForWindow(void* window, uint width,
+                                                                  uint height)
     {
-        return ForWindow(window, width, height, false);
+        return CreateForWindow(window, width, height, false);
     }
 
     /// The same, optionally with the debug layer -- which reports every
     /// mistake to the debug output and **fails outright if the graphics tools
     /// feature is not installed**, so this falls back to a device without it
     /// rather than refusing.
-    public static Result<Graphics, GraphicsError> ForWindow(void* window, uint width,
-                                                            uint height, bool debug)
+    public static Result<Graphics, GraphicsError> CreateForWindow(void* window, uint width,
+                                                                  uint height, bool debug)
     {
         if (window == null || width == 0u || height == 0u)
             return Fail(GraphicsError.NoSwapChain);
@@ -287,12 +287,12 @@ public sealed class Graphics
         if (debug)
             flags = D3D11_CREATE_DEVICE_DEBUG;
 
-        var made = Build(&description, levels, flags);
+        var made = CreateDeviceAndSwapChain(&description, levels, flags);
         if (!made.Ok && debug)
         {
             // No graphics tools, which is the ordinary state of a machine that
             // is not a developer's. Worth trying again rather than refusing.
-            made = Build(&description, levels, 0u);
+            made = CreateDeviceAndSwapChain(&description, levels, 0u);
         }
 
         if (!made.Ok)
@@ -306,8 +306,8 @@ public sealed class Graphics
         return Ok(graphics);
     }
 
-    static Result<Graphics, GraphicsError> Build(DXGI_SWAP_CHAIN_DESC* description,
-                                                 int[] levels, uint flags)
+    static Result<Graphics, GraphicsError> CreateDeviceAndSwapChain(
+        DXGI_SWAP_CHAIN_DESC* description, int[] levels, uint flags)
     {
         byte* rawChain = null;
         byte* rawDevice = null;
@@ -374,7 +374,7 @@ public sealed class Graphics
         if (_closed)
             return;
 
-        Bind();
+        BindRenderTargets();
 
         var view = _target;
         if (view == null)
@@ -398,12 +398,12 @@ public sealed class Graphics
     /// layer that does not know what else has touched the context. A program
     /// drawing thousands of meshes should sort by material and bind through
     /// `Context` itself.
-    public void Draw(Material material, Mesh mesh)
+    public void DrawMesh(Material material, Mesh mesh)
     {
         if (_closed || mesh.Count == 0u)
             return;
 
-        Bind();
+        BindRenderTargets();
 
         uint stride = mesh.Stride;
         uint offset = 0u;
@@ -433,7 +433,7 @@ public sealed class Graphics
     /// means the window is hidden and drawing is wasted, and
     /// `DXGI_ERROR_DEVICE_REMOVED` means everything has to be built again --
     /// `IsDeviceLost` in `Windows.DirectX` asks that question.
-    public int Present(bool waitForVBlank)
+    public int PresentFrame(bool waitForVBlank)
     {
         if (_closed)
             return DXGI_ERROR_DEVICE_REMOVED;
@@ -455,7 +455,7 @@ public sealed class Graphics
     /// what this does with the render target view before calling
     /// `ResizeBuffers` -- and is the single most common reason a hand-written
     /// resize fails and leaves the window stretched.
-    public Result<bool, GraphicsError> Resize(uint width, uint height)
+    public Result<bool, GraphicsError> ResizeBuffers(uint width, uint height)
     {
         if (_closed)
             return Fail(GraphicsError.DeviceLost);
@@ -494,7 +494,7 @@ public sealed class Graphics
         if (stride == 0u || vertices.Length == 0u || vertices.Length % (nuint)stride != 0u)
             return Fail(GraphicsError.Resource);
 
-        var made = MakeBuffer(vertices, D3D11_BIND_VERTEX_BUFFER);
+        var made = CreateGpuBuffer(vertices, D3D11_BIND_VERTEX_BUFFER);
         if (!made.Ok)
             return Fail(made.Error);
 
@@ -511,7 +511,7 @@ public sealed class Graphics
         if (stride == 0u || vertices.Length == 0u || indices.Length == 0u)
             return Fail(GraphicsError.Resource);
 
-        var vertexBuffer = MakeBuffer(vertices, D3D11_BIND_VERTEX_BUFFER);
+        var vertexBuffer = CreateGpuBuffer(vertices, D3D11_BIND_VERTEX_BUFFER);
         if (!vertexBuffer.Ok)
             return Fail(vertexBuffer.Error);
 
@@ -524,7 +524,7 @@ public sealed class Graphics
             raw[i * 4u + 3u] = (byte)((indices[i] >> 24) & 0xFFu);
         }
 
-        var indexBuffer = MakeBuffer(raw, D3D11_BIND_INDEX_BUFFER);
+        var indexBuffer = CreateGpuBuffer(raw, D3D11_BIND_INDEX_BUFFER);
         if (!indexBuffer.Ok)
             return Fail(indexBuffer.Error);
 
@@ -534,8 +534,8 @@ public sealed class Graphics
 
     /// A material from compiled bytecode and the vertex shape it expects.
     ///
-    /// `Hlsl.Compile` in `Windows.DirectX` is what produces the two arrays.
-    /// The layout is validated against the vertex shader here, so a mismatch
+    /// `Hlsl.CompileShader` in `Windows.DirectX` is what produces the two
+    /// arrays. The layout is validated against the vertex shader here, so a mismatch
     /// between the fields and the shader's inputs is caught at creation rather
     /// than showing up as nothing being drawn.
     public Result<Material, GraphicsError> CreateMaterial(byte[] vertexBytecode,
@@ -583,7 +583,7 @@ public sealed class Graphics
     }
 
     /// A constant buffer of `size` bytes, rounded up to a multiple of sixteen.
-    public Result<ConstantBuffer, GraphicsError> CreateConstants(nuint size)
+    public Result<ConstantBuffer, GraphicsError> CreateConstantBuffer(nuint size)
     {
         if (_closed || size == 0u)
             return Fail(GraphicsError.Resource);
@@ -609,7 +609,7 @@ public sealed class Graphics
 
     /// New values into a constant buffer. Anything past what it holds is
     /// dropped, and anything short of it is left as it was.
-    public bool UpdateConstants(ConstantBuffer constants, byte[] data)
+    public bool UpdateConstantBuffer(ConstantBuffer constants, byte[] data)
     {
         if (_closed || data.Length == 0u)
             return false;
@@ -635,7 +635,7 @@ public sealed class Graphics
     /// Both, because a transform is nearly always wanted in the vertex shader
     /// and a light in the pixel shader, and one call is what a program that
     /// puts them in the same block should have to make.
-    public void SetConstants(ConstantBuffer constants, uint slot)
+    public void SetConstantBuffer(ConstantBuffer constants, uint slot)
     {
         if (_closed)
             return;
@@ -658,7 +658,7 @@ public sealed class Graphics
 
         if (_opaque == null || _blended == null)
         {
-            var made = MakeBlendStates();
+            var made = CreateBlendStates();
             if (!made.Ok)
                 return false;
         }
@@ -672,7 +672,7 @@ public sealed class Graphics
         return true;
     }
 
-    Result<bool, GraphicsError> MakeBlendStates()
+    Result<bool, GraphicsError> CreateBlendStates()
     {
         D3D11_BLEND_DESC description;
         description.AlphaToCoverageEnable = 0;
@@ -719,7 +719,7 @@ public sealed class Graphics
     /// so it is a diagnostic rather than something to call in a loop. Call it
     /// *before* `Present` under a flip-model swap chain: flipping leaves the
     /// buffer's contents undefined, which is what the "discard" means.
-    public Result<Image, GraphicsError> Capture()
+    public Result<Image, GraphicsError> CaptureFrame()
     {
         if (_closed)
             return Fail(GraphicsError.DeviceLost);
@@ -783,7 +783,7 @@ public sealed class Graphics
     /// The back buffer, written to a PNG. What a headless check calls.
     public Result<bool, GraphicsError> SaveFrame(String path)
     {
-        var captured = Capture();
+        var captured = CaptureFrame();
         if (!captured.Ok)
             return Fail(captured.Error);
 
@@ -795,7 +795,7 @@ public sealed class Graphics
 
     /// Releases everything, in the order Direct3D requires. Idempotent, and
     /// the destructor calls it.
-    public void Close()
+    public void Dispose()
     {
         if (_closed)
             return;
@@ -836,13 +836,13 @@ public sealed class Graphics
         var view = (ID3D11RenderTargetView)rawView;
         _target = view;
 
-        var madeDepth = MakeDepthBuffer();
+        var madeDepth = CreateDepthBuffer();
         if (!madeDepth.Ok)
             return Fail(madeDepth.Error);
 
         _depth = madeDepth.Value;
         _bound = false;
-        Bind();
+        BindRenderTargets();
 
         return Ok(true);
     }
@@ -850,10 +850,10 @@ public sealed class Graphics
     /// The back buffer and its depth buffer onto the output merger, if they
     /// are not there already.
     ///
-    /// Called by `Clear` and by `Draw` rather than left to the program,
+    /// Called by `Clear` and by `DrawMesh` rather than left to the program,
     /// because the one thing a program cannot be expected to know is that
     /// presenting took the binding away.
-    void Bind()
+    void BindRenderTargets()
     {
         if (_bound || _closed)
             return;
@@ -889,7 +889,7 @@ public sealed class Graphics
     /// **Nothing is three-dimensional without one.** With no depth buffer the
     /// order things are drawn in is the order they appear in, and a cube looks
     /// like a cube only from the angle it was built at.
-    Result<ID3D11DepthStencilView, GraphicsError> MakeDepthBuffer()
+    Result<ID3D11DepthStencilView, GraphicsError> CreateDepthBuffer()
     {
         D3D11_TEXTURE2D_DESC description;
         description.Width = _wide;
@@ -918,7 +918,7 @@ public sealed class Graphics
         return Ok((ID3D11DepthStencilView)rawView);
     }
 
-    Result<ID3D11Buffer, GraphicsError> MakeBuffer(byte[] data, uint bind)
+    Result<ID3D11Buffer, GraphicsError> CreateGpuBuffer(byte[] data, uint bind)
     {
         D3D11_BUFFER_DESC description;
         description.ByteWidth = (uint)data.Length;

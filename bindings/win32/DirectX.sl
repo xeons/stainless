@@ -61,8 +61,9 @@ public enum GraphicsError
     /// chain with multisampling, one buffer, or an sRGB buffer format.
     NoSwapChain,
 
-    /// A shader did not compile, or its bytecode was refused. `Hlsl.Compile`
-    /// answers the compiler's own message, which says far more than this does.
+    /// A shader did not compile, or its bytecode was refused.
+    /// `Hlsl.CompileShader` answers the compiler's own message, which says far
+    /// more than this does.
     Shader,
 
     /// A buffer, a texture or a view could not be made -- out of video memory,
@@ -90,7 +91,7 @@ public bool Failed(int result) => result < 0;
 /// and because "0x887A0001" says nothing to anybody. Everything else is
 /// reported as its hex, since inventing prose for a facility this does not
 /// know would be worse than showing the number.
-public String Describe(int result)
+public String DescribeHResult(int result)
 {
     if (result == 0)
         return "ok";
@@ -121,7 +122,7 @@ public String Describe(int result)
     if (result == 0x80004002)
         return "no such interface";
 
-    return "error 0x" + Hex((uint)result);
+    return "error 0x" + FormatHexadecimal((uint)result);
 }
 
 /// Whether a failure means the device is gone, which is the one failure a
@@ -155,7 +156,7 @@ public String DescribeFeatureLevel(int level)
     return "unknown";
 }
 
-String Hex(uint value)
+String FormatHexadecimal(uint value)
 {
     var digits = "0123456789ABCDEF";
     var builder = new StringBuilder();
@@ -191,9 +192,9 @@ public struct AdapterInfo
 
 /// The name of an adapter, which is UTF-16 in the description and so needs a
 /// conversion rather than a field.
-public String AdapterName(AdapterInfo adapter)
+public String GetAdapterName(AdapterInfo adapter)
 {
-    var factory = Factory();
+    var factory = CreateFactory();
     if (factory == null)
         return "";
 
@@ -214,10 +215,10 @@ public String AdapterName(AdapterInfo adapter)
 /// Index 0 is the one to use unless a program has been told otherwise. The
 /// software adapter is included and marked, because a program that wants to
 /// refuse it has to be able to see it.
-public List<AdapterInfo> Adapters()
+public List<AdapterInfo> EnumerateAdapters()
 {
     var found = new List<AdapterInfo>();
-    var factory = Factory();
+    var factory = CreateFactory();
     if (factory == null)
         return found;
 
@@ -251,7 +252,7 @@ public List<AdapterInfo> Adapters()
 /// **Made fresh each time on purpose.** A factory stops being current the
 /// moment a display is plugged or unplugged, and a cached one then enumerates
 /// hardware that is no longer there.
-public IDXGIFactory1? Factory()
+public IDXGIFactory1? CreateFactory()
 {
     byte* raw = null;
     if (CreateDXGIFactory1(iidof(IDXGIFactory1), &raw) < 0 || raw == null)
@@ -264,7 +265,7 @@ public IDXGIFactory1? Factory()
 /// HLSL, compiled.
 ///
 /// ```csharp
-/// var compiled = Hlsl.Compile(source, "VertexMain", "vs_5_0");
+/// var compiled = Hlsl.CompileShader(source, "VertexMain", "vs_5_0");
 /// if (!compiled.Ok)
 /// {
 ///     Console.WriteLine(compiled.Error);     // the compiler's own message
@@ -279,15 +280,16 @@ public static class Hlsl
     /// **The failure is the compiler's text**, not a code: an HLSL error names
     /// a line and a column and says what is wrong, and reducing that to
     /// `GraphicsError.Shader` would throw away the only thing that helps.
-    public static Result<byte[], String> Compile(String source, String entryPoint, String target)
+    public static Result<byte[], String> CompileShader(String source, String entryPoint,
+                                                       String target)
     {
-        return Compile(source, entryPoint, target,
+        return CompileShader(source, entryPoint, target,
                        D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3);
     }
 
     /// The same, with the `D3DCOMPILE_*` flags spelled out.
-    public static Result<byte[], String> Compile(String source, String entryPoint,
-                                                 String target, uint flags)
+    public static Result<byte[], String> CompileShader(String source, String entryPoint,
+                                                       String target, uint flags)
     {
         byte* code = null;
         byte* errors = null;
@@ -309,7 +311,7 @@ public static class Hlsl
         {
             return Fail(message.ByteLength() > 0u
                 ? message
-                : "the shader compiler failed: " + Describe(result));
+                : "the shader compiler failed: " + DescribeHResult(result));
         }
 
         if (code == null)

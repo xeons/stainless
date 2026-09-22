@@ -26,7 +26,7 @@
 // pragma, so a program compiling it needs no `-l`.
 //
 // ```csharp
-// var engine = try Mixer.Start();
+// var engine = try Mixer.CreateDefault();
 // var shot = try engine.Load(pcmBytes, 44100u, 1u);
 // shot.Play();                       // and again, over the top of itself
 // ```
@@ -117,7 +117,7 @@ public sealed class Mixer
 
     ~Mixer()
     {
-        Close();
+        Dispose();
     }
 
     /// The engine, started, with a mastering voice on the default endpoint.
@@ -126,10 +126,10 @@ public sealed class Mixer
     /// needs nothing -- but the mastering voice reaches the endpoint through
     /// MMDevice, which is COM, and on a thread with no apartment it fails with
     /// nothing to say why. Rather than make every caller remember, this enters
-    /// a free-threaded apartment and leaves it in `Close`. A thread that is
+    /// a free-threaded apartment and leaves it in `Dispose`. A thread that is
     /// already in a single-threaded one is left alone: COM is up, it is
     /// somebody else's, and tearing it down here would take it from them.
-    public static Result<Mixer, SoundError> Start()
+    public static Result<Mixer, SoundError> CreateDefault()
     {
         bool owned = false;
         int apartment = CoInitializeEx(null, MultiThreaded);
@@ -193,7 +193,7 @@ public sealed class Mixer
     /// The array is kept by the `Sound` and must not be written to while it is
     /// playing -- XAudio2 reads the bytes rather than copying them, which is
     /// what makes submitting one free.
-    public Result<Sound, SoundError> Load(byte[] samples, uint sampleRate, uint channels)
+    public Result<Sound, SoundError> CreateSound(byte[] samples, uint sampleRate, uint channels)
     {
         if (_closed)
             return Fail(SoundError.NoEngine);
@@ -237,7 +237,7 @@ public sealed class Mixer
 
     /// Stops the engine and destroys the mastering voice. Idempotent, and the
     /// destructor calls it.
-    public void Close()
+    public void Dispose()
     {
         if (_closed)
             return;
@@ -278,7 +278,7 @@ public sealed class Sound
 
     ~Sound()
     {
-        Close();
+        Dispose();
     }
 
     /// How long it lasts, in seconds, at the rate it was loaded with.
@@ -312,7 +312,7 @@ public sealed class Sound
         if (_closed)
             return false;
 
-        var voice = Free();
+        var voice = FindFreeVoice();
 
         // Stopped and flushed first: a voice that is still playing refuses a
         // second buffer at the position this one wants.
@@ -339,15 +339,15 @@ public sealed class Sound
     }
 
     /// Plays it over and over until `Stop`.
-    public bool Loop() => Loop(1.0f);
+    public bool PlayLooping() => PlayLooping(1.0f);
 
     /// The same, at a volume.
-    public bool Loop(float volume)
+    public bool PlayLooping(float volume)
     {
         if (_closed)
             return false;
 
-        var voice = Free();
+        var voice = FindFreeVoice();
         voice.Stop(0u, XAUDIO2_COMMIT_NOW);
         voice.FlushSourceBuffers();
 
@@ -403,7 +403,7 @@ public sealed class Sound
     }
 
     /// Destroys the voices. Idempotent, and the destructor calls it.
-    public void Close()
+    public void Dispose()
     {
         if (_closed)
             return;
@@ -418,7 +418,7 @@ public sealed class Sound
 
     /// The first voice with nothing queued, or the next one round if every one
     /// is busy.
-    IXAudio2SourceVoice Free()
+    IXAudio2SourceVoice FindFreeVoice()
     {
         for (nuint i = 0u; i < _voices.Count; i++)
         {
@@ -440,12 +440,12 @@ public sealed class Sound
 /// `2 * sin(pi * cutoff / sampleRate)`, which is what the one-pole filter
 /// actually uses. Getting that wrong gives a filter that does nothing or one
 /// that removes everything, and neither says why.
-public float FrequencyFromHertz(double cutoff, uint sampleRate)
+public float XAudio2CutoffFrequencyToRadians(double cutoff, uint sampleRate)
 {
     if (sampleRate == 0u)
         return 1.0f;
 
-    double ratio = 2.0 * Sine(3.14159265358979311600 * cutoff / (double)sampleRate);
+    double ratio = 2.0 * ComputeSine(3.14159265358979311600 * cutoff / (double)sampleRate);
     if (ratio > 1.0)
         ratio = 1.0;
     if (ratio < 0.0)
@@ -455,6 +455,6 @@ public float FrequencyFromHertz(double cutoff, uint sampleRate)
 
 extern "C" double sin(double x);
 
-double Sine(double x) => sin(x);
+double ComputeSine(double x) => sin(x);
 
 #endif

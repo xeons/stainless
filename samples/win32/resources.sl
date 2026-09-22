@@ -49,26 +49,26 @@ void Line(String label, String value)
 
 int Main()
 {
-    Win32.Terminal.EnableAnsi();
+    Win32.Terminal.EnableAnsiEscapes();
 
     // ------------------------------------------------------------ strings
     //
     // A string table is addressed by a bare id rather than by a resource name,
     // because Windows stores strings in blocks of sixteen and `LoadStringW`
     // works out which block holds the one asked for.
-    Heading(Resources.Text((uint)IdsTitle));
-    Line("subtitle", Resources.Text((uint)IdsSubtitle));
-    Line("ready", Resources.Text((uint)IdsReady));
+    Heading(Resources.LoadString((uint)IdsTitle));
+    Line("subtitle", Resources.LoadString((uint)IdsSubtitle));
+    Line("ready", Resources.LoadString((uint)IdsReady));
 
     // An id with nothing behind it is an empty string rather than an abort. A
     // resource that is not there is an ordinary answer.
-    Line("id 999", "'" + Resources.Text(999u) + "'");
+    Line("id 999", "'" + Resources.LoadString(999u) + "'");
 
     // -------------------------------------------------------------- bytes
     Heading("Bytes");
 
     // Copied out, which is what anything outliving the call wants.
-    var banner = Resources.Bytes(Resources.Id(IdrBanner), RtRcData());
+    var banner = Resources.ReadResourceBytes(Resources.MakeIntResource(IdrBanner), RtRcData());
     Line("banner", $"{banner.Length} bytes");
 
     // The same resource without copying: a pointer into the mapped image,
@@ -77,12 +77,13 @@ int Main()
     // `LockResource` is a cast, which is why `FreeResource` has done nothing
     // since Win32 and is not bound.
     uint size = 0u;
-    byte* at = Resources.Pointer(Resources.Id(IdrBanner), RtRcData(), &size);
+    byte* at = Resources.GetResourcePointer(Resources.MakeIntResource(IdrBanner), RtRcData(),
+        &size);
     Line("in place", $"{size} bytes at a borrowed pointer: {at != null}");
 
     // A string name, and a type this program invented. Both halves of a
     // resource's identity may be either a number or a name.
-    var licence = Resources.Bytes("LICENCE".ToUtf16().ToPointer(),
+    var licence = Resources.ReadResourceBytes("LICENCE".ToUtf16().ToPointer(),
                                   "TEXTBLOB".ToUtf16().ToPointer());
     Line("licence", $"{licence.Length} bytes under a string name");
 
@@ -98,9 +99,9 @@ int Main()
     // name nothing here wrote: strings are filed in blocks of sixteen, so ids
     // 201 to 203 all live in block 13. That is why `LoadStringW` takes a bare
     // id and every other call takes a name.
-    foreach (var type in Resources.Types())
+    foreach (var type in Resources.GetResourceTypes())
     {
-        var names = Resources.Names(TypeNamed(type));
+        var names = Resources.GetResourceNames(TypeNamed(type));
         Line(type, $"{names.Length} resource(s)");
         foreach (var name in names)
             Console.WriteLine("      " + Dim + name + Off);
@@ -112,7 +113,8 @@ int Main()
     // is read by the loader before `Main` runs. It is what selects version 6
     // of comctl32, which is the difference between themed common controls and
     // the Windows 2000 look.
-    Line("RT_MANIFEST", $"{Resources.Size(Resources.Id(ManifestResourceId), RtManifest())} bytes");
+    char16* manifest = Resources.MakeIntResource(ManifestResourceId);
+    Line("RT_MANIFEST", $"{Resources.GetResourceSize(manifest, RtManifest())} bytes");
 
     // ----------------------------------------------------------- another
     Heading("Another binary's resources");
@@ -120,14 +122,15 @@ int Main()
     // `LOAD_LIBRARY_AS_DATAFILE` maps a file without running any code in it --
     // no DllMain, no imports resolved -- which is the only safe way to read
     // resources out of something this program did not build.
-    var shell = Resources.OpenForResources("C:\\Windows\\System32\\shell32.dll");
+    var shell = Resources.OpenModuleForResources("C:\\Windows\\System32\\shell32.dll");
     if (shell == null)
     {
-        Line("shell32.dll", "could not be opened: " + Win32.LastErrorMessage());
+        Line("shell32.dll", "could not be opened: " + Win32.GetLastErrorMessage());
     }
     else
     {
-        Line("shell32.dll", $"{Resources.NamesIn(shell, RtGroupIcon()).Length} icon groups");
+        String[] icons = Resources.GetResourceNamesIn(shell, RtGroupIcon());
+        Line("shell32.dll", $"{icons.Length} icon groups");
         Resources.CloseModule(shell);
     }
 
@@ -147,7 +150,7 @@ char16* TypeNamed(String type)
     {
         var number = Convert.ToInt(type.Substring(1u));
         if (number.Ok)
-            return Resources.Id(number.Value);
+            return Resources.MakeIntResource(number.Value);
     }
     return type.ToUtf16().ToPointer();
 }

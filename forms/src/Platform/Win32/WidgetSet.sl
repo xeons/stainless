@@ -497,10 +497,10 @@ public class WindowPeer : ControlPeer, IWindowPeer
     {
         HINSTANCE self = (HINSTANCE)GetModuleHandleW(null);
 
-        var large = LoadImageW(self, Resources.Id(id), ImageIcon,
+        var large = LoadImageW(self, Resources.MakeIntResource(id), ImageIcon,
                                GetSystemMetrics(SmIconWidth),
                                GetSystemMetrics(SmIconHeight), LrDefaultColor);
-        var small = LoadImageW(self, Resources.Id(id), ImageIcon,
+        var small = LoadImageW(self, Resources.MakeIntResource(id), ImageIcon,
                                GetSystemMetrics(SmSmallIconWidth),
                                GetSystemMetrics(SmSmallIconHeight), LrDefaultColor);
 
@@ -1126,8 +1126,8 @@ public class Win32WidgetSet : IWidgetSet
         {
             int got = GetMessageW(&message, null, 0u, 0u);
             // Zero is WM_QUIT and -1 is a real failure; the two must not be
-            // tested together, which is the bug `Win32.Succeeded` would cause
-            // here and the reason it is not used.
+            // tested together, which is the bug `Win32.IsBoolSuccess` would
+            // cause here and the reason it is not used.
             if (got == 0)
                 return;
             if (got < 0)

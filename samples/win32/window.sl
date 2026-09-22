@@ -79,11 +79,11 @@ nint Procedure(HWND window, uint message, nuint wParam, nint lParam)
             {
                 // Both coordinates are packed into one LPARAM, low word first,
                 // and both are signed: a drag can leave the window to the left.
-                Point at = PointOf(lParam);
+                Point at = UnpackPoint(lParam);
                 state->CursorX = at.X;
                 state->CursorY = at.Y;
                 state->Tracking = true;
-                Invalidate(window, false);
+                InvalidateWindow(window, false);
                 return 0;
             }
             break;
@@ -92,7 +92,7 @@ nint Procedure(HWND window, uint message, nuint wParam, nint lParam)
             if (state != null)
             {
                 state->Clicks++;
-                Invalidate(window, false);
+                InvalidateWindow(window, false);
                 return 0;
             }
             break;
@@ -118,18 +118,18 @@ void Paint(HWND window, State* state)
     PaintStruct paint;
     HDC dc = BeginPaint(window, &paint);
 
-    Rect client = ClientRect(window);
+    Rect client = QueryClientRect(window);
 
     // Everything is drawn into an off-screen bitmap and copied over in one go,
     // so the window never shows a half-finished frame.
-    var buffer = CreateOffScreen(dc, Width(client), Height(client));
+    var buffer = CreateOffScreen(dc, GetRectWidth(client), GetRectHeight(client));
 
-    Fill(buffer.Dc, &client, Colour(24u, 26u, 32u));
+    FillSolidRect(buffer.Dc, &client, RGB(24u, 26u, 32u));
 
     DrawCrosshair(buffer.Dc, client, state);
     DrawLabels(buffer.Dc, state);
 
-    BitBlt(dc, 0, 0, Width(client), Height(client), buffer.Dc, 0, 0, SrcCopy);
+    BitBlt(dc, 0, 0, GetRectWidth(client), GetRectHeight(client), buffer.Dc, 0, 0, SrcCopy);
     DestroyOffScreen(buffer);
 
     EndPaint(window, &paint);
@@ -140,20 +140,20 @@ void DrawCrosshair(HDC dc, Rect client, State* state)
     if (state == null || !state->Tracking)
         return;
 
-    HPEN pen = CreatePen(PenSolid, 1, Colour(60u, 70u, 90u));
+    HPEN pen = CreatePen(PenSolid, 1, RGB(60u, 70u, 90u));
     HGDIOBJ previousPen = SelectObject(dc, pen);
 
     MoveToEx(dc, 0, state->CursorY, null);
-    LineTo(dc, Width(client), state->CursorY);
+    LineTo(dc, GetRectWidth(client), state->CursorY);
     MoveToEx(dc, state->CursorX, 0, null);
-    LineTo(dc, state->CursorX, Height(client));
+    LineTo(dc, state->CursorX, GetRectHeight(client));
 
     SelectObject(dc, previousPen);
     DeleteObject(pen);
 
     // A circle that grows with the click count, so a click is visible.
     int radius = 12 + state->Clicks * 3;
-    HBRUSH brush = CreateSolidBrush(Colour(90u, 160u, 240u));
+    HBRUSH brush = CreateSolidBrush(RGB(90u, 160u, 240u));
     HGDIOBJ previousBrush = SelectObject(dc, brush);
 
     Ellipse(dc, state->CursorX - radius, state->CursorY - radius,
@@ -169,7 +169,7 @@ void DrawLabels(HDC dc, State* state)
     HGDIOBJ previousFont = SelectObject(dc, font);
 
     SetBkMode(dc, TransparentBackground);
-    SetTextColor(dc, Colour(220u, 224u, 232u));
+    SetTextColor(dc, RGB(220u, 224u, 232u));
 
     DrawTextAt(dc, 16, 14, "Move the mouse. Click. Escape closes.");
 
@@ -191,7 +191,7 @@ int Main()
 {
     HMODULE instance = GetModuleHandleW(null);
 
-    var windowClass = NewWindowClass();
+    var windowClass = CreateWindowClass();
     windowClass.Style = ClassStyleHorizontalRedraw | ClassStyleVerticalRedraw;
     windowClass.Procedure = Procedure;
     windowClass.Instance = instance;
@@ -200,21 +200,21 @@ int Main()
 
     if (RegisterClassExW(&windowClass) == 0u)
     {
-        Console.WriteError("could not register the class: " + Win32.LastErrorMessage());
+        Console.WriteError("could not register the class: " + Win32.GetLastErrorMessage());
         return 1;
     }
 
     // Ask for a client area of exactly 640x400 by growing it into the window
     // size that would contain it. Otherwise the frame eats into the drawing.
-    Rect wanted = Rectangle(0, 0, 640, 400);
-    Rect outer = AdjustForFrame(wanted, WsOverlappedWindow, 0u);
+    Rect wanted = CreateRect(0, 0, 640, 400);
+    Rect outer = AdjustRectForFrame(wanted, WsOverlappedWindow, 0u);
 
     HWND window = CreateWindow("StainlessWindow", "Stainless on Win32",
                                 WsOverlappedWindow, UseDefault, UseDefault,
-                                Width(outer), Height(outer), instance);
+                                GetRectWidth(outer), GetRectHeight(outer), instance);
     if (window == null)
     {
-        Console.WriteError("could not create the window: " + Win32.LastErrorMessage());
+        Console.WriteError("could not create the window: " + Win32.GetLastErrorMessage());
         return 1;
     }
 

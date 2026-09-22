@@ -46,9 +46,9 @@ import Win32;
 import Win32.Kernel32;
 import Win32.Handles;
 
-public HANDLE Output() => GetStdHandle(StdOutput);
-public HANDLE Input() => GetStdHandle(StdInput);
-public HANDLE Error() => GetStdHandle(StdError);
+public HANDLE GetOutputHandle() => GetStdHandle(StdOutput);
+public HANDLE GetInputHandle() => GetStdHandle(StdInput);
+public HANDLE GetErrorHandle() => GetStdHandle(StdError);
 
 /// Grey on black: what a console starts as, and what a program that changed the
 /// colour should put back rather than leaving its own behind.
@@ -59,31 +59,31 @@ public const uint DefaultAttributes = 0x0007u;
 /// Turns on ANSI escape handling for the console's output, and answers whether
 /// it took. It is off by default, and a program that writes colour codes
 /// without asking for this prints them as text.
-public bool EnableAnsi()
+public bool EnableAnsiEscapes()
 {
-    HANDLE handle = Output();
+    HANDLE handle = GetOutputHandle();
     uint mode = 0u;
-    if (!Win32.Succeeded(GetConsoleMode(handle, &mode)))
+    if (!Win32.IsBoolSuccess(GetConsoleMode(handle, &mode)))
         return false;
-    return Win32.Succeeded(
+    return Win32.IsBoolSuccess(
         SetConsoleMode(handle, mode | EnableVirtualTerminalProcessing));
 }
 
 /// Tells the console its output is UTF-8, which matters for a program that
 /// writes bytes rather than going through `Standard.Console`.
-public bool UseUtf8()
+public bool UseUtf8Output()
 {
-    return Win32.Succeeded(SetConsoleOutputCP(CodePageUtf8))
-        && Win32.Succeeded(SetConsoleCP(CodePageUtf8));
+    return Win32.IsBoolSuccess(SetConsoleOutputCP(CodePageUtf8))
+        && Win32.IsBoolSuccess(SetConsoleCP(CodePageUtf8));
 }
 
 /// Turns off line editing and echo, so that `ReadKey` sees a key the moment it
 /// is pressed. The previous mode is returned, to be put back.
 public uint EnableRawInput()
 {
-    HANDLE handle = Input();
+    HANDLE handle = GetInputHandle();
     uint mode = 0u;
-    if (!Win32.Succeeded(GetConsoleMode(handle, &mode)))
+    if (!Win32.IsBoolSuccess(GetConsoleMode(handle, &mode)))
         return 0u;
 
     SetConsoleMode(handle, mode & ~(EnableLineInput | EnableEchoInput));
@@ -91,22 +91,22 @@ public uint EnableRawInput()
 }
 
 /// Puts back a mode `EnableRawInput` returned.
-public bool RestoreInput(uint mode)
+public bool RestoreInputMode(uint mode)
 {
-    return Win32.Succeeded(SetConsoleMode(Input(), mode));
+    return Win32.IsBoolSuccess(SetConsoleMode(GetInputHandle(), mode));
 }
 
 // ============================================================= screen buffer
 
 /// How big the window is, in characters — not how big the buffer is, which is
 /// usually taller. Zero by zero when the output is not a console.
-public Coord WindowSize()
+public Coord GetWindowSize()
 {
     ScreenBufferInfo info;
     Coord size;
     size.X = 0;
     size.Y = 0;
-    if (!Win32.Succeeded(GetConsoleScreenBufferInfo(Output(), &info)))
+    if (!Win32.IsBoolSuccess(GetConsoleScreenBufferInfo(GetOutputHandle(), &info)))
         return size;
 
     // The window rectangle's edges are inclusive, so the width is the
@@ -117,13 +117,13 @@ public Coord WindowSize()
 }
 
 /// Where the cursor is.
-public Coord CursorPosition()
+public Coord GetCursorPosition()
 {
     ScreenBufferInfo info;
     Coord position;
     position.X = 0;
     position.Y = 0;
-    if (Win32.Succeeded(GetConsoleScreenBufferInfo(Output(), &info)))
+    if (Win32.IsBoolSuccess(GetConsoleScreenBufferInfo(GetOutputHandle(), &info)))
     {
         position = info.CursorPosition;
     }
@@ -135,7 +135,7 @@ public bool SetCursorPosition(short x, short y)
     Coord position;
     position.X = x;
     position.Y = y;
-    return Win32.Succeeded(SetConsoleCursorPosition(Output(), position));
+    return Win32.IsBoolSuccess(SetConsoleCursorPosition(GetOutputHandle(), position));
 }
 
 /// Sets the colour of everything written after this point.
@@ -145,7 +145,7 @@ public bool SetCursorPosition(short x, short y)
 /// `int` and every use would need a cast back. This narrows once, here.
 public bool SetColour(uint attributes)
 {
-    return Win32.Succeeded(SetConsoleTextAttribute(Output(), (ushort)attributes));
+    return Win32.IsBoolSuccess(SetConsoleTextAttribute(GetOutputHandle(), (ushort)attributes));
 }
 
 /// The colour a console starts with.
@@ -153,36 +153,36 @@ public bool ResetColour() => SetColour(DefaultAttributes);
 
 public bool SetTitle(String title)
 {
-    return Win32.Succeeded(SetConsoleTitleW(title.ToUtf16().ToPointer()));
+    return Win32.IsBoolSuccess(SetConsoleTitleW(title.ToUtf16().ToPointer()));
 }
 
-public String Title()
+public String GetTitle()
 {
     var buffer = new WideBuffer(1024u);
-    uint units = GetConsoleTitleW(buffer.Pointer(), buffer.Capacity);
+    uint units = GetConsoleTitleW(buffer.Pointer, buffer.Capacity);
     if (units == 0u)
         return "";
-    return buffer.Text(units);
+    return buffer.ReadText(units);
 }
 
 /// Shows or hides the cursor, keeping whatever size it had.
 public bool ShowCursor(bool visible)
 {
-    HANDLE handle = Output();
+    HANDLE handle = GetOutputHandle();
     CursorInfo info;
-    if (!Win32.Succeeded(GetConsoleCursorInfo(handle, &info)))
+    if (!Win32.IsBoolSuccess(GetConsoleCursorInfo(handle, &info)))
         return false;
     info.Visible = visible ? 1 : 0;
-    return Win32.Succeeded(SetConsoleCursorInfo(handle, &info));
+    return Win32.IsBoolSuccess(SetConsoleCursorInfo(handle, &info));
 }
 
 /// Blanks the whole buffer and puts the cursor back at the top left, which is
 /// what `cls` does and what no single API call does.
-public bool Clear()
+public bool ClearScreen()
 {
-    HANDLE handle = Output();
+    HANDLE handle = GetOutputHandle();
     ScreenBufferInfo info;
-    if (!Win32.Succeeded(GetConsoleScreenBufferInfo(handle, &info)))
+    if (!Win32.IsBoolSuccess(GetConsoleScreenBufferInfo(handle, &info)))
         return false;
 
     uint cells = (uint)((int)info.Size.X * (int)info.Size.Y);
@@ -193,7 +193,7 @@ public bool Clear()
     uint written = 0u;
     FillConsoleOutputCharacterW(handle, 32u, cells, origin, &written);
     FillConsoleOutputAttribute(handle, info.Attributes, cells, origin, &written);
-    return Win32.Succeeded(SetConsoleCursorPosition(handle, origin));
+    return Win32.IsBoolSuccess(SetConsoleCursorPosition(handle, origin));
 }
 
 // ================================================================ raw input
@@ -205,13 +205,13 @@ public bool Clear()
 /// and the caller that cares reads the whole record instead.
 public ushort ReadKey()
 {
-    HANDLE handle = Input();
+    HANDLE handle = GetInputHandle();
     InputRecord record;
     uint read = 0u;
 
     while (true)
     {
-        if (!Win32.Succeeded(ReadConsoleInputW(handle, &record, 1u, &read)))
+        if (!Win32.IsBoolSuccess(ReadConsoleInputW(handle, &record, 1u, &read)))
             return 0u;
         if (read == 0u)
             return 0u;
@@ -227,13 +227,13 @@ public ushort ReadKey()
 /// key code or the modifier state rather than a character.
 public KeyEvent ReadKeyEvent()
 {
-    HANDLE handle = Input();
+    HANDLE handle = GetInputHandle();
     InputRecord record;
     uint read = 0u;
 
     while (true)
     {
-        if (!Win32.Succeeded(ReadConsoleInputW(handle, &record, 1u, &read)) || read == 0u)
+        if (!Win32.IsBoolSuccess(ReadConsoleInputW(handle, &record, 1u, &read)) || read == 0u)
         {
             KeyEvent nothing;
             nothing.KeyDown = 0;
@@ -259,21 +259,21 @@ public KeyEvent ReadKeyEvent()
 /// the count on its own would answer yes for a window someone had merely
 /// resized. Anything that is not a press is dropped until a press is at the
 /// front or the queue is empty.
-public bool KeyAvailable()
+public bool IsKeyAvailable()
 {
-    HANDLE handle = Input();
+    HANDLE handle = GetInputHandle();
     InputRecord record;
 
     while (true)
     {
         uint count = 0u;
-        if (!Win32.Succeeded(GetNumberOfConsoleInputEvents(handle, &count)))
+        if (!Win32.IsBoolSuccess(GetNumberOfConsoleInputEvents(handle, &count)))
             return false;
         if (count == 0u)
             return false;
 
         uint read = 0u;
-        if (!Win32.Succeeded(PeekConsoleInputW(handle, &record, 1u, &read)))
+        if (!Win32.IsBoolSuccess(PeekConsoleInputW(handle, &record, 1u, &read)))
             return false;
         if (read == 0u)
             return false;
@@ -282,7 +282,7 @@ public bool KeyAvailable()
             return true;
 
         // Not a press: take it off so the next look sees the one behind it.
-        if (!Win32.Succeeded(ReadConsoleInputW(handle, &record, 1u, &read)))
+        if (!Win32.IsBoolSuccess(ReadConsoleInputW(handle, &record, 1u, &read)))
             return false;
     }
 }

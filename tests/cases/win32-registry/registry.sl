@@ -35,12 +35,12 @@ String Why(RegistryError error)
 int Main()
 {
     // --- a key that is not there --------------------------------------------
-    var missing = Registry.OpenRead(AdvApi32.LocalMachine(), "SOFTWARE\\NoSuchKeyHere");
+    var missing = Registry.OpenKeyForReading(AdvApi32.LocalMachine(), "SOFTWARE\\NoSuchKeyHere");
     switch (missing)
     {
         case Ok found:
             Console.WriteLine("WRONG: a key that should not exist opened");
-            Registry.Close(found.Value);
+            Registry.CloseKey(found.Value);
             break;
         case Fail why:
             Console.WriteLine("a missing key fails with: " + Why(why.Error));
@@ -48,7 +48,7 @@ int Main()
     }
 
     // --- a key that is -------------------------------------------------------
-    var opened = Registry.OpenRead(AdvApi32.LocalMachine(), CurrentVersion);
+    var opened = Registry.OpenKeyForReading(AdvApi32.LocalMachine(), CurrentVersion);
     switch (opened)
     {
         case Fail why:
@@ -94,17 +94,17 @@ int Main()
 
             // Enumeration. The names differ per machine; the counts agreeing
             // with what enumeration produces does not.
-            var counts = Registry.Counts(key);
+            var counts = Registry.QueryKeyCounts(key);
             Console.WriteLine("it has subkeys: " + Text.FromBool(counts.SubKeys > 0u));
             Console.WriteLine("it has values: " + Text.FromBool(counts.Values > 0u));
             Console.WriteLine("the first value has a name: "
-                + Text.FromBool(!Registry.ValueName(key, 0u).IsEmpty));
+                + Text.FromBool(!Registry.GetValueName(key, 0u).IsEmpty));
             Console.WriteLine("the first subkey has a name: "
-                + Text.FromBool(!Registry.SubKey(key, 0u).IsEmpty));
+                + Text.FromBool(!Registry.GetSubKeyName(key, 0u).IsEmpty));
             Console.WriteLine("one past the end is empty: "
-                + Text.FromBool(Registry.SubKey(key, counts.SubKeys).IsEmpty));
+                + Text.FromBool(Registry.GetSubKeyName(key, counts.SubKeys).IsEmpty));
 
-            Console.WriteLine("closed: " + Text.FromBool(Registry.Close(key)));
+            Console.WriteLine("closed: " + Text.FromBool(Registry.CloseKey(key)));
             break;
     }
 
@@ -114,12 +114,12 @@ int Main()
     // path is resolved before the rights are, so the mask is not what decides
     // this. Whether HKLM itself opens for writing depends on whether the test
     // is running elevated, which is why that is not what is asked.
-    var writable = Registry.Open(AdvApi32.LocalMachine(), "SOFTWARE\\NoSuchKeyHere", KeyWrite);
+    var writable = Registry.OpenKey(AdvApi32.LocalMachine(), "SOFTWARE\\NoSuchKeyHere", KeyWrite);
     switch (writable)
     {
         case Ok key:
             Console.WriteLine("WRONG: a key that should not exist opened for writing");
-            Registry.Close(key.Value);
+            Registry.CloseKey(key.Value);
             break;
         case Fail why:
             Console.WriteLine("a missing key is missing whatever is asked of it: "
@@ -129,12 +129,12 @@ int Main()
 
     // HKEY_CURRENT_USER is always openable by the user running the program, and
     // opening it reads nothing and changes nothing.
-    var mine = Registry.OpenRead(AdvApi32.CurrentUser(), "Software");
+    var mine = Registry.OpenKeyForReading(AdvApi32.CurrentUser(), "Software");
     switch (mine)
     {
         case Ok key:
             Console.WriteLine("HKCU\\Software opens: true");
-            Registry.Close(key.Value);
+            Registry.CloseKey(key.Value);
             break;
         case Fail why:
             Console.WriteLine("WRONG: HKCU\\Software did not open: " + Why(why.Error));

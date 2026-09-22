@@ -56,13 +56,13 @@ static readonly String CurrentVersion =
 /// or a dash.
 String Version(String name)
 {
-    var opened = Registry.OpenRead(AdvApi32.LocalMachine(), CurrentVersion);
+    var opened = Registry.OpenKeyForReading(AdvApi32.LocalMachine(), CurrentVersion);
     switch (opened)
     {
         case Fail why: return "-";
         case Ok held:
             var value = Registry.ReadString(held.Value, name);
-            Registry.Close(held.Value);
+            Registry.CloseKey(held.Value);
             return value.ValueOr("-");
     }
 }
@@ -73,13 +73,13 @@ String Version(String name)
 /// strings.
 String VersionNumber(String name)
 {
-    var opened = Registry.OpenRead(AdvApi32.LocalMachine(), CurrentVersion);
+    var opened = Registry.OpenKeyForReading(AdvApi32.LocalMachine(), CurrentVersion);
     switch (opened)
     {
         case Fail why: return "-";
         case Ok held:
             var value = Registry.ReadUInt(held.Value, name);
-            Registry.Close(held.Value);
+            Registry.CloseKey(held.Value);
             if (!value.Ok)
                 return "-";
             return Text.FromInteger((long)value.Value);
@@ -88,50 +88,50 @@ String VersionNumber(String name)
 
 int Main()
 {
-    Terminal.EnableAnsi();
+    Terminal.EnableAnsiEscapes();
 
     Heading("Windows");
     Row("edition", Version("ProductName"));
     Row("build", Version("CurrentBuild") + "." + VersionNumber("UBR"));
     Row("installed", Version("InstallationType"));
-    Row("uptime", Text.FromInteger((long)(Clock.Uptime() / 3600000u)) + " hours");
-    Row("local time", Clock.Format(Clock.Now()));
-    Row("utc", Clock.Format(Clock.UtcNow()));
+    Row("uptime", Text.FromInteger((long)(Clock.GetUptimeMilliseconds() / 3600000u)) + " hours");
+    Row("local time", Clock.FormatSystemTime(Clock.GetLocalNow()));
+    Row("utc", Clock.FormatSystemTime(Clock.GetUtcNow()));
 
     Heading("Machine");
-    var system = Machine.NativeInfo();
-    Row("name", Environment.ComputerName());
+    var system = Machine.QueryNativeSystemInfo();
+    Row("name", Environment.GetComputerName());
     Row("processors", Text.FromInteger((long)system.ProcessorCount));
-    Row("architecture", Machine.ArchitectureName(system.Architecture));
+    Row("architecture", Machine.GetArchitectureName(system.Architecture));
     Row("page size", Text.FromInteger((long)system.PageSize) + " bytes");
 
-    var memory = Machine.Memory();
+    var memory = Machine.QueryMemoryStatus();
     Row("memory", Megabytes(memory.TotalPhysical) + " total, "
         + Megabytes(memory.AvailablePhysical) + " free ("
         + Text.FromInteger((long)memory.MemoryLoad) + "% used)");
 
     Heading("This process");
-    Row("executable", Machine.ExecutablePath());
-    Row("directory", Environment.CurrentDirectory());
-    Row("user", Environment.Expand("%USERNAME%"));
-    Row("temp", Files.TempPath());
-    Row("command", Environment.CommandLine());
+    Row("executable", Machine.GetExecutablePath());
+    Row("directory", Environment.GetCurrentDirectory());
+    Row("user", Environment.ExpandEnvironmentVariables("%USERNAME%"));
+    Row("temp", Files.GetTempPath());
+    Row("command", Environment.GetCommandLine());
 
     Heading("Console");
-    var size = Terminal.WindowSize();
+    var size = Terminal.GetWindowSize();
     Row("window", Text.FromInteger((long)size.X) + " x " + Text.FromInteger((long)size.Y));
-    Row("title", Terminal.Title());
+    Row("title", Terminal.GetTitle());
     Console.Write("  " + Dim + Pad("colours", 14u) + Plain);
     Swatch();
 
     Heading("A child process");
-    var ran = Tasks.Run("cmd.exe /c ver", "");
+    var ran = Tasks.RunProcess("cmd.exe /c ver", "");
     Row("started", Text.FromBool(ran.Started));
     Row("exit code", Text.FromInteger((long)ran.ExitCode));
     Row("said", Trimmed(ran.Output));
 
     Heading("The system directory");
-    var names = Files.Entries(Environment.SystemDirectory());
+    var names = Files.GetDirectoryEntries(Environment.GetSystemDirectory());
     Row("entries", Text.FromInteger((long)names.Count));
     Console.WriteLine("");
     return 0;

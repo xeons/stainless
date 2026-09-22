@@ -59,14 +59,14 @@ import Win32.Handles;
 
 /// A `COLORREF` is 0x00BBGGRR — blue in the *high* byte, which is the opposite
 /// of the order the components are usually written in.
-public uint Colour(byte red, byte green, byte blue)
+public uint RGB(byte red, byte green, byte blue)
 {
     return (uint)red | ((uint)green << 8) | ((uint)blue << 16);
 }
 
-public byte Red(uint colour) => (byte)(colour & 0xFFu);
-public byte Green(uint colour) => (byte)((colour >> 8) & 0xFFu);
-public byte Blue(uint colour) => (byte)((colour >> 16) & 0xFFu);
+public byte GetRValue(uint colour) => (byte)(colour & 0xFFu);
+public byte GetGValue(uint colour) => (byte)((colour >> 8) & 0xFFu);
+public byte GetBValue(uint colour) => (byte)((colour >> 16) & 0xFFu);
 
 public const uint Black    = 0x000000u;
 public const uint White    = 0xFFFFFFu;
@@ -90,7 +90,7 @@ public HFONT CreateFont(String face, int height, int weight, bool italic)
 public bool DrawTextAt(HDC dc, int x, int y, String text)
 {
     var wide = text.ToUtf16();
-    return Win32.Succeeded(TextOutW(dc, x, y, wide.ToPointer(), (int)wide.UnitCount()));
+    return Win32.IsBoolSuccess(TextOutW(dc, x, y, wide.ToPointer(), (int)wide.UnitCount()));
 }
 
 /// How wide and tall the text would be in the device context's current font.
@@ -138,10 +138,10 @@ public void DestroyOffScreen(OffScreen buffer)
 ///
 /// Convenient rather than fast: a caller filling many rectangles in the same
 /// colour should make one brush and keep it.
-public bool Fill(HDC dc, Rect* rectangle, uint colour)
+public bool FillSolidRect(HDC dc, Rect* rectangle, uint colour)
 {
     HBRUSH brush = CreateSolidBrush(colour);
-    bool filled = Win32.Succeeded(FillRect(dc, rectangle, brush));
+    bool filled = Win32.IsBoolSuccess(FillRect(dc, rectangle, brush));
     DeleteObject(brush);
     return filled;
 }

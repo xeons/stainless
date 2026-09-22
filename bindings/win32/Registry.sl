@@ -50,13 +50,13 @@ public enum RegistryError : uint
     NoMoreItems  = 259u,
 
     /// Something the enumeration above does not name, including a value that
-    /// is there but is not the kind that was asked for. `Win32.Describe` will
-    /// say what the raw code meant.
+    /// is there but is not the kind that was asked for.
+    /// `Win32.FormatErrorMessage` will say what the raw code meant.
     Other        = 0xFFFFFFFFu,
 }
 
 /// A code from a `Reg...` call as one of the errors above.
-public RegistryError Classify(int code)
+public RegistryError ClassifyRegistryResult(int code)
 {
     if (code == 0)
         return RegistryError.None;
@@ -75,45 +75,45 @@ public RegistryError Classify(int code)
 
 /// Opens a key, or fails.
 ///
-/// The handle must be closed with `Close`. `root` is one of `Win32.AdvApi32`'s
-/// predefined keys, and `path` is relative to it:
-/// `Open(LocalMachine(), "SOFTWARE\\...", KeyRead)`.
-public Result<HKEY, RegistryError> Open(HKEY root, String path, uint access)
+/// The handle must be closed with `CloseKey`. `root` is one of
+/// `Win32.AdvApi32`'s predefined keys, and `path` is relative to it:
+/// `OpenKey(LocalMachine(), "SOFTWARE\\...", KeyRead)`.
+public Result<HKEY, RegistryError> OpenKey(HKEY root, String path, uint access)
 {
     HKEY key = null;
     int code = RegOpenKeyExW(root, path.ToUtf16().ToPointer(), 0u, access, &key);
     if (code != 0)
-        return Fail(Classify(code));
+        return Fail(ClassifyRegistryResult(code));
     return Ok(key);
 }
 
 /// Opens a key for reading, which is what most callers want.
-public Result<HKEY, RegistryError> OpenRead(HKEY root, String path)
+public Result<HKEY, RegistryError> OpenKeyForReading(HKEY root, String path)
 {
-    return Open(root, path, KeyRead);
+    return OpenKey(root, path, KeyRead);
 }
 
 /// Opens a key, creating it and every missing parent if it is not there.
-public Result<HKEY, RegistryError> Create(HKEY root, String path, uint access)
+public Result<HKEY, RegistryError> CreateKey(HKEY root, String path, uint access)
 {
     HKEY key = null;
     uint disposition = 0u;
     int code = RegCreateKeyExW(root, path.ToUtf16().ToPointer(), 0u, null, 0u,
                                access, null, &key, &disposition);
     if (code != 0)
-        return Fail(Classify(code));
+        return Fail(ClassifyRegistryResult(code));
     return Ok(key);
 }
 
-public bool Close(HKEY key) => RegCloseKey(key) == 0;
+public bool CloseKey(HKEY key) => RegCloseKey(key) == 0;
 
 // ================================================================== reading
 
 /// A string value, or why there was not one.
 ///
 /// `REG_SZ` and `REG_EXPAND_SZ` both read as strings; an expandable one is
-/// returned with its `%VARIABLES%` still in it, and `Win32.Environment.Expand`
-/// is what fills them in.
+/// returned with its `%VARIABLES%` still in it, and
+/// `Win32.Environment.ExpandEnvironmentVariables` is what fills them in.
 public Result<String, RegistryError> ReadString(HKEY key, String name)
 {
     var buffer = new ByteBuffer(8192u);
@@ -121,15 +121,15 @@ public Result<String, RegistryError> ReadString(HKEY key, String name)
     uint kind = 0u;
 
     int code = RegQueryValueExW(key, name.ToUtf16().ToPointer(), null, &kind,
-                                buffer.Pointer(), &size);
+                                buffer.Pointer, &size);
     if (code != 0)
-        return Fail(Classify(code));
+        return Fail(ClassifyRegistryResult(code));
     if (kind != KindString && kind != KindExpandString)
     {
         return Fail(RegistryError.Other);
     }
 
-    return Ok(buffer.AsText());
+    return Ok(buffer.ReadText());
 }
 
 /// A `REG_DWORD`.
@@ -140,13 +140,13 @@ public Result<uint, RegistryError> ReadUInt(HKEY key, String name)
     uint kind = 0u;
 
     int code = RegQueryValueExW(key, name.ToUtf16().ToPointer(), null, &kind,
-                                buffer.Pointer(), &size);
+                                buffer.Pointer, &size);
     if (code != 0)
-        return Fail(Classify(code));
+        return Fail(ClassifyRegistryResult(code));
     if (kind != KindUInt)
         return Fail(RegistryError.Other);
 
-    return Ok(buffer.AsUInt());
+    return Ok(buffer.ReadUInt());
 }
 
 /// A `REG_QWORD`.
@@ -157,13 +157,13 @@ public Result<ulong, RegistryError> ReadULong(HKEY key, String name)
     uint kind = 0u;
 
     int code = RegQueryValueExW(key, name.ToUtf16().ToPointer(), null, &kind,
-                                buffer.Pointer(), &size);
+                                buffer.Pointer, &size);
     if (code != 0)
-        return Fail(Classify(code));
+        return Fail(ClassifyRegistryResult(code));
     if (kind != KindULong)
         return Fail(RegistryError.Other);
 
-    return Ok(buffer.AsULong());
+    return Ok(buffer.ReadULong());
 }
 
 // ================================================================== writing
@@ -175,7 +175,7 @@ public RegistryError WriteString(HKEY key, String name, String value)
     uint bytes = (uint)((wide.UnitCount() + 1u) * 2u);
     int code = RegSetValueExW(key, name.ToUtf16().ToPointer(), 0u, KindString,
                               (byte*)wide.ToPointer(), bytes);
-    return Classify(code);
+    return ClassifyRegistryResult(code);
 }
 
 /// Writes a `REG_DWORD`.
@@ -184,13 +184,13 @@ public RegistryError WriteUInt(HKEY key, String name, uint value)
     uint stored = value;
     int code = RegSetValueExW(key, name.ToUtf16().ToPointer(), 0u, KindUInt,
                               (byte*)&stored, 4u);
-    return Classify(code);
+    return ClassifyRegistryResult(code);
 }
 
 /// Removes a value from a key.
 public RegistryError DeleteValue(HKEY key, String name)
 {
-    return Classify(RegDeleteValueW(key, name.ToUtf16().ToPointer()));
+    return ClassifyRegistryResult(RegDeleteValueW(key, name.ToUtf16().ToPointer()));
 }
 
 // ============================================================== enumeration
@@ -199,29 +199,29 @@ public RegistryError DeleteValue(HKEY key, String name)
 ///
 /// A registry key name is at most 255 characters, which is why the buffer is
 /// that size and no thought is given to it being too small.
-public String SubKey(HKEY key, uint index)
+public String GetSubKeyName(HKEY key, uint index)
 {
     var buffer = new WideBuffer(256u);
     uint size = (uint)(buffer.Capacity + 1u);
 
-    int code = RegEnumKeyExW(key, index, buffer.Pointer(), &size,
+    int code = RegEnumKeyExW(key, index, buffer.Pointer, &size,
                              null, null, null, null);
     if (code != 0)
         return "";
-    return buffer.Text(size);
+    return buffer.ReadText(size);
 }
 
 /// The name of the `index`th value, or an empty string past the end.
-public String ValueName(HKEY key, uint index)
+public String GetValueName(HKEY key, uint index)
 {
     var buffer = new WideBuffer(16384u);
     uint size = (uint)(buffer.Capacity + 1u);
 
-    int code = RegEnumValueW(key, index, buffer.Pointer(), &size,
+    int code = RegEnumValueW(key, index, buffer.Pointer, &size,
                              null, null, null, null);
     if (code != 0)
         return "";
-    return buffer.Text(size);
+    return buffer.ReadText(size);
 }
 
 /// How many subkeys and how many values a key has, so an enumeration knows
@@ -232,7 +232,7 @@ public struct KeyCounts
     public uint Values;
 }
 
-public KeyCounts Counts(HKEY key)
+public KeyCounts QueryKeyCounts(HKEY key)
 {
     KeyCounts counts;
     counts.SubKeys = 0u;

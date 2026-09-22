@@ -786,7 +786,7 @@ public const int HdnItemChangedW = -321;
 /// unticked and 2 is ticked, and 0 means no state image at all.
 public const uint LvisStateImageMask = 0xF000u;
 
-public uint CheckedState(bool ticked)
+public uint GetCheckedStateMask(bool ticked)
 {
     return ((uint)(ticked ? 2 : 1)) << 12;
 }

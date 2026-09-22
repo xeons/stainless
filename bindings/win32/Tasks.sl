@@ -25,8 +25,8 @@
 //
 // `CreateProcessW` has a trap worth stating once: it may *write to* the command
 // line it is given, so the buffer cannot be a string literal or anything
-// shared. `Run` copies into a `Win32.WideBuffer` for exactly that reason, and a
-// caller using the declaration directly has to do the same.
+// shared. `RunProcess` copies into a `Win32.WideBuffer` for exactly that
+// reason, and a caller using the declaration directly has to do the same.
 module Win32.Tasks;
 
 #if WINDOWS
@@ -36,7 +36,7 @@ import Win32.Kernel32;
 import Win32.Handles;
 
 /// A `SECURITY_ATTRIBUTES` that says only "the child may inherit this handle".
-public SecurityAttributes Inheritable()
+public SecurityAttributes CreateInheritableAttributes()
 {
     SecurityAttributes attributes;
     attributes.Length = (uint)sizeof(SecurityAttributes);
@@ -46,7 +46,7 @@ public SecurityAttributes Inheritable()
 }
 
 /// A `STARTUPINFOW` with `cb` filled in and everything else zeroed.
-public StartupInfo NewStartupInfo()
+public StartupInfo CreateStartupInfo()
 {
     StartupInfo startup;
     startup.Size = (uint)sizeof(StartupInfo);
@@ -75,7 +75,7 @@ public StartupInfo NewStartupInfo()
 /// A process handle becomes signalled when the process exits, a thread's when
 /// the thread does, and an event's when it is set — which is why one function
 /// covers all three.
-public bool Wait(HANDLE handle, uint milliseconds)
+public bool WaitForHandle(HANDLE handle, uint milliseconds)
 {
     return WaitForSingleObject(handle, milliseconds) == WaitObject0;
 }
@@ -106,7 +106,7 @@ public struct Completed
 /// that is itself waiting for the child to exit. This reads until the write end
 /// is gone, which happens when the last holder of it closes — hence closing the
 /// parent's copy immediately after the child is started.
-public Completed Run(String commandLine, String workingDirectory)
+public Completed RunProcess(String commandLine, String workingDirectory)
 {
     Completed completed;
     completed.Started = false;
@@ -114,11 +114,11 @@ public Completed Run(String commandLine, String workingDirectory)
     completed.Output = "";
 
     // Both ends must be inheritable for the child to receive one.
-    var security = Inheritable();
+    var security = CreateInheritableAttributes();
 
     HANDLE readEnd = null;
     HANDLE writeEnd = null;
-    if (!Win32.Succeeded(CreatePipe(&readEnd, &writeEnd, &security, 0u)))
+    if (!Win32.IsBoolSuccess(CreatePipe(&readEnd, &writeEnd, &security, 0u)))
     {
         return completed;
     }
@@ -127,7 +127,7 @@ public Completed Run(String commandLine, String workingDirectory)
     // copy of it and the pipe never reports end-of-file.
     SetHandleInformation(readEnd, HandleFlagInherit, 0u);
 
-    var startup = NewStartupInfo();
+    var startup = CreateStartupInfo();
     startup.Flags = StartFlagUseStdHandles | StartFlagUseShowWindow;
     startup.ShowWindow = 0u;                    // SW_HIDE
     startup.StandardOutput = writeEnd;
@@ -135,14 +135,14 @@ public Completed Run(String commandLine, String workingDirectory)
     startup.StandardInput = null;
 
     // CreateProcessW may write to the command line, so it gets a copy it owns.
-    var mutable = Win32.Copy(commandLine);
+    var mutable = Win32.CopyToWideBuffer(commandLine);
 
     ProcessInformation information;
     var wideDirectory = workingDirectory.ToUtf16();
     char16* directory = workingDirectory.IsEmpty ? null : wideDirectory.ToPointer();
 
-    bool started = Win32.Succeeded(CreateProcessW(
-        null, mutable.Pointer(), null, null, 1, CreateNoWindow, null,
+    bool started = Win32.IsBoolSuccess(CreateProcessW(
+        null, mutable.Pointer, null, null, 1, CreateNoWindow, null,
         directory, &startup, &information));
 
     // The parent's write end has to go now, whether or not the child started:
@@ -156,7 +156,7 @@ public Completed Run(String commandLine, String workingDirectory)
     }
 
     completed.Started = true;
-    completed.Output = ReadAll(readEnd);
+    completed.Output = ReadPipeToEnd(readEnd);
     CloseHandle(readEnd);
 
     WaitForSingleObject(information.Process, Infinite);
@@ -170,8 +170,9 @@ public Completed Run(String commandLine, String workingDirectory)
 ///
 /// The child's output is bytes, and this treats them as UTF-8 — which is right
 /// for a program that says so and wrong for one still writing the OEM code
-/// page. `Win32.Terminal.UseUtf8` is what a child of this program would call.
-public String ReadAll(HANDLE pipe)
+/// page. `Win32.Terminal.UseUtf8Output` is what a child of this program would
+/// call.
+public String ReadPipeToEnd(HANDLE pipe)
 {
     var text = new StringBuilder();
     var chunk = new ByteBuffer(4096u);
@@ -179,13 +180,13 @@ public String ReadAll(HANDLE pipe)
     while (true)
     {
         uint read = 0u;
-        int result = ReadFile(pipe, (void*)chunk.Pointer(), chunk.Capacity, &read, null);
+        int result = ReadFile(pipe, (void*)chunk.Pointer, chunk.Capacity, &read, null);
 
         // Zero bytes, or ERROR_BROKEN_PIPE, both mean the writer is gone.
         if (result == 0 || read == 0u)
             break;
 
-        text.Append(Text.FromBytes(chunk.Pointer(), (nuint)read));
+        text.Append(Text.FromBytes(chunk.Pointer, (nuint)read));
     }
 
     return text.ToText();
@@ -193,7 +194,7 @@ public String ReadAll(HANDLE pipe)
 
 /// Starts a command without waiting for it, and returns the handles. The caller
 /// owns both and must close them with `CloseProcess`.
-public ProcessInformation Start(String commandLine, uint flags)
+public ProcessInformation StartProcess(String commandLine, uint flags)
 {
     ProcessInformation information;
     information.Process = null;
@@ -201,16 +202,16 @@ public ProcessInformation Start(String commandLine, uint flags)
     information.ProcessId = 0u;
     information.ThreadId = 0u;
 
-    var mutable = Win32.Copy(commandLine);
-    var startup = NewStartupInfo();
+    var mutable = Win32.CopyToWideBuffer(commandLine);
+    var startup = CreateStartupInfo();
 
-    CreateProcessW(null, mutable.Pointer(), null, null, 0, flags, null, null,
+    CreateProcessW(null, mutable.Pointer, null, null, 0, flags, null, null,
                    &startup, &information);
     return information;
 }
 
 /// Waits for a started process and returns its exit code.
-public uint WaitFor(ProcessInformation information)
+public uint WaitForProcessExit(ProcessInformation information)
 {
     WaitForSingleObject(information.Process, Infinite);
     uint code = 0u;

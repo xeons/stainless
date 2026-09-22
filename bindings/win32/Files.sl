@@ -41,34 +41,34 @@ import Standard.Collections;
 /// Opens or creates a file, taking the path as text.
 ///
 /// Returns `InvalidHandle()` on failure — not null — and the reason is in
-/// `Win32.LastError()`. `Win32.IsInvalid` covers both conventions.
-public HANDLE Open(String path, uint access, uint shareMode, uint disposition)
+/// `Win32.GetLastErrorCode()`. `Win32.IsInvalidHandle` covers both conventions.
+public HANDLE OpenFileHandle(String path, uint access, uint shareMode, uint disposition)
 {
     return CreateFileW(path.ToUtf16().ToPointer(), access, shareMode, null,
                        disposition, FileAttributeNormal, null);
 }
 
 /// Opens an existing file for reading, sharing it with other readers.
-public HANDLE OpenRead(String path)
+public HANDLE OpenFileHandleForReading(String path)
 {
-    return Open(path, GenericRead, FileShareRead, OpenExisting);
+    return OpenFileHandle(path, GenericRead, FileShareRead, OpenExisting);
 }
 
 /// Creates a file, or replaces what is there.
-public HANDLE Create(String path)
+public HANDLE CreateFileHandle(String path)
 {
-    return Open(path, GenericWrite, 0u, CreateAlways);
+    return OpenFileHandle(path, GenericWrite, 0u, CreateAlways);
 }
 
 /// True when something exists at this path, of any kind.
-public bool Exists(String path)
+public bool FileExists(String path)
 {
     return GetFileAttributesW(path.ToUtf16().ToPointer()) != InvalidFileAttributes;
 }
 
 /// True when the path names a directory. False when it names a file *and* when
 /// there is nothing there, so it is not the negation of a file test.
-public bool IsDirectory(String path)
+public bool DirectoryExists(String path)
 {
     uint attributes = GetFileAttributesW(path.ToUtf16().ToPointer());
     if (attributes == InvalidFileAttributes)
@@ -79,25 +79,25 @@ public bool IsDirectory(String path)
 /// The path with `.`, `..` and a relative prefix resolved against the current
 /// directory. Windows does this textually; it does not touch the filesystem, so
 /// it works for a path that is not there.
-public String FullPath(String path)
+public String GetFullPath(String path)
 {
     var buffer = new WideBuffer(32768u);
     uint units = GetFullPathNameW(path.ToUtf16().ToPointer(), buffer.Capacity,
-                                  buffer.Pointer(), null);
+                                  buffer.Pointer, null);
     if (units == 0u)
         return "";
-    return buffer.Text(units);
+    return buffer.ReadText(units);
 }
 
 /// The directory Windows hands out for temporary files, with its trailing
 /// separator, which Windows includes and callers routinely forget.
-public String TempPath()
+public String GetTempPath()
 {
     var buffer = new WideBuffer(32768u);
-    uint units = GetTempPathW(buffer.Capacity, buffer.Pointer());
+    uint units = GetTempPathW(buffer.Capacity, buffer.Pointer);
     if (units == 0u)
         return "";
-    return buffer.Text(units);
+    return buffer.ReadText(units);
 }
 
 // ============================================================ directory walk
@@ -106,56 +106,56 @@ public String TempPath()
 ///
 /// `Win32.Kernel32.FindData` is the struct itself, with the fields Windows
 /// fills in; these read the parts of it that want converting.
-public String NameOf(ref FindData data)
+public String GetEntryName(ref FindData data)
 {
     return Text.FromNullTerminatedUtf16(&data.FileName[0]);
 }
 
 /// The two size halves joined the way the header intends them to be.
-public ulong SizeOf(ref FindData data)
+public ulong GetEntrySize(ref FindData data)
 {
     return ((ulong)data.FileSizeHigh << 32) | (ulong)data.FileSizeLow;
 }
 
-public bool IsDirectory(ref FindData data)
+public bool IsDirectoryEntry(ref FindData data)
 {
     return (data.Attributes & FileAttributeDirectory) != 0u;
 }
 
 /// True for `.` and `..`, which a directory walk always sees first and which
 /// almost no caller wants.
-public bool IsSelfOrParent(ref FindData data)
+public bool IsSelfOrParentEntry(ref FindData data)
 {
-    var name = NameOf(ref data);
+    var name = GetEntryName(ref data);
     return name == "." || name == "..";
 }
 
 /// Begins a directory walk. `pattern` is a path with wildcards — `C:\dir\*` —
 /// not a directory. Returns `InvalidHandle()` when nothing matches, with
 /// `ErrorFileNotFound`.
-public HANDLE FindFirst(String pattern, ref FindData data)
+public HANDLE FindFirstFile(String pattern, ref FindData data)
 {
     return FindFirstFileW(pattern.ToUtf16().ToPointer(), &data);
 }
 
-/// The next entry, or false at the end — where `Win32.LastError()` is
+/// The next entry, or false at the end — where `Win32.GetLastErrorCode()` is
 /// `ErrorNoMoreFiles` rather than a real failure.
-public bool FindNext(HANDLE find, ref FindData data)
+public bool FindNextFile(HANDLE find, ref FindData data)
 {
-    return Win32.Succeeded(FindNextFileW(find, &data));
+    return Win32.IsBoolSuccess(FindNextFileW(find, &data));
 }
 
 /// Every name in a directory, without `.` and `..`.
 ///
 /// The whole walk in one call, for the common case where the caller wants a
 /// list rather than a cursor. It returns names, not paths.
-public List<String> Entries(String directory)
+public List<String> GetDirectoryEntries(String directory)
 {
     var names = new List<String>();
     FindData data;
 
-    HANDLE find = FindFirst(directory + "\\*", ref data);
-    if (Win32.IsInvalid(find))
+    HANDLE find = FindFirstFile(directory + "\\*", ref data);
+    if (Win32.IsInvalidHandle(find))
         return names;
 
     // FindFirstFileW has already produced the first entry, so this reads
@@ -163,9 +163,9 @@ public List<String> Entries(String directory)
     bool more = true;
     while (more)
     {
-        if (!IsSelfOrParent(ref data))
-            names.Add(NameOf(ref data));
-        more = FindNext(find, ref data);
+        if (!IsSelfOrParentEntry(ref data))
+            names.Add(GetEntryName(ref data));
+        more = FindNextFile(find, ref data);
     }
 
     FindClose(find);

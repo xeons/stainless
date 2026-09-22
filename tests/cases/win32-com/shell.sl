@@ -41,55 +41,55 @@ void Folder(String label, Result<String, ComError> found)
 }
 
 /// Everything that needs an apartment, in a scope that ends before the
-/// apartment does -- see Win32.Com.Uninitialize for why that matters.
+/// apartment does -- see Win32.Com.UninitializeApartment for why that matters.
 void Run()
 {
     // --- known folders ------------------------------------------------
     //
     // Downloads and SavedGames are the point: neither has an
     // SHGetFolderPathW number, and neither ever will.
-    Folder("downloads ", Shell.Downloads());
-    Folder("documents ", Shell.Documents());
-    Folder("appdata   ", Shell.AppData());
-    Folder("windows   ", Shell.WindowsFolder());
-    Folder("savedgames", Shell.SavedGames());
+    Folder("downloads ", Shell.GetDownloadsPath());
+    Folder("documents ", Shell.GetDocumentsPath());
+    Folder("appdata   ", Shell.GetAppDataPath());
+    Folder("windows   ", Shell.GetWindowsPath());
+    Folder("savedgames", Shell.GetSavedGamesPath());
 
     // A GUID survives being written out and read back.
     Say("guid round trip",
-        Com.Format(Shell.DownloadsId()) ==
-        Com.Format(Com.Parse(Com.Format(Shell.DownloadsId()))));
+        Com.FormatGuid(Shell.DownloadsId()) ==
+        Com.FormatGuid(Com.ParseGuid(Com.FormatGuid(Shell.DownloadsId()))));
 
     // --- shell items --------------------------------------------------
-    var windows = Shell.KnownFolder(Shell.WindowsId());
+    var windows = Shell.GetKnownFolderPath(Shell.WindowsId());
     if (!windows.Ok)
     {
         Console.WriteLine("no windows folder");
         return;
     }
 
-    var item = Shell.ItemFromPath(windows.Value);
+    var item = Shell.CreateItemFromPath(windows.Value);
     if (!item.Ok)
     {
         Console.WriteLine("no item");
         return;
     }
 
-    Say("path matches   ", Shell.PathOf(item.Value) == windows.Value);
-    Say("is a folder    ", Shell.IsFolder(item.Value));
-    Say("has a name     ", !Shell.NameOf(item.Value).IsEmpty);
+    Say("path matches   ", Shell.GetItemPath(item.Value) == windows.Value);
+    Say("is a folder    ", Shell.IsFolderItem(item.Value));
+    Say("has a name     ", !Shell.GetItemName(item.Value).IsEmpty);
 
-    var parent = Shell.ParentOf(item.Value);
+    var parent = Shell.GetItemParent(item.Value);
     Say("has a parent   ", parent.Ok);
 
     // An item for a path that is not there is a failure rather than a crash.
-    Say("missing fails  ", !Shell.ItemFromPath("Z:\\no\\such\\place").Ok);
+    Say("missing fails  ", !Shell.CreateItemFromPath("Z:\\no\\such\\place").Ok);
 
     // --- the file dialog ----------------------------------------------
     //
     // Created through CoCreateInstance and driven through a vtable the shell
     // built, which is what makes the slot numbers real rather than internally
     // consistent.
-    var made = Com.Create(Dialogs.FileOpenDialogId(), iidof(IFileOpenDialog));
+    var made = Com.CreateInstance(Dialogs.FileOpenDialogId(), iidof(IFileOpenDialog));
     if (!made.Ok)
     {
         Console.WriteLine("no dialog");
@@ -130,7 +130,7 @@ void Run()
     if (Com.Succeeded(dialog.GetFolder(&back)))
     {
         IShellItem got = (IShellItem)back;
-        Say("folder kept    ", Shell.PathOf(got) == windows.Value);
+        Say("folder kept    ", Shell.GetItemPath(got) == windows.Value);
     }
 
     // Slots 4, 5 and 6: a type list, built from label and pattern pairs.
@@ -139,7 +139,7 @@ void Run()
     // that do not conflict: the shell refuses a type list on a folder picker,
     // and it is right to.
     var held = new Utf16String[4];
-    var specs = Dialogs.BuildSpecs(["Text", "*.txt", "All", "*.*"], held);
+    var specs = Dialogs.BuildFilterSpecs(["Text", "*.txt", "All", "*.*"], held);
     Say("filters set    ",
         Com.Succeeded(dialog.SetFileTypes((uint)specs.Length, &specs[0])));
 
@@ -161,7 +161,7 @@ void Run()
 
     // A folder picker is the same dialog with one option, which is what
     // replaced SHBrowseForFolder.
-    var picker = Com.Create(Dialogs.FileOpenDialogId(), iidof(IFileOpenDialog));
+    var picker = Com.CreateInstance(Dialogs.FileOpenDialogId(), iidof(IFileOpenDialog));
     if (!picker.Ok)
         return;
 
@@ -177,7 +177,7 @@ void Run()
 
 public void Main()
 {
-    if (!Com.Initialize())
+    if (!Com.InitializeApartment())
     {
         Console.WriteLine("COM would not start");
         return;
@@ -186,6 +186,6 @@ public void Main()
     Run();
 
     // Every reference Run made is gone, because Run's scope ended.
-    Com.Uninitialize();
+    Com.UninitializeApartment();
     Console.WriteLine("done");
 }

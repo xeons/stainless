@@ -194,7 +194,7 @@ public extern "C"
 }
 
 /// `errno`, which every call above reports through rather than returning.
-public int Errno() => *__errno_location();
+public int GetErrno() => *__errno_location();
 
 /// A read or a wait that a signal interrupted. Not an error: ask again.
 public const int EINTR = 4;

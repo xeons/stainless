@@ -125,8 +125,8 @@ public struct XAUDIO2_EFFECT_CHAIN
 /// `XAUDIO2_FILTER_PARAMETERS`: a one-pole filter on a voice.
 ///
 /// `Frequency` is not hertz. It is `2 * sin(pi * cutoff / sampleRate)`, which
-/// is the coefficient the filter actually uses; `FrequencyFromHertz` in
-/// `Win32.Sound` does the conversion.
+/// is the coefficient the filter actually uses;
+/// `XAudio2CutoffFrequencyToRadians` in `Win32.Sound` does the conversion.
 public struct XAUDIO2_FILTER_PARAMETERS
 {
     public int Type;

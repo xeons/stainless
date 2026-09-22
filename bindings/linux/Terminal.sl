@@ -81,7 +81,7 @@ public class Mode
     ///
     /// `TCSADRAIN` rather than `TCSAFLUSH`: what the program has printed
     /// should reach the screen before the terminal changes under it.
-    public bool Restore()
+    public bool RestoreTerminal()
     {
         if (!_held)
             return true;
@@ -91,22 +91,22 @@ public class Mode
         return tcsetattr(_fd, TCSADRAIN, &state) == 0;
     }
 
-    ~Mode() { Restore(); }
+    ~Mode() { RestoreTerminal(); }
 
     /// Turns off everything that stands between a keystroke and the program:
     /// line collection, echo, signal keys, flow control and output
     /// translation. What comes back restores the terminal.
     ///
-    ///     var mode = try Raw(Terminal.Input);
+    ///     var mode = try Mode.EnterRawMode(Terminal.Input);
     ///     ...
     ///     mode.Restore();
     ///
     /// Or simply let it go out of scope, which does the same.
-    public static Result<Mode, int> Raw(int fd)
+    public static Result<Mode, int> EnterRawMode(int fd)
     {
         termios before;
         if (tcgetattr(fd, &before) != 0)
-            return Fail(Errno());
+            return Fail(GetErrno());
 
         termios wanted = before;
 
@@ -121,7 +121,7 @@ public class Mode
         wanted.c_cc[VTIME] = 0;
 
         if (tcsetattr(fd, TCSAFLUSH, &wanted) != 0)
-            return Fail(Errno());
+            return Fail(GetErrno());
         return Ok(new Mode(fd, before));
     }
 
@@ -129,11 +129,11 @@ public class Mode
     /// stops collecting lines and stops echoing, and Ctrl-C still interrupts.
     ///
     /// This is what a prompt wants. Raw is what a full-screen program wants.
-    public static Result<Mode, int> Quiet(int fd)
+    public static Result<Mode, int> EnterQuietMode(int fd)
     {
         termios before;
         if (tcgetattr(fd, &before) != 0)
-            return Fail(Errno());
+            return Fail(GetErrno());
 
         termios wanted = before;
         wanted.c_lflag &= ~(ECHO | ICANON);
@@ -141,22 +141,22 @@ public class Mode
         wanted.c_cc[VTIME] = 0;
 
         if (tcsetattr(fd, TCSAFLUSH, &wanted) != 0)
-            return Fail(Errno());
+            return Fail(GetErrno());
         return Ok(new Mode(fd, before));
     }
 
     /// Echo off and nothing else, for reading a password.
-    public static Result<Mode, int> Hidden(int fd)
+    public static Result<Mode, int> EnterHiddenMode(int fd)
     {
         termios before;
         if (tcgetattr(fd, &before) != 0)
-            return Fail(Errno());
+            return Fail(GetErrno());
 
         termios wanted = before;
         wanted.c_lflag &= ~ECHO;
 
         if (tcsetattr(fd, TCSAFLUSH, &wanted) != 0)
-            return Fail(Errno());
+            return Fail(GetErrno());
         return Ok(new Mode(fd, before));
     }
 }
@@ -166,39 +166,36 @@ public class Mode
 // Written rather than called. Everything below is text going to the output,
 // which is why none of it can fail and none of it returns anything.
 
-/// The two bytes every sequence below begins with: escape, then '['.
-///
-/// A function rather than a `const`, because a `const` holds a number, a bool,
-/// a char or an enum. A String has storage and is reference counted, and the
-/// literal here is one interned object however often it is named.
-String Escape() => "[";
+/// Writes one control sequence: escape, then '[', then `body`.
+void WriteControlSequence(String body) => Console.Write("[" + body);
 
 /// Puts the cursor at a row and column, both counting from 1 as the terminal
 /// does — which is off by one from everything else here, and is the
 /// terminal's convention rather than a choice.
-public void MoveTo(int row, int column)
-{
-    Console.Write($"{Escape()}{row};{column}H");
-}
+public void MoveCursorTo(int row, int column) => WriteControlSequence($"{row};{column}H");
 
-public void Up(int rows) => Console.Write($"{Escape()}{rows}A");
-public void Down(int rows) => Console.Write($"{Escape()}{rows}B");
-public void Right(int columns) => Console.Write($"{Escape()}{columns}C");
-public void Left(int columns) => Console.Write($"{Escape()}{columns}D");
+public void MoveCursorUp(int rows) => WriteControlSequence($"{rows}A");
+public void MoveCursorDown(int rows) => WriteControlSequence($"{rows}B");
+public void MoveCursorRight(int columns) => WriteControlSequence($"{columns}C");
+public void MoveCursorLeft(int columns) => WriteControlSequence($"{columns}D");
 
 /// Clears the screen and puts the cursor at the top left.
-public void Clear() => Console.Write($"{Escape()}2J{Escape()}H");
+public void ClearScreen()
+{
+    WriteControlSequence("2J");
+    WriteControlSequence("H");
+}
 
 /// Clears from the cursor to the end of the line.
-public void ClearLine() => Console.Write($"{Escape()}K");
+public void ClearLine() => WriteControlSequence("K");
 
-public void HideCursor() => Console.Write($"{Escape()}?25l");
-public void ShowCursor() => Console.Write($"{Escape()}?25h");
+public void HideCursor() => WriteControlSequence("?25l");
+public void ShowCursor() => WriteControlSequence("?25h");
 
 /// Switches to the alternate screen, which is what a full-screen program uses
 /// so that the scrollback it found is still there when it leaves.
-public void UseAlternateScreen() => Console.Write($"{Escape()}?1049h");
-public void UseMainScreen() => Console.Write($"{Escape()}?1049l");
+public void UseAlternateScreen() => WriteControlSequence("?1049h");
+public void UseMainScreen() => WriteControlSequence("?1049l");
 
 /// The eight colours every terminal has, as their foreground codes.
 public enum Colour
@@ -208,14 +205,14 @@ public enum Colour
     Default = 39,
 }
 
-public void SetColour(Colour colour) => Console.Write($"{Escape()}{(long)colour}m");
+public void SetColour(Colour colour) => WriteControlSequence($"{(long)colour}m");
 
-public void SetBackground(Colour colour) => Console.Write($"{Escape()}{(long)colour + 10}m");
+public void SetBackgroundColour(Colour colour) => WriteControlSequence($"{(long)colour + 10}m");
 
-public void Bold(bool on) => Console.Write(on ? $"{Escape()}1m" : $"{Escape()}22m");
+public void SetBold(bool on) => WriteControlSequence(on ? "1m" : "22m");
 
 /// Puts every attribute back to what it was. The one to call before leaving,
 /// so the shell does not inherit a colour.
-public void Reset() => Console.Write($"{Escape()}0m");
+public void ResetAttributes() => WriteControlSequence("0m");
 
 #endif

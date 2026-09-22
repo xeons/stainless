@@ -94,7 +94,7 @@ public struct Stick
     {
         get
         {
-            double length = Root(X * X + Y * Y);
+            double length = ComputeSquareRoot(X * X + Y * Y);
             return length > 1.0 ? 1.0 : length;
         }
     }
@@ -105,7 +105,7 @@ public struct Stick
 
 extern "C" double sqrt(double x);
 
-double Root(double value) => sqrt(value);
+double ComputeSquareRoot(double value) => sqrt(value);
 
 /// One controller slot, remembered between polls.
 ///
@@ -133,7 +133,7 @@ public class Pad
     ulong _nextScan;
 
     /// A pad for slot `slot`, which must be 0 to 3. Nothing is asked of the
-    /// system until the first `Poll`.
+    /// system until the first `PollState`.
     public Pad(uint slot)
     {
         _slot = slot;
@@ -153,7 +153,7 @@ public class Pad
     ///
     /// Call this once a frame. An empty slot is only actually asked about once
     /// a second; in between, this answers false without touching the system.
-    public bool Poll()
+    public bool PollState()
     {
         _previousButtons = _connected ? _state.Gamepad.wButtons : (ushort)0;
 
@@ -201,41 +201,41 @@ public class Pad
 
     /// The left stick, dead-zoned and scaled.
     public Stick LeftStick =>
-        Scaled(_state.Gamepad.sThumbLX, _state.Gamepad.sThumbLY,
+        ScaleStick(_state.Gamepad.sThumbLX, _state.Gamepad.sThumbLY,
                XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
 
     /// The right stick, dead-zoned and scaled. Its dead zone is larger, which
     /// is the hardware's asymmetry rather than this module's.
     public Stick RightStick =>
-        Scaled(_state.Gamepad.sThumbRX, _state.Gamepad.sThumbRY,
+        ScaleStick(_state.Gamepad.sThumbRX, _state.Gamepad.sThumbRY,
                XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE);
 
     /// The left trigger, 0.0 to 1.0, with everything below the threshold read
     /// as nothing.
-    public double LeftTrigger => Trigger(_state.Gamepad.bLeftTrigger);
+    public double LeftTrigger => ScaleTrigger(_state.Gamepad.bLeftTrigger);
 
     /// The right trigger, 0.0 to 1.0.
-    public double RightTrigger => Trigger(_state.Gamepad.bRightTrigger);
+    public double RightTrigger => ScaleTrigger(_state.Gamepad.bRightTrigger);
 
     /// Sets both motors, 0.0 to 1.0 each, and says whether the pad took it.
     ///
     /// **The two motors are not the same.** The left is a heavy weight and
     /// gives a low rumble; the right is lighter and gives a buzz. Equal numbers
     /// do not give "medium", they give both at once.
-    public bool Rumble(double low, double high)
+    public bool SetRumble(double low, double high)
     {
         if (!_connected)
             return false;
 
         XINPUT_VIBRATION vibration;
-        vibration.wLeftMotorSpeed = Motor(low);
-        vibration.wRightMotorSpeed = Motor(high);
+        vibration.wLeftMotorSpeed = ScaleMotorSpeed(low);
+        vibration.wRightMotorSpeed = ScaleMotorSpeed(high);
         return XInputSetState(_slot, &vibration) == ERROR_SUCCESS;
     }
 
     /// Both motors off. Worth calling before a program exits: the pad keeps
     /// buzzing after the process that set it has gone.
-    public bool StopRumble() => Rumble(0.0, 0.0);
+    public bool StopRumble() => SetRumble(0.0, 0.0);
 
     /// What kind of device this is -- one of the `XINPUT_DEVSUBTYPE_*` values.
     /// A wheel and a flight stick both arrive as XInput devices and report
@@ -291,7 +291,7 @@ public class Pad
     /// neither axis, and one pushed straight along an axis registers sooner
     /// than one pushed at 45 degrees. Measuring the length and scaling both
     /// axes together is what makes the stick feel round.
-    Stick Scaled(short x, short y, short deadZone)
+    Stick ScaleStick(short x, short y, short deadZone)
     {
         Stick stick;
         stick.X = 0.0;
@@ -302,7 +302,7 @@ public class Pad
 
         double horizontal = (double)x;
         double vertical = (double)y;
-        double length = Root(horizontal * horizontal + vertical * vertical);
+        double length = ComputeSquareRoot(horizontal * horizontal + vertical * vertical);
         double edge = (double)deadZone;
 
         if (length <= edge)
@@ -327,7 +327,7 @@ public class Pad
         return stick;
     }
 
-    double Trigger(byte value)
+    double ScaleTrigger(byte value)
     {
         if (!_connected || value <= XINPUT_GAMEPAD_TRIGGER_THRESHOLD)
             return 0.0;
@@ -336,7 +336,7 @@ public class Pad
         return ((double)value - threshold) / (255.0 - threshold);
     }
 
-    ushort Motor(double amount)
+    ushort ScaleMotorSpeed(double amount)
     {
         if (amount <= 0.0)
             return (ushort)0;
@@ -350,7 +350,7 @@ public class Pad
 ///
 /// The usual shape for a game: four pads, polled together, with the ones that
 /// are not plugged in costing nothing.
-public Pad[] AllPads()
+public Pad[] CreateAllPads()
 {
     Pad[] pads = new Pad[XUSER_MAX_COUNT];
     for (nuint i = 0u; i < pads.Length; i++)
@@ -359,12 +359,12 @@ public Pad[] AllPads()
 }
 
 /// How many of `pads` found a controller, after polling every one.
-public nuint PollAll(Pad[] pads)
+public nuint PollAllPads(Pad[] pads)
 {
     nuint found = 0u;
     for (nuint i = 0u; i < pads.Length; i++)
     {
-        if (pads[i].Poll())
+        if (pads[i].PollState())
             found++;
     }
     return found;

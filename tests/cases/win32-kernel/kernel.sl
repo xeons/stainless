@@ -23,55 +23,59 @@ int Main()
     // back: the value goes out as UTF-16 and returns as UTF-8, so a mistake in
     // either direction shows up here.
     String wanted = "héllo 日本 🌍";
-    Console.WriteLine("set: " + Text.FromBool(Environment.Set("STAINLESS_TEST", wanted)));
-    String read = Environment.Get("STAINLESS_TEST");
+    Console.WriteLine("set: "
+        + Text.FromBool(Environment.SetEnvironmentVariable("STAINLESS_TEST", wanted)));
+    String read = Environment.GetEnvironmentVariable("STAINLESS_TEST");
     Console.WriteLine("read back identical: " + Text.FromBool(read == wanted));
     Console.WriteLine("value: " + read);
 
-    Console.WriteLine("expanded: " + Environment.Expand("[%STAINLESS_TEST%]"));
+    Console.WriteLine("expanded: " + Environment.ExpandEnvironmentVariables("[%STAINLESS_TEST%]"));
 
-    Console.WriteLine("cleared: " + Text.FromBool(Environment.Clear("STAINLESS_TEST")));
-    Console.WriteLine("gone: " + Text.FromBool(Environment.Get("STAINLESS_TEST").IsEmpty));
+    Console.WriteLine("cleared: "
+        + Text.FromBool(Environment.ClearEnvironmentVariable("STAINLESS_TEST")));
+    Console.WriteLine("gone: "
+        + Text.FromBool(Environment.GetEnvironmentVariable("STAINLESS_TEST").IsEmpty));
 
     // --- errors -------------------------------------------------------------
-    Console.WriteLine("code 2: " + Win32.Describe(2u));
-    Console.WriteLine("code 5: " + Win32.Describe(5u));
+    Console.WriteLine("code 2: " + Win32.FormatErrorMessage(2u));
+    Console.WriteLine("code 5: " + Win32.FormatErrorMessage(5u));
     Console.WriteLine("an impossible code has no message: "
-        + Text.FromBool(Win32.Describe(0xFFFFFFFEu).IsEmpty));
+        + Text.FromBool(Win32.FormatErrorMessage(0xFFFFFFFEu).IsEmpty));
 
-    Console.WriteLine("0 is failure: " + Text.FromBool(Win32.Failed(0)));
-    Console.WriteLine("1 is success: " + Text.FromBool(Win32.Succeeded(1)));
-    Console.WriteLine("null is invalid: " + Text.FromBool(Win32.IsInvalid(null)));
-    Console.WriteLine("-1 is invalid: " + Text.FromBool(Win32.IsInvalid(InvalidHandle())));
+    Console.WriteLine("0 is failure: " + Text.FromBool(Win32.IsBoolFailure(0)));
+    Console.WriteLine("1 is success: " + Text.FromBool(Win32.IsBoolSuccess(1)));
+    Console.WriteLine("null is invalid: " + Text.FromBool(Win32.IsInvalidHandle(null)));
+    Console.WriteLine("-1 is invalid: " + Text.FromBool(Win32.IsInvalidHandle(InvalidHandle())));
 
     // --- paths ---------------------------------------------------------------
-    Console.WriteLine("the exe exists: " + Text.FromBool(Files.Exists(Machine.ExecutablePath())));
+    Console.WriteLine("the exe exists: "
+        + Text.FromBool(Files.FileExists(Machine.GetExecutablePath())));
     Console.WriteLine("the exe is not a directory: "
-        + Text.FromBool(!Files.IsDirectory(Machine.ExecutablePath())));
+        + Text.FromBool(!Files.DirectoryExists(Machine.GetExecutablePath())));
     Console.WriteLine("nothing is at C:\\no\\such\\place: "
-        + Text.FromBool(!Files.Exists("C:\\no\\such\\place")));
+        + Text.FromBool(!Files.FileExists("C:\\no\\such\\place")));
     Console.WriteLine("the system directory is one: "
-        + Text.FromBool(Files.IsDirectory(Environment.SystemDirectory())));
+        + Text.FromBool(Files.DirectoryExists(Environment.GetSystemDirectory())));
 
     // GetFullPathNameW is textual: it resolves .. without asking the
     // filesystem, so this works for a path that is not there.
-    Console.WriteLine("normalised: " + Files.FullPath("C:\\one\\two\\..\\three\\.\\four.txt"));
+    Console.WriteLine("normalised: " + Files.GetFullPath("C:\\one\\two\\..\\three\\.\\four.txt"));
 
-    String temp = Files.TempPath();
+    String temp = Files.GetTempPath();
     Console.WriteLine("the temp path ends in a separator: "
         + Text.FromBool(temp.Substring(temp.ByteLength() - 1u, 1u) == "\\"));
 
     // --- a directory walk ----------------------------------------------------
-    String directory = Files.TempPath() + "stainless-win32-case";
+    String directory = Files.GetTempPath() + "stainless-win32-case";
     RemoveTree(directory);
     Console.WriteLine("made: " + Text.FromBool(
-        Win32.Succeeded(CreateDirectoryW(directory.ToUtf16().ToPointer(), null))));
+        Win32.IsBoolSuccess(CreateDirectoryW(directory.ToUtf16().ToPointer(), null))));
 
     Touch(directory + "\\alpha.txt");
     Touch(directory + "\\béta.txt");
     Touch(directory + "\\日本.txt");
 
-    var names = Files.Entries(directory);
+    var names = Files.GetDirectoryEntries(directory);
     Sort(names);
     Console.WriteLine("found " + Text.FromInteger((long)names.Count) + ":");
     foreach (String name in names)
@@ -83,26 +87,26 @@ int Main()
     Console.WriteLine("offsetof(FileName) = " + Text.FromInteger(offsetof(FindData, FileName)));
 
     FindData data;
-    HANDLE find = Files.FindFirst(directory + "\\alpha.txt", ref data);
-    Console.WriteLine("alpha found: " + Text.FromBool(!Win32.IsInvalid(find)));
-    Console.WriteLine("  name: " + Files.NameOf(ref data));
-    Console.WriteLine("  size: " + Text.FromInteger((long)Files.SizeOf(ref data)));
-    Console.WriteLine("  is a directory: " + Text.FromBool(Files.IsDirectory(ref data)));
+    HANDLE find = Files.FindFirstFile(directory + "\\alpha.txt", ref data);
+    Console.WriteLine("alpha found: " + Text.FromBool(!Win32.IsInvalidHandle(find)));
+    Console.WriteLine("  name: " + Files.GetEntryName(ref data));
+    Console.WriteLine("  size: " + Text.FromInteger((long)Files.GetEntrySize(ref data)));
+    Console.WriteLine("  is a directory: " + Text.FromBool(Files.IsDirectoryEntry(ref data)));
     Console.WriteLine("  written after 1601: "
-        + Text.FromBool(Clock.Ticks(data.Written) > 0u));
+        + Text.FromBool(Clock.FileTimeToTicks(data.Written) > 0u));
     FindClose(find);
 
     // A pattern nothing matches is InvalidHandle with ERROR_FILE_NOT_FOUND
     // rather than an empty walk.
-    HANDLE missing = Files.FindFirst(directory + "\\*.nothing", ref data);
-    Console.WriteLine("no match is invalid: " + Text.FromBool(Win32.IsInvalid(missing)));
-    Console.WriteLine("  because: " + Text.FromBool(Win32.LastError() == ErrorFileNotFound));
+    HANDLE missing = Files.FindFirstFile(directory + "\\*.nothing", ref data);
+    Console.WriteLine("no match is invalid: " + Text.FromBool(Win32.IsInvalidHandle(missing)));
+    Console.WriteLine("  because: " + Text.FromBool(Win32.GetLastErrorCode() == ErrorFileNotFound));
 
     RemoveTree(directory);
-    Console.WriteLine("removed: " + Text.FromBool(!Files.Exists(directory)));
+    Console.WriteLine("removed: " + Text.FromBool(!Files.FileExists(directory)));
 
     // --- the system -----------------------------------------------------------
-    var info = Machine.Info();
+    var info = Machine.QuerySystemInfo();
     Console.WriteLine("at least one processor: " + Text.FromBool(info.ProcessorCount >= 1u));
     Console.WriteLine("pages are 4K: " + Text.FromBool(info.PageSize == 4096u));
     // SYSTEM_INFO's first word is a nameless union of a whole DWORD and two
@@ -110,7 +114,7 @@ int Main()
     Console.WriteLine("the nameless union reads both ways: "
         + Text.FromBool((info.OemId & 0xFFFFu) == (uint)info.Architecture));
 
-    var memory = Machine.Memory();
+    var memory = Machine.QueryMemoryStatus();
     Console.WriteLine("some memory is free: " + Text.FromBool(memory.AvailablePhysical > 0u));
     Console.WriteLine("load is a percentage: " + Text.FromBool(memory.MemoryLoad <= 100u));
 
@@ -129,8 +133,8 @@ int Main()
 /// so that CreateFileW and CloseHandle are what is being tested.
 void Touch(String path)
 {
-    HANDLE file = Files.Open(path, GenericWrite, 0u, CreateAlways);
-    if (!Win32.IsInvalid(file))
+    HANDLE file = Files.OpenFileHandle(path, GenericWrite, 0u, CreateAlways);
+    if (!Win32.IsInvalidHandle(file))
         CloseHandle(file);
 }
 
@@ -138,7 +142,7 @@ void Touch(String path)
 /// this case makes.
 void RemoveTree(String directory)
 {
-    foreach (String name in Files.Entries(directory))
+    foreach (String name in Files.GetDirectoryEntries(directory))
     {
         DeleteFileW((directory + "\\" + name).ToUtf16().ToPointer());
     }

@@ -423,7 +423,7 @@ public extern "C"
 }
 
 /// This thread's `errno`.
-public int Errno() => *__errno_location();
+public int GetErrno() => *__errno_location();
 
 public const int EINTR = 4;
 public const int EBADF = 9;

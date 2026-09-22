@@ -175,6 +175,6 @@ public extern "C"
 }
 
 /// `errno`, which every call above reports through rather than returning.
-public int Errno() => *__errno_location();
+public int GetErrno() => *__errno_location();
 
 #endif

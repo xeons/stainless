@@ -534,7 +534,7 @@ public class GtkClipboardWatchPeer : IClipboardWatchPeer
         _relay.Listening = false;
         if (_handler == 0u)
             return;
-        Disconnect((GtkWidget*)DefaultClipboard(), _handler);
+        DisconnectHandler((GtkWidget*)DefaultClipboard(), _handler);
         _handler = 0u;
     }
 }

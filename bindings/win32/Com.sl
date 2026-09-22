@@ -63,7 +63,7 @@ public bool WasCancelled(int result) => result == Cancelled;
 /// case the message Windows already has for it is the useful one. Anything
 /// else is reported as its hex code, because inventing prose for a facility
 /// this does not know would be worse than showing the number.
-public String Describe(int result)
+public String DescribeHResult(int result)
 {
     if (result == Ok)
         return "ok";
@@ -92,15 +92,15 @@ public String Describe(int result)
     // low half, so Windows' own message is available for those.
     if ((result & 0xFFFF0000) == 0x80070000)
     {
-        return Win32.Describe((uint)(result & 0x0000FFFF));
+        return Win32.FormatErrorMessage((uint)(result & 0x0000FFFF));
     }
 
-    return "COM error 0x" + Hex((uint)result);
+    return "COM error 0x" + FormatHexadecimal((uint)result);
 }
 
 /// An unsigned value as eight hex digits, which is how an `HRESULT` is
 /// written everywhere it appears.
-String Hex(uint value)
+String FormatHexadecimal(uint value)
 {
     var digits = "0123456789ABCDEF";
     var builder = new StringBuilder();
@@ -118,22 +118,22 @@ String Hex(uint value)
 /// Brings this thread's apartment up, single-threaded, which is what anything
 /// that shows a window needs.
 ///
-/// Every successful call must be matched by an `Uninitialize`, including the
-/// ones that return `S_FALSE` because the apartment was already up. Reference
-/// counting an apartment is Windows' rule, not this binding's.
-public bool Initialize()
+/// Every successful call must be matched by an `UninitializeApartment`,
+/// including the ones that return `S_FALSE` because the apartment was already
+/// up. Reference counting an apartment is Windows' rule, not this binding's.
+public bool InitializeApartment()
 {
     return Succeeded(CoInitializeEx(null, ApartmentThreaded | DisableOle1Dde));
 }
 
 /// Brings this thread's apartment up free-threaded, for a thread that will not
 /// pump messages.
-public bool InitializeMultiThreaded()
+public bool InitializeMultiThreadedApartment()
 {
     return Succeeded(CoInitializeEx(null, MultiThreaded | DisableOle1Dde));
 }
 
-/// Drops one of this thread's `Initialize` calls.
+/// Drops one of this thread's `InitializeApartment` calls.
 ///
 /// **Every COM reference must be gone before this runs**, and ARC drops one at
 /// the end of the scope that holds it -- which is after this call, if the two
@@ -145,17 +145,17 @@ public bool InitializeMultiThreaded()
 /// the scope:
 ///
 /// ```
-/// Com.Initialize();
+/// Com.InitializeApartment();
 /// {
 ///     IFileOpenDialog dialog = ...;   // released when this block ends
 /// }
-/// Com.Uninitialize();                 // and only then does the apartment go
+/// Com.UninitializeApartment();       // and only then does the apartment go
 /// ```
 ///
 /// The conveniences in `Win32.Dialogs` and `Win32.Shell` are safe either way:
 /// each drops whatever it made before it returns, so nothing of theirs is
 /// still alive when a caller uninitializes.
-public void Uninitialize() => CoUninitialize();
+public void UninitializeApartment() => CoUninitialize();
 
 // ------------------------------------------------------------------- GUIDs
 
@@ -168,7 +168,7 @@ public void Uninitialize() => CoUninitialize();
 ///
 /// This is how a CLSID reaches a program. An IID does not need it: `[Guid]` on
 /// a `com interface` folds to a constant, and `iidof` is its address.
-public Guid Parse(String text)
+public Guid ParseGuid(String text)
 {
     Guid value;
 
@@ -189,15 +189,15 @@ public Guid Parse(String text)
 }
 
 /// A GUID as `{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}`.
-public String Format(Guid value)
+public String FormatGuid(Guid value)
 {
     // 38 characters and a NUL, which is what StringFromGUID2 documents.
     var buffer = new WideBuffer(40u);
-    int units = StringFromGUID2(&value, buffer.Pointer(), (int)buffer.Capacity);
+    int units = StringFromGUID2(&value, buffer.Pointer, (int)buffer.Capacity);
     if (units <= 0)
         return "";
 
-    return Text.FromUtf16(buffer.Pointer(), (nuint)(units - 1));
+    return Text.FromUtf16(buffer.Pointer, (nuint)(units - 1));
 }
 
 // -------------------------------------------------------------- activation
@@ -216,7 +216,7 @@ public enum ComError : uint
     /// COM was never started on this thread.
     NotInitialized = 3u,
 
-    /// Something else. `Describe` on the raw code says what.
+    /// Something else. `DescribeHResult` on the raw code says what.
     Other = 4u,
 }
 
@@ -225,7 +225,8 @@ public enum ComError : uint
 /// The pointer that comes back is at +1, and the caller adopts it with a cast:
 ///
 /// ```
-/// var made = Com.Create(Com.Parse(Dialogs.FileOpenDialogClsid), iidof(IFileOpenDialog));
+/// var made = Com.CreateInstance(Dialogs.FileOpenDialogId(),
+///     iidof(IFileOpenDialog));
 /// if (made.IsOk()) {
 ///     IFileOpenDialog dialog = (IFileOpenDialog)made.Value;
 ///     ...                       // ARC releases it at the end of the scope
@@ -236,30 +237,30 @@ public enum ComError : uint
 /// language does not cross on its own: which interface a caller asked for is
 /// known to the caller and not to a signature, so the cast is where the
 /// programmer says it.
-public Result<byte*, ComError> Create(Guid classId, Guid* interfaceId)
+public Result<byte*, ComError> CreateInstance(Guid classId, Guid* interfaceId)
 {
     byte* made = null;
     int hr = CoCreateInstance(&classId, null, AllContexts, interfaceId, &made);
 
     if (Succeeded(hr))
         return Ok(made);
-    return Fail(Classify(hr));
+    return Fail(ClassifyHResult(hr));
 }
 
 /// Makes an object in this process only, refusing a class that would need a
 /// server started.
-public Result<byte*, ComError> CreateInProcess(Guid classId, Guid* interfaceId)
+public Result<byte*, ComError> CreateInProcessInstance(Guid classId, Guid* interfaceId)
 {
     byte* made = null;
     int hr = CoCreateInstance(&classId, null, InProcessServer, interfaceId, &made);
 
     if (Succeeded(hr))
         return Ok(made);
-    return Fail(Classify(hr));
+    return Fail(ClassifyHResult(hr));
 }
 
 /// An `HRESULT` from an activation call as one of the errors above.
-public ComError Classify(int result)
+public ComError ClassifyHResult(int result)
 {
     if (Succeeded(result))
         return ComError.None;
@@ -291,6 +292,6 @@ public String TakeString(char16* text)
 }
 
 /// Frees a block COM allocated, for the cases `TakeString` does not cover.
-public void Free(byte* block) => CoTaskMemFree(block);
+public void FreeTaskMemory(byte* block) => CoTaskMemFree(block);
 
 #endif

@@ -556,9 +556,9 @@ same scope is released *after* the apartment it belongs to is gone, through a
 vtable that is no longer there:
 
 ```csharp
-Com.Initialize();
+Com.InitializeApartment();
 IFileOpenDialog dialog = ...;
-Com.Uninitialize();                 // the object is still held
+Com.UninitializeApartment();        // the object is still held
                                     // -> released here, into freed memory
 ```
 
@@ -566,11 +566,11 @@ In C both are statements and the programmer orders them. Here one of them is
 emitted, so what orders them is the scope:
 
 ```csharp
-Com.Initialize();
+Com.InitializeApartment();
 {
     IFileOpenDialog dialog = ...;   // released when this block ends
 }
-Com.Uninitialize();
+Com.UninitializeApartment();
 ```
 
 This is the cost of the compiler owning the reference count, and it is a small

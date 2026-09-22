@@ -46,45 +46,45 @@ import Win32.Handles;
 
 /// `ShellExecuteW` returns a fake `HINSTANCE` that is an error code when it is
 /// 32 or less. Anything above that means it worked.
-public bool Started(HINSTANCE result) => (nuint)result > ShellExecuteThreshold;
+public bool IsShellExecuteSuccess(HINSTANCE result) => (nuint)result > ShellExecuteThreshold;
 
 /// Opens a file, a folder or a URL with whatever the user has associated with
 /// it — the same thing double-clicking would do.
-public bool Launch(String target)
+public bool OpenWithShell(String target)
 {
     HINSTANCE result = ShellExecuteW(null, "open".ToUtf16().ToPointer(),
                                  target.ToUtf16().ToPointer(), null, null, SwShowNormal);
-    return Started(result);
+    return IsShellExecuteSuccess(result);
 }
 
 /// Opens a folder in Explorer.
-public bool Browse(String directory)
+public bool OpenFolderInExplorer(String directory)
 {
     HINSTANCE result = ShellExecuteW(null, "explore".ToUtf16().ToPointer(),
                                  directory.ToUtf16().ToPointer(), null, null, SwShowNormal);
-    return Started(result);
+    return IsShellExecuteSuccess(result);
 }
 
 /// Runs a program, elevated. Windows shows the consent prompt; a user who
 /// refuses is a `false` here and not an error worth explaining.
-public bool RunElevated(String program, String arguments)
+public bool RunProgramElevated(String program, String arguments)
 {
     HINSTANCE result = ShellExecuteW(null, "runas".ToUtf16().ToPointer(),
                                  program.ToUtf16().ToPointer(),
                                  arguments.ToUtf16().ToPointer(), null, SwShowNormal);
-    return Started(result);
+    return IsShellExecuteSuccess(result);
 }
 
 /// A well-known folder's path, or an empty string. The `Folder...` constants
 /// are in `Win32.Shell32`.
-public String FolderPath(int folder)
+public String GetFolderPath(int folder)
 {
     // MAX_PATH, which is what this API writes and does not check against.
     var buffer = new WideBuffer(260u);
-    uint result = SHGetFolderPathW(null, folder, null, 0u, buffer.Pointer());
+    uint result = SHGetFolderPathW(null, folder, null, 0u, buffer.Pointer);
     if (result != 0u)
         return "";
-    return buffer.Text();
+    return buffer.ReadText();
 }
 
 // ============================================================ known folders
@@ -101,41 +101,41 @@ public String FolderPath(int folder)
 // lookup, against a shell call that is thousands of times dearer.
 
 /// `FOLDERID_Desktop`.
-public Guid DesktopId() => Com.Parse("B4BFCC3A-DB2C-424C-B029-7FE99A87C641");
+public Guid DesktopId() => Com.ParseGuid("B4BFCC3A-DB2C-424C-B029-7FE99A87C641");
 /// `FOLDERID_Documents`.
-public Guid DocumentsId() => Com.Parse("FDD39AD0-238F-46AF-ADB4-6C85480369C7");
+public Guid DocumentsId() => Com.ParseGuid("FDD39AD0-238F-46AF-ADB4-6C85480369C7");
 /// `FOLDERID_Downloads`.
-public Guid DownloadsId() => Com.Parse("374DE290-123F-4565-9164-39C4925E467B");
+public Guid DownloadsId() => Com.ParseGuid("374DE290-123F-4565-9164-39C4925E467B");
 /// `FOLDERID_Pictures`.
-public Guid PicturesId() => Com.Parse("33E28130-4E1E-4676-835A-98395C3BC3BB");
+public Guid PicturesId() => Com.ParseGuid("33E28130-4E1E-4676-835A-98395C3BC3BB");
 /// `FOLDERID_Music`.
-public Guid MusicId() => Com.Parse("4BD8D571-6D19-48D3-BE97-422220080E43");
+public Guid MusicId() => Com.ParseGuid("4BD8D571-6D19-48D3-BE97-422220080E43");
 /// `FOLDERID_Videos`.
-public Guid VideosId() => Com.Parse("18989B1D-99B5-455B-841C-AB7C74E4DDFC");
+public Guid VideosId() => Com.ParseGuid("18989B1D-99B5-455B-841C-AB7C74E4DDFC");
 /// `FOLDERID_SavedGames`.
-public Guid SavedGamesId() => Com.Parse("4C5C32FF-BB9D-43B0-B5B4-2D72E54EAAA4");
+public Guid SavedGamesId() => Com.ParseGuid("4C5C32FF-BB9D-43B0-B5B4-2D72E54EAAA4");
 /// `FOLDERID_RoamingAppData`.
-public Guid RoamingAppDataId() => Com.Parse("3EB685DB-65F9-4CF6-A03A-E3EF65729F3D");
+public Guid RoamingAppDataId() => Com.ParseGuid("3EB685DB-65F9-4CF6-A03A-E3EF65729F3D");
 /// `FOLDERID_LocalAppData`.
-public Guid LocalAppDataId() => Com.Parse("F1B32785-6FBA-4FCF-9D55-7B8E7F157091");
+public Guid LocalAppDataId() => Com.ParseGuid("F1B32785-6FBA-4FCF-9D55-7B8E7F157091");
 /// `FOLDERID_ProgramData`.
-public Guid ProgramDataId() => Com.Parse("62AB5D82-FDC1-4DC3-A9DD-070D1D495D97");
+public Guid ProgramDataId() => Com.ParseGuid("62AB5D82-FDC1-4DC3-A9DD-070D1D495D97");
 /// `FOLDERID_Profile`.
-public Guid ProfileId() => Com.Parse("5E6C858F-0E22-4760-9AFE-EA3317B67173");
+public Guid ProfileId() => Com.ParseGuid("5E6C858F-0E22-4760-9AFE-EA3317B67173");
 /// `FOLDERID_Windows`.
-public Guid WindowsId() => Com.Parse("F38BF404-1D43-42F2-9305-67DE0B28FC23");
+public Guid WindowsId() => Com.ParseGuid("F38BF404-1D43-42F2-9305-67DE0B28FC23");
 /// `FOLDERID_System`.
-public Guid SystemId() => Com.Parse("1AC14E77-02E7-4E5D-B744-2EB1AE5198B7");
+public Guid SystemId() => Com.ParseGuid("1AC14E77-02E7-4E5D-B744-2EB1AE5198B7");
 /// `FOLDERID_ProgramFiles`.
-public Guid ProgramFilesId() => Com.Parse("905E63B6-C1BF-494E-B29C-65B732D3D21A");
+public Guid ProgramFilesId() => Com.ParseGuid("905E63B6-C1BF-494E-B29C-65B732D3D21A");
 /// `FOLDERID_Fonts`.
-public Guid FontsId() => Com.Parse("FD228CB7-AE11-4AE3-864C-16F3910AB8FE");
+public Guid FontsId() => Com.ParseGuid("FD228CB7-AE11-4AE3-864C-16F3910AB8FE");
 /// `FOLDERID_Startup`.
-public Guid StartupId() => Com.Parse("B97D20BB-F46A-4C97-BA10-5E3608430854");
+public Guid StartupId() => Com.ParseGuid("B97D20BB-F46A-4C97-BA10-5E3608430854");
 /// `FOLDERID_Programs`.
-public Guid ProgramsId() => Com.Parse("A77F5D77-2E2B-44C3-A6A2-ABA601054A51");
+public Guid ProgramsId() => Com.ParseGuid("A77F5D77-2E2B-44C3-A6A2-ABA601054A51");
 /// `FOLDERID_Public`.
-public Guid PublicId() => Com.Parse("DFDF76A2-C82A-4D63-906A-5644AC457385");
+public Guid PublicId() => Com.ParseGuid("DFDF76A2-C82A-4D63-906A-5644AC457385");
 
 /// The path of a known folder, or why there was not one.
 ///
@@ -143,19 +143,19 @@ public Guid PublicId() => Com.Parse("DFDF76A2-C82A-4D63-906A-5644AC457385");
 /// `KNOWNFOLDERID`. It fails for a folder that is registered and not created,
 /// which is what `KnownFolderCreate` is for, and for a folder that has no path
 /// at all.
-public Result<String, ComError> KnownFolder(Guid folder)
+public Result<String, ComError> GetKnownFolderPath(Guid folder)
 {
-    return KnownFolderWith(folder, KnownFolderDefault);
+    return GetKnownFolderPath(folder, KnownFolderDefault);
 }
 
 /// The same, creating the folder if it is registered and not yet made.
-public Result<String, ComError> KnownFolderCreating(Guid folder)
+public Result<String, ComError> GetKnownFolderPathCreating(Guid folder)
 {
-    return KnownFolderWith(folder, KnownFolderCreate);
+    return GetKnownFolderPath(folder, KnownFolderCreate);
 }
 
 /// The path of a known folder with `SHGetKnownFolderPath`'s flags spelled out.
-public Result<String, ComError> KnownFolderWith(Guid folder, uint flags)
+public Result<String, ComError> GetKnownFolderPath(Guid folder, uint flags)
 {
     char16* path = null;
     int hr = SHGetKnownFolderPath(&folder, flags, null, &path);
@@ -163,64 +163,64 @@ public Result<String, ComError> KnownFolderWith(Guid folder, uint flags)
     // The string is CoTaskMemAlloc'd and the caller's to free, which TakeString
     // does -- so there is no path through this that leaks it.
     if (Com.Failed(hr))
-        return Fail(Com.Classify(hr));
+        return Fail(Com.ClassifyHResult(hr));
     return Ok(Com.TakeString(path));
 }
 
 /// The user's desktop.
-public Result<String, ComError> Desktop() => KnownFolder(DesktopId());
+public Result<String, ComError> GetDesktopPath() => GetKnownFolderPath(DesktopId());
 
 /// The user's Documents folder.
-public Result<String, ComError> Documents() => KnownFolder(DocumentsId());
+public Result<String, ComError> GetDocumentsPath() => GetKnownFolderPath(DocumentsId());
 
 /// The user's Downloads folder, which has no `SHGetFolderPathW` number and is
 /// the usual reason to want this API at all.
-public Result<String, ComError> Downloads() => KnownFolder(DownloadsId());
+public Result<String, ComError> GetDownloadsPath() => GetKnownFolderPath(DownloadsId());
 
 /// The user's Pictures folder.
-public Result<String, ComError> Pictures() => KnownFolder(PicturesId());
+public Result<String, ComError> GetPicturesPath() => GetKnownFolderPath(PicturesId());
 
 /// The user's Music folder.
-public Result<String, ComError> Music() => KnownFolder(MusicId());
+public Result<String, ComError> GetMusicPath() => GetKnownFolderPath(MusicId());
 
 /// The user's Videos folder.
-public Result<String, ComError> Videos() => KnownFolder(VideosId());
+public Result<String, ComError> GetVideosPath() => GetKnownFolderPath(VideosId());
 
 /// The user's Saved Games folder, which also has no number.
-public Result<String, ComError> SavedGames() => KnownFolder(SavedGamesId());
+public Result<String, ComError> GetSavedGamesPath() => GetKnownFolderPath(SavedGamesId());
 
 /// Roaming application data: settings that follow the user between machines.
-public Result<String, ComError> AppData() => KnownFolder(RoamingAppDataId());
+public Result<String, ComError> GetAppDataPath() => GetKnownFolderPath(RoamingAppDataId());
 
 /// Local application data: caches and anything too large to roam.
-public Result<String, ComError> LocalAppData() => KnownFolder(LocalAppDataId());
+public Result<String, ComError> GetLocalAppDataPath() => GetKnownFolderPath(LocalAppDataId());
 
 /// Application data shared by every user of the machine.
-public Result<String, ComError> ProgramData() => KnownFolder(ProgramDataId());
+public Result<String, ComError> GetProgramDataPath() => GetKnownFolderPath(ProgramDataId());
 
 /// The user's profile directory, the parent of most of the above.
-public Result<String, ComError> Profile() => KnownFolder(ProfileId());
+public Result<String, ComError> GetProfilePath() => GetKnownFolderPath(ProfileId());
 
 /// The Windows directory.
-public Result<String, ComError> WindowsFolder() => KnownFolder(WindowsId());
+public Result<String, ComError> GetWindowsPath() => GetKnownFolderPath(WindowsId());
 
 /// The system32 directory.
-public Result<String, ComError> System() => KnownFolder(SystemId());
+public Result<String, ComError> GetSystemPath() => GetKnownFolderPath(SystemId());
 
 /// The 64-bit Program Files directory.
-public Result<String, ComError> ProgramFiles() => KnownFolder(ProgramFilesId());
+public Result<String, ComError> GetProgramFilesPath() => GetKnownFolderPath(ProgramFilesId());
 
 /// The fonts directory.
-public Result<String, ComError> Fonts() => KnownFolder(FontsId());
+public Result<String, ComError> GetFontsPath() => GetKnownFolderPath(FontsId());
 
 /// The user's Startup folder, whose contents run at logon.
-public Result<String, ComError> Startup() => KnownFolder(StartupId());
+public Result<String, ComError> GetStartupPath() => GetKnownFolderPath(StartupId());
 
 /// The user's Start menu Programs folder.
-public Result<String, ComError> Programs() => KnownFolder(ProgramsId());
+public Result<String, ComError> GetProgramsPath() => GetKnownFolderPath(ProgramsId());
 
 /// The Public profile, shared by every user.
-public Result<String, ComError> PublicFolder() => KnownFolder(PublicId());
+public Result<String, ComError> GetPublicPath() => GetKnownFolderPath(PublicId());
 
 // ============================================================= shell items
 
@@ -229,20 +229,20 @@ public Result<String, ComError> PublicFolder() => KnownFolder(PublicId());
 /// This is the door into everything the shell has added since Vista: an item
 /// is what `IFileDialog.SetFolder`, `IShellItemArray` and the rest all speak
 /// in. The reference is counted by ARC, so nothing here needs releasing.
-public Result<IShellItem, ComError> ItemFromPath(String path)
+public Result<IShellItem, ComError> CreateItemFromPath(String path)
 {
     byte* raw = null;
     int hr = SHCreateItemFromParsingName(
         path.ToUtf16().ToPointer(), null, iidof(IShellItem), &raw);
 
     if (Com.Failed(hr))
-        return Fail(Com.Classify(hr));
+        return Fail(Com.ClassifyHResult(hr));
     return Ok((IShellItem)raw);
 }
 
 /// A shell item's full path, or the empty string for an item that has none --
 /// a control panel entry, a device, a search result.
-public String PathOf(IShellItem item)
+public String GetItemPath(IShellItem item)
 {
     char16* name = null;
     if (Com.Failed(item.GetDisplayName(NameFileSystemPath, &name)))
@@ -252,7 +252,7 @@ public String PathOf(IShellItem item)
 
 /// A shell item's name as the user sees it, which is not its path: a folder
 /// may be localised, and a file may have its extension hidden.
-public String NameOf(IShellItem item)
+public String GetItemName(IShellItem item)
 {
     char16* name = null;
     if (Com.Failed(item.GetDisplayName(NameNormalDisplay, &name)))
@@ -261,7 +261,7 @@ public String NameOf(IShellItem item)
 }
 
 /// Whether a shell item is a folder rather than a file.
-public bool IsFolder(IShellItem item)
+public bool IsFolderItem(IShellItem item)
 {
     uint attributes = 0u;
 
@@ -273,18 +273,18 @@ public bool IsFolder(IShellItem item)
 }
 
 /// The item's parent folder, or nothing when it is a root.
-public Result<IShellItem, ComError> ParentOf(IShellItem item)
+public Result<IShellItem, ComError> GetItemParent(IShellItem item)
 {
     byte* raw = null;
     int hr = item.GetParent(&raw);
 
     if (Com.Failed(hr))
-        return Fail(Com.Classify(hr));
+        return Fail(Com.ClassifyHResult(hr));
     return Ok((IShellItem)raw);
 }
 
 /// How many items an array holds.
-public uint CountOf(IShellItemArray items)
+public uint GetArrayCount(IShellItemArray items)
 {
     uint count = 0u;
     if (Com.Failed(items.GetCount(&count)))
@@ -293,13 +293,13 @@ public uint CountOf(IShellItemArray items)
 }
 
 /// One item out of an array, or nothing when the index is past the end.
-public Result<IShellItem, ComError> ItemAt(IShellItemArray items, uint index)
+public Result<IShellItem, ComError> GetArrayItem(IShellItemArray items, uint index)
 {
     byte* raw = null;
     int hr = items.GetItemAt(index, &raw);
 
     if (Com.Failed(hr))
-        return Fail(Com.Classify(hr));
+        return Fail(Com.ClassifyHResult(hr));
     return Ok((IShellItem)raw);
 }
 
@@ -307,19 +307,19 @@ public Result<IShellItem, ComError> ItemAt(IShellItemArray items, uint index)
 ///
 /// What a multi-select open dialog is for, and the shape a program actually
 /// wants: a `String[]` rather than a COM enumerator.
-public String[] PathsOf(IShellItemArray items)
+public String[] GetArrayPaths(IShellItemArray items)
 {
-    nuint count = (nuint)CountOf(items);
+    nuint count = (nuint)GetArrayCount(items);
     var paths = new String[count];
 
     nuint found = 0u;
     for (nuint i = 0u; i < count; i++)
     {
-        var got = ItemAt(items, (uint)i);
+        var got = GetArrayItem(items, (uint)i);
         if (!got.Ok)
             continue;
 
-        String path = PathOf(got.Value);
+        String path = GetItemPath(got.Value);
         if (path.IsEmpty)
             continue;
 

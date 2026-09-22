@@ -877,7 +877,7 @@ Being straight about the edges, roughly in the order they are worth adding:
 - **No portable COM *client* activation.** Being a server is done everywhere:
   a class factory, a table of them and `DllGetClassObject` all work on any
   platform, because none of that is Windows. What is missing is the other
-  direction — a `Com.Create(clsid, ...)` that finds a module, loads it and asks
+  direction — a `Com.CreateInstance(clsid, ...)` that finds a module, loads it and asks
   it, so a caller need not know where the class came from. On Windows
   `Win32.Com` and `Win32.ShellCom` bind the real thing, so `CoCreateInstance`,
   `IShellItem` and `IFileDialog` all work today. Absent everywhere are the

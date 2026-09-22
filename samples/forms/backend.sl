@@ -245,7 +245,7 @@ public class BackendForm : Form
         ok = Check(ok, "the selection emptying is reported too", RowChanges == moved + 2);
 
         int ticked = ChoreChanges;
-        var tick = ListItemState(CheckedState(true), LvisStateImageMask);
+        var tick = ListItemState(GetCheckedStateMask(true), LvisStateImageMask);
         SendMessageW(WindowOf(Chores), LvmSetItemState, 2u, (nint)(void*)&tick);
         Pump();
         ok = Check(ok, "a tick the user makes is reported", ChoreChanges == ticked + 1);

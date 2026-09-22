@@ -82,20 +82,20 @@ public class SearchBox
         _root = new Box(true, 4);
 
         var row = new Box(false, 4);
-        _root.Pack(row, false);
+        _root.PackStart(row, false);
 
         _field = new Entry();
         _field.SetPlaceholder(prompt);
-        row.Pack(_field, true);
+        row.PackStart(_field, true);
 
         _search = new Button("Search");
-        row.Pack(_search, false);
+        row.PackStart(_search, false);
 
         _clear = new Button("Clear");
-        row.Pack(_clear, false);
+        row.PackStart(_clear, false);
 
         _status = new Label("");
-        _root.Pack(_status, false);
+        _root.PackStart(_status, false);
 
         // The wiring, and the reason a control is worth writing: every one of
         // these is a method of *this* control bound to *this* object, so the
@@ -112,7 +112,7 @@ public class SearchBox
     /// What a layout puts in. Borrowed: the control owns it.
     public Widget Root() => _root;
 
-    public String Text() => _field.Text();
+    public String Text() => _field.GetText();
 
     public void SetText(String text) => _field.SetText(text);
 
@@ -161,7 +161,7 @@ public class SearchBox
     /// The one that does the work. Private, and bound to two widgets above.
     void Run()
     {
-        var text = _field.Text();
+        var text = _field.GetText();
 
         if (text.ByteLength() == 0u)
         {
@@ -193,7 +193,7 @@ public class SearchBox
     void Changed()
     {
         if (_hasChanged)
-            _onChanged(_field.Text());
+            _onChanged(_field.GetText());
     }
 }
 
@@ -237,7 +237,7 @@ public int Main()
 {
     var app = new Application();
 
-    if (!app.Start())
+    if (!app.StartToolkit())
     {
         Console.WriteLine("no display; set DISPLAY or run this on a desktop");
         return 1;
@@ -252,14 +252,14 @@ public int Main()
     window.Add(page);
 
     var heading = new Label("Type something and press Search");
-    page.Pack(heading, false);
+    page.PackStart(heading, false);
 
     // The control. Everything the program knows about it is on these lines.
     var search = new SearchBox("search terms");
-    page.Pack(search.Root(), false);
+    page.PackStart(search.Root(), false);
 
     var found = new Label("results:");
-    page.Pack(found, false);
+    page.PackStart(found, false);
 
     var results = new Results(found);
 

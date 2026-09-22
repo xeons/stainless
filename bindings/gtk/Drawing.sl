@@ -32,12 +32,12 @@
 // Two consequences catch people out and `Canvas` keeps them visible rather
 // than smoothing them over:
 //
-//   - **`Fill` and `Stroke` clear the path.** Filling *and* outlining one
-//     shape is `FillAndKeep` then `Stroke`.
+//   - **`FillPath` and `StrokePath` clear the path.** Filling *and*
+//     outlining one shape is `FillPathAndKeep` then `StrokePath`.
 //   - **Colours are 0.0 to 1.0**, not 0 to 255.
 //
 // **Paint only inside a paint handler.** There is no drawing outside one;
-// asking for a repaint is `Redraw`, and GTK decides when.
+// asking for a repaint is `Invalidate`, and GTK decides when.
 module Gtk;
 
 import Gtk.GLib;
@@ -105,20 +105,20 @@ public class Canvas
     public void MoveTo(double x, double y) => cairo_move_to(_cr, x, y);
     public void LineTo(double x, double y) => cairo_line_to(_cr, x, y);
 
-    public void Rectangle(double x, double y, double width, double height)
+    public void AddRectangle(double x, double y, double width, double height)
     {
         cairo_rectangle(_cr, x, y, width, height);
     }
 
-    /// A whole circle. `Arc` is the one that takes angles.
-    public void Circle(double x, double y, double radius)
+    /// A whole circle. `AddArc` is the one that takes angles.
+    public void AddCircle(double x, double y, double radius)
     {
         cairo_arc(_cr, x, y, radius, 0.0, 6.283185307179586);
     }
 
     /// An arc clockwise from `start` to `stop`, in radians, with zero pointing
     /// right and angles increasing **downwards** -- because y grows downwards.
-    public void Arc(double x, double y, double radius, double start, double stop)
+    public void AddArc(double x, double y, double radius, double start, double stop)
     {
         cairo_arc(_cr, x, y, radius, start, stop);
     }
@@ -134,20 +134,20 @@ public class Canvas
     // ----------------------------------------------------------- the marking
 
     /// Fills the path and **clears it**.
-    public void Fill() => cairo_fill(_cr);
+    public void FillPath() => cairo_fill(_cr);
 
     /// Fills and keeps the path, for a shape that is filled and then outlined.
-    public void FillAndKeep() => cairo_fill_preserve(_cr);
+    public void FillPathAndKeep() => cairo_fill_preserve(_cr);
 
-    public void Stroke() => cairo_stroke(_cr);
-    public void StrokeAndKeep() => cairo_stroke_preserve(_cr);
+    public void StrokePath() => cairo_stroke(_cr);
+    public void StrokePathAndKeep() => cairo_stroke_preserve(_cr);
 
     /// Paints the current colour over everything. What a paint handler calls
     /// first to clear its background.
     public void Clear() => cairo_paint(_cr);
 
     /// Limits everything after this to the current path.
-    public void Clip() => cairo_clip(_cr);
+    public void ClipToPath() => cairo_clip(_cr);
 
     // ------------------------------------------------------------------ text
 
@@ -170,7 +170,7 @@ public class Canvas
 
     /// How wide the text will be: the pen advance rather than the inked width,
     /// so a trailing space counts. What centring wants.
-    public double TextWidth(String text)
+    public double MeasureTextWidth(String text)
     {
         cairo_text_extents_t extents;
         cairo_text_extents(_cr, text.ToPointer(), &extents);
@@ -185,9 +185,9 @@ public class Canvas
     public void Save() => cairo_save(_cr);
     public void Restore() => cairo_restore(_cr);
 
-    public void Translate(double x, double y) => cairo_translate(_cr, x, y);
-    public void Scale(double x, double y) => cairo_scale(_cr, x, y);
-    public void Rotate(double radians) => cairo_rotate(_cr, radians);
+    public void TranslateTransform(double x, double y) => cairo_translate(_cr, x, y);
+    public void ScaleTransform(double x, double y) => cairo_scale(_cr, x, y);
+    public void RotateTransform(double radians) => cairo_rotate(_cr, radians);
 }
 
 // =================================================================== painter
@@ -206,7 +206,7 @@ public closure void Painter(Canvas canvas, int width, int height);
 /// A function returning a closure rather than a class implementing an
 /// interface: the lambda it returns captures the painter, which is exactly
 /// what the class's field used to be.
-EventHandler PaintAdapter(Painter body)
+EventHandler CreatePaintAdapter(Painter body)
 {
     return (sender, carried) =>
     {
@@ -233,7 +233,7 @@ public class DrawingArea : Widget
     /// answer true stops the rest.
     public void OnPaint(Painter painter)
     {
-        ConnectEvent(handle, "draw", PaintAdapter(painter));
+        ConnectEvent(handle, "draw", CreatePaintAdapter(painter));
     }
 
     /// Asks to receive mouse and key events.
@@ -242,7 +242,7 @@ public class DrawingArea : Widget
     /// first mouse handler on one never fires. Call this before connecting
     /// anything, and note that keys also need the widget to be able to take
     /// focus.
-    public void WantInput()
+    public void EnableInputEvents()
     {
         gtk_widget_add_events(handle,
             GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
@@ -289,7 +289,7 @@ public closure bool PointerHandler(Pointer at);
 /// What a key event runs. True means handled.
 public closure bool KeyHandler(Key key);
 
-EventHandler PointerAdapter(PointerHandler body)
+EventHandler CreatePointerAdapter(PointerHandler body)
 {
     return (sender, carried) =>
     {
@@ -314,7 +314,7 @@ EventHandler PointerAdapter(PointerHandler body)
     };
 }
 
-EventHandler KeyAdapter(KeyHandler body)
+EventHandler CreateKeyAdapter(KeyHandler body)
 {
     return (sender, carried) =>
     {
