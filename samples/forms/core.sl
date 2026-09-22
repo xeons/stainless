@@ -508,8 +508,57 @@ public class CoreForm : Form
                    IsWindowEnabled((HWND)(void*)Handle) != 0);
 #endif
         ok = Check(ok, "and the program goes on", Application.DoEvents());
+#if WINDOWS
+        ok = EscapeChecks(ok);
+#endif
         return ok;
     }
+
+#if WINDOWS
+    ComboBox? _choice;
+    bool _survivedEscape;
+
+    /// Drops the list, and presses Escape at it through the modal loop.
+    void DropAndEscape()
+    {
+        var choice = _choice;
+        if (choice == null)
+            return;
+        HWND combo = (HWND)(void*)((ComboBox)choice).Handle;
+        SendMessageW(combo, CbShowDropDown, 1u, 0);
+        PostMessageW(combo, WmKeyDown, (ulong)VkEscape, 0);
+        Application.Post(() => { AfterEscape(); });
+    }
+
+    void AfterEscape()
+    {
+        var dialog = _dialog;
+        if (dialog == null)
+            return;
+        _survivedEscape = !((Form)dialog).IsClosed;
+        ((Form)dialog).Close();
+    }
+
+    bool EscapeChecks(bool ok)
+    {
+        var dialog = new Form(WindowBorder.Fixed);
+        dialog.SetBounds(0, 0, 240, 120);
+        var choice = new ComboBox(dialog);
+        choice.SetBounds(12, 12, 200, 24);
+        choice.Add("one");
+        choice.Add("two");
+        _choice = choice;
+        _dialog = dialog;
+        _survivedEscape = false;
+        Application.Post(() => { DropAndEscape(); });
+        dialog.ShowModal();
+        _dialog = null;
+        _choice = null;
+        ok = Check(ok, "Escape closes a combo box's list rather than the dialog",
+                   _survivedEscape);
+        return ok;
+    }
+#endif
 
     /// Last, because it asks the program to quit.
     public bool QuitChecks(bool ok)
