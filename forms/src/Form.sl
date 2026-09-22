@@ -154,7 +154,7 @@ public class Form : WindowedControl, IWindowNotify
             }
             else
             {
-                _window.SetMenu(((MainMenu)value).Build());
+                _window.SetMenu(((MainMenu)value).Build(this));
             }
             PerformLayout();
         }
