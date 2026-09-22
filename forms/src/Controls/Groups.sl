@@ -58,6 +58,13 @@ import Forms.Platform;
 public class RadioGroup : GroupBox
 {
     List<RadioButton> _buttons;
+    /// Ticked to untick every choice, as `TCustomRadioGroup.FHiddenButton`
+    /// is. GTK will not untick the last radio of a group, and a group always
+    /// has one ticked; this is the one ticked when nothing is chosen.
+    RadioButton _none;
+    /// The index `SelectedIndexChanged` last reported, or the program last
+    /// set.
+    int _reported;
     int _columns;
     bool _ready;
 
@@ -65,6 +72,10 @@ public class RadioGroup : GroupBox
     {
         base(parent);
         _buttons = new List<RadioButton>();
+        _none = new RadioButton(this);
+        _none.Visible = false;
+        _none.Checked = true;
+        _reported = -1;
         _columns = 1;
         _ready = true;
     }
@@ -87,7 +98,7 @@ public class RadioGroup : GroupBox
     {
         var made = new RadioButton(this);
         made.Text = caption;
-        made.Click += this.OnChildClicked;
+        made.CheckedChanged += this.OnChildChecked;
         _buttons.Add(made);
         Arrange();
         return (int)_buttons.Count - 1;
@@ -101,6 +112,10 @@ public class RadioGroup : GroupBox
     /// Read from the buttons rather than remembered, because the platform ticks
     /// and unticks them itself when one is clicked -- a field here would be a
     /// second answer to a question that already has one.
+    ///
+    /// Setting it to -1 unticks every choice; any other index naming no choice
+    /// is ignored. Setting it raises no `SelectedIndexChanged`, as setting
+    /// `CheckBox.Checked` raises no `CheckedChanged`.
     public int SelectedIndex
     {
         get
@@ -114,9 +129,11 @@ public class RadioGroup : GroupBox
         }
         set
         {
-            if (value < 0 || (nuint)value >= _buttons.Count)
+            if (value < -1 || value >= (int)_buttons.Count)
                 return;
-            _buttons[(nuint)value].Checked = true;
+            _reported = value;
+            var ticked = value < 0 ? _none : _buttons[(nuint)value];
+            ticked.Checked = true;
         }
     }
 
@@ -132,12 +149,27 @@ public class RadioGroup : GroupBox
         }
     }
 
-    /// The choice changed.
+    /// The user chose a different choice.
     public event EventHandler SelectedIndexChanged;
 
     protected virtual void OnSelectedIndexChanged() => SelectedIndexChanged(this);
 
-    void OnChildClicked(Control sender) => OnSelectedIndexChanged();
+    /// Reports once per choice. A click moves two ticks on GTK, which reports
+    /// both, and Win32 reports a click on the choice already ticked -- so only
+    /// the button now ticked counts, and only when it is a different choice.
+    void OnChildChecked(Control sender)
+    {
+        if (sender is RadioButton button)
+        {
+            if (!button.Checked)
+                return;
+        }
+        int now = SelectedIndex;
+        if (now == _reported)
+            return;
+        _reported = now;
+        OnSelectedIndexChanged();
+    }
 
     /// Lays the buttons out in `Columns` columns, filling the client area.
     ///
