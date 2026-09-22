@@ -389,44 +389,58 @@ public class CheckPeer : ControlPeer, ICheckPeer
 /// `WM_COMMAND` to the parent like any other control's.
 public class LabelPeer : ControlPeer, ILabelPeer
 {
+    HorizontalAlignment _aligned;
+    bool _wraps;
+
     public LabelPeer(IControlNotify owner, IContainerPeer parent)
     {
         base(MakeChild("STATIC", WindowOf(parent),
                        (ChildStyle() & ~WsTabStop) | SsNotify | SsLeft, 0u),
              owner, true);
+        _aligned = HorizontalAlignment.Left;
+        _wraps = true;
     }
 
-    /// The alignment is a style bit, so changing it is a read, a mask and a
-    /// write -- and a repaint, since Windows does not notice.
     public void SetAlignment(HorizontalAlignment alignment)
     {
-        long style = Win32.User32.GetWindowLongPtrW(window, GwlStyle);
-        style = style & ~(long)(SsLeft | SsCenter | SsRight);
-        if (alignment == HorizontalAlignment.Center)
-        {
-            style = style | (long)SsCenter;
-        }
-        else if (alignment == HorizontalAlignment.Right)
-        {
-            style = style | (long)SsRight;
-        }
-        Win32.User32.SetWindowLongPtrW(window, GwlStyle, style);
-        Invalidate();
+        _aligned = alignment;
+        ApplyTextStyle();
     }
 
-    /// A `STATIC` wraps unless told not to, so this sets the bit that stops it.
     public void SetWordWrap(bool wrap)
     {
+        _wraps = wrap;
+        ApplyTextStyle();
+    }
+
+    /// **`SS_LEFT`, `SS_CENTER`, `SS_RIGHT` and `SS_LEFTNOWORDWRAP` are values
+    /// of one field, not bits.** OR-ing two of them names a third kind of
+    /// control: centred and not wrapping is `SS_OWNERDRAW`, which draws
+    /// nothing. So `SS_TYPEMASK` is replaced whole.
+    ///
+    /// No kind is centred or right-aligned without wrapping. Those end in an
+    /// ellipsis on one line instead, as GTK ends a label that does not wrap.
+    void ApplyTextStyle()
+    {
+        uint kind = _wraps ? SsLeft : SsLeftNoWordWrap;
+        switch (_aligned)
+        {
+            case HorizontalAlignment.Center:
+                kind = SsCenter;
+                break;
+            case HorizontalAlignment.Right:
+                kind = SsRight;
+                break;
+            default:
+                break;
+        }
+        if (!_wraps && _aligned != HorizontalAlignment.Left)
+            kind = kind | SsEndEllipsis;
+
         long style = Win32.User32.GetWindowLongPtrW(window, GwlStyle);
-        if (wrap)
-        {
-            style = style & ~(long)SsLeftNoWordWrap;
-        }
-        else
-        {
-            style = style | (long)SsLeftNoWordWrap;
-        }
+        style = (style & ~(long)(SsTypeMask | SsEllipsisMask)) | (long)kind;
         Win32.User32.SetWindowLongPtrW(window, GwlStyle, style);
+        // Windows reads the style when it paints and does not notice it change.
         Invalidate();
     }
 

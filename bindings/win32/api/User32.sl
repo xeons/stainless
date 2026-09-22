@@ -854,11 +854,16 @@ public const uint CbsAutoHScroll    = 0x0040u;
 public const uint CbsSort           = 0x0100u;
 public const uint CbsHasStrings     = 0x0200u;
 
-/// Static (label) styles.
+/// Static (label) styles. The kinds up to `SsTypeMask` are values of one
+/// field rather than bits, and so are the ellipsis styles in `SsEllipsisMask`.
 public const uint SsLeft        = 0x0000u;
 public const uint SsCenter      = 0x0001u;
 public const uint SsRight       = 0x0002u;
 public const uint SsLeftNoWordWrap = 0x000Cu;
+public const uint SsOwnerDraw   = 0x000Du;
+public const uint SsTypeMask    = 0x001Fu;
+public const uint SsEndEllipsis = 0x4000u;
+public const uint SsEllipsisMask = 0xC000u;
 public const uint SsNoPrefix    = 0x0080u;
 public const uint SsNotify      = 0x0100u;
 public const uint SsSunken      = 0x1000u;
