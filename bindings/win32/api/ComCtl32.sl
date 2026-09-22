@@ -704,6 +704,10 @@ public const uint LvsSmallIcon = 0x0002u;
 public const uint LvsList      = 0x0003u;
 public const uint LvsSingleSel = 0x0004u;
 public const uint LvsShowSelAlways = 0x0008u;
+/// The image lists are the caller's. Without it a list view destroys them
+/// when it is destroyed, whoever else is using them.
+public const uint LvsShareImageLists = 0x0040u;
+public const uint LvsNoColumnHeader = 0x4000u;
 public const uint LvsNoSortHeader = 0x8000u;
 
 public const uint LvsExFullRowSelect = 0x00000020u;

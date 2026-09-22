@@ -747,6 +747,7 @@ public class TreeViewPeer : ControlPeer, ITreeViewPeer
         SendQuietly(TvmDeleteItem, 0u, (long)(nuint)(void*)TreeRoot());
     }
 
+    /// A tree view never destroys the image list it is given.
     public void SetImages(IImageListBackend? images)
     {
         SendMessageW(window, TvmSetImageList, 0u, (long)ImageListHandle(images));
@@ -766,21 +767,146 @@ public class TreeViewPeer : ControlPeer, ITreeViewPeer
     }
 }
 
+// ========================================================= report list view
+
+/// Posted by a list view to itself when a row loses the selection. See
+/// `ReportListPeer`.
+const uint WmSelectionSettled = 0x8001u;   // WM_APP + 1
+
+/// An `LVITEMW` that sets the state bits in `mask` to `state`.
+ListItem ListItemSettingState(uint state, uint mask)
+{
+    ListItem item;
+    item.Mask = LvifState;
+    item.Item = 0;
+    item.SubItem = 0;
+    item.State = state;
+    item.StateMask = mask;
+    item.Text = null;
+    item.TextLength = 0;
+    item.Image = 0;
+    item.Param = 0u;
+    item.Indent = 0;
+    item.GroupId = 0;
+    item.Columns = 0u;
+    item.ColumnFormat = null;
+    return item;
+}
+
+/// What a list view and a check list share: at most one row selected, set and
+/// reported on the seam's terms.
+///
+/// **`LVN_ITEMCHANGED` is one notification per row.** Moving the selection is
+/// one row losing it and another gaining it, in an order comctl32 does not
+/// promise. So a gain is reported at once, and a loss only once the messages
+/// already queued have run and no row has gained it since.
+public class ReportListPeer : ControlPeer
+{
+    /// The row last reported as selected, or -1.
+    int _reported;
+
+    protected ReportListPeer(HWND made, IControlNotify owner)
+    {
+        base(made, owner, true);
+        _reported = -1;
+    }
+
+    /// The selected row, or -1.
+    protected int SelectedRow
+    {
+        get
+        {
+            return (int)SendMessageW(window, LvmGetNextItem, (ulong)(nuint)(nint)(-1),
+                                     (long)LvniSelected);
+        }
+    }
+
+    /// Selects one row, or none for -1.
+    ///
+    /// Every row is cleared first: `LVM_SETITEMSTATE` adds a row to the
+    /// selection rather than moving it there.
+    protected void SelectRow(int row)
+    {
+        var item = ListItemSettingState(0u, LvisSelected);
+        SendQuietly(LvmSetItemState, (ulong)(nuint)(nint)(-1), (long)(nuint)&item);
+        if (row >= 0)
+        {
+            item = ListItemSettingState(LvisSelected | LvisFocused, LvisSelected | LvisFocused);
+            SendQuietly(LvmSetItemState, (ulong)row, (long)(nuint)&item);
+            SendMessageW(window, LvmEnsureVisible, (ulong)row, 0);
+        }
+        SelectionSettled();
+    }
+
+    /// Takes the selection as it now is, after the program changed it.
+    protected void SelectionSettled() => _reported = SelectedRow;
+
+    /// Whether a change to a row's state bits, other than its selection, is
+    /// the control's value changing. A tick is, in a check list.
+    protected virtual bool ChangesValue(uint flipped) => false;
+
+    void Report()
+    {
+        var owner = Owner;
+        if (owner != null)
+            ((IControlNotify)owner).OnPlatformValueChanged();
+    }
+
+    protected override bool NotifiedBy(int code, void* raw, long* answer)
+    {
+        if (code != LvnItemChanged)
+            return false;
+        if (Echoing)
+            return true;
+        NotifyListView* details = (NotifyListView*)raw;
+        if ((details->Changed & LvifState) == 0u)
+            return true;
+
+        uint flipped = details->NewState ^ details->OldState;
+        bool moved = (flipped & LvisSelected) != 0u;
+        bool gained = moved && (details->NewState & LvisSelected) != 0u;
+        if (moved && !gained)
+            PostMessageW(window, WmSelectionSettled, 0u, 0);
+        if (gained)
+            _reported = details->Item;
+        if (gained || ChangesValue(flipped))
+            Report();
+        return true;
+    }
+
+    public override long Dispatch(uint message, ulong wParam, long lParam)
+    {
+        if (message == WmSelectionSettled)
+        {
+            if (_reported >= 0 && SelectedRow < 0)
+            {
+                _reported = -1;
+                Report();
+            }
+            return 0;
+        }
+        return base.Dispatch(message, wParam, lParam);
+    }
+}
+
 // ================================================================ list view
 
-public class ListViewPeer : ControlPeer, IListViewPeer
+/// **`LVS_SHAREIMAGELISTS`, because the image list is not this control's.** A
+/// list view without it destroys its image lists with itself, and the
+/// `ImageList` that made one goes on to destroy it again -- while a tree or a
+/// toolbar sharing it draws from a handle that is gone.
+public class ListViewPeer : ReportListPeer, IListViewPeer
 {
-    weak IControlNotify? owning;
     int _columns;
     int _rows;
 
     public ListViewPeer(IControlNotify owner, IContainerPeer parent)
     {
         base(MakeChild("SysListView32", WindowOf(parent),
-                       ChildStyle() | LvsReport | LvsShowSelAlways,
+                       ChildStyle() | LvsReport | LvsShowSelAlways | LvsSingleSel
+                                    | LvsShareImageLists,
                        WsExClientEdge),
-             owner, true);
-        owning = owner;
+             owner);
         _columns = 0;
         _rows = 0;
     }
@@ -860,7 +986,7 @@ public class ListViewPeer : ControlPeer, IListViewPeer
             item.Image = image;
         }
 
-        int at = (int)SendMessageW(window, LvmInsertItemW, 0u, (long)(nuint)&item);
+        int at = (int)SendQuietly(LvmInsertItemW, 0u, (long)(nuint)&item);
         if (at >= 0)
             _rows = _rows + 1;
         return at;
@@ -911,45 +1037,25 @@ public class ListViewPeer : ControlPeer, IListViewPeer
 
     public void RemoveRow(int row)
     {
-        if (SendMessageW(window, LvmDeleteItem, (ulong)row, 0) != 0 && _rows > 0)
+        if (SendQuietly(LvmDeleteItem, (ulong)row, 0) != 0 && _rows > 0)
         {
             _rows = _rows - 1;
         }
+        SelectionSettled();
     }
 
     public void Clear()
     {
-        SendMessageW(window, LvmDeleteAllItems, 0u, 0);
+        SendQuietly(LvmDeleteAllItems, 0u, 0);
         _rows = 0;
+        SelectionSettled();
     }
 
     public int RowCount => (int)SendMessageW(window, LvmGetItemCount, 0u, 0);
 
-    public int GetSelectedRow()
-    {
-        return (int)SendMessageW(window, LvmGetNextItem, (ulong)(nuint)(nint)(-1),
-                                 (long)LvniSelected);
-    }
+    public int GetSelectedRow() => SelectedRow;
 
-    public void SetSelectedRow(int row)
-    {
-        ListItem item;
-        item.Mask = LvifState;
-        item.Item = row;
-        item.SubItem = 0;
-        item.State = LvisSelected | LvisFocused;
-        item.StateMask = LvisSelected | LvisFocused;
-        item.Text = null;
-        item.TextLength = 0;
-        item.Image = 0;
-        item.Param = 0u;
-        item.Indent = 0;
-        item.GroupId = 0;
-        item.Columns = 0u;
-        item.ColumnFormat = null;
-        SendMessageW(window, LvmSetItemState, (ulong)row, (long)(nuint)&item);
-        SendMessageW(window, LvmEnsureVisible, (ulong)row, 0);
-    }
+    public void SetSelectedRow(int row) => SelectRow(row);
 
     public void SetImages(IImageListBackend? images)
     {
@@ -965,25 +1071,6 @@ public class ListViewPeer : ControlPeer, IListViewPeer
             wanted = wanted | LvsExGridLines;
         SendMessageW(window, LvmSetExtendedStyle,
                      (ulong)(LvsExFullRowSelect | LvsExGridLines), (long)wanted);
-    }
-
-    /// `LVN_ITEMCHANGED` fires for every change to every row, including the one
-    /// losing the selection -- so the state mask is checked, or a single click
-    /// raises two changes.
-    protected override bool NotifiedBy(int code, void* raw, long* answer)
-    {
-        if (code != LvnItemChanged)
-            return false;
-        NotifyListView* details = (NotifyListView*)raw;
-        if ((details->Changed & 0x0008u) == 0u)   // LVIF_STATE
-            return false;
-        if ((details->NewState & LvisSelected) == 0u)
-            return false;
-        IControlNotify? held = owning;
-        if (held == null)
-            return false;
-        ((IControlNotify)held).OnPlatformValueChanged();
-        return true;
     }
 }
 
@@ -1080,18 +1167,19 @@ public class SpinPeer : ControlPeer, ISpinPeer
 /// `LVS_EX_CHECKBOXES`, and the LCL owner-draws a list box instead. The list
 /// view is the one that looks native and the one that already knows how to
 /// report a tick.
-public class CheckListPeer : ControlPeer, ICheckListPeer
+public class CheckListPeer : ReportListPeer, ICheckListPeer
 {
-    weak IControlNotify? owning;
     int _rows;
 
+    /// `LVS_NOCOLUMNHEADER`, since the one column exists to hold the text and
+    /// has no heading to show.
     public CheckListPeer(IControlNotify owner, IContainerPeer parent)
     {
         base(MakeChild("SysListView32", WindowOf(parent),
-                       ChildStyle() | LvsReport | LvsShowSelAlways | LvsNoSortHeader,
+                       ChildStyle() | LvsReport | LvsShowSelAlways | LvsSingleSel
+                                    | LvsNoColumnHeader,
                        WsExClientEdge),
-             owner, true);
-        owning = owner;
+             owner);
         _rows = 0;
         SendMessageW(window, LvmSetExtendedStyle,
                      (ulong)(LvsExCheckBoxes | LvsExFullRowSelect),
@@ -1127,6 +1215,7 @@ public class CheckListPeer : ControlPeer, ICheckListPeer
         }
     }
 
+    /// Quiet, because a new row is given its empty tick as it goes in.
     public void InsertItem(int index, String text)
     {
         ListItem item;
@@ -1144,7 +1233,7 @@ public class CheckListPeer : ControlPeer, ICheckListPeer
         item.GroupId = 0;
         item.Columns = 0u;
         item.ColumnFormat = null;
-        if (SendMessageW(window, LvmInsertItemW, 0u, (long)(nuint)&item) >= 0)
+        if (SendQuietly(LvmInsertItemW, 0u, (long)(nuint)&item) >= 0)
         {
             _rows = _rows + 1;
         }
@@ -1152,99 +1241,45 @@ public class CheckListPeer : ControlPeer, ICheckListPeer
 
     public void RemoveItem(int index)
     {
-        if (SendMessageW(window, LvmDeleteItem, (ulong)index, 0) != 0 && _rows > 0)
+        if (SendQuietly(LvmDeleteItem, (ulong)index, 0) != 0 && _rows > 0)
         {
             _rows = _rows - 1;
         }
+        SelectionSettled();
     }
 
     public void ClearItems()
     {
-        SendMessageW(window, LvmDeleteAllItems, 0u, 0);
+        SendQuietly(LvmDeleteAllItems, 0u, 0);
         _rows = 0;
+        SelectionSettled();
     }
 
     public int ItemCount => (int)SendMessageW(window, LvmGetItemCount, 0u, 0);
 
-    public void SetSelectedIndex(int index)
-    {
-        ListItem item;
-        item.Mask = LvifState;
-        item.Item = index;
-        item.SubItem = 0;
-        item.State = LvisSelected | LvisFocused;
-        item.StateMask = LvisSelected | LvisFocused;
-        item.Text = null;
-        item.TextLength = 0;
-        item.Image = 0;
-        item.Param = 0u;
-        item.Indent = 0;
-        item.GroupId = 0;
-        item.Columns = 0u;
-        item.ColumnFormat = null;
-        SendMessageW(window, LvmSetItemState, (ulong)index, (long)(nuint)&item);
-    }
+    public void SetSelectedIndex(int index) => SelectRow(index);
 
-    public int GetSelectedIndex()
-    {
-        return (int)SendMessageW(window, LvmGetNextItem, (ulong)(nuint)(nint)(-1),
-                                 (long)LvniSelected);
-    }
+    public int GetSelectedIndex() => SelectedRow;
 
     /// The tick is the *state image*, one-based: 1 is empty and 2 is ticked.
     public void SetItemChecked(int index, bool checked)
     {
-        ListItem item;
-        item.Mask = LvifState;
-        item.Item = index;
-        item.SubItem = 0;
-        item.State = CheckedState(checked);
-        item.StateMask = LvisStateImageMask;
-        item.Text = null;
-        item.TextLength = 0;
-        item.Image = 0;
-        item.Param = 0u;
-        item.Indent = 0;
-        item.GroupId = 0;
-        item.Columns = 0u;
-        item.ColumnFormat = null;
-        SendMessageW(window, LvmSetItemState, (ulong)index, (long)(nuint)&item);
+        var item = ListItemSettingState(CheckedState(checked), LvisStateImageMask);
+        SendQuietly(LvmSetItemState, (ulong)index, (long)(nuint)&item);
     }
 
     public bool GetItemChecked(int index)
     {
-        ListItem item;
-        item.Mask = LvifState;
+        var item = ListItemSettingState(0u, LvisStateImageMask);
         item.Item = index;
-        item.SubItem = 0;
-        item.State = 0u;
-        item.StateMask = LvisStateImageMask;
-        item.Text = null;
-        item.TextLength = 0;
-        item.Image = 0;
-        item.Param = 0u;
-        item.Indent = 0;
-        item.GroupId = 0;
-        item.Columns = 0u;
-        item.ColumnFormat = null;
         SendMessageW(window, LvmGetItemW, 0u, (long)(nuint)&item);
         return ((item.State & LvisStateImageMask) >> 12) == 2u;
     }
 
-    /// A tick and a selection both arrive as `LVN_ITEMCHANGED`; the state mask
-    /// says which, and both are worth reporting.
-    protected override bool NotifiedBy(int code, void* raw, long* answer)
+    /// A tick is a change of value as much as a selection is.
+    protected override bool ChangesValue(uint flipped)
     {
-        if (code != LvnItemChanged)
-            return false;
-        NotifyListView* details = (NotifyListView*)raw;
-        if ((details->Changed & 0x0008u) == 0u)
-            return false;
-        IControlNotify? held = owning;
-        if (held == null)
-            return false;
-        ((IControlNotify)held).OnPlatformValueChanged();
-        return true;
+        return (flipped & LvisStateImageMask) != 0u;
     }
 }
 
