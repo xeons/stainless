@@ -88,7 +88,7 @@ public enum XmlError
 }
 
 /// A sentence describing an error, for a message a person will read.
-public String Describe(XmlError error)
+public String DescribeXmlError(XmlError error)
 {
     switch (error)
     {
@@ -131,10 +131,10 @@ public class XmlAttributes
     public nuint Count => _entries.Count;
 
     /// The name at a position, in the order they were written.
-    public String NameAt(nuint index) => _entries.GetKeyAt(index);
+    public String GetNameAt(nuint index) => _entries.GetKeyAt(index);
 
-    /// The value at a position, pairing with `NameAt` at the same index.
-    public String ValueAt(nuint index) => _entries.GetValueAt(index);
+    /// The value at a position, pairing with `GetNameAt` at the same index.
+    public String GetValueAt(nuint index) => _entries.GetValueAt(index);
 
     /// Appends an attribute without looking for the name first. A parsed
     /// document cannot reach here with a repeat -- that is
@@ -143,13 +143,13 @@ public class XmlAttributes
 
     /// Sets the value of a name, adding it if it is new. A replaced name keeps
     /// the position it had.
-    public void Set(String name, String value) => _entries.SetValue(name, value);
+    public void SetValue(String name, String value) => _entries.SetValue(name, value);
 
     /// Where a name is, or `None`.
     public Optional<nuint> IndexOf(String name) => _entries.IndexOf(name);
 
     /// Whether an attribute of that name is there.
-    public bool Has(String name) => _entries.ContainsKey(name);
+    public bool ContainsKey(String name) => _entries.ContainsKey(name);
 
     /// The value of an attribute, or the fallback when it is not there.
     public String Find(String name, String fallback) => _entries.GetValueOrDefault(name, fallback);
@@ -171,7 +171,7 @@ public class XmlAttributes
 ///
 /// **Whitespace between elements is formatting.** In an element with child
 /// elements, a run of text that is only whitespace in the source is dropped:
-/// it is the indentation a person or `WriteIndented` put there. A run with
+/// it is the indentation a person or `ToXmlTextIndented` put there. A run with
 /// anything else in it is kept whole, as is a CDATA section or a character
 /// reference, and an element with no children keeps all of its text.
 public class XmlNode
@@ -201,7 +201,7 @@ public class XmlNode
     }
 
     /// The first child of that name, or null.
-    public XmlNode? Child(String name)
+    public XmlNode? FindChild(String name)
     {
         for (nuint i = 0u; i < Children.Count; i++)
         {
@@ -213,7 +213,7 @@ public class XmlNode
     }
 
     /// Every child of that name, in order.
-    public List<XmlNode> ChildrenNamed(String name)
+    public List<XmlNode> FindChildren(String name)
     {
         var found = new List<XmlNode>();
         for (nuint i = 0u; i < Children.Count; i++)
@@ -226,9 +226,9 @@ public class XmlNode
     }
 
     /// The text of the first child of that name, or the fallback.
-    public String TextOf(String name, String fallback)
+    public String FindChildText(String name, String fallback)
     {
-        var child = Child(name);
+        var child = FindChild(name);
         if (child == null)
             return fallback;
         return child.Text;
@@ -258,7 +258,7 @@ class Cursor
 
     public bool Failed => Failure != XmlError.None;
 
-    public void Reject(XmlError why)
+    public void RecordFailure(XmlError why)
     {
         if (Failure == XmlError.None)
             Failure = why;
@@ -283,7 +283,7 @@ class Cursor
     public void Skip() => At = At + 1u;
 
     /// Consumes `word` when it is next, and answers whether it was.
-    public bool Take(String word)
+    public bool TryConsume(String word)
     {
         if (At + word.ByteLength() > Source.ByteLength())
             return false;
@@ -303,7 +303,7 @@ class Cursor
     {
         while (!AtEnd)
         {
-            if (Take(word))
+            if (TryConsume(word))
                 return true;
             Skip();
         }
@@ -351,7 +351,7 @@ String ParseName(Cursor cursor)
 
     if (cursor.AtEnd || !IsNameStart(cursor.Peek()))
     {
-        cursor.Reject(XmlError.BadName);
+        cursor.RecordFailure(XmlError.BadName);
         return "";
     }
 
@@ -364,15 +364,15 @@ String ParseName(Cursor cursor)
 /// Skips a comment or a processing instruction, answering whether it found
 /// one. These are what may appear anywhere; a CDATA section produces text and
 /// a doctype has one place, so their callers handle them.
-bool SkipAside(Cursor cursor)
+bool SkipCommentOrInstruction(Cursor cursor)
 {
-    if (cursor.Take("<!--"))
+    if (cursor.TryConsume("<!--"))
     {
         SkipComment(cursor);
         return true;
     }
 
-    if (cursor.Take("<?"))
+    if (cursor.TryConsume("<?"))
     {
         SkipInstruction(cursor);
         return true;
@@ -386,11 +386,11 @@ void SkipComment(Cursor cursor)
 {
     while (!cursor.AtEnd)
     {
-        if (cursor.Take("--"))
+        if (cursor.TryConsume("--"))
         {
             if (cursor.Peek() != (byte)'>')
             {
-                cursor.Reject(XmlError.Unexpected);
+                cursor.RecordFailure(XmlError.Unexpected);
                 return;
             }
             cursor.Skip();
@@ -399,7 +399,7 @@ void SkipComment(Cursor cursor)
         cursor.Skip();
     }
 
-    cursor.Reject(XmlError.UnclosedTag);
+    cursor.RecordFailure(XmlError.UnclosedTag);
 }
 
 /// The rest of a processing instruction. Its target MUST be a name and MUST
@@ -413,18 +413,18 @@ void SkipInstruction(Cursor cursor)
 
     if (IsReservedTarget(target))
     {
-        cursor.Reject(XmlError.Unexpected);
+        cursor.RecordFailure(XmlError.Unexpected);
         return;
     }
 
     if (!IsSpace(cursor.Peek()) && !(cursor.Peek() == (byte)'?' && cursor.PeekAt(1u) == (byte)'>'))
     {
-        cursor.Reject(XmlError.Unexpected);
+        cursor.RecordFailure(XmlError.Unexpected);
         return;
     }
 
     if (!cursor.SkipPast("?>"))
-        cursor.Reject(XmlError.UnclosedTag);
+        cursor.RecordFailure(XmlError.UnclosedTag);
 }
 
 /// Whether a processing instruction's target spells `xml`, which the
@@ -449,7 +449,7 @@ void SkipDoctype(Cursor cursor)
 
     while (!cursor.AtEnd)
     {
-        if (depth > 0u && cursor.Take("<!--"))
+        if (depth > 0u && cursor.TryConsume("<!--"))
         {
             SkipComment(cursor);
             if (cursor.Failed)
@@ -457,7 +457,7 @@ void SkipDoctype(Cursor cursor)
             continue;
         }
 
-        if (depth > 0u && cursor.Take("<?"))
+        if (depth > 0u && cursor.TryConsume("<?"))
         {
             SkipInstruction(cursor);
             if (cursor.Failed)
@@ -476,7 +476,7 @@ void SkipDoctype(Cursor cursor)
                     cursor.Skip();
                 if (cursor.AtEnd)
                 {
-                    cursor.Reject(XmlError.UnclosedText);
+                    cursor.RecordFailure(XmlError.UnclosedText);
                     return;
                 }
                 cursor.Skip();
@@ -498,7 +498,7 @@ void SkipDoctype(Cursor cursor)
         }
     }
 
-    cursor.Reject(XmlError.UnclosedTag);
+    cursor.RecordFailure(XmlError.UnclosedTag);
 }
 
 /// One element, its attributes and everything inside it.
@@ -506,7 +506,7 @@ XmlNode ParseElement(Cursor cursor)
 {
     if (cursor.Depth > MaxDepth)
     {
-        cursor.Reject(XmlError.TooDeep);
+        cursor.RecordFailure(XmlError.TooDeep);
         return new XmlNode("");
     }
 
@@ -527,7 +527,7 @@ XmlNode ParseElement(Cursor cursor)
 
         if (cursor.AtEnd)
         {
-            cursor.Reject(XmlError.UnclosedTag);
+            cursor.RecordFailure(XmlError.UnclosedTag);
             return node;
         }
 
@@ -544,7 +544,7 @@ XmlNode ParseElement(Cursor cursor)
             cursor.Skip();
             if (cursor.Peek() != (byte)'>')
             {
-                cursor.Reject(XmlError.Unexpected);
+                cursor.RecordFailure(XmlError.Unexpected);
                 return node;
             }
             cursor.Skip();
@@ -553,7 +553,7 @@ XmlNode ParseElement(Cursor cursor)
 
         if (!spaced)
         {
-            cursor.Reject(XmlError.Unexpected);
+            cursor.RecordFailure(XmlError.Unexpected);
             return node;
         }
 
@@ -564,7 +564,7 @@ XmlNode ParseElement(Cursor cursor)
         SkipSpace(cursor);
         if (cursor.Peek() != (byte)'=')
         {
-            cursor.Reject(XmlError.Unexpected);
+            cursor.RecordFailure(XmlError.Unexpected);
             return node;
         }
         cursor.Skip();
@@ -573,7 +573,7 @@ XmlNode ParseElement(Cursor cursor)
         byte quote = cursor.Peek();
         if (quote != (byte)'"' && quote != (byte)'\'')
         {
-            cursor.Reject(XmlError.Unexpected);
+            cursor.RecordFailure(XmlError.Unexpected);
             return node;
         }
         cursor.Skip();
@@ -585,9 +585,9 @@ XmlNode ParseElement(Cursor cursor)
         // XML forbids a repeated attribute on one element, and a document with
         // one means something its writer did not: which of the two is the
         // value is not a question with an answer.
-        if (node.Attributes.Has(key))
+        if (node.Attributes.ContainsKey(key))
         {
-            cursor.Reject(XmlError.DuplicateAttribute);
+            cursor.RecordFailure(XmlError.DuplicateAttribute);
             return node;
         }
 
@@ -607,7 +607,7 @@ XmlNode ParseElement(Cursor cursor)
     {
         if (cursor.AtEnd)
         {
-            cursor.Reject(XmlError.UnexpectedEnd);
+            cursor.RecordFailure(XmlError.UnexpectedEnd);
             break;
         }
 
@@ -624,27 +624,27 @@ XmlNode ParseElement(Cursor cursor)
 
                 if (closing != node.Name)
                 {
-                    cursor.Reject(XmlError.MismatchedEnd);
+                    cursor.RecordFailure(XmlError.MismatchedEnd);
                     break;
                 }
 
                 SkipSpace(cursor);
                 if (cursor.Peek() != (byte)'>')
                 {
-                    cursor.Reject(XmlError.Unexpected);
+                    cursor.RecordFailure(XmlError.Unexpected);
                     break;
                 }
                 cursor.Skip();
                 break;
             }
 
-            if (cursor.Take("<![CDATA["))
+            if (cursor.TryConsume("<![CDATA["))
             {
                 nuint start = cursor.At;
 
                 if (!cursor.SkipPast("]]>"))
                 {
-                    cursor.Reject(XmlError.UnclosedTag);
+                    cursor.RecordFailure(XmlError.UnclosedTag);
                     break;
                 }
 
@@ -656,7 +656,7 @@ XmlNode ParseElement(Cursor cursor)
                 continue;
             }
 
-            if (SkipAside(cursor))
+            if (SkipCommentOrInstruction(cursor))
             {
                 if (cursor.Failed)
                     break;
@@ -717,7 +717,7 @@ String ParseUntil(Cursor cursor, byte stop)
             // Running out inside a quoted value is an error; running out of
             // content is the caller's to notice.
             if (quoted)
-                cursor.Reject(XmlError.UnclosedText);
+                cursor.RecordFailure(XmlError.UnclosedText);
             break;
         }
 
@@ -736,7 +736,7 @@ String ParseUntil(Cursor cursor, byte stop)
 
         if (quoted && c == (byte)'<')
         {
-            cursor.Reject(XmlError.Unexpected);
+            cursor.RecordFailure(XmlError.Unexpected);
             break;
         }
 
@@ -754,7 +754,7 @@ String ParseUntil(Cursor cursor, byte stop)
 
         if (!quoted && c == (byte)']' && cursor.PeekAt(1u) == (byte)']' && cursor.PeekAt(2u) == (byte)'>')
         {
-            cursor.Reject(XmlError.Unexpected);
+            cursor.RecordFailure(XmlError.Unexpected);
             break;
         }
 
@@ -782,27 +782,27 @@ String ParseUntil(Cursor cursor, byte stop)
 /// One `&...;`: the five XML predefines, or a numeric character reference.
 String ParseEntity(Cursor cursor)
 {
-    if (cursor.Take("&amp;"))
+    if (cursor.TryConsume("&amp;"))
         return "&";
-    if (cursor.Take("&lt;"))
+    if (cursor.TryConsume("&lt;"))
         return "<";
-    if (cursor.Take("&gt;"))
+    if (cursor.TryConsume("&gt;"))
         return ">";
-    if (cursor.Take("&quot;"))
+    if (cursor.TryConsume("&quot;"))
         return "\"";
-    if (cursor.Take("&apos;"))
+    if (cursor.TryConsume("&apos;"))
         return "'";
 
     // The hexadecimal form is spelled with a lower-case `x` only.
-    if (cursor.Take("&#x"))
+    if (cursor.TryConsume("&#x"))
         return ParseCharacterReference(cursor, 16u);
-    if (cursor.Take("&#"))
+    if (cursor.TryConsume("&#"))
         return ParseCharacterReference(cursor, 10u);
 
     // A document's own entity would have been declared in a DTD, and the DTD
     // was skipped -- so this is honest about not knowing rather than dropping
     // the reference silently.
-    cursor.Reject(XmlError.BadEntity);
+    cursor.RecordFailure(XmlError.BadEntity);
     return "";
 }
 
@@ -844,7 +844,7 @@ String ParseCharacterReference(Cursor cursor, uint radix)
 
     if (digits == 0u || cursor.Peek() != (byte)';')
     {
-        cursor.Reject(XmlError.BadEntity);
+        cursor.RecordFailure(XmlError.BadEntity);
         return "";
     }
     cursor.Skip();
@@ -853,7 +853,7 @@ String ParseCharacterReference(Cursor cursor, uint radix)
     // a way around.
     if (!IsXmlChar(value))
     {
-        cursor.Reject(XmlError.BadEntity);
+        cursor.RecordFailure(XmlError.BadEntity);
         return "";
     }
 
@@ -943,7 +943,7 @@ public Result<XmlNode, XmlError> Parse(String source)
 
     // The declaration, which MUST be the very first thing when it is there.
     // Anything else spelled `<?xml` is an instruction, read as one below.
-    if (cursor.Take("<?xml"))
+    if (cursor.TryConsume("<?xml"))
     {
         if (!IsSpace(cursor.Peek()))
         {
@@ -966,7 +966,7 @@ public Result<XmlNode, XmlError> Parse(String source)
         if (cursor.Peek() != (byte)'<')
             return Fail(XmlError.Unexpected);
 
-        if (cursor.Take("<!DOCTYPE"))
+        if (cursor.TryConsume("<!DOCTYPE"))
         {
             if (doctype)
                 return Fail(XmlError.Unexpected);
@@ -978,7 +978,7 @@ public Result<XmlNode, XmlError> Parse(String source)
             continue;
         }
 
-        if (!SkipAside(cursor))
+        if (!SkipCommentOrInstruction(cursor))
             break;
         if (cursor.Failed)
             return Fail(cursor.Failure);
@@ -1000,7 +1000,7 @@ public Result<XmlNode, XmlError> Parse(String source)
 
         if (cursor.Peek() != (byte)'<')
             return Fail(XmlError.TrailingContent);
-        if (!SkipAside(cursor))
+        if (!SkipCommentOrInstruction(cursor))
             return Fail(XmlError.TrailingContent);
         if (cursor.Failed)
             return Fail(cursor.Failure);
@@ -1012,10 +1012,10 @@ public Result<XmlNode, XmlError> Parse(String source)
 // ------------------------------------------------------------------ writing
 
 /// The element as text, on one line.
-public String Write(XmlNode node)
+public String ToXmlText(XmlNode node)
 {
     var text = new StringBuilder();
-    WriteInto(text, node, 0u, false);
+    WriteNodeInto(text, node, 0u, false);
     return text.ToText();
 }
 
@@ -1024,20 +1024,20 @@ public String Write(XmlNode node)
 /// adds would become part of that text when it was read back. The indentation
 /// between the children of any other element is dropped by the reader -- see
 /// the note on XmlNode -- so writing what was read back gives the same text.
-public String WriteIndented(XmlNode node)
+public String ToXmlTextIndented(XmlNode node)
 {
     var text = new StringBuilder();
-    WriteInto(text, node, 0u, true);
+    WriteNodeInto(text, node, 0u, true);
     return text.ToText();
 }
 
 /// The declaration and the element under it, which is what a whole file wants.
-public String WriteDocument(XmlNode node)
+public String ToXmlDocumentText(XmlNode node)
 {
-    return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + WriteIndented(node);
+    return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + ToXmlTextIndented(node);
 }
 
-void WriteInto(StringBuilder text, XmlNode node, nuint depth, bool pretty)
+void WriteNodeInto(StringBuilder text, XmlNode node, nuint depth, bool pretty)
 {
     if (pretty)
     {
@@ -1051,9 +1051,9 @@ void WriteInto(StringBuilder text, XmlNode node, nuint depth, bool pretty)
     for (nuint i = 0u; i < node.Attributes.Count; i++)
     {
         text.Append(" ");
-        text.Append(node.Attributes.NameAt(i));
+        text.Append(node.Attributes.GetNameAt(i));
         text.Append("=\"");
-        WriteEscaped(text, node.Attributes.ValueAt(i), true);
+        WriteEscaped(text, node.Attributes.GetValueAt(i), true);
         text.Append("\"");
     }
 
@@ -1077,7 +1077,7 @@ void WriteInto(StringBuilder text, XmlNode node, nuint depth, bool pretty)
     {
         if (indent)
             text.Append("\n");
-        WriteInto(text, node.Children[i], depth + 1u, indent);
+        WriteNodeInto(text, node.Children[i], depth + 1u, indent);
     }
 
     if (indent && node.Children.Count > 0u)
@@ -1171,21 +1171,21 @@ public attribute XmlCreate { }
 /// A field marked `[XmlAttribute]` becomes an attribute instead, which is what
 /// makes the output look like XML a person would have written rather than a
 /// JSON document with angle brackets.
-public XmlNode ToNode<T>(T value, String name)
+public XmlNode ToXmlNode<T>(T value, String name)
 {
-    return NodeOfInstance((byte*)value, typeof(T), name);
+    return BuildInstanceNode((byte*)value, typeof(T), name);
 }
 
 /// The element as text.
-public String Serialize<T>(T value, String name) => Write(ToNode(value, name));
+public String Serialize<T>(T value, String name) => ToXmlText(ToXmlNode(value, name));
 
 /// The same, with a declaration and indentation.
 public String SerializeDocument<T>(T value, String name)
 {
-    return WriteDocument(ToNode(value, name));
+    return ToXmlDocumentText(ToXmlNode(value, name));
 }
 
-XmlNode NodeOfInstance(byte* instance, Type type, String name)
+XmlNode BuildInstanceNode(byte* instance, Type type, String name)
 {
     var node = new XmlNode(name);
     if (instance == null)
@@ -1195,11 +1195,11 @@ XmlNode NodeOfInstance(byte* instance, Type type, String name)
 
     for (nuint i = 0u; i < type.FieldCount; i++)
     {
-        var field = type.FieldAt(i);
-        if (field.Has("XmlIgnore"))
+        var field = type.GetFieldAt(i);
+        if (field.HasAttribute("XmlIgnore"))
             continue;
 
-        var fieldName = NameOf(field);
+        var fieldName = GetFieldName(field);
 
         if (field.IsWalkable)
         {
@@ -1207,14 +1207,14 @@ XmlNode NodeOfInstance(byte* instance, Type type, String name)
             if (nested == null)
                 continue;
 
-            node.Add(NodeOfInstance(nested, field.TypeOf(), fieldName));
+            node.Add(BuildInstanceNode(nested, field.FieldType, fieldName));
             continue;
         }
 
         // An array is repeated children of one name, which is how XML says a
         // sequence. A `List<T>` still cannot be walked -- its own fields are
         // its private storage -- and is left out rather than misstated.
-        if (WalksAsArray(field))
+        if (IsWalkedAsArray(field))
         {
             AddArray(node, instance, field, fieldName);
             continue;
@@ -1223,9 +1223,9 @@ XmlNode NodeOfInstance(byte* instance, Type type, String name)
         if (!field.IsSimple)
             continue;
 
-        var written = TextOfField(instance, field);
+        var written = GetFieldText(instance, field);
 
-        if (field.Has("XmlAttribute"))
+        if (field.HasAttribute("XmlAttribute"))
         {
             node.Attributes.Add(fieldName, written);
             continue;
@@ -1239,15 +1239,15 @@ XmlNode NodeOfInstance(byte* instance, Type type, String name)
     return node;
 }
 
-String NameOf(Field field)
+String GetFieldName(Field field)
 {
-    if (field.Has("XmlName"))
-        return field.Get("XmlName").AsText(0u);
+    if (field.HasAttribute("XmlName"))
+        return field.GetAttribute("XmlName").GetText(0u);
     return field.Name;
 }
 
 /// An array whose elements this can write and read back.
-bool WalksAsArray(Field field)
+bool IsWalkedAsArray(Field field)
 {
     if (!field.IsArray)
         return false;
@@ -1265,7 +1265,7 @@ bool WalksAsArray(Field field)
     if (kind == KindClass || kind == KindStruct)
     {
         var inner = field.ElementType;
-        return inner.Exists && inner.Has("Reflect");
+        return inner.Exists && inner.HasAttribute("Reflect");
     }
 
     return false;
@@ -1284,26 +1284,26 @@ void AddArray(XmlNode node, byte* instance, Field field, String name)
 
     int kind = field.ElementKind;
 
-    for (nuint i = 0u; i < Reflection.ArrayLength(array); i++)
+    for (nuint i = 0u; i < Reflection.GetArrayLength(array); i++)
     {
-        byte* at = Reflection.ElementAt(array, field, i);
+        byte* at = Reflection.GetElementAddress(array, field, i);
 
         if (kind == KindClass || kind == KindStruct)
         {
             byte* nested = Reflection.ReadAggregateAt(at, field);
             if (nested == null)
                 continue;
-            node.Add(NodeOfInstance(nested, field.ElementType, name));
+            node.Add(BuildInstanceNode(nested, field.ElementType, name));
             continue;
         }
 
         var child = new XmlNode(name);
-        child.Text = TextOfElement(at, field);
+        child.Text = GetElementText(at, field);
         node.Add(child);
     }
 }
 
-String TextOfElement(byte* at, Field field)
+String GetElementText(byte* at, Field field)
 {
     int kind = field.ElementKind;
 
@@ -1318,7 +1318,7 @@ String TextOfElement(byte* at, Field field)
     return Text.FromInteger(Reflection.ReadIntegerAt(at, field));
 }
 
-String TextOfField(byte* instance, Field field)
+String GetFieldText(byte* instance, Field field)
 {
     if (field.Kind == KindString)
         return Reflection.ReadText(instance, field);
@@ -1333,20 +1333,20 @@ String TextOfField(byte* instance, Field field)
 
 /// Fills an object's fields from an element.
 ///
-/// The object is the program's, for the reason `Json.Populate` takes one: its
+/// The object is the program's, for the reason `Json.PopulateObject` takes one: its
 /// constructor has run, so a field the document does not mention keeps the
 /// value the type promised rather than a zero.
-public XmlError Populate<T>(T value, String source)
+public XmlError PopulateObject<T>(T value, String source)
 {
     var parsed = Parse(source);
     if (!parsed.Ok)
         return parsed.Error;
 
-    return PopulateFrom(value, parsed.Value);
+    return PopulateObject(value, parsed.Value);
 }
 
 /// The same, from an element already parsed.
-public XmlError PopulateFrom<T>(T value, XmlNode node)
+public XmlError PopulateObject<T>(T value, XmlNode node)
 {
     var type = typeof(T);
     if (type.FieldCount == 0u)
@@ -1360,32 +1360,32 @@ void FillInstance(byte* instance, Type type, XmlNode node)
 {
     for (nuint i = 0u; i < type.FieldCount; i++)
     {
-        var field = type.FieldAt(i);
-        if (field.Has("XmlIgnore"))
+        var field = type.GetFieldAt(i);
+        if (field.HasAttribute("XmlIgnore"))
             continue;
 
-        var name = NameOf(field);
+        var name = GetFieldName(field);
 
         if (field.IsWalkable)
         {
-            var child = node.Child(name);
+            var child = node.FindChild(name);
             if (child == null)
                 continue;
 
             byte* nested = Reflection.ReadAggregate(instance, field);
-            if (nested == null && field.Has("XmlCreate"))
+            if (nested == null && field.HasAttribute("XmlCreate"))
             {
-                nested = Reflection.MakeInto(instance, field);
+                nested = Reflection.CreateInstanceInto(instance, field);
             }
 
             if (nested != null)
-                FillInstance(nested, field.TypeOf(), child);
+                FillInstance(nested, field.FieldType, child);
             continue;
         }
 
-        if (WalksAsArray(field))
+        if (IsWalkedAsArray(field))
         {
-            FillArray(instance, field, node.ChildrenNamed(name));
+            FillArray(instance, field, node.FindChildren(name));
             continue;
         }
 
@@ -1395,18 +1395,18 @@ void FillInstance(byte* instance, Type type, XmlNode node)
         // An attribute first, then a child element of the name: a document
         // that writes one is read by whichever the type asked for, and one
         // that writes both is read the way the type is marked.
-        if (field.Has("XmlAttribute"))
+        if (field.HasAttribute("XmlAttribute"))
         {
             // A call result cannot carry a narrowing -- it could answer
             // differently the second time -- so the name is what holds it.
             if (node.Attributes.IndexOf(name) is Some at)
             {
-                FillField(instance, field, node.Attributes.ValueAt(at.Value));
+                FillField(instance, field, node.Attributes.GetValueAt(at.Value));
             }
             continue;
         }
 
-        var element = node.Child(name);
+        var element = node.FindChild(name);
         if (element != null)
             FillField(instance, field, element.Text);
     }
@@ -1423,12 +1423,12 @@ void FillArray(byte* instance, Field field, List<XmlNode> found)
     if (array == null)
         return;
 
-    nuint length = Reflection.ArrayLength(array);
+    nuint length = Reflection.GetArrayLength(array);
     int kind = field.ElementKind;
 
     for (nuint i = 0u; i < found.Count && i < length; i++)
     {
-        byte* at = Reflection.ElementAt(array, field, i);
+        byte* at = Reflection.GetElementAddress(array, field, i);
 
         if (kind == KindClass || kind == KindStruct)
         {

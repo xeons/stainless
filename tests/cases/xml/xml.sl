@@ -19,10 +19,10 @@ void Round(String label, String source)
     var parsed = Xml.Parse(source);
     if (!parsed.Ok)
     {
-        Say(label, "failed: " + Xml.Describe(parsed.Error));
+        Say(label, "failed: " + Xml.DescribeXmlError(parsed.Error));
         return;
     }
-    Say(label, Xml.Write(parsed.Value));
+    Say(label, Xml.ToXmlText(parsed.Value));
 }
 
 void Refuse(String label, String source)
@@ -33,7 +33,7 @@ void Refuse(String label, String source)
         Say(label, "accepted, and should not have been");
         return;
     }
-    Say(label, Xml.Describe(parsed.Error));
+    Say(label, Xml.DescribeXmlError(parsed.Error));
 }
 
 // ---------------------------------------------------------------- the mapping
@@ -146,9 +146,9 @@ public int Main()
         Say("root-name", root.Name);
         Say("attribute", root.Attributes.Find("env", "?"));
         Say("missing-attribute", root.Attributes.Find("nope", "(default)"));
-        Say("child-text", root.TextOf("name", "?"));
-        Say("missing-child", root.TextOf("nope", "(default)"));
-        Say("named-count", Text.FromInteger((long)root.ChildrenNamed("name").Count));
+        Say("child-text", root.FindChildText("name", "?"));
+        Say("missing-child", root.FindChildText("nope", "(default)"));
+        Say("named-count", Text.FromInteger((long)root.FindChildren("name").Count));
         Say("child-count", Text.FromInteger((long)root.Children.Count));
     }
 
@@ -159,9 +159,9 @@ public int Main()
     item.Text = "a < b & c";
     built.Add(item);
 
-    Say("built", Xml.Write(built));
+    Say("built", Xml.ToXmlText(built));
     Console.WriteLine("document =");
-    Console.WriteLine(Xml.WriteDocument(built));
+    Console.WriteLine(Xml.ToXmlDocumentText(built));
 
     // ----------------------------------------------------------- serializing
     var settings = new Settings();
@@ -179,7 +179,7 @@ public int Main()
 
     // --------------------------------------------------------- deserializing
     var loaded = new Settings();
-    var failure = Xml.Populate(loaded,
+    var failure = Xml.PopulateObject(loaded,
         "<settings Environment=\"staging\" Version=\"9\">" +
         "<Name>read back</Name><Enabled>true</Enabled>" +
         "<Threshold>1.25</Threshold><retry-limit>2</retry-limit>" +
@@ -187,7 +187,7 @@ public int Main()
         "<Primary><Host>localhost</Host><Port>80</Port></Primary>" +
         "</settings>");
 
-    Say("populate", Xml.Describe(failure));
+    Say("populate", Xml.DescribeXmlError(failure));
     Say("round-tripped", Xml.Serialize(loaded, "settings"));
 
     // Ignored in both directions, so the constructor's value stands.
@@ -196,17 +196,17 @@ public int Main()
     // A document that mentions nothing leaves everything as it was.
     var partial = new Settings();
     partial.Name = "unchanged";
-    Xml.Populate(partial, "<settings><Enabled>1</Enabled></settings>");
+    Xml.PopulateObject(partial, "<settings><Enabled>1</Enabled></settings>");
     Say("partial", partial.Name + "/" + Text.FromBool(partial.Enabled));
 
     // A value that is not a number for a number's field is left alone rather
     // than guessed at.
     var typed = new Settings();
     typed.Retries = 4;
-    Xml.Populate(typed, "<settings><retry-limit>not a number</retry-limit></settings>");
+    Xml.PopulateObject(typed, "<settings><retry-limit>not a number</retry-limit></settings>");
     Say("wrong-type", Text.FromInteger((long)typed.Retries));
 
-    Say("bad-document", Xml.Describe(Xml.Populate(partial, "<a>")));
+    Say("bad-document", Xml.DescribeXmlError(Xml.PopulateObject(partial, "<a>")));
 
     // Arrays, out and back.
     var listed = new Settings();
@@ -215,7 +215,7 @@ public int Main()
     Say("array-out", Xml.Serialize(listed, "settings"));
 
     var read = new Settings();
-    Xml.Populate(read, "<settings><Hosts>a</Hosts><Hosts>b</Hosts><Hosts>c</Hosts></settings>");
+    Xml.PopulateObject(read, "<settings><Hosts>a</Hosts><Hosts>b</Hosts><Hosts>c</Hosts></settings>");
     Say("array-in", read.Hosts[0u] + "/" + read.Hosts[1u]);
 
     return 0;

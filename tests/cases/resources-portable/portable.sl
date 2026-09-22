@@ -19,23 +19,23 @@ int Main()
     // of block 13 and 218 is the third entry of block 14. Windows does that
     // arithmetic inside LoadStringW; off Windows it is done by hand, and the
     // two have to agree.
-    Console.WriteLine(Resources.Text(201u));
-    Console.WriteLine(Resources.Text(202u));
-    Console.WriteLine(Resources.Text(218u));
-    Console.WriteLine($"absent '{Resources.Text(999u)}'");
+    Console.WriteLine(Resources.GetText(201u));
+    Console.WriteLine(Resources.GetText(202u));
+    Console.WriteLine(Resources.GetText(218u));
+    Console.WriteLine($"absent '{Resources.GetText(999u)}'");
 
-    var payload = Resources.Bytes(Resources.RcData, 301);
+    var payload = Resources.GetBytes(Resources.RcData, 301);
     Console.WriteLine($"payload {payload.Length} bytes, first {(char32)payload[0u]}");
 
     uint borrowed = 0u;
-    byte* at = Resources.Pointer(Resources.RcData, 301, &borrowed);
+    byte* at = Resources.GetPointer(Resources.RcData, 301, &borrowed);
     Console.WriteLine($"in place {borrowed} bytes, pointer {at != null}");
 
-    var greeting = Resources.Bytes("TEXTBLOB", "GREETING");
+    var greeting = Resources.GetBytes("TEXTBLOB", "GREETING");
     Console.WriteLine($"greeting {greeting.Length} bytes");
 
     Console.WriteLine($"present {Resources.Exists(Resources.RcData, 301)}");
     Console.WriteLine($"absent {Resources.Exists(Resources.RcData, 999)}");
-    Console.WriteLine($"size {Resources.Size(Resources.RcData, 301)}");
+    Console.WriteLine($"size {Resources.GetSize(Resources.RcData, 301)}");
     return 0;
 }

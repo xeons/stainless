@@ -73,7 +73,7 @@ byte* Build(String typeName, String[] settings)
     if (!type.Exists)
         return null;
 
-    byte* made = Make(type);
+    byte* made = CreateInstance(type);
     if (made == null)
         return null;
 

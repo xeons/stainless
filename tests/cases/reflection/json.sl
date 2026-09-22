@@ -45,8 +45,8 @@ public String ToJson<T>(T value)
 
     for (nuint i = 0; i < type.FieldCount; i = i + 1)
     {
-        var field = type.FieldAt(i);
-        if (field.Has("JsonIgnore"))
+        var field = type.GetFieldAt(i);
+        if (field.HasAttribute("JsonIgnore"))
             continue;
 
         if (!first)
@@ -54,8 +54,8 @@ public String ToJson<T>(T value)
         first = false;
 
         var name = field.Name;
-        if (field.Has("JsonName"))
-            name = field.Get("JsonName").AsText(0);
+        if (field.HasAttribute("JsonName"))
+            name = field.GetAttribute("JsonName").GetText(0);
 
         text.Append("\"");
         text.Append(name);

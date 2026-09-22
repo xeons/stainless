@@ -37,10 +37,10 @@ void Decode(String label, String text)
     var parsed = Json.Parse(text);
     if (!parsed.Ok)
     {
-        Say(label, "failed: " + Json.Describe(parsed.Error));
+        Say(label, "failed: " + Json.DescribeJsonError(parsed.Error));
         return;
     }
-    Say(label, Points(Json.TextOr(parsed.Value, "?")));
+    Say(label, Points(Json.GetTextOrDefault(parsed.Value, "?")));
 }
 
 /// A document read and written back, or why it could not be read.
@@ -48,8 +48,8 @@ String Rewrite(String text)
 {
     var parsed = Json.Parse(text);
     if (!parsed.Ok)
-        return "failed: " + Json.Describe(parsed.Error);
-    return Json.Write(parsed.Value);
+        return "failed: " + Json.DescribeJsonError(parsed.Error);
+    return Json.ToJsonText(parsed.Value);
 }
 
 /// A document read as a whole number, or the fallback.
@@ -58,7 +58,7 @@ long IntegerIn(String text, long fallback)
     var parsed = Json.Parse(text);
     if (!parsed.Ok)
         return fallback;
-    return Json.IntegerOr(parsed.Value, fallback);
+    return Json.GetIntegerOrDefault(parsed.Value, fallback);
 }
 
 void Refuse(String label, String text)
@@ -66,10 +66,10 @@ void Refuse(String label, String text)
     var parsed = Json.Parse(text);
     if (parsed.Ok)
     {
-        Say(label, "accepted, and should not have been: " + Json.Write(parsed.Value));
+        Say(label, "accepted, and should not have been: " + Json.ToJsonText(parsed.Value));
         return;
     }
-    Say(label, Json.Describe(parsed.Error));
+    Say(label, Json.DescribeJsonError(parsed.Error));
 }
 
 [Reflect]
@@ -113,11 +113,11 @@ public int Main()
     Say("underflow", Rewrite("1e-400"));
 
     double zero = 0.0;
-    var odd = Json.NewArray();
-    Json.ItemsOf(odd).Add(JsonValue.Number(1.0 / zero));
-    Json.ItemsOf(odd).Add(JsonValue.Number(-1.0 / zero));
-    Json.ItemsOf(odd).Add(JsonValue.Number(Math.Sqrt(-1.0)));
-    Say("non-finite", Json.Write(odd));
+    var odd = Json.CreateJsonArray();
+    Json.GetItems(odd).Add(JsonValue.Number(1.0 / zero));
+    Json.GetItems(odd).Add(JsonValue.Number(-1.0 / zero));
+    Json.GetItems(odd).Add(JsonValue.Number(Math.Sqrt(-1.0)));
+    Say("non-finite", Json.ToJsonText(odd));
 
     var measured = new Measured();
     measured.Value = 1.0 / zero;
@@ -148,10 +148,10 @@ public int Main()
     // A null array is made at the document's length; every element of it
     // is a real value of its type, whatever the document held there.
     var holder = new Holder();
-    var failure = Json.Populate(holder,
+    var failure = Json.PopulateObject(holder,
         "{\"Items\":[{\"Label\":\"a\",\"Size\":1},7,{\"Size\":3}]," +
         "\"Tags\":[\"x\",4,null]}");
-    Say("populate", Json.Describe(failure));
+    Say("populate", Json.DescribeJsonError(failure));
     Say("items", Json.Serialize(holder));
     Say("item-label", holder.Items[1u].Label + "|" + holder.Items[2u].Label + "|");
     Say("tag-lengths", Text.FromInteger((long)holder.Tags[1u].ByteLength())
@@ -161,7 +161,7 @@ public int Main()
     var ranged = new Holder();
     ranged.Big = 5;
     ranged.Small = 6;
-    Json.Populate(ranged, "{\"Big\":1e300,\"Small\":-1e300}");
+    Json.PopulateObject(ranged, "{\"Big\":1e300,\"Small\":-1e300}");
     Say("out-of-range", Text.FromInteger(ranged.Big) + "/" + Text.FromInteger((long)ranged.Small));
 
     return 0;

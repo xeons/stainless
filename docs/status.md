@@ -543,7 +543,7 @@ last person to edit it -- the suite is the authority.
   no type -- `Json.Parse` gives a `JsonValue`, a variant that is exactly one of
   the six things JSON has, and `Xml.Parse` gives an `XmlNode` -- and a mapping
   onto a `[Reflect]` type, where `Serialize` reads an object's fields and
-  `Populate` writes them. Reading fills an object the program made rather than
+  `PopulateObject` writes them. Reading fills an object the program made rather than
   allocating one, so a constructor has established the type's invariants before
   a single field is overwritten, and a field the document does not mention keeps
   what the constructor chose. Arrays and collections are left out of the

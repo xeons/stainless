@@ -684,13 +684,13 @@ var parsed = try Json.Parse(text);
 
 switch (parsed)
 {
-    case Object held: Console.WriteLine(Json.TextOr(held.Members.Find("name"), "?")); break;
+    case Object held: Console.WriteLine(Json.GetTextOrDefault(held.Members.Find("name"), "?")); break;
     default: break;
 }
 ```
 
 **A mapping onto a type**, through the field tables of a `[Reflect]` type
-([§6](06-attributes-reflection.md#6-attributes-and-reflection)). `Json.Serialize(value)` reads an object's fields and `Json.Populate`
+([§6](06-attributes-reflection.md#6-attributes-and-reflection)). `Json.Serialize(value)` reads an object's fields and `Json.PopulateObject`
 writes them, walking into a nested object rather than stopping at it.
 `[JsonName("id")]` renames a field and `[JsonIgnore]` leaves it out; XML has
 `[XmlName]`, `[XmlIgnore]` and `[XmlAttribute]`, which writes a field as an
@@ -701,7 +701,7 @@ rather than a limitation:
 
 ```csharp
 var settings = new Settings();          // the constructor establishes the type
-Json.Populate(settings, text);          // the document overwrites what it names
+Json.PopulateObject(settings, text);    // the document overwrites what it names
 ```
 
 A constructor is what makes a type's invariants true. A deserializer that

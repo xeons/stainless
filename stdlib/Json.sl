@@ -22,18 +22,18 @@
 /// JSON, in two layers.
 ///
 /// The lower one is a document: `Json.Parse` gives a `JsonValue`, a variant that
-/// is exactly one of the six things JSON has, and `Write` puts one back. Nothing
+/// is exactly one of the six things JSON has, and `ToJsonText` puts one back. Nothing
 /// about it needs a type, so it handles a document whose shape a program learns
 /// at run time -- which is most of them.
 ///
 /// The upper one maps a document onto a type, through the field tables a
 /// `[Reflect]` type carries (§6). `Serialize` reads an object's fields and
-/// `Populate` writes them.
+/// `PopulateObject` writes them.
 ///
 /// **Why the mapping fills an object rather than making one.** A constructor is
 /// what establishes a type's invariants, and a deserializer that allocated
 /// zeroed memory would produce an object whose non-nullable fields were null --
-/// a hole in the type system rather than a value. So `Populate` takes an
+/// a hole in the type system rather than a value. So `PopulateObject` takes an
 /// instance the program made, and `Deserialize<T>` calls `new T()` first, which
 /// is what `where T : new()` is there to guarantee.
 module Standard.Json;
@@ -82,7 +82,7 @@ public enum JsonError
 }
 
 /// A sentence describing an error, for a message a person will read.
-public String Describe(JsonError error)
+public String DescribeJsonError(JsonError error)
 {
     switch (error)
     {
@@ -126,17 +126,17 @@ public class JsonObject
     public nuint Count => _members.Count;
 
     /// The name at a position, in the order the document wrote them.
-    public String NameAt(nuint index) => _members.GetKeyAt(index);
+    public String GetNameAt(nuint index) => _members.GetKeyAt(index);
 
-    /// The value at a position, pairing with `NameAt` at the same index.
-    public JsonValue ValueAt(nuint index) => _members.GetValueAt(index);
+    /// The value at a position, pairing with `GetNameAt` at the same index.
+    public JsonValue GetValueAt(nuint index) => _members.GetValueAt(index);
 
     /// Adds a member. A repeated name is kept rather than replaced, because
     /// that is what the document said; `Find` answers with the first.
     public void Add(String name, JsonValue value) => _members.Add(name, value);
 
     /// Replaces the value of a name, or adds it.
-    public void Set(String name, JsonValue value) => _members.SetValue(name, value);
+    public void SetValue(String name, JsonValue value) => _members.SetValue(name, value);
 
     /// Where a name is, or `None`. One lookup rather than the two that asking
     /// whether it is there and then asking for it would cost.
@@ -144,7 +144,7 @@ public class JsonObject
 
     /// Whether a member of that name is there. A scan, so `IndexOf` once
     /// beats this followed by a lookup.
-    public bool Has(String name) => _members.ContainsKey(name);
+    public bool ContainsKey(String name) => _members.ContainsKey(name);
 
     /// The value of a name, or `Null` when it is not there. A document that
     /// does not mention a field and one that says `null` are the same thing to
@@ -174,7 +174,7 @@ public variant JsonValue
 
     /// A number. JSON has only the one numeric type and it is a double, so an
     /// integer past 2^53 has already lost precision by the time it is here.
-    /// A parsed one is always finite; `Write` says what becomes of one that
+    /// A parsed one is always finite; `ToJsonText` says what becomes of one that
     /// is not.
     Number(double Value);
 
@@ -189,17 +189,17 @@ public variant JsonValue
 }
 
 /// An empty array, ready to add to.
-public JsonValue NewArray() => JsonValue.Array(new List<JsonValue>());
+public JsonValue CreateJsonArray() => JsonValue.Array(new List<JsonValue>());
 
 /// An empty object, ready to add to.
-public JsonValue NewObject() => JsonValue.Object(new JsonObject());
+public JsonValue CreateJsonObject() => JsonValue.Object(new JsonObject());
 
 /// A whole number as a JSON number, which has only the one numeric type.
 ///
 /// Not `FromInteger`: `Standard.Text` is imported everywhere and has one of
 /// those, and two functions of a name reached without a prefix is an ambiguity
 /// at every call rather than at this declaration.
-public JsonValue NumberOf(long value) => JsonValue.Number((double)value);
+public JsonValue CreateJsonNumber(long value) => JsonValue.Number((double)value);
 
 // The readers below answer with a default rather than a failure: a program
 // that wants to know which case it has switches instead.
@@ -209,7 +209,7 @@ public JsonValue NumberOf(long value) => JsonValue.Number((double)value);
 // that case carries is readable under its own name.
 
 /// The text of a `Text`, or the fallback for anything else.
-public String TextOr(JsonValue value, String fallback)
+public String GetTextOrDefault(JsonValue value, String fallback)
 {
     if (value.Text)
         return value.Value;
@@ -218,7 +218,7 @@ public String TextOr(JsonValue value, String fallback)
 
 /// The value of a `Number`, or the fallback for anything else. A JSON number
 /// is a double, so a large integer has already lost precision by here.
-public double NumberOr(JsonValue value, double fallback)
+public double GetNumberOrDefault(JsonValue value, double fallback)
 {
     if (value.Number)
         return value.Value;
@@ -230,7 +230,7 @@ public double NumberOr(JsonValue value, double fallback)
 /// Truncation, not rounding: `3.9` is 3. JSON has one number type, so this is
 /// how a field that is conceptually an integer is read back. A value past what
 /// a `long` holds answers the fallback, as a value of the wrong type does.
-public long IntegerOr(JsonValue value, long fallback)
+public long GetIntegerOrDefault(JsonValue value, long fallback)
 {
     if (value.Number && IsWithinLong(value.Value))
         return (long)value.Value;
@@ -246,7 +246,7 @@ bool IsWithinLong(double value)
 
 /// The value of a `Bool`, or the fallback. A `Number` of 1 is not true here;
 /// only the JSON literals are.
-public bool BoolOr(JsonValue value, bool fallback)
+public bool GetBoolOrDefault(JsonValue value, bool fallback)
 {
     if (value.Bool)
         return value.Value;
@@ -257,7 +257,7 @@ public bool BoolOr(JsonValue value, bool fallback)
 public bool IsNull(JsonValue value) => value.Null;
 
 /// The members of an `Object`, or an empty one.
-public JsonObject MembersOf(JsonValue value)
+public JsonObject GetMembers(JsonValue value)
 {
     if (value.Object)
         return value.Members;
@@ -265,7 +265,7 @@ public JsonObject MembersOf(JsonValue value)
 }
 
 /// The elements of an `Array`, or an empty list.
-public List<JsonValue> ItemsOf(JsonValue value)
+public List<JsonValue> GetItems(JsonValue value)
 {
     if (value.Array)
         return value.Items;
@@ -298,7 +298,7 @@ class Cursor
 
     /// The first reason wins: everything after a failure is noise about the
     /// same mistake, and the first one is where it was made.
-    public void Reject(JsonError why)
+    public void RecordFailure(JsonError why)
     {
         if (Failure == JsonError.None)
             Failure = why;
@@ -366,7 +366,7 @@ JsonValue ParseValue(Cursor cursor)
 
     if (cursor.Depth > MaxDepth)
     {
-        cursor.Reject(JsonError.TooDeep);
+        cursor.RecordFailure(JsonError.TooDeep);
         return JsonValue.Null;
     }
 
@@ -374,7 +374,7 @@ JsonValue ParseValue(Cursor cursor)
 
     if (cursor.AtEnd)
     {
-        cursor.Reject(JsonError.Unexpected);
+        cursor.RecordFailure(JsonError.Unexpected);
         return JsonValue.Null;
     }
 
@@ -391,7 +391,7 @@ JsonValue ParseValue(Cursor cursor)
     if (c == (byte)'-' || (c >= (byte)'0' && c <= (byte)'9'))
         return ParseNumber(cursor);
 
-    cursor.Reject(JsonError.Unexpected);
+    cursor.RecordFailure(JsonError.Unexpected);
     return JsonValue.Null;
 }
 
@@ -416,7 +416,7 @@ JsonValue ParseObject(Cursor cursor)
 
         if (cursor.Peek() != (byte)'"')
         {
-            cursor.Reject(JsonError.Unexpected);
+            cursor.RecordFailure(JsonError.Unexpected);
             break;
         }
 
@@ -427,7 +427,7 @@ JsonValue ParseObject(Cursor cursor)
         SkipSpace(cursor);
         if (cursor.Peek() != (byte)':')
         {
-            cursor.Reject(JsonError.Unexpected);
+            cursor.RecordFailure(JsonError.Unexpected);
             break;
         }
         cursor.Skip();
@@ -453,7 +453,7 @@ JsonValue ParseObject(Cursor cursor)
             break;
         }
 
-        cursor.Reject(JsonError.Unexpected);
+        cursor.RecordFailure(JsonError.Unexpected);
         break;
     }
 
@@ -499,7 +499,7 @@ JsonValue ParseArray(Cursor cursor)
             break;
         }
 
-        cursor.Reject(JsonError.Unexpected);
+        cursor.RecordFailure(JsonError.Unexpected);
         break;
     }
 
@@ -528,7 +528,7 @@ String ParseText(Cursor cursor)
     {
         if (cursor.AtEnd)
         {
-            cursor.Reject(JsonError.UnterminatedText);
+            cursor.RecordFailure(JsonError.UnterminatedText);
             return "";
         }
 
@@ -547,7 +547,7 @@ String ParseText(Cursor cursor)
         // RFC 8259 §7: a control character inside a string MUST be escaped.
         if (c < 0x20u)
         {
-            cursor.Reject(JsonError.Unexpected);
+            cursor.RecordFailure(JsonError.Unexpected);
             return "";
         }
 
@@ -565,7 +565,7 @@ String ParseText(Cursor cursor)
         cursor.Skip();
         if (cursor.AtEnd)
         {
-            cursor.Reject(JsonError.UnterminatedText);
+            cursor.RecordFailure(JsonError.UnterminatedText);
             return "";
         }
 
@@ -652,7 +652,7 @@ String ParseText(Cursor cursor)
         }
         else
         {
-            cursor.Reject(JsonError.BadEscape);
+            cursor.RecordFailure(JsonError.BadEscape);
             return "";
         }
 
@@ -668,7 +668,7 @@ uint ParseHex4(Cursor cursor)
     {
         if (cursor.AtEnd)
         {
-            cursor.Reject(JsonError.BadEscape);
+            cursor.RecordFailure(JsonError.BadEscape);
             return 0u;
         }
 
@@ -689,7 +689,7 @@ uint ParseHex4(Cursor cursor)
         }
         else
         {
-            cursor.Reject(JsonError.BadEscape);
+            cursor.RecordFailure(JsonError.BadEscape);
             return 0u;
         }
 
@@ -718,14 +718,14 @@ JsonValue ParseNumber(Cursor cursor)
 
     if (cursor.At == digits)
     {
-        cursor.Reject(JsonError.BadNumber);
+        cursor.RecordFailure(JsonError.BadNumber);
         return JsonValue.Null;
     }
 
     // A leading zero may only be the whole of the integer part.
     if (cursor.Text.GetByteAt(digits) == (byte)'0' && cursor.At - digits > 1u)
     {
-        cursor.Reject(JsonError.BadNumber);
+        cursor.RecordFailure(JsonError.BadNumber);
         return JsonValue.Null;
     }
 
@@ -741,7 +741,7 @@ JsonValue ParseNumber(Cursor cursor)
 
         if (cursor.At == fraction)
         {
-            cursor.Reject(JsonError.BadNumber);
+            cursor.RecordFailure(JsonError.BadNumber);
             return JsonValue.Null;
         }
     }
@@ -768,7 +768,7 @@ JsonValue ParseNumber(Cursor cursor)
 
             if (cursor.At == exponent)
             {
-                cursor.Reject(JsonError.BadNumber);
+                cursor.RecordFailure(JsonError.BadNumber);
                 return JsonValue.Null;
             }
         }
@@ -781,7 +781,7 @@ JsonValue ParseNumber(Cursor cursor)
     // cannot write back.
     if (!parsed.Ok || !Math.IsFinite(parsed.Value))
     {
-        cursor.Reject(JsonError.BadNumber);
+        cursor.RecordFailure(JsonError.BadNumber);
         return JsonValue.Null;
     }
 
@@ -792,18 +792,18 @@ bool IsDigit(byte c) => c >= (byte)'0' && c <= (byte)'9';
 
 JsonValue ParseLiteral(Cursor cursor)
 {
-    if (Matches(cursor, "true"))
+    if (TryConsume(cursor, "true"))
         return JsonValue.Bool(true);
-    if (Matches(cursor, "false"))
+    if (TryConsume(cursor, "false"))
         return JsonValue.Bool(false);
-    if (Matches(cursor, "null"))
+    if (TryConsume(cursor, "null"))
         return JsonValue.Null;
 
-    cursor.Reject(JsonError.BadLiteral);
+    cursor.RecordFailure(JsonError.BadLiteral);
     return JsonValue.Null;
 }
 
-bool Matches(Cursor cursor, String word)
+bool TryConsume(Cursor cursor, String word)
 {
     if (cursor.At + word.ByteLength() > cursor.Text.ByteLength())
         return false;
@@ -844,29 +844,29 @@ public Result<JsonValue, JsonError> Parse(String text)
 /// A `Number` that is infinite or NaN is written as `null`, since JSON has no
 /// spelling for either. `JSON.stringify` does the same, and it reads back as a
 /// value absent rather than as some other number.
-public String Write(JsonValue value)
+public String ToJsonText(JsonValue value)
 {
     var text = new StringBuilder();
-    WriteInto(text, value, 0u, false);
+    WriteValueInto(text, value, 0u, false);
     return text.ToText();
 }
 
 /// The document as text, indented two spaces a level.
-public String WriteIndented(JsonValue value)
+public String ToJsonTextIndented(JsonValue value)
 {
     var text = new StringBuilder();
-    WriteInto(text, value, 0u, true);
+    WriteValueInto(text, value, 0u, true);
     return text.ToText();
 }
 
-void Newline(StringBuilder text, nuint depth)
+void AppendNewline(StringBuilder text, nuint depth)
 {
     text.Append("\n");
     for (nuint i = 0u; i < depth; i++)
         text.Append("  ");
 }
 
-void WriteInto(StringBuilder text, JsonValue value, nuint depth, bool pretty)
+void WriteValueInto(StringBuilder text, JsonValue value, nuint depth, bool pretty)
 {
     switch (value)
     {
@@ -899,11 +899,11 @@ void WriteInto(StringBuilder text, JsonValue value, nuint depth, bool pretty)
                 if (i > 0u)
                     text.Append(",");
                 if (pretty)
-                    Newline(text, depth + 1u);
-                WriteInto(text, array.Items[i], depth + 1u, pretty);
+                    AppendNewline(text, depth + 1u);
+                WriteValueInto(text, array.Items[i], depth + 1u, pretty);
             }
             if (pretty)
-                Newline(text, depth);
+                AppendNewline(text, depth);
             text.Append("]");
             break;
 
@@ -920,14 +920,14 @@ void WriteInto(StringBuilder text, JsonValue value, nuint depth, bool pretty)
                 if (i > 0u)
                     text.Append(",");
                 if (pretty)
-                    Newline(text, depth + 1u);
+                    AppendNewline(text, depth + 1u);
 
-                WriteText(text, object.Members.NameAt(i));
+                WriteText(text, object.Members.GetNameAt(i));
                 text.Append(pretty ? ": " : ":");
-                WriteInto(text, object.Members.ValueAt(i), depth + 1u, pretty);
+                WriteValueInto(text, object.Members.GetValueAt(i), depth + 1u, pretty);
             }
             if (pretty)
-                Newline(text, depth);
+                AppendNewline(text, depth);
             text.Append("}");
             break;
     }
@@ -1004,7 +1004,7 @@ void WriteText(StringBuilder text, String value)
         }
         else if (c < 32u)
         {
-            escaped = "\\u00" + Nibble((byte)(c >> 4)) + Nibble((byte)(c & 15u));
+            escaped = "\\u00" + FormatHexNibble((byte)(c >> 4)) + FormatHexNibble((byte)(c & 15u));
         }
         else
         {
@@ -1026,7 +1026,7 @@ void WriteText(StringBuilder text, String value)
 }
 
 /// One hex digit, for the `\u00XX` a control character is written as.
-String Nibble(byte value)
+String FormatHexNibble(byte value)
 {
     if (value < 10u)
         return Text.FromChar((char32)((uint)value + 48u));
@@ -1059,18 +1059,18 @@ public attribute JsonCreate { }
 /// Reads the field tables of `[Reflect] T`, walking into a nested class or
 /// struct rather than stopping at it. A field of a kind with no JSON spelling
 /// -- a pointer, a delegate, an array -- is left out rather than guessed at.
-public JsonValue ToValue<T>(T value)
+public JsonValue ToJsonValue<T>(T value)
 {
-    return ValueOfInstance((byte*)value, typeof(T));
+    return BuildInstanceValue((byte*)value, typeof(T));
 }
 
 /// The document as text.
-public String Serialize<T>(T value) => Write(ToValue(value));
+public String Serialize<T>(T value) => ToJsonText(ToJsonValue(value));
 
 /// The same, indented.
-public String SerializeIndented<T>(T value) => WriteIndented(ToValue(value));
+public String SerializeIndented<T>(T value) => ToJsonTextIndented(ToJsonValue(value));
 
-JsonValue ValueOfInstance(byte* instance, Type type)
+JsonValue BuildInstanceValue(byte* instance, Type type)
 {
     if (instance == null)
         return JsonValue.Null;
@@ -1079,16 +1079,16 @@ JsonValue ValueOfInstance(byte* instance, Type type)
 
     for (nuint i = 0u; i < type.FieldCount; i++)
     {
-        var field = type.FieldAt(i);
-        if (field.Has("JsonIgnore"))
+        var field = type.GetFieldAt(i);
+        if (field.HasAttribute("JsonIgnore"))
             continue;
 
         // A field with no JSON spelling is left out rather than written as
-        // something it is not. See `Represents` for which those are and why.
-        if (!Represents(field))
+        // something it is not. See `CanRepresent` for which those are and why.
+        if (!CanRepresent(field))
             continue;
 
-        members.Add(NameOf(field), ValueOfField(instance, field));
+        members.Add(GetFieldName(field), BuildFieldValue(instance, field));
     }
 
     return JsonValue.Object(members);
@@ -1107,17 +1107,17 @@ JsonValue ValueOfInstance(byte* instance, Type type)
 /// `null` says the value was absent when it was not, and walking a `List`
 /// writes `{}` for a list with things in it -- both of which a reader would
 /// believe.
-bool Represents(Field field)
+bool CanRepresent(Field field)
 {
     if (field.IsSimple)
         return true;
     if (field.IsWalkable)
         return true;
-    return RepresentsArray(field);
+    return CanRepresentArray(field);
 }
 
 /// An array whose elements are something this can read and write.
-bool RepresentsArray(Field field)
+bool CanRepresentArray(Field field)
 {
     if (!field.IsArray)
         return false;
@@ -1136,20 +1136,20 @@ bool RepresentsArray(Field field)
     if (kind == KindClass || kind == KindStruct)
     {
         var inner = field.ElementType;
-        return inner.Exists && inner.Has("Reflect");
+        return inner.Exists && inner.HasAttribute("Reflect");
     }
 
     return false;
 }
 
-String NameOf(Field field)
+String GetFieldName(Field field)
 {
-    if (field.Has("JsonName"))
-        return field.Get("JsonName").AsText(0u);
+    if (field.HasAttribute("JsonName"))
+        return field.GetAttribute("JsonName").GetText(0u);
     return field.Name;
 }
 
-JsonValue ValueOfField(byte* instance, Field field)
+JsonValue BuildFieldValue(byte* instance, Field field)
 {
     int kind = field.Kind;
 
@@ -1160,16 +1160,16 @@ JsonValue ValueOfField(byte* instance, Field field)
     if (field.IsFloating)
         return JsonValue.Number(Reflection.ReadDouble(instance, field));
     if (field.IsInteger)
-        return NumberOf(Reflection.ReadInteger(instance, field));
+        return CreateJsonNumber(Reflection.ReadInteger(instance, field));
 
     if (field.IsWalkable)
     {
         byte* nested = Reflection.ReadAggregate(instance, field);
-        return ValueOfInstance(nested, field.TypeOf());
+        return BuildInstanceValue(nested, field.FieldType);
     }
 
-    if (RepresentsArray(field))
-        return ValueOfArray(instance, field);
+    if (CanRepresentArray(field))
+        return BuildArrayValue(instance, field);
 
     return JsonValue.Null;
 }
@@ -1179,7 +1179,7 @@ JsonValue ValueOfField(byte* instance, Field field)
 /// A null array is `null` rather than `[]`: the two are different, and a
 /// reader that gets `[]` for an array the object did not have would write it
 /// back as one.
-JsonValue ValueOfArray(byte* instance, Field field)
+JsonValue BuildArrayValue(byte* instance, Field field)
 {
     byte* array = Reflection.ReadArray(instance, field);
     if (array == null)
@@ -1188,9 +1188,9 @@ JsonValue ValueOfArray(byte* instance, Field field)
     var items = new List<JsonValue>();
     int kind = field.ElementKind;
 
-    for (nuint i = 0u; i < Reflection.ArrayLength(array); i++)
+    for (nuint i = 0u; i < Reflection.GetArrayLength(array); i++)
     {
-        byte* at = Reflection.ElementAt(array, field, i);
+        byte* at = Reflection.GetElementAddress(array, field, i);
 
         if (kind == KindString)
         {
@@ -1206,11 +1206,11 @@ JsonValue ValueOfArray(byte* instance, Field field)
         }
         else if (kind == KindClass || kind == KindStruct)
         {
-            items.Add(ValueOfInstance(Reflection.ReadAggregateAt(at, field), field.ElementType));
+            items.Add(BuildInstanceValue(Reflection.ReadAggregateAt(at, field), field.ElementType));
         }
         else
         {
-            items.Add(NumberOf(Reflection.ReadIntegerAt(at, field)));
+            items.Add(CreateJsonNumber(Reflection.ReadIntegerAt(at, field)));
         }
     }
 
@@ -1228,17 +1228,17 @@ JsonValue ValueOfArray(byte* instance, Field field)
 /// A document naming a nested object the constructor left null is skipped
 /// rather than allocated into, since nothing here could give the rest of that
 /// object's fields a value.
-public JsonError Populate<T>(T value, String text)
+public JsonError PopulateObject<T>(T value, String text)
 {
     var parsed = Parse(text);
     if (!parsed.Ok)
         return parsed.Error;
 
-    return PopulateFrom(value, parsed.Value);
+    return PopulateObject(value, parsed.Value);
 }
 
 /// The same, from a document already parsed.
-public JsonError PopulateFrom<T>(T value, JsonValue document)
+public JsonError PopulateObject<T>(T value, JsonValue document)
 {
     var type = typeof(T);
     if (type.FieldCount == 0u)
@@ -1255,18 +1255,18 @@ void FillInstance(byte* instance, Type type, JsonObject members)
 {
     for (nuint i = 0u; i < type.FieldCount; i++)
     {
-        var field = type.FieldAt(i);
-        if (field.Has("JsonIgnore"))
+        var field = type.GetFieldAt(i);
+        if (field.HasAttribute("JsonIgnore"))
             continue;
 
-        if (!Represents(field))
+        if (!CanRepresent(field))
             continue;
 
         // A call result cannot carry a narrowing -- it could answer
         // differently the second time -- so the name is what holds it.
-        if (members.IndexOf(NameOf(field)) is Some at)
+        if (members.IndexOf(GetFieldName(field)) is Some at)
         {
-            FillField(instance, field, members.ValueAt(at.Value));
+            FillField(instance, field, members.GetValueAt(at.Value));
         }
     }
 }
@@ -1309,20 +1309,20 @@ void FillField(byte* instance, Field field, JsonValue value)
 
         // A field the constructor left empty, which the type has said the
         // document may fill.
-        if (nested == null && field.Has("JsonCreate") && !IsNull(value))
+        if (nested == null && field.HasAttribute("JsonCreate") && !IsNull(value))
         {
-            nested = Reflection.MakeInto(instance, field);
+            nested = Reflection.CreateInstanceInto(instance, field);
         }
 
         if (nested == null)
             return;
 
         if (value.Object)
-            FillInstance(nested, field.TypeOf(), value.Members);
+            FillInstance(nested, field.FieldType, value.Members);
         return;
     }
 
-    if (RepresentsArray(field))
+    if (CanRepresentArray(field))
         FillArray(instance, field, value);
 }
 
@@ -1357,7 +1357,7 @@ void FillArray(byte* instance, Field field, JsonValue value)
     bool made = false;
     if (array == null)
     {
-        array = Reflection.NewArray(field, value.Items.Count);
+        array = Reflection.CreateArray(field, value.Items.Count);
         if (array == null)
             return;
 
@@ -1368,12 +1368,12 @@ void FillArray(byte* instance, Field field, JsonValue value)
         made = true;
     }
 
-    nuint length = Reflection.ArrayLength(array);
+    nuint length = Reflection.GetArrayLength(array);
     int kind = field.ElementKind;
 
     for (nuint i = 0u; i < value.Items.Count && i < length; i++)
     {
-        byte* at = Reflection.ElementAt(array, field, i);
+        byte* at = Reflection.GetElementAddress(array, field, i);
         var item = value.Items[i];
 
         if (kind == KindString)
@@ -1407,7 +1407,7 @@ void FillArray(byte* instance, Field field, JsonValue value)
             if (made)
             {
                 if (nested == null)
-                    nested = MakeElementAt(at, field.ElementType);
+                    nested = CreateElementAt(at, field.ElementType);
                 if (nested != null)
                     ClearTextFields(nested, field.ElementType);
             }
@@ -1425,9 +1425,9 @@ void FillArray(byte* instance, Field field, JsonValue value)
 
 /// Makes a zeroed object of `type` into an empty class element, answering it.
 /// The element takes the allocation's reference, so nothing is released.
-byte* MakeElementAt(byte* at, Type type)
+byte* CreateElementAt(byte* at, Type type)
 {
-    byte* element = Reflection.Make(type);
+    byte* element = Reflection.CreateInstance(type);
     if (element == null)
         return null;
 
@@ -1441,7 +1441,7 @@ void ClearTextFields(byte* instance, Type type)
 {
     for (nuint i = 0u; i < type.FieldCount; i++)
     {
-        var field = type.FieldAt(i);
+        var field = type.GetFieldAt(i);
         if (field.Kind == KindString)
             Reflection.WriteText(instance, field, "");
     }

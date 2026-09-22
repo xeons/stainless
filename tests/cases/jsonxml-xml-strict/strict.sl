@@ -26,10 +26,10 @@ void Round(String label, String source)
     var parsed = Xml.Parse(source);
     if (!parsed.Ok)
     {
-        Say(label, "failed: " + Xml.Describe(parsed.Error));
+        Say(label, "failed: " + Xml.DescribeXmlError(parsed.Error));
         return;
     }
-    Say(label, Visible(Xml.Write(parsed.Value)));
+    Say(label, Visible(Xml.ToXmlText(parsed.Value)));
 }
 
 void TextOf(String label, String source)
@@ -37,7 +37,7 @@ void TextOf(String label, String source)
     var parsed = Xml.Parse(source);
     if (!parsed.Ok)
     {
-        Say(label, "failed: " + Xml.Describe(parsed.Error));
+        Say(label, "failed: " + Xml.DescribeXmlError(parsed.Error));
         return;
     }
     Say(label, "[" + Visible(parsed.Value.Text) + "]");
@@ -48,7 +48,7 @@ void AttributeOf(String label, String source)
     var parsed = Xml.Parse(source);
     if (!parsed.Ok)
     {
-        Say(label, "failed: " + Xml.Describe(parsed.Error));
+        Say(label, "failed: " + Xml.DescribeXmlError(parsed.Error));
         return;
     }
     Say(label, "[" + Visible(parsed.Value.Attributes.Find("x", "?")) + "]");
@@ -62,7 +62,7 @@ void Refuse(String label, String source)
         Say(label, "accepted, and should not have been");
         return;
     }
-    Say(label, Xml.Describe(parsed.Error));
+    Say(label, Xml.DescribeXmlError(parsed.Error));
 }
 
 /// Writes indented, reads that back, and writes it again: the two MUST match.
@@ -71,19 +71,19 @@ void Settle(String label, String source)
     var first = Xml.Parse(source);
     if (!first.Ok)
     {
-        Say(label, "failed: " + Xml.Describe(first.Error));
+        Say(label, "failed: " + Xml.DescribeXmlError(first.Error));
         return;
     }
 
-    var once = Xml.WriteIndented(first.Value);
+    var once = Xml.ToXmlTextIndented(first.Value);
     var second = Xml.Parse(once);
     if (!second.Ok)
     {
-        Say(label, "failed to read back: " + Xml.Describe(second.Error));
+        Say(label, "failed to read back: " + Xml.DescribeXmlError(second.Error));
         return;
     }
 
-    var twice = Xml.WriteIndented(second.Value);
+    var twice = Xml.ToXmlTextIndented(second.Value);
     Say(label, Visible(once) + (once == twice ? " (stable)" : " (grew: " + Visible(twice) + ")"));
 }
 
@@ -169,11 +169,11 @@ public int Main()
 
     // --------------------------------------------------------- the mapping
     var service = new Service();
-    var failure = Xml.Populate(service,
+    var failure = Xml.PopulateObject(service,
         "<Service Weight=\" 3 \">\r\n  <Port>\r\n 8080\r\n</Port>\r\n" +
         "  <Enabled> true </Enabled>\r\n  <Ratio> 0.5 </Ratio>\r\n" +
         "  <Count>\n7\n</Count>\r\n</Service>");
-    Say("populate", Xml.Describe(failure));
+    Say("populate", Xml.DescribeXmlError(failure));
     Say("trimmed", Xml.Serialize(service, "Service"));
 
     // A double with no finite value is written in XML Schema's spelling, and
@@ -184,20 +184,20 @@ public int Main()
     var written = Xml.Serialize(odd, "Service");
     Say("infinite", written);
     var back = new Service();
-    Xml.Populate(back, written);
+    Xml.PopulateObject(back, written);
     Say("infinite-back", Xml.Serialize(back, "Service"));
 
     odd.Ratio = zero / zero;
     written = Xml.Serialize(odd, "Service");
     Say("nan", written);
     var nan = new Service();
-    Xml.Populate(nan, written);
+    Xml.PopulateObject(nan, written);
     Say("nan-back", nan.Ratio != nan.Ratio ? "NaN" : "not NaN");
 
     // A numeral past what a double holds is not read as an infinity.
     var over = new Service();
     over.Ratio = 2.0;
-    Xml.Populate(over, "<Service><Ratio>1e400</Ratio></Service>");
+    Xml.PopulateObject(over, "<Service><Ratio>1e400</Ratio></Service>");
     Say("overflow", Xml.Serialize(over, "Service"));
 
     return 0;

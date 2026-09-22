@@ -108,20 +108,20 @@ public struct BuildMessage
         }
 
         var members = document.Members;
-        if (!members.Has("severity"))
+        if (!members.ContainsKey("severity"))
         {
             made.Message = line;
             return made;
         }
 
         made.IsDiagnostic = true;
-        made.Message = Json.TextOr(members.Find("message"), "");
-        made.Code = Json.TextOr(members.Find("code"), "");
-        made.IsError = Json.TextOr(members.Find("severity"), "") == "error";
-        made.File = Json.TextOr(members.Find("file"), "");
-        made.Line = (nuint)Json.IntegerOr(members.Find("line"), 0);
-        made.Column = (nuint)Json.IntegerOr(members.Find("column"), 0);
-        made.Length = (nuint)Json.IntegerOr(members.Find("length"), 0);
+        made.Message = Json.GetTextOrDefault(members.Find("message"), "");
+        made.Code = Json.GetTextOrDefault(members.Find("code"), "");
+        made.IsError = Json.GetTextOrDefault(members.Find("severity"), "") == "error";
+        made.File = Json.GetTextOrDefault(members.Find("file"), "");
+        made.Line = (nuint)Json.GetIntegerOrDefault(members.Find("line"), 0);
+        made.Column = (nuint)Json.GetIntegerOrDefault(members.Find("column"), 0);
+        made.Length = (nuint)Json.GetIntegerOrDefault(members.Find("length"), 0);
         return made;
     }
 

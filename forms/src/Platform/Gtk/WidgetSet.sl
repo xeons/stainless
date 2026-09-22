@@ -534,7 +534,7 @@ public class GtkWidgetSet : IWidgetSet
     ///
     /// **The resource is not a file.** `rc` strips the 14-byte
     /// `BITMAPFILEHEADER` because Windows never wants it, and every decoder
-    /// that is not Windows does -- so `Resources.BitmapFile` puts it back and
+    /// that is not Windows does -- so `Resources.GetBitmapFile` puts it back and
     /// what arrives here is a whole `.bmp`. Then it is fed to a
     /// `GdkPixbufLoader` rather than `gdk_pixbuf_new_from_file`, because there
     /// is no file: the bytes came out of this binary's `.rsrc` section.
@@ -547,7 +547,7 @@ public class GtkWidgetSet : IWidgetSet
     {
         Start();
 
-        var whole = Resources.BitmapFile(id);
+        var whole = Resources.GetBitmapFile(id);
         if (whole.Length == 0)
         {
             return Fail($"this program has no bitmap resource with id {id}");

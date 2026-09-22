@@ -93,7 +93,7 @@ public int Main()
     var names = new StringBuilder();
     for (nuint i = 0u; i < type.PropertyCount; i = i + 1u)
     {
-        var property = type.PropertyAt(i);
+        var property = type.GetPropertyAt(i);
         if (i > 0u)
             names.Append(",");
         names.Append(property.Name);
@@ -109,7 +109,7 @@ public int Main()
     var fields = new StringBuilder();
     for (nuint i = 0u; i < type.FieldCount; i = i + 1u)
     {
-        var field = type.FieldAt(i);
+        var field = type.GetFieldAt(i);
         if (i > 0u)
             fields.Append(",");
         fields.Append(field.Name);
@@ -172,7 +172,7 @@ public int Main()
     {
         if (i > 0u)
             inherited.Append(",");
-        inherited.Append(panelType.PropertyAt(i).Name);
+        inherited.Append(panelType.GetPropertyAt(i).Name);
     }
     Say("panel", inherited.ToText());
 

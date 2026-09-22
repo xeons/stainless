@@ -335,15 +335,15 @@ public DockLayout ParseLayout(String text)
     var layout = new DockLayout();
 
     if (members.IndexOf("left") is Some left)
-        layout.LeftWidth = (int)Json.IntegerOr(members.ValueAt(left.Value), (long)layout.LeftWidth);
+        layout.LeftWidth = (int)Json.GetIntegerOrDefault(members.GetValueAt(left.Value), (long)layout.LeftWidth);
     if (members.IndexOf("right") is Some right)
-        layout.RightWidth = (int)Json.IntegerOr(members.ValueAt(right.Value), (long)layout.RightWidth);
+        layout.RightWidth = (int)Json.GetIntegerOrDefault(members.GetValueAt(right.Value), (long)layout.RightWidth);
     if (members.IndexOf("bottom") is Some bottom)
-        layout.BottomHeight = (int)Json.IntegerOr(members.ValueAt(bottom.Value), (long)layout.BottomHeight);
+        layout.BottomHeight = (int)Json.GetIntegerOrDefault(members.GetValueAt(bottom.Value), (long)layout.BottomHeight);
 
     if (members.IndexOf("panes") is Some at)
     {
-        var value = members.ValueAt(at.Value);
+        var value = members.GetValueAt(at.Value);
         if (value.Array)
         {
             var items = value.Items;
@@ -356,17 +356,17 @@ public DockLayout ParseLayout(String text)
                 var inside = item.Members;
                 if (inside.IndexOf("name") is Some named)
                 {
-                    String name = Json.TextOr(inside.ValueAt(named.Value), "");
+                    String name = Json.GetTextOrDefault(inside.GetValueAt(named.Value), "");
                     if (name == "")
                         continue;
 
                     DockEdge edge = DockEdge.Document;
                     if (inside.IndexOf("edge") is Some where)
-                        edge = ParseEdgeName(Json.TextOr(inside.ValueAt(where.Value), "document"));
+                        edge = ParseEdgeName(Json.GetTextOrDefault(inside.GetValueAt(where.Value), "document"));
 
                     bool pinned = true;
                     if (inside.IndexOf("pinned") is Some held)
-                        pinned = Json.BoolOr(inside.ValueAt(held.Value), true);
+                        pinned = Json.GetBoolOrDefault(inside.GetValueAt(held.Value), true);
 
                     var place = layout.PlacePane(name, edge, pinned);
                     place.Order = i;
@@ -389,9 +389,9 @@ public DockLayout ParseLayout(String text)
 public String SerializeLayout(DockLayout layout)
 {
     var members = new JsonObject();
-    members.Add("left", Json.NumberOf((long)layout.LeftWidth));
-    members.Add("right", Json.NumberOf((long)layout.RightWidth));
-    members.Add("bottom", Json.NumberOf((long)layout.BottomHeight));
+    members.Add("left", Json.CreateJsonNumber((long)layout.LeftWidth));
+    members.Add("right", Json.CreateJsonNumber((long)layout.RightWidth));
+    members.Add("bottom", Json.CreateJsonNumber((long)layout.BottomHeight));
 
     var panes = new List<JsonValue>();
     AppendEdgePlacements(panes, layout, DockEdge.Left);
@@ -400,7 +400,7 @@ public String SerializeLayout(DockLayout layout)
     AppendEdgePlacements(panes, layout, DockEdge.Document);
 
     members.Add("panes", JsonValue.Array(panes));
-    return Json.WriteIndented(JsonValue.Object(members));
+    return Json.ToJsonTextIndented(JsonValue.Object(members));
 }
 
 /// Written edge by edge rather than in the order the panes were added, so that

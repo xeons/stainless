@@ -105,12 +105,12 @@ var type = typeof(Person);
 type.Name;                         // "App.Person"
 type.FieldCount;
 
-var field = type.FieldAt(0);
+var field = type.GetFieldAt(0);
 field.Name;                        // "Name"
 field.Offset;                      // 24, past the object header
 field.Kind;                        // KindString
-field.Has("JsonName");
-field.Get("JsonName").AsText(0);   // "full_name"
+field.HasAttribute("JsonName");
+field.GetAttribute("JsonName").GetText(0);   // "full_name"
 ```
 
 Values are read from an instance by offset. That needs the object as a raw
@@ -138,8 +138,8 @@ public String ToJson<T>(T value)
     ...
     for (nuint i = 0; i < type.FieldCount; i++)
     {
-        var field = type.FieldAt(i);
-        if (field.Has("JsonIgnore"))
+        var field = type.GetFieldAt(i);
+        if (field.HasAttribute("JsonIgnore"))
             continue;
         ...
     }
@@ -203,7 +203,7 @@ the other direction, and it is a search:
 var type = FindType("App.Button");        // the qualified name
 if (type.Exists)
 {
-    byte* made = Make(type);
+    byte* made = CreateInstance(type);
     SetInteger(made, type.FindProperty("Left"), 40);
 }
 ```
@@ -218,7 +218,7 @@ A program that could name any type at run time would be a program whose linker
 could drop nothing, which is the trade `[Reflect]` exists to make explicit.
 
 Together with [§6.4.1](#641-properties-which-are-not-fields) that is enough to build an object graph from data: a
-document names a type, this finds it, `Make` allocates one and the property
+document names a type, this finds it, `CreateInstance` allocates one and the property
 table sets it up. What is still missing is a method — an event handler named
 by a document has nothing to resolve against, because methods carry no
 metadata.
@@ -260,14 +260,14 @@ and the four lines that do it live in one place. The bytes cross rather than
 the `String`, so no counted reference is ever in the ABI — the same bargain
 `ReadText` makes coming back.
 
-**A nested object is reached rather than copied.** `Field.TypeOf()` is the type
+**A nested object is reached rather than copied.** `Field.FieldType` is the type
 of what a field holds and `ReadAggregate` is its address, so a walk continues
 into a class or a struct without either being typed:
 
 ```csharp
 var field = type.FindField("Where");
 byte* nested = Reflection.ReadAggregate(raw, field);
-Reflection.WriteText(nested, field.TypeOf().FindField("City"), "London");
+Reflection.WriteText(nested, field.FieldType.FindField("City"), "London");
 ```
 
 **An array's elements are described too.** A field of type `T[]` records what
@@ -277,21 +277,21 @@ one possible without knowing `T` at compile time:
 ```csharp
 byte* array = Reflection.ReadArray(raw, field);
 
-for (nuint i = 0u; i < Reflection.ArrayLength(array); i++)
+for (nuint i = 0u; i < Reflection.GetArrayLength(array); i++)
 {
-    byte* at = Reflection.ElementAt(array, field, i);
+    byte* at = Reflection.GetElementAddress(array, field, i);
     Console.WriteLine(Reflection.ReadTextAt(at));
 }
 ```
 
-`ElementAt` is the data pointer plus the stride times the index, bounds
+`GetElementAddress` is the data pointer plus the stride times the index, bounds
 checked. The read and write pairs beside it take an address and a kind rather
 than an instance and a field, because an element has no `SlFieldInfo` of its
 own. A **slice** is deliberately not described: it is three words rather than a
 reference, so its elements are not where this arithmetic would look, and
 answering as though they were would be worse than answering nothing.
 
-`Reflection.Make(type)` allocates a zeroed instance and `MakeInto(instance,
+`Reflection.CreateInstance(type)` allocates a zeroed instance and `CreateInstanceInto(instance,
 field)` puts one straight into a class field, for a reader that has a document
 and a field holding nothing. **Every reference in what comes back starts
 null**, including one whose type says it cannot be — so it is safe to fill and

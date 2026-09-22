@@ -425,8 +425,8 @@ public String ToJson<T>(T value)
     var type = typeof(T);
     for (nuint i = 0; i < type.FieldCount; i++)
     {
-        var field = type.FieldAt(i);
-        if (field.Has("JsonIgnore"))
+        var field = type.GetFieldAt(i);
+        if (field.HasAttribute("JsonIgnore"))
             continue;
         ...
     }

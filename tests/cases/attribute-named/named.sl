@@ -44,7 +44,7 @@ public class Row
 /// A field nobody wrote a value for holds its type's default, and says so:
 /// there is no value in the binary for it, so its kind is `KindNone`.
 String Source(Attribute written, nuint index) =>
-    written.ValueKind(index) == KindNone ? " (default)" : "";
+    written.GetValueKind(index) == KindNone ? " (default)" : "";
 
 int Main()
 {
@@ -52,13 +52,13 @@ int Main()
 
     for (nuint i = 0u; i < type.FieldCount; i++)
     {
-        var field = type.FieldAt(i);
-        var column = field.Get("Column");
+        var field = type.GetFieldAt(i);
+        var column = field.GetAttribute("Column");
 
         Console.WriteLine($"{field.Name}: {column.ValueCount} values, " +
-                          $"name '{column.AsText(0u)}'{Source(column, 0u)}, " +
-                          $"width {column.Number(1u)}{Source(column, 1u)}, " +
-                          $"hidden {column.Number(2u)}{Source(column, 2u)}");
+                          $"name '{column.GetText(0u)}'{Source(column, 0u)}, " +
+                          $"width {column.GetNumber(1u)}{Source(column, 1u)}, " +
+                          $"hidden {column.GetNumber(2u)}{Source(column, 2u)}");
     }
 
     return 0;

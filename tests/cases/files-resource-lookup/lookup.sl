@@ -18,7 +18,7 @@ uint ReadU32(byte[] data, nuint at)
 
 void DescribeBitmap(String what, int id)
 {
-    var file = Resources.BitmapFile(id);
+    var file = Resources.GetBitmapFile(id);
     if (file.Length < 14u)
     {
         Console.WriteLine($"{what}: missing");
@@ -31,11 +31,11 @@ int Main()
 {
     Console.WriteLine($"as filed {Resources.Exists("TEXTBLOB", "GREETING")}");
     Console.WriteLine($"as written {Resources.Exists("TextBlob", "greeting")}");
-    Console.WriteLine($"lower {Resources.Bytes("textblob", "greeting").Length} bytes");
+    Console.WriteLine($"lower {Resources.GetBytes("textblob", "greeting").Length} bytes");
     Console.WriteLine($"other name {Resources.Exists("TextBlob", "farewell")}");
 
     Console.WriteLine($"empty exists {Resources.Exists(Resources.RcData, 302)}");
-    Console.WriteLine($"empty size {Resources.Size(Resources.RcData, 302)}");
+    Console.WriteLine($"empty size {Resources.GetSize(Resources.RcData, 302)}");
 
     DescribeBitmap("bitfields", 401);
     DescribeBitmap("core", 402);

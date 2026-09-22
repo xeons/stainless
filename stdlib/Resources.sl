@@ -27,8 +27,8 @@
 /// ```csharp
 /// import Standard.Resources;
 ///
-/// String ready = Resources.Text(201u);
-/// byte[] icon  = Resources.Bytes(Resources.Bitmap, 101);
+/// String ready = Resources.GetText(201u);
+/// byte[] icon  = Resources.GetBytes(Resources.Bitmap, 101);
 /// ```
 ///
 /// **The same answers on both platforms, by two different routes.** A PE has a
@@ -47,8 +47,8 @@
 /// outside Windows does. Those are readable here as bytes and mean nothing.
 ///
 /// **Nothing is freed.** A resource lives in the loaded image on both routes,
-/// so `Pointer` hands back memory that is already there and stays valid as long
-/// as the program runs. It must not be written through. `Bytes` copies, which
+/// so `GetPointer` hands back memory that is already there and stays valid as long
+/// as the program runs. It must not be written through. `GetBytes` copies, which
 /// is what anything outliving the call wants.
 module Standard.Resources;
 
@@ -161,12 +161,12 @@ nuint BlobSize() => (nuint)sl_resource_blob_size;
 /// A resource's bytes, found by walking the `.res` records.
 byte* FindBytes(int type, int id, uint* byteCount)
 {
-    return Walk(type, "", id, "", byteCount, true, true);
+    return WalkResourceTree(type, "", id, "", byteCount, true, true);
 }
 
 byte* FindNamedBytes(String type, String name, uint* byteCount)
 {
-    return Walk(0, type, 0, name, byteCount, false, false);
+    return WalkResourceTree(0, type, 0, name, byteCount, false, false);
 }
 
 // ------------------------------------------------------- the .res format
@@ -230,7 +230,7 @@ nuint SkipName(byte* blob, nuint at, nuint size, out bool isId, out int id, out 
 /// The resource compiler files a name in upper case and `FindResourceW`
 /// upper-cases the one it is asked for, so on Windows `greeting` finds
 /// `GREETING`. This answers the same.
-bool TextEquals(byte* blob, nuint at, String expected)
+bool IsNameEqual(byte* blob, nuint at, String expected)
 {
     nuint units = 0u;
     while (ReadU16(blob, at + units * 2u) != 0u)
@@ -242,7 +242,7 @@ bool TextEquals(byte* blob, nuint at, String expected)
 
 /// Walks the blob for one resource. A match is by number or by text on each
 /// half independently, which is what the two flags choose between.
-byte* Walk(int type, String typeName, int id, String name,
+byte* WalkResourceTree(int type, String typeName, int id, String name,
            uint* byteCount, bool typeIsNumber, bool nameIsNumber)
 {
     if (byteCount != null)
@@ -278,11 +278,11 @@ byte* Walk(int type, String typeName, int id, String name,
 
         bool typeMatches = typeIsNumber
             ? foundTypeIsId && foundTypeId == type
-            : !foundTypeIsId && TextEquals(blob, typeAt, typeName);
+            : !foundTypeIsId && IsNameEqual(blob, typeAt, typeName);
 
         bool nameMatches = nameIsNumber
             ? foundNameIsId && foundNameId == id
-            : !foundNameIsId && TextEquals(blob, nameAt, name);
+            : !foundNameIsId && IsNameEqual(blob, nameAt, name);
 
         // A null marker matches nothing, because its type is zero and no
         // resource is filed under it. An empty resource is still found, as
@@ -318,7 +318,7 @@ public bool Exists(String type, String name)
 }
 
 /// How many bytes a resource holds, or zero when there is none.
-public uint Size(int type, int id)
+public uint GetSize(int type, int id)
 {
     uint count = 0u;
     FindBytes(type, id, &count);
@@ -328,9 +328,9 @@ public uint Size(int type, int id)
 /// A pointer straight at a resource's bytes, without copying them.
 ///
 /// The memory belongs to the loaded image: read-only, never freed, and valid
-/// for as long as the program runs. `Bytes` is the one to use for anything that
+/// for as long as the program runs. `GetBytes` is the one to use for anything that
 /// outlives the call.
-public byte* Pointer(int type, int id, uint* byteCount)
+public byte* GetPointer(int type, int id, uint* byteCount)
 {
     return FindBytes(type, id, byteCount);
 }
@@ -339,22 +339,22 @@ public byte* Pointer(int type, int id, uint* byteCount)
 ///
 /// Empty when there is no such resource, which is also what an empty resource
 /// gives -- ask `Exists` where the difference matters.
-public byte[] Bytes(int type, int id)
+public byte[] GetBytes(int type, int id)
 {
     uint count = 0u;
     byte* at = FindBytes(type, id, &count);
-    return CopyOut(at, count);
+    return CopyBytesOut(at, count);
 }
 
 /// The same, for a resource named by text.
-public byte[] Bytes(String type, String name)
+public byte[] GetBytes(String type, String name)
 {
     uint count = 0u;
     byte* at = FindNamedBytes(type, name, &count);
-    return CopyOut(at, count);
+    return CopyBytesOut(at, count);
 }
 
-byte[] CopyOut(byte* at, uint count)
+byte[] CopyBytesOut(byte* at, uint count)
 {
     if (at == null || count == 0u)
         return new byte[0];
@@ -377,7 +377,7 @@ byte[] CopyOut(byte* at, uint count)
 /// platforms answer identically and so that Windows needs no user32.
 ///
 /// Empty for a number with no string, which is what `LoadStringW` answers too.
-public String Text(uint id)
+public String GetText(uint id)
 {
     uint count = 0u;
     byte* block = FindBytes(StringTable, (int)(id / 16u) + 1, &count);
@@ -426,9 +426,9 @@ public String Text(uint id)
 /// entries are three bytes each.
 ///
 /// Empty when there is no such bitmap.
-public byte[] BitmapFile(int id)
+public byte[] GetBitmapFile(int id)
 {
-    var stored = Bytes(Bitmap, id);
+    var stored = GetBytes(Bitmap, id);
     if (stored.Length < 12u)
         return new byte[0];
 

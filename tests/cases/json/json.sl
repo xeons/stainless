@@ -22,10 +22,10 @@ void Round(String label, String text)
     var parsed = Json.Parse(text);
     if (!parsed.Ok)
     {
-        Say(label, "failed: " + Json.Describe(parsed.Error));
+        Say(label, "failed: " + Json.DescribeJsonError(parsed.Error));
         return;
     }
-    Say(label, Json.Write(parsed.Value));
+    Say(label, Json.ToJsonText(parsed.Value));
 }
 
 void Refuse(String label, String text)
@@ -36,7 +36,7 @@ void Refuse(String label, String text)
         Say(label, "accepted, and should not have been");
         return;
     }
-    Say(label, Json.Describe(parsed.Error));
+    Say(label, Json.DescribeJsonError(parsed.Error));
 }
 
 // ---------------------------------------------------------------- the mapping
@@ -168,23 +168,23 @@ public int Main()
     Refuse("comma-only", "[1,]");
 
     // ---------------------------------------------------------- the document
-    var built = Json.NewObject();
-    var members = Json.MembersOf(built);
+    var built = Json.CreateJsonObject();
+    var members = Json.GetMembers(built);
     members.Add("name", JsonValue.Text("built by hand"));
-    members.Add("count", Json.NumberOf(3));
+    members.Add("count", Json.CreateJsonNumber(3));
 
-    var items = Json.NewArray();
-    Json.ItemsOf(items).Add(JsonValue.Bool(true));
-    Json.ItemsOf(items).Add(JsonValue.Null);
+    var items = Json.CreateJsonArray();
+    Json.GetItems(items).Add(JsonValue.Bool(true));
+    Json.GetItems(items).Add(JsonValue.Null);
     members.Add("items", items);
 
-    Say("built", Json.Write(built));
-    Say("found", Json.TextOr(members.Find("name"), "?"));
-    Say("missing", Json.TextOr(members.Find("nope"), "(default)"));
-    Say("as-number", Text.FromInteger(Json.IntegerOr(members.Find("count"), 0)));
+    Say("built", Json.ToJsonText(built));
+    Say("found", Json.GetTextOrDefault(members.Find("name"), "?"));
+    Say("missing", Json.GetTextOrDefault(members.Find("nope"), "(default)"));
+    Say("as-number", Text.FromInteger(Json.GetIntegerOrDefault(members.Find("count"), 0)));
 
     Console.WriteLine("indented =");
-    Console.WriteLine(Json.WriteIndented(built));
+    Console.WriteLine(Json.ToJsonTextIndented(built));
 
     // ----------------------------------------------------------- serializing
     var person = new Person();
@@ -201,12 +201,12 @@ public int Main()
 
     // --------------------------------------------------------- deserializing
     var loaded = new Person();
-    var failure = Json.Populate(loaded,
+    var failure = Json.PopulateObject(loaded,
         "{\"Name\":\"Grace Hopper\",\"Years\":85,\"Active\":false," +
         "\"Rating\":10.0,\"id\":1906,\"Secret\":7," +
         "\"Where\":{\"City\":\"New York\",\"Country\":\"USA\"}}");
 
-    Say("populate", Json.Describe(failure));
+    Say("populate", Json.DescribeJsonError(failure));
     Say("round-tripped", Json.Serialize(loaded));
 
     // `Secret` is ignored in both directions, so the constructor's value stands
@@ -216,26 +216,26 @@ public int Main()
     // A field the document leaves out keeps what the constructor gave it.
     var partial = new Person();
     partial.Name = "unchanged";
-    Json.Populate(partial, "{\"Years\":1}");
+    Json.PopulateObject(partial, "{\"Years\":1}");
     Say("partial", partial.Name + "/" + Text.FromInteger((long)partial.Years));
 
     // A document of the wrong shape is refused rather than half-applied.
-    Say("not-an-object", Json.Describe(Json.Populate(partial, "[1,2]")));
-    Say("bad-document", Json.Describe(Json.Populate(partial, "{")));
+    Say("not-an-object", Json.DescribeJsonError(Json.PopulateObject(partial, "[1,2]")));
+    Say("bad-document", Json.DescribeJsonError(Json.PopulateObject(partial, "{")));
 
     // And a value of the wrong type for its field is skipped, which leaves the
     // field as it was rather than guessing at a conversion.
     var typed = new Person();
     typed.Years = 5;
-    Json.Populate(typed, "{\"Years\":\"not a number\",\"Name\":123}");
+    Json.PopulateObject(typed, "{\"Years\":\"not a number\",\"Name\":123}");
     Say("wrong-types", typed.Name + "/" + Text.FromInteger((long)typed.Years));
 
     // A document read into an object made for it, which is the whole of what
     // deserializing is here: there is no `Deserialize<Person>(text)`, because
     // a type argument cannot be written at a call.
     var made = new Person();
-    var madeFailure = Json.Populate(made, "{\"Name\":\"Alan Turing\",\"Years\":41}");
-    Say("deserialized", Json.Describe(madeFailure) + "/" + made.Name + "/"
+    var madeFailure = Json.PopulateObject(made, "{\"Name\":\"Alan Turing\",\"Years\":41}");
+    Say("deserialized", Json.DescribeJsonError(madeFailure) + "/" + made.Name + "/"
         + Text.FromInteger((long)made.Years) + "/[" + made.Where.City + "]");
 
     var bag = new Bag();
@@ -246,25 +246,25 @@ public int Main()
     // Read back into an array the object already has. A document with more
     // elements than the array fills what fits; one with fewer leaves the rest.
     var filled = new Bag();
-    Json.Populate(filled, "{\"Tags\":[\"one\",\"two\",\"three\"]}");
+    Json.PopulateObject(filled, "{\"Tags\":[\"one\",\"two\",\"three\"]}");
     Say("array-longer", Json.Serialize(filled));
 
     var shorter = new Bag();
     shorter.Tags[0u] = "kept";
-    Json.Populate(shorter, "{\"Tags\":[]}");
+    Json.PopulateObject(shorter, "{\"Tags\":[]}");
     Say("array-shorter", Json.Serialize(shorter));
 
     // An array the constructor never made. The elements have already been
     // parsed by the time this is reached, so taking the length from the
     // document costs an allocation the document has paid for.
     var sparse = new Sparse();
-    Json.Populate(sparse, "{\"Tags\":[\"a\",\"b\",\"c\"],\"Counts\":[4,5]}");
+    Json.PopulateObject(sparse, "{\"Tags\":[\"a\",\"b\",\"c\"],\"Counts\":[4,5]}");
     Say("array-null", Json.Serialize(sparse));
 
     // And an empty one is still an array rather than a null, so a reader can
     // tell "the document said none" from "the document said nothing".
     var none = new Sparse();
-    Json.Populate(none, "{\"Tags\":[]}");
+    Json.PopulateObject(none, "{\"Tags\":[]}");
     Say("array-empty", Json.Serialize(none));
 
     // A file with a UTF-8 byte order mark in front of it, which is what
@@ -274,7 +274,7 @@ public int Main()
     // that looks perfectly correct in every editor.
     String marked = "﻿{\"Tags\":[\"x\"]}";
     var withMark = new Sparse();
-    Json.Populate(withMark, marked);
+    Json.PopulateObject(withMark, marked);
     Say("bom", Json.Serialize(withMark));
 
     // And one that is *only* a mark is still an empty document, not a value.

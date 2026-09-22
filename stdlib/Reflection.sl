@@ -154,7 +154,7 @@ public const int KindPointer   = 15;
 /// A `String`. Read and written by value, through
 /// `ReadText` and `WriteText`.
 public const int KindString    = 16;
-/// A class reference. `TypeOf()` gives the type to walk
+/// A class reference. `FieldType` gives the type to walk
 /// into, and the value can be null.
 public const int KindClass     = 17;
 /// An interface reference, walked like a class.
@@ -188,11 +188,11 @@ public struct Attribute
     public nuint ValueCount => sl_attribute_value_count(Handle);
 
     /// Which kind the value at `index` is -- one of the `Kind` constants --
-    /// so a reader knows whether to call `AsText` or `Number`.
-    public int ValueKind(nuint index) => (int)sl_attribute_value_kind(Handle, index);
+    /// so a reader knows whether to call `GetText` or `GetNumber`.
+    public int GetValueKind(nuint index) => (int)sl_attribute_value_kind(Handle, index);
 
-    /// The value as text. Only meaningful when ValueKind is KindString.
-    public String AsText(nuint index)
+    /// The value as text. Only meaningful when GetValueKind is KindString.
+    public String GetText(nuint index)
     {
         return Text.FromNullTerminated(sl_attribute_value_text(Handle, index));
     }
@@ -200,7 +200,7 @@ public struct Attribute
     /// The value as a whole number. Meaningful for the integer kinds and for
     /// `KindBool`, where one is true; zero for anything else, including a
     /// string, rather than a reinterpretation of its pointer.
-    public long Number(nuint index) => sl_attribute_value_number(Handle, index);
+    public long GetNumber(nuint index) => sl_attribute_value_number(Handle, index);
 }
 
 // -------------------------------------------------------------------- fields
@@ -232,7 +232,7 @@ public struct Field
     public nuint AttributeCount => sl_field_attribute_count(Handle);
 
     /// The attribute at `index`, in the order they were written.
-    public Attribute AttributeAt(nuint index)
+    public Attribute GetAttributeAt(nuint index)
     {
         Attribute result;
         result.Handle = sl_field_attribute(Handle, index);
@@ -251,26 +251,26 @@ public struct Field
     public bool IsPropertyStorage => (sl_field_flags(Handle) & 1u) != 0u;
 
     /// True when an attribute of this name is written on the field.
-    public bool Has(String name)
+    public bool HasAttribute(String name)
     {
         for (nuint i = 0; i < AttributeCount; i++)
         {
-            if (AttributeAt(i).Name == name)
+            if (GetAttributeAt(i).Name == name)
                 return true;
         }
         return false;
     }
 
     /// The named attribute, if it is present. Check Has first.
-    public Attribute Get(String name)
+    public Attribute GetAttribute(String name)
     {
         for (nuint i = 0; i < AttributeCount; i++)
         {
-            var candidate = AttributeAt(i);
+            var candidate = GetAttributeAt(i);
             if (candidate.Name == name)
                 return candidate;
         }
-        return AttributeAt(0);
+        return GetAttributeAt(0);
     }
 
     /// True for a field whose value can be read as a whole number.
@@ -296,7 +296,7 @@ public struct Field
 
     /// True for a field this module can read and write by value: a number, a
     /// bool or a String. Everything else is an aggregate, reached through
-    /// `TypeOf()` and walked rather than copied.
+    /// `FieldType` and walked rather than copied.
     public bool IsSimple
     {
         get
@@ -311,11 +311,14 @@ public struct Field
     /// `Kind` is the whole of what there is to know. It is what makes a
     /// nested object reachable: with the address of the field and the type of
     /// what is in it, the walk continues without any of it being typed.
-    public Type TypeOf()
+    public Type FieldType
     {
-        Type result;
-        result.Handle = sl_field_type(Handle);
-        return result;
+        get
+        {
+            Type result;
+            result.Handle = sl_field_type(Handle);
+            return result;
+        }
     }
 
     /// True when this field holds something with fields of its own.
@@ -365,8 +368,8 @@ public struct Field
         {
             if (!IsAggregate)
                 return false;
-            var inner = TypeOf();
-            return inner.Exists && inner.Has("Reflect");
+            var inner = FieldType;
+            return inner.Exists && inner.HasAttribute("Reflect");
         }
     }
 }
@@ -413,18 +416,21 @@ public struct Property
 
     /// The type of an aggregate property, for walking into it. A handle of
     /// null for a primitive.
-    public Type TypeOf()
+    public Type PropertyType
     {
-        Type result;
-        result.Handle = sl_property_type(Handle);
-        return result;
+        get
+        {
+            Type result;
+            result.Handle = sl_property_type(Handle);
+            return result;
+        }
     }
 
     /// How many attributes are written on the property.
     public nuint AttributeCount => sl_property_attribute_count(Handle);
 
     /// The attribute at `index`, in the order they were written.
-    public Attribute AttributeAt(nuint index)
+    public Attribute GetAttributeAt(nuint index)
     {
         Attribute result;
         result.Handle = sl_property_attribute(Handle, index);
@@ -432,11 +438,11 @@ public struct Property
     }
 
     /// True when an attribute of this name is written on the property.
-    public bool Has(String name)
+    public bool HasAttribute(String name)
     {
         for (nuint i = 0u; i < AttributeCount; i++)
         {
-            if (AttributeAt(i).Name == name)
+            if (GetAttributeAt(i).Name == name)
                 return true;
         }
         return false;
@@ -559,8 +565,8 @@ public void SetAggregate(byte* instance, Property property, byte* value)
 
 /// One type, and the way into everything it declares.
 ///
-/// Got from `typeof(T)`, from `FindType` by name, or from a field's or
-/// property's `TypeOf()`. Only a class or struct marked `[Reflect]` carries
+/// Got from `typeof(T)`, from `FindType` by name, or from a field's `FieldType` or a
+/// property's `PropertyType`. Only a class or struct marked `[Reflect]` carries
 /// metadata, and what it carries is its fields, properties and attributes;
 /// methods are not described, so there is nothing here to call.
 public struct Type
@@ -581,7 +587,7 @@ public struct Type
     public nuint FieldCount => sl_type_field_count(Handle);
 
     /// The field at `index`, in declaration order with inherited fields first.
-    public Field FieldAt(nuint index)
+    public Field GetFieldAt(nuint index)
     {
         Field result;
         result.Handle = sl_type_field(Handle, index);
@@ -592,14 +598,14 @@ public struct Type
     public nuint AttributeCount => sl_type_attribute_count(Handle);
 
     /// The attribute at `index`, in the order they were written.
-    public Attribute AttributeAt(nuint index)
+    public Attribute GetAttributeAt(nuint index)
     {
         Attribute result;
         result.Handle = sl_type_attribute(Handle, index);
         return result;
     }
 
-    /// True when this handle names a type at all. A `TypeOf()` on a primitive
+    /// True when this handle names a type at all. A `FieldType` on a primitive
     /// field answers false.
     public bool Exists => Handle != null;
 
@@ -609,7 +615,7 @@ public struct Type
     {
         for (nuint i = 0u; i < FieldCount; i++)
         {
-            var field = FieldAt(i);
+            var field = GetFieldAt(i);
             if (field.Name == name)
                 return field;
         }
@@ -620,11 +626,11 @@ public struct Type
     }
 
     /// True when the type carries an attribute of that name.
-    public bool Has(String name)
+    public bool HasAttribute(String name)
     {
         for (nuint i = 0u; i < AttributeCount; i++)
         {
-            if (AttributeAt(i).Name == name)
+            if (GetAttributeAt(i).Name == name)
                 return true;
         }
         return false;
@@ -642,7 +648,7 @@ public struct Type
 
     /// The property at `index`. An overridden property appears once, at the
     /// position the base gave it, carrying the derived accessors.
-    public Property PropertyAt(nuint index)
+    public Property GetPropertyAt(nuint index)
     {
         Property result;
         result.Handle = sl_type_property(Handle, index);
@@ -654,7 +660,7 @@ public struct Type
     {
         for (nuint i = 0u; i < PropertyCount; i++)
         {
-            var property = PropertyAt(i);
+            var property = GetPropertyAt(i);
             if (property.Name == name)
                 return property;
         }
@@ -777,7 +783,7 @@ public void WriteText(byte* instance, Field field, String value)
 /// the trade `[Reflect]` exists to make explicit.
 ///
 ///     var type = FindType("App.Button");
-///     if (type.Exists) { byte* made = Make(type); }
+///     if (type.Exists) { byte* made = CreateInstance(type); }
 public Type FindType(String name)
 {
     Type result;
@@ -791,13 +797,13 @@ public Type FindType(String name)
 /// **Every reference field starts null**, including one whose type says it
 /// cannot be. What comes back is safe to fill and unsafe to hand out until it
 /// has been: prefer making the object the ordinary way and filling it, which
-/// is what `Json.Populate` does and why it is the one that needs no warning.
-public byte* Make(Type type)
+/// is what `Json.PopulateObject` does and why it is the one that needs no warning.
+public byte* CreateInstance(Type type)
 {
     return sl_type_make(type.Handle);
 }
 
-/// Points a reference field at an object made by `Make`, releasing whatever it
+/// Points a reference field at an object made by `CreateInstance`, releasing whatever it
 /// held. The field takes a reference of its own, so the caller still owns
 /// theirs.
 public void WriteAggregate(byte* instance, Field field, byte* value)
@@ -817,14 +823,14 @@ public void WriteAggregate(byte* instance, Field field, byte* value)
 /// It exists because a deserializer holding a document for a nested object,
 /// and a field holding nothing, otherwise has nowhere to put it. Use it where
 /// the document is the thing that decides, and prefer a constructor that made
-/// the object already: `Json.Populate` fills in place and only reaches for
+/// the object already: `Json.PopulateObject` fills in place and only reaches for
 /// this where a field is marked to say so.
-public byte* MakeInto(byte* instance, Field field)
+public byte* CreateInstanceInto(byte* instance, Field field)
 {
     if (field.Kind != KindClass)
         return null;
 
-    var inner = field.TypeOf();
+    var inner = field.FieldType;
     if (!inner.Exists)
         return null;
 
@@ -872,7 +878,7 @@ public byte* ReadArray(byte* instance, Field field)
 /// build recorded nothing for. `WriteAggregate` is what puts it in the field,
 /// and it retains -- so the caller still owns what it was given and the object
 /// owns what it now holds.
-public byte* NewArray(Field field, nuint count)
+public byte* CreateArray(Field field, nuint count)
 {
     if (field.Kind != KindArray)
         return null;
@@ -880,7 +886,7 @@ public byte* NewArray(Field field, nuint count)
 }
 
 /// How many elements an array has. Zero for null.
-public nuint ArrayLength(byte* array)
+public nuint GetArrayLength(byte* array)
 {
     if (array == null)
         return 0u;
@@ -890,7 +896,7 @@ public nuint ArrayLength(byte* array)
 /// The address of one element, or null when the array is null or the index is
 /// past its end. Checked rather than trusted: the caller is walking metadata,
 /// and an index that came from a document is not the program's.
-public byte* ElementAt(byte* array, Field field, nuint index)
+public byte* GetElementAddress(byte* array, Field field, nuint index)
 {
     if (array == null)
         return null;

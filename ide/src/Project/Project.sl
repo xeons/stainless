@@ -379,7 +379,7 @@ public Result<ProjectFile, String> ParseProjectFile(String text, String path)
 {
     var parsed = Json.Parse(text);
     if (!parsed.Ok)
-        return Fail("could not read '" + path + "': " + Json.Describe(parsed.Error));
+        return Fail("could not read '" + path + "': " + Json.DescribeJsonError(parsed.Error));
 
     var document = parsed.Value;
     if (!document.Object)
@@ -395,9 +395,9 @@ public Result<ProjectFile, String> ParseProjectFile(String text, String path)
         return Fail(unknown);
 
     var project = new ProjectFile();
-    var failed = Json.PopulateFrom(project, document);
+    var failed = Json.PopulateObject(project, document);
     if (failed != JsonError.None)
-        return Fail("'" + path + "': " + Json.Describe(failed));
+        return Fail("'" + path + "': " + Json.DescribeJsonError(failed));
 
     // The three lists are read by hand, and the reason is a rule rather than an
     // omission. `Populate` fills an array *in place*: the length is the one the
@@ -410,7 +410,7 @@ public Result<ProjectFile, String> ParseProjectFile(String text, String path)
     var sources = ReadTextArray(members, "sources", path);
     if (!sources.Ok)
         return Fail(sources.Error);
-    if (members.Has("sources"))
+    if (members.ContainsKey("sources"))
         project.Sources = sources.Value;
 
     var libraries = ReadTextArray(members, "libraries", path);
@@ -466,7 +466,7 @@ Result<String[], String> ReadTextArray(JsonObject members, String name, String p
 {
     if (members.IndexOf(name) is Some at)
     {
-        var value = members.ValueAt(at.Value);
+        var value = members.GetValueAt(at.Value);
         if (!value.Array)
             return Fail("'" + path + "': '" + name + "' is a list, [ ... ]");
 
@@ -495,7 +495,7 @@ Result<PlatformOverlay, String> ReadPlatformOverlay(JsonObject members, String p
 
     if (members.IndexOf(platform) is Some at)
     {
-        var value = members.ValueAt(at.Value);
+        var value = members.GetValueAt(at.Value);
         if (!value.Object)
         {
             return Fail("'" + path + "': '" + platform + "' is an object of what that "
@@ -534,7 +534,7 @@ Result<List<Dependency>, String> ReadDependencies(JsonObject members, String pat
 
     if (members.IndexOf("dependencies") is Some at)
     {
-        var value = members.ValueAt(at.Value);
+        var value = members.GetValueAt(at.Value);
         if (!value.Object)
         {
             return Fail("'" + path + "': 'dependencies' is an object of names, "
@@ -544,8 +544,8 @@ Result<List<Dependency>, String> ReadDependencies(JsonObject members, String pat
         var listed = value.Members;
         for (nuint i = 0u; i < listed.Count; i++)
         {
-            String name = listed.NameAt(i);
-            var entry = listed.ValueAt(i);
+            String name = listed.GetNameAt(i);
+            var entry = listed.GetValueAt(i);
 
             if (!entry.Object)
             {
@@ -559,7 +559,7 @@ Result<List<Dependency>, String> ReadDependencies(JsonObject members, String pat
                 return Fail(unknown);
 
             var made = new Dependency();
-            Json.PopulateFrom(made, entry);
+            Json.PopulateObject(made, entry);
             made.Name = name;
             answer.Add(made);
         }
@@ -576,7 +576,7 @@ String ReportUnknownField(JsonObject members, List<String> known, String kind, S
 {
     for (nuint i = 0u; i < members.Count; i++)
     {
-        String wrote = members.NameAt(i);
+        String wrote = members.GetNameAt(i);
         if (IsKnownName(known, wrote))
             continue;
 
@@ -683,10 +683,10 @@ List<String> ListKnownFields()
 
     for (nuint i = 0u; i < type.FieldCount; i++)
     {
-        var field = type.FieldAt(i);
-        if (field.Has("JsonIgnore"))
+        var field = type.GetFieldAt(i);
+        if (field.HasAttribute("JsonIgnore"))
             continue;
-        names.Add(field.Has("JsonName") ? field.Get("JsonName").AsText(0u) : field.Name);
+        names.Add(field.HasAttribute("JsonName") ? field.GetAttribute("JsonName").GetText(0u) : field.Name);
     }
 
     // The four the type does not carry, because reflection cannot fill any of
@@ -715,10 +715,10 @@ List<String> ListKnownDependencyFields()
 
     for (nuint i = 0u; i < type.FieldCount; i++)
     {
-        var field = type.FieldAt(i);
-        if (field.Has("JsonIgnore") || field.Name == "Name")
+        var field = type.GetFieldAt(i);
+        if (field.HasAttribute("JsonIgnore") || field.Name == "Name")
             continue;
-        names.Add(field.Has("JsonName") ? field.Get("JsonName").AsText(0u) : field.Name);
+        names.Add(field.HasAttribute("JsonName") ? field.GetAttribute("JsonName").GetText(0u) : field.Name);
     }
 
     return names;
@@ -737,14 +737,14 @@ public String SerializeProjectFile(ProjectFile project)
 {
     // The object is built and then wrapped, rather than made and reached
     // into: a variant's payload is not readable until something has
-    // established which case it is (SL0286), and `NewObject` answers a
+    // established which case it is (SL0286), and `CreateJsonObject` answers a
     // `JsonValue` that this would have to narrow first. Building the
     // `JsonObject` itself skips the question.
     var members = new JsonObject();
     var fresh = new ProjectFile();
 
     if (project.Format != fresh.Format)
-        members.Add("format", Json.NumberOf((long)project.Format));
+        members.Add("format", Json.CreateJsonNumber((long)project.Format));
 
     members.Add("name", JsonValue.Text(project.Name));
     members.Add("version", JsonValue.Text(project.Version));
@@ -769,14 +769,14 @@ public String SerializeProjectFile(ProjectFile project)
         members.Add("defines", CreateTextArray(project.Defines));
 
     if (project.Optimize != fresh.Optimize)
-        members.Add("optimize", Json.NumberOf((long)project.Optimize));
+        members.Add("optimize", Json.CreateJsonNumber((long)project.Optimize));
     if (project.Debug != fresh.Debug)
         members.Add("debug", JsonValue.Bool(project.Debug));
 
     AddTextMember(members, "abi", project.Abi, fresh.Abi);
     AddTextMember(members, "runtime", project.Runtime, fresh.Runtime);
 
-    return Json.WriteIndented(JsonValue.Object(members));
+    return Json.ToJsonTextIndented(JsonValue.Object(members));
 }
 
 /// Writes the project back where it came from.

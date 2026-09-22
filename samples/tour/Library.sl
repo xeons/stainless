@@ -341,10 +341,10 @@ void ShowLibrary()
     var document = Json.Parse("{\"name\":\"tour\",\"count\":3,\"on\":true}");
     if (document.Ok)
     {
-        var members = MembersOf(document.Value);
-        PrintValue("JSON", TextOr(members.Find("name"), "-"));
-        PrintValue("JSON number", IntegerOr(members.Find("count"), -1));
-        PrintValue("JSON round trip", Json.Write(document.Value));
+        var members = GetMembers(document.Value);
+        PrintValue("JSON", GetTextOrDefault(members.Find("name"), "-"));
+        PrintValue("JSON number", GetIntegerOrDefault(members.Find("count"), -1));
+        PrintValue("JSON round trip", Json.ToJsonText(document.Value));
     }
 
     var parsed = Xml.Parse("<tour kind=\"sample\"><part>one</part></tour>");
@@ -374,8 +374,8 @@ String DescribeValue<T>(T value)
 
     for (nuint i = 0u; i < type.FieldCount; i++)
     {
-        var field = type.FieldAt(i);
-        if (field.Has("Hidden"))
+        var field = type.GetFieldAt(i);
+        if (field.HasAttribute("Hidden"))
             continue;
 
         if (!first)
@@ -383,8 +383,8 @@ String DescribeValue<T>(T value)
         first = false;
 
         var name = field.Name;
-        if (field.Has("Column"))
-            name = field.Get("Column").AsText(0u);
+        if (field.HasAttribute("Column"))
+            name = field.GetAttribute("Column").GetText(0u);
 
         text.Append(name);
         text.Append("=");
@@ -441,8 +441,8 @@ void ShowReflection()
     PrintValue("property written", person.City);
 
     // The annotation travels with the storage.
-    PrintValue("attribute", type.FindField("Name").Get("Column").AsText(0u));
-    PrintValue("ignored", type.FindField("Internal").Has("Hidden"));
+    PrintValue("attribute", type.FindField("Name").GetAttribute("Column").GetText(0u));
+    PrintValue("ignored", type.FindField("Internal").HasAttribute("Hidden"));
 
     // And a type may be found by its name, which is what a loader needs.
     PrintValue("by name", FindType("Tour.Types.Person").Exists);
