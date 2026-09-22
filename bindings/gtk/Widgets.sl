@@ -217,22 +217,22 @@ public class Widget
 
     public void OnMouseDown(PointerHandler handler)
     {
-        ConnectEvent(handle, "button-press-event", PointerAdapter(handler));
+        ConnectEvent(handle, "button-press-event", CreatePointerAdapter(handler));
     }
 
     public void OnMouseUp(PointerHandler handler)
     {
-        ConnectEvent(handle, "button-release-event", PointerAdapter(handler));
+        ConnectEvent(handle, "button-release-event", CreatePointerAdapter(handler));
     }
 
     public void OnMouseMoved(PointerHandler handler)
     {
-        ConnectEvent(handle, "motion-notify-event", PointerAdapter(handler));
+        ConnectEvent(handle, "motion-notify-event", CreatePointerAdapter(handler));
     }
 
     public void OnKeyDown(KeyHandler handler)
     {
-        ConnectEvent(handle, "key-press-event", KeyAdapter(handler));
+        ConnectEvent(handle, "key-press-event", CreateKeyAdapter(handler));
     }
 }
 
@@ -871,7 +871,7 @@ public class MenuBar : Menu
     {
         var item = new MenuItem(label);
         item.SetSubmenu(menu);
-        Append(item);
+        AppendItem(item);
         return item;
     }
 }
