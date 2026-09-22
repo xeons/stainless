@@ -132,14 +132,19 @@ public Result<byte[], IOError> ReadAllBytes(String path)
     return Ok(exact);
 }
 
-/// The whole file as text, read as UTF-8.
+/// The whole file as text, read as UTF-8. A byte order mark at the start is
+/// dropped: it says how the text is stored and is not part of it.
 public Result<String, IOError> ReadAllText(String path)
 {
     var raw = try ReadAllBytes(path);
-    if (raw.Length == 0)
+
+    nuint start = 0u;
+    if (raw.Length >= 3u && raw[0u] == 0xEF && raw[1u] == 0xBB && raw[2u] == 0xBF)
+        start = 3u;
+    if (raw.Length == start)
         return Ok("");
 
-    return Ok(Text.FromBytes(&raw[0], raw.Length));
+    return Ok(Text.FromBytes(&raw[start], raw.Length - start));
 }
 
 /// The file's lines, with either line ending accepted and a trailing newline

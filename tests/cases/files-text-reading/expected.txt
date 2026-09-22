@@ -1,0 +1,8 @@
+all text: 7 bytes, starts hi true
+first line is hi: true, second 4 bytes
+bytes kept: 10
+reader first line is hi: true
+reader rest: 4 bytes
+reader error: no error
+broken line is null: true
+broken error: it failed for an unknown reason

@@ -127,6 +127,12 @@ public class StringReader : TextReader
 /// character when the next buffer arrives. That is what makes this a stream
 /// reader rather than a way of spelling `ReadToEnd`: a log being followed, or
 /// a file larger than memory, works.
+///
+/// A byte order mark at the very start is dropped, in whatever encoding: it
+/// says how the text is stored and is not part of the first line.
+///
+/// `ReadLine` answers null at the end and also when the stream fails; `Error`
+/// tells the two apart.
 public class StreamReader : TextReader
 {
     /// What .NET reads at a time, and for the same reason: large enough that
@@ -145,6 +151,8 @@ public class StreamReader : TextReader
 
     bool _ended;
     bool _closed;
+    bool _markChecked;
+    IOError _error;
 
     /// UTF-8, which is what a file without a preamble almost always is.
     public StreamReader(IStream stream)
@@ -157,6 +165,8 @@ public class StreamReader : TextReader
         _at = 0u;
         _ended = false;
         _closed = false;
+        _markChecked = false;
+        _error = IOError.None;
     }
 
     /// In a stated encoding, for a file that is not UTF-8 and says so
@@ -171,10 +181,16 @@ public class StreamReader : TextReader
         _at = 0u;
         _ended = false;
         _closed = false;
+        _markChecked = false;
+        _error = IOError.None;
     }
 
     /// The encoding the text is being read as.
     public IEncoding Encoding => _encoding;
+
+    /// Why the stream stopped, when it was a failure rather than the end.
+    /// `None` until then.
+    public IOError Error => _error;
 
     /// Reads one buffer and decodes it, answering whether anything new
     /// arrived. False means the stream is finished and the decoder flushed.
@@ -187,6 +203,7 @@ public class StreamReader : TextReader
         if (got == 0u)
         {
             _ended = true;
+            _error = _stream.Error;
 
             // The flush turns anything the decoder still holds into U+FFFD: a
             // file that stops mid-character is malformed, not unfinished.
@@ -195,6 +212,7 @@ public class StreamReader : TextReader
                 return false;
 
             _ready.Append(last);
+            this.DropByteOrderMark();
             return true;
         }
 
@@ -207,7 +225,24 @@ public class StreamReader : TextReader
             return true;
 
         _ready.Append(more);
+        this.DropByteOrderMark();
         return true;
+    }
+
+    /// Removes U+FEFF from the start of the text, once, when the first
+    /// decoded text arrives. The decoder hands back whole characters, so a
+    /// mark is never split across two calls.
+    void DropByteOrderMark()
+    {
+        if (_markChecked || _ready.ByteLength() == 0u)
+            return;
+        _markChecked = true;
+
+        if (_ready.ByteLength() >= 3u && _ready.ByteAt(0u) == 0xEF
+            && _ready.ByteAt(1u) == 0xBB && _ready.ByteAt(2u) == 0xBF)
+        {
+            _ready.Remove(0u, 3u);
+        }
     }
 
     /// Drops what has already been handed back, so a long read does not keep
