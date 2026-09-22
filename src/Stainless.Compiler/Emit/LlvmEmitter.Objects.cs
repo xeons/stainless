@@ -61,6 +61,33 @@ public sealed partial class LlvmEmitter
     }
 
     /// <summary>
+    /// <c>new Point(3, 4)</c>: a slot, zeroed, with the constructor run over
+    /// it.
+    ///
+    /// The slot is the value, as every struct expression's is, so there is no
+    /// allocation and no reference count. Zeroing first is what makes a field
+    /// the constructor did not write agree with what <c>Point value;</c> would
+    /// have left there.
+    /// </summary>
+    private Val EmitStructNew(BoundStructNew expression)
+    {
+        var structType = expression.StructType;
+
+        string slot = Alloca(StructName(structType), "struct.new");
+        Line($"store {StructName(structType)} zeroinitializer, ptr {slot}");
+
+        var arguments = new List<string> { $"ptr {slot}" };
+        AppendArguments(expression.Arguments, arguments);
+        Line($"call void {Symbol(expression.Constructor)}({string.Join(", ", arguments)})");
+
+        // What the constructor stored is owned by the slot, so the statement
+        // drops it the way it drops any other struct temporary.
+        if (structType.CarriesReferences()) TrackTemporary(slot, structType);
+
+        return new Val(slot, "ptr", structType);
+    }
+
+    /// <summary>
     /// Moves this module's live-com-object count, where it keeps one.
     ///
     /// Every com class instance is counted, not only an activated one: a class

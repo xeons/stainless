@@ -445,8 +445,8 @@ public sealed class MetadataLoader(
 
             switch (method.Kind)
             {
-                case FunctionKind.Constructor when symbol is ClassTypeSymbol constructed:
-                    constructed.Constructors.Add(declared);
+                case FunctionKind.Constructor:
+                    symbol.Constructors.Add(declared);
                     break;
 
                 case FunctionKind.Destructor when symbol is ClassTypeSymbol destroyed:

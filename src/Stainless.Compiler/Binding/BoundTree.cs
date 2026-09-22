@@ -736,6 +736,26 @@ public sealed class BoundNew(
     public IReadOnlyList<BoundExpression> Arguments { get; } = arguments;
 }
 
+/// <summary>
+/// Zeroes a slot and runs a struct's constructor over it; yields the value.
+///
+/// Nothing is allocated: a struct is a value, so the slot is the temporary the
+/// expression already needed. The zeroing is what makes a field the
+/// constructor did not write the zero it would have been in <c>T value;</c>,
+/// which is the only answer that keeps the two ways of making one agreeing.
+/// </summary>
+public sealed class BoundStructNew(
+    SourceSpan span,
+    StructTypeSymbol structType,
+    FunctionSymbol constructor,
+    IReadOnlyList<BoundExpression> arguments)
+    : BoundExpression(span, structType)
+{
+    public StructTypeSymbol StructType { get; } = structType;
+    public FunctionSymbol Constructor { get; } = constructor;
+    public IReadOnlyList<BoundExpression> Arguments { get; } = arguments;
+}
+
 /// <summary><c>*p</c></summary>
 public sealed class BoundDereference(SourceSpan span, TypeSymbol type, BoundExpression operand)
     : BoundExpression(span, type)

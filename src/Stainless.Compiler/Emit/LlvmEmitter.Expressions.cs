@@ -147,6 +147,7 @@ public sealed partial class LlvmEmitter
             case BoundPropertyAssignment written: return EmitPropertyAssignment(written);
             case BoundCall call: return EmitCall(call);
             case BoundNew newExpression: return EmitNew(newExpression);
+            case BoundStructNew filled: return EmitStructNew(filled);
             case BoundClosure closure: return EmitClosure(closure);
             case BoundNewArray newArray: return EmitNewArray(newArray);
             case BoundArrayLiteral literalArray: return EmitArrayLiteral(literalArray);

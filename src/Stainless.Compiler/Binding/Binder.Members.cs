@@ -620,12 +620,35 @@ public sealed partial class Binder
 
                 case ConstructorDeclSyntax constructor:
                 {
-                    if (classType is null)
+                    if (!CanBeConstructed(type))
                     {
                         diagnostics.Error("SL0207", constructor.Span,
-                            $"'{type.Name}' is a struct; structs are plain C values and have no constructors");
+                            $"'{type.Name}' is {DescribeKind(type)}, so it has no constructor; " +
+                            "only a class or a struct is made by writing 'new'");
                         break;
                     }
+
+                    // A struct declared and never constructed is its zero value,
+                    // and nothing runs for it. A constructor taking no arguments
+                    // would therefore run on some of them and not on others,
+                    // which is a rule a reader cannot see at the point of use.
+                    if (classType is null && constructor.Parameters.Count == 0)
+                    {
+                        diagnostics.Error("SL0738", constructor.Span,
+                            $"'{type.Name}' is a struct, so '{type.Name} value;' is its zero " +
+                            "value and runs nothing; a constructor taking no arguments would " +
+                            "run for some of them and not for others. Give it a parameter, or " +
+                            "let the zero value be what an unconstructed one is");
+                        break;
+                    }
+
+                    // A struct's receiver is its address, as every struct
+                    // method's is: the constructor fills in a slot the caller
+                    // already has rather than making one.
+                    TypeSymbol receiver = classType is not null
+                        ? classType
+                        : new PointerTypeSymbol(type);
+
                     var symbol = new FunctionSymbol
                     {
                         Name = "ctor",
@@ -639,9 +662,9 @@ public sealed partial class Binder
                         Scope = scope,
                         IsPublic = constructor.Modifiers.HasFlag(Modifiers.Public),
                     };
-                    symbol.Parameters.Add(new ParameterSymbol("this", classType, 0) { IsThis = true });
+                    symbol.Parameters.Add(new ParameterSymbol("this", receiver, 0) { IsThis = true });
                     AddParameters(symbol, constructor.Parameters, scope);
-                    classType.Constructors.Add(symbol);
+                    type.Constructors.Add(symbol);
                     break;
                 }
 
@@ -692,6 +715,28 @@ public sealed partial class Binder
 
         CheckOperatorPairs(type);
     }
+
+    /// <summary>
+    /// Whether <c>new</c> can make one of these, which is what decides whether
+    /// the type may declare a constructor.
+    ///
+    /// A class and a struct can. A union cannot, because which member is live
+    /// is exactly what it does not record, and a variant is made by naming the
+    /// case rather than the type.
+    /// </summary>
+    private static bool CanBeConstructed(NamedTypeSymbol type) =>
+        type is ClassTypeSymbol ||
+        type is StructTypeSymbol and not (UnionTypeSymbol or VariantTypeSymbol);
+
+    /// <summary>What a diagnostic calls this kind of type, article and all.</summary>
+    private static string DescribeKind(NamedTypeSymbol type) => type switch
+    {
+        UnionTypeSymbol => "a union",
+        VariantTypeSymbol => "a variant",
+        EnumTypeSymbol => "an enum",
+        InterfaceTypeSymbol => "an interface",
+        _ => "not a class or a struct",
+    };
 
     /// <summary>
     /// Gives a class with field initializers and no constructor one to run them

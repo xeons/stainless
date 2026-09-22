@@ -72,10 +72,14 @@ last person to edit it -- the suite is the authority.
   `struct` and nothing else. The generated C header states them with
   `#pragma pack` and an `SL_ALIGN` macro, and the sizes, alignments and offsets
   are checked against the target's own C compiler
-- `struct` with fields and methods; exact C layout; value copy semantics. A
-  struct may hold a reference, and copying one then retains what it holds — the
-  cost is that it is no longer a value C can be handed, which the compiler
-  checks at every `extern "C"` and `export "C"`
+- `struct` with fields, methods and constructors; exact C layout; value copy
+  semantics. `new Point(3, 4)` allocates nothing: the constructor runs over the
+  slot the expression needed, zeroed first, so a constructor adds no header and
+  no hidden field. One taking no arguments is refused, because `Point value;`
+  runs nothing and the zero value is what an unconstructed struct is. A struct
+  may hold a reference, and copying one then retains what it holds — the cost
+  is that it is no longer a value C can be handed, which the compiler checks at
+  every `extern "C"` and `export "C"`
 - `union`: C's, every member at offset zero, with the size and alignment C
   computes. No member may hold a counted reference, because a union does not
   record which one is live. `[Packed]` and `[Align]` apply as they do to a
@@ -123,8 +127,8 @@ last person to edit it -- the suite is the authority.
   satisfy -- so a record is a dictionary key with nothing said, which is most
   of what the form is for. `point with { Y = 9 }` makes a changed copy,
   evaluating its target once. There is no generated `ToString`, because the
-  language has none for any type, and no `record struct`, because a struct is a
-  plain C value with no constructor to generate
+  language has none for any type, and no `record struct`, because what makes a
+  record a key is the two interfaces it declares and a struct implements none
 - Single inheritance, the C# model: `virtual`, `override`, `abstract`,
   `sealed`, `protected`, `base.M()`, and `base(...)` chaining written either
   after the parameters as C# writes it -- `Square(double side) : base(4)` --

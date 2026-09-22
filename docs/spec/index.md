@@ -67,9 +67,10 @@ Primitives, `struct`, `class`, pointers, `variant`, `union`, `Result`, `interfac
 
 - [2.1 Primitives](02-types.md#21-primitives)
 - [2.2 `struct` — value type, C layout](02-types.md#22-struct--value-type-c-layout)
-  - [2.2.1 `struct HWND__;` — a type declared and not laid out](02-types.md#221-struct-hwnd__--a-type-declared-and-not-laid-out)
-  - [2.2.2 A type declared inside another](02-types.md#222-a-type-declared-inside-another)
-  - [2.2.3 `(int, String)` — a tuple](02-types.md#223-int-string--a-tuple)
+  - [2.2.1 A struct's constructor](02-types.md#221-a-structs-constructor)
+  - [2.2.2 `struct HWND__;` — a type declared and not laid out](02-types.md#222-struct-hwnd__--a-type-declared-and-not-laid-out)
+  - [2.2.3 A type declared inside another](02-types.md#223-a-type-declared-inside-another)
+  - [2.2.4 `(int, String)` — a tuple](02-types.md#224-int-string--a-tuple)
 - [2.3 `[Packed]` and `[Align]`](02-types.md#23-packed-and-align)
 - [2.4 `class` — reference type, ARC managed](02-types.md#24-class--reference-type-arc-managed)
   - [2.4.1 A field with a value](02-types.md#241-a-field-with-a-value)

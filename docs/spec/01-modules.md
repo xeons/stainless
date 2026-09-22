@@ -179,7 +179,7 @@ A ring of aliases names no type, and is refused whether or not anything uses it:
 error[SL0522]: 'Ring' is defined in terms of itself, so it names no type
 ```
 
-**Distinctness comes from the type, not the alias** — see [§2.2.1](02-types.md#221-struct-hwnd__--a-type-declared-and-not-laid-out).
+**Distinctness comes from the type, not the alias** — see [§2.2.2](02-types.md#222-struct-hwnd__--a-type-declared-and-not-laid-out).
 
 ## 1.6 Ambiguity
 

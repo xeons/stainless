@@ -818,14 +818,15 @@ public sealed class Parser
         var kind = TypeDeclKind.Class;
         if (At(TokenKind.StructKeyword))
         {
-            // A record is its constructor and a struct has none: a struct is a
-            // plain C value, which is what lets one cross to C at all. Giving
-            // structs constructors is a decision about structs rather than a
-            // consequence of this one, so it is not made here.
+            // A record is a key and a set element, and it is those by declaring
+            // IEquatable and IHashable. A struct implements no interface: an
+            // interface reference is counted and a struct has no header to
+            // count. What a record would be without them is a struct with a
+            // constructor, which is already writable.
             _diagnostics.Error("SL0734", SpanFrom(_pos),
-                "a struct is a plain C value and has no constructor, so there is no " +
-                "'record struct'; write 'record' for a class, or a struct and a function " +
-                "that fills one in");
+                "a record implements 'IEquatable' and 'IHashable', and a struct implements " +
+                "no interface, so there is no 'record struct'; write 'record' for a class, " +
+                "or a struct with a constructor and an 'EqualTo' of its own");
             Advance();
         }
         else if (At(TokenKind.ClassKeyword))

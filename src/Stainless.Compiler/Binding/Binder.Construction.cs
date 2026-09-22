@@ -170,13 +170,21 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
+        // A struct is made where it stands rather than on the heap, so this is
+        // a different expression with the same spelling.
+        if (type is StructTypeSymbol and not (UnionTypeSymbol or VariantTypeSymbol))
+            return BindStructConstruction(syntax, (StructTypeSymbol)type);
+
         if (type is not ClassTypeSymbol classType)
         {
             diagnostics.Error("SL0244", syntax.Span,
-                $"'{type.Name}' is not a class; only classes are heap allocated. " +
+                $"'{type.Name}' is not a class or a struct, so there is nothing for 'new' to " +
+                "make. " +
                 type switch
                 {
-                    StructTypeSymbol => "Declare a struct as a plain value instead.",
+                    UnionTypeSymbol => "A union records nothing about which member is live, " +
+                                       "so declare one and write the member you mean.",
+                    VariantTypeSymbol => "A variant is made by naming one of its cases.",
                     InterfaceTypeSymbol => "An interface has no implementation to construct; " +
                                            "create a class that implements it.",
                     _ => "Use a pointer and an allocator for raw memory.",
@@ -261,6 +269,70 @@ public sealed partial class Binder
     }
 
     /// <summary>
+    /// <c>new Point(3, 4)</c>: a struct's constructor, run over a slot of its
+    /// own.
+    ///
+    /// <para>
+    /// Nothing is allocated and nothing is counted, because a struct is a
+    /// value. What the expression answers is the slot, which the caller copies
+    /// wherever it is going -- so <c>new</c> on a struct costs a zeroing and a
+    /// call, and a struct that crosses to C is still the bytes C expects.
+    /// </para>
+    ///
+    /// <para>
+    /// A struct that declares no constructor is refused rather than zeroed: a
+    /// value with no constructor is written <c>Point value;</c>, and having two
+    /// spellings for it would make <c>new</c> mean one thing on a struct with
+    /// constructors and another on a struct without.
+    /// </para>
+    /// </summary>
+    private BoundExpression BindStructConstruction(NewSyntax syntax, StructTypeSymbol structType)
+    {
+        var arguments = syntax.Arguments.Select(BindArgument).ToList();
+
+        if (structType.Constructors.Count == 0)
+        {
+            diagnostics.Error("SL0245", syntax.Span,
+                $"'{structType.Name}' declares no constructor, so there is nothing for " +
+                $"'new {structType.Name}' to run; write '{structType.Name} value;' for the " +
+                "zero value and give its fields their values");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        var constructor = ResolveOverload(
+            structType.Constructors, arguments, syntax.Span, $"new {structType.Name}",
+            syntax.Arguments);
+        if (constructor is null) return new BoundErrorExpression(syntax.Span);
+
+        if (!CanReach(constructor.IsPublic, constructor.IsProtected, structType))
+            diagnostics.Error("SL0572", syntax.Span,
+                $"'{structType.Name}' has no constructor that can be reached from here; " +
+                "the ones it declares belong to its own module. There is usually a " +
+                "function that makes one and says what went wrong if it could not");
+
+        var parameters = constructor.Parameters.Where(p => !p.IsThis).ToList();
+
+        int[]? map = MapArguments(
+            parameters, arguments.Count, syntax.Arguments, constructor.IsVariadic, out string? why);
+
+        if (map is null)
+        {
+            diagnostics.Error("SL0601", syntax.Span,
+                $"'new {structType.Name}' does not fit: " +
+                (why ?? "the names do not match its parameters"));
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        var (ordered, spans) = Arrange(
+            constructor, parameters, arguments, syntax.Arguments, map, syntax.Span);
+
+        var converted = ConvertArguments(constructor, ordered, spans);
+
+        return WithObjectInitializer(
+            syntax, structType, new BoundStructNew(syntax.Span, structType, constructor, converted));
+    }
+
+    /// <summary>
     /// <c>new Panel { Width = 3 }</c> and <c>new List&lt;int&gt; { 1, 2 }</c>:
     /// the object, and the writes or additions the braces asked for.
     ///
@@ -287,7 +359,7 @@ public sealed partial class Binder
     /// </para>
     /// </summary>
     private BoundExpression WithObjectInitializer(
-        NewSyntax syntax, ClassTypeSymbol classType, BoundExpression creation)
+        NewSyntax syntax, NamedTypeSymbol type, BoundExpression creation)
     {
         if (syntax.Initializer is not { } initializer) return creation;
 
@@ -311,7 +383,7 @@ public sealed partial class Binder
 
         // Held in a name, because every entry works on the same object and the
         // construction may not be evaluated again.
-        var held = new LocalSymbol(SyntheticName("made"), classType, isConst: true);
+        var held = new LocalSymbol(SyntheticName("made"), type, isConst: true);
         var reading = new BoundLocalAccess(syntax.Span, held);
 
         var writes = new List<BoundExpression>();
@@ -319,8 +391,8 @@ public sealed partial class Binder
         foreach (var entry in initializer.Entries)
         {
             var written = named
-                ? BindMemberInitializer(classType, reading, entry)
-                : BindElementAddition(classType, reading, entry);
+                ? BindMemberInitializer(type, reading, entry)
+                : BindElementAddition(type, reading, entry);
 
             if (written is null) return new BoundErrorExpression(syntax.Span);
             writes.Add(written);
@@ -335,16 +407,16 @@ public sealed partial class Binder
     /// made. A property goes through its setter, as it does anywhere else.
     /// </summary>
     private BoundExpression? BindMemberInitializer(
-        ClassTypeSymbol classType, BoundExpression receiver, InitializerEntrySyntax entry)
+        NamedTypeSymbol type, BoundExpression receiver, InitializerEntrySyntax entry)
     {
         string name = entry.Name!;
 
-        if (classType.FindProperty(name) is { } property)
+        if (type.FindProperty(name) is { } property)
         {
             if (property.Setter is null)
             {
                 diagnostics.Error("SL0618", entry.NameSpan,
-                    $"'{classType.Name}.{name}' has no setter, so there is nothing here to " +
+                    $"'{type.Name}.{name}' has no setter, so there is nothing here to " +
                     "write; a brace list writes members the way an assignment does");
                 return null;
             }
@@ -363,7 +435,7 @@ public sealed partial class Binder
             return new BoundPropertyAssignment(entry.Span, receiver, property, value);
         }
 
-        if (classType.FindField(name) is { IsBackingField: false } field)
+        if (type.FindField(name) is { IsBackingField: false } field)
         {
             if (!CanReach(field.IsPublic, field.IsProtected, field.ContainingType))
             {
@@ -380,7 +452,7 @@ public sealed partial class Binder
         }
 
         diagnostics.Error("SL0618", entry.NameSpan,
-            $"'{classType.Name}' has no field or property named '{name}' to write");
+            $"'{type.Name}' has no field or property named '{name}' to write");
         return null;
     }
 
@@ -389,14 +461,14 @@ public sealed partial class Binder
     /// the way <c>foreach</c> finds <c>GetEnumerator</c>.
     /// </summary>
     private BoundExpression? BindElementAddition(
-        ClassTypeSymbol classType, BoundExpression receiver, InitializerEntrySyntax entry)
+        NamedTypeSymbol type, BoundExpression receiver, InitializerEntrySyntax entry)
     {
-        var candidates = classType.FindMethods("Add").Where(m => !m.IsStatic).ToList();
+        var candidates = type.FindMethods("Add").Where(m => !m.IsStatic).ToList();
 
         if (candidates.Count == 0)
         {
             diagnostics.Error("SL0618", entry.Span,
-                $"'{classType.Name}' has no 'Add' method, so there is nothing for an element " +
+                $"'{type.Name}' has no 'Add' method, so there is nothing for an element " +
                 "here to be added with; a brace list of values is a call to 'Add' per value");
             return null;
         }
@@ -405,7 +477,7 @@ public sealed partial class Binder
         if (argument.Type.IsError()) return null;
 
         var chosen = ResolveOverload(
-            candidates, [argument], entry.Span, $"{classType.Name}.Add");
+            candidates, [argument], entry.Span, $"{type.Name}.Add");
 
         if (chosen is null) return null;
 

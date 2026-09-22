@@ -77,6 +77,10 @@ internal sealed class StaticReferenceWalker
                 foreach (var argument in created.Arguments) Visit(argument);
                 break;
 
+            case BoundStructNew filled:
+                foreach (var argument in filled.Arguments) Visit(argument);
+                break;
+
             case BoundDereference dereference: Visit(dereference.Operand); break;
             case BoundAddressOf address: Visit(address.Operand); break;
             case BoundNewArray array: Visit(array.Length); break;
@@ -242,6 +246,10 @@ internal sealed class CaptureWalker(LocalSymbol loopVariable)
 
             case BoundNew created:
                 foreach (var argument in created.Arguments) Visit(argument);
+                break;
+
+            case BoundStructNew filled:
+                foreach (var argument in filled.Arguments) Visit(argument);
                 break;
 
             case BoundDereference dereference: Visit(dereference.Operand); break;

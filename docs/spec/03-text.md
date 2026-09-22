@@ -195,7 +195,7 @@ returns `char16*`, and `ToText()`, which transcodes back.
 took the second would accept any 16-bit pointer within reach — an array of
 counts, a `short*` off by one field. Naming the units is what makes the wrong
 pointer a compile error, and it is the same move the handle types made against
-`void*` ([§2.2.1](02-types.md#221-struct-hwnd__--a-type-declared-and-not-laid-out)). A cast still crosses between them where a C header really did
+`void*` ([§2.2.2](02-types.md#222-struct-hwnd__--a-type-declared-and-not-laid-out)). A cast still crosses between them where a C header really did
 mean a number.
 
 The return direction usually is not a `Utf16String` at all, because a wide API

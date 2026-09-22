@@ -242,13 +242,13 @@ public sealed partial class Binder
         if (type.StaticConstructor is { HasBody: true } setup)
             _pending.Enqueue((setup, substitution));
 
-        if (type is ClassTypeSymbol withMembers)
-        {
-            foreach (var constructor in withMembers.Constructors)
-                _pending.Enqueue((constructor, substitution));
-            if (withMembers.Destructor is not null)
-                _pending.Enqueue((withMembers.Destructor, substitution));
-        }
+        // A constructor is reached by writing `new` rather than by lookup, so
+        // it is queued here whether the type is a class or a struct.
+        foreach (var constructor in type.Constructors)
+            _pending.Enqueue((constructor, substitution));
+
+        if (type is ClassTypeSymbol { Destructor: { } destructor })
+            _pending.Enqueue((destructor, substitution));
 
         _substitution = previousSubstitution;
         _currentScope = previousScope;
@@ -548,9 +548,10 @@ public sealed partial class Binder
     /// <c>new T()</c>.
     ///
     /// C# admits a struct here, because there <c>new T()</c> on a value type is
-    /// default-initialization. It is not that here -- <c>new</c> allocates, and
-    /// a struct is declared rather than allocated (SL0244) -- so a struct
-    /// would satisfy a constraint whose whole purpose it then failed.
+    /// default-initialization. It is not that here: a struct declares no
+    /// constructor taking no arguments (SL0738), because <c>T value;</c> runs
+    /// nothing -- so a struct would satisfy a constraint whose whole purpose it
+    /// then failed.
     ///
     /// A class that declares no constructor is given one taking no arguments
     /// (§2.4.1), and <c>new Base()</c> already compiled; the constraint used to

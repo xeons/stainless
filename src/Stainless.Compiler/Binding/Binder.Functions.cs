@@ -656,13 +656,10 @@ public sealed partial class Binder
                 foreach (var method in type.Methods.ToList()) BindDefaultsOnce(method);
                 foreach (var declared in type.Operators.ToList()) BindDefaultsOnce(declared);
 
-                if (type is ClassTypeSymbol classType)
-                {
-                    foreach (var constructor in classType.Constructors.ToList())
-                        BindDefaultsOnce(constructor);
+                foreach (var constructor in type.Constructors.ToList())
+                    BindDefaultsOnce(constructor);
 
-                    CheckImplementedDefaults(classType);
-                }
+                if (type is ClassTypeSymbol classType) CheckImplementedDefaults(classType);
             }
         }
     }

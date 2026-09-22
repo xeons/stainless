@@ -425,6 +425,16 @@ public abstract class NamedTypeSymbol : TypeSymbol
     public FunctionSymbol? StaticConstructor { get; set; }
 
     /// <summary>
+    /// Constructors this type declares, for a class and for a struct alike.
+    ///
+    /// A class's runs over an allocation and a struct's runs over a slot the
+    /// caller already has, which is a difference in where <c>this</c> points
+    /// and in nothing else: both take it as the first parameter, both return
+    /// nothing, and both are reached by writing <c>new</c>.
+    /// </summary>
+    public List<FunctionSymbol> Constructors { get; } = [];
+
+    /// <summary>
     /// Declared <c>static class</c>: a holder for static members, with no
     /// instances and nothing to derive from it.
     ///
@@ -1293,7 +1303,6 @@ public sealed class ClassTypeSymbol : NamedTypeSymbol
         ? TearOffsStart + ComInterfaces.Count * TearOffSize
         : HeaderSize + FieldsSize;
 
-    public List<FunctionSymbol> Constructors { get; } = [];
     public FunctionSymbol? Destructor { get; set; }
 
     /// <summary>

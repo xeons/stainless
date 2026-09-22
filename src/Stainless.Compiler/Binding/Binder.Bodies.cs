@@ -51,10 +51,11 @@ public sealed partial class Binder
                          .ToList())
                 BindFunctionBody(function);
 
-            foreach (var type in module.Types.Values.OfType<ClassTypeSymbol>().ToList())
+            foreach (var type in module.Types.Values.ToList())
             {
                 foreach (var constructor in type.Constructors.ToList()) BindFunctionBody(constructor);
-                if (type.Destructor is not null) BindFunctionBody(type.Destructor);
+                if (type is ClassTypeSymbol { Destructor: { } destructor })
+                    BindFunctionBody(destructor);
             }
         }
 
@@ -283,7 +284,13 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
-        var classType = (ClassTypeSymbol)_currentFunction!.ContainingType!;
+        if (_currentFunction!.ContainingType is not ClassTypeSymbol classType)
+        {
+            diagnostics.Error("SL0515", syntax.Span,
+                $"'{_currentFunction.ContainingType!.Name}' is a struct, so there is nothing " +
+                "above it to construct; only a class derives from another");
+            return new BoundErrorExpression(syntax.Span);
+        }
 
         if (classType.BaseClass is not { } baseClass)
         {
@@ -335,22 +342,25 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
-        var classType = (ClassTypeSymbol)_currentFunction!.ContainingType!;
+        var owner = _currentFunction!.ContainingType!;
 
         var chosen = ResolveOverload(
-            classType.Constructors, arguments, syntax.Span, $"this {classType.Name}");
+            owner.Constructors, arguments, syntax.Span, $"this {owner.Name}");
         if (chosen is null) return new BoundErrorExpression(syntax.Span);
 
         if (chosen == _currentFunction)
         {
             diagnostics.Error("SL0521", syntax.Span,
-                $"this constructor of '{classType.Name}' delegates to itself");
+                $"this constructor of '{owner.Name}' delegates to itself");
             return new BoundErrorExpression(syntax.Span);
         }
 
         _delegated[_currentFunction] = chosen;
 
-        var self = new BoundThis(syntax.Span, classType, _currentFunction.Parameters[0]);
+        // The receiver is what the constructor was handed: a class reference,
+        // or the address of the struct being filled in.
+        var receiver = _currentFunction.Parameters[0];
+        var self = new BoundThis(syntax.Span, receiver.Type, receiver);
 
         _boundExplicitChain = true;
         return BuildCall(syntax, chosen, self, arguments, nonVirtual: true);
@@ -1555,7 +1565,7 @@ public sealed partial class Binder
     {
         BoundAssignment or BoundPropertyAssignment or BoundCall or BoundIndirectCall
             or BoundClosureCall or BoundIncrement or BoundPropertyIncrement
-            or BoundNew or BoundErrorExpression => true,
+            or BoundNew or BoundStructNew or BoundErrorExpression => true,
 
         BoundLet held => Effective(held.Body),
         BoundConditional chosen => Effective(chosen.WhenTrue) || Effective(chosen.WhenFalse),

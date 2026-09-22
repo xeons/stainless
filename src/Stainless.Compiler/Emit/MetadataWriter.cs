@@ -428,7 +428,14 @@ public static class MetadataWriter
         IsOpaque = type.IsOpaque,
         IsThreadsafe = type.IsThreadsafe,
         Fields = type.Fields.Select(Describe).ToList(),
-        Methods = type.Methods.Where(m => m.IsPublic).Select(Describe).ToList(),
+
+        // A constructor is a method as far as a consumer is concerned: a symbol
+        // to call with the address of the slot being filled in.
+        Methods = type.Methods
+            .Concat(type.Constructors)
+            .Where(m => m.IsPublic)
+            .Select(Describe)
+            .ToList(),
     };
 
     private static MetadataType Describe(EnumTypeSymbol type) => new()

@@ -125,7 +125,55 @@ struct holding only primitives and `String`s crosses freely, and one holding a
 `List<T>` does not, because that is what holding a `List<T>` means either way
 ([§9.5](09-statements-expressions.md#95-what-may-cross-a-thread-boundary)). A struct of plain data is unaffected by both rules and pays for neither.
 
-### 2.2.1 `struct HWND__;` — a type declared and not laid out
+### 2.2.1 A struct's constructor
+
+```csharp
+public struct Point
+{
+    public int X;
+    public int Y;
+
+    public Point(int x, int y)
+    {
+        X = x;
+        Y = y;
+    }
+
+    public Point(int both) : this(both, both) { }
+}
+
+var point = new Point(3, 4);
+```
+
+**`new` on a struct allocates nothing.** The constructor runs over the slot the
+expression already needed, with `this` as its address — which is what every
+struct method takes anyway. So the value is built where it is going, it is
+copied on assignment like any other struct, and a struct of plain data is still
+the bytes C expects: a constructor adds no header and no hidden field.
+
+**The slot is zeroed first.** A field the constructor did not write holds what
+`Point value;` would have left there, so the two ways of making one agree.
+
+**A constructor taking no arguments is refused** (SL0738). `Point value;`
+declares one and runs nothing, so such a constructor would run for some of them
+and not for others — a rule the reader cannot see at the point of use. The zero
+value is what an unconstructed struct is, and that stays true.
+
+**`new` on a struct that declares no constructor is refused** (SL0245), rather
+than meaning the zero value. A struct with no constructor is written
+`Point value;`, and having two spellings for it would make `new` mean one thing
+on a struct with constructors and another on a struct without.
+
+`: this(...)` delegates to another of the struct's own constructors, on the
+same terms as a class's ([§2.3.4](#234-constructors)). `base(...)` is SL0515:
+only a class derives from another. A union has no constructor at all (SL0207),
+because which of its members is live is exactly what it does not record, and a
+variant is made by naming one of its cases.
+
+A constructor crosses a library boundary as the symbol it is: a consumer with
+only the metadata writes `new Point(3, 4)` and the call fills in its own slot.
+
+### 2.2.2 `struct HWND__;` — a type declared and not laid out
 
 A `struct` written with no body at all is C's incomplete type: declared here,
 laid out somewhere else, and never completed. The only thing that can be done
@@ -184,7 +232,7 @@ Signatures spell the underlying type: the header states the ABI, and an alias is
 a name rather than a type. The typedef is there so C can spell a handle the way
 the Stainless source does.
 
-### 2.2.2 A type declared inside another
+### 2.2.3 A type declared inside another
 
 ```csharp
 public struct Rect
@@ -225,7 +273,7 @@ public class Cache<T>
 }
 ```
 
-### 2.2.3 `(int, String)` — a tuple
+### 2.2.4 `(int, String)` — a tuple
 
 ```csharp
 (int, int) MinMax(int[:] numbers)
@@ -812,16 +860,17 @@ every type owes ([§3.7](03-text.md#37-conversions)), and a record is not the
 place to invent one — every class would then owe an implementation, for a
 default that printed a type name.
 
-**There is no `record struct`.** A record is its constructor and a struct has
-none: a struct is a plain C value, which is what lets one cross to C at all
-([§2.2](#22-struct--value-type-c-layout)). Giving structs constructors is a
-decision about structs rather than a consequence of wanting records, so it has
-not been made.
+**There is no `record struct`.** What makes a record a dictionary key is the
+`IEquatable` and `IHashable` it declares, and a struct implements no interface:
+an interface reference is counted and a struct has no header to count it in
+([§2.2](#22-struct--value-type-c-layout)). A record without those two would be
+a struct with a constructor and an `EqualTo`, which is already writable
+([§2.2.1](#221-a-structs-constructor)).
 
 ```
-error[SL0734]: a struct is a plain C value and has no constructor, so there is
-no 'record struct'; write 'record' for a class, or a struct and a function that
-fills one in
+error[SL0734]: a record implements 'IEquatable' and 'IHashable', and a struct
+implements no interface, so there is no 'record struct'; write 'record' for a
+class, or a struct with a constructor and an 'EqualTo' of its own
 ```
 
 **`record` is contextual**, as `closure` and `where` are: it is read as a
@@ -1178,9 +1227,10 @@ public struct Tagged
 }
 ```
 
-A union has no constructor and no destructor, as a struct has neither, and it
-implements no interface, because an interface reference is a counted pointer and
-a union is a plain C value (SL0302). `[Packed]` and `[Align]` apply to one as
+A union has no constructor (SL0207) and no destructor, and it implements no
+interface, because an interface reference is a counted pointer and a union is a
+plain C value (SL0302). Which member is live is exactly what a union does not
+record, so there is nothing for a constructor to have established. `[Packed]` and `[Align]` apply to one as
 they do to a struct. A generated C header writes it as a C `union`, member for
 member.
 
