@@ -136,11 +136,12 @@ int SampleAt(nuint frame, nuint channel)
 One sample, as a number from -32768 to 32767 whatever the width is.
 
 Eight-bit samples are widened and re-centred on the way out, so a
-caller reading a clip need not know which it has. Out of range answers
+caller reading a clip need not know which it has. A sample wider than
+sixteen bits answers its top sixteen. Out of range answers
 zero rather than aborting: a program walking a waveform runs off the
 end at the end, and that is not a mistake in it.
 
-<sub>[stdlib/Audio.sl:248](../../stdlib/Audio.sl#L248)</sub>
+<sub>[stdlib/Audio.sl:249](../../stdlib/Audio.sl#L249)</sub>
 
 #### SetSample *method*
 
@@ -149,9 +150,10 @@ void SetSample(nuint frame, nuint channel, int value)
 ```
 
 One sample written, taking the same range `SampleAt` answers in and
-clamping to it. Out of range does nothing.
+clamping to it. A sample wider than sixteen bits has its top sixteen
+set and the bits below them cleared. Out of range does nothing.
 
-<sub>[stdlib/Audio.sl:268](../../stdlib/Audio.sl#L268)</sub>
+<sub>[stdlib/Audio.sl:273](../../stdlib/Audio.sl#L273)</sub>
 
 ### AudioError *enum*
 
@@ -400,7 +402,7 @@ Calling `Write` from another thread reaches an in-process object and works
 in practice; it is outside what this module promises, and a player per
 thread is the arrangement to prefer.
 
-<sub>[stdlib/Audio.sl:1144](../../stdlib/Audio.sl#L1144)</sub>
+<sub>[stdlib/Audio.sl:1170](../../stdlib/Audio.sl#L1170)</sub>
 
 #### Open *method*
 
@@ -416,7 +418,7 @@ the device in exclusive mode, and `Format` when the engine will not
 take these numbers -- which is worth telling apart, because the answer
 to the last one is to resample rather than to give up.
 
-<sub>[stdlib/Audio.sl:1190](../../stdlib/Audio.sl#L1190)</sub>
+<sub>[stdlib/Audio.sl:1237](../../stdlib/Audio.sl#L1237)</sub>
 
 #### Format *property*
 
@@ -426,7 +428,7 @@ AudioFormat Format { get; }
 
 The format this was opened for.
 
-<sub>[stdlib/Audio.sl:1248](../../stdlib/Audio.sl#L1248)</sub>
+<sub>[stdlib/Audio.sl:1274](../../stdlib/Audio.sl#L1274)</sub>
 
 #### IsOpen *property*
 
@@ -436,7 +438,7 @@ bool IsOpen { get; }
 
 Whether the device is still open.
 
-<sub>[stdlib/Audio.sl:1251](../../stdlib/Audio.sl#L1251)</sub>
+<sub>[stdlib/Audio.sl:1277](../../stdlib/Audio.sl#L1277)</sub>
 
 #### Write *method*
 
@@ -451,7 +453,7 @@ have been heard -- `Drain` is what waits for that. A length that is not
 a whole number of frames is refused rather than truncated, because
 truncating swaps the channels for the rest of the stream.
 
-<sub>[stdlib/Audio.sl:1259](../../stdlib/Audio.sl#L1259)</sub>
+<sub>[stdlib/Audio.sl:1285](../../stdlib/Audio.sl#L1285)</sub>
 
 #### Drain *method*
 
@@ -461,7 +463,7 @@ void Drain()
 
 Waits until everything written has been played.
 
-<sub>[stdlib/Audio.sl:1363](../../stdlib/Audio.sl#L1363)</sub>
+<sub>[stdlib/Audio.sl:1389](../../stdlib/Audio.sl#L1389)</sub>
 
 #### Stop *method*
 
@@ -471,7 +473,7 @@ void Stop()
 
 Stops at once, dropping whatever has not been played.
 
-<sub>[stdlib/Audio.sl:1397](../../stdlib/Audio.sl#L1397)</sub>
+<sub>[stdlib/Audio.sl:1423](../../stdlib/Audio.sl#L1423)</sub>
 
 #### Close *method*
 
@@ -481,7 +483,7 @@ void Close()
 
 Releases the device. Idempotent, and the destructor calls it.
 
-<sub>[stdlib/Audio.sl:1424](../../stdlib/Audio.sl#L1424)</sub>
+<sub>[stdlib/Audio.sl:1450](../../stdlib/Audio.sl#L1450)</sub>
 
 ### AudioRecorder *class*
 
@@ -514,7 +516,7 @@ route this through a portal; a program that opens an input without saying
 so is doing something its user did not ask for, and no library can fix that
 from underneath.
 
-<sub>[stdlib/Audio.sl:1484](../../stdlib/Audio.sl#L1484)</sub>
+<sub>[stdlib/Audio.sl:1510](../../stdlib/Audio.sl#L1510)</sub>
 
 #### Open *method*
 
@@ -524,7 +526,7 @@ static Result<AudioRecorder, AudioError> Open(AudioFormat format)
 
 A device open for this format. Fails as `AudioPlayer.Open` does.
 
-<sub>[stdlib/Audio.sl:1531](../../stdlib/Audio.sl#L1531)</sub>
+<sub>[stdlib/Audio.sl:1574](../../stdlib/Audio.sl#L1574)</sub>
 
 #### Format *property*
 
@@ -534,7 +536,7 @@ AudioFormat Format { get; }
 
 The format this was opened for.
 
-<sub>[stdlib/Audio.sl:1581](../../stdlib/Audio.sl#L1581)</sub>
+<sub>[stdlib/Audio.sl:1611](../../stdlib/Audio.sl#L1611)</sub>
 
 #### IsOpen *property*
 
@@ -544,7 +546,7 @@ bool IsOpen { get; }
 
 Whether the device is still open.
 
-<sub>[stdlib/Audio.sl:1584](../../stdlib/Audio.sl#L1584)</sub>
+<sub>[stdlib/Audio.sl:1614](../../stdlib/Audio.sl#L1614)</sub>
 
 #### IsRecording *property*
 
@@ -554,7 +556,7 @@ bool IsRecording { get; }
 
 Whether it is listening now.
 
-<sub>[stdlib/Audio.sl:1587](../../stdlib/Audio.sl#L1587)</sub>
+<sub>[stdlib/Audio.sl:1617](../../stdlib/Audio.sl#L1617)</sub>
 
 #### Start *method*
 
@@ -565,7 +567,7 @@ Result<bool, AudioError> Start()
 Starts listening. Sound that arrives before the first `Read` is
 buffered, up to about a fifth of a second of it, and dropped after that.
 
-<sub>[stdlib/Audio.sl:1591](../../stdlib/Audio.sl#L1591)</sub>
+<sub>[stdlib/Audio.sl:1621](../../stdlib/Audio.sl#L1621)</sub>
 
 #### Read *method*
 
@@ -579,7 +581,7 @@ Blocks until there is something. Zero means the recorder was stopped or
 closed while this was waiting, which is how a loop in another thread
 ends. The count is always a whole number of frames.
 
-<sub>[stdlib/Audio.sl:1626](../../stdlib/Audio.sl#L1626)</sub>
+<sub>[stdlib/Audio.sl:1658](../../stdlib/Audio.sl#L1658)</sub>
 
 #### Stop *method*
 
@@ -589,7 +591,7 @@ void Stop()
 
 Stops listening. The device stays open, so `Start` may be called again.
 
-<sub>[stdlib/Audio.sl:1705](../../stdlib/Audio.sl#L1705)</sub>
+<sub>[stdlib/Audio.sl:1737](../../stdlib/Audio.sl#L1737)</sub>
 
 #### Close *method*
 
@@ -599,7 +601,7 @@ void Close()
 
 Releases the device. Idempotent, and the destructor calls it.
 
-<sub>[stdlib/Audio.sl:1733](../../stdlib/Audio.sl#L1733)</sub>
+<sub>[stdlib/Audio.sl:1765](../../stdlib/Audio.sl#L1765)</sub>
 
 ### Tone *class*
 
@@ -614,7 +616,7 @@ wants to know whether its audio works needs a sound to play, and writing
 one by hand in every such program is worse than three functions that are
 obviously correct.
 
-<sub>[stdlib/Audio.sl:1791](../../stdlib/Audio.sl#L1791)</sub>
+<sub>[stdlib/Audio.sl:1823](../../stdlib/Audio.sl#L1823)</sub>
 
 #### Sine *method*
 
@@ -625,7 +627,7 @@ static AudioClip Sine(AudioFormat format, double frequency, double seconds, doub
 A sine wave: `frequency` hertz for `seconds`, at `amplitude` from 0.0
 to 1.0. On every channel.
 
-<sub>[stdlib/Audio.sl:1795](../../stdlib/Audio.sl#L1795)</sub>
+<sub>[stdlib/Audio.sl:1827](../../stdlib/Audio.sl#L1827)</sub>
 
 #### Square *method*
 
@@ -636,7 +638,7 @@ static AudioClip Square(AudioFormat format, double frequency, double seconds, do
 A square wave, which is louder than a sine of the same amplitude and is
 what a beep traditionally is.
 
-<sub>[stdlib/Audio.sl:1813](../../stdlib/Audio.sl#L1813)</sub>
+<sub>[stdlib/Audio.sl:1845](../../stdlib/Audio.sl#L1845)</sub>
 
 #### Rest *method*
 
@@ -647,7 +649,7 @@ static AudioClip Rest(AudioFormat format, double seconds)
 Silence, which is the third thing a test needs: a gap between two
 tones, and something to compare against.
 
-<sub>[stdlib/Audio.sl:1833](../../stdlib/Audio.sl#L1833)</sub>
+<sub>[stdlib/Audio.sl:1865](../../stdlib/Audio.sl#L1865)</sub>
 
 ### Wav *class*
 
@@ -663,7 +665,7 @@ this reports `AudioError.Format` and says which tag it found. It does read
 `WAVE_FORMAT_EXTENSIBLE`, because that is what a modern recorder writes
 for ordinary PCM and refusing it would refuse half the files on a machine.
 
-<sub>[stdlib/Audio.sl:312](../../stdlib/Audio.sl#L312)</sub>
+<sub>[stdlib/Audio.sl:327](../../stdlib/Audio.sl#L327)</sub>
 
 #### Decode *method*
 
@@ -673,7 +675,7 @@ static Result<AudioClip, AudioError> Decode(byte[] bytes)
 
 The bytes of a `.wav` file, read.
 
-<sub>[stdlib/Audio.sl:315](../../stdlib/Audio.sl#L315)</sub>
+<sub>[stdlib/Audio.sl:330](../../stdlib/Audio.sl#L330)</sub>
 
 #### Encode *method*
 
@@ -681,10 +683,10 @@ The bytes of a `.wav` file, read.
 static byte[] Encode(AudioClip clip)
 ```
 
-A clip as the bytes of a `.wav` file: a 44-byte canonical header and
-the samples.
+A clip as the bytes of a `.wav` file: a 44-byte canonical header, the
+samples, and the pad byte an odd length is followed by.
 
-<sub>[stdlib/Audio.sl:379](../../stdlib/Audio.sl#L379)</sub>
+<sub>[stdlib/Audio.sl:400](../../stdlib/Audio.sl#L400)</sub>
 
 #### FromFile *method*
 
@@ -694,7 +696,7 @@ static Result<AudioClip, AudioError> FromFile(String path)
 
 A `.wav` on disk, read.
 
-<sub>[stdlib/Audio.sl:408](../../stdlib/Audio.sl#L408)</sub>
+<sub>[stdlib/Audio.sl:430](../../stdlib/Audio.sl#L430)</sub>
 
 #### Save *method*
 
@@ -704,7 +706,7 @@ static Result<bool, AudioError> Save(AudioClip clip, String path)
 
 A clip written to a `.wav` on disk.
 
-<sub>[stdlib/Audio.sl:417](../../stdlib/Audio.sl#L417)</sub>
+<sub>[stdlib/Audio.sl:439](../../stdlib/Audio.sl#L439)</sub>
 
 ## Functions
 
@@ -720,7 +722,7 @@ call is where the cost is.
 **Ask before trying.** A game wants to say "no audio device" at startup
 rather than in the middle of a level, and this is how it finds out.
 
-<sub>[stdlib/Audio.sl:1009](../../stdlib/Audio.sl#L1009)</sub>
+<sub>[stdlib/Audio.sl:1035](../../stdlib/Audio.sl#L1035)</sub>
 
 ### BackendName *function*
 
@@ -731,7 +733,7 @@ String BackendName()
 What is behind it, for a program that reports what it found. `""` when
 there is nothing.
 
-<sub>[stdlib/Audio.sl:1028](../../stdlib/Audio.sl#L1028)</sub>
+<sub>[stdlib/Audio.sl:1054](../../stdlib/Audio.sl#L1054)</sub>
 
 ### CanPlay *function*
 
@@ -742,7 +744,7 @@ bool CanPlay()
 Whether anything can play. False on a machine that has the library and no
 device, which is what a headless server is.
 
-<sub>[stdlib/Audio.sl:1013](../../stdlib/Audio.sl#L1013)</sub>
+<sub>[stdlib/Audio.sl:1039](../../stdlib/Audio.sl#L1039)</sub>
 
 ### CanRecord *function*
 
@@ -752,7 +754,7 @@ bool CanRecord()
 
 Whether anything can record.
 
-<sub>[stdlib/Audio.sl:1020](../../stdlib/Audio.sl#L1020)</sub>
+<sub>[stdlib/Audio.sl:1046](../../stdlib/Audio.sl#L1046)</sub>
 
 ### Play *function*
 
@@ -767,7 +769,7 @@ writes the samples, waits for them, and closes. A program playing many
 sounds should keep an `AudioPlayer` instead, because opening a device takes
 tens of milliseconds and this does it every time.
 
-<sub>[stdlib/Audio.sl:1045](../../stdlib/Audio.sl#L1045)</sub>
+<sub>[stdlib/Audio.sl:1071](../../stdlib/Audio.sl#L1071)</sub>
 
 ### Record *function*
 
@@ -780,5 +782,5 @@ Result<AudioClip, AudioError> Record(AudioFormat format, double seconds)
 Blocks for that long. A program that wants to stop early, or to see the
 sound as it arrives, wants an `AudioRecorder`.
 
-<sub>[stdlib/Audio.sl:1068](../../stdlib/Audio.sl#L1068)</sub>
+<sub>[stdlib/Audio.sl:1094](../../stdlib/Audio.sl#L1094)</sub>
 

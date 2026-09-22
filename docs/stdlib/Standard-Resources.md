@@ -58,10 +58,13 @@ decodes an image expects a whole file, so this puts the header back.
 The pixel offset is not guesswork: the DIB header says how long it is, and
 the palette between it and the pixels is `biClrUsed` entries of four bytes,
 or the full `2^depth` when that field is zero and the depth is 8 or fewer.
+A 40-byte header with `BI_BITFIELDS` is followed by its three colour masks
+first; the 12-byte `BITMAPCOREHEADER` has no `biClrUsed`, and its palette
+entries are three bytes each.
 
 Empty when there is no such bitmap.
 
-<sub>[stdlib/Resources.sl:417](../../stdlib/Resources.sl#L417)</sub>
+<sub>[stdlib/Resources.sl:429](../../stdlib/Resources.sl#L429)</sub>
 
 ### Bytes *function*
 
@@ -74,7 +77,7 @@ A resource's bytes, copied into an array this program owns.
 Empty when there is no such resource, which is also what an empty resource
 gives -- ask `Exists` where the difference matters.
 
-<sub>[stdlib/Resources.sl:333](../../stdlib/Resources.sl#L333)</sub>
+<sub>[stdlib/Resources.sl:342](../../stdlib/Resources.sl#L342)</sub>
 
 ### Bytes *function*
 
@@ -84,7 +87,7 @@ byte[] Bytes(String type, String name)
 
 The same, for a resource named by text.
 
-<sub>[stdlib/Resources.sl:341](../../stdlib/Resources.sl#L341)</sub>
+<sub>[stdlib/Resources.sl:350](../../stdlib/Resources.sl#L350)</sub>
 
 ### Exists *function*
 
@@ -94,7 +97,7 @@ bool Exists(int type, int id)
 
 Whether a resource of this type and number is there.
 
-<sub>[stdlib/Resources.sl:303](../../stdlib/Resources.sl#L303)</sub>
+<sub>[stdlib/Resources.sl:312](../../stdlib/Resources.sl#L312)</sub>
 
 ### Exists *function*
 
@@ -104,7 +107,7 @@ bool Exists(String type, String name)
 
 Whether one named by text, of a type named by text, is there.
 
-<sub>[stdlib/Resources.sl:306](../../stdlib/Resources.sl#L306)</sub>
+<sub>[stdlib/Resources.sl:315](../../stdlib/Resources.sl#L315)</sub>
 
 ### Pointer *function*
 
@@ -118,7 +121,7 @@ The memory belongs to the loaded image: read-only, never freed, and valid
 for as long as the program runs. `Bytes` is the one to use for anything that
 outlives the call.
 
-<sub>[stdlib/Resources.sl:324](../../stdlib/Resources.sl#L324)</sub>
+<sub>[stdlib/Resources.sl:333](../../stdlib/Resources.sl#L333)</sub>
 
 ### Size *function*
 
@@ -128,7 +131,7 @@ uint Size(int type, int id)
 
 How many bytes a resource holds, or zero when there is none.
 
-<sub>[stdlib/Resources.sl:312](../../stdlib/Resources.sl#L312)</sub>
+<sub>[stdlib/Resources.sl:321](../../stdlib/Resources.sl#L321)</sub>
 
 ### Text *function*
 
@@ -147,7 +150,7 @@ platforms answer identically and so that Windows needs no user32.
 
 Empty for a number with no string, which is what `LoadStringW` answers too.
 
-<sub>[stdlib/Resources.sl:371](../../stdlib/Resources.sl#L371)</sub>
+<sub>[stdlib/Resources.sl:380](../../stdlib/Resources.sl#L380)</sub>
 
 ## Constants
 

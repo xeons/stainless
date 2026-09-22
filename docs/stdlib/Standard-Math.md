@@ -149,7 +149,7 @@ rather than an error, as in the `double` form.
 long Clamp(long x, long low, long high)
 ```
 
-`x`, brought within [low, high].
+`x`, brought within [low, high]. Bounds the wrong way round give `low`.
 
 <sub>[stdlib/Math.sl:280](../../stdlib/Math.sl#L280)</sub>
 
@@ -160,9 +160,10 @@ nuint Clamp(nuint x, nuint low, nuint high)
 ```
 
 `x`, brought within [low, high]. Unsigned, so there is no negative side to
-clamp against and `low` of zero is the natural floor.
+clamp against and `low` of zero is the natural floor. Bounds the wrong way
+round give `low`.
 
-<sub>[stdlib/Math.sl:291](../../stdlib/Math.sl#L291)</sub>
+<sub>[stdlib/Math.sl:292](../../stdlib/Math.sl#L292)</sub>
 
 ### Cos *function*
 
@@ -204,7 +205,7 @@ nuint DivideCeiling(nuint a, nuint b)
 `a` divided by `b`, rounded up. Written this way rather than as
 `(a + b - 1) / b` so that a large `a` cannot overflow on the way.
 
-<sub>[stdlib/Math.sl:323](../../stdlib/Math.sl#L323)</sub>
+<sub>[stdlib/Math.sl:324](../../stdlib/Math.sl#L324)</sub>
 
 ### Exp *function*
 
@@ -233,9 +234,13 @@ The largest whole number at or below `x`. Goes away from zero for negative
 long GreatestCommonDivisor(long a, long b)
 ```
 
-The greatest common divisor, by Euclid.
+The greatest common divisor, by Euclid. Never negative, but for one case.
 
-<sub>[stdlib/Math.sl:331](../../stdlib/Math.sl#L331)</sub>
+Zero with zero answers zero. The answer is 2^63 when both arguments are the
+most negative `long`, or one is and the other is zero; no `long` holds that,
+so it answers `MinLong`, whose magnitude it is, as `Abs` does.
+
+<sub>[stdlib/Math.sl:336](../../stdlib/Math.sl#L336)</sub>
 
 ### Hypot *function*
 
@@ -288,7 +293,7 @@ bool IsPowerOfTwo(ulong value)
 True when exactly one bit is set. Zero is not a power of two and answers
 false, which is the case a bare `value & (value - 1)` test gets wrong.
 
-<sub>[stdlib/Math.sl:403](../../stdlib/Math.sl#L403)</sub>
+<sub>[stdlib/Math.sl:411](../../stdlib/Math.sl#L411)</sub>
 
 ### LeadingZeros *function*
 
@@ -298,7 +303,7 @@ int LeadingZeros(ulong value)
 
 How many zero bits sit above the highest set bit. 64 for zero.
 
-<sub>[stdlib/Math.sl:372](../../stdlib/Math.sl#L372)</sub>
+<sub>[stdlib/Math.sl:380](../../stdlib/Math.sl#L380)</sub>
 
 ### LeastCommonMultiple *function*
 
@@ -311,7 +316,7 @@ The least common multiple. Zero when either argument is zero.
 Divides before multiplying, which keeps the intermediate as small as it can
 be; two large arguments can still overflow, and nothing here detects it.
 
-<sub>[stdlib/Math.sl:349](../../stdlib/Math.sl#L349)</sub>
+<sub>[stdlib/Math.sl:357](../../stdlib/Math.sl#L357)</sub>
 
 ### Lerp *function*
 
@@ -456,7 +461,7 @@ ulong NextPowerOfTwo(ulong value)
 The smallest power of two that is at least `value`. Zero and one both give
 one; a value above 2^63 has no answer and gives zero.
 
-<sub>[stdlib/Math.sl:410](../../stdlib/Math.sl#L410)</sub>
+<sub>[stdlib/Math.sl:418](../../stdlib/Math.sl#L418)</sub>
 
 ### PopCount *function*
 
@@ -467,7 +472,7 @@ int PopCount(ulong value)
 How many bits are set. Kernighan's loop: each step clears the lowest set
 bit, so it runs once per bit that is actually there.
 
-<sub>[stdlib/Math.sl:360](../../stdlib/Math.sl#L360)</sub>
+<sub>[stdlib/Math.sl:368](../../stdlib/Math.sl#L368)</sub>
 
 ### Pow *function*
 
@@ -531,7 +536,7 @@ int Sign(int x)
 
 -1, 0 or 1 for a negative, zero or positive `int`.
 
-<sub>[stdlib/Math.sl:301](../../stdlib/Math.sl#L301)</sub>
+<sub>[stdlib/Math.sl:302](../../stdlib/Math.sl#L302)</sub>
 
 ### Sign *function*
 
@@ -542,7 +547,7 @@ int Sign(long x)
 -1, 0 or 1 for a negative, zero or positive `long`. An `int` either way,
 since three values need no more.
 
-<sub>[stdlib/Math.sl:312](../../stdlib/Math.sl#L312)</sub>
+<sub>[stdlib/Math.sl:313](../../stdlib/Math.sl#L313)</sub>
 
 ### Sin *function*
 
@@ -604,7 +609,7 @@ int TrailingZeros(ulong value)
 
 How many zero bits sit below the lowest set bit. 64 for zero.
 
-<sub>[stdlib/Math.sl:387](../../stdlib/Math.sl#L387)</sub>
+<sub>[stdlib/Math.sl:395](../../stdlib/Math.sl#L395)</sub>
 
 ### Truncate *function*
 
@@ -631,7 +636,7 @@ The base of the natural logarithm.
 ### Epsilon *constant*
 
 ```
-const double Epsilon = 2.2204E-16
+const double Epsilon = 2.220446049250313E-16
 ```
 
 The smallest step between 1.0 and the next representable double.

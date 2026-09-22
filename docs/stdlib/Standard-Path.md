@@ -34,7 +34,11 @@ String DirectoryName(String path)
 Everything before the last part, without its trailing separator. A path
 with no separator gives the empty string.
 
-<sub>[stdlib/Path.sl:128](../../stdlib/Path.sl#L128)</sub>
+A root keeps its separator, because without it the answer names somewhere
+else: `/foo` gives `/`, and on Windows `C:\foo` gives `C:\`, where `C:`
+alone would be that drive's current directory.
+
+<sub>[stdlib/Path.sl:132](../../stdlib/Path.sl#L132)</sub>
 
 ### Extension *function*
 
@@ -43,9 +47,9 @@ String Extension(String path)
 ```
 
 The extension, with its dot: `notes.txt` gives `.txt`. No dot in the last
-part, or a dot that starts it, gives the empty string.
+part, a dot that starts it, or a dot that ends it gives the empty string.
 
-<sub>[stdlib/Path.sl:142](../../stdlib/Path.sl#L142)</sub>
+<sub>[stdlib/Path.sl:175](../../stdlib/Path.sl#L175)</sub>
 
 ### FileName *function*
 
@@ -70,7 +74,7 @@ be a mistake.
 ordinary relative names elsewhere, where a colon and a backslash are both
 characters a filename may contain.
 
-<sub>[stdlib/Path.sl:182](../../stdlib/Path.sl#L182)</sub>
+<sub>[stdlib/Path.sl:210](../../stdlib/Path.sl#L210)</sub>
 
 ### Join *function*
 
@@ -114,7 +118,7 @@ Only ASCII letters are case-folded. Windows folds more, with a table that
 has changed between releases, so two paths differing only in the case of a
 non-ASCII letter are reported as different.
 
-<sub>[stdlib/Path.sl:214](../../stdlib/Path.sl#L214)</sub>
+<sub>[stdlib/Path.sl:242](../../stdlib/Path.sl#L242)</sub>
 
 ### Split *function*
 
@@ -124,7 +128,7 @@ List<String> Split(String path)
 
 The parts, with the separators dropped and empty parts skipped.
 
-<sub>[stdlib/Path.sl:252](../../stdlib/Path.sl#L252)</sub>
+<sub>[stdlib/Path.sl:280](../../stdlib/Path.sl#L280)</sub>
 
 ### WithExtension *function*
 
@@ -133,9 +137,9 @@ String WithExtension(String path, String with)
 ```
 
 The path with a different extension. `with` may be written with or without
-its leading dot.
+its leading dot. Nothing before the last part is touched.
 
-<sub>[stdlib/Path.sl:166](../../stdlib/Path.sl#L166)</sub>
+<sub>[stdlib/Path.sl:194](../../stdlib/Path.sl#L194)</sub>
 
 ### WithoutExtension *function*
 
@@ -143,9 +147,9 @@ its leading dot.
 String WithoutExtension(String path)
 ```
 
-The last part with its extension removed.
+The last part with its extension removed. A trailing dot goes with it.
 
-<sub>[stdlib/Path.sl:157](../../stdlib/Path.sl#L157)</sub>
+<sub>[stdlib/Path.sl:186](../../stdlib/Path.sl#L186)</sub>
 
 ## Constants
 

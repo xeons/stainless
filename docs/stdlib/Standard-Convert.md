@@ -71,12 +71,14 @@ Result<byte[], ConvertError> FromBase64(String text)
 ```
 
 Base64 back into bytes, accepting both alphabets and padding or none.
+Padding MUST come only at the end, and MUST complete the last group of
+four when it is there at all.
 
 Whitespace is skipped, because base64 in the wild arrives wrapped at 64 or
 76 columns and a decoder that refused a newline would be useless for the
 thing it is most often pointed at.
 
-<sub>[stdlib/Convert.sl:367](../../stdlib/Convert.sl#L367)</sub>
+<sub>[stdlib/Convert.sl:376](../../stdlib/Convert.sl#L376)</sub>
 
 ### FromHex *function*
 
@@ -88,7 +90,7 @@ Hexadecimal back into bytes. Either case, and an odd number of digits is
 malformed rather than padded, because there is no way to know which end the
 missing half belonged to.
 
-<sub>[stdlib/Convert.sl:326](../../stdlib/Convert.sl#L326)</sub>
+<sub>[stdlib/Convert.sl:333](../../stdlib/Convert.sl#L333)</sub>
 
 ### FromLong *function*
 
@@ -111,7 +113,7 @@ String ToBase64(byte[] data)
 
 `data` as base64, padded with `=` to a multiple of four.
 
-<sub>[stdlib/Convert.sl:350](../../stdlib/Convert.sl#L350)</sub>
+<sub>[stdlib/Convert.sl:357](../../stdlib/Convert.sl#L357)</sub>
 
 ### ToBase64Text *function*
 
@@ -121,7 +123,7 @@ String ToBase64Text(String text)
 
 Base64 of the UTF-8 bytes of `text`, which is the common case.
 
-<sub>[stdlib/Convert.sl:429](../../stdlib/Convert.sl#L429)</sub>
+<sub>[stdlib/Convert.sl:449](../../stdlib/Convert.sl#L449)</sub>
 
 ### ToBase64Url *function*
 
@@ -132,7 +134,7 @@ String ToBase64Url(byte[] data)
 `data` as base64url: `-` and `_` for the last two characters, and no
 padding. What a JWT and a URL query both want, and RFC 4648 §5.
 
-<sub>[stdlib/Convert.sl:357](../../stdlib/Convert.sl#L357)</sub>
+<sub>[stdlib/Convert.sl:364](../../stdlib/Convert.sl#L364)</sub>
 
 ### ToDouble *function*
 
@@ -146,7 +148,10 @@ Accepts what C accepts of the ordinary forms -- an optional sign, digits, a
 point, an exponent -- and nothing else. Hexadecimal floats, infinities and
 NaN are not spelled here.
 
-<sub>[stdlib/Convert.sl:231](../../stdlib/Convert.sl#L231)</sub>
+A magnitude past the largest double is `OutOfRange`. One below the
+smallest rounds to zero, which is the nearest double and not a failure.
+
+<sub>[stdlib/Convert.sl:234](../../stdlib/Convert.sl#L234)</sub>
 
 ### ToHex *function*
 
@@ -156,7 +161,7 @@ String ToHex(byte[] data)
 
 `data` as lowercase hexadecimal, two characters per byte and nothing between.
 
-<sub>[stdlib/Convert.sl:292](../../stdlib/Convert.sl#L292)</sub>
+<sub>[stdlib/Convert.sl:299](../../stdlib/Convert.sl#L299)</sub>
 
 ### ToHex *function*
 
@@ -166,7 +171,7 @@ String ToHex(byte[] data, bool upper)
 
 The same, in the case asked for.
 
-<sub>[stdlib/Convert.sl:298](../../stdlib/Convert.sl#L298)</sub>
+<sub>[stdlib/Convert.sl:305](../../stdlib/Convert.sl#L305)</sub>
 
 ### ToInt *function*
 

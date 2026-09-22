@@ -23,7 +23,7 @@ IOError AppendText(String path, String text)
 
 Adds `text` to the end, creating the file if it is not there.
 
-<sub>[stdlib/File.sl:205](../../stdlib/File.sl#L205)</sub>
+<sub>[stdlib/File.sl:218](../../stdlib/File.sl#L218)</sub>
 
 ### Copy *function*
 
@@ -34,7 +34,7 @@ IOError Copy(String from, String to)
 Copies a file. Reads it whole, so this is for ordinary files rather than
 for something that will not fit in memory.
 
-<sub>[stdlib/File.sl:221](../../stdlib/File.sl#L221)</sub>
+<sub>[stdlib/File.sl:231](../../stdlib/File.sl#L231)</sub>
 
 ### Delete *function*
 
@@ -94,7 +94,7 @@ Result<List<String>, IOError> ReadAllLines(String path)
 The file's lines, with either line ending accepted and a trailing newline
 producing no final empty line.
 
-<sub>[stdlib/File.sl:147](../../stdlib/File.sl#L147)</sub>
+<sub>[stdlib/File.sl:152](../../stdlib/File.sl#L152)</sub>
 
 ### ReadAllText *function*
 
@@ -102,9 +102,10 @@ producing no final empty line.
 Result<String, IOError> ReadAllText(String path)
 ```
 
-The whole file as text, read as UTF-8.
+The whole file as text, read as UTF-8. A byte order mark at the start is
+dropped: it says how the text is stored and is not part of it.
 
-<sub>[stdlib/File.sl:136](../../stdlib/File.sl#L136)</sub>
+<sub>[stdlib/File.sl:137](../../stdlib/File.sl#L137)</sub>
 
 ### Rename *function*
 
@@ -135,7 +136,7 @@ IOError WriteAllBytes(String path, byte[] data)
 
 Replaces the file with `data`, creating it if needed.
 
-<sub>[stdlib/File.sl:155](../../stdlib/File.sl#L155)</sub>
+<sub>[stdlib/File.sl:172](../../stdlib/File.sl#L172)</sub>
 
 ### WriteAllLines *function*
 
@@ -143,9 +144,10 @@ Replaces the file with `data`, creating it if needed.
 IOError WriteAllLines(String path, IReadOnlyList<String> lines)
 ```
 
-Writes the lines, each followed by a newline.
+Writes the lines, each followed by a newline. Stops at the first write that
+fails.
 
-<sub>[stdlib/File.sl:185](../../stdlib/File.sl#L185)</sub>
+<sub>[stdlib/File.sl:197](../../stdlib/File.sl#L197)</sub>
 
 ### WriteAllText *function*
 
@@ -155,5 +157,5 @@ IOError WriteAllText(String path, String text)
 
 Replaces the file with `text`, written as UTF-8.
 
-<sub>[stdlib/File.sl:170](../../stdlib/File.sl#L170)</sub>
+<sub>[stdlib/File.sl:184](../../stdlib/File.sl#L184)</sub>
 
