@@ -1953,7 +1953,7 @@ public class GtkCustomPeer : GtkContainerPeer, ICustomPeer
         if (_blinking)
             return;
         _blinking = true;
-        Tick(BlinkHalfCycle, () => { return Phase; });
+        Tick(BlinkHalfCycle, () => { return this.Phase; });
     }
 
     bool Phase

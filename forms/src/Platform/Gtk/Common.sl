@@ -1115,15 +1115,19 @@ public class GtkContainerPeer : GtkPeer, IContainerPeer
     /// which are the platform controls on the form. False leaves them drawn
     /// over whatever the program painted, which is the order Win32 gets from
     /// `WS_CLIPCHILDREN` for nothing.
+    ///
+    /// The handler clips to the widget it was connected to, which a tab
+    /// control's later change of `content` MUST NOT move.
     protected void ReportPaints()
     {
-        ConnectEvent(content, "draw", (sender, carried) =>
+        var drawn = content;
+        ConnectEvent(drawn, "draw", (sender, carried) =>
         {
             var owner = Owner;
             if (owner == null)
                 return false;
 
-            ClipToSelf((cairo_t*)carried, content);
+            ClipToSelf((cairo_t*)carried, drawn);
             var surface = new GtkGraphicsBackend(carried);
             ((IControlNotify)owner).OnPlatformPaint(new Graphics(surface));
             cairo_restore((cairo_t*)carried);
