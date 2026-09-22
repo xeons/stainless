@@ -5,7 +5,7 @@
 Hashes, message authentication codes, key derivation and block ciphers.
 
 ```csharp
-var digest = Sha256.HashData(Encoding.Utf8().GetBytes("hello"));
+var digest = Sha256.HashData(Encoding.CreateUtf8().GetBytes("hello"));
 Console.WriteLine(Convert.ToHex(digest));
 
 var cipher = try Aes.FromKey(key);
@@ -556,7 +556,7 @@ compression function, the state, and whether the length that terminates the
 message is written big-endian -- and agree about everything else: fill a
 block, compress it, and finish by appending a one bit, zeros, and the
 length in bits. That is what is here, so a new algorithm of this family is
-`Compress`, `Digest` and `StartOver` and nothing else.
+`CompressBlock`, `ComputeDigest` and `InitializeState` and nothing else.
 
 <sub>[stdlib/Cryptography.sl:218](../../stdlib/Cryptography.sl#L218)</sub>
 
@@ -590,10 +590,10 @@ nuint BlockSizeInBytes { get; }
 
 <sub>[stdlib/Cryptography.sl:251](../../stdlib/Cryptography.sl#L251)</sub>
 
-#### Append *method*
+#### AppendData *method*
 
 ```
-void Append(byte[:] data)
+void AppendData(byte[:] data)
 ```
 
 *No documentation.*
@@ -731,10 +731,10 @@ nuint BlockSizeInBytes { get; }
 
 <sub>[stdlib/Cryptography.sl:956](../../stdlib/Cryptography.sl#L956)</sub>
 
-#### Append *method*
+#### AppendData *method*
 
 ```
-void Append(byte[:] data)
+void AppendData(byte[:] data)
 ```
 
 *No documentation.*
@@ -974,10 +974,10 @@ which is why it is on the interface rather than inside.
 
 <sub>[stdlib/Cryptography.sl:196](../../stdlib/Cryptography.sl#L196)</sub>
 
-#### Append *method*
+#### AppendData *method*
 
 ```
-void Append(byte[:] data)
+void AppendData(byte[:] data)
 ```
 
 Adds bytes to what is being hashed.

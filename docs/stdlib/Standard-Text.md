@@ -18,7 +18,7 @@ and `Substring` takes bytes. Every position this file produces lands on a
 character boundary, because it came from matching whole text -- a UTF-8
 sequence cannot begin inside another one, which is what makes byte-wise
 search correct on encoded text rather than merely fast. Positions a *caller*
-invents are its own business; `CodePointAt` and `NextCodePoint` are here for
+invents are its own business; `GetCodePointAt` and `SkipCodePoint` are here for
 walking the text properly.
 
 **Case and whitespace are ASCII.** Full Unicode case mapping is a table of
@@ -57,11 +57,11 @@ ones that would have nothing to change answer `this` rather than a copy.
 
 Every position is a byte offset, and every length is a byte count.
 `ByteLength` is O(1) and no method here counts characters. Use
-`CodePointAt` and `NextCodePoint` to walk by character.
+`GetCodePointAt` and `SkipCodePoint` to walk by character.
 
 Slicing clamps rather than failing: a `start` past the end and a length
 past the end both give what is actually there, so `Substring` cannot be
-made to abort. `ByteAt` is the exception and reads the buffer directly. A
+made to abort. `GetByteAt` is the exception and reads the buffer directly. A
 search that finds nothing answers `NotFound`.
 
 <sub>[stdlib/Text.sl:78](../../stdlib/Text.sl#L78)</sub>
@@ -187,30 +187,30 @@ Everything from `start` to the end. A `start` past the end gives "".
 
 <sub>[stdlib/Text.sl:213](../../stdlib/Text.sl#L213)</sub>
 
-#### Before *method*
+#### SubstringBefore *method*
 
 ```
-String Before(String separator)
+String SubstringBefore(String separator)
 ```
 
 The text before the first `separator`, or all of it when there is none.
 
 <sub>[stdlib/Text.sl:222](../../stdlib/Text.sl#L222)</sub>
 
-#### After *method*
+#### SubstringAfter *method*
 
 ```
-String After(String separator)
+String SubstringAfter(String separator)
 ```
 
 The text after the first `separator`, or "" when there is none.
 
 <sub>[stdlib/Text.sl:231](../../stdlib/Text.sl#L231)</sub>
 
-#### AfterLast *method*
+#### SubstringAfterLast *method*
 
 ```
-String AfterLast(String separator)
+String SubstringAfterLast(String separator)
 ```
 
 The text after the last `separator`, or all of it when there is none.
@@ -404,10 +404,10 @@ linguistic ordering and does not claim to be one.
 
 <sub>[stdlib/Text.sl:542](../../stdlib/Text.sl#L542)</sub>
 
-#### ByteAt *method*
+#### GetByteAt *method*
 
 ```
-byte ByteAt(nuint index)
+byte GetByteAt(nuint index)
 ```
 
 The byte at `index`, which is a code unit and not a character.
@@ -418,10 +418,10 @@ string's. Check the length first, or slice instead.
 
 <sub>[stdlib/Text.sl:569](../../stdlib/Text.sl#L569)</sub>
 
-#### CodePointAt *method*
+#### GetCodePointAt *method*
 
 ```
-char32 CodePointAt(nuint index)
+char32 GetCodePointAt(nuint index)
 ```
 
 The scalar beginning at `index`.
@@ -433,19 +433,19 @@ short, an overlong form, a surrogate or a value past U+10FFFF.
 
 <sub>[stdlib/Text.sl:580](../../stdlib/Text.sl#L580)</sub>
 
-#### NextCodePoint *method*
+#### SkipCodePoint *method*
 
 ```
-nuint NextCodePoint(nuint index)
+nuint SkipCodePoint(nuint index)
 ```
 
 The index of the character after the one at `index`.
 
-Together with `CodePointAt` this is how the text is walked properly:
+Together with `GetCodePointAt` this is how the text is walked properly:
 
 ```
-for (nuint at = 0; at < s.ByteLength(); at = s.NextCodePoint(at)) {
-    var c = s.CodePointAt(at);
+for (nuint at = 0; at < s.ByteLength(); at = s.SkipCodePoint(at)) {
+    var c = s.GetCodePointAt(at);
 }
 ```
 
@@ -583,10 +583,10 @@ loop allocates once.
 
 <sub>[stdlib/Text.sl:892](../../stdlib/Text.sl#L892)</sub>
 
-#### ByteAt *method*
+#### GetByteAt *method*
 
 ```
-byte ByteAt(nuint index)
+byte GetByteAt(nuint index)
 ```
 
 One byte by position.
@@ -735,10 +735,10 @@ True when `value` appears in what has been built.
 
 <sub>[stdlib/Text.sl:1087](../../stdlib/Text.sl#L1087)</sub>
 
-#### Truncate *method*
+#### TruncateTo *method*
 
 ```
-void Truncate(nuint at)
+void TruncateTo(nuint at)
 ```
 
 Everything from `at` to the end, thrown away.
@@ -782,7 +782,7 @@ Convert at the boundary and stay in `String` everywhere else.
 
 Positions are units, not characters and not bytes: a scalar outside the
 basic plane is two units, so `UnitCount` is not a character count and
-`UnitAt` can land on half a surrogate pair. `CodePointAt` joins the pair.
+`GetUnitAt` can land on half a surrogate pair. `GetCodePointAt` joins the pair.
 
 <sub>[stdlib/Text.sl:1176](../../stdlib/Text.sl#L1176)</sub>
 
@@ -796,10 +796,10 @@ Whether there are any units at all.
 
 <sub>[stdlib/Text.sl:1180](../../stdlib/Text.sl#L1180)</sub>
 
-#### UnitAt *method*
+#### GetUnitAt *method*
 
 ```
-char16 UnitAt(nuint index)
+char16 GetUnitAt(nuint index)
 ```
 
 The unit at `index`. A unit, not a character: one half of a surrogate
@@ -807,10 +807,10 @@ pair is a unit and is not a character.
 
 <sub>[stdlib/Text.sl:1184](../../stdlib/Text.sl#L1184)</sub>
 
-#### CodePointAt *method*
+#### GetCodePointAt *method*
 
 ```
-char32 CodePointAt(nuint index)
+char32 GetCodePointAt(nuint index)
 ```
 
 The scalar beginning at `index`, joining a surrogate pair.
@@ -820,10 +820,10 @@ have produced -- a lone half cannot be encoded in UTF-8 at all.
 
 <sub>[stdlib/Text.sl:1193](../../stdlib/Text.sl#L1193)</sub>
 
-#### NextCodePoint *method*
+#### SkipCodePoint *method*
 
 ```
-nuint NextCodePoint(nuint index)
+nuint SkipCodePoint(nuint index)
 ```
 
 The index of the character after the one at `index`.

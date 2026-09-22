@@ -18,22 +18,9 @@ program that never prints has no reason to carry `Write` in scope.
 
 ## Contents
 
-**Functions** &nbsp; [AtEnd](#atend-function) &middot; [Flush](#flush-function) &middot; [ReadLine](#readline-function) &middot; [ReadToEnd](#readtoend-function) &middot; [Write](#write-function) &middot; [WriteError](#writeerror-function) &middot; [WriteLine](#writeline-function)
+**Functions** &nbsp; [Flush](#flush-function) &middot; [IsInputAtEnd](#isinputatend-function) &middot; [ReadLine](#readline-function) &middot; [ReadToEnd](#readtoend-function) &middot; [Write](#write-function) &middot; [WriteError](#writeerror-function) &middot; [WriteLine](#writeline-function)
 
 ## Functions
-
-### AtEnd *function*
-
-```
-bool AtEnd()
-```
-
-Whether stdin has reached its end.
-
-It reads a byte to find out and pushes it back, so it answers only when
-the stream has something to say: on one that is open and idle it waits.
-
-<sub>[stdlib/Console.sl:91](../../stdlib/Console.sl#L91)</sub>
 
 ### Flush *function*
 
@@ -49,6 +36,19 @@ nothing the reader can see. A process killed rather than returned from
 loses whatever is still held.
 
 <sub>[stdlib/Console.sl:73](../../stdlib/Console.sl#L73)</sub>
+
+### IsInputAtEnd *function*
+
+```
+bool IsInputAtEnd()
+```
+
+Whether stdin has reached its end.
+
+It reads a byte to find out and pushes it back, so it answers only when
+the stream has something to say: on one that is open and idle it waits.
+
+<sub>[stdlib/Console.sl:91](../../stdlib/Console.sl#L91)</sub>
 
 ### ReadLine *function*
 

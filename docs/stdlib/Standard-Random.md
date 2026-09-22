@@ -12,14 +12,14 @@ reproduce. A `Random` you made is a `Random` you can seed and replay.
 **This is not cryptographic.** xoshiro256** is fast and well-distributed,
 and its entire future is computable from 256 bits of state -- which is what
 makes a seeded run reproducible and what makes it unfit for a key, a token
-or a password. `Bytes` from the platform is what that needs; `sl_random_bytes`
+or a password. `FillSecureBytes` from the platform is what that needs; `sl_random_bytes`
 is what this seeds from and is right there.
 
 ## Contents
 
 **Types** &nbsp; [Random](#random-class)
 
-**Functions** &nbsp; [Bytes](#bytes-function) &middot; [Seed](#seed-function)
+**Functions** &nbsp; [FillSecureBytes](#fillsecurebytes-function) &middot; [GenerateSeed](#generateseed-function)
 
 ## Types
 
@@ -143,10 +143,10 @@ likely paths over n! orderings, which cannot come out even.
 
 ## Functions
 
-### Bytes *function*
+### FillSecureBytes *function*
 
 ```
-bool Bytes(byte[] buffer)
+bool FillSecureBytes(byte[] buffer)
 ```
 
 Bytes straight from the operating system's cryptographic source, which is
@@ -155,14 +155,14 @@ reason to fall back on the clock.
 
 <sub>[stdlib/Random.sl:204](../../stdlib/Random.sl#L204)</sub>
 
-### Seed *function*
+### GenerateSeed *function*
 
 ```
-long Seed()
+long GenerateSeed()
 ```
 
 One unpredictable 64-bit value from the platform, for seeding something
-else deliberately. Aborts if the platform supplies none; `Bytes` is the
+else deliberately. Aborts if the platform supplies none; `FillSecureBytes` is the
 form that reports instead.
 
 <sub>[stdlib/Random.sl:214](../../stdlib/Random.sl#L214)</sub>

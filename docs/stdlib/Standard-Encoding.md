@@ -13,7 +13,7 @@ crossing, and every crossing is explicit.
 The shape is .NET's, adapted to what this language has: an interface rather
 than an abstract class with static instances, because a static needs a
 Sendable type and an initializer that `--shared` has nowhere to run. So the
-encodings come from functions -- `Encoding.Utf8()` -- and a program may add
+encodings come from functions -- `Encoding.CreateUtf8()` -- and a program may add
 one of its own by implementing `IEncoding`.
 
 Both directions are lossy by default and say so, which is the same rule the
@@ -26,7 +26,7 @@ is the strict form for a caller that needs to know rather than to cope, and
 
 **Types** &nbsp; [AsciiEncoding](#asciiencoding-class) &middot; [EncodingError](#encodingerror-enum) &middot; [IDecoder](#idecoder-interface) &middot; [IEncoding](#iencoding-interface) &middot; [Latin1Encoding](#latin1encoding-class) &middot; [SingleByteEncoding](#singlebyteencoding-class) &middot; [Utf16Encoding](#utf16encoding-class) &middot; [Utf32Encoding](#utf32encoding-class) &middot; [Utf8Encoding](#utf8encoding-class) &middot; [Windows1252Encoding](#windows1252encoding-class)
 
-**Functions** &nbsp; [Ascii](#ascii-function) &middot; [Detect](#detect-function) &middot; [Latin1](#latin1-function) &middot; [Utf16](#utf16-function) &middot; [Utf16BigEndian](#utf16bigendian-function) &middot; [Utf32](#utf32-function) &middot; [Utf32BigEndian](#utf32bigendian-function) &middot; [Utf8](#utf8-function) &middot; [Windows1252](#windows1252-function) &middot; [WithoutPreamble](#withoutpreamble-function)
+**Functions** &nbsp; [CreateAscii](#createascii-function) &middot; [CreateLatin1](#createlatin1-function) &middot; [CreateUtf16](#createutf16-function) &middot; [CreateUtf16BigEndian](#createutf16bigendian-function) &middot; [CreateUtf32](#createutf32-function) &middot; [CreateUtf32BigEndian](#createutf32bigendian-function) &middot; [CreateUtf8](#createutf8-function) &middot; [CreateWindows1252](#createwindows1252-function) &middot; [DetectEncoding](#detectencoding-function) &middot; [StripPreamble](#strippreamble-function)
 
 ## Types
 
@@ -494,7 +494,7 @@ String GetString(byte[] bytes)
 
 `bytes` read as UTF-16, with an unpaired surrogate or a trailing odd
 byte becoming U+FFFD. A byte order mark, if present, is not stripped --
-`WithoutPreamble` is what does that.
+`StripPreamble` is what does that.
 
 <sub>[stdlib/Encoding.sl:501](../../stdlib/Encoding.sl#L501)</sub>
 
@@ -536,7 +536,7 @@ byte[] Preamble { get; }
 ```
 
 Four bytes, and the little-endian one begins with UTF-16LE's -- which
-is why `Detect` tests UTF-32 first.
+is why `DetectEncoding` tests UTF-32 first.
 
 <sub>[stdlib/Encoding.sl:592](../../stdlib/Encoding.sl#L592)</sub>
 
@@ -756,20 +756,94 @@ unassigned bytes and is written by none of them.
 
 ## Functions
 
-### Ascii *function*
+### CreateAscii *function*
 
 ```
-IEncoding Ascii()
+IEncoding CreateAscii()
 ```
 
 US-ASCII: seven bits, and nothing above them.
 
 <sub>[stdlib/Encoding.sl:300](../../stdlib/Encoding.sl#L300)</sub>
 
-### Detect *function*
+### CreateLatin1 *function*
 
 ```
-IEncoding? Detect(byte[] bytes)
+IEncoding CreateLatin1()
+```
+
+ISO-8859-1, in which every byte is the code point of the same number. That
+makes it the one encoding that can carry any byte sequence without failing,
+which is why it is what a protocol reaches for when it does not know.
+
+<sub>[stdlib/Encoding.sl:305](../../stdlib/Encoding.sl#L305)</sub>
+
+### CreateUtf16 *function*
+
+```
+IEncoding CreateUtf16()
+```
+
+UTF-16, little-endian -- the one Windows means by "Unicode".
+
+<sub>[stdlib/Encoding.sl:288](../../stdlib/Encoding.sl#L288)</sub>
+
+### CreateUtf16BigEndian *function*
+
+```
+IEncoding CreateUtf16BigEndian()
+```
+
+UTF-16, big-endian.
+
+<sub>[stdlib/Encoding.sl:291](../../stdlib/Encoding.sl#L291)</sub>
+
+### CreateUtf32 *function*
+
+```
+IEncoding CreateUtf32()
+```
+
+UTF-32, little-endian: one scalar per four bytes, no surrogates.
+
+<sub>[stdlib/Encoding.sl:294](../../stdlib/Encoding.sl#L294)</sub>
+
+### CreateUtf32BigEndian *function*
+
+```
+IEncoding CreateUtf32BigEndian()
+```
+
+UTF-32, big-endian.
+
+<sub>[stdlib/Encoding.sl:297](../../stdlib/Encoding.sl#L297)</sub>
+
+### CreateUtf8 *function*
+
+```
+IEncoding CreateUtf8()
+```
+
+UTF-8: what a `String` already is, so both directions are a copy.
+
+<sub>[stdlib/Encoding.sl:285](../../stdlib/Encoding.sl#L285)</sub>
+
+### CreateWindows1252 *function*
+
+```
+IEncoding CreateWindows1252()
+```
+
+Windows-1252: Latin-1 with the C1 control range replaced by punctuation --
+curly quotes, the dash, the euro. Most text labelled ISO-8859-1 is really
+this, because that is what a Windows editor wrote.
+
+<sub>[stdlib/Encoding.sl:310](../../stdlib/Encoding.sl#L310)</sub>
+
+### DetectEncoding *function*
+
+```
+IEncoding? DetectEncoding(byte[] bytes)
 ```
 
 Which encoding a byte order mark says this is, or null when there is none.
@@ -780,84 +854,10 @@ every UTF-32 file reads as UTF-16 whose first character is NUL.
 
 <sub>[stdlib/Encoding.sl:317](../../stdlib/Encoding.sl#L317)</sub>
 
-### Latin1 *function*
+### StripPreamble *function*
 
 ```
-IEncoding Latin1()
-```
-
-ISO-8859-1, in which every byte is the code point of the same number. That
-makes it the one encoding that can carry any byte sequence without failing,
-which is why it is what a protocol reaches for when it does not know.
-
-<sub>[stdlib/Encoding.sl:305](../../stdlib/Encoding.sl#L305)</sub>
-
-### Utf16 *function*
-
-```
-IEncoding Utf16()
-```
-
-UTF-16, little-endian -- the one Windows means by "Unicode".
-
-<sub>[stdlib/Encoding.sl:288](../../stdlib/Encoding.sl#L288)</sub>
-
-### Utf16BigEndian *function*
-
-```
-IEncoding Utf16BigEndian()
-```
-
-UTF-16, big-endian.
-
-<sub>[stdlib/Encoding.sl:291](../../stdlib/Encoding.sl#L291)</sub>
-
-### Utf32 *function*
-
-```
-IEncoding Utf32()
-```
-
-UTF-32, little-endian: one scalar per four bytes, no surrogates.
-
-<sub>[stdlib/Encoding.sl:294](../../stdlib/Encoding.sl#L294)</sub>
-
-### Utf32BigEndian *function*
-
-```
-IEncoding Utf32BigEndian()
-```
-
-UTF-32, big-endian.
-
-<sub>[stdlib/Encoding.sl:297](../../stdlib/Encoding.sl#L297)</sub>
-
-### Utf8 *function*
-
-```
-IEncoding Utf8()
-```
-
-UTF-8: what a `String` already is, so both directions are a copy.
-
-<sub>[stdlib/Encoding.sl:285](../../stdlib/Encoding.sl#L285)</sub>
-
-### Windows1252 *function*
-
-```
-IEncoding Windows1252()
-```
-
-Windows-1252: Latin-1 with the C1 control range replaced by punctuation --
-curly quotes, the dash, the euro. Most text labelled ISO-8859-1 is really
-this, because that is what a Windows editor wrote.
-
-<sub>[stdlib/Encoding.sl:310](../../stdlib/Encoding.sl#L310)</sub>
-
-### WithoutPreamble *function*
-
-```
-byte[] WithoutPreamble(IEncoding encoding, byte[] bytes)
+byte[] StripPreamble(IEncoding encoding, byte[] bytes)
 ```
 
 `bytes` without the byte order mark `encoding` writes, if it is there.

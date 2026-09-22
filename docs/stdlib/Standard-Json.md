@@ -5,18 +5,18 @@
 JSON, in two layers.
 
 The lower one is a document: `Json.Parse` gives a `JsonValue`, a variant that
-is exactly one of the six things JSON has, and `Write` puts one back. Nothing
+is exactly one of the six things JSON has, and `ToJsonText` puts one back. Nothing
 about it needs a type, so it handles a document whose shape a program learns
 at run time -- which is most of them.
 
 The upper one maps a document onto a type, through the field tables a
 `[Reflect]` type carries (§6). `Serialize` reads an object's fields and
-`Populate` writes them.
+`PopulateObject` writes them.
 
 **Why the mapping fills an object rather than making one.** A constructor is
 what establishes a type's invariants, and a deserializer that allocated
 zeroed memory would produce an object whose non-nullable fields were null --
-a hole in the type system rather than a value. So `Populate` takes an
+a hole in the type system rather than a value. So `PopulateObject` takes an
 instance the program made, and `Deserialize<T>` calls `new T()` first, which
 is what `where T : new()` is there to guarantee.
 
@@ -24,7 +24,7 @@ is what `where T : new()` is there to guarantee.
 
 **Types** &nbsp; [JsonCreate](#jsoncreate-attribute) &middot; [JsonError](#jsonerror-enum) &middot; [JsonIgnore](#jsonignore-attribute) &middot; [JsonName](#jsonname-attribute) &middot; [JsonObject](#jsonobject-class) &middot; [JsonValue](#jsonvalue-variant)
 
-**Functions** &nbsp; [BoolOr](#boolor-function) &middot; [Describe](#describe-function) &middot; [IntegerOr](#integeror-function) &middot; [IsNull](#isnull-function) &middot; [ItemsOf](#itemsof-function) &middot; [MembersOf](#membersof-function) &middot; [NewArray](#newarray-function) &middot; [NewObject](#newobject-function) &middot; [NumberOf](#numberof-function) &middot; [NumberOr](#numberor-function) &middot; [Parse](#parse-function) &middot; [Populate](#populate-function) &middot; [PopulateFrom](#populatefrom-function) &middot; [Serialize](#serialize-function) &middot; [SerializeIndented](#serializeindented-function) &middot; [TextOr](#textor-function) &middot; [ToValue](#tovalue-function) &middot; [Write](#write-function) &middot; [WriteIndented](#writeindented-function)
+**Functions** &nbsp; [CreateJsonArray](#createjsonarray-function) &middot; [CreateJsonNumber](#createjsonnumber-function) &middot; [CreateJsonObject](#createjsonobject-function) &middot; [DescribeJsonError](#describejsonerror-function) &middot; [GetBoolOrDefault](#getboolordefault-function) &middot; [GetIntegerOrDefault](#getintegerordefault-function) &middot; [GetItems](#getitems-function) &middot; [GetMembers](#getmembers-function) &middot; [GetNumberOrDefault](#getnumberordefault-function) &middot; [GetTextOrDefault](#gettextordefault-function) &middot; [IsNull](#isnull-function) &middot; [Parse](#parse-function) &middot; [PopulateObject](#populateobject-function) &middot; [PopulateObject](#populateobject-function) &middot; [Serialize](#serialize-function) &middot; [SerializeIndented](#serializeindented-function) &middot; [ToJsonText](#tojsontext-function) &middot; [ToJsonTextIndented](#tojsontextindented-function) &middot; [ToJsonValue](#tojsonvalue-function)
 
 **Constants** &nbsp; [MaxDepth](#maxdepth-constant)
 
@@ -204,23 +204,23 @@ repeated name is kept, so this can exceed the number of names.
 
 <sub>[stdlib/Json.sl:126](../../stdlib/Json.sl#L126)</sub>
 
-#### NameAt *method*
+#### GetNameAt *method*
 
 ```
-String NameAt(nuint index)
+String GetNameAt(nuint index)
 ```
 
 The name at a position, in the order the document wrote them.
 
 <sub>[stdlib/Json.sl:129](../../stdlib/Json.sl#L129)</sub>
 
-#### ValueAt *method*
+#### GetValueAt *method*
 
 ```
-JsonValue ValueAt(nuint index)
+JsonValue GetValueAt(nuint index)
 ```
 
-The value at a position, pairing with `NameAt` at the same index.
+The value at a position, pairing with `GetNameAt` at the same index.
 
 <sub>[stdlib/Json.sl:132](../../stdlib/Json.sl#L132)</sub>
 
@@ -235,10 +235,10 @@ that is what the document said; `Find` answers with the first.
 
 <sub>[stdlib/Json.sl:136](../../stdlib/Json.sl#L136)</sub>
 
-#### Set *method*
+#### SetValue *method*
 
 ```
-void Set(String name, JsonValue value)
+void SetValue(String name, JsonValue value)
 ```
 
 Replaces the value of a name, or adds it.
@@ -256,10 +256,10 @@ whether it is there and then asking for it would cost.
 
 <sub>[stdlib/Json.sl:143](../../stdlib/Json.sl#L143)</sub>
 
-#### Has *method*
+#### ContainsKey *method*
 
 ```
-bool Has(String name)
+bool ContainsKey(String name)
 ```
 
 Whether a member of that name is there. A scan, so `IndexOf` once
@@ -333,7 +333,7 @@ Number(double Value)
 
 A number. JSON has only the one numeric type and it is a double, so an
 integer past 2^53 has already lost precision by the time it is here.
-A parsed one is always finite; `Write` says what becomes of one that
+A parsed one is always finite; `ToJsonText` says what becomes of one that
 is not.
 
 <sub>[stdlib/Json.sl:179](../../stdlib/Json.sl#L179)</sub>
@@ -370,95 +370,20 @@ An object, in the order its members were written.
 
 ## Functions
 
-### BoolOr *function*
+### CreateJsonArray *function*
 
 ```
-bool BoolOr(JsonValue value, bool fallback)
-```
-
-The value of a `Bool`, or the fallback. A `Number` of 1 is not true here;
-only the JSON literals are.
-
-<sub>[stdlib/Json.sl:249](../../stdlib/Json.sl#L249)</sub>
-
-### Describe *function*
-
-```
-String Describe(JsonError error)
-```
-
-A sentence describing an error, for a message a person will read.
-
-<sub>[stdlib/Json.sl:85](../../stdlib/Json.sl#L85)</sub>
-
-### IntegerOr *function*
-
-```
-long IntegerOr(JsonValue value, long fallback)
-```
-
-The value of a `Number` truncated toward zero, or the fallback.
-
-Truncation, not rounding: `3.9` is 3. JSON has one number type, so this is
-how a field that is conceptually an integer is read back. A value past what
-a `long` holds answers the fallback, as a value of the wrong type does.
-
-<sub>[stdlib/Json.sl:233](../../stdlib/Json.sl#L233)</sub>
-
-### IsNull *function*
-
-```
-bool IsNull(JsonValue value)
-```
-
-True for the one case that carries nothing.
-
-<sub>[stdlib/Json.sl:257](../../stdlib/Json.sl#L257)</sub>
-
-### ItemsOf *function*
-
-```
-List<JsonValue> ItemsOf(JsonValue value)
-```
-
-The elements of an `Array`, or an empty list.
-
-<sub>[stdlib/Json.sl:268](../../stdlib/Json.sl#L268)</sub>
-
-### MembersOf *function*
-
-```
-JsonObject MembersOf(JsonValue value)
-```
-
-The members of an `Object`, or an empty one.
-
-<sub>[stdlib/Json.sl:260](../../stdlib/Json.sl#L260)</sub>
-
-### NewArray *function*
-
-```
-JsonValue NewArray()
+JsonValue CreateJsonArray()
 ```
 
 An empty array, ready to add to.
 
 <sub>[stdlib/Json.sl:192](../../stdlib/Json.sl#L192)</sub>
 
-### NewObject *function*
+### CreateJsonNumber *function*
 
 ```
-JsonValue NewObject()
-```
-
-An empty object, ready to add to.
-
-<sub>[stdlib/Json.sl:195](../../stdlib/Json.sl#L195)</sub>
-
-### NumberOf *function*
-
-```
-JsonValue NumberOf(long value)
+JsonValue CreateJsonNumber(long value)
 ```
 
 A whole number as a JSON number, which has only the one numeric type.
@@ -469,16 +394,101 @@ at every call rather than at this declaration.
 
 <sub>[stdlib/Json.sl:202](../../stdlib/Json.sl#L202)</sub>
 
-### NumberOr *function*
+### CreateJsonObject *function*
 
 ```
-double NumberOr(JsonValue value, double fallback)
+JsonValue CreateJsonObject()
+```
+
+An empty object, ready to add to.
+
+<sub>[stdlib/Json.sl:195](../../stdlib/Json.sl#L195)</sub>
+
+### DescribeJsonError *function*
+
+```
+String DescribeJsonError(JsonError error)
+```
+
+A sentence describing an error, for a message a person will read.
+
+<sub>[stdlib/Json.sl:85](../../stdlib/Json.sl#L85)</sub>
+
+### GetBoolOrDefault *function*
+
+```
+bool GetBoolOrDefault(JsonValue value, bool fallback)
+```
+
+The value of a `Bool`, or the fallback. A `Number` of 1 is not true here;
+only the JSON literals are.
+
+<sub>[stdlib/Json.sl:249](../../stdlib/Json.sl#L249)</sub>
+
+### GetIntegerOrDefault *function*
+
+```
+long GetIntegerOrDefault(JsonValue value, long fallback)
+```
+
+The value of a `Number` truncated toward zero, or the fallback.
+
+Truncation, not rounding: `3.9` is 3. JSON has one number type, so this is
+how a field that is conceptually an integer is read back. A value past what
+a `long` holds answers the fallback, as a value of the wrong type does.
+
+<sub>[stdlib/Json.sl:233](../../stdlib/Json.sl#L233)</sub>
+
+### GetItems *function*
+
+```
+List<JsonValue> GetItems(JsonValue value)
+```
+
+The elements of an `Array`, or an empty list.
+
+<sub>[stdlib/Json.sl:268](../../stdlib/Json.sl#L268)</sub>
+
+### GetMembers *function*
+
+```
+JsonObject GetMembers(JsonValue value)
+```
+
+The members of an `Object`, or an empty one.
+
+<sub>[stdlib/Json.sl:260](../../stdlib/Json.sl#L260)</sub>
+
+### GetNumberOrDefault *function*
+
+```
+double GetNumberOrDefault(JsonValue value, double fallback)
 ```
 
 The value of a `Number`, or the fallback for anything else. A JSON number
 is a double, so a large integer has already lost precision by here.
 
 <sub>[stdlib/Json.sl:221](../../stdlib/Json.sl#L221)</sub>
+
+### GetTextOrDefault *function*
+
+```
+String GetTextOrDefault(JsonValue value, String fallback)
+```
+
+The text of a `Text`, or the fallback for anything else.
+
+<sub>[stdlib/Json.sl:212](../../stdlib/Json.sl#L212)</sub>
+
+### IsNull *function*
+
+```
+bool IsNull(JsonValue value)
+```
+
+True for the one case that carries nothing.
+
+<sub>[stdlib/Json.sl:257](../../stdlib/Json.sl#L257)</sub>
 
 ### Parse *function*
 
@@ -492,10 +502,10 @@ something else by.
 
 <sub>[stdlib/Json.sl:824](../../stdlib/Json.sl#L824)</sub>
 
-### Populate *function*
+### PopulateObject *function*
 
 ```
-JsonError Populate<T>(T value, String text)
+JsonError PopulateObject<T>(T value, String text)
 ```
 
 Fills an object's fields from a document.
@@ -512,10 +522,10 @@ object's fields a value.
 
 <sub>[stdlib/Json.sl:1231](../../stdlib/Json.sl#L1231)</sub>
 
-### PopulateFrom *function*
+### PopulateObject *function*
 
 ```
-JsonError PopulateFrom<T>(T value, JsonValue document)
+JsonError PopulateObject<T>(T value, JsonValue document)
 ```
 
 The same, from a document already parsed.
@@ -542,34 +552,10 @@ The same, indented.
 
 <sub>[stdlib/Json.sl:1071](../../stdlib/Json.sl#L1071)</sub>
 
-### TextOr *function*
+### ToJsonText *function*
 
 ```
-String TextOr(JsonValue value, String fallback)
-```
-
-The text of a `Text`, or the fallback for anything else.
-
-<sub>[stdlib/Json.sl:212](../../stdlib/Json.sl#L212)</sub>
-
-### ToValue *function*
-
-```
-JsonValue ToValue<T>(T value)
-```
-
-The document a value would produce, as a `JsonValue`.
-
-Reads the field tables of `[Reflect] T`, walking into a nested class or
-struct rather than stopping at it. A field of a kind with no JSON spelling
--- a pointer, a delegate, an array -- is left out rather than guessed at.
-
-<sub>[stdlib/Json.sl:1062](../../stdlib/Json.sl#L1062)</sub>
-
-### Write *function*
-
-```
-String Write(JsonValue value)
+String ToJsonText(JsonValue value)
 ```
 
 The document as text, on one line.
@@ -580,15 +566,29 @@ value absent rather than as some other number.
 
 <sub>[stdlib/Json.sl:847](../../stdlib/Json.sl#L847)</sub>
 
-### WriteIndented *function*
+### ToJsonTextIndented *function*
 
 ```
-String WriteIndented(JsonValue value)
+String ToJsonTextIndented(JsonValue value)
 ```
 
 The document as text, indented two spaces a level.
 
 <sub>[stdlib/Json.sl:855](../../stdlib/Json.sl#L855)</sub>
+
+### ToJsonValue *function*
+
+```
+JsonValue ToJsonValue<T>(T value)
+```
+
+The document a value would produce, as a `JsonValue`.
+
+Reads the field tables of `[Reflect] T`, walking into a nested class or
+struct rather than stopping at it. A field of a kind with no JSON spelling
+-- a pointer, a delegate, an array -- is left out rather than guessed at.
+
+<sub>[stdlib/Json.sl:1062](../../stdlib/Json.sl#L1062)</sub>
 
 ## Constants
 

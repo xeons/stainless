@@ -15,7 +15,7 @@ are written out, since C has no such library.
 
 ## Contents
 
-**Functions** &nbsp; [Abs](#abs-function) &middot; [Abs](#abs-function) &middot; [Abs](#abs-function) &middot; [Acos](#acos-function) &middot; [Asin](#asin-function) &middot; [Atan](#atan-function) &middot; [Atan2](#atan2-function) &middot; [Cbrt](#cbrt-function) &middot; [Ceiling](#ceiling-function) &middot; [Clamp](#clamp-function) &middot; [Clamp](#clamp-function) &middot; [Clamp](#clamp-function) &middot; [Clamp](#clamp-function) &middot; [Cos](#cos-function) &middot; [Cosh](#cosh-function) &middot; [Degrees](#degrees-function) &middot; [DivideCeiling](#divideceiling-function) &middot; [Exp](#exp-function) &middot; [Floor](#floor-function) &middot; [GreatestCommonDivisor](#greatestcommondivisor-function) &middot; [Hypot](#hypot-function) &middot; [IsFinite](#isfinite-function) &middot; [IsInfinite](#isinfinite-function) &middot; [IsNaN](#isnan-function) &middot; [IsPowerOfTwo](#ispoweroftwo-function) &middot; [LeadingZeros](#leadingzeros-function) &middot; [LeastCommonMultiple](#leastcommonmultiple-function) &middot; [Lerp](#lerp-function) &middot; [Log](#log-function) &middot; [Log10](#log10-function) &middot; [Log2](#log2-function) &middot; [Max](#max-function) &middot; [Max](#max-function) &middot; [Max](#max-function) &middot; [Max](#max-function) &middot; [Min](#min-function) &middot; [Min](#min-function) &middot; [Min](#min-function) &middot; [Min](#min-function) &middot; [Near](#near-function) &middot; [NextPowerOfTwo](#nextpoweroftwo-function) &middot; [PopCount](#popcount-function) &middot; [Pow](#pow-function) &middot; [Radians](#radians-function) &middot; [Remainder](#remainder-function) &middot; [Round](#round-function) &middot; [Sign](#sign-function) &middot; [Sign](#sign-function) &middot; [Sign](#sign-function) &middot; [Sin](#sin-function) &middot; [Sinh](#sinh-function) &middot; [Sqrt](#sqrt-function) &middot; [Tan](#tan-function) &middot; [Tanh](#tanh-function) &middot; [TrailingZeros](#trailingzeros-function) &middot; [Truncate](#truncate-function)
+**Functions** &nbsp; [Abs](#abs-function) &middot; [Abs](#abs-function) &middot; [Abs](#abs-function) &middot; [Acos](#acos-function) &middot; [Asin](#asin-function) &middot; [Atan](#atan-function) &middot; [Atan2](#atan2-function) &middot; [Cbrt](#cbrt-function) &middot; [Ceiling](#ceiling-function) &middot; [Clamp](#clamp-function) &middot; [Clamp](#clamp-function) &middot; [Clamp](#clamp-function) &middot; [Clamp](#clamp-function) &middot; [Cos](#cos-function) &middot; [Cosh](#cosh-function) &middot; [DivideCeiling](#divideceiling-function) &middot; [Exp](#exp-function) &middot; [Floor](#floor-function) &middot; [GreatestCommonDivisor](#greatestcommondivisor-function) &middot; [Hypot](#hypot-function) &middot; [IsFinite](#isfinite-function) &middot; [IsInfinite](#isinfinite-function) &middot; [IsNaN](#isnan-function) &middot; [IsNear](#isnear-function) &middot; [IsPowerOfTwo](#ispoweroftwo-function) &middot; [LeadingZeroCount](#leadingzerocount-function) &middot; [LeastCommonMultiple](#leastcommonmultiple-function) &middot; [Lerp](#lerp-function) &middot; [Log](#log-function) &middot; [Log10](#log10-function) &middot; [Log2](#log2-function) &middot; [Max](#max-function) &middot; [Max](#max-function) &middot; [Max](#max-function) &middot; [Max](#max-function) &middot; [Min](#min-function) &middot; [Min](#min-function) &middot; [Min](#min-function) &middot; [Min](#min-function) &middot; [PopCount](#popcount-function) &middot; [Pow](#pow-function) &middot; [Remainder](#remainder-function) &middot; [Round](#round-function) &middot; [RoundUpToPowerOfTwo](#rounduptopoweroftwo-function) &middot; [Sign](#sign-function) &middot; [Sign](#sign-function) &middot; [Sign](#sign-function) &middot; [Sin](#sin-function) &middot; [Sinh](#sinh-function) &middot; [Sqrt](#sqrt-function) &middot; [Tan](#tan-function) &middot; [Tanh](#tanh-function) &middot; [ToDegrees](#todegrees-function) &middot; [ToRadians](#toradians-function) &middot; [TrailingZeroCount](#trailingzerocount-function) &middot; [Truncate](#truncate-function)
 
 **Constants** &nbsp; [E](#e-constant) &middot; [Epsilon](#epsilon-constant) &middot; [Pi](#pi-constant) &middot; [Tau](#tau-constant)
 
@@ -186,16 +186,6 @@ like `Sinh`.
 
 <sub>[stdlib/Math.sl:139](../../stdlib/Math.sl#L139)</sub>
 
-### Degrees *function*
-
-```
-double Degrees(double radians)
-```
-
-An angle in radians, as degrees.
-
-<sub>[stdlib/Math.sl:231](../../stdlib/Math.sl#L231)</sub>
-
 ### DivideCeiling *function*
 
 ```
@@ -284,6 +274,17 @@ True when `x` is Not a Number, which is the one value not equal to itself.
 
 <sub>[stdlib/Math.sl:202](../../stdlib/Math.sl#L202)</sub>
 
+### IsNear *function*
+
+```
+bool IsNear(double a, double b, double tolerance)
+```
+
+True when the two are within `tolerance` of each other. Comparing floats
+with `==` is almost always a mistake, and this is what to write instead.
+
+<sub>[stdlib/Math.sl:219](../../stdlib/Math.sl#L219)</sub>
+
 ### IsPowerOfTwo *function*
 
 ```
@@ -295,10 +296,10 @@ false, which is the case a bare `value & (value - 1)` test gets wrong.
 
 <sub>[stdlib/Math.sl:411](../../stdlib/Math.sl#L411)</sub>
 
-### LeadingZeros *function*
+### LeadingZeroCount *function*
 
 ```
-int LeadingZeros(ulong value)
+int LeadingZeroCount(ulong value)
 ```
 
 How many zero bits sit above the highest set bit. 64 for zero.
@@ -441,28 +442,6 @@ The smaller of two `nuint`s.
 
 <sub>[stdlib/Math.sl:263](../../stdlib/Math.sl#L263)</sub>
 
-### Near *function*
-
-```
-bool Near(double a, double b, double tolerance)
-```
-
-True when the two are within `tolerance` of each other. Comparing floats
-with `==` is almost always a mistake, and this is what to write instead.
-
-<sub>[stdlib/Math.sl:219](../../stdlib/Math.sl#L219)</sub>
-
-### NextPowerOfTwo *function*
-
-```
-ulong NextPowerOfTwo(ulong value)
-```
-
-The smallest power of two that is at least `value`. Zero and one both give
-one; a value above 2^63 has no answer and gives zero.
-
-<sub>[stdlib/Math.sl:418](../../stdlib/Math.sl#L418)</sub>
-
 ### PopCount *function*
 
 ```
@@ -485,17 +464,6 @@ raised to zero, `0.0` included, gives 1.
 
 <sub>[stdlib/Math.sl:93](../../stdlib/Math.sl#L93)</sub>
 
-### Radians *function*
-
-```
-double Radians(double degrees)
-```
-
-An angle in degrees, as radians. Every trigonometric function here takes
-radians, so this is what goes between a human's number and `Sin`.
-
-<sub>[stdlib/Math.sl:235](../../stdlib/Math.sl#L235)</sub>
-
 ### Remainder *function*
 
 ```
@@ -517,6 +485,17 @@ To the nearest integer, halves away from zero -- C's rule, not the
 banker's rounding C# uses by default.
 
 <sub>[stdlib/Math.sl:160](../../stdlib/Math.sl#L160)</sub>
+
+### RoundUpToPowerOfTwo *function*
+
+```
+ulong RoundUpToPowerOfTwo(ulong value)
+```
+
+The smallest power of two that is at least `value`. Zero and one both give
+one; a value above 2^63 has no answer and gives zero.
+
+<sub>[stdlib/Math.sl:418](../../stdlib/Math.sl#L418)</sub>
 
 ### Sign *function*
 
@@ -555,7 +534,7 @@ since three values need no more.
 double Sin(double x)
 ```
 
-The sine of `x` in radians. Use `Radians` on an angle in degrees; a very
+The sine of `x` in radians. Use `ToRadians` on an angle in degrees; a very
 large `x` loses accuracy, since the reduction is done in the same double.
 
 <sub>[stdlib/Math.sl:111](../../stdlib/Math.sl#L111)</sub>
@@ -601,10 +580,31 @@ The hyperbolic tangent, which stays within (-1, 1) and cannot overflow.
 
 <sub>[stdlib/Math.sl:142](../../stdlib/Math.sl#L142)</sub>
 
-### TrailingZeros *function*
+### ToDegrees *function*
 
 ```
-int TrailingZeros(ulong value)
+double ToDegrees(double radians)
+```
+
+An angle in radians, as degrees.
+
+<sub>[stdlib/Math.sl:231](../../stdlib/Math.sl#L231)</sub>
+
+### ToRadians *function*
+
+```
+double ToRadians(double degrees)
+```
+
+An angle in degrees, as radians. Every trigonometric function here takes
+radians, so this is what goes between a human's number and `Sin`.
+
+<sub>[stdlib/Math.sl:235](../../stdlib/Math.sl#L235)</sub>
+
+### TrailingZeroCount *function*
+
+```
+int TrailingZeroCount(ulong value)
 ```
 
 How many zero bits sit below the lowest set bit. 64 for zero.

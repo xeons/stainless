@@ -11,14 +11,14 @@ cases where the whole file is the unit of work.
 
 ## Contents
 
-**Functions** &nbsp; [AppendText](#appendtext-function) &middot; [Copy](#copy-function) &middot; [Delete](#delete-function) &middot; [Exists](#exists-function) &middot; [Modified](#modified-function) &middot; [ReadAllBytes](#readallbytes-function) &middot; [ReadAllLines](#readalllines-function) &middot; [ReadAllText](#readalltext-function) &middot; [Rename](#rename-function) &middot; [Size](#size-function) &middot; [WriteAllBytes](#writeallbytes-function) &middot; [WriteAllLines](#writealllines-function) &middot; [WriteAllText](#writealltext-function)
+**Functions** &nbsp; [AppendAllText](#appendalltext-function) &middot; [Copy](#copy-function) &middot; [Delete](#delete-function) &middot; [Exists](#exists-function) &middot; [GetLastWriteTime](#getlastwritetime-function) &middot; [GetSize](#getsize-function) &middot; [Move](#move-function) &middot; [ReadAllBytes](#readallbytes-function) &middot; [ReadAllLines](#readalllines-function) &middot; [ReadAllText](#readalltext-function) &middot; [WriteAllBytes](#writeallbytes-function) &middot; [WriteAllLines](#writealllines-function) &middot; [WriteAllText](#writealltext-function)
 
 ## Functions
 
-### AppendText *function*
+### AppendAllText *function*
 
 ```
-IOError AppendText(String path, String text)
+IOError AppendAllText(String path, String text)
 ```
 
 Adds `text` to the end, creating the file if it is not there.
@@ -57,15 +57,36 @@ so this is false for one.
 
 <sub>[stdlib/File.sl:45](../../stdlib/File.sl#L45)</sub>
 
-### Modified *function*
+### GetLastWriteTime *function*
 
 ```
-long Modified(String path)
+long GetLastWriteTime(String path)
 ```
 
 When it was last written, in seconds since the epoch, or -1.
 
 <sub>[stdlib/File.sl:54](../../stdlib/File.sl#L54)</sub>
+
+### GetSize *function*
+
+```
+long GetSize(String path)
+```
+
+The size in bytes, or -1 when there is nothing there.
+
+<sub>[stdlib/File.sl:51](../../stdlib/File.sl#L51)</sub>
+
+### Move *function*
+
+```
+IOError Move(String from, String to)
+```
+
+Moves or renames. Whether it replaces an existing destination is the
+platform's decision, not this one's.
+
+<sub>[stdlib/File.sl:61](../../stdlib/File.sl#L61)</sub>
 
 ### ReadAllBytes *function*
 
@@ -106,27 +127,6 @@ The whole file as text, read as UTF-8. A byte order mark at the start is
 dropped: it says how the text is stored and is not part of it.
 
 <sub>[stdlib/File.sl:137](../../stdlib/File.sl#L137)</sub>
-
-### Rename *function*
-
-```
-IOError Rename(String from, String to)
-```
-
-Moves or renames. Whether it replaces an existing destination is the
-platform's decision, not this one's.
-
-<sub>[stdlib/File.sl:61](../../stdlib/File.sl#L61)</sub>
-
-### Size *function*
-
-```
-long Size(String path)
-```
-
-The size in bytes, or -1 when there is nothing there.
-
-<sub>[stdlib/File.sl:51](../../stdlib/File.sl#L51)</sub>
 
 ### WriteAllBytes *function*
 

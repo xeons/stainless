@@ -12,7 +12,7 @@ not sorted; `Sort` is one call away when it matters.
 
 **Types** &nbsp; [Entry](#entry-class)
 
-**Functions** &nbsp; [AllFiles](#allfiles-function) &middot; [Create](#create-function) &middot; [CreateAll](#createall-function) &middot; [Delete](#delete-function) &middot; [Directories](#directories-function) &middot; [Entries](#entries-function) &middot; [Exists](#exists-function) &middot; [Files](#files-function)
+**Functions** &nbsp; [CreateDirectory](#createdirectory-function) &middot; [CreateDirectoryTree](#createdirectorytree-function) &middot; [Delete](#delete-function) &middot; [Exists](#exists-function) &middot; [GetAllFiles](#getallfiles-function) &middot; [GetDirectories](#getdirectories-function) &middot; [GetEntries](#getentries-function) &middot; [GetFiles](#getfiles-function)
 
 ## Types
 
@@ -61,34 +61,21 @@ here, because it is the one that decides whether a walk descends.
 
 ## Functions
 
-### AllFiles *function*
+### CreateDirectory *function*
 
 ```
-Result<List<String>, IOError> AllFiles(String path)
+IOError CreateDirectory(String path)
 ```
 
-Every file underneath, at any depth.
-
-Written as a worklist rather than a recursion so that a deep tree cannot
-run the stack out.
-
-<sub>[stdlib/Directory.sl:186](../../stdlib/Directory.sl#L186)</sub>
-
-### Create *function*
-
-```
-IOError Create(String path)
-```
-
-Creates one directory. The parent has to exist already; use `CreateAll` when
+Creates one directory. The parent has to exist already; use `CreateDirectoryTree` when
 it might not.
 
 <sub>[stdlib/Directory.sl:52](../../stdlib/Directory.sl#L52)</sub>
 
-### CreateAll *function*
+### CreateDirectoryTree *function*
 
 ```
-IOError CreateAll(String path)
+IOError CreateDirectoryTree(String path)
 ```
 
 Creates the directory and every parent that is missing.
@@ -108,26 +95,6 @@ Removes one empty directory.
 
 <sub>[stdlib/Directory.sl:90](../../stdlib/Directory.sl#L90)</sub>
 
-### Directories *function*
-
-```
-Result<List<String>, IOError> Directories(String path)
-```
-
-The full paths of the directories directly inside.
-
-<sub>[stdlib/Directory.sl:167](../../stdlib/Directory.sl#L167)</sub>
-
-### Entries *function*
-
-```
-Result<List<Entry>, IOError> Entries(String path)
-```
-
-Everything directly inside, files and directories both, not recursively.
-
-<sub>[stdlib/Directory.sl:123](../../stdlib/Directory.sl#L123)</sub>
-
 ### Exists *function*
 
 ```
@@ -138,10 +105,43 @@ True when the path names a directory that is there.
 
 <sub>[stdlib/Directory.sl:45](../../stdlib/Directory.sl#L45)</sub>
 
-### Files *function*
+### GetAllFiles *function*
 
 ```
-Result<List<String>, IOError> Files(String path)
+Result<List<String>, IOError> GetAllFiles(String path)
+```
+
+Every file underneath, at any depth.
+
+Written as a worklist rather than a recursion so that a deep tree cannot
+run the stack out.
+
+<sub>[stdlib/Directory.sl:186](../../stdlib/Directory.sl#L186)</sub>
+
+### GetDirectories *function*
+
+```
+Result<List<String>, IOError> GetDirectories(String path)
+```
+
+The full paths of the directories directly inside.
+
+<sub>[stdlib/Directory.sl:167](../../stdlib/Directory.sl#L167)</sub>
+
+### GetEntries *function*
+
+```
+Result<List<Entry>, IOError> GetEntries(String path)
+```
+
+Everything directly inside, files and directories both, not recursively.
+
+<sub>[stdlib/Directory.sl:123](../../stdlib/Directory.sl#L123)</sub>
+
+### GetFiles *function*
+
+```
+Result<List<String>, IOError> GetFiles(String path)
 ```
 
 The full paths of the files directly inside.

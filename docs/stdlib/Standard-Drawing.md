@@ -9,7 +9,7 @@ var loaded = Image.FromFile("logo.png");
 if (!loaded.Ok) { return; }
 
 var logo = loaded.Value;
-logo.FillRectangle(Rgba.Rgb(200, 30, 30), 8, 8, 64, 24);
+logo.FillRectangle(Rgba.FromRgb(200, 30, 30), 8, 8, 64, 24);
 logo.DrawLine(Rgba.Black, 0, 0, logo.Width, logo.Height, 2);
 logo.Save("out.png", ImageFormat.Png);
 ```
@@ -308,20 +308,20 @@ void FillPolygon(Rgba colour, int[] points)
 
 <sub>[stdlib/Drawing.sl:1640](../../stdlib/Drawing.sl#L1640)</sub>
 
-#### Draw *method*
+#### DrawImage *method*
 
 ```
-void Draw(Image source, int x, int y)
+void DrawImage(Image source, int x, int y)
 ```
 
 Draws another picture on this one, at its own size.
 
 <sub>[stdlib/Drawing.sl:1656](../../stdlib/Drawing.sl#L1656)</sub>
 
-#### DrawScaled *method*
+#### DrawImageScaled *method*
 
 ```
-void DrawScaled(Image source, int x, int y, int width, int height, int sourceX, int sourceY, int sourceWidth, int sourceHeight)
+void DrawImageScaled(Image source, int x, int y, int width, int height, int sourceX, int sourceY, int sourceWidth, int sourceHeight)
 ```
 
 Draws part of another picture into a rectangle of this one, scaling to
@@ -612,20 +612,20 @@ byte A
 
 <sub>[stdlib/Drawing.sl:87](../../stdlib/Drawing.sl#L87)</sub>
 
-#### Rgb *method*
+#### FromRgb *method*
 
 ```
-static Rgba Rgb(byte red, byte green, byte blue)
+static Rgba FromRgb(byte red, byte green, byte blue)
 ```
 
 An opaque colour.
 
 <sub>[stdlib/Drawing.sl:90](../../stdlib/Drawing.sl#L90)</sub>
 
-#### Argb *method*
+#### FromArgb *method*
 
 ```
-static Rgba Argb(byte alpha, byte red, byte green, byte blue)
+static Rgba FromArgb(byte alpha, byte red, byte green, byte blue)
 ```
 
 A colour with an alpha, where 0 is invisible and 255 is opaque.

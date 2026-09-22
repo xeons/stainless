@@ -21,7 +21,7 @@ what is here says so rather than working until it does not.
 
 **Types** &nbsp; [XmlAttribute](#xmlattribute-attribute) &middot; [XmlAttributes](#xmlattributes-class) &middot; [XmlCreate](#xmlcreate-attribute) &middot; [XmlError](#xmlerror-enum) &middot; [XmlIgnore](#xmlignore-attribute) &middot; [XmlName](#xmlname-attribute) &middot; [XmlNode](#xmlnode-class)
 
-**Functions** &nbsp; [Describe](#describe-function) &middot; [Parse](#parse-function) &middot; [Populate](#populate-function) &middot; [PopulateFrom](#populatefrom-function) &middot; [Serialize](#serialize-function) &middot; [SerializeDocument](#serializedocument-function) &middot; [ToNode](#tonode-function) &middot; [Write](#write-function) &middot; [WriteDocument](#writedocument-function) &middot; [WriteIndented](#writeindented-function)
+**Functions** &nbsp; [DescribeXmlError](#describexmlerror-function) &middot; [Parse](#parse-function) &middot; [PopulateObject](#populateobject-function) &middot; [PopulateObject](#populateobject-function) &middot; [Serialize](#serialize-function) &middot; [SerializeDocument](#serializedocument-function) &middot; [ToXmlDocumentText](#toxmldocumenttext-function) &middot; [ToXmlNode](#toxmlnode-function) &middot; [ToXmlText](#toxmltext-function) &middot; [ToXmlTextIndented](#toxmltextindented-function)
 
 **Constants** &nbsp; [MaxDepth](#maxdepth-constant)
 
@@ -61,23 +61,23 @@ How many attributes there are.
 
 <sub>[stdlib/Xml.sl:131](../../stdlib/Xml.sl#L131)</sub>
 
-#### NameAt *method*
+#### GetNameAt *method*
 
 ```
-String NameAt(nuint index)
+String GetNameAt(nuint index)
 ```
 
 The name at a position, in the order they were written.
 
 <sub>[stdlib/Xml.sl:134](../../stdlib/Xml.sl#L134)</sub>
 
-#### ValueAt *method*
+#### GetValueAt *method*
 
 ```
-String ValueAt(nuint index)
+String GetValueAt(nuint index)
 ```
 
-The value at a position, pairing with `NameAt` at the same index.
+The value at a position, pairing with `GetNameAt` at the same index.
 
 <sub>[stdlib/Xml.sl:137](../../stdlib/Xml.sl#L137)</sub>
 
@@ -93,10 +93,10 @@ document cannot reach here with a repeat -- that is
 
 <sub>[stdlib/Xml.sl:142](../../stdlib/Xml.sl#L142)</sub>
 
-#### Set *method*
+#### SetValue *method*
 
 ```
-void Set(String name, String value)
+void SetValue(String name, String value)
 ```
 
 Sets the value of a name, adding it if it is new. A replaced name keeps
@@ -114,10 +114,10 @@ Where a name is, or `None`.
 
 <sub>[stdlib/Xml.sl:149](../../stdlib/Xml.sl#L149)</sub>
 
-#### Has *method*
+#### ContainsKey *method*
 
 ```
-bool Has(String name)
+bool ContainsKey(String name)
 ```
 
 Whether an attribute of that name is there.
@@ -334,7 +334,7 @@ configuration file has.
 
 **Whitespace between elements is formatting.** In an element with child
 elements, a run of text that is only whitespace in the source is dropped:
-it is the indentation a person or `WriteIndented` put there. A run with
+it is the indentation a person or `ToXmlTextIndented` put there. A run with
 anything else in it is kept whole, as is a CDATA section or a character
 reference, and an element with no children keeps all of its text.
 
@@ -383,30 +383,30 @@ relative to the children is not kept -- see the note above.
 
 <sub>[stdlib/Xml.sl:192](../../stdlib/Xml.sl#L192)</sub>
 
-#### Child *method*
+#### FindChild *method*
 
 ```
-XmlNode? Child(String name)
+XmlNode? FindChild(String name)
 ```
 
 The first child of that name, or null.
 
 <sub>[stdlib/Xml.sl:204](../../stdlib/Xml.sl#L204)</sub>
 
-#### ChildrenNamed *method*
+#### FindChildren *method*
 
 ```
-List<XmlNode> ChildrenNamed(String name)
+List<XmlNode> FindChildren(String name)
 ```
 
 Every child of that name, in order.
 
 <sub>[stdlib/Xml.sl:216](../../stdlib/Xml.sl#L216)</sub>
 
-#### TextOf *method*
+#### FindChildText *method*
 
 ```
-String TextOf(String name, String fallback)
+String FindChildText(String name, String fallback)
 ```
 
 The text of the first child of that name, or the fallback.
@@ -426,10 +426,10 @@ node to one of its own descendants: writing the tree would not end.
 
 ## Functions
 
-### Describe *function*
+### DescribeXmlError *function*
 
 ```
-String Describe(XmlError error)
+String DescribeXmlError(XmlError error)
 ```
 
 A sentence describing an error, for a message a person will read.
@@ -450,24 +450,24 @@ is refused wherever it is. A UTF-8 byte order mark at the start is skipped.
 
 <sub>[stdlib/Xml.sl:936](../../stdlib/Xml.sl#L936)</sub>
 
-### Populate *function*
+### PopulateObject *function*
 
 ```
-XmlError Populate<T>(T value, String source)
+XmlError PopulateObject<T>(T value, String source)
 ```
 
 Fills an object's fields from an element.
 
-The object is the program's, for the reason `Json.Populate` takes one: its
+The object is the program's, for the reason `Json.PopulateObject` takes one: its
 constructor has run, so a field the document does not mention keeps the
 value the type promised rather than a zero.
 
 <sub>[stdlib/Xml.sl:1339](../../stdlib/Xml.sl#L1339)</sub>
 
-### PopulateFrom *function*
+### PopulateObject *function*
 
 ```
-XmlError PopulateFrom<T>(T value, XmlNode node)
+XmlError PopulateObject<T>(T value, XmlNode node)
 ```
 
 The same, from an element already parsed.
@@ -494,10 +494,20 @@ The same, with a declaration and indentation.
 
 <sub>[stdlib/Xml.sl:1183](../../stdlib/Xml.sl#L1183)</sub>
 
-### ToNode *function*
+### ToXmlDocumentText *function*
 
 ```
-XmlNode ToNode<T>(T value, String name)
+String ToXmlDocumentText(XmlNode node)
+```
+
+The declaration and the element under it, which is what a whole file wants.
+
+<sub>[stdlib/Xml.sl:1035](../../stdlib/Xml.sl#L1035)</sub>
+
+### ToXmlNode *function*
+
+```
+XmlNode ToXmlNode<T>(T value, String name)
 ```
 
 A value as an element, with each field a child element under it.
@@ -508,30 +518,20 @@ JSON document with angle brackets.
 
 <sub>[stdlib/Xml.sl:1174](../../stdlib/Xml.sl#L1174)</sub>
 
-### Write *function*
+### ToXmlText *function*
 
 ```
-String Write(XmlNode node)
+String ToXmlText(XmlNode node)
 ```
 
 The element as text, on one line.
 
 <sub>[stdlib/Xml.sl:1015](../../stdlib/Xml.sl#L1015)</sub>
 
-### WriteDocument *function*
+### ToXmlTextIndented *function*
 
 ```
-String WriteDocument(XmlNode node)
-```
-
-The declaration and the element under it, which is what a whole file wants.
-
-<sub>[stdlib/Xml.sl:1035](../../stdlib/Xml.sl#L1035)</sub>
-
-### WriteIndented *function*
-
-```
-String WriteIndented(XmlNode node)
+String ToXmlTextIndented(XmlNode node)
 ```
 
 The same, indented two spaces a level. An element with text in it is still

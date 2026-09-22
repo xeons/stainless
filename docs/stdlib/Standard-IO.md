@@ -22,7 +22,7 @@ would make the common cases read worse than the rare one.
 
 **Types** &nbsp; [FileAccess](#fileaccess-enum) &middot; [FileMode](#filemode-enum) &middot; [FileStream](#filestream-class) &middot; [IOError](#ioerror-enum) &middot; [IStream](#istream-interface) &middot; [MemoryStream](#memorystream-class) &middot; [SeekOrigin](#seekorigin-enum) &middot; [StreamReader](#streamreader-class) &middot; [StreamWriter](#streamwriter-class) &middot; [StringReader](#stringreader-class) &middot; [StringWriter](#stringwriter-class) &middot; [TextReader](#textreader-class) &middot; [TextWriter](#textwriter-class)
 
-**Functions** &nbsp; [Describe](#describe-function) &middot; [ReadTextToEnd](#readtexttoend-function) &middot; [ReadToEnd](#readtoend-function) &middot; [SplitLines](#splitlines-function)
+**Functions** &nbsp; [DescribeIOError](#describeioerror-function) &middot; [ReadTextToEnd](#readtexttoend-function) &middot; [ReadToEnd](#readtoend-function) &middot; [SplitLines](#splitlines-function)
 
 ## Types
 
@@ -1170,10 +1170,10 @@ Each of `lines`, each ended.
 
 ## Functions
 
-### Describe *function*
+### DescribeIOError *function*
 
 ```
-String Describe(IOError error)
+String DescribeIOError(IOError error)
 ```
 
 A sentence describing an error, for a message a person will read.

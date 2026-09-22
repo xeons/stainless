@@ -7,9 +7,9 @@ Sound out of the machine, and sound into it.
 ```csharp
 var loaded = Wav.FromFile("chime.wav");
 if (loaded.Ok)
-    Audio.Play(loaded.Value);
+    Audio.PlayClip(loaded.Value);
 
-var heard = Audio.Record(AudioFormat.Voice, 3.0);   // three seconds
+var heard = Audio.RecordClip(AudioFormat.Voice, 3.0);   // three seconds
 if (heard.Ok)
     Wav.Save(heard.Value, "heard.wav");
 ```
@@ -24,7 +24,7 @@ half of it.
 are reached by name the first time a device is opened, which is what lets
 this live in the standard library: a program that makes no sound pays
 nothing, and a machine with no ALSA answers `AudioError.NoBackend` -- a
-value to print, rather than a link error. `Audio.Available` asks before
+value to print, rather than a link error. `Audio.IsAvailable` asks before
 anything is tried.
 
 **WASAPI rather than waveOut.** `winmm`'s `waveOut` is four calls and is
@@ -48,7 +48,7 @@ not.
 
 **Types** &nbsp; [AudioClip](#audioclip-class) &middot; [AudioError](#audioerror-enum) &middot; [AudioFormat](#audioformat-struct) &middot; [AudioPlayer](#audioplayer-class) &middot; [AudioRecorder](#audiorecorder-class) &middot; [Tone](#tone-class) &middot; [Wav](#wav-class)
 
-**Functions** &nbsp; [Available](#available-function) &middot; [BackendName](#backendname-function) &middot; [CanPlay](#canplay-function) &middot; [CanRecord](#canrecord-function) &middot; [Play](#play-function) &middot; [Record](#record-function)
+**Functions** &nbsp; [BackendName](#backendname-function) &middot; [CanPlay](#canplay-function) &middot; [CanRecord](#canrecord-function) &middot; [IsAvailable](#isavailable-function) &middot; [PlayClip](#playclip-function) &middot; [RecordClip](#recordclip-function)
 
 ## Types
 
@@ -60,18 +60,18 @@ sealed class AudioClip
 
 Samples in memory, and what they are.
 
-The unit `Wav` reads and writes and `Audio.Play` takes. It is bytes rather
+The unit `Wav` reads and writes and `Audio.PlayClip` takes. It is bytes rather
 than a typed sample array deliberately: the width is in the format, a
 conversion on the way in would cost a copy of every sound a program loads,
-and the platform wants bytes at the end of it anyway. `SampleAt` and
+and the platform wants bytes at the end of it anyway. `GetSample` and
 `SetSample` are there for a program that does want to look.
 
 <sub>[stdlib/Audio.sl:185](../../stdlib/Audio.sl#L185)</sub>
 
-#### Silence *method*
+#### CreateSilence *method*
 
 ```
-static AudioClip Silence(AudioFormat format, nuint frames)
+static AudioClip CreateSilence(AudioFormat format, nuint frames)
 ```
 
 Silence, `frames` long.
@@ -127,10 +127,10 @@ How long it lasts, in seconds.
 
 <sub>[stdlib/Audio.sl:238](../../stdlib/Audio.sl#L238)</sub>
 
-#### SampleAt *method*
+#### GetSample *method*
 
 ```
-int SampleAt(nuint frame, nuint channel)
+int GetSample(nuint frame, nuint channel)
 ```
 
 One sample, as a number from -32768 to 32767 whatever the width is.
@@ -149,7 +149,7 @@ end at the end, and that is not a mistake in it.
 void SetSample(nuint frame, nuint channel, int value)
 ```
 
-One sample written, taking the same range `SampleAt` answers in and
+One sample written, taking the same range `GetSample` answers in and
 clamping to it. A sample wider than sixteen bits has its top sixteen
 set and the bits below them cleared. Out of range does nothing.
 
@@ -172,7 +172,7 @@ NoBackend
 ```
 
 There is no audio library on this machine: no winmm, or no
-libasound. `Audio.Available` is how to ask before trying.
+libasound. `Audio.IsAvailable` is how to ask before trying.
 
 <sub>[stdlib/Audio.sl:154](../../stdlib/Audio.sl#L154)</sub>
 
@@ -287,10 +287,10 @@ and both platforms', however strange it reads.
 
 <sub>[stdlib/Audio.sl:107](../../stdlib/Audio.sl#L107)</sub>
 
-#### Of *method*
+#### Create *method*
 
 ```
-static AudioFormat Of(uint sampleRate, ushort channels, ushort bits)
+static AudioFormat Create(uint sampleRate, ushort channels, ushort bits)
 ```
 
 A format written out.
@@ -387,7 +387,7 @@ if (!opened.Ok) { return; }
 var player = opened.Value;
 player.Write(first);
 player.Write(second);        // returns when the device has taken them
-player.Drain();              // and this when it has played them
+player.DrainBuffer();       // and this when it has played them
 player.Close();
 ```
 
@@ -449,16 +449,16 @@ Result<bool, AudioError> Write(byte[] samples)
 Samples queued, blocking until the device has room for them.
 
 Returns when the bytes have been handed over, which is not when they
-have been heard -- `Drain` is what waits for that. A length that is not
+have been heard -- `DrainBuffer` is what waits for that. A length that is not
 a whole number of frames is refused rather than truncated, because
 truncating swaps the channels for the rest of the stream.
 
 <sub>[stdlib/Audio.sl:1285](../../stdlib/Audio.sl#L1285)</sub>
 
-#### Drain *method*
+#### DrainBuffer *method*
 
 ```
-void Drain()
+void DrainBuffer()
 ```
 
 Waits until everything written has been played.
@@ -618,10 +618,10 @@ obviously correct.
 
 <sub>[stdlib/Audio.sl:1823](../../stdlib/Audio.sl#L1823)</sub>
 
-#### Sine *method*
+#### CreateSine *method*
 
 ```
-static AudioClip Sine(AudioFormat format, double frequency, double seconds, double amplitude)
+static AudioClip CreateSine(AudioFormat format, double frequency, double seconds, double amplitude)
 ```
 
 A sine wave: `frequency` hertz for `seconds`, at `amplitude` from 0.0
@@ -629,10 +629,10 @@ to 1.0. On every channel.
 
 <sub>[stdlib/Audio.sl:1827](../../stdlib/Audio.sl#L1827)</sub>
 
-#### Square *method*
+#### CreateSquare *method*
 
 ```
-static AudioClip Square(AudioFormat format, double frequency, double seconds, double amplitude)
+static AudioClip CreateSquare(AudioFormat format, double frequency, double seconds, double amplitude)
 ```
 
 A square wave, which is louder than a sine of the same amplitude and is
@@ -640,10 +640,10 @@ what a beep traditionally is.
 
 <sub>[stdlib/Audio.sl:1845](../../stdlib/Audio.sl#L1845)</sub>
 
-#### Rest *method*
+#### CreateRest *method*
 
 ```
-static AudioClip Rest(AudioFormat format, double seconds)
+static AudioClip CreateRest(AudioFormat format, double seconds)
 ```
 
 Silence, which is the third thing a test needs: a gap between two
@@ -710,20 +710,6 @@ A clip written to a `.wav` on disk.
 
 ## Functions
 
-### Available *function*
-
-```
-bool Available()
-```
-
-Whether there is an audio library on this machine. Loads it, so the first
-call is where the cost is.
-
-**Ask before trying.** A game wants to say "no audio device" at startup
-rather than in the middle of a level, and this is how it finds out.
-
-<sub>[stdlib/Audio.sl:1035](../../stdlib/Audio.sl#L1035)</sub>
-
 ### BackendName *function*
 
 ```
@@ -756,10 +742,24 @@ Whether anything can record.
 
 <sub>[stdlib/Audio.sl:1046](../../stdlib/Audio.sl#L1046)</sub>
 
-### Play *function*
+### IsAvailable *function*
 
 ```
-Result<bool, AudioError> Play(AudioClip clip)
+bool IsAvailable()
+```
+
+Whether there is an audio library on this machine. Loads it, so the first
+call is where the cost is.
+
+**Ask before trying.** A game wants to say "no audio device" at startup
+rather than in the middle of a level, and this is how it finds out.
+
+<sub>[stdlib/Audio.sl:1035](../../stdlib/Audio.sl#L1035)</sub>
+
+### PlayClip *function*
+
+```
+Result<bool, AudioError> PlayClip(AudioClip clip)
 ```
 
 A clip played through to the end.
@@ -771,10 +771,10 @@ tens of milliseconds and this does it every time.
 
 <sub>[stdlib/Audio.sl:1071](../../stdlib/Audio.sl#L1071)</sub>
 
-### Record *function*
+### RecordClip *function*
 
 ```
-Result<AudioClip, AudioError> Record(AudioFormat format, double seconds)
+Result<AudioClip, AudioError> RecordClip(AudioFormat format, double seconds)
 ```
 
 `seconds` of sound from the default input.

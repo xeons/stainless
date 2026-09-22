@@ -15,7 +15,7 @@ Interfaces are named with a leading I, as in C#.
 
 **Types** &nbsp; [Dictionary&lt;TKey, TValue&gt;](#dictionarytkey-tvalue-class) &middot; [DictionaryEnumerator&lt;TKey, TValue&gt;](#dictionaryenumeratortkey-tvalue-class) &middot; [HashSet&lt;T&gt;](#hashsett-class) &middot; [HashSetCursor&lt;T&gt;](#hashsetcursort-class) &middot; [IComparable&lt;T&gt;](#icomparablet-interface) &middot; [IEnumerable&lt;T&gt;](#ienumerablet-interface) &middot; [IEnumerator&lt;T&gt;](#ienumeratort-interface) &middot; [IEquatable&lt;T&gt;](#iequatablet-interface) &middot; [IHashable](#ihashable-interface) &middot; [IList&lt;T&gt;](#ilistt-interface) &middot; [IReadOnlyList&lt;T&gt;](#ireadonlylistt-interface) &middot; [LinkedList&lt;T&gt;](#linkedlistt-class) &middot; [LinkedListCursor&lt;T&gt;](#linkedlistcursort-class) &middot; [List&lt;T&gt;](#listt-class) &middot; [ListEnumerator&lt;T&gt;](#listenumeratort-class) &middot; [OrderedDictionary&lt;TKey, TValue&gt;](#ordereddictionarytkey-tvalue-class) &middot; [Pair&lt;TKey, TValue&gt;](#pairtkey-tvalue-class) &middot; [Queue&lt;T&gt;](#queuet-class) &middot; [QueueCursor&lt;T&gt;](#queuecursort-class) &middot; [SortedList&lt;TKey, TValue&gt;](#sortedlisttkey-tvalue-class) &middot; [SortedListCursor&lt;TKey, TValue&gt;](#sortedlistcursortkey-tvalue-class) &middot; [Stack&lt;T&gt;](#stackt-class) &middot; [StackCursor&lt;T&gt;](#stackcursort-class)
 
-**Functions** &nbsp; [Aggregate](#aggregate-function) &middot; [Aggregate](#aggregate-function) &middot; [All](#all-function) &middot; [All](#all-function) &middot; [Any](#any-function) &middot; [Any](#any-function) &middot; [BinarySearch](#binarysearch-function) &middot; [Contains](#contains-function) &middot; [CountWhere](#countwhere-function) &middot; [CountWhere](#countwhere-function) &middot; [Distinct](#distinct-function) &middot; [Distinct](#distinct-function) &middot; [Filter](#filter-function) &middot; [Filter](#filter-function) &middot; [Find](#find-function) &middot; [FirstOr](#firstor-function) &middot; [FirstOr](#firstor-function) &middot; [ForEach](#foreach-function) &middot; [ForEach](#foreach-function) &middot; [IndexOf](#indexof-function) &middot; [IndexWhere](#indexwhere-function) &middot; [Largest](#largest-function) &middot; [LastIndexOf](#lastindexof-function) &middot; [LowerBound](#lowerbound-function) &middot; [Map](#map-function) &middot; [Map](#map-function) &middot; [OrderBy](#orderby-function) &middot; [OrderBy](#orderby-function) &middot; [Reduce](#reduce-function) &middot; [Reduce](#reduce-function) &middot; [RemoveFirst](#removefirst-function) &middot; [RemoveWhere](#removewhere-function) &middot; [Reverse](#reverse-function) &middot; [Select](#select-function) &middot; [Select](#select-function) &middot; [Skip](#skip-function) &middot; [Skip](#skip-function) &middot; [Smallest](#smallest-function) &middot; [Sort](#sort-function) &middot; [Sort](#sort-function) &middot; [Sort](#sort-function) &middot; [Sort](#sort-function) &middot; [Take](#take-function) &middot; [Take](#take-function) &middot; [ToArray](#toarray-function) &middot; [ToArray](#toarray-function) &middot; [ToList](#tolist-function) &middot; [ToList](#tolist-function) &middot; [Where](#where-function) &middot; [Where](#where-function)
+**Functions** &nbsp; [Aggregate](#aggregate-function) &middot; [Aggregate](#aggregate-function) &middot; [All](#all-function) &middot; [All](#all-function) &middot; [Any](#any-function) &middot; [Any](#any-function) &middot; [BinarySearch](#binarysearch-function) &middot; [Contains](#contains-function) &middot; [Count](#count-function) &middot; [Count](#count-function) &middot; [Distinct](#distinct-function) &middot; [Distinct](#distinct-function) &middot; [Find](#find-function) &middot; [FindIndex](#findindex-function) &middot; [FindLowerBound](#findlowerbound-function) &middot; [FirstOrDefault](#firstordefault-function) &middot; [FirstOrDefault](#firstordefault-function) &middot; [ForEach](#foreach-function) &middot; [ForEach](#foreach-function) &middot; [IndexOf](#indexof-function) &middot; [LastIndexOf](#lastindexof-function) &middot; [Max](#max-function) &middot; [Min](#min-function) &middot; [OrderBy](#orderby-function) &middot; [OrderBy](#orderby-function) &middot; [RemoveFirst](#removefirst-function) &middot; [RemoveWhere](#removewhere-function) &middot; [Reverse](#reverse-function) &middot; [Select](#select-function) &middot; [Select](#select-function) &middot; [Skip](#skip-function) &middot; [Skip](#skip-function) &middot; [Sort](#sort-function) &middot; [Sort](#sort-function) &middot; [Sort](#sort-function) &middot; [Sort](#sort-function) &middot; [Take](#take-function) &middot; [Take](#take-function) &middot; [ToArray](#toarray-function) &middot; [ToArray](#toarray-function) &middot; [ToList](#tolist-function) &middot; [ToList](#tolist-function) &middot; [Where](#where-function) &middot; [Where](#where-function)
 
 ## Types
 
@@ -74,7 +74,7 @@ bool ContainsKey(TKey key)
 Whether `key` is there.
 
 One probe, but reach for `Find` when the value is what is wanted:
-`ContainsKey` and then `Get` probes twice for one answer.
+`ContainsKey` and then `GetValue` probes twice for one answer.
 
 <sub>[stdlib/Dictionary.sl:113](../../stdlib/Dictionary.sl#L113)</sub>
 
@@ -94,32 +94,32 @@ way any other variant is:
 
     if (settings.Find(name) is Some value) { Use(value); }
 
-One probe, where `ContainsKey` followed by `Get` is two, and no sentinel
-to collide with a real value the way `GetOr` has.
+One probe, where `ContainsKey` followed by `GetValue` is two, and no sentinel
+to collide with a real value the way `GetValueOrDefault` has.
 
 <sub>[stdlib/Dictionary.sl:127](../../stdlib/Dictionary.sl#L127)</sub>
 
-#### Get *method*
+#### GetValue *method*
 
 ```
-TValue Get(TKey key)
+TValue GetValue(TKey key)
 ```
 
 The value for `key`, aborting when there is none.
 
 The asserting form, and it asserts: use it only where the key is there
 by construction -- one set two lines above, or a name this code chose
-itself. `Get` means the same thing here as on `Optional`, which is that
+itself. `GetValue` means the same thing here as on `Optional`, which is that
 the caller is claiming the value exists and would rather stop than
 carry on if it does not. For a key that came from anywhere else, `Find`
 is the question and this is not.
 
 <sub>[stdlib/Dictionary.sl:143](../../stdlib/Dictionary.sl#L143)</sub>
 
-#### GetOr *method*
+#### GetValueOrDefault *method*
 
 ```
-TValue GetOr(TKey key, TValue fallback)
+TValue GetValueOrDefault(TKey key, TValue fallback)
 ```
 
 The value for `key`, or `fallback` when there is none.
@@ -141,7 +141,7 @@ carries no verb to warn anyone that it might -- which is exactly the
 shape a reader trusts without thinking.
 
     if (settings["timeout"] is Some found) { Use(found.Value); }
-    int port = settings["port"].ValueOr(8080);
+    int port = settings["port"].GetValueOrDefault(8080);
 
 A getter and a setter share one type (§7.5), so the setter takes an
 `Optional<TValue>` too -- and that turns out to say something rather than
@@ -154,16 +154,16 @@ which is what removing a key means.
 
 What this cannot do is `map[key] += 1`, because there is no value to
 add to when the key is absent. That is not a limitation so much as the
-question being asked out loud: `map[key] = map[key].ValueOr(0) + 1`
+question being asked out loud: `map[key] = map[key].GetValueOrDefault(0) + 1`
 says what should happen, and Swift's `dict[key, default: 0] += 1`
 exists for the same reason.
 
 <sub>[stdlib/Dictionary.sl:185](../../stdlib/Dictionary.sl#L185)</sub>
 
-#### Set *method*
+#### SetValue *method*
 
 ```
-void Set(TKey key, TValue value)
+void SetValue(TKey key, TValue value)
 ```
 
 Adds the key or replaces what it maps to.
@@ -201,28 +201,28 @@ anything they held is released now.
 
 <sub>[stdlib/Dictionary.sl:275](../../stdlib/Dictionary.sl#L275)</sub>
 
-#### Keys *method*
+#### GetKeys *method*
 
 ```
-List<TKey> Keys()
+List<TKey> GetKeys()
 ```
 
 Every key, in the table's own order.
 
 A fresh list, so changing it changes nothing here, and building it is a
 scan of every slot rather than of every entry -- O(capacity), not
-O(count). Pairs with `Values` position for position as long as nothing
+O(count). Pairs with `GetValues` position for position as long as nothing
 is written in between.
 
 <sub>[stdlib/Dictionary.sl:289](../../stdlib/Dictionary.sl#L289)</sub>
 
-#### Values *method*
+#### GetValues *method*
 
 ```
-List<TValue> Values()
+List<TValue> GetValues()
 ```
 
-Every value, in the same order `Keys` gives.
+Every value, in the same order `GetKeys` gives.
 
 Values are not distinct: a value stored under two keys appears twice.
 
@@ -720,8 +720,8 @@ var first = line.AddLast("a");
 line.AddLast("c");
 line.InsertAfter(first, "b");
 
-for (nint at = line.First(); at >= 0; at = line.After(at)) {
-    Console.WriteLine(line.ValueAt(at));
+for (nint at = line.First; at >= 0; at = line.GetNext(at)) {
+    Console.WriteLine(line.GetValueAt(at));
 }
 ```
 
@@ -751,50 +751,50 @@ True when nothing is linked in.
 
 <sub>[stdlib/Sequences.sl:286](../../stdlib/Sequences.sl#L286)</sub>
 
-#### First *method*
+#### First *property*
 
 ```
-nint First()
+nint First { get; }
 ```
 
 A handle to the first node, or -1 when the list is empty.
 
 <sub>[stdlib/Sequences.sl:289](../../stdlib/Sequences.sl#L289)</sub>
 
-#### Last *method*
+#### Last *property*
 
 ```
-nint Last()
+nint Last { get; }
 ```
 
 A handle to the last node, or -1 when the list is empty.
 
 <sub>[stdlib/Sequences.sl:292](../../stdlib/Sequences.sl#L292)</sub>
 
-#### After *method*
+#### GetNext *method*
 
 ```
-nint After(nint handle)
+nint GetNext(nint handle)
 ```
 
 The node after `handle`, or -1 at the end.
 
 <sub>[stdlib/Sequences.sl:295](../../stdlib/Sequences.sl#L295)</sub>
 
-#### Before *method*
+#### GetPrevious *method*
 
 ```
-nint Before(nint handle)
+nint GetPrevious(nint handle)
 ```
 
 The node before `handle`, or -1 at the start.
 
 <sub>[stdlib/Sequences.sl:298](../../stdlib/Sequences.sl#L298)</sub>
 
-#### ValueAt *method*
+#### GetValueAt *method*
 
 ```
-T ValueAt(nint handle)
+T GetValueAt(nint handle)
 ```
 
 The value in a node.
@@ -805,14 +805,14 @@ whatever the pool slot now holds, so test `at >= 0` before walking.
 
 <sub>[stdlib/Sequences.sl:305](../../stdlib/Sequences.sl#L305)</sub>
 
-#### SetAt *method*
+#### SetValueAt *method*
 
 ```
-void SetAt(nint handle, T value)
+void SetValueAt(nint handle, T value)
 ```
 
 Replaces the value in a node, leaving the links alone. Same
-requirement on `handle` as `ValueAt`.
+requirement on `handle` as `GetValueAt`.
 
 <sub>[stdlib/Sequences.sl:309](../../stdlib/Sequences.sl#L309)</sub>
 
@@ -974,7 +974,7 @@ Two deliberate differences, both stated rather than discovered:
   [docs/style.md](docs/style.md) is the reason it is a property and not a
   method: a zero-argument side-effect-free getter is a property here.
 - **The members that compare two `T`s are free functions below**, not
-  methods. `Contains`, `IndexOf`, `Remove`, `Sort` and `BinarySearch` all
+  methods. `Contains`, `IndexOf`, `RemoveFirst`, `Sort` and `BinarySearch` all
   need `T : IEquatable<T>` or `IComparable<T>`, and this class constrains
   `T` not at all -- a `List<Control>` has to stay possible. A class cannot
   demand of one method's type parameter what it does not demand of every
@@ -1396,20 +1396,20 @@ keeps a repeated key, so this can exceed the number of different keys.
 
 <sub>[stdlib/Collections.sl:1015](../../stdlib/Collections.sl#L1015)</sub>
 
-#### KeyAt *method*
+#### GetKeyAt *method*
 
 ```
-TKey KeyAt(nuint index)
+TKey GetKeyAt(nuint index)
 ```
 
 The key at a position, in insertion order.
 
 <sub>[stdlib/Collections.sl:1018](../../stdlib/Collections.sl#L1018)</sub>
 
-#### ValueAt *method*
+#### GetValueAt *method*
 
 ```
-TValue ValueAt(nuint index)
+TValue GetValueAt(nuint index)
 ```
 
 The value at a position, in insertion order.
@@ -1431,14 +1431,14 @@ every caller has to know and none can be made to.
 
 <sub>[stdlib/Collections.sl:1029](../../stdlib/Collections.sl#L1029)</sub>
 
-#### Has *method*
+#### ContainsKey *method*
 
 ```
-bool Has(TKey key)
+bool ContainsKey(TKey key)
 ```
 
 Whether the key is there at all. A scan, like everything else here, so
-`IndexOf` once beats `Has` followed by a lookup.
+`IndexOf` once beats `ContainsKey` followed by a lookup.
 
 <sub>[stdlib/Collections.sl:1041](../../stdlib/Collections.sl#L1041)</sub>
 
@@ -1452,14 +1452,14 @@ Appends, without looking for the key first.
 
 A repeated key is kept rather than replaced, because a document that
 contains one said so and dropping either half would be this collection
-deciding what the document meant. `Set` is the one that replaces.
+deciding what the document meant. `SetValue` is the one that replaces.
 
 <sub>[stdlib/Collections.sl:1048](../../stdlib/Collections.sl#L1048)</sub>
 
-#### Set *method*
+#### SetValue *method*
 
 ```
-void Set(TKey key, TValue value)
+void SetValue(TKey key, TValue value)
 ```
 
 Replaces the value of a key, or appends it. A replaced key keeps the
@@ -1467,10 +1467,10 @@ position it had, which is the point of the collection.
 
 <sub>[stdlib/Collections.sl:1056](../../stdlib/Collections.sl#L1056)</sub>
 
-#### Find *method*
+#### GetValueOrDefault *method*
 
 ```
-TValue Find(TKey key, TValue fallback)
+TValue GetValueOrDefault(TKey key, TValue fallback)
 ```
 
 The value of a key, or the fallback. There is no overload that aborts:
@@ -1734,23 +1734,23 @@ when the value is what is wanted, rather than searching twice.
 
 <sub>[stdlib/Sequences.sl:572](../../stdlib/Sequences.sl#L572)</sub>
 
-#### KeyAt *method*
+#### GetKeyAt *method*
 
 ```
-TKey KeyAt(nuint index)
+TKey GetKeyAt(nuint index)
 ```
 
 The key at a position in the ordering, counting from the smallest.
 
 <sub>[stdlib/Sequences.sl:575](../../stdlib/Sequences.sl#L575)</sub>
 
-#### ValueAt *method*
+#### GetValueAt *method*
 
 ```
-TValue ValueAt(nuint index)
+TValue GetValueAt(nuint index)
 ```
 
-The value at a position in the ordering, paired with `KeyAt` at the
+The value at a position in the ordering, paired with `GetKeyAt` at the
 same index. Aborts past the end.
 
 <sub>[stdlib/Sequences.sl:584](../../stdlib/Sequences.sl#L584)</sub>
@@ -1767,23 +1767,23 @@ that is not there is an outcome rather than a mistake.
 
 <sub>[stdlib/Sequences.sl:594](../../stdlib/Sequences.sl#L594)</sub>
 
-#### Get *method*
+#### GetValue *method*
 
 ```
-TValue Get(TKey key)
+TValue GetValue(TKey key)
 ```
 
 The value for `key`, aborting when there is none.
 
 The asserting form, for a key that is there by construction. `Find` is
-the question where it might not be, and `GetOr` where a default will do.
+the question where it might not be, and `GetValueOrDefault` where a default will do.
 
 <sub>[stdlib/Sequences.sl:606](../../stdlib/Sequences.sl#L606)</sub>
 
-#### GetOr *method*
+#### GetValueOrDefault *method*
 
 ```
-TValue GetOr(TKey key, TValue fallback)
+TValue GetValueOrDefault(TKey key, TValue fallback)
 ```
 
 The value for `key`, or `fallback` when there is none.
@@ -1794,10 +1794,10 @@ tells them apart.
 
 <sub>[stdlib/Sequences.sl:619](../../stdlib/Sequences.sl#L619)</sub>
 
-#### Set *method*
+#### SetValue *method*
 
 ```
-void Set(TKey key, TValue value)
+void SetValue(TKey key, TValue value)
 ```
 
 Sets the value of a key, adding it in order if it is new.
@@ -1815,7 +1815,7 @@ bool Remove(TKey key)
 ```
 
 Removes a key, answering whether it was there. Closes the gap, so it
-is O(n) like `Set` on a new key.
+is O(n) like `SetValue` on a new key.
 
 <sub>[stdlib/Sequences.sl:660](../../stdlib/Sequences.sl#L660)</sub>
 
@@ -1830,23 +1830,23 @@ anything they held is released now.
 
 <sub>[stdlib/Sequences.sl:685](../../stdlib/Sequences.sl#L685)</sub>
 
-#### Keys *method*
+#### GetKeys *method*
 
 ```
-List<TKey> Keys()
+List<TKey> GetKeys()
 ```
 
 Every key, smallest first, as a fresh list.
 
 <sub>[stdlib/Sequences.sl:693](../../stdlib/Sequences.sl#L693)</sub>
 
-#### Values *method*
+#### GetValues *method*
 
 ```
-List<TValue> Values()
+List<TValue> GetValues()
 ```
 
-Every value, in key order, pairing with `Keys` position for position.
+Every value, in key order, pairing with `GetKeys` position for position.
 
 <sub>[stdlib/Sequences.sl:702](../../stdlib/Sequences.sl#L702)</sub>
 
@@ -2038,9 +2038,12 @@ The item the last `MoveNext` landed on.
 A Aggregate<T, A>(T[:] items, A seed, Fold<A, T> combine)
 ```
 
-`Reduce`, spelled as LINQ spells it.
+Everything folded into one value, left to right. The seed decides the
+result type, so `A` is settled before the lambda is looked at.
 
-<sub>[stdlib/Functional.sl:466](../../stdlib/Functional.sl#L466)</sub>
+    long total = Aggregate(numbers, (long)0, (sum, n) => sum + (long)n);
+
+<sub>[stdlib/Functional.sl:81](../../stdlib/Functional.sl#L81)</sub>
 
 ### Aggregate *function*
 
@@ -2048,9 +2051,9 @@ A Aggregate<T, A>(T[:] items, A seed, Fold<A, T> combine)
 A Aggregate<T, A>(IEnumerable<T> items, A seed, Fold<A, T> combine)
 ```
 
-`Reduce` over any sequence, spelled as LINQ spells it.
+Everything folded into one value, left to right, over any sequence.
 
-<sub>[stdlib/Functional.sl:475](../../stdlib/Functional.sl#L475)</sub>
+<sub>[stdlib/Functional.sl:219](../../stdlib/Functional.sl#L219)</sub>
 
 ### All *function*
 
@@ -2123,20 +2126,20 @@ free function here for the reason `IndexOf` is.
 
 <sub>[stdlib/Collections.sl:646](../../stdlib/Collections.sl#L646)</sub>
 
-### CountWhere *function*
+### Count *function*
 
 ```
-nuint CountWhere<T>(T[:] items, Predicate<T> test)
+nuint Count<T>(T[:] items, Predicate<T> test)
 ```
 
 How many satisfy the predicate.
 
 <sub>[stdlib/Functional.sl:113](../../stdlib/Functional.sl#L113)</sub>
 
-### CountWhere *function*
+### Count *function*
 
 ```
-nuint CountWhere<T>(IEnumerable<T> items, Predicate<T> test)
+nuint Count<T>(IEnumerable<T> items, Predicate<T> test)
 ```
 
 How many satisfy the predicate, over any sequence. Walks all of it.
@@ -2170,30 +2173,6 @@ O(n squared) in comparisons, as the slice overload is.
 
 <sub>[stdlib/Functional.sl:353](../../stdlib/Functional.sl#L353)</sub>
 
-### Filter *function*
-
-```
-List<T> Filter<T>(T[:] items, Predicate<T> keep)
-```
-
-The elements the predicate keeps, in the order they were in.
-
-An array converts to a slice of the whole of itself, so this takes both.
-
-<sub>[stdlib/Functional.sl:51](../../stdlib/Functional.sl#L51)</sub>
-
-### Filter *function*
-
-```
-List<T> Filter<T>(IEnumerable<T> items, Predicate<T> keep)
-```
-
-The same, for anything with a `GetEnumerator()` that names its shape --
-`List<T>`, `Queue<T>`, `Stack<T>`, `LinkedList<T>`, `HashSet<T>` and
-`SortedList<K, V>` all do.
-
-<sub>[stdlib/Functional.sl:198](../../stdlib/Functional.sl#L198)</sub>
-
 ### Find *function*
 
 ```
@@ -2210,10 +2189,33 @@ treat a real answer as a miss.
 
 <sub>[stdlib/Functional.sl:146](../../stdlib/Functional.sl#L146)</sub>
 
-### FirstOr *function*
+### FindIndex *function*
 
 ```
-T FirstOr<T>(T[:] items, Predicate<T> test, T fallback)
+Optional<nuint> FindIndex<T>(T[:] items, Predicate<T> test)
+```
+
+Where the first element satisfying the predicate is, if it is there.
+
+<sub>[stdlib/Functional.sl:157](../../stdlib/Functional.sl#L157)</sub>
+
+### FindLowerBound *function*
+
+```
+nuint FindLowerBound<T>(T[:] items, T wanted)
+    where T : IComparable<T>
+```
+
+The first index at which `wanted` could be inserted and leave the slice
+ordered: the length when it belongs at the end, and the index of the first
+equal element when there is one.
+
+<sub>[stdlib/Collections.sl:906](../../stdlib/Collections.sl#L906)</sub>
+
+### FirstOrDefault *function*
+
+```
+T FirstOrDefault<T>(T[:] items, Predicate<T> test, T fallback)
 ```
 
 The first element satisfying the predicate, or `fallback` if none does.
@@ -2224,10 +2226,10 @@ than a different value.
 
 <sub>[stdlib/Functional.sl:129](../../stdlib/Functional.sl#L129)</sub>
 
-### FirstOr *function*
+### FirstOrDefault *function*
 
 ```
-T FirstOr<T>(IEnumerable<T> items, Predicate<T> test, T fallback)
+T FirstOrDefault<T>(IEnumerable<T> items, Predicate<T> test, T fallback)
 ```
 
 The first element satisfying the predicate, or `fallback` if none does,
@@ -2275,27 +2277,6 @@ has always answered this way; now they agree.
 
 <sub>[stdlib/Collections.sl:634](../../stdlib/Collections.sl#L634)</sub>
 
-### IndexWhere *function*
-
-```
-Optional<nuint> IndexWhere<T>(T[:] items, Predicate<T> test)
-```
-
-Where the first element satisfying the predicate is, if it is there.
-
-<sub>[stdlib/Functional.sl:157](../../stdlib/Functional.sl#L157)</sub>
-
-### Largest *function*
-
-```
-T Largest<T>(IReadOnlyList<T> items)
-    where T : IComparable<T>
-```
-
-The largest item, by its own ordering. The list must not be empty.
-
-<sub>[stdlib/Collections.sl:597](../../stdlib/Collections.sl#L597)</sub>
-
 ### LastIndexOf *function*
 
 ```
@@ -2307,44 +2288,27 @@ Where the *last* item equal to `wanted` is, if it is there at all.
 
 <sub>[stdlib/Collections.sl:652](../../stdlib/Collections.sl#L652)</sub>
 
-### LowerBound *function*
+### Max *function*
 
 ```
-nuint LowerBound<T>(T[:] items, T wanted)
+T Max<T>(IReadOnlyList<T> items)
     where T : IComparable<T>
 ```
 
-The first index at which `wanted` could be inserted and leave the slice
-ordered: the length when it belongs at the end, and the index of the first
-equal element when there is one.
+The largest item, by its own ordering. The list must not be empty.
 
-<sub>[stdlib/Collections.sl:906](../../stdlib/Collections.sl#L906)</sub>
+<sub>[stdlib/Collections.sl:597](../../stdlib/Collections.sl#L597)</sub>
 
-### Map *function*
+### Min *function*
 
 ```
-List<R> Map<T, R>(T[:] items, Func<T, R> transform)
+T Min<T>(IReadOnlyList<T> items)
+    where T : IComparable<T>
 ```
 
-Every element put through the transform.
+The smallest item, by its own ordering. The list must not be empty.
 
-    var spelled = Map(numbers, n => Text.FromInteger((long)n));
-
-`R` appears nowhere but in the transform's result, so working it out means
-binding the lambda's body -- which cannot happen until `T` has given the
-lambda its parameter type. The compiler does the two in that order.
-
-<sub>[stdlib/Functional.sl:69](../../stdlib/Functional.sl#L69)</sub>
-
-### Map *function*
-
-```
-List<R> Map<T, R>(IEnumerable<T> items, Func<T, R> transform)
-```
-
-Every element put through the transform, over any sequence.
-
-<sub>[stdlib/Functional.sl:210](../../stdlib/Functional.sl#L210)</sub>
+<sub>[stdlib/Collections.sl:612](../../stdlib/Collections.sl#L612)</sub>
 
 ### OrderBy *function*
 
@@ -2370,29 +2334,6 @@ The elements ordered by what `order` says, over any sequence, leaving the
 input alone. Copies into an array first, so it costs one.
 
 <sub>[stdlib/Functional.sl:381](../../stdlib/Functional.sl#L381)</sub>
-
-### Reduce *function*
-
-```
-A Reduce<T, A>(T[:] items, A seed, Fold<A, T> combine)
-```
-
-Everything folded into one value, left to right. The seed decides the
-result type, so `A` is settled before the lambda is looked at.
-
-    long total = Reduce(numbers, (long)0, (sum, n) => sum + (long)n);
-
-<sub>[stdlib/Functional.sl:81](../../stdlib/Functional.sl#L81)</sub>
-
-### Reduce *function*
-
-```
-A Reduce<T, A>(IEnumerable<T> items, A seed, Fold<A, T> combine)
-```
-
-Everything folded into one value, left to right, over any sequence.
-
-<sub>[stdlib/Functional.sl:219](../../stdlib/Functional.sl#L219)</sub>
 
 ### RemoveFirst *function*
 
@@ -2444,9 +2385,15 @@ Reverses part of an array in place.
 List<R> Select<T, R>(T[:] items, Func<T, R> transform)
 ```
 
-`Map`, spelled as LINQ spells it.
+Every element put through the transform.
 
-<sub>[stdlib/Functional.sl:448](../../stdlib/Functional.sl#L448)</sub>
+    var spelled = Select(numbers, n => Text.FromInteger((long)n));
+
+`R` appears nowhere but in the transform's result, so working it out means
+binding the lambda's body -- which cannot happen until `T` has given the
+lambda its parameter type. The compiler does the two in that order.
+
+<sub>[stdlib/Functional.sl:69](../../stdlib/Functional.sl#L69)</sub>
 
 ### Select *function*
 
@@ -2454,9 +2401,9 @@ List<R> Select<T, R>(T[:] items, Func<T, R> transform)
 List<R> Select<T, R>(IEnumerable<T> items, Func<T, R> transform)
 ```
 
-`Map` over any sequence, spelled as LINQ spells it.
+Every element put through the transform, over any sequence.
 
-<sub>[stdlib/Functional.sl:457](../../stdlib/Functional.sl#L457)</sub>
+<sub>[stdlib/Functional.sl:210](../../stdlib/Functional.sl#L210)</sub>
 
 ### Skip *function*
 
@@ -2477,17 +2424,6 @@ List<T> Skip<T>(IEnumerable<T> items, nuint count)
 Everything after the first `count`.
 
 <sub>[stdlib/Functional.sl:402](../../stdlib/Functional.sl#L402)</sub>
-
-### Smallest *function*
-
-```
-T Smallest<T>(IReadOnlyList<T> items)
-    where T : IComparable<T>
-```
-
-The smallest item, by its own ordering. The list must not be empty.
-
-<sub>[stdlib/Collections.sl:612](../../stdlib/Collections.sl#L612)</sub>
 
 ### Sort *function*
 
@@ -2624,9 +2560,11 @@ accident: a slice is not an `IEnumerable`, so nothing is ever both.
 List<T> Where<T>(T[:] items, Predicate<T> keep)
 ```
 
-`Filter`, spelled as LINQ spells it.
+The elements the predicate keeps, in the order they were in.
 
-<sub>[stdlib/Functional.sl:424](../../stdlib/Functional.sl#L424)</sub>
+An array converts to a slice of the whole of itself, so this takes both.
+
+<sub>[stdlib/Functional.sl:51](../../stdlib/Functional.sl#L51)</sub>
 
 ### Where *function*
 
@@ -2634,7 +2572,9 @@ List<T> Where<T>(T[:] items, Predicate<T> keep)
 List<T> Where<T>(IEnumerable<T> items, Predicate<T> keep)
 ```
 
-`Filter` over any sequence, spelled as LINQ spells it.
+The same, for anything with a `GetEnumerator()` that names its shape --
+`List<T>`, `Queue<T>`, `Stack<T>`, `LinkedList<T>`, `HashSet<T>` and
+`SortedList<K, V>` all do.
 
-<sub>[stdlib/Functional.sl:436](../../stdlib/Functional.sl#L436)</sub>
+<sub>[stdlib/Functional.sl:198](../../stdlib/Functional.sl#L198)</sub>
 

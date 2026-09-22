@@ -10,8 +10,8 @@ into the binary, and this reads it back:
 ```csharp
 import Standard.Resources;
 
-String ready = Resources.Text(201u);
-byte[] icon  = Resources.Bytes(Resources.Bitmap, 101);
+String ready = Resources.GetText(201u);
+byte[] icon  = Resources.GetBytes(Resources.Bitmap, 101);
 ```
 
 **The same answers on both platforms, by two different routes.** A PE has a
@@ -30,64 +30,17 @@ comctl32 version 6, an `RT_GROUP_ICON` becomes the window's icon, and an
 outside Windows does. Those are readable here as bytes and mean nothing.
 
 **Nothing is freed.** A resource lives in the loaded image on both routes,
-so `Pointer` hands back memory that is already there and stays valid as long
-as the program runs. It must not be written through. `Bytes` copies, which
+so `GetPointer` hands back memory that is already there and stays valid as long
+as the program runs. It must not be written through. `GetBytes` copies, which
 is what anything outliving the call wants.
 
 ## Contents
 
-**Functions** &nbsp; [BitmapFile](#bitmapfile-function) &middot; [Bytes](#bytes-function) &middot; [Bytes](#bytes-function) &middot; [Exists](#exists-function) &middot; [Exists](#exists-function) &middot; [Pointer](#pointer-function) &middot; [Size](#size-function) &middot; [Text](#text-function)
+**Functions** &nbsp; [Exists](#exists-function) &middot; [Exists](#exists-function) &middot; [GetBitmapFile](#getbitmapfile-function) &middot; [GetBytes](#getbytes-function) &middot; [GetBytes](#getbytes-function) &middot; [GetPointer](#getpointer-function) &middot; [GetSize](#getsize-function) &middot; [GetText](#gettext-function)
 
 **Constants** &nbsp; [Accelerator](#accelerator-constant) &middot; [Bitmap](#bitmap-constant) &middot; [Cursor](#cursor-constant) &middot; [Dialog](#dialog-constant) &middot; [GroupCursor](#groupcursor-constant) &middot; [GroupIcon](#groupicon-constant) &middot; [Html](#html-constant) &middot; [Icon](#icon-constant) &middot; [Manifest](#manifest-constant) &middot; [ManifestId](#manifestid-constant) &middot; [Menu](#menu-constant) &middot; [MessageTable](#messagetable-constant) &middot; [RcData](#rcdata-constant) &middot; [StringTable](#stringtable-constant) &middot; [Version](#version-constant)
 
 ## Functions
-
-### BitmapFile *function*
-
-```
-byte[] BitmapFile(int id)
-```
-
-A `RT_BITMAP` as a whole `.bmp` file.
-
-**The resource is not a file.** The resource compiler strips the 14-byte
-`BITMAPFILEHEADER`, because Windows never wants it -- `LoadImageW` is handed
-the `BITMAPINFOHEADER` onwards and knows what to do. Anything else that
-decodes an image expects a whole file, so this puts the header back.
-
-The pixel offset is not guesswork: the DIB header says how long it is, and
-the palette between it and the pixels is `biClrUsed` entries of four bytes,
-or the full `2^depth` when that field is zero and the depth is 8 or fewer.
-A 40-byte header with `BI_BITFIELDS` is followed by its three colour masks
-first; the 12-byte `BITMAPCOREHEADER` has no `biClrUsed`, and its palette
-entries are three bytes each.
-
-Empty when there is no such bitmap.
-
-<sub>[stdlib/Resources.sl:429](../../stdlib/Resources.sl#L429)</sub>
-
-### Bytes *function*
-
-```
-byte[] Bytes(int type, int id)
-```
-
-A resource's bytes, copied into an array this program owns.
-
-Empty when there is no such resource, which is also what an empty resource
-gives -- ask `Exists` where the difference matters.
-
-<sub>[stdlib/Resources.sl:342](../../stdlib/Resources.sl#L342)</sub>
-
-### Bytes *function*
-
-```
-byte[] Bytes(String type, String name)
-```
-
-The same, for a resource named by text.
-
-<sub>[stdlib/Resources.sl:350](../../stdlib/Resources.sl#L350)</sub>
 
 ### Exists *function*
 
@@ -109,34 +62,81 @@ Whether one named by text, of a type named by text, is there.
 
 <sub>[stdlib/Resources.sl:315](../../stdlib/Resources.sl#L315)</sub>
 
-### Pointer *function*
+### GetBitmapFile *function*
 
 ```
-byte* Pointer(int type, int id, uint* byteCount)
+byte[] GetBitmapFile(int id)
+```
+
+A `RT_BITMAP` as a whole `.bmp` file.
+
+**The resource is not a file.** The resource compiler strips the 14-byte
+`BITMAPFILEHEADER`, because Windows never wants it -- `LoadImageW` is handed
+the `BITMAPINFOHEADER` onwards and knows what to do. Anything else that
+decodes an image expects a whole file, so this puts the header back.
+
+The pixel offset is not guesswork: the DIB header says how long it is, and
+the palette between it and the pixels is `biClrUsed` entries of four bytes,
+or the full `2^depth` when that field is zero and the depth is 8 or fewer.
+A 40-byte header with `BI_BITFIELDS` is followed by its three colour masks
+first; the 12-byte `BITMAPCOREHEADER` has no `biClrUsed`, and its palette
+entries are three bytes each.
+
+Empty when there is no such bitmap.
+
+<sub>[stdlib/Resources.sl:429](../../stdlib/Resources.sl#L429)</sub>
+
+### GetBytes *function*
+
+```
+byte[] GetBytes(int type, int id)
+```
+
+A resource's bytes, copied into an array this program owns.
+
+Empty when there is no such resource, which is also what an empty resource
+gives -- ask `Exists` where the difference matters.
+
+<sub>[stdlib/Resources.sl:342](../../stdlib/Resources.sl#L342)</sub>
+
+### GetBytes *function*
+
+```
+byte[] GetBytes(String type, String name)
+```
+
+The same, for a resource named by text.
+
+<sub>[stdlib/Resources.sl:350](../../stdlib/Resources.sl#L350)</sub>
+
+### GetPointer *function*
+
+```
+byte* GetPointer(int type, int id, uint* byteCount)
 ```
 
 A pointer straight at a resource's bytes, without copying them.
 
 The memory belongs to the loaded image: read-only, never freed, and valid
-for as long as the program runs. `Bytes` is the one to use for anything that
+for as long as the program runs. `GetBytes` is the one to use for anything that
 outlives the call.
 
 <sub>[stdlib/Resources.sl:333](../../stdlib/Resources.sl#L333)</sub>
 
-### Size *function*
+### GetSize *function*
 
 ```
-uint Size(int type, int id)
+uint GetSize(int type, int id)
 ```
 
 How many bytes a resource holds, or zero when there is none.
 
 <sub>[stdlib/Resources.sl:321](../../stdlib/Resources.sl#L321)</sub>
 
-### Text *function*
+### GetText *function*
 
 ```
-String Text(uint id)
+String GetText(uint id)
 ```
 
 One string from a string table, by the number the script gave it.

@@ -28,7 +28,7 @@ was never anything file-shaped in it.
 
 **Types** &nbsp; [AddressFamily](#addressfamily-enum) &middot; [EndPoint](#endpoint-struct) &middot; [Socket](#socket-class) &middot; [SocketError](#socketerror-enum) &middot; [SocketKind](#socketkind-enum) &middot; [SocketShutdown](#socketshutdown-enum) &middot; [TcpClient](#tcpclient-class) &middot; [TcpListener](#tcplistener-class) &middot; [UdpSocket](#udpsocket-class)
 
-**Functions** &nbsp; [Describe](#describe-function) &middot; [Resolve](#resolve-function) &middot; [Resolve](#resolve-function)
+**Functions** &nbsp; [DescribeSocketError](#describesocketerror-function) &middot; [ResolveHost](#resolvehost-function) &middot; [ResolveHost](#resolvehost-function)
 
 ## Types
 
@@ -51,7 +51,7 @@ Any = 0
 Whichever the name resolves to.
 
 Only meaningful where a name is being resolved: connecting to one, or
-`Resolve`. There is no socket of no family, so opening one with `Any`
+`ResolveHost`. There is no socket of no family, so opening one with `Any`
 is `SocketError.Invalid` -- which is what Linux says and Windows
 quietly does not, handing back an IPv4 socket instead.
 
@@ -114,10 +114,10 @@ will then say.
 
 <sub>[stdlib/Net.sl:217](../../stdlib/Net.sl#L217)</sub>
 
-#### At *method*
+#### Create *method*
 
 ```
-static EndPoint At(String host, ushort port)
+static EndPoint Create(String host, ushort port)
 ```
 
 An endpoint, made in one expression.
@@ -763,7 +763,7 @@ answer and the one an `IStream` is built to give.
     client.SendText("GET / HTTP/1.0\r\n\r\n");
 
 The `IOError` an `IStream` reports is the nearest one to the socket error;
-`SocketError()` has the exact one, and the two are there together because a
+`SocketErrorCode` has the exact one, and the two are there together because a
 generic reader wants the first and code that knows it is a socket wants the
 second.
 
@@ -803,10 +803,10 @@ Whether the connection is there. False after the peer finished, after
 
 <sub>[stdlib/Net.sl:921](../../stdlib/Net.sl#L921)</sub>
 
-#### SocketError *method*
+#### SocketErrorCode *property*
 
 ```
-SocketError SocketError()
+SocketError SocketErrorCode { get; }
 ```
 
 The exact reason, which `Error` rounds off to fit an `IStream`.
@@ -1177,26 +1177,26 @@ reliable and has no message boundaries at all. Pretending the first is the
 second is how a program comes to assume things about UDP that are not true.
 
     var socket = try UdpSocket.Bind(9000u);
-    var from = EndPoint.At("", 0u);
+    var from = EndPoint.Create("", 0u);
     var buffer = new byte[1500];
     nuint got = socket.Receive(buffer, ref from);
 
 <sub>[stdlib/Net.sl:1091](../../stdlib/Net.sl#L1091)</sub>
 
-#### Datagram *method*
+#### Create *method*
 
 ```
-static Result<UdpSocket, SocketError> Datagram()
+static Result<UdpSocket, SocketError> Create()
 ```
 
 A socket that can send and not receive, because nothing bound it.
 
 <sub>[stdlib/Net.sl:1097](../../stdlib/Net.sl#L1097)</sub>
 
-#### Datagram *method*
+#### Create *method*
 
 ```
-static Result<UdpSocket, SocketError> Datagram(AddressFamily family)
+static Result<UdpSocket, SocketError> Create(AddressFamily family)
 ```
 
 The same, in a named family.
@@ -1354,20 +1354,20 @@ Closes the socket. Idempotent, and the destructor calls it.
 
 ## Functions
 
-### Describe *function*
+### DescribeSocketError *function*
 
 ```
-String Describe(SocketError error)
+String DescribeSocketError(SocketError error)
 ```
 
 What went wrong, in words.
 
 <sub>[stdlib/Net.sl:174](../../stdlib/Net.sl#L174)</sub>
 
-### Resolve *function*
+### ResolveHost *function*
 
 ```
-Result<String, SocketError> Resolve(String host)
+Result<String, SocketError> ResolveHost(String host)
 ```
 
 The first address a name resolves to, as text.
@@ -1378,10 +1378,10 @@ runtime, where it can try each socket as well as each address.
 
 <sub>[stdlib/Net.sl:246](../../stdlib/Net.sl#L246)</sub>
 
-### Resolve *function*
+### ResolveHost *function*
 
 ```
-Result<String, SocketError> Resolve(String host, AddressFamily family)
+Result<String, SocketError> ResolveHost(String host, AddressFamily family)
 ```
 
 The first address a name resolves to in one family, as text.

@@ -9,7 +9,7 @@ is not a limitation being apologised for -- it is the whole point. A byte
 above 127 in UTF-8 is part of a character rather than a character, so a
 question like "is this a digit" has exactly one honest answer at the byte
 level, and it is this one. Anything that needs to ask about a character
-should decode first, with `String.CodePointAt`.
+should decode first, with `String.GetCodePointAt`.
 
 This is a module of its own rather than more of `Standard.Text` because
 `Standard.Text` is imported into every module whether a program asks or not,
@@ -17,34 +17,14 @@ and `IsDigit` is far too good a name to take from every program in the world.
 
 ## Contents
 
-**Functions** &nbsp; [HexDigit](#hexdigit-function) &middot; [HexDigitUpper](#hexdigitupper-function) &middot; [HexValue](#hexvalue-function) &middot; [IsAscii](#isascii-function) &middot; [IsControl](#iscontrol-function) &middot; [IsDigit](#isdigit-function) &middot; [IsHexDigit](#ishexdigit-function) &middot; [IsLetter](#isletter-function) &middot; [IsLetterOrDigit](#isletterordigit-function) &middot; [IsLower](#islower-function) &middot; [IsUpper](#isupper-function) &middot; [IsWhiteSpace](#iswhitespace-function) &middot; [ToLower](#tolower-function) &middot; [ToUpper](#toupper-function)
+**Functions** &nbsp; [FromHexDigit](#fromhexdigit-function) &middot; [IsAscii](#isascii-function) &middot; [IsControl](#iscontrol-function) &middot; [IsDigit](#isdigit-function) &middot; [IsHexDigit](#ishexdigit-function) &middot; [IsLetter](#isletter-function) &middot; [IsLetterOrDigit](#isletterordigit-function) &middot; [IsLower](#islower-function) &middot; [IsUpper](#isupper-function) &middot; [IsWhiteSpace](#iswhitespace-function) &middot; [ToHexDigit](#tohexdigit-function) &middot; [ToHexDigitUpper](#tohexdigitupper-function) &middot; [ToLower](#tolower-function) &middot; [ToUpper](#toupper-function)
 
 ## Functions
 
-### HexDigit *function*
+### FromHexDigit *function*
 
 ```
-byte HexDigit(int value)
-```
-
-The lowercase hexadecimal digit for a value from 0 to 15.
-
-<sub>[stdlib/Ascii.sl:122](../../stdlib/Ascii.sl#L122)</sub>
-
-### HexDigitUpper *function*
-
-```
-byte HexDigitUpper(int value)
-```
-
-The uppercase hexadecimal digit for a value from 0 to 15.
-
-<sub>[stdlib/Ascii.sl:130](../../stdlib/Ascii.sl#L130)</sub>
-
-### HexValue *function*
-
-```
-int HexValue(byte value)
+int FromHexDigit(byte value)
 ```
 
 What a hexadecimal digit is worth, or -1 when it is not one.
@@ -141,6 +121,26 @@ bool IsWhiteSpace(byte value)
 True for space, tab, newline, vertical tab, form feed and carriage return.
 
 <sub>[stdlib/Ascii.sl:37](../../stdlib/Ascii.sl#L37)</sub>
+
+### ToHexDigit *function*
+
+```
+byte ToHexDigit(int value)
+```
+
+The lowercase hexadecimal digit for a value from 0 to 15.
+
+<sub>[stdlib/Ascii.sl:122](../../stdlib/Ascii.sl#L122)</sub>
+
+### ToHexDigitUpper *function*
+
+```
+byte ToHexDigitUpper(int value)
+```
+
+The uppercase hexadecimal digit for a value from 0 to 15.
+
+<sub>[stdlib/Ascii.sl:130](../../stdlib/Ascii.sl#L130)</sub>
 
 ### ToLower *function*
 

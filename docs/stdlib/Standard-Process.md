@@ -7,13 +7,13 @@ Running another program.
 **There is no shell.** The program and its arguments are a list, so a `>`, a
 `|` or a space in a filename is a character the child receives rather than
 something a shell acts on. That is the whole of shell injection, designed
-out rather than warned about -- and it is why there is no `Run(String
+out rather than warned about -- and it is why there is no `RunProcess(String
 commandLine)` here to reach for by mistake.
 
-    var done = try Run("git", ["rev-parse", "HEAD"]);
-    if (done.Ok()) { Console.WriteLine(done.Output.Trim()); }
+    var done = try RunProcess("git", ["rev-parse", "HEAD"]);
+    if (done.Succeeded) { Console.WriteLine(done.Output.Trim()); }
 
-`Run` waits and captures; `Start` hands back a `Process` to wait on later.
+`RunProcess` waits and captures; `Start` hands back a `Process` to wait on later.
 Both read the child's streams while it runs, which is not optional: a pipe
 holds about 64KB, so a parent that waits before reading waits forever on a
 child that writes more than that.
@@ -22,7 +22,7 @@ child that writes more than that.
 
 **Types** &nbsp; [Completed](#completed-struct) &middot; [Process](#process-class) &middot; [ProcessError](#processerror-enum) &middot; [Running](#running-class) &middot; [Signals](#signals-class)
 
-**Functions** &nbsp; [Open](#open-function) &middot; [Open](#open-function) &middot; [Run](#run-function) &middot; [Run](#run-function)
+**Functions** &nbsp; [OpenProcess](#openprocess-function) &middot; [OpenProcess](#openprocess-function) &middot; [RunProcess](#runprocess-function) &middot; [RunProcess](#runprocess-function)
 
 ## Types
 
@@ -68,10 +68,10 @@ progress there does not corrupt what was being captured.
 
 <sub>[stdlib/Process.sl:102](../../stdlib/Process.sl#L102)</sub>
 
-#### Ok *method*
+#### Succeeded *property*
 
 ```
-bool Ok()
+bool Succeeded { get; }
 ```
 
 The usual question, spelled once.
@@ -87,7 +87,7 @@ class Process
 A program that was started and has not been waited for.
 
 Its streams are this process's own, so what it prints goes where this
-program's output goes. `Run` is the one that captures.
+program's output goes. `RunProcess` is the one that captures.
 
 <sub>[stdlib/Process.sl:197](../../stdlib/Process.sl#L197)</sub>
 
@@ -227,25 +227,25 @@ class Running
 
 A program running with both its output streams captured, read as they fill.
 
-**What `Run` cannot do.** `Run` does not answer until the child has exited,
+**What `RunProcess` cannot do.** `RunProcess` does not answer until the child has exited,
 so a build taking a minute says nothing for a minute and then says all of
 it at once. This hands over what has arrived so far, as often as it is
 asked -- which is what a window showing a build as it happens needs, and
 the only difference between the two.
 
-    var started = Open("stainless", ["build"]);
+    var started = OpenProcess("stainless", ["build"]);
     if (started.Ok)
     {
         var child = started.Value;
-        while (child.Read())
+        while (child.ReadAvailableOutput())
         {
             Show(child.TakeOutput());
             Complain(child.TakeErrors());
         }
-        Console.WriteLine("exit " + Text.FromInteger(child.Wait().ValueOr(-1)));
+        Console.WriteLine("exit " + Text.FromInteger(child.Wait().GetValueOrDefault(-1)));
     }
 
-**`Read` waits**, and that is deliberate: it answers when there is
+**`ReadAvailableOutput` waits**, and that is deliberate: it answers when there is
 something to hand over or when the child has closed both streams, and never
 immediately with nothing. So the loop above blocks rather than spinning,
 and belongs on a thread of its own when there is a window to keep painting.
@@ -254,7 +254,7 @@ and belongs on a thread of its own when there is a window to keep painting.
 add afterwards. A pipe holds about 64KB, and a reader that drains one to
 the end while the child fills the other is waiting for a child that is
 waiting for the reader. That is why this hands back two strings rather than
-being two objects with a `Read` each.
+being two objects with a `ReadAvailableOutput` each.
 
 <sub>[stdlib/Process.sl:292](../../stdlib/Process.sl#L292)</sub>
 
@@ -268,10 +268,10 @@ What the operating system calls it.
 
 <sub>[stdlib/Process.sl:314](../../stdlib/Process.sl#L314)</sub>
 
-#### Read *method*
+#### ReadAvailableOutput *method*
 
 ```
-bool Read()
+bool ReadAvailableOutput()
 ```
 
 Takes in whatever the child has written since the last call, and
@@ -293,7 +293,7 @@ What the child wrote to its output since this was last asked, and
 nothing at all the next time.
 
 **Taken rather than read.** The buffer is emptied, because a caller
-showing output as it arrives wants each line once; `Run` is the one
+showing output as it arrives wants each line once; `RunProcess` is the one
 that answers with the whole of it at the end.
 
 <sub>[stdlib/Process.sl:336](../../stdlib/Process.sl#L336)</sub>
@@ -316,7 +316,7 @@ Result<int, ProcessError> Wait()
 
 Waits for it to finish, and answers with the code it left.
 
-**After `Read` has answered false**, not before: waiting on a child
+**After `ReadAvailableOutput` has answered false**, not before: waiting on a child
 whose output pipe is full is the deadlock the pumping exists to avoid,
 arriving from the other side. Asking twice is harmless and answers the
 same both times.
@@ -357,16 +357,16 @@ therefore no Stainless at all. What is legal is a store to a flag, so that
 is what the handler does, and this is where a program reads it -- at the
 top of its own loop, where it can actually tidy up.
 
-    Signals.Watch();
+    Signals.StartWatching();
     while (!Signals.Interrupted) { DoAPieceOfWork(); }
     Console.WriteLine("stopping");
 
 <sub>[stdlib/Process.sl:410](../../stdlib/Process.sl#L410)</sub>
 
-#### Watch *method*
+#### StartWatching *method*
 
 ```
-static bool Watch()
+static bool StartWatching()
 ```
 
 Starts noticing interrupts. Until this is called they end the program,
@@ -380,14 +380,14 @@ which is the right default for something that has nothing to tidy.
 static bool Interrupted { get; }
 ```
 
-Whether one has arrived since the last `Clear`.
+Whether one has arrived since the last `ClearInterrupt`.
 
 <sub>[stdlib/Process.sl:417](../../stdlib/Process.sl#L417)</sub>
 
-#### Clear *method*
+#### ClearInterrupt *method*
 
 ```
-static void Clear()
+static void ClearInterrupt()
 ```
 
 Forgets the one that arrived, for a program that means to carry on.
@@ -396,30 +396,30 @@ Forgets the one that arrived, for a program that means to carry on.
 
 ## Functions
 
-### Open *function*
+### OpenProcess *function*
 
 ```
-Result<Running, ProcessError> Open(String program, String[] arguments)
+Result<Running, ProcessError> OpenProcess(String program, String[] arguments)
 ```
 
 Starts a program with its output captured, to be read as it arrives.
 
 `arguments` does **not** include the program's own name; that is `program`,
 and it is what a PATH lookup is done on when it has no separator in it --
-the same bargain `Run` makes.
+the same bargain `RunProcess` makes.
 
 <sub>[stdlib/Process.sl:367](../../stdlib/Process.sl#L367)</sub>
 
-### Open *function*
+### OpenProcess *function*
 
 ```
-Result<Running, ProcessError> Open(String program, String[] arguments, String? input)
+Result<Running, ProcessError> OpenProcess(String program, String[] arguments, String? input)
 ```
 
 The same, with `input` written to the program's input.
 
 What fits in the pipe is written before this returns, and the rest no
-later than `Read` waits for output, so input of any size is safe to give a
+later than `ReadAvailableOutput` waits for output, so input of any size is safe to give a
 filter that answers as it reads. The pipe is closed once all of it is written, which
 is what makes a program reading to end-of-input stop rather than wait.
 
@@ -428,26 +428,26 @@ program's own.
 
 <sub>[stdlib/Process.sl:381](../../stdlib/Process.sl#L381)</sub>
 
-### Run *function*
+### RunProcess *function*
 
 ```
-Result<Completed, ProcessError> Run(String program, String[] arguments)
+Result<Completed, ProcessError> RunProcess(String program, String[] arguments)
 ```
 
 Runs a program to completion and answers with what it wrote and what it
 returned.
 
-    var done = try Run("git", ["status", "--short"]);
+    var done = try RunProcess("git", ["status", "--short"]);
 
 `arguments` does **not** include the program's own name; that is `program`,
 and it is what a PATH lookup is done on when it has no separator in it.
 
 <sub>[stdlib/Process.sl:154](../../stdlib/Process.sl#L154)</sub>
 
-### Run *function*
+### RunProcess *function*
 
 ```
-Result<Completed, ProcessError> Run(String program, String[] arguments, String? input)
+Result<Completed, ProcessError> RunProcess(String program, String[] arguments, String? input)
 ```
 
 The same, with `input` written to the program's input.

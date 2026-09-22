@@ -133,10 +133,10 @@ A map several threads may use at once.
 
 <sub>[stdlib/Concurrent.sl:278](../../stdlib/Concurrent.sl#L278)</sub>
 
-#### Set *method*
+#### SetValue *method*
 
 ```
-void Set(TKey key, TValue value)
+void SetValue(TKey key, TValue value)
 ```
 
 Sets the value of a key, whether or not it was there. `Add` is the one
@@ -151,15 +151,15 @@ bool Add(TKey key, TValue value)
 ```
 
 Adds the key only if it is absent, reporting whether it did. This is the
-operation `ContainsKey` followed by `Set` cannot be: between those two
+operation `ContainsKey` followed by `SetValue` cannot be: between those two
 another thread can insert.
 
 <sub>[stdlib/Concurrent.sl:306](../../stdlib/Concurrent.sl#L306)</sub>
 
-#### TryGet *method*
+#### TryGetValue *method*
 
 ```
-Taken<TValue> TryGet(TKey key)
+Taken<TValue> TryGetValue(TKey key)
 ```
 
 The value for `key` if it is there. One lock rather than two, which is
@@ -168,10 +168,10 @@ between those two another thread can remove the key.
 
 <sub>[stdlib/Concurrent.sl:317](../../stdlib/Concurrent.sl#L317)</sub>
 
-#### GetOr *method*
+#### GetValueOrDefault *method*
 
 ```
-TValue GetOr(TKey key, TValue fallback)
+TValue GetValueOrDefault(TKey key, TValue fallback)
 ```
 
 The value for `key`, or `fallback` when it is absent. No allocation,
@@ -187,8 +187,8 @@ bool ContainsKey(TKey key)
 ```
 
 Whether the key is there *now*. True here does not mean the next
-`TryGet` succeeds -- another thread may remove it in between -- so this
-is for reporting, and `TryGet` is for acting.
+`TryGetValue` succeeds -- another thread may remove it in between -- so this
+is for reporting, and `TryGetValue` is for acting.
 
 <sub>[stdlib/Concurrent.sl:346](../../stdlib/Concurrent.sl#L346)</sub>
 
@@ -233,10 +233,10 @@ Whether it is empty *now*, with the same caveat as `Count`.
 
 <sub>[stdlib/Concurrent.sl:385](../../stdlib/Concurrent.sl#L385)</sub>
 
-#### Keys *method*
+#### GetKeys *method*
 
 ```
-List<TKey> Keys()
+List<TKey> GetKeys()
 ```
 
 A snapshot of the keys. Out of date the moment it is returned, which is
@@ -244,13 +244,13 @@ why it is a copy rather than a view.
 
 <sub>[stdlib/Concurrent.sl:389](../../stdlib/Concurrent.sl#L389)</sub>
 
-#### Values *method*
+#### GetValues *method*
 
 ```
-List<TValue> Values()
+List<TValue> GetValues()
 ```
 
-A snapshot of the values, in the same order as `Keys` when neither is
+A snapshot of the values, in the same order as `GetKeys` when neither is
 interleaved with a write. Out of date the moment it is returned, and
 pairing the two lists after the fact is not safe -- iterate the map if
 the pairing matters.
@@ -290,10 +290,10 @@ together, because asking twice would race.
 
 <sub>[stdlib/Concurrent.sl:124](../../stdlib/Concurrent.sl#L124)</sub>
 
-#### DequeueOr *method*
+#### DequeueOrDefault *method*
 
 ```
-T DequeueOr(T fallback)
+T DequeueOrDefault(T fallback)
 ```
 
 Takes the front item, or `fallback` when there is none. The same as
@@ -367,10 +367,10 @@ race with every other thread.
 
 <sub>[stdlib/Concurrent.sl:215](../../stdlib/Concurrent.sl#L215)</sub>
 
-#### PopOr *method*
+#### PopOrDefault *method*
 
 ```
-T PopOr(T fallback)
+T PopOrDefault(T fallback)
 ```
 
 Takes the top item, or `fallback` when there is none. The same as

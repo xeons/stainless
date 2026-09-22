@@ -52,7 +52,7 @@ fold is the one shape that carries something along with it.
 closure R Func<T, R>(T value)
 ```
 
-Turns a T into an R. The transform half of `Map`.
+Turns a T into an R. The transform half of `Select`.
 
 <sub>[stdlib/Standard.sl:83](../../stdlib/Standard.sl#L83)</sub>
 
@@ -83,7 +83,7 @@ a case to name. This is for everything a null pointer cannot say -- which
 is also why the names differ: `Optional<T>` is this type, and "an optional"
 is what the spec calls `C?`.
 
-<sub>[stdlib/Standard.sl:128](../../stdlib/Standard.sl#L128)</sub>
+<sub>[stdlib/Standard.sl:139](../../stdlib/Standard.sl#L139)</sub>
 
 #### None *case*
 
@@ -94,7 +94,7 @@ None
 There is no value. Carries nothing, so there is nothing to read by
 mistake.
 
-<sub>[stdlib/Standard.sl:132](../../stdlib/Standard.sl#L132)</sub>
+<sub>[stdlib/Standard.sl:143](../../stdlib/Standard.sl#L143)</sub>
 
 #### Some *case*
 
@@ -105,7 +105,7 @@ Some(T Value)
 There is one, and `Some` carries it. Reached with `is Some x`, which
 takes the value and names it in the same step.
 
-<sub>[stdlib/Standard.sl:136](../../stdlib/Standard.sl#L136)</sub>
+<sub>[stdlib/Standard.sl:147](../../stdlib/Standard.sl#L147)</sub>
 
 #### HasValue *property*
 
@@ -116,7 +116,7 @@ bool HasValue { get; }
 True when there is a value. The reader for a caller that is about to
 ask a second question anyway; `is Some x` is the one that gets at it.
 
-<sub>[stdlib/Standard.sl:140](../../stdlib/Standard.sl#L140)</sub>
+<sub>[stdlib/Standard.sl:151](../../stdlib/Standard.sl#L151)</sub>
 
 #### IsEmpty *property*
 
@@ -127,40 +127,40 @@ bool IsEmpty { get; }
 True when there is not. The same question the other way round, because
 `!x.HasValue` reads worse than the thing it means.
 
-<sub>[stdlib/Standard.sl:152](../../stdlib/Standard.sl#L152)</sub>
+<sub>[stdlib/Standard.sl:163](../../stdlib/Standard.sl#L163)</sub>
 
-#### Get *method*
+#### GetValue *method*
 
 ```
-T Get()
+T GetValue()
 ```
 
 The value, aborting when there is none.
 
-The bargain `Dictionary.Get` and an array index make: asking for
+The bargain `Dictionary.GetValue` and an array index make: asking for
 something that is not there is a mistake in the caller rather than a
-value to return. Use `ValueOr` where a miss is ordinary, and
+value to return. Use `GetValueOrDefault` where a miss is ordinary, and
 `is Some x` where the answer decides what happens next.
 
-<sub>[stdlib/Standard.sl:168](../../stdlib/Standard.sl#L168)</sub>
+<sub>[stdlib/Standard.sl:179](../../stdlib/Standard.sl#L179)</sub>
 
-#### ValueOr *method*
+#### GetValueOrDefault *method*
 
 ```
-T ValueOr(T fallback)
+T GetValueOrDefault(T fallback)
 ```
 
 The value if there is one, and `fallback` if there is not.
 
 The reader that needs no proof, because it supplies its own -- the same
-bargain `Result.ValueOr` makes.
+bargain `Result.GetValueOrDefault` makes.
 
-<sub>[stdlib/Standard.sl:184](../../stdlib/Standard.sl#L184)</sub>
+<sub>[stdlib/Standard.sl:195](../../stdlib/Standard.sl#L195)</sub>
 
-#### Or *method*
+#### Coalesce *method*
 
 ```
-Optional<T> Or(Optional<T> other)
+Optional<T> Coalesce(Optional<T> other)
 ```
 
 This one if it holds anything, and `other` if it does not.
@@ -169,53 +169,53 @@ This one if it holds anything, and `other` if it does not.
 A lambda would allocate a closure to save an evaluation, which is the
 wrong way round at the sizes this is used at.
 
-<sub>[stdlib/Standard.sl:196](../../stdlib/Standard.sl#L196)</sub>
+<sub>[stdlib/Standard.sl:207](../../stdlib/Standard.sl#L207)</sub>
 
-#### Map *method*
+#### Select *method*
 
 ```
-Optional<R> Map<R>(Func<T, R> transform)
+Optional<R> Select<R>(Func<T, R> transform)
 ```
 
 The value put through `transform`, or none.
 
-    Optional<String> name = found.Map(i => people[i].Name);
+    Optional<String> name = found.Select(i => people[i].Name);
 
 The transform runs only where there is something to run it on, which is
 the point: it is the `if` that would otherwise be written by hand.
 
-<sub>[stdlib/Standard.sl:209](../../stdlib/Standard.sl#L209)</sub>
+<sub>[stdlib/Standard.sl:220](../../stdlib/Standard.sl#L220)</sub>
 
-#### FlatMap *method*
+#### SelectMany *method*
 
 ```
-Optional<R> FlatMap<R>(Func<T, Optional<R>> transform)
+Optional<R> SelectMany<R>(Func<T, Optional<R>> transform)
 ```
 
-`Map` for a transform that answers with an optional of its own, which
+`Select` for a transform that answers with an optional of its own, which
 would otherwise nest one inside the other.
 
-<sub>[stdlib/Standard.sl:218](../../stdlib/Standard.sl#L218)</sub>
+<sub>[stdlib/Standard.sl:229](../../stdlib/Standard.sl#L229)</sub>
 
-#### Filter *method*
+#### Where *method*
 
 ```
-Optional<T> Filter(Predicate<T> keep)
+Optional<T> Where(Predicate<T> keep)
 ```
 
 This one when it holds something `keep` accepts, and none otherwise.
 
-<sub>[stdlib/Standard.sl:226](../../stdlib/Standard.sl#L226)</sub>
+<sub>[stdlib/Standard.sl:237](../../stdlib/Standard.sl#L237)</sub>
 
-#### IfPresent *method*
+#### InvokeIfPresent *method*
 
 ```
-void IfPresent(Action<T> action)
+void InvokeIfPresent(Action<T> action)
 ```
 
 Runs `action` on the value, if there is one.
 
-<sub>[stdlib/Standard.sl:237](../../stdlib/Standard.sl#L237)</sub>
+<sub>[stdlib/Standard.sl:248](../../stdlib/Standard.sl#L248)</sub>
 
 ### Predicate&lt;T&gt; *closure*
 
@@ -282,10 +282,10 @@ that is the whole of what a variant buys over a pair.
 
 <sub>[stdlib/Standard.sl:58](../../stdlib/Standard.sl#L58)</sub>
 
-#### ValueOr *method*
+#### GetValueOrDefault *method*
 
 ```
-T ValueOr(T fallback)
+T GetValueOrDefault(T fallback)
 ```
 
 The value if there is one, and `fallback` if there is not.
