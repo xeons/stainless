@@ -41,6 +41,7 @@ module Standard.Json;
 import Standard.Collections;
 import Standard.Reflection;
 import Standard.Convert;
+import Standard.Math;
 
 // ------------------------------------------------------------------- errors
 
@@ -50,7 +51,8 @@ public enum JsonError
     /// Nothing went wrong.
     None,
 
-    /// A character that cannot start what is expected here.
+    /// A character that cannot start what is expected here, or a control
+    /// character inside a string that was not escaped.
     Unexpected,
 
     /// A string with no closing quote.
@@ -172,6 +174,8 @@ public variant JsonValue
 
     /// A number. JSON has only the one numeric type and it is a double, so an
     /// integer past 2^53 has already lost precision by the time it is here.
+    /// A parsed one is always finite; `Write` says what becomes of one that
+    /// is not.
     Number(double Value);
 
     /// A string, decoded: the escapes are gone and the text is what they meant.
@@ -224,13 +228,20 @@ public double NumberOr(JsonValue value, double fallback)
 /// The value of a `Number` truncated toward zero, or the fallback.
 ///
 /// Truncation, not rounding: `3.9` is 3. JSON has one number type, so this is
-/// how a field that is conceptually an integer is read back, and a value past
-/// what a `long` holds is not detected.
+/// how a field that is conceptually an integer is read back. A value past what
+/// a `long` holds answers the fallback, as a value of the wrong type does.
 public long IntegerOr(JsonValue value, long fallback)
 {
-    if (value.Number)
+    if (value.Number && IsWithinLong(value.Value))
         return (long)value.Value;
     return fallback;
+}
+
+/// Whether a double truncates to a `long`. The test MUST come before the
+/// cast: converting a value outside the range is undefined, not saturating.
+bool IsWithinLong(double value)
+{
+    return value >= -9223372036854775808.0 && value < 9223372036854775808.0;
 }
 
 /// The value of a `Bool`, or the fallback. A `Number` of 1 is not true here;
@@ -533,6 +544,13 @@ String ParseText(Cursor cursor)
             return text.ToText();
         }
 
+        // RFC 8259 §7: a control character inside a string MUST be escaped.
+        if (c < 0x20u)
+        {
+            cursor.Reject(JsonError.Unexpected);
+            return "";
+        }
+
         if (c != (byte)'\\')
         {
             cursor.Skip();
@@ -602,6 +620,7 @@ String ParseText(Cursor cursor)
                     cursor.Text.ByteAt(cursor.At) == (byte)'\\' &&
                     cursor.Text.ByteAt(cursor.At + 1u) == (byte)'u')
                 {
+                    nuint next = cursor.At;
                     cursor.At = cursor.At + 2u;
                     uint second = ParseHex4(cursor);
                     if (cursor.Failed)
@@ -613,6 +632,9 @@ String ParseText(Cursor cursor)
                     }
                     else
                     {
+                        // Not the other half, so it is read again as an
+                        // escape of its own.
+                        cursor.At = next;
                         scalar = 0xFFFDu;
                     }
                 }
@@ -679,7 +701,8 @@ uint ParseHex4(Cursor cursor)
 }
 
 /// A JSON number, which is stricter than what a C parser accepts: no leading
-/// `+`, no leading zero, no hex, and a `.` needs a digit on both sides.
+/// `+`, no leading zero, no hex, and a `.` needs a digit on both sides. One
+/// too large for a double is `BadNumber`; one too small is zero.
 JsonValue ParseNumber(Cursor cursor)
 {
     nuint start = cursor.At;
@@ -754,7 +777,9 @@ JsonValue ParseNumber(Cursor cursor)
     var text = cursor.Text.Substring(start, cursor.At - start);
     var parsed = Convert.ToDouble(text);
 
-    if (!parsed.Ok)
+    // A numeral past what a double holds rounds to an infinity, which JSON
+    // cannot write back.
+    if (!parsed.Ok || !Math.IsFinite(parsed.Value))
     {
         cursor.Reject(JsonError.BadNumber);
         return JsonValue.Null;
@@ -815,6 +840,10 @@ public Result<JsonValue, JsonError> Parse(String text)
 // ------------------------------------------------------------------ writing
 
 /// The document as text, on one line.
+///
+/// A `Number` that is infinite or NaN is written as `null`, since JSON has no
+/// spelling for either. `JSON.stringify` does the same, and it reads back as a
+/// value absent rather than as some other number.
 public String Write(JsonValue value)
 {
     var text = new StringBuilder();
@@ -908,9 +937,16 @@ void WriteInto(StringBuilder text, JsonValue value, nuint depth, bool pretty)
 /// one numeric type, and a reader that wanted an integer should get one back.
 void WriteNumber(StringBuilder text, double value)
 {
+    if (!Math.IsFinite(value))
+    {
+        text.Append("null");
+        return;
+    }
+
     // A whole number small enough to be exact as a double is written as one.
-    if (value == (double)(long)value &&
-        value >= -9007199254740992.0 && value <= 9007199254740992.0)
+    // The range is tested first, so the cast is never asked for more.
+    if (value >= -9007199254740992.0 && value <= 9007199254740992.0 &&
+        value == (double)(long)value)
     {
         text.AppendInteger((long)value);
         return;
@@ -1262,7 +1298,7 @@ void FillField(byte* instance, Field field, JsonValue value)
 
     if (field.IsInteger)
     {
-        if (value.Number)
+        if (value.Number && IsWithinLong(value.Value))
             Reflection.WriteInteger(instance, field, (long)value.Value);
         return;
     }
@@ -1299,24 +1335,26 @@ void FillField(byte* instance, Field field, JsonValue value)
 /// the program made -- and it is also what stops a document deciding how much
 /// memory to spend.
 ///
-/// **A field that is null is a different question, and the answer changed.**
-/// There is no length the constructor chose, so filling in place means filling
-/// nothing: the field stayed null and the document was silently dropped, which
-/// is why a `String[]` had to be pre-sized by a constructor that could not know
-/// the size. One is allocated now, at the document's length.
+/// **A field that is null is a different question.** There is no length the
+/// constructor chose, so one is allocated at the document's length. That is
+/// not the memory bill the paragraph above refuses: the elements have
+/// *already been parsed*, so an array of `Items.Count` elements is bounded by
+/// an allocation that has happened anyway. What the rule above refuses is a
+/// length field naming a number nothing has paid for yet, and a JSON array has
+/// no such thing.
 ///
-/// That is not the memory bill the paragraph above refuses, and the difference
-/// is worth stating: the elements have *already been parsed*. `value.Items` is
-/// a real list of real values in memory before this is reached, so an array of
-/// `Items.Count` elements is bounded by an allocation that has happened
-/// anyway. What the rule above refuses is a length field naming a number
-/// nothing has paid for yet, and a JSON array has no such thing.
+/// Every element of an array made here holds a value, whatever the document
+/// had in its place. A String element is `""` where the item was not text. A
+/// class element is made zeroed, as `[JsonCreate]` makes one; it and a struct
+/// element have their String fields set to `""` before the item fills them,
+/// and their other reference fields carry the hazard that attribute names.
 void FillArray(byte* instance, Field field, JsonValue value)
 {
     if (!value.Array)
         return;
 
     byte* array = Reflection.ReadArray(instance, field);
+    bool made = false;
     if (array == null)
     {
         array = Reflection.NewArray(field, value.Items.Count);
@@ -1327,6 +1365,7 @@ void FillArray(byte* instance, Field field, JsonValue value)
         // retains, and a failure part-way through then leaves a short array
         // rather than a leak.
         Reflection.WriteAggregate(instance, field, array);
+        made = true;
     }
 
     nuint length = Reflection.ArrayLength(array);
@@ -1342,6 +1381,10 @@ void FillArray(byte* instance, Field field, JsonValue value)
             if (item.Text)
             {
                 Reflection.WriteTextAt(at, item.Value);
+            }
+            else if (made)
+            {
+                Reflection.WriteTextAt(at, "");
             }
         }
         else if (kind == KindBool)
@@ -1361,16 +1404,45 @@ void FillArray(byte* instance, Field field, JsonValue value)
         else if (kind == KindClass || kind == KindStruct)
         {
             byte* nested = Reflection.ReadAggregateAt(at, field);
-            if (nested != null)
+            if (made)
             {
-                if (item.Object)
-                    FillInstance(nested, field.ElementType, item.Members);
+                if (nested == null)
+                    nested = MakeElementAt(at, field.ElementType);
+                if (nested != null)
+                    ClearTextFields(nested, field.ElementType);
             }
+
+            if (nested != null && item.Object)
+                FillInstance(nested, field.ElementType, item.Members);
         }
         else
         {
-            if (item.Number)
+            if (item.Number && IsWithinLong(item.Value))
                 Reflection.WriteIntegerAt(at, field, (long)item.Value);
         }
+    }
+}
+
+/// Makes a zeroed object of `type` into an empty class element, answering it.
+/// The element takes the allocation's reference, so nothing is released.
+byte* MakeElementAt(byte* at, Type type)
+{
+    byte* element = Reflection.Make(type);
+    if (element == null)
+        return null;
+
+    byte** slot = (byte**)at;
+    *slot = element;
+    return element;
+}
+
+/// Sets every String field of a zeroed instance to `""`.
+void ClearTextFields(byte* instance, Type type)
+{
+    for (nuint i = 0u; i < type.FieldCount; i++)
+    {
+        var field = type.FieldAt(i);
+        if (field.Kind == KindString)
+            Reflection.WriteText(instance, field, "");
     }
 }
