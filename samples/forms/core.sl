@@ -122,7 +122,7 @@ public class HandledForm : Form
         _presses = 0;
         _save = new Button(this);
         _save.Click += this.OnSaveClick;
-        _save.Click += (sender) => { _presses++; };
+        _save.Click += (sender) => { this._presses++; };
     }
 
     void OnSaveClick(Control sender) => _presses++;
