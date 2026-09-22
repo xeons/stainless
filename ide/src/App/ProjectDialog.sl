@@ -266,7 +266,7 @@ public class ProjectDialog : Form
     {
         for (nuint i = 0u; i < list.Count; i++)
         {
-            if (list.ItemAt(i) == value)
+            if (list.GetItemAt(i) == value)
             {
                 list.SelectedIndex = (int)i;
                 return;

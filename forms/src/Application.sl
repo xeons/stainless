@@ -98,7 +98,7 @@ public static class Application
     {
         if (s_started)
             return;
-        WidgetSet.Current = MakeWidgetSet();
+        WidgetSet.Current = CreateWidgetSet();
         s_uiThread = CurrentId();
         s_started = true;
     }
@@ -120,7 +120,7 @@ public static class Application
         // Anything posted before the loop existed is run first rather than
         // waiting for the next wake, which may never come in a program that
         // does its setup on a thread and then shows a window.
-        Drain();
+        RunPostedWork();
         WidgetSet.Current.RunEventLoop();
     }
 
@@ -129,14 +129,14 @@ public static class Application
     /// call after that.
     public static bool DoEvents()
     {
-        Drain();
+        RunPostedWork();
         if (!WidgetSet.Current.PumpEvents())
             s_quitting = true;
         return !s_quitting;
     }
 
     /// Makes `Run` return, whether or not any window is still open.
-    public static void Quit()
+    public static void Exit()
     {
         s_quitting = true;
         WidgetSet.Current.QuitEventLoop();
@@ -153,7 +153,7 @@ public static class Application
     /// procedure runs on the thread that made the window, and GTK wants its
     /// main context -- so touching one from anywhere else is a bug whatever it
     /// appears to do. `Post` is how another thread reaches them instead.
-    public static bool OnUiThread => s_uiThread != 0u && CurrentId() == s_uiThread;
+    public static bool IsOnUiThread => s_uiThread != 0u && CurrentId() == s_uiThread;
 
     /// Runs `work` on the UI thread and returns without waiting for it.
     ///
@@ -169,8 +169,8 @@ public static class Application
     /// it directly to report progress from inside a long job.
     public static void Post(Action work)
     {
-        Enqueue(work);
-        WidgetSet.Current.Wake();
+        AddPostedWork(work);
+        WidgetSet.Current.WakeEventLoop();
     }
 
     /// Runs `work` on the UI thread and waits for it to finish.
@@ -188,7 +188,7 @@ public static class Application
     /// yet, so there is no loop to wait for, and waiting would never end.
     public static void Send(Action work)
     {
-        if (OnUiThread || s_uiThread == 0u)
+        if (IsOnUiThread || s_uiThread == 0u)
         {
             work();
             return;
@@ -203,7 +203,7 @@ public static class Application
         done.Wait();
     }
 
-    /// Runs everything posted so far. Called by the backend when `Wake` has
+    /// Runs everything posted so far. Called by the backend when `WakeEventLoop` has
     /// had its effect, and by `Run` and `DoEvents` so that work posted before
     /// a loop started is not left sitting.
     ///
@@ -212,20 +212,20 @@ public static class Application
     /// and a queue drained in place could be appended to for as long as the
     /// actions kept posting -- which would turn one turn of the loop into an
     /// unbounded one.
-    public static void Drain()
+    public static void RunPostedWork()
     {
-        var taken = TakePosted();
+        var taken = TakePostedWork();
         for (nuint i = 0u; i < taken.Count; i++)
             taken[i]();
     }
 
-    static void Enqueue(Action work)
+    static void AddPostedWork(Action work)
     {
         var guard = s_posted.Enter();
         guard.Value.Add(work);
     }                                   // ~Guard() unlocks before the wake
 
-    static List<Action> TakePosted()
+    static List<Action> TakePostedWork()
     {
         var taken = new List<Action>();
         var guard = s_posted.Enter();
@@ -241,21 +241,21 @@ public static class Application
     // -------------------------------------------------------- the register
 
     /// Called by `Form.Show`. Not public: a form registers itself.
-    static void Register(Form form)
+    static void RegisterForm(Form form)
     {
         s_open.Add(form);
     }
 
     /// Called when a form has closed. The last one out stops the loop, which is
-    /// what makes a one-window program need no `Quit` call at all.
+    /// what makes a one-window program need no `Exit` call at all.
     ///
     /// **A modal form is never the last one out.** It is a question asked on
     /// the way somewhere, and a login dialog closing before the main window
     /// opens MUST NOT end the program.
-    static void Unregister(Form form, bool wasModal)
+    static void UnregisterForm(Form form, bool wasModal)
     {
-        Remove(form);
-        ReleaseLater(form);
+        RemoveForm(form);
+        ReleaseFormLater(form);
         if (wasModal)
             return;
         foreach (var open in s_open)
@@ -263,7 +263,7 @@ public static class Application
             if (!open.IsModal)
                 return;
         }
-        Quit();
+        Exit();
     }
 
     /// Keeps a closed form alive until the loop's next turn.
@@ -272,15 +272,15 @@ public static class Application
     /// from inside the handlers of its own window. Freeing it there would
     /// destroy that window a second time while the platform is still
     /// destroying it.
-    static void ReleaseLater(Form form)
+    static void ReleaseFormLater(Form form)
     {
-        Post(() => { Application.KeepUntilDrained(form); });
+        Post(() => { Application.KeepFormUntilDrained(form); });
     }
 
-    static void KeepUntilDrained(Form form) { }
+    static void KeepFormUntilDrained(Form form) { }
 
     /// Called by a form that became the active window.
-    static void NoteActivated(Form form)
+    static void RecordActivation(Form form)
     {
         s_activations++;
         form.MarkActivated(s_activations);
@@ -288,7 +288,7 @@ public static class Application
 
     /// The form a modal dialog belongs to: the one the user was in most
     /// recently, or the main one, or null when nothing else is showing.
-    static Form? OwnerFor(Form dialog)
+    static Form? FindOwnerFor(Form dialog)
     {
         Form? chosen = null;
         foreach (var form in s_open)
@@ -305,7 +305,7 @@ public static class Application
     ///
     /// Written out rather than using a `Remove` on the list, because removal by
     /// value needs equality on `Form` and reference identity is what is meant.
-    static void Remove(Form gone)
+    static void RemoveForm(Form gone)
     {
         var kept = new List<Form>();
         foreach (var form in s_open)
@@ -346,25 +346,25 @@ public static class Application
     }
 
     /// Tells the user something.
-    public static void Inform(String text, String caption)
+    public static void ShowInformation(String text, String caption)
     {
         ShowMessage(text, caption, MessageButtons.Ok, MessageIcon.Information);
     }
 
     /// Warns them.
-    public static void Warn(String text, String caption)
+    public static void ShowWarning(String text, String caption)
     {
         ShowMessage(text, caption, MessageButtons.Ok, MessageIcon.Warning);
     }
 
     /// Reports a failure.
-    public static void Complain(String text, String caption)
+    public static void ShowError(String text, String caption)
     {
         ShowMessage(text, caption, MessageButtons.Ok, MessageIcon.Error);
     }
 
     /// Asks a yes-or-no question. True for yes.
-    public static bool Ask(String text, String caption)
+    public static bool AskYesNo(String text, String caption)
     {
         return ShowMessage(text, caption, MessageButtons.YesNo, MessageIcon.Question)
             == DialogResult.Yes;

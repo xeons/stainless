@@ -46,25 +46,25 @@ import Forms.Platform;
 public class Label : WindowedControl
 {
     ILabelPeer _native;
-    HorizontalAlignment _aligned;
-    bool _wrapping;
+    HorizontalAlignment _textAlign;
+    bool _wordWrap;
 
     public Label(WindowedControl parent)
     {
         base(parent);
-        _aligned = HorizontalAlignment.Left;
-        _wrapping = false;
-        _native = WidgetSet.Current.CreateLabel(this, ParentPeer());
+        _textAlign = HorizontalAlignment.Left;
+        _wordWrap = false;
+        _native = WidgetSet.Current.CreateLabel(this, ParentPeer);
         AttachPeer(_native);
     }
 
     /// Where the text sits across the label's width.
     public HorizontalAlignment TextAlign
     {
-        get => _aligned;
+        get => _textAlign;
         set
         {
-            _aligned = value;
+            _textAlign = value;
             _native.SetAlignment(value);
         }
     }
@@ -72,17 +72,17 @@ public class Label : WindowedControl
     /// Whether a line too long for the label wraps rather than being cut.
     public bool WordWrap
     {
-        get => _wrapping;
+        get => _wordWrap;
         set
         {
-            _wrapping = value;
+            _wordWrap = value;
             _native.SetWordWrap(value);
         }
     }
 
     public override Size PreferredSize => _native.PreferredSize;
 
-    /// Repaints. The label keeps its size: `AutoSize()` fits it to the text,
+    /// Repaints. The label keeps its size: `ResizeToPreferredSize()` fits it to the text,
     /// and a program that wants that after every change calls it.
     protected override void OnTextChanged()
     {
@@ -234,7 +234,7 @@ public class TextBox : TextBoxBase
     {
         base(parent);
         this._multiline = multiline;
-        _native = WidgetSet.Current.CreateTextEntry(this, ParentPeer(), multiline);
+        _native = WidgetSet.Current.CreateTextEntry(this, ParentPeer, multiline);
         AttachPeer(_native);
     }
 
@@ -259,15 +259,15 @@ public class TextBox : TextBoxBase
     /// by it.
     public char PasswordChar
     {
-        get => _mask;
+        get => _passwordChar;
         set
         {
-            _mask = value;
+            _passwordChar = value;
             _native.SetPasswordChar(value);
         }
     }
 
     public override Size PreferredSize => _native.PreferredSize;
 
-    char _mask;
+    char _passwordChar;
 }

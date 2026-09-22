@@ -277,7 +277,7 @@ public class ButtonsForm : Form
         ok = Check(ok, "and lays the new one out",
                    SecondPage.Width == Pages.ClientBounds.Width);
         ok = Check(ok, "a page can be found by name",
-                   Pages.Find("Finished") == ThirdPage);
+                   Pages.FindPage("Finished") == ThirdPage);
         ok = Check(ok, "and an index past the end is clamped, not an error",
                    ClampsTo(9, 2) && ClampsTo(-4, 0));
         Pages.SelectedIndex = 0;

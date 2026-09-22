@@ -290,7 +290,7 @@ public enum CursorKind
 
 /// What every control's peer can do.
 ///
-/// **`Destroy` is here and is not a destructor.** A peer is destroyed when its
+/// **`DestroyHandle` is here and is not a destructor.** A peer is destroyed when its
 /// control is, and ARC would do that on its own -- but a control can also be
 /// asked to give up its platform window and make a new one, which is what
 /// changing a border style costs on Windows. So the release is a method, and
@@ -359,7 +359,7 @@ public interface IControlPeer
     /// somewhere inside a panel, rather than over the panel itself, cannot be
     /// written from events at all. A pane that slides out and has to slide back
     /// when the pointer leaves is exactly that, and it is why this is here.
-    Point PointerPosition();
+    Point GetPointerPosition();
 
     /// How much room children have, as a size at the origin.
     ///
@@ -381,7 +381,7 @@ public interface IControlPeer
     Point ClientOrigin { get; }
 
     /// What the platform thinks this control ought to be, given its text and
-    /// font. What `AutoSize` uses, and the reason a button sized to its caption
+    /// font. What `ResizeToPreferredSize` uses, and the reason a button sized to its caption
     /// looks native rather than merely close.
     Size PreferredSize { get; }
 
@@ -390,7 +390,7 @@ public interface IControlPeer
     /// the peer has no handle yet.
     nuint Handle { get; }
 
-    void Destroy();
+    void DestroyHandle();
 }
 
 /// A container that other controls can be put inside.
@@ -817,7 +817,7 @@ public interface IToolBarPeer : IControlPeer
     /// What the platform calls one button, on the same terms as
     /// `IMenuItemPeer.Id` -- a toolbar's buttons share one window, so this is
     /// what tells them apart.
-    nuint ButtonId(int index);
+    nuint GetButtonId(int index);
 
     void SetButtonEnabled(int index, bool enabled);
     void SetButtonChecked(int index, bool checked);
@@ -900,7 +900,7 @@ public interface ITreeViewPeer : IControlPeer
     void RemoveNode(ITreeNodeHandle node);
     void SetNodeText(ITreeNodeHandle node, String text);
     String GetNodeText(ITreeNodeHandle node);
-    void Expand(ITreeNodeHandle node, bool expanded);
+    void SetNodeExpanded(ITreeNodeHandle node, bool expanded);
     void SelectNode(ITreeNodeHandle node);
     ITreeNodeHandle? GetSelectedNode();
 
@@ -919,7 +919,7 @@ public interface ITreeViewPeer : IControlPeer
     /// this is the only way a context menu can know what it was opened on.
     /// Building one from `GetSelectedNode` instead acts on whatever was
     /// selected beforehand -- which is a menu that renames the wrong file.
-    ITreeNodeHandle? NodeAt(Point at);
+    ITreeNodeHandle? GetNodeAt(Point at);
 
     void Clear();
     void SetImages(IImageListBackend? images);
@@ -1132,7 +1132,7 @@ public enum MessageIcon { None, Information, Warning, Error, Question }
 public enum DialogOutcome
 {
     /// The user pressed Cancel or closed it.
-    Cancelled,
+    Canceled,
     /// The platform could not show it at all.
     Failed,
 }
@@ -1228,13 +1228,13 @@ public interface IWidgetSet
 
     /// Whether a standard format is on offer. Cheaper than reading it, and on
     /// X11 much cheaper: the owner is asked what it has rather than for it.
-    bool ClipboardHas(ClipboardKind kind);
+    bool ContainsClipboardKind(ClipboardKind kind);
 
     /// Whether a named format is on offer.
-    bool ClipboardHasFormat(String name);
+    bool ContainsClipboardFormat(String name);
 
     /// The names of every format on offer, in the platform's own spelling.
-    String[] ClipboardFormatNames();
+    String[] GetClipboardFormatNames();
 
     /// A peer that reports every change to the clipboard's contents, by this
     /// program or any other, until it is stopped or released.
@@ -1294,11 +1294,11 @@ public interface IWidgetSet
 
     /// The theme's colour for one role, read now rather than cached, so a
     /// theme change between two calls is seen.
-    Color SystemColor(SystemColorId which);
+    Color GetSystemColor(SystemColorId which);
 
     /// The font the platform dresses its own dialogs in. What every control
     /// starts with, so a program that sets no fonts looks native.
-    Font DefaultFont();
+    Font GetDefaultFont();
 
     /// The whole screen, in pixels.
     Size ScreenSize { get; }
@@ -1321,7 +1321,7 @@ public interface IWidgetSet
     /// Makes `RunEventLoop` return.
     void QuitEventLoop();
 
-    /// Arranges for the UI thread to call `Application.Drain` soon.
+    /// Arranges for the UI thread to call `Application.RunPostedWork` soon.
     ///
     /// **Called from any thread**, and the only member of this interface of
     /// which that is true. Everything else here touches a widget and so belongs
@@ -1331,7 +1331,7 @@ public interface IWidgetSet
     /// The queue itself is not here. It is portable -- a list and a lock -- so
     /// it lives in `Application`, and all a backend owes is a way to make its
     /// loop turn.
-    void Wake();
+    void WakeEventLoop();
 
     // ---------------------------------------------------------- the common
 

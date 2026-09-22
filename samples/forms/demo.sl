@@ -170,7 +170,7 @@ public class DemoForm : Form
     {
         if (_items.Count > 0u)
         {
-            args.Cancel = !Application.Ask("There are items in the list. Close anyway?",
+            args.Cancel = !Application.AskYesNo("There are items in the list. Close anyway?",
                                            "Forms for Stainless");
         }
     }

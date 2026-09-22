@@ -35,8 +35,8 @@ public class BuiltPopup : PopupMenu
     public void BuildAndDiscard()
     {
         var built = WidgetSet.Current.CreateMenu();
-        RealiseInto(built);
-        ForgetBuilt();
+        BuildPlatformMenu(built);
+        ReleasePlatformMenu();
     }
 }
 
@@ -216,7 +216,7 @@ public class ChecksForm : Form
         Bar.Renderer = new OfficeXpRenderer();
         var file = Bar.Add("&File");
         Shared = file.Add("&New");
-        file.Add(MenuItem.Separator());
+        file.Add(MenuItem.CreateSeparator());
         file.Add("E&xit").Click += this.OnExit;
         Menu = Bar;
 

@@ -179,11 +179,11 @@ public class BackendForm : Form
         Pump();
         ok = Check(ok, "selecting a node is not reported", NodeChanges == 0);
 
-        Chores.SetChecked(1, true);
+        Chores.SetItemChecked(1, true);
         Chores.Add("Water plants");
         Pump();
         ok = Check(ok, "ticking or adding a chore is not reported", ChoreChanges == 0);
-        ok = Check(ok, "and the tick is there", Chores.IsChecked(1));
+        ok = Check(ok, "and the tick is there", Chores.GetItemChecked(1));
 
         Quantity.Value = 7;
         Pump();
@@ -193,7 +193,7 @@ public class BackendForm : Form
         Headings.SetSectionWidth(0, 150);
         Pump();
         ok = Check(ok, "setting a heading's width is not reported", SectionChanges == 0);
-        ok = Check(ok, "and the width is there", Headings.SectionWidth(0) == 150);
+        ok = Check(ok, "and the width is there", Headings.GetSectionWidth(0) == 150);
         return ok;
     }
 
@@ -324,7 +324,7 @@ public class BackendForm : Form
 
         // Replacing only the bits of the frame, and not the visibility.
         var ghost = new Form(WindowBorder.Sizable);
-        var peer = ghost.WindowPeer();
+        var peer = ghost.WindowPeer;
         peer.SetVisible(true);
         peer.SetBorder(WindowBorder.Fixed);
         ok = Check(ok, "changing a border leaves a window visible",
@@ -355,7 +355,7 @@ public class BackendForm : Form
         var picture = Bitmap.FromPixels(16, 16, pixels);
         if (picture.Ok)
             icons.Add(picture.Value);
-        HIMAGELIST shared = (HIMAGELIST)(void*)icons.Backend().Handle;
+        HIMAGELIST shared = (HIMAGELIST)(void*)icons.Backend.Handle;
         LoseListViewWith(ghost, icons);
         ok = Check(ok, "a list view leaves the image list it shared",
                    ImageList_GetImageCount(shared) == 1);
@@ -370,7 +370,7 @@ public class BackendForm : Form
                    IsMenu((HMENU)(void*)inner.Handle) != 0);
 
         // A menu bar a window is made to let go of is destroyed with its peer.
-        nuint replaced = ReplaceMenuBar(ghost.WindowPeer());
+        nuint replaced = ReplaceMenuBar(ghost.WindowPeer);
         ok = Check(ok, "a replaced menu bar is destroyed",
                    IsMenu((HMENU)(void*)replaced) == 0);
         return ok;
@@ -476,7 +476,7 @@ String ClassNameOf(HWND window)
 /// A coloured panel whose window is destroyed under it, and then the panel.
 void LoseColouredPanel(Form host)
 {
-    var panel = WidgetSet.Current.CreatePanel(host, host.WindowPeer());
+    var panel = WidgetSet.Current.CreatePanel(host, host.WindowPeer);
     panel.SetBackColor(Colors.Red);
     DestroyWindow((HWND)(void*)panel.Handle);
 }
@@ -484,8 +484,8 @@ void LoseColouredPanel(Form host)
 /// A list view given `icons`, whose window is destroyed under it.
 void LoseListViewWith(Form host, ImageList icons)
 {
-    var list = WidgetSet.Current.CreateListView(host, host.WindowPeer());
-    list.SetImages(icons.Backend());
+    var list = WidgetSet.Current.CreateListView(host, host.WindowPeer);
+    list.SetImages(icons.Backend);
     DestroyWindow((HWND)(void*)list.Handle);
 }
 

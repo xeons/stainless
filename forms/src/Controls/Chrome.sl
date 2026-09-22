@@ -72,14 +72,14 @@ public abstract class ChromeRenderer
     /// `SystemChromeRenderer` is: turning owner drawing off is a thing a program
     /// must be able to do, and a renderer that is asked for and then draws
     /// nothing would be a menu of empty rectangles.
-    public abstract bool OwnerDrawn { get; }
+    public abstract bool IsOwnerDrawn { get; }
 
     /// How much room the item wants.
-    public abstract Size Measure(Graphics surface, MenuItem item);
+    public abstract Size MeasureMenuItem(Graphics surface, MenuItem item);
 
     /// Draw it, background included: nothing is drawn underneath an
     /// owner-drawn item.
-    public abstract void Draw(Graphics surface, MenuItem item,
+    public abstract void DrawMenuItem(Graphics surface, MenuItem item,
                               Rectangle bounds, MenuItemState state);
 
     /// Fill the strip a toolbar's buttons sit on, before any of them is drawn.
@@ -96,23 +96,23 @@ public abstract class ChromeRenderer
     ///
     /// `bounds` is the rectangle comctl32 decided on, so a renderer arranges
     /// the picture and the caption inside a box it did not choose.
-    public abstract void DrawTool(Graphics surface, ToolButton button,
+    public abstract void DrawToolButton(Graphics surface, ToolButton button,
                                   Rectangle bounds, ToolItemState state);
 }
 
 /// The platform's own drawing, which is what a menu has unless asked
 /// otherwise.
 ///
-/// `Measure` and `Draw` are never called: `OwnerDrawn` is false, so nothing is
+/// `MeasureMenuItem` and `DrawMenuItem` are never called: `IsOwnerDrawn` is false, so nothing is
 /// ever handed over. They are here because the base class declares them and an
 /// abstract method with no body is not a thing.
 public sealed class SystemChromeRenderer : ChromeRenderer
 {
-    public override bool OwnerDrawn => false;
+    public override bool IsOwnerDrawn => false;
 
-    public override Size Measure(Graphics surface, MenuItem item) => Size.FromDimensions(0, 0);
+    public override Size MeasureMenuItem(Graphics surface, MenuItem item) => Size.FromDimensions(0, 0);
 
-    public override void Draw(Graphics surface, MenuItem item,
+    public override void DrawMenuItem(Graphics surface, MenuItem item,
                               Rectangle bounds, MenuItemState state)
     {
     }
@@ -121,7 +121,7 @@ public sealed class SystemChromeRenderer : ChromeRenderer
     {
     }
 
-    public override void DrawTool(Graphics surface, ToolButton button,
+    public override void DrawToolButton(Graphics surface, ToolButton button,
                                   Rectangle bounds, ToolItemState state)
     {
     }
@@ -170,7 +170,7 @@ public class OfficeXpRenderer : ChromeRenderer
         DisabledOpacity = 35;
     }
 
-    public override bool OwnerDrawn => true;
+    public override bool IsOwnerDrawn => true;
 
     /// The colour a hot item is washed with: the highlight, mostly faded out.
     ///
@@ -178,7 +178,7 @@ public class OfficeXpRenderer : ChromeRenderer
     /// is light enough to read black text on -- and reading black text on it is
     /// the point, because the other way round means the text colour changing
     /// as the pointer moves.
-    public virtual Color HotFill => Blend(SystemColors.Highlight, SystemColors.Window, 20);
+    public virtual Color HotFill => BlendColors(SystemColors.Highlight, SystemColors.Window, 20);
 
     /// And the line round it, which is the selection colour itself.
     public virtual Color HotBorder => SystemColors.Highlight;
@@ -192,7 +192,7 @@ public class OfficeXpRenderer : ChromeRenderer
     /// nobody can see, which is a gutter that is not there. A quarter of the
     /// shadow colour mixed in gives it an edge that reads on every scheme
     /// without naming a colour of its own.
-    public virtual Color GutterFrom => Blend(SystemColors.ControlDark, SystemColors.Control, 25);
+    public virtual Color GutterFrom => BlendColors(SystemColors.ControlDark, SystemColors.Control, 25);
     public virtual Color GutterTo => SystemColors.Control;
 
     public virtual Color Background => SystemColors.Window;
@@ -209,14 +209,14 @@ public class OfficeXpRenderer : ChromeRenderer
     /// device context has no font in this library -- text is drawn with one
     /// that is passed in, which is what keeps a `Graphics` from carrying state
     /// between calls. A program wanting another one sets this.
-    public virtual Font Font => WidgetSet.Current.DefaultFont();
+    public virtual Font Font => WidgetSet.Current.GetDefaultFont();
 
-    public override Size Measure(Graphics surface, MenuItem item)
+    public override Size MeasureMenuItem(Graphics surface, MenuItem item)
     {
         if (item.IsSeparator)
             return Size.FromDimensions(GutterWidth + 32, 3 + Padding);
 
-        var text = surface.MeasureString(Spoken(item.Text), Font);
+        var text = surface.MeasureString(RemoveMnemonics(item.Text), Font);
 
         // A word on the bar, and **nothing added to it**.
         //
@@ -230,7 +230,7 @@ public class OfficeXpRenderer : ChromeRenderer
         // The height is reported and ignored: a bar is `SM_CYMENU` tall
         // whatever an item asks for, which is why `File` came back nineteen
         // when this asked for twenty-three.
-        if (item.OnMenuBar)
+        if (item.IsOnMenuBar)
             return Size.FromDimensions(text.Width, text.Height);
 
         // Room for the caption, the gutter it sits beside, and a margin on the
@@ -248,7 +248,7 @@ public class OfficeXpRenderer : ChromeRenderer
         return Size.FromDimensions(GutterWidth + text.Width + 18, text.Height + Padding * 2);
     }
 
-    public override void Draw(Graphics surface, MenuItem item,
+    public override void DrawMenuItem(Graphics surface, MenuItem item,
                               Rectangle bounds, MenuItemState state)
     {
         bool disabled = state.HasFlag(MenuItemState.Disabled);
@@ -263,11 +263,11 @@ public class OfficeXpRenderer : ChromeRenderer
         // is measured with, which is also why the width does not move when the
         // underline appears.
         String caption = state.HasFlag(MenuItemState.NoAccelerators)
-                       ? Spoken(item.Text) : item.Text;
+                       ? RemoveMnemonics(item.Text) : item.Text;
 
-        if (item.OnMenuBar)
+        if (item.IsOnMenuBar)
         {
-            DrawOnBar(surface, caption, bounds, disabled, selected);
+            DrawMenuBarItem(surface, caption, bounds, disabled, selected);
             return;
         }
 
@@ -291,11 +291,11 @@ public class OfficeXpRenderer : ChromeRenderer
         {
             // Over the gutter as well, which is what makes a hot item read as
             // one strip rather than as two rectangles side by side.
-            Wash(surface, bounds, HotFill);
+            DrawHighlight(surface, bounds, HotFill);
         }
 
         if (state.HasFlag(MenuItemState.Checked))
-            DrawTick(surface, gutter, disabled);
+            DrawCheckMark(surface, gutter, disabled);
 
         var text = Rectangle.FromBounds(bounds.X + GutterWidth + 8, bounds.Y,
                                 bounds.Width - GutterWidth - 16, bounds.Height);
@@ -309,7 +309,7 @@ public class OfficeXpRenderer : ChromeRenderer
                            disabled ? DisabledText : TextColor, text, format);
 
         if (item.HasItems)
-            DrawArrow(surface, bounds, disabled);
+            DrawSubmenuArrow(surface, bounds, disabled);
     }
 
     /// The triangle on an item that opens a submenu.
@@ -318,7 +318,7 @@ public class OfficeXpRenderer : ChromeRenderer
     /// reason the tick is: the character a font has for this is not the same
     /// character in every font, and a menu cannot afford to find that out on
     /// somebody else's machine.
-    void DrawArrow(Graphics surface, Rectangle bounds, bool disabled)
+    void DrawSubmenuArrow(Graphics surface, Rectangle bounds, bool disabled)
     {
         var ink = new Pen(disabled ? DisabledText : TextColor, 1, PenStyle.Solid);
         int x = bounds.Right - 12;
@@ -337,14 +337,14 @@ public class OfficeXpRenderer : ChromeRenderer
     /// and what makes the bar read as one row of words rather than as buttons.
     /// Windows reports an open heading as selected, so both arrive here the
     /// same way and neither needs telling apart.
-    void DrawOnBar(Graphics surface, String caption, Rectangle bounds,
+    void DrawMenuBarItem(Graphics surface, String caption, Rectangle bounds,
                    bool disabled, bool selected)
     {
         surface.FillRectangle(new Brush(BarBackground), bounds);
 
         if (selected)
         {
-            Wash(surface, bounds, HotFill);
+            DrawHighlight(surface, bounds, HotFill);
         }
 
         TextFormat format;
@@ -359,7 +359,7 @@ public class OfficeXpRenderer : ChromeRenderer
     /// A tick, drawn as two strokes rather than as a character: the glyph
     /// fonts disagree about is the one thing a menu cannot afford to get
     /// wrong, and two lines look the same everywhere.
-    void DrawTick(Graphics surface, Rectangle gutter, bool disabled)
+    void DrawCheckMark(Graphics surface, Rectangle gutter, bool disabled)
     {
         var ink = new Pen(disabled ? DisabledText : TextColor, 2, PenStyle.Solid);
         int x = gutter.X + gutter.Width / 2 - 3;
@@ -377,7 +377,7 @@ public class OfficeXpRenderer : ChromeRenderer
     public virtual Color ToolBackground => BarBackground;
 
     /// A button held down, and a ticked one under the pointer.
-    public virtual Color PressedFill => Blend(SystemColors.Highlight, SystemColors.Window, 45);
+    public virtual Color PressedFill => BlendColors(SystemColors.Highlight, SystemColors.Window, 45);
 
     /// A toggle that is on while the pointer is somewhere else.
     ///
@@ -393,18 +393,18 @@ public class OfficeXpRenderer : ChromeRenderer
     /// pressed is how a flat toolbar has spelled that since Office XP. Hot
     /// stays where it is, because the menu shares it and the menu was
     /// measured.
-    public virtual Color CheckedFill => Blend(SystemColors.Highlight, SystemColors.Window, 32);
+    public virtual Color CheckedFill => BlendColors(SystemColors.Highlight, SystemColors.Window, 32);
 
     /// The line between groups of buttons, well short of the full contrast:
     /// `ControlDark` at full strength is a rule that shouts.
-    public virtual Color SeparatorInk => Blend(SystemColors.ControlDark, SystemColors.Control, 60);
+    public virtual Color SeparatorInk => BlendColors(SystemColors.ControlDark, SystemColors.Control, 60);
 
     public override void DrawToolBackground(Graphics surface, Rectangle bounds)
     {
         surface.FillRectangle(new Brush(ToolBackground), bounds);
     }
 
-    public override void DrawTool(Graphics surface, ToolButton button,
+    public override void DrawToolButton(Graphics surface, ToolButton button,
                                   Rectangle bounds, ToolItemState state)
     {
         if (button.IsSeparator)
@@ -430,14 +430,14 @@ public class OfficeXpRenderer : ChromeRenderer
             // A ticked button that is also hot reads as pressed, which is what
             // it is about to become.
             if (pressed || (ticked && hot))
-                Wash(surface, bounds, PressedFill);
+                DrawHighlight(surface, bounds, PressedFill);
             else if (ticked)
-                Wash(surface, bounds, CheckedFill);
+                DrawHighlight(surface, bounds, CheckedFill);
             else if (hot)
-                Wash(surface, bounds, HotFill);
+                DrawHighlight(surface, bounds, HotFill);
         }
 
-        DrawToolContent(surface, button, bounds, disabled);
+        DrawToolButtonContent(surface, button, bounds, disabled);
     }
 
     /// The picture and the caption, centred together in whatever box comctl32
@@ -450,7 +450,7 @@ public class OfficeXpRenderer : ChromeRenderer
     /// the content and centring it lands on the platform's arrangement without
     /// this code having to know any of those numbers -- and where it is wrong
     /// it is wrong symmetrically, which is the failure a reader forgives.
-    void DrawToolContent(Graphics surface, ToolButton button, Rectangle bounds,
+    void DrawToolButtonContent(Graphics surface, ToolButton button, Rectangle bounds,
                          bool disabled)
     {
         Bitmap? picture = button.Picture;
@@ -464,7 +464,7 @@ public class OfficeXpRenderer : ChromeRenderer
 
         String caption = button.ShowsText ? button.Text : "";
         var text = caption.IsEmpty ? Size.FromDimensions(0, 0)
-                                   : surface.MeasureString(Spoken(caption), Font);
+                                   : surface.MeasureString(RemoveMnemonics(caption), Font);
 
         int gap = pictureWidth > 0 && text.Width > 0 ? ToolGap : 0;
         int at = bounds.X + (bounds.Width - (pictureWidth + gap + text.Width)) / 2;
@@ -487,7 +487,7 @@ public class OfficeXpRenderer : ChromeRenderer
         format.Wrap = false;
 
         // The caption as written, not as measured: `DrawTextW` eats the
-        // ampersand, and `Spoken` above is what keeps the two in step.
+        // ampersand, and `RemoveMnemonics` above is what keeps the two in step.
         surface.DrawString(caption, Font, disabled ? DisabledText : TextColor,
                            Rectangle.FromBounds(at, bounds.Y, text.Width, bounds.Height),
                            format);
@@ -497,7 +497,7 @@ public class OfficeXpRenderer : ChromeRenderer
     ///
     /// Shared by the menu and the toolbar because it is the same rectangle --
     /// the single shape the whole look is built out of.
-    void Wash(Graphics surface, Rectangle bounds, Color fill)
+    void DrawHighlight(Graphics surface, Rectangle bounds, Color fill)
     {
         surface.FillRectangle(new Brush(fill), bounds);
         surface.DrawRectangle(new Pen(HotBorder), bounds);
@@ -517,7 +517,7 @@ public class OfficeXpRenderer : ChromeRenderer
     ///
     /// `&&` is a literal ampersand and stays one, which is the same rule
     /// `DrawTextW` follows.
-    static String Spoken(String caption)
+    static String RemoveMnemonics(String caption)
     {
         if (!caption.Contains("&"))
             return caption;
@@ -558,7 +558,7 @@ public class OfficeXpRenderer : ChromeRenderer
     /// through an object, so `protected` has nothing to say about one
     /// (SL0575), and a subclass wanting it can call it by name like anything
     /// else in this module.
-    static Color Blend(Color a, Color b, int percent)
+    static Color BlendColors(Color a, Color b, int percent)
     {
         int rest = 100 - percent;
         return Color.FromRgb(

@@ -470,7 +470,7 @@ bool CheckMouse(ReportsForm form)
     ok = ReportCheck(ok, "in client coordinates, below the menu: " + FormatPoint(form.FormAt),
                      form.FormAt.X == 600 && form.FormAt.Y == 400);
 
-    var pointer = form.PointerPosition();
+    var pointer = form.GetPointerPosition();
     ok = ReportCheck(ok, "the form's pointer is in client coordinates: " + FormatPoint(pointer),
                      pointer.X == 600 && pointer.Y == 400);
 
@@ -480,7 +480,7 @@ bool CheckMouse(ReportsForm form)
                      form.PaneAt.X == 150 && form.PaneAt.Y == 90);
     ok = ReportCheck(ok, "and not the form", form.FormDowns == 1);
 
-    pointer = form.Pane.PointerPosition();
+    pointer = form.Pane.GetPointerPosition();
     ok = ReportCheck(ok, "the panel's pointer is in its own coordinates: " + FormatPoint(pointer),
                      pointer.X == 150 && pointer.Y == 90);
 

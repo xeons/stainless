@@ -193,7 +193,7 @@ public class CommonForm : Form
         Options.Add("Urgent");
         Options.Add("Repeat");
         Options.Add("Notify");
-        Options.SetChecked(0, true);
+        Options.SetItemChecked(0, true);
 
         Named = new LabeledEdit(_formPage);
         Named.SetBounds(12, 120, 240, 44);
@@ -211,7 +211,7 @@ public class CommonForm : Form
         Chores.Add("Buy milk");
         Chores.Add("Post letter");
         Chores.Add("Fix shelf");
-        Chores.SetChecked(1, true);
+        Chores.SetItemChecked(1, true);
 
         Headings = new HeaderControl(_formPage);
         Headings.SetBounds(264, 176, 240, 24);
@@ -222,7 +222,7 @@ public class CommonForm : Form
         _context = new PopupMenu();
         _context.Add("Add a row").Click += this.OnAddRow;
         _context.Add("Remove the row").Click += this.OnRemoveRow;
-        _context.Add(MenuItem.Separator());
+        _context.Add(MenuItem.CreateSeparator());
         _context.Add("Clear").Click += this.OnClearList;
         _list.MouseUp += this.OnListMouseUp;
     }
@@ -235,7 +235,7 @@ public class CommonForm : Form
         var file = bar.Add("&File");
         file.Add("&New").Click += this.OnNew;
         file.Add("&Open...").Click += this.OnOpen;
-        file.Add(MenuItem.Separator());
+        file.Add(MenuItem.CreateSeparator());
         file.Add("E&xit").Click += this.OnExit;
 
         var view = bar.Add("&View");
@@ -405,7 +405,7 @@ public class CommonForm : Form
                    _tools.Buttons[0u].Text == "New");
         ok = Check(ok, "status bar has its panels", _status.PanelCount == 3u);
         ok = Check(ok, "status panel text round-trips",
-                   _status.PanelText(0) == "Ready.");
+                   _status.GetPanelText(0) == "Ready.");
 
         ok = Check(ok, "tabs hold their pages", _tabs.Pages.Count == 4u);
         ok = Check(ok, "the platform has the tabs too", _tabs.TabCount == 4);
@@ -440,9 +440,9 @@ public class CommonForm : Form
         // reading the text finds that.
         ok = Check(ok, "list holds its rows", _list.Count == 3);
         ok = Check(ok, "a list cell keeps its whole text",
-                   _list.CellText(0, 0) == "Apples");
+                   _list.GetCellText(0, 0) == "Apples");
         ok = Check(ok, "a list cell past the first does too",
-                   _list.CellText(1, 2) == "Hardware");
+                   _list.GetCellText(1, 2) == "Hardware");
         _list.SelectedIndex = 2;
         for (int i = 0; i < 4; i++)
             Application.DoEvents();
@@ -526,8 +526,8 @@ public class CommonForm : Form
                    && Priority.Buttons[1u].Top > 0);
 
         ok = Check(ok, "a check group holds several ticks",
-                   Options.IsChecked(0) && !Options.IsChecked(1));
-        Options.SetChecked(2, true);
+                   Options.GetItemChecked(0) && !Options.GetItemChecked(1));
+        Options.SetItemChecked(2, true);
         ok = Check(ok, "and reports which", Options.CheckedIndices.Length == 2u);
 
         ok = Check(ok, "a labelled edit keeps caption and value apart",
@@ -543,12 +543,12 @@ public class CommonForm : Form
 
         ok = Check(ok, "a check list holds its items", Chores.Count == 3u);
         ok = Check(ok, "and its ticks",
-                   Chores.IsChecked(1) && !Chores.IsChecked(0));
-        Chores.SetChecked(2, true);
+                   Chores.GetItemChecked(1) && !Chores.GetItemChecked(0));
+        Chores.SetItemChecked(2, true);
         ok = Check(ok, "and reports which", Chores.CheckedIndices.Length == 2u);
 
         ok = Check(ok, "a header holds its sections", Headings.Count == 2);
-        ok = Check(ok, "and its widths", Headings.SectionWidth(0) == 120);
+        ok = Check(ok, "and its widths", Headings.GetSectionWidth(0) == 120);
 
         // And loading a picture that is not there says so, rather than
         // answering a null nobody checks.

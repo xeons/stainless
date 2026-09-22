@@ -1014,7 +1014,7 @@ public class DockHost : Panel
     /// The pointer left the slid-out pane, so it goes away.
     ///
     /// **A poll rather than a leave event**, and the seam carries
-    /// `PointerPosition` for this reason. A container is told the pointer left
+    /// `GetPointerPosition` for this reason. A container is told the pointer left
     /// the moment it moves onto one of that container's own children -- so a
     /// well would slide shut as soon as the pointer reached the tree inside it,
     /// which is the one place it is certainly meant to stay open.
@@ -1028,7 +1028,7 @@ public class DockHost : Panel
         }
 
         var well = (DockWell)flying;
-        var here = PointerPosition();
+        var here = GetPointerPosition();
 
         // The strip counts as inside: the pointer travelling from the label
         // that opened the pane to the pane itself crosses it, and a pane that

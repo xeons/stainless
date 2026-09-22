@@ -100,7 +100,7 @@ nint WakeProc(HWND window, uint message, nuint wParam, nint lParam)
 {
     if (message == WmApp)
     {
-        Application.Drain();
+        Application.RunPostedWork();
         return 0;
     }
     return DefWindowProcW(window, message, wParam, lParam);
@@ -1000,7 +1000,7 @@ public class Win32WidgetSet : IWidgetSet
 
     /// `CF_UNICODETEXT` alone stands for text because Windows synthesises it
     /// from `CF_TEXT` and `CF_OEMTEXT`; the DIBs likewise from `CF_BITMAP`.
-    public bool ClipboardHas(ClipboardKind kind)
+    public bool ContainsClipboardKind(ClipboardKind kind)
     {
         switch (kind)
         {
@@ -1017,9 +1017,9 @@ public class Win32WidgetSet : IWidgetSet
         return false;
     }
 
-    public bool ClipboardHasFormat(String name) => ClipboardOffers(RegisterFormatNamed(name));
+    public bool ContainsClipboardFormat(String name) => ClipboardOffers(RegisterFormatNamed(name));
 
-    public String[] ClipboardFormatNames() => ReadClipboardFormatNames();
+    public String[] GetClipboardFormatNames() => ReadClipboardFormatNames();
 
     public IClipboardWatchPeer CreateClipboardWatch(IClipboardNotify owner)
     {
@@ -1055,7 +1055,7 @@ public class Win32WidgetSet : IWidgetSet
 
     public IFontBackend CreateFont(Font font) => new FontBackend(font);
 
-    public Color SystemColor(SystemColorId which)
+    public Color GetSystemColor(SystemColorId which)
     {
         return FromColorRef(GetSysColor(IndexOfColor(which)));
     }
@@ -1085,7 +1085,7 @@ public class Win32WidgetSet : IWidgetSet
     /// than guessed. Cached, because it costs a `SystemParametersInfoW` and a
     /// `NONCLIENTMETRICS` the size of a small struct, and because every control
     /// asks for it.
-    public Font DefaultFont()
+    public Font GetDefaultFont()
     {
         var held = _defaultFont;
         if (held != null)
@@ -1183,7 +1183,7 @@ public class Win32WidgetSet : IWidgetSet
     /// thread's queue and returns rather than waiting for it -- which is the
     /// whole reason this is the Win32 answer. The window is made in the
     /// constructor, on the UI thread, for the reason recorded there.
-    public void Wake()
+    public void WakeEventLoop()
     {
         if (s_wake != null)
             PostMessageW(s_wake, WmApp, 0u, 0);

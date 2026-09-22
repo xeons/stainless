@@ -1907,7 +1907,7 @@ public class GtkToolBarPeer : GtkPeer, IToolBarPeer
     /// A GTK tool item is a widget, so what the platform calls one is its
     /// address -- where Win32 has a command id because its buttons share a
     /// window and nothing else tells them apart.
-    public nuint ButtonId(int index)
+    public nuint GetButtonId(int index)
     {
         if (index < 0 || (nuint)index >= _items.Count)
             return 0u;

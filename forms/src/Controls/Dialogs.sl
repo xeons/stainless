@@ -64,11 +64,11 @@ public struct FileFilter
 /// What a file dialog has in common.
 public abstract class FileDialog
 {
-    protected List<FileFilter> filters;
+    protected List<FileFilter> _filters;
 
     protected FileDialog()
     {
-        filters = new List<FileFilter>();
+        _filters = new List<FileFilter>();
         Title = "";
         FileName = "";
     }
@@ -83,32 +83,32 @@ public abstract class FileDialog
     /// Adds a kind of file the dialog offers to filter by.
     public FileDialog AddFilter(String description, String patterns)
     {
-        filters.Add(FileFilter.FromPatterns(description, patterns));
+        _filters.Add(FileFilter.FromPatterns(description, patterns));
         return this;
     }
 
     /// The filters flattened the way the platform wants them, description and
     /// pattern alternating.
-    protected String[] FilterPairs()
+    protected String[] BuildFilterPairs()
     {
-        var flat = new String[filters.Count * 2u];
-        for (nuint i = 0u; i < filters.Count; i++)
+        var flat = new String[_filters.Count * 2u];
+        for (nuint i = 0u; i < _filters.Count; i++)
         {
-            flat[i * 2u] = filters[i].Description;
-            flat[i * 2u + 1u] = filters[i].Patterns;
+            flat[i * 2u] = _filters[i].Description;
+            flat[i * 2u + 1u] = _filters[i].Patterns;
         }
         return flat;
     }
 
     /// The window the dialog should sit over, or null for none.
-    protected IWindowPeer? OwnerOf(Control? owner)
+    protected IWindowPeer? FindOwnerWindow(Control? owner)
     {
         if (owner == null)
             return null;
         var form = ((Control)owner).FindForm();
         if (form == null)
             return null;
-        return ((Form)form).WindowPeer();
+        return ((Form)form).WindowPeer;
     }
 }
 
@@ -121,10 +121,10 @@ public class OpenDialog : FileDialog
     ///
     /// `FileName` is also set, for a caller that would rather read it there --
     /// but only when there was an answer, so it is never a stale path.
-    public Result<String, DialogOutcome> Show(Control? owner)
+    public Result<String, DialogOutcome> ShowDialog(Control? owner)
     {
         var chosen = WidgetSet.Current.ChooseFileToOpen(
-            OwnerOf(owner), Title, FileName, FilterPairs());
+            FindOwnerWindow(owner), Title, FileName, BuildFilterPairs());
         if (chosen.Ok)
             FileName = chosen.Value;
         return chosen;
@@ -136,10 +136,10 @@ public class SaveDialog : FileDialog
 {
     public SaveDialog() => base();
 
-    public Result<String, DialogOutcome> Show(Control? owner)
+    public Result<String, DialogOutcome> ShowDialog(Control? owner)
     {
         var chosen = WidgetSet.Current.ChooseFileToSave(
-            OwnerOf(owner), Title, FileName, FilterPairs());
+            FindOwnerWindow(owner), Title, FileName, BuildFilterPairs());
         if (chosen.Ok)
             FileName = chosen.Value;
         return chosen;
@@ -151,9 +151,9 @@ public class FolderDialog : FileDialog
 {
     public FolderDialog() => base();
 
-    public Result<String, DialogOutcome> Show(Control? owner)
+    public Result<String, DialogOutcome> ShowDialog(Control? owner)
     {
-        var chosen = WidgetSet.Current.ChooseFolder(OwnerOf(owner), Title);
+        var chosen = WidgetSet.Current.ChooseFolder(FindOwnerWindow(owner), Title);
         if (chosen.Ok)
             FileName = chosen.Value;
         return chosen;
@@ -170,22 +170,22 @@ public class ColorDialog
     /// What the dialog opens on, and what it last answered.
     public Color Color { get; set; }
 
-    public Result<Color, DialogOutcome> Show(Control? owner)
+    public Result<Color, DialogOutcome> ShowDialog(Control? owner)
     {
-        var chosen = WidgetSet.Current.ChooseColor(OwnerWindow(owner), Color);
+        var chosen = WidgetSet.Current.ChooseColor(FindOwnerWindow(owner), Color);
         if (chosen.Ok)
             Color = chosen.Value;
         return chosen;
     }
 
-    IWindowPeer? OwnerWindow(Control? owner)
+    IWindowPeer? FindOwnerWindow(Control? owner)
     {
         if (owner == null)
             return null;
         var form = ((Control)owner).FindForm();
         if (form == null)
             return null;
-        return ((Form)form).WindowPeer();
+        return ((Form)form).WindowPeer;
     }
 }
 
@@ -194,33 +194,33 @@ public class ColorDialog
 /// Choose a font.
 public class FontDialog
 {
-    Font _chosen;
+    Font _font;
 
-    public FontDialog() => _chosen = WidgetSet.Current.DefaultFont();
+    public FontDialog() => _font = WidgetSet.Current.GetDefaultFont();
 
     /// What the dialog opens on, and what it last answered.
     public Font Font
     {
-        get => _chosen;
-        set => _chosen = value;
+        get => _font;
+        set => _font = value;
     }
 
-    public Result<Font, DialogOutcome> Show(Control? owner)
+    public Result<Font, DialogOutcome> ShowDialog(Control? owner)
     {
-        var answer = WidgetSet.Current.ChooseFont(OwnerWindow(owner), _chosen);
+        var answer = WidgetSet.Current.ChooseFont(FindOwnerWindow(owner), _font);
         if (answer.Ok)
-            _chosen = answer.Value;
+            _font = answer.Value;
         return answer;
     }
 
-    IWindowPeer? OwnerWindow(Control? owner)
+    IWindowPeer? FindOwnerWindow(Control? owner)
     {
         if (owner == null)
             return null;
         var form = ((Control)owner).FindForm();
         if (form == null)
             return null;
-        return ((Form)form).WindowPeer();
+        return ((Form)form).WindowPeer;
     }
 }
 
@@ -240,14 +240,14 @@ public class FontDialog
 public class Timer : ITimerNotify
 {
     ITimerPeer _native;
-    int _every;
-    bool _running;
+    int _interval;
+    bool _enabled;
 
     /// A timer that has not started, ticking every `milliseconds` when it does.
     public Timer(int milliseconds)
     {
-        _every = milliseconds;
-        _running = false;
+        _interval = milliseconds;
+        _enabled = false;
         _native = WidgetSet.Current.CreateTimer(this);
     }
 
@@ -257,21 +257,21 @@ public class Timer : ITimerNotify
     /// which is the only thing a platform timer can do.
     public int Interval
     {
-        get => _every;
+        get => _interval;
         set
         {
-            _every = value;
-            if (_running)
+            _interval = value;
+            if (_enabled)
             {
                 _native.Stop();
-                _native.Start(_every);
+                _native.Start(_interval);
             }
         }
     }
 
     public bool Enabled
     {
-        get => _running;
+        get => _enabled;
         set
         {
             if (value)
@@ -287,17 +287,17 @@ public class Timer : ITimerNotify
 
     public void Start()
     {
-        if (_running)
+        if (_enabled)
             return;
-        _running = true;
-        _native.Start(_every);
+        _enabled = true;
+        _native.Start(_interval);
     }
 
     public void Stop()
     {
-        if (!_running)
+        if (!_enabled)
             return;
-        _running = false;
+        _enabled = false;
         _native.Stop();
     }
 
@@ -330,7 +330,7 @@ public closure void TimerHandler(Timer sender);
 /// find nothing to read rather than a stale string left over from last time.
 ///
 /// ```
-/// var name = InputDialog.Ask("Rename", "New name:", "old.sl");
+/// var name = InputDialog.PromptForText("Rename", "New name:", "old.sl");
 /// if (name is Some given)
 ///     Rename(given.Value);
 /// ```
@@ -351,7 +351,7 @@ public class InputDialog : Form
     String _answer;
     bool _accepted;
 
-    /// Made by `Ask` alone: a dialog whose answer is read through a field
+    /// Made by `PromptForText` alone: a dialog whose answer is read through a field
     /// should not be one a caller can hold and read at the wrong moment.
     InputDialog(String caption, String question, String initial)
     {
@@ -369,19 +369,19 @@ public class InputDialog : Form
         _entry.Text = initial;
         _entry.SetBounds(12, 38, 352, 24);
         _entry.Anchors = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-        _entry.KeyDown += this.OnKey;
+        _entry.KeyDown += this.OnEntryKeyDown;
 
         _ok = new Button(this);
         _ok.Text = "OK";
         _ok.SetBounds(182, 78, 88, 28);
         _ok.Anchors = AnchorStyles.Top | AnchorStyles.Right;
-        _ok.Click += this.OnOk;
+        _ok.Click += this.OnOkClick;
 
         _cancel = new Button(this);
         _cancel.Text = "Cancel";
         _cancel.SetBounds(276, 78, 88, 28);
         _cancel.Anchors = AnchorStyles.Top | AnchorStyles.Right;
-        _cancel.Click += this.OnCancel;
+        _cancel.Click += this.OnCancelClick;
     }
 
     /// Enter accepts, because a one-line box is a form someone types into and
@@ -389,20 +389,20 @@ public class InputDialog : Form
     /// `IsDialogMessageW` gives a modal window Tab between its controls, but a
     /// default button needs a real dialog box with a `DEFPUSHBUTTON`, which
     /// these are not. Escape is handled by the modal loop already.
-    void OnKey(Control sender, KeyEventArgs args)
+    void OnEntryKeyDown(Control sender, KeyEventArgs args)
     {
         if (args.Key == Key.Enter)
-            OnOk(sender);
+            OnOkClick(sender);
     }
 
-    void OnOk(Control sender)
+    void OnOkClick(Control sender)
     {
         _answer = _entry.Text;
         _accepted = true;
         Close();
     }
 
-    void OnCancel(Control sender)
+    void OnCancelClick(Control sender)
     {
         _accepted = false;
         Close();
@@ -412,7 +412,7 @@ public class InputDialog : Form
     ///
     /// `initial` is what the box starts with, which is the old name for a
     /// rename and the empty string for a new one.
-    public static Optional<String> Ask(String caption, String question, String initial)
+    public static Optional<String> PromptForText(String caption, String question, String initial)
     {
         var dialog = new InputDialog(caption, question, initial);
         dialog.ShowModal();

@@ -229,59 +229,59 @@ public enum AnchorStyles
 /// subscription of itself is weak (spec §2.14.2).
 public abstract class Control : IControlNotify
 {
-    weak WindowedControl? _owner;
+    weak WindowedControl? _parent;
     /// Where the control is.
-    Rectangle _area;
+    Rectangle _bounds;
     /// Where the program asked for it to be. The layout reads this and writes
-    /// only `_area`.
-    Rectangle _requested;
+    /// only `_bounds`.
+    Rectangle _requestedBounds;
     /// The request the anchors are measured from, and the parent's client
     /// size when it was made. Every anchored position is computed afresh from
     /// these two, so no error from one resize reaches the next.
     Rectangle _anchorBase;
     Size _anchorClient;
     bool _anchorKnown;
-    /// Set while `Place` pushes bounds at the platform, so the report the
-    /// platform sends back raises nothing: `Place` raises once for the change.
-    bool _placing;
-    DockStyle _docking;
-    AnchorStyles _anchoring;
-    bool _shown;
-    bool _usable;
-    String _caption;
-    Font? _typeface;
-    Color _foreground;
-    Color _background;
-    bool _backgroundSet;
-    bool _foregroundSet;
+    /// Set while `SetBoundsCore` pushes bounds at the platform, so the report the
+    /// platform sends back raises nothing: `SetBoundsCore` raises once for the change.
+    bool _isPlacing;
+    DockStyle _dock;
+    AnchorStyles _anchors;
+    bool _visible;
+    bool _enabled;
+    String _text;
+    Font? _font;
+    Color _foreColor;
+    Color _backColor;
+    bool _backColorSet;
+    bool _foreColorSet;
     /// Set while the platform is telling us something, so that the setter we
     /// call in response does not tell the platform straight back. One flag
     /// replaces the LCL's `csLoading`/`csUpdating` pair for this layer's needs.
-    bool _echoing;
-    CursorKind _pointer;
+    bool _isEchoing;
+    CursorKind _cursor;
     String _toolTip;
 
     protected Control()
     {
-        _owner = null;
-        _area = Rectangle.FromBounds(0, 0, 100, 24);
-        _requested = _area;
-        _anchorBase = _area;
+        _parent = null;
+        _bounds = Rectangle.FromBounds(0, 0, 100, 24);
+        _requestedBounds = _bounds;
+        _anchorBase = _bounds;
         _anchorClient = Size.Empty;
         _anchorKnown = false;
-        _placing = false;
-        _docking = DockStyle.None;
-        _anchoring = AnchorStyles.Top | AnchorStyles.Left;
-        _shown = true;
-        _usable = true;
-        _caption = "";
-        _typeface = null;
-        _foreground = Colors.Black;
-        _background = Colors.White;
-        _backgroundSet = false;
-        _foregroundSet = false;
-        _echoing = false;
-        _pointer = CursorKind.Default;
+        _isPlacing = false;
+        _dock = DockStyle.None;
+        _anchors = AnchorStyles.Top | AnchorStyles.Left;
+        _visible = true;
+        _enabled = true;
+        _text = "";
+        _font = null;
+        _foreColor = Colors.Black;
+        _backColor = Colors.White;
+        _backColorSet = false;
+        _foreColorSet = false;
+        _isEchoing = false;
+        _cursor = CursorKind.Default;
         _toolTip = "";
         Name = "";
     }
@@ -304,17 +304,17 @@ public abstract class Control : IControlNotify
     /// re-parenting means destroying and re-creating the window for several
     /// control classes, so the operation that looks like an assignment is
     /// really a rebuild, and a program that wants one should say so.
-    public WindowedControl? Parent => _owner;
+    public WindowedControl? Parent => _parent;
 
     /// Called by `WindowedControl` when it takes this control in.
-    void Adopt(WindowedControl newParent)
+    void AttachToParent(WindowedControl newParent)
     {
-        _owner = newParent;
+        _parent = newParent;
         RememberAnchor();
     }
 
     /// Called by `WindowedControl.RemoveControl`, which is the only way out.
-    void Orphan() => _owner = null;
+    void DetachFromParent() => _parent = null;
 
     /// The form this control is on, walking up until it finds one.
     public Form? FindForm()
@@ -339,15 +339,15 @@ public abstract class Control : IControlNotify
     /// parent lays out again at once and decides the rest.
     public Rectangle Bounds
     {
-        get => _area;
+        get => _bounds;
         set
         {
-            _requested = value;
+            _requestedBounds = value;
             RememberAnchor();
-            Place(value);
-            if (_docking == DockStyle.None)
+            SetBoundsCore(value);
+            if (_dock == DockStyle.None)
                 return;
-            WindowedControl? parent = _owner;
+            WindowedControl? parent = _parent;
             if (parent != null)
                 ((WindowedControl)parent).PerformLayout();
         }
@@ -355,20 +355,20 @@ public abstract class Control : IControlNotify
 
     /// What the program last asked for, which the layout sizes a docked
     /// control from.
-    Rectangle RequestedBounds => _requested;
+    Rectangle RequestedBounds => _requestedBounds;
 
     /// Moves and sizes the control without changing what was asked for. What
     /// the layout calls; raises `Resize` and `Move` once each, for what
     /// changed.
-    void Place(Rectangle value)
+    void SetBoundsCore(Rectangle value)
     {
-        if (_area.Equals(value))
+        if (_bounds.Equals(value))
             return;
-        var was = _area;
-        Push(value);
+        var was = _bounds;
+        PushBounds(value);
 
-        bool sized = !was.Extent.Equals(value.Extent) || !was.Extent.Equals(_area.Extent);
-        bool moved = !was.Location.Equals(value.Location) || !was.Location.Equals(_area.Location);
+        bool sized = !was.Extent.Equals(value.Extent) || !was.Extent.Equals(_bounds.Extent);
+        bool moved = !was.Location.Equals(value.Location) || !was.Location.Equals(_bounds.Location);
         if (sized)
         {
             if (this is WindowedControl container)
@@ -377,8 +377,8 @@ public abstract class Control : IControlNotify
                 // GTK holds a container at least as large as its children
                 // reached, which they did at the old size. They have been laid
                 // out again now, so the size is asked for again.
-                if (!_area.Extent.Equals(value.Extent))
-                    Push(value);
+                if (!_bounds.Extent.Equals(value.Extent))
+                    PushBounds(value);
             }
             OnResize();
         }
@@ -387,13 +387,13 @@ public abstract class Control : IControlNotify
     }
 
     /// Tells the platform. It reports the change back from inside this call,
-    /// and MAY settle on a size of its own; `_area` then holds what it said.
-    void Push(Rectangle value)
+    /// and MAY settle on a size of its own; `_bounds` then holds what it said.
+    void PushBounds(Rectangle value)
     {
-        _area = value;
-        _placing = true;
+        _bounds = value;
+        _isPlacing = true;
         ApplyBounds();
-        _placing = false;
+        _isPlacing = false;
     }
 
     /// Takes the current request as what the anchors measure from, against
@@ -403,9 +403,9 @@ public abstract class Control : IControlNotify
     /// taken at the first layout that has some.
     void RememberAnchor()
     {
-        _anchorBase = _requested;
+        _anchorBase = _requestedBounds;
         _anchorKnown = false;
-        WindowedControl? parent = _owner;
+        WindowedControl? parent = _parent;
         if (parent == null)
             return;
         var client = ((WindowedControl)parent).LayoutClient;
@@ -419,11 +419,11 @@ public abstract class Control : IControlNotify
     ///
     /// Each edge is a distance from the base, so the answer depends only on
     /// the base and `client` and never on the sizes in between.
-    Rectangle AnchoredBounds(Size client)
+    Rectangle ComputeAnchoredBounds(Size client)
     {
         if (!_anchorKnown)
         {
-            _anchorBase = _requested;
+            _anchorBase = _requestedBounds;
             _anchorClient = client;
             _anchorKnown = true;
         }
@@ -434,8 +434,8 @@ public abstract class Control : IControlNotify
 
         int x = at.X;
         int width = at.Width;
-        bool left = _anchoring.HasFlag(AnchorStyles.Left);
-        bool right = _anchoring.HasFlag(AnchorStyles.Right);
+        bool left = _anchors.HasFlag(AnchorStyles.Left);
+        bool right = _anchors.HasFlag(AnchorStyles.Right);
         if (left && right)
         {
             width = width + growX;
@@ -446,13 +446,13 @@ public abstract class Control : IControlNotify
         }
         else if (!left)
         {
-            x = x + HalfOf(growX);
+            x = x + HalveRoundingDown(growX);
         }
 
         int y = at.Y;
         int height = at.Height;
-        bool top = _anchoring.HasFlag(AnchorStyles.Top);
-        bool bottom = _anchoring.HasFlag(AnchorStyles.Bottom);
+        bool top = _anchors.HasFlag(AnchorStyles.Top);
+        bool bottom = _anchors.HasFlag(AnchorStyles.Bottom);
         if (top && bottom)
         {
             height = height + growY;
@@ -463,7 +463,7 @@ public abstract class Control : IControlNotify
         }
         else if (!top)
         {
-            y = y + HalfOf(growY);
+            y = y + HalveRoundingDown(growY);
         }
 
         if (width < 0)
@@ -475,41 +475,41 @@ public abstract class Control : IControlNotify
 
     /// Half, rounded down rather than towards zero, so a centred control
     /// moves by the same amount for a pixel gained as for a pixel lost.
-    static int HalfOf(int value)
+    static int HalveRoundingDown(int value)
     {
         if (value >= 0)
             return value / 2;
         return -((1 - value) / 2);
     }
 
-    public int Left   { get => _area.X;      set { Bounds = Rectangle.FromBounds(value, _area.Y, _area.Width, _area.Height); } }
-    public int Top    { get => _area.Y;      set { Bounds = Rectangle.FromBounds(_area.X, value, _area.Width, _area.Height); } }
-    public int Width  { get => _area.Width;  set { Bounds = Rectangle.FromBounds(_area.X, _area.Y, value, _area.Height); } }
-    public int Height { get => _area.Height; set { Bounds = Rectangle.FromBounds(_area.X, _area.Y, _area.Width, value); } }
+    public int Left   { get => _bounds.X;      set { Bounds = Rectangle.FromBounds(value, _bounds.Y, _bounds.Width, _bounds.Height); } }
+    public int Top    { get => _bounds.Y;      set { Bounds = Rectangle.FromBounds(_bounds.X, value, _bounds.Width, _bounds.Height); } }
+    public int Width  { get => _bounds.Width;  set { Bounds = Rectangle.FromBounds(_bounds.X, _bounds.Y, value, _bounds.Height); } }
+    public int Height { get => _bounds.Height; set { Bounds = Rectangle.FromBounds(_bounds.X, _bounds.Y, _bounds.Width, value); } }
 
     /// The far edges, which a layout calculation wants far more often than it
     /// wants the width. Read-only: setting `Right` could mean moving or
     /// resizing, and C# leaves them read-only for the same reason.
-    public int Right  => _area.X + _area.Width;
-    public int Bottom => _area.Y + _area.Height;
+    public int Right  => _bounds.X + _bounds.Width;
+    public int Bottom => _bounds.Y + _bounds.Height;
 
     public Point Location
     {
-        get => _area.Location;
-        set => Bounds = Rectangle.FromBounds(value.X, value.Y, _area.Width, _area.Height);
+        get => _bounds.Location;
+        set => Bounds = Rectangle.FromBounds(value.X, value.Y, _bounds.Width, _bounds.Height);
     }
 
     public Size Extent
     {
-        get => _area.Extent;
-        set => Bounds = Rectangle.FromBounds(_area.X, _area.Y, value.Width, value.Height);
+        get => _bounds.Extent;
+        set => Bounds = Rectangle.FromBounds(_bounds.X, _bounds.Y, value.Width, value.Height);
     }
 
     /// The area inside this control that its own children use. The same as the
     /// bounds at the origin for anything without a frame, and overridden by
     /// what has one.
     public virtual Rectangle ClientBounds =>
-        Rectangle.FromBounds(0, 0, _area.Width, _area.Height);
+        Rectangle.FromBounds(0, 0, _bounds.Width, _bounds.Height);
 
     /// Moves and sizes in one step, which is what a layout pass wants: two
     /// assignments would lay the children out twice and paint an intermediate
@@ -524,24 +524,24 @@ public abstract class Control : IControlNotify
     /// nothing to tell and only needs its parent to repaint.
     protected virtual void ApplyBounds()
     {
-        WindowedControl? parent = _owner;
+        WindowedControl? parent = _parent;
         if (parent != null)
             ((WindowedControl)parent).Invalidate();
     }
 
     /// How large the control would like to be, given its text and font. Zero
     /// means "no opinion", which is what the base says and what stops
-    /// `AutoSize` doing anything to a control that has not overridden it.
+    /// `ResizeToPreferredSize` doing anything to a control that has not overridden it.
     public virtual Size PreferredSize => Size.Empty;
 
     /// Resizes to `PreferredSize`, keeping the top-left corner. Does nothing
     /// when the control has no opinion.
-    public void AutoSize()
+    public void ResizeToPreferredSize()
     {
         var wanted = PreferredSize;
         if (wanted.IsEmpty)
             return;
-        Bounds = Rectangle.FromBounds(_area.X, _area.Y, wanted.Width, wanted.Height);
+        Bounds = Rectangle.FromBounds(_bounds.X, _bounds.Y, wanted.Width, wanted.Height);
     }
 
     // -------------------------------------------------------------- layout
@@ -551,19 +551,19 @@ public abstract class Control : IControlNotify
     /// leaving it stale would show the old one.
     public DockStyle Dock
     {
-        get => _docking;
+        get => _dock;
         set
         {
-            if (_docking == value)
+            if (_dock == value)
                 return;
-            _docking = value;
+            _dock = value;
             // Undocked, it stays where the dock put it, as the LCL leaves it.
             if (value == DockStyle.None)
             {
-                _requested = _area;
+                _requestedBounds = _bounds;
                 RememberAnchor();
             }
-            WindowedControl? parent = _owner;
+            WindowedControl? parent = _parent;
             if (parent != null)
                 ((WindowedControl)parent).PerformLayout();
         }
@@ -576,13 +576,13 @@ public abstract class Control : IControlNotify
     /// or when `Bounds` is next written.
     public AnchorStyles Anchors
     {
-        get => _anchoring;
+        get => _anchors;
         set
         {
-            _anchoring = value;
-            if (_docking != DockStyle.None)
+            _anchors = value;
+            if (_dock != DockStyle.None)
                 return;
-            _requested = _area;
+            _requestedBounds = _bounds;
             RememberAnchor();
         }
     }
@@ -594,14 +594,14 @@ public abstract class Control : IControlNotify
     /// program usually wants is `IsShowing`.
     public bool Visible
     {
-        get => _shown;
+        get => _visible;
         set
         {
-            if (_shown == value)
+            if (_visible == value)
                 return;
-            _shown = value;
+            _visible = value;
             ApplyVisible();
-            WindowedControl? parent = _owner;
+            WindowedControl? parent = _parent;
             if (parent != null)
                 ((WindowedControl)parent).PerformLayout();
         }
@@ -613,9 +613,9 @@ public abstract class Control : IControlNotify
     {
         get
         {
-            if (!_shown)
+            if (!_visible)
                 return false;
-            WindowedControl? parent = _owner;
+            WindowedControl? parent = _parent;
             if (parent == null)
                 return true;
             return ((WindowedControl)parent).IsShowing;
@@ -630,7 +630,7 @@ public abstract class Control : IControlNotify
 
     /// Records the control as hidden without telling the platform, for a
     /// window the platform has already destroyed.
-    void ForgetShown() => _shown = false;
+    void MarkHidden() => _visible = false;
 
     /// Whether this control and every parent above it is enabled -- the
     /// question "can the user use it", which `Enabled` alone does not answer.
@@ -640,9 +640,9 @@ public abstract class Control : IControlNotify
     {
         get
         {
-            if (!_usable)
+            if (!_enabled)
                 return false;
-            WindowedControl? parent = _owner;
+            WindowedControl? parent = _parent;
             if (parent == null)
                 return true;
             return ((WindowedControl)parent).IsEnabled;
@@ -654,12 +654,12 @@ public abstract class Control : IControlNotify
     /// `IsEnabled`.
     public bool Enabled
     {
-        get => _usable;
+        get => _enabled;
         set
         {
-            if (_usable == value)
+            if (_enabled == value)
                 return;
-            _usable = value;
+            _enabled = value;
             ApplyEnabled();
         }
     }
@@ -677,13 +677,13 @@ public abstract class Control : IControlNotify
     /// Overridable so a control backed by a platform widget can read the live
     /// value rather than the last one set -- which for a text box is the only
     /// correct answer, since the user has been typing into it.
-    protected virtual String GetTextValue() => _caption;
+    protected virtual String GetTextValue() => _text;
 
     protected virtual void SetTextValue(String value)
     {
-        if (_caption == value)
+        if (_text == value)
             return;
-        _caption = value;
+        _text = value;
         ApplyText();
         OnTextChanged();
     }
@@ -692,8 +692,8 @@ public abstract class Control : IControlNotify
     /// and still needs the field.
     protected String StoredText
     {
-        get => _caption;
-        set => _caption = value;
+        get => _text;
+        set => _text = value;
     }
 
     /// The font this control draws with. Inherited from the parent when nothing
@@ -704,17 +704,17 @@ public abstract class Control : IControlNotify
     {
         get
         {
-            var mine = _typeface;
+            var mine = _font;
             if (mine != null)
                 return (Font)mine;
-            WindowedControl? parent = _owner;
+            WindowedControl? parent = _parent;
             if (parent != null)
                 return ((WindowedControl)parent).Font;
-            return WidgetSet.Current.DefaultFont();
+            return WidgetSet.Current.GetDefaultFont();
         }
         set
         {
-            _typeface = value;
+            _font = value;
             ApplyFont();
             OnFontChanged();
         }
@@ -733,7 +733,7 @@ public abstract class Control : IControlNotify
     {
         get
         {
-            WindowedControl? parent = _owner;
+            WindowedControl? parent = _parent;
             if (parent != null)
                 return ((WindowedControl)parent).BackColor;
             return SystemColors.Control;
@@ -745,7 +745,7 @@ public abstract class Control : IControlNotify
     {
         get
         {
-            WindowedControl? parent = _owner;
+            WindowedControl? parent = _parent;
             if (parent != null)
                 return ((WindowedControl)parent).ForeColor;
             return SystemColors.ControlText;
@@ -757,14 +757,14 @@ public abstract class Control : IControlNotify
     {
         get
         {
-            if (_foregroundSet)
-                return _foreground;
+            if (_foreColorSet)
+                return _foreColor;
             return DefaultForeColor;
         }
         set
         {
-            _foreground = value;
-            _foregroundSet = true;
+            _foreColor = value;
+            _foreColorSet = true;
             ApplyForeColor();
         }
     }
@@ -774,22 +774,22 @@ public abstract class Control : IControlNotify
     {
         get
         {
-            if (_backgroundSet)
-                return _background;
+            if (_backColorSet)
+                return _backColor;
             return DefaultBackColor;
         }
         set
         {
-            _background = value;
-            _backgroundSet = true;
+            _backColor = value;
+            _backColorSet = true;
             ApplyBackColor();
         }
     }
 
     /// Whether a colour was set here rather than inherited, which decides
     /// whether a parent's change reaches this control.
-    bool HasOwnForeColor => _foregroundSet;
-    bool HasOwnBackColor => _backgroundSet;
+    bool HasOwnForeColor => _foreColorSet;
+    bool HasOwnBackColor => _backColorSet;
 
     // What a derived class overrides to reach a platform widget. Each does
     // nothing here, because a control with no platform side has nothing to do.
@@ -803,10 +803,10 @@ public abstract class Control : IControlNotify
     /// What the pointer looks like over this control.
     public CursorKind Cursor
     {
-        get => _pointer;
+        get => _cursor;
         set
         {
-            _pointer = value;
+            _cursor = value;
             ApplyCursor();
         }
     }
@@ -856,13 +856,13 @@ public abstract class Control : IControlNotify
     /// A `GraphicControl` answers relative to itself by asking its parent and
     /// subtracting, since the parent is what owns the window the platform can
     /// measure against.
-    public virtual Point PointerPosition()
+    public virtual Point GetPointerPosition()
     {
-        WindowedControl? parent = _owner;
+        WindowedControl? parent = _parent;
         if (parent == null)
             return Point.Empty;
         var container = (WindowedControl)parent;
-        var outer = container.PointerPosition();
+        var outer = container.GetPointerPosition();
         var origin = container.ClientOrigin;
         return Point.FromXY(outer.X - origin.X - Left, outer.Y - origin.Y - Top);
     }
@@ -870,7 +870,7 @@ public abstract class Control : IControlNotify
     /// Marks the control as needing repainting.
     public virtual void Invalidate()
     {
-        WindowedControl? parent = _owner;
+        WindowedControl? parent = _parent;
         if (parent != null)
             ((WindowedControl)parent).Invalidate();
     }
@@ -939,7 +939,7 @@ public abstract class Control : IControlNotify
     // `IControlNotify`, implemented once here for every control there will ever
     // be. Each method turns the platform's report into the raiser above it, so
     // a control that wants to react overrides `OnClick` and never sees any of
-    // this. The `echoing` flag is set around the ones that would otherwise
+    // this. The `_isEchoing` flag is set around the ones that would otherwise
     // cause a write back to the platform that reported them.
 
     public void OnPlatformPaint(Graphics surface)
@@ -953,7 +953,7 @@ public abstract class Control : IControlNotify
 
     /// The platform says what size the control is.
     ///
-    /// **An echo of `Place` raises nothing**, since `Place` raises once itself.
+    /// **An echo of `SetBoundsCore` raises nothing**, since `Place` raises once itself.
     /// Anything else is the platform resizing on its own -- the user dragging a
     /// window's frame, a toolbar fitting itself to its buttons -- and becomes
     /// what was asked for.
@@ -961,12 +961,12 @@ public abstract class Control : IControlNotify
     {
         if (IsMinimizedWindow)
             return;
-        var was = _area;
-        _area = Rectangle.FromBounds(_area.X, _area.Y, extent.Width, extent.Height);
-        if (_placing)
+        var was = _bounds;
+        _bounds = Rectangle.FromBounds(_bounds.X, _bounds.Y, extent.Width, extent.Height);
+        if (_isPlacing)
             return;
 
-        _requested = Rectangle.FromBounds(_requested.X, _requested.Y, extent.Width, extent.Height);
+        _requestedBounds = Rectangle.FromBounds(_requestedBounds.X, _requestedBounds.Y, extent.Width, extent.Height);
         RememberAnchor();
         // Laid out whether or not the size changed: a window's first report is
         // where it learns the room it was actually given.
@@ -985,18 +985,18 @@ public abstract class Control : IControlNotify
         // Taking the offset off again is what makes a control's position read
         // back as the one it was given, under a group box as anywhere else.
         var placed = position;
-        WindowedControl? parent = _owner;
+        WindowedControl? parent = _parent;
         if (parent != null)
         {
             var origin = ((WindowedControl)parent).ClientOrigin;
             placed = Point.FromXY(position.X - origin.X, position.Y - origin.Y);
         }
-        var was = _area;
-        _area = Rectangle.FromBounds(placed.X, placed.Y, _area.Width, _area.Height);
-        if (_placing)
+        var was = _bounds;
+        _bounds = Rectangle.FromBounds(placed.X, placed.Y, _bounds.Width, _bounds.Height);
+        if (_isPlacing)
             return;
 
-        _requested = Rectangle.FromBounds(placed.X, placed.Y, _requested.Width, _requested.Height);
+        _requestedBounds = Rectangle.FromBounds(placed.X, placed.Y, _requestedBounds.Width, _requestedBounds.Height);
         RememberAnchor();
         if (!was.Location.Equals(placed))
             OnMove();
@@ -1073,5 +1073,5 @@ public abstract class Control : IControlNotify
 
     /// Whether we are currently inside a platform notification, for a derived
     /// class whose setter must not answer one.
-    protected bool IsEchoing => _echoing;
+    protected bool IsEchoing => _isEchoing;
 }

@@ -70,17 +70,17 @@ public enum ShapeKind { Rectangle, RoundRectangle, Ellipse, Circle, Square }
 public class Shape : GraphicControl
 {
     ShapeKind _kind;
-    Color _fill;
-    Color _edge;
-    int _thickness;
+    Color _fillColor;
+    Color _lineColor;
+    int _lineWidth;
 
     public Shape(WindowedControl parent)
     {
         base(parent);
         _kind = ShapeKind.Rectangle;
-        _fill = Colors.White;
-        _edge = Colors.Black;
-        _thickness = 1;
+        _fillColor = Colors.White;
+        _lineColor = Colors.Black;
+        _lineWidth = 1;
     }
 
     public ShapeKind Kind
@@ -95,30 +95,30 @@ public class Shape : GraphicControl
 
     public Color FillColor
     {
-        get => _fill;
+        get => _fillColor;
         set
         {
-            _fill = value;
+            _fillColor = value;
             Invalidate();
         }
     }
 
     public Color LineColor
     {
-        get => _edge;
+        get => _lineColor;
         set
         {
-            _edge = value;
+            _lineColor = value;
             Invalidate();
         }
     }
 
     public int LineWidth
     {
-        get => _thickness;
+        get => _lineWidth;
         set
         {
-            _thickness = value;
+            _lineWidth = value;
             Invalidate();
         }
     }
@@ -126,8 +126,8 @@ public class Shape : GraphicControl
     protected override void OnPaint(PaintEventArgs args)
     {
         var surface = args.Graphics;
-        var brush = new Brush(_fill);
-        var pen = new Pen(_edge, _thickness, PenStyle.Solid);
+        var brush = new Brush(_fillColor);
+        var pen = new Pen(_lineColor, _lineWidth, PenStyle.Solid);
 
         // A square and a circle are the same shapes fitted to the shorter side,
         // which is what makes them worth having as separate kinds rather than
@@ -265,7 +265,7 @@ public class Splitter : GraphicControl
     bool _dragging;
     Point _grabbed;
     int _startedAt;
-    int _smallest;
+    int _minimumSize;
 
     public Splitter(WindowedControl parent)
     {
@@ -273,7 +273,7 @@ public class Splitter : GraphicControl
         _dragging = false;
         _grabbed = Point.Empty;
         _startedAt = 0;
-        _smallest = 40;
+        _minimumSize = 40;
         Dock = DockStyle.Left;
         Width = 5;
         Height = 5;
@@ -283,13 +283,13 @@ public class Splitter : GraphicControl
     /// The smallest the neighbour may be dragged to.
     public int MinimumSize
     {
-        get => _smallest;
-        set => _smallest = value;
+        get => _minimumSize;
+        set => _minimumSize = value;
     }
 
     /// Which control this splitter resizes: the visible one docked to the same
     /// edge immediately before it.
-    Control? Neighbour()
+    Control? FindNeighbor()
     {
         var parent = Parent;
         if (parent == null)
@@ -306,27 +306,27 @@ public class Splitter : GraphicControl
         return null;
     }
 
-    bool _Horizontal => Dock == DockStyle.Left || Dock == DockStyle.Right;
+    bool IsHorizontal => Dock == DockStyle.Left || Dock == DockStyle.Right;
 
     /// The largest the neighbour may be dragged to: the parent's extent less
     /// every other visible control docked on the same axis, this one included.
     /// Beyond it the neighbour would push the splitter out of the parent.
-    int LargestFor(Control beside)
+    int GetLargestSizeFor(Control beside)
     {
         var parent = Parent;
         if (parent == null)
-            return _smallest;
+            return _minimumSize;
         var holder = (WindowedControl)parent;
         var room = holder.ClientBounds;
-        int most = _Horizontal ? room.Width : room.Height;
+        int most = IsHorizontal ? room.Width : room.Height;
         foreach (var child in holder.Controls)
         {
             if (child == beside || !child.Visible)
                 continue;
             var edge = child.Dock;
-            if (_Horizontal && (edge == DockStyle.Left || edge == DockStyle.Right))
+            if (IsHorizontal && (edge == DockStyle.Left || edge == DockStyle.Right))
                 most -= child.Width;
-            if (!_Horizontal && (edge == DockStyle.Top || edge == DockStyle.Bottom))
+            if (!IsHorizontal && (edge == DockStyle.Top || edge == DockStyle.Bottom))
                 most -= child.Height;
         }
         return most;
@@ -337,7 +337,7 @@ public class Splitter : GraphicControl
     /// changing it need not change this control's size.
     void ChooseCursor()
     {
-        var wanted = _Horizontal ? CursorKind.SizeWestEast : CursorKind.SizeNorthSouth;
+        var wanted = IsHorizontal ? CursorKind.SizeWestEast : CursorKind.SizeNorthSouth;
         if (Cursor != wanted)
             Cursor = wanted;
     }
@@ -359,14 +359,14 @@ public class Splitter : GraphicControl
         base.OnMouseDown(args);
         if (args.Button != MouseButton.Left)
             return;
-        var beside = Neighbour();
+        var beside = FindNeighbor();
         if (beside == null)
             return;
         _dragging = true;
         // In the *parent's* coordinates, because that is the space the drag is
         // measured in and the splitter itself is about to move underneath it.
         _grabbed = Point.FromXY(Left + args.X, Top + args.Y);
-        _startedAt = _Horizontal ? ((Control)beside).Width : ((Control)beside).Height;
+        _startedAt = IsHorizontal ? ((Control)beside).Width : ((Control)beside).Height;
         CaptureMouse(true);
     }
 
@@ -375,12 +375,12 @@ public class Splitter : GraphicControl
         base.OnMouseMove(args);
         if (!_dragging)
             return;
-        var beside = Neighbour();
+        var beside = FindNeighbor();
         if (beside == null)
             return;
 
         var now = Point.FromXY(Left + args.X, Top + args.Y);
-        int moved = _Horizontal ? now.X - _grabbed.X : now.Y - _grabbed.Y;
+        int moved = IsHorizontal ? now.X - _grabbed.X : now.Y - _grabbed.Y;
         // Dragging a right- or bottom-docked splitter grows its neighbour the
         // other way, since the neighbour's far edge is the one that is fixed.
         if (Dock == DockStyle.Right || Dock == DockStyle.Bottom)
@@ -388,13 +388,13 @@ public class Splitter : GraphicControl
 
         var control = (Control)beside;
         int wanted = _startedAt + moved;
-        int most = LargestFor(control);
+        int most = GetLargestSizeFor(control);
         if (wanted > most)
             wanted = most;
-        if (wanted < _smallest)
-            wanted = _smallest;
+        if (wanted < _minimumSize)
+            wanted = _minimumSize;
 
-        if (_Horizontal)
+        if (IsHorizontal)
         {
             control.Width = wanted;
         }

@@ -316,7 +316,7 @@ public class Shell : Form
         // the binary, and a window has to be handed one. False on GTK, where
         // an icon comes from the desktop theme rather than from the program,
         // and there is nothing useful to do about that here.
-        UseIconResource(ProgramIcon);
+        SetIconResource(ProgramIcon);
 
         _statusBar = new StatusBar(this);
         _statusBar.Dock = DockStyle.Bottom;
@@ -745,21 +745,21 @@ public class Shell : Form
         file.Add("P&roperties...").Click += this.OnProjectProperties;
         file.Add("&Save").Click += this.OnSave;
         file.Add("Save &As...").Click += this.OnSaveAs;
-        file.Add(MenuItem.Separator());
+        file.Add(MenuItem.CreateSeparator());
         file.Add("&Close tab").Click += this.OnCloseTab;
-        file.Add(MenuItem.Separator());
+        file.Add(MenuItem.CreateSeparator());
         file.Add("E&xit").Click += this.OnExit;
 
         var edit = _menuBar.Add("&Edit");
         edit.Add("&Undo").Click += this.OnUndo;
         edit.Add("&Redo").Click += this.OnRedo;
-        edit.Add(MenuItem.Separator());
+        edit.Add(MenuItem.CreateSeparator());
         edit.Add("Cu&t").Click += this.OnCut;
         edit.Add("&Copy").Click += this.OnCopy;
         edit.Add("&Paste").Click += this.OnPaste;
-        edit.Add(MenuItem.Separator());
+        edit.Add(MenuItem.CreateSeparator());
         edit.Add("Select &all").Click += this.OnSelectAll;
-        edit.Add(MenuItem.Separator());
+        edit.Add(MenuItem.CreateSeparator());
         edit.Add("&Find and replace...").Click += this.OnFind;
         edit.Add("Find &next").Click += this.OnFindNext;
 
@@ -768,9 +768,9 @@ public class Shell : Form
         build.Add("Re&build").Click += this.OnRebuild;
         build.Add("&Run").Click += this.OnRun;
         build.Add("&Stop").Click += this.OnStop;
-        build.Add(MenuItem.Separator());
+        build.Add(MenuItem.CreateSeparator());
         build.Add("&Clean").Click += this.OnClean;
-        build.Add(MenuItem.Separator());
+        build.Add(MenuItem.CreateSeparator());
         build.Add("&Clear output").Click += this.OnClearOutput;
 
         var debug = _menuBar.Add("&Debug");
@@ -778,18 +778,18 @@ public class Shell : Form
         debug.Add("Start &without debugging\tCtrl+F5").Click += this.OnRun;
         debug.Add("&Restart\tCtrl+Shift+F5").Click += this.OnRestartDebugging;
         debug.Add("Stop &debugging\tShift+F5").Click += this.OnStopDebugging;
-        debug.Add(MenuItem.Separator());
+        debug.Add(MenuItem.CreateSeparator());
         debug.Add("Break &all").Click += this.OnBreakAll;
         debug.Add("&Continue\tF5").Click += this.OnContinue;
-        debug.Add(MenuItem.Separator());
+        debug.Add(MenuItem.CreateSeparator());
         debug.Add("Step &into\tF11").Click += this.OnStepInto;
         debug.Add("Step &over\tF10").Click += this.OnStepOver;
         debug.Add("Step o&ut\tShift+F11").Click += this.OnStepOut;
-        debug.Add(MenuItem.Separator());
+        debug.Add(MenuItem.CreateSeparator());
         debug.Add("Toggle &breakpoint\tF9").Click += this.OnToggleBreakpoint;
         debug.Add("Brea&kpoint condition...").Click += this.OnBreakpointCondition;
         debug.Add("Delete all brea&kpoints").Click += this.OnClearBreakpoints;
-        debug.Add(MenuItem.Separator());
+        debug.Add(MenuItem.CreateSeparator());
         debug.Add("Add &watch...").Click += this.OnAddWatch;
 
         var view = _menuBar.Add("&View");
@@ -806,18 +806,18 @@ public class Shell : Form
         view.Add("T&hreads").Click += this.OnShowThreads;
         view.Add("&Breakpoints").Click += this.OnShowBreakpoints;
         view.Add("&Debug Output").Click += this.OnShowDebugOutput;
-        view.Add(MenuItem.Separator());
+        view.Add(MenuItem.CreateSeparator());
         view.Add("&Reset layout").Click += this.OnResetLayout;
-        view.Add(MenuItem.Separator());
+        view.Add(MenuItem.CreateSeparator());
 
         _themeItem = view.Add("&Dark theme");
         _themeItem.Click += this.OnToggleTheme;
-        view.Add(MenuItem.Separator());
+        view.Add(MenuItem.CreateSeparator());
 
         var size = view.Add("&Text size");
         size.Add("&Larger").Click += this.OnLarger;
         size.Add("&Smaller").Click += this.OnSmaller;
-        size.Add(MenuItem.Separator());
+        size.Add(MenuItem.CreateSeparator());
         size.Add("&Reset").Click += this.OnResetSize;
 
         Menu = _menuBar;
@@ -838,7 +838,7 @@ public class Shell : Form
         dialog.AddFilter("Stainless source", "*.sl");
         dialog.AddFilter("Every file", "*");
 
-        var chosen = dialog.Show(this);
+        var chosen = dialog.ShowDialog(this);
         if (!chosen.Ok)
             return;
         if (!OpenFile(chosen.Value))
@@ -938,7 +938,7 @@ public class Shell : Form
             dialog.Title = "Save as";
             dialog.AddFilter("Stainless source", "*.sl");
             dialog.FileName = editor.Contents.Location;
-            var chosen = dialog.Show(this);
+            var chosen = dialog.ShowDialog(this);
             if (!chosen.Ok)
                 return false;
             target = chosen.Value;
@@ -1141,7 +1141,7 @@ public class Shell : Form
         dialog.AddFilter("Stainless projects", "stainless.json");
         dialog.AddFilter("All files", "*");
 
-        var chosen = dialog.Show(this);
+        var chosen = dialog.ShowDialog(this);
         if (!chosen.Ok)
             return;
 
@@ -2117,7 +2117,7 @@ public class Shell : Form
 
     /// Ties a node to the file or directory it stands for.
     ///
-    /// A list searched rather than a map, for the reason `TreeView.Lookup`
+    /// A list searched rather than a map, for the reason `TreeView.FindNode`
     /// gives: a tree small enough to be usable is a tree small enough to walk,
     /// and a handful of files is a search that is over in microseconds.
     void AddTreeEntry(TreeNode node, String path, bool folder)
@@ -2171,7 +2171,7 @@ public class Shell : Form
     /// **The node under the pointer, not the selected one.** Neither platform
     /// moves the selection on a right-click, so a menu built from
     /// `SelectedNode` would act on whatever was selected beforehand -- a
-    /// Delete that removes a file nobody pointed at. `TreeView.NodeAt` answers
+    /// Delete that removes a file nobody pointed at. `TreeView.GetNodeAt` answers
     /// what was actually clicked, and the selection is moved to follow it, so
     /// that what the menu is about is also what is highlighted while it is up.
     ///
@@ -2190,7 +2190,7 @@ public class Shell : Form
         // Asked for from the keyboard, there is no pointer to hit-test, so it
         // is the selection that the menu is about -- and it belongs beside the
         // selected row rather than in the control's corner.
-        var hit = args.FromKeyboard ? _tree.SelectedNode : _tree.NodeAt(where);
+        var hit = args.FromKeyboard ? _tree.SelectedNode : _tree.GetNodeAt(where);
 
         if (hit != null)
         {
@@ -2227,7 +2227,7 @@ public class Shell : Form
         if (isFile)
         {
             menu.Add("&Open").Click += this.OnTreeOpen;
-            menu.Add(MenuItem.Separator());
+            menu.Add(MenuItem.CreateSeparator());
         }
 
         var added = menu.Add("Add &new file...");
@@ -2242,7 +2242,7 @@ public class Shell : Form
         removed.Enabled = isFile;
         removed.Click += this.OnTreeDelete;
 
-        menu.Add(MenuItem.Separator());
+        menu.Add(MenuItem.CreateSeparator());
 
         var shown = menu.Add(RevealVerb);
         shown.Enabled = target != null;
@@ -2307,7 +2307,7 @@ public class Shell : Form
         if (folder.ByteLength() == 0u)
             return;
 
-        var asked = InputDialog.Ask("Add file", "Name of the new file:", "");
+        var asked = InputDialog.PromptForText("Add file", "Name of the new file:", "");
         if (asked is Some given)
             CreateSourceFile(folder, given.Value);
     }
@@ -2328,7 +2328,7 @@ public class Shell : Form
         String path = Path.Join(folder, name);
         if (File.Exists(path))
         {
-            Application.Complain(name + " is already there.", "Add file");
+            Application.ShowError(name + " is already there.", "Add file");
             return;
         }
 
@@ -2339,7 +2339,7 @@ public class Shell : Form
 
         if (File.WriteAllText(path, seed) != IOError.None)
         {
-            Application.Complain("Could not create " + path + ".", "Add file");
+            Application.ShowError("Could not create " + path + ".", "Add file");
             return;
         }
 
@@ -2419,7 +2419,7 @@ public class Shell : Form
         if (entry.IsFolder)
             return;
 
-        var asked = InputDialog.Ask("Rename", "New name:", GetDisplayName(entry.FullPath));
+        var asked = InputDialog.PromptForText("Rename", "New name:", GetDisplayName(entry.FullPath));
         if (asked is Some given)
             RenameTreeEntry(entry, given.Value);
     }
@@ -2433,13 +2433,13 @@ public class Shell : Form
         String path = Path.Join(Path.GetDirectoryName(entry.FullPath), name);
         if (File.Exists(path))
         {
-            Application.Complain(name + " is already there.", "Rename");
+            Application.ShowError(name + " is already there.", "Rename");
             return;
         }
 
         if (File.Move(entry.FullPath, path) != IOError.None)
         {
-            Application.Complain("Could not rename " + entry.FullPath + ".", "Rename");
+            Application.ShowError("Could not rename " + entry.FullPath + ".", "Rename");
             return;
         }
 
@@ -2469,14 +2469,14 @@ public class Shell : Form
         if (entry.IsFolder)
             return;
 
-        if (!Application.Ask("Delete " + GetDisplayName(entry.FullPath) + "?\n\n"
+        if (!Application.AskYesNo("Delete " + GetDisplayName(entry.FullPath) + "?\n\n"
                              + entry.FullPath + "\n\nThis cannot be undone.",
                              "Delete file"))
             return;
 
         if (File.Delete(entry.FullPath) != IOError.None)
         {
-            Application.Complain("Could not delete " + entry.FullPath + ".",
+            Application.ShowError("Could not delete " + entry.FullPath + ".",
                                  "Delete file");
             return;
         }
@@ -2757,7 +2757,7 @@ public class Shell : Form
         toggled.Enabled = onOne;
         toggled.Click += this.OnToggleBreakpointEnabled;
 
-        menu.Add(MenuItem.Separator());
+        menu.Add(MenuItem.CreateSeparator());
 
         var removed = menu.Add("&Delete");
         removed.Enabled = onOne;
@@ -2786,7 +2786,7 @@ public class Shell : Form
         }
 
         var one = _breakpoints.All[(nuint)row];
-        var asked = InputDialog.Ask("Breakpoint Condition",
+        var asked = InputDialog.PromptForText("Breakpoint Condition",
                                     "Stop only when this holds:", one.Condition);
         if (asked is Some given)
         {
@@ -2796,14 +2796,14 @@ public class Shell : Form
                 var parsed = ParseWatch(wanted);
                 if (parsed.Problem.ByteLength() != 0u)
                 {
-                    Application.Complain("That is not a condition: "
+                    Application.ShowError("That is not a condition: "
                                          + parsed.Problem,
                                          "Breakpoint Condition");
                     return;
                 }
                 if (!parsed.IsCondition)
                 {
-                    Application.Complain(
+                    Application.ShowError(
                         "A condition has to compare two things, as 'i == 3'"
                         + " does.", "Breakpoint Condition");
                     return;
@@ -3245,7 +3245,7 @@ public class Shell : Form
     /// empty box has already changed their mind.
     void AskForWatch(String initial)
     {
-        var asked = InputDialog.Ask("Add Watch", "Expression to watch:", initial);
+        var asked = InputDialog.PromptForText("Add Watch", "Expression to watch:", initial);
         if (asked is Some given)
         {
             if (given.Value.Trim().ByteLength() == 0u)
@@ -3253,7 +3253,7 @@ public class Shell : Form
 
             String problem = AddWatch(given.Value);
             if (problem.ByteLength() != 0u)
-                Application.Complain("That is not a watch expression: " + problem,
+                Application.ShowError("That is not a watch expression: " + problem,
                                      "Add Watch");
         }
     }
@@ -4394,9 +4394,9 @@ public class Shell : Form
 
             // A chunk that stops mid-line shows the whole lines and keeps the
             // rest. Nothing of "second ha" may reach the pane.
-            String left = ShowCompleteLines("first line" + Newline + "second ha", false);
+            String left = ShowCompleteLines("first line" + Newline() + "second ha", false);
             if (left != "second ha" || _outputList.Count != 1u
-                || _outputList.ItemAt(0u) != "first line")
+                || _outputList.GetItemAt(0u) != "first line")
             {
                 Console.WriteLine("FAIL: a split line was not held back: left='"
                                   + left + "' shown="
@@ -4405,12 +4405,12 @@ public class Shell : Form
             }
 
             // And the rest of it completes the line rather than starting one.
-            left = ShowCompleteLines(left + "lf" + Newline, false);
+            left = ShowCompleteLines(left + "lf" + Newline(), false);
             if (left != "" || _outputList.Count != 2u
-                || _outputList.ItemAt(1u) != "second half")
+                || _outputList.GetItemAt(1u) != "second half")
             {
                 Console.WriteLine("FAIL: a line split across two chunks came back as '"
-                                  + (_outputList.Count > 1u ? _outputList.ItemAt(1u) : "")
+                                  + (_outputList.Count > 1u ? _outputList.GetItemAt(1u) : "")
                                   + "' with '" + left + "' left over");
                 ok = false;
             }
@@ -4419,10 +4419,10 @@ public class Shell : Form
             // must not arrive as a stray carriage return on the end of a line.
             ClearOutput();
             ShowCompleteLines("carried\r\n", false);
-            if (_outputList.Count != 1u || _outputList.ItemAt(0u) != "carried")
+            if (_outputList.Count != 1u || _outputList.GetItemAt(0u) != "carried")
             {
                 Console.WriteLine("FAIL: a CRLF line came back as '"
-                                  + (_outputList.Count == 0u ? "" : _outputList.ItemAt(0u)) + "'");
+                                  + (_outputList.Count == 0u ? "" : _outputList.GetItemAt(0u)) + "'");
                 ok = false;
             }
 

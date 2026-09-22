@@ -695,7 +695,7 @@ public class GtkPeer : IControlPeer
         echoing = was;
     }
 
-    ~GtkPeer() { Destroy(); }
+    ~GtkPeer() { DestroyHandle(); }
 
     /// The control this peer reports to, or null once it has gone -- which a
     /// signal arriving during teardown genuinely can see, because GTK emits
@@ -1324,7 +1324,7 @@ public class GtkPeer : IControlPeer
     }
 
     /// In the same coordinates the mouse is reported in: see `Surface`.
-    public Point PointerPosition()
+    public Point GetPointerPosition()
     {
         GtkWidget* measured = Surface;
         gpointer surface = gtk_widget_get_window(measured);
@@ -1450,7 +1450,7 @@ public class GtkPeer : IControlPeer
 
     public nuint Handle => (nuint)(void*)widget;
 
-    public void Destroy()
+    public void DestroyHandle()
     {
         if (destroyed)
             return;

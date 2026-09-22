@@ -137,7 +137,7 @@ public class MainForm : Form
         data.Text = "three shapes";
         data.Html = "<i>three</i> shapes";
         data.SetData(ShapesFormat, "circle,square,star".ToBytes());
-        Clipboard.Set(data);
+        Clipboard.SetDataObject(data);
     }
 
     void OnCopyText(Control sender) => Clipboard.SetText(_editor.Text);
@@ -156,7 +156,7 @@ public class MainForm : Form
     void ShowFormats()
     {
         _formats.Clear();
-        var names = Clipboard.ListFormats();
+        var names = Clipboard.GetFormats();
         for (nuint i = 0u; i < names.Length; i++)
             _formats.Add(names[i]);
         _said.Text = Standard.Text.FromInteger((long)_changes) + " changes seen";
@@ -283,7 +283,7 @@ public class MainForm : Form
         ok = Check(ok, "and HTML", Clipboard.GetHtml() == "<i>three</i> shapes");
         ok = Check(ok, "and its own format", Clipboard.HasFormat(ShapesFormat));
         ok = Check(ok, "and not what it did not set", !Clipboard.HasImage && !Clipboard.HasFiles);
-        ok = Check(ok, "the formats are listed", Clipboard.ListFormats().Length >= 3u);
+        ok = Check(ok, "the formats are listed", Clipboard.GetFormats().Length >= 3u);
         ok = Check(ok, "the watcher heard that too", HeardChangeAfter(seen));
         ok = Check(ok, "and listed what it saw", _formats.Count >= 3u);
 
@@ -429,7 +429,7 @@ int Main(String[] arguments)
 
     if (testing)
     {
-        Application.Drain();
+        Application.RunPostedWork();
         bool ok = form.SelfTest();
         Console.WriteLine(ok ? "all checks passed" : "checks FAILED");
         return ok ? 0 : 1;

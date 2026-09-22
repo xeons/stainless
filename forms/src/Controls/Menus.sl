@@ -37,7 +37,7 @@
 //
 //     var file = new MenuItem("&File");
 //     file.Add("&Open").Click += this.OnOpen;
-//     file.Add(MenuItem.Separator());
+//     file.Add(MenuItem.CreateSeparator());
 //     file.Add("E&xit").Click += this.OnExit;
 //
 //     var bar = new MainMenu();
@@ -62,46 +62,46 @@ public closure void MenuEventHandler(MenuItem sender);
 /// and in a context menu is one object with one `Click`. Each menu built with
 /// it makes one of these, so a change to the item reaches every menu it is in
 /// and rebuilding one menu leaves the others' alone.
-class MenuItemRealisation
+class MenuItemBuild
 {
     /// The menu that built it. Weak, because that menu holds the item.
     public weak Menu? Root;
     /// Null for a separator the platform draws, which has no item to name.
     public IMenuItemPeer? Peer;
     /// The submenu under a heading, held for as long as the item is.
-    public IMenuPeer? Below;
+    public IMenuPeer? Submenu;
     public ChromeRenderer Renderer;
-    public bool OnBar;
-    public bool OwnerDrawn;
+    public bool IsOnMenuBar;
+    public bool IsOwnerDrawn;
 
-    public MenuItemRealisation(Menu root, ChromeRenderer renderer, bool onBar)
+    public MenuItemBuild(Menu root, ChromeRenderer renderer, bool onBar)
     {
         Root = root;
         Peer = null;
-        Below = null;
+        Submenu = null;
         Renderer = renderer;
-        OnBar = onBar;
-        OwnerDrawn = false;
+        IsOnMenuBar = onBar;
+        IsOwnerDrawn = false;
     }
 }
 
 /// One line in a menu: a command, a separator, or a heading with more under it.
 public class MenuItem : IMenuItemNotify
 {
-    List<MenuItemRealisation> _realised;
+    List<MenuItemBuild> _builds;
     List<MenuItem> _children;
-    String _caption;
+    String _text;
     bool _enabled;
-    bool _ticked;
-    bool _divider;
+    bool _checked;
+    bool _isSeparator;
 
     public MenuItem(String text)
     {
-        _caption = text;
+        _text = text;
         _enabled = true;
-        _ticked = false;
-        _divider = false;
-        _realised = new List<MenuItemRealisation>();
+        _checked = false;
+        _isSeparator = false;
+        _builds = new List<MenuItemBuild>();
         _children = new List<MenuItem>();
     }
 
@@ -110,25 +110,25 @@ public class MenuItem : IMenuItemNotify
     /// A `MenuItem` with a flag rather than a type of its own, because it goes
     /// in the same list as everything else and a separate type would mean the
     /// list holding a base nobody else derives from.
-    public static MenuItem Separator()
+    public static MenuItem CreateSeparator()
     {
         var made = new MenuItem("");
-        made._divider = true;
+        made._isSeparator = true;
         return made;
     }
 
-    public bool IsSeparator => _divider;
+    public bool IsSeparator => _isSeparator;
 
     /// What the item says. `&` before a letter underlines it and makes it the
     /// key that chooses the item while the menu is open, as everywhere else on
     /// Windows.
     public String Text
     {
-        get => _caption;
+        get => _text;
         set
         {
-            _caption = value;
-            foreach (var built in _realised)
+            _text = value;
+            foreach (var built in _builds)
             {
                 var peer = built.Peer;
                 if (peer != null)
@@ -143,7 +143,7 @@ public class MenuItem : IMenuItemNotify
         set
         {
             _enabled = value;
-            foreach (var built in _realised)
+            foreach (var built in _builds)
             {
                 var peer = built.Peer;
                 if (peer != null)
@@ -155,11 +155,11 @@ public class MenuItem : IMenuItemNotify
     /// Whether a tick is drawn beside it.
     public bool Checked
     {
-        get => _ticked;
+        get => _checked;
         set
         {
-            _ticked = value;
-            foreach (var built in _realised)
+            _checked = value;
+            foreach (var built in _builds)
             {
                 var peer = built.Peer;
                 if (peer != null)
@@ -217,7 +217,7 @@ public class MenuItem : IMenuItemNotify
     /// including every level of a `PopupMenu`, is not. An item in two menus
     /// answers for the one built last that still exists, as `IsOwnerDrawn`
     /// does.
-    public bool OnMenuBar { get; private set; }
+    public bool IsOnMenuBar { get; private set; }
 
     /// Whether the platform agreed to hand this item over to the renderer.
     ///
@@ -234,7 +234,7 @@ public class MenuItem : IMenuItemNotify
         var drawing = _renderer;
         if (drawing == null)
             return Size.FromDimensions(0, 0);
-        return ((ChromeRenderer)drawing).Measure(surface, this);
+        return ((ChromeRenderer)drawing).MeasureMenuItem(surface, this);
     }
 
     public void OnPlatformDrawItem(Graphics surface, Rectangle bounds,
@@ -242,7 +242,7 @@ public class MenuItem : IMenuItemNotify
     {
         var drawing = _renderer;
         if (drawing != null)
-            ((ChromeRenderer)drawing).Draw(surface, this, bounds, state);
+            ((ChromeRenderer)drawing).DrawMenuItem(surface, this, bounds, state);
     }
 
     /// What the platform calls this item in the first menu built with it that
@@ -254,7 +254,7 @@ public class MenuItem : IMenuItemNotify
     {
         get
         {
-            foreach (var built in _realised)
+            foreach (var built in _builds)
             {
                 var peer = built.Peer;
                 if (peer != null)
@@ -273,13 +273,13 @@ public class MenuItem : IMenuItemNotify
     ///
     /// `ownerDrawn` is whether to ask the platform to hand the items over. It
     /// is the renderer's wish, or false once the platform has turned it down.
-    void Realise(IMenuPeer into, Menu root, ChromeRenderer renderer, bool ownerDrawn,
+    void BuildPlatformItem(IMenuPeer into, Menu root, ChromeRenderer renderer, bool ownerDrawn,
                  bool onBar)
     {
-        var built = new MenuItemRealisation(root, renderer, onBar);
-        _realised.Add(built);
+        var built = new MenuItemBuild(root, renderer, onBar);
+        _builds.Add(built);
 
-        if (_divider)
+        if (_isSeparator)
         {
             // **A separator is owner-drawn too, or it is not drawn at all.** A
             // platform separator in a menu whose items are the program's is a
@@ -290,14 +290,14 @@ public class MenuItem : IMenuItemNotify
             if (!ownerDrawn)
             {
                 into.AddSeparator();
-                TakeStyleFrom(built);
+                ApplyStyleFrom(built);
                 return;
             }
 
             var line = into.AddItem(this, "", null);
             built.Peer = line;
-            built.OwnerDrawn = line.SetOwnerDrawn(true);
-            TakeStyleFrom(built);
+            built.IsOwnerDrawn = line.SetOwnerDrawn(true);
+            ApplyStyleFrom(built);
             return;
         }
 
@@ -306,56 +306,56 @@ public class MenuItem : IMenuItemNotify
         {
             var made = WidgetSet.Current.CreateMenu();
             foreach (var child in _children)
-                child.Realise(made, root, renderer, ownerDrawn, false);
+                child.BuildPlatformItem(made, root, renderer, ownerDrawn, false);
             submenu = made;
-            built.Below = made;
+            built.Submenu = made;
         }
 
-        var peer = into.AddItem(this, _caption, submenu);
+        var peer = into.AddItem(this, _text, submenu);
         built.Peer = peer;
 
         // The state was set while there was nothing to tell, so it is told now.
         if (!_enabled)
             peer.SetEnabled(false);
-        if (_ticked)
+        if (_checked)
             peer.SetChecked(true);
         if (ownerDrawn)
-            built.OwnerDrawn = peer.SetOwnerDrawn(true);
-        TakeStyleFrom(built);
+            built.IsOwnerDrawn = peer.SetOwnerDrawn(true);
+        ApplyStyleFrom(built);
     }
 
     /// Forgets the platform side `root` built, so that menu can be built
     /// again. The side any other menu built is kept.
-    void Forget(Menu root)
+    void ReleasePlatformItems(Menu root)
     {
-        for (nuint i = _realised.Count; i > 0u; i--)
+        for (nuint i = _builds.Count; i > 0u; i--)
         {
-            Menu? owner = _realised[i - 1u].Root;
+            Menu? owner = _builds[i - 1u].Root;
             if (owner == null || (Menu)owner == root)
-                _realised.RemoveAt(i - 1u);
+                _builds.RemoveAt(i - 1u);
         }
-        if (!_realised.IsEmpty)
-            TakeStyleFrom(_realised[_realised.Count - 1u]);
+        if (!_builds.IsEmpty)
+            ApplyStyleFrom(_builds[_builds.Count - 1u]);
         foreach (var child in _children)
-            child.Forget(root);
+            child.ReleasePlatformItems(root);
     }
 
-    void TakeStyleFrom(MenuItemRealisation built)
+    void ApplyStyleFrom(MenuItemBuild built)
     {
         _renderer = built.Renderer;
-        OnMenuBar = built.OnBar;
-        IsOwnerDrawn = built.OwnerDrawn;
+        IsOnMenuBar = built.IsOnMenuBar;
+        IsOwnerDrawn = built.IsOwnerDrawn;
     }
 
     /// Whether the platform took this item, or any under it, from the
     /// renderer.
-    bool AnyOwnerDrawn()
+    bool ContainsOwnerDrawnItem()
     {
         if (IsOwnerDrawn)
             return true;
         foreach (var child in _children)
         {
-            if (child.AnyOwnerDrawn())
+            if (child.ContainsOwnerDrawnItem())
                 return true;
         }
         return false;
@@ -372,7 +372,7 @@ public abstract class Menu
     /// `MainMenu`, and it is what tells a renderer which shape to draw.
     protected virtual bool IsBar => false;
 
-    protected IMenuPeer? peer;
+    protected IMenuPeer? _peer;
     List<MenuItem> _items;
 
     /// How this menu is drawn. The platform's own until a program says
@@ -381,7 +381,7 @@ public abstract class Menu
 
     protected Menu()
     {
-        peer = null;
+        _peer = null;
         _items = new List<MenuItem>();
         _renderer = new SystemChromeRenderer();
     }
@@ -427,40 +427,40 @@ public abstract class Menu
     /// **Built twice when the platform declines owner drawing.** Whether it
     /// will is only known by asking an item, and by then a separator meant for
     /// the renderer is already in the menu as a blank item that can be clicked.
-    protected void RealiseInto(IMenuPeer into)
+    protected void BuildPlatformMenu(IMenuPeer into)
     {
-        bool drawn = _renderer.OwnerDrawn;
-        RealiseItems(into, drawn);
-        if (drawn && !AnyOwnerDrawn())
+        bool drawn = _renderer.IsOwnerDrawn;
+        BuildPlatformItems(into, drawn);
+        if (drawn && !ContainsOwnerDrawnItem())
         {
             into.Clear();
-            RealiseItems(into, false);
+            BuildPlatformItems(into, false);
         }
-        peer = into;
+        _peer = into;
     }
 
     /// Forgets what this menu built, when its platform side has gone.
-    protected void ForgetBuilt()
+    protected void ReleasePlatformMenu()
     {
         foreach (var item in _items)
-            item.Forget(this);
-        peer = null;
+            item.ReleasePlatformItems(this);
+        _peer = null;
     }
 
-    void RealiseItems(IMenuPeer into, bool ownerDrawn)
+    void BuildPlatformItems(IMenuPeer into, bool ownerDrawn)
     {
         foreach (var item in _items)
         {
-            item.Forget(this);
-            item.Realise(into, this, _renderer, ownerDrawn, IsBar);
+            item.ReleasePlatformItems(this);
+            item.BuildPlatformItem(into, this, _renderer, ownerDrawn, IsBar);
         }
     }
 
-    bool AnyOwnerDrawn()
+    bool ContainsOwnerDrawnItem()
     {
         foreach (var item in _items)
         {
-            if (item.AnyOwnerDrawn())
+            if (item.ContainsOwnerDrawnItem())
                 return true;
         }
         return false;
@@ -473,14 +473,14 @@ public abstract class Menu
 /// var bar = new MainMenu();
 /// var file = bar.Add("&File");
 /// file.Add("&Open").Click += this.OnOpen;
-/// file.Add(MenuItem.Separator());
+/// file.Add(MenuItem.CreateSeparator());
 /// file.Add("E&xit").Click += this.OnExit;
 /// Menu = bar;
 /// ```
 public class MainMenu : Menu
 {
     /// The form this bar was last given to. Weak, because the form holds it.
-    weak Form? host;
+    weak Form? _host;
 
     public MainMenu() => base();
 
@@ -488,18 +488,18 @@ public class MainMenu : Menu
 
     /// Builds the bar for `form`. Called by `Form.Menu`, which is how a program
     /// attaches one.
-    IMenuPeer Build(Form form)
+    IMenuPeer BuildMenuBar(Form form)
     {
-        host = form;
+        _host = form;
         var bar = WidgetSet.Current.CreateMenuBar();
-        RealiseInto(bar);
+        BuildPlatformMenu(bar);
         return bar;
     }
 
     /// Gives the bar to its form again, which builds it afresh.
     protected override void OnRendererChanged()
     {
-        Form? form = host;
+        Form? form = _host;
         if (form == null)
             return;
         var shown = (Form)form;
@@ -527,8 +527,8 @@ public class PopupMenu : Menu
             return;
 
         var built = WidgetSet.Current.CreateMenu();
-        RealiseInto(built);
-        built.ShowPopup(((Form)form).WindowPeer(), ((Form)form).ToScreen(owner, at));
-        ForgetBuilt();
+        BuildPlatformMenu(built);
+        built.ShowPopup(((Form)form).WindowPeer, ((Form)form).PointToScreen(owner, at));
+        ReleasePlatformMenu();
     }
 }

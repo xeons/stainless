@@ -45,7 +45,7 @@ import Forms.Platform.Gtk;
 /// Called once, by `Application.Initialize`. A program that wants a different
 /// one -- a recording widget set under test, or a choice made at run time --
 /// assigns `WidgetSet.Current` itself and never calls `Initialize`.
-IWidgetSet MakeWidgetSet()
+IWidgetSet CreateWidgetSet()
 {
 #if WINDOWS
     return new Win32WidgetSet();

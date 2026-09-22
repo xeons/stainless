@@ -65,7 +65,7 @@ HWND OwnerWindowOf(IWindowPeer? owner)
 DialogOutcome OutcomeOf(DialogError why)
 {
     if (why == DialogError.Cancelled)
-        return DialogOutcome.Cancelled;
+        return DialogOutcome.Canceled;
     return DialogOutcome.Failed;
 }
 
@@ -130,7 +130,7 @@ public Result<Color, DialogOutcome> ColorDialogFor(IWindowPeer? owner, Color sta
     if (ChooseColorW(&choose) == 0)
     {
         return Fail(CommDlgExtendedError() == 0u
-            ? DialogOutcome.Cancelled : DialogOutcome.Failed);
+            ? DialogOutcome.Canceled : DialogOutcome.Failed);
     }
     return Ok(FromColorRef(choose.Result));
 }
@@ -182,7 +182,7 @@ public Result<Font, DialogOutcome> FontDialogFor(IWindowPeer? owner, Font start)
     if (ChooseFontW(&choose) == 0)
     {
         return Fail(CommDlgExtendedError() == 0u
-            ? DialogOutcome.Cancelled : DialogOutcome.Failed);
+            ? DialogOutcome.Canceled : DialogOutcome.Failed);
     }
 
     var style = FontStyle.Regular;

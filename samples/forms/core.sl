@@ -336,8 +336,8 @@ public class CoreForm : Form
                    _framed.Presses == 1);
         ok = Check(ok, "at its own coordinates",
                    _framed.LastPress.X == 5 && _framed.LastPress.Y == 5);
-        var groupCorner = ToScreen(_group, Drawing.Point.Empty);
-        var framedCorner = ToScreen(_framed, Drawing.Point.Empty);
+        var groupCorner = PointToScreen(_group, Drawing.Point.Empty);
+        var framedCorner = PointToScreen(_framed, Drawing.Point.Empty);
         ok = Check(ok, "and the screen agrees where it is",
                    framedCorner.X - groupCorner.X == origin.X + _framed.Left
                    && framedCorner.Y - groupCorner.Y == origin.Y + _framed.Top);
@@ -360,7 +360,7 @@ public class CoreForm : Form
         ok = WindowChecks(ok);
         ok = ModalChecks(ok);
 
-        var squeezed = Rectangle.FromBounds(0, 0, 10, 10).Deflate(6);
+        var squeezed = Rectangle.FromBounds(0, 0, 10, 10).DeflateBy(6);
         ok = Check(ok, "deflating past nothing gives an empty rectangle",
                    squeezed.Width == 0 && squeezed.Height == 0);
         return ok;
@@ -565,7 +565,7 @@ public class CoreForm : Form
     {
         var dialog = new Form(WindowBorder.Fixed);
         dialog.SetBounds(0, 0, 240, 120);
-        Application.Post(() => { Application.Quit(); });
+        Application.Post(() => { Application.Exit(); });
         dialog.ShowModal();
         ok = Check(ok, "a quit asked for inside a modal dialog ends the program",
                    !Application.DoEvents());

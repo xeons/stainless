@@ -93,7 +93,7 @@ public class Clipboard
     /// What a paste command greys itself out on. Cheaper than fetching the text
     /// on both platforms -- and on X11 much cheaper, since it does not wait for
     /// another process to hand the contents over.
-    public static bool HasText => WidgetSet.Current.ClipboardHas(ClipboardKind.Text);
+    public static bool HasText => WidgetSet.Current.ContainsClipboardKind(ClipboardKind.Text);
 
     // ------------------------------------------------------------------ HTML
 
@@ -126,7 +126,7 @@ public class Clipboard
         WidgetSet.Current.SetClipboard(content);
     }
 
-    public static bool HasHtml => WidgetSet.Current.ClipboardHas(ClipboardKind.Html);
+    public static bool HasHtml => WidgetSet.Current.ContainsClipboardKind(ClipboardKind.Html);
 
     // -------------------------------------------------------------- pictures
 
@@ -171,10 +171,10 @@ public class Clipboard
     {
         var data = new ClipboardData();
         data.Picture = picture;
-        Set(data);
+        SetDataObject(data);
     }
 
-    public static bool HasImage => WidgetSet.Current.ClipboardHas(ClipboardKind.Image);
+    public static bool HasImage => WidgetSet.Current.ContainsClipboardKind(ClipboardKind.Image);
 
     // ----------------------------------------------------------------- files
 
@@ -196,7 +196,7 @@ public class Clipboard
         WidgetSet.Current.SetClipboard(content);
     }
 
-    public static bool HasFiles => WidgetSet.Current.ClipboardHas(ClipboardKind.Files);
+    public static bool HasFiles => WidgetSet.Current.ContainsClipboardKind(ClipboardKind.Files);
 
     // ------------------------------------------------------ a program's own
 
@@ -217,7 +217,7 @@ public class Clipboard
     }
 
     /// Whether something is on offer under `format`.
-    public static bool HasFormat(String format) => WidgetSet.Current.ClipboardHasFormat(format);
+    public static bool HasFormat(String format) => WidgetSet.Current.ContainsClipboardFormat(format);
 
     // ------------------------------------------------------------ everything
 
@@ -228,9 +228,9 @@ public class Clipboard
     /// data.Text = "3 shapes";
     /// data.Html = "<b>3</b> shapes";
     /// data.SetData("application/x-shapes", Serialise(selection));
-    /// Clipboard.Set(data);
+    /// Clipboard.SetDataObject(data);
     /// ```
-    public static void Set(ClipboardData data) => WidgetSet.Current.SetClipboard(data.ToContent());
+    public static void SetDataObject(ClipboardData data) => WidgetSet.Current.SetClipboard(data.ToContent());
 
     /// Empties the clipboard, whichever program filled it.
     public static void Clear() => WidgetSet.Current.SetClipboard(new ClipboardContent());
@@ -242,12 +242,12 @@ public class Clipboard
     /// For a program that wants to show what it could paste, and for finding
     /// out what name another program's format goes by. A method rather than a
     /// property because it is a question for another process.
-    public static String[] ListFormats() => WidgetSet.Current.ClipboardFormatNames();
+    public static String[] GetFormats() => WidgetSet.Current.GetClipboardFormatNames();
 }
 
 /// Several formats for one copy.
 ///
-/// Each is absent until set, and `Clipboard.Set` puts on every one that is
+/// Each is absent until set, and `Clipboard.SetDataObject` puts on every one that is
 /// present. The data is copied out when it is set on the clipboard, so a
 /// `ClipboardData` may be reused or changed afterwards.
 public sealed class ClipboardData
@@ -332,20 +332,20 @@ public sealed class ClipboardData
 /// now is `Clipboard`'s to answer.
 public class ClipboardWatcher : IClipboardNotify
 {
-    IClipboardWatchPeer _native;
-    bool _running;
+    IClipboardWatchPeer _peer;
+    bool _enabled;
 
     /// A watcher that is already watching.
     public ClipboardWatcher()
     {
-        _running = false;
-        _native = WidgetSet.Current.CreateClipboardWatch(this);
+        _enabled = false;
+        _peer = WidgetSet.Current.CreateClipboardWatch(this);
         Start();
     }
 
     public bool Enabled
     {
-        get => _running;
+        get => _enabled;
         set
         {
             if (value)
@@ -361,18 +361,18 @@ public class ClipboardWatcher : IClipboardNotify
 
     public void Start()
     {
-        if (_running)
+        if (_enabled)
             return;
-        _running = true;
-        _native.Start();
+        _enabled = true;
+        _peer.Start();
     }
 
     public void Stop()
     {
-        if (!_running)
+        if (!_enabled)
             return;
-        _running = false;
-        _native.Stop();
+        _enabled = false;
+        _peer.Stop();
     }
 
     /// The clipboard's contents changed.

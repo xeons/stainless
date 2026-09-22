@@ -637,7 +637,7 @@ public class GtkTreePeer : GtkModelPeer, ITreeViewPeer
         return TakeText(model, &row, 1);
     }
 
-    public void Expand(ITreeNodeHandle node, bool expanded)
+    public void SetNodeExpanded(ITreeNodeHandle node, bool expanded)
     {
         GtkTreeIter row;
         if (!IterFor(node, &row))
@@ -729,7 +729,7 @@ public class GtkTreePeer : GtkModelPeer, ITreeViewPeer
     /// A miss answers false *and* leaves the path null, so both are checked:
     /// the documented contract is the flag, and the null is what the rest of
     /// this method would otherwise dereference.
-    public ITreeNodeHandle? NodeAt(Forms.Drawing.Point at)
+    public ITreeNodeHandle? GetNodeAt(Forms.Drawing.Point at)
     {
         gint x = 0;
         gint y = 0;

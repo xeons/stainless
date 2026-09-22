@@ -44,12 +44,12 @@ import Forms.Platform;
 /// chosen.
 public abstract class ListControl : WindowedControl
 {
-    List<String> _entries;
+    List<String> _items;
 
     protected ListControl(WindowedControl parent)
     {
         base(parent);
-        _entries = new List<String>();
+        _items = new List<String>();
     }
 
     /// The platform's side of the list, which the derived class made.
@@ -61,19 +61,19 @@ public abstract class ListControl : WindowedControl
     protected override Color DefaultForeColor => SystemColors.WindowText;
 
     /// How many items there are.
-    public nuint Count => _entries.Count;
+    public nuint Count => _items.Count;
 
     /// One item, by position.
-    public String ItemAt(nuint index) => _entries[index];
+    public String GetItemAt(nuint index) => _items[index];
 
     /// Every item, as an array. A copy, so a caller may keep it.
     public String[] Items
     {
         get
         {
-            var all = new String[_entries.Count];
-            for (nuint i = 0u; i < _entries.Count; i++)
-                all[i] = _entries[i];
+            var all = new String[_items.Count];
+            for (nuint i = 0u; i < _items.Count; i++)
+                all[i] = _items[i];
             return all;
         }
         set
@@ -87,8 +87,8 @@ public abstract class ListControl : WindowedControl
     /// Adds an item to the end.
     public void Add(String text)
     {
-        List.InsertItem((int)_entries.Count, text);
-        _entries.Add(text);
+        List.InsertItem((int)_items.Count, text);
+        _items.Add(text);
     }
 
     /// Puts one in at a position, moving the rest along.
@@ -96,14 +96,14 @@ public abstract class ListControl : WindowedControl
     /// The list here goes first: it is the one that checks the index.
     public void Insert(nuint index, String text)
     {
-        _entries.Insert(index, text);
+        _items.Insert(index, text);
         List.InsertItem((int)index, text);
     }
 
     /// Removes one.
     public void RemoveAt(nuint index)
     {
-        _entries.RemoveAt(index);
+        _items.RemoveAt(index);
         List.RemoveItem((int)index);
     }
 
@@ -111,7 +111,7 @@ public abstract class ListControl : WindowedControl
     public void Clear()
     {
         List.ClearItems();
-        _entries.Clear();
+        _items.Clear();
     }
 
     /// Which item is chosen, or -1 for none.
@@ -131,9 +131,9 @@ public abstract class ListControl : WindowedControl
         get
         {
             int at = SelectedIndex;
-            if (at < 0 || (nuint)at >= _entries.Count)
+            if (at < 0 || (nuint)at >= _items.Count)
                 return null;
-            return _entries[(nuint)at];
+            return _items[(nuint)at];
         }
     }
 
@@ -158,7 +158,7 @@ public class ListBox : ListControl
     public ListBox(WindowedControl parent)
     {
         base(parent);
-        _native = WidgetSet.Current.CreateList(this, ParentPeer());
+        _native = WidgetSet.Current.CreateList(this, ParentPeer);
         AttachPeer(_native);
     }
 
@@ -175,7 +175,7 @@ public class ComboBox : ListControl
     public ComboBox(WindowedControl parent)
     {
         base(parent);
-        _native = WidgetSet.Current.CreateCombo(this, ParentPeer());
+        _native = WidgetSet.Current.CreateCombo(this, ParentPeer);
         AttachPeer(_native);
     }
 

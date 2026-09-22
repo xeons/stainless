@@ -120,7 +120,7 @@ public class BackgroundForm : Form
                 // so without it these two record nothing and the check below
                 // fails for a reason that has nothing to do with threads.
                 this.Delivered = weather;
-                this.DeliveredOnUiThread = Application.OnUiThread;
+                this.DeliveredOnUiThread = Application.IsOnUiThread;
             });
     }
 

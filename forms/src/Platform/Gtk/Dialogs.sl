@@ -98,13 +98,13 @@ Result<String, DialogOutcome> Chosen(GtkWidget* chooser, gint answer)
     if (answer != GTK_RESPONSE_ACCEPT)
     {
         gtk_widget_destroy(chooser);
-        return Fail(DialogOutcome.Cancelled);
+        return Fail(DialogOutcome.Canceled);
     }
 
     gchar* raw = gtk_file_chooser_get_filename(chooser);
     gtk_widget_destroy(chooser);
     if (raw == null)
-        return Fail(DialogOutcome.Cancelled);
+        return Fail(DialogOutcome.Canceled);
 
     var path = Text.FromNullTerminated(raw);
     g_free((gpointer)raw);
@@ -172,7 +172,7 @@ public Result<Color, DialogOutcome> PickColor(IWindowPeer? owner, Color start)
     if (answer != GTK_RESPONSE_OK)
     {
         gtk_widget_destroy(chooser);
-        return Fail(DialogOutcome.Cancelled);
+        return Fail(DialogOutcome.Canceled);
     }
 
     GdkRGBA picked;
@@ -346,13 +346,13 @@ public Result<Font, DialogOutcome> PickFont(IWindowPeer? owner, Font start)
     if (answer != GTK_RESPONSE_OK)
     {
         gtk_widget_destroy(chooser);
-        return Fail(DialogOutcome.Cancelled);
+        return Fail(DialogOutcome.Canceled);
     }
 
     gchar* raw = gtk_font_chooser_get_font(chooser);
     gtk_widget_destroy(chooser);
     if (raw == null)
-        return Fail(DialogOutcome.Cancelled);
+        return Fail(DialogOutcome.Canceled);
 
     var described = Text.FromNullTerminated(raw);
     g_free((gpointer)raw);

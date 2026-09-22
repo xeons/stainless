@@ -212,7 +212,7 @@ public struct Rectangle
 
     /// The rectangle shrunk by `amount` on every side, or empty if there is
     /// less than that to shrink.
-    public Rectangle Deflate(int amount)
+    public Rectangle DeflateBy(int amount)
     {
         int width = Width - amount * 2;
         int height = Height - amount * 2;
@@ -298,22 +298,21 @@ public sealed class Font
 
     /// The platform's font, made on first use.
     ///
-    /// Not public: a control hands a `Font` to `Graphics` and the backend asks
-    /// for this. A program that has reached for it wanted `Graphics` instead.
-    IFontBackend Backend()
+    /// For the backend: a control hands a `Font` to `Graphics` and the backend
+    /// asks for this. A program that has reached for it wanted `Graphics`.
+    public IFontBackend Resource
     {
-        var made = _backend;
-        if (made == null)
+        get
         {
-            made = WidgetSet.Current.CreateFont(this);
-            _backend = made;
+            var made = _backend;
+            if (made == null)
+            {
+                made = WidgetSet.Current.CreateFont(this);
+                _backend = made;
+            }
+            return (IFontBackend)made;
         }
-        return (IFontBackend)made;
     }
-
-    /// For the backend, which needs the handle it made and cannot see a
-    /// module-private method from where it lives.
-    public IFontBackend Resource => Backend();
 }
 
 // ============================================================== pen and brush
@@ -535,7 +534,7 @@ public sealed class Graphics
     /// Draws a picture with its top-left corner at a point.
     public void DrawBitmap(Bitmap picture, Point at)
     {
-        _backend.DrawBitmap(picture.Backend(), at);
+        _backend.DrawBitmap(picture.Backend, at);
     }
 
     /// Draws a picture faded into its background: `opacity` percent of it,
@@ -548,12 +547,12 @@ public sealed class Graphics
     {
         if (opacity >= 100)
         {
-            _backend.DrawBitmap(picture.Backend(), at);
+            _backend.DrawBitmap(picture.Backend, at);
             return;
         }
         if (opacity <= 0)
             return;
-        _backend.DrawBitmapFaded(picture.Backend(), at, opacity);
+        _backend.DrawBitmapFaded(picture.Backend, at, opacity);
     }
 
     /// Draws it scaled to fill a rectangle.
@@ -561,7 +560,7 @@ public sealed class Graphics
     {
         if (into.IsEmpty)
             return;
-        _backend.DrawBitmapIn(picture.Backend(), into);
+        _backend.DrawBitmapIn(picture.Backend, into);
     }
 
     /// How large that text would be. What a control's `PreferredSize` is built
@@ -689,7 +688,7 @@ public sealed class Bitmap
     public Size Extent => Size.FromDimensions(_backend.Width, _backend.Height);
 
     /// The platform's picture, for the things that take one.
-    public IBitmapBackend Backend() => _backend;
+    public IBitmapBackend Backend => _backend;
 }
 
 // =========================================================== system colours
@@ -703,13 +702,13 @@ public sealed class Bitmap
 /// exactly that reason: a field is read once, before `Main`, and then wrong.
 public static class SystemColors
 {
-    public static Color Control          => WidgetSet.Current.SystemColor(SystemColorId.Control);
-    public static Color ControlText      => WidgetSet.Current.SystemColor(SystemColorId.ControlText);
-    public static Color Window           => WidgetSet.Current.SystemColor(SystemColorId.Window);
-    public static Color WindowText       => WidgetSet.Current.SystemColor(SystemColorId.WindowText);
-    public static Color Highlight        => WidgetSet.Current.SystemColor(SystemColorId.Highlight);
-    public static Color HighlightText    => WidgetSet.Current.SystemColor(SystemColorId.HighlightText);
-    public static Color GrayText         => WidgetSet.Current.SystemColor(SystemColorId.GrayText);
-    public static Color ControlDark      => WidgetSet.Current.SystemColor(SystemColorId.ControlDark);
-    public static Color ControlLight     => WidgetSet.Current.SystemColor(SystemColorId.ControlLight);
+    public static Color Control          => WidgetSet.Current.GetSystemColor(SystemColorId.Control);
+    public static Color ControlText      => WidgetSet.Current.GetSystemColor(SystemColorId.ControlText);
+    public static Color Window           => WidgetSet.Current.GetSystemColor(SystemColorId.Window);
+    public static Color WindowText       => WidgetSet.Current.GetSystemColor(SystemColorId.WindowText);
+    public static Color Highlight        => WidgetSet.Current.GetSystemColor(SystemColorId.Highlight);
+    public static Color HighlightText    => WidgetSet.Current.GetSystemColor(SystemColorId.HighlightText);
+    public static Color GrayText         => WidgetSet.Current.GetSystemColor(SystemColorId.GrayText);
+    public static Color ControlDark      => WidgetSet.Current.GetSystemColor(SystemColorId.ControlDark);
+    public static Color ControlLight     => WidgetSet.Current.GetSystemColor(SystemColorId.ControlLight);
 }

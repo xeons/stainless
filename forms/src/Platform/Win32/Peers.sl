@@ -365,7 +365,7 @@ public class ControlPeer : IControlPeer
         }
     }
 
-    ~ControlPeer() { Destroy(); }
+    ~ControlPeer() { DestroyHandle(); }
 
     /// Hands a message to the procedure this peer displaced: the system
     /// control's own for a subclassed widget, `DefWindowProcW` for a class of
@@ -1093,7 +1093,7 @@ public class ControlPeer : IControlPeer
         }
     }
 
-    public FPoint PointerPosition()
+    public FPoint GetPointerPosition()
     {
         // Two types called `Point` are in scope here -- the library's and the
         // one `GetCursorPos` fills -- so both are named in full. `FPoint` is
@@ -1169,7 +1169,7 @@ public class ControlPeer : IControlPeer
 
     /// Releases the window and what this peer made for it. The brush goes
     /// even when the window has already gone with its parent.
-    public void Destroy()
+    public void DestroyHandle()
     {
         if (backBrush != null)
         {

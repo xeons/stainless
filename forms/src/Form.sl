@@ -78,16 +78,16 @@ public enum CloseReason { User, Program, ApplicationExit }
 /// is a mistake that stops the program; make a new one instead.
 public class Form : WindowedControl, IWindowNotify
 {
-    IWindowPeer _window;
-    MainMenu? _bar;
-    WindowBorder _framing;
+    IWindowPeer _windowPeer;
+    MainMenu? _menu;
+    WindowBorder _border;
     /// Set while `Closing` is being raised, so a handler calling `Close` does
     /// not ask the question a second time inside the first.
-    bool _asking;
-    bool _closed;
-    bool _registered;
-    bool _modal;
-    bool _everShown;
+    bool _isAskingToClose;
+    bool _isClosed;
+    bool _isRegistered;
+    bool _isModal;
+    bool _wasShown;
     /// When this form last became active, in `Application`'s count; zero for
     /// never.
     int _activation;
@@ -101,17 +101,17 @@ public class Form : WindowedControl, IWindowNotify
     public Form(WindowBorder border)
     {
         base(null);
-        _framing = border;
-        _bar = null;
-        _asking = false;
-        _closed = false;
-        _registered = false;
-        _modal = false;
-        _everShown = false;
+        _border = border;
+        _menu = null;
+        _isAskingToClose = false;
+        _isClosed = false;
+        _isRegistered = false;
+        _isModal = false;
+        _wasShown = false;
         _activation = 0;
         Visible = false;
-        _window = WidgetSet.Current.CreateWindow(this, border);
-        AttachContainerPeer(_window);
+        _windowPeer = WidgetSet.Current.CreateWindow(this, border);
+        AttachContainerPeer(_windowPeer);
         SetBounds(0, 0, 640, 480);
     }
 
@@ -139,35 +139,35 @@ public class Form : WindowedControl, IWindowNotify
     /// **Windows only**, and false everywhere else. An icon in the binary is a
     /// resource, and only a PE has those; a GTK program takes its icon from the
     /// desktop's icon theme, keyed by the name in its `.desktop` file.
-    public bool UseIconResource(int id) => _window.SetIconResource(id);
+    public bool SetIconResource(int id) => _windowPeer.SetIconResource(id);
 
     /// How the window is framed. Read-only after construction; see the note on
     /// the constructor.
-    public WindowBorder Border => _framing;
+    public WindowBorder Border => _border;
 
     /// Normal, minimised or maximised. Read from the platform, because the user
     /// changes it without asking.
     public WindowState State
     {
-        get => _window.GetState();
-        set => _window.SetState(value);
+        get => _windowPeer.GetState();
+        set => _windowPeer.SetState(value);
     }
 
     /// A minimised window's size and position are its icon's, and a form that
     /// took them would lay itself out for nothing and forget where it was.
-    protected override bool IsMinimizedWindow => !_closed && State == WindowState.Minimized;
+    protected override bool IsMinimizedWindow => !_isClosed && State == WindowState.Minimized;
 
     /// Whether `ShowModal` is showing this form and has not yet returned.
-    public bool IsModal => _modal;
+    public bool IsModal => _isModal;
 
     /// Whether the window has closed. A closed form cannot be shown again.
-    public bool IsClosed => _closed;
+    public bool IsClosed => _isClosed;
 
     int Activation => _activation;
     void MarkActivated(int count) => _activation = count;
 
     /// Centres the window on the work area of the screen it is on.
-    public void CenterOnScreen() => _window.CenterOnScreen();
+    public void CenterOnScreen() => _windowPeer.CenterOnScreen();
 
     /// The bar across the top of the window, or null for none.
     ///
@@ -176,17 +176,17 @@ public class Form : WindowedControl, IWindowNotify
     /// assembled in any order. Assigning a second one replaces the first.
     public MainMenu? Menu
     {
-        get => _bar;
+        get => _menu;
         set
         {
-            _bar = value;
+            _menu = value;
             if (value == null)
             {
-                _window.SetMenu(null);
+                _windowPeer.SetMenu(null);
             }
             else
             {
-                _window.SetMenu(((MainMenu)value).Build(this));
+                _windowPeer.SetMenu(((MainMenu)value).BuildMenuBar(this));
             }
             PerformLayout();
         }
@@ -194,13 +194,13 @@ public class Form : WindowedControl, IWindowNotify
 
     /// This form's window, for the things that need one -- a popup menu, and a
     /// modal dialog's owner.
-    public IWindowPeer WindowPeer() => _window;
+    public IWindowPeer WindowPeer => _windowPeer;
 
     /// A point in a control's own coordinates, in the screen's.
     ///
     /// What a popup menu needs, since every platform places one in screen
     /// coordinates and every handler has the point in the control's.
-    public Point ToScreen(Control from, Point at)
+    public Point PointToScreen(Control from, Point at)
     {
         int x = at.X;
         int y = at.Y;
@@ -234,14 +234,14 @@ public class Form : WindowedControl, IWindowNotify
     /// Shows the window and registers it with the `Application`.
     public override void Show()
     {
-        RequireOpen();
-        if (!_registered)
+        EnsureNotClosed();
+        if (!_isRegistered)
         {
-            Application.Register(this);
-            _registered = true;
+            Application.RegisterForm(this);
+            _isRegistered = true;
         }
         Visible = true;
-        _window.Activate();
+        _windowPeer.Activate();
         RaiseShownOnce();
     }
 
@@ -262,40 +262,40 @@ public class Form : WindowedControl, IWindowNotify
     /// `DialogResult` property and loses nothing.
     public void ShowModal()
     {
-        RequireOpen();
-        var owner = Application.OwnerFor(this);
-        _modal = true;
-        if (!_registered)
+        EnsureNotClosed();
+        var owner = Application.FindOwnerFor(this);
+        _isModal = true;
+        if (!_isRegistered)
         {
-            Application.Register(this);
-            _registered = true;
+            Application.RegisterForm(this);
+            _isRegistered = true;
         }
         Visible = true;
         RaiseShownOnce();
 
         if (owner == null)
         {
-            _window.ShowModal(null);
+            _windowPeer.ShowModal(null);
         }
         else
         {
-            _window.ShowModal(((Form)owner).WindowPeer());
+            _windowPeer.ShowModal(((Form)owner).WindowPeer);
         }
-        _modal = false;
+        _isModal = false;
     }
 
     /// Asks the window to close, exactly as though the user had clicked the
     /// close box: `Closing` is raised once, and a handler may refuse.
     public void Close()
     {
-        if (_closed || _asking)
+        if (_isClosed || _isAskingToClose)
             return;
-        _window.Close();
+        _windowPeer.Close();
     }
 
-    void RequireOpen()
+    void EnsureNotClosed()
     {
-        if (_closed)
+        if (_isClosed)
         {
             sl_fail("this form has closed and cannot be shown again; make a new one".ToPointer());
         }
@@ -303,9 +303,9 @@ public class Form : WindowedControl, IWindowNotify
 
     void RaiseShownOnce()
     {
-        if (_everShown)
+        if (_wasShown)
             return;
-        _everShown = true;
+        _wasShown = true;
         OnShown();
     }
 
@@ -338,32 +338,32 @@ public class Form : WindowedControl, IWindowNotify
     /// that returns anything.
     public bool OnPlatformClosing()
     {
-        if (_closed)
+        if (_isClosed)
             return true;
         var asked = new CancelEventArgs();
-        _asking = true;
+        _isAskingToClose = true;
         OnClosing(asked);
-        _asking = false;
+        _isAskingToClose = false;
         return !asked.Cancel;
     }
 
     public void OnPlatformClosed()
     {
-        if (_closed)
+        if (_isClosed)
             return;
-        _closed = true;
-        ForgetShown();
+        _isClosed = true;
+        MarkHidden();
         OnClosed();
-        if (_registered)
+        if (_isRegistered)
         {
-            _registered = false;
-            Application.Unregister(this, _modal);
+            _isRegistered = false;
+            Application.UnregisterForm(this, _isModal);
         }
     }
 
     public void OnPlatformActivatedWindow()
     {
-        Application.NoteActivated(this);
+        Application.RecordActivation(this);
         OnActivated();
     }
     public void OnPlatformDeactivated() => OnDeactivated();

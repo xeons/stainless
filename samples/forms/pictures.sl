@@ -176,7 +176,7 @@ public class MainForm : Form
             var picture = (Bitmap)shown;
             ok = Check(ok, "at the size it was drawn",
                        picture.Width == 160 && picture.Height == 120);
-            ok = Check(ok, "and the platform took it", picture.Backend().Handle != 0u);
+            ok = Check(ok, "and the platform took it", picture.Backend.Handle != 0u);
         }
 
         ok = Check(ok, "both controls show it",
@@ -212,7 +212,7 @@ int Main(String[] arguments)
 
     if (testing)
     {
-        Application.Drain();
+        Application.RunPostedWork();
         bool ok = form.SelfTest();
         Console.WriteLine(ok ? "all checks passed" : "checks FAILED");
         return ok ? 0 : 1;

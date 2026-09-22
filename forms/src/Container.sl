@@ -61,7 +61,7 @@ public abstract class GraphicControl : Control
     protected GraphicControl(WindowedControl parent)
     {
         base();
-        parent.Add(this);
+        parent.AddControl(this);
     }
 
     /// A graphic control has no window to capture with, so it asks its parent
@@ -71,7 +71,7 @@ public abstract class GraphicControl : Control
         var parent = Parent;
         if (parent == null)
             return;
-        ((WindowedControl)parent).CaptureFor(captured ? this : null);
+        ((WindowedControl)parent).CaptureMouseFor(captured ? this : null);
     }
 
     /// The cursor is the parent's to set, for the same reason: there is no
@@ -121,7 +121,7 @@ public abstract class GraphicControl : Control
     ///
     /// The surface is the parent widget's, which starts at the widget's corner
     /// rather than at its client area; under a group box the two differ.
-    void PaintOn(Graphics surface, Point origin)
+    void PaintOnSurface(Graphics surface, Point origin)
     {
         var at = Bounds;
         int layer = surface.PushLayer(Rectangle.FromBounds(at.X + origin.X, at.Y + origin.Y,
@@ -145,7 +145,7 @@ public abstract class GraphicControl : Control
 /// the `csCreating` flag that guards it.
 public abstract class WindowedControl : Control
 {
-    IControlPeer? _platform;
+    IControlPeer? _peer;
     /// The same peer again, when it is one children can go inside.
     ///
     /// Held separately rather than tested for, because `is` does not ask
@@ -153,54 +153,60 @@ public abstract class WindowedControl : Control
     /// interface reference down to a class, which is the other direction. So
     /// the control that knows its peer is a container is the one that says so,
     /// by calling `AttachContainerPeer` instead of `AttachPeer`.
-    IContainerPeer? _asContainer;
-    List<Control> _inside;
-    ControlList _view;
-    bool _laying;
+    IContainerPeer? _containerPeer;
+    List<Control> _children;
+    ControlList _controls;
+    bool _isLayingOut;
 
     protected WindowedControl(WindowedControl? parent)
     {
         base();
-        _platform = null;
-        _asContainer = null;
-        _inside = new List<Control>();
-        _view = new ControlList(_inside);
-        _laying = false;
+        _peer = null;
+        _containerPeer = null;
+        _children = new List<Control>();
+        _controls = new ControlList(_children);
+        _isLayingOut = false;
         _grabbed = null;
         _hovered = null;
         _pressed = null;
         if (parent != null)
-            ((WindowedControl)parent).Add(this);
+            ((WindowedControl)parent).AddControl(this);
     }
 
     // ---------------------------------------------------------------- peer
 
     /// The platform's side of this control, once it has one.
-    protected IControlPeer? Peer => _platform;
+    protected IControlPeer? Peer => _peer;
 
     /// This control as something children can be put inside. Fails if the peer
     /// is not a container, which is a mistake in the control that attached it
     /// rather than anything a program did.
-    protected IContainerPeer ContainerPeer()
+    protected IContainerPeer ContainerPeer
     {
-        var mine = _asContainer;
-        if (mine == null)
+        get
         {
-            sl_fail("this control cannot contain others".ToPointer());
+            var mine = _containerPeer;
+            if (mine == null)
+            {
+                sl_fail("this control cannot contain others".ToPointer());
+            }
+            return (IContainerPeer)mine;
         }
-        return (IContainerPeer)mine;
     }
 
     /// The peer of whatever contains this control, which is what a widget set
     /// needs to make a child widget.
-    protected IContainerPeer ParentPeer()
+    protected IContainerPeer ParentPeer
     {
-        var parent = Parent;
-        if (parent == null)
+        get
         {
-            sl_fail("this control has no parent to be created inside".ToPointer());
+            var parent = Parent;
+            if (parent == null)
+            {
+                sl_fail("this control has no parent to be created inside".ToPointer());
+            }
+            return ((WindowedControl)parent).ContainerPeer;
         }
-        return ((WindowedControl)parent).ContainerPeer();
     }
 
     /// Takes ownership of the platform widget and pushes down everything that
@@ -211,20 +217,20 @@ public abstract class WindowedControl : Control
     /// wrong size for one frame.
     protected void AttachPeer(IControlPeer made)
     {
-        _platform = made;
-        PushDown(made);
+        _peer = made;
+        PushStateToPeer(made);
     }
 
     /// The same, for a peer that other controls may be put inside.
     protected void AttachContainerPeer(IContainerPeer made)
     {
         IControlPeer asControl = made;
-        _platform = asControl;
-        _asContainer = made;
-        PushDown(made);
+        _peer = asControl;
+        _containerPeer = made;
+        PushStateToPeer(made);
     }
 
-    void PushDown(IControlPeer made)
+    void PushStateToPeer(IControlPeer made)
     {
         made.SetBounds(Bounds);
         made.SetFont(Font);
@@ -240,16 +246,16 @@ public abstract class WindowedControl : Control
     /// control stays an object, with nothing on screen behind it.
     void ReleasePeer()
     {
-        foreach (var child in _inside)
+        foreach (var child in _children)
         {
             if (child is WindowedControl windowed)
                 windowed.ReleasePeer();
         }
-        var mine = _platform;
+        var mine = _peer;
         if (mine != null)
-            ((IControlPeer)mine).Destroy();
-        _platform = null;
-        _asContainer = null;
+            ((IControlPeer)mine).DestroyHandle();
+        _peer = null;
+        _containerPeer = null;
     }
 
     /// The platform handle, for reaching an API this layer does not wrap: an
@@ -258,7 +264,7 @@ public abstract class WindowedControl : Control
     {
         get
         {
-            var mine = _platform;
+            var mine = _peer;
             if (mine == null)
                 return 0u;
             return ((IControlPeer)mine).Handle;
@@ -272,14 +278,14 @@ public abstract class WindowedControl : Control
     ///
     /// A view, not a copy, and not a list to change: a control joins by being
     /// made with this as its parent and leaves by `RemoveControl`.
-    public ControlList Controls => _view;
+    public ControlList Controls => _controls;
 
     /// Takes a control in. Called by the child's own constructor, which is why
     /// it is not public: a control chooses its parent once, at birth.
-    void Add(Control child)
+    void AddControl(Control child)
     {
-        _inside.Add(child);
-        child.Adopt(this);
+        _children.Add(child);
+        child.AttachToParent(this);
         PerformLayout();
     }
 
@@ -291,15 +297,15 @@ public abstract class WindowedControl : Control
     /// null and nothing on screen; dropping the last reference frees it.
     public bool RemoveControl(Control child)
     {
-        nuint count = _inside.Count;
+        nuint count = _children.Count;
         for (nuint i = 0u; i < count; i++)
         {
-            if (_inside[i] != child)
+            if (_children[i] != child)
                 continue;
 
-            _inside.RemoveAt(i);
-            ForgetGraphic(child);
-            child.Orphan();
+            _children.RemoveAt(i);
+            ClearMouseStateFor(child);
+            child.DetachFromParent();
             if (child is WindowedControl windowed)
                 windowed.ReleasePeer();
             Invalidate();
@@ -310,12 +316,12 @@ public abstract class WindowedControl : Control
     }
 
     /// Drops every reference the mouse routing holds to a child that is going.
-    void ForgetGraphic(Control child)
+    void ClearMouseStateFor(Control child)
     {
         if (_grabbed == child)
         {
             _grabbed = null;
-            var mine = _platform;
+            var mine = _peer;
             if (mine != null)
                 ((IControlPeer)mine).SetCapture(false);
         }
@@ -326,20 +332,20 @@ public abstract class WindowedControl : Control
     }
 
     /// Every control inside this one, and inside those, and so on.
-    public List<Control> Descendants()
+    public List<Control> GetDescendants()
     {
         var found = new List<Control>();
-        Gather(found);
+        CollectDescendants(found);
         return found;
     }
 
-    void Gather(List<Control> into)
+    void CollectDescendants(List<Control> into)
     {
-        foreach (var child in _inside)
+        foreach (var child in _children)
         {
             into.Add(child);
             if (child is WindowedControl container)
-                container.Gather(into);
+                container.CollectDescendants(into);
         }
     }
 
@@ -352,7 +358,7 @@ public abstract class WindowedControl : Control
     {
         get
         {
-            var mine = _platform;
+            var mine = _peer;
             if (mine == null)
                 return base.ClientBounds;
             return ((IControlPeer)mine).ClientBounds;
@@ -363,7 +369,7 @@ public abstract class WindowedControl : Control
     {
         get
         {
-            var mine = _platform;
+            var mine = _peer;
             if (mine == null)
                 return Size.Empty;
             return ((IControlPeer)mine).PreferredSize;
@@ -376,7 +382,7 @@ public abstract class WindowedControl : Control
     {
         get
         {
-            var mine = _platform;
+            var mine = _peer;
             if (mine == null)
                 return Point.Empty;
             return ((IControlPeer)mine).ClientOrigin;
@@ -385,16 +391,16 @@ public abstract class WindowedControl : Control
 
     protected override void ApplyBounds()
     {
-        var mine = _platform;
+        var mine = _peer;
         if (mine == null || IsEchoing)
             return;
-        ((IControlPeer)mine).SetBounds(InParentSpace(Bounds));
+        ((IControlPeer)mine).SetBounds(ToParentSpace(Bounds));
     }
 
     /// This control's bounds as the platform wants them: measured from the
     /// parent widget's own corner rather than from the corner of the area it
     /// gives its children. The two differ only under a group box.
-    Rectangle InParentSpace(Rectangle bounds)
+    Rectangle ToParentSpace(Rectangle bounds)
     {
         var parent = Parent;
         if (parent == null)
@@ -408,7 +414,7 @@ public abstract class WindowedControl : Control
 
     protected override void ApplyVisible()
     {
-        var mine = _platform;
+        var mine = _peer;
         if (mine != null)
             ((IControlPeer)mine).SetVisible(Visible);
     }
@@ -418,10 +424,10 @@ public abstract class WindowedControl : Control
     /// because its answer has just changed too.
     protected override void ApplyEnabled()
     {
-        var mine = _platform;
+        var mine = _peer;
         if (mine != null)
             ((IControlPeer)mine).SetEnabled(IsEnabled);
-        foreach (var child in _inside)
+        foreach (var child in _children)
         {
             if (child is WindowedControl windowed)
             {
@@ -436,19 +442,19 @@ public abstract class WindowedControl : Control
 
     protected override void ApplyText()
     {
-        var mine = _platform;
+        var mine = _peer;
         if (mine != null && !IsEchoing)
             ((IControlPeer)mine).SetText(StoredText);
     }
 
     protected override void ApplyFont()
     {
-        var mine = _platform;
+        var mine = _peer;
         if (mine != null)
             ((IControlPeer)mine).SetFont(Font);
         // A child that inherits its font has just had it changed too, and only
         // this control knows that happened.
-        foreach (var child in _inside)
+        foreach (var child in _children)
         {
             if (child is WindowedControl windowed)
                 windowed.ApplyFont();
@@ -459,10 +465,10 @@ public abstract class WindowedControl : Control
     /// changed too -- and only this control knows that happened.
     protected override void ApplyForeColor()
     {
-        var mine = _platform;
+        var mine = _peer;
         if (mine != null)
             ((IControlPeer)mine).SetForeColor(ForeColor);
-        foreach (var child in _inside)
+        foreach (var child in _children)
         {
             if (!child.HasOwnForeColor)
                 child.ApplyForeColor();
@@ -471,10 +477,10 @@ public abstract class WindowedControl : Control
 
     protected override void ApplyBackColor()
     {
-        var mine = _platform;
+        var mine = _peer;
         if (mine != null)
             ((IControlPeer)mine).SetBackColor(BackColor);
-        foreach (var child in _inside)
+        foreach (var child in _children)
         {
             if (!child.HasOwnBackColor)
                 child.ApplyBackColor();
@@ -483,38 +489,38 @@ public abstract class WindowedControl : Control
 
     protected override void ApplyCursor()
     {
-        var mine = _platform;
+        var mine = _peer;
         if (mine != null)
             ((IControlPeer)mine).SetCursor(Cursor);
     }
 
     protected override void ApplyToolTip()
     {
-        var mine = _platform;
+        var mine = _peer;
         if (mine != null)
             ((IControlPeer)mine).SetToolTip(ToolTip);
     }
 
     public override void CaptureMouse(bool captured)
     {
-        var mine = _platform;
+        var mine = _peer;
         if (mine != null)
             ((IControlPeer)mine).SetCapture(captured);
     }
 
     public override void BringToFront()
     {
-        var mine = _platform;
+        var mine = _peer;
         if (mine != null)
             ((IControlPeer)mine).BringToFront();
     }
 
-    public override Point PointerPosition()
+    public override Point GetPointerPosition()
     {
-        var mine = _platform;
+        var mine = _peer;
         if (mine == null)
             return Point.Empty;
-        return ((IControlPeer)mine).PointerPosition();
+        return ((IControlPeer)mine).GetPointerPosition();
     }
 
     // ------------------------------------------- the mouse, for the windowless
@@ -537,14 +543,14 @@ public abstract class WindowedControl : Control
     ///
     /// Backwards, because a later child is drawn on top of an earlier one, and
     /// what is on top is what the mouse should find.
-    GraphicControl? GraphicAt(Point reported)
+    GraphicControl? FindGraphicAt(Point reported)
     {
         var origin = ClientOrigin;
         var at = Point.FromXY(reported.X - origin.X, reported.Y - origin.Y);
-        nuint count = _inside.Count;
+        nuint count = _children.Count;
         for (nuint i = count; i > 0u; i--)
         {
-            var child = _inside[i - 1u];
+            var child = _children[i - 1u];
             if (!child.Visible || !child.Enabled)
                 continue;
             if (child is GraphicControl drawn)
@@ -557,10 +563,10 @@ public abstract class WindowedControl : Control
     }
 
     /// Called by a graphic child taking or giving up the mouse.
-    void CaptureFor(GraphicControl? child)
+    void CaptureMouseFor(GraphicControl? child)
     {
         _grabbed = child;
-        var mine = _platform;
+        var mine = _peer;
         if (mine != null)
             ((IControlPeer)mine).SetCapture(child != null);
     }
@@ -574,7 +580,7 @@ public abstract class WindowedControl : Control
     /// none -- which is what puts a resize cursor over a splitter.
     void RefreshCursor()
     {
-        var mine = _platform;
+        var mine = _peer;
         if (mine == null)
             return;
 
@@ -584,7 +590,7 @@ public abstract class WindowedControl : Control
     }
 
     /// Where a point the platform reported is in a child's coordinates.
-    Point Within(Control child, Point reported)
+    Point ToChildSpace(Control child, Point reported)
     {
         var origin = ClientOrigin;
         return Point.FromXY(reported.X - origin.X - child.Left,
@@ -593,23 +599,23 @@ public abstract class WindowedControl : Control
 
     /// Whichever graphic child a mouse message belongs to: the one holding the
     /// mouse if any, otherwise whatever is under the pointer.
-    GraphicControl? MouseTarget(Point at)
+    GraphicControl? FindMouseTarget(Point at)
     {
         var held = _grabbed;
         if (held != null)
             return held;
-        return GraphicAt(at);
+        return FindGraphicAt(at);
     }
 
     public override void OnPlatformMouseDown(MouseButton button, Point at,
                                              ModifierKeys modifiers)
     {
-        var target = MouseTarget(at);
+        var target = FindMouseTarget(at);
         _pressed = target;
         if (target != null)
         {
             var child = (GraphicControl)target;
-            child.OnPlatformMouseDown(button, Within(child, at), modifiers);
+            child.OnPlatformMouseDown(button, ToChildSpace(child, at), modifiers);
             return;
         }
         base.OnPlatformMouseDown(button, at, modifiers);
@@ -618,11 +624,11 @@ public abstract class WindowedControl : Control
     public override void OnPlatformMouseUp(MouseButton button, Point at,
                                            ModifierKeys modifiers)
     {
-        var target = MouseTarget(at);
+        var target = FindMouseTarget(at);
         if (target != null)
         {
             var child = (GraphicControl)target;
-            child.OnPlatformMouseUp(button, Within(child, at), modifiers);
+            child.OnPlatformMouseUp(button, ToChildSpace(child, at), modifiers);
             return;
         }
         base.OnPlatformMouseUp(button, at, modifiers);
@@ -630,7 +636,7 @@ public abstract class WindowedControl : Control
 
     public override void OnPlatformMouseMove(Point at, ModifierKeys modifiers)
     {
-        var target = MouseTarget(at);
+        var target = FindMouseTarget(at);
 
         // Entering and leaving a windowless control is this method's doing --
         // the pointer never crosses a window boundary, so nothing else would
@@ -653,7 +659,7 @@ public abstract class WindowedControl : Control
         if (target != null)
         {
             var child = (GraphicControl)target;
-            child.OnPlatformMouseMove(Within(child, at), modifiers);
+            child.OnPlatformMouseMove(ToChildSpace(child, at), modifiers);
             return;
         }
         base.OnPlatformMouseMove(at, modifiers);
@@ -674,11 +680,11 @@ public abstract class WindowedControl : Control
 
     public override void OnPlatformMouseWheel(int delta, Point at, ModifierKeys modifiers)
     {
-        var target = MouseTarget(at);
+        var target = FindMouseTarget(at);
         if (target != null)
         {
             var child = (GraphicControl)target;
-            child.OnPlatformMouseWheel(delta, Within(child, at), modifiers);
+            child.OnPlatformMouseWheel(delta, ToChildSpace(child, at), modifiers);
             return;
         }
         base.OnPlatformMouseWheel(delta, at, modifiers);
@@ -691,11 +697,11 @@ public abstract class WindowedControl : Control
     {
         if (!fromKeyboard)
         {
-            var target = MouseTarget(at);
+            var target = FindMouseTarget(at);
             if (target != null)
             {
                 var child = (GraphicControl)target;
-                if (child.OnPlatformContextMenu(Within(child, at), false))
+                if (child.OnPlatformContextMenu(ToChildSpace(child, at), false))
                     return true;
             }
         }
@@ -717,7 +723,7 @@ public abstract class WindowedControl : Control
 
     public override void Invalidate()
     {
-        var mine = _platform;
+        var mine = _peer;
         if (mine != null)
             ((IControlPeer)mine).Invalidate();
     }
@@ -730,7 +736,7 @@ public abstract class WindowedControl : Control
     /// Paints it now rather than when the platform gets round to it.
     public void Update()
     {
-        var mine = _platform;
+        var mine = _peer;
         if (mine != null)
             ((IControlPeer)mine).Update();
     }
@@ -738,7 +744,7 @@ public abstract class WindowedControl : Control
     /// Gives this control the keyboard.
     public void Focus()
     {
-        var mine = _platform;
+        var mine = _peer;
         if (mine != null)
             ((IControlPeer)mine).Focus();
     }
@@ -747,7 +753,7 @@ public abstract class WindowedControl : Control
     {
         get
         {
-            var mine = _platform;
+            var mine = _peer;
             if (mine == null)
                 return false;
             return ((IControlPeer)mine).HasFocus;
@@ -762,7 +768,7 @@ public abstract class WindowedControl : Control
     {
         get
         {
-            if (_platform == null)
+            if (_peer == null)
                 return Size.Empty;
             return ClientBounds.Extent;
         }
@@ -791,17 +797,17 @@ public abstract class WindowedControl : Control
     /// writes such a handler.
     public void PerformLayout()
     {
-        if (_laying)
+        if (_isLayingOut)
             return;
         var client = LayoutClient;
         if (client.IsEmpty)
             return;
 
-        _laying = true;
+        _isLayingOut = true;
 
         var free = ClientBounds;
 
-        foreach (var child in _inside)
+        foreach (var child in _children)
         {
             if (!child.Visible)
                 continue;
@@ -811,36 +817,36 @@ public abstract class WindowedControl : Control
             {
                 case DockStyle.Top:
                 {
-                    child.Place(Rectangle.FromBounds(free.X, free.Y, free.Width,
-                                             Clamped(asked.Height, free.Height)));
-                    int took = Clamped(child.Height, free.Height);
+                    child.SetBoundsCore(Rectangle.FromBounds(free.X, free.Y, free.Width,
+                                             ClampToRoom(asked.Height, free.Height)));
+                    int took = ClampToRoom(child.Height, free.Height);
                     free = Rectangle.FromBounds(free.X, free.Y + took, free.Width, free.Height - took);
                     break;
                 }
 
                 case DockStyle.Bottom:
                 {
-                    int height = Clamped(asked.Height, free.Height);
-                    child.Place(Rectangle.FromBounds(free.X, free.Bottom - height, free.Width, height));
-                    int took = Clamped(child.Height, free.Height);
+                    int height = ClampToRoom(asked.Height, free.Height);
+                    child.SetBoundsCore(Rectangle.FromBounds(free.X, free.Bottom - height, free.Width, height));
+                    int took = ClampToRoom(child.Height, free.Height);
                     free = Rectangle.FromBounds(free.X, free.Y, free.Width, free.Height - took);
                     break;
                 }
 
                 case DockStyle.Left:
                 {
-                    child.Place(Rectangle.FromBounds(free.X, free.Y,
-                                             Clamped(asked.Width, free.Width), free.Height));
-                    int took = Clamped(child.Width, free.Width);
+                    child.SetBoundsCore(Rectangle.FromBounds(free.X, free.Y,
+                                             ClampToRoom(asked.Width, free.Width), free.Height));
+                    int took = ClampToRoom(child.Width, free.Width);
                     free = Rectangle.FromBounds(free.X + took, free.Y, free.Width - took, free.Height);
                     break;
                 }
 
                 case DockStyle.Right:
                 {
-                    int width = Clamped(asked.Width, free.Width);
-                    child.Place(Rectangle.FromBounds(free.Right - width, free.Y, width, free.Height));
-                    int took = Clamped(child.Width, free.Width);
+                    int width = ClampToRoom(asked.Width, free.Width);
+                    child.SetBoundsCore(Rectangle.FromBounds(free.Right - width, free.Y, width, free.Height));
+                    int took = ClampToRoom(child.Width, free.Width);
                     free = Rectangle.FromBounds(free.X, free.Y, free.Width - took, free.Height);
                     break;
                 }
@@ -853,21 +859,21 @@ public abstract class WindowedControl : Control
         // `Fill` takes everything the edges left, and the last one wins if a
         // program docked two -- which is a mistake, and one the LCL also lets
         // through rather than diagnosing.
-        foreach (var child in _inside)
+        foreach (var child in _children)
         {
             if (!child.Visible)
                 continue;
             if (child.Dock == DockStyle.Fill)
-                child.Place(free);
+                child.SetBoundsCore(free);
         }
 
-        foreach (var child in _inside)
+        foreach (var child in _children)
         {
             if (child.Dock == DockStyle.None)
-                child.Place(child.AnchoredBounds(client));
+                child.SetBoundsCore(child.ComputeAnchoredBounds(client));
         }
 
-        _laying = false;
+        _isLayingOut = false;
     }
 
     /// A size, held between zero and what is left.
@@ -875,7 +881,7 @@ public abstract class WindowedControl : Control
     /// The platform MAY make a control larger than it was given -- GTK keeps a
     /// widget at its minimum -- so what a docked control took is read back from
     /// it, and held to the room there was.
-    static int Clamped(int wanted, int room)
+    static int ClampToRoom(int wanted, int room)
     {
         if (wanted > room)
             wanted = room;
@@ -897,13 +903,13 @@ public abstract class WindowedControl : Control
     {
         base.OnPaint(args);
         var origin = ClientOrigin;
-        foreach (var child in _inside)
+        foreach (var child in _children)
         {
             if (!child.Visible)
                 continue;
             if (child is GraphicControl drawn)
             {
-                drawn.PaintOn(args.Graphics, origin);
+                drawn.PaintOnSurface(args.Graphics, origin);
             }
         }
     }

@@ -271,7 +271,7 @@ public class ToolBarPeer : ControlPeer, IToolBarPeer
         return state;
     }
 
-    public nuint ButtonId(int index)
+    public nuint GetButtonId(int index)
     {
         int command = CommandAt(index);
         if (command < 0)
@@ -709,7 +709,7 @@ public class TreeViewPeer : ControlPeer, ITreeViewPeer
         return Text.FromNullTerminatedUtf16(&buffer[0u]);
     }
 
-    public void Expand(ITreeNodeHandle node, bool expanded)
+    public void SetNodeExpanded(ITreeNodeHandle node, bool expanded)
     {
         SendMessageW(window, TvmExpand, expanded ? TveExpand : TveCollapse,
                      (long)(nuint)(void*)NativeOf(node));
@@ -728,7 +728,7 @@ public class TreeViewPeer : ControlPeer, ITreeViewPeer
         return new TreeNodeHandle((HTREEITEM)(void*)(nuint)chosen);
     }
 
-    public ITreeNodeHandle? NodeAt(Forms.Drawing.Point at)
+    public ITreeNodeHandle? GetNodeAt(Forms.Drawing.Point at)
     {
         TreeHitTest probe;
         probe.At.X = at.X;

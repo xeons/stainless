@@ -105,17 +105,17 @@ public abstract class ButtonBase : WindowedControl
 public class Button : ButtonBase
 {
     IPushButtonPeer _native;
-    Bitmap? _glyph;
-    ImageAlignment _glyphAlign;
-    int _glyphGap;
+    Bitmap? _image;
+    ImageAlignment _imageAlign;
+    int _imageSpacing;
 
     public Button(WindowedControl parent)
     {
         base(parent);
-        _glyph = null;
-        _glyphAlign = ImageAlignment.Left;
-        _glyphGap = 4;
-        _native = WidgetSet.Current.CreateButton(this, ParentPeer());
+        _image = null;
+        _imageAlign = ImageAlignment.Left;
+        _imageSpacing = 4;
+        _native = WidgetSet.Current.CreateButton(this, ParentPeer);
         AttachPeer(_native);
     }
 
@@ -131,7 +131,7 @@ public class Button : ButtonBase
             {
                 var form = FindForm();
                 if (form != null)
-                    ClearDefaultIn((WindowedControl)form);
+                    ClearDefaultButtonIn((WindowedControl)form);
             }
             _isDefault = value;
             _native.SetDefault(value);
@@ -141,7 +141,7 @@ public class Button : ButtonBase
     bool _isDefault;
 
     /// Clears `IsDefault` on every button under `holder` but this one.
-    void ClearDefaultIn(WindowedControl holder)
+    void ClearDefaultButtonIn(WindowedControl holder)
     {
         foreach (var child in holder.Controls)
         {
@@ -151,7 +151,7 @@ public class Button : ButtonBase
                     other.IsDefault = false;
             }
             if (child is WindowedControl inner)
-                ClearDefaultIn(inner);
+                ClearDefaultButtonIn(inner);
         }
     }
 
@@ -162,21 +162,21 @@ public class Button : ButtonBase
     /// for; what the peer keeps is the platform's own copy of it.
     public Bitmap? Image
     {
-        get => _glyph;
+        get => _image;
         set
         {
-            _glyph = value;
-            _native.SetImage(value == null ? null : ((Bitmap)value).Backend());
+            _image = value;
+            _native.SetImage(value == null ? null : ((Bitmap)value).Backend);
         }
     }
 
     /// Which side of the caption the picture sits on.
     public ImageAlignment ImageAlign
     {
-        get => _glyphAlign;
+        get => _imageAlign;
         set
         {
-            _glyphAlign = value;
+            _imageAlign = value;
             _native.SetImageAlign(value);
         }
     }
@@ -185,10 +185,10 @@ public class Button : ButtonBase
     /// defaults to 4 there and here.
     public int ImageSpacing
     {
-        get => _glyphGap;
+        get => _imageSpacing;
         set
         {
-            _glyphGap = value;
+            _imageSpacing = value;
             _native.SetImageSpacing(value);
         }
     }
@@ -210,7 +210,7 @@ public class CheckBox : ButtonBase
     public CheckBox(WindowedControl parent)
     {
         base(parent);
-        _native = WidgetSet.Current.CreateCheck(this, ParentPeer(), CheckKind.Check);
+        _native = WidgetSet.Current.CreateCheck(this, ParentPeer, CheckKind.Check);
         AttachPeer(_native);
     }
 
@@ -219,7 +219,7 @@ public class CheckBox : ButtonBase
     protected CheckBox(WindowedControl parent, CheckKind kind)
     {
         base(parent);
-        _native = WidgetSet.Current.CreateCheck(this, ParentPeer(), kind);
+        _native = WidgetSet.Current.CreateCheck(this, ParentPeer, kind);
         AttachPeer(_native);
     }
 
@@ -286,13 +286,13 @@ public class RadioButton : CheckBox
             SetCheckedOnly(value);
             if (!value)
                 return;
-            ClearSiblings();
+            UncheckSiblings();
         }
     }
 
     /// Unticks every other radio button with the same parent, which is what
     /// makes a group a group on every platform.
-    void ClearSiblings()
+    void UncheckSiblings()
     {
         var parent = Parent;
         if (parent == null)
@@ -373,34 +373,34 @@ public enum ButtonState { Up, Down, Hot, Disabled }
 /// ```
 public class SpeedButton : GraphicControl
 {
-    Bitmap? _glyph;
-    ImageAlignment _glyphAlign;
+    Bitmap? _image;
+    ImageAlignment _imageAlign;
     int _margin;
     int _spacing;
     bool _flat;
     bool _down;
     bool _allowAllUp;
-    int _group;
+    int _groupIndex;
     bool _showCaption;
     bool _hot;
     bool _pressing;
-    HorizontalAlignment _align;
+    HorizontalAlignment _alignment;
 
     public SpeedButton(WindowedControl parent)
     {
         base(parent);
-        _glyph = null;
-        _glyphAlign = ImageAlignment.Left;
+        _image = null;
+        _imageAlign = ImageAlignment.Left;
         _margin = -1;
         _spacing = 4;
         _flat = false;
         _down = false;
         _allowAllUp = false;
-        _group = 0;
+        _groupIndex = 0;
         _showCaption = true;
         _hot = false;
         _pressing = false;
-        _align = HorizontalAlignment.Center;
+        _alignment = HorizontalAlignment.Center;
         Width = 23;
         Height = 22;
     }
@@ -408,10 +408,10 @@ public class SpeedButton : GraphicControl
     /// The picture, or null for a button that is only a caption.
     public Bitmap? Image
     {
-        get => _glyph;
+        get => _image;
         set
         {
-            _glyph = value;
+            _image = value;
             Invalidate();
         }
     }
@@ -419,10 +419,10 @@ public class SpeedButton : GraphicControl
     /// Which side of the caption the picture sits on.
     public ImageAlignment ImageAlign
     {
-        get => _glyphAlign;
+        get => _imageAlign;
         set
         {
-            _glyphAlign = value;
+            _imageAlign = value;
             Invalidate();
         }
     }
@@ -482,13 +482,13 @@ public class SpeedButton : GraphicControl
         get => _down;
         set
         {
-            bool wanted = _group != 0 && value;
+            bool wanted = _groupIndex != 0 && value;
             if (wanted == _down)
                 return;
             if (_down && !_allowAllUp)
                 return;
             if (wanted)
-                RaiseGroup();
+                RaiseGroupSiblings();
             _down = wanted;
             Invalidate();
         }
@@ -498,10 +498,10 @@ public class SpeedButton : GraphicControl
     /// button that does not stay down at all.
     public int GroupIndex
     {
-        get => _group;
+        get => _groupIndex;
         set
         {
-            _group = value;
+            _groupIndex = value;
             Invalidate();
         }
     }
@@ -530,10 +530,10 @@ public class SpeedButton : GraphicControl
     /// Where the caption sits across the room left for it.
     public HorizontalAlignment Alignment
     {
-        get => _align;
+        get => _alignment;
         set
         {
-            _align = value;
+            _alignment = value;
             Invalidate();
         }
     }
@@ -554,7 +554,7 @@ public class SpeedButton : GraphicControl
     }
 
     /// Raises every other button of this one's group.
-    void RaiseGroup()
+    void RaiseGroupSiblings()
     {
         var parent = Parent;
         if (parent == null)
@@ -565,7 +565,7 @@ public class SpeedButton : GraphicControl
                 continue;
             if (sibling is SpeedButton other)
             {
-                if (other.GroupIndex != _group)
+                if (other.GroupIndex != _groupIndex)
                     continue;
                 if (!other.Down)
                     continue;
@@ -627,7 +627,7 @@ public class SpeedButton : GraphicControl
 
         bool inside = args.X >= 0 && args.Y >= 0 && args.X < Width && args.Y < Height;
         if (inside)
-            Toggle();
+            ToggleInGroup();
         Invalidate();
         if (inside)
             OnClick();
@@ -638,7 +638,7 @@ public class SpeedButton : GraphicControl
     /// `ButtonBase`.
     public void PerformClick()
     {
-        Toggle();
+        ToggleInGroup();
         Invalidate();
         OnClick();
     }
@@ -646,9 +646,9 @@ public class SpeedButton : GraphicControl
     /// What a completed press does to a grouped button: presses it and raises
     /// the rest, or -- if it was the one down and the group may be empty --
     /// raises it. A button with no group does nothing here.
-    void Toggle()
+    void ToggleInGroup()
     {
-        if (_group == 0)
+        if (_groupIndex == 0)
             return;
         if (_down)
         {
@@ -656,7 +656,7 @@ public class SpeedButton : GraphicControl
                 _down = false;
             return;
         }
-        RaiseGroup();
+        RaiseGroupSiblings();
         _down = true;
     }
 
@@ -666,14 +666,14 @@ public class SpeedButton : GraphicControl
     {
         get
         {
-            var picture = _glyph;
+            var picture = _image;
             int glyphWide = picture == null ? 0 : ((Bitmap)picture).Width;
             int glyphHigh = picture == null ? 0 : ((Bitmap)picture).Height;
 
             // **The caption is not measured here**, because measuring needs a
             // surface and there is none outside a paint. This is the picture
             // plus its margins, floored at a Windows button's smallest size,
-            // which is what a palette button wants and all `AutoSize` can
+            // which is what a palette button wants and all `ResizeToPreferredSize` can
             // honestly promise for one that also has text.
             int room = _margin < 0 ? 4 : _margin;
             int wide = glyphWide + room * 2;
@@ -703,7 +703,7 @@ public class SpeedButton : GraphicControl
             DrawEdge(surface, whole, state == ButtonState.Down);
         }
 
-        var picture = _glyph;
+        var picture = _image;
         int glyphWide = picture == null ? 0 : ((Bitmap)picture).Width;
         int glyphHigh = picture == null ? 0 : ((Bitmap)picture).Height;
 
@@ -714,8 +714,8 @@ public class SpeedButton : GraphicControl
         if (gap < 0)
             gap = 0;
 
-        bool sideways = _glyphAlign == ImageAlignment.Left
-                     || _glyphAlign == ImageAlignment.Right;
+        bool sideways = _imageAlign == ImageAlignment.Left
+                     || _imageAlign == ImageAlignment.Right;
 
         // The picture and the caption as one block, sized on the axis they
         // share and on the axis they stack.
@@ -730,13 +730,13 @@ public class SpeedButton : GraphicControl
         int startY = (Height - blockHigh) / 2;
         if (_margin >= 0)
         {
-            if (_glyphAlign == ImageAlignment.Left)
+            if (_imageAlign == ImageAlignment.Left)
                 startX = _margin;
-            if (_glyphAlign == ImageAlignment.Right)
+            if (_imageAlign == ImageAlignment.Right)
                 startX = Width - _margin - blockWide;
-            if (_glyphAlign == ImageAlignment.Top)
+            if (_imageAlign == ImageAlignment.Top)
                 startY = _margin;
-            if (_glyphAlign == ImageAlignment.Bottom)
+            if (_imageAlign == ImageAlignment.Bottom)
                 startY = Height - _margin - blockHigh;
         }
         if (startX < 0)
@@ -749,19 +749,19 @@ public class SpeedButton : GraphicControl
         int textX = startX;
         int textY = startY;
 
-        if (_glyphAlign == ImageAlignment.Left)
+        if (_imageAlign == ImageAlignment.Left)
         {
             glyphY = startY + (blockHigh - glyphHigh) / 2;
             textX = startX + glyphWide + gap;
             textY = startY + (blockHigh - textSize.Height) / 2;
         }
-        else if (_glyphAlign == ImageAlignment.Right)
+        else if (_imageAlign == ImageAlignment.Right)
         {
             glyphX = startX + textSize.Width + gap;
             glyphY = startY + (blockHigh - glyphHigh) / 2;
             textY = startY + (blockHigh - textSize.Height) / 2;
         }
-        else if (_glyphAlign == ImageAlignment.Top)
+        else if (_imageAlign == ImageAlignment.Top)
         {
             glyphX = startX + (blockWide - glyphWide) / 2;
             textX = startX + (blockWide - textSize.Width) / 2;
@@ -778,12 +778,12 @@ public class SpeedButton : GraphicControl
         // is what `Alignment` is for and is only visible on a wide button.
         if (!caption.IsEmpty && sideways && _margin >= 0)
         {
-            if (_align == HorizontalAlignment.Right)
+            if (_alignment == HorizontalAlignment.Right)
             {
                 textX = Width - _margin - textSize.Width;
             }
-            else if (_align == HorizontalAlignment.Left
-                       && _glyphAlign == ImageAlignment.Right)
+            else if (_alignment == HorizontalAlignment.Left
+                       && _imageAlign == ImageAlignment.Right)
             {
                 textX = _margin;
             }

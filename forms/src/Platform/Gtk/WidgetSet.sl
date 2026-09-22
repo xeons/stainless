@@ -56,7 +56,7 @@ import Gtk.Events;
 /// before either source runs.
 gboolean DrainPosted(gpointer data)
 {
-    Application.Drain();
+    Application.RunPostedWork();
     return 0;
 }
 
@@ -385,7 +385,7 @@ public class GtkWidgetSet : IWidgetSet
         return ReadClipboardTarget(name);
     }
 
-    public bool ClipboardHas(ClipboardKind kind)
+    public bool ContainsClipboardKind(ClipboardKind kind)
     {
         Start();
         gpointer clipboard = DefaultClipboard();
@@ -403,13 +403,13 @@ public class GtkWidgetSet : IWidgetSet
         return false;
     }
 
-    public bool ClipboardHasFormat(String name)
+    public bool ContainsClipboardFormat(String name)
     {
         Start();
         return gtk_clipboard_wait_is_target_available(DefaultClipboard(), AtomNamed(name)) != 0;
     }
 
-    public String[] ClipboardFormatNames()
+    public String[] GetClipboardFormatNames()
     {
         Start();
         return ReadClipboardTargetNames();
@@ -605,7 +605,7 @@ public class GtkWidgetSet : IWidgetSet
     /// defines and every theme derived from it keeps. A theme that defines
     /// none of them gets the fallbacks below, which are Adwaita's own values
     /// -- so the wrong answer is still a sensible one.
-    public Color SystemColor(SystemColorId which)
+    public Color GetSystemColor(SystemColorId which)
     {
         Start();
 
@@ -652,7 +652,7 @@ public class GtkWidgetSet : IWidgetSet
     /// control starts with. `gtk-font-name` is a Pango description --
     /// `"Cantarell 11"` -- so it is read apart the same way a font chooser's
     /// answer is.
-    public Font DefaultFont()
+    public Font GetDefaultFont()
     {
         Start();
 
@@ -751,7 +751,7 @@ public class GtkWidgetSet : IWidgetSet
     /// Idle priority rather than default, so that a long run of posted work
     /// cannot starve redrawing -- which is the thing the posted work almost
     /// always exists to cause.
-    public void Wake()
+    public void WakeEventLoop()
     {
         g_idle_add_full(G_PRIORITY_DEFAULT_IDLE, DrainPosted, null, null);
     }
