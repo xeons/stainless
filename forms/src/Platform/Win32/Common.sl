@@ -1156,6 +1156,12 @@ public class SpinPeer : ControlPeer, ISpinPeer
         ShowWindow(window, visible ? SwShowNoActivate : SwHide);
         ShowWindow(_arrows, visible ? SwShowNoActivate : SwHide);
     }
+
+    public override void SetEnabled(bool enabled)
+    {
+        EnableWindow(window, enabled ? 1 : 0);
+        EnableWindow(_arrows, enabled ? 1 : 0);
+    }
 }
 
 // ========================================================== check list box

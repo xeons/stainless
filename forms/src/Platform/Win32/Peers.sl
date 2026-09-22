@@ -901,7 +901,8 @@ public class ControlPeer : IControlPeer
         ShowWindow(window, visible ? SwShowNoActivate : SwHide);
     }
 
-    public void SetEnabled(bool enabled) => EnableWindow(window, enabled ? 1 : 0);
+    /// Virtual for the same reason as `SetBounds`.
+    public virtual void SetEnabled(bool enabled) => EnableWindow(window, enabled ? 1 : 0);
 
     /// Quiet, because an `EDIT` answers `WM_SETTEXT` with `EN_CHANGE`.
     public void SetText(String text)
