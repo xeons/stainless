@@ -896,6 +896,7 @@ threadsafe sealed class Backend
     PcmCommandFn _drain;
     PcmCommandFn _drop;
     PcmCommandFn _prepare;
+    PcmCommandFn _start;
     PcmCommandFn _close;
     PcmRecoverFn _recover;
 
@@ -924,6 +925,7 @@ threadsafe sealed class Backend
         _drain = (PcmCommandFn)Find(alsa, "snd_pcm_drain", &complete);
         _drop = (PcmCommandFn)Find(alsa, "snd_pcm_drop", &complete);
         _prepare = (PcmCommandFn)Find(alsa, "snd_pcm_prepare", &complete);
+        _start = (PcmCommandFn)Find(alsa, "snd_pcm_start", &complete);
         _close = (PcmCommandFn)Find(alsa, "snd_pcm_close", &complete);
         _recover = (PcmRecoverFn)Find(alsa, "snd_pcm_recover", &complete);
 
@@ -974,6 +976,8 @@ threadsafe sealed class Backend
     public int Drop(void* pcm) => _drop(pcm);
 
     public int Prepare(void* pcm) => _prepare(pcm);
+
+    public int Start(void* pcm) => _start(pcm);
 
     public int Close(void* pcm) => _close(pcm);
 
@@ -1636,7 +1640,9 @@ public sealed class AudioRecorder
         if (code < 0)
             return Fail(Translate(code));
 #else
-        if (found.Prepare(_device) < 0)
+        // Started here rather than left to the first read, which is when a
+        // prepared capture stream would otherwise begin.
+        if (found.Prepare(_device) < 0 || found.Start(_device) < 0)
             return Fail(AudioError.Device);
 #endif
 
