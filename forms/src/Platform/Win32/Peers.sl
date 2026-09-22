@@ -230,6 +230,17 @@ ControlPeer? PeerOf(HWND window)
 
 // ========================================================= window procedures
 
+/// A subclassed window its peer is destroying, and the procedure it displaced.
+///
+/// The peer is unbound before `DestroyWindow`, because a message reaching it
+/// then would retain an object whose count is already zero. The control's own
+/// procedure MUST still see `WM_DESTROY` and `WM_NCDESTROY`, or it never frees
+/// what it holds, so the procedure is kept here for exactly that long. One
+/// slot, saved and put back around each destruction, since one can only nest
+/// inside another.
+static HWND s_departingWindow = null;
+static WindowProcedure s_departingProcedure = StainlessProc;
+
 /// The procedure every window this library makes goes through.
 ///
 /// **One function for every window, not one per control.** It is a module-level
@@ -241,6 +252,9 @@ nint StainlessProc(HWND window, uint message, nuint wParam, nint lParam)
     var peer = PeerOf(window);
     if (peer == null)
     {
+        if (window == s_departingWindow)
+            return CallWindowProcW(s_departingProcedure, window, message, wParam, lParam);
+
         // A timer's window and a clipboard watch's are of this class too, and
         // have no control behind them.
         switch (message)
@@ -417,9 +431,11 @@ public class ControlPeer : IControlPeer
         if (message == WmNcDestroy)
         {
             // The last message a window ever gets, and the only safe place to
-            // let go of the binding: messages can still arrive before it.
+            // let go of the binding: messages can still arrive before it. The
+            // tip is an owned window, and went before this one.
             UnbindPeer(window);
             destroyed = true;
+            tip = null;
             return Inherited(message, wParam, lParam);
         }
 
@@ -1151,16 +1167,18 @@ public class ControlPeer : IControlPeer
 
     public nuint Handle => (nuint)(void*)window;
 
+    /// Releases the window and what this peer made for it. The brush goes
+    /// even when the window has already gone with its parent.
     public void Destroy()
     {
-        if (destroyed)
-            return;
-        destroyed = true;
         if (backBrush != null)
         {
             DeleteObject((HGDIOBJ)(void*)backBrush);
             backBrush = null;
         }
+        if (destroyed)
+            return;
+        destroyed = true;
         // Before the control, because the tool it holds names that window.
         if (tip != null)
         {
@@ -1170,7 +1188,20 @@ public class ControlPeer : IControlPeer
         if (window != null)
         {
             UnbindPeer(window);
-            DestroyWindow(window);
+            if (subclassed)
+            {
+                HWND outerWindow = s_departingWindow;
+                WindowProcedure outerProcedure = s_departingProcedure;
+                s_departingWindow = window;
+                s_departingProcedure = displaced;
+                DestroyWindow(window);
+                s_departingWindow = outerWindow;
+                s_departingProcedure = outerProcedure;
+            }
+            else
+            {
+                DestroyWindow(window);
+            }
             window = null;
         }
     }
