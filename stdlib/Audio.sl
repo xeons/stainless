@@ -242,7 +242,8 @@ public sealed class AudioClip
     /// One sample, as a number from -32768 to 32767 whatever the width is.
     ///
     /// Eight-bit samples are widened and re-centred on the way out, so a
-    /// caller reading a clip need not know which it has. Out of range answers
+    /// caller reading a clip need not know which it has. A sample wider than
+    /// sixteen bits answers its top sixteen. Out of range answers
     /// zero rather than aborting: a program walking a waveform runs off the
     /// end at the end, and that is not a mistake in it.
     public int SampleAt(nuint frame, nuint channel)
@@ -251,11 +252,14 @@ public sealed class AudioClip
         if (at == _samples.Length)
             return 0;
 
-        if (_format.BitsPerSample == 8u)
+        nuint width = (nuint)_format.BitsPerSample / 8u;
+        if (width == 1u)
             return ((int)_samples[at] - 128) * 256;
 
-        int low = (int)_samples[at];
-        int high = (int)_samples[at + 1u];
+        // Little-endian, so the top sixteen bits are the last two bytes.
+        nuint top = at + width - 2u;
+        int low = (int)_samples[top];
+        int high = (int)_samples[top + 1u];
         int value = low | (high << 8);
 
         // Sixteen-bit samples are signed and the bytes are little-endian, so
@@ -264,7 +268,8 @@ public sealed class AudioClip
     }
 
     /// One sample written, taking the same range `SampleAt` answers in and
-    /// clamping to it. Out of range does nothing.
+    /// clamping to it. A sample wider than sixteen bits has its top sixteen
+    /// set and the bits below them cleared. Out of range does nothing.
     public void SetSample(nuint frame, nuint channel, int value)
     {
         nuint at = Offset(frame, channel);
@@ -276,15 +281,22 @@ public sealed class AudioClip
         if (value > 32767)
             value = 32767;
 
-        if (_format.BitsPerSample == 8u)
+        // A shift rather than a division, which would truncate toward zero and
+        // put -255 to 255 all on the centre.
+        nuint width = (nuint)_format.BitsPerSample / 8u;
+        if (width == 1u)
         {
-            _samples[at] = (byte)((value / 256) + 128);
+            _samples[at] = (byte)((value >> 8) + 128);
             return;
         }
 
+        nuint top = at + width - 2u;
+        for (nuint i = at; i < top; i++)
+            _samples[i] = 0;
+
         int stored = value < 0 ? value + 65536 : value;
-        _samples[at] = (byte)(stored & 0xFF);
-        _samples[at + 1u] = (byte)((stored >> 8) & 0xFF);
+        _samples[top] = (byte)(stored & 0xFF);
+        _samples[top + 1u] = (byte)((stored >> 8) & 0xFF);
     }
 
     /// Where a sample sits, or `_samples.Length` when it is not in the clip --
@@ -295,6 +307,9 @@ public sealed class AudioClip
             return _samples.Length;
 
         nuint width = (nuint)_format.BitsPerSample / 8u;
+        if (width == 0u)
+            return _samples.Length;
+
         nuint at = frame * _format.BytesPerFrame + channel * width;
         return at + width > _samples.Length ? _samples.Length : at;
     }
@@ -330,8 +345,10 @@ public static class Wav
             nuint body = at + 8u;
 
             // A chunk that claims more than the file holds is a truncated
-            // download, and reading it would walk off the end.
-            if (body + size > bytes.Length)
+            // download, and reading it would walk off the end. Compared with
+            // what remains rather than summed, because the sum wraps where
+            // `nuint` is four bytes.
+            if (size > bytes.Length - body)
                 size = bytes.Length - body;
 
             if (Marks(bytes, at, "fmt ") && size >= 16u)
@@ -359,6 +376,10 @@ public static class Wav
                 if (!format.IsSupported)
                     return Fail(AudioError.Format);
 
+                // A truncated file can end inside a frame, and a partial frame
+                // is one no device will take.
+                size -= size % format.BytesPerFrame;
+
                 byte[] samples = new byte[size];
                 for (nuint i = 0u; i < size; i++)
                     samples[i] = bytes[body + i];
@@ -374,16 +395,17 @@ public static class Wav
         return Fail(AudioError.Malformed);
     }
 
-    /// A clip as the bytes of a `.wav` file: a 44-byte canonical header and
-    /// the samples.
+    /// A clip as the bytes of a `.wav` file: a 44-byte canonical header, the
+    /// samples, and the pad byte an odd length is followed by.
     public static byte[] Encode(AudioClip clip)
     {
         var format = clip.Format;
         byte[] samples = clip.Samples;
-        byte[] file = new byte[44u + samples.Length];
+        nuint pad = samples.Length % 2u;
+        byte[] file = new byte[44u + samples.Length + pad];
 
         WriteMark(file, 0u, "RIFF");
-        WriteUInt(file, 4u, (uint)(36u + samples.Length));
+        WriteUInt(file, 4u, (uint)(36u + samples.Length + pad));
         WriteMark(file, 8u, "WAVE");
 
         WriteMark(file, 12u, "fmt ");

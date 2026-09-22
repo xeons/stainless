@@ -20,6 +20,11 @@ eight-silence ok
 eight-zero ok
 eight-set ok
 eight-read ok
+eight-negative ok
+eight-positive ok
+deep-read ok
+deep-set ok
+deep-back ok
 sine-frames ok
 sine-start ok
 sine-peak ok
@@ -38,3 +43,9 @@ wav-samples ok
 wav-empty refused
 wav-not-riff refused
 wav-compressed refused
+wav-odd-size ok
+wav-odd-riff ok
+wav-odd-data ok
+wav-odd-pad ok
+wav-odd-frames ok
+wav-truncated-bytes ok

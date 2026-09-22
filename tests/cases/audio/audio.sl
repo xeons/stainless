@@ -88,6 +88,23 @@ void Clips()
     narrow.SetSample(1u, 0u, 25600);
     Check("eight-set", Number((long)narrow.Samples[1u]), "228");
     Check("eight-read", Number((long)narrow.SampleAt(1u, 0u)), "25600");
+
+    // Narrowing floors, so a small negative sample lands below the centre and
+    // a small positive one on it.
+    narrow.SetSample(2u, 0u, -1);
+    Check("eight-negative", Number((long)narrow.Samples[2u]), "127");
+    narrow.SetSample(3u, 0u, 255);
+    Check("eight-positive", Number((long)narrow.Samples[3u]), "128");
+
+    // A sample wider than sixteen bits answers its top sixteen.
+    byte[] wide = new byte[3u];
+    wide[1u] = 0x34;
+    wide[2u] = 0x12;
+    var deep = new AudioClip(AudioFormat.Of(8000u, (ushort)1, (ushort)24), wide);
+    Check("deep-read", Number((long)deep.SampleAt(0u, 0u)), "4660");
+    deep.SetSample(0u, 0u, -2);
+    Check("deep-set", Convert.ToHex(deep.Samples), "00feff");
+    Check("deep-back", Number((long)deep.SampleAt(0u, 0u)), "-2");
 }
 
 void Tones()
@@ -158,6 +175,27 @@ void Container()
     compressed[20u] = 85;
     var mp3 = Wav.Decode(compressed);
     Console.WriteLine(mp3.Ok ? "wav-compressed WRONG" : "wav-compressed refused");
+
+    // An odd-length data chunk is followed by a pad byte, and the RIFF size
+    // counts it.
+    var odd = AudioClip.Silence(AudioFormat.Of(8000u, (ushort)1, (ushort)8), 3u);
+    byte[] padded = Wav.Encode(odd);
+    Check("wav-odd-size", Number((long)padded.Length), "48");
+    Check("wav-odd-riff", Convert.ToHex(padded).Substring(8u, 8u), "28000000");
+    Check("wav-odd-data", Convert.ToHex(padded).Substring(80u, 8u), "03000000");
+    Check("wav-odd-pad", Number((long)padded[47u]), "0");
+    var oddBack = Wav.Decode(padded);
+    Check("wav-odd-frames", oddBack.Ok ? Number((long)oddBack.Value.FrameCount) : "refused", "3");
+
+    // A file cut off inside a frame keeps the whole frames before the cut.
+    var mono = AudioClip.Silence(AudioFormat.Of(8000u, (ushort)1, (ushort)16), 4u);
+    byte[] whole = Wav.Encode(mono);
+    byte[] cut = new byte[whole.Length - 1u];
+    for (nuint i = 0u; i < cut.Length; i++)
+        cut[i] = whole[i];
+    var truncated = Wav.Decode(cut);
+    Check("wav-truncated-bytes",
+          truncated.Ok ? Number((long)truncated.Value.Samples.Length) : "refused", "6");
 }
 
 int Main()
