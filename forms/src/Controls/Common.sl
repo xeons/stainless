@@ -1216,6 +1216,11 @@ public class CoolBand
         get => _held;
         set
         {
+            var was = _held;
+            if (was == value)
+                return;
+            if (was != null)
+                ((Control)was).Resize -= this.OnHeldResized;
             _held = value;
 
             // A band is as tall as what it holds, and a widget set MAY decide
@@ -1224,7 +1229,12 @@ public class CoolBand
             // that was asked for, leaves the control standing outside its
             // band.
             if (value != null)
-                ((Control)value).Resize += this.OnHeldResized;
+            {
+                var one = (Control)value;
+                one.Resize += this.OnHeldResized;
+                if (!_shown)
+                    one.Visible = false;
+            }
 
             Refresh();
         }
