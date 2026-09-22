@@ -54,6 +54,10 @@ import Gtk.Events;
 
 // ================================================================== window
 
+/// How long a window waits, in milliseconds, for the size it asked for before
+/// taking the one the window manager gave it instead.
+const int RequestPatience = 250;
+
 public class GtkWindowPeer : GtkContainerPeer, IWindowPeer
 {
     /// The vertical box between the window and its client area, which exists
@@ -88,11 +92,17 @@ public class GtkWindowPeer : GtkContainerPeer, IWindowPeer
     /// succession ends up laid out for the first.
     ///
     /// So a request is outstanding until a configure matches it, and the
-    /// echoes in between are dropped. `skipped` bounds that: a window manager
-    /// is allowed to refuse a size, and after four it is taken at its word
-    /// rather than ignored for ever.
+    /// echoes in between are dropped. A window manager is allowed to refuse a
+    /// size, so a request still outstanding `RequestPatience` after the first
+    /// echo is given up on and the size the window has is reported.
+    ///
+    /// **Bounded by time, not by a count of echoes.** A window placed twice
+    /// before it is shown -- a form centred after `SetBounds` -- is configured
+    /// at a small interim size five times under a window manager before the
+    /// size asked for arrives. Reporting the interim size lays every control
+    /// anchored on both sides out against it, and they do not grow back.
     bool _pending;
-    int _skipped;
+    bool _waiting;
     FRect _requested;
     weak IWindowNotify? window;
 
@@ -107,7 +117,7 @@ public class GtkWindowPeer : GtkContainerPeer, IWindowPeer
         _modal = false;
         _laidOut = false;
         _pending = false;
-        _skipped = 0;
+        _waiting = false;
         _requested = Area(0, 0, 0, 0);
 
         // **A window's size MUST NOT be decided by what is in it**, and this
@@ -147,40 +157,56 @@ public class GtkWindowPeer : GtkContainerPeer, IWindowPeer
 
         SetBorder(border);
 
-        // **Every one of these goes through a method.** A lambda captures a
-        // member read by value (spec §2.15), so `window`, `modal` and `bounds`
-        // read as fields here would be whatever they were when the handler was
-        // connected -- which for `bounds` is the zero rectangle, for ever.
+        // **Every one of these goes through a method on the peer it is
+        // handed**, never through `this`: see `PeerRelay`.
         //
         // `delete-event` is the close the user asked for, and answering true
         // refuses it -- which is the one place the seam lets a control decide
         // and the reason `OnPlatformClosing` returns a bool at all.
-        ConnectEvent(widget, "delete-event", (sender, carried) => { return Closing(); });
+        WhenEvent(widget, "delete-event", (peer, carried) =>
+        {
+            return ((GtkWindowPeer)peer).Closing();
+        });
 
         // A window is the one control whose size the *user* decides, so this
         // is the one place the platform reports a resize rather than echoing
         // one back at the layout that asked for it.
-        ConnectEvent(widget, "configure-event", (sender, carried) =>
+        WhenEvent(widget, "configure-event", (peer, carried) =>
         {
-            Reconfigured();
+            ((GtkWindowPeer)peer).Reconfigured();
             return false;
         });
 
-        ConnectEvent(widget, "focus-in-event", (sender, carried) =>
+        WhenEvent(widget, "focus-in-event", (peer, carried) =>
         {
-            var owner2 = Reporting();
-            if (owner2 != null)
-                ((IWindowNotify)owner2).OnPlatformActivatedWindow();
+            ((GtkWindowPeer)peer).Activated(true);
             return false;
         });
 
-        ConnectEvent(widget, "focus-out-event", (sender, carried) =>
+        WhenEvent(widget, "focus-out-event", (peer, carried) =>
         {
-            var owner2 = Reporting();
-            if (owner2 != null)
-                ((IWindowNotify)owner2).OnPlatformDeactivated();
+            ((GtkWindowPeer)peer).Activated(false);
             return false;
         });
+    }
+
+    /// The client area, which is where a form's mouse is reported and
+    /// measured from: see `GtkPeer.Surface`.
+    protected override GtkWidget* Surface => content;
+
+    void Activated(bool gained)
+    {
+        var owner2 = Reporting();
+        if (owner2 == null)
+            return;
+        if (gained)
+        {
+            ((IWindowNotify)owner2).OnPlatformActivatedWindow();
+        }
+        else
+        {
+            ((IWindowNotify)owner2).OnPlatformDeactivated();
+        }
     }
 
     /// The form this window reports to, or null once it has gone.
@@ -227,23 +253,16 @@ public class GtkWindowPeer : GtkContainerPeer, IWindowPeer
         gtk_window_get_size(widget, &width, &height);
 
         // An echo of a size the program has already replaced. Dropped, but
-        // only so many times: a window manager that refuses the size outright
+        // only for so long: a window manager that refuses the size outright
         // must not silence the window for ever.
         if (_pending)
         {
-            if (width == _requested.Width && height == _requested.Height)
+            if (width != _requested.Width || height != _requested.Height)
             {
-                _pending = false;
-            }
-            else if (_skipped >= 4)
-            {
-                _pending = false;
-            }
-            else
-            {
-                _skipped = _skipped + 1;
+                AwaitRequest();
                 return;
             }
+            _pending = false;
         }
 
         bool first = !_laidOut;
@@ -268,6 +287,33 @@ public class GtkWindowPeer : GtkContainerPeer, IWindowPeer
         }
     }
 
+    /// Gives up on an outstanding resize `RequestPatience` from now, once.
+    void AwaitRequest()
+    {
+        if (_waiting)
+            return;
+        _waiting = true;
+        var relay = Relay;
+        Tick(RequestPatience, () =>
+        {
+            var peer = relay.Peer;
+            if (peer != null)
+                ((GtkWindowPeer)peer).AbandonRequest();
+            return false;
+        });
+    }
+
+    /// The window manager has had its chance, so whatever size the window is
+    /// now is the one reported.
+    void AbandonRequest()
+    {
+        _waiting = false;
+        if (!_pending)
+            return;
+        _pending = false;
+        Reconfigured();
+    }
+
     /// A top-level window is not inside anything, so there is no `GtkFixed` to
     /// move it within: position is the window manager's business and size is
     /// the window's own.
@@ -284,7 +330,6 @@ public class GtkWindowPeer : GtkContainerPeer, IWindowPeer
         bounds = wanted;
         _requested = wanted;
         _pending = true;
-        _skipped = 0;
         gtk_window_move(widget, wanted.X, wanted.Y);
 
         if (gtk_widget_get_realized(widget) == 0)
@@ -460,9 +505,18 @@ public class GtkWindowPeer : GtkContainerPeer, IWindowPeer
 
     public void Close() => gtk_window_close(widget);
 
+    /// Moves it to the middle of the work area of the monitor it is on.
+    ///
+    /// **A position, not a policy.** `GTK_WIN_POS_CENTER` is read only when a
+    /// window is first mapped, and a `gtk_window_move` -- which every
+    /// `SetBounds` makes -- overrides it, so a form placed and then centred
+    /// stayed where it was placed. Win32 computes the point the same way.
     public void CenterOnScreen()
     {
-        gtk_window_set_position(widget, GTK_WIN_POS_CENTER);
+        var area = MonitorWorkArea(gtk_widget_get_window(widget));
+        SetBounds(Area(area.X + (area.Width - bounds.Width) / 2,
+                       area.Y + (area.Height - bounds.Height) / 2,
+                       bounds.Width, bounds.Height));
     }
 
     /// Shows the window and does not return until it is closed.
@@ -516,12 +570,14 @@ public class GtkButtonPeer : GtkPeer, IPushButtonPeer
         _glyph = null;
         _placed = ImageAlignment.Left;
         _gap = 4;
-        ConnectPlain(widget, "clicked", () =>
-        {
-            var target2 = Owner;
-            if (target2 != null)
-                ((IControlNotify)target2).OnPlatformActivated();
-        });
+        WhenSignal(widget, "clicked", (peer) => { ((GtkButtonPeer)peer).Clicked(); });
+    }
+
+    void Clicked()
+    {
+        var target2 = Owner;
+        if (target2 != null)
+            ((IControlNotify)target2).OnPlatformActivated();
     }
 
     /// The picture beside the caption, or null for none.
@@ -623,9 +679,13 @@ public class GtkButtonPeer : GtkPeer, IPushButtonPeer
 public class GtkCheckPeer : GtkPeer, ICheckPeer
 {
     /// Which of the three this is, which the container it goes into has to
-    /// know: it joins every radio in it to the first, and there is nothing
+    /// know: it joins every radio in it to one group, and there is nothing
     /// about a `GtkWidget*` that says which kind it is.
     CheckKind _sort;
+
+    /// The container's hidden radio, for a radio button: ticking it is how
+    /// this one is unticked. Borrowed; the container owns it.
+    GtkWidget* _unticked;
 
     public bool IsRadio => _sort == CheckKind.Radio;
 
@@ -651,17 +711,33 @@ public class GtkCheckPeer : GtkPeer, ICheckPeer
     {
         base(WidgetFor(kind), owner);
         _sort = kind;
+        _unticked = null;
+        WhenSignal(widget, "toggled", (peer) => { ((GtkCheckPeer)peer).Toggled(); });
+    }
 
-        ConnectPlain(widget, "toggled", () =>
-        {
-            if (this.Echoing)
-                return;
-            var target2 = Owner;
-            if (target2 == null)
-                return;
-            ((IControlNotify)target2).OnPlatformValueChanged();
-            ((IControlNotify)target2).OnPlatformActivated();
-        });
+    /// **A radio button being unticked because a sibling was chosen reports
+    /// nothing**, which is what Windows does: the user clicked the sibling, and
+    /// that is the one that says so.
+    void Toggled()
+    {
+        if (echoing)
+            return;
+        var target2 = Owner;
+        if (target2 == null)
+            return;
+        if (_sort == CheckKind.Radio && !GetChecked())
+            return;
+        ((IControlNotify)target2).OnPlatformValueChanged();
+        ((IControlNotify)target2).OnPlatformActivated();
+    }
+
+    /// Puts a radio button in its container's group, unticked. Called by
+    /// `GtkContainerPeer.AddChild` and by nothing else.
+    public void JoinGroup(GtkWidget* group)
+    {
+        _unticked = group;
+        var made = widget;
+        Quietly(() => { gtk_radio_button_join_group(made, group); });
     }
 
     public override void SetText(String text)
@@ -674,10 +750,19 @@ public class GtkCheckPeer : GtkPeer, ICheckPeer
         return Text.FromNullTerminated(gtk_button_get_label(widget));
     }
 
+    /// GTK will not untick a radio button, only tick another: so unticking
+    /// one ticks the group's hidden member.
     public void SetChecked(bool checked)
     {
-        Echo(true);
-        gtk_toggle_button_set_active(widget, checked ? 1 : 0);
+        var made = widget;
+        var hidden = _unticked;
+        if (!checked && hidden != null)
+        {
+            if (GetChecked())
+                Quietly(() => { gtk_toggle_button_set_active(hidden, 1); });
+            return;
+        }
+        Quietly(() => { gtk_toggle_button_set_active(made, checked ? 1 : 0); });
     }
 
     public bool GetChecked() => gtk_toggle_button_get_active(widget) != 0;
@@ -779,45 +864,46 @@ public class GtkEntryPeer : GtkPeer, ITextEntryPeer
 
             // `changed` is on the buffer rather than on the view, which is the
             // one place in this backend where a signal is not on `inner`.
-            ConnectPlain((GtkWidget*)_buffer, "changed", () =>
+            WhenSignal((GtkWidget*)_buffer, "changed", (peer) =>
             {
-                if (this.Echoing)
-                    return;
-                var target2 = Owner;
-                if (target2 != null)
-                    ((IControlNotify)target2).OnPlatformValueChanged();
+                ((GtkEntryPeer)peer).Edited();
             });
         }
         else
         {
             _buffer = null;
-            ConnectPlain(widget, "changed", () =>
-            {
-                if (this.Echoing)
-                    return;
-                var target2 = Owner;
-                if (target2 != null)
-                    ((IControlNotify)target2).OnPlatformValueChanged();
-            });
-            ConnectPlain(widget, "activate", () =>
-            {
-                var target2 = Owner;
-                if (target2 != null)
-                    ((IControlNotify)target2).OnPlatformActivated();
-            });
+            WhenSignal(widget, "changed", (peer) => { ((GtkEntryPeer)peer).Edited(); });
+            WhenSignal(widget, "activate", (peer) => { ((GtkEntryPeer)peer).Entered(); });
         }
+    }
+
+    void Edited()
+    {
+        if (echoing)
+            return;
+        var target2 = Owner;
+        if (target2 != null)
+            ((IControlNotify)target2).OnPlatformValueChanged();
+    }
+
+    void Entered()
+    {
+        var target2 = Owner;
+        if (target2 != null)
+            ((IControlNotify)target2).OnPlatformActivated();
     }
 
     public override void SetText(String text)
     {
-        Echo(true);
+        var made = widget;
+        var buffer = _buffer;
         if (_multiline)
         {
-            gtk_text_buffer_set_text(_buffer, text.ToPointer(), -1);
+            Quietly(() => { gtk_text_buffer_set_text(buffer, text.ToPointer(), -1); });
         }
         else
         {
-            gtk_entry_set_text(widget, text.ToPointer());
+            Quietly(() => { gtk_entry_set_text(made, text.ToPointer()); });
         }
     }
 
@@ -853,10 +939,15 @@ public class GtkEntryPeer : GtkPeer, ITextEntryPeer
     /// A `GtkTextView` has no length limit, and neither has `TMemo`. Ignored
     /// for a multi-line entry rather than approximated with a `changed`
     /// handler that truncates, which would fight the user's cursor.
+    ///
+    /// Quietly, because a limit below the length truncates the text and GTK
+    /// reports that as an edit.
     public void SetMaxLength(int length)
     {
-        if (!_multiline)
-            gtk_entry_set_max_length(widget, length);
+        if (_multiline)
+            return;
+        var made = widget;
+        Quietly(() => { gtk_entry_set_max_length(made, length); });
     }
 
     /// **GTK hides with a fixed character and will not be told which.**
@@ -986,32 +1077,38 @@ public class GtkComboPeer : GtkPeer, IComboPeer
     {
         base(gtk_combo_box_text_new(), owner);
         _count = 0;
+        WhenSignal(widget, "changed", (peer) => { ((GtkComboPeer)peer).Chosen(); });
+    }
 
-        ConnectPlain(widget, "changed", () =>
-        {
-            if (this.Echoing)
-                return;
-            var target2 = Owner;
-            if (target2 != null)
-                ((IControlNotify)target2).OnPlatformValueChanged();
-        });
+    void Chosen()
+    {
+        if (echoing)
+            return;
+        var target2 = Owner;
+        if (target2 != null)
+            ((IControlNotify)target2).OnPlatformValueChanged();
     }
 
     public void InsertItem(int index, String text)
     {
-        gtk_combo_box_text_insert_text(widget, index, text.ToPointer());
-        _count = _count + 1;
+        var made = widget;
+        Quietly(() => { gtk_combo_box_text_insert_text(made, index, text.ToPointer()); });
+        _count++;
     }
 
+    /// Quietly, as every change to the items is: removing the chosen item
+    /// changes the choice, and that was the program's doing.
     public void RemoveItem(int index)
     {
-        gtk_combo_box_text_remove(widget, index);
-        _count = _count - 1;
+        var made = widget;
+        Quietly(() => { gtk_combo_box_text_remove(made, index); });
+        _count--;
     }
 
     public void ClearItems()
     {
-        gtk_combo_box_text_remove_all(widget);
+        var made = widget;
+        Quietly(() => { gtk_combo_box_text_remove_all(made); });
         _count = 0;
     }
 
@@ -1019,8 +1116,8 @@ public class GtkComboPeer : GtkPeer, IComboPeer
 
     public void SetSelectedIndex(int index)
     {
-        Echo(true);
-        gtk_combo_box_set_active(widget, index);
+        var made = widget;
+        Quietly(() => { gtk_combo_box_set_active(made, index); });
     }
 
     public int GetSelectedIndex() => gtk_combo_box_get_active(widget);
@@ -1055,36 +1152,43 @@ public class GtkScrollBarPeer : GtkPeer, IScrollBarPeer
                                         : GTK_ORIENTATION_HORIZONTAL, null),
              owner);
         _adjustment = gtk_range_get_adjustment(widget);
-
-        ConnectPlain(widget, "value-changed", () =>
-        {
-            if (this.Echoing)
-                return;
-            var target2 = Owner;
-            if (target2 != null)
-                ((IControlNotify)target2).OnPlatformValueChanged();
-        });
+        WhenSignal(widget, "value-changed", (peer) => { ((GtkScrollBarPeer)peer).Scrolled(); });
     }
 
-    /// **The page size is part of the range, not beside it.** A scrollbar's
-    /// thumb can never reach `maximum`: it stops a page short, which is what
-    /// makes the thumb's size mean something. Win32 takes the same three
-    /// numbers and does the same arithmetic internally.
+    void Scrolled()
+    {
+        if (echoing)
+            return;
+        var target2 = Owner;
+        if (target2 != null)
+            ((IControlNotify)target2).OnPlatformValueChanged();
+    }
+
+    /// **The page size is part of the range, not beside it.** Windows lets
+    /// the thumb reach `maximum - page + 1`, counting `maximum` as a position
+    /// the page covers; GTK stops the value at `upper - page`. So `upper` is
+    /// `maximum + 1`, and the two stop at the same place.
+    ///
+    /// Quietly, because a range that no longer holds the value clamps it.
     public void SetRange(int minimum, int maximum, int pageSize)
     {
         double page = (double)pageSize;
         if (page < 1.0)
             page = 1.0;
 
-        gtk_adjustment_configure(_adjustment, gtk_adjustment_get_value(_adjustment),
-                                 (double)minimum, (double)maximum + page,
-                                 1.0, page, page);
+        var adjustment = _adjustment;
+        Quietly(() =>
+        {
+            gtk_adjustment_configure(adjustment, gtk_adjustment_get_value(adjustment),
+                                     (double)minimum, (double)maximum + 1.0,
+                                     1.0, page, page);
+        });
     }
 
     public void SetValue(int value)
     {
-        Echo(true);
-        gtk_adjustment_set_value(_adjustment, (double)value);
+        var adjustment = _adjustment;
+        Quietly(() => { gtk_adjustment_set_value(adjustment, (double)value); });
     }
 
     public int GetValue() => (int)gtk_adjustment_get_value(_adjustment);
@@ -1097,6 +1201,9 @@ public class GtkGroupPeer : GtkContainerPeer, IGroupPeer
     public GtkGroupPeer(IControlNotify owner)
     {
         base(gtk_frame_new(null), owner, gtk_fixed_new());
+        // A window of its own, so that the mouse over the interior is the
+        // group's and not the form's: see `GtkPanelPeer`.
+        gtk_widget_set_has_window(content, 1);
         gtk_container_add(widget, content);
         gtk_widget_show(content);
         ReportPaints();
@@ -1132,6 +1239,14 @@ public class GtkPanelPeer : GtkContainerPeer, IPanelPeer
     public GtkPanelPeer(IControlNotify owner)
     {
         base(gtk_frame_new(null), owner, gtk_fixed_new());
+
+        // **A window of its own, or the mouse goes to the form.** A `GtkFixed`
+        // is windowless: it occupies a region of its parent's window, so GTK
+        // gives a click on it to whatever owns that window, and a panel -- and
+        // every graphic control on one -- was never clicked at all. A Win32
+        // panel is a window. A `GtkFixed` with a window still draws no
+        // background, which is what `GtkCustomPeer` relies on too.
+        gtk_widget_set_has_window(content, 1);
         gtk_container_add(widget, content);
         gtk_widget_show(content);
         gtk_frame_set_shadow_type(widget, GTK_SHADOW_NONE);
@@ -1164,26 +1279,29 @@ public class GtkSpinPeer : GtkPeer, ISpinPeer
     {
         base(gtk_spin_button_new_with_range(0.0, 100.0, 1.0), owner);
         gtk_spin_button_set_digits(widget, 0);
-
-        ConnectPlain(widget, "value-changed", () =>
-        {
-            if (this.Echoing)
-                return;
-            var target2 = Owner;
-            if (target2 != null)
-                ((IControlNotify)target2).OnPlatformValueChanged();
-        });
+        WhenSignal(widget, "value-changed", (peer) => { ((GtkSpinPeer)peer).Spun(); });
     }
 
+    void Spun()
+    {
+        if (echoing)
+            return;
+        var target2 = Owner;
+        if (target2 != null)
+            ((IControlNotify)target2).OnPlatformValueChanged();
+    }
+
+    /// Quietly, because a range that no longer holds the value clamps it.
     public void SetRange(int minimum, int maximum)
     {
-        gtk_spin_button_set_range(widget, (double)minimum, (double)maximum);
+        var made = widget;
+        Quietly(() => { gtk_spin_button_set_range(made, (double)minimum, (double)maximum); });
     }
 
     public void SetValue(int value)
     {
-        Echo(true);
-        gtk_spin_button_set_value(widget, (double)value);
+        var made = widget;
+        Quietly(() => { gtk_spin_button_set_value(made, (double)value); });
     }
 
     public int GetValue() => gtk_spin_button_get_value_as_int(widget);
@@ -1208,6 +1326,15 @@ public class GtkProgressPeer : GtkPeer, IProgressPeer
         _now = 0;
         _pulsing = false;
         _pulse = 0u;
+    }
+
+    ~GtkProgressPeer()
+    {
+        if (_pulse != 0u)
+        {
+            g_source_remove((guint)_pulse);
+            _pulse = 0u;
+        }
     }
 
     public void SetRange(int minimum, int maximum)
@@ -1244,19 +1371,25 @@ public class GtkProgressPeer : GtkPeer, IProgressPeer
             Show();
             return;
         }
-        // Through a method: a lambda captures `widget` by value, and a peer
-        // destroyed while pulsing would leave this one pulsing a widget that
-        // is gone.
-        _pulse = Tick(250, () => { return Pulse(); });
+        // Through the relay, for the reason every handler is: a source that
+        // held the peer would keep it, and its widget, pulsing for ever.
+        var relay = Relay;
+        _pulse = Tick(250, () =>
+        {
+            var peer = relay.Peer;
+            return peer != null && ((GtkProgressPeer)peer).Pulse();
+        });
     }
 
     /// One step of the back-and-forth, and false once there is nothing left to
-    /// step -- which is what takes the source off the loop when the control
-    /// is destroyed.
+    /// step, which takes the source off the loop.
     bool Pulse()
     {
-        if (widget == null)
+        if (widget == null || !_pulsing)
+        {
+            _pulse = 0u;
             return false;
+        }
         gtk_progress_bar_pulse(widget);
         return true;
     }
@@ -1294,28 +1427,31 @@ public class GtkTrackBarPeer : GtkPeer, ITrackBarPeer
         _high = 100;
         gtk_scale_set_draw_value(widget, 0);
         gtk_scale_set_digits(widget, 0);
-
-        ConnectPlain(widget, "value-changed", () =>
-        {
-            if (this.Echoing)
-                return;
-            var target2 = Owner;
-            if (target2 != null)
-                ((IControlNotify)target2).OnPlatformValueChanged();
-        });
+        WhenSignal(widget, "value-changed", (peer) => { ((GtkTrackBarPeer)peer).Slid(); });
     }
 
+    void Slid()
+    {
+        if (echoing)
+            return;
+        var target2 = Owner;
+        if (target2 != null)
+            ((IControlNotify)target2).OnPlatformValueChanged();
+    }
+
+    /// Quietly, because a range that no longer holds the value clamps it.
     public void SetRange(int minimum, int maximum)
     {
         _low = minimum;
         _high = maximum;
-        gtk_range_set_range(widget, (double)minimum, (double)maximum);
+        var made = widget;
+        Quietly(() => { gtk_range_set_range(made, (double)minimum, (double)maximum); });
     }
 
     public void SetValue(int value)
     {
-        Echo(true);
-        gtk_range_set_value(widget, (double)value);
+        var made = widget;
+        Quietly(() => { gtk_range_set_value(made, (double)value); });
     }
 
     public int GetValue() => (int)gtk_range_get_value(widget);
@@ -1371,6 +1507,9 @@ public class GtkTabControlPeer : GtkContainerPeer, ITabControlPeer
     /// looks like the first.
     GtkPeer? _waiting;
 
+    /// The page GTK last said was current, or -1.
+    int _shown;
+
     public GtkTabControlPeer(IControlNotify owner)
     {
         base(gtk_notebook_new(), owner, gtk_fixed_new());
@@ -1378,6 +1517,7 @@ public class GtkTabControlPeer : GtkContainerPeer, ITabControlPeer
         _reported = Area(0, 0, 0, 0);
         _queued = false;
         _waiting = null;
+        _shown = -1;
 
         // **A page is the one child GTK sizes rather than the layout.**
         //
@@ -1397,9 +1537,9 @@ public class GtkTabControlPeer : GtkContainerPeer, ITabControlPeer
         // lay out again. It reports the tab control's own extent unchanged --
         // nothing about *it* moved -- which is enough to reach `OnResize`, and
         // `TabControl.OnResize` is what calls `ShowOnly`.
-        ConnectEvent(widget, "size-allocate", (sender, carried) =>
+        WhenEvent(widget, "size-allocate", (peer, carried) =>
         {
-            return Reallocated();
+            return ((GtkTabControlPeer)peer).Reallocated();
         });
 
         // **`notify::page` rather than `switch-page`, and the reason is a
@@ -1410,15 +1550,26 @@ public class GtkTabControlPeer : GtkContainerPeer, ITabControlPeer
         // read out of a `guint`, and a segfault at the first tab added. The
         // property notification carries a `GParamSpec*` and fits, and it says
         // the same thing.
-        ConnectEvent(widget, "notify::page", (sender, carried) =>
+        WhenEvent(widget, "notify::page", (peer, carried) =>
         {
-            if (this.Echoing)
-                return false;
-            var target2 = Owner;
-            if (target2 != null)
-                ((IControlNotify)target2).OnPlatformValueChanged();
+            ((GtkTabControlPeer)peer).Switched();
             return false;
         });
+    }
+
+    /// **Once per change of page**, which GTK is not: one switch notifies
+    /// `page` twice. The page is recorded even while the guard is up, so that a
+    /// change the program made is not reported later as the user's.
+    void Switched()
+    {
+        int now = gtk_notebook_get_current_page(widget);
+        bool moved = now != _shown;
+        _shown = now;
+        if (echoing || !moved)
+            return;
+        var target2 = Owner;
+        if (target2 != null)
+            ((IControlNotify)target2).OnPlatformValueChanged();
     }
 
     /// **Owned, and that is what makes removing one safe.** A notebook holds
@@ -1441,8 +1592,12 @@ public class GtkTabControlPeer : GtkContainerPeer, ITabControlPeer
     {
         GtkWidget* page = (GtkWidget*)g_object_ref_sink((gpointer)gtk_fixed_new());
         gtk_widget_show(page);
-        int index = gtk_notebook_append_page(widget, page,
-                                             gtk_label_new(text.ToPointer()));
+
+        // Quietly: the first page appended becomes the current one, and GTK
+        // reports that as a change of page.
+        int index = (int)_pages.Count;
+        var book = widget;
+        Quietly(() => { gtk_notebook_append_page(book, page, gtk_label_new(text.ToPointer())); });
         _pages.Add(page);
         if (_pages.Count == 1u)
             content = page;
@@ -1494,8 +1649,8 @@ public class GtkTabControlPeer : GtkContainerPeer, ITabControlPeer
 
     public void SetSelectedTab(int index)
     {
-        Echo(true);
-        gtk_notebook_set_current_page(widget, index);
+        var book = widget;
+        Quietly(() => { gtk_notebook_set_current_page(book, index); });
         if (index >= 0 && (nuint)index < _pages.Count)
             content = _pages[(nuint)index];
     }
@@ -1577,7 +1732,14 @@ public class GtkTabControlPeer : GtkContainerPeer, ITabControlPeer
         if (!_queued)
         {
             _queued = true;
-            Tick(0, () => { return Relayout(); });
+            var relay = Relay;
+            Tick(0, () =>
+            {
+                var peer = relay.Peer;
+                if (peer != null)
+                    ((GtkTabControlPeer)peer).Relayout();
+                return false;
+            });
         }
         return false;
     }
@@ -1724,31 +1886,22 @@ public class GtkToolBarPeer : GtkPeer, IToolBarPeer
 
         if (kind != ToolButtonKind.Separator)
         {
-            ConnectPlain(item, "clicked", () =>
-            {
-                // **A toggle set by the program emits this too**, which is the
-                // difference between the two backends and was a crash rather
-                // than a cosmetic bug: `gtk_toggle_tool_button_set_active`
-                // raises `clicked` synchronously, so `BoldButton.Checked =
-                // true` in a form's constructor ran the button's own handler
-                // before the rest of the form existed. Windows does not --
-                // `TB_CHECKBUTTON` notifies nobody -- so a program written and
-                // tested there met it for the first time on Linux.
-                //
-                // `this.Echoing`, never the bare field: a lambda captures a
-                // bare member read by value when it is made, so the field form
-                // tests what the flag said at connection time and guards
-                // nothing at all. See `GtkPeer.Echoing`.
-                if (this.Echoing)
-                    return;
-                var target2 = Owner;
-                if (target2 != null)
-                {
-                    ((IControlNotify)target2).OnPlatformToolClicked(index);
-                }
-            });
+            WhenSignal(item, "clicked", (peer) => { ((GtkToolBarPeer)peer).Clicked(index); });
         }
         return index;
+    }
+
+    /// **A toggle set by the program emits `clicked` too**, which is the
+    /// difference between the two backends: `gtk_toggle_tool_button_set_active`
+    /// raises it synchronously, and `TB_CHECKBUTTON` notifies nobody. So
+    /// `SetButtonChecked` is quiet and this listens for the guard.
+    void Clicked(int index)
+    {
+        if (echoing)
+            return;
+        var target2 = Owner;
+        if (target2 != null)
+            ((IControlNotify)target2).OnPlatformToolClicked(index);
     }
 
     /// A GTK tool item is a widget, so what the platform calls one is its
@@ -1776,11 +1929,9 @@ public class GtkToolBarPeer : GtkPeer, IToolBarPeer
             return;
 
         // Quiet, because this is the program speaking and not the user. The
-        // click that comes back out of this call is the one the handler above
-        // drops.
-        Echo(true);
-        gtk_toggle_tool_button_set_active(_items[(nuint)index], checked ? 1 : 0);
-        Echo(false);
+        // click that comes back out of this call is the one `Clicked` drops.
+        var item = _items[(nuint)index];
+        Quietly(() => { gtk_toggle_tool_button_set_active(item, checked ? 1 : 0); });
     }
 
     public bool GetButtonChecked(int index)
@@ -1849,18 +2000,28 @@ public class GtkTimerPeer : ITimerPeer
         if (milliseconds <= 0)
             return;
 
-        // Through a method, for the reason every handler in this backend is:
-        // a lambda captures a member read by value, and `target` is a member.
-        _source = Tick(milliseconds, () => { return Fire(); });
+        // The source holds a weak reference and not the peer, for the reason
+        // a signal handler does: see `PeerRelay`. A source holding the peer
+        // would keep a dropped timer ticking.
+        var relay = new TimerRelay(this);
+        _source = Tick(milliseconds, () =>
+        {
+            var peer = relay.Peer;
+            return peer != null && ((GtkTimerPeer)peer).Fire();
+        });
     }
 
     /// Reports a tick, and false once there is nobody to report to -- which
-    /// is what takes the source off the loop when the control has gone.
+    /// takes the source off the loop, so it is forgotten here too and `Stop`
+    /// does not remove it a second time.
     bool Fire()
     {
         ITimerNotify? owner = target;
         if (owner == null)
+        {
+            _source = 0u;
             return false;
+        }
         ((ITimerNotify)owner).OnPlatformTick();
         return true;
     }
@@ -1871,6 +2032,23 @@ public class GtkTimerPeer : ITimerPeer
             return;
         g_source_remove((guint)_source);
         _source = 0u;
+    }
+}
+
+/// What a timer's source holds instead of the timer. See `PeerRelay`.
+class TimerRelay
+{
+    weak GtkTimerPeer? _peer;
+
+    public TimerRelay(GtkTimerPeer peer) => _peer = peer;
+
+    public GtkTimerPeer? Peer
+    {
+        get
+        {
+            GtkTimerPeer? held = _peer;
+            return held;
+        }
     }
 }
 
@@ -1911,6 +2089,11 @@ public class GtkCustomPeer : GtkContainerPeer, ICustomPeer
     bool _blinking;
     bool _focusable;
 
+    /// Which blink timer is the live one. Every start and stop moves it on,
+    /// so a timer from before the focus was lost and regained stops itself
+    /// rather than running beside the new one at twice the rate.
+    int _blinkRun;
+
     public GtkCustomPeer(IControlNotify owner)
     {
         base(gtk_frame_new(null), owner, gtk_fixed_new());
@@ -1940,23 +2123,32 @@ public class GtkCustomPeer : GtkContainerPeer, ICustomPeer
         _blinkOn = true;
         _blinking = false;
         _focusable = true;
+        _blinkRun = 0;
         gtk_widget_set_can_focus(content, 1);
 
-        // Through methods rather than reading the fields, for the reason every
-        // handler in this backend is: a lambda captures a bare member read by
-        // value at the moment it is made.
-        ConnectEvent(content, "draw", (sender, carried) => { return Painted(carried); });
+        WhenEvent(content, "draw", (peer, carried) =>
+        {
+            return ((GtkCustomPeer)peer).Painted(carried);
+        });
 
         // GTK does not focus a clicked widget either; only an entry and a
         // button do, from their own handlers.
-        ConnectEvent(content, "button-press-event", (sender, carried) =>
+        WhenEvent(content, "button-press-event", (peer, carried) =>
         {
-            TakeFocus();
+            ((GtkCustomPeer)peer).TakeFocus();
             return false;
         });
 
-        ConnectEvent(content, "focus-in-event",  (sender, carried) => { Blink(true);  return false; });
-        ConnectEvent(content, "focus-out-event", (sender, carried) => { Blink(false); return false; });
+        WhenEvent(content, "focus-in-event", (peer, carried) =>
+        {
+            ((GtkCustomPeer)peer).Blink(true);
+            return false;
+        });
+        WhenEvent(content, "focus-out-event", (peer, carried) =>
+        {
+            ((GtkCustomPeer)peer).Blink(false);
+            return false;
+        });
     }
 
     public void SetBorder(ControlBorder border)
@@ -2018,37 +2210,48 @@ public class GtkCustomPeer : GtkContainerPeer, ICustomPeer
     /// Starts or stops the blink.
     ///
     /// The source is not held and never removed: `Phase` answers false as soon
-    /// as the control is unfocused or gone, and a GLib source that answers
-    /// false takes itself off the loop. Holding the tag would mean removing it
-    /// from a destructor that may run after the loop has stopped.
+    /// as it is not the live run, the control is unfocused or the peer has
+    /// gone, and a GLib source that answers false takes itself off the loop.
+    /// Holding the tag would mean removing it from a destructor that may run
+    /// after the loop has stopped.
     void Blink(bool on)
     {
         _blinkOn = true;
         if (!on)
         {
             _blinking = false;
+            _blinkRun++;
             gtk_widget_queue_draw(content);
             return;
         }
         if (_blinking)
             return;
         _blinking = true;
-        Tick(BlinkHalfCycle, () => { return this.Phase; });
+        _blinkRun++;
+
+        int run = _blinkRun;
+        var relay = Relay;
+        Tick(BlinkHalfCycle, () =>
+        {
+            var peer = relay.Peer;
+            return peer != null && ((GtkCustomPeer)peer).Phase(run);
+        });
     }
 
-    bool Phase
+    /// One half of the blink, for the timer started as `run`. False takes
+    /// that timer off the loop.
+    bool Phase(int run)
     {
-        get
+        if (run != _blinkRun)
+            return false;
+        if (Owner == null || !_blinking || !Focused)
         {
-            if (Owner == null || !_blinking || !Focused)
-            {
-                _blinking = false;
-                return false;
-            }
-            _blinkOn = !_blinkOn;
-            gtk_widget_queue_draw(content);
-            return true;
+            _blinking = false;
+            return false;
         }
+        _blinkOn = !_blinkOn;
+        gtk_widget_queue_draw(content);
+        return true;
     }
 
     /// **False, so that GTK's own handler still runs.** For a `GtkFixed` that

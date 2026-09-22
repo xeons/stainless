@@ -325,26 +325,96 @@ public MouseButton ButtonOf(GdkEvent* event)
     return MouseButton.None;
 }
 
-/// Where an event happened, in the widget's own coordinates.
-public FPoint PointOf(GdkEvent* event)
+/// The largest whole number not above `value`, which a cast is not for a
+/// negative one.
+int FloorToInt(gdouble value)
 {
-    gdouble x = 0.0;
-    gdouble y = 0.0;
-    gdk_event_get_coords(event, &x, &y);
-    return At((int)x, (int)y);
+    int whole = (int)value;
+    if ((gdouble)whole > value)
+        whole--;
+    return whole;
 }
 
-/// A GDK keyval as one of the seam's keys.
+/// A key event as one of the seam's keys.
 ///
 /// **The seam numbers keys the Win32 way**, which it says so in its own
 /// comment: one backend has to own the numbering and Windows' is the one with
 /// a name for everything. So this is the mapping that comment promised.
 ///
-/// The printable range needs no table. GDK's keyval for an ASCII letter *is*
-/// its character code, so `a` is 0x61 and `A` is 0x41, and the seam's `Key.A`
-/// is 65 -- which means folding case is the whole of the conversion. The
-/// digits line up exactly.
-public Key KeyOf(guint keyval)
+/// **The key, not the character.** A keyval says what the keystroke typed, so
+/// Shift+1 is `!` and Shift+Tab is `ISO_Left_Tab`; Windows names the key, so
+/// both are the unshifted key. The keycode is looked up again with nothing
+/// held but Num Lock, which is what makes the answer the key's.
+public Key KeyOf(GdkEvent* event)
+{
+    guint keyval = 0u;
+    gdk_event_get_keyval(event, &keyval);
+
+    guint16 keycode = 0u;
+    gpointer keymap = gdk_keymap_get_for_display(gdk_display_get_default());
+    if (keymap == null || gdk_event_get_keycode(event, &keycode) == 0)
+        return KeyOfKeyval(keyval);
+
+    guint state = 0u;
+    gdk_event_get_state(event, &state);
+    guint numLock = state & GDK_MOD2_MASK;
+
+    guint plain = 0u;
+    if (gdk_keymap_translate_keyboard_state(keymap, (guint)keycode, numLock, 0,
+                                            &plain, null, null, null) != 0)
+    {
+        var key = KeyOfKeyval(plain);
+        if (key != Key.None)
+            return key;
+    }
+
+    // A layout whose digits are shifted, as French puts them, still has the
+    // digit on the key.
+    guint shifted = 0u;
+    if (gdk_keymap_translate_keyboard_state(keymap, (guint)keycode,
+                                            numLock | GDK_SHIFT_MASK, 0,
+                                            &shifted, null, null, null) != 0
+        && shifted >= 0x30u && shifted <= 0x39u)
+    {
+        return (Key)(int)shifted;
+    }
+    return KeyOfKeyval(keyval);
+}
+
+/// Whether a key press is a shortcut rather than typing: Control or Alt held,
+/// and not used up in choosing the character.
+///
+/// Windows reports Ctrl+C as the control code 3 and Alt+C as a system
+/// character, and neither reaches a text control as a C. A layout that types
+/// a character through one of the two has consumed it, and that character is
+/// typed.
+public bool IsShortcut(GdkEvent* event)
+{
+    guint state = 0u;
+    gdk_event_get_state(event, &state);
+    guint held = state & (GDK_CONTROL_MASK | GDK_MOD1_MASK);
+    if (held == 0u)
+        return false;
+
+    guint16 keycode = 0u;
+    gpointer keymap = gdk_keymap_get_for_display(gdk_display_get_default());
+    if (keymap == null || gdk_event_get_keycode(event, &keycode) == 0)
+        return true;
+
+    guint consumed = 0u;
+    gdk_keymap_translate_keyboard_state(keymap, (guint)keycode, state, 0,
+                                        null, null, null, &consumed);
+    return (held & ~consumed) != 0u;
+}
+
+/// A keyval as one of the seam's keys, or `None` for one Windows has no key
+/// for.
+///
+/// GDK's keyval for an ASCII letter *is* its character code, so `a` is 0x61
+/// and `Key.A` is 65, and folding case is the whole of the conversion. The
+/// digits, the function keys and the keypad digits are consecutive in both
+/// numberings.
+public Key KeyOfKeyval(guint keyval)
 {
     if (keyval >= 0x61u && keyval <= 0x7Au)
         return (Key)(int)(keyval - 0x20u);
@@ -352,46 +422,181 @@ public Key KeyOf(guint keyval)
         return (Key)(int)keyval;
     if (keyval >= 0x30u && keyval <= 0x39u)
         return (Key)(int)keyval;
-    if (keyval == 0x20u)
-        return Key.Space;
-
-    if (keyval == GDK_KEY_BackSpace)
-        return Key.Backspace;
-    if (keyval == GDK_KEY_Tab)
-        return Key.Tab;
-    if (keyval == GDK_KEY_Return)
-        return Key.Enter;
-    if (keyval == GDK_KEY_Escape)
-        return Key.Escape;
-    if (keyval == GDK_KEY_Delete)
-        return Key.Delete;
-    if (keyval == GDK_KEY_Insert)
-        return Key.Insert;
-    if (keyval == GDK_KEY_Home)
-        return Key.Home;
-    if (keyval == GDK_KEY_End)
-        return Key.End;
-    if (keyval == GDK_KEY_Left)
-        return Key.Left;
-    if (keyval == GDK_KEY_Up)
-        return Key.Up;
-    if (keyval == GDK_KEY_Right)
-        return Key.Right;
-    if (keyval == GDK_KEY_Down)
-        return Key.Down;
-    if (keyval == GDK_KEY_Page_Up)
-        return Key.PageUp;
-    if (keyval == GDK_KEY_Page_Down)
-        return Key.PageDown;
-
-    // The function keys are consecutive in both numberings, so one subtraction
-    // covers all twelve rather than twelve comparisons.
     if (keyval >= GDK_KEY_F1 && keyval <= GDK_KEY_F1 + 11u)
-    {
         return (Key)(int)((keyval - GDK_KEY_F1) + 112u);
+    // `VK_NUMPAD0` is 96.
+    if (keyval >= GDK_KEY_KP_0 && keyval <= GDK_KEY_KP_9)
+        return (Key)(int)((keyval - GDK_KEY_KP_0) + 96u);
+
+    switch (keyval)
+    {
+        case GDK_KEY_space:
+            return Key.Space;
+        case GDK_KEY_BackSpace:
+            return Key.Backspace;
+        case GDK_KEY_Tab:
+        case GDK_KEY_ISO_Left_Tab:
+            return Key.Tab;
+        case GDK_KEY_Return:
+        case GDK_KEY_KP_Enter:
+            return Key.Enter;
+        case GDK_KEY_Escape:
+            return Key.Escape;
+        case GDK_KEY_Delete:
+        case GDK_KEY_KP_Delete:
+            return Key.Delete;
+        case GDK_KEY_Insert:
+        case GDK_KEY_KP_Insert:
+            return Key.Insert;
+        case GDK_KEY_Home:
+        case GDK_KEY_KP_Home:
+            return Key.Home;
+        case GDK_KEY_End:
+        case GDK_KEY_KP_End:
+            return Key.End;
+        case GDK_KEY_Left:
+        case GDK_KEY_KP_Left:
+            return Key.Left;
+        case GDK_KEY_Up:
+        case GDK_KEY_KP_Up:
+            return Key.Up;
+        case GDK_KEY_Right:
+        case GDK_KEY_KP_Right:
+            return Key.Right;
+        case GDK_KEY_Down:
+        case GDK_KEY_KP_Down:
+            return Key.Down;
+        case GDK_KEY_Page_Up:
+        case GDK_KEY_KP_Page_Up:
+            return Key.PageUp;
+        case GDK_KEY_Page_Down:
+        case GDK_KEY_KP_Page_Down:
+            return Key.PageDown;
+        case GDK_KEY_Shift_L:
+        case GDK_KEY_Shift_R:
+            return Key.Shift;
+        case GDK_KEY_Control_L:
+        case GDK_KEY_Control_R:
+            return Key.Control;
+        // AltGr is the right Alt key, and Windows calls it that.
+        case GDK_KEY_Alt_L:
+        case GDK_KEY_Alt_R:
+        case GDK_KEY_Meta_L:
+        case GDK_KEY_Meta_R:
+        case GDK_KEY_ISO_Level3_Shift:
+            return Key.Alt;
+        case GDK_KEY_Pause:
+            return Key.Pause;
+        case GDK_KEY_Caps_Lock:
+            return Key.CapsLock;
+    }
+
+    // Keys Windows numbers and the seam has not named yet.
+    switch (keyval)
+    {
+        case GDK_KEY_Clear:
+        case GDK_KEY_KP_Begin:
+            return (Key)12;
+        case GDK_KEY_Print:
+            return (Key)44;
+        case GDK_KEY_Super_L:
+            return (Key)91;
+        case GDK_KEY_Super_R:
+            return (Key)92;
+        case GDK_KEY_Menu:
+            return (Key)93;
+        case GDK_KEY_KP_Multiply:
+            return (Key)106;
+        case GDK_KEY_KP_Add:
+            return (Key)107;
+        case GDK_KEY_KP_Separator:
+            return (Key)108;
+        case GDK_KEY_KP_Subtract:
+            return (Key)109;
+        case GDK_KEY_KP_Decimal:
+            return (Key)110;
+        case GDK_KEY_KP_Divide:
+            return (Key)111;
+        case GDK_KEY_Num_Lock:
+            return (Key)144;
+        case GDK_KEY_Scroll_Lock:
+            return (Key)145;
+        // The punctuation keys of a US layout, `VK_OEM_*`.
+        case 0x3Bu:
+            return (Key)186;
+        case 0x3Du:
+            return (Key)187;
+        case 0x2Cu:
+            return (Key)188;
+        case 0x2Du:
+            return (Key)189;
+        case 0x2Eu:
+            return (Key)190;
+        case 0x2Fu:
+            return (Key)191;
+        case 0x60u:
+            return (Key)192;
+        case 0x5Bu:
+            return (Key)219;
+        case 0x5Cu:
+            return (Key)220;
+        case 0x5Du:
+            return (Key)221;
+        case 0x27u:
+            return (Key)222;
     }
     return Key.None;
 }
+
+// ============================================================== the relay
+
+/// What a signal handler holds in place of the peer it reports for.
+///
+/// **A handler MUST NOT capture its peer.** GTK holds a handler for as long as
+/// the widget lives and the peer holds the widget, so a closure over the peer
+/// closes a loop that ARC cannot see into: neither is ever freed, and a form
+/// that was dropped keeps its window, its timers and its handlers. A handler
+/// holds one of these instead, which answers null once the peer has gone.
+public class PeerRelay
+{
+    weak GtkPeer? _peer;
+    weak IControlNotify? _target;
+
+    public PeerRelay(GtkPeer peer, IControlNotify? owner)
+    {
+        _peer = peer;
+        _target = owner;
+    }
+
+    /// The control the peer reports to, or null once it has gone.
+    public IControlNotify? Owner
+    {
+        get
+        {
+            IControlNotify? held = _target;
+            return held;
+        }
+    }
+
+    public GtkPeer? Peer
+    {
+        get
+        {
+            GtkPeer? held = _peer;
+            return held;
+        }
+    }
+}
+
+/// A handler for a signal that carries nothing, given the peer it is for.
+public closure void PeerSignal(GtkPeer peer);
+
+/// A handler for a signal that carries one pointer and answers.
+public closure bool PeerEvent(GtkPeer peer, gpointer carried);
+
+/// The key a peer's widgets carry, naming the widget that peer reports the
+/// mouse in. How an event is traced back to the peer it belongs to.
+static readonly String PeerMark = "forms-peer";
 
 // ============================================================== the peer
 
@@ -441,8 +646,18 @@ public class GtkPeer : IControlPeer
     /// True while the *program* is setting a value, so that the signal GTK
     /// raises for it is not reported back as the user's doing. The seam is
     /// explicit that `OnPlatformValueChanged` is never raised for a change the
-    /// program made, and this is what keeps that true.
+    /// program made, and this is what keeps that true. Raised by `Quietly`.
     protected bool echoing;
+
+    /// What this peer's handlers hold instead of the peer. See `PeerRelay`.
+    PeerRelay _relay;
+
+    /// Whether this peer holds the mouse, in which case every mouse event is
+    /// its to report, as it is for a window that has called `SetCapture`.
+    bool _captured;
+
+    /// Whether the `realize` handler that applies the cursor is connected.
+    bool _cursorWatched;
 
     public GtkPeer(GtkWidget* made, IControlNotify? owner)
     {
@@ -459,27 +674,26 @@ public class GtkPeer : IControlPeer
         destroyed = false;
         shape = CursorKind.Default;
         echoing = false;
+        _captured = false;
+        _cursorWatched = false;
+        _relay = new PeerRelay(this, owner);
     }
 
-    /// **Never read as a bare field from inside a lambda.**
+    /// Makes a change the program asked for with the echo guard up, so that
+    /// the signal GTK raises for it is not reported as the user's.
     ///
-    /// A lambda captures a bare member *read* by value at the moment it is
-    /// made (spec §2.15), so `if (echoing)` inside a handler tests what the
-    /// flag said when the handler was connected -- which is false, for ever.
-    /// Written that way it compiles, runs, and silently guards nothing: a
-    /// program that ticked a checked menu item from its own click handler
-    /// recursed until the stack ran out, and the backtrace was thirty frames
-    /// of GObject with nothing in it to suggest a capture rule.
-    ///
-    /// `this.echoing` would do -- naming the receiver captures the object and
-    /// reads the field through it -- and a call does the same thing for the
-    /// same reason. The call is what this backend uses, because the two names
-    /// say what the pair is for at every one of the dozen sites that uses it.
-    ///
-    /// The compiler warns about the bare form now (SL0610), which it did not
-    /// while this was being written.
-    protected bool Echoing => echoing;
-    protected void Echo(bool on) => echoing = on;
+    /// **Every setter whose GTK call emits a signal the peer listens to MUST
+    /// go through this**, and that includes calls that change a value only as
+    /// a side effect: a range narrowed past the value clamps it, removing the
+    /// selected row changes the selection. The guard is restored rather than
+    /// lowered, so a change made inside another does not lower it early.
+    protected void Quietly(Handler change)
+    {
+        bool was = echoing;
+        echoing = true;
+        change();
+        echoing = was;
+    }
 
     ~GtkPeer() { Destroy(); }
 
@@ -493,6 +707,38 @@ public class GtkPeer : IControlPeer
             IControlNotify? held = target;
             return held;
         }
+    }
+
+    /// What this peer's handlers hold, for one a subclass connects itself.
+    protected PeerRelay Relay => _relay;
+
+    /// Connects `handler` to a signal that carries nothing, handing it this
+    /// peer for as long as the peer lives. See `PeerRelay`.
+    ///
+    /// **`handler` MUST NOT capture the peer**: it reaches it through its
+    /// argument, which is the point.
+    protected gulong WhenSignal(GtkWidget* instance, String signal, PeerSignal handler)
+    {
+        var relay = _relay;
+        return ConnectPlain(instance, signal, () =>
+        {
+            var peer = relay.Peer;
+            if (peer != null)
+                handler((GtkPeer)peer);
+        });
+    }
+
+    /// The same, for a signal that carries one pointer and answers.
+    protected gulong WhenEvent(GtkWidget* instance, String signal, PeerEvent handler)
+    {
+        var relay = _relay;
+        return ConnectEvent(instance, signal, (sender, carried) =>
+        {
+            var peer = relay.Peer;
+            if (peer == null)
+                return false;
+            return handler((GtkPeer)peer, carried);
+        });
     }
 
     /// Says which widget carries the signals and the style, for a peer whose
@@ -510,138 +756,153 @@ public class GtkPeer : IControlPeer
 
     // ---------------------------------------------------------- the input
 
+    /// The widget this peer reports the mouse from, and in whose coordinates.
+    ///
+    /// `inner` for everything but a window, whose surface is its client area:
+    /// Win32 reports a form's mouse in client coordinates, below the menu bar,
+    /// and does not report a click on the menu bar to the form at all.
+    protected virtual GtkWidget* Surface => inner;
+
+    /// Marks this peer's widgets as its own, so that `IsFor` can trace an
+    /// event from the widget GTK gave it to back to this peer.
+    protected virtual void Mark()
+    {
+        gpointer surface = (gpointer)Surface;
+        g_object_set_data((gpointer)widget, PeerMark.ToPointer(), surface);
+        g_object_set_data((gpointer)inner, PeerMark.ToPointer(), surface);
+    }
+
+    /// Whether a mouse event is this peer's to report.
+    ///
+    /// **GTK gives an event to the widget under the pointer and then to each of
+    /// its ancestors in turn; Win32 sends it to one window.** So a peer
+    /// reports an event only when the nearest marked widget at or above the one
+    /// GTK gave it to is its own. A widget with no window of its own -- a label
+    /// -- has its events given to its parent, which is also where a `STATIC`
+    /// sends them on Windows.
+    bool IsFor(GdkEvent* event)
+    {
+        if (_captured)
+            return true;
+
+        GtkWidget* at = gtk_get_event_widget(event);
+        while (at != null)
+        {
+            gpointer mark = g_object_get_data((gpointer)at, PeerMark.ToPointer());
+            if (mark != null)
+                return mark == (gpointer)Surface;
+            at = gtk_widget_get_parent(at);
+        }
+        return false;
+    }
+
+    /// Where the surface's corner is on the screen.
+    ///
+    /// A widget with no window of its own is drawn on its parent's, and its
+    /// allocation says where on it.
+    FPoint SurfaceOrigin()
+    {
+        GtkWidget* surface = Surface;
+        gpointer window = gtk_widget_get_window(surface);
+        if (window == null)
+            return At(0, 0);
+
+        gint x = 0;
+        gint y = 0;
+        gdk_window_get_origin((GdkWindow*)window, &x, &y);
+        if (gtk_widget_get_has_window(surface) == 0)
+        {
+            GdkRectangle allocation;
+            gtk_widget_get_allocation(surface, &allocation);
+            x += allocation.X;
+            y += allocation.Y;
+        }
+        return At(x, y);
+    }
+
+    /// Where a mouse event happened, in this peer's own coordinates.
+    ///
+    /// **Not the event's coordinates**, which are in whichever window GTK
+    /// delivered it to -- a child's, or a parent's for a widget with no window.
+    /// The position on the screen is the same whoever receives it.
+    FPoint LocalPointOf(GdkEvent* event)
+    {
+        gdouble x = 0.0;
+        gdouble y = 0.0;
+        gdk_event_get_root_coords(event, &x, &y);
+        var origin = SurfaceOrigin();
+        return At(FloorToInt(x) - origin.X, FloorToInt(y) - origin.Y);
+    }
+
     /// Subscribes to everything `IControlNotify` reports.
     ///
     /// **Not in the constructor**, because a subclass may not have settled
     /// which widget is `inner` yet, and because a peer with no notification
     /// target -- a menu's, a timer's -- has nothing to subscribe on behalf of.
     /// Every `Create` in `WidgetSet.sl` calls it once.
+    ///
+    /// The mouse is heard on `Surface` and the keyboard on `inner`, which
+    /// differ only for a window: its keys arrive at the window, and its mouse
+    /// at the client area.
+    ///
+    /// Every handler answers false, so that the widget's own handling still
+    /// runs: GTK calls a handler connected here *before* the widget's class
+    /// handler, and answering true would stop a button being pressed or an
+    /// entry placing its cursor. `IsFor` is what keeps an ancestor quiet.
     public void Listen()
     {
+        Mark();
         if (Owner == null)
             return;
 
-        gtk_widget_add_events(inner,
+        GtkWidget* mouse = Surface;
+        gtk_widget_add_events(mouse,
             GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
             GDK_POINTER_MOTION_MASK | GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK |
-            GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK |
-            GDK_FOCUS_CHANGE_MASK | GDK_SCROLL_MASK);
+            GDK_SCROLL_MASK);
+        gtk_widget_add_events(inner,
+            GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK | GDK_FOCUS_CHANGE_MASK);
 
-        ConnectEvent(inner, "button-press-event", (sender, carried) =>
+        WhenEvent(mouse, "button-press-event", (peer, carried) =>
         {
-            var owner = Owner;
-            if (owner == null)
-                return false;
-            var event = (GdkEvent*)carried;
-
-            // GTK sends a plain press, then a second plain press, then a
-            // `GDK_2BUTTON_PRESS` carrying the same position -- so the double
-            // arrives as a *third* event rather than in place of anything. It
-            // must not be reported as another press, or every double-click
-            // would be three of them.
-            if (EventType(event) == GDK_2BUTTON_PRESS)
-            {
-                ((IControlNotify)owner).OnPlatformDoubleClick();
-                return false;
-            }
-            if (EventType(event) == GDK_3BUTTON_PRESS)
-                return false;
-
-            ((IControlNotify)owner).OnPlatformMouseDown(
-                ButtonOf(event), PointOf(event), ModifiersOf(event));
-
-            // **On the press, which is where a GTK program shows a menu** --
-            // and unlike Win32 this needs no special message, because a GTK
-            // tree does not run a loop of its own that swallows the release.
-            // The notification is shared all the same: a control should not
-            // have to know which platform it is on to offer a menu.
-            //
-            // The keyboard's menu key is not here. GTK reports it through the
-            // `popup-menu` signal, whose handler answers a gboolean, and the
-            // plain connector in this file returns nothing -- so wiring it
-            // would put a garbage answer in the return register. It wants a
-            // connector of its own and does not have one yet.
-            if (ButtonOf(event) == MouseButton.Right)
-            {
-                if (((IControlNotify)owner).OnPlatformContextMenu(PointOf(event), false))
-                    return true;
-            }
+            return peer.Pressed((GdkEvent*)carried);
+        });
+        WhenEvent(mouse, "button-release-event", (peer, carried) =>
+        {
+            peer.Released((GdkEvent*)carried);
             return false;
         });
-
-        ConnectEvent(inner, "button-release-event", (sender, carried) =>
+        WhenEvent(mouse, "motion-notify-event", (peer, carried) =>
         {
-            var owner = Owner;
-            if (owner == null)
-                return false;
-            var event = (GdkEvent*)carried;
-            ((IControlNotify)owner).OnPlatformMouseUp(
-                ButtonOf(event), PointOf(event), ModifiersOf(event));
-            return false;
-        });
-
-        ConnectEvent(inner, "motion-notify-event", (sender, carried) =>
-        {
-            var owner = Owner;
-            if (owner == null)
-                return false;
-            var event = (GdkEvent*)carried;
-            ((IControlNotify)owner).OnPlatformMouseMove(PointOf(event), ModifiersOf(event));
+            peer.Moved((GdkEvent*)carried);
             return false;
         });
 
         // GTK sends an enter and a leave for a crossing *within* a widget --
-        // on to a child and back -- which Win32 does not, so a control would
-        // otherwise see pairs of these while the pointer never left it. The
-        // detail field says which, and it is not one the accessors reach, so
-        // this is the one place the backend accepts being approximately right:
+        // on to a child and back -- which Win32 does too, for a child window.
+        // The detail field says which, and it is not one the accessors reach;
         // a control that only highlights on enter and unhighlights on leave
         // ends in the correct state either way.
-        ConnectEvent(inner, "enter-notify-event", (sender, carried) =>
+        WhenEvent(mouse, "enter-notify-event", (peer, carried) =>
         {
-            var owner = Owner;
-            if (owner != null)
-                ((IControlNotify)owner).OnPlatformMouseEnter();
+            peer.Crossed(true);
+            return false;
+        });
+        WhenEvent(mouse, "leave-notify-event", (peer, carried) =>
+        {
+            peer.Crossed(false);
+            return false;
+        });
+        WhenEvent(mouse, "scroll-event", (peer, carried) =>
+        {
+            peer.Scrolled((GdkEvent*)carried);
             return false;
         });
 
-        ConnectEvent(inner, "leave-notify-event", (sender, carried) =>
-        {
-            var owner = Owner;
-            if (owner != null)
-                ((IControlNotify)owner).OnPlatformMouseLeave();
-            return false;
-        });
-
-        ConnectEvent(inner, "scroll-event", (sender, carried) =>
-        {
-            var owner = Owner;
-            if (owner == null)
-                return false;
-            var event = (GdkEvent*)carried;
-
-            // GDK reports a direction rather than an amount. Win32's wheel
-            // delta is 120 per notch and the seam took that number, so this
-            // reports whole notches in the same units.
-            gint direction = 0;
-            if (gdk_event_get_scroll_direction(event, &direction) == 0)
-                return false;
-            int delta = 0;
-            if (direction == GDK_SCROLL_UP)
-                delta = 120;
-            if (direction == GDK_SCROLL_DOWN)
-                delta = -120;
-            if (delta == 0)
-                return false;
-
-            ((IControlNotify)owner).OnPlatformMouseWheel(
-                delta, PointOf(event), ModifiersOf(event));
-            return false;
-        });
-
+        var relay = _relay;
         ConnectEvent(inner, "key-press-event", (sender, carried) =>
         {
-            var owner = Owner;
+            var owner = relay.Owner;
             if (owner == null)
                 return false;
             var event = (GdkEvent*)carried;
@@ -649,13 +910,13 @@ public class GtkPeer : IControlPeer
             guint keyval = 0u;
             gdk_event_get_keyval(event, &keyval);
             var modifiers = ModifiersOf(event);
-            ((IControlNotify)owner).OnPlatformKeyDown(KeyOf(keyval), modifiers);
+            ((IControlNotify)owner).OnPlatformKeyDown(KeyOf(event), modifiers);
 
             // The typed character, which the seam keeps separate from the key
             // for the reason it says: the layout and any dead keys have been
             // applied by now, and nothing about the keyval says so.
             guint typed = gdk_keyval_to_unicode(keyval);
-            if (typed >= 32u && typed != 127u)
+            if (typed >= 32u && typed != 127u && !IsShortcut(event))
             {
                 ((IControlNotify)owner).OnPlatformKeyPress((char32)typed);
             }
@@ -664,31 +925,135 @@ public class GtkPeer : IControlPeer
 
         ConnectEvent(inner, "key-release-event", (sender, carried) =>
         {
-            var owner = Owner;
+            var owner = relay.Owner;
             if (owner == null)
                 return false;
             var event = (GdkEvent*)carried;
-            guint keyval = 0u;
-            gdk_event_get_keyval(event, &keyval);
-            ((IControlNotify)owner).OnPlatformKeyUp(KeyOf(keyval), ModifiersOf(event));
+            ((IControlNotify)owner).OnPlatformKeyUp(KeyOf(event), ModifiersOf(event));
             return false;
         });
 
-        ConnectEvent(inner, "focus-in-event", (sender, carried) =>
+        WhenEvent(inner, "focus-in-event", (peer, carried) =>
         {
-            var owner = Owner;
-            if (owner != null)
-                ((IControlNotify)owner).OnPlatformGotFocus();
+            peer.Focused(true);
             return false;
         });
+        WhenEvent(inner, "focus-out-event", (peer, carried) =>
+        {
+            peer.Focused(false);
+            return false;
+        });
+    }
 
-        ConnectEvent(inner, "focus-out-event", (sender, carried) =>
-        {
-            var owner = Owner;
-            if (owner != null)
-                ((IControlNotify)owner).OnPlatformLostFocus();
+    /// True when a context menu was shown, which is the one press a handler
+    /// claims.
+    bool Pressed(GdkEvent* event)
+    {
+        var owner = Owner;
+        if (owner == null || !IsFor(event))
             return false;
-        });
+
+        // GTK sends a plain press, then a second plain press, then a
+        // `GDK_2BUTTON_PRESS` carrying the same position -- so the double
+        // arrives as a *third* event rather than in place of anything. It
+        // must not be reported as another press, or every double-click
+        // would be three of them.
+        if (EventType(event) == GDK_2BUTTON_PRESS)
+        {
+            ((IControlNotify)owner).OnPlatformDoubleClick();
+            return false;
+        }
+        if (EventType(event) == GDK_3BUTTON_PRESS)
+            return false;
+
+        var at = LocalPointOf(event);
+        ((IControlNotify)owner).OnPlatformMouseDown(ButtonOf(event), at, ModifiersOf(event));
+
+        // **On the press, which is where a GTK program shows a menu** --
+        // and unlike Win32 this needs no special message, because a GTK
+        // tree does not run a loop of its own that swallows the release.
+        // The notification is shared all the same: a control should not
+        // have to know which platform it is on to offer a menu.
+        //
+        // The keyboard's menu key is not here. GTK reports it through the
+        // `popup-menu` signal, whose handler answers a gboolean, and the
+        // plain connector in this file returns nothing -- so wiring it
+        // would put a garbage answer in the return register. It wants a
+        // connector of its own and does not have one yet.
+        if (ButtonOf(event) == MouseButton.Right)
+            return ((IControlNotify)owner).OnPlatformContextMenu(at, false);
+        return false;
+    }
+
+    void Released(GdkEvent* event)
+    {
+        var owner = Owner;
+        if (owner == null || !IsFor(event))
+            return;
+        ((IControlNotify)owner).OnPlatformMouseUp(ButtonOf(event), LocalPointOf(event),
+                                                  ModifiersOf(event));
+    }
+
+    void Moved(GdkEvent* event)
+    {
+        var owner = Owner;
+        if (owner == null || !IsFor(event))
+            return;
+        ((IControlNotify)owner).OnPlatformMouseMove(LocalPointOf(event), ModifiersOf(event));
+    }
+
+    void Crossed(bool entered)
+    {
+        var owner = Owner;
+        if (owner == null)
+            return;
+        if (entered)
+        {
+            ((IControlNotify)owner).OnPlatformMouseEnter();
+        }
+        else
+        {
+            ((IControlNotify)owner).OnPlatformMouseLeave();
+        }
+    }
+
+    void Scrolled(GdkEvent* event)
+    {
+        var owner = Owner;
+        if (owner == null || !IsFor(event))
+            return;
+
+        // GDK reports a direction rather than an amount. Win32's wheel delta
+        // is 120 per notch and the seam took that number, so this reports
+        // whole notches in the same units.
+        gint direction = 0;
+        if (gdk_event_get_scroll_direction(event, &direction) == 0)
+            return;
+        int delta = 0;
+        if (direction == GDK_SCROLL_UP)
+            delta = 120;
+        if (direction == GDK_SCROLL_DOWN)
+            delta = -120;
+        if (delta == 0)
+            return;
+
+        ((IControlNotify)owner).OnPlatformMouseWheel(delta, LocalPointOf(event),
+                                                     ModifiersOf(event));
+    }
+
+    void Focused(bool gained)
+    {
+        var owner = Owner;
+        if (owner == null)
+            return;
+        if (gained)
+        {
+            ((IControlNotify)owner).OnPlatformGotFocus();
+        }
+        else
+        {
+            ((IControlNotify)owner).OnPlatformLostFocus();
+        }
     }
 
     // ---------------------------------------------------------- the style
@@ -896,18 +1261,25 @@ public class GtkPeer : IControlPeer
 
     /// **A cursor needs a `GdkWindow` and a widget may not have one yet.**
     /// A control is given its cursor when it is made, long before it is shown,
-    /// so the shape is remembered and applied again once the widget is
-    /// realised -- which is what the `realize` handler below is for.
+    /// so the shape is remembered and applied again whenever the widget is
+    /// realised -- which is what the `realize` handler below is for. One
+    /// handler serves every later change of shape.
     public void SetCursor(CursorKind wanted)
     {
         shape = wanted;
         ApplyCursor();
 
-        if (gtk_widget_get_realized(inner) == 0)
+        if (!_cursorWatched)
         {
-            ConnectPlain(inner, "realize", () => { ApplyCursor(); });
+            _cursorWatched = true;
+            WhenSignal(CursorTarget, "realize", (peer) => { peer.ApplyCursor(); });
         }
     }
+
+    /// The widget whose window the cursor is set on. A container whose
+    /// interior has a window of its own overrides this, so that its cursor
+    /// does not reach the window it sits on.
+    protected virtual GtkWidget* CursorTarget => inner;
 
     /// GTK keeps the text on the widget and shows it itself, delays and
     /// placement included. A null takes the tip away; an empty string would
@@ -924,18 +1296,23 @@ public class GtkPeer : IControlPeer
             gtk_widget_trigger_tooltip_query(inner);
     }
 
+    /// The window takes a reference of its own, so the one the cursor was
+    /// made with is dropped here.
     void ApplyCursor()
     {
-        gpointer window = gtk_widget_get_window(inner);
+        gpointer window = gtk_widget_get_window(CursorTarget);
         if (window == null)
             return;
-        gdk_window_set_cursor((GdkWindow*)window,
-            gdk_cursor_new_from_name(gdk_display_get_default(),
-                                     CursorName(shape).ToPointer()));
+        gpointer cursor = gdk_cursor_new_from_name(gdk_display_get_default(),
+                                                   CursorName(shape).ToPointer());
+        gdk_window_set_cursor((GdkWindow*)window, cursor);
+        if (cursor != null)
+            g_object_unref(cursor);
     }
 
     public void SetCapture(bool captured)
     {
+        _captured = captured;
         if (captured)
         {
             gtk_grab_add(inner);
@@ -946,9 +1323,11 @@ public class GtkPeer : IControlPeer
         }
     }
 
+    /// In the same coordinates the mouse is reported in: see `Surface`.
     public Point PointerPosition()
     {
-        gpointer surface = gtk_widget_get_window(inner);
+        GtkWidget* measured = Surface;
+        gpointer surface = gtk_widget_get_window(measured);
         if (surface == null)
             return Point.Empty;
 
@@ -964,19 +1343,53 @@ public class GtkPeer : IControlPeer
         gint y = 0;
         guint buttons = 0u;
         gdk_window_get_device_position((GdkWindow*)surface, device, &x, &y, &buttons);
+
+        // A widget with no window of its own is measured from its parent's.
+        if (gtk_widget_get_has_window(measured) == 0)
+        {
+            GdkRectangle allocation;
+            gtk_widget_get_allocation(measured, &allocation);
+            x -= allocation.X;
+            y -= allocation.Y;
+        }
         return Point.At((int)x, (int)y);
     }
 
+    /// Puts the widget last among its container's children.
+    ///
+    /// **Taken out and put back**, because most GTK widgets have no window to
+    /// raise -- a button draws on its container's, and raising the window
+    /// that is there raises the container. A `GtkFixed` draws and hit-tests
+    /// its children in the order they were added, so the last one added is
+    /// the one in front, and a widget with windows of its own gets them made
+    /// again on top of its siblings'. The focus is given back if it had it.
     public void BringToFront()
     {
-        // Only a widget with a window of its own can be stacked, and a GTK
-        // widget may legitimately have none -- a label or a button draws on its
-        // parent's. Nothing to raise is not a failure: a windowless widget is
-        // painted in container order and was already in front of what it was
-        // added after.
-        gpointer surface = gtk_widget_get_window(inner);
-        if (surface != null)
-            gdk_window_raise((GdkWindow*)surface);
+        if (placedIn == null)
+            return;
+
+        GList* children = gtk_container_get_children(placedIn);
+        GtkWidget* last = null;
+        for (GList* at = children; at != null; at = at->Next)
+            last = (GtkWidget*)at->Data;
+        g_list_free(children);
+        if (last == widget)
+            return;
+
+        bool focused = gtk_widget_has_focus(inner) != 0;
+        g_object_ref((gpointer)widget);
+        gtk_container_remove(placedIn, widget);
+        if (placedInLayout)
+        {
+            gtk_layout_put(placedIn, widget, bounds.X, bounds.Y);
+        }
+        else
+        {
+            gtk_fixed_put(placedIn, widget, bounds.X, bounds.Y);
+        }
+        g_object_unref((gpointer)widget);
+        if (focused)
+            gtk_widget_grab_focus(inner);
     }
 
     /// What the layout gave the widget, at the origin.
@@ -1079,9 +1492,9 @@ public class GtkContainerPeer : GtkPeer, IContainerPeer
     /// other container here is a `GtkFixed`. See `GtkWindowPeer`.
     protected bool contentIsLayout;
 
-    /// The first radio button put in this container, which every later one
-    /// joins. Null until there is one, and a container with no radios never
-    /// has one.
+    /// The hidden radio button every radio put in this container joins, and
+    /// the one that is ticked while none of them is. Owned: one reference,
+    /// sunk when the first radio arrives. Null in a container with no radios.
     GtkWidget* _radios;
 
     public GtkContainerPeer(GtkWidget* made, IControlNotify? owner, GtkWidget* inside)
@@ -1091,8 +1504,37 @@ public class GtkContainerPeer : GtkPeer, IContainerPeer
         _radios = null;
     }
 
+    ~GtkContainerPeer()
+    {
+        if (_radios != null)
+        {
+            g_object_unref((gpointer)_radios);
+            _radios = null;
+        }
+    }
+
     /// The fixed children are placed in, for a peer that has to reach it.
     public GtkWidget* Content => content;
+
+    /// The interior too, which is what GTK gives an event to when the
+    /// interior has a window of its own.
+    protected override void Mark()
+    {
+        base.Mark();
+        g_object_set_data((gpointer)content, PeerMark.ToPointer(), (gpointer)Surface);
+    }
+
+    /// The interior, when it has a window of its own: a cursor set on the
+    /// window the container sits on would reach its siblings too.
+    protected override GtkWidget* CursorTarget
+    {
+        get
+        {
+            if (gtk_widget_get_has_window(content) != 0)
+                return content;
+            return inner;
+        }
+    }
 
     /// Reports every paint of this container's interior to the control, so
     /// that the windowless children sitting on it are drawn.
@@ -1121,18 +1563,23 @@ public class GtkContainerPeer : GtkPeer, IContainerPeer
     protected void ReportPaints()
     {
         var drawn = content;
-        ConnectEvent(drawn, "draw", (sender, carried) =>
+        WhenEvent(drawn, "draw", (peer, carried) =>
         {
-            var owner = Owner;
-            if (owner == null)
-                return false;
-
-            ClipToSelf((cairo_t*)carried, drawn);
-            var surface = new GtkGraphicsBackend(carried);
-            ((IControlNotify)owner).OnPlatformPaint(new Graphics(surface));
-            cairo_restore((cairo_t*)carried);
+            ((GtkContainerPeer)peer).PaintInterior((cairo_t*)carried, drawn);
             return false;
         });
+    }
+
+    void PaintInterior(cairo_t* context, GtkWidget* drawn)
+    {
+        var owner = Owner;
+        if (owner == null)
+            return;
+
+        ClipToSelf(context, drawn);
+        var surface = new GtkGraphicsBackend((gpointer)context);
+        ((IControlNotify)owner).OnPlatformPaint(new Graphics(surface));
+        cairo_restore(context);
     }
 
     /// Virtual, because a notebook cannot honour this when it is called: see
@@ -1148,23 +1595,24 @@ public class GtkContainerPeer : GtkPeer, IContainerPeer
 
         // **Radio buttons are grouped by their container**, which is where the
         // seam leaves the question: `CreateCheck(owner, parent, radio)` says a
-        // radio is wanted and nothing about which others it belongs with. Win32
-        // reads that off `WS_GROUP` on the first of a run; here the first radio
-        // in a container is the group and every later one joins it, which is
-        // the same rule. Without it each is its own group and they all stay
-        // ticked at once.
+        // radio is wanted and nothing about which others it belongs with.
+        // Without a group each is its own and they all stay ticked at once.
+        //
+        // **The group is a hidden radio of its own**, as the LCL's GTK3
+        // widgetset makes one. A GTK group always has one member ticked and a
+        // Win32 group starts with none: the hidden one is the member that is
+        // ticked while the program has ticked nothing, and ticking it is how a
+        // radio is unticked.
         if (child is GtkCheckPeer check)
         {
             if (check.IsRadio)
             {
                 if (_radios == null)
                 {
-                    _radios = check.Widget;
+                    _radios = (GtkWidget*)g_object_ref_sink((gpointer)
+                        gtk_radio_button_new_with_label_from_widget(null, "".ToPointer()));
                 }
-                else
-                {
-                    gtk_radio_button_join_group(check.Widget, _radios);
-                }
+                check.JoinGroup(_radios);
             }
         }
 

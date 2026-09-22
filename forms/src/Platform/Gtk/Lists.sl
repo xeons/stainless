@@ -167,13 +167,9 @@ public class GtkModelPeer : GtkPeer
         selection = gtk_tree_view_get_selection(view);
         gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
 
-        ConnectPlain((GtkWidget*)selection, "changed", () =>
+        WhenSignal((GtkWidget*)selection, "changed", (peer) =>
         {
-            if (this.Echoing)
-                return;
-            var target2 = Owner;
-            if (target2 != null)
-                ((IControlNotify)target2).OnPlatformValueChanged();
+            ((GtkModelPeer)peer).SelectionChanged();
         });
 
         // **A double click rather than `row-activated`, for the same reason
@@ -182,21 +178,30 @@ public class GtkModelPeer : GtkPeer
         // boxed closure out of the column pointer. The click count is already
         // on the event, so this is the same notification from a signal that
         // fits.
-        ConnectEvent(view, "button-press-event", (sender, carried) =>
+        WhenEvent(view, "button-press-event", (peer, carried) =>
         {
-            guint clicks = 0u;
-            if (gdk_event_get_click_count((GdkEvent*)carried, &clicks) == 0)
-            {
-                return false;
-            }
-            if (clicks != 2u)
-                return false;
-
-            var target2 = Owner;
-            if (target2 != null)
-                ((IControlNotify)target2).OnPlatformActivated();
+            ((GtkModelPeer)peer).RowPressed((GdkEvent*)carried);
             return false;
         });
+    }
+
+    void SelectionChanged()
+    {
+        if (echoing)
+            return;
+        var target2 = Owner;
+        if (target2 != null)
+            ((IControlNotify)target2).OnPlatformValueChanged();
+    }
+
+    void RowPressed(GdkEvent* event)
+    {
+        guint clicks = 0u;
+        if (gdk_event_get_click_count(event, &clicks) == 0 || clicks != 2u)
+            return;
+        var target2 = Owner;
+        if (target2 != null)
+            ((IControlNotify)target2).OnPlatformActivated();
     }
 
     /// The row at `index` among the roots, or false when there is none.
@@ -244,17 +249,37 @@ public class GtkModelPeer : GtkPeer
 
     protected void SelectRow(int index)
     {
-        Echo(true);
+        var chosen = selection;
         if (index < 0)
         {
-            gtk_tree_selection_unselect_all(selection);
+            Quietly(() => { gtk_tree_selection_unselect_all(chosen); });
+            return;
         }
-        else
-        {
-            GtkTreeIter row;
-            if (RowAt(index, &row))
-                gtk_tree_selection_select_iter(selection, &row);
-        }
+
+        GtkTreeIter row;
+        if (!RowAt(index, &row))
+            return;
+        var at = row;
+        Quietly(() => { gtk_tree_selection_select_iter(chosen, &at); });
+    }
+
+    /// Removes a row of a flat model, quietly: removing the selected row
+    /// changes the selection, and that was the program's doing.
+    protected void RemoveListRow(int index)
+    {
+        GtkTreeIter row;
+        if (!RowAt(index, &row))
+            return;
+        var store = model;
+        var at = row;
+        Quietly(() => { gtk_list_store_remove(store, &at); });
+    }
+
+    /// Empties a flat model, quietly, for the same reason.
+    protected void ClearList()
+    {
+        var store = model;
+        Quietly(() => { gtk_list_store_clear(store); });
     }
 }
 
@@ -289,14 +314,8 @@ public class GtkListPeer : GtkModelPeer, IListPeer
         PutText(model, &row, 0, text, false);
     }
 
-    public void RemoveItem(int index)
-    {
-        GtkTreeIter row;
-        if (RowAt(index, &row))
-            gtk_list_store_remove(model, &row);
-    }
-
-    public void ClearItems() => gtk_list_store_clear(model);
+    public void RemoveItem(int index) => RemoveListRow(index);
+    public void ClearItems() => ClearList();
     public int ItemCount => RowCountOf();
 
     public void SetSelectedIndex(int index) => SelectRow(index);
@@ -330,13 +349,9 @@ public class GtkCheckListPeer : GtkModelPeer, ICheckListPeer
         gtk_tree_view_append_column(inner, column);
         gtk_tree_view_append_column(inner, TextColumn("", 1));
 
-        // Through a method, because a lambda captures a member read by value
-        // and `model` is a member: it happens to be set before this line and
-        // never again, so a capture would be right today and wrong the moment
-        // anything reassigned it.
-        ConnectEvent((GtkWidget*)toggle, "toggled", (sender, carried) =>
+        WhenEvent((GtkWidget*)toggle, "toggled", (peer, carried) =>
         {
-            Flip(Text.FromNullTerminated((gchar*)carried));
+            ((GtkCheckListPeer)peer).Flip(Text.FromNullTerminated((gchar*)carried));
             return false;
         });
     }
@@ -378,14 +393,8 @@ public class GtkCheckListPeer : GtkModelPeer, ICheckListPeer
         PutText(model, &row, 1, text, false);
     }
 
-    public void RemoveItem(int index)
-    {
-        GtkTreeIter row;
-        if (RowAt(index, &row))
-            gtk_list_store_remove(model, &row);
-    }
-
-    public void ClearItems() => gtk_list_store_clear(model);
+    public void RemoveItem(int index) => RemoveListRow(index);
+    public void ClearItems() => ClearList();
     public int ItemCount => RowCountOf();
 
     public void SetSelectedIndex(int index) => SelectRow(index);
@@ -582,17 +591,34 @@ public class GtkTreePeer : GtkModelPeer, ITreeViewPeer
         return new GtkTreeNode(Remember(&made));
     }
 
+    /// Quietly, because removing the selected node changes the selection.
+    ///
+    /// **The node's descendants go with it**, and so do their references: a
+    /// reference to a removed row stays allocated and answers nothing, so each
+    /// one no longer valid is freed here rather than kept for the life of the
+    /// tree.
     public void RemoveNode(ITreeNodeHandle node)
     {
         GtkTreeIter row;
         if (IterFor(node, &row))
-            gtk_tree_store_remove(model, &row);
-
-        var found = _nodes.Find(node.Id);
-        if (found is Some held)
         {
-            gtk_tree_row_reference_free(held.Value);
-            _nodes.Remove(node.Id);
+            var store = model;
+            var at = row;
+            Quietly(() => { gtk_tree_store_remove(store, &at); });
+        }
+
+        var gone = new List<nuint>();
+        foreach (var pair in _nodes)
+        {
+            if (pair.Key == node.Id || gtk_tree_row_reference_valid(pair.Value) == 0)
+                gone.Add(pair.Key);
+        }
+        foreach (var id in gone)
+        {
+            var found = _nodes.Find(id);
+            if (found is Some held)
+                gtk_tree_row_reference_free(held.Value);
+            _nodes.Remove(id);
         }
     }
 
@@ -636,8 +662,9 @@ public class GtkTreePeer : GtkModelPeer, ITreeViewPeer
         GtkTreeIter row;
         if (!IterFor(node, &row))
             return;
-        Echo(true);
-        gtk_tree_selection_select_iter(selection, &row);
+        var chosen = selection;
+        var at = row;
+        Quietly(() => { gtk_tree_selection_select_iter(chosen, &at); });
     }
 
     /// A *fresh* handle for the node at a row path, which is why the seam says
@@ -693,17 +720,23 @@ public class GtkTreePeer : GtkModelPeer, ITreeViewPeer
         return found;
     }
 
-    /// The row under a point, with the point taken exactly as the button event
-    /// reported it -- see the seam, and `gtk_tree_view_get_path_at_pos`.
+    /// The row under a point in the control's coordinates, which is what the
+    /// mouse is reported in.
+    ///
+    /// `gtk_tree_view_get_path_at_pos` wants the rows' own coordinates, which
+    /// begin below any column headers, so the point is converted first.
     ///
     /// A miss answers false *and* leaves the path null, so both are checked:
     /// the documented contract is the flag, and the null is what the rest of
     /// this method would otherwise dereference.
     public ITreeNodeHandle? NodeAt(Forms.Drawing.Point at)
     {
+        gint x = 0;
+        gint y = 0;
+        gtk_tree_view_convert_widget_to_bin_window_coords(inner, at.X, at.Y, &x, &y);
+
         gpointer path = null;
-        if (gtk_tree_view_get_path_at_pos(inner, at.X, at.Y,
-                                          &path, null, null, null) == 0)
+        if (gtk_tree_view_get_path_at_pos(inner, x, y, &path, null, null, null) == 0)
             return null;
         if (path == null)
             return null;
@@ -716,7 +749,8 @@ public class GtkTreePeer : GtkModelPeer, ITreeViewPeer
     public void Clear()
     {
         ForgetAll();
-        gtk_tree_store_clear(model);
+        var store = model;
+        Quietly(() => { gtk_tree_store_clear(store); });
     }
 
     public void SetImages(IImageListBackend? images)
@@ -849,14 +883,8 @@ public class GtkListViewPeer : GtkModelPeer, IListViewPeer
         return TakeText(model, &at, column + 1);
     }
 
-    public void RemoveRow(int row)
-    {
-        GtkTreeIter at;
-        if (RowAt(row, &at))
-            gtk_list_store_remove(model, &at);
-    }
-
-    public void Clear() => gtk_list_store_clear(model);
+    public void RemoveRow(int row) => RemoveListRow(row);
+    public void Clear() => ClearList();
     public int RowCount => RowCountOf();
 
     public int  GetSelectedRow() => SelectedRow;

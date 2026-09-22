@@ -143,6 +143,7 @@ public class SampleTests
         new("forms/clipboard", ["samples/forms/clipboard.sl"]) { NeedsForms = true },
         new("forms/controls", ["samples/forms/controls.sl"]) { NeedsForms = true },
         new("forms/core", ["samples/forms/core.sl"]) { NeedsForms = true },
+        new("forms/reports", ["samples/forms/reports.sl"]) { NeedsForms = true },
 
         new("gtk/hello", ["samples/gtk/hello.sl"]) { UnixOnly = true },
         new("gtk/control", ["samples/gtk/control.sl"]) { UnixOnly = true },

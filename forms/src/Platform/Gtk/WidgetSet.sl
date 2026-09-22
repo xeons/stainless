@@ -60,6 +60,45 @@ gboolean DrainPosted(gpointer data)
     return 0;
 }
 
+/// The monitor `window` is on, or for a window not shown yet the primary one
+/// -- or the first, because a compositor need not name one primary.
+gpointer MonitorOf(gpointer window)
+{
+    gpointer display = gdk_display_get_default();
+    if (display == null)
+        return null;
+
+    if (window != null)
+    {
+        gpointer found = gdk_display_get_monitor_at_window(display, (GdkWindow*)window);
+        if (found != null)
+            return found;
+    }
+
+    gpointer monitor = gdk_display_get_primary_monitor(display);
+    if (monitor != null)
+        return monitor;
+    if (gdk_display_get_n_monitors(display) <= 0)
+        return null;
+    return gdk_display_get_monitor(display, 0);
+}
+
+/// The part of `window`'s monitor a window belongs in: all of it but a panel
+/// or a dock. A display that reports an empty work area -- Broadway does --
+/// has the whole monitor.
+public Rectangle MonitorWorkArea(gpointer window)
+{
+    gpointer monitor = MonitorOf(window);
+    if (monitor == null)
+        return Area(0, 0, 1024, 768);
+
+    GdkRectangle area;
+    gdk_monitor_get_workarea(monitor, &area);
+    if (area.Width <= 0 || area.Height <= 0)
+        gdk_monitor_get_geometry(monitor, &area);
+    return Area(area.X, area.Y, area.Width, area.Height);
+}
+
 public class GtkWidgetSet : IWidgetSet
 {
     /// Whether `gtk_init` has run. A program that opens no window never pays
@@ -645,28 +684,12 @@ public class GtkWidgetSet : IWidgetSet
 
     // ------------------------------------------------------------- screen
 
-    /// The monitor a window should be centred on: the primary one, or the
-    /// first, because a compositor need not name one primary.
-    gpointer Monitor()
-    {
-        Start();
-        gpointer display = gdk_display_get_default();
-        if (display == null)
-            return null;
-
-        gpointer monitor = gdk_display_get_primary_monitor(display);
-        if (monitor != null)
-            return monitor;
-        if (gdk_display_get_n_monitors(display) <= 0)
-            return null;
-        return gdk_display_get_monitor(display, 0);
-    }
-
     public Size ScreenSize
     {
         get
         {
-            gpointer monitor = Monitor();
+            Start();
+            gpointer monitor = MonitorOf(null);
             if (monitor == null)
                 return Extent(1024, 768);
 
@@ -680,13 +703,8 @@ public class GtkWidgetSet : IWidgetSet
     {
         get
         {
-            gpointer monitor = Monitor();
-            if (monitor == null)
-                return Area(0, 0, 1024, 768);
-
-            GdkRectangle area;
-            gdk_monitor_get_workarea(monitor, &area);
-            return Area(area.X, area.Y, area.Width, area.Height);
+            Start();
+            return MonitorWorkArea(null);
         }
     }
 
