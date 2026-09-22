@@ -52,7 +52,7 @@ int Main()
     printf("sorted=%d %d %d %d\n",
         numbers[0], numbers[1], numbers[2], numbers[3]);
     printf("index=%llu largest=%d smallest=%d\n",
-        IndexOf(numbers, 17).ValueOr(99u), Max(numbers), Min(numbers));
+        IndexOf(numbers, 17).GetValueOrDefault(99u), Max(numbers), Min(numbers));
 
     // Strings order by their bytes, which for UTF-8 is also by code point.
     var words = new List<String>();

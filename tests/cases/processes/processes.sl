@@ -98,8 +98,8 @@ public int Main()
     if (started.Ok)
     {
         var child = started.Value;
-        Console.WriteLine($"started  named={child.Id > 0L} waited={child.Wait().ValueOr(-1)}");
-        Console.WriteLine($"again    {child.Wait().ValueOr(-1)}");
+        Console.WriteLine($"started  named={child.Id > 0L} waited={child.Wait().GetValueOrDefault(-1)}");
+        Console.WriteLine($"again    {child.Wait().GetValueOrDefault(-1)}");
     }
 
     // Started, seen to be running, and stopped.
@@ -128,7 +128,7 @@ public int Main()
             text.Append(child.TakeOutput());
             text.Append(child.TakeErrors());
         }
-        Console.WriteLine($"stream   [{text.ToText().Trim()}] code={child.Wait().ValueOr(-1)}");
+        Console.WriteLine($"stream   [{text.ToText().Trim()}] code={child.Wait().GetValueOrDefault(-1)}");
     }
 
     // The two streams stay apart here too, which they would not if a caller

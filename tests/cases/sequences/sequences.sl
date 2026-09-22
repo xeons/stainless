@@ -67,9 +67,9 @@ int Main()
     printf("count<5  = %llu\n", (ulong)Count(numbers, n => n < 5));
     printf("first>4  = %d\n", FirstOrDefault(numbers, n => n > 4, -1));
     printf("first>99 = %d\n", FirstOrDefault(numbers, n => n > 99, -1));
-    printf("index>8  = %llu\n", (ulong)FindIndex(numbers, n => n > 8).ValueOr(99u));
+    printf("index>8  = %llu\n", (ulong)FindIndex(numbers, n => n > 8).GetValueOrDefault(99u));
     printf("index>99 = %d\n", FindIndex(numbers, n => n > 99).IsEmpty);
-    printf("find>4   = %d\n", Find(numbers, n => n > 4).ValueOr(-1));
+    printf("find>4   = %d\n", Find(numbers, n => n > 4).GetValueOrDefault(-1));
 
     printf("take3    = %llu\n", (ulong)Take(numbers, 3u).Count);
     printf("skip4    = %llu\n", (ulong)Skip(numbers, 4u).Count);

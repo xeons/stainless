@@ -309,7 +309,7 @@ void ShowVariants()
     // pointer cannot say: "a value, which may itself be null".
     Optional<String> found = Some("here");
     Optional<String> missing = None;
-    PrintValue("optional", found.ValueOr("-") + " / " + missing.ValueOr("-"));
+    PrintValue("optional", found.GetValueOrDefault("-") + " / " + missing.GetValueOrDefault("-"));
     if (found is Some got)
         PrintValue("optional is", got.Value);
 }
@@ -346,7 +346,7 @@ void ShowResults()
         PrintValue("not a number", (long)bad.Error);
 
     // A default needs no proof, because it supplies one.
-    PrintValue("valueOr", (long)bad.ValueOr(-1));
+    PrintValue("valueOr", (long)bad.GetValueOrDefault(-1));
 
     // `&&` carries the proof into what it guards.
     var left = ParseHalf("10");
@@ -763,7 +763,7 @@ void ShowText()
     PrintValue("from bool", Text.FromBool(false));
     PrintValue("from char", Text.FromChar('A'));
     PrintValue("to hex", Convert.FromLong(255, 16u));
-    PrintValue("parsed", (long)Convert.ToLong("123").ValueOr(-1));
+    PrintValue("parsed", (long)Convert.ToLong("123").GetValueOrDefault(-1));
 
     // §3.4: UTF-16, for the platform APIs that want it. A `Utf16String` is a
     // second representation rather than a second string type: it converts on

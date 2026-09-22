@@ -57,7 +57,7 @@ int Main()
     Console.WriteLine("smallest = " + Min(prices).Show());
     // `IndexOf` answers with an `Optional<nuint>`: a list's length standing in
     // for "not there" is the sentinel that type exists to retire.
-    Console.WriteLine($"index of 999c = {IndexOf(prices, new Money(999)).ValueOr(99u)}");
+    Console.WriteLine($"index of 999c = {IndexOf(prices, new Money(999)).GetValueOrDefault(99u)}");
     Console.WriteLine($"index of 1c   = {IndexOf(prices, new Money(1)).IsEmpty}");
 
     Sort(prices);
@@ -73,7 +73,7 @@ int Main()
     some.Add(new Money(5));
 
     Console.WriteLine("contains = " + Text.FromBool(Contains(some, new Money(9))));
-    Console.WriteLine("last of 5c = " + Text.FromInteger((long)LastIndexOf(some, new Money(5)).ValueOr(99u)));
+    Console.WriteLine("last of 5c = " + Text.FromInteger((long)LastIndexOf(some, new Money(5)).GetValueOrDefault(99u)));
     Console.WriteLine("exists   = " + Text.FromBool(some.Exists((m) => m.Cents() > 8)));
     Console.WriteLine("all      = " + Text.FromBool(some.TrueForAll((m) => m.Cents() > 0)));
     Console.WriteLine("found    = " + Text.FromInteger((long)some.FindAll((m) => m.Cents() == 5).Count));

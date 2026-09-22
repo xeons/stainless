@@ -189,7 +189,7 @@ int Main()
     var refused = Halve(7);
     if (!refused.Ok)
         Console.WriteLine(refused.Error);
-    Console.WriteLine(Text.FromInteger(Halve(9).ValueOr(-1)));
+    Console.WriteLine(Text.FromInteger(Halve(9).GetValueOrDefault(-1)));
 
     return 0;
 }

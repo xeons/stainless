@@ -804,7 +804,7 @@ int Main()
         else if (argument.EndsWith(".xm"))
             songPath = argument;
         else
-            limit = Convert.ToLong(argument).ValueOr(limit);
+            limit = Convert.ToLong(argument).GetValueOrDefault(limit);
     }
 
     // ------------------------------------------------------------ the window

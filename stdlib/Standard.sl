@@ -61,7 +61,7 @@ public variant Result<T, TError>
     ///
     /// The one reader that needs no proof, because it supplies its own: a
     /// caller with a sensible default has nothing to check.
-    public T ValueOr(T fallback)
+    public T GetValueOrDefault(T fallback)
     {
         switch (this)
         {
@@ -79,7 +79,7 @@ public variant Result<T, TError>
 // a lambda are the same thing and neither needs a declaration to hold it.
 // They live here rather than in `Standard.Collections`, and need no import.
 
-/// Turns a T into an R. The transform half of `Map`.
+/// Turns a T into an R. The transform half of `Select`.
 public closure R Func<T, R>(T value);
 
 /// Answers a question about a T.
@@ -172,16 +172,16 @@ public variant Optional<T>
 
     /// The value, aborting when there is none.
     ///
-    /// The bargain `Dictionary.Get` and an array index make: asking for
+    /// The bargain `Dictionary.GetValue` and an array index make: asking for
     /// something that is not there is a mistake in the caller rather than a
-    /// value to return. Use `ValueOr` where a miss is ordinary, and
+    /// value to return. Use `GetValueOrDefault` where a miss is ordinary, and
     /// `is Some x` where the answer decides what happens next.
-    public T Get()
+    public T GetValue()
     {
         if (this is Some held)
             return held.Value;
 
-        sl_fail("Optional.Get: there is no value");
+        sl_fail("Optional.GetValue: there is no value");
 
         // Unreachable: `sl_fail` ends the program, and an `extern` has no way
         // to say so. The tail has to be some expression of type T.
@@ -191,8 +191,8 @@ public variant Optional<T>
     /// The value if there is one, and `fallback` if there is not.
     ///
     /// The reader that needs no proof, because it supplies its own -- the same
-    /// bargain `Result.ValueOr` makes.
-    public T ValueOr(T fallback)
+    /// bargain `Result.GetValueOrDefault` makes.
+    public T GetValueOrDefault(T fallback)
     {
         if (this is Some held)
             return held.Value;
@@ -204,7 +204,7 @@ public variant Optional<T>
     /// `other` is a value rather than something that produces one on demand.
     /// A lambda would allocate a closure to save an evaluation, which is the
     /// wrong way round at the sizes this is used at.
-    public Optional<T> Or(Optional<T> other)
+    public Optional<T> Coalesce(Optional<T> other)
     {
         if (this is Some)
             return this;
@@ -213,20 +213,20 @@ public variant Optional<T>
 
     /// The value put through `transform`, or none.
     ///
-    ///     Optional<String> name = found.Map(i => people[i].Name);
+    ///     Optional<String> name = found.Select(i => people[i].Name);
     ///
     /// The transform runs only where there is something to run it on, which is
     /// the point: it is the `if` that would otherwise be written by hand.
-    public Optional<R> Map<R>(Func<T, R> transform)
+    public Optional<R> Select<R>(Func<T, R> transform)
     {
         if (this is Some held)
             return Some(transform(held.Value));
         return None;
     }
 
-    /// `Map` for a transform that answers with an optional of its own, which
+    /// `Select` for a transform that answers with an optional of its own, which
     /// would otherwise nest one inside the other.
-    public Optional<R> FlatMap<R>(Func<T, Optional<R>> transform)
+    public Optional<R> SelectMany<R>(Func<T, Optional<R>> transform)
     {
         if (this is Some held)
             return transform(held.Value);
@@ -234,7 +234,7 @@ public variant Optional<T>
     }
 
     /// This one when it holds something `keep` accepts, and none otherwise.
-    public Optional<T> Filter(Predicate<T> keep)
+    public Optional<T> Where(Predicate<T> keep)
     {
         if (this is Some held)
         {
@@ -245,7 +245,7 @@ public variant Optional<T>
     }
 
     /// Runs `action` on the value, if there is one.
-    public void IfPresent(Action<T> action)
+    public void InvokeIfPresent(Action<T> action)
     {
         if (this is Some held)
             action(held.Value);

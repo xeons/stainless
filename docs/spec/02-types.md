@@ -1469,7 +1469,7 @@ written at them:
 Optional<String> name = index.IndexOf(id).Select(i => people[i].Name);
 ```
 
-`Or` takes a value rather than something that produces one on demand, unlike
+`Coalesce` takes a value rather than something that produces one on demand, unlike
 Java's: a lambda here allocates a closure to save an evaluation, which is the
 wrong way round at the sizes this is used at.
 

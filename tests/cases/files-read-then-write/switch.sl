@@ -44,7 +44,7 @@ int Main()
     stream.Close();
 
     var after = File.ReadAllText(path);
-    Console.WriteLine($"file {after.ValueOr("?")}");
+    Console.WriteLine($"file {after.GetValueOrDefault("?")}");
 
     File.Delete(path);
     return 0;

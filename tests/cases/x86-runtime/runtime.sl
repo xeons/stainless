@@ -89,6 +89,6 @@ int Main()
 
     // And back out through the converter, which walks digits.
     var parsed = ToLong("4321");
-    Console.WriteLine("parsed    " + Text.FromInteger(parsed.ValueOr(-1)));
+    Console.WriteLine("parsed    " + Text.FromInteger(parsed.GetValueOrDefault(-1)));
     return 0;
 }

@@ -282,8 +282,8 @@ void ShowLibrary()
     PrintValue("map / reduce", (long)values.Select(n => n * 2).Aggregate(0, (t, n) => t + n));
     PrintValue("any / all", $"{values.Any(n => n > 8)} {values.All(n => n > 0)}");
     PrintValue("count where", (long)values.Count(n => n == 3));
-    PrintValue("find", (long)values.Find(n => n > 4).ValueOr(-1));
-    PrintValue("index where", (long)values.FindIndex(n => n == 9).ValueOr(0u));
+    PrintValue("find", (long)values.Find(n => n > 4).GetValueOrDefault(-1));
+    PrintValue("index where", (long)values.FindIndex(n => n == 9).GetValueOrDefault(0u));
 
     Sort(values);
     PrintValue("sorted", (long)values[0u]);

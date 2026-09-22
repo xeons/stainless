@@ -171,8 +171,8 @@ String Results()
 
     return (good.Ok ? good.Value : "none")
         + " / " + Text.FromInteger(bad.Ok ? 0 : (int)bad.Error)
-        + " / " + Text.FromInteger(Doubled(-9).ValueOr(8080))
-        + " / " + Text.FromInteger(held.ValueOr(0));
+        + " / " + Text.FromInteger(Doubled(-9).GetValueOrDefault(8080))
+        + " / " + Text.FromInteger(held.GetValueOrDefault(0));
 }
 
 // --- spec 2.2 a struct that holds a reference ----------------------------
@@ -539,15 +539,15 @@ String Lookup()
     if (ages["ada"] is Some found)
         built.AppendInteger((long)found.Value);
     built.Append(":");
-    built.AppendInteger((long)ages["nobody"].ValueOr(0));
+    built.AppendInteger((long)ages["nobody"].GetValueOrDefault(0));
     built.Append(":");
     built.AppendInteger((long)ages.Count);
 
     // Counting, said out loud, because there is nothing to add to when the
     // key is absent.
-    ages["visits"] = ages["visits"].ValueOr(0) + 1;
+    ages["visits"] = ages["visits"].GetValueOrDefault(0) + 1;
     built.Append(":");
-    built.AppendInteger((long)ages["visits"].ValueOr(-1));
+    built.AppendInteger((long)ages["visits"].GetValueOrDefault(-1));
 
     // A list's index is a position rather than data, so its subscript is a
     // plain value.
@@ -561,8 +561,8 @@ String Lookup()
     Optional<int> promoted = 8080;
     Optional<int> none = None;
     built.Append(":");
-    built.AppendInteger((long)promoted.ValueOr(-1));
-    built.AppendInteger((long)none.ValueOr(-1));
+    built.AppendInteger((long)promoted.GetValueOrDefault(-1));
+    built.AppendInteger((long)none.GetValueOrDefault(-1));
 
     return built.ToText();
 }

@@ -22,7 +22,7 @@ String Which(int v) => "int";
 String Which(Optional<int> v) => "optional";
 
 // And is available where nothing exact is there.
-String Only(Optional<int> v) => N((long)v.ValueOr(-1));
+String Only(Optional<int> v) => N((long)v.GetValueOrDefault(-1));
 
 Optional<int> Returned(int v) => v;
 Optional<String> Named(String s) => s;
@@ -36,12 +36,12 @@ int Main()
     Optional<int> number = 5;
     Optional<String> text = "text";
     Optional<int> nothing = None;
-    Console.WriteLine("promoted " + N((long)number.ValueOr(-1)) + " " +
-        text.ValueOr("?") + " " + N((long)nothing.ValueOr(-1)));
+    Console.WriteLine("promoted " + N((long)number.GetValueOrDefault(-1)) + " " +
+        text.GetValueOrDefault("?") + " " + N((long)nothing.GetValueOrDefault(-1)));
 
     // Through a return, an argument and an assignment alike.
-    Console.WriteLine("shapes " + N((long)Returned(9).ValueOr(-1)) + " " +
-        Named("ok").ValueOr("?") + " " + Only(7));
+    Console.WriteLine("shapes " + N((long)Returned(9).GetValueOrDefault(-1)) + " " +
+        Named("ok").GetValueOrDefault("?") + " " + Only(7));
 
     Console.WriteLine("overload " + Which(5) + " " + Which(Some(5)));
 
@@ -62,21 +62,21 @@ int Main()
 
     // Something already an Optional is not wrapped twice.
     Optional<int> again = number;
-    Console.WriteLine("idempotent " + N((long)again.ValueOr(-1)));
+    Console.WriteLine("idempotent " + N((long)again.GetValueOrDefault(-1)));
 
     // But an Optional assigned to an Optional of one is, which is what it
     // means rather than a mistake.
     Optional<Optional<int>> nested = number;
     if (nested is Some lifted)
     {
-        Console.WriteLine("nested " + N((long)lifted.Value.ValueOr(-1)));
+        Console.WriteLine("nested " + N((long)lifted.Value.GetValueOrDefault(-1)));
     }
 
     // What the rule was for.
     var settings = new Dictionary<String, int>();
     settings["port"] = 8080;
-    Console.WriteLine("subscript " + N((long)settings["port"].ValueOr(-1)) + " " +
-        N((long)settings["absent"].ValueOr(-1)));
+    Console.WriteLine("subscript " + N((long)settings["port"].GetValueOrDefault(-1)) + " " +
+        N((long)settings["absent"].GetValueOrDefault(-1)));
 
     return 0;
 }

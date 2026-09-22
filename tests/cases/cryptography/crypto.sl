@@ -15,7 +15,7 @@ import Standard.Security.Cryptography;
 
 byte[] Bytes(String text) => Encoding.Utf8().GetBytes(text);
 
-byte[] Hex(String text) => Convert.FromHex(text).ValueOr(new byte[0u]);
+byte[] Hex(String text) => Convert.FromHex(text).GetValueOrDefault(new byte[0u]);
 
 byte[] Repeat(byte value, nuint count)
 {
@@ -27,7 +27,7 @@ byte[] Repeat(byte value, nuint count)
 
 // The cipher factories report a bad key length, and every key here is a good
 // one; `GetValueOrDefault` supplies a cipher that is never reached.
-Aes Cipher(byte[] key) => Aes.FromKey(key).ValueOr(Aes.Create());
+Aes Cipher(byte[] key) => Aes.FromKey(key).GetValueOrDefault(Aes.Create());
 
 void Check(String label, String actual, String expected)
 {
@@ -116,19 +116,19 @@ void Derivation()
     byte[] salt = Bytes("salt");
 
     var once = Rfc2898DeriveBytes.Pbkdf2(password, salt, 1u, new Sha1(), 20u);
-    Check("pbkdf2-1", Convert.ToHex(once.ValueOr(new byte[0u])),
+    Check("pbkdf2-1", Convert.ToHex(once.GetValueOrDefault(new byte[0u])),
           "0c60c80f961f0e71f3a9b524af6012062fe037a6");
 
     var twice = Rfc2898DeriveBytes.Pbkdf2(password, salt, 2u, new Sha1(), 20u);
-    Check("pbkdf2-2", Convert.ToHex(twice.ValueOr(new byte[0u])),
+    Check("pbkdf2-2", Convert.ToHex(twice.GetValueOrDefault(new byte[0u])),
           "ea6c014dc72d6f8ccd1ed92ace1d41f0d8de8957");
 
     var many = Rfc2898DeriveBytes.Pbkdf2(password, salt, 4096u, new Sha1(), 20u);
-    Check("pbkdf2-4096", Convert.ToHex(many.ValueOr(new byte[0u])),
+    Check("pbkdf2-4096", Convert.ToHex(many.GetValueOrDefault(new byte[0u])),
           "4b007901b765489abead49d926f721d065a429c1");
 
     var wide = Rfc2898DeriveBytes.Pbkdf2(password, salt, 1u, new Sha256(), 32u);
-    Check("pbkdf2-sha256", Convert.ToHex(wide.ValueOr(new byte[0u])),
+    Check("pbkdf2-sha256", Convert.ToHex(wide.GetValueOrDefault(new byte[0u])),
           "120fb6cffcf8b32c43e7225256c4f837a86548c92ccc35480805987cb70be17b");
 
     var refused = Rfc2898DeriveBytes.Pbkdf2(password, salt, 0u, new Sha256(), 32u);
@@ -137,7 +137,7 @@ void Derivation()
     var derived = Hkdf.DeriveKey(new Sha256(), Repeat((byte)0x0B, 22u),
                                  Hex("000102030405060708090a0b0c"),
                                  Hex("f0f1f2f3f4f5f6f7f8f9"), 42u);
-    Check("hkdf", Convert.ToHex(derived.ValueOr(new byte[0u])),
+    Check("hkdf", Convert.ToHex(derived.GetValueOrDefault(new byte[0u])),
           "3cb25f25faacd57a90434f64d0362f2a2d2d0a90cf1a5a4c5db02d56ecc4c5bf" +
           "34007208d5b887185865");
 }
@@ -177,44 +177,44 @@ void Modes()
     var cipher = Cipher(key);
 
     var ecb = cipher.EncryptEcb(plain, PaddingMode.None);
-    Check("ecb", Convert.ToHex(ecb.ValueOr(new byte[0u])),
+    Check("ecb", Convert.ToHex(ecb.GetValueOrDefault(new byte[0u])),
           "3ad77bb40d7a3660a89ecaf32466ef97f5d3d58503b9699de785895a96fdbaaf");
 
     var cbc = cipher.EncryptCbc(plain, iv, PaddingMode.None);
-    Check("cbc", Convert.ToHex(cbc.ValueOr(new byte[0u])),
+    Check("cbc", Convert.ToHex(cbc.GetValueOrDefault(new byte[0u])),
           "7649abac8119b246cee98e9b12e9197d5086cb9b507219ee95db113a917678b2");
 
     // F.5.1: the counter runs from a named start rather than from an IV.
     var ctr = cipher.ApplyCtr(plain, Hex("f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff"));
-    Check("ctr", Convert.ToHex(ctr.ValueOr(new byte[0u])),
+    Check("ctr", Convert.ToHex(ctr.GetValueOrDefault(new byte[0u])),
           "874d6191b620e3261bef6864990db6ce9806f66b7970fdff8617187bb9fffdff");
 
     // CTR is its own inverse, which is the whole of why it needs no padding.
-    var back = cipher.ApplyCtr(ctr.ValueOr(new byte[0u]),
+    var back = cipher.ApplyCtr(ctr.GetValueOrDefault(new byte[0u]),
                                Hex("f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff"));
-    Check("ctr-inverse", Convert.ToHex(back.ValueOr(new byte[0u])), Convert.ToHex(plain));
+    Check("ctr-inverse", Convert.ToHex(back.GetValueOrDefault(new byte[0u])), Convert.ToHex(plain));
 
     // The padding, which is what a message that is not a whole block needs.
     byte[] message = Bytes("the quick brown fox");
     var padded = cipher.EncryptCbc(message, iv, PaddingMode.Pkcs7);
-    Console.WriteLine("pkcs7 grows to " + Text.FromInteger((long)padded.ValueOr(new byte[0u]).Length));
+    Console.WriteLine("pkcs7 grows to " + Text.FromInteger((long)padded.GetValueOrDefault(new byte[0u]).Length));
 
-    var opened = cipher.DecryptCbc(padded.ValueOr(new byte[0u]), iv, PaddingMode.Pkcs7);
-    Check("cbc-round-trip", Encoding.Utf8().GetString(opened.ValueOr(new byte[0u])),
+    var opened = cipher.DecryptCbc(padded.GetValueOrDefault(new byte[0u]), iv, PaddingMode.Pkcs7);
+    Check("cbc-round-trip", Encoding.Utf8().GetString(opened.GetValueOrDefault(new byte[0u])),
           "the quick brown fox");
 
     // A wrong key is a padding failure far more often than it is a wrong
     // plaintext, and that is what a caller sees.
     var wrong = Cipher(Hex("00000000000000000000000000000000"))
-        .DecryptCbc(padded.ValueOr(new byte[0u]), iv, PaddingMode.Pkcs7);
+        .DecryptCbc(padded.GetValueOrDefault(new byte[0u]), iv, PaddingMode.Pkcs7);
     Console.WriteLine(wrong.Ok ? "cbc-wrong-key opened" : "cbc-wrong-key refused");
 
     var ragged = cipher.EncryptCbc(message, iv, PaddingMode.None);
     Console.WriteLine(ragged.Ok ? "cbc-no-padding WRONG" : "cbc-no-padding refused");
 
     var cfb = cipher.EncryptCfb(message, iv);
-    var cfbBack = cipher.DecryptCfb(cfb.ValueOr(new byte[0u]), iv);
-    Check("cfb-round-trip", Encoding.Utf8().GetString(cfbBack.ValueOr(new byte[0u])),
+    var cfbBack = cipher.DecryptCfb(cfb.GetValueOrDefault(new byte[0u]), iv);
+    Check("cfb-round-trip", Encoding.Utf8().GetString(cfbBack.GetValueOrDefault(new byte[0u])),
           "the quick brown fox");
 }
 
@@ -238,27 +238,27 @@ void Authenticated()
     byte[] tag = new byte[16u];
     var sealedText = box.Encrypt(nonce, plain, new byte[0u], tag);
 
-    Check("gcm-ciphertext", Convert.ToHex(sealedText.ValueOr(new byte[0u])),
+    Check("gcm-ciphertext", Convert.ToHex(sealedText.GetValueOrDefault(new byte[0u])),
           "42831ec2217774244b7221b784d0d49ce3aa212f2c02a4e035c17e2329aca12e" +
           "21d514b25466931c7d8f6a5aac84aa051ba30b396a0aac973d58e091473f5985");
     Check("gcm-tag", Convert.ToHex(tag), "4d5c2af327cd64a62cf35abd2ba6fab4");
 
-    var opened = box.Decrypt(nonce, sealedText.ValueOr(new byte[0u]), new byte[0u], tag);
-    Check("gcm-round-trip", Convert.ToHex(opened.ValueOr(new byte[0u])), Convert.ToHex(plain));
+    var opened = box.Decrypt(nonce, sealedText.GetValueOrDefault(new byte[0u]), new byte[0u], tag);
+    Check("gcm-round-trip", Convert.ToHex(opened.GetValueOrDefault(new byte[0u])), Convert.ToHex(plain));
 
     // Associated data is authenticated and not encrypted, so changing it after
     // the fact is a forgery like any other.
     byte[] header = Bytes("record 7");
     byte[] boundTag = new byte[16u];
     var bound = box.Encrypt(nonce, Bytes("secret"), header, boundTag);
-    var rightHeader = box.Decrypt(nonce, bound.ValueOr(new byte[0u]), header, boundTag);
-    Check("gcm-associated", Encoding.Utf8().GetString(rightHeader.ValueOr(new byte[0u])), "secret");
+    var rightHeader = box.Decrypt(nonce, bound.GetValueOrDefault(new byte[0u]), header, boundTag);
+    Check("gcm-associated", Encoding.Utf8().GetString(rightHeader.GetValueOrDefault(new byte[0u])), "secret");
 
-    var wrongHeader = box.Decrypt(nonce, bound.ValueOr(new byte[0u]), Bytes("record 8"), boundTag);
+    var wrongHeader = box.Decrypt(nonce, bound.GetValueOrDefault(new byte[0u]), Bytes("record 8"), boundTag);
     Console.WriteLine(wrongHeader.Ok ? "gcm-associated-changed opened" : "gcm-associated-changed refused");
 
     tag[0u] = (byte)(tag[0u] ^ 1u);
-    var forged = box.Decrypt(nonce, sealedText.ValueOr(new byte[0u]), new byte[0u], tag);
+    var forged = box.Decrypt(nonce, sealedText.GetValueOrDefault(new byte[0u]), new byte[0u], tag);
     Console.WriteLine(forged.Ok ? "gcm-forgery opened" : "gcm-forgery refused");
 }
 

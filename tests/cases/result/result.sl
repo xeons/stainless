@@ -51,7 +51,7 @@ int Main()
     }
 
     // A default needs no proof, because it supplies one.
-    Console.WriteLine(Text.FromInteger(Doubled(1000).ValueOr(-1)));
+    Console.WriteLine(Text.FromInteger(Doubled(1000).GetValueOrDefault(-1)));
 
     // `&&` carries the proof into what it guards.
     var left = Doubled(4);

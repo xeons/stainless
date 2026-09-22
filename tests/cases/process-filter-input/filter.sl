@@ -66,7 +66,7 @@ public int Main(String[] args)
             text.Append(child.TakeOutput());
             child.TakeErrors();
         }
-        Console.WriteLine($"open  same={text.ToText() == input} code={child.Wait().ValueOr(-1)}");
+        Console.WriteLine($"open  same={text.ToText() == input} code={child.Wait().GetValueOrDefault(-1)}");
     }
     else
         Console.WriteLine($"open  refused why={(int)opened.Error}");

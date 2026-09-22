@@ -47,7 +47,7 @@ int Main()
         (settings.Find("absent").HasValue ? "set" : "unset"));
 
     // The combinators come free, Optional being an ordinary variant.
-    Console.WriteLine("valueOr " + N((long)settings.Find("absent").ValueOr(-1)));
+    Console.WriteLine("valueOr " + N((long)settings.Find("absent").GetValueOrDefault(-1)));
     Console.WriteLine("empty " + (settings.Find("absent").IsEmpty ? "y" : "n"));
 
     // A key that is there by construction: `Get` is honest here.
@@ -56,8 +56,8 @@ int Main()
     // Over a reference type, so the miss has a counted value to not return.
     var names = new Dictionary<int, String>();
     names.SetValue(1, "one");
-    Console.WriteLine("ref " + names.Find(1).ValueOr("?") + " " +
-        names.Find(2).ValueOr("?"));
+    Console.WriteLine("ref " + names.Find(1).GetValueOrDefault("?") + " " +
+        names.Find(2).GetValueOrDefault("?"));
 
     // `map[key]` is Swift's subscript: it answers `Optional<V>`, so it cannot
     // stop the program, and the setter takes one too -- which is what makes
@@ -70,7 +70,7 @@ int Main()
     if (counts["hits"] is Some hit)
         Console.WriteLine("subscript " + N((long)hit.Value));
     Console.WriteLine("subscript-miss " + (counts["absent"].IsEmpty ? "empty" : "?"));
-    Console.WriteLine("subscript-or " + N((long)counts["absent"].ValueOr(8080)));
+    Console.WriteLine("subscript-or " + N((long)counts["absent"].GetValueOrDefault(8080)));
 
     counts["misses"] = None;
     Console.WriteLine("removed " + (counts.ContainsKey("misses") ? "no" : "yes") +
@@ -78,16 +78,16 @@ int Main()
 
     // No `+= 1`, because there is nothing to add to when the key is absent.
     // Saying what should happen instead is the point rather than the cost.
-    counts["hits"] = counts["hits"].ValueOr(0) + 1;
-    counts["fresh"] = counts["fresh"].ValueOr(0) + 1;
-    Console.WriteLine("counted " + N((long)counts["hits"].ValueOr(-1)) + " " +
-        N((long)counts["fresh"].ValueOr(-1)));
+    counts["hits"] = counts["hits"].GetValueOrDefault(0) + 1;
+    counts["fresh"] = counts["fresh"].GetValueOrDefault(0) + 1;
+    Console.WriteLine("counted " + N((long)counts["hits"].GetValueOrDefault(-1)) + " " +
+        N((long)counts["fresh"].GetValueOrDefault(-1)));
 
     // A sorted map answers the same four ways.
     var prices = new SortedList<String, int>();
     prices.SetValue("apple", 5);
-    Console.WriteLine("sorted " + N((long)prices.Find("apple").ValueOr(-1)) + " " +
-        N((long)prices.Find("pear").ValueOr(-1)));
+    Console.WriteLine("sorted " + N((long)prices.Find("apple").GetValueOrDefault(-1)) + " " +
+        N((long)prices.Find("pear").GetValueOrDefault(-1)));
 
     // Every miss above was survivable, and here is the proof.
     Console.WriteLine("still running");

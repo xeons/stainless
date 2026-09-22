@@ -25,7 +25,7 @@ Optional<nuint> FirstEven(int[] values)
     return None;
 }
 
-// A second optional, so `FlatMap` has something to flatten.
+// A second optional, so `SelectMany` has something to flatten.
 Optional<nuint> Even(nuint value)
 {
     if (value % 2u == 0u)
@@ -62,24 +62,24 @@ public int Main()
     Say("has-value", Text.FromBool(FirstEven(evens).HasValue));
     Say("no-value", Text.FromBool(FirstEven(odds).HasValue));
     Say("is-empty", Text.FromBool(FirstEven(odds).IsEmpty));
-    Say("value-or", Text.FromInteger((long)FirstEven(odds).ValueOr(99u)));
-    Say("value-or-present", Text.FromInteger((long)FirstEven(evens).ValueOr(99u)));
-    Say("get", Text.FromInteger((long)FirstEven(evens).Get()));
+    Say("value-or", Text.FromInteger((long)FirstEven(odds).GetValueOrDefault(99u)));
+    Say("value-or-present", Text.FromInteger((long)FirstEven(evens).GetValueOrDefault(99u)));
+    Say("get", Text.FromInteger((long)FirstEven(evens).GetValue()));
 
     // And the ones that take the work rather than the value.
-    Say("map", Describe(FirstEven(evens).Map(i => i + 10u)));
-    Say("map-none", Describe(FirstEven(odds).Map(i => i + 10u)));
-    Say("map-type", FirstEven(evens).Map(i => "index " + Text.FromInteger((long)i))
-        .ValueOr("(none)"));
-    Say("flat-map", Describe(FirstEven(evens).FlatMap(i => Even(i + 1u))));
-    Say("flat-map-none", Describe(FirstEven(evens).FlatMap(i => Even(i))));
-    Say("filter", Describe(FirstEven(evens).Filter(i => i > 0u)));
-    Say("filter-out", Describe(FirstEven(evens).Filter(i => i > 5u)));
-    Say("or", Describe(FirstEven(odds).Or(FirstEven(evens))));
-    Say("or-held", Describe(FirstEven(evens).Or(FirstEven(odds))));
+    Say("map", Describe(FirstEven(evens).Select(i => i + 10u)));
+    Say("map-none", Describe(FirstEven(odds).Select(i => i + 10u)));
+    Say("map-type", FirstEven(evens).Select(i => "index " + Text.FromInteger((long)i))
+        .GetValueOrDefault("(none)"));
+    Say("flat-map", Describe(FirstEven(evens).SelectMany(i => Even(i + 1u))));
+    Say("flat-map-none", Describe(FirstEven(evens).SelectMany(i => Even(i))));
+    Say("filter", Describe(FirstEven(evens).Where(i => i > 0u)));
+    Say("filter-out", Describe(FirstEven(evens).Where(i => i > 5u)));
+    Say("or", Describe(FirstEven(odds).Coalesce(FirstEven(evens))));
+    Say("or-held", Describe(FirstEven(evens).Coalesce(FirstEven(odds))));
 
-    FirstEven(evens).IfPresent(i => Say("if-present", Text.FromInteger((long)i)));
-    FirstEven(odds).IfPresent(i => Say("never", "never"));
+    FirstEven(evens).InvokeIfPresent(i => Say("if-present", Text.FromInteger((long)i)));
+    FirstEven(odds).InvokeIfPresent(i => Say("never", "never"));
 
     // The tag test with a name, which is what these are all shorthand for.
     if (FirstEven(evens) is Some found)

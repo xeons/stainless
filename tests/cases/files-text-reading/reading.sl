@@ -59,13 +59,13 @@ int Main()
     File.WriteAllBytes(path, MarkedText());
 
     var text = File.ReadAllText(path);
-    Console.WriteLine($"all text: {text.ValueOr("?").ByteLength()} bytes, starts hi {text.ValueOr("?").StartsWith("hi")}");
+    Console.WriteLine($"all text: {text.GetValueOrDefault("?").ByteLength()} bytes, starts hi {text.GetValueOrDefault("?").StartsWith("hi")}");
 
     var lines = File.ReadAllLines(path);
     if (lines.Ok)
         Console.WriteLine($"first line is hi: {lines.Value[0u] == "hi"}, second {lines.Value[1u].ByteLength()} bytes");
 
-    Console.WriteLine($"bytes kept: {File.ReadAllBytes(path).ValueOr(new byte[0]).Length}");
+    Console.WriteLine($"bytes kept: {File.ReadAllBytes(path).GetValueOrDefault(new byte[0]).Length}");
 
     var reader = new StreamReader(new MemoryStream(MarkedText()));
     var first = reader.ReadLine();

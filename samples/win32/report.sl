@@ -64,7 +64,7 @@ String ReadVersionString(String name)
         case Ok held:
             var value = Registry.ReadString(held.Value, name);
             Registry.CloseKey(held.Value);
-            return value.ValueOr("-");
+            return value.GetValueOrDefault("-");
     }
 }
 

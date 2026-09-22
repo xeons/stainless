@@ -1624,7 +1624,7 @@ public class Shell : Form
                 Application.Post(() => OnCompilerOutput(errors, output));
             }
 
-            int code = child.Wait().ValueOr(-1);
+            int code = child.Wait().GetValueOrDefault(-1);
             Application.Post(() => OnCompilerExited(code, success));
         });
         worker.Detach();

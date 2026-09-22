@@ -134,7 +134,7 @@ int Main()
 
     // There is no failed value to read by mistake; a caller that wants to carry
     // on supplies its own.
-    printf("missing-value=%llu\n", missing.ValueOr("").ByteLength());
+    printf("missing-value=%llu\n", missing.GetValueOrDefault("").ByteLength());
 
     // --------------------------------------------------------- file stream
     //
