@@ -182,6 +182,18 @@ public abstract class TextBoxBase : WindowedControl
         return ((IControlPeer)peer).GetText();
     }
 
+    /// Compared against the text the platform holds, for the reason the getter
+    /// reads it: the stored text is the last the program set, and the user or
+    /// `Lines` may have replaced it since.
+    protected override void SetTextValue(String value)
+    {
+        if (GetTextValue() == value)
+            return;
+        StoredText = value;
+        ApplyText();
+        OnTextChanged();
+    }
+
     /// The text changed because the user typed. Distinct from `TextChanged`
     /// only in that the program setting `Text` does not raise it.
     public event EventHandler UserTextChanged;
