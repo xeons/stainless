@@ -530,7 +530,11 @@ SL_API size_t sl_format_double(char *buffer, size_t size, double value);
  * The caller decides what is well formed; this only says what the digits are
  * worth. Reading them by hand -- ten times the running total, or a tenth of a
  * running scale -- compounds a rounding error per digit, so a number written
- * by sl_format_double did not read back as itself. */
+ * by sl_format_double did not read back as itself.
+ *
+ * All `count` bytes are read. Overflow answers an infinity of the right sign
+ * and underflow answers zero; the caller MUST treat an infinity from finite
+ * digits as out of range. */
 SL_API double sl_parse_double(const uint8_t *text, size_t count);
 
 /* One code point as the UTF-8 that spells it. Anything that is not one --

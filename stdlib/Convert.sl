@@ -228,6 +228,9 @@ public String FromLong(long value, uint radix)
 /// Accepts what C accepts of the ordinary forms -- an optional sign, digits, a
 /// point, an exponent -- and nothing else. Hexadecimal floats, infinities and
 /// NaN are not spelled here.
+///
+/// A magnitude past the largest double is `OutOfRange`. One below the
+/// smallest rounds to zero, which is the nearest double and not a failure.
 public Result<double, ConvertError> ToDouble(String text)
 {
     nuint size = text.ByteLength();
@@ -282,8 +285,12 @@ public Result<double, ConvertError> ToDouble(String text)
     if (at != size)
         return Fail(ConvertError.Malformed);
 
-    // Correctly rounded, which is the one thing the walk above cannot be.
-    return Ok(sl_parse_double(bytes, size));
+    // Correctly rounded, which is the one thing the walk above cannot be. No
+    // infinity is spelled here, so one in the answer is an overflow.
+    double value = sl_parse_double(bytes, size);
+    if (value - value != 0.0)
+        return Fail(ConvertError.OutOfRange);
+    return Ok(value);
 }
 
 // ---------------------------------------------------------------- hexadecimal
@@ -360,6 +367,8 @@ public String ToBase64Url(byte[] data)
 }
 
 /// Base64 back into bytes, accepting both alphabets and padding or none.
+/// Padding MUST come only at the end, and MUST complete the last group of
+/// four when it is there at all.
 ///
 /// Whitespace is skipped, because base64 in the wild arrives wrapped at 64 or
 /// 76 columns and a decoder that refused a newline would be useless for the
@@ -372,17 +381,28 @@ public Result<byte[], ConvertError> FromBase64(String text)
     // Counted first: four characters become three bytes, and the padding says
     // how many of the last three are real.
     nuint characters = 0;
+    nuint padding = 0;
     for (nuint i = 0; i < size; i++)
     {
         byte one = bytes[i];
-        if (Ascii.IsWhiteSpace(one) || one == 61)      // '='
+        if (Ascii.IsWhiteSpace(one))
             continue;
-        if (Base64Value(one) < 0)
+
+        if (one == 61)                                  // '='
+        {
+            padding++;
+            continue;
+        }
+
+        // Padding ends the text; a character after it is not base64.
+        if (padding > 0 || Base64Value(one) < 0)
             return Fail(ConvertError.Malformed);
         characters++;
     }
 
     if (characters % 4 == 1)
+        return Fail(ConvertError.Malformed);
+    if (padding > 0 && (padding > 2 || (characters + padding) % 4 != 0))
         return Fail(ConvertError.Malformed);
 
     var data = new byte[characters * 3 / 4];

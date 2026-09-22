@@ -1,0 +1,15 @@
+leading-zeros 1.5
+long-mantissa 1
+long-fraction 1
+huge out-of-range
+huge-negative out-of-range
+huge-digits out-of-range
+tiny 0
+largest 1.7976931348623157e+308
+b64-padded 65
+b64-unpadded 65
+b64-wrapped-padding 65 66
+b64-middle malformed
+b64-middle-one malformed
+b64-short-padding malformed
+b64-long-padding malformed

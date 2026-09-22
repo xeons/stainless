@@ -386,19 +386,30 @@ void *sl_string_from_double(double value)
  * scale of a tenth loses more, because a tenth is not a binary fraction; a
  * number written at full precision then did not read back as itself.
  *
- * A copy is made because the bytes are a String's and are not terminated.
- * Anything longer than the buffer cannot name a distinct double anyway: a
- * double carries seventeen significant digits and an exponent of three.
+ * A copy is made because the bytes are a String's and are not terminated. All
+ * of it is read: leading zeros and a long mantissa balanced by its exponent
+ * spell an ordinary number at any length.
+ *
+ * A value too large for a double answers an infinity of the right sign, and one
+ * too small answers zero, as strtod does. Telling overflow from a real
+ * infinity is the caller's, whose grammar knows whether one was spelled.
  */
 double sl_parse_double(const uint8_t *text, size_t count)
 {
-    char buffer[512];
+    char  local[256];
+    char *buffer = local;
 
-    if (count >= sizeof buffer) count = sizeof buffer - 1;
+    if (count >= sizeof local) {
+        buffer = (char *)malloc(count + 1);
+        if (buffer == NULL) sl_fail("out of memory");
+    }
+
     memcpy(buffer, text, count);
     buffer[count] = '\0';
 
-    return strtod(buffer, NULL);
+    double value = strtod(buffer, NULL);
+    if (buffer != local) free(buffer);
+    return value;
 }
 
 void *sl_string_from_bool(_Bool value)
