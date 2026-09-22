@@ -607,10 +607,21 @@ public class WindowPeer : ControlPeer, IWindowPeer
     /// telling Windows the frame moved. Not every bit takes effect -- a window
     /// created `WS_POPUP` will not grow a caption -- which is why the control
     /// layer makes this read-only and this is here for a backend that can.
+    ///
+    /// Only the frame's bits are replaced. The rest -- `WS_VISIBLE`, the
+    /// minimised and maximised states, `WS_DISABLED` -- belong to the window.
     public void SetBorder(WindowBorder border)
     {
-        Win32.User32.SetWindowLongPtrW(window, GwlStyle,
-                          (long)(StyleForBorder(border) | WsClipChildren));
+        uint frame = WsPopup | WsCaption | WsThickFrame | WsSystemMenu
+                   | WsMinimizeBox | WsMaximizeBox;
+        long style = Win32.User32.GetWindowLongPtrW(window, GwlStyle);
+        style = (style & ~(long)frame) | (long)StyleForBorder(border);
+        Win32.User32.SetWindowLongPtrW(window, GwlStyle, style);
+
+        long extended = Win32.User32.GetWindowLongPtrW(window, GwlExtendedStyle);
+        extended = (extended & ~(long)WsExToolWindow) | (long)ExtendedStyleForBorder(border);
+        Win32.User32.SetWindowLongPtrW(window, GwlExtendedStyle, extended);
+
         SetWindowPos(window, null, 0, 0, 0, 0,
                      SwpNoMove | SwpNoSize | SwpNoZOrder | SwpFrameChanged);
     }
