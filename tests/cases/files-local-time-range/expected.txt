@@ -1,0 +1,5 @@
+1965: true
+1900: true
+2026: true
+second before the epoch: -1
+1965 to local: 1965
