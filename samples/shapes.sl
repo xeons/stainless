@@ -8,7 +8,7 @@ public struct Point
     public double X;
     public double Y;
 
-    public double LengthSquared() => X * X + Y * Y;
+    public double LengthSquared => X * X + Y * Y;
 }
 
 public struct Pair
@@ -17,11 +17,11 @@ public struct Pair
     public int B;
 }
 
-double Sum(Point p) => p.X + p.Y;
+double SumCoordinates(Point p) => p.X + p.Y;
 
 int AddPair(Pair p) => p.A + p.B;
 
-Point Make(double x, double y)
+Point MakePoint(double x, double y)
 {
     Point p;
     p.X = x;
@@ -31,10 +31,10 @@ Point Make(double x, double y)
 
 int Main()
 {
-    var p = Make(3.0, 4.0);
+    var p = MakePoint(3.0, 4.0);
     printf("p          = (%g, %g)\n", p.X, p.Y);
-    printf("lengthSq   = %g\n", p.LengthSquared());
-    printf("Sum(p)     = %g\n", Sum(p));
+    printf("lengthSq   = %g\n", p.LengthSquared);
+    printf("Sum(p)     = %g\n", SumCoordinates(p));
 
     Pair q;
     q.A = 20;

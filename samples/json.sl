@@ -31,7 +31,7 @@ public struct Point
 // One serializer, written once, for any reflected type. T is concrete by the
 // time this is compiled, so typeof(T) is a constant and every call below is a
 // direct load from a table in .rdata.
-public String ToJson<T>(T value)
+public String SerializeToJson<T>(T value)
 {
     var type = typeof(T);
     var text = new StringBuilder();
@@ -95,7 +95,7 @@ int Main()
     person.Rating = 9.5;
     person.Internal = 999;
 
-    Console.WriteLine(ToJson(person));
+    Console.WriteLine(SerializeToJson(person));
 
     // A struct works the same way, though it has no object header, so its
     // metadata is reached only through typeof.

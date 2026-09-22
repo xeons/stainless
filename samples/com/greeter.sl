@@ -23,7 +23,7 @@ import Standard.Text;
 /// A shared library has its own stdout buffer, so without the flush every line
 /// below would arrive in a lump when the module detaches -- long after the
 /// host's output, and saying nothing about the order the two actually ran in.
-void Say(String line)
+void WriteLineAndFlush(String line)
 {
     Console.WriteLine(line);
     Console.Flush();
@@ -66,12 +66,12 @@ public com class Greeter : IGreeter, ICounter
     public Greeter()
     {
         _total = 0;
-        Say("[stainless] Greeter constructed");
+        WriteLineAndFlush("[stainless] Greeter constructed");
     }
 
     ~Greeter()
     {
-        Say("[stainless] Greeter destroyed");
+        WriteLineAndFlush("[stainless] Greeter destroyed");
     }
 
     public int Greet(int times, int* total)
@@ -80,7 +80,7 @@ public com class Greeter : IGreeter, ICounter
             return Com.PointerError;
 
         this._total = this._total + times;
-        Say("[stainless] Greet(" + Text.FromInteger((long)times) +
+        WriteLineAndFlush("[stainless] Greet(" + Text.FromInteger((long)times) +
             ") -> " + Text.FromInteger((long)this._total));
         *total = this._total;
         return Com.Ok;
@@ -96,7 +96,7 @@ public com class Greeter : IGreeter, ICounter
 
     public int Reset()
     {
-        Say("[stainless] Reset");
+        WriteLineAndFlush("[stainless] Reset");
         _total = 0;
         return Com.Ok;
     }

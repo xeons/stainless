@@ -29,7 +29,7 @@ export "C" int SumPair(Pair p) => p.A + p.B;
 export "C" double Hypotenuse(double x, double y) => x * x + y * y;
 
 // Visible to other Stainless modules, but not exported from the library.
-public int Helper() => 1;
+public int GetHelperValue() => 1;
 
 // Module-private.
-int Secret() => 2;
+int GetSecretValue() => 2;

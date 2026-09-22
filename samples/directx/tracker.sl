@@ -209,21 +209,21 @@ public sealed class Module
 // =================================================================== loading
 
 /// A module read from disk.
-public Result<Module, ModuleError> Load(String path)
+public Result<Module, ModuleError> LoadModule(String path)
 {
     var read = File.ReadAllBytes(path);
     if (!read.Ok)
         return Fail(ModuleError.Io);
-    return Decode(read.Value);
+    return DecodeModule(read.Value);
 }
 
 /// A module read from bytes.
-public Result<Module, ModuleError> Decode(byte[] bytes)
+public Result<Module, ModuleError> DecodeModule(byte[] bytes)
 {
     if (bytes.Length < 80u)
         return Fail(ModuleError.NotAModule);
 
-    if (!Marks(bytes, 0u, "Extended Module: "))
+    if (!HasMarkAt(bytes, 0u, "Extended Module: "))
         return Fail(ModuleError.NotAModule);
 
     // 1.04 is what FastTracker 2 wrote and what the pattern format below
@@ -233,7 +233,7 @@ public Result<Module, ModuleError> Decode(byte[] bytes)
         return Fail(ModuleError.Unsupported);
 
     var song = new Module();
-    song.Name = Trimmed(bytes, 17u, 20u);
+    song.Name = ReadTrimmedText(bytes, 17u, 20u);
 
     nuint headerSize = (nuint)ReadU32(bytes, 60u);
     song.OrderLength = (nuint)ReadU16(bytes, 64u);
@@ -276,7 +276,7 @@ public Result<Module, ModuleError> Decode(byte[] bytes)
         // A packed size of zero is a pattern of nothing, which is legal and
         // common: the rows are already blank from the allocation.
         if (packed > 0u)
-            Unpack(bytes, at + patternHeader, packed, pattern, song.Channels);
+            UnpackPattern(bytes, at + patternHeader, packed, pattern, song.Channels);
 
         song.Patterns.Add(pattern);
         at = at + patternHeader + packed;
@@ -372,7 +372,7 @@ LoadedInstrument ReadInstrument(byte[] bytes, nuint at)
         if (sample.LoopStart + sample.LoopLength > count)
             sample.LoopKind = 0;
 
-        sample.Data = Decode(bytes, data, byteLength, wide, count);
+        sample.Data = DecodeSamples(bytes, data, byteLength, wide, count);
         data += byteLength;
 
         instrument.Samples.Add(sample);
@@ -387,7 +387,7 @@ LoadedInstrument ReadInstrument(byte[] bytes, nuint at)
 /// **XM stores a difference per sample, not a value.** Reading it as absolute
 /// gives a waveform that looks like the right shape and sounds like noise,
 /// which is the kind of bug that takes an afternoon.
-short[] Decode(byte[] bytes, nuint at, nuint byteLength, bool wide, nuint count)
+short[] DecodeSamples(byte[] bytes, nuint at, nuint byteLength, bool wide, nuint count)
 {
     short[] data = new short[count];
     if (at + byteLength > bytes.Length)
@@ -426,7 +426,7 @@ short[] Decode(byte[] bytes, nuint at, nuint byteLength, bool wide, nuint count)
 ///
 /// A byte with the top bit set is a mask saying which of the five fields
 /// follow; a byte without it *is* the note, and the other four follow whole.
-void Unpack(byte[] bytes, nuint at, nuint packed, Pattern pattern, nuint channels)
+void UnpackPattern(byte[] bytes, nuint at, nuint packed, Pattern pattern, nuint channels)
 {
     nuint end = at + packed;
     if (end > bytes.Length)
@@ -576,7 +576,7 @@ sealed class Voice
 /// place already played -- which is what a song that loops does at its end --
 /// or when `maxSeconds` is reached, whichever is first. The buffer is meant to
 /// be looped by whatever plays it.
-public byte[] Render(Module song, uint rate, double maxSeconds)
+public byte[] RenderModule(Module song, uint rate, double maxSeconds)
 {
     nuint channels = song.Channels;
     var voices = new List<Voice>();
@@ -634,7 +634,7 @@ public byte[] Render(Module song, uint rate, double maxSeconds)
         if (samplesThisTick == 0u)
             samplesThisTick = 1u;
 
-        written = Mix(output, written, capacity, voices, channels, samplesThisTick);
+        written = MixVoices(output, written, capacity, voices, channels, samplesThisTick);
 
         tick++;
         if (tick < speed)
@@ -734,7 +734,7 @@ void StartRow(Module song, Pattern pattern, nuint row, List<Voice> voices,
                 {
                     var sample = found.Samples[which];
                     int realNote = (int)key + sample.RelativeNote;
-                    int period = PeriodOf(realNote, sample.Finetune);
+                    int period = NoteToPeriod(realNote, sample.Finetune);
 
                     if (tonePorta && voice.Playing)
                     {
@@ -774,7 +774,7 @@ void StartRow(Module song, Pattern pattern, nuint row, List<Voice> voices,
             voice.PortaSpeed = (column - 0xF0) * 16;
 
         ApplyRowEffect(voice, speed, tempo, jumpTo, breakTo);
-        Retune(voice, rate);
+        RetuneVoice(voice, rate);
     }
 }
 
@@ -858,9 +858,9 @@ void ApplyRowEffect(Voice voice, nuint* speed, nuint* tempo, int* jumpTo, int* b
         int amount = parameter & 0xF;
 
         if (kind == 0x1)
-            voice.Period = Clamp(voice.Period - amount * 4);
+            voice.Period = ClampPeriod(voice.Period - amount * 4);
         else if (kind == 0x2)
-            voice.Period = Clamp(voice.Period + amount * 4);
+            voice.Period = ClampPeriod(voice.Period + amount * 4);
         return;
     }
 
@@ -894,18 +894,18 @@ void TickVoice(Voice voice, nuint tick, uint rate)
         else if (which == 2u)
             offset = voice.Arpeggio & 0xF;
 
-        Retune(voice, rate, offset);
+        RetuneVoice(voice, rate, offset);
         return;
     }
 
     if (effect == 0x1)
-        voice.Period = Clamp(voice.Period - voice.PortaUp * 4);
+        voice.Period = ClampPeriod(voice.Period - voice.PortaUp * 4);
     else if (effect == 0x2)
-        voice.Period = Clamp(voice.Period + voice.PortaDown * 4);
+        voice.Period = ClampPeriod(voice.Period + voice.PortaDown * 4);
     else if (effect == 0x3 || effect == 0x5)
         SlideToNote(voice);
     else if (effect == 0x4 || effect == 0x6)
-        Vibrato(voice);
+        ApplyVibrato(voice);
 
     if (effect == 0xA || effect == 0x5 || effect == 0x6)
     {
@@ -927,7 +927,7 @@ void TickVoice(Voice voice, nuint tick, uint rate)
             voice.Position = 0.0;
     }
 
-    Retune(voice, rate);
+    RetuneVoice(voice, rate);
 }
 
 void SlideToNote(Voice voice)
@@ -946,12 +946,12 @@ void SlideToNote(Voice voice)
     }
 }
 
-void Vibrato(Voice voice)
+void ApplyVibrato(Voice voice)
 {
     voice.VibratoPosition = (voice.VibratoPosition + voice.VibratoSpeed) & 63;
     double phase = (double)voice.VibratoPosition * 6.28318530717958623200 / 64.0;
     int depth = (int)(Math.Sin(phase) * (double)voice.VibratoDepth * 4.0);
-    voice.Period = Clamp(voice.Period + depth);
+    voice.Period = ClampPeriod(voice.Period + depth);
 }
 
 /// The envelope, one tick on.
@@ -979,7 +979,7 @@ void AdvanceEnvelope(Voice voice)
         return;
     }
 
-    voice.EnvelopeValue = EnvelopeAt(instrument, voice.EnvelopeTick);
+    voice.EnvelopeValue = ReadEnvelopeAt(instrument, voice.EnvelopeTick);
 
     // Held at the sustain point until the key is released, then free to run
     // on. That is what makes a held note hold.
@@ -1003,7 +1003,7 @@ void AdvanceEnvelope(Voice voice)
 }
 
 /// The envelope's value at a tick, interpolated between its points.
-double EnvelopeAt(Instrument instrument, int tick)
+double ReadEnvelopeAt(Instrument instrument, int tick)
 {
     nuint count = instrument.VolumePointCount;
     if (count == 0u)
@@ -1039,17 +1039,17 @@ double EnvelopeAt(Instrument instrument, int tick)
 /// The constants are the table's: 7680 is ten octaves of sixteenths of a
 /// semitone, and 4608 is where C-4 lands -- which is the note that sounds at
 /// 8363 Hz, the rate every tracker measures a sample against.
-int PeriodOf(int note, int finetune)
+int NoteToPeriod(int note, int finetune)
 {
     return 7680 - note * 64 - finetune / 2;
 }
 
-double FrequencyOf(int period)
+double PeriodToFrequency(int period)
 {
     return 8363.0 * Math.Pow(2.0, (double)(4608 - period) / 768.0);
 }
 
-int Clamp(int period)
+int ClampPeriod(int period)
 {
     if (period < 64)
         return 64;
@@ -1059,19 +1059,19 @@ int Clamp(int period)
 }
 
 /// The step the mixer advances by, from the voice's period.
-void Retune(Voice voice, uint rate)
+void RetuneVoice(Voice voice, uint rate)
 {
-    Retune(voice, rate, 0);
+    RetuneVoice(voice, rate, 0);
 }
 
-void Retune(Voice voice, uint rate, int semitones)
+void RetuneVoice(Voice voice, uint rate, int semitones)
 {
     int period = voice.Period - semitones * 64;
-    voice.Step = FrequencyOf(Clamp(period)) / (double)rate;
+    voice.Step = PeriodToFrequency(ClampPeriod(period)) / (double)rate;
 }
 
 /// One tick's worth of sound from every voice.
-nuint Mix(byte[] output, nuint written, nuint capacity, List<Voice> voices,
+nuint MixVoices(byte[] output, nuint written, nuint capacity, List<Voice> voices,
           nuint channels, nuint frames)
 {
     for (nuint frame = 0u; frame < frames; frame++)
@@ -1135,8 +1135,8 @@ nuint Mix(byte[] output, nuint written, nuint capacity, List<Voice> voices,
             }
         }
 
-        written = Put(output, written, left);
-        written = Put(output, written, right);
+        written = WriteSample(output, written, left);
+        written = WriteSample(output, written, right);
     }
 
     return written;
@@ -1145,7 +1145,7 @@ nuint Mix(byte[] output, nuint written, nuint capacity, List<Voice> voices,
 /// One sample written, clipped. The headroom is a guess that four channels of
 /// full-scale sample will not all line up, which is the same guess every
 /// tracker makes.
-nuint Put(byte[] output, nuint at, double value)
+nuint WriteSample(byte[] output, nuint at, double value)
 {
     int sample = (int)(value * 0.55);
     if (sample > 32767)
@@ -1164,7 +1164,7 @@ nuint Put(byte[] output, nuint at, double value)
 
 // =================================================================== reading
 
-bool Marks(byte[] bytes, nuint at, String mark)
+bool HasMarkAt(byte[] bytes, nuint at, String mark)
 {
     nuint length = mark.ByteLength();
     if (at + length > bytes.Length)
@@ -1180,7 +1180,7 @@ bool Marks(byte[] bytes, nuint at, String mark)
     return true;
 }
 
-String Trimmed(byte[] bytes, nuint at, nuint length)
+String ReadTrimmedText(byte[] bytes, nuint at, nuint length)
 {
     nuint end = at + length;
     if (end > bytes.Length)

@@ -24,18 +24,19 @@ import Win32.Clock;
 import Win32.Registry;
 import Win32.Tasks;
 
-// ANSI, which the console understands once EnableAnsi has been called and which
-// is inert text when it has not — so this degrades rather than breaking.
+// ANSI, which the console understands once EnableAnsiEscapes has been called
+// and which is inert text when it has not — so this degrades rather than
+// breaking.
 static readonly String Dim = "\x1b[90m";
 static readonly String Bold = "\x1b[1m";
 static readonly String Plain = "\x1b[0m";
 
-void Row(String label, String value)
+void PrintRow(String label, String value)
 {
-    Console.WriteLine("  " + Dim + Pad(label, 14u) + Plain + value);
+    Console.WriteLine("  " + Dim + PadText(label, 14u) + Plain + value);
 }
 
-String Pad(String text, nuint width)
+String PadText(String text, nuint width)
 {
     String padded = text;
     while (padded.ByteLength() < width)
@@ -43,7 +44,7 @@ String Pad(String text, nuint width)
     return padded;
 }
 
-void Heading(String text)
+void PrintHeading(String text)
 {
     Console.WriteLine("");
     Console.WriteLine(Bold + text + Plain);
@@ -54,7 +55,7 @@ static readonly String CurrentVersion =
 
 /// A string value from HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion,
 /// or a dash.
-String Version(String name)
+String ReadVersionString(String name)
 {
     var opened = Registry.OpenKeyForReading(AdvApi32.LocalMachine(), CurrentVersion);
     switch (opened)
@@ -71,7 +72,7 @@ String Version(String name)
 /// the wrong kind is refused rather than reinterpreted, which is why the update
 /// build revision needs its own reader: it is a number, and its neighbours are
 /// strings.
-String VersionNumber(String name)
+String ReadVersionNumber(String name)
 {
     var opened = Registry.OpenKeyForReading(AdvApi32.LocalMachine(), CurrentVersion);
     switch (opened)
@@ -90,62 +91,63 @@ int Main()
 {
     Terminal.EnableAnsiEscapes();
 
-    Heading("Windows");
-    Row("edition", Version("ProductName"));
-    Row("build", Version("CurrentBuild") + "." + VersionNumber("UBR"));
-    Row("installed", Version("InstallationType"));
-    Row("uptime", Text.FromInteger((long)(Clock.GetUptimeMilliseconds() / 3600000u)) + " hours");
-    Row("local time", Clock.FormatSystemTime(Clock.GetLocalNow()));
-    Row("utc", Clock.FormatSystemTime(Clock.GetUtcNow()));
+    PrintHeading("Windows");
+    PrintRow("edition", ReadVersionString("ProductName"));
+    PrintRow("build", ReadVersionString("CurrentBuild") + "." + ReadVersionNumber("UBR"));
+    PrintRow("installed", ReadVersionString("InstallationType"));
+    ulong hours = Clock.GetUptimeMilliseconds() / 3600000u;
+    PrintRow("uptime", Text.FromInteger((long)hours) + " hours");
+    PrintRow("local time", Clock.FormatSystemTime(Clock.GetLocalNow()));
+    PrintRow("utc", Clock.FormatSystemTime(Clock.GetUtcNow()));
 
-    Heading("Machine");
+    PrintHeading("Machine");
     var system = Machine.QueryNativeSystemInfo();
-    Row("name", Environment.GetComputerName());
-    Row("processors", Text.FromInteger((long)system.ProcessorCount));
-    Row("architecture", Machine.GetArchitectureName(system.Architecture));
-    Row("page size", Text.FromInteger((long)system.PageSize) + " bytes");
+    PrintRow("name", Environment.GetComputerName());
+    PrintRow("processors", Text.FromInteger((long)system.ProcessorCount));
+    PrintRow("architecture", Machine.GetArchitectureName(system.Architecture));
+    PrintRow("page size", Text.FromInteger((long)system.PageSize) + " bytes");
 
     var memory = Machine.QueryMemoryStatus();
-    Row("memory", Megabytes(memory.TotalPhysical) + " total, "
-        + Megabytes(memory.AvailablePhysical) + " free ("
+    PrintRow("memory", FormatMegabytes(memory.TotalPhysical) + " total, "
+        + FormatMegabytes(memory.AvailablePhysical) + " free ("
         + Text.FromInteger((long)memory.MemoryLoad) + "% used)");
 
-    Heading("This process");
-    Row("executable", Machine.GetExecutablePath());
-    Row("directory", Environment.GetCurrentDirectory());
-    Row("user", Environment.ExpandEnvironmentVariables("%USERNAME%"));
-    Row("temp", Files.GetTempPath());
-    Row("command", Environment.GetCommandLine());
+    PrintHeading("This process");
+    PrintRow("executable", Machine.GetExecutablePath());
+    PrintRow("directory", Environment.GetCurrentDirectory());
+    PrintRow("user", Environment.ExpandEnvironmentVariables("%USERNAME%"));
+    PrintRow("temp", Files.GetTempPath());
+    PrintRow("command", Environment.GetCommandLine());
 
-    Heading("Console");
+    PrintHeading("Console");
     var size = Terminal.GetWindowSize();
-    Row("window", Text.FromInteger((long)size.X) + " x " + Text.FromInteger((long)size.Y));
-    Row("title", Terminal.GetTitle());
-    Console.Write("  " + Dim + Pad("colours", 14u) + Plain);
-    Swatch();
+    PrintRow("window", Text.FromInteger((long)size.X) + " x " + Text.FromInteger((long)size.Y));
+    PrintRow("title", Terminal.GetTitle());
+    Console.Write("  " + Dim + PadText("colours", 14u) + Plain);
+    PrintColourSwatch();
 
-    Heading("A child process");
+    PrintHeading("A child process");
     var ran = Tasks.RunProcess("cmd.exe /c ver", "");
-    Row("started", Text.FromBool(ran.Started));
-    Row("exit code", Text.FromInteger((long)ran.ExitCode));
-    Row("said", Trimmed(ran.Output));
+    PrintRow("started", Text.FromBool(ran.Started));
+    PrintRow("exit code", Text.FromInteger((long)ran.ExitCode));
+    PrintRow("said", FindFirstNonBlankLine(ran.Output));
 
-    Heading("The system directory");
+    PrintHeading("The system directory");
     var names = Files.GetDirectoryEntries(Environment.GetSystemDirectory());
-    Row("entries", Text.FromInteger((long)names.Count));
+    PrintRow("entries", Text.FromInteger((long)names.Count));
     Console.WriteLine("");
     return 0;
 }
 
-String Megabytes(ulong bytes)
+String FormatMegabytes(ulong bytes)
 {
     return Text.FromInteger((long)(bytes / 1048576u)) + " MB";
 }
 
 /// The eight console colours, set and put back. This one goes through
 /// SetConsoleTextAttribute rather than through an escape sequence, so it shows
-/// something even on a console where EnableAnsi failed.
-void Swatch()
+/// something even on a console where EnableAnsiEscapes failed.
+void PrintColourSwatch()
 {
     for (uint i = 0u; i < 8u; i = (uint)(i + 1u))
     {
@@ -159,7 +161,7 @@ void Swatch()
 /// The first line with anything on it, so that a multi-line answer fits a row
 /// and a leading blank line -- which `cmd /c ver` produces -- does not read as
 /// an empty answer.
-String Trimmed(String text)
+String FindFirstNonBlankLine(String text)
 {
     foreach (var line in text.SplitLines())
     {

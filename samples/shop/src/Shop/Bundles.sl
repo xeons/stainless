@@ -20,26 +20,26 @@ public class Bundle : IPriced
         _count = 0;
     }
 
-    public void Include(IPriced item)
+    public void Add(IPriced item)
     {
         _items[_count] = item;
         _count++;
     }
 
-    public Money Price()
+    public Money Price
     {
-        var total = Cents(0);
-        for (nuint i = 0; i < _count; i++)
+        get
         {
-            // Dynamic dispatch: each element may be a Book, a Subscription,
-            // or another Bundle.
-            total = Add(total, _items[i].Price());
+            var total = CreateMoney(0);
+            for (nuint i = 0; i < _count; i++)
+            {
+                // Dynamic dispatch: each element may be a Book, a Subscription,
+                // or another Bundle.
+                total = AddMoney(total, _items[i].Price);
+            }
+            return total;
         }
-        return total;
     }
 
-    public String Label()
-    {
-        return _name + " (" + Text.FromInteger(_count) + " items)";
-    }
+    public String Label => _name + " (" + Text.FromInteger(_count) + " items)";
 }

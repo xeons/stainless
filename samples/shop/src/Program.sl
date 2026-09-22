@@ -19,22 +19,24 @@ int Main()
     var register = new Register<IPriced>(4);
 
     // `Book` and `Subscription` come from Shop.Catalog, unqualified.
-    register.Add(new Book("The Annotated Turing", Money.Cents(3499)));
-    register.Add(new Subscription("Journal", Money.Cents(500), 12));
+    register.Add(new Book("The Annotated Turing", Money.CreateMoney(3499)));
+    register.Add(new Subscription("Journal", Money.CreateMoney(500), 12));
 
     // Fully qualified, with no import of Shop.Bundles anywhere in this file.
     var boxed = new Shop.Bundles.Bundle("Starter set", 2);
-    boxed.Include(new Book("SICP", Money.Cents(5200)));
-    boxed.Include(new Book("TAPL", Money.Cents(6800)));
+    boxed.Add(new Book("SICP", Money.CreateMoney(5200)));
+    boxed.Add(new Book("TAPL", Money.CreateMoney(6800)));
     register.Add(boxed);
 
     foreach (var item in register)
     {
-        Console.WriteLine("  " + item.Label() + " = " + Money.Format(item.Price()));
+        Console.WriteLine("  " + item.Label + " = " + Money.FormatMoney(item.Price));
     }
 
-    // Total comes from Shop.Inventory; Format from Shop.Pricing via its alias.
-    Console.WriteLine("total = " + Money.Format(Total(register)));
-    Console.WriteLine("twice = " + Money.Format(Money.Twice(Total(register))));
+    // SumPrices comes from Shop.Inventory; FormatMoney from Shop.Pricing via
+    // its alias.
+    var total = SumPrices(register);
+    Console.WriteLine("total = " + Money.FormatMoney(total));
+    Console.WriteLine("twice = " + Money.FormatMoney(Money.DoubleMoney(total)));
     return 0;
 }

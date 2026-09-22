@@ -5,8 +5,8 @@ import Standard.Console;
 
 public interface IShape
 {
-    double Area();
-    String Describe();
+    double Area { get; }
+    String Description { get; }
 }
 
 public interface INamed
@@ -21,8 +21,8 @@ public class Circle : IShape, INamed
     public Circle(double r) => _radius = r;
     ~Circle() { Console.WriteLine("  ~Circle"); }
 
-    public double Area() => 3.14159265 * _radius * _radius;
-    public String Describe() => "circle of radius " + Text.FromDouble(_radius);
+    public double Area => 3.14159265 * _radius * _radius;
+    public String Description => "circle of radius " + Text.FromDouble(_radius);
     public String Name => "Circle";
 }
 
@@ -37,20 +37,21 @@ public class Rectangle : IShape
         _height = h;
     }
 
-    public double Area() => _width * _height;
-    public String Describe() => "rectangle " + Text.FromDouble(_width) + "x" + Text.FromDouble(_height);
+    public double Area => _width * _height;
+    public String Description =>
+        "rectangle " + Text.FromDouble(_width) + "x" + Text.FromDouble(_height);
 }
 
 // Dispatch happens through the interface, not the concrete class.
-double TotalArea(IShape a, IShape b) => a.Area() + b.Area();
+double SumAreas(IShape a, IShape b) => a.Area + b.Area;
 
-void Report(IShape s)
+void ReportShape(IShape s)
 {
     var line = new StringBuilder();
     line.Append("  ");
-    line.Append(s.Describe());
+    line.Append(s.Description);
     line.Append(" -> area ");
-    line.AppendDouble(s.Area());
+    line.AppendDouble(s.Area);
     Console.WriteLine(line.ToText());
 }
 
@@ -59,9 +60,9 @@ int Main()
     IShape circle = new Circle(2.0);
     IShape box    = new Rectangle(3.0, 4.0);
 
-    Report(circle);
-    Report(box);
-    Console.WriteLine("total = " + Text.FromDouble(TotalArea(circle, box)));
+    ReportShape(circle);
+    ReportShape(box);
+    Console.WriteLine("total = " + Text.FromDouble(SumAreas(circle, box)));
 
     // A class may implement several interfaces; each gets its own vtable.
     INamed named = new Circle(1.0);

@@ -54,7 +54,7 @@ public struct State
 
 // ------------------------------------------------------------ the procedure
 
-nint Procedure(HWND window, uint message, nuint wParam, nint lParam)
+nint HandleWindowMessage(HWND window, uint message, nuint wParam, nint lParam)
 {
     State* state = (State*)(nuint)GetWindowLongPtrW(window, GwlpUserData);
 
@@ -65,7 +65,7 @@ nint Procedure(HWND window, uint message, nuint wParam, nint lParam)
             return 0;
 
         case WmPaint:
-            Paint(window, state);
+            PaintWindow(window, state);
             return 0;
 
         // The background is painted as part of WM_PAINT, into the off-screen
@@ -113,7 +113,7 @@ nint Procedure(HWND window, uint message, nuint wParam, nint lParam)
 
 // --------------------------------------------------------------- the drawing
 
-void Paint(HWND window, State* state)
+void PaintWindow(HWND window, State* state)
 {
     PaintStruct paint;
     HDC dc = BeginPaint(window, &paint);
@@ -193,7 +193,7 @@ int Main()
 
     var windowClass = CreateWindowClass();
     windowClass.Style = ClassStyleHorizontalRedraw | ClassStyleVerticalRedraw;
-    windowClass.Procedure = Procedure;
+    windowClass.Procedure = HandleWindowMessage;
     windowClass.Instance = instance;
     windowClass.Cursor = LoadCursorW(null, CursorArrow());
     windowClass.ClassName = "StainlessWindow".ToUtf16().ToPointer();

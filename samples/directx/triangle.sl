@@ -36,7 +36,7 @@ import Windows.DirectX11;
 // `SV_Position` is the one output a vertex shader must produce, and it is in
 // clip space -- so the coordinates below are already where they will appear,
 // with -1 at the left and +1 at the top.
-String Source() =>
+String GetShaderSource() =>
     "struct Vertex { float3 Position : POSITION; float3 Colour : COLOR; };\n" +
     "struct Fragment { float4 Position : SV_Position; float3 Colour : COLOR; };\n" +
     "\n" +
@@ -55,7 +55,7 @@ String Source() =>
 
 // Six floats a vertex: a position and a colour. Written as bytes because that
 // is what a vertex buffer takes, and `Float` is the one conversion needed.
-byte[] Vertices()
+byte[] BuildVertices()
 {
     double[] numbers = [
         //  x      y     z      r     g     b
@@ -66,13 +66,13 @@ byte[] Vertices()
 
     byte[] bytes = new byte[numbers.Length * 4u];
     for (nuint i = 0u; i < numbers.Length; i++)
-        PutFloat(bytes, i * 4u, (float)numbers[i]);
+        WriteFloat(bytes, i * 4u, (float)numbers[i]);
     return bytes;
 }
 
 // A float's bits, little-endian. There is no reinterpret in the language, so
 // this goes through a pointer -- which is what the cast is for.
-void PutFloat(byte[] into, nuint at, float value)
+void WriteFloat(byte[] into, nuint at, float value)
 {
     float held = value;
     byte* bits = (byte*)&held;
@@ -84,7 +84,7 @@ void PutFloat(byte[] into, nuint at, float value)
 
 // --------------------------------------------------------------- the window
 
-nint Procedure(HWND window, uint message, nuint wParam, nint lParam)
+nint HandleWindowMessage(HWND window, uint message, nuint wParam, nint lParam)
 {
     if (message == WmDestroy)
     {
@@ -100,7 +100,7 @@ int Main()
     HMODULE instance = GetModuleHandleW(null);
 
     var windowClass = CreateWindowClass();
-    windowClass.Procedure = Procedure;
+    windowClass.Procedure = HandleWindowMessage;
     windowClass.Instance = instance;
     windowClass.Cursor = LoadCursorW(null, CursorArrow());
     windowClass.ClassName = "StainlessDirectX".ToUtf16().ToPointer();
@@ -148,14 +148,14 @@ int Main()
 
     // ----------------------------------------------------------- the shaders
 
-    var vertexCode = Hlsl.CompileShader(Source(), "VertexMain", "vs_5_0");
+    var vertexCode = Hlsl.CompileShader(GetShaderSource(), "VertexMain", "vs_5_0");
     if (!vertexCode.Ok)
     {
         Console.WriteError("vertex shader:\n" + vertexCode.Error);
         return 1;
     }
 
-    var pixelCode = Hlsl.CompileShader(Source(), "PixelMain", "ps_5_0");
+    var pixelCode = Hlsl.CompileShader(GetShaderSource(), "PixelMain", "ps_5_0");
     if (!pixelCode.Ok)
     {
         Console.WriteError("pixel shader:\n" + pixelCode.Error);
@@ -177,7 +177,7 @@ int Main()
     var material = made.Value;
 
     // 24 bytes a vertex: six floats.
-    var built = graphics.CreateMesh(Vertices(), 24u, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    var built = graphics.CreateMesh(BuildVertices(), 24u, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     if (!built.Ok)
     {
         Console.WriteError("could not make the mesh");

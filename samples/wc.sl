@@ -32,9 +32,9 @@ public class Wanted
         Bytes = false;
     }
 
-    public bool Nothing() => !Lines && !Words && !Bytes;
+    public bool IsEmpty => !Lines && !Words && !Bytes;
 
-    public void Everything()
+    public void SelectEverything()
     {
         Lines = true;
         Words = true;
@@ -54,7 +54,7 @@ public struct Count
 /// that is not a space. The last line counts only if it ends with a newline,
 /// which is why a file with no trailing newline reports one fewer than a
 /// reader might expect.
-Count Tally(String text)
+Count TallyText(String text)
 {
     Count found;
     found.Lines = 0;
@@ -85,18 +85,18 @@ Count Tally(String text)
     return found;
 }
 
-String Column(long value) => Text.FromInteger(value).PadLeft(8u);
+String FormatColumn(long value) => Text.FromInteger(value).PadLeft(8u);
 
-void Report(Wanted wanted, Count found, String label)
+void ReportCounts(Wanted wanted, Count found, String label)
 {
     var line = new StringBuilder();
 
     if (wanted.Lines)
-        line.Append(Column(found.Lines));
+        line.Append(FormatColumn(found.Lines));
     if (wanted.Words)
-        line.Append(Column(found.Words));
+        line.Append(FormatColumn(found.Words));
     if (wanted.Bytes)
-        line.Append(Column(found.Bytes));
+        line.Append(FormatColumn(found.Bytes));
 
     if (label.ByteLength() > 0u)
     {
@@ -107,7 +107,7 @@ void Report(Wanted wanted, Count found, String label)
     Console.WriteLine(line.ToText());
 }
 
-Count Add(Count left, Count right)
+Count AddCounts(Count left, Count right)
 {
     Count total;
     total.Lines = left.Lines + right.Lines;
@@ -166,13 +166,13 @@ int Main(String[] args)
 
     if (bad)
         return 2;
-    if (wanted.Nothing())
-        wanted.Everything();
+    if (wanted.IsEmpty)
+        wanted.SelectEverything();
 
     // Nothing named means standard input, which is what makes it a filter.
     if (files.Count == 0u)
     {
-        Report(wanted, Tally(Console.ReadToEnd()), "");
+        ReportCounts(wanted, TallyText(Console.ReadToEnd()), "");
         return 0;
     }
 
@@ -193,14 +193,14 @@ int Main(String[] args)
             continue;
         }
 
-        var found = Tally(read.Value);
-        total = Add(total, found);
-        Report(wanted, found, path);
+        var found = TallyText(read.Value);
+        total = AddCounts(total, found);
+        ReportCounts(wanted, found, path);
     }
 
     // A total only when there was more than one file to total, as `wc` does.
     if (files.Count > 1u)
-        Report(wanted, total, "total");
+        ReportCounts(wanted, total, "total");
 
     if (failures > 0)
         return 1;

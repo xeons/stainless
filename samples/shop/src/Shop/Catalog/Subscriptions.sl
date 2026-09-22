@@ -23,14 +23,17 @@ public class Subscription : IPriced
         _months = count;
     }
 
-    public Money Price()
+    public Money Price
     {
-        var total = Pricing.Cents(0);
-        for (int i = 0; i < _months; i++)
-            total = Pricing.Add(total, _monthly);
-        return total;
+        get
+        {
+            var total = Pricing.CreateMoney(0);
+            for (int i = 0; i < _months; i++)
+                total = Pricing.AddMoney(total, _monthly);
+            return total;
+        }
     }
 
-    // Decorate comes from Books.sl -- same module, no import.
-    public String Label() => Decorate(_name) + " x" + Text.FromInteger(_months);
+    // QuoteTitle comes from Books.sl -- same module, no import.
+    public String Label => QuoteTitle(_name) + " x" + Text.FromInteger(_months);
 }

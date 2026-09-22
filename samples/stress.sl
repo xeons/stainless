@@ -13,19 +13,19 @@ class Node
     ~Node() { printf("  ~Node(%d)\n", _id); }
 
     public int Id => _id;
-    public void Link(Node other) => _next = other;
+    public void SetNext(Node other) => _next = other;
 }
 
-int Fib(int n)
+int ComputeFibonacci(int n)
 {
     if (n < 2)
         return n;
-    return Fib(n - 1) + Fib(n - 2);
+    return ComputeFibonacci(n - 1) + ComputeFibonacci(n - 2);
 }
 
 int Main()
 {
-    printf("fib(20)     = %d\n", Fib(20));
+    printf("fib(20)     = %d\n", ComputeFibonacci(20));
 
     var total = 0;
     for (int i = 0; i < 10; i++)
@@ -46,13 +46,13 @@ int Main()
         j++;
     }
     printf("while total = %d\n", doubled);
-    printf("guard(0)    = %d\n", Guard(0));
+    printf("guard(0)    = %d\n", TestShortCircuit(0));
 
     printf("building chain\n");
     {
         var a = new Node(1);
         var b = new Node(2);
-        a.Link(b);
+        a.SetNext(b);
         printf("  a=%d b=%d\n", a.Id, b.Id);
         printf("  leaving inner scope\n");
     }
@@ -61,7 +61,7 @@ int Main()
 }
 
 // The right operand must not run when the left already decides the answer.
-int Guard(int d)
+int TestShortCircuit(int d)
 {
     if (d != 0 && 100 / d > 1)
         return 1;

@@ -6,7 +6,7 @@ module Arrays;
 
 import Standard.Console;
 
-int Sum(int[] values)
+int SumArray(int[] values)
 {
     var total = 0;
     foreach (int value in values)
@@ -16,7 +16,7 @@ int Sum(int[] values)
 
 /// A slice is a view: no copy, and the array it came from stays alive as long
 /// as the view does.
-int SumOf(int[:] window)
+int SumSlice(int[:] window)
 {
     var total = 0;
     foreach (int value in window)
@@ -31,7 +31,7 @@ int Main()
     var squares = [0, 1, 4, 9, 16];
 
     Console.WriteLine("length = " + Text.FromInteger(squares.Length));
-    Console.WriteLine("sum    = " + Text.FromInteger(Sum(squares)));
+    Console.WriteLine("sum    = " + Text.FromInteger(SumArray(squares)));
 
     // `new T[n]` when the length is not a literal, and the elements are zero.
     var counted = new int[5];
@@ -39,7 +39,7 @@ int Main()
     {
         counted[i] = (int)(i * i);
     }
-    Console.WriteLine("same   = " + Text.FromBool(Sum(counted) == Sum(squares)));
+    Console.WriteLine("same   = " + Text.FromBool(SumArray(counted) == SumArray(squares)));
 
     // Arrays of references: each element is retained and released with the
     // array, so nothing here has a lifetime to get wrong.
@@ -48,7 +48,7 @@ int Main()
 
     // A slice of the middle. `squares` is not copied and cannot be freed while
     // the view exists.
-    Console.WriteLine("middle = " + Text.FromInteger(SumOf(squares[1:4])));
+    Console.WriteLine("middle = " + Text.FromInteger(SumSlice(squares[1:4])));
 
     // A fixed-length array is a slot rather than an allocation: it lives in the
     // struct or the frame that declares it, which is what makes it C's `int[3]`.

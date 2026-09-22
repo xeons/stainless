@@ -18,7 +18,10 @@ public class Register<T>
     }
 
     public nuint Count => _count;
-    public T At(nuint index) => _items[index];
+    public T this[nuint index]
+    {
+        get => _items[index];
+    }
 
     public void Add(T item)
     {
@@ -50,13 +53,13 @@ public class RegisterCursor<T>
         return true;
     }
 
-    public T Current => _source.At(_next - 1);
+    public T Current => _source[_next - 1];
 }
 
-public Money Total(Register<IPriced> register)
+public Money SumPrices(Register<IPriced> register)
 {
-    var sum = Cents(0);
+    var sum = CreateMoney(0);
     foreach (var item in register)
-        sum = Add(sum, item.Price());
+        sum = AddMoney(sum, item.Price);
     return sum;
 }

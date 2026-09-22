@@ -6,7 +6,7 @@ import Standard.Collections;    // IComparable<T> lives here
 
 public interface IDescribable
 {
-    String Describe();
+    String Description { get; }
 }
 
 public class Money : IComparable<Money>, IDescribable
@@ -14,22 +14,22 @@ public class Money : IComparable<Money>, IDescribable
     int _cents;
 
     public Money(int amount) => _cents = amount;
-    public int Cents() => _cents;
+    public int Cents => _cents;
 
     public int CompareTo(Money other)
     {
-        if (_cents < other.Cents())
+        if (_cents < other.Cents)
             return -1;
-        if (_cents > other.Cents())
+        if (_cents > other.Cents)
             return 1;
         return 0;
     }
 
-    public String Describe() => Text.FromInteger(_cents) + "c";
+    public String Description => Text.FromInteger(_cents) + "c";
 }
 
 // `where T : IComparable<T>` is F-bounded: T must be comparable to itself.
-T Largest<T>(T[] values) where T : IComparable<T>
+T FindLargest<T>(T[] values) where T : IComparable<T>
 {
     var best = values[0];
     for (nuint i = 1; i < values.Length; i++)
@@ -58,7 +58,7 @@ public class Ranked<T> where T : IComparable<T>, IDescribable
         _count++;
     }
 
-    public String BestDescription()
+    public String FindBestDescription()
     {
         var best = _items[0];
         for (nuint i = 1; i < _count; i++)
@@ -66,7 +66,7 @@ public class Ranked<T> where T : IComparable<T>, IDescribable
             if (_items[i].CompareTo(best) > 0)
                 best = _items[i];
         }
-        return best.Describe();
+        return best.Description;
     }
 }
 
@@ -77,12 +77,12 @@ int Main()
     prices[1] = new Money(999);
     prices[2] = new Money(125);
 
-    Console.WriteLine("largest = " + Largest(prices).Describe());
+    Console.WriteLine("largest = " + FindLargest(prices).Description);
 
     var ranked = new Ranked<Money>(3);
     ranked.Add(new Money(10));
     ranked.Add(new Money(70));
     ranked.Add(new Money(40));
-    Console.WriteLine("best    = " + ranked.BestDescription());
+    Console.WriteLine("best    = " + ranked.FindBestDescription());
     return 0;
 }

@@ -13,12 +13,12 @@ import Standard.Convert;
 
 extern "C" int printf(byte* format, ...);
 
-void Show(String label, String value)
+void PrintLabelled(String label, String value)
 {
     Console.WriteLine(label + " " + value);
 }
 
-void ShowNumber(String label, long value)
+void PrintLabelledNumber(String label, long value)
 {
     Console.WriteLine(label + " " + Text.FromInteger(value));
 }
@@ -45,8 +45,8 @@ int Main()
     // Bytes and characters are different questions, and both are answerable.
     String accented = "näive café";
     Console.WriteLine(accented);
-    ShowNumber("bytes           ", (long)accented.ByteLength());
-    ShowNumber("code points     ", (long)accented.CodePointCount());
+    PrintLabelledNumber("bytes           ", (long)accented.ByteLength());
+    PrintLabelledNumber("code points     ", (long)accented.CodePointCount());
 
     // Walking it properly: CodePointAt reads one character, NextCodePoint
     // steps over it. A `for` over bytes would land inside one.
@@ -56,42 +56,42 @@ int Main()
         scalars.AppendInteger((long)(uint)accented.CodePointAt(at));
         scalars.Append(" ");
     }
-    Show("scalars         ", scalars.ToText().TrimEnd());
+    PrintLabelled("scalars         ", scalars.ToText().TrimEnd());
 
     // ------------------------------------------------------------ searching
 
     String line = "  name = Ada Lovelace  ";
 
-    Show("trimmed         ", "[" + line.Trim() + "]");
-    Show("key             ", line.Before("=").Trim());
-    Show("value           ", line.After("=").Trim());
-    ShowNumber("indexOf =       ", line.IndexOf("="));
-    ShowNumber("not there       ", line.IndexOf("@"));      // Text.NotFound, which is -1
+    PrintLabelled("trimmed         ", "[" + line.Trim() + "]");
+    PrintLabelled("key             ", line.Before("=").Trim());
+    PrintLabelled("value           ", line.After("=").Trim());
+    PrintLabelledNumber("indexOf =       ", line.IndexOf("="));
+    PrintLabelledNumber("not there       ", line.IndexOf("@"));      // Text.NotFound, which is -1
 
     printf("startsWith       : %d\n", line.Trim().StartsWith("name"));
     printf("contains         : %d\n", line.Contains("Ada"));
 
     // ------------------------------------------------------------- rebuilding
 
-    Show("upper           ", subject.ToUpperAscii());
-    Show("replaced        ", "one two one".Replace("one", "1"));
-    Show("repeated        ", "ab".Repeat(3u));
-    Show("padded          ", "[" + "7".PadLeft(4u) + "]");
+    PrintLabelled("upper           ", subject.ToUpperAscii());
+    PrintLabelled("replaced        ", "one two one".Replace("one", "1"));
+    PrintLabelled("repeated        ", "ab".Repeat(3u));
+    PrintLabelled("padded          ", "[" + "7".PadLeft(4u) + "]");
 
     // Split and Join are inverses: joining what Split produced gives the
     // original back, empty parts and all.
     var fields = "alpha,beta,,delta".Split(',');
-    ShowNumber("fields          ", (long)fields.Length);
-    Show("joined          ", " | ".Join(fields));
+    PrintLabelledNumber("fields          ", (long)fields.Length);
+    PrintLabelled("joined          ", " | ".Join(fields));
 
     var lines = "one\ntwo\r\nthree\n".SplitLines();
-    ShowNumber("lines           ", (long)lines.Length);   // three: the last \n adds none
+    PrintLabelledNumber("lines           ", (long)lines.Length);   // three: the last \n adds none
 
     // ------------------------------------------------------------- comparing
 
     // Ordinal, by bytes -- which orders by code point as well, because UTF-8
     // was designed so that it would. It is not a linguistic ordering.
-    ShowNumber("apple vs banana ", (long)"apple".CompareTo("banana"));
+    PrintLabelledNumber("apple vs banana ", (long)"apple".CompareTo("banana"));
     printf("ignoring case    : %d\n", "HELLO".EqualsIgnoreCaseAscii("hello"));
 
     // --------------------------------------------------------- the neighbours
@@ -103,19 +103,19 @@ int Main()
     var port = Convert.ToInt("8080");
     switch (port)
     {
-        case Ok ok:  ShowNumber("parsed          ", (long)ok.Value); break;
-        case Fail:   Show("parsed          ", "not a number"); break;
+        case Ok ok:  PrintLabelledNumber("parsed          ", (long)ok.Value); break;
+        case Fail:   PrintLabelled("parsed          ", "not a number"); break;
     }
 
-    Show("in hex          ", Convert.FromLong(255, 16u));
-    Show("base64          ", Convert.ToBase64Text("Hello"));
+    PrintLabelled("in hex          ", Convert.FromLong(255, 16u));
+    PrintLabelled("base64          ", Convert.ToBase64Text("Hello"));
 
     // ------------------------------------------------------------- UTF-16
 
     // For a wide platform API, and always an explicit conversion.
     var wide = accented.ToUtf16();
-    ShowNumber("utf16 units     ", (long)wide.UnitCount());
-    Show("round trip      ", wide.ToText());
+    PrintLabelledNumber("utf16 units     ", (long)wide.UnitCount());
+    PrintLabelled("round trip      ", wide.ToText());
 
     return 0;
 }

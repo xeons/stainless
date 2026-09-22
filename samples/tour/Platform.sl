@@ -44,7 +44,7 @@ public const Status Broken = -1;
 /// Which platform this was built for, decided at compile time. `WINDOWS`,
 /// `UNIX`, `LINUX`, `MACOS` and `STAINLESS` are defined by the compiler; `-D`
 /// adds more.
-public String Family()
+public String GetPlatformFamily()
 {
 #if WINDOWS
     return "windows";
@@ -59,7 +59,7 @@ public String Family()
 
 /// A symbol the tour never defines, so the `#else` is what survives. Nothing
 /// in the discarded branch is lexed, let alone bound.
-public String Mood()
+public String GetMood()
 {
 #if TOUR_IS_GRUMPY
     this line is not even tokenized
@@ -118,12 +118,12 @@ public export "C" int tour_triple(int value) => value * 3;
 
 /// Handles are made from integers here, there being no real window to ask for.
 /// What matters is that the two stay apart on the way through.
-public Slot   SlotAt(nuint n) => (Slot)n;
-public Cursor CursorAt(nuint n) => (Cursor)n;
+public Slot   MakeSlot(nuint n) => (Slot)n;
+public Cursor MakeCursor(nuint n) => (Cursor)n;
 
-public nuint NumberOf(Slot slot) => (nuint)slot;
+public nuint GetSlotNumber(Slot slot) => (nuint)slot;
 
-public Status Check(Slot slot, Cursor cursor)
+public Status CheckHandles(Slot slot, Cursor cursor)
 {
     if (slot == null)
         return Broken;

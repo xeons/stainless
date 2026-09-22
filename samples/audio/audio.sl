@@ -18,9 +18,9 @@ import Standard.Media.Audio;
 
 // A major scale in semitones from the root, which is what makes the tones
 // sound like something rather than like a test.
-int[] Scale() => [0, 2, 4, 5, 7, 9, 11, 12];
+int[] GetMajorScale() => [0, 2, 4, 5, 7, 9, 11, 12];
 
-double Note(int semitones)
+double ComputeNoteFrequency(int semitones)
 {
     // Twelve-tone equal temperament from A above middle C: each semitone is
     // the twelfth root of two.
@@ -30,26 +30,26 @@ double Note(int semitones)
     return 440.0 * ratio;
 }
 
-int Play()
+int PlayScale()
 {
     var format = AudioFormat.Cd;
     var opened = AudioPlayer.Open(format);
     if (!opened.Ok)
     {
-        Console.WriteLine("could not open a device: " + Describe(opened.Error));
+        Console.WriteLine("could not open a device: " + DescribeAudioError(opened.Error));
         return 1;
     }
 
     var player = opened.Value;
     Console.WriteLine("playing a scale through " + Audio.BackendName());
 
-    foreach (int step in Scale())
+    foreach (int step in GetMajorScale())
     {
-        var tone = Tone.Sine(format, Note(step), 0.18, 0.25);
+        var tone = Tone.Sine(format, ComputeNoteFrequency(step), 0.18, 0.25);
         var written = player.Write(tone.Samples);
         if (!written.Ok)
         {
-            Console.WriteLine("write failed: " + Describe(written.Error));
+            Console.WriteLine("write failed: " + DescribeAudioError(written.Error));
             player.Close();
             return 1;
         }
@@ -63,7 +63,7 @@ int Play()
     return 0;
 }
 
-int Record()
+int RecordAndPlayBack()
 {
     var format = AudioFormat.Voice;
     Console.WriteLine("recording three seconds through " + Audio.BackendName() + "...");
@@ -71,7 +71,7 @@ int Record()
     var heard = Audio.Record(format, 3.0);
     if (!heard.Ok)
     {
-        Console.WriteLine("could not record: " + Describe(heard.Error));
+        Console.WriteLine("could not record: " + DescribeAudioError(heard.Error));
         return 1;
     }
 
@@ -104,14 +104,14 @@ int Record()
     var played = Audio.Play(clip);
     if (!played.Ok)
     {
-        Console.WriteLine("playback failed: " + Describe(played.Error));
+        Console.WriteLine("playback failed: " + DescribeAudioError(played.Error));
         return 1;
     }
 
     return 0;
 }
 
-String Describe(AudioError error)
+String DescribeAudioError(AudioError error)
 {
     switch (error)
     {
@@ -136,7 +136,7 @@ int Main()
     }
 
     if (Env.ArgumentCount() > 0u && Env.ArgumentAt(0u) == "record")
-        return Record();
+        return RecordAndPlayBack();
 
-    return Play();
+    return PlayScale();
 }

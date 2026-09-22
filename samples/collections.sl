@@ -10,29 +10,29 @@ public class Money : IComparable<Money>, IEquatable<Money>
     int _cents;
 
     public Money(int amount) => _cents = amount;
-    public int Cents() => _cents;
+    public int Cents => _cents;
 
     public int CompareTo(Money other)
     {
-        if (_cents < other.Cents())
+        if (_cents < other.Cents)
             return -1;
-        if (_cents > other.Cents())
+        if (_cents > other.Cents)
             return 1;
         return 0;
     }
 
-    public bool EqualTo(Money other) => _cents == other.Cents();
+    public bool EqualTo(Money other) => _cents == other.Cents;
 
-    public String Show() => Text.FromInteger(_cents) + "c";
+    public String ToText() => Text.FromInteger(_cents) + "c";
 }
 
 // IList<T> extends IReadOnlyList<T>, so a list passed here can only be read.
-String Describe(IReadOnlyList<Money> prices)
+String DescribePrices(IReadOnlyList<Money> prices)
 {
     var text = new StringBuilder();
     for (nuint i = 0; i < prices.Count; i++)
     {
-        text.Append(prices[i].Show());
+        text.Append(prices[i].ToText());
         text.Append(" ");
     }
     return text.ToText();
@@ -51,10 +51,10 @@ int Main()
     Console.WriteLine($"capacity = {prices.Capacity}");
 
     // A List<Money> is accepted wherever an IReadOnlyList<Money> is wanted.
-    Console.WriteLine($"items    = {Describe(prices)}");
+    Console.WriteLine($"items    = {DescribePrices(prices)}");
 
-    Console.WriteLine($"largest  = {Largest(prices).Show()}");
-    Console.WriteLine($"smallest = {Smallest(prices).Show()}");
+    Console.WriteLine($"largest  = {Largest(prices).ToText()}");
+    Console.WriteLine($"smallest = {Smallest(prices).ToText()}");
 
     // `IndexOf` answers with an `Optional<nuint>`. A list's length standing in
     // for "not there" is exactly the sentinel that type exists to retire.
@@ -65,7 +65,7 @@ int Main()
     Console.WriteLine($"index of 1c   = {IndexOf(prices, new Money(1)).IsEmpty}");
 
     Sort(prices);
-    Console.WriteLine($"sorted   = {Describe(prices)}");
+    Console.WriteLine($"sorted   = {DescribePrices(prices)}");
 
     prices.Clear();
     Console.WriteLine($"cleared  = {prices.IsEmpty}");

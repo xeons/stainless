@@ -14,7 +14,7 @@
 // The events are `closure` types (§2.14.1) -- a method and the object it
 // belongs to -- so a handler can be either:
 //
-//     search.OnSearch(results.Show);          // a method bound to an object
+//     search.OnSearch(results.AddResult);     // a method bound to an object
 //     search.OnSearch((text) => { ... });     // or a lambda that captures
 //
 // and both are the same two words. That is what a component library needs and
@@ -49,7 +49,7 @@ public closure bool SearchAllowed(String text);
 ///
 /// **It is not a `Widget`.** `Widget`'s constructor takes a GTK handle and
 /// takes ownership of it, and a composite control owns several -- so it holds
-/// its root rather than being one, and `Root()` is what goes into a layout.
+/// its root rather than being one, and `Root` is what goes into a layout.
 /// Deriving would have meant claiming to be a single widget it is not.
 public class SearchBox
 {
@@ -101,18 +101,18 @@ public class SearchBox
         // these is a method of *this* control bound to *this* object, so the
         // handlers know which SearchBox they belong to without a `sender`
         // parameter or a lookup table.
-        _search.OnClicked(this.Run);
-        _field.OnEntered(this.Run);
-        _clear.OnClicked(this.Clear);
-        _field.OnChanged(this.Changed);
+        _search.OnClicked(this.RunSearch);
+        _field.OnEntered(this.RunSearch);
+        _clear.OnClicked(this.ClearSearch);
+        _field.OnChanged(this.OnFieldChanged);
     }
 
     // ------------------------------------------------------------ the surface
 
     /// What a layout puts in. Borrowed: the control owns it.
-    public Widget Root() => _root;
+    public Widget Root => _root;
 
-    public String Text() => _field.GetText();
+    public String GetText() => _field.GetText();
 
     public void SetText(String text) => _field.SetText(text);
 
@@ -125,7 +125,7 @@ public class SearchBox
 
     /// Runs the search as if the button had been pressed, refusal and all.
     /// What a program calls to restore a saved search on startup.
-    public void Submit() => Run();
+    public void SubmitSearch() => RunSearch();
 
     /// How many searches have run, which the demo prints and a real control
     /// would not have.
@@ -159,7 +159,7 @@ public class SearchBox
     // ------------------------------------------------------------- the wiring
 
     /// The one that does the work. Private, and bound to two widgets above.
-    void Run()
+    void RunSearch()
     {
         var text = _field.GetText();
 
@@ -182,7 +182,7 @@ public class SearchBox
             _onSearch(text);
     }
 
-    void Clear()
+    void ClearSearch()
     {
         _field.SetText("");
         _status.SetText("");
@@ -190,7 +190,7 @@ public class SearchBox
             _onChanged("");
     }
 
-    void Changed()
+    void OnFieldChanged()
     {
         if (_hasChanged)
             _onChanged(_field.GetText());
@@ -213,8 +213,8 @@ class Results
     }
 
     /// A method with exactly the shape of `SearchRequested`, which is what
-    /// lets `search.OnSearch(results.Show)` work.
-    public void Show(String text)
+    /// lets `search.OnSearch(results.AddResult)` work.
+    public void AddResult(String text)
     {
         _seen.Add(text);
 
@@ -256,7 +256,7 @@ public int Main()
 
     // The control. Everything the program knows about it is on these lines.
     var search = new SearchBox("search terms");
-    page.PackStart(search.Root(), false);
+    page.PackStart(search.Root, false);
 
     var found = new Label("results:");
     page.PackStart(found, false);
@@ -265,7 +265,7 @@ public int Main()
 
     // A bound method as the handler: the object it belongs to is the one that
     // has somewhere to put the answer.
-    search.OnSearch(results.Show);
+    search.OnSearch(results.AddResult);
 
     // A lambda where there is no object to bind to, which is the other half of
     // the same type.

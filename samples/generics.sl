@@ -6,12 +6,9 @@ import Standard.Console;
 // A generic class. Nothing in it is checked until it is instantiated.
 public class Box<T>
 {
-    T _value;
+    public Box(T initial) => Value = initial;
 
-    public Box(T initial) => _value = initial;
-
-    public T Get() => _value;
-    public void Set(T next) => _value = next;
+    public T Value { get; set; }
 }
 
 // A growable list built on arrays.
@@ -41,11 +38,14 @@ public class List<T>
         _count++;
     }
 
-    public T At(nuint index) => _items[index];
+    public T this[nuint index]
+    {
+        get => _items[index];
+    }
 }
 
 // A generic function; its type argument is inferred from the arguments.
-T Larger<T>(T a, T b, bool takeFirst)
+T ChooseEither<T>(T a, T b, bool takeFirst)
 {
     if (takeFirst)
         return a;
@@ -55,11 +55,11 @@ T Larger<T>(T a, T b, bool takeFirst)
 int Main()
 {
     var number = new Box<int>(41);
-    number.Set(number.Get() + 1);
-    Console.WriteLine("box int    = " + Text.FromInteger(number.Get()));
+    number.Value++;
+    Console.WriteLine("box int    = " + Text.FromInteger(number.Value));
 
     var text = new Box<String>("boxed");
-    Console.WriteLine("box String = " + text.Get());
+    Console.WriteLine("box String = " + text.Value);
 
     var names = new List<String>();
     names.Add("alpha");
@@ -72,12 +72,12 @@ int Main()
     var joined = new StringBuilder();
     for (nuint i = 0; i < names.Count; i++)
     {
-        joined.Append(names.At(i));
+        joined.Append(names[i]);
         joined.Append(" ");
     }
     Console.WriteLine("items      = " + joined.ToText());
 
-    Console.WriteLine("larger int = " + Text.FromInteger(Larger(10, 20, false)));
-    Console.WriteLine("larger str = " + Larger("first", "second", true));
+    Console.WriteLine("larger int = " + Text.FromInteger(ChooseEither(10, 20, false)));
+    Console.WriteLine("larger str = " + ChooseEither("first", "second", true));
     return 0;
 }

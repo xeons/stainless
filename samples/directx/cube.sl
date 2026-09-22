@@ -76,30 +76,36 @@ public struct Matrix
 {
     public float[16] M;
 
-    public static Matrix Identity()
+    public static Matrix Identity
     {
-        Matrix result;
-        for (nuint i = 0u; i < 16u; i++)
-            result.M[i] = 0.0f;
-        result.M[0u] = 1.0f;
-        result.M[5u] = 1.0f;
-        result.M[10u] = 1.0f;
-        result.M[15u] = 1.0f;
-        return result;
+        get
+        {
+            Matrix result;
+            for (nuint i = 0u; i < 16u; i++)
+                result.M[i] = 0.0f;
+            result.M[0u] = 1.0f;
+            result.M[5u] = 1.0f;
+            result.M[10u] = 1.0f;
+            result.M[15u] = 1.0f;
+            return result;
+        }
     }
 
-    public static Matrix Zero()
+    public static Matrix Zero
     {
-        Matrix result;
-        for (nuint i = 0u; i < 16u; i++)
-            result.M[i] = 0.0f;
-        return result;
+        get
+        {
+            Matrix result;
+            for (nuint i = 0u; i < 16u; i++)
+                result.M[i] = 0.0f;
+            return result;
+        }
     }
 }
 
-Matrix Multiply(Matrix left, Matrix right)
+Matrix MultiplyMatrices(Matrix left, Matrix right)
 {
-    var result = Matrix.Zero();
+    var result = Matrix.Zero;
     for (nuint row = 0u; row < 4u; row++)
     {
         for (nuint column = 0u; column < 4u; column++)
@@ -113,9 +119,9 @@ Matrix Multiply(Matrix left, Matrix right)
     return result;
 }
 
-Matrix RotationY(double angle)
+Matrix CreateRotationY(double angle)
 {
-    var result = Matrix.Identity();
+    var result = Matrix.Identity;
     float c = (float)Math.Cos(angle);
     float s = (float)Math.Sin(angle);
     result.M[0u] = c;
@@ -125,9 +131,9 @@ Matrix RotationY(double angle)
     return result;
 }
 
-Matrix RotationX(double angle)
+Matrix CreateRotationX(double angle)
 {
-    var result = Matrix.Identity();
+    var result = Matrix.Identity;
     float c = (float)Math.Cos(angle);
     float s = (float)Math.Sin(angle);
     result.M[5u] = c;
@@ -137,18 +143,18 @@ Matrix RotationX(double angle)
     return result;
 }
 
-Matrix Translation(double x, double y, double z)
+Matrix CreateTranslation(double x, double y, double z)
 {
-    var result = Matrix.Identity();
+    var result = Matrix.Identity;
     result.M[12u] = (float)x;
     result.M[13u] = (float)y;
     result.M[14u] = (float)z;
     return result;
 }
 
-Matrix Scale(double x, double y, double z)
+Matrix CreateScale(double x, double y, double z)
 {
-    var result = Matrix.Identity();
+    var result = Matrix.Identity;
     result.M[0u] = (float)x;
     result.M[5u] = (float)y;
     result.M[10u] = (float)z;
@@ -158,9 +164,9 @@ Matrix Scale(double x, double y, double z)
 /// A left-handed perspective projection, which is the convention Direct3D
 /// uses: z runs into the screen, and the depth buffer holds 0 at the near
 /// plane and 1 at the far one.
-Matrix Perspective(double fieldOfView, double aspect, double near, double far)
+Matrix CreatePerspective(double fieldOfView, double aspect, double near, double far)
 {
-    var result = Matrix.Zero();
+    var result = Matrix.Zero;
     double height = 1.0 / Math.Tan(fieldOfView * 0.5);
     result.M[0u] = (float)(height / aspect);
     result.M[5u] = (float)height;
@@ -172,7 +178,7 @@ Matrix Perspective(double fieldOfView, double aspect, double near, double far)
 
 /// A view matrix from an eye and what it is looking at. Left-handed, to match
 /// the projection: right is `up x forward`, and up is `forward x right`.
-Matrix LookAt(double eyeX, double eyeY, double eyeZ, double atX, double atY, double atZ)
+Matrix CreateLookAt(double eyeX, double eyeY, double eyeZ, double atX, double atY, double atZ)
 {
     double fx = atX - eyeX;
     double fy = atY - eyeY;
@@ -229,13 +235,13 @@ Matrix LookAt(double eyeX, double eyeY, double eyeZ, double atX, double atY, dou
 /// which is why a general renderer uses a shadow map instead; for a cube on a
 /// plane it is correct, costs one extra draw, and needs no second render
 /// target.
-Matrix FlattenOntoFloor(double lightX, double lightY, double lightZ, double height)
+Matrix CreateFloorShadow(double lightX, double lightY, double lightZ, double height)
 {
     // The plane is y = height, so n is (0, 1, 0) and d is -height.
     double d = -height;
     double dot = lightY + d;
 
-    var result = Matrix.Zero();
+    var result = Matrix.Zero;
     result.M[0u] = (float)dot;
 
     result.M[4u] = (float)-lightX;
@@ -256,7 +262,7 @@ Matrix FlattenOntoFloor(double lightX, double lightY, double lightZ, double heig
 
 // A vertex is a position, a normal and a colour: nine floats, 36 bytes.
 
-void PutFloat(byte[] into, nuint at, double value)
+void WriteFloat(byte[] into, nuint at, double value)
 {
     float held = (float)value;
     byte* bits = (byte*)&held;
@@ -266,19 +272,19 @@ void PutFloat(byte[] into, nuint at, double value)
     into[at + 3u] = bits[3u];
 }
 
-byte[] Pack(List<double> numbers)
+byte[] PackFloats(List<double> numbers)
 {
     byte[] bytes = new byte[numbers.Count * 4u];
     for (nuint i = 0u; i < numbers.Count; i++)
-        PutFloat(bytes, i * 4u, numbers[i]);
+        WriteFloat(bytes, i * 4u, numbers[i]);
     return bytes;
 }
 
-byte[] PackArray(double[] numbers)
+byte[] PackFloatArray(double[] numbers)
 {
     byte[] bytes = new byte[numbers.Length * 4u];
     for (nuint i = 0u; i < numbers.Length; i++)
-        PutFloat(bytes, i * 4u, numbers[i]);
+        WriteFloat(bytes, i * 4u, numbers[i]);
     return bytes;
 }
 
@@ -295,7 +301,7 @@ byte[] PackArray(double[] numbers)
 /// survives. Getting it backwards does not make the cube disappear: it culls
 /// the near faces and draws the far ones, so the cube is rendered inside out
 /// and looks like a shape with four visible sides.
-byte[] CubeVertices()
+byte[] BuildCubeVertices()
 {
     double[] numbers = [
         // +X, red
@@ -335,12 +341,12 @@ byte[] CubeVertices()
         -1.0, -1.0, -1.0,   0.0, 0.0, -1.0, 0.22, 0.86, 0.88,
     ];
 
-    return PackArray(numbers);
+    return PackFloatArray(numbers);
 }
 
 /// Two triangles per face, from the four corners in the order they were
 /// written.
-uint[] QuadIndices(uint quads)
+uint[] BuildQuadIndices(uint quads)
 {
     uint[] indices = new uint[(nuint)quads * 6u];
     for (uint quad = 0u; quad < quads; quad++)
@@ -358,7 +364,7 @@ uint[] QuadIndices(uint quads)
 }
 
 /// A grey floor at y = -1.6, big enough to catch the shadow.
-byte[] FloorVertices()
+byte[] BuildFloorVertices()
 {
     double[] numbers = [
          7.0, -1.6,  7.0,   0.0, 1.0, 0.0,   0.62, 0.63, 0.70,
@@ -366,7 +372,7 @@ byte[] FloorVertices()
         -7.0, -1.6, -7.0,   0.0, 1.0, 0.0,   0.44, 0.45, 0.52,
         -7.0, -1.6,  7.0,   0.0, 1.0, 0.0,   0.62, 0.63, 0.70,
     ];
-    return PackArray(numbers);
+    return PackFloatArray(numbers);
 }
 
 // ================================================================== letters
@@ -376,7 +382,7 @@ byte[] FloorVertices()
 /// Seven letters is all "STAINLESS" needs. Written as text rather than as hex
 /// so that the shapes are visible in the source, which is the whole reason a
 /// bitmap font is readable at all.
-String[] Glyph(char letter)
+String[] GetGlyphRows(char letter)
 {
     if (letter == 'S')
         return [".####", "#....", "#....", ".###.", "....#", "....#", "####."];
@@ -397,7 +403,7 @@ String[] Glyph(char letter)
 }
 
 /// How wide the word is, in font pixels: five per letter and one between.
-nuint WordWidth(String word) => word.ByteLength() * 6u - 1u;
+nuint MeasureWordWidth(String word) => word.ByteLength() * 6u - 1u;
 
 /// The word as a mesh of little squares, one per lit pixel.
 ///
@@ -405,14 +411,14 @@ nuint WordWidth(String word) => word.ByteLength() * 6u - 1u;
 /// no shader resource view and no font file -- and it suits the subject, since
 /// a chiptune's letters were squares too. The y axis points up, so row 0 of
 /// the glyph is at the top.
-byte[] WordVertices(String word)
+byte[] BuildWordVertices(String word)
 {
     var numbers = new List<double>();
     var letters = word.ToPointer();
 
     for (nuint index = 0u; index < word.ByteLength(); index++)
     {
-        var glyph = Glyph((char)letters[index]);
+        var glyph = GetGlyphRows((char)letters[index]);
         double left = (double)(index * 6u);
 
         for (nuint row = 0u; row < 7u; row++)
@@ -430,7 +436,7 @@ byte[] WordVertices(String word)
         }
     }
 
-    return Pack(numbers);
+    return PackFloats(numbers);
 }
 
 /// One unit square at (x, y), wound clockwise as seen on screen.
@@ -467,7 +473,7 @@ void AddVertex(List<double> into, double x, double y)
 /// reuse the cube's shaders. `Override.w` above zero means "use `Override.rgb`
 /// flat, with no lighting", and doubles as the alpha, which is what makes the
 /// shadow translucent.
-String Source() =>
+String GetShaderSource() =>
     "cbuffer Frame : register(b0)\n" +
     "{\n" +
     "    float4x4 Transform;\n" +
@@ -525,7 +531,7 @@ struct Music
 /// A module is thirty kilobytes for two minutes where the same as PCM is
 /// twelve megabytes, which is the whole reason the format exists -- and it
 /// means a demo can carry real music without carrying a wave file.
-Music Load(String wanted)
+Music LoadMusic(String wanted)
 {
     Music music;
     music.Rate = 22050u;
@@ -542,18 +548,18 @@ Music Load(String wanted)
         if (candidates[i].ByteLength() == 0u)
             continue;
 
-        var loaded = Tracker.Load(candidates[i]);
+        var loaded = Tracker.LoadModule(candidates[i]);
         if (!loaded.Ok)
             continue;
 
         var song = loaded.Value;
-        music.Samples = Tracker.Render(song, music.Rate, 240.0);
+        music.Samples = Tracker.RenderModule(song, music.Rate, 240.0);
         music.Channels = 2u;
         music.Source = song.Name + " (" + candidates[i] + ")";
         return music;
     }
 
-    music.Samples = Chiptune(music.Rate);
+    music.Samples = SynthesizeChiptune(music.Rate);
     music.Channels = 1u;
     music.Source = "the built-in chiptune";
     return music;
@@ -584,7 +590,7 @@ const nuint TicksPerRow = 6u;
 const int Rest = -128;
 
 /// The melody, in semitones from A above middle C, one entry per row.
-int[] Lead() => [
+int[] GetLeadNotes() => [
     12, Rest, 10, 12,   15, Rest, 12, 10,
      7, Rest, 10, 12,   15,   17, 15, 12,
     12, Rest, 15, 17,   19, Rest, 17, 15,
@@ -594,7 +600,7 @@ int[] Lead() => [
 /// The chord under each group of four rows: Am, Am, F, F, C, C, G, G. Three
 /// notes each, an octave or so below the melody, which is where a SID put
 /// them.
-int[] Chords() => [
+int[] GetChordNotes() => [
     -12,  -9,  -5,     -12,  -9,  -5,
     -16, -12,  -7,     -16, -12,  -7,
      -9,  -5,  -2,      -9,  -5,  -2,
@@ -602,7 +608,7 @@ int[] Chords() => [
 ];
 
 /// The root of each chord, two octaves down, for the bass.
-int[] BassRoots() => [-24, -24, -28, -28, -21, -21, -26, -26];
+int[] GetBassRoots() => [-24, -24, -28, -28, -21, -21, -26, -26];
 
 /// How many rows the pattern is.
 const nuint RowCount = 32u;
@@ -613,7 +619,7 @@ const nuint RowCount = 32u;
 /// phases are accumulated rather than computed from the elapsed time, because
 /// a frequency that changes -- and the vibrato changes it every sample --
 /// leaves a click at every boundary if the phase is recomputed instead.
-byte[] Chiptune(uint rate)
+byte[] SynthesizeChiptune(uint rate)
 {
     nuint samplesPerTick = (nuint)((double)rate / TicksPerSecond);
     nuint samplesPerRow = samplesPerTick * TicksPerRow;
@@ -621,9 +627,9 @@ byte[] Chiptune(uint rate)
 
     byte[] samples = new byte[frames * 2u];
 
-    var lead = Lead();
-    var chords = Chords();
-    var roots = BassRoots();
+    var lead = GetLeadNotes();
+    var chords = GetChordNotes();
+    var roots = GetBassRoots();
 
     double leadPhase = 0.0;
     double arpPhase = 0.0;
@@ -660,7 +666,7 @@ byte[] Chiptune(uint rate)
             double depth = through < 0.25 ? 0.0 : (through - 0.25) * 0.012;
             double wobble = 1.0 + depth * Math.Sin(vibratoPhase * 6.28318530717958623200);
 
-            leadPhase = leadPhase + Frequency(note) * wobble / (double)rate;
+            leadPhase = leadPhase + ComputeFrequency(note) * wobble / (double)rate;
 
             // Pulse-width modulation: the duty cycle sweeps between a thin
             // reedy pulse and a hollow square.
@@ -674,7 +680,7 @@ byte[] Chiptune(uint rate)
             else if (through > 0.82)
                 envelope = (1.0 - through) / 0.18;
 
-            leadValue = Pulse(leadPhase, duty) * 0.26 * envelope;
+            leadValue = ComputePulseWave(leadPhase, duty) * 0.26 * envelope;
         }
 
         // ------------------------------------------------------- the arpeggio
@@ -683,11 +689,11 @@ byte[] Chiptune(uint rate)
         // three notes at 50 Hz is heard as a chord.
         nuint which = tick % 3u;
         int arpNote = chords[chord * 3u + which];
-        arpPhase = arpPhase + Frequency(arpNote) / (double)rate;
+        arpPhase = arpPhase + ComputeFrequency(arpNote) / (double)rate;
 
         // Softer than the lead and never gated, so it sits underneath as a
         // texture rather than a part.
-        double arpValue = Pulse(arpPhase, 0.5) * 0.11;
+        double arpValue = ComputePulseWave(arpPhase, 0.5) * 0.11;
 
         // ------------------------------------------------------------- bass
 
@@ -695,9 +701,9 @@ byte[] Chiptune(uint rate)
         double bassValue = 0.0;
         if (row % 2u == 0u)
         {
-            bassPhase = bassPhase + Frequency(roots[chord]) / (double)rate;
+            bassPhase = bassPhase + ComputeFrequency(roots[chord]) / (double)rate;
             double decay = Math.Pow(1.0 - through, 1.4);
-            bassValue = Pulse(bassPhase, 0.5) * 0.30 * decay;
+            bassValue = ComputePulseWave(bassPhase, 0.5) * 0.30 * decay;
         }
 
         // ------------------------------------------------------------- mix
@@ -720,7 +726,7 @@ byte[] Chiptune(uint rate)
 }
 
 /// A semitone offset from A above middle C, as hertz.
-double Frequency(int semitones)
+double ComputeFrequency(int semitones)
 {
     double ratio = 1.0;
     int steps = semitones;
@@ -741,7 +747,7 @@ double Frequency(int semitones)
 ///
 /// The phase is allowed to grow without bound and only its fraction is used,
 /// which costs nothing here and keeps the caller from having to wrap it.
-double Pulse(double cycles, double duty)
+double ComputePulseWave(double cycles, double duty)
 {
     double phase = cycles - (double)(long)cycles;
     return phase < duty ? 1.0 : -1.0;
@@ -749,7 +755,7 @@ double Pulse(double cycles, double duty)
 
 // =================================================================== window
 
-nint Procedure(HWND window, uint message, nuint wParam, nint lParam)
+nint HandleWindowMessage(HWND window, uint message, nuint wParam, nint lParam)
 {
     if (message == WmDestroy)
     {
@@ -762,22 +768,22 @@ nint Procedure(HWND window, uint message, nuint wParam, nint lParam)
 
 /// The constant block, packed the way HLSL expects it: a 4x4 matrix and two
 /// float4s, 96 bytes.
-byte[] FrameConstants(Matrix transform, double lightX, double lightY, double lightZ,
+byte[] PackFrameConstants(Matrix transform, double lightX, double lightY, double lightZ,
                       double red, double green, double blue, double flat)
 {
     byte[] bytes = new byte[96u];
     for (nuint i = 0u; i < 16u; i++)
-        PutFloat(bytes, i * 4u, (double)transform.M[i]);
+        WriteFloat(bytes, i * 4u, (double)transform.M[i]);
 
-    PutFloat(bytes, 64u, lightX);
-    PutFloat(bytes, 68u, lightY);
-    PutFloat(bytes, 72u, lightZ);
-    PutFloat(bytes, 76u, 0.0);
+    WriteFloat(bytes, 64u, lightX);
+    WriteFloat(bytes, 68u, lightY);
+    WriteFloat(bytes, 72u, lightZ);
+    WriteFloat(bytes, 76u, 0.0);
 
-    PutFloat(bytes, 80u, red);
-    PutFloat(bytes, 84u, green);
-    PutFloat(bytes, 88u, blue);
-    PutFloat(bytes, 92u, flat);
+    WriteFloat(bytes, 80u, red);
+    WriteFloat(bytes, 84u, green);
+    WriteFloat(bytes, 88u, blue);
+    WriteFloat(bytes, 92u, flat);
     return bytes;
 }
 
@@ -806,7 +812,7 @@ int Main()
     HMODULE instance = GetModuleHandleW(null);
 
     var windowClass = CreateWindowClass();
-    windowClass.Procedure = Procedure;
+    windowClass.Procedure = HandleWindowMessage;
     windowClass.Instance = instance;
     windowClass.Cursor = LoadCursorW(null, CursorArrow());
     windowClass.ClassName = "StainlessCube".ToUtf16().ToPointer();
@@ -857,14 +863,14 @@ int Main()
     // Row-major, so the matrices above reach the GPU as they are written.
     uint flags = D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | D3DCOMPILE_OPTIMIZATION_LEVEL3;
 
-    var vertexCode = Hlsl.CompileShader(Source(), "VertexMain", "vs_5_0", flags);
+    var vertexCode = Hlsl.CompileShader(GetShaderSource(), "VertexMain", "vs_5_0", flags);
     if (!vertexCode.Ok)
     {
         Console.WriteError("vertex shader:\n" + vertexCode.Error);
         return 1;
     }
 
-    var pixelCode = Hlsl.CompileShader(Source(), "PixelMain", "ps_5_0", flags);
+    var pixelCode = Hlsl.CompileShader(GetShaderSource(), "PixelMain", "ps_5_0", flags);
     if (!pixelCode.Ok)
     {
         Console.WriteError("pixel shader:\n" + pixelCode.Error);
@@ -888,16 +894,16 @@ int Main()
 
     // ---------------------------------------------------------- the geometry
 
-    byte[] wordVertices = WordVertices("STAINLESS");
+    byte[] wordVertices = BuildWordVertices("STAINLESS");
     // 36 bytes a vertex, four vertices a square.
     nuint bytesPerQuad = 144u;
     uint wordQuads = (uint)(wordVertices.Length / bytesPerQuad);
 
-    var builtCube = graphics.CreateIndexedMesh(CubeVertices(), 36u, QuadIndices(6u),
+    var builtCube = graphics.CreateIndexedMesh(BuildCubeVertices(), 36u, BuildQuadIndices(6u),
                                                D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    var builtFloor = graphics.CreateIndexedMesh(FloorVertices(), 36u, QuadIndices(1u),
+    var builtFloor = graphics.CreateIndexedMesh(BuildFloorVertices(), 36u, BuildQuadIndices(1u),
                                                 D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    var builtWord = graphics.CreateIndexedMesh(wordVertices, 36u, QuadIndices(wordQuads),
+    var builtWord = graphics.CreateIndexedMesh(wordVertices, 36u, BuildQuadIndices(wordQuads),
                                                D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     if (!builtCube.Ok || !builtFloor.Ok || !builtWord.Ok)
@@ -937,7 +943,7 @@ int Main()
         {
             mixer = engine.Value;
 
-            var tune = Load(songPath);
+            var tune = LoadMusic(songPath);
             var loaded = engine.Value.CreateSound(tune.Samples, tune.Rate, tune.Channels);
             if (loaded.Ok)
             {
@@ -959,19 +965,19 @@ int Main()
     double lightZ = -2.4;
     double floorHeight = -1.6;
 
-    var projection = Perspective(Math.Pi / 3.6, 800.0 / 600.0, 0.1, 100.0);
-    var view = LookAt(0.0, 2.4, -6.6, 0.0, -0.3, 0.0);
-    var viewProjection = Multiply(view, projection);
+    var projection = CreatePerspective(Math.Pi / 3.6, 800.0 / 600.0, 0.1, 100.0);
+    var view = CreateLookAt(0.0, 2.4, -6.6, 0.0, -0.3, 0.0);
+    var viewProjection = MultiplyMatrices(view, projection);
 
     // A hair above the floor, so the shadow wins the depth test against it.
-    var flatten = FlattenOntoFloor(lightX, lightY, lightZ, floorHeight + 0.002);
+    var flatten = CreateFloorShadow(lightX, lightY, lightZ, floorHeight + 0.002);
 
     // The bouncing overlay, in clip space. The letters are 53 font pixels
     // wide; the scale turns that into 0.9 of the screen's width, and the
     // vertical scale matches so the squares stay square.
-    double letterScale = 0.62 / (double)WordWidth("STAINLESS");
+    double letterScale = 0.62 / (double)MeasureWordWidth("STAINLESS");
     double letterScaleY = letterScale * (800.0 / 600.0);
-    double wordWide = letterScale * (double)WordWidth("STAINLESS");
+    double wordWide = letterScale * (double)MeasureWordWidth("STAINLESS");
     double wordHigh = letterScaleY * 7.0;
 
     double wordX = -wordWide * 0.5;
@@ -983,15 +989,15 @@ int Main()
     while (PumpMessages())
     {
         double time = (double)drawn / 60.0;
-        var spin = Multiply(RotationX(time * 0.6), RotationY(time * 0.9));
-        var model = Multiply(spin, Translation(0.0, 0.2, 0.0));
+        var spin = MultiplyMatrices(CreateRotationX(time * 0.6), CreateRotationY(time * 0.9));
+        var model = MultiplyMatrices(spin, CreateTranslation(0.0, 0.2, 0.0));
 
         graphics.Clear(0.05f, 0.06f, 0.10f, 1.0f);
 
         // The floor, lit by the same light as everything else.
         graphics.SetAlphaBlend(false);
         graphics.UpdateConstantBuffer(constants,
-            FrameConstants(viewProjection, lightX, lightY, lightZ, 0.0, 0.0, 0.0, 0.0));
+            PackFrameConstants(viewProjection, lightX, lightY, lightZ, 0.0, 0.0, 0.0, 0.0));
         graphics.DrawMesh(material, ground);
 
         // The shadow: the cube's own geometry, flattened onto the floor by the
@@ -999,14 +1005,14 @@ int Main()
         // than replacing it.
         graphics.SetAlphaBlend(true);
         graphics.UpdateConstantBuffer(constants,
-            FrameConstants(Multiply(Multiply(model, flatten), viewProjection),
+            PackFrameConstants(MultiplyMatrices(MultiplyMatrices(model, flatten), viewProjection),
                            lightX, lightY, lightZ, 0.04, 0.04, 0.08, 0.55));
         graphics.DrawMesh(material, cube);
 
         // The cube itself, on top of its shadow.
         graphics.SetAlphaBlend(false);
         graphics.UpdateConstantBuffer(constants,
-            FrameConstants(Multiply(model, viewProjection),
+            PackFrameConstants(MultiplyMatrices(model, viewProjection),
                            lightX, lightY, lightZ, 0.0, 0.0, 0.0, 0.0));
         graphics.DrawMesh(material, cube);
 
@@ -1026,20 +1032,21 @@ int Main()
             wordY = wordY + driftY;
         }
 
-        var letters = Multiply(Scale(letterScale, letterScaleY, 1.0),
-                               Translation(wordX, wordY - wordHigh, 0.0));
+        var letters = MultiplyMatrices(CreateScale(letterScale, letterScaleY, 1.0),
+                               CreateTranslation(wordX, wordY - wordHigh, 0.0));
 
         // Twice: a dark copy a little down and to the right, then the bright
         // one over it. A drop shadow is two draws and makes text readable over
         // anything.
         graphics.UpdateConstantBuffer(constants,
-            FrameConstants(Multiply(Scale(letterScale, letterScaleY, 1.0),
-                                    Translation(wordX + 0.008, wordY - wordHigh - 0.008, 0.0)),
-                           lightX, lightY, lightZ, 0.02, 0.02, 0.04, 1.0));
+            PackFrameConstants(
+                MultiplyMatrices(CreateScale(letterScale, letterScaleY, 1.0),
+                    CreateTranslation(wordX + 0.008, wordY - wordHigh - 0.008, 0.0)),
+                lightX, lightY, lightZ, 0.02, 0.02, 0.04, 1.0));
         graphics.DrawMesh(material, word);
 
         graphics.UpdateConstantBuffer(constants,
-            FrameConstants(letters, lightX, lightY, lightZ, 1.0, 0.86, 0.22, 1.0));
+            PackFrameConstants(letters, lightX, lightY, lightZ, 1.0, 0.86, 0.22, 1.0));
         graphics.DrawMesh(material, word);
 
         if (shot && drawn == 90)

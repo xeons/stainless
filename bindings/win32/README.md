@@ -290,7 +290,7 @@ A `delegate` captures nothing, so a `WNDPROC` is an ordinary module-level
 function and per-window state goes where Win32 has always kept it:
 
 ```csharp
-nint Procedure(HWND window, uint message, nuint wParam, nint lParam) {
+nint HandleWindowMessage(HWND window, uint message, nuint wParam, nint lParam) {
     State* state = (State*)(nuint)GetWindowLongPtrW(window, GwlpUserData);
     switch (message) {
         case WmDestroy: PostQuitMessage(0); return 0;

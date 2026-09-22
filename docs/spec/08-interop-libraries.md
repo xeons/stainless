@@ -213,8 +213,8 @@ reachable from outside, and that is the only control there is:
 | Declaration | In the library |
 |---|---|
 | `export "C" int Add(int, int)` | exported, unmangled, as `Add` |
-| `public int Helper()` | visible to other Stainless modules, **not** exported |
-| `int Secret()` | module-private |
+| `public int GetHelperValue()` | visible to other Stainless modules, **not** exported |
+| `int GetSecretValue()` | module-private |
 
 `public` deliberately does not export. It answers a different question — which
 modules may see this — and a library's surface should be stated once,

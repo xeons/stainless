@@ -10,8 +10,8 @@ import Shop.Pricing;
 
 public interface IPriced
 {
-    Money Price();
-    String Label();
+    Money Price { get; }
+    String Label { get; }
 }
 
 public class Book : IPriced
@@ -25,11 +25,11 @@ public class Book : IPriced
         _price = amount;
     }
 
-    public Money Price() => _price;
-    public String Label() => Decorate(_title);
+    public Money Price => _price;
+    public String Label => QuoteTitle(_title);
 }
 
 // No `public`: visible throughout Shop.Catalog, including its other file, but
 // invisible to anyone who imports the module. This is C#'s `internal`, with the
 // module playing the part of the assembly.
-String Decorate(String text) => "\"" + text + "\"";
+String QuoteTitle(String text) => "\"" + text + "\"";

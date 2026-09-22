@@ -315,8 +315,8 @@ no `Main`, and **the export table is exactly the `export "C"` functions**:
 ```csharp
 export "C" int Add(int a, int b) { return a + b; }   // exported
 
-public int Helper() { return 1; }                    // other modules only
-int Secret()        { return 2; }                    // module-private
+public int GetHelperValue() { return 1; }            // other modules only
+int GetSecretValue()        { return 2; }            // module-private
 ```
 
 That library's export table holds exactly one name:

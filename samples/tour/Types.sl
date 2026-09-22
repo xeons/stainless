@@ -27,7 +27,12 @@ public struct Point
 
     /// A struct may have methods. It has no constructor: `Point p;` is how one
     /// comes into being, and every field starts at zero.
-    public double LengthSquared() => X * X + Y * Y;
+    public double MeasureDistanceSquaredTo(Point other)
+    {
+        double dx = X - other.X;
+        double dy = Y - other.Y;
+        return dx * dx + dy * dy;
+    }
 }
 
 /// A struct may hold a *reference*, and then copying it retains and dropping it
@@ -174,7 +179,7 @@ public interface INamed
 /// both.
 public interface IDrawable : INamed
 {
-    String Draw();
+    String DrawAsText();
 }
 
 #endregion
@@ -197,18 +202,18 @@ public abstract class Figure : IDrawable
     }
 
     /// No body, so a derived class has to supply one.
-    public abstract double Area();
+    public abstract double Area { get; }
 
     /// A body, which a derived class may take or replace.
     public virtual String Name => "figure";
 
-    public virtual String Draw()
+    public virtual String DrawAsText()
     {
         return Name + " with " + Text.FromInteger((long)sides) + " sides";
     }
 
     /// Not virtual, and reads a protected field.
-    public int Sides() => sides;
+    public int Sides => sides;
 
     public String Tag { get { return tag; } }
 }
@@ -223,12 +228,12 @@ public class Polygon : Figure
         width = w;
     }
 
-    public override double Area() => width * width;
+    public override double Area => width * width;
     public override String Name => "polygon";
 
     /// Reaching the base's implementation, which the dispatch table would
     /// never find.
-    public override String Draw() => "a " + base.Draw();
+    public override String DrawAsText() => "a " + base.DrawAsText();
 }
 
 /// `sealed` closes the chain, and `this(...)` delegates to another constructor

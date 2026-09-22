@@ -36,13 +36,13 @@ static readonly String Dim  = "\x1b[90m";
 static readonly String Bold = "\x1b[1m";
 static readonly String Off  = "\x1b[0m";
 
-void Heading(String text)
+void PrintHeading(String text)
 {
     Console.WriteLine("");
     Console.WriteLine(Bold + text + Off);
 }
 
-void Line(String label, String value)
+void PrintLine(String label, String value)
 {
     Console.WriteLine("  " + Dim + label + Off + "  " + value);
 }
@@ -56,20 +56,20 @@ int Main()
     // A string table is addressed by a bare id rather than by a resource name,
     // because Windows stores strings in blocks of sixteen and `LoadStringW`
     // works out which block holds the one asked for.
-    Heading(Resources.LoadString((uint)IdsTitle));
-    Line("subtitle", Resources.LoadString((uint)IdsSubtitle));
-    Line("ready", Resources.LoadString((uint)IdsReady));
+    PrintHeading(Resources.LoadString((uint)IdsTitle));
+    PrintLine("subtitle", Resources.LoadString((uint)IdsSubtitle));
+    PrintLine("ready", Resources.LoadString((uint)IdsReady));
 
     // An id with nothing behind it is an empty string rather than an abort. A
     // resource that is not there is an ordinary answer.
-    Line("id 999", "'" + Resources.LoadString(999u) + "'");
+    PrintLine("id 999", "'" + Resources.LoadString(999u) + "'");
 
     // -------------------------------------------------------------- bytes
-    Heading("Bytes");
+    PrintHeading("Bytes");
 
     // Copied out, which is what anything outliving the call wants.
     var banner = Resources.ReadResourceBytes(Resources.MakeIntResource(IdrBanner), RtRcData());
-    Line("banner", $"{banner.Length} bytes");
+    PrintLine("banner", $"{banner.Length} bytes");
 
     // The same resource without copying: a pointer into the mapped image,
     // read-only and valid as long as this program is running. Nothing to free
@@ -79,16 +79,16 @@ int Main()
     uint size = 0u;
     byte* at = Resources.GetResourcePointer(Resources.MakeIntResource(IdrBanner), RtRcData(),
         &size);
-    Line("in place", $"{size} bytes at a borrowed pointer: {at != null}");
+    PrintLine("in place", $"{size} bytes at a borrowed pointer: {at != null}");
 
     // A string name, and a type this program invented. Both halves of a
     // resource's identity may be either a number or a name.
     var licence = Resources.ReadResourceBytes("LICENCE".ToUtf16().ToPointer(),
                                   "TEXTBLOB".ToUtf16().ToPointer());
-    Line("licence", $"{licence.Length} bytes under a string name");
+    PrintLine("licence", $"{licence.Length} bytes under a string name");
 
     // ------------------------------------------------------------ asking
-    Heading("What is actually in here");
+    PrintHeading("What is actually in here");
 
     // Enumeration, which is how a program checks that its own build put in
     // what the script said rather than assuming. `#101` is the spelling a
@@ -101,23 +101,23 @@ int Main()
     // id and every other call takes a name.
     foreach (var type in Resources.GetResourceTypes())
     {
-        var names = Resources.GetResourceNames(TypeNamed(type));
-        Line(type, $"{names.Length} resource(s)");
+        var names = Resources.GetResourceNames(ParseTypeName(type));
+        PrintLine(type, $"{names.Length} resource(s)");
         foreach (var name in names)
             Console.WriteLine("      " + Dim + name + Off);
     }
 
-    Heading("The manifest");
+    PrintHeading("The manifest");
 
     // Nothing above asked for this one and it is here anyway: an RT_MANIFEST
     // is read by the loader before `Main` runs. It is what selects version 6
     // of comctl32, which is the difference between themed common controls and
     // the Windows 2000 look.
     char16* manifest = Resources.MakeIntResource(ManifestResourceId);
-    Line("RT_MANIFEST", $"{Resources.GetResourceSize(manifest, RtManifest())} bytes");
+    PrintLine("RT_MANIFEST", $"{Resources.GetResourceSize(manifest, RtManifest())} bytes");
 
     // ----------------------------------------------------------- another
-    Heading("Another binary's resources");
+    PrintHeading("Another binary's resources");
 
     // `LOAD_LIBRARY_AS_DATAFILE` maps a file without running any code in it --
     // no DllMain, no imports resolved -- which is the only safe way to read
@@ -125,12 +125,12 @@ int Main()
     var shell = Resources.OpenModuleForResources("C:\\Windows\\System32\\shell32.dll");
     if (shell == null)
     {
-        Line("shell32.dll", "could not be opened: " + Win32.GetLastErrorMessage());
+        PrintLine("shell32.dll", "could not be opened: " + Win32.GetLastErrorMessage());
     }
     else
     {
         String[] icons = Resources.GetResourceNamesIn(shell, RtGroupIcon());
-        Line("shell32.dll", $"{icons.Length} icon groups");
+        PrintLine("shell32.dll", $"{icons.Length} icon groups");
         Resources.CloseModule(shell);
     }
 
@@ -138,13 +138,13 @@ int Main()
     return 0;
 }
 
-/// Turns what `Types()` printed back into the name an API wants.
+/// Turns what `GetResourceTypes()` printed back into the name an API wants.
 ///
-/// `Types()` renders an integer type as `#10`, because that is how a resource
-/// script spells one; this is the other direction, so that enumerating types
-/// and then enumerating each type's names works without the caller keeping the
-/// raw pointers around.
-char16* TypeNamed(String type)
+/// `GetResourceTypes()` renders an integer type as `#10`, because that is how
+/// a resource script spells one; this is the other direction, so that
+/// enumerating types and then enumerating each type's names works without the
+/// caller keeping the raw pointers around.
+char16* ParseTypeName(String type)
 {
     if (type.StartsWith("#"))
     {

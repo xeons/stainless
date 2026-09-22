@@ -39,15 +39,15 @@ class State
 }
 
 // The drawing, as an object rather than a lambda because it wants a name and
-// some state. It implements nothing: `Paint` is an ordinary method, and
-// `face.OnPaint(painting.Paint)` binds it to this object.
+// some state. It implements nothing: `DrawDial` is an ordinary method, and
+// `face.OnPaint(painting.DrawDial)` binds it to this object.
 class Face
 {
     State _state;
 
     public Face(State shared) => _state = shared;
 
-    public void Paint(Canvas canvas, int width, int height)
+    public void DrawDial(Canvas canvas, int width, int height)
     {
         // A paint handler is handed the size, because the two GTK versions ask
         // for it differently and a painter should not have to know which.
@@ -139,7 +139,7 @@ public int Main()
     var painting = new Face(state);
 
     var face = new DrawingArea();
-    face.OnPaint(painting.Paint);
+    face.OnPaint(painting.DrawDial);
     face.SetSize(220, 220);
     body.PackStart(face, true);
 

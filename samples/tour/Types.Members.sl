@@ -60,7 +60,7 @@ public class Control
 
     /// An ordinary method, so that something exists to name on an instance
     /// and store in a closure.
-    public void Bump(int by)
+    public void MoveBy(int by)
     {
         Left = Left + by;
         Moved(Left);
@@ -86,15 +86,15 @@ public struct Money
 {
     public long Cents;
 
-    public static Money operator +(Money a, Money b) { return Cents(a.Cents + b.Cents); }
-    public static Money operator -(Money a, Money b) { return Cents(a.Cents - b.Cents); }
-    public static Money operator -(Money a)          { return Cents(0 - a.Cents); }
+    public static Money operator +(Money a, Money b) { return CreateMoney(a.Cents + b.Cents); }
+    public static Money operator -(Money a, Money b) { return CreateMoney(a.Cents - b.Cents); }
+    public static Money operator -(Money a)          { return CreateMoney(0 - a.Cents); }
 
     // Both ways round, so it reads either way it is written.
-    public static Money operator *(Money a, long by) => Cents(a.Cents * by);
-    public static Money operator *(long by, Money a) => Cents(a.Cents * by);
-    public static Money operator /(Money a, long by) { return Cents(a.Cents / by); }
-    public static Money operator %(Money a, long by) { return Cents(a.Cents % by); }
+    public static Money operator *(Money a, long by) => CreateMoney(a.Cents * by);
+    public static Money operator *(long by, Money a) => CreateMoney(a.Cents * by);
+    public static Money operator /(Money a, long by) { return CreateMoney(a.Cents / by); }
+    public static Money operator %(Money a, long by) { return CreateMoney(a.Cents % by); }
 
     // Comparison operators come in pairs.
     public static bool operator ==(Money a, Money b) { return a.Cents == b.Cents; }
@@ -105,7 +105,7 @@ public struct Money
     public static bool operator >=(Money a, Money b) { return a.Cents >= b.Cents; }
 }
 
-public Money Cents(long value)
+public Money CreateMoney(long value)
 {
     Money made;
     made.Cents = value;
@@ -117,19 +117,19 @@ public struct Mask
 {
     public uint Bits;
 
-    public static Mask operator |(Mask a, Mask b)  { return Of(a.Bits | b.Bits); }
-    public static Mask operator &(Mask a, Mask b)  { return Of(a.Bits & b.Bits); }
-    public static Mask operator ^(Mask a, Mask b)  { return Of(a.Bits ^ b.Bits); }
-    public static Mask operator ~(Mask a)          { return Of(~a.Bits); }
-    public static Mask operator <<(Mask a, int by) => Of(a.Bits << (uint)by);
-    public static Mask operator >>(Mask a, int by) => Of(a.Bits >> (uint)by);
+    public static Mask operator |(Mask a, Mask b)  { return CreateMask(a.Bits | b.Bits); }
+    public static Mask operator &(Mask a, Mask b)  { return CreateMask(a.Bits & b.Bits); }
+    public static Mask operator ^(Mask a, Mask b)  { return CreateMask(a.Bits ^ b.Bits); }
+    public static Mask operator ~(Mask a)          { return CreateMask(~a.Bits); }
+    public static Mask operator <<(Mask a, int by) => CreateMask(a.Bits << (uint)by);
+    public static Mask operator >>(Mask a, int by) => CreateMask(a.Bits >> (uint)by);
     public static bool operator !(Mask a)          { return a.Bits == 0u; }
 
     public static bool operator ==(Mask a, Mask b) { return a.Bits == b.Bits; }
     public static bool operator !=(Mask a, Mask b) { return a.Bits != b.Bits; }
 }
 
-public Mask Of(uint bits)
+public Mask CreateMask(uint bits)
 {
     Mask made;
     made.Bits = bits;
@@ -163,7 +163,7 @@ public class Registry
 
     public String Name => _name;
 
-    public static int Made() => s_made;
+    public static bool HasMade(int count) => s_made >= count;
 
     /// A static property, which is two static functions.
     public static int Doubled { get { return s_made * 2; } }
@@ -175,7 +175,7 @@ public class Registry
 public static class Defaults
 {
     public static int Retries = 3;
-    public static String Note() => "defaults";
+    public static String Note => "defaults";
 }
 
 // ============================================================ nested types
@@ -209,7 +209,7 @@ public class Widget
 
 /// A generic function. `T` is substituted at each call and the body compiled
 /// again, so there is no boxing and no type erasure.
-public T Larger<T>(T a, T b) where T : IComparable<T>
+public T ChooseLarger<T>(T a, T b) where T : IComparable<T>
 {
     return a.CompareTo(b) >= 0 ? a : b;
 }
@@ -220,16 +220,16 @@ public struct Box<T>
 {
     public T Value;
 
-    public static Box<T> operator +(Box<T> a, Box<T> b) { return Boxed(a.Value + b.Value); }
+    public static Box<T> operator +(Box<T> a, Box<T> b) { return CreateBox(a.Value + b.Value); }
     public static bool operator ==(Box<T> a, Box<T> b)  { return a.Value == b.Value; }
     public static bool operator !=(Box<T> a, Box<T> b)  { return a.Value != b.Value; }
 
     /// A generic *method* on a generic type: two parameters, bound at
     /// different times.
-    public String Pair<U>(U other) => $"{Value}/{other}";
+    public String PairWith<U>(U other) => $"{Value}/{other}";
 }
 
-public Box<T> Boxed<T>(T value)
+public Box<T> CreateBox<T>(T value)
 {
     Box<T> made;
     made.Value = value;
@@ -237,7 +237,7 @@ public Box<T> Boxed<T>(T value)
 }
 
 /// Two constraints at once, both interfaces the standard library defines.
-public nuint Digest<T>(T[:] items) where T : IHashable, IEquatable<T>
+public nuint ComputeDigest<T>(T[:] items) where T : IHashable, IEquatable<T>
 {
     nuint total = 0u;
     foreach (var item in items)

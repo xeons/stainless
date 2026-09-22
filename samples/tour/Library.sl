@@ -29,59 +29,60 @@ import Tour.Types;
 
 // ==================================================================== §7
 
-void Members()
+void ShowMembers()
 {
-    Heading("7. properties, indexers, operators and statics");
+    PrintHeading("7. properties, indexers, operators and statics");
 
     // §7.3: a property is a pair of functions wearing the spelling of a field,
     // so writing one runs the setter -- which is what the counter shows.
     var control = new Control("panel");
     control.Left = 5;
     control.Left = 8;
-    Say("property", (long)control.Left);
-    Say("setter ran", (long)control.Layouts);
-    Say("computed", (long)control.Right);
-    Say("automatic", control.Name);
+    PrintValue("property", (long)control.Left);
+    PrintValue("setter ran", (long)control.Layouts);
+    PrintValue("computed", (long)control.Right);
+    PrintValue("automatic", control.Name);
 
     // §7.5: an indexer is a property that takes an argument, and overloads on
     // the index type.
-    Say("indexer get", (long)control[2u]);
+    PrintValue("indexer get", (long)control[2u]);
     control[3u] = 20;
-    Say("indexer set", (long)control.Left);
-    Say("other indexer", control["panel"]);
+    PrintValue("indexer set", (long)control.Left);
+    PrintValue("other indexer", control["panel"]);
 
     // §7.4: operators, declared inside the type with every operand written
     // out. `3 * money` is why there is no implicit receiver.
-    var price = Cents(1250);
-    var tax = Cents(100);
-    Say("plus", (price + tax).Cents);
-    Say("minus", (price - tax).Cents);
-    Say("negate", (-price).Cents);
-    Say("times", (price * 3).Cents);
-    Say("times, other way", (3 * price).Cents);
-    Say("divide", (price / 5).Cents);
-    Say("remainder", (price % 7).Cents);
-    Say("equal", price == Cents(1250));
-    Say("less", price < tax);
-    Say("compound", (price += tax).Cents);
+    var price = CreateMoney(1250);
+    var tax = CreateMoney(100);
+    PrintValue("plus", (price + tax).Cents);
+    PrintValue("minus", (price - tax).Cents);
+    PrintValue("negate", (-price).Cents);
+    PrintValue("times", (price * 3).Cents);
+    PrintValue("times, other way", (3 * price).Cents);
+    PrintValue("divide", (price / 5).Cents);
+    PrintValue("remainder", (price % 7).Cents);
+    PrintValue("equal", price == CreateMoney(1250));
+    PrintValue("less", price < tax);
+    PrintValue("compound", (price += tax).Cents);
 
-    var bits = Of(12u);
-    var other = Of(10u);
-    Say("or / and / xor", $"{(bits | other).Bits} {(bits & other).Bits} {(bits ^ other).Bits}");
-    Say("complement", (long)(~bits).Bits);
-    Say("shifts", $"{(bits << 2).Bits} {(bits >> 2).Bits}");
-    Say("not", !Of(0u));
+    var bits = CreateMask(12u);
+    var other = CreateMask(10u);
+    PrintValue("or / and / xor",
+        $"{(bits | other).Bits} {(bits & other).Bits} {(bits ^ other).Bits}");
+    PrintValue("complement", (long)(~bits).Bits);
+    PrintValue("shifts", $"{(bits << 2).Bits} {(bits >> 2).Bits}");
+    PrintValue("not", !CreateMask(0u));
 
     // §7.6: storage that belongs to the type. The static constructor ran
     // before `Main`, in the same pass the field initializers did.
     var one = new Registry("one");
     var two = new Registry("two");
-    Say("static field", Registry.Kind);
-    Say("static readonly", Registry.Version);
-    Say("static method", (long)Registry.Made());
-    Say("static property", (long)Registry.Doubled);
-    Say("instances", one.Name + " " + two.Name);
-    Say("static class", $"{Defaults.Retries} {Defaults.Note()}");
+    PrintValue("static field", Registry.Kind);
+    PrintValue("static readonly", Registry.Version);
+    PrintValue("static method", Registry.HasMade(2));
+    PrintValue("static property", (long)Registry.Doubled);
+    PrintValue("instances", one.Name + " " + two.Name);
+    PrintValue("static class", $"{Defaults.Retries} {Defaults.Note}");
 
     // A type declared inside another, named for where it was written.
     var widget = new Widget;
@@ -90,27 +91,27 @@ void Members()
     span.From = 2;
     span.To = 9;
     widget.Extent = span;
-    Say("nested enum", (long)widget.Mood);
-    Say("nested struct", (long)widget.Width);
+    PrintValue("nested enum", (long)widget.Mood);
+    PrintValue("nested struct", (long)widget.Width);
 }
 
 // ==================================================================== §7.1
 
 /// Overloads are told apart by their parameters, and a free function is
 /// reached without a prefix from inside the module that declares it.
-String Render(int value) => $"int {value}";
-String Render(double value) => $"double {value}";
-String Render(String value) => $"text {value}";
+String RenderValue(int value) => $"int {value}";
+String RenderValue(double value) => $"double {value}";
+String RenderValue(String value) => $"text {value}";
 
 // ==================================================================== §7.2
 
 /// `ref` is one storage location under two names: the callee writes what the
 /// caller can see.
-void Twice(ref int value) => value *= 2;
+void DoubleInPlace(ref int value) => value *= 2;
 
 /// `in` is the same address without the permission to write through it, which
 /// is how a large struct is passed without a copy.
-double Length(in Point point) => point.X + point.Y;
+double SumCoordinates(in Point point) => point.X + point.Y;
 
 /// `out` is a second answer rather than a second call. It must be written
 /// before the function returns, and the caller need not have initialized it.
@@ -126,11 +127,11 @@ bool TryHalve(int n, out int half)
 }
 
 /// Passing one straight on, which is what makes `out` compose.
-bool Forward(int n, out int half) => TryHalve(n, out half);
+bool ForwardTryHalve(int n, out int half) => TryHalve(n, out half);
 
 /// Four parameters, three of which read as nothing at a call site without
 /// names for them.
-String Draw(String text, int width, bool center, char fill)
+String DecorateText(String text, int width, bool center, char fill)
 {
     var pad = new StringBuilder();
     for (int i = 0; i < width; i++)
@@ -138,20 +139,20 @@ String Draw(String text, int width, bool center, char fill)
     return (center ? "[" : "<") + text + pad.ToText() + (center ? "]" : ">");
 }
 
-void Calls()
+void ShowCalls()
 {
-    Heading("7.1 and 7.2 how a function is called");
+    PrintHeading("7.1 and 7.2 how a function is called");
 
     // Overloads, resolved on the arguments.
-    Say("overload int", Render(3));
-    Say("overload double", Render(3.5));
-    Say("overload String", Render("three"));
+    PrintValue("overload int", RenderValue(3));
+    PrintValue("overload double", RenderValue(3.5));
+    PrintValue("overload String", RenderValue("three"));
 
     // `ref`: the caller's own storage, and the word is written at both ends so
     // that a call that can change its argument says so where it is read.
     int counter = 21;
-    Twice(ref counter);
-    Say("ref", (long)counter);
+    DoubleInPlace(ref counter);
+    PrintValue("ref", (long)counter);
 
     // `in`: the address, and no way to write through it. It is not written at
     // the call, because a promise not to change anything needs no warning --
@@ -159,106 +160,106 @@ void Calls()
     Point point;
     point.X = 3.0;
     point.Y = 4.0;
-    Say("in", Length(point));
+    PrintValue("in", SumCoordinates(point));
 
     // `out`: the answer beside the answer.
     int half = 0;
-    Say("out, taken", TryHalve(84, out half) ? $"yes {half}" : "no");
-    Say("out, refused", TryHalve(7, out half) ? $"yes {half}" : $"no {half}");
-    Forward(100, out half);
-    Say("out, passed on", (long)half);
+    PrintValue("out, taken", TryHalve(84, out half) ? $"yes {half}" : "no");
+    PrintValue("out, refused", TryHalve(7, out half) ? $"yes {half}" : $"no {half}");
+    ForwardTryHalve(100, out half);
+    PrintValue("out, passed on", (long)half);
 
     // Named arguments, which may be given in any order once the positional
     // ones are done -- and are matched to parameters by name rather than by
     // where they sit.
-    Say("positional", Draw("x", 3, true, '.'));
-    Say("named", Draw(text: "x", width: 3, center: true, fill: '.'));
-    Say("reordered", Draw("x", center: false, fill: '-', width: 5));
+    PrintValue("positional", DecorateText("x", 3, true, '.'));
+    PrintValue("named", DecorateText(text: "x", width: 3, center: true, fill: '.'));
+    PrintValue("reordered", DecorateText("x", center: false, fill: '-', width: 5));
 }
 
 // ==================================================================== §4
 
-void Generics()
+void ShowGenerics()
 {
-    Heading("4. generics");
+    PrintHeading("4. generics");
 
     // Monomorphization: `T` is substituted and the body compiled again, so
     // there is no boxing, no type erasure and no shared code.
     // §4.4: type arguments are inferred and never written at a call, `<` in
     // expression position being ambiguous with less-than.
-    Say("over int", (long)Larger(3, 9));
-    Say("over String", Larger("alpha", "beta"));
-    Say("over long", (long)Larger(2L, 7L));
+    PrintValue("over int", (long)ChooseLarger(3, 9));
+    PrintValue("over String", ChooseLarger("alpha", "beta"));
+    PrintValue("over long", (long)ChooseLarger(2L, 7L));
 
     // A generic type, whose operators are instantiated with it.
-    var a = Boxed(3);
-    var b = Boxed(4);
-    Say("generic operator", (long)(a + b).Value);
-    Say("generic equality", a == Boxed(3));
-    Say("generic method", a.Pair("text"));
+    var a = CreateBox(3);
+    var b = CreateBox(4);
+    PrintValue("generic operator", (long)(a + b).Value);
+    PrintValue("generic equality", a == CreateBox(3));
+    PrintValue("generic method", a.PairWith("text"));
 
     // Two type parameters bound at different times, and an instantiation held
     // inside another.
     var cell = new Cell<Box<int>>(a);
-    Say("nested instantiation", (long)cell.Held.Value);
+    PrintValue("nested instantiation", (long)cell.Held.Value);
 
     // A constraint is what lets the body call something. Two at once is the
     // shape `Dictionary` needs of a key.
     int[] numbers = [3, 1, 4, 1, 5];
-    Say("constrained", (long)Digest(numbers));
+    PrintValue("constrained", (long)ComputeDigest(numbers));
 
     // §2.14 again, now generic: a closure over a type parameter is what the
     // standard library's whole combinator surface is built on.
     Keeps<int> odd = n => n % 2 != 0;
     Turns<int, String> show = n => $"<{n}>";
-    Say("generic closure", odd(3));
-    Say("generic transform", show(9));
+    PrintValue("generic closure", odd(3));
+    PrintValue("generic transform", show(9));
 }
 
 // ==================================================================== §5
 
-void Library()
+void ShowLibrary()
 {
-    Heading("5. the standard library");
+    PrintHeading("5. the standard library");
 
     // ------------------------------------------------------------ containers
     var list = new List<String>();
     list.Add("gamma");
     list.Add("alpha");
     list.Add("beta");
-    Say("List", $"{list.Count} items, first {list[0u]}");
+    PrintValue("List", $"{list.Count} items, first {list[0u]}");
 
     var map = new Dictionary<String, int>();
     map.Set("one", 1);
     map.Set("two", 2);
-    Say("Dictionary", (long)map.GetOr("two", -1));
-    Say("missing", (long)map.GetOr("three", -1));
+    PrintValue("Dictionary", (long)map.GetOr("two", -1));
+    PrintValue("missing", (long)map.GetOr("three", -1));
 
     var set = new HashSet<int>();
     set.Add(1);
     set.Add(1);
     set.Add(2);
-    Say("HashSet", (long)set.Count);
+    PrintValue("HashSet", (long)set.Count);
 
     var queue = new Queue<int>();
     queue.Enqueue(1);
     queue.Enqueue(2);
-    Say("Queue", (long)queue.Dequeue());
+    PrintValue("Queue", (long)queue.Dequeue());
 
     var stack = new Stack<int>();
     stack.Push(1);
     stack.Push(2);
-    Say("Stack", (long)stack.Pop());
+    PrintValue("Stack", (long)stack.Pop());
 
     var chain = new LinkedList<String>();
     chain.AddLast("tail");
     chain.AddFirst("head");
-    Say("LinkedList", (long)chain.Count);
+    PrintValue("LinkedList", (long)chain.Count);
 
     var sorted = new SortedList<int, String>();
     sorted.Set(2, "two");
     sorted.Set(1, "one");
-    Say("SortedList", sorted.ValueAt(0u));
+    PrintValue("SortedList", sorted.ValueAt(0u));
 
     // ------------------------------------------------------------ sequences
     //
@@ -276,25 +277,25 @@ void Library()
     var line = new StringBuilder();
     foreach (var n in picked)
         line.Append($"{n} ");
-    Say("chained", line.ToText().Trim());
+    PrintValue("chained", line.ToText().Trim());
 
-    Say("map / reduce", (long)values.Select(n => n * 2).Aggregate(0, (t, n) => t + n));
-    Say("any / all", $"{values.Any(n => n > 8)} {values.All(n => n > 0)}");
-    Say("count where", (long)values.CountWhere(n => n == 3));
-    Say("find", (long)values.Find(n => n > 4).ValueOr(-1));
-    Say("index where", (long)values.IndexWhere(n => n == 9).ValueOr(0u));
+    PrintValue("map / reduce", (long)values.Select(n => n * 2).Aggregate(0, (t, n) => t + n));
+    PrintValue("any / all", $"{values.Any(n => n > 8)} {values.All(n => n > 0)}");
+    PrintValue("count where", (long)values.CountWhere(n => n == 3));
+    PrintValue("find", (long)values.Find(n => n > 4).ValueOr(-1));
+    PrintValue("index where", (long)values.IndexWhere(n => n == 9).ValueOr(0u));
 
     Sort(values);
-    Say("sorted", (long)values[0u]);
+    PrintValue("sorted", (long)values[0u]);
 
     // ------------------------------------------------------------ numbers
-    Say("Math", $"{Sqrt(16.0)} {Floor(2.7)} {Abs(-3.0)} {Pow(2.0, 10.0)}");
-    Say("Pi", Round(Pi * 100.0) / 100.0);
+    PrintValue("Math", $"{Sqrt(16.0)} {Floor(2.7)} {Abs(-3.0)} {Pow(2.0, 10.0)}");
+    PrintValue("Pi", Round(Pi * 100.0) / 100.0);
 
     // Seeded, so the tour prints the same numbers every time it runs.
     var dice = new Random(20260906);
-    Say("Random", (long)(dice.NextBelow(6u) + 1u));
-    Say("again", (long)(dice.NextBelow(6u) + 1u));
+    PrintValue("Random", (long)(dice.NextBelow(6u) + 1u));
+    PrintValue("again", (long)(dice.NextBelow(6u) + 1u));
 
     // ------------------------------------------------------------ the clock
     //
@@ -305,12 +306,13 @@ void Library()
     for (int i = 0; i < 100000; i++)
         spun += i;
     var taken = clock.Elapsed();
-    Say("monotonic", taken.Nanoseconds >= 0);
-    Say("a duration", Duration.FromSeconds(90).TotalMinutes);
+    PrintValue("monotonic", taken.Nanoseconds >= 0);
+    PrintValue("a duration", Duration.FromSeconds(90).TotalMinutes);
 
     // ------------------------------------------------------------ the world
-    Say("has PATH", Env.Has("PATH") || Env.Has("Path"));
-    Say("set and read", Env.Set("STAINLESS_TOUR", "yes") ? Env.GetOr("STAINLESS_TOUR", "-") : "-");
+    PrintValue("has PATH", Env.Has("PATH") || Env.Has("Path"));
+    PrintValue("set and read",
+        Env.Set("STAINLESS_TOUR", "yes") ? Env.GetOr("STAINLESS_TOUR", "-") : "-");
 
     // ------------------------------------------------------------ files
     //
@@ -319,41 +321,42 @@ void Library()
     var folder = Path.Join(Env.CurrentDirectory(), "tour-scratch");
     var file = Path.Join(folder, "notes.txt");
 
-    Say("made a directory", IO.Describe(Directory.CreateAll(folder)));
-    Say("wrote", IO.Describe(File.WriteAllText(file, "one" + Newline() + "two" + Newline())));
+    PrintValue("made a directory", IO.Describe(Directory.CreateAll(folder)));
+    String lines = "one" + GetNewline() + "two" + GetNewline();
+    PrintValue("wrote", IO.Describe(File.WriteAllText(file, lines)));
 
     var read = File.ReadAllLines(file);
-    Say("read back", read.Ok ? (long)read.Value.Count : -1);
-    Say("size", File.Size(file));
-    Say("extension", Path.Extension(file));
-    Say("file name", Path.FileName(file));
-    Say("without it", Path.WithoutExtension(Path.FileName(file)));
-    Say("rooted", Path.IsRooted(file));
+    PrintValue("read back", read.Ok ? (long)read.Value.Count : -1);
+    PrintValue("size", File.Size(file));
+    PrintValue("extension", Path.Extension(file));
+    PrintValue("file name", Path.FileName(file));
+    PrintValue("without it", Path.WithoutExtension(Path.FileName(file)));
+    PrintValue("rooted", Path.IsRooted(file));
 
     File.Delete(file);
     Directory.Delete(folder);
-    Say("cleaned up", !File.Exists(file) && !Directory.Exists(folder));
+    PrintValue("cleaned up", !File.Exists(file) && !Directory.Exists(folder));
 
     // ------------------------------------------------------------ documents
     var document = Json.Parse("{\"name\":\"tour\",\"count\":3,\"on\":true}");
     if (document.Ok)
     {
         var members = MembersOf(document.Value);
-        Say("JSON", TextOr(members.Find("name"), "-"));
-        Say("JSON number", IntegerOr(members.Find("count"), -1));
-        Say("JSON round trip", Json.Write(document.Value));
+        PrintValue("JSON", TextOr(members.Find("name"), "-"));
+        PrintValue("JSON number", IntegerOr(members.Find("count"), -1));
+        PrintValue("JSON round trip", Json.Write(document.Value));
     }
 
     var parsed = Xml.Parse("<tour kind=\"sample\"><part>one</part></tour>");
     if (parsed.Ok)
     {
-        Say("XML", parsed.Value.Name);
-        Say("XML attribute", parsed.Value.Attributes.Find("kind", "-"));
+        PrintValue("XML", parsed.Value.Name);
+        PrintValue("XML attribute", parsed.Value.Attributes.Find("kind", "-"));
     }
 
     // ------------------------------------------------------------ text, again
-    Say("base64", Convert.ToBase64Text("stainless"));
-    Say("hex of 48879", Convert.FromLong(48879, 16u));
+    PrintValue("base64", Convert.ToBase64Text("stainless"));
+    PrintValue("hex of 48879", Convert.FromLong(48879, 16u));
 }
 
 // ==================================================================== §6
@@ -361,7 +364,7 @@ void Library()
 /// One serializer, written once, for any reflected type. `T` is concrete by the
 /// time this is compiled, so `typeof(T)` is a constant and every call below is
 /// a load from a table in the binary's read-only data.
-String Describe<T>(T value)
+String DescribeValue<T>(T value)
 {
     var type = typeof(T);
     var text = new StringBuilder();
@@ -413,43 +416,43 @@ String Describe<T>(T value)
     return text.ToText();
 }
 
-void Reflected()
+void ShowReflection()
 {
-    Heading("6. attributes and reflection");
+    PrintHeading("6. attributes and reflection");
 
     var person = new Person("Ada", 36);
     var type = typeof(Person);
 
-    Say("type name", type.Name);
-    Say("fields", (long)type.FieldCount);
-    Say("serialized", Describe(person));
+    PrintValue("type name", type.Name);
+    PrintValue("fields", (long)type.FieldCount);
+    PrintValue("serialized", DescribeValue(person));
 
     // A field is an offset, so writing one stores bytes.
     var years = type.FindField("Years");
     WriteInteger((byte*)person, years, 37);
-    Say("field written", (long)person.Years);
+    PrintValue("field written", (long)person.Years);
 
     // A property is a pair of functions, so writing one runs the setter --
     // which is the difference the two tables exist to keep.
-    Say("properties", (long)type.PropertyCount);
+    PrintValue("properties", (long)type.PropertyCount);
     var city = type.FindProperty("City");
-    Say("can write", city.CanWrite);
+    PrintValue("can write", city.CanWrite);
     SetText((byte*)person, city, "Lovelace");
-    Say("property written", person.City);
+    PrintValue("property written", person.City);
 
     // The annotation travels with the storage.
-    Say("attribute", type.FindField("Name").Get("Column").AsText(0u));
-    Say("ignored", type.FindField("Internal").Has("Hidden"));
+    PrintValue("attribute", type.FindField("Name").Get("Column").AsText(0u));
+    PrintValue("ignored", type.FindField("Internal").Has("Hidden"));
 
     // And a type may be found by its name, which is what a loader needs.
-    Say("by name", FindType("Tour.Types.Person").Exists);
+    PrintValue("by name", FindType("Tour.Types.Person").Exists);
 }
 
 // ==================================================================== §8
 
-void Interop()
+void ShowInterop()
 {
-    Heading("8. interoperability");
+    PrintHeading("8. interoperability");
 
     // A variadic `extern` -- the only kind there is, a Stainless function
     // never being variadic.
@@ -458,22 +461,22 @@ void Interop()
     // A delegate is one function pointer with the C convention, so C both
     // receives one and calls back through it.
     Adjust twice = value => value + 1;
-    Say("C called back", (long)c_apply_twice(twice, 10));
+    PrintValue("C called back", (long)c_apply_twice(twice, 10));
 
     // A struct of plain data crosses by value, laid out as C lays it out.
     PlainPair pair;
     pair.A = 4;
     pair.B = 5;
-    Say("struct by value", (long)c_sum_pair(pair));   // C calls tour_triple
+    PrintValue("struct by value", (long)c_sum_pair(pair));   // C calls tour_triple
 
     // And the other direction: `export "C"` put this in the export table under
     // exactly that name, which is what the C file called.
-    Say("export", (long)tour_triple(7));
+    PrintValue("export", (long)tour_triple(7));
 
     // §8.1: C++, reached by mangling the signature the way the target's own
     // compiler does. Nothing here is `extern "C"`, and there is no shim.
-    Say("C++ namespace", area(3.0, 4.0));
-    Say("C++ round trip", (long)cpp_round_trip(20));
+    PrintValue("C++ namespace", area(3.0, 4.0));
+    PrintValue("C++ round trip", (long)cpp_round_trip(20));
 }
 
 // ==================================================================== §9.2
@@ -487,12 +490,12 @@ threadsafe class Tally
 
     public Tally(AtomicLong cell) => _total = cell;
 
-    public void Contribute(long amount) => _total.Add(amount);
+    public void Add(long amount) => _total.Add(amount);
 }
 
-int Squared(int value) => value * value;
+int SquareValue(int value) => value * value;
 
-long SumOf(int[] values, int from, int upto)
+long SumRange(int[] values, int from, int upto)
 {
     long total = 0;
     for (int i = from; i < upto; i++)
@@ -500,9 +503,9 @@ long SumOf(int[] values, int from, int upto)
     return total;
 }
 
-void Concurrency()
+void ShowConcurrency()
 {
-    Heading("9.2 parallel, spawn, and what may be shared");
+    PrintHeading("9.2 parallel, spawn, and what may be shared");
 
     var values = new int[100];
     for (int i = 0; i < 100; i++)
@@ -515,11 +518,11 @@ void Concurrency()
 
     parallel
     {
-        left = spawn SumOf(values, 0, 50);
-        right = spawn SumOf(values, 50, 100);
+        left = spawn SumRange(values, 0, 50);
+        right = spawn SumRange(values, 50, 100);
     }
 
-    Say("parallel", left + right);
+    PrintValue("parallel", left + right);
 
     // One job per iteration: sharing one argument block would give every job
     // the last iteration's values.
@@ -528,10 +531,10 @@ void Concurrency()
     {
         for (int i = 0; i < 8; i++)
         {
-            squares[i] = spawn Squared(values[i]);
+            squares[i] = spawn SquareValue(values[i]);
         }
     }
-    Say("spawn in a loop", (long)(squares[3] + squares[7]));
+    PrintValue("spawn in a loop", (long)(squares[3] + squares[7]));
 
     // `for parallel` is the same thing said once: the body runs for every
     // index, and nothing it writes may be read by another iteration.
@@ -540,7 +543,7 @@ void Concurrency()
     {
         doubled[i] = values[i] * 2;
     }
-    Say("for parallel", (long)doubled[15]);
+    PrintValue("for parallel", (long)doubled[15]);
 
     // A mutex owns what it guards, so there is no way to read the value
     // without holding the lock.
@@ -550,12 +553,12 @@ void Concurrency()
 
     parallel
     {
-        spawn Contribute(tally, guarded, 10);
-        spawn Contribute(tally, guarded, 32);
+        spawn ContributeToBoth(tally, guarded, 10);
+        spawn ContributeToBoth(tally, guarded, 32);
     }
 
-    Say("atomic", counter.Load());
-    Say("mutex", guarded.Lock().Value);
+    PrintValue("atomic", counter.Load());
+    PrintValue("mutex", guarded.Lock().Value);
 
     // A queue that several threads may hold at once.
     var pending = new ConcurrentQueue<long>();
@@ -564,7 +567,7 @@ void Concurrency()
         spawn pending.Enqueue(1);
         spawn pending.Enqueue(2);
     }
-    Say("concurrent queue", (long)pending.Count);
+    PrintValue("concurrent queue", (long)pending.Count);
 
     // A thread of its own, for work no closing brace brackets. It takes a
     // closure, and a closure captures by value -- so there is no frame here
@@ -572,22 +575,22 @@ void Concurrency()
     var ticks = new AtomicLong(0);
     var worker = new Thread(() => ticks.Add(7));
     worker.Join();
-    Say("thread", ticks.Load());
+    PrintValue("thread", ticks.Load());
 
     // A future is the same idea with a result. `Get` blocks, which is what
     // having real threads buys: no `async`, no state machine, and nothing in
     // any signature changes colour.
-    var later = new Future<long>(() => SumOf(values, 0, 100));
-    Say("future", later.Get());
+    var later = new Future<long>(() => SumRange(values, 0, 100));
+    PrintValue("future", later.Get());
 }
 
 /// A newline, written as an escape rather than embedded, so the file the tour
 /// writes is the same on both platforms.
-String Newline() => Text.FromChar((char32)10);
+String GetNewline() => Text.FromChar((char32)10);
 
-void Contribute(Tally tally, Mutex<long> guarded, long amount)
+void ContributeToBoth(Tally tally, Mutex<long> guarded, long amount)
 {
-    tally.Contribute(amount);
+    tally.Add(amount);
     var guard = guarded.Lock();
     guard.Set(guard.Value + amount);
 }

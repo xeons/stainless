@@ -10,7 +10,7 @@ public struct Size
     public int Width;
     public int Height;
 
-    public int Area() => Width * Height;
+    public int Area => Width * Height;
 }
 
 // A class crosses a library boundary with its fields, its properties, its
@@ -32,7 +32,7 @@ public class Canvas
     public Size Extent { get { return _size; } }
     public int Drawn { get { return _drawn; } }
 
-    public void Draw(Size shape)
+    public void DrawShape(Size shape)
     {
         if (shape.Width <= _size.Width && shape.Height <= _size.Height)
         {
@@ -41,7 +41,7 @@ public class Canvas
     }
 }
 
-public Size Square(int side)
+public Size MakeSquare(int side)
 {
     Size s;
     s.Width = side;
@@ -51,7 +51,7 @@ public Size Square(int side)
 
 // Not public: this is the package's own, and a consumer cannot see it however
 // it is linked.
-int Clamp(int value, int high)
+int ClampValue(int value, int high)
 {
     return value > high ? high : value;
 }
