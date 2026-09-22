@@ -47,19 +47,49 @@ import Win32.Gdi32;
 import Win32.ComCtl32;
 import Win32.Resources;
 
-/// The next command id to hand out.
+/// The range command ids are handed out from.
 ///
-/// A plain `int`, so it crosses no thread boundary the compiler would object to
-/// -- and it never needs to be reused, because ids are only ever compared for
-/// equality and a program that exhausts two billion menu items has other
-/// problems. Starting above the range a dialog's own controls use keeps it
-/// clear of `IDOK` and its relatives.
-static int nextCommandId = 0x8000;
+/// `WM_COMMAND` carries an id in its low word, so an id MUST fit in sixteen
+/// bits. The upper half keeps clear of `IDOK` and its relatives, which
+/// `IsDialogMessageW` sends as commands of its own.
+const int FirstCommandId = 0x8000;
+const int CommandIdCount = 0x8000;
+
+/// One bit per id, set while an item or a button holds it. A popup menu is
+/// built afresh on every showing, so ids MUST come back when their holders go.
+static ulong[] s_commandIdsHeld = new ulong[512];
+
+/// Where the search for a free id starts: just past the last one handed out,
+/// so a freed id is the last to be reused rather than the first -- a click
+/// already queued for it then finds nothing rather than someone else.
+static int s_commandIdCursor = 0;
 
 int NewCommandId()
 {
-    nextCommandId = nextCommandId + 1;
-    return nextCommandId;
+    for (int tried = 0; tried < CommandIdCount; tried++)
+    {
+        int slot = s_commandIdCursor;
+        s_commandIdCursor = (s_commandIdCursor + 1) % CommandIdCount;
+        nuint word = (nuint)(slot / 64);
+        ulong bit = (ulong)1u << (nuint)(slot % 64);
+        if ((s_commandIdsHeld[word] & bit) == 0u)
+        {
+            s_commandIdsHeld[word] = s_commandIdsHeld[word] | bit;
+            return FirstCommandId + slot;
+        }
+    }
+    sl_fail("more than 32768 menu items and toolbar buttons are alive at once".ToPointer());
+    return 0;
+}
+
+/// Gives an id back. The caller MUST NOT use it afterwards.
+void ReleaseCommandId(int id)
+{
+    int slot = id - FirstCommandId;
+    if (slot < 0 || slot >= CommandIdCount)
+        return;
+    nuint word = (nuint)(slot / 64);
+    s_commandIdsHeld[word] = s_commandIdsHeld[word] & ~((ulong)1u << (nuint)(slot % 64));
 }
 
 // ====================================================================== items
@@ -103,6 +133,11 @@ public class MenuItemPeer : IMenuItemPeer
         _at = position;
         target = notify;
         _below = submenu;
+    }
+
+    ~MenuItemPeer()
+    {
+        ReleaseCommandId(_id);
     }
 
     /// The id `WM_COMMAND` will carry for this item.

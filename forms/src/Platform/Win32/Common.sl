@@ -88,6 +88,12 @@ public class ToolBarPeer : ControlPeer, IToolBarPeer
         SendMessageW(window, TbSetMaxTextRows, 1u, 0);
     }
 
+    ~ToolBarPeer()
+    {
+        for (nuint i = 0u; i < _commands.Count; i++)
+            ReleaseCommandId(_commands[i]);
+    }
+
     public int AddButton(String text, int image, ToolButtonKind kind)
     {
         ToolBarButton button;
