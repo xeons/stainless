@@ -2,7 +2,7 @@
 //
 // A builder's bytes are a growable allocation that moves, so unlike String it
 // hands out no pointer: reading and editing go through the runtime one byte at
-// a time. That is what `ByteAt`, `Insert` and `Remove` are for, and everything
+// a time. That is what `GetByteAt`, `Insert` and `Remove` are for, and everything
 // else here is written on top of them in Stainless.
 module TextBuilder;
 
@@ -48,7 +48,7 @@ int Main()
     // replacement character rather than corrupting the builder.
     var lone = new StringBuilder();
     lone.AppendCodePoint((char32)0xD800);
-    SayNumber("lone-surrogate", (long)(uint)lone.ToText().CodePointAt(0u));
+    SayNumber("lone-surrogate", (long)(uint)lone.ToText().GetCodePointAt(0u));
 
     var joined = new StringBuilder();
     joined.AppendJoined(", ", ["one", "two", "three"]);
@@ -57,7 +57,7 @@ int Main()
     // -------------------------------------------------------------- reading
     var read = new StringBuilder();
     read.Append("hello world");
-    SayNumber("byte-at", (long)read.ByteAt(0u));
+    SayNumber("byte-at", (long)read.GetByteAt(0u));
     SayNumber("index-of", read.IndexOf("world"));
     SayNumber("index-missing", read.IndexOf("nope"));
     SayBool("contains", read.Contains("lo wo"));
@@ -72,7 +72,7 @@ int Main()
     edited.Remove(0u, 6u);
     Say("removed", edited.ToText());
 
-    edited.Truncate(3u);
+    edited.TruncateTo(3u);
     Say("truncated", edited.ToText());
 
     var replaced = new StringBuilder();
@@ -99,15 +99,15 @@ int Main()
     var wide = "aé€".ToUtf16();
     SayNumber("utf16-units", (long)wide.UnitCount());
     SayBool("utf16-empty", wide.IsEmpty);
-    SayNumber("utf16-unit-at", (long)(uint)wide.UnitAt(0u));
-    SayNumber("utf16-point", (long)(uint)wide.CodePointAt(1u));
+    SayNumber("utf16-unit-at", (long)(uint)wide.GetUnitAt(0u));
+    SayNumber("utf16-point", (long)(uint)wide.GetCodePointAt(1u));
     Say("utf16-round-trip", wide.ToText());
 
     // An emoji is a surrogate pair: two units, one character.
     var pair = "😀".ToUtf16();
     SayNumber("pair-units", (long)pair.UnitCount());
-    SayNumber("pair-point", (long)(uint)pair.CodePointAt(0u));
-    SayNumber("pair-next", (long)pair.NextCodePoint(0u));
+    SayNumber("pair-point", (long)(uint)pair.GetCodePointAt(0u));
+    SayNumber("pair-next", (long)pair.SkipCodePoint(0u));
 
     SayBool("utf16-equals", "abc".ToUtf16().Equals("abc".ToUtf16()));
     SayBool("utf16-differs", "abc".ToUtf16().Equals("abd".ToUtf16()));
@@ -126,10 +126,10 @@ int Main()
     SayBool("control", Ascii.IsControl((byte)10));
     SayNumber("upper", (long)Ascii.ToUpper((byte)'a'));
     SayNumber("lower", (long)Ascii.ToLower((byte)'A'));
-    SayNumber("hex-value", (long)Ascii.HexValue((byte)'e'));
-    SayNumber("hex-value-no", (long)Ascii.HexValue((byte)'z'));
-    SayNumber("hex-digit", (long)Ascii.HexDigit(11));
-    SayNumber("hex-digit-upper", (long)Ascii.HexDigitUpper(11));
+    SayNumber("hex-value", (long)Ascii.FromHexDigit((byte)'e'));
+    SayNumber("hex-value-no", (long)Ascii.FromHexDigit((byte)'z'));
+    SayNumber("hex-digit", (long)Ascii.ToHexDigit(11));
+    SayNumber("hex-digit-upper", (long)Ascii.ToHexDigitUpper(11));
 
     return 0;
 }

@@ -26,7 +26,7 @@
 /// above 127 in UTF-8 is part of a character rather than a character, so a
 /// question like "is this a digit" has exactly one honest answer at the byte
 /// level, and it is this one. Anything that needs to ask about a character
-/// should decode first, with `String.CodePointAt`.
+/// should decode first, with `String.GetCodePointAt`.
 ///
 /// This is a module of its own rather than more of `Standard.Text` because
 /// `Standard.Text` is imported into every module whether a program asks or not,
@@ -107,7 +107,7 @@ public byte ToLower(byte value)
 }
 
 /// What a hexadecimal digit is worth, or -1 when it is not one.
-public int HexValue(byte value)
+public int FromHexDigit(byte value)
 {
     if (IsDigit(value))
         return (int)value - 48;
@@ -119,7 +119,7 @@ public int HexValue(byte value)
 }
 
 /// The lowercase hexadecimal digit for a value from 0 to 15.
-public byte HexDigit(int value)
+public byte ToHexDigit(int value)
 {
     if (value < 10)
         return (byte)(48 + value);
@@ -127,7 +127,7 @@ public byte HexDigit(int value)
 }
 
 /// The uppercase hexadecimal digit for a value from 0 to 15.
-public byte HexDigitUpper(int value)
+public byte ToHexDigitUpper(int value)
 {
     if (value < 10)
         return (byte)(48 + value);

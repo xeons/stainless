@@ -84,13 +84,13 @@ int Main()
 
     // An encoding whose bytes a newline scan would cut a character in half in.
     var wide = new MemoryStream();
-    var wideWriter = new StreamWriter(wide, Utf16());
+    var wideWriter = new StreamWriter(wide, CreateUtf16());
     wideWriter.WriteLine("世界");
     wideWriter.WriteLine("second");
     wideWriter.Flush();
 
     wide.Seek(0, SeekOrigin.Start);
-    var wideLines = new StreamReader(wide, Utf16()).ReadLines();
+    var wideLines = new StreamReader(wide, CreateUtf16()).ReadLines();
     Count("utf16lines", wideLines.Length);
     Say("utf16first", wideLines[0u]);
     Say("utf16second", wideLines[1u]);
@@ -98,20 +98,20 @@ int Main()
     // ------------------------------------------------------ across a buffer
 
     // Three bytes, at each offset the boundary can fall inside them.
-    Intact("utf8/1021", Utf8(), 1021u, "世");
-    Intact("utf8/1022", Utf8(), 1022u, "世");
-    Intact("utf8/1023", Utf8(), 1023u, "世");
+    Intact("utf8/1021", CreateUtf8(), 1021u, "世");
+    Intact("utf8/1022", CreateUtf8(), 1022u, "世");
+    Intact("utf8/1023", CreateUtf8(), 1023u, "世");
 
     // Four bytes: a scalar outside the basic plane.
-    Intact("utf8/astral", Utf8(), 1022u, "𝄞");
+    Intact("utf8/astral", CreateUtf8(), 1022u, "𝄞");
 
     // UTF-16 cuts at an odd byte, and between the halves of a surrogate pair.
-    Intact("utf16/plain", Utf16(), 511u, "世");
-    Intact("utf16/pair", Utf16(), 510u, "𝄞");
-    Intact("utf16be/pair", Utf16BigEndian(), 511u, "𝄞");
+    Intact("utf16/plain", CreateUtf16(), 511u, "世");
+    Intact("utf16/pair", CreateUtf16(), 510u, "𝄞");
+    Intact("utf16be/pair", CreateUtf16BigEndian(), 511u, "𝄞");
 
     // UTF-32 puts four bytes on every scalar, so every boundary cuts one.
-    Intact("utf32", Utf32(), 255u, "世");
+    Intact("utf32", CreateUtf32(), 255u, "世");
 
     // And a line longer than the buffer is still one line.
     var spanning = new MemoryStream();

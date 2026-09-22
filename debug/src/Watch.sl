@@ -129,7 +129,7 @@ List<WatchWord> ScanWatch(String text)
 
     while (at < size)
     {
-        byte here = text.ByteAt(at);
+        byte here = text.GetByteAt(at);
 
         if (here == (byte)' ' || here == (byte)'\t')
         {
@@ -140,7 +140,7 @@ List<WatchWord> ScanWatch(String text)
         if (IsWatchNameStart(here))
         {
             nuint from = at;
-            while (at < size && IsWatchNameByte(text.ByteAt(at)))
+            while (at < size && IsWatchNameByte(text.GetByteAt(at)))
                 at++;
             words.Add(new WatchWord(WatchKind.Name,
                                     text.Substring(from, at - from), 0u));
@@ -151,11 +151,11 @@ List<WatchWord> ScanWatch(String text)
         {
             nuint from = at;
             bool hex = here == (byte)'0' && at + 1u < size
-                    && (text.ByteAt(at + 1u) == (byte)'x'
-                        || text.ByteAt(at + 1u) == (byte)'X');
+                    && (text.GetByteAt(at + 1u) == (byte)'x'
+                        || text.GetByteAt(at + 1u) == (byte)'X');
             at = at + (hex ? 2u : 1u);
-            while (at < size && (hex ? IsWatchHexDigit(text.ByteAt(at))
-                                     : IsWatchDigit(text.ByteAt(at))))
+            while (at < size && (hex ? IsWatchHexDigit(text.GetByteAt(at))
+                                     : IsWatchDigit(text.GetByteAt(at))))
                 at++;
             words.Add(new WatchWord(WatchKind.Number, "",
                                     ParseWatchNumber(text.Substring(from,
@@ -206,10 +206,10 @@ WatchKind WatchKindOfByte(byte here)
 /// `==`, `!=`, `<=` or `>=` at `at`, or `None`.
 Comparison TwoByteComparison(String text, nuint at, nuint size)
 {
-    if (at + 1u >= size || text.ByteAt(at + 1u) != (byte)'=')
+    if (at + 1u >= size || text.GetByteAt(at + 1u) != (byte)'=')
         return Comparison.None;
 
-    switch (text.ByteAt(at))
+    switch (text.GetByteAt(at))
     {
         case (byte)'=': return Comparison.Equal;
         case (byte)'!': return Comparison.NotEqual;
@@ -300,18 +300,18 @@ String OneByteText(byte here)
 ulong ParseWatchNumber(String text)
 {
     nuint size = text.ByteLength();
-    if (size > 2u && text.ByteAt(0u) == (byte)'0'
-        && (text.ByteAt(1u) == (byte)'x' || text.ByteAt(1u) == (byte)'X'))
+    if (size > 2u && text.GetByteAt(0u) == (byte)'0'
+        && (text.GetByteAt(1u) == (byte)'x' || text.GetByteAt(1u) == (byte)'X'))
     {
         ulong value = 0u;
         for (nuint i = 2u; i < size; i++)
-            value = value * 16u + WatchHexValue(text.ByteAt(i));
+            value = value * 16u + WatchHexValue(text.GetByteAt(i));
         return value;
     }
 
     ulong plain = 0u;
     for (nuint i = 0u; i < size; i++)
-        plain = plain * 10u + (ulong)(text.ByteAt(i) - (byte)'0');
+        plain = plain * 10u + (ulong)(text.GetByteAt(i) - (byte)'0');
     return plain;
 }
 

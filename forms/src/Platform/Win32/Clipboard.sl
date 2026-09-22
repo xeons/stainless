@@ -371,7 +371,7 @@ long HtmlHeaderNumber(String whole, String key)
 
     nuint from = (nuint)at + key.ByteLength();
     nuint to = from;
-    while (to < whole.ByteLength() && whole.ByteAt(to) >= (byte)'0' && whole.ByteAt(to) <= (byte)'9')
+    while (to < whole.ByteLength() && whole.GetByteAt(to) >= (byte)'0' && whole.GetByteAt(to) <= (byte)'9')
         to++;
     if (to == from)
         return -1;

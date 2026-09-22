@@ -281,9 +281,9 @@ last person to edit it -- the suite is the authority.
   `Text.FromUtf16`; anything malformed becomes U+FFFD in both directions, so a
   `String` is UTF-8 by invariant
 - A string API to go with it: `StartsWith`, `Contains`, `IndexOf`,
-  `LastIndexOf`, `Substring`, `Before`/`After`/`AfterLast`, `Trim`, `Replace`,
+  `LastIndexOf`, `Substring`, `SubstringBefore`/`SubstringAfter`/`SubstringAfterLast`, `Trim`, `Replace`,
   `Repeat`, `PadLeft`/`PadRight`, `Split`, `SplitLines`, `Join`, `CompareTo`,
-  the ASCII case pair, and `CodePointAt`/`NextCodePoint` for walking the text
+  the ASCII case pair, and `GetCodePointAt`/`SkipCodePoint` for walking the text
   properly. All of it written in Stainless rather than C, because a type may be
   declared more than once inside its own module and `String`'s second
   declaration is `stdlib/Text.sl` — which is also why `Split` can return a
@@ -292,8 +292,8 @@ last person to edit it -- the suite is the authority.
   says what the type is — its kind, its fields, what it derives from — and a
   later one adds behaviour and nothing else. No `partial` keyword, because
   there is nothing for it to prevent
-- `StringBuilder`: appending, reading (`ByteAt`, `IndexOf`) and editing
-  (`Insert`, `Remove`, `Truncate`, `ReplaceAll`). It hands out no pointer,
+- `StringBuilder`: appending, reading (`GetByteAt`, `IndexOf`) and editing
+  (`Insert`, `Remove`, `TruncateTo`, `ReplaceAll`). It hands out no pointer,
   unlike `String`: its bytes move as it grows, so one would dangle at the next
   append
 - `char`, `char16` and `char32`: one UTF-8 code unit, one UTF-16 code unit and
@@ -517,7 +517,7 @@ last person to edit it -- the suite is the authority.
   Latin-1 and Windows-1252, behind an `IEncoding` a program can implement.
   Lossy by default, because `GetString` returns a `String` and a `String` is
   valid UTF-8 by invariant; `TryGetString` is the strict form and refuses an
-  overlong sequence as well as a malformed one. `Detect` reads a byte order mark
+  overlong sequence as well as a malformed one. `DetectEncoding` reads a byte order mark
 - `Standard.Drawing`: raster images. `Image.FromFile` and `FromBytes` decode
   PNG, JPEG, BMP and GIF by sniffing the first bytes rather than the name;
   `Create` makes an empty one; lines, rectangles, ellipses, polygons, blits and
@@ -760,7 +760,7 @@ Being straight about the edges, roughly in the order they are worth adding:
   every position the library produces lands on a character boundary because it
   came from matching whole text. A position a caller invents is its own
   business: `Substring(1, 1)` on a multi-byte character will slice it in half.
-  `CodePointAt` and `NextCodePoint` are the way to walk the text properly.
+  `GetCodePointAt` and `SkipCodePoint` are the way to walk the text properly.
 - **Flow narrowing does not reach a field.** `if (x != null)` makes `x` usable
   as a `C` (§2.5), on the same terms a variant is narrowed — but only for a
   local or a parameter, because a field or a call result may be a different

@@ -797,7 +797,7 @@ it meant. A polygon therefore takes its points as a flat `int[]`.
 ## 5.13 `Standard.Security.Cryptography`
 
 ```csharp
-var digest = Sha256.HashData(Encoding.Utf8().GetBytes("hello"));
+var digest = Sha256.HashData(Encoding.CreateUtf8().GetBytes("hello"));
 var mac    = HmacSha256.HashData(key, message);
 var box    = try AesGcm.FromKey(key);
 ```

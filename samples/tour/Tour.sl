@@ -722,7 +722,7 @@ void ShowText()
     // object however often it is written.
     String greeting = "hello";
     PrintValue("length in bytes", (long)greeting.ByteLength());
-    PrintValue("byte at", (long)greeting.ByteAt(1u));
+    PrintValue("byte at", (long)greeting.GetByteAt(1u));
     PrintValue("substring", greeting.Substring(1u, 3u));
     PrintValue("upper", greeting.ToUpperAscii());
     PrintValue("padded", "[" + greeting.PadLeft(8u) + "]");
@@ -775,7 +775,7 @@ void ShowText()
 
     // §3.6: other encodings, behind an interface, so what a file was written
     // in is a value rather than a branch.
-    var latin = Encoding.Latin1();
+    var latin = Encoding.CreateLatin1();
     var bytes = latin.GetBytes("café");
     PrintValue("latin-1 bytes", (long)bytes.Length);
     PrintValue("decoded", latin.GetString(bytes));

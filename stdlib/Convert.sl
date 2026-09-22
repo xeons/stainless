@@ -98,7 +98,7 @@ public Result<long, ConvertError> ToLong(String text, uint radix)
 
     for (nuint i = at; i < size; i++)
     {
-        int digit = DigitValue(bytes[i]);
+        int digit = FromRadixDigit(bytes[i]);
         if (digit < 0 || (uint)digit >= radix)
             return Fail(ConvertError.Malformed);
 
@@ -170,7 +170,7 @@ public Result<ulong, ConvertError> ToULong(String text, uint radix)
     ulong value = 0;
     for (nuint i = at; i < size; i++)
     {
-        int digit = DigitValue(bytes[i]);
+        int digit = FromRadixDigit(bytes[i]);
         if (digit < 0 || (uint)digit >= radix)
             return Fail(ConvertError.Malformed);
 
@@ -203,7 +203,7 @@ public String FromLong(long value, uint radix)
     var digits = new StringBuilder();
     while (magnitude > 0)
     {
-        byte digit = DigitTable((nuint)(magnitude % (ulong)radix));
+        byte digit = ToRadixDigit((nuint)(magnitude % (ulong)radix));
         digits.Append(FromBytes(&digit, 1));
         magnitude = magnitude / (ulong)radix;
     }
@@ -215,7 +215,7 @@ public String FromLong(long value, uint radix)
     // Written backwards, so read backwards.
     for (nuint i = digits.ByteLength(); i > 0; i--)
     {
-        var one = digits.ByteAt(i - 1);
+        var one = digits.GetByteAt(i - 1);
         built.Append(FromBytes(&one, 1));
     }
     return built.ToText();
@@ -314,13 +314,13 @@ public String ToHex(byte[] data, bool upper)
         byte[2] pair;
         if (upper)
         {
-            pair[0] = Ascii.HexDigitUpper(high);
-            pair[1] = Ascii.HexDigitUpper(low);
+            pair[0] = Ascii.ToHexDigitUpper(high);
+            pair[1] = Ascii.ToHexDigitUpper(low);
         }
         else
         {
-            pair[0] = Ascii.HexDigit(high);
-            pair[1] = Ascii.HexDigit(low);
+            pair[0] = Ascii.ToHexDigit(high);
+            pair[1] = Ascii.ToHexDigit(low);
         }
         built.Append(FromBytes(&pair[0], 2));
     }
@@ -341,8 +341,8 @@ public Result<byte[], ConvertError> FromHex(String text)
 
     for (nuint i = 0; i < data.Length; i++)
     {
-        int high = Ascii.HexValue(bytes[i * 2]);
-        int low = Ascii.HexValue(bytes[i * 2 + 1]);
+        int high = Ascii.FromHexDigit(bytes[i * 2]);
+        int low = Ascii.FromHexDigit(bytes[i * 2 + 1]);
         if (high < 0 || low < 0)
             return Fail(ConvertError.Malformed);
 
@@ -356,14 +356,14 @@ public Result<byte[], ConvertError> FromHex(String text)
 /// `data` as base64, padded with `=` to a multiple of four.
 public String ToBase64(byte[] data)
 {
-    return Encode64(data, false, true);
+    return EncodeBase64(data, false, true);
 }
 
 /// `data` as base64url: `-` and `_` for the last two characters, and no
 /// padding. What a JWT and a URL query both want, and RFC 4648 §5.
 public String ToBase64Url(byte[] data)
 {
-    return Encode64(data, true, false);
+    return EncodeBase64(data, true, false);
 }
 
 /// Base64 back into bytes, accepting both alphabets and padding or none.
@@ -395,7 +395,7 @@ public Result<byte[], ConvertError> FromBase64(String text)
         }
 
         // Padding ends the text; a character after it is not base64.
-        if (padding > 0 || Base64Value(one) < 0)
+        if (padding > 0 || FromBase64Digit(one) < 0)
             return Fail(ConvertError.Malformed);
         characters++;
     }
@@ -416,7 +416,7 @@ public Result<byte[], ConvertError> FromBase64(String text)
         if (Ascii.IsWhiteSpace(one) || one == 61)
             continue;
 
-        accumulator = (accumulator << 6) | (uint)Base64Value(one);
+        accumulator = (accumulator << 6) | (uint)FromBase64Digit(one);
         held++;
 
         if (held == 4)
@@ -453,7 +453,7 @@ public String ToBase64Text(String text)
 
 // --------------------------------------------------------------------- private
 
-String Encode64(byte[] data, bool url, bool pad)
+String EncodeBase64(byte[] data, bool url, bool pad)
 {
     var built = new StringBuilder();
     nuint at = 0;
@@ -461,14 +461,14 @@ String Encode64(byte[] data, bool url, bool pad)
     while (at + 2 < data.Length)
     {
         uint block = ((uint)data[at] << 16) | ((uint)data[at + 1] << 8) | (uint)data[at + 2];
-        AppendSix(built, block, 4, url);
+        AppendSextets(built, block, 4, url);
         at = at + 3;
     }
 
     nuint left = data.Length - at;
     if (left == 1)
     {
-        AppendSix(built, (uint)data[at] << 16, 2, url);
+        AppendSextets(built, (uint)data[at] << 16, 2, url);
         if (pad)
         {
             built.Append("==");
@@ -476,7 +476,7 @@ String Encode64(byte[] data, bool url, bool pad)
     }
     else if (left == 2)
     {
-        AppendSix(built, ((uint)data[at] << 16) | ((uint)data[at + 1] << 8), 3, url);
+        AppendSextets(built, ((uint)data[at] << 16) | ((uint)data[at + 1] << 8), 3, url);
         if (pad)
             built.Append("=");
     }
@@ -485,17 +485,17 @@ String Encode64(byte[] data, bool url, bool pad)
 }
 
 /// The top `count` six-bit groups of a 24-bit block, as characters.
-void AppendSix(StringBuilder built, uint block, nuint count, bool url)
+void AppendSextets(StringBuilder built, uint block, nuint count, bool url)
 {
     for (nuint i = 0; i < count; i++)
     {
         uint six = (uint)((block >> (int)(18 - i * 6)) & 0x3F);
-        var one = Base64Digit(six, url);
+        var one = ToBase64Digit(six, url);
         built.Append(FromBytes(&one, 1));
     }
 }
 
-byte Base64Digit(uint value, bool url)
+byte ToBase64Digit(uint value, bool url)
 {
     if (value < 26)               // 'A'
         return (byte)(65 + value);
@@ -509,7 +509,7 @@ byte Base64Digit(uint value, bool url)
 }
 
 /// What a base64 character is worth, in either alphabet, or -1.
-int Base64Value(byte one)
+int FromBase64Digit(byte one)
 {
     if (one >= 65 && one <= 90)
         return (int)one - 65;
@@ -525,7 +525,7 @@ int Base64Value(byte one)
 }
 
 /// What a digit is worth in any radix up to 36, or -1.
-int DigitValue(byte one)
+int FromRadixDigit(byte one)
 {
     if (Ascii.IsDigit(one))
         return (int)one - 48;
@@ -537,7 +537,7 @@ int DigitValue(byte one)
 }
 
 /// The lowercase character for a digit value up to 35.
-byte DigitTable(nuint value)
+byte ToRadixDigit(nuint value)
 {
     if (value < 10)
         return (byte)(48 + value);

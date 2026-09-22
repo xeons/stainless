@@ -35,7 +35,7 @@
 /// character boundary, because it came from matching whole text -- a UTF-8
 /// sequence cannot begin inside another one, which is what makes byte-wise
 /// search correct on encoded text rather than merely fast. Positions a *caller*
-/// invents are its own business; `CodePointAt` and `NextCodePoint` are here for
+/// invents are its own business; `GetCodePointAt` and `SkipCodePoint` are here for
 /// walking the text properly.
 ///
 /// **Case and whitespace are ASCII.** Full Unicode case mapping is a table of
@@ -69,11 +69,11 @@ public const long NotFound = -1;
 ///
 /// Every position is a byte offset, and every length is a byte count.
 /// `ByteLength` is O(1) and no method here counts characters. Use
-/// `CodePointAt` and `NextCodePoint` to walk by character.
+/// `GetCodePointAt` and `SkipCodePoint` to walk by character.
 ///
 /// Slicing clamps rather than failing: a `start` past the end and a length
 /// past the end both give what is actually there, so `Substring` cannot be
-/// made to abort. `ByteAt` is the exception and reads the buffer directly. A
+/// made to abort. `GetByteAt` is the exception and reads the buffer directly. A
 /// search that finds nothing answers `NotFound`.
 public class String
 {
@@ -96,7 +96,7 @@ public class String
         nuint wanted = prefix.ByteLength();
         if (wanted > this.ByteLength())
             return false;
-        return Matches(this.ToPointer(), prefix.ToPointer(), wanted);
+        return AreBytesEqual(this.ToPointer(), prefix.ToPointer(), wanted);
     }
 
     /// True when this text ends with `suffix`. An empty suffix always does.
@@ -106,7 +106,7 @@ public class String
         nuint size = this.ByteLength();
         if (wanted > size)
             return false;
-        return Matches(this.ToPointer() + (size - wanted), suffix.ToPointer(), wanted);
+        return AreBytesEqual(this.ToPointer() + (size - wanted), suffix.ToPointer(), wanted);
     }
 
     /// True when `value` appears anywhere in this text.
@@ -152,7 +152,7 @@ public class String
 
         for (nuint i = start; i <= size - wanted; i++)
         {
-            if (mine[i] == first && Matches(mine + i, theirs, wanted))
+            if (mine[i] == first && AreBytesEqual(mine + i, theirs, wanted))
                 return (long)i;
         }
         return NotFound;
@@ -174,7 +174,7 @@ public class String
 
         for (nuint i = size - wanted + 1; i > 0; i--)
         {
-            if (Matches(mine + (i - 1), theirs, wanted))
+            if (AreBytesEqual(mine + (i - 1), theirs, wanted))
                 return (long)(i - 1);
         }
         return NotFound;
@@ -219,7 +219,7 @@ public class String
     }
 
     /// The text before the first `separator`, or all of it when there is none.
-    public String Before(String separator)
+    public String SubstringBefore(String separator)
     {
         long at = this.IndexOf(separator);
         if (at == NotFound)
@@ -228,7 +228,7 @@ public class String
     }
 
     /// The text after the first `separator`, or "" when there is none.
-    public String After(String separator)
+    public String SubstringAfter(String separator)
     {
         long at = this.IndexOf(separator);
         if (at == NotFound)
@@ -237,7 +237,7 @@ public class String
     }
 
     /// The text after the last `separator`, or all of it when there is none.
-    public String AfterLast(String separator)
+    public String SubstringAfterLast(String separator)
     {
         long at = this.LastIndexOf(separator);
         if (at == NotFound)
@@ -526,7 +526,7 @@ public class String
 
         for (nuint i = 0; i < size; i++)
         {
-            if (LowerByte(mine[i]) != LowerByte(theirs[i]))
+            if (ToLowerByte(mine[i]) != ToLowerByte(theirs[i]))
                 return false;
         }
         return true;
@@ -566,7 +566,7 @@ public class String
     /// Unchecked, unlike the slicing methods: this reads the buffer directly,
     /// so an `index` at or past `ByteLength` reads memory that is not the
     /// string's. Check the length first, or slice instead.
-    public byte ByteAt(nuint index)
+    public byte GetByteAt(nuint index)
     {
         return this.ToPointer()[index];
     }
@@ -577,14 +577,14 @@ public class String
     /// sequence gives U+FFFD, which is what a decoder does with a byte that
     /// cannot begin one. So does a sequence that is not well formed: one cut
     /// short, an overlong form, a surrogate or a value past U+10FFFF.
-    public char32 CodePointAt(nuint index)
+    public char32 GetCodePointAt(nuint index)
     {
         nuint size = this.ByteLength();
         if (index >= size)
             return (char32)0xFFFD;
 
         var mine = this.ToPointer();
-        nuint width = WellFormedWidth(mine, index, size);
+        nuint width = GetWellFormedWidth(mine, index, size);
         if (width == 0)
             return (char32)0xFFFD;
 
@@ -600,23 +600,23 @@ public class String
 
     /// The index of the character after the one at `index`.
     ///
-    /// Together with `CodePointAt` this is how the text is walked properly:
+    /// Together with `GetCodePointAt` this is how the text is walked properly:
     ///
     /// ```
-    /// for (nuint at = 0; at < s.ByteLength(); at = s.NextCodePoint(at)) {
-    ///     var c = s.CodePointAt(at);
+    /// for (nuint at = 0; at < s.ByteLength(); at = s.SkipCodePoint(at)) {
+    ///     var c = s.GetCodePointAt(at);
     /// }
     /// ```
     ///
     /// A sequence that is not well formed is stepped over one byte at a time,
     /// each byte reading as U+FFFD. `CodePointCount` counts the same steps.
-    public nuint NextCodePoint(nuint index)
+    public nuint SkipCodePoint(nuint index)
     {
         nuint size = this.ByteLength();
         if (index >= size)
             return size;
 
-        nuint width = WellFormedWidth(this.ToPointer(), index, size);
+        nuint width = GetWellFormedWidth(this.ToPointer(), index, size);
         if (width == 0)
             width = 1;
         return index + width;
@@ -676,7 +676,7 @@ public class String
         bool differs = false;
         for (nuint i = 0; i < size; i++)
         {
-            byte mapped = upper ? UpperByte(mine[i]) : LowerByte(mine[i]);
+            byte mapped = upper ? ToUpperByte(mine[i]) : ToLowerByte(mine[i]);
             if (mapped != mine[i])
                 differs = true;
         }
@@ -686,7 +686,7 @@ public class String
         var bytes = new byte[size];
         for (nuint i = 0; i < size; i++)
         {
-            bytes[i] = upper ? UpperByte(mine[i]) : LowerByte(mine[i]);
+            bytes[i] = upper ? ToUpperByte(mine[i]) : ToLowerByte(mine[i]);
         }
         return FromBytes(&bytes[0], size);
     }
@@ -755,7 +755,7 @@ public class StringBuilder
     /// exists, since building text by repeated concatenation is O(n^2).
     ///
     /// Capacity outlives any particular length, so `Clear` keeps it.
-    void Reserve(nuint extra)
+    void EnsureCapacity(nuint extra)
     {
         // Both of these would wrap rather than fail: the size wanted, and the
         // doubling that reaches for it -- which on wrapping to zero would loop
@@ -788,12 +788,12 @@ public class StringBuilder
 
     /// The one place bytes enter the buffer. Everything that appends comes
     /// through here.
-    void Write(byte* data, nuint byteLength)
+    void WriteBytes(byte* data, nuint byteLength)
     {
         if (byteLength == 0u || data == null)
             return;
 
-        this.Reserve(byteLength);
+        this.EnsureCapacity(byteLength);
         memcpy(_bytes + _length, data, byteLength);
         _length = _length + byteLength;
     }
@@ -803,7 +803,7 @@ public class StringBuilder
     /// Text, as its bytes.
     public void Append(String text)
     {
-        this.Write(text.ToPointer(), text.ByteLength());
+        this.WriteBytes(text.ToPointer(), text.ByteLength());
     }
 
     /// Text and a newline.
@@ -844,7 +844,7 @@ public class StringBuilder
             }
         }
 
-        this.Reserve(written + 1u);
+        this.EnsureCapacity(written + 1u);
         if (negative)
         {
             _bytes[_length] = 0x2D;
@@ -874,7 +874,7 @@ public class StringBuilder
     /// half a character has written half a character.
     public void AppendByte(byte value)
     {
-        this.Reserve(1u);
+        this.EnsureCapacity(1u);
         _bytes[_length] = value;
         _length++;
     }
@@ -899,7 +899,7 @@ public class StringBuilder
     /// A call rather than a pointer, because the buffer moves as it grows and
     /// a `byte*` into it would dangle at the next append -- the one thing
     /// `String`'s own pointer can never do.
-    public byte ByteAt(nuint index)
+    public byte GetByteAt(nuint index)
     {
         if (index >= _length)
             sl_array_bounds_fail(index, _length);
@@ -926,7 +926,7 @@ public class StringBuilder
             sl_array_bounds_fail(at, _length + 1u);
 
         nuint count = text.ByteLength();
-        this.Reserve(count);
+        this.EnsureCapacity(count);
 
         memmove(_bytes + at + count, _bytes + at, _length - at);
         memcpy(_bytes + at, text.ToPointer(), count);
@@ -1027,7 +1027,7 @@ public class StringBuilder
     {
         if (data.Length == 0)
             return;
-        this.Write(&data[0], data.Length);
+        this.WriteBytes(&data[0], data.Length);
     }
 
     /// `parts` with `separator` between them.
@@ -1074,7 +1074,7 @@ public class StringBuilder
             bool same = true;
             for (nuint j = 0; j < wanted; j++)
             {
-                if (this.ByteAt(i + j) != theirs[j])
+                if (this.GetByteAt(i + j) != theirs[j])
                     same = false;
             }
             if (same)
@@ -1092,7 +1092,7 @@ public class StringBuilder
     // ------------------------------------------------------------- editing
 
     /// Everything from `at` to the end, thrown away.
-    public void Truncate(nuint at)
+    public void TruncateTo(nuint at)
     {
         nuint size = this.ByteLength();
         if (at >= size)
@@ -1154,7 +1154,7 @@ public class StringBuilder
             bool same = true;
             for (nuint j = 0; j < wanted; j++)
             {
-                if (this.ByteAt(i + j) != theirs[j])
+                if (this.GetByteAt(i + j) != theirs[j])
                     same = false;
             }
             if (same)
@@ -1172,7 +1172,7 @@ public class StringBuilder
 ///
 /// Positions are units, not characters and not bytes: a scalar outside the
 /// basic plane is two units, so `UnitCount` is not a character count and
-/// `UnitAt` can land on half a surrogate pair. `CodePointAt` joins the pair.
+/// `GetUnitAt` can land on half a surrogate pair. `GetCodePointAt` joins the pair.
 public class Utf16String
 {
 
@@ -1181,7 +1181,7 @@ public class Utf16String
 
     /// The unit at `index`. A unit, not a character: one half of a surrogate
     /// pair is a unit and is not a character.
-    public char16 UnitAt(nuint index)
+    public char16 GetUnitAt(nuint index)
     {
         return this.ToPointer()[index];
     }
@@ -1190,7 +1190,7 @@ public class Utf16String
     ///
     /// An unpaired surrogate gives U+FFFD, which is what transcoding it would
     /// have produced -- a lone half cannot be encoded in UTF-8 at all.
-    public char32 CodePointAt(nuint index)
+    public char32 GetCodePointAt(nuint index)
     {
         nuint count = this.UnitCount();
         if (index >= count)
@@ -1212,7 +1212,7 @@ public class Utf16String
     }
 
     /// The index of the character after the one at `index`.
-    public nuint NextCodePoint(nuint index)
+    public nuint SkipCodePoint(nuint index)
     {
         nuint count = this.UnitCount();
         if (index >= count)
@@ -1279,7 +1279,7 @@ bool IsAsciiWhiteSpace(byte value)
 }
 
 /// The uppercase of an ASCII letter, or the byte unchanged.
-byte UpperByte(byte value)
+byte ToUpperByte(byte value)
 {
     if (value >= 97 && value <= 122)
         return (byte)(value - 32);
@@ -1287,7 +1287,7 @@ byte UpperByte(byte value)
 }
 
 /// The lowercase of an ASCII letter, or the byte unchanged.
-byte LowerByte(byte value)
+byte ToLowerByte(byte value)
 {
     if (value >= 65 && value <= 90)
         return (byte)(value + 32);
@@ -1300,7 +1300,7 @@ byte LowerByte(byte value)
 /// Well formed is Unicode's Table 3-7: every continuation byte present, and no
 /// overlong form, surrogate or value past U+10FFFF. The runtime's
 /// `sl_utf8_well_formed_width` MUST give the same answers.
-nuint WellFormedWidth(byte* bytes, nuint index, nuint size)
+nuint GetWellFormedWidth(byte* bytes, nuint index, nuint size)
 {
     byte lead = bytes[index];
     if (lead < 0x80)
@@ -1342,7 +1342,7 @@ nuint WellFormedWidth(byte* bytes, nuint index, nuint size)
 }
 
 /// Whether `count` bytes at two addresses are the same.
-bool Matches(byte* left, byte* right, nuint count)
+bool AreBytesEqual(byte* left, byte* right, nuint count)
 {
     for (nuint i = 0; i < count; i++)
     {

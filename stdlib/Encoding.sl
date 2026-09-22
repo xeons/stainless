@@ -30,7 +30,7 @@
 /// The shape is .NET's, adapted to what this language has: an interface rather
 /// than an abstract class with static instances, because a static needs a
 /// Sendable type and an initializer that `--shared` has nowhere to run. So the
-/// encodings come from functions -- `Encoding.Utf8()` -- and a program may add
+/// encodings come from functions -- `Encoding.CreateUtf8()` -- and a program may add
 /// one of its own by implementing `IEncoding`.
 ///
 /// Both directions are lossy by default and say so, which is the same rule the
@@ -123,7 +123,7 @@ public interface IDecoder
 ///
 /// The held bytes and the new ones are joined, everything complete is handed
 /// to the encoding it belongs to, and the remainder is kept. Only
-/// `IncompleteTail` differs between encodings, and it is the one thing that
+/// `CountIncompleteTail` differs between encodings, and it is the one thing that
 /// needs to know how the encoding is shaped.
 abstract class TailDecoder : IDecoder
 {
@@ -142,7 +142,7 @@ abstract class TailDecoder : IDecoder
     }
 
     /// How many bytes at the end begin a character that is not finished.
-    protected abstract nuint IncompleteTail(byte[] data, nuint length);
+    protected abstract nuint CountIncompleteTail(byte[] data, nuint length);
 
     public String GetString(byte[] bytes, nuint index, nuint count, bool flush)
     {
@@ -158,7 +158,7 @@ abstract class TailDecoder : IDecoder
 
         // Nothing is held back on a flush: what is unfinished then is never
         // going to be finished, and the encoding turns it into U+FFFD.
-        nuint tail = flush ? 0u : this.IncompleteTail(joined, total);
+        nuint tail = flush ? 0u : this.CountIncompleteTail(joined, total);
         if (tail > 4u)
             tail = 4u;
 
@@ -210,7 +210,7 @@ class Utf8Decoder : TailDecoder
 {
     public Utf8Decoder(IEncoding encoding) { base(encoding); }
 
-    protected override nuint IncompleteTail(byte[] data, nuint length)
+    protected override nuint CountIncompleteTail(byte[] data, nuint length)
     {
         // A sequence is at most four bytes, so a lead byte further back than
         // that cannot be waiting on anything here.
@@ -250,7 +250,7 @@ class Utf16Decoder : TailDecoder
         _bigEndian = big;
     }
 
-    protected override nuint IncompleteTail(byte[] data, nuint length)
+    protected override nuint CountIncompleteTail(byte[] data, nuint length)
     {
         nuint odd = length % 2u;
         nuint whole = length - odd;
@@ -276,66 +276,66 @@ class Utf32Decoder : TailDecoder
 {
     public Utf32Decoder(IEncoding encoding) { base(encoding); }
 
-    protected override nuint IncompleteTail(byte[] data, nuint length) => length % 4u;
+    protected override nuint CountIncompleteTail(byte[] data, nuint length) => length % 4u;
 }
 
 // ------------------------------------------------------------------ choosing
 
 /// UTF-8: what a `String` already is, so both directions are a copy.
-public IEncoding Utf8() => new Utf8Encoding();
+public IEncoding CreateUtf8() => new Utf8Encoding();
 
 /// UTF-16, little-endian -- the one Windows means by "Unicode".
-public IEncoding Utf16() => new Utf16Encoding(false);
+public IEncoding CreateUtf16() => new Utf16Encoding(false);
 
 /// UTF-16, big-endian.
-public IEncoding Utf16BigEndian() => new Utf16Encoding(true);
+public IEncoding CreateUtf16BigEndian() => new Utf16Encoding(true);
 
 /// UTF-32, little-endian: one scalar per four bytes, no surrogates.
-public IEncoding Utf32() => new Utf32Encoding(false);
+public IEncoding CreateUtf32() => new Utf32Encoding(false);
 
 /// UTF-32, big-endian.
-public IEncoding Utf32BigEndian() => new Utf32Encoding(true);
+public IEncoding CreateUtf32BigEndian() => new Utf32Encoding(true);
 
 /// US-ASCII: seven bits, and nothing above them.
-public IEncoding Ascii() => new AsciiEncoding();
+public IEncoding CreateAscii() => new AsciiEncoding();
 
 /// ISO-8859-1, in which every byte is the code point of the same number. That
 /// makes it the one encoding that can carry any byte sequence without failing,
 /// which is why it is what a protocol reaches for when it does not know.
-public IEncoding Latin1() => new Latin1Encoding();
+public IEncoding CreateLatin1() => new Latin1Encoding();
 
 /// Windows-1252: Latin-1 with the C1 control range replaced by punctuation --
 /// curly quotes, the dash, the euro. Most text labelled ISO-8859-1 is really
 /// this, because that is what a Windows editor wrote.
-public IEncoding Windows1252() => new Windows1252Encoding();
+public IEncoding CreateWindows1252() => new Windows1252Encoding();
 
 /// Which encoding a byte order mark says this is, or null when there is none.
 ///
 /// UTF-32LE is tested before UTF-16LE deliberately: a UTF-32LE mark begins with
 /// the two bytes of a UTF-16LE one, so the longer test has to come first or
 /// every UTF-32 file reads as UTF-16 whose first character is NUL.
-public IEncoding? Detect(byte[] bytes)
+public IEncoding? DetectEncoding(byte[] bytes)
 {
-    if (StartsWith(bytes, [0xFF, 0xFE, 0x00, 0x00]))
-        return Utf32();
-    if (StartsWith(bytes, [0x00, 0x00, 0xFE, 0xFF]))
-        return Utf32BigEndian();
-    if (StartsWith(bytes, [0xEF, 0xBB, 0xBF]))
-        return Utf8();
-    if (StartsWith(bytes, [0xFF, 0xFE]))
-        return Utf16();
-    if (StartsWith(bytes, [0xFE, 0xFF]))
-        return Utf16BigEndian();
+    if (BytesStartWith(bytes, [0xFF, 0xFE, 0x00, 0x00]))
+        return CreateUtf32();
+    if (BytesStartWith(bytes, [0x00, 0x00, 0xFE, 0xFF]))
+        return CreateUtf32BigEndian();
+    if (BytesStartWith(bytes, [0xEF, 0xBB, 0xBF]))
+        return CreateUtf8();
+    if (BytesStartWith(bytes, [0xFF, 0xFE]))
+        return CreateUtf16();
+    if (BytesStartWith(bytes, [0xFE, 0xFF]))
+        return CreateUtf16BigEndian();
     return null;
 }
 
 /// `bytes` without the byte order mark `encoding` writes, if it is there.
-public byte[] WithoutPreamble(IEncoding encoding, byte[] bytes)
+public byte[] StripPreamble(IEncoding encoding, byte[] bytes)
 {
     var mark = encoding.Preamble;
-    if (mark.Length == 0 || !StartsWith(bytes, mark))
+    if (mark.Length == 0 || !BytesStartWith(bytes, mark))
         return bytes;
-    return Tail(bytes, mark.Length);
+    return CopyBytesFrom(bytes, mark.Length);
 }
 
 // -------------------------------------------------------------------- UTF-8
@@ -379,16 +379,16 @@ public class Utf8Encoding : IEncoding
 
         while (at < bytes.Length)
         {
-            nuint width = Utf8Width(bytes[at]);
+            nuint width = GetUtf8Width(bytes[at]);
 
-            if (width == 0 || at + width > bytes.Length || !Continues(bytes, at, width))
+            if (width == 0 || at + width > bytes.Length || !HasContinuationBytes(bytes, at, width))
             {
                 built.AppendCodePoint((char32)0xFFFD);
                 at++;
                 continue;
             }
 
-            char32 scalar = Utf8Scalar(bytes, at, width);
+            char32 scalar = DecodeUtf8Scalar(bytes, at, width);
             if (!IsScalarSpelledOnce((uint)scalar, width))
             {
                 built.AppendCodePoint((char32)0xFFFD);
@@ -415,15 +415,15 @@ public class Utf8Encoding : IEncoding
 
         while (at < bytes.Length)
         {
-            nuint width = Utf8Width(bytes[at]);
+            nuint width = GetUtf8Width(bytes[at]);
             if (width == 0)
                 return Fail(EncodingError.Invalid);
             if (at + width > bytes.Length)
                 return Fail(EncodingError.Incomplete);
-            if (!Continues(bytes, at, width))
+            if (!HasContinuationBytes(bytes, at, width))
                 return Fail(EncodingError.Invalid);
 
-            if (!IsScalarSpelledOnce((uint)Utf8Scalar(bytes, at, width), width))
+            if (!IsScalarSpelledOnce((uint)DecodeUtf8Scalar(bytes, at, width), width))
                 return Fail(EncodingError.Invalid);
 
             at = at + width;
@@ -439,8 +439,8 @@ public class Utf16Encoding : IEncoding
 {
     bool _bigEndian;
 
-    /// A UTF-16 encoding, big-endian when `big`. `Utf16()` and
-    /// `Utf16BigEndian()` are the names to reach for.
+    /// A UTF-16 encoding, big-endian when `big`. `CreateUtf16()` and
+    /// `CreateUtf16BigEndian()` are the names to reach for.
     public Utf16Encoding(bool big) => _bigEndian = big;
 
     /// `"utf-16be"` or `"utf-16le"`, whichever this is.
@@ -480,7 +480,7 @@ public class Utf16Encoding : IEncoding
 
         for (nuint i = 0; i < count; i++)
         {
-            uint unit = (uint)wide.UnitAt(i);
+            uint unit = (uint)wide.GetUnitAt(i);
             if (_bigEndian)
             {
                 bytes[i * 2] = (byte)(unit >> 8);
@@ -497,7 +497,7 @@ public class Utf16Encoding : IEncoding
 
     /// `bytes` read as UTF-16, with an unpaired surrogate or a trailing odd
     /// byte becoming U+FFFD. A byte order mark, if present, is not stripped --
-    /// `WithoutPreamble` is what does that.
+    /// `StripPreamble` is what does that.
     public String GetString(byte[] bytes)
     {
         var built = new StringBuilder();
@@ -506,7 +506,7 @@ public class Utf16Encoding : IEncoding
         // A trailing odd byte is half a unit and cannot be anything.
         while (at + 1 < bytes.Length)
         {
-            uint first = this.UnitAt(bytes, at);
+            uint first = this.ReadUnitAt(bytes, at);
             at = at + 2;
 
             if (first < 0xD800 || first > 0xDFFF)
@@ -521,7 +521,7 @@ public class Utf16Encoding : IEncoding
                 continue;
             }
 
-            uint second = this.UnitAt(bytes, at);
+            uint second = this.ReadUnitAt(bytes, at);
             if (second < 0xDC00 || second > 0xDFFF)
             {
                 built.AppendCodePoint((char32)0xFFFD);
@@ -547,7 +547,7 @@ public class Utf16Encoding : IEncoding
         nuint at = 0;
         while (at < bytes.Length)
         {
-            uint first = this.UnitAt(bytes, at);
+            uint first = this.ReadUnitAt(bytes, at);
             at = at + 2;
 
             if (first < 0xD800 || first > 0xDFFF)
@@ -557,7 +557,7 @@ public class Utf16Encoding : IEncoding
             if (at >= bytes.Length)
                 return Fail(EncodingError.Incomplete);
 
-            uint second = this.UnitAt(bytes, at);
+            uint second = this.ReadUnitAt(bytes, at);
             if (second < 0xDC00 || second > 0xDFFF)
                 return Fail(EncodingError.Invalid);
             at = at + 2;
@@ -565,7 +565,7 @@ public class Utf16Encoding : IEncoding
         return Ok(GetString(bytes));
     }
 
-    uint UnitAt(byte[] bytes, nuint at)
+    uint ReadUnitAt(byte[] bytes, nuint at)
     {
         if (_bigEndian)
             return ((uint)bytes[at] << 8) | (uint)bytes[at + 1];
@@ -580,15 +580,15 @@ public class Utf32Encoding : IEncoding
 {
     bool _bigEndian;
 
-    /// A UTF-32 encoding, big-endian when `big`. `Utf32()` and
-    /// `Utf32BigEndian()` are the names to reach for.
+    /// A UTF-32 encoding, big-endian when `big`. `CreateUtf32()` and
+    /// `CreateUtf32BigEndian()` are the names to reach for.
     public Utf32Encoding(bool big) => _bigEndian = big;
 
     /// `"utf-32be"` or `"utf-32le"`, whichever this is.
     public String Name => _bigEndian ? "utf-32be" : "utf-32le";
 
     /// Four bytes, and the little-endian one begins with UTF-16LE's -- which
-    /// is why `Detect` tests UTF-32 first.
+    /// is why `DetectEncoding` tests UTF-32 first.
     public byte[] Preamble
     {
         get
@@ -614,9 +614,9 @@ public class Utf32Encoding : IEncoding
         var bytes = new byte[text.CodePointCount() * 4];
         nuint out = 0;
 
-        for (nuint at = 0; at < text.ByteLength(); at = text.NextCodePoint(at))
+        for (nuint at = 0; at < text.ByteLength(); at = text.SkipCodePoint(at))
         {
-            uint scalar = (uint)text.CodePointAt(at);
+            uint scalar = (uint)text.GetCodePointAt(at);
             if (_bigEndian)
             {
                 bytes[out] = (byte)(scalar >> 24);
@@ -646,7 +646,7 @@ public class Utf32Encoding : IEncoding
         nuint at = 0;
         while (at + 3 < bytes.Length)
         {
-            built.AppendCodePoint((char32)this.ScalarAt(bytes, at));
+            built.AppendCodePoint((char32)this.ReadScalarAt(bytes, at));
             at = at + 4;
         }
 
@@ -665,7 +665,7 @@ public class Utf32Encoding : IEncoding
         nuint at = 0;
         while (at < bytes.Length)
         {
-            uint scalar = this.ScalarAt(bytes, at);
+            uint scalar = this.ReadScalarAt(bytes, at);
             if (scalar > 0x10FFFF)
                 return Fail(EncodingError.Invalid);
             if (scalar >= 0xD800 && scalar <= 0xDFFF)
@@ -675,7 +675,7 @@ public class Utf32Encoding : IEncoding
         return Ok(GetString(bytes));
     }
 
-    uint ScalarAt(byte[] bytes, nuint at)
+    uint ReadScalarAt(byte[] bytes, nuint at)
     {
         if (_bigEndian)
         {
@@ -731,9 +731,9 @@ public abstract class SingleByteEncoding : IEncoding
         var bytes = new byte[text.CodePointCount()];
         nuint out = 0;
 
-        for (nuint at = 0; at < text.ByteLength(); at = text.NextCodePoint(at))
+        for (nuint at = 0; at < text.ByteLength(); at = text.SkipCodePoint(at))
         {
-            int written = this.FromScalar(text.CodePointAt(at));
+            int written = this.FromScalar(text.GetCodePointAt(at));
             bytes[out] = written < 0 ? (byte)63 : (byte)written;      // '?'
             out++;
         }
@@ -812,7 +812,7 @@ public class Windows1252Encoding : SingleByteEncoding
     {
         if (value < 0x80 || value > 0x9F)
             return (char32)(uint)value;
-        return (char32)Cp1252High((nuint)(value - 0x80));
+        return (char32)DecodeCp1252High((nuint)(value - 0x80));
     }
 
     /// The Latin-1 byte where there is one, else a scan of the 32-entry
@@ -828,7 +828,7 @@ public class Windows1252Encoding : SingleByteEncoding
 
         for (nuint i = 0; i < 32; i++)
         {
-            if (Cp1252High(i) == value)
+            if (DecodeCp1252High(i) == value)
                 return (int)(0x80 + i);
         }
         return -1;
@@ -837,7 +837,7 @@ public class Windows1252Encoding : SingleByteEncoding
 
 /// What Windows-1252 puts at 0x80 + `index`. 0xFFFD marks the five that are
 /// not assigned at all.
-uint Cp1252High(nuint index)
+uint DecodeCp1252High(nuint index)
 {
     uint[32] table = [
         0x20AC, 0xFFFD, 0x201A, 0x0192, 0x201E, 0x2026, 0x2020, 0x2021,
@@ -852,7 +852,7 @@ uint Cp1252High(nuint index)
 
 /// How many bytes the sequence starting with this byte occupies, or 0 when it
 /// cannot start one.
-nuint Utf8Width(byte lead)
+nuint GetUtf8Width(byte lead)
 {
     if (lead < 0x80)
         return 1;
@@ -866,7 +866,7 @@ nuint Utf8Width(byte lead)
 }
 
 /// Whether the bytes after the lead really are continuation bytes.
-bool Continues(byte[] bytes, nuint at, nuint width)
+bool HasContinuationBytes(byte[] bytes, nuint at, nuint width)
 {
     for (nuint i = 1; i < width; i++)
     {
@@ -877,7 +877,7 @@ bool Continues(byte[] bytes, nuint at, nuint width)
 }
 
 /// The scalar a validated sequence spells.
-char32 Utf8Scalar(byte[] bytes, nuint at, nuint width)
+char32 DecodeUtf8Scalar(byte[] bytes, nuint at, nuint width)
 {
     if (width == 1)
         return (char32)(uint)bytes[at];
@@ -895,7 +895,7 @@ char32 Utf8Scalar(byte[] bytes, nuint at, nuint width)
 /// An overlong sequence decodes to the right number and is still refused,
 /// because two spellings of one character is how a filter that checked the
 /// bytes gets walked past.
-bool Overlong(uint scalar, nuint width)
+bool IsOverlong(uint scalar, nuint width)
 {
     if (width == 2)
         return scalar < 0x80;
@@ -910,7 +910,7 @@ bool Overlong(uint scalar, nuint width)
 /// overlong, not a surrogate and not past U+10FFFF.
 bool IsScalarSpelledOnce(uint scalar, nuint width)
 {
-    if (Overlong(scalar, width) || scalar > 0x10FFFF)
+    if (IsOverlong(scalar, width) || scalar > 0x10FFFF)
         return false;
     return scalar < 0xD800 || scalar > 0xDFFF;
 }
@@ -918,7 +918,7 @@ bool IsScalarSpelledOnce(uint scalar, nuint width)
 // -------------------------------------------------------------------- arrays
 
 /// Whether `bytes` begins with `prefix`.
-bool StartsWith(byte[] bytes, byte[] prefix)
+bool BytesStartWith(byte[] bytes, byte[] prefix)
 {
     if (prefix.Length > bytes.Length)
         return false;
@@ -931,7 +931,7 @@ bool StartsWith(byte[] bytes, byte[] prefix)
 }
 
 /// `bytes` from `at` to the end.
-byte[] Tail(byte[] bytes, nuint at)
+byte[] CopyBytesFrom(byte[] bytes, nuint at)
 {
     if (at >= bytes.Length)
         return [];

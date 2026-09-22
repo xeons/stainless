@@ -19,10 +19,10 @@ void ShowScalars(String label, String text)
     var built = new StringBuilder();
     built.Append(label);
 
-    for (nuint at = 0; at < text.ByteLength(); at = text.NextCodePoint(at))
+    for (nuint at = 0; at < text.ByteLength(); at = text.SkipCodePoint(at))
     {
         built.Append(" ");
-        built.AppendInteger((long)(uint)text.CodePointAt(at));
+        built.AppendInteger((long)(uint)text.GetCodePointAt(at));
     }
     Console.WriteLine(built.ToText());
 }
@@ -45,7 +45,7 @@ void ShowBytes(String label, byte[] data)
 
 int Main()
 {
-    var utf8 = Encoding.Utf8();
+    var utf8 = Encoding.CreateUtf8();
     ShowScalars("utf8-overlong-slash", utf8.GetString([0xC0, 0xAF]));
     ShowScalars("utf8-overlong-dot", utf8.GetString([0xE0, 0x80, 0xAE]));
     ShowScalars("utf8-overlong-nul", utf8.GetString([0xC0, 0x80]));
@@ -54,21 +54,21 @@ int Main()
     ShowScalars("utf8-past-max", utf8.GetString([0xF4, 0x90, 0x80, 0x80]));
     ShowScalars("utf8-edges", utf8.GetString([0xC2, 0x80, 0xED, 0x9F, 0xBF, 0xF4, 0x8F, 0xBF, 0xBF]));
 
-    var cp1252 = Encoding.Windows1252();
+    var cp1252 = Encoding.CreateWindows1252();
     Console.WriteLine("cp1252-can-fffd " + Text.FromBool(cp1252.CanRepresent((char32)0xFFFD)));
     ShowBytes("cp1252-fffd", cp1252.GetBytes(Bytes([0x41, 0xEF, 0xBF, 0xBD])));
     ShowScalars("cp1252-81", cp1252.GetString([0x81]));
 
     var loose = Bytes([0x41, 0x80]);
-    ShowBytes("latin1-loose", Encoding.Latin1().GetBytes(loose));
+    ShowBytes("latin1-loose", Encoding.CreateLatin1().GetBytes(loose));
     Console.WriteLine("latin1-loose-count "
-        + Text.FromInteger((long)Encoding.Latin1().GetByteCount(loose)));
-    ShowBytes("utf32-loose", Encoding.Utf32().GetBytes(loose));
+        + Text.FromInteger((long)Encoding.CreateLatin1().GetByteCount(loose)));
+    ShowBytes("utf32-loose", Encoding.CreateUtf32().GetBytes(loose));
     Console.WriteLine("utf32-loose-count "
-        + Text.FromInteger((long)Encoding.Utf32().GetByteCount(loose)));
-    ShowBytes("utf32-cut", Encoding.Utf32().GetBytes(Bytes([0xC3, 0x41, 0xE2])));
+        + Text.FromInteger((long)Encoding.CreateUtf32().GetByteCount(loose)));
+    ShowBytes("utf32-cut", Encoding.CreateUtf32().GetBytes(Bytes([0xC3, 0x41, 0xE2])));
 
     // A trailing part of a unit is malformed, like any other.
-    ShowScalars("utf32-tail", Encoding.Utf32().GetString([0x41, 0x00, 0x00, 0x00, 0x42]));
+    ShowScalars("utf32-tail", Encoding.CreateUtf32().GetString([0x41, 0x00, 0x00, 0x00, 0x42]));
     return 0;
 }

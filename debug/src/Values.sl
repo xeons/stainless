@@ -853,8 +853,8 @@ bool IsStringNamed(String name)
 bool EndsWithBrackets(String name)
 {
     nuint length = name.ByteLength();
-    return length >= 2u && name.ByteAt(length - 2u) == (byte)91
-        && name.ByteAt(length - 1u) == (byte)93;
+    return length >= 2u && name.GetByteAt(length - 2u) == (byte)91
+        && name.GetByteAt(length - 1u) == (byte)93;
 }
 
 /// Every parameter and local in scope at an address, in declaration order.

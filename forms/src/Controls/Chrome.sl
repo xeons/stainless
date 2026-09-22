@@ -528,7 +528,7 @@ public class OfficeXpRenderer : ChromeRenderer
 
         while (at < length)
         {
-            byte here = caption.ByteAt(at);
+            byte here = caption.GetByteAt(at);
             if (here != (byte)38)                    // '&'
             {
                 plain.AppendByte(here);
@@ -539,7 +539,7 @@ public class OfficeXpRenderer : ChromeRenderer
             // A doubled one is a real ampersand; a single one marks the letter
             // after it and is not drawn.
             at++;
-            if (at < length && caption.ByteAt(at) == (byte)38)
+            if (at < length && caption.GetByteAt(at) == (byte)38)
             {
                 plain.AppendByte((byte)38);
                 at++;

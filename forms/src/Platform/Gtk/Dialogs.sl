@@ -258,7 +258,7 @@ int PangoSizeInPoints(String word)
 /// part of a family: a weight, a slant, a variant, a stretch or a gravity.
 bool IsPangoStyleWord(String word)
 {
-    if (word.ByteLength() > 0u && word.ByteAt(0u) == (byte)'@')
+    if (word.ByteLength() > 0u && word.GetByteAt(0u) == (byte)'@')
         return true;
     if (IsPangoBoldWord(word))
         return true;

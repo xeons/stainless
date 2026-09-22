@@ -409,7 +409,7 @@ public class CodeEditor : CustomControl
         nuint size = line.ByteLength();
         while (at < offset && at < size)
         {
-            if (line.ByteAt(at) == (byte)'\t')
+            if (line.GetByteAt(at) == (byte)'\t')
             {
                 column = column + (TabWidth - column % TabWidth);
                 at++;
@@ -417,7 +417,7 @@ public class CodeEditor : CustomControl
             else
             {
                 column++;
-                at = line.NextCodePoint(at);
+                at = line.SkipCodePoint(at);
             }
         }
         return column;
@@ -436,7 +436,7 @@ public class CodeEditor : CustomControl
         while (at < size)
         {
             nuint next = seen;
-            if (line.ByteAt(at) == (byte)'\t')
+            if (line.GetByteAt(at) == (byte)'\t')
             {
                 next = seen + (TabWidth - seen % TabWidth);
             }
@@ -449,7 +449,7 @@ public class CodeEditor : CustomControl
             if (column < next)
                 return at;
             seen = next;
-            at = line.ByteAt(at) == (byte)'\t' ? at + 1u : line.NextCodePoint(at);
+            at = line.GetByteAt(at) == (byte)'\t' ? at + 1u : line.SkipCodePoint(at);
         }
         return size;
     }
@@ -1066,7 +1066,7 @@ public class CodeEditor : CustomControl
         // Which run the byte under the pointer belongs to. A word, a run of
         // spaces, or a run of punctuation -- three cases rather than two, so
         // that double-clicking `=>` takes both characters instead of one.
-        byte here = line.ByteAt(at);
+        byte here = line.GetByteAt(at);
         bool wordly = IsWordByte(here);
         bool spacey = IsSpaceByte(here);
 
@@ -1074,14 +1074,14 @@ public class CodeEditor : CustomControl
         while (start > 0u)
         {
             nuint back = FindPreviousCharacter(line, start);
-            if (!IsInSameRun(line.ByteAt(back), wordly, spacey))
+            if (!IsInSameRun(line.GetByteAt(back), wordly, spacey))
                 break;
             start = back;
         }
 
         nuint end = at;
-        while (end < size && IsInSameRun(line.ByteAt(end), wordly, spacey))
-            end = line.NextCodePoint(end);
+        while (end < size && IsInSameRun(line.GetByteAt(end), wordly, spacey))
+            end = line.SkipCodePoint(end);
 
         _anchor = Position.Create(_caretPosition.Row, start);
         _caretPosition = Position.Create(_caretPosition.Row, end);
@@ -1147,21 +1147,21 @@ public class CodeEditor : CustomControl
         if (size == 0u || where.Column >= size)
             return "";
 
-        if (!IsWordByte(line.ByteAt(where.Column)))
+        if (!IsWordByte(line.GetByteAt(where.Column)))
             return "";
 
         nuint start = where.Column;
         while (start > 0u)
         {
             nuint back = FindPreviousCharacter(line, start);
-            if (!IsWordByte(line.ByteAt(back)))
+            if (!IsWordByte(line.GetByteAt(back)))
                 break;
             start = back;
         }
 
         nuint end = where.Column;
-        while (end < size && IsWordByte(line.ByteAt(end)))
-            end = line.NextCodePoint(end);
+        while (end < size && IsWordByte(line.GetByteAt(end)))
+            end = line.SkipCodePoint(end);
 
         return line.Substring(start, end - start);
     }
@@ -1430,7 +1430,7 @@ public class CodeEditor : CustomControl
         {
             _caretPosition = Position.Create(_caretPosition.Row,
                 word ? FindNextWordStart(line, _caretPosition.Column)
-                     : line.NextCodePoint(_caretPosition.Column));
+                     : line.SkipCodePoint(_caretPosition.Column));
         }
         else if (_caretPosition.Row + 1u < _contents.LineCount)
         {
@@ -1472,7 +1472,7 @@ public class CodeEditor : CustomControl
         nuint first = 0u;
         while (first < line.ByteLength())
         {
-            byte c = line.ByteAt(first);
+            byte c = line.GetByteAt(first);
             if (c != (byte)' ' && c != (byte)'\t')
                 break;
             first++;
@@ -1504,7 +1504,7 @@ public class CodeEditor : CustomControl
         while (at < offset)
         {
             last = at;
-            at = line.NextCodePoint(at);
+            at = line.SkipCodePoint(at);
         }
         return last;
     }
@@ -1514,16 +1514,16 @@ public class CodeEditor : CustomControl
     nuint FindPreviousWordStart(String line, nuint offset)
     {
         nuint at = FindPreviousCharacter(line, offset);
-        while (at > 0u && IsSpaceByte(line.ByteAt(at)))
+        while (at > 0u && IsSpaceByte(line.GetByteAt(at)))
             at = FindPreviousCharacter(line, at);
         if (at == 0u)
             return 0u;
-        if (!IsWordByte(line.ByteAt(at)))
+        if (!IsWordByte(line.GetByteAt(at)))
             return at;
         while (at > 0u)
         {
             nuint back = FindPreviousCharacter(line, at);
-            if (!IsWordByte(line.ByteAt(back)))
+            if (!IsWordByte(line.GetByteAt(back)))
                 return at;
             at = back;
         }
@@ -1534,19 +1534,19 @@ public class CodeEditor : CustomControl
     {
         nuint size = line.ByteLength();
         nuint at = offset;
-        if (at < size && IsWordByte(line.ByteAt(at)))
+        if (at < size && IsWordByte(line.GetByteAt(at)))
         {
-            while (at < size && IsWordByte(line.ByteAt(at)))
+            while (at < size && IsWordByte(line.GetByteAt(at)))
             {
-                at = line.NextCodePoint(at);
+                at = line.SkipCodePoint(at);
             }
         }
         else if (at < size)
         {
-            at = line.NextCodePoint(at);
+            at = line.SkipCodePoint(at);
         }
-        while (at < size && IsSpaceByte(line.ByteAt(at)))
-            at = line.NextCodePoint(at);
+        while (at < size && IsSpaceByte(line.GetByteAt(at)))
+            at = line.SkipCodePoint(at);
         return at;
     }
 
@@ -1689,7 +1689,7 @@ public class CodeEditor : CustomControl
         else if (_caretPosition.Column < _contents.GetLineLength(_caretPosition.Row))
         {
             nuint row = _caretPosition.Row;
-            nuint next = _contents.GetLineText(row).NextCodePoint(_caretPosition.Column);
+            nuint next = _contents.GetLineText(row).SkipCodePoint(_caretPosition.Column);
             _caretPosition = _contents.DeleteText(_caretPosition, Position.Create(row, next));
         }
         else if (_caretPosition.Row + 1u < _contents.LineCount)
@@ -1736,7 +1736,7 @@ public class CodeEditor : CustomControl
             {
                 nuint strip = 0u;
                 while (strip < TabWidth && strip < line.ByteLength()
-                       && line.ByteAt(strip) == (byte)' ')
+                       && line.GetByteAt(strip) == (byte)' ')
                 {
                     strip++;
                 }

@@ -71,11 +71,11 @@ String ToMnemonic(String caption)
 
     while (at < size)
     {
-        byte c = caption.ByteAt(at);
+        byte c = caption.GetByteAt(at);
         if (c == (byte)'&')
         {
             // `&&` is one literal ampersand, and the marker is dropped.
-            if (at + 1u < size && caption.ByteAt(at + 1u) == (byte)'&')
+            if (at + 1u < size && caption.GetByteAt(at + 1u) == (byte)'&')
             {
                 built.Append("&");
                 at += 2u;

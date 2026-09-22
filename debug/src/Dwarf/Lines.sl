@@ -618,13 +618,13 @@ bool IsAbsolutePath(String path)
     nuint length = path.ByteLength();
     if (length == 0u)
         return false;
-    byte first = path.ByteAt(0u);
+    byte first = path.GetByteAt(0u);
     if (first == (byte)47 || first == (byte)92)       // '/' or '\'
         return true;
     // A drive letter, a colon, and a separator.
-    if (length >= 3u && path.ByteAt(1u) == (byte)58)  // ':'
+    if (length >= 3u && path.GetByteAt(1u) == (byte)58)  // ':'
     {
-        byte third = path.ByteAt(2u);
+        byte third = path.GetByteAt(2u);
         return third == (byte)47 || third == (byte)92;
     }
     return false;
@@ -635,7 +635,7 @@ String JoinPath(String directory, String name)
     nuint length = directory.ByteLength();
     if (length == 0u)
         return name;
-    byte last = directory.ByteAt(length - 1u);
+    byte last = directory.GetByteAt(length - 1u);
     if (last == (byte)47 || last == (byte)92)
         return directory + name;
     return directory + "/" + name;

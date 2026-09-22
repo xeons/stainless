@@ -649,15 +649,15 @@ Result<Instant, TimeError> ParseInstantIso(String text)
 {
     if (text.ByteLength() != 20u)
         return Fail(TimeError.Malformed);
-    if (text.ByteAt(4u) != (byte)'-' || text.ByteAt(7u) != (byte)'-')
+    if (text.GetByteAt(4u) != (byte)'-' || text.GetByteAt(7u) != (byte)'-')
     {
         return Fail(TimeError.Malformed);
     }
-    if (text.ByteAt(10u) != (byte)'T' || text.ByteAt(19u) != (byte)'Z')
+    if (text.GetByteAt(10u) != (byte)'T' || text.GetByteAt(19u) != (byte)'Z')
     {
         return Fail(TimeError.Malformed);
     }
-    if (text.ByteAt(13u) != (byte)':' || text.ByteAt(16u) != (byte)':')
+    if (text.GetByteAt(13u) != (byte)':' || text.GetByteAt(16u) != (byte)':')
     {
         return Fail(TimeError.Malformed);
     }
@@ -692,7 +692,7 @@ int Digits(String text, nuint start, nuint count)
     int value = 0;
     for (nuint i = 0u; i < count; i++)
     {
-        byte digit = text.ByteAt(start + i);
+        byte digit = text.GetByteAt(start + i);
         if (digit < 48 || digit > 57)
             return -1;
         value = value * 10 + (int)(digit - 48);

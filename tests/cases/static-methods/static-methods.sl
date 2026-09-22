@@ -45,7 +45,7 @@ public class Small
         int total = 0;
         for (nuint i = 0u; i < text.ByteLength(); i = i + 1u)
         {
-            byte digit = text.ByteAt(i);
+            byte digit = text.GetByteAt(i);
             if (digit < (byte)'0' || digit > (byte)'9')
                 return Fail(ParseError.NotADigit);
 

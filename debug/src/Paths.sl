@@ -68,6 +68,6 @@ bool PathEndsWithTail(String full, String tail)
     if (!Standard.Path.SamePath(full.Substring(a - b, b), tail))
         return false;
 
-    byte before = full.ByteAt(a - b - 1u);
+    byte before = full.GetByteAt(a - b - 1u);
     return before == (byte)47 || before == (byte)92;
 }

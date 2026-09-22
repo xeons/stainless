@@ -45,92 +45,92 @@ int Main()
     // --------------------------------------------------------- round trips
     var sample = "héllo €";
 
-    RoundTrip("utf8", Encoding.Utf8(), sample);
-    RoundTrip("utf16", Encoding.Utf16(), sample);
-    RoundTrip("utf16be", Encoding.Utf16BigEndian(), sample);
-    RoundTrip("utf32", Encoding.Utf32(), sample);
-    RoundTrip("utf32be", Encoding.Utf32BigEndian(), sample);
-    RoundTrip("latin1", Encoding.Latin1(), "héllo");
-    RoundTrip("cp1252", Encoding.Windows1252(), "héllo €");
-    RoundTrip("ascii", Encoding.Ascii(), "hello");
+    RoundTrip("utf8", Encoding.CreateUtf8(), sample);
+    RoundTrip("utf16", Encoding.CreateUtf16(), sample);
+    RoundTrip("utf16be", Encoding.CreateUtf16BigEndian(), sample);
+    RoundTrip("utf32", Encoding.CreateUtf32(), sample);
+    RoundTrip("utf32be", Encoding.CreateUtf32BigEndian(), sample);
+    RoundTrip("latin1", Encoding.CreateLatin1(), "héllo");
+    RoundTrip("cp1252", Encoding.CreateWindows1252(), "héllo €");
+    RoundTrip("ascii", Encoding.CreateAscii(), "hello");
 
     // A character outside the eight-bit world becomes `?` on the way out, so
     // the round trip does not come back and that is the honest answer.
-    RoundTrip("latin1-lossy", Encoding.Latin1(), "€");
+    RoundTrip("latin1-lossy", Encoding.CreateLatin1(), "€");
 
     // ------------------------------------------------------------ the bytes
-    var utf16 = Encoding.Utf16().GetBytes("A");
+    var utf16 = Encoding.CreateUtf16().GetBytes("A");
     SayNumber("utf16-A-0", (long)utf16[0]);
     SayNumber("utf16-A-1", (long)utf16[1]);
 
-    var utf16be = Encoding.Utf16BigEndian().GetBytes("A");
+    var utf16be = Encoding.CreateUtf16BigEndian().GetBytes("A");
     SayNumber("utf16be-A-0", (long)utf16be[0]);
     SayNumber("utf16be-A-1", (long)utf16be[1]);
 
-    SayNumber("utf32-count", (long)Encoding.Utf32().GetByteCount("héllo"));
-    SayNumber("utf8-count", (long)Encoding.Utf8().GetByteCount("héllo"));
-    SayNumber("latin1-count", (long)Encoding.Latin1().GetByteCount("héllo"));
+    SayNumber("utf32-count", (long)Encoding.CreateUtf32().GetByteCount("héllo"));
+    SayNumber("utf8-count", (long)Encoding.CreateUtf8().GetByteCount("héllo"));
+    SayNumber("latin1-count", (long)Encoding.CreateLatin1().GetByteCount("héllo"));
 
     // Windows-1252 is Latin-1 with punctuation where the C1 controls were.
-    var euro = Encoding.Windows1252().GetBytes("€");
+    var euro = Encoding.CreateWindows1252().GetBytes("€");
     SayNumber("cp1252-euro", (long)euro[0]);
-    Say("cp1252-back", Encoding.Windows1252().GetString([0x93, 0x94]));
+    Say("cp1252-back", Encoding.CreateWindows1252().GetString([0x93, 0x94]));
 
     // --------------------------------------------------------- representable
-    SayBool("ascii-can-a", Encoding.Ascii().CanRepresent((char32)97));
-    SayBool("ascii-can-e", Encoding.Ascii().CanRepresent((char32)233));
-    SayBool("latin1-can-e", Encoding.Latin1().CanRepresent((char32)233));
-    SayBool("latin1-can-euro", Encoding.Latin1().CanRepresent((char32)0x20AC));
-    SayBool("cp1252-can-euro", Encoding.Windows1252().CanRepresent((char32)0x20AC));
-    SayBool("utf8-can-emoji", Encoding.Utf8().CanRepresent((char32)128512));
+    SayBool("ascii-can-a", Encoding.CreateAscii().CanRepresent((char32)97));
+    SayBool("ascii-can-e", Encoding.CreateAscii().CanRepresent((char32)233));
+    SayBool("latin1-can-e", Encoding.CreateLatin1().CanRepresent((char32)233));
+    SayBool("latin1-can-euro", Encoding.CreateLatin1().CanRepresent((char32)0x20AC));
+    SayBool("cp1252-can-euro", Encoding.CreateWindows1252().CanRepresent((char32)0x20AC));
+    SayBool("utf8-can-emoji", Encoding.CreateUtf8().CanRepresent((char32)128512));
 
     // ------------------------------------------------------------- strictness
-    var good = Encoding.Utf8().TryGetString([0x68, 0x69]);
+    var good = Encoding.CreateUtf8().TryGetString([0x68, 0x69]);
     SayBool("strict-ok", good.Ok);
 
     // A lead byte with no continuation: the bytes ran out.
-    var truncated = Encoding.Utf8().TryGetString([0xC3]);
+    var truncated = Encoding.CreateUtf8().TryGetString([0xC3]);
     SayBool("strict-short", truncated.Ok);
 
     // 0xC0 0x80 is an overlong NUL -- it decodes, and is refused anyway,
     // because two spellings of one character is how a filter gets walked past.
-    var overlong = Encoding.Utf8().TryGetString([0xC0, 0x80]);
+    var overlong = Encoding.CreateUtf8().TryGetString([0xC0, 0x80]);
     SayBool("strict-overlong", overlong.Ok);
 
     // Lossy, by contrast, always answers.
     Say("lossy-count",
-        Text.FromInteger((long)Encoding.Utf8().GetString([0xC3]).CodePointCount()));
+        Text.FromInteger((long)Encoding.CreateUtf8().GetString([0xC3]).CodePointCount()));
 
     // An odd number of bytes is half a UTF-16 unit.
-    var odd = Encoding.Utf16().TryGetString([0x41]);
+    var odd = Encoding.CreateUtf16().TryGetString([0x41]);
     SayBool("strict-odd", odd.Ok);
 
     // A single-byte encoding cannot fail: every byte means something.
-    var never = Encoding.Latin1().TryGetString([0x00, 0xFF, 0x80]);
+    var never = Encoding.CreateLatin1().TryGetString([0x00, 0xFF, 0x80]);
     SayBool("latin1-never-fails", never.Ok);
 
     // ------------------------------------------------------------- preambles
-    SayNumber("utf8-bom", (long)Encoding.Utf8().Preamble.Length);
-    SayNumber("latin1-bom", (long)Encoding.Latin1().Preamble.Length);
+    SayNumber("utf8-bom", (long)Encoding.CreateUtf8().Preamble.Length);
+    SayNumber("latin1-bom", (long)Encoding.CreateLatin1().Preamble.Length);
 
-    var marked = Encoding.Detect([0xEF, 0xBB, 0xBF, 0x68]);
+    var marked = Encoding.DetectEncoding([0xEF, 0xBB, 0xBF, 0x68]);
     if (marked != null)
         Say("detect-utf8", marked.Name);
 
-    var wide = Encoding.Detect([0xFF, 0xFE, 0x41, 0x00]);
+    var wide = Encoding.DetectEncoding([0xFF, 0xFE, 0x41, 0x00]);
     if (wide != null)
         Say("detect-utf16", wide.Name);
 
     // A UTF-32LE mark begins with a UTF-16LE one, so the longer test has to
     // come first or every UTF-32 file reads as UTF-16.
-    var widest = Encoding.Detect([0xFF, 0xFE, 0x00, 0x00]);
+    var widest = Encoding.DetectEncoding([0xFF, 0xFE, 0x00, 0x00]);
     if (widest != null)
         Say("detect-utf32", widest.Name);
 
-    var plain = Encoding.Detect([0x68, 0x69]);
+    var plain = Encoding.DetectEncoding([0x68, 0x69]);
     SayBool("detect-none", plain == null);
 
-    var stripped = Encoding.WithoutPreamble(Encoding.Utf8(), [0xEF, 0xBB, 0xBF, 0x68]);
+    var stripped = Encoding.StripPreamble(Encoding.CreateUtf8(), [0xEF, 0xBB, 0xBF, 0x68]);
     SayNumber("stripped", (long)stripped.Length);
 
     // ------------------------------------------------------------- base64
@@ -145,7 +145,7 @@ int Main()
     var decoded = Convert.FromBase64("SGVsbG8sIFdvcmxkIQ==");
     switch (decoded)
     {
-        case Ok ok: Say("b64-back", Encoding.Utf8().GetString(ok.Value)); break;
+        case Ok ok: Say("b64-back", Encoding.CreateUtf8().GetString(ok.Value)); break;
         case Fail: Say("b64-back", "failed"); break;
     }
 
@@ -153,7 +153,7 @@ int Main()
     var wrapped = Convert.FromBase64("SGVs\nbG8s\nIFdv\ncmxk\nIQ==");
     switch (wrapped)
     {
-        case Ok ok: Say("b64-wrapped", Encoding.Utf8().GetString(ok.Value)); break;
+        case Ok ok: Say("b64-wrapped", Encoding.CreateUtf8().GetString(ok.Value)); break;
         case Fail: Say("b64-wrapped", "failed"); break;
     }
 

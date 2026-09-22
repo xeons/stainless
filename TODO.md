@@ -17,7 +17,7 @@ none of them was quite what it looked like:
 
 **Blocks on everything public.** 484 declarations had none. The bar held:
 what a caller has to know before using it. Writing them found that
-`String.ByteAt` reads the buffer unchecked where every other position on a
+`String.GetByteAt` reads the buffer unchecked where every other position on a
 String clamps -- the class had to say which one does not rather than claim a
 rule it does not keep.
 

@@ -13,7 +13,7 @@ import Standard.Security.Cryptography;
 // GCM specification's own test case 3. A number that changes here is a broken
 // implementation rather than a changed convention.
 
-byte[] Bytes(String text) => Encoding.Utf8().GetBytes(text);
+byte[] Bytes(String text) => Encoding.CreateUtf8().GetBytes(text);
 
 byte[] Hex(String text) => Convert.FromHex(text).GetValueOrDefault(new byte[0u]);
 
@@ -200,7 +200,7 @@ void Modes()
     Console.WriteLine("pkcs7 grows to " + Text.FromInteger((long)padded.GetValueOrDefault(new byte[0u]).Length));
 
     var opened = cipher.DecryptCbc(padded.GetValueOrDefault(new byte[0u]), iv, PaddingMode.Pkcs7);
-    Check("cbc-round-trip", Encoding.Utf8().GetString(opened.GetValueOrDefault(new byte[0u])),
+    Check("cbc-round-trip", Encoding.CreateUtf8().GetString(opened.GetValueOrDefault(new byte[0u])),
           "the quick brown fox");
 
     // A wrong key is a padding failure far more often than it is a wrong
@@ -214,7 +214,7 @@ void Modes()
 
     var cfb = cipher.EncryptCfb(message, iv);
     var cfbBack = cipher.DecryptCfb(cfb.GetValueOrDefault(new byte[0u]), iv);
-    Check("cfb-round-trip", Encoding.Utf8().GetString(cfbBack.GetValueOrDefault(new byte[0u])),
+    Check("cfb-round-trip", Encoding.CreateUtf8().GetString(cfbBack.GetValueOrDefault(new byte[0u])),
           "the quick brown fox");
 }
 
@@ -252,7 +252,7 @@ void Authenticated()
     byte[] boundTag = new byte[16u];
     var bound = box.Encrypt(nonce, Bytes("secret"), header, boundTag);
     var rightHeader = box.Decrypt(nonce, bound.GetValueOrDefault(new byte[0u]), header, boundTag);
-    Check("gcm-associated", Encoding.Utf8().GetString(rightHeader.GetValueOrDefault(new byte[0u])), "secret");
+    Check("gcm-associated", Encoding.CreateUtf8().GetString(rightHeader.GetValueOrDefault(new byte[0u])), "secret");
 
     var wrongHeader = box.Decrypt(nonce, bound.GetValueOrDefault(new byte[0u]), Bytes("record 8"), boundTag);
     Console.WriteLine(wrongHeader.Ok ? "gcm-associated-changed opened" : "gcm-associated-changed refused");

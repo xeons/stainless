@@ -490,14 +490,14 @@ Cie? ReadCie(byte[] data, nuint at)
     // `z` opens an augmentation block whose length is a LEB, and the letters
     // after it say what is in it. Without it there is no block at all and no
     // pointer encoding to find -- which is `absptr`, the default.
-    if (augmentation.ByteLength() != 0u && augmentation.ByteAt(0u) == (byte)'z')
+    if (augmentation.ByteLength() != 0u && augmentation.GetByteAt(0u) == (byte)'z')
     {
         ulong size = reader.Leb();
         nuint blockEnd = reader.Offset + (nuint)size;
 
         for (nuint i = 1u; i < augmentation.ByteLength(); i++)
         {
-            byte letter = augmentation.ByteAt(i);
+            byte letter = augmentation.GetByteAt(i);
 
             if (letter == (byte)'R')
             {

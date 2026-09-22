@@ -415,7 +415,7 @@ nuint MappedBaseOf(int pid, String path)
     while (at < length)
     {
         nuint end = at;
-        while (end < length && maps.ByteAt(end) != (byte)10)
+        while (end < length && maps.GetByteAt(end) != (byte)10)
             end++;
 
         String line = maps.Substring(at, end - at);
@@ -429,7 +429,7 @@ nuint MappedBaseOf(int pid, String path)
         bool found = false;
         for (nuint i = 0u; i < line.ByteLength(); i++)
         {
-            if (line.ByteAt(i) == (byte)45)          // '-'
+            if (line.GetByteAt(i) == (byte)45)          // '-'
             {
                 dash = i;
                 found = true;
@@ -456,7 +456,7 @@ bool PathEndsWithName(String line, String path)
         return false;
     for (nuint i = 0u; i < b; i++)
     {
-        if (line.ByteAt(a - b + i) != path.ByteAt(i))
+        if (line.GetByteAt(a - b + i) != path.GetByteAt(i))
             return false;
     }
     return true;
@@ -467,7 +467,7 @@ ulong HexadecimalValueOf(String text, nuint from, nuint to)
     ulong answer = 0u;
     for (nuint i = from; i < to; i++)
     {
-        byte here = text.ByteAt(i);
+        byte here = text.GetByteAt(i);
         ulong digit = 16u;
         if (here >= (byte)48 && here <= (byte)57)
             digit = (ulong)(here - (byte)48);

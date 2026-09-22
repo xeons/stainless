@@ -310,7 +310,7 @@ class Cursor
     {
         if (AtEnd)
             return (byte)0;
-        return Text.ByteAt(At);
+        return Text.GetByteAt(At);
     }
 
     public void Skip() => At = At + 1u;
@@ -334,9 +334,9 @@ void SkipByteOrderMark(Cursor cursor)
 {
     if (cursor.Text.ByteLength() < 3u)
         return;
-    if (cursor.Text.ByteAt(0u) == 0xEFu
-     && cursor.Text.ByteAt(1u) == 0xBBu
-     && cursor.Text.ByteAt(2u) == 0xBFu)
+    if (cursor.Text.GetByteAt(0u) == 0xEFu
+     && cursor.Text.GetByteAt(1u) == 0xBBu
+     && cursor.Text.GetByteAt(2u) == 0xBFu)
     {
         cursor.Skip();
         cursor.Skip();
@@ -348,7 +348,7 @@ void SkipSpace(Cursor cursor)
 {
     while (!cursor.AtEnd)
     {
-        byte c = cursor.Text.ByteAt(cursor.At);
+        byte c = cursor.Text.GetByteAt(cursor.At);
         if (c != (byte)' ' && c != (byte)'\t' && c != (byte)'\n' && c != (byte)'\r')
         {
             return;
@@ -532,7 +532,7 @@ String ParseText(Cursor cursor)
             return "";
         }
 
-        byte c = cursor.Text.ByteAt(cursor.At);
+        byte c = cursor.Text.GetByteAt(cursor.At);
 
         if (c == (byte)'"')
         {
@@ -569,7 +569,7 @@ String ParseText(Cursor cursor)
             return "";
         }
 
-        byte escape = cursor.Text.ByteAt(cursor.At);
+        byte escape = cursor.Text.GetByteAt(cursor.At);
         cursor.Skip();
 
         if (escape == (byte)'"')
@@ -617,8 +617,8 @@ String ParseText(Cursor cursor)
             if (first >= 0xD800u && first <= 0xDBFFu)
             {
                 if (cursor.At + 1u < cursor.Text.ByteLength() &&
-                    cursor.Text.ByteAt(cursor.At) == (byte)'\\' &&
-                    cursor.Text.ByteAt(cursor.At + 1u) == (byte)'u')
+                    cursor.Text.GetByteAt(cursor.At) == (byte)'\\' &&
+                    cursor.Text.GetByteAt(cursor.At + 1u) == (byte)'u')
                 {
                     nuint next = cursor.At;
                     cursor.At = cursor.At + 2u;
@@ -672,7 +672,7 @@ uint ParseHex4(Cursor cursor)
             return 0u;
         }
 
-        byte c = cursor.Text.ByteAt(cursor.At);
+        byte c = cursor.Text.GetByteAt(cursor.At);
         uint digit = 0u;
 
         if (c >= (byte)'0' && c <= (byte)'9')
@@ -711,7 +711,7 @@ JsonValue ParseNumber(Cursor cursor)
         cursor.At = cursor.At + 1u;
 
     nuint digits = cursor.At;
-    while (!cursor.AtEnd && IsDigit(cursor.Text.ByteAt(cursor.At)))
+    while (!cursor.AtEnd && IsDigit(cursor.Text.GetByteAt(cursor.At)))
     {
         cursor.Skip();
     }
@@ -723,18 +723,18 @@ JsonValue ParseNumber(Cursor cursor)
     }
 
     // A leading zero may only be the whole of the integer part.
-    if (cursor.Text.ByteAt(digits) == (byte)'0' && cursor.At - digits > 1u)
+    if (cursor.Text.GetByteAt(digits) == (byte)'0' && cursor.At - digits > 1u)
     {
         cursor.Reject(JsonError.BadNumber);
         return JsonValue.Null;
     }
 
-    if (!cursor.AtEnd && cursor.Text.ByteAt(cursor.At) == (byte)'.')
+    if (!cursor.AtEnd && cursor.Text.GetByteAt(cursor.At) == (byte)'.')
     {
         cursor.Skip();
         nuint fraction = cursor.At;
 
-        while (!cursor.AtEnd && IsDigit(cursor.Text.ByteAt(cursor.At)))
+        while (!cursor.AtEnd && IsDigit(cursor.Text.GetByteAt(cursor.At)))
         {
             cursor.Skip();
         }
@@ -748,20 +748,20 @@ JsonValue ParseNumber(Cursor cursor)
 
     if (!cursor.AtEnd)
     {
-        byte e = cursor.Text.ByteAt(cursor.At);
+        byte e = cursor.Text.GetByteAt(cursor.At);
         if (e == (byte)'e' || e == (byte)'E')
         {
             cursor.Skip();
 
             if (!cursor.AtEnd)
             {
-                byte sign = cursor.Text.ByteAt(cursor.At);
+                byte sign = cursor.Text.GetByteAt(cursor.At);
                 if (sign == (byte)'+' || sign == (byte)'-')
                     cursor.At = cursor.At + 1u;
             }
 
             nuint exponent = cursor.At;
-            while (!cursor.AtEnd && IsDigit(cursor.Text.ByteAt(cursor.At)))
+            while (!cursor.AtEnd && IsDigit(cursor.Text.GetByteAt(cursor.At)))
             {
                 cursor.Skip();
             }
@@ -810,7 +810,7 @@ bool Matches(Cursor cursor, String word)
 
     for (nuint i = 0u; i < word.ByteLength(); i++)
     {
-        if (cursor.Text.ByteAt(cursor.At + i) != word.ByteAt(i))
+        if (cursor.Text.GetByteAt(cursor.At + i) != word.GetByteAt(i))
             return false;
     }
 
@@ -970,7 +970,7 @@ void WriteText(StringBuilder text, String value)
 
     for (nuint i = 0u; i < value.ByteLength(); i++)
     {
-        byte c = value.ByteAt(i);
+        byte c = value.GetByteAt(i);
 
         String escaped = "";
 

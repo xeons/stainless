@@ -65,7 +65,7 @@ Count TallyText(String text)
 
     for (nuint i = 0u; i < text.ByteLength(); i++)
     {
-        byte at = text.ByteAt(i);
+        byte at = text.GetByteAt(i);
 
         if (at == 10u)
             found.Lines++;

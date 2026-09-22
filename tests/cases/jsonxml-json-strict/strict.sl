@@ -25,7 +25,7 @@ String Points(String text)
     {
         if (at > 0u)
             built.Append(" ");
-        char32 point = text.CodePointAt(at);
+        char32 point = text.GetCodePointAt(at);
         built.Append(Text.FromInteger((long)(uint)point));
         at = at + (nuint)Text.FromChar(point).ByteLength();
     }

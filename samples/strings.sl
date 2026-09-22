@@ -51,9 +51,9 @@ int Main()
     // Walking it properly: CodePointAt reads one character, NextCodePoint
     // steps over it. A `for` over bytes would land inside one.
     var scalars = new StringBuilder();
-    for (nuint at = 0u; at < accented.ByteLength(); at = accented.NextCodePoint(at))
+    for (nuint at = 0u; at < accented.ByteLength(); at = accented.SkipCodePoint(at))
     {
-        scalars.AppendInteger((long)(uint)accented.CodePointAt(at));
+        scalars.AppendInteger((long)(uint)accented.GetCodePointAt(at));
         scalars.Append(" ");
     }
     PrintLabelled("scalars         ", scalars.ToText().TrimEnd());
@@ -63,8 +63,8 @@ int Main()
     String line = "  name = Ada Lovelace  ";
 
     PrintLabelled("trimmed         ", "[" + line.Trim() + "]");
-    PrintLabelled("key             ", line.Before("=").Trim());
-    PrintLabelled("value           ", line.After("=").Trim());
+    PrintLabelled("key             ", line.SubstringBefore("=").Trim());
+    PrintLabelled("value           ", line.SubstringAfter("=").Trim());
     PrintLabelledNumber("indexOf =       ", line.IndexOf("="));
     PrintLabelledNumber("not there       ", line.IndexOf("@"));      // Text.NotFound, which is -1
 

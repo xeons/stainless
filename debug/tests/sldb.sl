@@ -602,7 +602,7 @@ int PrintAddressOfLine(String path, String where)
     bool found = false;
     for (nuint i = where.ByteLength(); i > 0u; i--)
     {
-        if (where.ByteAt(i - 1u) == (byte)58)         // ':'
+        if (where.GetByteAt(i - 1u) == (byte)58)         // ':'
         {
             colon = i - 1u;
             found = true;
@@ -712,8 +712,8 @@ ulong ParseNumber(String text)
     nuint at = 0u;
     ulong radix = 10u;
 
-    if (length >= 2u && text.ByteAt(0u) == (byte)48
-        && (text.ByteAt(1u) == (byte)120 || text.ByteAt(1u) == (byte)88))
+    if (length >= 2u && text.GetByteAt(0u) == (byte)48
+        && (text.GetByteAt(1u) == (byte)120 || text.GetByteAt(1u) == (byte)88))
     {
         at = 2u;
         radix = 16u;
@@ -722,7 +722,7 @@ ulong ParseNumber(String text)
     ulong answer = 0u;
     for (nuint i = at; i < length; i++)
     {
-        byte here = text.ByteAt(i);
+        byte here = text.GetByteAt(i);
         ulong digit = 16u;
         if (here >= (byte)48 && here <= (byte)57)
             digit = (ulong)(here - (byte)48);
@@ -860,7 +860,7 @@ bool FindAddressOfWhere(List<LineTable> tables, String where, nuint* address,
     bool split = false;
     for (nuint i = where.ByteLength(); i > 0u; i--)
     {
-        if (where.ByteAt(i - 1u) == (byte)58)
+        if (where.GetByteAt(i - 1u) == (byte)58)
         {
             colon = i - 1u;
             split = true;

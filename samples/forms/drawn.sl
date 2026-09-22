@@ -36,7 +36,7 @@ import Win32.User32;
 /// **The caret is a byte offset**, because that is what a `String` position is
 /// here: the text is UTF-8 and nothing counts characters, so moving left and
 /// right means finding the next and previous character *boundary* rather than
-/// adding one. `NextCodePoint` does the first, and `Previous` below does the
+/// adding one. `SkipCodePoint` does the first, and `Previous` below does the
 /// second the only way a UTF-8 string allows -- by walking from the start.
 public class Scratch : CustomControl
 {
@@ -111,7 +111,7 @@ public class Scratch : CustomControl
         }
         else if (args.Key == Key.Right)
         {
-            Move(_text.NextCodePoint(_at));
+            Move(_text.SkipCodePoint(_at));
         }
         else if (args.Key == Key.Home)
         {
@@ -129,7 +129,7 @@ public class Scratch : CustomControl
         }
         else if (args.Key == Key.Delete && _at < size)
         {
-            _text = _text.Substring(0u, _at) + _text.Substring(_text.NextCodePoint(_at));
+            _text = _text.Substring(0u, _at) + _text.Substring(_text.SkipCodePoint(_at));
             Invalidate();
         }
 
@@ -182,7 +182,7 @@ public class Scratch : CustomControl
         while (walk < index)
         {
             last = walk;
-            walk = _text.NextCodePoint(walk);
+            walk = _text.SkipCodePoint(walk);
         }
         return last;
     }
@@ -204,7 +204,7 @@ public class Scratch : CustomControl
             }
             if (walk == size)
                 break;
-            walk = _text.NextCodePoint(walk);
+            walk = _text.SkipCodePoint(walk);
         }
         _pending = -1;
     }

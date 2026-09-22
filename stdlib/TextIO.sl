@@ -90,7 +90,7 @@ public class StringReader : TextReader
         // The terminator is found in the bytes, which is safe on UTF-8: a
         // sequence cannot begin inside another, so 0x0A is never part of one.
         nuint start = _at;
-        while (_at < size && _text.ByteAt(_at) != 0x0A)
+        while (_at < size && _text.GetByteAt(_at) != 0x0A)
             _at++;
 
         nuint end = _at;
@@ -98,7 +98,7 @@ public class StringReader : TextReader
             _at++;
 
         // The carriage return of a CRLF belongs to the terminator.
-        if (end > start && _text.ByteAt(end - 1u) == 0x0D)
+        if (end > start && _text.GetByteAt(end - 1u) == 0x0D)
             end--;
 
         return _text.Substring(start, end - start);
@@ -158,7 +158,7 @@ public class StreamReader : TextReader
     public StreamReader(IStream stream)
     {
         _stream = stream;
-        _encoding = Utf8();
+        _encoding = CreateUtf8();
         _decoder = _encoding.GetDecoder();
         _bytes = new byte[BufferSize];
         _ready = new StringBuilder();
@@ -194,7 +194,7 @@ public class StreamReader : TextReader
 
     /// Reads one buffer and decodes it, answering whether anything new
     /// arrived. False means the stream is finished and the decoder flushed.
-    bool Fill()
+    bool FillBuffer()
     {
         if (_ended)
             return false;
@@ -238,8 +238,8 @@ public class StreamReader : TextReader
             return;
         _markChecked = true;
 
-        if (_ready.ByteLength() >= 3u && _ready.ByteAt(0u) == 0xEF
-            && _ready.ByteAt(1u) == 0xBB && _ready.ByteAt(2u) == 0xBF)
+        if (_ready.ByteLength() >= 3u && _ready.GetByteAt(0u) == 0xEF
+            && _ready.GetByteAt(1u) == 0xBB && _ready.GetByteAt(2u) == 0xBF)
         {
             _ready.Remove(0u, 3u);
         }
@@ -247,7 +247,7 @@ public class StreamReader : TextReader
 
     /// Drops what has already been handed back, so a long read does not keep
     /// growing the buffer it is reading from.
-    void Compact()
+    void CompactBuffer()
     {
         if (_at == 0u)
             return;
@@ -266,20 +266,20 @@ public class StreamReader : TextReader
             // whatever the stream was: 0x0A there is never part of a character.
             for (nuint i = _at; i < _ready.ByteLength(); i++)
             {
-                if (_ready.ByteAt(i) != 0x0A)
+                if (_ready.GetByteAt(i) != 0x0A)
                     continue;
 
                 nuint end = i;
-                if (end > _at && _ready.ByteAt(end - 1u) == 0x0D)
+                if (end > _at && _ready.GetByteAt(end - 1u) == 0x0D)
                     end--;
 
-                String line = Between(_at, end);
+                String line = DecodeBetween(_at, end);
                 _at = i + 1u;
-                this.Compact();
+                this.CompactBuffer();
                 return line;
             }
 
-            if (!this.Fill())
+            if (!this.FillBuffer())
                 break;
         }
 
@@ -287,9 +287,9 @@ public class StreamReader : TextReader
         if (_at >= _ready.ByteLength())
             return null;
 
-        String rest = Between(_at, _ready.ByteLength());
+        String rest = DecodeBetween(_at, _ready.ByteLength());
         _at = _ready.ByteLength();
-        this.Compact();
+        this.CompactBuffer();
         return rest;
     }
 
@@ -298,26 +298,26 @@ public class StreamReader : TextReader
         if (_closed)
             return "";
 
-        while (this.Fill()) { }
+        while (this.FillBuffer()) { }
 
         if (_at >= _ready.ByteLength())
             return "";
 
-        String rest = Between(_at, _ready.ByteLength());
+        String rest = DecodeBetween(_at, _ready.ByteLength());
         _at = _ready.ByteLength();
-        this.Compact();
+        this.CompactBuffer();
         return rest;
     }
 
     /// The decoded text between two byte positions.
-    String Between(nuint from, nuint to)
+    String DecodeBetween(nuint from, nuint to)
     {
         if (to <= from)
             return "";
 
         var piece = new StringBuilder();
         for (nuint i = from; i < to; i++)
-            piece.AppendByte(_ready.ByteAt(i));
+            piece.AppendByte(_ready.GetByteAt(i));
         return piece.ToText();
     }
 
@@ -419,7 +419,7 @@ public class StreamWriter : TextWriter
     public StreamWriter(IStream stream)
     {
         _stream = stream;
-        _encoding = Utf8();
+        _encoding = CreateUtf8();
         _closed = false;
     }
 

@@ -57,11 +57,11 @@ int Main()
     // ------------------------------------------------------------- slicing
     Say("substring", "hello world".Substring(6u));
     Say("substring-past", "hello".Substring(99u));
-    Say("before", "key=value".Before("="));
-    Say("after", "key=value".After("="));
-    Say("before-none", "keyvalue".Before("="));
-    Say("after-none", "keyvalue".After("="));
-    Say("after-last", "a.b.c".AfterLast("."));
+    Say("before", "key=value".SubstringBefore("="));
+    Say("after", "key=value".SubstringAfter("="));
+    Say("before-none", "keyvalue".SubstringBefore("="));
+    Say("after-none", "keyvalue".SubstringAfter("="));
+    Say("after-last", "a.b.c".SubstringAfterLast("."));
 
     // ------------------------------------------------------------ trimming
     Say("trim", "[" + "  padded  ".Trim() + "]");
@@ -110,14 +110,14 @@ int Main()
     SayNumber("points", (long)text.CodePointCount());
 
     var walked = new StringBuilder();
-    for (nuint at = 0u; at < text.ByteLength(); at = text.NextCodePoint(at))
+    for (nuint at = 0u; at < text.ByteLength(); at = text.SkipCodePoint(at))
     {
-        walked.Append(Text.FromInteger((long)(uint)text.CodePointAt(at)));
+        walked.Append(Text.FromInteger((long)(uint)text.GetCodePointAt(at)));
         walked.Append(" ");
     }
     Say("walked", walked.ToText().TrimEnd());
 
-    SayNumber("byte-at", (long)text.ByteAt(0u));
+    SayNumber("byte-at", (long)text.GetByteAt(0u));
 
     // --------------------------------------------------------- conversion
     var raw = "abc".ToBytes();

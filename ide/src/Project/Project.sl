@@ -662,7 +662,7 @@ nuint ComputeEditDistance(String from, String to)
             nuint above = row[j];
             nuint insert = row[j] + 1u;
             nuint remove = row[j - 1u] + 1u;
-            nuint replace = diagonal + (from.ByteAt(i - 1u) == to.ByteAt(j - 1u) ? 0u : 1u);
+            nuint replace = diagonal + (from.GetByteAt(i - 1u) == to.GetByteAt(j - 1u) ? 0u : 1u);
 
             nuint least = insert < remove ? insert : remove;
             row[j] = least < replace ? least : replace;

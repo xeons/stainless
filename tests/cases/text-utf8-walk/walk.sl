@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: 0BSD
 //
-// Walking malformed UTF-8 with `CodePointAt` and `NextCodePoint`.
+// Walking malformed UTF-8 with `GetCodePointAt` and `SkipCodePoint`.
 //
 // A `String` made by `FromBytes` is not validated, so the walk is what decides
 // what the bytes mean. Every step either reads one well-formed sequence or
@@ -19,10 +19,10 @@ void ShowWalk(String label, String text)
     built.Append(label);
     nuint steps = 0;
 
-    for (nuint at = 0; at < text.ByteLength(); at = text.NextCodePoint(at))
+    for (nuint at = 0; at < text.ByteLength(); at = text.SkipCodePoint(at))
     {
         built.Append(" ");
-        built.AppendInteger((long)(uint)text.CodePointAt(at));
+        built.AppendInteger((long)(uint)text.GetCodePointAt(at));
         steps++;
     }
 
@@ -38,10 +38,10 @@ void ShowUnits(String label, Utf16String text)
     var built = new StringBuilder();
     built.Append(label);
 
-    for (nuint at = 0; at < text.UnitCount(); at = text.NextCodePoint(at))
+    for (nuint at = 0; at < text.UnitCount(); at = text.SkipCodePoint(at))
     {
         built.Append(" ");
-        built.AppendInteger((long)(uint)text.CodePointAt(at));
+        built.AppendInteger((long)(uint)text.GetCodePointAt(at));
     }
     Console.WriteLine(built.ToText());
 }

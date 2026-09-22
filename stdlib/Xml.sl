@@ -270,14 +270,14 @@ class Cursor
     {
         if (AtEnd)
             return (byte)0;
-        return Source.ByteAt(At);
+        return Source.GetByteAt(At);
     }
 
     public byte PeekAt(nuint ahead)
     {
         if (At + ahead >= Source.ByteLength())
             return (byte)0;
-        return Source.ByteAt(At + ahead);
+        return Source.GetByteAt(At + ahead);
     }
 
     public void Skip() => At = At + 1u;
@@ -290,7 +290,7 @@ class Cursor
 
         for (nuint i = 0u; i < word.ByteLength(); i++)
         {
-            if (Source.ByteAt(At + i) != word.ByteAt(i))
+            if (Source.GetByteAt(At + i) != word.GetByteAt(i))
                 return false;
         }
 
@@ -341,7 +341,7 @@ bool IsNamePart(byte c)
 
 void SkipSpace(Cursor cursor)
 {
-    while (!cursor.AtEnd && IsSpace(cursor.Source.ByteAt(cursor.At)))
+    while (!cursor.AtEnd && IsSpace(cursor.Source.GetByteAt(cursor.At)))
         cursor.Skip();
 }
 
@@ -355,7 +355,7 @@ String ParseName(Cursor cursor)
         return "";
     }
 
-    while (!cursor.AtEnd && IsNamePart(cursor.Source.ByteAt(cursor.At)))
+    while (!cursor.AtEnd && IsNamePart(cursor.Source.GetByteAt(cursor.At)))
         cursor.Skip();
 
     return cursor.Source.Substring(start, cursor.At - start);
@@ -433,9 +433,9 @@ bool IsReservedTarget(String target)
 {
     if (target.ByteLength() != 3u)
         return false;
-    return (target.ByteAt(0u) | 0x20u) == (byte)'x'
-        && (target.ByteAt(1u) | 0x20u) == (byte)'m'
-        && (target.ByteAt(2u) | 0x20u) == (byte)'l';
+    return (target.GetByteAt(0u) | 0x20u) == (byte)'x'
+        && (target.GetByteAt(1u) | 0x20u) == (byte)'m'
+        && (target.GetByteAt(2u) | 0x20u) == (byte)'l';
 }
 
 /// The rest of a doctype, after `<!DOCTYPE`.
@@ -691,7 +691,7 @@ bool IsBlankSource(String source, nuint from, nuint to)
 {
     for (nuint i = from; i < to; i++)
     {
-        if (!IsSpace(source.ByteAt(i)))
+        if (!IsSpace(source.GetByteAt(i)))
             return false;
     }
     return true;
@@ -721,7 +721,7 @@ String ParseUntil(Cursor cursor, byte stop)
             break;
         }
 
-        byte c = cursor.Source.ByteAt(cursor.At);
+        byte c = cursor.Source.GetByteAt(cursor.At);
 
         if (c == stop)
         {
@@ -878,7 +878,7 @@ bool ContainsForbiddenControl(String source)
 {
     for (nuint i = 0u; i < source.ByteLength(); i++)
     {
-        byte c = source.ByteAt(i);
+        byte c = source.GetByteAt(i);
         if (c < 0x20u && c != (byte)'\t' && c != (byte)'\n' && c != (byte)'\r')
             return true;
     }
@@ -895,14 +895,14 @@ String NormalizeLineEnds(String source)
 
     for (nuint i = 0u; i < size; i++)
     {
-        if (source.ByteAt(i) != (byte)'\r')
+        if (source.GetByteAt(i) != (byte)'\r')
             continue;
 
         if (i > run)
             text.Append(source.Substring(run, i - run));
         text.Append("\n");
 
-        if (i + 1u < size && source.ByteAt(i + 1u) == (byte)'\n')
+        if (i + 1u < size && source.GetByteAt(i + 1u) == (byte)'\n')
             i++;
         run = i + 1u;
     }
@@ -920,9 +920,9 @@ void SkipByteOrderMark(Cursor cursor)
 {
     if (cursor.Source.ByteLength() < 3u)
         return;
-    if (cursor.Source.ByteAt(0u) == 0xEFu
-     && cursor.Source.ByteAt(1u) == 0xBBu
-     && cursor.Source.ByteAt(2u) == 0xBFu)
+    if (cursor.Source.GetByteAt(0u) == 0xEFu
+     && cursor.Source.GetByteAt(1u) == 0xBBu
+     && cursor.Source.GetByteAt(2u) == 0xBFu)
     {
         cursor.At = 3u;
     }
@@ -1103,7 +1103,7 @@ void WriteEscaped(StringBuilder text, String value, bool inAttribute)
 
     for (nuint i = 0u; i < value.ByteLength(); i++)
     {
-        byte c = value.ByteAt(i);
+        byte c = value.GetByteAt(i);
         String escaped = "";
 
         if (c == (byte)'&')

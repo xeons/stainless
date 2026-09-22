@@ -77,7 +77,7 @@ a second declaration of the type ([§1.2.1](01-modules.md#121-and-so-may-a-type)
 | `LastIndexOf(v)` | `long` | as above, from the end |
 | **slicing** | | |
 | `Substring(start)`, `Substring(start, n)` | `String` | byte offsets, clamped to the end |
-| `Before(sep)`, `After(sep)`, `AfterLast(sep)` | `String` | the halves either side of a separator |
+| `SubstringBefore(sep)`, `SubstringAfter(sep)`, `SubstringAfterLast(sep)` | `String` | the halves either side of a separator |
 | **trimming** | | |
 | `Trim()`, `TrimStart()`, `TrimEnd()` | `String` | ASCII whitespace |
 | **rebuilding** | | |
@@ -92,8 +92,8 @@ a second declaration of the type ([§1.2.1](01-modules.md#121-and-so-may-a-type)
 | `EqualsIgnoreCaseAscii(o)` | `bool` | |
 | `CompareTo(o)` | `int` | ordinal: negative, zero or positive |
 | **characters** | | |
-| `ByteAt(i)` | `byte` | a code unit, not a character |
-| `CodePointAt(i)`, `NextCodePoint(i)` | `char32`, `nuint` | how the text is walked properly |
+| `GetByteAt(i)` | `byte` | a code unit, not a character |
+| `GetCodePointAt(i)`, `SkipCodePoint(i)` | `char32`, `nuint` | how the text is walked properly |
 | `ToBytes()` | `byte[]` | a copy, because a `String` is immutable |
 
 Two rules run through all of it.
@@ -103,12 +103,12 @@ characters. Every position these produce lands on a character boundary anyway,
 because it came from matching whole text — a UTF-8 sequence cannot begin inside
 another one, which is what makes byte-wise search correct on encoded text rather
 than merely fast. A position the *caller* invents is its own business, and
-`CodePointAt` with `NextCodePoint` is the way to walk:
+`GetCodePointAt` with `SkipCodePoint` is the way to walk:
 
 ```csharp
-for (nuint at = 0; at < s.ByteLength(); at = s.NextCodePoint(at))
+for (nuint at = 0; at < s.ByteLength(); at = s.SkipCodePoint(at))
 {
-    char32 c = s.CodePointAt(at);
+    char32 c = s.GetCodePointAt(at);
 }
 ```
 
@@ -117,7 +117,7 @@ of several thousand entries with locale exceptions, and the runtime has no room
 for it yet. `ToUpperAscii` maps A–Z and leaves every other byte alone, which is
 right for identifiers, protocol tokens and file extensions, and visibly wrong
 for prose in most languages. `Standard.Ascii` asks the same questions of one
-byte: `IsDigit`, `IsLetter`, `IsHexDigit`, `IsWhiteSpace`, `ToUpper`, `HexValue`
+byte: `IsDigit`, `IsLetter`, `IsHexDigit`, `IsWhiteSpace`, `ToUpper`, `FromHexDigit`
 and the rest. It is a module of its own, and imported rather than automatic,
 because `IsDigit` is too good a name to take from every program.
 
@@ -136,8 +136,8 @@ and is correctly rounded, so anything written can be read back unchanged.
 is a difference nobody looks for.
 
 `StringBuilder` appends (`Append`, `AppendLine`, `AppendInteger`,
-`AppendDouble`, `AppendByte`, `AppendBytes`, `AppendCodePoint`, `AppendJoined`), reads (`ByteAt`, `IndexOf`,
-`Contains`) and edits (`Insert`, `Remove`, `Truncate`, `SetByteAt`,
+`AppendDouble`, `AppendByte`, `AppendBytes`, `AppendCodePoint`, `AppendJoined`), reads (`GetByteAt`, `IndexOf`,
+`Contains`) and edits (`Insert`, `Remove`, `TruncateTo`, `SetByteAt`,
 `ReplaceFirst`, `ReplaceAll`). Unlike `String` it hands out no pointer: its
 bytes are a growable allocation that moves, so a `byte*` into it would dangle at
 the next append. Reading is a call per byte instead.
@@ -185,8 +185,8 @@ var wide = message.ToUtf16();       // owned, NUL terminated, released by ARC
 MessageBoxW(0, wide.ToPointer(), null, 0);
 ```
 
-It offers `UnitCount()`, `IsEmpty`, `UnitAt(i)`, `CodePointAt(i)` and
-`NextCodePoint(i)` — which join a surrogate pair, so a character outside the
+It offers `UnitCount()`, `IsEmpty`, `GetUnitAt(i)`, `GetCodePointAt(i)` and
+`SkipCodePoint(i)` — which join a surrogate pair, so a character outside the
 basic plane reads as one scalar across two units — plus `Equals(other)`,
 `ToBytes()`, which gives the raw little-endian units, `ToPointer()`, which
 returns `char16*`, and `ToText()`, which transcodes back.
@@ -245,9 +245,9 @@ Console.WriteLine(builder.ToText());       // 0,1,2,3,4,
 | `AppendCodePoint(char32)` | `void`, encoded as UTF-8 |
 | `AppendJoined(sep, parts)` | `void` |
 | `ByteLength()`, `IsEmpty`, `HasContent` | `nuint`, `bool`, `bool` |
-| `ByteAt(i)`, `SetByteAt(i, b)` | `byte`, `void` |
+| `GetByteAt(i)`, `SetByteAt(i, b)` | `byte`, `void` |
 | `IndexOf(String)`, `Contains(String)` | `long`, `bool` |
-| `Insert(at, String)`, `Remove(at, n)`, `Truncate(at)` | `void` |
+| `Insert(at, String)`, `Remove(at, n)`, `TruncateTo(at)` | `void` |
 | `ReplaceFirst(from, to)`, `ReplaceAll(from, to)` | `bool`, `nuint` |
 | `Clear()` | `void`, keeps the capacity |
 | `ToText()` | `String`, a snapshot; the builder stays usable |
@@ -259,7 +259,7 @@ the clearer call — which is why the two were spelled out in the first place.
 
 Unlike `String`, its bytes are a separate growable allocation, so it is not
 NUL-terminated and has no `ToPointer()`. Call `ToText().ToPointer()` to reach C.
-The same allocation moving as it grows is why reading goes through `ByteAt`
+The same allocation moving as it grows is why reading goes through `GetByteAt`
 rather than through a pointer: one taken before an append would be a pointer
 into the previous allocation.
 
@@ -273,14 +273,14 @@ explicit.
 
 The shape is .NET's, with the static instances replaced by functions: a static
 needs an initializer, and `--shared` has nowhere to run one ([§9.3](09-statements-expressions.md#93-const-and-static)), so
-`Encoding.Utf8()` is a call. Everything is behind an interface, so a
+`Encoding.CreateUtf8()` is a call. Everything is behind an interface, so a
 program may add an encoding of its own.
 
 ```csharp
 import Standard.Encoding;
 
-var bytes = Encoding.Utf16().GetBytes("héllo");    // 10 bytes, little-endian
-var back  = Encoding.Utf16().GetString(bytes);     // "héllo"
+var bytes = Encoding.CreateUtf16().GetBytes("héllo");    // 10 bytes, little-endian
+var back  = Encoding.CreateUtf16().GetString(bytes);     // "héllo"
 ```
 
 | Member of `IEncoding` | Result |
@@ -295,12 +295,12 @@ var back  = Encoding.Utf16().GetString(bytes);     // "héllo"
 
 | Encoding | From | Notes |
 |---|---|---|
-| UTF-8 | `Encoding.Utf8()` | what a `String` already is; both directions copy |
-| UTF-16 | `Utf16()`, `Utf16BigEndian()` | |
-| UTF-32 | `Utf32()`, `Utf32BigEndian()` | one scalar per four bytes |
-| US-ASCII | `Ascii()` | |
-| ISO-8859-1 | `Latin1()` | byte *n* is code point *n*; decoding never fails |
-| Windows-1252 | `Windows1252()` | Latin-1 with punctuation at 0x80–0x9F |
+| UTF-8 | `Encoding.CreateUtf8()` | what a `String` already is; both directions copy |
+| UTF-16 | `CreateUtf16()`, `CreateUtf16BigEndian()` | |
+| UTF-32 | `CreateUtf32()`, `CreateUtf32BigEndian()` | one scalar per four bytes |
+| US-ASCII | `CreateAscii()` | |
+| ISO-8859-1 | `CreateLatin1()` | byte *n* is code point *n*; decoding never fails |
+| Windows-1252 | `CreateWindows1252()` | Latin-1 with punctuation at 0x80–0x9F |
 
 **Both directions are lossy by default**, which is the rule the language
 already applies to `ToUtf16` and `Text.FromUtf16`: what cannot be decoded
@@ -311,8 +311,9 @@ a caller that needs to know rather than to cope, and it refuses an overlong
 UTF-8 sequence as well as a malformed one: two spellings of one character is
 how a filter that checked the bytes gets walked past.
 
-`Encoding.Detect(bytes)` reads a byte order mark and gives back the encoding it
-names, or null. `Encoding.WithoutPreamble(encoding, bytes)` drops the mark.
+`Encoding.DetectEncoding(bytes)` reads a byte order mark and gives back the
+encoding it names, or null. `Encoding.StripPreamble(encoding, bytes)` drops the
+mark.
 
 ## 3.7 Conversions
 

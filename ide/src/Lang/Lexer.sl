@@ -228,7 +228,7 @@ public class Scanner
         if (at == 0u)
         {
             nuint first = SkipSpaces(line, 0u);
-            if (first < size && line.ByteAt(first) == (byte)'#')
+            if (first < size && line.GetByteAt(first) == (byte)'#')
             {
                 if (first > 0u)
                     into.Add(Token.Create(TokenKind.Whitespace, 0u, first));
@@ -239,7 +239,7 @@ public class Scanner
 
         while (at < size)
         {
-            byte c = line.ByteAt(at);
+            byte c = line.GetByteAt(at);
 
             if (c == (byte)' ' || c == (byte)'\t')
             {
@@ -251,15 +251,15 @@ public class Scanner
 
             if (c == (byte)'/' && at + 1u < size)
             {
-                byte next = line.ByteAt(at + 1u);
+                byte next = line.GetByteAt(at + 1u);
                 if (next == (byte)'/')
                 {
                     // `///` is documentation; `//` is a note. Three slashes and
                     // not four: `////` is a ruled line, and the compiler treats
                     // it as an ordinary comment.
-                    bool doc = at + 2u < size && line.ByteAt(at + 2u) == (byte)'/'
-                            && !(at + 3u < size && line.ByteAt(at + 3u) == (byte)'/');
-                    into.Add(Token.Create(doc ? TokenKind.DocComment : TokenKind.Comment,
+                    bool doc = at + 2u < size && line.GetByteAt(at + 2u) == (byte)'/'
+                            && !(at + 3u < size && line.GetByteAt(at + 3u) == (byte)'/');
+                    into.Add(Token.Of(doc ? TokenKind.DocComment : TokenKind.Comment,
                                       at, size - at));
                     return state;
                 }
@@ -283,7 +283,7 @@ public class Scanner
                 continue;
             }
 
-            if (c == (byte)'$' && at + 1u < size && line.ByteAt(at + 1u) == (byte)'"')
+            if (c == (byte)'$' && at + 1u < size && line.GetByteAt(at + 1u) == (byte)'"')
             {
                 // The `$` belongs to the string, and what is inside the holes is
                 // lexed as ordinary code by `ScanText`.
@@ -320,7 +320,7 @@ public class Scanner
             if (IsOperator(c))
             {
                 nuint run = at;
-                while (run < size && IsOperator(line.ByteAt(run)))
+                while (run < size && IsOperator(line.GetByteAt(run)))
                     run++;
                 into.Add(Token.Create(TokenKind.Operator, at, run - at));
                 at = run;
@@ -346,7 +346,7 @@ public class Scanner
     {
         nuint size = line.ByteLength();
         nuint run = at;
-        while (run < size && IsWordPart(line.ByteAt(run)))
+        while (run < size && IsWordPart(line.GetByteAt(run)))
             run++;
 
         String word = line.Substring(at, run - at);
@@ -388,7 +388,7 @@ public class Scanner
     {
         if (word.ByteLength() < 2u)
             return false;
-        byte first = word.ByteAt(0u);
+        byte first = word.GetByteAt(0u);
         // `HWND` and `IO` are types; `MAX` may not be, but a word in capitals
         // is a constant either way, and the two want the same colour far more
         // often than they want different ones.
@@ -410,7 +410,7 @@ public class Scanner
 
         while (run < size)
         {
-            byte c = line.ByteAt(run);
+            byte c = line.GetByteAt(run);
 
             if (c == (byte)'\\' && run + 1u < size)
             {
@@ -421,7 +421,7 @@ public class Scanner
             if (c == (byte)'{')
             {
                 // A doubled brace is one literal brace, not a hole.
-                if (run + 1u < size && line.ByteAt(run + 1u) == (byte)'{')
+                if (run + 1u < size && line.GetByteAt(run + 1u) == (byte)'{')
                 {
                     run += 2u;
                     continue;
@@ -459,7 +459,7 @@ public class Scanner
 
         while (run < size)
         {
-            byte c = line.ByteAt(run);
+            byte c = line.GetByteAt(run);
             if (c == (byte)'{')
             {
                 depth++;
@@ -496,7 +496,7 @@ public class Scanner
         nuint run = at + 1u;
         while (run < size)
         {
-            byte c = line.ByteAt(run);
+            byte c = line.GetByteAt(run);
             if (c == (byte)'\\' && run + 1u < size)
             {
                 run += 2u;
@@ -525,12 +525,12 @@ public class Scanner
 
         while (run < size)
         {
-            byte c = line.ByteAt(run);
+            byte c = line.GetByteAt(run);
             if (IsWordPart(c) || c == (byte)'.')
             {
                 // `1..2` is a range, not a number with two points in it, and
                 // `x.Count` after a number is a member access.
-                if (c == (byte)'.' && run + 1u < size && !IsDigit(line.ByteAt(run + 1u)))
+                if (c == (byte)'.' && run + 1u < size && !IsDigit(line.GetByteAt(run + 1u)))
                 {
                     break;
                 }
@@ -540,7 +540,7 @@ public class Scanner
             // An exponent's sign is part of the number, and only there.
             if ((c == (byte)'+' || c == (byte)'-') && run > at)
             {
-                byte previous = line.ByteAt(run - 1u);
+                byte previous = line.GetByteAt(run - 1u);
                 if (previous == (byte)'e' || previous == (byte)'E')
                 {
                     run++;
@@ -563,7 +563,7 @@ public class Scanner
         nuint run = from;
         while (run + 1u < size)
         {
-            if (line.ByteAt(run) == (byte)'*' && line.ByteAt(run + 1u) == (byte)'/')
+            if (line.GetByteAt(run) == (byte)'*' && line.GetByteAt(run + 1u) == (byte)'/')
             {
                 return run + 2u;
             }
@@ -578,7 +578,7 @@ public class Scanner
         nuint run = from;
         while (run < size)
         {
-            byte c = line.ByteAt(run);
+            byte c = line.GetByteAt(run);
             if (c != (byte)' ' && c != (byte)'\t')
                 break;
             run++;

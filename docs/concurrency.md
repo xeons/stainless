@@ -499,8 +499,8 @@ parallel
 }
 ```
 
-`Search` checks `stop.Load()` every so often and returns early; whichever call
-finds an answer sets `stop.Store(true)`. Nothing else is needed, and nothing
+`Search` checks `stop.Read()` every so often and returns early; whichever call
+finds an answer sets `stop.Write(true)`. Nothing else is needed, and nothing
 else was needed before this section existed.
 
 ### 9.2 What will never work

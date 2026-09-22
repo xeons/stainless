@@ -708,7 +708,7 @@ public class Shell : Form
     {
         if (path.ByteLength() == 0u)
             return "Untitled";
-        String name = path.AfterLast(PathSeparator);
+        String name = path.SubstringAfterLast(PathSeparator);
         return name.ByteLength() == 0u ? path : name;
     }
 
@@ -2404,7 +2404,7 @@ public class Shell : Form
             String text = line.Trim();
             if (!text.StartsWith("module "))
                 continue;
-            return text.After("module ").Before(";").Trim();
+            return text.SubstringAfter("module ").SubstringBefore(";").Trim();
         }
         return "";
     }
@@ -2589,7 +2589,7 @@ public class Shell : Form
         bool split = false;
         for (nuint i = where.ByteLength(); i > 0u; i--)
         {
-            if (where.ByteAt(i - 1u) == (byte)58)
+            if (where.GetByteAt(i - 1u) == (byte)58)
             {
                 colon = i - 1u;
                 split = true;
