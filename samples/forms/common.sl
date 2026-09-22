@@ -407,6 +407,14 @@ public class CommonForm : Form
         ok = Check(ok, "status panel text round-trips",
                    _status.GetPanelText(0) == "Ready.");
 
+        // A hit test, because it asks the widget: `Nodes` is the control's
+        // own list and holds its order whatever the platform did with it.
+        for (int i = 0; i < 4; i++)
+            Application.DoEvents();
+        TreeNode? top = _tree.GetNodeAt(Point.FromXY(30, 4));
+        ok = Check(ok, "the tree shows its first root first",
+                   top != null && ((TreeNode)top).Text == "Shopping");
+
         ok = Check(ok, "tabs hold their pages", _tabs.Pages.Count == 4u);
         ok = Check(ok, "the platform has the tabs too", _tabs.TabCount == 4);
         ok = Check(ok, "one page is showing at a time",

@@ -579,6 +579,18 @@ public class GtkTreePeer : GtkModelPeer, ITreeViewPeer
         bool hasParent = TryGetIter(parent, &under);
         bool hasPrevious = TryGetIter(previous, &after);
 
+        // With no sibling, `insert_after` prepends; the seam appends.
+        if (!hasPrevious)
+        {
+            int count = gtk_tree_model_iter_n_children(Model, hasParent ? &under : null);
+            if (count > 0)
+            {
+                hasPrevious = gtk_tree_model_iter_nth_child(Model, &after,
+                                                            hasParent ? &under : null,
+                                                            count - 1) != 0;
+            }
+        }
+
         gtk_tree_store_insert_after(Model, &made,
                                     hasParent ? &under : null,
                                     hasPrevious ? &after : null);
