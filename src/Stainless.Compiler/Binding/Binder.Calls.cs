@@ -947,6 +947,19 @@ public sealed partial class Binder
         var other = BindConversion(arguments[0], type, syntax.Arguments[0].Span);
         if (other.Type.IsError()) return new BoundErrorExpression(syntax.Span);
 
+        // A float's EqualTo is CompareTo's equality rather than IEEE's, so NaN
+        // equals NaN as HashDouble already assumes. With `==` a NaN key in a
+        // Dictionary could never be found, and every Set added another.
+        if (member.Member == "EqualTo" && type is PrimitiveTypeSymbol { IsFloat: true })
+        {
+            var ordering = _builtins.CompareDouble;
+            var compared = new BoundCall(
+                syntax.Span, ordering, null, [Widen(receiver, ordering), Widen(other, ordering)]);
+            return BindBinaryOperation(
+                syntax.Span, compared, BoundBinaryOp.Equal,
+                new BoundLiteral(syntax.Span, PrimitiveTypeSymbol.Int, 0UL), TokenKind.EqualsEquals);
+        }
+
         // Equality is the operator, which already knows how to compare a String
         // and how to compare an enum.
         if (member.Member == "EqualTo")

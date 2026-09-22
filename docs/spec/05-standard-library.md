@@ -188,6 +188,11 @@ ages.Set("ada", 36);                    // String satisfies IEquatable + IHashab
 "apple".CompareTo("banana");            // -1, by bytes, which for UTF-8 is by code point
 ```
 
+**A float's `EqualTo` is `CompareTo`'s equality, not `==`.** NaN equals NaN
+and `-0.0` equals `0.0`, which is what lets a NaN key be found in a
+`Dictionary<double, …>` at all. The operator keeps IEEE's answer, so
+`nan == nan` is still false.
+
 A class still says what it implements, and a declared member always wins over
 the built-in one.
 
