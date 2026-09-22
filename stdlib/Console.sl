@@ -88,4 +88,4 @@ public String ReadToEnd() => sl_console_read_all();
 ///
 /// It reads a byte to find out and pushes it back, so it answers only when
 /// the stream has something to say: on one that is open and idle it waits.
-public bool AtEnd() => sl_console_at_end();
+public bool IsInputAtEnd() => sl_console_at_end();

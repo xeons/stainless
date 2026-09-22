@@ -415,16 +415,16 @@ int Main(String[] args)
 ```
 
 `Main` takes either nothing or a `String[]`, and nothing else (SL0282). The
-array holds the arguments only — the program's own name is `Env.Program()`,
+array holds the arguments only — the program's own name is `Env.ProgramPath()`,
 because it is not one of them and treating it as one is the mistake C's argv
 invites. `Standard.Env` reaches the same list from anywhere, which is for code
 that is nowhere near `Main`; taking the array as a parameter is better where it
 is possible.
 
 `Env` also has variables and the working directory. **An empty value is not
-portable**: Windows defines setting one as removal, so `Set(name, "")` deletes
+portable**: Windows defines setting one as removal, so `SetVariable(name, "")` deletes
 the variable there and keeps an empty one on Unix. Treat empty and unset alike,
-which is what `GetOr` does.
+which is what `GetVariableOrDefault` does.
 
 **`Standard.Time` keeps two kinds of time apart, because confusing them is the
 usual bug.** An `Instant` is a point on the wall clock and can jump — a user
@@ -537,7 +537,7 @@ import Standard.IO;
 
 var read = File.ReadAllText("config.json");
 if (read.Ok) { Console.WriteLine(read.Value); }
-else         { Console.WriteError(IO.Describe(read.Error)); }
+else         { Console.WriteError(IO.DescribeIOError(read.Error)); }
 ```
 
 Stainless has no static classes, so what C# spells `File.ReadAllText` is a
@@ -580,18 +580,19 @@ whether or not `Close` was called.
 Opening takes a `FileMode` (`Open`, `Create`, `Append`) and a `[Flags]`
 `FileAccess` (`Read`, `Write`, `ReadWrite`).
 
-**`File`** has `Exists`, `Size`, `Modified`, `Delete`, `Rename`, `Copy`, the
-openers, and the whole-file pairs `ReadAllText`/`WriteAllText`,
+**`File`** has `Exists`, `GetSize`, `GetLastWriteTime`, `Delete`, `Move`, `Copy`,
+the openers, and the whole-file pairs `ReadAllText`/`WriteAllText`,
 `ReadAllBytes`/`WriteAllBytes`, `ReadAllLines`/`WriteAllLines`, and
-`AppendText`.
+`AppendAllText`.
 
-**`Directory`** has `Exists`, `Create`, `CreateAll`, `Delete`, and the listings
-`Entries`, `Files`, `Directories` and `AllFiles`. Listings return full paths
+**`Directory`** has `Exists`, `CreateDirectory`, `CreateDirectoryTree`, `Delete`,
+and the listings `GetEntries`, `GetFiles`, `GetDirectories` and `GetAllFiles`.
+Listings return full paths
 rather than bare names, in the platform's order.
 
-**`Path`** is purely textual and touches no disk: `Join`, `FileName`,
-`DirectoryName`, `Extension`, `WithoutExtension`, `WithExtension`, `IsRooted`
-and `Split`. Both `/` and `\` are accepted when reading a path apart, because
+**`Path`** is purely textual and touches no disk: `Join`, `GetFileName`,
+`GetDirectoryName`, `GetExtension`, `GetFileNameWithoutExtension`,
+`ChangeExtension`, `IsPathRooted`, `IsSamePath` and `SplitPath`. Both `/` and `\` are accepted when reading a path apart, because
 Windows accepts both and a path from a config file may use either.
 
 **Paths are UTF-8, and stay correct.** A Stainless `String` is already UTF-8,
@@ -603,8 +604,8 @@ else.
 ### 5.9.1 `Standard.Process`
 
 ```csharp
-var done = try Run("git", ["rev-parse", "HEAD"]);
-if (done.Ok())
+var done = try RunProcess("git", ["rev-parse", "HEAD"]);
+if (done.Succeeded)
     Console.WriteLine(done.Output.Trim());
 ```
 
@@ -627,8 +628,8 @@ cannot report a failed exec through its exit code: 127 is the shell's
 convention for "could not run it" and is also a perfectly ordinary code a real
 program might return. So the child is given a close-on-exec pipe and writes
 `errno` into it; a successful exec closes it and the parent reads end-of-file.
-One pipe, one read, and `Run("/no/such/thing")` says `NotFound` while
-`Run("sh", ["-c", "exit 127"])` says the program ran and answered 127.
+One pipe, one read, and `RunProcess("/no/such/thing")` says `NotFound` while
+`RunProcess("sh", ["-c", "exit 127"])` says the program ran and answered 127.
 
 **Both streams are drained while the child runs.** A pipe holds about 64KB, so
 a parent that waits for the child before reading waits forever on a child that
@@ -659,12 +660,12 @@ gentle there.
 
 **Signals are asked for rather than delivered.** A handler runs between two
 instructions of whatever was executing, so almost nothing is legal inside one —
-no allocation, no locks, and therefore no Stainless at all. `Signals.Watch()`
+no allocation, no locks, and therefore no Stainless at all. `Signals.StartWatching()`
 installs a handler that stores to a flag, and `Signals.Interrupted` reads it
 where a program can act on it:
 
 ```csharp
-Signals.Watch();
+Signals.StartWatching();
 while (!Signals.Interrupted)
     DoAPieceOfWork();
 ```

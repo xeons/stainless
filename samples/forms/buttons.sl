@@ -443,7 +443,7 @@ int Main()
     var form = new ButtonsForm();
 
     bool testing = false;
-    var arguments = Standard.Env.Arguments();
+    var arguments = Standard.Env.GetArguments();
     for (nuint i = 0u; i < arguments.Length; i++)
     {
         if (arguments[i] == "--selftest")

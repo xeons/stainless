@@ -20,7 +20,7 @@ int Main()
     Console.WriteLine($"memory write: {memory.Write(buffer, 2u, huge)}");
     Console.WriteLine($"memory length: {memory.Length}");
 
-    var temp = Env.GetOr("TEMP", Env.GetOr("TMPDIR", "/tmp"));
+    var temp = Env.GetVariableOrDefault("TEMP", Env.GetVariableOrDefault("TMPDIR", "/tmp"));
     var path = Path.Join(temp, "stainless-files-stream-bounds.bin");
     File.WriteAllBytes(path, new byte[8]);
 
@@ -28,13 +28,13 @@ int Main()
     if (opened.Ok)
     {
         var file = opened.Value;
-        Console.WriteLine($"file read: {file.Read(buffer, 2u, huge)} {IO.Describe(file.Error)}");
-        Console.WriteLine($"file write: {file.Write(buffer, 2u, huge)} {IO.Describe(file.Error)}");
+        Console.WriteLine($"file read: {file.Read(buffer, 2u, huge)} {IO.DescribeIOError(file.Error)}");
+        Console.WriteLine($"file write: {file.Write(buffer, 2u, huge)} {IO.DescribeIOError(file.Error)}");
         Console.WriteLine($"file read past: {file.Read(buffer, 5u, 0u)}");
         file.Close();
     }
 
-    Console.WriteLine($"file length: {File.Size(path)}");
+    Console.WriteLine($"file length: {File.GetSize(path)}");
     File.Delete(path);
     return 0;
 }

@@ -86,15 +86,15 @@ extern "C" byte** environ;
 public nuint ArgumentCount() => sl_args_count();
 
 /// One argument, counting from zero. Aborts past the end, as an array does.
-public String ArgumentAt(nuint index)
+public String GetArgument(nuint index)
 {
     if (index >= sl_args_count())
-        sl_fail("Env.ArgumentAt: no argument at that index");
+        sl_fail("Env.GetArgument: no argument at that index");
     return sl_args_at(index);
 }
 
 /// Every argument, as an array. The same thing `Main(String[] args)` receives.
-public String[] Arguments()
+public String[] GetArguments()
 {
     nuint count = sl_args_count();
     var all = new String[count];
@@ -106,17 +106,17 @@ public String[] Arguments()
 /// The program's own path, as the operating system gave it. That is not
 /// necessarily where the executable is: a shell may pass a bare name, and on
 /// Linux nothing guarantees any relationship at all.
-public String Program() => sl_args_program();
+public String ProgramPath() => sl_args_program();
 
 // --------------------------------------------------------------- variables
 
 /// A variable's value, or null when it is not set.
 ///
 /// Null rather than empty, because "not set" and "set to nothing" are
-/// different states and both platforms can tell them apart. `GetOr` is what
+/// different states and both platforms can tell them apart. `GetVariableOrDefault` is what
 /// most callers want.
 #if WINDOWS
-public String? Get(String name)
+public String? GetVariable(String name)
 {
     var wanted = name.ToUtf16();
 
@@ -145,7 +145,7 @@ public String? Get(String name)
 /// ERROR_ENVVAR_NOT_FOUND.
 const uint ErrorVariableNotFound = 203u;
 #else
-public String? Get(String name)
+public String? GetVariable(String name)
 {
     byte* value = getenv(name.ToPointer());
     if (value == null)
@@ -155,16 +155,16 @@ public String? Get(String name)
 #endif
 
 /// A variable's value, or `fallback` when it is not set.
-public String GetOr(String name, String fallback)
+public String GetVariableOrDefault(String name, String fallback)
 {
-    var value = Get(name);
+    var value = GetVariable(name);
     if (value == null)
         return fallback;
     return value;
 }
 
 /// Whether a variable is set, whatever it is set to.
-public bool Has(String name) => Get(name) != null;
+public bool HasVariable(String name) => GetVariable(name) != null;
 
 /// Sets a variable for this process and anything it starts afterwards.
 ///
@@ -173,37 +173,37 @@ public bool Has(String name) => Get(name) != null;
 /// platform accepted it.
 ///
 /// An empty value leaves the variable set and empty, on both platforms, and
-/// `Get` answers with the empty string rather than null.
-public bool Set(String name, String value) => Store(name, value);
+/// `GetVariable` answers with the empty string rather than null.
+public bool SetVariable(String name, String value) => StoreVariable(name, value);
 
 /// Removes a variable, reporting whether the platform accepted it. Removing
 /// one that was never set is not a failure.
-public bool Remove(String name) => Store(name, null);
+public bool RemoveVariable(String name) => StoreVariable(name, null);
 
 #if WINDOWS
 
 /// Sets a variable, or removes it when `value` is null. A null value is what
 /// `SetEnvironmentVariableW` takes to mean "remove".
-bool Store(String name, String? value)
+bool StoreVariable(String name, String? value)
 {
     var wanted = name.ToUtf16();
     if (value == null)
-        return Win32Succeeded(SetEnvironmentVariableW(wanted.ToPointer(), null));
+        return IsWin32Success(SetEnvironmentVariableW(wanted.ToPointer(), null));
 
     var text = ((String)value).ToUtf16();
-    return Win32Succeeded(SetEnvironmentVariableW(wanted.ToPointer(), text.ToPointer()));
+    return IsWin32Success(SetEnvironmentVariableW(wanted.ToPointer(), text.ToPointer()));
 }
 
 /// Nonzero is success for a Win32 BOOL, which is not what the rest of this
 /// file means by an int.
-bool Win32Succeeded(int result) => result != 0;
+bool IsWin32Success(int result) => result != 0;
 
 /// The name of every variable, in whatever order the platform keeps them.
 ///
 /// The block is one run of NUL-terminated wide strings ending in an empty one.
 /// A name beginning with `=` is Windows' per-drive working directory (`=C:`),
 /// which is not a variable anybody set.
-public String[] Names()
+public String[] GetVariableNames()
 {
     char16* block = GetEnvironmentStringsW();
     if (block == null)
@@ -239,7 +239,7 @@ public String[] Names()
 #else
 
 /// Sets a variable, or removes it when `value` is null.
-bool Store(String name, String? value)
+bool StoreVariable(String name, String? value)
 {
     if (value == null)
         return unsetenv(name.ToPointer()) == 0;
@@ -250,7 +250,7 @@ bool Store(String name, String? value)
 ///
 /// `environ` is a null-terminated run of `name=value`, and an entry without an
 /// `=` is not one the C library put there.
-public String[] Names()
+public String[] GetVariableNames()
 {
     var found = new List<String>();
 

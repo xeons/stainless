@@ -434,20 +434,20 @@ public class DebugSession
             uint chosen = 0u;
             if (!FindLineAddress(tables, file, line, &at, &chosen))
             {
-                PostOutput("no code for " + Standard.Path.FileName(file) + ":"
+                PostOutput("no code for " + Standard.Path.GetFileName(file) + ":"
                     + Standard.Text.FromInteger((long)line)
                     + ", so it will not be hit.");
                 Application.Post(() => OnBreakpointBound(file, line, 0u));
                 continue;
             }
 
-            var planted = engine.Add(at, Standard.Path.FileName(file) + ":"
+            var planted = engine.Add(at, Standard.Path.GetFileName(file) + ":"
                                          + Standard.Text.FromInteger((long)line));
 
             String problem = engine.Condition(planted, condition);
             if (problem.ByteLength() != 0u)
             {
-                PostOutput(Standard.Path.FileName(file) + ":"
+                PostOutput(Standard.Path.GetFileName(file) + ":"
                     + Standard.Text.FromInteger((long)line) + ": " + condition
                     + ": " + problem + " -- it will stop every time.");
             }

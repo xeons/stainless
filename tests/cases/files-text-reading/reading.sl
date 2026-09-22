@@ -54,7 +54,7 @@ byte[] MarkedText()
 
 int Main()
 {
-    var temp = Env.GetOr("TEMP", Env.GetOr("TMPDIR", "/tmp"));
+    var temp = Env.GetVariableOrDefault("TEMP", Env.GetVariableOrDefault("TMPDIR", "/tmp"));
     var path = Path.Join(temp, "stainless-files-text-reading.txt");
     File.WriteAllBytes(path, MarkedText());
 
@@ -71,11 +71,11 @@ int Main()
     var first = reader.ReadLine();
     Console.WriteLine($"reader first line is hi: {first != null && (String)first == "hi"}");
     Console.WriteLine($"reader rest: {reader.ReadToEnd().ByteLength()} bytes");
-    Console.WriteLine($"reader error: {IO.Describe(reader.Error)}");
+    Console.WriteLine($"reader error: {IO.DescribeIOError(reader.Error)}");
 
     var broken = new StreamReader(new BrokenStream());
     Console.WriteLine($"broken line is null: {broken.ReadLine() == null}");
-    Console.WriteLine($"broken error: {IO.Describe(broken.Error)}");
+    Console.WriteLine($"broken error: {IO.DescribeIOError(broken.Error)}");
 
     File.Delete(path);
     return 0;

@@ -188,7 +188,7 @@ int Main(String[] args)
         var read = File.ReadAllText(path);
         if (!read.Ok)
         {
-            Console.WriteError("wc: " + path + ": " + IO.Describe(read.Error));
+            Console.WriteError("wc: " + path + ": " + IO.DescribeIOError(read.Error));
             failures++;
             continue;
         }

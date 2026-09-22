@@ -424,10 +424,10 @@ void AppendEdgePlacements(List<JsonValue> panes, DockLayout layout, DockEdge edg
 /// why nothing here says what went wrong.
 public bool SaveLayout(DockLayout layout, String path)
 {
-    String folder = Path.DirectoryName(path);
+    String folder = Path.GetDirectoryName(path);
     if (folder != "" && !Directory.Exists(folder))
     {
-        if (Directory.CreateAll(folder) != IOError.None)
+        if (Directory.CreateDirectoryTree(folder) != IOError.None)
             return false;
     }
 
@@ -445,14 +445,14 @@ public bool SaveLayout(DockLayout layout, String path)
 public String GetSettingsDirectory()
 {
 #if WINDOWS
-    String roaming = Env.GetOr("APPDATA", "");
+    String roaming = Env.GetVariableOrDefault("APPDATA", "");
     if (roaming != "")
         return Path.Join(Path.Join(roaming, "Stainless"), "ide");
 #else
-    String config = Env.GetOr("XDG_CONFIG_HOME", "");
+    String config = Env.GetVariableOrDefault("XDG_CONFIG_HOME", "");
     if (config == "")
     {
-        String home = Env.GetOr("HOME", "");
+        String home = Env.GetVariableOrDefault("HOME", "");
         if (home != "")
             config = Path.Join(home, ".config");
     }

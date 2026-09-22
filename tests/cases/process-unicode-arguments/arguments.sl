@@ -24,13 +24,13 @@ public int Main(String[] args)
     if (args.Length > 0u && args[0u] == "child")
     {
         Check("child ", args, 1u);
-        Check("env   ", Env.Arguments(), 1u);
+        Check("env   ", Env.GetArguments(), 1u);
         return 0;
     }
 
     Check("main  ", args, 0u);
 
-    var ran = Run(Env.Program(), ["child", "café", "日本", "a \"b\" c"]);
+    var ran = RunProcess(Env.ProgramPath(), ["child", "café", "日本", "a \"b\" c"]);
     if (ran.Ok)
         Console.Write(ran.Value.Output);
     return 0;

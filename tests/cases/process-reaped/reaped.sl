@@ -23,7 +23,7 @@ void StartAndDrop()
 
 void OpenAndDrop()
 {
-    var opened = Open("sleep", ["0.2"]);
+    var opened = OpenProcess("sleep", ["0.2"]);
     Console.WriteLine($"open   {opened.Ok}");
 }
 

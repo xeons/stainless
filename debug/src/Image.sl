@@ -150,7 +150,7 @@ public class Image
         var read = Standard.File.ReadAllBytes(path);
         if (!read.Ok)
             return Fail("cannot read " + path + ": "
-                    + Standard.IO.Describe(read.Error));
+                    + Standard.IO.DescribeIOError(read.Error));
 
         byte[] data = read.Value;
         if (data.Length < 4u)

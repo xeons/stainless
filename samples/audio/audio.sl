@@ -135,7 +135,7 @@ int Main()
         return 1;
     }
 
-    if (Env.ArgumentCount() > 0u && Env.ArgumentAt(0u) == "record")
+    if (Env.ArgumentCount() > 0u && Env.GetArgument(0u) == "record")
         return RecordAndPlayBack();
 
     return PlayScale();

@@ -344,14 +344,14 @@ public class LinuxTarget : ITarget
         found.Add((uint)_pid);
 
         String tasks = "/proc/" + Standard.Text.FromInteger((long)_pid) + "/task";
-        var read = Standard.Directory.Directories(tasks);
+        var read = Standard.Directory.GetDirectories(tasks);
         if (!read.Ok)
             return found;
 
         var names = read.Value;
         for (nuint i = 0u; i < names.Count; i++)
         {
-            var number = Standard.Convert.ToInt(Standard.Path.FileName(names[i]));
+            var number = Standard.Convert.ToInt(Standard.Path.GetFileName(names[i]));
             if (!number.Ok || number.Value == (long)_pid)
                 continue;
             found.Add((uint)number.Value);

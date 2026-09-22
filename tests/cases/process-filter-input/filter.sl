@@ -50,18 +50,18 @@ public int Main(String[] args)
 
     String input = Input();
 
-    var ran = Run(Env.Program(), ["echo"], input);
+    var ran = RunProcess(Env.ProgramPath(), ["echo"], input);
     if (ran.Ok)
         Console.WriteLine($"run   same={ran.Value.Output == input} code={ran.Value.ExitCode}");
     else
         Console.WriteLine($"run   refused why={(int)ran.Error}");
 
-    var opened = Open(Env.Program(), ["echo"], input);
+    var opened = OpenProcess(Env.ProgramPath(), ["echo"], input);
     if (opened.Ok)
     {
         var child = opened.Value;
         var text = new StringBuilder();
-        while (child.Read())
+        while (child.ReadAvailableOutput())
         {
             text.Append(child.TakeOutput());
             child.TakeErrors();
@@ -72,7 +72,7 @@ public int Main(String[] args)
         Console.WriteLine($"open  refused why={(int)opened.Error}");
 
     // A child that exits without reading. The unwritten input is dropped.
-    var deaf = Run(Env.Program(), ["deaf"], input);
+    var deaf = RunProcess(Env.ProgramPath(), ["deaf"], input);
     if (deaf.Ok)
         Console.WriteLine($"deaf  code={deaf.Value.ExitCode}");
 

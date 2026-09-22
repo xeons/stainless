@@ -92,7 +92,7 @@ public enum IOError
 }
 
 /// A sentence describing an error, for a message a person will read.
-public String Describe(IOError error)
+public String DescribeIOError(IOError error)
 {
     switch (error)
     {
@@ -506,7 +506,7 @@ public class MemoryStream : IStream
         if (offset > buffer.Length || count > buffer.Length - offset)
             return 0;
 
-        Reserve(_at + count);
+        EnsureCapacity(_at + count);
         for (nuint i = 0; i < count; i++)
             _bytes[_at + i] = buffer[offset + i];
 
@@ -520,7 +520,7 @@ public class MemoryStream : IStream
     public void WriteText(String text)
     {
         nuint size = text.ByteLength();
-        Reserve(_at + size);
+        EnsureCapacity(_at + size);
 
         var source = text.ToPointer();
         for (nuint i = 0; i < size; i++)
@@ -581,7 +581,7 @@ public class MemoryStream : IStream
         return Text.FromBytes(&_bytes[0], _length);
     }
 
-    void Reserve(nuint wanted)
+    void EnsureCapacity(nuint wanted)
     {
         if (wanted <= _bytes.Length)
             return;

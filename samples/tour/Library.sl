@@ -310,9 +310,9 @@ void ShowLibrary()
     PrintValue("a duration", Duration.FromSeconds(90).TotalMinutes);
 
     // ------------------------------------------------------------ the world
-    PrintValue("has PATH", Env.Has("PATH") || Env.Has("Path"));
+    PrintValue("has PATH", Env.HasVariable("PATH") || Env.HasVariable("Path"));
     PrintValue("set and read",
-        Env.Set("STAINLESS_TOUR", "yes") ? Env.GetOr("STAINLESS_TOUR", "-") : "-");
+        Env.SetVariable("STAINLESS_TOUR", "yes") ? Env.GetVariableOrDefault("STAINLESS_TOUR", "-") : "-");
 
     // ------------------------------------------------------------ files
     //
@@ -321,17 +321,17 @@ void ShowLibrary()
     var folder = Path.Join(Env.CurrentDirectory(), "tour-scratch");
     var file = Path.Join(folder, "notes.txt");
 
-    PrintValue("made a directory", IO.Describe(Directory.CreateAll(folder)));
+    PrintValue("made a directory", IO.DescribeIOError(Directory.CreateDirectoryTree(folder)));
     String lines = "one" + GetNewline() + "two" + GetNewline();
-    PrintValue("wrote", IO.Describe(File.WriteAllText(file, lines)));
+    PrintValue("wrote", IO.DescribeIOError(File.WriteAllText(file, lines)));
 
     var read = File.ReadAllLines(file);
     PrintValue("read back", read.Ok ? (long)read.Value.Count : -1);
-    PrintValue("size", File.Size(file));
-    PrintValue("extension", Path.Extension(file));
-    PrintValue("file name", Path.FileName(file));
-    PrintValue("without it", Path.WithoutExtension(Path.FileName(file)));
-    PrintValue("rooted", Path.IsRooted(file));
+    PrintValue("size", File.GetSize(file));
+    PrintValue("extension", Path.GetExtension(file));
+    PrintValue("file name", Path.GetFileName(file));
+    PrintValue("without it", Path.GetFileNameWithoutExtension(Path.GetFileName(file)));
+    PrintValue("rooted", Path.IsPathRooted(file));
 
     File.Delete(file);
     Directory.Delete(folder);

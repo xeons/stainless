@@ -24,13 +24,13 @@
 /// **There is no shell.** The program and its arguments are a list, so a `>`, a
 /// `|` or a space in a filename is a character the child receives rather than
 /// something a shell acts on. That is the whole of shell injection, designed
-/// out rather than warned about -- and it is why there is no `Run(String
+/// out rather than warned about -- and it is why there is no `RunProcess(String
 /// commandLine)` here to reach for by mistake.
 ///
-///     var done = try Run("git", ["rev-parse", "HEAD"]);
-///     if (done.Ok()) { Console.WriteLine(done.Output.Trim()); }
+///     var done = try RunProcess("git", ["rev-parse", "HEAD"]);
+///     if (done.Succeeded) { Console.WriteLine(done.Output.Trim()); }
 ///
-/// `Run` waits and captures; `Start` hands back a `Process` to wait on later.
+/// `RunProcess` waits and captures; `Start` hands back a `Process` to wait on later.
 /// Both read the child's streams while it runs, which is not optional: a pipe
 /// holds about 64KB, so a parent that waits before reading waits forever on a
 /// child that writes more than that.
@@ -102,11 +102,11 @@ public struct Completed
     public String Errors;
 
     /// The usual question, spelled once.
-    public bool Ok() => ExitCode == 0;
+    public bool Succeeded => ExitCode == 0;
 }
 
 /// The argument list a call needs, built once and freed however it ends.
-byte* Assemble(String program, String[] arguments)
+byte* AssembleArguments(String program, String[] arguments)
 {
     byte* args = sl_process_args_new();
     if (args == null)
@@ -130,7 +130,7 @@ byte* Assemble(String program, String[] arguments)
     return args;
 }
 
-ProcessError Coded(int number)
+ProcessError ToProcessError(int number)
 {
     switch (number)
     {
@@ -147,13 +147,13 @@ ProcessError Coded(int number)
 /// Runs a program to completion and answers with what it wrote and what it
 /// returned.
 ///
-///     var done = try Run("git", ["status", "--short"]);
+///     var done = try RunProcess("git", ["status", "--short"]);
 ///
 /// `arguments` does **not** include the program's own name; that is `program`,
 /// and it is what a PATH lookup is done on when it has no separator in it.
-public Result<Completed, ProcessError> Run(String program, String[] arguments)
+public Result<Completed, ProcessError> RunProcess(String program, String[] arguments)
 {
-    return Run(program, arguments, null);
+    return RunProcess(program, arguments, null);
 }
 
 /// The same, with `input` written to the program's input.
@@ -166,11 +166,11 @@ public Result<Completed, ProcessError> Run(String program, String[] arguments)
 ///
 /// Without `input` the program reads end of input at once, rather than this
 /// program's own.
-public Result<Completed, ProcessError> Run(
+public Result<Completed, ProcessError> RunProcess(
     String program, String[] arguments, String? input
 )
 {
-    byte* args = Assemble(program, arguments);
+    byte* args = AssembleArguments(program, arguments);
     if (args == null)
         return Fail(ProcessError.NoResource);
 
@@ -179,7 +179,7 @@ public Result<Completed, ProcessError> Run(
     sl_process_args_free(args);
 
     if (status != 0)
-        return Fail(Coded(status));
+        return Fail(ToProcessError(status));
 
     Completed done;
     done.ExitCode = exitCode;
@@ -193,7 +193,7 @@ public Result<Completed, ProcessError> Run(
 /// A program that was started and has not been waited for.
 ///
 /// Its streams are this process's own, so what it prints goes where this
-/// program's output goes. `Run` is the one that captures.
+/// program's output goes. `RunProcess` is the one that captures.
 public class Process
 {
     byte* _handle;
@@ -217,7 +217,7 @@ public class Process
     {
         int status = sl_process_wait(_handle, out int exitCode);
         if (status != 0)
-            return Fail(Coded(status));
+            return Fail(ToProcessError(status));
         return Ok(exitCode);
     }
 
@@ -244,7 +244,7 @@ public class Process
     /// Starts a program without waiting for it.
     public static Result<Process, ProcessError> Start(String program, String[] arguments)
     {
-        byte* args = Assemble(program, arguments);
+        byte* args = AssembleArguments(program, arguments);
         if (args == null)
             return Fail(ProcessError.NoResource);
 
@@ -252,7 +252,7 @@ public class Process
         sl_process_args_free(args);
 
         if (started == null)
-            return Fail(Coded(error));
+            return Fail(ToProcessError(error));
         return Ok(new Process(started));
     }
 }
@@ -261,25 +261,25 @@ public class Process
 
 /// A program running with both its output streams captured, read as they fill.
 ///
-/// **What `Run` cannot do.** `Run` does not answer until the child has exited,
+/// **What `RunProcess` cannot do.** `RunProcess` does not answer until the child has exited,
 /// so a build taking a minute says nothing for a minute and then says all of
 /// it at once. This hands over what has arrived so far, as often as it is
 /// asked -- which is what a window showing a build as it happens needs, and
 /// the only difference between the two.
 ///
-///     var started = Open("stainless", ["build"]);
+///     var started = OpenProcess("stainless", ["build"]);
 ///     if (started.Ok)
 ///     {
 ///         var child = started.Value;
-///         while (child.Read())
+///         while (child.ReadAvailableOutput())
 ///         {
 ///             Show(child.TakeOutput());
 ///             Complain(child.TakeErrors());
 ///         }
-///         Console.WriteLine("exit " + Text.FromInteger(child.Wait().ValueOr(-1)));
+///         Console.WriteLine("exit " + Text.FromInteger(child.Wait().GetValueOrDefault(-1)));
 ///     }
 ///
-/// **`Read` waits**, and that is deliberate: it answers when there is
+/// **`ReadAvailableOutput` waits**, and that is deliberate: it answers when there is
 /// something to hand over or when the child has closed both streams, and never
 /// immediately with nothing. So the loop above blocks rather than spinning,
 /// and belongs on a thread of its own when there is a window to keep painting.
@@ -288,7 +288,7 @@ public class Process
 /// add afterwards. A pipe holds about 64KB, and a reader that drains one to
 /// the end while the child fills the other is waiting for a child that is
 /// waiting for the reader. That is why this hands back two strings rather than
-/// being two objects with a `Read` each.
+/// being two objects with a `ReadAvailableOutput` each.
 public class Running
 {
     byte* _handle;
@@ -297,7 +297,7 @@ public class Running
     /// has closed both, which is what ends the loop.
     bool _more;
 
-    /// Made by `Open` alone: the handle is the runtime's and there is no way
+    /// Made by `OpenProcess` alone: the handle is the runtime's and there is no way
     /// to come by a valid one otherwise.
     Running(byte* started)
     {
@@ -319,7 +319,7 @@ public class Running
     /// False means both streams are closed and everything they held has
     /// already been handed over, so the last `Take` before it is not missing
     /// anything.
-    public bool Read()
+    public bool ReadAvailableOutput()
     {
         if (!_more)
             return false;
@@ -331,7 +331,7 @@ public class Running
     /// nothing at all the next time.
     ///
     /// **Taken rather than read.** The buffer is emptied, because a caller
-    /// showing output as it arrives wants each line once; `Run` is the one
+    /// showing output as it arrives wants each line once; `RunProcess` is the one
     /// that answers with the whole of it at the end.
     public String TakeOutput() => sl_process_take_output(_handle);
 
@@ -340,7 +340,7 @@ public class Running
 
     /// Waits for it to finish, and answers with the code it left.
     ///
-    /// **After `Read` has answered false**, not before: waiting on a child
+    /// **After `ReadAvailableOutput` has answered false**, not before: waiting on a child
     /// whose output pipe is full is the deadlock the pumping exists to avoid,
     /// arriving from the other side. Asking twice is harmless and answers the
     /// same both times.
@@ -348,7 +348,7 @@ public class Running
     {
         int status = sl_process_wait(_handle, out int exitCode);
         if (status != 0)
-            return Fail(Coded(status));
+            return Fail(ToProcessError(status));
         return Ok(exitCode);
     }
 
@@ -363,26 +363,26 @@ public class Running
 ///
 /// `arguments` does **not** include the program's own name; that is `program`,
 /// and it is what a PATH lookup is done on when it has no separator in it --
-/// the same bargain `Run` makes.
-public Result<Running, ProcessError> Open(String program, String[] arguments)
+/// the same bargain `RunProcess` makes.
+public Result<Running, ProcessError> OpenProcess(String program, String[] arguments)
 {
-    return Open(program, arguments, null);
+    return OpenProcess(program, arguments, null);
 }
 
 /// The same, with `input` written to the program's input.
 ///
 /// What fits in the pipe is written before this returns, and the rest no
-/// later than `Read` waits for output, so input of any size is safe to give a
+/// later than `ReadAvailableOutput` waits for output, so input of any size is safe to give a
 /// filter that answers as it reads. The pipe is closed once all of it is written, which
 /// is what makes a program reading to end-of-input stop rather than wait.
 ///
 /// Without `input` the program reads end of input at once, rather than this
 /// program's own.
-public Result<Running, ProcessError> Open(
+public Result<Running, ProcessError> OpenProcess(
     String program, String[] arguments, String? input
 )
 {
-    byte* args = Assemble(program, arguments);
+    byte* args = AssembleArguments(program, arguments);
     if (args == null)
         return Fail(ProcessError.NoResource);
 
@@ -390,7 +390,7 @@ public Result<Running, ProcessError> Open(
     sl_process_args_free(args);
 
     if (started == null)
-        return Fail(Coded(error));
+        return Fail(ToProcessError(error));
     return Ok(new Running(started));
 }
 
@@ -404,18 +404,18 @@ public Result<Running, ProcessError> Open(
 /// is what the handler does, and this is where a program reads it -- at the
 /// top of its own loop, where it can actually tidy up.
 ///
-///     Signals.Watch();
+///     Signals.StartWatching();
 ///     while (!Signals.Interrupted) { DoAPieceOfWork(); }
 ///     Console.WriteLine("stopping");
 public static class Signals
 {
     /// Starts noticing interrupts. Until this is called they end the program,
     /// which is the right default for something that has nothing to tidy.
-    public static bool Watch() => sl_signals_watch();
+    public static bool StartWatching() => sl_signals_watch();
 
-    /// Whether one has arrived since the last `Clear`.
+    /// Whether one has arrived since the last `ClearInterrupt`.
     public static bool Interrupted => sl_signals_interrupted();
 
     /// Forgets the one that arrived, for a program that means to carry on.
-    public static void Clear() => sl_signals_clear();
+    public static void ClearInterrupt() => sl_signals_clear();
 }

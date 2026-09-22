@@ -1510,7 +1510,7 @@ rather than discouraged. There is no way left to obtain a listener that exists
 and is not listening.
 
 `FileStream.Open`, `Socket.Open`, `TcpListener.Listen`, `TcpClient.Connect`,
-`UdpSocket.Bind` and `UdpSocket.Datagram` are the ones that can fail. Each
+`UdpSocket.Bind` and `UdpSocket.Create` are the ones that can fail. Each
 returns a `Result`, whose failure cannot be walked past because it has no value
 to read until its case has been named.
 

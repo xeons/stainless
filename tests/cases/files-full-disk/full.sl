@@ -12,13 +12,13 @@ import Standard.IO;
 
 void Say(String what, IOError error)
 {
-    Console.WriteLine($"{what}: {IO.Describe(error)}");
+    Console.WriteLine($"{what}: {IO.DescribeIOError(error)}");
 }
 
 int Main()
 {
     Say("text", File.WriteAllText("/dev/full", "hi"));
-    Say("append", File.AppendText("/dev/full", "hi"));
+    Say("append", File.AppendAllText("/dev/full", "hi"));
 
     var small = new byte[4];
     Say("bytes", File.WriteAllBytes("/dev/full", small));

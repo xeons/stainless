@@ -18,16 +18,16 @@ public int Main(String[] args)
         return 0;
     }
 
-    var ran = Run(Env.Program(), ["read"]);
+    var ran = RunProcess(Env.ProgramPath(), ["read"]);
     if (ran.Ok)
         Console.WriteLine($"run    {ran.Value.Output}");
 
-    var opened = Open(Env.Program(), ["read"]);
+    var opened = OpenProcess(Env.ProgramPath(), ["read"]);
     if (opened.Ok)
     {
         var child = opened.Value;
         var text = new StringBuilder();
-        while (child.Read())
+        while (child.ReadAvailableOutput())
             text.Append(child.TakeOutput());
         Console.WriteLine($"open   {text.ToText()}");
     }

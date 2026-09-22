@@ -1063,7 +1063,7 @@ public class Shell : Form
     /// Where `stainless` is: beside this program first, and on the path after.
     String FindCompiler()
     {
-        String self = Env.Program();
+        String self = Env.ProgramPath();
         long cut = self.LastIndexOf(PathSeparator);
         if (cut > 0)
         {
@@ -1201,7 +1201,7 @@ public class Shell : Form
         if (_project != null || path.ByteLength() == 0u)
             return;
 
-        String found = Project.FindProjectFile(Path.DirectoryName(path));
+        String found = Project.FindProjectFile(Path.GetDirectoryName(path));
         if (found == "")
             return;
 
@@ -1404,14 +1404,14 @@ public class Shell : Form
     {
         nuint removed = 0u;
 
-        var inside = Directory.Directories(directory);
+        var inside = Directory.GetDirectories(directory);
         if (inside.Ok)
         {
             foreach (var child in inside.Value)
                 removed = removed + DeleteDirectoryTree(child);
         }
 
-        var files = Directory.Files(directory);
+        var files = Directory.GetFiles(directory);
         if (files.Ok)
         {
             foreach (var file in files.Value)
@@ -1600,7 +1600,7 @@ public class Shell : Form
 
         var worker = new Thread(() =>
         {
-            var opened = Open(compiler, arguments);
+            var opened = OpenProcess(compiler, arguments);
             if (opened.Fail)
             {
                 Application.Post(() => OnCompilerFailedToStart());
@@ -1613,7 +1613,7 @@ public class Shell : Form
             // reads is only ever written by the thread Cancel runs on.
             Application.Post(() => OnCompilerStarted(child));
 
-            while (child.Read())
+            while (child.ReadAvailableOutput())
             {
                 // Taken here and captured by value, so each post carries its
                 // own piece: `Thread`'s doc comment is explicit that a closure
@@ -2093,7 +2093,7 @@ public class Shell : Form
     /// reordered what the build sees would be lying about the build.
     void AddFiles(TreeNode branch, String folder)
     {
-        var folders = Directory.Directories(folder);
+        var folders = Directory.GetDirectories(folder);
         if (folders.Ok)
         {
             foreach (var inner in folders.Value)
@@ -2104,7 +2104,7 @@ public class Shell : Form
             }
         }
 
-        var files = Directory.Files(folder);
+        var files = Directory.GetFiles(folder);
         if (!files.Ok)
             return;
 
@@ -2269,7 +2269,7 @@ public class Shell : Form
         var entry = (TreeEntry)target;
         if (entry.IsFolder)
             return entry.FullPath;
-        return Path.DirectoryName(entry.FullPath);
+        return Path.GetDirectoryName(entry.FullPath);
     }
 
     /// What the "show me this on disk" item says.
@@ -2364,7 +2364,7 @@ public class Shell : Form
     /// so plainly.
     String ReadFolderModule(String folder)
     {
-        var files = Directory.Files(folder);
+        var files = Directory.GetFiles(folder);
         if (!files.Ok)
             return "";
 
@@ -2430,14 +2430,14 @@ public class Shell : Form
         if (name.ByteLength() == 0u || name == GetDisplayName(entry.FullPath))
             return;
 
-        String path = Path.Join(Path.DirectoryName(entry.FullPath), name);
+        String path = Path.Join(Path.GetDirectoryName(entry.FullPath), name);
         if (File.Exists(path))
         {
             Application.Complain(name + " is already there.", "Rename");
             return;
         }
 
-        if (File.Rename(entry.FullPath, path) != IOError.None)
+        if (File.Move(entry.FullPath, path) != IOError.None)
         {
             Application.Complain("Could not rename " + entry.FullPath + ".", "Rename");
             return;
@@ -2517,11 +2517,11 @@ public class Shell : Form
         #else
         String program = "xdg-open";
         String folder = entry.IsFolder ? entry.FullPath
-                                       : Path.DirectoryName(entry.FullPath);
+                                       : Path.GetDirectoryName(entry.FullPath);
         String[] arguments = [folder];
         #endif
 
-        Background.Run(() => Process.Run(program, arguments), finished => { });
+        Background.Run(() => Process.RunProcess(program, arguments), finished => { });
         ShowStatus("Showing " + entry.FullPath);
     }
 
@@ -4515,7 +4515,7 @@ public class Shell : Form
                 // A new file goes beside a file, and inside a directory.
                 String wanted = entry.IsFolder
                               ? entry.FullPath
-                              : Path.DirectoryName(entry.FullPath);
+                              : Path.GetDirectoryName(entry.FullPath);
                 if (GetFolderFor(entry) != wanted)
                 {
                     Console.WriteLine("FAIL: a new file beside " + entry.FullPath

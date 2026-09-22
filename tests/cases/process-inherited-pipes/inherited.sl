@@ -43,14 +43,14 @@ public int Main(String[] args)
 
     String input = Input();
 
-    var opened = Open(Env.Program(), ["echo"], input);
-    var bystander = Process.Start(Env.Program(), ["sleep"]);
+    var opened = OpenProcess(Env.ProgramPath(), ["echo"], input);
+    var bystander = Process.Start(Env.ProgramPath(), ["sleep"]);
     if (!opened.Ok || !bystander.Ok)
         return 1;
 
     var child = opened.Value;
     var text = new StringBuilder();
-    while (child.Read())
+    while (child.ReadAvailableOutput())
     {
         text.Append(child.TakeOutput());
         child.TakeErrors();

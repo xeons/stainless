@@ -77,7 +77,7 @@ public Result<String, DialogOutcome> OpenFileDialog(IWindowPeer? owner, String t
     // suggestion the open dialog has no use for.
     var chosen = start.ByteLength() > 0u
         ? Dialogs.ChooseFileInFolder(OwnerWindowOf(owner), title, filters,
-                               Standard.Path.DirectoryName(start))
+                               Standard.Path.GetDirectoryName(start))
         : Dialogs.ChooseFile(OwnerWindowOf(owner), title, filters);
     if (!chosen.Ok)
         return Fail(OutcomeOf(chosen.Error));
@@ -88,7 +88,7 @@ public Result<String, DialogOutcome> SaveFileDialog(IWindowPeer? owner, String t
                                                     String start, String[] filters)
 {
     var chosen = Dialogs.ChooseSaveFile(OwnerWindowOf(owner), title, filters,
-                                        Standard.Path.FileName(start), "");
+                                        Standard.Path.GetFileName(start), "");
     if (!chosen.Ok)
         return Fail(OutcomeOf(chosen.Error));
     return Ok(chosen.Value);

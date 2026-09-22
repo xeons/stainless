@@ -48,8 +48,8 @@ int Main()
     String stopAt = "";
     String onlyWhen = "";
     String showing = "";
-    var arguments = Env.Arguments();
-    // From zero: `Env.Arguments` is what `Main(String[] args)` would have been
+    var arguments = Env.GetArguments();
+    // From zero: `Env.GetArguments` is what `Main(String[] args)` would have been
     // handed, which does not include the program's own name.
     //
     // Every path named gets a tab, in the order they were given, and the first

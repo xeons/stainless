@@ -35,7 +35,7 @@ String Flag() => "/c";
 /// Runs it and reports one line, so the checking happens in one place.
 void Show(String label, String program, String[] arguments)
 {
-    var answer = Run(program, arguments);
+    var answer = RunProcess(program, arguments);
 
     if (!answer.Ok)
     {
@@ -45,7 +45,7 @@ void Show(String label, String program, String[] arguments)
 
     var done = answer.Value;
     Console.WriteLine(
-        $"{label} code={done.ExitCode} ok={done.Ok()} " +
+        $"{label} code={done.ExitCode} ok={done.Succeeded} " +
         $"out=[{done.Output.Trim()}] err=[{done.Errors.Trim()}]");
 }
 
@@ -74,7 +74,7 @@ public int Main()
     // Input written to it, and the pipe closed, so a program reading to
     // end-of-input stops rather than waiting. `sort` is the one filter both
     // platforms ship, which is why it and not `wc`.
-    var sorted = Run(Shell(), [Flag(), "sort"], "gamma\nalpha\nbeta\n");
+    var sorted = RunProcess(Shell(), [Flag(), "sort"], "gamma\nalpha\nbeta\n");
     if (sorted.Ok)
     {
         var order = sorted.Value.Output.SplitLines();
@@ -84,9 +84,9 @@ public int Main()
     // More output than a pipe holds, which is what would deadlock a reader
     // that waited first.
 #if UNIX
-    var big = Run(Shell(), [Flag(), "head -c 200000 /dev/zero"]);
+    var big = RunProcess(Shell(), [Flag(), "head -c 200000 /dev/zero"]);
 #else
-    var big = Run(Shell(), [Flag(), "for /L %i in (1,1,4000) do @echo tttttttttttttttttttttttttttttttttttttttttttttttttt"]);
+    var big = RunProcess(Shell(), [Flag(), "for /L %i in (1,1,4000) do @echo tttttttttttttttttttttttttttttttttttttttttttttttttt"]);
 #endif
     if (big.Ok)
 {
@@ -117,13 +117,13 @@ public int Main()
     // The same program, read while it runs rather than after it. `Run` cannot
     // say anything until the child has exited; this hands over each piece as
     // it arrives, which is what a window showing a build as it happens needs.
-    var opened = Open(Shell(), [Flag(), "echo streamed"]);
+    var opened = OpenProcess(Shell(), [Flag(), "echo streamed"]);
     if (opened.Ok)
     {
         var child = opened.Value;
         var text = new StringBuilder();
 
-        while (child.Read())
+        while (child.ReadAvailableOutput())
         {
             text.Append(child.TakeOutput());
             text.Append(child.TakeErrors());
@@ -134,9 +134,9 @@ public int Main()
     // The two streams stay apart here too, which they would not if a caller
     // could only be handed one buffer.
 #if UNIX
-    var apart = Open(Shell(), [Flag(), "echo out; echo err 1>&2"]);
+    var apart = OpenProcess(Shell(), [Flag(), "echo out; echo err 1>&2"]);
 #else
-    var apart = Open(Shell(), [Flag(), "echo out& echo err 1>&2"]);
+    var apart = OpenProcess(Shell(), [Flag(), "echo out& echo err 1>&2"]);
 #endif
     if (apart.Ok)
     {
@@ -144,7 +144,7 @@ public int Main()
         var outText = new StringBuilder();
         var errText = new StringBuilder();
 
-        while (child.Read())
+        while (child.ReadAvailableOutput())
         {
             outText.Append(child.TakeOutput());
             errText.Append(child.TakeErrors());
@@ -161,9 +161,9 @@ public int Main()
     // It is also the deadlock case from the other side: the child fills the
     // pipe and stops, and only a reader that keeps reading lets it finish.
 #if UNIX
-    var flood = Open(Shell(), [Flag(), "head -c 200000 /dev/zero"]);
+    var flood = OpenProcess(Shell(), [Flag(), "head -c 200000 /dev/zero"]);
 #else
-    var flood = Open(Shell(), [Flag(), "for /L %i in (1,1,4000) do @echo tttttttttttttttttttttttttttttttttttttttttttttttttt"]);
+    var flood = OpenProcess(Shell(), [Flag(), "for /L %i in (1,1,4000) do @echo tttttttttttttttttttttttttttttttttttttttttttttttttt"]);
 #endif
     if (flood.Ok)
     {
@@ -171,7 +171,7 @@ public int Main()
         nuint total = 0u;
         nuint pieces = 0u;
 
-        while (child.Read())
+        while (child.ReadAvailableOutput())
         {
             total = total + child.TakeOutput().ByteLength();
             child.TakeErrors();
@@ -182,11 +182,11 @@ public int Main()
 
     // A program that was never there is an error rather than an outcome, the
     // same way it is for `Run` -- 1 is ProcessError.NotFound.
-    var nothing = Open("/no/such/program-that-exists", []);
+    var nothing = OpenProcess("/no/such/program-that-exists", []);
     if (nothing.Fail)
         Console.WriteLine($"noopen   refused=true why={(int)nothing.Error}");
 
     // Interrupts are noticed rather than delivered, so this asks.
-    Console.WriteLine($"signals  watching={Signals.Watch()} seen={Signals.Interrupted}");
+    Console.WriteLine($"signals  watching={Signals.StartWatching()} seen={Signals.Interrupted}");
     return 0;
 }

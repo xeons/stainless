@@ -66,9 +66,9 @@ String Roundtrip()
     buffer.WriteText("via a stream");
 
     var read = File.ReadAllText("no-such-file-anywhere.txt");
-    var reason = read.Ok ? read.Value : IO.Describe(read.Error);
+    var reason = read.Ok ? read.Value : IO.DescribeIOError(read.Error);
 
-    return buffer.ToText() + " / " + reason + " / " + Path.FileName("x/y/notes.txt");
+    return buffer.ToText() + " / " + reason + " / " + Path.GetFileName("x/y/notes.txt");
 }
 
 // --- spec 2.10 / 7.1 overloading, and one class implementing two interfaces -

@@ -348,7 +348,7 @@ public String FindProjectFile(String startingAt)
         if (File.Exists(candidate))
             return candidate;
 
-        String parent = Path.DirectoryName(directory);
+        String parent = Path.GetDirectoryName(directory);
         if (parent == directory || parent == "")
             return "";
         directory = parent;
@@ -443,7 +443,7 @@ public Result<ProjectFile, String> ParseProjectFile(String text, String path)
         return Fail(dependencies.Error);
     project.Dependencies = dependencies.Value;
 
-    project.Directory = Path.DirectoryName(path);
+    project.Directory = Path.GetDirectoryName(path);
 
     if (project.Format > CurrentFormat)
     {

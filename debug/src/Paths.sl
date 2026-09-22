@@ -32,7 +32,7 @@ import Standard.Path;
 /// information puts them in.
 ///
 /// It is a heuristic, not a fact about paths, which is why it is not named
-/// after `Standard.Path.SamePath` -- and why a caller wanting the fact MUST
+/// after `Standard.Path.IsSamePath` -- and why a caller wanting the fact MUST
 /// use that instead.
 ///
 /// Two things it allows for. Separators are mixed: a `DW_AT_decl_file` on
@@ -46,7 +46,7 @@ import Standard.Path;
 /// file.
 public bool IsTheSameSourceFile(String left, String right)
 {
-    if (Standard.Path.SamePath(left, right))
+    if (Standard.Path.IsSamePath(left, right))
         return true;
 
     nuint a = left.ByteLength();
@@ -65,7 +65,7 @@ bool PathEndsWithTail(String full, String tail)
     if (b == 0u)
         return false;
 
-    if (!Standard.Path.SamePath(full.Substring(a - b, b), tail))
+    if (!Standard.Path.IsSamePath(full.Substring(a - b, b), tail))
         return false;
 
     byte before = full.GetByteAt(a - b - 1u);

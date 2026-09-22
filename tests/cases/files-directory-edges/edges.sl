@@ -15,7 +15,7 @@ import Standard.Path;
 
 String Scratch()
 {
-    var temp = Env.GetOr("TEMP", Env.GetOr("TMPDIR", "/tmp"));
+    var temp = Env.GetVariableOrDefault("TEMP", Env.GetVariableOrDefault("TMPDIR", "/tmp"));
     return Path.Join(temp, "stainless-files-directory-edges");
 }
 
@@ -33,9 +33,9 @@ int Main()
     Directory.Delete(root);
 
     // Every parent made, and the trailing separator is the same directory.
-    Console.WriteLine($"create all: {IO.Describe(Directory.CreateAll(deep + Slash()))}");
+    Console.WriteLine($"create all: {IO.DescribeIOError(Directory.CreateDirectoryTree(deep + Slash()))}");
     Console.WriteLine($"made: {Directory.Exists(deep)}");
-    Console.WriteLine($"again: {IO.Describe(Directory.CreateAll(deep + Slash()))}");
+    Console.WriteLine($"again: {IO.DescribeIOError(Directory.CreateDirectoryTree(deep + Slash()))}");
     File.WriteAllText(file, "a");
 
     // A directory is not a file, and deleting it as one is refused on both
@@ -45,21 +45,21 @@ int Main()
     Console.WriteLine($"still there: {Directory.Exists(empty)}");
 
     // The listed path is spelled with the separator it was given once.
-    var listed = Directory.Files(root + Slash());
+    var listed = Directory.GetFiles(root + Slash());
     if (listed.Ok)
         Console.WriteLine($"trailing separator: {listed.Value.Count} {listed.Value[0u] == file}");
 
     // The empty path is the current directory, and its entries are relative.
     var back = Env.CurrentDirectory();
     Env.SetCurrentDirectory(root);
-    var here = Directory.Files("");
+    var here = Directory.GetFiles("");
     if (here.Ok)
     {
         Console.WriteLine($"current: {here.Value.Count} '{here.Value[0u]}'");
     }
     else
     {
-        Console.WriteLine($"current failed: {IO.Describe(here.Error)}");
+        Console.WriteLine($"current failed: {IO.DescribeIOError(here.Error)}");
     }
     Env.SetCurrentDirectory(back);
 

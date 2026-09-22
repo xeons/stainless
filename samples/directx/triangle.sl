@@ -191,7 +191,7 @@ int Main()
 
     long limit = 0;
     if (Env.ArgumentCount() > 0u)
-        limit = Convert.ToLong(Env.ArgumentAt(0u)).GetValueOrDefault(0);
+        limit = Convert.ToLong(Env.GetArgument(0u)).GetValueOrDefault(0);
 
     long drawn = 0;
     while (PumpMessages())

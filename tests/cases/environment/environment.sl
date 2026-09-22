@@ -27,28 +27,28 @@ int Main(String[] args)
 
     // The same list, reached from away from Main.
     printf("viaEnv    = %llu\n", (ulong)Env.ArgumentCount());
-    printf("agree     = %d\n", Env.ArgumentAt(0u) == args[0u]);
-    printf("program   = %d\n", Env.Program().ByteLength() > 0u);
+    printf("agree     = %d\n", Env.GetArgument(0u) == args[0u]);
+    printf("program   = %d\n", Env.ProgramPath().ByteLength() > 0u);
 
     // --------------------------------------------------------- environment
 
     // A variable this test sets, so the value is known. Round-tripping it is
     // the check; what the machine already had in its environment is not.
-    printf("setOk     = %d\n", Env.Set("SL_TEST_VARIABLE", "a value"));
-    printf("readBack  = %s\n", Env.GetOr("SL_TEST_VARIABLE", "<missing>").ToPointer());
-    printf("has       = %d\n", Env.Has("SL_TEST_VARIABLE"));
+    printf("setOk     = %d\n", Env.SetVariable("SL_TEST_VARIABLE", "a value"));
+    printf("readBack  = %s\n", Env.GetVariableOrDefault("SL_TEST_VARIABLE", "<missing>").ToPointer());
+    printf("has       = %d\n", Env.HasVariable("SL_TEST_VARIABLE"));
 
-    printf("removeOk  = %d\n", Env.Remove("SL_TEST_VARIABLE"));
-    printf("gone      = %d\n", !Env.Has("SL_TEST_VARIABLE"));
-    printf("fallback  = %s\n", Env.GetOr("SL_TEST_VARIABLE", "<missing>").ToPointer());
+    printf("removeOk  = %d\n", Env.RemoveVariable("SL_TEST_VARIABLE"));
+    printf("gone      = %d\n", !Env.HasVariable("SL_TEST_VARIABLE"));
+    printf("fallback  = %s\n", Env.GetVariableOrDefault("SL_TEST_VARIABLE", "<missing>").ToPointer());
 
     // Set to nothing is still set, on both platforms.
-    printf("emptyOk   = %d\n", Env.Set("SL_TEST_EMPTY", ""));
-    printf("emptyRead = %llu\n", (ulong)Env.GetOr("SL_TEST_EMPTY", "<missing>").ByteLength());
-    printf("emptyHas  = %d\n", Env.Has("SL_TEST_EMPTY"));
-    Env.Remove("SL_TEST_EMPTY");
+    printf("emptyOk   = %d\n", Env.SetVariable("SL_TEST_EMPTY", ""));
+    printf("emptyRead = %llu\n", (ulong)Env.GetVariableOrDefault("SL_TEST_EMPTY", "<missing>").ByteLength());
+    printf("emptyHas  = %d\n", Env.HasVariable("SL_TEST_EMPTY"));
+    Env.RemoveVariable("SL_TEST_EMPTY");
 
-    printf("names     = %d\n", Env.Names().Length > 0u);
+    printf("names     = %d\n", Env.GetVariableNames().Length > 0u);
     printf("cwd       = %d\n", Env.CurrentDirectory().ByteLength() > 0u);
 
     // ---------------------------------------------------------------- time
@@ -210,7 +210,7 @@ int Main(String[] args)
     }
 
     printf("rest      = %s", Console.ReadToEnd().ToPointer());
-    printf("atEnd     = %d\n", Console.AtEnd());
+    printf("atEnd     = %d\n", Console.IsInputAtEnd());
 
     var afterEnd = Console.ReadLine();
     printf("pastEnd   = %d\n", afterEnd == null);

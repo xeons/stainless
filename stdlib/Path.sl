@@ -66,7 +66,7 @@ bool IsSeparator(byte value)
 #endif
 
 /// The index just past the last separator, or 0 when there is none.
-nuint AfterLastSeparator(String path)
+nuint FindNameStart(String path)
 {
     var bytes = path.ToPointer();
     nuint size = path.ByteLength();
@@ -100,11 +100,11 @@ public String Join(String left, String right)
     if (endsWith || startsWith)
         return left + right;
 
-    return left + SeparatorText() + right;
+    return left + GetSeparatorText() + right;
 }
 
 /// `Separator` as text, since that is what joining needs.
-String SeparatorText()
+String GetSeparatorText()
 {
     byte one = (byte)Separator;
     return Text.FromBytes(&one, 1);
@@ -117,9 +117,9 @@ public String Join(String first, String second, String third)
 }
 
 /// The last part: `a/b/c.txt` gives `c.txt`.
-public String FileName(String path)
+public String GetFileName(String path)
 {
-    nuint at = AfterLastSeparator(path);
+    nuint at = FindNameStart(path);
     return path.Substring(at, path.ByteLength() - at);
 }
 
@@ -129,9 +129,9 @@ public String FileName(String path)
 /// A root keeps its separator, because without it the answer names somewhere
 /// else: `/foo` gives `/`, and on Windows `C:\foo` gives `C:\`, where `C:`
 /// alone would be that drive's current directory.
-public String DirectoryName(String path)
+public String GetDirectoryName(String path)
 {
-    nuint at = AfterLastSeparator(path);
+    nuint at = FindNameStart(path);
     if (at == 0)
         return "";
 
@@ -157,7 +157,7 @@ bool IsDriveRoot(String path, nuint length) => false;
 
 /// Where the extension's dot is in the last part `name`, or the length of
 /// `name` when there is no dot. A dot that starts the name is not one.
-nuint ExtensionDotAt(String name)
+nuint FindExtensionDot(String name)
 {
     var bytes = name.ToPointer();
     nuint size = name.ByteLength();
@@ -172,10 +172,10 @@ nuint ExtensionDotAt(String name)
 
 /// The extension, with its dot: `notes.txt` gives `.txt`. No dot in the last
 /// part, a dot that starts it, or a dot that ends it gives the empty string.
-public String Extension(String path)
+public String GetExtension(String path)
 {
-    var name = FileName(path);
-    nuint dot = ExtensionDotAt(name);
+    var name = GetFileName(path);
+    nuint dot = FindExtensionDot(name);
     nuint size = name.ByteLength();
     if (dot + 1 >= size)
         return "";
@@ -183,17 +183,17 @@ public String Extension(String path)
 }
 
 /// The last part with its extension removed. A trailing dot goes with it.
-public String WithoutExtension(String path)
+public String GetFileNameWithoutExtension(String path)
 {
-    var name = FileName(path);
-    return name.Substring(0, ExtensionDotAt(name));
+    var name = GetFileName(path);
+    return name.Substring(0, FindExtensionDot(name));
 }
 
 /// The path with a different extension. `with` may be written with or without
 /// its leading dot. Nothing before the last part is touched.
-public String WithExtension(String path, String with)
+public String ChangeExtension(String path, String with)
 {
-    var stem = path.Substring(0, AfterLastSeparator(path)) + WithoutExtension(path);
+    var stem = path.Substring(0, FindNameStart(path)) + GetFileNameWithoutExtension(path);
     if (with.ByteLength() == 0)
         return stem;
     if (with.ToPointer()[0] == 46)
@@ -207,7 +207,7 @@ public String WithExtension(String path, String with)
 /// `/x` is rooted everywhere. `\x` and `C:\x` are rooted on Windows and are
 /// ordinary relative names elsewhere, where a colon and a backslash are both
 /// characters a filename may contain.
-public bool IsRooted(String path)
+public bool IsPathRooted(String path)
 {
     nuint size = path.ByteLength();
     if (size == 0)
@@ -239,7 +239,7 @@ public bool IsRooted(String path)
 /// Only ASCII letters are case-folded. Windows folds more, with a table that
 /// has changed between releases, so two paths differing only in the case of a
 /// non-ASCII letter are reported as different.
-public bool SamePath(String left, String right)
+public bool IsSamePath(String left, String right)
 {
     if (left.ByteLength() != right.ByteLength())
         return false;
@@ -252,7 +252,7 @@ public bool SamePath(String left, String right)
     {
         if (a[i] == b[i])
             continue;
-        if (!SameByteInAPath(a[i], b[i]))
+        if (!IsSameByteInAPath(a[i], b[i]))
             return false;
     }
     return true;
@@ -261,23 +261,23 @@ public bool SamePath(String left, String right)
 #if WINDOWS
 
 /// Two bytes that differ but do not make two paths differ.
-bool SameByteInAPath(byte left, byte right)
+bool IsSameByteInAPath(byte left, byte right)
 {
     return (IsSeparator(left) && IsSeparator(right))
-        || LowerAscii(left) == LowerAscii(right);
+        || ToLowerAscii(left) == ToLowerAscii(right);
 }
 
-byte LowerAscii(byte value) => value >= 65 && value <= 90 ? (byte)(value + 32) : value;
+byte ToLowerAscii(byte value) => value >= 65 && value <= 90 ? (byte)(value + 32) : value;
 
 #else
 
 /// Outside Windows a path is bytes: two that differ differ.
-bool SameByteInAPath(byte left, byte right) => false;
+bool IsSameByteInAPath(byte left, byte right) => false;
 
 #endif
 
 /// The parts, with the separators dropped and empty parts skipped.
-public List<String> Split(String path)
+public List<String> SplitPath(String path)
 {
     var parts = new List<String>();
     var bytes = path.ToPointer();

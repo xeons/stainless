@@ -27,11 +27,11 @@ public int Main(String[] args)
     }
 
     String input = "a\r\nb\x1Ac\n";
-    var echoed = Run(Env.Program(), ["cat"], input);
+    var echoed = RunProcess(Env.ProgramPath(), ["cat"], input);
     if (echoed.Ok)
         Console.WriteLine($"in    same={echoed.Value.Output == input} bytes={echoed.Value.Output.ByteLength()}");
 
-    var written = Run(Env.Program(), ["write"]);
+    var written = RunProcess(Env.ProgramPath(), ["write"]);
     if (written.Ok)
     {
         var done = written.Value;

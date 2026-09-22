@@ -236,7 +236,7 @@ public sealed partial class LlvmEmitter
     ///
     /// It always takes argc and argv, whether or not <c>Main</c> asked for
     /// them: the arguments are handed to the runtime either way, so that
-    /// <c>Env.Program()</c> can name the executable in a program that declared
+    /// <c>Env.ProgramPath()</c> can name the executable in a program that declared
     /// <c>Main()</c>. An unused parameter costs a register that the call
     /// already had to leave alone.
     /// </summary>

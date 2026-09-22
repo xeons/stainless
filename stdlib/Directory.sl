@@ -47,9 +47,9 @@ public bool Exists(String path)
     return sl_path_exists(path.ToPointer()) && sl_path_is_directory(path.ToPointer());
 }
 
-/// Creates one directory. The parent has to exist already; use `CreateAll` when
+/// Creates one directory. The parent has to exist already; use `CreateDirectoryTree` when
 /// it might not.
-public IOError Create(String path)
+public IOError CreateDirectory(String path)
 {
     return (IOError)sl_directory_create(path.ToPointer());
 }
@@ -58,12 +58,12 @@ public IOError Create(String path)
 ///
 /// A trailing separator is allowed, and a directory that appears while this
 /// runs -- made by another process, say -- is success rather than a failure.
-public IOError CreateAll(String path)
+public IOError CreateDirectoryTree(String path)
 {
     // `a/b/` names `a/b`. Stop at a root, which is its own directory name.
-    while (Path.FileName(path).ByteLength() == 0)
+    while (Path.GetFileName(path).ByteLength() == 0)
     {
-        var trimmed = Path.DirectoryName(path);
+        var trimmed = Path.GetDirectoryName(path);
         if (trimmed.ByteLength() == 0 || trimmed.ByteLength() >= path.ByteLength())
             break;
         path = trimmed;
@@ -72,15 +72,15 @@ public IOError CreateAll(String path)
     if (Exists(path))
         return IOError.None;
 
-    var parent = Path.DirectoryName(path);
+    var parent = Path.GetDirectoryName(path);
     if (parent.ByteLength() > 0 && !Exists(parent))
     {
-        var failed = CreateAll(parent);
+        var failed = CreateDirectoryTree(parent);
         if (failed != IOError.None)
             return failed;
     }
 
-    var made = Create(path);
+    var made = CreateDirectory(path);
     if (made == IOError.AlreadyExists && Exists(path))
         return IOError.None;
     return made;
@@ -120,7 +120,7 @@ public class Entry
 }
 
 /// Everything directly inside, files and directories both, not recursively.
-public Result<List<Entry>, IOError> Entries(String path)
+public Result<List<Entry>, IOError> GetEntries(String path)
 {
     var found = new List<Entry>();
 
@@ -148,9 +148,9 @@ public Result<List<Entry>, IOError> Entries(String path)
 }
 
 /// The full paths of the files directly inside.
-public Result<List<String>, IOError> Files(String path)
+public Result<List<String>, IOError> GetFiles(String path)
 {
-    var all = Entries(path);
+    var all = GetEntries(path);
     if (!all.Ok)
         return Fail(all.Error);
 
@@ -164,9 +164,9 @@ public Result<List<String>, IOError> Files(String path)
 }
 
 /// The full paths of the directories directly inside.
-public Result<List<String>, IOError> Directories(String path)
+public Result<List<String>, IOError> GetDirectories(String path)
 {
-    var all = Entries(path);
+    var all = GetEntries(path);
     if (!all.Ok)
         return Fail(all.Error);
 
@@ -183,7 +183,7 @@ public Result<List<String>, IOError> Directories(String path)
 ///
 /// Written as a worklist rather than a recursion so that a deep tree cannot
 /// run the stack out.
-public Result<List<String>, IOError> AllFiles(String path)
+public Result<List<String>, IOError> GetAllFiles(String path)
 {
     var paths = new List<String>();
 
@@ -193,7 +193,7 @@ public Result<List<String>, IOError> AllFiles(String path)
     while (!pending.IsEmpty)
     {
         var here = pending.Dequeue();
-        var listed = Entries(here);
+        var listed = GetEntries(here);
         if (!listed.Ok)
             return Fail(listed.Error);
 

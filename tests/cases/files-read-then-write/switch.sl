@@ -13,7 +13,7 @@ import Standard.Path;
 
 String Scratch()
 {
-    var temp = Env.GetOr("TEMP", Env.GetOr("TMPDIR", "/tmp"));
+    var temp = Env.GetVariableOrDefault("TEMP", Env.GetVariableOrDefault("TMPDIR", "/tmp"));
     return Path.Join(temp, "stainless-files-read-then-write.txt");
 }
 
@@ -37,7 +37,7 @@ int Main()
     xy[0u] = 120;
     xy[1u] = 121;
     nuint written = stream.Write(xy, 0u, 2u);
-    Console.WriteLine($"wrote {written}, error {IO.Describe(stream.Error)}");
+    Console.WriteLine($"wrote {written}, error {IO.DescribeIOError(stream.Error)}");
 
     // And back to reading, which needs the same seek.
     Console.WriteLine($"read {stream.Read(two, 0u, 2u)} {Text.FromBytes(&two[0u], 2u)}");

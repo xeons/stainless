@@ -48,17 +48,17 @@ public bool Exists(String path)
 }
 
 /// The size in bytes, or -1 when there is nothing there.
-public long Size(String path) => sl_path_size(path.ToPointer());
+public long GetSize(String path) => sl_path_size(path.ToPointer());
 
 /// When it was last written, in seconds since the epoch, or -1.
-public long Modified(String path) => sl_path_modified(path.ToPointer());
+public long GetLastWriteTime(String path) => sl_path_modified(path.ToPointer());
 
 /// Removes the file. `IOError.None` on success.
 public IOError Delete(String path) => (IOError)sl_file_delete(path.ToPointer());
 
 /// Moves or renames. Whether it replaces an existing destination is the
 /// platform's decision, not this one's.
-public IOError Rename(String from, String to)
+public IOError Move(String from, String to)
 {
     return (IOError)sl_file_rename(from.ToPointer(), to.ToPointer());
 }
@@ -215,7 +215,7 @@ public IOError WriteAllLines(String path, IReadOnlyList<String> lines)
 }
 
 /// Adds `text` to the end, creating the file if it is not there.
-public IOError AppendText(String path, String text)
+public IOError AppendAllText(String path, String text)
 {
     var opened = FileStream.OpenAppend(path);
     if (!opened.Ok)

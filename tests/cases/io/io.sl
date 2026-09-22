@@ -32,14 +32,14 @@ void Wipe(String root)
     if (!Directory.Exists(root))
         return;
 
-    var files = Directory.AllFiles(root);
+    var files = Directory.GetAllFiles(root);
     if (files.Ok)
     {
         for (nuint i = 0; i < files.Value.Count; i = i + 1)
             File.Delete(files.Value[i]);
     }
 
-    var nested = Directory.Directories(root);
+    var nested = Directory.GetDirectories(root);
     if (nested.Ok)
     {
         for (nuint i = 0; i < nested.Value.Count; i = i + 1)
@@ -59,21 +59,21 @@ int Main()
         Path.Join("a/", "/b").ToPointer());
 
     printf("name=%s dir=%s\n",
-        Path.FileName("x/y/notes.txt").ToPointer(),
-        Path.DirectoryName("x/y/notes.txt").ToPointer());
+        Path.GetFileName("x/y/notes.txt").ToPointer(),
+        Path.GetDirectoryName("x/y/notes.txt").ToPointer());
 
     printf("ext=%s stem=%s with=%s\n",
-        Path.Extension("x/y/notes.txt").ToPointer(),
-        Path.WithoutExtension("x/y/notes.txt").ToPointer(),
-        Path.WithExtension("x/notes.txt", "md").ToPointer());
+        Path.GetExtension("x/y/notes.txt").ToPointer(),
+        Path.GetFileNameWithoutExtension("x/y/notes.txt").ToPointer(),
+        Path.ChangeExtension("x/notes.txt", "md").ToPointer());
 
     printf("noext=%s dotfile=%s\n",
-        Path.Extension("README").ToPointer(),
-        Path.Extension(".gitignore").ToPointer());
+        Path.GetExtension("README").ToPointer(),
+        Path.GetExtension(".gitignore").ToPointer());
 
     printf("rooted=%d %d %d parts=%llu\n",
-        Path.IsRooted("/x") ? 1 : 0, Path.IsRooted("C:/x") ? 1 : 0,
-        Path.IsRooted("x") ? 1 : 0, Path.Split("a/b/c").Count);
+        Path.IsPathRooted("/x") ? 1 : 0, Path.IsPathRooted("C:/x") ? 1 : 0,
+        Path.IsPathRooted("x") ? 1 : 0, Path.SplitPath("a/b/c").Count);
 
     // ------------------------------------------------------- memory stream
     var buffer = new MemoryStream();
@@ -97,13 +97,13 @@ int Main()
     Wipe(root);
 
     printf("create=%d exists=%d\n",
-        (int)Directory.CreateAll(Path.Join(root, "nested")),
+        (int)Directory.CreateDirectoryTree(Path.Join(root, "nested")),
         Directory.Exists(root) ? 1 : 0);
 
     var notes = Path.Join(root, "notes.txt");
     printf("write=%d is-file=%d size=%lld\n",
         (int)File.WriteAllText(notes, "line one\nline two\n"),
-        File.Exists(notes) ? 1 : 0, File.Size(notes));
+        File.Exists(notes) ? 1 : 0, File.GetSize(notes));
 
     var text = File.ReadAllText(notes);
     printf("read=%d bytes=%llu\n", text.Ok ? 1 : 0, text.Ok ? text.Value.ByteLength() : 0);
@@ -116,7 +116,7 @@ int Main()
             lines.Value[lines.Value.Count - 1].ToPointer());
     }
 
-    File.AppendText(notes, "line three\n");
+    File.AppendAllText(notes, "line three\n");
     var appended = File.ReadAllLines(notes);
     if (appended.Ok)
         printf("appended=%llu\n", appended.Value.Count);
@@ -129,7 +129,7 @@ int Main()
     var missing = File.ReadAllText(Path.Join(root, "nope.txt"));
     if (!missing.Ok)
     {
-        printf("missing=0 reason=%s\n", IO.Describe(missing.Error).ToPointer());
+        printf("missing=0 reason=%s\n", IO.DescribeIOError(missing.Error).ToPointer());
     }
 
     // There is no failed value to read by mistake; a caller that wants to carry
@@ -165,7 +165,7 @@ int Main()
 
         // `IsOpen` and `Error` remain, for what happens after a stream is
         // open: a read on a closed one is an outcome of the read.
-        printf("closed-error=%s\n", IO.Describe(stream.Error).ToPointer());
+        printf("closed-error=%s\n", IO.DescribeIOError(stream.Error).ToPointer());
     }
 
     // Opening something that is not there is a failure carrying its reason,
@@ -173,7 +173,7 @@ int Main()
     var absent = FileStream.OpenRead(Path.Join(root, "nope.txt"));
     printf("absent-open=%d\n", absent.Ok ? 1 : 0);
     if (!absent.Ok)
-        printf("absent-why=%s\n", IO.Describe(absent.Error).ToPointer());
+        printf("absent-why=%s\n", IO.DescribeIOError(absent.Error).ToPointer());
 
     // Writing through a stream, then reading it back.
     var made = FileStream.Create(Path.Join(root, "stream.txt"));
@@ -194,10 +194,10 @@ int Main()
     lineList.Add("beta");
     File.WriteAllLines(Path.Join(root, "list.txt"), lineList);
 
-    var entries = Directory.Entries(root);
-    var files = Directory.Files(root);
-    var dirs = Directory.Directories(root);
-    var everything = Directory.AllFiles(root);
+    var entries = Directory.GetEntries(root);
+    var files = Directory.GetFiles(root);
+    var dirs = Directory.GetDirectories(root);
+    var everything = Directory.GetAllFiles(root);
     if (entries.Ok && files.Ok && dirs.Ok && everything.Ok)
     {
         printf("entries=%llu files=%llu dirs=%llu all-files=%llu\n",
@@ -212,17 +212,17 @@ int Main()
             listed.Value.Count, listed.Value[1].ToPointer());
     }
 
-    var nowhere = Directory.Entries(Path.Join(root, "no-such"));
+    var nowhere = Directory.GetEntries(Path.Join(root, "no-such"));
     if (!nowhere.Ok)
     {
-        printf("no-dir=0 reason=%s\n", IO.Describe(nowhere.Error).ToPointer());
+        printf("no-dir=0 reason=%s\n", IO.DescribeIOError(nowhere.Error).ToPointer());
     }
 
     // Copy and rename.
     File.Copy(notes, Path.Join(root, "copy.txt"));
     printf("copied=%lld renamed=%d\n",
-        File.Size(Path.Join(root, "copy.txt")),
-        (int)File.Rename(Path.Join(root, "copy.txt"), Path.Join(root, "moved.txt")));
+        File.GetSize(Path.Join(root, "copy.txt")),
+        (int)File.Move(Path.Join(root, "copy.txt"), Path.Join(root, "moved.txt")));
     printf("moved=%d original-gone=%d\n",
         File.Exists(Path.Join(root, "moved.txt")) ? 1 : 0,
         File.Exists(Path.Join(root, "copy.txt")) ? 1 : 0);

@@ -471,18 +471,18 @@ last person to edit it -- the suite is the authority.
   collection in a field and never hands out a reference to it, because a lock
   protects what it guards and not the reference *count* of what it guards
 - `Standard.Process`: running another program, on both platforms.
-  `Run(program, arguments)` waits and captures; `Start` hands back a `Process`
+  `RunProcess(program, arguments)` waits and captures; `Start` hands back a `Process`
   to wait on, poll or stop. **There is no shell** — the arguments are a list,
   so a `>` or a space in a filename is a character the child receives rather
   than something a shell acts on. A failure to *start* is a `ProcessError`; a
   program that ran and returned 1 is a `Completed`, which is an outcome. Both
   streams are drained while it runs, because a pipe holds about 64KB and a
-  parent that waits first would wait forever. `Signals.Watch()` notices Ctrl-C
+  parent that waits first would wait forever. `Signals.StartWatching()` notices Ctrl-C
   as a flag to read rather than a handler to run in
 - `Standard.Env`: the command line, environment variables and the working
   directory. `Main(String[] args)` is the better way to read the arguments --
   a function that takes what it needs beats one that goes looking -- and
-  `Env.Arguments()` is for the code that is nowhere near `Main`
+  `Env.GetArguments()` is for the code that is nowhere near `Main`
 - `Standard.Time`: `Instant` (a point on the wall clock) and `Duration` (a
   length), both structs over one `long` of nanoseconds that declare the
   arithmetic to go with it -- `hour + minute`, `later - earlier` -- and are

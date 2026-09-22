@@ -76,7 +76,7 @@ public class SourceBreakpoint
     /// What the Breakpoints pane shows in its text column.
     public String ToDisplayText()
     {
-        String where = Standard.Path.FileName(File) + ", line "
+        String where = Standard.Path.GetFileName(File) + ", line "
                      + Standard.Text.FromInteger((long)ShownLine);
         if (IsBound && BoundLine != Line)
             where = where + " (asked for "

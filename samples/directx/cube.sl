@@ -796,7 +796,7 @@ int Main()
 
     for (nuint i = 0u; i < Env.ArgumentCount(); i++)
     {
-        String argument = Env.ArgumentAt(i);
+        String argument = Env.GetArgument(i);
         if (argument == "quiet")
             quiet = true;
         else if (argument == "shot")

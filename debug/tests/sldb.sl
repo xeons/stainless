@@ -1374,7 +1374,7 @@ int PrintUsage()
 
 int Main()
 {
-    var args = Standard.Env.Arguments();
+    var args = Standard.Env.GetArguments();
     if (args.Length == 0u)
         return PrintUsage();
 

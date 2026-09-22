@@ -16,7 +16,7 @@ import Standard.Process;
 
 String Scratch()
 {
-    var temp = Env.GetOr("TEMP", Env.GetOr("TMPDIR", "/tmp"));
+    var temp = Env.GetVariableOrDefault("TEMP", Env.GetVariableOrDefault("TMPDIR", "/tmp"));
     return Path.Join(temp, "stainless-files-directory-links");
 }
 
@@ -24,9 +24,9 @@ bool LinkDirectory(String link, String target)
 {
 #if WINDOWS
     // A junction, because a directory symbolic link needs a privilege.
-    var made = Process.Run("cmd", ["/c", "mklink", "/J", link, target]);
+    var made = Process.RunProcess("cmd", ["/c", "mklink", "/J", link, target]);
 #else
-    var made = Process.Run("ln", ["-s", target, link]);
+    var made = Process.RunProcess("ln", ["-s", target, link]);
 #endif
     return made.Ok && made.Value.ExitCode == 0;
 }
@@ -43,7 +43,7 @@ int Main()
     Directory.Delete(sub);
     Directory.Delete(root);
 
-    Directory.CreateAll(sub);
+    Directory.CreateDirectoryTree(sub);
     File.WriteAllText(file, "x");
     if (!LinkDirectory(loop, root))
     {
@@ -51,7 +51,7 @@ int Main()
         return 1;
     }
 
-    var entries = Directory.Entries(sub);
+    var entries = Directory.GetEntries(sub);
     if (entries.Ok)
     {
         foreach (var entry in entries.Value)
@@ -61,18 +61,18 @@ int Main()
         }
     }
 
-    var all = Directory.AllFiles(root);
+    var all = Directory.GetAllFiles(root);
     if (all.Ok)
     {
         Console.WriteLine($"all files: {all.Value.Count}");
     }
     else
     {
-        Console.WriteLine($"all files failed: {IO.Describe(all.Error)}");
+        Console.WriteLine($"all files failed: {IO.DescribeIOError(all.Error)}");
     }
 
     // Deleted as the file it is reported as, and the target stays.
-    Console.WriteLine($"delete link: {IO.Describe(File.Delete(loop))}");
+    Console.WriteLine($"delete link: {IO.DescribeIOError(File.Delete(loop))}");
     Console.WriteLine($"target still there: {Directory.Exists(root)}");
 
     File.Delete(file);
