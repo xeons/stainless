@@ -882,12 +882,15 @@ threadsafe sealed class Backend
 
     /// libgd's alpha is seven bits and inverted: 0 is opaque and 127 is
     /// invisible, where everything above this uses eight bits with 255 opaque.
-    /// The halving is lossy one way and exact the other, which is why a round
-    /// trip through an image is not quite the byte that went in.
+    ///
+    /// So only half the alphas survive a trip through an image. Both
+    /// directions round to nearest, which makes a value that has been through
+    /// once come back unchanged every time after; rounding down both ways
+    /// drifted further from the original on every trip.
     int ToGd(uint colour)
     {
         uint alpha = (colour >> 24) & 0xFFu;
-        uint inverted = (255u - alpha) * 127u / 255u;
+        uint inverted = ((255u - alpha) * 127u + 127u) / 255u;
         return (int)((inverted << 24) | (colour & 0x00FFFFFFu));
     }
 
@@ -895,7 +898,7 @@ threadsafe sealed class Backend
     {
         uint packed = (uint)colour;
         uint inverted = (packed >> 24) & 0x7Fu;
-        uint alpha = 255u - inverted * 255u / 127u;
+        uint alpha = 255u - (inverted * 255u + 63u) / 127u;
         return (alpha << 24) | (packed & 0x00FFFFFFu);
     }
 

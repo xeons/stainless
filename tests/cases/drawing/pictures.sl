@@ -80,6 +80,12 @@ int Main()
     ok = Check(ok, "and keeps roughly its alpha",
                written.A > (byte)120 && written.A < (byte)136);
 
+    // Whatever libgd rounded it to on the first trip, a second trip MUST
+    // leave alone.
+    picture.SetPixel(2, 2, written);
+    ok = Check(ok, "and an alpha that has been through once stays put",
+               picture.GetPixel(2, 2).A == written.A);
+
     ok = Check(ok, "a pixel outside is transparent",
                picture.GetPixel(-1, 0).IsInvisible
                && picture.GetPixel(0, 999).IsInvisible);
