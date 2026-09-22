@@ -2102,8 +2102,30 @@ public class CoolBar : CustomControl
 
         var found = BandAt(at);
         int onto = found.Item1;
-        if (onto == CoolNowhere)
+        if (onto == CoolNowhere || onto == dragged)
             return false;
+        if (onto == CoolRowAbove && dragged == 0)
+            return false;
+
+        // A drop can change only where rows break, and can also change
+        // nothing at all, so what it did is found by comparing.
+        var order = new List<CoolBand>();
+        var breaks = new List<bool>();
+        foreach (var band in Bands)
+        {
+            order.Add(band);
+            breaks.Add(band.Break);
+        }
+
+        // Read before anything moves: changing a break lays the bar out again.
+        bool pastEnd = false;
+        bool sameRow = false;
+        if (onto >= 0)
+        {
+            var target = showing[(nuint)onto];
+            pastEnd = at.X > target.Left + target.DrawnWidth;
+            sameRow = moving.Top == target.Top;
+        }
 
         // A band that broke a row and is leaving it must hand the break to
         // whoever now begins that row, or the row above swallows it.
@@ -2112,32 +2134,45 @@ public class CoolBar : CustomControl
             showing[(nuint)(dragged + 1)].Break = true;
         }
 
+        PlaceDropped(showing, dragged, onto, pastEnd, sameRow);
+
+        var now = Bands;
+        for (nuint i = 0u; i < now.Count; i++)
+        {
+            if (now[i] != order[i] || now[i].Break != breaks[i])
+                return true;
+        }
+        return false;
+    }
+
+    /// The three cases `Drop` describes, applied.
+    void PlaceDropped(List<CoolBand> showing, int dragged, int onto,
+                      bool pastEnd, bool sameRow)
+    {
+        var moving = showing[(nuint)dragged];
+
         if (onto == CoolRowAbove)
         {
-            if (dragged == 0)
-                return false;
             moving.Break = true;
-            return MoveTo(moving, 0);
+            MoveTo(moving, 0);
+            return;
         }
 
         if (onto == CoolRowBelow)
         {
             moving.Break = true;
-            return MoveTo(moving, (int)Bands.Count - 1);
+            MoveTo(moving, (int)Bands.Count - 1);
+            return;
         }
 
-        if (onto == dragged)
-            return false;
-
         var target = showing[(nuint)onto];
-        bool pastEnd = at.X > target.Left + target.DrawnWidth;
-
         if (pastEnd)
         {
             // Joining the end of the target's row.
             moving.Break = false;
             int after = dragged > onto ? onto + 1 : onto;
-            return MoveTo(moving, RealIndexOf(showing, after));
+            MoveTo(moving, RealIndexOf(showing, after));
+            return;
         }
 
         moving.Break = target.Break;
@@ -2146,17 +2181,19 @@ public class CoolBar : CustomControl
             // Moving left or up: the band it landed on stops beginning the row,
             // because the dropped one now does.
             target.Break = false;
-            return MoveTo(moving, RealIndexOf(showing, onto));
+            MoveTo(moving, RealIndexOf(showing, onto));
+            return;
         }
 
         // Moving right or down.
-        if (showing[(nuint)dragged].Top == target.Top)
+        if (sameRow)
         {
             moving.Break = false;
-            return MoveTo(moving, RealIndexOf(showing, onto));
+            MoveTo(moving, RealIndexOf(showing, onto));
+            return;
         }
         target.Break = false;
-        return MoveTo(moving, RealIndexOf(showing, onto - 1));
+        MoveTo(moving, RealIndexOf(showing, onto - 1));
     }
 
     /// The position in `Bands` of the nth visible band. The two lists differ
@@ -2181,7 +2218,7 @@ public class CoolBar : CustomControl
     }
 
     /// Takes a band out of the list and puts it back at another position.
-    bool MoveTo(CoolBand band, int index)
+    void MoveTo(CoolBand band, int index)
     {
         var all = Bands;
         nuint from = 0u;
@@ -2196,7 +2233,7 @@ public class CoolBar : CustomControl
             }
         }
         if (!found)
-            return false;
+            return;
 
         int to = index;
         if (to < 0)
@@ -2204,10 +2241,9 @@ public class CoolBar : CustomControl
         if ((nuint)to >= all.Count)
             to = (int)all.Count - 1;
         if ((nuint)to == from)
-            return false;
+            return;
 
         all.RemoveAt(from);
         all.Insert((nuint)to, band);
-        return true;
     }
 }
