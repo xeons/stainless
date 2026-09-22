@@ -228,13 +228,17 @@ public class ProjectFile
     /// anything else answers an empty one.
     public PlatformOverlay GetPlatformOverlay(String platform)
     {
-        if (platform == "windows")
-            return Windows;
-        if (platform == "linux")
-            return Linux;
-        if (platform == "macos")
-            return Macos;
-        return new PlatformOverlay();
+        switch (platform)
+        {
+            case "windows":
+                return Windows;
+            case "linux":
+                return Linux;
+            case "macos":
+                return Macos;
+            default:
+                return new PlatformOverlay();
+        }
     }
 
     /// What is compiled for a platform: the base list, then that platform's.

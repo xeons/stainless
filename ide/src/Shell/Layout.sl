@@ -262,13 +262,17 @@ public static class Panes
 /// The edge an enum member is written as in the file.
 public String FormatEdgeName(DockEdge edge)
 {
-    if (edge == DockEdge.Left)
-        return "left";
-    if (edge == DockEdge.Right)
-        return "right";
-    if (edge == DockEdge.Bottom)
-        return "bottom";
-    return "document";
+    switch (edge)
+    {
+        case DockEdge.Left:
+            return "left";
+        case DockEdge.Right:
+            return "right";
+        case DockEdge.Bottom:
+            return "bottom";
+        default:
+            return "document";
+    }
 }
 
 /// And back. An unrecognised edge is the document well, which is the one that
@@ -276,13 +280,17 @@ public String FormatEdgeName(DockEdge edge)
 /// pane somewhere visible rather than nowhere.
 public DockEdge ParseEdgeName(String name)
 {
-    if (name == "left")
-        return DockEdge.Left;
-    if (name == "right")
-        return DockEdge.Right;
-    if (name == "bottom")
-        return DockEdge.Bottom;
-    return DockEdge.Document;
+    switch (name)
+    {
+        case "left":
+            return DockEdge.Left;
+        case "right":
+            return DockEdge.Right;
+        case "bottom":
+            return DockEdge.Bottom;
+        default:
+            return DockEdge.Document;
+    }
 }
 
 // ==================================================================== reading

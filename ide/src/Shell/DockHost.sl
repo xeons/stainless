@@ -779,13 +779,18 @@ public class DockHost : Panel
 
     DockWell GetWellOn(DockEdge edge)
     {
-        if (edge == DockEdge.Right)
-            return _rightWell;
-        if (edge == DockEdge.Bottom)
-            return _bottomWell;
-        // Left, and the document well too: a pane cannot go among the editors,
-        // so a layout saying it does puts it on the left rather than nowhere.
-        return _leftWell;
+        switch (edge)
+        {
+            case DockEdge.Right:
+                return _rightWell;
+            case DockEdge.Bottom:
+                return _bottomWell;
+            default:
+                // Left, and the document well too: a pane cannot go among the
+                // editors, so a layout saying it does puts it on the left
+                // rather than nowhere.
+                return _leftWell;
+        }
     }
 
     DockWell? FindWellHolding(String name)
@@ -801,20 +806,28 @@ public class DockHost : Panel
 
     AutoHideStrip GetStripOn(DockEdge edge)
     {
-        if (edge == DockEdge.Right)
-            return _rightStrip;
-        if (edge == DockEdge.Bottom)
-            return _bottomStrip;
-        return _leftStrip;
+        switch (edge)
+        {
+            case DockEdge.Right:
+                return _rightStrip;
+            case DockEdge.Bottom:
+                return _bottomStrip;
+            default:
+                return _leftStrip;
+        }
     }
 
     Splitter GetSplitterOn(DockEdge edge)
     {
-        if (edge == DockEdge.Right)
-            return _rightSplit;
-        if (edge == DockEdge.Bottom)
-            return _bottomSplit;
-        return _leftSplit;
+        switch (edge)
+        {
+            case DockEdge.Right:
+                return _rightSplit;
+            case DockEdge.Bottom:
+                return _bottomSplit;
+            default:
+                return _leftSplit;
+        }
     }
 
     // ------------------------------------------------------- showing a well
@@ -907,20 +920,20 @@ public class DockHost : Panel
 
     void DockWellToEdge(DockWell well, DockEdge edge)
     {
-        if (edge == DockEdge.Bottom)
+        switch (edge)
         {
-            well.Dock = DockStyle.Bottom;
-            well.Height = _layout.BottomHeight;
-        }
-        else if (edge == DockEdge.Right)
-        {
-            well.Dock = DockStyle.Right;
-            well.Width = _layout.RightWidth;
-        }
-        else
-        {
-            well.Dock = DockStyle.Left;
-            well.Width = _layout.LeftWidth;
+            case DockEdge.Bottom:
+                well.Dock = DockStyle.Bottom;
+                well.Height = _layout.BottomHeight;
+                break;
+            case DockEdge.Right:
+                well.Dock = DockStyle.Right;
+                well.Width = _layout.RightWidth;
+                break;
+            default:
+                well.Dock = DockStyle.Left;
+                well.Width = _layout.LeftWidth;
+                break;
         }
     }
 
