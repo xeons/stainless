@@ -89,7 +89,7 @@ A program that was started and has not been waited for.
 Its streams are this process's own, so what it prints goes where this
 program's output goes. `Run` is the one that captures.
 
-<sub>[stdlib/Process.sl:192](../../stdlib/Process.sl#L192)</sub>
+<sub>[stdlib/Process.sl:197](../../stdlib/Process.sl#L197)</sub>
 
 #### Id *property*
 
@@ -99,7 +99,7 @@ long Id { get; }
 
 What the operating system calls it.
 
-<sub>[stdlib/Process.sl:206](../../stdlib/Process.sl#L206)</sub>
+<sub>[stdlib/Process.sl:211](../../stdlib/Process.sl#L211)</sub>
 
 #### Wait *method*
 
@@ -111,7 +111,7 @@ Waits for it to finish, and answers with the code it left.
 
 Asking twice is harmless and answers the same both times.
 
-<sub>[stdlib/Process.sl:211](../../stdlib/Process.sl#L211)</sub>
+<sub>[stdlib/Process.sl:216](../../stdlib/Process.sl#L216)</sub>
 
 #### Finished *property*
 
@@ -123,7 +123,7 @@ The code it left, if it has finished, without waiting for it.
 
     while (child.Finished.IsEmpty) { DoSomethingElse(); }
 
-<sub>[stdlib/Process.sl:222](../../stdlib/Process.sl#L222)</sub>
+<sub>[stdlib/Process.sl:227](../../stdlib/Process.sl#L227)</sub>
 
 #### Stop *method*
 
@@ -133,7 +133,7 @@ bool Stop()
 
 Asks it to stop, the way Ctrl-C would. It may decline.
 
-<sub>[stdlib/Process.sl:234](../../stdlib/Process.sl#L234)</sub>
+<sub>[stdlib/Process.sl:239](../../stdlib/Process.sl#L239)</sub>
 
 #### Kill *method*
 
@@ -143,7 +143,7 @@ bool Kill()
 
 Makes it stop. It cannot decline, and gets no chance to tidy up.
 
-<sub>[stdlib/Process.sl:237](../../stdlib/Process.sl#L237)</sub>
+<sub>[stdlib/Process.sl:242](../../stdlib/Process.sl#L242)</sub>
 
 #### Start *method*
 
@@ -153,7 +153,7 @@ static Result<Process, ProcessError> Start(String program, String[] arguments)
 
 Starts a program without waiting for it.
 
-<sub>[stdlib/Process.sl:240](../../stdlib/Process.sl#L240)</sub>
+<sub>[stdlib/Process.sl:245](../../stdlib/Process.sl#L245)</sub>
 
 ### ProcessError *enum*
 
@@ -256,7 +256,7 @@ the end while the child fills the other is waiting for a child that is
 waiting for the reader. That is why this hands back two strings rather than
 being two objects with a `Read` each.
 
-<sub>[stdlib/Process.sl:287](../../stdlib/Process.sl#L287)</sub>
+<sub>[stdlib/Process.sl:292](../../stdlib/Process.sl#L292)</sub>
 
 #### Id *property*
 
@@ -266,7 +266,7 @@ long Id { get; }
 
 What the operating system calls it.
 
-<sub>[stdlib/Process.sl:308](../../stdlib/Process.sl#L308)</sub>
+<sub>[stdlib/Process.sl:314](../../stdlib/Process.sl#L314)</sub>
 
 #### Read *method*
 
@@ -281,7 +281,7 @@ False means both streams are closed and everything they held has
 already been handed over, so the last `Take` before it is not missing
 anything.
 
-<sub>[stdlib/Process.sl:316](../../stdlib/Process.sl#L316)</sub>
+<sub>[stdlib/Process.sl:322](../../stdlib/Process.sl#L322)</sub>
 
 #### TakeOutput *method*
 
@@ -296,7 +296,7 @@ nothing at all the next time.
 showing output as it arrives wants each line once; `Run` is the one
 that answers with the whole of it at the end.
 
-<sub>[stdlib/Process.sl:330](../../stdlib/Process.sl#L330)</sub>
+<sub>[stdlib/Process.sl:336](../../stdlib/Process.sl#L336)</sub>
 
 #### TakeErrors *method*
 
@@ -306,7 +306,7 @@ String TakeErrors()
 
 The same for what it wrote to its error stream.
 
-<sub>[stdlib/Process.sl:333](../../stdlib/Process.sl#L333)</sub>
+<sub>[stdlib/Process.sl:339](../../stdlib/Process.sl#L339)</sub>
 
 #### Wait *method*
 
@@ -321,7 +321,7 @@ whose output pipe is full is the deadlock the pumping exists to avoid,
 arriving from the other side. Asking twice is harmless and answers the
 same both times.
 
-<sub>[stdlib/Process.sl:341](../../stdlib/Process.sl#L341)</sub>
+<sub>[stdlib/Process.sl:347](../../stdlib/Process.sl#L347)</sub>
 
 #### Stop *method*
 
@@ -331,7 +331,7 @@ bool Stop()
 
 Asks it to stop, the way Ctrl-C would. It may decline.
 
-<sub>[stdlib/Process.sl:350](../../stdlib/Process.sl#L350)</sub>
+<sub>[stdlib/Process.sl:356](../../stdlib/Process.sl#L356)</sub>
 
 #### Kill *method*
 
@@ -341,7 +341,7 @@ bool Kill()
 
 Makes it stop. It cannot decline, and gets no chance to tidy up.
 
-<sub>[stdlib/Process.sl:353](../../stdlib/Process.sl#L353)</sub>
+<sub>[stdlib/Process.sl:359](../../stdlib/Process.sl#L359)</sub>
 
 ### Signals *class*
 
@@ -361,7 +361,7 @@ top of its own loop, where it can actually tidy up.
     while (!Signals.Interrupted) { DoAPieceOfWork(); }
     Console.WriteLine("stopping");
 
-<sub>[stdlib/Process.sl:402](../../stdlib/Process.sl#L402)</sub>
+<sub>[stdlib/Process.sl:410](../../stdlib/Process.sl#L410)</sub>
 
 #### Watch *method*
 
@@ -372,7 +372,7 @@ static bool Watch()
 Starts noticing interrupts. Until this is called they end the program,
 which is the right default for something that has nothing to tidy.
 
-<sub>[stdlib/Process.sl:406](../../stdlib/Process.sl#L406)</sub>
+<sub>[stdlib/Process.sl:414](../../stdlib/Process.sl#L414)</sub>
 
 #### Interrupted *property*
 
@@ -382,7 +382,7 @@ static bool Interrupted { get; }
 
 Whether one has arrived since the last `Clear`.
 
-<sub>[stdlib/Process.sl:409](../../stdlib/Process.sl#L409)</sub>
+<sub>[stdlib/Process.sl:417](../../stdlib/Process.sl#L417)</sub>
 
 #### Clear *method*
 
@@ -392,7 +392,7 @@ static void Clear()
 
 Forgets the one that arrived, for a program that means to carry on.
 
-<sub>[stdlib/Process.sl:412](../../stdlib/Process.sl#L412)</sub>
+<sub>[stdlib/Process.sl:420](../../stdlib/Process.sl#L420)</sub>
 
 ## Functions
 
@@ -408,7 +408,7 @@ Starts a program with its output captured, to be read as it arrives.
 and it is what a PATH lookup is done on when it has no separator in it --
 the same bargain `Run` makes.
 
-<sub>[stdlib/Process.sl:361](../../stdlib/Process.sl#L361)</sub>
+<sub>[stdlib/Process.sl:367](../../stdlib/Process.sl#L367)</sub>
 
 ### Open *function*
 
@@ -416,15 +416,17 @@ the same bargain `Run` makes.
 Result<Running, ProcessError> Open(String program, String[] arguments, String? input)
 ```
 
-The same, with something written to the program's input first.
+The same, with `input` written to the program's input.
 
-The pipe is closed once `input` has been written, which is what makes a
-program reading to end-of-input stop rather than wait. It is written before
-any reading starts, so this is for input small enough to fit in a pipe --
-a child that will not read until it has answered, and an input larger than
-the buffer, would deadlock here exactly as it does under `Run`.
+What fits in the pipe is written before this returns, and the rest no
+later than `Read` waits for output, so input of any size is safe to give a
+filter that answers as it reads. The pipe is closed once all of it is written, which
+is what makes a program reading to end-of-input stop rather than wait.
 
-<sub>[stdlib/Process.sl:373](../../stdlib/Process.sl#L373)</sub>
+Without `input` the program reads end of input at once, rather than this
+program's own.
+
+<sub>[stdlib/Process.sl:381](../../stdlib/Process.sl#L381)</sub>
 
 ### Run *function*
 
@@ -448,11 +450,16 @@ and it is what a PATH lookup is done on when it has no separator in it.
 Result<Completed, ProcessError> Run(String program, String[] arguments, String? input)
 ```
 
-The same, with something written to the program's input first.
+The same, with `input` written to the program's input.
 
-The pipe is closed once `input` has been written, which is what makes a
-program reading to end-of-input stop rather than wait. A child that exits
-without reading is not an error here: the write stops and the run goes on.
+It is written while the output is read, so a filter that answers as it
+reads takes an input of any size. The pipe is closed once all of it is
+written, which is what makes a program reading to end-of-input stop rather
+than wait. A child that exits without reading is not an error here: the
+rest is dropped and the run goes on.
 
-<sub>[stdlib/Process.sl:164](../../stdlib/Process.sl#L164)</sub>
+Without `input` the program reads end of input at once, rather than this
+program's own.
+
+<sub>[stdlib/Process.sl:169](../../stdlib/Process.sl#L169)</sub>
 

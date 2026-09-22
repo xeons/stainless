@@ -1,0 +1,3 @@
+run   same=true code=0
+open  same=true code=0
+deaf  code=0

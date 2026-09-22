@@ -156,11 +156,16 @@ public Result<Completed, ProcessError> Run(String program, String[] arguments)
     return Run(program, arguments, null);
 }
 
-/// The same, with something written to the program's input first.
+/// The same, with `input` written to the program's input.
 ///
-/// The pipe is closed once `input` has been written, which is what makes a
-/// program reading to end-of-input stop rather than wait. A child that exits
-/// without reading is not an error here: the write stops and the run goes on.
+/// It is written while the output is read, so a filter that answers as it
+/// reads takes an input of any size. The pipe is closed once all of it is
+/// written, which is what makes a program reading to end-of-input stop rather
+/// than wait. A child that exits without reading is not an error here: the
+/// rest is dropped and the run goes on.
+///
+/// Without `input` the program reads end of input at once, rather than this
+/// program's own.
 public Result<Completed, ProcessError> Run(
     String program, String[] arguments, String? input
 )
@@ -197,9 +202,9 @@ public class Process
     /// to come by a valid one otherwise.
     Process(byte* started) => _handle = started;
 
-    /// Reaped here if it was never waited for, so that letting go of a
-    /// `Process` does not leave a zombie for the rest of the run. It is not
-    /// killed: letting go says nothing about wanting it stopped.
+    /// Reaped if it was never waited for, now or when it exits, so that
+    /// letting go of a `Process` does not leave a zombie for the rest of the
+    /// run. It is not killed: letting go says nothing about wanting it stopped.
     ~Process() { sl_process_release(_handle); }
 
     /// What the operating system calls it.
@@ -300,8 +305,9 @@ public class Running
         _more = true;
     }
 
-    /// Reaped here if it was never waited for, and the pipes go with it -- a
-    /// read end left open is a child blocked forever on a full one.
+    /// Reaped if it was never waited for, now or when it exits, and the pipes
+    /// go with it -- a read end left open is a child blocked forever on a full
+    /// one. Input not yet written is dropped.
     ~Running() { sl_process_release(_handle); }
 
     /// What the operating system calls it.
@@ -363,13 +369,15 @@ public Result<Running, ProcessError> Open(String program, String[] arguments)
     return Open(program, arguments, null);
 }
 
-/// The same, with something written to the program's input first.
+/// The same, with `input` written to the program's input.
 ///
-/// The pipe is closed once `input` has been written, which is what makes a
-/// program reading to end-of-input stop rather than wait. It is written before
-/// any reading starts, so this is for input small enough to fit in a pipe --
-/// a child that will not read until it has answered, and an input larger than
-/// the buffer, would deadlock here exactly as it does under `Run`.
+/// What fits in the pipe is written before this returns, and the rest no
+/// later than `Read` waits for output, so input of any size is safe to give a
+/// filter that answers as it reads. The pipe is closed once all of it is written, which
+/// is what makes a program reading to end-of-input stop rather than wait.
+///
+/// Without `input` the program reads end of input at once, rather than this
+/// program's own.
 public Result<Running, ProcessError> Open(
     String program, String[] arguments, String? input
 )

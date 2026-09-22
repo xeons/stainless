@@ -1,0 +1,3 @@
+run    read 0
+open   read 0
+parent kept by the parent

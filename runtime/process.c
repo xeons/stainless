@@ -29,7 +29,7 @@
  * something a shell would act on -- which is the whole of shell injection, and
  * it is designed out here rather than warned about.
  *
- * Two things in here are easy to get wrong and are worth reading before
+ * Three things in here are easy to get wrong and are worth reading before
  * changing anything:
  *
  * **The pipe deadlock.** A pipe holds about 64KB. A child that writes more
@@ -41,8 +41,19 @@
  * between fork and exec, because another thread may have held the malloc lock
  * at the moment of the fork and no thread exists in the child to release it.
  * So the child's half allocates nothing: the argv is built before the fork,
- * and what follows is dup2, close and execvp.
+ * and what follows is dup2 and execvp.
+ *
+ * **Input is fed while output is drained.** A child that writes while it
+ * reads -- any filter -- stops reading once its output pipe is full, so a
+ * parent that wrote all the input first would wait on it for ever. Unix
+ * writes the input from the pump, without blocking; Windows cannot poll an
+ * anonymous pipe for room and writes it from a thread.
  */
+
+/* pipe2 and O_CLOEXEC, named rather than left to the compiler's dialect. */
+#ifndef _WIN32
+#  define _GNU_SOURCE 1
+#endif
 
 #include "stainless.h"
 
@@ -56,8 +67,10 @@
 #else
 #  include <fcntl.h>
 #  include <poll.h>
+#  include <pthread.h>
 #  include <signal.h>
 #  include <sys/wait.h>
+#  include <time.h>
 #  include <unistd.h>
 #endif
 
@@ -135,6 +148,44 @@ static void buffer_free(Buffer *buffer)
     buffer->capacity = 0;
 }
 
+/*
+ * The input still to be written to a child, copied so that it outlives the
+ * String it came from.
+ */
+typedef struct Feed {
+    uint8_t *bytes;
+    size_t   length;
+    size_t   sent;
+#ifdef _WIN32
+    /* The write end, owned and closed by the thread that writes it. */
+    HANDLE        pipe;
+    volatile LONG stop;
+#endif
+} Feed;
+
+/* NULL for no input or an empty one: either way the pipe closes at once. */
+static Feed *feed_new(void *input)
+{
+    size_t length = input == NULL ? 0 : sl_string_byte_length(input);
+    if (length == 0) return NULL;
+
+    Feed *feed = (Feed *)calloc(1, sizeof(Feed));
+    uint8_t *bytes = (uint8_t *)malloc(length);
+    if (feed == NULL || bytes == NULL) sl_fail("out of memory");
+
+    memcpy(bytes, sl_string_data((SlString *)input), length);
+    feed->bytes  = bytes;
+    feed->length = length;
+    return feed;
+}
+
+static void feed_free(Feed *feed)
+{
+    if (feed == NULL) return;
+    free(feed->bytes);
+    free(feed);
+}
+
 typedef struct SlProcess {
 #ifdef _WIN32
     HANDLE handle;
@@ -144,14 +195,19 @@ typedef struct SlProcess {
      * pump can tell "nothing yet" from "nothing ever again". */
     HANDLE out;
     HANDLE err;
+    /* The thread writing the child's input, or NULL when there is none. */
+    HANDLE feeder;
 #else
     pid_t  id;
     /* The same, with -1 for absent -- which calloc does not give, so every
      * place that makes one of these sets them. Zero would be this process's
-     * own standard input. */
+     * own standard input. `in` is the non-blocking write end of the child's
+     * input, open until all of it is written. */
     int    out;
     int    err;
+    int    in;
 #endif
+    Feed *input;
     int  exitCode;
     _Bool finished;
 
@@ -349,6 +405,80 @@ static wchar_t *commandLineFor(SlArgs *list)
     return wide;
 }
 
+/*
+ * Writes the child's input and closes the pipe, on a thread of its own.
+ *
+ * In pieces, so that a stop asked for between two of them is seen. A write
+ * that fails is the child no longer reading, which is its business.
+ */
+static DWORD WINAPI feed_child(void *argument)
+{
+    Feed *feed = (Feed *)argument;
+
+    while (feed->sent < feed->length && InterlockedCompareExchange(&feed->stop, 0, 0) == 0) {
+        size_t left = feed->length - feed->sent;
+        DWORD wanted = left > 65536 ? 65536 : (DWORD)left;
+        DWORD sent = 0;
+
+        if (!WriteFile(feed->pipe, feed->bytes + feed->sent, wanted, &sent, NULL) || sent == 0)
+            break;
+
+        feed->sent += sent;
+    }
+
+    CloseHandle(feed->pipe);
+    return 0;
+}
+
+/*
+ * Stops the feeding thread, waits for it, and frees what it was writing.
+ *
+ * A child that has stopped reading leaves the thread blocked in WriteFile,
+ * which only CancelSynchronousIo interrupts -- and a cancel that lands before
+ * the write starts does nothing, so it is repeated until the thread is gone.
+ */
+static void feed_stop(HANDLE feeder, Feed *feed)
+{
+    InterlockedExchange(&feed->stop, 1);
+
+    while (WaitForSingleObject(feeder, 10) == WAIT_TIMEOUT)
+        CancelSynchronousIo(feeder);
+
+    CloseHandle(feeder);
+    feed_free(feed);
+}
+
+/*
+ * An attribute list naming the only handles a child may inherit.
+ *
+ * The child's pipe ends must be inheritable for it to receive them, which
+ * makes them inheritable by every child started meanwhile from another
+ * thread. One that took a copy of a write end would hold that pipe open, and
+ * the pump would not see its end until that unrelated child exited.
+ */
+static LPPROC_THREAD_ATTRIBUTE_LIST inheritingOnly(HANDLE *handles, size_t count)
+{
+    SIZE_T size = 0;
+    InitializeProcThreadAttributeList(NULL, 1, 0, &size);
+
+    LPPROC_THREAD_ATTRIBUTE_LIST list = (LPPROC_THREAD_ATTRIBUTE_LIST)malloc(size);
+    if (list == NULL) return NULL;
+
+    if (!InitializeProcThreadAttributeList(list, 1, 0, &size)) {
+        free(list);
+        return NULL;
+    }
+
+    if (!UpdateProcThreadAttribute(list, 0, PROC_THREAD_ATTRIBUTE_HANDLE_LIST,
+                                   handles, count * sizeof(HANDLE), NULL, NULL)) {
+        DeleteProcThreadAttributeList(list);
+        free(list);
+        return NULL;
+    }
+
+    return list;
+}
+
 #else
 
 static int classify(int number)
@@ -379,6 +509,148 @@ static int coded(int status)
 }
 
 /*
+ * A descriptor moved above the three standard ones, still close-on-exec.
+ *
+ * A parent started with one of them closed hands the number out again, and a
+ * pipe end sitting at 0, 1 or 2 is clobbered by the child's own dup2 onto it.
+ */
+static int lifted(int fd)
+{
+    if (fd < 0 || fd > 2) return fd;
+
+    int moved = fcntl(fd, F_DUPFD_CLOEXEC, 3);
+    int number = errno;
+    close(fd);
+    errno = number;
+    return moved;
+}
+
+/*
+ * A pipe whose ends no child inherits.
+ *
+ * Close-on-exec from the moment it exists, rather than set afterwards: a child
+ * forked meanwhile by another thread would otherwise keep a write end open,
+ * and the reader here would not see end of file until that child exited.
+ */
+static int privatePipe(int ends[2])
+{
+#ifdef __linux__
+    if (pipe2(ends, O_CLOEXEC) != 0) return -1;
+#else
+    if (pipe(ends) != 0) return -1;
+    fcntl(ends[0], F_SETFD, FD_CLOEXEC);
+    fcntl(ends[1], F_SETFD, FD_CLOEXEC);
+#endif
+
+    ends[0] = lifted(ends[0]);
+    ends[1] = lifted(ends[1]);
+
+    if (ends[0] < 0 || ends[1] < 0) {
+        int number = errno;
+        if (ends[0] >= 0) close(ends[0]);
+        if (ends[1] >= 0) close(ends[1]);
+        errno = number;
+        return -1;
+    }
+    return 0;
+}
+
+/*
+ * write(), with SIGPIPE held back on this thread alone.
+ *
+ * A child that exits without reading turns the next write into SIGPIPE, which
+ * by default ends this process. Ignoring the signal process-wide would change
+ * it for every other thread; blocking it here and consuming the one this write
+ * raised changes nothing anyone else can see. One already pending is left.
+ */
+static ssize_t writeQuietly(int fd, const uint8_t *bytes, size_t length)
+{
+    sigset_t pipeSignal, previous, pending;
+    sigemptyset(&pipeSignal);
+    sigaddset(&pipeSignal, SIGPIPE);
+
+    sigpending(&pending);
+    int wasPending = sigismember(&pending, SIGPIPE);
+
+    pthread_sigmask(SIG_BLOCK, &pipeSignal, &previous);
+
+    ssize_t sent = write(fd, bytes, length);
+    int number = errno;
+
+    if (sent < 0 && number == EPIPE && !wasPending) {
+        struct timespec none = { 0, 0 };
+        while (sigtimedwait(&pipeSignal, NULL, &none) < 0 && errno == EINTR) { }
+    }
+
+    pthread_sigmask(SIG_SETMASK, &previous, NULL);
+    errno = number;
+    return sent;
+}
+
+/*
+ * Writes as much of the child's input as the pipe takes without waiting, and
+ * closes it once all of it is written or the child has stopped reading.
+ */
+static void feed(SlProcess *process)
+{
+    Feed *input = process->input;
+
+    while (input != NULL && input->sent < input->length) {
+        ssize_t sent = writeQuietly(process->in, input->bytes + input->sent,
+                                    input->length - input->sent);
+
+        if (sent > 0) {
+            input->sent += (size_t)sent;
+            continue;
+        }
+
+        if (sent < 0 && errno == EINTR) continue;
+        if (sent < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) return;
+        break;
+    }
+
+    close(process->in);
+    process->in = -1;
+    feed_free(process->input);
+    process->input = NULL;
+}
+
+static void *reap(void *argument)
+{
+    pid_t child = (pid_t)(intptr_t)argument;
+    while (waitpid(child, NULL, 0) < 0 && errno == EINTR) { }
+    return NULL;
+}
+
+/*
+ * Reaps a child whose handle is being dropped, now or when it exits.
+ *
+ * A child still running is waited for on a detached thread, by its own pid:
+ * waitpid(-1) or a SIGCHLD handler would take children this process started
+ * for itself. The thread blocks every signal, so none meant for the program
+ * is delivered to it.
+ */
+static void reapLater(pid_t child)
+{
+    if (waitpid(child, NULL, WNOHANG) != 0) return;
+
+    sigset_t all, previous;
+    sigfillset(&all);
+    pthread_sigmask(SIG_SETMASK, &all, &previous);
+
+    pthread_attr_t attributes;
+    pthread_t thread;
+
+    if (pthread_attr_init(&attributes) == 0) {
+        pthread_attr_setdetachstate(&attributes, PTHREAD_CREATE_DETACHED);
+        pthread_create(&thread, &attributes, reap, (void *)(intptr_t)child);
+        pthread_attr_destroy(&attributes);
+    }
+
+    pthread_sigmask(SIG_SETMASK, &previous, NULL);
+}
+
+/*
  * Forks, execs, and tells the parent whether the exec worked.
  *
  * The child cannot report a failed exec through its exit code: 127 is the
@@ -392,23 +664,16 @@ static int coded(int status)
  * one read, and the answer is exact.
  *
  * `redirect` is the three descriptors to become stdin, stdout and stderr, each
- * -1 for "leave it alone", and `keep` is a descriptor the child must not
- * inherit -- the parent's end of a pipe it is about to be given the other half
- * of.
+ * -1 for "leave it alone". They MUST be close-on-exec and above 2, as
+ * privatePipe makes them: the child then keeps only the copies dup2 gives it.
  */
-static pid_t spawn(char **argv, const int redirect[3], const int *toClose, int count, int *why)
+static pid_t spawn(char **argv, const int redirect[3], int *why)
 {
     int report[2];
 
     *why = 0;
 
-    if (pipe(report) != 0) return -1;
-
-    if (fcntl(report[1], F_SETFD, FD_CLOEXEC) != 0) {
-        close(report[0]);
-        close(report[1]);
-        return -1;
-    }
+    if (privatePipe(report) != 0) return -1;
 
     pid_t child = fork();
 
@@ -424,13 +689,8 @@ static pid_t spawn(char **argv, const int redirect[3], const int *toClose, int c
         /* Async-signal-safe only, from here to the exec: another thread may
          * have held the malloc lock when the fork happened, and there is no
          * thread here to release it. Nothing below allocates. */
-        for (int i = 0; i < 3; i += 1)
+        for (int i = 0; i < 3; i++)
             if (redirect[i] >= 0) dup2(redirect[i], i);
-
-        for (int i = 0; i < count; i += 1)
-            if (toClose[i] >= 0) close(toClose[i]);
-
-        close(report[0]);
 
         execvp(argv[0], argv);
 
@@ -466,14 +726,17 @@ static pid_t spawn(char **argv, const int redirect[3], const int *toClose, int c
 
 #endif
 /*
- * Starts a program with both its output streams captured, and its input
- * written and closed.
+ * Starts a program with both its output streams captured, and its input fed
+ * to it while they are read.
  *
  * The read ends stay on the handle, which is the whole difference from
  * sl_process_start: that one leaves the child with this process's streams and
  * has nothing to read. Here they are kept so sl_process_pump can be called as
  * often as a caller likes, and output arrives while the child is still writing
  * rather than after it has exited.
+ *
+ * Without input the child's stdin is at its end from the start, on both
+ * platforms, rather than this process's own.
  */
 void *sl_process_open(void *args, void *input, int *error)
 {
@@ -483,6 +746,10 @@ void *sl_process_open(void *args, void *input, int *error)
     if (list == NULL || list->count == 0) return NULL;
 
 #ifdef _WIN32
+    /* The default is 4KB, and every time a child fills it the pump sleeps a
+     * scheduler tick before it looks again. 64KB is what a Unix pipe holds. */
+    enum { PipeBytes = 65536 };
+
     SECURITY_ATTRIBUTES shared;
     shared.nLength = sizeof shared;
     shared.lpSecurityDescriptor = NULL;
@@ -492,19 +759,19 @@ void *sl_process_open(void *args, void *input, int *error)
     HANDLE outRead = NULL, outWrite = NULL;
     HANDLE errRead = NULL, errWrite = NULL;
 
-    if (!CreatePipe(&outRead, &outWrite, &shared, 0)) {
+    if (!CreatePipe(&outRead, &outWrite, &shared, PipeBytes)) {
         *error = classify(GetLastError());
         return NULL;
     }
 
-    if (!CreatePipe(&errRead, &errWrite, &shared, 0)) {
+    if (!CreatePipe(&errRead, &errWrite, &shared, PipeBytes)) {
         DWORD why = GetLastError();
         CloseHandle(outRead); CloseHandle(outWrite);
         *error = classify(why);
         return NULL;
     }
 
-    if (!CreatePipe(&inRead, &inWrite, &shared, 0)) {
+    if (!CreatePipe(&inRead, &inWrite, &shared, PipeBytes)) {
         DWORD why = GetLastError();
         CloseHandle(outRead); CloseHandle(outWrite);
         CloseHandle(errRead); CloseHandle(errWrite);
@@ -516,24 +783,34 @@ void *sl_process_open(void *args, void *input, int *error)
     privately(errRead);
     privately(inWrite);
 
-    STARTUPINFOW startup;
+    /* The list points into this array, so it lives as long as the call. */
+    HANDLE inherited[3] = { inRead, outWrite, errWrite };
+    LPPROC_THREAD_ATTRIBUTE_LIST attributes = inheritingOnly(inherited, 3);
+
+    STARTUPINFOEXW startup;
     memset(&startup, 0, sizeof startup);
-    startup.cb = sizeof startup;
-    startup.dwFlags = STARTF_USESTDHANDLES;
-    startup.hStdInput = inRead;
-    startup.hStdOutput = outWrite;
-    startup.hStdError = errWrite;
+    startup.StartupInfo.cb = sizeof startup;
+    startup.StartupInfo.dwFlags = STARTF_USESTDHANDLES;
+    startup.StartupInfo.hStdInput = inRead;
+    startup.StartupInfo.hStdOutput = outWrite;
+    startup.StartupInfo.hStdError = errWrite;
+    startup.lpAttributeList = attributes;
 
     wchar_t *line = commandLineFor(list);
     PROCESS_INFORMATION information;
     memset(&information, 0, sizeof information);
 
-    BOOL started = line != NULL && CreateProcessW(
-        NULL, line, NULL, NULL, TRUE, CREATE_NO_WINDOW, NULL, NULL,
-        &startup, &information);
+    BOOL started = line != NULL && attributes != NULL && CreateProcessW(
+        NULL, line, NULL, NULL, TRUE, CREATE_NO_WINDOW | EXTENDED_STARTUPINFO_PRESENT,
+        NULL, NULL, &startup.StartupInfo, &information);
 
-    DWORD why = started ? 0 : GetLastError();
+    DWORD why = started ? 0 : attributes == NULL ? ERROR_NOT_ENOUGH_MEMORY : GetLastError();
     free(line);
+
+    if (attributes != NULL) {
+        DeleteProcThreadAttributeList(attributes);
+        free(attributes);
+    }
 
     /* The parent's copies of the child's ends go now, whether or not it
      * started: while one is open the pipe still has a writer, and the reads
@@ -550,29 +827,24 @@ void *sl_process_open(void *args, void *input, int *error)
 
     CloseHandle(information.hThread);
 
-    if (input != NULL) {
-        const uint8_t *bytes = sl_string_data((SlString *)input);
-        size_t length = sl_string_byte_length(input);
-        size_t written = 0;
+    SlProcess *made = (SlProcess *)calloc(1, sizeof(SlProcess));
+    Feed *feed = feed_new(input);
+    HANDLE feeder = NULL;
 
-        while (written < length) {
-            DWORD sent = 0;
-            DWORD wanted = (DWORD)(length - written);
-
-            if (!WriteFile(inWrite, bytes + written, wanted, &sent, NULL) || sent == 0)
-                break;      /* the child stopped reading; its business, not ours */
-
-            written += sent;
-        }
+    if (feed == NULL) {
+        CloseHandle(inWrite);
+    } else {
+        feed->pipe = inWrite;
+        feeder = CreateThread(NULL, 0, feed_child, feed, 0, NULL);
+        if (feeder == NULL) CloseHandle(inWrite);
     }
 
-    CloseHandle(inWrite);
-
-    SlProcess *made = (SlProcess *)calloc(1, sizeof(SlProcess));
-    if (made == NULL) {
+    if (made == NULL || (feed != NULL && feeder == NULL)) {
         CloseHandle(outRead); CloseHandle(errRead);
         TerminateProcess(information.hProcess, 1);
+        if (feeder != NULL) feed_stop(feeder, feed); else feed_free(feed);
         CloseHandle(information.hProcess);
+        free(made);
         *error = SL_PROCESS_NO_RESOURCE;
         return NULL;
     }
@@ -581,6 +853,8 @@ void *sl_process_open(void *args, void *input, int *error)
     made->id = information.dwProcessId;
     made->out = outRead;
     made->err = errRead;
+    made->feeder = feeder;
+    made->input = feed;
     made->exitCode = -1;
     *error = SL_PROCESS_OK;
     return made;
@@ -589,68 +863,58 @@ void *sl_process_open(void *args, void *input, int *error)
     int outPipe[2];
     int errPipe[2];
 
-    size_t inputLength = input == NULL ? 0 : sl_string_byte_length(input);
+    /* With nothing to give it, the child reads end of input rather than
+     * whatever this process's stdin holds. */
+    if (input != NULL) {
+        if (privatePipe(inPipe) != 0) {
+            *error = classify(errno);
+            return NULL;
+        }
+    } else {
+        inPipe[0] = lifted(open("/dev/null", O_RDONLY | O_CLOEXEC));
+        if (inPipe[0] < 0) {
+            *error = classify(errno);
+            return NULL;
+        }
+    }
 
-    if (input != NULL && pipe(inPipe) != 0) {
+    if (privatePipe(outPipe) != 0) {
         *error = classify(errno);
+        close(inPipe[0]);
+        if (inPipe[1] >= 0) close(inPipe[1]);
         return NULL;
     }
 
-    if (pipe(outPipe) != 0) {
+    if (privatePipe(errPipe) != 0) {
         *error = classify(errno);
-        if (inPipe[0] >= 0) { close(inPipe[0]); close(inPipe[1]); }
-        return NULL;
-    }
-
-    if (pipe(errPipe) != 0) {
-        *error = classify(errno);
-        if (inPipe[0] >= 0) { close(inPipe[0]); close(inPipe[1]); }
+        close(inPipe[0]);
+        if (inPipe[1] >= 0) close(inPipe[1]);
         close(outPipe[0]);
         close(outPipe[1]);
         return NULL;
     }
 
     int redirect[3] = { inPipe[0], outPipe[1], errPipe[1] };
-    int toClose[4] = { inPipe[1], outPipe[0], outPipe[1], errPipe[0] };
 
     int why = 0;
-    pid_t child = spawn(list->items, redirect, toClose, 4, &why);
+    pid_t child = spawn(list->items, redirect, &why);
 
     if (child < 0) {
         *error = why != 0 ? why : classify(errno);
-        if (inPipe[0] >= 0) { close(inPipe[0]); close(inPipe[1]); }
+        close(inPipe[0]);
+        if (inPipe[1] >= 0) close(inPipe[1]);
         close(outPipe[0]); close(outPipe[1]);
         close(errPipe[0]); close(errPipe[1]);
         return NULL;
     }
 
-    if (inPipe[0] >= 0) close(inPipe[0]);
+    close(inPipe[0]);
     close(outPipe[1]);
     close(errPipe[1]);
 
-    if (inPipe[1] >= 0) {
-        /* SIGPIPE would kill this process if the child exits without reading.
-         * A short write is the child's business, not a reason to die. */
-        void (*previous)(int) = signal(SIGPIPE, SIG_IGN);
-
-        const uint8_t *bytes = sl_string_data((SlString *)input);
-        size_t written = 0;
-
-        while (written < inputLength) {
-            ssize_t sent = write(inPipe[1], bytes + written, inputLength - written);
-            if (sent <= 0) {
-                if (sent < 0 && errno == EINTR) continue;
-                break;
-            }
-            written += (size_t)sent;
-        }
-
-        close(inPipe[1]);
-        signal(SIGPIPE, previous);
-    }
-
     SlProcess *started = (SlProcess *)calloc(1, sizeof(SlProcess));
     if (started == NULL) {
+        if (inPipe[1] >= 0) close(inPipe[1]);
         close(outPipe[0]); close(errPipe[0]);
         kill(child, SIGKILL);
         waitpid(child, NULL, 0);
@@ -661,7 +925,17 @@ void *sl_process_open(void *args, void *input, int *error)
     started->id = child;
     started->out = outPipe[0];
     started->err = errPipe[0];
+    started->in = inPipe[1];
     started->exitCode = -1;
+
+    /* Written from the pump, so it MUST NOT block; what fits now goes now, so
+     * a small input is already written and closed when this returns. */
+    if (started->in >= 0) {
+        fcntl(started->in, F_SETFL, fcntl(started->in, F_GETFL) | O_NONBLOCK);
+        started->input = feed_new(input);
+        feed(started);
+    }
+
     *error = SL_PROCESS_OK;
     return started;
 #endif
@@ -678,7 +952,8 @@ void *sl_process_open(void *args, void *input, int *error)
  * hands over every byte and then stops. Both pipes are watched together rather
  * than one and then the other, for the reason the two builders exist at all: a
  * pipe holds about 64KB, and a child that fills one waits for a reader that
- * would be waiting for the child.
+ * would be waiting for the child. On Unix the child's input is written from
+ * here too, as the pipe has room for it.
  */
 _Bool sl_process_pump(void *handle)
 {
@@ -711,9 +986,9 @@ _Bool sl_process_pump(void *handle)
     }
 #else
     for (;;) {
-        if (process->out < 0 && process->err < 0) return 0;
+        if (process->out < 0 && process->err < 0 && process->in < 0) return 0;
 
-        struct pollfd watched[2];
+        struct pollfd watched[3];
 
         /* A negative fd is ignored and reports no events, which is what makes
          * one closed stream harmless here rather than a second code path. */
@@ -721,11 +996,16 @@ _Bool sl_process_pump(void *handle)
         watched[0].events = POLLIN;
         watched[1].fd = process->err;
         watched[1].events = POLLIN;
+        watched[2].fd = process->in;
+        watched[2].events = POLLOUT;
 
-        if (poll(watched, 2, -1) < 0) {
+        if (poll(watched, 3, -1) < 0) {
             if (errno == EINTR) continue;
             return 0;
         }
+
+        if (process->in >= 0 && (watched[2].revents & (POLLOUT | POLLHUP | POLLERR)) != 0)
+            feed(process);
 
         size_t before = process->outText.length + process->errText.length;
 
@@ -755,7 +1035,7 @@ _Bool sl_process_pump(void *handle)
         size_t after = process->outText.length + process->errText.length;
 
         if (after != before) return 1;
-        if (process->out < 0 && process->err < 0) return 0;
+        if (process->out < 0 && process->err < 0 && process->in < 0) return 0;
     }
 #endif
 }
@@ -858,7 +1138,7 @@ void *sl_process_start(void *args, int *error)
     int redirect[3] = { -1, -1, -1 };
     int why = 0;
 
-    pid_t child = spawn(list->items, redirect, NULL, 0, &why);
+    pid_t child = spawn(list->items, redirect, &why);
 
     if (child < 0) {
         *error = why != 0 ? why : classify(errno);
@@ -871,6 +1151,7 @@ void *sl_process_start(void *args, int *error)
     started->id = child;
     started->out = -1;
     started->err = -1;
+    started->in = -1;
     started->exitCode = -1;
     *error = SL_PROCESS_OK;
     return started;
@@ -976,9 +1257,10 @@ _Bool sl_process_signal(void *handle, _Bool force)
 /*
  * Drops the handle.
  *
- * A child that was never waited for is reaped here, so that a `Process` let go
- * of does not leave a zombie for the rest of the run. It is not killed:
- * letting go of the handle says nothing about wanting it stopped.
+ * A child that was never waited for is reaped, now or when it exits, so that
+ * a `Process` let go of does not leave a zombie for the rest of the run. It is
+ * not killed: letting go of the handle says nothing about wanting it stopped.
+ * Input not yet written is dropped, and the child reads end of input.
  */
 void sl_process_release(void *handle)
 {
@@ -993,15 +1275,15 @@ void sl_process_release(void *handle)
      * read end left open is a child blocked forever on a full pipe. */
     if (process->out != NULL) CloseHandle(process->out);
     if (process->err != NULL) CloseHandle(process->err);
+    if (process->feeder != NULL) feed_stop(process->feeder, process->input);
     if (process->handle != NULL) CloseHandle(process->handle);
 #else
     if (process->out >= 0) close(process->out);
     if (process->err >= 0) close(process->err);
+    if (process->in >= 0) close(process->in);
+    feed_free(process->input);
 
-    if (!process->finished) {
-        int status = 0;
-        waitpid(process->id, &status, WNOHANG);
-    }
+    if (!process->finished) reapLater(process->id);
 #endif
 
     free(process);

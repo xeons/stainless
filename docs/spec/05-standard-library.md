@@ -636,13 +636,21 @@ writes more — and reading one stream to the end while the child fills the othe
 is the same deadlock in a different order. `poll` does it on POSIX and
 `PeekNamedPipe` on Windows.
 
+**Input is written while the output is read**, for the same reason from the
+other side: a filter stops reading once its output pipe is full, so a parent
+that wrote all of its input first would wait on it forever. POSIX writes it
+from the same `poll`; Windows, which cannot poll an anonymous pipe for room,
+from a thread. Without input the child reads end of input at once rather than
+the parent's own.
+
 `Output` and `Errors` are kept apart, so a program that prints progress to one
 does not corrupt what was captured from the other.
 
 **`Start` hands back a `Process`** for a program to be waited on later, or
 asked whether it has finished, or stopped. Its streams are the parent's. A
-`Process` let go of is reaped by its destructor, so nothing is left a zombie;
-it is not killed, letting go saying nothing about wanting it stopped.
+`Process` let go of is reaped, by its destructor or, if it is still running,
+when it exits, so nothing is left a zombie; it is not killed, letting go saying
+nothing about wanting it stopped.
 
 `Stop` is `SIGTERM` and `Kill` is `SIGKILL`. On Windows both are
 `TerminateProcess`: there is no polite signal for a process that is not a
