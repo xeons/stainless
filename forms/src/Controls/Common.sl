@@ -621,20 +621,23 @@ public class TabPage : WindowedControl
     /// `TabControl.RemovePage` and by nothing else.
     public void Renumber(int now) => _index = now;
 
-    /// The caption on the tab.
+    /// The caption on the tab. The same as `Text`.
     public String Caption
     {
-        get => StoredText;
-        set
-        {
-            StoredText = value;
-            var owner = Parent;
-            if (owner != null)
-            {
-                if (owner is TabControl tabs)
-                    tabs.SetTabText(_index, value);
-            }
-        }
+        get => Text;
+        set => Text = value;
+    }
+
+    /// A page's text is its tab's caption. The page's own panel shows no text,
+    /// so the base, which would tell the panel, is not called.
+    protected override void SetTextValue(String value)
+    {
+        if (StoredText == value)
+            return;
+        StoredText = value;
+        if (Parent is TabControl tabs)
+            tabs.SetTabText(_index, value);
+        OnTextChanged();
     }
 }
 
