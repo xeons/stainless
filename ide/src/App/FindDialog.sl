@@ -58,9 +58,9 @@ public class FindDialog : Form
     Button _replaceOne;
     Button _replaceAll;
     Button _close;
-    Label _report;
+    Label _statusLabel;
 
-    EditorSource _editorOf;
+    EditorSource _editorSource;
 
     public FindDialog(EditorSource source)
     {
@@ -68,7 +68,7 @@ public class FindDialog : Form
         // bar, which is what a utility window that belongs to another window
         // should be. Not sizable, because nothing in it would use the room.
         base(WindowBorder.Tool);
-        _editorOf = source;
+        _editorSource = source;
         Title = "Find and replace";
         // The outer frame, caption and borders included -- there is no
         // client-size setter -- so this is the 140 the controls need plus the
@@ -120,9 +120,9 @@ public class FindDialog : Form
         _close.Anchors = AnchorStyles.Top | AnchorStyles.Right;
         _close.Click += this.OnCloseClicked;
 
-        _report = new Label(this);
-        _report.SetBounds(12, 112, 296, 20);
-        _report.Anchors = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+        _statusLabel = new Label(this);
+        _statusLabel.SetBounds(12, 112, 296, 20);
+        _statusLabel.Anchors = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
     }
 
     /// What is being looked for, so that the shell can seed it from the
@@ -135,40 +135,40 @@ public class FindDialog : Form
 
     /// Brings it up, puts the caret in the Find box and selects what is there,
     /// so that typing replaces the last search rather than appending to it.
-    public void Present()
+    public void ShowForSearch()
     {
         Show();
         _find.Focus();
         _find.SelectAll();
-        Announce("");
+        ShowStatus("");
     }
 
-    void Announce(String what) => _report.Text = what;
+    void ShowStatus(String what) => _statusLabel.Text = what;
 
     /// The editor to act on, or null when there is none -- which is a state the
     /// window can genuinely be in, since this dialog outlives any tab.
-    CodeEditor? Target()
+    CodeEditor? FindTargetEditor()
     {
-        var editor = _editorOf();
+        var editor = _editorSource();
         if (editor == null)
-            Announce("Nothing to search.");
+            ShowStatus("Nothing to search.");
         return editor;
     }
 
     void OnFindNext(Control sender)
     {
-        var editor = Target();
+        var editor = FindTargetEditor();
         if (editor == null)
             return;
         if (_find.Text == "")
         {
-            Announce("Type something to find.");
+            ShowStatus("Type something to find.");
             return;
         }
 
         if (((CodeEditor)editor).FindNext(_find.Text, _matchCase.Checked, true))
         {
-            Announce("");
+            ShowStatus("");
             // The match is selected in the editor and the editor is behind this
             // window, so the selection has to be visible without the focus
             // moving -- which it is, because `CodeEditor` draws its own
@@ -176,36 +176,36 @@ public class FindDialog : Form
         }
         else
         {
-            Announce("No more matches for '" + _find.Text + "'.");
+            ShowStatus("No more matches for '" + _find.Text + "'.");
         }
     }
 
     void OnReplace(Control sender)
     {
-        var editor = Target();
+        var editor = FindTargetEditor();
         if (editor == null || _find.Text == "")
             return;
 
         if (((CodeEditor)editor).ReplaceCurrent(_find.Text, _replace.Text,
                                                 _matchCase.Checked))
         {
-            Announce("Replaced one.");
+            ShowStatus("Replaced one.");
         }
         else
         {
-            Announce("");
+            ShowStatus("");
         }
     }
 
     void OnReplaceAll(Control sender)
     {
-        var editor = Target();
+        var editor = FindTargetEditor();
         if (editor == null || _find.Text == "")
             return;
 
         nuint done = ((CodeEditor)editor).ReplaceAll(_find.Text, _replace.Text,
                                                      _matchCase.Checked);
-        Announce(done == 0u
+        ShowStatus(done == 0u
             ? "Nothing to replace."
             : "Replaced " + Standard.Text.FromInteger(done)
               + (done == 1u ? " occurrence." : " occurrences."));

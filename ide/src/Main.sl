@@ -84,7 +84,7 @@ int Main()
         // Repeatable, in the order given.
         if (argument == "--watch" && i + 1u < arguments.Length)
         {
-            window.Watch(arguments[i + 1u]);
+            window.TryAddWatch(arguments[i + 1u]);
             i++;
             continue;
         }
@@ -103,7 +103,7 @@ int Main()
         window.Show();
         for (int i = 0; i < 20; i++)
             Application.DoEvents();
-        bool ok = window.SelfTest();
+        bool ok = window.RunSelfTest();
         Console.WriteLine(ok ? "all checks passed" : "checks FAILED");
         return ok ? 0 : 1;
     }
@@ -114,7 +114,7 @@ int Main()
     // After the window is up: starting a session posts back to this thread,
     // and there has to be a loop for those posts to arrive on.
     if (stopAt.ByteLength() != 0u)
-        window.DebugFrom(stopAt, onlyWhen);
+        window.StartDebuggingAt(stopAt, onlyWhen);
 
     // After the session, because a stop brings its own pane forward and this
     // has to be what is showing when the picture is taken.

@@ -104,17 +104,17 @@ public enum Configuration { Debug, Release }
 /// The main window.
 public class Shell : Form
 {
-    TabControl _book;
-    List<EditorTab> _open;
+    TabControl _tabs;
+    List<EditorTab> _openTabs;
 
     /// The wells, the splitters and the strips. Everything but the menu and the
     /// status bar lives inside it.
     DockHost _dock;
     /// Where the panes are and how wide, read at startup and written at exit.
-    DockLayout _arrangement;
+    DockLayout _layout;
 
-    ListBox _output;
-    ListView _errors;
+    ListBox _outputList;
+    ListView _errorList;
     TreeView _tree;
 
     // ------------------------------------------------------------ debugging
@@ -130,11 +130,11 @@ public class Shell : Form
     /// The panes are filled from it, and a hover reads its locals rather than
     /// asking the process: the values were true at the stop and nothing has
     /// run since.
-    Snapshot? _stopped;
+    Snapshot? _lastStop;
 
-    ListView _stack;
+    ListView _callStackList;
     ListView _threadList;
-    ListView _locals;
+    ListView _localsList;
     ListView _watchList;
     ListView _breakList;
     ListBox _debugOutput;
@@ -145,10 +145,10 @@ public class Shell : Form
     List<String> _watches;
 
     /// The frame the Call Stack has selected. Zero is where the program is.
-    nuint _frame;
+    nuint _selectedFrame;
 
     /// Whether the next stop is this session's first.
-    bool _firstStop;
+    bool _isFirstStop;
 
     /// The pane `--show` asked for, which stays in front of the one a stop
     /// would otherwise bring forward. Empty when nobody asked.
@@ -161,23 +161,23 @@ public class Shell : Form
     ToolButton _stepIntoButton;
     ToolButton _stepOverButton;
     ToolButton _stepOutButton;
-    StatusBar _status;
-    MainMenu _bar;
+    StatusBar _statusBar;
+    MainMenu _menuBar;
 
     MenuItem _themeItem;
 
     /// The find window, made the first time it is asked for and kept after
     /// that -- so the last search and the Match case tick survive closing it.
     /// Null until then: a window nobody has asked for should not be built.
-    FindDialog? _finder;
+    FindDialog? _findDialog;
 
     /// The size every editor's text is, kept here rather than on an editor
     /// because it is a preference of the program's and not of one file's.
     int _textSize;
-    bool _dark;
+    bool _isDark;
 
     /// Where the compiler is. Found once at startup.
-    String _compiler;
+    String _compilerPath;
 
     /// What the last build reported, one entry per line of its output.
     List<BuildMessage> _messages;
@@ -193,7 +193,7 @@ public class Shell : Form
 
     /// What every node of the tree stands for on disk, so that a double-click
     /// knows what to open and the context menu knows what it was opened on.
-    List<TreeEntry> _treeItems;
+    List<TreeEntry> _treeEntries;
 
     /// What the Solution Explorer's context menu was opened on, held only for
     /// as long as the menu is up.
@@ -216,7 +216,7 @@ public class Shell : Form
     /// Whether a build is running. One at a time, and the menu says so rather
     /// than queueing: two compilers writing the same object directory is the
     /// failure that looks like a scatter of unrelated errors.
-    bool _building;
+    bool _isBuilding;
 
     /// The part of each of the compiler's streams that has arrived without the
     /// newline that would end it.
@@ -232,7 +232,7 @@ public class Shell : Form
     String _outputTail;
 
     /// The strip across the top: the commands, and what they build for.
-    CoolBar _strip;
+    CoolBar _coolBar;
 
     /// What draws the menus and the toolbar, which is deliberately **one**
     /// object shared by both: Office XP's hot menu item and its hot toolbar
@@ -258,7 +258,7 @@ public class Shell : Form
     /// safe for the reason it is useful -- the worker is blocked in `Read`,
     /// killing the child closes its pipes, and the read it was blocked in
     /// comes back empty and ends the loop.
-    Running? _child;
+    Running? _compilerProcess;
 
     /// Where each icon sits in the list `BuildIcons` makes, in the order it
     /// adds them. Named rather than counted at the call site: a toolbar whose
@@ -287,29 +287,29 @@ public class Shell : Form
         Text = "Stainless";
         SetBounds(0, 0, 1000, 700);
 
-        _open = new List<EditorTab>();
+        _openTabs = new List<EditorTab>();
         _messages = new List<BuildMessage>();
         _errorLines = new List<nuint>();
-        _treeItems = new List<TreeEntry>();
+        _treeEntries = new List<TreeEntry>();
         _menuTarget = null;
         _project = null;
         _projectPath = "";
-        _finder = null;
-        _building = false;
-        _child = null;
+        _findDialog = null;
+        _isBuilding = false;
+        _compilerProcess = null;
         _icons = null;
         _errorTail = "";
         _outputTail = "";
         _breakpoints = new BreakpointStore();
         _watches = new List<String>();
         _session = null;
-        _stopped = null;
-        _frame = 0u;
-        _firstStop = true;
+        _lastStop = null;
+        _selectedFrame = 0u;
+        _isFirstStop = true;
         _preferredPane = "";
-        _compiler = FindCompiler();
+        _compilerPath = FindCompiler();
         _textSize = 10;
-        _dark = false;
+        _isDark = false;
 
         // The window's own icon, which is separate from the one Explorer
         // draws: the shell finds that by picking the lowest-numbered icon in
@@ -318,17 +318,17 @@ public class Shell : Form
         // and there is nothing useful to do about that here.
         UseIconResource(ProgramIcon);
 
-        _status = new StatusBar(this);
-        _status.Dock = DockStyle.Bottom;
+        _statusBar = new StatusBar(this);
+        _statusBar.Dock = DockStyle.Bottom;
         // Four, and the third is why. The error count used to be written into
         // the same panel as the message, so "Built." appeared and was replaced
         // by "3 errors" on the same line in the same instant -- which read as
         // the build having said only the second thing.
-        _status.AddPanel(420);      // the path
-        _status.AddPanel(200);      // what just happened
-        _status.AddPanel(110);      // how many errors
-        _status.AddPanel(110);      // where the caret is
-        _status.AddPanel(0);        // what the pointer is over, while stopped
+        _statusBar.AddPanel(420);      // the path
+        _statusBar.AddPanel(200);      // what just happened
+        _statusBar.AddPanel(110);      // how many errors
+        _statusBar.AddPanel(110);      // where the caret is
+        _statusBar.AddPanel(0);        // what the pointer is over, while stopped
 
         // The commands, on a band shared with the configuration picker.
         //
@@ -342,10 +342,10 @@ public class Shell : Form
         // client area first; the host fills what is left.
         _chrome = new OfficeXpRenderer();
 
-        _strip = new CoolBar(this);
-        _strip.Dock = DockStyle.Top;
+        _coolBar = new CoolBar(this);
+        _coolBar.Dock = DockStyle.Top;
 
-        _configuration = new ComboBox(_strip);
+        _configuration = new ComboBox(_coolBar);
         _configuration.Height = 24;
         _configuration.Add("Debug");
         _configuration.Add("Release");
@@ -358,12 +358,12 @@ public class Shell : Form
         // stretched across half the window looks like a mistake. A toolbar
         // does not mind, because its buttons sit at the left and the rest of
         // the band is bar.
-        var chosen = new CoolBand(_strip);
+        var chosen = new CoolBand(_coolBar);
         chosen.Text = "Configuration";
         chosen.Control = _configuration;
         chosen.Width = 230;
 
-        _tools = new ToolBar(_strip);
+        _tools = new ToolBar(_coolBar);
         _tools.Height = 26;
         _tools.Renderer = _chrome;
 
@@ -385,7 +385,7 @@ public class Shell : Form
         // No caption: the buttons already say what they do, and a band reading
         // "Build" beside a button reading "Build" is twice the width for none
         // of the information.
-        var commands = new CoolBand(_strip);
+        var commands = new CoolBand(_coolBar);
         commands.Text = "";
         commands.Break = false;     // share the row with the picker
         commands.Control = _tools;
@@ -394,7 +394,7 @@ public class Shell : Form
         // The debug commands on a row of their own. Start Debugging and Run
         // are both a green triangle; separating the rows is what tells them
         // apart, and is how Visual Studio's own two bands read.
-        _debugTools = new ToolBar(_strip);
+        _debugTools = new ToolBar(_coolBar);
         _debugTools.Height = 26;
         _debugTools.Renderer = _chrome;
         if (_icons != null)
@@ -415,20 +415,20 @@ public class Shell : Form
         _stepOutButton = _debugTools.Add("Out", IconStepOut);
         _stepOutButton.Click += this.OnStepOut;
 
-        var debugging = new CoolBand(_strip);
+        var debugging = new CoolBand(_coolBar);
         debugging.Text = "Debug";
         debugging.Break = true;     // its own row
         debugging.Control = _debugTools;
         debugging.Width = 420;
 
-        _strip.Height = _strip.PreferredSize.Height;
-        ShowWhatIsRunning();
+        _coolBar.Height = _coolBar.PreferredSize.Height;
+        EnableBuildCommands();
 
         // The layout is read before anything is built, because where a pane
         // goes is decided as it is made -- a control's parent is fixed at
         // construction and `forms/` cannot move it afterwards.
-        _arrangement = ReadLayout(GetLayoutPath());
-        _dock = new DockHost(this, _arrangement);
+        _layout = ReadLayout(GetLayoutPath());
+        _dock = new DockHost(this, _layout);
         _dock.Dock = DockStyle.Fill;
 
         var solution = _dock.AddPane(Panes.Solution, "Solution Explorer", DockEdge.Left);
@@ -438,34 +438,34 @@ public class Shell : Form
         _tree.ContextMenu += this.OnTreeContextMenu;
 
         var errors = _dock.AddPane(Panes.Errors, "Error List", DockEdge.Bottom);
-        _errors = new ListView(errors);
-        _errors.Dock = DockStyle.Fill;
-        _errors.View = ListViewStyle.Details;
-        _errors.SetFullRowSelect(true, true);
+        _errorList = new ListView(errors);
+        _errorList.Dock = DockStyle.Fill;
+        _errorList.View = ListViewStyle.Details;
+        _errorList.SetFullRowSelect(true, true);
         // Widths that add up to less than the bottom well starts at, so that
         // every column is visible without scrolling on a first run. Description
         // is the one that gives, because it is also the one the platform lets
         // you widen by dragging when a message is long.
-        _errors.AddColumn("", 22);
-        _errors.AddColumn("Code", 70);
-        _errors.AddColumn("Description", 380);
-        _errors.AddColumn("File", 140);
-        _errors.AddColumn("Line", 50, HorizontalAlignment.Right);
-        _errors.DoubleClick += this.OnErrorChosen;
+        _errorList.AddColumn("", 22);
+        _errorList.AddColumn("Code", 70);
+        _errorList.AddColumn("Description", 380);
+        _errorList.AddColumn("File", 140);
+        _errorList.AddColumn("Line", 50, HorizontalAlignment.Right);
+        _errorList.DoubleClick += this.OnErrorChosen;
 
         var output = _dock.AddPane(Panes.Output, "Output", DockEdge.Bottom);
-        _output = new ListBox(output);
-        _output.Dock = DockStyle.Fill;
-        _output.DoubleClick += this.OnOutputChosen;
+        _outputList = new ListBox(output);
+        _outputList.Dock = DockStyle.Fill;
+        _outputList.DoubleClick += this.OnOutputChosen;
 
         var locals = _dock.AddPane(Panes.Locals, "Locals", DockEdge.Bottom);
-        _locals = new ListView(locals);
-        _locals.Dock = DockStyle.Fill;
-        _locals.View = ListViewStyle.Details;
-        _locals.SetFullRowSelect(true, true);
-        _locals.AddColumn("Name", 130);
-        _locals.AddColumn("Value", 260);
-        _locals.AddColumn("Type", 170);
+        _localsList = new ListView(locals);
+        _localsList.Dock = DockStyle.Fill;
+        _localsList.View = ListViewStyle.Details;
+        _localsList.SetFullRowSelect(true, true);
+        _localsList.AddColumn("Name", 130);
+        _localsList.AddColumn("Value", 260);
+        _localsList.AddColumn("Type", 170);
 
         var watches = _dock.AddPane(Panes.Watch, "Watch", DockEdge.Bottom);
         _watchList = new ListView(watches);
@@ -479,14 +479,14 @@ public class Shell : Form
         _watchList.DoubleClick += this.OnWatchChosen;
 
         var stack = _dock.AddPane(Panes.CallStack, "Call Stack", DockEdge.Bottom);
-        _stack = new ListView(stack);
-        _stack.Dock = DockStyle.Fill;
-        _stack.View = ListViewStyle.Details;
-        _stack.SetFullRowSelect(true, true);
-        _stack.AddColumn("", 22);
-        _stack.AddColumn("Function", 220);
-        _stack.AddColumn("Line", 320);
-        _stack.DoubleClick += this.OnFrameChosen;
+        _callStackList = new ListView(stack);
+        _callStackList.Dock = DockStyle.Fill;
+        _callStackList.View = ListViewStyle.Details;
+        _callStackList.SetFullRowSelect(true, true);
+        _callStackList.AddColumn("", 22);
+        _callStackList.AddColumn("Function", 220);
+        _callStackList.AddColumn("Line", 320);
+        _callStackList.DoubleClick += this.OnFrameChosen;
 
         var threads = _dock.AddPane(Panes.Threads, "Threads", DockEdge.Bottom);
         _threadList = new ListView(threads);
@@ -514,19 +514,19 @@ public class Shell : Form
         _debugOutput = new ListBox(trace);
         _debugOutput.Dock = DockStyle.Fill;
 
-        _book = new TabControl(_dock.Documents);
-        _book.Dock = DockStyle.Fill;
-        _book.SelectedIndexChanged += this.OnTabChanged;
+        _tabs = new TabControl(_dock.Documents);
+        _tabs.Dock = DockStyle.Fill;
+        _tabs.SelectedIndexChanged += this.OnTabChanged;
 
         // Once, after every pane exists, rather than after each -- see
         // `DockHost.ArrangeWells`.
         _dock.ArrangeWells();
 
-        BuildMenu();
-        NewFile();
+        BuildMenuBar();
+        OpenBlankTab();
         ShowProjectTree();
-        ShowWhatDebuggingAllows();
-        Say("Ready.");
+        EnableDebugCommands();
+        ShowStatus("Ready.");
     }
 
     // ------------------------------------------------------------- the tabs
@@ -536,10 +536,10 @@ public class Shell : Form
     {
         get
         {
-            int at = _book.SelectedIndex;
-            if (at < 0 || (nuint)at >= _open.Count)
+            int at = _tabs.SelectedIndex;
+            if (at < 0 || (nuint)at >= _openTabs.Count)
                 return null;
-            return _open[(nuint)at].Editor;
+            return _openTabs[(nuint)at].Editor;
         }
     }
 
@@ -558,7 +558,7 @@ public class Shell : Form
         }
     }
 
-    public nuint TabCount => _open.Count;
+    public nuint TabCount => _openTabs.Count;
 
     /// Brings the first tab to the front and gives it the keyboard.
     ///
@@ -567,21 +567,21 @@ public class Shell : Form
     /// `*.sl` means the first.
     public void ShowFirstTab()
     {
-        if (_open.IsEmpty)
+        if (_openTabs.IsEmpty)
             return;
-        _book.SelectedIndex = 0;
-        _open[0u].Editor.Focus();
+        _tabs.SelectedIndex = 0;
+        _openTabs[0u].Editor.Focus();
     }
 
     /// Makes a tab, puts an editor on it, and brings it to the front.
     EditorTab AddTab(Document document)
     {
-        var page = new TabPage(_book, "");
+        var page = new TabPage(_tabs, "");
         var editor = new CodeEditor(page);
         editor.Dock = DockStyle.Fill;
         editor.SetDocument(document);
         editor.FontSize = _textSize;
-        editor.Palette = _dark ? Theme.CreateDark() : Theme.CreateLight();
+        editor.Palette = _isDark ? Theme.CreateDark() : Theme.CreateLight();
         editor.CaretMoved += this.OnCaretMoved;
         editor.Edited += this.OnEdited;
         editor.KeyDown += this.OnEditorKey;
@@ -590,7 +590,7 @@ public class Shell : Form
         // one store answers for every tab and nothing is copied.
         editor.MarginClicked += this.OnMarginClicked;
         editor.Hovered += (word) => this.OnHovered(word);
-        editor.ShowMarginMarks((row) => MarkFor(editor, row));
+        editor.ShowMarginMarks((row) => GetMarkFor(editor, row));
 
         // A breakpoint is anchored to a line number, and typing above one
         // moves that line. Without this the glyph stays beside code that has
@@ -599,11 +599,11 @@ public class Shell : Form
             => ShiftBreakpoints(editor, first, delta);
 
         var tab = new EditorTab(page, editor);
-        _open.Add(tab);
+        _openTabs.Add(tab);
 
-        _book.SelectedIndex = page.Index;
-        Relabel(tab);
-        Retitle();
+        _tabs.SelectedIndex = page.Index;
+        UpdateTabCaption(tab);
+        UpdateTitle();
         return tab;
     }
 
@@ -613,11 +613,11 @@ public class Shell : Form
     /// relative path and an absolute one, or two capitalisations on Windows --
     /// would open it twice. Settling that needs a canonical form from the
     /// platform, which `Standard.Path` does not offer yet.
-    EditorTab? TabFor(String path)
+    EditorTab? FindTab(String path)
     {
         if (path.ByteLength() == 0u)
             return null;
-        foreach (var tab in _open)
+        foreach (var tab in _openTabs)
         {
             if (tab.Editor.Contents.Location == path)
                 return tab;
@@ -628,11 +628,11 @@ public class Shell : Form
     /// Opens a file, or brings its tab forward when it is already open.
     public bool OpenFile(String path)
     {
-        var already = TabFor(path);
+        var already = FindTab(path);
         if (already != null)
         {
-            _book.SelectedIndex = ((EditorTab)already).Page.Index;
-            Say(path + " is already open.");
+            _tabs.SelectedIndex = ((EditorTab)already).Page.Index;
+            ShowStatus(path + " is already open.");
             return true;
         }
 
@@ -643,8 +643,8 @@ public class Shell : Form
         // An untouched, unnamed, empty first tab is a placeholder rather than a
         // document, so opening a file replaces it instead of sitting beside it.
         var spare = Current;
-        bool replacing = _open.Count == 1u && spare != null && IsBlank((CodeEditor)spare);
-        var stale = replacing ? _open[0u] : null;
+        bool replacing = _openTabs.Count == 1u && spare != null && IsBlank((CodeEditor)spare);
+        var stale = replacing ? _openTabs[0u] : null;
 
         var tab = AddTab(document);
         if (stale != null)
@@ -656,7 +656,7 @@ public class Shell : Form
         // opened the project by hand.
         AdoptProjectFor(path);
 
-        Say("Opened " + path);
+        ShowStatus("Opened " + path);
         return true;
     }
 
@@ -668,7 +668,7 @@ public class Shell : Form
             && editor.Contents.GetLineLength(0u) == 0u;
     }
 
-    void NewFile()
+    void OpenBlankTab()
     {
         var tab = AddTab(new Document());
         tab.Editor.Focus();
@@ -677,44 +677,44 @@ public class Shell : Form
     /// Shuts a tab, and makes sure one is always left.
     void CloseTab(EditorTab tab)
     {
-        _book.RemovePage(tab.Page);
-        for (nuint i = 0u; i < _open.Count; i++)
+        _tabs.RemovePage(tab.Page);
+        for (nuint i = 0u; i < _openTabs.Count; i++)
         {
-            if (_open[i] == tab)
+            if (_openTabs[i] == tab)
             {
-                _open.RemoveAt(i);
+                _openTabs.RemoveAt(i);
                 break;
             }
         }
         // A window with no editor in it has nowhere to type, so closing the
         // last tab opens an empty one rather than leaving a hole.
-        if (_open.IsEmpty)
+        if (_openTabs.IsEmpty)
         {
-            NewFile();
+            OpenBlankTab();
             return;
         }
-        Retitle();
+        UpdateTitle();
         OnCaretMoved(this);
     }
 
     /// What a tab says: the file's name, and a mark when it has been changed.
-    void Relabel(EditorTab tab)
+    void UpdateTabCaption(EditorTab tab)
     {
         tab.Page.Caption = (tab.Editor.Contents.Edited ? "* " : "")
-                         + NameOf(tab.Editor.Contents.Location);
+                         + GetDisplayName(tab.Editor.Contents.Location);
     }
 
-    String NameOf(String path)
+    String GetDisplayName(String path)
     {
         if (path.ByteLength() == 0u)
             return "Untitled";
-        String name = path.AfterLast(Separator());
+        String name = path.AfterLast(PathSeparator);
         return name.ByteLength() == 0u ? path : name;
     }
 
     void OnTabChanged(Control sender)
     {
-        Retitle();
+        UpdateTitle();
         var now = Current;
         if (now != null)
         {
@@ -725,9 +725,9 @@ public class Shell : Form
 
     // ------------------------------------------------------------- the menu
 
-    void BuildMenu()
+    void BuildMenuBar()
     {
-        _bar = new MainMenu();
+        _menuBar = new MainMenu();
 
         // **Office XP, on Windows, and nothing on GTK.** A renderer asks the
         // platform to hand its items over and takes no for an answer: the GTK
@@ -735,9 +735,9 @@ public class Shell : Form
         // what somebody running that desktop wanted from them. There is no
         // `#if` here for the same reason there is none anywhere else in this
         // program -- the seam is what knows which platform it is on.
-        _bar.Renderer = _chrome;
+        _menuBar.Renderer = _chrome;
 
-        var file = _bar.Add("&File");
+        var file = _menuBar.Add("&File");
         file.Add("&New").Click += this.OnNew;
         file.Add("&Open...").Click += this.OnOpen;
         file.Add("Open &project...").Click += this.OnOpenProject;
@@ -750,7 +750,7 @@ public class Shell : Form
         file.Add(MenuItem.Separator());
         file.Add("E&xit").Click += this.OnExit;
 
-        var edit = _bar.Add("&Edit");
+        var edit = _menuBar.Add("&Edit");
         edit.Add("&Undo").Click += this.OnUndo;
         edit.Add("&Redo").Click += this.OnRedo;
         edit.Add(MenuItem.Separator());
@@ -763,7 +763,7 @@ public class Shell : Form
         edit.Add("&Find and replace...").Click += this.OnFind;
         edit.Add("Find &next").Click += this.OnFindNext;
 
-        var build = _bar.Add("&Build");
+        var build = _menuBar.Add("&Build");
         build.Add("&Build").Click += this.OnBuild;
         build.Add("Re&build").Click += this.OnRebuild;
         build.Add("&Run").Click += this.OnRun;
@@ -773,7 +773,7 @@ public class Shell : Form
         build.Add(MenuItem.Separator());
         build.Add("&Clear output").Click += this.OnClearOutput;
 
-        var debug = _bar.Add("&Debug");
+        var debug = _menuBar.Add("&Debug");
         debug.Add("&Start debugging\tF5").Click += this.OnStartDebugging;
         debug.Add("Start &without debugging\tCtrl+F5").Click += this.OnRun;
         debug.Add("&Restart\tCtrl+Shift+F5").Click += this.OnRestartDebugging;
@@ -792,7 +792,7 @@ public class Shell : Form
         debug.Add(MenuItem.Separator());
         debug.Add("Add &watch...").Click += this.OnAddWatch;
 
-        var view = _bar.Add("&View");
+        var view = _menuBar.Add("&View");
         // The panes first, which is where Visual Studio puts them and where
         // someone goes after closing one by accident -- a closed pane is hidden
         // rather than destroyed, so this brings back the same tree with the
@@ -820,15 +820,15 @@ public class Shell : Form
         size.Add(MenuItem.Separator());
         size.Add("&Reset").Click += this.OnResetSize;
 
-        Menu = _bar;
+        Menu = _menuBar;
     }
 
     // ------------------------------------------------------------- the file
 
     void OnNew(MenuItem sender)
     {
-        NewFile();
-        Say("A new file.");
+        OpenBlankTab();
+        ShowStatus("A new file.");
     }
 
     void OnOpen(MenuItem sender)
@@ -842,30 +842,30 @@ public class Shell : Form
         if (!chosen.Ok)
             return;
         if (!OpenFile(chosen.Value))
-            Say("Could not read " + chosen.Value);
+            ShowStatus("Could not read " + chosen.Value);
     }
 
     void OnSave(MenuItem sender)
     {
         var now = Current;
         if (now != null)
-            SaveTo((CodeEditor)now, ((CodeEditor)now).Contents.Location);
+            SaveEditorTo((CodeEditor)now, ((CodeEditor)now).Contents.Location);
     }
 
     void OnSaveAs(MenuItem sender)
     {
         var now = Current;
         if (now != null)
-            SaveTo((CodeEditor)now, "");
+            SaveEditorTo((CodeEditor)now, "");
     }
 
     void OnCloseTab(MenuItem sender)
     {
-        int at = _book.SelectedIndex;
-        if (at < 0 || (nuint)at >= _open.Count)
+        int at = _tabs.SelectedIndex;
+        if (at < 0 || (nuint)at >= _openTabs.Count)
             return;
-        var tab = _open[(nuint)at];
-        if (!MayClose(tab))
+        var tab = _openTabs[(nuint)at];
+        if (!ConfirmCloseTab(tab))
             return;
         CloseTab(tab);
     }
@@ -886,12 +886,12 @@ public class Shell : Form
     ///
     /// True for a tab with nothing to lose, so the caller never has to ask
     /// whether it was edited first.
-    bool MayClose(EditorTab tab)
+    bool ConfirmCloseTab(EditorTab tab)
     {
         if (!tab.Editor.Contents.Edited)
             return true;
 
-        String name = NameOf(tab.Editor.Contents.Location);
+        String name = GetDisplayName(tab.Editor.Contents.Location);
         if (name == "")
             name = "this file";
 
@@ -900,7 +900,7 @@ public class Shell : Form
             "Stainless", MessageButtons.YesNoCancel, MessageIcon.Question);
 
         if (answer == DialogResult.Yes)
-            return SaveTo(tab.Editor, tab.Editor.Contents.Location);
+            return SaveEditorTo(tab.Editor, tab.Editor.Contents.Location);
 
         // Anything that is not an explicit Yes or No keeps the tab. A dialog
         // that failed to open answers `None`, and treating that as "discard"
@@ -911,17 +911,17 @@ public class Shell : Form
     /// Every edited tab, asked about in turn. False as soon as one is
     /// cancelled, leaving the rest untouched -- which is what cancelling the
     /// whole operation means.
-    bool MayCloseAll()
+    bool ConfirmCloseAllTabs()
     {
         // Backwards, because saying No to a tab closes it and shortens the
         // list under the loop. Going forwards would skip the tab that slid
         // into the index just visited, which is the classic way to lose one.
-        for (nuint i = _open.Count; i > 0u; i--)
+        for (nuint i = _openTabs.Count; i > 0u; i--)
         {
             nuint at = i - 1u;
-            if (at >= _open.Count)
+            if (at >= _openTabs.Count)
                 continue;
-            if (!MayClose(_open[at]))
+            if (!ConfirmCloseTab(_openTabs[at]))
                 return false;
         }
         return true;
@@ -929,7 +929,7 @@ public class Shell : Form
 
     /// Saves an editor to `path`, or asks for one when it is empty. Answers
     /// whether it was written.
-    bool SaveTo(CodeEditor editor, String path)
+    bool SaveEditorTo(CodeEditor editor, String path)
     {
         String target = path;
         if (target.ByteLength() == 0u)
@@ -946,23 +946,23 @@ public class Shell : Form
 
         if (!editor.Contents.SaveFile(target))
         {
-            Say("Could not write " + target);
+            ShowStatus("Could not write " + target);
             return false;
         }
-        RelabelFor(editor);
-        Retitle();
-        Say("Saved " + target);
+        UpdateTabCaptionFor(editor);
+        UpdateTitle();
+        ShowStatus("Saved " + target);
         return true;
     }
 
     /// Updates the tab an editor is on, whichever one that is.
-    void RelabelFor(CodeEditor editor)
+    void UpdateTabCaptionFor(CodeEditor editor)
     {
-        foreach (var tab in _open)
+        foreach (var tab in _openTabs)
         {
             if (tab.Editor == editor)
             {
-                Relabel(tab);
+                UpdateTabCaption(tab);
                 return;
             }
         }
@@ -979,7 +979,7 @@ public class Shell : Form
         if (now == null)
             return;
         if (!((CodeEditor)now).Undo())
-            Say("Nothing to undo.");
+            ShowStatus("Nothing to undo.");
     }
 
     void OnRedo(MenuItem sender)
@@ -988,7 +988,7 @@ public class Shell : Form
         if (now == null)
             return;
         if (!((CodeEditor)now).Redo())
-            Say("Nothing to redo.");
+            ShowStatus("Nothing to redo.");
     }
 
     void OnCut(MenuItem sender)
@@ -1023,16 +1023,16 @@ public class Shell : Form
 
     void OnToggleTheme(MenuItem sender)
     {
-        _dark = !_themeItem.Checked;
-        _themeItem.Checked = _dark;
-        var palette = _dark ? Theme.CreateDark() : Theme.CreateLight();
-        foreach (var tab in _open)
+        _isDark = !_themeItem.Checked;
+        _themeItem.Checked = _isDark;
+        var palette = _isDark ? Theme.CreateDark() : Theme.CreateLight();
+        foreach (var tab in _openTabs)
             tab.Editor.Palette = palette;
     }
 
-    void OnLarger(MenuItem sender) => Resize(1);
-    void OnSmaller(MenuItem sender) => Resize(-1);
-    void OnResetSize(MenuItem sender) => Resize(DefaultTextSize - _textSize);
+    void OnLarger(MenuItem sender) => ResizeText(1);
+    void OnSmaller(MenuItem sender) => ResizeText(-1);
+    void OnResetSize(MenuItem sender) => ResizeText(DefaultTextSize - _textSize);
 
     /// Changes the text size in every tab at once.
     ///
@@ -1040,7 +1040,7 @@ public class Shell : Form
     /// person reads and not of which file they are looking at, so an editor
     /// that resized one tab would make switching tabs change the size of the
     /// text.
-    public void Resize(int by)
+    public void ResizeText(int by)
     {
         if (by == 0)
             return;
@@ -1053,9 +1053,9 @@ public class Shell : Form
         // ended up with is the answer the rest follow.
         ((CodeEditor)now).ResizeFont(by);
         _textSize = ((CodeEditor)now).FontSize;
-        foreach (var tab in _open)
+        foreach (var tab in _openTabs)
             tab.Editor.FontSize = _textSize;
-        Say("Text size " + Standard.Text.FromInteger(_textSize) + ".");
+        ShowStatus("Text size " + Standard.Text.FromInteger(_textSize) + ".");
     }
 
     // --------------------------------------------------------- the compiler
@@ -1064,10 +1064,10 @@ public class Shell : Form
     String FindCompiler()
     {
         String self = Env.Program();
-        long cut = self.LastIndexOf(Separator());
+        long cut = self.LastIndexOf(PathSeparator);
         if (cut > 0)
         {
-            String beside = self.Substring(0u, (nuint)cut) + Separator()
+            String beside = self.Substring(0u, (nuint)cut) + PathSeparator
                           + "stainless" + Extension;
             if (File.Exists(beside))
                 return beside;
@@ -1081,31 +1081,37 @@ public class Shell : Form
     /// captures by value in this language -- a visitor that set a flag would
     /// be setting its own copy of it, and the check would pass whatever it
     /// found.
-    nuint PlatformDrawn(MenuItem item)
+    nuint CountPlatformDrawnItems(MenuItem item)
     {
         nuint kept = item.IsOwnerDrawn ? 0u : 1u;
         foreach (var child in item.Items)
-            kept = kept + PlatformDrawn(child);
+            kept = kept + CountPlatformDrawnItems(child);
         return kept;
     }
 
     /// One line ending, as the compiler writes them on this platform.
-    String Newline()
+    String Newline
     {
-        #if WINDOWS
-        return "\r\n";
-        #else
-        return "\n";
-        #endif
+        get
+        {
+            #if WINDOWS
+            return "\r\n";
+            #else
+            return "\n";
+            #endif
+        }
     }
 
-    String Separator()
+    String PathSeparator
     {
-        #if WINDOWS
-        return "\\";
-        #else
-        return "/";
-        #endif
+        get
+        {
+            #if WINDOWS
+            return "\\";
+            #else
+            return "/";
+            #endif
+        }
     }
 
     String Extension
@@ -1120,10 +1126,10 @@ public class Shell : Form
         }
     }
 
-    void OnBuild(MenuItem sender) => Compile(false);
-    void OnBuild(Control sender) => Compile(false);
-    void OnRun(MenuItem sender) => Compile(true);
-    void OnRun(Control sender) => Compile(true);
+    void OnBuild(MenuItem sender) => BuildProgram(false);
+    void OnBuild(Control sender) => BuildProgram(false);
+    void OnRun(MenuItem sender) => BuildProgram(true);
+    void OnRun(Control sender) => BuildProgram(true);
 
     // ------------------------------------------------------------ the project
 
@@ -1146,15 +1152,15 @@ public class Shell : Form
     {
         if (_project == null)
         {
-            Say("No project is open.");
+            ShowStatus("No project is open.");
             return;
         }
 
         _project = null;
         _projectPath = "";
-        Retitle();
+        UpdateTitle();
         ShowProjectTree();
-        Say("Project closed. Building compiles the file in front.");
+        ShowStatus("Project closed. Building compiles the file in front.");
     }
 
     /// Reads a project and takes it as the one in front.
@@ -1168,18 +1174,18 @@ public class Shell : Form
         var read = Project.ReadProjectFile(path);
         if (!read.Ok)
         {
-            Show(read.Error);
-            Say("That project could not be read.");
+            ShowOutputLine(read.Error);
+            ShowStatus("That project could not be read.");
             return false;
         }
 
         _project = read.Value;
         _projectPath = path;
-        Retitle();
+        UpdateTitle();
         ShowProjectTree();
 
         var project = (ProjectFile)read.Value;
-        Say("Project " + project.Name + " " + project.Version + ".");
+        ShowStatus("Project " + project.Name + " " + project.Version + ".");
         return true;
     }
 
@@ -1205,16 +1211,19 @@ public class Shell : Form
 
         _project = read.Value;
         _projectPath = found;
-        Retitle();
+        UpdateTitle();
         ShowProjectTree();
     }
 
     /// What the compiler is being asked to do, for the status line.
-    String ProjectName()
+    String ProjectName
     {
-        if (_project == null)
-            return "";
-        return ((ProjectFile)_project).Name;
+        get
+        {
+            if (_project == null)
+                return "";
+            return ((ProjectFile)_project).Name;
+        }
     }
 
     void OnClearOutput(MenuItem sender)
@@ -1242,11 +1251,11 @@ public class Shell : Form
     /// child whose two streams can be read while it is still writing them,
     /// where `Run` answers only once it has exited. A build now says what it
     /// is doing while it does it.
-    void Compile(bool thenRun)
+    void BuildProgram(bool thenRun)
     {
-        if (_building)
+        if (_isBuilding)
         {
-            Say("A build is already running.");
+            ShowStatus("A build is already running.");
             return;
         }
 
@@ -1255,33 +1264,33 @@ public class Shell : Form
 
         ClearOutput();
 
-        var arguments = BuildArguments(thenRun);
-        Say(thenRun ? "Running..." : "Building...");
-        Start(arguments, thenRun ? "Ran." : "Built.");
+        var arguments = ComposeCompilerArguments(thenRun);
+        ShowStatus(thenRun ? "Running..." : "Building...");
+        StartCompiler(arguments, thenRun ? "Ran." : "Built.");
     }
 
-    void OnClean(MenuItem sender) => Clean();
-    void OnClean(Control sender) => Clean();
+    void OnClean(MenuItem sender) => CleanProject();
+    void OnClean(Control sender) => CleanProject();
 
-    void Clean()
+    void CleanProject()
     {
-        if (_building)
+        if (_isBuilding)
         {
-            Say("A build is already running.");
+            ShowStatus("A build is already running.");
             return;
         }
 
         if (_project == null)
         {
-            Say("Clean needs a project; there is nothing else to clean.");
+            ShowStatus("Clean needs a project; there is nothing else to clean.");
             return;
         }
 
         ClearOutput();
-        Say("Cleaning...");
+        ShowStatus("Cleaning...");
 
         if (CleanObjects())
-            Say("Cleaned.");
+            ShowStatus("Cleaned.");
     }
 
     /// Removes the object directory, and answers whether it may be built into
@@ -1305,16 +1314,17 @@ public class Shell : Form
 
         if (!IsInsideProject(project, rubbish))
         {
-            Show("refusing to clean '" + rubbish + "', which is outside the project");
-            Say("Clean refused.");
+            ShowOutputLine("refusing to clean '" + rubbish + "', which is outside the project");
+            ShowStatus("Clean refused.");
             return false;
         }
 
         if (!Directory.Exists(rubbish))
             return true;
 
-        nuint removed = RemoveTree(rubbish);
-        Show("removed " + Standard.Text.FromInteger((long)removed) + " files from " + rubbish);
+        nuint removed = DeleteDirectoryTree(rubbish);
+        ShowOutputLine("removed " + Standard.Text.FromInteger((long)removed)
+                       + " files from " + rubbish);
         return true;
     }
 
@@ -1323,15 +1333,15 @@ public class Shell : Form
     ///
     /// **Not `Clean` followed by `Build` from the menu**, which would clear the
     /// output pane twice and lose what the clean said.
-    void OnRebuild(MenuItem sender) => Rebuild();
+    void OnRebuild(MenuItem sender) => RebuildProgram();
 
-    void OnRebuild(Control sender) => Rebuild();
+    void OnRebuild(Control sender) => RebuildProgram();
 
-    void Rebuild()
+    void RebuildProgram()
     {
-        if (_building)
+        if (_isBuilding)
         {
-            Say("A build is already running.");
+            ShowStatus("A build is already running.");
             return;
         }
 
@@ -1343,8 +1353,8 @@ public class Shell : Form
         if (_project != null && !CleanObjects())
             return;
 
-        Say("Rebuilding...");
-        Start(BuildArguments(false), "Rebuilt.");
+        ShowStatus("Rebuilding...");
+        StartCompiler(ComposeCompilerArguments(false), "Rebuilt.");
     }
 
     /// Stops the build that is running. Nothing to say when none is.
@@ -1354,20 +1364,20 @@ public class Shell : Form
     /// halfway through writing an object file has nothing to tidy that a
     /// rebuild will not do better. What this leaves behind is a partial object
     /// directory, which is what Clean is for.
-    void OnStop(MenuItem sender) => Stop();
-    void OnStop(Control sender) => Stop();
+    void OnStop(MenuItem sender) => StopBuild();
+    void OnStop(Control sender) => StopBuild();
 
-    void Stop()
+    void StopBuild()
     {
-        var running = _child;
+        var running = _compilerProcess;
         if (running == null)
         {
-            Say("Nothing is building.");
+            ShowStatus("Nothing is building.");
             return;
         }
 
         ((Running)running).Kill();
-        Say("Stopping...");
+        ShowStatus("Stopping...");
     }
 
     /// Whether a path the project named is somewhere this may delete.
@@ -1390,7 +1400,7 @@ public class Shell : Form
 
     /// Deletes a directory and everything under it, answering how many files
     /// went. Deepest first, since a directory is only removable once empty.
-    nuint RemoveTree(String directory)
+    nuint DeleteDirectoryTree(String directory)
     {
         nuint removed = 0u;
 
@@ -1398,7 +1408,7 @@ public class Shell : Form
         if (inside.Ok)
         {
             foreach (var child in inside.Value)
-                removed = removed + RemoveTree(child);
+                removed = removed + DeleteDirectoryTree(child);
         }
 
         var files = Directory.Files(directory);
@@ -1442,20 +1452,20 @@ public class Shell : Form
         String path = editor.Contents.Location;
         if (path.ByteLength() == 0u)
         {
-            if (!SaveTo(editor, ""))
+            if (!SaveEditorTo(editor, ""))
                 return false;
         }
         else if (editor.Contents.Edited && !editor.Contents.SaveFile(path))
         {
-            Say("Could not write " + path);
+            ShowStatus("Could not write " + path);
             return false;
         }
-        RelabelFor(editor);
+        UpdateTabCaptionFor(editor);
 
         if (_project != null && !SaveEveryOtherTab(editor))
             return false;
 
-        Retitle();
+        UpdateTitle();
         return true;
     }
 
@@ -1464,7 +1474,7 @@ public class Shell : Form
     /// than no build.
     bool SaveEveryOtherTab(CodeEditor except)
     {
-        foreach (var tab in _open)
+        foreach (var tab in _openTabs)
         {
             var editor = tab.Editor;
             if (editor == except || !editor.Contents.Edited)
@@ -1476,24 +1486,27 @@ public class Shell : Form
 
             if (!editor.Contents.SaveFile(path))
             {
-                Say("Could not write " + path);
+                ShowStatus("Could not write " + path);
                 return false;
             }
-            Relabel(tab);
+            UpdateTabCaption(tab);
         }
         return true;
     }
 
-    /// What the compiler is asked, which is the project when there is one.
     /// Which configuration the picker is showing.
-    Configuration Chosen()
+    Configuration SelectedConfiguration
     {
-        if (_configuration.SelectedIndex == 1)
-            return Configuration.Release;
-        return Configuration.Debug;
+        get
+        {
+            if (_configuration.SelectedIndex == 1)
+                return Configuration.Release;
+            return Configuration.Debug;
+        }
     }
 
-    String[] BuildArguments(bool thenRun)
+    /// What the compiler is asked, which is the project when there is one.
+    String[] ComposeCompilerArguments(bool thenRun)
     {
         var arguments = new List<String>();
         arguments.Add(thenRun ? "run" : "build");
@@ -1515,7 +1528,7 @@ public class Shell : Form
         // `--no-debug` exists because of this line: `-g` could only ever turn
         // debug information on, so a Release build of a project whose `debug`
         // is true had no way to say what it meant.
-        if (Chosen() == Configuration.Release)
+        if (SelectedConfiguration == Configuration.Release)
         {
             arguments.Add("--no-debug");
             arguments.Add("-O2");
@@ -1551,7 +1564,7 @@ public class Shell : Form
 
     void OnConfigurationChanged(Control sender)
     {
-        Say(Chosen() == Configuration.Release
+        ShowStatus(SelectedConfiguration == Configuration.Release
             ? "Release: optimised, and nothing for a debugger."
             : "Debug: unoptimised, and described to a debugger.");
     }
@@ -1561,9 +1574,9 @@ public class Shell : Form
     /// Stop is the one that matters: a Stop that is always pressable is one
     /// that does nothing most of the time, and a toolbar is the place a person
     /// looks to find out whether anything is happening.
-    void ShowWhatIsRunning()
+    void EnableBuildCommands()
     {
-        _stopButton.Enabled = _building;
+        _stopButton.Enabled = _isBuilding;
     }
 
     /// Runs the compiler on a thread and reports back on the UI one, in
@@ -1579,18 +1592,18 @@ public class Shell : Form
     /// done, and the whole point here is that there are many. `Application.Post`
     /// is what it uses underneath, so this is the same mechanism with the loop
     /// opened up rather than a second way of doing it.
-    void Start(String[] arguments, String success)
+    void StartCompiler(String[] arguments, String success)
     {
-        _building = true;
-        ShowWhatIsRunning();
-        String compiler = _compiler;
+        _isBuilding = true;
+        EnableBuildCommands();
+        String compiler = _compilerPath;
 
         var worker = new Thread(() =>
         {
             var opened = Open(compiler, arguments);
             if (opened.Fail)
             {
-                Application.Post(() => Failed());
+                Application.Post(() => OnCompilerFailedToStart());
                 return;
             }
 
@@ -1598,7 +1611,7 @@ public class Shell : Form
 
             // Handed across rather than assigned, so that the field Cancel
             // reads is only ever written by the thread Cancel runs on.
-            Application.Post(() => Holding(child));
+            Application.Post(() => OnCompilerStarted(child));
 
             while (child.Read())
             {
@@ -1608,30 +1621,30 @@ public class Shell : Form
                 // that posts from inside itself safe.
                 String errors = child.TakeErrors();
                 String output = child.TakeOutput();
-                Application.Post(() => Arrived(errors, output));
+                Application.Post(() => OnCompilerOutput(errors, output));
             }
 
             int code = child.Wait().ValueOr(-1);
-            Application.Post(() => Ended(code, success));
+            Application.Post(() => OnCompilerExited(code, success));
         });
         worker.Detach();
     }
 
     /// The build's child, handed over by the worker that made it.
-    void Holding(Running child)
+    void OnCompilerStarted(Running child)
     {
-        _child = child;
-        ShowWhatIsRunning();
+        _compilerProcess = child;
+        EnableBuildCommands();
     }
 
     /// The compiler could not be started at all, back on the UI thread.
-    void Failed()
+    void OnCompilerFailedToStart()
     {
-        _building = false;
-        _child = null;
-        ShowWhatIsRunning();
-        Show("could not start '" + _compiler + "' -- is it on the path?");
-        Say("The compiler could not be started.");
+        _isBuilding = false;
+        _compilerProcess = null;
+        EnableBuildCommands();
+        ShowOutputLine("could not start '" + _compilerPath + "' -- is it on the path?");
+        ShowStatus("The compiler could not be started.");
     }
 
     /// A piece of each stream, on the UI thread.
@@ -1640,15 +1653,15 @@ public class Shell : Form
     /// own output to the other, so the two are read differently and shown in
     /// that order -- which is the order they were written in when the build
     /// fails, and near enough when it does not.
-    void Arrived(String errors, String output)
+    void OnCompilerOutput(String errors, String output)
     {
-        _errorTail = ShowComplete(_errorTail + errors, true);
-        _outputTail = ShowComplete(_outputTail + output, false);
+        _errorTail = ShowCompleteLines(_errorTail + errors, true);
+        _outputTail = ShowCompleteLines(_outputTail + output, false);
     }
 
     /// Shows every whole line in `text`, and answers the part after the last
     /// newline -- which is not a whole line yet, and waits for the rest.
-    String ShowComplete(String text, bool diagnostics)
+    String ShowCompleteLines(String text, bool diagnostics)
     {
         if (text.ByteLength() == 0u)
             return "";
@@ -1661,53 +1674,34 @@ public class Shell : Form
         foreach (var line in tidy.Substring(0u, (nuint)cut).Split("\n"))
         {
             if (diagnostics)
-                Show(line);
+                ShowOutputLine(line);
             else
-                ShowRaw(line);
+                ShowRawLine(line);
         }
         return tidy.Substring((nuint)cut + 1u);
     }
 
     /// The child has exited and every byte of it has been handed over.
-    void Ended(int code, String success)
+    void OnCompilerExited(int code, String success)
     {
-        _building = false;
-        _child = null;
-        ShowWhatIsRunning();
+        _isBuilding = false;
+        _compilerProcess = null;
+        EnableBuildCommands();
 
         // Whatever came without a newline after it is still a line, and this
         // is the last chance to say so: a compiler that does not end its
         // output with one would otherwise have its final diagnostic dropped.
         if (_errorTail.ByteLength() != 0u)
-            Show(_errorTail);
+            ShowOutputLine(_errorTail);
         if (_outputTail.ByteLength() != 0u)
-            ShowRaw(_outputTail);
+            ShowRawLine(_outputTail);
         _errorTail = "";
         _outputTail = "";
 
-        Say(code == 0
+        ShowStatus(code == 0
             ? success
             : "Failed, with " + Standard.Text.FromInteger(code) + ".");
-        _status.SetPanelText(2, CountErrors());
-    }
-
-    /// Every line of one of the compiler's two streams.
-    ///
-    /// `diagnostics` says which. The error stream carries the compiler's own
-    /// JSON and is read as such; the other carries whatever the program
-    /// printed and is nobody's to interpret -- a `run` whose program prints a
-    /// line beginning with a brace is printing a line beginning with a brace.
-    void ShowAll(String text, bool diagnostics)
-    {
-        if (text.ByteLength() == 0u)
-            return;
-        foreach (var line in text.Replace("\r\n", "\n").Split("\n"))
-        {
-            if (diagnostics)
-                Show(line);
-            else
-                ShowRaw(line);
-        }
+        _statusBar.SetPanelText(2, FormatErrorCount());
     }
 
     /// Adds one line of the compiler's output to the pane.
@@ -1721,10 +1715,10 @@ public class Shell : Form
     /// code, the message and the place, sortable by the platform, with the
     /// linker's own complaints and whatever a `run` printed left in Output
     /// where they belong.
-    void Show(String line)
+    void ShowOutputLine(String line)
     {
         var message = BuildMessage.Parse(line);
-        _output.Add(message.ToDisplayText());
+        _outputList.Add(message.ToDisplayText());
         _messages.Add(message);
 
         if (message.IsDiagnostic)
@@ -1738,8 +1732,8 @@ public class Shell : Form
     /// existed, and a fourth pane will be added after this one.
     void ClearOutput()
     {
-        _output.Clear();
-        _errors.Clear();
+        _outputList.Clear();
+        _errorList.Clear();
         _messages.Clear();
         _errorLines.Clear();
         _errorTail = "";
@@ -1750,23 +1744,23 @@ public class Shell : Form
     /// that double-clicking either list does the same thing.
     void AddError(BuildMessage message)
     {
-        int row = _errors.AddRow(message.IsError ? "!" : "?");
-        _errors.SetCell(row, 1, message.Code);
-        _errors.SetCell(row, 2, message.Message);
-        _errors.SetCell(row, 3, NameOf(message.File));
-        _errors.SetCell(row, 4, message.HasPlace
+        int row = _errorList.AddRow(message.IsError ? "!" : "?");
+        _errorList.SetCell(row, 1, message.Code);
+        _errorList.SetCell(row, 2, message.Message);
+        _errorList.SetCell(row, 3, GetDisplayName(message.File));
+        _errorList.SetCell(row, 4, message.HasPlace
                                 ? Standard.Text.FromInteger(message.Line) : "");
         _errorLines.Add(_messages.Count - 1u);
     }
 
     /// A line that is not the compiler's, shown as it came.
-    void ShowRaw(String line)
+    void ShowRawLine(String line)
     {
-        _output.Add(line);
+        _outputList.Add(line);
         _messages.Add(BuildMessage.CreateEmpty());
     }
 
-    String CountErrors()
+    String FormatErrorCount()
     {
         nuint errors = 0u;
         foreach (var message in _messages)
@@ -1784,9 +1778,9 @@ public class Shell : Form
     /// tabs made possible and what the single-editor version had to refuse.
     void OnOutputChosen(Control sender)
     {
-        if (_output.SelectedIndex < 0)
+        if (_outputList.SelectedIndex < 0)
             return;
-        GoToMessage((nuint)_output.SelectedIndex);
+        GoToMessage((nuint)_outputList.SelectedIndex);
     }
 
     /// Goes to what the diagnostic at `index` points at. Shared by Output and
@@ -1801,21 +1795,21 @@ public class Shell : Form
         if (!message.HasPlace)
             return;
 
-        var tab = TabFor(message.File);
+        var tab = FindTab(message.File);
         if (tab == null)
         {
             if (!OpenFile(message.File))
             {
-                Say("Could not open " + message.File);
+                ShowStatus("Could not open " + message.File);
                 return;
             }
-            tab = TabFor(message.File);
+            tab = FindTab(message.File);
             if (tab == null)
                 return;
         }
 
         var found = (EditorTab)tab;
-        _book.SelectedIndex = found.Page.Index;
+        _tabs.SelectedIndex = found.Page.Index;
         found.Editor.MoveCaretTo(message.Line - 1u,
                           message.Column > 0u ? message.Column - 1u : 0u);
         found.Editor.Focus();
@@ -1842,7 +1836,7 @@ public class Shell : Form
     {
         if (_project == null)
         {
-            Say("No project is open.");
+            ShowStatus("No project is open.");
             return;
         }
 
@@ -1853,7 +1847,7 @@ public class Shell : Form
 
         if (!dialog.WasAccepted)
         {
-            Say("Properties unchanged.");
+            ShowStatus("Properties unchanged.");
             return;
         }
 
@@ -1866,23 +1860,23 @@ public class Shell : Form
         // its cause, and this stands between the next one and somebody's file.
         if (project.Name == "" || project.Sources.Length == 0u)
         {
-            Show("refusing to write a project with no name or no sources");
-            Say("Properties not saved.");
+            ShowOutputLine("refusing to write a project with no name or no sources");
+            ShowStatus("Properties not saved.");
             return;
         }
 
         var written = Project.WriteProjectFile(project, _projectPath);
         if (!written.Ok)
         {
-            Show(written.Error);
-            Say("Could not write " + _projectPath);
+            ShowOutputLine(written.Error);
+            ShowStatus("Could not write " + _projectPath);
             return;
         }
 
         if (!OpenProject(_projectPath))
             return;
 
-        Say("Project saved.");
+        ShowStatus("Project saved.");
     }
 
     // ------------------------------------------------------ find and replace
@@ -1896,7 +1890,7 @@ public class Shell : Form
     /// promise otherwise.
     void OnFind(MenuItem sender)
     {
-        var dialog = Finder();
+        var dialog = GetFindDialog();
 
         var now = Current;
         if (now != null)
@@ -1907,7 +1901,7 @@ public class Shell : Form
                 dialog.Needle = chosen;
         }
 
-        dialog.Present();
+        dialog.ShowForSearch();
     }
 
     /// Find Next without opening the window, which is what the menu item next
@@ -1919,7 +1913,7 @@ public class Shell : Form
         if (now == null)
             return;
 
-        var dialog = Finder();
+        var dialog = GetFindDialog();
         if (dialog.Needle == "")
         {
             OnFind(sender);
@@ -1927,15 +1921,15 @@ public class Shell : Form
         }
 
         if (!((CodeEditor)now).FindNext(dialog.Needle, false, true))
-            Say("No more matches for '" + dialog.Needle + "'.");
+            ShowStatus("No more matches for '" + dialog.Needle + "'.");
         else
-            Say("");
+            ShowStatus("");
     }
 
     /// The find window, made on the first ask.
-    FindDialog Finder()
+    FindDialog GetFindDialog()
     {
-        var made = _finder;
+        var made = _findDialog;
         if (made != null)
             return (FindDialog)made;
 
@@ -1943,7 +1937,7 @@ public class Shell : Form
         // one is in front at the moment a button is pressed, so changing tabs
         // with the window open searches the tab now being looked at.
         var dialog = new FindDialog(() => this.Current);
-        _finder = dialog;
+        _findDialog = dialog;
         return dialog;
     }
 
@@ -1967,7 +1961,7 @@ public class Shell : Form
     {
         if (!_dock.ShowPane(name))
         {
-            Say("There is no pane called '" + name + "'.");
+            ShowStatus("There is no pane called '" + name + "'.");
             return false;
         }
         _preferredPane = name;
@@ -1981,7 +1975,7 @@ public class Shell : Form
     void ShowPane(String name, String title)
     {
         if (_dock.ShowPane(name))
-            Say(title + ".");
+            ShowStatus(title + ".");
     }
 
     /// Puts every pane back where a first run would have had it.
@@ -1993,11 +1987,11 @@ public class Shell : Form
     /// item that silently does three quarters of what it says.
     void OnResetLayout(MenuItem sender)
     {
-        _arrangement = DockLayout.CreateDefault();
-        if (SaveLayout(_arrangement, GetLayoutPath()))
-            Say("Layout reset. It takes effect next time this starts.");
+        _layout = DockLayout.CreateDefault();
+        if (SaveLayout(_layout, GetLayoutPath()))
+            ShowStatus("Layout reset. It takes effect next time this starts.");
         else
-            Say("Could not write " + GetLayoutPath() + ".");
+            ShowStatus("Could not write " + GetLayoutPath() + ".");
     }
 
     /// Saves where everything is, on the way out.
@@ -2020,14 +2014,14 @@ public class Shell : Form
         // all if the answer is no: a session that was not closed should not
         // leave a saved arrangement behind, because the next thing the person
         // does may be to move a pane and close properly.
-        if (!MayCloseAll())
+        if (!ConfirmCloseAllTabs())
         {
             args.Cancel = true;
             return;
         }
 
         _dock.RememberWellSizes();
-        SaveLayout(_arrangement, GetLayoutPath());
+        SaveLayout(_layout, GetLayoutPath());
     }
 
     // ------------------------------------------------------ the project tree
@@ -2048,7 +2042,7 @@ public class Shell : Form
     void ShowProjectTree()
     {
         _tree.Clear();
-        _treeItems.Clear();
+        _treeEntries.Clear();
 
         if (_project == null)
         {
@@ -2067,12 +2061,12 @@ public class Shell : Form
 
             if (Directory.Exists(resolved))
             {
-                Remember(branch, resolved, true);
+                AddTreeEntry(branch, resolved, true);
                 AddFiles(branch, resolved);
             }
             else if (File.Exists(resolved))
             {
-                Remember(branch, resolved, false);
+                AddTreeEntry(branch, resolved, false);
             }
             branch.Expand();
         }
@@ -2104,8 +2098,8 @@ public class Shell : Form
         {
             foreach (var inner in folders.Value)
             {
-                var below = branch.Add(NameOf(inner));
-                Remember(below, inner, true);
+                var below = branch.Add(GetDisplayName(inner));
+                AddTreeEntry(below, inner, true);
                 AddFiles(below, inner);
             }
         }
@@ -2117,7 +2111,7 @@ public class Shell : Form
         foreach (var file in files.Value)
         {
             if (file.EndsWith(".sl"))
-                Remember(branch.Add(NameOf(file)), file, false);
+                AddTreeEntry(branch.Add(GetDisplayName(file)), file, false);
         }
     }
 
@@ -2126,16 +2120,16 @@ public class Shell : Form
     /// A list searched rather than a map, for the reason `TreeView.Lookup`
     /// gives: a tree small enough to be usable is a tree small enough to walk,
     /// and a handful of files is a search that is over in microseconds.
-    void Remember(TreeNode node, String path, bool folder)
+    void AddTreeEntry(TreeNode node, String path, bool folder)
     {
-        _treeItems.Add(new TreeEntry(node, path, folder));
+        _treeEntries.Add(new TreeEntry(node, path, folder));
     }
 
     /// What a node stands for, or null for one that stands for nothing -- the
     /// project root, the References branch and everything under it.
-    TreeEntry? EntryFor(TreeNode node)
+    TreeEntry? FindTreeEntry(TreeNode node)
     {
-        foreach (var entry in _treeItems)
+        foreach (var entry in _treeEntries)
         {
             if (entry.Node == node)
                 return entry;
@@ -2150,11 +2144,11 @@ public class Shell : Form
         if (chosen == null)
             return;
 
-        var entry = EntryFor((TreeNode)chosen);
+        var entry = FindTreeEntry((TreeNode)chosen);
         if (entry == null || ((TreeEntry)entry).IsFolder)
             return;
 
-        OpenEntry((TreeEntry)entry);
+        OpenTreeEntry((TreeEntry)entry);
     }
 
     /// Opens what a node stands for.
@@ -2164,10 +2158,10 @@ public class Shell : Form
     /// method that shares a name with one of those -- it resolves to the free
     /// function inside a lambda body and to the method everywhere else, which
     /// is a bug that shows up in exactly one place and looks like nothing.
-    void OpenEntry(TreeEntry entry)
+    void OpenTreeEntry(TreeEntry entry)
     {
         if (!OpenFile(entry.FullPath))
-            Say("Could not read " + entry.FullPath);
+            ShowStatus("Could not read " + entry.FullPath);
     }
 
     // ------------------------------------------ the Solution Explorer's menu
@@ -2201,7 +2195,7 @@ public class Shell : Form
         if (hit != null)
         {
             _tree.SelectedNode = hit;
-            target = EntryFor((TreeNode)hit);
+            target = FindTreeEntry((TreeNode)hit);
         }
 
         ShowTreeMenu(target, where);
@@ -2226,7 +2220,7 @@ public class Shell : Form
         _menuTarget = target;
 
         bool isFile = target != null && !((TreeEntry)target).IsFolder;
-        String folder = FolderFor(target);
+        String folder = GetFolderFor(target);
 
         var menu = new PopupMenu();
 
@@ -2250,7 +2244,7 @@ public class Shell : Form
 
         menu.Add(MenuItem.Separator());
 
-        var shown = menu.Add(RevealVerb());
+        var shown = menu.Add(RevealVerb);
         shown.Enabled = target != null;
         shown.Click += this.OnTreeReveal;
 
@@ -2267,7 +2261,7 @@ public class Shell : Form
     /// The directory a new file would go in: the one that was clicked, or the
     /// one holding the file that was. Empty when neither, which is what
     /// disables the item rather than offering somewhere arbitrary.
-    String FolderFor(TreeEntry? target)
+    String GetFolderFor(TreeEntry? target)
     {
         if (target == null)
             return "";
@@ -2282,37 +2276,40 @@ public class Shell : Form
     ///
     /// The file manager's own name on each platform rather than one generic
     /// phrase, because people look for the word they already know.
-    String RevealVerb()
+    String RevealVerb
     {
-        #if WINDOWS
-        return "Reveal in &Explorer";
-        #else
-        return "Open containing &folder";
-        #endif
+        get
+        {
+            #if WINDOWS
+            return "Reveal in &Explorer";
+            #else
+            return "Open containing &folder";
+            #endif
+        }
     }
 
     void OnTreeOpen(MenuItem sender)
     {
         var target = _menuTarget;
         if (target != null && !((TreeEntry)target).IsFolder)
-            OpenEntry((TreeEntry)target);
+            OpenTreeEntry((TreeEntry)target);
     }
 
     void OnTreeRefresh(MenuItem sender)
     {
         ShowProjectTree();
-        Say("Solution Explorer refreshed.");
+        ShowStatus("Solution Explorer refreshed.");
     }
 
     void OnTreeAddFile(MenuItem sender)
     {
-        String folder = FolderFor(_menuTarget);
+        String folder = GetFolderFor(_menuTarget);
         if (folder.ByteLength() == 0u)
             return;
 
         var asked = InputDialog.Ask("Add file", "Name of the new file:", "");
         if (asked is Some given)
-            AddFileNamed(folder, given.Value);
+            CreateSourceFile(folder, given.Value);
     }
 
     /// Makes the file, seeds it, and opens it.
@@ -2320,7 +2317,7 @@ public class Shell : Form
     /// **The extension is added when it is missing**, because `.sl` is the only
     /// thing the compiler reads out of a source directory and a file without it
     /// would sit there being ignored.
-    void AddFileNamed(String folder, String typed)
+    void CreateSourceFile(String folder, String typed)
     {
         String name = typed.Trim();
         if (name.ByteLength() == 0u)
@@ -2336,7 +2333,7 @@ public class Shell : Form
         }
 
         String seed = "";
-        String named = ModuleOf(folder);
+        String named = ReadFolderModule(folder);
         if (named.ByteLength() != 0u)
             seed = "module " + named + ";\n\n";
 
@@ -2348,7 +2345,7 @@ public class Shell : Form
 
         ShowProjectTree();
         OpenFile(path);
-        Say("Added " + path);
+        ShowStatus("Added " + path);
     }
 
     /// The module the `.sl` files in a directory declare, or `""` when they
@@ -2365,7 +2362,7 @@ public class Shell : Form
     /// right answer, and seeding with either would be a guess wearing the
     /// clothes of a fact -- so it seeds with nothing, and the empty file says
     /// so plainly.
-    String ModuleOf(String folder)
+    String ReadFolderModule(String folder)
     {
         var files = Directory.Files(folder);
         if (!files.Ok)
@@ -2377,7 +2374,7 @@ public class Shell : Form
             if (!file.EndsWith(".sl"))
                 continue;
 
-            String named = ModuleIn(file);
+            String named = ReadFileModule(file);
             if (named.ByteLength() == 0u)
                 continue;
             if (found.ByteLength() == 0u)
@@ -2396,7 +2393,7 @@ public class Shell : Form
     /// The first line beginning with `module` wins, which is what the language
     /// requires anyway: a file has one module declaration, and it comes before
     /// everything but the licence comment.
-    String ModuleIn(String path)
+    String ReadFileModule(String path)
     {
         var lines = File.ReadAllLines(path);
         if (!lines.Ok)
@@ -2422,15 +2419,15 @@ public class Shell : Form
         if (entry.IsFolder)
             return;
 
-        var asked = InputDialog.Ask("Rename", "New name:", NameOf(entry.FullPath));
+        var asked = InputDialog.Ask("Rename", "New name:", GetDisplayName(entry.FullPath));
         if (asked is Some given)
-            RenameTo(entry, given.Value);
+            RenameTreeEntry(entry, given.Value);
     }
 
-    void RenameTo(TreeEntry entry, String typed)
+    void RenameTreeEntry(TreeEntry entry, String typed)
     {
         String name = typed.Trim();
-        if (name.ByteLength() == 0u || name == NameOf(entry.FullPath))
+        if (name.ByteLength() == 0u || name == GetDisplayName(entry.FullPath))
             return;
 
         String path = Path.Join(Path.DirectoryName(entry.FullPath), name);
@@ -2449,17 +2446,17 @@ public class Shell : Form
         // **A tab showing the file has to be told**, or it keeps the old path
         // and the next save writes the file back into existence under the name
         // it was just moved off.
-        var open = TabFor(entry.FullPath);
+        var open = FindTab(entry.FullPath);
         if (open != null)
         {
             var tab = (EditorTab)open;
             tab.Editor.Contents.Location = path;
-            Relabel(tab);
-            Retitle();
+            UpdateTabCaption(tab);
+            UpdateTitle();
         }
 
         ShowProjectTree();
-        Say("Renamed to " + name);
+        ShowStatus("Renamed to " + name);
     }
 
     void OnTreeDelete(MenuItem sender)
@@ -2472,7 +2469,7 @@ public class Shell : Form
         if (entry.IsFolder)
             return;
 
-        if (!Application.Ask("Delete " + NameOf(entry.FullPath) + "?\n\n"
+        if (!Application.Ask("Delete " + GetDisplayName(entry.FullPath) + "?\n\n"
                              + entry.FullPath + "\n\nThis cannot be undone.",
                              "Delete file"))
             return;
@@ -2486,19 +2483,19 @@ public class Shell : Form
 
         // A tab showing a file that is no longer there is a tab that would
         // write it back on the next save, so it goes with the file.
-        var open = TabFor(entry.FullPath);
+        var open = FindTab(entry.FullPath);
         if (open != null)
             CloseTab((EditorTab)open);
 
         ShowProjectTree();
-        Say("Deleted " + entry.FullPath);
+        ShowStatus("Deleted " + entry.FullPath);
     }
 
     void OnTreeReveal(MenuItem sender)
     {
         var target = _menuTarget;
         if (target != null)
-            Reveal((TreeEntry)target);
+            ShowInFileManager((TreeEntry)target);
     }
 
     /// Shows a file on disk, in whatever the platform's file manager is.
@@ -2508,7 +2505,7 @@ public class Shell : Form
     /// moment to come up would take this window with it. Nothing is done with
     /// the answer -- there is nothing useful to say about a file manager that
     /// declined to open, and the file is still right there in the tree.
-    void Reveal(TreeEntry entry)
+    void ShowInFileManager(TreeEntry entry)
     {
         #if WINDOWS
         // `/select,<path>` is **one** argument, comma and all: Explorer parses
@@ -2525,14 +2522,14 @@ public class Shell : Form
         #endif
 
         Background.Run(() => Process.Run(program, arguments), finished => { });
-        Say("Showing " + entry.FullPath);
+        ShowStatus("Showing " + entry.FullPath);
     }
 
     /// A row of the Error List was double-clicked, which goes to exactly where
     /// the same diagnostic in Output goes -- one path through one model.
     void OnErrorChosen(Control sender)
     {
-        int row = _errors.SelectedIndex;
+        int row = _errorList.SelectedIndex;
         if (row < 0 || (nuint)row >= _errorLines.Count)
             return;
 
@@ -2554,7 +2551,7 @@ public class Shell : Form
             case Key.F5:
             {
                 if (args.Control)
-                    Compile(true);
+                    BuildProgram(true);
                 else if (args.Shift)
                     StopDebugging();
                 else
@@ -2567,11 +2564,11 @@ public class Shell : Form
                 break;
 
             case Key.F10:
-                Step(DebugCommand.StepOver);
+                StepDebuggee(DebugCommand.StepOver);
                 break;
 
             case Key.F11:
-                Step(args.Shift ? DebugCommand.StepOut : DebugCommand.StepIn);
+                StepDebuggee(args.Shift ? DebugCommand.StepOut : DebugCommand.StepIn);
                 break;
 
             default:
@@ -2586,7 +2583,7 @@ public class Shell : Form
     /// For `--break`, which exists so that a stopped session can be
     /// photographed. It does what a person would do with F9 and F5, and adds
     /// nothing the menu cannot reach.
-    public bool DebugFrom(String where, String condition)
+    public bool StartDebuggingAt(String where, String condition)
     {
         nuint colon = 0u;
         bool split = false;
@@ -2601,7 +2598,7 @@ public class Shell : Form
         }
         if (!split)
         {
-            Say("--break wants file:line.");
+            ShowStatus("--break wants file:line.");
             return false;
         }
 
@@ -2611,14 +2608,14 @@ public class Shell : Form
         uint line = number.Ok && number.Value > 0 ? (uint)number.Value : 0u;
         if (line == 0u)
         {
-            Say("--break wants a line number.");
+            ShowStatus("--break wants a line number.");
             return false;
         }
 
-        if (TabFor(file) == null && TabMatching(file) == null)
+        if (FindTab(file) == null && FindTabMatching(file) == null)
             OpenFile(file);
 
-        var tab = TabMatching(file);
+        var tab = FindTabMatching(file);
         String path = tab == null ? file
                                   : ((EditorTab)tab).Editor.Contents.Location;
         var made = _breakpoints.ToggleBreakpoint(path, line);
@@ -2642,20 +2639,20 @@ public class Shell : Form
         String path = editor.Contents.Location;
         if (path.ByteLength() == 0u)
         {
-            Say("Save the file before setting a breakpoint in it.");
+            ShowStatus("Save the file before setting a breakpoint in it.");
             return;
         }
 
         uint line = (uint)(editor.CaretPosition.Row + 1u);
         var made = _breakpoints.ToggleBreakpoint(path, line);
-        Say(made == null
+        ShowStatus(made == null
             ? "Breakpoint removed from line "
               + Standard.Text.FromInteger((long)line) + "."
             : "Breakpoint set on line "
               + Standard.Text.FromInteger((long)line) + ".");
 
         if (_session != null)
-            Say("It takes effect when debugging is restarted.");
+            ShowStatus("It takes effect when debugging is restarted.");
 
         ShowBreakpointList();
         editor.Invalidate();
@@ -2669,7 +2666,7 @@ public class Shell : Form
             String path = editor.Contents.Location;
             if (path.ByteLength() == 0u)
             {
-                Say("Save the file before setting a breakpoint in it.");
+                ShowStatus("Save the file before setting a breakpoint in it.");
                 return;
             }
 
@@ -2700,7 +2697,7 @@ public class Shell : Form
     }
 
     /// What the margin draws beside one line of one editor.
-    LineMark MarkFor(CodeEditor editor, nuint row)
+    LineMark GetMarkFor(CodeEditor editor, nuint row)
     {
         String path = editor.Contents.Location;
         if (path.ByteLength() == 0u || _breakpoints.IsEmpty)
@@ -2726,13 +2723,13 @@ public class Shell : Form
     {
         if (_breakpoints.IsEmpty)
         {
-            Say("There are no breakpoints.");
+            ShowStatus("There are no breakpoints.");
             return;
         }
         _breakpoints.Clear();
         ShowBreakpointList();
         RepaintEditors();
-        Say("Breakpoints deleted.");
+        ShowStatus("Breakpoints deleted.");
     }
 
     /// Goes to the breakpoint that was double-clicked.
@@ -2742,7 +2739,7 @@ public class Shell : Form
         if (row < 0 || (nuint)row >= _breakpoints.Count)
             return;
         var one = _breakpoints.All[(nuint)row];
-        GoTo(one.File, one.ShownLine);
+        ShowStatementAt(one.File, one.ShownLine);
     }
 
     void OnBreakpointContextMenu(Control sender, ContextMenuEventArgs args)
@@ -2784,7 +2781,7 @@ public class Shell : Form
         int row = _breakList.SelectedIndex;
         if (row < 0 || (nuint)row >= _breakpoints.Count)
         {
-            Say("Select a breakpoint first.");
+            ShowStatus("Select a breakpoint first.");
             return;
         }
 
@@ -2815,19 +2812,19 @@ public class Shell : Form
 
             one.Condition = wanted;
             ShowBreakpointList();
-            Say(wanted.ByteLength() == 0u
+            ShowStatus(wanted.ByteLength() == 0u
                 ? "The breakpoint will stop every time."
                 : "The breakpoint will stop when " + wanted + ".");
-            SayConditionTakesEffect();
+            ReportConditionTakesEffect();
         }
     }
 
     /// A condition is read where a breakpoint is planted, which is when a
     /// session starts.
-    void SayConditionTakesEffect()
+    void ReportConditionTakesEffect()
     {
         if (_session != null)
-            ShowTrace("Breakpoint conditions take effect next time you start.");
+            AppendDebugOutput("Breakpoint conditions take effect next time you start.");
     }
 
     void OnToggleBreakpointEnabled(MenuItem sender)
@@ -2862,11 +2859,11 @@ public class Shell : Form
             var one = _breakpoints.All[i];
             int row = _breakList.AddRow(one.Enabled ? "*" : "o");
             _breakList.SetCell(row, 1, one.ToDisplayText());
-            _breakList.SetCell(row, 2, StateOf(one));
+            _breakList.SetCell(row, 2, FormatBreakpointState(one));
         }
     }
 
-    String StateOf(SourceBreakpoint one)
+    String FormatBreakpointState(SourceBreakpoint one)
     {
         if (!one.Enabled)
             return "disabled";
@@ -2886,25 +2883,25 @@ public class Shell : Form
         var running = _session;
         if (running != null && ((DebugSession)running).IsStopped)
         {
-            Resume();
+            ContinueDebugging();
             return;
         }
         if (running != null)
         {
-            Say("It is already running. Break to stop it.");
+            ShowStatus("It is already running. Break to stop it.");
             return;
         }
         StartDebugging();
     }
 
-    void OnContinue(MenuItem sender) => Resume();
+    void OnContinue(MenuItem sender) => ContinueDebugging();
 
-    void Resume()
+    void ContinueDebugging()
     {
         var running = _session;
         if (running == null || !((DebugSession)running).IsStopped)
         {
-            Say("Nothing is stopped.");
+            ShowStatus("Nothing is stopped.");
             return;
         }
         ClearStopMarks();
@@ -2912,19 +2909,19 @@ public class Shell : Form
         ShowRunning("Running...");
     }
 
-    void OnStepInto(MenuItem sender) => Step(DebugCommand.StepIn);
-    void OnStepInto(Control sender) => Step(DebugCommand.StepIn);
-    void OnStepOver(MenuItem sender) => Step(DebugCommand.StepOver);
-    void OnStepOver(Control sender) => Step(DebugCommand.StepOver);
-    void OnStepOut(MenuItem sender) => Step(DebugCommand.StepOut);
-    void OnStepOut(Control sender) => Step(DebugCommand.StepOut);
+    void OnStepInto(MenuItem sender) => StepDebuggee(DebugCommand.StepIn);
+    void OnStepInto(Control sender) => StepDebuggee(DebugCommand.StepIn);
+    void OnStepOver(MenuItem sender) => StepDebuggee(DebugCommand.StepOver);
+    void OnStepOver(Control sender) => StepDebuggee(DebugCommand.StepOver);
+    void OnStepOut(MenuItem sender) => StepDebuggee(DebugCommand.StepOut);
+    void OnStepOut(Control sender) => StepDebuggee(DebugCommand.StepOut);
 
-    void Step(DebugCommand how)
+    void StepDebuggee(DebugCommand how)
     {
         var running = _session;
         if (running == null || !((DebugSession)running).IsStopped)
         {
-            Say("Nothing is stopped.");
+            ShowStatus("Nothing is stopped.");
             return;
         }
 
@@ -2948,13 +2945,13 @@ public class Shell : Form
         var running = _session;
         if (running == null || ((DebugSession)running).State != RunState.Running)
         {
-            Say("Nothing is running.");
+            ShowStatus("Nothing is running.");
             return;
         }
         if (((DebugSession)running).RequestBreak())
-            Say("Breaking...");
+            ShowStatus("Breaking...");
         else
-            Say("It could not be interrupted.");
+            ShowStatus("It could not be interrupted.");
     }
 
     void OnStopDebugging(MenuItem sender) => StopDebugging();
@@ -2965,11 +2962,11 @@ public class Shell : Form
         var running = _session;
         if (running == null)
         {
-            Say("Nothing is being debugged.");
+            ShowStatus("Nothing is being debugged.");
             return;
         }
         ((DebugSession)running).Stop();
-        Say("Stopping...");
+        ShowStatus("Stopping...");
     }
 
     /// Stops what is running and starts it again with the same breakpoints.
@@ -2988,7 +2985,7 @@ public class Shell : Form
             // one that paints. `Stop` is asynchronous, so the restart is the
             // next thing the person does.
             ((DebugSession)running).Stop();
-            Say("Stopping. Press F5 to start again.");
+            ShowStatus("Stopping. Press F5 to start again.");
             return;
         }
         StartDebugging();
@@ -2997,50 +2994,50 @@ public class Shell : Form
     /// Launches the built program under the debugger.
     bool StartDebugging()
     {
-        if (_building)
+        if (_isBuilding)
         {
-            Say("A build is running.");
+            ShowStatus("A build is running.");
             return false;
         }
 
-        String program = DebuggeePath();
+        String program = DebuggeePath;
         if (program.ByteLength() == 0u)
         {
-            Say("Open a project to debug. A loose file has no output path.");
+            ShowStatus("Open a project to debug. A loose file has no output path.");
             return false;
         }
 
         if (!Standard.File.Exists(program))
         {
-            Say("Build it first: " + program + " is not there.");
+            ShowStatus("Build it first: " + program + " is not there.");
             return false;
         }
 
-        if (Chosen() == Configuration.Release)
-            ShowTrace("note: Release is optimised and has no debug information."
+        if (SelectedConfiguration == Configuration.Release)
+            AppendDebugOutput("note: Release is optimised and has no debug information."
                       + " Switch to Debug and rebuild to step through it.");
 
         _breakpoints.ClearBindings();
-        _stopped = null;
-        _frame = 0u;
-        _firstStop = true;
+        _lastStop = null;
+        _selectedFrame = 0u;
+        _isFirstStop = true;
         _debugOutput.Clear();
         ClearDebugPanes();
 
         var session = new DebugSession((taken) => this.OnProgramStopped(taken),
-                                       (line) => ShowTrace(line),
+                                       (line) => AppendDebugOutput(line),
                                        (file, line, bound)
-                                           => BoundBreakpoint(file, line, bound));
+                                           => OnBreakpointBound(file, line, bound));
         _session = session;
 
         if (!session.Start(program, _breakpoints.All, _watches))
         {
             _session = null;
-            Say("The session would not start.");
+            ShowStatus("The session would not start.");
             return false;
         }
 
-        ShowTrace("Starting " + program);
+        AppendDebugOutput("Starting " + program);
         ShowRunning("Debugging...");
         _dock.ShowPane(Panes.DebugOutput);
         return true;
@@ -3050,17 +3047,20 @@ public class Shell : Form
     ///
     /// Empty when there is no project. A loose file is compiled to a path the
     /// compiler chooses and this window never learns.
-    String DebuggeePath()
+    String DebuggeePath
     {
-        if (_project == null)
-            return "";
-        return ((ProjectFile)_project).OutputPath;
+        get
+        {
+            if (_project == null)
+                return "";
+            return ((ProjectFile)_project).OutputPath;
+        }
     }
 
     // ------------------------------------------- what comes back from a stop
 
     /// One line from the session or from the program.
-    void ShowTrace(String line)
+    void AppendDebugOutput(String line)
     {
         _debugOutput.Add(line);
         if (_debugOutput.Count > 0u)
@@ -3068,7 +3068,7 @@ public class Shell : Form
     }
 
     /// A breakpoint's binding, once a session has looked for code for it.
-    void BoundBreakpoint(String file, uint line, uint bound)
+    void OnBreakpointBound(String file, uint line, uint bound)
     {
         _breakpoints.RecordBinding(file, line, bound);
         ShowBreakpointList();
@@ -3082,12 +3082,12 @@ public class Shell : Form
     /// a lambda body it wins. See `docs/style.md` §1.5.
     void OnProgramStopped(Snapshot taken)
     {
-        _stopped = taken;
-        _frame = 0u;
+        _lastStop = taken;
+        _selectedFrame = 0u;
 
         if (taken.State == RunState.Ended)
         {
-            Finished(taken);
+            OnSessionEnded(taken);
             return;
         }
 
@@ -3095,7 +3095,7 @@ public class Shell : Form
         ShowWatches(taken);
         ShowCallStack(taken);
         ShowThreads(taken);
-        ShowWhatDebuggingAllows();
+        EnableDebugCommands();
 
         // One pane comes forward on the first stop and on none after it. Every
         // stop would take the pane away from whoever had chosen another.
@@ -3103,66 +3103,66 @@ public class Shell : Form
         // Watch when there are watches, because a watch is there on purpose
         // and Locals is what to show someone who has not said what they are
         // interested in.
-        if (_firstStop)
+        if (_isFirstStop)
         {
-            _firstStop = false;
+            _isFirstStop = false;
             _dock.ShowPane(_preferredPane.ByteLength() != 0u
                          ? _preferredPane
                          : (_watches.IsEmpty ? Panes.Locals : Panes.Watch));
         }
 
         if (taken.HasSource)
-            GoTo(taken.File, taken.Line);
+            ShowStatementAt(taken.File, taken.Line);
         RepaintEditors();
 
         switch (taken.Kind)
         {
             case StopKind.Breakpoint:
-                Say("Stopped at " + Placed(taken) + ".");
+                ShowStatus("Stopped at " + FormatStopLocation(taken) + ".");
                 break;
 
             case StopKind.Paused:
-                Say("Broken at " + Placed(taken) + ".");
+                ShowStatus("Broken at " + FormatStopLocation(taken) + ".");
                 break;
 
             case StopKind.Fault:
             {
                 String what = "Faulted (0x"
                             + FormatHexadecimal((ulong)taken.FaultCode)
-                            + ") at " + Placed(taken) + ".";
-                Say(what);
-                ShowTrace(what);
+                            + ") at " + FormatStopLocation(taken) + ".";
+                ShowStatus(what);
+                AppendDebugOutput(what);
                 break;
             }
 
             default:
-                Say(Placed(taken));
+                ShowStatus(FormatStopLocation(taken));
                 break;
         }
     }
 
     /// The session is over.
-    void Finished(Snapshot taken)
+    void OnSessionEnded(Snapshot taken)
     {
         String note = "Exited with "
                     + Standard.Text.FromInteger((long)taken.ExitCode) + ".";
-        ShowTrace(note);
-        Say(note);
+        AppendDebugOutput(note);
+        ShowStatus(note);
 
         _session = null;
-        _stopped = null;
+        _lastStop = null;
         _breakpoints.ClearBindings();
         ClearDebugPanes();
         ClearStopMarks();
         ShowBreakpointList();
-        ShowWhatDebuggingAllows();
+        EnableDebugCommands();
         RepaintEditors();
     }
 
-    String Placed(Snapshot taken)
+    String FormatStopLocation(Snapshot taken)
     {
         String where = taken.HasSource
-            ? NameOf(taken.File) + ":"
+            ? GetDisplayName(taken.File) + ":"
               + Standard.Text.FromInteger((long)taken.Line)
             : "0x" + FormatHexadecimal((ulong)taken.Address);
         return taken.Function.ByteLength() == 0u
@@ -3171,13 +3171,13 @@ public class Shell : Form
 
     void ShowLocals(Snapshot taken)
     {
-        _locals.Clear();
+        _localsList.Clear();
         for (nuint i = 0u; i < taken.Locals.Count; i++)
         {
             var one = taken.Locals[i];
-            int row = _locals.AddRow(one.Name);
-            _locals.SetCell(row, 1, one.Value);
-            _locals.SetCell(row, 2, one.TypeName
+            int row = _localsList.AddRow(one.Name);
+            _localsList.SetCell(row, 1, one.Value);
+            _localsList.SetCell(row, 2, one.TypeName
                                     + (one.IsParameter ? "  (parameter)" : ""));
         }
     }
@@ -3265,12 +3265,12 @@ public class Shell : Form
     /// Answers whether it was kept, and says why on the status line when it
     /// was not: there is nobody at a dialog when a program is being started by
     /// a script.
-    public bool Watch(String expression)
+    public bool TryAddWatch(String expression)
     {
         String problem = AddWatch(expression);
         if (problem.ByteLength() == 0u)
             return true;
-        Say(expression + ": " + problem);
+        ShowStatus(expression + ": " + problem);
         return false;
     }
 
@@ -3352,16 +3352,16 @@ public class Shell : Form
             _threadList.SetCell(row, 1, Standard.Text.FromInteger((long)one.Id));
             _threadList.SetCell(row, 2, one.Function.ByteLength() != 0u
                                         ? one.Function : "??");
-            _threadList.SetCell(row, 3, ThreadWhere(one));
+            _threadList.SetCell(row, 3, FormatThreadLocation(one));
         }
     }
 
-    String ThreadWhere(ThreadLine one)
+    String FormatThreadLocation(ThreadLine one)
     {
         if (!one.CanRead)
             return "not traced";
         if (one.HasSource)
-            return NameOf(one.File) + ", line "
+            return GetDisplayName(one.File) + ", line "
                  + Standard.Text.FromInteger((long)one.Line);
         return "0x" + FormatHexadecimal((ulong)one.Pc);
     }
@@ -3374,7 +3374,7 @@ public class Shell : Form
     /// do that.
     void OnThreadChosen(Control sender)
     {
-        var taken = _stopped;
+        var taken = _lastStop;
         if (taken == null)
             return;
 
@@ -3385,32 +3385,32 @@ public class Shell : Form
         var one = ((Snapshot)taken).Threads[(nuint)row];
         if (!one.HasSource)
         {
-            Say(one.CanRead ? "That thread is not in code this program was built"
+            ShowStatus(one.CanRead ? "That thread is not in code this program was built"
                               + " from."
                             : "That thread cannot be read.");
             return;
         }
 
-        GoTo(one.File, one.Line);
+        ShowStatementAt(one.File, one.Line);
         RepaintEditors();
     }
 
     void ShowCallStack(Snapshot taken)
     {
-        _stack.Clear();
+        _callStackList.Clear();
         for (nuint i = 0u; i < taken.Frames.Count; i++)
         {
             var frame = taken.Frames[i];
-            int row = _stack.AddRow(i == 0u ? ">" : "");
-            _stack.SetCell(row, 1, frame.Function.ByteLength() != 0u
+            int row = _callStackList.AddRow(i == 0u ? ">" : "");
+            _callStackList.SetCell(row, 1, frame.Function.ByteLength() != 0u
                                    ? frame.Function : "??");
-            _stack.SetCell(row, 2, frame.HasSource
-                ? NameOf(frame.File) + ", line "
+            _callStackList.SetCell(row, 2, frame.HasSource
+                ? GetDisplayName(frame.File) + ", line "
                   + Standard.Text.FromInteger((long)frame.Line)
                 : "0x" + FormatHexadecimal((ulong)frame.Pc));
         }
         if (!taken.Frames.IsEmpty)
-            _stack.SelectedIndex = 0;
+            _callStackList.SelectedIndex = 0;
     }
 
     /// A frame was double-clicked: show where it is.
@@ -3420,23 +3420,23 @@ public class Shell : Form
     /// base, and that MUST come from the session's thread.
     void OnFrameChosen(Control sender)
     {
-        var taken = _stopped;
+        var taken = _lastStop;
         if (taken == null)
             return;
 
-        int row = _stack.SelectedIndex;
+        int row = _callStackList.SelectedIndex;
         if (row < 0 || (nuint)row >= ((Snapshot)taken).Frames.Count)
             return;
 
-        _frame = (nuint)row;
-        var frame = ((Snapshot)taken).Frames[_frame];
+        _selectedFrame = (nuint)row;
+        var frame = ((Snapshot)taken).Frames[_selectedFrame];
         if (!frame.HasSource)
         {
-            Say("That frame has no source.");
+            ShowStatus("That frame has no source.");
             return;
         }
 
-        GoTo(frame.File, frame.Line);
+        ShowStatementAt(frame.File, frame.Line);
         RepaintEditors();
     }
 
@@ -3454,13 +3454,13 @@ public class Shell : Form
     /// while the pointer is moved away to read it.
     void OnHovered(String word)
     {
-        if (_stopped == null || word.ByteLength() == 0u)
+        if (_lastStop == null || word.ByteLength() == 0u)
         {
             ShowHover("");
             return;
         }
 
-        var stop = (Snapshot)_stopped;
+        var stop = (Snapshot)_lastStop;
         for (nuint i = 0u; i < stop.Locals.Count; i++)
         {
             var one = stop.Locals[i];
@@ -3475,8 +3475,8 @@ public class Shell : Form
 
     void ClearDebugPanes()
     {
-        _locals.Clear();
-        _stack.Clear();
+        _localsList.Clear();
+        _callStackList.Clear();
         _threadList.Clear();
         ShowWatchNames();
     }
@@ -3484,48 +3484,48 @@ public class Shell : Form
     /// Takes the current-statement highlight off every tab.
     void ClearStopMarks()
     {
-        foreach (var tab in _open)
+        foreach (var tab in _openTabs)
             tab.Editor.ClearStatement();
     }
 
     void RepaintEditors()
     {
-        foreach (var tab in _open)
+        foreach (var tab in _openTabs)
             tab.Editor.Invalidate();
     }
 
     /// Opens a file if it is not open, and puts the statement mark on a line.
-    void GoTo(String file, uint line)
+    void ShowStatementAt(String file, uint line)
     {
-        var tab = TabFor(file);
+        var tab = FindTab(file);
         if (tab == null)
         {
             // The debugger's path may be spelled differently from the editor's:
             // a compiler joining a directory to a file name mixes separators.
-            tab = TabMatching(file);
+            tab = FindTabMatching(file);
         }
         if (tab == null)
         {
             if (!OpenFile(file))
             {
-                Say("Could not open " + file);
+                ShowStatus("Could not open " + file);
                 return;
             }
-            tab = TabFor(file);
+            tab = FindTab(file);
             if (tab == null)
                 return;
         }
 
         var found = (EditorTab)tab;
-        _book.SelectedIndex = found.Page.Index;
-        found.Editor.ShowStatementAt(line - 1u, _frame == 0u);
+        _tabs.SelectedIndex = found.Page.Index;
+        found.Editor.ShowStatementAt(line - 1u, _selectedFrame == 0u);
         OnCaretMoved(this);
     }
 
     /// The tab holding a file, compared the way the debugger compares paths.
-    EditorTab? TabMatching(String path)
+    EditorTab? FindTabMatching(String path)
     {
-        foreach (var tab in _open)
+        foreach (var tab in _openTabs)
         {
             String open = tab.Editor.Contents.Location;
             if (open.ByteLength() != 0u && IsTheSameSourceFile(open, path))
@@ -3535,7 +3535,7 @@ public class Shell : Form
     }
 
     /// Enables what can be done now.
-    void ShowWhatDebuggingAllows()
+    void EnableDebugCommands()
     {
         var running = _session;
         bool live = running != null;
@@ -3552,9 +3552,9 @@ public class Shell : Form
     /// The program is on the move, so nothing may be read from it.
     void ShowRunning(String what)
     {
-        Say(what);
+        ShowStatus(what);
         ClearDebugPanes();
-        ShowWhatDebuggingAllows();
+        EnableDebugCommands();
     }
 
     // -------------------------------------------------------------- the rest
@@ -3567,7 +3567,7 @@ public class Shell : Form
         var editor = (CodeEditor)now;
         var at = editor.CaretPosition;
         String line = editor.Contents.GetLineText(at.Row);
-        _status.SetPanelText(3,
+        _statusBar.SetPanelText(3,
             "Ln " + Standard.Text.FromInteger(at.Row + 1u)
           + ", Col " + Standard.Text.FromInteger(editor.GetColumnOfOffset(line, at.Column) + 1u));
     }
@@ -3575,13 +3575,13 @@ public class Shell : Form
     void OnEdited(Control sender)
     {
         if (sender is CodeEditor editor)
-            RelabelFor(editor);
-        Retitle();
+            UpdateTabCaptionFor(editor);
+        UpdateTitle();
     }
 
     /// The title says what is open and whether it has been changed, which is
     /// the one piece of state a person checks without being told to.
-    void Retitle()
+    void UpdateTitle()
     {
         var now = Current;
         if (now == null)
@@ -3595,14 +3595,14 @@ public class Shell : Form
         // The project's name leads, as it does in every editor that has one:
         // which program this is matters more than which of its files is in
         // front, and the file is in the tab already.
-        String project = ProjectName();
+        String project = ProjectName;
         String lead = project == "" ? "" : project + " -- ";
 
-        Text = (editor.Contents.Edited ? "* " : "") + lead + NameOf(path) + " -- Stainless";
-        _status.SetPanelText(0, path.ByteLength() == 0u ? "Not saved" : path);
+        Text = (editor.Contents.Edited ? "* " : "") + lead + GetDisplayName(path) + " -- Stainless";
+        _statusBar.SetPanelText(0, path.ByteLength() == 0u ? "Not saved" : path);
     }
 
-    void Say(String what) => _status.SetPanelText(1, what);
+    void ShowStatus(String what) => _statusBar.SetPanelText(1, what);
 
     /// What the pointer is over, or "" to clear it.
     ///
@@ -3611,7 +3611,7 @@ public class Shell : Form
     /// pointing at a name is looking.
     void ShowHover(String what)
     {
-        _status.SetPanelText(4, what);
+        _statusBar.SetPanelText(4, what);
 
         var now = Current;
         if (now != null)
@@ -3619,7 +3619,7 @@ public class Shell : Form
     }
 
     /// Whether a list of arguments holds one.
-    static bool Names(String[] arguments, String wanted)
+    static bool ContainsArgument(String[] arguments, String wanted)
     {
         foreach (var argument in arguments)
         {
@@ -3631,7 +3631,7 @@ public class Shell : Form
 
     /// What the self test checks, since a window cannot be typed into by a
     /// machine.
-    public bool SelfTest()
+    public bool RunSelfTest()
     {
         bool ok = true;
         var editor = Editor;
@@ -3701,51 +3701,51 @@ public class Shell : Form
 
         // The text size, which every tab shares.
         int before = editor.FontSize;
-        Resize(2);
+        ResizeText(2);
         if (editor.FontSize != before + 2)
         {
             Console.WriteLine("FAIL: the text did not resize");
             ok = false;
         }
-        Resize(-2);
+        ResizeText(-2);
 
         // A second tab, brought to the front, then closed again.
-        nuint had = _open.Count;
-        NewFile();
-        if (_open.Count != had + 1u)
+        nuint had = _openTabs.Count;
+        OpenBlankTab();
+        if (_openTabs.Count != had + 1u)
         {
             Console.WriteLine("FAIL: a new tab did not appear");
             ok = false;
         }
-        if (_book.SelectedIndex != (int)(_open.Count - 1u))
+        if (_tabs.SelectedIndex != (int)(_openTabs.Count - 1u))
         {
             Console.WriteLine("FAIL: the new tab did not come to the front");
             ok = false;
         }
 
-        int at = _book.SelectedIndex;
-        CloseTab(_open[(nuint)at]);
-        if (_open.Count != had)
+        int at = _tabs.SelectedIndex;
+        CloseTab(_openTabs[(nuint)at]);
+        if (_openTabs.Count != had)
         {
             Console.WriteLine("FAIL: closing a tab did not remove it");
             ok = false;
         }
 
         // Closing them all leaves one empty tab rather than none.
-        while (_open.Count > 1u)
-            CloseTab(_open[0u]);
-        CloseTab(_open[0u]);
-        if (_open.Count != 1u)
+        while (_openTabs.Count > 1u)
+            CloseTab(_openTabs[0u]);
+        CloseTab(_openTabs[0u]);
+        if (_openTabs.Count != 1u)
         {
             Console.WriteLine("FAIL: closing every tab left "
-                              + Standard.Text.FromInteger(_open.Count));
+                              + Standard.Text.FromInteger(_openTabs.Count));
             ok = false;
         }
 
         // Several files at once, which is what the command line does and what
         // a single open never exercised.
-        while (_open.Count > 1u)
-            CloseTab(_open[0u]);
+        while (_openTabs.Count > 1u)
+            CloseTab(_openTabs[0u]);
         OpenFile("samples/shapes.sl");
         OpenFile("samples/hello.sl");
         OpenFile("samples/json.sl");
@@ -3756,7 +3756,7 @@ public class Shell : Form
         // Only checkable from the repository root, since the paths are
         // relative; said rather than skipped silently, so a run that proved
         // less than it looks like says so.
-        if (_open.Count != 3u)
+        if (_openTabs.Count != 3u)
         {
             Console.WriteLine("  (three-tab check skipped: run from the repository root)");
         }
@@ -3940,7 +3940,7 @@ public class Shell : Form
                 ok = false;
             }
 
-            CloseTab(_open[_open.Count - 1u]);
+            CloseTab(_openTabs[_openTabs.Count - 1u]);
             Application.DoEvents();
         }
 
@@ -4091,7 +4091,7 @@ public class Shell : Form
                 ok = false;
             }
 
-            CloseTab(_open[_open.Count - 1u]);
+            CloseTab(_openTabs[_openTabs.Count - 1u]);
             Application.DoEvents();
         }
 
@@ -4294,7 +4294,7 @@ public class Shell : Form
             pad.Editor.Contents.Location = "selftest-breakpoints.sl";
             _breakpoints.Clear();
 
-            pad.Editor.TypeText("one" + Newline() + "two" + Newline() + "three");
+            pad.Editor.TypeText("one" + Newline + "two" + Newline + "three");
             pad.Editor.MoveCaretTo(2u, 0u);
             ToggleBreakpointAtCaret();
 
@@ -4303,12 +4303,12 @@ public class Shell : Form
                 Console.WriteLine("FAIL: F9 did not set a breakpoint on line 3");
                 ok = false;
             }
-            if (MarkFor(pad.Editor, 2u) != LineMark.Breakpoint)
+            if (GetMarkFor(pad.Editor, 2u) != LineMark.Breakpoint)
             {
                 Console.WriteLine("FAIL: the margin does not show it");
                 ok = false;
             }
-            if (MarkFor(pad.Editor, 1u) != LineMark.None)
+            if (GetMarkFor(pad.Editor, 1u) != LineMark.None)
             {
                 Console.WriteLine("FAIL: the margin shows one on a line with none");
                 ok = false;
@@ -4316,7 +4316,7 @@ public class Shell : Form
 
             // Two lines typed above it push it from 3 to 5.
             pad.Editor.MoveCaretTo(0u, 0u);
-            pad.Editor.TypeText("a" + Newline() + "b" + Newline());
+            pad.Editor.TypeText("a" + Newline + "b" + Newline);
             Application.DoEvents();
 
             if (_breakpoints.FindAtLine("selftest-breakpoints.sl", 5u) == null)
@@ -4359,7 +4359,7 @@ public class Shell : Form
 
             ToggleBreakpointAtCaret();
             _breakpoints.Clear();
-            CloseTab(_open[_open.Count - 1u]);
+            CloseTab(_openTabs[_openTabs.Count - 1u]);
             Application.DoEvents();
         }
 
@@ -4371,7 +4371,7 @@ public class Shell : Form
                 Console.WriteLine("FAIL: a session exists before anything started one");
                 ok = false;
             }
-            if (DebuggeePath().ByteLength() == 0u && _project != null)
+            if (DebuggeePath.ByteLength() == 0u && _project != null)
             {
                 Console.WriteLine("FAIL: a project gave no path to debug");
                 ok = false;
@@ -4394,23 +4394,23 @@ public class Shell : Form
 
             // A chunk that stops mid-line shows the whole lines and keeps the
             // rest. Nothing of "second ha" may reach the pane.
-            String left = ShowComplete("first line" + Newline() + "second ha", false);
-            if (left != "second ha" || _output.Count != 1u
-                || _output.ItemAt(0u) != "first line")
+            String left = ShowCompleteLines("first line" + Newline + "second ha", false);
+            if (left != "second ha" || _outputList.Count != 1u
+                || _outputList.ItemAt(0u) != "first line")
             {
                 Console.WriteLine("FAIL: a split line was not held back: left='"
                                   + left + "' shown="
-                                  + Standard.Text.FromInteger((long)_output.Count));
+                                  + Standard.Text.FromInteger((long)_outputList.Count));
                 ok = false;
             }
 
             // And the rest of it completes the line rather than starting one.
-            left = ShowComplete(left + "lf" + Newline(), false);
-            if (left != "" || _output.Count != 2u
-                || _output.ItemAt(1u) != "second half")
+            left = ShowCompleteLines(left + "lf" + Newline, false);
+            if (left != "" || _outputList.Count != 2u
+                || _outputList.ItemAt(1u) != "second half")
             {
                 Console.WriteLine("FAIL: a line split across two chunks came back as '"
-                                  + (_output.Count > 1u ? _output.ItemAt(1u) : "")
+                                  + (_outputList.Count > 1u ? _outputList.ItemAt(1u) : "")
                                   + "' with '" + left + "' left over");
                 ok = false;
             }
@@ -4418,11 +4418,11 @@ public class Shell : Form
             // Windows line endings are the compiler's on this platform, and
             // must not arrive as a stray carriage return on the end of a line.
             ClearOutput();
-            ShowComplete("carried\r\n", false);
-            if (_output.Count != 1u || _output.ItemAt(0u) != "carried")
+            ShowCompleteLines("carried\r\n", false);
+            if (_outputList.Count != 1u || _outputList.ItemAt(0u) != "carried")
             {
                 Console.WriteLine("FAIL: a CRLF line came back as '"
-                                  + (_output.Count == 0u ? "" : _output.ItemAt(0u)) + "'");
+                                  + (_outputList.Count == 0u ? "" : _outputList.ItemAt(0u)) + "'");
                 ok = false;
             }
 
@@ -4445,8 +4445,8 @@ public class Shell : Form
         #if WINDOWS
         {
             nuint kept = 0u;
-            foreach (var item in _bar.Items)
-                kept = kept + PlatformDrawn(item);
+            foreach (var item in _menuBar.Items)
+                kept = kept + CountPlatformDrawnItems(item);
 
             if (kept != 0u)
             {
@@ -4464,10 +4464,10 @@ public class Shell : Form
         if (OpenFile("ide/tests/fixture/src/main.sl"))
         {
             Application.DoEvents();
-            if (ProjectName() != "fixture")
+            if (ProjectName != "fixture")
             {
                 Console.WriteLine("FAIL: opening a file did not find the project above it,"
-                                  + " and answered '" + ProjectName() + "'");
+                                  + " and answered '" + ProjectName + "'");
                 ok = false;
             }
 
@@ -4482,7 +4482,7 @@ public class Shell : Form
             // the right file.
             nuint folders = 0u;
             nuint files = 0u;
-            foreach (var entry in _treeItems)
+            foreach (var entry in _treeEntries)
             {
                 if (entry.IsFolder)
                     folders++;
@@ -4503,9 +4503,9 @@ public class Shell : Form
                 ok = false;
             }
 
-            foreach (var entry in _treeItems)
+            foreach (var entry in _treeEntries)
             {
-                if (EntryFor(entry.Node) != entry)
+                if (FindTreeEntry(entry.Node) != entry)
                 {
                     Console.WriteLine("FAIL: a tree node did not answer with its own"
                                       + " entry: " + entry.FullPath);
@@ -4516,15 +4516,15 @@ public class Shell : Form
                 String wanted = entry.IsFolder
                               ? entry.FullPath
                               : Path.DirectoryName(entry.FullPath);
-                if (FolderFor(entry) != wanted)
+                if (GetFolderFor(entry) != wanted)
                 {
                     Console.WriteLine("FAIL: a new file beside " + entry.FullPath
-                                      + " would go to '" + FolderFor(entry) + "'");
+                                      + " would go to '" + GetFolderFor(entry) + "'");
                     ok = false;
                 }
             }
 
-            if (FolderFor(null).ByteLength() != 0u)
+            if (GetFolderFor(null).ByteLength() != 0u)
             {
                 Console.WriteLine("FAIL: a new file was offered a home with nothing"
                                   + " clicked on");
@@ -4533,7 +4533,7 @@ public class Shell : Form
 
             // The module a new file would be seeded with. Both of the
             // fixture's files declare `Fixture`, so a third belongs in it too.
-            String seeded = ModuleOf("ide/tests/fixture/src");
+            String seeded = ReadFolderModule("ide/tests/fixture/src");
             if (seeded != "Fixture")
             {
                 Console.WriteLine("FAIL: a new file would be seeded with module '"
@@ -4548,13 +4548,15 @@ public class Shell : Form
             // and broke the day `--diagnostics json` was added in front, which
             // is the test being about the wrong thing rather than the change
             // being wrong.
-            var arguments = BuildArguments(false);
-            if (!Names(arguments, "--project") || !Names(arguments, _projectPath))
+            var arguments = ComposeCompilerArguments(false);
+            if (!ContainsArgument(arguments, "--project")
+                || !ContainsArgument(arguments, _projectPath))
             {
                 Console.WriteLine("FAIL: a project build did not ask for the project");
                 ok = false;
             }
-            if (!Names(arguments, "--diagnostics") || !Names(arguments, "json"))
+            if (!ContainsArgument(arguments, "--diagnostics")
+                || !ContainsArgument(arguments, "json"))
             {
                 Console.WriteLine("FAIL: a build did not ask for diagnostics it can read");
                 ok = false;
@@ -4564,23 +4566,23 @@ public class Shell : Form
             // what a build is optimised for -- a project's own `optimize` and
             // `debug` are overridden rather than consulted, so what the picker
             // says has to reach the command line or it says nothing at all.
-            if (!Names(arguments, "-g") || !Names(arguments, "-O0")
-                || Names(arguments, "--no-debug"))
+            if (!ContainsArgument(arguments, "-g") || !ContainsArgument(arguments, "-O0")
+                || ContainsArgument(arguments, "--no-debug"))
             {
                 Console.WriteLine("FAIL: a Debug build did not ask to be debuggable");
                 ok = false;
             }
 
             _configuration.SelectedIndex = 1;
-            if (Chosen() != Configuration.Release)
+            if (SelectedConfiguration != Configuration.Release)
             {
                 Console.WriteLine("FAIL: the picker did not move to Release");
                 ok = false;
             }
 
-            var shipping = BuildArguments(false);
-            if (!Names(shipping, "--no-debug") || !Names(shipping, "-O2")
-                || Names(shipping, "-g") || Names(shipping, "-O0"))
+            var shipping = ComposeCompilerArguments(false);
+            if (!ContainsArgument(shipping, "--no-debug") || !ContainsArgument(shipping, "-O2")
+                || ContainsArgument(shipping, "-g") || ContainsArgument(shipping, "-O0"))
             {
                 Console.WriteLine("FAIL: a Release build asked to be debuggable");
                 ok = false;
