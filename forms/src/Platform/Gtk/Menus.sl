@@ -34,6 +34,8 @@
 // `GtkMenuItem` are not exchangeable, and a menu item does not know at
 // construction whether it will ever be ticked -- so every command item is a
 // check item that is not drawing its tick, which is what `TMenuItem` is too.
+// A check item ticks itself when it is chosen, and a Win32 item does not, so
+// the tick is put back to what the program set every time.
 module Forms.Platform.Gtk;
 
 import Standard.Collections;
@@ -103,6 +105,11 @@ public class GtkMenuItemPeer : IMenuItemPeer
     /// True while the program is setting the tick, so that the `activate` GTK
     /// raises for it is not reported as the user choosing the item.
     bool _echoing;
+    /// Whether the item is a `GtkCheckMenuItem`, which a heading is not.
+    bool _checkable;
+    /// The tick as the program last set it, which is what the item shows
+    /// whatever the user does.
+    bool _checked;
 
     /// **Read as `this.Echoing`, because a lambda captures a bare member read
     /// by value.** `if (Echoing)` in the handler below tests what the flag said
@@ -122,17 +129,31 @@ public class GtkMenuItemPeer : IMenuItemPeer
     /// rather than left to the next reader's judgement.
     bool Echoing => _echoing;
 
-    public GtkMenuItemPeer(GtkWidget* made, IMenuItemNotify owner)
+    public GtkMenuItemPeer(GtkWidget* made, IMenuItemNotify owner, bool checkable)
     {
         _item = made;
         _echoing = false;
+        _checkable = checkable;
+        _checked = false;
 
         ConnectPlain(_item, "activate", () =>
         {
             if (this.Echoing)
                 return;
+            this.KeepTick();
             owner.OnPlatformMenuClicked();
         });
+    }
+
+    /// Puts the tick back after GTK's own `activate` handler, which runs first
+    /// and flips it. Choosing an item on Windows changes no tick, and a
+    /// program that wants one flipped says so through `Checked`.
+    void KeepTick()
+    {
+        if (!_checkable)
+            return;
+        if ((gtk_check_menu_item_get_active(_item) != 0) != _checked)
+            SetChecked(_checked);
     }
 
     /// The widget's address. Win32 needs a number because its items share a
@@ -153,9 +174,13 @@ public class GtkMenuItemPeer : IMenuItemPeer
 
     public void SetChecked(bool checked)
     {
+        _checked = checked;
+        if (!_checkable)
+            return;
+        bool was = _echoing;
         _echoing = true;
         gtk_check_menu_item_set_active(_item, checked ? 1 : 0);
-        _echoing = false;
+        _echoing = was;
     }
 
     /// **GTK does not draw a default menu item.** Windows bolds one and
@@ -227,7 +252,7 @@ public class GtkMenuPeer : IMenuPeer
         gtk_menu_shell_append(_menu, made);
         gtk_widget_show(made);
         _items.Add(made);
-        return new GtkMenuItemPeer(made, owner);
+        return new GtkMenuItemPeer(made, owner, submenu == null);
     }
 
     public void AddSeparator()
