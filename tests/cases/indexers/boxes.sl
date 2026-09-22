@@ -40,6 +40,40 @@ public struct Row<T>
     }
 }
 
+// An indexer that only reads, written as the one expression it is. The braces
+// say nothing a property's would not, so they are left out the same way.
+public class Ruler
+{
+    int[] _marks;
+
+    public Ruler(int[] marks) => _marks = marks;
+
+    public int this[nuint at] => _marks[at] * 2;
+
+    // Two indices, and an arrow body over both of them.
+    public int this[nuint at, int add] => _marks[at] + add;
+}
+
+// Two indices, read and written, because a grid is indexed by a pair and
+// nothing is gained by making the caller work out the one number.
+public class Grid
+{
+    int[] _cells;
+    nuint _width;
+
+    public Grid(nuint width, nuint height)
+    {
+        _cells = new int[width * height];
+        _width = width;
+    }
+
+    public int this[nuint row, nuint column]
+    {
+        get => _cells[row * _width + column];
+        set => _cells[row * _width + column] = value;
+    }
+}
+
 // Overloaded on what it takes, which is the reason an indexer is not a
 // property with a fixed name.
 public class Table
@@ -86,6 +120,16 @@ int Main()
     row[0] = 7;
     row[0]++;
     Console.WriteLine("row " + N((long)row[0]));
+
+    var ruler = new Ruler([3, 5]);
+    Console.WriteLine("ruler " + N((long)ruler[1]) + " " + N((long)ruler[0, 4]));
+
+    var grid = new Grid(3u, 2u);
+    grid[1u, 2u] = 8;
+    grid[1u, 2u] += 1;
+    grid[0u, 0u] = grid[1u, 2u] - 4;
+    Console.WriteLine("grid " + N((long)grid[1u, 2u]) + " " + N((long)grid[0u, 0u]) + " " +
+        N((long)grid[0u, 1u]));
 
     var table = new Table();
     table[2] = 99;

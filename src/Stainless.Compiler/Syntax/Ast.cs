@@ -1192,7 +1192,12 @@ public sealed record SliceSyntax(
     ExpressionSyntax? Start,
     ExpressionSyntax? End) : ExpressionSyntax(Span);
 
-public sealed record IndexSyntax(SourceSpan Span, ExpressionSyntax Target, ExpressionSyntax Index)
+/// <summary>
+/// <c>a[i]</c>, and <c>a[i, j]</c> where the target declares an indexer taking
+/// that many. An array, a slice and a pointer take one.
+/// </summary>
+public sealed record IndexSyntax(
+    SourceSpan Span, ExpressionSyntax Target, IReadOnlyList<ExpressionSyntax> Indices)
     : ExpressionSyntax(Span);
 
 public sealed record NewSyntax(

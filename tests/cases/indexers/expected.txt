@@ -1,6 +1,8 @@
 box 10 25 4
 text aab
 row 8
+ruler 10 7
+grid 9 5 0
 table 99 k=set
 list 1 22 22
 map 5 5 -1 1

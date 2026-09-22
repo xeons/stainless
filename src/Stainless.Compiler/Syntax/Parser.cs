@@ -1838,6 +1838,9 @@ public sealed class Parser
     /// the compiler find storage for it, and there is nothing to find here:
     /// what an index means is the whole of what an indexer is for, so both
     /// accessors are written.
+    ///
+    /// <c>public T this[nuint i] =&gt; _items[i];</c> is the same getter with
+    /// the braces left out, as on a property.
     /// </summary>
     private Declaration ParseIndexer(
         int start, Modifiers modifiers, TypeSyntax returnType,
@@ -1863,7 +1866,12 @@ public sealed class Parser
             _diagnostics.Error("SL0568", SpanFrom(start),
                 "an indexer takes at least one index; `this[]` indexes by nothing");
 
-        var accessors = ParseAccessorList("this[]");
+        // `T this[nuint i] => expression;` is a getter and nothing else, as it
+        // is on a property: an indexer that only reads is most of them, and the
+        // two ways of writing one read the same.
+        var accessors = At(TokenKind.EqualsGreater)
+            ? ArrowGetter(start)
+            : ParseAccessorList("this[]");
 
         return new PropertyDeclSyntax(
             SpanFrom(start), modifiers, returnType, "Item", accessors, attributes)
@@ -1920,18 +1928,10 @@ public sealed class Parser
         int start, Modifiers modifiers, TypeSyntax type, string name,
         IReadOnlyList<AttributeSyntax> attributes)
     {
-        // `T Name => expression;` is a getter and nothing else. An indexer has
-        // no such form, which is why this is here and not in the shared part.
-        if (Match(TokenKind.EqualsGreater))
-        {
-            var getter = ParseArrowBody(isGetter: true);
-            var arrow = new List<AccessorSyntax>
-            {
-                new(SpanFrom(start), Modifiers.None, IsGetter: true, getter),
-            };
-            Expect(TokenKind.Semicolon);
-            return new PropertyDeclSyntax(SpanFrom(start), modifiers, type, name, arrow, attributes);
-        }
+        // `T Name => expression;` is a getter and nothing else.
+        if (At(TokenKind.EqualsGreater))
+            return new PropertyDeclSyntax(
+                SpanFrom(start), modifiers, type, name, ArrowGetter(start), attributes);
 
         var accessors = ParseAccessorList(name);
 
@@ -1947,6 +1947,18 @@ public sealed class Parser
         {
             Initializer = initializer,
         };
+    }
+
+    /// <summary>
+    /// <c>=&gt; expression;</c> where an accessor list could stand: the one
+    /// getter it is short for.
+    /// </summary>
+    private List<AccessorSyntax> ArrowGetter(int start)
+    {
+        Expect(TokenKind.EqualsGreater);
+        var getter = ParseArrowBody(isGetter: true);
+        Expect(TokenKind.Semicolon);
+        return [new AccessorSyntax(SpanFrom(start), Modifiers.None, IsGetter: true, getter)];
     }
 
     /// <summary>
@@ -1998,10 +2010,6 @@ public sealed class Parser
     }
 
     /// <summary>
-    /// The body behind <c>=&gt;</c>: an expression a getter returns, or one a
-    /// setter simply evaluates.
-    /// </summary>
-    /// <summary>
     /// <c>=&gt; expression;</c> if that is what is here, and null otherwise, so
     /// a caller that has its own diagnostic for a missing body keeps it.
     /// </summary>
@@ -2014,6 +2022,10 @@ public sealed class Parser
         return body;
     }
 
+    /// <summary>
+    /// The body behind <c>=&gt;</c>: an expression a getter returns, or one a
+    /// setter simply evaluates.
+    /// </summary>
     private BlockSyntax ParseArrowBody(bool isGetter)
     {
         int start = _pos;
@@ -3360,9 +3372,17 @@ public sealed class Parser
                     continue;
                 }
 
+                // `a[i, j]`, which only a declared indexer takes: an array, a
+                // slice and a pointer are indexed by one number, and the binder
+                // is where that is said.
+                var indices = new List<ExpressionSyntax>();
+                if (first is not null) indices.Add(first);
+                while (Match(TokenKind.Comma))
+                    indices.Add(ParseExpression());
+
                 Expect(TokenKind.CloseBracket);
 
-                if (first is null)
+                if (indices.Count == 0)
                 {
                     _diagnostics.Error("SL0450", SpanFrom(start),
                         "an index is missing; write 'a[i]' to read one element, or 'a[i:j]' " +
@@ -3370,7 +3390,7 @@ public sealed class Parser
                     continue;
                 }
 
-                expression = new IndexSyntax(SpanFrom(start), expression, first);
+                expression = new IndexSyntax(SpanFrom(start), expression, indices);
                 continue;
             }
 

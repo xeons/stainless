@@ -576,6 +576,29 @@ compiler find storage; there is nothing to find here, since what an index
 *means* is the whole of what an indexer is for. Both accessors are written, or
 just the getter for a read-only one.
 
+**A read-only indexer is written with `=>`**, exactly as a property is
+([§3.3](../style.md#33-one-line-members)):
+
+```csharp
+public int this[nuint at] => _cells[at];
+```
+
+**An indexer may take more than one index**, and is the only thing that does:
+
+```csharp
+public int this[nuint row, nuint column]
+{
+    get => _cells[row * _width + column];
+    set => _cells[row * _width + column] = value;
+}
+
+grid[1u, 2u] += 1;
+```
+
+An array, a slice and a pointer take the one number they are laid out by, so a
+second index on one of those is SL0241. What a pair means is a question only
+the type can answer, which is why answering it is what declaring an indexer is.
+
 An indexer is inherited like any other member, and works on a struct — where
 the setter reaches its receiver by pointer, as every struct method does.
 

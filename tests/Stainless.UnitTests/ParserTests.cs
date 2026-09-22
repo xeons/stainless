@@ -51,7 +51,9 @@ public class ParserTests
             $"(?: {Render(conditional.Condition)} {Render(conditional.WhenTrue)} " +
             $"{Render(conditional.WhenFalse)})",
         MemberAccessSyntax member => $"(. {Render(member.Target)} {member.Member})",
-        IndexSyntax index => $"([] {Render(index.Target)} {Render(index.Index)})",
+        IndexSyntax index =>
+            $"([] {Render(index.Target)}" +
+            $"{string.Concat(index.Indices.Select(i => " " + Render(i)))})",
         SliceSyntax slice =>
             $"([:] {Render(slice.Target)} {Render(slice.Start)} {Render(slice.End)})",
         CallSyntax call =>

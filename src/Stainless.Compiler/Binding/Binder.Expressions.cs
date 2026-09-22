@@ -2506,7 +2506,8 @@ public sealed partial class Binder
     /// `this[String]` can both be declared and asking with one does not find
     /// the other.
     /// </summary>
-    private FunctionSymbol? FindIndexer(NamedTypeSymbol type, BoundExpression index, bool setting)
+    private FunctionSymbol? FindIndexer(
+        NamedTypeSymbol type, IReadOnlyList<BoundExpression> given, bool setting)
     {
         for (NamedTypeSymbol? at = type; at is not null;
              at = (at as ClassTypeSymbol)?.BaseClass)
@@ -2516,13 +2517,18 @@ public sealed partial class Binder
                 var accessor = setting ? property.Setter : property.Getter;
                 if (accessor is null) continue;
 
-                // Parameter 0 is `this`; parameter 1 is the index. A setter's
-                // last parameter is `value` and is not one of the indices.
+                // Parameter 0 is `this` and the indices follow it. A setter's
+                // last parameter is `value` and is not one of them.
                 var indices = accessor.Parameters.Where(p => !p.IsThis).ToList();
                 if (setting && indices.Count > 0) indices.RemoveAt(indices.Count - 1);
 
-                if (indices.Count == 1 && IsImplicitlyConvertible(index, indices[0].Type))
-                    return accessor;
+                if (indices.Count != given.Count) continue;
+
+                bool fits = true;
+                for (int i = 0; i < given.Count && fits; i++)
+                    fits = IsImplicitlyConvertible(given[i], indices[i].Type);
+
+                if (fits) return accessor;
             }
         }
 
@@ -2534,14 +2540,13 @@ public sealed partial class Binder
     /// </summary>
     private BoundExpression BuildIndexerCall(
         SourceSpan span, FunctionSymbol accessor, BoundExpression target,
-        BoundExpression index, BoundExpression? value)
+        IReadOnlyList<BoundExpression> given, BoundExpression? value)
     {
         var indices = accessor.Parameters.Where(p => !p.IsThis).ToList();
 
-        var arguments = new List<BoundExpression>
-        {
-            BindConversion(index, indices[0].Type, span),
-        };
+        var arguments = new List<BoundExpression>();
+        for (int i = 0; i < given.Count; i++)
+            arguments.Add(BindConversion(given[i], indices[i].Type, span));
 
         if (value is not null)
             arguments.Add(BindConversion(value, indices[^1].Type, span));
@@ -2557,30 +2562,44 @@ public sealed partial class Binder
     private BoundExpression BindIndex(IndexSyntax syntax)
     {
         var target = BindExpression(syntax.Target);
-        var index = BindExpression(syntax.Index);
+        var given = syntax.Indices.Select(BindExpression).ToList();
 
-        if (target.Type.IsError() || index.Type.IsError())
+        if (target.Type.IsError() || given.Any(i => i.Type.IsError()))
             return new BoundErrorExpression(syntax.Span);
 
         // A type's own indexer. Reached through the getter it lowers to, which
         // is why nothing here has to know that a property was involved.
-        if (target.Type is NamedTypeSymbol named && FindIndexer(named, index, false) is { } getter)
-            return BuildIndexerCall(syntax.Span, getter, target, index, null);
+        if (target.Type is NamedTypeSymbol named && FindIndexer(named, given, false) is { } getter)
+            return BuildIndexerCall(syntax.Span, getter, target, given, null);
 
         if (target.Type is not (PointerTypeSymbol or ArrayTypeSymbol or SliceTypeSymbol
                                 or FixedArrayTypeSymbol))
         {
             diagnostics.Error("SL0241", syntax.Span,
                 target.Type is NamedTypeSymbol subject && subject.Properties.Any(p => p.IsIndexer)
-                    ? $"no indexer on '{target.Type.Name}' takes '{index.Type.Name}'"
+                    ? $"no indexer on '{target.Type.Name}' takes " +
+                      $"({string.Join(", ", given.Select(i => i.Type.Name))})"
                     : $"cannot index '{target.Type.Name}'; only arrays, slices and pointers " +
                       "support indexing, and this type declares no 'this[...]'");
             return new BoundErrorExpression(syntax.Span);
         }
 
+        // Only an indexer takes more than one, because only an indexer decides
+        // what a second one would mean.
+        if (given.Count > 1)
+        {
+            diagnostics.Error("SL0241", syntax.Span,
+                $"'{target.Type.Name}' is indexed by one index, and there are " +
+                $"{given.Count} here; a type takes more than one only by declaring " +
+                "'this[...]' with that many");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        var index = given[0];
+
         if (index.Type is not PrimitiveTypeSymbol { IsInteger: true })
         {
-            diagnostics.Error("SL0242", syntax.Index.Span,
+            diagnostics.Error("SL0242", syntax.Indices[0].Span,
                 $"an index must be an integer, but this is '{index.Type.Name}'");
             return new BoundErrorExpression(syntax.Span);
         }
@@ -2597,7 +2616,7 @@ public sealed partial class Binder
             if (FoldSwitchLabel(index) is { } constant &&
                 constant <= long.MaxValue && (long)constant >= inline.Length)
             {
-                diagnostics.Error("SL0490", syntax.Index.Span,
+                diagnostics.Error("SL0490", syntax.Indices[0].Span,
                     $"index {constant} is past the end of '{inline.Name}', which has " +
                     $"{Counted(inline.Length, "element")}");
                 return new BoundErrorExpression(syntax.Span);
