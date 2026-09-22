@@ -328,14 +328,18 @@ public class GtkGraphicsBackend : IGraphicsBackend
         cairo_stroke(_cairo);
     }
 
+    /// **Inside the rectangle, as GDI draws it.** `Rectangle(l, t, r, b)` puts
+    /// its outline on the columns `l` and `r - 1`, so a 10 by 10 rectangle
+    /// covers 10 by 10 pixels. The path runs through the centres of the edge
+    /// pixels, which is one less than the size apart.
     public void DrawRectangle(Pen pen, Rectangle bounds)
     {
-        if (pen.Style == PenStyle.None)
+        if (pen.Style == PenStyle.None || bounds.Width <= 0 || bounds.Height <= 0)
             return;
         double half = Ready(pen);
         cairo_new_path(_cairo);
         cairo_rectangle(_cairo, (double)bounds.X + half, (double)bounds.Y + half,
-                        (double)bounds.Width, (double)bounds.Height);
+                        (double)(bounds.Width - 1), (double)(bounds.Height - 1));
         cairo_stroke(_cairo);
     }
 
@@ -395,15 +399,23 @@ public class GtkGraphicsBackend : IGraphicsBackend
     /// An ellipse is a scaled circle, which is the only way cairo draws one.
     /// The save and restore are what keep the scaling from reaching the line
     /// width, which would otherwise be squashed along with the shape.
-    void Ellipse(Rectangle bounds)
+    ///
+    /// False, with no path, for a rectangle with no area. A scale by zero
+    /// leaves cairo in `CAIRO_STATUS_INVALID_MATRIX`, which is sticky: every
+    /// call after it in the same paint is ignored, so one empty shape would
+    /// blank the rest of the control.
+    bool Ellipse(Rectangle bounds)
     {
         cairo_new_path(_cairo);
+        if (bounds.Width <= 0 || bounds.Height <= 0)
+            return false;
         cairo_save(_cairo);
         cairo_translate(_cairo, (double)bounds.X + (double)bounds.Width / 2.0,
                                (double)bounds.Y + (double)bounds.Height / 2.0);
         cairo_scale(_cairo, (double)bounds.Width / 2.0, (double)bounds.Height / 2.0);
         cairo_arc(_cairo, 0.0, 0.0, 1.0, 0.0, 6.283185307179586);
         cairo_restore(_cairo);
+        return true;
     }
 
     public void DrawEllipse(Pen pen, Rectangle bounds)
@@ -411,15 +423,15 @@ public class GtkGraphicsBackend : IGraphicsBackend
         if (pen.Style == PenStyle.None)
             return;
         Ready(pen);
-        Ellipse(bounds);
-        cairo_stroke(_cairo);
+        if (Ellipse(bounds))
+            cairo_stroke(_cairo);
     }
 
     public void FillEllipse(Brush brush, Rectangle bounds)
     {
         Source(brush.Color);
-        Ellipse(bounds);
-        cairo_fill(_cairo);
+        if (Ellipse(bounds))
+            cairo_fill(_cairo);
     }
 
     void Path(Point[] points, double half, bool close)
@@ -609,7 +621,9 @@ public class GtkGraphicsBackend : IGraphicsBackend
         var pixbuf = (GdkPixbuf*)((GtkBitmapBackend)picture).Pixbuf;
         int width = gdk_pixbuf_get_width(pixbuf);
         int height = gdk_pixbuf_get_height(pixbuf);
-        if (width <= 0 || height <= 0)
+        // Nothing to draw into, and a scale by zero would stop the context:
+        // see `Ellipse`.
+        if (width <= 0 || height <= 0 || into.Width <= 0 || into.Height <= 0)
             return;
 
         cairo_save(_cairo);
