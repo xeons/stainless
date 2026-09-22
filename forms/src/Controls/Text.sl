@@ -155,7 +155,11 @@ public abstract class TextBoxBase : WindowedControl
 
     /// Selects everything, which is what a field being focused for replacement
     /// wants.
-    public void SelectAll() => Entry.SetSelection(0, Text.ByteLength() > 0u ? 1000000 : 0);
+    ///
+    /// Twice the byte count bounds the length on both platforms: a UTF-16 unit
+    /// is never fewer bytes than one, and a line break Windows counts as two
+    /// is one byte here. Both platforms clamp a selection to the text.
+    public void SelectAll() => Entry.SetSelection(0, (int)Text.ByteLength() * 2);
 
     /// Moves the selection to the clipboard, as Ctrl+X does. Nothing happens
     /// when nothing is selected or the box is read-only.

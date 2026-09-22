@@ -910,8 +910,6 @@ here at all. Where one is a backend's rather than the library's, it says so.
 - **Not DPI aware.** On a scaled display Windows renders the window at 96 DPI
   and scales the result, so text is soft. Per-monitor awareness is a manifest
   setting and a layout that scales with it, and neither is here.
-- **`SelectAll` uses a large sentinel length** rather than asking for the text's
-  length in characters.
 
 ### GTK's own
 
