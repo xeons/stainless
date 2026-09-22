@@ -67,6 +67,9 @@ public class GtkWindowPeer : GtkContainerPeer, IWindowPeer
     /// The menu bar currently in that box, so that replacing one can take the
     /// old one out first.
     GtkWidget* _bar;
+    /// The peer that owns `_bar`. Held because a peer destroys its widget when
+    /// dropped, and the program drops the old bar before handing over the new.
+    IMenuPeer? _barPeer;
     /// True while `ShowModal`'s nested loop is running, so that the close
     /// which ends it does not also quit the application's loop.
     bool _modal;
@@ -99,6 +102,7 @@ public class GtkWindowPeer : GtkContainerPeer, IWindowPeer
              gtk_layout_new(null, null));
         window = owner;
         _bar = null;
+        _barPeer = null;
         _scroller = null;
         _modal = false;
         _laidOut = false;
@@ -368,6 +372,7 @@ public class GtkWindowPeer : GtkContainerPeer, IWindowPeer
             gtk_container_remove(_stack, _bar);
             _bar = null;
         }
+        _barPeer = menu;
         if (menu == null)
             return;
 
