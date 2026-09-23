@@ -790,20 +790,41 @@ public static class DocWriter
             {
                 string target = page + "#" + Anchor(entry);
 
-                Note(entry.Name, target, entry);
-                Note(module.Name + "." + entry.Name, target, entry);
-                Note(shortName + "." + entry.Name, target, entry);
+                // A generic type's entry is headed `Queue<T>`, which is what a
+                // reader sees and not what a block writes: `@see Queue.Dequeue`
+                // names the type, and the parameters are the call's business.
+                string bare = Without(entry.Name);
+
+                foreach (string spelling in Spellings(bare, module.Name, shortName))
+                    Note(spelling, target, entry);
 
                 foreach (var member in entry.Members)
                 {
                     string inner = page + "#" + Anchor(member);
 
-                    Note(entry.Name + "." + member.Name, inner, member);
-                    Note(module.Name + "." + entry.Name + "." + member.Name, inner, member);
-                    Note(shortName + "." + entry.Name + "." + member.Name, inner, member);
+                    foreach (string spelling in Spellings(bare, module.Name, shortName))
+                        Note(spelling + "." + member.Name, inner, member);
                 }
             }
         }
+    }
+
+    /// <summary>A name without its type parameters: <c>Queue&lt;T&gt;</c> is <c>Queue</c>.</summary>
+    private static string Without(string name)
+    {
+        int angle = name.IndexOf('<');
+        return angle < 0 ? name : name[..angle];
+    }
+
+    /// <summary>
+    /// Every way a block may name this thing: on its own, under the module
+    /// written out, and under the short name the module is reached by.
+    /// </summary>
+    private static IEnumerable<string> Spellings(string name, string module, string shortName)
+    {
+        yield return name;
+        yield return module + "." + name;
+        yield return shortName + "." + name;
     }
 
     /// <summary>

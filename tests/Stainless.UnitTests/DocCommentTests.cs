@@ -299,6 +299,29 @@ public class DocCommentTests
     }
 
     /// <summary>
+    /// A generic type's heading carries its parameters and a block naming it
+    /// does not, so the page has to link the name that was written.
+    /// </summary>
+    [Fact]
+    public void AGenericTypeIsLinkedByItsBareName()
+    {
+        string page = Page("""
+            module M;
+            /// A queue.
+            public class Queue<T> {
+                /// Takes one off.
+                public void Dequeue() { }
+                /// Puts one on.
+                ///
+                /// @see Queue.Dequeue
+                public void Enqueue(T item) { }
+            }
+            """);
+
+        Assert.Contains("[Queue.Dequeue](#dequeue-method)", page);
+    }
+
+    /// <summary>
     /// A module is reached by its last segment once imported, so that is what a
     /// block writes and what the page has to link.
     /// </summary>
