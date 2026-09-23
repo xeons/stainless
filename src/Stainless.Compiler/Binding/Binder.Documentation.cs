@@ -487,6 +487,9 @@ public sealed partial class Binder
             HasMember(enclosing, parts[0]))
             return true;
 
+        // A generic type written on its own: `Mutex`, `Optional`.
+        if (GenericTypeNamed(parts) is not null) return true;
+
         if (parts.Length < 2) return false;
 
         var owner = parts[..^1];
@@ -494,8 +497,56 @@ public sealed partial class Binder
 
         if (TypeNamed(owner) is { } type && HasMember(type, member)) return true;
 
+        // A member of a generic type. Until a call says what its parameters
+        // are there is no symbol to ask, so the declaration is read instead --
+        // and `Optional.GetValueOrDefault`, `Result.Ok` and `Mutex.Enter` are
+        // among the names most worth pointing at in this library.
+        if (GenericTypeNamed(owner) is { } template &&
+            DeclaresMember(template.Declaration, member))
+            return true;
+
         return ModuleNamed(owner) is { } module && HasModuleMember(module, member);
     }
+
+    /// <summary>The generic type a name reaches, or null.</summary>
+    private GenericTypeTemplate? GenericTypeNamed(IReadOnlyList<string> parts)
+    {
+        if (parts.Count == 1)
+        {
+            if (_currentScope!.Module.GenericTypes.TryGetValue(parts[0], out var here))
+                return here;
+
+            foreach (var imported in _currentScope.Imports.Values.Distinct())
+                if (imported.GenericTypes.TryGetValue(parts[0], out var there) && there.IsPublic)
+                    return there;
+
+            return null;
+        }
+
+        return ModuleNamed(parts.Take(parts.Count - 1).ToList()) is { } module &&
+               module.GenericTypes.TryGetValue(parts[^1], out var qualified)
+            ? qualified
+            : null;
+    }
+
+    /// <summary>Whether a type declaration declares something of this name.</summary>
+    private static bool DeclaresMember(TypeDeclSyntax declaration, string member) =>
+        declaration.Cases.Any(c => c.Name == member) ||
+        declaration.Members.Any(m => DeclaredName(m) == member);
+
+    /// <summary>The name a member declaration gives what it declares.</summary>
+    private static string? DeclaredName(Declaration declaration) => declaration switch
+    {
+        FunctionDeclSyntax function => function.Name,
+        PropertyDeclSyntax property => property.Name,
+        FieldDeclSyntax field => field.Name,
+        StaticDeclSyntax shared => shared.Name,
+        GlobalConstDeclSyntax constant => constant.Name,
+        EventDeclSyntax declared => declared.Name,
+        EnumDeclSyntax enumeration => enumeration.Name,
+        TypeDeclSyntax nested => nested.Name,
+        _ => null,
+    };
 
     /// <summary>The last segment of a dotted module name, which is how a file that
     /// imports it reaches it.</summary>
