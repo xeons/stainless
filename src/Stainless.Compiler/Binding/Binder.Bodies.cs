@@ -933,6 +933,10 @@ public sealed partial class Binder
     /// <see cref="Bindings"/> at the top of the branch the test proved. That
     /// is also why the form is the whole of a condition and not part of one:
     /// under a <c>&amp;&amp;</c> the spill would run when the test did not.
+    ///
+    /// A <c>while</c> puts the spills at the top of its body rather than
+    /// around itself, because its condition is asked again on every pass; see
+    /// <see cref="BindWhile"/>.
     /// </summary>
     private sealed class PatternScope
     {
@@ -942,7 +946,10 @@ public sealed partial class Binder
             Bindings { get; } = [];
     }
 
-    /// <summary>Non-null only while the whole condition of an `if` is being bound.</summary>
+    /// <summary>
+    /// Non-null only while the whole condition of an `if` or a `while` is being
+    /// bound.
+    /// </summary>
     private PatternScope? _patterns;
 
     /// <summary>
@@ -1696,9 +1703,43 @@ public sealed partial class Binder
         return new BoundBlock(body.Span, statements);
     }
 
+    /// <summary>
+    /// <c>while (c) { ... }</c>, and <c>while (x is Some v)</c> with it.
+    ///
+    /// A binding is offered here for the reason it is offered on an <c>if</c>:
+    /// the body is the place the test proved, and it is the only place. What
+    /// differs is that the condition is asked again on every pass, so what it
+    /// spilled has to be spilled again -- which a loop with the test in its
+    /// head has nowhere to put. The loop is entered unconditionally instead
+    /// and left by the test:
+    ///
+    /// <code>
+    /// while (queue.TryDequeue() is Some got) { Use(got.Value); }
+    ///
+    /// while (true)
+    /// {
+    ///     var held = queue.TryDequeue();      // the spill, once per pass
+    ///     if (held is Some) { var got = ...; Use(got.Value); } else { break; }
+    /// }
+    /// </code>
+    ///
+    /// <c>continue</c> lands at the top of that body, so it re-spills and
+    /// re-tests, which is what continuing a <c>while</c> means.
+    /// </summary>
     private BoundStatement BindWhile(WhileSyntax syntax)
     {
+        // The names the condition puts in scope belong to the body, so the
+        // scope opens before the condition is bound rather than after.
+        bool binding = syntax.Condition is TypeTestSyntax;
+        if (binding) PushScope();
+
+        var outer = _patterns;
+        _patterns = binding ? new PatternScope() : null;
+
         var condition = BindCondition(syntax.Condition);
+
+        var patterns = _patterns;
+        _patterns = outer;
 
         // A loop body runs again, so anything it assigns to is unknown inside it
         // however the loop was entered.
@@ -1708,13 +1749,25 @@ public sealed partial class Binder
         ApplyFacts(ConditionFacts(condition).WhenTrue);
 
         _loopDepth++;
-        var body = BindStatement(syntax.Body);
+        var body = BindPatternBranch(patterns, syntax.Body);
         _loopDepth--;
+
+        if (binding) PopScope();
 
         // Nothing the condition proved survives the loop: it is also left by
         // failing that same condition.
         _variantFacts = entry;
-        return new BoundWhile(syntax.Span, condition, body);
+
+        if (patterns is null || patterns.Spills.Count == 0)
+            return new BoundWhile(syntax.Span, condition, body);
+
+        var test = new BoundIf(
+            syntax.Condition.Span, condition, body, new BoundBreak(syntax.Condition.Span));
+
+        return new BoundWhile(
+            syntax.Span,
+            new BoundLiteral(syntax.Condition.Span, PrimitiveTypeSymbol.Bool, true),
+            new BoundBlock(syntax.Span, [.. patterns.Spills, test]));
     }
 
     /// <summary>

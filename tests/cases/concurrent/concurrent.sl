@@ -32,17 +32,10 @@ void Stack(ConcurrentStack<int> stack, int from, int upto)
 // them they see each item exactly once.
 void Consume(Channel<int> channel, AtomicLong total, AtomicLong seen)
 {
-    while (true)
+    while (channel.Take() is Some item)
     {
-        if (channel.Take() is Some item)
-        {
-            total.Add((long)item.Value);
-            seen.Add(1);
-        }
-        else
-        {
-            break;
-        }
+        total.Add((long)item.Value);
+        seen.Add(1);
     }
 }
 
@@ -60,13 +53,8 @@ int Main()
     printf("queued=%llu\n", queue.Count);
 
     long sum = 0;
-    while (true)
-    {
-        if (queue.TryDequeue() is Some got)
-            sum = sum + (long)got.Value;
-        else
-            break;
-    }
+    while (queue.TryDequeue() is Some got)
+        sum = sum + (long)got.Value;
     // 0 + 1 + ... + 3999
     printf("drained=%lld empty=%d again=%d\n",
         sum, queue.IsEmpty ? 1 : 0, queue.TryDequeue().HasValue ? 1 : 0);
@@ -81,13 +69,8 @@ int Main()
     }
 
     long stacked = 0;
-    while (true)
-    {
-        if (stack.TryPop() is Some popped)
-            stacked = stacked + (long)popped.Value;
-        else
-            break;
-    }
+    while (stack.TryPop() is Some popped)
+        stacked = stacked + (long)popped.Value;
     printf("stacked=%lld empty=%d or=%d\n", stacked, stack.IsEmpty ? 1 : 0, stack.PopOrDefault(-7));
 
     // ------------------------------------------------------- dictionary

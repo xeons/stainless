@@ -14,8 +14,8 @@ public variant Value
     Number(double Held);
 }
 
-// SL0585: the name needs a branch to be true in, and only an `if` whose whole
-// condition is the test has one.
+// SL0585: the name needs somewhere to be true, and only a branch or a loop
+// body the test guards is such a place.
 void OutsideAnIf(Value value)
 {
     bool ok = value is Number n;
@@ -37,10 +37,13 @@ void Negated(Value value)
         Console.WriteLine("no");
 }
 
-void InAWhile(Value value)
+// A `do` runs its body before the test, so there is no pass in which the name
+// would be true. A `while` is fine, and is the case beside this one.
+void InADoWhile(Value value)
 {
-    while (value is Number n)
+    do
         Console.WriteLine("no");
+    while (value is Number n);
 }
 
 // SL0586: a case that carries nothing has nothing to name.

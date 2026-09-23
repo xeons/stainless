@@ -52,14 +52,13 @@ still delivered, and once it is drained every `Take` returns at once with
 
     var channel = new Channel<String>();
     // producer:  channel.Add(line);  ... channel.Close();
-    // consumer:  if (channel.Take() is Some got) { Handle(got.Value); }
-    //            while (got.Ok) { use(got.Value); got = channel.Take(); }
+    // consumer:  while (channel.Take() is Some got) { Handle(got.Value); }
 
 **Type parameters**
 
 - `T` — what is sent through it; nothing is required of it, and nothing yet checks that the sender is done with what it sent
 
-<sub>[stdlib/Concurrent/Channel.sl:45](../../stdlib/Concurrent/Channel.sl#L45)</sub>
+<sub>[stdlib/Concurrent/Channel.sl:44](../../stdlib/Concurrent/Channel.sl#L44)</sub>
 
 #### Add *method*
 
@@ -70,7 +69,7 @@ bool Add(T item)
 Adds an item and wakes one waiter. Adding to a closed channel changes
 nothing and reports false.
 
-<sub>[stdlib/Concurrent/Channel.sl:71](../../stdlib/Concurrent/Channel.sl#L71)</sub>
+<sub>[stdlib/Concurrent/Channel.sl:70](../../stdlib/Concurrent/Channel.sl#L70)</sub>
 
 #### Take *method*
 
@@ -81,7 +80,7 @@ Optional<T> Take()
 Waits for an item. Answers `None` once the channel is closed and
 drained, and not before.
 
-<sub>[stdlib/Concurrent/Channel.sl:89](../../stdlib/Concurrent/Channel.sl#L89)</sub>
+<sub>[stdlib/Concurrent/Channel.sl:88](../../stdlib/Concurrent/Channel.sl#L88)</sub>
 
 #### TryTake *method*
 
@@ -91,7 +90,7 @@ Optional<T> TryTake()
 
 Takes an item if one is there already, without waiting.
 
-<sub>[stdlib/Concurrent/Channel.sl:113](../../stdlib/Concurrent/Channel.sl#L113)</sub>
+<sub>[stdlib/Concurrent/Channel.sl:112](../../stdlib/Concurrent/Channel.sl#L112)</sub>
 
 #### Close *method*
 
@@ -101,7 +100,7 @@ void Close()
 
 Says there will be no more, and wakes everyone waiting. Idempotent.
 
-<sub>[stdlib/Concurrent/Channel.sl:129](../../stdlib/Concurrent/Channel.sl#L129)</sub>
+<sub>[stdlib/Concurrent/Channel.sl:128](../../stdlib/Concurrent/Channel.sl#L128)</sub>
 
 #### IsClosed *property*
 
@@ -113,7 +112,7 @@ Whether `Close` has been called. A closed channel may still have items
 in it: this answers whether more can be sent, not whether more can be
 taken. What `Take` answers with is what says that.
 
-<sub>[stdlib/Concurrent/Channel.sl:140](../../stdlib/Concurrent/Channel.sl#L140)</sub>
+<sub>[stdlib/Concurrent/Channel.sl:139](../../stdlib/Concurrent/Channel.sl#L139)</sub>
 
 #### Count *property*
 
@@ -124,7 +123,7 @@ nuint Count { get; }
 How many items are waiting *now* -- the producer's backlog. For
 reporting rather than for deciding; a consumer should call `Take`.
 
-<sub>[stdlib/Concurrent/Channel.sl:153](../../stdlib/Concurrent/Channel.sl#L153)</sub>
+<sub>[stdlib/Concurrent/Channel.sl:152](../../stdlib/Concurrent/Channel.sl#L152)</sub>
 
 ### ConcurrentDictionary&lt;TKey, TValue&gt; *class*
 

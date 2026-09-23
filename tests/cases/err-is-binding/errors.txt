@@ -1,5 +1,5 @@
-# Four places a name after `is` has no branch to be true in,
-# a case that carries nothing, an interface, and a name that is no case at all.
+# Four places a name after `is` has nowhere to be true, a case that carries
+# nothing, an interface, and a name that is no case at all.
 SL0585
 SL0585
 SL0585

@@ -37,8 +37,7 @@ import Standard.Threading;
 ///
 ///     var channel = new Channel<String>();
 ///     // producer:  channel.Add(line);  ... channel.Close();
-///     // consumer:  if (channel.Take() is Some got) { Handle(got.Value); }
-///     //            while (got.Ok) { use(got.Value); got = channel.Take(); }
+///     // consumer:  while (channel.Take() is Some got) { Handle(got.Value); }
 ///
 /// @typeparam T  what is sent through it; nothing is required of it, and nothing yet checks
 ///               that the sender is done with what it sent

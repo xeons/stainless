@@ -922,9 +922,9 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0585", syntax.BindingSpan,
                 $"'{syntax.Binding}' is in scope only where this test succeeded, and there is " +
-                "such a place only when the test is the whole condition of an 'if': write " +
-                "'if (node.Payload is Number n)', and put anything else the branch needs " +
-                "inside it");
+                "such a place only when the test is the whole condition of an 'if' or a " +
+                "'while': write 'if (node.Payload is Number n)', and put anything else the " +
+                "branch needs inside it");
             return null;
         }
 
