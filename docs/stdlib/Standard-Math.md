@@ -30,7 +30,7 @@ double Abs(double x)
 The magnitude, sign removed. Clears the sign bit, so `Abs(-0.0)` is `0.0`
 and `Abs` of either infinity is positive infinity.
 
-<sub>[stdlib/Math.sl:171](../../stdlib/Math.sl#L171)</sub>
+<sub>[stdlib/Math.sl:177](../../stdlib/Math.sl#L177)</sub>
 
 ### Abs *function*
 
@@ -44,7 +44,7 @@ The most negative `int` has no positive counterpart, so `Abs(-2147483648)`
 negates to itself and stays negative. Widen to a `long` first where the
 input could reach that far.
 
-<sub>[stdlib/Math.sl:244](../../stdlib/Math.sl#L244)</sub>
+<sub>[stdlib/Math.sl:254](../../stdlib/Math.sl#L254)</sub>
 
 ### Abs *function*
 
@@ -55,7 +55,7 @@ long Abs(long x)
 The magnitude of a `long`, with the same edge as the `int` form: the most
 negative `long` answers itself.
 
-<sub>[stdlib/Math.sl:248](../../stdlib/Math.sl#L248)</sub>
+<sub>[stdlib/Math.sl:258](../../stdlib/Math.sl#L258)</sub>
 
 ### Acos *function*
 
@@ -86,7 +86,9 @@ double Atan(double x)
 The angle in (-Pi/2, Pi/2) whose tangent is `x`. Defined everywhere, and
 blind to which quadrant the point was in -- `Atan2` is the one that knows.
 
-<sub>[stdlib/Math.sl:128](../../stdlib/Math.sl#L128)</sub>
+**See also** &nbsp; [Math.Atan2](#atan2-function)
+
+<sub>[stdlib/Math.sl:130](../../stdlib/Math.sl#L130)</sub>
 
 ### Atan2 *function*
 
@@ -97,7 +99,14 @@ double Atan2(double y, double x)
 The angle to (x, y) from the positive x axis, in the correct quadrant.
 Note the argument order, which is the C library's: y first.
 
-<sub>[stdlib/Math.sl:132](../../stdlib/Math.sl#L132)</sub>
+**Parameters**
+
+- `y` — the point's y coordinate, which comes first
+- `x` — the point's x coordinate
+
+**See also** &nbsp; [Math.Atan](#atan-function)
+
+<sub>[stdlib/Math.sl:138](../../stdlib/Math.sl#L138)</sub>
 
 ### Cbrt *function*
 
@@ -119,7 +128,7 @@ double Ceiling(double x)
 
 The smallest whole number at or above `x`. `Ceiling(-2.5)` is -2.
 
-<sub>[stdlib/Math.sl:156](../../stdlib/Math.sl#L156)</sub>
+<sub>[stdlib/Math.sl:162](../../stdlib/Math.sl#L162)</sub>
 
 ### Clamp *function*
 
@@ -130,7 +139,7 @@ double Clamp(double x, double low, double high)
 `x`, brought within [low, high]. Aborts nothing when the bounds are the
 wrong way round; it simply returns `low`.
 
-<sub>[stdlib/Math.sl:182](../../stdlib/Math.sl#L182)</sub>
+<sub>[stdlib/Math.sl:188](../../stdlib/Math.sl#L188)</sub>
 
 ### Clamp *function*
 
@@ -141,7 +150,7 @@ int Clamp(int x, int low, int high)
 `x`, brought within [low, high]. Bounds the wrong way round give `low`
 rather than an error, as in the `double` form.
 
-<sub>[stdlib/Math.sl:270](../../stdlib/Math.sl#L270)</sub>
+<sub>[stdlib/Math.sl:280](../../stdlib/Math.sl#L280)</sub>
 
 ### Clamp *function*
 
@@ -151,7 +160,7 @@ long Clamp(long x, long low, long high)
 
 `x`, brought within [low, high]. Bounds the wrong way round give `low`.
 
-<sub>[stdlib/Math.sl:280](../../stdlib/Math.sl#L280)</sub>
+<sub>[stdlib/Math.sl:290](../../stdlib/Math.sl#L290)</sub>
 
 ### Clamp *function*
 
@@ -163,7 +172,7 @@ nuint Clamp(nuint x, nuint low, nuint high)
 clamp against and `low` of zero is the natural floor. Bounds the wrong way
 round give `low`.
 
-<sub>[stdlib/Math.sl:292](../../stdlib/Math.sl#L292)</sub>
+<sub>[stdlib/Math.sl:302](../../stdlib/Math.sl#L302)</sub>
 
 ### Cos *function*
 
@@ -184,7 +193,7 @@ double Cosh(double x)
 The hyperbolic cosine, which is at least 1 and never negative. Overflows
 like `Sinh`.
 
-<sub>[stdlib/Math.sl:139](../../stdlib/Math.sl#L139)</sub>
+<sub>[stdlib/Math.sl:145](../../stdlib/Math.sl#L145)</sub>
 
 ### DivideCeiling *function*
 
@@ -195,7 +204,7 @@ nuint DivideCeiling(nuint a, nuint b)
 `a` divided by `b`, rounded up. Written this way rather than as
 `(a + b - 1) / b` so that a large `a` cannot overflow on the way.
 
-<sub>[stdlib/Math.sl:324](../../stdlib/Math.sl#L324)</sub>
+<sub>[stdlib/Math.sl:334](../../stdlib/Math.sl#L334)</sub>
 
 ### Exp *function*
 
@@ -216,7 +225,7 @@ double Floor(double x)
 The largest whole number at or below `x`. Goes away from zero for negative
 `x`, unlike `Truncate`: `Floor(-2.5)` is -3.
 
-<sub>[stdlib/Math.sl:153](../../stdlib/Math.sl#L153)</sub>
+<sub>[stdlib/Math.sl:159](../../stdlib/Math.sl#L159)</sub>
 
 ### GreatestCommonDivisor *function*
 
@@ -230,7 +239,9 @@ Zero with zero answers zero. The answer is 2^63 when both arguments are the
 most negative `long`, or one is and the other is zero; no `long` holds that,
 so it answers `MinLong`, whose magnitude it is, as `Abs` does.
 
-<sub>[stdlib/Math.sl:336](../../stdlib/Math.sl#L336)</sub>
+**See also** &nbsp; [Math.LeastCommonMultiple](#leastcommonmultiple-function)
+
+<sub>[stdlib/Math.sl:348](../../stdlib/Math.sl#L348)</sub>
 
 ### Hypot *function*
 
@@ -240,7 +251,7 @@ double Hypot(double x, double y)
 
 The length of the vector (x, y), computed without overflowing on the way.
 
-<sub>[stdlib/Math.sl:145](../../stdlib/Math.sl#L145)</sub>
+<sub>[stdlib/Math.sl:151](../../stdlib/Math.sl#L151)</sub>
 
 ### IsFinite *function*
 
@@ -251,7 +262,7 @@ bool IsFinite(double x)
 True for an ordinary number: neither NaN nor an infinity. The check to
 make on a value that came out of a division or a parse.
 
-<sub>[stdlib/Math.sl:215](../../stdlib/Math.sl#L215)</sub>
+<sub>[stdlib/Math.sl:221](../../stdlib/Math.sl#L221)</sub>
 
 ### IsInfinite *function*
 
@@ -262,7 +273,7 @@ bool IsInfinite(double x)
 True for either infinity. A finite number minus itself is zero; an infinity
 minus itself is NaN, which is what separates the two.
 
-<sub>[stdlib/Math.sl:206](../../stdlib/Math.sl#L206)</sub>
+<sub>[stdlib/Math.sl:212](../../stdlib/Math.sl#L212)</sub>
 
 ### IsNaN *function*
 
@@ -272,7 +283,7 @@ bool IsNaN(double x)
 
 True when `x` is Not a Number, which is the one value not equal to itself.
 
-<sub>[stdlib/Math.sl:202](../../stdlib/Math.sl#L202)</sub>
+<sub>[stdlib/Math.sl:208](../../stdlib/Math.sl#L208)</sub>
 
 ### IsNear *function*
 
@@ -283,7 +294,7 @@ bool IsNear(double a, double b, double tolerance)
 True when the two are within `tolerance` of each other. Comparing floats
 with `==` is almost always a mistake, and this is what to write instead.
 
-<sub>[stdlib/Math.sl:219](../../stdlib/Math.sl#L219)</sub>
+<sub>[stdlib/Math.sl:225](../../stdlib/Math.sl#L225)</sub>
 
 ### IsPowerOfTwo *function*
 
@@ -294,7 +305,9 @@ bool IsPowerOfTwo(ulong value)
 True when exactly one bit is set. Zero is not a power of two and answers
 false, which is the case a bare `value & (value - 1)` test gets wrong.
 
-<sub>[stdlib/Math.sl:411](../../stdlib/Math.sl#L411)</sub>
+**See also** &nbsp; [Standard.Bits.IsPowerOfTwo](Standard-Bits.md#ispoweroftwo-function)
+
+<sub>[stdlib/Math.sl:433](../../stdlib/Math.sl#L433)</sub>
 
 ### LeadingZeroCount *function*
 
@@ -304,7 +317,9 @@ int LeadingZeroCount(ulong value)
 
 How many zero bits sit above the highest set bit. 64 for zero.
 
-<sub>[stdlib/Math.sl:380](../../stdlib/Math.sl#L380)</sub>
+**See also** &nbsp; [Standard.Bits.LeadingZeroCount](Standard-Bits.md#leadingzerocount-function)
+
+<sub>[stdlib/Math.sl:398](../../stdlib/Math.sl#L398)</sub>
 
 ### LeastCommonMultiple *function*
 
@@ -317,7 +332,9 @@ The least common multiple. Zero when either argument is zero.
 Divides before multiplying, which keeps the intermediate as small as it can
 be; two large arguments can still overflow, and nothing here detects it.
 
-<sub>[stdlib/Math.sl:357](../../stdlib/Math.sl#L357)</sub>
+**See also** &nbsp; [Math.GreatestCommonDivisor](#greatestcommondivisor-function)
+
+<sub>[stdlib/Math.sl:371](../../stdlib/Math.sl#L371)</sub>
 
 ### Lerp *function*
 
@@ -327,7 +344,7 @@ double Lerp(double from, double to, double at)
 
 Straight-line interpolation: `at` of 0 gives `from`, 1 gives `to`.
 
-<sub>[stdlib/Math.sl:225](../../stdlib/Math.sl#L225)</sub>
+<sub>[stdlib/Math.sl:231](../../stdlib/Math.sl#L231)</sub>
 
 ### Log *function*
 
@@ -369,7 +386,7 @@ double Max(double a, double b)
 
 The larger of the two, with the same NaN behaviour as `Min`.
 
-<sub>[stdlib/Math.sl:178](../../stdlib/Math.sl#L178)</sub>
+<sub>[stdlib/Math.sl:184](../../stdlib/Math.sl#L184)</sub>
 
 ### Max *function*
 
@@ -379,7 +396,7 @@ int Max(int a, int b)
 
 The larger of two `int`s.
 
-<sub>[stdlib/Math.sl:254](../../stdlib/Math.sl#L254)</sub>
+<sub>[stdlib/Math.sl:264](../../stdlib/Math.sl#L264)</sub>
 
 ### Max *function*
 
@@ -389,7 +406,7 @@ long Max(long a, long b)
 
 The larger of two `long`s.
 
-<sub>[stdlib/Math.sl:260](../../stdlib/Math.sl#L260)</sub>
+<sub>[stdlib/Math.sl:270](../../stdlib/Math.sl#L270)</sub>
 
 ### Max *function*
 
@@ -399,7 +416,7 @@ nuint Max(nuint a, nuint b)
 
 The larger of two `nuint`s.
 
-<sub>[stdlib/Math.sl:266](../../stdlib/Math.sl#L266)</sub>
+<sub>[stdlib/Math.sl:276](../../stdlib/Math.sl#L276)</sub>
 
 ### Min *function*
 
@@ -410,7 +427,7 @@ double Min(double a, double b)
 The smaller of the two. A NaN argument answers `b`, since every comparison
 against NaN is false -- check with `IsNaN` if that matters.
 
-<sub>[stdlib/Math.sl:175](../../stdlib/Math.sl#L175)</sub>
+<sub>[stdlib/Math.sl:181](../../stdlib/Math.sl#L181)</sub>
 
 ### Min *function*
 
@@ -420,7 +437,7 @@ int Min(int a, int b)
 
 The smaller of two `int`s.
 
-<sub>[stdlib/Math.sl:251](../../stdlib/Math.sl#L251)</sub>
+<sub>[stdlib/Math.sl:261](../../stdlib/Math.sl#L261)</sub>
 
 ### Min *function*
 
@@ -430,7 +447,7 @@ long Min(long a, long b)
 
 The smaller of two `long`s.
 
-<sub>[stdlib/Math.sl:257](../../stdlib/Math.sl#L257)</sub>
+<sub>[stdlib/Math.sl:267](../../stdlib/Math.sl#L267)</sub>
 
 ### Min *function*
 
@@ -440,7 +457,7 @@ nuint Min(nuint a, nuint b)
 
 The smaller of two `nuint`s.
 
-<sub>[stdlib/Math.sl:263](../../stdlib/Math.sl#L263)</sub>
+<sub>[stdlib/Math.sl:273](../../stdlib/Math.sl#L273)</sub>
 
 ### PopCount *function*
 
@@ -451,7 +468,9 @@ int PopCount(ulong value)
 How many bits are set. Kernighan's loop: each step clears the lowest set
 bit, so it runs once per bit that is actually there.
 
-<sub>[stdlib/Math.sl:368](../../stdlib/Math.sl#L368)</sub>
+**See also** &nbsp; [Standard.Bits.PopCount](Standard-Bits.md#popcount-function)
+
+<sub>[stdlib/Math.sl:384](../../stdlib/Math.sl#L384)</sub>
 
 ### Pow *function*
 
@@ -473,7 +492,7 @@ double Remainder(double x, double y)
 The remainder of x/y, with the sign of x. This is C's fmod, not a modulus:
 `Remainder(-7.0, 3.0)` is -1.0, not 2.0.
 
-<sub>[stdlib/Math.sl:167](../../stdlib/Math.sl#L167)</sub>
+<sub>[stdlib/Math.sl:173](../../stdlib/Math.sl#L173)</sub>
 
 ### Round *function*
 
@@ -484,7 +503,7 @@ double Round(double x)
 To the nearest integer, halves away from zero -- C's rule, not the
 banker's rounding C# uses by default.
 
-<sub>[stdlib/Math.sl:160](../../stdlib/Math.sl#L160)</sub>
+<sub>[stdlib/Math.sl:166](../../stdlib/Math.sl#L166)</sub>
 
 ### RoundUpToPowerOfTwo *function*
 
@@ -495,7 +514,9 @@ ulong RoundUpToPowerOfTwo(ulong value)
 The smallest power of two that is at least `value`. Zero and one both give
 one; a value above 2^63 has no answer and gives zero.
 
-<sub>[stdlib/Math.sl:418](../../stdlib/Math.sl#L418)</sub>
+**See also** &nbsp; [Standard.Bits.RoundUpToPowerOfTwo](Standard-Bits.md#rounduptopoweroftwo-function)
+
+<sub>[stdlib/Math.sl:442](../../stdlib/Math.sl#L442)</sub>
 
 ### Sign *function*
 
@@ -505,7 +526,7 @@ int Sign(double x)
 
 -1, 0 or 1. NaN has no sign, and returns 0.
 
-<sub>[stdlib/Math.sl:192](../../stdlib/Math.sl#L192)</sub>
+<sub>[stdlib/Math.sl:198](../../stdlib/Math.sl#L198)</sub>
 
 ### Sign *function*
 
@@ -515,7 +536,7 @@ int Sign(int x)
 
 -1, 0 or 1 for a negative, zero or positive `int`.
 
-<sub>[stdlib/Math.sl:302](../../stdlib/Math.sl#L302)</sub>
+<sub>[stdlib/Math.sl:312](../../stdlib/Math.sl#L312)</sub>
 
 ### Sign *function*
 
@@ -526,7 +547,7 @@ int Sign(long x)
 -1, 0 or 1 for a negative, zero or positive `long`. An `int` either way,
 since three values need no more.
 
-<sub>[stdlib/Math.sl:313](../../stdlib/Math.sl#L313)</sub>
+<sub>[stdlib/Math.sl:323](../../stdlib/Math.sl#L323)</sub>
 
 ### Sin *function*
 
@@ -547,7 +568,7 @@ double Sinh(double x)
 
 The hyperbolic sine. Overflows to an infinity past roughly 710.
 
-<sub>[stdlib/Math.sl:135](../../stdlib/Math.sl#L135)</sub>
+<sub>[stdlib/Math.sl:141](../../stdlib/Math.sl#L141)</sub>
 
 ### Sqrt *function*
 
@@ -578,7 +599,7 @@ double Tanh(double x)
 
 The hyperbolic tangent, which stays within (-1, 1) and cannot overflow.
 
-<sub>[stdlib/Math.sl:142](../../stdlib/Math.sl#L142)</sub>
+<sub>[stdlib/Math.sl:148](../../stdlib/Math.sl#L148)</sub>
 
 ### ToDegrees *function*
 
@@ -588,7 +609,9 @@ double ToDegrees(double radians)
 
 An angle in radians, as degrees.
 
-<sub>[stdlib/Math.sl:231](../../stdlib/Math.sl#L231)</sub>
+**See also** &nbsp; [Math.ToRadians](#toradians-function)
+
+<sub>[stdlib/Math.sl:239](../../stdlib/Math.sl#L239)</sub>
 
 ### ToRadians *function*
 
@@ -599,7 +622,9 @@ double ToRadians(double degrees)
 An angle in degrees, as radians. Every trigonometric function here takes
 radians, so this is what goes between a human's number and `Sin`.
 
-<sub>[stdlib/Math.sl:235](../../stdlib/Math.sl#L235)</sub>
+**See also** &nbsp; [Math.ToDegrees](#todegrees-function)
+
+<sub>[stdlib/Math.sl:245](../../stdlib/Math.sl#L245)</sub>
 
 ### TrailingZeroCount *function*
 
@@ -609,7 +634,9 @@ int TrailingZeroCount(ulong value)
 
 How many zero bits sit below the lowest set bit. 64 for zero.
 
-<sub>[stdlib/Math.sl:395](../../stdlib/Math.sl#L395)</sub>
+**See also** &nbsp; [Standard.Bits.TrailingZeroCount](Standard-Bits.md#trailingzerocount-function)
+
+<sub>[stdlib/Math.sl:415](../../stdlib/Math.sl#L415)</sub>
 
 ### Truncate *function*
 
@@ -619,7 +646,7 @@ double Truncate(double x)
 
 Towards zero, dropping the fractional part.
 
-<sub>[stdlib/Math.sl:163](../../stdlib/Math.sl#L163)</sub>
+<sub>[stdlib/Math.sl:169](../../stdlib/Math.sl#L169)</sub>
 
 ## Constants
 

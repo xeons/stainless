@@ -48,6 +48,10 @@ module Standard;
 /// Being a variant is also what makes it small. Only one case is ever present,
 /// so the payloads overlap: a `Result<String, IOError>` is a tag and one
 /// pointer, not a flag and both halves. Nothing allocates either way.
+///
+/// @typeparam T       what the call produces when it worked
+/// @typeparam TError  why it did not, usually an enum so that a failure has a name rather than
+///                    a number
 public variant Result<T, TError>
 {
     /// It worked, and `Value` is the answer.
@@ -80,16 +84,28 @@ public variant Result<T, TError>
 // They live here rather than in `Standard.Collections`, and need no import.
 
 /// Turns a T into an R. The transform half of `Select`.
+///
+/// @typeparam T  what goes in
+/// @typeparam R  what comes out
 public closure R Func<T, R>(T value);
 
 /// Answers a question about a T.
+///
+/// @typeparam T  what the question is about
 public closure bool Predicate<T>(T value);
 
 /// Does something with a T and returns nothing.
+///
+/// @typeparam T  what is handed to it
 public closure void Action<T>(T value);
 
 /// Folds one T into a running A. Two parameters rather than one, because a
 /// fold is the one shape that carries something along with it.
+///
+/// @param total  what has been accumulated so far
+/// @param value  the next element to fold in
+/// @typeparam A  what is carried along, and what the fold answers with
+/// @typeparam T  what is folded over
 public closure A Fold<A, T>(A total, T value);
 
 /// Orders two Ts: negative if `left` comes first, positive if `right` does,
@@ -97,6 +113,8 @@ public closure A Fold<A, T>(A total, T value);
 ///
 /// This is what lets a type be sorted more than one way, and what lets a type
 /// that implements no interface be sorted at all.
+///
+/// @typeparam T  what is being ordered
 public closure int Comparer<T>(T left, T right);
 
 // ---------------------------------------------------------- a value, or not
@@ -136,6 +154,8 @@ extern "C"
 /// a case to name. This is for everything a null pointer cannot say -- which
 /// is also why the names differ: `Optional<T>` is this type, and "an optional"
 /// is what the spec calls `C?`.
+///
+/// @typeparam T  what it may hold -- a value type, usually, since a reference already has `C?`
 public variant Optional<T>
 {
     /// There is no value. Carries nothing, so there is nothing to read by
@@ -176,6 +196,8 @@ public variant Optional<T>
     /// something that is not there is a mistake in the caller rather than a
     /// value to return. Use `GetValueOrDefault` where a miss is ordinary, and
     /// `is Some x` where the answer decides what happens next.
+    ///
+    /// @see Optional.GetValueOrDefault
     public T GetValue()
     {
         if (this is Some held)
@@ -192,6 +214,9 @@ public variant Optional<T>
     ///
     /// The reader that needs no proof, because it supplies its own -- the same
     /// bargain `Result.GetValueOrDefault` makes.
+    ///
+    /// @param fallback  what to answer when there is nothing held
+    /// @see Optional.GetValue
     public T GetValueOrDefault(T fallback)
     {
         if (this is Some held)
@@ -217,6 +242,8 @@ public variant Optional<T>
     ///
     /// The transform runs only where there is something to run it on, which is
     /// the point: it is the `if` that would otherwise be written by hand.
+    ///
+    /// @typeparam R  what `transform` produces
     public Optional<R> Select<R>(Func<T, R> transform)
     {
         if (this is Some held)
@@ -226,6 +253,8 @@ public variant Optional<T>
 
     /// `Select` for a transform that answers with an optional of its own, which
     /// would otherwise nest one inside the other.
+    ///
+    /// @typeparam R  what the transform's own optional holds
     public Optional<R> SelectMany<R>(Func<T, Optional<R>> transform)
     {
         if (this is Some held)

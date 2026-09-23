@@ -54,10 +54,21 @@ public long GetSize(String path) => sl_path_size(path.ToPointer());
 public long GetLastWriteTime(String path) => sl_path_modified(path.ToPointer());
 
 /// Removes the file. `IOError.None` on success.
+///
+/// @failure IOError.NotFound      there is nothing at that path
+/// @failure IOError.AccessDenied  the file or its directory refuses it
+/// @failure IOError.IsADirectory  the path names a directory; use `Directory`
 public IOError Delete(String path) => (IOError)sl_file_delete(path.ToPointer());
 
 /// Moves or renames. Whether it replaces an existing destination is the
 /// platform's decision, not this one's.
+///
+/// @param from  the file to move, which must be there
+/// @param to    where it is to end up, directories and all
+/// @failure IOError.NotFound       `from` is not there
+/// @failure IOError.AccessDenied   either path refuses it
+/// @failure IOError.AlreadyExists  `to` is taken and this platform will not
+///                                 replace it
 public IOError Move(String from, String to)
 {
     return (IOError)sl_file_rename(from.ToPointer(), to.ToPointer());
@@ -84,6 +95,15 @@ const nuint KeepReading = 65536u;
 /// has to mean for this to be usable on Linux at all. Trusting the size gave
 /// every `/proc/<pid>/maps` back as empty, which is a debugger that cannot find
 /// where a program was loaded.
+///
+/// @failure IOError.NotFound      there is no file at that path
+/// @failure IOError.AccessDenied  the file refuses to be read
+/// @failure IOError.IsADirectory  the path names a directory
+/// @failure IOError.Unknown       the file is there and its length could not
+///                                be had, or the platform reported something
+///                                with no case of its own -- a full disk
+///                                among them
+/// @see File.ReadAllText
 public Result<byte[], IOError> ReadAllBytes(String path)
 {
     var file = try FileStream.OpenRead(path);
@@ -134,6 +154,13 @@ public Result<byte[], IOError> ReadAllBytes(String path)
 
 /// The whole file as text, read as UTF-8. A byte order mark at the start is
 /// dropped: it says how the text is stored and is not part of it.
+///
+/// @failure IOError.NotFound      there is no file at that path
+/// @failure IOError.AccessDenied  the file refuses to be read
+/// @failure IOError.IsADirectory  the path names a directory
+/// @failure IOError.Unknown       the platform reported something with no case
+///                                of its own
+/// @see File.WriteAllText
 public Result<String, IOError> ReadAllText(String path)
 {
     var raw = try ReadAllBytes(path);
@@ -149,6 +176,13 @@ public Result<String, IOError> ReadAllText(String path)
 
 /// The file's lines, with either line ending accepted and a trailing newline
 /// producing no final empty line.
+///
+/// @failure IOError.NotFound      there is no file at that path
+/// @failure IOError.AccessDenied  the file refuses to be read
+/// @failure IOError.IsADirectory  the path names a directory
+/// @failure IOError.Unknown       the platform reported something with no case
+///                                of its own
+/// @see File.WriteAllLines
 public Result<List<String>, IOError> ReadAllLines(String path)
 {
     return Ok(IO.SplitLines(try ReadAllText(path)));
@@ -169,6 +203,12 @@ IOError CloseWrittenFile(FileStream file)
 }
 
 /// Replaces the file with `data`, creating it if needed.
+///
+/// @failure IOError.AccessDenied  the path or its directory refuses it
+/// @failure IOError.IsADirectory  the path names a directory
+/// @failure IOError.Unknown       the write or the close failed for a reason
+///                                with no case of its own, a full disk among
+///                                them
 public IOError WriteAllBytes(String path, byte[] data)
 {
     var opened = FileStream.Create(path);
@@ -181,6 +221,13 @@ public IOError WriteAllBytes(String path, byte[] data)
 }
 
 /// Replaces the file with `text`, written as UTF-8.
+///
+/// @failure IOError.AccessDenied  the path or its directory refuses it
+/// @failure IOError.IsADirectory  the path names a directory
+/// @failure IOError.Unknown       the write or the close failed for a reason
+///                                with no case of its own, a full disk among
+///                                them
+/// @see File.ReadAllText
 public IOError WriteAllText(String path, String text)
 {
     var opened = FileStream.Create(path);
@@ -194,6 +241,12 @@ public IOError WriteAllText(String path, String text)
 
 /// Writes the lines, each followed by a newline. Stops at the first write that
 /// fails.
+///
+/// @failure IOError.AccessDenied  the path or its directory refuses it
+/// @failure IOError.IsADirectory  the path names a directory
+/// @failure IOError.Unknown       a write or the close failed for a reason
+///                                with no case of its own, a full disk among
+///                                them
 public IOError WriteAllLines(String path, IReadOnlyList<String> lines)
 {
     var opened = FileStream.Create(path);
@@ -215,6 +268,12 @@ public IOError WriteAllLines(String path, IReadOnlyList<String> lines)
 }
 
 /// Adds `text` to the end, creating the file if it is not there.
+///
+/// @failure IOError.AccessDenied  the path or its directory refuses it
+/// @failure IOError.IsADirectory  the path names a directory
+/// @failure IOError.Unknown       the write or the close failed for a reason
+///                                with no case of its own, a full disk among
+///                                them
 public IOError AppendAllText(String path, String text)
 {
     var opened = FileStream.OpenAppend(path);
@@ -228,6 +287,14 @@ public IOError AppendAllText(String path, String text)
 
 /// Copies a file. Reads it whole, so this is for ordinary files rather than
 /// for something that will not fit in memory.
+///
+/// @param from  the file to read, which must be there
+/// @param to    the file to replace or create
+/// @failure IOError.NotFound      `from` is not there
+/// @failure IOError.AccessDenied  either path refuses it
+/// @failure IOError.IsADirectory  either path names a directory
+/// @failure IOError.Unknown       the read or the write failed for a reason
+///                                with no case of its own
 public IOError Copy(String from, String to)
 {
     var data = ReadAllBytes(from);

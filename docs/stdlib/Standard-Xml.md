@@ -35,7 +35,7 @@ attribute XmlAttribute
 
 Writes the field as an attribute of its element rather than as a child.
 
-<sub>[stdlib/Xml.sl:1160](../../stdlib/Xml.sl#L1160)</sub>
+<sub>[stdlib/Xml.sl:1200](../../stdlib/Xml.sl#L1200)</sub>
 
 ### XmlAttributes *class*
 
@@ -49,7 +49,7 @@ The same `OrderedDictionary` a JSON object's members are, and for the same
 reason: an attribute list that came back reordered is a document nobody
 wrote.
 
-<sub>[stdlib/Xml.sl:123](../../stdlib/Xml.sl#L123)</sub>
+<sub>[stdlib/Xml.sl:126](../../stdlib/Xml.sl#L126)</sub>
 
 #### Count *property*
 
@@ -59,7 +59,7 @@ nuint Count { get; }
 
 How many attributes there are.
 
-<sub>[stdlib/Xml.sl:131](../../stdlib/Xml.sl#L131)</sub>
+<sub>[stdlib/Xml.sl:134](../../stdlib/Xml.sl#L134)</sub>
 
 #### GetNameAt *method*
 
@@ -69,7 +69,7 @@ String GetNameAt(nuint index)
 
 The name at a position, in the order they were written.
 
-<sub>[stdlib/Xml.sl:134](../../stdlib/Xml.sl#L134)</sub>
+<sub>[stdlib/Xml.sl:137](../../stdlib/Xml.sl#L137)</sub>
 
 #### GetValueAt *method*
 
@@ -79,7 +79,9 @@ String GetValueAt(nuint index)
 
 The value at a position, pairing with `GetNameAt` at the same index.
 
-<sub>[stdlib/Xml.sl:137](../../stdlib/Xml.sl#L137)</sub>
+**See also** &nbsp; [XmlAttributes.GetNameAt](#getnameat-method)
+
+<sub>[stdlib/Xml.sl:142](../../stdlib/Xml.sl#L142)</sub>
 
 #### Add *method*
 
@@ -91,7 +93,14 @@ Appends an attribute without looking for the name first. A parsed
 document cannot reach here with a repeat -- that is
 `XmlError.DuplicateAttribute` -- so this is for building one.
 
-<sub>[stdlib/Xml.sl:142](../../stdlib/Xml.sl#L142)</sub>
+**Parameters**
+
+- `name` — the attribute name
+- `value` — the text it carries, unescaped
+
+**See also** &nbsp; [XmlError.DuplicateAttribute](#duplicateattribute-case)
+
+<sub>[stdlib/Xml.sl:151](../../stdlib/Xml.sl#L151)</sub>
 
 #### SetValue *method*
 
@@ -102,7 +111,12 @@ void SetValue(String name, String value)
 Sets the value of a name, adding it if it is new. A replaced name keeps
 the position it had.
 
-<sub>[stdlib/Xml.sl:146](../../stdlib/Xml.sl#L146)</sub>
+**Parameters**
+
+- `name` — the attribute name
+- `value` — the text it is to carry, unescaped
+
+<sub>[stdlib/Xml.sl:158](../../stdlib/Xml.sl#L158)</sub>
 
 #### IndexOf *method*
 
@@ -112,7 +126,7 @@ Optional<nuint> IndexOf(String name)
 
 Where a name is, or `None`.
 
-<sub>[stdlib/Xml.sl:149](../../stdlib/Xml.sl#L149)</sub>
+<sub>[stdlib/Xml.sl:161](../../stdlib/Xml.sl#L161)</sub>
 
 #### ContainsKey *method*
 
@@ -122,7 +136,7 @@ bool ContainsKey(String name)
 
 Whether an attribute of that name is there.
 
-<sub>[stdlib/Xml.sl:152](../../stdlib/Xml.sl#L152)</sub>
+<sub>[stdlib/Xml.sl:164](../../stdlib/Xml.sl#L164)</sub>
 
 #### Find *method*
 
@@ -132,7 +146,12 @@ String Find(String name, String fallback)
 
 The value of an attribute, or the fallback when it is not there.
 
-<sub>[stdlib/Xml.sl:155](../../stdlib/Xml.sl#L155)</sub>
+**Parameters**
+
+- `name` — the attribute to look for
+- `fallback` — what to answer when there is no such attribute
+
+<sub>[stdlib/Xml.sl:170](../../stdlib/Xml.sl#L170)</sub>
 
 #### Remove *method*
 
@@ -142,7 +161,7 @@ bool Remove(String name)
 
 Removes an attribute, answering whether it was there.
 
-<sub>[stdlib/Xml.sl:158](../../stdlib/Xml.sl#L158)</sub>
+<sub>[stdlib/Xml.sl:173](../../stdlib/Xml.sl#L173)</sub>
 
 ### XmlCreate *attribute*
 
@@ -153,7 +172,7 @@ attribute XmlCreate
 Lets a reader make this field's object when the element is there and the
 field is null. The same opt-in, and the same hazard, as `[JsonCreate]`.
 
-<sub>[stdlib/Xml.sl:1167](../../stdlib/Xml.sl#L1167)</sub>
+<sub>[stdlib/Xml.sl:1207](../../stdlib/Xml.sl#L1207)</sub>
 
 ### XmlError *enum*
 
@@ -305,7 +324,7 @@ attribute XmlIgnore
 
 Leaves the field out entirely, in both directions.
 
-<sub>[stdlib/Xml.sl:1163](../../stdlib/Xml.sl#L1163)</sub>
+<sub>[stdlib/Xml.sl:1203](../../stdlib/Xml.sl#L1203)</sub>
 
 ### XmlName *attribute*
 
@@ -315,7 +334,7 @@ attribute XmlName
 
 The element name a field is written as, when it differs from the field's.
 
-<sub>[stdlib/Xml.sl:1157](../../stdlib/Xml.sl#L1157)</sub>
+<sub>[stdlib/Xml.sl:1197](../../stdlib/Xml.sl#L1197)</sub>
 
 ### XmlNode *class*
 
@@ -338,7 +357,7 @@ it is the indentation a person or `ToXmlTextIndented` put there. A run with
 anything else in it is kept whole, as is a CDATA section or a character
 reference, and an element with no children keeps all of its text.
 
-<sub>[stdlib/Xml.sl:177](../../stdlib/Xml.sl#L177)</sub>
+<sub>[stdlib/Xml.sl:192](../../stdlib/Xml.sl#L192)</sub>
 
 #### Name *field*
 
@@ -349,7 +368,7 @@ String Name
 The tag name, without any namespace prefix being separated out -- a
 prefix arrives as part of the name, since nothing here resolves one.
 
-<sub>[stdlib/Xml.sl:181](../../stdlib/Xml.sl#L181)</sub>
+<sub>[stdlib/Xml.sl:196](../../stdlib/Xml.sl#L196)</sub>
 
 #### Attributes *field*
 
@@ -360,7 +379,7 @@ XmlAttributes Attributes
 The attributes, in the order they were written. Never null; an element
 with none has an empty list.
 
-<sub>[stdlib/Xml.sl:185](../../stdlib/Xml.sl#L185)</sub>
+<sub>[stdlib/Xml.sl:200](../../stdlib/Xml.sl#L200)</sub>
 
 #### Children *field*
 
@@ -370,7 +389,7 @@ List<XmlNode> Children
 
 The child elements, in document order. Never null.
 
-<sub>[stdlib/Xml.sl:188](../../stdlib/Xml.sl#L188)</sub>
+<sub>[stdlib/Xml.sl:203](../../stdlib/Xml.sl#L203)</sub>
 
 #### Text *field*
 
@@ -381,7 +400,7 @@ String Text
 Every character run inside this element, joined. Where each run sat
 relative to the children is not kept -- see the note above.
 
-<sub>[stdlib/Xml.sl:192](../../stdlib/Xml.sl#L192)</sub>
+<sub>[stdlib/Xml.sl:207](../../stdlib/Xml.sl#L207)</sub>
 
 #### FindChild *method*
 
@@ -391,7 +410,7 @@ XmlNode? FindChild(String name)
 
 The first child of that name, or null.
 
-<sub>[stdlib/Xml.sl:204](../../stdlib/Xml.sl#L204)</sub>
+<sub>[stdlib/Xml.sl:219](../../stdlib/Xml.sl#L219)</sub>
 
 #### FindChildren *method*
 
@@ -401,7 +420,7 @@ List<XmlNode> FindChildren(String name)
 
 Every child of that name, in order.
 
-<sub>[stdlib/Xml.sl:216](../../stdlib/Xml.sl#L216)</sub>
+<sub>[stdlib/Xml.sl:231](../../stdlib/Xml.sl#L231)</sub>
 
 #### FindChildText *method*
 
@@ -411,7 +430,12 @@ String FindChildText(String name, String fallback)
 
 The text of the first child of that name, or the fallback.
 
-<sub>[stdlib/Xml.sl:229](../../stdlib/Xml.sl#L229)</sub>
+**Parameters**
+
+- `name` — the child element to look for
+- `fallback` — what to answer when there is no such child
+
+<sub>[stdlib/Xml.sl:247](../../stdlib/Xml.sl#L247)</sub>
 
 #### Add *method*
 
@@ -422,7 +446,7 @@ void Add(XmlNode child)
 Appends a child element. Nothing checks for a cycle, so do not add a
 node to one of its own descendants: writing the tree would not end.
 
-<sub>[stdlib/Xml.sl:239](../../stdlib/Xml.sl#L239)</sub>
+<sub>[stdlib/Xml.sl:257](../../stdlib/Xml.sl#L257)</sub>
 
 ## Functions
 
@@ -448,7 +472,23 @@ Line ends are normalized first (§2.11): a CR LF pair or a lone CR is read
 as LF everywhere, CDATA included. A control character XML does not allow
 is refused wherever it is. A UTF-8 byte order mark at the start is skipped.
 
-<sub>[stdlib/Xml.sl:936](../../stdlib/Xml.sl#L936)</sub>
+**Fails with**
+
+- [XmlError.Unexpected](#unexpected-case) — a character that cannot appear where it is
+- [XmlError.UnclosedTag](#unclosedtag-case) — a `<` with no `>`
+- [XmlError.UnclosedText](#unclosedtext-case) — a quoted value with no closing quote
+- [XmlError.MismatchedEnd](#mismatchedend-case) — an end tag naming another element
+- [XmlError.UnexpectedEnd](#unexpectedend-case) — the document stopped inside an element
+- [XmlError.BadName](#badname-case) — a tag or attribute name that is not one
+- [XmlError.BadEntity](#badentity-case) — an `&` that is not one of the five predefines or a character reference XML allows
+- [XmlError.NoRoot](#noroot-case) — nothing but whitespace and comments
+- [XmlError.TrailingContent](#trailingcontent-case) — a second root element
+- [XmlError.TooDeep](#toodeep-case) — nesting past `MaxDepth`
+- [XmlError.DuplicateAttribute](#duplicateattribute-case) — one element names an attribute twice
+
+**See also** &nbsp; [Xml.ToXmlText](#toxmltext-function)
+
+<sub>[stdlib/Xml.sl:968](../../stdlib/Xml.sl#L968)</sub>
 
 ### PopulateObject *function*
 
@@ -462,7 +502,28 @@ The object is the program's, for the reason `Json.PopulateObject` takes one: its
 constructor has run, so a field the document does not mention keeps the
 value the type promised rather than a zero.
 
-<sub>[stdlib/Xml.sl:1339](../../stdlib/Xml.sl#L1339)</sub>
+**Type parameters**
+
+- `T` — a `[Reflect]` type, whose field tables say what there is to fill
+
+**Fails with**
+
+- [XmlError.Unexpected](#unexpected-case) — a character that cannot appear where it is
+- [XmlError.UnclosedTag](#unclosedtag-case) — a `<` with no `>`
+- [XmlError.UnclosedText](#unclosedtext-case) — a quoted value with no closing quote
+- [XmlError.MismatchedEnd](#mismatchedend-case) — an end tag naming another element
+- [XmlError.UnexpectedEnd](#unexpectedend-case) — the document stopped inside an element
+- [XmlError.BadName](#badname-case) — a tag or attribute name that is not one
+- [XmlError.BadEntity](#badentity-case) — an `&` that is not one of the five predefines or a character reference XML allows
+- [XmlError.NoRoot](#noroot-case) — nothing but whitespace and comments
+- [XmlError.TrailingContent](#trailingcontent-case) — a second root element
+- [XmlError.TooDeep](#toodeep-case) — nesting past `MaxDepth`
+- [XmlError.DuplicateAttribute](#duplicateattribute-case) — one element names an attribute twice
+- [XmlError.NotReflected](#notreflected-case) — `T` carries no field tables
+
+**See also** &nbsp; [Xml.Serialize](#serialize-function)
+
+<sub>[stdlib/Xml.sl:1410](../../stdlib/Xml.sl#L1410)</sub>
 
 ### PopulateObject *function*
 
@@ -472,7 +533,17 @@ XmlError PopulateObject<T>(T value, XmlNode node)
 
 The same, from an element already parsed.
 
-<sub>[stdlib/Xml.sl:1349](../../stdlib/Xml.sl#L1349)</sub>
+**Type parameters**
+
+- `T` — a `[Reflect]` type, whose field tables say what there is to fill
+
+**Fails with**
+
+- [XmlError.NotReflected](#notreflected-case) — `T` carries no field tables
+
+**See also** &nbsp; [Xml.Serialize](#serialize-function)
+
+<sub>[stdlib/Xml.sl:1424](../../stdlib/Xml.sl#L1424)</sub>
 
 ### Serialize *function*
 
@@ -482,7 +553,18 @@ String Serialize<T>(T value, String name)
 
 The element as text.
 
-<sub>[stdlib/Xml.sl:1180](../../stdlib/Xml.sl#L1180)</sub>
+**Parameters**
+
+- `value` — the object to read the fields of
+- `name` — the tag name of the root element
+
+**Type parameters**
+
+- `T` — a `[Reflect]` type
+
+**See also** &nbsp; [Xml.PopulateObject](#populateobject-function)
+
+<sub>[stdlib/Xml.sl:1230](../../stdlib/Xml.sl#L1230)</sub>
 
 ### SerializeDocument *function*
 
@@ -492,7 +574,18 @@ String SerializeDocument<T>(T value, String name)
 
 The same, with a declaration and indentation.
 
-<sub>[stdlib/Xml.sl:1183](../../stdlib/Xml.sl#L1183)</sub>
+**Parameters**
+
+- `value` — the object to read the fields of
+- `name` — the tag name of the root element
+
+**Type parameters**
+
+- `T` — a `[Reflect]` type
+
+**See also** &nbsp; [Xml.Serialize](#serialize-function)
+
+<sub>[stdlib/Xml.sl:1238](../../stdlib/Xml.sl#L1238)</sub>
 
 ### ToXmlDocumentText *function*
 
@@ -502,7 +595,9 @@ String ToXmlDocumentText(XmlNode node)
 
 The declaration and the element under it, which is what a whole file wants.
 
-<sub>[stdlib/Xml.sl:1035](../../stdlib/Xml.sl#L1035)</sub>
+**See also** &nbsp; [Xml.ToXmlTextIndented](#toxmltextindented-function)
+
+<sub>[stdlib/Xml.sl:1075](../../stdlib/Xml.sl#L1075)</sub>
 
 ### ToXmlNode *function*
 
@@ -516,7 +611,18 @@ A field marked `[XmlAttribute]` becomes an attribute instead, which is what
 makes the output look like XML a person would have written rather than a
 JSON document with angle brackets.
 
-<sub>[stdlib/Xml.sl:1174](../../stdlib/Xml.sl#L1174)</sub>
+**Parameters**
+
+- `value` — the object to read the fields of
+- `name` — the tag name of the element they go under
+
+**Type parameters**
+
+- `T` — a `[Reflect]` type, whose field tables say what there is to write
+
+**See also** &nbsp; [Xml.Serialize](#serialize-function)
+
+<sub>[stdlib/Xml.sl:1219](../../stdlib/Xml.sl#L1219)</sub>
 
 ### ToXmlText *function*
 
@@ -526,7 +632,9 @@ String ToXmlText(XmlNode node)
 
 The element as text, on one line.
 
-<sub>[stdlib/Xml.sl:1015](../../stdlib/Xml.sl#L1015)</sub>
+**See also** &nbsp; [Xml.Parse](#parse-function) &middot; [Xml.ToXmlTextIndented](#toxmltextindented-function)
+
+<sub>[stdlib/Xml.sl:1050](../../stdlib/Xml.sl#L1050)</sub>
 
 ### ToXmlTextIndented *function*
 
@@ -540,7 +648,9 @@ adds would become part of that text when it was read back. The indentation
 between the children of any other element is dropped by the reader -- see
 the note on XmlNode -- so writing what was read back gives the same text.
 
-<sub>[stdlib/Xml.sl:1027](../../stdlib/Xml.sl#L1027)</sub>
+**See also** &nbsp; [Xml.ToXmlText](#toxmltext-function) &middot; [XmlNode](#xmlnode-class)
+
+<sub>[stdlib/Xml.sl:1065](../../stdlib/Xml.sl#L1065)</sub>
 
 ## Constants
 
@@ -553,5 +663,9 @@ const nuint MaxDepth = 128
 How far the parser will nest, for the reason `Json.MaxDepth` exists: the
 nesting is recursion, and a hostile document is one long line.
 
-<sub>[stdlib/Xml.sl:114](../../stdlib/Xml.sl#L114)</sub>
+**Value** &nbsp; 128 levels.
+
+**See also** &nbsp; [XmlError.TooDeep](#toodeep-case)
+
+<sub>[stdlib/Xml.sl:117](../../stdlib/Xml.sl#L117)</sub>
 

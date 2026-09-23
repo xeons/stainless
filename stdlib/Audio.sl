@@ -90,6 +90,8 @@ extern "C"
 /// descriptor holds and what a WAV header carries. Anything a device will not
 /// take is reported by `AudioPlayer.Open` rather than refused here -- what a
 /// sound card accepts is not knowable from the numbers alone.
+///
+/// @see AudioPlayer.Open
 public struct AudioFormat
 {
     /// Frames per second. 44100 is a CD, 48000 is what most hardware runs at
@@ -107,6 +109,11 @@ public struct AudioFormat
     public ushort BitsPerSample;
 
     /// A format written out.
+    ///
+    /// @param sampleRate  frames per second: 44100 for a CD, 8000 for a
+    ///                    telephone
+    /// @param channels    1 for mono, 2 for stereo, and nothing else
+    /// @param bits        8 or 16, the width of one sample
     public static AudioFormat Create(uint sampleRate, ushort channels, ushort bits)
     {
         AudioFormat format;
@@ -246,6 +253,10 @@ public sealed class AudioClip
     /// sixteen bits answers its top sixteen. Out of range answers
     /// zero rather than aborting: a program walking a waveform runs off the
     /// end at the end, and that is not a mistake in it.
+    ///
+    /// @param frame    which frame, counting from zero
+    /// @param channel  which channel of it, 0 or 1
+    /// @see AudioClip.SetSample
     public int GetSample(nuint frame, nuint channel)
     {
         nuint at = FindSampleOffset(frame, channel);
@@ -270,6 +281,11 @@ public sealed class AudioClip
     /// One sample written, taking the same range `GetSample` answers in and
     /// clamping to it. A sample wider than sixteen bits has its top sixteen
     /// set and the bits below them cleared. Out of range does nothing.
+    ///
+    /// @param frame    which frame, counting from zero
+    /// @param channel  which channel of it, 0 or 1
+    /// @param value    the sample, -32768 to 32767, clamped to that
+    /// @see AudioClip.GetSample
     public void SetSample(nuint frame, nuint channel, int value)
     {
         nuint at = FindSampleOffset(frame, channel);
@@ -327,6 +343,13 @@ public sealed class AudioClip
 public static class Wav
 {
     /// The bytes of a `.wav` file, read.
+    ///
+    /// @failure AudioError.Format     a WAVE that is not uncompressed PCM, or
+    ///                                whose rate, channel count or width is
+    ///                                not one this module handles
+    /// @failure AudioError.Malformed  not a RIFF/WAVE at all, or one with no
+    ///                                `fmt ` chunk before its `data`
+    /// @see Wav.Encode
     public static Result<AudioClip, AudioError> Decode(byte[] bytes)
     {
         if (bytes.Length < 44u)
@@ -397,6 +420,8 @@ public static class Wav
 
     /// A clip as the bytes of a `.wav` file: a 44-byte canonical header, the
     /// samples, and the pad byte an odd length is followed by.
+    ///
+    /// @see Wav.Decode
     public static byte[] Encode(AudioClip clip)
     {
         var format = clip.Format;
@@ -427,6 +452,14 @@ public static class Wav
     }
 
     /// A `.wav` on disk, read.
+    ///
+    /// @failure AudioError.Format     a WAVE that is not uncompressed PCM, or
+    ///                                one shaped in a way this module does not
+    ///                                handle
+    /// @failure AudioError.Malformed  not a RIFF/WAVE at all
+    /// @failure AudioError.Io         the file could not be read; the
+    ///                                `IOError` behind it is not carried
+    /// @see Wav.Save
     public static Result<AudioClip, AudioError> FromFile(String path)
     {
         var read = File.ReadAllBytes(path);
@@ -436,6 +469,10 @@ public static class Wav
     }
 
     /// A clip written to a `.wav` on disk.
+    ///
+    /// @failure AudioError.Io  the file could not be written; the `IOError`
+    ///                         behind it is not carried
+    /// @see Wav.FromFile
     public static Result<bool, AudioError> Save(AudioClip clip, String path)
     {
         if (File.WriteAllBytes(path, Encode(clip)) != IOError.None)
@@ -1063,11 +1100,21 @@ public String BackendName()
 }
 
 /// A clip played through to the end.
-    ///
+///
 /// The simple door, and the one most programs want: it opens a device,
 /// writes the samples, waits for them, and closes. A program playing many
 /// sounds should keep an `AudioPlayer` instead, because opening a device takes
 /// tens of milliseconds and this does it every time.
+///
+/// @failure AudioError.NoBackend  there is no audio library on this machine
+/// @failure AudioError.Format     the clip's format is not one this module
+///                                handles, the device would not take it, or
+///                                its samples are not whole frames
+/// @failure AudioError.Device     there is nothing to play through, or the
+///                                device failed part way
+/// @failure AudioError.Busy       something else has the device and will not
+///                                share it
+/// @see AudioPlayer
 public Result<bool, AudioError> PlayClip(AudioClip clip)
 {
     var opened = AudioPlayer.Open(clip.Format);
@@ -1091,6 +1138,15 @@ public Result<bool, AudioError> PlayClip(AudioClip clip)
 ///
 /// Blocks for that long. A program that wants to stop early, or to see the
 /// sound as it arrives, wants an `AudioRecorder`.
+///
+/// @failure AudioError.NoBackend  there is no audio library on this machine
+/// @failure AudioError.Format     the format is not one this module handles,
+///                                or not one the device would take
+/// @failure AudioError.Device     there is nothing to record from, or the
+///                                device refused to start
+/// @failure AudioError.Busy       something else has the device and will not
+///                                share it
+/// @see AudioRecorder
 public Result<AudioClip, AudioError> RecordClip(AudioFormat format, double seconds)
 {
     var opened = AudioRecorder.Open(format);
@@ -1234,6 +1290,14 @@ public sealed class AudioPlayer
     /// the device in exclusive mode, and `Format` when the engine will not
     /// take these numbers -- which is worth telling apart, because the answer
     /// to the last one is to resample rather than to give up.
+    ///
+    /// @failure AudioError.NoBackend  there is no audio library on this machine
+    /// @failure AudioError.Format     the format is not one this module handles,
+    ///                                or not one the engine would take
+    /// @failure AudioError.Device     there is nothing to play through, or the
+    ///                                stream would not open
+    /// @failure AudioError.Busy       something else has the device in
+    ///                                exclusive mode
     public static Result<AudioPlayer, AudioError> Open(AudioFormat format)
     {
         if (!format.IsSupported)
@@ -1282,6 +1346,12 @@ public sealed class AudioPlayer
     /// have been heard -- `DrainBuffer` is what waits for that. A length that is not
     /// a whole number of frames is refused rather than truncated, because
     /// truncating swaps the channels for the rest of the stream.
+    ///
+    /// @failure AudioError.Format  the length is not a whole number of frames
+    /// @failure AudioError.Device  the device failed or went away while this
+    ///                             was writing to it
+    /// @failure AudioError.Closed  `Close` has already been called
+    /// @see AudioPlayer.DrainBuffer
     public Result<bool, AudioError> Write(byte[] samples)
     {
         if (_closed)
@@ -1571,6 +1641,15 @@ public sealed class AudioRecorder
     }
 
     /// A device open for this format. Fails as `AudioPlayer.Open` does.
+    ///
+    /// @failure AudioError.NoBackend  there is no audio library on this machine
+    /// @failure AudioError.Format     the format is not one this module handles,
+    ///                                or not one the engine would take
+    /// @failure AudioError.Device     there is nothing to record from, or the
+    ///                                stream would not open
+    /// @failure AudioError.Busy       something else has the device in
+    ///                                exclusive mode
+    /// @see AudioPlayer.Open
     public static Result<AudioRecorder, AudioError> Open(AudioFormat format)
     {
         if (!format.IsSupported)
@@ -1618,6 +1697,10 @@ public sealed class AudioRecorder
 
     /// Starts listening. Sound that arrives before the first `Read` is
     /// buffered, up to about a fifth of a second of it, and dropped after that.
+    ///
+    /// @failure AudioError.Device  the device would not start
+    /// @failure AudioError.Closed  `Close` has already been called
+    /// @see AudioRecorder.Read
     public Result<bool, AudioError> Start()
     {
         if (_closed)
@@ -1842,6 +1925,12 @@ public static class Tone
 
     /// A square wave, which is louder than a sine of the same amplitude and is
     /// what a beep traditionally is.
+    ///
+    /// @param format     what the samples are to be
+    /// @param frequency  in hertz
+    /// @param seconds    how long it lasts
+    /// @param amplitude  0.0 to 1.0, where 1.0 is as loud as the format goes
+    /// @see Tone.CreateSine
     public static AudioClip CreateSquare(AudioFormat format, double frequency,
                                    double seconds, double amplitude)
     {

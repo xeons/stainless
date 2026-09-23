@@ -211,6 +211,9 @@ public struct Attribute
 /// A field is the storage. Writing one goes straight past any setter, which is
 /// what a serializer filling plain data wants and what a type with behaviour in
 /// its accessors does not -- see `IsPropertyStorage` and `Type.FindProperty`.
+///
+/// @see Type.FindProperty
+/// @seealso Property
 public struct Field
 {
     /// The runtime's record for this field, or null for one that was looked up
@@ -248,6 +251,8 @@ public struct Field
     /// depends on what is being filled: plain data wants the field, and
     /// anything whose setter does work -- a control that re-lays-out when it
     /// moves -- wants `Type.FindProperty` instead.
+    ///
+    /// @see Type.FindProperty
     public bool IsPropertyStorage => (sl_field_flags(Handle) & 1u) != 0u;
 
     /// True when an attribute of this name is written on the field.
@@ -390,6 +395,9 @@ public struct Field
 ///
 /// **Indexers and static properties are not here.** An indexer's accessors
 /// take arguments nothing could supply, and a static one has no instance.
+///
+/// @see Field
+/// @seealso Type.FindProperty
 public struct Property
 {
     /// The runtime's record for this property, or null for one that was looked
@@ -449,6 +457,9 @@ public struct Property
     }
 
     /// The same three questions a `Field` answers about its kind.
+    ///
+    /// @value true for a property whose value can be read as a whole number
+    /// @see Field.IsInteger
     public bool IsInteger
     {
         get
@@ -514,6 +525,9 @@ public String GetText(byte* instance, Property property)
 /// property MUST be one that holds its object: a getter that makes a new
 /// object on each call answers one nothing else owns, and it is freed before
 /// this returns.
+///
+/// @see ReadAggregate
+/// @seealso SetAggregate
 public byte* GetAggregate(byte* instance, Property property)
 {
     var kind = property.Kind;
@@ -569,6 +583,8 @@ public void SetAggregate(byte* instance, Property property, byte* value)
 /// property's `PropertyType`. Only a class or struct marked `[Reflect]` carries
 /// metadata, and what it carries is its fields, properties and attributes;
 /// methods are not described, so there is nothing here to call.
+///
+/// @see FindType
 public struct Type
 {
     /// The runtime's record for this type, or null for one that was looked up
@@ -674,6 +690,12 @@ public struct Type
 // ------------------------------------------------------------------ reading
 
 /// Reads a whole-number field from an instance.
+///
+/// @returns the value widened to a `long`, sign-extended from a signed kind and
+///          zero-extended from an unsigned one. Zero for a field whose kind is
+///          not a whole number. A `ulong` past the range of `long` comes back
+///          negative, with its bits unchanged.
+/// @see WriteInteger
 public long ReadInteger(byte* instance, Field field)
 {
     return sl_read_integer(instance, field.Handle);
@@ -681,6 +703,8 @@ public long ReadInteger(byte* instance, Field field)
 
 /// Reads a `float` or `double` field from an instance. Zero when the field's
 /// kind is not a floating one -- no conversion from an integer field.
+///
+/// @see WriteDouble
 public double ReadDouble(byte* instance, Field field)
 {
     return sl_read_double(instance, field.Handle);
@@ -688,6 +712,8 @@ public double ReadDouble(byte* instance, Field field)
 
 /// Reads a `bool` field from an instance. False when the field's kind is not
 /// `KindBool`, which reads the same as a real false.
+///
+/// @see WriteBool
 public bool ReadBool(byte* instance, Field field)
 {
     return sl_read_bool(instance, field.Handle);
@@ -695,6 +721,8 @@ public bool ReadBool(byte* instance, Field field)
 
 /// Reads a String field, as a copy of all its bytes. Empty when the field's
 /// kind is not `KindString`.
+///
+/// @see WriteText
 public String ReadText(byte* instance, Field field)
 {
     if (field.Kind != KindString)
@@ -718,6 +746,8 @@ String CopyCountedText(byte* raw)
 /// A class field holds a reference, so the address is what it points at; a
 /// struct field *is* its bytes, so the address is where it sits. Null for a
 /// class field holding nothing, which is the one case a caller has to check.
+///
+/// @see WriteAggregate
 public byte* ReadAggregate(byte* instance, Field field)
 {
     if (field.Kind == KindStruct)
@@ -742,18 +772,24 @@ public byte* ReadAggregate(byte* instance, Field field)
 // holding and it is right by construction.
 
 /// Writes a whole-number field.
+///
+/// @see ReadInteger
 public void WriteInteger(byte* instance, Field field, long value)
 {
     sl_write_integer(instance, field.Handle, value);
 }
 
 /// Writes a floating field, narrowed to `float` where that is its width.
+///
+/// @see ReadDouble
 public void WriteDouble(byte* instance, Field field, double value)
 {
     sl_write_double(instance, field.Handle, value);
 }
 
 /// Writes a `bool` field.
+///
+/// @see ReadBool
 public void WriteBool(byte* instance, Field field, bool value)
 {
     sl_write_bool(instance, field.Handle, value);
@@ -764,6 +800,8 @@ public void WriteBool(byte* instance, Field field, bool value)
 /// The bytes cross rather than the String, which is what keeps a counted
 /// reference out of the runtime's ABI -- the same bargain `ReadText` makes in
 /// the other direction. The field ends up owning a copy.
+///
+/// @see ReadText
 public void WriteText(byte* instance, Field field, String value)
 {
     sl_write_text(instance, field.Handle, value.ToPointer(), value.ByteLength());
@@ -798,6 +836,8 @@ public Type FindType(String name)
 /// cannot be. What comes back is safe to fill and unsafe to hand out until it
 /// has been: prefer making the object the ordinary way and filling it, which
 /// is what `Json.PopulateObject` does and why it is the one that needs no warning.
+///
+/// @see CreateInstanceInto
 public byte* CreateInstance(Type type)
 {
     return sl_type_make(type.Handle);
@@ -806,6 +846,9 @@ public byte* CreateInstance(Type type)
 /// Points a reference field at an object made by `CreateInstance`, releasing whatever it
 /// held. The field takes a reference of its own, so the caller still owns
 /// theirs.
+///
+/// @see CreateInstance
+/// @seealso ReadAggregate
 public void WriteAggregate(byte* instance, Field field, byte* value)
 {
     sl_write_reference(instance, field.Handle, value);
@@ -825,6 +868,8 @@ public void WriteAggregate(byte* instance, Field field, byte* value)
 /// the document is the thing that decides, and prefer a constructor that made
 /// the object already: `Json.PopulateObject` fills in place and only reaches for
 /// this where a field is marked to say so.
+///
+/// @see CreateInstance
 public byte* CreateInstanceInto(byte* instance, Field field)
 {
     if (field.Kind != KindClass)
@@ -878,6 +923,8 @@ public byte* ReadArray(byte* instance, Field field)
 /// build recorded nothing for. `WriteAggregate` is what puts it in the field,
 /// and it retains -- so the caller still owns what it was given and the object
 /// owns what it now holds.
+///
+/// @see WriteAggregate
 public byte* CreateArray(Field field, nuint count)
 {
     if (field.Kind != KindArray)
@@ -896,6 +943,10 @@ public nuint GetArrayLength(byte* array)
 /// The address of one element, or null when the array is null or the index is
 /// past its end. Checked rather than trusted: the caller is walking metadata,
 /// and an index that came from a document is not the program's.
+///
+/// @param array  the array itself, as `ReadArray` answers it
+/// @param field  the array field, which supplies the stride between elements
+/// @param index  which element, counted from zero
 public byte* GetElementAddress(byte* array, Field field, nuint index)
 {
     if (array == null)
@@ -906,6 +957,10 @@ public byte* GetElementAddress(byte* array, Field field, nuint index)
 }
 
 /// Reads an element of a whole-number array.
+///
+/// @param address  where the element sits, from `GetElementAddress`
+/// @param field    the array field, which supplies the element kind
+/// @see WriteIntegerAt
 public long ReadIntegerAt(byte* address, Field field)
 {
     return sl_read_at_integer(address, (uint)field.ElementKind);
@@ -946,6 +1001,8 @@ public byte* ReadAggregateAt(byte* address, Field field)
 }
 
 /// Writes an element of a whole-number array, narrowed to its width.
+///
+/// @see ReadIntegerAt
 public void WriteIntegerAt(byte* address, Field field, long value)
 {
     sl_write_at_integer(address, (uint)field.ElementKind, value);

@@ -71,6 +71,8 @@ extern "C"
 /// `Value` means nothing when `Ok` is false -- it holds whatever a zeroed slot
 /// holds. Check `Ok` first. The pair exists because a concurrent container
 /// cannot answer "is it empty?" and "give me the front" as two questions.
+///
+/// @typeparam T  what the container holds, and so what a take can hand back
 public class Taken<T>
 {
     /// Whether there was anything to take. Read this before `Value`.
@@ -92,6 +94,9 @@ public class Taken<T>
 // ------------------------------------------------------------------- queue
 
 /// A first-in, first-out queue several threads may use at once.
+///
+/// @typeparam T  what the queue holds; nothing is required of it, and nothing yet checks that
+///               two threads may safely hold one at once
 public threadsafe class ConcurrentQueue<T>
 {
     Queue<T> _items;
@@ -185,6 +190,9 @@ public threadsafe class ConcurrentQueue<T>
 // ------------------------------------------------------------------- stack
 
 /// A last-in, first-out stack several threads may use at once.
+///
+/// @typeparam T  what the stack holds; nothing is required of it, and nothing yet checks that
+///               two threads may safely hold one at once
 public threadsafe class ConcurrentStack<T>
 {
     Stack<T> _items;
@@ -275,6 +283,10 @@ public threadsafe class ConcurrentStack<T>
 // -------------------------------------------------------------- dictionary
 
 /// A map several threads may use at once.
+///
+/// @typeparam TKey    what entries are found by. It is compared and hashed on every lookup, so
+///                    it must implement both `IEquatable<TKey>` and `IHashable`.
+/// @typeparam TValue  what is stored against a key; nothing is required of it
 public threadsafe class ConcurrentDictionary<TKey, TValue> where TKey : IEquatable<TKey>, IHashable
 {
     Dictionary<TKey, TValue> _entries;
@@ -422,6 +434,9 @@ public threadsafe class ConcurrentDictionary<TKey, TValue> where TKey : IEquatab
 ///     // producer:  channel.Send(line);  ... channel.Close();
 ///     // consumer:  var got = channel.Take();
 ///     //            while (got.Ok) { use(got.Value); got = channel.Take(); }
+///
+/// @typeparam T  what is sent through it; nothing is required of it, and nothing yet checks
+///               that the sender is done with what it sent
 public threadsafe class Channel<T>
 {
     Queue<T> _items;

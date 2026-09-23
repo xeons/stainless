@@ -115,6 +115,8 @@ public String ProgramPath() => sl_args_program();
 /// Null rather than empty, because "not set" and "set to nothing" are
 /// different states and both platforms can tell them apart. `GetVariableOrDefault` is what
 /// most callers want.
+///
+/// @see Env.GetVariableOrDefault
 #if WINDOWS
 public String? GetVariable(String name)
 {
@@ -155,6 +157,10 @@ public String? GetVariable(String name)
 #endif
 
 /// A variable's value, or `fallback` when it is not set.
+///
+/// @param name      the variable to read
+/// @param fallback  what to answer when there is no such variable
+/// @see Env.GetVariable
 public String GetVariableOrDefault(String name, String fallback)
 {
     var value = GetVariable(name);
@@ -174,10 +180,16 @@ public bool HasVariable(String name) => GetVariable(name) != null;
 ///
 /// An empty value leaves the variable set and empty, on both platforms, and
 /// `GetVariable` answers with the empty string rather than null.
+///
+/// @param name   the variable to set
+/// @param value  what to set it to
+/// @see Env.RemoveVariable
 public bool SetVariable(String name, String value) => StoreVariable(name, value);
 
 /// Removes a variable, reporting whether the platform accepted it. Removing
 /// one that was never set is not a failure.
+///
+/// @see Env.SetVariable
 public bool RemoveVariable(String name) => StoreVariable(name, null);
 
 #if WINDOWS
@@ -279,6 +291,8 @@ public String[] GetVariableNames()
 #if WINDOWS
 
 /// The directory relative paths are resolved against.
+///
+/// @see Env.SetCurrentDirectory
 public String CurrentDirectory()
 {
     // Size first, then the path: the same two-call shape the variables use,
@@ -297,6 +311,8 @@ public String CurrentDirectory()
 
 /// Changes it, reporting whether the platform accepted it. It fails when the
 /// path is not a directory, or is not reachable.
+///
+/// @see Env.CurrentDirectory
 public bool SetCurrentDirectory(String path)
 {
     var wide = path.ToUtf16();
@@ -306,6 +322,8 @@ public bool SetCurrentDirectory(String path)
 #else
 
 /// The directory relative paths are resolved against.
+///
+/// @see Env.SetCurrentDirectory
 public String CurrentDirectory()
 {
     // 4096 is PATH_MAX on Linux and the number every shell assumes. A path
@@ -318,6 +336,8 @@ public String CurrentDirectory()
 
 /// Changes it, reporting whether the platform accepted it. It fails when the
 /// path is not a directory, or is not reachable.
+///
+/// @see Env.CurrentDirectory
 public bool SetCurrentDirectory(String path)
 {
     return chdir(path.ToPointer()) == 0;

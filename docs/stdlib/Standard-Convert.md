@@ -78,7 +78,13 @@ Whitespace is skipped, because base64 in the wild arrives wrapped at 64 or
 76 columns and a decoder that refused a newline would be useless for the
 thing it is most often pointed at.
 
-<sub>[stdlib/Convert.sl:376](../../stdlib/Convert.sl#L376)</sub>
+**Fails with**
+
+- [ConvertError.Malformed](#malformed-case) — a character outside both alphabets, or padding that is not a whole tail of the last group
+
+**See also** &nbsp; [Convert.ToBase64](#tobase64-function) &middot; [Convert.ToBase64Url](#tobase64url-function)
+
+<sub>[stdlib/Convert.sl:439](../../stdlib/Convert.sl#L439)</sub>
 
 ### FromHex *function*
 
@@ -90,7 +96,13 @@ Hexadecimal back into bytes. Either case, and an odd number of digits is
 malformed rather than padded, because there is no way to know which end the
 missing half belonged to.
 
-<sub>[stdlib/Convert.sl:333](../../stdlib/Convert.sl#L333)</sub>
+**Fails with**
+
+- [ConvertError.Malformed](#malformed-case) — an odd number of digits, or a character that is not one
+
+**See also** &nbsp; [Convert.ToHex](#tohex-function)
+
+<sub>[stdlib/Convert.sl:387](../../stdlib/Convert.sl#L387)</sub>
 
 ### FromLong *function*
 
@@ -103,7 +115,19 @@ A whole number written in `radix`, from 2 to 36, with lowercase letters.
 Base ten needs nothing from here: `Text.FromInteger` already does it, and
 through C's own formatter.
 
-<sub>[stdlib/Convert.sl:190](../../stdlib/Convert.sl#L190)</sub>
+**A radix outside 2 to 36 answers `""`.** There is no digit vocabulary for
+one, and the answer is a `String` rather than a `Result`, so an empty one
+is what says so. `ToLong` reports the same mistake as
+`ConvertError.Malformed`, because there it has somewhere to put it.
+
+**Parameters**
+
+- `value` — the number to write, negative or not
+- `radix` — the base to write it in, from 2 to 36
+
+**See also** &nbsp; [Convert.ToLong](#tolong-function) &middot; [Text.FromInteger](Standard-Text.md#frominteger-function)
+
+<sub>[stdlib/Convert.sl:231](../../stdlib/Convert.sl#L231)</sub>
 
 ### ToBase64 *function*
 
@@ -113,7 +137,9 @@ String ToBase64(byte[] data)
 
 `data` as base64, padded with `=` to a multiple of four.
 
-<sub>[stdlib/Convert.sl:357](../../stdlib/Convert.sl#L357)</sub>
+**See also** &nbsp; [Convert.FromBase64](#frombase64-function)
+
+<sub>[stdlib/Convert.sl:413](../../stdlib/Convert.sl#L413)</sub>
 
 ### ToBase64Text *function*
 
@@ -123,7 +149,9 @@ String ToBase64Text(String text)
 
 Base64 of the UTF-8 bytes of `text`, which is the common case.
 
-<sub>[stdlib/Convert.sl:449](../../stdlib/Convert.sl#L449)</sub>
+**See also** &nbsp; [Convert.ToBase64](#tobase64-function)
+
+<sub>[stdlib/Convert.sl:514](../../stdlib/Convert.sl#L514)</sub>
 
 ### ToBase64Url *function*
 
@@ -134,7 +162,9 @@ String ToBase64Url(byte[] data)
 `data` as base64url: `-` and `_` for the last two characters, and no
 padding. What a JWT and a URL query both want, and RFC 4648 §5.
 
-<sub>[stdlib/Convert.sl:364](../../stdlib/Convert.sl#L364)</sub>
+**See also** &nbsp; [Convert.FromBase64](#frombase64-function)
+
+<sub>[stdlib/Convert.sl:422](../../stdlib/Convert.sl#L422)</sub>
 
 ### ToDouble *function*
 
@@ -151,7 +181,13 @@ NaN are not spelled here.
 A magnitude past the largest double is `OutOfRange`. One below the
 smallest rounds to zero, which is the nearest double and not a failure.
 
-<sub>[stdlib/Convert.sl:234](../../stdlib/Convert.sl#L234)</sub>
+**Fails with**
+
+- [ConvertError.Empty](#empty-case) — the text is empty
+- [ConvertError.Malformed](#malformed-case) — the text is not one of the forms above
+- [ConvertError.OutOfRange](#outofrange-case) — the magnitude is past the largest double
+
+<sub>[stdlib/Convert.sl:279](../../stdlib/Convert.sl#L279)</sub>
 
 ### ToHex *function*
 
@@ -161,7 +197,9 @@ String ToHex(byte[] data)
 
 `data` as lowercase hexadecimal, two characters per byte and nothing between.
 
-<sub>[stdlib/Convert.sl:299](../../stdlib/Convert.sl#L299)</sub>
+**See also** &nbsp; [Convert.FromHex](#fromhex-function)
+
+<sub>[stdlib/Convert.sl:346](../../stdlib/Convert.sl#L346)</sub>
 
 ### ToHex *function*
 
@@ -171,7 +209,14 @@ String ToHex(byte[] data, bool upper)
 
 The same, in the case asked for.
 
-<sub>[stdlib/Convert.sl:305](../../stdlib/Convert.sl#L305)</sub>
+**Parameters**
+
+- `data` — the bytes to write out
+- `upper` — true for `A`-`F`, false for `a`-`f`
+
+**See also** &nbsp; [Convert.FromHex](#fromhex-function)
+
+<sub>[stdlib/Convert.sl:356](../../stdlib/Convert.sl#L356)</sub>
 
 ### ToInt *function*
 
@@ -181,7 +226,15 @@ Result<int, ConvertError> ToInt(String text)
 
 `text` as an `int`, which is `ToLong` plus a range check.
 
-<sub>[stdlib/Convert.sl:118](../../stdlib/Convert.sl#L118)</sub>
+**Fails with**
+
+- [ConvertError.Empty](#empty-case) — the text is empty, or is a sign and nothing else
+- [ConvertError.Malformed](#malformed-case) — a character is not a digit
+- [ConvertError.OutOfRange](#outofrange-case) — the digits do not fit an `int`
+
+**See also** &nbsp; [Convert.ToLong](#tolong-function)
+
+<sub>[stdlib/Convert.sl:134](../../stdlib/Convert.sl#L134)</sub>
 
 ### ToInt *function*
 
@@ -194,7 +247,15 @@ Result<int, ConvertError> ToInt(String text, uint radix)
 A number that parses as a `long` and does not fit an `int` is
 `OutOfRange`, not a truncation.
 
-<sub>[stdlib/Convert.sl:127](../../stdlib/Convert.sl#L127)</sub>
+**Fails with**
+
+- [ConvertError.Empty](#empty-case) — the text is empty, or is a sign and nothing else
+- [ConvertError.Malformed](#malformed-case) — `radix` is outside 2 to 36, or a character is not a digit in it
+- [ConvertError.OutOfRange](#outofrange-case) — the digits do not fit an `int`
+
+**See also** &nbsp; [Convert.ToLong](#tolong-function)
+
+<sub>[stdlib/Convert.sl:149](../../stdlib/Convert.sl#L149)</sub>
 
 ### ToLong *function*
 
@@ -207,7 +268,15 @@ Result<long, ConvertError> ToLong(String text)
 A leading `+` or `-` is allowed and nothing else is: no spaces, no
 separators, no trailing units. Trim first if the input might have any.
 
-<sub>[stdlib/Convert.sl:61](../../stdlib/Convert.sl#L61)</sub>
+**Fails with**
+
+- [ConvertError.Empty](#empty-case) — the text is empty, or is a sign and nothing else
+- [ConvertError.Malformed](#malformed-case) — a character is not a digit
+- [ConvertError.OutOfRange](#outofrange-case) — the digits do not fit a `long`
+
+**See also** &nbsp; [Convert.FromLong](#fromlong-function)
+
+<sub>[stdlib/Convert.sl:66](../../stdlib/Convert.sl#L66)</sub>
 
 ### ToLong *function*
 
@@ -220,7 +289,15 @@ Result<long, ConvertError> ToLong(String text, uint radix)
 Letters count from `a` = 10 in either case, so base 16 takes `1F` and `1f`
 alike, and base 36 goes to `z`.
 
-<sub>[stdlib/Convert.sl:70](../../stdlib/Convert.sl#L70)</sub>
+**Fails with**
+
+- [ConvertError.Empty](#empty-case) — the text is empty, or is a sign and nothing else
+- [ConvertError.Malformed](#malformed-case) — `radix` is outside 2 to 36, or a character is not a digit in it
+- [ConvertError.OutOfRange](#outofrange-case) — the digits do not fit a `long`
+
+**See also** &nbsp; [Convert.FromLong](#fromlong-function)
+
+<sub>[stdlib/Convert.sl:81](../../stdlib/Convert.sl#L81)</sub>
 
 ### ToULong *function*
 
@@ -231,7 +308,13 @@ Result<ulong, ConvertError> ToULong(String text)
 `text` as an unsigned whole number. A leading `-` is malformed rather than
 wrapping, which is the whole point of asking for an unsigned one.
 
-<sub>[stdlib/Convert.sl:145](../../stdlib/Convert.sl#L145)</sub>
+**Fails with**
+
+- [ConvertError.Empty](#empty-case) — the text is empty, or is a `+` and nothing else
+- [ConvertError.Malformed](#malformed-case) — a character is not a digit, a leading `-` among them
+- [ConvertError.OutOfRange](#outofrange-case) — the digits do not fit a `ulong`
+
+<sub>[stdlib/Convert.sl:171](../../stdlib/Convert.sl#L171)</sub>
 
 ### ToULong *function*
 
@@ -244,5 +327,11 @@ Result<ulong, ConvertError> ToULong(String text, uint radix)
 Letters count from `a` = 10 in either case. A leading `+` is allowed; a
 leading `-` is `Malformed`.
 
-<sub>[stdlib/Convert.sl:154](../../stdlib/Convert.sl#L154)</sub>
+**Fails with**
+
+- [ConvertError.Empty](#empty-case) — the text is empty, or is a `+` and nothing else
+- [ConvertError.Malformed](#malformed-case) — `radix` is outside 2 to 36, a character is not a digit in it, or the number carries a leading `-`
+- [ConvertError.OutOfRange](#outofrange-case) — the digits do not fit a `ulong`
+
+<sub>[stdlib/Convert.sl:185](../../stdlib/Convert.sl#L185)</sub>
 

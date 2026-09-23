@@ -42,6 +42,9 @@ extern "C" void sl_array_bounds_fail(nuint index, nuint length);
 /// because the containers assume all three and none of them checks. A type
 /// used as a dictionary key implements `IHashable` alongside this, and the two
 /// must agree: equal values must hash alike.
+///
+/// @typeparam T  what a value is compared against, which is normally the type
+///               implementing this
 public interface IEquatable<T>
 {
     /// True when this value and `other` are the same value. Implementations
@@ -51,6 +54,9 @@ public interface IEquatable<T>
 
 /// Returns a negative number, zero, or a positive number when this value orders
 /// before, with, or after `other`.
+///
+/// @typeparam T  what a value is ordered against, which is normally the type
+///               implementing this
 public interface IComparable<T>
 {
     /// Negative when this orders before `other`, zero when they order
@@ -92,6 +98,8 @@ public interface IHashable
 /// `foreach` does not require this interface -- it looks for the methods by
 /// name, so any type with a `GetEnumerator()` can be iterated. Naming the shape
 /// is still worth doing, because it lets a sequence be passed around.
+///
+/// @typeparam T  what the cursor lands on; nothing is asked of it
 public interface IEnumerator<T>
 {
     /// Advances to the next item and reports whether there was one. Must be
@@ -110,6 +118,8 @@ public interface IEnumerator<T>
 /// `foreach` does not need this interface -- it finds `GetEnumerator` by name
 /// -- so implementing it is about being passable as a sequence, not about
 /// being iterable.
+///
+/// @typeparam T  what the sequence yields; nothing is asked of it
 public interface IEnumerable<T>
 {
     /// A fresh cursor positioned before the first item. Each call gives an
@@ -121,6 +131,8 @@ public interface IEnumerable<T>
 
 /// Walks anything that can be counted and indexed, so one enumerator serves
 /// every list rather than each list writing its own.
+///
+/// @typeparam T  the element type of the list being walked
 public class ListEnumerator<T> : IEnumerator<T>
 {
     IReadOnlyList<T> _source;
@@ -160,6 +172,9 @@ public class ListEnumerator<T> : IEnumerator<T>
 /// list behind it may well be a `List<T>` that someone else is still adding
 /// to. Take this as a parameter type where a function reads and does not
 /// write, which says so in the signature.
+///
+/// @typeparam T  the element type; nothing is asked of it
+/// @see IList
 public interface IReadOnlyList<T>
 {
     /// How many items there are.
@@ -176,6 +191,9 @@ public interface IReadOnlyList<T>
 /// Everything a read-only list offers, plus mutation. A value of this type can
 /// be passed anywhere an IReadOnlyList is wanted, at no cost: an interface
 /// reference is a plain pointer, and the object carries a table for both.
+///
+/// @typeparam T  the element type; nothing is asked of it
+/// @see IReadOnlyList
 public interface IList<T> : IReadOnlyList<T>
 {
     /// The item at `index`, readable and writable. Redeclared because an
@@ -214,6 +232,9 @@ public interface IList<T> : IReadOnlyList<T>
 ///
 /// The members taking a predicate need no constraint, so those are methods,
 /// exactly as in .NET.
+///
+/// @typeparam T  the element type, constrained not at all so that a
+///               `List<Control>` stays possible
 public class List<T> : IList<T>, IEnumerable<T>
 {
     T[] _items;
@@ -287,6 +308,9 @@ public class List<T> : IList<T>, IEnumerable<T>
     ///
     /// Doubling, so a run of appends costs constant time each on average; a
     /// single one can cost a copy of everything so far.
+    ///
+    /// @see List.RemoveAt
+    /// @seealso List.AddRange
     public void Add(T item)
     {
         if (_count == _items.Length)
@@ -299,6 +323,8 @@ public class List<T> : IList<T>, IEnumerable<T>
     ///
     /// The items are collected before any is added, so a list given itself
     /// doubles rather than chasing its own growing end.
+    ///
+    /// @see List.InsertRange
     public void AddRange(IEnumerable<T> items) => InsertRange(_count, items);
 
     /// Inserts at a position, moving everything after it up one.
@@ -325,6 +351,9 @@ public class List<T> : IList<T>, IEnumerable<T>
     /// The vacated slot is cleared rather than left holding what moved out of
     /// it: a list of references would otherwise keep the last one alive past
     /// its removal, which is a leak that only shows up under a profiler.
+    ///
+    /// @see List.Add
+    /// @seealso List.RemoveRange
     public void RemoveAt(nuint index)
     {
         if (index >= _count)
@@ -338,6 +367,8 @@ public class List<T> : IList<T>, IEnumerable<T>
     }
 
     /// Removes `count` items from `index` onwards.
+    ///
+    /// @see List.RemoveAt
     public void RemoveRange(nuint index, nuint count)
     {
         if (count == 0)
@@ -388,6 +419,8 @@ public class List<T> : IList<T>, IEnumerable<T>
     }
 
     /// The items as a new array, which the caller owns.
+    ///
+    /// @see List.CopyTo
     public T[] ToArray()
     {
         var answer = new T[_count];
@@ -397,6 +430,8 @@ public class List<T> : IList<T>, IEnumerable<T>
     }
 
     /// Copies the items into `into`, starting at `at`.
+    ///
+    /// @see List.ToArray
     public void CopyTo(T[] into, nuint at)
     {
         if (at + _count > into.Length)
@@ -406,6 +441,8 @@ public class List<T> : IList<T>, IEnumerable<T>
     }
 
     /// A new list holding `count` items from `index` onwards.
+    ///
+    /// @see List.Slice
     public List<T> GetRange(nuint index, nuint count)
     {
         if (index + count > _count)
@@ -419,6 +456,9 @@ public class List<T> : IList<T>, IEnumerable<T>
 
     /// The first item the predicate accepts, or `default(T)` when there is
     /// none -- which is `null` for a reference type, as it is in .NET.
+    ///
+    /// @see List.FindIndex
+    /// @seealso List.FindLast
     public T Find(Predicate<T> matches)
     {
         for (nuint i = 0; i < _count; i++)
@@ -430,6 +470,8 @@ public class List<T> : IList<T>, IEnumerable<T>
     }
 
     /// The last item the predicate accepts, or `default(T)`.
+    ///
+    /// @see List.Find
     public T FindLast(Predicate<T> matches)
     {
         for (nuint i = _count; i > 0u; i--)
@@ -441,6 +483,8 @@ public class List<T> : IList<T>, IEnumerable<T>
     }
 
     /// Every item the predicate accepts, in order.
+    ///
+    /// @see List.Find
     public List<T> FindAll(Predicate<T> matches)
     {
         var answer = new List<T>();
@@ -459,6 +503,9 @@ public class List<T> : IList<T>, IEnumerable<T>
     /// this way, and an index that is a `nuint` cannot hold -1 at all. This is
     /// the one place the shape deliberately departs from C#, and it departs
     /// because C#'s shape is a workaround for a type it does not have.
+    ///
+    /// @see List.FindLastIndex
+    /// @seealso Collections.IndexOf
     public Optional<nuint> FindIndex(Predicate<T> matches)
     {
         for (nuint i = 0; i < _count; i++)
@@ -470,6 +517,8 @@ public class List<T> : IList<T>, IEnumerable<T>
     }
 
     /// Where the last item the predicate accepts is, or `None`.
+    ///
+    /// @see List.FindIndex
     public Optional<nuint> FindLastIndex(Predicate<T> matches)
     {
         for (nuint i = _count; i > 0u; i--)
@@ -481,9 +530,13 @@ public class List<T> : IList<T>, IEnumerable<T>
     }
 
     /// Whether any item is accepted by the predicate.
+    ///
+    /// @see List.TrueForAll
     public bool Exists(Predicate<T> matches) => FindIndex(matches).HasValue;
 
     /// Whether every item is.
+    ///
+    /// @see List.Exists
     public bool TrueForAll(Predicate<T> matches)
     {
         for (nuint i = 0; i < _count; i++)
@@ -509,6 +562,9 @@ public class List<T> : IList<T>, IEnumerable<T>
 
     /// Makes sure there is room for `capacity` items, and answers the capacity
     /// afterwards. Never shrinks.
+    ///
+    /// @see List.TrimExcess
+    /// @seealso List.Capacity
     public nuint EnsureCapacity(nuint capacity)
     {
         if (capacity > _items.Length)
@@ -517,6 +573,8 @@ public class List<T> : IList<T>, IEnumerable<T>
     }
 
     /// Gives back the room past `Count`.
+    ///
+    /// @see List.EnsureCapacity
     public void TrimExcess()
     {
         if (_count < _items.Length)
@@ -525,12 +583,16 @@ public class List<T> : IList<T>, IEnumerable<T>
 
     /// `count` items from `index`, as a new list. .NET's name for `GetRange`
     /// since ranges arrived, and the two are the same call.
+    ///
+    /// @see List.GetRange
     public List<T> Slice(nuint index, nuint count) => GetRange(index, count);
 
     /// Inserts every item of another sequence at `index`, in its order.
     ///
     /// Collected first, for the reason `AddRange` gives, and then moved into
     /// place with one shift of the tail rather than one per item.
+    ///
+    /// @see List.AddRange
     public void InsertRange(nuint index, IEnumerable<T> items)
     {
         if (index > _count)
@@ -569,6 +631,8 @@ public class List<T> : IList<T>, IEnumerable<T>
     /// A cursor over this list, for `foreach` and for passing it on as a
     /// sequence. The cursor reads the list as it goes rather than taking a
     /// copy, so changing the list during a walk changes what the walk sees.
+    ///
+    /// @see ListEnumerator
     public IEnumerator<T> GetEnumerator() => new ListEnumerator<T>(this);
 
     /// Drops every item. The backing array is replaced rather than merely
@@ -594,6 +658,9 @@ public class List<T> : IList<T>, IEnumerable<T>
 // ---------------------------------------------------------------- algorithms
 
 /// The largest item, by its own ordering. The list must not be empty.
+///
+/// @typeparam T  the element type, which must order itself
+/// @see Collections.Min
 public T Max<T>(IReadOnlyList<T> items) where T : IComparable<T>
 {
     if (items.Count == 0)
@@ -609,6 +676,9 @@ public T Max<T>(IReadOnlyList<T> items) where T : IComparable<T>
 }
 
 /// The smallest item, by its own ordering. The list must not be empty.
+///
+/// @typeparam T  the element type, which must order itself
+/// @see Collections.Max
 public T Min<T>(IReadOnlyList<T> items) where T : IComparable<T>
 {
     if (items.Count == 0)
@@ -631,6 +701,10 @@ public T Min<T>(IReadOnlyList<T> items) where T : IComparable<T>
 /// sentinel is the thing `Optional<T>` was added to retire, and its own
 /// documentation names this function as the example. `OrderedDictionary.IndexOf`
 /// has always answered this way; now they agree.
+///
+/// @typeparam T  the element type, which must answer whether it equals another
+/// @see Collections.Contains
+/// @seealso OrderedDictionary.IndexOf
 public Optional<nuint> IndexOf<T>(IReadOnlyList<T> items, T wanted) where T : IEquatable<T>
 {
     for (nuint i = 0; i < items.Count; i++)
@@ -643,12 +717,18 @@ public Optional<nuint> IndexOf<T>(IReadOnlyList<T> items, T wanted) where T : IE
 
 /// Whether `wanted` is in the list at all. `List<T>.Contains` in .NET, and a
 /// free function here for the reason `IndexOf` is.
+///
+/// @typeparam T  the element type, which must answer whether it equals another
+/// @see Collections.IndexOf
 public bool Contains<T>(IReadOnlyList<T> items, T wanted) where T : IEquatable<T>
 {
     return IndexOf(items, wanted).HasValue;
 }
 
 /// Where the *last* item equal to `wanted` is, if it is there at all.
+///
+/// @typeparam T  the element type, which must answer whether it equals another
+/// @see Collections.IndexOf
 public Optional<nuint> LastIndexOf<T>(IReadOnlyList<T> items, T wanted)
     where T : IEquatable<T>
 {
@@ -666,6 +746,10 @@ public Optional<nuint> LastIndexOf<T>(IReadOnlyList<T> items, T wanted)
 /// rather than a method because it needs `T : IEquatable<T>` and a class
 /// cannot constrain one method's type parameter to something the class itself
 /// does not demand of every element.
+///
+/// @typeparam T  the element type, which must answer whether it equals another
+/// @see Collections.RemoveWhere
+/// @seealso List.RemoveAt
 public bool RemoveFirst<T>(List<T> items, T wanted) where T : IEquatable<T>
 {
     if (IndexOf(items, wanted) is Some at)
@@ -685,6 +769,11 @@ public bool RemoveFirst<T>(List<T> items, T wanted) where T : IEquatable<T>
 /// callbacks could not be removed from at all before this.
 ///
 /// Walked from the end, so an index already passed cannot move.
+///
+/// @typeparam T  the element type; the predicate does the deciding, so nothing
+///               is asked of it
+/// @see Collections.RemoveFirst
+/// @seealso List.RemoveAll
 public nuint RemoveWhere<T>(List<T> items, Predicate<T> match)
 {
     nuint went = 0u;
@@ -719,6 +808,10 @@ const nuint SmallRun = 16u;
 /// if the second sort leaves equal elements where the first put them. The
 /// price is one scratch array as long as the input; an in-place quicksort
 /// would avoid it and would not be stable.
+///
+/// @typeparam T  the element type, which must order itself
+/// @see Collections.BinarySearch
+/// @seealso Collections.FindLowerBound
 public void Sort<T>(T[:] items) where T : IComparable<T>
 {
     if (items.Length < 2u)
@@ -800,6 +893,10 @@ void MergeRuns<T>(T[:] items, T[:] scratch, nuint low, nuint middle, nuint high)
 /// type that implements nothing at all:
 ///
 ///     Sort(people, (a, b) => a.Age - b.Age);
+///
+/// @typeparam T  the element type; the comparer orders it, so nothing is asked
+///               of it
+/// @see Collections.OrderBy
 public void Sort<T>(T[:] items, Comparer<T> order)
 {
     if (items.Length < 2u)
@@ -875,6 +972,10 @@ void MergeRuns<T>(T[:] items, T[:] scratch, nuint low, nuint middle, nuint high,
 /// Two functions rather than one with a found flag, because the language has
 /// no `out` and a caller that wants the insertion point usually does not want
 /// the search, and the other way round.
+///
+/// @typeparam T  the element type, which must order itself
+/// @see Collections.FindLowerBound
+/// @seealso Collections.Sort
 public nuint BinarySearch<T>(T[:] items, T wanted) where T : IComparable<T>
 {
     nuint low = 0u;
@@ -903,6 +1004,9 @@ public nuint BinarySearch<T>(T[:] items, T wanted) where T : IComparable<T>
 /// The first index at which `wanted` could be inserted and leave the slice
 /// ordered: the length when it belongs at the end, and the index of the first
 /// equal element when there is one.
+///
+/// @typeparam T  the element type, which must order itself
+/// @see Collections.BinarySearch
 public nuint FindLowerBound<T>(T[:] items, T wanted) where T : IComparable<T>
 {
     nuint low = 0u;
@@ -925,6 +1029,9 @@ public nuint FindLowerBound<T>(T[:] items, T wanted) where T : IComparable<T>
 }
 
 /// Reverses part of an array in place.
+///
+/// @typeparam T  the element type; nothing is asked of it
+/// @see List.Reverse
 public void Reverse<T>(T[:] items)
 {
     if (items.Length < 2)
@@ -949,6 +1056,8 @@ public void Reverse<T>(T[:] items)
 /// through the interface. Every `At` and `Set` on an `IList<T>` is a virtual
 /// call, and a sort makes O(n log n) of them; two linear passes to escape that
 /// is the cheaper trade, and it gets the array version's stability for free.
+///
+/// @typeparam T  the element type, which must order itself
 public void Sort<T>(IList<T> items) where T : IComparable<T>
 {
     nuint count = items.Count;
@@ -966,6 +1075,9 @@ public void Sort<T>(IList<T> items) where T : IComparable<T>
 }
 
 /// The same, ordered by a comparer.
+///
+/// @typeparam T  the element type; the comparer orders it, so nothing is asked
+///               of it
 public void Sort<T>(IList<T> items, Comparer<T> order)
 {
     nuint count = items.Count;
@@ -998,6 +1110,11 @@ public void Sort<T>(IList<T> items, Comparer<T> order)
 /// it as an index. That is a real limit rather than a temporary one: keeping a
 /// hash index in step with an order would double the storage and every write,
 /// which is not what the collection is for.
+///
+/// @typeparam TKey    what an entry is found by, which must answer whether it
+///                    equals another: the lookup is a scan of the keys
+/// @typeparam TValue  what an entry holds; nothing is asked of it
+/// @see Dictionary
 public class OrderedDictionary<TKey, TValue> where TKey : IEquatable<TKey>
 {
     List<TKey> _keys;
@@ -1018,6 +1135,8 @@ public class OrderedDictionary<TKey, TValue> where TKey : IEquatable<TKey>
     public TKey GetKeyAt(nuint index) => _keys[index];
 
     /// The value at a position, in insertion order.
+    ///
+    /// @see OrderedDictionary.GetKeyAt
     public TValue GetValueAt(nuint index) => _values[index];
 
     /// Where a key is, or `None`.
@@ -1026,6 +1145,8 @@ public class OrderedDictionary<TKey, TValue> where TKey : IEquatable<TKey>
     /// asking for its value walks the collection twice. An `Optional` rather
     /// than a sentinel, because a position that means "no position" is a rule
     /// every caller has to know and none can be made to.
+    ///
+    /// @see OrderedDictionary.ContainsKey
     public Optional<nuint> IndexOf(TKey key)
     {
         for (nuint i = 0u; i < _keys.Count; i++)
@@ -1038,6 +1159,8 @@ public class OrderedDictionary<TKey, TValue> where TKey : IEquatable<TKey>
 
     /// Whether the key is there at all. A scan, like everything else here, so
     /// `IndexOf` once beats `ContainsKey` followed by a lookup.
+    ///
+    /// @see OrderedDictionary.IndexOf
     public bool ContainsKey(TKey key) => IndexOf(key).HasValue;
 
     /// Appends, without looking for the key first.
@@ -1045,6 +1168,9 @@ public class OrderedDictionary<TKey, TValue> where TKey : IEquatable<TKey>
     /// A repeated key is kept rather than replaced, because a document that
     /// contains one said so and dropping either half would be this collection
     /// deciding what the document meant. `SetValue` is the one that replaces.
+    ///
+    /// @see OrderedDictionary.SetValue
+    /// @seealso OrderedDictionary.Remove
     public void Add(TKey key, TValue value)
     {
         _keys.Add(key);
@@ -1053,6 +1179,8 @@ public class OrderedDictionary<TKey, TValue> where TKey : IEquatable<TKey>
 
     /// Replaces the value of a key, or appends it. A replaced key keeps the
     /// position it had, which is the point of the collection.
+    ///
+    /// @see OrderedDictionary.Add
     public void SetValue(TKey key, TValue value)
     {
         if (IndexOf(key) is Some at)
@@ -1067,6 +1195,8 @@ public class OrderedDictionary<TKey, TValue> where TKey : IEquatable<TKey>
 
     /// The value of a key, or the fallback. There is no overload that aborts:
     /// a caller that wants to know writes `IndexOf`.
+    ///
+    /// @see OrderedDictionary.IndexOf
     public TValue GetValueOrDefault(TKey key, TValue fallback)
     {
         if (IndexOf(key) is Some at)
@@ -1076,6 +1206,8 @@ public class OrderedDictionary<TKey, TValue> where TKey : IEquatable<TKey>
 
     /// Removes the first entry with that key, closing the gap. Answers whether
     /// there was one.
+    ///
+    /// @see OrderedDictionary.Add
     public bool Remove(TKey key)
     {
         if (IndexOf(key) is Some at)

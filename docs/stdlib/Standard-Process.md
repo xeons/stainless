@@ -89,7 +89,7 @@ A program that was started and has not been waited for.
 Its streams are this process's own, so what it prints goes where this
 program's output goes. `RunProcess` is the one that captures.
 
-<sub>[stdlib/Process.sl:197](../../stdlib/Process.sl#L197)</sub>
+<sub>[stdlib/Process.sl:213](../../stdlib/Process.sl#L213)</sub>
 
 #### Id *property*
 
@@ -99,7 +99,7 @@ long Id { get; }
 
 What the operating system calls it.
 
-<sub>[stdlib/Process.sl:211](../../stdlib/Process.sl#L211)</sub>
+<sub>[stdlib/Process.sl:227](../../stdlib/Process.sl#L227)</sub>
 
 #### Wait *method*
 
@@ -111,7 +111,11 @@ Waits for it to finish, and answers with the code it left.
 
 Asking twice is harmless and answers the same both times.
 
-<sub>[stdlib/Process.sl:216](../../stdlib/Process.sl#L216)</sub>
+**Fails with**
+
+- [ProcessError.Failed](#failed-case) — the wait itself failed, so there is no code to report
+
+<sub>[stdlib/Process.sl:235](../../stdlib/Process.sl#L235)</sub>
 
 #### Finished *property*
 
@@ -123,7 +127,7 @@ The code it left, if it has finished, without waiting for it.
 
     while (child.Finished.IsEmpty) { DoSomethingElse(); }
 
-<sub>[stdlib/Process.sl:227](../../stdlib/Process.sl#L227)</sub>
+<sub>[stdlib/Process.sl:246](../../stdlib/Process.sl#L246)</sub>
 
 #### Stop *method*
 
@@ -133,7 +137,7 @@ bool Stop()
 
 Asks it to stop, the way Ctrl-C would. It may decline.
 
-<sub>[stdlib/Process.sl:239](../../stdlib/Process.sl#L239)</sub>
+<sub>[stdlib/Process.sl:258](../../stdlib/Process.sl#L258)</sub>
 
 #### Kill *method*
 
@@ -143,7 +147,7 @@ bool Kill()
 
 Makes it stop. It cannot decline, and gets no chance to tidy up.
 
-<sub>[stdlib/Process.sl:242](../../stdlib/Process.sl#L242)</sub>
+<sub>[stdlib/Process.sl:261](../../stdlib/Process.sl#L261)</sub>
 
 #### Start *method*
 
@@ -153,7 +157,21 @@ static Result<Process, ProcessError> Start(String program, String[] arguments)
 
 Starts a program without waiting for it.
 
-<sub>[stdlib/Process.sl:245](../../stdlib/Process.sl#L245)</sub>
+**Parameters**
+
+- `program` — what to run, looked up on the PATH when it has no separator in it
+- `arguments` — what to hand it, without the program's own name in front
+
+**Fails with**
+
+- [ProcessError.NotFound](#notfound-case) — no such program, on the PATH or at the path given
+- [ProcessError.Denied](#denied-case) — it is there and may not be run
+- [ProcessError.NoResource](#noresource-case) — out of processes, descriptors or memory
+- [ProcessError.Failed](#failed-case) — it did not start, for a reason none of the others names
+
+**See also** &nbsp; [RunProcess](#runprocess-function)
+
+<sub>[stdlib/Process.sl:277](../../stdlib/Process.sl#L277)</sub>
 
 ### ProcessError *enum*
 
@@ -256,7 +274,7 @@ the end while the child fills the other is waiting for a child that is
 waiting for the reader. That is why this hands back two strings rather than
 being two objects with a `ReadAvailableOutput` each.
 
-<sub>[stdlib/Process.sl:292](../../stdlib/Process.sl#L292)</sub>
+<sub>[stdlib/Process.sl:324](../../stdlib/Process.sl#L324)</sub>
 
 #### Id *property*
 
@@ -266,7 +284,7 @@ long Id { get; }
 
 What the operating system calls it.
 
-<sub>[stdlib/Process.sl:314](../../stdlib/Process.sl#L314)</sub>
+<sub>[stdlib/Process.sl:346](../../stdlib/Process.sl#L346)</sub>
 
 #### ReadAvailableOutput *method*
 
@@ -281,7 +299,7 @@ False means both streams are closed and everything they held has
 already been handed over, so the last `Take` before it is not missing
 anything.
 
-<sub>[stdlib/Process.sl:322](../../stdlib/Process.sl#L322)</sub>
+<sub>[stdlib/Process.sl:354](../../stdlib/Process.sl#L354)</sub>
 
 #### TakeOutput *method*
 
@@ -296,7 +314,7 @@ nothing at all the next time.
 showing output as it arrives wants each line once; `RunProcess` is the one
 that answers with the whole of it at the end.
 
-<sub>[stdlib/Process.sl:336](../../stdlib/Process.sl#L336)</sub>
+<sub>[stdlib/Process.sl:368](../../stdlib/Process.sl#L368)</sub>
 
 #### TakeErrors *method*
 
@@ -306,7 +324,7 @@ String TakeErrors()
 
 The same for what it wrote to its error stream.
 
-<sub>[stdlib/Process.sl:339](../../stdlib/Process.sl#L339)</sub>
+<sub>[stdlib/Process.sl:371](../../stdlib/Process.sl#L371)</sub>
 
 #### Wait *method*
 
@@ -321,7 +339,13 @@ whose output pipe is full is the deadlock the pumping exists to avoid,
 arriving from the other side. Asking twice is harmless and answers the
 same both times.
 
-<sub>[stdlib/Process.sl:347](../../stdlib/Process.sl#L347)</sub>
+**Fails with**
+
+- [ProcessError.Failed](#failed-case) — the wait itself failed, so there is no code to report
+
+**See also** &nbsp; [Running.ReadAvailableOutput](#readavailableoutput-method)
+
+<sub>[stdlib/Process.sl:383](../../stdlib/Process.sl#L383)</sub>
 
 #### Stop *method*
 
@@ -331,7 +355,7 @@ bool Stop()
 
 Asks it to stop, the way Ctrl-C would. It may decline.
 
-<sub>[stdlib/Process.sl:356](../../stdlib/Process.sl#L356)</sub>
+<sub>[stdlib/Process.sl:392](../../stdlib/Process.sl#L392)</sub>
 
 #### Kill *method*
 
@@ -341,7 +365,7 @@ bool Kill()
 
 Makes it stop. It cannot decline, and gets no chance to tidy up.
 
-<sub>[stdlib/Process.sl:359](../../stdlib/Process.sl#L359)</sub>
+<sub>[stdlib/Process.sl:395](../../stdlib/Process.sl#L395)</sub>
 
 ### Signals *class*
 
@@ -361,7 +385,7 @@ top of its own loop, where it can actually tidy up.
     while (!Signals.Interrupted) { DoAPieceOfWork(); }
     Console.WriteLine("stopping");
 
-<sub>[stdlib/Process.sl:410](../../stdlib/Process.sl#L410)</sub>
+<sub>[stdlib/Process.sl:463](../../stdlib/Process.sl#L463)</sub>
 
 #### StartWatching *method*
 
@@ -372,7 +396,7 @@ static bool StartWatching()
 Starts noticing interrupts. Until this is called they end the program,
 which is the right default for something that has nothing to tidy.
 
-<sub>[stdlib/Process.sl:414](../../stdlib/Process.sl#L414)</sub>
+<sub>[stdlib/Process.sl:467](../../stdlib/Process.sl#L467)</sub>
 
 #### Interrupted *property*
 
@@ -382,7 +406,7 @@ static bool Interrupted { get; }
 
 Whether one has arrived since the last `ClearInterrupt`.
 
-<sub>[stdlib/Process.sl:417](../../stdlib/Process.sl#L417)</sub>
+<sub>[stdlib/Process.sl:470](../../stdlib/Process.sl#L470)</sub>
 
 #### ClearInterrupt *method*
 
@@ -392,7 +416,7 @@ static void ClearInterrupt()
 
 Forgets the one that arrived, for a program that means to carry on.
 
-<sub>[stdlib/Process.sl:420](../../stdlib/Process.sl#L420)</sub>
+<sub>[stdlib/Process.sl:473](../../stdlib/Process.sl#L473)</sub>
 
 ## Functions
 
@@ -408,7 +432,16 @@ Starts a program with its output captured, to be read as it arrives.
 and it is what a PATH lookup is done on when it has no separator in it --
 the same bargain `RunProcess` makes.
 
-<sub>[stdlib/Process.sl:367](../../stdlib/Process.sl#L367)</sub>
+**Fails with**
+
+- [ProcessError.NotFound](#notfound-case) — no such program, on the PATH or at the path given
+- [ProcessError.Denied](#denied-case) — it is there and may not be run
+- [ProcessError.NoResource](#noresource-case) — out of processes, descriptors, pipes or memory
+- [ProcessError.Failed](#failed-case) — it did not start, for a reason none of the others names
+
+**See also** &nbsp; [RunProcess](#runprocess-function)
+
+<sub>[stdlib/Process.sl:412](../../stdlib/Process.sl#L412)</sub>
 
 ### OpenProcess *function*
 
@@ -426,7 +459,14 @@ is what makes a program reading to end-of-input stop rather than wait.
 Without `input` the program reads end of input at once, rather than this
 program's own.
 
-<sub>[stdlib/Process.sl:381](../../stdlib/Process.sl#L381)</sub>
+**Fails with**
+
+- [ProcessError.NotFound](#notfound-case) — no such program, on the PATH or at the path given
+- [ProcessError.Denied](#denied-case) — it is there and may not be run
+- [ProcessError.NoResource](#noresource-case) — out of processes, descriptors, pipes or memory
+- [ProcessError.Failed](#failed-case) — it did not start, for a reason none of the others names
+
+<sub>[stdlib/Process.sl:434](../../stdlib/Process.sl#L434)</sub>
 
 ### RunProcess *function*
 
@@ -442,7 +482,16 @@ returned.
 `arguments` does **not** include the program's own name; that is `program`,
 and it is what a PATH lookup is done on when it has no separator in it.
 
-<sub>[stdlib/Process.sl:154](../../stdlib/Process.sl#L154)</sub>
+**Fails with**
+
+- [ProcessError.NotFound](#notfound-case) — no such program, on the PATH or at the path given
+- [ProcessError.Denied](#denied-case) — it is there and may not be run
+- [ProcessError.NoResource](#noresource-case) — out of processes, descriptors or memory
+- [ProcessError.Failed](#failed-case) — it did not start, for a reason none of the others names
+
+**See also** &nbsp; [OpenProcess](#openprocess-function) &middot; [Process.Start](#start-method)
+
+<sub>[stdlib/Process.sl:163](../../stdlib/Process.sl#L163)</sub>
 
 ### RunProcess *function*
 
@@ -461,5 +510,12 @@ rest is dropped and the run goes on.
 Without `input` the program reads end of input at once, rather than this
 program's own.
 
-<sub>[stdlib/Process.sl:169](../../stdlib/Process.sl#L169)</sub>
+**Fails with**
+
+- [ProcessError.NotFound](#notfound-case) — no such program, on the PATH or at the path given
+- [ProcessError.Denied](#denied-case) — it is there and may not be run
+- [ProcessError.NoResource](#noresource-case) — out of processes, descriptors or memory
+- [ProcessError.Failed](#failed-case) — it did not start, for a reason none of the others names
+
+<sub>[stdlib/Process.sl:185](../../stdlib/Process.sl#L185)</sub>
 

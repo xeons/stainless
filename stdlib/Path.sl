@@ -82,6 +82,9 @@ nuint FindNameStart(String path)
 
 /// Joins two parts with a single separator, whichever way each one ends or
 /// starts. An empty part contributes nothing.
+///
+/// @param left   the part that comes first
+/// @param right  the part added to the end of it
 public String Join(String left, String right)
 {
     if (left.ByteLength() == 0)
@@ -117,6 +120,8 @@ public String Join(String first, String second, String third)
 }
 
 /// The last part: `a/b/c.txt` gives `c.txt`.
+///
+/// @see Path.GetDirectoryName
 public String GetFileName(String path)
 {
     nuint at = FindNameStart(path);
@@ -129,6 +134,8 @@ public String GetFileName(String path)
 /// A root keeps its separator, because without it the answer names somewhere
 /// else: `/foo` gives `/`, and on Windows `C:\foo` gives `C:\`, where `C:`
 /// alone would be that drive's current directory.
+///
+/// @see Path.GetFileName
 public String GetDirectoryName(String path)
 {
     nuint at = FindNameStart(path);
@@ -172,6 +179,8 @@ nuint FindExtensionDot(String name)
 
 /// The extension, with its dot: `notes.txt` gives `.txt`. No dot in the last
 /// part, a dot that starts it, or a dot that ends it gives the empty string.
+///
+/// @see Path.ChangeExtension
 public String GetExtension(String path)
 {
     var name = GetFileName(path);
@@ -183,6 +192,8 @@ public String GetExtension(String path)
 }
 
 /// The last part with its extension removed. A trailing dot goes with it.
+///
+/// @see Path.GetExtension
 public String GetFileNameWithoutExtension(String path)
 {
     var name = GetFileName(path);
@@ -191,6 +202,10 @@ public String GetFileNameWithoutExtension(String path)
 
 /// The path with a different extension. `with` may be written with or without
 /// its leading dot. Nothing before the last part is touched.
+///
+/// @param path  the path whose last part is rewritten
+/// @param with  the extension to put there, empty to take the extension off
+/// @see Path.GetExtension
 public String ChangeExtension(String path, String with)
 {
     var stem = path.Substring(0, FindNameStart(path)) + GetFileNameWithoutExtension(path);
@@ -207,6 +222,8 @@ public String ChangeExtension(String path, String with)
 /// `/x` is rooted everywhere. `\x` and `C:\x` are rooted on Windows and are
 /// ordinary relative names elsewhere, where a colon and a backslash are both
 /// characters a filename may contain.
+///
+/// @see Path.Join
 public bool IsPathRooted(String path)
 {
     nuint size = path.ByteLength();

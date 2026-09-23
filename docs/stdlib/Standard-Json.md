@@ -17,8 +17,9 @@ The upper one maps a document onto a type, through the field tables a
 what establishes a type's invariants, and a deserializer that allocated
 zeroed memory would produce an object whose non-nullable fields were null --
 a hole in the type system rather than a value. So `PopulateObject` takes an
-instance the program made, and `Deserialize<T>` calls `new T()` first, which
-is what `where T : new()` is there to guarantee.
+instance the program made, and there is no `Deserialize<T>` that makes one:
+the caller writes `new T()` itself, where the constructor it wants is in
+reach.
 
 ## Contents
 
@@ -45,7 +46,7 @@ every reference in it starts null, and only the document fills them. Mark a
 field with this when the document is what decides whether the object is
 there, and leave it alone when the constructor already made one.
 
-<sub>[stdlib/Json.sl:1055](../../stdlib/Json.sl#L1055)</sub>
+<sub>[stdlib/Json.sl:1083](../../stdlib/Json.sl#L1083)</sub>
 
 ### JsonError *enum*
 
@@ -55,7 +56,7 @@ enum JsonError
 
 Why a document could not be read.
 
-<sub>[stdlib/Json.sl:49](../../stdlib/Json.sl#L49)</sub>
+<sub>[stdlib/Json.sl:50](../../stdlib/Json.sl#L50)</sub>
 
 #### None *case*
 
@@ -65,7 +66,7 @@ None
 
 Nothing went wrong.
 
-<sub>[stdlib/Json.sl:52](../../stdlib/Json.sl#L52)</sub>
+<sub>[stdlib/Json.sl:53](../../stdlib/Json.sl#L53)</sub>
 
 #### Unexpected *case*
 
@@ -76,7 +77,7 @@ Unexpected
 A character that cannot start what is expected here, or a control
 character inside a string that was not escaped.
 
-<sub>[stdlib/Json.sl:56](../../stdlib/Json.sl#L56)</sub>
+<sub>[stdlib/Json.sl:57](../../stdlib/Json.sl#L57)</sub>
 
 #### UnterminatedText *case*
 
@@ -86,7 +87,7 @@ UnterminatedText
 
 A string with no closing quote.
 
-<sub>[stdlib/Json.sl:59](../../stdlib/Json.sl#L59)</sub>
+<sub>[stdlib/Json.sl:60](../../stdlib/Json.sl#L60)</sub>
 
 #### BadEscape *case*
 
@@ -96,7 +97,7 @@ BadEscape
 
 A backslash followed by something that is not an escape.
 
-<sub>[stdlib/Json.sl:62](../../stdlib/Json.sl#L62)</sub>
+<sub>[stdlib/Json.sl:63](../../stdlib/Json.sl#L63)</sub>
 
 #### BadNumber *case*
 
@@ -106,7 +107,7 @@ BadNumber
 
 Digits that are not a JSON number.
 
-<sub>[stdlib/Json.sl:65](../../stdlib/Json.sl#L65)</sub>
+<sub>[stdlib/Json.sl:66](../../stdlib/Json.sl#L66)</sub>
 
 #### BadLiteral *case*
 
@@ -116,7 +117,7 @@ BadLiteral
 
 Something that started like `true`, `false` or `null` and was not.
 
-<sub>[stdlib/Json.sl:68](../../stdlib/Json.sl#L68)</sub>
+<sub>[stdlib/Json.sl:69](../../stdlib/Json.sl#L69)</sub>
 
 #### TrailingContent *case*
 
@@ -126,7 +127,7 @@ TrailingContent
 
 A second value after the first. A JSON document is one value.
 
-<sub>[stdlib/Json.sl:71](../../stdlib/Json.sl#L71)</sub>
+<sub>[stdlib/Json.sl:72](../../stdlib/Json.sl#L72)</sub>
 
 #### TooDeep *case*
 
@@ -136,7 +137,7 @@ TooDeep
 
 Nesting past `MaxDepth`.
 
-<sub>[stdlib/Json.sl:74](../../stdlib/Json.sl#L74)</sub>
+<sub>[stdlib/Json.sl:75](../../stdlib/Json.sl#L75)</sub>
 
 #### NotAnObject *case*
 
@@ -147,7 +148,7 @@ NotAnObject
 A document that is not the object a type wants. Only reflection-based
 reading raises this; parsing to a `JsonValue` takes any value.
 
-<sub>[stdlib/Json.sl:78](../../stdlib/Json.sl#L78)</sub>
+<sub>[stdlib/Json.sl:79](../../stdlib/Json.sl#L79)</sub>
 
 #### NotReflected *case*
 
@@ -157,7 +158,7 @@ NotReflected
 
 A type with no field tables to map onto.
 
-<sub>[stdlib/Json.sl:81](../../stdlib/Json.sl#L81)</sub>
+<sub>[stdlib/Json.sl:82](../../stdlib/Json.sl#L82)</sub>
 
 ### JsonIgnore *attribute*
 
@@ -167,7 +168,7 @@ attribute JsonIgnore
 
 Leaves the field out of the document entirely, in both directions.
 
-<sub>[stdlib/Json.sl:1045](../../stdlib/Json.sl#L1045)</sub>
+<sub>[stdlib/Json.sl:1073](../../stdlib/Json.sl#L1073)</sub>
 
 ### JsonName *attribute*
 
@@ -177,7 +178,7 @@ attribute JsonName
 
 The name this field has in the document, when it differs from the field's.
 
-<sub>[stdlib/Json.sl:1042](../../stdlib/Json.sl#L1042)</sub>
+<sub>[stdlib/Json.sl:1070](../../stdlib/Json.sl#L1070)</sub>
 
 ### JsonObject *class*
 
@@ -191,7 +192,7 @@ An `OrderedDictionary` rather than a `Dictionary`: order is what makes a
 document read back the way it was written, which matters for a file a
 person edits. The cost is that a lookup is a scan -- see the note there.
 
-<sub>[stdlib/Json.sl:117](../../stdlib/Json.sl#L117)</sub>
+<sub>[stdlib/Json.sl:121](../../stdlib/Json.sl#L121)</sub>
 
 #### Count *property*
 
@@ -202,7 +203,7 @@ nuint Count { get; }
 How many members there are. Members rather than distinct names: a
 repeated name is kept, so this can exceed the number of names.
 
-<sub>[stdlib/Json.sl:126](../../stdlib/Json.sl#L126)</sub>
+<sub>[stdlib/Json.sl:130](../../stdlib/Json.sl#L130)</sub>
 
 #### GetNameAt *method*
 
@@ -212,7 +213,7 @@ String GetNameAt(nuint index)
 
 The name at a position, in the order the document wrote them.
 
-<sub>[stdlib/Json.sl:129](../../stdlib/Json.sl#L129)</sub>
+<sub>[stdlib/Json.sl:133](../../stdlib/Json.sl#L133)</sub>
 
 #### GetValueAt *method*
 
@@ -222,7 +223,9 @@ JsonValue GetValueAt(nuint index)
 
 The value at a position, pairing with `GetNameAt` at the same index.
 
-<sub>[stdlib/Json.sl:132](../../stdlib/Json.sl#L132)</sub>
+**See also** &nbsp; [JsonObject.GetNameAt](#getnameat-method)
+
+<sub>[stdlib/Json.sl:138](../../stdlib/Json.sl#L138)</sub>
 
 #### Add *method*
 
@@ -233,7 +236,9 @@ void Add(String name, JsonValue value)
 Adds a member. A repeated name is kept rather than replaced, because
 that is what the document said; `Find` answers with the first.
 
-<sub>[stdlib/Json.sl:136](../../stdlib/Json.sl#L136)</sub>
+**See also** &nbsp; [JsonObject.Find](#find-method)
+
+<sub>[stdlib/Json.sl:144](../../stdlib/Json.sl#L144)</sub>
 
 #### SetValue *method*
 
@@ -243,7 +248,7 @@ void SetValue(String name, JsonValue value)
 
 Replaces the value of a name, or adds it.
 
-<sub>[stdlib/Json.sl:139](../../stdlib/Json.sl#L139)</sub>
+<sub>[stdlib/Json.sl:147](../../stdlib/Json.sl#L147)</sub>
 
 #### IndexOf *method*
 
@@ -254,7 +259,7 @@ Optional<nuint> IndexOf(String name)
 Where a name is, or `None`. One lookup rather than the two that asking
 whether it is there and then asking for it would cost.
 
-<sub>[stdlib/Json.sl:143](../../stdlib/Json.sl#L143)</sub>
+<sub>[stdlib/Json.sl:151](../../stdlib/Json.sl#L151)</sub>
 
 #### ContainsKey *method*
 
@@ -265,7 +270,9 @@ bool ContainsKey(String name)
 Whether a member of that name is there. A scan, so `IndexOf` once
 beats this followed by a lookup.
 
-<sub>[stdlib/Json.sl:147](../../stdlib/Json.sl#L147)</sub>
+**See also** &nbsp; [JsonObject.IndexOf](#indexof-method)
+
+<sub>[stdlib/Json.sl:157](../../stdlib/Json.sl#L157)</sub>
 
 #### Find *method*
 
@@ -277,7 +284,7 @@ The value of a name, or `Null` when it is not there. A document that
 does not mention a field and one that says `null` are the same thing to
 a reader that has a default already.
 
-<sub>[stdlib/Json.sl:152](../../stdlib/Json.sl#L152)</sub>
+<sub>[stdlib/Json.sl:162](../../stdlib/Json.sl#L162)</sub>
 
 #### Remove *method*
 
@@ -287,7 +294,7 @@ bool Remove(String name)
 
 Removes the first member of that name, answering whether there was one.
 
-<sub>[stdlib/Json.sl:155](../../stdlib/Json.sl#L155)</sub>
+<sub>[stdlib/Json.sl:165](../../stdlib/Json.sl#L165)</sub>
 
 ### JsonValue *variant*
 
@@ -301,7 +308,7 @@ Exactly the six things the grammar has. A variant rather than a class with
 a kind field, so reading the wrong one is a compile error rather than a
 null: `case Text t:` is the only way to reach `t.Value`.
 
-<sub>[stdlib/Json.sl:165](../../stdlib/Json.sl#L165)</sub>
+<sub>[stdlib/Json.sl:175](../../stdlib/Json.sl#L175)</sub>
 
 #### Null *case*
 
@@ -313,7 +320,7 @@ The literal `null`. Also what `JsonObject.Find` answers for a name the
 document does not mention, since a reader with a default cannot tell
 the two apart and neither should have to.
 
-<sub>[stdlib/Json.sl:170](../../stdlib/Json.sl#L170)</sub>
+<sub>[stdlib/Json.sl:180](../../stdlib/Json.sl#L180)</sub>
 
 #### Bool *case*
 
@@ -323,7 +330,7 @@ Bool(bool Value)
 
 `true` or `false`.
 
-<sub>[stdlib/Json.sl:173](../../stdlib/Json.sl#L173)</sub>
+<sub>[stdlib/Json.sl:183](../../stdlib/Json.sl#L183)</sub>
 
 #### Number *case*
 
@@ -336,7 +343,7 @@ integer past 2^53 has already lost precision by the time it is here.
 A parsed one is always finite; `ToJsonText` says what becomes of one that
 is not.
 
-<sub>[stdlib/Json.sl:179](../../stdlib/Json.sl#L179)</sub>
+<sub>[stdlib/Json.sl:189](../../stdlib/Json.sl#L189)</sub>
 
 #### Text *case*
 
@@ -346,7 +353,7 @@ Text(String Value)
 
 A string, decoded: the escapes are gone and the text is what they meant.
 
-<sub>[stdlib/Json.sl:182](../../stdlib/Json.sl#L182)</sub>
+<sub>[stdlib/Json.sl:192](../../stdlib/Json.sl#L192)</sub>
 
 #### Array *case*
 
@@ -356,7 +363,7 @@ Array(List<JsonValue> Items)
 
 An array, in document order.
 
-<sub>[stdlib/Json.sl:185](../../stdlib/Json.sl#L185)</sub>
+<sub>[stdlib/Json.sl:195](../../stdlib/Json.sl#L195)</sub>
 
 #### Object *case*
 
@@ -366,7 +373,7 @@ Object(JsonObject Members)
 
 An object, in the order its members were written.
 
-<sub>[stdlib/Json.sl:188](../../stdlib/Json.sl#L188)</sub>
+<sub>[stdlib/Json.sl:198](../../stdlib/Json.sl#L198)</sub>
 
 ## Functions
 
@@ -378,7 +385,7 @@ JsonValue CreateJsonArray()
 
 An empty array, ready to add to.
 
-<sub>[stdlib/Json.sl:192](../../stdlib/Json.sl#L192)</sub>
+<sub>[stdlib/Json.sl:202](../../stdlib/Json.sl#L202)</sub>
 
 ### CreateJsonNumber *function*
 
@@ -392,7 +399,7 @@ Not `FromInteger`: `Standard.Text` is imported everywhere and has one of
 those, and two functions of a name reached without a prefix is an ambiguity
 at every call rather than at this declaration.
 
-<sub>[stdlib/Json.sl:202](../../stdlib/Json.sl#L202)</sub>
+<sub>[stdlib/Json.sl:212](../../stdlib/Json.sl#L212)</sub>
 
 ### CreateJsonObject *function*
 
@@ -402,7 +409,7 @@ JsonValue CreateJsonObject()
 
 An empty object, ready to add to.
 
-<sub>[stdlib/Json.sl:195](../../stdlib/Json.sl#L195)</sub>
+<sub>[stdlib/Json.sl:205](../../stdlib/Json.sl#L205)</sub>
 
 ### DescribeJsonError *function*
 
@@ -412,7 +419,7 @@ String DescribeJsonError(JsonError error)
 
 A sentence describing an error, for a message a person will read.
 
-<sub>[stdlib/Json.sl:85](../../stdlib/Json.sl#L85)</sub>
+<sub>[stdlib/Json.sl:86](../../stdlib/Json.sl#L86)</sub>
 
 ### GetBoolOrDefault *function*
 
@@ -423,7 +430,7 @@ bool GetBoolOrDefault(JsonValue value, bool fallback)
 The value of a `Bool`, or the fallback. A `Number` of 1 is not true here;
 only the JSON literals are.
 
-<sub>[stdlib/Json.sl:249](../../stdlib/Json.sl#L249)</sub>
+<sub>[stdlib/Json.sl:259](../../stdlib/Json.sl#L259)</sub>
 
 ### GetIntegerOrDefault *function*
 
@@ -437,7 +444,7 @@ Truncation, not rounding: `3.9` is 3. JSON has one number type, so this is
 how a field that is conceptually an integer is read back. A value past what
 a `long` holds answers the fallback, as a value of the wrong type does.
 
-<sub>[stdlib/Json.sl:233](../../stdlib/Json.sl#L233)</sub>
+<sub>[stdlib/Json.sl:243](../../stdlib/Json.sl#L243)</sub>
 
 ### GetItems *function*
 
@@ -447,7 +454,7 @@ List<JsonValue> GetItems(JsonValue value)
 
 The elements of an `Array`, or an empty list.
 
-<sub>[stdlib/Json.sl:268](../../stdlib/Json.sl#L268)</sub>
+<sub>[stdlib/Json.sl:278](../../stdlib/Json.sl#L278)</sub>
 
 ### GetMembers *function*
 
@@ -457,7 +464,7 @@ JsonObject GetMembers(JsonValue value)
 
 The members of an `Object`, or an empty one.
 
-<sub>[stdlib/Json.sl:260](../../stdlib/Json.sl#L260)</sub>
+<sub>[stdlib/Json.sl:270](../../stdlib/Json.sl#L270)</sub>
 
 ### GetNumberOrDefault *function*
 
@@ -468,7 +475,7 @@ double GetNumberOrDefault(JsonValue value, double fallback)
 The value of a `Number`, or the fallback for anything else. A JSON number
 is a double, so a large integer has already lost precision by here.
 
-<sub>[stdlib/Json.sl:221](../../stdlib/Json.sl#L221)</sub>
+<sub>[stdlib/Json.sl:231](../../stdlib/Json.sl#L231)</sub>
 
 ### GetTextOrDefault *function*
 
@@ -478,7 +485,7 @@ String GetTextOrDefault(JsonValue value, String fallback)
 
 The text of a `Text`, or the fallback for anything else.
 
-<sub>[stdlib/Json.sl:212](../../stdlib/Json.sl#L212)</sub>
+<sub>[stdlib/Json.sl:222](../../stdlib/Json.sl#L222)</sub>
 
 ### IsNull *function*
 
@@ -488,7 +495,7 @@ bool IsNull(JsonValue value)
 
 True for the one case that carries nothing.
 
-<sub>[stdlib/Json.sl:257](../../stdlib/Json.sl#L257)</sub>
+<sub>[stdlib/Json.sl:267](../../stdlib/Json.sl#L267)</sub>
 
 ### Parse *function*
 
@@ -500,7 +507,19 @@ Reads a whole document. Trailing content is an error rather than ignored,
 because a document with a second value in it is a document the writer meant
 something else by.
 
-<sub>[stdlib/Json.sl:824](../../stdlib/Json.sl#L824)</sub>
+**Fails with**
+
+- [JsonError.Unexpected](#unexpected-case) — a character that cannot start what is expected, or an unescaped control character in a string
+- [JsonError.UnterminatedText](#unterminatedtext-case) — a string with no closing quote
+- [JsonError.BadEscape](#badescape-case) — a backslash followed by something that is not an escape
+- [JsonError.BadNumber](#badnumber-case) — digits that are not a JSON number, or one too large for a double
+- [JsonError.BadLiteral](#badliteral-case) — something that started like `true`, `false` or `null` and was not
+- [JsonError.TooDeep](#toodeep-case) — nesting past `MaxDepth`
+- [JsonError.TrailingContent](#trailingcontent-case) — a second value after the first
+
+**See also** &nbsp; [Json.ToJsonText](#tojsontext-function)
+
+<sub>[stdlib/Json.sl:847](../../stdlib/Json.sl#L847)</sub>
 
 ### PopulateObject *function*
 
@@ -520,7 +539,25 @@ A document naming a nested object the constructor left null is skipped
 rather than allocated into, since nothing here could give the rest of that
 object's fields a value.
 
-<sub>[stdlib/Json.sl:1231](../../stdlib/Json.sl#L1231)</sub>
+**Type parameters**
+
+- `T` — a `[Reflect]` type, whose field tables say what there is to fill
+
+**Fails with**
+
+- [JsonError.Unexpected](#unexpected-case) — a character that cannot start what is expected, or an unescaped control character in a string
+- [JsonError.UnterminatedText](#unterminatedtext-case) — a string with no closing quote
+- [JsonError.BadEscape](#badescape-case) — a backslash followed by something that is not an escape
+- [JsonError.BadNumber](#badnumber-case) — digits that are not a JSON number, or one too large for a double
+- [JsonError.BadLiteral](#badliteral-case) — something that started like `true`, `false` or `null` and was not
+- [JsonError.TooDeep](#toodeep-case) — nesting past `MaxDepth`
+- [JsonError.TrailingContent](#trailingcontent-case) — a second value after the first
+- [JsonError.NotAnObject](#notanobject-case) — the document is not an object
+- [JsonError.NotReflected](#notreflected-case) — `T` carries no field tables
+
+**See also** &nbsp; [Json.Serialize](#serialize-function)
+
+<sub>[stdlib/Json.sl:1284](../../stdlib/Json.sl#L1284)</sub>
 
 ### PopulateObject *function*
 
@@ -530,7 +567,18 @@ JsonError PopulateObject<T>(T value, JsonValue document)
 
 The same, from a document already parsed.
 
-<sub>[stdlib/Json.sl:1241](../../stdlib/Json.sl#L1241)</sub>
+**Type parameters**
+
+- `T` — a `[Reflect]` type, whose field tables say what there is to fill
+
+**Fails with**
+
+- [JsonError.NotAnObject](#notanobject-case) — the document is not an object
+- [JsonError.NotReflected](#notreflected-case) — `T` carries no field tables
+
+**See also** &nbsp; [Json.Serialize](#serialize-function)
+
+<sub>[stdlib/Json.sl:1299](../../stdlib/Json.sl#L1299)</sub>
 
 ### Serialize *function*
 
@@ -540,7 +588,13 @@ String Serialize<T>(T value)
 
 The document as text.
 
-<sub>[stdlib/Json.sl:1068](../../stdlib/Json.sl#L1068)</sub>
+**Type parameters**
+
+- `T` — a `[Reflect]` type
+
+**See also** &nbsp; [Json.PopulateObject](#populateobject-function)
+
+<sub>[stdlib/Json.sl:1102](../../stdlib/Json.sl#L1102)</sub>
 
 ### SerializeIndented *function*
 
@@ -550,7 +604,13 @@ String SerializeIndented<T>(T value)
 
 The same, indented.
 
-<sub>[stdlib/Json.sl:1071](../../stdlib/Json.sl#L1071)</sub>
+**Type parameters**
+
+- `T` — a `[Reflect]` type
+
+**See also** &nbsp; [Json.Serialize](#serialize-function)
+
+<sub>[stdlib/Json.sl:1108](../../stdlib/Json.sl#L1108)</sub>
 
 ### ToJsonText *function*
 
@@ -564,7 +624,9 @@ A `Number` that is infinite or NaN is written as `null`, since JSON has no
 spelling for either. `JSON.stringify` does the same, and it reads back as a
 value absent rather than as some other number.
 
-<sub>[stdlib/Json.sl:847](../../stdlib/Json.sl#L847)</sub>
+**See also** &nbsp; [Json.Parse](#parse-function) &middot; [Json.ToJsonTextIndented](#tojsontextindented-function)
+
+<sub>[stdlib/Json.sl:873](../../stdlib/Json.sl#L873)</sub>
 
 ### ToJsonTextIndented *function*
 
@@ -574,7 +636,9 @@ String ToJsonTextIndented(JsonValue value)
 
 The document as text, indented two spaces a level.
 
-<sub>[stdlib/Json.sl:855](../../stdlib/Json.sl#L855)</sub>
+**See also** &nbsp; [Json.ToJsonText](#tojsontext-function)
+
+<sub>[stdlib/Json.sl:883](../../stdlib/Json.sl#L883)</sub>
 
 ### ToJsonValue *function*
 
@@ -588,7 +652,13 @@ Reads the field tables of `[Reflect] T`, walking into a nested class or
 struct rather than stopping at it. A field of a kind with no JSON spelling
 -- a pointer, a delegate, an array -- is left out rather than guessed at.
 
-<sub>[stdlib/Json.sl:1062](../../stdlib/Json.sl#L1062)</sub>
+**Type parameters**
+
+- `T` — a `[Reflect]` type, whose field tables say what there is to write
+
+**See also** &nbsp; [Json.Serialize](#serialize-function)
+
+<sub>[stdlib/Json.sl:1093](../../stdlib/Json.sl#L1093)</sub>
 
 ## Constants
 
@@ -604,5 +674,9 @@ A document is nested by recursion, so the limit is really about the stack.
 It exists because a hostile document is one line -- ten thousand `[` -- and
 the alternative to a limit is a crash that looks like a compiler bug.
 
-<sub>[stdlib/Json.sl:108](../../stdlib/Json.sl#L108)</sub>
+**Value** &nbsp; 128 levels.
+
+**See also** &nbsp; [JsonError.TooDeep](#toodeep-case)
+
+<sub>[stdlib/Json.sl:112](../../stdlib/Json.sl#L112)</sub>
 

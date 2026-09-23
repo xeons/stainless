@@ -67,19 +67,31 @@ public interface IEncoding
 
     /// How many bytes `GetBytes` would produce. Costs a pass, saves an
     /// allocation.
+    ///
+    /// @see IEncoding.GetBytes
     nuint GetByteCount(String text);
 
     /// `text` in this encoding. A scalar the encoding cannot write becomes
     /// `?`, which is what .NET's default fallback does and what the caller
     /// almost always wants when the alternative is failing a whole file.
+    ///
+    /// @see IEncoding.GetString
+    /// @seealso IEncoding.CanRepresent
     byte[] GetBytes(String text);
 
     /// `bytes` read as this encoding. Anything malformed becomes U+FFFD, so
     /// the result is always valid UTF-8 -- which it must be, because it is a
     /// `String`.
+    ///
+    /// @see IEncoding.GetBytes
+    /// @seealso IEncoding.TryGetString
     String GetString(byte[] bytes);
 
     /// The same, but saying what went wrong instead of papering over it.
+    ///
+    /// @failure EncodingError.Incomplete  the bytes end part-way through a character
+    /// @failure EncodingError.Invalid     a byte or a sequence this encoding cannot produce
+    /// @see IEncoding.GetString
     Result<String, EncodingError> TryGetString(byte[] bytes);
 
     /// Whether this encoding can write that scalar at all.
@@ -314,6 +326,8 @@ public IEncoding CreateWindows1252() => new Windows1252Encoding();
 /// UTF-32LE is tested before UTF-16LE deliberately: a UTF-32LE mark begins with
 /// the two bytes of a UTF-16LE one, so the longer test has to come first or
 /// every UTF-32 file reads as UTF-16 whose first character is NUL.
+///
+/// @see Encoding.StripPreamble
 public IEncoding? DetectEncoding(byte[] bytes)
 {
     if (BytesStartWith(bytes, [0xFF, 0xFE, 0x00, 0x00]))
@@ -409,6 +423,12 @@ public class Utf8Encoding : IEncoding
     /// surrogate and a value past U+10FFFF are each refused, because each is a
     /// way of spelling something that is not a character and each has been a
     /// security hole in a decoder that accepted it.
+    ///
+    /// @failure EncodingError.Incomplete  a sequence the bytes ran out during
+    /// @failure EncodingError.Invalid     a byte that starts nothing, a missing continuation
+    ///                                    byte, an overlong form, a surrogate, or a value past
+    ///                                    U+10FFFF
+    /// @see Utf8Encoding.GetString
     public Result<String, EncodingError> TryGetString(byte[] bytes)
     {
         nuint at = 0;
@@ -441,6 +461,9 @@ public class Utf16Encoding : IEncoding
 
     /// A UTF-16 encoding, big-endian when `big`. `CreateUtf16()` and
     /// `CreateUtf16BigEndian()` are the names to reach for.
+    ///
+    /// @see Encoding.CreateUtf16
+    /// @see Encoding.CreateUtf16BigEndian
     public Utf16Encoding(bool big) => _bigEndian = big;
 
     /// `"utf-16be"` or `"utf-16le"`, whichever this is.
@@ -539,6 +562,12 @@ public class Utf16Encoding : IEncoding
 
     /// The strict decode: `Incomplete` for an odd number of bytes or a high
     /// surrogate at the end, `Invalid` for a surrogate that is not paired.
+    ///
+    /// @failure EncodingError.Incomplete  an odd number of bytes, or a high surrogate with no
+    ///                                    unit after it
+    /// @failure EncodingError.Invalid     a low surrogate first, or a high one followed by
+    ///                                    something that is not a low one
+    /// @see Utf16Encoding.GetString
     public Result<String, EncodingError> TryGetString(byte[] bytes)
     {
         if (bytes.Length % 2 != 0)
@@ -582,6 +611,9 @@ public class Utf32Encoding : IEncoding
 
     /// A UTF-32 encoding, big-endian when `big`. `CreateUtf32()` and
     /// `CreateUtf32BigEndian()` are the names to reach for.
+    ///
+    /// @see Encoding.CreateUtf32
+    /// @see Encoding.CreateUtf32BigEndian
     public Utf32Encoding(bool big) => _bigEndian = big;
 
     /// `"utf-32be"` or `"utf-32le"`, whichever this is.
@@ -589,6 +621,8 @@ public class Utf32Encoding : IEncoding
 
     /// Four bytes, and the little-endian one begins with UTF-16LE's -- which
     /// is why `DetectEncoding` tests UTF-32 first.
+    ///
+    /// @see Encoding.DetectEncoding
     public byte[] Preamble
     {
         get
@@ -657,6 +691,10 @@ public class Utf32Encoding : IEncoding
 
     /// The strict decode: `Incomplete` when the length is not a multiple of
     /// four, `Invalid` for a value that is not a scalar.
+    ///
+    /// @failure EncodingError.Incomplete  the length is not a multiple of four
+    /// @failure EncodingError.Invalid     a surrogate, or a value past U+10FFFF
+    /// @see Utf32Encoding.GetString
     public Result<String, EncodingError> TryGetString(byte[] bytes)
     {
         if (bytes.Length % 4 != 0)
@@ -711,6 +749,8 @@ public abstract class SingleByteEncoding : IEncoding
     public abstract String Name { get; }
 
     /// None of these has one: a byte order mark is a Unicode idea.
+    ///
+    /// @value an empty array, always.
     public byte[] Preamble => [];
 
     /// Whether the table has a byte for that scalar. Most of Unicode is not in
@@ -726,6 +766,8 @@ public abstract class SingleByteEncoding : IEncoding
 
     /// The text in this encoding, with anything the table cannot write
     /// becoming `?`. Check `CanRepresent` first where losing it matters.
+    ///
+    /// @see SingleByteEncoding.CanRepresent
     public byte[] GetBytes(String text)
     {
         var bytes = new byte[text.CodePointCount()];

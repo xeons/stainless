@@ -29,7 +29,9 @@ int FromHexDigit(byte value)
 
 What a hexadecimal digit is worth, or -1 when it is not one.
 
-<sub>[stdlib/Ascii.sl:110](../../stdlib/Ascii.sl#L110)</sub>
+**See also** &nbsp; [Ascii.ToHexDigit](#tohexdigit-function)
+
+<sub>[stdlib/Ascii.sl:112](../../stdlib/Ascii.sl#L112)</sub>
 
 ### IsAscii *function*
 
@@ -130,7 +132,9 @@ byte ToHexDigit(int value)
 
 The lowercase hexadecimal digit for a value from 0 to 15.
 
-<sub>[stdlib/Ascii.sl:122](../../stdlib/Ascii.sl#L122)</sub>
+**See also** &nbsp; [Ascii.FromHexDigit](#fromhexdigit-function) &middot; [Ascii.ToHexDigitUpper](#tohexdigitupper-function)
+
+<sub>[stdlib/Ascii.sl:127](../../stdlib/Ascii.sl#L127)</sub>
 
 ### ToHexDigitUpper *function*
 
@@ -140,7 +144,9 @@ byte ToHexDigitUpper(int value)
 
 The uppercase hexadecimal digit for a value from 0 to 15.
 
-<sub>[stdlib/Ascii.sl:130](../../stdlib/Ascii.sl#L130)</sub>
+**See also** &nbsp; [Ascii.FromHexDigit](#fromhexdigit-function) &middot; [Ascii.ToHexDigit](#tohexdigit-function)
+
+<sub>[stdlib/Ascii.sl:138](../../stdlib/Ascii.sl#L138)</sub>
 
 ### ToLower *function*
 

@@ -35,6 +35,8 @@ module Standard.Collections;
 /// `Enqueue` and `Dequeue` are both constant time, and neither moves the other
 /// items -- which is the whole reason not to use a `List<T>` and remove from
 /// the front of it.
+///
+/// @typeparam T  what the queue holds; nothing is asked of it
 public class Queue<T> : IEnumerable<T>
 {
     T[] _items;
@@ -56,6 +58,9 @@ public class Queue<T> : IEnumerable<T>
 
     /// True when there is nothing to dequeue. Check this before `Dequeue` or
     /// `Peek`, both of which abort on an empty queue.
+    ///
+    /// @see Queue.Dequeue
+    /// @seealso Queue.Peek
     public bool IsEmpty => _count == 0;
 
     /// The number of slots the ring has. Always a power of two, so wrapping is
@@ -66,6 +71,8 @@ public class Queue<T> : IEnumerable<T>
     ///
     /// Constant time, and amortised constant when it grows. Growing moves
     /// every item once, which is the only time anything is copied.
+    ///
+    /// @see Queue.Dequeue
     public void Enqueue(T item)
     {
         if (_count == _items.Length)
@@ -75,6 +82,9 @@ public class Queue<T> : IEnumerable<T>
     }
 
     /// Removes and returns the oldest item. Aborts when the queue is empty.
+    ///
+    /// @see Queue.Enqueue
+    /// @seealso Queue.Peek
     public T Dequeue()
     {
         if (_count == 0)
@@ -91,6 +101,8 @@ public class Queue<T> : IEnumerable<T>
     }
 
     /// The oldest item, without removing it. Aborts when the queue is empty.
+    ///
+    /// @see Queue.Dequeue
     public T Peek()
     {
         if (_count == 0)
@@ -108,6 +120,8 @@ public class Queue<T> : IEnumerable<T>
     }
 
     /// The items, oldest first.
+    ///
+    /// @see Queue.GetEnumerator
     public List<T> ToList()
     {
         var result = new List<T>();
@@ -125,6 +139,9 @@ public class Queue<T> : IEnumerable<T>
     /// A cursor over the items, oldest first, for `foreach`. Walks the ring
     /// in place rather than copying, unlike `ToList`. Enqueueing or dequeueing
     /// during a walk invalidates it.
+    ///
+    /// @see QueueCursor
+    /// @seealso Queue.ToList
     public IEnumerator<T> GetEnumerator() => new QueueCursor<T>(this);
 
     void GrowStorage()
@@ -142,6 +159,8 @@ public class Queue<T> : IEnumerable<T>
 // ------------------------------------------------------------------- stack
 
 /// Last in, first out. The top is the end of the array, so nothing moves.
+///
+/// @typeparam T  what the stack holds; nothing is asked of it
 public class Stack<T> : IEnumerable<T>
 {
     T[] _items;
@@ -161,12 +180,17 @@ public class Stack<T> : IEnumerable<T>
 
     /// True when there is nothing to pop. Check this before `Pop` or `Peek`,
     /// both of which abort on an empty stack.
+    ///
+    /// @see Stack.Pop
+    /// @seealso Stack.Peek
     public bool IsEmpty => _count == 0;
 
     /// The number of slots the backing array has.
     public nuint Capacity => _items.Length;
 
     /// Pushes onto the top, growing when full. Amortised constant time.
+    ///
+    /// @see Stack.Pop
     public void Push(T item)
     {
         if (_count == _items.Length)
@@ -176,6 +200,9 @@ public class Stack<T> : IEnumerable<T>
     }
 
     /// Removes and returns the top. Aborts when the stack is empty.
+    ///
+    /// @see Stack.Push
+    /// @seealso Stack.Peek
     public T Pop()
     {
         if (_count == 0)
@@ -188,6 +215,8 @@ public class Stack<T> : IEnumerable<T>
     }
 
     /// The top, without removing it. Aborts when the stack is empty.
+    ///
+    /// @see Stack.Pop
     public T Peek()
     {
         if (_count == 0)
@@ -204,6 +233,8 @@ public class Stack<T> : IEnumerable<T>
     }
 
     /// The items, top first, which is the order they would be popped in.
+    ///
+    /// @see Stack.GetEnumerator
     public List<T> ToList()
     {
         var result = new List<T>();
@@ -217,6 +248,9 @@ public class Stack<T> : IEnumerable<T>
 
     /// A cursor over the items, top first -- the order `Pop` would give them
     /// back in. Pushing or popping during a walk invalidates it.
+    ///
+    /// @see StackCursor
+    /// @seealso Stack.ToList
     public IEnumerator<T> GetEnumerator() => new StackCursor<T>(this);
 
     void GrowStorage()
@@ -251,6 +285,9 @@ public class Stack<T> : IEnumerable<T>
 ///
 /// Removed nodes are recycled, so a list that is added to and removed from
 /// steadily does not grow without bound.
+///
+/// @typeparam T  what a node holds; nothing is asked of it, and a node is
+///               named by its handle rather than by its value
 public class LinkedList<T> : IEnumerable<T>
 {
     T[] _items;
@@ -286,15 +323,23 @@ public class LinkedList<T> : IEnumerable<T>
     public bool IsEmpty => _count == 0;
 
     /// A handle to the first node, or -1 when the list is empty.
+    ///
+    /// @see LinkedList.Last
     public nint First => _head;
 
     /// A handle to the last node, or -1 when the list is empty.
+    ///
+    /// @see LinkedList.First
     public nint Last => _tail;
 
     /// The node after `handle`, or -1 at the end.
+    ///
+    /// @see LinkedList.GetPrevious
     public nint GetNext(nint handle) => _next[(nuint)handle];
 
     /// The node before `handle`, or -1 at the start.
+    ///
+    /// @see LinkedList.GetNext
     public nint GetPrevious(nint handle) => _previous[(nuint)handle];
 
     /// The value in a node.
@@ -302,13 +347,20 @@ public class LinkedList<T> : IEnumerable<T>
     /// `handle` must be live: one this list handed out and has not had
     /// `RemoveAt` called on. A stale or `-1` handle is not checked and reads
     /// whatever the pool slot now holds, so test `at >= 0` before walking.
+    ///
+    /// @see LinkedList.SetValueAt
     public T GetValueAt(nint handle) => _items[(nuint)handle];
 
     /// Replaces the value in a node, leaving the links alone. Same
     /// requirement on `handle` as `GetValueAt`.
+    ///
+    /// @see LinkedList.GetValueAt
     public void SetValueAt(nint handle, T value) => _items[(nuint)handle] = value;
 
     /// Links a new node at the front and answers its handle. Constant time.
+    ///
+    /// @see LinkedList.AddLast
+    /// @seealso LinkedList.RemoveFirst
     public nint AddFirst(T item)
     {
         nint node = AllocateNode(item);
@@ -332,6 +384,9 @@ public class LinkedList<T> : IEnumerable<T>
 
     /// Links a new node at the back and answers its handle. Constant time --
     /// the tail is kept, so this does not walk the list.
+    ///
+    /// @see LinkedList.AddFirst
+    /// @seealso LinkedList.RemoveLast
     public nint AddLast(T item)
     {
         nint node = AllocateNode(item);
@@ -356,6 +411,8 @@ public class LinkedList<T> : IEnumerable<T>
     /// Links a new node just after `handle` and answers its handle. Constant
     /// time, and the reason to choose this over a `List<T>`. Inserting after
     /// the last node appends.
+    ///
+    /// @see LinkedList.InsertBefore
     public nint InsertAfter(nint handle, T item)
     {
         nint after = _next[(nuint)handle];
@@ -374,6 +431,8 @@ public class LinkedList<T> : IEnumerable<T>
 
     /// Links a new node just before `handle` and answers its handle.
     /// Inserting before the first node prepends.
+    ///
+    /// @see LinkedList.InsertAfter
     public nint InsertBefore(nint handle, T item)
     {
         nint before = _previous[(nuint)handle];
@@ -383,6 +442,9 @@ public class LinkedList<T> : IEnumerable<T>
     }
 
     /// Unlinks a node and recycles its slot. The handle is dead afterwards.
+    ///
+    /// @see LinkedList.RemoveFirst
+    /// @seealso LinkedList.RemoveLast
     public void RemoveAt(nint handle)
     {
         nuint at = (nuint)handle;
@@ -414,6 +476,9 @@ public class LinkedList<T> : IEnumerable<T>
     }
 
     /// Removes and returns the first item. Aborts when the list is empty.
+    ///
+    /// @see LinkedList.AddFirst
+    /// @seealso LinkedList.RemoveLast
     public T RemoveFirst()
     {
         if (_head < 0)
@@ -425,6 +490,8 @@ public class LinkedList<T> : IEnumerable<T>
     }
 
     /// Removes and returns the last item. Aborts when the list is empty.
+    ///
+    /// @see LinkedList.AddLast
     public T RemoveLast()
     {
         if (_tail < 0)
@@ -450,6 +517,8 @@ public class LinkedList<T> : IEnumerable<T>
     }
 
     /// The values, head first, as a fresh list. O(n), following the links.
+    ///
+    /// @see LinkedList.GetEnumerator
     public List<T> ToList()
     {
         var result = new List<T>();
@@ -467,6 +536,8 @@ public class LinkedList<T> : IEnumerable<T>
     /// A cursor over the values, head first, for `foreach`. Follows the links
     /// and keeps its place, so a whole walk is O(n). Adding or removing during
     /// a walk invalidates it.
+    ///
+    /// @see LinkedListCursor
     public IEnumerator<T> GetEnumerator() => new LinkedListCursor<T>(this);
 
     /// A slot for one more node: a recycled one if there is one, else the next
@@ -519,6 +590,11 @@ public class LinkedList<T> : IEnumerable<T>
 /// `Dictionary` cannot do. Insertion moves the tail of the arrays, so this is
 /// for maps that are read far more than they are written -- a lookup table
 /// built once, rather than a counter updated in a loop.
+///
+/// @typeparam TKey    what an entry is found by, and what the order is over:
+///                    comparable, since a lookup is a binary search
+/// @typeparam TValue  what an entry holds; nothing is asked of it
+/// @see Dictionary
 public class SortedList<TKey, TValue> : IEnumerable<Pair<TKey, TValue>> where TKey : IComparable<TKey>
 {
     TKey[] _keys;
@@ -542,6 +618,8 @@ public class SortedList<TKey, TValue> : IEnumerable<Pair<TKey, TValue>> where TK
     /// The index `key` is at, or the index it would be inserted at, negated and
     /// offset by one so the two cases stay apart: a result below zero means
     /// "not found, and `-result - 1` is where it goes".
+    ///
+    /// @see SortedList.Find
     public nint IndexOfKey(TKey key)
     {
         nuint low = 0;
@@ -569,9 +647,13 @@ public class SortedList<TKey, TValue> : IEnumerable<Pair<TKey, TValue>> where TK
 
     /// Whether `key` is there. A binary search, O(log n). Reach for `Find`
     /// when the value is what is wanted, rather than searching twice.
+    ///
+    /// @see SortedList.Find
     public bool ContainsKey(TKey key) => IndexOfKey(key) >= 0;
 
     /// The key at a position in the ordering, counting from the smallest.
+    ///
+    /// @see SortedList.GetValueAt
     public TKey GetKeyAt(nuint index)
     {
         if (index >= _count)
@@ -581,6 +663,8 @@ public class SortedList<TKey, TValue> : IEnumerable<Pair<TKey, TValue>> where TK
 
     /// The value at a position in the ordering, paired with `GetKeyAt` at the
     /// same index. Aborts past the end.
+    ///
+    /// @see SortedList.GetKeyAt
     public TValue GetValueAt(nuint index)
     {
         if (index >= _count)
@@ -591,6 +675,9 @@ public class SortedList<TKey, TValue> : IEnumerable<Pair<TKey, TValue>> where TK
     /// The value for `key`, or `None` when there is none. The one to reach
     /// for, for the reason `Dictionary.Find` gives: a key is data, so a key
     /// that is not there is an outcome rather than a mistake.
+    ///
+    /// @see SortedList.GetValue
+    /// @seealso SortedList.GetValueOrDefault
     public Optional<TValue> Find(TKey key)
     {
         nint at = IndexOfKey(key);
@@ -603,6 +690,9 @@ public class SortedList<TKey, TValue> : IEnumerable<Pair<TKey, TValue>> where TK
     ///
     /// The asserting form, for a key that is there by construction. `Find` is
     /// the question where it might not be, and `GetValueOrDefault` where a default will do.
+    ///
+    /// @see SortedList.Find
+    /// @seealso SortedList.GetValueOrDefault
     public TValue GetValue(TKey key)
     {
         nint at = IndexOfKey(key);
@@ -616,6 +706,8 @@ public class SortedList<TKey, TValue> : IEnumerable<Pair<TKey, TValue>> where TK
     /// Allocates nothing, at the cost of not distinguishing an absent key from
     /// one whose stored value equals the fallback. `Find` is the one that
     /// tells them apart.
+    ///
+    /// @see SortedList.Find
     public TValue GetValueOrDefault(TKey key, TValue fallback)
     {
         nint at = IndexOfKey(key);
@@ -629,6 +721,8 @@ public class SortedList<TKey, TValue> : IEnumerable<Pair<TKey, TValue>> where TK
     /// An existing key costs a search. A new one costs the search plus a shift
     /// of everything after it -- O(n) -- which is what makes this collection a
     /// poor choice for a map that is written in a loop.
+    ///
+    /// @see SortedList.Remove
     public void SetValue(TKey key, TValue value)
     {
         nint at = IndexOfKey(key);
@@ -657,6 +751,8 @@ public class SortedList<TKey, TValue> : IEnumerable<Pair<TKey, TValue>> where TK
 
     /// Removes a key, answering whether it was there. Closes the gap, so it
     /// is O(n) like `SetValue` on a new key.
+    ///
+    /// @see SortedList.SetValue
     public bool Remove(TKey key)
     {
         nint at = IndexOfKey(key);
@@ -690,6 +786,8 @@ public class SortedList<TKey, TValue> : IEnumerable<Pair<TKey, TValue>> where TK
     }
 
     /// Every key, smallest first, as a fresh list.
+    ///
+    /// @see SortedList.GetValues
     public List<TKey> GetKeys()
     {
         var result = new List<TKey>();
@@ -699,6 +797,8 @@ public class SortedList<TKey, TValue> : IEnumerable<Pair<TKey, TValue>> where TK
     }
 
     /// Every value, in key order, pairing with `GetKeys` position for position.
+    ///
+    /// @see SortedList.GetKeys
     public List<TValue> GetValues()
     {
         var result = new List<TValue>();
@@ -713,6 +813,8 @@ public class SortedList<TKey, TValue> : IEnumerable<Pair<TKey, TValue>> where TK
     /// A cursor over the entries in key order, for `foreach` -- the ordering
     /// a `Dictionary` cannot give. One `Pair` is built per step. Writing to
     /// the map during a walk invalidates it.
+    ///
+    /// @see SortedListCursor
     public IEnumerator<Pair<TKey, TValue>> GetEnumerator()
     {
         return new SortedListCursor<TKey, TValue>(this);
@@ -739,6 +841,9 @@ public class SortedList<TKey, TValue> : IEnumerable<Pair<TKey, TValue>> where TK
 /// The materialising version this replaced built a whole `List<T>` before the
 /// first `MoveNext`, so iterating a queue allocated as much again as the queue
 /// held. A cursor over the ring costs nothing.
+///
+/// @typeparam T  the element type of the queue being walked
+/// @see Queue.GetEnumerator
 public class QueueCursor<T> : IEnumerator<T>
 {
     Queue<T> _source;
@@ -765,6 +870,9 @@ public class QueueCursor<T> : IEnumerator<T>
 }
 
 /// Walks a stack top first, matching the order `Pop` would hand things back.
+///
+/// @typeparam T  the element type of the stack being walked
+/// @see Stack.GetEnumerator
 public class StackCursor<T> : IEnumerator<T>
 {
     Stack<T> _source;
@@ -793,6 +901,9 @@ public class StackCursor<T> : IEnumerator<T>
 /// Walks a linked list head first, following the links rather than flattening
 /// them. `At` is O(n) from the head, so a cursor that used it would make
 /// iterating O(n squared); this keeps the node it reached.
+///
+/// @typeparam T  the value type of the list being walked
+/// @see LinkedList.GetEnumerator
 public class LinkedListCursor<T> : IEnumerator<T>
 {
     LinkedList<T> _source;
@@ -832,6 +943,11 @@ public class LinkedListCursor<T> : IEnumerator<T>
 /// One `Pair` is built per step, as the materialising version built one per
 /// entry before the walk began -- the difference is that a loop that stops
 /// early now stops allocating too.
+///
+/// @typeparam TKey    the key type of the map being walked, comparable as that
+///                    map requires
+/// @typeparam TValue  its value type
+/// @see SortedList.GetEnumerator
 public class SortedListCursor<TKey, TValue> : IEnumerator<Pair<TKey, TValue>> where TKey : IComparable<TKey>
 {
     SortedList<TKey, TValue> _source;

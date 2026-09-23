@@ -38,6 +38,10 @@ extern "C" void sl_fail(byte* message);
 // ------------------------------------------------------------------- pairs
 
 /// One key and one value. What a dictionary yields when it is iterated.
+///
+/// @typeparam TKey    the key half's type; nothing is asked of it, since a pair
+///                    is looked at rather than looked in
+/// @typeparam TValue  the value half's type; nothing is asked of it
 public class Pair<TKey, TValue>
 {
     /// The key half.
@@ -59,9 +63,14 @@ public class Pair<TKey, TValue>
 
 /// A map from keys to values.
 ///
-/// `K` has to be equatable and hashable. A primitive, an enum and a String all
+/// `TKey` has to be equatable and hashable. A primitive, an enum and a String all
 /// are without saying so, so `Dictionary<String, int>` needs nothing extra; a
 /// class says so by implementing `IEquatable<T>` and `IHashable`.
+///
+/// @typeparam TKey    what an entry is found by: equatable and hashable, and
+///                    the two must agree, since a probe hashes to a slot and
+///                    then compares
+/// @typeparam TValue  what an entry holds; nothing is asked of it
 public class Dictionary<TKey, TValue> : IEnumerable<Pair<TKey, TValue>>
     where TKey : IEquatable<TKey>, IHashable
 {
@@ -110,6 +119,8 @@ public class Dictionary<TKey, TValue> : IEnumerable<Pair<TKey, TValue>>
     ///
     /// One probe, but reach for `Find` when the value is what is wanted:
     /// `ContainsKey` and then `GetValue` probes twice for one answer.
+    ///
+    /// @see Dictionary.Find
     public bool ContainsKey(TKey key) => _filled[FindSlot(key)];
 
     /// The value for `key`, or `None` when there is none.
@@ -124,6 +135,9 @@ public class Dictionary<TKey, TValue> : IEnumerable<Pair<TKey, TValue>>
     ///
     /// One probe, where `ContainsKey` followed by `GetValue` is two, and no sentinel
     /// to collide with a real value the way `GetValueOrDefault` has.
+    ///
+    /// @see Dictionary.GetValue
+    /// @seealso Dictionary.GetValueOrDefault
     public Optional<TValue> Find(TKey key)
     {
         nuint i = FindSlot(key);
@@ -140,6 +154,8 @@ public class Dictionary<TKey, TValue> : IEnumerable<Pair<TKey, TValue>>
     /// the caller is claiming the value exists and would rather stop than
     /// carry on if it does not. For a key that came from anywhere else, `Find`
     /// is the question and this is not.
+    ///
+    /// @see Dictionary.Find
     public TValue GetValue(TKey key)
     {
         nuint i = FindSlot(key);
@@ -149,6 +165,8 @@ public class Dictionary<TKey, TValue> : IEnumerable<Pair<TKey, TValue>>
     }
 
     /// The value for `key`, or `fallback` when there is none.
+    ///
+    /// @see Dictionary.Find
     public TValue GetValueOrDefault(TKey key, TValue fallback)
     {
         nuint i = FindSlot(key);
@@ -182,6 +200,9 @@ public class Dictionary<TKey, TValue> : IEnumerable<Pair<TKey, TValue>>
     /// question being asked out loud: `map[key] = map[key].GetValueOrDefault(0) + 1`
     /// says what should happen, and Swift's `dict[key, default: 0] += 1`
     /// exists for the same reason.
+    ///
+    /// @see Dictionary.Find
+    /// @seealso Dictionary.SetValue
     public Optional<TValue> this[TKey key]
     {
         get => Find(key);
@@ -199,6 +220,8 @@ public class Dictionary<TKey, TValue> : IEnumerable<Pair<TKey, TValue>>
     }
 
     /// Adds the key or replaces what it maps to.
+    ///
+    /// @see Dictionary.Add
     public void SetValue(TKey key, TValue value)
     {
         nuint i = FindSlot(key);
@@ -222,6 +245,11 @@ public class Dictionary<TKey, TValue> : IEnumerable<Pair<TKey, TValue>>
     }
 
     /// Adds the key, or reports that it was already there and changes nothing.
+    ///
+    /// @returns true when the entry was added, false when the key was already
+    ///          there
+    /// @see Dictionary.SetValue
+    /// @seealso Dictionary.Remove
     public bool Add(TKey key, TValue value)
     {
         if (_filled[FindSlot(key)])
@@ -231,6 +259,8 @@ public class Dictionary<TKey, TValue> : IEnumerable<Pair<TKey, TValue>>
     }
 
     /// Removes the key, reporting whether it was there.
+    ///
+    /// @see Dictionary.Add
     public bool Remove(TKey key)
     {
         nuint i = FindSlot(key);
@@ -286,6 +316,8 @@ public class Dictionary<TKey, TValue> : IEnumerable<Pair<TKey, TValue>>
     /// scan of every slot rather than of every entry -- O(capacity), not
     /// O(count). Pairs with `GetValues` position for position as long as nothing
     /// is written in between.
+    ///
+    /// @see Dictionary.GetValues
     public List<TKey> GetKeys()
     {
         var result = new List<TKey>();
@@ -300,6 +332,8 @@ public class Dictionary<TKey, TValue> : IEnumerable<Pair<TKey, TValue>>
     /// Every value, in the same order `GetKeys` gives.
     ///
     /// Values are not distinct: a value stored under two keys appears twice.
+    ///
+    /// @see Dictionary.GetKeys
     public List<TValue> GetValues()
     {
         var result = new List<TValue>();
@@ -317,6 +351,9 @@ public class Dictionary<TKey, TValue> : IEnumerable<Pair<TKey, TValue>>
     /// the table grows. `Standard.Collections.OrderedDictionary` is the one
     /// that keeps an order. Adding or removing during a walk invalidates the
     /// cursor.
+    ///
+    /// @see DictionaryEnumerator
+    /// @seealso OrderedDictionary
     public IEnumerator<Pair<TKey, TValue>> GetEnumerator()
     {
         return new DictionaryEnumerator<TKey, TValue>(this);
@@ -358,6 +395,11 @@ public class Dictionary<TKey, TValue> : IEnumerable<Pair<TKey, TValue>>
 ///
 /// The order is the table's own and says nothing about insertion order; adding
 /// or removing during a walk invalidates it, as it does in C#.
+///
+/// @typeparam TKey    the key type of the dictionary being walked, equatable
+///                    and hashable as that dictionary requires
+/// @typeparam TValue  its value type
+/// @see Dictionary.GetEnumerator
 public class DictionaryEnumerator<TKey, TValue> : IEnumerator<Pair<TKey, TValue>>
     where TKey : IEquatable<TKey>, IHashable
 {
@@ -399,6 +441,9 @@ public class DictionaryEnumerator<TKey, TValue> : IEnumerator<Pair<TKey, TValue>
 /// A set of distinct values, with membership in constant time.
 ///
 /// The same table as `Dictionary`, without the values.
+///
+/// @typeparam T  what the set holds: equatable and hashable, and the two must
+///               agree, since membership is a hash to a slot and a comparison
 public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable
 {
     T[] _items;
@@ -441,9 +486,14 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable
 
     /// Whether `item` is in the set. One probe, and the question the whole
     /// collection exists to answer.
+    ///
+    /// @see HashSet.Add
     public bool Contains(T item) => _filled[FindSlot(item)];
 
     /// Adds the item, reporting whether it was new.
+    ///
+    /// @see HashSet.Remove
+    /// @seealso HashSet.Contains
     public bool Add(T item)
     {
         nuint i = FindSlot(item);
@@ -463,6 +513,8 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable
     }
 
     /// Removes the item, reporting whether it was there.
+    ///
+    /// @see HashSet.Add
     public bool Remove(T item)
     {
         nuint i = FindSlot(item);
@@ -503,6 +555,9 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable
     }
 
     /// Adds everything in `other` that is not here already.
+    ///
+    /// @see HashSet.ExceptWith
+    /// @seealso HashSet.IntersectWith
     public void UnionWith(IReadOnlyList<T> other)
     {
         for (nuint i = 0; i < other.Count; i++)
@@ -510,6 +565,9 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable
     }
 
     /// Removes everything in `other`.
+    ///
+    /// @see HashSet.UnionWith
+    /// @seealso HashSet.IntersectWith
     public void ExceptWith(IReadOnlyList<T> other)
     {
         for (nuint i = 0; i < other.Count; i++)
@@ -517,6 +575,9 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable
     }
 
     /// Keeps only what is also in `other`.
+    ///
+    /// @see HashSet.UnionWith
+    /// @seealso HashSet.ExceptWith
     public void IntersectWith(HashSet<T> other)
     {
         var doomed = new List<T>();
@@ -534,6 +595,8 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable
     ///
     /// A fresh list, and building it scans every slot: O(capacity), not
     /// O(count). `foreach` walks the set without building one.
+    ///
+    /// @see HashSet.GetEnumerator
     public List<T> ToList()
     {
         var result = new List<T>();
@@ -554,6 +617,9 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable
     /// A cursor over the items, for `foreach`. Allocates nothing beyond the
     /// cursor itself, unlike `ToList`. Adding or removing during a walk
     /// invalidates it.
+    ///
+    /// @see HashSetCursor
+    /// @seealso HashSet.ToList
     public IEnumerator<T> GetEnumerator() => new HashSetCursor<T>(this);
 
     void GrowTable()
@@ -583,6 +649,11 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable
 /// The same shape as `DictionaryEnumerator`, and for the same reason: the
 /// materialising version built a whole `List<T>` before the first `MoveNext`,
 /// so iterating a set allocated as much again as the set held.
+///
+/// @typeparam T  the item type of the set being walked, equatable and hashable
+///               as that set requires
+/// @see HashSet.GetEnumerator
+/// @seealso DictionaryEnumerator
 public class HashSetCursor<T> : IEnumerator<T> where T : IEquatable<T>, IHashable
 {
     HashSet<T> _source;

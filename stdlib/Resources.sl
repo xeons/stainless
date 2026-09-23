@@ -309,15 +309,24 @@ byte* WalkResourceTree(int type, String typeName, int id, String name,
 // ================================================================ reading
 
 /// Whether a resource of this type and number is there.
+///
+/// @param type  an `RT_` number, `Bitmap` and the rest above
+/// @param id    the number the script filed the resource under
 public bool Exists(int type, int id) => FindBytes(type, id, null) != null;
 
 /// Whether one named by text, of a type named by text, is there.
+///
+/// @param type  the type name the script invented
+/// @param name  the resource name, matched without regard to ASCII case
 public bool Exists(String type, String name)
 {
     return FindNamedBytes(type, name, null) != null;
 }
 
 /// How many bytes a resource holds, or zero when there is none.
+///
+/// @param type  an `RT_` number
+/// @param id    the number the script filed the resource under
 public uint GetSize(int type, int id)
 {
     uint count = 0u;
@@ -330,6 +339,11 @@ public uint GetSize(int type, int id)
 /// The memory belongs to the loaded image: read-only, never freed, and valid
 /// for as long as the program runs. `GetBytes` is the one to use for anything that
 /// outlives the call.
+///
+/// @param type       an `RT_` number
+/// @param id         the number the script filed the resource under
+/// @param byteCount  where the size is written, or null to skip it
+/// @see Resources.GetBytes
 public byte* GetPointer(int type, int id, uint* byteCount)
 {
     return FindBytes(type, id, byteCount);
@@ -339,6 +353,10 @@ public byte* GetPointer(int type, int id, uint* byteCount)
 ///
 /// Empty when there is no such resource, which is also what an empty resource
 /// gives -- ask `Exists` where the difference matters.
+///
+/// @param type  an `RT_` number
+/// @param id    the number the script filed the resource under
+/// @see Resources.Exists
 public byte[] GetBytes(int type, int id)
 {
     uint count = 0u;
@@ -347,6 +365,10 @@ public byte[] GetBytes(int type, int id)
 }
 
 /// The same, for a resource named by text.
+///
+/// @param type  the type name the script invented
+/// @param name  the resource name, matched without regard to ASCII case
+/// @see Resources.Exists
 public byte[] GetBytes(String type, String name)
 {
     uint count = 0u;

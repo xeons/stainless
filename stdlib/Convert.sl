@@ -58,6 +58,11 @@ public enum ConvertError
 ///
 /// A leading `+` or `-` is allowed and nothing else is: no spaces, no
 /// separators, no trailing units. Trim first if the input might have any.
+///
+/// @failure ConvertError.Empty       the text is empty, or is a sign and nothing else
+/// @failure ConvertError.Malformed   a character is not a digit
+/// @failure ConvertError.OutOfRange  the digits do not fit a `long`
+/// @see Convert.FromLong
 public Result<long, ConvertError> ToLong(String text)
 {
     return ToLong(text, 10);
@@ -67,6 +72,12 @@ public Result<long, ConvertError> ToLong(String text)
 ///
 /// Letters count from `a` = 10 in either case, so base 16 takes `1F` and `1f`
 /// alike, and base 36 goes to `z`.
+///
+/// @failure ConvertError.Empty       the text is empty, or is a sign and nothing else
+/// @failure ConvertError.Malformed   `radix` is outside 2 to 36, or a character is not a
+///                                   digit in it
+/// @failure ConvertError.OutOfRange  the digits do not fit a `long`
+/// @see Convert.FromLong
 public Result<long, ConvertError> ToLong(String text, uint radix)
 {
     if (radix < 2 || radix > 36)
@@ -115,6 +126,11 @@ public Result<long, ConvertError> ToLong(String text, uint radix)
 }
 
 /// `text` as an `int`, which is `ToLong` plus a range check.
+///
+/// @failure ConvertError.Empty       the text is empty, or is a sign and nothing else
+/// @failure ConvertError.Malformed   a character is not a digit
+/// @failure ConvertError.OutOfRange  the digits do not fit an `int`
+/// @see Convert.ToLong
 public Result<int, ConvertError> ToInt(String text)
 {
     return ToInt(text, 10);
@@ -124,6 +140,12 @@ public Result<int, ConvertError> ToInt(String text)
 ///
 /// A number that parses as a `long` and does not fit an `int` is
 /// `OutOfRange`, not a truncation.
+///
+/// @failure ConvertError.Empty       the text is empty, or is a sign and nothing else
+/// @failure ConvertError.Malformed   `radix` is outside 2 to 36, or a character is not a
+///                                   digit in it
+/// @failure ConvertError.OutOfRange  the digits do not fit an `int`
+/// @see Convert.ToLong
 public Result<int, ConvertError> ToInt(String text, uint radix)
 {
     var wide = ToLong(text, radix);
@@ -142,6 +164,10 @@ public Result<int, ConvertError> ToInt(String text, uint radix)
 
 /// `text` as an unsigned whole number. A leading `-` is malformed rather than
 /// wrapping, which is the whole point of asking for an unsigned one.
+///
+/// @failure ConvertError.Empty       the text is empty, or is a `+` and nothing else
+/// @failure ConvertError.Malformed   a character is not a digit, a leading `-` among them
+/// @failure ConvertError.OutOfRange  the digits do not fit a `ulong`
 public Result<ulong, ConvertError> ToULong(String text)
 {
     return ToULong(text, 10);
@@ -151,6 +177,11 @@ public Result<ulong, ConvertError> ToULong(String text)
 ///
 /// Letters count from `a` = 10 in either case. A leading `+` is allowed; a
 /// leading `-` is `Malformed`.
+///
+/// @failure ConvertError.Empty       the text is empty, or is a `+` and nothing else
+/// @failure ConvertError.Malformed   `radix` is outside 2 to 36, a character is not a digit
+///                                   in it, or the number carries a leading `-`
+/// @failure ConvertError.OutOfRange  the digits do not fit a `ulong`
 public Result<ulong, ConvertError> ToULong(String text, uint radix)
 {
     if (radix < 2 || radix > 36)
@@ -187,6 +218,16 @@ public Result<ulong, ConvertError> ToULong(String text, uint radix)
 ///
 /// Base ten needs nothing from here: `Text.FromInteger` already does it, and
 /// through C's own formatter.
+///
+/// **A radix outside 2 to 36 answers `""`.** There is no digit vocabulary for
+/// one, and the answer is a `String` rather than a `Result`, so an empty one
+/// is what says so. `ToLong` reports the same mistake as
+/// `ConvertError.Malformed`, because there it has somewhere to put it.
+///
+/// @param value  the number to write, negative or not
+/// @param radix  the base to write it in, from 2 to 36
+/// @see Convert.ToLong
+/// @see Text.FromInteger
 public String FromLong(long value, uint radix)
 {
     if (radix < 2 || radix > 36)
@@ -231,6 +272,10 @@ public String FromLong(long value, uint radix)
 ///
 /// A magnitude past the largest double is `OutOfRange`. One below the
 /// smallest rounds to zero, which is the nearest double and not a failure.
+///
+/// @failure ConvertError.Empty       the text is empty
+/// @failure ConvertError.Malformed   the text is not one of the forms above
+/// @failure ConvertError.OutOfRange  the magnitude is past the largest double
 public Result<double, ConvertError> ToDouble(String text)
 {
     nuint size = text.ByteLength();
@@ -296,12 +341,18 @@ public Result<double, ConvertError> ToDouble(String text)
 // ---------------------------------------------------------------- hexadecimal
 
 /// `data` as lowercase hexadecimal, two characters per byte and nothing between.
+///
+/// @see Convert.FromHex
 public String ToHex(byte[] data)
 {
     return ToHex(data, false);
 }
 
 /// The same, in the case asked for.
+///
+/// @param data   the bytes to write out
+/// @param upper  true for `A`-`F`, false for `a`-`f`
+/// @see Convert.FromHex
 public String ToHex(byte[] data, bool upper)
 {
     var built = new StringBuilder();
@@ -330,6 +381,9 @@ public String ToHex(byte[] data, bool upper)
 /// Hexadecimal back into bytes. Either case, and an odd number of digits is
 /// malformed rather than padded, because there is no way to know which end the
 /// missing half belonged to.
+///
+/// @failure ConvertError.Malformed  an odd number of digits, or a character that is not one
+/// @see Convert.ToHex
 public Result<byte[], ConvertError> FromHex(String text)
 {
     nuint size = text.ByteLength();
@@ -354,6 +408,8 @@ public Result<byte[], ConvertError> FromHex(String text)
 // --------------------------------------------------------------------- base64
 
 /// `data` as base64, padded with `=` to a multiple of four.
+///
+/// @see Convert.FromBase64
 public String ToBase64(byte[] data)
 {
     return EncodeBase64(data, false, true);
@@ -361,6 +417,8 @@ public String ToBase64(byte[] data)
 
 /// `data` as base64url: `-` and `_` for the last two characters, and no
 /// padding. What a JWT and a URL query both want, and RFC 4648 §5.
+///
+/// @see Convert.FromBase64
 public String ToBase64Url(byte[] data)
 {
     return EncodeBase64(data, true, false);
@@ -373,6 +431,11 @@ public String ToBase64Url(byte[] data)
 /// Whitespace is skipped, because base64 in the wild arrives wrapped at 64 or
 /// 76 columns and a decoder that refused a newline would be useless for the
 /// thing it is most often pointed at.
+///
+/// @failure ConvertError.Malformed  a character outside both alphabets, or padding that is
+///                                  not a whole tail of the last group
+/// @see Convert.ToBase64
+/// @see Convert.ToBase64Url
 public Result<byte[], ConvertError> FromBase64(String text)
 {
     nuint size = text.ByteLength();
@@ -446,6 +509,8 @@ public Result<byte[], ConvertError> FromBase64(String text)
 }
 
 /// Base64 of the UTF-8 bytes of `text`, which is the common case.
+///
+/// @see Convert.ToBase64
 public String ToBase64Text(String text)
 {
     return ToBase64(text.ToBytes());

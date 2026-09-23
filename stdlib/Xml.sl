@@ -111,6 +111,9 @@ public String DescribeXmlError(XmlError error)
 
 /// How far the parser will nest, for the reason `Json.MaxDepth` exists: the
 /// nesting is recursion, and a hostile document is one long line.
+///
+/// @value 128 levels.
+/// @see XmlError.TooDeep
 public const nuint MaxDepth = 128u;
 
 // --------------------------------------------------------------- attributes
@@ -134,15 +137,24 @@ public class XmlAttributes
     public String GetNameAt(nuint index) => _entries.GetKeyAt(index);
 
     /// The value at a position, pairing with `GetNameAt` at the same index.
+    ///
+    /// @see XmlAttributes.GetNameAt
     public String GetValueAt(nuint index) => _entries.GetValueAt(index);
 
     /// Appends an attribute without looking for the name first. A parsed
     /// document cannot reach here with a repeat -- that is
     /// `XmlError.DuplicateAttribute` -- so this is for building one.
+    ///
+    /// @param name   the attribute name
+    /// @param value  the text it carries, unescaped
+    /// @see XmlError.DuplicateAttribute
     public void Add(String name, String value) => _entries.Add(name, value);
 
     /// Sets the value of a name, adding it if it is new. A replaced name keeps
     /// the position it had.
+    ///
+    /// @param name   the attribute name
+    /// @param value  the text it is to carry, unescaped
     public void SetValue(String name, String value) => _entries.SetValue(name, value);
 
     /// Where a name is, or `None`.
@@ -152,6 +164,9 @@ public class XmlAttributes
     public bool ContainsKey(String name) => _entries.ContainsKey(name);
 
     /// The value of an attribute, or the fallback when it is not there.
+    ///
+    /// @param name      the attribute to look for
+    /// @param fallback  what to answer when there is no such attribute
     public String Find(String name, String fallback) => _entries.GetValueOrDefault(name, fallback);
 
     /// Removes an attribute, answering whether it was there.
@@ -226,6 +241,9 @@ public class XmlNode
     }
 
     /// The text of the first child of that name, or the fallback.
+    ///
+    /// @param name      the child element to look for
+    /// @param fallback  what to answer when there is no such child
     public String FindChildText(String name, String fallback)
     {
         var child = FindChild(name);
@@ -933,6 +951,20 @@ void SkipByteOrderMark(Cursor cursor)
 /// Line ends are normalized first (§2.11): a CR LF pair or a lone CR is read
 /// as LF everywhere, CDATA included. A control character XML does not allow
 /// is refused wherever it is. A UTF-8 byte order mark at the start is skipped.
+///
+/// @failure XmlError.Unexpected           a character that cannot appear where it is
+/// @failure XmlError.UnclosedTag          a `<` with no `>`
+/// @failure XmlError.UnclosedText         a quoted value with no closing quote
+/// @failure XmlError.MismatchedEnd        an end tag naming another element
+/// @failure XmlError.UnexpectedEnd        the document stopped inside an element
+/// @failure XmlError.BadName              a tag or attribute name that is not one
+/// @failure XmlError.BadEntity            an `&` that is not one of the five predefines or a
+///                                        character reference XML allows
+/// @failure XmlError.NoRoot               nothing but whitespace and comments
+/// @failure XmlError.TrailingContent      a second root element
+/// @failure XmlError.TooDeep              nesting past `MaxDepth`
+/// @failure XmlError.DuplicateAttribute   one element names an attribute twice
+/// @see Xml.ToXmlText
 public Result<XmlNode, XmlError> Parse(String source)
 {
     if (ContainsForbiddenControl(source))
@@ -1012,6 +1044,9 @@ public Result<XmlNode, XmlError> Parse(String source)
 // ------------------------------------------------------------------ writing
 
 /// The element as text, on one line.
+///
+/// @see Xml.Parse
+/// @seealso Xml.ToXmlTextIndented
 public String ToXmlText(XmlNode node)
 {
     var text = new StringBuilder();
@@ -1024,6 +1059,9 @@ public String ToXmlText(XmlNode node)
 /// adds would become part of that text when it was read back. The indentation
 /// between the children of any other element is dropped by the reader -- see
 /// the note on XmlNode -- so writing what was read back gives the same text.
+///
+/// @see Xml.ToXmlText
+/// @seealso XmlNode
 public String ToXmlTextIndented(XmlNode node)
 {
     var text = new StringBuilder();
@@ -1032,6 +1070,8 @@ public String ToXmlTextIndented(XmlNode node)
 }
 
 /// The declaration and the element under it, which is what a whole file wants.
+///
+/// @see Xml.ToXmlTextIndented
 public String ToXmlDocumentText(XmlNode node)
 {
     return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + ToXmlTextIndented(node);
@@ -1171,15 +1211,30 @@ public attribute XmlCreate { }
 /// A field marked `[XmlAttribute]` becomes an attribute instead, which is what
 /// makes the output look like XML a person would have written rather than a
 /// JSON document with angle brackets.
+///
+/// @param value  the object to read the fields of
+/// @param name   the tag name of the element they go under
+/// @typeparam T  a `[Reflect]` type, whose field tables say what there is to write
+/// @see Xml.Serialize
 public XmlNode ToXmlNode<T>(T value, String name)
 {
     return BuildInstanceNode((byte*)value, typeof(T), name);
 }
 
 /// The element as text.
+///
+/// @param value  the object to read the fields of
+/// @param name   the tag name of the root element
+/// @typeparam T  a `[Reflect]` type
+/// @see Xml.PopulateObject
 public String Serialize<T>(T value, String name) => ToXmlText(ToXmlNode(value, name));
 
 /// The same, with a declaration and indentation.
+///
+/// @param value  the object to read the fields of
+/// @param name   the tag name of the root element
+/// @typeparam T  a `[Reflect]` type
+/// @see Xml.Serialize
 public String SerializeDocument<T>(T value, String name)
 {
     return ToXmlDocumentText(ToXmlNode(value, name));
@@ -1336,6 +1391,22 @@ String GetFieldText(byte* instance, Field field)
 /// The object is the program's, for the reason `Json.PopulateObject` takes one: its
 /// constructor has run, so a field the document does not mention keeps the
 /// value the type promised rather than a zero.
+///
+/// @typeparam T  a `[Reflect]` type, whose field tables say what there is to fill
+/// @failure XmlError.Unexpected           a character that cannot appear where it is
+/// @failure XmlError.UnclosedTag          a `<` with no `>`
+/// @failure XmlError.UnclosedText         a quoted value with no closing quote
+/// @failure XmlError.MismatchedEnd        an end tag naming another element
+/// @failure XmlError.UnexpectedEnd        the document stopped inside an element
+/// @failure XmlError.BadName              a tag or attribute name that is not one
+/// @failure XmlError.BadEntity            an `&` that is not one of the five predefines or a
+///                                        character reference XML allows
+/// @failure XmlError.NoRoot               nothing but whitespace and comments
+/// @failure XmlError.TrailingContent      a second root element
+/// @failure XmlError.TooDeep              nesting past `MaxDepth`
+/// @failure XmlError.DuplicateAttribute   one element names an attribute twice
+/// @failure XmlError.NotReflected         `T` carries no field tables
+/// @see Xml.Serialize
 public XmlError PopulateObject<T>(T value, String source)
 {
     var parsed = Parse(source);
@@ -1346,6 +1417,10 @@ public XmlError PopulateObject<T>(T value, String source)
 }
 
 /// The same, from an element already parsed.
+///
+/// @typeparam T  a `[Reflect]` type, whose field tables say what there is to fill
+/// @failure XmlError.NotReflected  `T` carries no field tables
+/// @see Xml.Serialize
 public XmlError PopulateObject<T>(T value, XmlNode node)
 {
     var type = typeof(T);

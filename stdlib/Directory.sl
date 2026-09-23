@@ -49,6 +49,14 @@ public bool Exists(String path)
 
 /// Creates one directory. The parent has to exist already; use `CreateDirectoryTree` when
 /// it might not.
+///
+/// @failure IOError.NotFound       a directory along the path is missing
+/// @failure IOError.AccessDenied   the parent refuses it
+/// @failure IOError.AlreadyExists  something is there under that name
+/// @failure IOError.NotADirectory  a file along the path was used as a directory
+/// @failure IOError.Unknown        the platform reported something with no case
+///                                 of its own -- a full disk among them
+/// @see Directory.CreateDirectoryTree
 public IOError CreateDirectory(String path)
 {
     return (IOError)sl_directory_create(path.ToPointer());
@@ -58,6 +66,13 @@ public IOError CreateDirectory(String path)
 ///
 /// A trailing separator is allowed, and a directory that appears while this
 /// runs -- made by another process, say -- is success rather than a failure.
+///
+/// @failure IOError.AccessDenied   a directory along the way refuses it
+/// @failure IOError.AlreadyExists  a file is there under one of the names
+/// @failure IOError.NotADirectory  a file along the path was used as a directory
+/// @failure IOError.Unknown        the platform reported something with no case
+///                                 of its own -- a full disk among them
+/// @see Directory.CreateDirectory
 public IOError CreateDirectoryTree(String path)
 {
     // `a/b/` names `a/b`. Stop at a root, which is its own directory name.
@@ -87,6 +102,15 @@ public IOError CreateDirectoryTree(String path)
 }
 
 /// Removes one empty directory.
+///
+/// @failure IOError.NotFound       there is nothing at that path
+/// @failure IOError.AccessDenied   the directory or its parent refuses it
+/// @failure IOError.NotADirectory  the path names a file; `File.Delete` removes
+///                                 one of those
+/// @failure IOError.Invalid        the last part of the path is `.`
+/// @failure IOError.Unknown        the platform reported something with no case
+///                                 of its own -- a directory that is not empty
+///                                 among them
 public IOError Delete(String path)
 {
     return (IOError)sl_directory_delete(path.ToPointer());
@@ -120,6 +144,11 @@ public class Entry
 }
 
 /// Everything directly inside, files and directories both, not recursively.
+///
+/// @failure IOError.NotFound      there is no directory at that path
+/// @failure IOError.AccessDenied  it is there and cannot be listed
+/// @see Directory.GetFiles
+/// @seealso Directory.GetDirectories
 public Result<List<Entry>, IOError> GetEntries(String path)
 {
     var found = new List<Entry>();
@@ -148,6 +177,11 @@ public Result<List<Entry>, IOError> GetEntries(String path)
 }
 
 /// The full paths of the files directly inside.
+///
+/// @failure IOError.NotFound      there is no directory at that path
+/// @failure IOError.AccessDenied  it is there and cannot be listed
+/// @see Directory.GetDirectories
+/// @seealso Directory.GetAllFiles
 public Result<List<String>, IOError> GetFiles(String path)
 {
     var all = GetEntries(path);
@@ -164,6 +198,10 @@ public Result<List<String>, IOError> GetFiles(String path)
 }
 
 /// The full paths of the directories directly inside.
+///
+/// @failure IOError.NotFound      there is no directory at that path
+/// @failure IOError.AccessDenied  it is there and cannot be listed
+/// @see Directory.GetFiles
 public Result<List<String>, IOError> GetDirectories(String path)
 {
     var all = GetEntries(path);
@@ -183,6 +221,11 @@ public Result<List<String>, IOError> GetDirectories(String path)
 ///
 /// Written as a worklist rather than a recursion so that a deep tree cannot
 /// run the stack out.
+///
+/// @failure IOError.NotFound      there is no directory at that path
+/// @failure IOError.AccessDenied  the directory, or one underneath it, cannot
+///                                be listed
+/// @see Directory.GetFiles
 public Result<List<String>, IOError> GetAllFiles(String path)
 {
     var paths = new List<String>();

@@ -310,6 +310,8 @@ public struct Instant
 
     /// What time it is now. It can go backwards between two calls; use `Clock`
     /// to measure how long something took.
+    ///
+    /// @see Clock
     public static Instant Now
     {
         get
@@ -362,6 +364,8 @@ public struct Instant
     /// A local date and time as an instant. Ambiguous during the hour a clock
     /// goes back, and impossible during the hour it goes forward; the platform
     /// decides.
+    ///
+    /// @see Instant.FromUtc
     public static Instant FromLocal(int year, int month, int day,
                                     int hour, int minute, int second)
     {
@@ -383,9 +387,13 @@ public struct Instant
 
     /// The same in the machine's local zone, with whatever the platform
     /// believes about daylight saving.
+    ///
+    /// @see Instant.ToUtc
     public DateTime ToLocal() => BreakDownInstant(this, true);
 
     /// ISO 8601, to the second: `2026-09-05T14:30:00Z`.
+    ///
+    /// @see Instant.ParseIso
     public String FormatIso() => FormatInstantIso(this);
 
     /// `2026-09-05T14:30:00Z` back to an instant.
@@ -396,6 +404,14 @@ public struct Instant
     ///
     /// Deliberately strict: exactly the shape `FormatIso` writes, so a round
     /// trip is exact and anything else is refused rather than half-read.
+    ///
+    /// @failure TimeError.Malformed   not that shape: the wrong length, a
+    ///                                separator out of place, or something
+    ///                                that is not a digit where one belongs
+    /// @failure TimeError.OutOfRange  that shape, and no real moment -- the
+    ///                                31st of February, a month of 13, an hour
+    ///                                of 24
+    /// @see Instant.FormatIso
     public static Result<Instant, TimeError> ParseIso(String text)
     {
         return ParseInstantIso(text);
@@ -584,6 +600,10 @@ public bool IsLeapYear(int year)
 }
 
 /// How many days a month has, which for February depends on the year.
+///
+/// @param year   the year the month is in, in full
+/// @param month  the month, 1 to 12; anything else has no days
+/// @see Time.IsLeapYear
 public int DaysInMonth(int year, int month)
 {
     if (month == 2)

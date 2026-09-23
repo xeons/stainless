@@ -107,6 +107,8 @@ public byte ToLower(byte value)
 }
 
 /// What a hexadecimal digit is worth, or -1 when it is not one.
+///
+/// @see Ascii.ToHexDigit
 public int FromHexDigit(byte value)
 {
     if (IsDigit(value))
@@ -119,6 +121,9 @@ public int FromHexDigit(byte value)
 }
 
 /// The lowercase hexadecimal digit for a value from 0 to 15.
+///
+/// @see Ascii.FromHexDigit
+/// @seealso Ascii.ToHexDigitUpper
 public byte ToHexDigit(int value)
 {
     if (value < 10)
@@ -127,6 +132,9 @@ public byte ToHexDigit(int value)
 }
 
 /// The uppercase hexadecimal digit for a value from 0 to 15.
+///
+/// @see Ascii.FromHexDigit
+/// @seealso Ascii.ToHexDigit
 public byte ToHexDigitUpper(int value)
 {
     if (value < 10)

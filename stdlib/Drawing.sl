@@ -87,6 +87,11 @@ public struct Rgba
     public byte A;
 
     /// An opaque colour.
+    ///
+    /// @param red    0 to 255
+    /// @param green  0 to 255
+    /// @param blue   0 to 255
+    /// @see Rgba.FromArgb
     public static Rgba FromRgb(byte red, byte green, byte blue)
     {
         Rgba colour;
@@ -98,6 +103,12 @@ public struct Rgba
     }
 
     /// A colour with an alpha, where 0 is invisible and 255 is opaque.
+    ///
+    /// @param alpha  0 to 255, and it comes first
+    /// @param red    0 to 255
+    /// @param green  0 to 255
+    /// @param blue   0 to 255
+    /// @see Rgba.FromRgb
     public static Rgba FromArgb(byte alpha, byte red, byte green, byte blue)
     {
         Rgba colour;
@@ -110,6 +121,8 @@ public struct Rgba
 
     /// From `0xAARRGGBB`, which is what `Packed` answers and what a colour
     /// written as a hex literal in a program usually is.
+    ///
+    /// @see Rgba.Packed
     public static Rgba FromPacked(uint packed)
     {
         return Rgba.FromArgb((byte)((packed >> 24) & 0xFFu), (byte)((packed >> 16) & 0xFFu),
@@ -1398,6 +1411,13 @@ public sealed class Image
     // ------------------------------------------------------------- making one
 
     /// An empty picture, every pixel transparent.
+    ///
+    /// @failure ImageError.NoBackend    there is no imaging library on this
+    ///                                  machine
+    /// @failure ImageError.OutOfMemory  the backend would not make a picture
+    ///                                  that big
+    /// @failure ImageError.Invalid      a width or a height that is not
+    ///                                  positive
     public static Result<Image, ImageError> Create(int width, int height)
     {
         if (width <= 0 || height <= 0)
@@ -1414,6 +1434,16 @@ public sealed class Image
     }
 
     /// A picture decoded from bytes, whatever of the four formats they hold.
+    ///
+    /// @failure ImageError.NoBackend    there is no imaging library on this
+    ///                                  machine
+    /// @failure ImageError.Unreadable   the format was recognised and the
+    ///                                  decoder would not have the bytes
+    /// @failure ImageError.Unsupported  the first bytes are none of the four,
+    ///                                  or name a format this backend was
+    ///                                  built without
+    /// @failure ImageError.Invalid      there are no bytes
+    /// @see Image.FromFile
     public static Result<Image, ImageError> FromBytes(byte[] data)
     {
         if (data.Length == 0u)
@@ -1440,6 +1470,17 @@ public sealed class Image
     /// The bytes are read here rather than handed to the decoder, so that a
     /// missing file is `NotFound` on both platforms rather than whatever each
     /// library says about one it could not open.
+    ///
+    /// @failure ImageError.NoBackend    there is no imaging library on this
+    ///                                  machine
+    /// @failure ImageError.NotFound     there is no file at that path
+    /// @failure ImageError.Unreadable   the file could not be read, or the
+    ///                                  decoder would not have it
+    /// @failure ImageError.Unsupported  the first bytes are none of the four,
+    ///                                  or name a format this backend was
+    ///                                  built without
+    /// @failure ImageError.Invalid      the file is empty
+    /// @see Image.Save
     public static Result<Image, ImageError> FromFile(String path)
     {
         var read = ReadAllBytes(path);
@@ -1456,6 +1497,15 @@ public sealed class Image
     ///
     /// What a clipboard or a capture hands back. The bytes are copied, so the
     /// array may change afterwards without changing the picture.
+    ///
+    /// @failure ImageError.NoBackend    there is no imaging library on this
+    ///                                  machine
+    /// @failure ImageError.OutOfMemory  the backend would not make a picture
+    ///                                  that big, or refused the pixels
+    /// @failure ImageError.Invalid      a width or a height that is not
+    ///                                  positive, or fewer than `width *
+    ///                                  height * 4` bytes
+    /// @see Image.CopyPixels
     public static Result<Image, ImageError> FromBgra(int width, int height, byte[] pixels)
     {
         if (width <= 0 || height <= 0)
@@ -1533,6 +1583,8 @@ public sealed class Image
     ///
     /// False when the picture is closed, when there is no backend, when `into`
     /// is shorter than `PixelByteLength`, or when the backend refused.
+    ///
+    /// @see Image.ToBgra
     public bool CopyPixels(byte[] into)
     {
         if (_handle == null || into.Length < PixelByteLength)
@@ -1551,6 +1603,8 @@ public sealed class Image
     /// Empty rather than null for the reason `Encode` gives: an array is a value
     /// here and is never null, and a picture with no pixels is not something
     /// either backend produces.
+    ///
+    /// @see Image.CopyPixels
     public byte[] ToBgra()
     {
         var pixels = new byte[PixelByteLength];
@@ -1653,6 +1707,8 @@ public sealed class Image
     }
 
     /// Draws another picture on this one, at its own size.
+    ///
+    /// @see Image.DrawImageScaled
     public void DrawImage(Image source, int x, int y)
     {
         DrawImageScaled(source, x, y, source.Width, source.Height,
@@ -1677,6 +1733,14 @@ public sealed class Image
     }
 
     /// A copy at another size, resampled.
+    ///
+    /// @failure ImageError.NoBackend    there is no imaging library on this
+    ///                                  machine
+    /// @failure ImageError.OutOfMemory  the backend would not make a picture
+    ///                                  that big
+    /// @failure ImageError.Invalid      a width or a height that is not
+    ///                                  positive
+    /// @see Image.DrawImageScaled
     public Result<Image, ImageError> Resize(int width, int height)
     {
         var made = Create(width, height);
@@ -1695,6 +1759,14 @@ public sealed class Image
     /// encoder's own default. GDI+ ignores it -- setting it there needs an
     /// `EncoderParameters` laid out by hand for the one format that reads one,
     /// and its default of 75 is the same number libgd uses.
+    ///
+    /// @failure ImageError.NoBackend    there is no imaging library on this
+    ///                                  machine
+    /// @failure ImageError.Unsupported  the backend cannot write that format
+    ///                                  -- a BMP on a libgd built without one
+    ///                                  -- or the encode failed, which it
+    ///                                  reports no other way
+    /// @see Image.FromBytes
     public Result<byte[], ImageError> Encode(ImageFormat format, int quality = -1)
     {
         if (_handle == null)
@@ -1711,6 +1783,14 @@ public sealed class Image
     }
 
     /// Encodes and writes to a file. `ImageError.None` when it worked.
+    ///
+    /// @failure ImageError.NoBackend    there is no imaging library on this
+    ///                                  machine
+    /// @failure ImageError.Unsupported  the backend cannot write that format,
+    ///                                  or the encode failed
+    /// @failure ImageError.WriteFailed  the picture encoded and the file would
+    ///                                  not be written
+    /// @see Image.FromFile
     public ImageError Save(String path, ImageFormat format, int quality = -1)
     {
         var data = Encode(format, quality);

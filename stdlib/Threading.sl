@@ -158,6 +158,9 @@ bool WaitBeforeDeadline(byte* signal, byte* mutex, long deadline)
 /// down and the object was freed while the mutex still held it. Reference counts
 /// are atomic now, which closes that; what remains is the lifetime hole above,
 /// which is about how long a borrowed thing lives rather than about counting.
+///
+/// @typeparam T  what the lock guards. Nothing is required of it: safety comes from the lock
+///               rather than from the type, and a `T` reached any other way is unguarded.
 public threadsafe class Mutex<T>
 {
     T _value;
@@ -178,6 +181,8 @@ public threadsafe class Mutex<T>
     /// Keep the result in a variable. `registry.Enter();` on its own locks and
     /// then immediately unlocks, because the guard is a temporary and dies at
     /// the end of the statement.
+    ///
+    /// @see Mutex.TryEnter
     public Guard<T> Enter()
     {
         sl_mutex_lock(_handle);
@@ -185,6 +190,8 @@ public threadsafe class Mutex<T>
     }
 
     /// Takes the lock only if it is free. Returns null rather than blocking.
+    ///
+    /// @see Mutex.Enter
     public Guard<T>? TryEnter()
     {
         if (sl_mutex_try_lock(_handle))
@@ -202,6 +209,8 @@ public threadsafe class Mutex<T>
 ///
 /// A guard keeps its mutex alive, so the lock cannot be freed while it is
 /// held. Releasing is the destructor's job; there is no `Exit` to forget.
+///
+/// @typeparam T  what the mutex guards, taken from the mutex rather than chosen here
 public class Guard<T>
 {
     Mutex<T> _owner;
@@ -238,6 +247,8 @@ public class Guard<T>
 ///     var held = queue.Enter();
 ///     while (held.Value.IsEmpty) { held.Wait(); }
 ///     var item = held.Value.Take();
+///
+/// @typeparam T  what the monitor guards, and what a waiter's condition is about
 public threadsafe class Monitor<T>
 {
     T _value;
@@ -280,6 +291,8 @@ public threadsafe class Monitor<T>
 }
 
 /// Proof that a monitor is held, and the only route to what it guards.
+///
+/// @typeparam T  what the monitor guards, taken from the monitor rather than chosen here
 public class MonitorGuard<T>
 {
     Monitor<T> _owner;
@@ -301,6 +314,12 @@ public class MonitorGuard<T>
 
     /// The same with a deadline. Returns false if the time ran out -- and the
     /// lock is held either way, because the predicate still has to be checked.
+    ///
+    /// **True means the wait did not time out, not that a pulse arrived.** A
+    /// spurious wake reports success, which is the other reason the predicate
+    /// is checked in a loop rather than read once.
+    ///
+    /// @param milliseconds  how long to wait for, from now
     public bool WaitFor(ulong milliseconds) => _owner.WaitForSignalFor(milliseconds);
 
     /// Wakes one waiter. It cannot run until this guard is dropped.
@@ -324,6 +343,9 @@ public class MonitorGuard<T>
 /// offers it, and neither should: two readers upgrading at once is a deadlock
 /// with no way out. Drop the read guard, take a write guard, and re-check what
 /// you read -- it may have changed in between.
+///
+/// @typeparam T  what the lock guards. Nothing is required of it, and nothing stops a reader
+///               mutating one through `ReadGuard.Value`; see the note there.
 public threadsafe class RwLock<T>
 {
     T _value;
@@ -377,6 +399,8 @@ public threadsafe class RwLock<T>
 }
 
 /// Shared access. There is no `SetValue`, which is the point.
+///
+/// @typeparam T  what the lock guards, taken from the lock rather than chosen here
 public class ReadGuard<T>
 {
     RwLock<T> _owner;
@@ -392,6 +416,8 @@ public class ReadGuard<T>
 }
 
 /// Exclusive access.
+///
+/// @typeparam T  what the lock guards, taken from the lock rather than chosen here
 public class WriteGuard<T>
 {
     RwLock<T> _owner;
@@ -428,10 +454,14 @@ public threadsafe class AtomicLong
     /// The value now. A read of a moving counter is stale the moment it is
     /// returned, so this is for reporting; `Add` and `CompareExchange` are
     /// what a decision is built on.
+    ///
+    /// @see AtomicLong.CompareExchange
     public long Read() => sl_atomic_load(&_cell);
 
     /// Overwrites the value, losing whatever was there. `Exchange` is the one
     /// that tells you what it replaced.
+    ///
+    /// @see AtomicLong.Exchange
     public void Write(long value) => sl_atomic_store(&_cell, value);
 
     /// Adds and returns the new value, so two threads never see the same result.
@@ -458,6 +488,8 @@ public threadsafe class AtomicLong
 
     /// Bitwise, for a set of flags several threads maintain. Each returns the
     /// new value, as `Add` does.
+    ///
+    /// @param mask  the bits to keep; every bit outside it is cleared
     public long And(long mask) => sl_atomic_and(&_cell, mask);
 
     /// Sets the bits in `mask`, returning the new value.
@@ -526,6 +558,8 @@ public threadsafe class AtomicBool
 
     /// Sets the flag, losing whatever it was. `Exchange` is the one to use
     /// when exactly one thread must win.
+    ///
+    /// @see AtomicBool.Exchange
     public void Write(bool value)
     {
         long raw = 0;
@@ -576,6 +610,8 @@ public threadsafe class Semaphore
     }
 
     /// Blocks until a permit is available, and takes it.
+    ///
+    /// @see Semaphore.Release
     public void Wait()
     {
         sl_mutex_lock(_handle);
@@ -597,6 +633,9 @@ public threadsafe class Semaphore
     }
 
     /// Blocks for at most `milliseconds`. Returns whether it got a permit.
+    ///
+    /// @param milliseconds  how long to wait at most. The deadline is taken once, so a wake
+    ///                      that finds no permit does not start the wait again.
     public bool WaitFor(ulong milliseconds)
     {
         long deadline = ComputeDeadlineAfter(milliseconds);
@@ -621,6 +660,8 @@ public threadsafe class Semaphore
     }
 
     /// Puts one permit back and wakes a waiter.
+    ///
+    /// @see Semaphore.Wait
     public void Release() => Release(1);
 
     /// Puts several back at once, waking as many waiters as could proceed.
@@ -689,6 +730,9 @@ public threadsafe class ManualResetEvent
 
     /// The same with a deadline. Answers whether the latch was open, so a
     /// false means the time ran out.
+    ///
+    /// @param milliseconds  how long to wait at most, measured from the call rather than from
+    ///                      the last wake
     public bool WaitFor(ulong milliseconds)
     {
         long deadline = ComputeDeadlineAfter(milliseconds);
@@ -706,6 +750,8 @@ public threadsafe class ManualResetEvent
     }
 
     /// Opens the latch and releases everybody waiting.
+    ///
+    /// @see ManualResetEvent.Reset
     public void Set()
     {
         sl_mutex_lock(_handle);
@@ -715,6 +761,8 @@ public threadsafe class ManualResetEvent
     }
 
     /// Closes it again, so the next `Wait` blocks.
+    ///
+    /// @see ManualResetEvent.Set
     public void Reset()
     {
         sl_mutex_lock(_handle);
@@ -776,6 +824,9 @@ public threadsafe class AutoResetEvent
 
     /// The same with a deadline. Answers whether it got through; a false
     /// leaves the turnstile as it found it.
+    ///
+    /// @param milliseconds  how long to wait at most, measured from the call rather than from
+    ///                      the last wake
     public bool WaitFor(ulong milliseconds)
     {
         long deadline = ComputeDeadlineAfter(milliseconds);
@@ -831,6 +882,8 @@ public threadsafe class CountdownEvent
 
     /// Counts one off. Returns true if that was the last one, and false for a
     /// signal after the count had already reached zero.
+    ///
+    /// @see CountdownEvent.Wait
     public bool Signal()
     {
         sl_mutex_lock(_handle);
@@ -878,6 +931,8 @@ public threadsafe class CountdownEvent
     ///
     /// The calling thread blocks rather than helping: this is not a `parallel`
     /// block, so there is no queue for it to work off.
+    ///
+    /// @see CountdownEvent.Signal
     public void Wait()
     {
         sl_mutex_lock(_handle);
@@ -887,6 +942,9 @@ public threadsafe class CountdownEvent
     }
 
     /// The same with a deadline. Answers whether the count reached zero.
+    ///
+    /// @param milliseconds  how long to wait at most, measured from the call rather than from
+    ///                      the last wake
     public bool WaitFor(ulong milliseconds)
     {
         long deadline = ComputeDeadlineAfter(milliseconds);
@@ -1010,9 +1068,16 @@ public class TaskScope
 
     /// Opens a scope. Starts the thread pool if this is the first one, which
     /// is what `StartPool` can do earlier and with a chosen size.
+    ///
+    /// @see Threading.StartPool
     public TaskScope() => _handle = sl_scope_begin();
 
     /// Queues a job. It may already be running when this returns.
+    ///
+    /// @param job       the work a pool thread runs
+    /// @param argument  what it is handed, uninterpreted. It is not owned and not counted, so
+    ///                  it MUST outlive the join.
+    /// @see TaskScope.Join
     public void Run(Job job, byte* argument)
     {
         sl_scope_submit(_handle, job, argument);
@@ -1135,6 +1200,8 @@ public class Thread
 
     /// Waits for it to finish. Doing it twice is harmless, which is what lets
     /// the destructor be a backstop.
+    ///
+    /// @see Thread.Detach
     public void Join()
     {
         if (_handle != null)
@@ -1146,6 +1213,8 @@ public class Thread
 
     /// Gives up the handle without waiting. The thread runs on and cleans up
     /// after itself; nothing can join it afterwards.
+    ///
+    /// @see Thread.Join
     public void Detach()
     {
         if (_handle != null)
@@ -1180,6 +1249,8 @@ public nuint CurrentId() => sl_thread_current_id();
 /// An interface rather than a `closure` because a closure type cannot be
 /// generic, and a lambda targets either -- so `() => Compute(x)` reaches it the
 /// same way it reaches `Action`.
+///
+/// @typeparam T  what the work produces
 public interface IProduce<T>
 {
     T Invoke();
@@ -1190,6 +1261,8 @@ public interface IProduce<T>
 ///
 /// An interface for the same reason `IProduce<T>` is one -- a closure type
 /// cannot be generic -- and a lambda reaches it the same way.
+///
+/// @typeparam T  what the work is handed
 public interface IConsume<T>
 {
     void Invoke(T value);
@@ -1224,6 +1297,8 @@ public interface IConsume<T>
 /// worker after the value has landed -- which is what lets the destructor free
 /// the condition variable without checking whether anyone is still waiting on
 /// it.
+///
+/// @typeparam T  what the body produces, and what every `GetResult` answers with
 public threadsafe class Future<T>
 {
     byte* _mutex;
@@ -1350,6 +1425,8 @@ public class SpinWait
 // -------------------------------------------------------------------- pool
 
 /// How many threads the pool is running. Zero until the first scope starts it.
+///
+/// @see Threading.StartPool
 public nuint WorkerCount() => sl_pool_worker_count();
 
 /// How many hardware threads the machine reports.
@@ -1357,4 +1434,6 @@ public nuint ProcessorCount() => sl_cpu_count();
 
 /// Starts the pool with a chosen number of workers, before any scope does it
 /// automatically. Passing zero sizes it from the processor count.
+///
+/// @see Threading.ProcessorCount
 public void StartPool(nuint workers) => sl_pool_start(workers);

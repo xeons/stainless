@@ -125,10 +125,16 @@ public double Acos(double x) => acos(x);
 
 /// The angle in (-Pi/2, Pi/2) whose tangent is `x`. Defined everywhere, and
 /// blind to which quadrant the point was in -- `Atan2` is the one that knows.
+///
+/// @see Math.Atan2
 public double Atan(double x) => atan(x);
 
 /// The angle to (x, y) from the positive x axis, in the correct quadrant.
 /// Note the argument order, which is the C library's: y first.
+///
+/// @param y  the point's y coordinate, which comes first
+/// @param x  the point's x coordinate
+/// @see Math.Atan
 public double Atan2(double y, double x) => atan2(y, x);
 
 /// The hyperbolic sine. Overflows to an infinity past roughly 710.
@@ -228,10 +234,14 @@ public double Lerp(double from, double to, double at)
 }
 
 /// An angle in radians, as degrees.
+///
+/// @see Math.ToRadians
 public double ToDegrees(double radians) => radians * 180.0 / Pi;
 
 /// An angle in degrees, as radians. Every trigonometric function here takes
 /// radians, so this is what goes between a human's number and `Sin`.
+///
+/// @see Math.ToDegrees
 public double ToRadians(double degrees) => degrees * Pi / 180.0;
 
 // ---------------------------------------------------------------- integers
@@ -333,6 +343,8 @@ public nuint DivideCeiling(nuint a, nuint b)
 /// Zero with zero answers zero. The answer is 2^63 when both arguments are the
 /// most negative `long`, or one is and the other is zero; no `long` holds that,
 /// so it answers `MinLong`, whose magnitude it is, as `Abs` does.
+///
+/// @see Math.LeastCommonMultiple
 public long GreatestCommonDivisor(long a, long b)
 {
     ulong left = GetMagnitude(a);
@@ -354,6 +366,8 @@ ulong GetMagnitude(long x) => x < 0 ? (ulong)0 - (ulong)x : (ulong)x;
 ///
 /// Divides before multiplying, which keeps the intermediate as small as it can
 /// be; two large arguments can still overflow, and nothing here detects it.
+///
+/// @see Math.GreatestCommonDivisor
 public long LeastCommonMultiple(long a, long b)
 {
     if (a == 0 || b == 0)
@@ -365,6 +379,8 @@ public long LeastCommonMultiple(long a, long b)
 
 /// How many bits are set. Kernighan's loop: each step clears the lowest set
 /// bit, so it runs once per bit that is actually there.
+///
+/// @see Standard.Bits.PopCount
 public int PopCount(ulong value)
 {
     int count = 0;
@@ -377,6 +393,8 @@ public int PopCount(ulong value)
 }
 
 /// How many zero bits sit above the highest set bit. 64 for zero.
+///
+/// @see Standard.Bits.LeadingZeroCount
 public int LeadingZeroCount(ulong value)
 {
     if (value == 0)
@@ -392,6 +410,8 @@ public int LeadingZeroCount(ulong value)
 }
 
 /// How many zero bits sit below the lowest set bit. 64 for zero.
+///
+/// @see Standard.Bits.TrailingZeroCount
 public int TrailingZeroCount(ulong value)
 {
     if (value == 0)
@@ -408,6 +428,8 @@ public int TrailingZeroCount(ulong value)
 
 /// True when exactly one bit is set. Zero is not a power of two and answers
 /// false, which is the case a bare `value & (value - 1)` test gets wrong.
+///
+/// @see Standard.Bits.IsPowerOfTwo
 public bool IsPowerOfTwo(ulong value)
 {
     return value != 0 && (value & (value - 1)) == 0;
@@ -415,6 +437,8 @@ public bool IsPowerOfTwo(ulong value)
 
 /// The smallest power of two that is at least `value`. Zero and one both give
 /// one; a value above 2^63 has no answer and gives zero.
+///
+/// @see Standard.Bits.RoundUpToPowerOfTwo
 public ulong RoundUpToPowerOfTwo(ulong value)
 {
     if (value <= 1)

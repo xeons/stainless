@@ -32,7 +32,9 @@ String CurrentDirectory()
 
 The directory relative paths are resolved against.
 
-<sub>[stdlib/Env.sl:282](../../stdlib/Env.sl#L282)</sub>
+**See also** &nbsp; [Env.SetCurrentDirectory](#setcurrentdirectory-function)
+
+<sub>[stdlib/Env.sl:296](../../stdlib/Env.sl#L296)</sub>
 
 ### GetArgument *function*
 
@@ -66,7 +68,9 @@ Null rather than empty, because "not set" and "set to nothing" are
 different states and both platforms can tell them apart. `GetVariableOrDefault` is what
 most callers want.
 
-<sub>[stdlib/Env.sl:119](../../stdlib/Env.sl#L119)</sub>
+**See also** &nbsp; [Env.GetVariableOrDefault](#getvariableordefault-function)
+
+<sub>[stdlib/Env.sl:121](../../stdlib/Env.sl#L121)</sub>
 
 ### GetVariableNames *function*
 
@@ -80,7 +84,7 @@ The block is one run of NUL-terminated wide strings ending in an empty one.
 A name beginning with `=` is Windows' per-drive working directory (`=C:`),
 which is not a variable anybody set.
 
-<sub>[stdlib/Env.sl:206](../../stdlib/Env.sl#L206)</sub>
+<sub>[stdlib/Env.sl:218](../../stdlib/Env.sl#L218)</sub>
 
 ### GetVariableOrDefault *function*
 
@@ -90,7 +94,14 @@ String GetVariableOrDefault(String name, String fallback)
 
 A variable's value, or `fallback` when it is not set.
 
-<sub>[stdlib/Env.sl:158](../../stdlib/Env.sl#L158)</sub>
+**Parameters**
+
+- `name` — the variable to read
+- `fallback` — what to answer when there is no such variable
+
+**See also** &nbsp; [Env.GetVariable](#getvariable-function)
+
+<sub>[stdlib/Env.sl:164](../../stdlib/Env.sl#L164)</sub>
 
 ### HasVariable *function*
 
@@ -100,7 +111,7 @@ bool HasVariable(String name)
 
 Whether a variable is set, whatever it is set to.
 
-<sub>[stdlib/Env.sl:167](../../stdlib/Env.sl#L167)</sub>
+<sub>[stdlib/Env.sl:173](../../stdlib/Env.sl#L173)</sub>
 
 ### ProgramPath *function*
 
@@ -123,7 +134,9 @@ bool RemoveVariable(String name)
 Removes a variable, reporting whether the platform accepted it. Removing
 one that was never set is not a failure.
 
-<sub>[stdlib/Env.sl:181](../../stdlib/Env.sl#L181)</sub>
+**See also** &nbsp; [Env.SetVariable](#setvariable-function)
+
+<sub>[stdlib/Env.sl:193](../../stdlib/Env.sl#L193)</sub>
 
 ### SetCurrentDirectory *function*
 
@@ -134,7 +147,9 @@ bool SetCurrentDirectory(String path)
 Changes it, reporting whether the platform accepted it. It fails when the
 path is not a directory, or is not reachable.
 
-<sub>[stdlib/Env.sl:300](../../stdlib/Env.sl#L300)</sub>
+**See also** &nbsp; [Env.CurrentDirectory](#currentdirectory-function)
+
+<sub>[stdlib/Env.sl:316](../../stdlib/Env.sl#L316)</sub>
 
 ### SetVariable *function*
 
@@ -151,5 +166,12 @@ platform accepted it.
 An empty value leaves the variable set and empty, on both platforms, and
 `GetVariable` answers with the empty string rather than null.
 
-<sub>[stdlib/Env.sl:177](../../stdlib/Env.sl#L177)</sub>
+**Parameters**
+
+- `name` — the variable to set
+- `value` — what to set it to
+
+**See also** &nbsp; [Env.RemoveVariable](#removevariable-function)
+
+<sub>[stdlib/Env.sl:187](../../stdlib/Env.sl#L187)</sub>
 

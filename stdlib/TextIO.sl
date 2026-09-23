@@ -40,6 +40,8 @@ import Standard.Encoding;
 // ================================================================== reading
 
 /// Text arriving from somewhere, a line at a time.
+///
+/// @see TextWriter
 public abstract class TextReader
 {
     /// One line without its terminator, or null once there are no more.
@@ -70,6 +72,8 @@ public abstract class TextReader
 }
 
 /// A reader over text already in memory.
+///
+/// @see StringWriter
 public class StringReader : TextReader
 {
     String _text;
@@ -133,6 +137,8 @@ public class StringReader : TextReader
 ///
 /// `ReadLine` answers null at the end and also when the stream fails; `Error`
 /// tells the two apart.
+///
+/// @see StreamWriter
 public class StreamReader : TextReader
 {
     /// What .NET reads at a time, and for the same reason: large enough that
@@ -335,6 +341,8 @@ public class StreamReader : TextReader
 // ================================================================== writing
 
 /// Text going somewhere, a piece at a time.
+///
+/// @see TextReader
 public abstract class TextWriter
 {
     /// What `WriteLine` puts after a line. `"\n"` until set.
@@ -379,6 +387,8 @@ public abstract class TextWriter
 
 /// A writer that keeps what it is given, for a caller that wanted a
 /// `TextWriter` and a string rather than a file.
+///
+/// @see StringReader
 public class StringWriter : TextWriter
 {
     StringBuilder _built;
@@ -408,6 +418,8 @@ public class StringWriter : TextWriter
 ///
 /// Unlike the reader this is genuinely incremental: every encoding here is
 /// stateless, so each piece of text can be encoded and written on its own.
+///
+/// @see StreamReader
 public class StreamWriter : TextWriter
 {
     IStream _stream;

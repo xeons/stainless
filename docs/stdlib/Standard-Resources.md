@@ -50,7 +50,12 @@ bool Exists(int type, int id)
 
 Whether a resource of this type and number is there.
 
-<sub>[stdlib/Resources.sl:312](../../stdlib/Resources.sl#L312)</sub>
+**Parameters**
+
+- `type` — an `RT_` number, `Bitmap` and the rest above
+- `id` — the number the script filed the resource under
+
+<sub>[stdlib/Resources.sl:315](../../stdlib/Resources.sl#L315)</sub>
 
 ### Exists *function*
 
@@ -60,7 +65,12 @@ bool Exists(String type, String name)
 
 Whether one named by text, of a type named by text, is there.
 
-<sub>[stdlib/Resources.sl:315](../../stdlib/Resources.sl#L315)</sub>
+**Parameters**
+
+- `type` — the type name the script invented
+- `name` — the resource name, matched without regard to ASCII case
+
+<sub>[stdlib/Resources.sl:321](../../stdlib/Resources.sl#L321)</sub>
 
 ### GetBitmapFile *function*
 
@@ -84,7 +94,7 @@ entries are three bytes each.
 
 Empty when there is no such bitmap.
 
-<sub>[stdlib/Resources.sl:429](../../stdlib/Resources.sl#L429)</sub>
+<sub>[stdlib/Resources.sl:451](../../stdlib/Resources.sl#L451)</sub>
 
 ### GetBytes *function*
 
@@ -97,7 +107,14 @@ A resource's bytes, copied into an array this program owns.
 Empty when there is no such resource, which is also what an empty resource
 gives -- ask `Exists` where the difference matters.
 
-<sub>[stdlib/Resources.sl:342](../../stdlib/Resources.sl#L342)</sub>
+**Parameters**
+
+- `type` — an `RT_` number
+- `id` — the number the script filed the resource under
+
+**See also** &nbsp; [Resources.Exists](#exists-function)
+
+<sub>[stdlib/Resources.sl:360](../../stdlib/Resources.sl#L360)</sub>
 
 ### GetBytes *function*
 
@@ -107,7 +124,14 @@ byte[] GetBytes(String type, String name)
 
 The same, for a resource named by text.
 
-<sub>[stdlib/Resources.sl:350](../../stdlib/Resources.sl#L350)</sub>
+**Parameters**
+
+- `type` — the type name the script invented
+- `name` — the resource name, matched without regard to ASCII case
+
+**See also** &nbsp; [Resources.Exists](#exists-function)
+
+<sub>[stdlib/Resources.sl:372](../../stdlib/Resources.sl#L372)</sub>
 
 ### GetPointer *function*
 
@@ -121,7 +145,15 @@ The memory belongs to the loaded image: read-only, never freed, and valid
 for as long as the program runs. `GetBytes` is the one to use for anything that
 outlives the call.
 
-<sub>[stdlib/Resources.sl:333](../../stdlib/Resources.sl#L333)</sub>
+**Parameters**
+
+- `type` — an `RT_` number
+- `id` — the number the script filed the resource under
+- `byteCount` — where the size is written, or null to skip it
+
+**See also** &nbsp; [Resources.GetBytes](#getbytes-function)
+
+<sub>[stdlib/Resources.sl:347](../../stdlib/Resources.sl#L347)</sub>
 
 ### GetSize *function*
 
@@ -131,7 +163,12 @@ uint GetSize(int type, int id)
 
 How many bytes a resource holds, or zero when there is none.
 
-<sub>[stdlib/Resources.sl:321](../../stdlib/Resources.sl#L321)</sub>
+**Parameters**
+
+- `type` — an `RT_` number
+- `id` — the number the script filed the resource under
+
+<sub>[stdlib/Resources.sl:330](../../stdlib/Resources.sl#L330)</sub>
 
 ### GetText *function*
 
@@ -150,7 +187,7 @@ platforms answer identically and so that Windows needs no user32.
 
 Empty for a number with no string, which is what `LoadStringW` answers too.
 
-<sub>[stdlib/Resources.sl:380](../../stdlib/Resources.sl#L380)</sub>
+<sub>[stdlib/Resources.sl:402](../../stdlib/Resources.sl#L402)</sub>
 
 ## Constants
 

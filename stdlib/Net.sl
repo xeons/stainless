@@ -171,6 +171,8 @@ public enum SocketShutdown
 }
 
 /// What went wrong, in words.
+///
+/// @see SocketError
 public String DescribeSocketError(SocketError error)
 {
     switch (error)
@@ -243,6 +245,10 @@ public struct EndPoint
 /// One address rather than the list: a list is only useful to something that
 /// will try each in turn, and that is what connecting already does inside the
 /// runtime, where it can try each socket as well as each address.
+///
+/// @failure SocketError.NoName   the name did not resolve, or resolved to an
+///                               address the platform would not write out
+/// @failure SocketError.Unknown  the platform's networking could not be started
 public Result<String, SocketError> ResolveHost(String host)
 {
     return ResolveHost(host, AddressFamily.Any);
@@ -253,6 +259,13 @@ public Result<String, SocketError> ResolveHost(String host)
 /// `AddressFamily.Any` takes whichever the resolver prefers. Name it when the
 /// socket that will use the address is already one family or the other, since
 /// an IPv6 address cannot be connected to from an IPv4 socket.
+///
+/// @param host    the name or literal address to look up
+/// @param family  which family to take an address from
+/// @failure SocketError.NoName   the name did not resolve in that family, or
+///                               resolved to an address the platform would not
+///                               write out
+/// @failure SocketError.Unknown  the platform's networking could not be started
 public Result<String, SocketError> ResolveHost(String host, AddressFamily family)
 {
     byte[64] buffer;
@@ -290,6 +303,13 @@ public class Socket
     bool _closed;
 
     /// A socket of a given family and kind, unbound and unconnected.
+    ///
+    /// @failure SocketError.Invalid  `AddressFamily.Any`, which is a question
+    ///                               for a resolver rather than a family a
+    ///                               socket can have
+    /// @failure SocketError.Unknown  the platform refused a socket -- out of
+    ///                               descriptors, among others
+    /// @see Socket.OpenConnected
     public static Result<Socket, SocketError> Open(AddressFamily family, SocketKind kind)
     {
         var made = new Socket(family, kind);
@@ -303,6 +323,15 @@ public class Socket
     /// One step, because connecting is what decides the family: a caller with
     /// a name does not know whether it will get IPv4 or IPv6, so it cannot
     /// open first.
+    ///
+    /// @failure SocketError.NoName       the host did not resolve
+    /// @failure SocketError.Refused      nothing is listening there
+    /// @failure SocketError.TimedOut     no answer from any address the name
+    ///                                   resolved to
+    /// @failure SocketError.Unreachable  no route to any of them
+    /// @failure SocketError.Unknown      the last address failed for a reason
+    ///                                   with no case of its own
+    /// @see Socket.Connect
     public static Result<Socket, SocketError> OpenConnected(
             String host, ushort port, AddressFamily family, SocketKind kind)
     {
@@ -403,6 +432,15 @@ public class Socket
 
     /// Takes the address, and the port. Port 0 asks the system to choose one,
     /// which `LocalEndPoint` will then say.
+    ///
+    /// @failure SocketError.Closed        the socket was closed before the call
+    /// @failure SocketError.NoName        the host did not resolve
+    /// @failure SocketError.AddressInUse  something else holds that port, or
+    ///                                    this machine has no such address
+    /// @failure SocketError.AccessDenied  a port this process may not take
+    /// @failure SocketError.Unknown       the platform reported something with
+    ///                                    no case of its own
+    /// @see Socket.Listen
     public SocketError Bind(String host, ushort port)
     {
         if (_closed)
@@ -415,12 +453,30 @@ public class Socket
 
     /// Binds to every address on this machine, which is what a server wants
     /// and what an empty host means to the resolver.
+    ///
+    /// @failure SocketError.Closed        the socket was closed before the call
+    /// @failure SocketError.AddressInUse  something else holds that port
+    /// @failure SocketError.AccessDenied  a port this process may not take
+    /// @failure SocketError.Unknown       the platform reported something with
+    ///                                    no case of its own
+    /// @see Socket.Bind
     public SocketError BindAny(ushort port) => Bind("", port);
 
     /// Starts accepting connections. `backlog` is how many may wait before
     /// the system refuses more; the platform may cap it lower than asked.
     ///
     /// Bind first -- listening on a socket that was never bound fails.
+    ///
+    /// @failure SocketError.Closed        the socket was closed before the call
+    /// @failure SocketError.Invalid       the socket was never bound, or is a
+    ///                                    datagram socket, which has nothing to
+    ///                                    listen for
+    /// @failure SocketError.AddressInUse  another socket is already listening
+    ///                                    on that address
+    /// @failure SocketError.Unknown       the platform reported something with
+    ///                                    no case of its own
+    /// @see Socket.Bind
+    /// @seealso Socket.Accept
     public SocketError Listen(int backlog)
     {
         if (_closed)
@@ -451,8 +507,21 @@ public class Socket
     ///
     /// Only the first address of this socket's family is tried, because a
     /// socket whose connect failed cannot be used for a second attempt and
-    /// this one is already made. `new Socket(host, port, family, kind)` is the
-    /// form that tries them all, and the one a client should reach for.
+    /// this one is already made. `Socket.OpenConnected` is the form that tries
+    /// them all, and the one a client should reach for.
+    ///
+    /// @failure SocketError.Closed       the socket was closed before the call
+    /// @failure SocketError.NoName       the host did not resolve in this
+    ///                                   socket's family
+    /// @failure SocketError.WouldBlock   a socket that does not block, where
+    ///                                   the connection is still being made;
+    ///                                   `WaitToWrite` is how it finishes
+    /// @failure SocketError.Refused      nothing is listening there
+    /// @failure SocketError.TimedOut     no answer from that address
+    /// @failure SocketError.Unreachable  no route to it
+    /// @failure SocketError.Unknown      the platform reported something with
+    ///                                   no case of its own
+    /// @see Socket.OpenConnected
     public SocketError Connect(String host, ushort port)
     {
         if (_closed)
@@ -476,6 +545,12 @@ public class Socket
     /// Fewer than asked for is normal on a stream: the kernel took what fitted
     /// in its buffer. A loop over what is left is the caller's job, or
     /// `SendAll` is.
+    ///
+    /// @param buffer  where the bytes come from
+    /// @param offset  where in it to start
+    /// @param count   how many to send from there
+    /// @see Socket.SendAll
+    /// @seealso Socket.Receive
     public nuint Send(byte[] buffer, nuint offset, nuint count)
     {
         if (_closed)
@@ -498,6 +573,17 @@ public class Socket
     }
 
     /// Sends all of it, or says why it could not.
+    ///
+    /// @failure SocketError.Closed        the socket was closed, or the peer
+    ///                                    took nothing and reported nothing
+    /// @failure SocketError.NotConnected  the socket has no peer to send to
+    /// @failure SocketError.Reset         the peer went away mid-send
+    /// @failure SocketError.TimedOut      a send timeout ran out
+    /// @failure SocketError.WouldBlock    a socket that does not block, with no
+    ///                                    room left for the rest
+    /// @failure SocketError.Unknown       the platform reported something with
+    ///                                    no case of its own
+    /// @see Socket.Send
     public SocketError SendAll(byte[] buffer)
     {
         nuint at = 0;
@@ -513,6 +599,17 @@ public class Socket
 
     /// Sends the UTF-8 bytes of `text`, which is what a String already holds,
     /// so nothing is converted or copied on the way.
+    ///
+    /// @failure SocketError.Closed        the socket was closed, or the peer
+    ///                                    took nothing and reported nothing
+    /// @failure SocketError.NotConnected  the socket has no peer to send to
+    /// @failure SocketError.Reset         the peer went away mid-send
+    /// @failure SocketError.TimedOut      a send timeout ran out
+    /// @failure SocketError.WouldBlock    a socket that does not block, with no
+    ///                                    room left for the rest
+    /// @failure SocketError.Unknown       the platform reported something with
+    ///                                    no case of its own
+    /// @see Socket.SendAll
     public SocketError SendText(String text)
     {
         if (_closed)
@@ -537,6 +634,11 @@ public class Socket
     /// Reads up to `count` bytes and reports how many arrived. Zero is the
     /// peer having finished, which is an ending rather than an error -- ask
     /// `Error` to tell the two apart.
+    ///
+    /// @param buffer  where the bytes go
+    /// @param offset  where in it to start writing them
+    /// @param count   how many to make room for
+    /// @see Socket.Send
     public nuint Receive(byte[] buffer, nuint offset, nuint count)
     {
         if (_closed)
@@ -561,6 +663,8 @@ public class Socket
     // ------------------------------------------------------------ datagrams
 
     /// Sends one datagram. It arrives whole or not at all.
+    ///
+    /// @see Socket.ReceiveFrom
     public nuint SendTo(byte[] buffer, EndPoint target)
     {
         if (_closed)
@@ -584,6 +688,10 @@ public class Socket
     /// one. The count is what fitted, and it is not an error.
     ///
     /// When the read fails, `from` is an empty host and port 0.
+    ///
+    /// @param buffer  where the datagram goes, from its first byte
+    /// @param from    filled in with where it came from
+    /// @see Socket.SendTo
     public nuint ReceiveFrom(byte[] buffer, ref EndPoint from)
     {
         if (_closed)
@@ -610,6 +718,9 @@ public class Socket
 
     /// Whether a call waits. A socket that does not block answers
     /// `WouldBlock` instead of waiting, which is not a failure.
+    ///
+    /// @failure SocketError.Closed   the socket was closed before the call
+    /// @failure SocketError.Unknown  the platform refused the change
     public SocketError SetBlocking(bool blocking)
     {
         return CheckOption(sl_socket_set_blocking(_handle, blocking ? 1 : 0, &_code), _code);
@@ -617,6 +728,10 @@ public class Socket
 
     /// Turns off Nagle's algorithm, so a small write goes out now rather than
     /// waiting to be joined by the next one.
+    ///
+    /// @failure SocketError.Closed   the socket was closed before the call
+    /// @failure SocketError.Unknown  the platform refused the option -- a
+    ///                               datagram socket has no Nagle to turn off
     public SocketError SetNoDelay(bool on)
     {
         return CheckOption(sl_socket_set_no_delay(_handle, on ? 1 : 0, &_code), _code);
@@ -629,6 +744,9 @@ public class Socket
     /// process steal a port another is actively listening on, which is a
     /// different and much worse thing to ask for. Windows already allows the
     /// TIME_WAIT case without being asked.
+    ///
+    /// @failure SocketError.Closed   the socket was closed before the call
+    /// @failure SocketError.Unknown  the platform refused the option
     public SocketError SetReuseAddress(bool on)
     {
         return CheckOption(sl_socket_set_reuse_address(_handle, on ? 1 : 0, &_code), _code);
@@ -636,6 +754,10 @@ public class Socket
 
     /// Lets a datagram socket send to a broadcast address. Off by default,
     /// and meaningless on a stream socket.
+    ///
+    /// @failure SocketError.Closed   the socket was closed before the call
+    /// @failure SocketError.Unknown  the platform refused the option, which is
+    ///                               what a stream socket does with it
     public SocketError SetBroadcast(bool on)
     {
         return CheckOption(sl_socket_set_broadcast(_handle, on ? 1 : 0, &_code), _code);
@@ -645,18 +767,29 @@ public class Socket
     /// without closing is eventually noticed. The interval is the platform's
     /// and is measured in hours by default, so this detects a dead peer rather
     /// than a slow one.
+    ///
+    /// @failure SocketError.Closed   the socket was closed before the call
+    /// @failure SocketError.Unknown  the platform refused the option
     public SocketError SetKeepAlive(bool on)
     {
         return CheckOption(sl_socket_set_keep_alive(_handle, on ? 1 : 0, &_code), _code);
     }
 
     /// How long a read waits before giving up. Zero is forever.
+    ///
+    /// @failure SocketError.Closed   the socket was closed before the call
+    /// @failure SocketError.Unknown  the platform refused the option
+    /// @see Socket.SetSendTimeout
     public SocketError SetReceiveTimeout(int milliseconds)
     {
         return CheckOption(sl_socket_set_timeout(_handle, milliseconds, 1, &_code), _code);
     }
 
     /// How long a send waits before giving up. Zero is forever.
+    ///
+    /// @failure SocketError.Closed   the socket was closed before the call
+    /// @failure SocketError.Unknown  the platform refused the option
+    /// @see Socket.SetReceiveTimeout
     public SocketError SetSendTimeout(int milliseconds)
     {
         return CheckOption(sl_socket_set_timeout(_handle, milliseconds, 0, &_code), _code);
@@ -664,6 +797,12 @@ public class Socket
 
     /// Finishes one direction, or both. The other end sees an ending rather
     /// than a reset, which is the difference between this and closing.
+    ///
+    /// @failure SocketError.Closed        the socket was closed before the call
+    /// @failure SocketError.NotConnected  there is no connection to finish
+    /// @failure SocketError.Unknown       the platform reported something with
+    ///                                    no case of its own
+    /// @see Socket.Close
     public SocketError Shutdown(SocketShutdown how)
     {
         if (_closed)
@@ -785,6 +924,12 @@ public class TcpListener
     bool _listening;
 
     /// Listens on every address this machine has.
+    ///
+    /// @failure SocketError.AddressInUse  something else holds that port
+    /// @failure SocketError.AccessDenied  a port this process may not take
+    /// @failure SocketError.Unknown       the open, the bind or the listen
+    ///                                    failed for a reason with no case of
+    ///                                    its own
     public static Result<TcpListener, SocketError> Listen(ushort port)
     {
         return Listen("", port, AddressFamily.IPv4, 16);
@@ -793,6 +938,14 @@ public class TcpListener
     /// Listens on one address. `"127.0.0.1"` is the useful one: a service that
     /// only its own machine should reach says so here rather than in a
     /// firewall.
+    ///
+    /// @failure SocketError.NoName        the host did not resolve, or is not
+    ///                                    an address this machine has
+    /// @failure SocketError.AddressInUse  something else holds that port
+    /// @failure SocketError.AccessDenied  a port this process may not take
+    /// @failure SocketError.Unknown       the open, the bind or the listen
+    ///                                    failed for a reason with no case of
+    ///                                    its own
     public static Result<TcpListener, SocketError> Listen(String host, ushort port)
     {
         return Listen(host, port, AddressFamily.IPv4, 16);
@@ -802,6 +955,21 @@ public class TcpListener
     /// how many connections may queue.
     ///
     /// The other two overloads are this one with IPv4 and a backlog of 16.
+    ///
+    /// @param host     which address to take, empty for every one of them
+    /// @param port     which port to take, 0 to be given one
+    /// @param family   which family to listen in
+    /// @param backlog  how many connections may queue before the system refuses
+    ///                 more
+    /// @failure SocketError.Invalid       `AddressFamily.Any`, which no socket
+    ///                                    can be opened in
+    /// @failure SocketError.NoName        the host did not resolve in that
+    ///                                    family
+    /// @failure SocketError.AddressInUse  something else holds that port
+    /// @failure SocketError.AccessDenied  a port this process may not take
+    /// @failure SocketError.Unknown       the open, the bind or the listen
+    ///                                    failed for a reason with no case of
+    ///                                    its own
     public static Result<TcpListener, SocketError> Listen(
             String host, ushort port, AddressFamily family, int backlog)
     {
@@ -889,6 +1057,15 @@ public class TcpClient : IStream
     bool _finished;
 
     /// Connects to a host and port.
+    ///
+    /// @failure SocketError.NoName       the host did not resolve
+    /// @failure SocketError.Refused      nothing is listening there
+    /// @failure SocketError.TimedOut     no answer from any address the name
+    ///                                   resolved to
+    /// @failure SocketError.Unreachable  no route to any of them
+    /// @failure SocketError.Unknown      the last address failed for a reason
+    ///                                   with no case of its own
+    /// @see TcpListener.Accept
     public static Result<TcpClient, SocketError> Connect(String host, ushort port)
     {
         return Connect(host, port, AddressFamily.Any);
@@ -898,6 +1075,18 @@ public class TcpClient : IStream
     ///
     /// Blocks until the connection is made or refused; there is no timeout
     /// here, and the system's own is measured in tens of seconds.
+    ///
+    /// @param host    the name or address to reach
+    /// @param port    the port to reach it on
+    /// @param family  which family to resolve the name in
+    /// @failure SocketError.NoName       the host did not resolve in that
+    ///                                   family
+    /// @failure SocketError.Refused      nothing is listening there
+    /// @failure SocketError.TimedOut     no answer from any address the name
+    ///                                   resolved to
+    /// @failure SocketError.Unreachable  no route to any of them
+    /// @failure SocketError.Unknown      the last address failed for a reason
+    ///                                   with no case of its own
     public static Result<TcpClient, SocketError> Connect(
             String host, ushort port, AddressFamily family)
     {
@@ -942,9 +1131,29 @@ public class TcpClient : IStream
     public Socket Underlying => _socket;
 
     /// Sends all of `text`, looping until it has gone.
+    ///
+    /// @failure SocketError.Closed        the connection was closed, or the
+    ///                                    peer took nothing and reported
+    ///                                    nothing
+    /// @failure SocketError.NotConnected  the connection was never made
+    /// @failure SocketError.Reset         the peer went away mid-send
+    /// @failure SocketError.TimedOut      a send timeout ran out
+    /// @failure SocketError.Unknown       the platform reported something with
+    ///                                    no case of its own
+    /// @see TcpClient.SendAll
     public SocketError SendText(String text) => _socket.SendText(text);
 
     /// Sends all of `data`.
+    ///
+    /// @failure SocketError.Closed        the connection was closed, or the
+    ///                                    peer took nothing and reported
+    ///                                    nothing
+    /// @failure SocketError.NotConnected  the connection was never made
+    /// @failure SocketError.Reset         the peer went away mid-send
+    /// @failure SocketError.TimedOut      a send timeout ran out
+    /// @failure SocketError.Unknown       the platform reported something with
+    ///                                    no case of its own
+    /// @see TcpClient.SendText
     public SocketError SendAll(byte[] data) => _socket.SendAll(data);
 
     /// Reads until the peer finishes, and gives back what arrived.
@@ -1094,12 +1303,20 @@ public class UdpSocket
     bool _ready;
 
     /// A socket that can send and not receive, because nothing bound it.
+    ///
+    /// @failure SocketError.Unknown  the platform refused a socket -- out of
+    ///                               descriptors, among others
+    /// @see UdpSocket.Bind
     public static Result<UdpSocket, SocketError> Create()
     {
         return Create(AddressFamily.IPv4);
     }
 
     /// The same, in a named family.
+    ///
+    /// @failure SocketError.Invalid  `AddressFamily.Any`, which no socket can
+    ///                               be opened in
+    /// @failure SocketError.Unknown  the platform refused a socket
     public static Result<UdpSocket, SocketError> Create(AddressFamily family)
     {
         var opened = Socket.Open(family, SocketKind.Datagram);
@@ -1110,18 +1327,43 @@ public class UdpSocket
 
     /// A socket bound to a port, so it can receive. Port 0 asks the system to
     /// choose one, which `LocalEndPoint` will say.
+    ///
+    /// @failure SocketError.AddressInUse  something else holds that port
+    /// @failure SocketError.AccessDenied  a port this process may not take
+    /// @failure SocketError.Unknown       the open or the bind failed for a
+    ///                                    reason with no case of its own
+    /// @see UdpSocket.Create
     public static Result<UdpSocket, SocketError> Bind(ushort port)
     {
         return Bind("", port, AddressFamily.IPv4);
     }
 
     /// The same, on one address rather than all of them.
+    ///
+    /// @failure SocketError.NoName        the host did not resolve, or is not
+    ///                                    an address this machine has
+    /// @failure SocketError.AddressInUse  something else holds that port
+    /// @failure SocketError.AccessDenied  a port this process may not take
+    /// @failure SocketError.Unknown       the open or the bind failed for a
+    ///                                    reason with no case of its own
     public static Result<UdpSocket, SocketError> Bind(String host, ushort port)
     {
         return Bind(host, port, AddressFamily.IPv4);
     }
 
     /// Binds with everything named: the address, the port and the family.
+    ///
+    /// @param host    which address to take, empty for every one of them
+    /// @param port    which port to take, 0 to be given one
+    /// @param family  which family to bind in
+    /// @failure SocketError.Invalid       `AddressFamily.Any`, which no socket
+    ///                                    can be opened in
+    /// @failure SocketError.NoName        the host did not resolve in that
+    ///                                    family
+    /// @failure SocketError.AddressInUse  something else holds that port
+    /// @failure SocketError.AccessDenied  a port this process may not take
+    /// @failure SocketError.Unknown       the open or the bind failed for a
+    ///                                    reason with no case of its own
     public static Result<UdpSocket, SocketError> Bind(
             String host, ushort port, AddressFamily family)
     {
@@ -1187,9 +1429,15 @@ public class UdpSocket
     public bool WaitToRead(int milliseconds) => _socket.WaitToRead(milliseconds);
 
     /// Lets this socket send to a broadcast address.
+    ///
+    /// @failure SocketError.Closed   the socket was closed before the call
+    /// @failure SocketError.Unknown  the platform refused the option
     public SocketError SetBroadcast(bool on) => _socket.SetBroadcast(on);
 
     /// How long `Receive` waits before giving up. Zero is forever.
+    ///
+    /// @failure SocketError.Closed   the socket was closed before the call
+    /// @failure SocketError.Unknown  the platform refused the option
     public SocketError SetReceiveTimeout(int milliseconds)
     {
         return _socket.SetReceiveTimeout(milliseconds);

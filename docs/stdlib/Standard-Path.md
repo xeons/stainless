@@ -34,7 +34,14 @@ String ChangeExtension(String path, String with)
 The path with a different extension. `with` may be written with or without
 its leading dot. Nothing before the last part is touched.
 
-<sub>[stdlib/Path.sl:194](../../stdlib/Path.sl#L194)</sub>
+**Parameters**
+
+- `path` — the path whose last part is rewritten
+- `with` — the extension to put there, empty to take the extension off
+
+**See also** &nbsp; [Path.GetExtension](#getextension-function)
+
+<sub>[stdlib/Path.sl:209](../../stdlib/Path.sl#L209)</sub>
 
 ### GetDirectoryName *function*
 
@@ -49,7 +56,9 @@ A root keeps its separator, because without it the answer names somewhere
 else: `/foo` gives `/`, and on Windows `C:\foo` gives `C:\`, where `C:`
 alone would be that drive's current directory.
 
-<sub>[stdlib/Path.sl:132](../../stdlib/Path.sl#L132)</sub>
+**See also** &nbsp; [Path.GetFileName](#getfilename-function)
+
+<sub>[stdlib/Path.sl:139](../../stdlib/Path.sl#L139)</sub>
 
 ### GetExtension *function*
 
@@ -60,7 +69,9 @@ String GetExtension(String path)
 The extension, with its dot: `notes.txt` gives `.txt`. No dot in the last
 part, a dot that starts it, or a dot that ends it gives the empty string.
 
-<sub>[stdlib/Path.sl:175](../../stdlib/Path.sl#L175)</sub>
+**See also** &nbsp; [Path.ChangeExtension](#changeextension-function)
+
+<sub>[stdlib/Path.sl:184](../../stdlib/Path.sl#L184)</sub>
 
 ### GetFileName *function*
 
@@ -70,7 +81,9 @@ String GetFileName(String path)
 
 The last part: `a/b/c.txt` gives `c.txt`.
 
-<sub>[stdlib/Path.sl:120](../../stdlib/Path.sl#L120)</sub>
+**See also** &nbsp; [Path.GetDirectoryName](#getdirectoryname-function)
+
+<sub>[stdlib/Path.sl:125](../../stdlib/Path.sl#L125)</sub>
 
 ### GetFileNameWithoutExtension *function*
 
@@ -80,7 +93,9 @@ String GetFileNameWithoutExtension(String path)
 
 The last part with its extension removed. A trailing dot goes with it.
 
-<sub>[stdlib/Path.sl:186](../../stdlib/Path.sl#L186)</sub>
+**See also** &nbsp; [Path.GetExtension](#getextension-function)
+
+<sub>[stdlib/Path.sl:197](../../stdlib/Path.sl#L197)</sub>
 
 ### IsPathRooted *function*
 
@@ -95,7 +110,9 @@ be a mistake.
 ordinary relative names elsewhere, where a colon and a backslash are both
 characters a filename may contain.
 
-<sub>[stdlib/Path.sl:210](../../stdlib/Path.sl#L210)</sub>
+**See also** &nbsp; [Path.Join](#join-function)
+
+<sub>[stdlib/Path.sl:227](../../stdlib/Path.sl#L227)</sub>
 
 ### IsSamePath *function*
 
@@ -118,7 +135,7 @@ Only ASCII letters are case-folded. Windows folds more, with a table that
 has changed between releases, so two paths differing only in the case of a
 non-ASCII letter are reported as different.
 
-<sub>[stdlib/Path.sl:242](../../stdlib/Path.sl#L242)</sub>
+<sub>[stdlib/Path.sl:259](../../stdlib/Path.sl#L259)</sub>
 
 ### Join *function*
 
@@ -129,7 +146,12 @@ String Join(String left, String right)
 Joins two parts with a single separator, whichever way each one ends or
 starts. An empty part contributes nothing.
 
-<sub>[stdlib/Path.sl:85](../../stdlib/Path.sl#L85)</sub>
+**Parameters**
+
+- `left` — the part that comes first
+- `right` — the part added to the end of it
+
+<sub>[stdlib/Path.sl:88](../../stdlib/Path.sl#L88)</sub>
 
 ### Join *function*
 
@@ -139,7 +161,7 @@ String Join(String first, String second, String third)
 
 Three parts joined left to right, with the same rule at each step.
 
-<sub>[stdlib/Path.sl:114](../../stdlib/Path.sl#L114)</sub>
+<sub>[stdlib/Path.sl:117](../../stdlib/Path.sl#L117)</sub>
 
 ### SplitPath *function*
 
@@ -149,7 +171,7 @@ List<String> SplitPath(String path)
 
 The parts, with the separators dropped and empty parts skipped.
 
-<sub>[stdlib/Path.sl:280](../../stdlib/Path.sl#L280)</sub>
+<sub>[stdlib/Path.sl:297](../../stdlib/Path.sl#L297)</sub>
 
 ## Constants
 

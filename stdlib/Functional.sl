@@ -48,6 +48,11 @@ module Standard.Collections;
 /// The elements the predicate keeps, in the order they were in.
 ///
 /// An array converts to a slice of the whole of itself, so this takes both.
+///
+/// @typeparam T  the element type; the predicate does the deciding, so nothing
+///               is asked of it
+/// @see Collections.Select
+/// @seealso Collections.Count
 public List<T> Where<T>(T[:] items, Predicate<T> keep)
 {
     var kept = new List<T>();
@@ -66,6 +71,10 @@ public List<T> Where<T>(T[:] items, Predicate<T> keep)
 /// `R` appears nowhere but in the transform's result, so working it out means
 /// binding the lambda's body -- which cannot happen until `T` has given the
 /// lambda its parameter type. The compiler does the two in that order.
+///
+/// @typeparam T  the element type, which settles the transform's parameter
+/// @typeparam R  what the transform answers, and so what the result holds
+/// @see Collections.Where
 public List<R> Select<T, R>(T[:] items, Func<T, R> transform)
 {
     var mapped = new List<R>();
@@ -78,6 +87,9 @@ public List<R> Select<T, R>(T[:] items, Func<T, R> transform)
 /// result type, so `A` is settled before the lambda is looked at.
 ///
 ///     long total = Aggregate(numbers, (long)0, (sum, n) => sum + (long)n);
+///
+/// @typeparam T  the element type, which the fold is given one of at a time
+/// @typeparam A  what is carried along and answered, taken from the seed
 public A Aggregate<T, A>(T[:] items, A seed, Fold<A, T> combine)
 {
     var total = seed;
@@ -87,6 +99,9 @@ public A Aggregate<T, A>(T[:] items, A seed, Fold<A, T> combine)
 }
 
 /// Whether any element satisfies the predicate. Stops at the first that does.
+///
+/// @typeparam T  the element type; nothing is asked of it
+/// @see Collections.All
 public bool Any<T>(T[:] items, Predicate<T> test)
 {
     foreach (var item in items)
@@ -99,6 +114,9 @@ public bool Any<T>(T[:] items, Predicate<T> test)
 
 /// Whether every element does. Stops at the first that does not, and is true
 /// of an empty input.
+///
+/// @typeparam T  the element type; nothing is asked of it
+/// @see Collections.Any
 public bool All<T>(T[:] items, Predicate<T> test)
 {
     foreach (var item in items)
@@ -110,6 +128,9 @@ public bool All<T>(T[:] items, Predicate<T> test)
 }
 
 /// How many satisfy the predicate.
+///
+/// @typeparam T  the element type; nothing is asked of it
+/// @see Collections.Where
 public nuint Count<T>(T[:] items, Predicate<T> test)
 {
     nuint found = 0u;
@@ -126,6 +147,10 @@ public nuint Count<T>(T[:] items, Predicate<T> test)
 /// The reader that needs no check, because it supplies its own answer. `Find`
 /// is the one to reach for when "there was none" is a different outcome rather
 /// than a different value.
+///
+/// @typeparam T  the element type, which is also the fallback's; nothing is
+///               asked of it
+/// @see Collections.Find
 public T FirstOrDefault<T>(T[:] items, Predicate<T> test, T fallback)
 {
     foreach (var item in items)
@@ -143,6 +168,11 @@ public T FirstOrDefault<T>(T[:] items, Predicate<T> test, T fallback)
 /// An `Optional<T>` rather than a fallback: a struct has no null to stand for
 /// "none" (§2.5), and inventing a value that means it is how a caller comes to
 /// treat a real answer as a miss.
+///
+/// @typeparam T  the element type, which the `Optional` holds; nothing is
+///               asked of it
+/// @see Collections.FirstOrDefault
+/// @seealso Collections.FindIndex
 public Optional<T> Find<T>(T[:] items, Predicate<T> test)
 {
     foreach (var item in items)
@@ -154,6 +184,9 @@ public Optional<T> Find<T>(T[:] items, Predicate<T> test)
 }
 
 /// Where the first element satisfying the predicate is, if it is there.
+///
+/// @typeparam T  the element type; nothing is asked of it
+/// @see Collections.Find
 public Optional<nuint> FindIndex<T>(T[:] items, Predicate<T> test)
 {
     for (nuint i = 0u; i < items.Length; i++)
@@ -165,6 +198,9 @@ public Optional<nuint> FindIndex<T>(T[:] items, Predicate<T> test)
 }
 
 /// Runs the action over every element.
+///
+/// @typeparam T  the element type, which the action is handed one of at a time
+/// @see List.ForEach
 public void ForEach<T>(T[:] items, Action<T> body)
 {
     foreach (var item in items)
@@ -172,6 +208,9 @@ public void ForEach<T>(T[:] items, Action<T> body)
 }
 
 /// The first `count` elements, or all of them if there are fewer.
+///
+/// @typeparam T  the element type; nothing is asked of it
+/// @see Collections.Skip
 public List<T> Take<T>(T[:] items, nuint count)
 {
     var taken = new List<T>();
@@ -182,6 +221,9 @@ public List<T> Take<T>(T[:] items, nuint count)
 }
 
 /// Everything after the first `count` elements, or nothing if there are fewer.
+///
+/// @typeparam T  the element type; nothing is asked of it
+/// @see Collections.Take
 public List<T> Skip<T>(T[:] items, nuint count)
 {
     var rest = new List<T>();
@@ -195,6 +237,10 @@ public List<T> Skip<T>(T[:] items, nuint count)
 /// The same, for anything with a `GetEnumerator()` that names its shape --
 /// `List<T>`, `Queue<T>`, `Stack<T>`, `LinkedList<T>`, `HashSet<T>` and
 /// `SortedList<K, V>` all do.
+///
+/// @typeparam T  the element type; the predicate does the deciding, so nothing
+///               is asked of it
+/// @see Collections.Select
 public List<T> Where<T>(IEnumerable<T> items, Predicate<T> keep)
 {
     var kept = new List<T>();
@@ -207,6 +253,10 @@ public List<T> Where<T>(IEnumerable<T> items, Predicate<T> keep)
 }
 
 /// Every element put through the transform, over any sequence.
+///
+/// @typeparam T  the element type, which settles the transform's parameter
+/// @typeparam R  what the transform answers, and so what the result holds
+/// @see Collections.Where
 public List<R> Select<T, R>(IEnumerable<T> items, Func<T, R> transform)
 {
     var mapped = new List<R>();
@@ -216,6 +266,9 @@ public List<R> Select<T, R>(IEnumerable<T> items, Func<T, R> transform)
 }
 
 /// Everything folded into one value, left to right, over any sequence.
+///
+/// @typeparam T  the element type, which the fold is given one of at a time
+/// @typeparam A  what is carried along and answered, taken from the seed
 public A Aggregate<T, A>(IEnumerable<T> items, A seed, Fold<A, T> combine)
 {
     var total = seed;
@@ -226,6 +279,9 @@ public A Aggregate<T, A>(IEnumerable<T> items, A seed, Fold<A, T> combine)
 
 /// Whether any element satisfies the predicate, over any sequence. Stops at
 /// the first that does, so the rest of the sequence is never walked.
+///
+/// @typeparam T  the element type; nothing is asked of it
+/// @see Collections.All
 public bool Any<T>(IEnumerable<T> items, Predicate<T> test)
 {
     foreach (var item in items)
@@ -238,6 +294,9 @@ public bool Any<T>(IEnumerable<T> items, Predicate<T> test)
 
 /// Whether every element does, over any sequence. Stops at the first that
 /// does not, and is true of an empty sequence.
+///
+/// @typeparam T  the element type; nothing is asked of it
+/// @see Collections.Any
 public bool All<T>(IEnumerable<T> items, Predicate<T> test)
 {
     foreach (var item in items)
@@ -249,6 +308,9 @@ public bool All<T>(IEnumerable<T> items, Predicate<T> test)
 }
 
 /// How many satisfy the predicate, over any sequence. Walks all of it.
+///
+/// @typeparam T  the element type; nothing is asked of it
+/// @see Collections.Where
 public nuint Count<T>(IEnumerable<T> items, Predicate<T> test)
 {
     nuint found = 0u;
@@ -264,6 +326,10 @@ public nuint Count<T>(IEnumerable<T> items, Predicate<T> test)
 /// over any sequence. A fallback equal to a real element is indistinguishable
 /// from a miss; `Find` is the overload that tells them apart, and it takes a
 /// slice rather than a sequence.
+///
+/// @typeparam T  the element type, which is also the fallback's; nothing is
+///               asked of it
+/// @see Collections.Find
 public T FirstOrDefault<T>(IEnumerable<T> items, Predicate<T> test, T fallback)
 {
     foreach (var item in items)
@@ -275,6 +341,9 @@ public T FirstOrDefault<T>(IEnumerable<T> items, Predicate<T> test, T fallback)
 }
 
 /// Runs the action over every element of any sequence.
+///
+/// @typeparam T  the element type, which the action is handed one of at a time
+/// @see List.ForEach
 public void ForEach<T>(IEnumerable<T> items, Action<T> body)
 {
     foreach (var item in items)
@@ -283,6 +352,9 @@ public void ForEach<T>(IEnumerable<T> items, Action<T> body)
 
 /// Everything in the sequence, as a list. The one that makes a `Queue` or a
 /// `HashSet` usable with the array overloads above.
+///
+/// @typeparam T  the element type; nothing is asked of it
+/// @see Collections.ToArray
 public List<T> ToList<T>(IEnumerable<T> items)
 {
     var all = new List<T>();
@@ -293,6 +365,9 @@ public List<T> ToList<T>(IEnumerable<T> items)
 
 /// And a slice, which an array converts to. Not an overload of the above by
 /// accident: a slice is not an `IEnumerable`, so nothing is ever both.
+///
+/// @typeparam T  the element type; nothing is asked of it
+/// @see Collections.ToArray
 public List<T> ToList<T>(T[:] items)
 {
     var all = new List<T>();
@@ -314,6 +389,9 @@ public List<T> ToList<T>(T[:] items)
 /// One `IEnumerable` overload rather than an `IReadOnlyList` one as well: a
 /// `List<T>` is both, so a pair would be ambiguous at exactly the type a chain
 /// hands over. That is why `ToList` takes only the sequence too.
+///
+/// @typeparam T  the element type; nothing is asked of it
+/// @see Collections.ToList
 public T[] ToArray<T>(IEnumerable<T> items)
 {
     var all = ToList(items);
@@ -324,6 +402,9 @@ public T[] ToArray<T>(IEnumerable<T> items)
 }
 
 /// The same for a slice, which is not an `IEnumerable` and so does not collide.
+///
+/// @typeparam T  the element type; nothing is asked of it
+/// @see Collections.ToList
 public T[] ToArray<T>(T[:] items)
 {
     var array = new T[items.Length];
@@ -337,6 +418,10 @@ public T[] ToArray<T>(T[:] items)
 /// O(n²) in comparisons, which is what asking nothing of `T` but `IEquatable`
 /// costs. A `HashSet<T>` does it in one pass and wants `IHashable` as well;
 /// this is the one to reach for at the sizes a chain works at.
+///
+/// @typeparam T  the element type, which must answer whether it equals
+///               another; that alone is what makes this O(n squared)
+/// @see HashSet
 public List<T> Distinct<T>(T[:] items) where T : IEquatable<T>
 {
     var seen = new List<T>();
@@ -350,6 +435,9 @@ public List<T> Distinct<T>(T[:] items) where T : IEquatable<T>
 
 /// The elements, in order, with later repeats left out, over any sequence.
 /// O(n squared) in comparisons, as the slice overload is.
+///
+/// @typeparam T  the element type, which must answer whether it equals another
+/// @see HashSet
 public List<T> Distinct<T>(IEnumerable<T> items) where T : IEquatable<T>
 {
     var seen = new List<T>();
@@ -366,6 +454,10 @@ public List<T> Distinct<T>(IEnumerable<T> items) where T : IEquatable<T>
 /// `Sort` orders in place, which a chain cannot use: what is being chained
 /// from is usually somebody else's array. This copies first, and is stable for
 /// the reason `Sort` is.
+///
+/// @typeparam T  the element type; the comparer orders it, so nothing is asked
+///               of it
+/// @see Collections.Sort
 public List<T> OrderBy<T>(T[:] items, Comparer<T> order)
 {
     var copy = new T[items.Length];
@@ -378,6 +470,10 @@ public List<T> OrderBy<T>(T[:] items, Comparer<T> order)
 
 /// The elements ordered by what `order` says, over any sequence, leaving the
 /// input alone. Copies into an array first, so it costs one.
+///
+/// @typeparam T  the element type; the comparer orders it, so nothing is asked
+///               of it
+/// @see Collections.Sort
 public List<T> OrderBy<T>(IEnumerable<T> items, Comparer<T> order)
 {
     var copy = ToArray(items);
@@ -386,6 +482,9 @@ public List<T> OrderBy<T>(IEnumerable<T> items, Comparer<T> order)
 }
 
 /// The first `count` elements, or all of them if there are fewer.
+///
+/// @typeparam T  the element type; nothing is asked of it
+/// @see Collections.Skip
 public List<T> Take<T>(IEnumerable<T> items, nuint count)
 {
     var kept = new List<T>();
@@ -399,6 +498,9 @@ public List<T> Take<T>(IEnumerable<T> items, nuint count)
 }
 
 /// Everything after the first `count`.
+///
+/// @typeparam T  the element type; nothing is asked of it
+/// @see Collections.Take
 public List<T> Skip<T>(IEnumerable<T> items, nuint count)
 {
     var kept = new List<T>();

@@ -62,6 +62,9 @@ public class Random
     /// constructor has nowhere to report one anyway (§2.9). Where that has to
     /// be survivable, `Random.FillSecureBytes` says whether it managed, and
     /// `new Random(seed)` takes the number it produced.
+    ///
+    /// @see Random.FillSecureBytes
+    /// @seealso Random.GenerateSeed
     public Random() => SeedState((ulong)sl_random_seed());
 
     /// SplitMix64 spreads one word into four.
@@ -115,6 +118,8 @@ public class Random
 
     /// The next 64 bits read as signed, so negative half the time. Reach for
     /// `NextBelow` when a range is what is wanted.
+    ///
+    /// @see Random.NextBelow
     public long NextLong() => (long)NextULong();
 
     /// A number in `[0, limit)`. Aborts on a limit of zero, which names an
@@ -201,6 +206,8 @@ public class Random
 /// Bytes straight from the operating system's cryptographic source, which is
 /// what a key or a token wants. Reports whether it managed; a false is not a
 /// reason to fall back on the clock.
+///
+/// @see GenerateSeed
 public bool FillSecureBytes(byte[] buffer)
 {
     if (buffer.Length == 0u)
@@ -211,4 +218,6 @@ public bool FillSecureBytes(byte[] buffer)
 /// One unpredictable 64-bit value from the platform, for seeding something
 /// else deliberately. Aborts if the platform supplies none; `FillSecureBytes` is the
 /// form that reports instead.
+///
+/// @see FillSecureBytes
 public long GenerateSeed() => sl_random_seed();

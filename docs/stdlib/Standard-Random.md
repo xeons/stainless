@@ -43,7 +43,7 @@ ulong NextULong()
 
 The next 64 bits. Every other method here is built on this one.
 
-<sub>[stdlib/Random.sl:101](../../stdlib/Random.sl#L101)</sub>
+<sub>[stdlib/Random.sl:104](../../stdlib/Random.sl#L104)</sub>
 
 #### NextLong *method*
 
@@ -54,7 +54,9 @@ long NextLong()
 The next 64 bits read as signed, so negative half the time. Reach for
 `NextBelow` when a range is what is wanted.
 
-<sub>[stdlib/Random.sl:118](../../stdlib/Random.sl#L118)</sub>
+**See also** &nbsp; [Random.NextBelow](#nextbelow-method)
+
+<sub>[stdlib/Random.sl:123](../../stdlib/Random.sl#L123)</sub>
 
 #### NextBelow *method*
 
@@ -70,7 +72,7 @@ the low end whenever the limit does not divide 2^64, and the bias is
 large exactly when the limit is large. The loop discards the short tail
 instead, and runs more than once with probability below one half.
 
-<sub>[stdlib/Random.sl:127](../../stdlib/Random.sl#L127)</sub>
+<sub>[stdlib/Random.sl:132](../../stdlib/Random.sl#L132)</sub>
 
 #### NextBetween *method*
 
@@ -80,7 +82,7 @@ long NextBetween(long low, long high)
 
 A number in `[low, high)`. Aborts when the range is empty.
 
-<sub>[stdlib/Random.sl:142](../../stdlib/Random.sl#L142)</sub>
+<sub>[stdlib/Random.sl:147](../../stdlib/Random.sl#L147)</sub>
 
 #### NextInt *method*
 
@@ -90,7 +92,7 @@ int NextInt(int limit)
 
 A number in `[0, limit)`, for the common case of an `int`.
 
-<sub>[stdlib/Random.sl:150](../../stdlib/Random.sl#L150)</sub>
+<sub>[stdlib/Random.sl:155](../../stdlib/Random.sl#L155)</sub>
 
 #### NextBool *method*
 
@@ -100,7 +102,7 @@ bool NextBool()
 
 True about half the time.
 
-<sub>[stdlib/Random.sl:153](../../stdlib/Random.sl#L153)</sub>
+<sub>[stdlib/Random.sl:158](../../stdlib/Random.sl#L158)</sub>
 
 #### NextDouble *method*
 
@@ -114,7 +116,7 @@ The top 53 bits, which is exactly the precision a double has: taking
 fewer would leave gaps, and taking more would round some draws up to
 1.0 and break the half-open range.
 
-<sub>[stdlib/Random.sl:160](../../stdlib/Random.sl#L160)</sub>
+<sub>[stdlib/Random.sl:165](../../stdlib/Random.sl#L165)</sub>
 
 #### NextBytes *method*
 
@@ -124,7 +126,7 @@ void NextBytes(byte[] buffer)
 
 Fills an array with random bytes.
 
-<sub>[stdlib/Random.sl:166](../../stdlib/Random.sl#L166)</sub>
+<sub>[stdlib/Random.sl:171](../../stdlib/Random.sl#L171)</sub>
 
 #### Shuffle *method*
 
@@ -139,7 +141,7 @@ chosen element at or below it. Walking up, or choosing from the whole
 array each time, is the classic wrong version -- it produces n^n equally
 likely paths over n! orderings, which cannot come out even.
 
-<sub>[stdlib/Random.sl:186](../../stdlib/Random.sl#L186)</sub>
+<sub>[stdlib/Random.sl:191](../../stdlib/Random.sl#L191)</sub>
 
 ## Functions
 
@@ -153,7 +155,9 @@ Bytes straight from the operating system's cryptographic source, which is
 what a key or a token wants. Reports whether it managed; a false is not a
 reason to fall back on the clock.
 
-<sub>[stdlib/Random.sl:204](../../stdlib/Random.sl#L204)</sub>
+**See also** &nbsp; [GenerateSeed](#generateseed-function)
+
+<sub>[stdlib/Random.sl:211](../../stdlib/Random.sl#L211)</sub>
 
 ### GenerateSeed *function*
 
@@ -165,5 +169,7 @@ One unpredictable 64-bit value from the platform, for seeding something
 else deliberately. Aborts if the platform supplies none; `FillSecureBytes` is the
 form that reports instead.
 
-<sub>[stdlib/Random.sl:214](../../stdlib/Random.sl#L214)</sub>
+**See also** &nbsp; [FillSecureBytes](#fillsecurebytes-function)
+
+<sub>[stdlib/Random.sl:223](../../stdlib/Random.sl#L223)</sub>
 

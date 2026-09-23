@@ -34,8 +34,9 @@
 /// what establishes a type's invariants, and a deserializer that allocated
 /// zeroed memory would produce an object whose non-nullable fields were null --
 /// a hole in the type system rather than a value. So `PopulateObject` takes an
-/// instance the program made, and `Deserialize<T>` calls `new T()` first, which
-/// is what `where T : new()` is there to guarantee.
+/// instance the program made, and there is no `Deserialize<T>` that makes one:
+/// the caller writes `new T()` itself, where the constructor it wants is in
+/// reach.
 module Standard.Json;
 
 import Standard.Collections;
@@ -105,6 +106,9 @@ public String DescribeJsonError(JsonError error)
 /// A document is nested by recursion, so the limit is really about the stack.
 /// It exists because a hostile document is one line -- ten thousand `[` -- and
 /// the alternative to a limit is a crash that looks like a compiler bug.
+///
+/// @value 128 levels.
+/// @see JsonError.TooDeep
 public const nuint MaxDepth = 128u;
 
 // ------------------------------------------------------------------ objects
@@ -129,10 +133,14 @@ public class JsonObject
     public String GetNameAt(nuint index) => _members.GetKeyAt(index);
 
     /// The value at a position, pairing with `GetNameAt` at the same index.
+    ///
+    /// @see JsonObject.GetNameAt
     public JsonValue GetValueAt(nuint index) => _members.GetValueAt(index);
 
     /// Adds a member. A repeated name is kept rather than replaced, because
     /// that is what the document said; `Find` answers with the first.
+    ///
+    /// @see JsonObject.Find
     public void Add(String name, JsonValue value) => _members.Add(name, value);
 
     /// Replaces the value of a name, or adds it.
@@ -144,6 +152,8 @@ public class JsonObject
 
     /// Whether a member of that name is there. A scan, so `IndexOf` once
     /// beats this followed by a lookup.
+    ///
+    /// @see JsonObject.IndexOf
     public bool ContainsKey(String name) => _members.ContainsKey(name);
 
     /// The value of a name, or `Null` when it is not there. A document that
@@ -821,6 +831,19 @@ bool TryConsume(Cursor cursor, String word)
 /// Reads a whole document. Trailing content is an error rather than ignored,
 /// because a document with a second value in it is a document the writer meant
 /// something else by.
+///
+/// @failure JsonError.Unexpected        a character that cannot start what is expected, or an
+///                                      unescaped control character in a string
+/// @failure JsonError.UnterminatedText  a string with no closing quote
+/// @failure JsonError.BadEscape         a backslash followed by something that is not an
+///                                      escape
+/// @failure JsonError.BadNumber         digits that are not a JSON number, or one too large
+///                                      for a double
+/// @failure JsonError.BadLiteral        something that started like `true`, `false` or `null`
+///                                      and was not
+/// @failure JsonError.TooDeep           nesting past `MaxDepth`
+/// @failure JsonError.TrailingContent   a second value after the first
+/// @see Json.ToJsonText
 public Result<JsonValue, JsonError> Parse(String text)
 {
     var cursor = new Cursor(text);
@@ -844,6 +867,9 @@ public Result<JsonValue, JsonError> Parse(String text)
 /// A `Number` that is infinite or NaN is written as `null`, since JSON has no
 /// spelling for either. `JSON.stringify` does the same, and it reads back as a
 /// value absent rather than as some other number.
+///
+/// @see Json.Parse
+/// @seealso Json.ToJsonTextIndented
 public String ToJsonText(JsonValue value)
 {
     var text = new StringBuilder();
@@ -852,6 +878,8 @@ public String ToJsonText(JsonValue value)
 }
 
 /// The document as text, indented two spaces a level.
+///
+/// @see Json.ToJsonText
 public String ToJsonTextIndented(JsonValue value)
 {
     var text = new StringBuilder();
@@ -1059,15 +1087,24 @@ public attribute JsonCreate { }
 /// Reads the field tables of `[Reflect] T`, walking into a nested class or
 /// struct rather than stopping at it. A field of a kind with no JSON spelling
 /// -- a pointer, a delegate, an array -- is left out rather than guessed at.
+///
+/// @typeparam T  a `[Reflect]` type, whose field tables say what there is to write
+/// @see Json.Serialize
 public JsonValue ToJsonValue<T>(T value)
 {
     return BuildInstanceValue((byte*)value, typeof(T));
 }
 
 /// The document as text.
+///
+/// @typeparam T  a `[Reflect]` type
+/// @see Json.PopulateObject
 public String Serialize<T>(T value) => ToJsonText(ToJsonValue(value));
 
 /// The same, indented.
+///
+/// @typeparam T  a `[Reflect]` type
+/// @see Json.Serialize
 public String SerializeIndented<T>(T value) => ToJsonTextIndented(ToJsonValue(value));
 
 JsonValue BuildInstanceValue(byte* instance, Type type)
@@ -1228,6 +1265,22 @@ JsonValue BuildArrayValue(byte* instance, Field field)
 /// A document naming a nested object the constructor left null is skipped
 /// rather than allocated into, since nothing here could give the rest of that
 /// object's fields a value.
+///
+/// @typeparam T  a `[Reflect]` type, whose field tables say what there is to fill
+/// @failure JsonError.Unexpected        a character that cannot start what is expected, or an
+///                                      unescaped control character in a string
+/// @failure JsonError.UnterminatedText  a string with no closing quote
+/// @failure JsonError.BadEscape         a backslash followed by something that is not an
+///                                      escape
+/// @failure JsonError.BadNumber         digits that are not a JSON number, or one too large
+///                                      for a double
+/// @failure JsonError.BadLiteral        something that started like `true`, `false` or `null`
+///                                      and was not
+/// @failure JsonError.TooDeep           nesting past `MaxDepth`
+/// @failure JsonError.TrailingContent   a second value after the first
+/// @failure JsonError.NotAnObject       the document is not an object
+/// @failure JsonError.NotReflected      `T` carries no field tables
+/// @see Json.Serialize
 public JsonError PopulateObject<T>(T value, String text)
 {
     var parsed = Parse(text);
@@ -1238,6 +1291,11 @@ public JsonError PopulateObject<T>(T value, String text)
 }
 
 /// The same, from a document already parsed.
+///
+/// @typeparam T  a `[Reflect]` type, whose field tables say what there is to fill
+/// @failure JsonError.NotAnObject   the document is not an object
+/// @failure JsonError.NotReflected  `T` carries no field tables
+/// @see Json.Serialize
 public JsonError PopulateObject<T>(T value, JsonValue document)
 {
     var type = typeof(T);

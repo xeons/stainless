@@ -151,6 +151,15 @@ ProcessError ToProcessError(int number)
 ///
 /// `arguments` does **not** include the program's own name; that is `program`,
 /// and it is what a PATH lookup is done on when it has no separator in it.
+///
+/// @failure ProcessError.NotFound    no such program, on the PATH or at the
+///                                   path given
+/// @failure ProcessError.Denied      it is there and may not be run
+/// @failure ProcessError.NoResource  out of processes, descriptors or memory
+/// @failure ProcessError.Failed      it did not start, for a reason none of the
+///                                   others names
+/// @see OpenProcess
+/// @seealso Process.Start
 public Result<Completed, ProcessError> RunProcess(String program, String[] arguments)
 {
     return RunProcess(program, arguments, null);
@@ -166,6 +175,13 @@ public Result<Completed, ProcessError> RunProcess(String program, String[] argum
 ///
 /// Without `input` the program reads end of input at once, rather than this
 /// program's own.
+///
+/// @failure ProcessError.NotFound    no such program, on the PATH or at the
+///                                   path given
+/// @failure ProcessError.Denied      it is there and may not be run
+/// @failure ProcessError.NoResource  out of processes, descriptors or memory
+/// @failure ProcessError.Failed      it did not start, for a reason none of the
+///                                   others names
 public Result<Completed, ProcessError> RunProcess(
     String program, String[] arguments, String? input
 )
@@ -213,6 +229,9 @@ public class Process
     /// Waits for it to finish, and answers with the code it left.
     ///
     /// Asking twice is harmless and answers the same both times.
+    ///
+    /// @failure ProcessError.Failed  the wait itself failed, so there is no
+    ///                               code to report
     public Result<int, ProcessError> Wait()
     {
         int status = sl_process_wait(_handle, out int exitCode);
@@ -242,6 +261,19 @@ public class Process
     public bool Kill() => sl_process_signal(_handle, true);
 
     /// Starts a program without waiting for it.
+    ///
+    /// @param program    what to run, looked up on the PATH when it has no
+    ///                   separator in it
+    /// @param arguments  what to hand it, without the program's own name in
+    ///                   front
+    /// @failure ProcessError.NotFound    no such program, on the PATH or at the
+    ///                                   path given
+    /// @failure ProcessError.Denied      it is there and may not be run
+    /// @failure ProcessError.NoResource  out of processes, descriptors or
+    ///                                   memory
+    /// @failure ProcessError.Failed      it did not start, for a reason none of
+    ///                                   the others names
+    /// @see RunProcess
     public static Result<Process, ProcessError> Start(String program, String[] arguments)
     {
         byte* args = AssembleArguments(program, arguments);
@@ -344,6 +376,10 @@ public class Running
     /// whose output pipe is full is the deadlock the pumping exists to avoid,
     /// arriving from the other side. Asking twice is harmless and answers the
     /// same both times.
+    ///
+    /// @failure ProcessError.Failed  the wait itself failed, so there is no
+    ///                               code to report
+    /// @see Running.ReadAvailableOutput
     public Result<int, ProcessError> Wait()
     {
         int status = sl_process_wait(_handle, out int exitCode);
@@ -364,6 +400,15 @@ public class Running
 /// `arguments` does **not** include the program's own name; that is `program`,
 /// and it is what a PATH lookup is done on when it has no separator in it --
 /// the same bargain `RunProcess` makes.
+///
+/// @failure ProcessError.NotFound    no such program, on the PATH or at the
+///                                   path given
+/// @failure ProcessError.Denied      it is there and may not be run
+/// @failure ProcessError.NoResource  out of processes, descriptors, pipes or
+///                                   memory
+/// @failure ProcessError.Failed      it did not start, for a reason none of the
+///                                   others names
+/// @see RunProcess
 public Result<Running, ProcessError> OpenProcess(String program, String[] arguments)
 {
     return OpenProcess(program, arguments, null);
@@ -378,6 +423,14 @@ public Result<Running, ProcessError> OpenProcess(String program, String[] argume
 ///
 /// Without `input` the program reads end of input at once, rather than this
 /// program's own.
+///
+/// @failure ProcessError.NotFound    no such program, on the PATH or at the
+///                                   path given
+/// @failure ProcessError.Denied      it is there and may not be run
+/// @failure ProcessError.NoResource  out of processes, descriptors, pipes or
+///                                   memory
+/// @failure ProcessError.Failed      it did not start, for a reason none of the
+///                                   others names
 public Result<Running, ProcessError> OpenProcess(
     String program, String[] arguments, String? input
 )

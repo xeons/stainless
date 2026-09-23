@@ -111,7 +111,9 @@ bool Contains(String value)
 
 True when `value` appears anywhere in this text.
 
-<sub>[stdlib/Text.sl:113](../../stdlib/Text.sl#L113)</sub>
+**See also** &nbsp; [String.IndexOf](#indexof-method)
+
+<sub>[stdlib/Text.sl:115](../../stdlib/Text.sl#L115)</sub>
 
 #### Contains *method*
 
@@ -122,7 +124,7 @@ bool Contains(char value)
 True when this single code unit appears. Only meaningful for ASCII: a
 `char` above 127 is one byte of a sequence rather than a character.
 
-<sub>[stdlib/Text.sl:120](../../stdlib/Text.sl#L120)</sub>
+<sub>[stdlib/Text.sl:122](../../stdlib/Text.sl#L122)</sub>
 
 #### IndexOf *method*
 
@@ -135,7 +137,9 @@ Where `value` first appears, or `NotFound`.
 An empty `value` is found at 0, which is where it is: every string
 begins with the empty string.
 
-<sub>[stdlib/Text.sl:131](../../stdlib/Text.sl#L131)</sub>
+**See also** &nbsp; [String.LastIndexOf](#lastindexof-method) &middot; [Text.NotFound](#notfound-constant)
+
+<sub>[stdlib/Text.sl:136](../../stdlib/Text.sl#L136)</sub>
 
 #### IndexOf *method*
 
@@ -145,7 +149,7 @@ long IndexOf(String value, nuint start)
 
 Where `value` first appears at or after `start`, or `NotFound`.
 
-<sub>[stdlib/Text.sl:137](../../stdlib/Text.sl#L137)</sub>
+<sub>[stdlib/Text.sl:142](../../stdlib/Text.sl#L142)</sub>
 
 #### LastIndexOf *method*
 
@@ -155,7 +159,9 @@ long LastIndexOf(String value)
 
 Where `value` last appears, or `NotFound`.
 
-<sub>[stdlib/Text.sl:162](../../stdlib/Text.sl#L162)</sub>
+**See also** &nbsp; [String.IndexOf](#indexof-method)
+
+<sub>[stdlib/Text.sl:169](../../stdlib/Text.sl#L169)</sub>
 
 #### IndexOf *method*
 
@@ -165,7 +171,7 @@ long IndexOf(char value)
 
 Where this code unit first appears, or `NotFound`.
 
-<sub>[stdlib/Text.sl:184](../../stdlib/Text.sl#L184)</sub>
+<sub>[stdlib/Text.sl:191](../../stdlib/Text.sl#L191)</sub>
 
 #### LastIndexOf *method*
 
@@ -175,7 +181,7 @@ long LastIndexOf(char value)
 
 Where this code unit last appears, or `NotFound`.
 
-<sub>[stdlib/Text.sl:198](../../stdlib/Text.sl#L198)</sub>
+<sub>[stdlib/Text.sl:205](../../stdlib/Text.sl#L205)</sub>
 
 #### Substring *method*
 
@@ -185,7 +191,7 @@ String Substring(nuint start)
 
 Everything from `start` to the end. A `start` past the end gives "".
 
-<sub>[stdlib/Text.sl:213](../../stdlib/Text.sl#L213)</sub>
+<sub>[stdlib/Text.sl:220](../../stdlib/Text.sl#L220)</sub>
 
 #### SubstringBefore *method*
 
@@ -195,7 +201,9 @@ String SubstringBefore(String separator)
 
 The text before the first `separator`, or all of it when there is none.
 
-<sub>[stdlib/Text.sl:222](../../stdlib/Text.sl#L222)</sub>
+**See also** &nbsp; [String.SubstringAfter](#substringafter-method)
+
+<sub>[stdlib/Text.sl:231](../../stdlib/Text.sl#L231)</sub>
 
 #### SubstringAfter *method*
 
@@ -205,7 +213,9 @@ String SubstringAfter(String separator)
 
 The text after the first `separator`, or "" when there is none.
 
-<sub>[stdlib/Text.sl:231](../../stdlib/Text.sl#L231)</sub>
+**See also** &nbsp; [String.SubstringBefore](#substringbefore-method) &middot; [String.SubstringAfterLast](#substringafterlast-method)
+
+<sub>[stdlib/Text.sl:243](../../stdlib/Text.sl#L243)</sub>
 
 #### SubstringAfterLast *method*
 
@@ -215,7 +225,9 @@ String SubstringAfterLast(String separator)
 
 The text after the last `separator`, or all of it when there is none.
 
-<sub>[stdlib/Text.sl:240](../../stdlib/Text.sl#L240)</sub>
+**See also** &nbsp; [String.SubstringAfter](#substringafter-method)
+
+<sub>[stdlib/Text.sl:254](../../stdlib/Text.sl#L254)</sub>
 
 #### Trim *method*
 
@@ -225,7 +237,9 @@ String Trim()
 
 This text without leading or trailing ASCII whitespace.
 
-<sub>[stdlib/Text.sl:251](../../stdlib/Text.sl#L251)</sub>
+**See also** &nbsp; [String.TrimStart](#trimstart-method) &middot; [String.TrimEnd](#trimend-method)
+
+<sub>[stdlib/Text.sl:268](../../stdlib/Text.sl#L268)</sub>
 
 #### TrimStart *method*
 
@@ -235,7 +249,7 @@ String TrimStart()
 
 This text without leading ASCII whitespace.
 
-<sub>[stdlib/Text.sl:257](../../stdlib/Text.sl#L257)</sub>
+<sub>[stdlib/Text.sl:274](../../stdlib/Text.sl#L274)</sub>
 
 #### TrimEnd *method*
 
@@ -245,7 +259,7 @@ String TrimEnd()
 
 This text without trailing ASCII whitespace.
 
-<sub>[stdlib/Text.sl:272](../../stdlib/Text.sl#L272)</sub>
+<sub>[stdlib/Text.sl:289](../../stdlib/Text.sl#L289)</sub>
 
 #### Replace *method*
 
@@ -258,7 +272,9 @@ Every occurrence of `from` replaced by `to`.
 Left to right and non-overlapping, so the replacement is never searched
 again: replacing "a" with "aa" terminates.
 
-<sub>[stdlib/Text.sl:292](../../stdlib/Text.sl#L292)</sub>
+**See also** &nbsp; [StringBuilder.ReplaceAll](#replaceall-method)
+
+<sub>[stdlib/Text.sl:311](../../stdlib/Text.sl#L311)</sub>
 
 #### Repeat *method*
 
@@ -268,7 +284,7 @@ String Repeat(nuint count)
 
 This text `count` times over. Zero gives "".
 
-<sub>[stdlib/Text.sl:319](../../stdlib/Text.sl#L319)</sub>
+<sub>[stdlib/Text.sl:338](../../stdlib/Text.sl#L338)</sub>
 
 #### PadLeft *method*
 
@@ -278,7 +294,9 @@ String PadLeft(nuint width)
 
 Spaces on the left until the text is `width` bytes. Never truncates.
 
-<sub>[stdlib/Text.sl:333](../../stdlib/Text.sl#L333)</sub>
+**See also** &nbsp; [String.PadRight](#padright-method)
+
+<sub>[stdlib/Text.sl:354](../../stdlib/Text.sl#L354)</sub>
 
 #### PadRight *method*
 
@@ -288,7 +306,9 @@ String PadRight(nuint width)
 
 Spaces on the right until the text is `width` bytes. Never truncates.
 
-<sub>[stdlib/Text.sl:342](../../stdlib/Text.sl#L342)</sub>
+**See also** &nbsp; [String.PadLeft](#padleft-method)
+
+<sub>[stdlib/Text.sl:365](../../stdlib/Text.sl#L365)</sub>
 
 #### PadLeft *method*
 
@@ -304,7 +324,7 @@ of more than one byte pads by whole copies and may fall short of the
 width rather than overshoot it. A single character is the sane case and
 the one to use.
 
-<sub>[stdlib/Text.sl:357](../../stdlib/Text.sl#L357)</sub>
+<sub>[stdlib/Text.sl:380](../../stdlib/Text.sl#L380)</sub>
 
 #### PadRight *method*
 
@@ -318,7 +338,7 @@ Measured in bytes, so a multi-byte `with` pads by whole copies and may
 fall short of the width rather than overshoot it. An empty `with`
 answers the string unchanged, since no number of copies would reach.
 
-<sub>[stdlib/Text.sl:372](../../stdlib/Text.sl#L372)</sub>
+<sub>[stdlib/Text.sl:395](../../stdlib/Text.sl#L395)</sub>
 
 #### Split *method*
 
@@ -333,7 +353,9 @@ splitting "a,,b" on ',' gives three parts, and "" gives one. That is
 what makes it reversible -- joining the result with the same separator
 gives the original back.
 
-<sub>[stdlib/Text.sl:390](../../stdlib/Text.sl#L390)</sub>
+**See also** &nbsp; [String.Join](#join-method) &middot; [String.SplitLines](#splitlines-method)
+
+<sub>[stdlib/Text.sl:416](../../stdlib/Text.sl#L416)</sub>
 
 #### Split *method*
 
@@ -343,7 +365,7 @@ String[] Split(char separator)
 
 This text cut at every occurrence of one code unit.
 
-<sub>[stdlib/Text.sl:425](../../stdlib/Text.sl#L425)</sub>
+<sub>[stdlib/Text.sl:451](../../stdlib/Text.sl#L451)</sub>
 
 #### SplitLines *method*
 
@@ -357,7 +379,9 @@ A trailing newline does not produce a final empty line, because a file
 that ends in one has as many lines as one that does not -- which is the
 opposite of what `Split` does, and the reason this is not `Split('\n')`.
 
-<sub>[stdlib/Text.sl:460](../../stdlib/Text.sl#L460)</sub>
+**See also** &nbsp; [String.Split](#split-method)
+
+<sub>[stdlib/Text.sl:488](../../stdlib/Text.sl#L488)</sub>
 
 #### ToUpperAscii *method*
 
@@ -368,7 +392,9 @@ String ToUpperAscii()
 This text with every ASCII letter uppercased, and every other byte left
 as it was. See the note at the top of this file.
 
-<sub>[stdlib/Text.sl:506](../../stdlib/Text.sl#L506)</sub>
+**See also** &nbsp; [String.ToLowerAscii](#tolowerascii-method) &middot; [String.EqualsIgnoreCaseAscii](#equalsignorecaseascii-method)
+
+<sub>[stdlib/Text.sl:537](../../stdlib/Text.sl#L537)</sub>
 
 #### ToLowerAscii *method*
 
@@ -378,7 +404,9 @@ String ToLowerAscii()
 
 This text with every ASCII letter lowercased.
 
-<sub>[stdlib/Text.sl:512](../../stdlib/Text.sl#L512)</sub>
+**See also** &nbsp; [String.ToUpperAscii](#toupperascii-method)
+
+<sub>[stdlib/Text.sl:545](../../stdlib/Text.sl#L545)</sub>
 
 #### EqualsIgnoreCaseAscii *method*
 
@@ -388,7 +416,7 @@ bool EqualsIgnoreCaseAscii(String other)
 
 True when the two texts differ only in the case of ASCII letters.
 
-<sub>[stdlib/Text.sl:518](../../stdlib/Text.sl#L518)</sub>
+<sub>[stdlib/Text.sl:551](../../stdlib/Text.sl#L551)</sub>
 
 #### CompareTo *method*
 
@@ -402,7 +430,7 @@ Comparing UTF-8 byte by byte happens to order by code point as well,
 because the encoding was designed so that it would. It is not a
 linguistic ordering and does not claim to be one.
 
-<sub>[stdlib/Text.sl:542](../../stdlib/Text.sl#L542)</sub>
+<sub>[stdlib/Text.sl:575](../../stdlib/Text.sl#L575)</sub>
 
 #### GetByteAt *method*
 
@@ -416,7 +444,9 @@ Unchecked, unlike the slicing methods: this reads the buffer directly,
 so an `index` at or past `ByteLength` reads memory that is not the
 string's. Check the length first, or slice instead.
 
-<sub>[stdlib/Text.sl:569](../../stdlib/Text.sl#L569)</sub>
+**See also** &nbsp; [String.GetCodePointAt](#getcodepointat-method)
+
+<sub>[stdlib/Text.sl:604](../../stdlib/Text.sl#L604)</sub>
 
 #### GetCodePointAt *method*
 
@@ -431,7 +461,9 @@ sequence gives U+FFFD, which is what a decoder does with a byte that
 cannot begin one. So does a sequence that is not well formed: one cut
 short, an overlong form, a surrogate or a value past U+10FFFF.
 
-<sub>[stdlib/Text.sl:580](../../stdlib/Text.sl#L580)</sub>
+**See also** &nbsp; [String.SkipCodePoint](#skipcodepoint-method)
+
+<sub>[stdlib/Text.sl:617](../../stdlib/Text.sl#L617)</sub>
 
 #### SkipCodePoint *method*
 
@@ -452,7 +484,9 @@ for (nuint at = 0; at < s.ByteLength(); at = s.SkipCodePoint(at)) {
 A sequence that is not well formed is stepped over one byte at a time,
 each byte reading as U+FFFD. `CodePointCount` counts the same steps.
 
-<sub>[stdlib/Text.sl:613](../../stdlib/Text.sl#L613)</sub>
+**See also** &nbsp; [String.GetCodePointAt](#getcodepointat-method)
+
+<sub>[stdlib/Text.sl:652](../../stdlib/Text.sl#L652)</sub>
 
 #### Join *method*
 
@@ -467,7 +501,9 @@ module imports `Standard.Text` without asking and a global named `Join`
 is a global named `Join`. `", ".Join(parts)` also reads in the order it
 happens.
 
-<sub>[stdlib/Text.sl:633](../../stdlib/Text.sl#L633)</sub>
+**See also** &nbsp; [String.Split](#split-method)
+
+<sub>[stdlib/Text.sl:674](../../stdlib/Text.sl#L674)</sub>
 
 #### ToBytes *method*
 
@@ -480,7 +516,9 @@ This text's bytes, copied into an array.
 A copy rather than a view: a `String` is immutable and an array is not,
 so handing out the storage would let one be changed through the other.
 
-<sub>[stdlib/Text.sl:656](../../stdlib/Text.sl#L656)</sub>
+**See also** &nbsp; [Text.FromBytes](#frombytes-function)
+
+<sub>[stdlib/Text.sl:699](../../stdlib/Text.sl#L699)</sub>
 
 ### StringBuilder *class*
 
@@ -490,7 +528,7 @@ class StringBuilder
 
 *No documentation.*
 
-<sub>[stdlib/Text.sl:724](../../stdlib/Text.sl#L724)</sub>
+<sub>[stdlib/Text.sl:767](../../stdlib/Text.sl#L767)</sub>
 
 #### Append *method*
 
@@ -500,7 +538,7 @@ void Append(String text)
 
 Text, as its bytes.
 
-<sub>[stdlib/Text.sl:804](../../stdlib/Text.sl#L804)</sub>
+<sub>[stdlib/Text.sl:847](../../stdlib/Text.sl#L847)</sub>
 
 #### AppendLine *method*
 
@@ -510,7 +548,7 @@ void AppendLine(String text)
 
 Text and a newline.
 
-<sub>[stdlib/Text.sl:810](../../stdlib/Text.sl#L810)</sub>
+<sub>[stdlib/Text.sl:853](../../stdlib/Text.sl#L853)</sub>
 
 #### AppendInteger *method*
 
@@ -524,7 +562,9 @@ Written into the buffer a digit at a time rather than through
 `FromInteger`, because a builder appending numbers in a loop should not
 allocate a `String` per number.
 
-<sub>[stdlib/Text.sl:821](../../stdlib/Text.sl#L821)</sub>
+**See also** &nbsp; [Text.FromInteger](#frominteger-function)
+
+<sub>[stdlib/Text.sl:866](../../stdlib/Text.sl#L866)</sub>
 
 #### AppendDouble *method*
 
@@ -537,7 +577,9 @@ The shortest text that reads back as the same number.
 This one does allocate a `String` first: shortest round-trip formatting
 is the runtime's, and there is nothing to gain by copying it here.
 
-<sub>[stdlib/Text.sl:866](../../stdlib/Text.sl#L866)</sub>
+**See also** &nbsp; [Text.FromDouble](#fromdouble-function)
+
+<sub>[stdlib/Text.sl:913](../../stdlib/Text.sl#L913)</sub>
 
 #### AppendByte *method*
 
@@ -550,7 +592,7 @@ One byte.
 The builder holds bytes, so nothing here validates: a caller writing
 half a character has written half a character.
 
-<sub>[stdlib/Text.sl:875](../../stdlib/Text.sl#L875)</sub>
+<sub>[stdlib/Text.sl:922](../../stdlib/Text.sl#L922)</sub>
 
 #### ByteLength *method*
 
@@ -560,7 +602,7 @@ nuint ByteLength()
 
 How many bytes have been built. Not a character count.
 
-<sub>[stdlib/Text.sl:885](../../stdlib/Text.sl#L885)</sub>
+<sub>[stdlib/Text.sl:932](../../stdlib/Text.sl#L932)</sub>
 
 #### IsEmpty *property*
 
@@ -570,7 +612,9 @@ bool IsEmpty { get; }
 
 Whether nothing has been appended, or everything has been cleared.
 
-<sub>[stdlib/Text.sl:888](../../stdlib/Text.sl#L888)</sub>
+**See also** &nbsp; [StringBuilder.HasContent](#hascontent-property)
+
+<sub>[stdlib/Text.sl:937](../../stdlib/Text.sl#L937)</sub>
 
 #### Clear *method*
 
@@ -581,7 +625,7 @@ void Clear()
 Throws the length away and keeps the room, so a builder reused in a
 loop allocates once.
 
-<sub>[stdlib/Text.sl:892](../../stdlib/Text.sl#L892)</sub>
+<sub>[stdlib/Text.sl:941](../../stdlib/Text.sl#L941)</sub>
 
 #### GetByteAt *method*
 
@@ -595,7 +639,7 @@ A call rather than a pointer, because the buffer moves as it grows and
 a `byte*` into it would dangle at the next append -- the one thing
 `String`'s own pointer can never do.
 
-<sub>[stdlib/Text.sl:902](../../stdlib/Text.sl#L902)</sub>
+<sub>[stdlib/Text.sl:951](../../stdlib/Text.sl#L951)</sub>
 
 #### SetByteAt *method*
 
@@ -605,7 +649,7 @@ void SetByteAt(nuint index, byte value)
 
 Replaces one byte by position.
 
-<sub>[stdlib/Text.sl:910](../../stdlib/Text.sl#L910)</sub>
+<sub>[stdlib/Text.sl:959](../../stdlib/Text.sl#L959)</sub>
 
 #### Insert *method*
 
@@ -616,7 +660,9 @@ void Insert(nuint at, String text)
 Text put in at a position. Inserting at the length is appending, which
 is why `at == ByteLength()` is allowed.
 
-<sub>[stdlib/Text.sl:921](../../stdlib/Text.sl#L921)</sub>
+**See also** &nbsp; [StringBuilder.Remove](#remove-method)
+
+<sub>[stdlib/Text.sl:972](../../stdlib/Text.sl#L972)</sub>
 
 #### Remove *method*
 
@@ -627,7 +673,9 @@ void Remove(nuint at, nuint count)
 Bytes taken out from a position. Removing more than is there removes to
 the end rather than failing.
 
-<sub>[stdlib/Text.sl:938](../../stdlib/Text.sl#L938)</sub>
+**See also** &nbsp; [StringBuilder.Insert](#insert-method) &middot; [StringBuilder.TruncateTo](#truncateto-method)
+
+<sub>[stdlib/Text.sl:992](../../stdlib/Text.sl#L992)</sub>
 
 #### ToText *method*
 
@@ -638,7 +686,7 @@ String ToText()
 What has been built, as text. The builder stays usable afterwards and
 the string does not change when it is appended to again.
 
-<sub>[stdlib/Text.sl:951](../../stdlib/Text.sl#L951)</sub>
+<sub>[stdlib/Text.sl:1005](../../stdlib/Text.sl#L1005)</sub>
 
 #### AppendCodePoint *method*
 
@@ -653,7 +701,9 @@ appending a lone continuation byte would put the builder into a state
 no `String` can be made from. A scalar always encodes to something
 whole.
 
-<sub>[stdlib/Text.sl:965](../../stdlib/Text.sl#L965)</sub>
+**See also** &nbsp; [Text.FromChar](#fromchar-function)
+
+<sub>[stdlib/Text.sl:1021](../../stdlib/Text.sl#L1021)</sub>
 
 #### AppendLine *method*
 
@@ -663,7 +713,7 @@ void AppendLine()
 
 A newline on its own.
 
-<sub>[stdlib/Text.sl:1008](../../stdlib/Text.sl#L1008)</sub>
+<sub>[stdlib/Text.sl:1064](../../stdlib/Text.sl#L1064)</sub>
 
 #### Append *method*
 
@@ -678,7 +728,7 @@ one. An integer literal converts to both, so the two together would make
 `Append(42)` ambiguous -- which is why `AppendInteger` and `AppendDouble`
 were spelled out in the first place. A bool converts to neither.
 
-<sub>[stdlib/Text.sl:1019](../../stdlib/Text.sl#L1019)</sub>
+<sub>[stdlib/Text.sl:1075](../../stdlib/Text.sl#L1075)</sub>
 
 #### AppendBytes *method*
 
@@ -689,7 +739,7 @@ void AppendBytes(byte[] data)
 Raw bytes. They are appended as they are, so it is the caller who
 decides whether what comes out is text.
 
-<sub>[stdlib/Text.sl:1026](../../stdlib/Text.sl#L1026)</sub>
+<sub>[stdlib/Text.sl:1082](../../stdlib/Text.sl#L1082)</sub>
 
 #### AppendJoined *method*
 
@@ -699,7 +749,7 @@ void AppendJoined(String separator, String[] parts)
 
 `parts` with `separator` between them.
 
-<sub>[stdlib/Text.sl:1034](../../stdlib/Text.sl#L1034)</sub>
+<sub>[stdlib/Text.sl:1090](../../stdlib/Text.sl#L1090)</sub>
 
 #### HasContent *property*
 
@@ -709,7 +759,9 @@ bool HasContent { get; }
 
 Whether anything has been appended. The opposite of `IsEmpty`.
 
-<sub>[stdlib/Text.sl:1047](../../stdlib/Text.sl#L1047)</sub>
+**See also** &nbsp; [StringBuilder.IsEmpty](#isempty-property)
+
+<sub>[stdlib/Text.sl:1105](../../stdlib/Text.sl#L1105)</sub>
 
 #### IndexOf *method*
 
@@ -723,7 +775,9 @@ Byte by byte through the runtime rather than over a pointer, because a
 builder's storage moves when it grows and a pointer into it would be a
 pointer into the previous allocation.
 
-<sub>[stdlib/Text.sl:1060](../../stdlib/Text.sl#L1060)</sub>
+**See also** &nbsp; [StringBuilder.Contains](#contains-method)
+
+<sub>[stdlib/Text.sl:1120](../../stdlib/Text.sl#L1120)</sub>
 
 #### Contains *method*
 
@@ -733,7 +787,9 @@ bool Contains(String value)
 
 True when `value` appears in what has been built.
 
-<sub>[stdlib/Text.sl:1087](../../stdlib/Text.sl#L1087)</sub>
+**See also** &nbsp; [StringBuilder.IndexOf](#indexof-method)
+
+<sub>[stdlib/Text.sl:1149](../../stdlib/Text.sl#L1149)</sub>
 
 #### TruncateTo *method*
 
@@ -743,7 +799,7 @@ void TruncateTo(nuint at)
 
 Everything from `at` to the end, thrown away.
 
-<sub>[stdlib/Text.sl:1095](../../stdlib/Text.sl#L1095)</sub>
+<sub>[stdlib/Text.sl:1157](../../stdlib/Text.sl#L1157)</sub>
 
 #### ReplaceFirst *method*
 
@@ -753,7 +809,11 @@ bool ReplaceFirst(String from, String to)
 
 The first occurrence of `from` replaced by `to`, if there is one.
 
-<sub>[stdlib/Text.sl:1104](../../stdlib/Text.sl#L1104)</sub>
+**Returns** &nbsp; whether there was one to replace
+
+**See also** &nbsp; [StringBuilder.ReplaceAll](#replaceall-method)
+
+<sub>[stdlib/Text.sl:1169](../../stdlib/Text.sl#L1169)</sub>
 
 #### ReplaceAll *method*
 
@@ -766,7 +826,11 @@ Every occurrence of `from` replaced by `to`.
 The search resumes past the replacement, so replacing "a" with "aa"
 terminates rather than growing forever.
 
-<sub>[stdlib/Text.sl:1119](../../stdlib/Text.sl#L1119)</sub>
+**Returns** &nbsp; how many occurrences were replaced
+
+**See also** &nbsp; [StringBuilder.ReplaceFirst](#replacefirst-method)
+
+<sub>[stdlib/Text.sl:1187](../../stdlib/Text.sl#L1187)</sub>
 
 ### Utf16String *class*
 
@@ -784,7 +848,7 @@ Positions are units, not characters and not bytes: a scalar outside the
 basic plane is two units, so `UnitCount` is not a character count and
 `GetUnitAt` can land on half a surrogate pair. `GetCodePointAt` joins the pair.
 
-<sub>[stdlib/Text.sl:1176](../../stdlib/Text.sl#L1176)</sub>
+<sub>[stdlib/Text.sl:1244](../../stdlib/Text.sl#L1244)</sub>
 
 #### IsEmpty *property*
 
@@ -794,7 +858,7 @@ bool IsEmpty { get; }
 
 Whether there are any units at all.
 
-<sub>[stdlib/Text.sl:1180](../../stdlib/Text.sl#L1180)</sub>
+<sub>[stdlib/Text.sl:1248](../../stdlib/Text.sl#L1248)</sub>
 
 #### GetUnitAt *method*
 
@@ -805,7 +869,7 @@ char16 GetUnitAt(nuint index)
 The unit at `index`. A unit, not a character: one half of a surrogate
 pair is a unit and is not a character.
 
-<sub>[stdlib/Text.sl:1184](../../stdlib/Text.sl#L1184)</sub>
+<sub>[stdlib/Text.sl:1252](../../stdlib/Text.sl#L1252)</sub>
 
 #### GetCodePointAt *method*
 
@@ -818,7 +882,9 @@ The scalar beginning at `index`, joining a surrogate pair.
 An unpaired surrogate gives U+FFFD, which is what transcoding it would
 have produced -- a lone half cannot be encoded in UTF-8 at all.
 
-<sub>[stdlib/Text.sl:1193](../../stdlib/Text.sl#L1193)</sub>
+**See also** &nbsp; [Utf16String.SkipCodePoint](#skipcodepoint-method) &middot; [String.GetCodePointAt](#getcodepointat-method)
+
+<sub>[stdlib/Text.sl:1264](../../stdlib/Text.sl#L1264)</sub>
 
 #### SkipCodePoint *method*
 
@@ -828,7 +894,9 @@ nuint SkipCodePoint(nuint index)
 
 The index of the character after the one at `index`.
 
-<sub>[stdlib/Text.sl:1215](../../stdlib/Text.sl#L1215)</sub>
+**See also** &nbsp; [Utf16String.GetCodePointAt](#getcodepointat-method)
+
+<sub>[stdlib/Text.sl:1288](../../stdlib/Text.sl#L1288)</sub>
 
 #### Equals *method*
 
@@ -838,7 +906,7 @@ bool Equals(Utf16String other)
 
 True when the two hold the same units.
 
-<sub>[stdlib/Text.sl:1233](../../stdlib/Text.sl#L1233)</sub>
+<sub>[stdlib/Text.sl:1306](../../stdlib/Text.sl#L1306)</sub>
 
 #### ToBytes *method*
 
@@ -849,7 +917,9 @@ byte[] ToBytes()
 The units as raw bytes, little-endian, which is what a Windows API and
 a UTF-16LE file both expect.
 
-<sub>[stdlib/Text.sl:1252](../../stdlib/Text.sl#L1252)</sub>
+**See also** &nbsp; [Text.FromUtf16](#fromutf16-function)
+
+<sub>[stdlib/Text.sl:1327](../../stdlib/Text.sl#L1327)</sub>
 
 ### string *alias*
 
@@ -863,7 +933,7 @@ using string = String
 built in has no reason to look different. It is an alias and not a second
 type, so a diagnostic says `String` whichever one was written.
 
-<sub>[stdlib/Text.sl:700](../../stdlib/Text.sl#L700)</sub>
+<sub>[stdlib/Text.sl:743](../../stdlib/Text.sl#L743)</sub>
 
 ## Functions
 
@@ -875,7 +945,7 @@ String FromBool(bool value)
 
 `"true"` or `"false"`.
 
-<sub>[stdlib/Text.sl:1398](../../stdlib/Text.sl#L1398)</sub>
+<sub>[stdlib/Text.sl:1473](../../stdlib/Text.sl#L1473)</sub>
 
 ### FromBytes *function*
 
@@ -885,7 +955,9 @@ String FromBytes(byte* data, nuint byteLength)
 
 A copy of `byteLength` bytes, taken to be UTF-8.
 
-<sub>[stdlib/Text.sl:1405](../../stdlib/Text.sl#L1405)</sub>
+**See also** &nbsp; [String.ToBytes](#tobytes-method)
+
+<sub>[stdlib/Text.sl:1484](../../stdlib/Text.sl#L1484)</sub>
 
 ### FromChar *function*
 
@@ -896,7 +968,9 @@ String FromChar(char32 value)
 One code point as the character it names, not as its number.
 `Text.FromInteger((long)c)` is how to ask for the number.
 
-<sub>[stdlib/Text.sl:1402](../../stdlib/Text.sl#L1402)</sub>
+**See also** &nbsp; [Text.FromInteger](#frominteger-function)
+
+<sub>[stdlib/Text.sl:1479](../../stdlib/Text.sl#L1479)</sub>
 
 ### FromDouble *function*
 
@@ -906,7 +980,7 @@ String FromDouble(double value)
 
 The shortest text that reads back as the same number.
 
-<sub>[stdlib/Text.sl:1395](../../stdlib/Text.sl#L1395)</sub>
+<sub>[stdlib/Text.sl:1470](../../stdlib/Text.sl#L1470)</sub>
 
 ### FromInteger *function*
 
@@ -916,7 +990,7 @@ String FromInteger(long value)
 
 A signed integer in base ten.
 
-<sub>[stdlib/Text.sl:1378](../../stdlib/Text.sl#L1378)</sub>
+<sub>[stdlib/Text.sl:1453](../../stdlib/Text.sl#L1453)</sub>
 
 ### FromInteger *function*
 
@@ -929,7 +1003,7 @@ An unsigned integer in base ten.
 A separate entry point rather than letting the signed one take it: a
 `ulong` past 2^63 formatted as signed prints as a negative number.
 
-<sub>[stdlib/Text.sl:1384](../../stdlib/Text.sl#L1384)</sub>
+<sub>[stdlib/Text.sl:1459](../../stdlib/Text.sl#L1459)</sub>
 
 ### FromInteger *function*
 
@@ -944,7 +1018,7 @@ and cannot share the 64-bit entry point: on a 32-bit target the runtime
 would read four bytes of argument and four of whatever was next on the
 stack, and `$"{n}"` printed 8612659968337772549 for 5.
 
-<sub>[stdlib/Text.sl:1392](../../stdlib/Text.sl#L1392)</sub>
+<sub>[stdlib/Text.sl:1467](../../stdlib/Text.sl#L1467)</sub>
 
 ### FromNullTerminated *function*
 
@@ -955,7 +1029,9 @@ String FromNullTerminated(byte* text)
 A copy of the bytes up to the first NUL, taken to be UTF-8. What a C
 function that answers with a `char*` hands back.
 
-<sub>[stdlib/Text.sl:1410](../../stdlib/Text.sl#L1410)</sub>
+**See also** &nbsp; [Text.FromBytes](#frombytes-function)
+
+<sub>[stdlib/Text.sl:1491](../../stdlib/Text.sl#L1491)</sub>
 
 ### FromNullTerminatedUtf16 *function*
 
@@ -965,7 +1041,9 @@ String FromNullTerminatedUtf16(char16* units)
 
 UTF-16 up to the first NUL unit, transcoded to UTF-8.
 
-<sub>[stdlib/Text.sl:1420](../../stdlib/Text.sl#L1420)</sub>
+**See also** &nbsp; [Text.FromUtf16](#fromutf16-function)
+
+<sub>[stdlib/Text.sl:1505](../../stdlib/Text.sl#L1505)</sub>
 
 ### FromUtf16 *function*
 
@@ -978,7 +1056,9 @@ UTF-16 transcoded to UTF-8.
 A pointer and a count rather than a `Utf16String`, because a wide platform
 API writes into a buffer the caller owns and that pair is what comes back.
 
-<sub>[stdlib/Text.sl:1416](../../stdlib/Text.sl#L1416)</sub>
+**See also** &nbsp; [Text.FromNullTerminatedUtf16](#fromnullterminatedutf16-function)
+
+<sub>[stdlib/Text.sl:1499](../../stdlib/Text.sl#L1499)</sub>
 
 ## Constants
 

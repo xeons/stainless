@@ -181,6 +181,8 @@ void WriteBigDoubleWord(byte[] into, nuint at, ulong value)
 ///
 /// Implement it to add an algorithm; `Hmac` takes any implementation, so a
 /// hash written outside this module gets a MAC for free.
+///
+/// @see Hmac
 public interface IHashAlgorithm
 {
     /// What the algorithm is called, as a standard names it -- `SHA-256`,
@@ -370,6 +372,8 @@ public abstract class HashAlgorithm : IHashAlgorithm
 /// those go away.
 ///
 /// Use `Sha256` for anything new.
+///
+/// @see Sha256
 public sealed class Md5 : HashAlgorithm
 {
     uint _a;
@@ -1061,6 +1065,13 @@ public static class Rfc2898DeriveBytes
     /// `hash` is the HMAC's inner hash -- `new Sha256()` is the usual answer.
     /// The salt should be at least sixteen random bytes and is not secret; its
     /// job is to make one attack per password rather than one per database.
+    ///
+    /// @param password    the secret to stretch
+    /// @param salt        at least sixteen random bytes, stored beside the result
+    /// @param iterations  how many HMAC passes; the whole security argument
+    /// @param hash        the HMAC's inner hash, `new Sha256()` for the usual answer
+    /// @param length      how many bytes to derive
+    /// @failure CryptoError.Parameter  `iterations` or `length` is zero
     public static Result<byte[], CryptoError> Pbkdf2(byte[:] password, byte[:] salt,
                                                      nuint iterations, IHashAlgorithm hash,
                                                      nuint length)
@@ -1126,6 +1137,11 @@ public static class Hkdf
 {
     /// The extract step: a uniformly random key from input that is random but
     /// not uniform. `salt` may be empty, and then a block of zeros is used.
+    ///
+    /// @param hash      the HMAC's inner hash
+    /// @param inputKey  the secret that is random but not uniform
+    /// @param salt      a non-secret value, or empty for a block of zeros
+    /// @see Hkdf.Expand
     public static byte[] Extract(IHashAlgorithm hash, byte[:] inputKey, byte[:] salt)
     {
         byte[] actual = salt.Length == 0u ? new byte[hash.HashSizeInBytes] : ToArray(salt);
@@ -1137,6 +1153,13 @@ public static class Hkdf
     /// `info` is what separates one derived key from another -- "encryption"
     /// and "authentication" from the same secret -- and is the argument that
     /// makes this worth using over a bare hash.
+    ///
+    /// @param hash       the HMAC's inner hash, the same one `Extract` used
+    /// @param pseudoKey  what `Extract` answered
+    /// @param info       what separates one derived key from another
+    /// @param length     how many bytes to derive, at most 255 digests' worth
+    /// @failure CryptoError.Parameter  `length` is zero, or past 255 times the digest size
+    /// @see Hkdf.Extract
     public static Result<byte[], CryptoError> Expand(IHashAlgorithm hash, byte[:] pseudoKey,
                                                      byte[:] info, nuint length)
     {
@@ -1175,6 +1198,15 @@ public static class Hkdf
     }
 
     /// Extract and expand together, which is how HKDF is nearly always used.
+    ///
+    /// @param hash      the HMAC's inner hash
+    /// @param inputKey  the secret that is random but not uniform
+    /// @param salt      a non-secret value, or empty for a block of zeros
+    /// @param info      what separates one derived key from another
+    /// @param length    how many bytes to derive, at most 255 digests' worth
+    /// @failure CryptoError.Parameter  `length` is zero, or past 255 times the digest size
+    /// @see Hkdf.Extract
+    /// @see Hkdf.Expand
     public static Result<byte[], CryptoError> DeriveKey(IHashAlgorithm hash, byte[:] inputKey,
                                                         byte[:] salt, byte[:] info,
                                                         nuint length)
@@ -1264,6 +1296,8 @@ public enum PaddingMode
 /// to stream a message larger than memory; `CryptoStream` is the piece that
 /// would want one and is not written, so the object with no stream to feed
 /// would be a shape with no user.
+///
+/// @see AesGcm
 public sealed class Aes
 {
     /// One block, for every key length. AES is a 128-bit block cipher; it is
@@ -1296,6 +1330,8 @@ public sealed class Aes
 
     /// A cipher under `key`, which must be 16, 24 or 32 bytes -- AES-128,
     /// AES-192 or AES-256.
+    ///
+    /// @failure CryptoError.KeyLength  `key` is not 16, 24 or 32 bytes
     public static Result<Aes, CryptoError> FromKey(byte[:] key)
     {
         if (key.Length != 16u && key.Length != 24u && key.Length != 32u)
@@ -1365,6 +1401,11 @@ public sealed class Aes
 
     /// Every block on its own. See `CipherMode.Ecb` for why this is almost
     /// always the wrong answer.
+    ///
+    /// @failure CryptoError.BlockLength  `padding` is `None` and the input is not a whole
+    ///                                   number of blocks
+    /// @see CipherMode.Ecb
+    /// @see Aes.DecryptEcb
     public Result<byte[], CryptoError> EncryptEcb(byte[:] plaintext, PaddingMode padding)
     {
         var padded = AddPadding(plaintext, padding);
@@ -1379,6 +1420,11 @@ public sealed class Aes
     }
 
     /// The inverse of `EncryptEcb`.
+    ///
+    /// @failure CryptoError.BlockLength  the input is empty or not a whole number of blocks
+    /// @failure CryptoError.Padding      the padding does not describe itself, which is usually
+    ///                                   the wrong key
+    /// @see Aes.EncryptEcb
     public Result<byte[], CryptoError> DecryptEcb(byte[:] ciphertext, PaddingMode padding)
     {
         if (ciphertext.Length == 0u || ciphertext.Length % BlockSize != 0u)
@@ -1396,6 +1442,12 @@ public sealed class Aes
     /// Chained blocks. `iv` must be one block and must never be reused with
     /// this key; `RandomNumberGenerator.GetBytes(16u)` is how to make one, and
     /// it is not secret -- send it alongside the ciphertext.
+    ///
+    /// @failure CryptoError.IvLength     `iv` is not one block
+    /// @failure CryptoError.BlockLength  `padding` is `None` and the input is not a whole
+    ///                                   number of blocks
+    /// @see Aes.DecryptCbc
+    /// @seealso RandomNumberGenerator.GetBytes
     public Result<byte[], CryptoError> EncryptCbc(byte[:] plaintext, byte[:] iv,
                                                   PaddingMode padding)
     {
@@ -1428,6 +1480,11 @@ public sealed class Aes
     /// A wrong key shows up as `CryptoError.Padding` about 255 times in 256,
     /// and as a plausible-looking wrong plaintext the rest of the time. That
     /// is the whole reason to authenticate a ciphertext before decrypting it.
+    ///
+    /// @failure CryptoError.IvLength     `iv` is not one block
+    /// @failure CryptoError.BlockLength  the input is empty or not a whole number of blocks
+    /// @failure CryptoError.Padding      the padding does not describe itself
+    /// @see Aes.EncryptCbc
     public Result<byte[], CryptoError> DecryptCbc(byte[:] ciphertext, byte[:] iv,
                                                   PaddingMode padding)
     {
@@ -1461,6 +1518,9 @@ public sealed class Aes
 
     /// Cipher feedback over whole blocks, which is .NET's `CipherMode.CFB`
     /// with a feedback size of 128 bits. No padding: the mode is a stream.
+    ///
+    /// @failure CryptoError.IvLength  `iv` is not one block
+    /// @see Aes.DecryptCfb
     public Result<byte[], CryptoError> EncryptCfb(byte[:] plaintext, byte[:] iv)
     {
         if (iv.Length != BlockSize)
@@ -1488,6 +1548,9 @@ public sealed class Aes
     }
 
     /// The inverse of `EncryptCfb`.
+    ///
+    /// @failure CryptoError.IvLength  `iv` is not one block
+    /// @see Aes.EncryptCfb
     public Result<byte[], CryptoError> DecryptCfb(byte[:] ciphertext, byte[:] iv)
     {
         if (iv.Length != BlockSize)
@@ -1524,6 +1587,8 @@ public sealed class Aes
     /// do. **A counter value used twice under one key is fatal** -- the two
     /// messages XOR to the XOR of their plaintexts -- so the usual arrangement
     /// is a random nonce in the high bytes and a block counter in the low.
+    ///
+    /// @failure CryptoError.IvLength  `counter` is not one block
     public Result<byte[], CryptoError> ApplyCtr(byte[:] data, byte[:] counter) =>
         ApplyCounter(data, counter, 0u);
 
@@ -1927,10 +1992,14 @@ public sealed class AesGcm
     /// What the tag is, and the only length this produces. .NET allows 12 to
     /// 16; a shorter tag weakens forgery resistance by exactly the bits it
     /// drops, and no format here asks for one.
+    ///
+    /// @value sixteen bytes.
     public const nuint TagSize = 16u;
 
     /// What every protocol built on GCM uses, and the only length for which
     /// the nonce is used directly rather than hashed.
+    ///
+    /// @value twelve bytes.
     public const nuint NonceSize = 12u;
 
     Aes _cipher;
@@ -1944,6 +2013,8 @@ public sealed class AesGcm
     }
 
     /// A GCM box under `key`, which must be 16, 24 or 32 bytes.
+    ///
+    /// @failure CryptoError.KeyLength  `key` is not 16, 24 or 32 bytes
     public static Result<AesGcm, CryptoError> FromKey(byte[:] key)
     {
         var cipher = Aes.FromKey(key);
@@ -1957,6 +2028,15 @@ public sealed class AesGcm
     /// `associatedData` is authenticated and not encrypted -- a message header,
     /// a record number, anything the recipient must be sure of and that is not
     /// secret. Pass an empty array when there is none.
+    ///
+    /// @param nonce           never to repeat under this key; twelve bytes is what every
+    ///                        protocol uses
+    /// @param plaintext       the message to encipher
+    /// @param associatedData  authenticated and not encrypted; empty when there is none
+    /// @param tag             a `TagSize` array the tag is written into
+    /// @failure CryptoError.NonceLength  `nonce` is empty
+    /// @failure CryptoError.TagLength    `tag` is not `TagSize` long
+    /// @see AesGcm.Decrypt
     public Result<byte[], CryptoError> Encrypt(byte[:] nonce, byte[:] plaintext,
                                                byte[:] associatedData, byte[] tag)
     {
@@ -1984,6 +2064,16 @@ public sealed class AesGcm
     }
 
     /// The plaintext, or `AuthenticationFailed` and nothing.
+    ///
+    /// @param nonce           the one the message was enciphered under
+    /// @param ciphertext      the message to open
+    /// @param associatedData  the same bytes the sender authenticated
+    /// @param tag             the tag the sender sent
+    /// @failure CryptoError.NonceLength           `nonce` is empty
+    /// @failure CryptoError.TagLength             `tag` is not `TagSize` long
+    /// @failure CryptoError.AuthenticationFailed  the tag does not match, and no plaintext is
+    ///                                            returned
+    /// @see AesGcm.Encrypt
     public Result<byte[], CryptoError> Decrypt(byte[:] nonce, byte[:] ciphertext,
                                                byte[:] associatedData, byte[:] tag)
     {

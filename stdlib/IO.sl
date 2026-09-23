@@ -92,6 +92,8 @@ public enum IOError
 }
 
 /// A sentence describing an error, for a message a person will read.
+///
+/// @see IOError
 public String DescribeIOError(IOError error)
 {
     switch (error)
@@ -252,6 +254,19 @@ public class FileStream : IStream
     }
 
     /// Opens a file, or says why it could not be opened.
+    ///
+    /// @param path    the file to open
+    /// @param mode    what to do about whether it is already there
+    /// @param access  what may be done with it once it is open
+    /// @failure IOError.NotFound      `FileMode.Open` and there is no file
+    ///                                there, or a directory along the path is
+    ///                                missing
+    /// @failure IOError.AccessDenied  the file or its directory refuses it
+    /// @failure IOError.IsADirectory  a writing mode on a path that names a
+    ///                                directory
+    /// @failure IOError.Unknown       the platform reported something with no
+    ///                                case of its own -- too many open files
+    ///                                among them
     public static Result<FileStream, IOError> Open(
             String path, FileMode mode, FileAccess access)
     {
@@ -262,18 +277,38 @@ public class FileStream : IStream
     }
 
     /// Opens an existing file for reading.
+    ///
+    /// @failure IOError.NotFound      there is no file at that path
+    /// @failure IOError.AccessDenied  the file refuses to be read
+    /// @failure IOError.Unknown       the platform reported something with no
+    ///                                case of its own
+    /// @see FileStream.Open
     public static Result<FileStream, IOError> OpenRead(String path)
     {
         return Open(path, FileMode.Open, FileAccess.Read);
     }
 
     /// Creates the file, or replaces what is there.
+    ///
+    /// @failure IOError.NotFound      a directory along the path is missing
+    /// @failure IOError.AccessDenied  the file or its directory refuses it
+    /// @failure IOError.IsADirectory  the path names a directory
+    /// @failure IOError.Unknown       the platform reported something with no
+    ///                                case of its own
+    /// @see FileStream.Open
     public static Result<FileStream, IOError> Create(String path)
     {
         return Open(path, FileMode.Create, FileAccess.Write);
     }
 
     /// Opens for writing at the end, creating the file if it is not there.
+    ///
+    /// @failure IOError.NotFound      a directory along the path is missing
+    /// @failure IOError.AccessDenied  the file or its directory refuses it
+    /// @failure IOError.IsADirectory  the path names a directory
+    /// @failure IOError.Unknown       the platform reported something with no
+    ///                                case of its own
+    /// @see FileStream.Open
     public static Result<FileStream, IOError> OpenAppend(String path)
     {
         return Open(path, FileMode.Append, FileAccess.Write);
@@ -600,6 +635,13 @@ public class MemoryStream : IStream
 // ------------------------------------------------------------------ helpers
 
 /// Reads a stream to its end.
+///
+/// @failure IOError.Closed        the stream was closed before the read
+///                               finished
+/// @failure IOError.AccessDenied  the stream refused to be read
+/// @failure IOError.Unknown       the stream failed for a reason with no case
+///                               of its own
+/// @see IO.ReadTextToEnd
 public Result<byte[], IOError> ReadToEnd(IStream stream)
 {
     var collected = new MemoryStream();
@@ -620,6 +662,13 @@ public Result<byte[], IOError> ReadToEnd(IStream stream)
 }
 
 /// Reads a stream to its end and reads the bytes as UTF-8.
+///
+/// @failure IOError.Closed        the stream was closed before the read
+///                               finished
+/// @failure IOError.AccessDenied  the stream refused to be read
+/// @failure IOError.Unknown       the stream failed for a reason with no case
+///                               of its own
+/// @see IO.ReadToEnd
 public Result<String, IOError> ReadTextToEnd(IStream stream)
 {
     var raw = ReadToEnd(stream);
@@ -633,6 +682,8 @@ public Result<String, IOError> ReadTextToEnd(IStream stream)
 
 /// Splits text into lines, accepting either line ending and dropping a final
 /// empty line, which is what a trailing newline produces.
+///
+/// @returns the lines, each without its ending
 public List<String> SplitLines(String text)
 {
     var lines = new List<String>();

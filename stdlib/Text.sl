@@ -110,6 +110,8 @@ public class String
     }
 
     /// True when `value` appears anywhere in this text.
+    ///
+    /// @see String.IndexOf
     public bool Contains(String value)
     {
         return this.IndexOf(value) != NotFound;
@@ -128,6 +130,9 @@ public class String
     ///
     /// An empty `value` is found at 0, which is where it is: every string
     /// begins with the empty string.
+    ///
+    /// @see String.LastIndexOf
+    /// @seealso Text.NotFound
     public long IndexOf(String value)
     {
         return this.IndexOf(value, 0);
@@ -159,6 +164,8 @@ public class String
     }
 
     /// Where `value` last appears, or `NotFound`.
+    ///
+    /// @see String.IndexOf
     public long LastIndexOf(String value)
     {
         nuint size = this.ByteLength();
@@ -219,6 +226,8 @@ public class String
     }
 
     /// The text before the first `separator`, or all of it when there is none.
+    ///
+    /// @see String.SubstringAfter
     public String SubstringBefore(String separator)
     {
         long at = this.IndexOf(separator);
@@ -228,6 +237,9 @@ public class String
     }
 
     /// The text after the first `separator`, or "" when there is none.
+    ///
+    /// @see String.SubstringBefore
+    /// @seealso String.SubstringAfterLast
     public String SubstringAfter(String separator)
     {
         long at = this.IndexOf(separator);
@@ -237,6 +249,8 @@ public class String
     }
 
     /// The text after the last `separator`, or all of it when there is none.
+    ///
+    /// @see String.SubstringAfter
     public String SubstringAfterLast(String separator)
     {
         long at = this.LastIndexOf(separator);
@@ -248,6 +262,9 @@ public class String
     // ------------------------------------------------------------- trimming
 
     /// This text without leading or trailing ASCII whitespace.
+    ///
+    /// @see String.TrimStart
+    /// @seealso String.TrimEnd
     public String Trim()
     {
         return this.TrimStart().TrimEnd();
@@ -289,6 +306,8 @@ public class String
     ///
     /// Left to right and non-overlapping, so the replacement is never searched
     /// again: replacing "a" with "aa" terminates.
+    ///
+    /// @see StringBuilder.ReplaceAll
     public String Replace(String from, String to)
     {
         if (from.ByteLength() == 0)
@@ -330,6 +349,8 @@ public class String
     }
 
     /// Spaces on the left until the text is `width` bytes. Never truncates.
+    ///
+    /// @see String.PadRight
     public String PadLeft(nuint width)
     {
         nuint size = this.ByteLength();
@@ -339,6 +360,8 @@ public class String
     }
 
     /// Spaces on the right until the text is `width` bytes. Never truncates.
+    ///
+    /// @see String.PadLeft
     public String PadRight(nuint width)
     {
         nuint size = this.ByteLength();
@@ -387,6 +410,9 @@ public class String
     /// splitting "a,,b" on ',' gives three parts, and "" gives one. That is
     /// what makes it reversible -- joining the result with the same separator
     /// gives the original back.
+    ///
+    /// @see String.Join
+    /// @seealso String.SplitLines
     public String[] Split(String separator)
     {
         if (separator.ByteLength() == 0)
@@ -457,6 +483,8 @@ public class String
     /// A trailing newline does not produce a final empty line, because a file
     /// that ends in one has as many lines as one that does not -- which is the
     /// opposite of what `Split` does, and the reason this is not `Split('\n')`.
+    ///
+    /// @see String.Split
     public String[] SplitLines()
     {
         nuint size = this.ByteLength();
@@ -503,12 +531,17 @@ public class String
 
     /// This text with every ASCII letter uppercased, and every other byte left
     /// as it was. See the note at the top of this file.
+    ///
+    /// @see String.ToLowerAscii
+    /// @seealso String.EqualsIgnoreCaseAscii
     public String ToUpperAscii()
     {
         return this.MapAscii(true);
     }
 
     /// This text with every ASCII letter lowercased.
+    ///
+    /// @see String.ToUpperAscii
     public String ToLowerAscii()
     {
         return this.MapAscii(false);
@@ -566,6 +599,8 @@ public class String
     /// Unchecked, unlike the slicing methods: this reads the buffer directly,
     /// so an `index` at or past `ByteLength` reads memory that is not the
     /// string's. Check the length first, or slice instead.
+    ///
+    /// @see String.GetCodePointAt
     public byte GetByteAt(nuint index)
     {
         return this.ToPointer()[index];
@@ -577,6 +612,8 @@ public class String
     /// sequence gives U+FFFD, which is what a decoder does with a byte that
     /// cannot begin one. So does a sequence that is not well formed: one cut
     /// short, an overlong form, a surrogate or a value past U+10FFFF.
+    ///
+    /// @see String.SkipCodePoint
     public char32 GetCodePointAt(nuint index)
     {
         nuint size = this.ByteLength();
@@ -610,6 +647,8 @@ public class String
     ///
     /// A sequence that is not well formed is stepped over one byte at a time,
     /// each byte reading as U+FFFD. `CodePointCount` counts the same steps.
+    ///
+    /// @see String.GetCodePointAt
     public nuint SkipCodePoint(nuint index)
     {
         nuint size = this.ByteLength();
@@ -630,6 +669,8 @@ public class String
     /// module imports `Standard.Text` without asking and a global named `Join`
     /// is a global named `Join`. `", ".Join(parts)` also reads in the order it
     /// happens.
+    ///
+    /// @see String.Split
     public String Join(String[] parts)
     {
         if (parts.Length == 0)
@@ -653,6 +694,8 @@ public class String
     ///
     /// A copy rather than a view: a `String` is immutable and an array is not,
     /// so handing out the storage would let one be changed through the other.
+    ///
+    /// @see Text.FromBytes
     public byte[] ToBytes()
     {
         nuint size = this.ByteLength();
@@ -818,6 +861,8 @@ public class StringBuilder
     /// Written into the buffer a digit at a time rather than through
     /// `FromInteger`, because a builder appending numbers in a loop should not
     /// allocate a `String` per number.
+    ///
+    /// @see Text.FromInteger
     public void AppendInteger(long value)
     {
         // The magnitude as unsigned, so that the smallest long -- whose
@@ -863,6 +908,8 @@ public class StringBuilder
     ///
     /// This one does allocate a `String` first: shortest round-trip formatting
     /// is the runtime's, and there is nothing to gain by copying it here.
+    ///
+    /// @see Text.FromDouble
     public void AppendDouble(double value)
     {
         this.Append(FromDouble(value));
@@ -885,6 +932,8 @@ public class StringBuilder
     public nuint ByteLength() => _length;
 
     /// Whether nothing has been appended, or everything has been cleared.
+    ///
+    /// @see StringBuilder.HasContent
     public bool IsEmpty => _length == 0u;
 
     /// Throws the length away and keeps the room, so a builder reused in a
@@ -918,6 +967,8 @@ public class StringBuilder
 
     /// Text put in at a position. Inserting at the length is appending, which
     /// is why `at == ByteLength()` is allowed.
+    ///
+    /// @see StringBuilder.Remove
     public void Insert(nuint at, String text)
     {
         if (text.ByteLength() == 0u)
@@ -935,6 +986,9 @@ public class StringBuilder
 
     /// Bytes taken out from a position. Removing more than is there removes to
     /// the end rather than failing.
+    ///
+    /// @see StringBuilder.Insert
+    /// @seealso StringBuilder.TruncateTo
     public void Remove(nuint at, nuint count)
     {
         if (at >= _length || count == 0u)
@@ -962,6 +1016,8 @@ public class StringBuilder
     /// appending a lone continuation byte would put the builder into a state
     /// no `String` can be made from. A scalar always encodes to something
     /// whole.
+    ///
+    /// @see Text.FromChar
     public void AppendCodePoint(char32 value)
     {
         uint scalar = (uint)value;
@@ -1044,6 +1100,8 @@ public class StringBuilder
     // ------------------------------------------------------------- reading
 
     /// Whether anything has been appended. The opposite of `IsEmpty`.
+    ///
+    /// @see StringBuilder.IsEmpty
     public bool HasContent
     {
         get
@@ -1057,6 +1115,8 @@ public class StringBuilder
     /// Byte by byte through the runtime rather than over a pointer, because a
     /// builder's storage moves when it grows and a pointer into it would be a
     /// pointer into the previous allocation.
+    ///
+    /// @see StringBuilder.Contains
     public long IndexOf(String value)
     {
         nuint size = this.ByteLength();
@@ -1084,6 +1144,8 @@ public class StringBuilder
     }
 
     /// True when `value` appears in what has been built.
+    ///
+    /// @see StringBuilder.IndexOf
     public bool Contains(String value)
     {
         return this.IndexOf(value) != NotFound;
@@ -1101,6 +1163,9 @@ public class StringBuilder
     }
 
     /// The first occurrence of `from` replaced by `to`, if there is one.
+    ///
+    /// @returns whether there was one to replace
+    /// @see StringBuilder.ReplaceAll
     public bool ReplaceFirst(String from, String to)
     {
         long at = this.IndexOf(from);
@@ -1116,6 +1181,9 @@ public class StringBuilder
     ///
     /// The search resumes past the replacement, so replacing "a" with "aa"
     /// terminates rather than growing forever.
+    ///
+    /// @returns how many occurrences were replaced
+    /// @see StringBuilder.ReplaceFirst
     public nuint ReplaceAll(String from, String to)
     {
         if (from.ByteLength() == 0)
@@ -1190,6 +1258,9 @@ public class Utf16String
     ///
     /// An unpaired surrogate gives U+FFFD, which is what transcoding it would
     /// have produced -- a lone half cannot be encoded in UTF-8 at all.
+    ///
+    /// @see Utf16String.SkipCodePoint
+    /// @seealso String.GetCodePointAt
     public char32 GetCodePointAt(nuint index)
     {
         nuint count = this.UnitCount();
@@ -1212,6 +1283,8 @@ public class Utf16String
     }
 
     /// The index of the character after the one at `index`.
+    ///
+    /// @see Utf16String.GetCodePointAt
     public nuint SkipCodePoint(nuint index)
     {
         nuint count = this.UnitCount();
@@ -1249,6 +1322,8 @@ public class Utf16String
 
     /// The units as raw bytes, little-endian, which is what a Windows API and
     /// a UTF-16LE file both expect.
+    ///
+    /// @see Text.FromUtf16
     public byte[] ToBytes()
     {
         nuint count = this.UnitCount();
@@ -1399,23 +1474,33 @@ public String FromBool(bool value) => sl_string_from_bool(value);
 
 /// One code point as the character it names, not as its number.
 /// `Text.FromInteger((long)c)` is how to ask for the number.
+///
+/// @see Text.FromInteger
 public String FromChar(char32 value) => sl_string_from_char(value);
 
 /// A copy of `byteLength` bytes, taken to be UTF-8.
+///
+/// @see String.ToBytes
 public String FromBytes(byte* data, nuint byteLength) =>
     sl_string_from_bytes(data, byteLength);
 
 /// A copy of the bytes up to the first NUL, taken to be UTF-8. What a C
 /// function that answers with a `char*` hands back.
+///
+/// @see Text.FromBytes
 public String FromNullTerminated(byte* text) => sl_string_from_null_terminated(text);
 
 /// UTF-16 transcoded to UTF-8.
 ///
 /// A pointer and a count rather than a `Utf16String`, because a wide platform
 /// API writes into a buffer the caller owns and that pair is what comes back.
+///
+/// @see Text.FromNullTerminatedUtf16
 public String FromUtf16(char16* units, nuint unitCount) =>
     sl_string_from_utf16(units, unitCount);
 
 /// UTF-16 up to the first NUL unit, transcoded to UTF-8.
+///
+/// @see Text.FromUtf16
 public String FromNullTerminatedUtf16(char16* units) =>
     sl_string_from_null_terminated_utf16(units);
