@@ -257,10 +257,18 @@ public Result<String, IOError> ReadAllText(String path)
 ```
 
 **`@failure` is what this language has in place of `<exception>`.** Nothing is
-thrown here, so there is no exception to document; a call that can fail returns
-a `Result<T, TError>` ([§2.8](02-types.md#28-resultt-terror--how-a-function-fails))
-and `@failure` names the cases of `TError` it can answer with. The error type's
-own name may be written in front of the case or left off.
+thrown here, so there is no exception to document; a call that can fail says so
+in its return type, and `@failure` names the cases it can answer with. Both
+shapes count: an operation that produces something returns
+`Result<T, TError>` ([§2.8](02-types.md#28-resultt-terror--how-a-function-fails))
+and the cases are `TError`'s, and one that produces nothing returns the error
+itself with `None` for success, as most of `Standard.File` does. The error
+type's own name may be written in front of the case or left off.
+
+**A `@failure` that names no case of that type is SL0744**, and a tag on a
+declaration that reports no failure at all is the same code. What is *not*
+checked is whether the case can actually occur: the compiler knows the name
+exists and no more, so the claim is still the author's.
 
 **One spelling of each.** A word that is nearly a tag — `@summary`, `@return`,
 `@throws` — is an unknown tag (SL0739) rather than a second way to write one,

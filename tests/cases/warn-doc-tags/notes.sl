@@ -66,12 +66,24 @@ public Result<String, ReadError> ReadProperly(String path)
     return Ok(path);
 }
 
+/// Writes one, reporting the error itself rather than a `Result`.
+///
+/// An operation that produces nothing returns the error directly, with `None`
+/// for success, so that is the other shape `@failure` names the cases of.
+///
+/// @failure ReadError.NoSpace the disk filled up
+public ReadError WriteProperly(String path)
+{
+    return path.IsEmpty ? ReadError.NotFound : ReadError.None;
+}
+
 int Main()
 {
     var shape = new Shape();
     shape.Name = "circle";
 
-    Console.WriteLine(shape.Name + " " + Text.FromInteger((long)Add(1, 2)));
+    Console.WriteLine(shape.Name + " " + Text.FromInteger((long)Add(1, 2)) + " " +
+        Text.FromInteger((long)(int)WriteProperly("a")));
     Quiet();
     return 0;
 }

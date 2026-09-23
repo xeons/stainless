@@ -62,6 +62,18 @@ public sealed partial class Binder
         _currentScope = null;
     }
 
+    /// <summary>
+    /// The type whose members are being checked, so that a name written bare
+    /// in one of their blocks resolves the way it would in the code beside it.
+    /// </summary>
+    private NamedTypeSymbol? _documentedType;
+
+    /// <summary>The symbol a type declaration made, or null where it is not one.</summary>
+    private NamedTypeSymbol? TypeDeclared(TypeDeclSyntax type) =>
+        _currentScope!.Module.Types.TryGetValue(type.Name, out var declared)
+            ? declared as NamedTypeSymbol
+            : null;
+
     /// <summary>What a block is written above, and what may be said about it.</summary>
     private enum DocumentedKind
     {
@@ -130,6 +142,9 @@ public sealed partial class Binder
 
             case TypeDeclSyntax type:
             {
+                var outer = _documentedType;
+                _documentedType = TypeDeclared(type);
+
                 Check(type.Documentation, type.DocumentationSpan, type.Span,
                     new Documented(type.Name, DocumentedKind.Type)
                     {
@@ -142,6 +157,8 @@ public sealed partial class Binder
                 foreach (var variantCase in type.Cases)
                     Check(variantCase.Documentation, variantCase.DocumentationSpan,
                         variantCase.Span, new Documented(variantCase.Name, DocumentedKind.Case));
+
+                _documentedType = outer;
                 break;
             }
 
@@ -299,8 +316,8 @@ public sealed partial class Binder
         if (ErrorTypeOf(subject.Returns) is not { } declared)
         {
             diagnostics.Warning("SL0744", where,
-                $"'{subject.Name}' does not return a 'Result', so it reports no failure; " +
-                "a call that can fail says so in its return type");
+                $"'{subject.Name}' reports no failure, so there is nothing for '@failure' to " +
+                "name; a call that can fail returns a 'Result' or the error itself");
             return;
         }
 
@@ -396,18 +413,36 @@ public sealed partial class Binder
     // ====================================================== resolving a name
 
     /// <summary>
-    /// The error type of a <c>Result&lt;T, TError&gt;</c> return, or null.
+    /// The type whose cases a <c>@failure</c> can name, or null where the
+    /// declaration reports no failure.
     ///
+    /// <para>
+    /// There are two shapes and both are failure. An operation that produces
+    /// something returns <c>Result&lt;T, TError&gt;</c> and the cases are
+    /// <c>TError</c>'s; an operation that produces nothing returns the error
+    /// itself, with <c>None</c> for success, which is what most of
+    /// <c>Standard.File</c> does. Taking only the first would refuse the tag
+    /// on exactly the calls that most need it.
+    /// </para>
+    ///
+    /// <para>
     /// Read from the syntax rather than from the bound signature, because that
     /// is what the author wrote and what the message should quote.
+    /// </para>
     /// </summary>
     private TypeSymbol? ErrorTypeOf(TypeSyntax? returns)
     {
-        if (returns is not NamedTypeSyntax { TypeArguments.Count: 2 } named) return null;
-        if (named.Name.Parts[^1] != "Result") return null;
+        if (returns is not NamedTypeSyntax named) return null;
 
-        var error = ResolveType(named.TypeArguments[1], _currentScope!);
-        return error.IsError() ? null : error;
+        var written = named.Name.Parts[^1] == "Result" && named.TypeArguments.Count == 2
+            ? ResolveType(named.TypeArguments[1], _currentScope!)
+            : ResolveType(named, _currentScope!);
+
+        // A variant carries its cases and an enum is a set of them. Anything
+        // else -- a String, a number -- is a value rather than a report.
+        return written.IsError() || written is not (EnumTypeSymbol or VariantTypeSymbol)
+            ? null
+            : written;
     }
 
     /// <summary>The names of an enum's members or a variant's cases, or null.</summary>
@@ -435,6 +470,23 @@ public sealed partial class Binder
         if (TypeNamed(parts) is not null) return true;
         if (ModuleNamed(parts) is not null) return true;
 
+        var here = _currentScope!.Module;
+
+        // A name in this module's own file may be written as a caller would
+        // write it from outside -- `File.ReadAllText`, under the short name the
+        // module is reached by -- or bare, as the code beside it writes it.
+        // Both are the name a reader would use, so both resolve.
+        if (parts.Length == 1 && HasModuleMember(here, parts[0])) return true;
+
+        if (parts.Length == 2 && parts[0] == ShortName(here.Name) &&
+            HasModuleMember(here, parts[1]))
+            return true;
+
+        // A member of the type the block is written inside, named on its own.
+        if (parts.Length == 1 && _documentedType is { } enclosing &&
+            HasMember(enclosing, parts[0]))
+            return true;
+
         if (parts.Length < 2) return false;
 
         var owner = parts[..^1];
@@ -442,12 +494,18 @@ public sealed partial class Binder
 
         if (TypeNamed(owner) is { } type && HasMember(type, member)) return true;
 
-        return ModuleNamed(owner) is { } module &&
-               (module.Functions.Any(f => f.Name == member) ||
-                module.Types.ContainsKey(member) ||
-                module.Constants.ContainsKey(member) ||
-                module.Statics.ContainsKey(member));
+        return ModuleNamed(owner) is { } module && HasModuleMember(module, member);
     }
+
+    /// <summary>The last segment of a dotted module name, which is how a file that
+    /// imports it reaches it.</summary>
+    private static string ShortName(string module) => module[(module.LastIndexOf('.') + 1)..];
+
+    private static bool HasModuleMember(ModuleSymbol module, string member) =>
+        module.Functions.Any(f => f.Name == member) ||
+        module.Types.ContainsKey(member) ||
+        module.Constants.ContainsKey(member) ||
+        module.Statics.ContainsKey(member);
 
     private ModuleSymbol? ModuleNamed(IReadOnlyList<string> parts)
     {
