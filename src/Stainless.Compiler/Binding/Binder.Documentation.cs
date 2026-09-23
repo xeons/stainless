@@ -65,10 +65,16 @@ public sealed partial class Binder
     /// <summary>
     /// The type whose members are being checked, so that a name written bare
     /// in one of their blocks resolves the way it would in the code beside it.
+    ///
+    /// Both halves are kept because a generic type has only the first: it is a
+    /// template until a call says what its parameters are, so there is no
+    /// symbol to ask and the declaration answers instead. The symbol is what
+    /// reaches an inherited member.
     /// </summary>
+    private TypeDeclSyntax? _documentedDeclaration;
     private NamedTypeSymbol? _documentedType;
 
-    /// <summary>The symbol a type declaration made, or null where it is not one.</summary>
+    /// <summary>The symbol a type declaration made, or null for a generic one.</summary>
     private NamedTypeSymbol? TypeDeclared(TypeDeclSyntax type) =>
         _currentScope!.Module.Types.TryGetValue(type.Name, out var declared)
             ? declared as NamedTypeSymbol
@@ -143,7 +149,9 @@ public sealed partial class Binder
             case TypeDeclSyntax type:
             {
                 var outer = _documentedType;
+                var outerDeclaration = _documentedDeclaration;
                 _documentedType = TypeDeclared(type);
+                _documentedDeclaration = type;
 
                 Check(type.Documentation, type.DocumentationSpan, type.Span,
                     new Documented(type.Name, DocumentedKind.Type)
@@ -159,6 +167,7 @@ public sealed partial class Binder
                         variantCase.Span, new Documented(variantCase.Name, DocumentedKind.Case));
 
                 _documentedType = outer;
+                _documentedDeclaration = outerDeclaration;
                 break;
             }
 
@@ -483,9 +492,16 @@ public sealed partial class Binder
             return true;
 
         // A member of the type the block is written inside, named on its own.
-        if (parts.Length == 1 && _documentedType is { } enclosing &&
-            HasMember(enclosing, parts[0]))
-            return true;
+        // The symbol is asked first, since it reaches what the type inherited;
+        // a generic type has none and answers from its declaration.
+        if (parts.Length == 1)
+        {
+            if (_documentedType is { } enclosing && HasMember(enclosing, parts[0]))
+                return true;
+
+            if (_documentedDeclaration is { } written && DeclaresMember(written, parts[0]))
+                return true;
+        }
 
         // A generic type written on its own: `Mutex`, `Optional`.
         if (GenericTypeNamed(parts) is not null) return true;
