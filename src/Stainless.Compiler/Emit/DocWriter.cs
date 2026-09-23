@@ -780,12 +780,19 @@ public static class DocWriter
 
             Note(module.Name, page);
 
+            // A file that imports `Standard.Json` reaches it as `Json`, so a
+            // block writes `Json.Parse` and that is the spelling to index --
+            // alongside the written-out one, which is what a block in another
+            // module with a name of its own has to write.
+            string shortName = module.Name[(module.Name.LastIndexOf('.') + 1)..];
+
             foreach (var entry in module.Types.Concat(module.Functions).Concat(module.Constants))
             {
                 string target = page + "#" + Anchor(entry);
 
                 Note(entry.Name, target, entry);
                 Note(module.Name + "." + entry.Name, target, entry);
+                Note(shortName + "." + entry.Name, target, entry);
 
                 foreach (var member in entry.Members)
                 {
@@ -793,6 +800,7 @@ public static class DocWriter
 
                     Note(entry.Name + "." + member.Name, inner, member);
                     Note(module.Name + "." + entry.Name + "." + member.Name, inner, member);
+                    Note(shortName + "." + entry.Name + "." + member.Name, inner, member);
                 }
             }
         }

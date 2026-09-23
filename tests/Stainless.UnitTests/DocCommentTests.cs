@@ -299,6 +299,26 @@ public class DocCommentTests
     }
 
     /// <summary>
+    /// A module is reached by its last segment once imported, so that is what a
+    /// block writes and what the page has to link.
+    /// </summary>
+    [Fact]
+    public void AModuleIsLinkedByTheNameItIsReachedBy()
+    {
+        string page = Page("""
+            module Standard.Paper;
+            /// One.
+            public int F() { return 0; }
+            /// Two.
+            ///
+            /// @see Paper.F
+            public int G() { return 0; }
+            """);
+
+        Assert.Contains("[Paper.F](#f-function)", page);
+    }
+
+    /// <summary>
     /// A bare <c>@inheritdoc</c> takes the block from the member it overrides,
     /// and what the override adds is written after it.
     /// </summary>
