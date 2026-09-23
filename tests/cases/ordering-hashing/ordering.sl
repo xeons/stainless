@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: 0BSD
 //
-// `CompareTo` and `HashCode` on the types that cannot implement an interface.
+// `CompareTo` and `GetHashCode` on the types that cannot implement an interface.
 //
 // A primitive is not a class, so `int` cannot be declared to implement
 // `IComparable<int>`; the binder recognises the two names and lowers each to a
@@ -62,8 +62,8 @@ int Main()
 
     // The two values that would break "equal compares, equal hashes".
     Say("double/zeroes-compare", Sign(zero.CompareTo(negativeZero)));
-    Say("double/zeroes-hash", zero.HashCode() == negativeZero.HashCode() ? "same" : "differ");
-    Say("double/nans-hash", nan.HashCode() == otherNan.HashCode() ? "same" : "differ");
+    Say("double/zeroes-hash", zero.GetHashCode() == negativeZero.GetHashCode() ? "same" : "differ");
+    Say("double/nans-hash", nan.GetHashCode() == otherNan.GetHashCode() ? "same" : "differ");
 
     // ----------------------------------------------------------------- text
 
@@ -85,8 +85,8 @@ int Main()
     Say("text/case", Sign("Z".CompareTo("a")));
     Say("text/beyond-ascii", Sign("é".CompareTo("世")));
 
-    Say("text/equal-hash", "apple".HashCode() == ("app" + "le").HashCode() ? "same" : "differ");
-    Say("text/unequal-hash", "apple".HashCode() == "banana".HashCode() ? "same" : "differ");
+    Say("text/equal-hash", "apple".GetHashCode() == ("app" + "le").GetHashCode() ? "same" : "differ");
+    Say("text/unequal-hash", "apple".GetHashCode() == "banana".GetHashCode() ? "same" : "differ");
 
     // ---------------------------------------------------------------- enums
 

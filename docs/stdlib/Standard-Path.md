@@ -21,7 +21,7 @@ platforms, and it says which rather than picking one.
 
 **Functions** &nbsp; [ChangeExtension](#changeextension-function) &middot; [GetDirectoryName](#getdirectoryname-function) &middot; [GetExtension](#getextension-function) &middot; [GetFileName](#getfilename-function) &middot; [GetFileNameWithoutExtension](#getfilenamewithoutextension-function) &middot; [IsPathRooted](#ispathrooted-function) &middot; [IsSamePath](#issamepath-function) &middot; [Join](#join-function) &middot; [Join](#join-function) &middot; [SplitPath](#splitpath-function)
 
-**Constants** &nbsp; [AltSeparator](#altseparator-constant) &middot; [Separator](#separator-constant)
+**Constants** &nbsp; [AltDirectorySeparatorChar](#altdirectoryseparatorchar-constant) &middot; [DirectorySeparatorChar](#directoryseparatorchar-constant)
 
 ## Functions
 
@@ -175,20 +175,20 @@ The parts, with the separators dropped and empty parts skipped.
 
 ## Constants
 
-### AltSeparator *constant*
+### AltDirectorySeparatorChar *constant*
 
 ```
-const char AltSeparator = 47
+const char AltDirectorySeparatorChar = 47
 ```
 
 The other one, accepted everywhere a separator is looked for.
 
 <sub>[stdlib/Path.sl:46](../../stdlib/Path.sl#L46)</sub>
 
-### Separator *constant*
+### DirectorySeparatorChar *constant*
 
 ```
-const char Separator = 92
+const char DirectorySeparatorChar = 92
 ```
 
 What `Join` writes between two parts.

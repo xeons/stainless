@@ -18,11 +18,11 @@ public int Main(String[] args)
         return 0;
     }
 
-    var ran = RunProcess(Env.ProgramPath(), ["read"]);
+    var ran = RunProcess(Env.GetProcessPath(), ["read"]);
     if (ran.Ok)
-        Console.WriteLine($"run    {ran.Value.Output}");
+        Console.WriteLine($"run    {ran.Value.StandardOutput}");
 
-    var opened = OpenProcess(Env.ProgramPath(), ["read"]);
+    var opened = OpenProcess(Env.GetProcessPath(), ["read"]);
     if (opened.Ok)
     {
         var child = opened.Value;

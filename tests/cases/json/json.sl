@@ -179,9 +179,9 @@ public int Main()
     members.Add("items", items);
 
     Say("built", Json.ToJsonText(built));
-    Say("found", Json.GetTextOrDefault(members.Find("name"), "?"));
-    Say("missing", Json.GetTextOrDefault(members.Find("nope"), "(default)"));
-    Say("as-number", Text.FromInteger(Json.GetIntegerOrDefault(members.Find("count"), 0)));
+    Say("found", Json.GetTextOrDefault(members.GetValueOrNull("name"), "?"));
+    Say("missing", Json.GetTextOrDefault(members.GetValueOrNull("nope"), "(default)"));
+    Say("as-number", Text.FromInteger(Json.GetIntegerOrDefault(members.GetValueOrNull("count"), 0)));
 
     Console.WriteLine("indented =");
     Console.WriteLine(Json.ToJsonTextIndented(built));

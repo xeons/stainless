@@ -2,7 +2,7 @@
 //
 // A child whose handle is dropped while it runs is reaped when it exits.
 //
-// Dropping a `Process` or a `Running` does not stop the child, and it MUST
+// Dropping a `Process` or a `RunningProcess` does not stop the child, and it MUST
 // NOT leave a zombie behind once the child has finished. Whatever is left for
 // waitpid(-1) afterwards is exactly what was not reaped.
 module Reaped;

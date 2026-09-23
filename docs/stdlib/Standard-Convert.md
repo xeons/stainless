@@ -18,7 +18,7 @@ type, and the value is unreadable until the failure has been checked (§2.6).
 
 **Types** &nbsp; [ConvertError](#converterror-enum)
 
-**Functions** &nbsp; [FromBase64](#frombase64-function) &middot; [FromHex](#fromhex-function) &middot; [FromLong](#fromlong-function) &middot; [ToBase64](#tobase64-function) &middot; [ToBase64Text](#tobase64text-function) &middot; [ToBase64Url](#tobase64url-function) &middot; [ToDouble](#todouble-function) &middot; [ToHex](#tohex-function) &middot; [ToHex](#tohex-function) &middot; [ToInt](#toint-function) &middot; [ToInt](#toint-function) &middot; [ToLong](#tolong-function) &middot; [ToLong](#tolong-function) &middot; [ToULong](#toulong-function) &middot; [ToULong](#toulong-function)
+**Functions** &nbsp; [FromBase64String](#frombase64string-function) &middot; [FromHexString](#fromhexstring-function) &middot; [FromLong](#fromlong-function) &middot; [ToBase64String](#tobase64string-function) &middot; [ToBase64String](#tobase64string-function) &middot; [ToBase64Url](#tobase64url-function) &middot; [ToDouble](#todouble-function) &middot; [ToHexString](#tohexstring-function) &middot; [ToHexString](#tohexstring-function) &middot; [ToInt](#toint-function) &middot; [ToInt](#toint-function) &middot; [ToLong](#tolong-function) &middot; [ToLong](#tolong-function) &middot; [ToULong](#toulong-function) &middot; [ToULong](#toulong-function)
 
 ## Types
 
@@ -30,7 +30,7 @@ enum ConvertError
 
 Why a conversion did not happen.
 
-<sub>[stdlib/Convert.sl:43](../../stdlib/Convert.sl#L43)</sub>
+<sub>[stdlib/Convert/ConvertError.sl:29](../../stdlib/Convert/ConvertError.sl#L29)</sub>
 
 #### Empty *case*
 
@@ -40,7 +40,7 @@ Empty
 
 There was nothing to convert.
 
-<sub>[stdlib/Convert.sl:46](../../stdlib/Convert.sl#L46)</sub>
+<sub>[stdlib/Convert/ConvertError.sl:32](../../stdlib/Convert/ConvertError.sl#L32)</sub>
 
 #### Malformed *case*
 
@@ -50,7 +50,7 @@ Malformed
 
 A character that cannot appear in this form.
 
-<sub>[stdlib/Convert.sl:49](../../stdlib/Convert.sl#L49)</sub>
+<sub>[stdlib/Convert/ConvertError.sl:35](../../stdlib/Convert/ConvertError.sl#L35)</sub>
 
 #### OutOfRange *case*
 
@@ -60,14 +60,14 @@ OutOfRange
 
 The digits were fine and the number does not fit.
 
-<sub>[stdlib/Convert.sl:52](../../stdlib/Convert.sl#L52)</sub>
+<sub>[stdlib/Convert/ConvertError.sl:38](../../stdlib/Convert/ConvertError.sl#L38)</sub>
 
 ## Functions
 
-### FromBase64 *function*
+### FromBase64String *function*
 
 ```
-Result<byte[], ConvertError> FromBase64(String text)
+Result<byte[], ConvertError> FromBase64String(String text)
 ```
 
 Base64 back into bytes, accepting both alphabets and padding or none.
@@ -82,14 +82,14 @@ thing it is most often pointed at.
 
 - [ConvertError.Malformed](#malformed-case) — a character outside both alphabets, or padding that is not a whole tail of the last group
 
-**See also** &nbsp; [Convert.ToBase64](#tobase64-function) &middot; [Convert.ToBase64Url](#tobase64url-function)
+**See also** &nbsp; [Convert.ToBase64String](#tobase64string-function) &middot; [Convert.ToBase64Url](#tobase64url-function)
 
-<sub>[stdlib/Convert.sl:439](../../stdlib/Convert.sl#L439)</sub>
+<sub>[stdlib/Convert/Convert.sl:426](../../stdlib/Convert/Convert.sl#L426)</sub>
 
-### FromHex *function*
+### FromHexString *function*
 
 ```
-Result<byte[], ConvertError> FromHex(String text)
+Result<byte[], ConvertError> FromHexString(String text)
 ```
 
 Hexadecimal back into bytes. Either case, and an odd number of digits is
@@ -100,9 +100,9 @@ missing half belonged to.
 
 - [ConvertError.Malformed](#malformed-case) — an odd number of digits, or a character that is not one
 
-**See also** &nbsp; [Convert.ToHex](#tohex-function)
+**See also** &nbsp; [Convert.ToHexString](#tohexstring-function)
 
-<sub>[stdlib/Convert.sl:387](../../stdlib/Convert.sl#L387)</sub>
+<sub>[stdlib/Convert/Convert.sl:374](../../stdlib/Convert/Convert.sl#L374)</sub>
 
 ### FromLong *function*
 
@@ -127,31 +127,31 @@ is what says so. `ToLong` reports the same mistake as
 
 **See also** &nbsp; [Convert.ToLong](#tolong-function) &middot; [Text.FromInteger](Standard-Text.md#frominteger-function)
 
-<sub>[stdlib/Convert.sl:231](../../stdlib/Convert.sl#L231)</sub>
+<sub>[stdlib/Convert/Convert.sl:218](../../stdlib/Convert/Convert.sl#L218)</sub>
 
-### ToBase64 *function*
+### ToBase64String *function*
 
 ```
-String ToBase64(byte[] data)
+String ToBase64String(byte[] data)
 ```
 
 `data` as base64, padded with `=` to a multiple of four.
 
-**See also** &nbsp; [Convert.FromBase64](#frombase64-function)
+**See also** &nbsp; [Convert.FromBase64String](#frombase64string-function)
 
-<sub>[stdlib/Convert.sl:413](../../stdlib/Convert.sl#L413)</sub>
+<sub>[stdlib/Convert/Convert.sl:400](../../stdlib/Convert/Convert.sl#L400)</sub>
 
-### ToBase64Text *function*
+### ToBase64String *function*
 
 ```
-String ToBase64Text(String text)
+String ToBase64String(String text)
 ```
 
 Base64 of the UTF-8 bytes of `text`, which is the common case.
 
-**See also** &nbsp; [Convert.ToBase64](#tobase64-function)
+**See also** &nbsp; [Convert.ToBase64String](#tobase64string-function)
 
-<sub>[stdlib/Convert.sl:514](../../stdlib/Convert.sl#L514)</sub>
+<sub>[stdlib/Convert/Convert.sl:501](../../stdlib/Convert/Convert.sl#L501)</sub>
 
 ### ToBase64Url *function*
 
@@ -162,9 +162,9 @@ String ToBase64Url(byte[] data)
 `data` as base64url: `-` and `_` for the last two characters, and no
 padding. What a JWT and a URL query both want, and RFC 4648 §5.
 
-**See also** &nbsp; [Convert.FromBase64](#frombase64-function)
+**See also** &nbsp; [Convert.FromBase64String](#frombase64string-function)
 
-<sub>[stdlib/Convert.sl:422](../../stdlib/Convert.sl#L422)</sub>
+<sub>[stdlib/Convert/Convert.sl:409](../../stdlib/Convert/Convert.sl#L409)</sub>
 
 ### ToDouble *function*
 
@@ -187,24 +187,24 @@ smallest rounds to zero, which is the nearest double and not a failure.
 - [ConvertError.Malformed](#malformed-case) — the text is not one of the forms above
 - [ConvertError.OutOfRange](#outofrange-case) — the magnitude is past the largest double
 
-<sub>[stdlib/Convert.sl:279](../../stdlib/Convert.sl#L279)</sub>
+<sub>[stdlib/Convert/Convert.sl:266](../../stdlib/Convert/Convert.sl#L266)</sub>
 
-### ToHex *function*
+### ToHexString *function*
 
 ```
-String ToHex(byte[] data)
+String ToHexString(byte[] data)
 ```
 
 `data` as lowercase hexadecimal, two characters per byte and nothing between.
 
-**See also** &nbsp; [Convert.FromHex](#fromhex-function)
+**See also** &nbsp; [Convert.FromHexString](#fromhexstring-function)
 
-<sub>[stdlib/Convert.sl:346](../../stdlib/Convert.sl#L346)</sub>
+<sub>[stdlib/Convert/Convert.sl:333](../../stdlib/Convert/Convert.sl#L333)</sub>
 
-### ToHex *function*
+### ToHexString *function*
 
 ```
-String ToHex(byte[] data, bool upper)
+String ToHexString(byte[] data, bool upper)
 ```
 
 The same, in the case asked for.
@@ -214,9 +214,9 @@ The same, in the case asked for.
 - `data` — the bytes to write out
 - `upper` — true for `A`-`F`, false for `a`-`f`
 
-**See also** &nbsp; [Convert.FromHex](#fromhex-function)
+**See also** &nbsp; [Convert.FromHexString](#fromhexstring-function)
 
-<sub>[stdlib/Convert.sl:356](../../stdlib/Convert.sl#L356)</sub>
+<sub>[stdlib/Convert/Convert.sl:343](../../stdlib/Convert/Convert.sl#L343)</sub>
 
 ### ToInt *function*
 
@@ -234,7 +234,7 @@ Result<int, ConvertError> ToInt(String text)
 
 **See also** &nbsp; [Convert.ToLong](#tolong-function)
 
-<sub>[stdlib/Convert.sl:134](../../stdlib/Convert.sl#L134)</sub>
+<sub>[stdlib/Convert/Convert.sl:121](../../stdlib/Convert/Convert.sl#L121)</sub>
 
 ### ToInt *function*
 
@@ -255,7 +255,7 @@ A number that parses as a `long` and does not fit an `int` is
 
 **See also** &nbsp; [Convert.ToLong](#tolong-function)
 
-<sub>[stdlib/Convert.sl:149](../../stdlib/Convert.sl#L149)</sub>
+<sub>[stdlib/Convert/Convert.sl:136](../../stdlib/Convert/Convert.sl#L136)</sub>
 
 ### ToLong *function*
 
@@ -276,7 +276,7 @@ separators, no trailing units. Trim first if the input might have any.
 
 **See also** &nbsp; [Convert.FromLong](#fromlong-function)
 
-<sub>[stdlib/Convert.sl:66](../../stdlib/Convert.sl#L66)</sub>
+<sub>[stdlib/Convert/Convert.sl:53](../../stdlib/Convert/Convert.sl#L53)</sub>
 
 ### ToLong *function*
 
@@ -297,7 +297,7 @@ alike, and base 36 goes to `z`.
 
 **See also** &nbsp; [Convert.FromLong](#fromlong-function)
 
-<sub>[stdlib/Convert.sl:81](../../stdlib/Convert.sl#L81)</sub>
+<sub>[stdlib/Convert/Convert.sl:68](../../stdlib/Convert/Convert.sl#L68)</sub>
 
 ### ToULong *function*
 
@@ -314,7 +314,7 @@ wrapping, which is the whole point of asking for an unsigned one.
 - [ConvertError.Malformed](#malformed-case) — a character is not a digit, a leading `-` among them
 - [ConvertError.OutOfRange](#outofrange-case) — the digits do not fit a `ulong`
 
-<sub>[stdlib/Convert.sl:171](../../stdlib/Convert.sl#L171)</sub>
+<sub>[stdlib/Convert/Convert.sl:158](../../stdlib/Convert/Convert.sl#L158)</sub>
 
 ### ToULong *function*
 
@@ -333,5 +333,5 @@ leading `-` is `Malformed`.
 - [ConvertError.Malformed](#malformed-case) — `radix` is outside 2 to 36, a character is not a digit in it, or the number carries a leading `-`
 - [ConvertError.OutOfRange](#outofrange-case) — the digits do not fit a `ulong`
 
-<sub>[stdlib/Convert.sl:185](../../stdlib/Convert.sl#L185)</sub>
+<sub>[stdlib/Convert/Convert.sl:172](../../stdlib/Convert/Convert.sl#L172)</sub>
 

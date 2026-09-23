@@ -17,8 +17,8 @@ public class Money : IComparable<Money>, IEquatable<Money>, IHashable
     public int Cents() => _cents;
 
     public int CompareTo(Money other) => _cents.CompareTo(other.Cents());
-    public bool EqualTo(Money other) => _cents == other.Cents();
-    public nuint HashCode() => _cents.HashCode();
+    public bool Equals(Money other) => _cents == other.Cents();
+    public nuint GetHashCode() => _cents.GetHashCode();
 }
 
 // The constraint is satisfied by 'int' and 'String' as readily as by a class.
@@ -38,7 +38,7 @@ nuint Digest<T>(IReadOnlyList<T> items) where T : IHashable, IEquatable<T>
     nuint total = 0;
     for (nuint i = 0; i < items.Count; i = i + 1)
     {
-        total = total + items[i].HashCode();
+        total = total + items[i].GetHashCode();
     }
     return total;
 }
@@ -64,7 +64,7 @@ int Main()
 
     // The three members, written out on values of each kind.
     printf("compare=%d %d %d\n", 3.CompareTo(5), 5.CompareTo(3), 4.CompareTo(4));
-    printf("equal=%d %d\n", 7.EqualTo(7) ? 1 : 0, "a".EqualTo("b") ? 1 : 0);
+    printf("equal=%d %d\n", 7.Equals(7) ? 1 : 0, "a".Equals("b") ? 1 : 0);
     printf("text=%d %d\n", "apple".CompareTo("banana"), "b".CompareTo("a"));
 
     // An unsigned type orders unsigned, and a signed one orders signed.
@@ -78,13 +78,13 @@ int Main()
     var level = Level.Severe;
     printf("enum=%d %d %d\n",
         level.CompareTo(Level.Low), level.CompareTo(Level.Fatal),
-        level.EqualTo(Level.Severe) ? 1 : 0);
+        level.Equals(Level.Severe) ? 1 : 0);
 
     // A hash is stable within a run and spreads adjacent keys apart.
     printf("hash=%d %d %d\n",
-        "key".HashCode() == "key".HashCode() ? 1 : 0,
-        1.HashCode() == 2.HashCode() ? 1 : 0,
-        (1.HashCode() & 7) == (2.HashCode() & 7) ? 1 : 0);
+        "key".GetHashCode() == "key".GetHashCode() ? 1 : 0,
+        1.GetHashCode() == 2.GetHashCode() ? 1 : 0,
+        (1.GetHashCode() & 7) == (2.GetHashCode() & 7) ? 1 : 0);
 
     // bool and char take part too.
     printf("misc=%d %d\n", false.CompareTo(true), 'a'.CompareTo('b'));

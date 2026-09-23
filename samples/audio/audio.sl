@@ -121,7 +121,7 @@ String DescribeAudioError(AudioError error)
         case AudioError.Busy: return "something else has the device";
         case AudioError.Closed: return "the device was closed";
         case AudioError.Malformed: return "that was not a WAV file";
-        case AudioError.Io: return "the file could not be read or written";
+        case AudioError.IO: return "the file could not be read or written";
     }
 
     return "something went wrong";

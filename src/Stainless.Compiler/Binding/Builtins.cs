@@ -159,7 +159,7 @@ public sealed class Builtins
     ///
     /// A primitive is not a class, so <c>int</c> cannot be declared to
     /// implement <c>IComparable&lt;int&gt;</c>. The binder recognises
-    /// <c>CompareTo</c> and <c>HashCode</c> on one anyway and lowers each to
+    /// <c>CompareTo</c> and <c>GetHashCode</c> on one anyway and lowers each to
     /// one of these, which is what lets <c>Sort(numbers)</c> work on a
     /// <c>List&lt;int&gt;</c> without the language growing operator constraints.
     ///

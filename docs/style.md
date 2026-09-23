@@ -41,7 +41,7 @@ counter-example.
 | Generic type parameter | `T`, or `T` + `PascalCase` | `T`, `TKey`, `TValue` |
 
 **Constants are `PascalCase`, not `SCREAMING_CASE`.** This is C#'s rule and not
-C's, and the tree already follows it — `Math.Pi`, `Math.Epsilon`,
+C's, and the tree already follows it — `Math.Pi`, `Math.MachineEpsilon`,
 `Path.Separator`. A `const` is part of the surface a caller reads, and there is
 no reason for it to shout.
 

@@ -336,9 +336,9 @@ switch (port)
 | `ToLong`, `ToInt`, `ToULong` | `Result<_, ConvertError>`, base 10 or any radix from 2 to 36 |
 | `ToDouble` | `Result<double, ConvertError>` |
 | `FromLong(value, radix)` | `String` — base 10 is `Text.FromInteger` |
-| `ToHex(data)`, `FromHex(text)` | `String`, `Result<byte[], ConvertError>` |
-| `ToBase64(data)`, `ToBase64Url(data)`, `ToBase64Text(text)` | `String` |
-| `FromBase64(text)` | `Result<byte[], ConvertError>`, either alphabet |
+| `ToHexString(data)`, `FromHexString(text)` | `String`, `Result<byte[], ConvertError>` |
+| `ToBase64String(data)`, `ToBase64Url(data)`, `ToBase64String(text)` | `String` |
+| `FromBase64String(text)` | `Result<byte[], ConvertError>`, either alphabet |
 
 Everything that can fail returns a `Result`. There is no `Parse` that stops the
 program, because the language has no exceptions, and no `TryParse` with an
@@ -348,7 +348,7 @@ is for the answer that has none ([§7.2.1](07-functions-members.md#721-out)).
 Two details worth knowing, because both are where a parser is usually wrong.
 The integer parsers accumulate as *unsigned* so that the most negative `long`,
 whose magnitude does not fit in a `long`, is reachable — a signed accumulator
-gets exactly that one value wrong. And `FromBase64` skips whitespace, because
+gets exactly that one value wrong. And `FromBase64String` skips whitespace, because
 base64 in the wild arrives wrapped at 64 or 76 columns and a decoder that
 refused a newline would be useless for the thing it is most often pointed at.
 

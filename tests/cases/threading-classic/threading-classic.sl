@@ -120,7 +120,7 @@ void Marching(byte* argument)
 
 // ------------------------------------------------------------ reader/writer
 
-static readonly RwLock<long> Shared = new RwLock<long>(100);
+static readonly ReaderWriterLock<long> Shared = new ReaderWriterLock<long>(100);
 static readonly AtomicLong ReadSum = new AtomicLong(0);
 
 void ReadIt(byte* argument)

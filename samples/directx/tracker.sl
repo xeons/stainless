@@ -44,7 +44,7 @@ import Standard.Math;
 public enum ModuleError
 {
     /// The file could not be read.
-    Io,
+    IO,
 
     /// It does not start with `Extended Module: `, so it is not an XM at all.
     NotAModule,
@@ -213,7 +213,7 @@ public Result<Module, ModuleError> LoadModule(String path)
 {
     var read = File.ReadAllBytes(path);
     if (!read.Ok)
-        return Fail(ModuleError.Io);
+        return Fail(ModuleError.IO);
     return DecodeModule(read.Value);
 }
 

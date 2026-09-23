@@ -19,7 +19,7 @@ int Main()
 {
     bool ok = true;
 
-    ok = Check(ok, "an imaging library is here", Imaging.Available);
+    ok = Check(ok, "an imaging library is here", Imaging.IsAvailable);
     ok = Check(ok, "and it has a name", !Imaging.BackendName.IsEmpty);
 
     // ---- making one.
@@ -310,7 +310,7 @@ bool Palettes(bool ok)
 
 byte[] Bytes(String hex)
 {
-    var decoded = Convert.FromHex(hex);
+    var decoded = Convert.FromHexString(hex);
     return decoded.Ok ? decoded.Value : new byte[0u];
 }
 

@@ -61,12 +61,12 @@ int Main()
     ShowDouble("tiny", Convert.ToDouble("1e-999"));
     ShowDouble("largest", Convert.ToDouble("1.7976931348623157e308"));
 
-    ShowBytes("b64-padded", Convert.FromBase64("QQ=="));
-    ShowBytes("b64-unpadded", Convert.FromBase64("QQ"));
-    ShowBytes("b64-wrapped-padding", Convert.FromBase64("QUI=\n"));
-    ShowBytes("b64-middle", Convert.FromBase64("QQ==QQ=="));
-    ShowBytes("b64-middle-one", Convert.FromBase64("QUI=QQ"));
-    ShowBytes("b64-short-padding", Convert.FromBase64("QQ="));
-    ShowBytes("b64-long-padding", Convert.FromBase64("QUJD===="));
+    ShowBytes("b64-padded", Convert.FromBase64String("QQ=="));
+    ShowBytes("b64-unpadded", Convert.FromBase64String("QQ"));
+    ShowBytes("b64-wrapped-padding", Convert.FromBase64String("QUI=\n"));
+    ShowBytes("b64-middle", Convert.FromBase64String("QQ==QQ=="));
+    ShowBytes("b64-middle-one", Convert.FromBase64String("QUI=QQ"));
+    ShowBytes("b64-short-padding", Convert.FromBase64String("QQ="));
+    ShowBytes("b64-long-padding", Convert.FromBase64String("QUJD===="));
     return 0;
 }

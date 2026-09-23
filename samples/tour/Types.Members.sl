@@ -241,7 +241,7 @@ public nuint ComputeDigest<T>(T[:] items) where T : IHashable, IEquatable<T>
 {
     nuint total = 0u;
     foreach (var item in items)
-        total = total + item.HashCode();
+        total = total + item.GetHashCode();
     return total;
 }
 

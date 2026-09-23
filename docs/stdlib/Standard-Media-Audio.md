@@ -66,7 +66,7 @@ conversion on the way in would cost a copy of every sound a program loads,
 and the platform wants bytes at the end of it anyway. `GetSample` and
 `SetSample` are there for a program that does want to look.
 
-<sub>[stdlib/Audio.sl:192](../../stdlib/Audio.sl#L192)</sub>
+<sub>[stdlib/Media/Audio/AudioClip.sl:38](../../stdlib/Media/Audio/AudioClip.sl#L38)</sub>
 
 #### CreateSilence *method*
 
@@ -81,7 +81,7 @@ ones, so this fills with 128 there -- which is what silence is in an
 unsigned format, and the kind of detail that otherwise shows up as a
 click.
 
-<sub>[stdlib/Audio.sl:212](../../stdlib/Audio.sl#L212)</sub>
+<sub>[stdlib/Media/Audio/AudioClip.sl:58](../../stdlib/Media/Audio/AudioClip.sl#L58)</sub>
 
 #### Format *property*
 
@@ -91,7 +91,7 @@ AudioFormat Format { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Audio.sl:224](../../stdlib/Audio.sl#L224)</sub>
+<sub>[stdlib/Media/Audio/AudioClip.sl:70](../../stdlib/Media/Audio/AudioClip.sl#L70)</sub>
 
 #### Samples *property*
 
@@ -101,7 +101,7 @@ byte[] Samples { get; }
 
 The bytes. Not a copy.
 
-<sub>[stdlib/Audio.sl:227](../../stdlib/Audio.sl#L227)</sub>
+<sub>[stdlib/Media/Audio/AudioClip.sl:73](../../stdlib/Media/Audio/AudioClip.sl#L73)</sub>
 
 #### FrameCount *property*
 
@@ -115,7 +115,7 @@ Written out rather than as a ternary: `nuint` is four bytes on a 32-bit
 target and eight on a 64-bit one, and the arms of a ternary over an
 unsuffixed literal and a `nuint` meet at a type that is neither.
 
-<sub>[stdlib/Audio.sl:234](../../stdlib/Audio.sl#L234)</sub>
+<sub>[stdlib/Media/Audio/AudioClip.sl:80](../../stdlib/Media/Audio/AudioClip.sl#L80)</sub>
 
 #### Duration *property*
 
@@ -125,7 +125,7 @@ double Duration { get; }
 
 How long it lasts, in seconds.
 
-<sub>[stdlib/Audio.sl:245](../../stdlib/Audio.sl#L245)</sub>
+<sub>[stdlib/Media/Audio/AudioClip.sl:91](../../stdlib/Media/Audio/AudioClip.sl#L91)</sub>
 
 #### GetSample *method*
 
@@ -148,7 +148,7 @@ end at the end, and that is not a mistake in it.
 
 **See also** &nbsp; [AudioClip.SetSample](#setsample-method)
 
-<sub>[stdlib/Audio.sl:260](../../stdlib/Audio.sl#L260)</sub>
+<sub>[stdlib/Media/Audio/AudioClip.sl:106](../../stdlib/Media/Audio/AudioClip.sl#L106)</sub>
 
 #### SetSample *method*
 
@@ -168,7 +168,7 @@ set and the bits below them cleared. Out of range does nothing.
 
 **See also** &nbsp; [AudioClip.GetSample](#getsample-method)
 
-<sub>[stdlib/Audio.sl:289](../../stdlib/Audio.sl#L289)</sub>
+<sub>[stdlib/Media/Audio/AudioClip.sl:135](../../stdlib/Media/Audio/AudioClip.sl#L135)</sub>
 
 ### AudioError *enum*
 
@@ -178,7 +178,7 @@ enum AudioError
 
 Why a sound did not happen.
 
-<sub>[stdlib/Audio.sl:157](../../stdlib/Audio.sl#L157)</sub>
+<sub>[stdlib/Media/Audio/AudioError.sl:30](../../stdlib/Media/Audio/AudioError.sl#L30)</sub>
 
 #### NoBackend *case*
 
@@ -189,7 +189,7 @@ NoBackend
 There is no audio library on this machine: no winmm, or no
 libasound. `Audio.IsAvailable` is how to ask before trying.
 
-<sub>[stdlib/Audio.sl:161](../../stdlib/Audio.sl#L161)</sub>
+<sub>[stdlib/Media/Audio/AudioError.sl:34](../../stdlib/Media/Audio/AudioError.sl#L34)</sub>
 
 #### Format *case*
 
@@ -200,7 +200,7 @@ Format
 The format is not one this module handles, or not one the device
 would take.
 
-<sub>[stdlib/Audio.sl:165](../../stdlib/Audio.sl#L165)</sub>
+<sub>[stdlib/Media/Audio/AudioError.sl:38](../../stdlib/Media/Audio/AudioError.sl#L38)</sub>
 
 #### Device *case*
 
@@ -210,7 +210,7 @@ Device
 
 There is no sound device, or the one there is refused to open.
 
-<sub>[stdlib/Audio.sl:168](../../stdlib/Audio.sl#L168)</sub>
+<sub>[stdlib/Media/Audio/AudioError.sl:41](../../stdlib/Media/Audio/AudioError.sl#L41)</sub>
 
 #### Busy *case*
 
@@ -220,7 +220,7 @@ Busy
 
 Something else has the device and will not share it.
 
-<sub>[stdlib/Audio.sl:171](../../stdlib/Audio.sl#L171)</sub>
+<sub>[stdlib/Media/Audio/AudioError.sl:44](../../stdlib/Media/Audio/AudioError.sl#L44)</sub>
 
 #### Closed *case*
 
@@ -230,7 +230,7 @@ Closed
 
 The player or recorder has been closed.
 
-<sub>[stdlib/Audio.sl:174](../../stdlib/Audio.sl#L174)</sub>
+<sub>[stdlib/Media/Audio/AudioError.sl:47](../../stdlib/Media/Audio/AudioError.sl#L47)</sub>
 
 #### Malformed *case*
 
@@ -240,17 +240,17 @@ Malformed
 
 The file was not a WAV, or was one this module does not read.
 
-<sub>[stdlib/Audio.sl:177](../../stdlib/Audio.sl#L177)</sub>
+<sub>[stdlib/Media/Audio/AudioError.sl:50](../../stdlib/Media/Audio/AudioError.sl#L50)</sub>
 
-#### Io *case*
+#### IO *case*
 
 ```
-Io
+IO
 ```
 
 The file could not be read or written; `Standard.IO` has the detail.
 
-<sub>[stdlib/Audio.sl:180](../../stdlib/Audio.sl#L180)</sub>
+<sub>[stdlib/Media/Audio/AudioError.sl:53](../../stdlib/Media/Audio/AudioError.sl#L53)</sub>
 
 ### AudioFormat *struct*
 
@@ -267,7 +267,7 @@ sound card accepts is not knowable from the numbers alone.
 
 **See also** &nbsp; [AudioPlayer.Open](#open-method)
 
-<sub>[stdlib/Audio.sl:95](../../stdlib/Audio.sl#L95)</sub>
+<sub>[stdlib/Media/Audio/AudioFormat.sl:39](../../stdlib/Media/Audio/AudioFormat.sl#L39)</sub>
 
 #### SampleRate *field*
 
@@ -278,7 +278,7 @@ uint SampleRate
 Frames per second. 44100 is a CD, 48000 is what most hardware runs at
 natively, 8000 is a telephone.
 
-<sub>[stdlib/Audio.sl:99](../../stdlib/Audio.sl#L99)</sub>
+<sub>[stdlib/Media/Audio/AudioFormat.sl:43](../../stdlib/Media/Audio/AudioFormat.sl#L43)</sub>
 
 #### Channels *field*
 
@@ -290,7 +290,7 @@ ushort Channels
 defined for those two and the channel-order conventions past them are
 not the same on both platforms.
 
-<sub>[stdlib/Audio.sl:104](../../stdlib/Audio.sl#L104)</sub>
+<sub>[stdlib/Media/Audio/AudioFormat.sl:48](../../stdlib/Media/Audio/AudioFormat.sl#L48)</sub>
 
 #### BitsPerSample *field*
 
@@ -302,7 +302,7 @@ ushort BitsPerSample
 sixteen-bit ones are signed and centred on zero -- which is WAV's rule
 and both platforms', however strange it reads.
 
-<sub>[stdlib/Audio.sl:109](../../stdlib/Audio.sl#L109)</sub>
+<sub>[stdlib/Media/Audio/AudioFormat.sl:53](../../stdlib/Media/Audio/AudioFormat.sl#L53)</sub>
 
 #### Create *method*
 
@@ -318,7 +318,7 @@ A format written out.
 - `channels` — 1 for mono, 2 for stereo, and nothing else
 - `bits` — 8 or 16, the width of one sample
 
-<sub>[stdlib/Audio.sl:117](../../stdlib/Audio.sl#L117)</sub>
+<sub>[stdlib/Media/Audio/AudioFormat.sl:61](../../stdlib/Media/Audio/AudioFormat.sl#L61)</sub>
 
 #### Cd *property*
 
@@ -329,7 +329,7 @@ static AudioFormat Cd { get; }
 44.1 kHz, sixteen bits, stereo: what a CD is and what a WAV file
 usually holds.
 
-<sub>[stdlib/Audio.sl:128](../../stdlib/Audio.sl#L128)</sub>
+<sub>[stdlib/Media/Audio/AudioFormat.sl:72](../../stdlib/Media/Audio/AudioFormat.sl#L72)</sub>
 
 #### Studio *property*
 
@@ -340,7 +340,7 @@ static AudioFormat Studio { get; }
 48 kHz, sixteen bits, stereo: what most sound hardware runs at without
 resampling, and what to prefer when nothing else decides.
 
-<sub>[stdlib/Audio.sl:132](../../stdlib/Audio.sl#L132)</sub>
+<sub>[stdlib/Media/Audio/AudioFormat.sl:76](../../stdlib/Media/Audio/AudioFormat.sl#L76)</sub>
 
 #### Voice *property*
 
@@ -351,7 +351,7 @@ static AudioFormat Voice { get; }
 16 kHz, sixteen bits, mono: enough for speech and a quarter of the
 bytes.
 
-<sub>[stdlib/Audio.sl:136](../../stdlib/Audio.sl#L136)</sub>
+<sub>[stdlib/Media/Audio/AudioFormat.sl:80](../../stdlib/Media/Audio/AudioFormat.sl#L80)</sub>
 
 #### BytesPerFrame *property*
 
@@ -363,7 +363,7 @@ How many bytes one frame takes -- one sample on every channel. This is
 the unit everything below counts in, because a buffer cut in the middle
 of a frame swaps the channels for the rest of the stream.
 
-<sub>[stdlib/Audio.sl:141](../../stdlib/Audio.sl#L141)</sub>
+<sub>[stdlib/Media/Audio/AudioFormat.sl:85](../../stdlib/Media/Audio/AudioFormat.sl#L85)</sub>
 
 #### BytesPerSecond *property*
 
@@ -373,7 +373,7 @@ nuint BytesPerSecond { get; }
 
 How many bytes a second of this takes.
 
-<sub>[stdlib/Audio.sl:144](../../stdlib/Audio.sl#L144)</sub>
+<sub>[stdlib/Media/Audio/AudioFormat.sl:88](../../stdlib/Media/Audio/AudioFormat.sl#L88)</sub>
 
 #### IsSupported *property*
 
@@ -383,7 +383,7 @@ bool IsSupported { get; }
 
 Whether this is a shape both backends can be asked for at all.
 
-<sub>[stdlib/Audio.sl:147](../../stdlib/Audio.sl#L147)</sub>
+<sub>[stdlib/Media/Audio/AudioFormat.sl:91](../../stdlib/Media/Audio/AudioFormat.sl#L91)</sub>
 
 #### Equals *method*
 
@@ -393,7 +393,7 @@ bool Equals(AudioFormat other)
 
 *No documentation.*
 
-<sub>[stdlib/Audio.sl:151](../../stdlib/Audio.sl#L151)</sub>
+<sub>[stdlib/Media/Audio/AudioFormat.sl:95](../../stdlib/Media/Audio/AudioFormat.sl#L95)</sub>
 
 ### AudioPlayer *class*
 
@@ -425,7 +425,7 @@ Calling `Write` from another thread reaches an in-process object and works
 in practice; it is outside what this module promises, and a player per
 thread is the arrangement to prefer.
 
-<sub>[stdlib/Audio.sl:1226](../../stdlib/Audio.sl#L1226)</sub>
+<sub>[stdlib/Media/Audio/AudioPlayer.sl:54](../../stdlib/Media/Audio/AudioPlayer.sl#L54)</sub>
 
 #### Open *method*
 
@@ -448,7 +448,7 @@ to the last one is to resample rather than to give up.
 - [AudioError.Device](#device-case) — there is nothing to play through, or the stream would not open
 - [AudioError.Busy](#busy-case) — something else has the device in exclusive mode
 
-<sub>[stdlib/Audio.sl:1301](../../stdlib/Audio.sl#L1301)</sub>
+<sub>[stdlib/Media/Audio/AudioPlayer.sl:129](../../stdlib/Media/Audio/AudioPlayer.sl#L129)</sub>
 
 #### Format *property*
 
@@ -458,7 +458,7 @@ AudioFormat Format { get; }
 
 The format this was opened for.
 
-<sub>[stdlib/Audio.sl:1338](../../stdlib/Audio.sl#L1338)</sub>
+<sub>[stdlib/Media/Audio/AudioPlayer.sl:166](../../stdlib/Media/Audio/AudioPlayer.sl#L166)</sub>
 
 #### IsOpen *property*
 
@@ -468,7 +468,7 @@ bool IsOpen { get; }
 
 Whether the device is still open.
 
-<sub>[stdlib/Audio.sl:1341](../../stdlib/Audio.sl#L1341)</sub>
+<sub>[stdlib/Media/Audio/AudioPlayer.sl:169](../../stdlib/Media/Audio/AudioPlayer.sl#L169)</sub>
 
 #### Write *method*
 
@@ -491,7 +491,7 @@ truncating swaps the channels for the rest of the stream.
 
 **See also** &nbsp; [AudioPlayer.DrainBuffer](#drainbuffer-method)
 
-<sub>[stdlib/Audio.sl:1355](../../stdlib/Audio.sl#L1355)</sub>
+<sub>[stdlib/Media/Audio/AudioPlayer.sl:183](../../stdlib/Media/Audio/AudioPlayer.sl#L183)</sub>
 
 #### DrainBuffer *method*
 
@@ -501,7 +501,7 @@ void DrainBuffer()
 
 Waits until everything written has been played.
 
-<sub>[stdlib/Audio.sl:1459](../../stdlib/Audio.sl#L1459)</sub>
+<sub>[stdlib/Media/Audio/AudioPlayer.sl:287](../../stdlib/Media/Audio/AudioPlayer.sl#L287)</sub>
 
 #### Stop *method*
 
@@ -511,7 +511,7 @@ void Stop()
 
 Stops at once, dropping whatever has not been played.
 
-<sub>[stdlib/Audio.sl:1493](../../stdlib/Audio.sl#L1493)</sub>
+<sub>[stdlib/Media/Audio/AudioPlayer.sl:321](../../stdlib/Media/Audio/AudioPlayer.sl#L321)</sub>
 
 #### Close *method*
 
@@ -521,7 +521,7 @@ void Close()
 
 Releases the device. Idempotent, and the destructor calls it.
 
-<sub>[stdlib/Audio.sl:1520](../../stdlib/Audio.sl#L1520)</sub>
+<sub>[stdlib/Media/Audio/AudioPlayer.sl:348](../../stdlib/Media/Audio/AudioPlayer.sl#L348)</sub>
 
 ### AudioRecorder *class*
 
@@ -554,7 +554,7 @@ route this through a portal; a program that opens an input without saying
 so is doing something its user did not ask for, and no library can fix that
 from underneath.
 
-<sub>[stdlib/Audio.sl:1580](../../stdlib/Audio.sl#L1580)</sub>
+<sub>[stdlib/Media/Audio/AudioRecorder.sl:55](../../stdlib/Media/Audio/AudioRecorder.sl#L55)</sub>
 
 #### Open *method*
 
@@ -573,7 +573,7 @@ A device open for this format. Fails as `AudioPlayer.Open` does.
 
 **See also** &nbsp; [AudioPlayer.Open](#open-method)
 
-<sub>[stdlib/Audio.sl:1653](../../stdlib/Audio.sl#L1653)</sub>
+<sub>[stdlib/Media/Audio/AudioRecorder.sl:128](../../stdlib/Media/Audio/AudioRecorder.sl#L128)</sub>
 
 #### Format *property*
 
@@ -583,7 +583,7 @@ AudioFormat Format { get; }
 
 The format this was opened for.
 
-<sub>[stdlib/Audio.sl:1690](../../stdlib/Audio.sl#L1690)</sub>
+<sub>[stdlib/Media/Audio/AudioRecorder.sl:165](../../stdlib/Media/Audio/AudioRecorder.sl#L165)</sub>
 
 #### IsOpen *property*
 
@@ -593,7 +593,7 @@ bool IsOpen { get; }
 
 Whether the device is still open.
 
-<sub>[stdlib/Audio.sl:1693](../../stdlib/Audio.sl#L1693)</sub>
+<sub>[stdlib/Media/Audio/AudioRecorder.sl:168](../../stdlib/Media/Audio/AudioRecorder.sl#L168)</sub>
 
 #### IsRecording *property*
 
@@ -603,7 +603,7 @@ bool IsRecording { get; }
 
 Whether it is listening now.
 
-<sub>[stdlib/Audio.sl:1696](../../stdlib/Audio.sl#L1696)</sub>
+<sub>[stdlib/Media/Audio/AudioRecorder.sl:171](../../stdlib/Media/Audio/AudioRecorder.sl#L171)</sub>
 
 #### Start *method*
 
@@ -621,7 +621,7 @@ buffered, up to about a fifth of a second of it, and dropped after that.
 
 **See also** &nbsp; [AudioRecorder.Read](#read-method)
 
-<sub>[stdlib/Audio.sl:1704](../../stdlib/Audio.sl#L1704)</sub>
+<sub>[stdlib/Media/Audio/AudioRecorder.sl:179](../../stdlib/Media/Audio/AudioRecorder.sl#L179)</sub>
 
 #### Read *method*
 
@@ -635,7 +635,7 @@ Blocks until there is something. Zero means the recorder was stopped or
 closed while this was waiting, which is how a loop in another thread
 ends. The count is always a whole number of frames.
 
-<sub>[stdlib/Audio.sl:1741](../../stdlib/Audio.sl#L1741)</sub>
+<sub>[stdlib/Media/Audio/AudioRecorder.sl:216](../../stdlib/Media/Audio/AudioRecorder.sl#L216)</sub>
 
 #### Stop *method*
 
@@ -645,7 +645,7 @@ void Stop()
 
 Stops listening. The device stays open, so `Start` may be called again.
 
-<sub>[stdlib/Audio.sl:1820](../../stdlib/Audio.sl#L1820)</sub>
+<sub>[stdlib/Media/Audio/AudioRecorder.sl:295](../../stdlib/Media/Audio/AudioRecorder.sl#L295)</sub>
 
 #### Close *method*
 
@@ -655,7 +655,7 @@ void Close()
 
 Releases the device. Idempotent, and the destructor calls it.
 
-<sub>[stdlib/Audio.sl:1848](../../stdlib/Audio.sl#L1848)</sub>
+<sub>[stdlib/Media/Audio/AudioRecorder.sl:323](../../stdlib/Media/Audio/AudioRecorder.sl#L323)</sub>
 
 ### Tone *class*
 
@@ -670,7 +670,7 @@ wants to know whether its audio works needs a sound to play, and writing
 one by hand in every such program is worse than three functions that are
 obviously correct.
 
-<sub>[stdlib/Audio.sl:1906](../../stdlib/Audio.sl#L1906)</sub>
+<sub>[stdlib/Media/Audio/Tone.sl:37](../../stdlib/Media/Audio/Tone.sl#L37)</sub>
 
 #### CreateSine *method*
 
@@ -681,7 +681,7 @@ static AudioClip CreateSine(AudioFormat format, double frequency, double seconds
 A sine wave: `frequency` hertz for `seconds`, at `amplitude` from 0.0
 to 1.0. On every channel.
 
-<sub>[stdlib/Audio.sl:1910](../../stdlib/Audio.sl#L1910)</sub>
+<sub>[stdlib/Media/Audio/Tone.sl:41](../../stdlib/Media/Audio/Tone.sl#L41)</sub>
 
 #### CreateSquare *method*
 
@@ -701,7 +701,7 @@ what a beep traditionally is.
 
 **See also** &nbsp; [Tone.CreateSine](#createsine-method)
 
-<sub>[stdlib/Audio.sl:1934](../../stdlib/Audio.sl#L1934)</sub>
+<sub>[stdlib/Media/Audio/Tone.sl:65](../../stdlib/Media/Audio/Tone.sl#L65)</sub>
 
 #### CreateRest *method*
 
@@ -712,7 +712,7 @@ static AudioClip CreateRest(AudioFormat format, double seconds)
 Silence, which is the third thing a test needs: a gap between two
 tones, and something to compare against.
 
-<sub>[stdlib/Audio.sl:1954](../../stdlib/Audio.sl#L1954)</sub>
+<sub>[stdlib/Media/Audio/Tone.sl:85](../../stdlib/Media/Audio/Tone.sl#L85)</sub>
 
 ### Wav *class*
 
@@ -728,7 +728,7 @@ this reports `AudioError.Format` and says which tag it found. It does read
 `WAVE_FORMAT_EXTENSIBLE`, because that is what a modern recorder writes
 for ordinary PCM and refusing it would refuse half the files on a machine.
 
-<sub>[stdlib/Audio.sl:343](../../stdlib/Audio.sl#L343)</sub>
+<sub>[stdlib/Media/Audio/Wav.sl:38](../../stdlib/Media/Audio/Wav.sl#L38)</sub>
 
 #### Decode *method*
 
@@ -745,7 +745,7 @@ The bytes of a `.wav` file, read.
 
 **See also** &nbsp; [Wav.Encode](#encode-method)
 
-<sub>[stdlib/Audio.sl:353](../../stdlib/Audio.sl#L353)</sub>
+<sub>[stdlib/Media/Audio/Wav.sl:48](../../stdlib/Media/Audio/Wav.sl#L48)</sub>
 
 #### Encode *method*
 
@@ -758,7 +758,7 @@ samples, and the pad byte an odd length is followed by.
 
 **See also** &nbsp; [Wav.Decode](#decode-method)
 
-<sub>[stdlib/Audio.sl:425](../../stdlib/Audio.sl#L425)</sub>
+<sub>[stdlib/Media/Audio/Wav.sl:120](../../stdlib/Media/Audio/Wav.sl#L120)</sub>
 
 #### FromFile *method*
 
@@ -772,11 +772,11 @@ A `.wav` on disk, read.
 
 - [AudioError.Format](#format-case) — a WAVE that is not uncompressed PCM, or one shaped in a way this module does not handle
 - [AudioError.Malformed](#malformed-case) — not a RIFF/WAVE at all
-- [AudioError.Io](#io-case) — the file could not be read; the `IOError` behind it is not carried
+- [AudioError.IO](#io-case) — the file could not be read; the `IOError` behind it is not carried
 
 **See also** &nbsp; [Wav.Save](#save-method)
 
-<sub>[stdlib/Audio.sl:463](../../stdlib/Audio.sl#L463)</sub>
+<sub>[stdlib/Media/Audio/Wav.sl:158](../../stdlib/Media/Audio/Wav.sl#L158)</sub>
 
 #### Save *method*
 
@@ -788,11 +788,11 @@ A clip written to a `.wav` on disk.
 
 **Fails with**
 
-- [AudioError.Io](#io-case) — the file could not be written; the `IOError` behind it is not carried
+- [AudioError.IO](#io-case) — the file could not be written; the `IOError` behind it is not carried
 
 **See also** &nbsp; [Wav.FromFile](#fromfile-method)
 
-<sub>[stdlib/Audio.sl:476](../../stdlib/Audio.sl#L476)</sub>
+<sub>[stdlib/Media/Audio/Wav.sl:171](../../stdlib/Media/Audio/Wav.sl#L171)</sub>
 
 ## Functions
 
@@ -805,7 +805,7 @@ String BackendName()
 What is behind it, for a program that reports what it found. `""` when
 there is nothing.
 
-<sub>[stdlib/Audio.sl:1091](../../stdlib/Audio.sl#L1091)</sub>
+<sub>[stdlib/Media/Audio/Audio.sl:650](../../stdlib/Media/Audio/Audio.sl#L650)</sub>
 
 ### CanPlay *function*
 
@@ -816,7 +816,7 @@ bool CanPlay()
 Whether anything can play. False on a machine that has the library and no
 device, which is what a headless server is.
 
-<sub>[stdlib/Audio.sl:1076](../../stdlib/Audio.sl#L1076)</sub>
+<sub>[stdlib/Media/Audio/Audio.sl:635](../../stdlib/Media/Audio/Audio.sl#L635)</sub>
 
 ### CanRecord *function*
 
@@ -826,7 +826,7 @@ bool CanRecord()
 
 Whether anything can record.
 
-<sub>[stdlib/Audio.sl:1083](../../stdlib/Audio.sl#L1083)</sub>
+<sub>[stdlib/Media/Audio/Audio.sl:642](../../stdlib/Media/Audio/Audio.sl#L642)</sub>
 
 ### IsAvailable *function*
 
@@ -840,7 +840,7 @@ call is where the cost is.
 **Ask before trying.** A game wants to say "no audio device" at startup
 rather than in the middle of a level, and this is how it finds out.
 
-<sub>[stdlib/Audio.sl:1072](../../stdlib/Audio.sl#L1072)</sub>
+<sub>[stdlib/Media/Audio/Audio.sl:631](../../stdlib/Media/Audio/Audio.sl#L631)</sub>
 
 ### PlayClip *function*
 
@@ -864,7 +864,7 @@ tens of milliseconds and this does it every time.
 
 **See also** &nbsp; [AudioPlayer](#audioplayer-class)
 
-<sub>[stdlib/Audio.sl:1118](../../stdlib/Audio.sl#L1118)</sub>
+<sub>[stdlib/Media/Audio/Audio.sl:677](../../stdlib/Media/Audio/Audio.sl#L677)</sub>
 
 ### RecordClip *function*
 
@@ -886,5 +886,5 @@ sound as it arrives, wants an `AudioRecorder`.
 
 **See also** &nbsp; [AudioRecorder](#audiorecorder-class)
 
-<sub>[stdlib/Audio.sl:1150](../../stdlib/Audio.sl#L1150)</sub>
+<sub>[stdlib/Media/Audio/Audio.sl:709](../../stdlib/Media/Audio/Audio.sl#L709)</sub>
 

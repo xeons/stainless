@@ -15,11 +15,11 @@ import Standard.Path;
 
 String Scratch()
 {
-    var temp = Env.GetVariableOrDefault("TEMP", Env.GetVariableOrDefault("TMPDIR", "/tmp"));
+    var temp = Env.GetEnvironmentVariableOrDefault("TEMP", Env.GetEnvironmentVariableOrDefault("TMPDIR", "/tmp"));
     return Path.Join(temp, "stainless-files-directory-edges");
 }
 
-String Slash() => Path.Separator == '/' ? "/" : "\\";
+String Slash() => Path.DirectorySeparatorChar == '/' ? "/" : "\\";
 
 int Main()
 {

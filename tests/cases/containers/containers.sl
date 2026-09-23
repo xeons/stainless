@@ -15,8 +15,8 @@ public class Card : IEquatable<Card>, IHashable, IComparable<Card>
     public Card(int value) => _rank = value;
     public int Rank() => _rank;
 
-    public bool EqualTo(Card other) => _rank == other.Rank();
-    public nuint HashCode() => _rank.HashCode();
+    public bool Equals(Card other) => _rank == other.Rank();
+    public nuint GetHashCode() => _rank.GetHashCode();
     public int CompareTo(Card other) => _rank.CompareTo(other.Rank());
 }
 

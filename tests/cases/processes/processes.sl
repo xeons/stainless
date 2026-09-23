@@ -46,7 +46,7 @@ void Show(String label, String program, String[] arguments)
     var done = answer.Value;
     Console.WriteLine(
         $"{label} code={done.ExitCode} ok={done.Succeeded} " +
-        $"out=[{done.Output.Trim()}] err=[{done.Errors.Trim()}]");
+        $"out=[{done.StandardOutput.Trim()}] err=[{done.StandardError.Trim()}]");
 }
 
 public int Main()
@@ -77,7 +77,7 @@ public int Main()
     var sorted = RunProcess(Shell(), [Flag(), "sort"], "gamma\nalpha\nbeta\n");
     if (sorted.Ok)
     {
-        var order = sorted.Value.Output.SplitLines();
+        var order = sorted.Value.StandardOutput.SplitLines();
         Console.WriteLine($"stdin    [{order[0u].Trim()} {order[1u].Trim()} {order[2u].Trim()}]");
     }
 
@@ -90,7 +90,7 @@ public int Main()
 #endif
     if (big.Ok)
 {
-        Console.WriteLine($"big      past a pipe: {big.Value.Output.ByteLength() > 100000u}");
+        Console.WriteLine($"big      past a pipe: {big.Value.StandardOutput.ByteLength() > 100000u}");
     }
 
     // Started without waiting, then waited for.
@@ -98,8 +98,8 @@ public int Main()
     if (started.Ok)
     {
         var child = started.Value;
-        Console.WriteLine($"started  named={child.Id > 0L} waited={child.Wait().GetValueOrDefault(-1)}");
-        Console.WriteLine($"again    {child.Wait().GetValueOrDefault(-1)}");
+        Console.WriteLine($"started  named={child.Id > 0L} waited={child.WaitForExit().GetValueOrDefault(-1)}");
+        Console.WriteLine($"again    {child.WaitForExit().GetValueOrDefault(-1)}");
     }
 
     // Started, seen to be running, and stopped.
@@ -107,9 +107,9 @@ public int Main()
     if (slow.Ok)
     {
         var child = slow.Value;
-        Console.WriteLine($"running  {child.Finished.IsEmpty}");
+        Console.WriteLine($"running  {child.TryGetExitCode().IsEmpty}");
         child.Kill();
-        Console.WriteLine($"stopped  {child.Wait().Ok}");
+        Console.WriteLine($"stopped  {child.WaitForExit().Ok}");
     }
 
     // ------------------------------------------------ read as it is written
@@ -128,7 +128,7 @@ public int Main()
             text.Append(child.TakeOutput());
             text.Append(child.TakeErrors());
         }
-        Console.WriteLine($"stream   [{text.ToText().Trim()}] code={child.Wait().GetValueOrDefault(-1)}");
+        Console.WriteLine($"stream   [{text.ToText().Trim()}] code={child.WaitForExit().GetValueOrDefault(-1)}");
     }
 
     // The two streams stay apart here too, which they would not if a caller

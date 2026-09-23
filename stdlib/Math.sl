@@ -71,7 +71,7 @@ public const double Tau = 6.28318530717958623200;
 public const double E = 2.71828182845904509080;
 
 /// The smallest step between 1.0 and the next representable double.
-public const double Epsilon = 2.220446049250313080847263336181640625e-16;
+public const double MachineEpsilon = 2.220446049250313080847263336181640625e-16;
 
 // ------------------------------------------------------ floating point
 
@@ -106,7 +106,7 @@ public double Log2(double x) => log2(x);
 /// The base-ten logarithm, with the same edges as `Log`.
 public double Log10(double x) => log10(x);
 
-/// The sine of `x` in radians. Use `ToRadians` on an angle in degrees; a very
+/// The sine of `x` in radians. Use `DegreesToRadians` on an angle in degrees; a very
 /// large `x` loses accuracy, since the reduction is done in the same double.
 public double Sin(double x) => sin(x);
 
@@ -209,7 +209,7 @@ public bool IsNaN(double x) => x != x;
 
 /// True for either infinity. A finite number minus itself is zero; an infinity
 /// minus itself is NaN, which is what separates the two.
-public bool IsInfinite(double x)
+public bool IsInfinity(double x)
 {
     if (IsNaN(x))
         return false;
@@ -218,7 +218,7 @@ public bool IsInfinite(double x)
 
 /// True for an ordinary number: neither NaN nor an infinity. The check to
 /// make on a value that came out of a division or a parse.
-public bool IsFinite(double x) => !IsNaN(x) && !IsInfinite(x);
+public bool IsFinite(double x) => !IsNaN(x) && !IsInfinity(x);
 
 /// True when the two are within `tolerance` of each other. Comparing floats
 /// with `==` is almost always a mistake, and this is what to write instead.
@@ -235,14 +235,14 @@ public double Lerp(double from, double to, double at)
 
 /// An angle in radians, as degrees.
 ///
-/// @see Math.ToRadians
-public double ToDegrees(double radians) => radians * 180.0 / Pi;
+/// @see Math.DegreesToRadians
+public double RadiansToDegrees(double radians) => radians * 180.0 / Pi;
 
 /// An angle in degrees, as radians. Every trigonometric function here takes
 /// radians, so this is what goes between a human's number and `Sin`.
 ///
-/// @see Math.ToDegrees
-public double ToRadians(double degrees) => degrees * Pi / 180.0;
+/// @see Math.RadiansToDegrees
+public double DegreesToRadians(double degrees) => degrees * Pi / 180.0;
 
 // ---------------------------------------------------------------- integers
 
@@ -373,81 +373,4 @@ public long LeastCommonMultiple(long a, long b)
     if (a == 0 || b == 0)
         return 0;
     return Abs(a / GreatestCommonDivisor(a, b) * b);
-}
-
-// -------------------------------------------------------------------- bits
-
-/// How many bits are set. Kernighan's loop: each step clears the lowest set
-/// bit, so it runs once per bit that is actually there.
-///
-/// @see Standard.Bits.PopCount
-public int PopCount(ulong value)
-{
-    int count = 0;
-    while (value != 0)
-    {
-        value = value & (value - 1);
-        count++;
-    }
-    return count;
-}
-
-/// How many zero bits sit above the highest set bit. 64 for zero.
-///
-/// @see Standard.Bits.LeadingZeroCount
-public int LeadingZeroCount(ulong value)
-{
-    if (value == 0)
-        return 64;
-
-    int count = 0;
-    while ((value & 0x8000000000000000) == 0)
-    {
-        value = value << 1;
-        count++;
-    }
-    return count;
-}
-
-/// How many zero bits sit below the lowest set bit. 64 for zero.
-///
-/// @see Standard.Bits.TrailingZeroCount
-public int TrailingZeroCount(ulong value)
-{
-    if (value == 0)
-        return 64;
-
-    int count = 0;
-    while ((value & 1) == 0)
-    {
-        value = value >> 1;
-        count++;
-    }
-    return count;
-}
-
-/// True when exactly one bit is set. Zero is not a power of two and answers
-/// false, which is the case a bare `value & (value - 1)` test gets wrong.
-///
-/// @see Standard.Bits.IsPowerOfTwo
-public bool IsPowerOfTwo(ulong value)
-{
-    return value != 0 && (value & (value - 1)) == 0;
-}
-
-/// The smallest power of two that is at least `value`. Zero and one both give
-/// one; a value above 2^63 has no answer and gives zero.
-///
-/// @see Standard.Bits.RoundUpToPowerOfTwo
-public ulong RoundUpToPowerOfTwo(ulong value)
-{
-    if (value <= 1)
-        return 1;
-    if (value > 0x8000000000000000)
-        return 0;
-
-    ulong result = 1;
-    while (result < value)
-        result = result << 1;
-    return result;
 }

@@ -24,18 +24,18 @@ int Main()
     Console.WriteLine(Resources.GetText(218u));
     Console.WriteLine($"absent '{Resources.GetText(999u)}'");
 
-    var payload = Resources.GetBytes(Resources.RcData, 301);
+    var payload = Resources.GetBytes(ResourceType.RcData, 301);
     Console.WriteLine($"payload {payload.Length} bytes, first {(char32)payload[0u]}");
 
     uint borrowed = 0u;
-    byte* at = Resources.GetPointer(Resources.RcData, 301, &borrowed);
+    byte* at = Resources.GetPointer(ResourceType.RcData, 301, &borrowed);
     Console.WriteLine($"in place {borrowed} bytes, pointer {at != null}");
 
     var greeting = Resources.GetBytes("TEXTBLOB", "GREETING");
     Console.WriteLine($"greeting {greeting.Length} bytes");
 
-    Console.WriteLine($"present {Resources.Exists(Resources.RcData, 301)}");
-    Console.WriteLine($"absent {Resources.Exists(Resources.RcData, 999)}");
-    Console.WriteLine($"size {Resources.GetSize(Resources.RcData, 301)}");
+    Console.WriteLine($"present {Resources.Exists(ResourceType.RcData, 301)}");
+    Console.WriteLine($"absent {Resources.Exists(ResourceType.RcData, 999)}");
+    Console.WriteLine($"size {Resources.GetSize(ResourceType.RcData, 301)}");
     return 0;
 }

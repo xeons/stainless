@@ -915,7 +915,7 @@ public sealed partial class Binder
     }
 
     /// <summary>
-    /// Binds <c>CompareTo</c>, <c>EqualTo</c> and <c>HashCode</c> on a type that
+    /// Binds <c>CompareTo</c>, <c>Equals</c> and <c>GetHashCode</c> on a type that
     /// implements them without saying so, or returns null when this is an
     /// ordinary call.
     ///
@@ -976,8 +976,8 @@ public sealed partial class Binder
         if (!HasIntrinsicMembers(type)) return null;
         if (type is NamedTypeSymbol named && named.FindMethod(member.Member) is not null) return null;
 
-        int wanted = member.Member == "HashCode" ? 0 : 1;
-        if (member.Member is not ("CompareTo" or "EqualTo" or "HashCode")) return null;
+        int wanted = member.Member == "GetHashCode" ? 0 : 1;
+        if (member.Member is not ("CompareTo" or "Equals" or "GetHashCode")) return null;
 
         if (arguments.Count != wanted)
         {
@@ -987,16 +987,16 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
-        if (member.Member == "HashCode")
+        if (member.Member == "GetHashCode")
             return new BoundCall(syntax.Span, HashFor(type), null, [Widen(receiver, HashFor(type))]);
 
         var other = BindConversion(arguments[0], type, syntax.Arguments[0].Span);
         if (other.Type.IsError()) return new BoundErrorExpression(syntax.Span);
 
-        // A float's EqualTo is CompareTo's equality rather than IEEE's, so NaN
+        // A float's Equals is CompareTo's equality rather than IEEE's, so NaN
         // equals NaN as HashDouble already assumes. With `==` a NaN key in a
         // Dictionary could never be found, and every Set added another.
-        if (member.Member == "EqualTo" && type is PrimitiveTypeSymbol { IsFloat: true })
+        if (member.Member == "Equals" && type is PrimitiveTypeSymbol { IsFloat: true })
         {
             var ordering = _builtins.CompareDouble;
             var compared = new BoundCall(
@@ -1008,7 +1008,7 @@ public sealed partial class Binder
 
         // Equality is the operator, which already knows how to compare a String
         // and how to compare an enum.
-        if (member.Member == "EqualTo")
+        if (member.Member == "Equals")
             return BindBinaryOperation(
                 syntax.Span, receiver, BoundBinaryOp.Equal, other, TokenKind.EqualsEquals);
 

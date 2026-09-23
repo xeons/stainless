@@ -445,14 +445,14 @@ public bool SaveLayout(DockLayout layout, String path)
 public String GetSettingsDirectory()
 {
 #if WINDOWS
-    String roaming = Env.GetVariableOrDefault("APPDATA", "");
+    String roaming = Env.GetEnvironmentVariableOrDefault("APPDATA", "");
     if (roaming != "")
         return Path.Join(Path.Join(roaming, "Stainless"), "ide");
 #else
-    String config = Env.GetVariableOrDefault("XDG_CONFIG_HOME", "");
+    String config = Env.GetEnvironmentVariableOrDefault("XDG_CONFIG_HOME", "");
     if (config == "")
     {
-        String home = Env.GetVariableOrDefault("HOME", "");
+        String home = Env.GetEnvironmentVariableOrDefault("HOME", "");
         if (home != "")
             config = Path.Join(home, ".config");
     }

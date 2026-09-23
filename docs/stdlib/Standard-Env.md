@@ -10,7 +10,7 @@ that goes looking. These are for the code that is nowhere near `Main`.
 
 ## Contents
 
-**Functions** &nbsp; [ArgumentCount](#argumentcount-function) &middot; [CurrentDirectory](#currentdirectory-function) &middot; [GetArgument](#getargument-function) &middot; [GetArguments](#getarguments-function) &middot; [GetVariable](#getvariable-function) &middot; [GetVariableNames](#getvariablenames-function) &middot; [GetVariableOrDefault](#getvariableordefault-function) &middot; [HasVariable](#hasvariable-function) &middot; [ProgramPath](#programpath-function) &middot; [RemoveVariable](#removevariable-function) &middot; [SetCurrentDirectory](#setcurrentdirectory-function) &middot; [SetVariable](#setvariable-function)
+**Functions** &nbsp; [ArgumentCount](#argumentcount-function) &middot; [CurrentDirectory](#currentdirectory-function) &middot; [GetArgument](#getargument-function) &middot; [GetArguments](#getarguments-function) &middot; [GetEnvironmentVariable](#getenvironmentvariable-function) &middot; [GetEnvironmentVariableNames](#getenvironmentvariablenames-function) &middot; [GetEnvironmentVariableOrDefault](#getenvironmentvariableordefault-function) &middot; [GetProcessPath](#getprocesspath-function) &middot; [HasEnvironmentVariable](#hasenvironmentvariable-function) &middot; [RemoveEnvironmentVariable](#removeenvironmentvariable-function) &middot; [SetCurrentDirectory](#setcurrentdirectory-function) &middot; [SetEnvironmentVariable](#setenvironmentvariable-function)
 
 ## Functions
 
@@ -34,7 +34,7 @@ The directory relative paths are resolved against.
 
 **See also** &nbsp; [Env.SetCurrentDirectory](#setcurrentdirectory-function)
 
-<sub>[stdlib/Env.sl:296](../../stdlib/Env.sl#L296)</sub>
+<sub>[stdlib/Env.sl:298](../../stdlib/Env.sl#L298)</sub>
 
 ### GetArgument *function*
 
@@ -56,26 +56,27 @@ Every argument, as an array. The same thing `Main(String[] args)` receives.
 
 <sub>[stdlib/Env.sl:97](../../stdlib/Env.sl#L97)</sub>
 
-### GetVariable *function*
+### GetEnvironmentVariable *function*
 
 ```
-String? GetVariable(String name)
+String? GetEnvironmentVariable(String name)
 ```
 
 A variable's value, or null when it is not set.
 
 Null rather than empty, because "not set" and "set to nothing" are
-different states and both platforms can tell them apart. `GetVariableOrDefault` is what
+different states and both platforms can tell them apart.
+`GetEnvironmentVariableOrDefault` is what
 most callers want.
 
-**See also** &nbsp; [Env.GetVariableOrDefault](#getvariableordefault-function)
+**See also** &nbsp; [Env.GetEnvironmentVariableOrDefault](#getenvironmentvariableordefault-function)
 
-<sub>[stdlib/Env.sl:121](../../stdlib/Env.sl#L121)</sub>
+<sub>[stdlib/Env.sl:122](../../stdlib/Env.sl#L122)</sub>
 
-### GetVariableNames *function*
+### GetEnvironmentVariableNames *function*
 
 ```
-String[] GetVariableNames()
+String[] GetEnvironmentVariableNames()
 ```
 
 The name of every variable, in whatever order the platform keeps them.
@@ -84,12 +85,12 @@ The block is one run of NUL-terminated wide strings ending in an empty one.
 A name beginning with `=` is Windows' per-drive working directory (`=C:`),
 which is not a variable anybody set.
 
-<sub>[stdlib/Env.sl:218](../../stdlib/Env.sl#L218)</sub>
+<sub>[stdlib/Env.sl:220](../../stdlib/Env.sl#L220)</sub>
 
-### GetVariableOrDefault *function*
+### GetEnvironmentVariableOrDefault *function*
 
 ```
-String GetVariableOrDefault(String name, String fallback)
+String GetEnvironmentVariableOrDefault(String name, String fallback)
 ```
 
 A variable's value, or `fallback` when it is not set.
@@ -99,24 +100,14 @@ A variable's value, or `fallback` when it is not set.
 - `name` — the variable to read
 - `fallback` — what to answer when there is no such variable
 
-**See also** &nbsp; [Env.GetVariable](#getvariable-function)
+**See also** &nbsp; [Env.GetEnvironmentVariable](#getenvironmentvariable-function)
 
-<sub>[stdlib/Env.sl:164](../../stdlib/Env.sl#L164)</sub>
+<sub>[stdlib/Env.sl:165](../../stdlib/Env.sl#L165)</sub>
 
-### HasVariable *function*
-
-```
-bool HasVariable(String name)
-```
-
-Whether a variable is set, whatever it is set to.
-
-<sub>[stdlib/Env.sl:173](../../stdlib/Env.sl#L173)</sub>
-
-### ProgramPath *function*
+### GetProcessPath *function*
 
 ```
-String ProgramPath()
+String GetProcessPath()
 ```
 
 The program's own path, as the operating system gave it. That is not
@@ -125,18 +116,28 @@ Linux nothing guarantees any relationship at all.
 
 <sub>[stdlib/Env.sl:109](../../stdlib/Env.sl#L109)</sub>
 
-### RemoveVariable *function*
+### HasEnvironmentVariable *function*
 
 ```
-bool RemoveVariable(String name)
+bool HasEnvironmentVariable(String name)
+```
+
+Whether a variable is set, whatever it is set to.
+
+<sub>[stdlib/Env.sl:174](../../stdlib/Env.sl#L174)</sub>
+
+### RemoveEnvironmentVariable *function*
+
+```
+bool RemoveEnvironmentVariable(String name)
 ```
 
 Removes a variable, reporting whether the platform accepted it. Removing
 one that was never set is not a failure.
 
-**See also** &nbsp; [Env.SetVariable](#setvariable-function)
+**See also** &nbsp; [Env.SetEnvironmentVariable](#setenvironmentvariable-function)
 
-<sub>[stdlib/Env.sl:193](../../stdlib/Env.sl#L193)</sub>
+<sub>[stdlib/Env.sl:195](../../stdlib/Env.sl#L195)</sub>
 
 ### SetCurrentDirectory *function*
 
@@ -149,12 +150,12 @@ path is not a directory, or is not reachable.
 
 **See also** &nbsp; [Env.CurrentDirectory](#currentdirectory-function)
 
-<sub>[stdlib/Env.sl:316](../../stdlib/Env.sl#L316)</sub>
+<sub>[stdlib/Env.sl:318](../../stdlib/Env.sl#L318)</sub>
 
-### SetVariable *function*
+### SetEnvironmentVariable *function*
 
 ```
-bool SetVariable(String name, String value)
+bool SetEnvironmentVariable(String name, String value)
 ```
 
 Sets a variable for this process and anything it starts afterwards.
@@ -164,14 +165,14 @@ environment is its own, and a child gets a copy. Reports whether the
 platform accepted it.
 
 An empty value leaves the variable set and empty, on both platforms, and
-`GetVariable` answers with the empty string rather than null.
+`GetEnvironmentVariable` answers with the empty string rather than null.
 
 **Parameters**
 
 - `name` — the variable to set
 - `value` — what to set it to
 
-**See also** &nbsp; [Env.RemoveVariable](#removevariable-function)
+**See also** &nbsp; [Env.RemoveEnvironmentVariable](#removeenvironmentvariable-function)
 
-<sub>[stdlib/Env.sl:187](../../stdlib/Env.sl#L187)</sub>
+<sub>[stdlib/Env.sl:188](../../stdlib/Env.sl#L188)</sub>
 

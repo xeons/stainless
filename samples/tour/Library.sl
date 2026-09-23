@@ -301,18 +301,18 @@ void ShowLibrary()
     //
     // A monotonic clock only goes forward, which is the one thing about it a
     // test may assert without printing a time that changes every run.
-    var clock = new Clock();
+    var clock = new Stopwatch();
     long spun = 0;
     for (int i = 0; i < 100000; i++)
         spun += i;
     var taken = clock.Elapsed;
     PrintValue("monotonic", taken.Nanoseconds >= 0);
-    PrintValue("a duration", Duration.FromSeconds(90).TotalMinutes);
+    PrintValue("a duration", (long)TimeSpan.FromSeconds(90).TotalMinutes);
 
     // ------------------------------------------------------------ the world
-    PrintValue("has PATH", Env.HasVariable("PATH") || Env.HasVariable("Path"));
+    PrintValue("has PATH", Env.HasEnvironmentVariable("PATH") || Env.HasEnvironmentVariable("Path"));
     PrintValue("set and read",
-        Env.SetVariable("STAINLESS_TOUR", "yes") ? Env.GetVariableOrDefault("STAINLESS_TOUR", "-") : "-");
+        Env.SetEnvironmentVariable("STAINLESS_TOUR", "yes") ? Env.GetEnvironmentVariableOrDefault("STAINLESS_TOUR", "-") : "-");
 
     // ------------------------------------------------------------ files
     //
@@ -342,8 +342,8 @@ void ShowLibrary()
     if (document.Ok)
     {
         var members = GetMembers(document.Value);
-        PrintValue("JSON", GetTextOrDefault(members.Find("name"), "-"));
-        PrintValue("JSON number", GetIntegerOrDefault(members.Find("count"), -1));
+        PrintValue("JSON", GetTextOrDefault(members.GetValueOrNull("name"), "-"));
+        PrintValue("JSON number", GetIntegerOrDefault(members.GetValueOrNull("count"), -1));
         PrintValue("JSON round trip", Json.ToJsonText(document.Value));
     }
 
@@ -351,11 +351,11 @@ void ShowLibrary()
     if (parsed.Ok)
     {
         PrintValue("XML", parsed.Value.Name);
-        PrintValue("XML attribute", parsed.Value.Attributes.Find("kind", "-"));
+        PrintValue("XML attribute", parsed.Value.Attributes.GetValueOrDefault("kind", "-"));
     }
 
     // ------------------------------------------------------------ text, again
-    PrintValue("base64", Convert.ToBase64Text("stainless"));
+    PrintValue("base64", Convert.ToBase64String("stainless"));
     PrintValue("hex of 48879", Convert.FromLong(48879, 16u));
 }
 

@@ -467,7 +467,7 @@ Two obligations the C ABI imposes, neither yet met:
   ABI, since a blocking `extern "C"` call stalls the carrier thread. That is the
   machinery Go needed years to build, and it is not free. §12 works through why
   the other two mechanisms are not available here at all.
-- ~~**`RwLock<T>`**~~ -- shipped, with `ReadGuard<T>` and `WriteGuard<T>`
+- ~~**`ReaderWriterLock<T>`**~~ -- shipped, with `ReadGuard<T>` and `WriteGuard<T>`
   (§11). Recursive locks and lock-free collections are still deferred, the first
   deliberately.
 - **Cancellation and failure.** Cancellation works as a shared flag today (§9);
@@ -649,7 +649,7 @@ unstructured set, and it is deliberately second rather than absent.
 | `Future<T>` | a value another thread is still computing; `GetResult` blocks, `IsReady` asks |
 | `Threading.Sleep` / `Yield` / `CurrentId` | the free functions a thread needs about itself |
 | `Monitor<T>` / `MonitorGuard<T>` | a `Mutex<T>` that can be waited on: `Wait`, `WaitFor`, `Pulse`, `PulseAll` |
-| `RwLock<T>` / `ReadGuard<T>` / `WriteGuard<T>` | many readers or one writer, with `EnterReadLock`, `EnterWriteLock` and their `TryEnter` forms |
+| `ReaderWriterLock<T>` / `ReadGuard<T>` / `WriteGuard<T>` | many readers or one writer, with `EnterReadLock`, `EnterWriteLock` and their `TryEnter` forms |
 | `Semaphore` | a permit count: `Wait`, `TryWait`, `WaitFor`, and `Release` of one or of several |
 | `ManualResetEvent` | a latch that stays open until `Reset` |
 | `AutoResetEvent` | a turnstile: one `Set`, one passage |

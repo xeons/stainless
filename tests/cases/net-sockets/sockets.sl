@@ -86,7 +86,7 @@ int Main()
 
     // And opening one directly with `Any` is an error rather than a guess,
     // because there is no socket of no family.
-    var nofamily = Socket.Open(AddressFamily.Any, SocketKind.Stream);
+    var nofamily = Socket.Open(AddressFamily.Any, SocketType.Stream);
     SayBool("any-is-not-a-socket", !nofamily.Ok);
     SayBool("any-says-why", !nofamily.Ok && nofamily.Error == SocketError.Invalid);
 
@@ -149,7 +149,7 @@ int Main()
     // ------------------------------------------------------------------ UDP
     //
     // No handshake, so one socket can talk to itself in a straight line.
-    var bound = UdpSocket.Bind("127.0.0.1", 0u);
+    var bound = UdpClient.Bind("127.0.0.1", 0u);
     if (!bound.Ok)
         return 1;
 
@@ -159,7 +159,7 @@ int Main()
     var inbox = listener.LocalEndPoint;
     SayBool("udp-port", inbox.Port != 0u);
 
-    var made = UdpSocket.Create();
+    var made = UdpClient.Create();
     if (!made.Ok)
         return 1;
 

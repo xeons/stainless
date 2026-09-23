@@ -24,7 +24,7 @@ class Entry
 
 One entry of a directory: where it is, and whether it is itself a directory.
 
-<sub>[stdlib/Directory.sl:122](../../stdlib/Directory.sl#L122)</sub>
+<sub>[stdlib/Directory/Entry.sl:31](../../stdlib/Directory/Entry.sl#L31)</sub>
 
 #### Path *property*
 
@@ -35,7 +35,7 @@ String Path { get; }
 The full path, ready to hand back to `File` or `Directory`. Built from
 the path that was listed, so a relative listing gives relative entries.
 
-<sub>[stdlib/Directory.sl:126](../../stdlib/Directory.sl#L126)</sub>
+<sub>[stdlib/Directory/Entry.sl:35](../../stdlib/Directory/Entry.sl#L35)</sub>
 
 #### Name *property*
 
@@ -45,7 +45,7 @@ String Name { get; }
 
 The last part alone, without any directory in front of it.
 
-<sub>[stdlib/Directory.sl:129](../../stdlib/Directory.sl#L129)</sub>
+<sub>[stdlib/Directory/Entry.sl:38](../../stdlib/Directory/Entry.sl#L38)</sub>
 
 #### IsDirectory *property*
 
@@ -57,7 +57,7 @@ True for a directory, false for anything else -- a regular file, a
 symbolic link to one, a device. Only the directory answer is relied on
 here, because it is the one that decides whether a walk descends.
 
-<sub>[stdlib/Directory.sl:134](../../stdlib/Directory.sl#L134)</sub>
+<sub>[stdlib/Directory/Entry.sl:43](../../stdlib/Directory/Entry.sl#L43)</sub>
 
 ## Functions
 
@@ -80,7 +80,7 @@ it might not.
 
 **See also** &nbsp; [Directory.CreateDirectoryTree](#createdirectorytree-function)
 
-<sub>[stdlib/Directory.sl:60](../../stdlib/Directory.sl#L60)</sub>
+<sub>[stdlib/Directory/Directory.sl:60](../../stdlib/Directory/Directory.sl#L60)</sub>
 
 ### CreateDirectoryTree *function*
 
@@ -102,7 +102,7 @@ runs -- made by another process, say -- is success rather than a failure.
 
 **See also** &nbsp; [Directory.CreateDirectory](#createdirectory-function)
 
-<sub>[stdlib/Directory.sl:76](../../stdlib/Directory.sl#L76)</sub>
+<sub>[stdlib/Directory/Directory.sl:76](../../stdlib/Directory/Directory.sl#L76)</sub>
 
 ### Delete *function*
 
@@ -120,7 +120,7 @@ Removes one empty directory.
 - [IOError.Invalid](Standard-IO.md#invalid-case) — the last part of the path is `.`
 - [IOError.Unknown](Standard-IO.md#unknown-case) — the platform reported something with no case of its own -- a directory that is not empty among them
 
-<sub>[stdlib/Directory.sl:114](../../stdlib/Directory.sl#L114)</sub>
+<sub>[stdlib/Directory/Directory.sl:114](../../stdlib/Directory/Directory.sl#L114)</sub>
 
 ### Exists *function*
 
@@ -130,7 +130,7 @@ bool Exists(String path)
 
 True when the path names a directory that is there.
 
-<sub>[stdlib/Directory.sl:45](../../stdlib/Directory.sl#L45)</sub>
+<sub>[stdlib/Directory/Directory.sl:45](../../stdlib/Directory/Directory.sl#L45)</sub>
 
 ### GetAllFiles *function*
 
@@ -150,7 +150,7 @@ run the stack out.
 
 **See also** &nbsp; [Directory.GetFiles](#getfiles-function)
 
-<sub>[stdlib/Directory.sl:229](../../stdlib/Directory.sl#L229)</sub>
+<sub>[stdlib/Directory/Directory.sl:202](../../stdlib/Directory/Directory.sl#L202)</sub>
 
 ### GetDirectories *function*
 
@@ -167,7 +167,7 @@ The full paths of the directories directly inside.
 
 **See also** &nbsp; [Directory.GetFiles](#getfiles-function)
 
-<sub>[stdlib/Directory.sl:205](../../stdlib/Directory.sl#L205)</sub>
+<sub>[stdlib/Directory/Directory.sl:178](../../stdlib/Directory/Directory.sl#L178)</sub>
 
 ### GetEntries *function*
 
@@ -184,7 +184,7 @@ Everything directly inside, files and directories both, not recursively.
 
 **See also** &nbsp; [Directory.GetFiles](#getfiles-function) &middot; [Directory.GetDirectories](#getdirectories-function)
 
-<sub>[stdlib/Directory.sl:152](../../stdlib/Directory.sl#L152)</sub>
+<sub>[stdlib/Directory/Directory.sl:125](../../stdlib/Directory/Directory.sl#L125)</sub>
 
 ### GetFiles *function*
 
@@ -201,5 +201,5 @@ The full paths of the files directly inside.
 
 **See also** &nbsp; [Directory.GetDirectories](#getdirectories-function) &middot; [Directory.GetAllFiles](#getallfiles-function)
 
-<sub>[stdlib/Directory.sl:185](../../stdlib/Directory.sl#L185)</sub>
+<sub>[stdlib/Directory/Directory.sl:158](../../stdlib/Directory/Directory.sl#L158)</sub>
 

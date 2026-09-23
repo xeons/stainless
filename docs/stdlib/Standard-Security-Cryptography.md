@@ -6,7 +6,7 @@ Hashes, message authentication codes, key derivation and block ciphers.
 
 ```csharp
 var digest = Sha256.HashData(Encoding.CreateUtf8().GetBytes("hello"));
-Console.WriteLine(Convert.ToHex(digest));
+Console.WriteLine(Convert.ToHexString(digest));
 
 var cipher = try Aes.FromKey(key);
 var sealed = try cipher.EncryptCbc(plaintext, iv, PaddingMode.Pkcs7);
@@ -83,7 +83,7 @@ would be a shape with no user.
 
 **See also** &nbsp; [AesGcm](#aesgcm-class)
 
-<sub>[stdlib/Cryptography.sl:1301](../../stdlib/Cryptography.sl#L1301)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:49](../../stdlib/Security/Cryptography/Aes.sl#L49)</sub>
 
 #### BlockSize *constant*
 
@@ -94,7 +94,7 @@ const nuint BlockSize = 16
 One block, for every key length. AES is a 128-bit block cipher; it is
 Rijndael that had others, and no standard uses them.
 
-<sub>[stdlib/Cryptography.sl:1305](../../stdlib/Cryptography.sl#L1305)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:53](../../stdlib/Security/Cryptography/Aes.sl#L53)</sub>
 
 #### FromKey *method*
 
@@ -109,7 +109,7 @@ AES-192 or AES-256.
 
 - [CryptoError.KeyLength](#keylength-case) — `key` is not 16, 24 or 32 bytes
 
-<sub>[stdlib/Cryptography.sl:1335](../../stdlib/Cryptography.sl#L1335)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:83](../../stdlib/Security/Cryptography/Aes.sl#L83)</sub>
 
 #### Create *method*
 
@@ -121,7 +121,7 @@ A cipher under a fresh 256-bit key from the platform, which is what
 .NET's `Aes.Create()` gives. Aborts if the machine will supply no
 entropy, which is a broken machine rather than an outcome to plan for.
 
-<sub>[stdlib/Cryptography.sl:1345](../../stdlib/Cryptography.sl#L1345)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:93](../../stdlib/Security/Cryptography/Aes.sl#L93)</sub>
 
 #### Rounds *property*
 
@@ -131,7 +131,7 @@ nuint Rounds { get; }
 
 How many rounds this key length runs: 10, 12 or 14.
 
-<sub>[stdlib/Cryptography.sl:1354](../../stdlib/Cryptography.sl#L1354)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:102](../../stdlib/Security/Cryptography/Aes.sl#L102)</sub>
 
 #### EncryptBlock *method*
 
@@ -147,7 +147,7 @@ implementing a mode this class does not have needs the same door.
 to the same input gives the same output, which is what a mode exists to
 fix.
 
-<sub>[stdlib/Cryptography.sl:1365](../../stdlib/Cryptography.sl#L1365)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:113](../../stdlib/Security/Cryptography/Aes.sl#L113)</sub>
 
 #### DecryptBlock *method*
 
@@ -157,7 +157,7 @@ void DecryptBlock(byte[] block, nuint offset)
 
 One block deciphered in place, at `offset` in `block`.
 
-<sub>[stdlib/Cryptography.sl:1383](../../stdlib/Cryptography.sl#L1383)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:131](../../stdlib/Security/Cryptography/Aes.sl#L131)</sub>
 
 #### EncryptEcb *method*
 
@@ -174,7 +174,7 @@ always the wrong answer.
 
 **See also** &nbsp; [CipherMode.Ecb](#ecb-case) &middot; [Aes.DecryptEcb](#decryptecb-method)
 
-<sub>[stdlib/Cryptography.sl:1409](../../stdlib/Cryptography.sl#L1409)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:157](../../stdlib/Security/Cryptography/Aes.sl#L157)</sub>
 
 #### DecryptEcb *method*
 
@@ -191,7 +191,7 @@ The inverse of `EncryptEcb`.
 
 **See also** &nbsp; [Aes.EncryptEcb](#encryptecb-method)
 
-<sub>[stdlib/Cryptography.sl:1428](../../stdlib/Cryptography.sl#L1428)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:176](../../stdlib/Security/Cryptography/Aes.sl#L176)</sub>
 
 #### EncryptCbc *method*
 
@@ -210,7 +210,7 @@ it is not secret -- send it alongside the ciphertext.
 
 **See also** &nbsp; [Aes.DecryptCbc](#decryptcbc-method) &middot; [RandomNumberGenerator.GetBytes](#getbytes-method)
 
-<sub>[stdlib/Cryptography.sl:1451](../../stdlib/Cryptography.sl#L1451)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:199](../../stdlib/Security/Cryptography/Aes.sl#L199)</sub>
 
 #### DecryptCbc *method*
 
@@ -232,7 +232,7 @@ is the whole reason to authenticate a ciphertext before decrypting it.
 
 **See also** &nbsp; [Aes.EncryptCbc](#encryptcbc-method)
 
-<sub>[stdlib/Cryptography.sl:1488](../../stdlib/Cryptography.sl#L1488)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:236](../../stdlib/Security/Cryptography/Aes.sl#L236)</sub>
 
 #### EncryptCfb *method*
 
@@ -249,7 +249,7 @@ with a feedback size of 128 bits. No padding: the mode is a stream.
 
 **See also** &nbsp; [Aes.DecryptCfb](#decryptcfb-method)
 
-<sub>[stdlib/Cryptography.sl:1524](../../stdlib/Cryptography.sl#L1524)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:272](../../stdlib/Security/Cryptography/Aes.sl#L272)</sub>
 
 #### DecryptCfb *method*
 
@@ -265,7 +265,7 @@ The inverse of `EncryptCfb`.
 
 **See also** &nbsp; [Aes.EncryptCfb](#encryptcfb-method)
 
-<sub>[stdlib/Cryptography.sl:1554](../../stdlib/Cryptography.sl#L1554)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:302](../../stdlib/Security/Cryptography/Aes.sl#L302)</sub>
 
 #### ApplyCtr *method*
 
@@ -285,7 +285,7 @@ is a random nonce in the high bytes and a block counter in the low.
 
 - [CryptoError.IvLength](#ivlength-case) — `counter` is not one block
 
-<sub>[stdlib/Cryptography.sl:1592](../../stdlib/Cryptography.sl#L1592)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:340](../../stdlib/Security/Cryptography/Aes.sl#L340)</sub>
 
 ### AesGcm *class*
 
@@ -313,7 +313,7 @@ the tag does not match. That is not a convenience: releasing unauthenticated
 plaintext is the single most common way AEAD is misused, and a `Result` is
 what makes it impossible here.
 
-<sub>[stdlib/Cryptography.sl:1990](../../stdlib/Cryptography.sl#L1990)</sub>
+<sub>[stdlib/Security/Cryptography/AesGcm.sl:48](../../stdlib/Security/Cryptography/AesGcm.sl#L48)</sub>
 
 #### TagSize *constant*
 
@@ -327,7 +327,7 @@ drops, and no format here asks for one.
 
 **Value** &nbsp; sixteen bytes.
 
-<sub>[stdlib/Cryptography.sl:1997](../../stdlib/Cryptography.sl#L1997)</sub>
+<sub>[stdlib/Security/Cryptography/AesGcm.sl:55](../../stdlib/Security/Cryptography/AesGcm.sl#L55)</sub>
 
 #### NonceSize *constant*
 
@@ -340,7 +340,7 @@ the nonce is used directly rather than hashed.
 
 **Value** &nbsp; twelve bytes.
 
-<sub>[stdlib/Cryptography.sl:2003](../../stdlib/Cryptography.sl#L2003)</sub>
+<sub>[stdlib/Security/Cryptography/AesGcm.sl:61](../../stdlib/Security/Cryptography/AesGcm.sl#L61)</sub>
 
 #### FromKey *method*
 
@@ -354,7 +354,7 @@ A GCM box under `key`, which must be 16, 24 or 32 bytes.
 
 - [CryptoError.KeyLength](#keylength-case) — `key` is not 16, 24 or 32 bytes
 
-<sub>[stdlib/Cryptography.sl:2018](../../stdlib/Cryptography.sl#L2018)</sub>
+<sub>[stdlib/Security/Cryptography/AesGcm.sl:76](../../stdlib/Security/Cryptography/AesGcm.sl#L76)</sub>
 
 #### Encrypt *method*
 
@@ -382,7 +382,7 @@ secret. Pass an empty array when there is none.
 
 **See also** &nbsp; [AesGcm.Decrypt](#decrypt-method)
 
-<sub>[stdlib/Cryptography.sl:2040](../../stdlib/Cryptography.sl#L2040)</sub>
+<sub>[stdlib/Security/Cryptography/AesGcm.sl:98](../../stdlib/Security/Cryptography/AesGcm.sl#L98)</sub>
 
 #### Decrypt *method*
 
@@ -407,7 +407,7 @@ The plaintext, or `AuthenticationFailed` and nothing.
 
 **See also** &nbsp; [AesGcm.Encrypt](#encrypt-method)
 
-<sub>[stdlib/Cryptography.sl:2077](../../stdlib/Cryptography.sl#L2077)</sub>
+<sub>[stdlib/Security/Cryptography/AesGcm.sl:135](../../stdlib/Security/Cryptography/AesGcm.sl#L135)</sub>
 
 ### CipherMode *enum*
 
@@ -421,7 +421,7 @@ How the blocks of a message are chained together.
 not implemented by .NET's own AES either, and a mode that exists only to be
 rejected is worse than a name that is not there.
 
-<sub>[stdlib/Cryptography.sl:1234](../../stdlib/Cryptography.sl#L1234)</sub>
+<sub>[stdlib/Security/Cryptography/CipherMode.sl:34](../../stdlib/Security/Cryptography/CipherMode.sl#L34)</sub>
 
 #### Cbc *case*
 
@@ -433,7 +433,7 @@ Cipher block chaining: each block is XORed with the one before it, and
 the first with the IV. Needs a unique, unpredictable IV per message,
 and provides no authentication at all.
 
-<sub>[stdlib/Cryptography.sl:1239](../../stdlib/Cryptography.sl#L1239)</sub>
+<sub>[stdlib/Security/Cryptography/CipherMode.sl:39](../../stdlib/Security/Cryptography/CipherMode.sl#L39)</sub>
 
 #### Ecb *case*
 
@@ -446,7 +446,7 @@ equal ciphertext blocks**, which is why the penguin picture is famous.
 Right for exactly one thing -- enciphering a single block that is
 already a key.
 
-<sub>[stdlib/Cryptography.sl:1245](../../stdlib/Cryptography.sl#L1245)</sub>
+<sub>[stdlib/Security/Cryptography/CipherMode.sl:45](../../stdlib/Security/Cryptography/CipherMode.sl#L45)</sub>
 
 #### Cfb *case*
 
@@ -457,7 +457,7 @@ Cfb
 Cipher feedback, as a full-block stream. Needs a unique IV and, like
 CBC, authenticates nothing.
 
-<sub>[stdlib/Cryptography.sl:1249](../../stdlib/Cryptography.sl#L1249)</sub>
+<sub>[stdlib/Security/Cryptography/CipherMode.sl:49](../../stdlib/Security/Cryptography/CipherMode.sl#L49)</sub>
 
 #### Ctr *case*
 
@@ -470,7 +470,7 @@ with it. Not in .NET's enum, and here because it is what AES-GCM is
 built on and what most modern protocols specify. **Reusing a counter
 value with the same key destroys the message pair completely.**
 
-<sub>[stdlib/Cryptography.sl:1255](../../stdlib/Cryptography.sl#L1255)</sub>
+<sub>[stdlib/Security/Cryptography/CipherMode.sl:55](../../stdlib/Security/Cryptography/CipherMode.sl#L55)</sub>
 
 ### CryptoError *enum*
 
@@ -484,7 +484,7 @@ One enum for the module, as `IOError` is for `Standard.IO`: a caller
 switching on the failure of a decrypt wants the same vocabulary as one
 checking a key length.
 
-<sub>[stdlib/Cryptography.sl:85](../../stdlib/Cryptography.sl#L85)</sub>
+<sub>[stdlib/Security/Cryptography/CryptoError.sl:34](../../stdlib/Security/Cryptography/CryptoError.sl#L34)</sub>
 
 #### KeyLength *case*
 
@@ -496,7 +496,7 @@ The key is not a length this algorithm takes. AES takes 16, 24 or 32
 bytes; an HMAC key may be any length at all, so this never comes from
 one.
 
-<sub>[stdlib/Cryptography.sl:90](../../stdlib/Cryptography.sl#L90)</sub>
+<sub>[stdlib/Security/Cryptography/CryptoError.sl:39](../../stdlib/Security/Cryptography/CryptoError.sl#L39)</sub>
 
 #### IvLength *case*
 
@@ -506,7 +506,7 @@ IvLength
 
 The initialization vector is not one block long.
 
-<sub>[stdlib/Cryptography.sl:93](../../stdlib/Cryptography.sl#L93)</sub>
+<sub>[stdlib/Security/Cryptography/CryptoError.sl:42](../../stdlib/Security/Cryptography/CryptoError.sl#L42)</sub>
 
 #### NonceLength *case*
 
@@ -517,7 +517,7 @@ NonceLength
 The nonce is not a length this mode takes. AES-GCM takes any non-empty
 nonce and wants twelve bytes.
 
-<sub>[stdlib/Cryptography.sl:97](../../stdlib/Cryptography.sl#L97)</sub>
+<sub>[stdlib/Security/Cryptography/CryptoError.sl:46](../../stdlib/Security/Cryptography/CryptoError.sl#L46)</sub>
 
 #### TagLength *case*
 
@@ -527,7 +527,7 @@ TagLength
 
 The authentication tag is not a length this mode produces.
 
-<sub>[stdlib/Cryptography.sl:100](../../stdlib/Cryptography.sl#L100)</sub>
+<sub>[stdlib/Security/Cryptography/CryptoError.sl:49](../../stdlib/Security/Cryptography/CryptoError.sl#L49)</sub>
 
 #### BlockLength *case*
 
@@ -538,7 +538,7 @@ BlockLength
 The input is not a whole number of blocks, and the padding mode in
 force does not add any.
 
-<sub>[stdlib/Cryptography.sl:104](../../stdlib/Cryptography.sl#L104)</sub>
+<sub>[stdlib/Security/Cryptography/CryptoError.sl:53](../../stdlib/Security/Cryptography/CryptoError.sl#L53)</sub>
 
 #### Padding *case*
 
@@ -549,7 +549,7 @@ Padding
 The padding on a decrypted block does not describe itself. Usually the
 wrong key, and deliberately says no more than that.
 
-<sub>[stdlib/Cryptography.sl:108](../../stdlib/Cryptography.sl#L108)</sub>
+<sub>[stdlib/Security/Cryptography/CryptoError.sl:57](../../stdlib/Security/Cryptography/CryptoError.sl#L57)</sub>
 
 #### AuthenticationFailed *case*
 
@@ -561,7 +561,7 @@ The tag did not match. **The plaintext is not returned**, because a
 plaintext that failed authentication is attacker-controlled and
 handling it at all is the mistake AEAD exists to prevent.
 
-<sub>[stdlib/Cryptography.sl:113](../../stdlib/Cryptography.sl#L113)</sub>
+<sub>[stdlib/Security/Cryptography/CryptoError.sl:62](../../stdlib/Security/Cryptography/CryptoError.sl#L62)</sub>
 
 #### Parameter *case*
 
@@ -572,7 +572,7 @@ Parameter
 An iteration count of zero, or an output length of zero, where neither
 is meaningful.
 
-<sub>[stdlib/Cryptography.sl:117](../../stdlib/Cryptography.sl#L117)</sub>
+<sub>[stdlib/Security/Cryptography/CryptoError.sl:66](../../stdlib/Security/Cryptography/CryptoError.sl#L66)</sub>
 
 #### NoEntropy *case*
 
@@ -582,7 +582,7 @@ NoEntropy
 
 The platform would not supply entropy.
 
-<sub>[stdlib/Cryptography.sl:120](../../stdlib/Cryptography.sl#L120)</sub>
+<sub>[stdlib/Security/Cryptography/CryptoError.sl:69](../../stdlib/Security/Cryptography/CryptoError.sl#L69)</sub>
 
 ### CryptographicOperations *class*
 
@@ -592,7 +592,7 @@ class CryptographicOperations
 
 The two operations on a secret that are easy to write wrongly.
 
-<sub>[stdlib/Cryptography.sl:2295](../../stdlib/Cryptography.sl#L2295)</sub>
+<sub>[stdlib/Security/Cryptography/CryptographicOperations.sl:30](../../stdlib/Security/Cryptography/CryptographicOperations.sl#L30)</sub>
 
 #### FixedTimeEquals *method*
 
@@ -612,7 +612,7 @@ guess.
 Unequal lengths answer false immediately, which leaks the length and
 nothing else; .NET does the same, and a length is not the secret.
 
-<sub>[stdlib/Cryptography.sl:2308](../../stdlib/Cryptography.sl#L2308)</sub>
+<sub>[stdlib/Security/Cryptography/CryptographicOperations.sl:43](../../stdlib/Security/Cryptography/CryptographicOperations.sl#L43)</sub>
 
 #### ZeroMemory *method*
 
@@ -628,7 +628,7 @@ version is a compiler intrinsic and this one is not. It is worth doing
 because a key that is overwritten is a key that is not in the next core
 dump, and it is not worth relying on.
 
-<sub>[stdlib/Cryptography.sl:2327](../../stdlib/Cryptography.sl#L2327)</sub>
+<sub>[stdlib/Security/Cryptography/CryptographicOperations.sl:62](../../stdlib/Security/Cryptography/CryptographicOperations.sl#L62)</sub>
 
 ### HashAlgorithm *class*
 
@@ -645,7 +645,7 @@ block, compress it, and finish by appending a one bit, zeros, and the
 length in bits. That is what is here, so a new algorithm of this family is
 `CompressBlock`, `ComputeDigest` and `InitializeState` and nothing else.
 
-<sub>[stdlib/Cryptography.sl:220](../../stdlib/Cryptography.sl#L220)</sub>
+<sub>[stdlib/Security/Cryptography/HashAlgorithm.sl:35](../../stdlib/Security/Cryptography/HashAlgorithm.sl#L35)</sub>
 
 #### Name *property*
 
@@ -655,7 +655,7 @@ String Name { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Cryptography.sl:249](../../stdlib/Cryptography.sl#L249)</sub>
+<sub>[stdlib/Security/Cryptography/HashAlgorithm.sl:64](../../stdlib/Security/Cryptography/HashAlgorithm.sl#L64)</sub>
 
 #### HashSizeInBytes *property*
 
@@ -665,7 +665,7 @@ nuint HashSizeInBytes { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Cryptography.sl:251](../../stdlib/Cryptography.sl#L251)</sub>
+<sub>[stdlib/Security/Cryptography/HashAlgorithm.sl:66](../../stdlib/Security/Cryptography/HashAlgorithm.sl#L66)</sub>
 
 #### BlockSizeInBytes *property*
 
@@ -675,7 +675,7 @@ nuint BlockSizeInBytes { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Cryptography.sl:253](../../stdlib/Cryptography.sl#L253)</sub>
+<sub>[stdlib/Security/Cryptography/HashAlgorithm.sl:68](../../stdlib/Security/Cryptography/HashAlgorithm.sl#L68)</sub>
 
 #### AppendData *method*
 
@@ -685,7 +685,7 @@ void AppendData(byte[:] data)
 
 *No documentation.*
 
-<sub>[stdlib/Cryptography.sl:255](../../stdlib/Cryptography.sl#L255)</sub>
+<sub>[stdlib/Security/Cryptography/HashAlgorithm.sl:70](../../stdlib/Security/Cryptography/HashAlgorithm.sl#L70)</sub>
 
 #### GetHashAndReset *method*
 
@@ -695,7 +695,7 @@ byte[] GetHashAndReset()
 
 *No documentation.*
 
-<sub>[stdlib/Cryptography.sl:280](../../stdlib/Cryptography.sl#L280)</sub>
+<sub>[stdlib/Security/Cryptography/HashAlgorithm.sl:95](../../stdlib/Security/Cryptography/HashAlgorithm.sl#L95)</sub>
 
 #### Reset *method*
 
@@ -705,7 +705,7 @@ void Reset()
 
 *No documentation.*
 
-<sub>[stdlib/Cryptography.sl:287](../../stdlib/Cryptography.sl#L287)</sub>
+<sub>[stdlib/Security/Cryptography/HashAlgorithm.sl:102](../../stdlib/Security/Cryptography/HashAlgorithm.sl#L102)</sub>
 
 #### ComputeHash *method*
 
@@ -716,7 +716,7 @@ byte[] ComputeHash(byte[:] data)
 The digest of `data` on its own. Resets first, so an object that has
 been appended to is still safe to ask.
 
-<sub>[stdlib/Cryptography.sl:299](../../stdlib/Cryptography.sl#L299)</sub>
+<sub>[stdlib/Security/Cryptography/HashAlgorithm.sl:114](../../stdlib/Security/Cryptography/HashAlgorithm.sl#L114)</sub>
 
 ### Hkdf *class*
 
@@ -732,7 +732,7 @@ fast on purpose because its input -- a Diffie-Hellman shared secret, a
 master key -- already has plenty, and all that is wanted is to spread it
 into several keys that reveal nothing about each other.
 
-<sub>[stdlib/Cryptography.sl:1136](../../stdlib/Cryptography.sl#L1136)</sub>
+<sub>[stdlib/Security/Cryptography/Hkdf.sl:34](../../stdlib/Security/Cryptography/Hkdf.sl#L34)</sub>
 
 #### Extract *method*
 
@@ -751,7 +751,7 @@ not uniform. `salt` may be empty, and then a block of zeros is used.
 
 **See also** &nbsp; [Hkdf.Expand](#expand-method)
 
-<sub>[stdlib/Cryptography.sl:1145](../../stdlib/Cryptography.sl#L1145)</sub>
+<sub>[stdlib/Security/Cryptography/Hkdf.sl:43](../../stdlib/Security/Cryptography/Hkdf.sl#L43)</sub>
 
 #### Expand *method*
 
@@ -778,7 +778,7 @@ makes this worth using over a bare hash.
 
 **See also** &nbsp; [Hkdf.Extract](#extract-method)
 
-<sub>[stdlib/Cryptography.sl:1163](../../stdlib/Cryptography.sl#L1163)</sub>
+<sub>[stdlib/Security/Cryptography/Hkdf.sl:61](../../stdlib/Security/Cryptography/Hkdf.sl#L61)</sub>
 
 #### DeriveKey *method*
 
@@ -802,7 +802,7 @@ Extract and expand together, which is how HKDF is nearly always used.
 
 **See also** &nbsp; [Hkdf.Extract](#extract-method) &middot; [Hkdf.Expand](#expand-method)
 
-<sub>[stdlib/Cryptography.sl:1210](../../stdlib/Cryptography.sl#L1210)</sub>
+<sub>[stdlib/Security/Cryptography/Hkdf.sl:108](../../stdlib/Security/Cryptography/Hkdf.sl#L108)</sub>
 
 ### Hmac *class*
 
@@ -821,7 +821,7 @@ Any key length works. A key longer than the hash's block is replaced by its
 digest, a shorter one is padded with zeros, and both of those are the
 standard's rules rather than a convenience.
 
-<sub>[stdlib/Cryptography.sl:913](../../stdlib/Cryptography.sl#L913)</sub>
+<sub>[stdlib/Security/Cryptography/Hmac.sl:39](../../stdlib/Security/Cryptography/Hmac.sl#L39)</sub>
 
 #### Name *property*
 
@@ -831,7 +831,7 @@ String Name { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Cryptography.sl:956](../../stdlib/Cryptography.sl#L956)</sub>
+<sub>[stdlib/Security/Cryptography/Hmac.sl:82](../../stdlib/Security/Cryptography/Hmac.sl#L82)</sub>
 
 #### HashSizeInBytes *property*
 
@@ -841,7 +841,7 @@ nuint HashSizeInBytes { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Cryptography.sl:958](../../stdlib/Cryptography.sl#L958)</sub>
+<sub>[stdlib/Security/Cryptography/Hmac.sl:84](../../stdlib/Security/Cryptography/Hmac.sl#L84)</sub>
 
 #### BlockSizeInBytes *property*
 
@@ -851,7 +851,7 @@ nuint BlockSizeInBytes { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Cryptography.sl:960](../../stdlib/Cryptography.sl#L960)</sub>
+<sub>[stdlib/Security/Cryptography/Hmac.sl:86](../../stdlib/Security/Cryptography/Hmac.sl#L86)</sub>
 
 #### AppendData *method*
 
@@ -861,7 +861,7 @@ void AppendData(byte[:] data)
 
 *No documentation.*
 
-<sub>[stdlib/Cryptography.sl:962](../../stdlib/Cryptography.sl#L962)</sub>
+<sub>[stdlib/Security/Cryptography/Hmac.sl:88](../../stdlib/Security/Cryptography/Hmac.sl#L88)</sub>
 
 #### GetHashAndReset *method*
 
@@ -871,7 +871,7 @@ byte[] GetHashAndReset()
 
 *No documentation.*
 
-<sub>[stdlib/Cryptography.sl:964](../../stdlib/Cryptography.sl#L964)</sub>
+<sub>[stdlib/Security/Cryptography/Hmac.sl:90](../../stdlib/Security/Cryptography/Hmac.sl#L90)</sub>
 
 #### Reset *method*
 
@@ -881,7 +881,7 @@ void Reset()
 
 *No documentation.*
 
-<sub>[stdlib/Cryptography.sl:974](../../stdlib/Cryptography.sl#L974)</sub>
+<sub>[stdlib/Security/Cryptography/Hmac.sl:100](../../stdlib/Security/Cryptography/Hmac.sl#L100)</sub>
 
 #### ComputeHash *method*
 
@@ -891,7 +891,7 @@ byte[] ComputeHash(byte[:] data)
 
 The MAC of `data` under `key`, with no object to keep.
 
-<sub>[stdlib/Cryptography.sl:981](../../stdlib/Cryptography.sl#L981)</sub>
+<sub>[stdlib/Security/Cryptography/Hmac.sl:107](../../stdlib/Security/Cryptography/Hmac.sl#L107)</sub>
 
 ### HmacMd5 *class*
 
@@ -903,7 +903,7 @@ HMAC-MD5, as .NET spells `HMACMD5`. Here for the protocols that specify it
 -- and unlike a bare MD5 digest it is not broken by the collision attacks,
 because a collision an attacker cannot compute without the key is no use.
 
-<sub>[stdlib/Cryptography.sl:1036](../../stdlib/Cryptography.sl#L1036)</sub>
+<sub>[stdlib/Security/Cryptography/HmacMd5.sl:30](../../stdlib/Security/Cryptography/HmacMd5.sl#L30)</sub>
 
 #### Create *method*
 
@@ -913,7 +913,7 @@ static Hmac Create(byte[:] key)
 
 A keyed hash to append to.
 
-<sub>[stdlib/Cryptography.sl:1039](../../stdlib/Cryptography.sl#L1039)</sub>
+<sub>[stdlib/Security/Cryptography/HmacMd5.sl:33](../../stdlib/Security/Cryptography/HmacMd5.sl#L33)</sub>
 
 #### HashData *method*
 
@@ -923,7 +923,7 @@ static byte[] HashData(byte[:] key, byte[:] data)
 
 The MAC of `data` under `key`.
 
-<sub>[stdlib/Cryptography.sl:1042](../../stdlib/Cryptography.sl#L1042)</sub>
+<sub>[stdlib/Security/Cryptography/HmacMd5.sl:36](../../stdlib/Security/Cryptography/HmacMd5.sl#L36)</sub>
 
 ### HmacSha1 *class*
 
@@ -933,7 +933,7 @@ class HmacSha1
 
 HMAC-SHA-1, as .NET spells `HMACSHA1`.
 
-<sub>[stdlib/Cryptography.sl:990](../../stdlib/Cryptography.sl#L990)</sub>
+<sub>[stdlib/Security/Cryptography/HmacSha1.sl:28](../../stdlib/Security/Cryptography/HmacSha1.sl#L28)</sub>
 
 #### Create *method*
 
@@ -943,7 +943,7 @@ static Hmac Create(byte[:] key)
 
 A keyed hash to append to.
 
-<sub>[stdlib/Cryptography.sl:993](../../stdlib/Cryptography.sl#L993)</sub>
+<sub>[stdlib/Security/Cryptography/HmacSha1.sl:31](../../stdlib/Security/Cryptography/HmacSha1.sl#L31)</sub>
 
 #### HashData *method*
 
@@ -953,7 +953,7 @@ static byte[] HashData(byte[:] key, byte[:] data)
 
 The MAC of `data` under `key`.
 
-<sub>[stdlib/Cryptography.sl:996](../../stdlib/Cryptography.sl#L996)</sub>
+<sub>[stdlib/Security/Cryptography/HmacSha1.sl:34](../../stdlib/Security/Cryptography/HmacSha1.sl#L34)</sub>
 
 ### HmacSha256 *class*
 
@@ -963,7 +963,7 @@ class HmacSha256
 
 HMAC-SHA-256, as .NET spells `HMACSHA256`. The default for anything new.
 
-<sub>[stdlib/Cryptography.sl:1001](../../stdlib/Cryptography.sl#L1001)</sub>
+<sub>[stdlib/Security/Cryptography/HmacSha256.sl:28](../../stdlib/Security/Cryptography/HmacSha256.sl#L28)</sub>
 
 #### Create *method*
 
@@ -973,7 +973,7 @@ static Hmac Create(byte[:] key)
 
 A keyed hash to append to.
 
-<sub>[stdlib/Cryptography.sl:1004](../../stdlib/Cryptography.sl#L1004)</sub>
+<sub>[stdlib/Security/Cryptography/HmacSha256.sl:31](../../stdlib/Security/Cryptography/HmacSha256.sl#L31)</sub>
 
 #### HashData *method*
 
@@ -983,7 +983,7 @@ static byte[] HashData(byte[:] key, byte[:] data)
 
 The MAC of `data` under `key`.
 
-<sub>[stdlib/Cryptography.sl:1007](../../stdlib/Cryptography.sl#L1007)</sub>
+<sub>[stdlib/Security/Cryptography/HmacSha256.sl:34](../../stdlib/Security/Cryptography/HmacSha256.sl#L34)</sub>
 
 ### HmacSha384 *class*
 
@@ -993,7 +993,7 @@ class HmacSha384
 
 HMAC-SHA-384, as .NET spells `HMACSHA384`.
 
-<sub>[stdlib/Cryptography.sl:1012](../../stdlib/Cryptography.sl#L1012)</sub>
+<sub>[stdlib/Security/Cryptography/HmacSha384.sl:28](../../stdlib/Security/Cryptography/HmacSha384.sl#L28)</sub>
 
 #### Create *method*
 
@@ -1003,7 +1003,7 @@ static Hmac Create(byte[:] key)
 
 A keyed hash to append to.
 
-<sub>[stdlib/Cryptography.sl:1015](../../stdlib/Cryptography.sl#L1015)</sub>
+<sub>[stdlib/Security/Cryptography/HmacSha384.sl:31](../../stdlib/Security/Cryptography/HmacSha384.sl#L31)</sub>
 
 #### HashData *method*
 
@@ -1013,7 +1013,7 @@ static byte[] HashData(byte[:] key, byte[:] data)
 
 The MAC of `data` under `key`.
 
-<sub>[stdlib/Cryptography.sl:1018](../../stdlib/Cryptography.sl#L1018)</sub>
+<sub>[stdlib/Security/Cryptography/HmacSha384.sl:34](../../stdlib/Security/Cryptography/HmacSha384.sl#L34)</sub>
 
 ### HmacSha512 *class*
 
@@ -1023,7 +1023,7 @@ class HmacSha512
 
 HMAC-SHA-512, as .NET spells `HMACSHA512`.
 
-<sub>[stdlib/Cryptography.sl:1023](../../stdlib/Cryptography.sl#L1023)</sub>
+<sub>[stdlib/Security/Cryptography/HmacSha512.sl:28](../../stdlib/Security/Cryptography/HmacSha512.sl#L28)</sub>
 
 #### Create *method*
 
@@ -1033,7 +1033,7 @@ static Hmac Create(byte[:] key)
 
 A keyed hash to append to.
 
-<sub>[stdlib/Cryptography.sl:1026](../../stdlib/Cryptography.sl#L1026)</sub>
+<sub>[stdlib/Security/Cryptography/HmacSha512.sl:31](../../stdlib/Security/Cryptography/HmacSha512.sl#L31)</sub>
 
 #### HashData *method*
 
@@ -1043,7 +1043,7 @@ static byte[] HashData(byte[:] key, byte[:] data)
 
 The MAC of `data` under `key`.
 
-<sub>[stdlib/Cryptography.sl:1029](../../stdlib/Cryptography.sl#L1029)</sub>
+<sub>[stdlib/Security/Cryptography/HmacSha512.sl:34](../../stdlib/Security/Cryptography/HmacSha512.sl#L34)</sub>
 
 ### IHashAlgorithm *interface*
 
@@ -1063,7 +1063,7 @@ hash written outside this module gets a MAC for free.
 
 **See also** &nbsp; [Hmac](#hmac-class)
 
-<sub>[stdlib/Cryptography.sl:186](../../stdlib/Cryptography.sl#L186)</sub>
+<sub>[stdlib/Security/Cryptography/IHashAlgorithm.sl:40](../../stdlib/Security/Cryptography/IHashAlgorithm.sl#L40)</sub>
 
 #### Name *property*
 
@@ -1075,7 +1075,7 @@ What the algorithm is called, as a standard names it -- `SHA-256`,
 `HMAC-SHA-256`. This is the spelling that goes in a protocol field,
 so it keeps the hyphens and the capitals.
 
-<sub>[stdlib/Cryptography.sl:191](../../stdlib/Cryptography.sl#L191)</sub>
+<sub>[stdlib/Security/Cryptography/IHashAlgorithm.sl:45](../../stdlib/Security/Cryptography/IHashAlgorithm.sl#L45)</sub>
 
 #### HashSizeInBytes *property*
 
@@ -1085,7 +1085,7 @@ nuint HashSizeInBytes { get; }
 
 How many bytes the digest is.
 
-<sub>[stdlib/Cryptography.sl:194](../../stdlib/Cryptography.sl#L194)</sub>
+<sub>[stdlib/Security/Cryptography/IHashAlgorithm.sl:48](../../stdlib/Security/Cryptography/IHashAlgorithm.sl#L48)</sub>
 
 #### BlockSizeInBytes *property*
 
@@ -1096,7 +1096,7 @@ nuint BlockSizeInBytes { get; }
 How many bytes the compression function eats at a time. HMAC needs it,
 which is why it is on the interface rather than inside.
 
-<sub>[stdlib/Cryptography.sl:198](../../stdlib/Cryptography.sl#L198)</sub>
+<sub>[stdlib/Security/Cryptography/IHashAlgorithm.sl:52](../../stdlib/Security/Cryptography/IHashAlgorithm.sl#L52)</sub>
 
 #### AppendData *method*
 
@@ -1106,7 +1106,7 @@ void AppendData(byte[:] data)
 
 Adds bytes to what is being hashed.
 
-<sub>[stdlib/Cryptography.sl:201](../../stdlib/Cryptography.sl#L201)</sub>
+<sub>[stdlib/Security/Cryptography/IHashAlgorithm.sl:55](../../stdlib/Security/Cryptography/IHashAlgorithm.sl#L55)</sub>
 
 #### GetHashAndReset *method*
 
@@ -1118,7 +1118,7 @@ The digest of everything appended since the last reset, and a reset.
 Calling it twice in a row gives the digest of the empty input the
 second time, which is what the reset means.
 
-<sub>[stdlib/Cryptography.sl:206](../../stdlib/Cryptography.sl#L206)</sub>
+<sub>[stdlib/Security/Cryptography/IHashAlgorithm.sl:60](../../stdlib/Security/Cryptography/IHashAlgorithm.sl#L60)</sub>
 
 #### Reset *method*
 
@@ -1128,7 +1128,7 @@ void Reset()
 
 Throws away what has been appended and starts again.
 
-<sub>[stdlib/Cryptography.sl:209](../../stdlib/Cryptography.sl#L209)</sub>
+<sub>[stdlib/Security/Cryptography/IHashAlgorithm.sl:63](../../stdlib/Security/Cryptography/IHashAlgorithm.sl#L63)</sub>
 
 ### Md5 *class*
 
@@ -1149,7 +1149,7 @@ Use `Sha256` for anything new.
 
 **See also** &nbsp; [Sha256](#sha256-class)
 
-<sub>[stdlib/Cryptography.sl:377](../../stdlib/Cryptography.sl#L377)</sub>
+<sub>[stdlib/Security/Cryptography/Md5.sl:41](../../stdlib/Security/Cryptography/Md5.sl#L41)</sub>
 
 #### Name *property*
 
@@ -1159,7 +1159,7 @@ String Name { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Cryptography.sl:426](../../stdlib/Cryptography.sl#L426)</sub>
+<sub>[stdlib/Security/Cryptography/Md5.sl:90](../../stdlib/Security/Cryptography/Md5.sl#L90)</sub>
 
 #### HashSizeInBytes *property*
 
@@ -1169,7 +1169,7 @@ nuint HashSizeInBytes { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Cryptography.sl:428](../../stdlib/Cryptography.sl#L428)</sub>
+<sub>[stdlib/Security/Cryptography/Md5.sl:92](../../stdlib/Security/Cryptography/Md5.sl#L92)</sub>
 
 #### HashData *method*
 
@@ -1179,7 +1179,7 @@ static byte[] HashData(byte[:] data)
 
 The digest of `data`, with no object to keep.
 
-<sub>[stdlib/Cryptography.sl:431](../../stdlib/Cryptography.sl#L431)</sub>
+<sub>[stdlib/Security/Cryptography/Md5.sl:95](../../stdlib/Security/Cryptography/Md5.sl#L95)</sub>
 
 ### PaddingMode *enum*
 
@@ -1189,7 +1189,7 @@ enum PaddingMode
 
 What is added to make the plaintext a whole number of blocks.
 
-<sub>[stdlib/Cryptography.sl:1259](../../stdlib/Cryptography.sl#L1259)</sub>
+<sub>[stdlib/Security/Cryptography/PaddingMode.sl:28](../../stdlib/Security/Cryptography/PaddingMode.sl#L28)</sub>
 
 #### None *case*
 
@@ -1200,7 +1200,7 @@ None
 Nothing. The input must already be a multiple of the block size, and
 `CryptoError.BlockLength` says so when it is not.
 
-<sub>[stdlib/Cryptography.sl:1263](../../stdlib/Cryptography.sl#L1263)</sub>
+<sub>[stdlib/Security/Cryptography/PaddingMode.sl:32](../../stdlib/Security/Cryptography/PaddingMode.sl#L32)</sub>
 
 #### Pkcs7 *case*
 
@@ -1212,7 +1212,7 @@ PKCS#7: N bytes of the value N, always at least one block-worth of
 information added. The default everywhere, and what .NET uses unless
 told otherwise.
 
-<sub>[stdlib/Cryptography.sl:1268](../../stdlib/Cryptography.sl#L1268)</sub>
+<sub>[stdlib/Security/Cryptography/PaddingMode.sl:37](../../stdlib/Security/Cryptography/PaddingMode.sl#L37)</sub>
 
 #### Zeros *case*
 
@@ -1224,7 +1224,7 @@ Zeros to the block boundary. **Not removable**: a plaintext that ended
 in a zero byte is indistinguishable from its padding, so decryption
 leaves it in place.
 
-<sub>[stdlib/Cryptography.sl:1273](../../stdlib/Cryptography.sl#L1273)</sub>
+<sub>[stdlib/Security/Cryptography/PaddingMode.sl:42](../../stdlib/Security/Cryptography/PaddingMode.sl#L42)</sub>
 
 #### AnsiX923 *case*
 
@@ -1234,7 +1234,7 @@ AnsiX923
 
 ANSI X9.23: zeros, and the last byte is the count.
 
-<sub>[stdlib/Cryptography.sl:1276](../../stdlib/Cryptography.sl#L1276)</sub>
+<sub>[stdlib/Security/Cryptography/PaddingMode.sl:45](../../stdlib/Security/Cryptography/PaddingMode.sl#L45)</sub>
 
 ### RandomNumberGenerator *class*
 
@@ -1250,7 +1250,7 @@ and its whole future is computable from 256 bits of state, which is what
 makes a seeded run reproducible and what makes it unfit for a key, a nonce
 or a token.
 
-<sub>[stdlib/Cryptography.sl:2234](../../stdlib/Cryptography.sl#L2234)</sub>
+<sub>[stdlib/Security/Cryptography/RandomNumberGenerator.sl:36](../../stdlib/Security/Cryptography/RandomNumberGenerator.sl#L36)</sub>
 
 #### Fill *method*
 
@@ -1264,7 +1264,7 @@ The failure is a machine with no entropy source at all, which in
 practice means a misconfigured container. It is a `bool` rather than a
 `Result` because there is exactly one reason and the name says it.
 
-<sub>[stdlib/Cryptography.sl:2241](../../stdlib/Cryptography.sl#L2241)</sub>
+<sub>[stdlib/Security/Cryptography/RandomNumberGenerator.sl:43](../../stdlib/Security/Cryptography/RandomNumberGenerator.sl#L43)</sub>
 
 #### GetBytes *method*
 
@@ -1278,7 +1278,7 @@ Aborts if the platform will supply none, which is the same judgement
 `new Random()` makes: a key that is not random is worse than a program
 that stops, and there is no useful value to return instead.
 
-<sub>[stdlib/Cryptography.sl:2253](../../stdlib/Cryptography.sl#L2253)</sub>
+<sub>[stdlib/Security/Cryptography/RandomNumberGenerator.sl:55](../../stdlib/Security/Cryptography/RandomNumberGenerator.sl#L55)</sub>
 
 #### GetInt32 *method*
 
@@ -1292,7 +1292,7 @@ A number in `[from, to)`, drawn without the modulo bias that
 Aborts on an empty or backwards range, which names a bug rather than an
 outcome -- the same judgement `Random.NextBelow` makes.
 
-<sub>[stdlib/Cryptography.sl:2266](../../stdlib/Cryptography.sl#L2266)</sub>
+<sub>[stdlib/Security/Cryptography/RandomNumberGenerator.sl:68](../../stdlib/Security/Cryptography/RandomNumberGenerator.sl#L68)</sub>
 
 ### Rfc2898DeriveBytes *class*
 
@@ -1314,7 +1314,7 @@ server, because it needs no memory. scrypt and Argon2 exist to close that
 gap and neither is written; TODO.md carries them. Use PBKDF2 where a format
 specifies it, and understand what it does not buy.
 
-<sub>[stdlib/Cryptography.sl:1061](../../stdlib/Cryptography.sl#L1061)</sub>
+<sub>[stdlib/Security/Cryptography/Rfc2898DeriveBytes.sl:42](../../stdlib/Security/Cryptography/Rfc2898DeriveBytes.sl#L42)</sub>
 
 #### Pbkdf2 *method*
 
@@ -1340,7 +1340,7 @@ job is to make one attack per password rather than one per database.
 
 - [CryptoError.Parameter](#parameter-case) — `iterations` or `length` is zero
 
-<sub>[stdlib/Cryptography.sl:1075](../../stdlib/Cryptography.sl#L1075)</sub>
+<sub>[stdlib/Security/Cryptography/Rfc2898DeriveBytes.sl:56](../../stdlib/Security/Cryptography/Rfc2898DeriveBytes.sl#L56)</sub>
 
 ### Sha1 *class*
 
@@ -1357,7 +1357,7 @@ still what Git names an object with, what HMAC-SHA-1 inside TOTP and
 PBKDF2 uses -- where the collision resistance is not what is relied on --
 and what a dozen older protocols specify.
 
-<sub>[stdlib/Cryptography.sl:512](../../stdlib/Cryptography.sl#L512)</sub>
+<sub>[stdlib/Security/Cryptography/Sha1.sl:37](../../stdlib/Security/Cryptography/Sha1.sl#L37)</sub>
 
 #### Name *property*
 
@@ -1367,7 +1367,7 @@ String Name { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Cryptography.sl:523](../../stdlib/Cryptography.sl#L523)</sub>
+<sub>[stdlib/Security/Cryptography/Sha1.sl:48](../../stdlib/Security/Cryptography/Sha1.sl#L48)</sub>
 
 #### HashSizeInBytes *property*
 
@@ -1377,7 +1377,7 @@ nuint HashSizeInBytes { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Cryptography.sl:525](../../stdlib/Cryptography.sl#L525)</sub>
+<sub>[stdlib/Security/Cryptography/Sha1.sl:50](../../stdlib/Security/Cryptography/Sha1.sl#L50)</sub>
 
 #### HashData *method*
 
@@ -1387,7 +1387,7 @@ static byte[] HashData(byte[:] data)
 
 The digest of `data`, with no object to keep.
 
-<sub>[stdlib/Cryptography.sl:528](../../stdlib/Cryptography.sl#L528)</sub>
+<sub>[stdlib/Security/Cryptography/Sha1.sl:53](../../stdlib/Security/Cryptography/Sha1.sl#L53)</sub>
 
 ### Sha256 *class*
 
@@ -1397,7 +1397,7 @@ sealed class Sha256 : HashAlgorithm
 
 SHA-256: the one to reach for when nothing else decides.
 
-<sub>[stdlib/Cryptography.sl:611](../../stdlib/Cryptography.sl#L611)</sub>
+<sub>[stdlib/Security/Cryptography/Sha256.sl:30](../../stdlib/Security/Cryptography/Sha256.sl#L30)</sub>
 
 #### Name *property*
 
@@ -1407,7 +1407,7 @@ String Name { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Cryptography.sl:643](../../stdlib/Cryptography.sl#L643)</sub>
+<sub>[stdlib/Security/Cryptography/Sha256.sl:62](../../stdlib/Security/Cryptography/Sha256.sl#L62)</sub>
 
 #### HashSizeInBytes *property*
 
@@ -1417,7 +1417,7 @@ nuint HashSizeInBytes { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Cryptography.sl:645](../../stdlib/Cryptography.sl#L645)</sub>
+<sub>[stdlib/Security/Cryptography/Sha256.sl:64](../../stdlib/Security/Cryptography/Sha256.sl#L64)</sub>
 
 #### HashData *method*
 
@@ -1427,7 +1427,7 @@ static byte[] HashData(byte[:] data)
 
 The digest of `data`, with no object to keep.
 
-<sub>[stdlib/Cryptography.sl:648](../../stdlib/Cryptography.sl#L648)</sub>
+<sub>[stdlib/Security/Cryptography/Sha256.sl:67](../../stdlib/Security/Cryptography/Sha256.sl#L67)</sub>
 
 ### Sha2Wide *class*
 
@@ -1442,7 +1442,7 @@ Public because a public class cannot usefully hide its base, and documented
 as machinery: there is nothing here to construct. `Sha384` and `Sha512` are
 the two that exist.
 
-<sub>[stdlib/Cryptography.sl:732](../../stdlib/Cryptography.sl#L732)</sub>
+<sub>[stdlib/Security/Cryptography/Sha2Wide.sl:35](../../stdlib/Security/Cryptography/Sha2Wide.sl#L35)</sub>
 
 ### Sha384 *class*
 
@@ -1456,7 +1456,7 @@ The truncation is what makes it worth having rather than a curiosity --
 a SHA-512 digest reveals the whole final state, and a SHA-384 one does
 not, so length-extension does not apply to it.
 
-<sub>[stdlib/Cryptography.sl:873](../../stdlib/Cryptography.sl#L873)</sub>
+<sub>[stdlib/Security/Cryptography/Sha384.sl:32](../../stdlib/Security/Cryptography/Sha384.sl#L32)</sub>
 
 #### Name *property*
 
@@ -1466,7 +1466,7 @@ String Name { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Cryptography.sl:881](../../stdlib/Cryptography.sl#L881)</sub>
+<sub>[stdlib/Security/Cryptography/Sha384.sl:40](../../stdlib/Security/Cryptography/Sha384.sl#L40)</sub>
 
 #### HashSizeInBytes *property*
 
@@ -1476,7 +1476,7 @@ nuint HashSizeInBytes { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Cryptography.sl:883](../../stdlib/Cryptography.sl#L883)</sub>
+<sub>[stdlib/Security/Cryptography/Sha384.sl:42](../../stdlib/Security/Cryptography/Sha384.sl#L42)</sub>
 
 #### HashData *method*
 
@@ -1486,7 +1486,7 @@ static byte[] HashData(byte[:] data)
 
 The digest of `data`, with no object to keep.
 
-<sub>[stdlib/Cryptography.sl:886](../../stdlib/Cryptography.sl#L886)</sub>
+<sub>[stdlib/Security/Cryptography/Sha384.sl:45](../../stdlib/Security/Cryptography/Sha384.sl#L45)</sub>
 
 ### Sha512 *class*
 
@@ -1497,7 +1497,7 @@ sealed class Sha512 : Sha2Wide
 SHA-512: the 64-bit member of the family, and faster than SHA-256 on a
 64-bit machine for the same reason it is wider.
 
-<sub>[stdlib/Cryptography.sl:840](../../stdlib/Cryptography.sl#L840)</sub>
+<sub>[stdlib/Security/Cryptography/Sha512.sl:29](../../stdlib/Security/Cryptography/Sha512.sl#L29)</sub>
 
 #### Name *property*
 
@@ -1507,7 +1507,7 @@ String Name { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Cryptography.sl:848](../../stdlib/Cryptography.sl#L848)</sub>
+<sub>[stdlib/Security/Cryptography/Sha512.sl:37](../../stdlib/Security/Cryptography/Sha512.sl#L37)</sub>
 
 #### HashSizeInBytes *property*
 
@@ -1517,7 +1517,7 @@ nuint HashSizeInBytes { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Cryptography.sl:850](../../stdlib/Cryptography.sl#L850)</sub>
+<sub>[stdlib/Security/Cryptography/Sha512.sl:39](../../stdlib/Security/Cryptography/Sha512.sl#L39)</sub>
 
 #### HashData *method*
 
@@ -1527,5 +1527,5 @@ static byte[] HashData(byte[:] data)
 
 The digest of `data`, with no object to keep.
 
-<sub>[stdlib/Cryptography.sl:853](../../stdlib/Cryptography.sl#L853)</sub>
+<sub>[stdlib/Security/Cryptography/Sha512.sl:42](../../stdlib/Security/Cryptography/Sha512.sl#L42)</sub>
 

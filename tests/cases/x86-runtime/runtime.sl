@@ -74,7 +74,7 @@ int Main()
     counts.SetValue("three", 3);
 
     Console.WriteLine("entries   " + Text.FromInteger((long)counts.Count));
-    if (counts.Find("two") is Some found)
+    if (counts.TryGetValue("two") is Some found)
     {
         Console.WriteLine("two       " + Text.FromInteger((long)found.Value));
     }

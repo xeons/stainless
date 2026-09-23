@@ -1,0 +1,1 @@
+a range whose length wraps must not get past the guard

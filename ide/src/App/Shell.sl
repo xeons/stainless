@@ -258,7 +258,7 @@ public class Shell : Form
     /// safe for the reason it is useful -- the worker is blocked in `Read`,
     /// killing the child closes its pipes, and the read it was blocked in
     /// comes back empty and ends the loop.
-    Running? _compilerProcess;
+    RunningProcess? _compilerProcess;
 
     /// Where each icon sits in the list `BuildIcons` makes, in the order it
     /// adds them. Named rather than counted at the call site: a toolbar whose
@@ -1063,7 +1063,7 @@ public class Shell : Form
     /// Where `stainless` is: beside this program first, and on the path after.
     String FindCompiler()
     {
-        String self = Env.ProgramPath();
+        String self = Env.GetProcessPath();
         long cut = self.LastIndexOf(PathSeparator);
         if (cut > 0)
         {
@@ -1376,7 +1376,7 @@ public class Shell : Form
             return;
         }
 
-        ((Running)running).Kill();
+        ((RunningProcess)running).Kill();
         ShowStatus("Stopping...");
     }
 
@@ -1624,14 +1624,14 @@ public class Shell : Form
                 Application.Post(() => OnCompilerOutput(errors, output));
             }
 
-            int code = child.Wait().GetValueOrDefault(-1);
+            int code = child.WaitForExit().GetValueOrDefault(-1);
             Application.Post(() => OnCompilerExited(code, success));
         });
         worker.Detach();
     }
 
     /// The build's child, handed over by the worker that made it.
-    void OnCompilerStarted(Running child)
+    void OnCompilerStarted(RunningProcess child)
     {
         _compilerProcess = child;
         EnableBuildCommands();

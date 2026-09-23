@@ -3,7 +3,7 @@
 // `record` — a class written as its constructor.
 //
 // The positional parameters become get-only properties and the constructor
-// that fills them, and the type gets `EqualTo` and `HashCode` over all of
+// that fills them, and the type gets `Equals` and `GetHashCode` over all of
 // them. Those two names rather than C#'s `Equals` and `GetHashCode` because
 // they are what `IEquatable` and `IHashable` declare, and what a `Dictionary`
 // probes with -- being usable as a key without saying anything is most of what
@@ -53,8 +53,8 @@ int Main()
     var same = new Point(3, 4);
     var other = new Point(3, 5);
 
-    Says("equalto", p.EqualTo(same));
-    Says("differs", p.EqualTo(other));
+    Says("equalto", p.Equals(same));
+    Says("differs", p.Equals(other));
     Says("operator", p == same);
     Says("notoperator", p != other);
 
@@ -64,17 +64,17 @@ int Main()
 
     // ----------------------------------------------------------- hashing
 
-    Says("hashagrees", p.HashCode() == same.HashCode());
-    Says("hashdiffers", p.HashCode() != other.HashCode());
-    Says("onefield", new Single(9).EqualTo(new Single(9)));
-    Says("onefieldhash", new Single(9).HashCode() == new Single(9).HashCode());
+    Says("hashagrees", p.GetHashCode() == same.GetHashCode());
+    Says("hashdiffers", p.GetHashCode() != other.GetHashCode());
+    Says("onefield", new Single(9).Equals(new Single(9)));
+    Says("onefieldhash", new Single(9).GetHashCode() == new Single(9).GetHashCode());
 
     // Every field counts, including the last.
     var t1 = new Tagged("alpha", 1, true);
-    Says("allfields", t1.EqualTo(new Tagged("alpha", 1, true)));
-    Says("lastfield", t1.EqualTo(new Tagged("alpha", 1, false)));
-    Says("middlefield", t1.EqualTo(new Tagged("alpha", 2, true)));
-    Says("firstfield", t1.EqualTo(new Tagged("beta", 1, true)));
+    Says("allfields", t1.Equals(new Tagged("alpha", 1, true)));
+    Says("lastfield", t1.Equals(new Tagged("alpha", 1, false)));
+    Says("middlefield", t1.Equals(new Tagged("alpha", 2, true)));
+    Says("firstfield", t1.Equals(new Tagged("beta", 1, true)));
 
     // -------------------------------------------------------- as a key
 

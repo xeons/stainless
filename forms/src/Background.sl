@@ -74,7 +74,7 @@ public static class Background
     ///
     /// `T` is worked out from the closures, so neither the type argument nor
     /// the parameter types are written at the call.
-    public static void Run<T>(IProduce<T> work, IConsume<T> then)
+    public static void Run<T>(IProducer<T> work, IConsumer<T> then)
     {
         var worker = new Thread(() =>
         {

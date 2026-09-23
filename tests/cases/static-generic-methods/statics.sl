@@ -16,15 +16,15 @@ module StaticGenerics;
 import Standard.Console;
 import Standard.Text;
 
-public interface IProduce<T> { T Produce(); }
-public interface IConsume<T> { void Consume(T value); }
+public interface IProducer<T> { T Produce(); }
+public interface IConsumer<T> { void Consume(T value); }
 public closure void Action();
 
 public static class Helper
 {
     /// Inferred from the closures: neither the type argument nor the parameter
     /// types are written at the call.
-    public static void Run<T>(IProduce<T> work, IConsume<T> then) => then.Consume(work.Produce());
+    public static void Run<T>(IProducer<T> work, IConsumer<T> then) => then.Consume(work.Produce());
 
     /// The same name without type parameters. Which one a call means is
     /// decided by whether the arguments fit, not by which was declared.
@@ -42,7 +42,7 @@ public static class Helper
 /// difference rather than as silence.
 public class Holder
 {
-    public T Twice<T>(IProduce<T> work)
+    public T Twice<T>(IProducer<T> work)
     {
         work.Produce();
         return work.Produce();

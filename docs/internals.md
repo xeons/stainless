@@ -141,7 +141,7 @@ ships in the same directory.
 | [Driver/PackageResolver.cs](../src/Stainless.Compiler/Driver/PackageResolver.cs) | resolving dependencies, with [PackageLock.cs](../src/Stainless.Compiler/Driver/PackageLock.cs) and [Digest.cs](../src/Stainless.Compiler/Driver/Digest.cs) for the lock and the layout fingerprint |
 | [Driver/Toolchain.cs](../src/Stainless.Compiler/Driver/Toolchain.cs) | finding clang and `llvm-rc` |
 | [runtime/](../runtime/) | the whole runtime, split by feature |
-| [stdlib/](../stdlib/) | the standard library, written in Stainless |
+| [stdlib/](../stdlib/) | the standard library, written in Stainless: a folder per module, a file per public type |
 
 ## Why textual IR
 

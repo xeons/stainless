@@ -123,7 +123,7 @@ last person to edit it -- the suite is the authority.
   nested destruction
 - `record`: a class written as its constructor. The positional parameters
   become get-only properties and the constructor that fills them, and the type
-  gets `EqualTo`, `HashCode`, `==`, `!=` and the `IEquatable`/`IHashable` those
+  gets `Equals`, `GetHashCode`, `==`, `!=` and the `IEquatable`/`IHashable` those
   satisfy -- so a record is a dictionary key with nothing said, which is most
   of what the form is for. `point with { Y = 9 }` makes a changed copy,
   evaluating its target once. There is no generated `ToString`, because the
@@ -408,7 +408,7 @@ last person to edit it -- the suite is the authority.
   rather than by reference — and every one of them walks itself when iterated
   rather than copying into a list first
 - **`Sort` is a stable merge sort**, over a `T[:]` or an `IList<T>`, by
-  `IComparable<T>` or by a `Comparer<T>` you pass. Stability is what lets a
+  `IComparable<T>` or by a `Comparison<T>` you pass. Stability is what lets a
   multi-key order be built by sorting twice. Alongside it: `Max`,
   `Min`, `IndexOf`, `RemoveFirst`, `RemoveWhere`, `Reverse`,
   `BinarySearch` and `FindLowerBound`
@@ -428,7 +428,7 @@ last person to edit it -- the suite is the authority.
   `FindIndex`, `ForEach`, `Take`, `Skip`, `Distinct`, `OrderBy`, `ToList` and
   `ToArray`, under the names LINQ gave them. Each takes a generic
   `closure` — `Func<T, R>`, `Predicate<T>`, `Action<T>`, `Fold<A, T>`,
-  `Comparer<T>` — so a lambda and a method that already exists are the same
+  `Comparison<T>` — so a lambda and a method that already exists are the same
   thing:
 
   ```csharp
@@ -458,7 +458,7 @@ last person to edit it -- the suite is the authority.
 - `StringBuilder`: mutable text with amortised O(1) appends
 - `Standard.Threading`: two layers. The structured one is `Mutex<T>` and its
   `Guard<T>` (the lock owns what it guards, and a destructor releases it),
-  `Monitor<T>` with `Wait`/`Pulse`, `RwLock<T>` with separate read and write
+  `Monitor<T>` with `Wait`/`Pulse`, `ReaderWriterLock<T>` with separate read and write
   guards, `AtomicLong`/`AtomicInt`/`AtomicBool`, and `TaskScope` for running
   `Job` delegates on the pool. The unstructured one is `Thread` itself
   (`Join`, `Detach`, and a destructor that joins), `Semaphore`,
@@ -468,7 +468,7 @@ last person to edit it -- the suite is the authority.
   it — see [docs/concurrency.md](concurrency.md) §11
 - `Standard.Math`: the C library's floating point, plus `Abs`/`Min`/`Max`/
   `Clamp`/`Sign` overloaded across `int`, `long`, `nuint` and `double`,
-  `IsNaN`/`IsInfinite`/`IsFinite`, `GreatestCommonDivisor`, and the bit
+  `IsNaN`/`IsInfinity`/`IsFinite`, `GreatestCommonDivisor`, and the bit
   functions. A module is a scope, so `Math.Sqrt(x)` needs no static class
 - `Standard.Concurrent`: `ConcurrentQueue<T>`, `ConcurrentStack<T>`,
   `ConcurrentDictionary<TKey, TValue>` and a blocking `Channel<T>`. Each owns its
@@ -487,11 +487,11 @@ last person to edit it -- the suite is the authority.
   directory. `Main(String[] args)` is the better way to read the arguments --
   a function that takes what it needs beats one that goes looking -- and
   `Env.GetArguments()` is for the code that is nowhere near `Main`
-- `Standard.Time`: `Instant` (a point on the wall clock) and `Duration` (a
+- `Standard.Time`: `DateTimeOffset` (a point on the wall clock) and `TimeSpan` (a
   length), both structs over one `long` of nanoseconds that declare the
   arithmetic to go with it -- `hour + minute`, `later - earlier` -- and are
-  made by naming the unit, `Duration.FromSeconds(30)`. Plus `DateTime` for the
-  parts a person reads, ISO 8601 in both directions, and `Clock` over the
+  made by naming the unit, `TimeSpan.FromSeconds(30)`. Plus `DateTime` for the
+  parts a person reads, ISO 8601 in both directions, and `Stopwatch` over the
   **monotonic** counter -- which is the only correct way to measure how long
   something took, because the wall clock can jump mid-measurement. The UTC
   calendar is computed rather than delegated, so dates before 1970 work on
@@ -511,7 +511,7 @@ last person to edit it -- the suite is the authority.
   only `/` is a separator — a backslash there is an ordinary character a
   filename may contain, so treating `report\2026.csv` as two parts would be
   wrong rather than lenient
-- `Standard.Net`: `TcpListener`, `TcpClient`, `UdpSocket` and the `Socket`
+- `Standard.Net`: `TcpListener`, `TcpClient`, `UdpClient` and the `Socket`
   underneath them, the same on Windows and Linux. `TcpClient` is an `IStream`,
   so a reader written against a file works over a connection with nothing
   changed. Winsock and BSD sockets disagree about the handle, the errors, the

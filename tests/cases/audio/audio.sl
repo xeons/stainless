@@ -66,7 +66,7 @@ void Clips()
     clip.SetSample(3u, 1u, -1000);
     Check("set-left", Number((long)clip.GetSample(3u, 0u)), "1000");
     Check("set-right", Number((long)clip.GetSample(3u, 1u)), "-1000");
-    Check("set-bytes", Convert.ToHex(clip.Samples).Substring(24u, 8u), "e80318fc");
+    Check("set-bytes", Convert.ToHexString(clip.Samples).Substring(24u, 8u), "e80318fc");
 
     // Clamped rather than wrapped: a sample that wrapped would be a loud click
     // at the opposite polarity, which is the worst possible failure.
@@ -103,7 +103,7 @@ void Clips()
     var deep = new AudioClip(AudioFormat.Create(8000u, (ushort)1, (ushort)24), wide);
     Check("deep-read", Number((long)deep.GetSample(0u, 0u)), "4660");
     deep.SetSample(0u, 0u, -2);
-    Check("deep-set", Convert.ToHex(deep.Samples), "00feff");
+    Check("deep-set", Convert.ToHexString(deep.Samples), "00feff");
     Check("deep-back", Number((long)deep.GetSample(0u, 0u)), "-2");
 }
 
@@ -136,8 +136,8 @@ void Container()
     byte[] file = Wav.Encode(original);
     Check("wav-size", Number((long)file.Length),
           Number((long)(44u + original.Samples.Length)));
-    Check("wav-riff", Convert.ToHex(file).Substring(0u, 8u), "52494646");
-    Check("wav-wave", Convert.ToHex(file).Substring(16u, 8u), "57415645");
+    Check("wav-riff", Convert.ToHexString(file).Substring(0u, 8u), "52494646");
+    Check("wav-wave", Convert.ToHexString(file).Substring(16u, 8u), "57415645");
 
     var read = Wav.Decode(file);
     if (!read.Ok)
@@ -181,8 +181,8 @@ void Container()
     var odd = AudioClip.CreateSilence(AudioFormat.Create(8000u, (ushort)1, (ushort)8), 3u);
     byte[] padded = Wav.Encode(odd);
     Check("wav-odd-size", Number((long)padded.Length), "48");
-    Check("wav-odd-riff", Convert.ToHex(padded).Substring(8u, 8u), "28000000");
-    Check("wav-odd-data", Convert.ToHex(padded).Substring(80u, 8u), "03000000");
+    Check("wav-odd-riff", Convert.ToHexString(padded).Substring(8u, 8u), "28000000");
+    Check("wav-odd-data", Convert.ToHexString(padded).Substring(80u, 8u), "03000000");
     Check("wav-odd-pad", Number((long)padded[47u]), "0");
     var oddBack = Wav.Decode(padded);
     Check("wav-odd-frames", oddBack.Ok ? Number((long)oddBack.Value.FrameCount) : "refused", "3");

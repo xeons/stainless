@@ -40,10 +40,10 @@ import Standard.Collections;
 #if WINDOWS
 
 /// What `Join` writes between two parts.
-public const char Separator = '\\';
+public const char DirectorySeparatorChar = '\\';
 
 /// The other one, accepted everywhere a separator is looked for.
-public const char AltSeparator = '/';
+public const char AltDirectorySeparatorChar = '/';
 
 bool IsSeparator(byte value)
 {
@@ -53,10 +53,10 @@ bool IsSeparator(byte value)
 #else
 
 /// What `Join` writes between two parts.
-public const char Separator = '/';
+public const char DirectorySeparatorChar = '/';
 
 /// The same one: there is no second separator outside Windows.
-public const char AltSeparator = '/';
+public const char AltDirectorySeparatorChar = '/';
 
 bool IsSeparator(byte value)
 {
@@ -106,10 +106,10 @@ public String Join(String left, String right)
     return left + GetSeparatorText() + right;
 }
 
-/// `Separator` as text, since that is what joining needs.
+/// `DirectorySeparatorChar` as text, since that is what joining needs.
 String GetSeparatorText()
 {
-    byte one = (byte)Separator;
+    byte one = (byte)DirectorySeparatorChar;
     return Text.FromBytes(&one, 1);
 }
 

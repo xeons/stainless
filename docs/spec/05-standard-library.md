@@ -54,7 +54,7 @@ is the measure of how completely the compiler is leaving the job to the linker.
 | `Standard.Resources` | what a `.rc` folded into the binary, read back on every platform ([§2.2 of packages.md](../packages.md#22-resources)) | on request |
 | `Standard.Net` | TCP and UDP sockets, the same on every platform | on request |
 | `Standard.Env` | the command line, the environment, the working directory | on request |
-| `Standard.Time` | `Instant`, `Duration`, `DateTime` and the monotonic `Clock` | on request |
+| `Standard.Time` | `DateTimeOffset`, `TimeSpan`, `DateTime` and the monotonic `Stopwatch` | on request |
 | `Standard.Random` | xoshiro256**, seeded by you or by the operating system | on request |
 | `Standard.Drawing` | raster images: decode, draw, encode ([§5.12](#512-standarddrawing)) | on request |
 | `Standard.Security.Cryptography` | hashes, MACs, key derivation, AES ([§5.13](#513-standardsecuritycryptography)) | on request |
@@ -152,9 +152,9 @@ enforces.
 ## 5.4 `Standard.Collections`
 
 ```csharp
-public interface IEquatable<T>     { bool EqualTo(T other); }
+public interface IEquatable<T>     { bool Equals(T other); }
 public interface IComparable<T>    { int CompareTo(T other); }
-public interface IHashable         { nuint HashCode(); }
+public interface IHashable         { nuint GetHashCode(); }
 
 public interface IReadOnlyList<T>  { nuint Count { get; } T this[nuint index] { get; } }
 
@@ -175,7 +175,7 @@ None of them can carry a declaration — a primitive is not a class, an enum is
 its integer, and `String` belongs to the runtime — but they are exactly the
 types people sort by and use as keys, so a rule that excluded them would
 exclude the point of having constraints. The compiler recognises `CompareTo`,
-`EqualTo` and `HashCode` on those types and lowers each to a comparison or a
+`Equals` and `GetHashCode` on those types and lowers each to a comparison or a
 runtime call:
 
 ```csharp
@@ -189,7 +189,7 @@ ages.SetValue("ada", 36);               // String satisfies IEquatable + IHashab
 "apple".CompareTo("banana");            // -1, by bytes, which for UTF-8 is by code point
 ```
 
-**A float's `EqualTo` is `CompareTo`'s equality, not `==`.** NaN equals NaN
+**A float's `Equals` is `CompareTo`'s equality, not `==`.** NaN equals NaN
 and `-0.0` equals `0.0`, which is what lets a NaN key be found in a
 `Dictionary<double, …>` at all. The operator keeps IEEE's answer, so
 `nan == nan` is still false.
@@ -313,7 +313,7 @@ public class Money : IComparable<Money>, IEquatable<Money>
 {
     int cents;
     public int CompareTo(Money other) { ... }
-    public bool EqualTo(Money other)  { ... }
+    public bool Equals(Money other)  { ... }
 }
 
 var prices = new List<Money>();
@@ -338,7 +338,7 @@ public closure R    Func<T, R>(T value);
 public closure bool Predicate<T>(T value);
 public closure void Action<T>(T value);
 public closure A    Fold<A, T>(A total, T value);
-public closure int  Comparer<T>(T left, T right);
+public closure int  Comparison<T>(T left, T right);
 ```
 
 These five are declared in `Standard` rather than here, so they need no import:
@@ -390,7 +390,7 @@ generators, and there is no `yield` here; a name borrowed from a language that
 has one would imply otherwise.
 
 **Sorting is a stable merge sort**, over a `T[:]` or an `IList<T>`, either by
-`IComparable<T>` or by a `Comparer<T>` given at the call. Stability is the
+`IComparable<T>` or by a `Comparison<T>` given at the call. Stability is the
 property worth the scratch array it costs: sorting by one key and then another
 is how a multi-key order gets built, and that only works if the second sort
 leaves equal elements where the first put them. An in-place quicksort would
@@ -414,38 +414,42 @@ int Main(String[] args)
 ```
 
 `Main` takes either nothing or a `String[]`, and nothing else (SL0282). The
-array holds the arguments only — the program's own name is `Env.ProgramPath()`,
+array holds the arguments only — the program's own name is `Env.GetProcessPath()`,
 because it is not one of them and treating it as one is the mistake C's argv
 invites. `Standard.Env` reaches the same list from anywhere, which is for code
 that is nowhere near `Main`; taking the array as a parameter is better where it
 is possible.
 
 `Env` also has variables and the working directory. **An empty value is not
-portable**: Windows defines setting one as removal, so `SetVariable(name, "")` deletes
+portable**: Windows defines setting one as removal, so `SetEnvironmentVariable(name, "")` deletes
 the variable there and keeps an empty one on Unix. Treat empty and unset alike,
-which is what `GetVariableOrDefault` does.
+which is what `GetEnvironmentVariableOrDefault` does.
 
 **`Standard.Time` keeps two kinds of time apart, because confusing them is the
-usual bug.** An `Instant` is a point on the wall clock and can jump — a user
-sets it, NTP corrects it, a laptop wakes. A `Duration` is a length, and `Clock`
-reads a **monotonic** counter that only goes forward:
+usual bug.** A `DateTimeOffset` is a point on the wall clock and can jump — a
+user sets it, NTP corrects it, a laptop wakes. A `TimeSpan` is a length, and
+`Stopwatch` reads a **monotonic** counter that only goes forward:
 
 ```csharp
-var clock = new Clock();
+var clock = new Stopwatch();
 DoTheWork();
 Console.WriteLine(clock.Elapsed.Format());
 ```
 
-Subtracting two `Instant`s to measure something is the thing not to do, and is
-why the timing type is a separate one. Both are structs over a single `long` of
-nanoseconds, so they cost nothing, and both declare the operators that go with
-that: `hour + minute` is a `Duration`, `later - earlier` is the `Duration`
-between two instants, and `instant + span` is another instant. Adding two
-instants is not defined, because the sum of two dates is not a date.
+Subtracting two `DateTimeOffset`s to measure something is the thing not to do,
+and is why the timing type is a separate one. Both are structs over a single
+`long` of nanoseconds, so they cost nothing, and both declare the operators
+that go with that: `hour + minute` is a `TimeSpan`, `later - earlier` is the
+`TimeSpan` between two points, and `point + span` is another point. Adding two
+points is not defined, because the sum of two dates is not a date.
 
-They are made by naming the unit — `Duration.FromSeconds(30)`,
-`Instant.FromUtc(...)` — rather than by a free function, since a bare count of
-nanoseconds at a call site says nothing about which unit was meant.
+They are made by naming the unit — `TimeSpan.FromSeconds(30)`,
+`DateTimeOffset.FromUtc(...)` — rather than by a free function, since a bare
+count of nanoseconds at a call site says nothing about which unit was meant.
+
+`TotalSeconds` and the rest are doubles that keep the fraction, as .NET's are.
+A caller counting whole units casts, which is also the only spelling that says
+which way it wanted the remainder to go.
 
 The UTC calendar is computed rather than delegated to `gmtime`, because the
 platforms disagree about the past: Windows refuses a negative `time_t`, so
@@ -481,8 +485,8 @@ because a Stainless `double` *is* a C `double`.
 
 `Abs`, `Min`, `Max`, `Clamp` and `Sign` are overloaded across `int`, `long`,
 `nuint` and `double`, resolved by argument type. Alongside them are the usual
-transcendentals, `Floor`/`Ceiling`/`Round`/`Truncate`, `IsNaN`/`IsInfinite`/
-`IsFinite`, `Lerp` and `IsNear`, `ToDegrees` and `ToRadians`, the integer
+transcendentals, `Floor`/`Ceiling`/`Round`/`Truncate`, `IsNaN`/`IsInfinity`/
+`IsFinite`, `Lerp` and `IsNear`, `RadiansToDegrees` and `DegreesToRadians`, the integer
 `GreatestCommonDivisor`, `LeastCommonMultiple` and `DivideCeiling`, and the bit
 functions `PopCount`, `LeadingZeroCount`, `TrailingZeroCount`, `IsPowerOfTwo` and
 `RoundUpToPowerOfTwo`.

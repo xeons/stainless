@@ -609,7 +609,7 @@ public sealed class Bitmap
         // The decoder first, because it reads four formats where the widget
         // set reads one -- and the widget set second, because a machine with
         // no imaging library still has whatever its own toolkit can decode.
-        if (Standard.Drawing.Imaging.Available)
+        if (Standard.Drawing.Imaging.IsAvailable)
         {
             var read = Standard.Drawing.Image.FromFile(path);
             if (read.Ok)

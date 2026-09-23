@@ -7,7 +7,7 @@ than library features, and so need no import to reach.
 
 ## Contents
 
-**Types** &nbsp; [Action&lt;T&gt;](#actiont-closure) &middot; [Comparer&lt;T&gt;](#comparert-closure) &middot; [Fold&lt;A, T&gt;](#folda-t-closure) &middot; [Func&lt;T, R&gt;](#funct-r-closure) &middot; [Optional&lt;T&gt;](#optionalt-variant) &middot; [Predicate&lt;T&gt;](#predicatet-closure) &middot; [Result&lt;T, TError&gt;](#resultt-terror-variant)
+**Types** &nbsp; [Action&lt;T&gt;](#actiont-closure) &middot; [Comparison&lt;T&gt;](#comparisont-closure) &middot; [Fold&lt;TAccumulate, TSource&gt;](#foldtaccumulate-tsource-closure) &middot; [Func&lt;T, TResult&gt;](#funct-tresult-closure) &middot; [Optional&lt;T&gt;](#optionalt-variant) &middot; [Predicate&lt;T&gt;](#predicatet-closure) &middot; [Result&lt;T, TError&gt;](#resultt-terror-variant)
 
 ## Types
 
@@ -23,12 +23,12 @@ Does something with a T and returns nothing.
 
 - `T` — what is handed to it
 
-<sub>[stdlib/Standard.sl:100](../../stdlib/Standard.sl#L100)</sub>
+<sub>[stdlib/Standard/Standard.sl:48](../../stdlib/Standard/Standard.sl#L48)</sub>
 
-### Comparer&lt;T&gt; *closure*
+### Comparison&lt;T&gt; *closure*
 
 ```
-closure int Comparer<T>(T left, T right)
+closure int Comparison<T>(T left, T right)
 ```
 
 Orders two Ts: negative if `left` comes first, positive if `right` does,
@@ -41,16 +41,16 @@ that implements no interface be sorted at all.
 
 - `T` — what is being ordered
 
-<sub>[stdlib/Standard.sl:118](../../stdlib/Standard.sl#L118)</sub>
+<sub>[stdlib/Standard/Standard.sl:66](../../stdlib/Standard/Standard.sl#L66)</sub>
 
-### Fold&lt;A, T&gt; *closure*
+### Fold&lt;TAccumulate, TSource&gt; *closure*
 
 ```
-closure A Fold<A, T>(A total, T value)
+closure TAccumulate Fold<TAccumulate, TSource>(TAccumulate total, TSource value)
 ```
 
-Folds one T into a running A. Two parameters rather than one, because a
-fold is the one shape that carries something along with it.
+Folds one element into a running total. Two parameters rather than one,
+because a fold is the one shape that carries something along with it.
 
 **Parameters**
 
@@ -59,25 +59,25 @@ fold is the one shape that carries something along with it.
 
 **Type parameters**
 
-- `A` — what is carried along, and what the fold answers with
-- `T` — what is folded over
+- `TAccumulate` — what is carried along, and what the fold answers with
+- `TSource` — what is folded over
 
-<sub>[stdlib/Standard.sl:109](../../stdlib/Standard.sl#L109)</sub>
+<sub>[stdlib/Standard/Standard.sl:57](../../stdlib/Standard/Standard.sl#L57)</sub>
 
-### Func&lt;T, R&gt; *closure*
+### Func&lt;T, TResult&gt; *closure*
 
 ```
-closure R Func<T, R>(T value)
+closure TResult Func<T, TResult>(T value)
 ```
 
-Turns a T into an R. The transform half of `Select`.
+Turns a T into a TResult. The transform half of `Select`.
 
 **Type parameters**
 
 - `T` — what goes in
-- `R` — what comes out
+- `TResult` — what comes out
 
-<sub>[stdlib/Standard.sl:90](../../stdlib/Standard.sl#L90)</sub>
+<sub>[stdlib/Standard/Standard.sl:38](../../stdlib/Standard/Standard.sl#L38)</sub>
 
 ### Optional&lt;T&gt; *variant*
 
@@ -110,7 +110,7 @@ is what the spec calls `C?`.
 
 - `T` — what it may hold -- a value type, usually, since a reference already has `C?`
 
-<sub>[stdlib/Standard.sl:159](../../stdlib/Standard.sl#L159)</sub>
+<sub>[stdlib/Standard/Optional.sl:46](../../stdlib/Standard/Optional.sl#L46)</sub>
 
 #### None *case*
 
@@ -121,7 +121,7 @@ None
 There is no value. Carries nothing, so there is nothing to read by
 mistake.
 
-<sub>[stdlib/Standard.sl:163](../../stdlib/Standard.sl#L163)</sub>
+<sub>[stdlib/Standard/Optional.sl:50](../../stdlib/Standard/Optional.sl#L50)</sub>
 
 #### Some *case*
 
@@ -132,7 +132,7 @@ Some(T Value)
 There is one, and `Some` carries it. Reached with `is Some x`, which
 takes the value and names it in the same step.
 
-<sub>[stdlib/Standard.sl:167](../../stdlib/Standard.sl#L167)</sub>
+<sub>[stdlib/Standard/Optional.sl:54](../../stdlib/Standard/Optional.sl#L54)</sub>
 
 #### HasValue *property*
 
@@ -143,7 +143,7 @@ bool HasValue { get; }
 True when there is a value. The reader for a caller that is about to
 ask a second question anyway; `is Some x` is the one that gets at it.
 
-<sub>[stdlib/Standard.sl:171](../../stdlib/Standard.sl#L171)</sub>
+<sub>[stdlib/Standard/Optional.sl:58](../../stdlib/Standard/Optional.sl#L58)</sub>
 
 #### IsEmpty *property*
 
@@ -154,7 +154,7 @@ bool IsEmpty { get; }
 True when there is not. The same question the other way round, because
 `!x.HasValue` reads worse than the thing it means.
 
-<sub>[stdlib/Standard.sl:183](../../stdlib/Standard.sl#L183)</sub>
+<sub>[stdlib/Standard/Optional.sl:70](../../stdlib/Standard/Optional.sl#L70)</sub>
 
 #### GetValue *method*
 
@@ -171,7 +171,7 @@ value to return. Use `GetValueOrDefault` where a miss is ordinary, and
 
 **See also** &nbsp; [Optional.GetValueOrDefault](#getvalueordefault-method)
 
-<sub>[stdlib/Standard.sl:201](../../stdlib/Standard.sl#L201)</sub>
+<sub>[stdlib/Standard/Optional.sl:88](../../stdlib/Standard/Optional.sl#L88)</sub>
 
 #### GetValueOrDefault *method*
 
@@ -190,7 +190,7 @@ bargain `Result.GetValueOrDefault` makes.
 
 **See also** &nbsp; [Optional.GetValue](#getvalue-method)
 
-<sub>[stdlib/Standard.sl:220](../../stdlib/Standard.sl#L220)</sub>
+<sub>[stdlib/Standard/Optional.sl:107](../../stdlib/Standard/Optional.sl#L107)</sub>
 
 #### Coalesce *method*
 
@@ -204,12 +204,12 @@ This one if it holds anything, and `other` if it does not.
 A lambda would allocate a closure to save an evaluation, which is the
 wrong way round at the sizes this is used at.
 
-<sub>[stdlib/Standard.sl:232](../../stdlib/Standard.sl#L232)</sub>
+<sub>[stdlib/Standard/Optional.sl:119](../../stdlib/Standard/Optional.sl#L119)</sub>
 
 #### Select *method*
 
 ```
-Optional<R> Select<R>(Func<T, R> transform)
+Optional<TResult> Select<TResult>(Func<T, TResult> transform)
 ```
 
 The value put through `transform`, or none.
@@ -221,14 +221,14 @@ the point: it is the `if` that would otherwise be written by hand.
 
 **Type parameters**
 
-- `R` — what `transform` produces
+- `TResult` — what `transform` produces
 
-<sub>[stdlib/Standard.sl:247](../../stdlib/Standard.sl#L247)</sub>
+<sub>[stdlib/Standard/Optional.sl:134](../../stdlib/Standard/Optional.sl#L134)</sub>
 
 #### SelectMany *method*
 
 ```
-Optional<R> SelectMany<R>(Func<T, Optional<R>> transform)
+Optional<TResult> SelectMany<TResult>(Func<T, Optional<TResult>> transform)
 ```
 
 `Select` for a transform that answers with an optional of its own, which
@@ -236,9 +236,9 @@ would otherwise nest one inside the other.
 
 **Type parameters**
 
-- `R` — what the transform's own optional holds
+- `TResult` — what the transform's own optional holds
 
-<sub>[stdlib/Standard.sl:258](../../stdlib/Standard.sl#L258)</sub>
+<sub>[stdlib/Standard/Optional.sl:145](../../stdlib/Standard/Optional.sl#L145)</sub>
 
 #### Where *method*
 
@@ -248,7 +248,7 @@ Optional<T> Where(Predicate<T> keep)
 
 This one when it holds something `keep` accepts, and none otherwise.
 
-<sub>[stdlib/Standard.sl:266](../../stdlib/Standard.sl#L266)</sub>
+<sub>[stdlib/Standard/Optional.sl:153](../../stdlib/Standard/Optional.sl#L153)</sub>
 
 #### InvokeIfPresent *method*
 
@@ -258,7 +258,7 @@ void InvokeIfPresent(Action<T> action)
 
 Runs `action` on the value, if there is one.
 
-<sub>[stdlib/Standard.sl:277](../../stdlib/Standard.sl#L277)</sub>
+<sub>[stdlib/Standard/Optional.sl:164](../../stdlib/Standard/Optional.sl#L164)</sub>
 
 ### Predicate&lt;T&gt; *closure*
 
@@ -272,7 +272,7 @@ Answers a question about a T.
 
 - `T` — what the question is about
 
-<sub>[stdlib/Standard.sl:95](../../stdlib/Standard.sl#L95)</sub>
+<sub>[stdlib/Standard/Standard.sl:43](../../stdlib/Standard/Standard.sl#L43)</sub>
 
 ### Result&lt;T, TError&gt; *variant*
 
@@ -311,7 +311,7 @@ pointer, not a flag and both halves. Nothing allocates either way.
 - `T` — what the call produces when it worked
 - `TError` — why it did not, usually an enum so that a failure has a name rather than a number
 
-<sub>[stdlib/Standard.sl:55](../../stdlib/Standard.sl#L55)</sub>
+<sub>[stdlib/Standard/Result.sl:53](../../stdlib/Standard/Result.sl#L53)</sub>
 
 #### Ok *case*
 
@@ -321,7 +321,7 @@ Ok(T Value)
 
 It worked, and `Value` is the answer.
 
-<sub>[stdlib/Standard.sl:58](../../stdlib/Standard.sl#L58)</sub>
+<sub>[stdlib/Standard/Result.sl:56](../../stdlib/Standard/Result.sl#L56)</sub>
 
 #### Fail *case*
 
@@ -332,7 +332,7 @@ Fail(TError Error)
 It did not, and `Error` says why. The value is not there to be read --
 that is the whole of what a variant buys over a pair.
 
-<sub>[stdlib/Standard.sl:62](../../stdlib/Standard.sl#L62)</sub>
+<sub>[stdlib/Standard/Result.sl:60](../../stdlib/Standard/Result.sl#L60)</sub>
 
 #### GetValueOrDefault *method*
 
@@ -345,5 +345,5 @@ The value if there is one, and `fallback` if there is not.
 The one reader that needs no proof, because it supplies its own: a
 caller with a sensible default has nothing to check.
 
-<sub>[stdlib/Standard.sl:68](../../stdlib/Standard.sl#L68)</sub>
+<sub>[stdlib/Standard/Result.sl:66](../../stdlib/Standard/Result.sl#L66)</sub>
 

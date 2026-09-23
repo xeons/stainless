@@ -54,7 +54,7 @@ byte[] MarkedText()
 
 int Main()
 {
-    var temp = Env.GetVariableOrDefault("TEMP", Env.GetVariableOrDefault("TMPDIR", "/tmp"));
+    var temp = Env.GetEnvironmentVariableOrDefault("TEMP", Env.GetEnvironmentVariableOrDefault("TMPDIR", "/tmp"));
     var path = Path.Join(temp, "stainless-files-text-reading.txt");
     File.WriteAllBytes(path, MarkedText());
 

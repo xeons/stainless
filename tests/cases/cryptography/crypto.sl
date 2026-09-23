@@ -15,7 +15,7 @@ import Standard.Security.Cryptography;
 
 byte[] Bytes(String text) => Encoding.CreateUtf8().GetBytes(text);
 
-byte[] Hex(String text) => Convert.FromHex(text).GetValueOrDefault(new byte[0u]);
+byte[] Hex(String text) => Convert.FromHexString(text).GetValueOrDefault(new byte[0u]);
 
 byte[] Repeat(byte value, nuint count)
 {
@@ -46,39 +46,39 @@ void Digests()
 {
     byte[] abc = Bytes("abc");
 
-    Check("md5", Convert.ToHex(Md5.HashData(abc)), "900150983cd24fb0d6963f7d28e17f72");
-    Check("sha1", Convert.ToHex(Sha1.HashData(abc)),
+    Check("md5", Convert.ToHexString(Md5.HashData(abc)), "900150983cd24fb0d6963f7d28e17f72");
+    Check("sha1", Convert.ToHexString(Sha1.HashData(abc)),
           "a9993e364706816aba3e25717850c26c9cd0d89d");
-    Check("sha256", Convert.ToHex(Sha256.HashData(abc)),
+    Check("sha256", Convert.ToHexString(Sha256.HashData(abc)),
           "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
-    Check("sha384", Convert.ToHex(Sha384.HashData(abc)),
+    Check("sha384", Convert.ToHexString(Sha384.HashData(abc)),
           "cb00753f45a35e8bb5a03d699ac65007272c32ab0eded1631a8b605a43ff5bed" +
           "8086072ba1e7cc2358baeca134c825a7");
-    Check("sha512", Convert.ToHex(Sha512.HashData(abc)),
+    Check("sha512", Convert.ToHexString(Sha512.HashData(abc)),
           "ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a" +
           "2192992a274fc1a836ba3c23a3feebbd454d4423643ce80e2a9ac94fa54ca49f");
 
     // The empty input is the one that exercises the padding on its own: the
     // block it hashes is nothing but the terminator, the zeros and the length.
-    Check("sha256-empty", Convert.ToHex(Sha256.HashData(new byte[0u])),
+    Check("sha256-empty", Convert.ToHexString(Sha256.HashData(new byte[0u])),
           "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
 
     // A message that crosses a block boundary, and the same message appended
     // in three pieces: the buffering has to give the same answer as the
     // one-shot, and the split is chosen to land inside a block.
     byte[] long448 = Bytes("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq");
-    Check("sha256-multiblock", Convert.ToHex(Sha256.HashData(long448)),
+    Check("sha256-multiblock", Convert.ToHexString(Sha256.HashData(long448)),
           "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1");
 
     var incremental = new Sha256();
     incremental.AppendData(Bytes("abcdbcdecdefdefgefghfghi"));
     incremental.AppendData(Bytes("ghijhijkijkl"));
     incremental.AppendData(Bytes("jklmklmnlmnomnopnopq"));
-    Check("sha256-incremental", Convert.ToHex(incremental.GetHashAndReset()),
+    Check("sha256-incremental", Convert.ToHexString(incremental.GetHashAndReset()),
           "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1");
 
     // And the reset that `GetHashAndReset` promises.
-    Check("sha256-reset", Convert.ToHex(incremental.GetHashAndReset()),
+    Check("sha256-reset", Convert.ToHexString(incremental.GetHashAndReset()),
           "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
 }
 
@@ -89,23 +89,23 @@ void Macs()
 
     // RFC 2202's MD5 cases use a sixteen-byte key where RFC 4231's SHA cases
     // use twenty, which is the only reason this line differs from the rest.
-    Check("hmac-md5", Convert.ToHex(HmacMd5.HashData(Repeat((byte)0x0B, 16u), data)),
+    Check("hmac-md5", Convert.ToHexString(HmacMd5.HashData(Repeat((byte)0x0B, 16u), data)),
           "9294727a3638bb1c13f48ef8158bfc9d");
-    Check("hmac-sha1", Convert.ToHex(HmacSha1.HashData(key, data)),
+    Check("hmac-sha1", Convert.ToHexString(HmacSha1.HashData(key, data)),
           "b617318655057264e28bc0b6fb378c8ef146be00");
-    Check("hmac-sha256", Convert.ToHex(HmacSha256.HashData(Repeat((byte)0x0B, 20u), data)),
+    Check("hmac-sha256", Convert.ToHexString(HmacSha256.HashData(Repeat((byte)0x0B, 20u), data)),
           "b0344c61d8db38535ca8afceaf0bf12b881dc200c9833da726e9376c2e32cff7");
-    Check("hmac-sha384", Convert.ToHex(HmacSha384.HashData(Repeat((byte)0x0B, 20u), data)),
+    Check("hmac-sha384", Convert.ToHexString(HmacSha384.HashData(Repeat((byte)0x0B, 20u), data)),
           "afd03944d84895626b0825f4ab46907f15f9dadbe4101ec682aa034c7cebc59c" +
           "faea9ea9076ede7f4af152e8b2fa9cb6");
-    Check("hmac-sha512", Convert.ToHex(HmacSha512.HashData(Repeat((byte)0x0B, 20u), data)),
+    Check("hmac-sha512", Convert.ToHexString(HmacSha512.HashData(Repeat((byte)0x0B, 20u), data)),
           "87aa7cdea5ef619d4ff0b4241a1d6cb02379f4e2ce4ec2787ad0b30545e17cde" +
           "daa833b7d6b8a702038b274eaea3f4e4be9d914eeb61f1702e696c203a126854");
 
     // A key longer than the block, which is hashed down before it is used --
     // RFC 4231 test case 6.
     Check("hmac-long-key",
-          Convert.ToHex(HmacSha256.HashData(Repeat((byte)0xAA, 131u),
+          Convert.ToHexString(HmacSha256.HashData(Repeat((byte)0xAA, 131u),
               Bytes("Test Using Larger Than Block-Size Key - Hash Key First"))),
           "60e431591ee0b67f0d8a26aacbf5b77f8e0bc6213728c5140546040f0ee37f54");
 }
@@ -116,19 +116,19 @@ void Derivation()
     byte[] salt = Bytes("salt");
 
     var once = Rfc2898DeriveBytes.Pbkdf2(password, salt, 1u, new Sha1(), 20u);
-    Check("pbkdf2-1", Convert.ToHex(once.GetValueOrDefault(new byte[0u])),
+    Check("pbkdf2-1", Convert.ToHexString(once.GetValueOrDefault(new byte[0u])),
           "0c60c80f961f0e71f3a9b524af6012062fe037a6");
 
     var twice = Rfc2898DeriveBytes.Pbkdf2(password, salt, 2u, new Sha1(), 20u);
-    Check("pbkdf2-2", Convert.ToHex(twice.GetValueOrDefault(new byte[0u])),
+    Check("pbkdf2-2", Convert.ToHexString(twice.GetValueOrDefault(new byte[0u])),
           "ea6c014dc72d6f8ccd1ed92ace1d41f0d8de8957");
 
     var many = Rfc2898DeriveBytes.Pbkdf2(password, salt, 4096u, new Sha1(), 20u);
-    Check("pbkdf2-4096", Convert.ToHex(many.GetValueOrDefault(new byte[0u])),
+    Check("pbkdf2-4096", Convert.ToHexString(many.GetValueOrDefault(new byte[0u])),
           "4b007901b765489abead49d926f721d065a429c1");
 
     var wide = Rfc2898DeriveBytes.Pbkdf2(password, salt, 1u, new Sha256(), 32u);
-    Check("pbkdf2-sha256", Convert.ToHex(wide.GetValueOrDefault(new byte[0u])),
+    Check("pbkdf2-sha256", Convert.ToHexString(wide.GetValueOrDefault(new byte[0u])),
           "120fb6cffcf8b32c43e7225256c4f837a86548c92ccc35480805987cb70be17b");
 
     var refused = Rfc2898DeriveBytes.Pbkdf2(password, salt, 0u, new Sha256(), 32u);
@@ -137,7 +137,7 @@ void Derivation()
     var derived = Hkdf.DeriveKey(new Sha256(), Repeat((byte)0x0B, 22u),
                                  Hex("000102030405060708090a0b0c"),
                                  Hex("f0f1f2f3f4f5f6f7f8f9"), 42u);
-    Check("hkdf", Convert.ToHex(derived.GetValueOrDefault(new byte[0u])),
+    Check("hkdf", Convert.ToHexString(derived.GetValueOrDefault(new byte[0u])),
           "3cb25f25faacd57a90434f64d0362f2a2d2d0a90cf1a5a4c5db02d56ecc4c5bf" +
           "34007208d5b887185865");
 }
@@ -148,20 +148,20 @@ void Blocks()
 
     byte[] block = Hex(plain);
     Cipher(Hex("000102030405060708090a0b0c0d0e0f")).EncryptBlock(block, 0u);
-    Check("aes-128", Convert.ToHex(block), "69c4e0d86a7b0430d8cdb78070b4c55a");
+    Check("aes-128", Convert.ToHexString(block), "69c4e0d86a7b0430d8cdb78070b4c55a");
     Cipher(Hex("000102030405060708090a0b0c0d0e0f")).DecryptBlock(block, 0u);
-    Check("aes-128-back", Convert.ToHex(block), plain);
+    Check("aes-128-back", Convert.ToHexString(block), plain);
 
     block = Hex(plain);
     Cipher(Hex("000102030405060708090a0b0c0d0e0f1011121314151617")).EncryptBlock(block, 0u);
-    Check("aes-192", Convert.ToHex(block), "dda97ca4864cdfe06eaf70a0ec0d7191");
+    Check("aes-192", Convert.ToHexString(block), "dda97ca4864cdfe06eaf70a0ec0d7191");
 
     block = Hex(plain);
     var wide = Cipher(Hex("000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f"));
     wide.EncryptBlock(block, 0u);
-    Check("aes-256", Convert.ToHex(block), "8ea2b7ca516745bfeafc49904b496089");
+    Check("aes-256", Convert.ToHexString(block), "8ea2b7ca516745bfeafc49904b496089");
     wide.DecryptBlock(block, 0u);
-    Check("aes-256-back", Convert.ToHex(block), plain);
+    Check("aes-256-back", Convert.ToHexString(block), plain);
 
     var stunted = Aes.FromKey(new byte[10u]);
     Console.WriteLine(stunted.Ok ? "aes-short-key WRONG" : "aes-short-key refused");
@@ -177,22 +177,22 @@ void Modes()
     var cipher = Cipher(key);
 
     var ecb = cipher.EncryptEcb(plain, PaddingMode.None);
-    Check("ecb", Convert.ToHex(ecb.GetValueOrDefault(new byte[0u])),
+    Check("ecb", Convert.ToHexString(ecb.GetValueOrDefault(new byte[0u])),
           "3ad77bb40d7a3660a89ecaf32466ef97f5d3d58503b9699de785895a96fdbaaf");
 
     var cbc = cipher.EncryptCbc(plain, iv, PaddingMode.None);
-    Check("cbc", Convert.ToHex(cbc.GetValueOrDefault(new byte[0u])),
+    Check("cbc", Convert.ToHexString(cbc.GetValueOrDefault(new byte[0u])),
           "7649abac8119b246cee98e9b12e9197d5086cb9b507219ee95db113a917678b2");
 
     // F.5.1: the counter runs from a named start rather than from an IV.
     var ctr = cipher.ApplyCtr(plain, Hex("f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff"));
-    Check("ctr", Convert.ToHex(ctr.GetValueOrDefault(new byte[0u])),
+    Check("ctr", Convert.ToHexString(ctr.GetValueOrDefault(new byte[0u])),
           "874d6191b620e3261bef6864990db6ce9806f66b7970fdff8617187bb9fffdff");
 
     // CTR is its own inverse, which is the whole of why it needs no padding.
     var back = cipher.ApplyCtr(ctr.GetValueOrDefault(new byte[0u]),
                                Hex("f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff"));
-    Check("ctr-inverse", Convert.ToHex(back.GetValueOrDefault(new byte[0u])), Convert.ToHex(plain));
+    Check("ctr-inverse", Convert.ToHexString(back.GetValueOrDefault(new byte[0u])), Convert.ToHexString(plain));
 
     // The padding, which is what a message that is not a whole block needs.
     byte[] message = Bytes("the quick brown fox");
@@ -238,13 +238,13 @@ void Authenticated()
     byte[] tag = new byte[16u];
     var sealedText = box.Encrypt(nonce, plain, new byte[0u], tag);
 
-    Check("gcm-ciphertext", Convert.ToHex(sealedText.GetValueOrDefault(new byte[0u])),
+    Check("gcm-ciphertext", Convert.ToHexString(sealedText.GetValueOrDefault(new byte[0u])),
           "42831ec2217774244b7221b784d0d49ce3aa212f2c02a4e035c17e2329aca12e" +
           "21d514b25466931c7d8f6a5aac84aa051ba30b396a0aac973d58e091473f5985");
-    Check("gcm-tag", Convert.ToHex(tag), "4d5c2af327cd64a62cf35abd2ba6fab4");
+    Check("gcm-tag", Convert.ToHexString(tag), "4d5c2af327cd64a62cf35abd2ba6fab4");
 
     var opened = box.Decrypt(nonce, sealedText.GetValueOrDefault(new byte[0u]), new byte[0u], tag);
-    Check("gcm-round-trip", Convert.ToHex(opened.GetValueOrDefault(new byte[0u])), Convert.ToHex(plain));
+    Check("gcm-round-trip", Convert.ToHexString(opened.GetValueOrDefault(new byte[0u])), Convert.ToHexString(plain));
 
     // Associated data is authenticated and not encrypted, so changing it after
     // the fact is a forgery like any other.
@@ -276,7 +276,7 @@ void Discipline()
         ? "lengths WRONG" : "lengths ok");
 
     CryptographicOperations.ZeroMemory(left);
-    Console.WriteLine("zeroed " + Convert.ToHex(left));
+    Console.WriteLine("zeroed " + Convert.ToHexString(left));
 
     // Entropy is not reproducible, so what is checked is that it arrives and
     // that two draws differ -- which a stuck generator would fail.

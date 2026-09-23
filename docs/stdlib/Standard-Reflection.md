@@ -30,7 +30,7 @@ struct Attribute
 
 One attribute as written on a declaration, with the constants it was given.
 
-<sub>[stdlib/Reflection.sl:178](../../stdlib/Reflection.sl#L178)</sub>
+<sub>[stdlib/Reflection/Attribute.sl:27](../../stdlib/Reflection/Attribute.sl#L27)</sub>
 
 #### Handle *field*
 
@@ -41,7 +41,7 @@ byte* Handle
 The runtime's record for this attribute. Owned by the metadata, which
 lives as long as the program, so it never has to be freed.
 
-<sub>[stdlib/Reflection.sl:182](../../stdlib/Reflection.sl#L182)</sub>
+<sub>[stdlib/Reflection/Attribute.sl:31](../../stdlib/Reflection/Attribute.sl#L31)</sub>
 
 #### Name *property*
 
@@ -51,7 +51,7 @@ String Name { get; }
 
 The attribute's name, without the brackets.
 
-<sub>[stdlib/Reflection.sl:185](../../stdlib/Reflection.sl#L185)</sub>
+<sub>[stdlib/Reflection/Attribute.sl:34](../../stdlib/Reflection/Attribute.sl#L34)</sub>
 
 #### ValueCount *property*
 
@@ -61,7 +61,7 @@ nuint ValueCount { get; }
 
 How many constants were written in the brackets.
 
-<sub>[stdlib/Reflection.sl:188](../../stdlib/Reflection.sl#L188)</sub>
+<sub>[stdlib/Reflection/Attribute.sl:37](../../stdlib/Reflection/Attribute.sl#L37)</sub>
 
 #### GetValueKind *method*
 
@@ -72,7 +72,7 @@ int GetValueKind(nuint index)
 Which kind the value at `index` is -- one of the `Kind` constants --
 so a reader knows whether to call `GetText` or `GetNumber`.
 
-<sub>[stdlib/Reflection.sl:192](../../stdlib/Reflection.sl#L192)</sub>
+<sub>[stdlib/Reflection/Attribute.sl:41](../../stdlib/Reflection/Attribute.sl#L41)</sub>
 
 #### GetText *method*
 
@@ -82,7 +82,7 @@ String GetText(nuint index)
 
 The value as text. Only meaningful when GetValueKind is KindString.
 
-<sub>[stdlib/Reflection.sl:195](../../stdlib/Reflection.sl#L195)</sub>
+<sub>[stdlib/Reflection/Attribute.sl:44](../../stdlib/Reflection/Attribute.sl#L44)</sub>
 
 #### GetNumber *method*
 
@@ -94,7 +94,7 @@ The value as a whole number. Meaningful for the integer kinds and for
 `KindBool`, where one is true; zero for anything else, including a
 string, rather than a reinterpretation of its pointer.
 
-<sub>[stdlib/Reflection.sl:203](../../stdlib/Reflection.sl#L203)</sub>
+<sub>[stdlib/Reflection/Attribute.sl:52](../../stdlib/Reflection/Attribute.sl#L52)</sub>
 
 ### Field *struct*
 
@@ -111,7 +111,7 @@ its accessors does not -- see `IsPropertyStorage` and `Type.FindProperty`.
 
 **See also** &nbsp; [Type.FindProperty](#findproperty-method) &middot; [Property](#property-struct)
 
-<sub>[stdlib/Reflection.sl:217](../../stdlib/Reflection.sl#L217)</sub>
+<sub>[stdlib/Reflection/Field.sl:35](../../stdlib/Reflection/Field.sl#L35)</sub>
 
 #### Handle *field*
 
@@ -122,7 +122,7 @@ byte* Handle
 The runtime's record for this field, or null for one that was looked up
 and not found. `Type.FindField` is what answers with a null one.
 
-<sub>[stdlib/Reflection.sl:221](../../stdlib/Reflection.sl#L221)</sub>
+<sub>[stdlib/Reflection/Field.sl:39](../../stdlib/Reflection/Field.sl#L39)</sub>
 
 #### Name *property*
 
@@ -133,7 +133,7 @@ String Name { get; }
 The field's name. For an automatic property's storage this is the
 property's name, which is why `IsPropertyStorage` has to exist.
 
-<sub>[stdlib/Reflection.sl:225](../../stdlib/Reflection.sl#L225)</sub>
+<sub>[stdlib/Reflection/Field.sl:43](../../stdlib/Reflection/Field.sl#L43)</sub>
 
 #### Offset *property*
 
@@ -144,7 +144,7 @@ nuint Offset { get; }
 How many bytes from the start of the instance the field sits. Add it to
 an instance pointer to reach the storage directly.
 
-<sub>[stdlib/Reflection.sl:229](../../stdlib/Reflection.sl#L229)</sub>
+<sub>[stdlib/Reflection/Field.sl:47](../../stdlib/Reflection/Field.sl#L47)</sub>
 
 #### Kind *property*
 
@@ -154,7 +154,7 @@ int Kind { get; }
 
 What the field holds, as one of the `Kind` constants.
 
-<sub>[stdlib/Reflection.sl:232](../../stdlib/Reflection.sl#L232)</sub>
+<sub>[stdlib/Reflection/Field.sl:50](../../stdlib/Reflection/Field.sl#L50)</sub>
 
 #### AttributeCount *property*
 
@@ -164,7 +164,7 @@ nuint AttributeCount { get; }
 
 How many attributes are written on the field.
 
-<sub>[stdlib/Reflection.sl:235](../../stdlib/Reflection.sl#L235)</sub>
+<sub>[stdlib/Reflection/Field.sl:53](../../stdlib/Reflection/Field.sl#L53)</sub>
 
 #### GetAttributeAt *method*
 
@@ -174,7 +174,7 @@ Attribute GetAttributeAt(nuint index)
 
 The attribute at `index`, in the order they were written.
 
-<sub>[stdlib/Reflection.sl:238](../../stdlib/Reflection.sl#L238)</sub>
+<sub>[stdlib/Reflection/Field.sl:56](../../stdlib/Reflection/Field.sl#L56)</sub>
 
 #### IsPropertyStorage *property*
 
@@ -194,7 +194,7 @@ moves -- wants `Type.FindProperty` instead.
 
 **See also** &nbsp; [Type.FindProperty](#findproperty-method)
 
-<sub>[stdlib/Reflection.sl:256](../../stdlib/Reflection.sl#L256)</sub>
+<sub>[stdlib/Reflection/Field.sl:74](../../stdlib/Reflection/Field.sl#L74)</sub>
 
 #### HasAttribute *method*
 
@@ -204,7 +204,7 @@ bool HasAttribute(String name)
 
 True when an attribute of this name is written on the field.
 
-<sub>[stdlib/Reflection.sl:259](../../stdlib/Reflection.sl#L259)</sub>
+<sub>[stdlib/Reflection/Field.sl:77](../../stdlib/Reflection/Field.sl#L77)</sub>
 
 #### GetAttribute *method*
 
@@ -214,7 +214,7 @@ Attribute GetAttribute(String name)
 
 The named attribute, if it is present. Check Has first.
 
-<sub>[stdlib/Reflection.sl:270](../../stdlib/Reflection.sl#L270)</sub>
+<sub>[stdlib/Reflection/Field.sl:88](../../stdlib/Reflection/Field.sl#L88)</sub>
 
 #### IsInteger *property*
 
@@ -228,7 +228,7 @@ The two code unit kinds were added after the numbering was fixed, so
 they sit past KindArray rather than beside KindChar and a range test
 alone no longer reaches them.
 
-<sub>[stdlib/Reflection.sl:286](../../stdlib/Reflection.sl#L286)</sub>
+<sub>[stdlib/Reflection/Field.sl:104](../../stdlib/Reflection/Field.sl#L104)</sub>
 
 #### IsFloating *property*
 
@@ -240,7 +240,7 @@ True for a field whose value can be read as a `double` -- a `float` or
 a `double`. An integer field is not one: `ReadDouble` on it answers
 zero rather than converting.
 
-<sub>[stdlib/Reflection.sl:300](../../stdlib/Reflection.sl#L300)</sub>
+<sub>[stdlib/Reflection/Field.sl:118](../../stdlib/Reflection/Field.sl#L118)</sub>
 
 #### IsSimple *property*
 
@@ -252,7 +252,7 @@ True for a field this module can read and write by value: a number, a
 bool or a String. Everything else is an aggregate, reached through
 `FieldType` and walked rather than copied.
 
-<sub>[stdlib/Reflection.sl:305](../../stdlib/Reflection.sl#L305)</sub>
+<sub>[stdlib/Reflection/Field.sl:123](../../stdlib/Reflection/Field.sl#L123)</sub>
 
 #### FieldType *property*
 
@@ -267,7 +267,7 @@ Set for a class, an interface and a struct; null for a primitive, whose
 nested object reachable: with the address of the field and the type of
 what is in it, the walk continues without any of it being typed.
 
-<sub>[stdlib/Reflection.sl:319](../../stdlib/Reflection.sl#L319)</sub>
+<sub>[stdlib/Reflection/Field.sl:137](../../stdlib/Reflection/Field.sl#L137)</sub>
 
 #### IsAggregate *property*
 
@@ -277,7 +277,7 @@ bool IsAggregate { get; }
 
 True when this field holds something with fields of its own.
 
-<sub>[stdlib/Reflection.sl:330](../../stdlib/Reflection.sl#L330)</sub>
+<sub>[stdlib/Reflection/Field.sl:148](../../stdlib/Reflection/Field.sl#L148)</sub>
 
 #### ElementKind *property*
 
@@ -287,7 +287,7 @@ int ElementKind { get; }
 
 What an array field's elements are. `KindNone` for anything else.
 
-<sub>[stdlib/Reflection.sl:340](../../stdlib/Reflection.sl#L340)</sub>
+<sub>[stdlib/Reflection/Field.sl:158](../../stdlib/Reflection/Field.sl#L158)</sub>
 
 #### ElementType *property*
 
@@ -297,7 +297,7 @@ Type ElementType { get; }
 
 The type of an array's elements, when they have one.
 
-<sub>[stdlib/Reflection.sl:343](../../stdlib/Reflection.sl#L343)</sub>
+<sub>[stdlib/Reflection/Field.sl:161](../../stdlib/Reflection/Field.sl#L161)</sub>
 
 #### ElementSize *property*
 
@@ -308,7 +308,7 @@ nuint ElementSize { get; }
 How far apart an array's elements sit, in bytes. Zero for a field that
 is not an array.
 
-<sub>[stdlib/Reflection.sl:355](../../stdlib/Reflection.sl#L355)</sub>
+<sub>[stdlib/Reflection/Field.sl:173](../../stdlib/Reflection/Field.sl#L173)</sub>
 
 #### IsArray *property*
 
@@ -321,7 +321,7 @@ True when this field is an array whose elements can be read one by one.
 A slice answers false: it is three words rather than a reference, so
 its elements are not where this arithmetic would look.
 
-<sub>[stdlib/Reflection.sl:361](../../stdlib/Reflection.sl#L361)</sub>
+<sub>[stdlib/Reflection/Field.sl:179](../../stdlib/Reflection/Field.sl#L179)</sub>
 
 #### IsWalkable *property*
 
@@ -337,7 +337,7 @@ Both are classes; only one has anything to walk, and a walk into the
 other finds no fields and reports an empty object -- which is a lie
 about a list that had things in it.
 
-<sub>[stdlib/Reflection.sl:370](../../stdlib/Reflection.sl#L370)</sub>
+<sub>[stdlib/Reflection/Field.sl:188](../../stdlib/Reflection/Field.sl#L188)</sub>
 
 ### Property *struct*
 
@@ -362,7 +362,7 @@ take arguments nothing could supply, and a static one has no instance.
 
 **See also** &nbsp; [Field](#field-struct) &middot; [Type.FindProperty](#findproperty-method)
 
-<sub>[stdlib/Reflection.sl:401](../../stdlib/Reflection.sl#L401)</sub>
+<sub>[stdlib/Reflection/Property.sl:43](../../stdlib/Reflection/Property.sl#L43)</sub>
 
 #### Handle *field*
 
@@ -373,7 +373,7 @@ byte* Handle
 The runtime's record for this property, or null for one that was looked
 up and not found. `Exists` is the check.
 
-<sub>[stdlib/Reflection.sl:405](../../stdlib/Reflection.sl#L405)</sub>
+<sub>[stdlib/Reflection/Property.sl:47](../../stdlib/Reflection/Property.sl#L47)</sub>
 
 #### Name *property*
 
@@ -383,7 +383,7 @@ String Name { get; }
 
 The property's name.
 
-<sub>[stdlib/Reflection.sl:408](../../stdlib/Reflection.sl#L408)</sub>
+<sub>[stdlib/Reflection/Property.sl:50](../../stdlib/Reflection/Property.sl#L50)</sub>
 
 #### Kind *property*
 
@@ -393,7 +393,7 @@ int Kind { get; }
 
 What the property's type is, as one of the `Kind` constants.
 
-<sub>[stdlib/Reflection.sl:411](../../stdlib/Reflection.sl#L411)</sub>
+<sub>[stdlib/Reflection/Property.sl:53](../../stdlib/Reflection/Property.sl#L53)</sub>
 
 #### Exists *property*
 
@@ -404,7 +404,7 @@ bool Exists { get; }
 True when this handle names a property at all; `FindProperty` answers
 with a null one when there is no such name.
 
-<sub>[stdlib/Reflection.sl:415](../../stdlib/Reflection.sl#L415)</sub>
+<sub>[stdlib/Reflection/Property.sl:57](../../stdlib/Reflection/Property.sl#L57)</sub>
 
 #### CanRead *property*
 
@@ -415,7 +415,7 @@ bool CanRead { get; }
 False for a write-only property, and for one whose getter this build
 did not emit.
 
-<sub>[stdlib/Reflection.sl:419](../../stdlib/Reflection.sl#L419)</sub>
+<sub>[stdlib/Reflection/Property.sl:61](../../stdlib/Reflection/Property.sl#L61)</sub>
 
 #### CanWrite *property*
 
@@ -426,7 +426,7 @@ bool CanWrite { get; }
 False for a read-only property -- `public int Left { get; }` -- which
 is worth checking before a loader decides a document was ignored.
 
-<sub>[stdlib/Reflection.sl:423](../../stdlib/Reflection.sl#L423)</sub>
+<sub>[stdlib/Reflection/Property.sl:65](../../stdlib/Reflection/Property.sl#L65)</sub>
 
 #### PropertyType *property*
 
@@ -437,7 +437,7 @@ Type PropertyType { get; }
 The type of an aggregate property, for walking into it. A handle of
 null for a primitive.
 
-<sub>[stdlib/Reflection.sl:427](../../stdlib/Reflection.sl#L427)</sub>
+<sub>[stdlib/Reflection/Property.sl:69](../../stdlib/Reflection/Property.sl#L69)</sub>
 
 #### AttributeCount *property*
 
@@ -447,7 +447,7 @@ nuint AttributeCount { get; }
 
 How many attributes are written on the property.
 
-<sub>[stdlib/Reflection.sl:438](../../stdlib/Reflection.sl#L438)</sub>
+<sub>[stdlib/Reflection/Property.sl:80](../../stdlib/Reflection/Property.sl#L80)</sub>
 
 #### GetAttributeAt *method*
 
@@ -457,7 +457,7 @@ Attribute GetAttributeAt(nuint index)
 
 The attribute at `index`, in the order they were written.
 
-<sub>[stdlib/Reflection.sl:441](../../stdlib/Reflection.sl#L441)</sub>
+<sub>[stdlib/Reflection/Property.sl:83](../../stdlib/Reflection/Property.sl#L83)</sub>
 
 #### HasAttribute *method*
 
@@ -467,7 +467,7 @@ bool HasAttribute(String name)
 
 True when an attribute of this name is written on the property.
 
-<sub>[stdlib/Reflection.sl:449](../../stdlib/Reflection.sl#L449)</sub>
+<sub>[stdlib/Reflection/Property.sl:91](../../stdlib/Reflection/Property.sl#L91)</sub>
 
 #### IsInteger *property*
 
@@ -481,7 +481,7 @@ The same three questions a `Field` answers about its kind.
 
 **See also** &nbsp; [Field.IsInteger](#isinteger-property)
 
-<sub>[stdlib/Reflection.sl:463](../../stdlib/Reflection.sl#L463)</sub>
+<sub>[stdlib/Reflection/Property.sl:105](../../stdlib/Reflection/Property.sl#L105)</sub>
 
 #### IsFloating *property*
 
@@ -491,7 +491,7 @@ bool IsFloating { get; }
 
 True for a `float` or a `double` property.
 
-<sub>[stdlib/Reflection.sl:475](../../stdlib/Reflection.sl#L475)</sub>
+<sub>[stdlib/Reflection/Property.sl:117](../../stdlib/Reflection/Property.sl#L117)</sub>
 
 #### IsText *property*
 
@@ -501,7 +501,7 @@ bool IsText { get; }
 
 True for a `String` property.
 
-<sub>[stdlib/Reflection.sl:478](../../stdlib/Reflection.sl#L478)</sub>
+<sub>[stdlib/Reflection/Property.sl:120](../../stdlib/Reflection/Property.sl#L120)</sub>
 
 ### Reflect *attribute*
 
@@ -511,7 +511,7 @@ attribute Reflect
 
 Marks a class or struct to carry field metadata in the binary.
 
-<sub>[stdlib/Reflection.sl:34](../../stdlib/Reflection.sl#L34)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:34](../../stdlib/Reflection/Reflection.sl#L34)</sub>
 
 ### Type *struct*
 
@@ -528,7 +528,7 @@ methods are not described, so there is nothing here to call.
 
 **See also** &nbsp; [FindType](#findtype-function)
 
-<sub>[stdlib/Reflection.sl:588](../../stdlib/Reflection.sl#L588)</sub>
+<sub>[stdlib/Reflection/Type.sl:34](../../stdlib/Reflection/Type.sl#L34)</sub>
 
 #### Handle *field*
 
@@ -539,7 +539,7 @@ byte* Handle
 The runtime's record for this type, or null for one that was looked up
 and not found. `Exists` is the check.
 
-<sub>[stdlib/Reflection.sl:592](../../stdlib/Reflection.sl#L592)</sub>
+<sub>[stdlib/Reflection/Type.sl:38](../../stdlib/Reflection/Type.sl#L38)</sub>
 
 #### Name *property*
 
@@ -549,7 +549,7 @@ String Name { get; }
 
 The type's name, qualified by its module.
 
-<sub>[stdlib/Reflection.sl:595](../../stdlib/Reflection.sl#L595)</sub>
+<sub>[stdlib/Reflection/Type.sl:41](../../stdlib/Reflection/Type.sl#L41)</sub>
 
 #### Size *property*
 
@@ -560,7 +560,7 @@ nuint Size { get; }
 How many bytes an instance occupies -- the struct's own size, or for a
 class the size of the object including its header.
 
-<sub>[stdlib/Reflection.sl:599](../../stdlib/Reflection.sl#L599)</sub>
+<sub>[stdlib/Reflection/Type.sl:45](../../stdlib/Reflection/Type.sl#L45)</sub>
 
 #### FieldCount *property*
 
@@ -571,7 +571,7 @@ nuint FieldCount { get; }
 How many fields the type has, inherited ones included, and automatic
 properties' storage among them.
 
-<sub>[stdlib/Reflection.sl:603](../../stdlib/Reflection.sl#L603)</sub>
+<sub>[stdlib/Reflection/Type.sl:49](../../stdlib/Reflection/Type.sl#L49)</sub>
 
 #### GetFieldAt *method*
 
@@ -581,7 +581,7 @@ Field GetFieldAt(nuint index)
 
 The field at `index`, in declaration order with inherited fields first.
 
-<sub>[stdlib/Reflection.sl:606](../../stdlib/Reflection.sl#L606)</sub>
+<sub>[stdlib/Reflection/Type.sl:52](../../stdlib/Reflection/Type.sl#L52)</sub>
 
 #### AttributeCount *property*
 
@@ -591,7 +591,7 @@ nuint AttributeCount { get; }
 
 How many attributes are written on the type.
 
-<sub>[stdlib/Reflection.sl:614](../../stdlib/Reflection.sl#L614)</sub>
+<sub>[stdlib/Reflection/Type.sl:60](../../stdlib/Reflection/Type.sl#L60)</sub>
 
 #### GetAttributeAt *method*
 
@@ -601,7 +601,7 @@ Attribute GetAttributeAt(nuint index)
 
 The attribute at `index`, in the order they were written.
 
-<sub>[stdlib/Reflection.sl:617](../../stdlib/Reflection.sl#L617)</sub>
+<sub>[stdlib/Reflection/Type.sl:63](../../stdlib/Reflection/Type.sl#L63)</sub>
 
 #### Exists *property*
 
@@ -612,7 +612,7 @@ bool Exists { get; }
 True when this handle names a type at all. A `FieldType` on a primitive
 field answers false.
 
-<sub>[stdlib/Reflection.sl:626](../../stdlib/Reflection.sl#L626)</sub>
+<sub>[stdlib/Reflection/Type.sl:72](../../stdlib/Reflection/Type.sl#L72)</sub>
 
 #### FindField *method*
 
@@ -623,7 +623,7 @@ Field FindField(String name)
 The field of that name, or a handle of null. Names are compared whole,
 so a serializer looking up what a document named does one pass.
 
-<sub>[stdlib/Reflection.sl:630](../../stdlib/Reflection.sl#L630)</sub>
+<sub>[stdlib/Reflection/Type.sl:76](../../stdlib/Reflection/Type.sl#L76)</sub>
 
 #### HasAttribute *method*
 
@@ -633,7 +633,7 @@ bool HasAttribute(String name)
 
 True when the type carries an attribute of that name.
 
-<sub>[stdlib/Reflection.sl:645](../../stdlib/Reflection.sl#L645)</sub>
+<sub>[stdlib/Reflection/Type.sl:91](../../stdlib/Reflection/Type.sl#L91)</sub>
 
 #### PropertyCount *property*
 
@@ -650,7 +650,7 @@ object through `typeof(Base)` and setting a property the derived class
 overrode calls the base's setter, where `.Left = x` in the language
 would not.
 
-<sub>[stdlib/Reflection.sl:663](../../stdlib/Reflection.sl#L663)</sub>
+<sub>[stdlib/Reflection/Type.sl:109](../../stdlib/Reflection/Type.sl#L109)</sub>
 
 #### GetPropertyAt *method*
 
@@ -661,7 +661,7 @@ Property GetPropertyAt(nuint index)
 The property at `index`. An overridden property appears once, at the
 position the base gave it, carrying the derived accessors.
 
-<sub>[stdlib/Reflection.sl:667](../../stdlib/Reflection.sl#L667)</sub>
+<sub>[stdlib/Reflection/Type.sl:113](../../stdlib/Reflection/Type.sl#L113)</sub>
 
 #### FindProperty *method*
 
@@ -671,7 +671,7 @@ Property FindProperty(String name)
 
 The property of that name, or a handle of null.
 
-<sub>[stdlib/Reflection.sl:675](../../stdlib/Reflection.sl#L675)</sub>
+<sub>[stdlib/Reflection/Type.sl:121](../../stdlib/Reflection/Type.sl#L121)</sub>
 
 ## Functions
 
@@ -701,7 +701,7 @@ owns what it now holds.
 
 **See also** &nbsp; [WriteAggregate](#writeaggregate-function)
 
-<sub>[stdlib/Reflection.sl:928](../../stdlib/Reflection.sl#L928)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:510](../../stdlib/Reflection/Reflection.sl#L510)</sub>
 
 ### CreateInstance *function*
 
@@ -719,7 +719,7 @@ is what `Json.PopulateObject` does and why it is the one that needs no warning.
 
 **See also** &nbsp; [CreateInstanceInto](#createinstanceinto-function)
 
-<sub>[stdlib/Reflection.sl:841](../../stdlib/Reflection.sl#L841)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:423](../../stdlib/Reflection/Reflection.sl#L423)</sub>
 
 ### CreateInstanceInto *function*
 
@@ -744,7 +744,7 @@ this where a field is marked to say so.
 
 **See also** &nbsp; [CreateInstance](#createinstance-function)
 
-<sub>[stdlib/Reflection.sl:873](../../stdlib/Reflection.sl#L873)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:455](../../stdlib/Reflection/Reflection.sl#L455)</sub>
 
 ### FindType *function*
 
@@ -768,7 +768,7 @@ the trade `[Reflect]` exists to make explicit.
     var type = FindType("App.Button");
     if (type.Exists) { byte* made = CreateInstance(type); }
 
-<sub>[stdlib/Reflection.sl:825](../../stdlib/Reflection.sl#L825)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:407](../../stdlib/Reflection/Reflection.sl#L407)</sub>
 
 ### GetAggregate *function*
 
@@ -786,7 +786,7 @@ this returns.
 
 **See also** &nbsp; [ReadAggregate](#readaggregate-function) &middot; [SetAggregate](#setaggregate-function)
 
-<sub>[stdlib/Reflection.sl:531](../../stdlib/Reflection.sl#L531)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:225](../../stdlib/Reflection/Reflection.sl#L225)</sub>
 
 ### GetArrayLength *function*
 
@@ -796,7 +796,7 @@ nuint GetArrayLength(byte* array)
 
 How many elements an array has. Zero for null.
 
-<sub>[stdlib/Reflection.sl:936](../../stdlib/Reflection.sl#L936)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:518](../../stdlib/Reflection/Reflection.sl#L518)</sub>
 
 ### GetBool *function*
 
@@ -808,7 +808,7 @@ Calls the getter of a `bool` property. False when it cannot be read, or
 when its kind is not `KindBool` -- which is indistinguishable from a real
 false, so check `CanRead` and `Kind` where it matters.
 
-<sub>[stdlib/Reflection.sl:500](../../stdlib/Reflection.sl#L500)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:194](../../stdlib/Reflection/Reflection.sl#L194)</sub>
 
 ### GetDouble *function*
 
@@ -819,7 +819,7 @@ double GetDouble(byte* instance, Property property)
 Calls the getter of a `float` or `double` property. Zero when it cannot be
 read, or when its kind is not a floating one.
 
-<sub>[stdlib/Reflection.sl:492](../../stdlib/Reflection.sl#L492)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:186](../../stdlib/Reflection/Reflection.sl#L186)</sub>
 
 ### GetElementAddress *function*
 
@@ -837,7 +837,7 @@ and an index that came from a document is not the program's.
 - `field` — the array field, which supplies the stride between elements
 - `index` — which element, counted from zero
 
-<sub>[stdlib/Reflection.sl:950](../../stdlib/Reflection.sl#L950)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:532](../../stdlib/Reflection/Reflection.sl#L532)</sub>
 
 ### GetInteger *function*
 
@@ -848,7 +848,7 @@ long GetInteger(byte* instance, Property property)
 Calls the getter. Zero when the property cannot be read, or when its kind
 is not a whole number -- rather than reading the wrong four bytes.
 
-<sub>[stdlib/Reflection.sl:485](../../stdlib/Reflection.sl#L485)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:179](../../stdlib/Reflection/Reflection.sl#L179)</sub>
 
 ### GetText *function*
 
@@ -859,7 +859,7 @@ String GetText(byte* instance, Property property)
 Calls the getter of a String property, and answers a copy of what it gave.
 Empty when the property cannot be read or its kind is not `KindString`.
 
-<sub>[stdlib/Reflection.sl:507](../../stdlib/Reflection.sl#L507)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:201](../../stdlib/Reflection/Reflection.sl#L201)</sub>
 
 ### ReadAggregate *function*
 
@@ -875,7 +875,7 @@ class field holding nothing, which is the one case a caller has to check.
 
 **See also** &nbsp; [WriteAggregate](#writeaggregate-function)
 
-<sub>[stdlib/Reflection.sl:751](../../stdlib/Reflection.sl#L751)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:333](../../stdlib/Reflection/Reflection.sl#L333)</sub>
 
 ### ReadAggregateAt *function*
 
@@ -886,7 +886,7 @@ byte* ReadAggregateAt(byte* address, Field field)
 The address of an aggregate element: what a class element points at, or
 where a struct element sits.
 
-<sub>[stdlib/Reflection.sl:992](../../stdlib/Reflection.sl#L992)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:574](../../stdlib/Reflection/Reflection.sl#L574)</sub>
 
 ### ReadArray *function*
 
@@ -896,7 +896,7 @@ byte* ReadArray(byte* instance, Field field)
 
 The array a field holds, or null. The instance still owns it.
 
-<sub>[stdlib/Reflection.sl:902](../../stdlib/Reflection.sl#L902)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:484](../../stdlib/Reflection/Reflection.sl#L484)</sub>
 
 ### ReadBool *function*
 
@@ -909,7 +909,7 @@ Reads a `bool` field from an instance. False when the field's kind is not
 
 **See also** &nbsp; [WriteBool](#writebool-function)
 
-<sub>[stdlib/Reflection.sl:717](../../stdlib/Reflection.sl#L717)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:299](../../stdlib/Reflection/Reflection.sl#L299)</sub>
 
 ### ReadBoolAt *function*
 
@@ -920,7 +920,7 @@ bool ReadBoolAt(byte* address)
 Reads an element of a `bool` array. Takes no field, a `bool` being one byte
 whatever array it is in.
 
-<sub>[stdlib/Reflection.sl:979](../../stdlib/Reflection.sl#L979)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:561](../../stdlib/Reflection/Reflection.sl#L561)</sub>
 
 ### ReadDouble *function*
 
@@ -933,7 +933,7 @@ kind is not a floating one -- no conversion from an integer field.
 
 **See also** &nbsp; [WriteDouble](#writedouble-function)
 
-<sub>[stdlib/Reflection.sl:708](../../stdlib/Reflection.sl#L708)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:290](../../stdlib/Reflection/Reflection.sl#L290)</sub>
 
 ### ReadDoubleAt *function*
 
@@ -945,7 +945,7 @@ Reads an element of a floating array. `field` supplies the element kind,
 which is what says whether the four or the eight bytes at `address` are the
 value.
 
-<sub>[stdlib/Reflection.sl:972](../../stdlib/Reflection.sl#L972)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:554](../../stdlib/Reflection/Reflection.sl#L554)</sub>
 
 ### ReadInteger *function*
 
@@ -959,7 +959,7 @@ Reads a whole-number field from an instance.
 
 **See also** &nbsp; [WriteInteger](#writeinteger-function)
 
-<sub>[stdlib/Reflection.sl:699](../../stdlib/Reflection.sl#L699)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:281](../../stdlib/Reflection/Reflection.sl#L281)</sub>
 
 ### ReadIntegerAt *function*
 
@@ -976,7 +976,7 @@ Reads an element of a whole-number array.
 
 **See also** &nbsp; [WriteIntegerAt](#writeintegerat-function)
 
-<sub>[stdlib/Reflection.sl:964](../../stdlib/Reflection.sl#L964)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:546](../../stdlib/Reflection/Reflection.sl#L546)</sub>
 
 ### ReadText *function*
 
@@ -989,7 +989,7 @@ kind is not `KindString`.
 
 **See also** &nbsp; [WriteText](#writetext-function)
 
-<sub>[stdlib/Reflection.sl:726](../../stdlib/Reflection.sl#L726)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:308](../../stdlib/Reflection/Reflection.sl#L308)</sub>
 
 ### ReadTextAt *function*
 
@@ -999,7 +999,7 @@ String ReadTextAt(byte* address)
 
 Reads a String element, as a copy of all its bytes.
 
-<sub>[stdlib/Reflection.sl:982](../../stdlib/Reflection.sl#L982)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:564](../../stdlib/Reflection/Reflection.sl#L564)</sub>
 
 ### SetAggregate *function*
 
@@ -1009,7 +1009,7 @@ void SetAggregate(byte* instance, Property property, byte* value)
 
 Points a class or interface property at an object, on the same terms.
 
-<sub>[stdlib/Reflection.sl:573](../../stdlib/Reflection.sl#L573)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:267](../../stdlib/Reflection/Reflection.sl#L267)</sub>
 
 ### SetBool *function*
 
@@ -1020,7 +1020,7 @@ void SetBool(byte* instance, Property property, bool value)
 Calls the setter of a `bool` property. Does nothing when there is no
 setter, which `CanWrite` is how to find out in advance.
 
-<sub>[stdlib/Reflection.sl:558](../../stdlib/Reflection.sl#L558)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:252](../../stdlib/Reflection/Reflection.sl#L252)</sub>
 
 ### SetDouble *function*
 
@@ -1031,7 +1031,7 @@ void SetDouble(byte* instance, Property property, double value)
 Calls the setter of a floating property, narrowing to `float` where that
 is its width. Does nothing when there is no setter.
 
-<sub>[stdlib/Reflection.sl:551](../../stdlib/Reflection.sl#L551)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:245](../../stdlib/Reflection/Reflection.sl#L245)</sub>
 
 ### SetInteger *function*
 
@@ -1042,7 +1042,7 @@ void SetInteger(byte* instance, Property property, long value)
 Calls the setter, narrowing to the property's own width. Does nothing when
 there is no setter, which `CanWrite` is how to find out in advance.
 
-<sub>[stdlib/Reflection.sl:544](../../stdlib/Reflection.sl#L544)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:238](../../stdlib/Reflection/Reflection.sl#L238)</sub>
 
 ### SetText *function*
 
@@ -1055,7 +1055,7 @@ Calls the setter of a String property.
 The setter retains what it stores, so the caller still owns `value`
 afterwards.
 
-<sub>[stdlib/Reflection.sl:567](../../stdlib/Reflection.sl#L567)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:261](../../stdlib/Reflection/Reflection.sl#L261)</sub>
 
 ### WriteAggregate *function*
 
@@ -1069,7 +1069,7 @@ theirs.
 
 **See also** &nbsp; [CreateInstance](#createinstance-function) &middot; [ReadAggregate](#readaggregate-function)
 
-<sub>[stdlib/Reflection.sl:852](../../stdlib/Reflection.sl#L852)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:434](../../stdlib/Reflection/Reflection.sl#L434)</sub>
 
 ### WriteBool *function*
 
@@ -1081,7 +1081,7 @@ Writes a `bool` field.
 
 **See also** &nbsp; [ReadBool](#readbool-function)
 
-<sub>[stdlib/Reflection.sl:793](../../stdlib/Reflection.sl#L793)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:375](../../stdlib/Reflection/Reflection.sl#L375)</sub>
 
 ### WriteBoolAt *function*
 
@@ -1091,7 +1091,7 @@ void WriteBoolAt(byte* address, bool value)
 
 Writes an element of a `bool` array.
 
-<sub>[stdlib/Reflection.sl:1018](../../stdlib/Reflection.sl#L1018)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:600](../../stdlib/Reflection/Reflection.sl#L600)</sub>
 
 ### WriteDouble *function*
 
@@ -1103,7 +1103,7 @@ Writes a floating field, narrowed to `float` where that is its width.
 
 **See also** &nbsp; [ReadDouble](#readdouble-function)
 
-<sub>[stdlib/Reflection.sl:785](../../stdlib/Reflection.sl#L785)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:367](../../stdlib/Reflection/Reflection.sl#L367)</sub>
 
 ### WriteDoubleAt *function*
 
@@ -1113,7 +1113,7 @@ void WriteDoubleAt(byte* address, Field field, double value)
 
 Writes an element of a floating array, narrowed to the element's width.
 
-<sub>[stdlib/Reflection.sl:1012](../../stdlib/Reflection.sl#L1012)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:594](../../stdlib/Reflection/Reflection.sl#L594)</sub>
 
 ### WriteInteger *function*
 
@@ -1125,7 +1125,7 @@ Writes a whole-number field.
 
 **See also** &nbsp; [ReadInteger](#readinteger-function)
 
-<sub>[stdlib/Reflection.sl:777](../../stdlib/Reflection.sl#L777)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:359](../../stdlib/Reflection/Reflection.sl#L359)</sub>
 
 ### WriteIntegerAt *function*
 
@@ -1137,7 +1137,7 @@ Writes an element of a whole-number array, narrowed to its width.
 
 **See also** &nbsp; [ReadIntegerAt](#readintegerat-function)
 
-<sub>[stdlib/Reflection.sl:1006](../../stdlib/Reflection.sl#L1006)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:588](../../stdlib/Reflection/Reflection.sl#L588)</sub>
 
 ### WriteText *function*
 
@@ -1153,7 +1153,7 @@ the other direction. The field ends up owning a copy.
 
 **See also** &nbsp; [ReadText](#readtext-function)
 
-<sub>[stdlib/Reflection.sl:805](../../stdlib/Reflection.sl#L805)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:387](../../stdlib/Reflection/Reflection.sl#L387)</sub>
 
 ### WriteTextAt *function*
 
@@ -1163,7 +1163,7 @@ void WriteTextAt(byte* address, String value)
 
 Writes a String element, releasing whatever it held.
 
-<sub>[stdlib/Reflection.sl:1021](../../stdlib/Reflection.sl#L1021)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:603](../../stdlib/Reflection/Reflection.sl#L603)</sub>
 
 ## Constants
 
@@ -1175,7 +1175,7 @@ const int KindArray = 20
 
 An array. `ElementKind` says what is in it.
 
-<sub>[stdlib/Reflection.sl:166](../../stdlib/Reflection.sl#L166)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:166](../../stdlib/Reflection/Reflection.sl#L166)</sub>
 
 ### KindBool *constant*
 
@@ -1185,7 +1185,7 @@ const int KindBool = 1
 
 A `bool`.
 
-<sub>[stdlib/Reflection.sl:124](../../stdlib/Reflection.sl#L124)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:124](../../stdlib/Reflection/Reflection.sl#L124)</sub>
 
 ### KindByte *constant*
 
@@ -1195,7 +1195,7 @@ const int KindByte = 8
 
 A `byte`.
 
-<sub>[stdlib/Reflection.sl:138](../../stdlib/Reflection.sl#L138)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:138](../../stdlib/Reflection/Reflection.sl#L138)</sub>
 
 ### KindChar *constant*
 
@@ -1205,7 +1205,7 @@ const int KindChar = 2
 
 A `char`: one UTF-8 code unit.
 
-<sub>[stdlib/Reflection.sl:126](../../stdlib/Reflection.sl#L126)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:126](../../stdlib/Reflection/Reflection.sl#L126)</sub>
 
 ### KindChar16 *constant*
 
@@ -1217,7 +1217,7 @@ A `char16`: one UTF-16 code unit. Numbered past
 `KindArray` because it was added after the numbering was fixed, which is
 why `IsInteger` tests it separately.
 
-<sub>[stdlib/Reflection.sl:170](../../stdlib/Reflection.sl#L170)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:170](../../stdlib/Reflection/Reflection.sl#L170)</sub>
 
 ### KindChar32 *constant*
 
@@ -1228,7 +1228,7 @@ const int KindChar32 = 22
 A `char32`: one Unicode scalar, with the same
 numbering story as `KindChar16`.
 
-<sub>[stdlib/Reflection.sl:173](../../stdlib/Reflection.sl#L173)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:173](../../stdlib/Reflection/Reflection.sl#L173)</sub>
 
 ### KindClass *constant*
 
@@ -1239,7 +1239,7 @@ const int KindClass = 17
 A class reference. `FieldType` gives the type to walk
 into, and the value can be null.
 
-<sub>[stdlib/Reflection.sl:159](../../stdlib/Reflection.sl#L159)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:159](../../stdlib/Reflection/Reflection.sl#L159)</sub>
 
 ### KindDouble *constant*
 
@@ -1249,7 +1249,7 @@ const int KindDouble = 14
 
 A `double`.
 
-<sub>[stdlib/Reflection.sl:150](../../stdlib/Reflection.sl#L150)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:150](../../stdlib/Reflection/Reflection.sl#L150)</sub>
 
 ### KindFloat *constant*
 
@@ -1259,7 +1259,7 @@ const int KindFloat = 13
 
 A `float`.
 
-<sub>[stdlib/Reflection.sl:148](../../stdlib/Reflection.sl#L148)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:148](../../stdlib/Reflection/Reflection.sl#L148)</sub>
 
 ### KindInt *constant*
 
@@ -1269,7 +1269,7 @@ const int KindInt = 5
 
 An `int`.
 
-<sub>[stdlib/Reflection.sl:132](../../stdlib/Reflection.sl#L132)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:132](../../stdlib/Reflection/Reflection.sl#L132)</sub>
 
 ### KindInterface *constant*
 
@@ -1279,7 +1279,7 @@ const int KindInterface = 18
 
 An interface reference, walked like a class.
 
-<sub>[stdlib/Reflection.sl:161](../../stdlib/Reflection.sl#L161)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:161](../../stdlib/Reflection/Reflection.sl#L161)</sub>
 
 ### KindLong *constant*
 
@@ -1289,7 +1289,7 @@ const int KindLong = 6
 
 A `long`.
 
-<sub>[stdlib/Reflection.sl:134](../../stdlib/Reflection.sl#L134)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:134](../../stdlib/Reflection/Reflection.sl#L134)</sub>
 
 ### KindNInt *constant*
 
@@ -1299,7 +1299,7 @@ const int KindNInt = 7
 
 An `nint`: pointer-wide and signed.
 
-<sub>[stdlib/Reflection.sl:136](../../stdlib/Reflection.sl#L136)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:136](../../stdlib/Reflection/Reflection.sl#L136)</sub>
 
 ### KindNUInt *constant*
 
@@ -1309,7 +1309,7 @@ const int KindNUInt = 12
 
 An `nuint`: pointer-wide and unsigned.
 
-<sub>[stdlib/Reflection.sl:146](../../stdlib/Reflection.sl#L146)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:146](../../stdlib/Reflection/Reflection.sl#L146)</sub>
 
 ### KindNone *constant*
 
@@ -1319,7 +1319,7 @@ const int KindNone = 0
 
 What a field holds. Kept in step with enum SlKind in the runtime.
 
-<sub>[stdlib/Reflection.sl:122](../../stdlib/Reflection.sl#L122)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:122](../../stdlib/Reflection/Reflection.sl#L122)</sub>
 
 ### KindPointer *constant*
 
@@ -1330,7 +1330,7 @@ const int KindPointer = 15
 A raw pointer. Nothing here follows one -- what it
 points at carries no metadata.
 
-<sub>[stdlib/Reflection.sl:153](../../stdlib/Reflection.sl#L153)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:153](../../stdlib/Reflection/Reflection.sl#L153)</sub>
 
 ### KindSByte *constant*
 
@@ -1340,7 +1340,7 @@ const int KindSByte = 3
 
 An `sbyte`.
 
-<sub>[stdlib/Reflection.sl:128](../../stdlib/Reflection.sl#L128)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:128](../../stdlib/Reflection/Reflection.sl#L128)</sub>
 
 ### KindShort *constant*
 
@@ -1350,7 +1350,7 @@ const int KindShort = 4
 
 A `short`.
 
-<sub>[stdlib/Reflection.sl:130](../../stdlib/Reflection.sl#L130)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:130](../../stdlib/Reflection/Reflection.sl#L130)</sub>
 
 ### KindString *constant*
 
@@ -1361,7 +1361,7 @@ const int KindString = 16
 A `String`. Read and written by value, through
 `ReadText` and `WriteText`.
 
-<sub>[stdlib/Reflection.sl:156](../../stdlib/Reflection.sl#L156)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:156](../../stdlib/Reflection/Reflection.sl#L156)</sub>
 
 ### KindStruct *constant*
 
@@ -1372,7 +1372,7 @@ const int KindStruct = 19
 A struct, stored inline rather than referenced -- so
 its address is where it sits, and it is never null.
 
-<sub>[stdlib/Reflection.sl:164](../../stdlib/Reflection.sl#L164)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:164](../../stdlib/Reflection/Reflection.sl#L164)</sub>
 
 ### KindUInt *constant*
 
@@ -1382,7 +1382,7 @@ const int KindUInt = 10
 
 A `uint`.
 
-<sub>[stdlib/Reflection.sl:142](../../stdlib/Reflection.sl#L142)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:142](../../stdlib/Reflection/Reflection.sl#L142)</sub>
 
 ### KindULong *constant*
 
@@ -1392,7 +1392,7 @@ const int KindULong = 11
 
 A `ulong`.
 
-<sub>[stdlib/Reflection.sl:144](../../stdlib/Reflection.sl#L144)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:144](../../stdlib/Reflection/Reflection.sl#L144)</sub>
 
 ### KindUShort *constant*
 
@@ -1402,5 +1402,5 @@ const int KindUShort = 9
 
 A `ushort`.
 
-<sub>[stdlib/Reflection.sl:140](../../stdlib/Reflection.sl#L140)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:140](../../stdlib/Reflection/Reflection.sl#L140)</sub>
 

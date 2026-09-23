@@ -2,6 +2,7 @@
 module Maths;
 
 import Standard.Math;
+import Standard.Bits;
 import Standard.Console;
 
 extern "C" int printf(byte* format, ...);
@@ -31,12 +32,12 @@ int Main()
     double one = 1.0;
     printf("special=%d %d %d %d\n",
         Math.IsNaN(zero / zero) ? 1 : 0,
-        Math.IsInfinite(one / zero) ? 1 : 0,
+        Math.IsInfinity(one / zero) ? 1 : 0,
         Math.IsFinite(1.0) ? 1 : 0,
         Math.IsFinite(zero / zero) ? 1 : 0);
 
     printf("trig=%.4f %.4f %.4f\n", Math.Sin(0.0), Math.Cos(0.0), Math.Atan2(1.0, 1.0));
-    printf("angles=%.1f %.4f\n", Math.ToDegrees(Math.Pi), Math.ToRadians(180.0));
+    printf("angles=%.1f %.4f\n", Math.RadiansToDegrees(Math.Pi), Math.DegreesToRadians(180.0));
 
     printf("lerp=%.2f near=%d %d\n",
         Math.Lerp(0.0, 10.0, 0.25),
@@ -49,12 +50,12 @@ int Main()
         Math.DivideCeiling((nuint)7, (nuint)2));
 
     printf("bits=%d %d %d\n",
-        Math.PopCount((ulong)255), Math.LeadingZeroCount((ulong)1), Math.TrailingZeroCount((ulong)8));
+        Bits.PopCount((ulong)255), Bits.LeadingZeroCount((ulong)1), Bits.TrailingZeroCount((ulong)8));
     printf("powers=%d %d %llu %llu\n",
-        Math.IsPowerOfTwo((ulong)64) ? 1 : 0,
-        Math.IsPowerOfTwo((ulong)63) ? 1 : 0,
-        Math.RoundUpToPowerOfTwo((ulong)100),
-        Math.RoundUpToPowerOfTwo((ulong)1));
+        Bits.IsPowerOfTwo((ulong)64) ? 1 : 0,
+        Bits.IsPowerOfTwo((ulong)63) ? 1 : 0,
+        Bits.RoundUpToPowerOfTwo((ulong)100),
+        Bits.RoundUpToPowerOfTwo((ulong)1));
 
     printf("constants=%.5f %.5f %.5f\n", Math.Pi, Math.Tau, Math.E);
 

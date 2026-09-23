@@ -11,7 +11,7 @@ into the binary, and this reads it back:
 import Standard.Resources;
 
 String ready = Resources.GetText(201u);
-byte[] icon  = Resources.GetBytes(Resources.Bitmap, 101);
+byte[] icon  = Resources.GetBytes(ResourceType.Bitmap, 101);
 ```
 
 **The same answers on both platforms, by two different routes.** A PE has a
@@ -36,26 +36,185 @@ is what anything outliving the call wants.
 
 ## Contents
 
+**Types** &nbsp; [ResourceType](#resourcetype-enum)
+
 **Functions** &nbsp; [Exists](#exists-function) &middot; [Exists](#exists-function) &middot; [GetBitmapFile](#getbitmapfile-function) &middot; [GetBytes](#getbytes-function) &middot; [GetBytes](#getbytes-function) &middot; [GetPointer](#getpointer-function) &middot; [GetSize](#getsize-function) &middot; [GetText](#gettext-function)
 
-**Constants** &nbsp; [Accelerator](#accelerator-constant) &middot; [Bitmap](#bitmap-constant) &middot; [Cursor](#cursor-constant) &middot; [Dialog](#dialog-constant) &middot; [GroupCursor](#groupcursor-constant) &middot; [GroupIcon](#groupicon-constant) &middot; [Html](#html-constant) &middot; [Icon](#icon-constant) &middot; [Manifest](#manifest-constant) &middot; [ManifestId](#manifestid-constant) &middot; [Menu](#menu-constant) &middot; [MessageTable](#messagetable-constant) &middot; [RcData](#rcdata-constant) &middot; [StringTable](#stringtable-constant) &middot; [Version](#version-constant)
+**Constants** &nbsp; [ManifestId](#manifestid-constant)
+
+## Types
+
+### ResourceType *enum*
+
+```
+enum ResourceType
+```
+
+The `RT_` numbers, which mean what they mean in `winuser.h` because that is
+what the resource compiler writes.
+
+An enum rather than fourteen constants at module level, because `Icon`,
+`Menu`, `Dialog` and `Version` are words an importer has other uses for.
+
+<sub>[stdlib/Resources/ResourceType.sl:33](../../stdlib/Resources/ResourceType.sl#L33)</sub>
+
+#### Cursor *case*
+
+```
+Cursor = 1
+```
+
+`RT_CURSOR`.
+
+<sub>[stdlib/Resources/ResourceType.sl:36](../../stdlib/Resources/ResourceType.sl#L36)</sub>
+
+#### Bitmap *case*
+
+```
+Bitmap = 2
+```
+
+`RT_BITMAP`, without the file header; `GetBitmapFile` puts one back.
+
+<sub>[stdlib/Resources/ResourceType.sl:39](../../stdlib/Resources/ResourceType.sl#L39)</sub>
+
+#### Icon *case*
+
+```
+Icon = 3
+```
+
+`RT_ICON`.
+
+<sub>[stdlib/Resources/ResourceType.sl:42](../../stdlib/Resources/ResourceType.sl#L42)</sub>
+
+#### Menu *case*
+
+```
+Menu = 4
+```
+
+`RT_MENU`.
+
+<sub>[stdlib/Resources/ResourceType.sl:45](../../stdlib/Resources/ResourceType.sl#L45)</sub>
+
+#### Dialog *case*
+
+```
+Dialog = 5
+```
+
+`RT_DIALOG`.
+
+<sub>[stdlib/Resources/ResourceType.sl:48](../../stdlib/Resources/ResourceType.sl#L48)</sub>
+
+#### StringTable *case*
+
+```
+StringTable = 6
+```
+
+`RT_STRING`; `GetText` reads one entry out of a block of sixteen.
+
+<sub>[stdlib/Resources/ResourceType.sl:51](../../stdlib/Resources/ResourceType.sl#L51)</sub>
+
+#### Accelerator *case*
+
+```
+Accelerator = 9
+```
+
+`RT_ACCELERATOR`.
+
+<sub>[stdlib/Resources/ResourceType.sl:54](../../stdlib/Resources/ResourceType.sl#L54)</sub>
+
+#### RcData *case*
+
+```
+RcData = 10
+```
+
+`RT_RCDATA`, which is bytes and nothing else, and so the one that
+travels to every platform unchanged.
+
+<sub>[stdlib/Resources/ResourceType.sl:58](../../stdlib/Resources/ResourceType.sl#L58)</sub>
+
+#### MessageTable *case*
+
+```
+MessageTable = 11
+```
+
+`RT_MESSAGETABLE`.
+
+<sub>[stdlib/Resources/ResourceType.sl:61](../../stdlib/Resources/ResourceType.sl#L61)</sub>
+
+#### GroupCursor *case*
+
+```
+GroupCursor = 12
+```
+
+`RT_GROUP_CURSOR`.
+
+<sub>[stdlib/Resources/ResourceType.sl:64](../../stdlib/Resources/ResourceType.sl#L64)</sub>
+
+#### GroupIcon *case*
+
+```
+GroupIcon = 14
+```
+
+`RT_GROUP_ICON`.
+
+<sub>[stdlib/Resources/ResourceType.sl:67](../../stdlib/Resources/ResourceType.sl#L67)</sub>
+
+#### Version *case*
+
+```
+Version = 16
+```
+
+`RT_VERSION`.
+
+<sub>[stdlib/Resources/ResourceType.sl:70](../../stdlib/Resources/ResourceType.sl#L70)</sub>
+
+#### Html *case*
+
+```
+Html = 23
+```
+
+`RT_HTML`.
+
+<sub>[stdlib/Resources/ResourceType.sl:73](../../stdlib/Resources/ResourceType.sl#L73)</sub>
+
+#### Manifest *case*
+
+```
+Manifest = 24
+```
+
+`RT_MANIFEST`, read by the loader rather than by the program.
+
+<sub>[stdlib/Resources/ResourceType.sl:76](../../stdlib/Resources/ResourceType.sl#L76)</sub>
 
 ## Functions
 
 ### Exists *function*
 
 ```
-bool Exists(int type, int id)
+bool Exists(ResourceType type, int id)
 ```
 
 Whether a resource of this type and number is there.
 
 **Parameters**
 
-- `type` — an `RT_` number, `Bitmap` and the rest above
+- `type` — which `RT_` kind it was filed as
 - `id` — the number the script filed the resource under
 
-<sub>[stdlib/Resources.sl:315](../../stdlib/Resources.sl#L315)</sub>
+<sub>[stdlib/Resources/Resources.sl:296](../../stdlib/Resources/Resources.sl#L296)</sub>
 
 ### Exists *function*
 
@@ -70,7 +229,7 @@ Whether one named by text, of a type named by text, is there.
 - `type` — the type name the script invented
 - `name` — the resource name, matched without regard to ASCII case
 
-<sub>[stdlib/Resources.sl:321](../../stdlib/Resources.sl#L321)</sub>
+<sub>[stdlib/Resources/Resources.sl:303](../../stdlib/Resources/Resources.sl#L303)</sub>
 
 ### GetBitmapFile *function*
 
@@ -94,12 +253,12 @@ entries are three bytes each.
 
 Empty when there is no such bitmap.
 
-<sub>[stdlib/Resources.sl:451](../../stdlib/Resources.sl#L451)</sub>
+<sub>[stdlib/Resources/Resources.sl:433](../../stdlib/Resources/Resources.sl#L433)</sub>
 
 ### GetBytes *function*
 
 ```
-byte[] GetBytes(int type, int id)
+byte[] GetBytes(ResourceType type, int id)
 ```
 
 A resource's bytes, copied into an array this program owns.
@@ -114,7 +273,7 @@ gives -- ask `Exists` where the difference matters.
 
 **See also** &nbsp; [Resources.Exists](#exists-function)
 
-<sub>[stdlib/Resources.sl:360](../../stdlib/Resources.sl#L360)</sub>
+<sub>[stdlib/Resources/Resources.sl:342](../../stdlib/Resources/Resources.sl#L342)</sub>
 
 ### GetBytes *function*
 
@@ -131,12 +290,12 @@ The same, for a resource named by text.
 
 **See also** &nbsp; [Resources.Exists](#exists-function)
 
-<sub>[stdlib/Resources.sl:372](../../stdlib/Resources.sl#L372)</sub>
+<sub>[stdlib/Resources/Resources.sl:354](../../stdlib/Resources/Resources.sl#L354)</sub>
 
 ### GetPointer *function*
 
 ```
-byte* GetPointer(int type, int id, uint* byteCount)
+byte* GetPointer(ResourceType type, int id, uint* byteCount)
 ```
 
 A pointer straight at a resource's bytes, without copying them.
@@ -153,12 +312,12 @@ outlives the call.
 
 **See also** &nbsp; [Resources.GetBytes](#getbytes-function)
 
-<sub>[stdlib/Resources.sl:347](../../stdlib/Resources.sl#L347)</sub>
+<sub>[stdlib/Resources/Resources.sl:329](../../stdlib/Resources/Resources.sl#L329)</sub>
 
 ### GetSize *function*
 
 ```
-uint GetSize(int type, int id)
+uint GetSize(ResourceType type, int id)
 ```
 
 How many bytes a resource holds, or zero when there is none.
@@ -168,7 +327,7 @@ How many bytes a resource holds, or zero when there is none.
 - `type` — an `RT_` number
 - `id` — the number the script filed the resource under
 
-<sub>[stdlib/Resources.sl:330](../../stdlib/Resources.sl#L330)</sub>
+<sub>[stdlib/Resources/Resources.sl:312](../../stdlib/Resources/Resources.sl#L312)</sub>
 
 ### GetText *function*
 
@@ -187,100 +346,9 @@ platforms answer identically and so that Windows needs no user32.
 
 Empty for a number with no string, which is what `LoadStringW` answers too.
 
-<sub>[stdlib/Resources.sl:402](../../stdlib/Resources.sl#L402)</sub>
+<sub>[stdlib/Resources/Resources.sl:384](../../stdlib/Resources/Resources.sl#L384)</sub>
 
 ## Constants
-
-### Accelerator *constant*
-
-```
-const int Accelerator = 9
-```
-
-*No documentation.*
-
-<sub>[stdlib/Resources.sl:67](../../stdlib/Resources.sl#L67)</sub>
-
-### Bitmap *constant*
-
-```
-const int Bitmap = 2
-```
-
-*No documentation.*
-
-<sub>[stdlib/Resources.sl:62](../../stdlib/Resources.sl#L62)</sub>
-
-### Cursor *constant*
-
-```
-const int Cursor = 1
-```
-
-The `RT_` numbers, which mean what they mean in `winuser.h` because that is
-what the resource compiler writes.
-
-<sub>[stdlib/Resources.sl:61](../../stdlib/Resources.sl#L61)</sub>
-
-### Dialog *constant*
-
-```
-const int Dialog = 5
-```
-
-*No documentation.*
-
-<sub>[stdlib/Resources.sl:65](../../stdlib/Resources.sl#L65)</sub>
-
-### GroupCursor *constant*
-
-```
-const int GroupCursor = 12
-```
-
-*No documentation.*
-
-<sub>[stdlib/Resources.sl:70](../../stdlib/Resources.sl#L70)</sub>
-
-### GroupIcon *constant*
-
-```
-const int GroupIcon = 14
-```
-
-*No documentation.*
-
-<sub>[stdlib/Resources.sl:71](../../stdlib/Resources.sl#L71)</sub>
-
-### Html *constant*
-
-```
-const int Html = 23
-```
-
-*No documentation.*
-
-<sub>[stdlib/Resources.sl:73](../../stdlib/Resources.sl#L73)</sub>
-
-### Icon *constant*
-
-```
-const int Icon = 3
-```
-
-*No documentation.*
-
-<sub>[stdlib/Resources.sl:63](../../stdlib/Resources.sl#L63)</sub>
-
-### Manifest *constant*
-
-```
-const int Manifest = 24
-```
-
-*No documentation.*
-
-<sub>[stdlib/Resources.sl:74](../../stdlib/Resources.sl#L74)</sub>
 
 ### ManifestId *constant*
 
@@ -291,55 +359,5 @@ const int ManifestId = 1
 `CREATEPROCESS_MANIFEST_RESOURCE_ID`: the name an executable's own manifest
 is filed under.
 
-<sub>[stdlib/Resources.sl:78](../../stdlib/Resources.sl#L78)</sub>
-
-### Menu *constant*
-
-```
-const int Menu = 4
-```
-
-*No documentation.*
-
-<sub>[stdlib/Resources.sl:64](../../stdlib/Resources.sl#L64)</sub>
-
-### MessageTable *constant*
-
-```
-const int MessageTable = 11
-```
-
-*No documentation.*
-
-<sub>[stdlib/Resources.sl:69](../../stdlib/Resources.sl#L69)</sub>
-
-### RcData *constant*
-
-```
-const int RcData = 10
-```
-
-*No documentation.*
-
-<sub>[stdlib/Resources.sl:68](../../stdlib/Resources.sl#L68)</sub>
-
-### StringTable *constant*
-
-```
-const int StringTable = 6
-```
-
-*No documentation.*
-
-<sub>[stdlib/Resources.sl:66](../../stdlib/Resources.sl#L66)</sub>
-
-### Version *constant*
-
-```
-const int Version = 16
-```
-
-*No documentation.*
-
-<sub>[stdlib/Resources.sl:72](../../stdlib/Resources.sl#L72)</sub>
+<sub>[stdlib/Resources/Resources.sl:59](../../stdlib/Resources/Resources.sl#L59)</sub>
 

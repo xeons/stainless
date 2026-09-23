@@ -115,13 +115,13 @@ public struct BuildMessage
         }
 
         made.IsDiagnostic = true;
-        made.Message = Json.GetTextOrDefault(members.Find("message"), "");
-        made.Code = Json.GetTextOrDefault(members.Find("code"), "");
-        made.IsError = Json.GetTextOrDefault(members.Find("severity"), "") == "error";
-        made.File = Json.GetTextOrDefault(members.Find("file"), "");
-        made.Line = (nuint)Json.GetIntegerOrDefault(members.Find("line"), 0);
-        made.Column = (nuint)Json.GetIntegerOrDefault(members.Find("column"), 0);
-        made.Length = (nuint)Json.GetIntegerOrDefault(members.Find("length"), 0);
+        made.Message = Json.GetTextOrDefault(members.GetValueOrNull("message"), "");
+        made.Code = Json.GetTextOrDefault(members.GetValueOrNull("code"), "");
+        made.IsError = Json.GetTextOrDefault(members.GetValueOrNull("severity"), "") == "error";
+        made.File = Json.GetTextOrDefault(members.GetValueOrNull("file"), "");
+        made.Line = (nuint)Json.GetIntegerOrDefault(members.GetValueOrNull("line"), 0);
+        made.Column = (nuint)Json.GetIntegerOrDefault(members.GetValueOrNull("column"), 0);
+        made.Length = (nuint)Json.GetIntegerOrDefault(members.GetValueOrNull("length"), 0);
         return made;
     }
 

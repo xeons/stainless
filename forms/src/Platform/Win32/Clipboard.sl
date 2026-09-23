@@ -671,7 +671,7 @@ public ClipboardImage? DecodeDib(byte[] dib)
 /// and from `CF_BITMAP`, so a screenshot arrives as either.
 ClipboardImage? ReadClipboardImage()
 {
-    if (ClipboardOffersFormat(GetPngClipboardFormat()) && Standard.Drawing.Imaging.Available)
+    if (ClipboardOffersFormat(GetPngClipboardFormat()) && Standard.Drawing.Imaging.IsAvailable)
     {
         var png = ReadClipboardFormat(GetPngClipboardFormat());
         var decoded = Standard.Drawing.Image.FromBytes(png);
@@ -698,7 +698,7 @@ ClipboardImage? ReadClipboardImage()
 /// The picture as PNG, or an empty array where there is no encoder.
 byte[] EncodePng(ClipboardImage picture)
 {
-    if (!Standard.Drawing.Imaging.Available)
+    if (!Standard.Drawing.Imaging.IsAvailable)
         return new byte[0u];
 
     var made = Standard.Drawing.Image.FromBgra(picture.Width, picture.Height, picture.Pixels);

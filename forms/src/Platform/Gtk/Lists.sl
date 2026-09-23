@@ -543,7 +543,7 @@ public class GtkTreePeer : GtkModelPeer, ITreeViewPeer
         if (node == null)
             return false;
 
-        var found = _nodes.Find(((ITreeNodeHandle)node).Id);
+        var found = _nodes.TryGetValue(((ITreeNodeHandle)node).Id);
         if (found is Some held)
         {
             gpointer path = gtk_tree_row_reference_get_path(held.Value);
@@ -627,7 +627,7 @@ public class GtkTreePeer : GtkModelPeer, ITreeViewPeer
         }
         foreach (var id in gone)
         {
-            var found = _nodes.Find(id);
+            var found = _nodes.TryGetValue(id);
             if (found is Some held)
                 gtk_tree_row_reference_free(held.Value);
             _nodes.Remove(id);

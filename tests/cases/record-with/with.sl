@@ -51,7 +51,7 @@ int Main()
     // What comes out is a record like any other.
     Console.WriteLine("equal " + ((p with { }) == p ? "yes" : "no"));
     Console.WriteLine("changed " + ((p with { Y = 9 }) == p ? "yes" : "no"));
-    Console.WriteLine("hash " + ((p with { }).HashCode() == p.HashCode() ? "yes" : "no"));
+    Console.WriteLine("hash " + ((p with { }).GetHashCode() == p.GetHashCode() ? "yes" : "no"));
 
     // The middle of three: the outer two keep their positions.
     var t = new Three("alpha", 1, true);

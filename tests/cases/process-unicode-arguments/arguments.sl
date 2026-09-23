@@ -30,8 +30,8 @@ public int Main(String[] args)
 
     Check("main  ", args, 0u);
 
-    var ran = RunProcess(Env.ProgramPath(), ["child", "café", "日本", "a \"b\" c"]);
+    var ran = RunProcess(Env.GetProcessPath(), ["child", "café", "日本", "a \"b\" c"]);
     if (ran.Ok)
-        Console.Write(ran.Value.Output);
+        Console.Write(ran.Value.StandardOutput);
     return 0;
 }

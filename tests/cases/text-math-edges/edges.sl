@@ -50,7 +50,7 @@ int Main()
     Says("clamp-double-reversed", Math.Clamp(15.0, 10.0, 0.0) == 10.0);
     Signed("clamp-int-inside", (long)Math.Clamp(5, 0, 10));
 
-    Says("epsilon-exact", Math.Epsilon == 1.0 / 4503599627370496.0);
-    Says("epsilon-step", 1.0 + Math.Epsilon != 1.0);
+    Says("epsilon-exact", Math.MachineEpsilon == 1.0 / 4503599627370496.0);
+    Says("epsilon-step", 1.0 + Math.MachineEpsilon != 1.0);
     return 0;
 }

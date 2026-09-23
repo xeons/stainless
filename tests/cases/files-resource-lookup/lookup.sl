@@ -34,8 +34,8 @@ int Main()
     Console.WriteLine($"lower {Resources.GetBytes("textblob", "greeting").Length} bytes");
     Console.WriteLine($"other name {Resources.Exists("TextBlob", "farewell")}");
 
-    Console.WriteLine($"empty exists {Resources.Exists(Resources.RcData, 302)}");
-    Console.WriteLine($"empty size {Resources.GetSize(Resources.RcData, 302)}");
+    Console.WriteLine($"empty exists {Resources.Exists(ResourceType.RcData, 302)}");
+    Console.WriteLine($"empty size {Resources.GetSize(ResourceType.RcData, 302)}");
 
     DescribeBitmap("bitfields", 401);
     DescribeBitmap("core", 402);

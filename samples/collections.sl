@@ -21,7 +21,7 @@ public class Money : IComparable<Money>, IEquatable<Money>
         return 0;
     }
 
-    public bool EqualTo(Money other) => _cents == other.Cents;
+    public bool Equals(Money other) => _cents == other.Cents;
 
     public String ToText() => Text.FromInteger(_cents) + "c";
 }

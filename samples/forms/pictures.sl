@@ -166,7 +166,7 @@ public class MainForm : Form
         bool ok = true;
 
         ok = Check(ok, "an imaging library is here",
-                   Standard.Drawing.Imaging.Available);
+                   Standard.Drawing.Imaging.IsAvailable);
 
         var shown = _shown.Picture;
         ok = Check(ok, "a PNG became a bitmap", shown != null);

@@ -828,15 +828,15 @@ public class Point : IEquatable<Point>, IHashable
 
     public Point(int X, int Y) { this.X = X; this.Y = Y; }
 
-    public bool EqualTo(Point other) => X.EqualTo(other.X) && Y.EqualTo(other.Y);
-    public nuint HashCode()          => X.HashCode() * 31u + Y.HashCode();
+    public bool Equals(Point other) => X.Equals(other.X) && Y.Equals(other.Y);
+    public nuint GetHashCode()          => X.GetHashCode() * 31u + Y.GetHashCode();
 
-    public static bool operator ==(Point left, Point right) => left.EqualTo(right);
-    public static bool operator !=(Point left, Point right) => !left.EqualTo(right);
+    public static bool operator ==(Point left, Point right) => left.Equals(right);
+    public static bool operator !=(Point left, Point right) => !left.Equals(right);
 }
 ```
 
-**`EqualTo` and `HashCode`, not `Equals` and `GetHashCode`.** Those are the
+**`Equals` and `GetHashCode`, not `Equals` and `GetHashCode`.** Those are the
 names [`IEquatable<T>` and `IHashable`](05-standard-library.md) declare, and
 the pair a `Dictionary` probes a key with — so a record is a key, and a set
 element, without saying anything. That is most of what the form is for.
@@ -864,13 +864,13 @@ default that printed a type name.
 `IEquatable` and `IHashable` it declares, and a struct implements no interface:
 an interface reference is counted and a struct has no header to count it in
 ([§2.2](#22-struct--value-type-c-layout)). A record without those two would be
-a struct with a constructor and an `EqualTo`, which is already writable
+a struct with a constructor and an `Equals`, which is already writable
 ([§2.2.1](#221-a-structs-constructor)).
 
 ```
 error[SL0734]: a record implements 'IEquatable' and 'IHashable', and a struct
 implements no interface, so there is no 'record struct'; write 'record' for a
-class, or a struct with a constructor and an 'EqualTo' of its own
+class, or a struct with a constructor and an 'Equals' of its own
 ```
 
 **`record` is contextual**, as `closure` and `where` are: it is read as a
@@ -1560,7 +1560,7 @@ rather than discouraged. There is no way left to obtain a listener that exists
 and is not listening.
 
 `FileStream.Open`, `Socket.Open`, `TcpListener.Listen`, `TcpClient.Connect`,
-`UdpSocket.Bind` and `UdpSocket.Create` are the ones that can fail. Each
+`UdpClient.Bind` and `UdpClient.Create` are the ones that can fail. Each
 returns a `Result`, whose failure cannot be walked past because it has no value
 to read until its case has been named.
 

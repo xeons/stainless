@@ -20,7 +20,7 @@ int Main()
     Console.WriteLine($"memory write: {memory.Write(buffer, 2u, huge)}");
     Console.WriteLine($"memory length: {memory.Length}");
 
-    var temp = Env.GetVariableOrDefault("TEMP", Env.GetVariableOrDefault("TMPDIR", "/tmp"));
+    var temp = Env.GetEnvironmentVariableOrDefault("TEMP", Env.GetEnvironmentVariableOrDefault("TMPDIR", "/tmp"));
     var path = Path.Join(temp, "stainless-files-stream-bounds.bin");
     File.WriteAllBytes(path, new byte[8]);
 

@@ -1,5 +1,5 @@
 ok   NaN is one key
 ok   and can be removed
 ok   a set holds one NaN and one zero
-ok   NaN equals itself by EqualTo
+ok   NaN equals itself by Equals
 ok   but not by ==

@@ -96,7 +96,7 @@ them off does not fail cleanly (see below).
 | | |
 |---|---|
 | `runtime/` | fourteen C files, embedded in the compiler as resources |
-| `stdlib/` | the standard library, in Stainless, also embedded |
+| `stdlib/` | the standard library, in Stainless, also embedded: a folder per module, a file per public type |
 | `bindings/win32`, `bindings/gtk`, `bindings/linux` | platform APIs, compiled only by a program that asks |
 | `forms/` | a GUI framework, one control layer over a Win32 and a GTK backend |
 | `ide/` | an editor for Stainless, written in Stainless, on `forms/` |
@@ -132,10 +132,10 @@ These are rules held by the unit tests, and each has caught a real commit:
 
 ## Things that will cost you an hour
 
-**Rebuild after editing `runtime/*.c` or adding a `stdlib/*.sl` file.** Both are
-embedded resources picked up by a wildcard, so no Stainless program sees the
-change until `dotnet build` has run. A new stdlib file cannot even be imported
-before that.
+**Rebuild after editing `runtime/*.c` or adding a `stdlib/**/*.sl` file.** Both
+are embedded resources picked up by a wildcard, so no Stainless program sees
+the change until `dotnet build` has run. A new stdlib file cannot even be
+imported before that, wherever in the tree it sits.
 
 **Two end-to-end runs at once corrupt each other.** The harness builds every
 case under one shared `%TEMP%/stainless-tests/`, so a second run overwrites the

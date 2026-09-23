@@ -106,19 +106,20 @@ public String[] GetArguments()
 /// The program's own path, as the operating system gave it. That is not
 /// necessarily where the executable is: a shell may pass a bare name, and on
 /// Linux nothing guarantees any relationship at all.
-public String ProgramPath() => sl_args_program();
+public String GetProcessPath() => sl_args_program();
 
 // --------------------------------------------------------------- variables
 
 /// A variable's value, or null when it is not set.
 ///
 /// Null rather than empty, because "not set" and "set to nothing" are
-/// different states and both platforms can tell them apart. `GetVariableOrDefault` is what
+/// different states and both platforms can tell them apart.
+/// `GetEnvironmentVariableOrDefault` is what
 /// most callers want.
 ///
-/// @see Env.GetVariableOrDefault
+/// @see Env.GetEnvironmentVariableOrDefault
 #if WINDOWS
-public String? GetVariable(String name)
+public String? GetEnvironmentVariable(String name)
 {
     var wanted = name.ToUtf16();
 
@@ -147,7 +148,7 @@ public String? GetVariable(String name)
 /// ERROR_ENVVAR_NOT_FOUND.
 const uint ErrorVariableNotFound = 203u;
 #else
-public String? GetVariable(String name)
+public String? GetEnvironmentVariable(String name)
 {
     byte* value = getenv(name.ToPointer());
     if (value == null)
@@ -160,17 +161,17 @@ public String? GetVariable(String name)
 ///
 /// @param name      the variable to read
 /// @param fallback  what to answer when there is no such variable
-/// @see Env.GetVariable
-public String GetVariableOrDefault(String name, String fallback)
+/// @see Env.GetEnvironmentVariable
+public String GetEnvironmentVariableOrDefault(String name, String fallback)
 {
-    var value = GetVariable(name);
+    var value = GetEnvironmentVariable(name);
     if (value == null)
         return fallback;
     return value;
 }
 
 /// Whether a variable is set, whatever it is set to.
-public bool HasVariable(String name) => GetVariable(name) != null;
+public bool HasEnvironmentVariable(String name) => GetEnvironmentVariable(name) != null;
 
 /// Sets a variable for this process and anything it starts afterwards.
 ///
@@ -179,24 +180,25 @@ public bool HasVariable(String name) => GetVariable(name) != null;
 /// platform accepted it.
 ///
 /// An empty value leaves the variable set and empty, on both platforms, and
-/// `GetVariable` answers with the empty string rather than null.
+/// `GetEnvironmentVariable` answers with the empty string rather than null.
 ///
 /// @param name   the variable to set
 /// @param value  what to set it to
-/// @see Env.RemoveVariable
-public bool SetVariable(String name, String value) => StoreVariable(name, value);
+/// @see Env.RemoveEnvironmentVariable
+public bool SetEnvironmentVariable(String name, String value) =>
+    StoreEnvironmentVariable(name, value);
 
 /// Removes a variable, reporting whether the platform accepted it. Removing
 /// one that was never set is not a failure.
 ///
-/// @see Env.SetVariable
-public bool RemoveVariable(String name) => StoreVariable(name, null);
+/// @see Env.SetEnvironmentVariable
+public bool RemoveEnvironmentVariable(String name) => StoreEnvironmentVariable(name, null);
 
 #if WINDOWS
 
 /// Sets a variable, or removes it when `value` is null. A null value is what
 /// `SetEnvironmentVariableW` takes to mean "remove".
-bool StoreVariable(String name, String? value)
+bool StoreEnvironmentVariable(String name, String? value)
 {
     var wanted = name.ToUtf16();
     if (value == null)
@@ -215,7 +217,7 @@ bool IsWin32Success(int result) => result != 0;
 /// The block is one run of NUL-terminated wide strings ending in an empty one.
 /// A name beginning with `=` is Windows' per-drive working directory (`=C:`),
 /// which is not a variable anybody set.
-public String[] GetVariableNames()
+public String[] GetEnvironmentVariableNames()
 {
     char16* block = GetEnvironmentStringsW();
     if (block == null)
@@ -251,7 +253,7 @@ public String[] GetVariableNames()
 #else
 
 /// Sets a variable, or removes it when `value` is null.
-bool StoreVariable(String name, String? value)
+bool StoreEnvironmentVariable(String name, String? value)
 {
     if (value == null)
         return unsetenv(name.ToPointer()) == 0;
@@ -262,7 +264,7 @@ bool StoreVariable(String name, String? value)
 ///
 /// `environ` is a null-terminated run of `name=value`, and an entry without an
 /// `=` is not one the C library put there.
-public String[] GetVariableNames()
+public String[] GetEnvironmentVariableNames()
 {
     var found = new List<String>();
 

@@ -328,7 +328,7 @@ import Standard.Collections;
 public class Money : IComparable<Money>, IEquatable<Money>
 {
     public int  CompareTo(Money other) { ... }
-    public bool EqualTo(Money other)   { ... }
+    public bool Equals(Money other)   { ... }
 }
 
 var prices = new List<Money>();

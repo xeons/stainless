@@ -25,7 +25,7 @@ nuint DirtyTheStack()
 
 void CheckDatagrams()
 {
-    var bound = UdpSocket.Bind("127.0.0.1", 0u);
+    var bound = UdpClient.Bind("127.0.0.1", 0u);
     if (!bound.Ok)
     {
         Console.WriteLine("udp bind failed");
@@ -104,8 +104,8 @@ void CheckStream()
 void CheckFailedConnect()
 {
     // A port that is bound and not listening refuses a connection.
-    var holder = Socket.Open(AddressFamily.IPv4, SocketKind.Stream);
-    var socket = Socket.Open(AddressFamily.IPv4, SocketKind.Stream);
+    var holder = Socket.Open(AddressFamily.IPv4, SocketType.Stream);
+    var socket = Socket.Open(AddressFamily.IPv4, SocketType.Stream);
     if (!holder.Ok || !socket.Ok)
     {
         Console.WriteLine("open failed");

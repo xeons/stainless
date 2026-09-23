@@ -26,7 +26,7 @@ int Main()
     set.Add(-0.0);
     Say("a set holds one NaN and one zero", set.Count == 2u);
 
-    Say("NaN equals itself by EqualTo", nan.EqualTo(nan));
+    Say("NaN equals itself by Equals", nan.Equals(nan));
     Say("but not by ==", !(nan == nan));
     return 0;
 }

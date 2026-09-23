@@ -108,7 +108,7 @@ int Main()
     }
 
     PrintLabelled("in hex          ", Convert.FromLong(255, 16u));
-    PrintLabelled("base64          ", Convert.ToBase64Text("Hello"));
+    PrintLabelled("base64          ", Convert.ToBase64String("Hello"));
 
     // ------------------------------------------------------------- UTF-16
 

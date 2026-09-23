@@ -28,50 +28,50 @@ int Main(String[] args)
     // The same list, reached from away from Main.
     printf("viaEnv    = %llu\n", (ulong)Env.ArgumentCount());
     printf("agree     = %d\n", Env.GetArgument(0u) == args[0u]);
-    printf("program   = %d\n", Env.ProgramPath().ByteLength() > 0u);
+    printf("program   = %d\n", Env.GetProcessPath().ByteLength() > 0u);
 
     // --------------------------------------------------------- environment
 
     // A variable this test sets, so the value is known. Round-tripping it is
     // the check; what the machine already had in its environment is not.
-    printf("setOk     = %d\n", Env.SetVariable("SL_TEST_VARIABLE", "a value"));
-    printf("readBack  = %s\n", Env.GetVariableOrDefault("SL_TEST_VARIABLE", "<missing>").ToPointer());
-    printf("has       = %d\n", Env.HasVariable("SL_TEST_VARIABLE"));
+    printf("setOk     = %d\n", Env.SetEnvironmentVariable("SL_TEST_VARIABLE", "a value"));
+    printf("readBack  = %s\n", Env.GetEnvironmentVariableOrDefault("SL_TEST_VARIABLE", "<missing>").ToPointer());
+    printf("has       = %d\n", Env.HasEnvironmentVariable("SL_TEST_VARIABLE"));
 
-    printf("removeOk  = %d\n", Env.RemoveVariable("SL_TEST_VARIABLE"));
-    printf("gone      = %d\n", !Env.HasVariable("SL_TEST_VARIABLE"));
-    printf("fallback  = %s\n", Env.GetVariableOrDefault("SL_TEST_VARIABLE", "<missing>").ToPointer());
+    printf("removeOk  = %d\n", Env.RemoveEnvironmentVariable("SL_TEST_VARIABLE"));
+    printf("gone      = %d\n", !Env.HasEnvironmentVariable("SL_TEST_VARIABLE"));
+    printf("fallback  = %s\n", Env.GetEnvironmentVariableOrDefault("SL_TEST_VARIABLE", "<missing>").ToPointer());
 
     // Set to nothing is still set, on both platforms.
-    printf("emptyOk   = %d\n", Env.SetVariable("SL_TEST_EMPTY", ""));
-    printf("emptyRead = %llu\n", (ulong)Env.GetVariableOrDefault("SL_TEST_EMPTY", "<missing>").ByteLength());
-    printf("emptyHas  = %d\n", Env.HasVariable("SL_TEST_EMPTY"));
-    Env.RemoveVariable("SL_TEST_EMPTY");
+    printf("emptyOk   = %d\n", Env.SetEnvironmentVariable("SL_TEST_EMPTY", ""));
+    printf("emptyRead = %llu\n", (ulong)Env.GetEnvironmentVariableOrDefault("SL_TEST_EMPTY", "<missing>").ByteLength());
+    printf("emptyHas  = %d\n", Env.HasEnvironmentVariable("SL_TEST_EMPTY"));
+    Env.RemoveEnvironmentVariable("SL_TEST_EMPTY");
 
-    printf("names     = %d\n", Env.GetVariableNames().Length > 0u);
+    printf("names     = %d\n", Env.GetEnvironmentVariableNames().Length > 0u);
     printf("cwd       = %d\n", Env.CurrentDirectory().ByteLength() > 0u);
 
     // ---------------------------------------------------------------- time
 
     // A date the calendar arithmetic can be checked against by hand.
-    var moon = Instant.FromUtc(1969, 7, 20, 20, 17, 40);
+    var moon = DateTimeOffset.FromUtc(1969, 7, 20, 20, 17, 40);
     printf("moon      = %s\n", moon.FormatIso().ToPointer());
-    printf("moonUnix  = %lld\n", moon.ToUnixSeconds());
+    printf("moonUnix  = %lld\n", moon.ToUnixTimeSeconds());
 
-    var broken = moon.ToUtc();
+    var broken = moon.UtcDateTime;
     printf("moonDay   = %d\n", broken.DayOfWeek);        // a Sunday
     printf("moonYday  = %d\n", broken.DayOfYear);
 
     // Before the epoch, which is where truncating division goes wrong.
-    var early = Instant.FromUtc(1960, 1, 1, 0, 0, 0);
+    var early = DateTimeOffset.FromUtc(1960, 1, 1, 0, 0, 0);
     printf("early     = %s\n", early.FormatIso().ToPointer());
-    printf("earlyUnix = %lld\n", early.ToUnixSeconds());
+    printf("earlyUnix = %lld\n", early.ToUnixTimeSeconds());
 
     // The epoch itself.
-    printf("epoch     = %s\n", Instant.Epoch.FormatIso().ToPointer());
+    printf("epoch     = %s\n", DateTimeOffset.UnixEpoch.FormatIso().ToPointer());
 
     // Round trip, which is what makes the format worth having.
-    var parsed = Instant.ParseIso("2026-09-05T14:30:00Z");
+    var parsed = DateTimeOffset.ParseIso("2026-09-05T14:30:00Z");
     switch (parsed)
     {
         case Ok ok:
@@ -82,12 +82,12 @@ int Main(String[] args)
             break;
     }
 
-    printf("malformed = %d\n", Instant.ParseIso("not a date").Ok);
-    printf("shortForm = %d\n", Instant.ParseIso("2026-09-05").Ok);
-    printf("badMonth  = %d\n", Instant.ParseIso("2026-13-05T14:30:00Z").Ok);
-    printf("feb30     = %d\n", Instant.ParseIso("2026-02-30T00:00:00Z").Ok);
-    printf("feb29leap = %d\n", Instant.ParseIso("2024-02-29T00:00:00Z").Ok);
-    printf("feb29not  = %d\n", Instant.ParseIso("2026-02-29T00:00:00Z").Ok);
+    printf("malformed = %d\n", DateTimeOffset.ParseIso("not a date").Ok);
+    printf("shortForm = %d\n", DateTimeOffset.ParseIso("2026-09-05").Ok);
+    printf("badMonth  = %d\n", DateTimeOffset.ParseIso("2026-13-05T14:30:00Z").Ok);
+    printf("feb30     = %d\n", DateTimeOffset.ParseIso("2026-02-30T00:00:00Z").Ok);
+    printf("feb29leap = %d\n", DateTimeOffset.ParseIso("2024-02-29T00:00:00Z").Ok);
+    printf("feb29not  = %d\n", DateTimeOffset.ParseIso("2026-02-29T00:00:00Z").Ok);
 
     printf("leap2024  = %d\n", Time.IsLeapYear(2024));
     printf("leap1900  = %d\n", Time.IsLeapYear(1900));
@@ -97,28 +97,28 @@ int Main(String[] args)
 
     // Durations, which really are ordinary arithmetic now: the operators
     // are declared on the struct, so `hour + minute` is the whole of it.
-    var hour = Duration.FromHours(1);
-    var minute = Duration.FromMinutes(1);
+    var hour = TimeSpan.FromHours(1);
+    var minute = TimeSpan.FromMinutes(1);
 
-    printf("hourSecs  = %lld\n", hour.TotalSeconds);
-    printf("sum       = %lld\n", (hour + minute).TotalSeconds);
-    printf("diff      = %lld\n", (hour - minute).TotalSeconds);
+    printf("hourSecs  = %lld\n", (long)hour.TotalSeconds);
+    printf("sum       = %lld\n", (long)(hour + minute).TotalSeconds);
+    printf("diff      = %lld\n", (long)(hour - minute).TotalSeconds);
     printf("negative  = %d\n", (minute - hour).IsNegative);
-    printf("format    = %s\n", Duration.FromMilliseconds(3661004).Format().ToPointer());
-    printf("small     = %s\n", Duration.FromMilliseconds(42).Format().ToPointer());
-    printf("negFormat = %s\n", Duration.FromMilliseconds(-1500).Format().ToPointer());
+    printf("format    = %s\n", TimeSpan.FromMilliseconds(3661004).Format().ToPointer());
+    printf("small     = %s\n", TimeSpan.FromMilliseconds(42).Format().ToPointer());
+    printf("negFormat = %s\n", TimeSpan.FromMilliseconds(-1500).Format().ToPointer());
 
     // Two instants an hour apart, which is a fact about the arithmetic rather
     // than about the machine's clock.
     var later = moon + hour;
-    printf("apart     = %lld\n", (later - moon).TotalSeconds);
+    printf("apart     = %lld\n", (long)(later - moon).TotalSeconds);
 
     // The wall clock is somewhere in this century, and the monotonic one does
     // not go backwards. Neither is a value that can be written down.
-    var now = Instant.Now.ToUtc();
+    var now = DateTimeOffset.UtcNow.UtcDateTime;
     printf("thisEra   = %d\n", now.Year >= 2020 && now.Year < 2200);
 
-    var clock = new Clock();
+    var clock = new Stopwatch();
     var first = clock.Elapsed;
     var second = clock.Elapsed;
     printf("forwards  = %d\n", second >= first);
@@ -181,6 +181,15 @@ int Main(String[] args)
         again[i] = (long)i;
     new Random(99).Shuffle(again);
     printf("sameOrder = %d\n", SameOrder(deck, again));
+
+    // Any array, not just one of longs.
+    var words = new String[4];
+    words[0u] = "a"; words[1u] = "b"; words[2u] = "c"; words[3u] = "d";
+    new Random(7).Shuffle(words);
+    var rejoined = new StringBuilder();
+    for (nuint i = 0u; i < words.Length; i++)
+        rejoined.Append(words[i]);
+    printf("shuffledText = %d\n", rejoined.ToText().ByteLength() == 4u);
 
     // Bytes from the platform, which cannot be predicted and can only be
     // checked for having arrived at all.

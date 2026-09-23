@@ -33,7 +33,7 @@ xoshiro256**, which is the current answer for a general-purpose generator:
 four words of state, no multiply in the step, and it passes the test suites
 that killed the older ones.
 
-<sub>[stdlib/Random.sl:47](../../stdlib/Random.sl#L47)</sub>
+<sub>[stdlib/Random/Random.sl:47](../../stdlib/Random/Random.sl#L47)</sub>
 
 #### NextULong *method*
 
@@ -43,7 +43,7 @@ ulong NextULong()
 
 The next 64 bits. Every other method here is built on this one.
 
-<sub>[stdlib/Random.sl:104](../../stdlib/Random.sl#L104)</sub>
+<sub>[stdlib/Random/Random.sl:104](../../stdlib/Random/Random.sl#L104)</sub>
 
 #### NextLong *method*
 
@@ -56,7 +56,7 @@ The next 64 bits read as signed, so negative half the time. Reach for
 
 **See also** &nbsp; [Random.NextBelow](#nextbelow-method)
 
-<sub>[stdlib/Random.sl:123](../../stdlib/Random.sl#L123)</sub>
+<sub>[stdlib/Random/Random.sl:123](../../stdlib/Random/Random.sl#L123)</sub>
 
 #### NextBelow *method*
 
@@ -72,7 +72,7 @@ the low end whenever the limit does not divide 2^64, and the bias is
 large exactly when the limit is large. The loop discards the short tail
 instead, and runs more than once with probability below one half.
 
-<sub>[stdlib/Random.sl:132](../../stdlib/Random.sl#L132)</sub>
+<sub>[stdlib/Random/Random.sl:132](../../stdlib/Random/Random.sl#L132)</sub>
 
 #### NextBetween *method*
 
@@ -82,7 +82,7 @@ long NextBetween(long low, long high)
 
 A number in `[low, high)`. Aborts when the range is empty.
 
-<sub>[stdlib/Random.sl:147](../../stdlib/Random.sl#L147)</sub>
+<sub>[stdlib/Random/Random.sl:147](../../stdlib/Random/Random.sl#L147)</sub>
 
 #### NextInt *method*
 
@@ -92,7 +92,7 @@ int NextInt(int limit)
 
 A number in `[0, limit)`, for the common case of an `int`.
 
-<sub>[stdlib/Random.sl:155](../../stdlib/Random.sl#L155)</sub>
+<sub>[stdlib/Random/Random.sl:155](../../stdlib/Random/Random.sl#L155)</sub>
 
 #### NextBool *method*
 
@@ -102,7 +102,7 @@ bool NextBool()
 
 True about half the time.
 
-<sub>[stdlib/Random.sl:158](../../stdlib/Random.sl#L158)</sub>
+<sub>[stdlib/Random/Random.sl:158](../../stdlib/Random/Random.sl#L158)</sub>
 
 #### NextDouble *method*
 
@@ -116,7 +116,7 @@ The top 53 bits, which is exactly the precision a double has: taking
 fewer would leave gaps, and taking more would round some draws up to
 1.0 and break the half-open range.
 
-<sub>[stdlib/Random.sl:165](../../stdlib/Random.sl#L165)</sub>
+<sub>[stdlib/Random/Random.sl:165](../../stdlib/Random/Random.sl#L165)</sub>
 
 #### NextBytes *method*
 
@@ -126,12 +126,12 @@ void NextBytes(byte[] buffer)
 
 Fills an array with random bytes.
 
-<sub>[stdlib/Random.sl:171](../../stdlib/Random.sl#L171)</sub>
+<sub>[stdlib/Random/Random.sl:171](../../stdlib/Random/Random.sl#L171)</sub>
 
 #### Shuffle *method*
 
 ```
-void Shuffle(long[] items)
+void Shuffle<T>(T[] items)
 ```
 
 Reorders an array in place, every ordering equally likely.
@@ -141,7 +141,7 @@ chosen element at or below it. Walking up, or choosing from the whole
 array each time, is the classic wrong version -- it produces n^n equally
 likely paths over n! orderings, which cannot come out even.
 
-<sub>[stdlib/Random.sl:191](../../stdlib/Random.sl#L191)</sub>
+<sub>[stdlib/Random/Random.sl:191](../../stdlib/Random/Random.sl#L191)</sub>
 
 ## Functions
 
@@ -157,7 +157,7 @@ reason to fall back on the clock.
 
 **See also** &nbsp; [GenerateSeed](#generateseed-function)
 
-<sub>[stdlib/Random.sl:211](../../stdlib/Random.sl#L211)</sub>
+<sub>[stdlib/Random/Random.sl:211](../../stdlib/Random/Random.sl#L211)</sub>
 
 ### GenerateSeed *function*
 
@@ -171,5 +171,5 @@ form that reports instead.
 
 **See also** &nbsp; [FillSecureBytes](#fillsecurebytes-function)
 
-<sub>[stdlib/Random.sl:223](../../stdlib/Random.sl#L223)</sub>
+<sub>[stdlib/Random/Random.sl:223](../../stdlib/Random/Random.sl#L223)</sub>
 

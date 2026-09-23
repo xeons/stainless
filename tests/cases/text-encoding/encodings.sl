@@ -134,15 +134,15 @@ int Main()
     SayNumber("stripped", (long)stripped.Length);
 
     // ------------------------------------------------------------- base64
-    Say("b64-empty", "[" + Convert.ToBase64([]) + "]");
-    Say("b64-1", Convert.ToBase64([102]));
-    Say("b64-2", Convert.ToBase64([102, 111]));
-    Say("b64-3", Convert.ToBase64([102, 111, 111]));
-    Say("b64-text", Convert.ToBase64Text("Hello, World!"));
+    Say("b64-empty", "[" + Convert.ToBase64String([]) + "]");
+    Say("b64-1", Convert.ToBase64String([102]));
+    Say("b64-2", Convert.ToBase64String([102, 111]));
+    Say("b64-3", Convert.ToBase64String([102, 111, 111]));
+    Say("b64-text", Convert.ToBase64String("Hello, World!"));
     Say("b64-url", Convert.ToBase64Url([251, 255, 190]));
-    Say("b64-std", Convert.ToBase64([251, 255, 190]));
+    Say("b64-std", Convert.ToBase64String([251, 255, 190]));
 
-    var decoded = Convert.FromBase64("SGVsbG8sIFdvcmxkIQ==");
+    var decoded = Convert.FromBase64String("SGVsbG8sIFdvcmxkIQ==");
     switch (decoded)
     {
         case Ok ok: Say("b64-back", Encoding.CreateUtf8().GetString(ok.Value)); break;
@@ -150,7 +150,7 @@ int Main()
     }
 
     // Wrapped at a column, which is how base64 arrives in the wild.
-    var wrapped = Convert.FromBase64("SGVs\nbG8s\nIFdv\ncmxk\nIQ==");
+    var wrapped = Convert.FromBase64String("SGVs\nbG8s\nIFdv\ncmxk\nIQ==");
     switch (wrapped)
     {
         case Ok ok: Say("b64-wrapped", Encoding.CreateUtf8().GetString(ok.Value)); break;
@@ -158,18 +158,18 @@ int Main()
     }
 
     // Both alphabets decode, so a JWT and a MIME body go through one door.
-    var urlBack = Convert.FromBase64("-_--");
+    var urlBack = Convert.FromBase64String("-_--");
     SayBool("b64-url-back", urlBack.Ok);
 
-    SayBool("b64-bad", Convert.FromBase64("a").Ok);
-    SayBool("b64-junk", Convert.FromBase64("!!!!").Ok);
+    SayBool("b64-bad", Convert.FromBase64String("a").Ok);
+    SayBool("b64-junk", Convert.FromBase64String("!!!!").Ok);
 
     // ---------------------------------------------------------------- hex
-    Say("hex", Convert.ToHex([0x00, 0x0F, 0xA5, 0xFF]));
-    Say("hex-upper", Convert.ToHex([0x0F, 0xA5], true));
-    Say("hex-empty", "[" + Convert.ToHex([]) + "]");
+    Say("hex", Convert.ToHexString([0x00, 0x0F, 0xA5, 0xFF]));
+    Say("hex-upper", Convert.ToHexString([0x0F, 0xA5], true));
+    Say("hex-empty", "[" + Convert.ToHexString([]) + "]");
 
-    var unhex = Convert.FromHex("000fa5FF");
+    var unhex = Convert.FromHexString("000fa5FF");
     switch (unhex)
     {
         case Ok ok:
@@ -179,8 +179,8 @@ int Main()
         case Fail: Say("unhex", "failed"); break;
     }
 
-    SayBool("hex-odd", Convert.FromHex("abc").Ok);
-    SayBool("hex-junk", Convert.FromHex("zz").Ok);
+    SayBool("hex-odd", Convert.FromHexString("abc").Ok);
+    SayBool("hex-junk", Convert.FromHexString("zz").Ok);
 
     // ------------------------------------------------------------- numbers
     ShowLong("int", Convert.ToLong("1234"));

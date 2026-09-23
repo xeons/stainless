@@ -43,8 +43,8 @@ public int Main(String[] args)
 
     String input = Input();
 
-    var opened = OpenProcess(Env.ProgramPath(), ["echo"], input);
-    var bystander = Process.Start(Env.ProgramPath(), ["sleep"]);
+    var opened = OpenProcess(Env.GetProcessPath(), ["echo"], input);
+    var bystander = Process.Start(Env.GetProcessPath(), ["sleep"]);
     if (!opened.Ok || !bystander.Ok)
         return 1;
 
@@ -55,12 +55,12 @@ public int Main(String[] args)
         text.Append(child.TakeOutput());
         child.TakeErrors();
     }
-    child.Wait();
+    child.WaitForExit();
 
     var other = bystander.Value;
-    Console.WriteLine($"echoed {text.ToText() == input} before the bystander ended {other.Finished.IsEmpty}");
+    Console.WriteLine($"echoed {text.ToText() == input} before the bystander ended {other.TryGetExitCode().IsEmpty}");
 
     other.Kill();
-    other.Wait();
+    other.WaitForExit();
     return 0;
 }

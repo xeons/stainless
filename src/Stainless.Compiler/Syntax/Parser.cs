@@ -833,7 +833,7 @@ public sealed class Parser
             _diagnostics.Error("SL0734", SpanFrom(_pos),
                 "a record implements 'IEquatable' and 'IHashable', and a struct implements " +
                 "no interface, so there is no 'record struct'; write 'record' for a class, " +
-                "or a struct with a constructor and an 'EqualTo' of its own");
+                "or a struct with a constructor and an 'Equals' of its own");
             Advance();
         }
         else if (At(TokenKind.ClassKeyword))
@@ -852,8 +852,8 @@ public sealed class Parser
         var members = new List<Declaration>(declared.Members);
         members.AddRange(PropertiesFor(positional));
         members.Add(ConstructorFor(declared.Name, positional));
-        members.Add(EqualToFor(declared.Name, positional));
-        members.Add(HashCodeFor(positional));
+        members.Add(EqualsFor(declared.Name, positional));
+        members.Add(GetHashCodeFor(positional));
         members.Add(EqualityOperatorFor(declared.Name, positional, TokenKind.EqualsEquals));
         members.Add(EqualityOperatorFor(declared.Name, positional, TokenKind.BangEquals));
 
@@ -894,13 +894,12 @@ public sealed class Parser
     private static NameSyntax Named(SourceSpan span, QualifiedName name) => new(span, name);
 
     /// <summary>
-    /// <c>bool EqualTo(T other)</c>: every field equal to the matching one.
+    /// <c>bool Equals(T other)</c>: every field equal to the matching one.
     ///
-    /// Written as <c>EqualTo</c> rather than as <c>Equals</c> because that is
-    /// the name <c>IEquatable</c> declares and the one a dictionary probes
+    /// The name <c>IEquatable</c> declares, and the one a dictionary probes
     /// with, which is most of what a record is for.
     /// </summary>
-    private static FunctionDeclSyntax EqualToFor(string name, List<ParameterSyntax> positional)
+    private static FunctionDeclSyntax EqualsFor(string name, List<ParameterSyntax> positional)
     {
         var span = positional[0].Span;
 
@@ -911,7 +910,7 @@ public sealed class Parser
                 span, Named(span, new QualifiedName(span, ["other"])), parameter.Name);
 
             ExpressionSyntax one = new CallSyntax(
-                span, new MemberAccessSyntax(span, Mine(span, parameter.Name), "EqualTo"),
+                span, new MemberAccessSyntax(span, Mine(span, parameter.Name), "Equals"),
                 [other]);
 
             test = test is null ? one : new BinarySyntax(span, test, TokenKind.AmpAmp, one);
@@ -921,18 +920,18 @@ public sealed class Parser
 
         return new FunctionDeclSyntax(
             span, Modifiers.Public, LinkageKind.Stainless,
-            new PrimitiveTypeSyntax(span, TokenKind.BoolKeyword), "EqualTo", [], [],
+            new PrimitiveTypeSyntax(span, TokenKind.BoolKeyword), "Equals", [], [],
             [new ParameterSyntax(span, Named(span, name), "other")], false, body);
     }
 
     /// <summary>
-    /// <c>nuint HashCode()</c>: the fields' hashes folded together.
+    /// <c>nuint GetHashCode()</c>: the fields' hashes folded together.
     ///
     /// Each field's own hash is already mixed -- that is what
     /// <c>Standard.HashInteger</c> does for it -- so the fold only has to keep
     /// the fields apart, and multiplying by an odd number does that.
     /// </summary>
-    private static FunctionDeclSyntax HashCodeFor(List<ParameterSyntax> positional)
+    private static FunctionDeclSyntax GetHashCodeFor(List<ParameterSyntax> positional)
     {
         var span = positional[0].Span;
 
@@ -940,7 +939,7 @@ public sealed class Parser
         foreach (var parameter in positional)
         {
             ExpressionSyntax one = new CallSyntax(
-                span, new MemberAccessSyntax(span, Mine(span, parameter.Name), "HashCode"), []);
+                span, new MemberAccessSyntax(span, Mine(span, parameter.Name), "GetHashCode"), []);
 
             if (hash is null)
             {
@@ -958,12 +957,12 @@ public sealed class Parser
 
         return new FunctionDeclSyntax(
             span, Modifiers.Public, LinkageKind.Stainless,
-            new PrimitiveTypeSyntax(span, TokenKind.NUIntKeyword), "HashCode", [], [],
+            new PrimitiveTypeSyntax(span, TokenKind.NUIntKeyword), "GetHashCode", [], [],
             [], false, body);
     }
 
     /// <summary>
-    /// <c>a == b</c> and <c>a != b</c>, both over <c>EqualTo</c>.
+    /// <c>a == b</c> and <c>a != b</c>, both over <c>Equals</c>.
     ///
     /// Neither takes a nullable, so neither has C#'s problem of an operator
     /// that must answer for a null operand: comparing a <c>T?</c> is a
@@ -978,7 +977,7 @@ public sealed class Parser
         ExpressionSyntax test = new CallSyntax(
             span,
             new MemberAccessSyntax(
-                span, Named(span, new QualifiedName(span, ["left"])), "EqualTo"),
+                span, Named(span, new QualifiedName(span, ["left"])), "Equals"),
             [Named(span, new QualifiedName(span, ["right"]))]);
 
         if (which == TokenKind.BangEquals)

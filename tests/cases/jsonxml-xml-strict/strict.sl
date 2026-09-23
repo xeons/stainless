@@ -51,7 +51,7 @@ void AttributeOf(String label, String source)
         Say(label, "failed: " + Xml.DescribeXmlError(parsed.Error));
         return;
     }
-    Say(label, "[" + Visible(parsed.Value.Attributes.Find("x", "?")) + "]");
+    Say(label, "[" + Visible(parsed.Value.Attributes.GetValueOrDefault("x", "?")) + "]");
 }
 
 void Refuse(String label, String source)

@@ -144,8 +144,8 @@ public int Main()
     {
         var root = parsed.Value;
         Say("root-name", root.Name);
-        Say("attribute", root.Attributes.Find("env", "?"));
-        Say("missing-attribute", root.Attributes.Find("nope", "(default)"));
+        Say("attribute", root.Attributes.GetValueOrDefault("env", "?"));
+        Say("missing-attribute", root.Attributes.GetValueOrDefault("nope", "(default)"));
         Say("child-text", root.FindChildText("name", "?"));
         Say("missing-child", root.FindChildText("nope", "(default)"));
         Say("named-count", Text.FromInteger((long)root.FindChildren("name").Count));
