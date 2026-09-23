@@ -290,8 +290,8 @@ last person to edit it -- the suite is the authority.
   the ASCII case pair, and `GetCodePointAt`/`SkipCodePoint` for walking the text
   properly. All of it written in Stainless rather than C, because a type may be
   declared more than once inside its own module and `String`'s second
-  declaration is `stdlib/Text.sl` — which is also why `Split` can return a
-  `String[]` when the runtime cannot allocate one
+  declaration is `stdlib/Text/String.sl` — which is also why `Split` can
+  return a `String[]` when the runtime cannot allocate one
 - A type may span declarations, the way a module already spans files. The first
   says what the type is — its kind, its fields, what it derives from — and a
   later one adds behaviour and nothing else. No `partial` keyword, because
@@ -427,9 +427,9 @@ last person to edit it -- the suite is the authority.
   `Where`, `Aggregate`, `Any`, `All`, `Count`, `Find`, `FirstOrDefault`,
   `FindIndex`, `ForEach`, `Take`, `Skip`, `Distinct`, `OrderBy`, `ToList` and
   `ToArray`, under the names LINQ gave them. Each takes a generic
-  `closure` — `Func<T, R>`, `Predicate<T>`, `Action<T>`, `Fold<A, T>`,
-  `Comparison<T>` — so a lambda and a method that already exists are the same
-  thing:
+  `closure` — `Func<T, TResult>`, `Predicate<T>`, `Action<T>`,
+  `Fold<TAccumulate, TSource>`, `Comparison<T>` — so a lambda and a method
+  that already exists are the same thing:
 
   ```csharp
   var adults = Where(people, p => p.Age >= 18);
@@ -468,8 +468,10 @@ last person to edit it -- the suite is the authority.
   it — see [docs/concurrency.md](concurrency.md) §11
 - `Standard.Math`: the C library's floating point, plus `Abs`/`Min`/`Max`/
   `Clamp`/`Sign` overloaded across `int`, `long`, `nuint` and `double`,
-  `IsNaN`/`IsInfinity`/`IsFinite`, `GreatestCommonDivisor`, and the bit
-  functions. A module is a scope, so `Math.Sqrt(x)` needs no static class
+  `IsNaN`/`IsInfinity`/`IsFinite`, `GreatestCommonDivisor` and
+  `LeastCommonMultiple`. Counting and rotating bits is `Standard.Bits`, as it
+  is `BitOperations` and not `Math` in .NET. A module is a scope, so
+  `Math.Sqrt(x)` needs no static class
 - `Standard.Concurrent`: `ConcurrentQueue<T>`, `ConcurrentStack<T>`,
   `ConcurrentDictionary<TKey, TValue>` and a blocking `Channel<T>`. Each owns its
   collection in a field and never hands out a reference to it, because a lock
@@ -479,18 +481,19 @@ last person to edit it -- the suite is the authority.
   to wait on, poll or stop. **There is no shell** — the arguments are a list,
   so a `>` or a space in a filename is a character the child receives rather
   than something a shell acts on. A failure to *start* is a `ProcessError`; a
-  program that ran and returned 1 is a `Completed`, which is an outcome. Both
-  streams are drained while it runs, because a pipe holds about 64KB and a
-  parent that waits first would wait forever. `Signals.StartWatching()` notices Ctrl-C
+  program that ran and returned 1 is a `ProcessResult`, which is an outcome.
+  Both streams are drained while it runs, because a pipe holds about 64KB and
+  a parent that waits first would wait forever. `Signals.StartWatching()` notices Ctrl-C
   as a flag to read rather than a handler to run in
 - `Standard.Env`: the command line, environment variables and the working
   directory. `Main(String[] args)` is the better way to read the arguments --
   a function that takes what it needs beats one that goes looking -- and
   `Env.GetArguments()` is for the code that is nowhere near `Main`
-- `Standard.Time`: `DateTimeOffset` (a point on the wall clock) and `TimeSpan` (a
-  length), both structs over one `long` of nanoseconds that declare the
-  arithmetic to go with it -- `hour + minute`, `later - earlier` -- and are
-  made by naming the unit, `TimeSpan.FromSeconds(30)`. Plus `DateTime` for the
+- `Standard.Time`: `DateTimeOffset` (a point on the wall clock) and
+  `TimeSpan` (a length), both structs over one `long` of nanoseconds that
+  declare the arithmetic to go with it -- `hour + minute`,
+  `later - earlier` -- and are made by naming the unit,
+  `TimeSpan.FromSeconds(30)`. Plus `DateTime` for the
   parts a person reads, ISO 8601 in both directions, and `Stopwatch` over the
   **monotonic** counter -- which is the only correct way to measure how long
   something took, because the wall clock can jump mid-measurement. The UTC
