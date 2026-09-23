@@ -501,9 +501,20 @@ public sealed partial class Binder
     /// imports it reaches it.</summary>
     private static string ShortName(string module) => module[(module.LastIndexOf('.') + 1)..];
 
+    /// <summary>
+    /// Whether a module declares something of this name.
+    ///
+    /// A generic function is a template until a call says what its parameters
+    /// are, so it is not among the ordinary functions -- and `Xml.Serialize` is
+    /// exactly the sort of name a block points at.
+    /// </summary>
     private static bool HasModuleMember(ModuleSymbol module, string member) =>
         module.Functions.Any(f => f.Name == member) ||
+        module.GenericFunctions.Any(f => f.Name == member) ||
         module.Types.ContainsKey(member) ||
+        module.GenericTypes.ContainsKey(member) ||
+        module.GenericDelegates.ContainsKey(member) ||
+        module.Aliases.ContainsKey(member) ||
         module.Constants.ContainsKey(member) ||
         module.Statics.ContainsKey(member);
 

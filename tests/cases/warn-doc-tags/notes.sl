@@ -60,11 +60,18 @@ public class Shape
 /// @failure ReadError.NotFound  there is no file there
 /// @failure ReadError.NoSpace   the disk filled up
 /// @see Shape
+/// @see Notes.Describe
 /// @seealso Standard.Console
 public Result<String, ReadError> ReadProperly(String path)
 {
     return Ok(path);
 }
+
+/// Wraps a value, so that a generic function of this module's own is here to
+/// be pointed at.
+///
+/// @typeparam T what is wrapped
+public String Describe<T>(T value) => "one";
 
 /// Writes one, reporting the error itself rather than a `Result`.
 ///
