@@ -240,17 +240,37 @@ internal static class Program
 
     private static (bool Ok, string Detail) RunCase(string directory, string workDirectory)
     {
-        var sources = Directory.EnumerateFiles(directory, "*.sl")
+        // Recursively, as the CLI reads a directory given on the command line,
+        // so a case may put its files in folders. Two kinds of folder are left
+        // out: 'library' is a separate compilation and is collected below, and
+        // what a previous build wrote is not a source at all -- a -g build
+        // leaves the standard library in obj/stdlib, and scanning that in
+        // declares every module of Standard twice.
+        string libraryDirectory = Path.Combine(directory, "library");
+
+        bool Wanted(string file)
+        {
+            string relative = Path.GetRelativePath(directory, file);
+            foreach (string segment in relative.Split(
+                         Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar))
+            {
+                if (segment is "library" or "obj" or "bin" or "build") return false;
+            }
+            return true;
+        }
+
+        List<string> Within(params string[] patterns) => patterns
+            .SelectMany(p => Directory.EnumerateFiles(directory, p, SearchOption.AllDirectories))
+            .Where(Wanted)
             .OrderBy(p => p, StringComparer.Ordinal).ToList();
+
+        var sources = Within("*.sl");
         // C and C++ both, so a case can link against either language.
-        var natives = Directory.EnumerateFiles(directory, "*.c")
-            .Concat(Directory.EnumerateFiles(directory, "*.cpp"))
-            .OrderBy(p => p, StringComparer.Ordinal).ToList();
+        var natives = Within("*.c", "*.cpp");
 
         // A Windows resource script, for a case whose subject is what ends up
         // in the binary rather than what the code says.
-        var resources = Directory.EnumerateFiles(directory, "*.rc")
-            .OrderBy(p => p, StringComparer.Ordinal).ToList();
+        var resources = Within("*.rc");
 
         string name = Path.GetFileName(directory);
 
@@ -334,7 +354,6 @@ internal static class Program
         // module metadata, and the case's own sources are then compiled against
         // it. That is the two-compilation shape the metadata exists for, and the
         // only way to test it is to actually perform both.
-        string libraryDirectory = Path.Combine(directory, "library");
         string? referencePath = null;
 
         // A warning about what a library's metadata leaves out is reported where
@@ -344,7 +363,8 @@ internal static class Program
 
         if (Directory.Exists(libraryDirectory))
         {
-            var librarySources = Directory.EnumerateFiles(libraryDirectory, "*.sl")
+            var librarySources = Directory
+                .EnumerateFiles(libraryDirectory, "*.sl", SearchOption.AllDirectories)
                 .OrderBy(p => p, StringComparer.Ordinal).ToList();
 
             string libraryOutput =

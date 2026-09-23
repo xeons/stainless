@@ -367,7 +367,8 @@ internal static class Program
         // builds rather than something that needs editing first.
         string sources =
             Directory.Exists(Path.Combine(directory, "src")) ? "src"
-            : Directory.EnumerateFiles(directory, "*" + Compilation.SourceExtension).Any() ? "."
+            : Directory.EnumerateFiles(directory, "*" + Compilation.SourceExtension,
+                                       SearchOption.AllDirectories).Any() ? "."
             : "src";
 
         var project = new ProjectFile

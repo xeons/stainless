@@ -345,15 +345,22 @@ public static class StandardLibrary
     {
         var assembly = System.Reflection.Assembly.GetExecutingAssembly();
 
-        foreach (string resource in assembly.GetManifestResourceNames().Order(StringComparer.Ordinal))
-        {
-            if (!resource.StartsWith(Prefix, StringComparison.Ordinal)) continue;
+        // A resource carries the folders it was built from, and the separator
+        // of the machine that built it. Both are normalised here, so a
+        // diagnostic reads the same on either platform and the order these
+        // arrive in does not depend on which one compiled the compiler.
+        var found = assembly.GetManifestResourceNames()
+            .Where(r => r.StartsWith(Prefix, StringComparison.Ordinal))
+            .Select(r => (Resource: r, Relative: r[Prefix.Length..].Replace('\\', '/')))
+            .OrderBy(f => f.Relative, StringComparer.Ordinal);
 
+        foreach (var (resource, relative) in found)
+        {
             using var stream = assembly.GetManifestResourceStream(resource);
             if (stream is null) continue;
 
             using var reader = new StreamReader(stream);
-            yield return (PathMarker + "/" + resource[Prefix.Length..], reader.ReadToEnd());
+            yield return (PathMarker + "/" + relative, reader.ReadToEnd());
         }
     }
 }
@@ -597,9 +604,24 @@ public sealed class Compilation
 
             if (librarySources is not null)
             {
-                path = Path.Combine(librarySources, Path.GetFileName(name));
-                if (!File.Exists(path) || File.ReadAllText(path) != text)
-                    File.WriteAllText(path, text);
+                // The folders come with the name. Flattening them would let two
+                // sources that share a base name overwrite each other, and the
+                // debugger would then step into the wrong text.
+                string relative = name[(StandardLibrary.PathMarker.Length + 1)..];
+                path = Path.Combine(
+                    librarySources, relative.Replace('/', Path.DirectorySeparatorChar));
+
+                try
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+                    if (!File.Exists(path) || File.ReadAllText(path) != text)
+                        File.WriteAllText(path, text);
+                }
+                catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+                {
+                    return Failure($"could not write the standard library's sources to " +
+                                   $"'{librarySources}' for debugging: {e.Message}");
+                }
             }
 
             units.Add(new Parser(new SourceText(path, text), diagnostics, symbols)

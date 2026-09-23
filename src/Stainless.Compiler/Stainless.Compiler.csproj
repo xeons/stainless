@@ -18,8 +18,8 @@
   <!-- The parts of the standard library written in Stainless itself. They are
        compiled with every program, and cost nothing when unused. -->
   <ItemGroup>
-    <EmbeddedResource Include="../../stdlib/*.sl">
-      <LogicalName>Stainless.Library.%(Filename)%(Extension)</LogicalName>
+    <EmbeddedResource Include="../../stdlib/**/*.sl">
+      <LogicalName>Stainless.Library.%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
     </EmbeddedResource>
   </ItemGroup>
 </Project>
