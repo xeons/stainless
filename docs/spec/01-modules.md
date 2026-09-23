@@ -209,7 +209,92 @@ Everything else is requested. `Standard.Console` is not automatic — printing i
 a choice — and neither is `Standard.Reflection`, so `[Reflect]` needs an import
 like any other name.
 
-## 1.8 Order never matters
+## 1.8 `///` documentation blocks
+
+A run of `///` lines documents the declaration under it. The marker and one
+following space are removed, the lines are joined, and what is left is the
+block. A blank line or an ordinary `//` comment between the run and the
+declaration ends the run, and the block then documents nothing.
+
+**A block is Markdown.** It is written as Markdown and `stainless doc` emits
+Markdown, so there is no third syntax in the middle: a backtick is code, `**`
+is bold, an indented or fenced block is a sample, and a list is a list.
+
+**Everything before the first tag is the summary**, so a block with no tags is
+a summary and nothing else.
+
+### 1.8.1 `@tags`
+
+A line whose first character is `@`, followed by letters, opens a tag. It runs
+until the next tag or the end of the block, so a description wraps like any
+other prose. **An indented `@` is text**, which is what keeps a code sample —
+and an address, or a decorated symbol such as `_LoadLibraryA@4` — from being
+read as markup.
+
+| Tag | What it says | .NET's |
+|---|---|---|
+| `@param name` | what one parameter is | `<param>` |
+| `@typeparam T` | what one type parameter stands for | `<typeparam>` |
+| `@returns` | what the call answers | `<returns>` |
+| `@value` | what a property or field holds | `<value>` |
+| `@remarks` | an aside, after the summary | `<remarks>` |
+| `@example` | a sample, kept exactly as written | `<example>` |
+| `@failure Error.Case` | one failure a `Result` can carry | `<exception>` |
+| `@see Name` | a pointer, rendered as a link | `<see>` |
+| `@seealso Name` | the same, at the end | `<seealso>` |
+| `@inheritdoc [Name]` | the block from what this overrides | `<inheritdoc>` |
+
+```csharp
+/// The whole file as text.
+///
+/// @param path  where to read from, absolute or relative to the working
+///              directory
+/// @returns the contents, decoded as UTF-8
+/// @failure IOError.NotFound  there is no file at that path
+/// @failure IOError.NoSpace   the disk filled up while reading
+/// @see File.WriteAllText
+public Result<String, IOError> ReadAllText(String path)
+```
+
+**`@failure` is what this language has in place of `<exception>`.** Nothing is
+thrown here, so there is no exception to document; a call that can fail returns
+a `Result<T, TError>` ([§2.8](02-types.md#28-resultt-terror--how-a-function-fails))
+and `@failure` names the cases of `TError` it can answer with. The error type's
+own name may be written in front of the case or left off.
+
+**One spelling of each.** A word that is nearly a tag — `@summary`, `@return`,
+`@throws` — is an unknown tag (SL0739) rather than a second way to write one,
+and the diagnostic says what to write instead.
+
+### 1.8.2 A tag is checked
+
+Every tag makes a claim the compiler has already resolved for itself, so every
+tag is checked against the declaration under it. Each is a warning: a mistake
+in a block is a mistake in prose, never a reason to refuse the program.
+
+```
+warning[SL0740]: 'ReadAllText' has no parameter named 'pth'; it has 'path'
+warning[SL0741]: 'Add' documents some of its parameters and not 'b'; document
+all of them or none
+warning[SL0742]: 'Add' has no type parameter named 'T'; it takes none
+warning[SL0743]: '@value' says nothing about 'ReadAllText'; it belongs on a
+property or a field
+warning[SL0744]: 'IOError' has no case named 'Vanished'; it has 'None',
+'NotFound' and 'NoSpace'
+warning[SL0745]: 'Standard.NoSuchModule' is not a type, a member or a module
+this file can see
+```
+
+SL0741 is C#'s CS1573 and exists for its reason: a parameter left out of a
+documented set reads as an oversight, and nothing else says whether it is.
+
+**A `cref` is a name, resolved the way a name in code is.** `@see Substring`,
+`@see String.Substring` and `@see Standard.Text.String.Substring` reach the
+same member; the shortest one that is clear where it stands is the one to
+write. It is not an overload: `@see Text.FromInteger` names all three of them,
+which is what a reader following it wants.
+
+## 1.9 Order never matters
 
 Not within a file, and not across them. The compiler resolves every name in the
 program before checking any body, so these are all fine:

@@ -232,6 +232,9 @@ public abstract record Declaration(SourceSpan Span, Modifiers Modifiers) : Synta
     /// whatever came back, in one place.
     /// </summary>
     public string? Documentation { get; init; }
+
+    /// <summary>Where that block was written, for reporting a mistake in a tag.</summary>
+    public SourceSpan? DocumentationSpan { get; init; }
 }
 
 /// <summary>
@@ -570,6 +573,9 @@ public sealed record EnumMemberSyntax(SourceSpan Span, string Name, ExpressionSy
 {
     /// <summary>The <c>///</c> block written above this case, or null.</summary>
     public string? Documentation { get; init; }
+
+    /// <summary>Where that block was written, for reporting a mistake in a tag.</summary>
+    public SourceSpan? DocumentationSpan { get; init; }
 }
 
 /// <summary>
@@ -601,6 +607,9 @@ public sealed record VariantCaseSyntax(
 {
     /// <summary>The <c>///</c> block written above this case, or null.</summary>
     public string? Documentation { get; init; }
+
+    /// <summary>Where that block was written, for reporting a mistake in a tag.</summary>
+    public SourceSpan? DocumentationSpan { get; init; }
 }
 
 /// <summary>
@@ -704,6 +713,9 @@ public sealed record CompilationUnitSyntax(
     /// it in whichever file is the module's centre and leaves the rest silent.
     /// </summary>
     public string? Documentation { get; init; }
+
+    /// <summary>Where that block was written, for reporting a mistake in a tag.</summary>
+    public SourceSpan? DocumentationSpan { get; init; }
 }
 
 // ---------------------------------------------------------------- statements

@@ -163,6 +163,15 @@ stainless doc --stdlib               # the standard library, into docs/stdlib
 [docs/stdlib](stdlib/index.md) is that output for the standard library, checked
 in so it can be read here. It is generated, so the source is what to edit.
 
+A block is Markdown and is carried through as it was written. The `@tags` in it
+become sections of the page — what it takes, what it answers, how it fails —
+and `@see`, `@seealso` and `@failure` become links to wherever that name is
+documented, or stay as code where this run documents nothing of that name.
+`@inheritdoc` writes the block of the member being overridden, then whatever
+the override adds. [§1.8 of the specification](spec/01-modules.md#18--documentation-blocks)
+is the vocabulary, and a mistake in a tag is reported by an ordinary build
+rather than here.
+
 ## Export names
 
 A library's export table is exactly its `export "C"` functions, under the names

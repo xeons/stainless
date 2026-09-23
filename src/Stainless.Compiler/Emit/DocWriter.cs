@@ -68,6 +68,22 @@ public static class DocWriter
         string? sourceRoot = null,
         (string From, string To)? rewritePath = null)
     {
+        // What a run needs to know -- where the sources are, which page is
+        // being written, what every name links to -- is held in static fields,
+        // so two runs at once would read each other's. One at a time is the
+        // whole of the fix: this writes a few dozen files and is never on a
+        // path where the wait matters.
+        lock (s_writing) return WriteOnce(units, directory, sourceRoot, rewritePath);
+    }
+
+    private static readonly object s_writing = new();
+
+    private static IReadOnlyList<string> WriteOnce(
+        IReadOnlyList<CompilationUnitSyntax> units,
+        string directory,
+        string? sourceRoot,
+        (string From, string To)? rewritePath)
+    {
         Directory.CreateDirectory(directory);
 
         _rewrite = rewritePath;
@@ -75,11 +91,14 @@ public static class DocWriter
         _output = directory;
 
         var modules = Gather(units);
+        IndexLinkTargets(modules);
+
         var written = new List<string>();
 
         foreach (var module in modules)
         {
             string path = Path.Combine(directory, FileNameOf(module.Name));
+            _page = FileNameOf(module.Name);
             File.WriteAllText(path, Page(module, sourceRoot), Utf8);
             written.Add(path);
         }
@@ -133,6 +152,13 @@ public static class DocWriter
     {
         public List<Entry> Members { get; } = [];
         public string Kind { get; init; } = "";
+
+        /// <summary>
+        /// For a type, what it was declared with after the colon: its base
+        /// class and the interfaces it implements, as they were written. It is
+        /// what a bare '@inheritdoc' on a member searches.
+        /// </summary>
+        public IReadOnlyList<string> Inherits { get; init; } = [];
     }
 
     private sealed record SourceLocation(string File, int Line);
@@ -261,7 +287,10 @@ public static class DocWriter
             signature.ToString(),
             type.Documentation,
             Locate(unit, type.Span))
-        { Kind = kind };
+        {
+            Kind = kind,
+            Inherits = [.. type.Implements.Select(Render)],
+        };
 
         foreach (var variantCase in type.Cases)
             entry.Members.Add(new Entry(
@@ -539,8 +568,7 @@ public static class DocWriter
         page.Append("# ").Append(module.Name).Append("\n\n");
         page.Append(Generated()).Append("\n\n");
 
-        if (module.Documentation is not null)
-            page.Append(Prose(module.Documentation)).Append("\n\n");
+        if (module.Documentation is not null) WriteBlock(page, module.Documentation);
 
         // A contents list, because these pages are long and a module's shape is
         // the first thing to want. Left out where there is nothing to list.
@@ -578,7 +606,7 @@ public static class DocWriter
     }
 
     private static void WriteEntry(
-        StringBuilder page, Entry entry, string? sourceRoot, int depth)
+        StringBuilder page, Entry entry, string? sourceRoot, int depth, Entry? owner = null)
     {
         page.Append(new string('#', depth)).Append(' ').Append(Escape(entry.Name));
         if (entry.Kind.Length > 0) page.Append(" *").Append(entry.Kind).Append('*');
@@ -587,7 +615,7 @@ public static class DocWriter
         page.Append("```\n").Append(entry.Signature).Append("\n```\n\n");
 
         if (entry.Documentation is not null)
-            page.Append(Prose(entry.Documentation)).Append("\n\n");
+            WriteBlock(page, entry.Documentation, owner: owner, member: entry.Name);
         else
             // Said rather than left blank. A page that is silent about a member
             // looks the same whether the member needs no explanation or nobody
@@ -598,7 +626,7 @@ public static class DocWriter
             page.Append(link).Append("\n\n");
 
         foreach (var member in entry.Members)
-            WriteEntry(page, member, sourceRoot, Math.Min(depth + 1, 6));
+            WriteEntry(page, member, sourceRoot, Math.Min(depth + 1, 6), owner: entry);
     }
 
     private static string? Link(SourceLocation where, string? sourceRoot)
@@ -714,6 +742,230 @@ public static class DocWriter
     /// of the block.
     /// </summary>
     private static string Prose(string documentation) => documentation.TrimEnd();
+
+    /// <summary>
+    /// Where a name written in a <c>@see</c> is documented: the page and the
+    /// heading on it.
+    ///
+    /// A name is indexed under every spelling that reaches it -- <c>Substring</c>,
+    /// <c>String.Substring</c> and <c>Standard.Text.String.Substring</c> are
+    /// one entry -- because a block writes the shortest one that is clear where
+    /// it stands. A spelling two things answer to is left out rather than
+    /// pointed at one of them: an ambiguous link is worse than none, since a
+    /// reader cannot see it went somewhere else.
+    /// </summary>
+    private static readonly Dictionary<string, string> s_links = new(StringComparer.Ordinal);
+
+    /// <summary>Spellings that reach more than one thing, and so link nowhere.</summary>
+    private static readonly HashSet<string> s_ambiguous = new(StringComparer.Ordinal);
+
+    /// <summary>
+    /// The block each spelling documents, which is what <c>@inheritdoc</c>
+    /// copies.
+    /// </summary>
+    private static readonly Dictionary<string, Entry> s_entries = new(StringComparer.Ordinal);
+
+    /// <summary>The page being written, so a link to something on it is just an anchor.</summary>
+    private static string _page = "";
+
+    private static void IndexLinkTargets(List<Module> modules)
+    {
+        s_links.Clear();
+        s_ambiguous.Clear();
+        s_entries.Clear();
+
+        foreach (var module in modules)
+        {
+            string page = FileNameOf(module.Name);
+
+            Note(module.Name, page);
+
+            foreach (var entry in module.Types.Concat(module.Functions).Concat(module.Constants))
+            {
+                string target = page + "#" + Anchor(entry);
+
+                Note(entry.Name, target, entry);
+                Note(module.Name + "." + entry.Name, target, entry);
+
+                foreach (var member in entry.Members)
+                {
+                    string inner = page + "#" + Anchor(member);
+
+                    Note(entry.Name + "." + member.Name, inner, member);
+                    Note(module.Name + "." + entry.Name + "." + member.Name, inner, member);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Records one spelling. A second thing answering to it makes the spelling
+    /// ambiguous, and an overload does not -- two <c>FromInteger</c>s are one
+    /// name a reader is following, and both are on the same page.
+    /// </summary>
+    private static void Note(string spelling, string target, Entry? entry = null)
+    {
+        if (s_links.TryGetValue(spelling, out string? already))
+        {
+            if (already != target) s_ambiguous.Add(spelling);
+            return;
+        }
+
+        s_links[spelling] = target;
+        if (entry is not null) s_entries[spelling] = entry;
+    }
+
+    /// <summary>
+    /// A name as a link to where it is documented, or as code when nothing here
+    /// documents it -- a type from another library, or one that is not public.
+    /// </summary>
+    private static string Pointer(string name)
+    {
+        if (s_ambiguous.Contains(name) || !s_links.TryGetValue(name, out string? target))
+            return $"`{name}`";
+
+        // On this page it is an anchor and nothing more, which is what the
+        // contents list at the top already writes.
+        if (target.StartsWith(_page + "#", StringComparison.Ordinal))
+            target = target[_page.Length..];
+
+        return $"[{Escape(name)}]({target})";
+    }
+
+    /// <summary>
+    /// A <c>///</c> block as a page reads it: the summary, then a section per
+    /// kind of tag, in the order a reader wants them -- what it takes, what it
+    /// answers, how it fails, then the asides.
+    ///
+    /// <para>
+    /// A block with no tags is its summary and nothing else, so a page of
+    /// untagged blocks is exactly what it was before tags existed.
+    /// </para>
+    /// </summary>
+    private static void WriteBlock(
+        StringBuilder page, string documentation, int depth = 0,
+        Entry? owner = null, string? member = null)
+    {
+        var read = DocComment.Parse(documentation);
+
+        // `@inheritdoc` is the block it points at, written here. Following one
+        // that itself inherits is fine and a ring is cut: the page has to be
+        // written either way.
+        if (read.FirstOfKind(DocTagKind.InheritDoc) is { } inherit && depth < 4 &&
+            Inherited(inherit.Name, owner, member) is { } borrowed)
+        {
+            WriteBlock(page, borrowed, depth + 1);
+
+            // What the overriding member adds is written after what it
+            // inherited, which is the order a reader needs: the general first,
+            // then what is different here. A block that opens with the tag has
+            // its prose under it rather than before it, so both are written.
+            if (read.Summary.Length > 0) page.Append(Prose(read.Summary)).Append("\n\n");
+            if (inherit.Text.Length > 0) page.Append(Prose(inherit.Text)).Append("\n\n");
+            return;
+        }
+
+        if (read.Summary.Length > 0) page.Append(Prose(read.Summary)).Append("\n\n");
+
+        if (read.Tags.Count == 0) return;
+
+        Section(page, "Parameters", read.OfKind(DocTagKind.Param));
+        Section(page, "Type parameters", read.OfKind(DocTagKind.TypeParam));
+
+        Sentence(page, "Returns", read.FirstOfKind(DocTagKind.Returns));
+        Sentence(page, "Value", read.FirstOfKind(DocTagKind.Value));
+
+        Section(page, "Fails with", read.OfKind(DocTagKind.Failure));
+
+        foreach (var remark in read.OfKind(DocTagKind.Remarks))
+            page.Append(Prose(remark.Text)).Append("\n\n");
+
+        foreach (var example in read.OfKind(DocTagKind.Example))
+            page.Append("**Example**\n\n").Append(Prose(example.Text)).Append("\n\n");
+
+        var pointers = read.OfKind(DocTagKind.See)
+            .Concat(read.OfKind(DocTagKind.SeeAlso))
+            .Select(t => t.Name)
+            .Where(n => n is not null)
+            .ToList();
+
+        if (pointers.Count > 0)
+            page.Append("**See also** &nbsp; ")
+                .Append(string.Join(" &middot; ", pointers.Select(n => Pointer(n!))))
+                .Append("\n\n");
+    }
+
+    /// <summary>
+    /// The block an <c>@inheritdoc</c> takes, or null when there is none to
+    /// take.
+    ///
+    /// Named, it is whatever that name documents. Bare, it is the member of
+    /// the same name on something the owner was declared with -- which is
+    /// where an override's documentation lives, and the case the tag exists
+    /// for.
+    /// </summary>
+    private static string? Inherited(string? cref, Entry? owner, string? member)
+    {
+        if (cref is not null)
+            return s_entries.TryGetValue(cref, out var named) ? named.Documentation : null;
+
+        if (owner is null || member is null) return null;
+
+        foreach (string above in owner.Inherits)
+            if (s_entries.TryGetValue(above + "." + member, out var found) &&
+                found.Documentation is { } block)
+                return block;
+
+        return null;
+    }
+
+    /// <summary>
+    /// A titled list, one entry per tag: the name it is about, then its prose.
+    /// A list rather than a table because a description is a sentence and
+    /// wraps, and a Markdown table cell cannot.
+    /// </summary>
+    private static void Section(StringBuilder page, string title, IEnumerable<DocTag> tags)
+    {
+        var written = tags.ToList();
+        if (written.Count == 0) return;
+
+        page.Append("**").Append(title).Append("**\n\n");
+
+        foreach (var tag in written)
+        {
+            page.Append("- ");
+
+            // A failure names a case of an error type, which is documented and
+            // so is worth linking; a parameter is a name in the signature above
+            // and links nowhere.
+            if (tag.Name is not null)
+                page.Append(tag.Kind == DocTagKind.Failure
+                    ? Pointer(tag.Name)
+                    : "`" + tag.Name + "`").Append(" — ");
+
+            page.Append(OneLine(tag.Text)).Append('\n');
+        }
+
+        page.Append('\n');
+    }
+
+    /// <summary>A titled sentence: what a call answers, or what a property holds.</summary>
+    private static void Sentence(StringBuilder page, string title, DocTag? tag)
+    {
+        if (tag is null || tag.Text.Length == 0) return;
+
+        page.Append("**").Append(title).Append("** &nbsp; ").Append(OneLine(tag.Text))
+            .Append("\n\n");
+    }
+
+    /// <summary>
+    /// A tag's text as one line, since it stands inside a list item or after a
+    /// bold lead-in. A blank line inside one would end the item it is part of.
+    /// </summary>
+    private static string OneLine(string text) =>
+        string.Join(" ", text.Split('\n')
+            .Select(line => line.Trim())
+            .Where(line => line.Length > 0));
 
     /// <summary>
     /// A name in a heading. The angle brackets of a generic are the only thing

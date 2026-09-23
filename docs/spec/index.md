@@ -59,7 +59,10 @@ What a module is, how one spans files, and why nothing depends on declaration or
 - [1.5 Aliases](01-modules.md#15-aliases)
 - [1.6 Ambiguity](01-modules.md#16-ambiguity)
 - [1.7 What is automatic](01-modules.md#17-what-is-automatic)
-- [1.8 Order never matters](01-modules.md#18-order-never-matters)
+- [1.8 `///` documentation blocks](01-modules.md#18--documentation-blocks)
+  - [1.8.1 `@tags`](01-modules.md#181-tags)
+  - [1.8.2 A tag is checked](01-modules.md#182-a-tag-is-checked)
+- [1.9 Order never matters](01-modules.md#19-order-never-matters)
 
 ### [2. Types](02-types.md)
 

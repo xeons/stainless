@@ -302,6 +302,7 @@ public sealed partial class Binder(
                                     //          the statics that came with them, and their order
         CheckConstructorDelegation();
         ResolveRemainingAliases();
+        CheckDocumentation();       //          and every '@tag' says something true
 
         // Last, because both halves of the question need every body bound: a
         // member may be captured in one file and written in another.

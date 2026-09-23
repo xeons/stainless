@@ -64,6 +64,14 @@ public sealed class Lexer(
     private readonly List<string> _documentation = [];
 
     /// <summary>
+    /// Where the run being collected starts and ends in the source, so that a
+    /// <c>@tag</c> inside it can be reported where it was written rather than
+    /// against the declaration below it.
+    /// </summary>
+    private int _documentationStart = -1;
+    private int _documentationEnd = -1;
+
+    /// <summary>
     /// Line breaks seen since the last <c>///</c> line. A run is contiguous, so
     /// two of these -- a blank line -- ends the run and the block belongs to
     /// nothing. One is the ordinary case: the newline that ended the last
@@ -129,7 +137,7 @@ public sealed class Lexer(
 
         // Taken before the token is lexed and applied after, so that every path
         // out of Lex carries it without each one having to remember to.
-        string? documentation = TakeDocumentation();
+        var documentation = TakeDocumentation();
 
         var token = _asm is AsmPosition.AfterWord or AsmPosition.AfterOperands &&
                     _pos < _text.Length && Current == '{'
@@ -137,7 +145,9 @@ public sealed class Lexer(
             : Lex();
 
         FollowAsm(token);
-        return documentation is null ? token : token with { Documentation = documentation };
+        return documentation is not { } block
+            ? token
+            : token with { Documentation = block.Text, DocumentationSpan = block.Span };
     }
 
     // ============================================================ asm
@@ -314,13 +324,17 @@ public sealed class Lexer(
     /// The documentation collected since the last token, or null. Clears it, so
     /// a block reaches exactly one token.
     /// </summary>
-    private string? TakeDocumentation()
+    private (string Text, SourceSpan Span)? TakeDocumentation()
     {
         if (_documentation.Count == 0) return null;
 
         string text = string.Join("\n", _documentation);
+        var span = new SourceSpan(source, _documentationStart, _documentationEnd);
+
         _documentation.Clear();
-        return text;
+        _documentationStart = -1;
+        _documentationEnd = -1;
+        return (text, span);
     }
 
     private void SkipTrivia()
@@ -360,11 +374,15 @@ public sealed class Lexer(
                 // punctuation in the middle of a description.
                 bool isDoc = Peek(2) == '/' && Peek(3) != '/';
 
+                int lineStart = _pos;
                 int from = _pos + (isDoc ? 3 : 2);
                 while (_pos < _text.Length && Current != '\n') _pos++;
 
                 if (isDoc)
                 {
+                    if (_documentation.Count == 0) _documentationStart = lineStart;
+                    _documentationEnd = _pos;
+
                     // One leading space is the marker's, not the text's, so
                     // '/// x' is "x" and '///     x' keeps its indent.
                     string line = _text[from.._pos].TrimEnd('\r');

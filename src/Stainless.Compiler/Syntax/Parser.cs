@@ -289,6 +289,7 @@ public sealed class Parser
         int start = _pos;
 
         string? documentation = Current.Documentation;
+        var documentationSpan = Current.DocumentationSpan;
 
         QualifiedName? moduleName = null;
         if (Match(TokenKind.ModuleKeyword))
@@ -328,6 +329,7 @@ public sealed class Parser
             SpanFrom(start), _source, moduleName, imports, declarations, _lexer!.Libraries)
         {
             Documentation = documentation,
+            DocumentationSpan = documentationSpan,
         };
     }
 
@@ -355,6 +357,7 @@ public sealed class Parser
         // applying it to whatever comes back is the whole of the plumbing --
         // the twenty methods below never mention documentation.
         string? documentation = Current.Documentation;
+        var documentationSpan = Current.DocumentationSpan;
 
         var declarations = ParseDeclarationCore(enclosingType);
         if (documentation is null) return declarations;
@@ -363,7 +366,11 @@ public sealed class Parser
         // second declaration from the same source, and the block was written
         // about the type the reader can see.
         if (declarations.Count > 0)
-            declarations[0] = declarations[0] with { Documentation = documentation };
+            declarations[0] = declarations[0] with
+            {
+                Documentation = documentation,
+                DocumentationSpan = documentationSpan,
+            };
 
         return declarations;
     }
@@ -1244,6 +1251,7 @@ public sealed class Parser
     {
         int start = _pos;
         string? documentation = Current.Documentation;
+        var documentationSpan = Current.DocumentationSpan;
 
         string name = ExpectIdentifier();
 
@@ -1261,6 +1269,7 @@ public sealed class Parser
         return new VariantCaseSyntax(SpanFrom(start), name, parameters)
         {
             Documentation = documentation,
+            DocumentationSpan = documentationSpan,
         };
     }
 
@@ -1295,6 +1304,7 @@ public sealed class Parser
         {
             int memberStart = _pos;
             string? memberDoc = Current.Documentation;
+            var memberDocSpan = Current.DocumentationSpan;
 
             string memberName = ExpectIdentifier();
             ExpressionSyntax? value = Match(TokenKind.Equals) ? ParseExpression() : null;
@@ -1302,6 +1312,7 @@ public sealed class Parser
             members.Add(new EnumMemberSyntax(SpanFrom(memberStart), memberName, value)
             {
                 Documentation = memberDoc,
+                DocumentationSpan = memberDocSpan,
             });
 
             if (!Match(TokenKind.Comma)) break;

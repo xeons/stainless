@@ -38,5 +38,12 @@ public sealed record Token(TokenKind Kind, SourceSpan Span, string Text, object?
     /// </summary>
     public string? Documentation { get; init; }
 
+    /// <summary>
+    /// Where that run was written, from the first marker to the end of the last
+    /// line. It is what gives a <c>@tag</c> inside the block a span of its own,
+    /// so a mistake in one is reported on the line that made it.
+    /// </summary>
+    public SourceSpan? DocumentationSpan { get; init; }
+
     public override string ToString() => $"{Kind} '{Text}'";
 }
