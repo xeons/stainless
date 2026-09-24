@@ -558,12 +558,27 @@ public sealed partial class LlvmEmitter
         var value = EmitExpression(expression.Operand);
         StoreInto(slot, value, held);
 
+        // The store took a reference, so something has to give it back. Both
+        // arms read the payload out and whatever consumes it takes a reference
+        // of its own, and a return retains before it flushes -- so the end of
+        // the statement is where this slot stops owning what it holds.
+        if (held.CarriesReferences()) TrackTemporary(slot, held);
+
         var test = EmitExpression(expression.Test);
         Terminator($"br i1 {test.Ref}, label %{okLabel}, label %{failLabel}");
+
+        // The failure arm returns, and a return releases every temporary this
+        // statement has made and then forgets them. They are still live on the
+        // arm below, which has not returned, so the list is put back -- one
+        // branch's cleanup MUST NOT stand for the other's.
+        var pending = new List<(string Ref, TypeSymbol Type)>(_pendingReleases);
 
         Label(failLabel);
         EmitStatement(expression.OnFailure);
         if (!_blockTerminated) Terminator($"br label %{okLabel}");
+
+        _pendingReleases.Clear();
+        _pendingReleases.AddRange(pending);
 
         Label(okLabel);
         return EmitExpression(expression.OnSuccess);

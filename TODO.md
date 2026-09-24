@@ -73,6 +73,45 @@ counts, and the leak report has exactly nine `Button` and nine `ButtonPeer`
 alive beside the one form. The IDE is bigger and has not been read the same
 way.
 
+### `Reflection.CreateInstance` hands out a reference nobody can give back
+
+It answers with a `byte*` the caller owns, and the module states two paragraphs
+away that it keeps `sl_release` to itself -- which is the whole reason
+`CreateArrayInto` exists:
+
+> **It stores the array rather than handing it over** [...] the reference an
+> allocation answers with is owned by whoever received it, this module keeps
+> `sl_release` to itself, and so a caller outside it had no way to let go of
+> what `CreateArray` gave them.
+
+`CreateInstance` is the same shape and did not get the same treatment, so
+`tests/cases/type-by-name` leaks the two objects it builds and no caller could
+do otherwise. Either the module offers the way back, or `CreateInstance` goes
+the way `CreateArray` went.
+
+### A program and the library it links get a runtime each
+
+`NeedsSharedRuntime` exists so that two Stainless binaries meeting in one
+process share one allocator, one set of reference counts and one stdio buffer.
+Both sides ask for it and both sides still get their own, because each build
+puts its copy in its own intermediate directory:
+
+```
+$ ldd /tmp/stainless-tests/library-structs/library-structs | grep stainless
+        .../obj/libstainless-rt-leak.so
+        .../library-structs-library.so
+        .../obj-library/libstainless-rt-leak.so
+```
+
+Two DSOs, two sets of globals, which is exactly what one shared runtime is
+meant to prevent. The visible symptom is two allocation reports at exit, found
+by running the leak suite on Linux for the first time; the reports are added
+up now, so the count is still right. What is not right is an object made on
+one side and released on the other, which is the case the shared runtime was
+built for.
+
+Windows has not shown it, and why is worth knowing before this is fixed.
+
 ### An event holds its subscriber unless the handler is bound to `this`
 
 Not a bug, and the earlier note here said it was. The rule is written down in

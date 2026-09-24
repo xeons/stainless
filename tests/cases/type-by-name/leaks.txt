@@ -1,4 +1,5 @@
-# 2: a leak, and not a static -- this case declares none, so what is here
-# was allocated and never let go of. Two objects a reflection lookup made. Recorded so the
-# number stops moving rather than because it is right. See TODO.md.
+# 2: the two objects `Reflection.CreateInstance` made. It answers with a
+# reference the caller owns and the module keeps `sl_release` to itself, so
+# there is no way to give it back -- the same gap `CreateArrayInto` was added
+# to close for arrays. See TODO.md.
 2

@@ -26,5 +26,5 @@ samples/forms/demo	5
 samples/forms/drawn	5
 samples/forms/pictures	5
 samples/forms/reports	5
-ide	4267
+ide	4249
 sldb	0
