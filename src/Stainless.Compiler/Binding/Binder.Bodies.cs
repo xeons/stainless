@@ -2587,10 +2587,26 @@ public sealed partial class Binder
         _ => null,
     };
 
+    /// <summary>
+    /// The storage a write reaches, for the questions that are about the
+    /// storage rather than the value: a <c>static readonly</c>, an <c>in</c>
+    /// parameter.
+    ///
+    /// <b>A step that crosses a reference ends the walk.</b> A struct field and
+    /// an inline array element live inside the base, so writing one writes it.
+    /// An array element and a class field do not: they are another object's
+    /// storage, reached through a reference the base merely holds. That is what
+    /// makes <c>readonly</c> a promise about the slot rather than about
+    /// everything under it, which is C#'s rule and the one
+    /// <c>BindPropertyAssignment</c> already applies to a setter.
+    /// </summary>
     private static BoundExpression BaseOf(BoundExpression expression) => expression switch
     {
-        BoundFieldAccess { Receiver: { } receiver } => BaseOf(receiver),
-        BoundIndex index => BaseOf(index.Target),
+        BoundFieldAccess { Receiver: { } receiver }
+            when receiver.Type is StructTypeSymbol => BaseOf(receiver),
+
+        BoundIndex index when index.Target.Type is FixedArrayTypeSymbol => BaseOf(index.Target),
+
         BoundConversion conversion => BaseOf(conversion.Operand),
 
         // A struct receiver is passed by address, so the address of a thing is

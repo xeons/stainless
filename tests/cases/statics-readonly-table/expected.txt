@@ -1,0 +1,4 @@
+bits 255
+hits 7
+seen 11
+pair 2

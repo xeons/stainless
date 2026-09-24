@@ -1,0 +1,4 @@
+# 4: a `static readonly`, which is made immortal as it is stored and so is
+# never released. What one holds is alive at exit by construction, and that is
+# what the word buys and what it costs.
+4
