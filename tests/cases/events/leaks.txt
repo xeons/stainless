@@ -1,6 +1,5 @@
-# 3: a reference cycle that should not be one. An event holds its
-# subscriber through a weak cell precisely so that an object subscribing to
-# something it owns is not a cycle (runtime/arc.c) -- and this is that shape,
-# and it leaks anyway. A known bug, recorded so that it does not get worse
-# while it waits to be fixed. See TODO.md.
+# 3: a reference cycle, and the known one. An event holds its subscriber
+# weakly only where the handler is bound to `this`; wired by anyone else it
+# takes the strong path, and an object that also holds the event is then never
+# freed. See TODO.md.
 3

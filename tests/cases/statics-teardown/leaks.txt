@@ -1,3 +1,4 @@
-# 1: the `readonly` static, which is immortal from the moment it is stored
-# and so is never released. That is what the word buys and what it costs.
+# 1: a `static readonly`, which is made immortal as it is stored and so is
+# never released. What one holds is alive at exit by construction, and that is
+# what the word buys and what it costs.
 1

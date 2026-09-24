@@ -1,3 +1,4 @@
-# 15: not yet explained. Recorded so the number stops moving; it is
-# not known whether these are held on purpose. See TODO.md.
+# 15: a leak, and not a static -- this case declares none, so what is here
+# was allocated and never let go of. Seven `FileStream` and what they held. Recorded so the
+# number stops moving rather than because it is right. See TODO.md.
 15

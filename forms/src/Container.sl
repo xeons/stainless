@@ -242,6 +242,20 @@ public abstract class WindowedControl : Control
         made.SetVisible(Visible);
     }
 
+    /// Gives up the platform widget before the control's own fields go.
+    ///
+    /// **Children first**, which is what `ReleasePeer` walks. A window
+    /// destroyed while its children still have windows leaves the platform to
+    /// destroy those, and the notification that arrives then finds a peer
+    /// through the property and retains it -- a count of zero brought back to
+    /// one and dropped again, which frees a peer its control is about to free.
+    /// The LCL destroys a handle in this order for the same reason: see
+    /// `TWinControl.DestroyHandle`.
+    ~WindowedControl()
+    {
+        ReleasePeer();
+    }
+
     /// Lets go of the platform widget, and of every one inside it: the
     /// control stays an object, with nothing on screen behind it.
     void ReleasePeer()

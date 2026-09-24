@@ -1,7 +1,7 @@
 ﻿# What each program still had allocated when it ended, as of the last
-# -Update. A static is alive at exit on purpose and a cycle is not, and
-# this file does not tell them apart -- it is here so that the number
-# stops moving. See runtime/leak.c.
+# -Update. What a mutable static holds is released before the count is
+# taken, so anything here is either a 'readonly' static -- immortal by
+# construction -- or a cycle. See runtime/leak.c.
 
 samples/arrays	0
 samples/collections	0
@@ -15,16 +15,16 @@ samples/shapes	0
 samples/stress	0
 samples/strings	0
 samples/wc	0
-samples/forms/backend	344
-samples/forms/background	216
-samples/forms/buttons	688
-samples/forms/clipboard	384
-samples/forms/common	991
-samples/forms/controls	1011
-samples/forms/core	432
-samples/forms/demo	373
-samples/forms/drawn	116
-samples/forms/pictures	109
-samples/forms/reports	513
-ide	4273
+samples/forms/backend	5
+samples/forms/background	5
+samples/forms/buttons	5
+samples/forms/clipboard	378
+samples/forms/common	5
+samples/forms/controls	5
+samples/forms/core	5
+samples/forms/demo	5
+samples/forms/drawn	5
+samples/forms/pictures	5
+samples/forms/reports	5
+ide	4267
 sldb	0

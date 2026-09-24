@@ -441,9 +441,20 @@ a **compile error** on a cycle rather than a zero at run time.
 
 A `readonly` static's reference is made immortal as it is stored, so it is
 never destroyed and never has its count touched again. A mutable one is counted
-like any other slot, and what it holds at exit is simply never released. Either
-way there is no teardown, which sidesteps C++'s static *destruction* order
-problem as well.
+like any other slot, and **what it holds is released when the program ends** —
+in the opposite order to the one they were given it in, which is the order in
+which nothing is yet depended on. That is what makes "still allocated at exit"
+an exact count of what leaked rather than one that counts every static.
+
+C++ calls its version of that a fiasco for the same reason it calls the
+initialization one a fiasco, and reverse order answers only half of it: it
+covers what an *initializer* read, and a destructor reaching sideways to
+another static finds a slot that has already been emptied. So the rule is
+written down rather than inferred — **a destructor that runs at exit MUST NOT
+read a mutable static.** A table that lives for the program is declared
+`readonly` and is then never torn down at all; a register that something
+reports back into is emptied by its owner, from a hook registered after the
+statics were made and so run before their teardown.
 
 A `--shared` library has no entry point to initialize statics from, so a static
 in one is an error (SL0380) rather than a silently zeroed global — unless the

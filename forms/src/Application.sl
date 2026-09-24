@@ -38,6 +38,16 @@ import Standard.Threading;
 import Forms.Drawing;
 import Forms.Platform;
 
+/// A function the C runtime runs when the program ends. See
+/// `Application.ReleaseOpenForms`.
+delegate void ExitHook();
+
+extern "C" void sl_run_at_exit(ExitHook hook);
+
+/// What the register hands the C runtime. A delegate is a bare function
+/// pointer, so what it names is a function and not a member.
+void ReleaseFormsAtExit() => Application.ReleaseOpenForms();
+
 /// The running program.
 ///
 /// ```
@@ -62,6 +72,9 @@ public static class Application
     static List<Form> s_open = new List<Form>();
 
     static bool s_started = false;
+
+    /// Whether the register empties itself at exit yet. See `ReleaseOpenForms`.
+    static bool s_closesAtExit = false;
 
     /// Set once the program has been asked to quit, and never cleared: the
     /// platform's quit message is consumed by whichever loop sees it first,
@@ -243,6 +256,15 @@ public static class Application
     /// Called by `Form.Show`. Not public: a form registers itself.
     static void RegisterForm(Form form)
     {
+        if (!s_closesAtExit)
+        {
+            // Registered as the register gains its first form, which is after
+            // every static was made -- so the C runtime runs this before it
+            // runs their teardown. A program that sets `WidgetSet.Current`
+            // itself and never calls `Initialize` is covered by that too.
+            s_closesAtExit = true;
+            sl_run_at_exit(ReleaseFormsAtExit);
+        }
         s_open.Add(form);
     }
 
@@ -264,6 +286,29 @@ public static class Application
                 return;
         }
         Exit();
+    }
+
+    /// Lets go of every window still open, while there is still something to
+    /// let go of it with.
+    ///
+    /// **A form MUST be released before the statics are.** Releasing one
+    /// destroys its window; the platform destroys the windows that window
+    /// owns; and the peer of an owned window reports the close back through
+    /// `UnregisterForm`, which reads this register. Left to the teardown of
+    /// the statics, the register has been emptied by then and the report
+    /// reaches nothing. The LCL frees its forms from `Application` for the
+    /// same reason.
+    ///
+    /// The register is replaced before anything is released, so a report that
+    /// releasing provokes finds an empty list rather than the one being walked.
+    static void ReleaseOpenForms()
+    {
+        var open = s_open;
+        s_open = new List<Form>();
+        open.Clear();
+
+        // A close posts a keep-alive, and nothing will drain it now.
+        TakePostedWork();
     }
 
     /// Keeps a closed form alive until the loop's next turn.

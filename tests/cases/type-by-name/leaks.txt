@@ -1,4 +1,4 @@
-# 2: alive at exit on purpose. Nothing releases a static, so what one
-# holds is still held when the process ends. Not a leak, and the number is
-# here to stop moving rather than to be zero.
+# 2: a leak, and not a static -- this case declares none, so what is here
+# was allocated and never let go of. Two objects a reflection lookup made. Recorded so the
+# number stops moving rather than because it is right. See TODO.md.
 2

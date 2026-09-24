@@ -49,11 +49,19 @@ that ends with more alive than its `leaks.txt` allows; `tools/leakcheck.ps1`
 does the same for every sample and application against
 `tools/leaks.baseline.txt`. Both are off by default and cost nothing when off.
 
-`--static-teardown` releases what a mutable static holds at exit, in reverse
-order of initialization, which is what makes "still allocated" an exact answer
-rather than one that counts every static as a leak. It is off by default
-because it runs the destructor of whatever a static held, and Forms hangs on
-its own: see TODO.md.
+What a mutable static holds is released at exit, in reverse order of
+initialization, which is what makes "still allocated" an exact answer rather
+than one that counts every static as a leak. It is not optional and there is
+no flag. A `static readonly` is not torn down: it is made immortal as it is
+stored, so what one holds is alive at exit whatever is asked.
+
+**A destructor that runs at exit MUST NOT reach a mutable static.** Reverse
+order covers what an initializer read and nothing else, so a destructor
+reaching sideways finds a slot that has already been emptied. The two ways out
+are both in `forms/`: a table that lives for the program is declared
+`readonly`, and a register something reports back into is emptied by its owner
+from a `sl_run_at_exit` hook -- registered after the statics were made, so the
+C runtime runs it before their teardown.
 
 **A crash is not a diagnostic, and the fuzzer finds them.** `dotnet run --project
 tests/Stainless.Fuzz -- fuzz --minutes 10` mutates the tree's own programs and

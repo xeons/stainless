@@ -168,21 +168,6 @@ public sealed record CompilationOptions
     public bool LeakCheck { get; init; }
 
     /// <summary>
-    /// Releases what a mutable static holds when the program ends, in the
-    /// opposite order to the one they were given it in.
-    ///
-    /// <b>Off by default, and the reason is what it runs.</b> Letting a static
-    /// go runs the destructor of whatever it held, at exit -- and a destructor
-    /// written for a live program may not be one. Forms destroys windows in
-    /// some of its own, and <c>DestroyWindow</c> after the message loop has
-    /// ended hangs rather than returns. Until that is fixed this is a thing to
-    /// ask for, not a thing to impose: it is exactly what makes "still
-    /// allocated at exit" an exact answer, and that is a measurement rather
-    /// than a shipping default.
-    /// </summary>
-    public bool StaticTeardown { get; init; }
-
-    /// <summary>
     /// Which debugger's format to describe it in, or null for what the target
     /// reads: CodeView for Windows, DWARF everywhere else.
     ///
@@ -847,8 +832,7 @@ public sealed class Compilation
             debug: debug,
             sharedRuntime: options.NeedsSharedRuntime,
             abi: target.Abi,
-            resourceBlob: resourceBlob,
-            staticTeardown: options.StaticTeardown);
+            resourceBlob: resourceBlob);
         string ir = emitter.Emit(program);
 
         string output = options.OutputPath

@@ -41,27 +41,37 @@ at all: that prose lives in `///`, which is where it belongs.
 
 ## Next
 
-### Statics are not torn down unless asked, because Forms hangs when they are
+### Two programs are still holding a form nothing can reach
 
-`--static-teardown` releases what a mutable static holds when the program
-ends, in the opposite order to the one it was given it in, and it works: a
-program whose statics hold a list of objects goes from four alive at exit to
-none, and `samples/forms/drawn` goes from 116 to 3 -- the 3 being a
-`static readonly`, which is immortal by construction and so is never released
-at all.
+Statics are torn down at exit now, which makes "still allocated" an exact
+count of what leaked rather than one that counts every static as a leak. Ten
+of the eleven Forms samples end with five objects alive -- the `static
+readonly` tables, which are immortal by construction and so are never released
+at all -- and two do not:
 
-It is off by default because of what it runs. Letting a static go runs the
-destructor of whatever it held, and Forms calls `DestroyWindow` in some of
-those: after the message loop has ended that blocks rather than returns, and
-six of the Forms samples hang. Forms already anticipated destructors running
-during shutdown -- `WidgetSet.IsReady` exists for exactly that -- so this is
-that work being unfinished rather than unconsidered.
+| | |
+|---|---|
+| `samples/forms/clipboard` | 378, and one of them is the form |
+| `ide` | 4267, among them 11 `CodeEditor` and 20 `TabPage` |
 
-What has to happen before it can be the default: a peer's destructor must not
-destroy a window once the platform is down, the way it already must not reach
-`WidgetSet.Current`. Then this becomes the default and `--static-teardown`
-goes away, because a static that is never let go of is the reason the leak
-report cannot tell a leak from a deliberate root.
+`clipboard` is the entry below, measured. Nine buttons are wired by a helper
+that takes the handler as a parameter:
+
+```csharp
+AddButton("Cut", 12, 122, this.OnCut);
+
+void AddButton(String caption, int x, int y, EventHandler handler)
+{
+    var button = new Button(this);
+    button.Click += handler;            // strong: the receiver is not `this` here
+}
+```
+
+The `+=` sees a parameter, not `this`, so it takes the strong path; the form
+holds the button and the button's event holds the form. Nine buttons, nine
+counts, and the leak report has exactly nine `Button` and nine `ButtonPeer`
+alive beside the one form. The IDE is bigger and has not been read the same
+way.
 
 ### An event holds its subscriber unless the handler is bound to `this`
 

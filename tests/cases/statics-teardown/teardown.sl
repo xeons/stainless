@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: 0BSD
 //
-// `--static-teardown`: what a mutable static holds is let go of when the
-// program ends, in the opposite order to the one it was given it in.
+// What a mutable static holds is let go of when the program ends, in the
+// opposite order to the one it was given it in.
 //
 // Reverse, because that is the order in which nothing is yet depended on. The
 // binder sorts the initializers so a static is made after everything it reads,

@@ -34,15 +34,11 @@
  * closure holding the form is a leak nothing reports and nothing crashes on.
  * It shows up here as objects alive at exit and nowhere else.
  *
- * **Static storage is alive at exit unless it is torn down**, and shows up
- * here when it is not. `--static-teardown` releases what a mutable static
- * holds, in reverse order of initialization, and with it on the number is an
- * exact count of what leaked; without it every static counts as one. A
- * `readonly` static is immortal by construction and is never released either
- * way, so what one holds is here whatever is asked.
- *
- * So what this reports is *live at exit*, which is the same thing as a leak
- * only when the statics have been let go of.
+ * **A `readonly` static is alive at exit on purpose.** What a mutable one
+ * holds is released before this runs, in reverse order of initialization, so
+ * the number is an exact count of what leaked. A `readonly` one is made
+ * immortal as it is stored and nothing releases an immortal object, so what
+ * one holds is counted here and is not a leak.
  *
  * Off unless SL_LEAK_CHECK is defined, and the calls compile to nothing when
  * it is not, so a release build is byte for byte what it was.

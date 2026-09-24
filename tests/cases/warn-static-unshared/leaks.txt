@@ -1,4 +1,4 @@
-# 2: alive at exit on purpose. Nothing releases a static, so what one
-# holds is still held when the process ends. Not a leak, and the number is
-# here to stop moving rather than to be zero.
+# 2: a `static readonly`, which is made immortal as it is stored and so is
+# never released. What one holds is alive at exit by construction, and that is
+# what the word buys and what it costs.
 2

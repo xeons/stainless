@@ -1,6 +1,4 @@
-# 127: a reference cycle that should not be one. An event holds its
-# subscriber through a weak cell precisely so that an object subscribing to
-# something it owns is not a cycle (runtime/arc.c) -- and this is that shape,
-# and it leaks anyway. A known bug, recorded so that it does not get worse
-# while it waits to be fixed. See TODO.md.
-127
+# 5: what the Win32 backend keeps for the life of the program -- the menu-id
+# table, the custom-colour table, and the queue another thread posts work on.
+# Each is a `static readonly`, and so immortal rather than leaked.
+5

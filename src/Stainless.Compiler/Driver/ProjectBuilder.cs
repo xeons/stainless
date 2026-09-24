@@ -47,7 +47,6 @@ public sealed record BuildOverrides
     public Binding.CppAbi? CppAbi { get; init; }
     public bool? SharedRuntime { get; init; }
     public bool LeakCheck { get; init; }
-    public bool StaticTeardown { get; init; }
     public string? HeaderPath { get; init; }
 
     /// <summary>A module definition file to hand the linker, or null.</summary>
@@ -620,7 +619,6 @@ public sealed class ProjectBuilder(
             Target = overrides.Target,
             CppAbi = overrides.CppAbi ?? (root.Abi is null ? null : ProjectFile.ParseAbi(root.Abi)),
             LeakCheck = overrides.LeakCheck,
-            StaticTeardown = overrides.StaticTeardown,
             SharedRuntime = overrides.SharedRuntime ?? (root.Runtime switch
             {
                 "shared" => true,

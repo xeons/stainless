@@ -57,7 +57,7 @@ const int CommandIdCount = 0x8000;
 
 /// One bit per id, set while an item or a button holds it. A popup menu is
 /// built afresh on every showing, so ids MUST come back when their holders go.
-static ulong[] s_commandIdsHeld = new ulong[512];
+static readonly ulong[] s_commandIdsHeld = new ulong[512];
 
 /// Where the search for a free id starts: just past the last one handed out,
 /// so a freed id is the last to be reused rather than the first -- a click

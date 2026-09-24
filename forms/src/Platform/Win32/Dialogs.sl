@@ -110,7 +110,7 @@ public Result<String, DialogOutcome> ShowFolderDialog(IWindowPeer? owner, String
 /// so that what a user mixed is still there the next time. Kept here, module
 /// wide, because that is the whole point of it -- a fresh array each time would
 /// give the user an empty palette on every showing.
-static uint[] s_customColors = new uint[16];
+static readonly uint[] s_customColors = new uint[16];
 
 public Result<Color, DialogOutcome> ShowColorDialog(IWindowPeer? owner, Color start)
 {

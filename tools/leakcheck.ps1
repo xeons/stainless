@@ -163,9 +163,9 @@ foreach ($program in $programs) {
 if ($Update) {
     $lines = @(
         "# What each program still had allocated when it ended, as of the last",
-        "# -Update. A static is alive at exit on purpose and a cycle is not, and",
-        "# this file does not tell them apart -- it is here so that the number",
-        "# stops moving. See runtime/leak.c.",
+        "# -Update. What a mutable static holds is released before the count is",
+        "# taken, so anything here is either a 'readonly' static -- immortal by",
+        "# construction -- or a cycle. See runtime/leak.c.",
         ""
     )
     foreach ($entry in $measured.GetEnumerator()) {

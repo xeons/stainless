@@ -241,9 +241,15 @@ public sealed partial class LlvmEmitter
     ///
     /// Reverse, because that is the order in which nothing is yet depended on:
     /// the binder sorted the initializers so that a static is made after
-    /// everything it reads, so undoing them backwards means a destructor never
-    /// runs against a static that has already been emptied. It is C++'s rule
-    /// for the same reason.
+    /// everything it reads. It is C++'s rule for the same reason.
+    ///
+    /// <b>It covers what an initializer read and nothing else.</b> A
+    /// destructor reaching sideways to another static is outside that graph,
+    /// and so is a callback the platform makes while a window is being
+    /// destroyed -- so the order is a guarantee about initialization that
+    /// teardown borrows, not one teardown earns. The rule a program has to
+    /// follow is written down in docs/spec/09: a destructor that runs at exit
+    /// MUST NOT read a mutable static.
     ///
     /// <b>Only a mutable static.</b> A <c>readonly</c> one is made immortal as
     /// it is stored -- which is what takes the reference traffic off a value
@@ -251,9 +257,10 @@ public sealed partial class LlvmEmitter
     /// by construction. What it holds lives to process exit, and that is the
     /// bargain the word makes.
     ///
-    /// The slot is emptied rather than merely released, so a destructor that
-    /// runs during teardown and reaches a static finds null instead of a
-    /// pointer to something already destroyed.
+    /// The slot is emptied rather than merely released. Reading one then is a
+    /// null dereference where leaving the pointer would be a use after free,
+    /// and of the two answers to a rule that has been broken the loud one is
+    /// better.
     /// </summary>
     private void EmitStaticTeardown(BoundProgram program)
     {

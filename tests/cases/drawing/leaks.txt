@@ -1,4 +1,0 @@
-# 1: alive at exit on purpose. Nothing releases a static, so what one
-# holds is still held when the process ends. Not a leak, and the number is
-# here to stop moving rather than to be zero.
-1

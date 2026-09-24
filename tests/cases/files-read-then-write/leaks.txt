@@ -1,3 +1,4 @@
-# 2: not yet explained. Recorded so the number stops moving; it is
-# not known whether these are held on purpose. See TODO.md.
+# 2: a leak, and not a static -- this case declares none, so what is here
+# was allocated and never let go of. A stream and its buffer. Recorded so the
+# number stops moving rather than because it is right. See TODO.md.
 2
