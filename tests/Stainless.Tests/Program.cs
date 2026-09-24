@@ -670,7 +670,9 @@ internal static class Program
         // otherwise wait for one that is never coming.
         process.StandardInput.Close();
 
-        string output = process.StandardOutput.ReadToEnd() + process.StandardError.ReadToEnd();
+        string wrote = process.StandardOutput.ReadToEnd();
+        string complained = process.StandardError.ReadToEnd();
+        string output = wrote + complained;
 
         if (!process.WaitForExit(20_000))
         {
@@ -678,19 +680,23 @@ internal static class Program
             return (-1, output + "\n[the program did not finish within 20 seconds]", null);
         }
 
-        // The tracker reports at exit, so its lines are the tail of stderr and
-        // therefore the tail of this. Split off rather than compared: a case
-        // states what its program prints, and what the runtime says about the
-        // program is a different question with a different answer file.
-        // The *last* one: a case that runs a Stainless child captures the
-        // child's report too, and forwards it as its own output. This
-        // program's own is written at its own exit, so it is the tail.
+        // The tracker reports at exit, on stderr, so everything from the first
+        // report there onwards is the runtime talking about the program rather
+        // than the program itself. Split off rather than compared: a case
+        // states what it prints, and what the runtime says about it is a
+        // different question with a different answer file.
+        //
+        // **The first one in stderr, not the last one anywhere.** A program
+        // that links a Stainless shared library loads two copies of the
+        // runtime and prints a report from each (see TODO.md), and a case that
+        // runs a Stainless child forwards the child's on its own stdout. Only
+        // a report at or past the stderr boundary is this program's own.
         string? leaks = null;
-        int at = output.LastIndexOf("stainless-leak:", StringComparison.Ordinal);
+        int at = complained.IndexOf("stainless-leak:", StringComparison.Ordinal);
         if (at >= 0)
         {
-            leaks = output[at..].TrimEnd();
-            output = output[..at];
+            leaks = complained[at..].TrimEnd();
+            output = wrote + complained[..at];
         }
 
         return (process.ExitCode, output, leaks);
@@ -700,9 +706,16 @@ internal static class Program
     /// What the tracker said, against what the case allows.
     ///
     /// Zero unless the case carries a leaks.txt, whose first number is how
-    /// many objects it may end with. A case needs one where something is alive
-    /// at exit on purpose -- a static holds it, and nothing releases statics --
-    /// and the number is there to stop moving rather than to be zero.
+    /// many objects it may end with. What a mutable static holds is released
+    /// before the count is taken, so a case needs one only where something is
+    /// alive at exit by construction -- a <c>readonly</c> static, which is
+    /// immortal -- or where a cycle is a known bug whose number should stop
+    /// moving while it waits to be fixed.
+    ///
+    /// <b>Every report is added up.</b> A program that links a Stainless
+    /// shared library loads two copies of the runtime and each counts its own
+    /// allocations, so the live total is the sum and reading one report would
+    /// miss what leaked on the other side. See TODO.md.
     /// </summary>
     private static string? LeakFailure(string directory, string? report)
     {
@@ -712,11 +725,12 @@ internal static class Program
         if (report is null)
             return "the program printed no allocation report, so the tracker was not in it";
 
-        var first = report.Split('\n')[0];
-        var live = Regex.Match(first, @"live=(\d+)");
-        var untracked = Regex.Match(first, @"untracked=(\d+)");
+        var counts = Regex.Matches(report, @"live=(\d+)");
+        if (counts.Count == 0) return "could not read the allocation report:\n" + report;
 
-        if (!live.Success) return "could not read the allocation report:\n" + report;
+        int alive = counts.Sum(m => int.Parse(m.Groups[1].Value));
+        int unrecorded = Regex.Matches(report, @"untracked=(\d+)")
+            .Sum(m => int.Parse(m.Groups[1].Value));
 
         int allowed = 0;
         string allowedPath = Path.Combine(directory, "leaks.txt");
@@ -728,14 +742,14 @@ internal static class Program
             if (stated is not null) int.TryParse(stated, out allowed);
         }
 
-        if (untracked.Success && untracked.Groups[1].Value != "0")
+        if (unrecorded != 0)
             return "the runtime freed something it never recorded, so an "
                  + "allocation site is missing its hook:\n" + report;
 
         // More than allowed is the regression this exists to catch. Fewer is an
         // improvement, and lowers the number rather than failing the run.
-        if (int.Parse(live.Groups[1].Value) > allowed)
-            return $"{live.Groups[1].Value} object(s) alive at exit, and this case "
+        if (alive > allowed)
+            return $"{alive} object(s) alive at exit, and this case "
                  + $"allows {allowed}:\n" + report;
 
         return null;
