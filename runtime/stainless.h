@@ -268,6 +268,9 @@ SL_API void *sl_weak_cell_load(void *cell, void **function);
 SL_API int32_t sl_weak_cell_matches(void *cell, void *function, void *target);
 SL_API int32_t sl_weak_cell_is_dead(void *cell);
 
+/* Runs `hook` when the program ends, however it ends. */
+SL_API void sl_run_at_exit(void (*hook)(void));
+
 /* Initialises a header the runtime allocated itself, outside sl_alloc. */
 SL_API void  sl_object_init(void *pointer, const SlTypeInfo *type);
 

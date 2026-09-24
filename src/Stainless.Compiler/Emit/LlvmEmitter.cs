@@ -59,7 +59,8 @@ public readonly record struct Val(string Ref, string LlvmType, TypeSymbol Type)
 public sealed partial class LlvmEmitter(
     bool forSharedLibrary = false, bool forStainlessConsumers = false,
     DebugInfo? debug = null, bool sharedRuntime = false,
-    CppAbi abi = CppAbi.Microsoft, byte[]? resourceBlob = null)
+    CppAbi abi = CppAbi.Microsoft, byte[]? resourceBlob = null,
+    bool staticTeardown = false)
 {
     /// <summary>
     /// How a struct crosses a call, which is a property of the target and not
@@ -234,6 +235,9 @@ public sealed partial class LlvmEmitter(
         foreach (var function in program.Functions)
             EmitFunction(function);
 
+        // Before the initializer, which registers it: whether there is
+        // anything to tear down is what decides whether it does.
+        if (staticTeardown) EmitStaticTeardown(program);
         EmitStaticInitializer(program);
 
         // After the functions, because a thunk clobbers the per-function state

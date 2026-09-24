@@ -34,13 +34,15 @@
  * closure holding the form is a leak nothing reports and nothing crashes on.
  * It shows up here as objects alive at exit and nowhere else.
  *
- * **Static storage is alive at exit on purpose**, and shows up here too: there
- * is no teardown pass, so a static holding a List still holds it when the
- * process ends. That is not a leak and the report cannot tell it from one --
- * telling them apart wants either a trace from the roots, which needs field
- * layouts only a [Reflect] type has, or releasing the statics in reverse, which
- * the compiler does not emit. So what this reports is *live at exit*, and a
- * program with statics has a number that is not zero and should not move.
+ * **Static storage is alive at exit unless it is torn down**, and shows up
+ * here when it is not. `--static-teardown` releases what a mutable static
+ * holds, in reverse order of initialization, and with it on the number is an
+ * exact count of what leaked; without it every static counts as one. A
+ * `readonly` static is immortal by construction and is never released either
+ * way, so what one holds is here whatever is asked.
+ *
+ * So what this reports is *live at exit*, which is the same thing as a leak
+ * only when the statics have been let go of.
  *
  * Off unless SL_LEAK_CHECK is defined, and the calls compile to nothing when
  * it is not, so a release build is byte for byte what it was.

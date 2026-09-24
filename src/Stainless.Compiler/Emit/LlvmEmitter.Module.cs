@@ -358,6 +358,7 @@ public sealed partial class LlvmEmitter
         Declare("sl_release", "declare void @sl_release(ptr) nounwind");
 
         Declare("sl_make_immortal", $"declare void @sl_make_immortal(ptr) {HeaderOnly}");
+        Declare("sl_run_at_exit", "declare void @sl_run_at_exit(ptr) nounwind");
         Declare("sl_weak_retain", $"declare void @sl_weak_retain(ptr) {HeaderOnly}");
 
         // free() touches the allocator's own bookkeeping, which is reachable

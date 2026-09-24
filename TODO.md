@@ -41,40 +41,55 @@ at all: that prose lives in `///`, which is where it belongs.
 
 ## Next
 
-### An event still holds its subscriber
+### Statics are not torn down unless asked, because Forms hangs when they are
 
-`--leak-check` says the GUI leaks essentially everything it builds: 109 to
-1011 objects per Forms sample, and 4,273 objects and 303 KB for the IDE. Every
-other program measured is zero -- every non-GUI sample, `sldb`, and 386 of the
-403 end-to-end cases.
+`--static-teardown` releases what a mutable static holds when the program
+ends, in the opposite order to the one it was given it in, and it works: a
+program whose statics hold a list of objects goes from four alive at exit to
+none, and `samples/forms/drawn` goes from 116 to 3 -- the 3 being a
+`static readonly`, which is immortal by construction and so is never released
+at all.
 
-It is one shape, and `runtime/arc.c` describes it as the shape the weak
-subscription exists to prevent: an object that **holds something and subscribes
-to it**. A form holds a button, the button's event holds the closure, the
-closure holds the form.
+It is off by default because of what it runs. Letting a static go runs the
+destructor of whatever it held, and Forms calls `DestroyWindow` in some of
+those: after the message loop has ended that blocks rather than returns, and
+six of the Forms samples hang. Forms already anticipated destructors running
+during shutdown -- `WidgetSet.IsReady` exists for exactly that -- so this is
+that work being unfinished rather than unconsidered.
 
-The machinery is there and is emitted -- `sl_weak_cell_new` is in the adder,
-the cell weak-retains its target, the thunk loads it and skips a subscriber
-that has died. What is not true is the outcome:
+What has to happen before it can be the default: a peer's destructor must not
+destroy a window once the platform is down, the way it already must not reach
+`WidgetSet.Current`. Then this becomes the default and `--static-teardown`
+goes away, because a static that is never let go of is the reason the leak
+report cannot tell a leak from a deliberate root.
+
+### An event holds its subscriber unless the handler is bound to `this`
+
+Not a bug, and the earlier note here said it was. The rule is written down in
+[Binder.Expressions.cs](src/Stainless.Compiler/Binding/Binder.Expressions.cs) --
+`IsBoundToThis` -- and `runtime/arc.c` states it: an object never keeps itself
+alive through its own subscriptions. It is emitted, it is taken, and the shape
+it is for is clean:
 
 ```csharp
-var s = new Source("s");
-var l = new Listener();
-l.Watching = s;                 // the listener holds the source
-s.Changed += l.OnChanged;       // and subscribes to it
+Ok.Clicked += this.OnOk;        // weak: the form does not hold itself
 ```
 
-Neither destructor runs. Two things fix it and both are the caller doing the
-compiler's job: `weak Source? Watching`, or an explicit `-=`. A subscription
-with no back-reference is already clean, which is why this went unnoticed --
-releasing the source cascades and frees the subscriber, so the one-way case
-looks right.
+The gap is the same cycle wired by somebody else. `a.Changed += b.OnChanged`
+takes the strong path, so if `b` also holds `a` neither is ever freed:
 
-`tests/cases/events` records 3 and the Forms cases record their numbers, so
-this cannot get worse while it waits. Start from `BindEventSubscribe` in
-[Binder.Bodies.cs](src/Stainless.Compiler/Binding/Binder.Bodies.cs): the cell
-is built and wrapped correctly, so what to find is where the subscriber
-acquires the strong reference that the cell was meant to replace.
+```csharp
+l.Watching = s;
+s.Changed += l.OnChanged;       // strong: nothing frees either
+```
+
+`tests/cases/events` records 3 for this. Widening the rule is not obviously
+right: a handler must be held by *something*, and the receiver of a lambda is
+a capture object the event is the only owner of -- hold that weakly and the
+handler is freed before it is ever called. The narrow version, and the one
+worth measuring first, is to take the weak path when the receiver is a plain
+read of storage the caller already holds -- a local, a parameter, a field --
+and keep the strong one for anything freshly made.
 
 ### Bring the comments to §4
 

@@ -146,6 +146,21 @@ void sl_arithmetic_overflow(void)
     sl_fail("checked arithmetic overflowed");
 }
 
+/*
+ * Runs `hook` when the program ends, however it ends.
+ *
+ * atexit rather than a call after main returns, because a program that calls
+ * exit() has still ended and its statics still hold what they hold. The
+ * ordering that matters is with the allocation tracker's own report, and it
+ * comes out right for free: the tracker registers before main and this
+ * registers from the static initializer, so the C runtime -- which runs these
+ * in reverse -- tears the statics down first and reports afterwards.
+ */
+void sl_run_at_exit(void (*hook)(void))
+{
+    if (hook != NULL) atexit(hook);
+}
+
 void sl_object_init(void *pointer, const SlTypeInfo *type)
 {
     SlObject *object = (SlObject *)pointer;

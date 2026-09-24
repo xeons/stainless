@@ -196,6 +196,11 @@ public sealed partial class LlvmEmitter
         foreach (var initializer in program.StaticConstructors)
             Line($"call void {Symbol(initializer)}()");
 
+        // And the undoing, registered here rather than called from the entry
+        // point so that a program which calls exit() is torn down too.
+        if (_hasStaticTeardown)
+            Line($"call void @sl_run_at_exit(ptr @{StaticTeardownName})");
+
         Terminator("ret void");
         PopScopeWithoutRelease();
 
@@ -228,6 +233,76 @@ public sealed partial class LlvmEmitter
 
         TrackOwnedLocal(slot, parameter.Type);
     }
+
+
+    /// <summary>
+    /// Lets go of what the statics hold, in the opposite order to the one they
+    /// were given it in.
+    ///
+    /// Reverse, because that is the order in which nothing is yet depended on:
+    /// the binder sorted the initializers so that a static is made after
+    /// everything it reads, so undoing them backwards means a destructor never
+    /// runs against a static that has already been emptied. It is C++'s rule
+    /// for the same reason.
+    ///
+    /// <b>Only a mutable static.</b> A <c>readonly</c> one is made immortal as
+    /// it is stored -- which is what takes the reference traffic off a value
+    /// every thread can see -- and an immortal object is one nothing releases,
+    /// by construction. What it holds lives to process exit, and that is the
+    /// bargain the word makes.
+    ///
+    /// The slot is emptied rather than merely released, so a destructor that
+    /// runs during teardown and reaches a static finds null instead of a
+    /// pointer to something already destroyed.
+    /// </summary>
+    private void EmitStaticTeardown(BoundProgram program)
+    {
+        var releasable = program.Statics
+            .Where(s => s.Type.NeedsArc() && !s.IsReadonly
+                        || s.Type is StructTypeSymbol structType && structType.CarriesReferences())
+            .Reverse()
+            .ToList();
+
+        if (releasable.Count == 0) return;
+
+        ResetFunctionState();
+        _module.AppendLine($"define internal void @{StaticTeardownName}()"
+                           + FrameAttributes + " {");
+        _body.Clear();
+        _blockTerminated = false;
+
+        PushScope();
+
+        foreach (var symbol in releasable)
+        {
+            string slot = "@" + StaticName(symbol);
+
+            if (symbol.Type is StructTypeSymbol structType)
+            {
+                ReleaseFieldsAt(slot, structType);
+                Line($"call void @llvm.memset.p0.i64(ptr {slot}, i8 0, i64 {structType.Size}, i1 false)");
+                continue;
+            }
+
+            string held = Emit("ptr", $"load ptr, ptr {slot}");
+            Line($"store ptr null, ptr {slot}");
+            Release(held, symbol.Type);
+        }
+
+        Terminator("ret void");
+        PopScopeWithoutRelease();
+
+        _module.AppendLine("entry:");
+        _module.Append(_entryAllocas);
+        _module.Append(_body);
+        _module.AppendLine("}");
+        _module.AppendLine();
+
+        _hasStaticTeardown = true;
+    }
+
+    private const string StaticTeardownName = "_SLstaticsdown";
+    private bool _hasStaticTeardown;
 
     private const string StaticInitializerName = "_SLstatics";
 

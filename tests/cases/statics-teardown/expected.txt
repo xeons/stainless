@@ -1,0 +1,7 @@
+first  first
+third  third
+kept   readonly, and so kept
+main returning
+  ~third
+  ~held by the list
+  ~first

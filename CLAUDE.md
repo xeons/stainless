@@ -49,6 +49,12 @@ that ends with more alive than its `leaks.txt` allows; `tools/leakcheck.ps1`
 does the same for every sample and application against
 `tools/leaks.baseline.txt`. Both are off by default and cost nothing when off.
 
+`--static-teardown` releases what a mutable static holds at exit, in reverse
+order of initialization, which is what makes "still allocated" an exact answer
+rather than one that counts every static as a leak. It is off by default
+because it runs the destructor of whatever a static held, and Forms hangs on
+its own: see TODO.md.
+
 **A crash is not a diagnostic, and the fuzzer finds them.** `dotnet run --project
 tests/Stainless.Fuzz -- fuzz --minutes 10` mutates the tree's own programs and
 keeps every input that makes the compiler throw, overflow, hang or report a span

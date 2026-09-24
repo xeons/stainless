@@ -1,0 +1,1 @@
+# Built with --static-teardown; the point is the order the destructors run in.

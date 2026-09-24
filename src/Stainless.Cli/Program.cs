@@ -140,6 +140,8 @@ internal static class Program
               -O<0-3>              optimization level (default: -O2)
               --leak-check         count what the program allocates and never
                                    frees, and report it on stderr at exit
+              --static-teardown    release what a static holds when the program
+                                   ends, in reverse order of initialization
               -g, --debug          describe the program to a debugger
               --no-debug           do not, whatever the project file says
               --debug-format <dwarf|codeview|both>
@@ -745,6 +747,7 @@ internal static class Program
         /// </summary>
         public bool? Debug { get; set; }
         public bool LeakCheck { get; set; }
+        public bool StaticTeardown { get; set; }
 
         /// <summary>
         /// Which debugger's format, or null for what the target reads.
@@ -771,6 +774,7 @@ internal static class Program
             OptimizationLevel = OptimizationGiven ? Optimization : null,
             Debug = Debug,
             LeakCheck = LeakCheck,
+            StaticTeardown = StaticTeardown,
             DebugFormat = DebugFormat,
             KeepIntermediates = Keep,
             EmitIrOnly = EmitIrOnly,
@@ -842,6 +846,7 @@ internal static class Program
                 KeepIntermediates = Keep,
                 Debug = Debug ?? false,
                 LeakCheck = LeakCheck,
+                StaticTeardown = StaticTeardown,
                 DebugFormat = DebugFormat,
                 Defines = Defines,
                 CppAbi = Abi,
@@ -903,6 +908,10 @@ internal static class Program
 
                 case "--leak-check":
                     arguments.LeakCheck = true;
+                    continue;
+
+                case "--static-teardown":
+                    arguments.StaticTeardown = true;
                     continue;
 
                 case "-g" or "--debug":
