@@ -41,6 +41,14 @@ dotnet run --project tests/Stainless.Tests      # end-to-end: compile, link, run
 dotnet test tests/Stainless.UnitTests           # the front end alone
 ```
 
+**A leak is not a crash, and `--leak-check` finds them.** The runtime counts
+every reference-counted allocation and reports what was never freed, which with
+counting rather than collecting is an exact answer. `dotnet run --project
+tests/Stainless.Tests -- --leak-check` runs every case that way and refuses one
+that ends with more alive than its `leaks.txt` allows; `tools/leakcheck.ps1`
+does the same for every sample and application against
+`tools/leaks.baseline.txt`. Both are off by default and cost nothing when off.
+
 **A crash is not a diagnostic, and the fuzzer finds them.** `dotnet run --project
 tests/Stainless.Fuzz -- fuzz --minutes 10` mutates the tree's own programs and
 keeps every input that makes the compiler throw, overflow, hang or report a span

@@ -158,6 +158,16 @@ public sealed record CompilationOptions
     public bool Debug { get; init; }
 
     /// <summary>
+    /// Builds the runtime with its allocation tracker on, so the program says
+    /// what it never freed when it ends.
+    ///
+    /// The runtime's objects are named for it, because a runtime built with
+    /// the tracker is a different runtime and sharing one object directory
+    /// with an ordinary build would hand whichever ran second the other's.
+    /// </summary>
+    public bool LeakCheck { get; init; }
+
+    /// <summary>
     /// Which debugger's format to describe it in, or null for what the target
     /// reads: CodeView for Windows, DWARF everywhere else.
     ///
@@ -865,7 +875,8 @@ public sealed class Compilation
         try
         {
             if (options.NeedsSharedRuntime)
-                sharedRuntime = toolchain.BuildSharedRuntime(intermediate, options.Debug);
+                sharedRuntime = toolchain.BuildSharedRuntime(
+                    intermediate, options.Debug, options.LeakCheck);
             else
                 // `options.Shared` and not just the shared-runtime case: an
                 // object linked into a shared library has to be
@@ -873,7 +884,8 @@ public sealed class Compilation
                 // for that. Windows relocates a DLL at load time and never
                 // noticed; an ELF linker refuses the relocation outright.
                 runtimeObjects = toolchain.BuildRuntime(
-                    intermediate, options.Debug, shared: options.Shared);
+                    intermediate, options.Debug, shared: options.Shared,
+                    leakCheck: options.LeakCheck);
         }
         catch (Exception e) when (e is InvalidOperationException or IOException)
         {

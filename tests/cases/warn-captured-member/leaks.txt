@@ -1,0 +1,6 @@
+# 4: a reference cycle, and a documented one. A lambda that captures
+# `this` keeps its object alive, so an object holding its own closure holds
+# itself (docs/status.md, "A lambda with nothing written needs something to
+# be"). `weak` is how it is broken, and this case does not break it because
+# what it is about is the warning, not the lifetime.
+4

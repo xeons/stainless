@@ -16,7 +16,7 @@ so nothing else pays for it.
 
 **Types** &nbsp; [Attribute](#attribute-struct) &middot; [Field](#field-struct) &middot; [Property](#property-struct) &middot; [Reflect](#reflect-attribute) &middot; [Type](#type-struct)
 
-**Functions** &nbsp; [CreateArray](#createarray-function) &middot; [CreateInstance](#createinstance-function) &middot; [CreateInstanceInto](#createinstanceinto-function) &middot; [FindType](#findtype-function) &middot; [GetAggregate](#getaggregate-function) &middot; [GetArrayLength](#getarraylength-function) &middot; [GetBool](#getbool-function) &middot; [GetDouble](#getdouble-function) &middot; [GetElementAddress](#getelementaddress-function) &middot; [GetInteger](#getinteger-function) &middot; [GetText](#gettext-function) &middot; [ReadAggregate](#readaggregate-function) &middot; [ReadAggregateAt](#readaggregateat-function) &middot; [ReadArray](#readarray-function) &middot; [ReadBool](#readbool-function) &middot; [ReadBoolAt](#readboolat-function) &middot; [ReadDouble](#readdouble-function) &middot; [ReadDoubleAt](#readdoubleat-function) &middot; [ReadInteger](#readinteger-function) &middot; [ReadIntegerAt](#readintegerat-function) &middot; [ReadText](#readtext-function) &middot; [ReadTextAt](#readtextat-function) &middot; [SetAggregate](#setaggregate-function) &middot; [SetBool](#setbool-function) &middot; [SetDouble](#setdouble-function) &middot; [SetInteger](#setinteger-function) &middot; [SetText](#settext-function) &middot; [WriteAggregate](#writeaggregate-function) &middot; [WriteBool](#writebool-function) &middot; [WriteBoolAt](#writeboolat-function) &middot; [WriteDouble](#writedouble-function) &middot; [WriteDoubleAt](#writedoubleat-function) &middot; [WriteInteger](#writeinteger-function) &middot; [WriteIntegerAt](#writeintegerat-function) &middot; [WriteText](#writetext-function) &middot; [WriteTextAt](#writetextat-function)
+**Functions** &nbsp; [CreateArrayInto](#createarrayinto-function) &middot; [CreateInstance](#createinstance-function) &middot; [CreateInstanceInto](#createinstanceinto-function) &middot; [FindType](#findtype-function) &middot; [GetAggregate](#getaggregate-function) &middot; [GetArrayLength](#getarraylength-function) &middot; [GetBool](#getbool-function) &middot; [GetDouble](#getdouble-function) &middot; [GetElementAddress](#getelementaddress-function) &middot; [GetInteger](#getinteger-function) &middot; [GetText](#gettext-function) &middot; [ReadAggregate](#readaggregate-function) &middot; [ReadAggregateAt](#readaggregateat-function) &middot; [ReadArray](#readarray-function) &middot; [ReadBool](#readbool-function) &middot; [ReadBoolAt](#readboolat-function) &middot; [ReadDouble](#readdouble-function) &middot; [ReadDoubleAt](#readdoubleat-function) &middot; [ReadInteger](#readinteger-function) &middot; [ReadIntegerAt](#readintegerat-function) &middot; [ReadText](#readtext-function) &middot; [ReadTextAt](#readtextat-function) &middot; [SetAggregate](#setaggregate-function) &middot; [SetBool](#setbool-function) &middot; [SetDouble](#setdouble-function) &middot; [SetInteger](#setinteger-function) &middot; [SetText](#settext-function) &middot; [WriteAggregate](#writeaggregate-function) &middot; [WriteBool](#writebool-function) &middot; [WriteBoolAt](#writeboolat-function) &middot; [WriteDouble](#writedouble-function) &middot; [WriteDoubleAt](#writedoubleat-function) &middot; [WriteInteger](#writeinteger-function) &middot; [WriteIntegerAt](#writeintegerat-function) &middot; [WriteText](#writetext-function) &middot; [WriteTextAt](#writetextat-function)
 
 **Constants** &nbsp; [KindArray](#kindarray-constant) &middot; [KindBool](#kindbool-constant) &middot; [KindByte](#kindbyte-constant) &middot; [KindChar](#kindchar-constant) &middot; [KindChar16](#kindchar16-constant) &middot; [KindChar32](#kindchar32-constant) &middot; [KindClass](#kindclass-constant) &middot; [KindDouble](#kinddouble-constant) &middot; [KindFloat](#kindfloat-constant) &middot; [KindInt](#kindint-constant) &middot; [KindInterface](#kindinterface-constant) &middot; [KindLong](#kindlong-constant) &middot; [KindNInt](#kindnint-constant) &middot; [KindNUInt](#kindnuint-constant) &middot; [KindNone](#kindnone-constant) &middot; [KindPointer](#kindpointer-constant) &middot; [KindSByte](#kindsbyte-constant) &middot; [KindShort](#kindshort-constant) &middot; [KindString](#kindstring-constant) &middot; [KindStruct](#kindstruct-constant) &middot; [KindUInt](#kinduint-constant) &middot; [KindULong](#kindulong-constant) &middot; [KindUShort](#kindushort-constant)
 
@@ -675,13 +675,14 @@ The property of that name, or a handle of null.
 
 ## Functions
 
-### CreateArray *function*
+### CreateArrayInto *function*
 
 ```
-byte* CreateArray(Field field, nuint count)
+byte* CreateArrayInto(byte* instance, Field field, nuint count)
 ```
 
-A new array of `count` elements, of whatever this field holds.
+Makes an array of `count` elements for an array field and stores it there,
+answering its address.
 
 **The one thing about an array that could not be done here.** Elements
 could be read and written, and the stride made that possible without
@@ -690,18 +691,23 @@ document that said how many elements it had could only be read into an
 array that already happened to be that long. That is the whole of why a
 reader could round-trip an array and not fill one.
 
-The elements are zero, which for a reference means null, so an array handed
-back from here is safe to write into in any order and safe to abandon
-half-filled.
+The elements are zero, which for a reference means null, so the array is
+safe to write into in any order and safe to abandon half-filled.
+
+**It stores the array rather than handing it over**, for the reason
+`CreateInstanceInto` does: the reference an allocation answers with is
+owned by whoever received it, this module keeps `sl_release` to itself, and
+so a caller outside it had no way to let go of what `CreateArray` gave
+them. Writing it into the field here, and dropping the allocation's
+reference here, leaves the field the only owner and the caller nothing to
+remember.
 
 Null for a field that is not an array, and for one whose array type the
-build recorded nothing for. `WriteAggregate` is what puts it in the field,
-and it retains -- so the caller still owns what it was given and the object
-owns what it now holds.
+build recorded nothing for.
 
-**See also** &nbsp; [WriteAggregate](#writeaggregate-function)
+**See also** &nbsp; [CreateInstanceInto](#createinstanceinto-function) &middot; [WriteAggregate](#writeaggregate-function)
 
-<sub>[stdlib/Reflection/Reflection.sl:510](../../stdlib/Reflection/Reflection.sl#L510)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:517](../../stdlib/Reflection/Reflection.sl#L517)</sub>
 
 ### CreateInstance *function*
 
@@ -796,7 +802,7 @@ nuint GetArrayLength(byte* array)
 
 How many elements an array has. Zero for null.
 
-<sub>[stdlib/Reflection/Reflection.sl:518](../../stdlib/Reflection/Reflection.sl#L518)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:534](../../stdlib/Reflection/Reflection.sl#L534)</sub>
 
 ### GetBool *function*
 
@@ -837,7 +843,7 @@ and an index that came from a document is not the program's.
 - `field` — the array field, which supplies the stride between elements
 - `index` — which element, counted from zero
 
-<sub>[stdlib/Reflection/Reflection.sl:532](../../stdlib/Reflection/Reflection.sl#L532)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:548](../../stdlib/Reflection/Reflection.sl#L548)</sub>
 
 ### GetInteger *function*
 
@@ -886,7 +892,7 @@ byte* ReadAggregateAt(byte* address, Field field)
 The address of an aggregate element: what a class element points at, or
 where a struct element sits.
 
-<sub>[stdlib/Reflection/Reflection.sl:574](../../stdlib/Reflection/Reflection.sl#L574)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:590](../../stdlib/Reflection/Reflection.sl#L590)</sub>
 
 ### ReadArray *function*
 
@@ -920,7 +926,7 @@ bool ReadBoolAt(byte* address)
 Reads an element of a `bool` array. Takes no field, a `bool` being one byte
 whatever array it is in.
 
-<sub>[stdlib/Reflection/Reflection.sl:561](../../stdlib/Reflection/Reflection.sl#L561)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:577](../../stdlib/Reflection/Reflection.sl#L577)</sub>
 
 ### ReadDouble *function*
 
@@ -945,7 +951,7 @@ Reads an element of a floating array. `field` supplies the element kind,
 which is what says whether the four or the eight bytes at `address` are the
 value.
 
-<sub>[stdlib/Reflection/Reflection.sl:554](../../stdlib/Reflection/Reflection.sl#L554)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:570](../../stdlib/Reflection/Reflection.sl#L570)</sub>
 
 ### ReadInteger *function*
 
@@ -976,7 +982,7 @@ Reads an element of a whole-number array.
 
 **See also** &nbsp; [WriteIntegerAt](#writeintegerat-function)
 
-<sub>[stdlib/Reflection/Reflection.sl:546](../../stdlib/Reflection/Reflection.sl#L546)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:562](../../stdlib/Reflection/Reflection.sl#L562)</sub>
 
 ### ReadText *function*
 
@@ -999,7 +1005,7 @@ String ReadTextAt(byte* address)
 
 Reads a String element, as a copy of all its bytes.
 
-<sub>[stdlib/Reflection/Reflection.sl:564](../../stdlib/Reflection/Reflection.sl#L564)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:580](../../stdlib/Reflection/Reflection.sl#L580)</sub>
 
 ### SetAggregate *function*
 
@@ -1091,7 +1097,7 @@ void WriteBoolAt(byte* address, bool value)
 
 Writes an element of a `bool` array.
 
-<sub>[stdlib/Reflection/Reflection.sl:600](../../stdlib/Reflection/Reflection.sl#L600)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:616](../../stdlib/Reflection/Reflection.sl#L616)</sub>
 
 ### WriteDouble *function*
 
@@ -1113,7 +1119,7 @@ void WriteDoubleAt(byte* address, Field field, double value)
 
 Writes an element of a floating array, narrowed to the element's width.
 
-<sub>[stdlib/Reflection/Reflection.sl:594](../../stdlib/Reflection/Reflection.sl#L594)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:610](../../stdlib/Reflection/Reflection.sl#L610)</sub>
 
 ### WriteInteger *function*
 
@@ -1137,7 +1143,7 @@ Writes an element of a whole-number array, narrowed to its width.
 
 **See also** &nbsp; [ReadIntegerAt](#readintegerat-function)
 
-<sub>[stdlib/Reflection/Reflection.sl:588](../../stdlib/Reflection/Reflection.sl#L588)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:604](../../stdlib/Reflection/Reflection.sl#L604)</sub>
 
 ### WriteText *function*
 
@@ -1163,7 +1169,7 @@ void WriteTextAt(byte* address, String value)
 
 Writes a String element, releasing whatever it held.
 
-<sub>[stdlib/Reflection/Reflection.sl:603](../../stdlib/Reflection/Reflection.sl#L603)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:619](../../stdlib/Reflection/Reflection.sl#L619)</sub>
 
 ## Constants
 

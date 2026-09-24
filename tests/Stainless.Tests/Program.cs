@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 using Stainless.Driver;
 
 namespace Stainless.Tests;
@@ -85,6 +86,19 @@ namespace Stainless.Tests;
 /// still matched exactly, stdout then stderr, which is what makes it a test of
 /// what a program leaves behind when it stops.
 ///
+/// A case containing noleakcheck.txt is built without the tracker even under
+/// --leak-check. That is for a case whose subject is bytes the tracker would
+/// add a line to -- one that captures a child's streams and prints them -- and
+/// not for one that merely leaks.
+///
+/// A case containing leaks.txt states how many objects its program may still
+/// have allocated when it ends, which is checked only under --leak-check. The
+/// first line that is not blank and not a '#' comment is the number; zero is
+/// what a case without the file must answer. It is there because a static is
+/// alive at exit on purpose -- nothing releases one -- and because a cycle
+/// that is a known bug should stop getting worse while it waits to be fixed.
+/// The comment in each says which of those it is.
+///
 /// A case containing platform.txt runs only on the platform it names -- windows,
 /// linux or macos -- and is reported as skipped elsewhere. Only a case that
 /// cannot mean anything on another platform should have one.
@@ -112,6 +126,7 @@ internal static class Program
 
         string? filter = args.FirstOrDefault(a => !a.StartsWith('-'));
         bool verbose = args.Contains("-v") || args.Contains("--verbose");
+        s_leakCheck = args.Contains("--leak-check");
 
         var cases = Directory.EnumerateDirectories(root)
             .Where(d => filter is null ||
@@ -238,6 +253,15 @@ internal static class Program
     private static string RepositoryRoot() =>
         Path.GetDirectoryName(Path.GetDirectoryName(FindCasesDirectory()))!;
 
+    /// <summary>
+    /// Whether every case is built with the runtime's allocation tracker on.
+    ///
+    /// A run-wide switch rather than a per-case one: the question "did this
+    /// program free what it allocated" is worth asking of all of them, and a
+    /// case that may not answer zero says so with a leaks.txt of its own.
+    /// </summary>
+    private static bool s_leakCheck;
+
     private static (bool Ok, string Detail) RunCase(string directory, string workDirectory)
     {
         // Recursively, as the CLI reads a directory given on the command line,
@@ -246,6 +270,11 @@ internal static class Program
         // what a previous build wrote is not a source at all -- a -g build
         // leaves the standard library in obj/stdlib, and scanning that in
         // declares every module of Standard twice.
+        // A case that captures a child's streams and prints them measures
+        // bytes the tracker would add a line to, so it says it wants none.
+        bool leakCheck = s_leakCheck
+                      && !File.Exists(Path.Combine(directory, "noleakcheck.txt"));
+
         string libraryDirectory = Path.Combine(directory, "library");
 
         bool Wanted(string file)
@@ -378,6 +407,11 @@ internal static class Program
                 IntermediateDirectory = Path.Combine(caseWork, "obj-library"),
                 OptimizationLevel = 1,
                 Shared = true,
+
+                // The library allocates through the same runtime the program
+                // frees through, so both halves have to be tracking or the
+                // program reports freeing what nothing ever recorded.
+                LeakCheck = leakCheck,
                 MetadataPath = referencePath,
             });
 
@@ -413,6 +447,7 @@ internal static class Program
             // the code as written, and the optimiser rewrites what it describes.
             OptimizationLevel = debug ? 0 : 1,
             Debug = debug,
+            LeakCheck = leakCheck,
             Defines = defines,
             Libraries = libraries,
             CppAbi = abi,
@@ -538,7 +573,7 @@ internal static class Program
                            string.Join(Environment.NewLine + "  ", absentIr));
 
         string expected = Normalize(File.ReadAllText(expectedOutputPath));
-        var (exitCode, output) = Execute(executable, directory);
+        var (exitCode, output, leaks) = Execute(executable, directory);
         string actualOutput = Normalize(output);
 
         if (actualOutput != expected)
@@ -556,6 +591,12 @@ internal static class Program
 
         if (exitCode == 0 && File.Exists(Path.Combine(directory, "aborts.txt")))
             return (false, "the program was expected to abort and returned 0 instead");
+
+        // Only for a program that finished. One that stopped part-way never ran
+        // what would have freed the rest, so what it left behind says nothing
+        // about whether it leaks.
+        if (exitCode == 0 && LeakFailure(directory, leaks) is { } leaked)
+            return (false, leaked);
 
         return (true, $"{actualOutput.Split('\n').Length} line(s) matched");
     }
@@ -597,7 +638,8 @@ internal static class Program
     /// gets no arguments and an immediately closed input, which is what every
     /// case did before either existed.
     /// </summary>
-    private static (int ExitCode, string Output) Execute(string executablePath, string directory)
+    private static (int ExitCode, string Output, string? Leaks) Execute(
+        string executablePath, string directory)
     {
         var startInfo = new ProcessStartInfo(executablePath)
         {
@@ -633,10 +675,68 @@ internal static class Program
         if (!process.WaitForExit(20_000))
         {
             process.Kill(entireProcessTree: true);
-            return (-1, output + "\n[the program did not finish within 20 seconds]");
+            return (-1, output + "\n[the program did not finish within 20 seconds]", null);
         }
 
-        return (process.ExitCode, output);
+        // The tracker reports at exit, so its lines are the tail of stderr and
+        // therefore the tail of this. Split off rather than compared: a case
+        // states what its program prints, and what the runtime says about the
+        // program is a different question with a different answer file.
+        // The *last* one: a case that runs a Stainless child captures the
+        // child's report too, and forwards it as its own output. This
+        // program's own is written at its own exit, so it is the tail.
+        string? leaks = null;
+        int at = output.LastIndexOf("stainless-leak:", StringComparison.Ordinal);
+        if (at >= 0)
+        {
+            leaks = output[at..].TrimEnd();
+            output = output[..at];
+        }
+
+        return (process.ExitCode, output, leaks);
+    }
+
+    /// <summary>
+    /// What the tracker said, against what the case allows.
+    ///
+    /// Zero unless the case carries a leaks.txt, whose first number is how
+    /// many objects it may end with. A case needs one where something is alive
+    /// at exit on purpose -- a static holds it, and nothing releases statics --
+    /// and the number is there to stop moving rather than to be zero.
+    /// </summary>
+    private static string? LeakFailure(string directory, string? report)
+    {
+        if (!s_leakCheck) return null;
+        if (File.Exists(Path.Combine(directory, "noleakcheck.txt"))) return null;
+
+        if (report is null)
+            return "the program printed no allocation report, so the tracker was not in it";
+
+        var first = report.Split('\n')[0];
+        var live = Regex.Match(first, @"live=(\d+)");
+        var untracked = Regex.Match(first, @"untracked=(\d+)");
+
+        if (!live.Success) return "could not read the allocation report:\n" + report;
+
+        int allowed = 0;
+        string allowedPath = Path.Combine(directory, "leaks.txt");
+        if (File.Exists(allowedPath))
+        {
+            var stated = File.ReadAllLines(allowedPath)
+                .Select(l => l.Trim())
+                .FirstOrDefault(l => l.Length > 0 && !l.StartsWith('#'));
+            if (stated is not null) int.TryParse(stated, out allowed);
+        }
+
+        if (untracked.Success && untracked.Groups[1].Value != "0")
+            return "the runtime freed something it never recorded, so an "
+                 + "allocation site is missing its hook:\n" + report;
+
+        if (live.Groups[1].Value != allowed.ToString())
+            return $"{live.Groups[1].Value} object(s) alive at exit, and this case "
+                 + $"allows {allowed}:\n" + report;
+
+        return null;
     }
 
     /// <summary>The lines of a file that do not appear in the IR.</summary>

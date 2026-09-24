@@ -1290,14 +1290,14 @@ void FillArray(byte* instance, Field field, JsonValue value)
     bool made = false;
     if (array == null)
     {
-        array = Reflection.CreateArray(field, value.Items.Count);
+        // Stored before it is filled, so the field owns it: a failure
+        // part-way through leaves a short array rather than a leak, and the
+        // reference the allocation answered with is dropped inside rather
+        // than left for this caller to remember.
+        array = Reflection.CreateArrayInto(instance, field, value.Items.Count);
         if (array == null)
             return;
 
-        // Written before it is filled, so the field owns it: `WriteAggregate`
-        // retains, and a failure part-way through then leaves a short array
-        // rather than a leak.
-        Reflection.WriteAggregate(instance, field, array);
         made = true;
     }
 

@@ -46,6 +46,7 @@ void *sl_array_alloc(const SlTypeInfo *type, size_t length, size_t elementSize)
     if (array == NULL) sl_fail("out of memory");
 
     sl_object_init(array, type);
+    SL_LEAK_RECORD(array, sizeof(SlArray) + length * elementSize);
     array->length = length;
     return array;
 }

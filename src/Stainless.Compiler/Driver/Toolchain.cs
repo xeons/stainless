@@ -296,7 +296,8 @@ public sealed class Toolchain
     /// rebuilt, and each unit stays small enough to read in one sitting.
     /// </summary>
     public IReadOnlyList<string> BuildRuntime(
-        string objectDirectory, bool debug = false, bool shared = false)
+        string objectDirectory, bool debug = false, bool shared = false,
+        bool leakCheck = false)
     {
         Directory.CreateDirectory(objectDirectory);
 
@@ -346,7 +347,8 @@ public sealed class Toolchain
                 : "." + target.Architecture.ToString().ToLowerInvariant()
                       + (target.IsWindows ? "-windows" : "-linux");
 
-            string suffix = platform + (shared ? ".so" : "") + (debug ? ".g" : "") + ".o";
+            string suffix = platform + (shared ? ".so" : "") + (debug ? ".g" : "")
+                          + (leakCheck ? ".leak" : "") + ".o";
             string objectFile = Path.ChangeExtension(source, suffix);
             objectFiles.Add(objectFile);
 
@@ -385,6 +387,11 @@ public sealed class Toolchain
                     arguments.AddRange(["-fPIC", "-fvisibility=hidden"]);
             }
 
+            // Every reference-counted allocation records itself and every free
+            // forgets itself, and what is left when the program ends is
+            // reported. Off, the calls are not compiled at all.
+            if (leakCheck) arguments.Add("-DSL_LEAK_CHECK");
+
             // -O0 alongside -g, because a runtime compiled at -O2 has had the
             // frames a debugger wants to show inlined away.
             arguments.InsertRange(2, debug ? ["-O0", "-g"] : ["-O2"]);
@@ -410,13 +417,14 @@ public sealed class Toolchain
     /// rebuilt only when an input is newer, because every build in a session
     /// asks for this and the answer is almost always the same one.
     /// </summary>
-    public SharedRuntime BuildSharedRuntime(string objectDirectory, bool debug = false)
+    public SharedRuntime BuildSharedRuntime(
+        string objectDirectory, bool debug = false, bool leakCheck = false)
     {
-        var objects = BuildRuntime(objectDirectory, debug, shared: true);
+        var objects = BuildRuntime(objectDirectory, debug, shared: true, leakCheck: leakCheck);
 
         string library = Path.Combine(objectDirectory,
             (OperatingSystem.IsWindows() ? "" : "lib") + RuntimeName +
-            (debug ? "-g" : "") + SharedLibraryExtension);
+            (debug ? "-g" : "") + (leakCheck ? "-leak" : "") + SharedLibraryExtension);
 
         // The import library is what a Windows link line names, and the linker
         // writes it beside the DLL rather than being told where to put it.

@@ -272,6 +272,30 @@ SL_API int32_t sl_weak_cell_is_dead(void *cell);
 SL_API void  sl_object_init(void *pointer, const SlTypeInfo *type);
 
 /*
+ * leak.c: what was allocated and never freed.
+ *
+ * Every reference-counted allocation records itself and every free forgets
+ * itself, so what is left at exit was never let go of -- which with counting
+ * rather than collecting is an exact answer rather than a hint.
+ *
+ * Every place an SlObject is allocated MUST record it: sl_alloc, sl_array_new,
+ * sl_string_new and sl_utf16_new. A free with no record is counted and
+ * reported rather than ignored, which is how the fourth of those was found --
+ * it had been missed, and the count said so on the first run.
+ *
+ * Both compile to nothing unless SL_LEAK_CHECK is defined.
+ */
+#ifdef SL_LEAK_CHECK
+SL_API void sl_leak_record(void *object, size_t bytes);
+SL_API void sl_leak_forget(void *object);
+#define SL_LEAK_RECORD(object, bytes) sl_leak_record((object), (bytes))
+#define SL_LEAK_FORGET(object)        sl_leak_forget((object))
+#else
+#define SL_LEAK_RECORD(object, bytes) ((void)0)
+#define SL_LEAK_FORGET(object)        ((void)0)
+#endif
+
+/*
  * Marks an object immortal, so retain and release skip it for the rest of the
  * program. Static storage uses this: a value that lives to process exit has no
  * reference traffic at all, and therefore none to race over.

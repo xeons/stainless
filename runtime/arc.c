@@ -175,6 +175,7 @@ void *sl_alloc(const SlTypeInfo *type)
     if (object == NULL) sl_fail("out of memory");
 
     sl_object_init(object, type);
+    SL_LEAK_RECORD(object, type->size);
     return object;
 }
 
@@ -205,7 +206,10 @@ void sl_weak_release(void *pointer)
     SlObject *object = (SlObject *)pointer;
     if (object == NULL || sl_is_immortal(object)) return;
 
-    if (__atomic_fetch_sub(&object->weak, 1, __ATOMIC_ACQ_REL) == 1) free(object);
+    if (__atomic_fetch_sub(&object->weak, 1, __ATOMIC_ACQ_REL) == 1) {
+        SL_LEAK_FORGET(object);
+        free(object);
+    }
 }
 
 void sl_release(void *pointer)

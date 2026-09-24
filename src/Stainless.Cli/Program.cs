@@ -138,6 +138,8 @@ internal static class Program
                                    library boundary has nothing to gain and a file
                                    to carry
               -O<0-3>              optimization level (default: -O2)
+              --leak-check         count what the program allocates and never
+                                   frees, and report it on stderr at exit
               -g, --debug          describe the program to a debugger
               --no-debug           do not, whatever the project file says
               --debug-format <dwarf|codeview|both>
@@ -742,6 +744,7 @@ internal static class Program
         /// `debug` is true.
         /// </summary>
         public bool? Debug { get; set; }
+        public bool LeakCheck { get; set; }
 
         /// <summary>
         /// Which debugger's format, or null for what the target reads.
@@ -767,6 +770,7 @@ internal static class Program
             IntermediateDirectory = ObjectDirectory,
             OptimizationLevel = OptimizationGiven ? Optimization : null,
             Debug = Debug,
+            LeakCheck = LeakCheck,
             DebugFormat = DebugFormat,
             KeepIntermediates = Keep,
             EmitIrOnly = EmitIrOnly,
@@ -837,6 +841,7 @@ internal static class Program
                 OptimizationLevel = Optimization,
                 KeepIntermediates = Keep,
                 Debug = Debug ?? false,
+                LeakCheck = LeakCheck,
                 DebugFormat = DebugFormat,
                 Defines = Defines,
                 CppAbi = Abi,
@@ -894,6 +899,10 @@ internal static class Program
 
                 case "--update":
                     arguments.Update = true;
+                    continue;
+
+                case "--leak-check":
+                    arguments.LeakCheck = true;
                     continue;
 
                 case "-g" or "--debug":

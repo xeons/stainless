@@ -41,6 +41,41 @@ at all: that prose lives in `///`, which is where it belongs.
 
 ## Next
 
+### An event still holds its subscriber
+
+`--leak-check` says the GUI leaks essentially everything it builds: 109 to
+1011 objects per Forms sample, and 4,273 objects and 303 KB for the IDE. Every
+other program measured is zero -- every non-GUI sample, `sldb`, and 386 of the
+403 end-to-end cases.
+
+It is one shape, and `runtime/arc.c` describes it as the shape the weak
+subscription exists to prevent: an object that **holds something and subscribes
+to it**. A form holds a button, the button's event holds the closure, the
+closure holds the form.
+
+The machinery is there and is emitted -- `sl_weak_cell_new` is in the adder,
+the cell weak-retains its target, the thunk loads it and skips a subscriber
+that has died. What is not true is the outcome:
+
+```csharp
+var s = new Source("s");
+var l = new Listener();
+l.Watching = s;                 // the listener holds the source
+s.Changed += l.OnChanged;       // and subscribes to it
+```
+
+Neither destructor runs. Two things fix it and both are the caller doing the
+compiler's job: `weak Source? Watching`, or an explicit `-=`. A subscription
+with no back-reference is already clean, which is why this went unnoticed --
+releasing the source cascades and frees the subscriber, so the one-way case
+looks right.
+
+`tests/cases/events` records 3 and the Forms cases record their numbers, so
+this cannot get worse while it waits. Start from `BindEventSubscribe` in
+[Binder.Bodies.cs](src/Stainless.Compiler/Binding/Binder.Bodies.cs): the cell
+is built and wrapped correctly, so what to find is where the subscriber
+acquires the strong reference that the cell was meant to replace.
+
 ### Bring the comments to §4
 
 [docs/style.md](docs/style.md) §4 is new and most of the tree predates it.

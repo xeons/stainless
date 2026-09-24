@@ -1,0 +1,30 @@
+﻿# What each program still had allocated when it ended, as of the last
+# -Update. A static is alive at exit on purpose and a cycle is not, and
+# this file does not tell them apart -- it is here so that the number
+# stops moving. See runtime/leak.c.
+
+samples/arrays	0
+samples/collections	0
+samples/constraints	0
+samples/counter	0
+samples/generics	0
+samples/hello	0
+samples/interfaces	0
+samples/json	0
+samples/shapes	0
+samples/stress	0
+samples/strings	0
+samples/wc	0
+samples/forms/backend	344
+samples/forms/background	216
+samples/forms/buttons	688
+samples/forms/clipboard	384
+samples/forms/common	991
+samples/forms/controls	1011
+samples/forms/core	432
+samples/forms/demo	373
+samples/forms/drawn	116
+samples/forms/pictures	109
+samples/forms/reports	513
+ide	4273
+sldb	0

@@ -1,0 +1,3 @@
+# This case runs itself as a child and prints what the child wrote to
+# stderr, byte for byte. The tracker writes a line there, so measuring the
+# capture and tracking the child are the same measurement twice over.

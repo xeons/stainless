@@ -64,6 +64,7 @@ SlString *sl_string_new(size_t byteLength)
     if (string == NULL) sl_fail("out of memory");
 
     sl_object_init(string, &sl_string_type_info);
+    SL_LEAK_RECORD(string, sizeof(SlString) + byteLength + 1);
     string->byteLength = byteLength;
     return string;
 }

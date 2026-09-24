@@ -488,7 +488,8 @@ public byte* ReadArray(byte* instance, Field field)
     return sl_read_reference(instance, field.Handle);
 }
 
-/// A new array of `count` elements, of whatever this field holds.
+/// Makes an array of `count` elements for an array field and stores it there,
+/// answering its address.
 ///
 /// **The one thing about an array that could not be done here.** Elements
 /// could be read and written, and the stride made that possible without
@@ -497,21 +498,36 @@ public byte* ReadArray(byte* instance, Field field)
 /// array that already happened to be that long. That is the whole of why a
 /// reader could round-trip an array and not fill one.
 ///
-/// The elements are zero, which for a reference means null, so an array handed
-/// back from here is safe to write into in any order and safe to abandon
-/// half-filled.
+/// The elements are zero, which for a reference means null, so the array is
+/// safe to write into in any order and safe to abandon half-filled.
+///
+/// **It stores the array rather than handing it over**, for the reason
+/// `CreateInstanceInto` does: the reference an allocation answers with is
+/// owned by whoever received it, this module keeps `sl_release` to itself, and
+/// so a caller outside it had no way to let go of what `CreateArray` gave
+/// them. Writing it into the field here, and dropping the allocation's
+/// reference here, leaves the field the only owner and the caller nothing to
+/// remember.
 ///
 /// Null for a field that is not an array, and for one whose array type the
-/// build recorded nothing for. `WriteAggregate` is what puts it in the field,
-/// and it retains -- so the caller still owns what it was given and the object
-/// owns what it now holds.
+/// build recorded nothing for.
 ///
-/// @see WriteAggregate
-public byte* CreateArray(Field field, nuint count)
+/// @see CreateInstanceInto
+/// @seealso WriteAggregate
+public byte* CreateArrayInto(byte* instance, Field field, nuint count)
 {
     if (field.Kind != KindArray)
         return null;
-    return sl_field_new_array(field.Handle, count);
+
+    byte* made = sl_field_new_array(field.Handle, count);
+    if (made == null)
+        return null;
+
+    // The field takes a reference of its own; this one was the allocation's,
+    // and letting it go leaves the field the only owner.
+    sl_write_reference(instance, field.Handle, made);
+    sl_release(made);
+    return made;
 }
 
 /// How many elements an array has. Zero for null.

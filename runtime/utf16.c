@@ -52,6 +52,8 @@ static SlUtf16String *sl_utf16_new(size_t unitCount)
     if (string == NULL) sl_fail("out of memory");
 
     sl_object_init(string, &sl_utf16_string_type_info);
+    SL_LEAK_RECORD(string,
+                   sizeof(SlUtf16String) + (unitCount + 1) * sizeof(uint16_t));
     string->unitCount = unitCount;
     return string;
 }
