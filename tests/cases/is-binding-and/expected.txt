@@ -1,0 +1,17 @@
+calls after a false guard: 0
+big 42
+small
+wide circle, radius 4
+not a wide circle
+not a wide circle
+sum 7
+calls: 7
+named box
+nothing is not named
+got a
+~Tracked(a)
+got b
+~Tracked(b)
+~Tracked(stop)
+left: 1
+~Tracked(unreached)

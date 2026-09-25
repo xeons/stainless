@@ -116,11 +116,8 @@ public class FormComponent : FormMember
     {
         for (nuint i = 0u; i < Members.Count; i++)
         {
-            if (Members[i] is FormProperty property)
-            {
-                if (property.Name == name)
-                    return property;
-            }
+            if (Members[i] is FormProperty property && property.Name == name)
+                return property;
         }
         return null;
     }
@@ -150,13 +147,10 @@ public class FormComponent : FormMember
     {
         for (nuint i = 0u; i < Members.Count; i++)
         {
-            if (Members[i] is FormProperty property)
+            if (Members[i] is FormProperty property && property.Name == name)
             {
-                if (property.Name == name)
-                {
-                    Members.RemoveAt(i);
-                    return true;
-                }
+                Members.RemoveAt(i);
+                return true;
             }
         }
         return false;
@@ -167,11 +161,8 @@ public class FormComponent : FormMember
     {
         for (nuint i = 0u; i < Members.Count; i++)
         {
-            if (Members[i] is FormHandler handler)
-            {
-                if (handler.EventName == eventName)
-                    return handler;
-            }
+            if (Members[i] is FormHandler handler && handler.EventName == eventName)
+                return handler;
         }
         return null;
     }
@@ -182,10 +173,8 @@ public class FormComponent : FormMember
     {
         for (nuint i = 0u; i < Members.Count; i++)
         {
-            if (Members[i] is FormHandler handler)
+            if (Members[i] is FormHandler handler && handler.EventName == eventName)
             {
-                if (handler.EventName != eventName)
-                    continue;
                 if (methodName == "")
                     Members.RemoveAt(i);
                 else

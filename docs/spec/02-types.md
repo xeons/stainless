@@ -723,12 +723,24 @@ if (shape is Square square)
 }
 ```
 
-That is the cast written once instead of twice. The name is in scope in the
-branch the test proved and nowhere else — not after the `if`, and not in the
-rest of the condition — so the form is the whole condition of an `if` or a
-`while`, and not part of a larger one (SL0585). A *class* is what may be
-named: `x is INamed n` is refused (SL0587), because a reference does not
-convert down to an interface and there would be nothing for `n` to be.
+That is the cast written once instead of twice. The name is in scope wherever
+the test is known to have succeeded: the rest of an `&&` after it, and the
+branch the condition guards.
+
+```csharp
+if (node.Next is Node next && next.Value > limit)
+    Visit(next);
+```
+
+The value tested is taken where the test is evaluated, so an `&&` that stops
+before the test takes nothing: in `ready && Load() is Square s`, `Load` is not
+called when `ready` is false. Anywhere else — under `!` or `||`, as an
+argument, after the `if` — the name would be in scope where the test may have
+failed or never run, and it is refused there (SL0585).
+
+A *class* is what may be named: `x is INamed n` is refused (SL0587), because a
+reference does not convert down to an interface and there would be nothing for
+`n` to be.
 
 **A `while` names it too**, and its body is the place the test proved:
 
@@ -739,7 +751,8 @@ while (queue.TryDequeue() is Some got)
 
 The condition is asked again on every pass, so the value it tests is taken
 again on every pass; `continue` re-takes and re-tests, as continuing a `while`
-means. The name is gone after the loop, which is left by failing that same
+means. `while (queue.TryDequeue() is Some got && got.Value != 0)` stops at the
+first zero. The name is gone after the loop, which is left by failing that same
 test. A `do ... while` is refused: its body runs before the test, so there is
 no place the binding would be true.
 
@@ -1137,8 +1150,8 @@ A field or a call result carries no narrowing (SL0285), because either could be
 a different value by the time the payload is read. `is` says so explicitly: the
 value is evaluated once and what came out of it has a name. That name is a copy
 of the case's payload — the same struct `case Circle c:` binds — and it is in
-scope in the branch the test proved and nowhere else, so the form is the whole
-condition of an `if` or a `while` rather than part of one (SL0585). A case
+scope in the rest of an `&&` and the branch the test proved, and nowhere else
+(SL0585). A case
 that carries nothing has nothing to name (SL0586); `if (value is Null)` is the
 whole question there.
 

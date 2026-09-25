@@ -55,8 +55,19 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
+        // A name `is` makes is true in the rest of an `&&` and in the branch
+        // the condition guards. Under anything else -- `!`, `||`, an argument
+        // -- there is no such place, so the scope is hidden there.
+        var enclosing = _patterns;
+        if (syntax is not (TypeTestSyntax or BinarySyntax { Operator: TokenKind.AmpAmp }))
+            _patterns = null;
+
         try { return BindExpressionCore(syntax); }
-        finally { _bindDepth--; }
+        finally
+        {
+            _patterns = enclosing;
+            _bindDepth--;
+        }
     }
 
     private BoundExpression BindExpressionCore(ExpressionSyntax syntax) => syntax switch
@@ -863,13 +874,12 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
-        if (PatternSubject(syntax, value) is not { } subject)
+        if (PatternSubject(syntax, value, out var taking) is not { } subject)
             return new BoundErrorExpression(syntax.Span);
 
-        _patterns!.Bindings.Add((syntax.Binding, tested.Payload, syntax.BindingSpan,
-            new BoundVariantPayload(syntax.BindingSpan, subject, tested, null)));
-
-        return new BoundVariantTest(syntax.Span, PrimitiveTypeSymbol.Bool, subject, tested);
+        return BindPatternOperand(syntax, taking,
+            new BoundVariantTest(syntax.Span, PrimitiveTypeSymbol.Bool, subject, tested),
+            tested.Payload, new BoundVariantPayload(syntax.BindingSpan, subject, tested, null));
     }
 
     /// <summary>
@@ -892,7 +902,7 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
-        if (PatternSubject(syntax, value) is not { } subject)
+        if (PatternSubject(syntax, value, out var taking) is not { } subject)
             return new BoundErrorExpression(syntax.Span);
 
         if (ClassifyConversion(subject.Type, wanted, explicitCast: true) is not { } kind)
@@ -903,36 +913,80 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
-        _patterns!.Bindings.Add((syntax.Binding!, wanted, syntax.BindingSpan,
-            new BoundConversion(syntax.BindingSpan, wanted, subject, kind)));
+        return BindPatternOperand(syntax, taking,
+            new BoundTypeTest(syntax.Span, PrimitiveTypeSymbol.Bool, subject, wanted),
+            wanted, new BoundConversion(syntax.BindingSpan, wanted, subject, kind));
+    }
 
-        return new BoundTypeTest(syntax.Span, PrimitiveTypeSymbol.Bool, subject, wanted);
+    /// <summary>
+    /// The operand <c>x is T t</c> becomes, with <c>t</c> and the value tested
+    /// declared around the statement:
+    ///
+    /// <code>
+    /// (held = x) is T &amp;&amp; (t = (T)held, true)
+    /// </code>
+    ///
+    /// Nothing is evaluated outside the operand, so an <c>&amp;&amp;</c> that
+    /// stops before it evaluates none of it.
+    /// </summary>
+    private BoundExpression BindPatternOperand(
+        TypeTestSyntax syntax, BoundExpression? taking, BoundExpression test,
+        TypeSymbol type, BoundExpression value)
+    {
+        var patterns = _patterns!;
+        string name = syntax.Binding!;
+
+        if (patterns.Bindings.Any(b => b.Name == name) || LookupLocal(name) is not null)
+            diagnostics.Error("SL0218", syntax.BindingSpan,
+                $"'{name}' is already declared in this scope");
+        else if (_currentFunction?.Parameters.Any(p => p.Name == name) == true)
+            diagnostics.Error("SL0219", syntax.BindingSpan,
+                $"'{name}' is already the name of a parameter");
+
+        var local = new LocalSymbol(name, type, isConst: true);
+        patterns.Spills.Add(new BoundLocalDeclaration(syntax.BindingSpan, local, null));
+        patterns.Bindings.Add((name, local));
+
+        if (taking is not null)
+            test = new BoundSequence(syntax.Span, [taking], test);
+
+        var bind = new BoundSequence(syntax.BindingSpan,
+            [new BoundAssignment(
+                syntax.BindingSpan, new BoundLocalAccess(syntax.BindingSpan, local), value)],
+            new BoundLiteral(syntax.BindingSpan, PrimitiveTypeSymbol.Bool, true));
+
+        return new BoundBinary(
+            syntax.Span, PrimitiveTypeSymbol.Bool, test, BoundBinaryOp.LogicalAnd, bind);
     }
 
     /// <summary>
     /// The value a test and its binding both read, evaluated once.
     ///
     /// A local or a parameter is already that. Anything else -- the field and
-    /// the call result this form exists for -- is spilled into a name of the
-    /// compiler's own, declared around the <c>if</c>.
+    /// the call result this form exists for -- is held in a name of the
+    /// compiler's own, declared around the statement and assigned by
+    /// <paramref name="taking"/> where the test is evaluated.
     /// </summary>
-    private BoundExpression? PatternSubject(TypeTestSyntax syntax, BoundExpression value)
+    private BoundExpression? PatternSubject(
+        TypeTestSyntax syntax, BoundExpression value, out BoundExpression? taking)
     {
+        taking = null;
         if (_patterns is null)
         {
             diagnostics.Error("SL0585", syntax.BindingSpan,
                 $"'{syntax.Binding}' is in scope only where this test succeeded, and there is " +
-                "such a place only when the test is the whole condition of an 'if' or a " +
-                "'while': write 'if (node.Payload is Number n)', and put anything else the " +
-                "branch needs inside it");
+                "such a place only in the condition of an 'if' or a 'while', joined to the " +
+                "rest of it by '&&': write 'if (node.Payload is Number n && n.Held > 0)', and " +
+                "put anything else the branch needs inside it");
             return null;
         }
 
         if (NarrowableSubject(value) is not null) return value;
 
-        var held = DeclareLocal(
-            SyntheticName("is"), value.Type, isConst: true, syntax.Value.Span);
-        _patterns.Spills.Add(new BoundLocalDeclaration(syntax.Value.Span, held, value));
+        var held = new LocalSymbol(SyntheticName("is"), value.Type, isConst: true);
+        _patterns.Spills.Add(new BoundLocalDeclaration(syntax.Value.Span, held, null));
+        taking = new BoundAssignment(
+            syntax.Value.Span, new BoundLocalAccess(syntax.Value.Span, held), value);
 
         return new BoundLocalAccess(syntax.Value.Span, held);
     }
@@ -1295,9 +1349,22 @@ public sealed partial class Binder
         // `a || b` evaluates b only when a was false, and knows that instead.
         // Without this, `x != null && x.Next != null` -- the shape every walk
         // over a linked structure is written in -- could not be said at all.
-        var right = syntax.Operator is TokenKind.AmpAmp or TokenKind.PipePipe
-            ? BindUnderFacts(syntax.Right, left, whenTrue: syntax.Operator == TokenKind.AmpAmp)
-            : BindExpression(syntax.Right);
+        BoundExpression right;
+        if (_patterns is { } patterns && syntax.Operator == TokenKind.AmpAmp)
+        {
+            // The right side runs only when the left was true, so what the left
+            // named is in scope there.
+            PushScope();
+            ExposePatternBindings(patterns);
+            right = BindUnderFacts(syntax.Right, left, whenTrue: true);
+            PopScope();
+        }
+        else
+        {
+            right = syntax.Operator is TokenKind.AmpAmp or TokenKind.PipePipe
+                ? BindUnderFacts(syntax.Right, left, whenTrue: syntax.Operator == TokenKind.AmpAmp)
+                : BindExpression(syntax.Right);
+        }
 
         if (left.Type.IsError() || right.Type.IsError()) return new BoundErrorExpression(syntax.Span);
 

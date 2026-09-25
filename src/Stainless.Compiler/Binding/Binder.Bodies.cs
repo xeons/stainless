@@ -924,33 +924,33 @@ public sealed partial class Binder
     }
 
     /// <summary>
-    /// The two names <c>x is Case n</c> needs, on their way to the statements
-    /// that will declare them.
+    /// What the <c>x is Case n</c> tests in one condition declare.
     ///
-    /// A binding is only meaningful where the test succeeded, so nothing here
-    /// is a declaration yet: the <see cref="Spills"/> are declared around the
-    /// <c>if</c> -- they hold the thing tested, evaluated once -- and the
-    /// <see cref="Bindings"/> at the top of the branch the test proved. That
-    /// is also why the form is the whole of a condition and not part of one:
-    /// under a <c>&amp;&amp;</c> the spill would run when the test did not.
-    ///
-    /// A <c>while</c> puts the spills at the top of its body rather than
-    /// around itself, because its condition is asked again on every pass; see
-    /// <see cref="BindWhile"/>.
+    /// The <see cref="Spills"/> are declarations with no value, put around the
+    /// statement: the thing tested, and each name. The operand assigns them
+    /// where it is evaluated, so a test an <c>&amp;&amp;</c> skips assigns
+    /// nothing. A name is in scope in the rest of the <c>&amp;&amp;</c> and in
+    /// the branch, which are the places it has been assigned.
     /// </summary>
     private sealed class PatternScope
     {
         public List<BoundStatement> Spills { get; } = [];
 
-        public List<(string Name, TypeSymbol Type, SourceSpan Span, BoundExpression Value)>
-            Bindings { get; } = [];
+        public List<(string Name, LocalSymbol Local)> Bindings { get; } = [];
     }
 
     /// <summary>
-    /// Non-null only while the whole condition of an `if` or a `while` is being
-    /// bound.
+    /// Non-null only while the condition of an `if` or a `while` is being
+    /// bound, and hidden beneath anything but an `is` or an `&&`.
     /// </summary>
     private PatternScope? _patterns;
+
+    /// <summary>Puts every name a condition has made so far into the innermost scope.</summary>
+    private void ExposePatternBindings(PatternScope patterns)
+    {
+        foreach (var (name, local) in patterns.Bindings)
+            _scopes[^1][name] = local;
+    }
 
     /// <summary>
     /// The declaration a narrowed fact can be attached to.
@@ -1636,7 +1636,7 @@ public sealed partial class Binder
         // the whole of a condition. Parentheses are not a node here, so
         // `if ((x is Circle c))` arrives as the test itself and works too.
         var outer = _patterns;
-        _patterns = syntax.Condition is TypeTestSyntax ? new PatternScope() : null;
+        _patterns = new PatternScope();
 
         var condition = BindCondition(syntax.Condition);
 
@@ -1668,73 +1668,42 @@ public sealed partial class Binder
 
         BoundStatement result = new BoundIf(syntax.Span, condition, then, otherwise);
 
-        // The thing tested is evaluated once, before the test, so its name is
-        // declared around the whole `if` rather than inside either branch.
-        return patterns is null || patterns.Spills.Count == 0
+        return patterns.Spills.Count == 0
             ? result
             : new BoundBlock(syntax.Span, [.. patterns.Spills, result]);
     }
 
     /// <summary>
-    /// The branch a test proved, with what it found declared at the top of it.
+    /// The branch a condition proved, with what its tests named in scope.
     ///
-    /// The declarations go here rather than beside the spill because this is
-    /// the only place they are true: reading a case's payload where the tag
-    /// says something else would be reading one type's bytes as another, and
-    /// for a payload holding a reference it would be retaining a value that
-    /// was never there.
+    /// Only here and in the rest of the <c>&amp;&amp;</c>: in the other branch a
+    /// name may never have been assigned, and reading a case's payload there
+    /// would read one type's bytes as another.
     /// </summary>
-    private BoundStatement BindPatternBranch(PatternScope? patterns, StatementSyntax body)
+    private BoundStatement BindPatternBranch(PatternScope patterns, StatementSyntax body)
     {
-        if (patterns is null || patterns.Bindings.Count == 0) return BindStatement(body);
+        if (patterns.Bindings.Count == 0) return BindStatement(body);
 
         PushScope();
-
-        var statements = new List<BoundStatement>();
-        foreach (var (name, type, span, value) in patterns.Bindings)
-        {
-            var local = DeclareLocal(name, type, isConst: true, span);
-            statements.Add(new BoundLocalDeclaration(span, local, value));
-        }
-
-        statements.Add(BindStatement(body));
-
+        ExposePatternBindings(patterns);
+        var bound = BindStatement(body);
         PopScope();
-        return new BoundBlock(body.Span, statements);
+        return bound;
     }
 
     /// <summary>
     /// <c>while (c) { ... }</c>, and <c>while (x is Some v)</c> with it.
     ///
     /// A binding is offered here for the reason it is offered on an <c>if</c>:
-    /// the body is the place the test proved, and it is the only place. What
-    /// differs is that the condition is asked again on every pass, so what it
-    /// spilled has to be spilled again -- which a loop with the test in its
-    /// head has nowhere to put. The loop is entered unconditionally instead
-    /// and left by the test:
-    ///
-    /// <code>
-    /// while (queue.TryDequeue() is Some got) { Use(got.Value); }
-    ///
-    /// while (true)
-    /// {
-    ///     var held = queue.TryDequeue();      // the spill, once per pass
-    ///     if (held is Some) { var got = ...; Use(got.Value); } else { break; }
-    /// }
-    /// </code>
-    ///
-    /// <c>continue</c> lands at the top of that body, so it re-spills and
-    /// re-tests, which is what continuing a <c>while</c> means.
+    /// the body is the place the test proved. The names are declared around
+    /// the loop and assigned by the condition, so each pass takes the value
+    /// again and <c>continue</c> re-tests, which is what continuing a
+    /// <c>while</c> means.
     /// </summary>
     private BoundStatement BindWhile(WhileSyntax syntax)
     {
-        // The names the condition puts in scope belong to the body, so the
-        // scope opens before the condition is bound rather than after.
-        bool binding = syntax.Condition is TypeTestSyntax;
-        if (binding) PushScope();
-
         var outer = _patterns;
-        _patterns = binding ? new PatternScope() : null;
+        _patterns = new PatternScope();
 
         var condition = BindCondition(syntax.Condition);
 
@@ -1752,22 +1721,14 @@ public sealed partial class Binder
         var body = BindPatternBranch(patterns, syntax.Body);
         _loopDepth--;
 
-        if (binding) PopScope();
-
         // Nothing the condition proved survives the loop: it is also left by
         // failing that same condition.
         _variantFacts = entry;
 
-        if (patterns is null || patterns.Spills.Count == 0)
-            return new BoundWhile(syntax.Span, condition, body);
-
-        var test = new BoundIf(
-            syntax.Condition.Span, condition, body, new BoundBreak(syntax.Condition.Span));
-
-        return new BoundWhile(
-            syntax.Span,
-            new BoundLiteral(syntax.Condition.Span, PrimitiveTypeSymbol.Bool, true),
-            new BoundBlock(syntax.Span, [.. patterns.Spills, test]));
+        BoundStatement loop = new BoundWhile(syntax.Span, condition, body);
+        return patterns.Spills.Count == 0
+            ? loop
+            : new BoundBlock(syntax.Span, [.. patterns.Spills, loop]);
     }
 
     /// <summary>

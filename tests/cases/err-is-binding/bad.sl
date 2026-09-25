@@ -14,21 +14,29 @@ public variant Value
     Number(double Held);
 }
 
-// SL0585: the name needs somewhere to be true, and only a branch or a loop
-// body the test guards is such a place.
+// SL0585: the name needs somewhere to be true, and only the rest of an `&&`
+// and the branch or loop body it guards are such places.
 void OutsideAnIf(Value value)
 {
     bool ok = value is Number n;
     Console.WriteLine(Text.FromBool(ok));
 }
 
-// The same, under an `&&`: the value would be taken before the `if`, which is
-// not when the test would have run.
-void UnderAnd(Value value, bool flag)
+// Under an `||`, where the branch runs whether or not the test did.
+void UnderOr(Value value, bool flag)
 {
-    if (flag && value is Number n)
+    if (flag || value is Number n)
         Console.WriteLine("no");
 }
+
+// As an argument, which has no branch of its own.
+void AsAnArgument(Value value)
+{
+    if (Holds(value is Number n))
+        Console.WriteLine("no");
+}
+
+bool Holds(bool truth) => truth;
 
 // And negated, where the name would be true in the branch that ruled it out.
 void Negated(Value value)
