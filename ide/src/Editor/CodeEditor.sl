@@ -120,6 +120,10 @@ public class CodeEditor : CustomControl
     nuint _topLine;
     nuint _leftColumn;
 
+    /// Set when the caret was placed before the editor could measure itself,
+    /// so the first paint places it again with real sizes.
+    bool _isPlacingCaretOnPaint;
+
     ScrollBar _verticalScroll;
     ScrollBar _horizontalScroll;
 
@@ -179,6 +183,7 @@ public class CodeEditor : CustomControl
         _keepsWantedColumn = false;
         _topLine = 0u;
         _leftColumn = 0u;
+        _isPlacingCaretOnPaint = false;
         _cellWidth = 0;
         _lineHeight = 0;
         _gutterWidth = 0;
@@ -366,14 +371,21 @@ public class CodeEditor : CustomControl
         nuint line = row >= _contents.LineCount ? _contents.LineCount - 1u : row;
         _caretPosition = Position.Create(line, ClampColumn(line, column));
         _anchor = _caretPosition;
-        // Roughly a third of the way down, rather than at the very top: an
-        // error is nearly always about the lines above it as well.
+        PlaceCaretLine();
+        _isPlacingCaretOnPaint = _lineHeight <= 0;
+        Invalidate();
+        OnCaretMoved();
+    }
+
+    /// Roughly a third of the way down, rather than at the very top: an error
+    /// is nearly always about the lines above it as well.
+    void PlaceCaretLine()
+    {
         nuint visible = (nuint)VisibleLines;
+        nuint line = _caretPosition.Row;
         _topLine = line > visible / 3u ? line - visible / 3u : 0u;
         UpdateScrollBars();
         ScrollToCaret();
-        Invalidate();
-        OnCaretMoved();
     }
 
     /// Raised whenever the caret moves, so a status bar can say where it is.
@@ -576,6 +588,16 @@ public class CodeEditor : CustomControl
             _topLine = _caretPosition.Row - lines + 1u;
         }
 
+        // Before its first paint a control has no cell width, and before its
+        // layout no width at all; `VisibleColumns` then answers 1, and any
+        // caret past column 0 would scroll the text sideways before anyone had
+        // seen it. A tab opened and moved in one step is exactly that.
+        if (_cellWidth <= 0 || ClientBounds.Width <= _gutterWidth + ScrollThickness)
+        {
+            UpdateScrollBars();
+            return;
+        }
+
         nuint column = MeasureCaretColumn();
         nuint columns = (nuint)VisibleColumns;
         if (column < _leftColumn)
@@ -611,6 +633,11 @@ public class CodeEditor : CustomControl
             if (_lineHeight <= 0)
                 _lineHeight = 14;
             UpdateScrollBars();
+        }
+        if (_isPlacingCaretOnPaint)
+        {
+            _isPlacingCaretOnPaint = false;
+            PlaceCaretLine();
         }
 
         _marginWidth = _isMarginShown ? MarginCells * _cellWidth : 0;
