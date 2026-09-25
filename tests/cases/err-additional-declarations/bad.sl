@@ -1,35 +1,44 @@
 // What a second declaration of a type may not do.
 //
-// A type may be declared more than once inside its own module, the way a module
-// may span files. The first declaration settles what the type *is*; a later one
-// may add behaviour and nothing else. That is narrower than C#'s `partial`, and
-// deliberately: the reason the rule exists is `String`, whose layout belongs to
-// the runtime, and a rule that let a later declaration change a layout would be
-// a rule that let one change String's.
+// A class may take fields from any of its declarations and its base list from
+// any one. A struct takes both from its first, because its layout is C's.
 module Bad;
 
-public class Shape
+public interface IDrawable { void Draw(); }
+public interface ISized { int Size(); }
+
+public class Shape : IDrawable
 {
     public int Sides;
+    public void Draw() { }
 }
 
-// Fine: another declaration, adding a method.
+// Fine: another declaration, adding a method and a field.
 public class Shape
 {
-    public int Corners() => Sides;
+    public int Corners;
+    public int Count() => Sides + Corners;
 }
 
-// Not fine: the layout belongs to the declaration that has the fields.
-public class Shape
+// Not fine: the first declaration already said what it derives from.
+public class Shape : ISized // SL0551
 {
-    public int Extra;                           // SL0552
+    public int Size() => Sides;
 }
 
-// Not fine: pass 5 builds the dispatch tables from the first declaration, so a
-// base list arriving later would arrive after they were built.
-public interface IDrawable { void Draw(); }
+public struct Point
+{
+    public int X;
+}
 
-public class Shape : IDrawable // SL0551
+// Not fine: a struct's layout belongs to the declaration that has the fields.
+public struct Point
+{
+    public int Y;                               // SL0552
+}
+
+// Not fine: nor does a struct take a base list from a later declaration.
+public struct Point : IDrawable // SL0551
 {
     public void Draw() { }
 }

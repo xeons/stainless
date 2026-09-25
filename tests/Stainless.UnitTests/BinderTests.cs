@@ -407,26 +407,42 @@ public class BinderTests
     }
 
     /// <summary>
-    /// A field in a later declaration would move a layout that has already been
-    /// settled -- and for an intrinsic, settled by the runtime.
+    /// A class takes fields from any declaration, which is what lets a form
+    /// designer's generated half hold the controls.
     /// </summary>
     [Fact]
-    public void ASecondDeclarationMayNotAddAField() =>
-        Assert.Equal(["SL0552"], Front.ModuleCodes(
+    public void ASecondDeclarationOfAClassMayAddAField() =>
+        Assert.Empty(Front.ModuleCodes(
             "public class C { public int A; }" +
             "\npublic class C { public int B; }"));
 
-    /// <summary>
-    /// Nor a base list: pass 5 builds the dispatch tables from the first
-    /// declaration, so one arriving later would arrive after they were built.
-    /// </summary>
+    /// <summary>A struct does not: its layout is C's.</summary>
     [Fact]
-    public void ASecondDeclarationMayNotNameABase() =>
-        Assert.Equal(["SL0551"], Front.ModuleCodes(
+    public void ASecondDeclarationOfAStructMayNotAddAField() =>
+        Assert.Equal(["SL0552"], Front.ModuleCodes(
+            "public struct S { public int A; }" +
+            "\npublic struct S { public int B; }"));
+
+    /// <summary>A class takes its base list from whichever declaration has one.</summary>
+    [Fact]
+    public void ASecondDeclarationOfAClassMayNameABase() =>
+        Assert.Empty(Front.ModuleCodes(
             """
             public interface I { void F(); }
             public class C { public void F() { } }
             public class C : I { }
+            public void Use() { I i = new C(); i.F(); }
+            """));
+
+    /// <summary>But from one of them: two would be two answers to one question.</summary>
+    [Fact]
+    public void TwoDeclarationsMayNotBothNameABase() =>
+        Assert.Equal(["SL0551"], Front.ModuleCodes(
+            """
+            public interface I { void F(); }
+            public interface J { void G(); }
+            public class C : I { public void F() { } }
+            public class C : J { public void G() { } }
             """));
 
     /// <summary>And every declaration must agree about what it is.</summary>

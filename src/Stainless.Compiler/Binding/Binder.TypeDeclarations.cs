@@ -40,7 +40,7 @@ public sealed partial class Binder
                 if (module.Types.TryGetValue(declaration.Name, out var already) &&
                     declaration.TypeParameters.Count == 0)
                 {
-                    DeclareAdditionalPart(declaration, already);
+                    DeclareAdditionalPart(declaration, already, scope);
                     continue;
                 }
 
@@ -403,19 +403,19 @@ public sealed partial class Binder
     /// <summary>
     /// A second declaration of a type inside its own module.
     ///
-    /// A module already spans files, and this lets a type do the same. The
-    /// first declaration settles what the type <em>is</em>: its kind, its
-    /// fields, and what it derives from. A later one may only add behaviour,
-    /// which is a narrower rule than C#'s <c>partial</c> and is deliberate --
-    /// the reason this exists is <c>String</c>, whose layout belongs to the
-    /// runtime and whose methods no longer have to.
+    /// A module already spans files, and this lets a type do the same. Every
+    /// declaration must agree about what kind of type it is. A class may take
+    /// fields from any of them and its base list from any one; every other
+    /// kind takes both from the first, because its layout is C's or the
+    /// runtime's.
     ///
     /// The members are declared by pass 4 without any help from here, because
     /// pass 4 walks declarations and looks each type up by name. All that is
-    /// needed is to stop reporting the name as a duplicate, and to refuse the
-    /// two things a later part may not carry.
+    /// needed is to stop reporting the name as a duplicate, and to refuse what
+    /// a later part may not carry.
     /// </summary>
-    private void DeclareAdditionalPart(TypeDeclSyntax declaration, NamedTypeSymbol existing)
+    private void DeclareAdditionalPart(
+        TypeDeclSyntax declaration, NamedTypeSymbol existing, FileScope scope)
     {
         // An enum, a delegate and a closure were not made by a type
         // declaration, so they have no kind of one to compare -- and asked for
@@ -433,13 +433,21 @@ public sealed partial class Binder
             return;
         }
 
-        // A base list on a later part would mean the dispatch tables were built
-        // before it was read, since pass 5 works from the first declaration.
         if (declaration.Implements.Count > 0)
-            diagnostics.Error("SL0551", declaration.Span,
-                $"'{declaration.Name}' is already declared in this module, so this declaration " +
-                "may add members but not a base list; write what it derives from on the first " +
-                "declaration");
+        {
+            if (!SpansDeclarations(existing))
+                diagnostics.Error("SL0551", declaration.Span,
+                    $"'{declaration.Name}' is already declared in this module, so this " +
+                    "declaration may add members but not a base list; only a class takes its " +
+                    "base list from a declaration other than the first");
+            else if (_typeSyntax[existing].Declaration.Implements.Count > 0 ||
+                     _baseListSyntax.ContainsKey(existing))
+                diagnostics.Error("SL0551", declaration.Span,
+                    $"'{declaration.Name}' already says what it derives from in another " +
+                    "declaration; write the base list on exactly one of them");
+            else
+                _baseListSyntax[existing] = (declaration, scope);
+        }
 
         if (declaration.IsOpaque)
             diagnostics.Error("SL0551", declaration.Span,
@@ -449,6 +457,13 @@ public sealed partial class Binder
         _additionalParts.Add(declaration);
         _declaredTypes[declaration] = existing;
     }
+
+    /// <summary>
+    /// Whether a later declaration may add fields and a base list. A class's
+    /// layout is its own; a struct's is C's and an intrinsic's the runtime's.
+    /// </summary>
+    private static bool SpansDeclarations(NamedTypeSymbol type) =>
+        type is ClassTypeSymbol { IsIntrinsic: false, IsCom: false };
 
     /// <summary>The kind of declaration a symbol came from, for comparing two.</summary>
     private static TypeDeclKind KindOf(NamedTypeSymbol type) => type switch

@@ -79,7 +79,11 @@ public sealed partial class Binder
         if (type is ComInterfaceTypeSymbol vtable)
             vtable.HasUnknown = !declaration.Attributes.Any(a => a.Name.Last == "NoUnknown");
 
-        if (type is StructTypeSymbol && declaration.Implements.Count > 0)
+        var (listed, listedScope) = _baseListSyntax.TryGetValue(type, out var elsewhere)
+            ? elsewhere
+            : (declaration, scope);
+
+        if (type is StructTypeSymbol && listed.Implements.Count > 0)
         {
             string kind = type switch
             {
@@ -93,10 +97,10 @@ public sealed partial class Binder
         }
         else
         {
-            for (int i = 0; i < declaration.Implements.Count; i++)
+            for (int i = 0; i < listed.Implements.Count; i++)
             {
-                var written = declaration.Implements[i];
-                var resolved = ResolveType(written, scope);
+                var written = listed.Implements[i];
+                var resolved = ResolveType(written, listedScope);
                 if (resolved.IsError()) continue;
 
                 // A class in the list is the base class, and only the first name

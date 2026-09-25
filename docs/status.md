@@ -292,10 +292,11 @@ last person to edit it -- the suite is the authority.
   declared more than once inside its own module and `String`'s second
   declaration is `stdlib/Text/String.sl` — which is also why `Split` can
   return a `String[]` when the runtime cannot allocate one
-- A type may span declarations, the way a module already spans files. The first
-  says what the type is — its kind, its fields, what it derives from — and a
-  later one adds behaviour and nothing else. No `partial` keyword, because
-  there is nothing for it to prevent
+- A type may span declarations, the way a module already spans files. Every
+  declaration agrees on its kind; a class takes fields from any of them and its
+  base list from any one, and anything else keeps both in its first, since its
+  layout is C's or the runtime's. No `partial` keyword, because there is
+  nothing for it to prevent
 - `StringBuilder`: appending, reading (`GetByteAt`, `IndexOf`) and editing
   (`Insert`, `Remove`, `TruncateTo`, `ReplaceAll`). It hands out no pointer,
   unlike `String`: its bytes move as it grows, so one would dangle at the next

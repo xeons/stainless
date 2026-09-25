@@ -71,22 +71,43 @@ public class Shape
 }
 ```
 
-The rule is narrower than C#'s `partial`, and the difference is the point. The
-**first declaration settles what the type is** — its kind, its fields, and what
-it derives from. A later one may add methods and properties and nothing else:
+**Every declaration must agree about what the type is.** What else a later one
+may carry depends on whose layout it is:
 
-| In a later declaration | |
-|---|---|
-| a method or a property | added |
-| a field | SL0552 — the layout belongs to the declaration that has the fields |
-| a base or interface list | SL0551 — the dispatch tables are built from the first |
-| a different kind | SL0550 — every declaration must agree about what it is |
+| In a later declaration | of a class | of anything else |
+|---|---|---|
+| a method or a property | added | added |
+| a field | added, after the fields before it | SL0552 — the layout is C's, or the runtime's |
+| a base or interface list | taken, if no other declaration has one | SL0551 |
+| a different kind | SL0550 | SL0550 |
+
+**A class may be written in two halves**, which is what a
+[form designer](../slfm.md) needs: the generated file holds the controls and
+the code that builds them, and the file a person edits holds the base list, the
+constructor, the handlers and whatever state the form keeps. Neither half has
+to be the one that sorts first.
+
+```csharp
+// MainForm.designer.sl                    // MainForm.sl
+public class MainForm                      public class MainForm : Form
+{                                          {
+    Button _greet;                             int _greetings;
+
+    void InitializeComponent() { ... }         public MainForm() { ... }
+}                                          }
+```
+
+**Fields are laid out in the order the files are read**, which is by path. A
+class's layout is its own business, so that order is not a contract; a
+struct's is C's, which is why a struct keeps all of its fields in one place.
+At most one declaration writes the base list, because two would be two answers
+to one question.
 
 No `partial` keyword marks either one. There is nothing for it to prevent: a
 second declaration of a name in the same module used to be an error and is now
 this, and a name from *another* module was never reachable to redeclare.
 
-What this exists for is `String`. It is intrinsic — the runtime owns its layout
+The standard library's use of it is `String`. It is intrinsic — the runtime owns its layout
 and its allocation, and the compiler creates the symbol before any source is
 read — and until this rule existed, every method it had was a C function
 declared in the compiler. Now `Standard.Text` declares `String` a second time

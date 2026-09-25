@@ -140,6 +140,12 @@ public sealed partial class Binder(
     private readonly HashSet<TypeDeclSyntax> _additionalParts = [];
 
     /// <summary>
+    /// The declaration a class takes its base list from, where that is not
+    /// its first. At most one declaration of a type may write one.
+    /// </summary>
+    private readonly Dictionary<NamedTypeSymbol, (TypeDeclSyntax Declaration, FileScope Scope)> _baseListSyntax = [];
+
+    /// <summary>
     /// The type each non-generic type, enum, delegate or closure declaration
     /// made, or added to.
     ///

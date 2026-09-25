@@ -518,15 +518,14 @@ public sealed partial class Binder
             {
                 case FieldDeclSyntax field:
                 {
-                    // A later declaration may add behaviour and not state: the
-                    // layout was settled by the first one, and for an intrinsic
-                    // it was settled by the runtime.
-                    if (_additionalParts.Contains(declaration))
+                    // A struct's layout is C's and an intrinsic's the runtime's,
+                    // so only a class takes fields from a later declaration.
+                    if (_additionalParts.Contains(declaration) && !SpansDeclarations(type))
                     {
                         diagnostics.Error("SL0552", field.Span,
                             $"'{type.Name}' is already declared in this module, so this " +
                             $"declaration may add methods but not the field '{field.Name}'; " +
-                            "the layout belongs to the declaration that has the fields");
+                            "only a class takes fields from a declaration other than the first");
                         break;
                     }
 
