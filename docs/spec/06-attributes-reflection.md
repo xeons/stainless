@@ -223,13 +223,49 @@ table sets it up. What is still missing is a method — an event handler named
 by a document has nothing to resolve against, because methods carry no
 metadata.
 
+### 6.4.3 Enums and events
+
+**An enum property or field is its integer.** Its `Kind` is the enum's
+underlying one, so `GetInteger` and `SetInteger` read and write it through the
+real accessors, and its `PropertyType` describes the enum:
+
+```csharp
+var dock = typeof(Control).FindProperty("Dock");
+var style = dock.PropertyType;
+style.IsEnum;                      // true
+style.EnumMemberCount;             // 6
+style.GetEnumMemberName(5);        // "Fill"
+style.GetEnumMemberValue(5);       // 5
+style.HasAttribute("Flags");       // false; true for AnchorStyles
+
+SetInteger(raw, dock, style.GetEnumMemberValue(5));
+```
+
+An enum carries this without `[Reflect]` of its own: it is described where a
+reflected field or property names it, and nowhere else.
+
+**A reflected class lists its public events**, its bases' first, each with the
+delegate a handler has to match:
+
+```csharp
+var click = typeof(Button).GetEventAt(0);
+click.Name;                        // "Click"
+click.HandlerTypeName;             // "Forms.EventHandler"
+```
+
+They are described and not raised or subscribed to: a handler is a method, and
+methods carry no metadata. What this is for is a tool that writes the `+=`
+into source — the form designer's Events list.
+
 ## 6.5 What is emitted
 
 A reflected type's `TypeInfo` gains six entries — a field count and table, an
 attribute count and table, and a property count and table — and each
 `SlFieldInfo` records a name, offset, kind, nested type, its own attributes and
 a flag saying whether it is property storage. Each `SlPropertyInfo` records a
-name, kind, nested type, its getter and setter, and its attributes. All of it
+name, kind, nested type, its getter and setter, and its attributes. A class's
+public events follow as name-and-delegate pairs, and an enum a reflected member
+names gets a `TypeInfo` of its own carrying its members. All of it
 is `const`, so it lands in read-only data and is shared, never allocated. See
 [abi.md](../abi.md).
 

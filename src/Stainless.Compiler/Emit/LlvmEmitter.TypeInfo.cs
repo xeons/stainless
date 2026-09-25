@@ -167,7 +167,7 @@ public sealed partial class LlvmEmitter
                 $"{{ {Word} {classType.InstanceSize}, ptr @{DestroyName(classType)}, " +
                 $"ptr {nameConstant}, ptr {tables}, {Metadata(classType, ClassTypeSymbol.HeaderSize)}, " +
                 $"ptr {baseInfo}, ptr {vtable}, ptr {comLayout}, " +
-                $"{PropertyTable(classType)} }}");
+                $"{PropertyTable(classType)}, ptr null, {EventTable(classType)} }}");
         }
 
         PatchBasesAtStartup(patched);
@@ -182,7 +182,7 @@ public sealed partial class LlvmEmitter
                 $"@{ArrayTypeInfoName(arrayType)} = internal constant %SlTypeInfo " +
                 $"{{ {Word} {ArrayTypeSymbol.HeaderSize}, ptr @{ArrayDestroyName(arrayType)}, " +
                 $"ptr {nameConstant}, ptr null, {Word} 0, ptr null, {Word} 0, ptr null, " +
-                $"ptr null, ptr null, ptr null, {Word} 0, ptr null }}");
+                $"ptr null, ptr null, ptr null, {Word} 0, ptr null, ptr null, {Word} 0, ptr null }}");
         }
 
         foreach (var structType in program.Modules
@@ -197,7 +197,7 @@ public sealed partial class LlvmEmitter
                 $"@{StructTypeInfoName(structType)} = internal constant %SlTypeInfo " +
                 $"{{ {Word} {structType.Size}, ptr null, ptr {nameConstant}, ptr null, " +
                 $"{Metadata(structType, 0)}, ptr null, ptr null, ptr null, " +
-                $"{PropertyTable(structType)} }}");
+                $"{PropertyTable(structType)}, ptr null, {Word} 0, ptr null }}");
         }
 
         if (program.Classes.Count > 0 || program.Arrays.Count > 0) _module.AppendLine();
@@ -398,9 +398,13 @@ public sealed partial class LlvmEmitter
             string getter = property.Getter is { } read ? Symbol(read) : "null";
             string setter = property.Setter is { } write ? Symbol(write) : "null";
 
+            // SL_PROPERTY_PUBLIC, so a tool listing what a caller can set --
+            // a form designer's grid -- can leave out what a caller cannot.
+            int flags = property.IsPublic ? 1 : 0;
+
             return $"%SlPropertyInfo {{ ptr {InternBytes(property.Name)}, " +
                    $"i32 {(int)KindOf(property.Type)}, ptr {NestedTypeInfo(property.Type)}, " +
-                   $"ptr {getter}, ptr {setter}, {attributes} }}";
+                   $"ptr {getter}, ptr {setter}, {attributes}, i32 {flags} }}";
         }).ToList();
 
         string table = "@" + NextMetadataName("properties");
@@ -424,7 +428,7 @@ public sealed partial class LlvmEmitter
     /// reference, so an element of one is not reached the way this describes,
     /// and answering as though it were would be worse than answering nothing.
     /// </summary>
-    private static string ElementColumns(TypeSymbol type)
+    private string ElementColumns(TypeSymbol type)
     {
         if (type is not ArrayTypeSymbol array) return $"i32 0, ptr null, {Word} 0";
 
@@ -483,6 +487,72 @@ public sealed partial class LlvmEmitter
         return $"{Word} {attributes.Count}, ptr {table}";
     }
 
+    /// <summary>
+    /// A reflected class's public events, its bases' included, each once: a
+    /// name and the delegate it takes. What a form designer lists.
+    /// </summary>
+    private string EventTable(ClassTypeSymbol type)
+    {
+        if (!type.IsReflected) return $"{Word} 0, ptr null";
+
+        var seen = new HashSet<string>(StringComparer.Ordinal);
+        var rows = new List<string>();
+        foreach (var declared in type.SelfAndBases().Reverse().SelectMany(c => c.Events))
+        {
+            if (!declared.IsPublic || declared.IsStatic || !seen.Add(declared.Name)) continue;
+            rows.Add($"%SlEventInfo {{ ptr {InternBytes(declared.Name)}, " +
+                     $"ptr {InternBytes(declared.Type.QualifiedName)} }}");
+        }
+        if (rows.Count == 0) return $"{Word} 0, ptr null";
+
+        string table = "@" + NextMetadataName("events");
+        _metadata.AppendLine(
+            $"{table} = internal constant [{rows.Count} x %SlEventInfo] [{string.Join(", ", rows)}]");
+        return $"{Word} {rows.Count}, ptr {table}";
+    }
+
+    private readonly Dictionary<EnumTypeSymbol, string> _enumTypeInfos = [];
+
+    /// <summary>
+    /// An enum's TypeInfo, made the first time a reflected property or field
+    /// names it: its members' names and values, its attributes -- which is
+    /// where `[Flags]` is read from -- and the kind of integer it is.
+    /// </summary>
+    private string EnumTypeInfo(EnumTypeSymbol type)
+    {
+        if (_enumTypeInfos.TryGetValue(type, out var known)) return known;
+        string info = "@" + NextMetadataName("enum");
+        _enumTypeInfos[type] = info;
+
+        int count = type.Members.Count;
+        string names = "null";
+        string values = "null";
+        if (count > 0)
+        {
+            var nameCells = type.Members.Select(m => $"ptr {InternBytes(m.Name)}").ToList();
+            var valueCells = type.Members.Select(m => $"i64 {unchecked((long)m.Value)}").ToList();
+            names = "@" + NextMetadataName("enumnames");
+            values = "@" + NextMetadataName("enumvalues");
+            _metadata.AppendLine(
+                $"{names} = internal constant [{count} x ptr] [{string.Join(", ", nameCells)}]");
+            _metadata.AppendLine(
+                $"{values} = internal constant [{count} x i64] [{string.Join(", ", valueCells)}]");
+        }
+
+        string members = "@" + NextMetadataName("enummembers");
+        _metadata.AppendLine(
+            $"{members} = internal constant %SlEnumInfo {{ {Word} {count}, ptr {names}, " +
+            $"ptr {values}, i32 {(int)KindOf(type.UnderlyingType)} }}");
+
+        string attributes = AttributeTable(type.Attributes);
+        string name = InternBytes(type.QualifiedName);
+        _metadata.AppendLine(
+            $"{info} = internal constant %SlTypeInfo {{ {Word} {type.Size}, ptr null, " +
+            $"ptr {name}, ptr null, {Word} 0, ptr null, {attributes}, ptr null, ptr null, " +
+            $"ptr null, {Word} 0, ptr null, ptr {members}, {Word} 0, ptr null }}");
+        return info;
+    }
+
     private readonly StringBuilder _metadata = new();
     private int _nextMetadata;
 
@@ -496,9 +566,10 @@ public sealed partial class LlvmEmitter
     /// said the field held a class of no type -- which is what stopped a
     /// serializer walking into one.
     /// </summary>
-    private static string NestedTypeInfo(TypeSymbol type) => type switch
+    private string NestedTypeInfo(TypeSymbol type) => type switch
     {
         OptionalTypeSymbol optional => NestedTypeInfo(optional.Element),
+        EnumTypeSymbol enumeration => EnumTypeInfo(enumeration),
         StructTypeSymbol { IsReflected: true } structType => TypeInfoOf(structType),
         ClassTypeSymbol { IsIntrinsic: false } classType => TypeInfoOf(classType),
 
@@ -531,6 +602,9 @@ public sealed partial class LlvmEmitter
 
     private static FieldKind KindOf(TypeSymbol type) => type switch
     {
+        // An enum is its integer: the accessors pass one, and what it means is
+        // in the TypeInfo `NestedTypeInfo` points at.
+        EnumTypeSymbol enumeration => KindOf(enumeration.UnderlyingType),
         PrimitiveTypeSymbol primitive => primitive.Kind switch
         {
             PrimitiveKind.Bool => FieldKind.Bool,

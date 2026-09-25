@@ -782,7 +782,8 @@ Being straight about the edges, roughly in the order they are worth adding:
 - **Hiding an inherited member is refused, not warned about.** C# has `new` for
   it; a language with no way to reach the hidden member has nothing to say it
   about, so the same name and parameters means `override` or nothing (SL0503).
-- **Reflection describes fields, properties and array elements.** A property
+- **Reflection describes fields, properties, array elements, public events and
+  the enums a reflected member names.** A property
   is its accessors rather than an offset, so setting one through reflection
   runs the setter — which is what anything whose setter does work needs, and
   what writing an automatic property's storage silently skips.

@@ -56,6 +56,10 @@ public struct Property
     /// with a null one when there is no such name.
     public bool Exists => Handle != null;
 
+    /// Whether any code may reach it, rather than its own class and module
+    /// only. The table lists both.
+    public bool IsPublic => (sl_property_flags(Handle) & 1u) != 0u;
+
     /// False for a write-only property, and for one whose getter this build
     /// did not emit.
     public bool CanRead => sl_property_can_read(Handle);

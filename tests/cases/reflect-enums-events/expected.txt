@@ -1,0 +1,10 @@
+Docked kind 5 enum yes ReflectEnums.Side
+  None = 0
+  Top = 1
+  Fill = 5
+Edges flags yes
+set Docked to Fill: yes
+read back 5
+Docked public yes, Hidden public no
+event Clicked : ReflectEnums.Handler
+event Changed : ReflectEnums.Handler

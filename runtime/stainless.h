@@ -187,7 +187,29 @@ typedef struct SlPropertyInfo {
     const void        *setter;      /* NULL for a read-only one */
     size_t             attributeCount;
     const SlAttribute *attributes;
+    uint32_t           flags;       /* SL_PROPERTY_PUBLIC */
 } SlPropertyInfo;
+
+/* A property anything can reach, rather than its class and module only. */
+#define SL_PROPERTY_PUBLIC 1u
+
+/*
+ * An enum, described for reflection: its members' names and values, and the
+ * kind of integer it is. Reached from the TypeInfo a reflected property or
+ * field of that enum type points at.
+ */
+typedef struct SlEnumInfo {
+    size_t              count;
+    const char *const  *names;
+    const int64_t      *values;
+    uint32_t            kind;
+} SlEnumInfo;
+
+/* An event a reflected class declares or inherits, and its delegate's name. */
+typedef struct SlEventInfo {
+    const char *name;
+    const char *handlerType;
+} SlEventInfo;
 
 struct SlTypeInfo {
     size_t              size;   /* header + fields, in bytes            */
@@ -241,6 +263,14 @@ struct SlTypeInfo {
      */
     size_t                  propertyCount;
     const SlPropertyInfo   *properties;
+
+    /*
+     * For an enum, its members; NULL for everything else. Then a reflected
+     * class's public events. Appended on the same terms as everything above.
+     */
+    const SlEnumInfo       *enumeration;
+    size_t                  eventCount;
+    const SlEventInfo      *events;
 };
 
 typedef struct SlObject {
@@ -811,6 +841,18 @@ SL_API _Bool       sl_property_can_read(const void *property);
 SL_API _Bool       sl_property_can_write(const void *property);
 SL_API size_t      sl_property_attribute_count(const void *property);
 SL_API const void *sl_property_attribute(const void *property, size_t index);
+SL_API uint32_t    sl_property_flags(const void *property);
+
+/* ------------------------------------------------------ enums and events */
+
+SL_API _Bool       sl_type_is_enum(const void *type);
+SL_API size_t      sl_type_enum_count(const void *type);
+SL_API const char *sl_type_enum_name(const void *type, size_t index);
+SL_API int64_t     sl_type_enum_value(const void *type, size_t index);
+
+SL_API size_t      sl_type_event_count(const void *type);
+SL_API const char *sl_type_event_name(const void *type, size_t index);
+SL_API const char *sl_type_event_handler_type(const void *type, size_t index);
 
 /*
  * Calling an accessor, which is the whole point of the property table.

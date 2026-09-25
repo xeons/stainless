@@ -264,6 +264,10 @@ struct TypeInfo {
 
     size_t                 propertyCount;   /* zero unless the type is [Reflect] */
     const SlPropertyInfo  *properties;
+
+    const SlEnumInfo      *enumeration;     /* an enum's members; else NULL      */
+    size_t                 eventCount;      /* public events of a [Reflect] class */
+    const SlEventInfo     *events;
 };
 ```
 
@@ -298,13 +302,32 @@ struct SlFieldInfo {
 struct SlPropertyInfo {
     const char        *name;
     uint32_t           kind;
-    const SlTypeInfo  *type;          /* for aggregates; NULL for primitives */
+    const SlTypeInfo  *type;          /* for aggregates and enums; else NULL */
     const void        *getter;        /* NULL for a write-only property */
     const void        *setter;        /* NULL for a read-only one       */
     size_t             attributeCount;
     const SlAttribute *attributes;
+    uint32_t           flags;         /* SL_PROPERTY_PUBLIC                 */
+};
+
+struct SlEnumInfo {
+    size_t              count;
+    const char *const  *names;
+    const int64_t      *values;
+    uint32_t            kind;         /* the underlying integer */
+};
+
+struct SlEventInfo {
+    const char *name;
+    const char *handlerType;          /* the delegate, qualified */
 };
 ```
+
+**An enum is its integer.** A field or property of an enum type records the
+underlying kind, so the integer accessors read and write it; its `type`
+points at a `TypeInfo` made for the enum, whose `enumeration` lists the
+members and whose attributes carry `[Flags]`. One is emitted per enum a
+reflected member names, and none for any other.
 
 The reflection entries are why reflection needs no runtime: a `[Reflect]`
 type's tables are `const`, the linker places them in read-only data, and
@@ -318,11 +341,12 @@ the runtime is where that switch lives, once, so that no caller has to guess.
 Indexers and static properties are not in the table: the first takes arguments
 nothing could supply and the second has no instance.
 
-`base`, `vtable`, `com`, the element columns, `flags` and the property pair are
-all **appended** rather than inserted, so every offset the compiler hard-codes
-— `interfaces` at 24, above all — goes on meaning what it meant. `base` sits at
-offset 64, `vtable` at 72, `com` at 80, `propertyCount` at 88 and `properties`
-at 96.
+`base`, `vtable`, `com`, the element columns, `flags`, the property pair,
+`enumeration` and the event pair are all **appended** rather than inserted, so
+every offset the compiler hard-codes — `interfaces` at 24, above all — goes on
+meaning what it meant. `base` sits at offset 64, `vtable` at 72, `com` at 80,
+`propertyCount` at 88, `properties` at 96, `enumeration` at 104, `eventCount`
+at 112 and `events` at 120.
 
 Because a class reference is a plain pointer, it can cross the C boundary as
 `void*` — but C code must call `sl_retain` / `sl_release` to participate in

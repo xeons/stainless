@@ -104,6 +104,17 @@ extern "C"
 
     byte*  sl_type_find(byte* name);
 
+    uint   sl_property_flags(byte* property);
+
+    bool   sl_type_is_enum(byte* type);
+    nuint  sl_type_enum_count(byte* type);
+    byte*  sl_type_enum_name(byte* type, nuint index);
+    long   sl_type_enum_value(byte* type, nuint index);
+
+    nuint  sl_type_event_count(byte* type);
+    byte*  sl_type_event_name(byte* type, nuint index);
+    byte*  sl_type_event_handler_type(byte* type, nuint index);
+
     byte*  sl_array_data(byte* array);
     nuint  sl_array_length(byte* array);
 

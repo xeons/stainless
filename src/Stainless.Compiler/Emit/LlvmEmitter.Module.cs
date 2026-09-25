@@ -101,12 +101,17 @@ public sealed partial class LlvmEmitter
         _module.AppendLine($"%SlObjectHeader = type {{ {word}, {word}, ptr }}");
 
         // size, destroy, name, interfaces, fieldCount, fields, attributeCount,
-        // attributes, base, vtable, com, propertyCount, properties. The last
-        // five are appended rather than inserted so that every offset the
-        // emitter already hard-codes goes on meaning what it meant.
+        // attributes, base, vtable, com, propertyCount, properties,
+        // enumeration, eventCount, events. Everything after `attributes` is
+        // appended rather than inserted so that every offset the emitter
+        // already hard-codes goes on meaning what it meant.
         _module.AppendLine(
             $"%SlTypeInfo = type {{ {word}, ptr, ptr, ptr, {word}, ptr, {word}, ptr, "
-            + $"ptr, ptr, ptr, {word}, ptr }}");
+            + $"ptr, ptr, ptr, {word}, ptr, ptr, {word}, ptr }}");
+
+        // count, names, values, kind; and name, handlerType.
+        _module.AppendLine($"%SlEnumInfo = type {{ {word}, ptr, ptr, i32 }}");
+        _module.AppendLine("%SlEventInfo = type { ptr, ptr }");
 
         // name, offset, kind, type, attributeCount, attributes, elementKind,
         // elementType, elementSize, flags.
@@ -114,9 +119,9 @@ public sealed partial class LlvmEmitter
             $"%SlFieldInfo = type {{ ptr, {word}, i32, ptr, {word}, ptr, i32, ptr, "
             + $"{word}, i32 }}");
 
-        // name, kind, type, getter, setter, attributeCount, attributes.
+        // name, kind, type, getter, setter, attributeCount, attributes, flags.
         _module.AppendLine(
-            $"%SlPropertyInfo = type {{ ptr, i32, ptr, ptr, ptr, {word}, ptr }}");
+            $"%SlPropertyInfo = type {{ ptr, i32, ptr, ptr, ptr, {word}, ptr, i32 }}");
 
         _module.AppendLine($"%SlTypeBlock = type {{ {word}, ptr, ptr }}");
         _module.AppendLine($"%SlAttribute = type {{ ptr, {word}, ptr }}");

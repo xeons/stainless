@@ -402,6 +402,55 @@ uint32_t sl_field_flags(const void *field)
     return ((const SlFieldInfo *)field)->flags;
 }
 
+_Bool sl_type_is_enum(const void *type)
+{
+    return ((const SlTypeInfo *)type)->enumeration != NULL;
+}
+
+size_t sl_type_enum_count(const void *type)
+{
+    const SlEnumInfo *members = ((const SlTypeInfo *)type)->enumeration;
+    return members == NULL ? 0 : members->count;
+}
+
+const char *sl_type_enum_name(const void *type, size_t index)
+{
+    size_t count = sl_type_enum_count(type);
+    if (index >= count) sl_array_bounds_fail(index, count);
+    return ((const SlTypeInfo *)type)->enumeration->names[index];
+}
+
+int64_t sl_type_enum_value(const void *type, size_t index)
+{
+    size_t count = sl_type_enum_count(type);
+    if (index >= count) sl_array_bounds_fail(index, count);
+    return ((const SlTypeInfo *)type)->enumeration->values[index];
+}
+
+size_t sl_type_event_count(const void *type)
+{
+    return ((const SlTypeInfo *)type)->eventCount;
+}
+
+const char *sl_type_event_name(const void *type, size_t index)
+{
+    const SlTypeInfo *info = (const SlTypeInfo *)type;
+    if (index >= info->eventCount) sl_array_bounds_fail(index, info->eventCount);
+    return info->events[index].name;
+}
+
+const char *sl_type_event_handler_type(const void *type, size_t index)
+{
+    const SlTypeInfo *info = (const SlTypeInfo *)type;
+    if (index >= info->eventCount) sl_array_bounds_fail(index, info->eventCount);
+    return info->events[index].handlerType;
+}
+
+uint32_t sl_property_flags(const void *property)
+{
+    return ((const SlPropertyInfo *)property)->flags;
+}
+
 size_t sl_type_property_count(const void *type)
 {
     return ((const SlTypeInfo *)type)->propertyCount;

@@ -27,8 +27,11 @@ module Standard.Reflection;
 ///
 /// Got from `typeof(T)`, from `FindType` by name, or from a field's `FieldType` or a
 /// property's `PropertyType`. Only a class or struct marked `[Reflect]` carries
-/// metadata, and what it carries is its fields, properties and attributes;
-/// methods are not described, so there is nothing here to call.
+/// metadata, and what it carries is its fields, properties, public events and
+/// attributes; methods are not described, so there is nothing here to call.
+///
+/// **An enum is described where a reflected field or property names it**: its
+/// members, and its attributes, which is where `[Flags]` is read.
 ///
 /// @see FindType
 public struct Type
@@ -114,6 +117,33 @@ public struct Type
     {
         Property result;
         result.Handle = sl_type_property(Handle, index);
+        return result;
+    }
+
+    /// Whether this is an enum, whose members `EnumMemberCount` and the two
+    /// after it describe.
+    public bool IsEnum => sl_type_is_enum(Handle);
+
+    /// How many members an enum has; zero for anything else.
+    public nuint EnumMemberCount => sl_type_enum_count(Handle);
+
+    /// An enum member's name, in declaration order.
+    public String GetEnumMemberName(nuint index) =>
+        Text.FromNullTerminated(sl_type_enum_name(Handle, index));
+
+    /// An enum member's value. A property of the enum's type is read and
+    /// written with `GetInteger` and `SetInteger`.
+    public long GetEnumMemberValue(nuint index) => sl_type_enum_value(Handle, index);
+
+    /// How many public events a class has, inherited ones included.
+    public nuint EventCount => sl_type_event_count(Handle);
+
+    /// The event at `index`, a base's before its derived class's.
+    public Event GetEventAt(nuint index)
+    {
+        Event result;
+        result.Type = Handle;
+        result.Index = index;
         return result;
     }
 
