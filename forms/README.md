@@ -291,9 +291,19 @@ ends its loop and then the program's: the Win32 loop posts `WM_QUIT` back rather
 than consuming it, and `Application` remembers the quit either way.
 
 **The modal loop also does the keyboard pre-processing the main loop always
-did.** `IsDialogMessageW` is what makes Tab move between controls and the arrows
-move within a radio group, and `ShowModal` never called it — so a dialog, the one
-window where that matters most, had none of it. Escape is handled just above it
+did**, and `ShowModal` never called it — so a dialog, the one window where that
+matters most, had none of it.
+
+**The control made last is in front, on both backends**, which is the LCL's
+order and GTK's. Windows puts a new child window at the bottom, so every
+Win32 peer is raised as it is made. Windows also reads Tab and the arrow keys'
+order from that same stacking, so the form takes them before
+`IsDialogMessageW` does: Tab walks the controls in the order they were made,
+depth first — the LCL's default tab order — and an arrow key a control does
+not want moves among its siblings, carrying a radio button's tick with it.
+`IsDialogMessageW` keeps Enter and the access keys. A `SpinEdit` names its
+buddy rather than taking the window before it in the stacking, which after
+the change was somebody else's text box. Escape is handled just above it
 rather than through it: `IsDialogMessageW` turns Escape into a `WM_COMMAND`
 carrying `IDCANCEL`, which means something only to a real dialog box with a
 control of that id, and these are ordinary windows. Claiming id 2 in `WM_COMMAND`
@@ -630,7 +640,7 @@ not turned back into them.
   Win32, `gtk_widget_set_tooltip_text` with a `query-tooltip` handler on
   GTK), which is what a splitter or a toolbar button would want.
 - **Accelerators.** `&O` underlines a letter and works while a menu is open, and
-  `IsDialogMessage` now handles Tab, the arrows, Enter and Escape; `Ctrl+O`
+  Tab, the arrows, Enter and Escape are handled; `Ctrl+O`
   still needs an accelerator table and `TranslateAccelerator` in the loop.
 - **`TrayIcon`** (`extctrls.pp`) — needs `Shell_NotifyIconW` bound.
 

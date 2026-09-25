@@ -781,6 +781,17 @@ public abstract class WindowedControl : Control
             ((IControlPeer)mine).Focus();
     }
 
+    /// Whether Tab may give this control the keyboard: it takes the focus,
+    /// and is shown and enabled.
+    public bool AcceptsTabFocus
+    {
+        get
+        {
+            var mine = _peer;
+            return mine != null && ((IControlPeer)mine).AcceptsTabFocus;
+        }
+    }
+
     public bool Focused
     {
         get

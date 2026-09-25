@@ -227,6 +227,11 @@ public extern "C"
 
     void gtk_widget_grab_focus(GtkWidget* widget);
     void gtk_widget_set_can_focus(GtkWidget* widget, gboolean can);
+    gboolean gtk_widget_get_can_focus(GtkWidget* widget);
+    /// Shown, and every ancestor shown: what `get_visible` does not say.
+    gboolean gtk_widget_is_drawable(GtkWidget* widget);
+    /// Sensitive, and every ancestor sensitive.
+    gboolean gtk_widget_is_sensitive(GtkWidget* widget);
 
     /// Whether the widget gets a `GdkWindow` of its own.
     ///

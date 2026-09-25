@@ -367,6 +367,83 @@ public class Form : WindowedControl, IWindowNotify
         OnActivated();
     }
     public void OnPlatformDeactivated() => OnDeactivated();
+
+    public bool OnPlatformNavigate(Key key, bool backward)
+    {
+        if (key == Key.Tab)
+            return SelectNextControl(!backward);
+        return SelectNextInGroup(key == Key.Right || key == Key.Down);
+    }
+
+    /// Moves the keyboard to the next control Tab reaches, or the one before,
+    /// wrapping at the ends. The order is the order the controls were made,
+    /// depth first, which is the LCL's default tab order. False when no
+    /// control takes it.
+    public bool SelectNextControl(bool forward)
+    {
+        var order = new List<WindowedControl>();
+        foreach (var each in GetDescendants())
+        {
+            if (each is WindowedControl windowed && windowed.AcceptsTabFocus)
+                order.Add(windowed);
+        }
+        if (order.IsEmpty)
+            return false;
+
+        long count = (long)order.Count;
+        long at = -1;
+        for (nuint i = 0u; i < order.Count; i++)
+        {
+            if (order[i].Focused)
+                at = (long)i;
+        }
+
+        long next = at < 0 ? (forward ? 0 : count - 1) : (at + (forward ? 1 : count - 1)) % count;
+        order[(nuint)next].Focus();
+        return true;
+    }
+
+    /// The arrows: the focus moves among the focused control's siblings, a
+    /// group being its parent's children as it is for radio buttons. Among
+    /// radio buttons the tick moves with it.
+    bool SelectNextInGroup(bool forward)
+    {
+        WindowedControl? focused = null;
+        foreach (var each in GetDescendants())
+        {
+            if (each is WindowedControl windowed && windowed.Focused)
+                focused = windowed;
+        }
+        if (focused == null)
+            return false;
+
+        var group = new List<WindowedControl>();
+        nuint at = 0u;
+        bool radio = focused is RadioButton;
+        var parent = ((WindowedControl)focused).Parent;
+        foreach (var sibling in ((WindowedControl)parent).Controls)
+        {
+            if (sibling is WindowedControl windowed && windowed.Visible && windowed.Enabled
+                && (!radio || windowed is RadioButton))
+            {
+                if (windowed == focused)
+                    at = group.Count;
+                group.Add(windowed);
+            }
+        }
+        if (group.Count < 2u)
+            return true;
+
+        nuint next = forward ? (at + 1u) % group.Count : (at + group.Count - 1u) % group.Count;
+        var chosen = group[next];
+        chosen.Focus();
+        if (chosen is RadioButton button)
+        {
+            button.Checked = true;
+            button.PerformClick();
+        }
+        return true;
+    }
 }
 
 // ================================================================== screen

@@ -368,6 +368,18 @@ public class ControlPeer : IControlPeer
         {
             Displaced = StainlessProc;
         }
+
+        // Windows puts a new child window at the bottom of its siblings; the
+        // LCL and GTK put the control made last in front. The Tab order that
+        // Windows reads from the same list is the form's to keep instead:
+        // see `HandleDialogKey`.
+        if ((Win32.User32.GetWindowLongPtrW(made, GwlStyle) & (long)WsChild) != 0)
+        {
+            _echoDepth++;
+            SetWindowPos(made, (HWND)(void*)HwndTop, 0, 0, 0, 0,
+                         SwpNoMove | SwpNoSize | SwpNoActivate);
+            _echoDepth--;
+        }
     }
 
     ~ControlPeer() { DestroyHandle(); }
@@ -1087,6 +1099,10 @@ public class ControlPeer : IControlPeer
         info.Reserved = null;
         return info;
     }
+
+    public bool AcceptsTabFocus =>
+        (Win32.User32.GetWindowLongPtrW(Window, GwlStyle) & (long)WsTabStop) != 0
+        && IsWindowVisible(Window) != 0 && IsWindowEnabled(Window) != 0;
 
     public void SetDesigning(bool designing)
     {

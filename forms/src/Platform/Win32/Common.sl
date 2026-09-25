@@ -1101,9 +1101,12 @@ public class SpinPeer : ControlPeer, ISpinPeer
              owner, true);
         _owner = owner;
 
+        // The buddy is named rather than `UDS_AUTOBUDDY`, which takes whichever
+        // window is before it in the stacking order and writes its number
+        // there -- another control's text, once the last made is in front.
         _arrows = CreateChildWindow("msctls_updown32", GetContainerWindow(parent),
-                           GetChildStyle() | UdsSetBuddyInt | UdsAlignRight
-                                        | UdsArrowKeys | UdsAutoBuddy, 0u);
+                           GetChildStyle() | UdsSetBuddyInt | UdsAlignRight | UdsArrowKeys,
+                           0u);
         SendMessageW(_arrows, UdmSetBuddy, (ulong)(nuint)(void*)Window, 0);
         SetRange(0, 100);
     }

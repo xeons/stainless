@@ -273,8 +273,14 @@ bool HandleDialogKey(Msg* message)
     // Only windows of this library's own class, so a message bound for a
     // dialog Windows is running -- a message box, a file chooser -- is left
     // entirely alone.
-    if (FindControlPeer(top) == null)
+    ControlPeer? peer = FindControlPeer(top);
+    if (peer == null)
         return false;
+    if (message->Message == WmKeyDown && peer is WindowPeer window)
+    {
+        if (window.NavigateInControlOrder(message))
+            return true;
+    }
     return IsDialogMessageW(top, message) != 0;
 }
 
@@ -311,6 +317,57 @@ public class WindowPeer : ControlPeer, IWindowPeer
     /// Held, not merely handed to Windows: a menu command names an id, and this
     /// is what turns one back into the item that was chosen.
     IMenuPeer? _menuBar;
+
+    /// Tab, and the arrows between controls, which `IsDialogMessageW` would
+    /// take through the stacking order -- the reverse of the order the
+    /// controls were made in, now that the last made is in front. The form
+    /// moves the focus instead, unless the focused control wants the key.
+    public bool NavigateInControlOrder(Msg* message)
+    {
+        int key = (int)message->WParam;
+        bool arrow = key == VkLeft || key == VkUp || key == VkRight || key == VkDown;
+        if (key != VkTab && !arrow)
+            return false;
+        if (IsKeyDown(VkControl) || IsKeyDown(VkMenu))
+            return false;
+
+        uint wants = (uint)SendMessageW(message->Window, WmGetDlgCode, message->WParam,
+                                        (long)(nint)(void*)message);
+        if ((wants & DlgcWantAllKeys) != 0)
+            return false;
+        if (key == VkTab && (wants & DlgcWantTab) != 0)
+            return false;
+        if (arrow && (wants & DlgcWantArrows) != 0)
+            return false;
+
+        IWindowNotify? held = _owner;
+        if (held == null)
+            return false;
+
+        Key which = Key.Tab;
+        switch (key)
+        {
+            case VkLeft: which = Key.Left; break;
+            case VkUp: which = Key.Up; break;
+            case VkRight: which = Key.Right; break;
+            case VkDown: which = Key.Down; break;
+            default: break;
+        }
+        if (!((IWindowNotify)held).OnPlatformNavigate(which, IsKeyDown(VkShift)))
+            return false;
+
+        // The keyboard is in use, so the focus rectangle is shown from here
+        // on, as the dialog manager would have shown it.
+        SendMessageW(Window, WmChangeUiState,
+                     (ulong)(UisClear | ((UisfHideFocus | UisfHideAccel) << 16)), 0);
+
+        // What the dialog manager does for an edit Tab arrives in: select it.
+        HWND now = GetFocus();
+        if (key == VkTab && now != null
+            && ((uint)SendMessageW(now, WmGetDlgCode, 0u, 0) & DlgcHasSetSel) != 0)
+            SendMessageW(now, EmSetSel, 0u, -1);
+        return true;
+    }
 
     public WindowPeer(IWindowNotify owner, WindowBorder border)
     {

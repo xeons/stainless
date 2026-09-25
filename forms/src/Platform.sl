@@ -244,6 +244,14 @@ public interface IWindowNotify : IControlNotify
     void OnPlatformClosed();
     void OnPlatformActivatedWindow();
     void OnPlatformDeactivated();
+
+    /// Tab, or an arrow key the focused control does not want: the form moves
+    /// the focus in the order its controls were made. True when it did.
+    ///
+    /// A platform whose own navigation follows its stacking order calls this
+    /// rather than navigating, since the stacking order puts the last control
+    /// made in front and the tab order puts it last.
+    bool OnPlatformNavigate(Key key, bool backward);
 }
 
 // ====================================================== control to platform
@@ -336,6 +344,10 @@ public interface IControlPeer
     /// else does.
     void SetCapture(bool captured);
 
+    /// Whether Tab may give this control the keyboard: it takes the focus,
+    /// and is shown and enabled.
+    bool AcceptsTabFocus { get; }
+
     /// Whether the control is being designed: shown as it will look, and
     /// given none of the pointer, so it never turns hot or pressed under a
     /// designer's overlay. After it paints it reports the paint, so what the
@@ -349,8 +361,8 @@ public interface IControlPeer
     /// offer: a child cannot be raised above its parent's siblings, so a panel
     /// that must cover the whole window has to be a child of the whole window.
     ///
-    /// Z-order is otherwise the order controls were made in, and that is a poor
-    /// thing to depend on -- it ties what is in front to the order of lines in
+    /// Z-order is otherwise the order controls were made in, the last made in
+    /// front -- the LCL's order and GTK's. That is a poor thing to depend on -- it ties what is in front to the order of lines in
     /// a constructor, and the two drift apart the first time a control is added
     /// in a hurry. Anything that deliberately overlaps says so by calling this.
     void BringToFront();

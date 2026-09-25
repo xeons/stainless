@@ -1317,6 +1317,10 @@ public class GtkPeer : IControlPeer
     {
     }
 
+    public bool AcceptsTabFocus =>
+        gtk_widget_get_can_focus(Inner) != 0 && gtk_widget_is_drawable(Inner) != 0
+        && gtk_widget_is_sensitive(Inner) != 0;
+
     public void SetCapture(bool captured)
     {
         _captured = captured;

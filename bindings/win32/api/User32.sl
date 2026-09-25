@@ -397,6 +397,16 @@ public const uint DlgcWantArrows     = 0x0001u;
 public const uint DlgcWantTab        = 0x0002u;
 public const uint DlgcWantAllKeys    = 0x0004u;
 public const uint DlgcWantChars      = 0x0080u;
+/// An edit whose text Tab should select, and a radio button.
+public const uint DlgcHasSetSel      = 0x0008u;
+public const uint DlgcRadioButton    = 0x0040u;
+
+/// Shows or hides focus rectangles and access keys for a window and all it
+/// contains. `IsDialogMessage` sends it when the keyboard is first used.
+public const uint WmChangeUiState    = 0x0127u;
+public const uint UisClear           = 2u;
+public const uint UisfHideFocus      = 0x1u;
+public const uint UisfHideAccel      = 0x2u;
 
 public const uint DtLeft           = 0x00000000u;
 public const uint DtCenter         = 0x00000001u;

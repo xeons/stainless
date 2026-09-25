@@ -286,6 +286,34 @@ public class DemoForm : Form
         _add.PerformClick();
         ok = Check(ok, "a click reaches the handler", _items.Count == 1u);
 
+        // Tab follows the order the controls were made, which is not the
+        // stacking order on Windows: there the last made is in front.
+        _entry.Focus();
+        Application.DoEvents();
+        SelectNextControl(true);
+        Application.DoEvents();
+        ok = Check(ok, "Tab goes from the entry to the button made after it", _add.Focused);
+        SelectNextControl(false);
+        Application.DoEvents();
+        ok = Check(ok, "Shift+Tab comes back", _entry.Focused);
+        _notes.Focus();
+        Application.DoEvents();
+        SelectNextControl(true);
+        Application.DoEvents();
+        ok = Check(ok, "Tab from the last control wraps to the first", _entry.Focused);
+
+        // The arrows among radio buttons move the tick with the focus.
+        _low.Checked = true;
+        _low.Focus();
+        Application.DoEvents();
+        OnPlatformNavigate(Key.Down, false);
+        Application.DoEvents();
+        ok = Check(ok, "Down moves the tick to the next radio button",
+                   _high.Checked && !_low.Checked && _high.Focused);
+        OnPlatformNavigate(Key.Down, false);
+        Application.DoEvents();
+        ok = Check(ok, "and wraps within its group", _low.Checked && _low.Focused);
+
         return ok;
     }
 

@@ -259,10 +259,6 @@ Named honestly, since the point of the page is to say where the edges are.
   and `Enabled`; anything else is kept in the file and not previewed, until a
   grid reads properties through reflection. There is one selection, not
   several, and no rubber band.
-- **Overlapping controls stack differently on the two backends.** A control
-  made later is in front on GTK and behind on Win32, where a new child window
-  goes to the bottom — and where the Tab order comes from that same order, so
-  it cannot simply be flipped. The designer shows what each platform does.
 - **No Properties *pane*.** Project properties are a dialog, which is the right
   shape for editing a file; a docked property grid over a selected control is a
   designer feature and waits for one. The name is reserved in the layout file
