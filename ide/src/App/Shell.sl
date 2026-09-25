@@ -45,6 +45,8 @@ import Ide.Project;
 import Ide.Build;
 import Ide.Shell;
 import Ide.Debugging;
+import Ide.Designer;
+import Ide.Designing;
 import Debugger;
 
 /// One open file: the tab it is behind, and the editor on it.
@@ -58,10 +60,28 @@ public class EditorTab
     public TabPage Page;
     public CodeEditor Editor;
 
+    /// The designer over a form file's text, or null for any other file.
+    ///
+    /// **Over the editor rather than instead of it.** The text is still the
+    /// document: the designer writes each change back into it, so saving,
+    /// the edited mark and undo are the editor's and nothing is kept twice.
+    public DesignSurface? Designer;
+
     public EditorTab(TabPage page, CodeEditor editor)
     {
         Page = page;
         Editor = editor;
+        Designer = null;
+    }
+
+    /// Whether the designer is what is showing.
+    public bool IsDesigning
+    {
+        get
+        {
+            var surface = Designer;
+            return surface != null && ((DesignSurface)surface).Visible;
+        }
     }
 }
 
@@ -650,6 +670,8 @@ public class Shell : Form
         if (stale != null)
             CloseTab((EditorTab)stale);
         tab.Editor.Focus();
+        if (path.EndsWith(".slfm"))
+            AttachDesigner(tab);
 
         // A file usually arrives with a project above it, and finding it here
         // is what makes Build mean "build this program" without anyone having
@@ -798,6 +820,7 @@ public class Shell : Form
         // rather than destroyed, so this brings back the same tree with the
         // same project already in it.
         view.Add("&Solution Explorer").Click += this.OnShowSolution;
+        view.Add("Form or &Code\tF12").Click += this.OnToggleDesigner;
         view.Add("&Error List").Click += this.OnShowErrors;
         view.Add("&Output").Click += this.OnShowOutput;
         view.Add("&Locals").Click += this.OnShowLocals;
@@ -937,6 +960,7 @@ public class Shell : Form
             var dialog = new SaveDialog();
             dialog.Title = "Save as";
             dialog.AddFilter("Stainless source", "*.sl");
+            dialog.AddFilter("Form file", "*.slfm");
             dialog.FileName = editor.Contents.Location;
             var chosen = dialog.ShowDialog(this);
             if (!chosen.Ok)
@@ -952,6 +976,21 @@ public class Shell : Form
         UpdateTabCaptionFor(editor);
         UpdateTitle();
         ShowStatus("Saved " + target);
+
+        if (target.EndsWith(".slfm"))
+        {
+            var read = ParseFormDocument(editor.Contents.GetText());
+            if (!read.Ok)
+            {
+                ShowStatus("Saved " + target + ", but " + read.Error.Describe(target));
+                return true;
+            }
+            var wrote = WriteFormSource(read.Value, target);
+            if (!wrote.Ok)
+                ShowStatus("Saved " + target + ", but " + wrote.Error);
+            else if (wrote.Value)
+                ShowStatus("Saved " + target + " and wrote " + FindDesignerPath(target));
+        }
         return true;
     }
 
@@ -1263,6 +1302,8 @@ public class Shell : Form
             return;
 
         ClearOutput();
+        if (!RegenerateFormHalves())
+            return;
 
         var arguments = ComposeCompilerArguments(thenRun);
         ShowStatus(thenRun ? "Running..." : "Building...");
@@ -2572,9 +2613,141 @@ public class Shell : Form
                 StepDebuggee(args.Shift ? DebugCommand.StepOut : DebugCommand.StepIn);
                 break;
 
+            case Key.F12:
+                ToggleDesigner();
+                break;
+
             default:
                 break;
         }
+    }
+
+    // ------------------------------------------------------------ designing
+
+    /// Puts a designer over a form file's tab, and shows it.
+    void AttachDesigner(EditorTab tab)
+    {
+        var surface = new DesignSurface(tab.Page);
+        surface.Dock = DockStyle.Fill;
+        surface.Visible = false;
+        surface.Changed += () => this.WriteDesignBack(tab);
+        surface.KeyNotHandled += this.OnEditorKey;
+        tab.Designer = surface;
+        ShowDesigner(tab);
+    }
+
+    /// Shows the designer, from the text as it is now -- so an edit made in
+    /// the text is what the designer shows. A text that does not read stays
+    /// in front, with the reason on the status line.
+    bool ShowDesigner(EditorTab tab)
+    {
+        var chosen = tab.Designer;
+        if (chosen == null)
+            return false;
+        var surface = (DesignSurface)chosen;
+
+        var read = ParseFormDocument(tab.Editor.Contents.GetText());
+        if (!read.Ok)
+        {
+            ShowStatus(read.Error.Describe(GetDisplayName(tab.Editor.Contents.Location)));
+            return false;
+        }
+
+        var unknown = surface.LoadDocument(read.Value);
+        tab.Editor.Visible = false;
+        surface.Visible = true;
+        surface.FocusSurface();
+        if (unknown.Count > 0u)
+            ShowStatus("Not shown, being of a type the designer cannot make: "
+                       + ", ".Join(unknown.ToArray()));
+        else
+            ShowStatus("F12 shows the form file's text.");
+        return true;
+    }
+
+    void ShowFormText(EditorTab tab)
+    {
+        var chosen = tab.Designer;
+        if (chosen != null)
+            ((DesignSurface)chosen).Visible = false;
+        tab.Editor.Visible = true;
+        tab.Editor.Focus();
+    }
+
+    void OnToggleDesigner(MenuItem sender) => ToggleDesigner();
+
+    /// Between a form file's designer and its text.
+    void ToggleDesigner()
+    {
+        int at = _tabs.SelectedIndex;
+        if (at < 0 || (nuint)at >= _openTabs.Count)
+            return;
+        var tab = _openTabs[(nuint)at];
+        if (tab.Designer == null)
+        {
+            ShowStatus("F12 switches between a form and its text; this is not a form file.");
+            return;
+        }
+
+        if (tab.IsDesigning)
+            ShowFormText(tab);
+        else
+            ShowDesigner(tab);
+    }
+
+    /// The designer's document, written into the tab's text as one edit.
+    void WriteDesignBack(EditorTab tab)
+    {
+        var chosen = tab.Designer;
+        if (chosen == null)
+            return;
+        String text = WriteFormDocument(((DesignSurface)chosen).Document);
+        if (text == tab.Editor.Contents.GetText())
+            return;
+        tab.Editor.SelectAll();
+        tab.Editor.TypeText(text);
+        UpdateTabCaption(tab);
+        UpdateTitle();
+    }
+
+    /// Writes the generated half of every form file the build will see, so
+    /// what is built is what the forms say. False, with the reasons in
+    /// Output, when a form could not be read.
+    bool RegenerateFormHalves()
+    {
+        var forms = new List<String>();
+        var project = _project;
+        if (project != null)
+        {
+            var sources = ((ProjectFile)project).GetSourcesFor(ProjectFile.ThisPlatform);
+            foreach (var source in sources)
+            {
+                String resolved = ((ProjectFile)project).ResolvePath(source);
+                if (!Directory.Exists(resolved))
+                    continue;
+                var found = FindFormFiles(resolved);
+                if (found.Ok)
+                    forms.AddRange(found.Value);
+            }
+        }
+        foreach (var tab in _openTabs)
+        {
+            String location = tab.Editor.Contents.Location;
+            if (location.EndsWith(".slfm") && !forms.Contains(location))
+                forms.Add(location);
+        }
+        if (forms.IsEmpty)
+            return true;
+
+        var written = RegenerateFormSources(forms);
+        if (!written.Ok)
+        {
+            foreach (var line in written.Error.Split("\n"))
+                ShowOutputLine(line);
+            ShowStatus("A form file could not be read; see Output.");
+            return false;
+        }
+        return true;
     }
 
     // ------------------------------------------------------- breakpoints
@@ -4611,11 +4784,95 @@ public class Shell : Form
             Console.WriteLine("  (project check skipped: run from the repository root)");
         }
 
+        ok = TestDesigner() && ok;
+
         if (ok)
         {
             Console.WriteLine("  editing, undo, word selection, lexing, the clipboard,");
-            Console.WriteLine("  text size, tabs, the project and the docked panes");
+            Console.WriteLine("  text size, tabs, the project, the docked panes and the designer");
         }
+        return ok;
+    }
+
+    /// The designer against a form file's tab: that its changes reach the
+    /// text, and the text's reach it. Whether anything is drawn is a
+    /// screenshot's question.
+    bool TestDesigner()
+    {
+        bool ok = true;
+        var pad = AddTab(new Document());
+        pad.Editor.Contents.Location = "selftest.slfm";
+        pad.Editor.TypeText("module Test;" + Newline + Newline
+            + "form Probe : Form" + Newline + "{" + Newline
+            + "    Bounds = 0, 0, 300, 200;" + Newline + Newline
+            + "    Button _ok" + Newline + "    {" + Newline
+            + "        Text = \"OK\";" + Newline
+            + "        Bounds = 8, 8, 80, 24;" + Newline + "    }" + Newline + Newline
+            + "    Panel _box" + Newline + "    {" + Newline
+            + "        Bounds = 8, 48, 200, 80;" + Newline + Newline
+            + "        Label _note" + Newline + "        {" + Newline
+            + "            Bounds = 8, 8, 100, 20;" + Newline + "        }" + Newline
+            + "    }" + Newline + "}" + Newline);
+
+        AttachDesigner(pad);
+        var surface = (DesignSurface)pad.Designer;
+        if (!pad.IsDesigning || surface.ItemCount != 3u)
+        {
+            Console.WriteLine("FAIL: a form file did not open in the designer with its three controls");
+            ok = false;
+        }
+
+        surface.MoveComponent("_ok", 16, 24, 96, 32);
+        if (!pad.Editor.Contents.GetText().Contains("Bounds = 16, 24, 96, 32;"))
+        {
+            Console.WriteLine("FAIL: moving a control did not reach the text");
+            ok = false;
+        }
+        if (!pad.Editor.Contents.Edited)
+        {
+            Console.WriteLine("FAIL: a designer change did not mark the tab edited");
+            ok = false;
+        }
+
+        surface.SelectComponent("_box");
+        surface.DeleteSelectedComponent();
+        String text = pad.Editor.Contents.GetText();
+        if (text.Contains("_box") || text.Contains("_note") || surface.ItemCount != 1u)
+        {
+            Console.WriteLine("FAIL: deleting a panel left it, or what was in it, behind");
+            ok = false;
+        }
+
+        ToggleDesigner();
+        if (pad.IsDesigning || !pad.Editor.Visible)
+        {
+            Console.WriteLine("FAIL: F12 did not show the text");
+            ok = false;
+        }
+
+        // An edit made in the text is what the designer shows next.
+        pad.Editor.SelectAll();
+        pad.Editor.TypeText(text.Replace("Button _ok", "Label _ok"));
+        ToggleDesigner();
+        var live = surface.FindLiveControl("_ok");
+        if (!pad.IsDesigning || live == null || !(live is Label))
+        {
+            Console.WriteLine("FAIL: an edit to the text did not reach the designer");
+            ok = false;
+        }
+
+        // Text that does not read keeps the text in front.
+        ToggleDesigner();
+        pad.Editor.SelectAll();
+        pad.Editor.TypeText("module Test; form");
+        ToggleDesigner();
+        if (pad.IsDesigning)
+        {
+            Console.WriteLine("FAIL: a form file that does not read opened in the designer");
+            ok = false;
+        }
+
+        CloseTab(pad);
         return ok;
     }
 }

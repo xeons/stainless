@@ -188,6 +188,23 @@ were fixed — the IDE is what found every one of them.
   that builds them — [docs/slfm.md](../docs/slfm.md) is the format. The reader
   keeps comments and order, so the designer and a text editor can take turns
   on one file.
+- **A form designer.** Opening a `.slfm` shows the form: its real controls,
+  made by the program as they will be at run time, under a transparent
+  overlay that takes the pointer. Click to select, drag to move, drag a handle
+  to resize, all snapped to an 8-pixel grid; the arrows nudge a pixel, Shift
+  and the arrows resize, Delete removes, Escape selects the container. F12
+  switches to the file's text and back.
+
+  **Lazarus's arrangement.** The controls are in design mode
+  (`WindowedControl.IsDesigning`, its `csDesigning`) so they never turn hot or
+  pressed, and after one paints the overlay draws the handles again — which
+  is `TDesigner.PaintControl` and the redraw after it.
+
+  **The text is the document.** Every change is written back into the tab's
+  text as an edit, so saving, the edited mark and undo are the editor's own;
+  switching from the text to the designer reads it again, so a hand edit is
+  what the designer shows. Saving a form, and every build, writes its
+  generated `.designer.sl`.
 
 ## What does not exist yet
 
@@ -236,10 +253,16 @@ Named honestly, since the point of the page is to say where the edges are.
   belongs to the parent it was constructed with and `forms/` cannot move it, so
   putting a pane back on an edge it was not built on is the one thing that
   cannot happen live.
-- **No form designer yet.** Form files are read, written and generated from;
-  nothing draws one. The surface — live controls under a transparent shield
-  that takes the pointer — the Toolbox and a Properties grid driven by
-  reflection are what is left of it.
+- **The designer has no Toolbox and no Properties grid.** A control is added
+  by writing it in the text; the designer shows, moves, sizes and deletes it.
+  What it shows of a control is `Text`, `Bounds`, `Width`, `Height`, `Dock`
+  and `Enabled`; anything else is kept in the file and not previewed, until a
+  grid reads properties through reflection. There is one selection, not
+  several, and no rubber band.
+- **Overlapping controls stack differently on the two backends.** A control
+  made later is in front on GTK and behind on Win32, where a new child window
+  goes to the bottom — and where the Tab order comes from that same order, so
+  it cannot simply be flipped. The designer shows what each platform does.
 - **No Properties *pane*.** Project properties are a dialog, which is the right
   shape for editing a file; a docked property grid over a selected control is a
   designer feature and waits for one. The name is reserved in the layout file
@@ -285,6 +308,8 @@ ide/src/Debug/Breakpoints.sl where to stop, as files and lines -- no controls
 ide/src/Debug/Session.sl    the thread that owns the debuggee, and its queue
 ide/src/Designer/FormDocument.sl  .slfm, read and written, comments and all
 ide/src/Designer/FormGenerator.sl .slfm into the generated .designer.sl
+ide/src/Designing/DesignedControls.sl a form file's controls, made for real
+ide/src/Designing/DesignSurface.sl    the designer: live controls, and the overlay
 ide/slforms/                the generator on its own, for a build with no IDE
 ide/src/Main.sl             the command line
 ide/tests/lextest.sl        the scanner, on lines that are awkward on purpose
