@@ -64,7 +64,12 @@ $libraries = @("-l", "user32", "-l", "gdi32", "-l", "comctl32",
 # the binary and nothing to lose when one is moved.
 $resources = Join-Path $PSScriptRoot "forms.rc"
 
-$samples = Get-ChildItem $PSScriptRoot -Filter *.sl | Sort-Object Name
+# A file is one program, and so is a directory: `designed` is a form's two
+# halves, one of them generated from its `.slfm`.
+$samples = @(Get-ChildItem $PSScriptRoot -Filter *.sl) +
+           @(Get-ChildItem $PSScriptRoot -Directory |
+             Where-Object { $_.Name -ne "build" -and (Get-ChildItem $_.FullName -Filter *.sl) }) |
+           Sort-Object Name
 
 foreach ($sample in $samples) {
     $name = [IO.Path]::GetFileNameWithoutExtension($sample.Name)

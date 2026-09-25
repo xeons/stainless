@@ -1,0 +1,43 @@
+// SPDX-License-Identifier: 0BSD
+
+module Greeter;
+
+form GreeterForm : Form
+{
+    Text = "Greeter";
+    Bounds = 0, 0, 360, 170;
+
+    Label _prompt
+    {
+        Text = "Your name:";
+        Bounds = 16, 20, 80, 20;
+    }
+
+    TextBox _name
+    {
+        Text = "world";
+        Bounds = 100, 16, 240, 24;
+        Anchors = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+    }
+
+    Button _greet
+    {
+        Text = "Greet";
+        Bounds = 250, 56, 90, 28;
+        Anchors = AnchorStyles.Top | AnchorStyles.Right;
+        Click += OnGreet;
+    }
+
+    // The answer, along the bottom.
+    Panel _footer
+    {
+        Dock = DockStyle.Bottom;
+        Height = 40;
+
+        Label _greeting
+        {
+            Text = "";
+            Bounds = 16, 10, 320, 20;
+        }
+    }
+}

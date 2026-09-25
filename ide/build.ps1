@@ -93,6 +93,20 @@ if ($Test) {
     if ($LASTEXITCODE -ne 0) { Fail "the breakpoint tests failed" }
 
     Write-Host ""
+    Write-Host "form files" -ForegroundColor Cyan
+    & $compiler run (Join-Path $PSScriptRoot "tests\formtest.sl") (Join-Path $PSScriptRoot "src\Designer")
+    if ($LASTEXITCODE -ne 0) { Fail "the form file tests failed" }
+
+    # A checked-in generated half MUST match its form file, or what is built
+    # is not what the form says.
+    Write-Host ""
+    Write-Host "generated halves" -ForegroundColor Cyan
+    & $compiler build --project (Join-Path $PSScriptRoot "slforms")
+    if ($LASTEXITCODE -ne 0) { Fail "slforms failed to build" }
+    & (Join-Path $PSScriptRoot "slforms\build\slforms.exe") --check (Join-Path $repository "samples")
+    if ($LASTEXITCODE -ne 0) { Fail "a generated half is stale" }
+
+    Write-Host ""
     Write-Host "the window" -ForegroundColor Cyan
     & $exe --selftest
     if ($LASTEXITCODE -ne 0) { Fail "the IDE self test failed" }

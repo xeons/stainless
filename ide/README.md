@@ -183,6 +183,12 @@ were fixed — the IDE is what found every one of them.
   that `.pdb`, so Visual Studio, WinDbg, minidumps and Windows Error Reporting
   see an unsymbolised binary; build Release when that matters.
 
+- **Form files.** A `.slfm` describes a form's controls, their properties
+  and their handlers, and `slforms` generates the half of the form's class
+  that builds them — [docs/slfm.md](../docs/slfm.md) is the format. The reader
+  keeps comments and order, so the designer and a text editor can take turns
+  on one file.
+
 ## What does not exist yet
 
 Named honestly, since the point of the page is to say where the edges are.
@@ -230,6 +236,10 @@ Named honestly, since the point of the page is to say where the edges are.
   belongs to the parent it was constructed with and `forms/` cannot move it, so
   putting a pane back on an edge it was not built on is the one thing that
   cannot happen live.
+- **No form designer yet.** Form files are read, written and generated from;
+  nothing draws one. The surface — live controls under a transparent shield
+  that takes the pointer — the Toolbox and a Properties grid driven by
+  reflection are what is left of it.
 - **No Properties *pane*.** Project properties are a dialog, which is the right
   shape for editing a file; a docked property grid over a selected control is a
   designer feature and waits for one. The name is reserved in the layout file
@@ -273,19 +283,23 @@ ide/src/App/FindDialog.sl   find and replace, over whichever tab is in front
 ide/src/App/ProjectDialog.sl stainless.json, edited in four pages
 ide/src/Debug/Breakpoints.sl where to stop, as files and lines -- no controls
 ide/src/Debug/Session.sl    the thread that owns the debuggee, and its queue
+ide/src/Designer/FormDocument.sl  .slfm, read and written, comments and all
+ide/src/Designer/FormGenerator.sl .slfm into the generated .designer.sl
+ide/slforms/                the generator on its own, for a build with no IDE
 ide/src/Main.sl             the command line
 ide/tests/lextest.sl        the scanner, on lines that are awkward on purpose
 ide/tests/buildtest.sl      the diagnostic reader, on real compiler output
 ide/tests/projecttest.sl    the project reader, on files that are awkward
 ide/tests/docktest.sl       the layout model, on files a newer build wrote
 ide/tests/debugtest.sl      breakpoints: toggling, binding, paths, and edits
+ide/tests/formtest.sl       form files: round trips, refusals, edits, output
 ide/tests/fixture/          a two-file project, which is the smallest thing
                             that fails if Build ever compiles one file again
 ```
 
-**Five of those are modules rather than parts of the window**, and the reason is
-the same each time: `Ide.Project`, `Ide.Build`, `Ide.Shell`'s `Layout.sl` and
-`Ide.Debugging`'s `Breakpoints.sl` mention no control, so a console harness can
+**Several of those are modules rather than parts of the window**, and the reason is
+the same each time: `Ide.Project`, `Ide.Build`, `Ide.Designer`, `Ide.Shell`'s
+`Layout.sl` and `Ide.Debugging`'s `Breakpoints.sl` mention no control, so a console harness can
 test them without linking a widget set or opening a display. `BuildMessage` was a struct at the bottom of
 `Shell.sl` and moving it is what made `buildtest.sl` possible at all.
 

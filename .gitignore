@@ -21,6 +21,7 @@ samples/**/build/
 
 # IDE build output
 ide/build/
+ide/slforms/build/
 
 # The debug engine's build output
 debug/build/

@@ -142,6 +142,10 @@ public class SampleTests
         new("forms/buttons", ["samples/forms/buttons.sl"]) { NeedsForms = true },
         new("forms/pictures", ["samples/forms/pictures.sl"]) { NeedsForms = true },
         new("forms/clipboard", ["samples/forms/clipboard.sl"]) { NeedsForms = true },
+        new("forms/designed", [
+            "samples/forms/designed/Greeter.designer.sl",
+            "samples/forms/designed/Greeter.sl",
+        ]) { NeedsForms = true },
         new("forms/controls", ["samples/forms/controls.sl"]) { NeedsForms = true },
         new("forms/core", ["samples/forms/core.sl"]) { NeedsForms = true },
         new("forms/reports", ["samples/forms/reports.sl"]) { NeedsForms = true },

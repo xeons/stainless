@@ -82,14 +82,14 @@ may carry depends on whose layout it is:
 | a different kind | SL0550 | SL0550 |
 
 **A class may be written in two halves**, which is what a
-[form designer](../slfm.md) needs: the generated file holds the controls and
-the code that builds them, and the file a person edits holds the base list, the
+[form designer](../slfm.md) needs: the generated file holds the base list, the
+controls and the code that builds them, and the file a person edits holds the
 constructor, the handlers and whatever state the form keeps. Neither half has
 to be the one that sorts first.
 
 ```csharp
 // MainForm.designer.sl                    // MainForm.sl
-public class MainForm                      public class MainForm : Form
+public class MainForm : Form               public class MainForm
 {                                          {
     Button _greet;                             int _greetings;
 

@@ -642,10 +642,10 @@ finished work, and is in `git log` where history belongs.
 
 ### Method metadata, and invoke-by-name
 
-Reflection describes types and fields and stops there. Methods are the last
-piece before a form file can wire a handler -- `event` supplies the other half,
-and what is missing is finding the method by name -- and the same work would let
-a deserializer fill a `List<T>`, which is the one shape `Standard.Json` cannot
+Reflection describes types and fields and stops there. A form file does not
+need this: it wires handlers in generated code rather than by name at run time
+([docs/slfm.md](docs/slfm.md#5-what-was-rejected)). What still wants it is a
+deserializer filling a `List<T>`, which is the one shape `Standard.Json` cannot
 represent.
 
 ### A registry, or a decision not to have one
