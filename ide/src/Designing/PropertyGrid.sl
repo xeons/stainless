@@ -296,6 +296,22 @@ public class PropertyGrid : Panel
         if (live == null)
             return ReadDocumentValue(component, row.Name);
 
+        // Where and how big are the file's `Bounds`, as asked for; the live
+        // control MAY have settled larger.
+        switch (row.Name)
+        {
+            case "Left":
+            case "Top":
+            case "Width":
+            case "Height":
+            {
+                Rectangle asked = ((DesignSurface)_surface).ReadDesignedBounds(component);
+                return Standard.Text.FromInteger(PickBoundsField(asked, row.Name));
+            }
+            default:
+                break;
+        }
+
         byte* raw = (byte*)((WindowedControl)live);
         switch (row.Kind)
         {
@@ -635,6 +651,31 @@ public class PropertyGrid : Panel
         }
 
         var control = (WindowedControl)live;
+
+        // Where and how big go through the file's `Bounds`, one field of it.
+        Rectangle asked = designer.ReadDesignedBounds(component);
+        switch (row.Name)
+        {
+            case "Left":
+                designer.SetDesignedBounds(component, Rectangle.FromBounds(
+                    (int)value, asked.Y, asked.Width, asked.Height));
+                return;
+            case "Top":
+                designer.SetDesignedBounds(component, Rectangle.FromBounds(
+                    asked.X, (int)value, asked.Width, asked.Height));
+                return;
+            case "Width":
+                designer.SetDesignedBounds(component, Rectangle.FromBounds(
+                    asked.X, asked.Y, (int)value, asked.Height));
+                return;
+            case "Height":
+                designer.SetDesignedBounds(component, Rectangle.FromBounds(
+                    asked.X, asked.Y, asked.Width, (int)value));
+                return;
+            default:
+                break;
+        }
+
         SetInteger((byte*)control, row.Reflected, value);
 
         switch (row.Kind)
@@ -651,22 +692,17 @@ public class PropertyGrid : Panel
                 break;
         }
 
-        // Where a control is and how big is one `Bounds` in the file.
-        switch (row.Name)
+        designer.StoreComponentProperty(component, row.Name, FormValue.FromInteger(value));
+    }
+
+    private static int PickBoundsField(Rectangle bounds, String name)
+    {
+        switch (name)
         {
-            case "Left":
-            case "Top":
-            case "Width":
-            case "Height":
-            {
-                Rectangle now = control.Bounds;
-                designer.StoreComponentProperty(component, "Bounds",
-                    FormValue.FromRectangle(now.X, now.Y, now.Width, now.Height));
-                return;
-            }
-            default:
-                designer.StoreComponentProperty(component, row.Name, FormValue.FromInteger(value));
-                return;
+            case "Left": return bounds.X;
+            case "Top": return bounds.Y;
+            case "Width": return bounds.Width;
+            default: return bounds.Height;
         }
     }
 

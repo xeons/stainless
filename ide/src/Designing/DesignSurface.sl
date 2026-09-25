@@ -86,6 +86,8 @@ public class DesignSurface : Panel
     private int _handle;
     private Point _dragFrom;
     private Rectangle _boundsAtDrag;
+    /// Where the drag last put the control, as asked rather than as settled.
+    private Rectangle _draggedTo;
 
     public DesignSurface(WindowedControl parent)
     {
@@ -99,6 +101,7 @@ public class DesignSurface : Panel
         _handle = 0;
         _dragFrom = Point.Empty;
         _boundsAtDrag = Rectangle.Empty;
+        _draggedTo = Rectangle.Empty;
         _document = new FormDocument("", "", "Form");
 
         _frame = new Panel(this);
@@ -407,7 +410,8 @@ public class DesignSurface : Panel
         _dragStarted = false;
         _handle = handle;
         _dragFrom = from;
-        _boundsAtDrag = ((DesignedItem)_selected).Live.Bounds;
+        _boundsAtDrag = ReadDesignedBounds(((DesignedItem)_selected).Component);
+        _draggedTo = _boundsAtDrag;
         _overlay.CaptureMouse(true);
     }
 
@@ -430,7 +434,9 @@ public class DesignSurface : Panel
 
         if (_drag == DesignDrag.Moving)
         {
-            live.SetBounds(SnapToGrid(was.X + dx), SnapToGrid(was.Y + dy), was.Width, was.Height);
+            _draggedTo = Rectangle.FromBounds(SnapToGrid(was.X + dx), SnapToGrid(was.Y + dy),
+                                              was.Width, was.Height);
+            live.Bounds = _draggedTo;
         }
         else
         {
@@ -450,7 +456,8 @@ public class DesignSurface : Panel
                 right = left + GridStep;
             if (bottom - top < GridStep)
                 bottom = top + GridStep;
-            live.SetBounds(left, top, right - left, bottom - top);
+            _draggedTo = Rectangle.FromBounds(left, top, right - left, bottom - top);
+            live.Bounds = _draggedTo;
         }
         _overlay.Invalidate();
     }
@@ -463,8 +470,8 @@ public class DesignSurface : Panel
         _overlay.CaptureMouse(false);
 
         var chosen = _selected;
-        if (chosen != null && !((DesignedItem)chosen).Live.Bounds.Equals(_boundsAtDrag))
-            StoreDesignedBounds((DesignedItem)chosen);
+        if (chosen != null && _dragStarted && !_draggedTo.Equals(_boundsAtDrag))
+            StoreDesignedBounds((DesignedItem)chosen, _draggedTo);
     }
 
     // ------------------------------------------------------------ the keyboard
@@ -502,12 +509,12 @@ public class DesignSurface : Panel
             default: return;
         }
 
-        Rectangle was = item.Live.Bounds;
-        if (args.Shift)
-            item.Live.SetBounds(was.X, was.Y, Math.Max(1, was.Width + dx), Math.Max(1, was.Height + dy));
-        else
-            item.Live.SetBounds(was.X + dx, was.Y + dy, was.Width, was.Height);
-        StoreDesignedBounds(item);
+        Rectangle was = ReadDesignedBounds(item.Component);
+        Rectangle now = args.Shift
+            ? Rectangle.FromBounds(was.X, was.Y, Math.Max(1, was.Width + dx), Math.Max(1, was.Height + dy))
+            : Rectangle.FromBounds(was.X + dx, was.Y + dy, was.Width, was.Height);
+        item.Live.Bounds = now;
+        StoreDesignedBounds(item, now);
     }
 
     // ------------------------------------------------------------ changes
@@ -589,8 +596,9 @@ public class DesignSurface : Panel
         {
             if (item.Component.Name == name)
             {
-                item.Live.SetBounds(x, y, width, height);
-                StoreDesignedBounds(item);
+                var wanted = Rectangle.FromBounds(x, y, width, height);
+                item.Live.Bounds = wanted;
+                StoreDesignedBounds(item, wanted);
                 return;
             }
         }
@@ -728,9 +736,39 @@ public class DesignSurface : Panel
         }
     }
 
-    private void StoreDesignedBounds(DesignedItem item)
+    /// Where the file puts a component: its `Bounds`, which is what was asked
+    /// for. A platform MAY settle a control larger -- a GTK button will not go
+    /// below its minimum -- and the file is not the place for that.
+    public Rectangle ReadDesignedBounds(FormComponent component)
     {
-        Rectangle now = item.Live.Bounds;
+        FormProperty? bounds = component.FindProperty("Bounds");
+        if (bounds != null && ((FormProperty)bounds).Value.Items.Count == 4u)
+        {
+            var items = ((FormProperty)bounds).Value.Items;
+            return Rectangle.FromBounds(ReadDesignedInteger(items[0u]), ReadDesignedInteger(items[1u]),
+                                        ReadDesignedInteger(items[2u]), ReadDesignedInteger(items[3u]));
+        }
+        WindowedControl? live = FindLiveControl(component.Name);
+        return live == null ? Rectangle.Empty : ((WindowedControl)live).Bounds;
+    }
+
+    /// Moves a component in the file and on the surface, by the rectangle
+    /// asked for.
+    public void SetDesignedBounds(FormComponent component, Rectangle wanted)
+    {
+        foreach (var item in _items)
+        {
+            if (item.Component == component)
+            {
+                item.Live.Bounds = wanted;
+                StoreDesignedBounds(item, wanted);
+                return;
+            }
+        }
+    }
+
+    private void StoreDesignedBounds(DesignedItem item, Rectangle now)
+    {
         item.Component.SetProperty("Bounds",
             FormValue.FromRectangle(now.X, now.Y, now.Width, now.Height));
 
