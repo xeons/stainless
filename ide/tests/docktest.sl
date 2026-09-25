@@ -67,16 +67,10 @@ void TestDefaults(Harness harness)
     Console.WriteLine("the arrangement a first run gets");
 
     var layout = DockLayout.CreateDefault();
-    harness.CheckSameNumber("three panes are placed", 3, (long)layout.Places.Count);
-    harness.CheckSameNumber("one on the left", 1, (long)layout.Count(DockEdge.Left));
+    harness.CheckSameNumber("five panes are placed", 5, (long)layout.Places.Count);
+    harness.CheckSameNumber("two on the left", 2, (long)layout.Count(DockEdge.Left));
     harness.CheckSameNumber("two at the bottom", 2, (long)layout.Count(DockEdge.Bottom));
-
-    // The default names only panes the window actually builds. Properties has
-    // a constant but no place, so nobody's settings file carries a line for a
-    // pane they cannot see.
-    harness.Check("and a pane that does not exist yet is not placed",
-                  layout.Find(Panes.Properties) == null);
-    harness.CheckSameNumber("so the right well is empty", 0,
+    harness.CheckSameNumber("and Properties on the right", 1,
                             (long)layout.Count(DockEdge.Right));
 
     var solution = layout.Find(Panes.Solution);
@@ -87,7 +81,7 @@ void TestDefaults(Harness harness)
     // A name no build uses. The answer must be null rather than a placement,
     // or a pane added later cannot tell "the file predates me" from "the file
     // put me in the document well".
-    harness.Check("a pane nobody placed is not found", layout.Find("toolbox") == null);
+    harness.Check("a pane nobody placed is not found", layout.Find("nonesuch") == null);
 }
 
 void TestPlacing(Harness harness)
@@ -97,8 +91,8 @@ void TestPlacing(Harness harness)
     var layout = DockLayout.CreateDefault();
     layout.PlacePane(Panes.Solution, DockEdge.Bottom, false);
 
-    harness.CheckSameNumber("still three panes", 3, (long)layout.Places.Count);
-    harness.CheckSameNumber("the left well is empty", 0, (long)layout.Count(DockEdge.Left));
+    harness.CheckSameNumber("still five panes", 5, (long)layout.Places.Count);
+    harness.CheckSameNumber("the left well has the Toolbox", 1, (long)layout.Count(DockEdge.Left));
     harness.CheckSameNumber("and the bottom has three", 3, (long)layout.Count(DockEdge.Bottom));
 
     var moved = layout.Find(Panes.Solution);
@@ -143,7 +137,7 @@ void TestRoundTrip(Harness harness)
     harness.CheckSameNumber("the left width came back", 300, (long)again.LeftWidth);
     harness.CheckSameNumber("the right width came back", 200, (long)again.RightWidth);
     harness.CheckSameNumber("the bottom height came back", 120, (long)again.BottomHeight);
-    harness.CheckSameNumber("every pane came back", 4, (long)again.Places.Count);
+    harness.CheckSameNumber("every pane came back", 5, (long)again.Places.Count);
 
     var moved = again.Find(Panes.Properties);
     harness.Check("the moved pane kept its edge", moved != null
@@ -193,14 +187,14 @@ void TestSurviving(Harness harness)
     // not refuse to open, which is the difference between this reader and
     // every other one in the tree and is argued for where it is written.
     var broken = ParseLayout("{not json");
-    harness.CheckSameNumber("a broken file gives the default", 3, (long)broken.Places.Count);
+    harness.CheckSameNumber("a broken file gives the default", 5, (long)broken.Places.Count);
     harness.Check("with the tree on the left", broken.Find(Panes.Solution) != null);
 
     var empty = ParseLayout("");
-    harness.CheckSameNumber("so does an empty one", 3, (long)empty.Places.Count);
+    harness.CheckSameNumber("so does an empty one", 5, (long)empty.Places.Count);
 
     var array = ParseLayout("[1,2,3]");
-    harness.CheckSameNumber("so does JSON that is not an object", 3, (long)array.Places.Count);
+    harness.CheckSameNumber("so does JSON that is not an object", 5, (long)array.Places.Count);
 
     // A byte order mark in front of it, which is what Notepad and PowerShell
     // 5.1 write. This one is not hypothetical: it is how the first hand-edited

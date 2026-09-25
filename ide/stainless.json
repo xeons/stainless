@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "kind": "executable",
   "sources": ["src", "../forms/src", "../debug/src", "../samples/forms/forms.rc", "res/stainless-ide.rc"],
+  "defines": ["FORMS_REFLECT"],
   "windows": {
     "sources": ["../bindings/win32"],
     "libraries": [

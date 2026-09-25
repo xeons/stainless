@@ -126,6 +126,8 @@ public class Shell : Form
 {
     TabControl _tabs;
     List<EditorTab> _openTabs;
+    Toolbox _toolbox;
+    PropertyGrid _grid;
 
     /// The wells, the splitters and the strips. Everything but the menu and the
     /// status bar lives inside it.
@@ -457,6 +459,17 @@ public class Shell : Form
         _tree.DoubleClick += this.OnTreeChosen;
         _tree.ContextMenu += this.OnTreeContextMenu;
 
+        var tools = _dock.AddPane(Panes.Toolbox, "Toolbox", DockEdge.Left);
+        _toolbox = new Toolbox(tools);
+        _toolbox.Dock = DockStyle.Fill;
+        _toolbox.Chosen += (typeName) => this.OnToolChosen(typeName);
+
+        var properties = _dock.AddPane(Panes.Properties, "Properties", DockEdge.Right);
+        _grid = new PropertyGrid(properties);
+        _grid.Dock = DockStyle.Fill;
+        _grid.HandlerChosen += (method, handlerType) => this.WriteHandlerStub(method, handlerType);
+        _grid.Message += (message) => this.ShowStatus(message);
+
         var errors = _dock.AddPane(Panes.Errors, "Error List", DockEdge.Bottom);
         _errorList = new ListView(errors);
         _errorList.Dock = DockStyle.Fill;
@@ -736,6 +749,7 @@ public class Shell : Form
 
     void OnTabChanged(Control sender)
     {
+        ShowActiveDesign();
         UpdateTitle();
         var now = Current;
         if (now != null)
@@ -2630,7 +2644,8 @@ public class Shell : Form
         var surface = new DesignSurface(tab.Page);
         surface.Dock = DockStyle.Fill;
         surface.Visible = false;
-        surface.Changed += () => this.WriteDesignBack(tab);
+        surface.Changed += () => this.OnDesignChanged(tab);
+        surface.SelectionChanged += () => this.ShowActiveDesign();
         surface.KeyNotHandled += this.OnEditorKey;
         tab.Designer = surface;
         ShowDesigner(tab);
@@ -2657,6 +2672,7 @@ public class Shell : Form
         tab.Editor.Visible = false;
         surface.Visible = true;
         surface.FocusSurface();
+        _grid.ShowSurface(surface);
         if (unknown.Count > 0u)
             ShowStatus("Not shown, being of a type the designer cannot make: "
                        + ", ".Join(unknown.ToArray()));
@@ -2672,6 +2688,7 @@ public class Shell : Form
             ((DesignSurface)chosen).Visible = false;
         tab.Editor.Visible = true;
         tab.Editor.Focus();
+        _grid.ShowSurface(null);
     }
 
     void OnToggleDesigner(MenuItem sender) => ToggleDesigner();
@@ -2693,6 +2710,181 @@ public class Shell : Form
             ShowFormText(tab);
         else
             ShowDesigner(tab);
+    }
+
+    /// The designer of the tab in front, when it is showing, or null.
+    DesignSurface? FindActiveDesign()
+    {
+        int at = _tabs.SelectedIndex;
+        if (at < 0 || (nuint)at >= _openTabs.Count)
+            return null;
+        var tab = _openTabs[(nuint)at];
+        if (!tab.IsDesigning)
+            return null;
+        return tab.Designer;
+    }
+
+    void ShowActiveDesign() => _grid.ShowSurface(FindActiveDesign());
+
+    void OnDesignChanged(EditorTab tab)
+    {
+        WriteDesignBack(tab);
+        _toolbox.ClearChoice();
+        ShowActiveDesign();
+    }
+
+    void OnToolChosen(String typeName)
+    {
+        var surface = FindActiveDesign();
+        if (surface == null)
+        {
+            _toolbox.ClearChoice();
+            ShowStatus("Open a form file to put a " + typeName + " on it.");
+            return;
+        }
+        ((DesignSurface)surface).PendingType = typeName;
+        ShowStatus("Click on the form to put a " + typeName + " there.");
+    }
+
+    /// Makes sure the form's own half has a method of that name, writing an
+    /// empty one into its class if not, and shows it.
+    ///
+    /// The form's half is the `.sl` beside the `.slfm`, as the designer
+    /// writes it; a form whose class is somewhere else is told so.
+    void WriteHandlerStub(String method, String handlerType)
+    {
+        int at = _tabs.SelectedIndex;
+        if (at < 0 || (nuint)at >= _openTabs.Count)
+            return;
+        var formTab = _openTabs[(nuint)at];
+        var surface = formTab.Designer;
+        if (surface == null)
+            return;
+        String className = ((DesignSurface)surface).Document.Form.Name;
+        String location = formTab.Editor.Contents.Location;
+        String source = Path.ChangeExtension(location, ".sl");
+        if (location == "" || !File.Exists(source))
+        {
+            ShowStatus("Wired to " + method + "; write it in the form's class, which is not in "
+                       + (location == "" ? "an unsaved form's directory" : source) + ".");
+            return;
+        }
+
+        if (!OpenFile(source))
+            return;
+        var editor = Editor;
+        String text = editor.Contents.GetText();
+        long found = text.IndexOf(" " + method + "(");
+        if (found >= 0)
+        {
+            MoveCaretToOffset(editor, (nuint)found);
+            ShowStatus(method + " is already written.");
+            return;
+        }
+
+        long closing = FindClassEnd(text, className);
+        if (closing < 0)
+        {
+            ShowStatus("Wired to " + method + "; no class " + className + " was found in " + source + ".");
+            return;
+        }
+
+        nuint row = MoveCaretToOffset(editor, (nuint)closing);
+        editor.MoveCaretTo(row, 0u);
+        editor.TypeText(Newline + "    private void " + method + "(" + DescribeHandlerParameters(handlerType)
+                        + ")" + Newline + "    {" + Newline + "    }" + Newline);
+        editor.MoveCaretTo(row + 2u, 5u);
+        ShowStatus("Wrote " + method + " into " + GetDisplayName(source) + ".");
+    }
+
+    /// Forms' delegates take their sender and, for `XEventHandler`, an
+    /// `XEventArgs`: the parameters follow from the name.
+    static String DescribeHandlerParameters(String handlerType)
+    {
+        String name = handlerType;
+        long dot = name.LastIndexOf(".");
+        if (dot >= 0)
+            name = name.Substring((nuint)dot + 1u);
+        if (name == "EventHandler" || !name.EndsWith("EventHandler"))
+            return "Control sender";
+        String stem = name.Substring(0u, name.ByteLength() - "Handler".ByteLength());
+        return "Control sender, " + stem + "Args args";
+    }
+
+    /// Where the `}` that ends a class's first declaration is, or -1. Braces
+    /// in strings, characters and comments are skipped.
+    static long FindClassEnd(String text, String className)
+    {
+        long start = -1;
+        nuint from = 0u;
+        while (true)
+        {
+            long at = text.IndexOf("class " + className, from);
+            if (at < 0)
+                return -1;
+            nuint after = (nuint)at + ("class " + className).ByteLength();
+            byte next = after < text.ByteLength() ? text.GetByteAt(after) : (byte)' ';
+            bool whole = !((next >= (byte)'a' && next <= (byte)'z') || (next >= (byte)'A' && next <= (byte)'Z')
+                           || (next >= (byte)'0' && next <= (byte)'9') || next == (byte)'_');
+            if (whole)
+            {
+                start = (long)after;
+                break;
+            }
+            from = after;
+        }
+
+        int depth = 0;
+        nuint size = text.ByteLength();
+        for (nuint i = (nuint)start; i < size; i++)
+        {
+            byte c = text.GetByteAt(i);
+            if (c == (byte)'/' && i + 1u < size && text.GetByteAt(i + 1u) == (byte)'/')
+            {
+                while (i < size && text.GetByteAt(i) != (byte)'\n')
+                    i++;
+                continue;
+            }
+            if (c == (byte)'"' || c == (byte)'\'')
+            {
+                byte quote = c;
+                i++;
+                while (i < size && text.GetByteAt(i) != quote)
+                {
+                    if (text.GetByteAt(i) == (byte)'\\')
+                        i++;
+                    i++;
+                }
+                continue;
+            }
+            if (c == (byte)'{')
+                depth++;
+            if (c == (byte)'}')
+            {
+                depth--;
+                if (depth == 0)
+                    return (long)i;
+            }
+        }
+        return -1;
+    }
+
+    /// Puts an editor's caret at a byte offset into its text, and answers
+    /// the row that is on.
+    static nuint MoveCaretToOffset(CodeEditor editor, nuint offset)
+    {
+        nuint row = 0u;
+        nuint remaining = offset;
+        var contents = editor.Contents;
+        String separator = contents.Endings == LineEnding.CrLf ? "\r\n" : "\n";
+        while (row + 1u < contents.LineCount
+               && remaining > contents.GetLineLength(row))
+        {
+            remaining -= contents.GetLineLength(row) + separator.ByteLength();
+            row++;
+        }
+        editor.MoveCaretTo(row, remaining);
+        return row;
     }
 
     /// The designer's document, written into the tab's text as one edit.
@@ -4278,10 +4470,10 @@ public class Shell : Form
         // it landed on the edge the layout asked for, and that closing and
         // reopening one is the same object rather than a new empty tree.
         {
-            // Three from Phase 1 and six the debugger added.
-            if (_dock.PaneCount != 9u)
+            // Three from Phase 1, six the debugger added and two the designer.
+            if (_dock.PaneCount != 11u)
             {
-                Console.WriteLine("FAIL: expected nine panes, found "
+                Console.WriteLine("FAIL: expected eleven panes, found "
                                   + Standard.Text.FromInteger(_dock.PaneCount));
                 ok = false;
             }
@@ -4341,7 +4533,7 @@ public class Shell : Form
 
             // A pane nobody has heard of is not held, which is what makes
             // `ShowPane` safe to call from a menu that outlives a pane.
-            if (_dock.HasPane("toolbox") || _dock.ShowPane("toolbox"))
+            if (_dock.HasPane("nonesuch") || _dock.ShowPane("nonesuch"))
             {
                 Console.WriteLine("FAIL: a pane that does not exist was found");
                 ok = false;
@@ -4785,12 +4977,117 @@ public class Shell : Form
         }
 
         ok = TestDesigner() && ok;
+        ok = TestToolboxAndGrid() && ok;
 
         if (ok)
         {
             Console.WriteLine("  editing, undo, word selection, lexing, the clipboard,");
             Console.WriteLine("  text size, tabs, the project, the docked panes and the designer");
         }
+        return ok;
+    }
+
+    /// The Toolbox and the Properties grid against a designer, through the
+    /// same calls a click and a keystroke make.
+    bool TestToolboxAndGrid()
+    {
+        bool ok = true;
+        var pad = AddTab(new Document());
+        pad.Editor.Contents.Location = "selftest-grid.slfm";
+        pad.Editor.TypeText("module Test;" + Newline + Newline
+            + "form Probe : Form" + Newline + "{" + Newline
+            + "    Bounds = 0, 0, 320, 240;" + Newline + Newline
+            + "    Button _ok" + Newline + "    {" + Newline
+            + "        Text = \"OK\";" + Newline
+            + "        Bounds = 8, 8, 80, 24;" + Newline + "    }" + Newline + "}" + Newline);
+        AttachDesigner(pad);
+        var surface = (DesignSurface)pad.Designer;
+
+        _toolbox.ChooseType("CheckBox");
+        if (surface.PendingType != "CheckBox")
+        {
+            Console.WriteLine("FAIL: choosing from the Toolbox did not arm the designer");
+            ok = false;
+        }
+        surface.PlaceComponent(surface.PendingType, Point.FromXY(20, 60));
+        surface.PendingType = "";
+        String text = pad.Editor.Contents.GetText();
+        if (!text.Contains("CheckBox _checkBox1") || !text.Contains("Bounds = 24, 64, 104, 24;")
+            || surface.FindLiveControl("_checkBox1") == null)
+        {
+            Console.WriteLine("FAIL: a Toolbox control was not placed, named and snapped");
+            ok = false;
+        }
+
+        surface.SelectComponent("_ok");
+        if (_grid.RowCount < 10u || _grid.ReadPropertyValue("Text") != "OK")
+        {
+            Console.WriteLine("FAIL: the grid did not show the button's properties through reflection");
+            ok = false;
+        }
+
+        _grid.SelectProperty("Text");
+        _grid.ApplyText("Changed");
+        var live = surface.FindLiveControl("_ok");
+        if (!pad.Editor.Contents.GetText().Contains("Text = \"Changed\";")
+            || live == null || ((WindowedControl)live).Text != "Changed")
+        {
+            Console.WriteLine("FAIL: setting Text in the grid reached neither the file nor the control");
+            ok = false;
+        }
+
+        _grid.SelectProperty("Anchors");
+        _grid.SelectProperty("Dock");
+        _grid.ApplyText("Top");
+        if (!pad.Editor.Contents.GetText().Contains("Dock = DockStyle.Top;"))
+        {
+            Console.WriteLine("FAIL: an enum set in the grid was not written as its member");
+            ok = false;
+        }
+
+        _grid.SelectProperty("Dock");
+        _grid.ApplyText("None");
+        _grid.SelectProperty("Width");
+        _grid.ApplyText("120");
+        if (!pad.Editor.Contents.GetText().Contains(", 120, 24;"))
+        {
+            Console.WriteLine("FAIL: a width set in the grid did not reach Bounds");
+            ok = false;
+        }
+
+        long click = _grid.FindEventIndex("Click");
+        if (click < 0)
+        {
+            Console.WriteLine("FAIL: the grid listed no Click event");
+            ok = false;
+        }
+        else
+        {
+            _grid.WireEventHandler((nuint)click, _grid.CreateHandlerName("Click"));
+            if (!pad.Editor.Contents.GetText().Contains("Click += OnOkClick;"))
+            {
+                Console.WriteLine("FAIL: wiring an event in the grid did not reach the file");
+                ok = false;
+            }
+        }
+
+        if (DescribeHandlerParameters("Forms.MouseEventHandler") != "Control sender, MouseEventArgs args"
+            || DescribeHandlerParameters("Forms.EventHandler") != "Control sender")
+        {
+            Console.WriteLine("FAIL: a handler's parameters did not follow from its delegate");
+            ok = false;
+        }
+
+        String source = "class Other { }" + Newline + "public class Probe" + Newline + "{" + Newline
+            + "    String _s = \"}\"; // }" + Newline + "    void F() { }" + Newline + "}" + Newline;
+        long end = FindClassEnd(source, "Probe");
+        if (end < 0 || source.GetByteAt((nuint)end) != (byte)'}' || (nuint)end + 2u < source.ByteLength() - 2u)
+        {
+            Console.WriteLine("FAIL: the end of a class was not found past braces in strings and comments");
+            ok = false;
+        }
+
+        CloseTab(pad);
         return ok;
     }
 

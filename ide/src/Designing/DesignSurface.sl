@@ -58,6 +58,9 @@ public class DesignSurface : Panel
     /// The grid positions snap to, in pixels.
     public const int GridStep = 8;
 
+    /// How far the pointer moves before a press becomes a drag.
+    const int DragThreshold = 4;
+
     /// The side of a grab handle, in pixels.
     const int HandleSize = 6;
 
@@ -77,6 +80,8 @@ public class DesignSurface : Panel
     private DesignedItem? _selected;
 
     private DesignDrag _drag;
+    /// Whether the pointer has gone far enough for a press to be a drag.
+    private bool _dragStarted;
     /// Which handle a resize is holding, 0 to 7 clockwise from the top left.
     private int _handle;
     private Point _dragFrom;
@@ -88,7 +93,9 @@ public class DesignSurface : Panel
         BackColor = SystemColors.ControlDark;
         _items = new List<DesignedItem>();
         _selected = null;
+        PendingType = "";
         _drag = DesignDrag.None;
+        _dragStarted = false;
         _handle = 0;
         _dragFrom = Point.Empty;
         _boundsAtDrag = Rectangle.Empty;
@@ -112,6 +119,13 @@ public class DesignSurface : Panel
     /// Raised after every change to the document.
     public event DesignChangedHandler Changed;
 
+    /// Raised when a different component is selected, or the form.
+    public event DesignChangedHandler SelectionChanged;
+
+    /// The type the next click on the form places, as the Toolbox names it,
+    /// or empty for a click that selects.
+    public String PendingType;
+
     /// A key the surface has no use for, passed on -- F12, F5 -- as the
     /// editor passes on the ones it has none for.
     public event KeyEventHandler KeyNotHandled;
@@ -129,6 +143,16 @@ public class DesignSurface : Panel
         {
             var chosen = _selected;
             return chosen == null ? null : ((DesignedItem)chosen).Component;
+        }
+    }
+
+    /// The live control of the selected component, or null for the form.
+    public WindowedControl? SelectedLive
+    {
+        get
+        {
+            var chosen = _selected;
+            return chosen == null ? null : ((DesignedItem)chosen).Live;
         }
     }
 
@@ -192,7 +216,9 @@ public class DesignSurface : Panel
         return overlay;
     }
 
-    private void ApplyFormProperties()
+    /// Shows the form's own properties again from the document: its title
+    /// and its size, which are all a surface shows of a form.
+    public void ApplyFormProperties()
     {
         FormComponent form = _document.Form;
         int width = 320;
@@ -232,10 +258,11 @@ public class DesignSurface : Panel
             var live = (WindowedControl)made;
             live.IsDesigning = true;
             live.Paint += this.OnLiveControlPaint;
+            var type = FindDesignedType(child.TypeName);
             for (nuint i = 0u; i < child.Members.Count; i++)
             {
                 if (child.Members[i] is FormProperty property)
-                    ApplyDesignedProperty(live, property);
+                    ApplyDesignedProperty(live, type, property);
             }
             _items.Add(new DesignedItem(child, live));
             CreateDesignedChildren(child, live, unknown);
@@ -358,8 +385,18 @@ public class DesignSurface : Panel
             }
         }
 
+        if (PendingType != "")
+        {
+            PlaceComponent(PendingType, args.Location);
+            PendingType = "";
+            return;
+        }
+
+        var was = _selected;
         _selected = FindItemAt(args.Location);
         _overlay.Invalidate();
+        if (_selected != was)
+            SelectionChanged();
         if (_selected != null)
             BeginDesignDrag(DesignDrag.Moving, 0, args.Location);
     }
@@ -367,6 +404,7 @@ public class DesignSurface : Panel
     private void BeginDesignDrag(DesignDrag kind, int handle, Point from)
     {
         _drag = kind;
+        _dragStarted = false;
         _handle = handle;
         _dragFrom = from;
         _boundsAtDrag = ((DesignedItem)_selected).Live.Bounds;
@@ -381,6 +419,12 @@ public class DesignSurface : Panel
 
         int dx = args.X - _dragFrom.X;
         int dy = args.Y - _dragFrom.Y;
+
+        // A click is not a move: a control off the grid would otherwise snap
+        // to it just for being selected.
+        if (!_dragStarted && Math.Abs(dx) < DragThreshold && Math.Abs(dy) < DragThreshold)
+            return;
+        _dragStarted = true;
         Rectangle was = _boundsAtDrag;
         var live = ((DesignedItem)chosen).Live;
 
@@ -478,6 +522,7 @@ public class DesignSurface : Panel
                 _selected = item;
         }
         _overlay.Invalidate();
+        SelectionChanged();
     }
 
     /// Selects what contains the selection, or the form.
@@ -494,6 +539,7 @@ public class DesignSurface : Panel
                 _selected = item;
         }
         _overlay.Invalidate();
+        SelectionChanged();
     }
 
     /// Removes the selected component, and everything inside it, from the
@@ -520,6 +566,7 @@ public class DesignSurface : Panel
         _selected = null;
         Changed();
         _overlay.Invalidate();
+        SelectionChanged();
     }
 
     private bool IsInside(Control inner, Control outer)
@@ -546,6 +593,138 @@ public class DesignSurface : Panel
                 StoreDesignedBounds(item);
                 return;
             }
+        }
+    }
+
+    // ------------------------------------------------------------ editing
+
+    /// Sets a property of a component in the document. The caller has set it
+    /// on the live control already, or for the form nothing is live and the
+    /// surface applies what it shows of one.
+    public void StoreComponentProperty(FormComponent component, String name, FormValue value)
+    {
+        component.SetProperty(name, value);
+        if (component == _document.Form)
+            ApplyFormProperties();
+        Changed();
+        _overlay.Invalidate();
+    }
+
+    /// Wires an event of a component to a method, or unwires it for an empty
+    /// name.
+    public void StoreComponentHandler(FormComponent component, String eventName, String method)
+    {
+        component.SetHandler(eventName, method);
+        Changed();
+    }
+
+    /// Gives a component a new name, which is its field's. False when the
+    /// name is taken or is not a name.
+    public bool RenameComponent(FormComponent component, String name)
+    {
+        if (name == "" || _document.Form.FindComponent(name) != null || !IsDesignName(name))
+            return false;
+        component.Name = name;
+        Changed();
+        return true;
+    }
+
+    private static bool IsDesignName(String name)
+    {
+        nuint size = name.ByteLength();
+        for (nuint i = 0u; i < size; i++)
+        {
+            byte c = name.GetByteAt(i);
+            bool letter = (c >= (byte)'a' && c <= (byte)'z') || (c >= (byte)'A' && c <= (byte)'Z')
+                          || c == (byte)'_';
+            bool digit = c >= (byte)'0' && c <= (byte)'9';
+            if (!letter && !(digit && i > 0u))
+                return false;
+        }
+        return true;
+    }
+
+    /// A new control of a Toolbox type, where the pointer is: inside the
+    /// container under it, or on the form. Named `_button1` and so on.
+    public void PlaceComponent(String typeName, Point at)
+    {
+        FormComponent parent = _document.Form;
+        int x = at.X;
+        int y = at.Y;
+
+        var under = FindItemAt(at);
+        if (under != null && IsDesignableContainer(((DesignedItem)under).Component.TypeName))
+        {
+            var container = (DesignedItem)under;
+            Rectangle outer = FindClientBounds(container.Live);
+            x = at.X - outer.X - container.Live.ClientOrigin.X;
+            y = at.Y - outer.Y - container.Live.ClientOrigin.Y;
+            parent = container.Component;
+        }
+
+        String name = CreateComponentName(typeName);
+        var made = new FormComponent(typeName, name);
+        made.HasBlankLineBefore = true;
+        if (TakesDesignedText(typeName))
+            made.SetProperty("Text", FormValue.FromText(name.Substring(1u)));
+        Size extent = FindDefaultExtent(typeName);
+        made.SetProperty("Bounds", FormValue.FromRectangle(SnapToGrid(x), SnapToGrid(y),
+                                                            extent.Width, extent.Height));
+        parent.Members.Add(made);
+
+        LoadDocument(_document);
+        SelectComponent(name);
+        Changed();
+    }
+
+    /// `_button1`, `_button2`: the type's name, lowered, and the first number
+    /// no component has yet.
+    private String CreateComponentName(String typeName)
+    {
+        String stem = "_" + typeName.Substring(0u, 1u).ToLowerAscii() + typeName.Substring(1u);
+        for (int n = 1; ; n++)
+        {
+            String candidate = stem + Standard.Text.FromInteger(n);
+            if (_document.Form.FindComponent(candidate) == null)
+                return candidate;
+        }
+    }
+
+    private static bool TakesDesignedText(String typeName)
+    {
+        switch (typeName)
+        {
+            case "Button":
+            case "Label":
+            case "CheckBox":
+            case "RadioButton":
+            case "ToggleButton":
+            case "GroupBox":
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    /// The size a new control is made at, in whole grid steps.
+    private static Size FindDefaultExtent(String typeName)
+    {
+        switch (typeName)
+        {
+            case "Label": return Size.FromDimensions(80, 16);
+            case "TextBox":
+            case "ComboBox": return Size.FromDimensions(120, 24);
+            case "CheckBox":
+            case "RadioButton": return Size.FromDimensions(104, 24);
+            case "ListBox":
+            case "CheckListBox": return Size.FromDimensions(120, 96);
+            case "ProgressBar": return Size.FromDimensions(160, 24);
+            case "TrackBar": return Size.FromDimensions(160, 32);
+            case "TreeView":
+            case "ListView": return Size.FromDimensions(160, 120);
+            case "Panel":
+            case "GroupBox": return Size.FromDimensions(160, 96);
+            default: return Size.FromDimensions(80, 24);
         }
     }
 

@@ -219,17 +219,16 @@ public class DockLayout
     /// one. What is deliberately different is that nothing floats -- see
     /// `DockHost.sl` for why that is a decision and not an omission.
     ///
-    /// **Only panes that exist.** `Panes.Properties` is named here in the
-    /// constant list and deliberately not placed: the pane is not built yet,
-    /// and a default layout describing one the window never makes would put a
-    /// line in everyone's settings file for something they cannot see. When
-    /// the pane arrives it is placed by `DockHost.AddPane`'s fallback, which is
-    /// the same path that handles a settings file written before any later
-    /// pane existed.
+    /// **Only the panes a first run shows.** The debugger's panes are placed
+    /// by `DockHost.AddPane`'s fallback when the window makes them, which is
+    /// the same path that handles a settings file written before a pane
+    /// existed.
     public static DockLayout CreateDefault()
     {
         var layout = new DockLayout();
         layout.PlacePane(Panes.Solution, DockEdge.Left, true);
+        layout.PlacePane(Panes.Toolbox, DockEdge.Left, true);
+        layout.PlacePane(Panes.Properties, DockEdge.Right, true);
         layout.PlacePane(Panes.Errors, DockEdge.Bottom, true);
         layout.PlacePane(Panes.Output, DockEdge.Bottom, true);
         return layout;
@@ -246,6 +245,7 @@ public static class Panes
 {
     public static readonly String Solution = "solution";
     public static readonly String Properties = "properties";
+    public static readonly String Toolbox = "toolbox";
     public static readonly String Errors = "errors";
     public static readonly String Output = "output";
 

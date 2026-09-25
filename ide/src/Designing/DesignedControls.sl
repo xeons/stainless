@@ -16,14 +16,14 @@
 
 // The controls a form file names, made for real so the designer can show them.
 //
-// A type is made by name through a table, because reflection cannot make an
-// instance of a `Type`. Properties are applied from a short list until the
-// Properties grid reads them through reflection; one that is not on it is kept
-// in the file and simply not shown.
+// A type is made by name through a table: reflection can allocate an instance
+// of a `Type` but not run a constructor that takes a parent. Properties are
+// applied through reflection, each by its own setter.
 module Ide.Designing;
 
 import Standard.Collections;
 import Standard.Convert;
+import Standard.Reflection;
 import Standard.Text;
 import Forms;
 import Ide.Designer;
@@ -64,44 +64,88 @@ public WindowedControl? CreateDesignedControl(String typeName, WindowedControl p
     }
 }
 
-/// Applies what the designer knows how to show, and answers whether it did.
-public bool ApplyDesignedProperty(Control control, FormProperty property)
+/// The Forms type a component's type name means: `Button` is `Forms.Button`.
+/// It exists only in a build that reflects Forms, which the IDE's is.
+public Type FindDesignedType(String typeName) =>
+    FindType(typeName.Contains(".") ? typeName : "Forms." + typeName);
+
+/// Applies a property from the file to its live control through the
+/// property's own setter, and answers whether it could.
+///
+/// `Bounds` is several values and goes to `SetBounds`. `Visible` is not
+/// applied: a hidden control stays in the designer, which is where a person
+/// would otherwise lose it, and the file is what says it is hidden.
+public bool ApplyDesignedProperty(WindowedControl control, Type type, FormProperty property)
 {
     var items = property.Value.Items;
-    switch (property.Name)
+    if (property.Name == "Bounds")
     {
-        case "Text":
-            control.Text = UnquoteFormText(items[0u]);
-            return true;
-
-        case "Bounds":
-        {
-            if (items.Count != 4u)
-                return false;
-            control.SetBounds(ReadDesignedInteger(items[0u]), ReadDesignedInteger(items[1u]),
-                              ReadDesignedInteger(items[2u]), ReadDesignedInteger(items[3u]));
-            return true;
-        }
-
-        case "Width":
-            control.Width = ReadDesignedInteger(items[0u]);
-            return true;
-
-        case "Height":
-            control.Height = ReadDesignedInteger(items[0u]);
-            return true;
-
-        case "Enabled":
-            control.Enabled = items[0u] == "true";
-            return true;
-
-        case "Dock":
-            control.Dock = ReadDesignedDock(items[0u]);
-            return true;
-
-        default:
+        if (items.Count != 4u)
             return false;
+        control.SetBounds(ReadDesignedInteger(items[0u]), ReadDesignedInteger(items[1u]),
+                          ReadDesignedInteger(items[2u]), ReadDesignedInteger(items[3u]));
+        return true;
     }
+    if (property.Name == "Visible" || items.Count != 1u || !type.Exists)
+        return false;
+
+    var target = type.FindProperty(property.Name);
+    if (!target.Exists || !target.IsPublic || !target.CanWrite)
+        return false;
+
+    byte* raw = (byte*)control;
+    String item = items[0u];
+    Type enumeration = target.PropertyType;
+    if (enumeration.Exists && enumeration.IsEnum)
+    {
+        SetInteger(raw, target, ReadDesignedEnum(enumeration, item));
+        return true;
+    }
+
+    int kind = target.Kind;
+    if (kind == KindString)
+    {
+        SetText(raw, target, UnquoteFormText(item));
+        return true;
+    }
+    if (kind == KindBool)
+    {
+        SetBool(raw, target, item == "true");
+        return true;
+    }
+    if (target.IsInteger)
+    {
+        SetInteger(raw, target, (long)ReadDesignedInteger(item));
+        return true;
+    }
+    if (target.IsFloating)
+    {
+        var read = Convert.ToDouble(item);
+        if (read.Ok)
+            SetDouble(raw, target, read.Value);
+        return read.Ok;
+    }
+    return false;
+}
+
+/// An enum item as the file writes it -- `DockStyle.Fill`, or several joined
+/// by `|` for flags -- as the value its members add up to.
+long ReadDesignedEnum(Type enumeration, String item)
+{
+    long value = 0;
+    foreach (var part in item.Split("|"))
+    {
+        String name = part.Trim();
+        long dot = name.LastIndexOf(".");
+        if (dot >= 0)
+            name = name.Substring((nuint)dot + 1u);
+        for (nuint i = 0u; i < enumeration.EnumMemberCount; i++)
+        {
+            if (enumeration.GetEnumMemberName(i) == name)
+                value = value | enumeration.GetEnumMemberValue(i);
+        }
+    }
+    return value;
 }
 
 /// An item as an integer, and zero for one that is not.
@@ -109,17 +153,4 @@ public int ReadDesignedInteger(String item)
 {
     var read = Convert.ToInt(item);
     return read.Ok ? read.Value : 0;
-}
-
-DockStyle ReadDesignedDock(String item)
-{
-    switch (item)
-    {
-        case "DockStyle.Top": return DockStyle.Top;
-        case "DockStyle.Bottom": return DockStyle.Bottom;
-        case "DockStyle.Left": return DockStyle.Left;
-        case "DockStyle.Right": return DockStyle.Right;
-        case "DockStyle.Fill": return DockStyle.Fill;
-        default: return DockStyle.None;
-    }
 }

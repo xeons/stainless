@@ -188,6 +188,20 @@ were fixed — the IDE is what found every one of them.
   that builds them — [docs/slfm.md](../docs/slfm.md) is the format. The reader
   keeps comments and order, so the designer and a text editor can take turns
   on one file.
+- **A Toolbox and a Properties grid.** Pick a control in the Toolbox and
+  click on the form to place one, inside a `Panel` or `GroupBox` if that is
+  what was clicked. The grid shows the selected control's properties — or the
+  form's title and size — and sets them on the live control and in the file
+  as they are changed; an enum is a list of its members and a `[Flags]` enum
+  a box per member. Its Events tab names the handler for each event, and
+  double-clicking one wires it to `OnGreetClick` and writes the empty method
+  into the form's own half, opening it there.
+
+  **Driven by reflection.** The IDE builds Forms with `FORMS_REFLECT`, which
+  marks each control class `[Reflect]`: its properties are found by name and
+  set through their setters, which is what lays a control out again, and its
+  events and enums are described by the same tables. A program that links
+  Forms without the define carries none of it.
 - **A form designer.** Opening a `.slfm` shows the form: its real controls,
   made by the program as they will be at run time, under a transparent
   overlay that takes the pointer. Click to select, drag to move, drag a handle
@@ -253,16 +267,13 @@ Named honestly, since the point of the page is to say where the edges are.
   belongs to the parent it was constructed with and `forms/` cannot move it, so
   putting a pane back on an edge it was not built on is the one thing that
   cannot happen live.
-- **The designer has no Toolbox and no Properties grid.** A control is added
-  by writing it in the text; the designer shows, moves, sizes and deletes it.
-  What it shows of a control is `Text`, `Bounds`, `Width`, `Height`, `Dock`
-  and `Enabled`; anything else is kept in the file and not previewed, until a
-  grid reads properties through reflection. There is one selection, not
-  several, and no rubber band.
-- **No Properties *pane*.** Project properties are a dialog, which is the right
-  shape for editing a file; a docked property grid over a selected control is a
-  designer feature and waits for one. The name is reserved in the layout file
-  and the right-hand well is built and empty until then.
+- **The Properties grid edits what reflection can set**: text, true or false,
+  numbers, and enums, with `[Flags]` ones as a box per member. A colour, a
+  font, a picture and a list's items are none of those and are written in
+  the text. There is one selection, not several, and no rubber band.
+- **A handler is written into the `.sl` beside the `.slfm`**, into the first
+  declaration of the form's class there. A form whose class lives elsewhere
+  gets its `+=` and a status line saying where to write the method.
 - **`sources`, `defines` and `libraries` are edited as one space-separated
   line each.** Short lists of short words, where a text field shows the whole of
   it at once and three buttons round a list box does not — but a path with a
@@ -306,6 +317,8 @@ ide/src/Designer/FormDocument.sl  .slfm, read and written, comments and all
 ide/src/Designer/FormGenerator.sl .slfm into the generated .designer.sl
 ide/src/Designing/DesignedControls.sl a form file's controls, made for real
 ide/src/Designing/DesignSurface.sl    the designer: live controls, and the overlay
+ide/src/Designing/Toolbox.sl          the control types, picked and placed
+ide/src/Designing/PropertyGrid.sl     properties and events, through reflection
 ide/slforms/                the generator on its own, for a build with no IDE
 ide/src/Main.sl             the command line
 ide/tests/lextest.sl        the scanner, on lines that are awkward on purpose

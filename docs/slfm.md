@@ -192,5 +192,6 @@ with `partial`, and Stainless now allows it for a class.
   be written yet.
 - **Items.** A `ListBox`'s rows, a `MenuItem`'s children and a `ToolBar`'s
   buttons are made by calling methods, not by setting properties.
-- **The designer surface itself.** The IDE reads and writes these files; it
-  does not yet draw one — see [ide/README.md](../ide/README.md).
+- **A colour, a font or a picture as a value.** The grid sets what reflection
+  can — text, numbers, true or false, enums — and a struct or an object is
+  not one of those yet.
