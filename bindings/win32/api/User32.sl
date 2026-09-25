@@ -233,6 +233,7 @@ public extern "C"
     int  GetWindowTextLengthW(HWND window);
 
     int  InvalidateRect(HWND window, Rect* rectangle, int erase);
+    int  RedrawWindow(HWND window, Rect* rectangle, void* region, uint flags);
     int  ValidateRect(HWND window, Rect* rectangle);
 }
 
@@ -296,6 +297,11 @@ public const int UseDefault = -2147483648;
 /// above the ones it overlaps asks for.
 public const nint HwndTop    = 0;
 public const nint HwndBottom = 1;
+
+/// `RedrawWindow`'s flags.
+public const uint RdwInvalidate  = 0x0001u;
+public const uint RdwErase       = 0x0004u;
+public const uint RdwAllChildren = 0x0080u;
 
 public const uint SwpNoSize       = 0x0001u;
 public const uint SwpNoMove       = 0x0002u;

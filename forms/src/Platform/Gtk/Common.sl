@@ -1310,6 +1310,13 @@ public class GtkPeer : IControlPeer
             g_object_unref(cursor);
     }
 
+    /// Nothing yet. A designer's overlay has its own window above the
+    /// control, so the pointer is never over the control's, and GTK draws
+    /// the overlay after it in the same frame.
+    public void SetDesigning(bool designing)
+    {
+    }
+
     public void SetCapture(bool captured)
     {
         _captured = captured;

@@ -809,14 +809,8 @@ public class GroupPeer : ControlPeer, IGroupPeer
 
 // =================================================================== panel
 
-/// A plain container, which Windows has no class for.
-///
-/// **`STATIC` with no text**, rather than a class of this library's own. A
-/// registered class would want a window procedure, a background brush and a
-/// name that could collide; a static control is already a window that does
-/// nothing, takes children, and paints its background in the colour
-/// `WM_CTLCOLORSTATIC` says -- which is exactly the whole specification of a
-/// panel.
+/// A plain container, which Windows has no class for, so this library
+/// registers one; `EnsurePanelClass` says why a `STATIC` would not do.
 public class PanelPeer : ControlPeer, IPanelPeer
 {
     /// A window of this library's own class rather than a system control, for
@@ -1215,6 +1209,34 @@ public class CustomPeer : ControlPeer, ICustomPeer
 
         return base.WndProc(message, wParam, lParam);
     }
+
+    /// A transparent one repaints what is under it too: whatever it drew last
+    /// time is on its siblings' pixels, and only they can paint it out. The
+    /// queue paints them first and this last, which is what
+    /// `WS_EX_TRANSPARENT` asks of it.
+    public override void Invalidate()
+    {
+        if (!_transparent)
+        {
+            base.Invalidate();
+            return;
+        }
+
+        HWND parent = GetParent(Window);
+        Rect area;
+        GetWindowRect(Window, &area);
+        Win32.User32.Point corner;
+        corner.X = area.Left;
+        corner.Y = area.Top;
+        ScreenToClient(parent, &corner);
+        area.Right = corner.X + (area.Right - area.Left);
+        area.Bottom = corner.Y + (area.Bottom - area.Top);
+        area.Left = corner.X;
+        area.Top = corner.Y;
+        RedrawWindow(parent, &area, null, RdwInvalidate | RdwErase | RdwAllChildren);
+    }
+
+    public void RedrawOver() => InvalidateRect(Window, null, 0);
 
     /// Paints on the window itself, over whatever the siblings beneath left.
     long PaintDirectly()

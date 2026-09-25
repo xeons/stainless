@@ -2184,6 +2184,8 @@ public class GtkCustomPeer : GtkContainerPeer, ICustomPeer
     {
     }
 
+    public void RedrawOver() => gtk_widget_queue_draw(Content);
+
     public void SetFocusable(bool wanted)
     {
         _focusable = wanted;

@@ -292,6 +292,12 @@ public class CustomControl : WindowedControl
         }
     }
 
+    /// Paints it again over the controls beneath, leaving them as they are.
+    ///
+    /// For a transparent one after one of those has painted itself, which
+    /// `Invalidate` would answer by painting them all again.
+    public void RedrawOver() => _native.RedrawOver();
+
     /// Where the insertion point is and how big, in this control's own
     /// coordinates. `Rectangle.Empty` -- the default -- for a control with no
     /// caret at all.

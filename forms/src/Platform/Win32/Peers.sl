@@ -321,6 +321,8 @@ public class ControlPeer : IControlPeer
     /// The first half of a surrogate pair `WM_CHAR` delivered, or zero.
     protected uint HighSurrogate;
     protected bool IsDestroyed;
+    /// See `SetDesigning`.
+    protected bool IsDesigning;
     /// The cursor this control asks for, and which shape it is. Null means the
     /// class cursor, which is what `Default` leaves in place.
     protected HCURSOR CursorHandle;
@@ -350,6 +352,7 @@ public class ControlPeer : IControlPeer
         IsInside = false;
         HighSurrogate = 0u;
         IsDestroyed = false;
+        IsDesigning = false;
         CursorHandle = null;
         CursorShape = CursorKind.Default;
         ToolTipWindow = null;
@@ -441,6 +444,14 @@ public class ControlPeer : IControlPeer
             return DefWndProc(message, wParam, lParam);
         }
 
+        // Lazarus routes a designed control's input to the designer before the
+        // control sees it (`TDesigner.IsDesignMsg`); here the overlay has it
+        // already, so what reaches the control is dropped.
+        if (IsDesigning && IsPointerMessage(message))
+            return 0;
+        if (IsDesigning && IsSubclassed && message == WmPaint)
+            return PaintOverInherited(message, wParam, lParam);
+
         // A child scroll bar or slider reports to its *parent*, so every peer
         // MUST route it: that parent is a form, a panel, or a custom control
         // drawing its own content beside bars of its own.
@@ -471,19 +482,6 @@ public class ControlPeer : IControlPeer
             return DefWndProc(message, wParam, lParam);
         var control = (IControlNotify)owner;
 
-        // **Erase, rather than claiming to have.** A window of a class this
-        // library registered has a null background brush, so if nothing fills
-        // the client area nothing ever does: the window shows whatever memory
-        // held, and every region a moved control vacates keeps the old picture.
-        // Both were one bug.
-        //
-        // Only for our own classes. A subclassed system control is erased by
-        // the procedure it displaced, using the brush its parent hands back
-        // from `WM_CTLCOLOR*` -- filling over that would cost every `EDIT` and
-        // `LISTBOX` its native appearance.
-        //
-        // The form carries `WS_CLIPCHILDREN`, so this paints only the parts no
-        // child covers, which is what keeps a resize from flickering.
         // **A transparent child's erase is always ours to answer**, whatever
         // this peer does about its own. A `TBSTYLE_FLAT` toolbar draws no
         // background of its own: it offsets its DC into the parent's
@@ -973,7 +971,7 @@ public class ControlPeer : IControlPeer
         Invalidate();
     }
 
-    public void Invalidate() => InvalidateRect(Window, null, 1);
+    public virtual void Invalidate() => InvalidateRect(Window, null, 1);
     public void Update() => UpdateWindow(Window);
 
     public void Focus() => SetFocus(Window);
@@ -1089,6 +1087,17 @@ public class ControlPeer : IControlPeer
         info.Reserved = null;
         return info;
     }
+
+    public void SetDesigning(bool designing)
+    {
+        IsDesigning = designing;
+        InvalidateRect(Window, null, 1);
+    }
+
+    /// The pointer's messages, and the hover and leave that follow from them.
+    static bool IsPointerMessage(uint message) =>
+        (message >= WmMouseMove && message <= 0x020Eu) || message == 0x02A1u
+        || message == WmMouseLeave;
 
     public void SetCapture(bool captured)
     {

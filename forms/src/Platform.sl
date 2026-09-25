@@ -336,6 +336,12 @@ public interface IControlPeer
     /// else does.
     void SetCapture(bool captured);
 
+    /// Whether the control is being designed: shown as it will look, and
+    /// given none of the pointer, so it never turns hot or pressed under a
+    /// designer's overlay. After it paints it reports the paint, so what the
+    /// designer draws over it can be drawn again. Lazarus's `csDesigning`.
+    void SetDesigning(bool designing);
+
     /// Puts the control in front of its siblings, so that one overlapping
     /// another covers it rather than being covered.
     ///
@@ -603,6 +609,9 @@ public interface ICustomPeer : IContainerPeer
     /// Whether the siblings under it show through wherever it does not draw.
     /// It still takes the pointer and the keys over its whole area.
     void SetTransparent(bool transparent);
+
+    /// Paints it again over what is beneath, without asking that to paint.
+    void RedrawOver();
 
     /// Where the insertion point is and how big, or an empty rectangle for a
     /// control that has none.
