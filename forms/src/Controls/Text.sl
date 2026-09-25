@@ -32,6 +32,9 @@ module Forms;
 import Standard.Collections;
 import Forms.Drawing;
 import Forms.Platform;
+#if FORMS_REFLECT
+import Standard.Reflection;
+#endif
 
 // ===================================================================== label
 
@@ -43,6 +46,9 @@ import Forms.Platform;
 /// gets the theme's font smoothing, its ellipsis behaviour and its right-to-left
 /// handling for nothing, and a painted one gets none of those until each is
 /// written. `GraphicControl` is there for when the count matters.
+#if FORMS_REFLECT
+[Reflect]
+#endif
 public class Label : WindowedControl
 {
     ILabelPeer _native;
@@ -221,6 +227,9 @@ public abstract class TextBoxBase : WindowedControl
 /// name.Text = "Ada";
 /// name.UserTextChanged += this.OnNameEdited;
 /// ```
+#if FORMS_REFLECT
+[Reflect]
+#endif
 public class TextBox : TextBoxBase
 {
     ITextEntryPeer _native;

@@ -33,6 +33,9 @@ module Forms;
 import Standard.Collections;
 import Forms.Drawing;
 import Forms.Platform;
+#if FORMS_REFLECT
+import Standard.Reflection;
+#endif
 
 // ================================================================ image list
 
@@ -481,6 +484,9 @@ int ClampToRange(int value, int low, int high)
 }
 
 /// How far along something is.
+#if FORMS_REFLECT
+[Reflect]
+#endif
 public class ProgressBar : WindowedControl
 {
     IProgressPeer _native;
@@ -556,6 +562,9 @@ public class ProgressBar : WindowedControl
 // ================================================================ track bar
 
 /// A slider.
+#if FORMS_REFLECT
+[Reflect]
+#endif
 public class TrackBar : WindowedControl
 {
     ITrackBarPeer _native;
@@ -919,6 +928,9 @@ public class TreeNode
 }
 
 /// A tree of nodes that open and close.
+#if FORMS_REFLECT
+[Reflect]
+#endif
 public class TreeView : WindowedControl
 {
     ITreeViewPeer _native;
@@ -1051,6 +1063,9 @@ public class TreeView : WindowedControl
 /// thousand objects before any text. Here a row is an index and its cells are
 /// set through the list, which is what the platform stores anyway -- and what
 /// C#'s virtual mode exists to get back to.
+#if FORMS_REFLECT
+[Reflect]
+#endif
 public class ListView : WindowedControl
 {
     IListViewPeer _native;

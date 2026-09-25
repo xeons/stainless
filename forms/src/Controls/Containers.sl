@@ -31,6 +31,9 @@ module Forms;
 import Standard.Collections;
 import Forms.Drawing;
 import Forms.Platform;
+#if FORMS_REFLECT
+import Standard.Reflection;
+#endif
 
 // ==================================================================== panel
 
@@ -41,6 +44,9 @@ import Forms.Platform;
 /// strip.Dock = DockStyle.Top;
 /// strip.Height = 32;
 /// ```
+#if FORMS_REFLECT
+[Reflect]
+#endif
 public class Panel : WindowedControl
 {
     IPanelPeer _native;
@@ -74,6 +80,9 @@ public class Panel : WindowedControl
 /// Its client area is inset by the frame and the caption, which the platform
 /// works out -- so a control docked to the top of a group box lands under the
 /// caption rather than through it.
+#if FORMS_REFLECT
+[Reflect]
+#endif
 public class GroupBox : WindowedControl
 {
     IGroupPeer _native;

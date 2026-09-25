@@ -36,6 +36,9 @@ module Forms;
 import Standard.Collections;
 import Forms.Drawing;
 import Forms.Platform;
+#if FORMS_REFLECT
+import Standard.Reflection;
+#endif
 
 // ============================================================== radio group
 
@@ -605,6 +608,9 @@ public class Image : GraphicControl
 /// up-down, which is a pair of arrows that drives a *buddy* window, so a spin
 /// edit is an `EDIT` with one docked inside its right-hand edge. The pair moves
 /// and hides together, which is the whole of the illusion.
+#if FORMS_REFLECT
+[Reflect]
+#endif
 public class SpinEdit : WindowedControl
 {
     ISpinPeer _native;
@@ -678,6 +684,9 @@ public class SpinEdit : WindowedControl
 /// The one control here that is a different widget from the one its name
 /// suggests: a report-mode list view with check boxes, because Windows has no
 /// checked list box and that is what every program that shows one uses.
+#if FORMS_REFLECT
+[Reflect]
+#endif
 public class CheckListBox : ListControl
 {
     ICheckListPeer _native;

@@ -294,6 +294,12 @@ than consuming it, and `Application` remembers the quit either way.
 did**, and `ShowModal` never called it — so a dialog, the one window where that
 matters most, had none of it.
 
+**`FORMS_REFLECT` marks the controls `[Reflect]`.** A form designer finds a
+control's properties by name, sets them through their setters and lists its
+events, and the IDE is built with the define for that. Every other program
+leaves it undefined and carries no tables: the attribute sits inside
+`#if FORMS_REFLECT`, and a branch not taken is never lexed.
+
 **The control made last is in front, on both backends**, which is the LCL's
 order and GTK's. Windows puts a new child window at the bottom, so every
 Win32 peer is raised as it is made. Windows also reads Tab and the arrow keys'

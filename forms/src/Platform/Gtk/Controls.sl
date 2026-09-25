@@ -1525,6 +1525,11 @@ public class GtkTabControlPeer : GtkContainerPeer, ITabControlPeer
         _waiting = null;
         _shown = -1;
 
+        // Arrows when the tabs do not fit, as Win32's tab control draws them.
+        // Without them a notebook asks for the width of every tab, and in a
+        // `GtkFixed` that nothing can refuse it draws them over its neighbour.
+        gtk_notebook_set_scrollable(Widget, 1);
+
         // **A page is the one child GTK sizes rather than the layout.**
         //
         // Everywhere else in this backend a child's size is what the layout

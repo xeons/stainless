@@ -39,6 +39,9 @@ module Forms;
 import Standard.Collections;
 import Forms.Drawing;
 import Forms.Platform;
+#if FORMS_REFLECT
+import Standard.Reflection;
+#endif
 
 // =============================================================== button base
 
@@ -102,6 +105,9 @@ public abstract class ButtonBase : WindowedControl
 /// stock glyph -- is not here. It is one table of translated strings and stock
 /// icon names serving one caller, and that caller is `ButtonPanel`, which now
 /// holds the table itself.
+#if FORMS_REFLECT
+[Reflect]
+#endif
 public class Button : ButtonBase
 {
     IPushButtonPeer _native;
@@ -203,6 +209,9 @@ public class Button : ButtonBase
 /// value that differs across a selection. Nothing here needs one yet, and a
 /// two-state box whose property is a `bool` is a much better thing to use than
 /// a three-state one whose property is an enum that is usually two of three.
+#if FORMS_REFLECT
+[Reflect]
+#endif
 public class CheckBox : ButtonBase
 {
     ICheckPeer _native;
@@ -267,6 +276,9 @@ public class CheckBox : ButtonBase
 /// and is why a form with two sets of choices puts each set in its own `Panel`
 /// or `GroupBox`. A `GroupName` property would have to fight the platform for
 /// the behaviour it already has.
+#if FORMS_REFLECT
+[Reflect]
+#endif
 public class RadioButton : CheckBox
 {
     public RadioButton(WindowedControl parent) => base(parent, CheckKind.Radio);
@@ -334,6 +346,9 @@ public class RadioButton : CheckBox
 /// A group of these is *not* a radio group: nothing unticks the others, which
 /// is what `RadioButton` is for. A toolbar's mutually exclusive buttons are
 /// `ToolButton` toggles and the program clears them, as they are in the LCL.
+#if FORMS_REFLECT
+[Reflect]
+#endif
 public class ToggleButton : CheckBox
 {
     public ToggleButton(WindowedControl parent) => base(parent, CheckKind.Toggle);

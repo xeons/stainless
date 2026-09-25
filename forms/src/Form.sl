@@ -37,6 +37,9 @@ module Forms;
 import Standard.Collections;
 import Forms.Drawing;
 import Forms.Platform;
+#if FORMS_REFLECT
+import Standard.Reflection;
+#endif
 
 // ===================================================================== form
 
@@ -76,6 +79,9 @@ public enum CloseReason { User, Program, ApplicationExit }
 ///
 /// **A closed form stays closed.** Its window is gone, and showing it again
 /// is a mistake that stops the program; make a new one instead.
+#if FORMS_REFLECT
+[Reflect]
+#endif
 public class Form : WindowedControl, IWindowNotify
 {
     IWindowPeer _windowPeer;

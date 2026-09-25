@@ -37,6 +37,9 @@ module Forms;
 import Standard.Collections;
 import Forms.Drawing;
 import Forms.Platform;
+#if FORMS_REFLECT
+import Standard.Reflection;
+#endif
 
 // ============================================================== list control
 
@@ -151,6 +154,9 @@ public abstract class ListControl : WindowedControl
 // ================================================================= list box
 
 /// A list of items, all of them visible.
+#if FORMS_REFLECT
+[Reflect]
+#endif
 public class ListBox : ListControl
 {
     IListPeer _native;
@@ -168,6 +174,9 @@ public class ListBox : ListControl
 // ================================================================ combo box
 
 /// A list that drops down from one line.
+#if FORMS_REFLECT
+[Reflect]
+#endif
 public class ComboBox : ListControl
 {
     IComboPeer _native;
