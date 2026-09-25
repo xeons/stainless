@@ -236,6 +236,12 @@ public class ButtonsForm : Form
         ok = Check(ok, "and asks for a height that fits the rows",
                    Bar.PreferredSize.Height >= ToolsBand.Height);
 
+        // Asked for 24, a combo box on GTK settles on more; the row is sized
+        // from what it settled on, or it draws over the row below.
+        ok = Check(ok, "a control keeps the height the platform settled on",
+                   Zoom.Height >= Zoom.PreferredSize.Height);
+        ok = Check(ok, "and its row is tall enough for it", ZoomBand.Height >= Zoom.Height);
+
         // A band told to break takes a row of its own, and every band after it
         // in that row comes with it.
         ZoomBand.Break = true;

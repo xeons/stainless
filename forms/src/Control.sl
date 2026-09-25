@@ -378,7 +378,12 @@ public abstract class Control : IControlNotify
                 // GTK holds a container at least as large as its children
                 // reached, which they did at the old size. They have been laid
                 // out again now, so the size is asked for again.
-                if (!_bounds.Extent.Equals(value.Extent))
+                //
+                // Only with children: a control with none that settled larger
+                // -- a GTK combo box asked for less than its minimum -- has
+                // said what it really is, and asking again would write the
+                // request back over the answer.
+                if (container.Controls.Count > 0u && !_bounds.Extent.Equals(value.Extent))
                     PushBounds(value);
             }
             OnResize();
