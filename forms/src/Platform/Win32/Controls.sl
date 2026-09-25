@@ -1030,12 +1030,14 @@ public class CustomPeer : ControlPeer, ICustomPeer
     /// and this is what it is made from both times.
     FRect _caret;
     bool _focusable;
+    bool _transparent;
 
     public CustomPeer(IControlNotify owner, IContainerPeer parent)
     {
         base(CreateCustomWindow(GetContainerWindow(parent)), owner, false);
         _caret = CreateRectangle(0, 0, 0, 0);
         _focusable = true;
+        _transparent = false;
     }
 
     /// Made before `base(...)`, which needs the window to bind its peer to.
@@ -1091,6 +1093,26 @@ public class CustomPeer : ControlPeer, ICustomPeer
             style = style & ~(long)WsTabStop;
         }
         Win32.User32.SetWindowLongPtrW(Window, GwlStyle, style);
+    }
+
+    /// Lazarus's designer overlay, `GetDesignerDC` in its Win32 widget set:
+    /// `WS_EX_TRANSPARENT` has the siblings beneath painted first, and the
+    /// paint then draws straight on the window rather than through the opaque
+    /// buffer, so what it does not draw is theirs.
+    public void SetTransparent(bool wanted)
+    {
+        _transparent = wanted;
+        long extended = Win32.User32.GetWindowLongPtrW(Window, GwlExtendedStyle);
+        if (wanted)
+        {
+            extended = extended | (long)WsExTransparent;
+        }
+        else
+        {
+            extended = extended & ~(long)WsExTransparent;
+        }
+        Win32.User32.SetWindowLongPtrW(Window, GwlExtendedStyle, extended);
+        InvalidateRect(Window, null, 1);
     }
 
     /// The caret is remembered, and applied now only if this window is the one
@@ -1162,7 +1184,7 @@ public class CustomPeer : ControlPeer, ICustomPeer
         }
 
         if (message == WmPaint)
-            return PaintDoubleBuffered();
+            return _transparent ? PaintDirectly() : PaintDoubleBuffered();
 
         // Every key, and the characters too. Without this the message loop's
         // `IsDialogMessageW` takes Tab, the arrows, Return and Escape before
@@ -1192,6 +1214,27 @@ public class CustomPeer : ControlPeer, ICustomPeer
             DestroyCaret();
 
         return base.WndProc(message, wParam, lParam);
+    }
+
+    /// Paints on the window itself, over whatever the siblings beneath left.
+    long PaintDirectly()
+    {
+        PaintStruct paint;
+        HDC screen = BeginPaint(Window, &paint);
+        if (screen == null)
+            return 0;
+
+        Rect client;
+        GetClientRect(Window, &client);
+        var owner = Owner;
+        if (owner != null)
+        {
+            var surface = new GraphicsBackend(screen, FromRect(client));
+            ((IControlNotify)owner).OnPlatformPaint(new Graphics(surface));
+        }
+
+        EndPaint(Window, &paint);
+        return 0;
     }
 
     /// Paints into a bitmap, and copies the bitmap to the screen.

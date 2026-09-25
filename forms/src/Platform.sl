@@ -600,6 +600,10 @@ public interface ICustomPeer : IContainerPeer
     /// this and a control that merely happens not to handle any keys.
     void SetFocusable(bool focusable);
 
+    /// Whether the siblings under it show through wherever it does not draw.
+    /// It still takes the pointer and the keys over its whole area.
+    void SetTransparent(bool transparent);
+
     /// Where the insertion point is and how big, or an empty rectangle for a
     /// control that has none.
     ///

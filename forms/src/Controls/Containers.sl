@@ -234,6 +234,7 @@ public class CustomControl : WindowedControl
     ControlBorder _border;
     Rectangle _caret;
     bool _focusable;
+    bool _isTransparent;
 
     public CustomControl(WindowedControl parent)
     {
@@ -241,6 +242,7 @@ public class CustomControl : WindowedControl
         _border = ControlBorder.None;
         _caret = Rectangle.Empty;
         _focusable = true;
+        _isTransparent = false;
         _native = WidgetSet.Current.CreateCustom(this, ParentPeer);
         AttachContainerPeer(_native);
     }
@@ -270,6 +272,23 @@ public class CustomControl : WindowedControl
         {
             _focusable = value;
             _native.SetFocusable(value);
+        }
+    }
+
+    /// Whether the controls under it show through wherever `Paint` does not
+    /// draw. It still takes every click and key over its area.
+    ///
+    /// **What a form designer lays over the form**, as Lazarus's does: the
+    /// controls beneath stay real and draw themselves, and the selection
+    /// handles are drawn on this. Call `BringToFront` as well, since a
+    /// control is only over the siblings made before it.
+    public bool IsTransparent
+    {
+        get => _isTransparent;
+        set
+        {
+            _isTransparent = value;
+            _native.SetTransparent(value);
         }
     }
 

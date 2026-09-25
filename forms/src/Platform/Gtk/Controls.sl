@@ -2178,6 +2178,12 @@ public class GtkCustomPeer : GtkContainerPeer, ICustomPeer
         }
     }
 
+    /// Nothing to do: the fixed renders no background, so its siblings
+    /// already show through wherever the program does not draw.
+    public void SetTransparent(bool wanted)
+    {
+    }
+
     public void SetFocusable(bool wanted)
     {
         _focusable = wanted;

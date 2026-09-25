@@ -350,9 +350,13 @@ moment the pointer reached the tree inside it. `GetCursorPos` plus
 `ScreenToClient` on Win32, `gdk_window_get_device_position` on GTK, and a
 `GraphicControl` answers by asking its parent and subtracting.
 
-Both are also what a form designer needs — a transparent input shield over live
-controls is `BringToFront` and nothing else — which is why they are here rather
-than in `ide/`.
+Both are also what a form designer needs, which is why they are here rather
+than in `ide/`. The third thing it needs is `CustomControl.IsTransparent`: an
+overlay raised over live controls that takes every click and key while the
+controls beneath keep drawing themselves. It is Lazarus's designer overlay
+(`GetDesignerDC` in its Win32 widget set) — `WS_EX_TRANSPARENT` and a paint
+straight on the window rather than through the opaque buffer. On GTK the
+windowed `GtkFixed` renders no background, so it is already see-through.
 
 **A `Graphics` carries no state.** `TCanvas` has a current `Pen`, `Brush` and
 `Font`, so any routine that draws must save and restore three things or corrupt
