@@ -211,6 +211,7 @@ Functions, defaults, `ref`/`in`/`out`, named arguments, properties, operators, i
 - [9.11 `nameof`](09-statements-expressions.md#911-nameof)
 - [9.12 `checked`](09-statements-expressions.md#912-checked)
 - [9.13 An expression on its own](09-statements-expressions.md#913-an-expression-on-its-own)
+- [9.14 Assignment](09-statements-expressions.md#914-assignment)
 
 ### [10. Conditional compilation](10-conditional-compilation.md)
 

@@ -405,7 +405,7 @@ public sealed partial class LlvmEmitter
         }
 
         int declaredFirst = arguments.Count;
-        AppendArguments(call.Arguments, arguments);
+        AppendArguments(call.Arguments, arguments, call.EvaluationOrder);
         MarkRegisters(function, arguments, declaredFirst);
 
         string signature = function.IsVariadic
@@ -649,10 +649,27 @@ public sealed partial class LlvmEmitter
     /// the expression's own type is the one the ABI classifies.
     /// </summary>
     private void AppendArguments(
-        IReadOnlyList<BoundExpression> expressions, List<string> arguments)
+        IReadOnlyList<BoundExpression> expressions, List<string> arguments,
+        IReadOnlyList<int>? order = null)
     {
-        for (int i = 0; i < expressions.Count; i++)
-            AppendArgument(EmitExpression(expressions[i]), expressions[i].Type, arguments);
+        if (order is null)
+        {
+            for (int i = 0; i < expressions.Count; i++)
+                AppendArgument(EmitExpression(expressions[i]), expressions[i].Type, arguments);
+            return;
+        }
+
+        // Each is lowered as soon as it is evaluated, so a struct is copied
+        // before a later argument can change it, and only the list is put back
+        // into the declared order.
+        var lowered = new List<string>[expressions.Count];
+        foreach (int i in order)
+        {
+            lowered[i] = [];
+            AppendArgument(EmitExpression(expressions[i]), expressions[i].Type, lowered[i]);
+        }
+
+        foreach (var pieces in lowered) arguments.AddRange(pieces);
     }
 
     /// <summary>Lowers one already-emitted value to its ABI form.</summary>

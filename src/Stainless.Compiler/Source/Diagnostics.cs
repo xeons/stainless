@@ -55,6 +55,10 @@ public static class RetiredDiagnostics
         // A plain function as a closure, refused until a shared thunk and a
         // null receiver made it a closure like any other.
         "SL0599",
+
+        // A compound assignment to a property whose receiver was not a plain
+        // load, refused until the receiver was held and evaluated once.
+        "SL0397",
     };
 }
 

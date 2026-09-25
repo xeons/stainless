@@ -313,6 +313,12 @@ left empty — all SL0601, which says which of those went wrong.
 **A name takes part in choosing an overload**, since two candidates may call
 their parameters different things.
 
+**Arguments are evaluated in the order they were written**, as C#'s are, and
+then passed in the order the parameters were declared. `Pair(b: Log("b"), a:
+Log("a"))` logs `b` first. A struct argument is copied as it is evaluated, so
+a later argument that changes the variable does not reach it. A default the
+call left out is a constant and has no order to keep.
+
 `base(...)` and `this(...)` take their arguments in order (SL0602): they name a
 constructor rather than a declaration, so there is nothing for a name to match.
 
@@ -401,9 +407,9 @@ automatic or written makes no difference to the caller.
 
 - **Not a field.** `get_Name` and `set_Name` exist as symbols, and naming one
   directly is an error: they are the lowering, not the language.
-- **Not free of evaluation order.** `p.X += 1` calls the getter and then the
-  setter, so the receiver is evaluated twice. A receiver that is not a plain
-  load — `Make().X += 1` — is rejected rather than quietly evaluated twice.
+- **Not two evaluations.** `p.X += 1` calls the getter and then the setter,
+  and the receiver is evaluated once for both: `Make().X += 1` makes one object
+  ([§9.14](09-statements-expressions.md#914-assignment)).
 - **Initialized at the declaration only when it owns storage.** `public int X
   { get; set; } = 5;` gives that storage its first value, at the head of every
   constructor, exactly as a field initializer does ([§2.4.1](02-types.md#241-a-field-with-a-value)). A property that

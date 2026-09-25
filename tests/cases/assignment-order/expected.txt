@@ -1,0 +1,63 @@
+a 10 0 i 1
+get field
+F 5
+index
+index
+grid 21
+make temporary
+get property
+get property
+P 4
+b 1 3
+get receiver
+value
+get receiver
+value
+index
+value
+F 9 P 11 grid 4
+x 12
+get name
+word a
+get name
+word b
+name ab
+slot
+word first
+slot
+get label
+word label
+get label
+names first label label
+bits
+flags 5 1
+purse
+purse
+purse 14
+wallet
+wallet
+wallet 8
+list
+list
+cell
+numbers
+numbers
+list 9 2 numbers 22
+lambda
+lambda
+lambda 10
+value 4 4 1
+box
+box
+step
+shape
+dx
+shape
+dy
+box 4 shape 5 6
+row
+column
+add
+pointer
+row 15
+owner 0 0 0 0

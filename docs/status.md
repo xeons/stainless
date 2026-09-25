@@ -797,10 +797,8 @@ Being straight about the edges, roughly in the order they are worth adding:
   single slot, so two of a name in one interface would be a call the receiver
   could not resolve. Methods on classes and structs overload freely, and a
   class may implement two interfaces whose methods share a name.
-- **A property still evaluates its receiver twice under `+=`.** `p.X += 1`
-  needs a receiver that is a plain load, since the getter and the setter each
-  evaluate it. An indexer has no automatic form either: `{ get; set; }` would
-  have nothing to find storage for.
+- **An indexer has no automatic form.** `{ get; set; }` would have nothing to
+  find storage for.
 - **The compiler prunes no dead code; the linker does.** Every stdlib module is
   compiled with your program whether or not it is imported, and only generics
   are free — an uninstantiated template emits nothing, but a non-generic

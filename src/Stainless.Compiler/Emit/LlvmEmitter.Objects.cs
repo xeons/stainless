@@ -51,7 +51,7 @@ public sealed partial class LlvmEmitter
         if (expression.Constructor is not null)
         {
             var arguments = new List<string> { $"ptr {instance}" };
-            AppendArguments(expression.Arguments, arguments);
+            AppendArguments(expression.Arguments, arguments, expression.EvaluationOrder);
             Line($"call void {Symbol(expression.Constructor)}({string.Join(", ", arguments)})");
         }
 
@@ -77,7 +77,7 @@ public sealed partial class LlvmEmitter
         Line($"store {StructName(structType)} zeroinitializer, ptr {slot}");
 
         var arguments = new List<string> { $"ptr {slot}" };
-        AppendArguments(expression.Arguments, arguments);
+        AppendArguments(expression.Arguments, arguments, expression.EvaluationOrder);
         Line($"call void {Symbol(expression.Constructor)}({string.Join(", ", arguments)})");
 
         // What the constructor stored is owned by the slot, so the statement

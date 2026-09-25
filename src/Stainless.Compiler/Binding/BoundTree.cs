@@ -238,7 +238,14 @@ public sealed class BoundFieldAccess(SourceSpan span, BoundExpression? receiver,
 {
     public BoundExpression? Receiver { get; } = receiver;
     public FieldSymbol Field { get; } = field;
-    public override bool IsLValue => true;
+
+    /// <summary>
+    /// A field of an object is storage wherever the reference came from. A
+    /// field of a struct is storage only when the struct is, because a struct
+    /// a call answered is a copy that nothing will read again.
+    /// </summary>
+    public override bool IsLValue =>
+        Receiver is null || Field.ContainingType is not StructTypeSymbol || Receiver.IsLValue;
 }
 
 public sealed class BoundCall(
@@ -261,6 +268,13 @@ public sealed class BoundCall(
     /// being run, not whichever the object would dispatch to.
     /// </summary>
     public bool IsNonVirtual { get; init; }
+
+    /// <summary>
+    /// The order to evaluate <see cref="Arguments"/> in, as indices into it,
+    /// when the call named them in an order other than the declared one. Null
+    /// when the two agree.
+    /// </summary>
+    public IReadOnlyList<int>? EvaluationOrder { get; init; }
 }
 
 public sealed class BoundUnary(
@@ -405,6 +419,13 @@ public sealed class BoundLet(
     public LocalSymbol Local { get; } = local;
     public BoundExpression Value { get; } = value;
     public BoundExpression Body { get; } = body;
+
+    /// <summary>
+    /// True when the local holds its own reference until the statement ends.
+    /// An assignment sets it on the object it stores into, because the value
+    /// it evaluates in between may release that object's last other owner.
+    /// </summary>
+    public bool IsOwned { get; init; }
 }
 
 /// <summary>
@@ -734,6 +755,9 @@ public sealed class BoundNew(
     public ClassTypeSymbol ClassType { get; } = classType;
     public FunctionSymbol? Constructor { get; } = constructor;
     public IReadOnlyList<BoundExpression> Arguments { get; } = arguments;
+
+    /// <summary>As <see cref="BoundCall.EvaluationOrder"/>.</summary>
+    public IReadOnlyList<int>? EvaluationOrder { get; init; }
 }
 
 /// <summary>
@@ -754,6 +778,9 @@ public sealed class BoundStructNew(
     public StructTypeSymbol StructType { get; } = structType;
     public FunctionSymbol Constructor { get; } = constructor;
     public IReadOnlyList<BoundExpression> Arguments { get; } = arguments;
+
+    /// <summary>As <see cref="BoundCall.EvaluationOrder"/>.</summary>
+    public IReadOnlyList<int>? EvaluationOrder { get; init; }
 }
 
 /// <summary><c>*p</c></summary>
@@ -859,7 +886,13 @@ public sealed class BoundIndex(
 {
     public BoundExpression Target { get; } = target;
     public BoundExpression Index { get; } = index;
-    public override bool IsLValue => true;
+
+    /// <summary>
+    /// An element of an array, a slice or a pointer is storage. An element of
+    /// an inline array is part of the value holding it, so it is storage only
+    /// when that value is.
+    /// </summary>
+    public override bool IsLValue => Target.Type is not FixedArrayTypeSymbol || Target.IsLValue;
 }
 
 public sealed class BoundSizeof(SourceSpan span, TypeSymbol type, TypeSymbol measuredType)

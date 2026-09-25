@@ -1125,7 +1125,27 @@ public sealed partial class Binder
 
         var converted = ConvertArguments(function, ordered, spans);
         return new BoundCall(syntax.Span, function, receiver, converted)
-            { IsNonVirtual = nonVirtual };
+            { IsNonVirtual = nonVirtual, EvaluationOrder = WrittenOrder(map, converted.Count) };
+    }
+
+    /// <summary>
+    /// The declared positions in the order the call wrote them, or null when
+    /// the two agree. Arguments are evaluated as written, as C#'s are; a
+    /// default is a constant and goes last.
+    /// </summary>
+    private static int[]? WrittenOrder(int[] map, int count)
+    {
+        var order = Enumerable.Range(0, count)
+            .Where(p => p >= map.Length || map[p] >= 0)
+            .OrderBy(p => p < map.Length ? map[p] : p)
+            .Concat(Enumerable.Range(0, map.Length).Where(p => map[p] < 0))
+            .ToArray();
+
+        for (int i = 0; i < order.Length; i++)
+            if (order[i] != i)
+                return order;
+
+        return null;
     }
 
     private List<BoundExpression> ConvertArguments(

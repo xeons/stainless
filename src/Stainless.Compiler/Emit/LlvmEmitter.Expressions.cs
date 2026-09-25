@@ -113,9 +113,10 @@ public sealed partial class LlvmEmitter
             {
                 var value = EmitExpression(held.Value);
 
-                // Borrowed, not owned: whatever produced the value is already
-                // a temporary the statement will drop, so nothing is retained
-                // here and nothing is released.
+                // Borrowed unless asked otherwise: whatever produced the value
+                // is already a temporary the statement will drop. An owned one
+                // is retained here and released with the statement's
+                // temporaries.
                 //
                 // A struct, a tuple, a variant and an inline array are all held
                 // by address, so the name is that address and there is nothing
@@ -124,6 +125,15 @@ public sealed partial class LlvmEmitter
                 if (held.Local.Type is StructTypeSymbol or FixedArrayTypeSymbol)
                 {
                     _slots[held.Local] = value.Ref;
+                }
+                else if (held.IsOwned && held.Local.Type.NeedsArc())
+                {
+                    Retain(value.Ref, held.Local.Type);
+                    TrackTemporary(value.Ref, held.Local.Type);
+
+                    string slot = Alloca("ptr", held.Local.Name);
+                    _slots[held.Local] = slot;
+                    Line($"store ptr {value.Ref}, ptr {slot}");
                 }
                 else
                 {
@@ -464,15 +474,17 @@ public sealed partial class LlvmEmitter
     /// ones in, write it back. Bits outside the field are untouched, which is
     /// what makes two fields sharing a unit independent.
     /// </summary>
-    private void StoreBitField(BoundFieldAccess access, Val value)
+    private void StoreBitField(BoundFieldAccess access, Val value) =>
+        StoreBitField(EmitFieldAddress(access), access.Field, value);
+
+    /// <summary>The same, into a storage unit whose address is already known.</summary>
+    private void StoreBitField(string address, FieldSymbol field, Val value)
     {
-        var field = access.Field;
         int width = field.BitWidth!.Value;
         int bytes = AccessBytes(field);
         int bits = bytes * 8;
         string unit = $"i{bits}";
 
-        string address = EmitFieldAddress(access);
         string loaded = Emit(unit, $"load {unit}, ptr {address}, align {AccessAlignment(field)}");
 
         int valueBits = int.Parse(value.LlvmType[1..], CultureInfo.InvariantCulture);
@@ -615,19 +627,24 @@ public sealed partial class LlvmEmitter
         }
     }
 
+    /// <summary>
+    /// Works out the place, then the value, then stores: C#'s order, so
+    /// <c>a[i++] = i</c> stores the new <c>i</c> into the old element.
+    /// </summary>
     private Val EmitAssignment(BoundAssignment assignment)
     {
-        var value = EmitExpression(assignment.Value);
-
         // A bit-field shares its storage unit with its neighbours, so writing it
         // is a read, a splice and a write rather than a store.
         if (assignment.Target is BoundFieldAccess { Field.IsBitField: true } bitField)
         {
-            StoreBitField(bitField, value);
-            return value;
+            string unit = EmitFieldAddress(bitField);
+            var bits = EmitExpression(assignment.Value);
+            StoreBitField(unit, bitField.Field, bits);
+            return bits;
         }
 
         string address = EmitAddress(assignment.Target);
+        var value = EmitExpression(assignment.Value);
         StoreInto(address, value, assignment.Target.Type);
         return value;
     }

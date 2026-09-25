@@ -727,7 +727,8 @@ converts to implicitly.
 Conditions must be `bool`; there is no implicit int-to-bool conversion.
 There are no implicit narrowing conversions. Widening integer conversions and
 `int` -> `float`/`double` are implicit, as in C#; everything else needs a
-cast: `(byte)x`.
+cast: `(byte)x`. The one place a cast is implied is a compound assignment,
+where `b += 10` on a `byte` is `b = (byte)(b + 10)` ([§9.14](#914-assignment)).
 
 An integer literal converts implicitly to any integer type that can hold its
 value, as in C#: `byte level = 200;` and `nuint size = 64;` need no cast, while
@@ -862,6 +863,63 @@ Fail("could not read the file");    // SL0222
 line builds a `Result` and throws it away. If the author meant a method of
 their own named `Fail`, it was never reached — and nothing else would have
 said so, because the line is perfectly well typed.
+
+## 9.14 Assignment
+
+```csharp
+a[i++] = i;             // the element i named before it stepped
+a[i++] += 10;           // i steps once, and the element read is the one written
+Next().Count += 1;      // Next is called once; getter and setter share its answer
+b += 10;                // on a byte: b = (byte)(b + 10)
+```
+
+**The place comes first, then the value, then the store.** That is C#'s
+order. The place's receiver and indices are evaluated left to right, then the
+right-hand side, and only then is anything written — so `b[j] = j = 1` writes
+the element `j` named before the value changed it, and `Get().F = Log()` calls
+`Get` first. The same holds for a property and an indexer, whose setter is
+called with a receiver and indices that were evaluated before the value was.
+
+**A compound assignment names its place twice and evaluates it once.**
+`x op= y` reads `x`, evaluates `y`, applies `op` and writes `x` back, and
+whatever the place depends on — a receiver, an index, the object a property
+belongs to — is held between the read and the write. So `a[Next()] += 1` calls
+`Next` once and adds to the element it read, `Make().F += 1` makes one object,
+and `p.X += 1` calls the getter and the setter on the same receiver. Where the
+place is a variable, or its parts are plain loads and the value has no effect,
+naming it twice is the same as naming it once and nothing is held; the
+ordinary `total += n` costs what it always did.
+
+**The object a store lands in is kept alive until the statement ends.** A value
+that runs code may drop the last other reference to the object or array being
+written: `_items[n] = Grow()`, where `Grow` replaces `_items`. C# writes the
+object it had already reached and its collector keeps that object alive; here
+the reference is retained for the length of the statement, so the write lands
+in the replaced object exactly as it does in C#, and nothing is written into
+freed memory. It costs a retain and a release, and is paid only where the value
+runs code and the container is reached through something other than a local
+or a parameter, which only the statement itself could change.
+
+**On a narrow integer, `x op= y` casts back.** The operator works at `int`, so
+`b + 10` on a `byte` is an `int`, and `b = b + 10` needs a cast. `b += 10`
+does not: it means `b = (byte)(b + 10)`, which is C#'s rule, and applies when
+`y` itself fits `x` or the operator is a shift. `b += 300` is still refused
+(SL0265), because 300 is not a byte's worth whatever the cast does. The cast
+wraps as every integer cast does, and **inside `checked` it still wraps**,
+because `checked` watches `+`, `-` and `*` and not conversions
+([§9.12](#912-checked)). C# would abort there.
+
+**A field of a temporary struct cannot be written** (SL0399). A struct a call,
+a property or an indexer answered is a copy that nothing will read again, so
+`list[0].X = 5`, `shape.Origin.X = 7` and `Make().X = 3` would each change the
+copy and throw it away. C# refuses the same three (CS1612 and CS0131). A
+struct's property on such a copy is refused for the same reason, since its
+setter writes through the receiver. An element of an array or a slice is
+storage, and `points[1].X = 5` writes into the array.
+
+`a ??= b` evaluates its place once as well: it asks whether the place is empty,
+and only then evaluates `b` and stores it. On a property the getter is called
+once and the setter only when the getter answered nothing.
 
 ---
 

@@ -265,7 +265,8 @@ public sealed partial class Binder
         var converted = ConvertArguments(constructor, ordered, spans);
 
         return WithObjectInitializer(
-            syntax, classType, new BoundNew(syntax.Span, classType, constructor, converted));
+            syntax, classType, new BoundNew(syntax.Span, classType, constructor, converted)
+                { EvaluationOrder = WrittenOrder(map, converted.Count) });
     }
 
     /// <summary>
@@ -329,7 +330,8 @@ public sealed partial class Binder
         var converted = ConvertArguments(constructor, ordered, spans);
 
         return WithObjectInitializer(
-            syntax, structType, new BoundStructNew(syntax.Span, structType, constructor, converted));
+            syntax, structType, new BoundStructNew(syntax.Span, structType, constructor, converted)
+                { EvaluationOrder = WrittenOrder(map, converted.Count) });
     }
 
     /// <summary>

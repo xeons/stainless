@@ -1,0 +1,6 @@
+byte 3
+short -25536
+ushort 0 3855
+sbyte -128 -56
+char d
+1 -32768 207 135

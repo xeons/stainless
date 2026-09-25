@@ -61,7 +61,16 @@ internal sealed class StaticReferenceWalker
             case BoundAssignment assignment: Visit(assignment.Target); Visit(assignment.Value); break;
 
             case BoundPropertyAssignment written:
-                Visit(written.Receiver); Visit(written.Value);
+                Visit(written.Receiver);
+                foreach (var index in written.Indices) Visit(index);
+                Visit(written.Value);
+                break;
+
+            case BoundIncrement stepped: Visit(stepped.Target); break;
+
+            case BoundPropertyIncrement stepped:
+                Visit(stepped.Receiver);
+                foreach (var index in stepped.Arguments) Visit(index);
                 break;
 
             case BoundConversion conversion: Visit(conversion.Operand); break;
@@ -229,10 +238,22 @@ internal sealed class CaptureWalker(LocalSymbol loopVariable)
                 Visit(assignment.Target); Visit(assignment.Value);
                 break;
 
+            case BoundIncrement stepped:
+                Assigned(stepped.Target);
+                Visit(stepped.Target);
+                break;
+
             // A property write goes through a method, so it changes the object
             // rather than the captured variable naming it; only the reads count.
             case BoundPropertyAssignment written:
-                Visit(written.Receiver); Visit(written.Value);
+                Visit(written.Receiver);
+                foreach (var index in written.Indices) Visit(index);
+                Visit(written.Value);
+                break;
+
+            case BoundPropertyIncrement stepped:
+                Visit(stepped.Receiver);
+                foreach (var index in stepped.Arguments) Visit(index);
                 break;
 
             case BoundConversion conversion: Visit(conversion.Operand); break;
@@ -240,9 +261,12 @@ internal sealed class CaptureWalker(LocalSymbol loopVariable)
             case BoundVariantTest asked: Visit(asked.Value); break;
             case BoundVariantPayload payload: Visit(payload.Receiver); break;
 
-            // A `switch` expression is a name and a chain of conditionals, and
-            // a static initializer may be written as one.
-            case BoundLet held: Visit(held.Value); Visit(held.Body); break;
+            // Held for the length of one expression, so it belongs to the
+            // iteration that evaluates it.
+            case BoundLet held:
+                _declared.Add(held.Local);
+                Visit(held.Value); Visit(held.Body);
+                break;
 
             case BoundNew created:
                 foreach (var argument in created.Arguments) Visit(argument);
