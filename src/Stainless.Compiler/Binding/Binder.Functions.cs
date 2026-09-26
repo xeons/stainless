@@ -161,11 +161,9 @@ public sealed partial class Binder
                         $"'{declaration.Name}' is abstract, so it cannot have a body; " +
                         "a derived class supplies one");
             }
-            else if (!declaration.Linkage.IsImport() && declaration.Body is null)
+            else
             {
-                diagnostics.Error("SL0210", declaration.Span,
-                    $"'{declaration.Name}' has no body; Stainless has no forward declarations, " +
-                    "because declaration order never matters");
+                RequireBody(declaration);
             }
         }
 
@@ -618,6 +616,21 @@ public sealed partial class Binder
                     "Pass a struct of plain data, or a raw pointer");
             }
         }
+    }
+
+    /// <summary>
+    /// Reports a function that is neither imported nor abstract and has no
+    /// body. A generic one is a template and never reaches
+    /// <see cref="DeclareFunction"/>, so its declaration asks for this itself.
+    /// </summary>
+    private void RequireBody(FunctionDeclSyntax declaration)
+    {
+        if (declaration.Linkage.IsImport() || declaration.Body is not null)
+            return;
+
+        diagnostics.Error("SL0210", declaration.Span,
+            $"'{declaration.Name}' has no body; Stainless has no forward declarations, " +
+            "because declaration order never matters");
     }
 
     /// <summary>

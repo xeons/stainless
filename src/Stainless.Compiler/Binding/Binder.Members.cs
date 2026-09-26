@@ -64,6 +64,7 @@ public sealed partial class Binder
                             // it once for every type argument, or never.
                             if (function.Modifiers.HasFlag(Modifiers.Static))
                                 CheckStatic(containingType: null, function);
+                            RequireBody(function);
 
                             module.GenericFunctions.Add(
                                 new GenericFunctionTemplate(function.Name, scope, function));
@@ -633,6 +634,9 @@ public sealed partial class Binder
                                 "each implementing type, not by a slot an instantiation can fill");
                             break;
                         }
+
+                        if (!type.IsContract && !method.Modifiers.HasFlag(Modifiers.Abstract))
+                            RequireBody(method);
 
                         // The substitution in force is the enclosing type's, if it
                         // is itself an instantiation; the method's own parameters
