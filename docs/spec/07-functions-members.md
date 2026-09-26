@@ -75,14 +75,11 @@ one is better, so a `uint` goes to `long` rather than `ulong`. It is what lets
 `Pair(long, int)` called with `(1, 2)` are each better for one argument, and
 that is SL0264.
 
-**An interface method may not be overloaded.** An interface gives each of its
-methods a dispatch slot by position, so two of a name in one interface would be
-a call the receiver could not resolve:
-
-```
-error[SL0416]: 'IBad' already declares 'Same'; an interface method may not be
-overloaded, because dispatch gives each one a single slot
-```
+**An interface method may be overloaded too.** Each overload is a slot of its
+own in the interface's table, numbered by declaration like every other member,
+so the call picks an overload by the arguments exactly as above and dispatch
+then reaches that slot. A class implements each overload with the method whose
+parameters match it, wherever in its chain that method is declared.
 
 A *class* implementing two interfaces whose methods share a name is a different
 matter, and it works — see [§2.10](02-types.md#210-interface--a-contract-dispatched-dynamically).

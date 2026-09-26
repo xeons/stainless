@@ -1,0 +1,19 @@
+rex fetches
+max fetches
+~max
+2
+fido fetches
+~fido
+woof
+circle
+~bit
+yip
+bit fetches
+~bit
+spot fetches
+woof
+rex fetches
+~rex
+~spot
+~rex
+~rex

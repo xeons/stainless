@@ -585,6 +585,21 @@ public sealed partial class Binder
         ClassTypeSymbol classType, FunctionSymbol method,
         [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] FunctionSymbol? inherited)
     {
+        // A setter of a property whose type was narrowed takes a different
+        // parameter, so nothing matched it. That is the narrowing's fault.
+        if (inherited is null && method.Accessor is { } property &&
+            method.Name.StartsWith("set_", StringComparison.Ordinal) &&
+            classType.BaseClass?.FindProperty(property.Name) is { } widerProperty &&
+            !widerProperty.Type.Equals(property.Type))
+        {
+            diagnostics.Error("SL0502", method.Span,
+                $"'{classType.Name}.{property.Name}' narrows its type from " +
+                $"'{widerProperty.Type.Name}' to '{property.Type.Name}', and only a property " +
+                $"with no setter may: a caller holding '{widerProperty.ContainingType.Name}' " +
+                $"could store any '{widerProperty.Type.Name}' in it");
+            return false;
+        }
+
         if (inherited is null)
         {
             diagnostics.Error("SL0499", method.Span,
@@ -619,7 +634,11 @@ public sealed partial class Binder
                 $"'{classType.Name}.{Describe(method)}' does not match what it overrides; " +
                 $"expected '{inherited.ReturnType.Name} {inherited.Name}(" +
                 string.Join(", ", inherited.Parameters.Where(p => !p.IsThis).Select(Spelled)) +
-                ")'");
+                ")'" +
+                (method.ReturnType.IsReferenceType || method.ReturnType is OptionalTypeSymbol
+                    ? $", or a return type that converts to '{inherited.ReturnType.Name}' " +
+                      "without changing the reference"
+                    : ""));
             return false;
         }
 
@@ -650,22 +669,39 @@ public sealed partial class Binder
     }
 
     /// <summary>
-    /// True when two methods agree on everything a caller can observe: the
-    /// return type, and each parameter's type and mode. The mode is part of it
-    /// because a <c>ref int</c> and an <c>int</c> are passed differently, and the
-    /// slot would then hold a function the caller is about to hand a pointer to.
+    /// True when an override agrees with what it replaces on everything a
+    /// caller can observe: each parameter's type and mode exactly, and a return
+    /// type that is the same or narrower. The mode is part of it because a
+    /// <c>ref int</c> and an <c>int</c> are passed differently, and the slot
+    /// would then hold a function the caller is about to hand a pointer to.
+    ///
+    /// A narrower return is C#'s covariant return. It is sound here because a
+    /// reference is one pointer whatever its static type: a caller through the
+    /// base receives the derived object and sees it as the base.
     /// </summary>
-    private static bool SignaturesAgree(FunctionSymbol method, FunctionSymbol other)
+    private bool SignaturesAgree(FunctionSymbol method, FunctionSymbol other)
     {
         var mine = method.Parameters.Where(p => !p.IsThis).ToList();
         var theirs = other.Parameters.Where(p => !p.IsThis).ToList();
 
-        return method.ReturnType.Equals(other.ReturnType) &&
+        return (method.ReturnType.Equals(other.ReturnType) ||
+                IsReferenceWidening(method.ReturnType, other.ReturnType)) &&
                mine.Count == theirs.Count &&
                mine.Zip(theirs).All(pair =>
                    pair.First.Type.Equals(pair.Second.Type) &&
                    pair.First.Mode == pair.Second.Mode);
     }
+
+    /// <summary>
+    /// True when a <paramref name="from"/> is a <paramref name="to"/> with no
+    /// instruction emitted: a class to its base or an interface it implements,
+    /// an interface to one it extends, and any of those to its optional.
+    /// </summary>
+    private bool IsReferenceWidening(TypeSymbol from, TypeSymbol to) =>
+        !from.Equals(to) &&
+        ClassifyConversion(from, to, explicitCast: false) is
+            ConversionKind.Upcast or ConversionKind.ClassToInterface or
+            ConversionKind.ReferenceToOptional;
 
     /// <summary>
     /// A method as a diagnostic should name it. An accessor is named by its

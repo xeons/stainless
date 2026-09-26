@@ -1,0 +1,14 @@
+int 1
+long 2
+text three
+point 4,5
+double 6.5
+int 7
+one a
+many a x3
+one b / many b x2
+~Label b
+int / int x2
+String / String x2
+int 8
+~Label a

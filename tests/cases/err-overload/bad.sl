@@ -1,12 +1,6 @@
 // SPDX-License-Identifier: 0BSD
 module Bad;
 
-interface IBad
-{
-    bool Same(int other);
-    bool Same(String other);      // an interface method has one dispatch slot
-}
-
 class Duplicate
 {
     public int Take(int n) => n;

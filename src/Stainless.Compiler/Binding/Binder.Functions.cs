@@ -202,16 +202,6 @@ public sealed partial class Binder
                     "taking these parameter types; overloads must differ in their parameters, " +
                     "and a return type alone does not distinguish two methods");
 
-            // An interface gives each of its methods a dispatch slot by
-            // position, so two of the same name in one interface would be a
-            // call the receiver could not resolve.
-            else if (containingType.IsContract &&
-                     containingType.Methods.Any(m => m.Name == declaration.Name))
-                diagnostics.Error("SL0416", declaration.Span,
-                    $"'{containingType.Name}' already declares '{declaration.Name}'; an interface " +
-                    "method may not be overloaded, because dispatch gives each one a single slot. " +
-                    "A class may still implement two interfaces whose methods share a name");
-
             containingType.Methods.Add(symbol);
         }
 

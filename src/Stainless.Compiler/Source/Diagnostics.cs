@@ -63,6 +63,10 @@ public static class RetiredDiagnostics
         // A static automatic property, refused until its storage became a
         // static that starts at its type's zero.
         "SL0584",
+
+        // An overloaded interface method, refused until each overload took a
+        // slot of its own.
+        "SL0416",
     };
 }
 

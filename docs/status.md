@@ -143,7 +143,8 @@ last person to edit it -- the suite is the authority.
   three constant-offset loads and an indirect call — one fewer than an interface
   call, because there is no interface id to look up. Fields are laid out after
   the base's, destructors chain derived-first, interfaces and their tables are
-  inherited, and an upcast emits no instructions at all
+  inherited, and an upcast emits no instructions at all. An override may
+  narrow a reference it returns, as C# 9's covariant returns do
 - `com interface` and `com class`: COM's binary contract, which is a pointer
   to a vtable pointer and needs no operating system, so both work on every
   platform. ARC drives `AddRef` and `Release`, `is` and a cast are
@@ -466,7 +467,8 @@ last person to edit it -- the suite is the authority.
   another with free conversion to the base. A class may implement
   two instantiations of one generic interface — `IEq<int>` and `IEq<String>` —
   because each interface has its own dispatch table and the overloads land in
-  different slots
+  different slots. One interface may overload a method too, each overload a
+  slot of its own
 - Overloading by parameter type, on methods as well as module-level functions;
   a return type alone does not distinguish two of them
 - `Standard.Collections`: `List<T>`, `Dictionary<TKey, TValue>`, `HashSet<T>`,
@@ -852,8 +854,6 @@ Being straight about the edges, roughly in the order they are worth adding:
   name is the other fix and reads better: `if (node.Payload is Circle c)` for a
   variant's case, `if (node.Next is Node n)` for a `C?` — the value is taken
   once, so there is nothing to prove about a second read.
-- **There is no covariant return.** An override returns exactly what it
-  overrides (SL0502).
 - **Hiding an inherited member is refused, not warned about.** C# has `new` for
   it; a language with no way to reach the hidden member has nothing to say it
   about, so the same name and parameters means `override` or nothing (SL0503).
@@ -868,10 +868,6 @@ Being straight about the edges, roughly in the order they are worth adding:
   That is what stops a serializer filling a `List<T>`: its storage is private
   and the way in is `Add`, which nothing here can call. An array is described
   and does round-trip.
-- **An interface method may not be overloaded.** Dispatch gives each one a
-  single slot, so two of a name in one interface would be a call the receiver
-  could not resolve. Methods on classes and structs overload freely, and a
-  class may implement two interfaces whose methods share a name.
 - **An indexer has no automatic form.** `{ get; set; }` would have nothing to
   find storage for.
 - **The compiler prunes no dead code; the linker does.** Every stdlib module is

@@ -654,6 +654,26 @@ public abstract class Node
 }
 ```
 
+**An override may narrow what it returns**, as in C# 9. Its parameters match
+exactly, but where the replaced method returns a reference the override may
+return a class derived from it, a class implementing it, or the non-optional
+form of an optional one. A caller holding the derived type sees the narrower
+type, and a caller holding the base sees the base's:
+
+```csharp
+public class Shelter { public virtual Animal Adopt() => new Animal(); }
+public class Kennel : Shelter { public override Dog Adopt() => new Dog(); }
+
+Dog dog = new Kennel().Adopt();             // no cast
+```
+
+It costs nothing, because a reference is one pointer whatever its static type:
+the slot holds the override, and what it hands back is already a valid `Animal`.
+A get-only property may narrow its type the same way. One with a setter may not
+(SL0502), because a caller holding the base could store any `Animal` through it.
+A value type is never narrowed, and neither is an interface implementation,
+which matches its interface's signature exactly as C# requires.
+
 **One base, not several.** A class reference points at the object header and the
 fields follow it, so with a single base the base subobject starts at the same
 address as the derived object. An upcast is therefore free — no instructions at
@@ -1859,8 +1879,8 @@ public class Both : IEq<int>, IEq<String>
 The two methods share a name and are told apart by their parameters ([§7.1](07-functions-members.md#71-functions)).
 `IEq<int>`'s table takes the first and `IEq<String>`'s the second, so a call
 through either reference reaches the right one, and a call on `Both` itself
-picks by argument type. What may *not* be overloaded is a method of one
-interface, since that is one slot.
+picks by argument type. A method of one interface may be overloaded as well:
+each overload is a slot of its own.
 
 ## 2.11 Arrays
 
