@@ -339,6 +339,8 @@ public sealed partial class LlvmEmitter
         if (returnInfo.Style == PassStyle.Indirect)
         {
             Line(invocation);
+            if (type.ReturnType.CarriesReferences())
+                TrackTemporary(sretSlot!, type.ReturnType);
             return new Val(sretSlot!, "ptr", type.ReturnType);
         }
 
@@ -418,6 +420,8 @@ public sealed partial class LlvmEmitter
         if (returnInfo.Style == PassStyle.Indirect)
         {
             Line(invocation);
+            if (delegateType.ReturnType.CarriesReferences())
+                TrackTemporary(sretSlot!, delegateType.ReturnType);
             return new Val(sretSlot!, "ptr", delegateType.ReturnType);
         }
 
