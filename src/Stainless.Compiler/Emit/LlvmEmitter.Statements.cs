@@ -105,20 +105,9 @@ public sealed partial class LlvmEmitter
                 local.Name, local.Type, declaration.Span, scope));
 
         if (local.Type.IsManagedSlot())
-        {
-            // Owned slots start null so the first assignment's release is a no-op.
-            Line($"store ptr null, ptr {slot}");
-            ZeroOnEntry(slot, "ptr");
-            TrackOwnedLocal(slot, local.Type);
-        }
+            StartOwnedSlot(slot, local.Type, "ptr", declaration.Initializer is not null);
         else if (local.Type is StructTypeSymbol { } owning && owning.CarriesReferences())
-        {
-            // The same reason, one level down: the references inside start null
-            // so the first assignment releases nothing.
-            Line($"store {StructName(owning)} zeroinitializer, ptr {slot}");
-            ZeroOnEntry(slot, StructName(owning));
-            TrackOwnedLocal(slot, local.Type);
-        }
+            StartOwnedSlot(slot, local.Type, StructName(owning), declaration.Initializer is not null);
 
         if (declaration.Initializer is not null)
         {
@@ -131,6 +120,26 @@ public sealed partial class LlvmEmitter
         }
 
         FlushTemporaries();
+    }
+
+    /// <summary>
+    /// Gives a declared local's owned slot the null it starts from.
+    ///
+    /// Where a jump may land, a declaration can run again with the slot still
+    /// holding what its last run left, so it releases rather than overwrites:
+    /// the initializer's store releases the old value, and a declaration with
+    /// none releases it here. Every release in such a function clears the
+    /// slot, which keeps it null or owned wherever a jump lands.
+    /// </summary>
+    private void StartOwnedSlot(string slot, TypeSymbol type, string llvmType, bool initialized)
+    {
+        ZeroOnEntry(slot, llvmType);
+        TrackOwnedLocal(slot, type);
+
+        if (!_hasLabels)
+            Line($"store {llvmType} {(llvmType == "ptr" ? "null" : "zeroinitializer")}, ptr {slot}");
+        else if (!initialized)
+            ReleaseSlot(slot, type);
     }
 
     private void EmitDeconstruct(BoundDeconstruct statement)
@@ -237,17 +246,78 @@ public sealed partial class LlvmEmitter
         string block = LabelBlock(statement.Label);
         if (!_blockTerminated) Terminator($"br label %{block}");
         Label(block);
+        _labelScopes[statement.Label] = [.. _scopes];
     }
 
+    /// <summary>
+    /// A jump, by way of a block of its own that releases what the scopes it
+    /// leaves were holding.
+    ///
+    /// Which scopes those are depends on where the label is, and a label
+    /// further down has not been emitted yet. So the block is written once the
+    /// function is: every scope the jump is in and the label is not.
+    /// </summary>
     private void EmitGoto(BoundGoto statement)
     {
-        // Everything the scopes between here and the target were holding is
-        // released, exactly as a `break` out of them would release it. A jump
-        // that leaves a scope must not leave its references behind.
         FlushTemporaries();
-        ReleaseScopes(_bodyScopeDepth);
-        Terminator($"br label %{LabelBlock(statement.Label)}");
+
+        string exit = NextLabel("goto");
+        _pendingJumps.Add(new PendingJump(exit, statement.Label, [.. _scopes], _debugLocation));
+        Terminator($"br label %{exit}");
     }
+
+    /// <summary>The release blocks of every jump in the function, once every label is placed.</summary>
+    private void EmitPendingJumps()
+    {
+        foreach (var jump in _pendingJumps)
+        {
+            Label(jump.Block);
+            _debugLocation = jump.Location;
+
+            var kept = _labelScopes[jump.Label];
+            for (int i = jump.Scopes.Count - 1; i >= 0; i--)
+            {
+                if (kept.Contains(jump.Scopes[i])) continue;
+
+                foreach (var (slot, type) in Enumerable.Reverse(jump.Scopes[i]))
+                    ReleaseSlot(slot, type);
+            }
+
+            Terminator($"br label %{LabelBlock(jump.Label)}");
+        }
+
+        _pendingJumps.Clear();
+    }
+
+    private sealed record PendingJump(
+        string Block, LabelSymbol Label, List<List<(string Slot, TypeSymbol Type)>> Scopes, int? Location);
+
+    private readonly List<PendingJump> _pendingJumps = [];
+
+    /// <summary>The scopes open where each label was emitted.</summary>
+    private readonly Dictionary<LabelSymbol, List<List<(string Slot, TypeSymbol Type)>>> _labelScopes = [];
+
+    /// <summary>
+    /// Whether the function being emitted has somewhere a jump lands. Such a
+    /// function clears every owned slot as it releases it, because a jump may
+    /// run a declaration again or skip one.
+    /// </summary>
+    private bool _hasLabels;
+
+    /// <summary>Whether a statement holds a label or a switch section a <c>goto case</c> names.</summary>
+    private static bool ContainsLabel(BoundStatement statement) => statement switch
+    {
+        BoundLabel => true,
+        BoundBlock block => block.Statements.Any(ContainsLabel),
+        BoundIf branch => ContainsLabel(branch.Then) || branch.Else is not null && ContainsLabel(branch.Else),
+        BoundWhile loop => ContainsLabel(loop.Body),
+        BoundDoWhile loop => ContainsLabel(loop.Body),
+        BoundFor loop => loop.Initializer is not null && ContainsLabel(loop.Initializer) || ContainsLabel(loop.Body),
+        BoundSwitch chosen => chosen.Sections.Any(s => s.Entry is not null || ContainsLabel(s.Body)),
+        BoundParallel parallel => ContainsLabel(parallel.Body),
+        BoundParallelFor loop => ContainsLabel(loop.Body),
+        _ => false,
+    };
 
     /// <summary>
     /// The block name for a source label, one per label per function.
@@ -262,12 +332,6 @@ public sealed partial class LlvmEmitter
     }
 
     private readonly Dictionary<LabelSymbol, string> _labelBlocks = [];
-
-    /// <summary>
-    /// The scope depth of the function body's own block. Every label sits at
-    /// exactly this depth (SL0595), so this is what a jump releases down to.
-    /// </summary>
-    private int _bodyScopeDepth;
 
     private void EmitFor(BoundFor statement)
     {
@@ -334,7 +398,9 @@ public sealed partial class LlvmEmitter
         FlushTemporaries();
 
         string endLabel = NextLabel("switch.end");
-        var bodies = statement.Sections.Select(_ => NextLabel("switch.section")).ToList();
+        var bodies = statement.Sections
+            .Select(section => section.Entry is { } entry ? LabelBlock(entry) : NextLabel("switch.section"))
+            .ToList();
 
         int defaultIndex = statement.Sections.ToList().FindIndex(s => s.IsDefault);
         string defaultLabel = defaultIndex < 0 ? endLabel : bodies[defaultIndex];
@@ -415,22 +481,7 @@ public sealed partial class LlvmEmitter
                        $"[ {string.Join(" ", arms)} ]");
         }
 
-        // `break` lands after the switch; `continue` still belongs to whatever
-        // loop encloses it, and unwinds to that loop's depth.
-        string continueLabel = _loops.Count > 0 ? _loops[^1].ContinueLabel : endLabel;
-        int continueDepth = _loops.Count > 0 ? _loops[^1].ContinueDepth : _scopes.Count;
-        _loops.Add((endLabel, _scopes.Count, continueLabel, continueDepth));
-
-        foreach (var (section, label) in statement.Sections.Zip(bodies))
-        {
-            Label(label);
-            EmitStatement(section.Body);
-            if (!_blockTerminated) Terminator($"br label %{endLabel}");
-        }
-
-        _loops.RemoveAt(_loops.Count - 1);
-
-        Label(endLabel);
+        EmitSwitchBodies(statement, bodies, endLabel);
     }
 
     /// <summary>
@@ -441,6 +492,8 @@ public sealed partial class LlvmEmitter
     private void EmitSwitchBodies(
         BoundSwitch statement, IReadOnlyList<string> bodies, string endLabel)
     {
+        // `break` lands after the switch; `continue` still belongs to whatever
+        // loop encloses it, and unwinds to that loop's depth.
         string continueLabel = _loops.Count > 0 ? _loops[^1].ContinueLabel : endLabel;
         int continueDepth = _loops.Count > 0 ? _loops[^1].ContinueDepth : _scopes.Count;
         _loops.Add((endLabel, _scopes.Count, continueLabel, continueDepth));
@@ -448,6 +501,7 @@ public sealed partial class LlvmEmitter
         foreach (var (section, label) in statement.Sections.Zip(bodies))
         {
             Label(label);
+            if (section.Entry is { } entry) _labelScopes[entry] = [.. _scopes];
             EmitStatement(section.Body);
             if (!_blockTerminated) Terminator($"br label %{endLabel}");
         }

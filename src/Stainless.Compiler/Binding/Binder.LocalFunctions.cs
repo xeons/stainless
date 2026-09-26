@@ -358,10 +358,9 @@ public sealed partial class Binder
         int savedSwitches = _switchDepth;
         int savedParallel = _parallelDepth;
         var savedFacts = _variantFacts;
-        var savedLabels = new Dictionary<string, LabelSymbol>(_labels, StringComparer.Ordinal);
+        var savedJumps = _jumps;
         bool savedChecked = _checkedArithmetic;
         var savedChain = _constructorChain;
-        int savedBodyDepth = _bodyDepth;
         var savedClosures = new List<ClosureContext>(_closures);
         var savedLocalScopes = _localFunctionScopes;
         var savedSubstitution = _substitution;
@@ -383,11 +382,9 @@ public sealed partial class Binder
         _switchDepth = savedSwitches;
         _parallelDepth = savedParallel;
         _variantFacts = savedFacts;
-        _labels.Clear();
-        foreach (var (name, label) in savedLabels) _labels[name] = label;
+        _jumps = savedJumps;
         _checkedArithmetic = savedChecked;
         _constructorChain = savedChain;
-        _bodyDepth = savedBodyDepth;
         _closures.Clear();
         _closures.AddRange(savedClosures);
         _localFunctionScopes = savedLocalScopes;

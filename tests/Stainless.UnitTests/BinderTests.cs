@@ -1050,4 +1050,76 @@ public class BinderTests
              "rbx", "dirflag", "fpsr", "flags"],
             clobbers);
     }
+
+    // --------------------------------------------------------- reachability
+
+    /// <summary>
+    /// A function whose end nothing reaches needs no return there, however
+    /// the loop or the jumps in front of it are written.
+    /// </summary>
+    [Theory]
+    [InlineData("int F() { do { return 1; } while (true); }")]
+    [InlineData("int F(bool b) { do { if (b) return 1; } while (true); }")]
+    [InlineData("int F() { while (true) { } }")]
+    [InlineData("int F() { for (;;) { } }")]
+    [InlineData("int F(int n) { again: n++; if (n < 3) goto again; return n; }")]
+    [InlineData("int F(int n) { top: n++; goto top; }")]
+    [InlineData("int F(int n) { while (true) { if (n > 3) goto done; n++; } done: return n; }")]
+    [InlineData("int F(int n) { switch (n) { case 1: goto case 2; case 2: return 2; default: goto case 1; } }")]
+    [InlineData("int F(int n) { { again: n++; if (n < 3) goto again; } return n; }")]
+    public void AnEndNothingReachesNeedsNoReturn(string module) =>
+        Assert.Empty(Front.ModuleCodes(module));
+
+    [Theory]
+    [InlineData("int F(bool b) { do { if (b) break; return 1; } while (true); }")]
+    [InlineData("int F(bool b) { do { if (b) continue; return 1; } while (b); }")]
+    [InlineData("int F(int n) { while (true) { if (n > 3) goto done; n++; } done: n++; }")]
+    [InlineData("int F(int n) { for (;;) { break; } }")]
+    [InlineData("int F(int n) { if (n > 0) goto done; return 1; done: n++; }")]
+    public void AnEndSomethingReachesNeedsAReturn(string module) =>
+        Assert.Equal(["SL0217"], Front.ModuleCodes(module));
+
+    /// <summary>A section that ends in a jump does not fall through.</summary>
+    [Theory]
+    [InlineData("void F(int n) { switch (n) { case 1: n++; goto case 2; case 2: break; } }")]
+    [InlineData("void F(int n) { switch (n) { case 1: goto default; default: break; } }")]
+    [InlineData("void F(int n) { switch (n) { case 1: goto done; default: break; } done: n++; }")]
+    [InlineData("void F(int n) { switch (n) { case 1: while (true) { } } }")]
+    public void ASectionEndingInAJumpDoesNotFallThrough(string module) =>
+        Assert.Empty(Front.ModuleCodes(module));
+
+    /// <summary>
+    /// A jump may leave blocks but not enter one, and the error says which
+    /// rather than that there is no such label.
+    /// </summary>
+    [Theory]
+    [InlineData("void F(bool b) { if (b) { inner: return; } goto inner; }")]
+    [InlineData("void F() { { goto other; } { other: return; } }")]
+    [InlineData("void F(int n) { goto inside; switch (n) { case 1: inside: break; } }")]
+    public void AJumpIntoABlockIsRefusedAsOne(string module) =>
+        Assert.Equal(["SL0595"], Front.ModuleCodes(module));
+
+    [Theory]
+    [InlineData("void F() { goto case 1; }", "SL0802")]
+    [InlineData("void F() { goto default; }", "SL0802")]
+    [InlineData("void F(int n) { switch (n) { case 1: goto case 2; } }", "SL0803")]
+    [InlineData("void F(int n) { switch (n) { case 1: goto default; } }", "SL0803")]
+    [InlineData("void F(int n) { switch (n) { case 1: goto case n; } }", "SL0803")]
+    [InlineData("void F(int n) { switch (n) { case 1: Func<int, int> f = x => { goto case 1; }; break; } }", "SL0802")]
+    public void GotoCaseNamesASectionOfTheSwitchItIsIn(string module, string code) =>
+        Assert.Equal([code], Front.ModuleCodes(module));
+
+    /// <summary>A label in a lambda belongs to the lambda, so each may use the same name.</summary>
+    [Fact]
+    public void ALambdaHasLabelsOfItsOwn() =>
+        Assert.Empty(Front.ModuleCodes("""
+            int F(int n)
+            {
+                Func<int, int> f = x => { again: x++; if (x < 3) goto again; return x; };
+            again:
+                n++;
+                if (n < 3) goto again;
+                return f(n);
+            }
+            """));
 }

@@ -39,7 +39,10 @@ public sealed partial class LlvmEmitter
 
     private void TrackOwnedLocal(string slot, TypeSymbol type)
     {
-        if (type.CarriesReferences()) _scopes[^1].Add((slot, type));
+        if (!type.CarriesReferences()) return;
+
+        _scopes[^1].Add((slot, type));
+        if (_hasLabels) _clearedOnRelease.Add(slot);
     }
 
     /// <summary>Releases every owned local from the innermost scope down to <paramref name="depth"/>.</summary>

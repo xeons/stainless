@@ -215,7 +215,12 @@ last person to edit it -- the suite is the authority.
 - `switch` over integers, `char`, `bool`, enums, `String` and variants, with
   stacked labels and no fall-through. An ordinal switch is one LLVM `switch`, so
   a jump table is LLVM's decision rather than the programmer's; `break` belongs
-  to the switch while `continue` passes through it to the enclosing loop
+  to the switch while `continue` passes through it to the enclosing loop.
+  `goto case` and `goto default` carry on into another section, in a switch of
+  constants or of patterns, though not over a variant
+- `goto` and labels as C# has them: a jump leaves any number of blocks and
+  enters none, releasing what the scopes it leaves were holding, and a
+  declaration a jump runs again releases what it held first
 - `parallel { place = spawn f(x); }` — a fork-join scope whose closing brace
   waits, so a job writes its result straight into the parent's local; and
   `for parallel`, which splits a counted loop across the pool. `spawn` prefixes
@@ -819,8 +824,8 @@ Being straight about the edges, roughly in the order they are worth adding:
   behind the call. So an instantiation that makes a larger one of itself
   through the interface has no end (SL0798) where C# would make the next one on
   demand, and such a class does not cross a library boundary (SL0799).
-- **No `goto case`, and no exhaustiveness requirement on a statement over an
-  enum**, whose value need not be one of its members. A switch expression over
+- **No exhaustiveness requirement on a statement over an enum**, whose value
+  need not be one of its members. A switch expression over
   one is covered by naming them all, and ends the program on a value that is
   none of them, since there is no exception to throw.
 - **Coverage does not follow ranges.** `< 0`, `0` and `> 0` over an `int`

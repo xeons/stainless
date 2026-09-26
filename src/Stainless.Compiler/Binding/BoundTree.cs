@@ -1136,10 +1136,17 @@ public sealed class BoundLabel(SourceSpan span, LabelSymbol label) : BoundStatem
     public LabelSymbol Label { get; } = label;
 }
 
-/// <summary>A jump to a <see cref="BoundLabel"/> in the same function.</summary>
+/// <summary>
+/// A jump to a <see cref="BoundLabel"/> in the same function, or to a switch
+/// section's <see cref="BoundSwitchSection.Entry"/>.
+/// </summary>
 public sealed class BoundGoto(SourceSpan span, LabelSymbol label) : BoundStatement(span)
 {
-    public LabelSymbol Label { get; } = label;
+    /// <summary>
+    /// Settable because <c>goto case</c> may name a section the binder has not
+    /// reached yet, and is pointed at it once the whole switch is bound.
+    /// </summary>
+    public LabelSymbol Label { get; set; } = label;
 }
 
 /// <summary>
@@ -1309,6 +1316,12 @@ public sealed class BoundSwitchSection(
     /// a tag rather than a value the switched expression could equal.
     /// </summary>
     public IReadOnlyList<VariantCaseSymbol> Cases { get; init; } = [];
+
+    /// <summary>
+    /// Where a <c>goto case</c> or <c>goto default</c> lands, or null when
+    /// nothing jumps to this section.
+    /// </summary>
+    public LabelSymbol? Entry { get; set; }
 
     /// <summary>
     /// The local a matched case's payload is copied into, for <c>case Circle

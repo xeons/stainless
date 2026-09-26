@@ -2898,6 +2898,20 @@ public sealed class Parser
             case TokenKind.GotoKeyword:
             {
                 Advance();
+
+                if (Match(TokenKind.CaseKeyword))
+                {
+                    var value = ParseExpression();
+                    Expect(TokenKind.Semicolon);
+                    return new GotoCaseSyntax(SpanFrom(start), value);
+                }
+
+                if (Match(TokenKind.DefaultKeyword))
+                {
+                    Expect(TokenKind.Semicolon);
+                    return new GotoCaseSyntax(SpanFrom(start), null);
+                }
+
                 var label = Current;
                 string name = ExpectIdentifier();
                 Expect(TokenKind.Semicolon);

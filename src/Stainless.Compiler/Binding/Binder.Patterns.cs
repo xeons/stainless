@@ -1464,6 +1464,7 @@ public sealed partial class Binder
         var covered = new Dictionary<VariantCaseSymbol, SourceSpan>();
         var rows = new List<Space>();
         bool sawDefault = false;
+        var frame = OpenSwitchFrame(subject.Type, overVariant: false);
 
         _switchDepth++;
 
@@ -1494,7 +1495,13 @@ public sealed partial class Binder
                         "nothing reaches this label: the ones before it match everything it does");
 
                 if (guard is null)
+                {
                     rows.Add(pattern.Under);
+
+                    // `case 3:` among patterns is still somewhere `goto case 3` lands.
+                    if (pattern.Under is ConstructorSpace { Key: ValueKey constant, Members.Count: 0 })
+                        frame.Cases.TryAdd(constant.Value, sections.Count);
+                }
 
                 matched.Add(pattern);
                 guards.Add(guard);
@@ -1505,6 +1512,8 @@ public sealed partial class Binder
                 if (sawDefault)
                     diagnostics.Error("SL0406", section.Span,
                         "this switch already has a 'default' section");
+                else
+                    frame.Default = sections.Count;
                 sawDefault = true;
             }
 
@@ -1553,10 +1562,10 @@ public sealed partial class Binder
             PopScope();
             _variantFacts = saved;
 
-            if (!AlwaysExits(body))
+            if (EndIsReachable(body))
                 diagnostics.Error("SL0407", section.Span,
                     "a switch section must not run off its end; finish it with 'break', " +
-                    "'return' or 'continue'. Stack the labels instead, as in " +
+                    "'return', 'continue' or 'goto'. Stack the labels instead, as in " +
                     "'case 1: case 2:', when two of them share a body");
 
             sections.Add(new BoundSwitchSection(section.Span, [], section.HasDefault, body)
@@ -1566,6 +1575,7 @@ public sealed partial class Binder
         }
 
         _switchDepth--;
+        CloseSwitchFrame(frame, sections);
 
         // A statement over an enum is not exhaustive, as in C#: the value need
         // not be one of the members, and one that is none of them falls past.

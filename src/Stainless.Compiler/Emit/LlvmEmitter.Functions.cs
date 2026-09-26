@@ -33,6 +33,7 @@ public sealed partial class LlvmEmitter
     {
         var symbol = function.Symbol;
         ResetFunctionState();
+        _hasLabels = ContainsLabel(function.Body);
 
         var returnInfo = ClassifyResult(symbol.ReturnType);
         var parameterInfos = symbol.Parameters
@@ -178,11 +179,6 @@ public sealed partial class LlvmEmitter
 
         DescribeParameters(symbol);
 
-        // The body's own block is pushed by EmitBlock, one deeper than the
-        // scope the parameters are in. A `goto` releases everything above it,
-        // and the binder has already made sure every label is at that depth.
-        _bodyScopeDepth = _scopes.Count + 1;
-
         _atFunctionBody = true;
         EmitStatement(function.Body);
         _atFunctionBody = false;
@@ -200,6 +196,7 @@ public sealed partial class LlvmEmitter
             });
         }
 
+        EmitPendingJumps();
         PopScopeWithoutRelease();
 
         _module.AppendLine("entry:");

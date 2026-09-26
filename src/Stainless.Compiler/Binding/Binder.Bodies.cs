@@ -83,7 +83,7 @@ public sealed partial class Binder
         _loopDepth = 0;
         _switchDepth = 0;
         _variantFacts = [];
-        _labels.Clear();
+        _jumps = new JumpState();
         _checkedArithmetic = false;
         _patternVariableNames.Clear();
 
@@ -101,11 +101,6 @@ public sealed partial class Binder
             : null;
 
         PushScope();
-
-        // BindBlock pushes one more for the body's own block, and that is the
-        // depth a label has to be at.
-        _bodyDepth = _scopes.Count + 1;
-
         var body = BindBlock(function.Body);
         PopScope();
 
@@ -115,19 +110,7 @@ public sealed partial class Binder
 
         _constructorChain = null;
 
-        // A jump with nowhere to land, and a label nothing lands on. The first
-        // is an error; the second is a warning, because a label costs nothing
-        // and deleting the last jump to one is an ordinary edit.
-        foreach (var label in _labels.Values)
-        {
-            if (label.Declared is null && label.FirstUse is { } used)
-                diagnostics.Error("SL0589", used,
-                    $"there is no label '{label.Name}' in '{function.Name}'; a 'goto' names a " +
-                    "label in the function it is written in, and nowhere else");
-            else if (label.Declared is { } declared && !label.IsUsed)
-                diagnostics.Warning("SL0591", declared,
-                    $"nothing jumps to '{label.Name}'");
-        }
+        CheckJumps($"'{function.Name}'");
 
         if (function.Kind == FunctionKind.Constructor)
         {
@@ -137,7 +120,7 @@ public sealed partial class Binder
             body = WithPrimaryCaptures(function, body);
         }
 
-        if (!function.ReturnType.IsVoid() && !function.ReturnType.IsError() && !AlwaysReturns(body))
+        if (!function.ReturnType.IsVoid() && !function.ReturnType.IsError() && EndIsReachable(body))
             diagnostics.Error("SL0217", function.Span,
                 $"not all paths through '{function.Name}' return a value of type '{function.ReturnType.Name}'");
 
@@ -1241,26 +1224,6 @@ public sealed partial class Binder
         _ => null,
     };
 
-    /// <summary>Conservative reachability check: does this statement always return?</summary>
-    private static bool AlwaysReturns(BoundStatement statement) => statement switch
-    {
-        BoundReturn => true,
-        BoundBlock block => block.Statements.Any(AlwaysReturns),
-        BoundIf { Else: not null } ifStatement =>
-            AlwaysReturns(ifStatement.Then) && AlwaysReturns(ifStatement.Else),
-        // `while (true)` without a break never falls through.
-        BoundWhile { Condition: BoundLiteral { Value: true } } loop => !ContainsBreak(loop.Body),
-        BoundFor { Condition: null } loop => !ContainsBreak(loop.Body),
-
-        // Every arm returns and no value escapes them, so nothing reaches the
-        // statement after the switch.
-        BoundSwitch chosen =>
-            (chosen.IsExhaustive || chosen.Sections.Any(s => s.IsDefault)) &&
-            chosen.Sections.All(s => AlwaysReturns(s.Body)),
-
-        _ => false,
-    };
-
     /// <summary>
     /// Every <c>out</c> parameter is written before the function returns.
     ///
@@ -1286,10 +1249,10 @@ public sealed partial class Binder
         // by the time control reaches here" stops being a question this walk
         // can answer. Rather than guess, the check stands down -- and the
         // clearing at the call site is what still holds.
-        if (_labels.Count > 0) return;
+        if (_jumps.Labels.Count > 0 || _jumps.Jumps.Count > 0) return;
 
         foreach (var parameter in outward)
-            if (!Assigns(body, parameter, false, function) && !AlwaysReturns(body))
+            if (!Assigns(body, parameter, false, function) && EndIsReachable(body))
                 diagnostics.Error("SL0600", function.Span,
                     $"'{function.Name}' can return without writing to '{parameter.Name}', " +
                     "which is what 'out' promises the caller. Assign it on every path, or " +
@@ -1419,18 +1382,6 @@ public sealed partial class Binder
             _ => false,
         };
 
-    private static bool ContainsBreak(BoundStatement statement) => statement switch
-    {
-        BoundBreak => true,
-
-        // A break inside a nested switch belongs to that switch, not to us.
-        BoundSwitch => false,
-        BoundBlock block => block.Statements.Any(ContainsBreak),
-        BoundIf ifStatement => ContainsBreak(ifStatement.Then) ||
-                               (ifStatement.Else is not null && ContainsBreak(ifStatement.Else)),
-        _ => false,     // a break inside a nested loop belongs to that loop
-    };
-
     // ------------------------------------------------------------ scopes
 
     private void PushScope() => _scopes.Add(new Dictionary<string, LocalSymbol>(StringComparer.Ordinal));
@@ -1523,6 +1474,7 @@ public sealed partial class Binder
         DoWhileSyntax doWhile => BindDoWhile(doWhile),
         LabelSyntax label => BindLabel(label),
         GotoSyntax jump => BindGoto(jump),
+        GotoCaseSyntax jump => BindGotoCase(jump),
         CheckedBlockSyntax guarded => BindCheckedBlock(guarded),
         AsmSyntax assembly => BindAsm(assembly),
         ForSyntax forStatement => BindFor(forStatement),
@@ -1722,8 +1674,8 @@ public sealed partial class Binder
         // `if (!read.Ok) { return Fail(read.Error); }` and the rest of the
         // function is holding a value -- and `if (x is not Node n) return;`
         // leaves `n` for the rest of the block.
-        bool thenExits = AlwaysExits(then);
-        bool elseExits = otherwise is not null && AlwaysExits(otherwise);
+        bool thenExits = !EndIsReachable(then);
+        bool elseExits = otherwise is not null && !EndIsReachable(otherwise);
         bool outlived = false;
 
         if (thenExits && !elseExits)
@@ -1808,74 +1760,6 @@ public sealed partial class Binder
 
         _variantFacts = entry;
         return new BoundDoWhile(syntax.Span, body, condition);
-    }
-
-    /// <summary>
-    /// <c>name:</c>.
-    ///
-    /// Labels are per function rather than per block, which is C's rule and
-    /// C#'s: a jump may leave a block, and a label a jump could not reach would
-    /// be a label for nothing.
-    /// </summary>
-    private BoundStatement BindLabel(LabelSyntax syntax)
-    {
-        var label = LabelNamed(syntax.Name);
-
-        if (label.Declared is not null)
-        {
-            diagnostics.Error("SL0588", syntax.Span,
-                $"'{syntax.Name}' is already a label in this function; a 'goto' names one " +
-                "place, so two of a name would be a jump with two destinations");
-            return new BoundBlock(syntax.Span, []);
-        }
-
-        // A label only at the top level of the function body, which is what
-        // makes the jump's reference counting decidable: everything a `goto`
-        // has to release is exactly the scopes between it and there, and a
-        // label nested somewhere else would mean the answer depended on which
-        // jump arrived. Every use a `goto` is actually for -- out of nested
-        // loops, forward to a cleanup, back to a retry -- names one of these.
-        if (_scopes.Count != _bodyDepth)
-        {
-            diagnostics.Error("SL0595", syntax.Span,
-                $"label '{syntax.Name}' is inside a block; a label goes at the top level of " +
-                "the function, so that what a jump to it has to release is the same whichever " +
-                "jump arrives");
-            return new BoundBlock(syntax.Span, []);
-        }
-
-        label.Declared = syntax.Span;
-
-        // A variant narrowed above a label is not narrowed at it: a jump from
-        // anywhere in the function arrives here, and what it proved on the way
-        // is not what the fall-through proved.
-        _variantFacts = [];
-        return new BoundLabel(syntax.Span, label);
-    }
-
-    private BoundStatement BindGoto(GotoSyntax syntax)
-    {
-        var label = LabelNamed(syntax.Label);
-        label.IsUsed = true;
-        label.FirstUse ??= syntax.LabelSpan;
-
-        // Every label is at the top level of the function, so every label is
-        // outside the `parallel` block this jump is in -- which makes this a
-        // jump out of work that has to finish where it was started.
-        if (_parallelDepth > 0)
-            diagnostics.Error("SL0590", syntax.Span,
-                $"'goto {syntax.Label}' is inside a 'parallel' block, and every label is " +
-                "outside one; the work queued in a block has to finish there, so there is " +
-                "nothing a jump out of it could mean. Leave with a flag the block sets");
-
-        return new BoundGoto(syntax.Span, label);
-    }
-
-    /// <summary>The label of that name in this function, made on first mention.</summary>
-    private LabelSymbol LabelNamed(string name)
-    {
-        if (_labels.TryGetValue(name, out var existing)) return existing;
-        return _labels[name] = new LabelSymbol(name);
     }
 
     /// <summary>
@@ -2315,12 +2199,15 @@ public sealed partial class Binder
     {
         int enclosingLoops = _loopDepth;
         int enclosingSwitches = _switchDepth;
+        int enclosingBase = _jumps.ParallelBase;
         _loopDepth = 0;
         _switchDepth = 0;
         _parallelDepth++;
+        _jumps.ParallelBase = _scopes.Count;
 
         var body = BindBlock(syntax.Body);
 
+        _jumps.ParallelBase = enclosingBase;
         _parallelDepth--;
         _loopDepth = enclosingLoops;
         _switchDepth = enclosingSwitches;
@@ -2403,6 +2290,8 @@ public sealed partial class Binder
     /// </summary>
     private BoundStatement BindParallelFor(ParallelForSyntax syntax)
     {
+        int enclosingBase = _jumps.ParallelBase;
+        _jumps.ParallelBase = _scopes.Count;
         PushScope();
 
         int enclosingLoops = _loopDepth;
@@ -2418,6 +2307,7 @@ public sealed partial class Binder
         _switchDepth = enclosingSwitches;
 
         PopScope();
+        _jumps.ParallelBase = enclosingBase;
         return result;
     }
 

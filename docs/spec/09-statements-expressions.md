@@ -148,8 +148,9 @@ switch (shape)
 The tag is a byte, so this is an LLVM `switch` like an enum's.
 
 **Sections do not fall through.** Each one has to end by leaving — `break`,
-`return` or `continue` — and running off the end is an error rather than a
-silent jump into the next section. Values that share a body stack their labels:
+`return`, `continue` or a `goto` — and running off the end is an error
+(SL0407) rather than a silent jump into the next section. Values that share a
+body stack their labels:
 
 ```csharp
 case 0:
@@ -157,6 +158,27 @@ case 2:
 case 4:
     return "even";
 ```
+
+A section that means to carry on into another says which, with `goto case`
+and a constant one of that section's labels has, or `goto default`:
+
+```csharp
+switch (step)
+{
+    case Step.Fetch:  Fetch();  goto case Step.Decode;
+    case Step.Decode: Decode(); goto default;
+    default:          Finish(); break;
+}
+```
+
+The constant converts to the switch's type as a label does, and names a
+section of the innermost switch statement around the jump. There has to be one
+(SL0802), and it has to have a section with that label, or a `default` (SL0803).
+A switch of patterns is a place to land too, wherever a section has a plain
+constant label with no `when`. A switch over a variant is not: its sections
+are entered knowing which case the value holds, which is what makes a case's
+fields readable there, and a jump into one would know nothing of the kind. The
+jump releases what its own section declared, as `break` does.
 
 **`break` belongs to the switch, `continue` passes through it.** A `continue`
 written inside a switch inside a loop continues the loop, as in C#; a `break`
@@ -181,8 +203,7 @@ one is SL0436. Elsewhere a value that matches nothing falls past the whole
 statement: a statement over an enum need not name every member, as in C#,
 because the value need not be one of them. A statement whose labels cover every
 value it could hold — both bools, every case of a variant — ends a function
-the way one with a `default` does. There is no `goto case`. Each section has
-its own scope, so two sections may declare the same local name — which C# does
+the way one with a `default` does. Each section has its own scope, so two sections may declare the same local name — which C# does
 not allow, having put the whole switch in one scope.
 
 ### 9.1.1 Patterns
@@ -812,23 +833,36 @@ for (int a = 0; a < n; a++)
 done:
 ```
 
-C#'s, with one restriction: **a label goes at the top level of a function**
-(SL0595). That is not taste, it is what makes the reference counting
-decidable. A jump has to release whatever the scopes between it and the label
-were holding, and a label inside a block would have a different answer for
-every jump that could reach it. At the top level there is one answer: release
-down to the function's own block. Every use a `goto` is actually for fits
-there — out of nested loops, forward to a cleanup, back to a retry.
+C#'s. **A jump may leave any number of blocks and may not enter one**
+(SL0595): the label it names is in the block the jump is in, or in a block
+around that one. A jump into a block would arrive past whatever the block
+declared ahead of the label. The rule is also what keeps the reference
+counting decidable: what a jump releases is every scope it is in that the
+label is not, which is known for each jump where it is written, and is the
+same release a `break` out of those scopes would make.
 
-A jump forwards may skip a declaration, and the local it skipped is still
-released at the end of the block it was in. That is safe because an owned slot
-is cleared at function entry as well as where it is declared, so the release is
-handed a null.
+A jump forwards may skip a declaration, and a jump backwards may run one
+again. So a function with a label keeps every owned local null or owning at
+every point: the slot is cleared on entry to the function, cleared again as
+it is released, and a declaration that runs a second time releases what the
+first run left before it stores. The skipped local is released at the end of
+its block as usual, and is handed a null. The cost is a store per release and
+a release per declaration, and only in a function with a label.
 
-A jump names a label in its own function and nowhere else (SL0589); two labels
-of a name is an error (SL0588); a label nothing jumps to is a warning (SL0591);
-and a `goto` inside a `parallel` block is refused (SL0590), because every label
-is outside one.
+A jump names a label in its own function and nowhere else (SL0589) — a lambda
+and a local function have labels of their own; two labels of a name is an
+error (SL0588), even in blocks that do not nest, where C# allows it, because
+a name that means one place in the function reads more plainly; a label nothing jumps to is a
+warning (SL0591); and a jump out of a `parallel` block or a `for parallel`
+body is refused (SL0590), because the work queued there has to finish there.
+A jump from one place to another inside the block is ordinary. `goto case`
+and `goto default` are the switch's own jumps, in [§9.1](#91-switch).
+
+**Reachability is C#'s**, without its constant folding beyond a literal
+`true`. A function has to return on every path that reaches its end
+(SL0217), and a jump, a `while (true)` or `for (;;)` with no `break`, and a
+`do` whose body always leaves all count as not reaching it. A label is
+reached when a jump that is itself reached names it.
 
 ## 9.11 `nameof`
 

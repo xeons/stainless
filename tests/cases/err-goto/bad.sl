@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: 0BSD
 module Bad;
 
-// A label goes at the top level of a function, is named once, and is named by
-// something. All three are about the same thing: a jump has to know what to
-// release on the way, and that answer has to be the same whichever jump lands.
+// A label is named once, is named by something, and is reached only from
+// inside the block it is in. A jump may leave blocks but not enter one: what
+// the block declared before the label would never have been made.
 
 int Nowhere()
 {
@@ -11,16 +11,25 @@ int Nowhere()
     goto elsewhere;
 }
 
-int Nested(bool flag)
+int Into(bool flag)
 {
     if (flag)
     {
-        // Two jumps from different depths would have different amounts to let
-        // go of, so a label inside a block has no single answer.
     inner:
         return 1;
     }
     goto inner;
+}
+
+int Sideways()
+{
+    {
+        goto other;
+    }
+    {
+    other:
+        return 2;
+    }
 }
 
 int Twice()
@@ -37,4 +46,29 @@ again:
     return n;
 }
 
-int Main() => Nowhere() + Nested(true) + Twice();
+// A lambda's labels are its own, so the enclosing function's is not one.
+int Across()
+{
+    Func<int, int> f = x =>
+    {
+        goto start;
+    };
+
+start:
+    return f(1);
+}
+
+// A jump out of a loop to a label that runs off the end still runs off it.
+int Falling(int n)
+{
+    while (true)
+    {
+        if (n > 3)
+            goto done;
+        n++;
+    }
+done:
+    n++;
+}
+
+int Main() => Nowhere() + Into(true) + Sideways() + Twice() + Across() + Falling(0);

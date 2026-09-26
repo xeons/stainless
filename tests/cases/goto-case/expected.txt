@@ -1,0 +1,26 @@
+zero small done
+small done
+  + five
+  - five
+five zero small done
+done
+stop go
+1 2 0
+three three other other
+machine:
+  + step 0
+  + pair 0
+  - pair 0
+  - step 0
+  + step 1
+  + pair 1
+  - pair 1
+  - step 1
+  + step 2
+  + pair 2
+  - pair 2
+  - step 2
+  + last
+  - last
+  steps 3
+once 7

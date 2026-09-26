@@ -118,7 +118,8 @@ public sealed class LocalSymbol(string name, TypeSymbol type, bool isConst)
 /// <summary>
 /// A <c>goto</c> target. One per label per function, made by whichever of the
 /// two the binder meets first: a jump forwards names a label that has not been
-/// bound yet, and a jump backwards names one that has.
+/// bound yet, and a jump backwards names one that has. A switch section that a
+/// <c>goto case</c> names has one too, with no name a jump could write.
 /// </summary>
 public sealed class LabelSymbol(string name)
 {
@@ -126,6 +127,12 @@ public sealed class LabelSymbol(string name)
 
     /// <summary>Where the label itself is, once it has been seen.</summary>
     public SourceSpan? Declared { get; set; }
+
+    /// <summary>
+    /// The block the label is in, as the binder's scope for it. A jump reaches
+    /// the label only from inside this block.
+    /// </summary>
+    public object? Block { get; set; }
 
     /// <summary>Where the first jump to it is, for the error when it is never declared.</summary>
     public SourceSpan? FirstUse { get; set; }

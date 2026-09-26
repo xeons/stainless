@@ -313,6 +313,38 @@ public class ParserTests
         Assert.False(diagnostics.HasErrors);
     }
 
+    /// <summary>
+    /// <c>goto case</c> and <c>goto default</c> are their own statement; a
+    /// plain <c>goto</c> still names a label.
+    /// </summary>
+    [Fact]
+    public void GotoCaseAndGotoDefaultNameASection()
+    {
+        var unit = Front.Parse("""
+            module A;
+            void F(int x)
+            {
+                switch (x)
+                {
+                    case 1: goto case 2 + 1;
+                    case 3: goto default;
+                    default: goto done;
+                }
+            done:
+                return;
+            }
+            """, out var diagnostics);
+        Assert.False(diagnostics.HasErrors);
+
+        var function = Assert.IsType<FunctionDeclSyntax>(unit.Declarations[0]);
+        var chosen = Assert.IsType<SwitchSyntax>(function.Body!.Statements[0]);
+
+        var toCase = Assert.IsType<GotoCaseSyntax>(chosen.Sections[0].Statements[0]);
+        Assert.IsType<BinarySyntax>(toCase.Value);
+        Assert.Null(Assert.IsType<GotoCaseSyntax>(chosen.Sections[1].Statements[0]).Value);
+        Assert.Equal("done", Assert.IsType<GotoSyntax>(chosen.Sections[2].Statements[0]).Label);
+    }
+
     // ------------------------------------------------------------- slices
 
     /// <summary>

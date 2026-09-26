@@ -671,12 +671,14 @@ public sealed partial class Binder
         int savedLoops = _loopDepth;
         int savedSwitches = _switchDepth;
         int savedParallel = _parallelDepth;
+        var savedJumps = _jumps;
 
         _scopes.Clear();
         _currentFunction = probe;
         _loopDepth = 0;
         _switchDepth = 0;
         _parallelDepth = 0;
+        _jumps = new JumpState();
         _closures.Add(context);
         PushScope();
 
@@ -713,6 +715,7 @@ public sealed partial class Binder
         _loopDepth = savedLoops;
         _switchDepth = savedSwitches;
         _parallelDepth = savedParallel;
+        _jumps = savedJumps;
 
         // Whatever the trial built on the way, it does not keep.
         DiscardGenerated(classes, functions);
@@ -1180,12 +1183,14 @@ public sealed partial class Binder
         int savedLoops = _loopDepth;
         int savedSwitches = _switchDepth;
         int savedParallel = _parallelDepth;
+        var savedJumps = _jumps;
 
         _scopes.Clear();
         _currentFunction = symbol;
         _loopDepth = 0;
         _switchDepth = 0;
         _parallelDepth = 0;
+        _jumps = new JumpState();
         _closures.Add(context);
 
         PushScope();
@@ -1208,8 +1213,9 @@ public sealed partial class Binder
         }
 
         PopScope();
+        CheckJumps("this lambda");
 
-        if (!symbol.ReturnType.IsVoid() && !AlwaysReturns(body))
+        if (!symbol.ReturnType.IsVoid() && EndIsReachable(body))
             diagnostics.Error("SL0217", syntax.Span,
                 $"not all paths through this lambda return a value of type '{symbol.ReturnType.Name}'");
 
@@ -1220,6 +1226,7 @@ public sealed partial class Binder
         _loopDepth = savedLoops;
         _switchDepth = savedSwitches;
         _parallelDepth = savedParallel;
+        _jumps = savedJumps;
 
         return body;
     }
@@ -1278,12 +1285,14 @@ public sealed partial class Binder
         var seenOrdinals = new Dictionary<ulong, SourceSpan>();
         var seenText = new Dictionary<string, SourceSpan>(StringComparer.Ordinal);
         bool sawDefault = false;
+        var frame = OpenSwitchFrame(value.Type, overVariant: false);
 
         _switchDepth++;
 
         foreach (var section in syntax.Sections)
         {
             var labels = new List<BoundExpression>();
+            int index = sections.Count;
 
             foreach (var label in section.Labels)
             {
@@ -1303,7 +1312,10 @@ public sealed partial class Binder
                         diagnostics.Error("SL0405", label.Span,
                             $"this switch already has a case for \"{text.Value}\"");
                     else
+                    {
                         labels.Add(text);
+                        frame.Cases[text.Value] = index;
+                    }
 
                     continue;
                 }
@@ -1320,10 +1332,13 @@ public sealed partial class Binder
                     diagnostics.Error("SL0405", label.Span,
                         "this switch already has a case for that value");
                 else
+                {
                     // The folded value, not the expression it was written as:
                     // `case -1:` is a negation, and an LLVM switch arm has to
                     // be a constant rather than an instruction.
                     labels.Add(new BoundLiteral(label.Span, value.Type, bits));
+                    frame.Cases[bits] = index;
+                }
             }
 
             if (section.HasDefault)
@@ -1331,6 +1346,8 @@ public sealed partial class Binder
                 if (sawDefault)
                     diagnostics.Error("SL0406", section.Span,
                         "this switch already has a 'default' section");
+                else
+                    frame.Default = index;
                 sawDefault = true;
             }
 
@@ -1342,17 +1359,19 @@ public sealed partial class Binder
             // No fall-through, as in C#. A section that runs off its end is
             // almost always a forgotten 'break', and the reader of one that
             // meant it has no way to tell.
-            if (!AlwaysExits(body))
+            if (EndIsReachable(body))
                 diagnostics.Error("SL0407", section.Span,
                     "a switch section must not run off its end; finish it with 'break', " +
-                    "'return' or 'continue'. Stack the labels instead, as in " +
-                    "'case 1: case 2:', when two values share a body");
+                    "'return', 'continue' or 'goto'. Stack the labels instead, as in " +
+                    "'case 1: case 2:', when two values share a body, or end one section " +
+                    "with 'goto case' to run another");
 
             sections.Add(new BoundSwitchSection(
                 section.Span, labels, section.HasDefault, body));
         }
 
         _switchDepth--;
+        CloseSwitchFrame(frame, sections);
 
         BoundStatement result = new BoundSwitch(syntax.Span, value, sections);
         return spill is null
@@ -1389,6 +1408,7 @@ public sealed partial class Binder
         var sections = new List<BoundSwitchSection>();
         var covered = new Dictionary<VariantCaseSymbol, SourceSpan>();
         bool sawDefault = false;
+        var frame = OpenSwitchFrame(variant, overVariant: true);
 
         _switchDepth++;
 
@@ -1466,6 +1486,8 @@ public sealed partial class Binder
                 if (sawDefault)
                     diagnostics.Error("SL0406", section.Span,
                         "this switch already has a 'default' section");
+                else
+                    frame.Default = sections.Count;
                 sawDefault = true;
             }
 
@@ -1494,10 +1516,10 @@ public sealed partial class Binder
             PopScope();
             _variantFacts = saved;
 
-            if (!AlwaysExits(body))
+            if (EndIsReachable(body))
                 diagnostics.Error("SL0407", section.Span,
                     "a switch section must not run off its end; finish it with 'break', " +
-                    "'return' or 'continue'. Stack the labels instead, as in " +
+                    "'return', 'continue' or 'goto'. Stack the labels instead, as in " +
                     "'case Circle: case Rect:', when two cases share a body");
 
             sections.Add(new BoundSwitchSection(section.Span, [], section.HasDefault, body)
@@ -1508,6 +1530,7 @@ public sealed partial class Binder
         }
 
         _switchDepth--;
+        CloseSwitchFrame(frame, sections);
 
         var missing = variant.Uncovered(covered.Keys).ToList();
 
@@ -1542,20 +1565,6 @@ public sealed partial class Binder
         BoundConstantAccess { Constant.Value: bool flag } => flag ? 1UL : 0UL,
         BoundConstantAccess { Constant.Value: int scalar } => (ulong)scalar,
         _ => null,
-    };
-
-    /// <summary>
-    /// Whether a statement always leaves the section it is in. Wider than
-    /// <see cref="AlwaysReturns"/> by exactly <c>break</c> and <c>continue</c>,
-    /// and it stops at a loop, whose own <c>break</c> lands after the loop
-    /// rather than out of the section.
-    /// </summary>
-    private static bool AlwaysExits(BoundStatement statement) => statement switch
-    {
-        BoundBreak or BoundContinue => true,
-        BoundBlock block => block.Statements.Any(AlwaysExits),
-        BoundIf { Else: not null } branch => AlwaysExits(branch.Then) && AlwaysExits(branch.Else),
-        _ => AlwaysReturns(statement),
     };
 
     private BoundStatement BindReturn(ReturnSyntax syntax)

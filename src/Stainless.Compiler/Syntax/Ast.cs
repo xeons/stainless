@@ -1101,6 +1101,13 @@ public sealed record GotoSyntax(SourceSpan Span, string Label, SourceSpan LabelS
     : StatementSyntax(Span);
 
 /// <summary>
+/// <c>goto case value;</c>, and <c>goto default;</c> where <see cref="Value"/>
+/// is null: a jump to a section of the switch the statement is in.
+/// </summary>
+public sealed record GotoCaseSyntax(SourceSpan Span, ExpressionSyntax? Value)
+    : StatementSyntax(Span);
+
+/// <summary>
 /// <c>checked { ... }</c> and <c>unchecked { ... }</c>: whether the integer
 /// arithmetic written inside is asked to notice that it overflowed.
 /// </summary>

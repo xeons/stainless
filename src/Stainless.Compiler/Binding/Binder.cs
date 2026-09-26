@@ -221,20 +221,11 @@ public sealed partial class Binder(
     private int _switchDepth;
 
     /// <summary>
-    /// Every <c>goto</c> target in the function being bound, by name.
-    ///
-    /// Labels are per function, not per block, so this is cleared with the rest
-    /// of the per-function state. A name lands here from whichever comes first,
-    /// the label or a jump to it, because a jump forwards names one that does
-    /// not exist yet.
+    /// The labels and jumps of the function being bound. Replaced rather than
+    /// cleared, so a lambda or local function bound in the middle of one puts
+    /// it aside and brings it back.
     /// </summary>
-    private readonly Dictionary<string, LabelSymbol> _labels = new(StringComparer.Ordinal);
-
-    /// <summary>
-    /// The scope depth of the function body's own block, which is the one depth
-    /// a label may be written at. See <c>BindLabel</c> for why.
-    /// </summary>
-    private int _bodyDepth;
+    private JumpState _jumps = new();
 
     /// <summary>
     /// The simple name of the type whose members are being declared, or null.

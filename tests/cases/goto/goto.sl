@@ -2,14 +2,10 @@
 //
 // `goto`, and the labels it names.
 //
-// **A label goes at the top level of a function**, and that restriction is
-// what makes the reference counting decidable. A jump has to release
-// everything the scopes between it and the label were holding; put a label
-// inside a block and the answer would depend on which jump arrived, because
-// two jumps from different depths would have different amounts to let go of.
-// At the top level there is one answer: release down to the function's own
-// block. Every use a `goto` is actually for fits there -- out of nested loops,
-// forward to a cleanup, back to a retry.
+// **A jump may leave blocks and may not enter one**, which is C#'s rule and
+// what keeps the reference counting decidable. What a jump releases is every
+// scope it is in that the label is not, and that is known for each jump.
+
 module Goto;
 
 import Standard.Console;
@@ -96,6 +92,68 @@ retry:
     Console.WriteLine($"  spun {spins}");
 }
 
+/// A jump backwards over a declaration runs it again, and what the last
+/// run left in the local is released rather than overwritten.
+void Redeclaring()
+{
+    int k = 0;
+
+again:
+    var held = new Tag($"again {k}");
+    Tag later;
+    later = new Tag($"later {k}");
+    k++;
+    if (k < 3)
+        goto again;
+
+    Console.WriteLine($"  kept {held.Name} {later.Name}");
+}
+
+/// A label inside a block, reached from deeper inside it.
+int InsideABlock(int rounds)
+{
+    int total = 0;
+
+    for (int i = 0; i < rounds; i++)
+    {
+        var outer = new Tag($"outer {i}");
+
+    again:
+        {
+            var inner = new Tag($"inner {total}");
+            total++;
+            if (total % 2 == 1)
+                goto again;
+        }
+    }
+
+    return total;
+}
+
+/// A lambda's labels are its own, and so are a local function's.
+int Separately()
+{
+    Func<int, int> doubling = x =>
+    {
+    again:
+        x = x * 2;
+        if (x < 100)
+            goto again;
+        return x;
+    };
+
+    int Counting(int n)
+    {
+    again:
+        n++;
+        if (n < 10)
+            goto again;
+        return n;
+    }
+
+    return doubling(3) + Counting(0);
+}
+
 public int Main()
 {
     Console.WriteLine($"return {FirstProduct(6)}");
@@ -110,5 +168,13 @@ public int Main()
 
     Console.WriteLine("retrying:");
     Retrying();
+
+    Console.WriteLine("redeclaring:");
+    Redeclaring();
+
+    Console.WriteLine("inside a block:");
+    Console.WriteLine($"  total {InsideABlock(2)}");
+
+    Console.WriteLine($"separately {Separately()}");
     return 0;
 }
