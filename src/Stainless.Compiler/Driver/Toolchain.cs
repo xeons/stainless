@@ -602,6 +602,69 @@ public sealed class Toolchain
             "-Wno-override-module",
         ]);
 
+    private string? _optPath;
+    private bool _lookedForOpt;
+
+    /// <summary>
+    /// LLVM's <c>opt</c>, from the directory clang is in or the one it
+    /// resolves to, or null. Nowhere else: an <c>opt</c> from another LLVM
+    /// judges the IR by a different version's rules. The Windows installer
+    /// ships none, and Debian's LLVM ships one beside its clang.
+    /// </summary>
+    public string? OptPath
+    {
+        get
+        {
+            if (_lookedForOpt) return _optPath;
+            _lookedForOpt = true;
+
+            string executable = OperatingSystem.IsWindows() ? "opt.exe" : "opt";
+            foreach (string near in new[] { ClangPath, RealPath(ClangPath) })
+            {
+                if (Path.GetDirectoryName(near) is not { Length: > 0 } beside)
+                    continue;
+
+                string candidate = Path.Combine(beside, executable);
+                if (File.Exists(candidate))
+                    return _optPath = candidate;
+            }
+
+            return _optPath = null;
+        }
+    }
+
+    /// <summary>
+    /// Runs LLVM's verifier over a module, and returns what it found wrong, or
+    /// null when nothing was.
+    ///
+    /// <c>opt -passes=verify</c> where it is installed. Otherwise clang, told to
+    /// read the module and write it back as bitcode with every pass off: it
+    /// verifies what it reads, and writing bitcode to nowhere is the cheapest
+    /// output it has. Both take about a tenth of a second on a module holding
+    /// the whole standard library.
+    ///
+    /// Invalid debug information is not an error to either tool. It is
+    /// stripped with a warning and the build goes on without it, so that
+    /// warning is a failure here.
+    /// </summary>
+    public IrFault? VerifyIr(string ir)
+    {
+        var result = OptPath is { } opt
+            ? Run(opt, ["-passes=verify", "-disable-output", "-"], ir)
+            : Run(ClangPath, [
+                .. TargetArguments,
+                "-x", "ir", "-c", "-emit-llvm",
+                "-Xclang", "-disable-llvm-passes",
+                "-Wno-override-module",
+                "-o", OperatingSystem.IsWindows() ? "NUL" : "/dev/null",
+                "-",
+            ], ir);
+
+        return result.Success && !IrFault.StrippedDebugInfo(result.StandardError)
+            ? null
+            : IrFault.FromVerifier(result.StandardError, ir);
+    }
+
     /// <summary>
     /// What a shared library built from a package of this name is called.
     ///
@@ -630,23 +693,48 @@ public sealed class Toolchain
     public static string ExecutableExtension =>
         OperatingSystem.IsWindows() ? ".exe" : "";
 
-    public static ToolResult Run(string executable, IReadOnlyList<string> arguments)
+    /// <summary>
+    /// Runs a tool to completion. <paramref name="input"/>, when given, is its
+    /// standard input; otherwise the tool inherits this process's.
+    /// </summary>
+    public static ToolResult Run(string executable, IReadOnlyList<string> arguments, string? input = null)
     {
         var startInfo = new ProcessStartInfo(executable)
         {
             RedirectStandardOutput = true,
             RedirectStandardError = true,
+            RedirectStandardInput = input is not null,
             UseShellExecute = false,
         };
+
+        // UTF-8 without a mark, which is what a .ll on disk is. The default
+        // is the console's code page, and a byte-order mark is not IR.
+        if (input is not null)
+            startInfo.StandardInputEncoding = new System.Text.UTF8Encoding(false);
         foreach (string argument in arguments) startInfo.ArgumentList.Add(argument);
 
         using var process = Process.Start(startInfo)
             ?? throw new InvalidOperationException($"could not start '{executable}'");
 
-        string output = process.StandardOutput.ReadToEnd();
-        string error = process.StandardError.ReadToEnd();
-        process.WaitForExit();
+        // Both streams at once, and the input beside them: a tool that fills
+        // one pipe while this waits on another never finishes.
+        var output = process.StandardOutput.ReadToEndAsync();
+        var error = process.StandardError.ReadToEndAsync();
 
-        return new ToolResult(process.ExitCode, output, error);
+        if (input is not null)
+        {
+            try
+            {
+                process.StandardInput.Write(input);
+                process.StandardInput.Close();
+            }
+            catch (IOException)
+            {
+                // The tool stopped reading, and its exit code says why.
+            }
+        }
+
+        process.WaitForExit();
+        return new ToolResult(process.ExitCode, output.Result, error.Result);
     }
 }

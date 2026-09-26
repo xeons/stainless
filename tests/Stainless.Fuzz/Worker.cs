@@ -36,6 +36,9 @@ internal static class Worker
 
     private const int MaxCorpus = 20_000;
 
+    /// <summary>A mutant larger than this is not compiled at all.</summary>
+    private const int MaxMutantLength = 2_000_000;
+
     public static int Run(string repository, string output, int id, int seed)
     {
         var random = new Random(seed);
@@ -53,6 +56,11 @@ internal static class Worker
             int which = random.Next(program.Count);
             var files = program.ToList();
             files[which] = program[which] with { Text = mutator.Mutate(program[which].Text) };
+
+            // Nesting a file inside itself compounds, and a mutant of tens of
+            // megabytes spends the supervisor's patience being read.
+            if (files[which].Text.Length > MaxMutantLength)
+                continue;
 
             File.WriteAllText(current, $"// mutated from {program[which].Path}\n" + files[which].Text);
             var outcome = Pipeline.Run(files);
@@ -94,6 +102,9 @@ internal static class Worker
 
         string minimal = Minimiser.Run(files[which].Text, text =>
         {
+            // Minimising takes longer than the supervisor waits in silence.
+            Console.WriteLine(Supervisor.Heartbeat);
+
             var candidate = files.ToList();
             candidate[which] = files[which] with { Text = text };
             return Pipeline.Run(candidate).Signature == outcome.Signature;

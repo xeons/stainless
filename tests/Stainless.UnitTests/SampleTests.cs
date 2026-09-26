@@ -14,23 +14,25 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+using Stainless.Emit;
 using Stainless.Source;
 using Xunit;
 
 namespace Stainless.UnitTests;
 
 /// <summary>
-/// Every sample still binds.
+/// Every sample still binds, and emits IR that LLVM's verifier accepts.
 ///
 /// Nothing compiled these. The end-to-end suite runs <c>tests/cases</c> and
 /// the samples are not among them, so a sample could stop matching the
 /// language and the only thing that would notice is somebody reading it --
 /// which is the one audience a sample has.
 ///
-/// Binding rather than building: it takes a millisecond and catches everything
-/// a sample can get wrong, since a sample is source and its mistakes are
-/// source mistakes. What it does not catch is a link error, which is what
-/// <c>samples/interop</c> would need its C file for.
+/// Binding and emitting rather than building: it catches everything a sample
+/// can get wrong, since a sample is source and its mistakes are source
+/// mistakes, and anything the emitter gets wrong about it. What it does not
+/// catch is a link error, which is what <c>samples/interop</c> would need its
+/// C file for.
 /// </summary>
 public class SampleTests
 {
@@ -204,7 +206,7 @@ public class SampleTests
             paths.AddRange(OperatingSystem.IsWindows() ? Win32Bindings() : GtkBindings());
         }
 
-        Front.BindFiles(paths, out var diagnostics, sample.Shared);
+        var program = Front.BindFiles(paths, out var diagnostics, sample.Shared);
 
         // The standard library's own diagnostics are not what any of these
         // tests is asking about and would show up in all of them at once, so
@@ -235,6 +237,11 @@ public class SampleTests
             .ToList();
 
         Assert.Empty(complaints);
+
+        // And what it binds to is IR LLVM accepts. The samples are the largest
+        // programs in the tree, and the only ones no end-to-end case builds.
+        if (!diagnostics.HasErrors)
+            Front.Verified(new LlvmEmitter(forSharedLibrary: sample.Shared).Emit(program));
     }
 
     /// <summary>

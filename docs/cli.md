@@ -48,6 +48,11 @@ stainless restore              resolve dependencies and lock them
                          arm64, optionally with a system -- x86-windows,
                          x86-linux, arm64-windows, arm64-linux
   --keep                 keep the generated .ll
+  --verify-ir            run LLVM's verifier over the generated IR first, and
+                         report a fault as a compiler bug in the function it is
+                         in. A linked build is verified by clang regardless;
+                         this reaches 'emit-ir' too. STAINLESS_VERIFY_IR=1 asks
+                         for it in every build
   --obj <dir>            directory for intermediates (default ./obj)
   --                     (run) everything after this is passed to the program
   -h, --help  -v, --version

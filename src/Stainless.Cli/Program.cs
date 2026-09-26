@@ -157,6 +157,11 @@ internal static class Program
                                    mangling, bit-field layout and how a struct
                                    is passed (default: the host's)
               --keep               keep the generated .ll next to the output
+              --verify-ir          run LLVM's verifier over the generated IR and
+                                   report a fault as a compiler bug. A linked
+                                   build is verified by clang regardless; this
+                                   reaches 'emit-ir' too. STAINLESS_VERIFY_IR=1
+                                   asks for it in every build
               --diagnostics <form> 'text' for a person, 'json' for a tool
               --obj <dir>          directory for intermediates (default: ./obj)
               --                   (run) everything after this is passed to the program
@@ -745,6 +750,7 @@ internal static class Program
         /// </summary>
         public bool? Debug { get; set; }
         public bool LeakCheck { get; set; }
+        public bool VerifyIr { get; set; }
 
         /// <summary>
         /// Which debugger's format, or null for what the target reads.
@@ -771,6 +777,7 @@ internal static class Program
             OptimizationLevel = OptimizationGiven ? Optimization : null,
             Debug = Debug,
             LeakCheck = LeakCheck,
+            VerifyIr = VerifyIr,
             DebugFormat = DebugFormat,
             KeepIntermediates = Keep,
             EmitIrOnly = EmitIrOnly,
@@ -842,6 +849,7 @@ internal static class Program
                 KeepIntermediates = Keep,
                 Debug = Debug ?? false,
                 LeakCheck = LeakCheck,
+                VerifyIr = VerifyIr,
                 DebugFormat = DebugFormat,
                 Defines = Defines,
                 CppAbi = Abi,
@@ -976,6 +984,10 @@ internal static class Program
 
                 case "--keep":
                     arguments.Keep = true;
+                    continue;
+
+                case "--verify-ir":
+                    arguments.VerifyIr = true;
                     continue;
 
                 case "--diagnostics":

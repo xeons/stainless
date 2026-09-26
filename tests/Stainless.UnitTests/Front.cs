@@ -283,9 +283,9 @@ public static class Front
         // writes CRLF on Windows and LF everywhere else. A test that asserted on
         // a line would otherwise pass on one platform and fail on the other for
         // a reason that has nothing to do with what it is testing.
-        return new LlvmEmitter(forSharedLibrary: true, abi: abi)
+        return Verified(new LlvmEmitter(forSharedLibrary: true, abi: abi)
             .Emit(program)
-            .ReplaceLineEndings("\n");
+            .ReplaceLineEndings("\n"));
     }
 
     /// <summary>
@@ -310,9 +310,27 @@ public static class Front
                     .Select(d => d.Code + " " + d.Message)));
 
         var debug = new DebugInfo(source, "Stainless tests", format, optimized);
-        return new LlvmEmitter(forSharedLibrary: true, abi: abi, debug: debug)
+        return Verified(new LlvmEmitter(forSharedLibrary: true, abi: abi, debug: debug)
             .Emit(program)
-            .ReplaceLineEndings("\n");
+            .ReplaceLineEndings("\n"));
+    }
+
+    /// <summary>The toolchain emitted IR is verified with, or null on a machine with none.</summary>
+    public static readonly Lazy<Toolchain?> Tools = new(() => Toolchain.Locate(out _));
+
+    /// <summary>
+    /// The IR, once LLVM's verifier has accepted it. A test asserting on the
+    /// text of a module LLVM would refuse is asserting on nothing.
+    ///
+    /// On a machine with no clang the IR is returned unverified, so a test's
+    /// own assertions still run; <c>EmitterTests.TheVerifierIsAvailable</c> is
+    /// skipped there to say so.
+    /// </summary>
+    public static string Verified(string ir)
+    {
+        if (Tools.Value?.VerifyIr(ir) is { } fault)
+            throw new InvalidOperationException(fault.Explain(irPath: null));
+        return ir;
     }
 
     /// <summary>

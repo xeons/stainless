@@ -493,7 +493,8 @@ public class EmbedTests
                 out var diagnostics);
             Assert.False(diagnostics.HasErrors);
 
-            string ir = new LlvmEmitter(forSharedLibrary: true).Emit(program).ReplaceLineEndings("\n");
+            string ir = Front.Verified(
+                new LlvmEmitter(forSharedLibrary: true).Emit(program).ReplaceLineEndings("\n"));
 
             Assert.Contains("module asm \".section \\22.stub\\22,\\22ax\\22,%progbits\"\n", ir);
             Assert.Contains("module asm \"_SLembed0:\"\n", ir);

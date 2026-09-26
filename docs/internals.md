@@ -43,8 +43,9 @@ dotnet run --project tests/Stainless.Fuzz -- repro file.sl
 It mutates every test case, sample and standard library file a token at a time
 — deleting, repeating, swapping, nesting seven hundred deep — and compiles each
 mutant through parse, bind and emit in process, stopping wherever the driver
-would. A compiler may reject anything; it may not throw, overflow its stack,
-run forever, or report a span that is not in the file, and any of those is kept
+would, and hands what emits to LLVM's verifier. A compiler may reject anything;
+it may not throw, overflow its stack, run forever, report a span that is not in
+the file, or emit a module LLVM refuses, and any of those is kept
 under `%TEMP%/stainless-fuzz/crashes`, one directory per distinct failure, with
 the input shrunk to what still fails the same way.
 
@@ -54,9 +55,30 @@ the supervisor keeps the input a worker was compiling when it died or went
 quiet. It is not coverage-guided: that would mean instrumenting the compiler
 assembly, and keeping any mutant that makes the compiler report something new
 has been enough to get past the parser. It does not link or run anything, so
-it finds crashes and not miscompilations. Its first five minutes found two
-dozen crashes the suites had not, and a fixed one is pinned by an ordinary case
-like any other bug — the fuzzer's findings directory is not a test suite.
+it finds crashes and invalid IR and not miscompilations. Verifying costs about
+a tenth of a second per mutant that emits, and a sixth of the throughput. Its
+first five minutes found two dozen crashes the suites had not, and a fixed one
+is pinned by an ordinary case like any other bug — the fuzzer's findings
+directory is not a test suite.
+
+**LLVM's verifier is the check on the emitter.** clang verifies every module it
+reads, before any pass runs, so every linked build and every end-to-end case is
+verified whatever `-O` says, and a module it refuses is reported as an internal
+compiler error naming the function rather than as clang's text. Debug
+information is the exception: clang drops a description that fails the verifier
+with a warning and links the binary anyway, so the driver and the end-to-end
+runner fail the build on that warning. What never reaches clang is verified on
+purpose — every emitter unit test and every sample, through `Front.Verified`,
+and every fuzz mutant — and `--verify-ir`, or `STAINLESS_VERIFY_IR=1`, runs it
+over an `emit-ir`.
+
+The verifier is `opt -passes=verify` where one is beside clang, which Debian's
+LLVM ships and the Windows installer does not, and clang otherwise, reading the
+module and writing bitcode to nowhere with every pass off. Either takes about a
+tenth of a second on a module holding the whole standard library, which is 5%
+of building `hello.sl`. It is not on by default, even in a Debug build of the
+compiler: every build that links is verified already, and all a default would
+add is `emit-ir`, which is what the flag is for.
 
 **Both Windows and Linux are tested.** 352 cases, of which 13 are
 Windows-only and 2 are Linux-only, so Linux runs 339 and Windows 350, each

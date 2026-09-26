@@ -63,6 +63,12 @@ are both in `forms/`: a table that lives for the program is declared
 from a `sl_run_at_exit` hook -- registered after the statics were made, so the
 C runtime runs it before their teardown.
 
+**Invalid IR is a compiler bug, and LLVM's verifier finds it.** clang verifies
+every module it links, and a refusal is reported as an internal compiler error
+naming the function. `--verify-ir` or `STAINLESS_VERIFY_IR=1` verifies a module
+nothing links; the unit tests, the samples and the fuzzer verify every one they
+emit. See [docs/internals.md](docs/internals.md#building-and-testing).
+
 **A crash is not a diagnostic, and the fuzzer finds them.** `dotnet run --project
 tests/Stainless.Fuzz -- fuzz --minutes 10` mutates the tree's own programs and
 keeps every input that makes the compiler throw, overflow, hang or report a span
@@ -86,6 +92,7 @@ The compiler itself, once built, is
 stainless run samples/hello.sl
 stainless build src --shared -o build/lib.dll --header build/lib.h
 stainless emit-ir samples/hello.sl              # the .ll, for reading
+stainless emit-ir samples/hello.sl --verify-ir  # and LLVM's verifier over it
 stainless doc --stdlib                          # regenerates docs/stdlib/
 ```
 

@@ -61,8 +61,9 @@ namespace Stainless.Tests;
 ///
 /// A case containing debug.txt is additionally built with debug information, and
 /// every line of that file must appear somewhere in the generated IR. Linking at
-/// all is most of the test: clang runs LLVM's verifier over the metadata, so a
-/// malformed description fails the build rather than producing a quiet lie. It
+/// all is most of the test: clang runs LLVM's verifier over the metadata. It
+/// drops a malformed description with a warning and carries on, so the driver
+/// and this runner fail the build on that warning rather than ship a quiet lie. It
 /// pairs with assemble.txt to pin a description written for a target this
 /// machine is not.
 ///
@@ -560,6 +561,11 @@ internal static class Program
                 return (false, "the IR did not assemble for " +
                                $"{(target ?? Binding.TargetPlatform.Host).Triple}:\n" +
                                assembled.StandardError.TrimEnd());
+
+            // clang drops a description that fails the verifier and succeeds.
+            if (IrFault.StrippedDebugInfo(assembled.StandardError))
+                return (false, IrFault.FromVerifier(assembled.StandardError, result.Ir!)
+                    .Explain(result.IrPath));
 
             string pinned = Path.Combine(directory, "ir.txt");
             if (!File.Exists(pinned) && !debug)

@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+using System.Text.RegularExpressions;
 using Stainless.Binding;
 using Stainless.Driver;
 using Stainless.Emit;
@@ -36,8 +37,15 @@ internal sealed class BadSpanException(Diagnostic diagnostic)
     public string Code => diagnostic.Code;
 }
 
+/// <summary>A module LLVM's verifier refused, which is a compiler bug like a crash.</summary>
+internal sealed class InvalidIrException(IrFault fault) : Exception(fault.Explain(irPath: null))
+{
+    public IrFault Fault => fault;
+}
+
 /// <summary>
-/// The driver's pipeline -- parse, bind, emit -- in process.
+/// The driver's pipeline -- parse, bind, emit -- in process, and then LLVM's
+/// verifier over what was emitted.
 ///
 /// It stops where <c>Compilation</c> stops: a program that does not parse is
 /// never bound, so a crash in the binder on a tree the parser rejected is not a
@@ -46,6 +54,12 @@ internal sealed class BadSpanException(Diagnostic diagnostic)
 internal static class Pipeline
 {
     private static readonly HashSet<string> s_symbols = Compilation.PlatformSymbols([]);
+
+    /// <summary>
+    /// What checks a module that emitted cleanly, or null with no clang. A
+    /// program the driver would hand to clang has to be one clang accepts.
+    /// </summary>
+    public static Toolchain? Verifier { get; } = Toolchain.Locate(out _);
 
     /// <summary>
     /// The standard library, parsed once and shared by every compilation. Safe
@@ -112,7 +126,12 @@ internal static class Pipeline
                 if (trace)
                     Console.Error.WriteLine(stage);
 
-                new LlvmEmitter(forSharedLibrary: shared).Emit(program);
+                string ir = new LlvmEmitter(forSharedLibrary: shared).Emit(program);
+
+                stage = "verify";
+                if (Verifier?.VerifyIr(ir) is { } fault)
+                    throw new InvalidIrException(fault);
+
                 return Stopped("done", diagnostics);
             });
         }
@@ -156,7 +175,33 @@ internal static class Pipeline
         if (e is BadSpanException bad)
             return $"{stage}: a span outside its file on {bad.Code}";
 
+        // By what the verifier objected to and the instruction it printed
+        // first, not by function: one fault in the emitter breaks every
+        // function that reaches it.
+        if (e is InvalidIrException invalid)
+            return $"{stage}: {InvalidIrShape(invalid.Fault.Message)}";
+
         return $"{stage}: {e.GetType().Name} in {string.Join(" < ", Frames(e.StackTrace ?? ""))}";
+    }
+
+    private static string InvalidIrShape(string message)
+    {
+        string[] lines = message.Split('\n');
+
+        // Without the names and the line: the same fault reached from two
+        // programs names two functions.
+        string first = Regex.Replace(lines[0], @" \(line \d+ of the module\)$", "");
+        first = Regex.Replace(first, @"'[^']*'", "'_'");
+
+        string? instruction = lines.Skip(1).FirstOrDefault(l => l.StartsWith("  ", StringComparison.Ordinal));
+        if (instruction is null)
+            return first;
+
+        string text = instruction.Trim();
+        int assigned = text.IndexOf(" = ", StringComparison.Ordinal);
+        if (assigned >= 0)
+            text = text[(assigned + 3)..];
+        return $"{first} at {text.Split(' ')[0]}";
     }
 
     /// <summary>The compiler's own frames in a .NET stack trace, innermost first.</summary>

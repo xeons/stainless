@@ -122,6 +122,21 @@ public sealed record CompilationOptions
     public bool EmitIrOnly { get; init; }
 
     /// <summary>
+    /// Run LLVM's verifier over the emitted module before anything else reads
+    /// it, and report a fault as a compiler bug in the function it is in.
+    /// <c>STAINLESS_VERIFY_IR</c> set to anything but <c>0</c> asks for it too.
+    ///
+    /// A linked build is verified without this, because clang verifies what
+    /// it reads, and a fault it finds is reported the same way. What this adds
+    /// is an <c>emit-ir</c> build, which reaches no clang at all.
+    /// </summary>
+    public bool VerifyIr { get; init; }
+
+    /// <summary>Whether this build verifies its IR, by option or by environment.</summary>
+    public bool VerifiesIr =>
+        VerifyIr || Environment.GetEnvironmentVariable("STAINLESS_VERIFY_IR") is { Length: > 0 } value && value != "0";
+
+    /// <summary>
     /// Where to write reference documentation generated from the <c>///</c>
     /// blocks, or null for none.
     ///
@@ -843,6 +858,16 @@ public sealed class Compilation
             Path.GetFileNameWithoutExtension(output) + ".ll");
         File.WriteAllText(irPath, ir);
 
+        Toolchain? toolchain = null;
+        if (options.VerifiesIr)
+        {
+            toolchain = Toolchain.Locate(out string verifierError);
+            if (toolchain is null) return Failure(verifierError);
+
+            if (toolchain.VerifyIr(ir) is { } fault)
+                return Failure(fault.Explain(irPath));
+        }
+
         if (options.EmitIrOnly)
             return new CompilationResult
             {
@@ -854,8 +879,11 @@ public sealed class Compilation
             };
 
         // --- assemble and link -------------------------------------------
-        var toolchain = Toolchain.Locate(out string toolchainError);
-        if (toolchain is null) return Failure(toolchainError);
+        if (toolchain is null)
+        {
+            toolchain = Toolchain.Locate(out string toolchainError);
+            if (toolchain is null) return Failure(toolchainError);
+        }
 
         // The linker will not make the directory it is writing into, and says
         // so in its own terms -- which read as a compiler bug rather than as a
@@ -932,8 +960,17 @@ public sealed class Compilation
                 return Failed(diagnostics);
             }
 
+            // clang verifies the module as it reads it, before any pass runs.
+            if (IrFault.RejectedByClang(link.StandardError))
+                return Failure(IrFault.FromVerifier(link.StandardError, ir).Explain(irPath));
+
             return Failure(LinkDiagnosis.Explain(link.StandardError.TrimEnd(), irPath, unlinkedReferences));
         }
+
+        // A description LLVM finds invalid is dropped with a warning, and the
+        // binary would go out undebuggable with nothing said.
+        if (IrFault.StrippedDebugInfo(link.StandardError))
+            return Failure(IrFault.FromVerifier(link.StandardError, ir).Explain(irPath));
 
         // The loader looks beside the binary, so that is where the runtime goes.
         // Both a program and a Stainless library need it there, and they are

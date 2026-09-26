@@ -30,6 +30,9 @@ internal static class Supervisor
     /// </summary>
     private static readonly TimeSpan s_quiet = TimeSpan.FromSeconds(30);
 
+    /// <summary>What a worker prints to say it is busy without finishing a compilation.</summary>
+    public const string Heartbeat = "~";
+
     private sealed class Slot
     {
         public required Process Process;
@@ -40,6 +43,8 @@ internal static class Supervisor
     {
         Directory.CreateDirectory(Path.Combine(output, "crashes"));
         Console.WriteLine($"fuzzing with {workers} workers for {minutes} minutes; findings in {output}");
+        if (Pipeline.Verifier is null)
+            Console.WriteLine("no clang was found, so emitted IR is not verified");
 
         var slots = new Slot[workers];
         var stages = new SortedDictionary<string, long>();
@@ -67,6 +72,8 @@ internal static class Supervisor
                 lock (gate)
                 {
                     slot.Heard = DateTime.UtcNow;
+                    if (e.Data == Heartbeat)
+                        return;
                     string stage = e.Data[(e.Data.IndexOf(' ') + 1)..];
                     stages[stage] = stages.GetValueOrDefault(stage) + 1;
                 }
