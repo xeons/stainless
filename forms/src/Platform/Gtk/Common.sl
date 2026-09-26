@@ -129,8 +129,27 @@ public closure bool Ticker();
 class BoxedTicker
 {
     public Ticker Body;
+    public guint Source;
+    /// Neighbours among the tickers still pending. Not owned: GLib's reference
+    /// is what keeps each one alive.
+    public gpointer Previous;
+    public gpointer Next;
     public BoxedTicker(Ticker body) => Body = body;
 }
+
+/// The first ticker GLib still holds. A source still pending when the program
+/// ends is never destroyed by GLib, so what it captured would outlive the
+/// program; `RemovePendingTickers` takes each off the loop first.
+///
+/// A pointer rather than a reference, so that static teardown has nothing to
+/// release and `ReleaseTicker` MAY still run from a destructor after it.
+static gpointer s_firstTicker = null;
+static bool s_tickersEndAtExit = false;
+
+/// A function the C runtime runs when the program ends.
+delegate void ExitHook();
+
+extern "C" void sl_run_at_exit(ExitHook hook);
 
 /// The C entry point, one for every timer rather than one per timer: a
 /// module-level function, so its address is a plain C function pointer.
@@ -140,7 +159,45 @@ gboolean InvokeTicker(gpointer data)
     return boxed.Body() ? 1 : 0;
 }
 
-void ReleaseTicker(gpointer data) => sl_release(data);
+void ReleaseTicker(gpointer data)
+{
+    var boxed = (BoxedTicker)data;
+    if (boxed.Previous != null)
+        ((BoxedTicker)boxed.Previous).Next = boxed.Next;
+    else
+        s_firstTicker = boxed.Next;
+    if (boxed.Next != null)
+        ((BoxedTicker)boxed.Next).Previous = boxed.Previous;
+    boxed.Previous = null;
+    boxed.Next = null;
+    sl_release(data);
+}
+
+/// Takes every ticker still pending off the loop, which releases it.
+void RemovePendingTickers()
+{
+    while (s_firstTicker != null)
+    {
+        gpointer first = s_firstTicker;
+        if (g_source_remove(((BoxedTicker)first).Source) == 0)
+            ReleaseTicker(first);
+    }
+}
+
+/// Takes a ticker off the loop if it is still on it. One that answered false,
+/// or was removed at exit, is already gone, and `g_source_remove` MUST NOT be
+/// given an id GLib has forgotten: it complains on stderr.
+public void StopTicker(gulong source)
+{
+    for (gpointer at = s_firstTicker; at != null; at = ((BoxedTicker)at).Next)
+    {
+        if ((gulong)((BoxedTicker)at).Source == source)
+        {
+            g_source_remove((guint)source);
+            return;
+        }
+    }
+}
 
 extern "C"
 {
@@ -156,11 +213,24 @@ extern "C"
 /// does not move unless something keeps pulsing it.
 public gulong StartTicker(int milliseconds, Ticker body)
 {
+    if (!s_tickersEndAtExit)
+    {
+        // Registered after every static was made, so it runs before their
+        // teardown.
+        s_tickersEndAtExit = true;
+        sl_run_at_exit(RemovePendingTickers);
+    }
+
     var boxed = new BoxedTicker(body);
     sl_retain((gpointer)boxed);
 
-    return (gulong)g_timeout_add_full(G_PRIORITY_DEFAULT, (guint)milliseconds,
+    boxed.Source = g_timeout_add_full(G_PRIORITY_DEFAULT, (guint)milliseconds,
                                       InvokeTicker, (gpointer)boxed, ReleaseTicker);
+    boxed.Next = s_firstTicker;
+    if (s_firstTicker != null)
+        ((BoxedTicker)s_firstTicker).Previous = (gpointer)boxed;
+    s_firstTicker = (gpointer)boxed;
+    return (gulong)boxed.Source;
 }
 
 // ================================================================ colours

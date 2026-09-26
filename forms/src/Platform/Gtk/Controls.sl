@@ -1337,7 +1337,7 @@ public class GtkProgressPeer : GtkPeer, IProgressPeer
     {
         if (_pulse != 0u)
         {
-            g_source_remove((guint)_pulse);
+            StopTicker(_pulse);
             _pulse = 0u;
         }
     }
@@ -1370,7 +1370,7 @@ public class GtkProgressPeer : GtkPeer, IProgressPeer
         {
             if (_pulse != 0u)
             {
-                g_source_remove((guint)_pulse);
+                StopTicker(_pulse);
                 _pulse = 0u;
             }
             ShowFraction();
@@ -2046,7 +2046,7 @@ public class GtkTimerPeer : ITimerPeer
     {
         if (_source == 0u)
             return;
-        g_source_remove((guint)_source);
+        StopTicker(_source);
         _source = 0u;
     }
 }

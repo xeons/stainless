@@ -250,7 +250,26 @@ void AnswerWithUris(gpointer selection, String[] paths)
 /// retain.
 void WithdrawOffer(gpointer clipboard, gpointer data)
 {
+    if (s_offer == data)
+        s_offer = null;
     sl_release(data);
+}
+
+/// The offer GTK holds for this program, or null. A pointer rather than a
+/// reference, so that static teardown has nothing to release.
+static gpointer s_offer = null;
+static bool s_offerEndsAtExit = false;
+
+/// Hands what this program still offers to a clipboard manager, if one is
+/// running, and withdraws the offer, which releases it. GTK itself never
+/// withdraws it, so without this it is alive when the program ends.
+void WithdrawOfferAtExit()
+{
+    if (s_offer == null)
+        return;
+    gpointer clipboard = GetDefaultClipboard();
+    gtk_clipboard_store(clipboard);
+    gtk_clipboard_clear(clipboard);
 }
 
 /// A copy of `content` that shares no array with it, since a paste may come
@@ -331,6 +350,12 @@ void WriteClipboard(ClipboardContent given)
     if (gtk_clipboard_set_with_data(clipboard, table, (guint)count, AnswerPaste,
                                     WithdrawOffer, (gpointer)content) != 0)
     {
+        s_offer = (gpointer)content;
+        if (!s_offerEndsAtExit)
+        {
+            s_offerEndsAtExit = true;
+            sl_run_at_exit(WithdrawOfferAtExit);
+        }
         if (empty)
         {
             gtk_clipboard_clear(clipboard);

@@ -876,6 +876,10 @@ public extern "C"
     void gtk_clipboard_set_can_store(gpointer clipboard, GtkTargetEntry* targets,
                                      gint count);
 
+    /// Hands what `set_can_store` named to the clipboard manager now, and
+    /// waits for it. Returns at once when no manager is running.
+    void gtk_clipboard_store(gpointer clipboard);
+
     /// The clipboard for a selection atom on a display, **borrowed**.
     gpointer gtk_clipboard_get_for_display(gpointer display, GdkAtom selection);
 }
