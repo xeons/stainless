@@ -284,16 +284,15 @@ public sealed partial class Binder
                 InvalidateVariantFact(receiver);
             }
 
-            if (!CanWriteProperty(syntax.Span, receiver, property, plain: true, out var backing))
+            if (!CanWriteProperty(syntax.Span, receiver, property, plain: true, out var storage))
                 return null;
 
-            if (backing is not null)
+            if (storage is not null)
             {
                 return new DeconstructionTarget(DeconstructionKind.Place, syntax.Span)
                 {
                     Type = property.Type,
-                    Place = HoldPlace(
-                        new BoundFieldAccess(syntax.Span, receiver, backing), held, everything: true),
+                    Place = HoldPlace(storage, held, everything: true),
                 };
             }
 

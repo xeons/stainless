@@ -173,6 +173,10 @@ variant is made by naming one of its cases.
 A constructor crosses a library boundary as the symbol it is: a consumer with
 only the metadata writes `new Point(3, 4)` and the call fills in its own slot.
 
+`struct Point(int x, int y) { ... }` declares the constructor with the type, as
+a class may ([§2.4.5](#245-a-primary-constructor)); what it keeps of its
+parameters is laid out after the fields the struct declares.
+
 ### 2.2.2 `struct HWND__;` — a type declared and not laid out
 
 A `struct` written with no body at all is C's incomplete type: declared here,
@@ -557,9 +561,11 @@ order, so what it would read is whatever the allocation left, which is zero.
 A constructor is where one field's value may depend on another. Everything else
 is in reach: a literal, a `const`, a static, a call to a free function, a `new`.
 
-**Only a class has them.** A `struct` is made by declaring one — `Point p;` —
-and there is no moment there for an initializer to run at, so one is refused
-(SL0617) rather than silently skipped.
+**Only a class has them**, and a struct with a primary constructor
+([§2.4.5](#245-a-primary-constructor)), every constructor of which runs that
+one. Any other `struct` is made by declaring one — `Point p;` — and there is no
+moment there for an initializer to run at, so one is refused (SL0617) rather
+than silently skipped.
 
 ### 2.4.2 Making one with its members written out
 
@@ -572,7 +578,9 @@ var numbers = new List<int> { 1, 2, 3 };
 An object initializer is short for the construction held in a name, a write per
 entry, and then the name — and it is lowered to exactly that, so nothing it can
 do is anything the written-out form could not. The writes go through a setter
-where the member is a property, as they would anywhere else.
+where the member is a property, as they would anywhere else — an `init` one
+included, which is what `init` is for — and a `required` member is one every
+such list has to name ([§7.3.2](07-functions-members.md#732-required--set-by-whoever-makes-one)).
 
 A brace list of *bare* values is a collection initializer instead: one `Add` per
 value, found **by name rather than by interface**, which is the rule `foreach`
@@ -928,6 +936,59 @@ test followed by a conversion would ask twice and could be told two different
 things. `(IThing)x` asks once, and ends the program if the answer was no —
 which is the same bargain a binding `is` refuses for the same reason (SL0587).
 
+### 2.4.5 A primary constructor
+
+```csharp
+public class Service(Logger log, int size)
+{
+    public int Doubled = size * 2;                 // the parameter itself
+
+    public Service(Logger log) : this(log, 1) { }
+
+    public void Run() => log.Log("running " + Text.FromInteger(size));
+}
+
+public class Circle(double radius) : Shape("circle")
+{
+    public double Area => radius * radius * Math.Pi;
+}
+```
+
+A parameter list after a class or struct's name is its constructor, and the
+parameters are in scope through the whole body. They are parameters, not
+properties — a record is the form that makes them properties (§2.4.1).
+
+**Where a parameter is read decides what it costs.** A field initializer and
+the base's arguments run inside the constructor, so there the parameter is the
+parameter. A member body runs after it has returned, so a parameter one names is
+copied by the constructor into a hidden field, and the body reads and writes that
+field through `this`, as a lambda written in it does. A parameter only
+initializers name costs no storage at all. Which parameters are kept is read off
+the source, because a field is layout and layout is settled before any body is
+bound: a parameter named in a body is kept, unless the type declares a member
+of that name, which is what the body means by it. A lambda that captures `this`
+therefore keeps what the object kept, and ARC counts a kept reference like any
+field and the destructor releases it.
+
+**Every other constructor runs the primary one**, with `: this(...)`, since it is
+the one that gives the parameters and the fields kept from them their values
+(SL0785). Only the primary constructor runs the initializers, so a struct with
+one may have them too: every `new` of it runs one. `: Shape("circle")` after the
+name is the primary constructor's `base(...)`, and goes on the first entry of the
+list (SL0786); a record passes its parameters on the same way.
+
+**On a struct, kept fields are part of the value.** They come after every field
+the struct declares, in the order of the parameter list, which is where C would
+put them if they were written out; they are ordinary fields to layout,
+`[Packed]` and a generated C header, which names them after the parameters. So
+`struct Point(int x, int y)` whose methods read `x` and `y` is sixteen bytes, and
+one whose parameters only initialize its fields is eight. They are not
+described to reflection, which describes what a type declares.
+
+A `ref`, `in` or `out` parameter names the caller's storage, which does not
+outlive the call, so a member body may not name one (SL0787). A static member
+has no instance to read a kept parameter from (SL0576).
+
 ## 2.4.1 `record` — a class written as its constructor
 
 ```csharp
@@ -939,8 +1000,9 @@ public record class Named(String Label, double Weight)
 }
 ```
 
-A `record` is a `class`. The parameters after its name become get-only
-properties and the constructor that fills them, and the type gets value
+A `record` is a `class`. The parameters after its name become `init`
+properties ([§7.3.1](07-functions-members.md#731-init--a-setter-for-an-object-being-made))
+and the constructor that fills them, and the type gets value
 equality and a hash over all of them. A bare `record` means `record class`, as
 in C#; the long spelling is there for the reader who wants it said.
 
@@ -949,8 +1011,8 @@ What is generated is what could have been written out:
 ```csharp
 public class Point : IEquatable<Point>, IHashable
 {
-    public int X { get; }
-    public int Y { get; }
+    public int X { get; init; }
+    public int Y { get; init; }
 
     public Point(int X, int Y) { this.X = X; this.Y = Y; }
 
@@ -1018,7 +1080,11 @@ var copy  = point with { };             // a copy, which is a thing to want
 ```
 
 It is the record's constructor, called with the values that were named and the
-ones that were not carried over from the target. Nothing is mutated: `point` is
+ones that were not carried over from the target. A name that is no parameter may
+be a property with a setter, `init` or not, and it is written through that
+setter once the copy is made; every other such property the record or its bases
+declare, with storage, is carried over storage to storage, as C#'s copy would,
+so no setter runs for a value that is not changing. Nothing is mutated: `point` is
 what it was, and what comes out is an ordinary record — equal by value, usable
 as a key, and itself a target for another `with`.
 
@@ -1046,8 +1112,8 @@ Three things are refused:
 error[SL0735]: 'with' makes a copy of a record with some of it changed, and
 'Plain' is not a record; give it positional parameters, or write out the
 construction this would have made
-error[SL0736]: 'Point' has no parameter named 'Z', so there is nothing for this
-to change; it takes 'X', 'Y'
+error[SL0736]: 'Point' has no parameter or settable property named 'Z', so
+there is nothing for this to change; it takes 'X', 'Y'
 error[SL0737]: 'X' is given a value twice here, and the second would silently be
 the one that counted
 ```

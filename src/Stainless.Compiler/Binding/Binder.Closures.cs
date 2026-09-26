@@ -420,7 +420,13 @@ public sealed partial class Binder
             return BindPropertyRead(span, receiver, property);
         }
 
-        if (owner.FindField(name) is not { } field) return null;
+        if (owner.FindField(name) is not { } field)
+        {
+            // A primary constructor parameter is the object's, as a field is.
+            return owner.PrimaryCaptures.TryGetValue(name, out var kept)
+                ? new BoundFieldAccess(span, receiver, kept)
+                : null;
+        }
 
         _memberCaptures.Add((field, name, owner, span));
         return new BoundFieldAccess(span, receiver, field);

@@ -1,0 +1,11 @@
+7 nobody card
+3 @ada ada
+900
+4..9
+1,2 first 4
+1,5 moved 4
+0,2 first 4
+9,8 point 0
+boxed
+released boxed
+released card

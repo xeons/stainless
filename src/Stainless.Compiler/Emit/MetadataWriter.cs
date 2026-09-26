@@ -458,6 +458,7 @@ public static class MetadataWriter
         Offset = field.Offset,
         IsPublic = field.IsPublic,
         IsBackingField = field.IsBackingField,
+        IsRequired = field.IsRequired,
         BitWidth = field.BitWidth,
         BitOffset = field.BitOffset,
     };
@@ -473,6 +474,9 @@ public static class MetadataWriter
         IsProtected = function.IsProtected,
         VirtualSlot = function.VirtualSlot,
         Accessor = function.Accessor?.Name,
+        IsInit = function.IsInitAccessor,
+        IsRequired = function.Accessor?.IsRequired == true,
+        SetsRequiredMembers = function.SetsRequiredMembers,
         Module = function.ContainingType is null ? function.ModuleName : null,
         Parameters = function.Parameters
             .Where(p => !p.IsThis)

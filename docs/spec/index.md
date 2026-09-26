@@ -81,6 +81,7 @@ Primitives, `struct`, `class`, pointers, `variant`, `union`, `Result`, `interfac
   - [2.4.2 Making one with its members written out](02-types.md#242-making-one-with-its-members-written-out)
   - [2.4.3 Inheritance](02-types.md#243-inheritance)
   - [2.4.4 `is`, `as`, and casting down](02-types.md#244-is-as-and-casting-down)
+  - [2.4.5 A primary constructor](02-types.md#245-a-primary-constructor)
 - [2.5 Pointers and nullability](02-types.md#25-pointers-and-nullability)
 - [2.6 `variant` — a value that is one of several things](02-types.md#26-variant--a-value-that-is-one-of-several-things)
 - [2.7 `union` — every member at offset zero](02-types.md#27-union--every-member-at-offset-zero)
@@ -167,7 +168,7 @@ Attributes and their arguments, `[Reflect]`, `typeof`, the tables that get emitt
 
 ### [7. Functions and members](07-functions-members.md)
 
-Functions, defaults, `ref`/`in`/`out`, named arguments, properties, operators, indexers and `static`.
+Functions, defaults, `ref`/`in`/`out`, named arguments, properties with `init`, `required` and `field`, operators, indexers and `static`.
 
 - [7.1 Functions](07-functions-members.md#71-functions)
   - [7.1.1 `x.F(y)` is `F(x, y)`](07-functions-members.md#711-xfy-is-fx-y)
@@ -178,6 +179,9 @@ Functions, defaults, `ref`/`in`/`out`, named arguments, properties, operators, i
   - [7.2.1 `out`](07-functions-members.md#721-out)
   - [7.2.2 Named arguments](07-functions-members.md#722-named-arguments)
 - [7.3 Properties](07-functions-members.md#73-properties)
+  - [7.3.1 `init` — a setter for an object being made](07-functions-members.md#731-init--a-setter-for-an-object-being-made)
+  - [7.3.2 `required` — set by whoever makes one](07-functions-members.md#732-required--set-by-whoever-makes-one)
+  - [7.3.3 `field` — the property's own storage](07-functions-members.md#733-field--the-propertys-own-storage)
 - [7.4 Operators](07-functions-members.md#74-operators)
   - [7.4.1 `implicit` and `explicit operator`](07-functions-members.md#741-implicit-and-explicit-operator)
 - [7.5 Indexers](07-functions-members.md#75-indexers)

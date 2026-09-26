@@ -349,6 +349,9 @@ public sealed partial class Binder
             creation = new BoundNew(span, collection, shape.Empty, []);
         }
 
+        // A collection expression has no initializer to name anything in.
+        CheckRequiredMembers(collection, ((BoundNew)creation).Constructor, null, span);
+
         return WithHeld(span, held, AddEach(parts, collection, creation, shape.Add, span, made => made));
     }
 

@@ -34,7 +34,10 @@ internal sealed class StaticReferenceWalker
 
             case BoundFieldAccess field: Visit(field.Receiver); break;
 
+            // A static automatic property's getter reads its storage, so
+            // reading the property is reading the static.
             case BoundCall call:
+                if (call.Function.Accessor?.StaticBacking is { } storage) Found.Add(storage);
                 Visit(call.Receiver);
                 foreach (var argument in call.Arguments) Visit(argument);
                 break;

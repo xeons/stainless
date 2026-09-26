@@ -568,6 +568,88 @@ public class ParserTests
         Assert.Single(type.Members.OfType<FunctionDeclSyntax>());
     }
 
+    private static PropertyDeclSyntax OnlyProperty(string members)
+    {
+        var unit = Front.Parse("module A;\nclass C { " + members + " }");
+        var type = Assert.IsType<TypeDeclSyntax>(unit.Declarations[0]);
+        return Assert.Single(type.Members.OfType<PropertyDeclSyntax>());
+    }
+
+    [Fact]
+    public void AnInitAccessorIsASetterThatSaysSo()
+    {
+        var property = OnlyProperty("public int X { get; init; }");
+
+        Assert.False(property.Accessors[0].IsInit);
+        Assert.False(property.Accessors[1].IsGetter);
+        Assert.True(property.Accessors[1].IsInit);
+    }
+
+    [Theory]
+    [InlineData("int X { get => field; }", true)]
+    [InlineData("int X { get; set => field = value; }", true)]
+    [InlineData("int X => field + 1;", true)]
+    [InlineData("int X { get => @field; }", false)]
+    [InlineData("int X { get => this.field; }", false)]
+    public void FieldInAnAccessorNamesTheStorage(string member, bool storage) =>
+        Assert.Equal(storage, OnlyProperty(member).Accessors.Any(a => a.UsesField));
+
+    [Fact]
+    public void FieldOutsideAnAccessorIsAName() =>
+        Assert.Equal("(+ field 1)", Shape("field + 1"));
+
+    [Theory]
+    [InlineData("required int X;", true)]
+    [InlineData("public required String Name { get; init; }", true)]
+    [InlineData("required List<int> Items;", true)]
+    [InlineData("required value;", false)]
+    public void RequiredIsAModifierOnlyBeforeAMember(string member, bool required)
+    {
+        var unit = Front.Parse("module A;\nclass C { " + member + " }");
+        var type = Assert.IsType<TypeDeclSyntax>(unit.Declarations[0]);
+
+        Assert.Equal(required, type.Members[0].Modifiers.HasFlag(Modifiers.Required));
+    }
+
+    [Fact]
+    public void APrimaryParameterListIsAConstructor()
+    {
+        var unit = Front.Parse("module A;\nclass D(int x, String s) : B(x), I { }");
+        var type = Assert.IsType<TypeDeclSyntax>(unit.Declarations[0]);
+        var constructor = Assert.Single(type.Members.OfType<ConstructorDeclSyntax>());
+
+        Assert.True(constructor.IsPrimary);
+        Assert.Equal(["x", "s"], constructor.Parameters.Select(p => p.Name));
+        Assert.Equal(["x", "s"], type.PrimaryParameters.Select(p => p.Name));
+        Assert.Equal(2, type.Implements.Count);
+
+        var chain = Assert.IsType<ExpressionStatementSyntax>(constructor.Body.Statements[0]);
+        Assert.IsType<BaseSyntax>(Assert.IsType<CallSyntax>(chain.Expression).Callee);
+    }
+
+    [Fact]
+    public void AClassWithAPrimaryConstructorMayEndAtASemicolon()
+    {
+        var unit = Front.Parse("module A;\nclass P(int x);");
+        var type = Assert.IsType<TypeDeclSyntax>(unit.Declarations[0]);
+
+        Assert.False(type.IsOpaque);
+        Assert.True(Assert.Single(type.Members.OfType<ConstructorDeclSyntax>()).IsPrimary);
+    }
+
+    [Fact]
+    public void SetsRequiredMembersIsReadOffAConstructor()
+    {
+        var unit = Front.Parse(
+            "module A;\nclass C { [SetsRequiredMembers] C(int x) { } C() { } }",
+            out var diagnostics);
+        var type = Assert.IsType<TypeDeclSyntax>(unit.Declarations[0]);
+
+        Assert.False(diagnostics.HasErrors);
+        Assert.Equal([true, false],
+            type.Members.OfType<ConstructorDeclSyntax>().Select(c => c.SetsRequiredMembers));
+    }
+
     // -------------------------------------------------------------- errors
 
     /// <summary>

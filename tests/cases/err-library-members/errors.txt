@@ -1,0 +1,3 @@
+# A required member left unset, and an init property written later.
+SL0784
+SL0781

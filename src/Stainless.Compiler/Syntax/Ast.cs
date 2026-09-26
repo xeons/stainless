@@ -133,6 +133,12 @@ public enum Modifiers
     /// something the compiler can check.
     /// </summary>
     Threadsafe = 1 << 10,
+
+    /// <summary>
+    /// On a field or a property, one every <c>new</c> must give a value in its
+    /// object initializer, unless the constructor it runs says it does.
+    /// </summary>
+    Required = 1 << 11,
 }
 
 /// <summary>
@@ -406,7 +412,20 @@ public sealed record AccessorSyntax(
     SourceSpan Span,
     Modifiers Modifiers,
     bool IsGetter,
-    BlockSyntax? Body) : SyntaxNode(Span);
+    BlockSyntax? Body) : SyntaxNode(Span)
+{
+    /// <summary>
+    /// <c>init</c> rather than <c>set</c>: a setter that only an object
+    /// initializer, a <c>with</c>, or the type's own constructors may call.
+    /// </summary>
+    public bool IsInit { get; init; }
+
+    /// <summary>
+    /// True when the body names <c>field</c>, the property's own storage. It
+    /// is what gives a property with written accessors a backing field.
+    /// </summary>
+    public bool UsesField { get; init; }
+}
 
 /// <summary>
 /// <c>public int Age { get; private set; }</c> — a property.
@@ -462,7 +481,21 @@ public sealed record ConstructorDeclSyntax(
     Modifiers Modifiers,
     string TypeName,
     IReadOnlyList<ParameterSyntax> Parameters,
-    BlockSyntax Body) : Declaration(Span, Modifiers);
+    BlockSyntax Body) : Declaration(Span, Modifiers)
+{
+    /// <summary>
+    /// <c>[SetsRequiredMembers]</c>: this constructor gives every
+    /// <c>required</c> member its value, so a <c>new</c> that runs it need not.
+    /// </summary>
+    public bool SetsRequiredMembers { get; init; }
+
+    /// <summary>
+    /// True for the constructor a parameter list after a class or struct's
+    /// name stands for: <c>class Service(ILogger log)</c>. Every other
+    /// constructor of the type MUST chain to it.
+    /// </summary>
+    public bool IsPrimary { get; init; }
+}
 
 public sealed record DestructorDeclSyntax(
     SourceSpan Span,
@@ -652,6 +685,13 @@ public sealed record TypeDeclSyntax(
     /// properties of the same names. This is what tells it.
     /// </summary>
     public IReadOnlyList<string> RecordParameters { get; init; } = [];
+
+    /// <summary>
+    /// A class or struct's primary constructor parameters, in scope through
+    /// the whole body, and empty when none were written. A record's are in
+    /// <see cref="RecordParameters"/> instead, because they become properties.
+    /// </summary>
+    public IReadOnlyList<ParameterSyntax> PrimaryParameters { get; init; } = [];
 }
 
 /// <summary>
@@ -1146,6 +1186,13 @@ public sealed record SpawnExpressionSyntax(SourceSpan Span, ExpressionSyntax Ope
     : ExpressionSyntax(Span);
 
 public sealed record ThisSyntax(SourceSpan Span) : ExpressionSyntax(Span);
+
+/// <summary>
+/// <c>field</c> inside an accessor of the property <paramref name="Property"/>:
+/// the storage the compiler made for it. <c>@field</c> is the ordinary name.
+/// </summary>
+public sealed record FieldKeywordSyntax(SourceSpan Span, string Property)
+    : ExpressionSyntax(Span);
 
 /// <summary>
 /// One <c>Name = value</c> inside a <c>with</c>.

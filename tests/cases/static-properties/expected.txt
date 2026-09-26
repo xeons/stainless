@@ -1,0 +1,10 @@
+0 registry registry!
+8 16
+42
+released first
+second
+9 6
+2 1
+shared shared
+released shared
+released second

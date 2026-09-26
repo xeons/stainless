@@ -1,0 +1,7 @@
+# The two interface mismatches, the override, a method, a static, and Main.
+SL0782
+SL0782
+SL0782
+SL0781
+SL0780
+SL0781

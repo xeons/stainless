@@ -124,6 +124,15 @@ public sealed class Parser
 
     private bool _tooDeep;
 
+    /// <summary>
+    /// The property whose accessor is being parsed, which is where
+    /// <c>field</c> names its storage; null everywhere else.
+    /// </summary>
+    private string? _accessorProperty;
+
+    /// <summary>Whether the accessor being parsed has named <c>field</c>.</summary>
+    private bool _accessorUsesField;
+
     // ------------------------------------------------------------ token helpers
 
     private Token Current => Peek(0);
@@ -366,6 +375,14 @@ public sealed class Parser
         var documentationSpan = Current.DocumentationSpan;
 
         var declarations = ParseDeclarationCore(enclosingType);
+
+        foreach (var declaration in declarations)
+            if (declaration.Modifiers.HasFlag(Modifiers.Required) &&
+                declaration is not (FieldDeclSyntax or PropertyDeclSyntax))
+                _diagnostics.Error("SL0783", declaration.Span,
+                    "only a field or a property of an object can be 'required': the word says " +
+                    "that whoever makes the object must give it a value");
+
         if (documentation is null) return declarations;
 
         // Only the first: an anonymous struct hoisted out of its parent is a
@@ -473,7 +490,11 @@ public sealed class Parser
             AtWord && Current.Text == enclosingType &&
             Peek(1).Kind == TokenKind.OpenParen)
         {
-            RejectAttributes(attributes, "a constructor");
+            // The one attribute a constructor takes is a rule for the
+            // compiler, so it is read here rather than kept.
+            bool setsRequired = attributes.Any(IsSetsRequiredMembers);
+            RejectAttributes(
+                attributes.Where(a => !IsSetsRequiredMembers(a)).ToList(), "a constructor");
             Advance();
             var ctorParams = ParseParameterList(out bool ctorVariadic);
 
@@ -513,7 +534,14 @@ public sealed class Parser
                     "be written on an 'extern \"C\"' declaration, because there is no " +
                     "'va_list' to read the extra arguments with");
 
-            return [new ConstructorDeclSyntax(SpanFrom(start), modifiers, enclosingType, ctorParams, ctorBody)];
+            return
+            [
+                new ConstructorDeclSyntax(
+                    SpanFrom(start), modifiers, enclosingType, ctorParams, ctorBody)
+                {
+                    SetsRequiredMembers = setsRequired,
+                },
+            ];
         }
 
         var member = ParseFunctionOrField(start, modifiers, LinkageKind.Stainless, attributes);
@@ -526,6 +554,10 @@ public sealed class Parser
 
         return [member];
     }
+
+    /// <summary><c>[SetsRequiredMembers]</c>, which takes nothing.</summary>
+    private static bool IsSetsRequiredMembers(AttributeSyntax attribute) =>
+        attribute.Name.Last == "SetsRequiredMembers" && attribute.Arguments.Count == 0;
 
     /// <summary>
     /// Parses any number of <c>[Name(args)]</c> groups, each of which may list
@@ -664,10 +696,37 @@ public sealed class Parser
                 // declaration; only `interface` and `class` may follow it,
                 // which ParseTypeDeclaration checks.
                 case TokenKind.ComKeyword: modifiers |= Modifiers.Com; Advance(); break;
+
+                case TokenKind.Identifier when AtRequiredModifier():
+                    modifiers |= Modifiers.Required;
+                    Advance();
+                    break;
+
                 default: return modifiers;
             }
         }
     }
+
+    /// <summary>
+    /// Whether <c>required</c> here is the modifier rather than a type of
+    /// that name: it is when a member's type and name follow it.
+    /// </summary>
+    private bool AtRequiredModifier()
+    {
+        if (!AtWord || Current.Text != "required") return false;
+
+        var next = Peek(1);
+        if (IsModifierKeyword(next.Kind) || PrimitiveKeywords.Contains(next.Kind)) return true;
+
+        return next.Kind == TokenKind.Identifier &&
+               Peek(2).Kind is TokenKind.Identifier or TokenKind.Less or TokenKind.Question
+                            or TokenKind.OpenBracket or TokenKind.Dot or TokenKind.Star;
+    }
+
+    private static bool IsModifierKeyword(TokenKind kind) => kind is
+        TokenKind.PublicKeyword or TokenKind.PrivateKeyword or TokenKind.ProtectedKeyword or
+        TokenKind.VirtualKeyword or TokenKind.OverrideKeyword or TokenKind.AbstractKeyword or
+        TokenKind.SealedKeyword or TokenKind.StaticKeyword or TokenKind.ConstKeyword;
 
     /// <summary>
     /// <c>__stdcall</c> and its relatives, written after the linkage string.
@@ -852,12 +911,23 @@ public sealed class Parser
             start, modifiers, attributes, hoisted, generatedName: null,
             forcedKind: kind, positional: positional);
 
+        var baseArguments = _recordBaseArguments;
+        _recordBaseArguments = null;
+
         if (positional.Count == 0)
             return declared;
 
+        var constructor = ConstructorFor(declared.Name, positional);
+        if (baseArguments is { } given)
+            constructor = constructor with
+            {
+                Body = WithChainFirst(constructor.Body,
+                    (CallSyntax)BaseCall(given.Span, given.Arguments).Expression),
+            };
+
         var members = new List<Declaration>(declared.Members);
         members.AddRange(PropertiesFor(positional));
-        members.Add(ConstructorFor(declared.Name, positional));
+        members.Add(constructor);
         members.Add(EqualsFor(declared.Name, positional));
         members.Add(GetHashCodeFor(positional));
         members.Add(EqualityOperatorFor(declared.Name, positional, TokenKind.EqualsEquals));
@@ -1009,8 +1079,8 @@ public sealed class Parser
     }
 
     /// <summary>
-    /// One <c>public T Name { get; }</c> per positional parameter: readable by
-    /// anyone, set by the constructor, fixed after it.
+    /// One <c>public T Name { get; init; }</c> per positional parameter:
+    /// readable by anyone, set while the record is made, fixed after it.
     /// </summary>
     private static List<Declaration> PropertiesFor(List<ParameterSyntax> positional)
     {
@@ -1019,9 +1089,13 @@ public sealed class Parser
         foreach (var parameter in positional)
         {
             var getter = new AccessorSyntax(parameter.Span, Modifiers.None, true, null);
+            var setter = new AccessorSyntax(parameter.Span, Modifiers.None, false, null)
+            {
+                IsInit = true,
+            };
             properties.Add(new PropertyDeclSyntax(
                 parameter.Span, Modifiers.Public, parameter.Type, parameter.Name,
-                [getter], []));
+                [getter, setter], []));
         }
 
         return properties;
@@ -1117,22 +1191,76 @@ public sealed class Parser
         if (positional is not null && At(TokenKind.OpenParen))
             positional.AddRange(ParseParameterList(out _));
 
+        // `class Service(ILogger log, int size)`: a primary constructor. Its
+        // parameters are in scope through the body rather than members.
+        List<ParameterSyntax>? primary = null;
+        if (positional is null && generatedName is null && At(TokenKind.OpenParen))
+        {
+            int at = _pos;
+            primary = ParseParameterList(out bool variadic);
+
+            if (kind is not (TypeDeclKind.Class or TypeDeclKind.Struct))
+            {
+                _diagnostics.Error("SL0786", SpanFrom(at),
+                    $"'{name}' is not a class or a struct, so it has no constructor for a " +
+                    "parameter list after its name to be");
+                primary = null;
+            }
+            else if (variadic)
+            {
+                _diagnostics.Error("SL0493", SpanFrom(at),
+                    $"'{name}' cannot have a variadic constructor; '...' may only be written " +
+                    "on an 'extern \"C\"' declaration, because there is no 'va_list' to read " +
+                    "the extra arguments with");
+            }
+        }
+
         // `class Circle : Shape, Comparable<Circle>` -- a list of interfaces,
         // which may themselves be generic, so these are full types not bare names.
+        // `: Shape(radius)` passes the primary constructor's arguments on.
         var implements = new List<TypeSyntax>();
+        List<ExpressionSyntax>? baseArguments = null;
+        SourceSpan baseArgumentsSpan = default;
         if (Match(TokenKind.Colon))
         {
-            do { implements.Add(ParseType()); }
+            do
+            {
+                implements.Add(ParseType());
+                if (!At(TokenKind.OpenParen)) continue;
+
+                int at = _pos;
+                var arguments = ParseArgumentList();
+                bool hasConstructor = primary is not null || positional is { Count: > 0 };
+
+                if (implements.Count == 1 && hasConstructor)
+                {
+                    baseArguments = arguments;
+                    baseArgumentsSpan = SpanFrom(at);
+                }
+                else
+                {
+                    _diagnostics.Error("SL0786", SpanFrom(at),
+                        "arguments after a base type are the primary constructor's call to the " +
+                        "base's constructor, so they go on the first type in the list, of a " +
+                        "class declared with a parameter list after its name");
+                }
+            }
             while (Match(TokenKind.Comma));
         }
 
         var constraints = ParseWhereClauses();
 
+        // Set as this declaration ends, so a record nested in the body cannot
+        // take it. ParseRecordDeclaration reads it back.
+        if (baseArguments is not null && positional is { Count: > 0 })
+            _recordBaseArguments = (baseArguments, baseArgumentsSpan);
+
         // `struct HWND__;` -- a type declared here and laid out somewhere else.
         // It is C's incomplete type and not a forward declaration: nothing
         // completes it, which is the point, and the binder says so if a second
-        // declaration tries to.
-        if (Match(TokenKind.Semicolon))
+        // declaration tries to. `class Point(int x, int y);` has a body: its
+        // primary constructor.
+        if (primary is null && Match(TokenKind.Semicolon))
             return new TypeDeclSyntax(
                 SpanFrom(start), modifiers, kind, name, typeParameters,
                 constraints, implements, [], attributes)
@@ -1143,10 +1271,20 @@ public sealed class Parser
                 IsOpaque = positional is not { Count: > 0 },
             };
 
-        Expect(TokenKind.OpenBrace);
-
         var members = new List<Declaration>();
         var cases = new List<VariantCaseSyntax>();
+
+        if (primary is not null && Match(TokenKind.Semicolon))
+            return new TypeDeclSyntax(
+                SpanFrom(start), modifiers, kind, name, typeParameters, constraints,
+                implements,
+                [PrimaryConstructor(start, name, primary, baseArguments, baseArgumentsSpan)],
+                attributes)
+            {
+                PrimaryParameters = primary,
+            };
+
+        Expect(TokenKind.OpenBrace);
 
         // A type inside a type is a level of nesting like a block inside a
         // block, and it costs more than one: every level copies the types hoisted
@@ -1227,6 +1365,9 @@ public sealed class Parser
             _diagnostics.Error("SL0331", SpanFrom(start),
                 $"'{name}' is not generic, so it cannot have a 'where' clause");
 
+        if (primary is not null)
+            members.Add(PrimaryConstructor(start, name, primary, baseArguments, baseArgumentsSpan));
+
         if (kind == TypeDeclKind.Variant && cases.Count == 0)
             _diagnostics.Error("SL0430", SpanFrom(start),
                 $"variant '{name}' has no cases; a variant is the choice between its cases, " +
@@ -1234,8 +1375,43 @@ public sealed class Parser
 
         return new TypeDeclSyntax(
             SpanFrom(start), modifiers, kind, name, typeParameters, constraints,
-            implements, members, attributes) { Cases = cases };
+            implements, members, attributes)
+        {
+            Cases = cases,
+            PrimaryParameters = primary ?? [],
+        };
     }
+
+    /// <summary>
+    /// A record's <c>: Base(args)</c>, from the declaration being parsed to the
+    /// constructor made for it.
+    /// </summary>
+    private (List<ExpressionSyntax> Arguments, SourceSpan Span)? _recordBaseArguments;
+
+    /// <summary>
+    /// The constructor a primary parameter list stands for: those parameters,
+    /// and a body that is the base's call if one was written.
+    /// </summary>
+    private ConstructorDeclSyntax PrimaryConstructor(
+        int start, string name, List<ParameterSyntax> primary,
+        List<ExpressionSyntax>? baseArguments, SourceSpan baseArgumentsSpan)
+    {
+        var span = SpanFrom(start);
+        List<StatementSyntax> chain = baseArguments is null
+            ? []
+            : [BaseCall(baseArgumentsSpan, baseArguments)];
+
+        return new ConstructorDeclSyntax(
+            span, Modifiers.Public, name, primary, new BlockSyntax(span, chain))
+        {
+            IsPrimary = true,
+        };
+    }
+
+    /// <summary><c>base(args);</c> as the first statement of a constructor.</summary>
+    private static ExpressionStatementSyntax BaseCall(
+        SourceSpan span, List<ExpressionSyntax> arguments) =>
+        new(span, new CallSyntax(span, new BaseSyntax(span), arguments));
 
     /// <summary>
     /// A nameless <c>struct { }</c> or <c>union { }</c> member.
@@ -1990,12 +2166,32 @@ public sealed class Parser
         int start, Modifiers modifiers, TypeSyntax type, string name,
         IReadOnlyList<AttributeSyntax> attributes)
     {
+        var enclosingProperty = _accessorProperty;
+        _accessorProperty = name;
+
+        try
+        {
+            return ParsePropertyBody(start, modifiers, type, name, attributes);
+        }
+        finally
+        {
+            _accessorProperty = enclosingProperty;
+        }
+    }
+
+    private Declaration ParsePropertyBody(
+        int start, Modifiers modifiers, TypeSyntax type, string name,
+        IReadOnlyList<AttributeSyntax> attributes)
+    {
         // `T Name => expression;` is a getter and nothing else.
         if (At(TokenKind.EqualsGreater))
             return new PropertyDeclSyntax(
                 SpanFrom(start), modifiers, type, name, ArrowGetter(start), attributes);
 
         var accessors = ParseAccessorList(name);
+
+        // The initializer is outside every accessor, so `field` is a name there.
+        _accessorProperty = null;
 
         // `public int Width { get; set; } = 80;`. The storage an automatic
         // property owns is a field like any other, so it takes a value the
@@ -2018,9 +2214,16 @@ public sealed class Parser
     private List<AccessorSyntax> ArrowGetter(int start)
     {
         Expect(TokenKind.EqualsGreater);
+        _accessorUsesField = false;
         var getter = ParseArrowBody(isGetter: true);
         Expect(TokenKind.Semicolon);
-        return [new AccessorSyntax(SpanFrom(start), Modifiers.None, IsGetter: true, getter)];
+        return
+        [
+            new AccessorSyntax(SpanFrom(start), Modifiers.None, IsGetter: true, getter)
+            {
+                UsesField = _accessorUsesField,
+            },
+        ];
     }
 
     /// <summary>
@@ -2038,17 +2241,19 @@ public sealed class Parser
             int accessorStart = _pos;
             var accessorModifiers = ParseModifiers();
 
-            // 'get' and 'set' stay ordinary identifiers everywhere else in the
-            // language, so they are recognised by text rather than reserved.
-            if (!(AtWord && Current.Text is "get" or "set"))
+            // 'get', 'set' and 'init' stay ordinary identifiers everywhere else
+            // in the language, so they are recognised by text rather than reserved.
+            if (!(AtWord && Current.Text is "get" or "set" or "init"))
             {
                 _diagnostics.Error("SL0385", Current.Span,
-                    $"expected 'get' or 'set' in property '{name}'");
+                    $"expected 'get', 'set' or 'init' in property '{name}'");
                 if (_pos == before) Advance();
                 continue;
             }
 
-            bool isGetter = Advance().Text == "get";
+            string word = Advance().Text;
+            bool isGetter = word == "get";
+            _accessorUsesField = false;
 
             // A block body stands on its own; a bare accessor and an arrow body
             // are both statements and end at a semicolon.
@@ -2056,7 +2261,11 @@ public sealed class Parser
             {
                 var block = ParseBlock();
                 accessors.Add(new AccessorSyntax(
-                    SpanFrom(accessorStart), accessorModifiers, isGetter, block));
+                    SpanFrom(accessorStart), accessorModifiers, isGetter, block)
+                {
+                    IsInit = word == "init",
+                    UsesField = _accessorUsesField,
+                });
                 continue;
             }
 
@@ -2064,7 +2273,11 @@ public sealed class Parser
             Expect(TokenKind.Semicolon);
 
             accessors.Add(new AccessorSyntax(
-                SpanFrom(accessorStart), accessorModifiers, isGetter, body));
+                SpanFrom(accessorStart), accessorModifiers, isGetter, body)
+            {
+                IsInit = word == "init",
+                UsesField = _accessorUsesField,
+            });
         }
 
         Expect(TokenKind.CloseBrace);
@@ -4294,11 +4507,16 @@ public sealed class Parser
                 continue;
             }
 
-            var inner = new Parser(_source, _diagnostics, segment.Tokens!, _depth, _tooDeep);
+            var inner = new Parser(_source, _diagnostics, segment.Tokens!, _depth, _tooDeep)
+            {
+                _accessorProperty = _accessorProperty,
+            };
             var value = inner.ParseExpression();
             ExpressionSyntax? alignment = null;
             if (inner.Match(TokenKind.Comma))
                 alignment = inner.ParseExpression();
+
+            _accessorUsesField |= inner._accessorUsesField;
 
             // A limit reached inside the hole was reached here too, and this
             // parser has to stop as the inner one did or the rest of the file
@@ -4577,6 +4795,15 @@ public sealed class Parser
 
             case TokenKind.Identifier:
             {
+                // `field` in an accessor is the property's storage; `@field`
+                // is still a name.
+                if (_accessorProperty is not null && AtWord && Current.Text == "field")
+                {
+                    Advance();
+                    _accessorUsesField = true;
+                    return new FieldKeywordSyntax(SpanFrom(start), _accessorProperty);
+                }
+
                 // Just the one identifier. A following '.' is postfix member access,
                 // which the binder later reinterprets as a module path when the
                 // leading name turns out to be a module rather than a value.

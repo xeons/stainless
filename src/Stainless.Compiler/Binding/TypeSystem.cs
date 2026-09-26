@@ -322,6 +322,16 @@ public sealed class FieldSymbol(string name, TypeSymbol type, NamedTypeSymbol co
     /// </summary>
     public bool IsBackingField { get; init; }
 
+    /// <summary>Declared <c>required</c>: every <c>new</c> must give it a value.</summary>
+    public bool IsRequired { get; init; }
+
+    /// <summary>
+    /// True for the hidden copy of a primary constructor parameter that a
+    /// member body names. Named after the parameter, laid out after the
+    /// declared fields and destroyed with them.
+    /// </summary>
+    public bool IsPrimaryCapture { get; init; }
+
     /// <summary>
     /// True for the field a nameless <c>struct { }</c> or <c>union { }</c>
     /// member became. It is laid out like any other field -- that is what makes
@@ -433,6 +443,18 @@ public abstract class NamedTypeSymbol : TypeSymbol
     /// nothing, and both are reached by writing <c>new</c>.
     /// </summary>
     public List<FunctionSymbol> Constructors { get; } = [];
+
+    /// <summary>
+    /// The constructor a parameter list after the name stands for, or null.
+    /// Every other constructor chains to it.
+    /// </summary>
+    public FunctionSymbol? PrimaryConstructor { get; set; }
+
+    /// <summary>
+    /// The hidden fields the primary constructor's parameters were copied
+    /// into, by parameter name: one per parameter a member body names.
+    /// </summary>
+    public Dictionary<string, FieldSymbol> PrimaryCaptures { get; } = new(StringComparer.Ordinal);
 
     /// <summary>
     /// Declared <c>static class</c>: a holder for static members, with no

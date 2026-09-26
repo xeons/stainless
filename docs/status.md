@@ -125,11 +125,15 @@ last person to edit it -- the suite is the authority.
 - `class` with fields, constructors, destructors, methods; ARC with correct
   nested destruction
 - `record`: a class written as its constructor. The positional parameters
-  become get-only properties and the constructor that fills them, and the type
+  become `init` properties and the constructor that fills them, and the type
   gets `Equals`, `GetHashCode`, `==`, `!=` and the `IEquatable`/`IHashable` those
   satisfy -- so a record is a dictionary key with nothing said, which is most
   of what the form is for. `point with { Y = 9 }` makes a changed copy,
-  evaluating its target once. There is no generated `ToString`, because the
+  evaluating its target once; it may also name a settable property of the
+  record's own, and one it does not name is carried over. `: Base(Id)` after
+  the parameters passes them on to a base class's constructor. A record does
+  not derive from another record: the `Equals` each generates would hide the
+  other's. There is no generated `ToString`, because the
   language has none for any type, and no `record struct`, because what makes a
   record a key is the two interfaces it declares and a struct implements none
 - Single inheritance, the C# model: `virtual`, `override`, `abstract`,
@@ -180,7 +184,13 @@ last person to edit it -- the suite is the authority.
   compiler-generated backing field, `{ get; private set; }`, get-only ones a
   constructor fills in, and written accessors with block or `=>` bodies. They
   lower to a pair of ordinary methods, so an interface property dispatches like
-  any other member
+  any other member. `init` is a setter only an object initializer, a `with`
+  and the object's own constructors may call (SL0780–SL0782); `required`
+  makes every `new` set a field or property unless its constructor is
+  `[SetsRequiredMembers]` (SL0783, SL0784); and `field` in an accessor is the
+  property's own storage, so `set => field = value.Trim()` needs no field
+  written beside it. A static property may be automatic, over a static that
+  starts at its type's zero
 - `extern "C"` and `export "C"`, including variadics and structs by value in
   both directions
 - `extern "C++"` and `export "C++"` for free functions, in both directions and
@@ -258,7 +268,14 @@ last person to edit it -- the suite is the authority.
   chains to `this(...)` does not run them again; and an initializer may not read
   the object it belongs to (SL0617), because it runs before the constructor's
   body and would be reading zeroes. A value type has no moment to run one at and
-  refuses it
+  refuses it, unless it has a primary constructor, which every constructor of
+  it runs
+- Primary constructors, `class Service(Logger log, int size) : Base(size)`, on
+  classes and structs. The parameters are in scope through the body: an
+  initializer reads the parameter, and a member body reads a hidden field the
+  constructor copied it into -- made only for the parameters some member body
+  names, laid out after the declared fields, counted and released like any
+  other. Every other constructor chains to it with `: this(...)` (SL0785–SL0787)
 - Object and collection initializers: `new Panel { Title = "readme" }` and
   `new List<int> { 1, 2, 3 }`, lowered to the construction held in a name, a
   write or an `Add` per entry, and the name. `Add` is found by name rather than
@@ -917,8 +934,8 @@ Being straight about the edges, roughly in the order they are worth adding:
   point to run any
   other
   initializer from (SL0380). There is no
-  per-thread storage either, and no automatic static property -- its backing
-  storage would have no initializer, which is the one moment a static has.
+  per-thread storage either. An automatic static property with no `= value`
+  starts at zero and is one a library may have.
 - **An enum does not become its number at `extern "C"`.** It crosses as exactly
   its underlying integer where the declaration names the enum, but a
   `[Flags] enum : uint` will not pass to a `uint` parameter without a cast, which

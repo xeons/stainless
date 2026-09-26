@@ -330,6 +330,7 @@ public static class DocWriter
             case FieldDeclSyntax { IsAnonymous: false } field:
                 owner.Members.Add(new Entry(
                     field.Name,
+                    (field.Modifiers.HasFlag(Modifiers.Required) ? "required " : "") +
                     $"{Render(field.Type)} {field.Name}",
                     field.Documentation,
                     Locate(unit, field.Span))
@@ -401,6 +402,7 @@ public static class DocWriter
     {
         var signature = new StringBuilder();
         if (property.Modifiers.HasFlag(Modifiers.Static)) signature.Append("static ");
+        if (property.Modifiers.HasFlag(Modifiers.Required)) signature.Append("required ");
 
         signature.Append(Render(property.Type)).Append(' ');
 
@@ -418,7 +420,7 @@ public static class DocWriter
         {
             bool isSetter = !accessor.IsGetter;
             if (isSetter && accessor.Modifiers.HasFlag(Modifiers.Private)) continue;
-            accessors.Add(isSetter ? "set;" : "get;");
+            accessors.Add(!isSetter ? "get;" : accessor.IsInit ? "init;" : "set;");
         }
 
         signature.Append(" { ").Append(string.Join(" ", accessors)).Append(" }");

@@ -427,6 +427,7 @@ public sealed class MetadataLoader(
             {
                 IsPublic = field.IsPublic,
                 IsBackingField = field.IsBackingField,
+                IsRequired = field.IsRequired,
                 Offset = field.Offset,
                 BitWidth = field.BitWidth,
                 BitOffset = field.BitOffset,
@@ -459,6 +460,11 @@ public sealed class MetadataLoader(
             }
         }
 
+        var required = described.Methods
+            .Where(m => m.IsRequired && m.Accessor is not null)
+            .Select(m => m.Accessor!)
+            .ToHashSet(StringComparer.Ordinal);
+
         // An accessor pair is a property again, so the consumer writes `p.X`
         // rather than naming the lowering.
         foreach (var group in symbol.Methods
@@ -479,6 +485,7 @@ public sealed class MetadataLoader(
                 IsPublic = true,
                 Getter = getter,
                 Setter = setter,
+                IsRequired = required.Contains(group.Key),
             };
 
             foreach (var accessor in group) accessor.Accessor = property;
@@ -525,6 +532,8 @@ public sealed class MetadataLoader(
             ForeignName = described.Symbol,
             IsExternal = true,
             MetadataAccessor = described.Accessor,
+            IsInitAccessor = described.IsInit,
+            SetsRequiredMembers = described.SetsRequiredMembers,
         };
 
         if (containingType is not null && !described.IsStatic)

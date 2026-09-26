@@ -59,6 +59,10 @@ public static class RetiredDiagnostics
         // A compound assignment to a property whose receiver was not a plain
         // load, refused until the receiver was held and evaluated once.
         "SL0397",
+
+        // A static automatic property, refused until its storage became a
+        // static that starts at its type's zero.
+        "SL0584",
     };
 }
 

@@ -742,9 +742,9 @@ public sealed class Compilation
             .ToList();
         if (options.Shared && uninitialized.Count > 0)
             diagnostics.Error("SL0380", uninitialized[0].Span,
-                $"'{uninitialized[0].Name}' is a static, and a --shared library has no entry " +
-                "point to initialize one from; hold the value behind an exported function " +
-                "instead, or build this module into an executable");
+                $"'{uninitialized[0].DisplayName}' is a static, and a --shared library has no " +
+                "entry point to initialize one from; hold the value behind an exported " +
+                "function instead, or build this module into an executable");
 
         if (diagnostics.HasErrors) return Failed(diagnostics);
 

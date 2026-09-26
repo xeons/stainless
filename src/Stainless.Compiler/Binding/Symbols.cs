@@ -295,6 +295,22 @@ public sealed class FunctionSymbol
     /// </summary>
     public bool IsAutoAccessor { get; init; }
 
+    /// <summary>
+    /// True for an <c>init</c> accessor: a setter only an object initializer,
+    /// a <c>with</c>, a constructor or another <c>init</c> accessor of the
+    /// object being made may call.
+    /// </summary>
+    public bool IsInitAccessor { get; init; }
+
+    /// <summary>
+    /// A constructor marked <c>[SetsRequiredMembers]</c>: a <c>new</c> that
+    /// runs it need not name the type's <c>required</c> members.
+    /// </summary>
+    public bool SetsRequiredMembers { get; init; }
+
+    /// <summary>The constructor a primary parameter list stands for.</summary>
+    public bool IsPrimaryConstructor { get; init; }
+
     private string? _mangledName;
 
     /// <summary>The symbol name the linker sees. See docs/abi.md.</summary>
@@ -377,11 +393,23 @@ public sealed class PropertySymbol
     /// <summary>The generated storage of an automatic property; null otherwise.</summary>
     public FieldSymbol? BackingField { get; set; }
 
+    /// <summary>
+    /// The generated storage of a static property that owns one: a static
+    /// named so that no source can reach it. Null otherwise.
+    /// </summary>
+    public StaticSymbol? StaticBacking { get; set; }
+
     /// <summary>Attributes written on the property, shared with its backing field.</summary>
     public List<AppliedAttribute> Attributes { get; } = [];
 
+    /// <summary>Declared <c>required</c>: every <c>new</c> must give it a value.</summary>
+    public bool IsRequired { get; init; }
+
+    /// <summary>True when the setter is <c>init</c>.</summary>
+    public bool IsInit => Setter?.IsInitAccessor == true;
+
     /// <summary>True when the compiler supplies both the storage and the accessors.</summary>
-    public bool IsAuto => BackingField is not null;
+    public bool IsAuto => BackingField is not null || StaticBacking is not null;
 
     public override string ToString() => $"{ContainingType.Name}.{Name}";
 }
@@ -467,6 +495,15 @@ public sealed class StaticSymbol(string name, TypeSymbol type, string moduleName
     public TypeSymbol Type { get; } = type;
     public string ModuleName { get; } = moduleName;
     public bool IsPublic { get; init; }
+
+    /// <summary>
+    /// True for the storage of a static automatic property. Its name ends in
+    /// <c>$</c>, which no identifier may, so only the accessors reach it.
+    /// </summary>
+    public bool IsPropertyStorage { get; init; }
+
+    /// <summary>What a diagnostic calls it: the property, for a property's storage.</summary>
+    public string DisplayName => IsPropertyStorage ? Name[..^1] : Name;
 
     /// <summary>
     /// What was written in brackets in front of it. Nothing reflects over a

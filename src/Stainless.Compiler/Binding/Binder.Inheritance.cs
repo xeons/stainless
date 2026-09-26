@@ -623,7 +623,30 @@ public sealed partial class Binder
             return false;
         }
 
+        if (method.IsInitAccessor != inherited.IsInitAccessor)
+        {
+            ReportInitMismatch(method, inherited);
+            return false;
+        }
+
         return true;
+    }
+
+    /// <summary>
+    /// An accessor standing in for another that disagrees about <c>init</c>.
+    /// Either way a caller of the one would be allowed a write the other forbids.
+    /// </summary>
+    private void ReportInitMismatch(FunctionSymbol found, FunctionSymbol required)
+    {
+        string owner = required.ContainingType!.Name;
+        string name = required.Accessor?.Name ?? required.Name;
+
+        diagnostics.Error("SL0782", found.Span,
+            required.IsInitAccessor
+                ? $"'{owner}.{name}' is written with 'init', so what stands in for it must be " +
+                  "'init' too; a 'set' would let a write through here that the declaration forbids"
+                : $"'{owner}.{name}' is written with 'set', so what stands in for it must be " +
+                  "'set' too; a caller holding the declared type may write it at any time");
     }
 
     /// <summary>
@@ -1121,6 +1144,10 @@ public sealed partial class Binder
                     $"'{interfaceType.Name}.{required.Name}'; expected " +
                     $"'{required.ReturnType.Name} {required.Name}(" +
                     string.Join(", ", wanted.Select(Spelled)) + ")'");
+            }
+            else if (found.IsInitAccessor != required.IsInitAccessor)
+            {
+                ReportInitMismatch(found, required);
             }
         }
     }

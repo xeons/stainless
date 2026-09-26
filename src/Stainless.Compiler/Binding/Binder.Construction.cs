@@ -271,6 +271,7 @@ public sealed partial class Binder
             // A class with no way to run one reported that where it was
             // declared, so nothing is said again here.
             TryImplicitBaseConstructor(classType, out var inherited);
+            CheckRequiredMembers(classType, null, syntax.Initializer, syntax.Span);
 
             return WithObjectInitializer(
                 syntax, classType, new BoundNew(syntax.Span, classType, inherited, []));
@@ -308,6 +309,7 @@ public sealed partial class Binder
             constructor, parameters, arguments, written, map, syntax.Span);
 
         var converted = ConvertArguments(constructor, ordered, spans);
+        CheckRequiredMembers(classType, constructor, syntax.Initializer, syntax.Span);
 
         return WithObjectInitializer(
             syntax, classType, new BoundNew(syntax.Span, classType, constructor, converted)
@@ -373,10 +375,62 @@ public sealed partial class Binder
             constructor, parameters, arguments, written, map, syntax.Span);
 
         var converted = ConvertArguments(constructor, ordered, spans);
+        CheckRequiredMembers(structType, constructor, syntax.Initializer, syntax.Span);
 
         return WithObjectInitializer(
             syntax, structType, new BoundStructNew(syntax.Span, structType, constructor, converted)
                 { EvaluationOrder = WrittenOrder(map, converted.Count) });
+    }
+
+    /// <summary>
+    /// The <c>required</c> members of a type, its bases' first, by name. An
+    /// override that drops the word does not make the base's optional.
+    /// </summary>
+    private static List<string> RequiredMembers(NamedTypeSymbol type)
+    {
+        var levels = new List<NamedTypeSymbol>();
+        for (NamedTypeSymbol? level = type;
+             level is not null;
+             level = (level as ClassTypeSymbol)?.BaseClass)
+            levels.Insert(0, level);
+
+        var names = new List<string>();
+        foreach (var level in levels)
+        {
+            names.AddRange(level.Fields.Where(f => f.IsRequired).Select(f => f.Name));
+            names.AddRange(level.Properties.Where(p => p.IsRequired).Select(p => p.Name));
+        }
+
+        return names.Distinct(StringComparer.Ordinal).ToList();
+    }
+
+    /// <summary>
+    /// Refuses a construction that leaves a <c>required</c> member unset,
+    /// naming every one it left. A constructor marked
+    /// <c>[SetsRequiredMembers]</c> answers for all of them.
+    /// </summary>
+    private void CheckRequiredMembers(
+        NamedTypeSymbol type, FunctionSymbol? constructor, ObjectInitializerSyntax? initializer,
+        SourceSpan span)
+    {
+        if (constructor?.SetsRequiredMembers == true) return;
+
+        var required = RequiredMembers(type);
+        if (required.Count == 0) return;
+
+        var named = new HashSet<string>(
+            initializer?.Entries.Where(e => e.Name is not null).Select(e => e.Name!) ?? [],
+            StringComparer.Ordinal);
+
+        var missing = required.Where(name => !named.Contains(name)).ToList();
+        if (missing.Count == 0) return;
+
+        bool one = missing.Count == 1;
+        diagnostics.Error("SL0784", span,
+            $"'{type.Name}' has {(one ? "a required member" : "required members")} " +
+            $"this does not set: {Listed(missing)}. Give " +
+            $"{(one ? "it a value" : "each a value")} in an object initializer, " +
+            "or call a constructor marked '[SetsRequiredMembers]'");
     }
 
     /// <summary>
@@ -828,7 +882,8 @@ public sealed partial class Binder
         (_currentFunction is { } function &&
          _localFunctionOf.GetValueOrDefault(function)?.Visible?.ContainsKey(name) == true) ||
         _currentFunction?.ContainingType?.FindField(name) is not null ||
-        _currentFunction?.ContainingType?.FindProperty(name) is not null;
+        _currentFunction?.ContainingType?.FindProperty(name) is not null ||
+        _currentFunction?.ContainingType?.PrimaryCaptures.ContainsKey(name) == true;
 
     private EnumTypeSymbol? ResolveEnumPrefix(ExpressionSyntax target)
     {

@@ -1,0 +1,8 @@
+ada 36, bob 40, cy 5
+dee 30 at desk
+6
+value held
+2
+released held
+released desk
+released cat

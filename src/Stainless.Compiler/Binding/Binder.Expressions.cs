@@ -64,6 +64,7 @@ public sealed partial class Binder
         LiteralSyntax literal => BindLiteral(literal),
         NameSyntax name => BindName(name),
         ThisSyntax thisExpression => BindThis(thisExpression),
+        FieldKeywordSyntax storage => BindFieldKeyword(storage),
         BaseSyntax baseExpression => BindBaseValue(baseExpression),
         IsPatternSyntax matched => BindIsPattern(matched),
         AsCastSyntax asCast => BindAsCast(asCast),
@@ -592,22 +593,46 @@ public sealed partial class Binder
 
         // Which parameter each name stands for, so that a misspelling is
         // caught here rather than becoming an argument in the wrong position.
+        // A name that is no parameter may be a property with a setter, 'init'
+        // or not, which is written after the construction.
         var given = new Dictionary<string, BoundExpression>(StringComparer.Ordinal);
+        var written = new List<(PropertySymbol Property, BoundExpression Value, SourceSpan Span)>();
 
         foreach (var assignment in syntax.Assignments)
         {
-            if (!record.RecordParameters.Contains(assignment.Name, StringComparer.Ordinal))
+            bool positional =
+                record.RecordParameters.Contains(assignment.Name, StringComparer.Ordinal);
+            var property = positional ? null : record.FindProperty(assignment.Name);
+
+            if (!positional && property is not { Setter: not null, IsIndexer: false })
             {
                 diagnostics.Error("SL0736", assignment.Span,
-                    $"'{record.Name}' has no parameter named '{assignment.Name}', so there is " +
-                    $"nothing for this to change; it takes {Listed(record.RecordParameters)}");
+                    $"'{record.Name}' has no parameter or settable property named " +
+                    $"'{assignment.Name}', so there is nothing for this to change; it takes " +
+                    $"{Listed(record.RecordParameters)}");
                 continue;
             }
 
-            if (!given.TryAdd(assignment.Name, BindExpression(assignment.Value)))
+            if (property is { Setter: { } setter } &&
+                !CanReach(setter.IsPublic, setter.IsProtected, property.ContainingType))
+            {
+                diagnostics.Error("SL0249", assignment.Span,
+                    NotVisible(property.ContainingType, property.Name, setter.IsProtected));
+                continue;
+            }
+
+            var value = BindExpression(assignment.Value);
+            if (!given.TryAdd(assignment.Name, value))
+            {
                 diagnostics.Error("SL0737", assignment.Span,
                     $"'{assignment.Name}' is given a value twice here, and the second would " +
                     "silently be the one that counted");
+                continue;
+            }
+
+            if (property is not null)
+                written.Add((property, BindConversion(value, property.Type, assignment.Value.Span),
+                             assignment.Span));
         }
 
         if (diagnostics.HasErrors) return new BoundErrorExpression(syntax.Span);
@@ -640,8 +665,50 @@ public sealed partial class Binder
             record.Constructors, arguments, syntax.Span, record.Name);
         if (chosen is null) return new BoundErrorExpression(syntax.Span);
 
+        var creation = new BoundNew(syntax.Span, record, chosen, arguments);
+        var carried = CarriedStorage(record, given.Keys);
+        if (carried.Count == 0 && written.Count == 0)
+            return new BoundLet(syntax.Span, held, target, creation);
+
+        // A writable property the constructor does not take keeps its value,
+        // copied storage to storage as C#'s clone would, so no setter runs
+        // for a value that is not changing. The named ones go through theirs.
+        var made = new LocalSymbol(SyntheticName("made"), record, isConst: true);
+        var old = new BoundLocalAccess(syntax.Span, held);
+        var copy = new BoundLocalAccess(syntax.Span, made);
+
+        var steps = new List<BoundExpression>();
+        foreach (var storage in carried)
+            steps.Add(new BoundAssignment(syntax.Span,
+                new BoundFieldAccess(syntax.Span, copy, storage),
+                new BoundFieldAccess(syntax.Span, old, storage)));
+
+        foreach (var (property, value, span) in written)
+            steps.Add(new BoundPropertyAssignment(span, copy, property, value));
+
         return new BoundLet(syntax.Span, held, target,
-            new BoundNew(syntax.Span, record, chosen, arguments));
+            new BoundLet(syntax.Span, made, creation,
+                new BoundSequence(syntax.Span, steps, copy)));
+    }
+
+    /// <summary>
+    /// The storage of every writable property of a record, up its chain, that
+    /// its constructor does not take and a <c>with</c> did not name.
+    /// </summary>
+    private static List<FieldSymbol> CarriedStorage(
+        ClassTypeSymbol record, IEnumerable<string> named)
+    {
+        var skip = new HashSet<string>(named, StringComparer.Ordinal);
+        skip.UnionWith(record.RecordParameters);
+
+        var carried = new List<FieldSymbol>();
+        for (ClassTypeSymbol? level = record; level is not null; level = level.BaseClass)
+            foreach (var property in level.Properties)
+                if (property is { Setter: not null, BackingField: { } storage, IsIndexer: false } &&
+                    skip.Add(property.Name))
+                    carried.Add(storage);
+
+        return carried;
     }
 
     /// <summary>Names in a list, for a diagnostic that offers them.</summary>
@@ -728,6 +795,32 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
         return Receiver(syntax.Span, parameter);
+    }
+
+    /// <summary>
+    /// <c>field</c>: the storage of the property whose accessor this is, read
+    /// through <c>this</c> as any field is, so a lambda captures the object.
+    /// </summary>
+    private BoundExpression BindFieldKeyword(FieldKeywordSyntax syntax)
+    {
+        var owner = _closures.Count > 0
+            ? _closures[0].OuterFunction?.ContainingType
+            : _currentFunction?.ContainingType;
+
+        var property = owner?.Properties.FirstOrDefault(p => p.Name == syntax.Property);
+
+        if (property?.StaticBacking is { } shared)
+            return new BoundStaticAccess(syntax.Span, shared);
+
+        // An interface or an abstract property has no storage, and its body
+        // was refused where it was written.
+        if (property?.BackingField is not { } storage)
+            return new BoundErrorExpression(syntax.Span);
+
+        var receiver = BindThis(new ThisSyntax(syntax.Span));
+        if (receiver.Type.IsError()) return receiver;
+
+        return new BoundFieldAccess(syntax.Span, receiver, storage);
     }
 
     /// <summary>
@@ -1030,6 +1123,9 @@ public sealed partial class Binder
                 var receiver = BindImplicitThis(syntax.Span);
                 if (receiver is not null) return new BoundFieldAccess(syntax.Span, receiver, field);
             }
+
+            if (BindPrimaryParameter(name, syntax.Span) is { } primary)
+                return primary;
 
             if (_currentModule!.Constants.TryGetValue(name, out var constant))
                 return new BoundConstantAccess(syntax.Span, constant);
@@ -2470,7 +2566,11 @@ public sealed partial class Binder
         // and the value is evaluated and stored only when there was nothing.
         if (syntax.Operator == TokenKind.QuestionQuestionEquals)
         {
-            if (target.Type is not (OptionalTypeSymbol or PointerTypeSymbol))
+            // A property's storage starts out null whatever its type says, and
+            // `field ??= Make()` is how an accessor fills it on first use.
+            bool unfilled = syntax.Target is FieldKeywordSyntax && target.Type.IsReferenceType;
+
+            if (target.Type is not (OptionalTypeSymbol or PointerTypeSymbol) && !unfilled)
             {
                 diagnostics.Error("SL0604", syntax.Target.Span,
                     $"'{target.Type.Name}' cannot be nothing, so '??=' has nothing to fill in");
@@ -2604,17 +2704,14 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
 
         if (!CanWriteProperty(syntax.Target.Span, receiver, property,
-                syntax.Operator == TokenKind.Equals, out var backing))
+                syntax.Operator == TokenKind.Equals, out var storage))
             return new BoundErrorExpression(syntax.Span);
 
         // A get-only automatic property is still storage, and the type's own
         // constructor is where storage gets filled in.
-        if (backing is not null)
-        {
-            var storage = new BoundFieldAccess(syntax.Target.Span, receiver, backing);
+        if (storage is not null)
             return new BoundAssignment(syntax.Span, storage,
                 BindConversion(value, property.Type, syntax.Value.Span));
-        }
 
         NoteMemberWritten(property);
 
@@ -2696,14 +2793,14 @@ public sealed partial class Binder
     /// Whether this property may be written here, reporting why not.
     ///
     /// A get-only automatic property has no setter and is still written by its
-    /// type's own constructor; <paramref name="backing"/> is then the field to
-    /// store into.
+    /// type's own constructor, or a static one by its type's static
+    /// constructor; <paramref name="storage"/> is then the place to store into.
     /// </summary>
     private bool CanWriteProperty(
         SourceSpan span, BoundExpression? receiver, PropertySymbol property, bool plain,
-        out FieldSymbol? backing)
+        out BoundExpression? storage)
     {
-        backing = null;
+        storage = null;
 
         if (property.Setter is not { } setter)
         {
@@ -2711,7 +2808,15 @@ public sealed partial class Binder
                 _currentFunction is { Kind: FunctionKind.Constructor } ctor &&
                 ctor.ContainingType == property.ContainingType)
             {
-                backing = field;
+                storage = new BoundFieldAccess(span, receiver, field);
+                return true;
+            }
+
+            if (property.StaticBacking is { } shared && receiver is null && plain &&
+                _currentFunction is { Kind: FunctionKind.StaticConstructor } initializer &&
+                initializer.ContainingType == property.ContainingType)
+            {
+                storage = new BoundStaticAccess(span, shared);
                 return true;
             }
 
@@ -2719,8 +2824,11 @@ public sealed partial class Binder
                 $"'{property.ContainingType.Name}.{property.Name}' has no setter" +
                 (property.ContainingType is InterfaceTypeSymbol
                     ? ", so the contract does not offer one; declare it 'get; set;'"
-                    : property.BackingField is null
+                    : !property.IsAuto
                         ? "; it is computed, so there is nothing to write"
+                        : property.StaticBacking is not null
+                        ? "; add 'set;', or assign it in the static constructor of " +
+                          $"'{property.ContainingType.Name}'"
                         : "; add 'set;', or assign it in a constructor of " +
                           $"'{property.ContainingType.Name}'"));
             return false;
@@ -2735,6 +2843,16 @@ public sealed partial class Binder
                       "classes deriving from it"
                     : $"'{property.ContainingType.Name}.{property.Name}' can be read from " +
                       "anywhere but only written inside its own module");
+            return false;
+        }
+
+        if (setter.IsInitAccessor && !MayCallInit(receiver, property))
+        {
+            diagnostics.Error("SL0781", span,
+                $"'{property.ContainingType.Name}.{property.Name}' is 'init', so it is written " +
+                "while its object is being made and not after: in an object initializer, a " +
+                $"'with', or on 'this' in a constructor or 'init' accessor of " +
+                $"'{property.ContainingType.Name}' or a class deriving from it");
             return false;
         }
 
@@ -2764,6 +2882,36 @@ public sealed partial class Binder
 
         return true;
     }
+
+    /// <summary>
+    /// Whether an <c>init</c> setter may be called on this receiver here: on
+    /// <c>this</c>, inside a constructor or an <c>init</c> accessor of the
+    /// declaring type or one deriving from it. An object initializer and a
+    /// <c>with</c> write through the setter without asking.
+    /// </summary>
+    private bool MayCallInit(BoundExpression? receiver, PropertySymbol property)
+    {
+        if (_closures.Count > 0) return false;
+        if (_currentFunction is not { } here) return false;
+        if (here.Kind != FunctionKind.Constructor && !here.IsInitAccessor) return false;
+
+        bool related = here.ContainingType == property.ContainingType ||
+                       (here.ContainingType is ClassTypeSymbol derived &&
+                        property.ContainingType is ClassTypeSymbol declaring &&
+                        derived.DerivesFrom(declaring));
+
+        return related && IsThisReceiver(receiver);
+    }
+
+    /// <summary>Whether an expression is the function's own <c>this</c>, however reached.</summary>
+    private static bool IsThisReceiver(BoundExpression? receiver) => receiver switch
+    {
+        BoundThis => true,
+        BoundConversion { Kind: ConversionKind.Upcast } upcast => IsThisReceiver(upcast.Operand),
+        BoundAddressOf address => IsThisReceiver(address.Operand),
+        BoundDereference dereference => IsThisReceiver(dereference.Operand),
+        _ => false,
+    };
 
     /// <summary>A value an assignment evaluates once and names again.</summary>
     private readonly record struct HeldValue(LocalSymbol Local, BoundExpression Value, bool IsOwned);

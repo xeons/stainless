@@ -187,7 +187,10 @@ public sealed partial class Binder
                 // program with one thread has no race to have, and the compiler
                 // cannot see which kind it is looking at.
                 if (!IsSendable(symbol.Type))
-                    ReportNotSendable(symbol.Type, declaration.Span, $"static '{symbol.Name}'");
+                    ReportNotSendable(symbol.Type, declaration.Span,
+                        symbol.IsPropertyStorage
+                            ? $"static property '{symbol.DisplayName}'"
+                            : $"static '{symbol.Name}'");
             }
         }
 
@@ -365,8 +368,8 @@ public sealed partial class Binder
             if (!onStack.Add(symbol))
             {
                 diagnostics.Error("SL0378", symbol.Span,
-                    $"the initializer of '{symbol.QualifiedName}' depends on itself, " +
-                    "directly or through another static; there is no order that would " +
+                    $"the initializer of '{symbol.QualifiedName.TrimEnd('$')}' depends on " +
+                    "itself, directly or through another static; there is no order that would " +
                     "give it a value before it is read");
                 return;
             }

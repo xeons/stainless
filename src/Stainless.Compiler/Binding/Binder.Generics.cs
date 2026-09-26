@@ -213,6 +213,10 @@ public sealed partial class Binder
         {
             DeclareTypeMembers(template.Scope, declaration, type);
             ResolveImplements(type, declaration, template.Scope);
+
+            // The pass that gives a class with initializers a constructor may
+            // already have run, and nothing else would give this one its own.
+            if (type is ClassTypeSymbol made) SynthesizeInitializerConstructor(made);
         }
         finally
         {
@@ -478,6 +482,20 @@ public sealed partial class Binder
                 return;
 
             case ConstraintKind.New:
+                // `new T()` names nothing, so it cannot set a required member.
+                if (IsDefaultConstructible(argument) && argument is NamedTypeSymbol made &&
+                    RequiredMembers(made).Count > 0 &&
+                    made.Constructors.FirstOrDefault(c => !c.Parameters.Any(p => !p.IsThis)) is
+                        not { SetsRequiredMembers: true })
+                {
+                    diagnostics.Error("SL0328", span,
+                        $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
+                        $"'{parameter}' is constrained to 'new()', and '{argument.Name}' has " +
+                        $"required members, which 'new {parameter}()' has no way to set: " +
+                        $"{Listed(RequiredMembers(made))}");
+                    return;
+                }
+
                 if (IsDefaultConstructible(argument)) return;
 
                 diagnostics.Error("SL0328", span,

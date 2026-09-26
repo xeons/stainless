@@ -13,9 +13,7 @@ public static class Holder
     public int Read() => 1;
     public int Value { get { return 1; } }
 
-    // And this one is refused for a different reason: an automatic property
-    // needs storage with an initializer, and a static has no other moment at
-    // which to be given a first value.
+    // Static storage, which a static class may have.
     public static int Count { get; set; }
 }
 

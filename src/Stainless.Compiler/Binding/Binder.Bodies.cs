@@ -131,8 +131,10 @@ public sealed partial class Binder
 
         if (function.Kind == FunctionKind.Constructor)
         {
+            CheckChainsToPrimary(function);
             body = WithFieldInitializers(function, body);
             body = WithBaseConstruction(function, body);
+            body = WithPrimaryCaptures(function, body);
         }
 
         if (!function.ReturnType.IsVoid() && !function.ReturnType.IsError() && !AlwaysReturns(body))
@@ -220,7 +222,7 @@ public sealed partial class Binder
     /// </summary>
     private BoundBlock WithFieldInitializers(FunctionSymbol constructor, BoundBlock body)
     {
-        if (constructor.ContainingType is not ClassTypeSymbol classType) return body;
+        if (constructor.ContainingType is not { } classType) return body;
         if (_delegated.ContainsKey(constructor)) return body;
 
         var initialized = classType.Fields
@@ -250,8 +252,7 @@ public sealed partial class Binder
             var value = BindConversion(BindExpression(written), field.Type, written.Span);
             _initializingField = false;
 
-            var target = new BoundFieldAccess(
-                written.Span, new BoundThis(written.Span, classType, self), field);
+            var target = new BoundFieldAccess(written.Span, Receiver(written.Span, self), field);
 
             statements.Add(new BoundExpressionStatement(
                 written.Span, new BoundAssignment(written.Span, target, value)));
@@ -414,15 +415,19 @@ public sealed partial class Binder
     private void BindAutoAccessor(FunctionSymbol accessor)
     {
         if (!_boundFunctions.Add(accessor)) return;
-        if (accessor.Accessor?.BackingField is not { } field) return;
 
         var span = accessor.Span;
-        var receiver = Receiver(span, accessor.Parameters[0]);
-        var storage = new BoundFieldAccess(span, receiver, field);
+        BoundExpression storage;
+        if (accessor.Accessor?.StaticBacking is { } shared)
+            storage = new BoundStaticAccess(span, shared);
+        else if (accessor.Accessor?.BackingField is { } field)
+            storage = new BoundFieldAccess(span, Receiver(span, accessor.Parameters[0]), field);
+        else
+            return;
 
         BoundStatement statement = accessor.ReturnType.IsVoid()
             ? new BoundExpressionStatement(span, new BoundAssignment(
-                span, storage, new BoundParameterAccess(span, accessor.Parameters[1])))
+                span, storage, new BoundParameterAccess(span, accessor.Parameters[^1])))
             : new BoundReturn(span, storage);
 
         _functions.Add(new BoundFunction(accessor, new BoundBlock(span, [statement])));

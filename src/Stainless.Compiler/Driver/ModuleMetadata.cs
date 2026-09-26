@@ -322,6 +322,9 @@ public sealed record MetadataField
     /// <summary>True for the storage behind a property, which is not nameable.</summary>
     public bool IsBackingField { get; init; }
 
+    /// <summary>Declared <c>required</c>: a consumer's <c>new</c> must set it.</summary>
+    public bool IsRequired { get; init; }
+
     /// <summary>
     /// For a bit-field, how wide it is and where in its storage unit it starts.
     /// Both have to cross: a consumer that knew only the byte offset would read
@@ -393,6 +396,15 @@ public sealed record MetadataFunction
 
     /// <summary>The property this is an accessor of, if it is one.</summary>
     public string? Accessor { get; init; }
+
+    /// <summary>An <c>init</c> setter, which a consumer may call only while making one.</summary>
+    public bool IsInit { get; init; }
+
+    /// <summary>An accessor of a <c>required</c> property.</summary>
+    public bool IsRequired { get; init; }
+
+    /// <summary>A constructor marked <c>[SetsRequiredMembers]</c>.</summary>
+    public bool SetsRequiredMembers { get; init; }
 
     /// <summary>The module a free function belongs to; null for a method.</summary>
     public string? Module { get; init; }

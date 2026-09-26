@@ -1,0 +1,14 @@
+[a] running 4
+[a] running 5
+8 4
+size 6 12
+[b] running 1
+5
+circle round 12
+7 7 11
+16 8 1
+[boxed] hello
+70 seven
+released [boxed] 
+released [b] 
+released [a] 

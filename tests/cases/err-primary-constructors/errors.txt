@@ -1,0 +1,4 @@
+# No chain to the primary constructor, a static reach, and a kept ref.
+SL0785
+SL0576
+SL0787

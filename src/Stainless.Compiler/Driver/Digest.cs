@@ -187,6 +187,7 @@ public static class Digest
                 field.IsBackingField ? "backing" : "",
                 field.BitWidth is { } width ? Number(width) : "",
                 Number(field.BitOffset),
+                .. field.IsRequired ? ["required"] : Array.Empty<string>(),
             ]);
 
         foreach (var member in type.Members.OrderBy(m => m.Name, StringComparer.Ordinal))
@@ -218,6 +219,12 @@ public static class Digest
             Number(function.VirtualSlot),
             function.Accessor ?? "",
         };
+
+        // Only when set, so a digest of a surface that uses none of them is
+        // what it was before they existed.
+        if (function.IsInit) parts.Add("init");
+        if (function.IsRequired) parts.Add("required");
+        if (function.SetsRequiredMembers) parts.Add("sets-required");
 
         // In declaration order, because for a parameter list that *is* the
         // meaning: swapping two parameters of the same type changes every call.

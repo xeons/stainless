@@ -560,13 +560,19 @@ public sealed partial class Binder
                             $"'{type.Name}.{field.Name}' cannot be 'protected'; the word means " +
                             "'and anything deriving from this', and only a class is derived from");
 
+                    bool fieldRequired = field.Modifiers.HasFlag(Modifiers.Required);
+                    if (fieldRequired)
+                        CheckRequiredVisible(type, field.Name,
+                            field.Modifiers.HasFlag(Modifiers.Public), field.Span);
+
                     var declared = new FieldSymbol(field.Name, fieldType, type, type.Fields.Count)
                     {
                         IsPublic = field.Modifiers.HasFlag(Modifiers.Public),
                         IsProtected = field.Modifiers.HasFlag(Modifiers.Protected),
+                        IsRequired = fieldRequired,
                         IsAnonymous = field.IsAnonymous,
                         Documentation = field.Documentation,
-                        InitializerSyntax = CheckedFieldInitializer(type, field),
+                        InitializerSyntax = CheckedFieldInitializer(type, field, declaration),
                         InitializerScope = scope,
                     };
 
@@ -606,7 +612,7 @@ public sealed partial class Binder
                     break;
 
                 case PropertyDeclSyntax property:
-                    DeclareProperty(scope, type, property);
+                    DeclareProperty(scope, type, property, declaration.PrimaryParameters.Count > 0);
                     break;
 
                 case EventDeclSyntax declared:
@@ -666,10 +672,13 @@ public sealed partial class Binder
                         Span = constructor.Span,
                         Scope = scope,
                         IsPublic = constructor.Modifiers.HasFlag(Modifiers.Public),
+                        SetsRequiredMembers = constructor.SetsRequiredMembers,
+                        IsPrimaryConstructor = constructor.IsPrimary,
                     };
                     symbol.Parameters.Add(new ParameterSymbol("this", receiver, 0) { IsThis = true });
                     AddParameters(symbol, constructor.Parameters, scope);
                     type.Constructors.Add(symbol);
+                    if (constructor.IsPrimary) type.PrimaryConstructor = symbol;
                     break;
                 }
 
@@ -718,6 +727,8 @@ public sealed partial class Binder
             }
         }
 
+        if (declaration.PrimaryParameters.Count > 0) DeclarePrimaryCaptures(declaration, type);
+
         CheckOperatorPairs(type);
     }
 
@@ -760,32 +771,40 @@ public sealed partial class Binder
                      .SelectMany(m => m.Types.Values)
                      .OfType<ClassTypeSymbol>()
                      .ToList())
+            SynthesizeInitializerConstructor(type);
+    }
+
+    /// <summary>
+    /// The constructor <see cref="SynthesizeInitializerConstructors"/> gives
+    /// one class, which an instantiation of a generic one is given as it is
+    /// made.
+    /// </summary>
+    private static void SynthesizeInitializerConstructor(ClassTypeSymbol type)
+    {
+        if (type.Constructors.Count > 0) return;
+        if (type.Fields.FirstOrDefault(f => f.InitializerSyntax is not null) is not { } first)
+            return;
+
+        // The first initializer is where this constructor came from, and
+        // where a diagnostic about it should point.
+        var where = first.InitializerSyntax!.Span;
+
+        var symbol = new FunctionSymbol
         {
-            if (type.Constructors.Count > 0) continue;
-            if (type.Fields.FirstOrDefault(f => f.InitializerSyntax is not null) is not { } first)
-                continue;
+            Name = "ctor",
+            ModuleName = type.ModuleName,
+            ReturnType = PrimitiveTypeSymbol.Void,
+            Linkage = LinkageKind.Stainless,
+            Kind = FunctionKind.Constructor,
+            ContainingType = type,
+            Body = new BlockSyntax(where, []),
+            Span = where,
+            Scope = first.InitializerScope,
+            IsPublic = true,
+        };
 
-            // The first initializer is where this constructor came from, and
-            // where a diagnostic about it should point.
-            var where = first.InitializerSyntax!.Span;
-
-            var symbol = new FunctionSymbol
-            {
-                Name = "ctor",
-                ModuleName = type.ModuleName,
-                ReturnType = PrimitiveTypeSymbol.Void,
-                Linkage = LinkageKind.Stainless,
-                Kind = FunctionKind.Constructor,
-                ContainingType = type,
-                Body = new BlockSyntax(where, []),
-                Span = where,
-                Scope = first.InitializerScope,
-                IsPublic = true,
-            };
-
-            symbol.Parameters.Add(new ParameterSymbol("this", type, 0) { IsThis = true });
-            type.Constructors.Add(symbol);
-        }
+        symbol.Parameters.Add(new ParameterSymbol("this", type, 0) { IsThis = true });
+        type.Constructors.Add(symbol);
     }
 
     /// <summary>
@@ -797,11 +816,14 @@ public sealed partial class Binder
     /// <c>Point p;</c> makes one by declaring it, and there is no moment there
     /// for an initializer to run at.
     /// </summary>
-    private ExpressionSyntax? CheckedFieldInitializer(NamedTypeSymbol type, FieldDeclSyntax field)
+    private ExpressionSyntax? CheckedFieldInitializer(
+        NamedTypeSymbol type, FieldDeclSyntax field, TypeDeclSyntax declaration)
     {
         if (field.Initializer is null) return null;
 
-        if (type is not ClassTypeSymbol)
+        // A struct with a primary constructor has that moment: every
+        // constructor of it runs the primary one.
+        if (type is not ClassTypeSymbol && declaration.PrimaryParameters.Count == 0)
         {
             diagnostics.Error("SL0617", field.Initializer.Span,
                 $"'{type.Name}' is not a class, so there is no moment at which this would " +
@@ -835,11 +857,11 @@ public sealed partial class Binder
     /// are the same field, so the same rule decides both.
     /// </summary>
     private ExpressionSyntax? CheckedPropertyInitializer(
-        NamedTypeSymbol type, PropertyDeclSyntax declaration)
+        NamedTypeSymbol type, PropertyDeclSyntax declaration, bool hasPrimaryConstructor)
     {
         if (declaration.Initializer is null) return null;
 
-        if (type is not ClassTypeSymbol)
+        if (type is not ClassTypeSymbol && !hasPrimaryConstructor)
         {
             diagnostics.Error("SL0617", declaration.Initializer.Span,
                 $"'{type.Name}' is not a class, so there is no moment at which this would " +
@@ -1162,7 +1184,8 @@ public sealed partial class Binder
     /// not an ordinary method.
     /// </summary>
     private void DeclareProperty(
-        FileScope scope, NamedTypeSymbol type, PropertyDeclSyntax declaration)
+        FileScope scope, NamedTypeSymbol type, PropertyDeclSyntax declaration,
+        bool hasPrimaryConstructor = false)
     {
         // An indexer may be overloaded on what it takes -- `this[nuint]` and
         // `this[String]` are different questions -- so the name alone does not
@@ -1226,23 +1249,27 @@ public sealed partial class Binder
         else
         {
             bool getterIsAuto = getter.Body is null;
+            bool usesField = declaration.Accessors.Any(a => a.UsesField);
 
             // Half a hidden field is not a thing: an automatic accessor and a
             // written one would have to agree about storage nothing can name.
-            if (setter is not null && (setter.Body is null) != getterIsAuto)
+            // `field` is that name, so a body that says it may sit beside `get;`.
+            if (setter is not null && (setter.Body is null) != getterIsAuto && !usesField)
             {
                 diagnostics.Error("SL0391", declaration.Span,
                     $"property '{type.Name}.{declaration.Name}' mixes an automatic accessor " +
                     "with a written one; either both are automatic, or both have bodies and " +
-                    "name storage the type already declares");
+                    "name storage the type already declares, or the written one names the " +
+                    "property's own storage as 'field'");
                 return;
             }
 
-            wantsStorage = getterIsAuto;
+            wantsStorage = getterIsAuto || usesField;
 
             // A struct has no constructor, so a get-only automatic property on
             // one has no moment at which it could ever be given a value.
-            if (wantsStorage && setter is null && type is StructTypeSymbol)
+            if (wantsStorage && setter is null && type is StructTypeSymbol &&
+                !declaration.Modifiers.HasFlag(Modifiers.Static))
                 diagnostics.Error("SL0401", declaration.Span,
                     $"'{type.Name}.{declaration.Name}' could never be assigned: it is automatic " +
                     "and has no setter, and a struct has no constructor to fill it in; add " +
@@ -1251,13 +1278,38 @@ public sealed partial class Binder
 
         bool isStatic = declaration.Modifiers.HasFlag(Modifiers.Static);
 
-        if (isStatic && wantsStorage)
+        bool isRequired = declaration.Modifiers.HasFlag(Modifiers.Required);
+        if (isRequired)
         {
-            diagnostics.Error("SL0584", declaration.Span,
-                $"'{type.Name}.{declaration.Name}' is static and automatic, so its storage " +
-                "would have no moment at which to be given a first value: a static is written " +
-                "by its initializer and there is no initializer here. Write the accessors over " +
-                "a 'static' field, which has one");
+            string? why =
+                isStatic ? "it is static, and a static belongs to no object that is made"
+                : isInterface ? "an interface is never made, so nothing could set it"
+                : declaration.IsIndexer
+                    ? "an indexer takes an index, and an initializer names members"
+                : setter is null ? "it has no setter, so nothing could give it a value"
+                : null;
+
+            if (why is not null)
+            {
+                diagnostics.Error("SL0783", declaration.Span,
+                    $"'{type.Name}.{declaration.Name}' cannot be 'required': {why}");
+                isRequired = false;
+            }
+            else
+            {
+                CheckRequiredVisible(type, declaration.Name,
+                    declaration.Modifiers.HasFlag(Modifiers.Public) &&
+                    !setter!.Modifiers.HasFlag(Modifiers.Private),
+                    declaration.Span);
+            }
+        }
+
+        if (setter is { IsInit: true } && isStatic)
+        {
+            diagnostics.Error("SL0780", setter.Span,
+                $"'{type.Name}.{declaration.Name}' is static, and 'init' is a setter for an " +
+                "object that is being made; a static belongs to no object. Write 'set;', or " +
+                "give it a value where it is declared");
             return;
         }
 
@@ -1268,14 +1320,38 @@ public sealed partial class Binder
                 "property, which is the one that owns a field");
 
         FieldSymbol? backing = null;
-        if (wantsStorage)
+        StaticSymbol? sharedBacking = null;
+        if (wantsStorage && isStatic)
+        {
+            // A static like any other, initialized in dependency order before
+            // `Main`. With no `= value` it starts as the type's zero, which a
+            // global is born holding.
+            sharedBacking = new StaticSymbol(
+                declaration.Name + "$", propertyType, scope.Module.Name)
+            {
+                ContainingType = type,
+                Span = declaration.Span,
+                IsPropertyStorage = true,
+            };
+
+            type.Statics.Add(sharedBacking);
+            var first = declaration.Initializer ?? new DefaultSyntax(declaration.Span, null);
+            _staticSyntax[sharedBacking] = (
+                new StaticDeclSyntax(
+                    declaration.Span, Modifiers.Static, declaration.Type, sharedBacking.Name,
+                    first, false, []),
+                scope,
+                new Dictionary<string, TypeSymbol>(_substitution, StringComparer.Ordinal));
+        }
+        else if (wantsStorage)
         {
             // Named after the property, because that is what the storage is. It
             // is hidden from lookup, so nothing can reach past the accessors.
             backing = new FieldSymbol(declaration.Name, propertyType, type, type.Fields.Count)
             {
                 IsBackingField = true,
-                InitializerSyntax = CheckedPropertyInitializer(type, declaration),
+                InitializerSyntax =
+                    CheckedPropertyInitializer(type, declaration, hasPrimaryConstructor),
                 InitializerScope = scope,
             };
             type.Fields.Add(backing);
@@ -1291,7 +1367,9 @@ public sealed partial class Binder
             IsPublic = declaration.Modifiers.HasFlag(Modifiers.Public) || isInterface,
             IsProtected = declaration.Modifiers.HasFlag(Modifiers.Protected),
             BackingField = backing,
+            StaticBacking = sharedBacking,
             IsIndexer = declaration.IsIndexer,
+            IsRequired = isRequired,
         };
 
         // A property's dispatch is its accessors' -- they are the methods, and a
@@ -1305,6 +1383,20 @@ public sealed partial class Binder
                 scope, type, property, setter, true, accessorModifiers, declaration.Indices);
 
         type.Properties.Add(property);
+    }
+
+    /// <summary>
+    /// A required member is named by every <c>new</c> of its type, so it has
+    /// to be writable wherever the type can be reached.
+    /// </summary>
+    private void CheckRequiredVisible(
+        NamedTypeSymbol type, string name, bool isPublic, SourceSpan span)
+    {
+        if (!type.IsPublic || isPublic) return;
+
+        diagnostics.Error("SL0783", span,
+            $"'{type.Name}.{name}' is 'required' and '{type.Name}' is public, so every 'new' of " +
+            "it anywhere has to set it; make the member and its setter public too");
     }
 
     /// <summary>
@@ -1376,6 +1468,7 @@ public sealed partial class Binder
             IsAutoAccessor = accessor.Body is null
                              && !type.IsContract
                              && !modifiers.HasFlag(Modifiers.Abstract),
+            IsInitAccessor = accessor.IsInit,
         };
 
         if (!symbol.IsStatic)

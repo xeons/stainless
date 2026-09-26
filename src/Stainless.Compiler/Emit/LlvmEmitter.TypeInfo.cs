@@ -304,9 +304,11 @@ public sealed partial class LlvmEmitter
         // reflects everything it inherited too, because that is what is in the
         // object a deserializer is about to fill in. The offsets are already
         // absolute, so the base's fields need no adjusting.
-        var reflected = type is ClassTypeSymbol withBase
-            ? withBase.AllFields().ToList()
-            : type.Fields.ToList();
+        // A primary constructor's hidden copies are how the type keeps its
+        // parameters, not data it declared, so they are not described.
+        var reflected = (type is ClassTypeSymbol withBase ? withBase.AllFields() : type.Fields)
+            .Where(f => !f.IsPrimaryCapture)
+            .ToList();
 
         string fields = "null";
         if (reflected.Count > 0)

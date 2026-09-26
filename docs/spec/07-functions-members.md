@@ -532,6 +532,103 @@ be assigned in a constructor of the class that declares it, and nowhere else —
 the rule C# arrived at, for the reason C# arrived at it. A *computed* get-only
 property has nothing to assign to at all, and the error says so.
 
+### 7.3.1 `init` — a setter for an object being made
+
+```csharp
+public class Account
+{
+    public int Id { get; init; }
+    public String Handle { get => field; init => field = "@" + value; }
+}
+
+var account = new Account { Id = 7, Handle = "ada" };
+account.Id = 8;                          // SL0781
+```
+
+`init` is `set` with a narrower list of callers: an object initializer, a
+`with` ([§2.4.2](02-types.md#242-with--a-record-again-with-some-of-it-changed)),
+and — on `this`, and nowhere else — a constructor or another `init` accessor of
+the declaring class or a class deriving from it. After that the object is made
+and the property reads as get-only. It lowers to the same `set_Name` method a
+setter does, so it costs nothing, and the rule is checked where the write is
+written. Either form of body works, and an automatic `init;` stores as `set;`
+does.
+
+An `init` property is part of a contract like a setter is: what implements an
+interface's `{ get; init; }`, or overrides a virtual one, says `init` too, and
+one declared `set` is implemented with `set` (SL0782) — otherwise a caller of
+one would be allowed a write the other forbids. A static property has no object
+that is being made, so it cannot be `init` (SL0780).
+
+```
+error[SL0781]: 'Account.Id' is 'init', so it is written while its object is
+being made and not after: in an object initializer, a 'with', or on 'this' in a
+constructor or 'init' accessor of 'Account' or a class deriving from it
+```
+
+### 7.3.2 `required` — set by whoever makes one
+
+```csharp
+public class Person
+{
+    public required String Name { get; init; }
+    public required int Age;
+
+    public Person() { }
+
+    [SetsRequiredMembers]
+    public Person(String name, int age) { Name = name; Age = age; }
+}
+
+var ada = new Person { Name = "ada", Age = 36 };
+var bob = new Person("bob", 40);
+var cy  = new Person { Name = "cy" };    // SL0784: 'Age' is not set
+```
+
+A field or a property marked `required` has to be given a value in the object
+initializer of every `new` that makes one, and the error names every member a
+construction left out. It is checked at the `new` and costs nothing at run time.
+A derived class inherits its base's required members, and an override that
+leaves the word off does not make one optional.
+
+**`[SetsRequiredMembers]` on a constructor** says that it sets them all, so a
+`new` that runs it names none. Like `[Packed]`, it is a rule about the language
+rather than a library type, so it needs no import. `new()` written with its type
+left off is a `new` like any other, and so is the collection a collection
+expression makes. A type argument for a `new()` constraint is refused if its
+constructor taking nothing would leave one unset, because `new T()` has no
+initializer to name them in (SL0328).
+
+Only an instance field or a property with a setter or `init` can be required;
+and on a public type it has to be public, setter included, because every `new`
+anywhere must be able to set it (SL0783).
+
+### 7.3.3 `field` — the property's own storage
+
+```csharp
+public class Person
+{
+    public String Name { get; set => field = value.Trim(); }
+    public Node Badge { get => field ??= MakeBadge(); }
+}
+```
+
+Inside an accessor, `field` is the storage the compiler made for that property,
+which is what lets an accessor do work without a field written beside it. A
+property whose accessors say it owns storage exactly as an automatic one does —
+it is laid out, released by the destructor and reflected like any field — so an
+automatic `get;` may sit beside a written `set` that says `field`. On a static
+property, the storage is a static.
+
+The storage of a reference-typed property starts out null whatever its type
+says, so `field ??= ...` is allowed on it: that is how an accessor fills it on
+first use. A lambda written in an accessor reaches `field` through the object,
+so it reads what is there when it runs.
+
+**`field` is contextual.** It means the storage only inside an accessor of a
+property, and is an ordinary name everywhere else. `@field` is the ordinary name
+inside one too, and `this.field` a member of that name.
+
 **On an interface**
 
 ```csharp
@@ -821,9 +918,23 @@ public class Registry
 ```
 
 **A property** is two static methods wearing the spelling of a field, exactly as
-an instance property is two ordinary ones. Both accessors are written: an
-automatic one would need storage with no initializer to fill it, and a static
-has no other moment at which to be given a first value (SL0584).
+an instance property is two ordinary ones. An automatic one owns a static the
+source cannot name:
+
+```csharp
+public static class Registry
+{
+    public static int Count { get; set; }                 // starts at zero
+    public static String Label { get; set; } = "registry";
+    public static int Fixed { get; }                      // set by the static constructor
+}
+```
+
+With no `= value` the storage starts as its type's zero, which a global is born
+holding, so it needs no code to run and a `--shared` library may have one. With
+one, it is ordered with every other static's initializer, and an initializer
+that reads the property is ordered after it. A get-only one is written by its
+type's static constructor and nowhere else.
 
 **A static constructor** is `static Name() { }` inside `class Name`. It runs
 once, before `Main`, after every static field's initializer — which is C#'s
