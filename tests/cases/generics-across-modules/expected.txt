@@ -1,0 +1,7 @@
+alpha 23
+list  40 beta
+tuple beta 2
+slice beta
+fn    42 beta beta
+ptr   beta
+both  11 1

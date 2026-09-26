@@ -782,12 +782,16 @@ public sealed partial class Binder
                 ? BindLambdaDefault(syntax.Parameters[i], written, parameterTypes[i])
                 : null);
 
-        string key = $"{result.Name}(" + string.Join(", ", parameterTypes.Select((t, i) =>
-            defaults[i] is { } fallback ? $"{t.Name} = {ConstantKey(fallback)}" : t.Name)) + ")";
+        string Signature(Func<TypeSymbol, string> name) =>
+            $"{name(result)}(" + string.Join(", ", parameterTypes.Select((t, i) =>
+                defaults[i] is { } fallback ? $"{name(t)} = {ConstantKey(fallback)}" : name(t))) + ")";
+
+        string key = Signature(TypeIdentity);
         if (_naturalClosures.TryGetValue(key, out var existing)) return existing;
 
         var type = NewClosureType(
-            $"closure {key}", _currentModule!.Name, syntax.Span, isPublic: false, []);
+            "closure " + MadeTypeName(_currentModule!.Name, Signature(t => t.Name), () => Signature(TypeIdentity)),
+            _currentModule.Name, syntax.Span, isPublic: false, []);
 
         type.ReturnType = result;
 

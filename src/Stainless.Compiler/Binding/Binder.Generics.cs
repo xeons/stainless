@@ -73,7 +73,42 @@ public sealed partial class Binder
     // ============================================================ generics
 
     private static string InstantiationKey(string name, IReadOnlyList<TypeSymbol> arguments) =>
-        name + "<" + string.Join(",", arguments.Select(a => a.Name)) + ">";
+        name + "<" + string.Join(",", arguments.Select(TypeIdentity)) + ">";
+
+    /// <summary>
+    /// A type's name with every named type in it qualified by its module, so
+    /// that <c>Alpha.Point</c> and <c>Beta.Point</c>, which print alike, are
+    /// told apart wherever they appear inside another type.
+    /// </summary>
+    private static string TypeIdentity(TypeSymbol type) => type switch
+    {
+        TupleTypeSymbol tuple => "(" + string.Join(",", tuple.Elements.Select(TypeIdentity)) + ")",
+        SliceTypeSymbol slice => TypeIdentity(slice.Element) + "[:]",
+        NamedTypeSymbol named => named.QualifiedName,
+        PointerTypeSymbol pointer => TypeIdentity(pointer.Element) + "*",
+        ArrayTypeSymbol array => TypeIdentity(array.Element) + "[]",
+        FixedArrayTypeSymbol fixedArray => $"{TypeIdentity(fixedArray.Element)}[{fixedArray.Length}]",
+        OptionalTypeSymbol optional => TypeIdentity(optional.Element) + "?",
+        WeakTypeSymbol weak => "weak " + TypeIdentity(weak.Element) + "?",
+        _ => type.Name,
+    };
+
+    /// <summary>The qualified names the compiler has made up for a type, one per type.</summary>
+    private readonly HashSet<string> _madeTypeNames = new(StringComparer.Ordinal);
+
+    /// <summary>
+    /// The name a made type is known by: <paramref name="written"/>, unless a
+    /// different type already has it -- a <c>List&lt;Point&gt;</c> of another
+    /// module's <c>Point</c> -- in which case the one with its arguments
+    /// qualified. The qualified name is also the symbol's, so the two MUST
+    /// differ.
+    /// </summary>
+    private string MadeTypeName(string module, string written, Func<string> qualified)
+    {
+        string name = _madeTypeNames.Add(module + "." + written) ? written : qualified();
+        _madeTypeNames.Add(module + "." + name);
+        return name;
+    }
 
     /// <summary>How deep the instantiation currently under way is nested.</summary>
     private int _instantiationDepth;
@@ -141,7 +176,9 @@ public sealed partial class Binder
             return new StructTypeSymbol { SimpleName = template.Name, ModuleName = template.Module.Name };
 
         var declaration = template.Declaration;
-        string displayName = template.Name + "<" + string.Join(", ", arguments.Select(a => a.Name)) + ">";
+        string displayName = MadeTypeName(template.Module.Name,
+            template.Name + "<" + string.Join(", ", arguments.Select(a => a.Name)) + ">",
+            () => template.Name + "<" + string.Join(", ", arguments.Select(TypeIdentity)) + ">");
         bool isPublic = declaration.Modifiers.HasFlag(Modifiers.Public);
 
         NamedTypeSymbol type = declaration.Kind switch
@@ -298,7 +335,9 @@ public sealed partial class Binder
         if (_instantiatedTypes.TryGetValue(key, out var existing)) return existing;
 
         var declaration = template.Declaration;
-        string displayName = template.Name + "<" + string.Join(", ", arguments.Select(a => a.Name)) + ">";
+        string displayName = MadeTypeName(template.Module.Name,
+            template.Name + "<" + string.Join(", ", arguments.Select(a => a.Name)) + ">",
+            () => template.Name + "<" + string.Join(", ", arguments.Select(TypeIdentity)) + ">");
         bool isPublic = declaration.Modifiers.HasFlag(Modifiers.Public);
 
         NamedTypeSymbol type = template.CarriesReceiver

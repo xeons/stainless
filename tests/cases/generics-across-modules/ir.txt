@@ -1,0 +1,2 @@
+define void @_SL8Standard11Collections11List_Point_3AddS11Alpha_PointEv
+define void @_SL8Standard11Collections16List_Beta_Point_3AddS10Beta_PointEv

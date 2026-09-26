@@ -60,13 +60,15 @@ public sealed partial class Binder
     /// </summary>
     private TupleTypeSymbol TupleOf(IReadOnlyList<TypeSymbol> elements)
     {
-        string key = string.Join(",", elements.Select(e => e.Name));
+        string key = string.Join(",", elements.Select(TypeIdentity));
         if (_tuples.TryGetValue(key, out var existing)) return existing;
 
         var tuple = new TupleTypeSymbol
         {
             Elements = elements.ToList(),
-            SimpleName = "(" + string.Join(", ", elements.Select(e => e.Name)) + ")",
+            SimpleName = MadeTypeName(Builtins.StandardModuleName,
+                "(" + string.Join(", ", elements.Select(e => e.Name)) + ")",
+                () => "(" + string.Join(", ", elements.Select(TypeIdentity)) + ")"),
             ModuleName = Builtins.StandardModuleName,
         };
 
@@ -87,7 +89,8 @@ public sealed partial class Binder
         var slice = new SliceTypeSymbol
         {
             Element = element,
-            SimpleName = element.Name + "[:]",
+            SimpleName = MadeTypeName(Builtins.StandardModuleName,
+                element.Name + "[:]", () => TypeIdentity(element) + "[:]"),
             ModuleName = Builtins.StandardModuleName,
         };
 
