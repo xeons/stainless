@@ -13,6 +13,9 @@ public class Object
 // Wider than what it is some of.
 public struct TooWide { public byte B : 9; }
 
+// Wider than a long holds is still only too wide.
+public struct FarTooWide { public uint U : 18446744073709551615; }
+
 // Zero is C's storage-unit closer, which is not written yet.
 public struct Zero { public int Z : 0; }
 

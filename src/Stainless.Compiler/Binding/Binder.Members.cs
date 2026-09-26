@@ -441,8 +441,17 @@ public sealed partial class Binder
             return null;
         }
 
-        long width = Convert.ToInt64(value, System.Globalization.CultureInfo.InvariantCulture);
         int capacity = fieldType.Size * 8;
+
+        // Past what a long holds is past every capacity, and too wide to convert.
+        if (value is ulong huge && huge > long.MaxValue)
+        {
+            diagnostics.Error("SL0474", field.BitWidth!.Span,
+                $"'{field.Name}' asks for {huge} bits, and '{fieldType.Name}' has {capacity}");
+            return null;
+        }
+
+        long width = Convert.ToInt64(value, System.Globalization.CultureInfo.InvariantCulture);
 
         if (width <= 0)
         {
