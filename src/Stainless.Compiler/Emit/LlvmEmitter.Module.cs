@@ -607,8 +607,19 @@ public sealed partial class LlvmEmitter
 
     private void ExternalDeclarations(BoundProgram program)
     {
+        // A C name this program defines is called through its definition. The
+        // binder has made sure every declaration of it agrees (SL0295), and a
+        // declare beside the define is a redefinition to LLVM.
+        var defined = program.Functions
+            .Where(f => f.Symbol.Linkage == LinkageKind.ExportC)
+            .Select(f => f.Symbol.MangledName)
+            .ToHashSet(StringComparer.Ordinal);
+
         foreach (var function in program.ExternalFunctions)
         {
+            if (defined.Contains(function.MangledName))
+                continue;
+
             var returnInfo = ClassifyResult(function.ReturnType);
             var parts = new List<string>();
 

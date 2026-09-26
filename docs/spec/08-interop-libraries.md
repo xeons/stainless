@@ -39,6 +39,20 @@ inside. Two modules may declare the same C function, because a declaration names
 a symbol rather than defining one — but only one of them should make it
 `public`, or a file importing both has an ambiguous name.
 
+**One C name is one function.** C has no overloading and a linker has one
+symbol per name, so an `export "C"` definition is the only thing under its name
+in the program: a second definition — in the same module with other parameters,
+or in another module with any — is refused, and so is a declaration of that
+name with another signature, and so is a name the runtime already defines. A
+declaration that agrees with the definition is how one module calls what another
+defines, as a C header would, and stays.
+
+```
+error[SL0295]: the C name 'Twin' is defined by 'Clash.Twin', and this defines
+it a second time; C has one function per name, so give this one a name of its
+own
+```
+
 **A `...` may be called and not written.** `printf` is bound with one and works;
 a function this program *defines* may not have one, whatever its linkage. Nothing
 in the language reads the extra arguments — there is no `va_list` — so the

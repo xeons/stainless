@@ -620,6 +620,91 @@ public sealed partial class Binder
         }
     }
 
+    /// <summary>
+    /// One C name, one function. C has no overloading and a linker has one
+    /// symbol per name, so an <c>export "C"</c> definition MUST be the only
+    /// thing under its name: another definition, or a declaration with another
+    /// signature, would be two functions in one symbol.
+    ///
+    /// A declaration that agrees with the definition stays. It is how one
+    /// module calls what another defines, as a C header would.
+    ///
+    /// SL0211 already refuses two such functions in one module whose
+    /// parameters match; this is the rest, across modules and across
+    /// parameter types.
+    /// </summary>
+    private void CheckForeignNames()
+    {
+        var byName = _modules.Values
+            .SelectMany(m => m.Functions)
+            .Where(f => f.Linkage is LinkageKind.ExternC or LinkageKind.ExportC)
+            .GroupBy(Mangler.Mangle, StringComparer.Ordinal);
+
+        foreach (var group in byName)
+        {
+            var functions = group
+                .OrderBy(f => f.Span.File?.Path, StringComparer.Ordinal)
+                .ThenBy(f => f.Span.Start)
+                .ToList();
+
+            var definition = functions.FirstOrDefault(f => f.Linkage == LinkageKind.ExportC);
+            if (definition is null)
+                continue;
+
+            // What else declares a runtime name is the standard library, so the
+            // definition is the one to blame.
+            if (s_runtimeFunctionNames.Value.Contains(group.Key))
+            {
+                diagnostics.Error("SL0295", definition.Span,
+                    $"'{group.Key}' is a function of the Stainless runtime, which every program " +
+                    "links; export this one under another name");
+                continue;
+            }
+
+            foreach (var other in functions)
+            {
+                if (ReferenceEquals(other, definition))
+                    continue;
+                if (other.Linkage == LinkageKind.ExternC && HasSameCSignature(other, definition))
+                    continue;
+
+                string what = other.Linkage == LinkageKind.ExportC
+                    ? "defines it a second time"
+                    : "declares it with another signature";
+                diagnostics.Error("SL0295", other.Span,
+                    $"the C name '{group.Key}' is defined by '{definition.ModuleName}.{definition.Name}', " +
+                    $"and this {what}; C has one function per name, so give this one a " +
+                    "name of its own");
+            }
+        }
+    }
+
+    private static bool HasSameCSignature(FunctionSymbol first, FunctionSymbol second) =>
+        first.ReturnType.Equals(second.ReturnType) &&
+        first.IsVariadic == second.IsVariadic &&
+        first.CallingConvention == second.CallingConvention &&
+        first.Parameters.Count == second.Parameters.Count &&
+        first.Parameters.Zip(second.Parameters).All(p =>
+            p.First.Type.Equals(p.Second.Type) && p.First.IsByReference == p.Second.IsByReference);
+
+    /// <summary>
+    /// What the runtime defines, read from its header. A program linking one
+    /// of these under its own definition gets two, and the linker refuses.
+    /// </summary>
+    private static readonly Lazy<HashSet<string>> s_runtimeFunctionNames = new(() =>
+    {
+        var names = new HashSet<string>(StringComparer.Ordinal);
+        using var stream = typeof(Binder).Assembly.GetManifestResourceStream("Stainless.Runtime.stainless.h");
+        if (stream is null)
+            return names;
+
+        using var reader = new StreamReader(stream);
+        foreach (System.Text.RegularExpressions.Match match in
+                 System.Text.RegularExpressions.Regex.Matches(reader.ReadToEnd(), @"\b(sl_\w+)\s*\("))
+            names.Add(match.Groups[1].Value);
+        return names;
+    });
+
     private void AddParameters(FunctionSymbol symbol, IReadOnlyList<ParameterSyntax> parameters, FileScope scope)
     {
         for (int index = 0; index < parameters.Count; index++)

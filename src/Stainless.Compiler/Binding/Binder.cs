@@ -301,6 +301,7 @@ public sealed partial class Binder(
         ComputeLayouts();           // pass 7: every value type has a size
         CheckUnions();              //         and a union counts nothing
         ValidateLinkageSignatures();// pass 8: no counted reference crosses a language boundary
+        CheckForeignNames();        //         and one C name is one function
         CheckConversions();         //         and no declared conversion restates one
         SynthesizeInitializerConstructors();
                                     //         and a class with field initializers has somewhere
