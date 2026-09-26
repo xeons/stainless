@@ -72,8 +72,31 @@ public sealed partial class Binder
 
     // ============================================================ generics
 
-    private static string InstantiationKey(string name, IReadOnlyList<TypeSymbol> arguments) =>
-        name + "<" + string.Join(",", arguments.Select(TypeIdentity)) + ">";
+    /// <summary>
+    /// Type arguments as a key. Every type is one object (see
+    /// <see cref="TypeSymbol.MakePointerType"/>), so two lists are the same
+    /// arguments exactly when they hold the same objects in the same order.
+    /// </summary>
+    private readonly record struct TypeList(IReadOnlyList<TypeSymbol> Types)
+    {
+        public bool Equals(TypeList other) =>
+            Types.Count == other.Types.Count &&
+            Types.Zip(other.Types).All(pair => ReferenceEquals(pair.First, pair.Second));
+
+        public override int GetHashCode()
+        {
+            var hash = new HashCode();
+            foreach (var type in Types) hash.Add(System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(type));
+            return hash.ToHashCode();
+        }
+    }
+
+    /// <summary>
+    /// A template at some arguments. The template is its declaration's own
+    /// object -- a method of a generic type has one per instantiation of that
+    /// type -- so it says everything the name, the owner and the overload do.
+    /// </summary>
+    private readonly record struct InstantiationKey(object Template, TypeList Arguments);
 
     /// <summary>
     /// A type's name with every named type in it qualified by its module, so
@@ -169,7 +192,7 @@ public sealed partial class Binder
             return new StructTypeSymbol { SimpleName = template.Name, ModuleName = template.Module.Name };
         }
 
-        string key = InstantiationKey(template.Module.Name + "." + template.Name, arguments);
+        var key = new InstantiationKey(template, new TypeList(arguments));
         if (_instantiatedTypes.TryGetValue(key, out var existing)) return existing;
 
         if (RefuseRunawayInstantiation(template.Name, arguments, span))
@@ -332,7 +355,7 @@ public sealed partial class Binder
                 { SimpleName = template.Name, ModuleName = template.Module.Name };
         }
 
-        string key = InstantiationKey(template.Module.Name + "." + template.Name, arguments);
+        var key = new InstantiationKey(template, new TypeList(arguments));
         if (_instantiatedTypes.TryGetValue(key, out var existing)) return existing;
 
         var declaration = template.Declaration;
@@ -391,16 +414,7 @@ public sealed partial class Binder
             return null;
         }
 
-        string owner = template.ContainingType is null
-            ? template.Module.Name
-            : template.ContainingType.QualifiedName;
-
-        // The declaration's position is in the key because functions overload and
-        // templates do too: `Sort<T>(T[:])` and `Sort<T>(IList<T>)` are two
-        // templates of one name, and instantiating both at `int` must give two
-        // functions rather than whichever was asked for first.
-        string key = InstantiationKey(
-            owner + "." + template.Name + "@" + template.Declaration.Span.Start, arguments);
+        var key = new InstantiationKey(template, new TypeList(arguments));
         if (_instantiatedFunctions.TryGetValue(key, out var existing)) return existing;
 
         if (RefuseRunawayInstantiation(template.Name, arguments, span)) return null;
@@ -455,7 +469,7 @@ public sealed partial class Binder
             // reference, structs by pointer.
             TypeSymbol thisType = containing is ClassTypeSymbol or InterfaceTypeSymbol
                 ? containing
-                : new PointerTypeSymbol(containing);
+                : containing.MakePointerType();
             symbol.Parameters.Add(new ParameterSymbol("this", thisType, 0) { IsThis = true });
         }
 

@@ -970,7 +970,7 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
-        var result = new OptionalTypeSymbol(wanted);
+        var result = wanted.MakeOptionalType();
 
         // Nothing to ask: every one of these already is one of those, so this
         // is the ordinary widening and the null arm would be unreachable.
@@ -1096,7 +1096,7 @@ public sealed partial class Binder
             if (_currentModule.Statics.TryGetValue(name, out var moduleStatic))
                 return new BoundStaticAccess(syntax.Span, moduleStatic);
 
-            foreach (var import in _currentScope!.Imports.Values.Distinct())
+            foreach (var import in _currentScope!.ImportedModules)
             {
                 if (import.Constants.TryGetValue(name, out var imported) && imported.IsPublic)
                     return new BoundConstantAccess(syntax.Span, imported);
@@ -1191,7 +1191,7 @@ public sealed partial class Binder
                 diagnostics.Error("SL0230", syntax.Span, "cannot take the address of a temporary value");
                 return new BoundErrorExpression(syntax.Span);
             }
-            return new BoundAddressOf(syntax.Span, new PointerTypeSymbol(target.Type), target);
+            return new BoundAddressOf(syntax.Span, target.Type.MakePointerType(), target);
         }
 
         if (syntax.Operator == TokenKind.Star)
@@ -1879,8 +1879,8 @@ public sealed partial class Binder
         if (left.Type.Equals(right.Type)) return left.Type;
 
         // `flag ? obj : null` is an optional, which is what the null was reaching for.
-        if (left is BoundNullLiteral && right.Type.IsReferenceType) return new OptionalTypeSymbol(right.Type);
-        if (right is BoundNullLiteral && left.Type.IsReferenceType) return new OptionalTypeSymbol(left.Type);
+        if (left is BoundNullLiteral && right.Type.IsReferenceType) return right.Type.MakeOptionalType();
+        if (right is BoundNullLiteral && left.Type.IsReferenceType) return left.Type.MakeOptionalType();
 
         if (left.Type is PrimitiveTypeSymbol { IsNumeric: true } leftNumber &&
             right.Type is PrimitiveTypeSymbol { IsNumeric: true } rightNumber &&
@@ -2021,7 +2021,7 @@ public sealed partial class Binder
         // A weak reference is read strongly first, which is where it is
         // asked whether the object is still alive.
         if (operand.Type is WeakTypeSymbol weak)
-            operand = BindConversion(operand, new OptionalTypeSymbol(weak.Element), syntax.Span);
+            operand = BindConversion(operand, weak.Element.MakeOptionalType(), syntax.Span);
 
         return operand.Type is OptionalTypeSymbol optional
             ? new BoundConversion(syntax.Span, optional.Element, operand, ConversionKind.NarrowOptional)
@@ -2664,7 +2664,7 @@ public sealed partial class Binder
         // A struct accessor takes its receiver by pointer, exactly as a struct
         // method does. A static one has none at all.
         if (receiver is not null && property.ContainingType is StructTypeSymbol structType)
-            receiver = new BoundAddressOf(span, new PointerTypeSymbol(structType), receiver);
+            receiver = new BoundAddressOf(span, structType.MakePointerType(), receiver);
 
         return new BoundCall(span, getter, receiver, []) { IsNonVirtual = nonVirtual };
     }
@@ -3085,7 +3085,7 @@ public sealed partial class Binder
 
         // A struct's method takes its receiver by pointer, as everywhere else.
         var receiver = accessor.ContainingType is StructTypeSymbol
-            ? new BoundAddressOf(span, new PointerTypeSymbol(target.Type), target)
+            ? new BoundAddressOf(span, target.Type.MakePointerType(), target)
             : target;
 
         return new BoundCall(span, accessor, receiver, arguments);
@@ -3302,7 +3302,7 @@ public sealed partial class Binder
             return ErrorTypeSymbol.Instance;
         }
 
-        return new FixedArrayTypeSymbol(element, (int)length);
+        return element.MakeFixedArrayType((int)length);
     }
 
     /// <summary>

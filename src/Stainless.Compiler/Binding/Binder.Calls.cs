@@ -402,7 +402,7 @@ public sealed partial class Binder
         ForgetWrittenThrough(target);
 
         return new BoundAddressOf(
-            reference.Span, new PointerTypeSymbol(target.Type), target)
+            reference.Span, target.Type.MakePointerType(), target)
         {
             FromRefKeyword = true,
         };
@@ -503,7 +503,7 @@ public sealed partial class Binder
             .Where(f => f.Name == name && f.ContainingType is null)
             .ToList();
 
-        foreach (var imported in _currentScope!.Imports.Values.Distinct())
+        foreach (var imported in _currentScope!.ImportedModules)
             if (imported != _currentModule)
                 found.AddRange(imported.Functions.Where(
                     f => f.Name == name && f.ContainingType is null && f.IsPublic));
@@ -562,7 +562,7 @@ public sealed partial class Binder
 
         ForgetWrittenThrough(target);
 
-        return new BoundAddressOf(syntax.Span, new PointerTypeSymbol(target.Type), target)
+        return new BoundAddressOf(syntax.Span, target.Type.MakePointerType(), target)
         {
             FromOutKeyword = true,
         };
@@ -588,7 +588,7 @@ public sealed partial class Binder
         var local = DeclareLocal(draft.Name, type, isConst: false, draft.NameSpan);
 
         return new BoundAddressOf(
-            draft.Span, new PointerTypeSymbol(type),
+            draft.Span, type.MakePointerType(),
             new BoundLocalAccess(draft.NameSpan, local))
         {
             FromOutKeyword = true,
@@ -1052,7 +1052,7 @@ public sealed partial class Binder
         // emitter puts it in a slot first, and anything the method writes back is
         // discarded, exactly as it is in C#.
         if (namedType is StructTypeSymbol)
-            receiver = new BoundAddressOf(member.Span, new PointerTypeSymbol(namedType), receiver);
+            receiver = new BoundAddressOf(member.Span, namedType.MakePointerType(), receiver);
 
         return BuildCall(syntax, method, receiver, arguments,
             nonVirtual: member.Target is BaseSyntax);
@@ -1254,7 +1254,7 @@ public sealed partial class Binder
             var local = _currentModule!.FindFunctions(name.Parts[0]).ToList();
             if (local.Count > 0) return local;
 
-            return _currentScope!.Imports.Values.Distinct()
+            return _currentScope!.ImportedModules
                 .SelectMany(m => m.FindFunctions(name.Parts[0]))
                 .Where(f => f.IsPublic)
                 .ToList();
@@ -1384,7 +1384,7 @@ public sealed partial class Binder
         var value = BindConversion(argument, parameter.Type, span);
 
         return parameter.Mode == ParameterMode.In && !value.Type.IsError()
-            ? new BoundAddressOf(span, new PointerTypeSymbol(parameter.Type), value)
+            ? new BoundAddressOf(span, parameter.Type.MakePointerType(), value)
             : value;
     }
 
@@ -1425,7 +1425,7 @@ public sealed partial class Binder
         // A C variadic function has no declared parameter type to convert
         // against, so the String-to-bytes decision has to be made here instead.
         if (argument is BoundStringLiteral)
-            return new BoundConversion(argument.Span, new PointerTypeSymbol(PrimitiveTypeSymbol.Byte),
+            return new BoundConversion(argument.Span, PrimitiveTypeSymbol.Byte.MakePointerType(),
                 argument, ConversionKind.StringLiteralToPointer);
 
         if (_builtins.IsString(argument.Type))

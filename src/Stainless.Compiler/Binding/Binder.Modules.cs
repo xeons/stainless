@@ -83,11 +83,11 @@ public sealed partial class Binder
                 }
 
                 string key = import.Alias ?? import.Name.Last;
-                scope.Imports[key] = target;
+                scope.Import(key, target);
 
                 // The full dotted name always works too, so `import A.B;` lets you
                 // write both `B.Thing` and `A.B.Thing`.
-                scope.Imports[import.Name.Text] = target;
+                scope.Import(import.Name.Text, target);
             }
         }
     }

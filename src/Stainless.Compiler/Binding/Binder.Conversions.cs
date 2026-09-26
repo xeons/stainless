@@ -408,7 +408,7 @@ public sealed partial class Binder
             Scope = _currentScope,
         };
 
-        var ignored = new PointerTypeSymbol(PrimitiveTypeSymbol.Byte);
+        var ignored = PrimitiveTypeSymbol.Byte.MakePointerType();
         thunk.Parameters.Add(new ParameterSymbol("receiver", ignored, 0));
 
         var forwarded = new List<BoundExpression>();
@@ -425,7 +425,7 @@ public sealed partial class Binder
             // A parameter passed by address is the caller's storage already, and
             // the address of it is what the function wants in turn.
             forwarded.Add(own.IsByReference
-                ? new BoundAddressOf(function.Span, new PointerTypeSymbol(own.Type), access)
+                ? new BoundAddressOf(function.Span, own.Type.MakePointerType(), access)
                 {
                     FromRefKeyword = own.Mode == ParameterMode.Ref,
                     FromOutKeyword = own.Mode == ParameterMode.Out,

@@ -56,6 +56,43 @@ public abstract class TypeSymbol
     public virtual bool IsContract => false;
 
     public override string ToString() => Name;
+
+    // ------------------------------------------------------------ interning
+    //
+    // A type built from another is made once, by the type it is built from, so
+    // two mentions of `int*` are one object and `==` is the whole of type
+    // identity. Held here rather than in a table, so it lives exactly as long
+    // as its element: the primitives are shared by every compilation in the
+    // process, and a table beside them would keep every compilation's types.
+
+    internal PointerTypeSymbol? PointerSlot;
+    internal ArrayTypeSymbol? ArraySlot;
+    internal OptionalTypeSymbol? OptionalSlot;
+    internal WeakTypeSymbol? WeakSlot;
+    internal System.Collections.Concurrent.ConcurrentDictionary<int, FixedArrayTypeSymbol>? FixedArraySlots;
+
+    /// <summary><c>T*</c>: the one pointer to this type.</summary>
+    public PointerTypeSymbol MakePointerType() => PointerTypeSymbol.Of(this);
+
+    /// <summary><c>T[]</c>: the one counted array of this type.</summary>
+    public ArrayTypeSymbol MakeArrayType() => ArrayTypeSymbol.Of(this);
+
+    /// <summary><c>T?</c>: the one optional reference to this type.</summary>
+    public OptionalTypeSymbol MakeOptionalType() => OptionalTypeSymbol.Of(this);
+
+    /// <summary><c>weak T?</c>: the one weak reference to this type.</summary>
+    public WeakTypeSymbol MakeWeakType() => WeakTypeSymbol.Of(this);
+
+    /// <summary><c>T[N]</c>: the one inline array of this type and length.</summary>
+    public FixedArrayTypeSymbol MakeFixedArrayType(int length) => FixedArrayTypeSymbol.Of(this, length);
+
+    /// <summary>
+    /// The slot's value, made on first use. Compared and exchanged because the
+    /// primitives are shared between compilations that run in parallel, and
+    /// two made at once MUST still come out as one.
+    /// </summary>
+    internal static T Intern<T>(ref T? slot, Func<T> make) where T : class =>
+        slot ?? System.Threading.Interlocked.CompareExchange(ref slot, make(), null) ?? slot;
 }
 
 public sealed class ErrorTypeSymbol : TypeSymbol
@@ -141,26 +178,36 @@ public sealed class PrimitiveTypeSymbol : TypeSymbol
     ];
 }
 
-/// <summary><c>T*</c>: a raw, unmanaged pointer, identical to C's.</summary>
-public sealed class PointerTypeSymbol(TypeSymbol element) : TypeSymbol
+/// <summary>
+/// <c>T*</c>: a raw, unmanaged pointer, identical to C's. Made only by
+/// <see cref="TypeSymbol.MakePointerType"/>.
+/// </summary>
+public sealed class PointerTypeSymbol : TypeSymbol
 {
-    public TypeSymbol Element { get; } = element;
+    private PointerTypeSymbol(TypeSymbol element) => Element = element;
+
+    internal static PointerTypeSymbol Of(TypeSymbol element) =>
+        Intern(ref element.PointerSlot, () => new PointerTypeSymbol(element));
+
+    public TypeSymbol Element { get; }
     public override string Name => Element.Name + "*";
     public override int Size => TargetPlatform.Current.PointerWidth;
     public override int Alignment => TargetPlatform.Current.PointerWidth;
-
-    public override bool Equals(object? obj) =>
-        obj is PointerTypeSymbol other && Element.Equals(other.Element);
-    public override int GetHashCode() => HashCode.Combine("ptr", Element);
 }
 
 /// <summary>
 /// <c>T[]</c>: a counted array. Like a class it is a reference counted object,
 /// so ARC, optionals and the calling convention apply unchanged; its elements
-/// live inline after a length, the same shape String uses for its bytes.
+/// live inline after a length, the same shape String uses for its bytes. Made
+/// only by <see cref="TypeSymbol.MakeArrayType"/>.
 /// </summary>
-public sealed class ArrayTypeSymbol(TypeSymbol element) : TypeSymbol
+public sealed class ArrayTypeSymbol : TypeSymbol
 {
+    private ArrayTypeSymbol(TypeSymbol element) => Element = element;
+
+    internal static ArrayTypeSymbol Of(TypeSymbol element) =>
+        Intern(ref element.ArraySlot, () => new ArrayTypeSymbol(element));
+
     /// <summary>
     /// strong, weak, TypeInfo*, length. Elements start here.
     ///
@@ -171,16 +218,12 @@ public sealed class ArrayTypeSymbol(TypeSymbol element) : TypeSymbol
     /// </summary>
     public static int HeaderSize => TargetPlatform.Current.ArrayHeaderSize;
 
-    public TypeSymbol Element { get; } = element;
+    public TypeSymbol Element { get; }
     public override string Name => Element.Name + "[]";
     public override int Size => TargetPlatform.Current.PointerWidth;
     public override int Alignment => TargetPlatform.Current.PointerWidth;
     public override bool IsManaged => true;
     public override bool IsReferenceType => true;
-
-    public override bool Equals(object? obj) =>
-        obj is ArrayTypeSymbol other && Element.Equals(other.Element);
-    public override int GetHashCode() => HashCode.Combine("array", Element);
 }
 
 /// <summary>
@@ -189,14 +232,25 @@ public sealed class ArrayTypeSymbol(TypeSymbol element) : TypeSymbol
 /// This is C's array and not C#'s. A <see cref="ArrayTypeSymbol"/> is a
 /// reference to a counted heap object; this one <em>is</em> its elements, so a
 /// struct holding one is exactly as wide as the C struct it mirrors and
-/// <c>sizeof</c> includes every element.
+/// <c>sizeof</c> includes every element. Made only by
+/// <see cref="TypeSymbol.MakeFixedArrayType"/>.
 /// </summary>
-public sealed class FixedArrayTypeSymbol(TypeSymbol element, int length) : TypeSymbol
+public sealed class FixedArrayTypeSymbol : TypeSymbol
 {
-    public TypeSymbol Element { get; } = element;
+    private FixedArrayTypeSymbol(TypeSymbol element, int length)
+    {
+        Element = element;
+        Length = length;
+    }
+
+    internal static FixedArrayTypeSymbol Of(TypeSymbol element, int length) =>
+        Intern(ref element.FixedArraySlots, () => new())
+            .GetOrAdd(length, n => new FixedArrayTypeSymbol(element, n));
+
+    public TypeSymbol Element { get; }
 
     /// <summary>How many elements. Always at least one.</summary>
-    public int Length { get; } = length;
+    public int Length { get; }
 
     public override string Name => $"{Element.Name}[{Length}]";
 
@@ -205,38 +259,41 @@ public sealed class FixedArrayTypeSymbol(TypeSymbol element, int length) : TypeS
 
     /// <summary>An array is aligned as its element is, which is C's rule.</summary>
     public override int Alignment => Element.Alignment;
-
-    public override bool Equals(object? obj) =>
-        obj is FixedArrayTypeSymbol other &&
-        Element.Equals(other.Element) && Length == other.Length;
-    public override int GetHashCode() => HashCode.Combine("fixed", Element, Length);
 }
 
-/// <summary><c>C?</c>: an optional reference. Same representation, may be null.</summary>
-public sealed class OptionalTypeSymbol(TypeSymbol element) : TypeSymbol
+/// <summary>
+/// <c>C?</c>: an optional reference. Same representation, may be null. Made
+/// only by <see cref="TypeSymbol.MakeOptionalType"/>.
+/// </summary>
+public sealed class OptionalTypeSymbol : TypeSymbol
 {
-    public TypeSymbol Element { get; } = element;
+    private OptionalTypeSymbol(TypeSymbol element) => Element = element;
+
+    internal static OptionalTypeSymbol Of(TypeSymbol element) =>
+        Intern(ref element.OptionalSlot, () => new OptionalTypeSymbol(element));
+
+    public TypeSymbol Element { get; }
     public override string Name => Element.Name + "?";
     public override int Size => TargetPlatform.Current.PointerWidth;
     public override int Alignment => TargetPlatform.Current.PointerWidth;
     public override bool IsManaged => true;
-
-    public override bool Equals(object? obj) =>
-        obj is OptionalTypeSymbol other && Element.Equals(other.Element);
-    public override int GetHashCode() => HashCode.Combine("opt", Element);
 }
 
-/// <summary><c>weak C?</c>: a non-owning reference that reads as null once the object dies.</summary>
-public sealed class WeakTypeSymbol(TypeSymbol element) : TypeSymbol
+/// <summary>
+/// <c>weak C?</c>: a non-owning reference that reads as null once the object
+/// dies. Made only by <see cref="TypeSymbol.MakeWeakType"/>.
+/// </summary>
+public sealed class WeakTypeSymbol : TypeSymbol
 {
-    public TypeSymbol Element { get; } = element;
+    private WeakTypeSymbol(TypeSymbol element) => Element = element;
+
+    internal static WeakTypeSymbol Of(TypeSymbol element) =>
+        Intern(ref element.WeakSlot, () => new WeakTypeSymbol(element));
+
+    public TypeSymbol Element { get; }
     public override string Name => "weak " + Element.Name + "?";
     public override int Size => TargetPlatform.Current.PointerWidth;
     public override int Alignment => TargetPlatform.Current.PointerWidth;
-
-    public override bool Equals(object? obj) =>
-        obj is WeakTypeSymbol other && Element.Equals(other.Element);
-    public override int GetHashCode() => HashCode.Combine("weak", Element);
 }
 
 /// <summary>
@@ -586,6 +643,13 @@ public abstract class NamedTypeSymbol : TypeSymbol
     private int _size;
     private int _alignment = 1;
 
+    /// <summary>
+    /// What <see cref="TypeExtensions.CarriesReferences"/> answered, kept once
+    /// the layout is settled: every field type is laid out before the type
+    /// holding it, so nothing the answer rests on changes after that.
+    /// </summary>
+    internal bool? CarriesReferencesOnceLaidOut;
+
     internal void SetLayout(int size, int alignment)
     {
         _size = size;
@@ -880,7 +944,7 @@ public sealed class ClosureTypeSymbol : StructTypeSymbol
     {
         // The function first, so that the word at offset zero is the thing a
         // debugger and a reader both look for.
-        Function = new FieldSymbol(FunctionFieldName, new PointerTypeSymbol(PrimitiveTypeSymbol.Byte), this, 0);
+        Function = new FieldSymbol(FunctionFieldName, PrimitiveTypeSymbol.Byte.MakePointerType(), this, 0);
 
         // The receiver second, and counted: this is the field that makes a
         // closure keep its object alive, and it does so through the ordinary
@@ -1198,8 +1262,12 @@ public sealed class InterfaceTypeSymbol : NamedTypeSymbol
         foreach (var candidate in Methods.Where(m => m.Name == name)
                      .Concat(AllInterfaces().SelectMany(i => i.Methods.Where(m => m.Name == name))))
         {
-            var signature = candidate.ParameterTypes.ToList();
-            if (seen.Any(m => m.Accepts(signature))) continue;
+            // The first has nothing to be hidden by, and is almost always the only one.
+            if (seen.Count > 0)
+            {
+                var signature = candidate.ParameterTypes.ToList();
+                if (seen.Any(m => m.Accepts(signature))) continue;
+            }
 
             seen.Add(candidate);
             yield return candidate;
@@ -1545,8 +1613,12 @@ public sealed class ClassTypeSymbol : NamedTypeSymbol
 
         foreach (var candidate in SelfAndBases().SelectMany(c => c.Methods.Where(m => m.Name == name)))
         {
-            var signature = candidate.ParameterTypes.ToList();
-            if (seen.Any(m => m.Accepts(signature))) continue;
+            // The first has nothing to be hidden by, and is almost always the only one.
+            if (seen.Count > 0)
+            {
+                var signature = candidate.ParameterTypes.ToList();
+                if (seen.Any(m => m.Accepts(signature))) continue;
+            }
 
             seen.Add(candidate);
             yield return candidate;
@@ -1598,7 +1670,15 @@ public static class TypeExtensions
     /// it, every question asked about such a struct after layout ran until the
     /// stack was gone.
     /// </summary>
-    public static bool CarriesReferences(this TypeSymbol type) => CarriesReferences(type, []);
+    public static bool CarriesReferences(this TypeSymbol type)
+    {
+        if (type is not StructTypeSymbol structType) return type.IsManagedSlot();
+        if (structType.CarriesReferencesOnceLaidOut is { } known) return known;
+
+        bool carries = CarriesReferences(type, []);
+        if (structType.LayoutComputed) structType.CarriesReferencesOnceLaidOut = carries;
+        return carries;
+    }
 
     /// <param name="walked">
     /// The types this question is already inside. A type reached twice answers
@@ -1608,6 +1688,8 @@ public static class TypeExtensions
     /// </param>
     private static bool CarriesReferences(TypeSymbol type, HashSet<TypeSymbol> walked)
     {
+        if (type is not StructTypeSymbol structType) return type.IsManagedSlot();
+        if (structType.CarriesReferencesOnceLaidOut is { } known) return known;
         if (!walked.Add(type)) return false;
 
         return type switch
@@ -1617,9 +1699,7 @@ public static class TypeExtensions
             VariantTypeSymbol variant => variant.Cases.Any(
                 c => c.Payload is not null &&
                      c.Payload.Fields.Any(f => CarriesReferences(f.Type, walked))),
-            StructTypeSymbol structType =>
-                structType.Fields.Any(f => CarriesReferences(f.Type, walked)),
-            _ => type.IsManagedSlot(),
+            _ => structType.Fields.Any(f => CarriesReferences(f.Type, walked)),
         };
     }
 

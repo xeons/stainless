@@ -109,19 +109,17 @@ public sealed partial class Binder(
     /// could have changed it.
     /// </summary>
     private Dictionary<object, Fact> _variantFacts = [];
+
+    /// <summary>Every array type something asked for, by element, each needing a TypeInfo.</summary>
     private readonly Dictionary<TypeSymbol, ArrayTypeSymbol> _arrays = [];
     private readonly Dictionary<TypeSymbol, SliceTypeSymbol> _slices = [];
 
-    /// <summary>
-    /// Tuple types, by their element types written out. Keyed by name rather
-    /// than by the list, because two lists of the same types are two objects
-    /// and one type.
-    /// </summary>
-    private readonly Dictionary<string, TupleTypeSymbol> _tuples = new(StringComparer.Ordinal);
+    /// <summary>Tuple types, by their element types.</summary>
+    private readonly Dictionary<TypeList, TupleTypeSymbol> _tuples = [];
 
     /// <summary>Instantiated generics, keyed by template and type arguments.</summary>
-    private readonly Dictionary<string, NamedTypeSymbol> _instantiatedTypes = new(StringComparer.Ordinal);
-    private readonly Dictionary<string, FunctionSymbol> _instantiatedFunctions = new(StringComparer.Ordinal);
+    private readonly Dictionary<InstantiationKey, NamedTypeSymbol> _instantiatedTypes = [];
+    private readonly Dictionary<InstantiationKey, FunctionSymbol> _instantiatedFunctions = [];
 
     /// <summary>
     /// Bodies already bound. An instantiated method is reachable both through its

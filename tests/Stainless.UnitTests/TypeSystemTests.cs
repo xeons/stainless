@@ -124,6 +124,50 @@ public class TypeSystemTests
             .Parameters[0].Type;
     }
 
+    // ------------------------------------------------------------- identity
+
+    /// <summary>
+    /// A type built from another is one object however many places write it,
+    /// so identity is <c>==</c>. Written in two parameters, it is resolved twice.
+    /// </summary>
+    [Theory]
+    [InlineData("int*")]
+    [InlineData("byte**")]
+    [InlineData("int[]")]
+    [InlineData("int[:]")]
+    [InlineData("int[4]*")]
+    [InlineData("(int, bool)")]
+    [InlineData("Box<int>")]
+    [InlineData("Node?")]
+    [InlineData("weak Node?")]
+    [InlineData("Box<Node?[]>*")]
+    public void ATypeWrittenTwiceIsOneObject(string written)
+    {
+        var program = Front.BindModule(
+            "public class Node { }\npublic struct Box<T> { public T Item; }\n" +
+            $"public void F({written} a, {written} b) {{ }}", out var diagnostics);
+        Assert.Empty(Front.Codes(diagnostics));
+
+        var parameters = program.Modules.SelectMany(m => m.Functions)
+            .First(f => f.Name == "F" && f.ModuleName == "Test").Parameters;
+        Assert.Same(parameters[0].Type, parameters[1].Type);
+    }
+
+    /// <summary>
+    /// Nothing compares types by what they hold. A type that did would let two
+    /// objects stand for one type, which is what <c>==</c> cannot see.
+    /// </summary>
+    [Fact]
+    public void NoTypeComparesByWhatItHolds()
+    {
+        var overriding = typeof(TypeSymbol).Assembly.GetTypes()
+            .Where(t => typeof(TypeSymbol).IsAssignableFrom(t))
+            .Where(t => t.GetMethod(nameof(Equals), [typeof(object)])!.DeclaringType != typeof(object))
+            .Select(t => t.Name);
+
+        Assert.Empty(overriding);
+    }
+
     // ---------------------------------------------------------------- layout
 
     /// <summary>

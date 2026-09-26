@@ -225,7 +225,7 @@ public sealed class Builtins
         BytePointer, BytePointer, BytePointer);
 
     public FunctionSymbol WeakCellLoad => Found(ref _weakCellLoad, Standard, "sl_weak_cell_load",
-        BytePointer, BytePointer, new PointerTypeSymbol(BytePointer));
+        BytePointer, BytePointer, BytePointer.MakePointerType());
 
     public FunctionSymbol WeakCellMatches => Found(ref _weakCellMatches, Standard,
         "sl_weak_cell_matches", PrimitiveTypeSymbol.Int, BytePointer, BytePointer, BytePointer);
@@ -253,7 +253,7 @@ public sealed class Builtins
     private static readonly SourceText BuiltinSource = new("<builtin>", "");
     private static readonly SourceSpan BuiltinSpan = new(BuiltinSource, 0, 0);
 
-    private static readonly PointerTypeSymbol BytePointer = new(PrimitiveTypeSymbol.Byte);
+    private static readonly PointerTypeSymbol BytePointer = PrimitiveTypeSymbol.Byte.MakePointerType();
     /// <summary>
     /// <c>char16*</c>: what a wide platform API takes and writes into.
     ///
@@ -261,7 +261,7 @@ public sealed class Builtins
     /// what the units were, and so accepted any 16-bit pointer that happened to
     /// be in reach.
     /// </summary>
-    private static readonly PointerTypeSymbol Char16Pointer = new(PrimitiveTypeSymbol.Char16);
+    private static readonly PointerTypeSymbol Char16Pointer = PrimitiveTypeSymbol.Char16.MakePointerType();
 
     public Builtins()
     {
@@ -397,7 +397,7 @@ public sealed class Builtins
         Guid.Fields.Add(new FieldSymbol("Data3", PrimitiveTypeSymbol.UShort, Guid, 2)
             { IsPublic = true, Offset = 6 });
         Guid.Fields.Add(new FieldSymbol(
-            "Data4", new FixedArrayTypeSymbol(PrimitiveTypeSymbol.Byte, 8), Guid, 3)
+            "Data4", PrimitiveTypeSymbol.Byte.MakeFixedArrayType(8), Guid, 3)
             { IsPublic = true, Offset = 8 });
         Guid.SetLayout(16, 4);
         Com.Types[Guid.SimpleName] = Guid;
@@ -417,8 +417,8 @@ public sealed class Builtins
         // The IID is fixed, and has been since 1993.
         Unknown.Iid = new System.Guid("00000000-0000-0000-C000-000000000046");
 
-        var guidPointer = new PointerTypeSymbol(Guid);
-        var bytePointerPointer = new PointerTypeSymbol(BytePointer);
+        var guidPointer = Guid.MakePointerType();
+        var bytePointerPointer = BytePointer.MakePointerType();
 
         ComMethod(Unknown, 0, "QueryInterface", PrimitiveTypeSymbol.Int,
             ("iid", guidPointer), ("result", bytePointerPointer));
@@ -526,9 +526,9 @@ public sealed class Builtins
     public void AutoImportInto(FileScope scope)
     {
         if (scope.Module == Text) return;
-        scope.Imports[TextModuleName] = Text;
-        scope.Imports["Text"] = Text;
-        scope.Imports[StandardModuleName] = Standard;
+        scope.Import(TextModuleName, Text);
+        scope.Import("Text", Text);
+        scope.Import(StandardModuleName, Standard);
     }
 
     private FunctionSymbol Method(

@@ -694,7 +694,7 @@ public sealed partial class Binder
     /// <summary>A closure's receiver word, as the runtime's <c>byte*</c>.</summary>
     private static BoundExpression ReceiverAsPointer(
         SourceSpan span, ClosureTypeSymbol closure, BoundExpression value) =>
-        new BoundConversion(span, new PointerTypeSymbol(PrimitiveTypeSymbol.Byte),
+        new BoundConversion(span, PrimitiveTypeSymbol.Byte.MakePointerType(),
             new BoundFieldAccess(span, value, closure.Receiver!), ConversionKind.PointerCast);
 
     /// <summary>Whether a stored subscriber is a weak one: its function is the thunk.</summary>
@@ -703,7 +703,7 @@ public sealed partial class Binder
         new BoundBinary(span, PrimitiveTypeSymbol.Bool,
             new BoundFieldAccess(span, value, closure.Function!),
             BoundBinaryOp.Equal,
-            new BoundFunctionReference(span, new PointerTypeSymbol(PrimitiveTypeSymbol.Byte), thunk));
+            new BoundFunctionReference(span, PrimitiveTypeSymbol.Byte.MakePointerType(), thunk));
 
     /// <summary>
     /// Supplies the body of <c>weakcall_Name</c>, the function a weak
@@ -727,7 +727,7 @@ public sealed partial class Binder
     {
         var span = thunk.Span;
         var closure = thunk.Event!.Type;
-        var bytes = new PointerTypeSymbol(PrimitiveTypeSymbol.Byte);
+        var bytes = PrimitiveTypeSymbol.Byte.MakePointerType();
 
         var method = new LocalSymbol("method", bytes, isConst: false);
         var target = new LocalSymbol("target", bytes, isConst: false);
@@ -742,7 +742,7 @@ public sealed partial class Binder
             new BoundLocalDeclaration(span, method, new BoundNullLiteral(span, bytes)),
             new BoundLocalDeclaration(span, target, new BoundCall(span, _builtins.WeakCellLoad, null, [
                 new BoundParameterAccess(span, thunk.Parameters[0]),
-                new BoundAddressOf(span, new PointerTypeSymbol(bytes), new BoundLocalAccess(span, method)),
+                new BoundAddressOf(span, bytes.MakePointerType(), new BoundLocalAccess(span, method)),
             ])),
             new BoundIf(span,
                 new BoundBinary(span, PrimitiveTypeSymbol.Bool,
@@ -784,7 +784,7 @@ public sealed partial class Binder
         var thunk = accessor.Event.WeakCall!;
         var array = ArrayOf(closure);
         var count = PrimitiveTypeSymbol.NUInt;
-        var bytes = new PointerTypeSymbol(PrimitiveTypeSymbol.Byte);
+        var bytes = PrimitiveTypeSymbol.Byte.MakePointerType();
 
         var receiver = Receiver(span, accessor.Parameters[0]);
         var handler = new BoundParameterAccess(span, accessor.Parameters[1]);

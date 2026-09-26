@@ -79,18 +79,18 @@ public static class MetadataTypeNames
             // `weak C?` is the only spelling, so the trailing '?' is part of it.
             string inner = name["weak ".Length..].TrimEnd('?');
             return Read(inner, lookup, sliceOf, tupleOf) is { } referenced
-                ? new WeakTypeSymbol(referenced)
+                ? referenced.MakeWeakType()
                 : null;
         }
 
         if (name.EndsWith('?'))
             return Read(name[..^1], lookup, sliceOf, tupleOf) is { } element
-                ? new OptionalTypeSymbol(element)
+                ? element.MakeOptionalType()
                 : null;
 
         if (name.EndsWith("[]", StringComparison.Ordinal))
             return Read(name[..^2], lookup, sliceOf, tupleOf) is { } element
-                ? new ArrayTypeSymbol(element)
+                ? element.MakeArrayType()
                 : null;
 
         // `T[:]`, before `T[N]`, which it would otherwise look like.
@@ -104,13 +104,13 @@ public static class MetadataTypeNames
             int.TryParse(name[(open + 1)..^1], out int length) && length > 0)
         {
             return Read(name[..open], lookup, sliceOf, tupleOf) is { } element
-                ? new FixedArrayTypeSymbol(element, length)
+                ? element.MakeFixedArrayType(length)
                 : null;
         }
 
         if (name.EndsWith('*'))
             return Read(name[..^1], lookup, sliceOf, tupleOf) is { } pointee
-                ? new PointerTypeSymbol(pointee)
+                ? pointee.MakePointerType()
                 : null;
 
         if (name.StartsWith('(') && name.EndsWith(')'))

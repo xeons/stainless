@@ -119,7 +119,7 @@ public sealed partial class Binder
         }
 
         return new BoundIidof(
-            syntax.Span, new PointerTypeSymbol(_builtins.Guid), comInterface);
+            syntax.Span, _builtins.Guid.MakePointerType(), comInterface);
     }
 
     private BoundExpression BindCast(CastSyntax syntax)
@@ -772,7 +772,7 @@ public sealed partial class Binder
         {
             if (module.Types.TryGetValue(whole, out var nestedHere)) return nestedHere;
 
-            foreach (var imported in _currentScope.Imports.Values.Distinct())
+            foreach (var imported in _currentScope.ImportedModules)
                 if (imported.Types.TryGetValue(whole, out var nestedThere) && nestedThere.IsPublic)
                     return nestedThere;
         }
@@ -789,7 +789,7 @@ public sealed partial class Binder
                 module.Types.TryGetValue(within + "." + parts[0], out var sibling))
                 return sibling;
 
-            var visible = _currentScope.Imports.Values.Distinct()
+            var visible = _currentScope.ImportedModules
                 .Select(m => m.Types.TryGetValue(parts[0], out var t) && t.IsPublic ? t : null)
                 .Where(t => t is not null)
                 .Distinct()

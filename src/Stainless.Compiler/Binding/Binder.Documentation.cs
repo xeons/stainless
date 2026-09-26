@@ -532,7 +532,7 @@ public sealed partial class Binder
             if (_currentScope!.Module.GenericTypes.TryGetValue(parts[0], out var here))
                 return here;
 
-            foreach (var imported in _currentScope.Imports.Values.Distinct())
+            foreach (var imported in _currentScope.ImportedModules)
                 if (imported.GenericTypes.TryGetValue(parts[0], out var there) && there.IsPublic)
                     return there;
 

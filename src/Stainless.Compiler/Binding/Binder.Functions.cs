@@ -81,7 +81,7 @@ public sealed partial class Binder
             // default body runs on, seen as the interface.
             TypeSymbol thisType = containingType is ClassTypeSymbol or InterfaceTypeSymbol
                 ? containingType
-                : new PointerTypeSymbol(containingType);
+                : containingType.MakePointerType();
             symbol.Parameters.Add(new ParameterSymbol("this", thisType, 0) { IsThis = true });
         }
 
@@ -112,7 +112,7 @@ public sealed partial class Binder
                 symbol.Parameters
                     .Where(p => !p.IsThis)
                     .Select(p => p.IsByReference
-                        ? new PointerTypeSymbol(p.Type)
+                        ? p.Type.MakePointerType()
                         : p.Type)
                     .ToList());
         }

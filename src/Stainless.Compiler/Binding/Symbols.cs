@@ -811,12 +811,34 @@ public sealed class ModuleSymbol(string name)
     public Dictionary<string, GenericTypeTemplate> GenericTypes { get; } = new(StringComparer.Ordinal);
     public List<GenericFunctionTemplate> GenericFunctions { get; } = [];
     public List<FunctionSymbol> Functions { get; } = [];
+
+    /// <summary>The module-level functions in <see cref="Functions"/>, by name, as far as it has been read.</summary>
+    private readonly Dictionary<string, FunctionSymbol[]> _functionsByName = new(StringComparer.Ordinal);
+    private int _functionsIndexed;
+
     public Dictionary<string, AliasSymbol> Aliases { get; } = new(StringComparer.Ordinal);
     public Dictionary<string, ConstantSymbol> Constants { get; } = new(StringComparer.Ordinal);
     public Dictionary<string, StaticSymbol> Statics { get; } = new(StringComparer.Ordinal);
 
-    public IEnumerable<FunctionSymbol> FindFunctions(string name) =>
-        Functions.Where(f => f.Name == name && f.ContainingType is null);
+    /// <summary>
+    /// Every module-level function of that name. <see cref="Functions"/> is
+    /// only ever added to, so the index is brought up to date by reading what
+    /// was added since it was last asked.
+    /// </summary>
+    public IReadOnlyList<FunctionSymbol> FindFunctions(string name)
+    {
+        for (; _functionsIndexed < Functions.Count; _functionsIndexed++)
+        {
+            var function = Functions[_functionsIndexed];
+            if (function.ContainingType is not null) continue;
+
+            _functionsByName[function.Name] = _functionsByName.TryGetValue(function.Name, out var known)
+                ? [.. known, function]
+                : [function];
+        }
+
+        return _functionsByName.TryGetValue(name, out var found) ? found : [];
+    }
 
     public override string ToString() => Name;
 }
@@ -833,8 +855,28 @@ public sealed class FileScope(ModuleSymbol module)
 {
     public ModuleSymbol Module { get; } = module;
 
+    private readonly Dictionary<string, ModuleSymbol> _imports = new(StringComparer.Ordinal);
+    private List<ModuleSymbol>? _importedModules;
+    private List<ModuleSymbol>? _visibleModules;
+
     /// <summary>Modules reachable from this file, keyed by the name used to reach them.</summary>
-    public Dictionary<string, ModuleSymbol> Imports { get; } = new(StringComparer.Ordinal);
+    public IReadOnlyDictionary<string, ModuleSymbol> Imports => _imports;
+
+    /// <summary>Makes <paramref name="imported"/> reachable from this file as <paramref name="name"/>.</summary>
+    public void Import(string name, ModuleSymbol imported)
+    {
+        _imports[name] = imported;
+        _importedModules = null;
+        _visibleModules = null;
+    }
+
+    /// <summary>Each module an import reaches, once, however many names reach it.</summary>
+    public IReadOnlyList<ModuleSymbol> ImportedModules =>
+        _importedModules ??= _imports.Values.Distinct().ToList();
+
+    /// <summary>This file's own module, then each module an import reaches, once.</summary>
+    public IReadOnlyList<ModuleSymbol> VisibleModules =>
+        _visibleModules ??= _imports.Values.Prepend(Module).Distinct().ToList();
 
     public override string ToString() => Module.Name;
 }

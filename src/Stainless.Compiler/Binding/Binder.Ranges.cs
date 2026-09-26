@@ -367,7 +367,7 @@ public sealed partial class Binder
                 var index = StandardIndex;
                 var getOffset = index.FindMethod("GetOffset")!;
                 return new BoundCall(span, getOffset,
-                    new BoundAddressOf(span, new PointerTypeSymbol(index), position), [length]);
+                    new BoundAddressOf(span, index.MakePointerType(), position), [length]);
             }
         }
     }
@@ -392,7 +392,7 @@ public sealed partial class Binder
     /// <summary>A method's receiver: a struct by its address, anything else as it is.</summary>
     private static BoundExpression AsReceiver(BoundExpression receiver, NamedTypeSymbol type) =>
         type is StructTypeSymbol
-            ? new BoundAddressOf(receiver.Span, new PointerTypeSymbol(type), receiver)
+            ? new BoundAddressOf(receiver.Span, type.MakePointerType(), receiver)
             : receiver;
 
     /// <summary>What counts a type: an integer <c>Count</c>, or failing that an integer <c>Length</c>.</summary>

@@ -208,6 +208,31 @@ ships in the same directory.
 | [runtime/](../runtime/) | the whole runtime, split by feature |
 | [stdlib/](../stdlib/) | the standard library, written in Stainless: a folder per module, a file per public type |
 
+## One object per type
+
+Two types are the same type exactly when they are the same object, so `==` is
+the whole of type identity and no type overrides `Equals` — a unit test holds
+both. `T*`, `T[]`, `T?`, `weak T?` and `T[N]` are made only by the type they
+are built from, through `MakePointerType()` and its siblings, which keep what
+they made; their constructors are private, so there is no second `int*` to
+compare field by field. Tuples, slices, closure types and instantiations are
+kept by the binder, keyed by the objects they are made of — an instantiation
+by its template's own object and its arguments', not by a name that two
+modules can both print.
+
+The derived types live on their element rather than in a table because the
+primitives are shared by every compilation in a process, and the unit tests
+run many at once: a table beside them would keep every compilation's types
+alive, and two filled at once would disagree. The slot is filled by
+compare-and-exchange.
+
+Whether a struct carries a counted reference is asked everywhere a value is
+copied, and is kept on the struct once its layout is settled. Binding the IDE
+takes about 530 ms in a Release build and 155 ms once the JIT has warmed.
+Indexing each module's functions by name, and reading each file's imports once
+rather than at every lookup, took 90 ms off the first and a third off the
+second.
+
 ## Why textual IR
 
 Emitting `.ll` text rather than calling the LLVM C API means the compiler has no

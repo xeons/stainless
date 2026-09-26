@@ -540,7 +540,7 @@ public sealed class MetadataLoader(
         {
             TypeSymbol receiver = containingType is ClassTypeSymbol reference
                 ? reference
-                : new PointerTypeSymbol(containingType);
+                : containingType.MakePointerType();
             symbol.Parameters.Add(new ParameterSymbol("this", receiver, 0) { IsThis = true });
         }
 

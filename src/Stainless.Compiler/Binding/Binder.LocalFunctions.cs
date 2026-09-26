@@ -65,7 +65,7 @@ public sealed partial class Binder
         /// <summary>The template, for one that is.</summary>
         public GenericFunctionTemplate? Template { get; set; }
 
-        public Dictionary<string, FunctionSymbol> Instances { get; } = new(StringComparer.Ordinal);
+        public Dictionary<TypeList, FunctionSymbol> Instances { get; } = [];
 
         /// <summary>Instances asked for before the declaration was reached.</summary>
         public List<(FunctionSymbol Symbol, Dictionary<string, TypeSymbol> Substitution)> Waiting { get; } = [];
@@ -397,7 +397,7 @@ public sealed partial class Binder
         LocalFunction local, GenericFunctionTemplate template, IReadOnlyList<TypeSymbol> arguments,
         SourceSpan span)
     {
-        string key = string.Join(",", arguments.Select(a => a.Name));
+        var key = new TypeList(arguments.ToList());
         if (local.Instances.TryGetValue(key, out var existing)) return existing;
 
         var substitution = new Dictionary<string, TypeSymbol>(

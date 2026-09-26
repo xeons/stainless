@@ -36,9 +36,8 @@ public sealed partial class Binder
     /// </summary>
     private ArrayTypeSymbol ArrayOf(TypeSymbol element)
     {
-        if (_arrays.TryGetValue(element, out var existing)) return existing;
-        var array = new ArrayTypeSymbol(element);
-        _arrays[element] = array;
+        var array = element.MakeArrayType();
+        _arrays.TryAdd(element, array);
         return array;
     }
 
@@ -60,7 +59,7 @@ public sealed partial class Binder
     /// </summary>
     private TupleTypeSymbol TupleOf(IReadOnlyList<TypeSymbol> elements)
     {
-        string key = string.Join(",", elements.Select(TypeIdentity));
+        var key = new TypeList(elements.ToList());
         if (_tuples.TryGetValue(key, out var existing)) return existing;
 
         var tuple = new TupleTypeSymbol
@@ -215,7 +214,7 @@ public sealed partial class Binder
                         "allowed; it is already a managed pointer");
                     return ErrorTypeSymbol.Instance;
                 }
-                return new PointerTypeSymbol(element);
+                return element.MakePointerType();
             }
 
             case NullableTypeSyntax nullable:
@@ -229,7 +228,7 @@ public sealed partial class Binder
                         $"be optional (a '{element.Name}' is a value and is never null)");
                     return ErrorTypeSymbol.Instance;
                 }
-                return new OptionalTypeSymbol(referenceType);
+                return referenceType.MakeOptionalType();
             }
 
             case WeakTypeSyntax weak:
@@ -244,7 +243,7 @@ public sealed partial class Binder
                         $"'weak' requires a class or interface reference, but '{element.Name}' is not one");
                     return ErrorTypeSymbol.Instance;
                 }
-                return new WeakTypeSymbol(referenced);
+                return referenced.MakeWeakType();
             }
 
             case NamedTypeSyntax named:
@@ -287,7 +286,7 @@ public sealed partial class Binder
 
         if (parts.Count > 1)
         {
-            foreach (var imported in scope.Imports.Values.Distinct())
+            foreach (var imported in scope.ImportedModules)
                 if (imported.Types.TryGetValue(syntax.Name.Text, out var nestedThere) &&
                     nestedThere.IsPublic)
                     return nestedThere;
@@ -314,7 +313,7 @@ public sealed partial class Binder
                 return ErrorTypeSymbol.Instance;
             }
 
-            var visible = scope.Imports.Values.Distinct()
+            var visible = scope.ImportedModules
                 .Where(imported => imported.Types.TryGetValue(parts[0], out var t) && t.IsPublic)
                 .Select(imported => imported.Types[parts[0]])
                 .Distinct()
@@ -324,7 +323,7 @@ public sealed partial class Binder
             // when no imported type answered -- a type is the more direct thing.
             if (visible.Count == 0)
             {
-                var aliases = scope.Imports.Values.Distinct()
+                var aliases = scope.ImportedModules
                     .Where(i => i.Aliases.TryGetValue(parts[0], out var a) && a.IsPublic)
                     .Select(i => i.Aliases[parts[0]])
                     .Distinct()
@@ -428,7 +427,7 @@ public sealed partial class Binder
         {
             if (module.GenericDelegates.TryGetValue(name.Parts[0], out var local)) return local;
 
-            return scope.Imports.Values.Distinct()
+            return scope.ImportedModules
                 .Select(m => m.GenericDelegates.TryGetValue(name.Parts[0], out var t) && t.IsPublic
                     ? t : null)
                 .FirstOrDefault(t => t is not null);
@@ -472,7 +471,7 @@ public sealed partial class Binder
         {
             if (module.GenericTypes.TryGetValue(name.Parts[0], out var local)) return local;
 
-            return scope.Imports.Values.Distinct()
+            return scope.ImportedModules
                 .Select(m => m.GenericTypes.TryGetValue(name.Parts[0], out var t) && t.IsPublic ? t : null)
                 .FirstOrDefault(t => t is not null);
         }
@@ -497,7 +496,7 @@ public sealed partial class Binder
             var local = _currentModule!.GenericFunctions.Where(f => f.Name == name.Parts[0]).ToList();
             if (local.Count > 0) return local;
 
-            return _currentScope!.Imports.Values.Distinct()
+            return _currentScope!.ImportedModules
                 .SelectMany(m => m.GenericFunctions)
                 .Where(f => f.Name == name.Parts[0] && f.IsPublic)
                 .ToList();
@@ -1079,7 +1078,7 @@ public sealed partial class Binder
 
         // A struct method takes its receiver by pointer, as everywhere else.
         var self = type is StructTypeSymbol
-            ? new BoundAddressOf(member.Span, new PointerTypeSymbol(type), receiver)
+            ? new BoundAddressOf(member.Span, type.MakePointerType(), receiver)
             : receiver;
 
         // `base.Visit<int>(...)` is the replaced body, not a dispatch.

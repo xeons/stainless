@@ -439,14 +439,14 @@ public sealed partial class Binder
         if (closure.WeakThis && outer.Type is NamedTypeSymbol { IsReferenceType: true } referenced)
         {
             var weakField = new FieldSymbol(
-                ThisCaptureName, new WeakTypeSymbol(referenced), closure.Type, closure.Type.Fields.Count);
+                ThisCaptureName, referenced.MakeWeakType(), closure.Type, closure.Type.Fields.Count);
             closure.Type.Fields.Add(weakField);
             closure.Captured[ThisCaptureName] = weakField;
             closure.Captures.Add((weakField, new BoundConversion(
                 span, weakField.Type, outer, ConversionKind.ReferenceToWeak)));
 
             closure.WeakSelfField = weakField;
-            closure.WeakSelf = new LocalSymbol(WeakSelfName, new OptionalTypeSymbol(referenced),
+            closure.WeakSelf = new LocalSymbol(WeakSelfName, referenced.MakeOptionalType(),
                 isConst: false);
             return ReadWeakSelf(span, closure.WeakSelf);
         }

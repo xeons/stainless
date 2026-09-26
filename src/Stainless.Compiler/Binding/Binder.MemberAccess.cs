@@ -122,7 +122,7 @@ public sealed partial class Binder
             whenNothing = new BoundNullLiteral(span, value.Type);
         }
         else if (value.Type is ClassTypeSymbol or InterfaceTypeSymbol &&
-                 new OptionalTypeSymbol(value.Type) is var lifted &&
+                 value.Type.MakeOptionalType() is var lifted &&
                  ClassifyConversion(value.Type, lifted, explicitCast: false) is not null)
         {
             // A reference answers null, so `a?.Name` is a `String?`.
@@ -635,12 +635,40 @@ public sealed partial class Binder
     private List<VariantTypeSymbol> VariantsWithCase(string name)
     {
         return VisibleModules()
-            .Distinct()
             .SelectMany(m => m.Types.Values)
             .OfType<VariantTypeSymbol>()
             .Where(v => v.FindCase(name) is not null)
             .Distinct()
             .ToList();
+    }
+
+    private HashSet<string>? _variantCaseNames;
+
+    /// <summary>
+    /// The name of every case any variant in the program declares. Every case
+    /// is written in a variant's declaration, generic or not, so the syntax is
+    /// the whole of it from pass 1 on.
+    /// </summary>
+    private HashSet<string> VariantCaseNames
+    {
+        get
+        {
+            if (_variantCaseNames is not null) return _variantCaseNames;
+
+            var names = new HashSet<string>(StringComparer.Ordinal);
+
+            void Collect(IEnumerable<Declaration> declarations)
+            {
+                foreach (var declaration in declarations.OfType<TypeDeclSyntax>())
+                {
+                    foreach (var declared in declaration.Cases) names.Add(declared.Name);
+                    Collect(declaration.Members);
+                }
+            }
+
+            foreach (var (_, unit) in _units) Collect(unit.Declarations);
+            return _variantCaseNames = names;
+        }
     }
 
     /// <summary>
@@ -655,6 +683,9 @@ public sealed partial class Binder
     /// </summary>
     private bool CouldBeVariantCase(string name)
     {
+        // Asked of every bare call, and almost always no.
+        if (!VariantCaseNames.Contains(name)) return false;
+
         if (VariantsWithCase(name).Count > 0) return true;
 
         return VisibleModules()
@@ -818,11 +849,7 @@ public sealed partial class Binder
             : expression;
 
     /// <summary>The modules a name written in the current file resolves against.</summary>
-    private IEnumerable<ModuleSymbol> VisibleModules()
-    {
-        if (_currentScope is null) return [];
-        return _currentScope.Imports.Values.Prepend(_currentScope.Module).Distinct();
-    }
+    private IReadOnlyList<ModuleSymbol> VisibleModules() => _currentScope?.VisibleModules ?? [];
 
     private static string SubjectName(object subject) => subject switch
     {

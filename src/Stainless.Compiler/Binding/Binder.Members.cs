@@ -708,7 +708,7 @@ public sealed partial class Binder
                     // already has rather than making one.
                     TypeSymbol receiver = classType is not null
                         ? classType
-                        : new PointerTypeSymbol(type);
+                        : type.MakePointerType();
 
                     var symbol = new FunctionSymbol
                     {
@@ -1121,7 +1121,7 @@ public sealed partial class Binder
 
         thunk.Event = symbol;
         thunk.Parameters.Add(new ParameterSymbol(
-            "cell", new PointerTypeSymbol(PrimitiveTypeSymbol.Byte), 0));
+            "cell", PrimitiveTypeSymbol.Byte.MakePointerType(), 0));
 
         int index = 1;
         foreach (var parameter in symbol.Type.Signature)
@@ -1574,7 +1574,7 @@ public sealed partial class Binder
         {
             TypeSymbol thisType = type is ClassTypeSymbol or InterfaceTypeSymbol
                 ? type
-                : new PointerTypeSymbol(type);
+                : type.MakePointerType();
             symbol.Parameters.Add(new ParameterSymbol("this", thisType, 0) { IsThis = true });
         }
 
