@@ -22,7 +22,7 @@ using Xunit;
 namespace Stainless.UnitTests;
 
 /// <summary>
-/// The bound tree's one walker, and the analyses built on it.
+/// The bound tree's one walker, the analyses built on it, and the verifier.
 /// </summary>
 public class BoundTreeTests
 {
@@ -247,4 +247,73 @@ public class BoundTreeTests
                 public void Raise() => _level = _level + 1;
             }
             """));
+
+    // ------------------------------------------------------------ the verifier
+
+    private static void Verify(params BoundStatement[] body)
+    {
+        var function = new FunctionSymbol
+        {
+            Name = "F",
+            ModuleName = "Test",
+            ReturnType = PrimitiveTypeSymbol.Void,
+            Linkage = Syntax.LinkageKind.Stainless,
+            Span = default,
+        };
+
+        BoundTreeVerifier.Verify(new BoundProgram
+        {
+            Modules = [],
+            Functions = [new BoundFunction(function, new BoundBlock(default, body))],
+            Classes = [],
+            Interfaces = [],
+            ComInterfaces = [],
+            Structs = [],
+            Arrays = [],
+            RuntimeFactories = [],
+            ExternalFunctions = [],
+            Statics = [],
+            StaticConstructors = [],
+            Initialization = [],
+        });
+    }
+
+    [Fact]
+    public void TheVerifierRefusesADraft()
+    {
+        var error = Assert.Throws<Source.InternalCompilerError>(() => Verify(
+            new BoundExpressionStatement(default, new BoundArrayDraft(default, ArrayDraftType.Instance, []))));
+        Assert.Contains("BoundArrayDraft", error.Problem);
+    }
+
+    [Fact]
+    public void TheVerifierRefusesALocalNothingDeclared()
+    {
+        var stray = new LocalSymbol("stray", PrimitiveTypeSymbol.Int, isConst: false);
+        var error = Assert.Throws<Source.InternalCompilerError>(() => Verify(
+            new BoundExpressionStatement(default, new BoundLocalAccess(default, stray))));
+        Assert.Contains("'stray'", error.Problem);
+    }
+
+    [Fact]
+    public void TheVerifierAcceptsALocalDeclaredFirst()
+    {
+        var local = new LocalSymbol("held", PrimitiveTypeSymbol.Int, isConst: false);
+        Verify(
+            new BoundLocalDeclaration(default, local, null),
+            new BoundExpressionStatement(default, new BoundLocalAccess(default, local)));
+    }
+
+    [Fact]
+    public void TheVerifierRefusesAWriteIntoACopy()
+    {
+        var local = new LocalSymbol("held", PrimitiveTypeSymbol.Int, isConst: false);
+        var copy = new BoundConversion(
+            default, PrimitiveTypeSymbol.Int, new BoundLocalAccess(default, local), ConversionKind.Identity);
+        var error = Assert.Throws<Source.InternalCompilerError>(() => Verify(
+            new BoundLocalDeclaration(default, local, null),
+            new BoundExpressionStatement(default, new BoundAssignment(
+                default, copy, new BoundLiteral(default, PrimitiveTypeSymbol.Int, 1ul)))));
+        Assert.Contains("not storage", error.Problem);
+    }
 }

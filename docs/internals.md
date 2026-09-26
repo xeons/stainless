@@ -80,6 +80,24 @@ of building `hello.sl`. It is not on by default, even in a Debug build of the
 compiler: every build that links is verified already, and all a default would
 add is `emit-ir`, which is what the flag is for.
 
+**The bound tree is checked before the emitter reads it.** The emitter trusts
+what binding hands it, so a mistake in the binder surfaces far from its cause:
+a node the emitter has no case for, a local it has no slot for, a write into a
+temporary copy. [BoundTreeVerifier](../src/Stainless.Compiler/Binding/BoundTreeVerifier.cs)
+walks every function and static initializer of a program that bound without
+error, and throws an internal compiler error naming the node and its span when
+the tree breaks a rule the emitter relies on: a draft node or type that binding
+should have settled, an error node, an expression with no type, a local read
+where nothing declared it, a parameter of another function, a `for parallel`
+body reading what it did not capture, an assignment to something with no
+address, a switch label that is not a constant of the switched type, a
+conditional whose arms disagree with it, an inline array holding a counted
+reference. It is on in a Debug build of the compiler, which every suite and the
+fuzzer run, and off in Release; `STAINLESS_VERIFY_BOUND` set to `0` or to
+anything else overrides either. It costs about 10 ms of a 210 ms bind for
+`hello.sl`, whose standard library it walks too, and about 30 ms of 670 ms for
+the IDE, in a Debug build.
+
 **A node nobody handles is a crash, not a guess.** Every dispatch over bound
 node kinds — the emitter's expression and statement switches, the conversion
 kinds, the types it spells — throws an `InternalCompilerError` on a case it
@@ -91,7 +109,7 @@ visits every child of every node exactly once, in evaluation order, and throws
 on a node kind it does not know. Every analysis that looks through a whole
 tree — which statics an initializer reads, what a `for parallel` body
 captures, which fields a getter reads, whether an `out` parameter is written,
-whether a function holds a label — is a subclass that
+whether a function holds a label, and the verifier — is a subclass that
 handles the nodes it is about and calls the base for the rest, so none of them
 can skip a node kind by omission. A unit test fills every property of every
 node type with fresh nodes by reflection and requires the walk to return each
@@ -166,6 +184,7 @@ ships in the same directory.
 | [Binding/Binder.cs](../src/Stainless.Compiler/Binding/Binder.cs) | the eleven passes; one partial class over `Binder.*.cs`, a file per area — bodies, calls, closures, conversions, generics, inheritance, layout |
 | [Binding/BoundTree.cs](../src/Stainless.Compiler/Binding/BoundTree.cs) | the bound tree's nodes |
 | [Binding/BoundTreeWalkers.cs](../src/Stainless.Compiler/Binding/BoundTreeWalkers.cs) | the one walker over them, and the analyses built on it |
+| [Binding/BoundTreeVerifier.cs](../src/Stainless.Compiler/Binding/BoundTreeVerifier.cs) | what the emitter relies on, checked after binding |
 | [Binding/TypeSystem.cs](../src/Stainless.Compiler/Binding/TypeSystem.cs) | types and C-rule layout |
 | [Binding/TargetPlatform.cs](../src/Stainless.Compiler/Binding/TargetPlatform.cs) | what `--target` and `--abi` parse to, and the host's defaults |
 | [Binding/EmbeddedFile.cs](../src/Stainless.Compiler/Binding/EmbeddedFile.cs) | what an `[Embed]` static holds: which sections a target already owns, and the assembly the object is written as |

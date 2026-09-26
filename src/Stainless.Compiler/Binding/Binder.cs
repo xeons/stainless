@@ -334,7 +334,7 @@ public sealed partial class Binder(
             .Select(g => g.First())
             .ToList();
 
-        return new BoundProgram
+        var program = new BoundProgram
         {
             Modules = _modules.Values.ToList(),
             Functions = _functions,
@@ -362,6 +362,13 @@ public sealed partial class Binder(
             Initialization = _initialization,
             Embeds = _embeds.Values.OrderBy(e => e.Index).ToList(),
         };
+
+        // A tree with an error in it is allowed to be unfinished, and is never
+        // emitted.
+        if (BoundTreeVerifier.IsEnabled && !diagnostics.HasErrors)
+            BoundTreeVerifier.Verify(program);
+
+        return program;
     }
 
 }
