@@ -159,7 +159,8 @@ public sealed partial class Binder
 
         return kind == ConversionKind.Identity && operand.Type.Equals(targetType)
             ? operand
-            : new BoundConversion(syntax.Span, targetType, operand, kind.Value);
+            : new BoundConversion(syntax.Span, targetType, operand, kind.Value)
+                { IsChecked = _checkedArithmetic };
     }
 
     private BoundExpression BindNew(NewSyntax syntax)

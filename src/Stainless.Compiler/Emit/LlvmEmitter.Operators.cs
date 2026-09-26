@@ -201,10 +201,14 @@ public sealed partial class LlvmEmitter
                 return new Val(operand.Ref, to, conversion.Type);
 
             case ConversionKind.IntegerWiden:
+                if (conversion.IsChecked)
+                    GuardIntegerConversion(operand.Ref, conversion.Operand.Type, conversion.Type);
                 if (from == to) return new Val(operand.Ref, to, conversion.Type);
                 return Converted(IsSigned(conversion.Operand.Type) ? "sext" : "zext");
 
             case ConversionKind.IntegerNarrow:
+                if (conversion.IsChecked)
+                    GuardIntegerConversion(operand.Ref, conversion.Operand.Type, conversion.Type);
                 if (from == to) return new Val(operand.Ref, to, conversion.Type);
                 return Converted("trunc");
 
@@ -212,7 +216,9 @@ public sealed partial class LlvmEmitter
                 return Converted(IsSigned(conversion.Operand.Type) ? "sitofp" : "uitofp");
 
             case ConversionKind.FloatToInt:
-                return Converted(IsSigned(conversion.Type) ? "fptosi" : "fptoui");
+                return new Val(
+                    FloatToInteger(operand.Ref, from, to, IsSigned(conversion.Type), conversion.IsChecked),
+                    to, conversion.Type);
 
             case ConversionKind.FloatResize:
                 if (from == to) return new Val(operand.Ref, to, conversion.Type);
@@ -235,10 +241,104 @@ public sealed partial class LlvmEmitter
             new(Emit(to, $"{instruction} {from} {operand.Ref} to {to}"), to, conversion.Type);
     }
 
+    /// <summary>
+    /// A float to an integer, truncating toward zero.
+    ///
+    /// Unchecked, it saturates: a value past either end becomes that end and a
+    /// NaN becomes zero, which is what .NET does on x64. A plain
+    /// <c>fptosi</c> would be poison there, and poison is a number the
+    /// optimiser picks. Checked, anything that does not truncate to a
+    /// representable value aborts, NaN included.
+    /// </summary>
+    private string FloatToInteger(string value, string from, string to, bool signed, bool isChecked)
+    {
+        if (isChecked)
+        {
+            int bits = int.Parse(to.AsSpan(1), CultureInfo.InvariantCulture);
+            string trunc = $"llvm.trunc.{LlvmFloatSuffix(from)}";
+            _overflowIntrinsics.Add(
+                $"declare {from} @{trunc}({from}) nounwind willreturn memory(none) speculatable");
+            string whole = Emit(from, $"call {from} @{trunc}({from} {value})");
+
+            // Both bounds are powers of two, so both are exact in either width;
+            // an ordered compare is false for NaN.
+            double low = signed ? -Math.Pow(2, bits - 1) : 0;
+            double high = signed ? Math.Pow(2, bits - 1) : Math.Pow(2, bits);
+            string above = Emit("i1", $"fcmp oge {from} {whole}, {FloatConstant(low)}");
+            string below = Emit("i1", $"fcmp olt {from} {whole}, {FloatConstant(high)}");
+            string fits = Emit("i1", $"and i1 {above}, {below}");
+            AbortUnless(fits);
+            return Emit(to, $"{(signed ? "fptosi" : "fptoui")} {from} {value} to {to}");
+        }
+
+        string intrinsic = $"llvm.{(signed ? "fptosi" : "fptoui")}.sat.{to}.{LlvmFloatSuffix(from)}";
+        _overflowIntrinsics.Add(
+            $"declare {to} @{intrinsic}({from}) nounwind willreturn memory(none) speculatable");
+        return Emit(to, $"call {to} @{intrinsic}({from} {value})");
+    }
+
+    private static string LlvmFloatSuffix(string type) => type == "float" ? "f32" : "f64";
+
+    private static string FloatConstant(double value) =>
+        $"0x{BitConverter.DoubleToInt64Bits(value):X16}";
+
+    /// <summary>
+    /// Aborts unless an integer converted from one type to another keeps its
+    /// value: narrowing must round-trip, and a change of signedness must not
+    /// carry a negative number into an unsigned type or out of one.
+    /// </summary>
+    private void GuardIntegerConversion(string value, TypeSymbol source, TypeSymbol target)
+    {
+        string from = LlvmTypeOf(source);
+        string to = LlvmTypeOf(target);
+        bool sourceSigned = IsSigned(source);
+        bool targetSigned = IsSigned(target);
+        string? fits = null;
+
+        if (target.Size < source.Size)
+        {
+            string narrowed = Emit(to, $"trunc {from} {value} to {to}");
+            string back = Emit(from, $"{(targetSigned ? "sext" : "zext")} {to} {narrowed} to {from}");
+            fits = Emit("i1", $"icmp eq {from} {back}, {value}");
+        }
+
+        if (sourceSigned && !targetSigned)
+            fits = Both(fits, Emit("i1", $"icmp sge {from} {value}, 0"));
+        else if (!sourceSigned && targetSigned && target.Size <= source.Size)
+        {
+            string narrowed = from == to ? value : Emit(to, $"trunc {from} {value} to {to}");
+            fits = Both(fits, Emit("i1", $"icmp sge {to} {narrowed}, 0"));
+        }
+
+        if (fits is not null)
+            AbortUnless(fits);
+
+        string Both(string? first, string second) =>
+            first is null ? second : Emit("i1", $"and i1 {first}, {second}");
+    }
+
+    private void AbortUnless(string condition)
+    {
+        string failLabel = NextLabel("checked.overflow");
+        string okLabel = NextLabel("checked.ok");
+        Terminator($"br i1 {condition}, label %{okLabel}, label %{failLabel}");
+
+        Label(failLabel);
+        Line("call void @sl_arithmetic_overflow()");
+        Terminator("unreachable");
+
+        Label(okLabel);
+    }
+
     private Val EmitUnary(BoundUnary unary)
     {
         var operand = EmitExpression(unary.Operand);
         string llvmType = operand.LlvmType;
+
+        if (unary.IsChecked && unary.Type is PrimitiveTypeSymbol { IsInteger: true, IsSigned: true })
+            return new Val(
+                CheckedArithmetic(BoundBinaryOp.Subtract, llvmType, "0", operand.Ref, signed: true),
+                llvmType, unary.Type);
 
         string instruction = unary.Operator switch
         {

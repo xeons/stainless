@@ -896,6 +896,18 @@ Signedness is part of the question: 60000 + 5000 fits a `ushort` and does not
 fit a `short`. A float has nothing to check — it goes to infinity rather than
 wrapping.
 
+`checked` covers what C#'s does:
+
+- `+`, `-`, `*`, `++` and `--` on integers;
+- unary `-` on a signed integer, whose one overflow is negating the minimum;
+- an explicit numeric conversion, and the cast a compound assignment implies.
+  An integer must keep its value — `(byte)300` aborts, and so does `(uint)-1`
+  — and a float must truncate to a value the integer holds, so a NaN or
+  1e19 to an `int` aborts.
+
+A user-defined conversion or operator is a call, and `checked` does not reach
+into it.
+
 Both are **contextual keywords**, as `closure` is: a test in this repository
 had a parameter named `checked` before this existed. So is `out`, which the
 standard library uses as a local.
@@ -975,6 +987,7 @@ all three:
 | `1 << 40` on an `int` | undefined | `1 << (40 & 31)` = 256, as in C# |
 | `x / 0` | undefined | aborts, the way an out-of-range index does |
 | the most negative `int` `/ -1` | undefined | aborts; the result is not representable |
+| `(int)1e19`, `(int)NaN` | undefined | saturates to the nearest end; NaN is 0 |
 
 A shift count is reduced modulo the operand's width, which costs one `and` and
 matches what a C# reader expects. Division is checked where the divisor is not
@@ -987,6 +1000,11 @@ error[SL0415]: division by zero
 
 Overflow of `+`, `-` and `*` is **not** in that table: it wraps, as C# does
 unchecked, and is defined rather than undefined.
+
+A float to an integer saturates because that is what .NET does on x64, and a
+C# program that relied on it should keep its answer; LLVM's own `fptosi` is
+poison there, which is a number the optimiser chooses. On ARM64 the
+conversion instruction saturates already; on x86-64 it costs two compares.
 
 **Nesting stops at 500 levels** (SL0108) — expressions inside expressions,
 blocks inside blocks, types inside types, and interpolated strings inside the
@@ -1086,9 +1104,8 @@ or a parameter, which only the statement itself could change.
 does not: it means `b = (byte)(b + 10)`, which is C#'s rule, and applies when
 `y` itself fits `x` or the operator is a shift. `b += 300` is still refused
 (SL0265), because 300 is not a byte's worth whatever the cast does. The cast
-wraps as every integer cast does, and **inside `checked` it still wraps**,
-because `checked` watches `+`, `-` and `*` and not conversions
-([§9.12](#912-checked)). C# would abort there.
+wraps as every integer cast does, and inside `checked` it aborts instead, as
+every numeric cast there does ([§9.12](#912-checked)).
 
 **A field of a temporary struct cannot be written** (SL0399). A struct a call,
 a property or an indexer answered is a copy that nothing will read again, so

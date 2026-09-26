@@ -1299,7 +1299,8 @@ public sealed partial class Binder
         if (op is BoundUnaryOp.Negate or BoundUnaryOp.BitwiseNot)
             operand = PromoteToInt(operand);
 
-        return new BoundUnary(syntax.Span, operand.Type, op, operand);
+        return new BoundUnary(syntax.Span, operand.Type, op, operand)
+            { IsChecked = _checkedArithmetic && op is BoundUnaryOp.Negate };
     }
 
     private BoundExpression BindBinary(BinarySyntax syntax)
@@ -2633,7 +2634,8 @@ public sealed partial class Binder
                 or BoundBinaryOp.UnsignedShiftRight ||
              IsImplicitlyConvertible(value, type)) &&
             ClassifyConversion(combined.Type, type, explicitCast: true) is { } kind)
-            return new BoundConversion(syntax.Span, type, combined, kind);
+            return new BoundConversion(syntax.Span, type, combined, kind)
+                { IsChecked = _checkedArithmetic };
 
         return BindConversion(combined, type, syntax.Value.Span);
     }

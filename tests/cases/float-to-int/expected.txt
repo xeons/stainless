@@ -1,0 +1,20 @@
+int high   2147483647
+int low    -2147483648
+int nan    0
+long high  9223372036854775807
+long low   -9223372036854775808
+ulong      10000000000000000000
+ulong neg  0
+uint neg   0
+byte high  255
+short low  -32768
+float      2147483647
+truncates  -2
+edge       -2147483648
+toward 0   0
+narrow     255
+sign       7
+compound   255
+negate     2147483647
+wraps      44
+negates    -2147483648

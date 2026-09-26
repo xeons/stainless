@@ -294,6 +294,9 @@ public sealed class BoundUnary(
 {
     public BoundUnaryOp Operator { get; } = op;
     public BoundExpression Operand { get; } = operand;
+
+    /// <summary>Written inside <c>checked</c>: negating the minimum aborts.</summary>
+    public bool IsChecked { get; init; }
 }
 
 public sealed class BoundBinary(
@@ -828,6 +831,12 @@ public sealed class BoundConversion(
 {
     public BoundExpression Operand { get; } = operand;
     public ConversionKind Kind { get; } = kind;
+
+    /// <summary>
+    /// Written inside <c>checked</c>: a numeric conversion whose value does not
+    /// fit the target aborts rather than truncating or saturating.
+    /// </summary>
+    public bool IsChecked { get; init; }
 }
 
 /// <summary>Allocates, zeroes and constructs a class instance; yields a +1 reference.</summary>

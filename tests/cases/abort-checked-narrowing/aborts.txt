@@ -1,0 +1,1 @@
+a compound assignment that overflows a byte inside checked ends the program
