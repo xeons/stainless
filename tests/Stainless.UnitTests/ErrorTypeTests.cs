@@ -365,9 +365,21 @@ public class ErrorTypeTests
             if (shape.Circle);
         }
         """)]
-    public void AConsequenceIsNotReported(string code, string source)
+    [InlineData("SL0295", """
+
+        module Other;
+        extern "C" long
+        [Align()]
+        shared_depth;
+        """, """
+
+        module Bad;
+        extern "C" int shared_depth;
+        int Main() => 0;
+        """)]
+    public void AConsequenceIsNotReported(string code, params string[] sources)
     {
-        Front.Bind(source, out var diagnostics);
+        Front.BindSources(sources, out var diagnostics);
 
         var named = diagnostics.Items
             .Where(d => d.Message.Contains(DiagnosticBag.ErrorTypeName, StringComparison.Ordinal))

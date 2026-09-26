@@ -124,6 +124,22 @@ public static class Front
     }
 
     /// <summary>
+    /// Binds several whole files as one program. Each carries its own
+    /// <c>module</c> line, so two modules can meet.
+    /// </summary>
+    public static BoundProgram BindSources(IEnumerable<string> sources,
+                                           out DiagnosticBag diagnostics)
+    {
+        diagnostics = new DiagnosticBag();
+
+        var units = Library.Value.ToList();
+        foreach (string source in sources)
+            units.Add(new Parser(Text(source), diagnostics, Symbols).ParseCompilationUnit());
+
+        return new Binder(diagnostics, requireEntryPoint: true).Bind(units);
+    }
+
+    /// <summary>
     /// Binds a file as though it had been read from <paramref name="path"/>,
     /// without it having to be there.
     ///

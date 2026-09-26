@@ -683,12 +683,16 @@ public sealed partial class Binder
                 continue;
 
             string? clash = null;
+            TypeSymbol? other = null;
             if (functionNames.Contains(name))
                 clash = "a function";
             else if (!variables.TryAdd(name, variable) && variables[name] is var first)
             {
                 if (!first.Type.Equals(variable.Type))
+                {
                     clash = $"a variable of '{first.Type.Name}'";
+                    other = first.Type;
+                }
                 else if (!first.IsImported && !variable.IsImported)
                     clash = "a variable this program defines";
                 else if (first.IsImported)
@@ -699,7 +703,8 @@ public sealed partial class Binder
                 diagnostics.Error("SL0295", variable.Span,
                     $"the C name '{name}' already names {clash}, and this declares " +
                     $"'{variable.Name}' under it; C has one symbol per name, so give this one a " +
-                    "name of its own");
+                    "name of its own",
+                    other, other is null ? null : variable.Type);
         }
 
         foreach (var group in byName)
