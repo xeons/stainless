@@ -86,6 +86,7 @@ public sealed partial class Binder
         DefaultSyntax zeroed => BindDefault(zeroed),
         NullForgivingSyntax forgiven => BindNullForgiving(forgiven),
         TupleSyntax tuple => BindTuple(tuple),
+        DeclarationExpressionSyntax declaration => RefuseDeclarationExpression(declaration),
         BinarySyntax binary => BindBinary(binary),
         AssignmentSyntax assignment => BindAssignment(assignment),
         CallSyntax call => BindCall(call),
@@ -2088,6 +2089,14 @@ public sealed partial class Binder
         }
 
         var type = CommonArmType(whenTrue, whenFalse);
+
+        // `flag ? (null, 1) : ("two", 2)` waits for a tuple type to convert
+        // both to, as a pair of tuple drafts would.
+        if (whenTrue is BoundTupleDraft && whenFalse is BoundTupleCreate or BoundTupleDraft ||
+            whenFalse is BoundTupleDraft && whenTrue is BoundTupleCreate)
+            return new BoundConditional(
+                syntax.Span, TupleDraftType.Instance, condition, whenTrue, whenFalse);
+
         if (type is null)
         {
             diagnostics.Error("SL0349", syntax.Span,
@@ -2146,21 +2155,73 @@ public sealed partial class Binder
     /// down and nothing is inferred from where it is going: a tuple is
     /// structural, and two of the same element types are one type.
     /// </summary>
+    /// <summary>
+    /// <c>(null, 1)</c> given a tuple type to be: each element converted to
+    /// the type in its place.
+    /// </summary>
+    private BoundExpression SettleTupleDraft(BoundTupleDraft draft, TypeSymbol target, SourceSpan span)
+    {
+        if (target is not TupleTypeSymbol tuple || tuple.Elements.Count != draft.Elements.Count)
+        {
+            diagnostics.Error("SL0773", span,
+                $"a tuple of {draft.Elements.Count} written out cannot become '{target.Name}'; " +
+                "and it has an element that takes its type from where it is going, so it has " +
+                "no type of its own to be instead");
+            return new BoundErrorExpression(span);
+        }
+
+        return ConvertTupleElements(draft.Elements, tuple, span);
+    }
+
+    /// <summary>
+    /// A tuple written out, as another tuple type of as many elements: each
+    /// element converted to the type in its place, as C# converts a tuple
+    /// literal. A tuple that is not written out converts only to its own type.
+    /// </summary>
+    private BoundExpression ConvertTupleElements(
+        IReadOnlyList<BoundExpression> written, TupleTypeSymbol tuple, SourceSpan span)
+    {
+        var elements = new List<BoundExpression>(written.Count);
+        for (int i = 0; i < written.Count; i++)
+        {
+            var element = written[i];
+            elements.Add(BindConversion(element, tuple.Elements[i], element.Span));
+        }
+
+        return elements.Any(e => e.Type.IsError())
+            ? new BoundErrorExpression(span)
+            : new BoundTupleCreate(span, tuple, elements);
+    }
+
+    private BoundExpression RefuseDeclarationExpression(DeclarationExpressionSyntax syntax)
+    {
+        diagnostics.Error("SL0771", syntax.Span,
+            $"'{syntax.Name}' is declared where nothing is being taken apart; a declaration " +
+            "like this is an element of the left side of a deconstruction, as in " +
+            "'(int a, var b) = pair;'");
+        return new BoundErrorExpression(syntax.Span);
+    }
+
     private BoundExpression BindTuple(TupleSyntax syntax)
     {
         var elements = syntax.Elements.Select(BindExpression).ToList();
         if (elements.Any(e => e.Type.IsError())) return new BoundErrorExpression(syntax.Span);
-        if (elements.Any(RefuseUntyped))
-            return new BoundErrorExpression(syntax.Span);
 
         foreach (var element in elements)
         {
-            if (!element.Type.IsVoid()) continue;
+            if (element.Type.IsVoid())
+            {
+                diagnostics.Error("SL0607", element.Span,
+                    "an element of a tuple has to be a value, and this produces none");
+                return new BoundErrorExpression(syntax.Span);
+            }
 
-            diagnostics.Error("SL0607", element.Span,
-                "an element of a tuple has to be a value, and this produces none");
-            return new BoundErrorExpression(syntax.Span);
         }
+
+        // A tuple's type is its elements' types, so one element that waits to
+        // be told its type leaves the whole tuple waiting too.
+        if (!elements.All(HasOwnType))
+            return new BoundTupleDraft(syntax.Span, elements);
 
         var type = TupleOf(elements.Select(e => e.Type).ToList());
         return new BoundTupleCreate(syntax.Span, type, elements);
@@ -2273,15 +2334,17 @@ public sealed partial class Binder
     /// <summary>Whether an expression has a type of its own rather than one it waits for.</summary>
     private static bool HasOwnType(BoundExpression expression) =>
         expression.Type is not (DefaultLiteralType or NewDraftType or NullType or LambdaType
-            or ArrayDraftType or VariantDraftType or FunctionGroupType or ErrorTypeSymbol)
+            or ArrayDraftType or VariantDraftType or FunctionGroupType or TupleDraftType
+            or ErrorTypeSymbol)
         && !expression.Type.IsVoid();
 
     /// <summary>
-    /// Whether this is a bare <c>default</c> or a <c>new(...)</c>, which have
-    /// no type until something they are going to gives them one.
+    /// Whether this is a bare <c>default</c>, a <c>new(...)</c>, or a tuple
+    /// with an element that waits likewise: none has a type until something
+    /// it is going to gives it one.
     /// </summary>
     private static bool IsTargetTyped(BoundExpression expression) =>
-        expression.Type is DefaultLiteralType or NewDraftType;
+        expression.Type is DefaultLiteralType or NewDraftType or TupleDraftType;
 
     /// <summary>
     /// Reports a <c>default</c> or <c>new(...)</c> that reached a place with no
@@ -2301,6 +2364,13 @@ public sealed partial class Binder
                 diagnostics.Error("SL0756", expression.Span,
                     "'new(...)' takes its type from where it is going, and nothing here says " +
                     "what that is; write the type, as in 'new Point(...)'");
+                return true;
+
+            case TupleDraftType:
+                diagnostics.Error("SL0773", expression.Span,
+                    "an element of this tuple takes its type from where it is going, and " +
+                    "nothing here says what that is; a tuple's type is its elements' types. " +
+                    "Write the type, as in '(String?, int) pair = (null, 1);'");
                 return true;
 
             default:
@@ -2684,6 +2754,9 @@ public sealed partial class Binder
 
     private BoundExpression BindAssignment(AssignmentSyntax syntax)
     {
+        if (syntax is { Operator: TokenKind.Equals, Target: TupleSyntax })
+            return BindDeconstructionExpression(syntax);
+
         if (RefuseConditionalTarget(syntax.Target))
             return new BoundErrorExpression(syntax.Span);
         if (BindSubscription(syntax) is { } subscription) return subscription;
@@ -2864,65 +2937,17 @@ public sealed partial class Binder
         if (value.Type.IsError() || property.Type.IsError())
             return new BoundErrorExpression(syntax.Span);
 
-        if (property.Setter is not { } setter)
-        {
-            // A get-only automatic property is still storage, and the type's own
-            // constructor is where storage gets filled in.
-            if (property.BackingField is { } backing && receiver is not null &&
-                syntax.Operator == TokenKind.Equals &&
-                _currentFunction is { Kind: FunctionKind.Constructor } ctor &&
-                ctor.ContainingType == property.ContainingType)
-            {
-                var storage = new BoundFieldAccess(syntax.Target.Span, receiver, backing);
-                return new BoundAssignment(syntax.Span, storage,
-                    BindConversion(value, property.Type, syntax.Value.Span));
-            }
-
-            diagnostics.Error("SL0395", syntax.Target.Span,
-                $"'{property.ContainingType.Name}.{property.Name}' has no setter" +
-                (property.ContainingType is InterfaceTypeSymbol
-                    ? ", so the contract does not offer one; declare it 'get; set;'"
-                    : property.BackingField is null
-                        ? "; it is computed, so there is nothing to write"
-                        : "; add 'set;', or assign it in a constructor of " +
-                          $"'{property.ContainingType.Name}'"));
+        if (!CanWriteProperty(syntax.Target.Span, receiver, property,
+                syntax.Operator == TokenKind.Equals, out var backing))
             return new BoundErrorExpression(syntax.Span);
-        }
 
-        if (!CanReach(setter.IsPublic, setter.IsProtected, property.ContainingType))
+        // A get-only automatic property is still storage, and the type's own
+        // constructor is where storage gets filled in.
+        if (backing is not null)
         {
-            diagnostics.Error("SL0396", syntax.Target.Span,
-                setter.IsProtected
-                    ? $"'{property.ContainingType.Name}.{property.Name}' can be read from " +
-                      $"anywhere but written only by '{property.ContainingType.Name}' and " +
-                      "classes deriving from it"
-                    : $"'{property.ContainingType.Name}.{property.Name}' can be read from " +
-                      "anywhere but only written inside its own module");
-            return new BoundErrorExpression(syntax.Span);
-        }
-
-        // A struct's setter writes the receiver's own storage, so writing one
-        // through a `static readonly` writes the static. A class's setter writes
-        // the object rather than the static, and a readonly static may hold an
-        // object whose fields still change.
-        if (property.ContainingType is StructTypeSymbol && receiver is not null &&
-            BaseOf(receiver) is BoundStaticAccess { Static.IsReadonly: true } owner)
-        {
-            diagnostics.Error("SL0379", syntax.Target.Span,
-                $"'{owner.Static.Name}' is 'static readonly', so it is written once by its " +
-                "initializer -- and setting a field of the struct it holds is writing it");
-            return new BoundErrorExpression(syntax.Span);
-        }
-
-        // A struct's setter writes through a pointer, so a temporary receiver
-        // would be written and then thrown away.
-        if (property.ContainingType is StructTypeSymbol && receiver is not null &&
-            receiver is BoundAddressOf { Operand: var target } && !target.IsLValue)
-        {
-            diagnostics.Error("SL0399", syntax.Target.Span,
-                $"'{property.ContainingType.Name}.{property.Name}' is being set on a temporary " +
-                "struct, so the write would be discarded; assign to a variable first");
-            return new BoundErrorExpression(syntax.Span);
+            var storage = new BoundFieldAccess(syntax.Target.Span, receiver, backing);
+            return new BoundAssignment(syntax.Span, storage,
+                BindConversion(value, property.Type, syntax.Value.Span));
         }
 
         NoteMemberWritten(property);
@@ -2999,6 +3024,79 @@ public sealed partial class Binder
         }
 
         return WithHeld(syntax.Span, held, written);
+    }
+
+    /// <summary>
+    /// Whether this property may be written here, reporting why not.
+    ///
+    /// A get-only automatic property has no setter and is still written by its
+    /// type's own constructor; <paramref name="backing"/> is then the field to
+    /// store into.
+    /// </summary>
+    private bool CanWriteProperty(
+        SourceSpan span, BoundExpression? receiver, PropertySymbol property, bool plain,
+        out FieldSymbol? backing)
+    {
+        backing = null;
+
+        if (property.Setter is not { } setter)
+        {
+            if (property.BackingField is { } field && receiver is not null && plain &&
+                _currentFunction is { Kind: FunctionKind.Constructor } ctor &&
+                ctor.ContainingType == property.ContainingType)
+            {
+                backing = field;
+                return true;
+            }
+
+            diagnostics.Error("SL0395", span,
+                $"'{property.ContainingType.Name}.{property.Name}' has no setter" +
+                (property.ContainingType is InterfaceTypeSymbol
+                    ? ", so the contract does not offer one; declare it 'get; set;'"
+                    : property.BackingField is null
+                        ? "; it is computed, so there is nothing to write"
+                        : "; add 'set;', or assign it in a constructor of " +
+                          $"'{property.ContainingType.Name}'"));
+            return false;
+        }
+
+        if (!CanReach(setter.IsPublic, setter.IsProtected, property.ContainingType))
+        {
+            diagnostics.Error("SL0396", span,
+                setter.IsProtected
+                    ? $"'{property.ContainingType.Name}.{property.Name}' can be read from " +
+                      $"anywhere but written only by '{property.ContainingType.Name}' and " +
+                      "classes deriving from it"
+                    : $"'{property.ContainingType.Name}.{property.Name}' can be read from " +
+                      "anywhere but only written inside its own module");
+            return false;
+        }
+
+        // A struct's setter writes the receiver's own storage, so writing one
+        // through a `static readonly` writes the static. A class's setter writes
+        // the object rather than the static, and a readonly static may hold an
+        // object whose fields still change.
+        if (property.ContainingType is StructTypeSymbol && receiver is not null &&
+            BaseOf(receiver) is BoundStaticAccess { Static.IsReadonly: true } owner)
+        {
+            diagnostics.Error("SL0379", span,
+                $"'{owner.Static.Name}' is 'static readonly', so it is written once by its " +
+                "initializer -- and setting a field of the struct it holds is writing it");
+            return false;
+        }
+
+        // A struct's setter writes through a pointer, so a temporary receiver
+        // would be written and then thrown away.
+        if (property.ContainingType is StructTypeSymbol && receiver is not null &&
+            receiver is BoundAddressOf { Operand: var target } && !target.IsLValue)
+        {
+            diagnostics.Error("SL0399", span,
+                $"'{property.ContainingType.Name}.{property.Name}' is being set on a temporary " +
+                "struct, so the write would be discarded; assign to a variable first");
+            return false;
+        }
+
+        return true;
     }
 
     /// <summary>A value an assignment evaluates once and names again.</summary>

@@ -68,6 +68,9 @@ public class ParserTests
         NewSyntax made => made.Type is null ? "new()" : "new",
         ArrayLiteralSyntax array =>
             $"[{string.Join(" ", array.Elements.Select(Render))}]",
+        TupleSyntax tuple => $"(tuple {string.Join(" ", tuple.Elements.Select(Render))})",
+        DeclarationExpressionSyntax declared =>
+            $"(declare {(declared.Type is null ? "var" : Render(declared.Type))} {declared.Name})",
         null => "_",
         _ => expression.GetType().Name,
     };
@@ -683,6 +686,55 @@ public class ParserTests
     [InlineData("F<int>(y);")]
     public void AStatementThatLooksLikeACallIsOne(string body) =>
         Assert.IsNotType<LocalFunctionSyntax>(FirstStatement(body, out _));
+
+    // ----------------------------------------------------- deconstruction
+
+    [Theory]
+    [InlineData("(a, b) = (b, a)", "(= (tuple a b) (tuple b a))")]
+    [InlineData("(int a, var b) = t", "(= (tuple (declare int a) (declare var b)) t)")]
+    [InlineData("(a, (int b, _)) = t", "(= (tuple a (tuple (declare int b) _)) t)")]
+    [InlineData("(x, var (y, z)) = t", "(= (tuple x (tuple (declare var y) (declare var z))) t)")]
+    [InlineData("(List<int> xs, p.Q) = t", "(= (tuple (declare List<int> xs) (. p Q)) t)")]
+    [InlineData("(a[i], b) = t", "(= (tuple ([] a i) b) t)")]
+    [InlineData("(a, b) = (c, d) = t", "(= (tuple a b) (= (tuple c d) t))")]
+    [InlineData("(x) = 5", "(= x 5)")]
+    public void ATupleBeforeAnEqualsIsTakenApart(string source, string shape) =>
+        Assert.Equal(shape, Shape(source));
+
+    /// <summary>Only an `=` after the parenthesis makes it a deconstruction.</summary>
+    [Theory]
+    [InlineData("(int)x", "(cast x)")]
+    [InlineData("(a, b) == t", "(== (tuple a b) t)")]
+    [InlineData("(a) + b", "(+ a b)")]
+    public void AParenthesisWithNoEqualsAfterItIsNotTakenApart(string source, string shape) =>
+        Assert.Equal(shape, Shape(source));
+
+    [Theory]
+    [InlineData("var (a, b) = t;", "(= (tuple (declare var a) (declare var b)) t)")]
+    [InlineData("var (a, (b, _)) = t;",
+        "(= (tuple (declare var a) (tuple (declare var b) (declare var _))) t)")]
+    [InlineData("(int a, String b) = t;", "(= (tuple (declare int a) (declare String b)) t)")]
+    public void ADeconstructionMayStandAsAStatement(string body, string shape)
+    {
+        var statement = FirstStatement(body, out var diagnostics);
+
+        Assert.Empty(diagnostics.Items);
+        var expression = Assert.IsType<ExpressionStatementSyntax>(statement);
+        Assert.Equal(shape, Render(expression.Expression));
+    }
+
+    [Theory]
+    [InlineData("foreach (var (k, v) in pairs) { }", "(tuple (declare var k) (declare var v))")]
+    [InlineData("foreach ((int k, var v) in pairs) { }", "(tuple (declare int k) (declare var v))")]
+    [InlineData("foreach ((int, String) pair in pairs) { }", null)]
+    public void AForeachMayTakeItsElementApart(string body, string? shape)
+    {
+        var statement = FirstStatement(body, out var diagnostics);
+
+        Assert.Empty(diagnostics.Items);
+        var loop = Assert.IsType<ForEachSyntax>(statement);
+        Assert.Equal(shape, loop.Deconstruction is null ? null : Render(loop.Deconstruction));
+    }
 
     [Fact]
     public void AStaticLocalVariableIsRefused()

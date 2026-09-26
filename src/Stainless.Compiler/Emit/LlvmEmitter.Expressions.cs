@@ -124,7 +124,25 @@ public sealed partial class LlvmEmitter
                 // by address, so the name is that address and there is nothing
                 // to copy. Everything else goes in a slot, because that is what
                 // a read of a local reads through.
-                if (held.Local.Type is StructTypeSymbol or FixedArrayTypeSymbol)
+                //
+                // An owned one is a copy, taken now: the storage it came from
+                // may be written before the name is read.
+                if (held.IsOwned && held.Local.Type is StructTypeSymbol or FixedArrayTypeSymbol)
+                {
+                    var type = held.Local.Type;
+                    string llvmType = LlvmTypeOf(type);
+                    string copy = Alloca(llvmType, held.Local.Name);
+                    MemCopy(copy, value.Ref, type.Size);
+
+                    if (type is StructTypeSymbol owning && owning.CarriesReferences())
+                    {
+                        RetainFieldsAt(copy, owning);
+                        TrackTemporary(copy, owning);
+                    }
+
+                    _slots[held.Local] = copy;
+                }
+                else if (held.Local.Type is StructTypeSymbol or FixedArrayTypeSymbol)
                 {
                     _slots[held.Local] = value.Ref;
                 }

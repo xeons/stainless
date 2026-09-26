@@ -1,0 +1,25 @@
+a 7 seven 7 seven 7 7
+b 1 2 three
+c 2 1
+d 10 20 30
+e 5 6
+f 1 2 3 4 5
+g 4 3
+h 2 1
+i 1 99 20
+get left
+get right
+one
+two
+index
+value
+discarded
+j 1 2 8
+k 5 6 5 6 5 6
+show 7 8
+l 0 3
+l 1 3
+l 2 3
+m 7 42 generic
+n none 3
+o 1 2

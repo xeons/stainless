@@ -554,21 +554,20 @@ public sealed class BoundTupleCreate(
 }
 
 /// <summary>
-/// <c>var (a, b) = t;</c> — a tuple taken apart into locals.
+/// <c>var (a, b) = t;</c> and <c>(int a, b) = t;</c> — a deconstruction that
+/// declares some of what it names.
 ///
-/// The tuple is held in <see cref="Local"/> so that whatever produced it is
-/// evaluated once, and each name is a local initialised from one of its
-/// fields.
+/// The locals belong to the enclosing block rather than to a block of their
+/// own, so they are declared here with no value and then written by
+/// <see cref="Expression"/>, which is the deconstruction itself.
 /// </summary>
 public sealed class BoundDeconstruct(
     SourceSpan span,
-    LocalSymbol source,
-    BoundExpression value,
-    IReadOnlyList<LocalSymbol> names) : BoundStatement(span)
+    IReadOnlyList<BoundLocalDeclaration> declarations,
+    BoundExpression expression) : BoundStatement(span)
 {
-    public LocalSymbol Local { get; } = source;
-    public BoundExpression Value { get; } = value;
-    public IReadOnlyList<LocalSymbol> Names { get; } = names;
+    public IReadOnlyList<BoundLocalDeclaration> Declarations { get; } = declarations;
+    public BoundExpression Expression { get; } = expression;
 }
 
 public sealed class BoundVariantConstruction(

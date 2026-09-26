@@ -1447,7 +1447,7 @@ public sealed partial class Binder
         // A conditional whose arms both wait fits where each of them would.
         if (argument is BoundConditional
             {
-                Type: DefaultLiteralType or NewDraftType or ArrayDraftType,
+                Type: DefaultLiteralType or NewDraftType or ArrayDraftType or TupleDraftType,
             } either)
             return IsImplicitlyConvertible(either.WhenTrue, target) &&
                    IsImplicitlyConvertible(either.WhenFalse, target);
@@ -1460,6 +1460,19 @@ public sealed partial class Binder
 
         if (argument.Type is NewDraftType)
             return CouldBeMadeByNew(target);
+
+        var written = argument switch
+        {
+            BoundTupleDraft waiting => waiting.Elements,
+            BoundTupleCreate literal when target is TupleTypeSymbol && !literal.Type.Equals(target)
+                => literal.Elements,
+            _ => null,
+        };
+
+        if (written is not null)
+            return target is TupleTypeSymbol wanted &&
+                   wanted.Elements.Count == written.Count &&
+                   written.Select((e, i) => IsImplicitlyConvertible(e, wanted.Elements[i])).All(x => x);
 
         if (argument is BoundArrayDraft draft2)
             return target switch

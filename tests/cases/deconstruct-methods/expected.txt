@@ -1,0 +1,18 @@
+a 3 4
+made a point
+b 5 6
+c 1 9
+d one two
+e heavy 90
+f 2 1 2 3
+g light 1 true
+h 212
+references:
+  l r
+  kept l kept r 2
+  kept l
+  dropped kept r
+  dropped l
+  dropped r
+  dropped kept l
+done

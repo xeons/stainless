@@ -715,7 +715,14 @@ last person to edit it -- the suite is the authority.
 - **Tuples**: `(int, String)`, structural, with `Item1` upwards for fields and
   `var (low, high) = MinMax(xs);` where the names matter. A tuple is a struct,
   so layout, both ABI classifiers and reference counting apply to it with
-  nothing written for tuples
+  nothing written for tuples. A tuple written out converts element by
+  element, so `(String?, int) none = (null, 0);` says what the `null` is
+- **Deconstruction**, as C#: `(a, b) = (b, a)` swaps, `(int n, var s) = t;`
+  and `var (x, (y, _)) = t;` declare, and targets may be fields, elements,
+  properties and indexers, evaluated before anything on the right. A value
+  that is not a tuple is taken apart by a `Deconstruct` method or free
+  function with an `out` per name; a record has one generated, and
+  `foreach (var (key, value) in dictionary)` works through `KeyValuePair`'s
 - **A type may be declared inside another**, and is lifted out and named for
   where it was written: `Rect.Point` from outside, `Point` from within `Rect`.
   Nesting is about where a name is reached from and nothing else — no hidden

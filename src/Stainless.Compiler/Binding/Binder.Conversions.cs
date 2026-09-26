@@ -63,9 +63,16 @@ public sealed partial class Binder
         if (expression is BoundNewDraft newDraft)
             return SettleNewDraft(newDraft, target, span);
 
+        if (expression is BoundTupleDraft tupleDraft)
+            return SettleTupleDraft(tupleDraft, target, span);
+
+        if (expression is BoundTupleCreate literalTuple && target is TupleTypeSymbol tuple &&
+            !literalTuple.Type.Equals(target) && literalTuple.Elements.Count == tuple.Elements.Count)
+            return ConvertTupleElements(literalTuple.Elements, tuple, span);
+
         if (expression is BoundConditional
             {
-                Type: DefaultLiteralType or NewDraftType or ArrayDraftType,
+                Type: DefaultLiteralType or NewDraftType or ArrayDraftType or TupleDraftType,
             } waiting)
             return new BoundConditional(span, target, waiting.Condition,
                 BindConversion(waiting.WhenTrue, target, waiting.WhenTrue.Span),

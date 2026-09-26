@@ -47,6 +47,28 @@ public sealed class ArrayDraftType : TypeSymbol
 }
 
 /// <summary>
+/// What <c>(null, 1)</c> is before anything says what it should be: a tuple
+/// with an element that waits to be told its type, and so no tuple type of
+/// its own. It never reaches the emitter: a conversion to a tuple type settles
+/// it element by element, or it is an error.
+/// </summary>
+public sealed class TupleDraftType : TypeSymbol
+{
+    public static readonly TupleDraftType Instance = new();
+    private TupleDraftType() { }
+    public override string Name => "tuple literal";
+    public override int Size => 0;
+    public override int Alignment => 1;
+}
+
+/// <summary>A tuple written out, one of whose elements has no type yet.</summary>
+public sealed class BoundTupleDraft(SourceSpan span, IReadOnlyList<BoundExpression> elements)
+    : BoundExpression(span, TupleDraftType.Instance)
+{
+    public IReadOnlyList<BoundExpression> Elements { get; } = elements;
+}
+
+/// <summary>
 /// The type of a bare case name before something says which variant it builds.
 ///
 /// One value cannot say what a variant's type arguments are -- <c>Ok(4)</c>

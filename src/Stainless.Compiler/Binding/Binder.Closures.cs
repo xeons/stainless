@@ -174,6 +174,9 @@ public sealed partial class Binder
             case BoundLocalDeclaration declaration:
                 CollectFieldReads(declaration.Initializer, into);
                 break;
+            case BoundDeconstruct taken:
+                CollectFieldReads(taken.Expression, into);
+                break;
             case BoundIf conditional:
                 CollectFieldReads(conditional.Condition, into);
                 CollectFieldReads(conditional.Then, into);

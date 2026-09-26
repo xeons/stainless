@@ -14,6 +14,6 @@ held:
   dropped second
 taken apart:
   first and second
-  dropped first
   dropped second
+  dropped first
 done

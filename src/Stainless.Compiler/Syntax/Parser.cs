@@ -863,6 +863,11 @@ public sealed class Parser
         members.Add(EqualityOperatorFor(declared.Name, positional, TokenKind.EqualsEquals));
         members.Add(EqualityOperatorFor(declared.Name, positional, TokenKind.BangEquals));
 
+        // One the body wrote with as many parameters takes its place, as in C#.
+        if (!declared.Members.Any(m => m is FunctionDeclSyntax
+                { Name: "Deconstruct" } own && own.Parameters.Count == positional.Count))
+            members.Add(DeconstructFor(positional));
+
         // The two interfaces those members satisfy, so that a record is a
         // dictionary key and a set element without anybody saying so.
         // Written out in full, so that a record needs no import to be one: the
@@ -1020,6 +1025,31 @@ public sealed class Parser
         }
 
         return properties;
+    }
+
+    /// <summary>
+    /// <c>void Deconstruct(out T1 X, out T2 Y)</c>, which is what lets
+    /// <c>var (x, y) = point;</c> take a record apart.
+    /// </summary>
+    private static FunctionDeclSyntax DeconstructFor(List<ParameterSyntax> positional)
+    {
+        var span = positional[0].Span;
+        var statements = new List<StatementSyntax>(positional.Count);
+        var parameters = new List<ParameterSyntax>(positional.Count);
+
+        foreach (var parameter in positional)
+        {
+            var target = new NameSyntax(span, new QualifiedName(span, [parameter.Name]));
+            statements.Add(new ExpressionStatementSyntax(span,
+                new AssignmentSyntax(span, target, TokenKind.Equals, Mine(span, parameter.Name))));
+            parameters.Add(new ParameterSyntax(
+                parameter.Span, parameter.Type, parameter.Name, ParameterMode.Out));
+        }
+
+        return new FunctionDeclSyntax(
+            span, Modifiers.Public, LinkageKind.Stainless,
+            new PrimitiveTypeSyntax(span, TokenKind.VoidKeyword), "Deconstruct", [], [],
+            parameters, false, new BlockSyntax(span, statements));
     }
 
     /// <summary>
@@ -2559,6 +2589,35 @@ public sealed class Parser
                 Advance();
                 Expect(TokenKind.OpenParen);
 
+                // `foreach (var (k, v) in pairs)` and `foreach ((int k, var v) in
+                // pairs)` take each element apart. A tuple type is followed by a
+                // name and the second form by `in`, so the token after the
+                // parenthesis settles it.
+                TupleSyntax? taken = null;
+                if (At(TokenKind.VarKeyword) && Peek(1).Kind == TokenKind.OpenParen)
+                {
+                    int designation = _pos;
+                    Advance();
+                    taken = ParseVarDesignation(designation);
+                }
+                else if (At(TokenKind.OpenParen) && AfterParenthesis(TokenKind.InKeyword))
+                {
+                    taken = ParseDeconstructionTarget();
+                }
+
+                if (taken is not null)
+                {
+                    Expect(TokenKind.InKeyword);
+                    var source = ParseExpression();
+                    Expect(TokenKind.CloseParen);
+
+                    var takenBody = ParseStatement();
+                    return new ForEachSyntax(SpanFrom(start), null, "", source, takenBody)
+                    {
+                        Deconstruction = taken,
+                    };
+                }
+
                 // `foreach (var x in xs)` infers; anything else names a type.
                 TypeSyntax? elementType = null;
                 if (At(TokenKind.VarKeyword)) Advance();
@@ -2597,32 +2656,6 @@ public sealed class Parser
             case TokenKind.Semicolon:
                 Advance();
                 return new BlockSyntax(SpanFrom(start), []);
-
-            case TokenKind.VarKeyword when Peek(1).Kind == TokenKind.OpenParen:
-            {
-                // `var (a, b) = ...`. `var` is otherwise followed by a name, so
-                // the parenthesis settles it with no speculation.
-                Advance();
-                Advance();
-
-                var names = new List<string>();
-                var spans = new List<SourceSpan>();
-
-                do
-                {
-                    var name = Current;
-                    names.Add(ExpectIdentifier());
-                    spans.Add(name.Span);
-                }
-                while (Match(TokenKind.Comma));
-
-                Expect(TokenKind.CloseParen);
-                Expect(TokenKind.Equals);
-
-                var value = ParseExpression();
-                Expect(TokenKind.Semicolon);
-                return new DeconstructSyntax(SpanFrom(start), names, spans, value);
-            }
 
             case TokenKind.StaticKeyword when Peek(1).Kind != TokenKind.EqualsGreater &&
                                               Peek(1).Kind != TokenKind.OpenParen:
@@ -3083,6 +3116,22 @@ public sealed class Parser
     {
         int start = _pos;
 
+        // `var (a, b) = ...`. `var` is otherwise followed by a name, so the
+        // parenthesis settles it with no speculation.
+        if (At(TokenKind.VarKeyword) && Peek(1).Kind == TokenKind.OpenParen)
+        {
+            Advance();
+            var names = ParseVarDesignation(start);
+            Expect(TokenKind.Equals);
+
+            var value = ParseExpression();
+            if (requireSemicolon)
+                Expect(TokenKind.Semicolon);
+
+            return new ExpressionStatementSyntax(SpanFrom(start),
+                new AssignmentSyntax(SpanFrom(start), names, TokenKind.Equals, value));
+        }
+
         if (At(TokenKind.VarKeyword) || At(TokenKind.ConstKeyword))
         {
             bool isConst = At(TokenKind.ConstKeyword);
@@ -3132,6 +3181,135 @@ public sealed class Parser
 
             _ => new ExpressionStatementSyntax(span, expression),
         };
+
+    /// <summary>
+    /// The <c>(a, (b, _))</c> after <c>var</c>, read as the tuple of
+    /// declarations it stands for: <c>(var a, (var b, var _))</c>.
+    /// </summary>
+    private TupleSyntax ParseVarDesignation(int start)
+    {
+        Expect(TokenKind.OpenParen);
+        var elements = new List<ExpressionSyntax>();
+
+        do
+        {
+            int element = _pos;
+            if (At(TokenKind.OpenParen))
+            {
+                elements.Add(ParseVarDesignation(element));
+                continue;
+            }
+
+            var name = Current;
+            string text = ExpectIdentifier();
+            elements.Add(new DeclarationExpressionSyntax(SpanFrom(element), null, text, name.Span));
+        }
+        while (Match(TokenKind.Comma) && !_tooDeep);
+
+        Expect(TokenKind.CloseParen);
+        return new TupleSyntax(SpanFrom(start), elements);
+    }
+
+    /// <summary>
+    /// Whether the parenthesis here closes and is followed by
+    /// <paramref name="kind"/>. A scan rather than a parse, so asking costs
+    /// nothing a failed guess would have to undo.
+    /// </summary>
+    private bool AfterParenthesis(TokenKind kind)
+    {
+        int depth = 0;
+        for (int offset = 0; _pos + offset < _tokens.Count; offset++)
+        {
+            switch (Peek(offset).Kind)
+            {
+                case TokenKind.OpenParen:
+                    depth++;
+                    break;
+
+                case TokenKind.CloseParen:
+                    if (--depth == 0) return Peek(offset + 1).Kind == kind;
+                    break;
+
+                case TokenKind.Semicolon:
+                case TokenKind.OpenBrace:
+                case TokenKind.CloseBrace:
+                case TokenKind.EndOfFile:
+                    return false;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// <c>(a, int b, var (c, _))</c>: the parenthesised left side of a
+    /// deconstruction, whose elements may declare what they name. Anything
+    /// that is not a declaration is an ordinary expression, left for the
+    /// binder to find a place in.
+    /// </summary>
+    private TupleSyntax ParseDeconstructionTarget()
+    {
+        int start = _pos;
+        Expect(TokenKind.OpenParen);
+        var elements = new List<ExpressionSyntax>();
+
+        do elements.Add(ParseDeconstructionElement());
+        while (Match(TokenKind.Comma) && !_tooDeep);
+
+        Expect(TokenKind.CloseParen);
+        return new TupleSyntax(SpanFrom(start), elements);
+    }
+
+    private ExpressionSyntax ParseDeconstructionElement()
+    {
+        int start = _pos;
+
+        if (At(TokenKind.VarKeyword) && Peek(1).Kind == TokenKind.OpenParen)
+        {
+            Advance();
+            return ParseVarDesignation(start);
+        }
+
+        if (At(TokenKind.VarKeyword))
+        {
+            Advance();
+            var name = Current;
+            string text = ExpectIdentifier();
+            return new DeclarationExpressionSyntax(SpanFrom(start), null, text, name.Span);
+        }
+
+        if (At(TokenKind.OpenParen) && Speculate(TryParseNestedDeconstruction, out var nested))
+            return nested!;
+
+        if (AtTypeStart() && Speculate(TryParseTypedDeclaration, out var declared))
+            return declared!;
+
+        return ParseExpression();
+    }
+
+    /// <summary>
+    /// A parenthesised element that is itself taken apart. One element in
+    /// parentheses is a parenthesised expression, so it needs a comma.
+    /// </summary>
+    private TupleSyntax? TryParseNestedDeconstruction()
+    {
+        var tuple = ParseDeconstructionTarget();
+        return tuple.Elements.Count > 1 && AtAny(TokenKind.Comma, TokenKind.CloseParen)
+            ? tuple
+            : null;
+    }
+
+    /// <summary><c>int a</c>, ending where the element does.</summary>
+    private DeclarationExpressionSyntax? TryParseTypedDeclaration()
+    {
+        int start = _pos;
+        var type = ParseType();
+        if (!At(TokenKind.Identifier)) return null;
+
+        var name = Advance();
+        if (!AtAny(TokenKind.Comma, TokenKind.CloseParen)) return null;
+        return new DeclarationExpressionSyntax(SpanFrom(start), type, name.Text, name.Span);
+    }
 
     private sealed record LocalDeclHead(TypeSyntax Type, string Name);
 
@@ -4138,6 +4316,14 @@ public sealed class Parser
 
             case TokenKind.OpenParen:
             {
+                // `(int a, b) = pair` declares as it takes apart, which only a
+                // parenthesis followed by `=` can be doing.
+                if (AfterParenthesis(TokenKind.Equals))
+                {
+                    var target = ParseDeconstructionTarget();
+                    return target.Elements.Count == 1 ? target.Elements[0] : target;
+                }
+
                 // `(Type)operand` is a cast; anything else in parentheses is grouping.
                 if (Speculate(TryParseCastHead, out var castType) && castType is not null)
                 {

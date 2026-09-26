@@ -1133,8 +1133,8 @@ public sealed partial class Binder
     {
         if (node is null) return;
 
-        if (node is Syntax.AssignmentSyntax assignment && RootName(assignment.Target) is { } assigned)
-            names.Add(assigned);
+        if (node is Syntax.AssignmentSyntax assignment)
+            CollectAssignedRoots(assignment.Target, names);
 
         if (node is Syntax.AsmOperandSyntax { Direction: not Syntax.AsmDirection.In } output &&
             RootName(output.Value) is { } stored)
@@ -1189,6 +1189,19 @@ public sealed partial class Binder
     }
 
     /// <summary>The identifier an assignment target is rooted at, if it is rooted at one.</summary>
+    /// <summary>The names an assignment writes, each element of a tuple being taken apart included.</summary>
+    private static void CollectAssignedRoots(Syntax.ExpressionSyntax target, HashSet<string> names)
+    {
+        if (target is Syntax.TupleSyntax tuple)
+        {
+            foreach (var element in tuple.Elements) CollectAssignedRoots(element, names);
+        }
+        else if (RootName(target) is { } assigned)
+        {
+            names.Add(assigned);
+        }
+    }
+
     private static string? RootName(Syntax.ExpressionSyntax expression) => expression switch
     {
         Syntax.NameSyntax name when name.Name.Parts.Count == 1 => name.Name.Parts[0],
@@ -1271,6 +1284,9 @@ public sealed partial class Binder
 
             case BoundLocalDeclaration declaration:
                 return assigned || Writes(declaration.Initializer, target);
+
+            case BoundDeconstruct taken:
+                return assigned || Writes(taken.Expression, target);
 
             case BoundReturn returned:
                 if (!assigned && !Writes(returned.Value, target))
@@ -1360,6 +1376,10 @@ public sealed partial class Binder
 
             BoundConversion conversion => Writes(conversion.Operand, target),
             BoundBinary binary => Writes(binary.Left, target) || Writes(binary.Right, target),
+            BoundLet held => Writes(held.Value, target) || Writes(held.Body, target),
+            BoundSequence sequence =>
+                sequence.Before.Any(e => Writes(e, target)) || Writes(sequence.Value, target),
+            BoundTupleCreate tuple => tuple.Elements.Any(e => Writes(e, target)),
             BoundUnary unary => Writes(unary.Operand, target),
 
             // Only the condition is certain: an arm may not be the one taken.
@@ -1420,6 +1440,8 @@ public sealed partial class Binder
         {
             var bound = BindStatement(statement);
             if (bound is BoundLocalDeclaration declaration) block.Locals.Add(declaration.Local);
+            if (bound is BoundDeconstruct taken)
+                block.Locals.AddRange(taken.Declarations.Select(d => d.Local));
             statements.Add(bound);
         }
 
@@ -1446,7 +1468,6 @@ public sealed partial class Binder
         BlockSyntax block => BindBlock(block),
         LocalDeclSyntax local => BindLocalDeclaration(local),
         LocalFunctionSyntax function => BindLocalFunctionDeclaration(function),
-        DeconstructSyntax taken => BindDeconstruct(taken),
         ExpressionStatementSyntax expression => BindExpressionStatement(expression),
         IfSyntax ifStatement => BindIf(ifStatement),
         WhileSyntax whileStatement => BindWhile(whileStatement),
@@ -1606,47 +1627,12 @@ public sealed partial class Binder
         _ => false,
     };
 
-    /// <summary>
-    /// <c>var (count, name) = Split(line);</c>.
-    ///
-    /// The tuple is held in a local of its own so that whatever produced it is
-    /// evaluated once, and each name is then a local initialised from one of
-    /// its fields. Names are wanted here rather than in the type: a tuple's own
-    /// fields are <c>Item1</c> upwards, and what they mean is a property of the
-    /// call that answered with them.
-    /// </summary>
-    private BoundStatement BindDeconstruct(DeconstructSyntax syntax)
-    {
-        var value = BindExpression(syntax.Value);
-        if (value.Type.IsError()) return new BoundBlock(syntax.Span, []);
-
-        if (value.Type is not TupleTypeSymbol tuple)
-        {
-            diagnostics.Error("SL0608", syntax.Value.Span,
-                $"'{value.Type.Name}' is not a tuple, so there is nothing here to take apart");
-            return new BoundBlock(syntax.Span, []);
-        }
-
-        if (tuple.Elements.Count != syntax.Names.Count)
-        {
-            diagnostics.Error("SL0609", syntax.Span,
-                $"'{tuple.Name}' has {Counted(tuple.Elements.Count, "element")}, and this " +
-                $"names {syntax.Names.Count}");
-            return new BoundBlock(syntax.Span, []);
-        }
-
-        var source = new LocalSymbol(SyntheticName("taken"), tuple, isConst: false);
-
-        var names = new List<LocalSymbol>(syntax.Names.Count);
-        for (int i = 0; i < syntax.Names.Count; i++)
-            names.Add(DeclareLocal(
-                syntax.Names[i], tuple.Elements[i], isConst: false, syntax.NameSpans[i]));
-
-        return new BoundDeconstruct(syntax.Span, source, value, names);
-    }
-
     private BoundStatement BindExpressionStatement(ExpressionStatementSyntax syntax)
     {
+        if (syntax.Expression is AssignmentSyntax { Operator: TokenKind.Equals, Target: TupleSyntax }
+            taken)
+            return BindDeconstructionStatement(taken);
+
         var expression = BindExpression(syntax.Expression);
         if (RefuseUntyped(expression))
             return new BoundExpressionStatement(syntax.Span, new BoundErrorExpression(syntax.Span));
@@ -2083,6 +2069,8 @@ public sealed partial class Binder
 
         var result = new BoundFor(syntax.Span, initializer, condition, step, body);
         if (initializer is BoundLocalDeclaration declaration) result.Locals.Add(declaration.Local);
+        if (initializer is BoundDeconstruct taken)
+            result.Locals.AddRange(taken.Declarations.Select(d => d.Local));
 
         PopScope();
         return result;
@@ -2243,7 +2231,10 @@ public sealed partial class Binder
             ? element
             : BindConversion(element, type, syntax.Collection.Span);
 
-        var variable = DeclareLocal(syntax.Name, type, isConst: false, syntax.Span);
+        // A loop that takes its element apart holds it under a name of its own.
+        var variable = DeclareLocal(
+            syntax.Deconstruction is null ? syntax.Name : SyntheticName("element"),
+            type, isConst: false, syntax.Span);
 
         var statements = new List<BoundStatement>
         {
@@ -2252,6 +2243,14 @@ public sealed partial class Binder
 
         var block = new BoundBlock(syntax.Span, statements);
         block.Locals.Add(variable);
+
+        if (syntax.Deconstruction is { } taken)
+        {
+            var parts = BindForEachDeconstruction(taken, variable, taken.Span);
+            if (parts is BoundDeconstruct declared)
+                block.Locals.AddRange(declared.Declarations.Select(d => d.Local));
+            statements.Add(parts);
+        }
 
         _loopDepth++;
         statements.Add(BindStatement(syntax.Body));

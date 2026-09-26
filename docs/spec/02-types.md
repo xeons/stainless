@@ -307,12 +307,94 @@ the *use* site, and that is what `var (low, high) = ...` is for.
 
 **At least two elements** (SL0606): one value in parentheses is that value.
 Every element is a value (SL0607), so a call returning nothing cannot be one.
-Taking one apart names exactly as many things as it holds (SL0609), and only a
-tuple can be taken apart (SL0608).
 
 A tuple is a type like any other: nested in another tuple, held in a
 `List<(int, String)>`, inferred through a generic — `T FirstOf<T, U>((T, U) p)`
 reads `T` from the argument the way it would through any other shape.
+
+**A tuple written out converts element by element**, as C#'s does:
+`(long, String?) wide = (1, "one");` converts the `int` and the `String` where
+they stand. That is what lets an element that takes its type from where it is
+going be written in one — `null`, `default`, `new(...)`, `Ok(x)` — provided
+the tuple is going somewhere that says what that is:
+
+```csharp
+(String?, int) Find(String key) => found ? (name, at) : (null, -1);
+Report((Ok(5), "five"));
+var loose = (null, 1);                  // SL0773: nothing says what the null is
+```
+
+A tuple held in a variable converts only to its own type. Converting one
+element by element would be a copy the reader had not asked for, and a
+literal is where the difference is ever wanted.
+
+### 2.2.5 Taking a tuple apart
+
+```csharp
+var (low, high) = MinMax(numbers);      // declared
+(int count, String name) = Split(line); // declared with their types
+(a, b) = (b, a);                        // assigned: a swap
+(x, int fresh, _) = Three();            // both, and a discard
+var (id, (first, last)) = person;       // nested, through Deconstruct
+```
+
+**Every value on the right is read before anything is stored.** That is C#'s
+order, and it is what makes the swap a swap. The targets come first — each
+receiver and index, left to right — then every value on the right, then the
+stores, left to right. So `(i, cells[i]) = (1, 99)` writes the element `i`
+named before it became 1, and `(t.Item2, t.Item1) = t` swaps the tuple's own
+fields, because `t` was read whole before either was written.
+
+A value that is not made by the statement itself — a variable, a field, an
+element — is held with a reference of its own until the statement ends, since
+a store may release the last other owner of what a later store reads. A value
+the statement made is already a temporary it will drop, and costs nothing
+more. `(a, b) = (b, a)` on two references is two retains and two releases, and
+no tuple is built: a tuple written on the right is taken apart where it
+stands.
+
+**A target is anything that can be assigned** — a variable, a field, an
+element, a property, an indexer — or a declaration, `int a` or `var a`, or
+`_`, which stores nothing. `var (a, b)` is `(var a, var b)` written once.
+Taking apart names exactly as many things as there are (SL0609).
+
+**A declaration belongs to a statement** (SL0771). `(int a, var b) = t;`
+declares two locals in the enclosing block; inside a larger expression there
+is no block for them to belong to. A deconstruction that only assigns is an
+expression, and its value is the tuple it stored — so `(a, b) = (c, d) = t`
+chains, as it does in C#.
+
+**`Deconstruct` takes apart what is not a tuple.** It is a method, or a free
+function taking the value first — uniform call syntax is this language's
+extension method ([§7.1.1](07-functions-members.md#711-xfy-is-fx-y)) — with an
+`out` parameter per name. Which overload is chosen by how many names there
+are:
+
+```csharp
+struct Point
+{
+    public int X;
+    public int Y;
+    public void Deconstruct(out int x, out int y) { x = X; y = Y; }
+}
+
+void Deconstruct(Range range, out int low, out int high) { ... }
+
+var (x, y) = point;
+var (low, high) = range;
+```
+
+A value that has neither a tuple's shape nor a `Deconstruct` for that many
+names cannot be taken apart (SL0608). A record has one generated
+([§2.4.1](#241-record--a-class-written-as-its-constructor)), and
+`KeyValuePair` has one, so `foreach (var (key, value) in dictionary)` names
+both halves.
+
+**`foreach` takes each element apart** as it reaches it:
+`foreach (var (key, count) in totals)`, or `foreach ((int k, String v) in
+pairs)`. The loop only declares: a name that already exists is SL0772,
+because the loop variable belongs to one iteration and a place outside the
+loop does not.
 
 ## 2.3 `[Packed]` and `[Align]`
 
@@ -859,8 +941,14 @@ public class Point : IEquatable<Point>, IHashable
 
     public static bool operator ==(Point left, Point right) => left.Equals(right);
     public static bool operator !=(Point left, Point right) => !left.Equals(right);
+
+    public void Deconstruct(out int X, out int Y) { X = this.X; Y = this.Y; }
 }
 ```
+
+**`Deconstruct` is what lets one be taken apart**, `var (x, y) = point;`, as
+in C#. A `Deconstruct` written in the body with as many parameters takes the
+generated one's place.
 
 **`Equals` and `GetHashCode`, not `Equals` and `GetHashCode`.** Those are the
 names [`IEquatable<T>` and `IHashable`](05-standard-library.md) declare, and

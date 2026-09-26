@@ -825,6 +825,17 @@ The value half.
 
 <sub>[stdlib/Collections/KeyValuePair.sl:37](../../stdlib/Collections/KeyValuePair.sl#L37)</sub>
 
+#### Deconstruct *method*
+
+```
+void Deconstruct(out TKey key, out TValue value)
+```
+
+Takes the pair apart, which is what lets
+`foreach (var (key, value) in dictionary)` name both halves.
+
+<sub>[stdlib/Collections/KeyValuePair.sl:49](../../stdlib/Collections/KeyValuePair.sl#L49)</sub>
+
 ### LinkedList&lt;T&gt; *class*
 
 ```

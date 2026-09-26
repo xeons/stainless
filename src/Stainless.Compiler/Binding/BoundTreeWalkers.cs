@@ -82,6 +82,10 @@ internal sealed class StaticReferenceWalker
             // a static initializer may be written as one.
             case BoundLet held: Visit(held.Value); Visit(held.Body); break;
 
+            case BoundTupleCreate tuple:
+                foreach (var element in tuple.Elements) Visit(element);
+                break;
+
             case BoundNew created:
                 foreach (var argument in created.Arguments) Visit(argument);
                 break;
@@ -154,6 +158,12 @@ internal sealed class CaptureWalker(LocalSymbol loopVariable)
                 break;
 
             case BoundExpressionStatement expression: Visit(expression.Expression); break;
+
+            case BoundDeconstruct taken:
+                foreach (var declaration in taken.Declarations)
+                    _declared.Add(declaration.Local);
+                Visit(taken.Expression);
+                break;
 
             case BoundIf branch:
                 Visit(branch.Condition); Visit(branch.Then); Visit(branch.Else);
@@ -266,6 +276,10 @@ internal sealed class CaptureWalker(LocalSymbol loopVariable)
             case BoundLet held:
                 _declared.Add(held.Local);
                 Visit(held.Value); Visit(held.Body);
+                break;
+
+            case BoundTupleCreate tuple:
+                foreach (var element in tuple.Elements) Visit(element);
                 break;
 
             case BoundNew created:

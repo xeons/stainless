@@ -1,0 +1,17 @@
+a 1 one
+a 2 two
+b x 10
+b y 20
+c x
+c y
+d 1 apples 3
+d 2 pears 5
+e bolts 40
+e total 40
+f two
+references:
+  first 1
+  second 2
+  dropped first
+  dropped second
+done

@@ -43,4 +43,12 @@ public class KeyValuePair<TKey, TValue>
         Key = key;
         Value = value;
     }
+
+    /// Takes the pair apart, which is what lets
+    /// `foreach (var (key, value) in dictionary)` name both halves.
+    public void Deconstruct(out TKey key, out TValue value)
+    {
+        key = Key;
+        value = Value;
+    }
 }

@@ -1,0 +1,38 @@
+swap:
+  two one
+  dropped one
+  dropped two
+a temporary taken apart:
+  left right
+  dropped right
+  dropped left
+a discarded element:
+  dropped discarded
+  kept
+  dropped kept
+overwritten:
+  dropped first
+  second
+  dropped second
+the last owner overwritten first:
+  dropped b
+  replacement a's
+  dropped a's
+  dropped replacement
+structs holding references:
+  y x
+  x y
+  dropped x
+  dropped y
+variants:
+  failed ok
+  dropped ok
+the container replaced by the value:
+  replacing the slots
+  dropped slot 0
+  dropped slot 1
+  dropped stored
+  new 0
+  dropped new 0
+  dropped new 1
+done

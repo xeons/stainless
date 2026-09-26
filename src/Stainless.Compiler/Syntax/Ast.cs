@@ -733,19 +733,6 @@ public sealed record BlockSyntax(SourceSpan Span, IReadOnlyList<StatementSyntax>
     : StatementSyntax(Span);
 
 /// <summary>
-/// <c>var (count, name) = Split(line);</c> — a tuple taken apart into locals.
-///
-/// The names are here rather than in the type, because this is where a name is
-/// actually wanted: a tuple's own fields are <c>Item1</c> upwards, and what
-/// they mean is a property of the call that produced them.
-/// </summary>
-public sealed record DeconstructSyntax(
-    SourceSpan Span,
-    IReadOnlyList<string> Names,
-    IReadOnlyList<SourceSpan> NameSpans,
-    ExpressionSyntax Value) : StatementSyntax(Span);
-
-/// <summary>
 /// A function declared in a block: <c>int Square(int x) =&gt; x * x;</c>.
 ///
 /// The declaration is an ordinary function's, so everything a function may
@@ -798,7 +785,14 @@ public sealed record ForEachSyntax(
     TypeSyntax? Type,
     string Name,
     ExpressionSyntax Collection,
-    StatementSyntax Body) : StatementSyntax(Span);
+    StatementSyntax Body) : StatementSyntax(Span)
+{
+    /// <summary>
+    /// <c>(k, v)</c> in <c>foreach (var (k, v) in pairs)</c>, which takes each
+    /// element apart; null for a loop with one variable.
+    /// </summary>
+    public TupleSyntax? Deconstruction { get; init; }
+}
 
 /// <summary>
 /// <c>parallel { ... }</c> — a fork-join scope. Every <c>spawn</c> inside it has
@@ -1074,6 +1068,18 @@ public sealed record NameSyntax(SourceSpan Span, QualifiedName Name) : Expressio
 /// </summary>
 public sealed record TupleSyntax(
     SourceSpan Span, IReadOnlyList<ExpressionSyntax> Elements) : ExpressionSyntax(Span);
+
+/// <summary>
+/// <c>int a</c> or <c>var a</c> as an element of a tuple being taken apart:
+/// <c>(int a, var b) = pair;</c>. A null <see cref="Type"/> means <c>var</c>,
+/// and the name <c>_</c> declares nothing.
+///
+/// <c>var (a, b)</c> is read as <c>(var a, var b)</c>, so it has no node of its
+/// own.
+/// </summary>
+public sealed record DeclarationExpressionSyntax(
+    SourceSpan Span, TypeSyntax? Type, string Name, SourceSpan NameSpan)
+    : ExpressionSyntax(Span);
 
 /// <summary>
 /// <c>try e</c>: the value if it succeeded, and otherwise a return from the

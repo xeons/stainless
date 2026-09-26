@@ -502,6 +502,11 @@ loop, so a managed element is released at the end of each iteration rather than
 piling up until the loop ends. `break` and `continue` behave as in any other
 loop; `continue` advances the enumerator.
 
+`foreach (var (key, value) in pairs)` takes each element apart into the names
+it declares, by the rules of
+[§2.2.5](02-types.md#225-taking-a-tuple-apart): a tuple by its elements,
+anything else by its `Deconstruct`.
+
 ## 9.5 What may cross a thread boundary
 
 Checked wherever a value can reach a second thread: a `spawn` argument or
@@ -975,6 +980,10 @@ storage, and `points[1].X = 5` writes into the array.
 `a ??= b` evaluates its place once as well: it asks whether the place is empty,
 and only then evaluates `b` and stores it. On a property the getter is called
 once and the setter only when the getter answered nothing.
+
+**`(a, b) = (b, a)` stores after it has read everything.** Its targets are
+evaluated left to right, then every value on the right, then the stores —
+[§2.2.5](02-types.md#225-taking-a-tuple-apart) has the whole of it.
 
 ## 9.15 `@name`
 
