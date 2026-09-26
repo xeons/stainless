@@ -130,6 +130,12 @@ public sealed partial class Binder
         if (syntax.Callee is NameSyntax { TypeArguments: not null } explicitly)
             return BindCallWithTypeArguments(syntax, explicitly, arguments);
 
+        // A local whose declaration was already refused: what it would have
+        // held is unknown, and that was reported where it was declared.
+        if (syntax.Callee is NameSyntax { Name.Parts: [var refused], TypeArguments: null } &&
+            LookupLocal(refused) is { } unusable && unusable.Type.IsError())
+            return new BoundErrorExpression(syntax.Span);
+
         // A local, parameter or field holding a delegate is called indirectly,
         // and shadows any function of the same name -- the value is nearer.
         if (BindDelegateTarget(syntax.Callee) is { } indirect)

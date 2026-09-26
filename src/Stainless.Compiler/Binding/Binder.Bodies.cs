@@ -1542,6 +1542,10 @@ public sealed partial class Binder
                         type = natural;
                         initializer = BindConversion(initializer, natural, syntax.Initializer.Span);
                     }
+                    else if (ReportedLambdaBody(written))
+                    {
+                        type = ErrorTypeSymbol.Instance;
+                    }
                     else
                     {
                         diagnostics.Error("SL0553", syntax.Initializer.Span,

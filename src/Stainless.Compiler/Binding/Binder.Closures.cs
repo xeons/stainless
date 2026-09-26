@@ -811,6 +811,29 @@ public sealed partial class Binder
     }
 
     /// <summary>
+    /// Binds the body of a lambda whose parameter types are all written, and
+    /// reports what does not bind in it. True when that reported anything:
+    /// the body's own error is then the reason it has no type.
+    /// </summary>
+    private bool ReportedLambdaBody(LambdaSyntax syntax)
+    {
+        var parameterTypes = new List<TypeSymbol>();
+        foreach (var parameter in syntax.Parameters)
+        {
+            if (parameter.Type is null) return false;
+
+            TypeSymbol resolved;
+            using (diagnostics.Muted()) resolved = ResolveType(parameter.Type, _currentScope!);
+            if (resolved.IsError() || resolved.IsVoid()) return false;
+            parameterTypes.Add(resolved);
+        }
+
+        int before = diagnostics.ErrorCount;
+        ProbeLambdaResult(syntax, parameterTypes, allowVoid: true, report: true);
+        return diagnostics.ErrorCount > before;
+    }
+
+    /// <summary>
     /// The closure type each signature got, so that two lambdas of the same
     /// shape are the same type rather than two types that look alike.
     /// </summary>

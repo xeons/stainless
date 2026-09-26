@@ -130,6 +130,20 @@ public class InferenceTests
     }
 
     /// <summary>
+    /// The same for a lambda given to <c>var</c>: its parameters are written,
+    /// so its body is why it has no type, and SL0553 would hide what is wrong.
+    /// A call through the refused local says nothing more.
+    /// </summary>
+    [Fact]
+    public void AVarLambdaReportsItsBodysError()
+    {
+        var codes = Body("var f = (int n) => n.NoSuchField;\n    int k = f(2);");
+        Assert.Contains("SL0247", codes);
+        Assert.DoesNotContain("SL0553", codes);
+        Assert.DoesNotContain("SL0252", codes);
+    }
+
+    /// <summary>
     /// A block-bodied lambda's result is the one type its <c>return</c>s agree
     /// on, so it is read off them.
     /// </summary>
