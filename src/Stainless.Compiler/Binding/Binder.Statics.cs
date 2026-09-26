@@ -100,7 +100,7 @@ public sealed partial class Binder
                     declaration.Span, declaration.Modifiers, declaration.Type,
                     declaration.Name, declaration.Initializer, false, []),
                 scope,
-                new Dictionary<string, TypeSymbol>(_substitution, StringComparer.Ordinal));
+                new Dictionary<string, TypeSymbol>(_context.Substitution, StringComparer.Ordinal));
     }
 
     private void DeclareStatic(
@@ -145,7 +145,7 @@ public sealed partial class Binder
         // one dictionary as it walks in and out of instantiations, and this has
         // to be what T meant here.
         _staticSyntax[symbol] = (declaration, scope,
-            new Dictionary<string, TypeSymbol>(_substitution, StringComparer.Ordinal));
+            new Dictionary<string, TypeSymbol>(_context.Substitution, StringComparer.Ordinal));
     }
 
     /// <summary>
@@ -160,8 +160,6 @@ public sealed partial class Binder
     /// </summary>
     private void BindStatics()
     {
-        var previousSubstitution = _substitution;
-
         // Binding one initializer can instantiate a generic and so declare more
         // statics, which is why this is a loop over what is left rather than a
         // walk of what was there.
@@ -176,11 +174,12 @@ public sealed partial class Binder
             {
                 _boundStatics.Add(symbol);
 
-                _currentScope = scope;
-                _currentFunction = StaticInitializerContext(symbol);
-                _substitution = substitution;
-
-                BindStatic(symbol, declaration, scope);
+                using (Enter(_context.ForBody(StaticInitializerContext(symbol)) with
+                       {
+                           File = scope,
+                           Substitution = substitution,
+                       }))
+                    BindStatic(symbol, declaration, scope);
 
                 // A static outlives every thread, so whatever it holds is
                 // reachable from all of them at once. Said, not refused: a
@@ -193,9 +192,6 @@ public sealed partial class Binder
                             : $"static '{symbol.Name}'");
             }
         }
-
-        _currentScope = null;
-        _substitution = previousSubstitution;
     }
 
     /// <summary>
@@ -216,7 +212,7 @@ public sealed partial class Binder
                 ContainingType = type,
                 IsStatic = true,
                 Span = symbol.Span,
-                Scope = _currentScope,
+                Scope = _context.File,
             };
 
     /// <summary>

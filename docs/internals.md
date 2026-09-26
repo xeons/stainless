@@ -208,6 +208,34 @@ ships in the same directory.
 | [runtime/](../runtime/) | the whole runtime, split by feature |
 | [stdlib/](../stdlib/) | the standard library, written in Stainless: a folder per module, a file per public type |
 
+## Where binding is, and binding on trial
+
+Everything about where the binder is — the function, the file, the type
+arguments, the locals, the loops, the lambdas being bound, what is known about
+each variant — is one `BinderContext`. A body bound in the middle of another,
+such as a lambda, a local function, an instantiation's signature or a static's
+initializer, is bound in a context of its own entered with `using`, and the
+one it interrupted is back when that is disposed. Nothing saves and restores
+the fields one at a time, so nothing forgets one.
+
+Some binding is a trial: an overload is tried, a lambda's body is bound to learn
+what it produces, or a name is bound to see whether it is callable. Binding
+changes the program as well as describing it. It instantiates generics and
+queues their bodies, makes closure classes and array types, and records members
+as written and parameters as assigned. A trial either keeps all of that or
+takes all of it back. Every table it adds to is written through `Remember`,
+which notes how to undo the write, and every list is cut back to its length
+when the trial began. A generic candidate that loses is discarded, so what its
+lambdas instantiated is not emitted. A lambda's result, once found, is kept,
+because it may be a type the body was the first to name.
+
+A quiet trial mutes what it reports, because a guess that fails is not the
+program's error. What an instantiation made inside one reports is not muted.
+It is held until the outermost trial ends, and reported if that trial is kept,
+because the cache would otherwise hand the instantiation to the real bind
+with its complaint lost. A constraint broken by a call written `n.Count()`
+went unreported that way.
+
 ## One object per type
 
 Two types are the same type exactly when they are the same object, so `==` is

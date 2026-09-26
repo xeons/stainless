@@ -93,12 +93,12 @@ public sealed partial class Binder
         }
 
         label.Declared = syntax.Span;
-        label.Block = _scopes[^1];
+        label.Block = _context.Locals[^1];
 
         // A variant narrowed above a label is not narrowed at it: a jump
         // arrives here from elsewhere, and what it proved on the way is not
         // what the fall-through proved.
-        _variantFacts = [];
+        _context.VariantFacts = [];
         return new BoundLabel(syntax.Span, label);
     }
 
@@ -109,7 +109,7 @@ public sealed partial class Binder
         label.FirstUse ??= syntax.LabelSpan;
 
         var jump = new BoundGoto(syntax.Span, label);
-        _jumps.Jumps.Add(new Jump(jump, $"goto {syntax.Label}", [.. _scopes], _jumps.ParallelBase));
+        _context.Jumps.Jumps.Add(new Jump(jump, $"goto {syntax.Label}", [.. _context.Locals], _context.Jumps.ParallelBase));
         return jump;
     }
 
@@ -124,7 +124,7 @@ public sealed partial class Binder
         // Until the switch is bound it is not known which section this is.
         var statement = new BoundGoto(syntax.Span, new LabelSymbol("case"));
 
-        if (_jumps.Switches.Count == 0)
+        if (_context.Jumps.Switches.Count == 0)
         {
             diagnostics.Error("SL0802", syntax.Span,
                 $"'{written}' names a section of the switch statement it is in, and this " +
@@ -132,7 +132,7 @@ public sealed partial class Binder
             return statement;
         }
 
-        var frame = _jumps.Switches[^1];
+        var frame = _context.Jumps.Switches[^1];
         object? key = null;
 
         if (syntax.Value is not null && frame.OverVariant)
@@ -159,7 +159,7 @@ public sealed partial class Binder
             }
         }
 
-        var jump = new Jump(statement, written, [.. _scopes], _jumps.ParallelBase);
+        var jump = new Jump(statement, written, [.. _context.Locals], _context.Jumps.ParallelBase);
         frame.Pending.Add((jump, key, syntax.Span));
         return statement;
     }
@@ -170,15 +170,15 @@ public sealed partial class Binder
 
     private SwitchFrame OpenSwitchFrame(TypeSymbol governing, bool overVariant)
     {
-        var frame = new SwitchFrame(governing, overVariant, _scopes[^1]);
-        _jumps.Switches.Add(frame);
+        var frame = new SwitchFrame(governing, overVariant, _context.Locals[^1]);
+        _context.Jumps.Switches.Add(frame);
         return frame;
     }
 
     /// <summary>Points every <c>goto case</c> in a bound switch at the section it names.</summary>
     private void CloseSwitchFrame(SwitchFrame frame, IReadOnlyList<BoundSwitchSection> sections)
     {
-        _jumps.Switches.RemoveAt(_jumps.Switches.Count - 1);
+        _context.Jumps.Switches.RemoveAt(_context.Jumps.Switches.Count - 1);
 
         foreach (var (jump, key, span) in frame.Pending)
         {
@@ -201,7 +201,7 @@ public sealed partial class Binder
             };
 
             jump.Statement.Label = section.Entry;
-            _jumps.Jumps.Add(jump);
+            _context.Jumps.Jumps.Add(jump);
         }
     }
 
@@ -213,7 +213,7 @@ public sealed partial class Binder
     /// </summary>
     private void CheckJumps(string owner)
     {
-        foreach (var label in _jumps.Labels.Values)
+        foreach (var label in _context.Jumps.Labels.Values)
         {
             if (label.Declared is null && label.FirstUse is { } used)
                 diagnostics.Error("SL0589", used,
@@ -224,7 +224,7 @@ public sealed partial class Binder
                     $"nothing jumps to '{label.Name}'");
         }
 
-        foreach (var jump in _jumps.Jumps)
+        foreach (var jump in _context.Jumps.Jumps)
         {
             if (jump.Statement.Label.Block is not { } block)
                 continue;
@@ -247,7 +247,7 @@ public sealed partial class Binder
     /// <summary>The label of that name in this function, made on first mention.</summary>
     private LabelSymbol LabelNamed(string name)
     {
-        if (_jumps.Labels.TryGetValue(name, out var existing)) return existing;
-        return _jumps.Labels[name] = new LabelSymbol(name);
+        if (_context.Jumps.Labels.TryGetValue(name, out var existing)) return existing;
+        return _context.Jumps.Labels[name] = new LabelSymbol(name);
     }
 }

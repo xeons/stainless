@@ -49,7 +49,7 @@ public sealed partial class Binder
     {
         foreach (var (scope, unit) in _units)
         {
-            _currentScope = scope;
+            _context.File = scope;
 
             Check(unit.Documentation, unit.DocumentationSpan, unit.Span,
                 new Documented($"module {unit.ModuleName?.Text ?? scope.Module.Name}",
@@ -59,7 +59,7 @@ public sealed partial class Binder
                 CheckDeclaration(declaration);
         }
 
-        _currentScope = null;
+        _context.File = null;
     }
 
     /// <summary>
@@ -76,7 +76,7 @@ public sealed partial class Binder
 
     /// <summary>The symbol a type declaration made, or null for a generic one.</summary>
     private NamedTypeSymbol? TypeDeclared(TypeDeclSyntax type) =>
-        _currentScope!.Module.Types.TryGetValue(type.Name, out var declared)
+        _context.File!.Module.Types.TryGetValue(type.Name, out var declared)
             ? declared as NamedTypeSymbol
             : null;
 
@@ -444,8 +444,8 @@ public sealed partial class Binder
         if (returns is not NamedTypeSyntax named) return null;
 
         var written = named.Name.Parts[^1] == "Result" && named.TypeArguments.Count == 2
-            ? ResolveType(named.TypeArguments[1], _currentScope!)
-            : ResolveType(named, _currentScope!);
+            ? ResolveType(named.TypeArguments[1], _context.File!)
+            : ResolveType(named, _context.File!);
 
         // A variant carries its cases and an enum is a set of them. Anything
         // else -- a String, a number -- is a value rather than a report.
@@ -479,7 +479,7 @@ public sealed partial class Binder
         if (TypeNamed(parts) is not null) return true;
         if (ModuleNamed(parts) is not null) return true;
 
-        var here = _currentScope!.Module;
+        var here = _context.File!.Module;
 
         // A name in this module's own file may be written as a caller would
         // write it from outside -- `File.ReadAllText`, under the short name the
@@ -529,10 +529,10 @@ public sealed partial class Binder
     {
         if (parts.Count == 1)
         {
-            if (_currentScope!.Module.GenericTypes.TryGetValue(parts[0], out var here))
+            if (_context.File!.Module.GenericTypes.TryGetValue(parts[0], out var here))
                 return here;
 
-            foreach (var imported in _currentScope.ImportedModules)
+            foreach (var imported in _context.File.ImportedModules)
                 if (imported.GenericTypes.TryGetValue(parts[0], out var there) && there.IsPublic)
                     return there;
 
@@ -589,7 +589,7 @@ public sealed partial class Binder
     {
         string name = string.Join('.', parts);
 
-        if (_currentScope!.Imports.TryGetValue(name, out var imported)) return imported;
+        if (_context.File!.Imports.TryGetValue(name, out var imported)) return imported;
         return _modules.TryGetValue(name, out var known) ? known : null;
     }
 

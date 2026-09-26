@@ -59,7 +59,7 @@ public sealed partial class Binder
             }
         }
 
-        _currentScope = null;
+        _context.File = null;
     }
 
     private void BindFunctionBody(FunctionSymbol function)
@@ -76,22 +76,12 @@ public sealed partial class Binder
         if (function.Body is null) return;
         if (!_boundFunctions.Add(function)) return;
 
-        // Bound against the imports of the file it was written in.
-        if (function.Scope is not null) _currentScope = function.Scope;
-
-        _currentFunction = function;
-        _scopes.Clear();
-        _loopDepth = 0;
-        _switchDepth = 0;
-        _variantFacts = [];
-        _jumps = new JumpState();
-        _checkedArithmetic = false;
         _patternVariableNames.Clear();
 
         // `base(...)` is only a statement at the very head of a constructor, so
         // the one place it may appear is found before anything is bound and
         // every other appearance is refused where it stands.
-        _constructorChain = function.Kind == FunctionKind.Constructor
+        var chain = function.Kind == FunctionKind.Constructor
             ? function.Body.Statements.FirstOrDefault() is
                 ExpressionStatementSyntax
                 {
@@ -101,6 +91,20 @@ public sealed partial class Binder
                 : null
             : null;
 
+        // Bound against the imports of the file it was written in.
+        using var entered = Enter(_context with
+        {
+            File = function.Scope ?? _context.File,
+            Function = function,
+            Locals = [],
+            LoopDepth = 0,
+            SwitchDepth = 0,
+            VariantFacts = [],
+            Jumps = new JumpState(),
+            CheckedArithmetic = false,
+            ConstructorChain = chain,
+        });
+
         PushScope();
         var body = BindBlock(function.Body);
         PopScope();
@@ -109,7 +113,7 @@ public sealed partial class Binder
         // against what is written the way capturing a field already is.
         NoteGetterReads(function, body);
 
-        _constructorChain = null;
+        _context.ConstructorChain = null;
 
         CheckJumps($"'{function.Name}'");
 
@@ -128,14 +132,7 @@ public sealed partial class Binder
         CheckOutParametersAssigned(function, body);
 
         _functions.Add(new BoundFunction(function, body));
-        _currentFunction = null;
     }
-
-    /// <summary>
-    /// The one <c>base(...)</c> a constructor may contain, or null. Compared by
-    /// reference, so a second one anywhere else is not it.
-    /// </summary>
-    private CallSyntax? _constructorChain;
 
     /// <summary>
     /// Puts the base construction at the head of a constructor when the source
@@ -216,33 +213,33 @@ public sealed partial class Binder
         if (initialized.Count == 0) return body;
 
         var self = constructor.Parameters[0];
-        var savedScope = _currentScope;
         var statements = new List<BoundStatement>();
 
         foreach (var field in initialized)
         {
+            var written = field.InitializerSyntax!;
+
             // Bound against the file the *field* was written in, which is not
             // necessarily this constructor's: a type may be declared across
             // files, and a name means what it meant where it was written.
-            if (field.InitializerScope is not null) _currentScope = field.InitializerScope;
-
-            var written = field.InitializerSyntax!;
-
+            //
             // With `this` out of reach, so an initializer cannot read a field
             // that has not been given its value yet -- the mistake C# also
             // refuses, and the reason it refuses it.
-            _initializingField = true;
             _reportedFieldInitializerReach = false;
-            var value = BindConversion(BindExpression(written), field.Type, written.Span);
-            _initializingField = false;
+            BoundExpression value;
+            using (Enter(_context with
+                   {
+                       File = field.InitializerScope ?? _context.File,
+                       InitializingField = true,
+                   }))
+                value = BindConversion(BindExpression(written), field.Type, written.Span);
 
             var target = new BoundFieldAccess(written.Span, Receiver(written.Span, self), field);
 
             statements.Add(new BoundExpressionStatement(
                 written.Span, new BoundAssignment(written.Span, target, value)));
         }
-
-        _currentScope = savedScope;
 
         // After an explicit `base(...)` or the chain check would move it; the
         // implicit one is prepended after this runs.
@@ -253,21 +250,15 @@ public sealed partial class Binder
     }
 
     /// <summary>
-    /// Set while a field initializer is being bound, which is the one place
-    /// <c>this</c> is out of reach inside a constructor.
-    /// </summary>
-    private bool _initializingField;
-
-    /// <summary>
     /// <c>base(args)</c> at the head of a constructor: run the base's
     /// constructor over this same object, before this one's body.
     /// </summary>
     private BoundExpression BindBaseConstruction(CallSyntax syntax, List<BoundExpression> arguments)
     {
-        if (!ReferenceEquals(syntax, _constructorChain))
+        if (!ReferenceEquals(syntax, _context.ConstructorChain))
         {
             diagnostics.Error("SL0516", syntax.Span,
-                _currentFunction?.Kind == FunctionKind.Constructor
+                _context.Function?.Kind == FunctionKind.Constructor
                     ? "'base(...)' has to be the first statement of the constructor: the base " +
                       "class is built before this class's body runs, and a body that had already " +
                       "run would be reading fields nothing had set"
@@ -276,10 +267,10 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
-        if (_currentFunction!.ContainingType is not ClassTypeSymbol classType)
+        if (_context.Function!.ContainingType is not ClassTypeSymbol classType)
         {
             diagnostics.Error("SL0515", syntax.Span,
-                $"'{_currentFunction.ContainingType!.Name}' is a struct, so there is nothing " +
+                $"'{_context.Function.ContainingType!.Name}' is a struct, so there is nothing " +
                 "above it to construct; only a class derives from another");
             return new BoundErrorExpression(syntax.Span);
         }
@@ -305,7 +296,7 @@ public sealed partial class Binder
             ancestor.Constructors, arguments, syntax.Span, $"base {ancestor.Name}");
         if (chosen is null) return new BoundErrorExpression(syntax.Span);
 
-        var self = new BoundThis(syntax.Span, classType, _currentFunction.Parameters[0]);
+        var self = new BoundThis(syntax.Span, classType, _context.Function.Parameters[0]);
         var receiver = new BoundConversion(syntax.Span, ancestor, self, ConversionKind.Upcast);
 
         _boundExplicitChain = true;
@@ -322,10 +313,10 @@ public sealed partial class Binder
     /// </summary>
     private BoundExpression BindThisConstruction(CallSyntax syntax, List<BoundExpression> arguments)
     {
-        if (!ReferenceEquals(syntax, _constructorChain))
+        if (!ReferenceEquals(syntax, _context.ConstructorChain))
         {
             diagnostics.Error("SL0516", syntax.Span,
-                _currentFunction?.Kind == FunctionKind.Constructor
+                _context.Function?.Kind == FunctionKind.Constructor
                     ? "'this(...)' has to be the first statement of the constructor: it is what " +
                       "builds the object, and a body that had already run would be overwritten " +
                       "by it"
@@ -334,24 +325,24 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
-        var owner = _currentFunction!.ContainingType!;
+        var owner = _context.Function!.ContainingType!;
 
         var chosen = ResolveOverload(
             owner.Constructors, arguments, syntax.Span, $"this {owner.Name}");
         if (chosen is null) return new BoundErrorExpression(syntax.Span);
 
-        if (chosen == _currentFunction)
+        if (chosen == _context.Function)
         {
             diagnostics.Error("SL0521", syntax.Span,
                 $"this constructor of '{owner.Name}' delegates to itself");
             return new BoundErrorExpression(syntax.Span);
         }
 
-        _delegated[_currentFunction] = chosen;
+        _delegated[_context.Function] = chosen;
 
         // The receiver is what the constructor was handed: a class reference,
         // or the address of the struct being filled in.
-        var receiver = _currentFunction.Parameters[0];
+        var receiver = _context.Function.Parameters[0];
         var self = new BoundThis(syntax.Span, receiver.Type, receiver);
 
         _boundExplicitChain = true;
@@ -990,7 +981,7 @@ public sealed partial class Binder
         {
             if (NarrowableSubject(current) is not { } subject) continue;
 
-            _variantFacts.Remove(subject);
+            _context.VariantFacts.Remove(subject);
             foreach (var witness in _writtenWitnesses) witness.Add(subject);
             return;
         }
@@ -1101,11 +1092,11 @@ public sealed partial class Binder
         return merged;
     }
 
-    private Dictionary<object, Fact> SnapshotFacts() => new(_variantFacts);
+    private Dictionary<object, Fact> SnapshotFacts() => new(_context.VariantFacts);
 
     private void ApplyFacts(Dictionary<object, Fact> facts)
     {
-        foreach (var (key, value) in facts) _variantFacts[key] = value;
+        foreach (var (key, value) in facts) _context.VariantFacts[key] = value;
     }
 
     /// <summary>
@@ -1122,7 +1113,7 @@ public sealed partial class Binder
         CollectAssignedNames(body, assigned);
         if (assigned.Count == 0) return;
 
-        foreach (var subject in _variantFacts.Keys.ToList())
+        foreach (var subject in _context.VariantFacts.Keys.ToList())
         {
             string name = subject switch
             {
@@ -1131,7 +1122,7 @@ public sealed partial class Binder
                 _ => "",
             };
 
-            if (assigned.Contains(name)) _variantFacts.Remove(subject);
+            if (assigned.Contains(name)) _context.VariantFacts.Remove(subject);
         }
     }
 
@@ -1250,7 +1241,7 @@ public sealed partial class Binder
         // by the time control reaches here" stops being a question this walk
         // can answer. Rather than guess, the check stands down -- and the
         // clearing at the call site is what still holds.
-        if (_jumps.Labels.Count > 0 || _jumps.Jumps.Count > 0) return;
+        if (_context.Jumps.Labels.Count > 0 || _context.Jumps.Jumps.Count > 0) return;
 
         foreach (var parameter in outward)
             if (!Assigns(body, parameter, false, function) && EndIsReachable(body))
@@ -1413,13 +1404,13 @@ public sealed partial class Binder
 
     // ------------------------------------------------------------ scopes
 
-    private void PushScope() => _scopes.Add(new Dictionary<string, LocalSymbol>(StringComparer.Ordinal));
-    private void PopScope() => _scopes.RemoveAt(_scopes.Count - 1);
+    private void PushScope() => _context.Locals.Add(new Dictionary<string, LocalSymbol>(StringComparer.Ordinal));
+    private void PopScope() => _context.Locals.RemoveAt(_context.Locals.Count - 1);
 
     private LocalSymbol? LookupLocal(string name)
     {
-        for (int i = _scopes.Count - 1; i >= 0; i--)
-            if (_scopes[i].TryGetValue(name, out var local)) return local;
+        for (int i = _context.Locals.Count - 1; i >= 0; i--)
+            if (_context.Locals[i].TryGetValue(name, out var local)) return local;
         return null;
     }
 
@@ -1427,11 +1418,11 @@ public sealed partial class Binder
     {
         var local = new LocalSymbol(name, type, isConst);
         if (LookupLocal(name) is not null ||
-            _localFunctionScopes.Count > 0 && _localFunctionScopes[^1].ContainsKey(name))
+            _context.LocalFunctionScopes.Count > 0 && _context.LocalFunctionScopes[^1].ContainsKey(name))
             diagnostics.Error("SL0218", span, $"'{name}' is already declared in this scope");
-        else if (_currentFunction?.Parameters.Any(p => p.Name == name) == true)
+        else if (_context.Function?.Parameters.Any(p => p.Name == name) == true)
             diagnostics.Error("SL0219", span, $"'{name}' is already the name of a parameter");
-        _scopes[^1][name] = local;
+        _context.Locals[^1][name] = local;
         return local;
     }
 
@@ -1444,7 +1435,7 @@ public sealed partial class Binder
         var block = new BoundBlock(syntax.Span, statements);
 
         var functions = new Dictionary<string, LocalFunction>(StringComparer.Ordinal);
-        _localFunctionScopes.Add(functions);
+        _context.LocalFunctionScopes.Add(functions);
         DeclareLocalFunctions(syntax, functions);
 
         foreach (var bound in BindStatementList(syntax.Statements))
@@ -1455,7 +1446,7 @@ public sealed partial class Binder
             statements.Add(bound);
         }
 
-        _localFunctionScopes.RemoveAt(_localFunctionScopes.Count - 1);
+        _context.LocalFunctionScopes.RemoveAt(_context.LocalFunctionScopes.Count - 1);
         PopScope();
         return block;
     }
@@ -1632,7 +1623,7 @@ public sealed partial class Binder
         }
         else
         {
-            type = ResolveType(syntax.Type, _currentScope!);
+            type = ResolveType(syntax.Type, _context.File!);
             if (syntax.Initializer is not null)
                 initializer = BindConversion(BindExpression(syntax.Initializer), type, syntax.Initializer.Span);
         }
@@ -1758,13 +1749,13 @@ public sealed partial class Binder
         ApplyFacts(whenTrue);
         var then = BindWhereAssigned(condition, whenTrue: true, () => BindStatement(syntax.Then));
 
-        _variantFacts = new Dictionary<object, Fact>(entry);
+        _context.VariantFacts = new Dictionary<object, Fact>(entry);
         ApplyFacts(whenFalse);
         var otherwise = syntax.Else is null
             ? null
             : BindWhereAssigned(condition, whenTrue: false, () => BindStatement(syntax.Else));
 
-        _variantFacts = entry;
+        _context.VariantFacts = entry;
 
         // A branch that always leaves proves its opposite for everything after
         // the `if`. This is what makes the early return read the way it should:
@@ -1813,18 +1804,18 @@ public sealed partial class Binder
 
         // A loop body runs again, so anything it assigns to is unknown inside it
         // however the loop was entered.
-        if (_variantFacts.Count > 0) InvalidateAssignedIn(syntax.Body);
+        if (_context.VariantFacts.Count > 0) InvalidateAssignedIn(syntax.Body);
 
         var entry = SnapshotFacts();
         ApplyFacts(ConditionFacts(condition).WhenTrue);
 
-        _loopDepth++;
+        _context.LoopDepth++;
         var body = BindWhereAssigned(condition, whenTrue: true, () => BindStatement(syntax.Body));
-        _loopDepth--;
+        _context.LoopDepth--;
 
         // Nothing the condition proved survives the loop: it is also left by
         // failing that same condition.
-        _variantFacts = entry;
+        _context.VariantFacts = entry;
 
         // And what it named is released where the loop ends.
         BoundStatement loop = new BoundWhile(syntax.Span, condition, body);
@@ -1845,17 +1836,17 @@ public sealed partial class Binder
     /// </summary>
     private BoundStatement BindDoWhile(DoWhileSyntax syntax)
     {
-        if (_variantFacts.Count > 0) InvalidateAssignedIn(syntax.Body);
+        if (_context.VariantFacts.Count > 0) InvalidateAssignedIn(syntax.Body);
 
         var entry = SnapshotFacts();
 
-        _loopDepth++;
+        _context.LoopDepth++;
         var body = BindStatement(syntax.Body);
-        _loopDepth--;
+        _context.LoopDepth--;
 
         var condition = BindCondition(syntax.Condition);
 
-        _variantFacts = entry;
+        _context.VariantFacts = entry;
         return new BoundDoWhile(syntax.Span, body, condition);
     }
 
@@ -1865,10 +1856,10 @@ public sealed partial class Binder
     /// </summary>
     private BoundStatement BindCheckedBlock(CheckedBlockSyntax syntax)
     {
-        bool previous = _checkedArithmetic;
-        _checkedArithmetic = syntax.IsChecked;
+        bool previous = _context.CheckedArithmetic;
+        _context.CheckedArithmetic = syntax.IsChecked;
         var body = BindBlock(syntax.Body);
-        _checkedArithmetic = previous;
+        _context.CheckedArithmetic = previous;
         return body;
     }
 
@@ -2064,7 +2055,7 @@ public sealed partial class Binder
         }
 
         InvalidateVariantFact(place);
-        if (WrittenParameter(place) is { } parameter) parameter.IsAssigned = true;
+        if (WrittenParameter(place) is { } parameter) MarkAssigned(parameter);
         NoteMemberWritten(place);
         return true;
     }
@@ -2079,16 +2070,16 @@ public sealed partial class Binder
 
         // The same rule a `while` obeys: what the body assigns to is unknown
         // inside it, and the condition proves nothing after it.
-        if (_variantFacts.Count > 0) InvalidateAssignedIn(syntax.Body);
+        if (_context.VariantFacts.Count > 0) InvalidateAssignedIn(syntax.Body);
         var entry = SnapshotFacts();
         if (condition is not null) ApplyFacts(ConditionFacts(condition).WhenTrue);
 
-        _loopDepth++;
+        _context.LoopDepth++;
         var body = condition is null
             ? BindStatement(syntax.Body)
             : BindWhereAssigned(condition, whenTrue: true, () => BindStatement(syntax.Body));
-        _loopDepth--;
-        _variantFacts = entry;
+        _context.LoopDepth--;
+        _context.VariantFacts = entry;
 
         var result = new BoundFor(syntax.Span, initializer, condition, step, body);
         if (initializer is BoundLocalDeclaration declaration) result.Locals.Add(declaration.Local);
@@ -2244,11 +2235,11 @@ public sealed partial class Binder
     private BoundStatement BindForEachBody(ForEachSyntax syntax, BoundExpression element)
     {
         PushScope();
-        if (_variantFacts.Count > 0) InvalidateAssignedIn(syntax.Body);
+        if (_context.VariantFacts.Count > 0) InvalidateAssignedIn(syntax.Body);
 
         var type = syntax.Type is null
             ? element.Type
-            : ResolveType(syntax.Type, _currentScope!);
+            : ResolveType(syntax.Type, _context.File!);
 
         var value = syntax.Type is null
             ? element
@@ -2275,9 +2266,9 @@ public sealed partial class Binder
             statements.Add(parts);
         }
 
-        _loopDepth++;
+        _context.LoopDepth++;
         statements.Add(BindStatement(syntax.Body));
-        _loopDepth--;
+        _context.LoopDepth--;
 
         PopScope();
         return block;
@@ -2294,27 +2285,27 @@ public sealed partial class Binder
     /// </summary>
     private BoundStatement BindParallel(ParallelSyntax syntax)
     {
-        int enclosingLoops = _loopDepth;
-        int enclosingSwitches = _switchDepth;
-        int enclosingBase = _jumps.ParallelBase;
-        _loopDepth = 0;
-        _switchDepth = 0;
-        _parallelDepth++;
-        _jumps.ParallelBase = _scopes.Count;
+        int enclosingLoops = _context.LoopDepth;
+        int enclosingSwitches = _context.SwitchDepth;
+        int enclosingBase = _context.Jumps.ParallelBase;
+        _context.LoopDepth = 0;
+        _context.SwitchDepth = 0;
+        _context.ParallelDepth++;
+        _context.Jumps.ParallelBase = _context.Locals.Count;
 
         var body = BindBlock(syntax.Body);
 
-        _jumps.ParallelBase = enclosingBase;
-        _parallelDepth--;
-        _loopDepth = enclosingLoops;
-        _switchDepth = enclosingSwitches;
+        _context.Jumps.ParallelBase = enclosingBase;
+        _context.ParallelDepth--;
+        _context.LoopDepth = enclosingLoops;
+        _context.SwitchDepth = enclosingSwitches;
 
         return new BoundParallel(syntax.Span, body);
     }
 
     private BoundStatement BindSpawn(SpawnSyntax syntax)
     {
-        if (_parallelDepth == 0)
+        if (_context.ParallelDepth == 0)
         {
             diagnostics.Error("SL0364", syntax.Span,
                 "'spawn' needs an enclosing 'parallel' block; it is that block's " +
@@ -2387,24 +2378,24 @@ public sealed partial class Binder
     /// </summary>
     private BoundStatement BindParallelFor(ParallelForSyntax syntax)
     {
-        int enclosingBase = _jumps.ParallelBase;
-        _jumps.ParallelBase = _scopes.Count;
+        int enclosingBase = _context.Jumps.ParallelBase;
+        _context.Jumps.ParallelBase = _context.Locals.Count;
         PushScope();
 
-        int enclosingLoops = _loopDepth;
-        int enclosingSwitches = _switchDepth;
-        _loopDepth = 0;
-        _switchDepth = 0;
-        _parallelDepth++;
+        int enclosingLoops = _context.LoopDepth;
+        int enclosingSwitches = _context.SwitchDepth;
+        _context.LoopDepth = 0;
+        _context.SwitchDepth = 0;
+        _context.ParallelDepth++;
 
         var result = BindParallelForCore(syntax);
 
-        _parallelDepth--;
-        _loopDepth = enclosingLoops;
-        _switchDepth = enclosingSwitches;
+        _context.ParallelDepth--;
+        _context.LoopDepth = enclosingLoops;
+        _context.SwitchDepth = enclosingSwitches;
 
         PopScope();
-        _jumps.ParallelBase = enclosingBase;
+        _context.Jumps.ParallelBase = enclosingBase;
         return result;
     }
 

@@ -37,8 +37,6 @@ public sealed partial class Binder
     /// </summary>
     private void DrainPending()
     {
-        var previous = _substitution;
-
         // The two feed each other. Binding a body can instantiate a generic,
         // which declares that instantiation's statics; binding a static's
         // initializer can instantiate one too, which queues more bodies. So
@@ -49,21 +47,19 @@ public sealed partial class Binder
         // it, and binding those can ask for more.
         do
         {
-            while (_pending.Count > 0 || _staticSyntax.Count != _boundStatics.Count)
+            while (PendingCount > 0 || _staticSyntax.Count != _boundStatics.Count)
             {
-                while (_pending.Count > 0)
+                while (PendingCount > 0)
                 {
-                    var (function, substitution) = _pending.Dequeue();
-                    _substitution = substitution;
-                    BindFunctionBody(function);
+                    var (function, substitution) = _pending[_pendingBound++];
+                    using (Enter(_context with { Substitution = substitution }))
+                        BindFunctionBody(function);
                 }
 
                 BindStatics();
             }
         }
         while (CompleteGenericDispatch() | CompleteVariantGenericSlots());
-
-        _substitution = previous;
 
         // Only now is the set of statics closed, so this is the first moment at
         // which the order they run in can be settled.
@@ -128,8 +124,8 @@ public sealed partial class Binder
     /// </summary>
     private string MadeTypeName(string module, string written, Func<string> qualified)
     {
-        string name = _madeTypeNames.Add(module + "." + written) ? written : qualified();
-        _madeTypeNames.Add(module + "." + name);
+        string name = Remember(_madeTypeNames, module + "." + written) ? written : qualified();
+        Remember(_madeTypeNames, module + "." + name);
         return name;
     }
 
@@ -195,6 +191,8 @@ public sealed partial class Binder
         var key = new InstantiationKey(template, new TypeList(arguments));
         if (_instantiatedTypes.TryGetValue(key, out var existing)) return existing;
 
+        using var owed = OweToTrial();
+
         if (RefuseRunawayInstantiation(template.Name, arguments, span))
             return new StructTypeSymbol { SimpleName = template.Name, ModuleName = template.Module.Name };
 
@@ -238,7 +236,7 @@ public sealed partial class Binder
         // template such as `class Node<T> { Node<T>? next; }` terminates.
         ReadInheritanceModifiers(type, declaration);
 
-        _instantiatedTypes[key] = type;
+        Remember(_instantiatedTypes, key, type);
         if (type is ClassTypeSymbol instantiatedClass) _classes.Add(instantiatedClass);
         if (type is InterfaceTypeSymbol instantiatedInterface) _interfaces.Add(instantiatedInterface);
         if (type is StructTypeSymbol instantiatedStruct) _structs.Add(instantiatedStruct);
@@ -246,13 +244,9 @@ public sealed partial class Binder
         var substitution = new Dictionary<string, TypeSymbol>(StringComparer.Ordinal);
         for (int i = 0; i < arguments.Count; i++) substitution[template.Parameters[i]] = arguments[i];
 
-        var previousSubstitution = _substitution;
-        var previousScope = _currentScope;
-        _substitution = substitution;
-
         // A template is bound with the imports of the file that declared it, not
         // those of the file asking for this instantiation.
-        _currentScope = template.Scope;
+        using var entered = Enter(_context with { Substitution = substitution, File = template.Scope });
 
         VerifyConstraintsOnceSettled(declaration.Constraints, template.Parameters, substitution,
             template.Scope, $"'{template.Name}'", span);
@@ -278,7 +272,7 @@ public sealed partial class Binder
         // having been set by the premature walk. So the layouts wait for the
         // outermost instantiation to finish, which is the moment every member
         // any of them holds is known.
-        _awaitingLayout.Add(type);
+        Remember(_awaitingLayout, type);
 
         _instantiationDepth++;
         try
@@ -305,30 +299,28 @@ public sealed partial class Binder
         // substitution.
         foreach (var method in type.Methods.Concat(type.ExplicitImplementations)
                      .Where(m => m.HasBody))
-            _pending.Enqueue((method, substitution));
+            _pending.Add((method, substitution));
 
         // Operators are deliberately not in `Methods` -- they have no receiver
         // and no dispatch slot -- so they have to be queued by name here. Miss
         // this and the symbol still exists, `a + b` still binds and mangles,
         // and the only sign of it is a link error naming the operator.
         foreach (var declared in type.Operators.Where(o => o.HasBody))
-            _pending.Enqueue((declared, substitution));
+            _pending.Add((declared, substitution));
 
         // The same for the one-per-type setup block, which is reached from the
         // static initialization pass rather than by lookup.
         if (type.StaticConstructor is { HasBody: true } setup)
-            _pending.Enqueue((setup, substitution));
+            _pending.Add((setup, substitution));
 
         // A constructor is reached by writing `new` rather than by lookup, so
         // it is queued here whether the type is a class or a struct.
         foreach (var constructor in type.Constructors)
-            _pending.Enqueue((constructor, substitution));
+            _pending.Add((constructor, substitution));
 
         if (type is ClassTypeSymbol { Destructor: { } destructor })
-            _pending.Enqueue((destructor, substitution));
+            _pending.Add((destructor, substitution));
 
-        _substitution = previousSubstitution;
-        _currentScope = previousScope;
         return type;
     }
 
@@ -358,6 +350,7 @@ public sealed partial class Binder
         var key = new InstantiationKey(template, new TypeList(arguments));
         if (_instantiatedTypes.TryGetValue(key, out var existing)) return existing;
 
+        using var owed = OweToTrial();
         var declaration = template.Declaration;
         string displayName = MadeTypeName(template.Module.Name,
             template.Name + "<" + string.Join(", ", arguments.Select(a => a.Name)) + ">",
@@ -378,23 +371,16 @@ public sealed partial class Binder
         // Registered before the signature is resolved, so a delegate that
         // mentions itself -- `closure Predicate<T> Compose<T>(Predicate<T> a)`
         // -- terminates.
-        _instantiatedTypes[key] = type;
-        _delegateTemplates[type] = template;
+        Remember(_instantiatedTypes, key, type);
+        Remember(_delegateTemplates, type, template);
         if (type is StructTypeSymbol asStruct) _structs.Add(asStruct);
 
         var substitution = new Dictionary<string, TypeSymbol>(StringComparer.Ordinal);
         for (int i = 0; i < arguments.Count; i++) substitution[template.Parameters[i]] = arguments[i];
 
-        var previousSubstitution = _substitution;
-        var previousScope = _currentScope;
+        using (Enter(_context with { Substitution = substitution, File = template.Scope }))
+            DeclareDelegateSignature(type, declaration, template.Scope);
 
-        _substitution = substitution;
-        _currentScope = template.Scope;
-
-        DeclareDelegateSignature(type, declaration, template.Scope);
-
-        _substitution = previousSubstitution;
-        _currentScope = previousScope;
         return type;
     }
 
@@ -417,6 +403,8 @@ public sealed partial class Binder
         var key = new InstantiationKey(template, new TypeList(arguments));
         if (_instantiatedFunctions.TryGetValue(key, out var existing)) return existing;
 
+        using var owed = OweToTrial();
+
         if (RefuseRunawayInstantiation(template.Name, arguments, span)) return null;
 
         // The enclosing type's arguments first, then the method's own on top.
@@ -424,65 +412,61 @@ public sealed partial class Binder
             template.OuterSubstitution, StringComparer.Ordinal);
         for (int i = 0; i < arguments.Count; i++) substitution[template.Parameters[i]] = arguments[i];
 
-        var previousSubstitution = _substitution;
-        var previousScope = _currentScope;
-        _substitution = substitution;
-        _currentScope = template.Scope;
-
-        var declaration = template.Declaration;
-
-        VerifyConstraintsOnceSettled(declaration.Constraints, template.Parameters, substitution,
-            template.Scope, $"'{template.Name}'", span);
-
-        bool dispatchedByClass = template.IsDispatched && template.ContainingType is ClassTypeSymbol;
-
-        var symbol = new FunctionSymbol
+        FunctionSymbol symbol;
+        using (Enter(_context with { Substitution = substitution, File = template.Scope }))
         {
-            Name = template.Name,
-            ModuleName = template.Module.Name,
-            ReturnType = ResolveType(declaration.ReturnType, template.Scope, allowVoid: true),
-            Linkage = LinkageKind.Stainless,
-            Kind = template.ContainingType is null ? FunctionKind.Function : FunctionKind.Method,
-            ContainingType = template.ContainingType,
-            IsPublic = template.IsPublic,
-            // Only a member is static; the word on a module function was
-            // refused where the template was declared (SL0573).
-            IsStatic = declaration.Modifiers.HasFlag(Modifiers.Static) &&
-                       template.ContainingType is not null,
-            Body = declaration.Body,
-            Span = declaration.Span,
-            TypeArguments = arguments.ToList(),
-            Scope = template.Scope,
-            Template = template,
-            IsVirtual = dispatchedByClass,
-            IsOverride = dispatchedByClass && declaration.Modifiers.HasFlag(Modifiers.Override),
-            IsAbstract = dispatchedByClass && declaration.Modifiers.HasFlag(Modifiers.Abstract),
-        };
+            var declaration = template.Declaration;
 
-        // A static one has no instance, and giving it one anyway is what made
-        // `Helper.Take<T>(...)` unreachable: the symbol came back with a `this`
-        // nobody could supply and with `IsStatic` false, so the only call shape
-        // that fits a static method was refused as needing an object.
-        if (template.ContainingType is { } containing && !symbol.IsStatic)
-        {
-            // A method receives its instance: classes and interfaces by
-            // reference, structs by pointer.
-            TypeSymbol thisType = containing is ClassTypeSymbol or InterfaceTypeSymbol
-                ? containing
-                : containing.MakePointerType();
-            symbol.Parameters.Add(new ParameterSymbol("this", thisType, 0) { IsThis = true });
+            VerifyConstraintsOnceSettled(declaration.Constraints, template.Parameters, substitution,
+                template.Scope, $"'{template.Name}'", span);
+
+            bool dispatchedByClass = template.IsDispatched && template.ContainingType is ClassTypeSymbol;
+
+            symbol = new FunctionSymbol
+            {
+                Name = template.Name,
+                ModuleName = template.Module.Name,
+                ReturnType = ResolveType(declaration.ReturnType, template.Scope, allowVoid: true),
+                Linkage = LinkageKind.Stainless,
+                Kind = template.ContainingType is null ? FunctionKind.Function : FunctionKind.Method,
+                ContainingType = template.ContainingType,
+                IsPublic = template.IsPublic,
+                // Only a member is static; the word on a module function was
+                // refused where the template was declared (SL0573).
+                IsStatic = declaration.Modifiers.HasFlag(Modifiers.Static) &&
+                           template.ContainingType is not null,
+                Body = declaration.Body,
+                Span = declaration.Span,
+                TypeArguments = arguments.ToList(),
+                Scope = template.Scope,
+                Template = template,
+                IsVirtual = dispatchedByClass,
+                IsOverride = dispatchedByClass && declaration.Modifiers.HasFlag(Modifiers.Override),
+                IsAbstract = dispatchedByClass && declaration.Modifiers.HasFlag(Modifiers.Abstract),
+            };
+
+            // A static one has no instance, and giving it one anyway is what made
+            // `Helper.Take<T>(...)` unreachable: the symbol came back with a `this`
+            // nobody could supply and with `IsStatic` false, so the only call shape
+            // that fits a static method was refused as needing an object.
+            if (template.ContainingType is { } containing && !symbol.IsStatic)
+            {
+                // A method receives its instance: classes and interfaces by
+                // reference, structs by pointer.
+                TypeSymbol thisType = containing is ClassTypeSymbol or InterfaceTypeSymbol
+                    ? containing
+                    : containing.MakePointerType();
+                symbol.Parameters.Add(new ParameterSymbol("this", thisType, 0) { IsThis = true });
+            }
+
+            AddParameters(symbol, declaration.Parameters, template.Scope);
+
+            Remember(_instantiatedFunctions, key, symbol);
+
+            // An interface's with no body is a slot to fill, and an abstract one
+            // is the same: neither has anything to bind.
+            if (symbol.Body is not null) _pending.Add((symbol, substitution));
         }
-
-        AddParameters(symbol, declaration.Parameters, template.Scope);
-
-        _instantiatedFunctions[key] = symbol;
-
-        // An interface's with no body is a slot to fill, and an abstract one
-        // is the same: neither has anything to bind.
-        if (symbol.Body is not null) _pending.Enqueue((symbol, substitution));
-
-        _substitution = previousSubstitution;
-        _currentScope = previousScope;
 
         if (template.IsDispatched) RegisterDispatched(template, symbol, span);
         return symbol;
@@ -509,7 +493,7 @@ public sealed partial class Binder
             return false;
 
         // Every path into the runaway meets the limit at the same call.
-        if (!_runawayReported.Add(span)) return true;
+        if (!Remember(_runawayReported, span)) return true;
 
         diagnostics.Error("SL0798", span,
             $"'{name}' is being instantiated with a type argument nested more than " +
@@ -571,18 +555,10 @@ public sealed partial class Binder
             return;
         }
 
-        _deferredConstraintChecks.Add(() =>
+        Remember(_deferredConstraintChecks, () =>
         {
-            var previous = _substitution;
-            _substitution = substitution;
-            try
-            {
+            using (Enter(_context with { Substitution = substitution }))
                 VerifyConstraints(clauses, parameters, substitution, scope, owner, span);
-            }
-            finally
-            {
-                _substitution = previous;
-            }
         });
     }
 
@@ -768,7 +744,7 @@ public sealed partial class Binder
         bool namesParameter = constraint.Type is NamedTypeSyntax
         {
             Name.Parts.Count: 1, TypeArguments.Count: 0,
-        } bare && _substitution.ContainsKey(bare.Name.Parts[0]);
+        } bare && _context.Substitution.ContainsKey(bare.Name.Parts[0]);
 
         if (!checkedWhereDeclared || namesParameter)
             diagnostics.Error("SL0329", constraint.Span,

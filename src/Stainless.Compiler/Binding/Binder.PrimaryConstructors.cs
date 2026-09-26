@@ -223,19 +223,19 @@ public sealed partial class Binder
     /// </summary>
     private BoundExpression? BindPrimaryParameter(string name, SourceSpan span)
     {
-        if (_currentFunction?.ContainingType is not { } owner) return null;
+        if (_context.Function?.ContainingType is not { } owner) return null;
         if (_refusedCaptures.Contains((owner, name))) return new BoundErrorExpression(span);
         if (!owner.PrimaryCaptures.TryGetValue(name, out var field)) return null;
 
-        if (_currentFunction.IsStatic)
+        if (_context.Function.IsStatic)
         {
-            if (TryGiveLocalFunctionThis(_currentFunction, span))
+            if (TryGiveLocalFunctionThis(_context.Function, span))
                 return new BoundErrorExpression(span);
 
             diagnostics.Error("SL0576", span,
                 $"'{name}' is a parameter of the primary constructor of " +
                 $"'{owner.Name}', kept by each instance, and " +
-                $"'{_currentFunction.Name}' is static, so there is no instance here");
+                $"'{_context.Function.Name}' is static, so there is no instance here");
             return new BoundErrorExpression(span);
         }
 

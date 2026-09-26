@@ -41,7 +41,7 @@ public sealed partial class Binder
         // names types, and pass 2 already made every type name exist.
         foreach (var (scope, unit) in _units)
         {
-            _currentScope = scope;
+            _context.File = scope;
 
             foreach (var declared in unit.Declarations.OfType<DelegateDeclSyntax>())
                 if (_declaredTypes.TryGetValue(declared, out var type))
@@ -50,7 +50,7 @@ public sealed partial class Binder
 
         foreach (var (scope, unit) in _units)
         {
-            _currentScope = scope;
+            _context.File = scope;
             var module = scope.Module;
 
             foreach (var declaration in unit.Declarations)
@@ -128,7 +128,7 @@ public sealed partial class Binder
             }
         }
 
-        _currentScope = null;
+        _context.File = null;
 
         // Every type declared in source now has its members, so an instantiation
         // made during this pass can finally be laid out. Until this moment it
@@ -512,8 +512,7 @@ public sealed partial class Binder
 
         if (!_derivedRecords.TryGetValue(declaration, out var completed))
         {
-            TypeSymbol written;
-            using (diagnostics.Muted()) written = ResolveType(declaration.Implements[0], scope);
+            var written = ResolveTypeQuietly(declaration.Implements[0], scope);
 
             completed = written is ClassTypeSymbol { RecordParameters.Count: > 0 } baseRecord
                 ? Records.Complete(source, declaration.Implements[0], baseRecord.RecordParameters)
@@ -654,7 +653,7 @@ public sealed partial class Binder
                         {
                             ContainingType = type,
                             OuterSubstitution = new Dictionary<string, TypeSymbol>(
-                                _substitution, StringComparer.Ordinal),
+                                _context.Substitution, StringComparer.Ordinal),
                         });
                         break;
                     }
@@ -1434,7 +1433,7 @@ public sealed partial class Binder
                     declaration.Span, Modifiers.Static, declaration.Type, sharedBacking.Name,
                     first, false, []),
                 scope,
-                new Dictionary<string, TypeSymbol>(_substitution, StringComparer.Ordinal));
+                new Dictionary<string, TypeSymbol>(_context.Substitution, StringComparer.Ordinal));
         }
         else if (wantsStorage)
         {

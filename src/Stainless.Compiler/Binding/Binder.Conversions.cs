@@ -405,7 +405,7 @@ public sealed partial class Binder
             Linkage = LinkageKind.Stainless,
             IsPublic = false,
             Span = function.Span,
-            Scope = _currentScope,
+            Scope = _context.File,
         };
 
         var ignored = PrimitiveTypeSymbol.Byte.MakePointerType();
@@ -439,7 +439,7 @@ public sealed partial class Binder
             : new BoundReturn(function.Span, call);
 
         _functions.Add(new BoundFunction(thunk, new BoundBlock(function.Span, [statement])));
-        _thunks[function] = thunk;
+        Remember(_thunks, function, thunk);
         if (_generated.Contains(function)) _generated.Add(thunk);
         return thunk;
     }

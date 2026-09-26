@@ -37,7 +37,7 @@ public sealed partial class Binder
     /// </summary>
     private bool NamesTypeParameter(ExpressionSyntax target) =>
         target is NameSyntax { Name.Parts.Count: 1, TypeArguments: null } name &&
-        _substitution.ContainsKey(name.Name.Parts[0]) &&
+        _context.Substitution.ContainsKey(name.Name.Parts[0]) &&
         !NamesAValue(name.Name.Parts[0]);
 
     /// <summary>

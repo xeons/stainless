@@ -995,17 +995,13 @@ public sealed partial class Binder
         // Bound where it was written, against that file's imports, and with no
         // function around it: a default is a constant, so there is nothing for
         // a local, a parameter or a `this` to be.
-        var savedScope = _currentScope;
-        var savedFunction = _currentFunction;
-        if (function.Scope is not null) _currentScope = function.Scope;
-        _currentFunction = null;
-
-        PushScope();
-        var bound = BindConversion(BindExpression(written), parameter.Type, written.Span);
-        PopScope();
-
-        _currentScope = savedScope;
-        _currentFunction = savedFunction;
+        BoundExpression bound;
+        using (Enter(_context.ForBody(null) with { File = function.Scope ?? _context.File }))
+        {
+            PushScope();
+            bound = BindConversion(BindExpression(written), parameter.Type, written.Span);
+            PopScope();
+        }
 
         if (bound.Type.IsError()) return null;
 

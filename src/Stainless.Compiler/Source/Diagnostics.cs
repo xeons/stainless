@@ -250,18 +250,70 @@ public sealed class DiagnosticBag
         public void Dispose() => _bag._muted -= 1;
     }
 
+    /// <summary>Where a report goes while something is holding them, or null.</summary>
+    private List<Diagnostic>? _holding;
+
+    /// <summary>
+    /// Keeps everything reported until the result is disposed in its own list,
+    /// muted or not.
+    ///
+    /// For what belongs to something other than the binding that asked for it:
+    /// an instantiation made inside a trial reports about the instantiation,
+    /// and whoever ends the trial decides whether that is said.
+    /// </summary>
+    public Hold Holding() => new(this);
+
+    public sealed class Hold : IDisposable
+    {
+        private readonly DiagnosticBag _bag;
+        private readonly int _muted;
+        private readonly List<Diagnostic>? _outer;
+
+        public List<Diagnostic> Items { get; } = [];
+
+        internal Hold(DiagnosticBag bag)
+        {
+            _bag = bag;
+            _muted = bag._muted;
+            _outer = bag._holding;
+            bag._muted = 0;
+            bag._holding = Items;
+        }
+
+        public void Dispose()
+        {
+            _bag._muted = _muted;
+            _bag._holding = _outer;
+        }
+    }
+
     public void Error(string code, SourceSpan span, string message)
     {
         Fresh(code);
         if (_muted > 0 || IsCascade(message)) return;
-        _items.Add(new Diagnostic(Severity.Error, code, message, span));
+        Keep(new Diagnostic(Severity.Error, code, message, span));
     }
 
     public void Warning(string code, SourceSpan span, string message)
     {
         Fresh(code);
         if (_muted > 0 || IsCascade(message)) return;
-        _items.Add(new Diagnostic(Severity.Warning, code, message, span));
+        Keep(new Diagnostic(Severity.Warning, code, message, span));
+    }
+
+    /// <summary>Reports, now, what was reported into a <see cref="Hold"/>.</summary>
+    public void Report(Diagnostic diagnostic)
+    {
+        if (_muted > 0) return;
+        Keep(diagnostic);
+    }
+
+    private void Keep(Diagnostic diagnostic)
+    {
+        if (_holding is not null)
+            _holding.Add(diagnostic);
+        else
+            _items.Add(diagnostic);
     }
 
     /// <summary>What the binder's stand-in for a type it could not resolve is called.</summary>

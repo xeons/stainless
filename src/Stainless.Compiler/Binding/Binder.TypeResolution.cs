@@ -37,7 +37,7 @@ public sealed partial class Binder
     private ArrayTypeSymbol ArrayOf(TypeSymbol element)
     {
         var array = element.MakeArrayType();
-        _arrays.TryAdd(element, array);
+        if (!_arrays.ContainsKey(element)) Remember(_arrays, element, array);
         return array;
     }
 
@@ -75,7 +75,7 @@ public sealed partial class Binder
             tuple.Fields.Add(new FieldSymbol(
                 TupleTypeSymbol.FieldName(i), elements[i], tuple, i) { IsPublic = true });
 
-        _tuples[key] = tuple;
+        Remember(_tuples, key, tuple);
         _structs.Add(tuple);
         LayOutIfLate(tuple);
         return tuple;
@@ -102,7 +102,7 @@ public sealed partial class Binder
             SliceTypeSymbol.LengthFieldName, PrimitiveTypeSymbol.NUInt, slice, 2)
             { IsBackingField = true });
 
-        _slices[element] = slice;
+        Remember(_slices, element, slice);
         _structs.Add(slice);
         ComputeLayout(slice, []);
         return slice;
@@ -271,7 +271,7 @@ public sealed partial class Binder
 
         // A bare name may be a type parameter of the instantiation being bound.
         if (parts.Count == 1 && syntax.TypeArguments.Count == 0 &&
-            _substitution.TryGetValue(parts[0], out var substituted))
+            _context.Substitution.TryGetValue(parts[0], out var substituted))
             return substituted;
 
         if (syntax.TypeArguments.Count > 0)
@@ -458,7 +458,7 @@ public sealed partial class Binder
         // The *template's* name for an instantiation. `Cache<int>` was written
         // `Cache`, and the type nested in it was hoisted as `Cache.Entry`
         // before any instantiation existed.
-        if (_currentFunction?.ContainingType is { } containing)
+        if (_context.Function?.ContainingType is { } containing)
             return containing.Template?.Name ?? containing.SimpleName;
 
         return null;
@@ -496,14 +496,14 @@ public sealed partial class Binder
             var local = _currentModule!.GenericFunctions.Where(f => f.Name == name.Parts[0]).ToList();
             if (local.Count > 0) return local;
 
-            return _currentScope!.ImportedModules
+            return _context.File!.ImportedModules
                 .SelectMany(m => m.GenericFunctions)
                 .Where(f => f.Name == name.Parts[0] && f.IsPublic)
                 .ToList();
         }
 
         string moduleName = string.Join('.', name.Parts.Take(name.Parts.Count - 1));
-        if (_currentScope!.Imports.TryGetValue(moduleName, out var target) ||
+        if (_context.File!.Imports.TryGetValue(moduleName, out var target) ||
             _modules.TryGetValue(moduleName, out target))
         {
             bool sameModule = target == _currentModule;
@@ -551,7 +551,7 @@ public sealed partial class Binder
         List<TypeSymbol>? given = null;
         if (written is not null)
         {
-            given = written.Select(w => ResolveType(w, _currentScope!)).ToList();
+            given = written.Select(w => ResolveType(w, _context.File!)).ToList();
             if (given.Any(g => g.IsError()))
                 return null;
 
@@ -585,53 +585,43 @@ public sealed partial class Binder
         var fitting = new List<(GenericFunctionTemplate Template, List<TypeSymbol> Arguments)>();
         Dictionary<string, TypeSymbol>? firstFailure = null;
         GenericFunctionTemplate? failed = null;
-        List<(LambdaSyntax Lambda, IReadOnlyList<TypeSymbol> Parameters)>? failedLambdas = null;
+
+        // The first candidate that got as far as a lambda's body.
+        GenericFunctionTemplate? failedAtLambda = null;
 
         // A candidate whose parameters were all worked out and which still would
         // not take the arguments. It is the better thing to report: the reader
         // has an argument that does not fit, not a type nobody could name.
-        (GenericFunctionTemplate Template, Dictionary<string, TypeSymbol> Inferred)? nearMiss = null;
+        GenericFunctionTemplate? nearMiss = null;
 
+        // Each candidate is a trial, kept only if it fits: one that loses MUST
+        // NOT leave behind what its lambdas instantiated. What is reported
+        // about a loser is worked out again, outside any trial, because what
+        // its trial made is gone.
         foreach (var candidate in viable)
         {
-            var names = candidate.Parameters.ToHashSet(StringComparer.Ordinal);
-            var inferred = new Dictionary<string, TypeSymbol>(StringComparer.Ordinal);
+            using var trial = BeginTrial(quiet: false);
 
-            // An enclosing type's parameters are already fixed, so they are
-            // given rather than inferred; only the method's own are worked out.
-            foreach (var (name, type) in candidate.OuterSubstitution) inferred.TryAdd(name, type);
-
-            // Written at the call, so there is nothing to infer.
-            if (given is not null)
-                for (int i = 0; i < given.Count; i++)
-                    inferred[candidate.Parameters[i]] = given[i];
-
-            for (int i = 0; i < arguments.Count; i++)
-                if (WrittenParameterType(candidate.Declaration.Parameters, arguments, i) is { } wanted)
-                    Infer(wanted, arguments[i].Type, names, inferred, candidate.Scope);
-
-            // A lambda has no type of its own, so the loop above learned nothing
-            // from one. Anything still unknown may yet be readable off a lambda's
-            // result, once the arguments that are values have said what its
-            // parameters are.
             var unanswered = new List<(LambdaSyntax, IReadOnlyList<TypeSymbol>)>();
-            if (candidate.Parameters.Any(p => !inferred.ContainsKey(p)))
-                InferFromLambdaResults(candidate, arguments, names, inferred, unanswered);
+            var inferred = InferTemplateArguments(candidate, given, arguments, unanswered);
 
             if (candidate.Parameters.Any(p => !inferred.ContainsKey(p)))
             {
                 firstFailure ??= inferred;
                 failed ??= candidate;
-
-                // The first candidate that got as far as a lambda's body.
-                if (unanswered.Count > 0) failedLambdas ??= unanswered;
+                if (unanswered.Count > 0) failedAtLambda ??= candidate;
                 continue;
             }
 
             if (Accepts(candidate, inferred, arguments))
+            {
                 fitting.Add((candidate, candidate.Parameters.Select(p => inferred[p]).ToList()));
+                trial.Accept();
+            }
             else
-                nearMiss ??= (candidate, inferred);
+            {
+                nearMiss ??= candidate;
+            }
         }
 
         if (fitting.Count == 1)
@@ -648,17 +638,21 @@ public sealed partial class Binder
         }
 
         // Everything was worked out and an argument still did not fit: say which.
-        if (nearMiss is { } near)
+        if (nearMiss is not null)
         {
-            Accepts(near.Template, near.Inferred, arguments, report: near.Template.Name);
+            var inferred = InferTemplateArguments(nearMiss, given, arguments, []);
+            Accepts(nearMiss, inferred, arguments, report: nearMiss.Name);
             return null;
         }
 
         // A lambda whose parameters were known and whose body still would not
         // bind is the reason nothing could be inferred, and its own errors say
         // why far better than SL0327 would.
-        if (failedLambdas is { Count: > 0 })
+        if (failedAtLambda is not null)
         {
+            var failedLambdas = new List<(LambdaSyntax Lambda, IReadOnlyList<TypeSymbol> Parameters)>();
+            InferTemplateArguments(failedAtLambda, given, arguments, failedLambdas);
+
             int before = diagnostics.ErrorCount;
             foreach (var (lambda, parameters) in failedLambdas)
                 ProbeLambdaResult(lambda, parameters, report: true);
@@ -675,6 +669,44 @@ public sealed partial class Binder
             $"for '{template.Name}' from these arguments; " +
             "Stainless infers type arguments only from the values passed");
         return null;
+    }
+
+    /// <summary>
+    /// What a template's type parameters are, as far as the arguments say:
+    /// those written at the call, those read off each argument's type, and
+    /// those read off what a lambda argument produces. A lambda whose body
+    /// could not say is added to <paramref name="unanswered"/>.
+    /// </summary>
+    private Dictionary<string, TypeSymbol> InferTemplateArguments(
+        GenericFunctionTemplate candidate,
+        List<TypeSymbol>? given,
+        List<BoundExpression> arguments,
+        List<(LambdaSyntax, IReadOnlyList<TypeSymbol>)> unanswered)
+    {
+        var names = candidate.Parameters.ToHashSet(StringComparer.Ordinal);
+        var inferred = new Dictionary<string, TypeSymbol>(StringComparer.Ordinal);
+
+        // An enclosing type's parameters are already fixed, so they are
+        // given rather than inferred; only the method's own are worked out.
+        foreach (var (name, type) in candidate.OuterSubstitution) inferred.TryAdd(name, type);
+
+        // Written at the call, so there is nothing to infer.
+        if (given is not null)
+            for (int i = 0; i < given.Count; i++)
+                inferred[candidate.Parameters[i]] = given[i];
+
+        for (int i = 0; i < arguments.Count; i++)
+            if (WrittenParameterType(candidate.Declaration.Parameters, arguments, i) is { } wanted)
+                Infer(wanted, arguments[i].Type, names, inferred, candidate.Scope);
+
+        // A lambda has no type of its own, so the loop above learned nothing
+        // from one. Anything still unknown may yet be readable off a lambda's
+        // result, once the arguments that are values have said what its
+        // parameters are.
+        if (candidate.Parameters.Any(p => !inferred.ContainsKey(p)))
+            InferFromLambdaResults(candidate, arguments, names, inferred, unanswered);
+
+        return inferred;
     }
 
     /// <summary>
@@ -987,26 +1019,16 @@ public sealed partial class Binder
     private List<TypeSymbol>? ResolveAll(
         IEnumerable<TypeSyntax> types, FileScope scope, Dictionary<string, TypeSymbol> inferred)
     {
-        var previous = _substitution;
-        _substitution = inferred;
-
-        try
+        using (Enter(_context with { Substitution = inferred }))
         {
             var resolved = new List<TypeSymbol>();
-            using (diagnostics.Muted())
+            foreach (var type in types)
             {
-                foreach (var type in types)
-                {
-                    var one = ResolveType(type, scope);
-                    if (one.IsError()) return null;
-                    resolved.Add(one);
-                }
+                var one = ResolveTypeQuietly(type, scope);
+                if (one.IsError()) return null;
+                resolved.Add(one);
             }
             return resolved;
-        }
-        finally
-        {
-            _substitution = previous;
         }
     }
 
@@ -1024,10 +1046,7 @@ public sealed partial class Binder
         List<BoundExpression> arguments,
         string? report = null)
     {
-        var previous = _substitution;
-        _substitution = inferred;
-
-        try
+        using (Enter(_context with { Substitution = inferred }))
         {
             // Only as far as both lists go. When no template has the arity of
             // the call, the first is tried anyway so that the call can report
@@ -1048,10 +1067,6 @@ public sealed partial class Binder
             }
 
             return true;
-        }
-        finally
-        {
-            _substitution = previous;
         }
     }
 

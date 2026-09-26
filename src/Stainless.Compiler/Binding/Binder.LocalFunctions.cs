@@ -100,9 +100,6 @@ public sealed partial class Binder
 
     private readonly Dictionary<FunctionSymbol, LocalFunction> _localFunctionOf = [];
 
-    /// <summary>The local functions in scope, innermost last. Not cleared by a lambda or a local body.</summary>
-    private List<Dictionary<string, LocalFunction>> _localFunctionScopes = [];
-
     /// <summary>The paths already given out, so that two in one program differ.</summary>
     private readonly HashSet<string> _localPaths = new(StringComparer.Ordinal);
 
@@ -154,15 +151,15 @@ public sealed partial class Binder
 
         // The function whose object a body here would mean by `this`: past any
         // lambda, to the function the outermost one was written in.
-        var user = _closures.Count > 0 ? _closures[0].OuterFunction : _currentFunction;
+        var user = _context.Closures.Count > 0 ? _context.Closures[0].OuterFunction : _context.Function;
         var parent = user is null ? null : _localFunctionOf.GetValueOrDefault(user);
 
         var local = new LocalFunction
         {
             Syntax = syntax,
             Data = data,
-            Path = UniquePath(LocalPathOf(_currentFunction) + "." + declaration.Name),
-            Scopes = [.. _localFunctionScopes],
+            Path = UniquePath(LocalPathOf(_context.Function) + "." + declaration.Name),
+            Scopes = [.. _context.LocalFunctionScopes],
             Owner = parent?.Owner ?? user?.ContainingType,
             ThisType = parent is not null
                 ? parent.ThisType
@@ -172,10 +169,10 @@ public sealed partial class Binder
 
         if (declaration.TypeParameters.Count > 0)
         {
-            local.Template = new GenericFunctionTemplate(declaration.Name, _currentScope!, declaration)
+            local.Template = new GenericFunctionTemplate(declaration.Name, _context.File!, declaration)
             {
                 ContainingType = local.Owner,
-                OuterSubstitution = new Dictionary<string, TypeSymbol>(_substitution, StringComparer.Ordinal),
+                OuterSubstitution = new Dictionary<string, TypeSymbol>(_context.Substitution, StringComparer.Ordinal),
                 Local = local,
             };
         }
@@ -192,7 +189,7 @@ public sealed partial class Binder
     private string UniquePath(string wanted)
     {
         string path = wanted;
-        for (int n = 2; !_localPaths.Add(path); n++) path = $"{wanted}.{n}";
+        for (int n = 2; !Remember(_localPaths, path); n++) path = $"{wanted}.{n}";
         return path;
     }
 
@@ -215,7 +212,7 @@ public sealed partial class Binder
         {
             Name = declaration.Name,
             ModuleName = _currentModule!.Name,
-            ReturnType = ResolveType(declaration.ReturnType, _currentScope!, allowVoid: true),
+            ReturnType = ResolveType(declaration.ReturnType, _context.File!, allowVoid: true),
             Linkage = LinkageKind.Stainless,
             Kind = local.Owner is null ? FunctionKind.Function : FunctionKind.Method,
             ContainingType = local.Owner,
@@ -223,7 +220,7 @@ public sealed partial class Binder
             IsStatic = local.Owner is not null && !hasThis,
             Body = declaration.Body,
             Span = declaration.Span,
-            Scope = _currentScope,
+            Scope = _context.File,
             TypeArguments = [.. local.OuterTypeArguments, .. own],
             LocalPath = local.Path,
         };
@@ -231,7 +228,7 @@ public sealed partial class Binder
         if (hasThis)
             symbol.Parameters.Add(new ParameterSymbol("this", local.ThisType!, 0) { IsThis = true });
 
-        AddParameters(symbol, declaration.Parameters, _currentScope!);
+        AddParameters(symbol, declaration.Parameters, _context.File!);
 
         _localFunctionOf[symbol] = local;
         _generated.Add(symbol);
@@ -244,7 +241,7 @@ public sealed partial class Binder
     /// </summary>
     private BoundStatement BindLocalFunctionDeclaration(LocalFunctionSyntax syntax)
     {
-        var scope = _localFunctionScopes[^1];
+        var scope = _context.LocalFunctionScopes[^1];
         string name = syntax.Declaration.Name;
 
         // Declared already at the top of the block, or refused there.
@@ -270,7 +267,7 @@ public sealed partial class Binder
         if (local.Symbol is { } symbol)
         {
             AttachCaptures(local, symbol);
-            BindLocalFunctionBody(local, symbol, _substitution);
+            BindLocalFunctionBody(local, symbol, _context.Substitution);
         }
 
         foreach (var (waiting, substitution) in local.Waiting)
@@ -314,13 +311,13 @@ public sealed partial class Binder
                     visible.TryAdd(name, variable);
         }
 
-        AddScopes(_scopes);
-        AddFunction(_currentFunction);
+        AddScopes(_context.Locals);
+        AddFunction(_context.Function);
 
-        for (int i = _closures.Count - 1; i >= 0; i--)
+        for (int i = _context.Closures.Count - 1; i >= 0; i--)
         {
-            AddScopes(_closures[i].OuterScopes);
-            AddFunction(_closures[i].OuterFunction);
+            AddScopes(_context.Closures[i].OuterScopes);
+            AddFunction(_context.Closures[i].OuterFunction);
         }
 
         return visible;
@@ -351,45 +348,16 @@ public sealed partial class Binder
     private void BindLocalFunctionBody(
         LocalFunction local, FunctionSymbol symbol, Dictionary<string, TypeSymbol> substitution)
     {
-        var savedScope = _currentScope;
-        var savedFunction = _currentFunction;
-        var savedScopes = new List<Dictionary<string, LocalSymbol>>(_scopes);
-        int savedLoops = _loopDepth;
-        int savedSwitches = _switchDepth;
-        int savedParallel = _parallelDepth;
-        var savedFacts = _variantFacts;
-        var savedJumps = _jumps;
-        bool savedChecked = _checkedArithmetic;
-        var savedChain = _constructorChain;
-        var savedClosures = new List<ClosureContext>(_closures);
-        var savedLocalScopes = _localFunctionScopes;
-        var savedSubstitution = _substitution;
-        bool savedInitializing = _initializingField;
+        var body = _context.ForBody(null) with
+        {
+            Closures = [],
+            LocalFunctionScopes = [.. local.Scopes],
+            Substitution = substitution,
+            InitializingField = false,
+        };
 
-        _closures.Clear();
-        _localFunctionScopes = [.. local.Scopes];
-        _substitution = substitution;
-        _initializingField = false;
-        _parallelDepth = 0;
-
-        BindFunctionBody(symbol);
-
-        _currentScope = savedScope;
-        _currentFunction = savedFunction;
-        _scopes.Clear();
-        _scopes.AddRange(savedScopes);
-        _loopDepth = savedLoops;
-        _switchDepth = savedSwitches;
-        _parallelDepth = savedParallel;
-        _variantFacts = savedFacts;
-        _jumps = savedJumps;
-        _checkedArithmetic = savedChecked;
-        _constructorChain = savedChain;
-        _closures.Clear();
-        _closures.AddRange(savedClosures);
-        _localFunctionScopes = savedLocalScopes;
-        _substitution = savedSubstitution;
-        _initializingField = savedInitializing;
+        using (Enter(body))
+            BindFunctionBody(symbol);
     }
 
     /// <summary>A generic local function at one set of type arguments.</summary>
@@ -400,6 +368,10 @@ public sealed partial class Binder
         var key = new TypeList(arguments.ToList());
         if (local.Instances.TryGetValue(key, out var existing)) return existing;
 
+        // The body is bound here and not again, so what it reports is the
+        // instantiation's.
+        using var owed = OweToTrial();
+
         var substitution = new Dictionary<string, TypeSymbol>(
             template.OuterSubstitution, StringComparer.Ordinal);
         for (int i = 0; i < arguments.Count; i++) substitution[template.Parameters[i]] = arguments[i];
@@ -407,12 +379,11 @@ public sealed partial class Binder
         VerifyConstraints(template.Declaration.Constraints, template.Parameters, substitution,
             template.Scope, $"'{template.Name}'", span, checkedWhereDeclared: false);
 
-        var previous = _substitution;
-        _substitution = substitution;
-        var symbol = NewLocalFunctionSymbol(local, arguments);
-        _substitution = previous;
+        FunctionSymbol symbol;
+        using (Enter(_context with { Substitution = substitution }))
+            symbol = NewLocalFunctionSymbol(local, arguments);
 
-        local.Instances[key] = symbol;
+        Remember(local.Instances, key, symbol);
 
         if (local.Visible is null)
         {
@@ -431,8 +402,8 @@ public sealed partial class Binder
 
     private LocalFunction? LookupLocalFunction(string name)
     {
-        for (int i = _localFunctionScopes.Count - 1; i >= 0; i--)
-            if (_localFunctionScopes[i].TryGetValue(name, out var local)) return local;
+        for (int i = _context.LocalFunctionScopes.Count - 1; i >= 0; i--)
+            if (_context.LocalFunctionScopes[i].TryGetValue(name, out var local)) return local;
         return null;
     }
 
@@ -464,8 +435,8 @@ public sealed partial class Binder
         BoundExpression? receiver = null;
         if (target.Parameters.Any(p => p.IsThis))
         {
-            receiver = _closures.Count > 0
-                ? CaptureThis(_closures.Count - 1, callee.Span)
+            receiver = _context.Closures.Count > 0
+                ? CaptureThis(_context.Closures.Count - 1, callee.Span)
                 : BindImplicitThis(callee.Span);
             if (receiver is null || receiver.Type.IsError()) return new BoundErrorExpression(syntax.Span);
         }
@@ -564,7 +535,7 @@ public sealed partial class Binder
         if (LookupLocal(name) is { } found && (expected is null || ReferenceEquals(found, expected)))
             return (new BoundLocalAccess(span, found), found);
 
-        if (_currentFunction is { } function)
+        if (_context.Function is { } function)
         {
             foreach (var parameter in function.Parameters.Where(p => !p.IsThis).Concat(function.Captures))
                 if (parameter.Name == name &&
@@ -578,8 +549,8 @@ public sealed partial class Binder
                 return (new BoundParameterAccess(span, parameter2), variable.Origin);
         }
 
-        if (_closures.Count > 0 &&
-            CaptureFrom(_closures.Count - 1, name, span, variablesOnly: true) is BoundFieldAccess field &&
+        if (_context.Closures.Count > 0 &&
+            CaptureFrom(_context.Closures.Count - 1, name, span, variablesOnly: true) is BoundFieldAccess field &&
             _captureOrigins.TryGetValue(field.Field, out var origin) &&
             (expected is null || ReferenceEquals(origin, expected)))
             return (field, origin);
@@ -594,7 +565,7 @@ public sealed partial class Binder
     /// </summary>
     private BoundExpression? TryCaptureIntoLocalFunction(string name, SourceSpan span)
     {
-        if (_currentFunction is not { } function) return null;
+        if (_context.Function is not { } function) return null;
 
         if (function.Captures.FirstOrDefault(c => c.Name == name) is { } known)
             return new BoundParameterAccess(span, known);
@@ -695,7 +666,6 @@ public sealed partial class Binder
     {
         bool outerRebindable = _rebindable;
         bool outerNeeded = _rebindNeeded;
-        var outerScopes = _localFunctionScopes;
         _rebindable = true;
 
         // Every round learns at least one capture, and there are finitely many
@@ -711,8 +681,8 @@ public sealed partial class Binder
             var paths = new HashSet<string>(_localPaths, StringComparer.Ordinal);
 
             _rebindNeeded = false;
-            _localFunctionScopes = [];
-            BindFunctionBodyCore(function);
+            using (Enter(_context with { LocalFunctionScopes = [] }))
+                BindFunctionBodyCore(function);
 
             if (!_rebindNeeded || round == 64) break;
 
@@ -727,7 +697,6 @@ public sealed partial class Binder
 
         _rebindable = outerRebindable;
         _rebindNeeded = outerNeeded;
-        _localFunctionScopes = outerScopes;
     }
 
     /// <summary>

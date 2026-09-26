@@ -289,12 +289,12 @@ public sealed partial class Binder
     {
         if (!context.Names.Add(name) || LookupLocal(name) is not null)
             diagnostics.Error("SL0218", span, $"'{name}' is already declared in this scope");
-        else if (_currentFunction?.Parameters.Any(p => p.Name == name) == true)
+        else if (_context.Function?.Parameters.Any(p => p.Name == name) == true)
             diagnostics.Error("SL0219", span, $"'{name}' is already the name of a parameter");
 
         var local = new LocalSymbol(name, type, isConst: true);
         into.Add(new PatternVariable(name, local, span));
-        _patternVariableNames.Add(name);
+        Remember(_patternVariableNames, name);
 
         var store = new BoundAssignment(span, new BoundLocalAccess(span, local), value)
         {
@@ -434,13 +434,8 @@ public sealed partial class Binder
     /// </summary>
     private bool LooksLikeType(NameSyntax name)
     {
-        using (diagnostics.Muted())
-        {
-            var resolved = ResolveType(
-                new NamedTypeSyntax(name.Span, name.Name), _currentScope!);
-
-            return resolved is NamedTypeSymbol { IsReferenceType: true };
-        }
+        var resolved = ResolveTypeQuietly(new NamedTypeSyntax(name.Span, name.Name), _context.File!);
+        return resolved is NamedTypeSymbol { IsReferenceType: true };
     }
 
     // ----------------------------------------------------------------- types
@@ -567,9 +562,7 @@ public sealed partial class Binder
         {
             // `(int x, var y)` over a tuple of ints: the one type an int can
             // be asked about is int, and the answer is yes.
-            TypeSymbol same;
-            using (diagnostics.Muted())
-                same = ResolveType(typeSyntax, _currentScope!);
+            var same = ResolveTypeQuietly(typeSyntax, _context.File!);
 
             if (same.Equals(subject.Type))
                 return new TypeMatch(True(span), subject, null, InstanceKey.Instance);
@@ -586,7 +579,7 @@ public sealed partial class Binder
             return null;
         }
 
-        var tested = ResolveType(typeSyntax, _currentScope!);
+        var tested = ResolveType(typeSyntax, _context.File!);
         if (tested.IsError())
             return null;
 
@@ -1338,7 +1331,7 @@ public sealed partial class Binder
     private void ExposeNames(IEnumerable<LocalSymbol> names)
     {
         foreach (var local in names)
-            _scopes[^1][local.Name] = local;
+            _context.Locals[^1][local.Name] = local;
     }
 
     /// <summary>
@@ -1368,12 +1361,12 @@ public sealed partial class Binder
         }
         finally
         {
-            var inner = _scopes[^1];
+            var inner = _context.Locals[^1];
             PopScope();
 
             if (isExpression)
                 foreach (var (name, local) in inner.Where(pair => !names.Contains(pair.Value)))
-                    _scopes[^1][name] = local;
+                    _context.Locals[^1][name] = local;
         }
     }
 
@@ -1405,9 +1398,9 @@ public sealed partial class Binder
             return;
 
         if (pattern.CaseWhenTrue is { } only)
-            _variantFacts[narrowed] = Fact.Holding(only);
+            _context.VariantFacts[narrowed] = Fact.Holding(only);
         else if (pattern.NotNullWhenTrue && subject.Type is OptionalTypeSymbol)
-            _variantFacts[narrowed] = Fact.NotNull;
+            _context.VariantFacts[narrowed] = Fact.NotNull;
     }
 
     // ------------------------------------------------------- switch statement
@@ -1466,7 +1459,7 @@ public sealed partial class Binder
         bool sawDefault = false;
         var frame = OpenSwitchFrame(subject.Type, overVariant: false);
 
-        _switchDepth++;
+        _context.SwitchDepth++;
 
         foreach (var section in syntax.Sections)
         {
@@ -1549,7 +1542,7 @@ public sealed partial class Binder
                 ApplyPatternFacts(matched[i], subject);
                 tests.Add(Guarded(matched[i], guards[i]));
                 PopScope();
-                _variantFacts = entry;
+                _context.VariantFacts = entry;
             }
 
             if (naming is not null)
@@ -1560,7 +1553,7 @@ public sealed partial class Binder
             var body = new BoundBlock(section.Span, BindStatementList(section.Statements));
 
             PopScope();
-            _variantFacts = saved;
+            _context.VariantFacts = saved;
 
             if (EndIsReachable(body))
                 diagnostics.Error("SL0407", section.Span,
@@ -1574,7 +1567,7 @@ public sealed partial class Binder
             });
         }
 
-        _switchDepth--;
+        _context.SwitchDepth--;
         CloseSwitchFrame(frame, sections);
 
         // A statement over an enum is not exhaustive, as in C#: the value need
@@ -1689,7 +1682,7 @@ public sealed partial class Binder
             var result = BindExpression(arm.Value);
 
             PopScope();
-            _variantFacts = saved;
+            _context.VariantFacts = saved;
 
             if (result.Type.IsError())
                 return new BoundErrorExpression(syntax.Span);

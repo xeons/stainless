@@ -63,7 +63,6 @@ public sealed partial class Binder
         public FieldSymbol? WeakSelfField { get; set; }
     }
 
-    private readonly List<ClosureContext> _closures = [];
     private int _closureCount;
 
     // ============================== a captured member that something changes
@@ -172,20 +171,20 @@ public sealed partial class Binder
     /// </summary>
     private void NoteMemberWritten(BoundExpression target)
     {
-        if (_currentFunction?.Kind is FunctionKind.Constructor) return;
+        if (_context.Function?.Kind is FunctionKind.Constructor) return;
 
         switch (target)
         {
-            case BoundFieldAccess field: _membersWritten.Add(field.Field); break;
-            case BoundCall { Function.Accessor: { } property }: _membersWritten.Add(property); break;
+            case BoundFieldAccess field: Remember(_membersWritten, field.Field); break;
+            case BoundCall { Function.Accessor: { } property }: Remember(_membersWritten, property); break;
         }
     }
 
     /// <summary>Remembers a property written through its setter.</summary>
     private void NoteMemberWritten(PropertySymbol property)
     {
-        if (_currentFunction?.Kind is FunctionKind.Constructor) return;
-        _membersWritten.Add(property);
+        if (_context.Function?.Kind is FunctionKind.Constructor) return;
+        Remember(_membersWritten, property);
     }
 
     /// <summary>
@@ -258,11 +257,11 @@ public sealed partial class Binder
     /// captured in turn.
     /// </summary>
     private BoundExpression? TryCapture(string name, SourceSpan span) =>
-        _closures.Count == 0 ? null : CaptureFrom(_closures.Count - 1, name, span);
+        _context.Closures.Count == 0 ? null : CaptureFrom(_context.Closures.Count - 1, name, span);
 
     private BoundExpression? CaptureFrom(int index, string name, SourceSpan span, bool variablesOnly = false)
     {
-        var closure = _closures[index];
+        var closure = _context.Closures[index];
 
         if (closure.Captured.TryGetValue(name, out var already))
             return new BoundFieldAccess(
@@ -289,11 +288,9 @@ public sealed partial class Binder
         if (outer.Type.IsVoid() || outer.Type.IsError()) return new BoundErrorExpression(span);
 
         var field = new FieldSymbol(name, outer.Type, closure.Type, closure.Type.Fields.Count);
-        closure.Type.Fields.Add(field);
-        closure.Captured[name] = field;
-        closure.Captures.Add((field, outer));
+        AddCapture(closure, name, field, outer);
 
-        if (VariableOf(outer) is { } origin) _captureOrigins[field] = origin;
+        if (VariableOf(outer) is { } origin) Remember(_captureOrigins, field, origin);
 
         return new BoundFieldAccess(span, new BoundThis(span, closure.Type, closure.This!), field);
     }
@@ -310,7 +307,7 @@ public sealed partial class Binder
     /// <summary>Reads a name in the context the closure at <paramref name="index"/> was written in.</summary>
     private BoundExpression? ResolveOutside(int index, string name, SourceSpan span, bool variablesOnly = false)
     {
-        var closure = _closures[index];
+        var closure = _context.Closures[index];
 
         for (int i = closure.OuterScopes.Count - 1; i >= 0; i--)
             if (closure.OuterScopes[i].TryGetValue(name, out var local))
@@ -375,9 +372,9 @@ public sealed partial class Binder
     /// bare call in a lambda body may mean.
     /// </summary>
     private List<FunctionSymbol> MethodsOfEnclosingThis(string name) =>
-        _closures.Count == 0
+        _context.Closures.Count == 0
             ? []
-            : _closures[0].OuterFunction?.ContainingType?.FindMethods(name).ToList() ?? [];
+            : _context.Closures[0].OuterFunction?.ContainingType?.FindMethods(name).ToList() ?? [];
 
     /// <summary>The receiver of the method a lambda was written inside, if it had one.</summary>
     private static BoundExpression? EnclosingThis(ClosureContext closure, SourceSpan span) =>
@@ -395,7 +392,7 @@ public sealed partial class Binder
     /// </summary>
     private BoundExpression CaptureThis(int index, SourceSpan span)
     {
-        var closure = _closures[index];
+        var closure = _context.Closures[index];
 
         if (closure.WeakSelf is { } alive)
             return ReadWeakSelf(span, alive);
@@ -440,10 +437,8 @@ public sealed partial class Binder
         {
             var weakField = new FieldSymbol(
                 ThisCaptureName, referenced.MakeWeakType(), closure.Type, closure.Type.Fields.Count);
-            closure.Type.Fields.Add(weakField);
-            closure.Captured[ThisCaptureName] = weakField;
-            closure.Captures.Add((weakField, new BoundConversion(
-                span, weakField.Type, outer, ConversionKind.ReferenceToWeak)));
+            AddCapture(closure, ThisCaptureName, weakField, new BoundConversion(
+                span, weakField.Type, outer, ConversionKind.ReferenceToWeak));
 
             closure.WeakSelfField = weakField;
             closure.WeakSelf = new LocalSymbol(WeakSelfName, referenced.MakeOptionalType(),
@@ -453,11 +448,28 @@ public sealed partial class Binder
 
         var field = new FieldSymbol(
             ThisCaptureName, outer.Type, closure.Type, closure.Type.Fields.Count);
-        closure.Type.Fields.Add(field);
-        closure.Captured[ThisCaptureName] = field;
-        closure.Captures.Add((field, outer));
+        AddCapture(closure, ThisCaptureName, field, outer);
 
         return new BoundFieldAccess(span, new BoundThis(span, closure.Type, closure.This!), field);
+    }
+
+    /// <summary>
+    /// A field of the closure holding what <paramref name="value"/> read where
+    /// the lambda was made. A discarded trial takes it back.
+    /// </summary>
+    private void AddCapture(ClosureContext closure, string name, FieldSymbol field, BoundExpression value)
+    {
+        var fields = closure.Type!.Fields;
+        fields.Add(field);
+        closure.Captured[name] = field;
+        closure.Captures.Add((field, value));
+
+        UndoOnDiscard(() =>
+        {
+            fields.Remove(field);
+            closure.Captured.Remove(name);
+            closure.Captures.RemoveAll(c => c.Field == field);
+        });
     }
 
     private void ReportStaticCapture(string name, SourceSpan span) =>
@@ -534,12 +546,13 @@ public sealed partial class Binder
     /// cannot be bound until T has given it its parameter types. That ordering
     /// is the whole of the trick.
     ///
-    /// Everything it does is undone. Diagnostics are muted, because a failure
-    /// here means "this candidate does not fit" rather than "this program is
-    /// wrong", and the real bind will report properly if there is anything to
-    /// report. Any closure class or function the body generated on the way is
-    /// truncated away, so a trial that is discarded -- or one that runs twice
-    /// while overloads are tried -- leaves nothing behind to emit.
+    /// It is a trial, and a kept one: the answer may be a type the body
+    /// instantiated, so what the body instantiated stays unless a trial around
+    /// this one is discarded. Diagnostics are muted, because a failure here
+    /// means "this candidate does not fit" rather than "this program is wrong",
+    /// and the real bind will report properly if there is anything to report.
+    /// The closure class and functions the body generated are taken back
+    /// whatever happens, since the real bind makes its own.
     ///
     /// Returns null when the answer cannot be had: a block body, whose result
     /// is whatever its `return`s agree on and which needs a declared return
@@ -555,16 +568,14 @@ public sealed partial class Binder
         // Written out, it is the answer, and nothing needs binding to learn it.
         if (syntax.ReturnType is not null)
         {
-            TypeSymbol written;
-            using (diagnostics.Muted())
-                written = ResolveType(syntax.ReturnType, _currentScope!, allowVoid: true);
-
+            var written = ResolveTypeQuietly(syntax.ReturnType, _context.File!, allowVoid: true);
             return written.IsError() || (written.IsVoid() && !allowVoid) ? null : written;
         }
 
         int classes = _classes.Count;
         int functions = _functions.Count;
         int closureCount = _closureCount;
+        int memberCaptures = _memberCaptures.Count;
 
         // A throwaway class to be the closure, so that a body reading something
         // from around it captures into this rather than being told it cannot
@@ -587,7 +598,7 @@ public sealed partial class Binder
             ContainingType = probeType,
             IsPublic = false,
             Span = syntax.Span,
-            Scope = _currentScope,
+            Scope = _context.File,
         };
 
         var self = new ParameterSymbol("this", probeType, 0) { IsThis = true };
@@ -601,42 +612,27 @@ public sealed partial class Binder
         {
             Type = probeType,
             This = self,
-            OuterScopes = [.. _scopes],
-            OuterFunction = _currentFunction,
+            OuterScopes = [.. _context.Locals],
+            OuterFunction = _context.Function,
             IsStatic = syntax.IsStatic,
         };
 
-        var savedScopes = new List<Dictionary<string, LocalSymbol>>(_scopes);
-        var savedFunction = _currentFunction;
-        int savedLoops = _loopDepth;
-        int savedSwitches = _switchDepth;
-        int savedParallel = _parallelDepth;
-        var savedJumps = _jumps;
+        var body = _context.ForBody(probe);
+        body.Closures.Add(context);
+        body.InferringReturnsOf = probe;
 
-        _scopes.Clear();
-        _currentFunction = probe;
-        _loopDepth = 0;
-        _switchDepth = 0;
-        _parallelDepth = 0;
-        _jumps = new JumpState();
-        _closures.Add(context);
-        PushScope();
+        // Kept, because the answer may name a type the body instantiated.
+        using var trial = BeginTrial(quiet: !report);
 
         TypeSymbol? produced;
-        using (report ? null : (IDisposable)diagnostics.Muted())
+        using (Enter(body))
         {
+            PushScope();
+
             if (syntax.Block is not null)
             {
-                var savedReturns = _returnsFound;
-                var savedInferring = _inferringReturnsOf;
-                _returnsFound = [];
-                _inferringReturnsOf = probe;
-
                 BindBlock(syntax.Block);
-                produced = AgreedReturnType(_returnsFound);
-
-                _returnsFound = savedReturns;
-                _inferringReturnsOf = savedInferring;
+                produced = AgreedReturnType(_context.ReturnsFound);
             }
             else
             {
@@ -651,22 +647,17 @@ public sealed partial class Binder
             // A lambda has no type until something gives it one, so it cannot
             // be what a type parameter is inferred to be.
             if (produced is LambdaType) produced = null;
+
+            PopScope();
         }
 
-        PopScope();
-        _closures.RemoveAt(_closures.Count - 1);
-        _scopes.Clear();
-        _scopes.AddRange(savedScopes);
-        _currentFunction = savedFunction;
-        _loopDepth = savedLoops;
-        _switchDepth = savedSwitches;
-        _parallelDepth = savedParallel;
-        _jumps = savedJumps;
-
-        // Whatever the trial built on the way, it does not keep.
+        // The closure it built is a throwaway, and what the body captured is
+        // captured again by the bind that keeps it.
         DiscardGenerated(classes, functions);
         _closureCount = closureCount;
+        _memberCaptures.RemoveRange(memberCaptures, _memberCaptures.Count - memberCaptures);
 
+        trial.Accept();
         return produced;
     }
 
@@ -705,7 +696,7 @@ public sealed partial class Binder
         {
             if (parameter.Type is null) return null;
 
-            var resolved = ResolveType(parameter.Type, _currentScope!);
+            var resolved = ResolveType(parameter.Type, _context.File!);
             if (resolved.IsError() || resolved.IsVoid()) return null;
 
             parameterTypes.Add(resolved);
@@ -748,8 +739,8 @@ public sealed partial class Binder
         // Registered so that the emitter writes its TypeInfo and the reference
         // walk that retains its receiver is generated, exactly as for one
         // somebody declared.
-        _currentModule.Types[type.SimpleName] = type;
-        _naturalClosures[key] = type;
+        Remember(_currentModule.Types, type.SimpleName, type);
+        Remember(_naturalClosures, key, (ClosureTypeSymbol)type);
 
         return type;
     }
@@ -766,8 +757,7 @@ public sealed partial class Binder
         {
             if (parameter.Type is null) return false;
 
-            TypeSymbol resolved;
-            using (diagnostics.Muted()) resolved = ResolveType(parameter.Type, _currentScope!);
+            var resolved = ResolveTypeQuietly(parameter.Type, _context.File!);
             if (resolved.IsError() || resolved.IsVoid()) return false;
             parameterTypes.Add(resolved);
         }
@@ -783,15 +773,6 @@ public sealed partial class Binder
     /// </summary>
     private readonly Dictionary<string, ClosureTypeSymbol> _naturalClosures =
         new(StringComparer.Ordinal);
-
-    /// <summary>
-    /// The function whose <c>return</c>s are being collected rather than
-    /// checked, while a block-bodied lambda's result is worked out.
-    /// </summary>
-    private FunctionSymbol? _inferringReturnsOf;
-
-    /// <summary>What each <c>return</c> in that function gave back; null for a bare one.</summary>
-    private List<BoundExpression?> _returnsFound = [];
 
     /// <summary>
     /// The one type every <c>return</c> reaches, which is the question a
@@ -834,7 +815,7 @@ public sealed partial class Binder
 
         var bound = BindConversion(BindExpression(written), type, written.Span);
         bool constant = !bound.Type.IsError() && IsConstantDefault(bound);
-        if (!diagnostics.IsMuted) _lambdaDefaults[(parameter, type)] = constant ? bound : null;
+        if (!diagnostics.IsMuted) Remember(_lambdaDefaults, (parameter, type), constant ? bound : null);
 
         if (bound.Type.IsError()) return null;
         if (constant) return bound;
@@ -872,7 +853,7 @@ public sealed partial class Binder
     {
         if (syntax.ReturnType is not null)
         {
-            var written = ResolveType(syntax.ReturnType, _currentScope!, allowVoid: true);
+            var written = ResolveType(syntax.ReturnType, _context.File!, allowVoid: true);
             if (!written.IsError() && !written.Equals(returns))
             {
                 diagnostics.Error("SL0765", syntax.ReturnType.Span,
@@ -943,7 +924,7 @@ public sealed partial class Binder
             ContainingType = closureType,
             IsPublic = true,
             Span = syntax.Span,
-            Scope = _currentScope,
+            Scope = _context.File,
         };
 
         var self = new ParameterSymbol("this", closureType, 0) { IsThis = true };
@@ -958,8 +939,8 @@ public sealed partial class Binder
         {
             Type = closureType,
             This = self,
-            OuterScopes = [.. _scopes],
-            OuterFunction = _currentFunction,
+            OuterScopes = [.. _context.Locals],
+            OuterFunction = _context.Function,
             IsStatic = syntax.IsStatic,
         };
 
@@ -1010,7 +991,7 @@ public sealed partial class Binder
             ContainingType = closureType,
             IsPublic = true,
             Span = syntax.Span,
-            Scope = _currentScope,
+            Scope = _context.File,
         };
 
         var self = new ParameterSymbol("this", closureType, 0) { IsThis = true };
@@ -1030,8 +1011,8 @@ public sealed partial class Binder
         {
             Type = closureType,
             This = self,
-            OuterScopes = [.. _scopes],
-            OuterFunction = _currentFunction,
+            OuterScopes = [.. _context.Locals],
+            OuterFunction = _context.Function,
             WeakThis = subscribed,
             IsStatic = syntax.IsStatic,
         };
@@ -1086,7 +1067,7 @@ public sealed partial class Binder
             Linkage = LinkageKind.Stainless,
             IsPublic = false,
             Span = syntax.Span,
-            Scope = _currentScope,
+            Scope = _context.File,
         };
 
         AddLambdaParameters(symbol, syntax, target.Signature);
@@ -1094,8 +1075,8 @@ public sealed partial class Binder
 
         var context = new ClosureContext
         {
-            OuterScopes = [.. _scopes],
-            OuterFunction = _currentFunction,
+            OuterScopes = [.. _context.Locals],
+            OuterFunction = _context.Function,
             IsStatic = syntax.IsStatic,
         };
 
@@ -1132,7 +1113,7 @@ public sealed partial class Binder
 
             if (declared.Type is not null)
             {
-                var written = ResolveType(declared.Type, _currentScope!);
+                var written = ResolveType(declared.Type, _context.File!);
                 if (!written.IsError() && !written.Equals(type))
                     diagnostics.Error("SL0384", declared.Span,
                         $"parameter '{declared.Name}' is '{written.Name}', but the target " +
@@ -1151,20 +1132,9 @@ public sealed partial class Binder
     private BoundBlock BindLambdaBody(
         LambdaSyntax syntax, FunctionSymbol symbol, ClosureContext context)
     {
-        var savedScopes = new List<Dictionary<string, LocalSymbol>>(_scopes);
-        var savedFunction = _currentFunction;
-        int savedLoops = _loopDepth;
-        int savedSwitches = _switchDepth;
-        int savedParallel = _parallelDepth;
-        var savedJumps = _jumps;
-
-        _scopes.Clear();
-        _currentFunction = symbol;
-        _loopDepth = 0;
-        _switchDepth = 0;
-        _parallelDepth = 0;
-        _jumps = new JumpState();
-        _closures.Add(context);
+        var inner = _context.ForBody(symbol);
+        inner.Closures.Add(context);
+        using var entered = Enter(inner);
 
         PushScope();
 
@@ -1202,15 +1172,6 @@ public sealed partial class Binder
         if (!symbol.ReturnType.IsVoid() && EndIsReachable(body))
             diagnostics.Error("SL0217", syntax.Span,
                 $"not all paths through this lambda return a value of type '{symbol.ReturnType.Name}'");
-
-        _closures.RemoveAt(_closures.Count - 1);
-        _scopes.Clear();
-        _scopes.AddRange(savedScopes);
-        _currentFunction = savedFunction;
-        _loopDepth = savedLoops;
-        _switchDepth = savedSwitches;
-        _parallelDepth = savedParallel;
-        _jumps = savedJumps;
 
         return body;
     }
@@ -1271,7 +1232,7 @@ public sealed partial class Binder
         bool sawDefault = false;
         var frame = OpenSwitchFrame(value.Type, overVariant: false);
 
-        _switchDepth++;
+        _context.SwitchDepth++;
 
         foreach (var section in syntax.Sections)
         {
@@ -1354,7 +1315,7 @@ public sealed partial class Binder
                 section.Span, labels, section.HasDefault, body));
         }
 
-        _switchDepth--;
+        _context.SwitchDepth--;
         CloseSwitchFrame(frame, sections);
 
         BoundStatement result = new BoundSwitch(syntax.Span, value, sections);
@@ -1394,7 +1355,7 @@ public sealed partial class Binder
         bool sawDefault = false;
         var frame = OpenSwitchFrame(variant, overVariant: true);
 
-        _switchDepth++;
+        _context.SwitchDepth++;
 
         foreach (var section in syntax.Sections)
         {
@@ -1479,8 +1440,8 @@ public sealed partial class Binder
             // reached by two of them has proved nothing about which.
             var saved = SnapshotFacts();
             if (subject is not null && cases.Count == 1)
-                _variantFacts[subject] = Fact.Holding(cases[0]);
-            else if (subject is not null) _variantFacts.Remove(subject);
+                _context.VariantFacts[subject] = Fact.Holding(cases[0]);
+            else if (subject is not null) _context.VariantFacts.Remove(subject);
 
             PushScope();
 
@@ -1498,7 +1459,7 @@ public sealed partial class Binder
             var body = new BoundBlock(section.Span, statements);
 
             PopScope();
-            _variantFacts = saved;
+            _context.VariantFacts = saved;
 
             if (EndIsReachable(body))
                 diagnostics.Error("SL0407", section.Span,
@@ -1513,7 +1474,7 @@ public sealed partial class Binder
             });
         }
 
-        _switchDepth--;
+        _context.SwitchDepth--;
         CloseSwitchFrame(frame, sections);
 
         var missing = variant.Uncovered(covered.Keys).ToList();
@@ -1553,7 +1514,7 @@ public sealed partial class Binder
 
     private BoundStatement BindReturn(ReturnSyntax syntax)
     {
-        if (_parallelDepth > 0)
+        if (_context.ParallelDepth > 0)
         {
             diagnostics.Error("SL0374", syntax.Span,
                 "'return' cannot leave a 'parallel' block; the join at its closing brace " +
@@ -1563,14 +1524,14 @@ public sealed partial class Binder
 
         // A block-bodied lambda whose result is being worked out: what each
         // return gives back is the evidence, and nothing is converted yet.
-        if (_inferringReturnsOf is not null && ReferenceEquals(_currentFunction, _inferringReturnsOf))
+        if (_context.InferringReturnsOf is not null && ReferenceEquals(_context.Function, _context.InferringReturnsOf))
         {
             var found = syntax.Value is null ? null : BindExpression(syntax.Value);
-            _returnsFound.Add(found);
+            _context.ReturnsFound.Add(found);
             return new BoundReturn(syntax.Span, found);
         }
 
-        var expected = _currentFunction?.ReturnType ?? PrimitiveTypeSymbol.Void;
+        var expected = _context.Function?.ReturnType ?? PrimitiveTypeSymbol.Void;
 
         if (syntax.Value is null)
         {
@@ -1593,7 +1554,7 @@ public sealed partial class Binder
 
     private BoundStatement BindBreak(BreakSyntax syntax)
     {
-        if (_loopDepth == 0 && _switchDepth == 0)
+        if (_context.LoopDepth == 0 && _context.SwitchDepth == 0)
             diagnostics.Error("SL0225", syntax.Span,
                 "'break' is only valid inside a loop or a switch");
         return new BoundBreak(syntax.Span);
@@ -1601,7 +1562,7 @@ public sealed partial class Binder
 
     private BoundStatement BindContinue(ContinueSyntax syntax)
     {
-        if (_loopDepth == 0)
+        if (_context.LoopDepth == 0)
             diagnostics.Error("SL0226", syntax.Span, "'continue' is only valid inside a loop");
         return new BoundContinue(syntax.Span);
     }

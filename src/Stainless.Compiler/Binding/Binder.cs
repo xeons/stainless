@@ -103,12 +103,6 @@ public sealed partial class Binder(
     private readonly List<InterfaceTypeSymbol> _interfaces = [];
     private readonly List<StructTypeSymbol> _structs = [];
 
-    /// <summary>
-    /// Which case each variant in scope is known to be holding. A fact is put
-    /// here by a condition that tested one, and taken away by anything that
-    /// could have changed it.
-    /// </summary>
-    private Dictionary<object, Fact> _variantFacts = [];
 
     /// <summary>Every array type something asked for, by element, each needing a TypeInfo.</summary>
     private readonly Dictionary<TypeSymbol, ArrayTypeSymbol> _arrays = [];
@@ -128,11 +122,15 @@ public sealed partial class Binder(
     /// </summary>
     private readonly HashSet<FunctionSymbol> _boundFunctions = [];
 
-    /// <summary>Bodies awaiting binding, with the substitution they belong to.</summary>
-    private readonly Queue<(FunctionSymbol Function, Dictionary<string, TypeSymbol> Substitution)> _pending = new();
+    /// <summary>
+    /// Bodies to be bound, with the substitution they belong to, in the order
+    /// they were asked for. Those before <see cref="_pendingBound"/> have been.
+    /// </summary>
+    private readonly List<(FunctionSymbol Function, Dictionary<string, TypeSymbol> Substitution)> _pending = [];
+    private int _pendingBound;
 
-    /// <summary>The type arguments in force while binding inside an instantiation.</summary>
-    private Dictionary<string, TypeSymbol> _substitution = new(StringComparer.Ordinal);
+    private int PendingCount => _pending.Count - _pendingBound;
+
     private readonly Dictionary<NamedTypeSymbol, (TypeDeclSyntax Declaration, FileScope Scope)> _typeSyntax = [];
 
     /// <summary>
@@ -205,33 +203,7 @@ public sealed partial class Binder(
     /// </summary>
     private int _synthetic;
 
-    /// <summary>How many 'parallel' scopes enclose what is being bound.</summary>
-    private int _parallelDepth;
-
     private string SyntheticName(string hint) => $"${hint}.{_synthetic++}";
-
-    // Per-function binding state.
-    private FunctionSymbol? _currentFunction;
-
-    /// <summary>The file being bound. Imports are per-file, so this is the unit of lookup.</summary>
-    private FileScope? _currentScope;
-    private ModuleSymbol? _currentModule => _currentScope?.Module;
-    private readonly List<Dictionary<string, LocalSymbol>> _scopes = [];
-    private int _loopDepth;
-
-    /// <summary>
-    /// How many <c>switch</c> statements enclose what is being bound. Separate
-    /// from the loop depth because a switch is a target for <c>break</c> but not
-    /// for <c>continue</c>, which passes straight through it to the loop.
-    /// </summary>
-    private int _switchDepth;
-
-    /// <summary>
-    /// The labels and jumps of the function being bound. Replaced rather than
-    /// cleared, so a lambda or local function bound in the middle of one puts
-    /// it aside and brings it back.
-    /// </summary>
-    private JumpState _jumps = new();
 
     /// <summary>
     /// The simple name of the type whose members are being declared, or null.
@@ -240,13 +212,6 @@ public sealed partial class Binder(
     /// pass 4, when there is no function to ask.
     /// </summary>
     private string? _declaringType;
-
-    /// <summary>
-    /// Whether <c>+</c>, <c>-</c> and <c>*</c> on integers are being asked to
-    /// notice that they overflowed. False everywhere but inside
-    /// <c>checked</c>: wrapping is the language's defined default (§9).
-    /// </summary>
-    private bool _checkedArithmetic;
 
     public BoundProgram Bind(IReadOnlyList<CompilationUnitSyntax> units)
     {

@@ -30,13 +30,13 @@ public sealed partial class Binder
 {
     private BoundExpression BindSizeof(SizeofSyntax syntax)
     {
-        var measured = ResolveType(syntax.Type, _currentScope!);
+        var measured = ResolveType(syntax.Type, _context.File!);
         return new BoundSizeof(syntax.Span, PrimitiveTypeSymbol.NUInt, measured);
     }
 
     private BoundExpression BindAlignof(AlignofSyntax syntax)
     {
-        var measured = ResolveType(syntax.Type, _currentScope!);
+        var measured = ResolveType(syntax.Type, _context.File!);
         return new BoundAlignof(syntax.Span, PrimitiveTypeSymbol.NUInt, measured);
     }
 
@@ -48,7 +48,7 @@ public sealed partial class Binder
     /// </summary>
     private BoundExpression BindOffsetof(OffsetofSyntax syntax)
     {
-        var owner = ResolveType(syntax.Type, _currentScope!);
+        var owner = ResolveType(syntax.Type, _context.File!);
         if (owner.IsError()) return new BoundErrorExpression(syntax.Span);
 
         if (owner is not NamedTypeSymbol named || owner is InterfaceTypeSymbol)
@@ -84,7 +84,7 @@ public sealed partial class Binder
     /// </summary>
     private BoundExpression BindTypeof(TypeofSyntax syntax)
     {
-        var measured = ResolveType(syntax.Type, _currentScope!);
+        var measured = ResolveType(syntax.Type, _context.File!);
         if (measured.IsError()) return new BoundErrorExpression(syntax.Span);
 
         if (TypeHandle is not { } handle)
@@ -107,7 +107,7 @@ public sealed partial class Binder
 
     private BoundExpression BindIidof(IidofSyntax syntax)
     {
-        var named = ResolveType(syntax.Type, _currentScope!);
+        var named = ResolveType(syntax.Type, _context.File!);
         if (named.IsError()) return new BoundErrorExpression(syntax.Span);
 
         if (named is not ComInterfaceTypeSymbol comInterface)
@@ -124,7 +124,7 @@ public sealed partial class Binder
 
     private BoundExpression BindCast(CastSyntax syntax)
     {
-        var targetType = ResolveType(syntax.Type, _currentScope!);
+        var targetType = ResolveType(syntax.Type, _context.File!);
         var operand = BindExpression(syntax.Operand);
         if (operand.Type.IsError() || targetType.IsError())
             return new BoundErrorExpression(syntax.Span);
@@ -160,7 +160,7 @@ public sealed partial class Binder
         return kind == ConversionKind.Identity && operand.Type.Equals(targetType)
             ? operand
             : new BoundConversion(syntax.Span, targetType, operand, kind.Value)
-                { IsChecked = _checkedArithmetic };
+                { IsChecked = _context.CheckedArithmetic };
     }
 
     private BoundExpression BindNew(NewSyntax syntax)
@@ -181,7 +181,7 @@ public sealed partial class Binder
                 : new BoundNewDraft(syntax.Span, syntax, given);
         }
 
-        var type = ResolveType(syntax.Type, _currentScope!);
+        var type = ResolveType(syntax.Type, _context.File!);
         if (type.IsError()) return new BoundErrorExpression(syntax.Span);
 
         return BindNewOf(syntax, type, syntax.Arguments.Select(BindArgument).ToList());
@@ -632,7 +632,7 @@ public sealed partial class Binder
     /// </summary>
     private bool CanReachProtected(NamedTypeSymbol owner) =>
         owner is ClassTypeSymbol ownerClass &&
-        _currentFunction?.ContainingType is ClassTypeSymbol here &&
+        _context.Function?.ContainingType is ClassTypeSymbol here &&
         here.DerivesFrom(ownerClass);
 
     /// <summary>
@@ -699,7 +699,7 @@ public sealed partial class Binder
         if (NamesAValue(parts[0])) return null;
 
         string name = string.Join('.', parts);
-        if (_currentScope!.Imports.TryGetValue(name, out var module)) return module;
+        if (_context.File!.Imports.TryGetValue(name, out var module)) return module;
         return _modules.TryGetValue(name, out module) ? module : null;
     }
 
@@ -724,10 +724,10 @@ public sealed partial class Binder
 
         if (parts.Count == 1)
         {
-            if (_currentScope!.Module.Types.TryGetValue(parts[0], out var local))
+            if (_context.File!.Module.Types.TryGetValue(parts[0], out var local))
                 return local as VariantTypeSymbol;
 
-            foreach (var imported in _currentScope.Imports.Values)
+            foreach (var imported in _context.File.Imports.Values)
                 if (imported.Types.TryGetValue(parts[0], out var found) &&
                     found is VariantTypeSymbol { IsPublic: true } visible)
                     return visible;
@@ -765,14 +765,14 @@ public sealed partial class Binder
     /// </summary>
     private TypeSymbol? TypeNamed(IReadOnlyList<string> parts)
     {
-        var module = _currentScope!.Module;
+        var module = _context.File!.Module;
         string whole = string.Join('.', parts);
 
         if (parts.Count > 1)
         {
             if (module.Types.TryGetValue(whole, out var nestedHere)) return nestedHere;
 
-            foreach (var imported in _currentScope.ImportedModules)
+            foreach (var imported in _context.File.ImportedModules)
                 if (imported.Types.TryGetValue(whole, out var nestedThere) && nestedThere.IsPublic)
                     return nestedThere;
         }
@@ -781,7 +781,7 @@ public sealed partial class Binder
         {
             // A type parameter, in a body bound for one instantiation, is the
             // type it was given: `T.Zero` is `Money.Zero`.
-            if (_substitution.TryGetValue(parts[0], out var argument)) return argument;
+            if (_context.Substitution.TryGetValue(parts[0], out var argument)) return argument;
 
             if (module.Types.TryGetValue(parts[0], out var local)) return local;
 
@@ -789,7 +789,7 @@ public sealed partial class Binder
                 module.Types.TryGetValue(within + "." + parts[0], out var sibling))
                 return sibling;
 
-            var visible = _currentScope.ImportedModules
+            var visible = _context.File.ImportedModules
                 .Select(m => m.Types.TryGetValue(parts[0], out var t) && t.IsPublic ? t : null)
                 .Where(t => t is not null)
                 .Distinct()
@@ -800,7 +800,7 @@ public sealed partial class Binder
 
         string moduleName = string.Join('.', parts.Take(parts.Count - 1));
         ModuleSymbol? owner =
-            _currentScope.Imports.TryGetValue(moduleName, out var imported2) ? imported2
+            _context.File.Imports.TryGetValue(moduleName, out var imported2) ? imported2
             : _modules.TryGetValue(moduleName, out var known) ? known
             : null;
 
@@ -855,19 +855,19 @@ public sealed partial class Binder
         // A name that is no generic type may be a generic function, and the
         // call is where that is settled.
         var name = new QualifiedName(target.Span, parts);
-        if (FindGenericType(name, _currentScope!) is null)
+        if (FindGenericType(name, _context.File!) is null)
             return null;
 
         // Asked several times of one expression, and reported once. A generic
         // body is bound once per instantiation, and each has its own answer.
         if (_constructedPrefixes.TryGetValue(target, out var known) &&
-            ReferenceEquals(known.Substitution, _substitution))
+            ReferenceEquals(known.Substitution, _context.Substitution))
             return known.Type;
 
-        var resolved = ResolveType(new NamedTypeSyntax(target.Span, name, arguments), _currentScope!);
+        var resolved = ResolveType(new NamedTypeSyntax(target.Span, name, arguments), _context.File!);
         var answer = resolved.IsError() ? null : resolved;
 
-        _constructedPrefixes[target] = (_substitution, answer);
+        Remember(_constructedPrefixes, target, (_context.Substitution, answer));
         return answer;
     }
 
@@ -882,13 +882,13 @@ public sealed partial class Binder
     /// </summary>
     private bool NamesAValue(string name) =>
         LookupLocal(name) is not null ||
-        _currentFunction?.Parameters.Any(p => p.Name == name && !p.IsThis) == true ||
-        _currentFunction?.Captures.Any(c => c.Name == name) == true ||
-        (_currentFunction is { } function &&
+        _context.Function?.Parameters.Any(p => p.Name == name && !p.IsThis) == true ||
+        _context.Function?.Captures.Any(c => c.Name == name) == true ||
+        (_context.Function is { } function &&
          _localFunctionOf.GetValueOrDefault(function)?.Visible?.ContainsKey(name) == true) ||
-        _currentFunction?.ContainingType?.FindField(name) is not null ||
-        _currentFunction?.ContainingType?.FindProperty(name) is not null ||
-        _currentFunction?.ContainingType?.PrimaryCaptures.ContainsKey(name) == true;
+        _context.Function?.ContainingType?.FindField(name) is not null ||
+        _context.Function?.ContainingType?.FindProperty(name) is not null ||
+        _context.Function?.ContainingType?.PrimaryCaptures.ContainsKey(name) == true;
 
     private EnumTypeSymbol? ResolveEnumPrefix(ExpressionSyntax target)
     {
@@ -904,7 +904,7 @@ public sealed partial class Binder
 
         string moduleName = string.Join('.', parts.Take(parts.Count - 1));
         ModuleSymbol? module =
-            _currentScope!.Imports.TryGetValue(moduleName, out var imported) ? imported
+            _context.File!.Imports.TryGetValue(moduleName, out var imported) ? imported
             : _modules.TryGetValue(moduleName, out var known) ? known
             : null;
 
@@ -916,7 +916,7 @@ public sealed partial class Binder
 
     private BoundExpression BindNewArray(NewArraySyntax syntax)
     {
-        var element = ResolveType(syntax.ElementType, _currentScope!);
+        var element = ResolveType(syntax.ElementType, _context.File!);
         var length = BindExpression(syntax.Length);
 
         if (element.IsError() || length.Type.IsError()) return new BoundErrorExpression(syntax.Span);

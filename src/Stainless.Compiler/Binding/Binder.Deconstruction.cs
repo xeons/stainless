@@ -135,7 +135,7 @@ public sealed partial class Binder
                 break;
 
             case DeclarationExpressionSyntax { Name: not "_" } declaration
-                when !_scopes[^1].ContainsKey(declaration.Name):
+                when !_context.Locals[^1].ContainsKey(declaration.Name):
                 DeclareLocal(declaration.Name, ErrorTypeSymbol.Instance, isConst: false,
                     declaration.NameSpan);
                 break;
@@ -235,7 +235,7 @@ public sealed partial class Binder
 
                 var type = declaration.Type is null
                     ? null
-                    : ResolveType(declaration.Type, _currentScope!);
+                    : ResolveType(declaration.Type, _context.File!);
                 if (type is not null && type.IsError()) return null;
 
                 return new DeconstructionTarget(
@@ -251,7 +251,7 @@ public sealed partial class Binder
             // `_` is a discard unless something in scope is called that.
             case NameSyntax { Name.Parts: ["_"], TypeArguments: null } discard
                 when LookupLocal("_") is null &&
-                     _currentFunction?.Parameters.Any(p => p.Name == "_") != true:
+                     _context.Function?.Parameters.Any(p => p.Name == "_") != true:
                 return new DeconstructionTarget(DeconstructionKind.Discard, discard.Span);
         }
 
@@ -280,7 +280,7 @@ public sealed partial class Binder
             var receiver = read.Receiver;
             if (receiver is not null)
             {
-                if (WrittenParameter(receiver) is { } mutated) mutated.IsAssigned = true;
+                if (WrittenParameter(receiver) is { } mutated) MarkAssigned(mutated);
                 InvalidateVariantFact(receiver);
             }
 
@@ -313,7 +313,7 @@ public sealed partial class Binder
         if (!Writable(target, syntax.Span, "=")) return null;
 
         InvalidateVariantFact(target);
-        if (WrittenParameter(target) is { } written) written.IsAssigned = true;
+        if (WrittenParameter(target) is { } written) MarkAssigned(written);
         NoteMemberWritten(target);
 
         return new DeconstructionTarget(DeconstructionKind.Place, syntax.Span)
@@ -534,15 +534,19 @@ public sealed partial class Binder
         var syntax = new CallSyntax(span, member, arguments);
 
         BoundExpression call;
-        using (diagnostics.Muted())
+        List<LocalSymbol> parts;
+        using (var trial = BeginTrial())
+        {
             call = BindCallOn(value, member, syntax);
+            parts = call is BoundCall bound
+                ? bound.Arguments.OfType<BoundAddressOf>()
+                    .Select(a => a.DeclaresLocal)
+                    .OfType<LocalSymbol>()
+                    .ToList()
+                : [];
 
-        var parts = call is BoundCall bound
-            ? bound.Arguments.OfType<BoundAddressOf>()
-                .Select(a => a.DeclaresLocal)
-                .OfType<LocalSymbol>()
-                .ToList()
-            : [];
+            if (!call.Type.IsError() && parts.Count == arity) trial.Accept();
+        }
 
         if (call.Type.IsError() || parts.Count != arity)
         {

@@ -594,10 +594,7 @@ public sealed partial class Binder
     /// </summary>
     private VariantCaseSymbol? CaseNamed(FileScope scope, string name)
     {
-        var previous = _currentScope;
-        _currentScope = scope;
-
-        try
+        using (Enter(_context with { File = scope }))
         {
             var found = VariantsWithCase(name).FirstOrDefault()?.FindCase(name);
             if (found is not null) return found;
@@ -624,10 +621,6 @@ public sealed partial class Binder
             }
 
             return null;
-        }
-        finally
-        {
-            _currentScope = previous;
         }
     }
 
@@ -792,7 +785,7 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
-        var known = _variantFacts.TryGetValue(subject, out var fact) ? fact.Case : null;
+        var known = _context.VariantFacts.TryGetValue(subject, out var fact) ? fact.Case : null;
         string name = SubjectName(subject);
 
         if (known is null)
@@ -828,7 +821,7 @@ public sealed partial class Binder
     private BoundExpression Narrowed(BoundExpression access, object subject)
     {
         if (access.Type is not OptionalTypeSymbol optional) return access;
-        if (!_variantFacts.TryGetValue(subject, out var fact)) return access;
+        if (!_context.VariantFacts.TryGetValue(subject, out var fact)) return access;
         if (!fact.ProvesNotNull) return access;
 
         return new BoundConversion(
@@ -849,7 +842,7 @@ public sealed partial class Binder
             : expression;
 
     /// <summary>The modules a name written in the current file resolves against.</summary>
-    private IReadOnlyList<ModuleSymbol> VisibleModules() => _currentScope?.VisibleModules ?? [];
+    private IReadOnlyList<ModuleSymbol> VisibleModules() => _context.File?.VisibleModules ?? [];
 
     private static string SubjectName(object subject) => subject switch
     {

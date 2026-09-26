@@ -98,9 +98,9 @@ public sealed partial class Binder
         }
 
         if (template.ContainingType is InterfaceTypeSymbol contract)
-            contract.GenericSlots.Add(instance);
+            Remember(contract.GenericSlots, instance);
         else
-            _genericVirtualRoots.Add(instance);
+            Remember(_genericVirtualRoots, instance);
     }
 
     /// <summary>
@@ -144,7 +144,7 @@ public sealed partial class Binder
             }
         }
 
-        return _instantiatedFunctions.Count != before || _pending.Count > 0;
+        return _instantiatedFunctions.Count != before || PendingCount > 0;
     }
 
     /// <summary>

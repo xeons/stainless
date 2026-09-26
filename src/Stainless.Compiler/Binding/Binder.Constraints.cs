@@ -209,17 +209,8 @@ public sealed partial class Binder
         if (MentionsAny(type, inScope)) return null;
 
         // Muted, because instantiation resolves it again and reports then.
-        var previous = _substitution;
-        _substitution = new Dictionary<string, TypeSymbol>(StringComparer.Ordinal);
-        try
-        {
-            using (diagnostics.Muted())
-                return ResolveType(type, scope);
-        }
-        finally
-        {
-            _substitution = previous;
-        }
+        using (Enter(_context with { Substitution = new(StringComparer.Ordinal) }))
+            return ResolveTypeQuietly(type, scope);
     }
 
     /// <summary>Whether a written type names any of these parameters, however deep.</summary>

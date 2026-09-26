@@ -439,12 +439,12 @@ public sealed partial class Binder
         }
 
         // The failure has to go somewhere, and the only place is the caller.
-        if (_currentFunction?.ReturnType is not VariantTypeSymbol target || !IsResult(target))
+        if (_context.Function?.ReturnType is not VariantTypeSymbol target || !IsResult(target))
         {
             diagnostics.Error("SL0570", syntax.Span,
-                _currentFunction is null
+                _context.Function is null
                     ? "'try' passes a failure to the caller, so it belongs in a function"
-                    : $"'{_currentFunction.Name}' returns '{_currentFunction.ReturnType.Name}', " +
+                    : $"'{_context.Function.Name}' returns '{_context.Function.ReturnType.Name}', " +
                       "so a failure has nowhere to go. A function containing 'try' returns a " +
                       "'Result'; use 'GetValueOrDefault' for a caller that has a sensible default");
             return new BoundErrorExpression(syntax.Span);
@@ -463,7 +463,7 @@ public sealed partial class Binder
         if (!carried.Equals(wanted))
         {
             diagnostics.Error("SL0571", syntax.Span,
-                $"this fails with '{carried.Name}' and '{_currentFunction.Name}' fails with " +
+                $"this fails with '{carried.Name}' and '{_context.Function.Name}' fails with " +
                 $"'{wanted.Name}'. 'try' passes a failure on unchanged, so convert it first: " +
                 "check it and return the failure you mean");
             return new BoundErrorExpression(syntax.Span);
@@ -721,18 +721,18 @@ public sealed partial class Binder
         // generated closure also has a `this`, and letting the keyword mean
         // that one silently rebound the programmer's word to a type they never
         // wrote.
-        if (_closures.Count > 0) return CaptureThis(_closures.Count - 1, syntax.Span);
+        if (_context.Closures.Count > 0) return CaptureThis(_context.Closures.Count - 1, syntax.Span);
 
         ReportReachingTheObject(syntax.Span);
 
-        var parameter = _currentFunction?.Parameters.FirstOrDefault(p => p.IsThis);
-        if (parameter is null && TryGiveLocalFunctionThis(_currentFunction, syntax.Span))
+        var parameter = _context.Function?.Parameters.FirstOrDefault(p => p.IsThis);
+        if (parameter is null && TryGiveLocalFunctionThis(_context.Function, syntax.Span))
             return new BoundErrorExpression(syntax.Span);
 
         if (parameter is null)
         {
             diagnostics.Error("SL0228", syntax.Span,
-                _currentFunction is { IsStatic: true } enclosing
+                _context.Function is { IsStatic: true } enclosing
                     ? $"'{enclosing.Name}' is static, so there is no 'this': it belongs to " +
                       $"'{enclosing.ContainingType!.Name}' rather than to one of them. Take " +
                       "the object as a parameter, or drop the 'static'"
@@ -748,9 +748,9 @@ public sealed partial class Binder
     /// </summary>
     private BoundExpression BindFieldKeyword(FieldKeywordSyntax syntax)
     {
-        var owner = _closures.Count > 0
-            ? _closures[0].OuterFunction?.ContainingType
-            : _currentFunction?.ContainingType;
+        var owner = _context.Closures.Count > 0
+            ? _context.Closures[0].OuterFunction?.ContainingType
+            : _context.Function?.ContainingType;
 
         var property = owner?.Properties.FirstOrDefault(p => p.Name == syntax.Property);
 
@@ -782,11 +782,11 @@ public sealed partial class Binder
     {
         get
         {
-            var function = _currentFunction;
-            for (int i = _closures.Count - 1;
-                 i >= 0 && function is not null && ReferenceEquals(function.ContainingType, _closures[i].Type);
+            var function = _context.Function;
+            for (int i = _context.Closures.Count - 1;
+                 i >= 0 && function is not null && ReferenceEquals(function.ContainingType, _context.Closures[i].Type);
                  i--)
-                function = _closures[i].OuterFunction;
+                function = _context.Closures[i].OuterFunction;
 
             return function?.ContainingType;
         }
@@ -824,7 +824,7 @@ public sealed partial class Binder
     /// </summary>
     private BoundExpression? BindBaseReceiver(SourceSpan span)
     {
-        if (_currentFunction?.ContainingType is not ClassTypeSymbol here)
+        if (_context.Function?.ContainingType is not ClassTypeSymbol here)
         {
             diagnostics.Error("SL0515", span,
                 "'base' is only valid inside a class method, constructor or destructor");
@@ -938,7 +938,7 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
-        var tested = ResolveType(syntax.Tested, _currentScope!);
+        var tested = ResolveType(syntax.Tested, _context.File!);
         if (tested.IsError()) return new BoundErrorExpression(syntax.Span);
 
         if (tested is not NamedTypeSymbol { IsReferenceType: true } wanted)
@@ -1025,7 +1025,7 @@ public sealed partial class Binder
             if (LookupLocal(name) is { } local)
                 return Narrowed(new BoundLocalAccess(syntax.Span, local), local);
 
-            if (_currentFunction?.Parameters.FirstOrDefault(p => p.Name == name && !p.IsThis) is { } parameter)
+            if (_context.Function?.Parameters.FirstOrDefault(p => p.Name == name && !p.IsThis) is { } parameter)
                 return Narrowed(new BoundParameterAccess(syntax.Span, parameter), parameter);
 
             // A variable of the function around a local function: one of the
@@ -1051,7 +1051,7 @@ public sealed partial class Binder
             // An unqualified member name inside a method means `this.member`.
             // A static method has no `this`, and saying so here is worth more
             // than letting the name fall through to "is not defined".
-            if (_currentFunction is { IsStatic: true } inStatic &&
+            if (_context.Function is { IsStatic: true } inStatic &&
                 (inStatic.ContainingType!.FindProperty(name) is not null ||
                  inStatic.ContainingType.FindField(name) is not null))
             {
@@ -1067,14 +1067,14 @@ public sealed partial class Binder
                 return new BoundErrorExpression(syntax.Span);
             }
 
-            if (_currentFunction?.ContainingType?.FindProperty(name) is { } ownProperty)
+            if (_context.Function?.ContainingType?.FindProperty(name) is { } ownProperty)
             {
                 var receiver = BindImplicitThis(syntax.Span);
                 if (receiver is not null)
                     return BindPropertyRead(syntax.Span, receiver, ownProperty);
             }
 
-            if (_currentFunction?.ContainingType?.FindField(name) is { } field)
+            if (_context.Function?.ContainingType?.FindField(name) is { } field)
             {
                 if (!CanReach(field.IsPublic, field.IsProtected, field.ContainingType))
                 {
@@ -1096,7 +1096,7 @@ public sealed partial class Binder
             if (_currentModule.Statics.TryGetValue(name, out var moduleStatic))
                 return new BoundStaticAccess(syntax.Span, moduleStatic);
 
-            foreach (var import in _currentScope!.ImportedModules)
+            foreach (var import in _context.File!.ImportedModules)
             {
                 if (import.Constants.TryGetValue(name, out var imported) && imported.IsPublic)
                     return new BoundConstantAccess(syntax.Span, imported);
@@ -1142,8 +1142,8 @@ public sealed partial class Binder
     {
         ReportReachingTheObject(span);
 
-        var parameter = _currentFunction?.Parameters.FirstOrDefault(p => p.IsThis);
-        if (parameter is null && TryGiveLocalFunctionThis(_currentFunction, span))
+        var parameter = _context.Function?.Parameters.FirstOrDefault(p => p.IsThis);
+        if (parameter is null && TryGiveLocalFunctionThis(_context.Function, span))
             return new BoundErrorExpression(span);
 
         return parameter is null ? null : Receiver(span, parameter);
@@ -1161,7 +1161,7 @@ public sealed partial class Binder
     /// </summary>
     private void ReportReachingTheObject(SourceSpan span)
     {
-        if (!_initializingField || _reportedFieldInitializerReach) return;
+        if (!_context.InitializingField || _reportedFieldInitializerReach) return;
 
         _reportedFieldInitializerReach = true;
 
@@ -1263,7 +1263,7 @@ public sealed partial class Binder
             operand = PromoteToInt(operand);
 
         return new BoundUnary(syntax.Span, operand.Type, op, operand)
-            { IsChecked = _checkedArithmetic && op is BoundUnaryOp.Negate };
+            { IsChecked = _context.CheckedArithmetic && op is BoundUnaryOp.Negate };
     }
 
     private BoundExpression BindBinary(BinarySyntax syntax)
@@ -1706,7 +1706,7 @@ public sealed partial class Binder
         // Only the three that can overflow, and only on integers: a float
         // saturates to infinity rather than wrapping, and there is nothing for
         // `checked` to catch.
-        bool watched = _checkedArithmetic && common.IsInteger &&
+        bool watched = _context.CheckedArithmetic && common.IsInteger &&
             op is BoundBinaryOp.Add or BoundBinaryOp.Subtract or BoundBinaryOp.Multiply;
 
         return new BoundBinary(span, isComparison ? PrimitiveTypeSymbol.Bool : common, left, op, right)
@@ -1796,7 +1796,7 @@ public sealed partial class Binder
         ApplyFacts(whenTrue ? proves : disproves);
         var bound = BindExpression(syntax);
 
-        _variantFacts = entry;
+        _context.VariantFacts = entry;
         return bound;
     }
 
@@ -1818,12 +1818,12 @@ public sealed partial class Binder
         var whenTrue = BindWhereAssigned(
             condition, whenTrue: true, () => BindExpression(syntax.WhenTrue), isExpression: true);
 
-        _variantFacts = new Dictionary<object, Fact>(entry);
+        _context.VariantFacts = new Dictionary<object, Fact>(entry);
         ApplyFacts(disproves);
         var whenFalse = BindWhereAssigned(
             condition, whenTrue: false, () => BindExpression(syntax.WhenFalse), isExpression: true);
 
-        _variantFacts = entry;
+        _context.VariantFacts = entry;
 
         if (whenTrue.Type.IsError() || whenFalse.Type.IsError())
             return new BoundErrorExpression(syntax.Span);
@@ -1991,7 +1991,7 @@ public sealed partial class Binder
         // allowVoid, so that the refusal below is the one reported: it says
         // what `default` in particular cannot do, where the general rule in
         // ResolveType says only that 'void' is not a type a value has.
-        var type = ResolveType(syntax.Type, _currentScope!, allowVoid: true);
+        var type = ResolveType(syntax.Type, _context.File!, allowVoid: true);
         if (type.IsError()) return new BoundErrorExpression(syntax.Span);
 
         if (type.IsVoid())
@@ -2155,11 +2155,11 @@ public sealed partial class Binder
         // keeps `nameof(Button)` and `nameof(button)` from needing different
         // spellings.
         bool found;
-        using (diagnostics.Muted())
+        using (BeginTrial())
         {
             found = BindExpression(syntax.Operand) is not BoundErrorExpression;
 
-            if (!found && syntax.Operand is NameSyntax typeName && _currentScope is { } scope)
+            if (!found && syntax.Operand is NameSyntax typeName && _context.File is { } scope)
                 found = ResolveNamedType(
                     new NamedTypeSyntax(typeName.Span, typeName.Name, []), scope)
                     is not ErrorTypeSymbol;
@@ -2193,10 +2193,10 @@ public sealed partial class Binder
     /// </summary>
     private BoundExpression BindChecked(CheckedSyntax syntax)
     {
-        bool previous = _checkedArithmetic;
-        _checkedArithmetic = syntax.IsChecked;
+        bool previous = _context.CheckedArithmetic;
+        _context.CheckedArithmetic = syntax.IsChecked;
         var value = BindExpression(syntax.Operand);
-        _checkedArithmetic = previous;
+        _context.CheckedArithmetic = previous;
         return value;
     }
 
@@ -2238,18 +2238,18 @@ public sealed partial class Binder
             return new BoundPropertyIncrement(
                 syntax.Span, read.Receiver, property, syntax.IsPrefix, syntax.IsIncrement,
                 read.Arguments)
-                { IsChecked = _checkedArithmetic };
+                { IsChecked = _context.CheckedArithmetic };
         }
 
         if (!Writable(target, syntax.Operand.Span, written)) return new BoundErrorExpression(syntax.Span);
         if (!Countable(target.Type, syntax.Span, written)) return new BoundErrorExpression(syntax.Span);
 
         InvalidateVariantFact(target);
-        if (WrittenParameter(target) is { } written2) written2.IsAssigned = true;
+        if (WrittenParameter(target) is { } written2) MarkAssigned(written2);
         NoteMemberWritten(target);
 
         return new BoundIncrement(syntax.Span, target, syntax.IsPrefix, syntax.IsIncrement)
-            { IsChecked = _checkedArithmetic };
+            { IsChecked = _context.CheckedArithmetic };
     }
 
     /// <summary>Whether one may be added to a value of this type.</summary>
@@ -2382,7 +2382,7 @@ public sealed partial class Binder
         {
             // `Fired += h` inside the declaring type.
             case NameSyntax { Name.Parts.Count: 1 } bare
-                when _currentFunction?.ContainingType?.FindEvent(bare.Name.Last) is { } own:
+                when _context.Function?.ContainingType?.FindEvent(bare.Name.Last) is { } own:
                 subscribed = own;
                 receiver = BindImplicitThis(span);
                 break;
@@ -2401,10 +2401,14 @@ public sealed partial class Binder
                 // error, no event is found, and the ordinary path binds it
                 // again and says whatever there is to say.
                 BoundExpression target;
-                using (diagnostics.Muted()) target = BindExpression(member.Target);
-
-                if (target.Type is not NamedTypeSymbol named) return null;
-                if (named.FindEvent(member.Member) is not { } found) return null;
+                EventSymbol? found;
+                using (var trial = BeginTrial())
+                {
+                    target = BindExpression(member.Target);
+                    found = (target.Type as NamedTypeSymbol)?.FindEvent(member.Member);
+                    if (found is null) return null;
+                    trial.Accept();
+                }
 
                 subscribed = found;
                 receiver = target;
@@ -2490,11 +2494,11 @@ public sealed partial class Binder
 
         return bound switch
         {
-            BoundThis self => _closures.Count == 0 && self.Parameter.IsThis
-                              && self.Parameter == _currentFunction?.Parameters.FirstOrDefault(p => p.IsThis),
-            BoundFieldAccess { Field.Name: ThisCaptureName, Receiver: BoundThis } => _closures.Count > 0,
+            BoundThis self => _context.Closures.Count == 0 && self.Parameter.IsThis
+                              && self.Parameter == _context.Function?.Parameters.FirstOrDefault(p => p.IsThis),
+            BoundFieldAccess { Field.Name: ThisCaptureName, Receiver: BoundThis } => _context.Closures.Count > 0,
             BoundConversion { Kind: ConversionKind.PointerCast, Operand: BoundLocalAccess local }
-                => _closures.Count > 0 && local.Local.Name == WeakSelfName,
+                => _context.Closures.Count > 0 && local.Local.Name == WeakSelfName,
             _ => false,
         };
     }
@@ -2530,7 +2534,7 @@ public sealed partial class Binder
 
         // Writing into a parameter's own storage makes it owned; see
         // ParameterSymbol.IsAssigned.
-        if (WrittenParameter(target) is { } written) written.IsAssigned = true;
+        if (WrittenParameter(target) is { } written) MarkAssigned(written);
 
         NoteMemberWritten(target);
 
@@ -2608,7 +2612,7 @@ public sealed partial class Binder
              IsImplicitlyConvertible(value, type)) &&
             ClassifyConversion(combined.Type, type, explicitCast: true) is { } kind)
             return new BoundConversion(syntax.Span, type, combined, kind)
-                { IsChecked = _checkedArithmetic };
+                { IsChecked = _context.CheckedArithmetic };
 
         return BindConversion(combined, type, syntax.Value.Span);
     }
@@ -2684,7 +2688,7 @@ public sealed partial class Binder
         // a write to the parameter exactly as `p.field = x` is.
         if (receiver is not null)
         {
-            if (WrittenParameter(receiver) is { } mutated) mutated.IsAssigned = true;
+            if (WrittenParameter(receiver) is { } mutated) MarkAssigned(mutated);
             InvalidateVariantFact(receiver);
         }
 
@@ -2794,7 +2798,7 @@ public sealed partial class Binder
         if (property.Setter is not { } setter)
         {
             if (property.BackingField is { } field && receiver is not null && plain &&
-                _currentFunction is { Kind: FunctionKind.Constructor } ctor &&
+                _context.Function is { Kind: FunctionKind.Constructor } ctor &&
                 ctor.ContainingType == property.ContainingType)
             {
                 storage = new BoundFieldAccess(span, receiver, field);
@@ -2802,7 +2806,7 @@ public sealed partial class Binder
             }
 
             if (property.StaticBacking is { } shared && receiver is null && plain &&
-                _currentFunction is { Kind: FunctionKind.StaticConstructor } initializer &&
+                _context.Function is { Kind: FunctionKind.StaticConstructor } initializer &&
                 initializer.ContainingType == property.ContainingType)
             {
                 storage = new BoundStaticAccess(span, shared);
@@ -2880,8 +2884,8 @@ public sealed partial class Binder
     /// </summary>
     private bool MayCallInit(BoundExpression? receiver, PropertySymbol property)
     {
-        if (_closures.Count > 0) return false;
-        if (_currentFunction is not { } here) return false;
+        if (_context.Closures.Count > 0) return false;
+        if (_context.Function is not { } here) return false;
         if (here.Kind != FunctionKind.Constructor && !here.IsInitAccessor) return false;
 
         bool related = here.ContainingType == property.ContainingType ||

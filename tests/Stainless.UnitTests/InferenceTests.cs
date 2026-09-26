@@ -264,6 +264,69 @@ public class InferenceTests
         Assert.Equal(1, applies);
     }
 
+    /// <summary>
+    /// A candidate that loses is a trial that is discarded, and what its lambda
+    /// instantiated goes with it. The `String` overload is tried and refused;
+    /// its lambda's `Echo(x)` made an `Echo&lt;String&gt;` that nothing calls.
+    /// </summary>
+    [Fact]
+    public void ARejectedCandidateLeavesNoInstantiationBehind()
+    {
+        string ir = Front.ModuleIr("""
+            public closure R Mapper<A, R>(A value);
+
+            T Echo<T>(T value) => value;
+
+            R Apply<R>(int value, Mapper<int, R> f) => f(value);
+            R Apply<R>(String value, Mapper<String, R> f) => f(value);
+
+            public int Once() => Apply(5, x => Echo(x));
+            """);
+
+        var echoes = ir.Split('\n')
+            .Where(l => l.StartsWith("define", StringComparison.Ordinal) &&
+                        l.Contains("4EchoG", StringComparison.Ordinal))
+            .ToList();
+
+        Assert.Single(echoes);
+        Assert.Contains("i32 @", echoes[0]);
+    }
+
+    /// <summary>
+    /// The winner's trial is kept, and with it the type its lambda's body was
+    /// the first to name. Taken back, it would be a type nothing emitted.
+    /// </summary>
+    [Fact]
+    public void AKeptTrialKeepsWhatItInstantiated() =>
+        Front.Verified(Front.ModuleIr(Shapes + """
+            public class Holder<T> { public T Item; public Holder(T item) { Item = item; } }
+
+            public int Once() {
+                var numbers = [1, 2];
+                var held = Transform(numbers, n => new Holder<int>(n));
+                return held.Item;
+            }
+            """));
+
+    /// <summary>
+    /// A guess that is kept reports what its instantiation broke. The guess is
+    /// quiet, and the instantiation it made was cached; muted with it, the
+    /// constraint was never said anywhere.
+    /// </summary>
+    [Fact]
+    public void AKeptGuessReportsWhatItsInstantiationBroke() =>
+        Assert.Contains("SL0328", Front.ModuleCodes("""
+            public interface IShape { int Sides(); }
+
+            int Count<T>(T value) where T : IShape => 0;
+
+            int Main()
+            {
+                int n = 3;
+                return n.Count();
+            }
+            """));
+
     /// <summary>A closure held in a variable says what its arguments are.</summary>
     [Fact]
     public void AClosureInAVariableIsReadOffItsType() =>

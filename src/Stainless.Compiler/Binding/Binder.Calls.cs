@@ -155,7 +155,7 @@ public sealed partial class Binder
             // arguments is still an error about the method, not a licence to go
             // looking for something else with the same name.
             if (callee.Name.Parts.Count == 1 &&
-                _currentFunction?.ContainingType?.FindMethods(callee.Name.Text).ToList() is
+                _context.Function?.ContainingType?.FindMethods(callee.Name.Text).ToList() is
                     { Count: > 0 } own)
             {
                 var method = ResolveOverload(own, arguments, callee.Span, callee.Name.Text, syntax.Arguments);
@@ -168,7 +168,7 @@ public sealed partial class Binder
                 if (method.IsStatic || receiver is not null)
                 {
                     // Inherited, so it may belong to a base in another module.
-                    var owner = method.ContainingType ?? _currentFunction!.ContainingType!;
+                    var owner = method.ContainingType ?? _context.Function!.ContainingType!;
                     if (!CanReach(method.IsPublic, method.IsProtected, owner))
                     {
                         diagnostics.Error("SL0257", callee.Span,
@@ -179,7 +179,7 @@ public sealed partial class Binder
                     return BuildCall(syntax, method, receiver, arguments);
                 }
 
-                if (_currentFunction is { IsStatic: true } enclosingStatic)
+                if (_context.Function is { IsStatic: true } enclosingStatic)
                 {
                     diagnostics.Error("SL0576", callee.Span,
                         $"'{callee.Name.Text}' is an instance method of " +
@@ -205,7 +205,7 @@ public sealed partial class Binder
             if (candidates.Count > 0)
                 return BindFunctionCall(syntax, candidates, callee.Name.Text, arguments);
 
-            if (callee.Name.Parts.Count == 1 && _currentFunction?.ContainingType is { } enclosing)
+            if (callee.Name.Parts.Count == 1 && _context.Function?.ContainingType is { } enclosing)
             {
                 var generics = GenericMethodsNamed(enclosing, callee.Name.Text);
                 if (generics.Count > 0)
@@ -222,14 +222,14 @@ public sealed partial class Binder
             // Inside a lambda, a bare name may be a method of the object the
             // lambda was written in. That object is captured, and the call then
             // goes through the capture like any other member.
-            if (callee.Name.Parts.Count == 1 && _closures.Count > 0 &&
+            if (callee.Name.Parts.Count == 1 && _context.Closures.Count > 0 &&
                 MethodsOfEnclosingThis(callee.Name.Text) is { Count: > 0 } outerMethods)
             {
                 var outerMethod =
                     ResolveOverload(outerMethods, arguments, callee.Span, callee.Name.Text, syntax.Arguments);
                 if (outerMethod is null) return new BoundErrorExpression(syntax.Span);
 
-                var captured = CaptureThis(_closures.Count - 1, callee.Span);
+                var captured = CaptureThis(_context.Closures.Count - 1, callee.Span);
                 if (captured.Type.IsError()) return new BoundErrorExpression(syntax.Span);
                 return BuildCall(syntax, outerMethod, captured, arguments);
             }
@@ -246,9 +246,9 @@ public sealed partial class Binder
             // -- `publisher.Fired(...)` is a caller raising somebody else's
             // event, which is the thing an event exists to prevent.
             if (callee.Name.Parts.Count == 1 &&
-                _currentFunction?.ContainingType?.FindEvent(callee.Name.Last) is { } raised)
+                _context.Function?.ContainingType?.FindEvent(callee.Name.Last) is { } raised)
             {
-                if (raised.ContainingType != _currentFunction.ContainingType)
+                if (raised.ContainingType != _context.Function.ContainingType)
                 {
                     diagnostics.Error("SL0554", callee.Span,
                         $"'{raised.Name}' is declared by '{raised.ContainingType.Name}', and only " +
@@ -315,7 +315,7 @@ public sealed partial class Binder
             return BindLocalFunctionCall(syntax, callee, local, arguments);
         }
 
-        if (callee.Name.Parts.Count == 1 && _currentFunction?.ContainingType is { } enclosing &&
+        if (callee.Name.Parts.Count == 1 && _context.Function?.ContainingType is { } enclosing &&
             GenericMethodsNamed(enclosing, name) is { Count: > 0 } own)
         {
             var instantiated = InferAndInstantiate(own, syntax, arguments);
@@ -339,7 +339,7 @@ public sealed partial class Binder
             return generic;
 
         bool plain = ResolveFunctionCandidates(callee.Name).Count > 0 ||
-                     _currentFunction?.ContainingType?.FindMethods(name).Any() == true;
+                     _context.Function?.ContainingType?.FindMethods(name).Any() == true;
         return RefuseTypeArgumentsOnPlainFunction(callee, name, plain);
     }
 
@@ -487,11 +487,14 @@ public sealed partial class Binder
         var templates = FindGenericFunctions(new QualifiedName(member.Span, [member.Member]));
         if (templates.Count == 0) return null;
 
-        // Muted: this is a guess, and its failure is not the program's error.
-        // The caller has a better one to report.
+        // A quiet trial: this is a guess, and its failure is not the program's
+        // error. The caller has a better one to report.
         FunctionSymbol? instantiated;
-        using (diagnostics.Muted())
+        using (var trial = BeginTrial())
+        {
             instantiated = InferAndInstantiate(templates, call, whole);
+            if (instantiated is not null) trial.Accept();
+        }
 
         return instantiated is null ? null : BuildCall(call, instantiated, receiver: null, whole);
     }
@@ -503,7 +506,7 @@ public sealed partial class Binder
             .Where(f => f.Name == name && f.ContainingType is null)
             .ToList();
 
-        foreach (var imported in _currentScope!.ImportedModules)
+        foreach (var imported in _context.File!.ImportedModules)
             if (imported != _currentModule)
                 found.AddRange(imported.Functions.Where(
                     f => f.Name == name && f.ContainingType is null && f.IsPublic));
@@ -536,7 +539,7 @@ public sealed partial class Binder
         {
             var declared = syntax.DeclaredType is null
                 ? ErrorTypeSymbol.Instance
-                : ResolveType(syntax.DeclaredType, _currentScope!);
+                : ResolveType(syntax.DeclaredType, _context.File!);
 
             return new BoundOutDraft(syntax.Span, declared, name, syntax.NameSpan);
         }
@@ -575,7 +578,7 @@ public sealed partial class Binder
     private void ForgetWrittenThrough(BoundExpression target)
     {
         InvalidateVariantFact(target);
-        if (WrittenParameter(target) is { } parameter) parameter.IsAssigned = true;
+        if (WrittenParameter(target) is { } parameter) MarkAssigned(parameter);
     }
 
     /// <summary>
@@ -638,18 +641,18 @@ public sealed partial class Binder
                 if (LookupLocal(text) is { } local && IsCallableValue(local.Type))
                     return new BoundLocalAccess(name.Span, local);
 
-                if (_currentFunction?.Parameters.FirstOrDefault(
+                if (_context.Function?.Parameters.FirstOrDefault(
                         p => p.Name == text && !p.IsThis) is { } parameter &&
                     IsCallableValue(parameter.Type))
                     return new BoundParameterAccess(name.Span, parameter);
 
-                if (_currentFunction is { } function &&
+                if (_context.Function is { } function &&
                     (function.Captures.FirstOrDefault(c => c.Name == text)?.Type ??
                      _localFunctionOf.GetValueOrDefault(function)?.Visible?.GetValueOrDefault(text).Type)
                     is { } capturedType && IsCallableValue(capturedType))
                     return TryCaptureIntoLocalFunction(text, name.Span);
 
-                if (_currentFunction?.ContainingType?.FindProperty(text) is { } property &&
+                if (_context.Function?.ContainingType?.FindProperty(text) is { } property &&
                     IsCallableValue(property.Type))
                 {
                     var receiver = BindImplicitThis(name.Span);
@@ -657,7 +660,7 @@ public sealed partial class Binder
                         return BindPropertyRead(name.Span, receiver, property);
                 }
 
-                if (_currentFunction?.ContainingType?.FindField(text) is { } field &&
+                if (_context.Function?.ContainingType?.FindField(text) is { } field &&
                     IsCallableValue(field.Type))
                 {
                     var receiver = BindImplicitThis(name.Span);
@@ -680,9 +683,12 @@ public sealed partial class Binder
     /// </summary>
     private BoundExpression? BindCallableValue(ExpressionSyntax callee)
     {
-        BoundExpression tried;
-        using (diagnostics.Muted()) tried = BindExpression(callee);
-        return IsCallableValue(tried.Type) ? BindExpression(callee) : null;
+        // Bound twice, so the first is a trial nothing keeps.
+        bool callable;
+        using (BeginTrial())
+            callable = IsCallableValue(BindExpression(callee).Type);
+
+        return callable ? BindExpression(callee) : null;
     }
 
     /// <summary>A value that is called rather than dispatched to.</summary>
@@ -1133,7 +1139,7 @@ public sealed partial class Binder
             })
             return null;
         if (LookupLocal(named.Name.Last) is not null) return null;
-        if (_currentFunction?.ContainingType is not { } owner) return null;
+        if (_context.Function?.ContainingType is not { } owner) return null;
         if (owner.FindEvent(named.Name.Last) is not { } cleared) return null;
         if (cleared.ContainingType != owner || cleared.BackingField is not { } field) return null;
 
@@ -1254,7 +1260,7 @@ public sealed partial class Binder
             var local = _currentModule!.FindFunctions(name.Parts[0]).ToList();
             if (local.Count > 0) return local;
 
-            return _currentScope!.ImportedModules
+            return _context.File!.ImportedModules
                 .SelectMany(m => m.FindFunctions(name.Parts[0]))
                 .Where(f => f.IsPublic)
                 .ToList();
@@ -1262,7 +1268,7 @@ public sealed partial class Binder
 
         // Qualified: everything before the last part names a module.
         string moduleName = string.Join('.', name.Parts.Take(name.Parts.Count - 1));
-        if (_currentScope!.Imports.TryGetValue(moduleName, out var module) ||
+        if (_context.File!.Imports.TryGetValue(moduleName, out var module) ||
             _modules.TryGetValue(moduleName, out module))
         {
             bool sameModule = module == _currentModule;
@@ -1589,10 +1595,7 @@ public sealed partial class Binder
     {
         if (syntax.ReturnType is null) return true;
 
-        TypeSymbol written;
-        using (diagnostics.Muted())
-            written = ResolveType(syntax.ReturnType, _currentScope!, allowVoid: true);
-
+        var written = ResolveTypeQuietly(syntax.ReturnType, _context.File!, allowVoid: true);
         return written.IsError() || written.Equals(returns);
     }
 
