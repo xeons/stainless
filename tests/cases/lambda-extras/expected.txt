@@ -1,0 +1,18 @@
+42 2
+9
+node
+none
+9
+4 1099511627776
+n7
+say hi
+HI
+20 6 9
+hello world, hello you
+50
+4
+0 7 2
+8
+200
+3
+one many

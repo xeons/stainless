@@ -635,31 +635,12 @@ public sealed partial class Binder
 
         var delegateType = (DelegateTypeSymbol)target.Type;
 
-        if (arguments.Count != delegateType.Signature.Count)
-        {
-            diagnostics.Error("SL0363", syntax.Span,
-                $"delegate '{delegateType.Name}' is '{delegateType.SignatureText}' and takes " +
-                $"{delegateType.Signature.Count} argument{(delegateType.Signature.Count == 1 ? "" : "s")}, " +
-                $"but {Given(arguments.Count)}");
+        if (ArrangeThroughSignature(syntax, delegateType.Name, delegateType.SignatureText,
+                delegateType.Signature, arguments, out var order) is not { } converted)
             return new BoundErrorExpression(syntax.Span);
-        }
 
-        var converted = new List<BoundExpression>(arguments.Count);
-        for (int i = 0; i < arguments.Count; i++)
-        {
-            var parameter = delegateType.Signature[i];
-            var span = syntax.Arguments[i].Span;
-
-            if (!ArgumentFits(arguments[i], parameter))
-            {
-                ReportArgumentMode(delegateType.Name, i, arguments[i], parameter);
-                return new BoundErrorExpression(syntax.Span);
-            }
-
-            converted.Add(ConvertArgument(arguments[i], parameter, span));
-        }
-
-        return new BoundIndirectCall(syntax.Span, delegateType, target, converted);
+        return new BoundIndirectCall(syntax.Span, delegateType, target, converted)
+            { EvaluationOrder = order };
     }
 
     /// <summary>
@@ -671,29 +652,69 @@ public sealed partial class Binder
         CallSyntax syntax, ClosureTypeSymbol closure,
         BoundExpression target, List<BoundExpression> arguments)
     {
-        if (arguments.Count != closure.Signature.Count)
+        if (ArrangeThroughSignature(syntax, closure.Name, closure.SignatureText,
+                closure.Signature, arguments, out var order) is not { } converted)
+            return new BoundErrorExpression(syntax.Span);
+
+        return new BoundClosureCall(syntax.Span, closure, target, converted)
+            { EvaluationOrder = order };
+    }
+
+    /// <summary>
+    /// The arguments of a call through a delegate or a closure, one per
+    /// parameter of its signature and converted to it. A name reaches the
+    /// parameter the signature calls that, and a default is filled in where a
+    /// lambda's own type has one (<c>var f = (int x = 1) =&gt; x;</c>).
+    /// </summary>
+    private List<BoundExpression>? ArrangeThroughSignature(
+        CallSyntax syntax, string name, string shape, IReadOnlyList<ParameterSymbol> signature,
+        List<BoundExpression> arguments, out int[]? order)
+    {
+        order = null;
+        int required = signature.Count(p => !p.IsOptional);
+
+        if (arguments.Count < required || arguments.Count > signature.Count)
         {
             diagnostics.Error("SL0363", syntax.Span,
-                $"closure '{closure.Name}' is '{closure.SignatureText}' and takes " +
-                $"{Counted(closure.Signature.Count, "argument")}, but {Given(arguments.Count)}");
-            return new BoundErrorExpression(syntax.Span);
+                $"'{name}' is '{shape}' and takes " +
+                (required == signature.Count
+                    ? Counted(signature.Count, "argument")
+                    : $"{required} to {signature.Count} arguments") +
+                $", but {Given(arguments.Count)}");
+            return null;
         }
 
-        var converted = new List<BoundExpression>(arguments.Count);
-        for (int i = 0; i < arguments.Count; i++)
+        int[]? map = MapArguments(signature, arguments.Count, syntax.Arguments, false, out string? why);
+        if (map is null)
         {
-            var parameter = closure.Signature[i];
+            diagnostics.Error("SL0601", syntax.Span,
+                $"the call to '{name}' does not fit: " + (why ?? "the names do not match its parameters"));
+            return null;
+        }
 
-            if (!ArgumentFits(arguments[i], parameter))
+        var converted = new List<BoundExpression>(signature.Count);
+        for (int p = 0; p < signature.Count; p++)
+        {
+            var parameter = signature[p];
+
+            if (map[p] < 0)
             {
-                ReportArgumentMode(closure.Name, i, arguments[i], parameter);
-                return new BoundErrorExpression(syntax.Span);
+                converted.Add(parameter.Default ?? new BoundErrorExpression(syntax.Span));
+                continue;
             }
 
-            converted.Add(ConvertArgument(arguments[i], parameter, syntax.Arguments[i].Span));
+            var argument = arguments[map[p]];
+            if (!ArgumentFits(argument, parameter))
+            {
+                ReportArgumentMode(name, p, argument, parameter);
+                return null;
+            }
+
+            converted.Add(ConvertArgument(argument, parameter, syntax.Arguments[map[p]].Span));
         }
 
-        return new BoundClosureCall(syntax.Span, closure, target, converted);
+        order = WrittenOrder(map, converted.Count);
+        return converted;
     }
 
     /// <summary>
@@ -1386,10 +1407,15 @@ public sealed partial class Binder
         if (argument is BoundLambda lambda)
             return target switch
             {
-                DelegateTypeSymbol signature => signature.Signature.Count == lambda.Syntax.Parameters.Count,
-                ClosureTypeSymbol bound => bound.Signature.Count == lambda.Syntax.Parameters.Count,
+                DelegateTypeSymbol signature =>
+                    signature.Signature.Count == lambda.Syntax.Parameters.Count &&
+                    WrittenResultFits(lambda.Syntax, signature.ReturnType),
+                ClosureTypeSymbol bound =>
+                    bound.Signature.Count == lambda.Syntax.Parameters.Count &&
+                    WrittenResultFits(lambda.Syntax, bound.ReturnType),
                 InterfaceTypeSymbol functional => SingleMethodOf(functional) is { } only &&
-                    only.Parameters.Count(p => !p.IsThis) == lambda.Syntax.Parameters.Count,
+                    only.Parameters.Count(p => !p.IsThis) == lambda.Syntax.Parameters.Count &&
+                    WrittenResultFits(lambda.Syntax, only.ReturnType),
                 _ => false,
             };
 
@@ -1451,6 +1477,22 @@ public sealed partial class Binder
         // A declared conversion makes an argument fit, so that overload
         // resolution and the conversion itself agree about what is possible.
         return HasUserConversion(argument, target);
+    }
+
+    /// <summary>
+    /// Whether a result a lambda wrote out is the one a target returns. It is
+    /// not converted, so it votes on the overload the way a written parameter
+    /// type would.
+    /// </summary>
+    private bool WrittenResultFits(LambdaSyntax syntax, TypeSymbol returns)
+    {
+        if (syntax.ReturnType is null) return true;
+
+        TypeSymbol written;
+        using (diagnostics.Muted())
+            written = ResolveType(syntax.ReturnType, _currentScope!, allowVoid: true);
+
+        return written.IsError() || written.Equals(returns);
     }
 
     /// <summary>

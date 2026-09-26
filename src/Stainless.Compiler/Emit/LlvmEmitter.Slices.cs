@@ -271,7 +271,7 @@ public sealed partial class LlvmEmitter
         }
 
         arguments.Add($"ptr {receiver}");
-        AppendArguments(call.Arguments, arguments);
+        AppendArguments(call.Arguments, arguments, call.EvaluationOrder);
 
         string signature = returnInfo.Style == PassStyle.Indirect ? "void" : returnInfo.LlvmType;
         string invocation = $"call {signature} {function}({string.Join(", ", arguments)})";
@@ -342,7 +342,7 @@ public sealed partial class LlvmEmitter
             arguments.Add($"ptr sret({StructName(structType)}) {sretSlot}");
         }
 
-        AppendArguments(call.Arguments, arguments);
+        AppendArguments(call.Arguments, arguments, call.EvaluationOrder);
 
         string signature = returnInfo.Style == PassStyle.Indirect ? "void" : returnInfo.LlvmType;
 

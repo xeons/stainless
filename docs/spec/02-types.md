@@ -2284,13 +2284,66 @@ lambdas of the same shape are the same type and either may be assigned to the
 other — and a `closure` somebody declared with that shape is interchangeable
 with both, since all three are the same two words.
 
-What this does not reach is a lambda that has not said enough (both SL0553):
+**The result is read off the body.** One expression gives its own type; a
+block gives the one type its `return`s agree on, the way a ternary's two arms
+agree, and `void` when none of them returns a value:
 
-- **A parameter with no type.** `var f = x => x;` has nothing to infer from —
-  that is the whole of what a target type was supplying.
-- **A block body.** Its result is whatever its `return`s agree on, and that is
-  decided by the type it is becoming rather than the other way round. One
-  expression, or write the type out.
+```csharp
+var magnitude = (int x) => { if (x > 0) { return x; } return -x; };   // int(int)
+var widened = (bool big) => { if (big) { return 1L << 40; } return 1; };  // long(bool)
+var say = (String text) => { Console.WriteLine(text); };              // void(String)
+```
+
+**Or it is written in front of the parameters**, as C# 10 writes it, which
+then must be in parentheses. It is what settles a body whose value would not
+say — a `null`, a `default` — and it is not converted to what a target returns:
+a written result that differs is SL0765.
+
+```csharp
+var maybe = Node? (bool make) => make ? new Node(5) : null;
+Transform wrong = long (x) => x;        // SL0765: Transform returns int
+```
+
+What this does not reach is a lambda that has not said enough (SL0553): a
+parameter with no type, as in `var f = x => x;`, which has nothing to infer
+from — that is the whole of what a target type was supplying — and a block
+whose `return`s agree on no one type, or return a value on one path and
+nothing on another.
+
+**A parameter may have a default**, and it is part of the lambda's own type:
+
+```csharp
+var area = (int width = 10, int height = 2) => width * height;
+area();                 // 20
+area(height: 5);        // 50
+```
+
+That type is the only place a call can see it. A declared `closure`, a
+`delegate` and an interface carry no defaults, so the same lambda assigned to
+one of those has a parameter every call must fill, and saying so is a warning
+(SL0766) — C#'s rule, for C#'s reason: the default belongs to the declaration a
+call reads, and there is no other declaration here. It must be a constant, as
+a function's is (SL0613, [§7.1.2](07-functions-members.md#712-a-parameter-with-a-default)).
+
+**Two or more parameters named `_` are discards**: `(_, _) => 0` takes two
+arguments and names neither, so neither can be read. One `_` alone is still a
+name, as it always was.
+
+**A `static` lambda captures nothing**, and says so where it is written:
+
+```csharp
+Transform twice = static x => x * 2;
+Transform scaled = static x => x * factor;      // SL0764: reads 'factor'
+```
+
+A local, a parameter, `this`, a member reached through it and a method called
+without a receiver are all refused, including from a lambda nested inside it.
+What is left is its parameters, statics, constants and functions. It is the
+promise a delegate needs — a static lambda always fits one — made at the
+lambda rather than discovered at the conversion.
+
+A lambda is a target of a cast like anything else: `(Transform)(x => x * 2)`
+is the lambda converted to `Transform`.
 
 **Capture is by value, taken when the closure is made.**
 

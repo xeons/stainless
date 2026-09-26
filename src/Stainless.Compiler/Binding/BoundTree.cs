@@ -672,6 +672,9 @@ public sealed class BoundIndirectCall(
     public DelegateTypeSymbol DelegateType { get; } = delegateType;
     public BoundExpression Target { get; } = target;
     public IReadOnlyList<BoundExpression> Arguments { get; } = arguments;
+
+    /// <summary>As <see cref="BoundCall.EvaluationOrder"/>.</summary>
+    public IReadOnlyList<int>? EvaluationOrder { get; init; }
 }
 
 /// <summary>
@@ -738,6 +741,9 @@ public sealed class BoundClosureCall(
     public ClosureTypeSymbol ClosureType { get; } = closureType;
     public BoundExpression Target { get; } = target;
     public IReadOnlyList<BoundExpression> Arguments { get; } = arguments;
+
+    /// <summary>As <see cref="BoundCall.EvaluationOrder"/>.</summary>
+    public IReadOnlyList<int>? EvaluationOrder { get; init; }
 }
 
 /// <summary>

@@ -220,6 +220,9 @@ public sealed class DiagnosticBag
     /// </summary>
     public Mute Muted() => new(this);
 
+    /// <summary>Whether a report made now would be dropped.</summary>
+    public bool IsMuted => _muted > 0;
+
     public readonly struct Mute : IDisposable
     {
         private readonly DiagnosticBag _bag;

@@ -3181,6 +3181,22 @@ public sealed class Parser
     {
         int start = _pos;
 
+        // `static` in an expression can only begin a lambda, so it commits.
+        if (At(TokenKind.StaticKeyword))
+        {
+            Advance();
+            if (TryParseLambdaAfterModifiers(start, isStatic: true) is { } made) return made;
+
+            _diagnostics.Error("SL0100", Current.Span,
+                $"expected a lambda after 'static', found '{Current.Text}'");
+            return Unreadable(start);
+        }
+
+        return TryParseLambdaAfterModifiers(start, isStatic: false);
+    }
+
+    private ExpressionSyntax? TryParseLambdaAfterModifiers(int start, bool isStatic)
+    {
         // The one form that needs no lookahead past a single token.
         if (At(TokenKind.Identifier) && Peek(1).Kind == TokenKind.EqualsGreater)
         {
@@ -3188,16 +3204,32 @@ public sealed class Parser
             string name = Advance().Text;
             var single = new LambdaParameterSyntax(SpanFrom(at), null, name);
             Advance();
-            return FinishLambda(start, [single]);
+            return FinishLambda(start, [single], isStatic, null);
         }
 
-        if (!At(TokenKind.OpenParen)) return null;
-        if (!Speculate(TryParseLambdaParameters, out var parameters) || parameters is null) return null;
+        if (At(TokenKind.OpenParen) &&
+            Speculate(TryParseLambdaParameters, out var parameters) && parameters is not null)
+            return FinishLambda(start, parameters, isStatic, null);
 
-        return FinishLambda(start, parameters);
+        // `int (x) => ...`: a result written in front of the parameters, which
+        // must then be in parentheses. Up to the arrow this is a call.
+        if (AtTypeStart() && Speculate(TryParseTypedLambdaHead, out var head) && head is not null)
+            return FinishLambda(start, head.Parameters, isStatic, head.ReturnType);
+
+        return null;
     }
 
-    private sealed record LambdaHead(List<LambdaParameterSyntax> Parameters);
+    private sealed record LambdaHead(TypeSyntax ReturnType, List<LambdaParameterSyntax> Parameters);
+
+    private LambdaHead? TryParseTypedLambdaHead()
+    {
+        var type = ParseType();
+        if (!At(TokenKind.OpenParen)) return null;
+
+        return Speculate(TryParseLambdaParameters, out var parameters) && parameters is not null
+            ? new LambdaHead(type, parameters)
+            : null;
+    }
 
     private List<LambdaParameterSyntax>? TryParseLambdaParameters()
     {
@@ -3221,7 +3253,12 @@ public sealed class Parser
                 if (!At(TokenKind.Identifier)) return null;
                 string name = Advance().Text;
 
-                parameters.Add(new LambdaParameterSyntax(SpanFrom(parameterStart), type, name));
+                // `(int x = 1)`: only through the lambda's own type does a
+                // call see it, which is the binder's to say.
+                var fallback = Match(TokenKind.Equals) ? ParseConditional() : null;
+
+                parameters.Add(new LambdaParameterSyntax(SpanFrom(parameterStart), type, name)
+                    { Default = fallback });
             }
             while (Match(TokenKind.Comma));
         }
@@ -3232,16 +3269,19 @@ public sealed class Parser
         return parameters;
     }
 
-    private ExpressionSyntax FinishLambda(int start, List<LambdaParameterSyntax> parameters)
+    private ExpressionSyntax FinishLambda(
+        int start, List<LambdaParameterSyntax> parameters, bool isStatic, TypeSyntax? returnType)
     {
         if (At(TokenKind.OpenBrace))
         {
             var block = ParseBlock();
-            return new LambdaSyntax(SpanFrom(start), parameters, null, block);
+            return new LambdaSyntax(SpanFrom(start), parameters, null, block)
+                { IsStatic = isStatic, ReturnType = returnType };
         }
 
         var body = ParseExpression();
-        return new LambdaSyntax(SpanFrom(start), parameters, body, null);
+        return new LambdaSyntax(SpanFrom(start), parameters, body, null)
+            { IsStatic = isStatic, ReturnType = returnType };
     }
 
     private ExpressionSyntax ParseConditional()
@@ -3312,7 +3352,7 @@ public sealed class Parser
             if (At(TokenKind.IsKeyword) && TypeTestPrecedence >= minPrecedence)
             {
                 Advance();
-                var tested = ParseType();
+                var tested = GiveBackConditionalQuestion(ParseType());
 
                 // `x is Circle c` names what the test found. Nothing else in
                 // the grammar puts an identifier straight after an expression,
@@ -3334,7 +3374,7 @@ public sealed class Parser
             if (At(TokenKind.AsKeyword) && TypeTestPrecedence >= minPrecedence)
             {
                 Advance();
-                var wanted = ParseType();
+                var wanted = GiveBackConditionalQuestion(ParseType());
                 left = new AsCastSyntax(SpanFrom(start), left, wanted);
                 continue;
             }
@@ -4115,6 +4155,24 @@ public sealed class Parser
         type is FixedArrayTypeSyntax fixedArray ? Core(fixedArray.Element) : type;
 
     /// <summary>Whether a token of this kind can only begin an operand.</summary>
+    /// <summary>
+    /// <c>x is Node ? a : b</c>: the <c>?</c> a type after <c>is</c> or
+    /// <c>as</c> just took is a conditional's when what follows it is an
+    /// expression and then a colon, as C# reads it.
+    /// </summary>
+    private TypeSyntax GiveBackConditionalQuestion(TypeSyntax type)
+    {
+        if (type is not NullableTypeSyntax nullable) return type;
+        if (_pos == 0 || _tokens[_pos - 1].Kind != TokenKind.Question) return type;
+        if (!StartsOperand(Current.Kind) && !At(TokenKind.Minus)) return type;
+
+        if (!Probe(() => { ParseTrueArm(); return At(TokenKind.Colon) && !_diagnostics.HasErrors; }))
+            return type;
+
+        _pos--;
+        return nullable.Element;
+    }
+
     private static bool StartsOperand(TokenKind kind) => kind is
         TokenKind.Identifier or TokenKind.IntLiteral or TokenKind.FloatLiteral or
         TokenKind.StringLiteral or TokenKind.Utf8StringLiteral or TokenKind.CharLiteral or

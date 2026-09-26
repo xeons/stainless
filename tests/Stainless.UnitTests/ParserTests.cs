@@ -395,6 +395,60 @@ public class ParserTests
     }
 
     [Fact]
+    public void AStaticLambdaSaysSo()
+    {
+        var lambda = Assert.IsType<LambdaSyntax>(Front.Expression("static (int x) => x"));
+        Assert.True(lambda.IsStatic);
+        Assert.Null(lambda.ReturnType);
+    }
+
+    [Theory]
+    [InlineData("int (x) => x")]
+    [InlineData("Node? () => null")]
+    [InlineData("List<int> (int n) => { return null; }")]
+    [InlineData("(int, String) (int n) => (n, \"\")")]
+    [InlineData("static long (int a, int b) => a")]
+    public void ALambdaMayWriteItsResult(string source)
+    {
+        var lambda = Assert.IsType<LambdaSyntax>(Front.Expression(source, out var diagnostics));
+        Assert.Empty(diagnostics.Items);
+        Assert.NotNull(lambda.ReturnType);
+    }
+
+    /// <summary>Up to the arrow a written result is a call, so a call stays one.</summary>
+    [Theory]
+    [InlineData("F(x)")]
+    [InlineData("F(x) + 1")]
+    [InlineData("List<int>(n)")]
+    public void ACallIsNotALambda(string source) =>
+        Assert.IsNotType<LambdaSyntax>(Front.Expression(source));
+
+    [Fact]
+    public void ALambdaParameterMayHaveADefault()
+    {
+        var lambda = Assert.IsType<LambdaSyntax>(Front.Expression("(int x = 1, int y = -2) => x"));
+        Assert.All(lambda.Parameters, p => Assert.NotNull(p.Default));
+    }
+
+    /// <summary>
+    /// A <c>?</c> after the type in <c>is</c> or <c>as</c> is a conditional's
+    /// where an expression and a colon follow it, as C# reads it.
+    /// </summary>
+    [Theory]
+    [InlineData("x is Node ? 1 : 2")]
+    [InlineData("x as Node ? a : b")]
+    [InlineData("x is int ? \"yes\" : \"no\"")]
+    public void AQuestionAfterATypeTestMayBeAConditional(string source) =>
+        Assert.IsType<ConditionalSyntax>(Front.Expression(source));
+
+    [Fact]
+    public void ANullableTypeTestStaysOne()
+    {
+        var test = Assert.IsType<TypeTestSyntax>(Front.Expression("x is Node? found"));
+        Assert.IsType<NullableTypeSyntax>(test.Tested);
+    }
+
+    [Fact]
     public void ATypeCollectsItsMembers()
     {
         var unit = Front.Parse("module A;\nclass C { int x; int F() { return 0; } }");

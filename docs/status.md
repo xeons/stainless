@@ -237,7 +237,11 @@ last person to edit it -- the suite is the authority.
 - A lambda with written parameter types has a type of its own, so `var doubled
   = (int x) => x * 2;` is a `closure int(int)` -- cached by signature, so two of
   a shape are one type, and a declared `closure` of that shape is
-  interchangeable with them
+  interchangeable with them. A block body's result is what its `return`s agree
+  on, and one may be written in front: `Node? (bool b) => ...`. A parameter
+  default is part of that type, so `var f = (int x = 1) => x; f();` works and a
+  declared closure never sees one (SL0766). `static x => ...` captures nothing
+  (SL0764), and `(_, _) => 0` discards both
 - Field and property initializers: `int Width = 80;` and `int W { get; set; }
   = 80;`, run at the head of every constructor in declaration order. A class
   that declares no constructor is given one to run them in; a constructor that
@@ -747,8 +751,7 @@ Being straight about the edges, roughly in the order they are worth adding:
 - **A lambda with nothing written needs something to be.** One that writes its
   parameter types out has a type of its own -- `var f = (int x) => x * 2;` is a
   closure -- but `var f = x => x;` has nothing to infer from and is refused
-  (SL0553), and so is a block body, whose result is decided by the type it is
-  becoming. Capture
+  (SL0553). Capture
   is by value only, and a capturing lambda cannot become a `delegate` — a
   function pointer has nowhere to keep what was captured. A lambda that captures `this` keeps its object
   alive, so an object holding its own closure is a cycle; `weak` is how that is

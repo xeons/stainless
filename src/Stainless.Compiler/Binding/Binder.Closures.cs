@@ -51,6 +51,9 @@ public sealed partial class Binder
         /// </summary>
         public bool WeakThis { get; init; }
 
+        /// <summary>A <c>static</c> lambda, which may capture nothing.</summary>
+        public bool IsStatic { get; init; }
+
         /// <summary>
         /// The local the body reads a weakly captured <c>this</c> through,
         /// loaded once at the top; null until something captures it.
@@ -327,6 +330,12 @@ public sealed partial class Binder
         var outer = ResolveOutside(index, name, span);
         if (outer is null) return null;
 
+        if (closure.IsStatic)
+        {
+            ReportStaticCapture(name, span);
+            return new BoundErrorExpression(span);
+        }
+
         if (closure.Type is null)
         {
             diagnostics.Error("SL0381", span,
@@ -436,6 +445,12 @@ public sealed partial class Binder
 
         if (outer.Type.IsError()) return new BoundErrorExpression(span);
 
+        if (closure.IsStatic)
+        {
+            ReportStaticCapture("this", span);
+            return new BoundErrorExpression(span);
+        }
+
         if (closure.Type is null)
         {
             diagnostics.Error("SL0381", span,
@@ -471,6 +486,11 @@ public sealed partial class Binder
 
         return new BoundFieldAccess(span, new BoundThis(span, closure.Type, closure.This!), field);
     }
+
+    private void ReportStaticCapture(string name, SourceSpan span) =>
+        diagnostics.Error("SL0764", span,
+            $"this lambda is 'static', so it cannot read '{name}' from around it; a static " +
+            "lambda captures nothing. Pass it in as a parameter, or drop 'static'");
 
     /// <summary>
     /// The local a weakly captured <c>this</c> is read through, as the class
@@ -543,10 +563,20 @@ public sealed partial class Binder
     /// is whatever its `return`s agree on and which needs a declared return
     /// type to bind at all, and anything that fails to bind.
     /// </summary>
-    private TypeSymbol? ProbeLambdaResult(LambdaSyntax syntax, IReadOnlyList<TypeSymbol> parameterTypes)
+    private TypeSymbol? ProbeLambdaResult(
+        LambdaSyntax syntax, IReadOnlyList<TypeSymbol> parameterTypes, bool allowVoid = false)
     {
-        if (syntax.Expression is null) return null;
         if (syntax.Parameters.Count != parameterTypes.Count) return null;
+
+        // Written out, it is the answer, and nothing needs binding to learn it.
+        if (syntax.ReturnType is not null)
+        {
+            TypeSymbol written;
+            using (diagnostics.Muted())
+                written = ResolveType(syntax.ReturnType, _currentScope!, allowVoid: true);
+
+            return written.IsError() || (written.IsVoid() && !allowVoid) ? null : written;
+        }
 
         int classes = _classes.Count;
         int functions = _functions.Count;
@@ -589,6 +619,7 @@ public sealed partial class Binder
             This = self,
             OuterScopes = [.. _scopes],
             OuterFunction = _currentFunction,
+            IsStatic = syntax.IsStatic,
         };
 
         var savedScopes = new List<Dictionary<string, LocalSymbol>>(_scopes);
@@ -608,10 +639,26 @@ public sealed partial class Binder
         TypeSymbol? produced;
         using (diagnostics.Muted())
         {
-            var value = BindExpression(syntax.Expression);
-            produced = value.Type.IsError() || value.Type.IsVoid() || IsTargetTyped(value)
-                ? null
-                : value.Type;
+            if (syntax.Block is not null)
+            {
+                var savedReturns = _returnsFound;
+                var savedInferring = _inferringReturnsOf;
+                _returnsFound = [];
+                _inferringReturnsOf = probe;
+
+                BindBlock(syntax.Block);
+                produced = AgreedReturnType(_returnsFound);
+
+                _returnsFound = savedReturns;
+                _inferringReturnsOf = savedInferring;
+            }
+            else
+            {
+                var value = BindExpression(syntax.Expression!);
+                produced = value.Type.IsError() || IsTargetTyped(value) ? null : value.Type;
+            }
+
+            if (produced is not null && produced.IsVoid() && !allowVoid) produced = null;
         }
 
         PopScope();
@@ -660,8 +707,6 @@ public sealed partial class Binder
     /// </summary>
     private ClosureTypeSymbol? NaturalClosureType(LambdaSyntax syntax)
     {
-        if (syntax.Expression is null) return null;
-
         var parameterTypes = new List<TypeSymbol>();
 
         foreach (var parameter in syntax.Parameters)
@@ -677,10 +722,20 @@ public sealed partial class Binder
         // The body, bound once against those parameter types and thrown away.
         // This is the same trial `Select(numbers, n => n * 2)` already makes to
         // work out a type parameter that appears only in a lambda's result.
-        if (ProbeLambdaResult(syntax, parameterTypes) is not { } result) return null;
+        if (ProbeLambdaResult(syntax, parameterTypes, allowVoid: true) is not { } result)
+            return null;
         if (result.IsError()) return null;
 
-        string key = $"{result.Name}({string.Join(", ", parameterTypes.Select(t => t.Name))})";
+        // A default is part of the type: it is what a call through this type
+        // fills in, and a call through any other type never sees it.
+        var defaults = new List<BoundExpression?>();
+        for (int i = 0; i < parameterTypes.Count; i++)
+            defaults.Add(syntax.Parameters[i].Default is { } written
+                ? BindLambdaDefault(syntax.Parameters[i], written, parameterTypes[i])
+                : null);
+
+        string key = $"{result.Name}(" + string.Join(", ", parameterTypes.Select((t, i) =>
+            defaults[i] is { } fallback ? $"{t.Name} = {ConstantKey(fallback)}" : t.Name)) + ")";
         if (_naturalClosures.TryGetValue(key, out var existing)) return existing;
 
         var type = NewClosureType(
@@ -689,7 +744,10 @@ public sealed partial class Binder
         type.ReturnType = result;
 
         for (int i = 0; i < parameterTypes.Count; i++)
-            type.Signature.Add(new ParameterSymbol(syntax.Parameters[i].Name, parameterTypes[i], i));
+            type.Signature.Add(new ParameterSymbol(syntax.Parameters[i].Name, parameterTypes[i], i)
+            {
+                Default = defaults[i],
+            });
 
         // Registered so that the emitter writes its TypeInfo and the reference
         // walk that retains its receiver is generated, exactly as for one
@@ -707,11 +765,146 @@ public sealed partial class Binder
     private readonly Dictionary<string, ClosureTypeSymbol> _naturalClosures =
         new(StringComparer.Ordinal);
 
+    /// <summary>
+    /// The function whose <c>return</c>s are being collected rather than
+    /// checked, while a block-bodied lambda's result is worked out.
+    /// </summary>
+    private FunctionSymbol? _inferringReturnsOf;
+
+    /// <summary>What each <c>return</c> in that function gave back; null for a bare one.</summary>
+    private List<BoundExpression?> _returnsFound = [];
+
+    /// <summary>
+    /// The one type every <c>return</c> reaches, which is the question a
+    /// ternary's two arms ask. A body that returns nothing is <c>void</c>, and
+    /// one that returns a value on one path and nothing on another has no answer.
+    /// </summary>
+    private TypeSymbol? AgreedReturnType(List<BoundExpression?> returns)
+    {
+        if (returns.Count == 0 || returns.All(r => r is null)) return PrimitiveTypeSymbol.Void;
+        if (returns.Any(r => r is null)) return null;
+
+        var values = returns.Select(r => r!).ToList();
+        if (values.Any(v => v.Type.IsError())) return null;
+
+        var typed = values.Where(v => !IsTargetTyped(v)).ToList();
+        if (typed.Count == 0) return null;
+
+        var agreed = typed[0].Type;
+        foreach (var next in typed.Skip(1))
+        {
+            if (IsImplicitlyConvertible(next, agreed)) continue;
+
+            if (!typed.All(v => IsImplicitlyConvertible(v, next.Type))) return null;
+            agreed = next.Type;
+        }
+
+        return values.All(v => IsImplicitlyConvertible(v, agreed)) ? agreed : null;
+    }
+
+    /// <summary>
+    /// A lambda parameter's default, bound where the lambda was written. A
+    /// constant, on the terms a function's default is (§7.1.2).
+    /// </summary>
+    private BoundExpression? BindLambdaDefault(
+        LambdaParameterSyntax parameter, ExpressionSyntax written, TypeSymbol type)
+    {
+        // Once per type: the natural type and the conversion to it both ask,
+        // and a mistake is reported once.
+        if (_lambdaDefaults.TryGetValue((parameter, type), out var known)) return known;
+
+        var bound = BindConversion(BindExpression(written), type, written.Span);
+        bool constant = !bound.Type.IsError() && IsConstantDefault(bound);
+        if (!diagnostics.IsMuted) _lambdaDefaults[(parameter, type)] = constant ? bound : null;
+
+        if (bound.Type.IsError()) return null;
+        if (constant) return bound;
+
+        diagnostics.Error("SL0613", written.Span,
+            $"the default for '{parameter.Name}' is not a constant, and a default is written " +
+            "into every call that leaves it out. A literal, 'null', a 'const', an enum member " +
+            "or 'default(T)' is what it may be");
+        return null;
+    }
+
+    private readonly Dictionary<(LambdaParameterSyntax, TypeSymbol), BoundExpression?> _lambdaDefaults = [];
+
+    /// <summary>A constant spelled so that two equal ones compare equal.</summary>
+    private static string ConstantKey(BoundExpression constant) => constant switch
+    {
+        BoundLiteral literal => Convert.ToString(literal.Value, System.Globalization.CultureInfo.InvariantCulture) ?? "",
+        BoundStringLiteral text => "\"" + text.Value + "\"",
+        BoundNullLiteral => "null",
+        BoundDefault => "default",
+        BoundConstantAccess named => Convert.ToString(named.Constant.Value, System.Globalization.CultureInfo.InvariantCulture) ?? "",
+        BoundConversion conversion => ConstantKey(conversion.Operand),
+        BoundUnary { Operator: BoundUnaryOp.Negate } negated => "-" + ConstantKey(negated.Operand),
+        _ => constant.GetType().Name,
+    };
+
+    /// <summary>
+    /// What a lambda wrote about itself, checked against what it is becoming:
+    /// a result written out has to be the target's, and a default is seen only
+    /// through a type that has one.
+    /// </summary>
+    private bool CheckLambdaAgainst(
+        LambdaSyntax syntax, TypeSymbol returns, IReadOnlyList<ParameterSymbol> wanted,
+        string target, SourceSpan span)
+    {
+        if (syntax.ReturnType is not null)
+        {
+            var written = ResolveType(syntax.ReturnType, _currentScope!, allowVoid: true);
+            if (!written.IsError() && !written.Equals(returns))
+            {
+                diagnostics.Error("SL0765", syntax.ReturnType.Span,
+                    $"this lambda returns '{written.Name}', and '{target}' returns " +
+                    $"'{returns.Name}'; a result written out is not converted");
+                return false;
+            }
+        }
+
+        for (int i = 0; i < syntax.Parameters.Count && i < wanted.Count; i++)
+        {
+            var parameter = syntax.Parameters[i];
+            if (parameter.Default is not { } written) continue;
+
+            var bound = BindLambdaDefault(parameter, written, wanted[i].Type);
+            if (bound is null) continue;
+
+            if (wanted[i].Default is { } theirs && ConstantKey(theirs) == ConstantKey(bound))
+                continue;
+
+            diagnostics.Warning("SL0766", written.Span,
+                $"'{target}' gives '{parameter.Name}' " +
+                (wanted[i].Default is null ? "no default" : "a different default") +
+                ", so a call through it never sees this one. A default on a lambda is " +
+                "seen only through the lambda's own type, as 'var' holds it");
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// The names a lambda's parameters are bound under. Two or more written
+    /// <c>_</c> are discards, and none of them can be read; one alone is a
+    /// name, as it always was.
+    /// </summary>
+    private static List<string> LambdaParameterNames(LambdaSyntax syntax)
+    {
+        int discards = syntax.Parameters.Count(p => p.Name == "_");
+
+        return syntax.Parameters
+            .Select((p, i) => discards > 1 && p.Name == "_" ? $"_?{i}" : p.Name)
+            .ToList();
+    }
+
     private BoundExpression BindLambdaAsClosure(
         LambdaSyntax syntax, InterfaceTypeSymbol target, FunctionSymbol method, SourceSpan span)
     {
         var wanted = method.Parameters.Where(p => !p.IsThis).ToList();
         if (!CheckLambdaArity(syntax, wanted.Count, target.Name, span)) return new BoundErrorExpression(span);
+        if (!CheckLambdaAgainst(syntax, method.ReturnType, wanted, target.Name, span))
+            return new BoundErrorExpression(span);
 
         var closureType = new ClassTypeSymbol
         {
@@ -746,6 +939,7 @@ public sealed partial class Binder
             This = self,
             OuterScopes = [.. _scopes],
             OuterFunction = _currentFunction,
+            IsStatic = syntax.IsStatic,
         };
 
         var body = BindLambdaBody(syntax, symbol, context);
@@ -774,6 +968,8 @@ public sealed partial class Binder
         LambdaSyntax syntax, ClosureTypeSymbol target, SourceSpan span)
     {
         if (!CheckLambdaArity(syntax, target.Signature.Count, target.Name, span))
+            return new BoundErrorExpression(span);
+        if (!CheckLambdaAgainst(syntax, target.ReturnType, target.Signature, target.Name, span))
             return new BoundErrorExpression(span);
 
         var closureType = new ClassTypeSymbol
@@ -814,6 +1010,7 @@ public sealed partial class Binder
             OuterScopes = [.. _scopes],
             OuterFunction = _currentFunction,
             WeakThis = subscribed,
+            IsStatic = syntax.IsStatic,
         };
 
         var body = BindLambdaBody(syntax, symbol, context);
@@ -855,6 +1052,8 @@ public sealed partial class Binder
     {
         if (!CheckLambdaArity(syntax, target.Signature.Count, target.Name, span))
             return new BoundErrorExpression(span);
+        if (!CheckLambdaAgainst(syntax, target.ReturnType, target.Signature, target.Name, span))
+            return new BoundErrorExpression(span);
 
         var symbol = new FunctionSymbol
         {
@@ -873,6 +1072,7 @@ public sealed partial class Binder
         {
             OuterScopes = [.. _scopes],
             OuterFunction = _currentFunction,
+            IsStatic = syntax.IsStatic,
         };
 
         var body = BindLambdaBody(syntax, symbol, context);
@@ -899,6 +1099,8 @@ public sealed partial class Binder
     private void AddLambdaParameters(
         FunctionSymbol symbol, LambdaSyntax syntax, IReadOnlyList<ParameterSymbol> wanted)
     {
+        var names = LambdaParameterNames(syntax);
+
         for (int i = 0; i < syntax.Parameters.Count && i < wanted.Count; i++)
         {
             var declared = syntax.Parameters[i];
@@ -913,7 +1115,7 @@ public sealed partial class Binder
                         $"expects '{type.Name}'");
             }
 
-            symbol.Parameters.Add(new ParameterSymbol(declared.Name, type, symbol.Parameters.Count));
+            symbol.Parameters.Add(new ParameterSymbol(names[i], type, symbol.Parameters.Count));
         }
     }
 
@@ -1316,6 +1518,15 @@ public sealed partial class Binder
                 "'return' cannot leave a 'parallel' block; the join at its closing brace " +
                 "would be skipped and the jobs left running against a dead frame");
             return new BoundReturn(syntax.Span, null);
+        }
+
+        // A block-bodied lambda whose result is being worked out: what each
+        // return gives back is the evidence, and nothing is converted yet.
+        if (_inferringReturnsOf is not null && ReferenceEquals(_currentFunction, _inferringReturnsOf))
+        {
+            var found = syntax.Value is null ? null : BindExpression(syntax.Value);
+            _returnsFound.Add(found);
+            return new BoundReturn(syntax.Span, found);
         }
 
         var expected = _currentFunction?.ReturnType ?? PrimitiveTypeSymbol.Void;

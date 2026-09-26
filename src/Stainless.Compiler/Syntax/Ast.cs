@@ -1325,7 +1325,14 @@ public sealed record ConditionalSyntax(
 /// interface or delegate the lambda is being converted to.
 /// </summary>
 public sealed record LambdaParameterSyntax(SourceSpan Span, TypeSyntax? Type, string Name)
-    : SyntaxNode(Span);
+    : SyntaxNode(Span)
+{
+    /// <summary>
+    /// <c>(int x = 1) =&gt; x</c>: what a call through the lambda's own type
+    /// passes when it leaves this out. Null for none.
+    /// </summary>
+    public ExpressionSyntax? Default { get; init; }
+}
 
 /// <summary>
 /// <c>(int a, int b) => a + b</c> — a lambda.
@@ -1337,7 +1344,14 @@ public sealed record LambdaSyntax(
     SourceSpan Span,
     IReadOnlyList<LambdaParameterSyntax> Parameters,
     ExpressionSyntax? Expression,
-    BlockSyntax? Block) : ExpressionSyntax(Span);
+    BlockSyntax? Block) : ExpressionSyntax(Span)
+{
+    /// <summary><c>static x =&gt; ...</c>: a lambda that may capture nothing.</summary>
+    public bool IsStatic { get; init; }
+
+    /// <summary><c>int (x) =&gt; ...</c>: the result written out, or null.</summary>
+    public TypeSyntax? ReturnType { get; init; }
+}
 
 public sealed record CastSyntax(SourceSpan Span, TypeSyntax Type, ExpressionSyntax Operand)
     : ExpressionSyntax(Span);

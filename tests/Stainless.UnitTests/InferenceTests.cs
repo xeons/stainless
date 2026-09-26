@@ -114,13 +114,20 @@ public class InferenceTests
         Assert.NotEmpty(Body("int result = Transform(numbers, n => n.NoSuchMethod());"));
 
     /// <summary>
-    /// A block-bodied lambda has no expression to read a type off, and binding
-    /// one needs the return type that is being worked out. It reaches SL0327
-    /// rather than a wrong answer.
+    /// A block-bodied lambda's result is the one type its <c>return</c>s agree
+    /// on, so it is read off them.
     /// </summary>
+    [Theory]
+    [InlineData("int result = Transform(numbers, n => { return n * 2; });")]
+    [InlineData("long result = Transform(numbers, n => { if (n > 1) { return 1; } return 2L; });")]
+    [InlineData("String result = Transform(numbers, n => { return \"x\"; });")]
+    public void ABlockBodyIsReadOffItsReturns(string body) => Assert.Empty(Body(body));
+
+    /// <summary>Returns that agree on nothing say nothing, and the call is SL0327.</summary>
     [Fact]
-    public void ABlockBodyIsNotProbed() =>
-        Assert.Contains("SL0327", Body("var result = Transform(numbers, n => { return n * 2; });"));
+    public void ReturnsThatDisagreeAreNotAnAnswer() =>
+        Assert.Contains("SL0327",
+            Body("var result = Transform(numbers, n => { if (n > 1) { return 1; } return \"x\"; });"));
 
     /// <summary>
     /// A lambda with nothing at all to become is an error.

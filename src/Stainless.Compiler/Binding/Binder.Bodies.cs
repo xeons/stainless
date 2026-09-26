@@ -1511,19 +1511,22 @@ public sealed partial class Binder
                     {
                         diagnostics.Error("SL0553", syntax.Initializer.Span,
                             $"'{syntax.Name}' cannot be a 'var': " +
-                            (written.Expression is null
-                                ? "a lambda with a block body takes its result from what its " +
-                                  "'return's agree on, and that is decided by the type it is " +
-                                  "becoming rather than the other way round. Write the type " +
-                                  "out, or make the body one expression"
+                            (written.Parameters.Any(p => p.Type is null)
+                                ? "this lambda does not say what its parameters are, so there " +
+                                  "is nothing here to infer from. Write them -- " +
+                                  "'(int x) => x * 2' -- or write the type out"
+                                : written.Expression is null
+                                ? "its 'return's do not agree on one type -- or one returns a " +
+                                  "value and another does not -- so there is no result to give " +
+                                  "it. Write the result in front of the parameters, as " +
+                                  "'int (x) => { ... }', or write the type out"
                                 : written.Expression is DefaultSyntax { Type: null } or
                                                         NewSyntax { Type: null }
                                 ? "its body is a bare 'default' or a 'new(...)', which takes " +
                                   "its type from where it is going rather than giving the " +
                                   "lambda one. Write the type out"
-                                : "this lambda does not say what its parameters are, so there " +
-                                  "is nothing here to infer from. Write them -- " +
-                                  "'(int x) => x * 2' -- or write the type out"));
+                                : "its body has no type to give it. Write the result in " +
+                                  "front of the parameters, or write the type out"));
                         type = ErrorTypeSymbol.Instance;
                     }
                 }

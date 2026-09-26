@@ -129,8 +129,9 @@ public sealed partial class Binder
         if (operand.Type.IsError() || targetType.IsError())
             return new BoundErrorExpression(syntax.Span);
 
-        // `(long)default` and `(Point)new(1, 2)`: the cast is the target.
-        if (IsTargetTyped(operand))
+        // `(long)default`, `(Point)new(1, 2)` and `(Transform)(x => x)`: the
+        // cast is the target.
+        if (IsTargetTyped(operand) || operand is BoundLambda or BoundFunctionGroup)
             return BindConversion(operand, targetType, syntax.Span);
 
         var kind = ClassifyConversion(operand.Type, targetType, explicitCast: true);

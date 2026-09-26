@@ -377,6 +377,10 @@ left empty — all SL0601, which says which of those went wrong.
 **A name takes part in choosing an overload**, since two candidates may call
 their parameters different things.
 
+**A call through a delegate or a closure** names the parameters its signature
+does: with `closure int Pair(int a, int b)`, `pair(b: 1, a: 5)` passes 5 for
+`a`.
+
 **Arguments are evaluated in the order they were written**, as C#'s are, and
 then passed in the order the parameters were declared. `Pair(b: Log("b"), a:
 Log("a"))` logs `b` first. A struct argument is copied as it is evaluated, so

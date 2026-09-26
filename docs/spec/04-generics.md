@@ -262,12 +262,16 @@ Where the parameter types are not known yet, a name with exactly one function
 of the right arity settles them too. An overloaded name that the known types
 do not narrow to one says nothing, and the call is SL0327.
 
-Two limits, both reported as SL0327 rather than guessed at. A **block-bodied**
-lambda is not read this way — binding `n => { return n * 2; }` needs the
-return type that is being worked out — so write it as an expression, or name
-the type. And the signature must mention its type parameters plainly:
-`R Func<T, R>(T)` is read, `List<R> Func<T, R>(T)` is left alone. Writing the
-type arguments at the call settles either.
+A **block-bodied** lambda is read off its `return`s: `n => { return n * 2; }`
+gives an `int`, and returns that differ widen to the one they all reach, as a
+ternary's arms do ([§2.15](02-types.md#215-lambdas-and-closures)). A result
+written in front of the parameters, `int (n) => ...`, is read without binding
+anything.
+
+Two limits, both reported as SL0327 rather than guessed at: returns that agree
+on no one type, and a signature that does not mention its type parameters
+plainly — `R Func<T, R>(T)` is read, `List<R> Func<T, R>(T)` is left alone.
+Writing the type arguments at the call settles either.
 
 ### 4.4.3 Not yet
 
