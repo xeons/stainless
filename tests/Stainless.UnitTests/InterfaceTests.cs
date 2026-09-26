@@ -323,6 +323,24 @@ public class InterfaceTests
             int Use() => Deep(1, 3);
             """));
 
+    /// <summary>
+    /// A type that makes a bigger one of itself is refused once, where it
+    /// grows past the limit, and what the refused type was wanted for is not
+    /// reported again: the placeholder has no constructor to complain about.
+    /// </summary>
+    [Fact]
+    public void ATypeThatGrowsItselfIsRefusedAlone() =>
+        Assert.Equal(["SL0798"], Front.ModuleCodes(
+            """
+            class Cell<T>
+            {
+                T _value;
+                public Cell(T value) { _value = value; }
+                public Cell<Cell<T>> Wrap() => new Cell<Cell<T>>(this);
+            }
+            int Use() { var cell = new Cell<int>(1); return 0; }
+            """).Distinct());
+
     // ------------------------------------------------------------- variance
 
     private const string Variant = """

@@ -411,6 +411,11 @@ public sealed partial class Binder
             return ErrorTypeSymbol.Instance;
         }
 
+        // Refused here as well as in Instantiate, so that what the type was
+        // wanted for is not reported again against a placeholder.
+        if (RefuseRunawayInstantiation(template.Name, arguments, syntax.Span))
+            return ErrorTypeSymbol.Instance;
+
         return Instantiate(template, arguments, syntax.Span);
     }
 
