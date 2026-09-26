@@ -73,17 +73,17 @@ public class MainForm : Form
         _lines.SetBounds(12, 44, 280, 70);
         _lines.Text = "alpha beta gamma";
 
-        AddButton("Cut", 12, 122, this.OnCut);
-        AddButton("Copy", 106, 122, this.OnCopy);
-        AddButton("Paste", 200, 122, this.OnPaste);
+        AddButton("Cut", 12, 122).Click += this.OnCut;
+        AddButton("Copy", 106, 122).Click += this.OnCopy;
+        AddButton("Paste", 200, 122).Click += this.OnPaste;
 
-        AddButton("Copy HTML", 12, 160, this.OnCopyHtml);
-        AddButton("Copy picture", 106, 160, this.OnCopyPicture);
-        AddButton("Copy files", 200, 160, this.OnCopyFiles);
+        AddButton("Copy HTML", 12, 160).Click += this.OnCopyHtml;
+        AddButton("Copy picture", 106, 160).Click += this.OnCopyPicture;
+        AddButton("Copy files", 200, 160).Click += this.OnCopyFiles;
 
-        AddButton("Copy all", 12, 198, this.OnCopyAll);
-        AddButton("Copy text", 106, 198, this.OnCopyText);
-        AddButton("Clear", 200, 198, this.OnClear);
+        AddButton("Copy all", 12, 198).Click += this.OnCopyAll;
+        AddButton("Copy text", 106, 198).Click += this.OnCopyText;
+        AddButton("Clear", 200, 198).Click += this.OnClear;
 
         _pasted = new Image(this);
         _pasted.SetBounds(12, 240, 280, 130);
@@ -102,12 +102,15 @@ public class MainForm : Form
         ShowFormats();
     }
 
-    void AddButton(String caption, int x, int y, EventHandler handler)
+    // The caller subscribes, as `+= this.OnCut`: a handler passed in as a
+    // value is a closure holding this form strongly, and the form holds the
+    // button, so the subscription would be a cycle.
+    Button AddButton(String caption, int x, int y)
     {
         var button = new Button(this);
         button.Text = caption;
         button.SetBounds(x, y, 88, 30);
-        button.Click += handler;
+        return button;
     }
 
     /// The last box the user was in, which is what Cut, Copy and Paste act on.

@@ -623,13 +623,30 @@ public class Shell : Form
         // one store answers for every tab and nothing is copied.
         editor.MarginClicked += this.OnMarginClicked;
         editor.Hovered += (word) => this.OnHovered(word);
-        editor.ShowMarginMarks((row) => GetMarkFor(editor, row));
+
+        // Both held weakly: the editor keeps the asker and the document keeps
+        // its subscribers, and this shell keeps both, so a strong capture of
+        // either is a cycle that outlives the tab.
+        weak Shell? shell = this;
+        weak CodeEditor? held = editor;
+        editor.ShowMarginMarks((row) =>
+        {
+            Shell? owner = shell;
+            CodeEditor? asking = held;
+            if (owner == null || asking == null)
+                return LineMark.None;
+            return owner.GetMarkFor(asking, row);
+        });
 
         // A breakpoint is anchored to a line number, and typing above one
         // moves that line. Without this the glyph stays beside code that has
         // moved on, which reads as a debugger ignoring where it was put.
-        document.LinesShifted += (first, delta)
-            => ShiftBreakpoints(editor, first, delta);
+        document.LinesShifted += (first, delta) =>
+        {
+            CodeEditor? shifted = held;
+            if (shifted != null)
+                ShiftBreakpoints(shifted, first, delta);
+        };
 
         var tab = new EditorTab(page, editor);
         _openTabs.Add(tab);
@@ -2644,7 +2661,15 @@ public class Shell : Form
         var surface = new DesignSurface(tab.Page);
         surface.Dock = DockStyle.Fill;
         surface.Visible = false;
-        surface.Changed += () => this.OnDesignChanged(tab);
+
+        // The tab weakly: it holds the surface, which holds this handler.
+        weak EditorTab? designing = tab;
+        surface.Changed += () =>
+        {
+            EditorTab? changed = designing;
+            if (changed != null)
+                this.OnDesignChanged(changed);
+        };
         surface.SelectionChanged += () => this.ShowActiveDesign();
         surface.KeyNotHandled += this.OnEditorKey;
         tab.Designer = surface;

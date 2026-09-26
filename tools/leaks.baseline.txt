@@ -18,7 +18,7 @@ samples/wc	0
 samples/forms/backend	5
 samples/forms/background	5
 samples/forms/buttons	5
-samples/forms/clipboard	378
+samples/forms/clipboard	5
 samples/forms/common	5
 samples/forms/controls	5
 samples/forms/core	5
@@ -26,5 +26,5 @@ samples/forms/demo	5
 samples/forms/drawn	5
 samples/forms/pictures	5
 samples/forms/reports	5
-ide	4249
+ide	5
 sldb	0
