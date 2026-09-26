@@ -1,0 +1,5 @@
+# A narrowing undone by a `ref` argument, by an assignment in a later operand
+# of the same `&&`, and a narrowed optional passed by `ref`.
+SL0286
+SL0248
+SL0248

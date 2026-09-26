@@ -1096,7 +1096,8 @@ the same machinery and the same table:
 | `while (x != null) { … }` | in the body |
 
 **Nothing that could have changed it survives.** An assignment takes the proof
-away, and, inside a loop, an assignment anywhere in the body does:
+away, so does passing it by `ref` or `out`, and, inside a loop, either of those
+anywhere in the body does:
 
 ```csharp
 if (x != null)
@@ -1105,6 +1106,11 @@ if (x != null)
     x.Value                     // error[SL0248]: the proof was about the old value
 }
 ```
+
+That holds inside one condition too: in `x != null && (x = Next()) != null`
+the first test proves nothing once the second has run, so neither side of the
+`&&` narrows `x` in the branch. A narrowed optional passed by `ref` or `out`
+goes as the `C?` it is stored as, because the callee may write a null into it.
 
 **Only a name can be narrowed** — a local or a parameter. A field or a call
 result may be a different value by the time it is read, so neither carries a
@@ -1486,7 +1492,8 @@ Console.Write(raw.Value);                    // proved by the line above
 ```
 
 Anything that could have changed the Result takes the proof away again — an
-assignment to it, and, inside a loop, an assignment anywhere in the body:
+assignment to it, passing it by `ref` or `out`, and, inside a loop, either of
+those anywhere in the body:
 
 ```csharp
 var r = Get();

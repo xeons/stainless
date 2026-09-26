@@ -1575,13 +1575,13 @@ public sealed partial class Binder
             // named is in scope there.
             PushScope();
             ExposePatternBindings(patterns);
-            right = BindUnderFacts(syntax.Right, left, whenTrue: true);
+            right = BindRightOperand(syntax.Right, left, whenTrue: true);
             PopScope();
         }
         else
         {
             right = syntax.Operator is TokenKind.AmpAmp or TokenKind.PipePipe
-                ? BindUnderFacts(syntax.Right, left, whenTrue: syntax.Operator == TokenKind.AmpAmp)
+                ? BindRightOperand(syntax.Right, left, whenTrue: syntax.Operator == TokenKind.AmpAmp)
                 : BindExpression(syntax.Right);
         }
 
@@ -2036,6 +2036,25 @@ public sealed partial class Binder
 
         common = wider;
         return true;
+    }
+
+    /// <summary>
+    /// The right side of <c>&amp;&amp;</c> or <c>||</c>, bound under what the
+    /// left established, with what it writes recorded against it: a proof the
+    /// left made does not outlive an assignment the right makes.
+    /// </summary>
+    private BoundExpression BindRightOperand(
+        Syntax.ExpressionSyntax syntax, BoundExpression left, bool whenTrue)
+    {
+        var written = new HashSet<object>();
+        _writtenWitnesses.Add(written);
+
+        var right = BindUnderFacts(syntax, left, whenTrue);
+
+        _writtenWitnesses.RemoveAt(_writtenWitnesses.Count - 1);
+        if (written.Count > 0) _writtenIn[right] = written;
+
+        return right;
     }
 
     /// <summary>

@@ -369,7 +369,9 @@ public sealed partial class Binder
         if (syntax is OutArgumentSyntax outgoing) return BindOutArgument(outgoing);
         if (syntax is not RefArgumentSyntax reference) return BindExpression(syntax);
 
-        var target = BindExpression(reference.Value);
+        // A narrowed optional is passed as the storage it is: the callee may
+        // write anything its type allows, so what was proved is forgotten.
+        var target = Widened(BindExpression(reference.Value));
         if (target.Type.IsError()) return target;
 
         if (!IsAddressable(target))
@@ -386,6 +388,8 @@ public sealed partial class Binder
                 $"'ref' lets the callee write to this, and {why}");
             return new BoundErrorExpression(reference.Span);
         }
+
+        ForgetWrittenThrough(target);
 
         return new BoundAddressOf(
             reference.Span, new PointerTypeSymbol(target.Type), target)
@@ -527,7 +531,7 @@ public sealed partial class Binder
             return new BoundOutDraft(syntax.Span, declared, name, syntax.NameSpan);
         }
 
-        var target = BindExpression(syntax.Value!);
+        var target = Widened(BindExpression(syntax.Value!));
         if (target.Type.IsError()) return target;
 
         if (!IsAddressable(target))
@@ -546,10 +550,22 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
+        ForgetWrittenThrough(target);
+
         return new BoundAddressOf(syntax.Span, new PointerTypeSymbol(target.Type), target)
         {
             FromOutKeyword = true,
         };
+    }
+
+    /// <summary>
+    /// What passing storage by <c>ref</c> or <c>out</c> costs the caller: the
+    /// callee may write it, so nothing proved about it survives the call.
+    /// </summary>
+    private void ForgetWrittenThrough(BoundExpression target)
+    {
+        InvalidateVariantFact(target);
+        if (WrittenParameter(target) is { } parameter) parameter.IsAssigned = true;
     }
 
     /// <summary>

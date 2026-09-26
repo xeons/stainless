@@ -105,8 +105,9 @@ last person to edit it -- the suite is the authority.
 - Flow narrowing, for a variant's case and for `C?` alike: `if (x != null)`
   makes `x` a `C`, through an `if`, a `!`, `&&`, `||`, a ternary, an early
   return and a `switch`. Only for a local or a parameter, and never for a
-  `weak C?`, which may die between the check and the use; an assignment takes
-  the proof away, and so does one anywhere in a loop body
+  `weak C?`, which may die between the check and the use; an assignment or a
+  `ref` or `out` argument takes the proof away, including one in a later
+  operand of the same `&&`, and so does one anywhere in a loop body
 - `is` with a name — `if (node.Payload is Circle c)`, for a variant's case or a
   class — which is how a field or a call result gets at what a test found. The
   value is evaluated once and the name is in scope where the test succeeded.

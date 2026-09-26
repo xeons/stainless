@@ -930,6 +930,15 @@ public sealed partial class Binder
     }
 
     /// <summary>
+    /// The subjects each enclosing right operand of <c>&amp;&amp;</c> or
+    /// <c>||</c> has assigned so far, innermost last.
+    /// </summary>
+    private readonly List<HashSet<object>> _writtenWitnesses = [];
+
+    /// <summary>What a right operand assigned, by the operand, for <see cref="ConditionFacts"/>.</summary>
+    private readonly Dictionary<BoundExpression, HashSet<object>> _writtenIn = [];
+
+    /// <summary>
     /// What the <c>x is Case n</c> tests in one condition declare.
     ///
     /// The <see cref="Spills"/> are declarations with no value, put around the
@@ -1009,6 +1018,7 @@ public sealed partial class Binder
             if (NarrowableSubject(current) is not { } subject) continue;
 
             _variantFacts.Remove(subject);
+            foreach (var witness in _writtenWitnesses) witness.Add(subject);
             return;
         }
     }
@@ -1068,23 +1078,34 @@ public sealed partial class Binder
 
             // `a && b` proves both only when it is true; either could be the
             // false one, so falsehood proves nothing. `a || b` is the mirror.
+            // What the right side assigns, it has unproved: `n != null &&
+            // (n = null) == null` says nothing about n by the time it is true.
             case BoundBinary { Operator: BoundBinaryOp.LogicalAnd } and:
             {
                 var left = ConditionFacts(and.Left);
                 var right = ConditionFacts(and.Right);
-                return (Merge(left.WhenTrue, right.WhenTrue), []);
+                return (Merge(Unwritten(left.WhenTrue, and.Right), right.WhenTrue), []);
             }
 
             case BoundBinary { Operator: BoundBinaryOp.LogicalOr } or:
             {
                 var left = ConditionFacts(or.Left);
                 var right = ConditionFacts(or.Right);
-                return ([], Merge(left.WhenFalse, right.WhenFalse));
+                return ([], Merge(Unwritten(left.WhenFalse, or.Right), right.WhenFalse));
             }
 
             default:
                 return ([], []);
         }
+    }
+
+    /// <summary>The facts in <paramref name="facts"/> that <paramref name="after"/> did not assign away.</summary>
+    private Dictionary<object, Fact> Unwritten(Dictionary<object, Fact> facts, BoundExpression after)
+    {
+        if (!_writtenIn.TryGetValue(after, out var written)) return facts;
+
+        return facts.Where(fact => !written.Contains(fact.Key))
+                    .ToDictionary(fact => fact.Key, fact => fact.Value);
     }
 
     private static Dictionary<object, Fact> Merge(
@@ -1135,6 +1156,15 @@ public sealed partial class Binder
 
         if (node is Syntax.AssignmentSyntax assignment)
             CollectAssignedRoots(assignment.Target, names);
+
+        // `ref x` and `out x` hand the callee the storage to write.
+        if (node is Syntax.RefArgumentSyntax { Value: var byReference } &&
+            RootName(byReference) is { } passed)
+            names.Add(passed);
+
+        if (node is Syntax.OutArgumentSyntax { Value: { } outward } &&
+            RootName(outward) is { } filled)
+            names.Add(filled);
 
         if (node is Syntax.AsmOperandSyntax { Direction: not Syntax.AsmDirection.In } output &&
             RootName(output.Value) is { } stored)
