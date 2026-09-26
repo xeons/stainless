@@ -4229,8 +4229,14 @@ public sealed class Parser
 
     /// <summary>
     /// Runs <paramref name="look"/> and then puts everything back, whatever it
-    /// answered.
+    /// answered -- except the depth limit, which ends the parse.
     /// </summary>
+    /// <remarks>
+    /// A look that reached the limit is a few levels deeper than the parse it
+    /// looks ahead of, so that parse would reach it too. Put back, the limit is
+    /// reached again by the look at every level above, each of which looks
+    /// again at every level above it: a doubling per level.
+    /// </remarks>
     private bool Probe(Func<bool> look)
     {
         int savedPos = _pos;
@@ -4243,11 +4249,22 @@ public sealed class Parser
         try { return look(); }
         finally
         {
-            _pos = savedPos;
-            RestoreSplits(savedSplits);
-            _depth = savedDepth;
-            _tooDeep = savedTooDeep;
+            var looked = _diagnostics;
             _diagnostics = savedDiagnostics;
+            _depth = savedDepth;
+
+            if (_tooDeep && !savedTooDeep)
+            {
+                foreach (var reached in looked.Items.Where(d => d.Code == "SL0108"))
+                    _diagnostics.Error(reached.Code, reached.Span, reached.Message);
+                _pos = _tokens.Count - 1;
+            }
+            else
+            {
+                _pos = savedPos;
+                RestoreSplits(savedSplits);
+                _tooDeep = savedTooDeep;
+            }
         }
     }
 
@@ -4773,7 +4790,9 @@ public sealed class Parser
     private static TypeSyntax Core(TypeSyntax type) =>
         type is FixedArrayTypeSyntax fixedArray ? Core(fixedArray.Element) : type;
 
-    /// <summary>Whether a token of this kind can only begin an operand.</summary>
+    /// <summary>What <see cref="GiveBackConditionalQuestion"/> decided, by position and context.</summary>
+    private readonly Dictionary<(int Position, bool Forced), bool> _conditionalQuestionAt = [];
+
     /// <summary>
     /// <c>x is Node ? a : b</c>: the <c>?</c> a type after <c>is</c> or
     /// <c>as</c> just took is a conditional's when what follows it is an
@@ -4785,13 +4804,25 @@ public sealed class Parser
         if (_pos == 0 || _tokens[_pos - 1].Kind != TokenKind.Question) return type;
         if (!StartsOperand(Current.Kind) && !At(TokenKind.Minus)) return type;
 
-        if (!Probe(() => { ParseTrueArm(); return At(TokenKind.Colon) && !_diagnostics.HasErrors; }))
+        // The probe parses everything after it, and each nested `?` probes
+        // again, so the answer is kept: unkept, every level doubles the parse.
+        var key = (_pos, _forceElementAccess);
+        if (!_conditionalQuestionAt.TryGetValue(key, out bool conditional))
+        {
+            conditional = Probe(() => { ParseTrueArm(); return At(TokenKind.Colon) && !_diagnostics.HasErrors; });
+            if (_tooDeep)
+                return type;
+            _conditionalQuestionAt[key] = conditional;
+        }
+
+        if (!conditional)
             return type;
 
         _pos--;
         return nullable.Element;
     }
 
+    /// <summary>Whether a token of this kind can only begin an operand.</summary>
     private static bool StartsOperand(TokenKind kind) => kind is
         TokenKind.Identifier or TokenKind.IntLiteral or TokenKind.FloatLiteral or
         TokenKind.StringLiteral or TokenKind.Utf8StringLiteral or TokenKind.CharLiteral or

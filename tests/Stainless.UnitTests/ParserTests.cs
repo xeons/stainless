@@ -838,6 +838,25 @@ public class ParserTests
     }
 
     /// <summary>
+    /// A <c>?</c> after the type an <c>is</c> or <c>as</c> took is a
+    /// conditional's only when a true arm and a colon follow, and finding out
+    /// parses everything after it. That answer is asked once per position.
+    /// </summary>
+    [Theory]
+    [InlineData("", "Alpha? twice = int as Alpha? ", "", "", 200)]
+    [InlineData("var y = ", "x is Node ? (", "1", ") : 0", 200)]
+    [InlineData("var y = ", "x as Node ? (", "1", ") : 0", 200)]
+    public void AQuestionAfterATypeTestIsDecidedOnce(
+        string head, string open, string middle, string close, int depth)
+    {
+        string source = "module A;\nclass Alpha {}\nclass Node {}\nvoid Main() { object x = null; " +
+                        head + Repeat(open, depth) + middle + Repeat(close, depth) + "; }";
+
+        var parse = Task.Run(() => Source.Recursion.OnADeepStack(() => Front.Parse(source)));
+        Assert.True(parse.Wait(TimeSpan.FromSeconds(30)), "the parse did not finish");
+    }
+
+    /// <summary>
     /// A <c>&gt;&gt;</c> split in two by a guess that was then abandoned is
     /// whole again for the parse that follows. The lambda guess comes first,
     /// and it left the halves behind, so the cast saw one <c>&gt;</c> too few.
