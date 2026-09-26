@@ -206,6 +206,66 @@ int Main()
             [TokenKind.Text, TokenKind.Text, TokenKind.TypeName, TokenKind.Bracket,
              TokenKind.Identifier, TokenKind.Bracket, TokenKind.Text]);
 
+    // A verbatim string's backslash is not an escape, so `\"` closes it, and
+    // `""` is a quote rather than an end.
+    t.Check("a verbatim string",
+            "@\"C:\\dir\\\" x",
+            [TokenKind.Text, TokenKind.Identifier]);
+    t.Check("a doubled quote in a verbatim string",
+            "@\"say \"\"hi\"\"\" x",
+            [TokenKind.Text, TokenKind.Identifier]);
+
+    // A raw string ends at a run as long as the one that opened it.
+    t.Check("a raw string",
+            "\"\"\"a \"\" b\"\"\" x",
+            [TokenKind.Text, TokenKind.Identifier]);
+    t.Check("a longer delimiter",
+            "\"\"\"\"has \"\"\" in it\"\"\"\" x",
+            [TokenKind.Text, TokenKind.Identifier]);
+
+    // Interpolated verbatim and raw strings have holes of code.
+    t.Check("an interpolated verbatim string",
+            "$@\"\\{n}\"",
+            [TokenKind.Text, TokenKind.Identifier, TokenKind.Text]);
+    t.Check("the other order",
+            "@$\"\\{n}\"",
+            [TokenKind.Text, TokenKind.Identifier, TokenKind.Text]);
+    t.Check("an interpolated raw string",
+            "$$\"\"\"{x} {{n}}\"\"\"",
+            [TokenKind.Text, TokenKind.Identifier, TokenKind.Text]);
+
+    // The `u8` is the string's.
+    t.Check("utf-8 bytes", "\"abc\"u8;", [TokenKind.Text, TokenKind.Bracket]);
+    t.Check("raw utf-8 bytes", "\"\"\"abc\"\"\"u8;", [TokenKind.Text, TokenKind.Bracket]);
+
+    // `@class` is a name.
+    t.Check("a verbatim identifier",
+            "int @class = @int;",
+            [TokenKind.TypeName, TokenKind.Identifier, TokenKind.Operator,
+             TokenKind.Identifier, TokenKind.Bracket]);
+
+    t.CheckTiling("tiling: verbatim",  "var s = @\"a\\b\" + \"\"\"c\"\"\"u8;");
+    t.CheckTiling("tiling: raw holes", "$$\"\"\"{{n}} {x}\"\"\"");
+
+    // A verbatim or raw string may span lines, and the next line starts
+    // inside it.
+    t.CheckState("an open verbatim string carries",
+                 "var s = @\"first", ScanState.Normal, ScanState.InVerbatimString);
+    t.CheckState("a closed verbatim string clears",
+                 "second\"; int y;", ScanState.InVerbatimString, ScanState.Normal);
+    t.CheckState("a doubled quote does not close it",
+                 "still \"\" open", ScanState.InVerbatimString, ScanState.InVerbatimString);
+    t.CheckState("an open raw string carries",
+                 "var s = \"\"\"", ScanState.Normal, CreateRawStringState(3u, 0u));
+    t.CheckState("two quotes do not close three",
+                 "  a \"\" b", CreateRawStringState(3u, 0u), CreateRawStringState(3u, 0u));
+    t.CheckState("three quotes do",
+                 "  \"\"\";", CreateRawStringState(3u, 0u), ScanState.Normal);
+    t.CheckState("four are needed for four",
+                 "  \"\"\" ", CreateRawStringState(4u, 0u), CreateRawStringState(4u, 0u));
+    t.CheckState("an interpolated raw string carries its dollars",
+                 "var s = $$\"\"\"", ScanState.Normal, CreateRawStringState(3u, 2u));
+
     t.Check("a directive", "#if WINDOWS", [TokenKind.Directive]);
 
     // `#` is a directive only at the start of a line.

@@ -123,8 +123,10 @@ because `IsDigit` is too good a name to take from every program.
 
 `Standard.Text` is imported into every module automatically, since a literal
 produces a `String` whether the program asked for one or not. It also provides
-`FromInteger`, `FromDouble`, `FromBool`, `FromBytes` and `FromNullTerminated`,
-plus `StringBuilder`.
+`FromInteger`, `FromDouble`, `FromBool`, `FromBytes` and `FromNullTerminated`;
+`FormatInteger`, `FormatDouble` and `AlignText`, which are what an
+interpolation's formats reach for ([§3.8.1](#381-alignment-and-format)); and
+`StringBuilder`.
 
 **`FromDouble` writes the shortest text that reads back as the same number**,
 which is what C# and every modern runtime do: `0.1` rather than
@@ -376,12 +378,18 @@ An interpolation with no holes is a literal, and costs what one costs.
 | `float`, `double` | `Text.FromDouble` |
 | `bool` | `true` or `false` |
 | `char32` | the character it names, not its number |
+| a class that implements `IFormattable` | its own `ToText(format)` |
 
 Anything else is refused (SL0557) rather than given a default. There is no
 `ToString` that every type owes, and inventing one to make this work would be a
 much larger decision than a formatting syntax — every class would owe an
 implementation, and a default that printed a type name would be worse than
-nothing.
+nothing. **`IFormattable` is the opt-in instead.** It is in `Standard.Text`,
+it has one method, `String ToText(String format)`, and a class that implements
+it has text to write: the hole calls it through the interface, so an override
+answers, and hands it the hole's format or `""`. A struct implements no
+interface ([§2.2](02-types.md#22-struct--value-type-c-layout)), so a struct's
+text is a method it names, called in the hole.
 
 Two refusals are worth the words they take. A **`char` or `char16` is one code
 unit, not a character** ([§2.1](02-types.md#21-primitives)), so which of the two meanings was wanted has to
@@ -403,9 +411,134 @@ $"{{{n}}}"                      // a literal brace either side of a hole
 **An empty hole** names no value (SL0555), and **two expressions in one hole**
 would mean the second was silently dropped (SL0556). Both are errors.
 
-**No format specifiers yet.** `{n:x}` and `{n,8}` are not written; `:` and `,`
-inside a hole are reserved so that adding them later is not a change of
-meaning. Padding and radix are `PadLeft` and `Convert.FromLong` until then.
+### 3.8.1 Alignment and format
+
+```csharp
+$"{count,6}"            // right-aligned in six columns
+$"{name,-12}|"          // left-aligned in twelve
+$"{flags:X8}"           // eight hexadecimal digits
+$"{price,10:N2}"        // both: 1,234.50 right-aligned in ten
+```
+
+C#'s shape and C#'s meanings. After the expression, a `,` and an **alignment**,
+then a `:` and a **format**, each optional and in that order.
+
+**The alignment is a constant integer** (SL0754): a literal, a negated one or a
+`const`. Positive pads on the left and negative on the right, with spaces, and
+text already wider is never cut. It counts characters rather than bytes, unlike
+`PadLeft`, because a width is a column and a column holds a character however
+many bytes encode it. It applies to anything a hole can hold. A width known
+only when the program runs is `Text.AlignText(text, width)`, which is what the
+hole calls.
+
+**The format is .NET's standard numeric formats**, a letter and up to three
+digits of precision:
+
+| | Integers | `float`, `double` |
+|---|---|---|
+| `D` | digits, zero-padded to the precision | — |
+| `X`, `x` | hexadecimal in that case, zero-padded | — |
+| `B` | binary, zero-padded | — |
+| `F` | fixed point, with the precision's decimals (2) | the same |
+| `N` | `F`, with a comma between groups of three | the same |
+| `E`, `e` | scientific, the precision's decimals (6), a three-digit exponent | the same |
+| `G`, `g` | the digits, or the precision's significant digits | the shortest spelling, or the same |
+
+Rounding is half away from zero on the exact binary value, which is .NET's
+rule and why `{0.125:F2}` is `0.13` and `{9.995:F2}` is `9.99` — the double
+nearest 9.995 is below it. The separators are the invariant culture's, since
+there is no other. A signed value in `X` or `B` writes its two's complement at
+its own width, so an `int` of -1 is `FFFFFFFF` and a `long` of -1 is sixteen
+`F`s. `G` with no precision is the language's shortest spelling of a double
+(§3.2), not .NET's, which differs from it only in where an exponent appears.
+
+**A number's format is checked when the program compiles** (SL0753). It is text
+in the source and the value's type is known, so `{n:Q}`, `{price:X}` on a
+`double` and `{name:D}` on a `String` are errors where they are written rather
+than a failure the first time the line runs. What was rejected is .NET's
+custom patterns — `0.00`, `#,##0` — which are a second small language, and
+three letters and a precision cover what they are mostly written for. The
+same formats are callable directly as `Text.FormatInteger(value, format)` and
+`Text.FormatDouble(value, format)`, where a format no number takes stops the
+program, as an index out of range does.
+
+A class that implements `IFormattable` receives the format as written and
+decides what it means, so `{when:yyyy-MM-dd}` is the class's business and is
+not checked.
+
+**A conditional in a hole is parenthesised** (SL0755), as in C#. The `:` that
+starts a format is found by the lexer — the format is not code, and
+`{when:HH:mm}` would not lex as any — so `{ok ? 1 : 2}` is `ok ? 1` with a
+format of ` 2`. Only a `:` outside every bracket starts one, so
+`{(ok ? 1 : 2)}`, `{items[i > 0 ? i : 0]}` and `{F(x: 1)}` are code.
+
+### 3.8.2 Verbatim and raw interpolations
+
+`$@"..."` and `@$"..."` are verbatim strings with holes, and `$"""..."""` is a
+raw one; §3.9 is what each is without the `$`. A raw string's `$` count is how
+many braces open a hole, which is what lets text hold braces without doubling
+them:
+
+```csharp
+$$"""{"id": {{id}}, "tags": []}"""       // {"id": 7, "tags": []}
+```
+
+With `n` dollars a run of fewer than `n` braces is text, and a run of `n` to
+`2n - 1` is text followed by a hole's opening. A longer run, or a run of `n`
+closing braces outside a hole, is SL0750, and so is a hole closed with fewer
+braces than opened it. More than one `$` on anything but a raw string is
+SL0751, since only a raw string has braces that need telling apart.
+
+## 3.9 Writing a string
+
+```csharp
+"C:\\temp\\log.txt"               // regular: escapes, one line
+@"C:\temp\log.txt"                // verbatim: a backslash is itself
+"""She said "hi" and \n."""       // raw: nothing is special
+"GET"u8                           // the bytes, not a String
+```
+
+C#'s four forms, each with C#'s rules, and one departure.
+
+**Verbatim**, `@"..."`: no escapes, so a backslash is itself; `""` is a quote;
+and the string may run over several lines, each line break being part of it.
+
+**Raw**, three or more quotes: the opening run is the delimiter, and only a run
+of exactly as many closes it, so the content may hold any shorter one. On one
+line the content is what stands between. Across lines the quotes stand on lines
+of their own — nothing but whitespace after the opening ones (SL0746), and
+before the closing ones (SL0747) — and the whitespace in front of the closing
+quotes is the literal's indentation, which comes off every line of content:
+
+```csharp
+String query = """
+    SELECT name
+      FROM users
+    """;                            // "SELECT name\n  FROM users"
+```
+
+A line that does not start with exactly that whitespace is SL0748, a tab where
+the closing line has spaces included, since there is no telling how wide a tab
+was meant to be. A line of nothing but whitespace is exempt and is empty. A run
+of quotes longer than the delimiter is SL0749, because it can be neither the
+end nor text.
+
+**A line break inside any string is one `\n`**, however the file was saved.
+That is the departure: C# keeps a verbatim or raw literal's line breaks as the
+file has them, so one checkout with CRLF and another with LF compile the same
+source to different strings. Here they compile to the same one.
+
+**`u8`** after a regular, verbatim or raw literal makes its UTF-8 bytes rather
+than a `String`. Its type is `byte[:]` — the language's view of bytes, where
+C#'s is `ReadOnlySpan<byte>` — over an array in read-only storage with an
+immortal count, laid out as an embedded file's is
+([§8.7](08-interop-libraries.md#87-embedding-a-file)). Nothing is allocated,
+copying the slice counts nothing, and a NUL follows the bytes without being
+counted in them. **The array is not writable**: a store through the slice is a
+fault, as it is into a read-only `[Embed]`, because a slice has no read-only
+form to refuse it with. An interpolated string cannot take `u8` (SL0752),
+since its bytes do not exist until it runs; `ToBytes()` on the `String` is
+that.
 
 ---
 

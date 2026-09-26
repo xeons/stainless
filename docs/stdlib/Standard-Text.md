@@ -31,13 +31,43 @@ documented here.
 
 ## Contents
 
-**Types** &nbsp; [String](#string-class) &middot; [StringBuilder](#stringbuilder-class) &middot; [Utf16String](#utf16string-class) &middot; [string](#string-alias)
+**Types** &nbsp; [IFormattable](#iformattable-interface) &middot; [String](#string-class) &middot; [StringBuilder](#stringbuilder-class) &middot; [Utf16String](#utf16string-class) &middot; [string](#string-alias)
 
-**Functions** &nbsp; [FromBool](#frombool-function) &middot; [FromBytes](#frombytes-function) &middot; [FromChar](#fromchar-function) &middot; [FromDouble](#fromdouble-function) &middot; [FromInteger](#frominteger-function) &middot; [FromInteger](#frominteger-function) &middot; [FromInteger](#frominteger-function) &middot; [FromNullTerminated](#fromnullterminated-function) &middot; [FromNullTerminatedUtf16](#fromnullterminatedutf16-function) &middot; [FromUtf16](#fromutf16-function)
+**Functions** &nbsp; [AlignText](#aligntext-function) &middot; [FormatDouble](#formatdouble-function) &middot; [FormatInteger](#formatinteger-function) &middot; [FormatInteger](#formatinteger-function) &middot; [FromBool](#frombool-function) &middot; [FromBytes](#frombytes-function) &middot; [FromChar](#fromchar-function) &middot; [FromDouble](#fromdouble-function) &middot; [FromInteger](#frominteger-function) &middot; [FromInteger](#frominteger-function) &middot; [FromInteger](#frominteger-function) &middot; [FromNullTerminated](#fromnullterminated-function) &middot; [FromNullTerminatedUtf16](#fromnullterminatedutf16-function) &middot; [FromUtf16](#fromutf16-function)
 
 **Constants** &nbsp; [NotFound](#notfound-constant)
 
 ## Types
+
+### IFormattable *interface*
+
+```
+interface IFormattable
+```
+
+A value that has text to write into an interpolated string.
+
+**Opted into, never owed.** There is no `ToString` every type has, and a
+class that does not implement this is still refused by `$"{value}"`. One
+that does is written by its own `ToText`, which is handed the hole's format
+-- `{when:yyyy-MM-dd}` passes `"yyyy-MM-dd"` -- or `""` when the hole has
+none. What a format means is the type's to decide, and nothing checks it
+when the program compiles.
+
+A struct implements no interface, so this is for classes; a struct's text is
+a method it names, called in the hole.
+
+<sub>[stdlib/Text/IFormattable.sl:35](../../stdlib/Text/IFormattable.sl#L35)</sub>
+
+#### ToText *method*
+
+```
+String ToText(String format)
+```
+
+This value as text, in `format`, which is `""` for the type's default.
+
+<sub>[stdlib/Text/IFormattable.sl:38](../../stdlib/Text/IFormattable.sl#L38)</sub>
 
 ### String *class*
 
@@ -936,6 +966,84 @@ type, so a diagnostic says `String` whichever one was written.
 <sub>[stdlib/Text/Text.sl:65](../../stdlib/Text/Text.sl#L65)</sub>
 
 ## Functions
+
+### AlignText *function*
+
+```
+String AlignText(String text, int alignment)
+```
+
+`text` padded with spaces to `alignment` characters: on the left when it is
+positive, so the text ends at the width, and on the right when it is
+negative. Never truncates. This is `{value,8}` and `{value,-8}`.
+
+**Characters, not bytes**, unlike `PadLeft`: a width is a column, and a
+column holds a character however many bytes encode it.
+
+**See also** &nbsp; [String.PadLeft](#padleft-method)
+
+<sub>[stdlib/Text/Format.sl:286](../../stdlib/Text/Format.sl#L286)</sub>
+
+### FormatDouble *function*
+
+```
+String FormatDouble(double value, String format)
+```
+
+A floating-point number in a standard numeric format, as `{value:F2}`
+writes it: `F`, `N`, `E` or `G`, as `FormatInteger` describes them. `D`,
+`X` and `B` are integer formats and are not taken here.
+
+**See also** &nbsp; [Text.FormatInteger](#formatinteger-function)
+
+<sub>[stdlib/Text/Format.sl:256](../../stdlib/Text/Format.sl#L256)</sub>
+
+### FormatInteger *function*
+
+```
+String FormatInteger(long value, String format)
+```
+
+A signed integer in a standard numeric format, as `{value:D8}` writes it.
+
+A format is a letter and an optional precision of up to three digits:
+
+| Format | Integers | Floating point |
+|---|---|---|
+| `D` | digits, zero-padded to the precision | -- |
+| `X`, `x` | hexadecimal in that case, zero-padded | -- |
+| `B` | binary, zero-padded | -- |
+| `F` | fixed point, the precision's decimals (2) | the same |
+| `N` | `F` with a comma between groups of three | the same |
+| `E`, `e` | scientific, the precision's decimals (6) | the same |
+| `G`, `g` | the digits, or the precision's significant digits | the shortest spelling, or the same |
+
+Either case of a letter is accepted; only `X`, `E` and `G` write something
+that differs by case. Rounding is half away from zero, and the separators
+are the invariant culture's, since there is no other.
+
+`X` and `B` write the two's complement of all 64 bits, so a narrower type
+widened to reach here reads as that type only if it was widened unsigned;
+an interpolation does that for itself. **A format that is not in the table
+stops the program**, as an index out of range does: which format is asked
+for is fixed where the call is written, and an interpolation's is checked
+when it compiles.
+
+**See also** &nbsp; [Text.FormatDouble](#formatdouble-function)
+
+<sub>[stdlib/Text/Format.sl:160](../../stdlib/Text/Format.sl#L160)</sub>
+
+### FormatInteger *function*
+
+```
+String FormatInteger(ulong value, String format)
+```
+
+An unsigned integer in a standard numeric format.
+
+**See also** &nbsp; [Text.FormatInteger](#formatinteger-function)
+
+<sub>[stdlib/Text/Format.sl:209](../../stdlib/Text/Format.sl#L209)</sub>
 
 ### FromBool *function*
 

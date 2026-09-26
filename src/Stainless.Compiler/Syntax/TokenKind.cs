@@ -22,6 +22,10 @@ public enum TokenKind
     Identifier, IntLiteral, FloatLiteral, StringLiteral, CharLiteral,
     InterpolatedString,
 
+    // `"..."u8`: the literal's UTF-8 bytes rather than a String. The value is
+    // the decoded text, as for a StringLiteral.
+    Utf8StringLiteral,
+
     // The text of an `asm` block, from its `{` to its matching `}`, as one token.
     AsmBody,
 
@@ -221,6 +225,7 @@ public static class TokenKindExtensions
         TokenKind.StringLiteral => "a string literal",
         TokenKind.CharLiteral => "a character literal",
         TokenKind.InterpolatedString => "an interpolated string",
+        TokenKind.Utf8StringLiteral => "a UTF-8 string literal",
         TokenKind.AsmBody => "an assembly block",
         TokenKind.EndOfFile => "end of file",
         _ => kind.FixedText() is { } t ? "'" + t + "'" : kind.ToString(),

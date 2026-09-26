@@ -25,12 +25,20 @@ namespace Stainless.Syntax;
 /// from. A second lexer over a copy would have to have its positions patched
 /// afterwards, and a diagnostic that pointed at the copy would be worse than
 /// no diagnostic.
+///
+/// A hole's format, the text after a top-level <c>:</c>, is not code and is
+/// carried as the text it is. Its alignment, after a top-level <c>,</c>, is
+/// code, and stays among the tokens for the parser to find.
 /// </summary>
-public sealed record InterpolationSegment(string? Literal, IReadOnlyList<Token>? Tokens)
+public sealed record InterpolationSegment(
+    string? Literal, IReadOnlyList<Token>? Tokens, string? Format = null,
+    Source.SourceSpan? FormatSpan = null)
 {
     public static InterpolationSegment Text(string literal) => new(literal, null);
 
-    public static InterpolationSegment Hole(IReadOnlyList<Token> tokens) => new(null, tokens);
+    public static InterpolationSegment Hole(
+        IReadOnlyList<Token> tokens, string? format = null, Source.SourceSpan? formatSpan = null) =>
+        new(null, tokens, format, formatSpan);
 
     public bool IsHole => Tokens is not null;
 }

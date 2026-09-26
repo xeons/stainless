@@ -564,8 +564,8 @@ public class Document
     /// is what it already was.
     ///
     /// **Which is nearly always the next one.** The state between two lines is
-    /// whether a block comment is open, so an ordinary edit rescans exactly one
-    /// line. Typing `/*` at the top of a file rescans all of it, once, and
+    /// whether a block comment or a verbatim or raw string is open, so an
+    /// ordinary edit rescans exactly one line. Typing `/*` at the top of a file rescans all of it, once, and
     /// typing the `*/` rescans it back -- which is the worst case and is the
     /// one people notice least, because they are looking at what they typed.
     public void RescanFrom(nuint row)

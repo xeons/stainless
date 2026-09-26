@@ -25,8 +25,9 @@
 // So this is a different tool with a different contract:
 //
 //   - **A line at a time, with the state carried between them.** What a line
-//     means depends on the one above it only through whether a block comment
-//     or a string was left open, which is one small value. Editing line 400 of
+//     means depends on the one above it only through whether a block comment,
+//     a verbatim string or a raw string was left open, which is one small
+//     value. Editing line 400 of
 //     a 4000-line file rescans line 400, and stops there the moment the state
 //     coming out matches what it was before.
 //   - **Nothing is ever an error.** An unterminated string is a string that
@@ -73,7 +74,8 @@ public enum TokenKind
     Identifier,
     /// A number, with whatever prefix and suffix it carried.
     Number,
-    /// `"text"`, or the text part of `$"text {hole}"`.
+    /// `"text"`, `@"text"`, `"""text"""` and `"text"u8`, or the text part of
+    /// an interpolated one.
     Text,
     /// `'c'`.
     Character,
@@ -125,9 +127,26 @@ public struct Token
 public enum ScanState
 {
     /// Nothing is open. The ordinary case, and what a file starts in.
-    Normal,
+    Normal = 0,
     /// A `/*` is open and has not been closed.
-    InBlockComment,
+    InBlockComment = 1,
+    /// An `@"` is open, which may span lines.
+    InVerbatimString = 2,
+    /// A `$@"` or `@$"` is open.
+    InInterpolatedVerbatimString = 3,
+    /// A raw string is open. What closes it is a run of as many quotes as
+    /// opened it, and a hole in it opens with as many braces as it has `$`, so
+    /// the state carries both: see `CreateRawStringState`.
+    InRawString = 16,
+}
+
+/// The state after a line that leaves a raw string open: `InRawString`, plus
+/// the quote count times 16, plus the `$` count. A raw string with fifteen `$`
+/// or more is carried as one with fifteen, which colours the same.
+public ScanState CreateRawStringState(nuint quotes, nuint dollars)
+{
+    nuint kept = dollars > 15u ? 15u : dollars;
+    return (ScanState)((int)ScanState.InRawString + (int)(quotes * 16u + kept));
 }
 
 // ================================================================== scanner
@@ -143,6 +162,11 @@ public class Scanner
     Dictionary<String, bool> _keywords;
     Dictionary<String, bool> _contextual;
     Dictionary<String, bool> _primitives;
+
+    /// Whether the string last read reached the end of the line without
+    /// closing, and what it leaves open for the next line when it did.
+    bool _leftOpen;
+    ScanState _openState;
 
     public Scanner()
     {
@@ -207,6 +231,15 @@ public class Scanner
         nuint size = line.ByteLength();
         nuint at = 0u;
         var state = entry;
+
+        // A line that arrives inside a string is one until its closing quotes.
+        if ((int)state >= (int)ScanState.InVerbatimString)
+        {
+            at = this.ContinueOpenString(line, state, into);
+            if (_leftOpen)
+                return state;
+            state = ScanState.Normal;
+        }
 
         // A line that arrives inside a block comment is one until the `*/`.
         if (state == ScanState.InBlockComment)
@@ -277,18 +310,26 @@ public class Scanner
                 }
             }
 
-            if (c == (byte)'"')
+            if (c == (byte)'"' || c == (byte)'$' || c == (byte)'@')
             {
-                at = ScanText(line, at, into);
-                continue;
+                nuint after = this.ScanAnyString(line, at, into);
+                if (after != at)
+                {
+                    if (_leftOpen)
+                        return _openState;
+                    at = after;
+                    continue;
+                }
             }
 
-            if (c == (byte)'$' && at + 1u < size && line.GetByteAt(at + 1u) == (byte)'"')
+            // `@class`: a keyword as a name, so an identifier whatever the word.
+            if (c == (byte)'@' && at + 1u < size && IsWordStart(line.GetByteAt(at + 1u)))
             {
-                // The `$` belongs to the string, and what is inside the holes is
-                // lexed as ordinary code by `ScanText`.
-                into.Add(Token.Create(TokenKind.Text, at, 1u));
-                at = ScanText(line, at + 1u, into);
+                nuint run = at + 1u;
+                while (run < size && IsWordPart(line.GetByteAt(run)))
+                    run++;
+                into.Add(Token.Create(TokenKind.Identifier, at, run - at));
+                at = run;
                 continue;
             }
 
@@ -340,6 +381,158 @@ public class Scanner
     }
 
     // ------------------------------------------------------------ the parts
+
+    /// Any string literal starting at `at`, or `at` unchanged when the `$` or
+    /// `@` there starts none. Sets `_leftOpen`, and `_openState` with it.
+    nuint ScanAnyString(String line, nuint at, List<Token> into)
+    {
+        nuint size = line.ByteLength();
+        _leftOpen = false;
+
+        nuint dollars = 0u;
+        while (at + dollars < size && line.GetByteAt(at + dollars) == (byte)'$')
+            dollars++;
+
+        nuint quote = at + dollars;
+        bool verbatim = false;
+        if (dollars == 0u && quote + 1u < size && line.GetByteAt(quote) == (byte)'@'
+            && line.GetByteAt(quote + 1u) == (byte)'$')
+        {
+            verbatim = true;
+            dollars = 1u;
+            quote = at + 2u;
+        }
+        else if (quote < size && line.GetByteAt(quote) == (byte)'@')
+        {
+            verbatim = true;
+            quote++;
+        }
+
+        if (quote >= size || line.GetByteAt(quote) != (byte)'"')
+            return at;
+
+        nuint quotes = 0u;
+        while (quote + quotes < size && line.GetByteAt(quote + quotes) == (byte)'"')
+            quotes++;
+
+        if (verbatim)
+        {
+            _openState = dollars > 0u
+                ? ScanState.InInterpolatedVerbatimString
+                : ScanState.InVerbatimString;
+            return this.ScanDelimitedText(line, quote + 1u, at, 1u, dollars, true, into);
+        }
+
+        if (quotes >= 3u)
+        {
+            _openState = CreateRawStringState(quotes, dollars);
+            return this.ScanDelimitedText(line, quote + quotes, at, quotes, dollars, false, into);
+        }
+
+        if (dollars == 0u)
+            return this.WithUtf8Suffix(line, ScanText(line, at, into), into);
+
+        // The `$` belongs to the string, and what is inside the holes is lexed
+        // as ordinary code by `ScanText`.
+        into.Add(Token.Create(TokenKind.Text, at, quote - at));
+        return ScanText(line, quote, into);
+    }
+
+    /// The rest of a verbatim or raw string that an earlier line left open.
+    nuint ContinueOpenString(String line, ScanState state, List<Token> into)
+    {
+        if (state == ScanState.InVerbatimString)
+            return this.ScanDelimitedText(line, 0u, 0u, 1u, 0u, true, into);
+        if (state == ScanState.InInterpolatedVerbatimString)
+            return this.ScanDelimitedText(line, 0u, 0u, 1u, 1u, true, into);
+
+        nuint packed = (nuint)((int)state - (int)ScanState.InRawString);
+        return this.ScanDelimitedText(line, 0u, 0u, packed / 16u, packed % 16u, false, into);
+    }
+
+    /// The body of a verbatim or raw string from `at` to its closing quotes or
+    /// the end of the line, as `Text` from `textStart`. A verbatim string closes
+    /// at a lone quote, since `""` is a quote, and a raw one at a run of
+    /// `quotes` or more. With `dollars`, a run of that many braces opens a hole,
+    /// and what is inside it is code.
+    nuint ScanDelimitedText(String line, nuint at, nuint textStart, nuint quotes, nuint dollars,
+                            bool verbatim, List<Token> into)
+    {
+        nuint size = line.ByteLength();
+        nuint run = at;
+        _leftOpen = false;
+
+        while (run < size)
+        {
+            byte c = line.GetByteAt(run);
+
+            if (c == (byte)'"')
+            {
+                nuint length = 1u;
+                while (run + length < size && line.GetByteAt(run + length) == (byte)'"')
+                    length++;
+
+                // In a verbatim string each pair is a quote, and an odd one
+                // over closes it.
+                bool closes = verbatim ? length % 2u == 1u : length >= quotes;
+                if (closes)
+                {
+                    nuint end = run + length;
+                    into.Add(Token.Create(TokenKind.Text, textStart, end - textStart));
+                    return this.WithUtf8Suffix(line, end, into);
+                }
+
+                run += length;
+                continue;
+            }
+
+            if (dollars > 0u && c == (byte)'{')
+            {
+                nuint length = 1u;
+                while (run + length < size && line.GetByteAt(run + length) == (byte)'{')
+                    length++;
+
+                // A verbatim string's `{{` is a brace; a raw string's run is
+                // text while it is shorter than its `$`.
+                bool opens = verbatim ? length % 2u == 1u : length >= dollars;
+                if (!opens)
+                {
+                    run += length;
+                    continue;
+                }
+
+                into.Add(Token.Create(TokenKind.Text, textStart, run + length - textStart));
+                run = ScanHole(line, run + length, into);
+                textStart = run;
+                continue;
+            }
+
+            run++;
+        }
+
+        if (run > textStart)
+            into.Add(Token.Create(TokenKind.Text, textStart, run - textStart));
+        _leftOpen = true;
+        return run;
+    }
+
+    /// `u8` straight after a string belongs to it, and is coloured with it.
+    nuint WithUtf8Suffix(String line, nuint at, List<Token> into)
+    {
+        nuint size = line.ByteLength();
+        if (at + 1u >= size || into.Count == 0u)
+            return at;
+
+        byte u = line.GetByteAt(at);
+        if ((u != (byte)'u' && u != (byte)'U') || line.GetByteAt(at + 1u) != (byte)'8')
+            return at;
+        if (at + 2u < size && IsWordPart(line.GetByteAt(at + 2u)))
+            return at;
+
+        var last = into[into.Count - 1u];
+        into[into.Count - 1u] = Token.Create(last.Kind, last.Start, last.Length + 2u);
+        return at + 2u;
+    }
 
     /// A word, and which of the three kinds of word it is.
     nuint ScanWord(String line, nuint at, List<Token> into)

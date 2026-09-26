@@ -110,6 +110,145 @@ public class InterpolationTests
     public void AnUnterminatedInterpolationIsRefused() =>
         Assert.Contains("SL0006", Body("""String s = $"unfinished;"""));
 
+    // ------------------------------------------------- alignment and format
+
+    [Theory]
+    [InlineData("""int n = 1; String s = $"{n,5}";""")]
+    [InlineData("""int n = 1; String s = $"{n,-5}";""")]
+    [InlineData("""int n = 1; String s = $"{n:X8}{n:x}{n:B}{n:D3}{n:N0}{n:F1}{n:E2}{n:G}";""")]
+    [InlineData("""byte n = 1; ulong u = 2u; String s = $"{n:X2}{u:N}";""")]
+    [InlineData("""double d = 1.5; float f = 2.5f; String s = $"{d:F2}{d:N}{d:e3}{f:G4}";""")]
+    [InlineData("""double d = 1.5; String s = $"{d,10:F3}";""")]
+    [InlineData("""String w = "x"; bool b = true; String s = $"{w,8}{b,-6}";""")]
+    [InlineData("""int n = 1; String s = $"{(n > 0 ? 1 : 2):D2}";""")]
+    [InlineData("""int n = 1; String s = $@"{n:X}\";""")]
+    [InlineData(""""int n = 1; String s = $$"""{{n:X}} {x}""";"""")]
+    public void AnAlignedOrFormattedHoleBinds(string body) => Assert.Empty(Body(body));
+
+    /// <summary>
+    /// A number's format is text in the source and its type is known, so a
+    /// letter it does not take is refused here rather than when the line runs.
+    /// </summary>
+    [Theory]
+    [InlineData("""int n = 1; String s = $"{n:Q}";""")]
+    [InlineData("""int n = 1; String s = $"{n:0.00}";""")]
+    [InlineData("""int n = 1; String s = $"{n:X1234}";""")]
+    [InlineData("""int n = 1; String s = $"{n:}";""")]
+    [InlineData("""double d = 1.0; String s = $"{d:X}";""")]
+    [InlineData("""double d = 1.0; String s = $"{d:D2}";""")]
+    [InlineData("""String w = "x"; String s = $"{w:X}";""")]
+    [InlineData("""bool b = true; String s = $"{b:D}";""")]
+    public void AFormatTheTypeDoesNotTakeIsRefused(string body) =>
+        Assert.Contains("SL0753", Body(body));
+
+    [Theory]
+    [InlineData("""int n = 1; int w = 4; String s = $"{n,w}";""")]
+    [InlineData("""int n = 1; String s = $"{n,1.5}";""")]
+    [InlineData("""int n = 1; String s = $"{n,"x"}";""")]
+    public void AnAlignmentMustBeAConstantInteger(string body) =>
+        Assert.Contains("SL0754", Body(body));
+
+    /// <summary>
+    /// A <c>:</c> at the top of a hole starts its format, so a conditional's
+    /// is taken for one. C# asks for the parentheses, and so does this.
+    /// </summary>
+    [Theory]
+    [InlineData("""bool b = true; String s = $"{b ? 1 : 2}";""")]
+    [InlineData("""bool b = true; String s = $"{b ? 1 : 2,4}";""")]
+    public void AConditionalInAHoleNeedsParentheses(string body)
+    {
+        var codes = Body(body);
+        Assert.Contains("SL0755", codes);
+        Assert.Single(codes);
+    }
+
+    /// <summary>
+    /// A class that implements <c>IFormattable</c> has text to write, and is
+    /// handed the format; one that does not is still refused.
+    /// </summary>
+    [Fact]
+    public void AFormattableClassIsWrittenByItsOwnText() =>
+        Assert.Empty(Front.ModuleCodes("""
+            public class Money : IFormattable
+            {
+                public String ToText(String format) => format;
+            }
+            int Main() { var m = new Money(); String s = $"{m} {m:C} {m,8:long}"; return 0; }
+            """));
+
+    /// <summary>The parser leaves the alignment as code and the format as text.</summary>
+    [Fact]
+    public void AHoleParsesToItsValueAlignmentAndFormat()
+    {
+        var parsed = Assert.IsType<InterpolatedStringSyntax>(Front.Expression("""$"{x,-5:F2}" """));
+        var hole = parsed.Parts.Single(p => p.Value is not null);
+
+        Assert.IsType<NameSyntax>(hole.Value);
+        Assert.IsType<UnarySyntax>(hole.Alignment);
+        Assert.Equal("F2", hole.Format);
+    }
+
+    /// <summary>A constant is as fixed as a literal, so it may be the width.</summary>
+    [Fact]
+    public void AConstantIsAnAlignment() =>
+        Assert.Empty(Front.ModuleCodes("""
+            const int Width = -6;
+            int Main() { int n = 1; String s = $"{n,Width}"; return 0; }
+            """));
+
+    [Fact]
+    public void AClassThatIsNotFormattableTakesNoFormat() =>
+        Assert.Contains("SL0557", Front.ModuleCodes("""
+            public class C { }
+            int Main() { var c = new C(); String s = $"{c:X}"; return 0; }
+            """));
+
+    // ------------------------------------------------------------ literals
+
+    /// <summary>
+    /// <c>"..."u8</c> is a view of bytes, as C#'s is a <c>ReadOnlySpan</c>, so
+    /// it goes where a <c>byte[:]</c> goes and not where a String does.
+    /// </summary>
+    [Fact]
+    public void AUtf8LiteralIsAByteSlice() =>
+        Assert.Empty(Body("""byte[:] b = "abc"u8; var c = "x"u8; byte[:] d = c; nuint n = b.Length;"""));
+
+    [Fact]
+    public void AUtf8LiteralIsNotAString() =>
+        Assert.NotEmpty(Body("""String s = "abc"u8;"""));
+
+    /// <summary>
+    /// The bytes are one constant, not an allocation: an immortal array in
+    /// read-only storage, with a NUL after the counted bytes.
+    /// </summary>
+    [Fact]
+    public void AUtf8LiteralIsStaticData()
+    {
+        string ir = Front.ModuleIr("""public byte[:] Bytes() { return "hé"u8; }""");
+
+        Assert.Contains("= private unnamed_addr constant", ir, StringComparison.Ordinal);
+        Assert.Contains("c\"h\\C3\\A9\\00\"", ir, StringComparison.Ordinal);
+        Assert.DoesNotContain("sl_array_alloc", Front.TestFunction(ir, "Bytes"), StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// <c>@name</c> is the name, keyword or not, and a contextual word written
+    /// with one is never the word.
+    /// </summary>
+    [Theory]
+    [InlineData("""int @class = 1; int @int = @class + 1; String s = $"{@int}";""")]
+    [InlineData("""int @checked = 1; int n = @checked;""")]
+    [InlineData("""int count = 1; int n = @count;""")]
+    public void AVerbatimIdentifierBinds(string body) => Assert.Empty(Body(body));
+
+    [Fact]
+    public void AVerbatimIdentifierMangledAsTheBareName()
+    {
+        string ir = Front.ModuleIr("""public int @class(int @int) { return @int; }""");
+        Assert.Contains("5class", ir, StringComparison.Ordinal);
+        Assert.DoesNotContain("@class(", ir.Replace("define", ""), StringComparison.Ordinal);
+    }
+
     // ---------------------------------------------------------------- lexing
 
     /// <summary>

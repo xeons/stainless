@@ -1028,7 +1028,17 @@ public sealed record LiteralSyntax(SourceSpan Span, TokenKind Kind, object? Valu
 public sealed record InterpolatedStringSyntax(
     SourceSpan Span, IReadOnlyList<InterpolatedPartSyntax> Parts) : ExpressionSyntax(Span);
 
-public sealed record InterpolatedPartSyntax(string? Literal, ExpressionSyntax? Value);
+/// <summary>
+/// One part of an interpolated string. A hole may carry an alignment, the
+/// expression after its top-level <c>,</c>, and a format, the text after its
+/// top-level <c>:</c>.
+/// </summary>
+public sealed record InterpolatedPartSyntax(string? Literal, ExpressionSyntax? Value)
+{
+    public ExpressionSyntax? Alignment { get; init; }
+    public string? Format { get; init; }
+    public SourceSpan? FormatSpan { get; init; }
+}
 
 public sealed record NameSyntax(SourceSpan Span, QualifiedName Name) : ExpressionSyntax(Span);
 

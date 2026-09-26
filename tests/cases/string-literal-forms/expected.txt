@@ -1,0 +1,23 @@
+C:\temp\new "quoted"
+first
+second
+a "quoted" \n word
+three """ in a row
+{
+  "name": "stainless",
+
+  "tags": ["c", "arc"]
+}
+C:\arc\42.txt
+say "arc"
+arc = "42" 
+{"name": "arc", "braces": "{42}"}
+[arc]
+  value = 42
+6 bytes: 68 C3 A9 6C 6C 6F
+C3 A9
+3 5C 6E 7B 7D
+53 4C 76 31 v1
+4
+6C 61 74 65 72
+5 6 tpl 8 118

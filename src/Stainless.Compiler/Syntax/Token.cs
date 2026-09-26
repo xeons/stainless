@@ -45,5 +45,13 @@ public sealed record Token(TokenKind Kind, SourceSpan Span, string Text, object?
     /// </summary>
     public SourceSpan? DocumentationSpan { get; init; }
 
+    /// <summary>
+    /// True for <c>@name</c>. <see cref="Text"/> is the name without the
+    /// <c>@</c>, which is what everything downstream names, mangles and
+    /// exports; this is only for the parser, where a contextual word written
+    /// with an <c>@</c> is a name and never the word.
+    /// </summary>
+    public bool IsVerbatim { get; init; }
+
     public override string ToString() => $"{Kind} '{Text}'";
 }

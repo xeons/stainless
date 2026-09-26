@@ -280,6 +280,201 @@ public class LexerTests
         Assert.Equal(expected, tokens[0].Value);
     }
 
+    /// <summary>
+    /// <c>@"..."</c>: a backslash is itself, <c>""</c> is a quote, and a line
+    /// break is part of the text -- one <c>\n</c> however the file was saved.
+    /// </summary>
+    [Theory]
+    [InlineData("@\"C:\\temp\\new\"", "C:\\temp\\new")]
+    [InlineData("@\"say \"\"hi\"\"\"", "say \"hi\"")]
+    [InlineData("@\"\"", "")]
+    [InlineData("@\"a\nb\"", "a\nb")]
+    [InlineData("@\"a\r\nb\"", "a\nb")]
+    [InlineData("@\"\"\"\"", "\"")]
+    public void VerbatimStringsDecode(string source, string expected)
+    {
+        var tokens = Front.Tokens(source, out var diagnostics);
+        Assert.Empty(Front.Codes(diagnostics));
+        Assert.Equal(TokenKind.StringLiteral, tokens[0].Kind);
+        Assert.Equal(expected, tokens[0].Value);
+        Assert.Equal(TokenKind.EndOfFile, tokens[1].Kind);
+    }
+
+    /// <summary>
+    /// <c>"""..."""</c>: nothing is special but a run of quotes as long as the
+    /// opening one, and across lines the closing line's indentation comes off
+    /// every line.
+    /// </summary>
+    [Theory]
+    [InlineData("\"\"\"a \"b\" \\n\"\"\"", "a \"b\" \\n")]
+    [InlineData("\"\"\"\"a \"\"\" b\"\"\"\"", "a \"\"\" b")]
+    [InlineData("\"\"\"\n  x\n  \"\"\"", "x")]
+    [InlineData("\"\"\"\n    one\n      two\n    \"\"\"", "one\n  two")]
+    [InlineData("\"\"\"\n  a\n\n  b\n  \"\"\"", "a\n\nb")]
+    [InlineData("\"\"\"\r\n  a\r\n  b\r\n  \"\"\"", "a\nb")]
+    [InlineData("\"\"\"   \n  \"q\"\n  \"\"\"", "\"q\"")]
+    [InlineData("\"\"\"\n\tx\n\t\"\"\"", "x")]
+    public void RawStringsDecode(string source, string expected)
+    {
+        var tokens = Front.Tokens(source, out var diagnostics);
+        Assert.Empty(Front.Codes(diagnostics));
+        Assert.Equal(TokenKind.StringLiteral, tokens[0].Kind);
+        Assert.Equal(expected, tokens[0].Value);
+        Assert.Equal(TokenKind.EndOfFile, tokens[1].Kind);
+    }
+
+    /// <summary>
+    /// Every malformed raw string is a diagnostic and never a crash, and the
+    /// lexer still ends in an end-of-file token.
+    /// </summary>
+    [Theory]
+    [InlineData("\"\"\"x\n  \"\"\"", "SL0746")]
+    [InlineData("\"\"\"\n  x\n  y\"\"\"", "SL0747")]
+    [InlineData("\"\"\"\n  \"\"\"", "SL0747")]
+    [InlineData("\"\"\"\n  x\n y\n  \"\"\"", "SL0748")]
+    [InlineData("\"\"\"\n  x\n\ty\n  \"\"\"", "SL0748")]
+    [InlineData("\"\"\"ab\"\"\"\"", "SL0749")]
+    [InlineData("\"\"\"never closed", "SL0006")]
+    [InlineData("\"\"\"\n  x\n", "SL0006")]
+    [InlineData("\"\"\"", "SL0006")]
+    [InlineData("$\"\"\"{{x}}\"\"\"", "SL0750")]
+    [InlineData("$$\"\"\"{{x}\"\"\"", "SL0750")]
+    [InlineData("$$\"\"\"}}\"\"\"", "SL0750")]
+    [InlineData("$$\"\"\"{{x\"\"\"", "SL0006")]
+    public void AMalformedRawStringIsReported(string source, string code)
+    {
+        var tokens = Front.Tokens(source, out var diagnostics);
+        Assert.Contains(code, Front.Codes(diagnostics));
+        Assert.Equal(TokenKind.EndOfFile, tokens[^1].Kind);
+    }
+
+    /// <summary>
+    /// With <c>$</c> in front, the number of them is how many braces open a
+    /// hole; a shorter run is text.
+    /// </summary>
+    [Theory]
+    [InlineData("$\"\"\"a {x} b\"\"\"", "a |x| b")]
+    [InlineData("$$\"\"\"{ {{x}} }\"\"\"", "{ |x| }")]
+    [InlineData("$$\"\"\"{{{x}}}\"\"\"", "{|x|}")]
+    [InlineData("$\"\"\"\n  a {x}\n    {y} b\n  \"\"\"", "a |x|\n  |y| b")]
+    [InlineData("$@\"a\\{x}\"", "a\\|x|")]
+    [InlineData("@$\"a\"\"{x}\"", "a\"|x|")]
+    public void InterpolatedRawAndVerbatimStringsSplit(string source, string expected)
+    {
+        var tokens = Front.Tokens(source, out var diagnostics);
+        Assert.Empty(Front.Codes(diagnostics));
+        Assert.Equal(TokenKind.InterpolatedString, tokens[0].Kind);
+
+        var segments = (IReadOnlyList<InterpolationSegment>)tokens[0].Value!;
+        string shown = string.Concat(segments.Select(s =>
+            s.IsHole ? "|" + string.Concat(s.Tokens!.Select(t => t.Text)) + "|" : s.Literal));
+        Assert.Equal(expected, shown);
+    }
+
+    /// <summary>
+    /// A hole's format is the text after a top-level <c>:</c>, carried as
+    /// text; a <c>:</c> inside brackets belongs to the code.
+    /// </summary>
+    [Theory]
+    [InlineData("$\"{x:X8}\"", "X8")]
+    [InlineData("$\"{x,5:F2}\"", "F2")]
+    [InlineData("$\"{f(a: 1):N}\"", "N")]
+    [InlineData("$\"{x[a ? 1 : 2]}\"", null)]
+    [InlineData("$\"{(a ? 1 : 2)}\"", null)]
+    [InlineData("$\"{when:yyyy-MM-dd HH:mm}\"", "yyyy-MM-dd HH:mm")]
+    [InlineData("$$\"\"\"{{x:D}}\"\"\"", "D")]
+    public void AHoleCarriesItsFormat(string source, string? format)
+    {
+        var tokens = Front.Tokens(source, out var diagnostics);
+        Assert.Empty(Front.Codes(diagnostics));
+
+        var hole = ((IReadOnlyList<InterpolationSegment>)tokens[0].Value!).Single(s => s.IsHole);
+        Assert.Equal(format, hole.Format);
+    }
+
+    [Theory]
+    [InlineData("$\"{x:X8\"")]
+    [InlineData("$\"{x:X8")]
+    [InlineData("@\"never closed")]
+    [InlineData("$@\"{x\"")]
+    public void AnUnterminatedFormOfStringIsReported(string source)
+    {
+        var tokens = Front.Tokens(source, out var diagnostics);
+        Assert.Contains("SL0006", Front.Codes(diagnostics));
+        Assert.Equal(TokenKind.EndOfFile, tokens[^1].Kind);
+    }
+
+    /// <summary>More than one <c>$</c> is a brace count, which only a raw string has.</summary>
+    [Fact]
+    public void ManyDollarsNeedARawString()
+    {
+        Front.Tokens("$$\"{x}\"", out var diagnostics);
+        Assert.Contains("SL0751", Front.Codes(diagnostics));
+    }
+
+    /// <summary>
+    /// <c>u8</c> makes the literal's bytes, and belongs to the token. It is not
+    /// a suffix an interpolated string can take, since those bytes would not be
+    /// known until the string was built.
+    /// </summary>
+    [Theory]
+    [InlineData("\"hé\"u8", "hé")]
+    [InlineData("\"x\"U8", "x")]
+    [InlineData("@\"a\\b\"u8", "a\\b")]
+    [InlineData("\"\"\"q\"\"\"u8", "q")]
+    public void AUtf8SuffixMakesBytes(string source, string expected)
+    {
+        var tokens = Front.Tokens(source, out var diagnostics);
+        Assert.Empty(Front.Codes(diagnostics));
+        Assert.Equal(TokenKind.Utf8StringLiteral, tokens[0].Kind);
+        Assert.Equal(expected, tokens[0].Value);
+        Assert.Equal(TokenKind.EndOfFile, tokens[1].Kind);
+    }
+
+    [Fact]
+    public void AUtf8SuffixNeedsToEndThere() =>
+        Assert.Equal([TokenKind.StringLiteral, TokenKind.Identifier], Front.Kinds("\"x\"u8x"));
+
+    [Fact]
+    public void AnInterpolatedStringTakesNoUtf8Suffix()
+    {
+        Front.Tokens("$\"{x}\"u8", out var diagnostics);
+        Assert.Contains("SL0752", Front.Codes(diagnostics));
+    }
+
+    // -------------------------------------------------- verbatim identifiers
+
+    /// <summary>
+    /// <c>@class</c> is an identifier whose text is the bare word, which is
+    /// what the symbol, its mangled name and any C export are called.
+    /// </summary>
+    [Theory]
+    [InlineData("@class", "class")]
+    [InlineData("@int", "int")]
+    [InlineData("@name", "name")]
+    [InlineData("@_", "_")]
+    public void AVerbatimIdentifierIsTheBareName(string source, string name)
+    {
+        var tokens = Front.Tokens(source, out var diagnostics);
+        Assert.Empty(Front.Codes(diagnostics));
+
+        var only = tokens[0];
+        Assert.Equal(TokenKind.Identifier, only.Kind);
+        Assert.Equal(name, only.Text);
+        Assert.True(only.IsVerbatim);
+        Assert.Equal(source.Length, only.Span.End);
+    }
+
+    [Theory]
+    [InlineData("@")]
+    [InlineData("@ class")]
+    [InlineData("@1")]
+    public void AnAtWithNoNameIsStillAnError(string source)
+    {
+        Front.Tokens(source, out var diagnostics);
+        Assert.Contains("SL0001", Front.Codes(diagnostics));
+    }
+
     // ------------------------------------------------------------ trivia
 
     [Fact]

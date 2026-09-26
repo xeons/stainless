@@ -75,9 +75,25 @@ public sealed partial class LlvmEmitter
 
     private void StringConstants()
     {
-        if (_byteConstants.Count == 0 && _stringObjects.Count == 0) return;
+        if (_byteConstants.Count == 0 && _stringObjects.Count == 0 && _utf8Arrays.Count == 0) return;
 
         _module.AppendLine();
+
+        // `"..."u8`: a byte[] as sl_array_alloc would lay it out, immortal and
+        // read-only. The type word is null, as an embedded file's is, because
+        // nothing reachable from a byte[] reads it. A NUL follows the bytes
+        // and is not counted, so the first element's address is a C string.
+        foreach (var (text, name) in _utf8Arrays)
+        {
+            byte[] bytes = Encoding.UTF8.GetBytes(text);
+            string layout = $"{{ {Word}, {Word}, ptr, {Word}, [{bytes.Length + 1} x i8] }}";
+
+            _module.AppendLine(
+                $"{name} = private unnamed_addr constant {layout} " +
+                $"{{ {Word} {ImmortalRefCount}, {Word} {ImmortalRefCount}, ptr null, " +
+                $"{Word} {bytes.Length}, [{bytes.Length + 1} x i8] c\"{EscapeBytes(bytes)}\" }}, " +
+                $"align {TargetPlatform.Current.PointerWidth}");
+        }
 
         foreach (var (text, name) in _byteConstants)
         {
@@ -231,6 +247,15 @@ public sealed partial class LlvmEmitter
         string joined = Emit("ptr", $"call ptr @sl_string_join(ptr {slots}, {Word} {count})");
         TrackTemporary(joined, expression.Type);
         return new Val(joined, "ptr", expression.Type);
+    }
+
+    /// <summary>The immortal byte[] behind a <c>"..."u8</c>, one per distinct text.</summary>
+    private string InternUtf8Array(string text)
+    {
+        if (_utf8Arrays.TryGetValue(text, out var existing)) return existing;
+        string name = $"@.u8.{_utf8Arrays.Count}";
+        _utf8Arrays[text] = name;
+        return name;
     }
 
     /// <summary>A static String object that a String-typed expression can refer to.</summary>

@@ -147,6 +147,31 @@ public sealed class Builtins
     public FunctionSymbol TextFromDouble => Found(ref _textFromDouble, Text, "FromDouble",
         String, PrimitiveTypeSymbol.Double);
 
+    /// <summary>What <c>{value:format}</c> and <c>{value,width}</c> reach for.</summary>
+    public FunctionSymbol TextFormatLong => Found(ref _textFormatLong, Text, "FormatInteger",
+        String, PrimitiveTypeSymbol.Long, String);
+
+    public FunctionSymbol TextFormatULong => Found(ref _textFormatULong, Text, "FormatInteger",
+        String, PrimitiveTypeSymbol.ULong, String);
+
+    public FunctionSymbol TextFormatDouble => Found(ref _textFormatDouble, Text, "FormatDouble",
+        String, PrimitiveTypeSymbol.Double, String);
+
+    public FunctionSymbol TextAlignText => Found(ref _textAlignText, Text, "AlignText",
+        String, String, PrimitiveTypeSymbol.Int);
+
+    /// <summary>
+    /// <c>Standard.Text.IFormattable</c>: what a class implements to be written
+    /// into an interpolation.
+    /// </summary>
+    public InterfaceTypeSymbol Formattable =>
+        _formattable ??= (InterfaceTypeSymbol)Text.Types["IFormattable"];
+
+    private FunctionSymbol? _textFormatLong;
+    private FunctionSymbol? _textFormatULong;
+    private FunctionSymbol? _textFormatDouble;
+    private FunctionSymbol? _textAlignText;
+    private InterfaceTypeSymbol? _formattable;
     private FunctionSymbol? _textFromLong;
     private FunctionSymbol? _textFromULong;
     private FunctionSymbol? _textFromBool;

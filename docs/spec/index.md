@@ -100,7 +100,7 @@ Primitives, `struct`, `class`, pointers, `variant`, `union`, `Result`, `interfac
 
 ### [3. Text](03-text.md)
 
-`String`, how its bytes reach C, UTF-16 for platform APIs, `StringBuilder`, other encodings and interpolation.
+`String`, how its bytes reach C, UTF-16 for platform APIs, `StringBuilder`, other encodings, interpolation and formatting, and the ways a literal is written.
 
 - [3.1 Representation](03-text.md#31-representation)
 - [3.2 Members](03-text.md#32-members)
@@ -110,6 +110,9 @@ Primitives, `struct`, `class`, pointers, `variant`, `union`, `Result`, `interfac
 - [3.6 Other encodings](03-text.md#36-other-encodings)
 - [3.7 Conversions](03-text.md#37-conversions)
 - [3.8 Interpolation](03-text.md#38-interpolation)
+  - [3.8.1 Alignment and format](03-text.md#381-alignment-and-format)
+  - [3.8.2 Verbatim and raw interpolations](03-text.md#382-verbatim-and-raw-interpolations)
+- [3.9 Writing a string](03-text.md#39-writing-a-string)
 
 ### [4. Generics](04-generics.md)
 
@@ -212,6 +215,7 @@ Functions, defaults, `ref`/`in`/`out`, named arguments, properties, operators, i
 - [9.12 `checked`](09-statements-expressions.md#912-checked)
 - [9.13 An expression on its own](09-statements-expressions.md#913-an-expression-on-its-own)
 - [9.14 Assignment](09-statements-expressions.md#914-assignment)
+- [9.15 `@name`](09-statements-expressions.md#915-name)
 
 ### [10. Conditional compilation](10-conditional-compilation.md)
 

@@ -312,12 +312,27 @@ public sealed class Lexer(
         _sawToken = true;
         char c = Current;
         if (char.IsLetter(c) || c == '_') return LexIdentifierOrKeyword(start);
+        if (c == '@' && (char.IsLetter(Peek(1)) || Peek(1) == '_')) return LexVerbatimIdentifier(start);
         if (char.IsAsciiDigit(c)) return LexNumber(start);
-        if (c == '"') return LexString(start);
-        if (c == '$' && _pos + 1 < _text.Length && _text[_pos + 1] == '"')
-            return LexInterpolatedString(start);
+        if (c is '"' or '$' or '@' && LexStringLiteral(start) is { } text) return text;
         if (c == '\'') return LexChar(start);
         return LexPunctuation(start);
+    }
+
+    /// <summary>
+    /// <c>@class</c>: a keyword used as a name, as in C#. The token is an
+    /// identifier whose text is the name without the <c>@</c>, so the symbol,
+    /// its mangled name and anything exported under it are the bare word.
+    /// </summary>
+    private Token LexVerbatimIdentifier(int start)
+    {
+        _pos++;                                             // the '@'
+        int nameStart = _pos;
+        while (_pos < _text.Length && (char.IsLetterOrDigit(Current) || Current == '_')) _pos++;
+        return new Token(TokenKind.Identifier, SpanFrom(start), _text[nameStart.._pos])
+        {
+            IsVerbatim = true,
+        };
     }
 
     /// <summary>
@@ -871,99 +886,455 @@ public sealed class Lexer(
         _ => char.IsAsciiDigit(c),
     };
 
-    private Token LexString(int start)
+    // ============================================================ strings
+
+    /// <summary>What a string's body is written in, which decides what a backslash and a line break mean.</summary>
+    private enum Quoting
     {
-        _pos++;                                             // opening quote
-        var sb = new StringBuilder();
-        while (true)
-        {
-            if (_pos >= _text.Length || Current == '\n')
-            {
-                diagnostics.Error("SL0006", SpanFrom(start), "unterminated string literal");
-                break;
-            }
-            if (Current == '"') { _pos++; break; }
-            if (Current != '\\') { sb.Append(_text[_pos++]); continue; }
-            sb.Append(char.ConvertFromUtf32(ReadEscape()));
-        }
-        return new Token(TokenKind.StringLiteral, SpanFrom(start), _text[start.._pos], sb.ToString());
+        /// <summary><c>"..."</c>: escapes, and one line.</summary>
+        Regular,
+
+        /// <summary><c>@"..."</c>: no escapes, <c>""</c> for a quote, and any number of lines.</summary>
+        Verbatim,
+
+        /// <summary><c>"""..."""</c>: nothing is special but a run of quotes as long as the opening one.</summary>
+        Raw,
     }
 
     /// <summary>
-    /// <c>$"a {b} c"</c>.
+    /// Any string literal starting here, or null when the <c>$</c> or <c>@</c>
+    /// here starts none.
+    ///
+    /// The forms are C#'s: <c>"..."</c>, <c>@"..."</c> and <c>"""..."""</c>,
+    /// each with a <c>$</c> for holes, and each but the interpolated ones with
+    /// a <c>u8</c> after it for bytes rather than a String.
+    /// </summary>
+    private Token? LexStringLiteral(int start)
+    {
+        int dollars = 0;
+        while (Peek(dollars) == '$') dollars++;
+
+        int at = dollars;
+        bool verbatim = false;
+        if (dollars == 0 && Peek(0) == '@' && Peek(1) == '$')
+        {
+            // `@$"..."`, which C# accepts as well as `$@"..."`.
+            verbatim = true;
+            dollars = 1;
+            at = 2;
+        }
+        else if (Peek(at) == '@')
+        {
+            verbatim = true;
+            at++;
+        }
+
+        if (Peek(at) != '"') return null;
+
+        int quotes = 0;
+        while (Peek(at + quotes) == '"') quotes++;
+
+        Token token;
+        if (!verbatim && quotes >= 3)
+        {
+            token = LexRawString(start, at, dollars);
+        }
+        else
+        {
+            if (dollars > 1)
+                diagnostics.Error("SL0751", new SourceSpan(source, start, start + at),
+                    "more than one '$' sets how many braces open a hole, and only a raw string " +
+                    "has holes that need it; write one '$', or open the string with '\"\"\"'");
+
+            token = LexQuotedString(start, at, verbatim ? Quoting.Verbatim : Quoting.Regular, dollars > 0);
+        }
+
+        return WithUtf8Suffix(start, token);
+    }
+
+    /// <summary>
+    /// <c>"..."u8</c>: the literal's bytes. The suffix is part of the token, as
+    /// a number's is, so nothing can come between the two.
+    /// </summary>
+    private Token WithUtf8Suffix(int start, Token token)
+    {
+        if (Current is not ('u' or 'U') || Peek(1) != '8' ||
+            char.IsLetterOrDigit(Peek(2)) || Peek(2) == '_')
+            return token;
+
+        _pos += 2;
+        if (token.Kind == TokenKind.InterpolatedString)
+        {
+            diagnostics.Error("SL0752", SpanFrom(start),
+                "an interpolated string is built when it runs, and 'u8' names bytes that are " +
+                "fixed when it compiles; build the String and call 'ToBytes()' on it");
+            return token with { Span = SpanFrom(start), Text = _text[start.._pos] };
+        }
+
+        return new Token(TokenKind.Utf8StringLiteral, SpanFrom(start), _text[start.._pos], token.Value);
+    }
+
+    /// <summary>
+    /// <c>"..."</c> and <c>@"..."</c>, with or without holes.
     ///
     /// The holes are lexed here, in place, rather than by a second lexer over a
     /// substring: this one is already walking the text, so every token inside a
     /// hole gets its real position for free and a diagnostic about one points at
     /// the source rather than at a copy of it.
     ///
-    /// The token carries the pieces as its value -- literal text and, for each
-    /// hole, the tokens it lexed -- and the parser turns each of those into an
-    /// expression. Nothing about what a hole may contain is decided here.
+    /// An interpolated string's token carries the pieces as its value -- literal
+    /// text and, for each hole, the tokens it lexed -- and the parser turns each
+    /// of those into an expression. Nothing about what a hole may contain is
+    /// decided here.
     /// </summary>
-    private Token LexInterpolatedString(int start)
+    private Token LexQuotedString(int start, int prefix, Quoting quoting, bool interpolated)
     {
-        _pos += 2;                                          // the '$' and the quote
+        _pos = start + prefix + 1;                          // the prefix and the quote
 
+        bool verbatim = quoting == Quoting.Verbatim;
         var segments = new List<InterpolationSegment>();
         var literal = new StringBuilder();
 
         while (true)
         {
-            if (_pos >= _text.Length || Current == '\n')
+            if (_pos >= _text.Length || (!verbatim && Current == '\n'))
             {
                 if (!TooDeep)
                     diagnostics.Error("SL0006", SpanFrom(start), "unterminated string literal");
                 break;
             }
 
-            if (Current == '"') { _pos++; break; }
-
-            // `{{` and `}}` are how a brace is written, as in C#. A lone `}` is
-            // a mistake rather than a literal, because it is far more often the
-            // end of a hole that was never opened.
-            if (Current == '{' && _pos + 1 < _text.Length && _text[_pos + 1] == '{')
+            char c = Current;
+            if (c == '"')
             {
-                literal.Append('{');
-                _pos += 2;
-                continue;
-            }
-
-            if (Current == '}')
-            {
-                if (_pos + 1 < _text.Length && _text[_pos + 1] == '}')
+                if (verbatim && Peek(1) == '"')
                 {
-                    literal.Append('}');
+                    literal.Append('"');
                     _pos += 2;
                     continue;
                 }
 
-                diagnostics.Error("SL0554", SpanFrom(_pos),
-                    "a '}' inside an interpolated string closes nothing; write '}}' for a " +
-                    "literal brace");
+                _pos++;
+                break;
+            }
+
+            // `{{` and `}}` are how a brace is written, as in C#. A lone `}` is
+            // a mistake rather than a literal, because it is far more often the
+            // end of a hole that was never opened.
+            if (interpolated && c is '{' or '}')
+            {
+                if (Peek(1) == c)
+                {
+                    literal.Append(c);
+                    _pos += 2;
+                    continue;
+                }
+
+                if (c == '}')
+                {
+                    diagnostics.Error("SL0554", SpanFrom(_pos),
+                        "a '}' inside an interpolated string closes nothing; write '}}' for a " +
+                        "literal brace");
+                    _pos++;
+                    continue;
+                }
+
+                FlushLiteral(literal, segments);
+                segments.Add(LexHole(start, 1, quoting));
+                continue;
+            }
+
+            // A line break is one '\n' however the file was saved, so the
+            // same source gives the same String on every checkout.
+            if (verbatim && c == '\r' && Peek(1) == '\n')
+            {
                 _pos++;
                 continue;
             }
 
-            if (Current == '{')
+            if (!verbatim && c == '\\')
             {
-                if (literal.Length > 0)
-                {
-                    segments.Add(InterpolationSegment.Text(literal.ToString()));
-                    literal.Clear();
-                }
-
-                segments.Add(LexHole(start));
+                literal.Append(char.ConvertFromUtf32(ReadEscape()));
                 continue;
             }
 
-            if (Current != '\\') { literal.Append(_text[_pos++]); continue; }
-            literal.Append(char.ConvertFromUtf32(ReadEscape()));
+            literal.Append(c);
+            _pos++;
         }
 
-        if (literal.Length > 0) segments.Add(InterpolationSegment.Text(literal.ToString()));
+        if (!interpolated)
+            return new Token(TokenKind.StringLiteral, SpanFrom(start), _text[start.._pos], literal.ToString());
+
+        FlushLiteral(literal, segments);
+        return new Token(TokenKind.InterpolatedString, SpanFrom(start), _text[start.._pos], segments);
+    }
+
+    private static void FlushLiteral(StringBuilder literal, List<InterpolationSegment> segments)
+    {
+        if (literal.Length == 0) return;
+        segments.Add(InterpolationSegment.Text(literal.ToString()));
+        literal.Clear();
+    }
+
+    /// <summary>How many of <paramref name="c"/> stand in a row from the current position.</summary>
+    private int CountRun(char c)
+    {
+        int run = 0;
+        while (_pos + run < _text.Length && _text[_pos + run] == c) run++;
+        return run;
+    }
+
+    /// <summary>
+    /// Literal text of a raw string, with where in the source each character
+    /// came from -- which is what lets a complaint about one line's
+    /// indentation point at that line.
+    /// </summary>
+    private sealed class RawText
+    {
+        public readonly StringBuilder Text = new();
+        public readonly List<int> Positions = [];
+
+        public void Append(char c, int position)
+        {
+            Text.Append(c);
+            Positions.Add(position);
+        }
+
+        public void Remove(int from, int count)
+        {
+            Text.Remove(from, count);
+            Positions.RemoveRange(from, count);
+        }
+    }
+
+    /// <summary>
+    /// <c>"""..."""</c>, and with one or more <c>$</c> in front of it.
+    ///
+    /// The opening run of quotes is the delimiter, however long, and only a run
+    /// exactly that long closes it, so content may hold any shorter run. The
+    /// number of <c>$</c> is how many braces open a hole in the same way: a
+    /// shorter run of braces is text.
+    ///
+    /// On one line the content is what stands between the quotes. Across
+    /// several, the lines holding the quotes are not content, and the closing
+    /// line's indentation is taken off every line -- see <see cref="TrimRawLines"/>.
+    /// </summary>
+    private Token LexRawString(int start, int prefix, int dollars)
+    {
+        _pos = start + prefix;
+        int quotes = CountRun('"');
+        _pos += quotes;
+
+        var pieces = new List<(RawText? Text, InterpolationSegment? Hole)>();
+        var text = new RawText();
+        bool closed = false;
+        bool multiLine = false;
+
+        while (_pos < _text.Length)
+        {
+            char c = Current;
+            if (c == '"')
+            {
+                int run = CountRun('"');
+                if (run < quotes)
+                {
+                    for (int i = 0; i < run; i++) text.Append('"', _pos + i);
+                    _pos += run;
+                    continue;
+                }
+
+                if (run > quotes)
+                    diagnostics.Error("SL0749", new SourceSpan(source, _pos, _pos + run),
+                        $"this raw string opens with {quotes} quotes, so {run} in a row cannot be " +
+                        $"part of it; open and close it with {run + 1}");
+
+                _pos += run;
+                closed = true;
+                break;
+            }
+
+            if (c == '\r' && Peek(1) == '\n')
+            {
+                _pos++;
+                continue;
+            }
+
+            if (c == '\n') multiLine = true;
+
+            if (dollars > 0 && c is '{' or '}')
+            {
+                int run = CountRun(c);
+                if (run < dollars)
+                {
+                    for (int i = 0; i < run; i++) text.Append(c, _pos + i);
+                    _pos += run;
+                    continue;
+                }
+
+                if (c == '}')
+                {
+                    diagnostics.Error("SL0750", new SourceSpan(source, _pos, _pos + run),
+                        $"with {dollars} '$', {dollars} braces belong to a hole, so these {run} " +
+                        "'}' close one that was never opened; start the string with " +
+                        $"{run + 1} '$' to write them as text");
+                    _pos += run;
+                    continue;
+                }
+
+                // The last `dollars` of the run open the hole and the rest are
+                // text, so a run is text and a hole at once only while the
+                // text part is shorter than an opening.
+                if (run >= 2 * dollars)
+                    diagnostics.Error("SL0750", new SourceSpan(source, _pos, _pos + run),
+                        $"with {dollars} '$', the last {dollars} of these {run} '{{' open a " +
+                        $"hole and the rest are text, which only a run shorter than {dollars} " +
+                        $"can be; start the string with {run / 2 + 1} '$'");
+
+                int literalBraces = run - dollars;
+                for (int i = 0; i < literalBraces; i++) text.Append('{', _pos + i);
+                _pos += literalBraces;
+
+                pieces.Add((text, null));
+                text = new RawText();
+                pieces.Add((null, LexHole(start, dollars, Quoting.Raw)));
+                continue;
+            }
+
+            text.Append(c, _pos);
+            _pos++;
+        }
+
+        pieces.Add((text, null));
+
+        if (!closed && !TooDeep)
+            diagnostics.Error("SL0006", SpanFrom(start),
+                $"unterminated raw string literal; it ends at a run of {quotes} quotes");
+
+        if (closed && multiLine) TrimRawLines(pieces, start);
+
+        if (dollars == 0)
+            return new Token(TokenKind.StringLiteral, SpanFrom(start), _text[start.._pos],
+                             pieces[0].Text!.Text.ToString());
+
+        var segments = new List<InterpolationSegment>();
+        foreach (var (literal, hole) in pieces)
+        {
+            if (hole is not null) segments.Add(hole);
+            else if (literal!.Text.Length > 0) segments.Add(InterpolationSegment.Text(literal.Text.ToString()));
+        }
 
         return new Token(TokenKind.InterpolatedString, SpanFrom(start), _text[start.._pos], segments);
+    }
+
+    /// <summary>
+    /// A raw string across lines, reduced to its content, as C# does it.
+    ///
+    /// The opening quotes MUST end their line and the closing ones MUST start
+    /// theirs, after nothing but whitespace. That whitespace is the string's
+    /// indentation: every line of content MUST begin with exactly it, and it is
+    /// taken off, so the literal can be indented with the code around it
+    /// without the indentation becoming text. A line of nothing but whitespace
+    /// is exempt, and is empty.
+    /// </summary>
+    private void TrimRawLines(List<(RawText? Text, InterpolationSegment? Hole)> pieces, int start)
+    {
+        // Text and holes alternate, and both ends are text, possibly empty.
+        var first = pieces[0].Text!;
+        var last = pieces[^1].Text!;
+
+        string opening = first.Text.ToString();
+        int firstBreak = opening.IndexOf('\n');
+        if (firstBreak < 0 || !IsBlank(opening, 0, firstBreak))
+        {
+            int at = first.Positions.Count > 0 ? first.Positions[0] : start;
+            diagnostics.Error("SL0746", new SourceSpan(source, at, at + 1),
+                "a raw string that spans lines starts on the line after its opening quotes, " +
+                "and nothing but whitespace may follow them");
+            return;
+        }
+
+        first.Remove(0, firstBreak + 1);
+
+        string closing = last.Text.ToString();
+        int lastBreak = closing.LastIndexOf('\n');
+        if (lastBreak < 0 || !IsBlank(closing, lastBreak + 1, closing.Length))
+        {
+            bool empty = pieces.Count == 1 && IsBlank(closing, 0, closing.Length);
+            diagnostics.Error("SL0747", new SourceSpan(source, _pos - 1, _pos),
+                empty
+                    ? "a raw string that spans lines needs a line of content between its quotes"
+                    : "the closing quotes of a raw string that spans lines stand on a line of " +
+                      "their own, after nothing but whitespace");
+            return;
+        }
+
+        string indent = closing[(lastBreak + 1)..];
+        last.Remove(lastBreak, closing.Length - lastBreak);
+
+        bool reported = false;
+        for (int p = 0; p < pieces.Count; p++)
+        {
+            if (pieces[p].Text is not { } piece) continue;
+
+            string body = piece.Text.ToString();
+            var trimmed = new StringBuilder();
+            int lineBegin = 0;
+
+            for (int line = 0; ; line++)
+            {
+                int lineEnd = body.IndexOf('\n', lineBegin);
+                bool broken = lineEnd >= 0;
+                if (!broken) lineEnd = body.Length;
+
+                // Only the first piece starts on a line of its own; the others
+                // start after a hole, partway along one.
+                bool atLineStart = line > 0 || p == 0;
+                bool wholeLine = broken || p == pieces.Count - 1;
+                string content = body[lineBegin..lineEnd];
+
+                if (!atLineStart)
+                {
+                    trimmed.Append(content);
+                }
+                else if (content.StartsWith(indent, StringComparison.Ordinal))
+                {
+                    trimmed.Append(content, indent.Length, content.Length - indent.Length);
+                }
+                else if (wholeLine && IsBlank(content, 0, content.Length))
+                {
+                    // Shorter than the indentation, or other whitespace: empty.
+                }
+                else
+                {
+                    trimmed.Append(content);
+                    if (!reported)
+                    {
+                        reported = true;
+                        int at = lineBegin < piece.Positions.Count ? piece.Positions[lineBegin] : start;
+                        diagnostics.Error("SL0748", new SourceSpan(source, at, at + 1),
+                            "this line of a raw string does not start with the whitespace its " +
+                            "closing quotes are indented by, which is taken off every line; " +
+                            "indent it at least as far, with the same characters");
+                    }
+                }
+
+                if (!broken) break;
+                trimmed.Append('\n');
+                lineBegin = lineEnd + 1;
+            }
+
+            piece.Text.Clear().Append(trimmed);
+        }
+    }
+
+    private static bool IsBlank(string text, int from, int to)
+    {
+        for (int i = from; i < to; i++)
+        {
+            if (text[i] is not (' ' or '\t' or '\r' or '\v' or '\f')) return false;
+        }
+
+        return true;
     }
 
     /// <summary>
@@ -973,7 +1344,7 @@ public sealed class Lexer(
     /// ordinary token loop does the reading -- so a string inside a hole is
     /// lexed as a string, and a `}` inside one does not end the hole.
     /// </summary>
-    private InterpolationSegment LexHole(int outerStart)
+    private InterpolationSegment LexHole(int outerStart, int braces, Quoting quoting)
     {
         int openedAt = _pos;
 
@@ -996,16 +1367,28 @@ public sealed class Lexer(
         }
 
         _holeDepth++;
-        try { return LexHoleCore(outerStart, openedAt); }
+        try { return LexHoleCore(outerStart, openedAt, braces, quoting); }
         finally { _holeDepth--; }
     }
 
-    private InterpolationSegment LexHoleCore(int outerStart, int openedAt)
+    /// <summary>
+    /// The hole's code, then its format if a <c>:</c> outside any bracket
+    /// starts one.
+    ///
+    /// The <c>:</c> is found here rather than by the parser because what
+    /// follows it is not code: <c>{when:yyyy-MM-dd}</c> would not lex. That is
+    /// C#'s rule and its cost is C#'s too -- a <c>?:</c> in a hole has to be
+    /// parenthesised, since its <c>:</c> would start the format.
+    /// </summary>
+    private InterpolationSegment LexHoleCore(int outerStart, int openedAt, int braces, Quoting quoting)
     {
-        _pos++;                                             // the '{'
+        _pos += braces;
 
         var tokens = new List<Token>();
         int depth = 1;
+        int grouping = 0;
+        string? format = null;
+        SourceSpan? formatSpan = null;
 
         while (true)
         {
@@ -1018,18 +1401,36 @@ public sealed class Lexer(
                 break;
             }
 
-            if (Current == '}')
+            if (Current == '}' && depth == 1)
             {
-                depth--;
-                if (depth == 0) { _pos++; break; }
+                CloseHole(braces);
+                break;
             }
-            else if (Current == '{')
+
+            if (Current == ':' && depth == 1 && grouping == 0)
             {
-                depth++;
+                (format, formatSpan) = LexFormat(outerStart, quoting);
+                if (Current == '}') CloseHole(braces);
+                break;
             }
+
+            if (Current == '{') depth++;
+            else if (Current == '}') depth--;
 
             var token = Next();
             if (token.Kind == TokenKind.EndOfFile) break;
+
+            switch (token.Kind)
+            {
+                case TokenKind.OpenParen or TokenKind.OpenBracket:
+                    grouping++;
+                    break;
+
+                case TokenKind.CloseParen or TokenKind.CloseBracket when grouping > 0:
+                    grouping--;
+                    break;
+            }
+
             tokens.Add(token);
         }
 
@@ -1038,7 +1439,44 @@ public sealed class Lexer(
                 "this interpolation is empty; '{}' has no value to write");
 
         tokens.Add(new Token(TokenKind.EndOfFile, SpanFrom(_pos), ""));
-        return InterpolationSegment.Hole(tokens);
+        return InterpolationSegment.Hole(tokens, format, formatSpan);
+    }
+
+    /// <summary>
+    /// The text after a hole's <c>:</c>, up to the brace that ends the hole.
+    /// It is one line, and in a quoted string it cannot hold the quote.
+    /// </summary>
+    private (string Format, SourceSpan Span) LexFormat(int outerStart, Quoting quoting)
+    {
+        int from = ++_pos;                                  // past the ':'
+        while (_pos < _text.Length && Current is not ('}' or '\n') &&
+               !(quoting != Quoting.Raw && Current == '"'))
+            _pos++;
+
+        if (Current != '}' && !TooDeep)
+            diagnostics.Error("SL0006", SpanFrom(outerStart),
+                "unterminated string literal; a hole's format runs to the '}' that closes it");
+
+        return (_text[from.._pos].TrimEnd('\r'), new SourceSpan(source, from, _pos));
+    }
+
+    /// <summary>
+    /// The braces that end a hole: as many as opened it. Only a raw string
+    /// with more than one <c>$</c> asks for more than one.
+    /// </summary>
+    private void CloseHole(int braces)
+    {
+        int run = CountRun('}');
+        if (run >= braces)
+        {
+            _pos += braces;
+            return;
+        }
+
+        diagnostics.Error("SL0750", new SourceSpan(source, _pos, _pos + run),
+            $"this hole was opened with {braces} braces and is closed with {run}; a hole " +
+            "closes with as many as opened it");
+        _pos += run;
     }
 
     /// <summary>

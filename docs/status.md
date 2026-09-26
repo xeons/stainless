@@ -284,6 +284,16 @@ last person to edit it -- the suite is the authority.
   back with `ToText()` or, from a buffer a platform API filled, with
   `Text.FromUtf16`; anything malformed becomes U+FFFD in both directions, so a
   `String` is UTF-8 by invariant
+- Every way C# writes a string: `"..."`, verbatim `@"..."`, raw `"""..."""`
+  with its indentation taken off, and `u8` after any of them for the bytes as a
+  `byte[:]` in read-only storage. A line break inside one is one `\n` however
+  the file was saved
+- Interpolation, `$"..."`, in each of those forms, joined in one allocation;
+  `$$"""..."""` sets how many braces open a hole. A hole takes C#'s alignment
+  and .NET's standard numeric formats, `{price,10:N2}`, with the format
+  checked when the program compiles, and a class that implements
+  `IFormattable` writes itself
+- `@name`: a keyword as a name, exported and mangled as the bare word
 - A string API to go with it: `StartsWith`, `Contains`, `IndexOf`,
   `LastIndexOf`, `Substring`, `SubstringBefore`/`SubstringAfter`/`SubstringAfterLast`, `Trim`, `Replace`,
   `Repeat`, `PadLeft`/`PadRight`, `Split`, `SplitLines`, `Join`, `CompareTo`,

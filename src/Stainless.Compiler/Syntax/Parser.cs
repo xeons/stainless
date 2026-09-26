@@ -134,6 +134,12 @@ public sealed class Parser
     }
 
     private bool At(TokenKind kind) => Current.Kind == kind;
+
+    /// <summary>
+    /// An identifier that may be a contextual word. <c>@get</c> is always a
+    /// name, which is what the <c>@</c> is for.
+    /// </summary>
+    private bool AtWord => At(TokenKind.Identifier) && !Current.IsVerbatim;
     private bool AtAny(params TokenKind[] kinds) => kinds.Contains(Current.Kind);
 
     /// <summary>
@@ -148,7 +154,7 @@ public sealed class Parser
     /// ones most likely to already be somebody's variable.
     /// </summary>
     private bool AtContextual(string word) =>
-        At(TokenKind.Identifier) && Current.Text == word;
+        AtWord && Current.Text == word;
 
     /// <summary>
     /// Consumes the current token, except the end of the file, which stays put.
@@ -464,7 +470,7 @@ public sealed class Parser
 
         // A constructor looks like `TypeName(` inside its own type.
         if (enclosingType is not null &&
-            At(TokenKind.Identifier) && Current.Text == enclosingType &&
+            AtWord && Current.Text == enclosingType &&
             Peek(1).Kind == TokenKind.OpenParen)
         {
             RejectAttributes(attributes, "a constructor");
@@ -797,7 +803,7 @@ public sealed class Parser
     /// </remarks>
     private bool AtRecord()
     {
-        if (!At(TokenKind.Identifier) || Current.Text != "record") return false;
+        if (!AtWord || Current.Text != "record") return false;
 
         var next = Peek(1).Kind;
         return next is TokenKind.ClassKeyword or TokenKind.StructKeyword
@@ -1377,7 +1383,7 @@ public sealed class Parser
     /// </summary>
     private bool AtOutModifier()
     {
-        if (!At(TokenKind.Identifier) || Current.Text != "out") return false;
+        if (!AtWord || Current.Text != "out") return false;
 
         // A literal is here so that `out 5` reaches the binder and is told it
         // has no storage to write back to, rather than dying in the parser
@@ -1444,7 +1450,7 @@ public sealed class Parser
     /// is the same price <c>closure</c> pays.
     /// </summary>
     private bool AtCheckedWord() =>
-        At(TokenKind.Identifier) && Current.Text is "checked" or "unchecked";
+        AtWord && Current.Text is "checked" or "unchecked";
 
     /// <summary>
     /// Whether this is <c>closure R Name(...)</c> rather than something that
@@ -1452,7 +1458,7 @@ public sealed class Parser
     /// </summary>
     private bool AtClosureDeclaration()
     {
-        if (!At(TokenKind.Identifier) || Current.Text != "closure") return false;
+        if (!AtWord || Current.Text != "closure") return false;
 
         var next = Peek(1).Kind;
         return next == TokenKind.Identifier || PrimitiveKeywords.Contains(next);
@@ -1466,7 +1472,7 @@ public sealed class Parser
     /// </summary>
     private bool AtEventDeclaration()
     {
-        if (!At(TokenKind.Identifier) || Current.Text != "event") return false;
+        if (!AtWord || Current.Text != "event") return false;
 
         var next = Peek(1).Kind;
         return next == TokenKind.Identifier || PrimitiveKeywords.Contains(next);
@@ -1537,7 +1543,7 @@ public sealed class Parser
         // `static implicit operator Money(long cents)`. The two words are
         // contextual, as `checked` and `closure` are: neither is reserved, and
         // `operator` straight after one is what settles it.
-        if (At(TokenKind.Identifier) && Current.Text is "implicit" or "explicit" &&
+        if (AtWord && Current.Text is "implicit" or "explicit" &&
             Peek(1).Kind == TokenKind.OperatorKeyword)
             return ParseConversionDeclaration(start, modifiers);
 
@@ -1643,7 +1649,7 @@ public sealed class Parser
         // `static Name() { }` inside `class Name`: the type's own initializer.
         // It has no return type, which is what tells it from a method.
         if (enclosingType is not null &&
-            At(TokenKind.Identifier) && Current.Text == enclosingType &&
+            AtWord && Current.Text == enclosingType &&
             Peek(1).Kind == TokenKind.OpenParen && Peek(2).Kind == TokenKind.CloseParen)
         {
             RejectAttributes(attributes, "a type initializer");
@@ -1989,7 +1995,7 @@ public sealed class Parser
 
             // 'get' and 'set' stay ordinary identifiers everywhere else in the
             // language, so they are recognised by text rather than reserved.
-            if (!(At(TokenKind.Identifier) && Current.Text is "get" or "set"))
+            if (!(AtWord && Current.Text is "get" or "set"))
             {
                 _diagnostics.Error("SL0385", Current.Span,
                     $"expected 'get' or 'set' in property '{name}'");
@@ -2680,7 +2686,7 @@ public sealed class Parser
         {
             direction = AsmDirection.In;
         }
-        else if (At(TokenKind.Identifier) && Current.Text is "out" or "inout" &&
+        else if (AtWord && Current.Text is "out" or "inout" &&
                  Peek(1).Kind == TokenKind.Identifier)
         {
             direction = Advance().Text == "out" ? AsmDirection.Out : AsmDirection.InOut;
@@ -2827,7 +2833,7 @@ public sealed class Parser
     }
 
     /// <summary>Whether the next word is a contextual <c>when</c>.</summary>
-    private bool AtWhenWord() => At(TokenKind.Identifier) && Current.Text == "when";
+    private bool AtWhenWord() => AtWord && Current.Text == "when";
 
     /// <summary>
     /// <c>when condition</c> after a pattern. The word is contextual, for the
@@ -2853,7 +2859,7 @@ public sealed class Parser
         int start = _pos;
         var left = ParsePatternAnd();
 
-        while (At(TokenKind.Identifier) && Current.Text == "or")
+        while (AtWord && Current.Text == "or")
         {
             Advance();
             var right = ParsePatternAnd();
@@ -2868,7 +2874,7 @@ public sealed class Parser
         int start = _pos;
         var left = ParsePatternPrimary();
 
-        while (At(TokenKind.Identifier) && Current.Text == "and")
+        while (AtWord && Current.Text == "and")
         {
             Advance();
             var right = ParsePatternPrimary();
@@ -2882,7 +2888,7 @@ public sealed class Parser
     {
         int start = _pos;
 
-        if (At(TokenKind.Identifier) && Current.Text == "not")
+        if (AtWord && Current.Text == "not")
         {
             Advance();
             var negated = ParsePatternPrimary();
@@ -2891,7 +2897,7 @@ public sealed class Parser
 
         // `_` matches anything. It is an ordinary identifier to the lexer, and
         // a pattern is the one place it means this.
-        if (At(TokenKind.Identifier) && Current.Text == "_" &&
+        if (AtWord && Current.Text == "_" &&
             Peek(1).Kind is TokenKind.Colon or TokenKind.EqualsGreater or TokenKind.Comma)
         {
             Advance();
@@ -2985,8 +2991,8 @@ public sealed class Parser
             }
         }
 
-        return Peek(at).Kind == TokenKind.Identifier && Peek(at).Text != "when" &&
-               Peek(at).Text != "or" && Peek(at).Text != "and";
+        return Peek(at).Kind == TokenKind.Identifier &&
+               (Peek(at).IsVerbatim || Peek(at).Text is not ("when" or "or" or "and"));
     }
 
     private StatementSyntax ParseSimpleStatement(bool requireSemicolon)
@@ -3356,7 +3362,7 @@ public sealed class Parser
                 continue;
             }
 
-            if (At(TokenKind.Identifier) && Current.Text == "with" &&
+            if (AtWord && Current.Text == "with" &&
                 Peek(1).Kind == TokenKind.OpenBrace)
             {
                 expression = ParseWithSuffix(start, expression);
@@ -3591,8 +3597,22 @@ public sealed class Parser
                 continue;
             }
 
+            // `{b ? 1 : 2}` reached the lexer as `b ? 1` with a format of
+            // ` 2`, and parsing that would only say a ':' is missing. C# asks
+            // for the parentheses, and so does this.
+            if (segment.Format is not null && HasTopLevelQuestion(segment.Tokens!))
+            {
+                _diagnostics.Error("SL0755", segment.Tokens![0].Span,
+                    "a ':' in an interpolation starts its format, so a conditional here is " +
+                    "cut in two; put it in parentheses, as in '{(a ? b : c)}'");
+                continue;
+            }
+
             var inner = new Parser(_source, _diagnostics, segment.Tokens!, _depth, _tooDeep);
             var value = inner.ParseExpression();
+            ExpressionSyntax? alignment = null;
+            if (inner.Match(TokenKind.Comma))
+                alignment = inner.ParseExpression();
 
             // A limit reached inside the hole was reached here too, and this
             // parser has to stop as the inner one did or the rest of the file
@@ -3608,10 +3628,39 @@ public sealed class Parser
                     $"an interpolation holds one expression, and {inner.Current.Kind.Describe()} " +
                     "follows this one");
 
-            parts.Add(new InterpolatedPartSyntax(null, value));
+            parts.Add(new InterpolatedPartSyntax(null, value)
+            {
+                Alignment = alignment,
+                Format = segment.Format,
+                FormatSpan = segment.FormatSpan,
+            });
         }
 
         return new InterpolatedStringSyntax(SpanFrom(start), parts);
+    }
+
+    /// <summary>Whether a hole's tokens hold a <c>?</c> outside any bracket.</summary>
+    private static bool HasTopLevelQuestion(IReadOnlyList<Token> tokens)
+    {
+        int depth = 0;
+        foreach (var token in tokens)
+        {
+            switch (token.Kind)
+            {
+                case TokenKind.OpenParen or TokenKind.OpenBracket or TokenKind.OpenBrace:
+                    depth++;
+                    break;
+
+                case TokenKind.CloseParen or TokenKind.CloseBracket or TokenKind.CloseBrace:
+                    depth--;
+                    break;
+
+                case TokenKind.Question when depth == 0:
+                    return true;
+            }
+        }
+
+        return false;
     }
 
     private ExpressionSyntax ParsePrimary()
@@ -3637,6 +3686,7 @@ public sealed class Parser
             case TokenKind.IntLiteral:
             case TokenKind.FloatLiteral:
             case TokenKind.StringLiteral:
+            case TokenKind.Utf8StringLiteral:
             case TokenKind.CharLiteral:
             case TokenKind.TrueKeyword:
             case TokenKind.FalseKeyword:
@@ -3851,8 +3901,8 @@ public sealed class Parser
         bool typeIsUnambiguous = Core(type) is not NamedTypeSyntax;
         bool operandFollows = AtAny(
             TokenKind.Identifier, TokenKind.IntLiteral, TokenKind.FloatLiteral,
-            TokenKind.StringLiteral, TokenKind.CharLiteral, TokenKind.OpenParen,
-            TokenKind.TryKeyword,
+            TokenKind.StringLiteral, TokenKind.Utf8StringLiteral, TokenKind.CharLiteral,
+            TokenKind.OpenParen, TokenKind.InterpolatedString, TokenKind.TryKeyword,
             TokenKind.ThisKeyword, TokenKind.BaseKeyword, TokenKind.NewKeyword,
             TokenKind.SizeofKeyword,
             TokenKind.AlignofKeyword, TokenKind.OffsetofKeyword,

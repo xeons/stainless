@@ -138,7 +138,14 @@ public sealed partial class Binder
             literalOnly = false;
 
             var value = BindExpression(part.Value!);
-            parts.Add(AsText(value, part.Value!.Span));
+            var written = part.Format is { } format
+                ? AsFormattedText(value, format, part.FormatSpan ?? part.Value!.Span, part.Value!.Span)
+                : AsText(value, part.Value!.Span);
+
+            if (part.Alignment is { } alignment)
+                written = AsAlignedText(written, BindExpression(alignment), alignment.Span);
+
+            parts.Add(written);
         }
 
         // Nothing was interpolated, so this is a string literal with an
@@ -156,6 +163,7 @@ public sealed partial class Binder
     {
         if (value.Type.IsError()) return value;
         if (_builtins.IsString(value.Type)) return value;
+        if (AsFormattable(value, "", span) is { } written) return written;
 
         // An enum is a distinct type and does not become its integer on its own
         // (SL0410), and writing the number would rarely be what was wanted
@@ -195,6 +203,163 @@ public sealed partial class Binder
         // reaching it has to widen exactly as it would at any other call.
         var argument = BindConversion(value, conversion.Parameters[0].Type, span);
         return new BoundCall(span, conversion, receiver: null, [argument]);
+    }
+
+    /// <summary>
+    /// <c>{value:format}</c>: a number in a standard numeric format, or a class
+    /// that implements <c>IFormattable</c> handed the format to read.
+    ///
+    /// A number's format is checked here, because it is text in the source and
+    /// its type is known: a letter the type does not take would otherwise
+    /// stop the program the first time the line ran. A class's format means
+    /// what the class says and is passed through unread.
+    /// </summary>
+    private BoundExpression AsFormattedText(
+        BoundExpression value, string format, SourceSpan formatSpan, SourceSpan span)
+    {
+        if (value.Type.IsError()) return value;
+        if (AsFormattable(value, format, span) is { } written) return written;
+
+        bool isInteger = value.Type is PrimitiveTypeSymbol
+        {
+            IsInteger: true, IsCodeUnit: false, Kind: not PrimitiveKind.Bool,
+        };
+        bool isFloat = value.Type is PrimitiveTypeSymbol { IsFloat: true };
+
+        if (!isInteger && !isFloat)
+        {
+            // What has text but no format is told so; anything else gets the
+            // reason it has no text at all.
+            var plain = AsText(value, span);
+            if (plain is BoundErrorExpression) return plain;
+
+            diagnostics.Error("SL0753", formatSpan,
+                $"'{value.Type.Name}' is written as it is and takes no format; a format " +
+                "is for a number, or for a class that implements 'IFormattable'");
+            return new BoundErrorExpression(span);
+        }
+
+        if (StandardFormatProblem(format, isInteger) is { } problem)
+        {
+            diagnostics.Error("SL0753", formatSpan, problem);
+            return new BoundErrorExpression(span);
+        }
+
+        var formatText = new BoundStringLiteral(formatSpan, _builtins.String, format);
+        if (isFloat)
+        {
+            var asDouble = BindConversion(value, PrimitiveTypeSymbol.Double, span);
+            return new BoundCall(span, _builtins.TextFormatDouble, receiver: null, [asDouble, formatText]);
+        }
+
+        var integer = (PrimitiveTypeSymbol)value.Type;
+
+        // Hexadecimal and binary write a signed value's two's complement at
+        // its own width, as C# does, so -1 as an int is FFFFFFFF rather than
+        // sixteen Fs. Reinterpreting it as the unsigned type of that width
+        // before widening is what keeps the width.
+        if (integer.IsSigned && format[0] is 'X' or 'x' or 'B' or 'b')
+        {
+            var unsigned = UnsignedOfWidth(integer);
+            value = new BoundConversion(span, unsigned, value,
+                ClassifyConversion(integer, unsigned, explicitCast: true)!.Value);
+            integer = unsigned;
+        }
+
+        var (function, wide) = integer.IsSigned
+            ? (_builtins.TextFormatLong, PrimitiveTypeSymbol.Long)
+            : (_builtins.TextFormatULong, PrimitiveTypeSymbol.ULong);
+
+        return new BoundCall(span, function, receiver: null,
+            [BindConversion(value, wide, span), formatText]);
+    }
+
+    /// <summary>The unsigned integer type as wide as <paramref name="signed"/>.</summary>
+    private static PrimitiveTypeSymbol UnsignedOfWidth(PrimitiveTypeSymbol signed) => signed.Kind switch
+    {
+        PrimitiveKind.SByte => PrimitiveTypeSymbol.Byte,
+        PrimitiveKind.Short => PrimitiveTypeSymbol.UShort,
+        PrimitiveKind.Int => PrimitiveTypeSymbol.UInt,
+        PrimitiveKind.NInt => PrimitiveTypeSymbol.NUInt,
+        _ => PrimitiveTypeSymbol.ULong,
+    };
+
+    /// <summary>
+    /// Why <paramref name="format"/> is not a standard numeric format for an
+    /// integer or a floating-point number, or null when it is one. The forms
+    /// are those <c>Text.FormatInteger</c> and <c>Text.FormatDouble</c> take:
+    /// a letter, then up to three digits of precision.
+    /// </summary>
+    private static string? StandardFormatProblem(string format, bool isInteger)
+    {
+        const string IntegerLetters = "DdXxBbFfNnEeGg";
+        const string FloatLetters = "FfNnEeGg";
+
+        string letters = isInteger ? IntegerLetters : FloatLetters;
+        string what = isInteger ? "an integer" : "a floating-point number";
+        string offered = isInteger
+            ? "'D', 'X', 'B', 'F', 'N', 'E' and 'G'"
+            : "'F', 'N', 'E' and 'G'";
+
+        if (format.Length == 0)
+            return "this format is empty; write a letter after the ':', or leave the ':' out";
+
+        if (!letters.Contains(format[0]))
+            return $"'{format}' is not a format for {what}; the standard ones are {offered}, " +
+                   "each with an optional precision, as in 'X8' or 'F2'. A custom pattern " +
+                   "such as '0.00' is not supported";
+
+        string precision = format[1..];
+        if (precision.Length > 3 || !precision.All(char.IsAsciiDigit))
+            return $"'{format}' is not a format for {what}: after the letter comes a precision " +
+                   "of up to three digits, and nothing else";
+
+        return null;
+    }
+
+    /// <summary>
+    /// A class's own text through <c>IFormattable.ToText</c>, or null when the
+    /// value's type does not implement it. The call goes through the
+    /// interface, so a derived class's override is the one that writes.
+    /// </summary>
+    private BoundExpression? AsFormattable(BoundExpression value, string format, SourceSpan span)
+    {
+        if (value.Type is not (ClassTypeSymbol or InterfaceTypeSymbol))
+            return null;
+
+        var formattable = _builtins.Formattable;
+        if (!IsImplicitlyConvertible(value, formattable)) return null;
+
+        var method = formattable.FindMethod("ToText")!;
+        var receiver = BindConversion(value, formattable, span);
+        return new BoundCall(span, method, receiver,
+            [new BoundStringLiteral(span, _builtins.String, format)]);
+    }
+
+    /// <summary>
+    /// <c>{value,width}</c>: the text padded to a width, on the left when it is
+    /// positive and on the right when it is negative. The width MUST be a
+    /// constant, as in C#, so that it is part of the string's shape rather
+    /// than something computed on the way.
+    /// </summary>
+    private BoundExpression AsAlignedText(BoundExpression text, BoundExpression alignment, SourceSpan span)
+    {
+        if (text.Type.IsError() || alignment.Type.IsError()) return text;
+
+        if (IntegerLiteral(alignment) is not { } written || written.Magnitude > int.MaxValue)
+        {
+            diagnostics.Error("SL0754", span,
+                "an interpolation's alignment is a constant integer, as in '{value,8}' or " +
+                "'{value,-8}'; pad to a width known only when the program runs with " +
+                "'Text.AlignText'");
+            return text;
+        }
+
+        long width = written.Negative ? -(long)written.Magnitude : (long)written.Magnitude;
+        if (width == 0) return text;
+
+        var literal = new BoundLiteral(span, PrimitiveTypeSymbol.Int, unchecked((ulong)width));
+        return new BoundCall(span, _builtins.TextAlignText, receiver: null, [text, literal]);
     }
 
     /// <summary>
@@ -511,6 +676,12 @@ public sealed partial class Binder
             new BoundLiteral(syntax.Span, PrimitiveTypeSymbol.Bool, syntax.Value),
         TokenKind.StringLiteral => new BoundStringLiteral(
             syntax.Span, _builtins.String, (string)syntax.Value!),
+        // `"..."u8` is a view of bytes that exist for the whole program, so
+        // its type is the view, as C#'s is a ReadOnlySpan<byte>.
+        TokenKind.Utf8StringLiteral => new BoundConversion(
+            syntax.Span, SliceOf(PrimitiveTypeSymbol.Byte),
+            new BoundUtf8Literal(syntax.Span, ArrayOf(PrimitiveTypeSymbol.Byte), (string)syntax.Value!),
+            ConversionKind.ArrayToSlice),
         TokenKind.NullKeyword => new BoundNullLiteral(syntax.Span, NullType.Instance),
         _ => new BoundErrorExpression(syntax.Span),
     };
@@ -2715,7 +2886,8 @@ public sealed partial class Binder
     /// <summary>Whether a value is the same wherever and however often it is read.</summary>
     private static bool IsFixed(BoundExpression expression) => expression switch
     {
-        BoundLiteral or BoundStringLiteral or BoundNullLiteral or BoundConstantAccess => true,
+        BoundLiteral or BoundStringLiteral or BoundUtf8Literal or BoundNullLiteral => true,
+        BoundConstantAccess => true,
         BoundSizeof or BoundAlignof or BoundOffsetof or BoundThis => true,
         BoundConversion conversion => IsFixed(conversion.Operand),
         _ => false,
@@ -2741,7 +2913,8 @@ public sealed partial class Binder
     /// </summary>
     private static bool IsRepeatable(BoundExpression expression) => expression switch
     {
-        BoundLiteral or BoundStringLiteral or BoundNullLiteral or BoundConstantAccess => true,
+        BoundLiteral or BoundStringLiteral or BoundUtf8Literal or BoundNullLiteral => true,
+        BoundConstantAccess => true,
         BoundLocalAccess or BoundParameterAccess or BoundThis or BoundStaticAccess => true,
         BoundFieldAccess field => field.Receiver is null || IsRepeatable(field.Receiver),
         BoundIndex element => IsRepeatable(element.Target) && IsRepeatable(element.Index),

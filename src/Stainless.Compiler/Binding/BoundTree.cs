@@ -180,6 +180,17 @@ public sealed class BoundStringLiteral(SourceSpan span, TypeSymbol type, string 
 }
 
 /// <summary>
+/// The bytes of <c>"..."u8</c>, as a <c>byte[]</c> in read-only storage with
+/// an immortal count. The binder wraps it in the conversion to <c>byte[:]</c>,
+/// which is the literal's type.
+/// </summary>
+public sealed class BoundUtf8Literal(SourceSpan span, TypeSymbol type, string value)
+    : BoundExpression(span, type)
+{
+    public string Value { get; } = value;
+}
+
+/// <summary>
 /// <c>$"a {b} c"</c>, as the String-valued pieces it is made of.
 ///
 /// Every part is already a String by the time it gets here -- the binder put

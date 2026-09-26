@@ -127,6 +127,7 @@ public sealed partial class LlvmEmitter(
     /// </summary>
     private readonly Dictionary<string, int[]> _fieldSlots = new(StringComparer.Ordinal);
     private readonly Dictionary<string, string> _stringObjects = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, string> _utf8Arrays = new(StringComparer.Ordinal);
     private readonly Dictionary<LocalSymbol, string> _slots = [];
     private readonly Dictionary<ParameterSymbol, string> _parameterSlots = [];
 

@@ -921,6 +921,25 @@ storage, and `points[1].X = 5` writes into the array.
 and only then evaluates `b` and stores it. On a property the getter is called
 once and the setter only when the getter answered nothing.
 
+## 9.15 `@name`
+
+```csharp
+int @class = 3;
+extern "C" int @default(int @int);      // C's `default`, taking `int`
+```
+
+An `@` in front of a word makes it a name, whatever the word is: a keyword, a
+type's keyword, or a contextual word such as `get`, `when` or `checked`, which
+written this way is never the word. It is C#'s rule and exists for the same
+reason — a C library, a file format or a generated binding names something with
+a word this language reserved — and `@name` and `name` are one name, so
+`@count` and `count` are the same variable.
+
+**The `@` is not part of the name.** A symbol, its mangled name, what `export`
+writes and what `extern` looks for are all the bare word, so `@default` above
+links against a C function called `default`. An `@` followed by anything but a
+letter or `_` is not a name (SL0001).
+
 ---
 
 <sub>[&larr; Interoperability and libraries](08-interop-libraries.md) &nbsp;&middot;&nbsp; [Conditional compilation &rarr;](10-conditional-compilation.md)</sub>

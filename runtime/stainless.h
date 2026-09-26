@@ -586,6 +586,12 @@ SL_API void  *sl_string_from_bool(_Bool value);
  * the kind of difference nobody looks for. */
 SL_API size_t sl_format_double(char *buffer, size_t size, double value);
 
+/* A double as a standard numeric format writes it: 'F' fixed, 'N' fixed with
+ * group separators, 'E' scientific and 'G' general, in either case. A
+ * precision below zero is the format's default. Rounding is half away from
+ * zero on the exact value, as in .NET. */
+SL_API void  *sl_string_format_double(double value, int32_t letter, int32_t precision);
+
 /* The double `count` bytes at `text` spell, correctly rounded.
  *
  * The caller decides what is well formed; this only says what the digits are
