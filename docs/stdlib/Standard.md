@@ -14,7 +14,7 @@ than library features, and so need no import to reach.
 ### Action&lt;T&gt; *closure*
 
 ```
-closure void Action<T>(T value)
+closure void Action<in T>(T value)
 ```
 
 Does something with a T and returns nothing.
@@ -28,7 +28,7 @@ Does something with a T and returns nothing.
 ### Comparison&lt;T&gt; *closure*
 
 ```
-closure int Comparison<T>(T left, T right)
+closure int Comparison<in T>(T left, T right)
 ```
 
 Orders two Ts: negative if `left` comes first, positive if `right` does,
@@ -46,7 +46,7 @@ that implements no interface be sorted at all.
 ### Fold&lt;TAccumulate, TSource&gt; *closure*
 
 ```
-closure TAccumulate Fold<TAccumulate, TSource>(TAccumulate total, TSource value)
+closure TAccumulate Fold<TAccumulate, in TSource>(TAccumulate total, TSource value)
 ```
 
 Folds one element into a running total. Two parameters rather than one,
@@ -67,7 +67,7 @@ because a fold is the one shape that carries something along with it.
 ### Func&lt;T, TResult&gt; *closure*
 
 ```
-closure TResult Func<T, TResult>(T value)
+closure TResult Func<in T, out TResult>(T value)
 ```
 
 Turns a T into a TResult. The transform half of `Select`.
@@ -343,7 +343,7 @@ Runs `action` on the value, if there is one.
 ### Predicate&lt;T&gt; *closure*
 
 ```
-closure bool Predicate<T>(T value)
+closure bool Predicate<in T>(T value)
 ```
 
 Answers a question about a T.

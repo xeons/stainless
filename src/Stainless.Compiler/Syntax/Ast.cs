@@ -595,6 +595,18 @@ public sealed record AttributeSyntax(
 /// words, a function and the object it is bound to, rather than one. Delphi
 /// spells the same distinction <c>of object</c>.
 /// </param>
+/// <summary>
+/// How a type parameter of an interface or a delegate lets two of its
+/// instantiations convert: <c>out T</c> as <c>T</c> does, <c>in T</c> the
+/// other way.
+/// </summary>
+public enum Variance
+{
+    None,
+    In,
+    Out,
+}
+
 public sealed record DelegateDeclSyntax(
     SourceSpan Span,
     Modifiers Modifiers,
@@ -606,6 +618,9 @@ public sealed record DelegateDeclSyntax(
     CallingConvention Convention = CallingConvention.Default)
     : Declaration(Span, Modifiers)
 {
+    /// <summary>What was written in front of each type parameter, as on an interface.</summary>
+    public IReadOnlyList<Variance> TypeParameterVariance { get; init; } = [];
+
     /// <summary>
     /// <c>delegate __stdcall int Callback(int value);</c>, or
     /// <see cref="CallingConvention.Default"/>.
@@ -699,6 +714,13 @@ public sealed record TypeDeclSyntax(
 {
     /// <summary>A variant's cases; empty for every other kind of declaration.</summary>
     public IReadOnlyList<VariantCaseSyntax> Cases { get; init; } = [];
+
+    /// <summary>
+    /// What was written in front of each type parameter, <c>in</c> or
+    /// <c>out</c>, which only an interface may; empty or all
+    /// <see cref="Variance.None"/> for every other declaration.
+    /// </summary>
+    public IReadOnlyList<Variance> TypeParameterVariance { get; init; } = [];
 
     /// <summary>True for one written with no body at all: <c>struct HWND__;</c>.</summary>
     public bool IsOpaque { get; init; }

@@ -521,7 +521,7 @@ The item the last `MoveNext` landed on.
 ### IComparable&lt;T&gt; *interface*
 
 ```
-interface IComparable<T>
+interface IComparable<in T>
 ```
 
 Returns a negative number, zero, or a positive number when this value orders
@@ -549,7 +549,7 @@ it cannot overflow.
 ### IEnumerable&lt;T&gt; *interface*
 
 ```
-interface IEnumerable<T>
+interface IEnumerable<out T>
 ```
 
 Something that can be walked from the start, once per enumerator.
@@ -580,7 +580,7 @@ changed in between will say something different.
 ### IEnumerator&lt;T&gt; *interface*
 
 ```
-interface IEnumerator<T>
+interface IEnumerator<out T>
 ```
 
 A cursor over a sequence. `MoveNext` advances and reports whether there was
@@ -623,7 +623,7 @@ enumerator is not required to catch.
 ### IEquatable&lt;T&gt; *interface*
 
 ```
-interface IEquatable<T>
+interface IEquatable<in T>
 ```
 
 A value that can be asked whether it equals another of its type.
@@ -740,7 +740,7 @@ Drops every item, leaving a length of zero.
 ### IReadOnlyList&lt;T&gt; *interface*
 
 ```
-interface IReadOnlyList<T>
+interface IReadOnlyList<out T>
 ```
 
 A sequence that knows its length and can be indexed, and cannot be changed

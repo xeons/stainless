@@ -35,17 +35,17 @@ module Standard;
 ///
 /// @typeparam T        what goes in
 /// @typeparam TResult  what comes out
-public closure TResult Func<T, TResult>(T value);
+public closure TResult Func<in T, out TResult>(T value);
 
 /// Answers a question about a T.
 ///
 /// @typeparam T  what the question is about
-public closure bool Predicate<T>(T value);
+public closure bool Predicate<in T>(T value);
 
 /// Does something with a T and returns nothing.
 ///
 /// @typeparam T  what is handed to it
-public closure void Action<T>(T value);
+public closure void Action<in T>(T value);
 
 /// Folds one element into a running total. Two parameters rather than one,
 /// because a fold is the one shape that carries something along with it.
@@ -54,7 +54,7 @@ public closure void Action<T>(T value);
 /// @param value  the next element to fold in
 /// @typeparam TAccumulate  what is carried along, and what the fold answers with
 /// @typeparam TSource      what is folded over
-public closure TAccumulate Fold<TAccumulate, TSource>(TAccumulate total, TSource value);
+public closure TAccumulate Fold<TAccumulate, in TSource>(TAccumulate total, TSource value);
 
 /// Orders two Ts: negative if `left` comes first, positive if `right` does,
 /// zero if neither.
@@ -63,7 +63,7 @@ public closure TAccumulate Fold<TAccumulate, TSource>(TAccumulate total, TSource
 /// that implements no interface be sorted at all.
 ///
 /// @typeparam T  what is being ordered
-public closure int Comparison<T>(T left, T right);
+public closure int Comparison<in T>(T left, T right);
 
 // ---------------------------------------------------------- a value, or not
 

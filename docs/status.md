@@ -478,7 +478,9 @@ last person to edit it -- the suite is the authority.
   monomorphized, a direct call to the type's own member. A struct may
   implement an interface whose members are all static. A generic method may
   be dispatched -- an interface's, or a class's `virtual` one -- with a slot per
-  instantiation the program calls
+  instantiation the program calls. `in` and `out` on an interface's or a
+  delegate's type parameters convert one instantiation to another, as C#'s
+  do; `IEnumerable<T>`, `Func<T, TResult>` and the rest are variant
 - Overloading by parameter type, on methods as well as module-level functions;
   a return type alone does not distinguish two of them
 - `Standard.Collections`: `List<T>`, `Dictionary<TKey, TValue>`, `HashSet<T>`,

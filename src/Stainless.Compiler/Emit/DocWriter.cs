@@ -273,7 +273,8 @@ public static class DocWriter
         if (type.Modifiers.HasFlag(Modifiers.Abstract)) signature.Append("abstract ");
         if (type.Modifiers.HasFlag(Modifiers.Sealed)) signature.Append("sealed ");
 
-        signature.Append(kind).Append(' ').Append(type.Name).Append(Parameters(type.TypeParameters));
+        signature.Append(kind).Append(' ').Append(type.Name)
+                 .Append(Parameters(type.TypeParameters, type.TypeParameterVariance));
 
         if (type.Implements.Count > 0)
             signature.Append(" : ").Append(string.Join(", ", type.Implements.Select(Render)));
@@ -463,7 +464,7 @@ public static class DocWriter
 
         string signature =
             $"{keyword} {Render(handler.ReturnType)} {handler.Name}" +
-            Parameters(handler.TypeParameters) +
+            Parameters(handler.TypeParameters, handler.TypeParameterVariance) +
             $"({string.Join(", ", handler.Parameters.Select(Render))})";
 
         return new Entry(
@@ -478,6 +479,18 @@ public static class DocWriter
 
     private static string Parameters(IReadOnlyList<string>? names) =>
         names is null || names.Count == 0 ? "" : "<" + string.Join(", ", names) + ">";
+
+    /// <summary>The same, with each parameter's <c>in</c> or <c>out</c> in front of it.</summary>
+    private static string Parameters(IReadOnlyList<string>? names, IReadOnlyList<Variance> variance) =>
+        names is null || names.Count == 0
+            ? ""
+            : "<" + string.Join(", ", names.Select((name, i) =>
+                (i < variance.Count ? variance[i] : Variance.None) switch
+                {
+                    Variance.In => "in " + name,
+                    Variance.Out => "out " + name,
+                    _ => name,
+                })) + ">";
 
     private static string Render(ParameterSyntax parameter)
     {

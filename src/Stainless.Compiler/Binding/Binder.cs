@@ -295,6 +295,7 @@ public sealed partial class Binder(
         _interfacesResolved = true;
         RunDeferredConstraintChecks();
         CheckConstraintDeclarations();
+        CheckVarianceDeclarations();
                                     //         and every 'where' clause could be met
         ResolveAttributes();        // pass 6: attributes fold to constants
         CheckActivatableClasses();  //         and a CLSID says who can be made
@@ -311,6 +312,7 @@ public sealed partial class Binder(
         DrainPending();             // pass 11: bodies of everything instantiated along the way,
                                     //          the statics that came with them, and their order
         NumberGenericVirtualSlots();//          and a slot for each dispatched generic instantiation
+        BuildVarianceTables();      //          and a table for each interface a class stands for
         CheckConstructorDelegation();
         ResolveRemainingAliases();
         CheckDocumentation();       //          and every '@tag' says something true

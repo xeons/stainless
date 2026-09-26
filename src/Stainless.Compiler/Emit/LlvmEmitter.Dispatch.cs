@@ -103,7 +103,9 @@ public sealed partial class LlvmEmitter
     /// </summary>
     private void InterfaceTables(BoundProgram program)
     {
-        var implementers = program.Classes.Where(c => c.Interfaces.Count > 0).ToList();
+        var implementers = program.Classes
+            .Where(c => c.Interfaces.Count > 0 || c.VarianceTables.Count > 0)
+            .ToList();
         if (implementers.Count == 0) return;
 
         _module.AppendLine();
@@ -134,9 +136,26 @@ public sealed partial class LlvmEmitter
                     $"[{width} x ptr] [{body}]");
             }
 
+            // An interface the class stands for by variance has a table of its
+            // own, filled with the functions of the one it really implements.
+            foreach (var (interfaceType, filled) in classType.VarianceTables)
+            {
+                var slots = filled
+                    .Select(found => found is null || found.IsAbstract ||
+                                     found is { ContainingType: InterfaceTypeSymbol, HasBody: false }
+                        ? "ptr null"
+                        : $"ptr {Symbol(found)}")
+                    .ToList();
+
+                string body = slots.Count == 0 ? "ptr null" : string.Join(", ", slots);
+                _module.AppendLine(
+                    $"@{VTableName(classType, interfaceType)} = internal constant " +
+                    $"[{Math.Max(1, slots.Count)} x ptr] [{body}]");
+            }
+
             var entries = new string[Math.Max(1, _interfaceCount)];
             Array.Fill(entries, "ptr null");
-            foreach (var interfaceType in classType.Interfaces)
+            foreach (var interfaceType in classType.Interfaces.Concat(classType.VarianceTables.Keys))
                 entries[interfaceType.Id] = $"ptr @{VTableName(classType, interfaceType)}";
 
             _module.AppendLine(

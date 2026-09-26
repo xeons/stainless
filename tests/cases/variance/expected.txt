@@ -1,0 +1,25 @@
+~rex1
+~rex2
+rex1 says woof
+~rex3
+~rex4
+rex3 says woof
+rex5
+~rex5
+kennel kennel
+put fido
+~fido
+woof
+~rex1
+true true
+woof
+~spot
+took max
+~max
+b
+a
+a
+b!
+ab
+~a
+~b

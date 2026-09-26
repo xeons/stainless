@@ -33,7 +33,7 @@ module Standard.Collections;
 ///
 /// @typeparam T  the element type; nothing is asked of it
 /// @see IList
-public interface IReadOnlyList<T>
+public interface IReadOnlyList<out T>
 {
     /// How many items there are.
     nuint Count { get; }

@@ -1183,7 +1183,18 @@ public sealed class Parser
 
         // A nameless member has no identifier to read; its name was made for it.
         string name = generatedName ?? ExpectIdentifier();
-        var typeParameters = generatedName is null ? ParseTypeParameterList() : [];
+        var variance = new List<Variance>();
+        var typeParameters = generatedName is null
+            ? ParseTypeParameterList(variance, kind switch
+            {
+                TypeDeclKind.Interface => null,
+                TypeDeclKind.Class => "a class's",
+                TypeDeclKind.Variant => "a variant's",
+                TypeDeclKind.Union => "a union's",
+                TypeDeclKind.Attribute => "an attribute's",
+                _ => "a struct's",
+            })
+            : [];
 
         // `record Point(int X, int Y)`: the parameters are the type's members
         // as well as its constructor's, which is the whole of what the form
@@ -1265,6 +1276,7 @@ public sealed class Parser
                 SpanFrom(start), modifiers, kind, name, typeParameters,
                 constraints, implements, [], attributes)
             {
+                TypeParameterVariance = variance,
                 // `record Point(int X, int Y);` ends the same way and means the
                 // opposite: the parameters are the body, so the type is laid
                 // out and only the braces were unnecessary.
@@ -1282,6 +1294,7 @@ public sealed class Parser
                 attributes)
             {
                 PrimaryParameters = primary,
+                TypeParameterVariance = variance,
             };
 
         Expect(TokenKind.OpenBrace);
@@ -1293,7 +1306,7 @@ public sealed class Parser
         if (!Descend())
             return new TypeDeclSyntax(
                 SpanFrom(start), modifiers, kind, name, typeParameters, constraints,
-                implements, members, attributes) { Cases = cases };
+                implements, members, attributes) { Cases = cases, TypeParameterVariance = variance };
 
         int anonymous = 0;
 
@@ -1379,6 +1392,7 @@ public sealed class Parser
         {
             Cases = cases,
             PrimaryParameters = primary ?? [],
+            TypeParameterVariance = variance,
         };
     }
 
@@ -1555,7 +1569,8 @@ public sealed class Parser
         var returnType = ParseType();
 
         string name = ExpectIdentifier();
-        var typeParameters = At(TokenKind.Less) ? ParseTypeParameterList() : [];
+        var variance = new List<Variance>();
+        var typeParameters = At(TokenKind.Less) ? ParseTypeParameterList(variance, null) : [];
         var parameters = ParseParameterList(out bool variadic);
 
         string kind = carriesReceiver ? "closure" : "delegate";
@@ -1576,7 +1591,10 @@ public sealed class Parser
         Expect(TokenKind.Semicolon);
         return new DelegateDeclSyntax(
             SpanFrom(start), modifiers, name, returnType, parameters, carriesReceiver,
-            typeParameters, carriesReceiver ? CallingConvention.Default : convention);
+            typeParameters, carriesReceiver ? CallingConvention.Default : convention)
+        {
+            TypeParameterVariance = variance,
+        };
     }
 
     /// <summary>
@@ -1994,7 +2012,9 @@ public sealed class Parser
 
         // `T Max<T>(T a, T b)`. Only a function may be generic, so the list is
         // accepted here and rejected below if no parameter list follows.
-        var typeParameters = At(TokenKind.Less) ? ParseTypeParameterList() : [];
+        var typeParameters = At(TokenKind.Less)
+            ? ParseTypeParameterList([], "a function's")
+            : [];
 
         if (At(TokenKind.OpenParen))
         {
@@ -2756,13 +2776,48 @@ public sealed class Parser
             triple ? ">>" : ">");
     }
 
-    /// <summary>Parses <c>&lt;T, U&gt;</c> in a declaration.</summary>
-    private List<string> ParseTypeParameterList()
+    /// <summary>
+    /// Parses <c>&lt;T, U&gt;</c> in a declaration, and <c>&lt;in T, out
+    /// U&gt;</c> on an interface or a delegate, whose variance goes into
+    /// <paramref name="variance"/> one per parameter.
+    /// </summary>
+    /// <param name="refused">
+    /// Null where variance may be written; otherwise whose parameters these
+    /// are, for the message refusing it.
+    /// </param>
+    private List<string> ParseTypeParameterList(List<Variance> variance, string? refused)
     {
         var parameters = new List<string>();
         if (!Match(TokenKind.Less)) return parameters;
 
-        do { parameters.Add(ExpectIdentifier()); }
+        do
+        {
+            int at = _pos;
+            var written = Variance.None;
+
+            // `out` is a word and `in` a keyword, and each is a modifier only
+            // in front of the name it modifies.
+            if (At(TokenKind.InKeyword) && Peek(1).Kind == TokenKind.Identifier)
+            {
+                Advance();
+                written = Variance.In;
+            }
+            else if (AtWord && Current.Text == "out" && Peek(1).Kind == TokenKind.Identifier)
+            {
+                Advance();
+                written = Variance.Out;
+            }
+
+            if (written != Variance.None && refused is not null)
+                _diagnostics.Error("SL0800", SpanFrom(at),
+                    $"'{(written == Variance.In ? "in" : "out")}' may be written only on an " +
+                    $"interface's or a delegate's type parameter, and this is {refused}. It " +
+                    "says when one instantiation may stand for another, and only an " +
+                    "interface's or a delegate's promise nothing about what they hold");
+
+            parameters.Add(ExpectIdentifier());
+            variance.Add(refused is null ? written : Variance.None);
+        }
         while (Match(TokenKind.Comma));
 
         ExpectTypeArgumentEnd();
@@ -3016,7 +3071,7 @@ public sealed class Parser
         if (!At(TokenKind.Identifier) || _diagnostics.HasErrors) return false;
         Advance();
 
-        if (At(TokenKind.Less)) ParseTypeParameterList();
+        if (At(TokenKind.Less)) ParseTypeParameterList([], "a function's");
         return At(TokenKind.OpenParen) && !_diagnostics.HasErrors;
     }
 

@@ -1086,6 +1086,47 @@ public class ParserTests
         Assert.Equal(["SL0793"], Front.Codes(diagnostics));
     }
 
+    // ------------------------------------------------------------- variance
+
+    [Fact]
+    public void AnInterfaceReadsItsVariance()
+    {
+        var declared = Assert.IsType<TypeDeclSyntax>(
+            Front.Declaration("interface IMap<in TKey, out TValue, TOther> { }"));
+
+        Assert.Equal(["TKey", "TValue", "TOther"], declared.TypeParameters);
+        Assert.Equal([Variance.In, Variance.Out, Variance.None], declared.TypeParameterVariance);
+    }
+
+    [Fact]
+    public void AClosureReadsItsVariance()
+    {
+        var declared = Assert.IsType<DelegateDeclSyntax>(
+            Front.Declaration("closure TResult Func<in T, out TResult>(T value);"));
+
+        Assert.Equal([Variance.In, Variance.Out], declared.TypeParameterVariance);
+    }
+
+    /// <summary>`out` is a word, and a parameter may still be called it.</summary>
+    [Fact]
+    public void OutAloneIsAParameterName()
+    {
+        var declared = Assert.IsType<TypeDeclSyntax>(Front.Declaration("interface IHold<out> { }"));
+
+        Assert.Equal(["out"], declared.TypeParameters);
+        Assert.Equal([Variance.None], declared.TypeParameterVariance);
+    }
+
+    [Theory]
+    [InlineData("class Box<out T> { }")]
+    [InlineData("struct Pair<in T> { }")]
+    [InlineData("T Pick<out T>(T value) => value;")]
+    public void OnlyAnInterfaceOrADelegateHasVariance(string declaration)
+    {
+        Front.Parse("module Test;\n" + declaration, out var diagnostics);
+        Assert.Equal(["SL0800"], Front.Codes(diagnostics));
+    }
+
     [Fact]
     public void UnmanagedAndNotnullRemainNames()
     {

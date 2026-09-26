@@ -28,7 +28,7 @@ module Standard.Threading;
 /// cannot be generic -- and a lambda reaches it the same way.
 ///
 /// @typeparam T  what the work is handed
-public interface IConsumer<T>
+public interface IConsumer<in T>
 {
     void Invoke(T value);
 }

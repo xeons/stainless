@@ -740,6 +740,14 @@ public sealed partial class Binder
                           p.Mode != toClosure.Signature[i].Mode).Any())
             return ConversionKind.Identity;
 
+        // Two instantiations of one variant delegate or closure: the same
+        // function pointer, and for a closure the same receiver, answers
+        // either type.
+        if (from is DelegateTypeSymbol or ClosureTypeSymbol &&
+            to is DelegateTypeSymbol or ClosureTypeSymbol &&
+            IsVarianceConvertible(from, to))
+            return ConversionKind.Identity;
+
         // The whole of an array, as a slice of it.
         if (from is ArrayTypeSymbol whole && to is SliceTypeSymbol asSlice)
             return whole.Element.Equals(asSlice.Element) ? ConversionKind.ArrayToSlice : null;
@@ -792,7 +800,9 @@ public sealed partial class Binder
         // any it extends. Because a reference is the same pointer either way,
         // this costs nothing at run time.
         if (from is NamedTypeSymbol { IsReferenceType: true } source2 && to is InterfaceTypeSymbol wanted)
-            return source2.AllInterfaces().Contains(wanted) ? ConversionKind.ClassToInterface : null;
+            return source2.AllInterfaces().Contains(wanted) || VarianceSource(source2, wanted) is not null
+                ? ConversionKind.ClassToInterface
+                : null;
 
         // And back down again, which is the same check a class downcast is.
         //
@@ -813,7 +823,8 @@ public sealed partial class Binder
 
         if (from is ClassTypeSymbol optionalImplementer &&
             to is OptionalTypeSymbol { Element: InterfaceTypeSymbol optionalWanted })
-            return optionalImplementer.Interfaces.Contains(optionalWanted)
+            return optionalImplementer.AllInterfaces().Contains(optionalWanted) ||
+                   VarianceSource(optionalImplementer, optionalWanted) is not null
                 ? ConversionKind.ClassToInterface
                 : null;
 
@@ -832,7 +843,10 @@ public sealed partial class Binder
             return ConversionKind.Upcast;
 
         if (from is InterfaceTypeSymbol fromInterface && to is OptionalTypeSymbol toOptionalInterface)
-            return fromInterface.Equals(toOptionalInterface.Element)
+            return fromInterface.Equals(toOptionalInterface.Element) ||
+                   (toOptionalInterface.Element is InterfaceTypeSymbol extended &&
+                    (fromInterface.AllInterfaces().Contains(extended) ||
+                     VarianceSource(fromInterface, extended) is not null))
                 ? ConversionKind.ReferenceToOptional
                 : null;
 

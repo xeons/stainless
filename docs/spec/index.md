@@ -126,6 +126,7 @@ Monomorphization, constraints, and what is and is not supported.
 - [4.2 Constraints](04-generics.md#42-constraints)
 - [4.3 What a constraint does, and does not, do](04-generics.md#43-what-a-constraint-does-and-does-not-do)
   - [4.3.1 `static abstract` — a promise about the type](04-generics.md#431-static-abstract--a-promise-about-the-type)
+  - [4.3.2 `in` and `out` — when one instantiation stands for another](04-generics.md#432-in-and-out--when-one-instantiation-stands-for-another)
 - [4.4 What is and is not supported](04-generics.md#44-what-is-and-is-not-supported)
   - [4.4.1 Writing type arguments at a call](04-generics.md#441-writing-type-arguments-at-a-call)
   - [4.4.2 Inferring from a lambda](04-generics.md#442-inferring-from-a-lambda)

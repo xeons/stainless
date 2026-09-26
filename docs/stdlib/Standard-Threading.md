@@ -585,7 +585,7 @@ guarded; mutating the one `Value` gave back is the usual thing.
 ### IConsumer&lt;T&gt; *interface*
 
 ```
-interface IConsumer<T>
+interface IConsumer<in T>
 ```
 
 Work that takes a value: the other half of a handoff, and what a
@@ -613,7 +613,7 @@ void Invoke(T value)
 ### IProducer&lt;T&gt; *interface*
 
 ```
-interface IProducer<T>
+interface IProducer<out T>
 ```
 
 Work that produces a value: what a `Future<T>` runs.

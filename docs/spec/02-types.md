@@ -1866,7 +1866,9 @@ IShape shape = named;                       // free, and no conversion is emitte
 ```
 
 The base's table is built for the class alongside the derived one, so a call
-through either reference is the same four loads.
+through either reference is the same four loads. An interface whose type
+parameters are written `in` or `out` converts between its instantiations as
+well ([§4.3.2](04-generics.md#432-in-and-out--when-one-instantiation-stands-for-another)).
 
 **A class may implement two instantiations of one generic interface**, because
 each interface it implements gets its own table:

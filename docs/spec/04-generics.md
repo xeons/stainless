@@ -265,6 +265,59 @@ operator of that name — not only for an operand typed by a type parameter.
 Binding sees a monomorphized body, where `T` is already `Money`, and so cannot
 tell the two apart.
 
+### 4.3.2 `in` and `out` — when one instantiation stands for another
+
+A type parameter of an interface or a delegate may be written `out`, when a
+value of it only ever comes out, or `in`, when one only ever goes in. That
+lets two instantiations convert where their arguments do, as in C#:
+
+```csharp
+public interface ISource<out T> { T Next(); }
+public interface ISink<in T> { void Put(T item); }
+
+ISource<Dog> dogs = kennel;
+ISource<Animal> animals = dogs;             // a source of dogs gives animals
+ISink<Animal> anything = pound;
+ISink<Dog> dogSink = anything;              // a sink for animals takes dogs
+```
+
+It composes through another variant type, the way C#'s does —
+`ISource<ISource<Dog>>` is an `ISource<ISource<Animal>>` — and the standard
+library uses it: `IEnumerable<out T>`, `IEnumerator<out T>`,
+`IReadOnlyList<out T>`, `IComparable<in T>`, `IEquatable<in T>`, `Func<in T,
+out TResult>`, `Action<in T>`, `Predicate<in T>` and `Comparison<in T>`. So a
+`List<Dog>` is an `IEnumerable<Animal>`, and `Sort` takes a list of a class
+that compares itself with any `Animal`.
+
+**Only references vary**, as in C#. An argument that differs has to convert to
+the other with no instruction at all — a class to its base or an interface it
+implements, an interface to one it extends, a reference to its optional, or
+one variant instantiation to another — because that is what lets one pointer
+be both. `ISource<int>` is not an `ISource<long>`.
+
+**Monomorphized, the two are different interfaces**, with different ids, and
+an object implementing one has no table for the other. What makes the
+conversion sound is that the program is whole: each class that implements
+`ISource<Dog>` and could therefore be behind an `ISource<Animal>` is given a
+table for `ISource<Animal>` as well, holding the same functions slot for slot —
+which is correct, because the two slots differ only in which reference type
+they name, and a reference is one pointer whatever it names. A generic method
+of the interface gets the same instantiation on both. So a call through the
+converted reference costs what any interface call costs, the conversion
+itself costs nothing, and `x is ISource<Animal>` answers as C#'s does. A
+delegate or a closure needs no table: the same function pointer, and receiver,
+answer either type.
+
+**A variant parameter appears only where its word lets it** (SL0801), C#'s
+CS1961: an `out` one in a return, a getter, an extended interface, or an `out`
+argument of another variant type; an `in` one in a parameter, a setter, or an
+`in` argument, where the direction turns round. A `ref` or `out` parameter,
+a property with both accessors, an array, a slice, a pointer and a tuple are
+read and written both, so neither word may reach them. A static member is not
+reached through a reference and is not checked. `in` and `out` may be written
+only on an interface's or a delegate's parameters (SL0800); a class or struct
+holds what it holds, and a function has nothing to convert.
+
 ## 4.4 What is and is not supported
 
 Supported: generic classes, generic interfaces (including implementing them,
@@ -363,6 +416,9 @@ the `Upper` meant is the one taking a `String`, and what it returns is `R`.
 Where the parameter types are not known yet, a name with exactly one function
 of the right arity settles them too. An overloaded name that the known types
 do not narrow to one says nothing, and the call is SL0327.
+
+A **closure already held** — a `Func<int, String>` in a variable — is read off
+its type, argument by argument, as an instantiated interface is.
 
 A **block-bodied** lambda is read off its `return`s: `n => { return n * 2; }`
 gives an `int`, and returns that differ widen to the one they all reach, as a

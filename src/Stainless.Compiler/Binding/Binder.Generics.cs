@@ -61,7 +61,7 @@ public sealed partial class Binder
                 BindStatics();
             }
         }
-        while (CompleteGenericDispatch());
+        while (CompleteGenericDispatch() | CompleteVariantGenericSlots());
 
         _substitution = previous;
 
@@ -316,6 +316,7 @@ public sealed partial class Binder
         // mentions itself -- `closure Predicate<T> Compose<T>(Predicate<T> a)`
         // -- terminates.
         _instantiatedTypes[key] = type;
+        _delegateTemplates[type] = template;
         if (type is StructTypeSymbol asStruct) _structs.Add(asStruct);
 
         var substitution = new Dictionary<string, TypeSymbol>(StringComparer.Ordinal);
@@ -796,6 +797,7 @@ public sealed partial class Binder
     {
         ClassTypeSymbol implementer =>
             implementer.AllInterfaces().Contains(required) ||
+            VarianceSource(implementer, required) is not null ||
             SatisfiesIntrinsically(argument, required),
         StructTypeSymbol implementer when implementer.AllInterfaces().Contains(required) => true,
         InterfaceTypeSymbol self => self.Equals(required) || self.AllInterfaces().Contains(required),
@@ -895,6 +897,18 @@ public sealed partial class Binder
             // `IReadOnlyList<T>` against a `List<Money>`: find the instantiation
             // of the same template on the argument or among its interfaces, then
             // line the arguments up.
+            // `Func<T, TResult>` against a `Func<int, String>` held in a
+            // variable: the same template, so the arguments line up.
+            case NamedTypeSyntax { TypeArguments.Count: > 0 } signature
+                when FindGenericDelegate(signature.Name, scope) is { } delegateTemplate &&
+                     actual is NamedTypeSymbol delegateType &&
+                     _delegateTemplates.GetValueOrDefault(delegateType) == delegateTemplate &&
+                     delegateType.TypeArguments.Count == signature.TypeArguments.Count:
+                for (int i = 0; i < signature.TypeArguments.Count; i++)
+                    Infer(signature.TypeArguments[i], delegateType.TypeArguments[i],
+                        parameters, inferred, scope);
+                break;
+
             case NamedTypeSyntax { TypeArguments.Count: > 0 } constructed:
             {
                 var template = FindGenericType(constructed.Name, scope);

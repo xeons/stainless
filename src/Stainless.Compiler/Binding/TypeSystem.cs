@@ -1490,6 +1490,13 @@ public sealed class ClassTypeSymbol : NamedTypeSymbol
     /// </summary>
     public Dictionary<FunctionSymbol, FunctionSymbol?> GenericImplementations { get; } = [];
 
+    /// <summary>
+    /// For each variant interface this class stands for without implementing
+    /// it -- <c>IEnumerable&lt;Animal&gt;</c> for a class implementing
+    /// <c>IEnumerable&lt;Dog&gt;</c> -- what fills each of its slots.
+    /// </summary>
+    public Dictionary<InterfaceTypeSymbol, List<FunctionSymbol?>> VarianceTables { get; } = [];
+
     /// <summary>This class, then its base, then its base's base.</summary>
     public IEnumerable<ClassTypeSymbol> SelfAndBases()
     {

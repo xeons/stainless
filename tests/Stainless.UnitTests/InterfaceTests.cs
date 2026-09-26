@@ -323,6 +323,68 @@ public class InterfaceTests
             int Use() => Deep(1, 3);
             """));
 
+    // ------------------------------------------------------------- variance
+
+    private const string Variant = """
+        public class Animal { }
+        public class Dog : Animal { }
+        public interface ISource<out T> { T Next(); }
+        public interface ISink<in T> { void Put(T item); }
+        public interface IBoth<T> { T Swap(T item); }
+        public class Kennel : ISource<Dog>, ISink<Animal>, IBoth<Dog>
+        {
+            public Dog Next() => new Dog();
+            public void Put(Animal item) { }
+            public Dog Swap(Dog item) => item;
+        }
+
+        """;
+
+    [Theory]
+    [InlineData("ISource<Animal> s = new Kennel();")]
+    [InlineData("ISink<Dog> s = new Kennel();")]
+    [InlineData("ISource<Dog> d = new Kennel(); ISource<Animal> a = d;")]
+    [InlineData("ISource<Dog> d = new Kennel(); ISource<Animal>? a = d;")]
+    public void AVariantInterfaceConverts(string statement) =>
+        Assert.Empty(Front.ModuleCodes(Variant + "void Use() { " + statement + " }"));
+
+    [Theory]
+    [InlineData("ISource<Animal> a = new Kennel(); ISource<Dog> d = a;")]
+    [InlineData("ISink<Animal> s = new Kennel(); ISink<Animal> t = (ISink<Dog>)s;")]
+    [InlineData("IBoth<Animal> s = new Kennel();")]
+    public void AVariantInterfaceConvertsOneWayOnly(string statement) =>
+        Assert.Contains("SL0265", Front.ModuleCodes(Variant + "void Use() { " + statement + " }"));
+
+    [Fact]
+    public void AClassGetsATableForWhatItStandsFor()
+    {
+        var program = Front.BindModule(Variant +
+            "void Use() { ISource<Animal> s = new Kennel(); }", out _);
+
+        var kennel = program.Classes.Single(c => c.Name == "Kennel");
+        var wanted = program.Interfaces.Single(i => i.Name == "ISource<Animal>");
+
+        Assert.True(kennel.VarianceTables.ContainsKey(wanted));
+        Assert.Equal("Kennel", kennel.VarianceTables[wanted].Single()!.ContainingType!.Name);
+    }
+
+    [Theory]
+    [InlineData("public interface IBad<out T> { void Push(T item); }")]
+    [InlineData("public interface IBad<in T> { T Pull(); }")]
+    [InlineData("public interface IBad<out T> { T[] All(); }")]
+    [InlineData("public interface IBad<out T> { T Value { get; set; } }")]
+    [InlineData("public interface ISink<in T> { void Put(T item); }\npublic interface IBad<out T> { ISink<T> Sink(); }")]
+    [InlineData("public closure void Bad<out T>(T value);")]
+    public void AVariantParameterAppearsOnlyWhereItsVarianceLets(string declaration) =>
+        Assert.Contains("SL0801", Front.ModuleCodes(declaration));
+
+    [Theory]
+    [InlineData("public interface IGood<out T> { T Get(); static void Take(T item) { } }")]
+    [InlineData("public interface ISink<in T> { void Put(T item); }\npublic interface IGood<in T> { ISink<T> Sink(); }")]
+    [InlineData("public interface IGood<out T> { T? Maybe(); }")]
+    public void AVariantParameterMayAppearWhereItsVarianceLets(string declaration) =>
+        Assert.Empty(Front.ModuleCodes(declaration));
+
     // ------------------------------------------------------ covariant returns
 
     private const string Animals = """

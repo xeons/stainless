@@ -28,7 +28,7 @@ module Standard.Collections;
 /// being iterable.
 ///
 /// @typeparam T  what the sequence yields; nothing is asked of it
-public interface IEnumerable<T>
+public interface IEnumerable<out T>
 {
     /// A fresh cursor positioned before the first item. Each call gives an
     /// independent one, so a sequence can be walked twice; what is not

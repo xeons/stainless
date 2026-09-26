@@ -39,7 +39,7 @@ module Standard.Collections;
 /// is still worth doing, because it lets a sequence be passed around.
 ///
 /// @typeparam T  what the cursor lands on; nothing is asked of it
-public interface IEnumerator<T>
+public interface IEnumerator<out T>
 {
     /// Advances to the next item and reports whether there was one. Must be
     /// called before the first `Current`: a fresh enumerator sits before the

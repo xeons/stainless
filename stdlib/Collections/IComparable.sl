@@ -26,7 +26,7 @@ module Standard.Collections;
 ///
 /// @typeparam T  what a value is ordered against, which is normally the type
 ///               implementing this
-public interface IComparable<T>
+public interface IComparable<in T>
 {
     /// Negative when this orders before `other`, zero when they order
     /// together, positive when after. The sign is all that is read -- the

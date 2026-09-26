@@ -30,7 +30,7 @@ module Standard.Threading;
 /// same way it reaches `Action`.
 ///
 /// @typeparam T  what the work produces
-public interface IProducer<T>
+public interface IProducer<out T>
 {
     T Invoke();
 }

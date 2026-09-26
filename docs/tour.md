@@ -657,6 +657,13 @@ ARC and the calling convention all behave exactly as they do for a class, and a
 class can implement any number of interfaces at no per-object cost. Dispatch is
 four constant-offset loads with no search and no branch.
 
+The rest of C#'s interface is here too: default bodies, members written under
+an interface's name, overloads, generic methods (a slot per instantiation the
+program calls), `static abstract` members reached through a type parameter,
+and `in` and `out` variance, so a `List<Dog>` is an `IEnumerable<Animal>`. See
+[§2.10](spec/02-types.md#210-interface--a-contract-dispatched-dynamically) and
+[§4](spec/04-generics.md).
+
 | | `struct` | `variant` | `class` | `interface` |
 |---|---|---|---|---|
 | Storage | value, inline | value, inline | heap | a reference to one |

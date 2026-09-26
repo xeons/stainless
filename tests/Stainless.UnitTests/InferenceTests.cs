@@ -233,4 +233,19 @@ public class InferenceTests
 
         Assert.Equal(1, applies);
     }
+
+    /// <summary>A closure held in a variable says what its arguments are.</summary>
+    [Fact]
+    public void AClosureInAVariableIsReadOffItsType() =>
+        Assert.Empty(Front.ModuleCodes(
+            """
+            import Standard.Collections;
+
+            String First(List<int> numbers)
+            {
+                Func<int, String> show = n => Text.FromInteger(n);
+                var shown = Select(numbers, show);
+                return shown[0];
+            }
+            """));
 }

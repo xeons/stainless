@@ -33,7 +33,7 @@ module Standard.Collections;
 ///
 /// @typeparam T  what a value is compared against, which is normally the type
 ///               implementing this
-public interface IEquatable<T>
+public interface IEquatable<in T>
 {
     /// True when this value and `other` are the same value. Implementations
     /// should answer without allocating; this runs once per probe.
