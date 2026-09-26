@@ -275,8 +275,13 @@ public sealed partial class Binder
         // methods wearing the spelling of a field, exactly as an instance
         // property is.
         if (!syntax.ThroughPointer && ResolveTypePrefix(syntax.Target) is { } propertyOwner &&
-            propertyOwner.FindProperty(syntax.Member) is { Getter.IsStatic: true } onTheType)
+            FindStaticProperty(propertyOwner, syntax.Member, syntax.Target) is { } onTheType)
+        {
+            if (RefuseStaticRequirement(onTheType.Getter!, propertyOwner, syntax.Span))
+                return new BoundErrorExpression(syntax.Span);
+
             return BindPropertyRead(syntax.Span, receiver: null, onTheType);
+        }
 
         if (!syntax.ThroughPointer && ResolveTypePrefix(syntax.Target) is { } staticOwner &&
             staticOwner.FindMethods(syntax.Member).ToList() is { Count: > 0 } declared)

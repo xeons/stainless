@@ -716,9 +716,12 @@ rule where two could disagree.
   (SL0567): `==` with `!=`, `<` with `>`, `<=` with `>=`. A type that answers
   one and not the other is a trap, and the missing half fails at a call site
   far from the declaration that forgot it.
-- An interface declares none. An operator is chosen from the operand types
-  where it is written rather than dispatched, so there is nothing for a
-  contract to promise.
+- An interface declares one only as `static abstract`, which every implementing
+  type must supply, or `static virtual`, whose body is what one that supplies
+  none falls back on (SL0560). An operator is chosen from the operand types
+  where it is written rather than dispatched, so one of the interface's own
+  would be reached only by an operand typed as the interface; see
+  [§4.3.1](04-generics.md#431-static-abstract--a-promise-about-the-type).
 
 **A declared `==` is asked first**, before the reference comparison a class
 would otherwise get. That is the whole reason to declare one.
@@ -969,8 +972,8 @@ What `static` may not be written on:
 | | Refused because | |
 |---|---|---|
 | a module-level function | a module has no instance for a function to belong to | SL0573 |
-| an interface member | an interface promises what an *object* can do | SL0574 |
-| `virtual`, `override`, `abstract` | dispatch chooses a body from the object a call arrives on | SL0575 |
+| an interface member with no body, unless it is `static abstract` | a requirement says so ([§4.3.1](04-generics.md#431-static-abstract--a-promise-about-the-type)) | SL0574 |
+| `virtual`, `override`, `abstract`, on a class | dispatch chooses a body from the object a call arrives on | SL0575 |
 | `protected` | the word is about what a derived object reaches through itself | SL0575 |
 | a struct, interface, enum, variant, union or delegate | only a class has instances for the word to deny | SL0578 |
 

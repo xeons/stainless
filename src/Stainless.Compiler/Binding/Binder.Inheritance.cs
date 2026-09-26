@@ -83,14 +83,12 @@ public sealed partial class Binder
             ? elsewhere
             : (declaration, scope);
 
-        if (type is StructTypeSymbol && listed.Implements.Count > 0)
+        // A struct may implement an interface all of whose members are static:
+        // that is a promise about the type, and no reference to one is ever
+        // made. A variant or a union may not, since neither declares members.
+        if (type is VariantTypeSymbol or UnionTypeSymbol && listed.Implements.Count > 0)
         {
-            string kind = type switch
-            {
-                VariantTypeSymbol => "variant",
-                UnionTypeSymbol => "union",
-                _ => "struct",
-            };
+            string kind = type is VariantTypeSymbol ? "variant" : "union";
             diagnostics.Error("SL0302", declaration.Span,
                 $"{kind} '{type.Name}' cannot implement an interface; an interface " +
                 "reference is a counted pointer, and a " + kind + " is a plain C value");
@@ -106,6 +104,16 @@ public sealed partial class Binder
                 var written = listed.Implements[i];
                 var resolved = ResolveType(written, listedScope);
                 if (resolved.IsError()) continue;
+
+                if (type is StructTypeSymbol && !StaticOnly(resolved))
+                {
+                    diagnostics.Error("SL0302", written.Span,
+                        $"struct '{type.Name}' cannot implement '{resolved.Name}', which has " +
+                        "members an object answers; an interface reference is a counted " +
+                        "pointer, and a struct is a plain C value. A struct implements only " +
+                        "an interface whose members are all static");
+                    continue;
+                }
 
                 // A class in the list is the base class, and only the first name
                 // may be one -- which is what makes `: Base, IShape` read the way
@@ -160,15 +168,15 @@ public sealed partial class Binder
 
                 type.Interfaces.Add(interfaceType);
 
-                // Only a class has to supply implementations. An interface
-                // extending another merely widens its own contract.
-                if (classType is not null) toVerify.Add((interfaceType, written.Span));
+                // Only a class or a struct has to supply implementations. An
+                // interface extending another merely widens its own contract.
+                if (!type.IsContract) toVerify.Add((interfaceType, written.Span));
             }
 
             ResolveExplicitMembers(type);
 
             foreach (var (contract, span) in toVerify)
-                VerifyImplements(classType!, contract, span);
+                VerifyImplements(type, contract, span);
         }
 
         // Every class gets a table, base or no base: a class may declare the
@@ -180,6 +188,7 @@ public sealed partial class Binder
 
         _inheritanceInProgress.Remove(type);
         _inheritanceDone.Add(type);
+        RunDeferredConstraintChecks();
     }
 
     /// <summary>
@@ -1185,17 +1194,30 @@ public sealed partial class Binder
                    pair.First.Mode == pair.Second.Mode);
     }
 
+    /// <summary>
+    /// True for an interface whose every member, inherited ones included, is
+    /// static: what a struct may implement, since nothing about it is reached
+    /// through an object.
+    /// </summary>
+    private static bool StaticOnly(TypeSymbol type) =>
+        type is InterfaceTypeSymbol contract &&
+        contract.AllInterfaces().Prepend(contract).All(i => i.Methods.All(m => m.IsStatic));
+
     private void VerifyImplements(
-        ClassTypeSymbol classType, InterfaceTypeSymbol interfaceType, SourceSpan span)
+        NamedTypeSymbol implementer, InterfaceTypeSymbol interfaceType, SourceSpan span)
     {
         // Implementing IList also means implementing IReadOnlyList, and the
         // object needs a dispatch table for each.
         foreach (var inherited in interfaceType.AllInterfaces())
         {
-            if (classType.Interfaces.Contains(inherited)) continue;
-            classType.Interfaces.Add(inherited);
-            VerifyImplements(classType, inherited, span);
+            if (implementer.Interfaces.Contains(inherited)) continue;
+            implementer.Interfaces.Add(inherited);
+            VerifyImplements(implementer, inherited, span);
         }
+
+        VerifyStaticRequirements(implementer, interfaceType, span);
+
+        if (implementer is not ClassTypeSymbol classType) return;
 
         foreach (var required in interfaceType.Methods.Where(m => !m.IsStatic))
         {
@@ -1272,6 +1294,64 @@ public sealed partial class Binder
             {
                 ReportInitMismatch(found, required);
             }
+        }
+    }
+
+    /// <summary>
+    /// Every <c>static abstract</c> member of an interface has a public static
+    /// member of the implementing type with its signature, and every
+    /// <c>static virtual</c> one either has one or falls back on its body.
+    ///
+    /// Nothing is dispatched: a static requirement is reached through a type
+    /// parameter, which instantiation has already replaced with the type, so
+    /// the call names the implementation directly. This is only the promise
+    /// that there is one to name.
+    /// </summary>
+    private void VerifyStaticRequirements(
+        NamedTypeSymbol implementer, InterfaceTypeSymbol interfaceType, SourceSpan span)
+    {
+        var requirements = interfaceType.Methods.Where(m => m.IsStatic && m.IsVirtual)
+            .Concat(interfaceType.Operators.Where(o => o.IsVirtual));
+
+        foreach (var required in requirements)
+        {
+            var wanted = required.ParameterTypes.ToList();
+            var candidates = required.ContainingType!.Operators.Contains(required)
+                ? implementer.Operators.Where(o => o.Name == required.Name)
+                : implementer.FindMethods(required.Name).Where(m => m.IsStatic);
+
+            var found = candidates.FirstOrDefault(m => m.Accepts(wanted));
+            if (found is null)
+            {
+                // A default is what a type that supplies nothing gets.
+                if (required.HasBody) continue;
+
+                // A missing property is one mistake, not two.
+                if (required.Accessor is { Getter: not null } missing &&
+                    required != missing.Getter)
+                    continue;
+
+                diagnostics.Error("SL0305", span,
+                    $"'{implementer.Name}' does not implement static " +
+                    $"'{interfaceType.Name}.{Describe(required)}'; add 'public static " +
+                    $"{(required.Accessor?.Type ?? required.ReturnType).Name} " +
+                    (required.Accessor is { } property
+                        ? $"{property.Name} {{ get; }}'"
+                        : $"{(required.Name.StartsWith("op_", StringComparison.Ordinal) ? "operator" : required.Name)}(" +
+                          string.Join(", ", required.Parameters.Select(p => p.Type.Name + " " + p.Name)) +
+                          ")'"));
+                continue;
+            }
+
+            if (!found.IsPublic)
+                diagnostics.Error("SL0306", found.Span,
+                    $"'{implementer.Name}.{Describe(found)}' implements " +
+                    $"'{interfaceType.Name}.{Describe(required)}' and must therefore be public");
+            else if (!SameSignature(found, required))
+                diagnostics.Error("SL0307", found.Span,
+                    $"'{implementer.Name}.{Describe(found)}' does not match " +
+                    $"'{interfaceType.Name}.{Describe(required)}'; expected " +
+                    $"'{required.ReturnType.Name}'");
         }
     }
 

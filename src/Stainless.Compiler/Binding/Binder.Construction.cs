@@ -778,6 +778,10 @@ public sealed partial class Binder
 
         if (parts.Count == 1)
         {
+            // A type parameter, in a body bound for one instantiation, is the
+            // type it was given: `T.Zero` is `Money.Zero`.
+            if (_substitution.TryGetValue(parts[0], out var argument)) return argument;
+
             if (module.Types.TryGetValue(parts[0], out var local)) return local;
 
             if (Enclosing() is { } within &&

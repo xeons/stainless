@@ -1788,10 +1788,12 @@ public sealed class Parser
         // An operator always gives a value back, so its arrow is a getter's.
         var body = At(TokenKind.OpenBrace) ? ParseBlock() : ParseArrowBodyOrNull(isGetter: true);
 
+        // An interface's `static abstract` one is the one with none.
         if (body is null)
         {
             Expect(TokenKind.Semicolon);
-            _diagnostics.Error("SL0559", SpanFrom(start), "an operator needs a body");
+            if (!modifiers.HasFlag(Modifiers.Abstract))
+                _diagnostics.Error("SL0559", SpanFrom(start), "an operator needs a body");
         }
 
         return new FunctionDeclSyntax(

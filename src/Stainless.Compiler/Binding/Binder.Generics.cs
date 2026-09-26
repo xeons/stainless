@@ -182,7 +182,7 @@ public sealed partial class Binder
         // those of the file asking for this instantiation.
         _currentScope = template.Scope;
 
-        VerifyConstraints(declaration.Constraints, template.Parameters, substitution,
+        VerifyConstraintsOnceSettled(declaration.Constraints, template.Parameters, substitution,
             template.Scope, $"'{template.Name}'", span);
 
         // Attributes come from the template, because pass 6 only walks types it
@@ -363,7 +363,7 @@ public sealed partial class Binder
 
         var declaration = template.Declaration;
 
-        VerifyConstraints(declaration.Constraints, template.Parameters, substitution,
+        VerifyConstraintsOnceSettled(declaration.Constraints, template.Parameters, substitution,
             template.Scope, $"'{template.Name}'", span);
 
         var symbol = new FunctionSymbol
@@ -418,6 +418,63 @@ public sealed partial class Binder
     /// offending type -- rather than a Rust-style contract the body is checked
     /// against. See docs/spec/04-generics.md for what that means in practice.
     /// </summary>
+    /// <summary>
+    /// Constraint checks asked for before every type knew what it implements.
+    ///
+    /// A class may name an instantiation in its own base list --
+    /// <c>class Money : IAdditive&lt;Money&gt;</c> where the interface asks
+    /// <c>where TSelf : IAdditive&lt;TSelf&gt;</c> -- or in a field's type,
+    /// declared before pass 5 has read a single base list. Asked then, the
+    /// answer is no, and it is the wrong answer.
+    /// </summary>
+    private readonly List<Action> _deferredConstraintChecks = [];
+
+    /// <summary>True once pass 5 has settled what every source type implements.</summary>
+    private bool _interfacesResolved;
+
+    private void VerifyConstraintsOnceSettled(
+        IReadOnlyList<WhereClauseSyntax> clauses,
+        IReadOnlyList<string> parameters,
+        Dictionary<string, TypeSymbol> substitution,
+        FileScope scope,
+        string owner,
+        SourceSpan span)
+    {
+        if (_interfacesResolved && _inheritanceInProgress.Count == 0)
+        {
+            VerifyConstraints(clauses, parameters, substitution, scope, owner, span);
+            return;
+        }
+
+        _deferredConstraintChecks.Add(() =>
+        {
+            var previous = _substitution;
+            _substitution = substitution;
+            try
+            {
+                VerifyConstraints(clauses, parameters, substitution, scope, owner, span);
+            }
+            finally
+            {
+                _substitution = previous;
+            }
+        });
+    }
+
+    /// <summary>Runs what was put off, once nothing is half-settled.</summary>
+    private void RunDeferredConstraintChecks()
+    {
+        if (!_interfacesResolved || _inheritanceInProgress.Count > 0) return;
+
+        // A check may instantiate something that defers another.
+        while (_deferredConstraintChecks.Count > 0)
+        {
+            var pending = _deferredConstraintChecks.ToList();
+            _deferredConstraintChecks.Clear();
+            foreach (var check in pending) check();
+        }
+    }
+
     /// <param name="checkedWhereDeclared">
     /// False for a local function, whose clauses
     /// <see cref="CheckConstraintDeclarations"/> does not reach, so what it
@@ -670,6 +727,7 @@ public sealed partial class Binder
         ClassTypeSymbol implementer =>
             implementer.AllInterfaces().Contains(required) ||
             SatisfiesIntrinsically(argument, required),
+        StructTypeSymbol implementer when implementer.AllInterfaces().Contains(required) => true,
         InterfaceTypeSymbol self => self.Equals(required) || self.AllInterfaces().Contains(required),
         _ => SatisfiesIntrinsically(argument, required),
     };

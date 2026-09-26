@@ -292,6 +292,8 @@ public sealed partial class Binder(
         ResolveImports();           // pass 3: every module can see its imports
         DeclareMembers();           // pass 4: every signature and field type is resolved
         ResolveInterfaces();        // pass 5: every class satisfies what it claims
+        _interfacesResolved = true;
+        RunDeferredConstraintChecks();
         CheckConstraintDeclarations();
                                     //         and every 'where' clause could be met
         ResolveAttributes();        // pass 6: attributes fold to constants

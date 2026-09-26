@@ -203,6 +203,68 @@ word is an assertion no compiler can check. Written in a `where` clause it is an
 error — there a library author has asked for it in their own signature, which is
 a different thing from a compiler guessing.
 
+### 4.3.1 `static abstract` — a promise about the type
+
+An interface may say what a **type** has, not only what an object can do. A
+`static abstract` member is one every implementing type must supply, as a
+public static member of the same signature; a `static virtual` one may be
+supplied, and a type that supplies none gets its body. C# 11 calls this
+generic math, and the shape is the same:
+
+```csharp
+public interface IAdditive<TSelf> where TSelf : IAdditive<TSelf>
+{
+    static abstract TSelf Zero { get; }
+    static abstract TSelf operator +(TSelf a, TSelf b);
+    static virtual TSelf Twice(TSelf x) => x + x;
+}
+
+public struct Money : IAdditive<Money>
+{
+    public long Cents;
+    public Money(long cents) => Cents = cents;
+    public static Money Zero => new Money(0);
+    public static Money operator +(Money a, Money b) => new Money(a.Cents + b.Cents);
+}
+
+T Sum<T>(T[] items) where T : IAdditive<T>
+{
+    T total = T.Zero;
+    foreach (var item in items)
+        total = total + item;
+    return total;
+}
+```
+
+**Monomorphization makes this free.** C# needs the runtime to find `T.Zero`
+for whatever `T` a shared body is running for. Here there is no shared body:
+`Sum<Money>` is bound with `T` replaced by `Money`, so `T.Zero` is
+`Money.Zero`, a direct call, and `total + item` is `Money`'s operator,
+resolved exactly as it would be written out. What the interface adds is the
+promise, checked where `Money` says it implements `IAdditive<Money>` (SL0305),
+and the default a `static virtual` member falls back on — found by `T.Twice`
+when `Money` declares no `Twice` of its own.
+
+**A struct may implement such an interface** when every member of it is
+static, since nothing about one is reached through a reference. An interface
+with an instance member is still refused to a struct (SL0302), for the reason
+[§2.10](02-types.md#210-interface--a-contract-dispatched-dynamically) gives.
+
+**Reached through a type parameter, not through the interface** (SL0797),
+which is C#'s rule: `IAdditive<Money>.Zero` names a requirement, and the
+interface is not one of the types that meets it. A plain `static` member with a
+body is the interface's own function and is named through it,
+`IAdditive<Money>.Describe()`. A static member with no body has to say it is a
+requirement by being `abstract` (SL0574). An operator on an interface is
+`static abstract` or `static virtual` (SL0560); one operand is the interface's
+own type argument, since that is the implementing type.
+
+**One place this is wider than C#.** A `static virtual` operator's body is
+found for any operand whose type implements the interface and declares no
+operator of that name — not only for an operand typed by a type parameter.
+Binding sees a monomorphized body, where `T` is already `Money`, and so cannot
+tell the two apart.
+
 ## 4.4 What is and is not supported
 
 Supported: generic classes, generic interfaces (including implementing them,

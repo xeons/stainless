@@ -1435,6 +1435,11 @@ public sealed partial class Binder
     /// <summary>
     /// The operators of that name on either operand's type, without repeating
     /// one when both operands are the same type.
+    ///
+    /// A type that declares none of that name falls back on a
+    /// <c>static virtual</c> operator's body in an interface it implements.
+    /// An interface's <c>static abstract</c> operator is never a candidate: it
+    /// has no body, and is a promise about the types that do.
     /// </summary>
     private static List<FunctionSymbol> OperatorsNamed(string name, TypeSymbol left, TypeSymbol right)
     {
@@ -1444,8 +1449,17 @@ public sealed partial class Binder
         {
             if (type is not NamedTypeSymbol named) continue;
 
-            foreach (var candidate in named.Operators)
-                if (candidate.Name == name && !found.Contains(candidate))
+            var own = named.Operators
+                .Where(o => o.Name == name && !(o.ContainingType is { IsContract: true } && !o.HasBody))
+                .ToList();
+            if (own.Count == 0)
+                own = named.AllInterfaces()
+                    .SelectMany(i => i.Operators)
+                    .Where(o => o.Name == name && o.IsVirtual && o.HasBody)
+                    .ToList();
+
+            foreach (var candidate in own)
+                if (!found.Contains(candidate))
                     found.Add(candidate);
         }
 

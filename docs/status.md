@@ -472,7 +472,11 @@ last person to edit it -- the suite is the authority.
   different slots. One interface may overload a method too, each overload a
   slot of its own. A member may have a default body, and a member may be
   written under its interface's name -- `void IShape.Draw()` -- to fill that
-  slot alone; two defaults meet by C#'s most-specific rule
+  slot alone; two defaults meet by C#'s most-specific rule. `static abstract`
+  and `static virtual` members, operators among them, are C# 11's generic
+  math: reached through a type parameter as `T.Zero`, and since the body is
+  monomorphized, a direct call to the type's own member. A struct may
+  implement an interface whose members are all static
 - Overloading by parameter type, on methods as well as module-level functions;
   a return type alone does not distinguish two of them
 - `Standard.Collections`: `List<T>`, `Dictionary<TKey, TValue>`, `HashSet<T>`,

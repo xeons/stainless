@@ -117,8 +117,13 @@ public sealed partial class Binder
                     .ToList());
         }
 
+        // On an interface, `static abstract` and `static virtual` say what an
+        // implementing type supplies, which is a different thing from dispatch.
+        bool staticRequirement = isStatic && containingType is { IsContract: true } &&
+                                 !declaration.Modifiers.HasFlag(Modifiers.Override);
+
         if (Dispatchable(declaration.Modifiers) is { } dispatch &&
-            containingType is not ClassTypeSymbol)
+            containingType is not ClassTypeSymbol && !staticRequirement)
             diagnostics.Error("SL0519", declaration.Span,
                 containingType is { IsContract: true }
                     ? $"'{declaration.Name}' is an interface method, so '{dispatch}' says nothing " +
@@ -290,12 +295,30 @@ public sealed partial class Binder
             return;
         }
 
+        // On an interface a static member is one of three things: `abstract`,
+        // which every implementing type supplies; `virtual`, which one may
+        // supply and otherwise gets this body; or a plain function of the
+        // interface's own.
         if (containingType.IsContract)
         {
-            diagnostics.Error("SL0574", declaration.Span,
-                $"'{containingType.Name}' is an interface, so '{declaration.Name}' cannot be " +
-                "'static': an interface promises what an object can do, and a static method " +
-                "has no object. Declare it on a type that implements this");
+            bool isAbstract = declaration.Modifiers.HasFlag(Modifiers.Abstract);
+            bool isVirtual = declaration.Modifiers.HasFlag(Modifiers.Virtual);
+
+            if (isAbstract && declaration.Body is not null)
+                diagnostics.Error("SL0498", declaration.Span,
+                    $"'{declaration.Name}' is abstract, so it cannot have a body; " +
+                    "an implementing type supplies one");
+            else if (!isAbstract && declaration.Body is null)
+                diagnostics.Error("SL0574", declaration.Span,
+                    $"'{containingType.Name}.{declaration.Name}' is static and has no body, so " +
+                    "it has to be 'static abstract': a requirement every implementing type " +
+                    "supplies. A static member with a body is the interface's own, or with " +
+                    "'virtual' a default an implementing type may replace");
+            else if (isAbstract && isVirtual)
+                diagnostics.Error("SL0574", declaration.Span,
+                    $"'{containingType.Name}.{declaration.Name}' cannot be both 'abstract' and " +
+                    "'virtual'; one has no body and the other is one");
+
             return;
         }
 
@@ -346,16 +369,22 @@ public sealed partial class Binder
             return;
         }
 
-        if (containingType.IsContract)
+        // An interface may require an operator of every type implementing it,
+        // or give it one to fall back on, and nothing else: an operator is
+        // chosen from the operand types, so one of the interface's own would
+        // be reached only by an operand typed as the interface.
+        if (containingType.IsContract &&
+            !declaration.Modifiers.HasFlag(Modifiers.Abstract) &&
+            !declaration.Modifiers.HasFlag(Modifiers.Virtual))
         {
             diagnostics.Error("SL0560", declaration.Span,
-                $"'{containingType.Name}' is an interface, and an operator is not dispatched: " +
-                "it is chosen from the operand types where it is written, so an interface has " +
-                "nothing to promise here");
+                $"'{containingType.Name}' is an interface, and an operator is chosen from the " +
+                "operand types where it is written; write it 'static abstract' to require it " +
+                "of every implementing type, or 'static virtual' to give them one");
             return;
         }
 
-        if (!declaration.Modifiers.HasFlag(Modifiers.Public))
+        if (!declaration.Modifiers.HasFlag(Modifiers.Public) && !containingType.IsContract)
             diagnostics.Error("SL0561", declaration.Span,
                 $"operator '{written}' has to be 'public'; an operator only this module could " +
                 "write is a method with an unusual spelling");
@@ -374,8 +403,12 @@ public sealed partial class Binder
                 $"operator '{written}' takes one operand or two, and this declares {count}");
 
         // One operand has to be the type, so that reading `a + b` says where
-        // to look. Without it, a type could give meaning to `int + int`.
-        if (count > 0 && !symbol.Parameters.Any(p => Mentions(p.Type, containingType)))
+        // to look. Without it, a type could give meaning to `int + int`. An
+        // interface's is about the type implementing it, which its own type
+        // argument names: `TSelf operator +(TSelf a, TSelf b)`.
+        if (count > 0 && !symbol.Parameters.Any(p =>
+                Mentions(p.Type, containingType) ||
+                (containingType.IsContract && containingType.TypeArguments.Contains(p.Type))))
             diagnostics.Error("SL0563", declaration.Span,
                 $"operator '{written}' is declared in '{containingType.Name}', so one of its " +
                 "operands has to be one; an operator over other people's types belongs to " +

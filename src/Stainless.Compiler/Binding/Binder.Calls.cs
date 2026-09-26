@@ -88,7 +88,9 @@ public sealed partial class Binder
             ResolveTypePrefix(onType.Target) is { } staticOwner &&
             (staticOwner.FindMethods(onType.Member).ToList() is { Count: > 0 } named2
                  && (named2.Any(m => m.IsStatic) || ResolveModulePrefix(onType.Target) is null)
-             || staticOwner.GenericMethods.Any(m => m.Name == onType.Member)))
+             || staticOwner.GenericMethods.Any(m => m.Name == onType.Member)
+             || (NamesTypeParameter(onType.Target) &&
+                 StaticDefaults(staticOwner, onType.Member).Count > 0)))
             return BindStaticCall(syntax, onType, staticOwner, arguments);
 
         // `receiver.Method(args)`, unless the receiver is really a module path.
@@ -772,6 +774,11 @@ public sealed partial class Binder
     {
         var overloads = type.FindMethods(member.Member).ToList();
 
+        // Through a type parameter, a type that supplies nothing of this name
+        // falls back on its interfaces' `static virtual` bodies.
+        if (!overloads.Any(m => m.IsStatic) && NamesTypeParameter(member.Target))
+            overloads = StaticDefaults(type, member.Member);
+
         // A generic method is a template rather than a method, so it is not
         // among the overloads and has to be looked for where templates live.
         //
@@ -828,6 +835,9 @@ public sealed partial class Binder
             : ResolveOverload(statics, arguments, member.Span, $"{type.Name}.{member.Member}", syntax.Arguments);
 
         if (method is null) return new BoundErrorExpression(syntax.Span);
+
+        if (RefuseStaticRequirement(method, type, member.Span))
+            return new BoundErrorExpression(syntax.Span);
 
         if (!CanReach(method.IsPublic, method.IsProtected, method.ContainingType ?? type))
         {

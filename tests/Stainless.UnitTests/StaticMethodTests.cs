@@ -159,12 +159,22 @@ public class StaticMethodTests
         int Main() { return 0; }
         """));
 
-    /// <summary>An interface promises what an object can do.</summary>
+    /// <summary>
+    /// On an interface a static member with no body is a requirement, and
+    /// says so with <c>abstract</c>.
+    /// </summary>
     [Fact]
-    public void AnInterfaceMemberIsRefused() => Assert.Contains("SL0574", Front.ModuleCodes("""
+    public void ABodilessInterfaceMemberMustBeAbstract() => Assert.Contains("SL0574", Front.ModuleCodes("""
         public interface I { static int Get(); }
         int Main() { return 0; }
         """));
+
+    [Theory]
+    [InlineData("static abstract int Get();")]
+    [InlineData("static virtual int Get() => 1;")]
+    [InlineData("static int Get() => 1;")]
+    public void AnInterfaceMayDeclareStaticMembers(string member) =>
+        Assert.Empty(Front.ModuleCodes("public interface I { " + member + " }"));
 
     /// <summary>
     /// And so a static method cannot be what satisfies an interface, even

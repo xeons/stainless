@@ -169,6 +169,91 @@ public class InterfaceTests
             double Measure(Square square) => square.Area();
             """));
 
+    // ------------------------------------------------------ static members
+
+    private const string Additive = """
+        public interface IAdditive<TSelf> where TSelf : IAdditive<TSelf>
+        {
+            static abstract TSelf Zero { get; }
+            static abstract TSelf operator +(TSelf a, TSelf b);
+            static virtual TSelf Twice(TSelf x) => x + x;
+        }
+
+        """;
+
+    private const string Money = """
+        public struct Money : IAdditive<Money>
+        {
+            public long Cents;
+            public Money(long cents) { Cents = cents; }
+            public static Money Zero => new Money(0);
+            public static Money operator +(Money a, Money b) => new Money(a.Cents + b.Cents);
+        }
+
+        """;
+
+    [Fact]
+    public void AStructMayImplementAStaticOnlyInterface() =>
+        Assert.Empty(Front.ModuleCodes(Additive + Money));
+
+    [Fact]
+    public void AStructMayNotImplementAnInterfaceAnObjectAnswers() =>
+        Assert.Equal(["SL0302"], Front.ModuleCodes(
+            "public interface IShape { double Area(); }\n" +
+            "public struct Flat : IShape { public double Area() => 0.0; }"));
+
+    [Fact]
+    public void AStaticRequirementMustBeSupplied() =>
+        Assert.Contains("SL0305", Front.ModuleCodes(Additive +
+            "public struct Bare : IAdditive<Bare> { }"));
+
+    [Fact]
+    public void AStaticRequirementIsReachedThroughATypeParameter() =>
+        Assert.Empty(Front.ModuleCodes(Additive + Money +
+            """
+            T Start<T>() where T : IAdditive<T> => T.Zero;
+            T Double<T>(T x) where T : IAdditive<T> => T.Twice(x);
+            long Use() => Start<Money>().Cents + Double(new Money(2)).Cents;
+            """));
+
+    [Theory]
+    [InlineData("var zero = IAdditive<Money>.Zero;")]
+    [InlineData("var two = IAdditive<Money>.Twice(new Money(1));")]
+    public void AStaticRequirementIsNotReachedThroughItsInterface(string statement) =>
+        Assert.Equal(["SL0797"], Front.ModuleCodes(Additive + Money +
+            "void Use() { " + statement + " }"));
+
+    /// <summary>
+    /// As in C#: the default belongs to the interface, and a type that does
+    /// not declare the member does not have it.
+    /// </summary>
+    [Fact]
+    public void AStaticDefaultIsNotAMemberOfTheType() =>
+        Assert.NotEmpty(Front.ModuleCodes(Additive + Money +
+            "Money Use() => Money.Twice(new Money(1));"));
+
+    [Fact]
+    public void AnFBoundedInterfaceAcceptsTheClassNamingIt() =>
+        Assert.Empty(Front.ModuleCodes(
+            """
+            public interface ISelf<TSelf> where TSelf : ISelf<TSelf> { TSelf Me(); }
+            public class Node : ISelf<Node> { public Node Me() => this; }
+            """));
+
+    /// <summary>
+    /// A field's type is resolved before any base list is read, and the
+    /// constraint waits for them.
+    /// </summary>
+    [Fact]
+    public void AConstraintOnAFieldTypeWaitsForTheBaseLists() =>
+        Assert.Empty(Front.ModuleCodes(
+            """
+            public interface INamed { String Name(); }
+            public class Box<T> where T : INamed { }
+            public class Holder { public Box<Named>? Kept; }
+            public class Named : INamed { public String Name() => "x"; }
+            """));
+
     // ------------------------------------------------------ covariant returns
 
     private const string Animals = """

@@ -1842,8 +1842,11 @@ reached through the object rather than carried alongside it. So `IShape?`,
 `weak IShape?`, ARC and the calling convention all behave exactly as they do for
 a class, and passing a `IShape` costs the same as passing any reference.
 
-A `struct` cannot implement an interface: an interface reference is counted,
-and a struct is a plain C value with nowhere to keep a count.
+A `struct` cannot implement an interface an object answers: an interface
+reference is counted, and a struct is a plain C value with nowhere to keep a
+count. One whose members are all static it may, because nothing about it is
+reached through a reference
+([§4.3.1](04-generics.md#431-static-abstract--a-promise-about-the-type)).
 
 Dispatch is four constant-offset loads with no search and no branch — see
 [abi.md](../abi.md) for the tables. An interface reference can be asked what it

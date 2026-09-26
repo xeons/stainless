@@ -1,0 +1,14 @@
+15c
+30
+4
+~Meters 0
+~Meters 1.5
+3.5?
+~Meters 3.5
+10
+~Meters 1
+~Meters 10
+18
+additive
+~Meters 1.5
+~Meters 2

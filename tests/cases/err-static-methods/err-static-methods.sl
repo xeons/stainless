@@ -35,7 +35,8 @@ public class Box
 
 public interface IThing
 {
-    // SL0574: an interface promises what an object can do.
+    // SL0574: with no body, a static interface member is a requirement, and
+    // says so with 'abstract'.
     static int Detached();
 }
 
