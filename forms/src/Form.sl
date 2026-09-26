@@ -170,6 +170,11 @@ public class Form : WindowedControl, IWindowNotify
     public bool IsClosed => _isClosed;
 
     int Activation => _activation;
+
+    /// Whether the window has ever been activated. Under a window manager that
+    /// is the manager's decision and arrives some time after `Show`, and the
+    /// keyboard focus waits for it.
+    public bool HasBeenActivated => _activation != 0;
     void MarkActivated(int count) => _activation = count;
 
     /// Centres the window on the work area of the screen it is on.

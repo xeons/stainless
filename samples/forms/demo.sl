@@ -347,6 +347,11 @@ int Main()
         // before anything is measured.
         for (int i = 0; i < 20; i++)
             Application.DoEvents();
+        for (int i = 0; i < 200 && !form.HasBeenActivated; i++)
+        {
+            Standard.Threading.Sleep(10u);
+            Application.DoEvents();
+        }
 
         bool ok = form.SelfTest();
         Console.WriteLine(ok ? "all checks passed" : "checks FAILED");

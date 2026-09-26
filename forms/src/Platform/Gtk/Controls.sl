@@ -466,19 +466,38 @@ public class GtkWindowPeer : GtkContainerPeer, IWindowPeer
 
     public void SetState(WindowState state)
     {
-        if (state == WindowState.Minimized)
+        switch (state)
         {
-            gtk_window_iconify(Widget);
+            case WindowState.Minimized:
+                gtk_window_iconify(Widget);
+                break;
+            case WindowState.Maximized:
+                gtk_window_deiconify(Widget);
+                gtk_window_maximize(Widget);
+                break;
+            default:
+                gtk_window_deiconify(Widget);
+                gtk_window_unmaximize(Widget);
+                break;
         }
-        else if (state == WindowState.Maximized)
+        AwaitState(state);
+    }
+
+    /// Runs the loop until the window manager has done what `SetState` asked,
+    /// for as long as `RequestPatience`. Win32 has changed the state by the
+    /// time `ShowWindow` returns; a window manager answers later, and a window
+    /// still iconified paints nothing. One that is not shown has no manager to
+    /// ask.
+    void AwaitState(WindowState wanted)
+    {
+        if (gtk_widget_get_visible(Widget) == 0 || gtk_widget_get_window(Widget) == null)
+            return;
+        gint64 deadline = g_get_monotonic_time() + RequestPatience * 1000;
+        while (GetState() != wanted && g_get_monotonic_time() < deadline)
         {
-            gtk_window_deiconify(Widget);
-            gtk_window_maximize(Widget);
-        }
-        else
-        {
-            gtk_window_deiconify(Widget);
-            gtk_window_unmaximize(Widget);
+            g_usleep(1000u);
+            while (gtk_events_pending() != 0)
+                gtk_main_iteration_do(0);
         }
     }
 

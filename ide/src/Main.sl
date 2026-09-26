@@ -103,6 +103,11 @@ int Main()
         window.Show();
         for (int i = 0; i < 20; i++)
             Application.DoEvents();
+        for (int i = 0; i < 200 && !window.HasBeenActivated; i++)
+        {
+            Standard.Threading.Sleep(10u);
+            Application.DoEvents();
+        }
         bool ok = window.RunSelfTest();
         Console.WriteLine(ok ? "all checks passed" : "checks FAILED");
         return ok ? 0 : 1;

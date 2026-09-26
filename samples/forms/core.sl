@@ -665,6 +665,11 @@ int Main()
     form.Show();
     for (int i = 0; i < 20; i++)
         Application.DoEvents();
+    for (int i = 0; i < 200 && !form.HasBeenActivated; i++)
+    {
+        Standard.Threading.Sleep(10u);
+        Application.DoEvents();
+    }
     ok = form.SelfTest() && ok;
     ok = form.QuitChecks(ok);
     Console.WriteLine(ok ? "all checks passed" : "checks FAILED");

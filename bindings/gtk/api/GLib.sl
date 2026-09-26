@@ -236,6 +236,12 @@ public extern "C"
                                      gpointer data, GDestroyNotify notify);
 
     gboolean g_source_remove(guint tag);
+
+    /// Microseconds on a clock that never goes back.
+    gint64 g_get_monotonic_time();
+
+    /// Blocks the calling thread for `microseconds`.
+    void g_usleep(gulong microseconds);
 }
 
 // ================================================================== logging
