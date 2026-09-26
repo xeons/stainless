@@ -940,8 +940,15 @@ that reads the property is ordered after it. A get-only one is written by its
 type's static constructor and nowhere else.
 
 **A static constructor** is `static Name() { }` inside `class Name`. It runs
-once, before `Main`, after every static field's initializer — which is C#'s
+once, before `Main`, after its own type's field initializers — which is C#'s
 order, and the only one that lets the block arrange the fields it is there for.
+**A type is set up as a unit**: anything that reads one of its statics — an
+initializer in another type, a module-level static, another type's static
+constructor — runs after that type's initializers *and* its static
+constructor, so it sees what the block arranged. The units are ordered by the
+same dependency sort the initializers are, and two blocks that each read the
+other's type are a cycle (SL0378). A static's initializer inside a type names
+the type's other statics, constants and static methods bare, as its methods do.
 
 C# runs one *lazily*, before the type is first used, behind a guard checked on
 every static access; that guard must become atomic the moment threads exist.

@@ -177,7 +177,7 @@ public sealed partial class Binder
                 _boundStatics.Add(symbol);
 
                 _currentScope = scope;
-                _currentFunction = null;
+                _currentFunction = StaticInitializerContext(symbol);
                 _substitution = substitution;
 
                 BindStatic(symbol, declaration, scope);
@@ -197,6 +197,27 @@ public sealed partial class Binder
         _currentScope = null;
         _substitution = previousSubstitution;
     }
+
+    /// <summary>
+    /// What a static on a type is initialized inside: a static function of that
+    /// type, so its initializer names the type's other statics, constants and
+    /// static methods without the type in front, as its methods do. Null at
+    /// module level, where there is nothing enclosing.
+    /// </summary>
+    private FunctionSymbol? StaticInitializerContext(StaticSymbol symbol) =>
+        symbol.ContainingType is not { } type
+            ? null
+            : new FunctionSymbol
+            {
+                Name = symbol.DisplayName,
+                ModuleName = symbol.ModuleName,
+                ReturnType = symbol.Type,
+                Linkage = LinkageKind.Stainless,
+                ContainingType = type,
+                IsStatic = true,
+                Span = symbol.Span,
+                Scope = _currentScope,
+            };
 
     /// <summary>
     /// One static's value: what its initializer says, or what <c>[Embed]</c>
@@ -286,7 +307,11 @@ public sealed partial class Binder
         foreach (var (symbol, _) in _staticSyntax)
             CollectStaticDependencies(symbol, symbol.Initializer);
 
-        _staticOrder = SortStatics();
+        _initialization = SortInitialization();
+        _staticOrder = _initialization
+            .Select(step => step.Static)
+            .OfType<StaticSymbol>()
+            .ToList();
 
         // Storage that crosses to C is emitted whether or not it had an
         // initializer to sort: an imported one has none by definition, and the
@@ -308,8 +333,10 @@ public sealed partial class Binder
     /// first use" becomes "before Main". A program that can tell those apart is
     /// timing its own startup.
     ///
-    /// It runs after every static field's initializer, which is C#'s order too,
-    /// and among themselves they run in declaration order.
+    /// It runs after its own type's field initializers, which is C#'s order
+    /// too, and before anything that reads one of that type's statics: an
+    /// initializer elsewhere, or another type's block. A type is set up as a
+    /// unit, and the units are sorted as the initializers are.
     /// </summary>
     private void DeclareStaticConstructor(
         FileScope scope, NamedTypeSymbol type, StaticConstructorDeclSyntax declaration)
@@ -352,35 +379,87 @@ public sealed partial class Binder
     }
 
     /// <summary>
-    /// Orders the statics so that nothing runs before what it reads. A cycle is
-    /// reported here rather than left to produce a zero at run time.
+    /// Orders the initializers and static constructors so that nothing runs
+    /// before what it reads. A cycle is reported here rather than left to
+    /// produce a zero at run time.
     /// </summary>
-    private List<StaticSymbol> SortStatics()
+    private List<StaticInitialization> SortInitialization()
     {
-        var ordered = new List<StaticSymbol>();
-        var done = new HashSet<StaticSymbol>();
-        var onStack = new HashSet<StaticSymbol>();
+        var ordered = new List<StaticInitialization>();
+        var done = new HashSet<object>();
+        var onStack = new HashSet<object>();
 
-        void Visit(StaticSymbol symbol)
-        {
-            if (done.Contains(symbol)) return;
-
-            if (!onStack.Add(symbol))
+        var constructorReads = _functions
+            .Where(f => f.Symbol.Kind == FunctionKind.StaticConstructor)
+            .ToDictionary(f => f.Symbol, f =>
             {
-                diagnostics.Error("SL0378", symbol.Span,
-                    $"the initializer of '{symbol.QualifiedName.TrimEnd('$')}' depends on " +
-                    "itself, directly or through another static; there is no order that would " +
-                    "give it a value before it is read");
+                var walker = new StaticReferenceWalker();
+                walker.Visit(f.Body);
+                return walker.Found;
+            });
+
+        // A static in a type with a static constructor is read after that
+        // constructor, unless it is read from the same type -- whose own
+        // initializers run first.
+        IEnumerable<object> Reading(StaticSymbol read, NamedTypeSymbol? from)
+        {
+            yield return read;
+            if (read.ContainingType is { StaticConstructor: { } setup } owner && owner != from)
+                yield return setup;
+        }
+
+        IEnumerable<object> DependenciesOf(object node)
+        {
+            if (node is StaticSymbol symbol)
+            {
+                foreach (var dependency in symbol.DependsOn)
+                foreach (var needed in Reading(dependency, symbol.ContainingType))
+                    yield return needed;
+                yield break;
+            }
+
+            var constructor = (FunctionSymbol)node;
+            var type = constructor.ContainingType!;
+
+            foreach (var own in type.Statics) yield return own;
+
+            foreach (var read in constructorReads.GetValueOrDefault(constructor) ?? [])
+                if (read.ContainingType != type)
+                    foreach (var needed in Reading(read, type))
+                        yield return needed;
+        }
+
+        void Visit(object node)
+        {
+            if (done.Contains(node)) return;
+
+            if (!onStack.Add(node))
+            {
+                if (node is StaticSymbol symbol)
+                    diagnostics.Error("SL0378", symbol.Span,
+                        $"the initializer of '{symbol.QualifiedName.TrimEnd('$')}' depends on " +
+                        "itself, directly or through another static; there is no order that would " +
+                        "give it a value before it is read");
+                else if (node is FunctionSymbol constructor)
+                    diagnostics.Error("SL0378", constructor.Span,
+                        $"the static constructor of '{constructor.ContainingType!.Name}' reads a " +
+                        "static that, directly or through another, needs this type set up first; " +
+                        "there is no order that would run both");
                 return;
             }
 
-            foreach (var dependency in symbol.DependsOn) Visit(dependency);
+            foreach (var dependency in DependenciesOf(node)) Visit(dependency);
 
-            onStack.Remove(symbol);
-            if (done.Add(symbol)) ordered.Add(symbol);
+            onStack.Remove(node);
+            if (!done.Add(node)) return;
+
+            ordered.Add(node is StaticSymbol initialized
+                ? new StaticInitialization(initialized, null)
+                : new StaticInitialization(null, (FunctionSymbol)node));
         }
 
         foreach (var symbol in _staticSyntax.Keys) Visit(symbol);
+        foreach (var constructor in _staticConstructors) Visit(constructor);
         return ordered;
     }
 }

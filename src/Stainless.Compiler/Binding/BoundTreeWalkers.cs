@@ -24,6 +24,31 @@ internal sealed class StaticReferenceWalker
 {
     public HashSet<StaticSymbol> Found { get; } = [];
 
+    /// <summary>A static constructor's body, statement by statement.</summary>
+    public void Visit(BoundStatement? statement)
+    {
+        switch (statement)
+        {
+            case null: return;
+
+            case BoundBlock block:
+                foreach (var inner in block.Statements) Visit(inner);
+                break;
+
+            case BoundLocalDeclaration declaration: Visit(declaration.Initializer); break;
+            case BoundExpressionStatement expression: Visit(expression.Expression); break;
+            case BoundDeconstruct taken: Visit(taken.Expression); break;
+            case BoundIf branch: Visit(branch.Condition); Visit(branch.Then); Visit(branch.Else); break;
+            case BoundWhile loop: Visit(loop.Condition); Visit(loop.Body); break;
+
+            case BoundFor loop:
+                Visit(loop.Initializer); Visit(loop.Condition); Visit(loop.Step); Visit(loop.Body);
+                break;
+
+            case BoundReturn returned: Visit(returned.Value); break;
+        }
+    }
+
     public void Visit(BoundExpression? expression)
     {
         switch (expression)

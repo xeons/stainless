@@ -51,11 +51,15 @@ public sealed class BoundProgram
     /// <summary>Module-level storage, in the order its initializers must run.</summary>
     public required IReadOnlyList<StaticSymbol> Statics { get; init; }
 
-    /// <summary>
-    /// The <c>static Name() { }</c> blocks, in declaration order, to run after
-    /// every static field has its value.
-    /// </summary>
+    /// <summary>The <c>static Name() { }</c> blocks.</summary>
     public required IReadOnlyList<FunctionSymbol> StaticConstructors { get; init; }
+
+    /// <summary>
+    /// Everything that runs before <c>Main</c>, in order: each static's
+    /// initializer and each type's static constructor, a type's constructor
+    /// after its own initializers and before anything that reads its statics.
+    /// </summary>
+    public required IReadOnlyList<StaticInitialization> Initialization { get; init; }
 
     /// <summary>
     /// Every file an <c>embed</c> carries into the binary, one per distinct
@@ -66,6 +70,9 @@ public sealed class BoundProgram
     /// </summary>
     public IReadOnlyList<EmbeddedFile> Embeds { get; init; } = [];
 }
+
+/// <summary>One step before <c>Main</c>: a static's initializer, or a type's static constructor.</summary>
+public sealed record StaticInitialization(StaticSymbol? Static, FunctionSymbol? Constructor);
 
 /// <summary>
 /// Turns parsed files into a typed program.
@@ -183,6 +190,7 @@ public sealed partial class Binder(
     /// </summary>
     private readonly HashSet<StaticSymbol> _boundStatics = [];
     private List<StaticSymbol> _staticOrder = [];
+    private List<StaticInitialization> _initialization = [];
 
     /// <summary>
     /// Module-level storage that crosses to C. Kept apart because the ordering
@@ -350,6 +358,7 @@ public sealed partial class Binder(
             EntryPoint = requireEntryPoint ? FindEntryPoint() : null,
             Statics = _staticOrder,
             StaticConstructors = _staticConstructors,
+            Initialization = _initialization,
             Embeds = _embeds.Values.OrderBy(e => e.Index).ToList(),
         };
     }

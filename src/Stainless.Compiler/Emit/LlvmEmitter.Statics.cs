@@ -125,8 +125,8 @@ public sealed partial class LlvmEmitter
     }
 
     /// <summary>
-    /// Runs every static initializer, in the order the binder worked out, then
-    /// every <c>static Name() { }</c> block in declaration order.
+    /// Runs every static initializer and every <c>static Name() { }</c> block,
+    /// in the order the binder worked out.
     ///
     /// There is no lazy guard and no once-flag: the whole program was compiled
     /// together, so the dependency graph was known and sorted at compile time.
@@ -147,8 +147,15 @@ public sealed partial class LlvmEmitter
 
         PushScope();
 
-        foreach (var symbol in program.Statics)
+        foreach (var step in program.Initialization)
         {
+            if (step.Constructor is { } setup)
+            {
+                Line($"call void {Symbol(setup)}()");
+                continue;
+            }
+
+            var symbol = step.Static!;
             if (symbol.Initializer is null) continue;
 
             // Already on the global, written by `StaticStorage`. Storing it
@@ -194,12 +201,6 @@ public sealed partial class LlvmEmitter
             ReleaseCurrentScope();
             PopScopeWithoutRelease();
         }
-
-        // Then the `static Name() { }` blocks, after every field has its
-        // value -- which is C#'s order, and the only one that makes a block
-        // able to read the fields it is there to arrange.
-        foreach (var initializer in program.StaticConstructors)
-            Line($"call void {Symbol(initializer)}()");
 
         // And the undoing, registered here rather than called from the entry
         // point so that a program which calls exit() is torn down too.

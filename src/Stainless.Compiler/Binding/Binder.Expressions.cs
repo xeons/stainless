@@ -773,6 +773,25 @@ public sealed partial class Binder
     /// holds the reference directly; a struct method holds a pointer to the value,
     /// so it is dereferenced back into an lvalue here.
     /// </summary>
+    /// <summary>
+    /// The type whose statics and constants a bare name may mean: the current
+    /// function's, or inside a lambda the one the lambda was written in, since
+    /// the lambda's own is the class it was made into.
+    /// </summary>
+    private NamedTypeSymbol? EnclosingType
+    {
+        get
+        {
+            var function = _currentFunction;
+            for (int i = _closures.Count - 1;
+                 i >= 0 && function is not null && ReferenceEquals(function.ContainingType, _closures[i].Type);
+                 i--)
+                function = _closures[i].OuterFunction;
+
+            return function?.ContainingType;
+        }
+    }
+
     private static BoundExpression Receiver(SourceSpan span, ParameterSymbol parameter)
     {
         var self = new BoundThis(span, parameter.Type, parameter);
@@ -1020,14 +1039,13 @@ public sealed partial class Binder
             // A constant the enclosing type declares, named without the type
             // in front of it -- which is how it reads inside its own methods,
             // and what C# does with the same declaration.
-            if (_currentFunction?.ContainingType?.FindConstant(name) is { } ownConstant)
+            if (EnclosingType?.FindConstant(name) is { } ownConstant)
                 return new BoundConstantAccess(syntax.Span, ownConstant);
 
-            if (_currentFunction?.ContainingType?.FindStatic(name) is { } ownStatic)
+            if (EnclosingType?.FindStatic(name) is { } ownStatic)
                 return new BoundStaticAccess(syntax.Span, ownStatic);
 
-            if (_currentFunction?.ContainingType?.FindProperty(name) is
-                    { Getter.IsStatic: true } ownStaticProperty)
+            if (EnclosingType?.FindProperty(name) is { Getter.IsStatic: true } ownStaticProperty)
                 return BindPropertyRead(syntax.Span, receiver: null, ownStaticProperty);
 
             // An unqualified member name inside a method means `this.member`.
