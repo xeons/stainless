@@ -72,6 +72,12 @@ error[SL0493]: 'log_line' cannot be variadic; '...' may only be written on an
 arguments with. Take an array, a slice, or a count and a pointer
 ```
 
+**What a `...` takes has a type of its own.** A lambda, a function's name, an
+array literal and a case constructor each take their type from the parameter
+they are given to, and `...` declares none, so passing one is refused (SL0805)
+rather than guessed at. The extra arguments are positional, as C's are, and
+naming one after them is SL0601.
+
 **`"C"` and `"C++"` are the conventions there are.** The string is checked, and
 anything else is rejected:
 

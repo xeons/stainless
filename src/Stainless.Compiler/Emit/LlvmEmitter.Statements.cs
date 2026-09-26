@@ -320,7 +320,7 @@ public sealed partial class LlvmEmitter
     private string LabelBlock(LabelSymbol label)
     {
         if (_labelBlocks.TryGetValue(label, out string? existing)) return existing;
-        return _labelBlocks[label] = NextLabel("label." + label.Name);
+        return _labelBlocks[label] = NextLabel("label." + Mangler.SymbolSafe(label.Name));
     }
 
     private readonly Dictionary<LabelSymbol, string> _labelBlocks = [];

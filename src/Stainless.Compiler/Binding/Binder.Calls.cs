@@ -1388,6 +1388,14 @@ public sealed partial class Binder
             : value;
     }
 
+    private static string DescribeUnsettled(TypeSymbol unsettled) => unsettled switch
+    {
+        LambdaType => "a lambda",
+        FunctionGroupType => "a function's name",
+        ArrayDraftType => "an array literal",
+        _ => "a case of a variant",
+    };
+
     /// <summary>C's default argument promotions: float widens to double, small ints to int.</summary>
     private BoundExpression PromoteVariadic(BoundExpression argument)
     {
@@ -1400,6 +1408,17 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0265", argument.Span,
                 "cannot pass 'void' to a C variadic function; 'void' is the absence of a value");
+            return new BoundErrorExpression(argument.Span);
+        }
+
+        // A lambda, a function's name, an array literal and a case take their
+        // type from a parameter, and '...' declares none.
+        if (argument.Type is LambdaType or FunctionGroupType or ArrayDraftType or VariantDraftType)
+        {
+            diagnostics.Error("SL0805", argument.Span,
+                $"cannot pass {DescribeUnsettled(argument.Type)} to a C variadic function; it takes its " +
+                "type from the parameter it is given to, and '...' declares none. Convert it " +
+                "to the type the function expects first");
             return new BoundErrorExpression(argument.Span);
         }
 
@@ -1947,7 +1966,14 @@ public sealed partial class Binder
                     return null;
                 }
 
-                if (i >= parameters.Count) return null;
+                if (i >= parameters.Count)
+                {
+                    why = isVariadic
+                        ? "the arguments a '...' takes are positional, so none may be named"
+                        : "it is given more arguments than it has parameters";
+                    return null;
+                }
+
                 order[i] = i;
                 continue;
             }
@@ -2091,11 +2117,21 @@ public sealed partial class Binder
                         return null;
                     }
 
+                    int reported = diagnostics.ErrorCount;
+
                     if (CheckArity(name, parameters, arguments.Count, only.IsVariadic, span))
                         for (int i = 0; i < parameters.Count; i++)
                             if (map is not null && map[i] >= 0 &&
                                 !ArgumentFits(arguments[map[i]], parameters[i]))
                                 ReportArgumentMode(name, i, arguments[map[i]], parameters[i]);
+
+                    // The call is refused either way, so it MUST say why -- unless a
+                    // parameter's type did not resolve, which was said where it was
+                    // written.
+                    if (diagnostics.ErrorCount == reported && !diagnostics.IsMuted &&
+                        !parameters.Any(p => p.Type.IsError()))
+                        diagnostics.Error("SL0263", span,
+                            $"no overload of '{name}' accepts these {arguments.Count} argument(s)");
                     return null;
                 }
 

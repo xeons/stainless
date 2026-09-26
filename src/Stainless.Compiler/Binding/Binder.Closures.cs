@@ -1177,10 +1177,21 @@ public sealed partial class Binder
         {
             // An expression body returns, unless the target returns nothing.
             var value = BindExpression(syntax.Expression!);
-            BoundStatement statement = symbol.ReturnType.IsVoid()
-                ? new BoundExpressionStatement(syntax.Expression!.Span, value)
-                : new BoundReturn(syntax.Expression!.Span,
-                    BindConversion(value, symbol.ReturnType, syntax.Expression!.Span));
+            var span = syntax.Expression!.Span;
+            BoundStatement statement;
+
+            if (!symbol.ReturnType.IsVoid())
+            {
+                statement = new BoundReturn(span, BindConversion(value, symbol.ReturnType, span));
+            }
+            else if (RefuseUntyped(value))
+            {
+                statement = new BoundExpressionStatement(span, new BoundErrorExpression(value.Span));
+            }
+            else
+            {
+                statement = Discarding(value, span);
+            }
 
             body = new BoundBlock(syntax.Span, [statement]);
         }

@@ -1676,18 +1676,27 @@ public sealed partial class Binder
             diagnostics.Warning("SL0222", syntax.Span,
                 "this expression has no effect; its result is discarded");
 
-        // A value with no type of its own is never made. What it was built
-        // from is evaluated for its effects, and nothing else is.
+        return Discarding(expression, syntax.Span);
+    }
+
+    /// <summary>
+    /// A statement that evaluates an expression and drops its value.
+    ///
+    /// A value with no type of its own is never made. What it was built from is
+    /// evaluated for its effects, and nothing else is.
+    /// </summary>
+    private BoundStatement Discarding(BoundExpression expression, SourceSpan span)
+    {
         if (expression.Type is LambdaType or FunctionGroupType or ArrayDraftType
             or VariantDraftType or NullType)
         {
             var parts = new List<BoundExpression>();
             CollectDraftParts(expression, parts);
-            return new BoundBlock(syntax.Span,
+            return new BoundBlock(span,
                 [.. parts.Select(part => new BoundExpressionStatement(part.Span, part))]);
         }
 
-        return new BoundExpressionStatement(syntax.Span, expression);
+        return new BoundExpressionStatement(span, expression);
     }
 
     /// <summary>The parts of an unsettled value that do have a type, in the order they were written.</summary>

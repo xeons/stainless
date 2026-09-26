@@ -1156,4 +1156,18 @@ public class BinderTests
         Assert.Equal(["SL0222"], Front.Codes(diagnostics));
         Front.Verified(new Stainless.Emit.LlvmEmitter(forSharedLibrary: true).Emit(program));
     }
+
+    /// <summary>The body of a lambda whose target returns nothing drops an unsettled value the same way.</summary>
+    [Theory]
+    [InlineData("() => (int x) => x")]
+    [InlineData("() => [1, 2]")]
+    public void AnUnsettledLambdaBodyIsDropped(string lambda) =>
+        Assert.Contains("define", Front.ModuleIr(
+            "public closure void Act();\nvoid F() { Act act = " + lambda + "; act(); }"));
+
+    /// <summary>A label's name is the program's, and a block name MUST be one LLVM reads.</summary>
+    [Fact]
+    public void ALabelNamedOutsideAsciiIsABlockLlvmReads() =>
+        Assert.Contains("label.caf_u00E9", Front.ModuleIr(
+            "void F(int n) { café: n++; if (n < 3) goto café; }"));
 }
