@@ -1411,7 +1411,8 @@ public sealed partial class Binder
 
     // ------------------------------------------------------------ scopes
 
-    private void PushScope() => _context.Locals.Add(new Dictionary<string, LocalSymbol>(StringComparer.Ordinal));
+    private void PushScope() =>
+        _context.Locals.Add(new Dictionary<string, LocalSymbol>(StringComparer.Ordinal));
     private void PopScope() => _context.Locals.RemoveAt(_context.Locals.Count - 1);
 
     private LocalSymbol? LookupLocal(string name)
@@ -1425,7 +1426,8 @@ public sealed partial class Binder
     {
         var local = new LocalSymbol(name, type, isConst);
         if (LookupLocal(name) is not null ||
-            _context.LocalFunctionScopes.Count > 0 && _context.LocalFunctionScopes[^1].ContainsKey(name))
+            _context.LocalFunctionScopes.Count > 0 &&
+            _context.LocalFunctionScopes[^1].ContainsKey(name))
             diagnostics.Error("SL0218", span, $"'{name}' is already declared in this scope");
         else if (_context.Function?.Parameters.Any(p => p.Name == name) == true)
             diagnostics.Error("SL0219", span, $"'{name}' is already the name of a parameter");

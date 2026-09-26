@@ -1420,7 +1420,10 @@ public sealed partial class Binder
                         : $"{(required.Name.StartsWith("op_", StringComparison.Ordinal) ? "operator" : required.Name)}(" +
                           string.Join(", ", required.Parameters.Select(p => p.Type.Name + " " + p.Name)) +
                           ")'"),
-                    [implementer, interfaceType, required.Accessor?.Type, .. SignatureTypes(required)]);
+                    [
+                        implementer, interfaceType, required.Accessor?.Type,
+                        .. SignatureTypes(required),
+                    ]);
                 continue;
             }
 

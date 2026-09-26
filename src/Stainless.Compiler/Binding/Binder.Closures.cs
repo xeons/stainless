@@ -176,7 +176,9 @@ public sealed partial class Binder
         switch (target)
         {
             case BoundFieldAccess field: Remember(_membersWritten, field.Field); break;
-            case BoundCall { Function.Accessor: { } property }: Remember(_membersWritten, property); break;
+            case BoundCall { Function.Accessor: { } property }:
+                Remember(_membersWritten, property);
+                break;
         }
     }
 
@@ -436,7 +438,8 @@ public sealed partial class Binder
         if (closure.WeakThis && outer.Type is NamedTypeSymbol { IsReferenceType: true } referenced)
         {
             var weakField = new FieldSymbol(
-                ThisCaptureName, referenced.MakeWeakType(), closure.Type, closure.Type.Fields.Count);
+                ThisCaptureName, referenced.MakeWeakType(), closure.Type,
+                closure.Type.Fields.Count);
             AddCapture(closure, ThisCaptureName, weakField, new BoundConversion(
                 span, weakField.Type, outer, ConversionKind.ReferenceToWeak));
 
@@ -457,7 +460,8 @@ public sealed partial class Binder
     /// A field of the closure holding what <paramref name="value"/> read where
     /// the lambda was made. A discarded trial takes it back.
     /// </summary>
-    private void AddCapture(ClosureContext closure, string name, FieldSymbol field, BoundExpression value)
+    private void AddCapture(
+        ClosureContext closure, string name, FieldSymbol field, BoundExpression value)
     {
         var fields = closure.Type!.Fields;
         fields.Add(field);
@@ -816,7 +820,8 @@ public sealed partial class Binder
 
         var bound = BindConversion(BindExpression(written), type, written.Span);
         bool constant = !bound.Type.IsError() && IsConstantDefault(bound);
-        if (!diagnostics.IsMuted) Remember(_lambdaDefaults, (parameter, type), constant ? bound : null);
+        if (!diagnostics.IsMuted)
+            Remember(_lambdaDefaults, (parameter, type), constant ? bound : null);
 
         if (bound.Type.IsError()) return null;
         if (constant) return bound;
@@ -1534,7 +1539,8 @@ public sealed partial class Binder
 
         // A block-bodied lambda whose result is being worked out: what each
         // return gives back is the evidence, and nothing is converted yet.
-        if (_context.InferringReturnsOf is not null && ReferenceEquals(_context.Function, _context.InferringReturnsOf))
+        if (_context.InferringReturnsOf is not null &&
+            ReferenceEquals(_context.Function, _context.InferringReturnsOf))
         {
             var found = syntax.Value is null ? null : BindExpression(syntax.Value);
             _context.ReturnsFound.Add(found);

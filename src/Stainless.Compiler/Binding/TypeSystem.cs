@@ -75,7 +75,8 @@ public abstract class TypeSymbol : Source.IDiagnosticSubject
     internal ArrayTypeSymbol? ArraySlot;
     internal OptionalTypeSymbol? OptionalSlot;
     internal WeakTypeSymbol? WeakSlot;
-    internal System.Collections.Concurrent.ConcurrentDictionary<int, FixedArrayTypeSymbol>? FixedArraySlots;
+    internal System.Collections.Concurrent.ConcurrentDictionary<int, FixedArrayTypeSymbol>?
+        FixedArraySlots;
 
     /// <summary><c>T*</c>: the one pointer to this type.</summary>
     public PointerTypeSymbol MakePointerType() => PointerTypeSymbol.Of(this);
@@ -90,7 +91,8 @@ public abstract class TypeSymbol : Source.IDiagnosticSubject
     public WeakTypeSymbol MakeWeakType() => WeakTypeSymbol.Of(this);
 
     /// <summary><c>T[N]</c>: the one inline array of this type and length.</summary>
-    public FixedArrayTypeSymbol MakeFixedArrayType(int length) => FixedArrayTypeSymbol.Of(this, length);
+    public FixedArrayTypeSymbol MakeFixedArrayType(int length) =>
+        FixedArrayTypeSymbol.Of(this, length);
 
     /// <summary>
     /// The slot's value, made on first use. Compared and exchanged because the
@@ -957,7 +959,8 @@ public sealed class ClosureTypeSymbol : StructTypeSymbol
     {
         // The function first, so that the word at offset zero is the thing a
         // debugger and a reader both look for.
-        Function = new FieldSymbol(FunctionFieldName, PrimitiveTypeSymbol.Byte.MakePointerType(), this, 0);
+        Function = new FieldSymbol(
+            FunctionFieldName, PrimitiveTypeSymbol.Byte.MakePointerType(), this, 0);
 
         // The receiver second, and counted: this is the field that makes a
         // closure keep its object alive, and it does so through the ordinary

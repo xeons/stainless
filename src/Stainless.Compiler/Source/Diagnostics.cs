@@ -224,7 +224,7 @@ public sealed class DiagnosticBag
     private readonly List<Diagnostic> _items = [];
     public IReadOnlyList<Diagnostic> Items => _items;
 
-    /// <summary>How many of <see cref="Items"/> are errors, kept as they are added and removed.</summary>
+    /// <summary>How many of <see cref="Items"/> are errors, counted as they come and go.</summary>
     private int _errors;
 
     public bool HasErrors => _errors > 0;
@@ -312,7 +312,9 @@ public sealed class DiagnosticBag
     /// What the message names. One that stands for an error already reported
     /// makes this a consequence of that error, and it is not said.
     /// </param>
-    public void Error(string code, SourceSpan span, string message, params ReadOnlySpan<IDiagnosticSubject?> about)
+    public void Error(
+        string code, SourceSpan span, string message,
+        params ReadOnlySpan<IDiagnosticSubject?> about)
     {
         Fresh(code);
         if (IsConsequence(about)) return;
@@ -322,7 +324,9 @@ public sealed class DiagnosticBag
     }
 
     /// <inheritdoc cref="Error"/>
-    public void Warning(string code, SourceSpan span, string message, params ReadOnlySpan<IDiagnosticSubject?> about)
+    public void Warning(
+        string code, SourceSpan span, string message,
+        params ReadOnlySpan<IDiagnosticSubject?> about)
     {
         Fresh(code);
         if (IsConsequence(about)) return;

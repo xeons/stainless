@@ -151,7 +151,9 @@ public sealed partial class Binder
 
         // The function whose object a body here would mean by `this`: past any
         // lambda, to the function the outermost one was written in.
-        var user = _context.Closures.Count > 0 ? _context.Closures[0].OuterFunction : _context.Function;
+        var user = _context.Closures.Count > 0
+            ? _context.Closures[0].OuterFunction
+            : _context.Function;
         var parent = user is null ? null : _localFunctionOf.GetValueOrDefault(user);
 
         var local = new LocalFunction
@@ -172,7 +174,8 @@ public sealed partial class Binder
             local.Template = new GenericFunctionTemplate(declaration.Name, _context.File!, declaration)
             {
                 ContainingType = local.Owner,
-                OuterSubstitution = new Dictionary<string, TypeSymbol>(_context.Substitution, StringComparer.Ordinal),
+                OuterSubstitution = new Dictionary<string, TypeSymbol>(
+                    _context.Substitution, StringComparer.Ordinal),
                 Local = local,
             };
         }
@@ -550,7 +553,8 @@ public sealed partial class Binder
         }
 
         if (_context.Closures.Count > 0 &&
-            CaptureFrom(_context.Closures.Count - 1, name, span, variablesOnly: true) is BoundFieldAccess field &&
+            CaptureFrom(_context.Closures.Count - 1, name, span, variablesOnly: true)
+                is BoundFieldAccess field &&
             _captureOrigins.TryGetValue(field.Field, out var origin) &&
             (expected is null || ReferenceEquals(origin, expected)))
             return (field, origin);

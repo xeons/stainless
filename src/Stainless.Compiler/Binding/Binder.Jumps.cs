@@ -109,7 +109,8 @@ public sealed partial class Binder
         label.FirstUse ??= syntax.LabelSpan;
 
         var jump = new BoundGoto(syntax.Span, label);
-        _context.Jumps.Jumps.Add(new Jump(jump, $"goto {syntax.Label}", [.. _context.Locals], _context.Jumps.ParallelBase));
+        _context.Jumps.Jumps.Add(new Jump(
+            jump, $"goto {syntax.Label}", [.. _context.Locals], _context.Jumps.ParallelBase));
         return jump;
     }
 

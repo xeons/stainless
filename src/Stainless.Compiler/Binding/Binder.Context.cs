@@ -34,11 +34,15 @@ public sealed partial class Binder
     {
         public FunctionSymbol? Function { get; set; }
 
-        /// <summary>The file being bound. Imports are per-file, so this is the unit of lookup.</summary>
+        /// <summary>
+        /// The file being bound. Imports are per-file, so this is the unit of
+        /// lookup.
+        /// </summary>
         public FileScope? File { get; set; }
 
         /// <summary>The type arguments in force while binding inside an instantiation.</summary>
-        public Dictionary<string, TypeSymbol> Substitution { get; set; } = new(StringComparer.Ordinal);
+        public Dictionary<string, TypeSymbol> Substitution { get; set; } =
+            new(StringComparer.Ordinal);
 
         /// <summary>The locals in scope, innermost block last.</summary>
         public List<Dictionary<string, LocalSymbol>> Locals { get; init; } = [];
@@ -81,7 +85,7 @@ public sealed partial class Binder
         /// <summary>The lambdas being bound, outermost first.</summary>
         public List<ClosureContext> Closures { get; init; } = [];
 
-        /// <summary>The local functions in scope, innermost last. Not cleared by a lambda.</summary>
+        /// <summary>The local functions in scope, innermost last; a lambda sees them too.</summary>
         public List<Dictionary<string, LocalFunction>> LocalFunctionScopes { get; set; } = [];
 
         /// <summary>
@@ -96,7 +100,7 @@ public sealed partial class Binder
         /// </summary>
         public FunctionSymbol? InferringReturnsOf { get; set; }
 
-        /// <summary>What each <c>return</c> in that function gave back; null for a bare one.</summary>
+        /// <summary>What each <c>return</c> there gave back; null for a bare one.</summary>
         public List<BoundExpression?> ReturnsFound { get; set; } = [];
 
         /// <summary>

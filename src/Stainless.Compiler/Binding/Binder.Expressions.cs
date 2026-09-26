@@ -731,7 +731,8 @@ public sealed partial class Binder
         // generated closure also has a `this`, and letting the keyword mean
         // that one silently rebound the programmer's word to a type they never
         // wrote.
-        if (_context.Closures.Count > 0) return CaptureThis(_context.Closures.Count - 1, syntax.Span);
+        if (_context.Closures.Count > 0)
+            return CaptureThis(_context.Closures.Count - 1, syntax.Span);
 
         ReportReachingTheObject(syntax.Span);
 
@@ -794,7 +795,8 @@ public sealed partial class Binder
         {
             var function = _context.Function;
             for (int i = _context.Closures.Count - 1;
-                 i >= 0 && function is not null && ReferenceEquals(function.ContainingType, _context.Closures[i].Type);
+                 i >= 0 && function is not null &&
+                 ReferenceEquals(function.ContainingType, _context.Closures[i].Type);
                  i--)
                 function = _context.Closures[i].OuterFunction;
 
@@ -1046,7 +1048,8 @@ public sealed partial class Binder
             if (LookupLocal(name) is { } local)
                 return Narrowed(new BoundLocalAccess(syntax.Span, local), local);
 
-            if (_context.Function?.Parameters.FirstOrDefault(p => p.Name == name && !p.IsThis) is { } parameter)
+            if (_context.Function?.Parameters.FirstOrDefault(p => p.Name == name && !p.IsThis)
+                is { } parameter)
                 return Narrowed(new BoundParameterAccess(syntax.Span, parameter), parameter);
 
             // A variable of the function around a local function: one of the
@@ -1914,8 +1917,10 @@ public sealed partial class Binder
         if (left.Type.Equals(right.Type)) return left.Type;
 
         // `flag ? obj : null` is an optional, which is what the null was reaching for.
-        if (left is BoundNullLiteral && right.Type.IsReferenceType) return right.Type.MakeOptionalType();
-        if (right is BoundNullLiteral && left.Type.IsReferenceType) return left.Type.MakeOptionalType();
+        if (left is BoundNullLiteral && right.Type.IsReferenceType)
+            return right.Type.MakeOptionalType();
+        if (right is BoundNullLiteral && left.Type.IsReferenceType)
+            return left.Type.MakeOptionalType();
 
         if (left.Type is PrimitiveTypeSymbol { IsNumeric: true } leftNumber &&
             right.Type is PrimitiveTypeSymbol { IsNumeric: true } rightNumber &&

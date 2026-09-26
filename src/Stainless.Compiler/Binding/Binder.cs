@@ -104,7 +104,7 @@ public sealed partial class Binder(
     private readonly List<StructTypeSymbol> _structs = [];
 
 
-    /// <summary>Every array type something asked for, by element, each needing a TypeInfo.</summary>
+    /// <summary>Every array type asked for, by element; each needs a TypeInfo.</summary>
     private readonly Dictionary<TypeSymbol, ArrayTypeSymbol> _arrays = [];
     private readonly Dictionary<TypeSymbol, SliceTypeSymbol> _slices = [];
 
@@ -126,7 +126,8 @@ public sealed partial class Binder(
     /// Bodies to be bound, with the substitution they belong to, in the order
     /// they were asked for. Those before <see cref="_pendingBound"/> have been.
     /// </summary>
-    private readonly List<(FunctionSymbol Function, Dictionary<string, TypeSymbol> Substitution)> _pending = [];
+    private readonly List<(FunctionSymbol Function, Dictionary<string, TypeSymbol> Substitution)>
+        _pending = [];
     private int _pendingBound;
 
     private int PendingCount => _pending.Count - _pendingBound;

@@ -812,8 +812,12 @@ public sealed class ModuleSymbol(string name)
     public List<GenericFunctionTemplate> GenericFunctions { get; } = [];
     public List<FunctionSymbol> Functions { get; } = [];
 
-    /// <summary>The module-level functions in <see cref="Functions"/>, by name, as far as it has been read.</summary>
-    private readonly Dictionary<string, FunctionSymbol[]> _functionsByName = new(StringComparer.Ordinal);
+    /// <summary>
+    /// The module-level functions in <see cref="Functions"/>, by name, as far
+    /// as it has been read.
+    /// </summary>
+    private readonly Dictionary<string, FunctionSymbol[]> _functionsByName =
+        new(StringComparer.Ordinal);
     private int _functionsIndexed;
 
     public Dictionary<string, AliasSymbol> Aliases { get; } = new(StringComparer.Ordinal);
@@ -832,9 +836,10 @@ public sealed class ModuleSymbol(string name)
             var function = Functions[_functionsIndexed];
             if (function.ContainingType is not null) continue;
 
-            _functionsByName[function.Name] = _functionsByName.TryGetValue(function.Name, out var known)
-                ? [.. known, function]
-                : [function];
+            _functionsByName[function.Name] =
+                _functionsByName.TryGetValue(function.Name, out var known)
+                    ? [.. known, function]
+                    : [function];
         }
 
         return _functionsByName.TryGetValue(name, out var found) ? found : [];
@@ -862,7 +867,10 @@ public sealed class FileScope(ModuleSymbol module)
     /// <summary>Modules reachable from this file, keyed by the name used to reach them.</summary>
     public IReadOnlyDictionary<string, ModuleSymbol> Imports => _imports;
 
-    /// <summary>Makes <paramref name="imported"/> reachable from this file as <paramref name="name"/>.</summary>
+    /// <summary>
+    /// Makes <paramref name="imported"/> reachable from this file as
+    /// <paramref name="name"/>.
+    /// </summary>
     public void Import(string name, ModuleSymbol imported)
     {
         _imports[name] = imported;

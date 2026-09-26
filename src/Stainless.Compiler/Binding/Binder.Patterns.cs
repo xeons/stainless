@@ -434,7 +434,8 @@ public sealed partial class Binder
     /// </summary>
     private bool LooksLikeType(NameSyntax name)
     {
-        var resolved = ResolveTypeQuietly(new NamedTypeSyntax(name.Span, name.Name), _context.File!);
+        var resolved = ResolveTypeQuietly(
+            new NamedTypeSyntax(name.Span, name.Name), _context.File!);
         return resolved is NamedTypeSymbol { IsReferenceType: true };
     }
 
@@ -937,7 +938,8 @@ public sealed partial class Binder
 
             diagnostics.Error("SL0247", member.PathSpan,
                 $"case '{matched.Name}' carries no '{name}'; it carries " +
-                (matched.Fields.Count == 0 ? "nothing" : matched.Signature));
+                (matched.Fields.Count == 0 ? "nothing" : matched.Signature),
+                [.. matched.Fields.Select(f => f.Type)]);
             return null;
         }
 

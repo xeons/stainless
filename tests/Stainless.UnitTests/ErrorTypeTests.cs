@@ -353,6 +353,18 @@ public class ErrorTypeTests
             [Embed("logo.bin", Section = ".embedded_logo")] static byte[rsp ] Logo;
         }
         """)]
+    [InlineData("SL0247", """
+
+        module Bad; variant Shape
+        {
+            Shape(double Radius);
+            Rect(doubl Width, double Height);
+        }
+        double WrongCase(Shape shape)
+        {
+            if (shape.Circle);
+        }
+        """)]
     public void AConsequenceIsNotReported(string code, string source)
     {
         Front.Bind(source, out var diagnostics);

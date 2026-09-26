@@ -793,7 +793,7 @@ public sealed partial class Binder
             diagnostics.Error("SL0247", syntax.Span,
                 $"'{variant.Name}' has no case or field named '{syntax.Member}'; its cases are " +
                 Listed(variant.Cases.Select(c => c.Signature)),
-                variant);
+                [variant, .. variant.Cases.SelectMany(c => c.Fields.Select(f => f.Type))]);
             return new BoundErrorExpression(syntax.Span);
         }
 

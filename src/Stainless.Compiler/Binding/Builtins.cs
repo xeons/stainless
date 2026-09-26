@@ -253,7 +253,8 @@ public sealed class Builtins
     private static readonly SourceText BuiltinSource = new("<builtin>", "");
     private static readonly SourceSpan BuiltinSpan = new(BuiltinSource, 0, 0);
 
-    private static readonly PointerTypeSymbol BytePointer = PrimitiveTypeSymbol.Byte.MakePointerType();
+    private static readonly PointerTypeSymbol BytePointer =
+        PrimitiveTypeSymbol.Byte.MakePointerType();
     /// <summary>
     /// <c>char16*</c>: what a wide platform API takes and writes into.
     ///
@@ -261,7 +262,8 @@ public sealed class Builtins
     /// what the units were, and so accepted any 16-bit pointer that happened to
     /// be in reach.
     /// </summary>
-    private static readonly PointerTypeSymbol Char16Pointer = PrimitiveTypeSymbol.Char16.MakePointerType();
+    private static readonly PointerTypeSymbol Char16Pointer =
+        PrimitiveTypeSymbol.Char16.MakePointerType();
 
     public Builtins()
     {

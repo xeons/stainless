@@ -82,7 +82,8 @@ public sealed partial class Binder
         public override int GetHashCode()
         {
             var hash = new HashCode();
-            foreach (var type in Types) hash.Add(System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(type));
+            foreach (var type in Types)
+                hash.Add(System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(type));
             return hash.ToHashCode();
         }
     }
@@ -246,7 +247,8 @@ public sealed partial class Binder
 
         // A template is bound with the imports of the file that declared it, not
         // those of the file asking for this instantiation.
-        using var entered = Enter(_context with { Substitution = substitution, File = template.Scope });
+        using var entered =
+            Enter(_context with { Substitution = substitution, File = template.Scope });
 
         VerifyConstraintsOnceSettled(declaration.Constraints, template.Parameters, substitution,
             template.Scope, $"'{template.Name}'", span);
@@ -420,7 +422,8 @@ public sealed partial class Binder
             VerifyConstraintsOnceSettled(declaration.Constraints, template.Parameters, substitution,
                 template.Scope, $"'{template.Name}'", span);
 
-            bool dispatchedByClass = template.IsDispatched && template.ContainingType is ClassTypeSymbol;
+            bool dispatchedByClass =
+                template.IsDispatched && template.ContainingType is ClassTypeSymbol;
 
             symbol = new FunctionSymbol
             {
@@ -428,7 +431,9 @@ public sealed partial class Binder
                 ModuleName = template.Module.Name,
                 ReturnType = ResolveType(declaration.ReturnType, template.Scope, allowVoid: true),
                 Linkage = LinkageKind.Stainless,
-                Kind = template.ContainingType is null ? FunctionKind.Function : FunctionKind.Method,
+                Kind = template.ContainingType is null
+                    ? FunctionKind.Function
+                    : FunctionKind.Method,
                 ContainingType = template.ContainingType,
                 IsPublic = template.IsPublic,
                 // Only a member is static; the word on a module function was

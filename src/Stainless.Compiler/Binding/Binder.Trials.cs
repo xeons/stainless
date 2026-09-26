@@ -85,7 +85,8 @@ public sealed partial class Binder
         return new TrialScope(this, _trial, quiet ? diagnostics.Muted() : null);
     }
 
-    private sealed class TrialScope(Binder binder, Trial trial, DiagnosticBag.Mute? mute) : IDisposable
+    private sealed class TrialScope(Binder binder, Trial trial, DiagnosticBag.Mute? mute)
+        : IDisposable
     {
         private bool _accepted;
         private bool _ended;
@@ -132,7 +133,8 @@ public sealed partial class Binder
         _structs.RemoveRange(trial.Structs, _structs.Count - trial.Structs);
         _functions.RemoveRange(trial.Functions, _functions.Count - trial.Functions);
         _pending.RemoveRange(trial.Pending, _pending.Count - trial.Pending);
-        _memberCaptures.RemoveRange(trial.MemberCaptures, _memberCaptures.Count - trial.MemberCaptures);
+        _memberCaptures.RemoveRange(
+            trial.MemberCaptures, _memberCaptures.Count - trial.MemberCaptures);
         _closureCount = trial.ClosureCount;
     }
 
@@ -152,7 +154,10 @@ public sealed partial class Binder
             UndoOnDiscard(() => table.Remove(key));
     }
 
-    /// <summary>A set member that a discarded trial takes back. False when it was one already.</summary>
+    /// <summary>
+    /// A set member that a discarded trial takes back. False when it was one
+    /// already.
+    /// </summary>
     private bool Remember<T>(HashSet<T> set, T item)
     {
         if (!set.Add(item)) return false;
@@ -199,7 +204,8 @@ public sealed partial class Binder
     /// A written type, with nothing about it reported: the real resolution,
     /// wherever it is, says what is wrong with it.
     /// </summary>
-    private TypeSymbol ResolveTypeQuietly(TypeSyntax syntax, FileScope scope, bool allowVoid = false)
+    private TypeSymbol ResolveTypeQuietly(
+        TypeSyntax syntax, FileScope scope, bool allowVoid = false)
     {
         using var trial = BeginTrial();
         var resolved = ResolveType(syntax, scope, allowVoid);

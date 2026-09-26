@@ -655,7 +655,7 @@ public sealed partial class Binder
         // why far better than SL0327 would.
         if (failedAtLambda is not null)
         {
-            var failedLambdas = new List<(LambdaSyntax Lambda, IReadOnlyList<TypeSymbol> Parameters)>();
+            var failedLambdas = new List<(LambdaSyntax, IReadOnlyList<TypeSymbol>)>();
             InferTemplateArguments(failedAtLambda, given, arguments, failedLambdas);
 
             int before = diagnostics.ErrorCount;
