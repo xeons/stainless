@@ -53,6 +53,14 @@ public sealed partial class Binder
         {
             var bound = written is SpreadElementSyntax spread ? BindSpread(spread) : BindExpression(written);
             failed |= bound.Type.IsError();
+
+            if (bound.Type.IsVoid())
+            {
+                diagnostics.Error("SL0310", bound.Span,
+                    "there is no array of 'void'; an element has to be a value, and this produces none");
+                failed = true;
+            }
+
             elements.Add(bound);
         }
 

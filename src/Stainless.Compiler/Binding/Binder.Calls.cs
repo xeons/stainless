@@ -1394,6 +1394,15 @@ public sealed partial class Binder
         if (RefuseUntyped(argument))
             return new BoundErrorExpression(argument.Span);
 
+        // Nothing declares what a variadic argument must be, so nothing else
+        // would notice there is no value to pass.
+        if (argument.Type.IsVoid())
+        {
+            diagnostics.Error("SL0265", argument.Span,
+                "cannot pass 'void' to a C variadic function; 'void' is the absence of a value");
+            return new BoundErrorExpression(argument.Span);
+        }
+
         // A C variadic function has no declared parameter type to convert
         // against, so the String-to-bytes decision has to be made here instead.
         if (argument is BoundStringLiteral)
