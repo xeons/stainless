@@ -1,0 +1,20 @@
+shape = circle    no
+circle = shape    no
+circle == same    yes
+circle != other   yes
+as base, same     yes
+as base, other    no
+hash agrees       yes
+circle = ring     no
+ring = ring       yes
+ring = other ring no
+scaled 30 30 u
+copy is a circle  yes
+copy 7 x
+original 1
+two   1 x
+three 1 x true
+keys 2 circle shape
+generic same      yes
+generic base      no
+generic copy 6 five

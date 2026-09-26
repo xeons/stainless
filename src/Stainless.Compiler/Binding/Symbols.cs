@@ -372,7 +372,10 @@ public sealed class FunctionSymbol
     // generated. The same two methods arriving from a referenced library
     // are external declarations, and the library has the code.
     public bool HasBody =>
-        Body is not null || IsAutoAccessor || (Event is not null && !IsExternal);
+        Body is not null || IsAutoAccessor || IsRecordClone || (Event is not null && !IsExternal);
+
+    /// <summary>A record's <c>$Clone</c>, whose body is generated as bound nodes.</summary>
+    public bool IsRecordClone { get; init; }
 
     public override string ToString() =>
         $"{ReturnType.Name} {(ContainingType is null ? "" : ContainingType.Name + ".")}{Name}" +

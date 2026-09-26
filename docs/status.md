@@ -129,11 +129,12 @@ last person to edit it -- the suite is the authority.
   gets `Equals`, `GetHashCode`, `==`, `!=` and the `IEquatable`/`IHashable` those
   satisfy -- so a record is a dictionary key with nothing said, which is most
   of what the form is for. `point with { Y = 9 }` makes a changed copy,
-  evaluating its target once; it may also name a settable property of the
-  record's own, and one it does not name is carried over. `: Base(Id)` after
-  the parameters passes them on to a base class's constructor. A record does
-  not derive from another record: the `Equals` each generates would hide the
-  other's. There is no generated `ToString`, because the
+  evaluating its target once, through a dispatched clone, so a derived record
+  reached as its base is copied whole; it may also name a settable property.
+  `: Base(Id)` after the parameters passes them on to a base class's
+  constructor, and a record may derive from a record: equality then also
+  asks that the two are the same type, as C#'s does, and a plain class may
+  not derive from a record (SL0804). There is no generated `ToString`, because the
   language has none for any type, and no `record struct`, because what makes a
   record a key is the two interfaces it declares and a struct implements none
 - Single inheritance, the C# model: `virtual`, `override`, `abstract`,

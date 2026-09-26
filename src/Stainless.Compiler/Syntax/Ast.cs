@@ -731,10 +731,15 @@ public sealed record TypeDeclSyntax(
     ///
     /// The members they stand for are generated in the parser, so by binding
     /// time a record is a class like any other -- except to <c>with</c>, which
-    /// has to know the constructor's parameters correspond to readable
-    /// properties of the same names. This is what tells it.
+    /// has to know which names the record was declared with.
     /// </summary>
     public IReadOnlyList<string> RecordParameters { get; init; } = [];
+
+    /// <summary>
+    /// The record as written, for the binder to complete again if its base is a
+    /// record; null for every other declaration.
+    /// </summary>
+    public RecordSource? Record { get; init; }
 
     /// <summary>
     /// A class or struct's primary constructor parameters, in scope through

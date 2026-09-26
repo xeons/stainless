@@ -446,6 +446,18 @@ public sealed partial class Binder
             return;
         }
 
+        // A record's equality and its copy are over exactly its type, and a
+        // class deriving from one would be compared and copied as the record.
+        if (baseClass.RecordParameters.Count > 0 && classType.RecordParameters.Count == 0)
+        {
+            diagnostics.Error("SL0804", span,
+                $"'{baseClass.Name}' is a record, and only a record may derive from one: " +
+                $"'{classType.Name}' would be compared and copied by 'with' as a " +
+                $"'{baseClass.Name}', losing what it adds. Declare it a record with the " +
+                "base's parameters and its own");
+            return;
+        }
+
         if (baseClass.IsIntrinsic || baseClass.RuntimeFactory is not null)
         {
             diagnostics.Error("SL0513", span,
@@ -497,6 +509,8 @@ public sealed partial class Binder
     {
         if (classType.BaseClass is { } inheritedFrom)
             classType.VirtualTable.AddRange(inheritedFrom.VirtualTable);
+
+        if (declaration.Record is not null) DeclareRecordClone(classType);
 
         ResolveGenericOverrides(classType, declaration);
 

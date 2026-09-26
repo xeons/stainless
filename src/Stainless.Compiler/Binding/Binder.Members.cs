@@ -461,11 +461,17 @@ public sealed partial class Binder
         return (int)width;
     }
 
-    private void DeclareTypeMembers(
+    /// <summary>
+    /// Declares a type's members, and answers with the declaration they were
+    /// declared from: a record whose base is a record is completed again, in
+    /// the derived form, here where its base can be looked up.
+    /// </summary>
+    private TypeDeclSyntax DeclareTypeMembers(
         FileScope scope, TypeDeclSyntax declaration, NamedTypeSymbol type)
     {
         var module = scope.Module;
         var classType = type as ClassTypeSymbol;
+        declaration = CompleteDerivedRecord(scope, declaration, type);
 
         var enclosing = _declaringType;
 
@@ -481,6 +487,35 @@ public sealed partial class Binder
         {
             _declaringType = enclosing;
         }
+
+        return declaration;
+    }
+
+    /// <summary>Each record declaration whose base is a record, completed in the derived form.</summary>
+    private readonly Dictionary<TypeDeclSyntax, TypeDeclSyntax> _derivedRecords = [];
+
+    private TypeDeclSyntax CompleteDerivedRecord(
+        FileScope scope, TypeDeclSyntax declaration, NamedTypeSymbol type)
+    {
+        if (declaration.Record is not { } source || declaration.Implements.Count == 0)
+            return declaration;
+
+        if (!_derivedRecords.TryGetValue(declaration, out var completed))
+        {
+            TypeSymbol written;
+            using (diagnostics.Muted()) written = ResolveType(declaration.Implements[0], scope);
+
+            completed = written is ClassTypeSymbol { RecordParameters.Count: > 0 } baseRecord
+                ? Records.Complete(source, declaration.Implements[0], baseRecord.RecordParameters)
+                : declaration;
+            _derivedRecords[declaration] = completed;
+        }
+
+        // Every later pass reads the declaration from here.
+        if (_typeSyntax.TryGetValue(type, out var entry) && ReferenceEquals(entry.Declaration, declaration))
+            _typeSyntax[type] = (completed, entry.Scope);
+
+        return completed;
     }
 
     private void DeclareMembersOf(

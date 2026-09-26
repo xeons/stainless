@@ -560,21 +560,18 @@ public sealed partial class Binder
     }
 
     /// <summary>
-    /// <c>point with { Y = 5 }</c>: the record's constructor, called with the
-    /// values that were named and the ones that were not carried over.
+    /// <c>point with { Y = 5 }</c>: a copy of the record, made by its
+    /// <c>$Clone</c>, with the named properties written through their setters.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// The target is held in a <see cref="BoundLet"/> and read from there. It
-    /// is named once per field the caller did not give a value for, and
-    /// <c>Compute() with { X = 1 }</c> must call <c>Compute</c> once however
-    /// many fields the record has.
+    /// The copy is dispatched, as C#'s is, so a derived record reached through
+    /// its base comes back whole rather than as the base, and a value its base
+    /// computed from a parameter is copied rather than computed again.
     /// </para>
     /// <para>
-    /// This is the one part of records that could not be done in the parser.
-    /// Everything else a record generates is a member somebody could have
-    /// written; this needs a temporary, and there is nowhere in an expression
-    /// to put a statement.
+    /// The target is held in a <see cref="BoundLet"/>, so <c>Compute() with
+    /// { X = 1 }</c> calls <c>Compute</c> once.
     /// </para>
     /// </remarks>
     private BoundExpression BindWith(WithSyntax syntax)
@@ -582,7 +579,8 @@ public sealed partial class Binder
         var target = BindExpression(syntax.Target);
         if (target.Type.IsError()) return new BoundErrorExpression(syntax.Span);
 
-        if (target.Type is not ClassTypeSymbol { RecordParameters.Count: > 0 } record)
+        if (target.Type is not ClassTypeSymbol { RecordParameters.Count: > 0 } record ||
+            RecordClone(record) is not { } clone)
         {
             diagnostics.Error("SL0735", syntax.Span,
                 $"'with' makes a copy of a record with some of it changed, and " +
@@ -591,20 +589,16 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
-        // Which parameter each name stands for, so that a misspelling is
-        // caught here rather than becoming an argument in the wrong position.
-        // A name that is no parameter may be a property with a setter, 'init'
-        // or not, which is written after the construction.
-        var given = new Dictionary<string, BoundExpression>(StringComparer.Ordinal);
+        // A positional parameter is a property with an init setter, and any
+        // other property with a setter, init or not, may be named too.
+        var given = new HashSet<string>(StringComparer.Ordinal);
         var written = new List<(PropertySymbol Property, BoundExpression Value, SourceSpan Span)>();
 
         foreach (var assignment in syntax.Assignments)
         {
-            bool positional =
-                record.RecordParameters.Contains(assignment.Name, StringComparer.Ordinal);
-            var property = positional ? null : record.FindProperty(assignment.Name);
+            var property = record.FindProperty(assignment.Name);
 
-            if (!positional && property is not { Setter: not null, IsIndexer: false })
+            if (property is not { Setter: not null, IsIndexer: false })
             {
                 diagnostics.Error("SL0736", assignment.Span,
                     $"'{record.Name}' has no parameter or settable property named " +
@@ -613,7 +607,9 @@ public sealed partial class Binder
                 continue;
             }
 
-            if (property is { Setter: { } setter } &&
+            bool positional =
+                record.RecordParameters.Contains(assignment.Name, StringComparer.Ordinal);
+            if (!positional && property.Setter is { } setter &&
                 !CanReach(setter.IsPublic, setter.IsProtected, property.ContainingType))
             {
                 diagnostics.Error("SL0249", assignment.Span,
@@ -622,7 +618,7 @@ public sealed partial class Binder
             }
 
             var value = BindExpression(assignment.Value);
-            if (!given.TryAdd(assignment.Name, value))
+            if (!given.Add(assignment.Name))
             {
                 diagnostics.Error("SL0737", assignment.Span,
                     $"'{assignment.Name}' is given a value twice here, and the second would " +
@@ -630,85 +626,34 @@ public sealed partial class Binder
                 continue;
             }
 
-            if (property is not null)
-                written.Add((property, BindConversion(value, property.Type, assignment.Value.Span),
-                             assignment.Span));
+            written.Add((property, BindConversion(value, property.Type, assignment.Value.Span),
+                         assignment.Span));
         }
 
         if (diagnostics.HasErrors) return new BoundErrorExpression(syntax.Span);
 
-        // Held once, and read from for every field the caller left alone.
         var held = new LocalSymbol(SyntheticName("changed"), record, isConst: false);
+        BoundExpression copied = new BoundCall(
+            syntax.Span, clone, new BoundLocalAccess(syntax.Span, held), []);
 
-        var arguments = new List<BoundExpression>(record.RecordParameters.Count);
-        foreach (string name in record.RecordParameters)
-        {
-            if (given.TryGetValue(name, out var value))
-            {
-                arguments.Add(value);
-                continue;
-            }
+        // The clone is the target's own type or one derived from it, so this
+        // narrows nothing that needs asking.
+        if (!ReferenceEquals(clone.ReturnType, record))
+            copied = new BoundConversion(syntax.Span, record, copied, ConversionKind.PointerCast);
 
-            if (record.FindProperty(name) is not { } property)
-            {
-                diagnostics.Error("SL0735", syntax.Span,
-                    $"'{record.Name}.{name}' cannot be read, so 'with' has nothing to carry " +
-                    "over for it");
-                return new BoundErrorExpression(syntax.Span);
-            }
+        if (written.Count == 0)
+            return new BoundLet(syntax.Span, held, target, copied);
 
-            arguments.Add(BindPropertyRead(
-                syntax.Target.Span, new BoundLocalAccess(syntax.Target.Span, held), property));
-        }
-
-        var chosen = ResolveOverload(
-            record.Constructors, arguments, syntax.Span, record.Name);
-        if (chosen is null) return new BoundErrorExpression(syntax.Span);
-
-        var creation = new BoundNew(syntax.Span, record, chosen, arguments);
-        var carried = CarriedStorage(record, given.Keys);
-        if (carried.Count == 0 && written.Count == 0)
-            return new BoundLet(syntax.Span, held, target, creation);
-
-        // A writable property the constructor does not take keeps its value,
-        // copied storage to storage as C#'s clone would, so no setter runs
-        // for a value that is not changing. The named ones go through theirs.
         var made = new LocalSymbol(SyntheticName("made"), record, isConst: true);
-        var old = new BoundLocalAccess(syntax.Span, held);
         var copy = new BoundLocalAccess(syntax.Span, made);
 
-        var steps = new List<BoundExpression>();
-        foreach (var storage in carried)
-            steps.Add(new BoundAssignment(syntax.Span,
-                new BoundFieldAccess(syntax.Span, copy, storage),
-                new BoundFieldAccess(syntax.Span, old, storage)));
-
-        foreach (var (property, value, span) in written)
-            steps.Add(new BoundPropertyAssignment(span, copy, property, value));
+        var steps = written
+            .Select(BoundExpression (w) => new BoundPropertyAssignment(w.Span, copy, w.Property, w.Value))
+            .ToList();
 
         return new BoundLet(syntax.Span, held, target,
-            new BoundLet(syntax.Span, made, creation,
+            new BoundLet(syntax.Span, made, copied,
                 new BoundSequence(syntax.Span, steps, copy)));
-    }
-
-    /// <summary>
-    /// The storage of every writable property of a record, up its chain, that
-    /// its constructor does not take and a <c>with</c> did not name.
-    /// </summary>
-    private static List<FieldSymbol> CarriedStorage(
-        ClassTypeSymbol record, IEnumerable<string> named)
-    {
-        var skip = new HashSet<string>(named, StringComparer.Ordinal);
-        skip.UnionWith(record.RecordParameters);
-
-        var carried = new List<FieldSymbol>();
-        for (ClassTypeSymbol? level = record; level is not null; level = level.BaseClass)
-            foreach (var property in level.Properties)
-                if (property is { Setter: not null, BackingField: { } storage, IsIndexer: false } &&
-                    skip.Add(property.Name))
-                    carried.Add(storage);
-
-        return carried;
     }
 
     /// <summary>Names in a list, for a diagnostic that offers them.</summary>

@@ -187,6 +187,7 @@ public sealed partial class Binder
             {
                 SimpleName = displayName, ModuleName = template.Module.Name, IsPublic = isPublic,
                 Template = template, TypeArguments = arguments, Span = declaration.Span,
+                RecordParameters = declaration.RecordParameters,
             },
             TypeDeclKind.Interface => new InterfaceTypeSymbol
             {
@@ -259,7 +260,7 @@ public sealed partial class Binder
         _instantiationDepth++;
         try
         {
-            DeclareTypeMembers(template.Scope, declaration, type);
+            declaration = DeclareTypeMembers(template.Scope, declaration, type);
             ResolveImplements(type, declaration, template.Scope);
 
             // The pass that gives a class with initializers a constructor may

@@ -1026,7 +1026,8 @@ and the constructor that fills them, and the type gets value
 equality and a hash over all of them. A bare `record` means `record class`, as
 in C#; the long spelling is there for the reader who wants it said.
 
-What is generated is what could have been written out:
+What is generated is what could have been written out, but for the one name
+that starts with `$`:
 
 ```csharp
 public class Point : IEquatable<Point>, IHashable
@@ -1036,8 +1037,11 @@ public class Point : IEquatable<Point>, IHashable
 
     public Point(int X, int Y) { this.X = X; this.Y = Y; }
 
-    public bool Equals(Point other) => X.Equals(other.X) && Y.Equals(other.Y);
-    public nuint GetHashCode()          => X.GetHashCode() * 31u + Y.GetHashCode();
+    public virtual bool Equals(Point other) =>
+        $SameRecordType(other) && other.$SameRecordType(this) &&
+        X.Equals(other.X) && Y.Equals(other.Y);
+    public virtual nuint GetHashCode() => X.GetHashCode() * 31u + Y.GetHashCode();
+    protected virtual bool $SameRecordType(IHashable other) => other is Point;
 
     public static bool operator ==(Point left, Point right) => left.Equals(right);
     public static bool operator !=(Point left, Point right) => !left.Equals(right);
@@ -1087,6 +1091,37 @@ implements no interface, so there is no 'record struct'; write 'record' for a
 class, or a struct with a constructor and an 'Equals' of its own
 ```
 
+**A record may derive from a record**, and then it is one type with more in
+it, as in C#:
+
+```csharp
+public record Shape(int Id);
+public record Circle(int Id, double Radius) : Shape(Id);
+```
+
+A parameter the base already has is the base's: it is passed on by the
+arguments after the base's name and gets no property of its own. What the
+derived record generates builds on the base's rather than hiding it —
+`Equals(Circle)` asks `base.Equals` and then compares `Radius`, `GetHashCode`
+folds `Radius` into the base's hash, and an override of `Equals(Shape)` means a
+`Circle` reached as a `Shape` still compares everything it has. **Equality asks
+for the same type**: a `Shape(1)` and a `Circle(1, 2.0)` are unequal whichever
+is asked, which is what C#'s `EqualityContract` is for. Here it is
+`$SameRecordType`, a dispatched test each record answers with `is`, asked of
+both sides. A name beginning with `$` cannot be written, so it collides with
+nothing. The cost is a virtual call per side on each `Equals`.
+
+**Only a record may derive from a record** (SL0804). A class deriving from one
+would be compared and copied as the record, and what it added would be
+silently left out of both. A record may derive from a class that is not one,
+which C# refuses: it is how a record shares state with a hierarchy that was not
+written as records, and nothing about the record's own members depends on its
+base being one.
+
+```
+error[SL0804]: 'Shape' is a record, and only a record may derive from one
+```
+
 **`record` is contextual**, as `closure` and `where` are: it is read as a
 keyword only where a type declaration can begin and the next word is `class`,
 `struct`, or the type's name. `int record = 7;` stays legal.
@@ -1099,26 +1134,32 @@ var moved = point with { Y = 9 };       // Point(3, 9)
 var copy  = point with { };             // a copy, which is a thing to want
 ```
 
-It is the record's constructor, called with the values that were named and the
-ones that were not carried over from the target. A name that is no parameter may
-be a property with a setter, `init` or not, and it is written through that
-setter once the copy is made; every other such property the record or its bases
-declare, with storage, is carried over storage to storage, as C#'s copy would,
-so no setter runs for a value that is not changing. Nothing is mutated: `point` is
-what it was, and what comes out is an ordinary record — equal by value, usable
-as a key, and itself a target for another `with`.
+It is a copy of the target, every field of it and of its bases, with each
+name then written through its property's setter — `init` or not, since the
+copy is still being made. No constructor runs: the values are the ones the
+target already has, so a base that computed one from a parameter is not asked
+to compute it again. Nothing is mutated: `point` is what it was, and what comes
+out is an ordinary record — equal by value, usable as a key, and itself a
+target for another `with`.
 
-**The target is evaluated once.** It is read once per parameter the caller did
-not supply, so a `with` that named it each time would call whatever produced it
-once per field:
+**The copy is dispatched**, as C#'s `<Clone>$` is, so a derived record reached
+through its base comes back as the derived record:
 
 ```csharp
-var made = Compute() with { Y = 99 };   // Compute() runs once, not twice
+Shape shape = new Circle(1, 2.0);
+var moved = shape with { Id = 7 };      // a Circle, Radius 2.0
 ```
 
-That is the whole reason this is not a rewrite of the source into a
-constructor call: an expression has nowhere to put the temporary such a rewrite
-would need.
+The copy is `$Clone`, a method the compiler writes for every record rather than
+source it could have been, because making an object without running its
+constructor is not something source can say.
+
+**The target is evaluated once**, and the copy is then read as often as there
+are names to write:
+
+```csharp
+var made = Compute() with { Y = 99 };   // Compute() runs once
+```
 
 A value on the right is any expression, including one that reads the target:
 

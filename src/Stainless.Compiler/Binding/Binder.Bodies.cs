@@ -72,6 +72,7 @@ public sealed partial class Binder
     {
         if (function.IsAutoAccessor) { BindAutoAccessor(function); return; }
         if (function.Event is not null) { BindEventAccessor(function); return; }
+        if (function.IsRecordClone) { BindRecordClone(function); return; }
         if (function.Body is null) return;
         if (!_boundFunctions.Add(function)) return;
 
