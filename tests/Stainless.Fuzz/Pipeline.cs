@@ -175,6 +175,11 @@ internal static class Pipeline
         if (e is BadSpanException bad)
             return $"{stage}: a span outside its file on {bad.Code}";
 
+        // By the problem and not by frame: one dispatch throws for every node
+        // kind it lacks, and each kind is its own bug.
+        if (e is InternalCompilerError internalError)
+            return $"{stage}: {Regex.Replace(internalError.Problem, @"'[^']*'", "'_'")}";
+
         // By what the verifier objected to and the instruction it printed
         // first, not by function: one fault in the emitter breaks every
         // function that reaches it.

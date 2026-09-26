@@ -17,6 +17,7 @@
 using System.Globalization;
 using System.Text;
 using Stainless.Binding;
+using Stainless.Source;
 using Stainless.Syntax;
 
 namespace Stainless.Emit;
@@ -199,9 +200,13 @@ public sealed partial class LlvmEmitter
             case BoundTry attempt: return EmitTry(attempt);
 
             default:
-                return new Val("0", "i32", PrimitiveTypeSymbol.Int);
+                throw Unhandled(expression, expression.Span);
         }
     }
+
+    /// <summary>A node no case of the emitter handles, which only a compiler bug can put there.</summary>
+    private static InternalCompilerError Unhandled(object node, SourceSpan span) =>
+        new($"the emitter has no case for {node.GetType().Name}", span);
 
     private Val EmitLiteral(BoundLiteral literal)
     {
@@ -213,7 +218,8 @@ public sealed partial class LlvmEmitter
             double number => FormatFloating(number, literal.Type),
             float number => FormatFloating(number, literal.Type),
             ulong number => FormatInteger(number, literal.Type),
-            _ => "0",
+            _ => throw new InternalCompilerError(
+                $"a literal holding {literal.Value?.GetType().Name ?? "null"}", literal.Span),
         };
         return new Val(text, llvmType, literal.Type);
     }
@@ -266,7 +272,8 @@ public sealed partial class LlvmEmitter
             float number => FormatFloating(number, constant.Type),
             ulong number => FormatInteger(number, constant.Type),
             string s => InternBytes(s),
-            _ => "0",
+            _ => throw new InternalCompilerError(
+                $"a constant holding {constant.Value?.GetType().Name ?? "null"}", access.Span),
         };
         return new Val(text, llvmType, constant.Type);
     }

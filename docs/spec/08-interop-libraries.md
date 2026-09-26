@@ -47,6 +47,11 @@ name with another signature, and so is a name the runtime already defines. A
 declaration that agrees with the definition is how one module calls what another
 defines, as a C header would, and stays.
 
+A variable is a symbol too, so the same holds for it: a C name is a function
+or a variable, not both. Several modules may declare one `extern "C"` variable,
+as several C files may, provided they agree on its type; one of them may define
+it with `export "C"`, and the program has one global under that name.
+
 ```
 error[SL0295]: the C name 'Twin' is defined by 'Clash.Twin', and this defines
 it a second time; C has one function per name, so give this one a name of its

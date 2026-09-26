@@ -1122,4 +1122,38 @@ public class BinderTests
                 return f(n);
             }
             """));
+
+    /// <summary>
+    /// Too deep is reported by the bind that counts. A trial bind before it
+    /// reports into a muted bag, and the bind after it MUST still say why the
+    /// expression is an error.
+    /// </summary>
+    [Fact]
+    public void NestingTooDeepIsReportedAfterATrialBind()
+    {
+        string chain = string.Concat(Enumerable.Repeat(".Changed", 600));
+        string[] codes = Source.Recursion.OnADeepStack(() => Front.ModuleCodes(
+            "public closure void Handler(int x);\n" +
+            "public class Source { public event Handler Changed; }\n" +
+            "void On(int x) { }\n" +
+            "void F(Source s) { s" + chain + " += On; }"));
+        Assert.Contains("SL0108", codes);
+    }
+
+    /// <summary>
+    /// A value with no type of its own, standing as a statement, is dropped
+    /// with a warning: what it was built from is evaluated, and it is not.
+    /// </summary>
+    [Theory]
+    [InlineData("Fail(1);")]
+    [InlineData("(int x) => x;")]
+    [InlineData("Main;")]
+    [InlineData("[1, 2];")]
+    [InlineData("null;")]
+    public void AnUnsettledValueAsAStatementIsDropped(string statement)
+    {
+        var program = Front.BindBody(statement, out var diagnostics);
+        Assert.Equal(["SL0222"], Front.Codes(diagnostics));
+        Front.Verified(new Stainless.Emit.LlvmEmitter(forSharedLibrary: true).Emit(program));
+    }
 }

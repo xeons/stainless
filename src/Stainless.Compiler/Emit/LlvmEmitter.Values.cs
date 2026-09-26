@@ -75,6 +75,12 @@ public sealed partial class LlvmEmitter
         // bytes as the C enum it lines up with.
         EnumTypeSymbol enumType => LlvmTypeOf(enumType.UnderlyingType),
 
+        // Binding settles each of these or reports an error, so none has a
+        // representation.
+        ErrorTypeSymbol or LambdaType or ArrayDraftType or TupleDraftType or VariantDraftType
+            or FunctionGroupType or DefaultLiteralType or NewDraftType =>
+            throw new Source.InternalCompilerError($"the emitter was handed the type '{type.Name}'"),
+
         _ => "ptr",     // pointers, class references, optionals and weak references
     };
 

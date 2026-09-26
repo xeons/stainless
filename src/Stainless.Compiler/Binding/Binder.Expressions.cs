@@ -35,17 +35,17 @@ public sealed partial class Binder
     /// </summary>
     private int _bindDepth;
 
-    private bool _boundTooDeep;
-
     private BoundExpression BindExpression(ExpressionSyntax syntax)
     {
         if (++_bindDepth > Source.Recursion.MaxDepth)
         {
             _bindDepth--;
 
-            if (!_boundTooDeep)
+            // Asked of the bag rather than remembered: a trial bind reports
+            // into a muted bag, or one that is rewound, and the real bind
+            // after it MUST still say why the expression is an error.
+            if (!diagnostics.Items.Any(d => d.Code == "SL0108"))
             {
-                _boundTooDeep = true;
                 diagnostics.Error("SL0108", syntax.Span,
                     $"this is nested more than {Source.Recursion.MaxDepth} levels deep, which " +
                     "is past what can be compiled; the usual cause is generated source, and " +

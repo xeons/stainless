@@ -1648,7 +1648,62 @@ public sealed partial class Binder
             diagnostics.Warning("SL0222", syntax.Span,
                 "this expression has no effect; its result is discarded");
 
+        // A value with no type of its own is never made. What it was built
+        // from is evaluated for its effects, and nothing else is.
+        if (expression.Type is LambdaType or FunctionGroupType or ArrayDraftType
+            or VariantDraftType or NullType)
+        {
+            var parts = new List<BoundExpression>();
+            CollectDraftParts(expression, parts);
+            return new BoundBlock(syntax.Span,
+                [.. parts.Select(part => new BoundExpressionStatement(part.Span, part))]);
+        }
+
         return new BoundExpressionStatement(syntax.Span, expression);
+    }
+
+    /// <summary>The parts of an unsettled value that do have a type, in the order they were written.</summary>
+    private static void CollectDraftParts(BoundExpression expression, List<BoundExpression> into)
+    {
+        switch (expression)
+        {
+            case BoundLambda or BoundNullLiteral:
+                break;
+
+            case BoundFunctionGroup group:
+                if (group.Receiver is not null)
+                    CollectDraftParts(group.Receiver, into);
+                break;
+
+            case BoundArrayDraft array:
+                foreach (var element in array.Elements)
+                    CollectDraftParts(element, into);
+                break;
+
+            case BoundSpread spread:
+                CollectDraftParts(spread.Source, into);
+                break;
+
+            case BoundVariantDraft built:
+                foreach (var argument in built.Arguments)
+                    CollectDraftParts(argument, into);
+                break;
+
+            case BoundTupleDraft tuple:
+                foreach (var element in tuple.Elements)
+                    CollectDraftParts(element, into);
+                break;
+
+            case BoundNewDraft created:
+                foreach (var argument in created.Arguments)
+                    CollectDraftParts(argument, into);
+                break;
+
+            default:
+                if (HasOwnType(expression) || expression.Type.IsVoid())
+                    into.Add(expression);
+                break;
+        }
     }
 
     private BoundStatement BindIf(IfSyntax syntax)

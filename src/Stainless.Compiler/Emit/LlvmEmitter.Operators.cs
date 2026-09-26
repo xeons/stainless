@@ -17,6 +17,7 @@
 using System.Globalization;
 using System.Text;
 using Stainless.Binding;
+using Stainless.Source;
 using Stainless.Syntax;
 
 namespace Stainless.Emit;
@@ -234,7 +235,8 @@ public sealed partial class LlvmEmitter
                 return Converted("zext");
 
             default:
-                return new Val(operand.Ref, to, conversion.Type);
+                throw new InternalCompilerError(
+                    $"the emitter has no case for the conversion {conversion.Kind}", conversion.Span);
         }
 
         Val Converted(string instruction) =>

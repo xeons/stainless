@@ -43,16 +43,24 @@ internal static class Program
         string command = args[0];
         string[] rest = args[1..];
 
-        return command switch
+        try
         {
-            "build" => Build(rest, run: false),
-            "run" => Build(rest, run: true),
-            "emit-ir" => EmitIr(rest),
-            "doc" => Document(rest),
-            "init" => Init(rest),
-            "restore" => Restore(rest),
-            _ => UnknownCommand(command),
-        };
+            return command switch
+            {
+                "build" => Build(rest, run: false),
+                "run" => Build(rest, run: true),
+                "emit-ir" => EmitIr(rest),
+                "doc" => Document(rest),
+                "init" => Init(rest),
+                "restore" => Restore(rest),
+                _ => UnknownCommand(command),
+            };
+        }
+        catch (Source.InternalCompilerError e)
+        {
+            Error(e.Message);
+            return 1;
+        }
     }
 
     private static int UnknownCommand(string command)

@@ -80,6 +80,12 @@ of building `hello.sl`. It is not on by default, even in a Debug build of the
 compiler: every build that links is verified already, and all a default would
 add is `emit-ir`, which is what the flag is for.
 
+**A node nobody handles is a crash, not a guess.** Every dispatch over bound
+node kinds — the emitter's expression and statement switches, the conversion
+kinds, the types it spells — throws an `InternalCompilerError` on a case it
+does not have, rather than emitting a zero. The driver reports one as a
+compiler bug, and the fuzzer records one as a finding under its problem.
+
 **Both Windows and Linux are tested.** 352 cases, of which 13 are
 Windows-only and 2 are Linux-only, so Linux runs 339 and Windows 350, each
 skipping the other's. A case whose *subject* differs by platform — `Path.Join` writes a

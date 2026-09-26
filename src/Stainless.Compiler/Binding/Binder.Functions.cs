@@ -651,7 +651,39 @@ public sealed partial class Binder
         var byName = _modules.Values
             .SelectMany(m => m.Functions)
             .Where(f => f.Linkage is LinkageKind.ExternC or LinkageKind.ExportC)
-            .GroupBy(Mangler.Mangle, StringComparer.Ordinal);
+            .GroupBy(Mangler.Mangle, StringComparer.Ordinal)
+            .ToList();
+
+        // A variable is a symbol too, so it shares the one name with anything
+        // else C calls by it. Two modules MAY declare one variable, as two C
+        // files may, if they agree on its type; only one may define it.
+        var functionNames = byName.Select(g => g.Key).ToHashSet(StringComparer.Ordinal);
+        var variables = new Dictionary<string, StaticSymbol>(StringComparer.Ordinal);
+
+        foreach (var variable in _foreignVariables)
+        {
+            if (variable.LinkName is not { } name)
+                continue;
+
+            string? clash = null;
+            if (functionNames.Contains(name))
+                clash = "a function";
+            else if (!variables.TryAdd(name, variable) && variables[name] is var first)
+            {
+                if (!first.Type.Equals(variable.Type))
+                    clash = $"a variable of '{first.Type.Name}'";
+                else if (!first.IsImported && !variable.IsImported)
+                    clash = "a variable this program defines";
+                else if (first.IsImported)
+                    variables[name] = variable;
+            }
+
+            if (clash is not null)
+                diagnostics.Error("SL0295", variable.Span,
+                    $"the C name '{name}' already names {clash}, and this declares " +
+                    $"'{variable.Name}' under it; C has one symbol per name, so give this one a " +
+                    "name of its own");
+        }
 
         foreach (var group in byName)
         {

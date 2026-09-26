@@ -63,6 +63,7 @@ public sealed partial class LlvmEmitter
             case BoundReturn returnStatement: EmitReturn(returnStatement); break;
             case BoundBreak: EmitJump(isBreak: true); break;
             case BoundContinue: EmitJump(isBreak: false); break;
+            default: throw Unhandled(statement, statement.Span);
         }
     }
 

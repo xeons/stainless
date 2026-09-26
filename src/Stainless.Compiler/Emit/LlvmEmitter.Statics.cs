@@ -83,11 +83,21 @@ public sealed partial class LlvmEmitter
         if (program.Statics.Count == 0) return;
 
 
+        // What this program defines under a C name, so no declaration of the
+        // same name is written beside it.
+        foreach (var symbol in program.Statics)
+            if (symbol.LinkName is not null && !symbol.IsImported)
+                _definedGlobals.Add(symbol.LinkName);
+
+        var declared = new HashSet<string>(StringComparer.Ordinal);
+
         foreach (var symbol in program.Statics)
         {
-            // Declared `extern "C"` and defined by this emitter: the definition
-            // is already written and a declaration beside it is a redefinition.
-            if (symbol.LinkName is not null && _definedGlobals.Contains(symbol.LinkName))
+            // Declared `extern "C"` and defined here, by this emitter or by the
+            // program: a declaration beside the definition is a redefinition.
+            // So is a second declaration, which two modules may each write.
+            if (symbol.LinkName is not null && symbol.IsImported &&
+                (_definedGlobals.Contains(symbol.LinkName) || !declared.Add(symbol.LinkName)))
                 continue;
 
             string llvmType = LlvmTypeOf(symbol.Type);

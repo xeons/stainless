@@ -1059,9 +1059,16 @@ Fail("could not read the file");    // SL0222
 ```
 
 `Fail` is `Result`'s case constructor ([§2.8](02-types.md#28-resultt-terror--how-a-function-fails)), so that
-line builds a `Result` and throws it away. If the author meant a method of
+line asks for a `Result` and throws it away. If the author meant a method of
 their own named `Fail`, it was never reached — and nothing else would have
 said so, because the line is perfectly well typed.
+
+**A value that waits for a type is never made.** A case constructor, an array
+literal, a lambda, a function's name and `null` each take their type from where
+they are going, and a statement is going nowhere. So what they were built from
+is evaluated, in order, for what it does, and nothing else is: `[Next(),
+Next()];` calls `Next` twice and allocates no array, and `Fail(Next());` calls
+it once and builds no `Result`.
 
 ## 9.14 Assignment
 
