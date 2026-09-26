@@ -93,6 +93,14 @@ public sealed partial class Binder
                  StaticDefaults(staticOwner, onType.Member).Count > 0)))
             return BindStaticCall(syntax, onType, staticOwner, arguments);
 
+        // `K.Handler(2)` and `Module.s_handler(2)`: a static holding a closure
+        // or a delegate, reached through the type or the module that owns it.
+        if (syntax.Callee is MemberAccessSyntax { ThroughPointer: false } held &&
+            (ResolveTypePrefix(held.Target) is not null || ResolveModulePrefix(held.Target) is { } holder &&
+                !holder.FindFunctions(held.Member).Any()) &&
+            BindCallableValue(held) is { } heldValue)
+            return BuildIndirectCall(syntax, heldValue, arguments);
+
         // `receiver.Method(args)`, unless the receiver is really a module path.
         if (syntax.Callee is MemberAccessSyntax member)
         {
@@ -220,18 +228,12 @@ public sealed partial class Binder
                 return BuildCall(syntax, outerMethod, captured, arguments);
             }
 
-            // A closure or delegate captured by the lambda this call is
-            // inside: binding the name is what creates the capture, so it is
-            // tried here rather than in BindDelegateTarget, which runs before
-            // any of the name lookups above.
-            if (_closures.Count > 0)
-            {
-                BoundExpression captured;
-                using (diagnostics.Muted()) captured = BindExpression(callee);
-
-                if (IsCallableValue(captured.Type))
-                    return BuildIndirectCall(syntax, BindExpression(callee), arguments);
-            }
+            // A closure or delegate held by a static, or captured by the
+            // lambda this call is inside: binding the name is what creates the
+            // capture, so it is tried here rather than in BindDelegateTarget,
+            // which runs before any of the name lookups above.
+            if (BindCallableValue(callee) is { } value)
+                return BuildIndirectCall(syntax, value, arguments);
 
             // `Fired(value)` where Fired is one of this type's events: raising
             // it. Only from inside the type that declared it, and only by name
@@ -664,6 +666,17 @@ public sealed partial class Binder
             default:
                 return null;
         }
+    }
+
+    /// <summary>
+    /// The callee bound as a value, when it is one that can be called; null,
+    /// with nothing reported, when it is not.
+    /// </summary>
+    private BoundExpression? BindCallableValue(ExpressionSyntax callee)
+    {
+        BoundExpression tried;
+        using (diagnostics.Muted()) tried = BindExpression(callee);
+        return IsCallableValue(tried.Type) ? BindExpression(callee) : null;
     }
 
     /// <summary>A value that is called rather than dispatched to.</summary>

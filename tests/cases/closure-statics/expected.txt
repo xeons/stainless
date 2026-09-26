@@ -1,0 +1,5 @@
+bare      12 15 42
+type      1 9 101
+module    8 102
+inside    9
+replaced  5
