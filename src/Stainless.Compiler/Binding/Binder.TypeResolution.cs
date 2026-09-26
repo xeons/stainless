@@ -578,6 +578,7 @@ public sealed partial class Binder
         var fitting = new List<(GenericFunctionTemplate Template, List<TypeSymbol> Arguments)>();
         Dictionary<string, TypeSymbol>? firstFailure = null;
         GenericFunctionTemplate? failed = null;
+        List<(LambdaSyntax Lambda, IReadOnlyList<TypeSymbol> Parameters)>? failedLambdas = null;
 
         // A candidate whose parameters were all worked out and which still would
         // not take the arguments. It is the better thing to report: the reader
@@ -606,13 +607,17 @@ public sealed partial class Binder
             // from one. Anything still unknown may yet be readable off a lambda's
             // result, once the arguments that are values have said what its
             // parameters are.
+            var unanswered = new List<(LambdaSyntax, IReadOnlyList<TypeSymbol>)>();
             if (candidate.Parameters.Any(p => !inferred.ContainsKey(p)))
-                InferFromLambdaResults(candidate, arguments, names, inferred);
+                InferFromLambdaResults(candidate, arguments, names, inferred, unanswered);
 
             if (candidate.Parameters.Any(p => !inferred.ContainsKey(p)))
             {
                 firstFailure ??= inferred;
                 failed ??= candidate;
+
+                // The first candidate that got as far as a lambda's body.
+                if (unanswered.Count > 0) failedLambdas ??= unanswered;
                 continue;
             }
 
@@ -640,6 +645,18 @@ public sealed partial class Binder
         {
             Accepts(near.Template, near.Inferred, arguments, report: near.Template.Name);
             return null;
+        }
+
+        // A lambda whose parameters were known and whose body still would not
+        // bind is the reason nothing could be inferred, and its own errors say
+        // why far better than SL0327 would.
+        if (failedLambdas is { Count: > 0 })
+        {
+            int before = diagnostics.ErrorCount;
+            foreach (var (lambda, parameters) in failedLambdas)
+                ProbeLambdaResult(lambda, parameters, report: true);
+            if (diagnostics.ErrorCount > before)
+                return null;
         }
 
         var template = failed ?? viable[0];
@@ -709,7 +726,8 @@ public sealed partial class Binder
         GenericFunctionTemplate candidate,
         List<BoundExpression> arguments,
         HashSet<string> names,
-        Dictionary<string, TypeSymbol> inferred)
+        Dictionary<string, TypeSymbol> inferred,
+        List<(LambdaSyntax, IReadOnlyList<TypeSymbol>)> unanswered)
     {
         int shared = Math.Min(arguments.Count, candidate.Declaration.Parameters.Count);
 
@@ -777,6 +795,8 @@ public sealed partial class Binder
                     if (parameterTypes is null) continue;
 
                     produced = ProbeLambdaResult(lambda.Syntax, parameterTypes);
+                    if (produced is null && !unanswered.Any(u => u.Item1 == lambda.Syntax))
+                        unanswered.Add((lambda.Syntax, parameterTypes));
                 }
                 else
                 {

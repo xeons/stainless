@@ -605,10 +605,12 @@ public sealed partial class Binder
     ///
     /// Returns null when the answer cannot be had: a block body, whose result
     /// is whatever its `return`s agree on and which needs a declared return
-    /// type to bind at all, and anything that fails to bind.
+    /// type to bind at all, and anything that fails to bind. With
+    /// <paramref name="report"/>, what fails to bind is reported.
     /// </summary>
     private TypeSymbol? ProbeLambdaResult(
-        LambdaSyntax syntax, IReadOnlyList<TypeSymbol> parameterTypes, bool allowVoid = false)
+        LambdaSyntax syntax, IReadOnlyList<TypeSymbol> parameterTypes, bool allowVoid = false,
+        bool report = false)
     {
         if (syntax.Parameters.Count != parameterTypes.Count) return null;
 
@@ -683,7 +685,7 @@ public sealed partial class Binder
         PushScope();
 
         TypeSymbol? produced;
-        using (diagnostics.Muted())
+        using (report ? null : (IDisposable)diagnostics.Muted())
         {
             if (syntax.Block is not null)
             {

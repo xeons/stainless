@@ -114,6 +114,22 @@ public class InferenceTests
         Assert.NotEmpty(Body("int result = Transform(numbers, n => n.NoSuchMethod());"));
 
     /// <summary>
+    /// And what is reported is the body's own error, not SL0327: every
+    /// parameter was known, so the body is the reason, and a failed inference
+    /// would send the reader to the call instead.
+    /// </summary>
+    [Theory]
+    [InlineData("int result = Transform(numbers, n => n.NoSuchMethod());", "SL0255")]
+    [InlineData("int result = Transform(words, (String w) => w.NoSuchField);", "SL0247")]
+    [InlineData("int result = Transform(numbers, n => NoSuchFunction(n));", "SL0252")]
+    public void ABodyThatCannotBindReportsItsOwnError(string body, string code)
+    {
+        var codes = Body(body);
+        Assert.Contains(code, codes);
+        Assert.DoesNotContain("SL0327", codes);
+    }
+
+    /// <summary>
     /// A block-bodied lambda's result is the one type its <c>return</c>s agree
     /// on, so it is read off them.
     /// </summary>
