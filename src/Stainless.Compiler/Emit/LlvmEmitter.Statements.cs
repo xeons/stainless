@@ -37,6 +37,12 @@ public sealed partial class LlvmEmitter
         if (debug is not null && _debugScope is { } scope)
             _debugLocation = debug.Location(statement.Span, scope);
 
+        // Code after a return, break or goto goes into a block nothing
+        // branches to. Dropped an instruction at a time, it kept the blocks
+        // its own branches made, and what they held used values never written.
+        if (_blockTerminated && statement is not BoundLabel)
+            Label(NextLabel("dead"));
+
         switch (statement)
         {
             case BoundBlock block: EmitBlock(block); break;
