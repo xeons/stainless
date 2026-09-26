@@ -703,10 +703,16 @@ public sealed partial class Binder
             else
             {
                 var value = BindExpression(syntax.Expression!);
-                produced = value.Type.IsError() || IsTargetTyped(value) ? null : value.Type;
+                produced = value.Type.IsError() || IsTargetTyped(value) ? null
+                    : value is BoundLambda inner ? NaturalClosureType(inner.Syntax)
+                    : value.Type;
             }
 
             if (produced is not null && produced.IsVoid() && !allowVoid) produced = null;
+
+            // A lambda has no type until something gives it one, so it cannot
+            // be what a type parameter is inferred to be.
+            if (produced is LambdaType) produced = null;
         }
 
         PopScope();
