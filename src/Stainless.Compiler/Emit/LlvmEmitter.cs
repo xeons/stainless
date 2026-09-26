@@ -188,6 +188,13 @@ public sealed partial class LlvmEmitter(
     private readonly HashSet<string> _stackArrays = [];
 
     /// <summary>
+    /// Owned slots declared inside an expression rather than by a statement,
+    /// which are cleared as they are released: the declaration may not run on
+    /// the next pass through the scope, and the release at its end still does.
+    /// </summary>
+    private readonly HashSet<string> _clearedOnRelease = [];
+
+    /// <summary>
     /// Where <c>break</c> and <c>continue</c> go, and how many scopes each has
     /// to unwind on the way. They are tracked separately because a switch is a
     /// target for one and not the other: a <c>continue</c> written inside a

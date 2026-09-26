@@ -390,6 +390,7 @@ public sealed partial class LlvmEmitter
         _scopes.Clear();
         _pendingReleases.Clear();
         _stackArrays.Clear();
+        _clearedOnRelease.Clear();
         _loops.Clear();
         _labelBlocks.Clear();
         _sretSlot = null;

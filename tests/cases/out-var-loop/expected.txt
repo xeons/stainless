@@ -1,0 +1,21 @@
+~static
+named static
+took t1
+~t1
+took t2
+~t2
+took t3
+~t3
+after the first loop
+made p0
+~p0
+made p1
+~p1
+made p2
+~p2
+after the second loop
+inner t1
+~t1
+inner t2
+~t2
+~t4

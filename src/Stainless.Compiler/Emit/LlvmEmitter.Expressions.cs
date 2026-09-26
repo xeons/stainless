@@ -70,7 +70,8 @@ public sealed partial class LlvmEmitter
                 // `out var x` declared a variable that no statement did, so
                 // this is where it gets its slot -- before the call, which is
                 // the only moment it could be.
-                if (addressOf.DeclaresLocal is { } declared) DeclareOutLocal(declared);
+                if (addressOf.DeclaresLocal is { } declared)
+                    DeclareExpressionLocal(declared);
                 return new Val(EmitAddress(addressOf.Operand), "ptr", addressOf.Type);
 
             case BoundDefault zeroed:
@@ -621,15 +622,20 @@ public sealed partial class LlvmEmitter
     }
 
     /// <summary>
-    /// Gives the variable an <c>out var x</c> introduced a slot, cleared.
+    /// Gives a variable no statement declared a slot, cleared: the one an
+    /// <c>out var x</c> introduced.
     ///
     /// Cleared because the language has no definite-assignment analysis: a
     /// callee that returns without writing would otherwise leave the caller
     /// reading whatever the stack held. Zero is not the right answer either,
     /// but it is an answer rather than a hazard, and it matches what a new
     /// array and an owned local already promise.
+    ///
+    /// An owned slot is cleared on entry and as it is released, never here.
+    /// A declaration inside a loop's condition runs on every pass, and a
+    /// store here would drop what the last pass left without releasing it.
     /// </summary>
-    private void DeclareOutLocal(LocalSymbol local)
+    private void DeclareExpressionLocal(LocalSymbol local)
     {
         if (_slots.ContainsKey(local)) return;
 
@@ -637,13 +643,16 @@ public sealed partial class LlvmEmitter
         string slot = Alloca(llvmType, local.Name);
         _slots[local] = slot;
 
-        Line($"store {llvmType} {ZeroOf(llvmType)}, ptr {slot}");
-
         if (local.Type.IsManagedSlot() ||
             local.Type is StructTypeSymbol { } owning && owning.CarriesReferences())
         {
             ZeroOnEntry(slot, llvmType);
             TrackOwnedLocal(slot, local.Type);
+            _clearedOnRelease.Add(slot);
+        }
+        else
+        {
+            Line($"store {llvmType} {ZeroOf(llvmType)}, ptr {slot}");
         }
     }
 

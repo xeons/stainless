@@ -260,8 +260,12 @@ public sealed partial class Binder
             return;
         }
 
+        // A scope for what the initializer declares as it goes, which an
+        // `out var` does.
+        PushScope();
         symbol.Initializer = BindConversion(
             BindExpression(declaration.Value), symbol.Type, declaration.Value.Span);
+        PopScope();
     }
 
     /// <summary>

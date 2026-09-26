@@ -157,6 +157,9 @@ public sealed partial class LlvmEmitter
             // got.
             if (ConstantStaticText(symbol) is not null) continue;
 
+            // A scope of its own, for what the initializer declares as it
+            // goes, such as an `out var`.
+            PushScope();
             var value = EmitExpression(symbol.Initializer);
             string slot = "@" + StaticName(symbol);
 
@@ -188,6 +191,8 @@ public sealed partial class LlvmEmitter
             // The initializer's own temporaries go now; the static holds its
             // value outright, and an immortal one cannot be released anyway.
             FlushTemporaries();
+            ReleaseCurrentScope();
+            PopScopeWithoutRelease();
         }
 
         // Then the `static Name() { }` blocks, after every field has its

@@ -62,14 +62,20 @@ public sealed partial class LlvmEmitter
     /// </summary>
     private void ReleaseSlot(string slot, TypeSymbol type)
     {
+        bool clear = _clearedOnRelease.Contains(slot);
+
         if (type is StructTypeSymbol structType)
         {
             ReleaseFieldsAt(slot, structType);
+            if (clear)
+                Line($"store {StructName(structType)} zeroinitializer, ptr {slot}");
             return;
         }
 
         string value = Emit("ptr", $"load ptr, ptr {slot}");
         Release(value, type);
+        if (clear)
+            Line($"store ptr null, ptr {slot}");
     }
 
     /// <summary>
