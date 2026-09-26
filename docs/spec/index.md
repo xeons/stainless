@@ -92,6 +92,7 @@ Primitives, `struct`, `class`, pointers, `variant`, `union`, `Result`, `interfac
 - [2.11 Arrays](02-types.md#211-arrays)
   - [2.11.1 `T[]` — a counted array](02-types.md#2111-t--a-counted-array)
   - [2.11.2 `T[N]` — an inline array](02-types.md#2112-tn--an-inline-array)
+  - [2.11.3 `[a, ..b]` — collection expressions](02-types.md#2113-a-b--collection-expressions)
 - [2.12 `T[:]` — part of an array](02-types.md#212-t--part-of-an-array)
 - [2.13 `enum` — a distinct type over an integer](02-types.md#213-enum--a-distinct-type-over-an-integer)
 - [2.14 `delegate` — a named function pointer](02-types.md#214-delegate--a-named-function-pointer)
@@ -203,7 +204,7 @@ Functions, defaults, `ref`/`in`/`out`, named arguments, properties, operators, i
 
 ### [9. Statements and expressions](09-statements-expressions.md)
 
-`switch`, `parallel`, `const`, `foreach`, thread boundaries, `?.` and `!`, `default`, `goto`, `nameof`, `checked`, assignment, `@name` and `new(...)`.
+`switch`, `parallel`, `const`, `foreach`, thread boundaries, `?.` and `!`, `default`, `goto`, `nameof`, `checked`, assignment, `@name`, `new(...)`, and `^` and `..`.
 
 - [9.1 `switch`](09-statements-expressions.md#91-switch)
   - [9.1.1 Patterns](09-statements-expressions.md#911-patterns)
@@ -223,6 +224,7 @@ Functions, defaults, `ref`/`in`/`out`, named arguments, properties, operators, i
 - [9.14 Assignment](09-statements-expressions.md#914-assignment)
 - [9.15 `@name`](09-statements-expressions.md#915-name)
 - [9.16 `new(...)` with the type left off](09-statements-expressions.md#916-new-with-the-type-left-off)
+- [9.17 `^` and `..`](09-statements-expressions.md#917--and-)
 
 ### [10. Conditional compilation](10-conditional-compilation.md)
 

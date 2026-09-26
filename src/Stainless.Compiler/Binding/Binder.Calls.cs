@@ -1491,17 +1491,7 @@ public sealed partial class Binder
                    written.Select((e, i) => IsImplicitlyConvertible(e, wanted.Elements[i])).All(x => x);
 
         if (argument is BoundArrayDraft draft2)
-            return target switch
-            {
-                ArrayTypeSymbol wanted =>
-                    draft2.Elements.All(e => IsImplicitlyConvertible(e, wanted.Element)),
-                FixedArrayTypeSymbol inline =>
-                    inline.Length == draft2.Elements.Count &&
-                    draft2.Elements.All(e => IsImplicitlyConvertible(e, inline.Element)),
-                SliceTypeSymbol slice =>
-                    draft2.Elements.All(e => IsImplicitlyConvertible(e, slice.Element)),
-                _ => false,
-            };
+            return CollectionFits(draft2, target);
 
         // A bare case name fits a variant with that case, on the same terms a
         // lambda fits an interface: the parameter is the only thing that says
@@ -2188,6 +2178,16 @@ public sealed partial class Binder
 
         if (argument.Type.Equals(first)) return 1;
         if (argument.Type.Equals(second)) return -1;
+
+        // An array literal is an array first, as C# prefers a span or an
+        // array to a type it would have to call `Add` on.
+        if (argument is BoundArrayDraft)
+        {
+            bool firstIsArray = first is ArrayTypeSymbol or SliceTypeSymbol or FixedArrayTypeSymbol;
+            bool secondIsArray = second is ArrayTypeSymbol or SliceTypeSymbol or FixedArrayTypeSymbol;
+            if (firstIsArray != secondIsArray)
+                return firstIsArray ? 1 : -1;
+        }
 
         bool firstToSecond = ClassifyConversion(first, second, explicitCast: false) is not null;
         bool secondToFirst = ClassifyConversion(second, first, explicitCast: false) is not null;

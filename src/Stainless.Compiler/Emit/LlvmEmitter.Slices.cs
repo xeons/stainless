@@ -69,11 +69,11 @@ public sealed partial class LlvmEmitter
 
         string from = expression.Start is null
             ? "0"
-            : WidenIndex(EmitExpression(expression.Start));
+            : PositionOf(EmitExpression(expression.Start), expression.StartOrigin, sourceLength).Index;
 
         string to = expression.End is null
             ? sourceLength
-            : WidenIndex(EmitExpression(expression.End));
+            : PositionOf(EmitExpression(expression.End), expression.EndOrigin, sourceLength).Index;
 
         // from <= to <= length, in one branch: an unsigned compare catches a
         // negative bound too, because it sign-extends to something enormous.
@@ -107,6 +107,64 @@ public sealed partial class LlvmEmitter
     }
 
     /// <summary>
+    /// A position as the word that indexes with it: as written, counted back
+    /// from <paramref name="length"/>, or whichever of the two a
+    /// <c>Standard.Index</c> says. Where it counted from is kept for the
+    /// message a failed bounds check gives.
+    ///
+    /// Counting back past the start wraps to a very large word, so the bounds
+    /// check that follows refuses <c>^0</c> and <c>^(n + 1)</c> by the same
+    /// compare that refuses any other index out of range.
+    /// </summary>
+    private Position PositionOf(Val position, IndexOrigin origin, string length)
+    {
+        switch (origin)
+        {
+            case IndexOrigin.Start:
+            {
+                string index = WidenIndex(position);
+                return new Position(index, index, "0");
+            }
+
+            case IndexOrigin.End:
+            {
+                string back = WidenIndex(position);
+                return new Position(Emit(Word, $"sub {Word} {length}, {back}"), back, "1");
+            }
+
+            default:
+            {
+                var index = (StructTypeSymbol)position.Type;
+                string value = Emit(Word, $"load {Word}, ptr " +
+                    StructFieldAddress(position.Ref, index, index.FindField("_value")!));
+                string fromEnd = Emit("i1", "load i1, ptr " +
+                    StructFieldAddress(position.Ref, index, index.FindField("_fromEnd")!));
+                string back = Emit(Word, $"sub {Word} {length}, {value}");
+                return new Position(
+                    Emit(Word, $"select i1 {fromEnd}, {Word} {back}, {Word} {value}"),
+                    value,
+                    Emit("i32", $"zext i1 {fromEnd} to i32"));
+            }
+        }
+    }
+
+    /// <summary>
+    /// A position resolved to an index, with the count it was written as and
+    /// whether that counted from the end, as an <c>i32</c>.
+    /// </summary>
+    private readonly record struct Position(string Index, string Written, string FromEnd);
+
+    /// <summary>The failure arm of a bounds check on a position.</summary>
+    private void FailPosition(Position position, string length)
+    {
+        if (position.FromEnd == "0")
+            Line($"call void @sl_array_bounds_fail({Word} {position.Index}, {Word} {length})");
+        else
+            Line($"call void @sl_index_bounds_fail({Word} {position.Written}, " +
+                 $"i32 {position.FromEnd}, {Word} {length})");
+    }
+
+    /// <summary>
     /// The address of one element of a slice: the array's data, then past the
     /// slice's own offset. The bound checked is the slice's length, not the
     /// array's, which is the whole point of having one.
@@ -117,8 +175,9 @@ public sealed partial class LlvmEmitter
         var slice = EmitExpression(index.Target);
         var offset = EmitExpression(index.Index);
 
-        string widened = WidenIndex(offset);
         string length = SliceLength(slice.Ref, type);
+        var position = PositionOf(offset, index.Origin, length);
+        string widened = position.Index;
         string inRange = Emit("i1", $"icmp ult {Word} {widened}, {length}");
 
         string okLabel = NextLabel("bounds.ok");
@@ -126,7 +185,7 @@ public sealed partial class LlvmEmitter
         Terminator($"br i1 {inRange}, label %{okLabel}, label %{failLabel}");
 
         Label(failLabel);
-        Line($"call void @sl_array_bounds_fail({Word} {widened}, {Word} {length})");
+        FailPosition(position, length);
         Terminator("unreachable");
 
         Label(okLabel);
@@ -146,10 +205,11 @@ public sealed partial class LlvmEmitter
         var array = EmitExpression(index.Target);
         var offset = EmitExpression(index.Index);
 
-        string widened = WidenIndex(offset);
         string lengthSlot = Emit("ptr",
             $"getelementptr inbounds i8, ptr {array.Ref}, i64 {RuntimeLayout.ArrayLength}");
         string length = Emit(Word, $"load {Word}, ptr {lengthSlot}");
+        var position = PositionOf(offset, index.Origin, length);
+        string widened = position.Index;
         string inRange = Emit("i1", $"icmp ult {Word} {widened}, {length}");
 
         string okLabel = NextLabel("bounds.ok");
@@ -157,7 +217,7 @@ public sealed partial class LlvmEmitter
         Terminator($"br i1 {inRange}, label %{okLabel}, label %{failLabel}");
 
         Label(failLabel);
-        Line($"call void @sl_array_bounds_fail({Word} {widened}, {Word} {length})");
+        FailPosition(position, length);
         Terminator("unreachable");
 
         Label(okLabel);

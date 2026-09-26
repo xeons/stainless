@@ -1,0 +1,8 @@
+# a spread of something foreach does not walk, and of elements that do not fit
+SL0778
+# a spread with no length until it runs, into an inline array
+SL0779
+# an inline array spread whose length does not match
+SL0547
+# a class with no Add, and one with no constructor taking nothing
+SL0546

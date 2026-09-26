@@ -46,6 +46,7 @@ public static class OperatorNames
         [TokenKind.Caret] = "op_BitXor",
         [TokenKind.LessLess] = "op_ShiftLeft",
         [TokenKind.GreaterGreater] = "op_ShiftRight",
+        [TokenKind.GreaterGreaterGreater] = "op_UnsignedShiftRight",
 
         [TokenKind.EqualsEquals] = "op_Equal",
         [TokenKind.BangEquals] = "op_NotEqual",

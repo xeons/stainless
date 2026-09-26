@@ -335,12 +335,13 @@ public sealed partial class LlvmEmitter
     {
         string array = EmitAddress(index.Target);
         var offset = EmitExpression(index.Index);
-        string widened = WidenIndex(offset);
 
         // One unsigned compare covers both ends, as it does for an array: a
         // negative index sign-extends to a very large unsigned value. The length
         // is a constant here rather than a load, because it was in the type.
         string length = inline.Length.ToString();
+        var position = PositionOf(offset, index.Origin, length);
+        string widened = position.Index;
         string inRange = Emit("i1", $"icmp ult {Word} {widened}, {length}");
 
         string okLabel = NextLabel("bounds.ok");
@@ -348,7 +349,7 @@ public sealed partial class LlvmEmitter
         Terminator($"br i1 {inRange}, label %{okLabel}, label %{failLabel}");
 
         Label(failLabel);
-        Line($"call void @sl_array_bounds_fail({Word} {widened}, {Word} {length})");
+        FailPosition(position, length);
         Terminator("unreachable");
 
         Label(okLabel);

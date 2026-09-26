@@ -82,6 +82,8 @@ public sealed partial class Binder
         MemberAccessSyntax member => BindMemberAccess(member),
         SliceSyntax slice => BindSlice(slice),
         IndexSyntax index => BindIndex(index),
+        IndexFromEndSyntax fromEnd => BindIndexFromEnd(fromEnd),
+        RangeSyntax range => BindRange(range),
         NewSyntax newExpression => BindNew(newExpression),
         WithSyntax changed => BindWith(changed),
         NewArraySyntax newArray => BindNewArray(newArray),
@@ -678,69 +680,6 @@ public sealed partial class Binder
     };
 
     /// <summary>
-    /// Binds the elements and leaves the type open, unless nothing is going to
-    /// close it -- in which case the elements themselves decide.
-    /// </summary>
-    private BoundExpression BindArrayLiteral(ArrayLiteralSyntax syntax)
-    {
-        var elements = syntax.Elements.Select(BindExpression).ToList();
-        if (elements.Any(e => e.Type.IsError())) return new BoundErrorExpression(syntax.Span);
-
-        return new BoundArrayDraft(syntax.Span, ArrayDraftType.Instance, elements);
-    }
-
-    /// <summary>
-    /// Settles an array literal against the type it is going into.
-    ///
-    /// <c>T[]</c> allocates; <c>T[N]</c> must match in length, because an
-    /// inline array is its elements and there is nowhere to put a different
-    /// number of them; <c>T[:]</c> settles as the <c>T[]</c> it is a view of,
-    /// and the ordinary array-to-slice conversion does the rest.
-    /// </summary>
-    private BoundExpression BindArraySettle(
-        BoundArrayDraft draft, TypeSymbol target, SourceSpan span)
-    {
-        if (target is SliceTypeSymbol slice)
-            return BindConversion(
-                BindArraySettle(draft, ArrayOf(slice.Element), span), slice, span);
-
-        TypeSymbol? element = target switch
-        {
-            ArrayTypeSymbol array => array.Element,
-            FixedArrayTypeSymbol inline => inline.Element,
-            _ => null,
-        };
-
-        if (element is null)
-        {
-            diagnostics.Error("SL0546", span,
-                $"'{target.Name}' is not an array, so an array literal cannot become one");
-            return new BoundErrorExpression(span);
-        }
-
-        if (target is FixedArrayTypeSymbol wanted && wanted.Length != draft.Elements.Count)
-        {
-            diagnostics.Error("SL0547", span,
-                $"'{wanted.Name}' holds exactly {wanted.Length} " +
-                $"element{(wanted.Length == 1 ? "" : "s")}, and this literal has " +
-                $"{draft.Elements.Count}; an inline array is its elements, so there is " +
-                "nowhere to keep a different number of them");
-            return new BoundErrorExpression(span);
-        }
-
-        var converted = draft.Elements
-            .Select(e => BindConversion(e, element, e.Span))
-            .ToList();
-
-        return new BoundArrayLiteral(span, target, element, converted);
-    }
-
-    /// <summary>
-    /// The type an array literal takes when nothing else says: the one type
-    /// every element reaches, which is the same question a ternary's two arms
-    /// ask.
-    /// </summary>
-    /// <summary>
     /// <c>var xs = flag ? [1, 2] : [3L];</c>: each arm settled from its own
     /// elements, and then the two brought to the type they share.
     /// </summary>
@@ -762,42 +701,6 @@ public sealed partial class Binder
         return new BoundConditional(chosen.Span, type, chosen.Condition,
             BindConversion(whenTrue, type, whenTrue.Span),
             BindConversion(whenFalse, type, whenFalse.Span));
-    }
-
-    private BoundExpression SettleArrayFromElements(BoundArrayDraft draft)
-    {
-        if (draft.Elements.Count == 0)
-        {
-            diagnostics.Error("SL0548", draft.Span,
-                "an empty array literal has no element type and nothing here says what it " +
-                "should be; write 'new T[0]', or give the variable a type");
-            return new BoundErrorExpression(draft.Span);
-        }
-
-        var element = draft.Elements[0].Type;
-        for (int i = 1; i < draft.Elements.Count; i++)
-        {
-            var next = draft.Elements[i];
-
-            // Already reaches what the ones before agreed on.
-            if (IsImplicitlyConvertible(next, element)) continue;
-
-            // Or is wider than they are, and they reach it: [1, 2L] is a long[]
-            // for the same reason `flag ? 1 : 2L` is a long.
-            if (draft.Elements.Take(i).All(e => IsImplicitlyConvertible(e, next.Type)))
-            {
-                element = next.Type;
-                continue;
-            }
-
-            diagnostics.Error("SL0549", next.Span,
-                $"this element is '{next.Type.Name}' and the ones before it are " +
-                $"'{element.Name}'; an array holds one type, so either make them agree " +
-                "or give the array a type of its own");
-            return new BoundErrorExpression(draft.Span);
-        }
-
-        return BindArraySettle(draft, ArrayOf(element), draft.Span);
     }
 
     private BoundExpression BindThis(ThisSyntax syntax)
@@ -1345,6 +1248,7 @@ public sealed partial class Binder
             TokenKind.Caret => BoundBinaryOp.BitXor,
             TokenKind.LessLess => BoundBinaryOp.ShiftLeft,
             TokenKind.GreaterGreater => BoundBinaryOp.ShiftRight,
+            TokenKind.GreaterGreaterGreater => BoundBinaryOp.UnsignedShiftRight,
             TokenKind.EqualsEquals => BoundBinaryOp.Equal,
             TokenKind.BangEquals => BoundBinaryOp.NotEqual,
             TokenKind.Less => BoundBinaryOp.Less,
@@ -1622,7 +1526,7 @@ public sealed partial class Binder
         }
 
         // Shifts keep the left type; only the left operand promotes.
-        if (op is BoundBinaryOp.ShiftLeft or BoundBinaryOp.ShiftRight)
+        if (op is BoundBinaryOp.ShiftLeft or BoundBinaryOp.ShiftRight or BoundBinaryOp.UnsignedShiftRight)
         {
             if (!leftPrimitive.IsInteger || !rightPrimitive.IsInteger)
             {
@@ -2611,7 +2515,8 @@ public sealed partial class Binder
             type is PrimitiveTypeSymbol { IsNumeric: true } or PrimitiveTypeSymbol { Kind: PrimitiveKind.Char } &&
             combined.Type is PrimitiveTypeSymbol &&
             !IsImplicitlyConvertible(combined, type) &&
-            (op is BoundBinaryOp.ShiftLeft or BoundBinaryOp.ShiftRight ||
+            (op is BoundBinaryOp.ShiftLeft or BoundBinaryOp.ShiftRight
+                or BoundBinaryOp.UnsignedShiftRight ||
              IsImplicitlyConvertible(value, type)) &&
             ClassifyConversion(combined.Type, type, explicitCast: true) is { } kind)
             return new BoundConversion(syntax.Span, type, combined, kind);
@@ -2631,6 +2536,8 @@ public sealed partial class Binder
         TokenKind.PipeEquals => (BoundBinaryOp.BitOr, TokenKind.Pipe),
         TokenKind.CaretEquals => (BoundBinaryOp.BitXor, TokenKind.Caret),
         TokenKind.LessLessEquals => (BoundBinaryOp.ShiftLeft, TokenKind.LessLess),
+        TokenKind.GreaterGreaterGreaterEquals =>
+            (BoundBinaryOp.UnsignedShiftRight, TokenKind.GreaterGreaterGreater),
         _ => (BoundBinaryOp.ShiftRight, TokenKind.GreaterGreater),
     };
 
@@ -2885,14 +2792,16 @@ public sealed partial class Binder
             case BoundIndex { Target.Type: FixedArrayTypeSymbol } element:
                 return new BoundIndex(element.Span, element.Type,
                     HoldPlace(element.Target, held, everything),
-                    HoldValue(element.Index, held, everything));
+                    HoldValue(element.Index, held, everything))
+                    { Origin = element.Origin };
 
             case BoundIndex element:
                 return new BoundIndex(element.Span, element.Type,
                     element.Target.Type is ArrayTypeSymbol
                         ? HoldContainer(element.Target, held, everything)
                         : HoldValue(element.Target, held, everything),
-                    HoldValue(element.Index, held, everything));
+                    HoldValue(element.Index, held, everything))
+                    { Origin = element.Origin };
 
             case BoundDereference dereference:
                 return new BoundDereference(dereference.Span, dereference.Type,
@@ -3072,6 +2981,10 @@ public sealed partial class Binder
         if (target.Type is NamedTypeSymbol named && FindIndexer(named, given, false) is { } getter)
             return BuildIndexerCall(syntax.Span, getter, target, given, null);
 
+        // `a[^1]`, `a[i]` of an Index, and `a[1..^1]` of anything that counts.
+        if (given is [var position] && (IsStandardIndex(position.Type) || IsStandardRange(position.Type)))
+            return BindPositionIndex(target, position, syntax.Span);
+
         if (target.Type is not (PointerTypeSymbol or ArrayTypeSymbol or SliceTypeSymbol
                                 or FixedArrayTypeSymbol))
         {
@@ -3159,38 +3072,31 @@ public sealed partial class Binder
     /// <summary>A slice of a target that has already been bound.</summary>
     private BoundExpression BindSliceOn(BoundExpression target, SliceSyntax syntax)
     {
-
-        var element = target.Type switch
-        {
-            ArrayTypeSymbol array => array.Element,
-            SliceTypeSymbol slice => slice.Element,
-            _ => null,
-        };
-
-        if (element is null)
-        {
-            diagnostics.Error("SL0452", syntax.Span,
-                $"cannot slice '{target.Type.Name}'; slicing takes part of an array or of " +
-                "another slice");
-            return new BoundErrorExpression(syntax.Span);
-        }
-
         var start = BindBound(syntax.Start);
         var end = BindBound(syntax.End);
 
         if (start?.Type.IsError() == true || end?.Type.IsError() == true)
             return new BoundErrorExpression(syntax.Span);
 
-        return new BoundSlice(syntax.Span, SliceOf(element), target, start, end);
+        var (from, fromOrigin) = start is null ? (null, IndexOrigin.Start) : PositionParts(start);
+        var (to, toOrigin) = end is null ? (null, IndexOrigin.Start) : PositionParts(end);
+
+        return MakeSlice(syntax.Span, target, from, fromOrigin, to, toOrigin);
     }
 
-    /// <summary>One end of a slice, or null where the source left it out.</summary>
+    /// <summary>
+    /// One end of a slice, or null where the source left it out: an integer as
+    /// a <c>nuint</c>, or a <c>Standard.Index</c> as it is.
+    /// </summary>
     private BoundExpression? BindBound(ExpressionSyntax? syntax)
     {
         if (syntax is null) return null;
 
         var bound = BindExpression(syntax);
         if (bound.Type.IsError()) return bound;
+
+        if (IsStandardIndex(bound.Type))
+            return bound;
 
         if (bound.Type is not PrimitiveTypeSymbol { IsInteger: true })
         {

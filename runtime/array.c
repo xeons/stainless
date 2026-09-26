@@ -82,6 +82,21 @@ void sl_array_bounds_fail(size_t index, size_t length)
     sl_fail(buffer);
 }
 
+/*
+ * An index counted from the end says so: `^4` of three elements is reported as
+ * that, rather than as the word the subtraction wrapped to.
+ */
+void sl_index_bounds_fail(size_t value, int from_end, size_t length)
+{
+    char buffer[128];
+
+    if (!from_end)
+        sl_array_bounds_fail(value, length);
+
+    snprintf(buffer, sizeof buffer,
+             "^%zu is outside the bounds of an array of length %zu", value, length);
+    sl_fail(buffer);
+}
 
 /*
  * A slice's two bounds are wrong in two different ways, and saying which one it

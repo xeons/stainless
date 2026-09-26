@@ -1,0 +1,2 @@
+last 3
+stainless: ^4 is outside the bounds of an array of length 3

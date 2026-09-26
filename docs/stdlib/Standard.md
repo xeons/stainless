@@ -7,7 +7,7 @@ than library features, and so need no import to reach.
 
 ## Contents
 
-**Types** &nbsp; [Action&lt;T&gt;](#actiont-closure) &middot; [Comparison&lt;T&gt;](#comparisont-closure) &middot; [Fold&lt;TAccumulate, TSource&gt;](#foldtaccumulate-tsource-closure) &middot; [Func&lt;T, TResult&gt;](#funct-tresult-closure) &middot; [Optional&lt;T&gt;](#optionalt-variant) &middot; [Predicate&lt;T&gt;](#predicatet-closure) &middot; [Result&lt;T, TError&gt;](#resultt-terror-variant)
+**Types** &nbsp; [Action&lt;T&gt;](#actiont-closure) &middot; [Comparison&lt;T&gt;](#comparisont-closure) &middot; [Fold&lt;TAccumulate, TSource&gt;](#foldtaccumulate-tsource-closure) &middot; [Func&lt;T, TResult&gt;](#funct-tresult-closure) &middot; [Index](#index-struct) &middot; [Optional&lt;T&gt;](#optionalt-variant) &middot; [Predicate&lt;T&gt;](#predicatet-closure) &middot; [Range](#range-struct) &middot; [Result&lt;T, TError&gt;](#resultt-terror-variant)
 
 ## Types
 
@@ -78,6 +78,86 @@ Turns a T into a TResult. The transform half of `Select`.
 - `TResult` — what comes out
 
 <sub>[stdlib/Standard/Standard.sl:38](../../stdlib/Standard/Standard.sl#L38)</sub>
+
+### Index *struct*
+
+```
+struct Index
+```
+
+A position in a sequence, counted from its start or back from its end.
+What `^n` makes when it is kept rather than used at once, as C#'s
+`System.Index` is.
+
+    Index last = ^1;
+    int x = numbers[last];
+
+**The count is a `nuint`**, as every length here is, where C# has `int`.
+`^n` takes any integer and converts it the way an index does, so a
+negative one becomes a position no sequence has.
+
+<sub>[stdlib/Standard/Index.sl:34](../../stdlib/Standard/Index.sl#L34)</sub>
+
+#### Value *property*
+
+```
+nuint Value { get; }
+```
+
+How far from the start, or back from the end.
+
+<sub>[stdlib/Standard/Index.sl:48](../../stdlib/Standard/Index.sl#L48)</sub>
+
+#### IsFromEnd *property*
+
+```
+bool IsFromEnd { get; }
+```
+
+Whether `Value` counts back from the end: `^1` is the last element.
+
+<sub>[stdlib/Standard/Index.sl:51](../../stdlib/Standard/Index.sl#L51)</sub>
+
+#### Start *property*
+
+```
+static Index Start { get; }
+```
+
+The first position, `0`.
+
+<sub>[stdlib/Standard/Index.sl:54](../../stdlib/Standard/Index.sl#L54)</sub>
+
+#### End *property*
+
+```
+static Index End { get; }
+```
+
+One past the last position, `^0`.
+
+<sub>[stdlib/Standard/Index.sl:57](../../stdlib/Standard/Index.sl#L57)</sub>
+
+#### GetOffset *method*
+
+```
+nuint GetOffset(nuint length)
+```
+
+The position this is in a sequence of `length` elements. Nothing is
+checked here; the index or slice that uses the answer checks it.
+
+<sub>[stdlib/Standard/Index.sl:61](../../stdlib/Standard/Index.sl#L61)</sub>
+
+#### operator Identifier *operator*
+
+```
+static Index operator Identifier(nuint value)
+```
+
+A position counted from the start, so `Index i = 3;` reads as it does in C#.
+
+<sub>[stdlib/Standard/Index.sl:64](../../stdlib/Standard/Index.sl#L64)</sub>
 
 ### Optional&lt;T&gt; *variant*
 
@@ -273,6 +353,65 @@ Answers a question about a T.
 - `T` — what the question is about
 
 <sub>[stdlib/Standard/Standard.sl:43](../../stdlib/Standard/Standard.sl#L43)</sub>
+
+### Range *struct*
+
+```
+struct Range
+```
+
+The half-open run of positions between two `Index`es. What `a..b` makes
+when it is kept rather than used at once, as C#'s `System.Range` is.
+
+    Range inner = 1..^1;
+    int[:] middle = numbers[inner];
+
+Either end may be left out: `..b` starts at the start and `a..` runs to
+the end.
+
+<sub>[stdlib/Standard/Range.sl:32](../../stdlib/Standard/Range.sl#L32)</sub>
+
+#### Start *property*
+
+```
+Index Start { get; }
+```
+
+The first position in the run.
+
+<sub>[stdlib/Standard/Range.sl:46](../../stdlib/Standard/Range.sl#L46)</sub>
+
+#### End *property*
+
+```
+Index End { get; }
+```
+
+The position just past the last.
+
+<sub>[stdlib/Standard/Range.sl:49](../../stdlib/Standard/Range.sl#L49)</sub>
+
+#### All *property*
+
+```
+static Range All { get; }
+```
+
+Every position, `..`.
+
+<sub>[stdlib/Standard/Range.sl:52](../../stdlib/Standard/Range.sl#L52)</sub>
+
+#### GetOffsetAndLength *method*
+
+```
+(nuint, nuint) GetOffsetAndLength(nuint length)
+```
+
+Where the run begins in a sequence of `length` elements, and how many
+elements it covers. Aborts when it runs backwards or past the end, as a
+slice does.
+
+<sub>[stdlib/Standard/Range.sl:57](../../stdlib/Standard/Range.sl#L57)</sub>
 
 ### Result&lt;T, TError&gt; *variant*
 

@@ -315,6 +315,7 @@ public sealed partial class LlvmEmitter
             BoundBinaryOp.BitOr => "or",
             BoundBinaryOp.BitXor => "xor",
             BoundBinaryOp.ShiftLeft => "shl",
+            BoundBinaryOp.UnsignedShiftRight => "lshr",
             _ => signed ? "ashr" : "lshr",
         };
 
@@ -326,6 +327,7 @@ public sealed partial class LlvmEmitter
             GuardDivision(type, left.Ref, right.Ref, signed);
 
         string operand = binary.Operator is BoundBinaryOp.ShiftLeft or BoundBinaryOp.ShiftRight
+                or BoundBinaryOp.UnsignedShiftRight
             ? MaskShiftCount(type, right.Ref)
             : right.Ref;
 

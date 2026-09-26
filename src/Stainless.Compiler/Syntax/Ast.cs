@@ -1313,6 +1313,21 @@ public sealed record IndexSyntax(
     public bool Conditional { get; init; }
 }
 
+/// <summary><c>^n</c>: a position counted back from the end, so <c>a[^1]</c> is the last element.</summary>
+public sealed record IndexFromEndSyntax(SourceSpan Span, ExpressionSyntax Operand)
+    : ExpressionSyntax(Span);
+
+/// <summary>
+/// <c>a..b</c>, <c>a..</c>, <c>..b</c> and <c>..</c>: a range of positions,
+/// half-open. Either end may be a <c>^n</c>.
+/// </summary>
+public sealed record RangeSyntax(SourceSpan Span, ExpressionSyntax? Start, ExpressionSyntax? End)
+    : ExpressionSyntax(Span);
+
+/// <summary><c>..e</c> in a collection expression: every element of <c>e</c>, in order.</summary>
+public sealed record SpreadElementSyntax(SourceSpan Span, ExpressionSyntax Operand)
+    : ExpressionSyntax(Span);
+
 /// <summary>
 /// <c>new C(args)</c>, or <c>new(args)</c> with a null <c>Type</c>, which takes
 /// the type from where the value is going.
@@ -1345,12 +1360,14 @@ public sealed record InitializerEntrySyntax(
     SourceSpan Span, string? Name, SourceSpan NameSpan, ExpressionSyntax Value) : SyntaxNode(Span);
 
 /// <summary>
-/// <c>[a, b, c]</c> — an array written out.
+/// <c>[a, b, ..c]</c> — a collection written out. An element may be a
+/// <see cref="SpreadElementSyntax"/>.
 ///
 /// It has no type of its own. What it becomes is decided by where it is going,
 /// the way a lambda and a variant case name are (§2.14, §2.6): a <c>T[]</c>, a
-/// <c>T[N]</c> of matching length, or a <c>T[:]</c>. With nothing to go on, the
-/// elements decide, so <c>var xs = [1, 2, 3];</c> is an <c>int[]</c>.
+/// <c>T[N]</c> of matching length, a <c>T[:]</c>, or a class with <c>Add</c>.
+/// With nothing to go on, the elements decide, so <c>var xs = [1, 2, 3];</c>
+/// is an <c>int[]</c>.
 /// </summary>
 public sealed record ArrayLiteralSyntax(
     SourceSpan Span,

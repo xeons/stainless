@@ -1864,6 +1864,10 @@ them
 Elements are stored the way an assignment into an element is, so a literal of
 references retains every one — `[a, b]` outlives the locals `a` and `b`.
 
+A literal may also spread another collection into itself, `[..a, 0]`, and may
+become a list rather than an array; both are
+[§2.11.3](#2113-a-b--collection-expressions).
+
 ### 2.11.2 `T[N]` — an inline array
 
 ```csharp
@@ -1916,6 +1920,83 @@ double Total(ref Matrix matrix) { ... }
 `new T[n]` is unaffected and still builds a counted heap array: under `new`, a
 length in brackets is the count rather than part of the type.
 
+### 2.11.3 `[a, ..b]` — collection expressions
+
+```csharp
+int[] both = [..first, 0, ..second];    // every element of each, in order
+List<String> names = ["ada", ..more];   // a class with Add
+IEnumerable<int> some = [1, 2, 3];      // given a List<int>
+int[5] five = [..three, 4, 5];          // an inline array's length is known
+int[:] view = [..numbers[1..], 99];     // an array, seen as a slice
+```
+
+An array literal is C#'s collection expression. **`..e` spreads**: every
+element of `e`, in order, where `e` is anything `foreach` walks
+([§9.4](09-statements-expressions.md#94-foreach)) — an array, a slice, an
+inline array, or anything with a `GetEnumerator()`. A range as an element is
+written in parentheses, `[(..n)]`, as in C#.
+
+**What one can become** is decided by where it is going, as for any literal:
+
+- a `T[]`, a `T[N]` or a `T[:]`, as above;
+- **a class with a constructor taking nothing and an `Add` taking one
+  element** — `List<T>`, `HashSet<T>`, or a type of the program's own. It is
+  made and then added to once per element, `Add` found by name as a collection
+  initializer's is ([§2.4.2](#242-making-one-with-its-members-written-out)).
+  One that also has a constructor taking only an integer `capacity` is given
+  the count, when every spread can say its own;
+- **`IEnumerable<T>`, `IList<T>` or `IReadOnlyList<T>`**, which are given a
+  `List<T>`.
+
+C#'s `[CollectionBuilder]` is not here. A constructor and an `Add` are what
+every collection in the library already has, and an attribute naming a factory
+would be a second way to say the same thing. A struct with `Add` is refused,
+because what it is added to would be a copy.
+
+**What it costs.** Without a `..` nothing is different: one allocation and a
+store per element at a constant index. With one, every element is evaluated
+first, in the order written, and held; then
+
+- when every spread can say how long it is — an array, a slice, an inline
+  array, a type with an integer `Count` or `Length` — the array is allocated
+  once at exactly that size and filled from the front;
+- otherwise the elements go through a growable buffer, and the array it hands
+  back is exact, without a copy when the buffer came out full.
+
+An inline array is written out element by element, since its length is in its
+type. Anything else is walked by a generic function in the standard library,
+instantiated at the element types involved. A class target is added to in
+order and needs no buffer.
+
+**A slice gets a heap array.** `int[:] view = [1, 2, 3]` allocates the array it
+views. A `params T[:]` can put its array in the caller's frame because the call
+is over by the end of the statement
+([§7.1.3](07-functions-members.md#713-params)); a literal stored in a variable
+outlives its statement, and with no escape analysis nothing can prove that a
+frame array would not be kept past it, so none is attempted.
+
+**An array is preferred.** A literal fits a `T[]`, a `T[:]` or a `T[N]` better
+than a class or an interface, so `Sum([1, 2])` against `Sum(int[:])` and
+`Sum(IEnumerable<int>)` chooses the first, as C# prefers a span or an array.
+
+**It still decides for itself** where C# would refuse, and a spread offers what
+it yields: `var all = [..numbers, 4L]` is a `long[]` when `numbers` is an
+`int[]`.
+
+```
+error[SL0778]: '..' spreads the elements of an array, a slice or anything with
+a 'GetEnumerator()', and 'int' is none of those
+
+error[SL0779]: 'int[4]' holds exactly 4 elements, and this '..' has no length
+until it runs; only an inline array's is known here
+
+error[SL0546]: 'Sealed' has no 'Add' taking one element, so there is nothing
+for an array literal's elements to be added with
+```
+
+A spread whose elements do not convert to the element type is SL0778 as well,
+and an inline array spread of the wrong length is SL0547.
+
 ## 2.12 `T[:]` — part of an array
 
 A slice names part of an array, as a value.
@@ -1931,6 +2012,12 @@ int[:] head   = numbers[:2];      // from the beginning
 
 The bounds are half-open, as everywhere: `numbers[1:4]` has three elements.
 Either end may be left out and means the beginning or the length.
+
+**C#'s ranges name the same slices**: `numbers[1..4]`, `numbers[3..]`,
+`numbers[..2]` and `numbers[..]` are the four above, and either end may count
+back from the length — `numbers[1..^1]`, or `numbers[1:^1]` in this syntax.
+`numbers[^1]` is the last element. Both are
+[§9.17](09-statements-expressions.md#917--and-).
 
 **A slice is a view, not a copy.** Writing through one writes the array it came
 from, and `Length` is the slice's own rather than the array's — which is also

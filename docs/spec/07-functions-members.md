@@ -596,7 +596,7 @@ its operators apart from its methods, and an operator is reached by writing it.
 | | |
 |---|---|
 | arithmetic | `+` `-` `*` `/` `%` |
-| bitwise | `&` `\|` `^` `<<` `>>` |
+| bitwise | `&` `\|` `^` `<<` `>>` `>>>` |
 | comparison | `==` `!=` `<` `>` `<=` `>=` |
 | unary | `-` `!` `~` |
 
@@ -750,6 +750,13 @@ the type can answer, which is why answering it is what declaring an indexer is.
 
 An indexer is inherited like any other member, and works on a struct — where
 the setter reaches its receiver by pointer, as every struct method does.
+
+**A type with a count needs no indexer for `^` and `..`.** An integer `Count`
+or `Length` and an indexer taking an integer make `x[^1]` mean
+`x[x.Count - 1]`, and a `Slice(start, length)` as well makes `x[1..^1]` mean
+what that method returns, as C# has it
+([§9.17](09-statements-expressions.md#917--and-)). An indexer declared to take
+a `Standard.Index` or a `Standard.Range` is asked first.
 
 ## 7.6 `static` members
 

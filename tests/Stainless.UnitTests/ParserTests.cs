@@ -68,6 +68,9 @@ public class ParserTests
         NewSyntax made => made.Type is null ? "new()" : "new",
         ArrayLiteralSyntax array =>
             $"[{string.Join(" ", array.Elements.Select(Render))}]",
+        IndexFromEndSyntax fromEnd => $"(hat {Render(fromEnd.Operand)})",
+        RangeSyntax range => $"(.. {Render(range.Start)} {Render(range.End)})",
+        SpreadElementSyntax spread => $"(spread {Render(spread.Operand)})",
         TupleSyntax tuple => $"(tuple {string.Join(" ", tuple.Elements.Select(Render))})",
         DeclarationExpressionSyntax declared =>
             $"(declare {(declared.Type is null ? "var" : Render(declared.Type))} {declared.Name})",
@@ -325,6 +328,39 @@ public class ParserTests
     public void SliceBoundsMayBeOmitted(string source, string shape) =>
         Assert.Equal(shape, Shape(source));
 
+    // ------------------------------------------------- indexes and ranges
+
+    /// <summary>
+    /// <c>^</c> in front of an operand counts from the end, and <c>..</c>
+    /// binds tighter than any binary operator, as in C#, so <c>0..n - 1</c>
+    /// is a range minus one rather than a range to <c>n - 1</c>.
+    /// </summary>
+    [Theory]
+    [InlineData("a[^1]", "([] a (hat 1))")]
+    [InlineData("a ^ ^b", "(^ a (hat b))")]
+    [InlineData("a[1..^1]", "([] a (.. 1 (hat 1)))")]
+    [InlineData("a[..]", "([] a (.. _ _))")]
+    [InlineData("a[..2]", "([] a (.. _ 2))")]
+    [InlineData("a[i..]", "([] a (.. i _))")]
+    [InlineData("a[^2..]", "([] a (.. (hat 2) _))")]
+    [InlineData("a[1:^1]", "([:] a 1 (hat 1))")]
+    [InlineData("1..2", "(.. 1 2)")]
+    [InlineData("0..n - 1", "(- (.. 0 n) 1)")]
+    [InlineData("x.y..z.w", "(.. (. x y) (. z w))")]
+    [InlineData("-a..b", "(.. (- a) b)")]
+    [InlineData("f(1.., ..2)", "(call f (.. 1 _) (.. _ 2))")]
+    public void IndexesAndRangesParse(string source, string shape) =>
+        Assert.Equal(shape, Shape(source));
+
+    [Theory]
+    [InlineData("a >>> b", "(>>> a b)")]
+    [InlineData("a >>> b >> c", "(>> (>>> a b) c)")]
+    [InlineData("a + b >>> c", "(>>> (+ a b) c)")]
+    [InlineData("a >>>= 2", "(>>>= a 2)")]
+    [InlineData("F<List<List<List<int>>>>()", "(call F<List<List<List<int>>>>)")]
+    public void UnsignedShiftParsesAsAShift(string source, string shape) =>
+        Assert.Equal(shape, Shape(source));
+
     // -------------------------------------------------------- array literals
 
     [Theory]
@@ -332,6 +368,10 @@ public class ParserTests
     [InlineData("[1]", "[1]")]
     [InlineData("[1, 2, 3]", "[1 2 3]")]
     [InlineData("[1 + 2, 3]", "[(+ 1 2) 3]")]
+    [InlineData("[..a]", "[(spread a)]")]
+    [InlineData("[1, ..a, ..b.c, 2]", "[1 (spread a) (spread (. b c)) 2]")]
+    [InlineData("[(..a)]", "[(.. _ a)]")]
+    [InlineData("[..a[1..]]", "[(spread ([] a (.. 1 _)))]")]
     public void ArrayLiteralsCollectTheirElements(string source, string shape) =>
         Assert.Equal(shape, Shape(source));
 

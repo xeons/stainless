@@ -293,8 +293,9 @@ last person to edit it -- the suite is the authority.
   gathers into an array in the caller's frame, so the call allocates nothing;
   the frame checks when the statement ends that nothing kept a reference to it,
   and stops the program if something did. Misplaced, it is SL0763
-- Full operator set with C# precedence, short-circuit `&&` and `||`, and the
-  conditional `a ? b : c`. The arithmetic C leaves undefined is defined here:
+- Full operator set with C# precedence, short-circuit `&&` and `||`, the
+  conditional `a ? b : c`, and `>>>`, which shifts zeros in whatever the sign
+  and overloads like the other shifts. The arithmetic C leaves undefined is defined here:
   a shift count is reduced modulo the operand's width as in C#, so `1 << 40` is
   256 rather than garbage, and an integer division by zero — or the one signed
   division that overflows — aborts the way an out-of-range index does, rather
@@ -345,9 +346,15 @@ last person to edit it -- the suite is the authority.
   `char16*`, which is what makes handing a wide API the wrong 16-bit pointer a
   compile error
 - `T[]`: counted arrays, always bounds checked, elements released with the array
-- Array literals: `[1, 2, 3]`, taking their type from where they are going — a
-  `T[]`, a `T[N]` of matching length or a `T[:]` — or from their own elements
-  when nothing else says, so `var xs = [1, 2, 3]` needs no type written out
+- Collection expressions: `[1, 2, 3]` and `[..a, 0, ..b]`, taking their type
+  from where they are going — a `T[]`, a `T[N]` of matching length, a `T[:]`,
+  a class with `Add` and a constructor taking nothing, or `IEnumerable<T>`,
+  `IList<T>` and `IReadOnlyList<T>` as a `List<T>` — or from their own elements
+  when nothing else says, so `var xs = [1, 2, 3]` needs no type written out. A
+  `..` spreads anything `foreach` walks; the elements are evaluated once, in
+  order, and the array is allocated once at its exact size when every spread
+  can say its length. A `T[:]` target is a heap array, since nothing proves a
+  frame one would not be kept
 - `T[N]`: an inline fixed-size array, which is C's and not C#'s — it *is* its
   elements rather than a reference to them, so a struct holding one is exactly
   as wide as the C struct it mirrors. The length is part of the type, so
@@ -360,6 +367,13 @@ last person to edit it -- the suite is the authority.
   It holds the array it came from, so it cannot dangle: what it points into is
   alive for as long as it is. An array converts to a slice of the whole of
   itself implicitly, and `foreach` walks one like an array
+- `^n` and `a..b`, as C# has them: `a[^1]`, `a[1..^1]`, `a[..2]`, and `^` in
+  Stainless's own `a[1:^1]`. On an array, a slice and an inline array they are
+  the index and the slice they spell, counted from the length the bounds check
+  already loads; kept, they are `Standard.Index` and `Standard.Range`. A type
+  with `Count` or `Length` and an integer indexer takes `^`, and one with
+  `Slice(start, length)` takes ranges, `List<T>` among them. A `String` takes
+  neither, because its positions are bytes
 - Generics: generic classes, interfaces, functions and methods, monomorphized,
   with inference at call sites or type arguments written there, and constraints: an interface, a base class,
   another type parameter, `class`, `struct`, `new()` and `threadsafe`

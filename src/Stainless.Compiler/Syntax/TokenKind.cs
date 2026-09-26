@@ -70,12 +70,13 @@ public enum TokenKind
     Less, LessEquals, Greater, GreaterEquals,
     Plus, Minus, Star, Slash, Percent,
     Amp, AmpAmp, Pipe, PipePipe, Caret,
-    LessLess, GreaterGreater, EqualsGreater, MinusGreater,
+    LessLess, GreaterGreater, GreaterGreaterGreater, EqualsGreater, MinusGreater,
     PlusPlus, MinusMinus,
 
     // Compound assignment
     PlusEquals, MinusEquals, StarEquals, SlashEquals, PercentEquals,
     AmpEquals, PipeEquals, CaretEquals, LessLessEquals, GreaterGreaterEquals,
+    GreaterGreaterGreaterEquals,
     QuestionQuestionEquals,
 
     EndOfFile, Bad,
@@ -198,6 +199,7 @@ public static class TokenKindExtensions
         TokenKind.Caret => "^",
         TokenKind.LessLess => "<<",
         TokenKind.GreaterGreater => ">>",
+        TokenKind.GreaterGreaterGreater => ">>>",
         TokenKind.EqualsGreater => "=>",
         TokenKind.MinusGreater => "->",
         TokenKind.PlusPlus => "++",
@@ -212,6 +214,7 @@ public static class TokenKindExtensions
         TokenKind.CaretEquals => "^=",
         TokenKind.LessLessEquals => "<<=",
         TokenKind.GreaterGreaterEquals => ">>=",
+        TokenKind.GreaterGreaterGreaterEquals => ">>>=",
         TokenKind.QuestionQuestionEquals => "??=",
         TokenKind.EndOfFile => "end of file",
         _ => null,

@@ -462,6 +462,8 @@ public sealed partial class LlvmEmitter
             $"declare void @sl_array_bounds_fail({Word}, {Word}) noreturn nounwind");
         Declare("sl_slice_bounds_fail",
             $"declare void @sl_slice_bounds_fail({Word}, {Word}, {Word}) noreturn nounwind");
+        Declare("sl_index_bounds_fail",
+            $"declare void @sl_index_bounds_fail({Word}, i32, {Word}) noreturn nounwind");
         Declare("sl_divide_by_zero",
             "declare void @sl_divide_by_zero() noreturn nounwind");
         Declare("sl_divide_overflow",

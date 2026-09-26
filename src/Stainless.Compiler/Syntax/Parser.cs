@@ -2426,7 +2426,7 @@ public sealed class Parser
     /// </summary>
     private void ExpectTypeArgumentEnd()
     {
-        if (!At(TokenKind.GreaterGreater))
+        if (!AtAny(TokenKind.GreaterGreater, TokenKind.GreaterGreaterGreater))
         {
             Expect(TokenKind.Greater);
             return;
@@ -2436,11 +2436,12 @@ public sealed class Parser
         var span = shift.Span;
         _splits.Push((_pos, shift));
 
-        // Put back the half this list did not need, so the enclosing one closes.
+        // Put back what this list did not need, so the enclosing ones close.
+        bool triple = shift.Kind == TokenKind.GreaterGreaterGreater;
         _tokens[_pos] = new Token(
-            TokenKind.Greater,
+            triple ? TokenKind.GreaterGreater : TokenKind.Greater,
             new SourceSpan(span.File, span.Start + 1, span.End),
-            ">");
+            triple ? ">>" : ">");
     }
 
     /// <summary>Parses <c>&lt;T, U&gt;</c> in a declaration.</summary>
@@ -3515,7 +3516,7 @@ public sealed class Parser
     {
         TokenKind.Star or TokenKind.Slash or TokenKind.Percent => 10,
         TokenKind.Plus or TokenKind.Minus => 9,
-        TokenKind.LessLess or TokenKind.GreaterGreater => 8,
+        TokenKind.LessLess or TokenKind.GreaterGreater or TokenKind.GreaterGreaterGreater => 8,
         TokenKind.Less or TokenKind.LessEquals or
         TokenKind.Greater or TokenKind.GreaterEquals => 7,
         TokenKind.EqualsEquals or TokenKind.BangEquals => 6,
@@ -3541,6 +3542,7 @@ public sealed class Parser
         TokenKind.SlashEquals, TokenKind.PercentEquals,
         TokenKind.AmpEquals, TokenKind.PipeEquals, TokenKind.CaretEquals,
         TokenKind.LessLessEquals, TokenKind.GreaterGreaterEquals,
+        TokenKind.GreaterGreaterGreaterEquals,
         TokenKind.QuestionQuestionEquals,
     ];
 
@@ -3751,7 +3753,7 @@ public sealed class Parser
     private ExpressionSyntax ParseBinary(int minPrecedence)
     {
         int start = _pos;
-        var left = ParseUnary();
+        var left = ParseRange();
 
         while (true)
         {
@@ -3795,6 +3797,33 @@ public sealed class Parser
 
         return left;
     }
+
+    /// <summary>
+    /// <c>a..b</c>, with either end optional. As in C#, it binds tighter than
+    /// any binary operator and looser than a prefix, so <c>1..^1</c> needs no
+    /// parentheses and <c>0..n - 1</c> is <c>(0..n) - 1</c>.
+    /// </summary>
+    private ExpressionSyntax ParseRange()
+    {
+        int start = _pos;
+        var first = AtDotDot() ? null : ParseUnary();
+        if (!AtDotDot())
+            return first!;
+
+        Advance();
+        Advance();
+
+        var last = EndsRangeOperand(Current) ? null : ParseUnary();
+        return new RangeSyntax(SpanFrom(start), first, last);
+    }
+
+    /// <summary>Whether this token closes the expression a <c>..</c> is in, so the range has no end.</summary>
+    private static bool EndsRangeOperand(Token token) =>
+        token.Kind is TokenKind.CloseBracket or TokenKind.CloseParen or TokenKind.CloseBrace
+            or TokenKind.Comma or TokenKind.Semicolon or TokenKind.Colon
+            or TokenKind.EqualsGreater or TokenKind.EndOfFile ||
+        BinaryPrecedence(token.Kind) > 0 && token.Kind is not (TokenKind.Minus or TokenKind.Plus
+            or TokenKind.Star or TokenKind.Amp or TokenKind.Caret);
 
     private ExpressionSyntax ParseUnary()
     {
@@ -3848,6 +3877,16 @@ public sealed class Parser
             var operand = ParseUnary();
             return new UnarySyntax(SpanFrom(start), op, operand);
         }
+
+        // `^n`. A binary `^` only ever follows an operand, so in front of one
+        // it can only count from the end.
+        if (At(TokenKind.Caret))
+        {
+            Advance();
+            var operand = ParseUnary();
+            return new IndexFromEndSyntax(SpanFrom(start), operand);
+        }
+
         return ParsePostfix();
     }
 
@@ -3858,7 +3897,8 @@ public sealed class Parser
 
         while (true)
         {
-            if (AtAny(TokenKind.Dot, TokenKind.MinusGreater, TokenKind.QuestionDot))
+            // `a..b` is a range, and its `..` belongs to ParseRange.
+            if (AtAny(TokenKind.Dot, TokenKind.MinusGreater, TokenKind.QuestionDot) && !AtDotDot())
             {
                 bool arrow = At(TokenKind.MinusGreater);
                 bool asking = At(TokenKind.QuestionDot);
@@ -4357,7 +4397,19 @@ public sealed class Parser
 
                 while (!At(TokenKind.CloseBracket) && !At(TokenKind.EndOfFile))
                 {
-                    elements.Add(ParseExpression());
+                    // `..e` spreads; a range as an element is written `(..e)`,
+                    // as in C#.
+                    int elementStart = _pos;
+                    if (AtDotDot())
+                    {
+                        Advance();
+                        Advance();
+                        elements.Add(new SpreadElementSyntax(SpanFrom(elementStart), ParseExpression()));
+                    }
+                    else
+                    {
+                        elements.Add(ParseExpression());
+                    }
 
                     // A trailing comma is allowed, so a list written one entry
                     // per line can have every line end the same way.

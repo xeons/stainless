@@ -82,9 +82,10 @@ at the object header ([§2 of abi.md](../abi.md#2-object-header-class-instances)
 the reference you are holding.
 
 Operators, by descending precedence: primary `a.b` `a?.b` `f(x)` `F<T>(x)`
-`a[i]` `a?[i]` `a[1:4]` `x++ x--` `x!` · prefix `++x --x - ! ~ * &` and `(T)x` and `try` · `* / %` ·
-`+ -` · `<< >>` · `< <= > >=` and `is` · `== !=` · `&` · `^` · `|` ·
-`&&` · `||` · `?:` · assignment `= += -= *= /= %= &= |= ^= <<= >>=`.
+`a[i]` `a?[i]` `a[1:4]` `x++ x--` `x!` · prefix `++x --x - ! ~ * & ^` and `(T)x` and `try` ·
+range `..` · `* / %` · `+ -` · `<< >> >>>` · `< <= > >=` and `is` · `== !=` ·
+`&` · `^` · `|` · `&&` · `||` · `?:` · assignment
+`= += -= *= /= %= &= |= ^= <<= >>= >>>=`.
 
 That row is member access, a call, an index, a slice and the postfix steps, and
 it binds tightest: `a.b.c` is `(a.b).c`, and `f(x)[i]` indexes what `f`
@@ -102,6 +103,14 @@ produces is a declaration's storage rather than the value of an expression.
 
 `?.`, `??` and `??=` are left out of that list deliberately and are in
 §9.7 below, where what they bind against is the whole of the question.
+
+**`>>>` shifts zeros in** whatever the left operand's sign, where `>>` copies
+the sign bit of a signed one; on an unsigned operand the two are the same.
+Otherwise it is a shift like the others: the left operand promotes, the result
+has its type, the count is taken modulo the width, and a type may overload it
+([§7.4](07-functions-members.md#74-operators)). Closing three type argument
+lists at once — `List<List<List<int>>>` — still closes them, because the parser
+splits the token as it already split `>>`.
 
 ## 9.1 `switch`
 
@@ -228,8 +237,9 @@ is read once and asked first; each element is then read by its index from
 whichever end it was written against, so `[.., var last]` reads one element.
 There is one `..` at most (SL0775). What `.. var rest` names is a slice of the
 same array ([§2.12](02-types.md#212-t--part-of-an-array)), which shares its storage
-rather than copying it — so only an array or a slice can give one, and naming
-the run of anything else is refused (SL0775). A `String` is not matched element
+rather than copying it, or, for a type, what its `Slice(start, length)` answers
+— `a[1..]` asks the same thing ([§9.17](#917--and-)). Naming the run of
+anything with neither is refused (SL0775). A `String` is not matched element
 by element (SL0774): its positions are bytes, and a pattern of characters over
 it would be a pattern of bytes that looked like something else.
 
@@ -1083,8 +1093,6 @@ letter or `_` is not a name (SL0001).
 
 ---
 
-<sub>[&larr; Interoperability and libraries](08-interop-libraries.md) &nbsp;&middot;&nbsp; [Conditional compilation &rarr;](10-conditional-compilation.md)</sub>
-
 ## 9.16 `new(...)` with the type left off
 
 ```csharp
@@ -1112,3 +1120,63 @@ little narrower than C#'s "any type": `Pick(new())` against `Pick(Point)` and
 `Pick(int)` chooses `Point`, where C# calls the pair ambiguous. Two class
 parameters are ambiguous in both. A generic parameter learns nothing from it,
 so `Id(new())` is SL0327 until the type argument is written: `Id<Point>(new())`.
+
+---
+
+## 9.17 `^` and `..`
+
+```csharp
+int last = numbers[^1];                 // the last element
+int[:] inner = numbers[1..^1];          // all but the first and the last
+int[:] tail = numbers[^3..];            // the last three
+int[:] all = numbers[..];
+
+Index at = ^2;                          // kept, as C#'s System.Index
+Range middle = 1..^1;                   // and System.Range
+Console.WriteLine(numbers[at] + numbers[middle].Length);
+```
+
+**`^n` counts back from the end**, so `^1` is the last element and `^0` is one
+past it. **`a..b` is the half-open run between two positions**, either of
+which may be left out or counted from the end. Both are C#'s, operators and
+precedence alike: `^` is a prefix, and `..` binds tighter than any binary
+operator, so `0..n - 1` is `(0..n) - 1` and a range to `n - 1` is written
+`0..(n - 1)`.
+
+**Used at once, they cost nothing a written index would not.** On an array, a
+slice or an inline array, `a[^n]` subtracts from the length the bounds check
+already loads, and the check that follows refuses `^0` and anything past the
+start by the same unsigned compare as any other index — reporting the `^n`
+that was written. `a[i..j]` is exactly the slice `a[i:j]` is
+([§2.12](02-types.md#212-t--part-of-an-array)): a view that shares the array,
+bounds-checked the same way. Stainless's own `a[i:j]` stays, and takes `^` in
+either place too: `a[1:^1]`. On an inline array a constant `^n` is folded, so
+one outside it is SL0490 at compile time.
+
+**Kept, each is a value**: `^n` is a `Standard.Index` and `a..b` a
+`Standard.Range`, small structs in the module every program already has. An
+`Index` used later is taken apart where it is used, so `a[at]` is one load and
+a select more than `a[^2]`. An integer converts to an `Index` implicitly, as in
+C#. **The count is a `nuint`** where C# has `int`, because every length here
+is one; `^n` takes any integer and converts it as an index would, so a negative
+one names no position and fails the bounds check.
+
+**Any other type takes them as C# has it take them.** A type with an integer
+`Count` or `Length` and an indexer taking an integer answers `x[^1]` as
+`x[x.Count - 1]`, and one with a `Slice(start, length)` as well answers
+`x[1..^1]` with what that method returns — for `List<T>`, a new list. The
+receiver is evaluated once, and a write through `x[^1]` still reaches the
+setter. An indexer declared to take an `Index` or a `Range` is asked first.
+
+**What is refused.** Counting from the end of something with no length — a
+pointer, a class with no `Count` — is SL0777; an `Index` on a type with a count
+and no integer indexer is SL0241; a range over an inline array, or over a type
+with no `Slice`, is SL0452, because a slice holds a counted array and an inline
+array is not one; and `^` or `..` over anything but an integer is SL0242.
+
+**A `String` is not indexed**, by `^` or otherwise, because its positions are
+bytes ([§3](03-text.md)). `Substring` is how part of one is taken.
+
+---
+
+<sub>[&larr; Interoperability and libraries](08-interop-libraries.md) &nbsp;&middot;&nbsp; [Conditional compilation &rarr;](10-conditional-compilation.md)</sub>

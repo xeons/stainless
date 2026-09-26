@@ -1,0 +1,20 @@
+last 50
+first 10
+back 40
+written 130
+slice 55
+inline 31
+inline written 7
+kept 86
+chosen 55
+value 1
+offset 4
+edsger edsger ada
+barbara
+one! zwei 2
+struct 31
+barbara
+none
+generic 55
+y
+closure 55

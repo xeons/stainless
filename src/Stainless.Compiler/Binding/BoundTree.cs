@@ -21,7 +21,7 @@ namespace Stainless.Binding;
 public enum BoundBinaryOp
 {
     Add, Subtract, Multiply, Divide, Remainder,
-    BitAnd, BitOr, BitXor, ShiftLeft, ShiftRight,
+    BitAnd, BitOr, BitXor, ShiftLeft, ShiftRight, UnsignedShiftRight,
     Equal, NotEqual, Less, LessEqual, Greater, GreaterEqual,
     LogicalAnd, LogicalOr,
 }
@@ -507,6 +507,17 @@ public sealed class BoundArrayDraft(
 }
 
 /// <summary>
+/// <c>..source</c> in an array literal, waiting with the literal to be told
+/// what it becomes. Its type is the element type of <see cref="Source"/>, which
+/// is what the literal's own elements are compared with. Never emitted.
+/// </summary>
+public sealed class BoundSpread(SourceSpan span, TypeSymbol elementType, BoundExpression source)
+    : BoundExpression(span, elementType)
+{
+    public BoundExpression Source { get; } = source;
+}
+
+/// <summary>
 /// A settled array literal: the array it builds, with every element already
 /// converted to the element type.
 /// </summary>
@@ -946,6 +957,25 @@ public sealed class BoundSlice(
     public BoundExpression Target { get; } = target;
     public BoundExpression? Start { get; } = start;
     public BoundExpression? End { get; } = end;
+
+    /// <summary>What <see cref="Start"/> counts from.</summary>
+    public IndexOrigin StartOrigin { get; init; }
+
+    /// <summary>What <see cref="End"/> counts from.</summary>
+    public IndexOrigin EndOrigin { get; init; }
+}
+
+/// <summary>What a position in an array, a slice or an inline array counts from.</summary>
+public enum IndexOrigin
+{
+    /// <summary>An integer, from the start.</summary>
+    Start,
+
+    /// <summary><c>^n</c>: an integer, back from the length.</summary>
+    End,
+
+    /// <summary>A <c>Standard.Index</c>, which carries which of the two it is.</summary>
+    Written,
 }
 
 public sealed class BoundArrayLength(SourceSpan span, TypeSymbol type, BoundExpression array)
@@ -961,6 +991,9 @@ public sealed class BoundIndex(
 {
     public BoundExpression Target { get; } = target;
     public BoundExpression Index { get; } = index;
+
+    /// <summary>What <see cref="Index"/> counts from. Only a pointer is always from the start.</summary>
+    public IndexOrigin Origin { get; init; }
 
     /// <summary>
     /// An element of an array, a slice or a pointer is storage. An element of

@@ -1068,9 +1068,9 @@ public sealed partial class Binder
                 if (slice(start, end) is not { } taken)
                 {
                     diagnostics.Error("SL0775", run.Span,
-                        $"'..' can name what it skipped only as a slice, which is taken from an " +
-                        $"array or another slice, and this is a '{viewed.Type.Name}'; write '..' " +
-                        "on its own");
+                        $"'..' can name what it skipped only as a slice of an array or another " +
+                        $"slice, or as what a type's 'Slice(start, length)' answers, and " +
+                        $"'{viewed.Type.Name}' has neither; write '..' on its own");
                     failed = true;
                     continue;
                 }
@@ -1208,15 +1208,34 @@ public sealed partial class Binder
                     return null;
 
                 var indexType = (PrimitiveTypeSymbol)indexer.Parameters.First(p => !p.IsThis).Type;
+                var slicer = SliceMethodOf(named);
 
                 return (AsInteger(BindPropertyRead(span, viewed, counter), PrimitiveTypeSymbol.NUInt),
                         index => BuildIndexerCall(span, indexer, viewed, [AsInteger(index, indexType)], null),
-                        (_, _) => null);
+                        (from, to) => slicer is null ? null : SliceCall(slicer, named, viewed, from, to, span));
             }
 
             default:
                 return null;
         }
+    }
+
+    /// <summary>
+    /// <c>Slice(from, to - from)</c>. Both bounds are constants or reads of a
+    /// held count, so naming <paramref name="from"/> twice evaluates nothing twice.
+    /// </summary>
+    private BoundExpression SliceCall(
+        FunctionSymbol slicer, NamedTypeSymbol type, BoundExpression viewed,
+        BoundExpression from, BoundExpression to, SourceSpan span)
+    {
+        var parameters = slicer.Parameters.Where(p => !p.IsThis).ToList();
+        var count = new BoundBinary(span, PrimitiveTypeSymbol.NUInt, to, BoundBinaryOp.Subtract, from);
+
+        return new BoundCall(span, slicer, AsReceiver(viewed, type),
+        [
+            AsInteger(from, (PrimitiveTypeSymbol)parameters[0].Type),
+            AsInteger(count, (PrimitiveTypeSymbol)parameters[1].Type),
+        ]);
     }
 
     /// <summary>An integer as another integer type, by the explicit conversion a cast would make.</summary>
