@@ -290,9 +290,10 @@ public sealed partial class Binder
                 "function that makes one and says what went wrong if it could not");
 
         var parameters = constructor.Parameters.Where(p => !p.IsThis).ToList();
+        var written = GatherParams(constructor, ref arguments, syntax.Arguments, syntax.Span);
 
         int[]? map = MapArguments(
-            parameters, arguments.Count, syntax.Arguments, constructor.IsVariadic, out string? why);
+            parameters, arguments.Count, written, constructor.IsVariadic, out string? why);
 
         if (map is null)
         {
@@ -303,7 +304,7 @@ public sealed partial class Binder
         }
 
         var (ordered, spans) = Arrange(
-            constructor, parameters, arguments, syntax.Arguments, map, syntax.Span);
+            constructor, parameters, arguments, written, map, syntax.Span);
 
         var converted = ConvertArguments(constructor, ordered, spans);
 
@@ -354,9 +355,10 @@ public sealed partial class Binder
                 "function that makes one and says what went wrong if it could not");
 
         var parameters = constructor.Parameters.Where(p => !p.IsThis).ToList();
+        var written = GatherParams(constructor, ref arguments, syntax.Arguments, syntax.Span);
 
         int[]? map = MapArguments(
-            parameters, arguments.Count, syntax.Arguments, constructor.IsVariadic, out string? why);
+            parameters, arguments.Count, written, constructor.IsVariadic, out string? why);
 
         if (map is null)
         {
@@ -367,7 +369,7 @@ public sealed partial class Binder
         }
 
         var (ordered, spans) = Arrange(
-            constructor, parameters, arguments, syntax.Arguments, map, syntax.Span);
+            constructor, parameters, arguments, written, map, syntax.Span);
 
         var converted = ConvertArguments(constructor, ordered, spans);
 
@@ -525,7 +527,10 @@ public sealed partial class Binder
 
         if (chosen is null) return null;
 
-        var converted = ConvertArguments(chosen, [argument], [entry.Value.Span]);
+        List<BoundExpression> arguments = [argument];
+        GatherParams(chosen, ref arguments, null, entry.Span);
+
+        var converted = ConvertArguments(chosen, arguments, [entry.Value.Span]);
         return new BoundCall(entry.Span, chosen, receiver, converted);
     }
 

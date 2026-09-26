@@ -564,7 +564,8 @@ public sealed partial class Binder
         }
 
         var viable = candidates
-            .Where(c => c.Declaration.Parameters.Count == arguments.Count)
+            .Where(c => c.Declaration.Parameters.Count == arguments.Count ||
+                        IsGathering(c.Declaration.Parameters, arguments))
             .ToList();
 
         if (viable.Count == 0) viable = [candidates[0]];
@@ -597,10 +598,9 @@ public sealed partial class Binder
                 for (int i = 0; i < given.Count; i++)
                     inferred[candidate.Parameters[i]] = given[i];
 
-            int shared = Math.Min(arguments.Count, candidate.Declaration.Parameters.Count);
-            for (int i = 0; i < shared; i++)
-                Infer(candidate.Declaration.Parameters[i].Type, arguments[i].Type,
-                    names, inferred, candidate.Scope);
+            for (int i = 0; i < arguments.Count; i++)
+                if (WrittenParameterType(candidate.Declaration.Parameters, arguments, i) is { } wanted)
+                    Infer(wanted, arguments[i].Type, names, inferred, candidate.Scope);
 
             // A lambda has no type of its own, so the loop above learned nothing
             // from one. Anything still unknown may yet be readable off a lambda's
@@ -651,6 +651,41 @@ public sealed partial class Binder
             $"for '{template.Name}' from these arguments; " +
             "Stainless infers type arguments only from the values passed");
         return null;
+    }
+
+    /// <summary>
+    /// Whether a call gives a template's <c>params</c> parameter its elements
+    /// one by one. An array, a slice or an array literal in its place is the
+    /// array itself, as it is for a function that is not generic.
+    /// </summary>
+    private static bool IsGathering(
+        IReadOnlyList<ParameterSyntax> declared, List<BoundExpression> arguments)
+    {
+        if (declared.Count == 0 || !declared[^1].IsParams) return false;
+        if (arguments.Count < declared.Count - 1) return false;
+        if (arguments.Count != declared.Count) return true;
+
+        return arguments[^1] is not BoundArrayDraft &&
+               arguments[^1].Type is not (ArrayTypeSymbol or SliceTypeSymbol);
+    }
+
+    /// <summary>
+    /// The type written for the parameter argument <paramref name="index"/>
+    /// lands on: the element type of a <c>params</c> array being gathered, and
+    /// null past the end of a template that has none.
+    /// </summary>
+    private static TypeSyntax? WrittenParameterType(
+        IReadOnlyList<ParameterSyntax> declared, List<BoundExpression> arguments, int index)
+    {
+        if (IsGathering(declared, arguments) && index >= declared.Count - 1)
+            return declared[^1].Type switch
+            {
+                ArrayTypeSyntax array => array.Element,
+                SliceTypeSyntax slice => slice.Element,
+                _ => null,
+            };
+
+        return index < declared.Count ? declared[index].Type : null;
     }
 
     /// <summary>
@@ -971,10 +1006,13 @@ public sealed partial class Binder
             // the call, the first is tried anyway so that the call can report
             // against something, and an argument past its last parameter is
             // the arity's problem, which the call itself reports as SL0260.
-            int shared = Math.Min(arguments.Count, template.Declaration.Parameters.Count);
-            for (int i = 0; i < shared; i++)
+            for (int i = 0; i < arguments.Count; i++)
             {
-                var wanted = ResolveType(template.Declaration.Parameters[i].Type, template.Scope);
+                if (WrittenParameterType(template.Declaration.Parameters, arguments, i)
+                    is not { } written)
+                    break;
+
+                var wanted = ResolveType(written, template.Scope);
                 if (wanted.IsError()) return false;
                 if (IsImplicitlyConvertible(arguments[i], wanted)) continue;
 

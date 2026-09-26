@@ -170,6 +170,7 @@ Functions, defaults, `ref`/`in`/`out`, named arguments, properties, operators, i
 - [7.1 Functions](07-functions-members.md#71-functions)
   - [7.1.1 `x.F(y)` is `F(x, y)`](07-functions-members.md#711-xfy-is-fx-y)
   - [7.1.2 A parameter with a default](07-functions-members.md#712-a-parameter-with-a-default)
+  - [7.1.3 `params`](07-functions-members.md#713-params)
 - [7.2 `ref`, `in` and `out` parameters](07-functions-members.md#72-ref-in-and-out-parameters)
   - [7.2.1 `out`](07-functions-members.md#721-out)
   - [7.2.2 Named arguments](07-functions-members.md#722-named-arguments)

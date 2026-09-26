@@ -231,9 +231,18 @@ public sealed partial class LlvmEmitter
 
     private void FlushTemporaries(int from = 0)
     {
+        var onStack = new List<string>();
+
         for (int i = from; i < _pendingReleases.Count; i++)
         {
             var (reference, type) = _pendingReleases[i];
+
+            // Last, once every slice of it has let go.
+            if (_stackArrays.Contains(reference))
+            {
+                onStack.Add(reference);
+                continue;
+            }
 
             // A struct temporary is held by address, so what is dropped is what
             // lies inside it rather than the pointer itself.
@@ -245,6 +254,10 @@ public sealed partial class LlvmEmitter
 
             Release(reference, type);
         }
+
+        // Newest first: a later one's elements may hold an earlier one.
+        for (int i = onStack.Count - 1; i >= 0; i--)
+            EndStackArray(onStack[i]);
 
         _pendingReleases.RemoveRange(from, _pendingReleases.Count - from);
     }

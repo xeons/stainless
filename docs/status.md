@@ -266,6 +266,12 @@ last person to edit it -- the suite is the authority.
   because a call reads the static type's declaration and two values would make
   the same line mean two things. They cross a library boundary as the value they
   folded to
+- `params` on the last parameter: `Sum(1, 2, 3)`, `Sum()` and `Sum(numbers)`
+  all reach `int Sum(params int[] values)`, with C#'s preference for the
+  declared form and generic inference from the elements. A `params T[:]`
+  gathers into an array in the caller's frame, so the call allocates nothing;
+  the frame checks when the statement ends that nothing kept a reference to it,
+  and stops the program if something did. Misplaced, it is SL0763
 - Full operator set with C# precedence, short-circuit `&&` and `||`, and the
   conditional `a ? b : c`. The arithmetic C leaves undefined is defined here:
   a shift count is reduced modulo the operand's width as in C#, so `1 << 40` is

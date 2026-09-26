@@ -262,7 +262,14 @@ public sealed record ParameterSyntax(
     TypeSyntax Type,
     string Name,
     ParameterMode Mode = ParameterMode.Value,
-    ExpressionSyntax? Default = null) : SyntaxNode(Span);
+    ExpressionSyntax? Default = null) : SyntaxNode(Span)
+{
+    /// <summary>
+    /// <c>params T[] name</c> or <c>params T[:] name</c>: a call may give the
+    /// elements one by one, and they are gathered into the array or slice.
+    /// </summary>
+    public bool IsParams { get; init; }
+}
 
 /// <summary>
 /// <c>ref x</c> at a call. Written at the call as well as the declaration,

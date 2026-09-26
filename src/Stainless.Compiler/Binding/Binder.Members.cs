@@ -205,6 +205,12 @@ public sealed partial class Binder
                 parameterType = ErrorTypeSymbol.Instance;
             }
 
+            if (parameter.IsParams)
+                diagnostics.Error("SL0763", parameter.Span,
+                    $"'{parameter.Name}' cannot be 'params': a call through a {kind} passes " +
+                    "exactly what its signature says, so there is no declaration to gather the " +
+                    "elements against");
+
             signature.Add(new ParameterSymbol(parameter.Name, parameterType, i)
             {
                 Mode = parameter.Mode,

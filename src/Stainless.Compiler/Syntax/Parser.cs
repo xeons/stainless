@@ -1449,6 +1449,21 @@ public sealed class Parser
     /// price is that a function of that exact name could not be called, which
     /// is the same price <c>closure</c> pays.
     /// </summary>
+    /// <summary>
+    /// Whether this is <c>params T[] name</c> rather than a type called
+    /// <c>params</c> followed by the parameter's name.
+    /// </summary>
+    private bool AtParamsModifier()
+    {
+        if (!AtWord || Current.Text != "params") return false;
+
+        var next = Peek(1).Kind;
+        if (PrimitiveKeywords.Contains(next)) return true;
+        if (next != TokenKind.Identifier) return false;
+
+        return Peek(2).Kind is not (TokenKind.Comma or TokenKind.CloseParen or TokenKind.Equals);
+    }
+
     private bool AtCheckedWord() =>
         AtWord && Current.Text is "checked" or "unchecked";
 
@@ -2074,10 +2089,23 @@ public sealed class Parser
 
             int paramStart = _pos;
 
+            // `params int[] values`. Contextual, as `out` is: a type named
+            // `params` stays writable where a name follows it directly.
+            bool isParams = AtParamsModifier();
+            if (isParams) Advance();
+
             var mode = ParameterMode.Value;
             if (Match(TokenKind.RefKeyword)) mode = ParameterMode.Ref;
             else if (Match(TokenKind.InKeyword)) mode = ParameterMode.In;
             else if (AtOutModifier()) { Advance(); mode = ParameterMode.Out; }
+
+            // Either order reads, so that `ref params` is refused by the
+            // binder with a reason rather than here with a parenthesis.
+            if (!isParams && mode != ParameterMode.Value && AtParamsModifier())
+            {
+                Advance();
+                isParams = true;
+            }
 
             var type = ParseType();
             string name = ExpectIdentifier();
@@ -2088,7 +2116,8 @@ public sealed class Parser
             // "expected ')'".
             var fallback = Match(TokenKind.Equals) ? ParseExpression() : null;
 
-            parameters.Add(new ParameterSyntax(SpanFrom(paramStart), type, name, mode, fallback));
+            parameters.Add(new ParameterSyntax(SpanFrom(paramStart), type, name, mode, fallback)
+                { IsParams = isParams });
 
             if (!Match(TokenKind.Comma)) break;
         }

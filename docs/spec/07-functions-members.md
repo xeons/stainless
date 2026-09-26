@@ -175,6 +175,70 @@ carries the number. A generated C header writes none of it: filling one in is
 the caller's half, and a C caller has no declaration of this kind to read, so it
 passes every argument.
 
+### 7.1.3 `params`
+
+```csharp
+int Sum(params int[] values) { ... }
+String Join(String separator, params String[:] parts) { ... }
+
+Sum(1, 2, 3);                     // the elements, one by one
+Sum();                            // none: an empty array
+Sum(numbers);                     // an int[] is the array itself
+Join(", ", "a", "b", "c");        // gathered into a slice
+```
+
+**The last parameter may take its elements one by one**, and the call gathers
+them. Like a default ([§7.1.2](#712-a-parameter-with-a-default)) it is the
+caller's half: the declaration says the parameter is an array, and a call that
+gives elements instead is rewritten, where it stands, into one that passes
+one.
+
+**What the gathering costs depends on what is asked for.** A `params T[]` is a
+new array per call, exactly as `[1, 2, 3]` would be, because the callee has
+been promised an array and may keep it. A `params T[:]` — C# 13's `params
+ReadOnlySpan<T>`, in this language's words — gathers into an array in the
+caller's frame: no allocation, and the elements are released when the
+statement ends. That is the one to write for a function that only reads what
+it was given.
+
+**A slice of the frame may not be kept.** The slice counts the array it views
+([§2.12](02-types.md#212-t--part-of-an-array)), and nothing in a signature can
+promise not to keep one, so the frame checks on the way out: when the statement
+ends, a reference to its array that anything still holds stops the program with
+a message, rather than leave something pointing into a frame that is gone. A
+callee that stores or returns what it was given wants a `T[]`. A `spawn`ed call
+is the one exception made silently — the worker outlives the statement by
+design, so its elements go on the heap.
+
+**The declared form wins where both fit**, as in C#: `Sum(numbers)` with an
+`int[]` passes it rather than an array holding it, and between `F(int)` and
+`F(params int[])` a call `F(1)` takes the first. Otherwise the ordinary rules
+choose ([§7.1](#71-functions)), each gathered argument converting to the element
+type.
+
+**Names reach past it and not into it.** A name may give the parameters before
+it, in any order, and the elements follow the positional arguments;
+`values: numbers` passes the array whole. Arguments are evaluated as written
+([§7.2.2](#722-named-arguments)), the gathered ones in their places.
+
+**A generic's type argument is read off the elements**: `First<T>(params T[]
+items)` called as `First("x", "y")` is `First<String>`. Given no elements there
+is nothing to read, and the call is SL0327 unless the argument is written.
+
+What may not be `params` (SL0763): a parameter that is not the last, one passed
+by `ref`, `in` or `out`, one with a default, anything but a `T[]` or a `T[:]`,
+a delegate's or closure's parameter — a call through one passes exactly what the
+signature says — and a C function's, since C has nothing to gather with.
+
+```
+error[SL0763]: 'values' cannot be 'params': only the last parameter may be
+'params'; the elements a call gives one by one are whatever is left after the
+others, so nothing may follow them
+```
+
+It crosses a library boundary: the metadata says which parameter gathers, and
+the consumer's call sites do the gathering.
+
 ## 7.2 `ref`, `in` and `out` parameters
 
 A parameter is a copy unless it says otherwise. `ref`, `in` and `out` say

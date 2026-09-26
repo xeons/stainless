@@ -756,6 +756,9 @@ typedef struct SlArray {
 SL_API void  *sl_array_alloc(const SlTypeInfo *type, size_t length, size_t elementSize);
 SL_API size_t sl_array_length(void *pointer);
 
+/* Ends an array a `params T[:]` call placed in the caller's frame. */
+SL_API void   sl_array_end_on_stack(void *pointer);
+
 /* Reports an out-of-range index and aborts. Neither returns. */
 SL_API SL_NORETURN void sl_array_bounds_fail(size_t index, size_t length);
 SL_API SL_NORETURN void sl_slice_bounds_fail(size_t from, size_t to, size_t length);

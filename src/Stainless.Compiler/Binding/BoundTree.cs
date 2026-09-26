@@ -510,6 +510,13 @@ public sealed class BoundArrayLiteral(
 {
     public TypeSymbol ElementType { get; } = elementType;
     public IReadOnlyList<BoundExpression> Elements { get; } = elements;
+
+    /// <summary>
+    /// True for the array behind a <c>params T[:]</c> call: it lives in the
+    /// caller's frame for the statement, and is checked on the way out for a
+    /// reference anything kept.
+    /// </summary>
+    public bool OnStack { get; set; }
 }
 
 public sealed class BoundLambda(SourceSpan span, TypeSymbol type, Syntax.LambdaSyntax syntax)

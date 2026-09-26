@@ -184,6 +184,9 @@ public sealed partial class LlvmEmitter(
     /// <summary>+1 values produced mid-statement, released once the statement completes.</summary>
     private readonly List<(string Ref, TypeSymbol Type)> _pendingReleases = [];
 
+    /// <summary>The temporaries in <see cref="_pendingReleases"/> that are arrays in the frame.</summary>
+    private readonly HashSet<string> _stackArrays = [];
+
     /// <summary>
     /// Where <c>break</c> and <c>continue</c> go, and how many scopes each has
     /// to unwind on the way. They are tracked separately because a switch is a

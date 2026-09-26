@@ -1,0 +1,2 @@
+7
+stainless: a 'params' slice was kept past the call it was made for; its elements live in the caller's frame. Copy them into an array to keep them

@@ -308,9 +308,11 @@ public sealed partial class LlvmEmitter
         }
 
         var arrayType = (ArrayTypeSymbol)expression.Type;
-        string array = Emit("ptr",
-            $"call ptr @sl_array_alloc(ptr @{ArrayTypeInfoName(arrayType)}, " +
-            $"{Word} {expression.Elements.Count}, {Word} {arrayType.Element.Size})");
+        string array = expression.OnStack
+            ? StackArray(arrayType, expression.Elements.Count)
+            : Emit("ptr",
+                $"call ptr @sl_array_alloc(ptr @{ArrayTypeInfoName(arrayType)}, " +
+                $"{Word} {expression.Elements.Count}, {Word} {arrayType.Element.Size})");
 
         string data = Emit("ptr",
             $"getelementptr inbounds i8, ptr {array}, i64 {ArrayTypeSymbol.HeaderSize}");
@@ -323,9 +325,43 @@ public sealed partial class LlvmEmitter
             StoreInto(at, value, arrayType.Element);
         }
 
+        if (expression.OnStack) _stackArrays.Add(array);
         TrackTemporary(array, arrayType);
         return new Val(array, "ptr", arrayType);
     }
+
+    /// <summary>
+    /// An array in this frame rather than on the heap: the header the runtime
+    /// would have written, and zeroed elements, in a slot of its own.
+    ///
+    /// It is counted like any array, so a slice of it retains and releases as
+    /// usual. What a heap array does at zero this one does when the statement
+    /// ends, in <see cref="EndStackArray"/>.
+    /// </summary>
+    private string StackArray(ArrayTypeSymbol arrayType, int length)
+    {
+        int bytes = ArrayTypeSymbol.HeaderSize + length * arrayType.Element.Size;
+        string slot = $"%params.s{_nextSlot++}";
+
+        // Sixteen, as calloc gives a heap array, whatever the element asks for.
+        _entryAllocas.AppendLine($"  {slot} = alloca [{bytes} x i8], align 16");
+
+        Line($"store [{bytes} x i8] zeroinitializer, ptr {slot}");
+        Line($"call void @sl_object_init(ptr {slot}, ptr @{ArrayTypeInfoName(arrayType)})");
+
+        string lengthSlot = Emit("ptr",
+            $"getelementptr inbounds i8, ptr {slot}, i64 {RuntimeLayout.ArrayLength}");
+        Line($"store {Word} {length}, ptr {lengthSlot}");
+        return slot;
+    }
+
+    /// <summary>
+    /// Ends an array made by <see cref="StackArray"/>. The runtime refuses one
+    /// still referenced from anywhere but here, which is the only way it could
+    /// outlive the frame, and releases the elements.
+    /// </summary>
+    private void EndStackArray(string array) =>
+        Line($"call void @sl_array_end_on_stack(ptr {array})");
 
     private Val EmitNewArray(BoundNewArray expression)
     {

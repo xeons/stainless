@@ -203,7 +203,7 @@ public class Scanner
         // is what C# editors do with `value` and `yield` for the same reason:
         // a reader recognises the word, and telling them apart would need the
         // parser this does not have.
-        String[] soft = ["closure", "event", "get", "set", "value"];
+        String[] soft = ["closure", "event", "get", "params", "set", "value"];
         foreach (var word in soft)
             _contextual.SetValue(word, true);
 

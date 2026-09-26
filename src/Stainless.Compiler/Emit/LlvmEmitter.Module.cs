@@ -392,6 +392,10 @@ public sealed partial class LlvmEmitter
         Declare("sl_array_alloc",
             $"declare noalias ptr @sl_array_alloc(ptr, {Word}, {Word}) nounwind");
 
+        // The header of an array in the frame, and its end: see StackArray.
+        Declare("sl_object_init", $"declare void @sl_object_init(ptr, ptr) {HeaderOnly}");
+        Declare("sl_array_end_on_stack", "declare void @sl_array_end_on_stack(ptr) nounwind");
+
         // The entry point hands the runtime what main() was given, and asks it
         // back as a String[] when Main declared one.
         // An interpolated string, joined in one allocation.

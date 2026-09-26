@@ -1,0 +1,40 @@
+6
+0
+15
+15
+24
+0
+15
+11
+a, bb, c
+
+one int
+params of 2
+params of 0
+params of 3
+10
+x
+4
+3
+2
+none:0
+some:3
+named:0
+none:15
+evaluated 1
+evaluated 2
+evaluated 3
+evaluated 4
+1,2+2
+evaluated 20
+evaluated 10
+10,20+0
+ada1bob2
+21
+18
+6
+3
+0
+3
+6
+300

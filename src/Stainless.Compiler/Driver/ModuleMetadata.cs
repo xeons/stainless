@@ -419,6 +419,13 @@ public sealed record MetadataParameter
     /// has no way to read that: what it needs is the number.
     /// </summary>
     public MetadataDefault? Default { get; init; }
+
+    /// <summary>
+    /// Declared <c>params</c>. A consumer gathers the elements at its own
+    /// call sites, so it is the consumer that has to know.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool IsParams { get; init; }
 }
 
 /// <summary>

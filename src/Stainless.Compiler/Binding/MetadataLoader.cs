@@ -551,6 +551,7 @@ public sealed class MetadataLoader(
                 {
                     Mode = parameter.Mode,
                     Default = DefaultOf(parameter, type),
+                    IsParams = parameter.IsParams,
                 });
         }
 

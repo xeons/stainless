@@ -70,6 +70,20 @@ public sealed class ParameterSymbol(string name, TypeSymbol type, int index)
     public bool IsOptional => DefaultSyntax is not null || Default is not null;
 
     /// <summary>
+    /// Declared <c>params</c>: a call may give the elements one by one. Only
+    /// the last parameter may be, and only a <c>T[]</c> or a <c>T[:]</c>.
+    /// </summary>
+    public bool IsParams { get; init; }
+
+    /// <summary>What one element of a <c>params</c> parameter is, or null.</summary>
+    public TypeSymbol? ParamsElement => !IsParams ? null : Type switch
+    {
+        ArrayTypeSymbol array => array.Element,
+        SliceTypeSymbol slice => slice.Element,
+        _ => null,
+    };
+
+    /// <summary>
     /// True when the body writes to this parameter, or to something inside it.
     ///
     /// A parameter is borrowed, so ordinarily it owns nothing and costs no

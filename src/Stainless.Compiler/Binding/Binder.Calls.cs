@@ -1201,6 +1201,7 @@ public sealed partial class Binder
         List<BoundExpression> arguments, bool nonVirtual = false)
     {
         var parameters = function.Parameters.Where(p => !p.IsThis).ToList();
+        var written = GatherParams(function, ref arguments, syntax.Arguments, syntax.Span);
 
         if (!CheckArity(function.Name, parameters, arguments.Count, function.IsVariadic, syntax.Span))
             return new BoundErrorExpression(syntax.Span);
@@ -1210,7 +1211,7 @@ public sealed partial class Binder
         // the call left out is filled in from its default -- everything after
         // it sees one argument per parameter, in the order they were declared.
         int[]? map = MapArguments(
-            parameters, arguments.Count, syntax.Arguments, function.IsVariadic, out string? why);
+            parameters, arguments.Count, written, function.IsVariadic, out string? why);
 
         if (map is null)
         {
@@ -1221,7 +1222,7 @@ public sealed partial class Binder
         }
 
         var (ordered, spans) = Arrange(
-            function, parameters, arguments, syntax.Arguments, map, syntax.Span);
+            function, parameters, arguments, written, map, syntax.Span);
 
         var converted = ConvertArguments(function, ordered, spans);
         return new BoundCall(syntax.Span, function, receiver, converted)
@@ -1558,12 +1559,148 @@ public sealed partial class Binder
         ReportArgumentMismatch(name, index, argument, parameter.Type);
     }
 
-    /// <summary>Whether one candidate could take these arguments.</summary>
+    /// <summary>
+    /// Whether one candidate could take these arguments, as declared or with
+    /// its <c>params</c> parameter given element by element.
+    /// </summary>
     private bool AcceptsArguments(
         FunctionSymbol candidate, List<BoundExpression> arguments,
-        IReadOnlyList<ExpressionSyntax>? written = null)
+        IReadOnlyList<ExpressionSyntax>? written = null) =>
+        FormOf(candidate, arguments, written, out _) is not null;
+
+    /// <summary>
+    /// The parameters a call to <paramref name="candidate"/> fills: the ones
+    /// declared, or -- when only that fits -- the expanded form, with one per
+    /// element in place of the <c>params</c> array. Null when neither fits.
+    ///
+    /// The declared form is asked first and wins where both fit, as in C#:
+    /// <c>F(values)</c> with an <c>int[]</c> passes the array rather than an
+    /// array holding it.
+    /// </summary>
+    private List<ParameterSymbol>? FormOf(
+        FunctionSymbol candidate, List<BoundExpression> arguments,
+        IReadOnlyList<ExpressionSyntax>? written, out bool expanded)
     {
-        var parameters = candidate.Parameters.Where(p => !p.IsThis).ToList();
+        expanded = false;
+
+        var declared = candidate.Parameters.Where(p => !p.IsThis).ToList();
+        if (Fits(candidate, declared, arguments, written)) return declared;
+
+        if (ExpandedParameters(candidate, arguments.Count, written) is not { } elements ||
+            !Fits(candidate, elements, arguments, written))
+            return null;
+
+        expanded = true;
+        return elements;
+    }
+
+    /// <summary>
+    /// The expanded form of a call to a function with a <c>params</c>
+    /// parameter: the parameters before it, then one of the element type for
+    /// each positional argument past them. Null when there is no such
+    /// parameter, or when a name gives it -- a name passes the array whole.
+    /// </summary>
+    private static List<ParameterSymbol>? ExpandedParameters(
+        FunctionSymbol candidate, int given, IReadOnlyList<ExpressionSyntax>? written)
+    {
+        var declared = candidate.Parameters.Where(p => !p.IsThis).ToList();
+        if (declared.Count == 0 || declared[^1].ParamsElement is not { } element) return null;
+
+        var gathered = declared[^1];
+        if (written is not null &&
+            written.Any(a => a is NamedArgumentSyntax named && named.Name == gathered.Name))
+            return null;
+
+        int fixedCount = declared.Count - 1;
+        int elements = Math.Max(0, PositionalCount(given, written) - fixedCount);
+
+        var expanded = declared.Take(fixedCount).ToList();
+
+        // Named so that no argument can name one: an element is reached by
+        // position or not at all.
+        for (int i = 0; i < elements; i++)
+            expanded.Add(new ParameterSymbol($"{gathered.Name}[{i}]", element, gathered.Index + i));
+
+        return expanded;
+    }
+
+    /// <summary>How many arguments come before the first named one.</summary>
+    private static int PositionalCount(int given, IReadOnlyList<ExpressionSyntax>? written) =>
+        written is null ? given : written.TakeWhile(a => a is not NamedArgumentSyntax).Count();
+
+    /// <summary>
+    /// Rewrites a call that uses the expanded form of a <c>params</c> parameter
+    /// into one that passes the array: the elements are gathered into a
+    /// <c>T[]</c> made for the call, or, for a <c>T[:]</c>, into an array in
+    /// the caller's frame. Answers the written arguments to go with the new
+    /// list; a call in the declared form is left as it was.
+    /// </summary>
+    private IReadOnlyList<ExpressionSyntax>? GatherParams(
+        FunctionSymbol function, ref List<BoundExpression> arguments,
+        IReadOnlyList<ExpressionSyntax>? written, SourceSpan callSpan)
+    {
+        if (FormOf(function, arguments, written, out bool expanded) is null || !expanded)
+            return written;
+
+        var declared = function.Parameters.Where(p => !p.IsThis).ToList();
+        var gathered = declared[^1];
+        var element = gathered.ParamsElement!;
+
+        int fixedCount = declared.Count - 1;
+        int positional = PositionalCount(arguments.Count, written);
+        int count = Math.Max(0, positional - fixedCount);
+        int at = Math.Min(positional, fixedCount);
+
+        var elements = arguments.GetRange(at, count);
+        var span = count == 0 ? callSpan : SourceSpan.Merge(elements[0].Span, elements[^1].Span);
+
+        var items = elements.Select(e => BindConversion(e, element, e.Span)).ToList();
+        BoundExpression packed = gathered.Type is SliceTypeSymbol slice
+            ? new BoundConversion(span, slice,
+                new BoundArrayLiteral(span, ArrayOf(element), element, items) { OnStack = true },
+                ConversionKind.ArrayToSlice)
+            : new BoundArrayLiteral(span, gathered.Type, element, items);
+
+        var rewritten = new List<BoundExpression>(arguments);
+        rewritten.RemoveRange(at, count);
+
+        var syntax = new ArrayLiteralSyntax(span,
+            written is null ? [] : written.Skip(at).Take(count).ToList());
+
+        // Short of the parameters before it, the array cannot be positional:
+        // it would land on one of them. With no names written the ones missing
+        // are defaults, filled here; with names, the array takes one too.
+        if (positional < fixedCount && !HasNames(written))
+        {
+            for (int p = positional; p < fixedCount; p++)
+                rewritten.Add(EnsureDefault(function, declared[p]) ?? new BoundErrorExpression(callSpan));
+
+            rewritten.Add(packed);
+            arguments = rewritten;
+            return null;
+        }
+
+        rewritten.Insert(at, packed);
+        arguments = rewritten;
+
+        if (written is null) return null;
+
+        var result = new List<ExpressionSyntax>(written);
+        result.RemoveRange(at, count);
+        result.Insert(at, positional < fixedCount
+            ? new NamedArgumentSyntax(span, gathered.Name, span, syntax)
+            : syntax);
+        return result;
+    }
+
+    /// <summary>
+    /// Whether one form of a candidate takes these arguments: the count, the
+    /// names, and each argument against the parameter it lands on.
+    /// </summary>
+    private bool Fits(
+        FunctionSymbol candidate, List<ParameterSymbol> parameters,
+        List<BoundExpression> arguments, IReadOnlyList<ExpressionSyntax>? written)
+    {
         int required = parameters.Count(p => !p.IsOptional);
 
         if (candidate.IsVariadic
@@ -1808,7 +1945,14 @@ public sealed partial class Binder
                     // One candidate: report the real mismatch rather than "no overload".
                     var only = candidates[0];
                     var parameters = only.Parameters.Where(p => !p.IsThis).ToList();
-                    int expected = parameters.Count;
+
+                    // Against the elements, where the call was plainly giving
+                    // them one by one: "expects 'int[]'" of a lone argument
+                    // would be true and no help.
+                    if (ExpandedParameters(only, arguments.Count, written) is { } expanded &&
+                        (arguments.Count != parameters.Count ||
+                         !ArgumentFits(arguments[^1], parameters[^1])))
+                        parameters = expanded;
 
                     // A name that does not fit is the whole story; reporting a
                     // type mismatch on top of it would be reporting the
@@ -1869,24 +2013,37 @@ public sealed partial class Binder
         List<FunctionSymbol> viable, List<BoundExpression> arguments,
         IReadOnlyList<ExpressionSyntax>? written)
     {
-        var shapes = viable.Select(c => ParameterTypesByArgument(c, arguments.Count, written)).ToList();
+        var expanded = new bool[viable.Count];
+        var shapes = viable
+            .Select((c, i) => ParameterTypesByArgument(c, arguments, written, out expanded[i]))
+            .ToList();
+
+        // C#'s last word on a tie: where every argument converts as well either
+        // way, the candidate taken as declared beats one that had to be given
+        // its elements one by one.
+        bool Beats(int i, int j) =>
+            IsBetter(shapes[i], shapes[j], arguments) ||
+            (!expanded[i] && expanded[j] && !IsBetter(shapes[j], shapes[i], arguments));
 
         var winners = viable
-            .Where((_, i) => Enumerable.Range(0, viable.Count)
-                .All(j => j == i || IsBetter(shapes[i], shapes[j], arguments)))
+            .Where((_, i) => Enumerable.Range(0, viable.Count).All(j => j == i || Beats(i, j)))
             .ToList();
 
         return winners.Count == 1 ? winners[0] : null;
     }
 
     /// <summary>
-    /// The parameter type each argument lands on for one candidate, or null
-    /// past the declared parameters, where a C variadic's arguments go.
+    /// The parameter type each argument lands on for one candidate, in the
+    /// form that takes them, or null past the declared parameters, where a C
+    /// variadic's arguments go.
     /// </summary>
-    private static TypeSymbol?[] ParameterTypesByArgument(
-        FunctionSymbol candidate, int count, IReadOnlyList<ExpressionSyntax>? written)
+    private TypeSymbol?[] ParameterTypesByArgument(
+        FunctionSymbol candidate, List<BoundExpression> arguments,
+        IReadOnlyList<ExpressionSyntax>? written, out bool expanded)
     {
-        var parameters = candidate.Parameters.Where(p => !p.IsThis).ToList();
+        int count = arguments.Count;
+        var parameters = FormOf(candidate, arguments, written, out expanded)
+                         ?? candidate.Parameters.Where(p => !p.IsThis).ToList();
         var types = new TypeSymbol?[count];
         int[]? map = MapArguments(parameters, count, written, candidate.IsVariadic, out _);
         if (map is null) return types;

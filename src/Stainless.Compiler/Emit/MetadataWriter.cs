@@ -482,6 +482,7 @@ public static class MetadataWriter
                 Type = MetadataTypeNames.Write(p.Type),
                 Mode = p.Mode,
                 Default = DefaultOf(p),
+                IsParams = p.IsParams,
             })
             .ToList(),
     };

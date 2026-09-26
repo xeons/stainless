@@ -51,6 +51,24 @@ void *sl_array_alloc(const SlTypeInfo *type, size_t length, size_t elementSize)
     return array;
 }
 
+/*
+ * The end of an array the compiler placed in a caller's frame, for the
+ * elements of a `params T[:]` call. Its header was initialised as one fresh
+ * from sl_array_alloc, so a count above one is a reference that would outlive
+ * the frame: the program stops rather than keep it.
+ */
+void sl_array_end_on_stack(void *pointer)
+{
+    SlObject *object = (SlObject *)pointer;
+
+    if (object->strong != 1 || object->weak != 1)
+        sl_fail("a 'params' slice was kept past the call it was made for; its elements "
+                "live in the caller's frame. Copy them into an array to keep them");
+
+    if (object->type != NULL && object->type->destroy != NULL)
+        object->type->destroy(object);
+}
+
 size_t sl_array_length(void *pointer)
 {
     return ((SlArray *)pointer)->length;

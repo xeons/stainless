@@ -134,6 +134,22 @@ internal static class Program
             .OrderBy(d => d, StringComparer.Ordinal)
             .ToList();
 
+        // `--shard=2/3` runs every third case starting from the second, so a
+        // run that would not fit in one sitting can be made in several.
+        if (args.FirstOrDefault(a => a.StartsWith("--shard=", StringComparison.Ordinal)) is { } shard)
+        {
+            var parts = shard["--shard=".Length..].Split('/');
+            if (parts.Length != 2 ||
+                !int.TryParse(parts[0], out int index) || !int.TryParse(parts[1], out int count) ||
+                count < 1 || index < 1 || index > count)
+            {
+                Console.Error.WriteLine($"error: '{shard}' is not a shard; write --shard=1/2");
+                return 2;
+            }
+
+            cases = cases.Where((_, i) => i % count == index - 1).ToList();
+        }
+
         if (cases.Count == 0)
         {
             Console.Error.WriteLine($"error: no test cases found in {root}");

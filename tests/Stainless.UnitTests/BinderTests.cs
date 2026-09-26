@@ -66,6 +66,28 @@ public class BinderTests
     public void SomethingCorrectReportsNothing(string body) =>
         Assert.Empty(Front.BodyCodes(body));
 
+    /// <summary>
+    /// A <c>params</c> call is resolved as C# resolves one: the declared form
+    /// is better than the expanded one where the arguments convert as well
+    /// either way, and otherwise the better conversion wins.
+    /// </summary>
+    [Theory]
+    [InlineData("int F(int a) => 1;\nint F(params int[] a) => 2;\nint G() => F(1);")]
+    [InlineData("int F(int[] a) => 1;\nint F(params int[][] a) => 2;\nint G(int[] x) => F(x);")]
+    [InlineData("int F(params int[] a) => 1;\nint F(params long[] a) => 2;\nint G() => F(1, 2);")]
+    [InlineData("int F(params int[:] a) => 1;\nint G() => F();")]
+    [InlineData("int F(int a, params int[] b) => 1;\nint G() => F(b: [1], a: 2);")]
+    public void AParamsCallResolvesWithoutAmbiguity(string module) =>
+        Assert.Empty(Front.ModuleCodes(module));
+
+    [Theory]
+    [InlineData("int F(params int[] a, int b) => 1;")]
+    [InlineData("int F(params int a) => 1;")]
+    [InlineData("int F(out params int[] a) { a = []; return 1; }")]
+    [InlineData("public delegate int D(params int[] a);")]
+    public void AMisplacedParamsIsRefused(string module) =>
+        Assert.Contains("SL0763", Front.ModuleCodes(module));
+
     // ------------------------------------------------------ where it points
 
     /// <summary>

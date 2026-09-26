@@ -379,6 +379,21 @@ public class ParserTests
         Assert.Equal(["a", "b"], function.Parameters.Select(p => p.Name));
     }
 
+    [Theory]
+    [InlineData("int F(params int[] values)", true)]
+    [InlineData("int F(params int[:] values)", true)]
+    [InlineData("int F(ref params int[] values)", true)]
+    [InlineData("int F(params values)", false)]
+    [InlineData("int F(params values, int b)", false)]
+    public void ParamsIsAModifierOnlyWhereATypeFollows(string head, bool gathers)
+    {
+        var unit = Front.Parse("module A;\n" + head + " => 0;", out var diagnostics);
+        var function = Assert.IsType<FunctionDeclSyntax>(unit.Declarations[0]);
+
+        Assert.Empty(diagnostics.Items);
+        Assert.Equal(gathers, function.Parameters[0].IsParams);
+    }
+
     [Fact]
     public void ATypeCollectsItsMembers()
     {

@@ -535,8 +535,10 @@ public sealed partial class Binder
 
     private void AddParameters(FunctionSymbol symbol, IReadOnlyList<ParameterSyntax> parameters, FileScope scope)
     {
-        foreach (var parameter in parameters)
+        for (int index = 0; index < parameters.Count; index++)
         {
+            var parameter = parameters[index];
+
             if (symbol.Parameters.Any(p => p.Name == parameter.Name))
             {
                 diagnostics.Error("SL0212", parameter.Span,
@@ -565,6 +567,8 @@ public sealed partial class Binder
                     Mode = parameter.Mode,
                     DeclaredSpan = parameter.Span,
                     DefaultSyntax = CheckedDefault(symbol, parameter),
+                    IsParams = parameter.IsParams &&
+                               CheckedParams(symbol, parameter, type, index == parameters.Count - 1),
                 });
         }
 
@@ -575,7 +579,7 @@ public sealed partial class Binder
         var written = symbol.Parameters.Where(p => !p.IsThis).ToList();
 
         for (int i = 1; i < written.Count; i++)
-            if (!written[i].IsOptional && written[i - 1].IsOptional)
+            if (!written[i].IsOptional && !written[i].IsParams && written[i - 1].IsOptional)
             {
                 diagnostics.Error("SL0614", written[i].DeclaredSpan ?? symbol.Span,
                     $"'{written[i].Name}' has no default and '{written[i - 1].Name}' before it " +
@@ -595,7 +599,8 @@ public sealed partial class Binder
     /// </summary>
     private ExpressionSyntax? CheckedDefault(FunctionSymbol symbol, ParameterSyntax parameter)
     {
-        if (parameter.Default is null) return null;
+        // Refused as a 'params' in CheckedParams, which says why.
+        if (parameter.Default is null || parameter.IsParams) return null;
 
         if (parameter.Mode != ParameterMode.Value)
         {
@@ -615,6 +620,38 @@ public sealed partial class Binder
         }
 
         return parameter.Default;
+    }
+
+    /// <summary>
+    /// Whether <c>params</c> may stand where it was written. Each refusal is
+    /// about the same thing: the elements a call gives one by one are whatever
+    /// is left once every other parameter has had its argument, so there has
+    /// to be exactly one place for them to go and one shape to gather them in.
+    /// </summary>
+    private bool CheckedParams(
+        FunctionSymbol symbol, ParameterSyntax parameter, TypeSymbol type, bool isLast)
+    {
+        string? why =
+            !isLast ? "only the last parameter may be 'params'; the elements a call gives " +
+                      "one by one are whatever is left after the others, so nothing may follow them"
+            : parameter.Mode != ParameterMode.Value ?
+                $"a 'params' parameter is filled with a new array, so it cannot be " +
+                $"'{Spelled(parameter.Mode)}' -- there is no storage of the caller's to pass"
+            : parameter.Default is not null ?
+                "a 'params' parameter left out is already an empty one, so it takes no default"
+            : symbol.IsVariadic ?
+                $"'{symbol.Name}' is variadic, and '...' and 'params' would both claim the tail"
+            : symbol.Linkage != LinkageKind.Stainless ?
+                "a function that crosses to C takes what C passes, and C has no 'params'"
+            : type is not (ArrayTypeSymbol or SliceTypeSymbol or ErrorTypeSymbol) ?
+                $"'params' gathers the elements into a 'T[]' or a 'T[:]', and " +
+                $"'{type.Name}' is neither"
+            : null;
+
+        if (why is null) return type is not ErrorTypeSymbol;
+
+        diagnostics.Error("SL0763", parameter.Span, $"'{parameter.Name}' cannot be 'params': {why}");
+        return false;
     }
 
     private static string Spelled(ParameterMode mode) => mode switch
