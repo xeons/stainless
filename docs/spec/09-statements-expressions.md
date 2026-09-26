@@ -81,8 +81,8 @@ allocation rather than from the first field, because a class reference points
 at the object header ([§2 of abi.md](../abi.md#2-object-header-class-instances)) — so the number is what to add to
 the reference you are holding.
 
-Operators, by descending precedence: primary `a.b` `f(x)` `a[i]` `a[1:4]`
-`x++ x--` · prefix `++x --x - ! ~ * &` and `(T)x` and `try` · `* / %` ·
+Operators, by descending precedence: primary `a.b` `a?.b` `f(x)` `F<T>(x)`
+`a[i]` `a?[i]` `a[1:4]` `x++ x--` `x!` · prefix `++x --x - ! ~ * &` and `(T)x` and `try` · `* / %` ·
 `+ -` · `<< >>` · `< <= > >=` and `is` · `== !=` · `&` · `^` · `|` ·
 `&&` · `||` · `?:` · assignment `= += -= *= /= %= &= |= ^= <<= >>=`.
 
@@ -92,6 +92,8 @@ answered. It is also where the terms sit that look like operators and are not:
 `new`, `typeof`, `sizeof`, `alignof`, `offsetof`, `nameof`, `iidof`,
 `default(T)` and `checked(x)` each take a type or a parenthesised argument list
 rather than binding over a neighbour, so nothing can group around them wrongly.
+A bare `default` and a `new(...)` with no type are terms too, and take their
+type from where they are going ([§9.8](#98-defaultt), [§9.16](#916-new-with-the-type-left-off)).
 A cast takes a unary operand, which is why `(T)a * b` is `((T)a) * b`.
 
 Carrying a file's bytes is not among them: that is `[Embed]`, an attribute on a
@@ -577,12 +579,14 @@ exactly once, so `cells[Next()]++` calls `Next` a single time.
 An enum is refused (SL0594): it is a choice rather than a count, and stepping
 one means stepping the integer behind it.
 
-## 9.7 `?.` and `??`
+## 9.7 `?.`, `?[`, `??` and `!`
 
 ```csharp
 node?.Name ?? "none"        // the name, or that, if there is no node
 node?.Save();               // called only if there is something to call it on
+list?[0]?.Name              // the first element's name, if there is a list
 handler ??= Default();      // filled in only if it was empty
+node!.Name                  // a Node? used as the Node it holds
 ```
 
 **The receiver is read once.** `a?.b` asks whether `a` is there and then
@@ -606,9 +610,24 @@ is how a value-typed member is reached. Without the fallback there is nowhere
 for "there was no node" to go, and the language says so rather than inventing a
 zero that a caller cannot tell from a real one.
 
-**A receiver that cannot be nothing is refused** (SL0604), for `?.`, `??` and
-`??=` alike. `here?.Name` on a plain `Node` is a question with one answer, and
-writing it suggests a doubt the type does not have.
+**A receiver that cannot be nothing is refused** (SL0604), for `?.`, `?[`,
+`??` and `??=` alike. `here?.Name` on a plain `Node` is a question with one
+answer, and writing it suggests a doubt the type does not have.
+
+**`a?[i]` asks the same question before an element.** The receiver is a `C?`
+whose class declares an indexer ([§7.5](07-functions-members.md#75-indexers)) — an array is never null, so there is
+nothing to ask of one — and the element follows the table above: a reference
+answers null, and a value needs `??`. `a?[i:j]` slices the same way.
+
+**`?[` is read as C# reads it.** `c ? [1] : [2]` is a conditional with an array
+literal in its arm, and `a?[i]` is an element: after `?[` the parser looks for
+a `:` following the expression, and takes the conditional only if it finds one.
+The true arm of an enclosing conditional that lost its `:` to that guess is
+read again with every `?[` as an element, so `c ? a?[i] : b` means what it
+says.
+
+**Neither is written through** (SL0762), as in C#. `node?.Weight = 4` would be
+a write that happens only sometimes, which is an `if`, and reads better as one.
 
 **Each `?.` asks its own question.** `a?.b?.c` is two, and `a?.b.c` is an
 error: the first answered with a `D?`, and a `.` does not reach through one.
@@ -617,6 +636,22 @@ rather than a chain that silently swallows the whole expression.
 
 `??` binds looser than `||`, so `a ?? b || c` is `a ?? (b || c)`: the fallback
 is the whole of what follows, which is what it looks like.
+
+**`x!` takes a `C?` as the `C` it holds, and checks nothing.** It is the cast
+`(C)x` ([§2.5](02-types.md#25-pointers-and-nullability)) with C#'s spelling, and like the cast it emits nothing: the
+same pointer is used as a different type. It is for the place where the
+program knows something a check cannot prove, such as a field another method
+has just filled. A null that gets through is not trapped: reaching through it
+is a read at address zero, which the platform ends the program for, and a `C`
+that is null is a broken promise every later reader trusts. Where the program
+does not know, `if (x != null)`, `is C c` or `??` is the question to ask
+instead. On a `weak C?` it reads strongly first, and on anything that cannot be
+null it changes nothing, so a generic body may write it for a `T` that is only
+sometimes a `C?`.
+
+It binds as a postfix operator, so `a!.b`, `a![i]` and `F()!` read as they
+look, and it cannot be confused with prefix `!` or with `!=`: nothing that
+follows a whole operand can begin a negation.
 
 ## 9.8 `default(T)`
 
@@ -641,6 +676,26 @@ vacated slot with. This is that, spelled.
 
 `default(void)` is the one refusal (SL0603): `void` is the absence of a value,
 so there is none of it to zero.
+
+**A bare `default` takes its type from where it is going**, as in C#:
+
+```csharp
+int count = default;                        // a declared local
+return default;                             // the function's return type
+Save(default);                              // the parameter
+void Draw(int width = default) { ... }      // a parameter's default
+if (count == default) { ... }               // the other side of a comparison
+var picked = ready ? default : 5;           // the other arm, so an int
+long wide = (long)default;                  // a cast
+```
+
+It is `default(T)` for the `T` that place names, and costs exactly that. With
+nothing to name one — `var x = default;`, `default.ToString()`,
+`default == default` — it is SL0757. As an argument it fits any parameter, so
+two overloads that differ only there are ambiguous, as in C#.
+
+**`case default:` is refused** (SL0758). It is nearly always a `default:` label
+written wrong, and as a constant it would match whatever the zero is.
 
 ## 9.9 `do`
 
@@ -943,3 +998,31 @@ letter or `_` is not a name (SL0001).
 ---
 
 <sub>[&larr; Interoperability and libraries](08-interop-libraries.md) &nbsp;&middot;&nbsp; [Conditional compilation &rarr;](10-conditional-compilation.md)</sub>
+
+## 9.16 `new(...)` with the type left off
+
+```csharp
+Point origin = new();                       // a declared local
+private List<int> _seen = new() { 1, 2 };   // a field, with an initializer
+Point Corner() => new(1, 1);                // a return
+Plot(new(3, 4));                            // an argument
+Point[] row = [new(1, 1), new(2, 2)];       // an element
+Point either = ready ? new(5, 5) : origin;  // the other arm
+```
+
+**The type is the one the value is going to**, and everything after it is the
+`new` that type would have had: its constructors, its initializer, a class
+allocated and counted, a struct made where it stands. A `C?` makes a `C`. The
+arguments are bound where they were written, before the type is known, so
+nothing about them depends on where the value ends up.
+
+**With nothing to take the type from it is SL0756**: `var p = new();`,
+`new().X`, a statement of its own. A type `new` cannot make — an interface, an
+abstract class, a variant — is refused as it would be written out (SL0244,
+SL0514).
+
+**In overload resolution it fits any parameter `new` could make**, which is a
+little narrower than C#'s "any type": `Pick(new())` against `Pick(Point)` and
+`Pick(int)` chooses `Point`, where C# calls the pair ambiguous. Two class
+parameters are ambiguous in both. A generic parameter learns nothing from it,
+so `Id(new())` is SL0327 until the type argument is written: `Id<Point>(new())`.

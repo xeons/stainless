@@ -1040,7 +1040,14 @@ public sealed record InterpolatedPartSyntax(string? Literal, ExpressionSyntax? V
     public SourceSpan? FormatSpan { get; init; }
 }
 
-public sealed record NameSyntax(SourceSpan Span, QualifiedName Name) : ExpressionSyntax(Span);
+public sealed record NameSyntax(SourceSpan Span, QualifiedName Name) : ExpressionSyntax(Span)
+{
+    /// <summary>
+    /// The <c>&lt;int&gt;</c> in <c>Pick&lt;int&gt;(a, b)</c> or
+    /// <c>Box&lt;int&gt;.Create()</c>, or null when none was written.
+    /// </summary>
+    public IReadOnlyList<TypeSyntax>? TypeArguments { get; init; }
+}
 
 /// <summary>
 /// <c>(a, b)</c> — several values written as one.
@@ -1113,14 +1120,22 @@ public sealed record NameofSyntax(SourceSpan Span, ExpressionSyntax Operand)
     : ExpressionSyntax(Span);
 
 /// <summary>
-/// <c>default(T)</c> — the zeroed value of a type.
+/// <c>default(T)</c> — the zeroed value of a type — or a bare <c>default</c>,
+/// whose <c>Type</c> is null and which takes its type from where it is going.
 ///
 /// It exists for generic code, which cannot write a literal for a type it does
 /// not know. Everything it produces was already reachable: a fresh array is
 /// zeroed, so <c>new T[1][0]</c> was the spelling before this, and the library
 /// kept exactly such an array around to blank a vacated slot with.
 /// </summary>
-public sealed record DefaultSyntax(SourceSpan Span, TypeSyntax Type) : ExpressionSyntax(Span);
+public sealed record DefaultSyntax(SourceSpan Span, TypeSyntax? Type) : ExpressionSyntax(Span);
+
+/// <summary>
+/// <c>x!</c>: a <c>C?</c> used as a <c>C</c>, with nothing checked. The same
+/// thing the cast <c>(C)x</c> is, spelled the way C# spells it.
+/// </summary>
+public sealed record NullForgivingSyntax(SourceSpan Span, ExpressionSyntax Operand)
+    : ExpressionSyntax(Span);
 
 /// <summary><c>checked(e)</c> and <c>unchecked(e)</c>.</summary>
 public sealed record CheckedSyntax(
@@ -1202,6 +1217,12 @@ public sealed record MemberAccessSyntax(
     /// the receiver is there, and the whole thing is nothing if it is not.
     /// </summary>
     public bool Conditional { get; init; }
+
+    /// <summary>
+    /// The <c>&lt;T&gt;</c> in <c>list.ConvertAll&lt;T&gt;(f)</c>, or null when
+    /// none was written.
+    /// </summary>
+    public IReadOnlyList<TypeSyntax>? TypeArguments { get; init; }
 }
 
 /// <summary>
@@ -1212,7 +1233,11 @@ public sealed record SliceSyntax(
     SourceSpan Span,
     ExpressionSyntax Target,
     ExpressionSyntax? Start,
-    ExpressionSyntax? End) : ExpressionSyntax(Span);
+    ExpressionSyntax? End) : ExpressionSyntax(Span)
+{
+    /// <summary>True when this was written <c>a?[i:j]</c>.</summary>
+    public bool Conditional { get; init; }
+}
 
 /// <summary>
 /// <c>a[i]</c>, and <c>a[i, j]</c> where the target declares an indexer taking
@@ -1220,11 +1245,22 @@ public sealed record SliceSyntax(
 /// </summary>
 public sealed record IndexSyntax(
     SourceSpan Span, ExpressionSyntax Target, IReadOnlyList<ExpressionSyntax> Indices)
-    : ExpressionSyntax(Span);
+    : ExpressionSyntax(Span)
+{
+    /// <summary>
+    /// True when this was written <c>a?[i]</c>: the element is read only if
+    /// the target is there, and the whole thing is nothing if it is not.
+    /// </summary>
+    public bool Conditional { get; init; }
+}
 
+/// <summary>
+/// <c>new C(args)</c>, or <c>new(args)</c> with a null <c>Type</c>, which takes
+/// the type from where the value is going.
+/// </summary>
 public sealed record NewSyntax(
     SourceSpan Span,
-    TypeSyntax Type,
+    TypeSyntax? Type,
     IReadOnlyList<ExpressionSyntax> Arguments) : ExpressionSyntax(Span)
 {
     /// <summary>

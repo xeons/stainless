@@ -1036,6 +1036,10 @@ if (node.Next is Node n)
     return n.Value;
 ```
 
+A third is `x!`, or the cast `(Node)x` it is short for, which asserts rather
+than asks: nothing is checked, and a null that gets through is a crash at its
+first use ([§9.7](09-statements-expressions.md#97----and-)).
+
 **A `weak C?` is never narrowed.** It may die between the check and the use,
 which is the whole of what weak means, so no check could establish anything
 about it. Reading it into a strong `C?` is what makes it safe to look at, and
@@ -1090,8 +1094,9 @@ Area(Circle(2.0));                // and so does a parameter
 
 The bare form is the one `Ok` and `Fail` have always used, and it obeys the same
 rule a lambda does: it takes its type from where it is going. It cannot be
-inferred *from*, so `var s = Circle(2.0);` is SL0287. A generic variant can only
-be built this way, because type arguments cannot be written at a call ([§4.4](04-generics.md#44-what-is-and-is-not-supported)).
+inferred *from*, so `var s = Circle(2.0);` is SL0287. A generic variant is
+built this way, or named with its type arguments in front of the case, as in
+`Tree<int>.Leaf(1)` ([§4.4.1](04-generics.md#441-writing-type-arguments-at-a-call)).
 
 Because a bare case name resolves before any function of that name would, **a
 module-level function may not be named after a case of a variant its file can
@@ -1341,11 +1346,11 @@ it is going. Being a variant is also what makes it small: only one case is ever
 present, so a `Result<String, IOError>` is a tag and one pointer rather than a
 flag and both halves. A call that succeeds allocates nothing.
 
-**`Ok` and `Fail` take their type from where they are going.** Neither can be
-written with type arguments — type arguments cannot be written at a call at all
-([§4.4](04-generics.md#44-what-is-and-is-not-supported)) — and one value could not say what both of them are: `Ok(4)` fixes `T`
-and says nothing about `TError`. So the compiler reads the type being returned,
-assigned into, or passed as an argument, exactly as it does for a lambda:
+**`Ok` and `Fail` take their type from where they are going.** One value could
+not say what both type arguments are: `Ok(4)` fixes `T` and says nothing about
+`TError`. So the compiler reads the type being returned, assigned into, or
+passed as an argument, exactly as it does for a lambda. Where nothing does, the
+variant is written out in front of the case, as in `Result<int, Why>.Ok(4)`:
 
 ```csharp
 Result<int, Why> Doubled(int n)

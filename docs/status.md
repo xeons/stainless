@@ -334,7 +334,7 @@ last person to edit it -- the suite is the authority.
   alive for as long as it is. An array converts to a slice of the whole of
   itself implicitly, and `foreach` walks one like an array
 - Generics: generic classes, interfaces, functions and methods, monomorphized,
-  with inference at call sites and constraints: an interface, a base class,
+  with inference at call sites or type arguments written there, and constraints: an interface, a base class,
   another type parameter, `class`, `struct`, `new()` and `threadsafe`
 - `enum`, strongly typed: a distinct type over an integer that never converts
   implicitly in either direction, with an optional underlying type
@@ -704,17 +704,25 @@ last person to edit it -- the suite is the authority.
   Nesting is about where a name is reached from and nothing else — no hidden
   reference to an outer instance, and no bearing on layout. It composes, and a
   nested type does not see its outer type's parameters
-- `?.`, `??` and `??=`, over a `C?`. The receiver is read once, so
-  `Next()?.Name` calls `Next` one time. A reference member answers null; a
-  value member has no null to answer with, so `node?.Weight` needs a
+- `?.`, `?[`, `??` and `??=`, over a `C?`. The receiver is read once, so
+  `Next()?.Name` calls `Next` one time. A reference member or element answers
+  null; a value member has no null to answer with, so `node?.Weight` needs a
   `?? fallback` and says so (SL0605) rather than inventing a zero a caller
   cannot tell from a real one. A receiver that cannot be nothing is refused,
-  and `a?.b.c` is an error where `a?.b?.c` is the question actually being asked
+  `a?.b.c` is an error where `a?.b?.c` is the question actually being asked,
+  and neither is written through (SL0762). `x!` is `(C)x`, checking nothing
 - `default(T)` is the zeroed value of a type, for generic code that cannot
-  write a literal for a type it does not know. Not a new hole in the null
+  write a literal for a type it does not know, and a bare `default` is the
+  same with the type taken from where it is going. Not a new hole in the null
   discipline: a fresh array is zeroed, so `new C[1][0]` was the spelling before
   it. `String.Empty` is a static property rather than a field, because a
   `--shared` library has no entry point to initialize a static from
+- `new(...)` with the type left off, taken from a declared local, a field, a
+  return, an argument, an element or the other arm of a conditional; with
+  nothing to take it from it is SL0756
+- Type arguments written at a call, `Pick<int>(a, b)`, and a generic type named
+  in front of its statics, `Box<int>.Create()`, with C#'s rule for when `<` is
+  less-than
 - Diagnostics with source excerpts and caret runs
 
 ## What does not exist yet
@@ -726,20 +734,7 @@ Being straight about the edges, roughly in the order they are worth adding:
   still checked per instantiation, so an unused template is never checked and
   a mistake inside one is reported against its use. Definition-site checking
   would need constraints on operators too, which is a larger step.
-- **Type arguments cannot be written at a call.** `Pick<int>(...)` is rejected,
-  because `<` in expression position is ambiguous with less-than, so a type
-  parameter that appears only in the function's own return type cannot be
-  worked out. That holds for generic methods too, and an interface method
-  cannot be generic at all, since dispatch gives it one slot. A parameter that
-  appears only in a *lambda's* result is a different case and is inferred, by
-  binding the body once the other arguments have given it its parameter types —
-  which is what makes `Select(numbers, n => n * 2)` work. The same ambiguity is
-  why an instantiation cannot be *named* in expression position either:
-  `new Box<int>(...)` reads, because a type is what is expected after `new`,
-  but `Box<int>.Of(2)` and `Box<int>.Count` do not. A generic type's static
-  members are reachable from inside it and from a value of it, and a maker for
-  one is written as a module-level generic function. Inside the type its own
-  statics are named directly, as they are anywhere else.
+- **An interface method cannot be generic**, since dispatch gives it one slot.
 - **No `goto case`, and no exhaustiveness requirement on an enum**, whose value
   need not be one of its members. A switch expression over one still needs a
   `_` arm for that reason.

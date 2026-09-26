@@ -534,6 +534,35 @@ public sealed partial class Binder
         CallSyntax syntax,
         List<BoundExpression> arguments)
     {
+        var written = syntax.Callee switch
+        {
+            NameSyntax name => name.TypeArguments,
+            MemberAccessSyntax member => member.TypeArguments,
+            _ => null,
+        };
+
+        List<TypeSymbol>? given = null;
+        if (written is not null)
+        {
+            given = written.Select(w => ResolveType(w, _currentScope!)).ToList();
+            if (given.Any(g => g.IsError()))
+                return null;
+
+            var arity = candidates.Where(c => c.Parameters.Count == given.Count).ToList();
+            if (arity.Count == 0)
+            {
+                var counts = candidates.Select(c => c.Parameters.Count).Distinct().Order().ToList();
+                diagnostics.Error("SL0760", syntax.Callee.Span,
+                    $"'{candidates[0].Name}' takes " +
+                    string.Join(" or ", counts) +
+                    $" type argument{(counts is [1] ? "" : "s")}, and {given.Count} " +
+                    $"{(given.Count == 1 ? "was" : "were")} written");
+                return null;
+            }
+
+            candidates = arity;
+        }
+
         var viable = candidates
             .Where(c => c.Declaration.Parameters.Count == arguments.Count)
             .ToList();
@@ -562,6 +591,11 @@ public sealed partial class Binder
             // An enclosing type's parameters are already fixed, so they are
             // given rather than inferred; only the method's own are worked out.
             foreach (var (name, type) in candidate.OuterSubstitution) inferred.TryAdd(name, type);
+
+            // Written at the call, so there is nothing to infer.
+            if (given is not null)
+                for (int i = 0; i < given.Count; i++)
+                    inferred[candidate.Parameters[i]] = given[i];
 
             int shared = Math.Min(arguments.Count, candidate.Declaration.Parameters.Count);
             for (int i = 0; i < shared; i++)

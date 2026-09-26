@@ -499,11 +499,9 @@ the step before that: there is no way to ask a `Type` for a new instance, so
 every reader fills an object the caller already made.
 
 That is why `PopulateObject<T>(T value, String text)` is the shape, and why there is no
-`Deserialize<T>(String)` answering a fresh `T`. Two things would have to change.
-A type argument cannot be written at a call (§4.4) — `<` in expression position
-is ambiguous with less-than — so a function whose only mention of `T` is its
-return type has nothing to infer from and could never be called. And the
-metadata carries no constructor to call once the bytes are allocated.
+`Deserialize<T>(String)` answering a fresh `T`: `Deserialize<Person>(text)` can
+be written (§4.4.1), but the metadata carries no constructor to call once the
+bytes are allocated.
 
 Methods and interfaces carry no metadata either — fields and properties only.
 

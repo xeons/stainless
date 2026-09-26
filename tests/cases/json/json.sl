@@ -232,7 +232,7 @@ public int Main()
 
     // A document read into an object made for it, which is the whole of what
     // deserializing is here: there is no `Deserialize<Person>(text)`, because
-    // a type argument cannot be written at a call.
+    // reflection has no constructor to call.
     var made = new Person();
     var madeFailure = Json.PopulateObject(made, "{\"Name\":\"Alan Turing\",\"Years\":41}");
     Say("deserialized", Json.DescribeJsonError(madeFailure) + "/" + made.Name + "/"

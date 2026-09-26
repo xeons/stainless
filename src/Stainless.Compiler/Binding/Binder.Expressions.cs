@@ -84,6 +84,7 @@ public sealed partial class Binder
         NameofSyntax nameOf => BindNameof(nameOf),
         CheckedSyntax guarded => BindChecked(guarded),
         DefaultSyntax zeroed => BindDefault(zeroed),
+        NullForgivingSyntax forgiven => BindNullForgiving(forgiven),
         TupleSyntax tuple => BindTuple(tuple),
         BinarySyntax binary => BindBinary(binary),
         AssignmentSyntax assignment => BindAssignment(assignment),
@@ -749,6 +750,30 @@ public sealed partial class Binder
     /// every element reaches, which is the same question a ternary's two arms
     /// ask.
     /// </summary>
+    /// <summary>
+    /// <c>var xs = flag ? [1, 2] : [3L];</c>: each arm settled from its own
+    /// elements, and then the two brought to the type they share.
+    /// </summary>
+    private BoundExpression SettleArraysFromElements(BoundConditional chosen)
+    {
+        var whenTrue = SettleArrayFromElements((BoundArrayDraft)chosen.WhenTrue);
+        var whenFalse = SettleArrayFromElements((BoundArrayDraft)chosen.WhenFalse);
+        if (whenTrue.Type.IsError() || whenFalse.Type.IsError())
+            return new BoundErrorExpression(chosen.Span);
+
+        if (CommonArmType(whenTrue, whenFalse) is not { } type)
+        {
+            diagnostics.Error("SL0349", chosen.Span,
+                $"the arms of a conditional have no common type: one is " +
+                $"'{whenTrue.Type.Name}', the other '{whenFalse.Type.Name}'");
+            return new BoundErrorExpression(chosen.Span);
+        }
+
+        return new BoundConditional(chosen.Span, type, chosen.Condition,
+            BindConversion(whenTrue, type, whenTrue.Span),
+            BindConversion(whenFalse, type, whenFalse.Span));
+    }
+
     private BoundExpression SettleArrayFromElements(BoundArrayDraft draft)
     {
         if (draft.Elements.Count == 0)
@@ -1287,6 +1312,9 @@ public sealed partial class Binder
 
     private BoundExpression BindName(NameSyntax syntax)
     {
+        if (syntax.TypeArguments is not null)
+            return RefuseTypeArgumentsOnValue(syntax, syntax.Name.Text);
+
         var parts = syntax.Name.Parts;
 
         if (parts.Count == 1)
@@ -1538,6 +1566,15 @@ public sealed partial class Binder
         }
 
         if (left.Type.IsError() || right.Type.IsError()) return new BoundErrorExpression(syntax.Span);
+
+        // `x == default` is the zero of the other side's type, as in C#.
+        if (left.Type is DefaultLiteralType && HasOwnType(right))
+            left = SettleDefault(left.Span, right.Type);
+        else if (right.Type is DefaultLiteralType && HasOwnType(left))
+            right = SettleDefault(right.Span, left.Type);
+
+        if (RefuseUntyped(left) | RefuseUntyped(right))
+            return new BoundErrorExpression(syntax.Span);
 
         var op = syntax.Operator switch
         {
@@ -2040,6 +2077,11 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
+        // Both arms wait for where the whole is going, and settle there.
+        if (IsTargetTyped(whenTrue) && IsTargetTyped(whenFalse) ||
+            whenTrue is BoundArrayDraft && whenFalse is BoundArrayDraft)
+            return new BoundConditional(syntax.Span, type, condition, whenTrue, whenFalse);
+
         return new BoundConditional(
             syntax.Span, type,
             condition,
@@ -2050,6 +2092,15 @@ public sealed partial class Binder
     /// <summary>The type both arms of a conditional reach, or null if they do not.</summary>
     private TypeSymbol? CommonArmType(BoundExpression left, BoundExpression right)
     {
+        // `flag ? new() : fallback` is a `new` of the other arm's type. Two
+        // such arms wait together for where the whole is going.
+        if (IsTargetTyped(left) && HasOwnType(right))
+            return right.Type;
+        if (IsTargetTyped(right) && HasOwnType(left))
+            return left.Type;
+        if (IsTargetTyped(left) && IsTargetTyped(right))
+            return left.Type is NewDraftType ? left.Type : right.Type;
+
         if (left.Type.Equals(right.Type)) return left.Type;
 
         // `flag ? obj : null` is an optional, which is what the null was reaching for.
@@ -2080,6 +2131,8 @@ public sealed partial class Binder
     {
         var elements = syntax.Elements.Select(BindExpression).ToList();
         if (elements.Any(e => e.Type.IsError())) return new BoundErrorExpression(syntax.Span);
+        if (elements.Any(RefuseUntyped))
+            return new BoundErrorExpression(syntax.Span);
 
         foreach (var element in elements)
         {
@@ -2105,6 +2158,9 @@ public sealed partial class Binder
     /// </summary>
     private BoundExpression BindDefault(DefaultSyntax syntax)
     {
+        if (syntax.Type is null)
+            return new BoundDefault(syntax.Span, DefaultLiteralType.Instance);
+
         // allowVoid, so that the refusal below is the one reported: it says
         // what `default` in particular cannot do, where the general rule in
         // ResolveType says only that 'void' is not a type a value has.
@@ -2119,6 +2175,118 @@ public sealed partial class Binder
         }
 
         return new BoundDefault(syntax.Span, type);
+    }
+
+    /// <summary>
+    /// <c>x!</c>: a <c>C?</c> taken as the <c>C</c> it holds, checking nothing,
+    /// exactly as <c>(C)x</c> does. On anything that cannot be null it is the
+    /// operand unchanged, as C# has it, so a generic body may write it for a
+    /// parameter that is only sometimes a <c>C?</c>.
+    /// </summary>
+    private BoundExpression BindNullForgiving(NullForgivingSyntax syntax)
+    {
+        var operand = BindExpression(syntax.Operand);
+        if (operand.Type.IsError())
+            return new BoundErrorExpression(syntax.Span);
+        if (RefuseUntyped(operand))
+            return new BoundErrorExpression(syntax.Span);
+
+        // A weak reference is read strongly first, which is where it is
+        // asked whether the object is still alive.
+        if (operand.Type is WeakTypeSymbol weak)
+            operand = BindConversion(operand, new OptionalTypeSymbol(weak.Element), syntax.Span);
+
+        return operand.Type is OptionalTypeSymbol optional
+            ? new BoundConversion(syntax.Span, optional.Element, operand, ConversionKind.NarrowOptional)
+            : operand;
+    }
+
+    /// <summary>
+    /// <c>Pick&lt;int&gt;</c> or <c>list.Map&lt;int&gt;</c> somewhere other than
+    /// the callee of a call, where there is nothing for the arguments to do.
+    /// </summary>
+    private BoundExpression RefuseTypeArgumentsOnValue(ExpressionSyntax syntax, string name)
+    {
+        if (ConstructedTypeNamed(syntax) is { } type)
+        {
+            diagnostics.Error("SL0761", syntax.Span,
+                $"'{type.Name}' is a type, not a value; reach a static member through it, as " +
+                $"in '{type.Name}.Create()', or make one with 'new'");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        diagnostics.Error("SL0761", syntax.Span,
+            $"'{name}' is written with type arguments and is not being called; type " +
+            "arguments go on a call, as in 'Pick<int>(a, b)', or on a type before its " +
+            "member, as in 'Box<int>.Create()'");
+        return new BoundErrorExpression(syntax.Span);
+    }
+
+    /// <summary>
+    /// Refuses <c>a?.b = v</c> and <c>a?[i]++</c>, as C# does: a write that
+    /// might not happen is an <c>if</c>, and is clearer written as one.
+    /// </summary>
+    private bool RefuseConditionalTarget(ExpressionSyntax target)
+    {
+        if (target is not (MemberAccessSyntax { Conditional: true } or
+                           IndexSyntax { Conditional: true } or SliceSyntax { Conditional: true }))
+            return false;
+
+        diagnostics.Error("SL0762", target.Span,
+            "a '?.' or '?[' reads, and cannot be written through: the write would happen " +
+            "only sometimes, which is an 'if'. Write 'if (a != null)' and assign inside it");
+        return true;
+    }
+
+    /// <summary>A bare <c>default</c>, as the zero of the type it is going to.</summary>
+    private BoundExpression SettleDefault(SourceSpan span, TypeSymbol target)
+    {
+        if (target.IsVoid())
+        {
+            diagnostics.Error("SL0603", span,
+                "'default' names no value here, because what it is going to is 'void'");
+            return new BoundErrorExpression(span);
+        }
+
+        return new BoundDefault(span, target);
+    }
+
+    /// <summary>Whether an expression has a type of its own rather than one it waits for.</summary>
+    private static bool HasOwnType(BoundExpression expression) =>
+        expression.Type is not (DefaultLiteralType or NewDraftType or NullType or LambdaType
+            or ArrayDraftType or VariantDraftType or FunctionGroupType or ErrorTypeSymbol)
+        && !expression.Type.IsVoid();
+
+    /// <summary>
+    /// Whether this is a bare <c>default</c> or a <c>new(...)</c>, which have
+    /// no type until something they are going to gives them one.
+    /// </summary>
+    private static bool IsTargetTyped(BoundExpression expression) =>
+        expression.Type is DefaultLiteralType or NewDraftType;
+
+    /// <summary>
+    /// Reports a <c>default</c> or <c>new(...)</c> that reached a place with no
+    /// type to give it, and answers whether it did.
+    /// </summary>
+    private bool RefuseUntyped(BoundExpression expression)
+    {
+        switch (expression.Type)
+        {
+            case DefaultLiteralType:
+                diagnostics.Error("SL0757", expression.Span,
+                    "a bare 'default' takes its type from where it is going, and nothing " +
+                    "here says what that is; write 'default(T)' with the type you mean");
+                return true;
+
+            case NewDraftType:
+                diagnostics.Error("SL0756", expression.Span,
+                    "'new(...)' takes its type from where it is going, and nothing here says " +
+                    "what that is; write the type, as in 'new Point(...)'");
+                return true;
+
+            default:
+                return false;
+        }
     }
 
     /// <summary>
@@ -2207,6 +2375,9 @@ public sealed partial class Binder
     private BoundExpression BindIncrement(IncrementSyntax syntax)
     {
         string written = syntax.IsIncrement ? "++" : "--";
+        if (RefuseConditionalTarget(syntax.Operand))
+            return new BoundErrorExpression(syntax.Span);
+
         var target = Widened(BindExpression(syntax.Operand));
 
         if (target.Type.IsError()) return new BoundErrorExpression(syntax.Span);
@@ -2485,6 +2656,8 @@ public sealed partial class Binder
 
     private BoundExpression BindAssignment(AssignmentSyntax syntax)
     {
+        if (RefuseConditionalTarget(syntax.Target))
+            return new BoundErrorExpression(syntax.Span);
         if (BindSubscription(syntax) is { } subscription) return subscription;
 
         // A narrowed optional is still an optional when it is written to: the
@@ -2989,7 +3162,21 @@ public sealed partial class Binder
 
     private BoundExpression BindIndex(IndexSyntax syntax)
     {
+        if (syntax.Conditional)
+            return BindConditionalElement(syntax, null);
+
         var target = BindExpression(syntax.Target);
+        if (target.Type.IsError())
+            return new BoundErrorExpression(syntax.Span);
+        if (RefuseUntyped(target))
+            return new BoundErrorExpression(syntax.Span);
+
+        return BindIndexOn(target, syntax);
+    }
+
+    /// <summary>The element of a target that has already been bound.</summary>
+    private BoundExpression BindIndexOn(BoundExpression target, IndexSyntax syntax)
+    {
         var given = syntax.Indices.Select(BindExpression).ToList();
 
         if (target.Type.IsError() || given.Any(i => i.Type.IsError()))
@@ -3073,8 +3260,20 @@ public sealed partial class Binder
     /// </summary>
     private BoundExpression BindSlice(SliceSyntax syntax)
     {
+        if (syntax.Conditional)
+            return BindConditionalElement(syntax, null);
+
         var target = BindExpression(syntax.Target);
         if (target.Type.IsError()) return new BoundErrorExpression(syntax.Span);
+        if (RefuseUntyped(target))
+            return new BoundErrorExpression(syntax.Span);
+
+        return BindSliceOn(target, syntax);
+    }
+
+    /// <summary>A slice of a target that has already been bound.</summary>
+    private BoundExpression BindSliceOn(BoundExpression target, SliceSyntax syntax)
+    {
 
         var element = target.Type switch
         {

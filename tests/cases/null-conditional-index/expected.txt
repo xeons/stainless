@@ -1,0 +1,8 @@
+a second none
+b no next after 1
+c 3 -1
+d slot empty named
+e nothing first 2
+f second
+g second second first 2
+h false true false

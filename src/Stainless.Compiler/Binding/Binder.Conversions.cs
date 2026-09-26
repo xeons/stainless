@@ -56,6 +56,21 @@ public sealed partial class Binder
         if (expression is BoundArrayDraft arrayDraft)
             return BindArraySettle(arrayDraft, target, span);
 
+        // Nor a bare `default`, nor `new(...)`.
+        if (expression is BoundDefault { Type: DefaultLiteralType })
+            return SettleDefault(expression.Span, target);
+
+        if (expression is BoundNewDraft newDraft)
+            return SettleNewDraft(newDraft, target, span);
+
+        if (expression is BoundConditional
+            {
+                Type: DefaultLiteralType or NewDraftType or ArrayDraftType,
+            } waiting)
+            return new BoundConditional(span, target, waiting.Condition,
+                BindConversion(waiting.WhenTrue, target, waiting.WhenTrue.Span),
+                BindConversion(waiting.WhenFalse, target, waiting.WhenFalse.Span));
+
         // A value becomes the `Optional<T>` holding it, the way it becomes a
         // `T?` in Swift and C#. This is what lets an indexer be honest about a
         // lookup that may miss: `map[key]` answers `Optional<V>` and

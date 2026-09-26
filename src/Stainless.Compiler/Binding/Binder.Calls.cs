@@ -51,14 +51,14 @@ public sealed partial class Binder
         // What keeps that unambiguous is SL0414: a module-level function may not
         // be named after a case of a variant this file can see. A method still
         // may, and is reached through its receiver.
-        if (syntax.Callee is NameSyntax { Name.Parts: [var bare] } &&
+        if (syntax.Callee is NameSyntax { Name.Parts: [var bare], TypeArguments: null } &&
             LookupLocal(bare) is null && CouldBeVariantCase(bare))
             return BindVariantDraft(syntax, bare, arguments);
 
 
         // `Shape.Circle(2.0)` names the variant as well as the case, so it
         // needs nothing from the surrounding expression to settle it.
-        if (syntax.Callee is MemberAccessSyntax { } named &&
+        if (syntax.Callee is MemberAccessSyntax { TypeArguments: null } named &&
             ResolveVariantPrefix(named.Target) is { } prefix)
         {
             if (prefix.FindCase(named.Member) is not { } prefixCase)
@@ -102,15 +102,23 @@ public sealed partial class Binder
                 .Where(f => sameModule || f.IsPublic)
                 .ToList();
 
-            if (visible.Any(f => AcceptsArguments(f, arguments, syntax.Arguments)))
+            bool written = member.TypeArguments is not null;
+
+            if (!written && visible.Any(f => AcceptsArguments(f, arguments, syntax.Arguments)))
                 return BindFunctionCall(syntax, visible, member.Member, arguments);
 
             var qualified = new QualifiedName(member.Span,
                 [.. FlattenName(member.Target)!, member.Member]);
             if (TryBindGenericCall(syntax, qualified, arguments) is { } generic) return generic;
 
+            if (written)
+                return RefuseTypeArgumentsOnPlainFunction(member, member.Member, visible.Count > 0);
+
             return BindFunctionCall(syntax, visible, member.Member, arguments);
         }
+
+        if (syntax.Callee is NameSyntax { TypeArguments: not null } explicitly)
+            return BindCallWithTypeArguments(syntax, explicitly, arguments);
 
         // A local, parameter or field holding a delegate is called indirectly,
         // and shadows any function of the same name -- the value is nearer.
@@ -271,6 +279,62 @@ public sealed partial class Binder
     }
 
     /// <summary>
+    /// <c>Pick&lt;int&gt;(a, b)</c>: a generic method of the enclosing type, or
+    /// a generic function, with its type arguments written rather than
+    /// inferred. Nothing that is not generic is a candidate, as in C#.
+    /// </summary>
+    private BoundExpression BindCallWithTypeArguments(
+        CallSyntax syntax, NameSyntax callee, List<BoundExpression> arguments)
+    {
+        string name = callee.Name.Text;
+
+        if (callee.Name.Parts.Count == 1 && _currentFunction?.ContainingType is { } enclosing &&
+            enclosing.GenericMethods.Where(m => m.Name == name).ToList() is { Count: > 0 } own)
+        {
+            var instantiated = InferAndInstantiate(own, syntax, arguments);
+            if (instantiated is null)
+                return new BoundErrorExpression(syntax.Span);
+
+            if (instantiated.IsStatic)
+                return BuildCall(syntax, instantiated, receiver: null, arguments);
+
+            var receiver = BindImplicitThis(callee.Span);
+            if (receiver is not null)
+                return BuildCall(syntax, instantiated, receiver, arguments);
+
+            diagnostics.Error("SL0576", callee.Span,
+                $"'{name}' is an instance method of '{enclosing.Name}', and there is no object " +
+                "here to call it on");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        if (TryBindGenericCall(syntax, callee.Name, arguments) is { } generic)
+            return generic;
+
+        bool plain = ResolveFunctionCandidates(callee.Name).Count > 0 ||
+                     _currentFunction?.ContainingType?.FindMethods(name).Any() == true;
+        return RefuseTypeArgumentsOnPlainFunction(callee, name, plain);
+    }
+
+    /// <summary>Type arguments written on a call to something that takes none.</summary>
+    private BoundExpression RefuseTypeArgumentsOnPlainFunction(
+        ExpressionSyntax callee, string name, bool exists)
+    {
+        if (exists)
+        {
+            diagnostics.Error("SL0759", callee.Span,
+                $"'{name}' is not generic, so it takes no type arguments; leave the " +
+                "'<...>' off");
+        }
+        else
+        {
+            diagnostics.Error("SL0252", callee.Span, $"no function named '{name}' is in scope");
+        }
+
+        return new BoundErrorExpression(callee.Span);
+    }
+
+    /// <summary>
     /// One argument, which may be written <c>ref x</c>.
     ///
     /// A <c>ref</c> argument is bound to the address of what it names, so what
@@ -371,12 +435,15 @@ public sealed partial class Binder
 
         var call = new CallSyntax(
             syntax.Span,
-            new NameSyntax(member.Span, new QualifiedName(member.Span, [member.Member])),
+            new NameSyntax(member.Span, new QualifiedName(member.Span, [member.Member]))
+                { TypeArguments = member.TypeArguments },
             written);
 
-        var viable = VisibleFunctions(member.Member)
-            .Where(c => AcceptsArguments(c, whole, written))
-            .ToList();
+        var viable = member.TypeArguments is not null
+            ? []
+            : VisibleFunctions(member.Member)
+                .Where(c => AcceptsArguments(c, whole, written))
+                .ToList();
 
         if (viable.Count == 1) return BuildCall(call, viable[0], receiver: null, whole);
 
@@ -652,8 +719,11 @@ public sealed partial class Binder
         // decide. Asking only whether the overload list was empty let the
         // non-generic one answer for every call, so the generic one was
         // unreachable and the error was about the lambda not fitting `Action`.
+        bool written = member.TypeArguments is not null;
+
         if (type.GenericMethods.Where(m => m.Name == member.Member).ToList() is { Count: > 0 } templates
-            && !overloads.Any(m => m.IsStatic && AcceptsArguments(m, arguments, syntax.Arguments)))
+            && (written ||
+                !overloads.Any(m => m.IsStatic && AcceptsArguments(m, arguments, syntax.Arguments))))
         {
             if (!templates[0].IsPublic && type.ModuleName != _currentModule!.Name)
             {
@@ -675,6 +745,9 @@ public sealed partial class Binder
 
             return BuildCall(syntax, instantiated, receiver: null, arguments);
         }
+
+        if (written)
+            return RefuseTypeArgumentsOnPlainFunction(member, member.Member, exists: true);
 
         // An instance method reached through the type name is the mistake this
         // is worth naming: the call is missing the thing it is about.
@@ -707,11 +780,20 @@ public sealed partial class Binder
     private BoundExpression BindMethodCall(
         CallSyntax syntax, MemberAccessSyntax member, List<BoundExpression> arguments)
     {
+        if (!member.ThroughPointer && ConstructedTypeNamed(member.Target) is { } constructed)
+        {
+            diagnostics.Error("SL0255", member.Span,
+                $"'{constructed.Name}' has no static method named '{member.Member}'");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
         var bound = member.Target is BaseSyntax
             ? BindBaseReceiver(member.Target.Span)
             : BindExpression(member.Target);
 
         if (bound is null || bound.Type.IsError()) return new BoundErrorExpression(syntax.Span);
+        if (RefuseUntyped(bound))
+            return new BoundErrorExpression(syntax.Span);
 
         if (ReachThroughPointer(member, bound) is not { } reachedThrough)
             return new BoundErrorExpression(syntax.Span);
@@ -741,6 +823,12 @@ public sealed partial class Binder
         // which is the same thing written by hand and costs the same.
         if (receiver.Type is EnumTypeSymbol flagsEnum && member.Member == "HasFlag")
             return BindHasFlag(syntax, member, receiver, flagsEnum, arguments);
+
+        if (member.TypeArguments is not null && receiver.Type is not NamedTypeSymbol)
+        {
+            return TryBindAsFreeFunction(syntax, member, receiver, arguments)
+                ?? RefuseTypeArgumentsOnPlainFunction(member, member.Member, exists: false);
+        }
 
         if (TryBindIntrinsicMember(syntax, member, receiver, arguments) is { } intrinsic)
             return intrinsic;
@@ -783,6 +871,18 @@ public sealed partial class Binder
         }
 
         var overloads = namedType.FindMethods(member.Member).ToList();
+
+        // Type arguments written: only a generic method is a candidate.
+        if (member.TypeArguments is not null)
+        {
+            if (TryBindGenericMethodCall(syntax, member, namedType, receiver, arguments) is { } asked)
+                return asked;
+
+            if (TryBindAsFreeFunction(syntax, member, receiver, arguments) is { } chainedGeneric)
+                return chainedGeneric;
+
+            return RefuseTypeArgumentsOnPlainFunction(member, member.Member, overloads.Count > 0);
+        }
 
         // The generic sibling of this name is tried whenever nothing here fits,
         // for the reason spelled out in BindStaticCall: a name may carry both a
@@ -1199,6 +1299,9 @@ public sealed partial class Binder
     /// <summary>C's default argument promotions: float widens to double, small ints to int.</summary>
     private BoundExpression PromoteVariadic(BoundExpression argument)
     {
+        if (RefuseUntyped(argument))
+            return new BoundErrorExpression(argument.Span);
+
         // A C variadic function has no declared parameter type to convert
         // against, so the String-to-bytes decision has to be made here instead.
         if (argument is BoundStringLiteral)
@@ -1288,6 +1391,23 @@ public sealed partial class Binder
                     only.Parameters.Count(p => !p.IsThis) == lambda.Syntax.Parameters.Count,
                 _ => false,
             };
+
+        // A conditional whose arms both wait fits where each of them would.
+        if (argument is BoundConditional
+            {
+                Type: DefaultLiteralType or NewDraftType or ArrayDraftType,
+            } either)
+            return IsImplicitlyConvertible(either.WhenTrue, target) &&
+                   IsImplicitlyConvertible(either.WhenFalse, target);
+
+        // C#'s rule for `default`: it fits anything with a value, so two such
+        // overloads are ambiguous rather than one of them chosen. `new(...)`
+        // fits anything `new` could make.
+        if (argument.Type is DefaultLiteralType)
+            return !target.IsVoid();
+
+        if (argument.Type is NewDraftType)
+            return CouldBeMadeByNew(target);
 
         if (argument is BoundArrayDraft draft2)
             return target switch

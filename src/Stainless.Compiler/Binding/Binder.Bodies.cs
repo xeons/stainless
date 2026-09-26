@@ -1477,9 +1477,15 @@ public sealed partial class Binder
                 // there is something to infer from and no need to write it out.
                 if (initializer is BoundArrayDraft loose)
                     initializer = SettleArrayFromElements(loose);
+                else if (initializer is BoundConditional { Type: ArrayDraftType } chosen)
+                    initializer = SettleArraysFromElements(chosen);
 
                 type = initializer.Type;
-                if (type.IsVoid())
+                if (RefuseUntyped(initializer))
+                {
+                    type = ErrorTypeSymbol.Instance;
+                }
+                else if (type.IsVoid())
                 {
                     diagnostics.Error("SL0221", syntax.Initializer.Span,
                         "cannot infer a type from an expression of type 'void'");
@@ -1510,6 +1516,11 @@ public sealed partial class Binder
                                   "'return's agree on, and that is decided by the type it is " +
                                   "becoming rather than the other way round. Write the type " +
                                   "out, or make the body one expression"
+                                : written.Expression is DefaultSyntax { Type: null } or
+                                                        NewSyntax { Type: null }
+                                ? "its body is a bare 'default' or a 'new(...)', which takes " +
+                                  "its type from where it is going rather than giving the " +
+                                  "lambda one. Write the type out"
                                 : "this lambda does not say what its parameters are, so there " +
                                   "is nothing here to infer from. Write them -- " +
                                   "'(int x) => x * 2' -- or write the type out"));
@@ -1621,6 +1632,8 @@ public sealed partial class Binder
     private BoundStatement BindExpressionStatement(ExpressionStatementSyntax syntax)
     {
         var expression = BindExpression(syntax.Expression);
+        if (RefuseUntyped(expression))
+            return new BoundExpressionStatement(syntax.Span, new BoundErrorExpression(syntax.Span));
 
         bool hasEffect = Effective(expression);
         if (!hasEffect)

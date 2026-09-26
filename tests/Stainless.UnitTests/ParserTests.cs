@@ -38,7 +38,7 @@ public class ParserTests
     private static string Render(ExpressionSyntax? expression) => expression switch
     {
         LiteralSyntax literal => literal.Value?.ToString() ?? "null",
-        NameSyntax name => name.Name.Text,
+        NameSyntax name => name.Name.Text + Arguments(name.TypeArguments),
         ThisSyntax => "this",
         BaseSyntax => "base",
         UnarySyntax unary => $"({unary.Operator.FixedText()} {Render(unary.Operand)})",
@@ -50,22 +50,37 @@ public class ParserTests
         ConditionalSyntax conditional =>
             $"(?: {Render(conditional.Condition)} {Render(conditional.WhenTrue)} " +
             $"{Render(conditional.WhenFalse)})",
-        MemberAccessSyntax member => $"(. {Render(member.Target)} {member.Member})",
+        MemberAccessSyntax member =>
+            $"({(member.Conditional ? "?." : ".")} {Render(member.Target)} " +
+            $"{member.Member}{Arguments(member.TypeArguments)})",
         IndexSyntax index =>
-            $"([] {Render(index.Target)}" +
+            $"({(index.Conditional ? "?[]" : "[]")} {Render(index.Target)}" +
             $"{string.Concat(index.Indices.Select(i => " " + Render(i)))})",
         SliceSyntax slice =>
-            $"([:] {Render(slice.Target)} {Render(slice.Start)} {Render(slice.End)})",
+            $"({(slice.Conditional ? "?[:]" : "[:]")} {Render(slice.Target)} " +
+            $"{Render(slice.Start)} {Render(slice.End)})",
+        NullForgivingSyntax forgiven => $"(forgive {Render(forgiven.Operand)})",
+        DefaultSyntax zeroed => zeroed.Type is null ? "default" : $"default({Render(zeroed.Type)})",
         CallSyntax call =>
             $"(call {Render(call.Callee)}{string.Concat(call.Arguments.Select(a => " " + Render(a)))})",
         CastSyntax cast => $"(cast {Render(cast.Operand)})",
         TypeTestSyntax test => $"(is {Render(test.Value)})",
-        NewSyntax => "new",
+        NewSyntax made => made.Type is null ? "new()" : "new",
         ArrayLiteralSyntax array =>
             $"[{string.Join(" ", array.Elements.Select(Render))}]",
         null => "_",
         _ => expression.GetType().Name,
     };
+
+    private static string Render(TypeSyntax type) => type switch
+    {
+        PrimitiveTypeSyntax primitive => primitive.Keyword.FixedText() ?? "?",
+        NamedTypeSyntax named => named.Name.Text + Arguments(named.TypeArguments),
+        _ => type.GetType().Name,
+    };
+
+    private static string Arguments(IReadOnlyList<TypeSyntax>? arguments) =>
+        arguments is null or { Count: 0 } ? "" : $"<{string.Join(",", arguments.Select(Render))}>";
 
     // ---------------------------------------------------------- precedence
 
@@ -146,6 +161,124 @@ public class ParserTests
     [InlineData("f(a, b, c)", "(call f a b c)")]
     public void ArgumentsAreCollectedInOrder(string source, string shape) =>
         Assert.Equal(shape, Shape(source));
+
+    // ------------------------------------------------------ type arguments
+
+    /// <summary>
+    /// C#'s rule for a <c>&lt;</c> after a name: type arguments when what is
+    /// inside parses as types and the token after the <c>&gt;</c> is one that
+    /// could follow them, and a less-than otherwise.
+    /// </summary>
+    [Theory]
+    [InlineData("F<int>(x)", "(call F<int> x)")]
+    [InlineData("F<A, B>(7)", "(call F<A,B> 7)")]
+    [InlineData("F(G<A, B>(7))", "(call F (call G<A,B> 7))")]
+    [InlineData("F<List<int>>()", "(call F<List<int>>)")]
+    [InlineData("F<List<List<int>>>()", "(call F<List<List<int>>>)")]
+    [InlineData("Box<int>.Create()", "(call (. Box<int> Create))")]
+    [InlineData("Box<int>.Count", "(. Box<int> Count)")]
+    [InlineData("a.M<T>()", "(call (. a M<T>))")]
+    [InlineData("a?.M<T>()", "(call (?. a M<T>))")]
+    [InlineData("A.B<int>.C", "(. (. A B<int>) C)")]
+    [InlineData("F<int> == x", "(== F<int> x)")]
+    public void ALessThanAfterANameMayOpenTypeArguments(string source, string shape) =>
+        Assert.Equal(shape, Shape(source));
+
+    [Theory]
+    [InlineData("F(a < b, c > d)", "(call F (< a b) (> c d))")]
+    [InlineData("a < b > c", "(> (< a b) c)")]
+    [InlineData("a < b == c > d", "(== (< a b) (> c d))")]
+    [InlineData("a < b && c > d", "(&& (< a b) (> c d))")]
+    [InlineData("x < y >> 1", "(< x (>> y 1))")]
+    [InlineData("i < n ? a : b", "(?: (< i n) a b)")]
+    [InlineData("F(a < b, c >= d)", "(call F (< a b) (>= c d))")]
+    [InlineData("F(a < b, c > -1)", "(call F (< a b) (> c (- 1)))")]
+    [InlineData("a < b[0]", "(< a ([] b 0))")]
+    public void ALessThanThatCannotOpenTypeArgumentsIsAComparison(string source, string shape) =>
+        Assert.Equal(shape, Shape(source));
+
+    // --------------------------------------------------- ?[ and postfix !
+
+    /// <summary>
+    /// <c>?[</c> is <c>a?[i]</c> unless a <c>:</c> follows the expression
+    /// after the <c>?</c>, which makes it a conditional with an array literal
+    /// in its true arm. Roslyn's rule, including the re-parse of an enclosing
+    /// conditional's true arm that lost its <c>:</c> to the guess.
+    /// </summary>
+    [Theory]
+    [InlineData("a?[0]", "(?[] a 0)")]
+    [InlineData("a?[0]?.Name", "(?. (?[] a 0) Name)")]
+    [InlineData("a?[i:j]", "(?[:] a i j)")]
+    [InlineData("a?[0] ?? b", "(?? (?[] a 0) b)")]
+    [InlineData("a ? [0] : [1]", "(?: a [0] [1])")]
+    [InlineData("a ?[0] : b", "(?: a [0] b)")]
+    [InlineData("c ? a?[i] : b", "(?: c (?[] a i) b)")]
+    [InlineData("c ? a?[i] : d ? [1] : [2]", "(?: c (?[] a i) (?: d [1] [2]))")]
+    public void AQuestionBracketIsAnElementAccessUnlessAColonFollows(string source, string shape) =>
+        Assert.Equal(shape, Shape(source));
+
+    [Theory]
+    [InlineData("x!", "(forgive x)")]
+    [InlineData("a!.b", "(. (forgive a) b)")]
+    [InlineData("a![0]", "([] (forgive a) 0)")]
+    [InlineData("F()!", "(forgive (call F))")]
+    [InlineData("!a!", "(! (forgive a))")]
+    [InlineData("a != b", "(!= a b)")]
+    [InlineData("a! != b", "(!= (forgive a) b)")]
+    [InlineData("(a)!.b", "(. (forgive a) b)")]
+    [InlineData("(a)!b", "(cast (! b))")]
+    public void APostfixBangForgivesANull(string source, string shape) =>
+        Assert.Equal(shape, Shape(source));
+
+    // ------------------------------------------------- new() and default
+
+    [Theory]
+    [InlineData("new(1, 2)", "new()")]
+    [InlineData("new()", "new()")]
+    [InlineData("new Point(1)", "new")]
+    [InlineData("default", "default")]
+    [InlineData("default(int)", "default(int)")]
+    [InlineData("x == default", "(== x default)")]
+    [InlineData("F(default, new())", "(call F default new())")]
+    public void NewAndDefaultMayLeaveTheirTypeOff(string source, string shape) =>
+        Assert.Equal(shape, Shape(source));
+
+    [Fact]
+    public void ABareDefaultIsNotAPattern()
+    {
+        var diagnostics = ParseMalformed("""
+            module A;
+            int F(int x)
+            {
+                switch (x)
+                {
+                    case default:
+                        return 1;
+                }
+                return 0;
+            }
+            """);
+        Assert.Contains("SL0758", diagnostics);
+    }
+
+    [Fact]
+    public void TheDefaultLabelStillWorks()
+    {
+        Front.Parse("""
+            module A;
+            int F(int x)
+            {
+                switch (x)
+                {
+                    case 1:
+                        return 1;
+                    default:
+                        return default;
+                }
+            }
+            """, out var diagnostics);
+        Assert.False(diagnostics.HasErrors);
+    }
 
     // ------------------------------------------------------------- slices
 
@@ -389,6 +522,26 @@ public class ParserTests
                         Repeat("( [", 40) + "1" + Repeat("] )", 40) + "; return 0; }";
 
         var parse = Task.Run(() => Front.Parse(source));
+        Assert.True(parse.Wait(TimeSpan.FromSeconds(30)), "the parse did not finish");
+    }
+
+    /// <summary>
+    /// Each <c>?[</c> looks ahead for a <c>:</c>, and each conditional whose
+    /// true arm lost one parses that arm again. Neither may cost a doubling per
+    /// level, and a nested <c>&lt;</c> guess may not either.
+    /// </summary>
+    [Theory]
+    [InlineData("a?[", "0", "]", 300)]
+    [InlineData("c ? a?[", "0", "] : b", 60)]
+    [InlineData("c ? ", "x?[0]", " : d", 60)]
+    [InlineData("F<", "int", ">(x)", 60)]
+    [InlineData("a < (", "b", ")", 60)]
+    public void NestedLookaheadIsNotRepeated(string open, string middle, string close, int depth)
+    {
+        string source = "module A;\nint Main() { var n = " +
+                        Repeat(open, depth) + middle + Repeat(close, depth) + "; return 0; }";
+
+        var parse = Task.Run(() => Source.Recursion.OnADeepStack(() => Front.Parse(source)));
         Assert.True(parse.Wait(TimeSpan.FromSeconds(30)), "the parse did not finish");
     }
 

@@ -50,10 +50,9 @@ public sealed class ArrayDraftType : TypeSymbol
 /// The type of a bare case name before something says which variant it builds.
 ///
 /// One value cannot say what a variant's type arguments are -- <c>Ok(4)</c>
-/// knows T and nothing about E -- and type arguments cannot be written at a
-/// call. So construction is target-typed, exactly as a lambda is, and this is
-/// the placeholder that carries the pieces until a conversion resolves it. It
-/// never reaches the emitter.
+/// knows T and nothing about E. So construction is target-typed, exactly as a
+/// lambda is, and this is the placeholder that carries the pieces until a
+/// conversion resolves it. It never reaches the emitter.
 /// </summary>
 public sealed class VariantDraftType : TypeSymbol
 {
@@ -97,4 +96,43 @@ public sealed class NullType : TypeSymbol
     public override string Name => "null";
     public override int Size => 8;
     public override int Alignment => 8;
+}
+
+/// <summary>
+/// The type of a bare <c>default</c> before something says what it is the
+/// zero of. It never reaches the emitter: a conversion settles it into a
+/// <see cref="BoundDefault"/> of the target type, or it is an error.
+/// </summary>
+public sealed class DefaultLiteralType : TypeSymbol
+{
+    public static readonly DefaultLiteralType Instance = new();
+    private DefaultLiteralType() { }
+    public override string Name => "default";
+    public override int Size => 0;
+    public override int Alignment => 1;
+}
+
+/// <summary>
+/// The type of <c>new(...)</c> before something says what it makes. It never
+/// reaches the emitter.
+/// </summary>
+public sealed class NewDraftType : TypeSymbol
+{
+    public static readonly NewDraftType Instance = new();
+    private NewDraftType() { }
+    public override string Name => "new()";
+    public override int Size => 0;
+    public override int Alignment => 1;
+}
+
+/// <summary>
+/// A <c>new(...)</c> awaiting its type. The arguments are bound where they
+/// were written, so settling it later changes nothing about what they mean.
+/// </summary>
+public sealed class BoundNewDraft(
+    SourceSpan span, NewSyntax syntax, List<BoundExpression> arguments)
+    : BoundExpression(span, NewDraftType.Instance)
+{
+    public NewSyntax Syntax { get; } = syntax;
+    public List<BoundExpression> Arguments { get; } = arguments;
 }

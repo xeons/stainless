@@ -185,11 +185,10 @@ void ShowGenerics()
 
     // Monomorphization: `T` is substituted and the body compiled again, so
     // there is no boxing, no type erasure and no shared code.
-    // §4.4: type arguments are inferred and never written at a call, `<` in
-    // expression position being ambiguous with less-than.
+    // §4.4: type arguments are inferred from what is passed, or written.
     PrintValue("over int", (long)ChooseLarger(3, 9));
     PrintValue("over String", ChooseLarger("alpha", "beta"));
-    PrintValue("over long", (long)ChooseLarger(2L, 7L));
+    PrintValue("over long", (long)ChooseLarger<long>(2, 7));
 
     // A generic type, whose operators are instantiated with it.
     var a = CreateBox(3);

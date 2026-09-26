@@ -122,6 +122,9 @@ Monomorphization, constraints, and what is and is not supported.
 - [4.2 Constraints](04-generics.md#42-constraints)
 - [4.3 What a constraint does, and does not, do](04-generics.md#43-what-a-constraint-does-and-does-not-do)
 - [4.4 What is and is not supported](04-generics.md#44-what-is-and-is-not-supported)
+  - [4.4.1 Writing type arguments at a call](04-generics.md#441-writing-type-arguments-at-a-call)
+  - [4.4.2 Inferring from a lambda](04-generics.md#442-inferring-from-a-lambda)
+  - [4.4.3 Not yet](04-generics.md#443-not-yet)
 - [4.5 A worked example](04-generics.md#45-a-worked-example)
 
 ### [5. The standard library](05-standard-library.md)
@@ -197,7 +200,7 @@ Functions, defaults, `ref`/`in`/`out`, named arguments, properties, operators, i
 
 ### [9. Statements and expressions](09-statements-expressions.md)
 
-`switch`, `parallel`, `const`, `foreach`, thread boundaries, `?.`, `default(T)`, `goto`, `nameof` and `checked`.
+`switch`, `parallel`, `const`, `foreach`, thread boundaries, `?.` and `!`, `default`, `goto`, `nameof`, `checked`, assignment, `@name` and `new(...)`.
 
 - [9.1 `switch`](09-statements-expressions.md#91-switch)
   - [9.1.1 Patterns](09-statements-expressions.md#911-patterns)
@@ -207,7 +210,7 @@ Functions, defaults, `ref`/`in`/`out`, named arguments, properties, operators, i
 - [9.4 `foreach`](09-statements-expressions.md#94-foreach)
 - [9.5 What may cross a thread boundary](09-statements-expressions.md#95-what-may-cross-a-thread-boundary)
 - [9.6 Stepping by one](09-statements-expressions.md#96-stepping-by-one)
-- [9.7 `?.` and `??`](09-statements-expressions.md#97--and-)
+- [9.7 `?.`, `?[`, `??` and `!`](09-statements-expressions.md#97----and-)
 - [9.8 `default(T)`](09-statements-expressions.md#98-defaultt)
 - [9.9 `do`](09-statements-expressions.md#99-do)
 - [9.10 `goto`](09-statements-expressions.md#910-goto)
@@ -216,6 +219,7 @@ Functions, defaults, `ref`/`in`/`out`, named arguments, properties, operators, i
 - [9.13 An expression on its own](09-statements-expressions.md#913-an-expression-on-its-own)
 - [9.14 Assignment](09-statements-expressions.md#914-assignment)
 - [9.15 `@name`](09-statements-expressions.md#915-name)
+- [9.16 `new(...)` with the type left off](09-statements-expressions.md#916-new-with-the-type-left-off)
 
 ### [10. Conditional compilation](10-conditional-compilation.md)
 

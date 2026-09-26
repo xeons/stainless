@@ -712,8 +712,8 @@ allocated zeroed memory would hand back an object whose non-nullable fields
 were null — a hole in the type system rather than a value — so the object comes
 from the program and a field the document does not mention keeps what the
 constructor chose. It is also why there is no `Deserialize<T>(text)` returning
-a fresh `T`: a type argument cannot be written at a call ([§4.4](04-generics.md#44-what-is-and-is-not-supported)), so a function
-whose only mention of `T` is its return type could never be called.
+a fresh `T`: making one means calling a constructor found through reflection,
+and the metadata describes fields and properties but no constructor.
 
 A value whose JSON type does not fit its field is **skipped**, not converted:
 `{"Years": "40"}` leaves `Years` alone. Guessing at a conversion is how a

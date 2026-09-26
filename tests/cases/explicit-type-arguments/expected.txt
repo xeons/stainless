@@ -1,0 +1,10 @@
+a 2
+b 0 0
+c 1 0
+d 5 five 1 1
+e 1
+f v5 9
+g 0 taken 2
+h 2
+i true true true
+j false false false

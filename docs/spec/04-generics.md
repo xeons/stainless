@@ -18,7 +18,7 @@ var text   = new Box<String>("hi"); // T is String
 ```
 
 Functions may be generic too, and their type arguments are **inferred from the
-arguments passed**:
+arguments passed**, or written out at the call as in C#:
 
 ```csharp
 T Pick<T>(T a, T b, bool first)
@@ -30,6 +30,7 @@ T Pick<T>(T a, T b, bool first)
 
 Pick(10, 20, false);            // T is int
 Pick("left", "right", true);    // T is String
+Pick<long>(10, 20, false);      // T is long, and both arguments widen to it
 ```
 
 ## 4.1 Monomorphization
@@ -53,11 +54,11 @@ counters once `Counted<int>` and `Counted<long>` both exist, and each
 instantiation's setup block runs against its own — which is C#'s rule and falls
 out of monomorphization rather than being decided separately.
 
-**A type argument list is only written where a type is expected.** `new
-Box<int>(41)` and `Box<int> b;` read, and so does a `Box<int>` field or
-parameter; `Box<int>.Of(41)` does not, because `<` in expression position is
-less-than. A generic type's statics are reachable from inside it, and a maker
-for one is a module-level generic function whose argument infers `T`.
+**An instantiation is named in an expression too.** `Box<int>.Of(41)` calls a
+static method of `Box<int>`, `Box<int>.Count` reads that instantiation's static,
+and `Standard.Collections.List<int>` may be qualified by its module as a type
+anywhere may. Each is the same `Box<int>` a declaration names; the statics of
+`Box<int>` and `Box<long>` are two sets, as above.
 
 ## 4.2 Constraints
 
@@ -191,50 +192,87 @@ public class Pair<A>
 
 var pair = new Pair<String>("outer");
 pair.KeepLeft(7);           // A is String already; B is inferred as int
+pair.KeepLeft<long>(7);     // or written, and 7 widens to it
 ```
 
-Not yet:
+### 4.4.1 Writing type arguments at a call
 
-- **Type arguments are inferred, never written, at a call.** `Pick<int>(...)`
-  is not accepted, because `<` in expression position is ambiguous with
-  less-than. A type parameter used solely in the *function's* return type
-  cannot be determined, since nothing passed mentions it. This applies to
-  generic methods exactly as it does to generic functions.
+**A type argument list may be written on any call to a generic function or
+method**: `Pick<int>(a, b)`, `list.ConvertAll<String>(f)`,
+`Helper.Take<T>(x)`, `Box<int>.Echo<long>(9)`. Written, the arguments are the
+type arguments and nothing is inferred, which is what makes a function whose
+only mention of `T` is its return type callable at all:
 
-  A parameter that appears only in a **lambda's** result is a different case
-  and does work, because a lambda's body is something to read a type off:
+```csharp
+T Zero<T>() => default;
 
-  ```csharp
-  public List<R> Select<T, R>(T[:] items, Func<T, R> transform) { ... }
+var none = Zero<int>();         // nothing passed could have said what T is
+```
 
-  var spelled = Select(numbers, n => Text.FromInteger((long)n));   // R is String
-  ```
+**Only a generic candidate is considered**, as in C#. `Plain<int>(1)` on a
+function that is not generic is SL0759, and a count that no template of that
+name takes is SL0760. A function written with type arguments and not called —
+`var f = Pick<int>;` — is SL0761: an instantiation is not a value of its own,
+and a delegate names the overload it wants by its own signature.
 
-  The order is what makes it possible. `T` comes from `numbers`; that gives the
-  lambda its parameter type; that lets the body be bound; and the body says
-  what `R` is. Each step needs the one before it, so this happens after
-  ordinary inference rather than as part of it, and only for what is left over.
-  It repeats while it is still learning, so one lambda's result may settle
-  another's parameter.
+**`<` after a name is read the way C# reads it.** In an expression `<` is also
+less-than, so a type argument list is tried only after a name, and kept only
+when everything up to the matching `>` parses as types *and* the token after
+the `>` is one of `( ) ] } : ; , . ? == != | ^ && || & [`, or the end. That is
+C#'s list for the same ambiguity, and it decides the classic cases the same
+way:
 
-  The signature it reads may be a generic closure's — `closure R Func<T, R>(T)`
-  — or a generic interface's single method, which is where this started. They
-  differ only in where the signature is written down.
+| Written | Read as |
+|---|---|
+| `F<A, B>(7)` | a call to `F` with two type arguments |
+| `F(G<A, B>(7))` | one argument: a generic call |
+| `F(a < b, c > d)` | two arguments, each a comparison, since `d` follows the `>` |
+| `a < b > c` | `(a < b) > c` |
+| `F<List<int>>()` | nested type arguments; the `>>` is split in two |
 
-  A **function passed by name** is read the same way, off its declaration
-  instead of a body: in `Select(names, Upper)`, `T` is `String` from `names`, so
-  the `Upper` meant is the one taking a `String`, and what it returns is `R`.
-  Where the parameter types are not known yet, a name with exactly one function
-  of the right arity settles them too. An overloaded name that the known types
-  do not narrow to one says nothing, and the call is SL0327.
+The guess parses the types alone and is thrown away when it does not hold, so
+it never re-reads anything past the `>`.
 
-  Two limits, both reported as SL0327 rather than guessed at. A **block-bodied**
-  lambda is not read this way — binding `n => { return n * 2; }` needs the
-  return type that is being worked out — so write it as an expression, or name
-  the type. And the signature must mention its type parameters plainly:
-  `R Func<T, R>(T)` is read, `List<R> Func<T, R>(T)` is left alone.
-- **An interface method cannot be generic.** Dispatch gives a method one vtable
-  slot, and a generic method has a body per instantiation.
+### 4.4.2 Inferring from a lambda
+
+A parameter that appears only in a **lambda's** result is inferred, because a
+lambda's body is something to read a type off:
+
+```csharp
+public List<R> Select<T, R>(T[:] items, Func<T, R> transform) { ... }
+
+var spelled = Select(numbers, n => Text.FromInteger((long)n));   // R is String
+```
+
+The order is what makes it possible. `T` comes from `numbers`; that gives the
+lambda its parameter type; that lets the body be bound; and the body says
+what `R` is. Each step needs the one before it, so this happens after
+ordinary inference rather than as part of it, and only for what is left over.
+It repeats while it is still learning, so one lambda's result may settle
+another's parameter.
+
+The signature it reads may be a generic closure's — `closure R Func<T, R>(T)`
+— or a generic interface's single method, which is where this started. They
+differ only in where the signature is written down.
+
+A **function passed by name** is read the same way, off its declaration
+instead of a body: in `Select(names, Upper)`, `T` is `String` from `names`, so
+the `Upper` meant is the one taking a `String`, and what it returns is `R`.
+Where the parameter types are not known yet, a name with exactly one function
+of the right arity settles them too. An overloaded name that the known types
+do not narrow to one says nothing, and the call is SL0327.
+
+Two limits, both reported as SL0327 rather than guessed at. A **block-bodied**
+lambda is not read this way — binding `n => { return n * 2; }` needs the
+return type that is being worked out — so write it as an expression, or name
+the type. And the signature must mention its type parameters plainly:
+`R Func<T, R>(T)` is read, `List<R> Func<T, R>(T)` is left alone. Writing the
+type arguments at the call settles either.
+
+### 4.4.3 Not yet
+
+**An interface method cannot be generic.** Dispatch gives a method one vtable
+slot, and a generic method has a body per instantiation.
 
 ## 4.5 A worked example
 

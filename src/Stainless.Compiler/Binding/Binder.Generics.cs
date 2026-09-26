@@ -646,6 +646,10 @@ public sealed partial class Binder
         Dictionary<string, TypeSymbol> inferred,
         FileScope scope)
     {
+        // A bare `default` or a `new(...)` has no type of its own to offer.
+        if (actual is DefaultLiteralType or NewDraftType)
+            return;
+
         switch (pattern)
         {
             case NamedTypeSyntax { Name.Parts.Count: 1, TypeArguments.Count: 0 } name

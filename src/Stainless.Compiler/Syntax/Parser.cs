@@ -2945,6 +2945,14 @@ public sealed class Parser
             return new TypePatternSyntax(SpanFrom(start), type, binding, name.Span);
         }
 
+        // `case default:` is almost always a `default:` label written wrong,
+        // and as a constant it would mean whatever zero the type has.
+        if (At(TokenKind.DefaultKeyword) && Peek(1).Kind != TokenKind.OpenParen)
+            _diagnostics.Error("SL0758", Current.Span,
+                "a bare 'default' is not a pattern; for the section that runs when nothing " +
+                "else matched, write 'default:' without 'case', and to match the zero value " +
+                "write it out -- '0', 'null', or 'default(T)'");
+
         // Everything else is a constant: a literal, a qualified name, a
         // negated number. A bare name may still turn out to name a variant's
         // case or a type, and the binder is where that is settled.
@@ -3216,11 +3224,50 @@ public sealed class Parser
         Advance();
 
         // The true arm is delimited by ':', so a full expression is unambiguous.
-        var whenTrue = ParseExpression();
+        var whenTrue = ParseTrueArm();
         Expect(TokenKind.Colon);
         var whenFalse = ParseAssignment();
 
         return new ConditionalSyntax(SpanFrom(start), condition, whenTrue, whenFalse);
+    }
+
+    /// <summary>
+    /// The true arm of a conditional. A <c>?[</c> inside it that was read as a
+    /// nested conditional may have taken this arm's <c>:</c>; when no <c>:</c>
+    /// is left, the arm is parsed again with every <c>?[</c> read as
+    /// <c>a?[i]</c>, so <c>c ? a?[i] : b</c> means what it says.
+    /// </summary>
+    private ExpressionSyntax ParseTrueArm()
+    {
+        if (_forceElementAccess)
+            return ParseExpression();
+
+        int savedPos = _pos;
+        int savedSplits = _splits.Count;
+        int savedDepth = _depth;
+        bool savedTooDeep = _tooDeep;
+        int taken = _bracketsTakenAsConditional;
+        var savedDiagnostics = _diagnostics;
+        _diagnostics = new DiagnosticBag();
+
+        var arm = ParseExpression();
+
+        if (At(TokenKind.Colon) || _bracketsTakenAsConditional == taken)
+        {
+            savedDiagnostics.AddRange(_diagnostics);
+            _diagnostics = savedDiagnostics;
+            return arm;
+        }
+
+        _pos = savedPos;
+        RestoreSplits(savedSplits);
+        _depth = savedDepth;
+        _tooDeep = savedTooDeep;
+        _diagnostics = savedDiagnostics;
+
+        _forceElementAccess = true;
+        try { return ParseExpression(); }
+        finally { _forceElementAccess = false; }
     }
 
     private ExpressionSyntax ParseBinary(int minPrecedence)
@@ -3350,8 +3397,22 @@ public sealed class Parser
                 bool asking = At(TokenKind.QuestionDot);
                 Advance();
                 string member = ExpectIdentifier();
+
+                List<TypeSyntax>? typeArguments = null;
+                if (At(TokenKind.Less))
+                    Speculate(TryParseExpressionTypeArguments, out typeArguments);
+
                 expression = new MemberAccessSyntax(SpanFrom(start), expression, member)
-                    { ThroughPointer = arrow, Conditional = asking };
+                    { ThroughPointer = arrow, Conditional = asking, TypeArguments = typeArguments };
+                continue;
+            }
+
+            // `x!`. After a whole operand no prefix `!` can follow, so this is
+            // never the start of a negation.
+            if (At(TokenKind.Bang))
+            {
+                Advance();
+                expression = new NullForgivingSyntax(SpanFrom(start), expression);
                 continue;
             }
 
@@ -3369,8 +3430,11 @@ public sealed class Parser
                 continue;
             }
 
-            if (At(TokenKind.OpenBracket))
+            bool conditional = AtConditionalElementAccess();
+            if (conditional || At(TokenKind.OpenBracket))
             {
+                if (conditional)
+                    Advance();
                 Advance();
 
                 // `a[:]`, `a[i:]`, `a[:j]` and `a[i:j]` all slice; `a[i]`
@@ -3385,7 +3449,8 @@ public sealed class Parser
                     ExpressionSyntax? last =
                         At(TokenKind.CloseBracket) ? null : ParseExpression();
                     Expect(TokenKind.CloseBracket);
-                    expression = new SliceSyntax(SpanFrom(start), expression, first, last);
+                    expression = new SliceSyntax(SpanFrom(start), expression, first, last)
+                        { Conditional = conditional };
                     continue;
                 }
 
@@ -3407,7 +3472,8 @@ public sealed class Parser
                     continue;
                 }
 
-                expression = new IndexSyntax(SpanFrom(start), expression, indices);
+                expression = new IndexSyntax(SpanFrom(start), expression, indices)
+                    { Conditional = conditional };
                 continue;
             }
 
@@ -3426,6 +3492,119 @@ public sealed class Parser
         }
 
         return expression;
+    }
+
+    /// <summary>
+    /// The tokens that may follow a type argument list in an expression, from
+    /// C#'s rule for the same ambiguity: <c>F&lt;A, B&gt;(7)</c> is a generic
+    /// call, and <c>F(a &lt; b, c &gt; d)</c> is two comparisons.
+    /// </summary>
+    private static readonly TokenKind[] AfterTypeArguments =
+    [
+        TokenKind.OpenParen, TokenKind.CloseParen, TokenKind.CloseBracket,
+        TokenKind.CloseBrace, TokenKind.Colon, TokenKind.Semicolon, TokenKind.Comma,
+        TokenKind.Dot, TokenKind.Question, TokenKind.EqualsEquals, TokenKind.BangEquals,
+        TokenKind.Pipe, TokenKind.Caret, TokenKind.AmpAmp, TokenKind.PipePipe,
+        TokenKind.Amp, TokenKind.OpenBracket, TokenKind.EndOfFile,
+    ];
+
+    /// <summary>
+    /// <c>&lt;int, String&gt;</c> after a name in an expression, or null when
+    /// the <c>&lt;</c> is a less-than. Only ever run speculatively.
+    /// </summary>
+    private List<TypeSyntax>? TryParseExpressionTypeArguments()
+    {
+        Expect(TokenKind.Less);
+
+        var arguments = new List<TypeSyntax>();
+        do
+        {
+            if (!AtTypeStart())
+                return null;
+            arguments.Add(ParseType());
+        }
+        while (Match(TokenKind.Comma));
+
+        if (!At(TokenKind.Greater))
+            return null;
+        Advance();
+
+        return AtAny(AfterTypeArguments) ? arguments : null;
+    }
+
+    /// <summary>Set while the true arm of a conditional is parsed again.</summary>
+    private bool _forceElementAccess;
+
+    /// <summary>What <see cref="AtConditionalElementAccess"/> decided, by position.</summary>
+    private readonly Dictionary<int, bool> _elementAccessAt = [];
+
+    /// <summary>How many <c>?[</c> have been read as the start of a conditional.</summary>
+    private int _bracketsTakenAsConditional;
+
+    /// <summary>
+    /// Whether a <c>?[</c> here is <c>a?[i]</c> rather than
+    /// <c>a ? [i] : b</c>. Roslyn's rule: it is a conditional exactly when a
+    /// <c>:</c> follows the expression after the <c>?</c>, which here must
+    /// also have parsed cleanly, since <c>a?[i:j]</c> is a slice and its
+    /// colon is inside the brackets. The true arm of an
+    /// enclosing conditional is parsed again with this forced, which is what
+    /// makes <c>c ? a?[i] : b</c> read as written.
+    /// </summary>
+    private bool AtConditionalElementAccess()
+    {
+        if (!At(TokenKind.Question) || Peek(1).Kind != TokenKind.OpenBracket)
+            return false;
+        if (_forceElementAccess)
+            return true;
+
+        if (_elementAccessAt.TryGetValue(_pos, out bool known))
+            return known;
+
+        bool access = !Probe(() =>
+        {
+            Advance();
+            ParseExpression();
+            return At(TokenKind.Colon) && !_diagnostics.HasErrors;
+        });
+
+        _elementAccessAt[_pos] = access;
+        if (!access)
+            _bracketsTakenAsConditional++;
+        return access;
+    }
+
+    /// <summary>
+    /// Runs <paramref name="look"/> and then puts everything back, whatever it
+    /// answered.
+    /// </summary>
+    private bool Probe(Func<bool> look)
+    {
+        int savedPos = _pos;
+        int savedSplits = _splits.Count;
+        int savedDepth = _depth;
+        bool savedTooDeep = _tooDeep;
+        var savedDiagnostics = _diagnostics;
+        _diagnostics = new DiagnosticBag();
+
+        try { return look(); }
+        finally
+        {
+            _pos = savedPos;
+            RestoreSplits(savedSplits);
+            _depth = savedDepth;
+            _tooDeep = savedTooDeep;
+            _diagnostics = savedDiagnostics;
+        }
+    }
+
+    /// <summary>Makes every <c>&gt;&gt;</c> split since then whole again.</summary>
+    private void RestoreSplits(int count)
+    {
+        while (_splits.Count > count)
+        {
+            var (index, token) = _splits.Pop();
+            _tokens[index] = token;
+        }
     }
 
     /// <summary>
@@ -3733,6 +3912,17 @@ public sealed class Parser
             case TokenKind.NewKeyword:
             {
                 Advance();
+
+                // `new(args)`: the type is the one the value is going to.
+                if (At(TokenKind.OpenParen))
+                {
+                    var given = ParseArgumentList();
+                    return new NewSyntax(SpanFrom(start), null, given)
+                    {
+                        Initializer = At(TokenKind.OpenBrace) ? ParseObjectInitializer() : null,
+                    };
+                }
+
                 var type = ParseType(allowFixedLength: false);
 
                 // `new T[n]`: ParseType stopped at the bracket because a length
@@ -3796,7 +3986,12 @@ public sealed class Parser
             case TokenKind.DefaultKeyword:
             {
                 Advance();
-                Expect(TokenKind.OpenParen);
+
+                // A bare `default` takes its type from where it is going.
+                if (!At(TokenKind.OpenParen))
+                    return new DefaultSyntax(SpanFrom(start), null);
+
+                Advance();
                 var zeroed = ParseType();
                 Expect(TokenKind.CloseParen);
                 return new DefaultSyntax(SpanFrom(start), zeroed);
@@ -3859,8 +4054,13 @@ public sealed class Parser
                 // which the binder later reinterprets as a module path when the
                 // leading name turns out to be a module rather than a value.
                 var identifier = Advance();
-                return new NameSyntax(SpanFrom(start),
-                    new QualifiedName(identifier.Span, [identifier.Text]));
+                var named = new QualifiedName(identifier.Span, [identifier.Text]);
+
+                if (At(TokenKind.Less) &&
+                    Speculate(TryParseExpressionTypeArguments, out var typeArguments))
+                    return new NameSyntax(SpanFrom(start), named) { TypeArguments = typeArguments };
+
+                return new NameSyntax(SpanFrom(start), named);
             }
 
             default:
@@ -3885,6 +4085,17 @@ public sealed class Parser
     private static TypeSyntax Core(TypeSyntax type) =>
         type is FixedArrayTypeSyntax fixedArray ? Core(fixedArray.Element) : type;
 
+    /// <summary>Whether a token of this kind can only begin an operand.</summary>
+    private static bool StartsOperand(TokenKind kind) => kind is
+        TokenKind.Identifier or TokenKind.IntLiteral or TokenKind.FloatLiteral or
+        TokenKind.StringLiteral or TokenKind.Utf8StringLiteral or TokenKind.CharLiteral or
+        TokenKind.OpenParen or TokenKind.InterpolatedString or TokenKind.TryKeyword or
+        TokenKind.ThisKeyword or TokenKind.BaseKeyword or TokenKind.NewKeyword or
+        TokenKind.SizeofKeyword or TokenKind.AlignofKeyword or TokenKind.OffsetofKeyword or
+        TokenKind.TypeofKeyword or TokenKind.DefaultKeyword or
+        TokenKind.TrueKeyword or TokenKind.FalseKeyword or TokenKind.NullKeyword or
+        TokenKind.Bang or TokenKind.Tilde;
+
     private TypeSyntax? TryParseCastHead()
     {
         Expect(TokenKind.OpenParen);
@@ -3899,16 +4110,12 @@ public sealed class Parser
         // and `(a[4])` is the same problem wearing brackets, since it is an
         // index as readily as it is a fixed-array type.
         bool typeIsUnambiguous = Core(type) is not NamedTypeSyntax;
-        bool operandFollows = AtAny(
-            TokenKind.Identifier, TokenKind.IntLiteral, TokenKind.FloatLiteral,
-            TokenKind.StringLiteral, TokenKind.Utf8StringLiteral, TokenKind.CharLiteral,
-            TokenKind.OpenParen, TokenKind.InterpolatedString, TokenKind.TryKeyword,
-            TokenKind.ThisKeyword, TokenKind.BaseKeyword, TokenKind.NewKeyword,
-            TokenKind.SizeofKeyword,
-            TokenKind.AlignofKeyword, TokenKind.OffsetofKeyword,
-            TokenKind.TypeofKeyword,
-            TokenKind.TrueKeyword, TokenKind.FalseKeyword, TokenKind.NullKeyword,
-            TokenKind.Bang, TokenKind.Tilde);
+        bool operandFollows = StartsOperand(Current.Kind);
+
+        // `(x)!.Name` forgives the parenthesised `x`; only a `!` that an
+        // operand follows is a negation.
+        if (At(TokenKind.Bang) && !StartsOperand(Peek(1).Kind))
+            operandFollows = false;
 
         return typeIsUnambiguous || operandFollows ? type : null;
     }

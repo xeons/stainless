@@ -129,6 +129,10 @@ public sealed partial class Binder
         if (operand.Type.IsError() || targetType.IsError())
             return new BoundErrorExpression(syntax.Span);
 
+        // `(long)default` and `(Point)new(1, 2)`: the cast is the target.
+        if (IsTargetTyped(operand))
+            return BindConversion(operand, targetType, syntax.Span);
+
         var kind = ClassifyConversion(operand.Type, targetType, explicitCast: true);
         if (kind is null)
         {
@@ -159,9 +163,55 @@ public sealed partial class Binder
 
     private BoundExpression BindNew(NewSyntax syntax)
     {
+        // BindArgument rather than BindExpression: a constructor call takes
+        // `ref`, `out` and `name:` like any other, and BindExpression has no
+        // case for those -- it would answer with an error expression and no
+        // diagnostic, which is how `new Rect(left: 1, ...)` came to compile
+        // and construct a rectangle of zeroes.
+        //
+        // Bound before the type is known, so that `new(...)` binds them where
+        // they were written and not wherever its type is settled.
+        if (syntax.Type is null)
+        {
+            var given = syntax.Arguments.Select(BindArgument).ToList();
+            return given.Any(a => a.Type.IsError())
+                ? new BoundErrorExpression(syntax.Span)
+                : new BoundNewDraft(syntax.Span, syntax, given);
+        }
+
         var type = ResolveType(syntax.Type, _currentScope!);
         if (type.IsError()) return new BoundErrorExpression(syntax.Span);
 
+        return BindNewOf(syntax, type, syntax.Arguments.Select(BindArgument).ToList());
+    }
+
+    /// <summary>
+    /// <c>new(...)</c> settled against the type it is going to. A <c>C?</c>
+    /// makes a <c>C</c>, which is then the optional holding it.
+    /// </summary>
+    private BoundExpression SettleNewDraft(BoundNewDraft draft, TypeSymbol target, SourceSpan span)
+    {
+        var made = target is OptionalTypeSymbol optional ? optional.Element : target;
+        var creation = BindNewOf(draft.Syntax, made, draft.Arguments);
+
+        return ReferenceEquals(made, target) || creation.Type.IsError()
+            ? creation
+            : BindConversion(creation, target, span);
+    }
+
+    /// <summary>Whether <c>new(...)</c> could make one of these.</summary>
+    private static bool CouldBeMadeByNew(TypeSymbol target) =>
+        (target is OptionalTypeSymbol optional ? optional.Element : target) switch
+        {
+            ClassTypeSymbol made => !made.IsAbstract && !made.IsStaticClass,
+            UnionTypeSymbol or VariantTypeSymbol => false,
+            StructTypeSymbol => true,
+            _ => false,
+        };
+
+    private BoundExpression BindNewOf(
+        NewSyntax syntax, TypeSymbol type, List<BoundExpression> arguments)
+    {
         if (type is ClassTypeSymbol { IsStaticClass: true })
         {
             diagnostics.Error("SL0583", syntax.Span,
@@ -173,7 +223,7 @@ public sealed partial class Binder
         // A struct is made where it stands rather than on the heap, so this is
         // a different expression with the same spelling.
         if (type is StructTypeSymbol and not (UnionTypeSymbol or VariantTypeSymbol))
-            return BindStructConstruction(syntax, (StructTypeSymbol)type);
+            return BindStructConstruction(syntax, (StructTypeSymbol)type, arguments);
 
         if (type is not ClassTypeSymbol classType)
         {
@@ -208,13 +258,6 @@ public sealed partial class Binder
                     $"'new {classType.Name}()' takes no arguments");
             return new BoundNew(syntax.Span, classType, constructor: null, []);
         }
-
-        // BindArgument rather than BindExpression: a constructor call takes
-        // `ref`, `out` and `name:` like any other, and BindExpression has no
-        // case for those -- it would answer with an error expression and no
-        // diagnostic, which is how `new Rect(left: 1, ...)` came to compile
-        // and construct a rectangle of zeroes.
-        var arguments = syntax.Arguments.Select(BindArgument).ToList();
 
         if (classType.Constructors.Count == 0)
         {
@@ -287,10 +330,9 @@ public sealed partial class Binder
     /// constructors and another on a struct without.
     /// </para>
     /// </summary>
-    private BoundExpression BindStructConstruction(NewSyntax syntax, StructTypeSymbol structType)
+    private BoundExpression BindStructConstruction(
+        NewSyntax syntax, StructTypeSymbol structType, List<BoundExpression> arguments)
     {
-        var arguments = syntax.Arguments.Select(BindArgument).ToList();
-
         if (structType.Constructors.Count == 0)
         {
             diagnostics.Error("SL0245", syntax.Span,
@@ -571,11 +613,14 @@ public sealed partial class Binder
 
         while (expression is MemberAccessSyntax member)
         {
+            if (member.TypeArguments is not null)
+                return null;
             trailing.Add(member.Member);
             expression = member.Target;
         }
 
-        if (expression is not NameSyntax name) return null;
+        if (expression is not NameSyntax { TypeArguments: null } name)
+            return null;
         if (trailing.Count == 0) return name.Name.Parts;
 
         trailing.Reverse();
@@ -603,14 +648,13 @@ public sealed partial class Binder
     /// wins, so an enum called <c>Level</c> never shadows a variable.
     /// </summary>
     /// <summary>
-    /// The variant a <c>Shape.Circle</c> is qualified by, or null.
-    ///
-    /// Only a variant already named as a type, so a generic one is not reachable
-    /// this way: type arguments cannot be written at a call, which is the same
-    /// reason <c>Ok(x)</c> takes its type from where it is going.
+    /// The variant a <c>Shape.Circle</c> or <c>Tree&lt;int&gt;.Leaf</c> is
+    /// qualified by, or null.
     /// </summary>
     private VariantTypeSymbol? ResolveVariantPrefix(ExpressionSyntax target)
     {
+        if (ConstructedTypeNamed(target) is { } constructed)
+            return constructed as VariantTypeSymbol;
         if (FlattenName(target) is not { } parts) return null;
 
         // A value of that name is nearer than a type of it, exactly as for an
@@ -643,8 +687,8 @@ public sealed partial class Binder
     ///
     /// Only a type reached by a name that is not already a value: a local
     /// called <c>Socket</c> wins over the type of that name, exactly as it does
-    /// for an enum or a variant. A generic type is not reachable this way,
-    /// because type arguments cannot be written at a call.
+    /// for an enum or a variant. A generic type is reached with its type
+    /// arguments written, as in <c>Box&lt;int&gt;.Create</c>.
     /// </summary>
     /// <summary>
     /// The type a dotted name in expression position means, or null.
@@ -704,11 +748,66 @@ public sealed partial class Binder
 
     private NamedTypeSymbol? ResolveTypePrefix(ExpressionSyntax target)
     {
+        if (ConstructedTypeNamed(target) is { } constructed)
+            return constructed as NamedTypeSymbol;
         if (FlattenName(target) is not { } parts) return null;
         if (NamesAValue(parts[0])) return null;
 
         return TypeNamed(parts) as NamedTypeSymbol;
     }
+
+    /// <summary>
+    /// The instantiation a <c>Box&lt;int&gt;</c> or
+    /// <c>Standard.Collections.List&lt;int&gt;</c> names in front of a member,
+    /// or null. The type arguments are on the last name, and every name before
+    /// it is a module or an enclosing type.
+    /// </summary>
+    private TypeSymbol? ConstructedTypeNamed(ExpressionSyntax target)
+    {
+        IReadOnlyList<string>? parts;
+        IReadOnlyList<TypeSyntax> arguments;
+
+        switch (target)
+        {
+            case NameSyntax { TypeArguments: { } written } simple:
+                parts = simple.Name.Parts;
+                arguments = written;
+                break;
+
+            case MemberAccessSyntax { TypeArguments: { } written, ThroughPointer: false, Conditional: false } member
+                when FlattenName(member.Target) is { } qualifier:
+                parts = [.. qualifier, member.Member];
+                arguments = written;
+                break;
+
+            default:
+                return null;
+        }
+
+        if (NamesAValue(parts[0]))
+            return null;
+
+        // A name that is no generic type may be a generic function, and the
+        // call is where that is settled.
+        var name = new QualifiedName(target.Span, parts);
+        if (FindGenericType(name, _currentScope!) is null)
+            return null;
+
+        // Asked several times of one expression, and reported once. A generic
+        // body is bound once per instantiation, and each has its own answer.
+        if (_constructedPrefixes.TryGetValue(target, out var known) &&
+            ReferenceEquals(known.Substitution, _substitution))
+            return known.Type;
+
+        var resolved = ResolveType(new NamedTypeSyntax(target.Span, name, arguments), _currentScope!);
+        var answer = resolved.IsError() ? null : resolved;
+
+        _constructedPrefixes[target] = (_substitution, answer);
+        return answer;
+    }
+
+    private readonly Dictionary<ExpressionSyntax, (object Substitution, TypeSymbol? Type)>
+        _constructedPrefixes = new(ReferenceEqualityComparer.Instance);
 
     /// <summary>
     /// Whether a name already means storage here. A local, a parameter, a field

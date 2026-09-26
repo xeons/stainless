@@ -609,7 +609,9 @@ public sealed partial class Binder
         using (diagnostics.Muted())
         {
             var value = BindExpression(syntax.Expression);
-            produced = value.Type.IsError() || value.Type.IsVoid() ? null : value.Type;
+            produced = value.Type.IsError() || value.Type.IsVoid() || IsTargetTyped(value)
+                ? null
+                : value.Type;
         }
 
         PopScope();

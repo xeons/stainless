@@ -296,8 +296,7 @@ void ShowVariants()
         PrintValue("is", "unreachable");
 
     // A generic variant, holding itself. A case is named without its type
-    // arguments, because the type it is being built for is already known --
-    // §4.4: type arguments are inferred and never written at a call.
+    // arguments, because the type it is being built for is already known.
     Tree<int> one = Leaf(1);
     Tree<int> two = Leaf(2);
     Tree<int> three = Leaf(3);

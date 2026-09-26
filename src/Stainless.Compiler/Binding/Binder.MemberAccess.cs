@@ -45,37 +45,64 @@ public sealed partial class Binder
     /// asks the same question and reaches a method rather than a field.
     /// </param>
     private BoundExpression BindConditionalAccess(
-        MemberAccessSyntax syntax, ExpressionSyntax? fallbackSyntax, CallSyntax? call = null)
+        MemberAccessSyntax syntax, ExpressionSyntax? fallbackSyntax, CallSyntax? call = null) =>
+        BindAskingFirst(
+            syntax.Target, syntax.Span, "?.", "'.'", $"'{syntax.Member}'", fallbackSyntax,
+            narrowed => call is null ? BindMemberOf(narrowed, syntax) : BindCallOn(narrowed, syntax, call));
+
+    /// <summary>
+    /// <c>a?[i]</c> and <c>a?[i:j]</c>: the same question as <c>a?.m</c>,
+    /// asked before an element rather than a member.
+    /// </summary>
+    private BoundExpression BindConditionalElement(
+        ExpressionSyntax syntax, ExpressionSyntax? fallbackSyntax) => syntax switch
+        {
+            IndexSyntax index => BindAskingFirst(
+                index.Target, index.Span, "?[", "'[' alone", "this element", fallbackSyntax,
+                narrowed => BindIndexOn(narrowed, index)),
+            SliceSyntax slice => BindAskingFirst(
+                slice.Target, slice.Span, "?[", "'[' alone", "this slice", fallbackSyntax,
+                narrowed => BindSliceOn(narrowed, slice)),
+            _ => new BoundErrorExpression(syntax.Span),
+        };
+
+    /// <summary>
+    /// What <c>?.</c> and <c>?[</c> share: the receiver held once, asked
+    /// whether it is there, and reached through by <paramref name="reach"/>
+    /// only if it is.
+    /// </summary>
+    private BoundExpression BindAskingFirst(
+        ExpressionSyntax target, SourceSpan span, string asking, string plain, string reached,
+        ExpressionSyntax? fallbackSyntax, Func<BoundExpression, BoundExpression> reach)
     {
-        var receiver = BindExpression(syntax.Target);
-        if (receiver.Type.IsError()) return new BoundErrorExpression(syntax.Span);
+        var receiver = BindExpression(target);
+        if (receiver.Type.IsError())
+            return new BoundErrorExpression(span);
 
         if (receiver.Type is not OptionalTypeSymbol optional)
         {
-            diagnostics.Error("SL0604", syntax.Span,
-                $"'{receiver.Type.Name}' cannot be nothing, so '?.' has no question to ask; " +
-                "write '.' instead");
-            return new BoundErrorExpression(syntax.Span);
+            diagnostics.Error("SL0604", span,
+                $"'{receiver.Type.Name}' cannot be nothing, so '{asking}' has no question to ask; " +
+                $"write {plain} instead");
+            return new BoundErrorExpression(span);
         }
 
         // Held once. The local borrows: the receiver is already a temporary
         // the statement will drop, and this only reads it in the meantime.
         var held = new LocalSymbol(SyntheticName("asked"), optional, isConst: false);
-        var reading = new BoundLocalAccess(syntax.Target.Span, held);
+        var reading = new BoundLocalAccess(target.Span, held);
 
         var present = new BoundBinary(
-            syntax.Span, PrimitiveTypeSymbol.Bool,
+            span, PrimitiveTypeSymbol.Bool,
             reading, BoundBinaryOp.NotEqual,
-            new BoundNullLiteral(syntax.Span, optional));
+            new BoundNullLiteral(span, optional));
 
         var narrowed = new BoundConversion(
-            syntax.Target.Span, optional.Element, reading, ConversionKind.NarrowOptional);
+            target.Span, optional.Element, reading, ConversionKind.NarrowOptional);
 
-        var value = call is null
-            ? BindMemberOf(narrowed, syntax)
-            : BindCallOn(narrowed, syntax, call);
-
-        if (value.Type.IsError()) return new BoundErrorExpression(syntax.Span);
+        var value = reach(narrowed);
+        if (value.Type.IsError())
+            return new BoundErrorExpression(span);
 
         BoundExpression whenNothing;
 
@@ -86,25 +113,33 @@ public sealed partial class Binder
         }
         else if (value.Type is OptionalTypeSymbol or PointerTypeSymbol)
         {
-            whenNothing = new BoundNullLiteral(syntax.Span, value.Type);
+            whenNothing = new BoundNullLiteral(span, value.Type);
         }
         else if (value.Type.IsVoid())
         {
             // `a?.Save();` as a statement: nothing is produced either way, so
             // the other arm is the same nothing.
-            whenNothing = new BoundNullLiteral(syntax.Span, value.Type);
+            whenNothing = new BoundNullLiteral(span, value.Type);
+        }
+        else if (value.Type is ClassTypeSymbol or InterfaceTypeSymbol &&
+                 new OptionalTypeSymbol(value.Type) is var lifted &&
+                 ClassifyConversion(value.Type, lifted, explicitCast: false) is not null)
+        {
+            // A reference answers null, so `a?.Name` is a `String?`.
+            value = BindConversion(value, lifted, span);
+            whenNothing = new BoundNullLiteral(span, lifted);
         }
         else
         {
-            diagnostics.Error("SL0605", syntax.Span,
-                $"'{syntax.Member}' is '{value.Type.Name}', which has no null to stand for " +
-                "the receiver having been nothing. Say what it is instead — " +
-                $"'{syntax.Member} ?? something' — or ask with an 'if'");
-            return new BoundErrorExpression(syntax.Span);
+            diagnostics.Error("SL0605", span,
+                $"{reached} is '{value.Type.Name}', which has no null to stand for the " +
+                "receiver having been nothing. Say what it is instead, with '?? something' " +
+                "after it, or ask with an 'if'");
+            return new BoundErrorExpression(span);
         }
 
-        return new BoundLet(syntax.Span, held, receiver,
-            new BoundConditional(syntax.Span, value.Type, present, value, whenNothing));
+        return new BoundLet(span, held, receiver,
+            new BoundConditional(span, value.Type, present, value, whenNothing));
     }
 
     /// <summary>
@@ -122,6 +157,9 @@ public sealed partial class Binder
 
         if (syntax.Left is CallSyntax { Callee: MemberAccessSyntax { Conditional: true } called } invoked)
             return BindConditionalAccess(called, syntax.Right, invoked);
+
+        if (syntax.Left is IndexSyntax { Conditional: true } or SliceSyntax { Conditional: true })
+            return BindConditionalElement(syntax.Left, syntax.Right);
 
         var left = BindExpression(syntax.Left);
         if (left.Type.IsError()) return new BoundErrorExpression(syntax.Span);
@@ -164,6 +202,9 @@ public sealed partial class Binder
     {
         // `a?.m` on its own: the fallback is the null the member's type must
         // have room for, and BindConditionalAccess says so if it has none.
+        if (syntax.TypeArguments is not null)
+            return RefuseTypeArgumentsOnValue(syntax, syntax.Member);
+
         if (syntax.Conditional) return BindConditionalAccess(syntax, null);
 
         // `Module.Member` is a qualified name, not a value access. A module,
@@ -267,11 +308,22 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
+        // `Box<int>.Missing`: a type was named, and it has nothing static by
+        // that name.
+        if (!syntax.ThroughPointer && ConstructedTypeNamed(syntax.Target) is { } constructed)
+        {
+            diagnostics.Error("SL0247", syntax.Span,
+                $"'{constructed.Name}' has no static member named '{syntax.Member}'");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
         var bound = syntax.Target is BaseSyntax
             ? BindBaseReceiver(syntax.Target.Span)
             : BindExpression(syntax.Target);
 
         if (bound is null || bound.Type.IsError()) return new BoundErrorExpression(syntax.Span);
+        if (RefuseUntyped(bound))
+            return new BoundErrorExpression(syntax.Span);
 
         return BindMemberOf(bound, syntax);
     }

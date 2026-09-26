@@ -1,0 +1,6 @@
+a 0 0 false 0 true
+b 0 true 0
+c 1 5 nothing
+d true false false
+e 0 0 5
+f 0
