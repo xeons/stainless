@@ -1496,9 +1496,19 @@ public sealed partial class Binder
         if (_builtins.IsString(left.Type) != _builtins.IsString(right.Type))
         {
             var other = _builtins.IsString(left.Type) ? right.Type : left.Type;
+            string advice = other switch
+            {
+                OptionalTypeSymbol { Element: var held } when _builtins.IsString(held) =>
+                    $"'{other.Name}' may be null, so check it against null first and compare " +
+                    "the String it holds",
+                PrimitiveTypeSymbol { IsInteger: true } =>
+                    "convert the number first, with Standard.Text.FromInteger",
+                PrimitiveTypeSymbol { IsFloat: true } =>
+                    "convert the number first, with Standard.Text.FromDouble",
+                _ => $"convert the '{other.Name}' to a String first",
+            };
             diagnostics.Error("SL0292", span,
-                $"cannot apply '{token.FixedText()}' to 'String' and '{other.Name}'; " +
-                "convert it first, for example with Standard.Text.FromInteger");
+                $"cannot apply '{token.FixedText()}' to 'String' and '{other.Name}'; {advice}");
             return new BoundErrorExpression(span);
         }
 

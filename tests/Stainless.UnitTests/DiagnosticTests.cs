@@ -301,4 +301,24 @@ public partial class DiagnosticTests
         string carets = diagnostic.Render(color: false).Split('\n').First(l => l.Contains('^'));
         Assert.Equal(3, carets.Count(c => c == '^'));
     }
+
+    /// <summary>
+    /// SL0292 says what to do with the operand that is not a String: a number
+    /// is converted, and an optional String is checked against null, which no
+    /// conversion of a number helps with.
+    /// </summary>
+    [Theory]
+    [InlineData("String? other = null;", "check it against null", "FromInteger")]
+    [InlineData("int other = 3;", "Standard.Text.FromInteger", "null")]
+    [InlineData("double other = 1.5;", "Standard.Text.FromDouble", "FromInteger")]
+    public void AStringComparedWithSomethingElseSaysWhatToDo(
+        string declaration, string said, string notSaid)
+    {
+        Front.BindBody(declaration + "\n    String text = \"x\";\n    bool same = text == other;",
+            out var diagnostics);
+
+        var reported = diagnostics.Items.Single(d => d.Code == "SL0292");
+        Assert.Contains(said, reported.Message);
+        Assert.DoesNotContain(notSaid, reported.Message);
+    }
 }
