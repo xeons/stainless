@@ -417,26 +417,34 @@ public sealed partial class Binder
     /// offending type -- rather than a Rust-style contract the body is checked
     /// against. See docs/spec/04-generics.md for what that means in practice.
     /// </summary>
+    /// <param name="checkedWhereDeclared">
+    /// False for a local function, whose clauses
+    /// <see cref="CheckConstraintDeclarations"/> does not reach, so what it
+    /// would have said is said here.
+    /// </param>
     private void VerifyConstraints(
         IReadOnlyList<WhereClauseSyntax> clauses,
         IReadOnlyList<string> parameters,
         Dictionary<string, TypeSymbol> substitution,
         FileScope scope,
         string owner,
-        SourceSpan span)
+        SourceSpan span,
+        bool checkedWhereDeclared = true)
     {
         foreach (var clause in clauses)
         {
             if (!substitution.TryGetValue(clause.TypeParameter, out var argument))
             {
-                diagnostics.Error("SL0330", clause.Span,
-                    $"'{clause.TypeParameter}' is not a type parameter of {owner}; " +
-                    $"it declares {string.Join(", ", parameters.Select(p => "'" + p + "'"))}");
+                if (!checkedWhereDeclared)
+                    diagnostics.Error("SL0330", clause.Span,
+                        $"'{clause.TypeParameter}' is not a type parameter of {owner}; " +
+                        $"it declares {string.Join(", ", parameters.Select(p => "'" + p + "'"))}");
                 continue;
             }
 
             foreach (var constraintSyntax in clause.Constraints)
-                VerifyConstraint(constraintSyntax, clause.TypeParameter, argument, scope, owner, span);
+                VerifyConstraint(constraintSyntax, clause.TypeParameter, argument, scope, owner,
+                    span, checkedWhereDeclared);
         }
     }
 
@@ -449,10 +457,34 @@ public sealed partial class Binder
     /// </summary>
     private void VerifyConstraint(
         ConstraintSyntax constraint, string parameter, TypeSymbol argument,
-        FileScope scope, string owner, SourceSpan span)
+        FileScope scope, string owner, SourceSpan span, bool checkedWhereDeclared)
     {
         switch (constraint.Kind)
         {
+            case ConstraintKind.Default:
+                return;
+
+            case ConstraintKind.Unmanaged:
+                if (IsUnmanaged(argument)) return;
+
+                diagnostics.Error("SL0328", span,
+                    $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
+                    $"'{parameter}' is constrained to 'unmanaged', and " +
+                    (IsValueType(argument)
+                        ? $"'{argument.Name}' holds a counted reference, so its bytes are not " +
+                          "all there is to it"
+                        : $"'{argument.Name}' is a counted reference"));
+                return;
+
+            case ConstraintKind.NotNull:
+                if (!IsNullable(argument)) return;
+
+                diagnostics.Error("SL0328", span,
+                    $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
+                    $"'{parameter}' is constrained to 'notnull', and a '{argument.Name}' may be " +
+                    "null");
+                return;
+
             case ConstraintKind.Class:
                 if (IsReferenceType(argument)) return;
 
@@ -548,11 +580,33 @@ public sealed partial class Binder
             return;
         }
 
-        diagnostics.Error("SL0329", constraint.Span,
-            $"'{required.Name}' cannot constrain '{parameter}': a constraint is an interface " +
-            "to implement, a class to derive from, 'class', 'struct' or 'new()', and " +
-            $"nothing derives from a {KindOf(required)}");
+        // A constraint naming a type was judged where it was written; only
+        // `where T : U`, whose U is known now, is judged here.
+        bool namesParameter = constraint.Type is NamedTypeSyntax
+        {
+            Name.Parts.Count: 1, TypeArguments.Count: 0,
+        } bare && _substitution.ContainsKey(bare.Name.Parts[0]);
+
+        if (!checkedWhereDeclared || namesParameter)
+            diagnostics.Error("SL0329", constraint.Span,
+                $"'{required.Name}' cannot constrain '{parameter}': a constraint is an interface " +
+                "to implement, a class to derive from, 'class', 'struct' or 'new()', and " +
+                $"nothing derives from a {KindOf(required)}");
+
     }
+
+    /// <summary>
+    /// What <c>unmanaged</c> asks for: a value whose bytes are the whole of
+    /// it, so it may be copied, compared and handed to C as bytes.
+    /// </summary>
+    private static bool IsUnmanaged(TypeSymbol type) =>
+        type is not (ErrorTypeSymbol or ClassTypeSymbol or InterfaceTypeSymbol or ArrayTypeSymbol
+            or OptionalTypeSymbol or WeakTypeSymbol or ComInterfaceTypeSymbol) &&
+        !type.IsVoid() && !type.IsReferenceType && !type.CarriesReferences();
+
+    /// <summary>What <c>notnull</c> refuses: a type one of whose values is null.</summary>
+    private static bool IsNullable(TypeSymbol type) =>
+        type is OptionalTypeSymbol or WeakTypeSymbol or PointerTypeSymbol or DelegateTypeSymbol;
 
     /// <summary>Reference types: what may be null and is reference counted.</summary>
     private bool IsReferenceType(TypeSymbol type) =>

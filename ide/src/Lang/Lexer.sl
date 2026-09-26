@@ -204,7 +204,8 @@ public class Scanner
         // a reader recognises the word, and telling them apart would need the
         // parser this does not have.
         String[] soft = [
-            "closure", "event", "field", "get", "init", "params", "required", "set", "value",
+            "closure", "event", "field", "get", "init", "notnull", "params", "required",
+            "set", "unmanaged", "value",
         ];
         foreach (var word in soft)
             _contextual.SetValue(word, true);

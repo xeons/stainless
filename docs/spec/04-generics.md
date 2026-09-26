@@ -95,7 +95,8 @@ public class Table<TKey, TValue> where TKey : IComparable<TKey> where TValue : I
 ```
 
 An interface is not the only thing that may follow the colon: a base class,
-another type parameter, `class`, `struct`, `new()` and `threadsafe` may too, and
+another type parameter, `class`, `struct`, `unmanaged`, `notnull`, `new()` and
+`threadsafe` may too, and
 [§4.3](#43-what-a-constraint-does-and-does-not-do) lists what each demands.
 
 `where` is a **contextual** keyword, as it is in C#: it is read as one only in
@@ -114,8 +115,9 @@ String Describe<T>(T thing, String where) where T : IDescribable
 
 ## 4.3 What a constraint does, and does not, do
 
-A constraint is **verified where the generic is instantiated**, and the error
-names the type, the parameter and the missing interface:
+A constraint is **verified against its argument where the generic is
+instantiated**, and the error names the type, the parameter and the missing
+interface:
 
 ```
 error[SL0328]: 'Half' cannot be used as 'T' in 'Ranked' because it does not
@@ -145,12 +147,50 @@ error at the use site and a signature that states its requirements.
 | `struct` | a value type: copied where it is assigned, never null | |
 | `new()` | a **class**, not abstract, with a public constructor taking no arguments — or with no constructor declared, which is given one ([§2.4.1](02-types.md#241-a-field-with-a-value)) | |
 | `threadsafe` | a type that says more than one thread may hold it ([§9.5](09-statements-expressions.md#95-what-may-cross-a-thread-boundary)) | |
+| `unmanaged` | a value type with no counted reference anywhere in it: a primitive, an enum, a pointer, a delegate, or a struct or tuple of those | |
+| `notnull` | a type none of whose values is null: not a `C?`, a `weak C?`, a pointer or a delegate | |
+| `default` | nothing; written on an `override`, see below | |
 
 Several are separated by commas in one clause, and several clauses by repeating
-`where`. `class` or `struct` comes first and `new()` last (SL0580) — the order
-carries no meaning, but a fixed one means every clause reads the same way.
-A parameter is a reference type or a value type, not both, and `struct`
-contradicts `new()` (SL0581).
+`where`. The word saying what kind of type it is — `class`, `struct`,
+`unmanaged`, `notnull` or `default` — comes first and `new()` last (SL0580):
+the order carries no meaning, but a fixed one means every clause reads the same
+way. A parameter is one kind, so two of those words contradict each other, and
+`struct` and `unmanaged` each contradict `new()` and a base class (SL0581).
+`unmanaged` and `notnull` are contextual, as in C#: they are read as
+constraints only where a constraint is, and a type of either name is still
+named with arguments or a qualifier.
+
+**`unmanaged` is what makes bytes safe to move.** A value that passes it is
+all of what it holds, so a template may copy it through a `byte*`, take
+`sizeof(T)` of it, or hand it to C, and no count goes out of step:
+
+```csharp
+void CopyBytes<T>(T* to, T* from, nuint count) where T : unmanaged
+{
+    var target = (byte*)to;
+    var source = (byte*)from;
+    for (nuint i = 0; i < count * sizeof(T); i++)
+        target[i] = source[i];
+}
+```
+
+**`notnull` is narrower than C#'s**, because nullability here is in the type
+rather than an annotation beside it: a `String` is never null and a `String?`
+may be, so the second is refused where C# would warn.
+
+**`default` belongs on an override**, which takes its constraints from what it
+overrides and so has no other way to say a parameter is unconstrained; anywhere
+else it says what leaving the clause out already says (SL0792). C#'s `allows
+ref struct` has no counterpart: there is no `ref struct` to allow.
+
+**The clauses are checked where they are written**, whether or not anything
+instantiates the template. A parameter has one clause (SL0788), names each
+constraint once (SL0789) and at most one base class (SL0790); parameters may
+not constrain each other in a circle (SL0791); and a constraint naming a struct,
+an enum, a sealed class or anything else nothing could derive from is refused
+there rather than at the first use (SL0329). What needs an argument to answer
+still waits for one.
 
 **`new()` means a class, unlike C#.** There, `new T()` on a value type is
 default-initialization, so a struct satisfies the constraint. Here `new`

@@ -534,6 +534,22 @@ public enum ConstraintKind
     /// their own signature, rather than a compiler having guessed.
     /// </summary>
     Threadsafe,
+
+    /// <summary>
+    /// <c>unmanaged</c>: a value type with no counted reference anywhere in
+    /// it, so its bytes are all there is to it.
+    /// </summary>
+    Unmanaged,
+
+    /// <summary><c>notnull</c>: a type none of whose values is null.</summary>
+    NotNull,
+
+    /// <summary>
+    /// <c>default</c>: nothing at all. It is written on an override, which
+    /// takes its constraints from what it overrides and so has no other way to
+    /// say it is unconstrained.
+    /// </summary>
+    Default,
 }
 
 /// <summary>

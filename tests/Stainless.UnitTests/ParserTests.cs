@@ -1017,4 +1017,38 @@ public class ParserTests
 
         Assert.Equal(["SL0713"], Front.Codes(diagnostics));
     }
+
+    // ------------------------------------------------------------ constraints
+
+    private static ConstraintSyntax OnlyConstraint(string clause)
+    {
+        var function = Assert.IsType<FunctionDeclSyntax>(
+            Front.Declaration("T F<T>(T v) " + clause + " => v;"));
+        return Assert.Single(Assert.Single(function.Constraints).Constraints);
+    }
+
+    [Theory]
+    [InlineData("where T : unmanaged", ConstraintKind.Unmanaged)]
+    [InlineData("where T : notnull", ConstraintKind.NotNull)]
+    [InlineData("where T : default", ConstraintKind.Default)]
+    public void TheConstraintWordsAreRead(string clause, ConstraintKind kind) =>
+        Assert.Equal(kind, OnlyConstraint(clause).Kind);
+
+    /// <summary>
+    /// Contextual, as in C#: a type of that name, qualified or given arguments,
+    /// is still a type.
+    /// </summary>
+    [Theory]
+    [InlineData("where T : unmanaged<int>")]
+    [InlineData("where T : notnull.Thing")]
+    public void AConstraintWordWithMoreAfterItIsAType(string clause) =>
+        Assert.Equal(ConstraintKind.Type, OnlyConstraint(clause).Kind);
+
+    [Fact]
+    public void UnmanagedAndNotnullRemainNames()
+    {
+        Front.Parse("module Test;\nvoid F()\n{\n    int unmanaged = 1;\n    int notnull = unmanaged;\n}",
+                    out var diagnostics);
+        Assert.Empty(diagnostics.Items);
+    }
 }

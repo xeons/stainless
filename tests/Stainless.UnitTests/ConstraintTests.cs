@@ -19,11 +19,12 @@ using Xunit;
 namespace Stainless.UnitTests;
 
 /// <summary>
-/// The five things a <c>where</c> clause can demand, and how each is refused.
+/// The things a <c>where</c> clause can demand, and how each is refused.
 ///
-/// A constraint is verified where the generic is instantiated, so every one of
-/// these needs a call to reach the check -- a template nobody uses is never
-/// checked at all, which is the same rule the bodies follow.
+/// A constraint is verified against its argument where the generic is
+/// instantiated, so most of these need a call to reach the check. Whether the
+/// clauses make sense on their own is checked where they are written, used or
+/// not; the last section is those.
 /// </summary>
 public class ConstraintTests
 {
@@ -203,6 +204,22 @@ public class ConstraintTests
         Assert.Contains("SL0581", Front.ModuleCodes(
             "T F<T>(T v) " + clause + " { return v; }\nint Main() { return 0; }"));
 
+    [Theory]
+    [InlineData("where T : INamed, unmanaged")]
+    [InlineData("where T : INamed, notnull")]
+    public void TheNewKindsComeFirstToo(string clause) =>
+        Assert.Contains("SL0580", Front.ModuleCodes(
+            Types + "T F<T>(T v) " + clause + " { return v; }\nint Main() { return 0; }"));
+
+    [Theory]
+    [InlineData("where T : unmanaged, new()")]
+    [InlineData("where T : class, notnull")]
+    [InlineData("where T : unmanaged, struct")]
+    [InlineData("where T : struct, Animal")]
+    public void TheNewKindsContradictToo(string clause) =>
+        Assert.Contains("SL0581", Front.ModuleCodes(
+            Types + "T F<T>(T v) " + clause + " { return v; }\nint Main() { return 0; }"));
+
     /// <summary>
     /// Only the parameterless form. A body wanting arguments would have to know
     /// their types, which is a promise a single type parameter cannot make.
@@ -211,4 +228,96 @@ public class ConstraintTests
     public void NewTakesNoParameters() =>
         Assert.Contains("SL0579", Front.ModuleCodes(
             "T F<T>(T v) where T : new(int) { return v; }\nint Main() { return 0; }"));
+
+    // ---------------------------------------------------------- unmanaged
+
+    [Theory]
+    [InlineData("var n = Size(1);")]
+    [InlineData("Point p; var n = Size(p);")]
+    [InlineData("int x = 1; var n = Size(&x);")]
+    [InlineData("var n = Size((1, 2.0));")]
+    public void UnmanagedAcceptsPlainBytes(string body) =>
+        Assert.Empty(With("nuint Size<T>(T v) where T : unmanaged { return 0; }", body));
+
+    [Theory]
+    [InlineData("var n = Size(\"text\");")]
+    [InlineData("var n = Size(new Dog());")]
+    [InlineData("Holder h; var n = Size(h);")]
+    [InlineData("var n = Size((1, \"text\"));")]
+    public void UnmanagedRefusesAnythingCounted(string body) =>
+        Assert.Contains("SL0328", With(
+            "nuint Size<T>(T v) where T : unmanaged { return 0; }\n" +
+            "public struct Holder { public String Text; }", body));
+
+    // ------------------------------------------------------------ notnull
+
+    [Theory]
+    [InlineData("var n = Keep(1);")]
+    [InlineData("var d = Keep(new Dog());")]
+    public void NotNullAcceptsWhatCannotBeNull(string body) =>
+        Assert.Empty(With("T Keep<T>(T v) where T : notnull { return v; }", body));
+
+    [Fact]
+    public void NotNullRefusesAnOptional() =>
+        Assert.Contains("SL0328", With("T Keep<T>(T v) where T : notnull { return v; }",
+            "Dog? d = null; var k = Keep(d);"));
+
+    // ------------------------------------------------ where they are written
+
+    [Fact]
+    public void AnUnknownParameterIsReportedUnused() =>
+        Assert.Equal(["SL0330"], Front.ModuleCodes("T F<T>(T v) where U : class { return v; }"));
+
+    [Fact]
+    public void AnUnknownParameterIsReportedOnce() =>
+        Assert.Equal(["SL0330"], Front.ModuleCodes(
+            "T F<T>(T v) where U : class { return v; }\nint Main() { F(1); return 0; }"));
+
+    [Fact]
+    public void AParameterHasOneClause() =>
+        Assert.Equal(["SL0788"], Front.ModuleCodes(Types +
+            "T F<T>(T v) where T : class where T : INamed { return v; }"));
+
+    [Fact]
+    public void AConstraintIsWrittenOnce() =>
+        Assert.Equal(["SL0789"], Front.ModuleCodes(Types +
+            "T F<T>(T v) where T : INamed, INamed { return v; }"));
+
+    [Fact]
+    public void AParameterHasOneBaseClass() =>
+        Assert.Equal(["SL0790"], Front.ModuleCodes(Types +
+            "T F<T>(T v) where T : Animal, Dog { return v; }"));
+
+    [Theory]
+    [InlineData("where T : U where U : T")]
+    [InlineData("where T : U where U : V where V : T")]
+    public void ParametersMayNotConstrainEachOtherInACircle(string clauses) =>
+        Assert.Equal(["SL0791"], Front.ModuleCodes(
+            "T F<T, U, V>(T a, U b, V c) " + clauses + " { return a; }"));
+
+    [Fact]
+    public void ASealedClassCannotConstrain() =>
+        Assert.Equal(["SL0329"], Front.ModuleCodes(
+            "public sealed class Leaf { }\nT F<T>(T v) where T : Leaf { return v; }"));
+
+    [Fact]
+    public void AStructCannotConstrainEvenUnused() =>
+        Assert.Equal(["SL0329"], Front.ModuleCodes(Types +
+            "T F<T>(T v) where T : Point { return v; }"));
+
+    [Fact]
+    public void AGenericStructCannotConstrain() =>
+        Assert.Equal(["SL0329"], Front.ModuleCodes(
+            "public struct Cell<T> { public T Value; }\n" +
+            "T F<T>(T v) where T : Cell<T> { return v; }"));
+
+    [Fact]
+    public void AMethodOfAGenericTypeIsCheckedToo() =>
+        Assert.Equal(["SL0788"], Front.ModuleCodes(Types +
+            "public class Box<T> { public U Get<U>(U v) where U : class where U : INamed " +
+            "{ return v; } }"));
+
+    [Fact]
+    public void DefaultIsOnlyForAnOverride() =>
+        Assert.Equal(["SL0792"], Front.ModuleCodes("T F<T>(T v) where T : default { return v; }"));
 }

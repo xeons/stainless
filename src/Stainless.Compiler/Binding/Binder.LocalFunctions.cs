@@ -408,7 +408,7 @@ public sealed partial class Binder
         for (int i = 0; i < arguments.Count; i++) substitution[template.Parameters[i]] = arguments[i];
 
         VerifyConstraints(template.Declaration.Constraints, template.Parameters, substitution,
-            template.Scope, $"'{template.Name}'", span);
+            template.Scope, $"'{template.Name}'", span, checkedWhereDeclared: false);
 
         var previous = _substitution;
         _substitution = substitution;

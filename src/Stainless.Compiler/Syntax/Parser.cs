@@ -2568,6 +2568,18 @@ public sealed class Parser
         if (Match(TokenKind.ThreadsafeKeyword))
             return new ConstraintSyntax(SpanFrom(start), ConstraintKind.Threadsafe, null);
 
+        if (Match(TokenKind.DefaultKeyword))
+            return new ConstraintSyntax(SpanFrom(start), ConstraintKind.Default, null);
+
+        // Contextual, as in C#: a type of that name is still a type when it
+        // is qualified or given arguments.
+        if (AtWord && Current.Text is "unmanaged" or "notnull" &&
+            Peek(1).Kind is not (TokenKind.Less or TokenKind.Dot))
+        {
+            var kind = Advance().Text == "unmanaged" ? ConstraintKind.Unmanaged : ConstraintKind.NotNull;
+            return new ConstraintSyntax(SpanFrom(start), kind, null);
+        }
+
         // `new()`, with the parentheses C# writes and no parameters in them:
         // there is nothing else a constructor constraint could ask for, since
         // a body that wanted arguments would have to know their types.
@@ -2588,31 +2600,32 @@ public sealed class Parser
     }
 
     /// <summary>
-    /// C#'s ordering rule, and C#'s reason for it: <c>class</c> or
-    /// <c>struct</c> says what kind of type this is and so comes first, and
-    /// <c>new()</c> is the last thing asked of it. The order carries no
-    /// meaning, but a fixed one means every <c>where</c> reads the same way.
+    /// C#'s ordering rule, and C#'s reason for it: <c>class</c>,
+    /// <c>struct</c>, <c>unmanaged</c>, <c>notnull</c> or <c>default</c> says
+    /// what kind of type this is and so comes first, and <c>new()</c> is the
+    /// last thing asked of it. The order carries no meaning, but a fixed one
+    /// means every <c>where</c> reads the same way.
     /// </summary>
     private void CheckConstraintOrder(List<ConstraintSyntax> constraints)
     {
         // Reported first, because `class, struct` is one mistake and saying
         // the second word is out of order as well would bury it.
-        bool bothKinds =
-            constraints.Count(c => c.Kind is ConstraintKind.Class or ConstraintKind.Struct) > 1;
+        var kinds = constraints.Where(c => IsKindConstraint(c.Kind)).ToList();
+        bool severalKinds = kinds.Count > 1;
 
-        if (bothKinds)
-            _diagnostics.Error("SL0581", constraints[0].Span,
-                "a type parameter is a reference type or a value type, not both");
+        if (severalKinds)
+            _diagnostics.Error("SL0581", kinds[1].Span,
+                $"'{KindWord(kinds[0].Kind)}' and '{KindWord(kinds[1].Kind)}' both say what " +
+                "kind of type this is, and a type parameter is one kind");
 
         for (int i = 0; i < constraints.Count; i++)
         {
             var constraint = constraints[i];
 
-            if (!bothKinds &&
-                constraint.Kind is ConstraintKind.Class or ConstraintKind.Struct && i != 0)
+            if (!severalKinds && IsKindConstraint(constraint.Kind) && i != 0)
                 _diagnostics.Error("SL0580", constraint.Span,
-                    $"'{(constraint.Kind == ConstraintKind.Class ? "class" : "struct")}' says " +
-                    "what kind of type this is, so it comes first in the clause");
+                    $"'{KindWord(constraint.Kind)}' says what kind of type this is, so it comes " +
+                    "first in the clause");
 
             if (constraint.Kind == ConstraintKind.New && i != constraints.Count - 1)
                 _diagnostics.Error("SL0580", constraint.Span,
@@ -2621,12 +2634,32 @@ public sealed class Parser
         }
 
         if (constraints.Count > 1 &&
-            constraints[0].Kind == ConstraintKind.Struct &&
+            constraints[0].Kind is ConstraintKind.Struct or ConstraintKind.Unmanaged &&
             constraints.Any(c => c.Kind == ConstraintKind.New))
             _diagnostics.Error("SL0581", constraints[0].Span,
-                "'struct' and 'new()' contradict each other: 'new' allocates, and only a class " +
-                "is allocated. A struct is declared where it is used");
+                $"'{KindWord(constraints[0].Kind)}' and 'new()' contradict each other: 'new' " +
+                "allocates, and only a class is allocated. A struct is declared where it is used");
+
+        // `default` removes constraints rather than adding one.
+        if (constraints.Count > 1 && constraints.Any(c => c.Kind == ConstraintKind.Default))
+            _diagnostics.Error("SL0581", constraints[0].Span,
+                "'default' says the parameter is unconstrained, so it stands alone in its clause");
     }
+
+    private static bool IsKindConstraint(ConstraintKind kind) =>
+        kind is ConstraintKind.Class or ConstraintKind.Struct or ConstraintKind.Unmanaged
+            or ConstraintKind.NotNull or ConstraintKind.Default;
+
+    private static string KindWord(ConstraintKind kind) => kind switch
+    {
+        ConstraintKind.Class => "class",
+        ConstraintKind.Struct => "struct",
+        ConstraintKind.Unmanaged => "unmanaged",
+        ConstraintKind.NotNull => "notnull",
+        ConstraintKind.Default => "default",
+        ConstraintKind.New => "new()",
+        _ => "threadsafe",
+    };
 
     /// <summary>
     /// Consumes the <c>&gt;</c> that closes a type argument list, splitting a

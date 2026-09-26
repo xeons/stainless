@@ -394,7 +394,9 @@ last person to edit it -- the suite is the authority.
   neither, because its positions are bytes
 - Generics: generic classes, interfaces, functions and methods, monomorphized,
   with inference at call sites or type arguments written there, and constraints: an interface, a base class,
-  another type parameter, `class`, `struct`, `new()` and `threadsafe`
+  another type parameter, `class`, `struct`, `unmanaged`, `notnull`, `default`,
+  `new()` and `threadsafe`, each clause checked where it is written as well as
+  against every argument
 - `enum`, strongly typed: a distinct type over an integer that never converts
   implicitly in either direction, with an optional underlying type
   (`enum Level : byte`)
@@ -796,11 +798,11 @@ last person to edit it -- the suite is the authority.
 
 Being straight about the edges, roughly in the order they are worth adding:
 
-- **Constraints are checked at the instantiation, not the declaration.**
-  `where T : IShape` is verified where the generic is used, but the body is
-  still checked per instantiation, so an unused template is never checked and
-  a mistake inside one is reported against its use. Definition-site checking
-  would need constraints on operators too, which is a larger step.
+- **A template's body is checked per instantiation, not against its
+  constraints.** The `where` clauses themselves are checked where they are
+  written, but an unused template's body is never checked and a mistake inside
+  one is reported against its use. Checking the body once would need
+  constraints on operators too, which is a larger step.
 - **An interface method cannot be generic**, since dispatch gives it one slot.
 - **No `goto case`, and no exhaustiveness requirement on a statement over an
   enum**, whose value need not be one of its members. A switch expression over

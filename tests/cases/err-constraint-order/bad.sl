@@ -20,6 +20,9 @@ T Early<T>(T v) where T : new(), INamed { return v; }
 // A value type is always made with no arguments, so this adds nothing.
 T Redundant<T>(T v) where T : struct, new() { return v; }
 
+// Nor is one with no references in it, which is what `unmanaged` says.
+T Plain<T>(T v) where T : unmanaged, new() { return v; }
+
 // And there is nothing to put in the parentheses: a body that wanted
 // arguments would have to know their types.
 T Args<T>(T v) where T : new(int) { return v; }
