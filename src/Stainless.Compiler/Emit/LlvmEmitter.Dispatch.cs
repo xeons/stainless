@@ -62,8 +62,10 @@ public sealed partial class LlvmEmitter
         _module.AppendLine();
         foreach (var classType in dispatching)
         {
+            // A null entry is a generic instantiation's slot this class leaves
+            // empty; see NumberGenericVirtualSlots.
             var slots = classType.VirtualTable
-                .Select(m => m.IsAbstract ? "ptr null" : $"ptr {Symbol(m)}");
+                .Select(m => m is null || m.IsAbstract ? "ptr null" : $"ptr {Symbol(m)}");
 
             _module.AppendLine(
                 $"@{VirtualTableName(classType)} = internal constant " +

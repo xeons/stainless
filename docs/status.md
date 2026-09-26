@@ -476,7 +476,9 @@ last person to edit it -- the suite is the authority.
   and `static virtual` members, operators among them, are C# 11's generic
   math: reached through a type parameter as `T.Zero`, and since the body is
   monomorphized, a direct call to the type's own member. A struct may
-  implement an interface whose members are all static
+  implement an interface whose members are all static. A generic method may
+  be dispatched -- an interface's, or a class's `virtual` one -- with a slot per
+  instantiation the program calls
 - Overloading by parameter type, on methods as well as module-level functions;
   a return type alone does not distinguish two of them
 - `Standard.Collections`: `List<T>`, `Dictionary<TKey, TValue>`, `HashSet<T>`,
@@ -809,7 +811,12 @@ Being straight about the edges, roughly in the order they are worth adding:
   written, but an unused template's body is never checked and a mistake inside
   one is reported against its use. Checking the body once would need
   constraints on operators too, which is a larger step.
-- **An interface method cannot be generic**, since dispatch gives it one slot.
+- **A dispatched generic method is compiled per instantiation, ahead of time.**
+  An interface's generic method, or a class's generic virtual one, gets a slot
+  per instantiation the program calls, filled for every class that could be
+  behind the call. So an instantiation that makes a larger one of itself
+  through the interface has no end (SL0798) where C# would make the next one on
+  demand, and such a class does not cross a library boundary (SL0799).
 - **No `goto case`, and no exhaustiveness requirement on a statement over an
   enum**, whose value need not be one of its members. A switch expression over
   one is covered by naming them all, and ends the program on a value that is

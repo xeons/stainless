@@ -586,14 +586,16 @@ public sealed partial class Binder
                 case FunctionDeclSyntax method:
                     if (method.TypeParameters.Count > 0)
                     {
-                        if (type.IsContract)
+                        // A static requirement is met by a type's own member,
+                        // which a generic one could only be for each
+                        // instantiation some caller happened to name.
+                        if (type.IsContract && method.Modifiers.HasFlag(Modifiers.Static) &&
+                            (method.Modifiers & (Modifiers.Abstract | Modifiers.Virtual)) != Modifiers.None)
                         {
-                            // A vtable has one slot per method, and a generic
-                            // method has as many bodies as it has instantiations.
                             diagnostics.Error("SL0322", method.Span,
-                                $"'{method.Name}' is generic, and an interface method cannot be; " +
-                                "dispatch needs one entry per method, and a generic one has " +
-                                "a body per instantiation");
+                                $"'{method.Name}' is generic, and a 'static abstract' or 'static " +
+                                "virtual' interface member cannot be: it is met by a member of " +
+                                "each implementing type, not by a slot an instantiation can fill");
                             break;
                         }
 

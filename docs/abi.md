@@ -410,6 +410,11 @@ reference reach whatever the object really is.
 @_SLvtable_App_Circle = internal constant [3 x ptr] [ptr @..Circle_Area.., ptr @..Describe.., ptr @..Circle_Name..]
 ```
 
+A generic virtual method has a slot per instantiation the program calls,
+numbered after every slot any class in its family already has; a class the
+instantiation cannot reach, or an abstract one, holds `ptr null` there. See
+[§4.4.3 of the specification](spec/04-generics.md#443-a-generic-method-that-is-dispatched).
+
 An abstract method's slot is `ptr null` and is unreachable: the class carrying
 it cannot be instantiated, and every concrete class below it has filled the slot
 in. A class with no virtual methods stores `NULL` for the whole table.
@@ -664,7 +669,11 @@ takes the slot: the entry a derived class supplies for `IShape.Area` is its own
 would.
 
 The compiler emits, per implementing class, one vtable per interface plus the
-`interfaces` array; a class implementing none stores `NULL`.
+`interfaces` array; a class implementing none stores `NULL`. An interface's
+slots are its instance methods in declaration order, each overload one of them,
+then one per instantiation of a generic method the program calls. A slot the
+class leaves to the interface's default holds the default's own function, which
+takes the object as the interface.
 
 ```llvm
 @_SLvt_App_Circle_App_Shape = internal constant [2 x ptr] [ptr @..Area.., ptr @..Describe..]
@@ -1197,7 +1206,11 @@ because the address has to come from the import address table.
   stable across compilations — which the dense directly-indexed table exists to
   avoid — or registering tables when the library loads.
 
-Both are reported where the library is built, as SL0419 and SL0420. A
+Both are reported where the library is built, as SL0419 and SL0420. A class
+with a generic virtual method is left out for the second reason in another
+form (SL0799): its instantiations' slots are numbered after the table the
+metadata would describe, so a class derived from it elsewhere would put its own
+methods in them. A
 **variant** stays behind as well (SL0441), because the metadata carries layouts
 and a variant is its cases; and anything described that reaches an undescribed
 type through a field or a signature is reported too (SL0477). A slice or a tuple

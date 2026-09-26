@@ -309,7 +309,17 @@ public static class MetadataWriter
     /// is not in the binary at all.
     /// </summary>
     private static bool Crosses(ClassTypeSymbol type) =>
-        type.Template is null && !type.IsIntrinsic && type.Interfaces.Count == 0 && !type.IsCom;
+        type.Template is null && !type.IsIntrinsic && type.Interfaces.Count == 0 && !type.IsCom &&
+        !HasGenericVirtual(type);
+
+    /// <summary>
+    /// True for a class with a generic <c>virtual</c> or <c>abstract</c>
+    /// method in its chain. Each instantiation the program calls is a slot of
+    /// its own, numbered after the table this library would describe; a class
+    /// derived from it elsewhere would put its own methods in those slots.
+    /// </summary>
+    private static bool HasGenericVirtual(ClassTypeSymbol type) =>
+        type.SelfAndBases().Any(c => c.GenericMethods.Any(m => m.IsDispatched));
 
     private static void Report(DiagnosticBag? diagnostics, ClassTypeSymbol excluded)
     {
@@ -327,6 +337,16 @@ public static class MetadataWriter
                 "library's metadata: its vtables and adjustor thunks are internal symbols of " +
                 "this compilation, and a consumer's 'new' would have to point at them. Hand one " +
                 "out through a com interface instead, which is what COM does");
+            return;
+        }
+
+        if (HasGenericVirtual(excluded))
+        {
+            diagnostics.Warning("SL0799", Where(excluded),
+                $"'{excluded.QualifiedName}' has a generic virtual method, so it is not described " +
+                "in this library's metadata: each instantiation the program calls is a slot " +
+                "numbered after every other, and a class derived from it in another program " +
+                "would put its own methods in those slots");
             return;
         }
 
@@ -355,7 +375,7 @@ public static class MetadataWriter
         // which is what the binder does for one derived here -- from this same
         // list, in this same order.
         VirtualTable = type.VirtualTable
-            .Select(m => m.IsAbstract ? null : m.MangledName)
+            .Select(m => m is null || m.IsAbstract ? null : m.MangledName)
             .ToList(),
 
         // Constructors and the destructor are methods as far as a consumer is

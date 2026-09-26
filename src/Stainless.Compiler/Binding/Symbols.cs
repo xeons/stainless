@@ -286,6 +286,9 @@ public sealed class FunctionSymbol
     /// </summary>
     public IReadOnlyList<TypeSymbol> TypeArguments { get; init; } = [];
 
+    /// <summary>The template this was instantiated from, or null.</summary>
+    public GenericFunctionTemplate? Template { get; init; }
+
     /// <summary>
     /// The file this was declared in. A module may span files with different
     /// imports, so a body must be bound against its own file's view.
@@ -739,6 +742,43 @@ public sealed class GenericFunctionTemplate(
 
     /// <summary>The binder's record of a local function, for one declared in a block.</summary>
     public object? Local { get; init; }
+
+    /// <summary>
+    /// True when a call to an instantiation goes through a table: an instance
+    /// method of an interface, or one of a class written <c>virtual</c>,
+    /// <c>abstract</c> or <c>override</c>. Each instantiation is a slot of its
+    /// own, numbered once the whole program has said which it uses.
+    /// </summary>
+    public bool IsDispatched =>
+        !Declaration.Modifiers.HasFlag(Modifiers.Static) &&
+        (ContainingType is InterfaceTypeSymbol ||
+         (ContainingType is ClassTypeSymbol &&
+          (Declaration.Modifiers & (Modifiers.Virtual | Modifiers.Abstract | Modifiers.Override))
+              != Modifiers.None));
+
+    /// <summary>For an <c>override</c> template, the one it replaces. Settled in pass 5.</summary>
+    public GenericFunctionTemplate? Overridden { get; set; }
+
+    /// <summary>The template that introduced the slot this one fills.</summary>
+    public GenericFunctionTemplate Root
+    {
+        get
+        {
+            var root = this;
+            while (root.Overridden is { } above) root = above;
+            return root;
+        }
+    }
+
+    /// <summary>
+    /// Whether another template could stand for this one: the same name, and
+    /// as many type parameters and parameters. Which types those are is only
+    /// known per instantiation, and is compared there.
+    /// </summary>
+    public bool HasShapeOf(GenericFunctionTemplate other) =>
+        Name == other.Name &&
+        Parameters.Count == other.Parameters.Count &&
+        Declaration.Parameters.Count == other.Declaration.Parameters.Count;
 
     public override string ToString() => $"{Name}<{string.Join(", ", Parameters)}>";
 }

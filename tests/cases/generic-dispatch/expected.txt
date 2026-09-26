@@ -1,0 +1,13 @@
+6
+(1 + (2 + 3))
+4textstored
+2
+loud
+inner loud
+tagged
+[base][base]/[base]
+[base]
+'q'/'q'
+~Number 1
+~Number 2
+~Number 3

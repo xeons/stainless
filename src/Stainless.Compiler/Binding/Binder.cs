@@ -310,6 +310,7 @@ public sealed partial class Binder(
         BindStatics();              // pass 10: static initializers
         DrainPending();             // pass 11: bodies of everything instantiated along the way,
                                     //          the statics that came with them, and their order
+        NumberGenericVirtualSlots();//          and a slot for each dispatched generic instantiation
         CheckConstructorDelegation();
         ResolveRemainingAliases();
         CheckDocumentation();       //          and every '@tag' says something true

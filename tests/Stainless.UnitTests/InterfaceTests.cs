@@ -254,6 +254,75 @@ public class InterfaceTests
             public class Named : INamed { public String Name() => "x"; }
             """));
 
+    // ------------------------------------------------------- generic methods
+
+    [Fact]
+    public void EachInstantiationCalledThroughAnInterfaceIsASlot()
+    {
+        var program = Front.BindModule(
+            """
+            public interface IStore { T Keep<T>(T value); }
+            public class Log : IStore { public T Keep<T>(T value) => value; }
+            int Use(IStore store) => store.Keep(1) + (int)store.Keep("x").ByteLength();
+            """, out var diagnostics);
+
+        Assert.Empty(Front.Codes(diagnostics));
+
+        var store = program.Interfaces.Single(i => i.Name == "IStore");
+        var log = program.Classes.Single(c => c.Name == "Log");
+
+        Assert.Equal(2, store.GenericSlots.Count);
+        Assert.All(store.GenericSlots, slot =>
+            Assert.Equal("Log", log.ImplementationOf(slot)!.ContainingType!.Name));
+    }
+
+    [Fact]
+    public void AGenericVirtualInstantiationSharesItsSlotWithItsOverride()
+    {
+        var program = Front.BindModule(
+            """
+            public class Formatter { public virtual String Format<T>(T value) => "base"; }
+            public class Loud : Formatter { public override String Format<T>(T value) => "loud"; }
+            String Use(Formatter formatter) => formatter.Format(1);
+            """, out var diagnostics);
+
+        Assert.Empty(Front.Codes(diagnostics));
+
+        var formatter = program.Classes.Single(c => c.Name == "Formatter");
+        var loud = program.Classes.Single(c => c.Name == "Loud");
+        int slot = formatter.VirtualTable.Count - 1;
+
+        Assert.Equal("Formatter", formatter.VirtualTable[slot].ContainingType!.Name);
+        Assert.Equal("Loud", loud.VirtualTable[slot].ContainingType!.Name);
+        Assert.Equal(slot, loud.VirtualTable[slot].VirtualSlot);
+    }
+
+    [Fact]
+    public void AGenericInterfaceMethodMustBeImplemented() =>
+        Assert.Equal(["SL0305"], Front.ModuleCodes(
+            """
+            public interface IStore { T Keep<T>(T value); }
+            public class Forgetful : IStore { }
+            """));
+
+    [Fact]
+    public void AGenericInterfaceMethodMayHaveADefault() =>
+        Assert.Empty(Front.ModuleCodes(
+            """
+            public interface IStore { String Describe<T>(T value) => "stored"; }
+            public class Quiet : IStore { }
+            String Use(IStore store) => store.Describe(1);
+            """));
+
+    [Fact]
+    public void AnInstantiationThatGrowsItselfIsRefused() =>
+        Assert.Equal(["SL0798"], Front.ModuleCodes(
+            """
+            public class Box<T> { }
+            int Deep<T>(T value, int n) => n == 0 ? 0 : Deep(new Box<T>(), n - 1);
+            int Use() => Deep(1, 3);
+            """));
+
     // ------------------------------------------------------ covariant returns
 
     private const string Animals = """

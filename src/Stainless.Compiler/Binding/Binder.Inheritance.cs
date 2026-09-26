@@ -498,6 +498,8 @@ public sealed partial class Binder
         if (classType.BaseClass is { } inheritedFrom)
             classType.VirtualTable.AddRange(inheritedFrom.VirtualTable);
 
+        ResolveGenericOverrides(classType, declaration);
+
         foreach (var method in classType.Methods)
         {
             if (method.IsVirtual && !method.IsPublic && !method.IsProtected)
@@ -1218,6 +1220,8 @@ public sealed partial class Binder
         VerifyStaticRequirements(implementer, interfaceType, span);
 
         if (implementer is not ClassTypeSymbol classType) return;
+
+        VerifyGenericImplements(classType, interfaceType, span);
 
         foreach (var required in interfaceType.Methods.Where(m => !m.IsStatic))
         {

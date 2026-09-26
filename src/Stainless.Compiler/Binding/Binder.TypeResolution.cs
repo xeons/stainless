@@ -1037,7 +1037,7 @@ public sealed partial class Binder
         CallSyntax syntax, MemberAccessSyntax member, NamedTypeSymbol type,
         BoundExpression receiver, List<BoundExpression> arguments)
     {
-        var candidates = type.GenericMethods.Where(m => m.Name == member.Member).ToList();
+        var candidates = GenericMethodsNamed(type, member.Member);
         if (candidates.Count == 0) return null;
 
         if (!candidates[0].IsPublic && type.ModuleName != _currentModule!.Name)
@@ -1054,7 +1054,8 @@ public sealed partial class Binder
             ? new BoundAddressOf(member.Span, new PointerTypeSymbol(type), receiver)
             : receiver;
 
-        return BuildCall(syntax, function, self, arguments);
+        // `base.Visit<int>(...)` is the replaced body, not a dispatch.
+        return BuildCall(syntax, function, self, arguments, nonVirtual: member.Target is BaseSyntax);
     }
 
     private static PrimitiveTypeSymbol PrimitiveFor(TokenKind keyword) => keyword switch

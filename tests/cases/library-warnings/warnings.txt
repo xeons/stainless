@@ -6,3 +6,5 @@ SL0545
 # a com interface, and a com class
 SL0543
 SL0544
+# a class with a generic virtual method
+SL0799

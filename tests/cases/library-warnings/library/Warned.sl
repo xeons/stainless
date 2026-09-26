@@ -48,6 +48,15 @@ public variant Shape // SL0441
     Empty;
 }
 
+/// A class with a generic virtual method. Each instantiation the program calls
+/// is a slot numbered after every other, and a class derived from it elsewhere
+/// would put its own methods in those slots.
+public class Formatter // SL0799
+{
+    Formatter() { }
+    public virtual String Format<T>(T value) => "?";
+}
+
 /// What does cross, so the consumer has something to be built against.
 public struct Point
 {

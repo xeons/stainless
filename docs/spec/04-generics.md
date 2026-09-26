@@ -375,10 +375,68 @@ on no one type, and a signature that does not mention its type parameters
 plainly — `R Func<T, R>(T)` is read, `List<R> Func<T, R>(T)` is left alone.
 Writing the type arguments at the call settles either.
 
-### 4.4.3 Not yet
+### 4.4.3 A generic method that is dispatched
 
-**An interface method cannot be generic.** Dispatch gives a method one vtable
-slot, and a generic method has a body per instantiation.
+**An interface method may be generic, and so may a `virtual`, `abstract` or
+`override` method of a class**:
+
+```csharp
+public interface IStore
+{
+    T Keep<T>(T value);
+    String Describe<T>(T value) => "stored";    // a default, as any member may have
+}
+
+public abstract class Node
+{
+    public abstract R Accept<R>(IVisitor<R> visitor);
+}
+```
+
+C# compiles one body for these and has the runtime make an instantiation when
+a call first needs one. Here each instantiation is a function of its own, and a
+table slot holds one function, so **each instantiation the program calls is a
+slot of its own**: `store.Keep(1)` and `store.Keep("x")` are two slots of
+`IStore`, and every class implementing `IStore` has its own `Keep` template
+instantiated at `int` and at `String` to fill them. A virtual one is the same
+over a class and everything derived from it, its slots numbered after every
+slot the family's tables already had, so nothing written by hand moves.
+
+That is sound because the program is whole. Every call is bound before
+anything is emitted, so which instantiations are called through `IStore` is
+known, and so is every class that could be behind the reference — including an
+instantiation of a generic class that implements it, which is a class like any
+other once something makes one. It is found by repeating until nothing new
+turns up, since instantiating one class's template binds a body that may call
+another instantiation. The cost is the usual cost of monomorphizing, paid per
+implementing class: `Keep<int>` is compiled for every class implementing
+`IStore`, whether or not one of them is ever behind a call to it.
+
+A class implements a generic interface method with a public generic method of
+the same name and the same numbers of type parameters and parameters
+(SL0305); whether the types then agree is known per instantiation and
+reported there, once (SL0307). An `override` names one of the same shape it
+inherits (SL0499, SL0503), a concrete class answers every abstract one
+(SL0504), and one that returns something else once instantiated is SL0502, as
+a plain override is. `base.Accept<R>(v)` calls the replaced body, as `base.M()`
+does.
+
+**Two things this cannot do, and both are refused rather than approximated.**
+
+- **An instantiation that makes a larger one of itself** — `Keep<T>` calling
+  `Keep<List<T>>` through the interface — is a new function at every step.
+  C# makes the next one when the call happens, if it ever does; a compiler that
+  makes them all in advance has no last one, and a type argument nested more
+  than 48 deep is SL0798. The same limit stops a plain generic function
+  recursing the same way, which used to run the compiler out of memory.
+- **Another binary.** A library's slots are numbered without its consumer's
+  instantiations, so a class with a generic virtual method is left out of a
+  library's metadata (SL0799), as a class implementing an interface already is
+  (SL0420).
+
+A `static abstract` or `static virtual` member may not be generic (SL0322): it
+is met by a member of each implementing type, which is not a slot an
+instantiation can fill.
 
 ## 4.5 A worked example
 

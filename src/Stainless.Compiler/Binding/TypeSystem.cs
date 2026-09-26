@@ -673,7 +673,10 @@ public abstract class NamedTypeSymbol : TypeSymbol
     /// specific one: see <see cref="MostSpecificDefault"/>.
     /// </summary>
     public FunctionSymbol? ImplementationOf(FunctionSymbol required) =>
-        OwnImplementationOf(required) ?? MostSpecificDefault(required, out _);
+        this is ClassTypeSymbol { GenericImplementations: var generic } &&
+        generic.TryGetValue(required, out var instantiated)
+            ? instantiated
+            : OwnImplementationOf(required) ?? MostSpecificDefault(required, out _);
 
     /// <summary>The member of this type or a base that fills the slot, defaults aside.</summary>
     public FunctionSymbol? OwnImplementationOf(FunctionSymbol required)
@@ -1158,11 +1161,19 @@ public sealed class InterfaceTypeSymbol : NamedTypeSymbol
     public int Id { get; internal set; } = -1;
 
     /// <summary>
-    /// The members a dispatch through this interface can reach, in slot
-    /// order: every instance method as it was declared. A static member has no
-    /// object to be reached through, so it has no slot.
+    /// The instantiations of this interface's generic methods that the program
+    /// calls, one slot each, after every declared method.
     /// </summary>
-    public IEnumerable<FunctionSymbol> DispatchSlots => Methods.Where(m => !m.IsStatic);
+    public List<FunctionSymbol> GenericSlots { get; } = [];
+
+    /// <summary>
+    /// The members a dispatch through this interface can reach, in slot
+    /// order: every instance method as it was declared, then each generic
+    /// instantiation. A static member has no object to be reached through, so
+    /// it has no slot.
+    /// </summary>
+    public IEnumerable<FunctionSymbol> DispatchSlots =>
+        Methods.Where(m => !m.IsStatic).Concat(GenericSlots);
 
     /// <summary>Position of a method in this interface's vtable.</summary>
     public int SlotOf(FunctionSymbol method) => DispatchSlots.ToList().IndexOf(method);
@@ -1470,6 +1481,14 @@ public sealed class ClassTypeSymbol : NamedTypeSymbol
     /// pass 5, and emitted verbatim.
     /// </summary>
     public List<FunctionSymbol> VirtualTable { get; } = [];
+
+    /// <summary>
+    /// For each instantiation of a dispatched generic method this class can
+    /// be reached through -- an interface's, or a base class's virtual one --
+    /// the instantiation that answers it here, or null where this class is
+    /// abstract and supplies none.
+    /// </summary>
+    public Dictionary<FunctionSymbol, FunctionSymbol?> GenericImplementations { get; } = [];
 
     /// <summary>This class, then its base, then its base's base.</summary>
     public IEnumerable<ClassTypeSymbol> SelfAndBases()

@@ -193,7 +193,7 @@ public sealed partial class Binder
 
             if (callee.Name.Parts.Count == 1 && _currentFunction?.ContainingType is { } enclosing)
             {
-                var generics = enclosing.GenericMethods.Where(m => m.Name == callee.Name.Text).ToList();
+                var generics = GenericMethodsNamed(enclosing, callee.Name.Text);
                 if (generics.Count > 0)
                 {
                     var instantiated = InferAndInstantiate(generics, syntax, arguments);
@@ -308,7 +308,7 @@ public sealed partial class Binder
         }
 
         if (callee.Name.Parts.Count == 1 && _currentFunction?.ContainingType is { } enclosing &&
-            enclosing.GenericMethods.Where(m => m.Name == name).ToList() is { Count: > 0 } own)
+            GenericMethodsNamed(enclosing, name) is { Count: > 0 } own)
         {
             var instantiated = InferAndInstantiate(own, syntax, arguments);
             if (instantiated is null)

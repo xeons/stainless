@@ -43,17 +43,25 @@ public sealed partial class Binder
         // which declares that instantiation's statics; binding a static's
         // initializer can instantiate one too, which queues more bodies. So
         // neither is done until both are.
-        while (_pending.Count > 0 || _staticSyntax.Count != _boundStatics.Count)
+        //
+        // And a dispatched generic method feeds both: each instantiation a call
+        // asks for has to be instantiated for every class that could answer
+        // it, and binding those can ask for more.
+        do
         {
-            while (_pending.Count > 0)
+            while (_pending.Count > 0 || _staticSyntax.Count != _boundStatics.Count)
             {
-                var (function, substitution) = _pending.Dequeue();
-                _substitution = substitution;
-                BindFunctionBody(function);
-            }
+                while (_pending.Count > 0)
+                {
+                    var (function, substitution) = _pending.Dequeue();
+                    _substitution = substitution;
+                    BindFunctionBody(function);
+                }
 
-            BindStatics();
+                BindStatics();
+            }
         }
+        while (CompleteGenericDispatch());
 
         _substitution = previous;
 
@@ -128,6 +136,9 @@ public sealed partial class Binder
 
         string key = InstantiationKey(template.Module.Name + "." + template.Name, arguments);
         if (_instantiatedTypes.TryGetValue(key, out var existing)) return existing;
+
+        if (RefuseRunawayInstantiation(template.Name, arguments, span))
+            return new StructTypeSymbol { SimpleName = template.Name, ModuleName = template.Module.Name };
 
         var declaration = template.Declaration;
         string displayName = template.Name + "<" + string.Join(", ", arguments.Select(a => a.Name)) + ">";
@@ -351,6 +362,8 @@ public sealed partial class Binder
             owner + "." + template.Name + "@" + template.Declaration.Span.Start, arguments);
         if (_instantiatedFunctions.TryGetValue(key, out var existing)) return existing;
 
+        if (RefuseRunawayInstantiation(template.Name, arguments, span)) return null;
+
         // The enclosing type's arguments first, then the method's own on top.
         var substitution = new Dictionary<string, TypeSymbol>(
             template.OuterSubstitution, StringComparer.Ordinal);
@@ -365,6 +378,8 @@ public sealed partial class Binder
 
         VerifyConstraintsOnceSettled(declaration.Constraints, template.Parameters, substitution,
             template.Scope, $"'{template.Name}'", span);
+
+        bool dispatchedByClass = template.IsDispatched && template.ContainingType is ClassTypeSymbol;
 
         var symbol = new FunctionSymbol
         {
@@ -383,6 +398,10 @@ public sealed partial class Binder
             Span = declaration.Span,
             TypeArguments = arguments.ToList(),
             Scope = template.Scope,
+            Template = template,
+            IsVirtual = dispatchedByClass,
+            IsOverride = dispatchedByClass && declaration.Modifiers.HasFlag(Modifiers.Override),
+            IsAbstract = dispatchedByClass && declaration.Modifiers.HasFlag(Modifiers.Abstract),
         };
 
         // A static one has no instance, and giving it one anyway is what made
@@ -391,9 +410,10 @@ public sealed partial class Binder
         // that fits a static method was refused as needing an object.
         if (template.ContainingType is { } containing && !symbol.IsStatic)
         {
-            // A method receives its instance: classes by reference, structs by pointer.
-            TypeSymbol thisType = containing is ClassTypeSymbol reference
-                ? reference
+            // A method receives its instance: classes and interfaces by
+            // reference, structs by pointer.
+            TypeSymbol thisType = containing is ClassTypeSymbol or InterfaceTypeSymbol
+                ? containing
                 : new PointerTypeSymbol(containing);
             symbol.Parameters.Add(new ParameterSymbol("this", thisType, 0) { IsThis = true });
         }
@@ -401,12 +421,62 @@ public sealed partial class Binder
         AddParameters(symbol, declaration.Parameters, template.Scope);
 
         _instantiatedFunctions[key] = symbol;
-        _pending.Enqueue((symbol, substitution));
+
+        // An interface's with no body is a slot to fill, and an abstract one
+        // is the same: neither has anything to bind.
+        if (symbol.Body is not null) _pending.Enqueue((symbol, substitution));
 
         _substitution = previousSubstitution;
         _currentScope = previousScope;
+
+        if (template.IsDispatched) RegisterDispatched(template, symbol, span);
         return symbol;
     }
+
+    /// <summary>
+    /// How deep a type argument may nest before an instantiation is taken to
+    /// be one that makes a larger one of itself for ever.
+    /// </summary>
+    private const int MaximumInstantiationDepth = 48;
+
+    private readonly HashSet<SourceSpan> _runawayReported = [];
+
+    /// <summary>
+    /// Refuses an instantiation whose arguments nest past any a program would
+    /// write: <c>F&lt;T&gt;</c> calling <c>F&lt;Box&lt;T&gt;&gt;</c> is a new
+    /// function at every step, and without a limit the compiler makes them
+    /// until it runs out of memory.
+    /// </summary>
+    private bool RefuseRunawayInstantiation(
+        string name, IReadOnlyList<TypeSymbol> arguments, SourceSpan span)
+    {
+        if (arguments.Count == 0 || arguments.Max(TypeDepth) <= MaximumInstantiationDepth)
+            return false;
+
+        // Every path into the runaway meets the limit at the same call.
+        if (!_runawayReported.Add(span)) return true;
+
+        diagnostics.Error("SL0798", span,
+            $"'{name}' is being instantiated with a type argument nested more than " +
+            $"{MaximumInstantiationDepth} deep, which is a generic that instantiates itself with " +
+            "a larger argument each time: it would be a new function or type at every step, " +
+            "and there would be no last one to compile");
+        return true;
+    }
+
+    /// <summary>How many types deep a type is: <c>int</c> is 1, <c>Box&lt;int&gt;[]</c> 3.</summary>
+    private static int TypeDepth(TypeSymbol type) => 1 + type switch
+    {
+        NamedTypeSymbol { TypeArguments.Count: > 0 } named => named.TypeArguments.Max(TypeDepth),
+        TupleTypeSymbol tuple when tuple.Elements.Count > 0 => tuple.Elements.Max(TypeDepth),
+        ArrayTypeSymbol array => TypeDepth(array.Element),
+        SliceTypeSymbol slice => TypeDepth(slice.Element),
+        FixedArrayTypeSymbol inline => TypeDepth(inline.Element),
+        PointerTypeSymbol pointer => TypeDepth(pointer.Element),
+        OptionalTypeSymbol optional => TypeDepth(optional.Element),
+        WeakTypeSymbol weak => TypeDepth(weak.Element),
+        _ => 0,
+    };
 
     /// <summary>
     /// Checks each <c>where</c> clause against the type arguments actually
