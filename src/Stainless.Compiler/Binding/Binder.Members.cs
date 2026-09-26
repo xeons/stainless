@@ -202,7 +202,8 @@ public sealed partial class Binder
             if (parameterType.IsVoid())
             {
                 diagnostics.Error("SL0359", parameter.Span,
-                    $"parameter '{parameter.Name}' of {kind} '{type.Name}' cannot be 'void'");
+                    $"parameter '{parameter.Name}' of {kind} '{type.Name}' cannot be 'void'",
+                    type);
                 parameterType = ErrorTypeSymbol.Instance;
             }
 
@@ -250,7 +251,8 @@ public sealed partial class Binder
             else if (!underlying.IsError())
             {
                 diagnostics.Error("SL0350", declaration.UnderlyingType.Span,
-                    $"an enum must be built on an integer type, but '{underlying.Name}' is not one");
+                    $"an enum must be built on an integer type, but '{underlying.Name}' is not one",
+                    underlying);
             }
         }
 
@@ -261,7 +263,8 @@ public sealed partial class Binder
             if (type.FindMember(member.Name) is not null)
             {
                 diagnostics.Error("SL0351", member.Span,
-                    $"'{type.Name}' already has a member named '{member.Name}'");
+                    $"'{type.Name}' already has a member named '{member.Name}'",
+                    type);
                 continue;
             }
 
@@ -273,7 +276,8 @@ public sealed partial class Binder
                     value = folded;
                 else
                     diagnostics.Error("SL0352", member.Value.Span,
-                        $"the value of '{type.Name}.{member.Name}' must be an integer constant");
+                        $"the value of '{type.Name}.{member.Name}' must be an integer constant",
+                        type);
             }
 
             type.Members.Add(new EnumMemberSymbol(member.Name, type, value)
@@ -320,14 +324,16 @@ public sealed partial class Binder
         if (declaration.Cases.Count > 255)
             diagnostics.Error("SL0432", declaration.Span,
                 $"variant '{variant.Name}' has {declaration.Cases.Count} cases; the tag is a " +
-                "byte, so 255 is the limit");
+                "byte, so 255 is the limit",
+                variant);
 
         foreach (var declared in declaration.Cases)
         {
             if (variant.FindCase(declared.Name) is not null)
             {
                 diagnostics.Error("SL0433", declared.Span,
-                    $"variant '{variant.Name}' already has a case named '{declared.Name}'");
+                    $"variant '{variant.Name}' already has a case named '{declared.Name}'",
+                    variant);
                 continue;
             }
 
@@ -418,7 +424,8 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0469", field.Span,
                 $"'{owner.Name}.{field.Name}' is a bit-field, and only a struct or a union has " +
-                "those; a class lays its fields out behind a header the compiler owns");
+                "those; a class lays its fields out behind a header the compiler owns",
+                owner);
             return null;
         }
 
@@ -429,7 +436,8 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0471", field.Span,
                 $"'{fieldType.Name}' cannot be a bit-field; a bit-field is some of the bits of " +
-                "an integer or a bool");
+                "an integer or a bool",
+                fieldType);
             return null;
         }
 
@@ -447,7 +455,8 @@ public sealed partial class Binder
         if (value is ulong huge && huge > long.MaxValue)
         {
             diagnostics.Error("SL0474", field.BitWidth!.Span,
-                $"'{field.Name}' asks for {huge} bits, and '{fieldType.Name}' has {capacity}");
+                $"'{field.Name}' asks for {huge} bits, and '{fieldType.Name}' has {capacity}",
+                fieldType);
             return null;
         }
 
@@ -464,7 +473,8 @@ public sealed partial class Binder
         if (width > capacity)
         {
             diagnostics.Error("SL0474", field.BitWidth!.Span,
-                $"'{field.Name}' asks for {width} bits, and '{fieldType.Name}' has {capacity}");
+                $"'{field.Name}' asks for {width} bits, and '{fieldType.Name}' has {capacity}",
+                fieldType);
             return null;
         }
 
@@ -544,7 +554,8 @@ public sealed partial class Binder
                 diagnostics.Error("SL0583", member.Span,
                     $"'{type.Name}' is a static class, so it has no instance for " +
                     $"{instanceMember} to belong to. Make it 'static', or make the class " +
-                    "an ordinary one");
+                    "an ordinary one",
+                    type);
                 continue;
             }
 
@@ -552,7 +563,8 @@ public sealed partial class Binder
             {
                 diagnostics.Error("SL0340", member.Span,
                     $"attribute '{type.Name}' may only declare fields; " +
-                    "it is compile-time data, not a type with behaviour");
+                    "it is compile-time data, not a type with behaviour",
+                    type);
                 continue;
             }
 
@@ -560,7 +572,8 @@ public sealed partial class Binder
             {
                 diagnostics.Error("SL0300", member.Span,
                     $"interface '{type.Name}' may only declare methods and properties; " +
-                    "it has no state, no constructor and no destructor");
+                    "it has no state, no constructor and no destructor",
+                    type);
                 continue;
             }
 
@@ -575,7 +588,8 @@ public sealed partial class Binder
                         diagnostics.Error("SL0552", field.Span,
                             $"'{type.Name}' is already declared in this module, so this " +
                             $"declaration may add methods but not the field '{field.Name}'; " +
-                            "only a class takes fields from a declaration other than the first");
+                            "only a class takes fields from a declaration other than the first",
+                            type);
                         break;
                     }
 
@@ -583,7 +597,8 @@ public sealed partial class Binder
                         type.FindProperty(field.Name) is not null)
                     {
                         diagnostics.Error("SL0205", field.Span,
-                            $"'{type.Name}' already declares a member named '{field.Name}'");
+                            $"'{type.Name}' already declares a member named '{field.Name}'",
+                            type);
                         break;
                     }
                     var fieldType = ResolveType(field.Type, scope);
@@ -596,13 +611,15 @@ public sealed partial class Binder
                     if (Dispatchable(field.Modifiers) is { } wrongOnAField)
                         diagnostics.Error("SL0497", field.Span,
                             $"'{type.Name}.{field.Name}' is a field, so it cannot be " +
-                            $"'{wrongOnAField}'; only a method or a property is dispatched");
+                            $"'{wrongOnAField}'; only a method or a property is dispatched",
+                            type);
 
                     if (field.Modifiers.HasFlag(Modifiers.Protected) &&
                         type is not ClassTypeSymbol)
                         diagnostics.Error("SL0519", field.Span,
                             $"'{type.Name}.{field.Name}' cannot be 'protected'; the word means " +
-                            "'and anything deriving from this', and only a class is derived from");
+                            "'and anything deriving from this', and only a class is derived from",
+                            type);
 
                     bool fieldRequired = field.Modifiers.HasFlag(Modifiers.Required);
                     if (fieldRequired)
@@ -675,7 +692,8 @@ public sealed partial class Binder
                     diagnostics.Error("SL0525", alias.Span,
                         $"'{alias.Name}' is a type alias inside '{type.Name}'; an alias belongs " +
                         "to a module, which is what this language has instead of a namespace. " +
-                        "Move it out of the type");
+                        "Move it out of the type",
+                        type);
                     break;
 
                 case ConstructorDeclSyntax constructor:
@@ -684,7 +702,8 @@ public sealed partial class Binder
                     {
                         diagnostics.Error("SL0207", constructor.Span,
                             $"'{type.Name}' is {DescribeKind(type)}, so it has no constructor; " +
-                            "only a class or a struct is made by writing 'new'");
+                            "only a class or a struct is made by writing 'new'",
+                            type);
                         break;
                     }
 
@@ -698,7 +717,8 @@ public sealed partial class Binder
                             $"'{type.Name}' is a struct, so '{type.Name} value;' is its zero " +
                             "value and runs nothing; a constructor taking no arguments would " +
                             "run for some of them and not for others. Give it a parameter, or " +
-                            "let the zero value be what an unconstructed one is");
+                            "let the zero value be what an unconstructed one is",
+                            type);
                         break;
                     }
 
@@ -726,6 +746,17 @@ public sealed partial class Binder
                     };
                     symbol.Parameters.Add(new ParameterSymbol("this", receiver, 0) { IsThis = true });
                     AddParameters(symbol, constructor.Parameters, scope);
+
+                    var signature = symbol.ParameterTypes.ToList();
+                    if (type.Constructors.Any(c => c.Accepts(signature)))
+                    {
+                        diagnostics.Error("SL0211", constructor.Span,
+                            $"'{type.Name}' already declares a constructor taking these parameter " +
+                            "types; constructors overload by their parameters, as methods do",
+                            type);
+                        break;
+                    }
+
                     type.Constructors.Add(symbol);
                     if (constructor.IsPrimary) type.PrimaryConstructor = symbol;
                     break;
@@ -748,13 +779,15 @@ public sealed partial class Binder
                     if (classType is null)
                     {
                         diagnostics.Error("SL0208", destructor.Span,
-                            $"'{type.Name}' is a struct; only classes are reference counted and can have a destructor");
+                            $"'{type.Name}' is a struct; only classes are reference counted and can have a destructor",
+                            type);
                         break;
                     }
                     if (classType.Destructor is not null)
                     {
                         diagnostics.Error("SL0209", destructor.Span,
-                            $"'{type.Name}' already declares a destructor");
+                            $"'{type.Name}' already declares a destructor",
+                            type);
                         break;
                     }
                     var symbol = new FunctionSymbol
@@ -878,7 +911,8 @@ public sealed partial class Binder
                 $"'{type.Name}' is not a class, so there is no moment at which this would " +
                 $"run: '{type.Name} value;' makes one by declaring it rather than by " +
                 "constructing it, and a field initializer runs in a constructor. Give the " +
-                "field its value where the value is made");
+                "field its value where the value is made",
+                type);
             return null;
         }
 
@@ -915,7 +949,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0617", declaration.Initializer.Span,
                 $"'{type.Name}' is not a class, so there is no moment at which this would " +
                 "run: a property's first value is given in a constructor, and a value type " +
-                "has none");
+                "has none",
+                type);
             return null;
         }
 
@@ -955,7 +990,8 @@ public sealed partial class Binder
                     $"'{declared.Name}', and an event is a list of closures: its type has to be " +
                     "a 'closure', which is a method and the object it belongs to. A 'delegate' " +
                     "is one pointer and has no object, so a subscriber could not be " +
-                    "'listener.OnChanged'");
+                    "'listener.OnChanged'",
+                    type, declared);
             return;
         }
 
@@ -968,7 +1004,8 @@ public sealed partial class Binder
                 $"'{type.Name}.{declaration.Name}' is an event whose handlers return " +
                 $"'{closure.ReturnType.Name}', and raising one calls every subscriber -- so " +
                 "there is no single value for it to return. Declare the closure 'void', and " +
-                "let a handler report through an argument it is given");
+                "let a handler report through an argument it is given",
+                type, closure.ReturnType);
             return;
         }
 
@@ -977,7 +1014,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0550", declaration.Span,
                 $"'{type.Name}.{declaration.Name}' is a static event, which is not supported: " +
                 "its subscribers would outlive every object that added one, and nothing would " +
-                "ever take them off");
+                "ever take them off",
+                type);
             return;
         }
 
@@ -1032,7 +1070,8 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0552", symbol.Span,
                 $"'{type.Name}' already declares a method named '{name}' taking one " +
-                $"'{symbol.Type.Name}', which is what the event '{symbol.Name}' has to use");
+                $"'{symbol.Type.Name}', which is what the event '{symbol.Name}' has to use",
+                type, symbol.Type);
             return null;
         }
 
@@ -1154,7 +1193,8 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0552", symbol.Span,
                 $"'{type.Name}' already declares a method named '{name}' taking these " +
-                $"parameters, which is what raising the event '{symbol.Name}' has to use");
+                $"parameters, which is what raising the event '{symbol.Name}' has to use",
+                type);
             return null;
         }
 
@@ -1218,7 +1258,8 @@ public sealed partial class Binder
                 diagnostics.Error("SL0567", declared.Span,
                     $"'{type.Name}' declares operator '{token.FixedText()}' for these operands " +
                     $"and not '{opposite.FixedText()}'; the two come together, because a type " +
-                    "that answers one and not the other is a question nobody can ask twice");
+                    "that answers one and not the other is a question nobody can ask twice",
+                    type);
             }
         }
     }
@@ -1259,7 +1300,8 @@ public sealed partial class Binder
                 diagnostics.Error("SL0795", declaration.Span,
                     $"'{contract.Name}.{declaration.Name}' is reached only through " +
                     $"'{contract.Name}', so it takes no modifier: it is as visible as the " +
-                    "interface, and dispatched because the interface is");
+                    "interface, and dispatched because the interface is",
+                    contract);
 
             // Storage would be named after the property, which the type may
             // well declare under its own name too.
@@ -1268,7 +1310,8 @@ public sealed partial class Binder
                 diagnostics.Error("SL0793", declaration.Span,
                     $"'{contract.Name}.{declaration.Name}' is named for an interface, so its " +
                     "accessors are written out: an automatic one would need storage, and a " +
-                    "member reached only through an interface has nowhere to name it");
+                    "member reached only through an interface has nowhere to name it",
+                    contract);
                 return;
             }
         }
@@ -1281,7 +1324,8 @@ public sealed partial class Binder
              type.FindProperty(declaration.Name) is not null))
         {
             diagnostics.Error("SL0205", declaration.Span,
-                $"'{type.Name}' already declares a member named '{declaration.Name}'");
+                $"'{type.Name}' already declares a member named '{declaration.Name}'",
+                type);
             return;
         }
 
@@ -1290,7 +1334,8 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0387", declaration.Span,
                 $"property '{type.Name}.{declaration.Name}' cannot have type 'void'; " +
-                "a property is a value, and 'void' is the absence of one");
+                "a property is a value, and 'void' is the absence of one",
+                type);
             propertyType = ErrorTypeSymbol.Instance;
         }
 
@@ -1300,7 +1345,8 @@ public sealed partial class Binder
         if (declaration.Accessors.Count > 2 || declaration.Accessors.Count(a => a.IsGetter) > 1)
         {
             diagnostics.Error("SL0388", declaration.Span,
-                $"property '{type.Name}.{declaration.Name}' declares the same accessor twice");
+                $"property '{type.Name}.{declaration.Name}' declares the same accessor twice",
+                type);
             return;
         }
 
@@ -1312,7 +1358,8 @@ public sealed partial class Binder
                 setter is null
                     ? $"property '{type.Name}.{declaration.Name}' declares no accessor; write 'get;'"
                     : $"property '{type.Name}.{declaration.Name}' has a setter but no getter; " +
-                      "something that can only be written is a method, not a property");
+                      "something that can only be written is a method, not a property",
+                type);
             return;
         }
 
@@ -1326,7 +1373,8 @@ public sealed partial class Binder
                 diagnostics.Error("SL0392", accessor.Span,
                     $"'{type.Name}.{declaration.Name}' is abstract, so its " +
                     $"{(accessor.IsGetter ? "getter" : "setter")} cannot have a body; " +
-                    "a derived class supplies one");
+                    "a derived class supplies one",
+                    type);
         }
         else if (isInterface)
         {
@@ -1336,7 +1384,8 @@ public sealed partial class Binder
                 diagnostics.Error("SL0300", declaration.Span,
                     $"'{type.Name}.{declaration.Name}' is an interface property, and an " +
                     "interface has no state, so there is no storage for 'field' or a value " +
-                    "to name");
+                    "to name",
+                    type);
         }
         else
         {
@@ -1352,7 +1401,8 @@ public sealed partial class Binder
                     $"property '{type.Name}.{declaration.Name}' mixes an automatic accessor " +
                     "with a written one; either both are automatic, or both have bodies and " +
                     "name storage the type already declares, or the written one names the " +
-                    "property's own storage as 'field'");
+                    "property's own storage as 'field'",
+                    type);
                 return;
             }
 
@@ -1365,7 +1415,8 @@ public sealed partial class Binder
                 diagnostics.Error("SL0401", declaration.Span,
                     $"'{type.Name}.{declaration.Name}' could never be assigned: it is automatic " +
                     "and has no setter, and a struct has no constructor to fill it in; add " +
-                    "'set;', or give it a body that computes the value");
+                    "'set;', or give it a body that computes the value",
+                    type);
         }
 
         bool isStatic = declaration.Modifiers.HasFlag(Modifiers.Static);
@@ -1384,7 +1435,8 @@ public sealed partial class Binder
             if (why is not null)
             {
                 diagnostics.Error("SL0783", declaration.Span,
-                    $"'{type.Name}.{declaration.Name}' cannot be 'required': {why}");
+                    $"'{type.Name}.{declaration.Name}' cannot be 'required': {why}",
+                    type);
                 isRequired = false;
             }
             else
@@ -1401,7 +1453,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0780", setter.Span,
                 $"'{type.Name}.{declaration.Name}' is static, and 'init' is a setter for an " +
                 "object that is being made; a static belongs to no object. Write 'set;', or " +
-                "give it a value where it is declared");
+                "give it a value where it is declared",
+                type);
             return;
         }
 
@@ -1409,7 +1462,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0617", declaration.Initializer.Span,
                 $"'{type.Name}.{declaration.Name}' computes its value, so there is no storage " +
                 "here to give one to; a value after the accessors belongs to an automatic " +
-                "property, which is the one that owns a field");
+                "property, which is the one that owns a field",
+                type);
 
         FieldSymbol? backing = null;
         StaticSymbol? sharedBacking = null;
@@ -1490,7 +1544,8 @@ public sealed partial class Binder
 
         diagnostics.Error("SL0783", span,
             $"'{type.Name}.{name}' is 'required' and '{type.Name}' is public, so every 'new' of " +
-            "it anywhere has to set it; make the member and its setter public too");
+            "it anywhere has to set it; make the member and its setter public too",
+            type);
     }
 
     /// <summary>
@@ -1524,7 +1579,8 @@ public sealed partial class Binder
                 $"'{type.Name}' already declares a method named '{name}' taking these " +
                 $"parameters, which is what the {role} of " +
                 (property.IsIndexer ? "this indexer" : $"property '{property.Name}'") +
-                " has to use");
+                " has to use",
+                type);
             return null;
         }
 
@@ -1539,7 +1595,8 @@ public sealed partial class Binder
                 diagnostics.Error("SL0394", accessor.Span,
                     $"the getter of '{type.Name}.{property.Name}' is what makes the property " +
                     "public or not, so it cannot be narrowed on its own; write the property " +
-                    "itself without 'public', or narrow the setter instead");
+                    "itself without 'public', or narrow the setter instead",
+                    type);
         }
 
         var symbol = new FunctionSymbol

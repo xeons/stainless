@@ -142,7 +142,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0524", syntax.Span,
                 $"'{opaque.Name}' is declared without a body, so its size is not known here " +
                 $"and there is no value of it to have; write '{opaque.Name}*', which is what an " +
-                "incomplete type is for");
+                "incomplete type is for",
+                opaque);
             return ErrorTypeSymbol.Instance;
         }
 
@@ -211,7 +212,8 @@ public sealed partial class Binder
                 {
                     diagnostics.Error("SL0270", syntax.Span,
                         $"'{element.Name}' is a reference type, so '{element.Name}*' is not " +
-                        "allowed; it is already a managed pointer");
+                        "allowed; it is already a managed pointer",
+                        element);
                     return ErrorTypeSymbol.Instance;
                 }
                 return element.MakePointerType();
@@ -225,7 +227,8 @@ public sealed partial class Binder
                 {
                     diagnostics.Error("SL0271", syntax.Span,
                         $"'{element.Name}?' is not valid; only class and interface references can " +
-                        $"be optional (a '{element.Name}' is a value and is never null)");
+                        $"be optional (a '{element.Name}' is a value and is never null)",
+                        element);
                     return ErrorTypeSymbol.Instance;
                 }
                 return referenceType.MakeOptionalType();
@@ -240,7 +243,8 @@ public sealed partial class Binder
                 if (referenced is null)
                 {
                     diagnostics.Error("SL0272", syntax.Span,
-                        $"'weak' requires a class or interface reference, but '{element.Name}' is not one");
+                        $"'weak' requires a class or interface reference, but '{element.Name}' is not one",
+                        element);
                     return ErrorTypeSymbol.Instance;
                 }
                 return referenced.MakeWeakType();
@@ -253,7 +257,8 @@ public sealed partial class Binder
                 {
                     diagnostics.Error("SL0345", syntax.Span,
                         $"'{resolved.Name}' is an attribute and cannot be used as a type; " +
-                        $"write it as '[{resolved.Name}]' on a declaration instead");
+                        $"write it as '[{resolved.Name}]' on a declaration instead",
+                        resolved);
                     return ErrorTypeSymbol.Instance;
                 }
                 return resolved;
@@ -1084,7 +1089,8 @@ public sealed partial class Binder
 
         if (!candidates[0].IsPublic && type.ModuleName != _currentModule!.Name)
         {
-            diagnostics.Error("SL0257", member.Span, $"'{type.Name}.{member.Member}' is not public");
+            diagnostics.Error("SL0257", member.Span, $"'{type.Name}.{member.Member}' is not public",
+                type);
             return new BoundErrorExpression(syntax.Span);
         }
 

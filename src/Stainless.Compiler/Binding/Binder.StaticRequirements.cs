@@ -85,7 +85,8 @@ public sealed partial class Binder
             $"'{contract.Name}.{name}' is 'static {(reached.IsAbstract ? "abstract" : "virtual")}', " +
             "so it is reached through a type parameter constrained to the interface, as " +
             $"'T.{name}' where 'T : {contract.Name}', and not through the interface, which is " +
-            "not one of the types that supply it");
+            "not one of the types that supply it",
+            contract);
         return true;
     }
 }

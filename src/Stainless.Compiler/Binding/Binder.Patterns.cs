@@ -545,7 +545,8 @@ public sealed partial class Binder
                 $"'{variant.Name}' is a variant and has no case named " +
                 $"'{typeSyntax.Span.File.Text[typeSyntax.Span.Start..typeSyntax.Span.End]}'; " +
                 "what a pattern asks a variant is which case it holds, and those are " +
-                Listed(variant.Cases.Select(c => c.Name)));
+                Listed(variant.Cases.Select(c => c.Name)),
+                variant);
             return null;
         }
 
@@ -554,7 +555,8 @@ public sealed partial class Binder
             diagnostics.Error(inIs ? "SL0518" : "SL0619", span,
                 $"'{subject.Type.Name}' may already have died, so what it is cannot be asked " +
                 "directly; read it into an optional first, which is the check that makes it " +
-                "safe to look at");
+                "safe to look at",
+                subject.Type);
             return null;
         }
 
@@ -570,12 +572,14 @@ public sealed partial class Binder
             if (inIs)
                 diagnostics.Error("SL0518", span,
                     $"'{subject.Type.Name}' is not a reference to an object, so 'is' has no type " +
-                    "to ask about: a value is exactly what it was declared to be");
+                    "to ask about: a value is exactly what it was declared to be",
+                    subject.Type);
             else
                 diagnostics.Error("SL0438", span,
                     $"this matches a variant's case or an object's class, and " +
                     $"'{subject.Type.Name}' is neither: a value of it is exactly what it was " +
-                    "declared to be. Match it against a value instead");
+                    "declared to be. Match it against a value instead",
+                    subject.Type);
             return null;
         }
 
@@ -589,7 +593,8 @@ public sealed partial class Binder
         {
             diagnostics.Error(code, span,
                 $"'{tested.Name}' is not a class or an interface, so there is nothing to ask " +
-                "about it: every other type is known exactly where it is written");
+                "about it: every other type is known exactly where it is written",
+                tested);
             return null;
         }
 
@@ -597,7 +602,8 @@ public sealed partial class Binder
         {
             diagnostics.Error(code, span,
                 $"'{subject.Type.Name}' is not a reference to an object, so what it really is " +
-                "is not a question");
+                "is not a question",
+                subject.Type);
             return null;
         }
 
@@ -619,7 +625,8 @@ public sealed partial class Binder
         {
             diagnostics.Error(code, span,
                 $"no object is both a '{subjectClass.Name}' and a '{wantedClass.Name}': " +
-                "neither derives from the other");
+                "neither derives from the other",
+                subjectClass, wantedClass);
             return null;
         }
 
@@ -632,7 +639,8 @@ public sealed partial class Binder
             if (inIs && !optional && ReferenceEquals(written, context.Root) &&
                 reference is ClassTypeSymbol && wanted is ClassTypeSymbol)
                 diagnostics.Warning("SL0520", span,
-                    $"every '{reference.Name}' is a '{wanted.Name}', so this is always true");
+                    $"every '{reference.Name}' is a '{wanted.Name}', so this is always true",
+                    reference, wanted);
 
             var present = optional
                 ? new BoundBinary(span, PrimitiveTypeSymbol.Bool, subject, BoundBinaryOp.NotEqual,
@@ -710,7 +718,8 @@ public sealed partial class Binder
                     ? $"'{subject.Type.Name}' may already have died, so it cannot be taken apart " +
                       "directly; read it into an optional first"
                     : $"'{subject.Type.Name}' is a variant, and what it holds depends on its case; " +
-                      "name the case first, as in 'Circle(var r)' or 'Circle { Radius: > 1 }'");
+                      "name the case first, as in 'Circle(var r)' or 'Circle { Radius: > 1 }'",
+                subject.Type);
             return null;
         }
         else
@@ -1019,7 +1028,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0774", span,
                 $"'{viewed.Type.Name}' cannot be matched element by element: a list pattern " +
                 "takes an array, a slice, an inline array, or a type with a 'Count' or " +
-                "'Length' and an integer indexer");
+                "'Length' and an integer indexer",
+                viewed.Type);
             return null;
         }
 
@@ -1063,7 +1073,8 @@ public sealed partial class Binder
                     diagnostics.Error("SL0775", run.Span,
                         $"'..' can name what it skipped only as a slice of an array or another " +
                         $"slice, or as what a type's 'Slice(start, length)' answers, and " +
-                        $"'{viewed.Type.Name}' has neither; write '..' on its own");
+                        $"'{viewed.Type.Name}' has neither; write '..' on its own",
+                        viewed.Type);
                     failed = true;
                     continue;
                 }
@@ -1579,7 +1590,8 @@ public sealed partial class Binder
                 $"this switch over '{variant.Name}' does not cover " +
                 Listed(UncoveredCases(rows, variant).Select(c => "'" + c.Name + "'")) +
                 "; a variant is the choice between its cases, so a switch that leaves one " +
-                "out has no answer for it. Add the case, or a 'default'");
+                "out has no answer for it. Add the case, or a 'default'",
+                variant);
 
         // A block of its own either way, so what the labels named is released
         // where the switch ends.

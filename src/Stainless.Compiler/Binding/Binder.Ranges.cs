@@ -62,7 +62,8 @@ public sealed partial class Binder
         if (count.Type is not PrimitiveTypeSymbol { IsInteger: true })
         {
             diagnostics.Error("SL0242", syntax.Operand.Span,
-                $"'^' counts back from the end by an integer, but this is '{count.Type.Name}'");
+                $"'^' counts back from the end by an integer, but this is '{count.Type.Name}'",
+                count.Type);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -99,7 +100,8 @@ public sealed partial class Binder
         if (bound.Type is not PrimitiveTypeSymbol { IsInteger: true })
         {
             diagnostics.Error("SL0242", syntax.Span,
-                $"a range runs between integers or 'Index' values, but this is '{bound.Type.Name}'");
+                $"a range runs between integers or 'Index' values, but this is '{bound.Type.Name}'",
+                bound.Type);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -158,7 +160,8 @@ public sealed partial class Binder
             case FixedArrayTypeSymbol:
                 diagnostics.Error("SL0452", span,
                     $"cannot slice '{target.Type.Name}'; a slice holds the array it is part of, " +
-                    "and an inline array is not one that can be held");
+                    "and an inline array is not one that can be held",
+                    target.Type);
                 return new BoundErrorExpression(span);
 
             case NamedTypeSymbol named:
@@ -170,7 +173,8 @@ public sealed partial class Binder
                 diagnostics.Error("SL0777", span,
                     $"'{target.Type.Name}' has no length, so there is no end to count back " +
                     "from; '^' and ranges work on an array, a slice, an inline array, or a " +
-                    "type with 'Count' or 'Length'");
+                    "type with 'Count' or 'Length'",
+                    target.Type);
                 return new BoundErrorExpression(span);
         }
     }
@@ -196,7 +200,8 @@ public sealed partial class Binder
             {
                 diagnostics.Error("SL0490", position.Span,
                     $"^{back} is outside '{inline.Name}', which has " +
-                    $"{Counted(inline.Length, "element")}");
+                    $"{Counted(inline.Length, "element")}",
+                    inline);
                 return new BoundErrorExpression(span);
             }
 
@@ -247,7 +252,8 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0452", span,
                 $"cannot slice '{target.Type.Name}'; slicing takes part of an array or of " +
-                "another slice, or calls a type's own 'Slice(start, length)'");
+                "another slice, or calls a type's own 'Slice(start, length)'",
+                target.Type);
             return new BoundErrorExpression(span);
         }
 
@@ -274,7 +280,8 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0241", span,
                 $"no indexer on '{named.Name}' takes an integer, so there is nothing for an " +
-                "'Index' to become");
+                "'Index' to become",
+                named);
             return new BoundErrorExpression(span);
         }
 
@@ -303,7 +310,8 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0452", span,
                 $"cannot slice '{named.Name}'; a range takes part of an array or a slice, or " +
-                "calls a type's own 'Slice(start, length)', and it declares none");
+                "calls a type's own 'Slice(start, length)', and it declares none",
+                named);
             return new BoundErrorExpression(span);
         }
 
@@ -344,7 +352,8 @@ public sealed partial class Binder
         diagnostics.Error("SL0777", span,
             $"'{named.Name}' has no 'Count' or 'Length', so there is no end to count back " +
             "from; '^' and ranges work on an array, a slice, an inline array, or a type " +
-            "with one");
+            "with one",
+            named);
         return new BoundErrorExpression(span);
     }
 

@@ -129,6 +129,7 @@ public sealed partial class Binder
             "nothing about it says how two of them may. Counts are atomic, so the " +
             "reference itself is safe; what is not is the contents. Pass plain data or " +
             $"a String, guard it with 'Mutex<T>', or declare '{type.Name}' 'threadsafe' " +
-            "if it already synchronizes itself");
+            "if it already synchronizes itself",
+            type);
     }
 }

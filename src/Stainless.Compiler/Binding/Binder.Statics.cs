@@ -124,7 +124,8 @@ public sealed partial class Binder
              containingType.FindProperty(declaration.Name) is not null))
         {
             diagnostics.Error("SL0205", declaration.Span,
-                $"'{containingType.Name}' already declares a member named '{declaration.Name}'");
+                $"'{containingType.Name}' already declares a member named '{declaration.Name}'",
+                containingType);
             return;
         }
 
@@ -264,7 +265,8 @@ public sealed partial class Binder
             else if (!isBytes)
                 diagnostics.Error("SL0730", declaration.Span,
                     $"'{symbol.Name}' is '{symbol.Type.Name}', and an embedded file is its bytes: " +
-                    "declare it 'byte[]'");
+                    "declare it 'byte[]'",
+                    symbol.Type);
             else
                 symbol.Initializer = BindEmbed(embed);
 
@@ -341,7 +343,8 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0209", declaration.Span,
                 $"'{type.Name}' already declares a 'static {type.SimpleName}()'; there is one " +
-                "moment before 'Main' at which a type is set up, so there is one block for it");
+                "moment before 'Main' at which a type is set up, so there is one block for it",
+                type);
             return;
         }
 
@@ -440,7 +443,8 @@ public sealed partial class Binder
                     diagnostics.Error("SL0378", constructor.Span,
                         $"the static constructor of '{constructor.ContainingType!.Name}' reads a " +
                         "static that, directly or through another, needs this type set up first; " +
-                        "there is no order that would run both");
+                        "there is no order that would run both",
+                        constructor.ContainingType);
                 return;
             }
 

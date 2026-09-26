@@ -155,7 +155,8 @@ public sealed partial class Binder
                     diagnostics.Error("SL0329", constraint.Span,
                         $"'{sealedClass.Name}' cannot constrain '{parameter}': it is sealed, so " +
                         "the only type that could satisfy it is itself, and a parameter that can " +
-                        $"only be one type is that type. Write '{sealedClass.Name}' instead");
+                        $"only be one type is that type. Write '{sealedClass.Name}' instead",
+                        sealedClass);
                     break;
 
                 case ClassTypeSymbol or GenericTypeTemplate { Declaration.Kind: TypeDeclKind.Class }:
@@ -182,7 +183,8 @@ public sealed partial class Binder
                     diagnostics.Error("SL0329", constraint.Span,
                         $"'{other.Name}' cannot constrain '{parameter}': a constraint is an " +
                         "interface to implement, a class to derive from, 'class', 'struct' or " +
-                        $"'new()', and nothing derives from a {KindOf(other)}");
+                        $"'new()', and nothing derives from a {KindOf(other)}",
+                        other);
                     break;
 
                 case GenericTypeTemplate other:

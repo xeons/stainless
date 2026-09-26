@@ -132,7 +132,8 @@ public sealed partial class Binder
                         ? $"'{declaration.Name}' is a module-level function, so it cannot be " +
                           $"'{dispatch}'; there is no receiver to dispatch on"
                         : $"'{containingType.Name}' is not a class, so '{declaration.Name}' " +
-                          $"cannot be '{dispatch}'; only a class is derived from");
+                          $"cannot be '{dispatch}'; only a class is derived from",
+                containingType);
 
         if (isStatic) CheckStatic(containingType, declaration);
 
@@ -210,7 +211,8 @@ public sealed partial class Binder
                 diagnostics.Error("SL0211", declaration.Span,
                     $"'{containingType.Name}' already declares a method '{declaration.Name}' " +
                     "taking these parameter types; overloads must differ in their parameters, " +
-                    "and a return type alone does not distinguish two methods");
+                    "and a return type alone does not distinguish two methods",
+                    containingType);
 
             containingType.Methods.Add(symbol);
         }
@@ -257,19 +259,22 @@ public sealed partial class Binder
             diagnostics.Error("SL0795", declaration.Span,
                 $"'{contract.Name}.{declaration.Name}' is reached only through '{contract.Name}', " +
                 "so it takes no modifier: it is as visible as the interface, and dispatched " +
-                "because the interface is");
+                "because the interface is",
+                contract);
 
         if (declaration.Body is null && !containingType.IsContract)
             diagnostics.Error("SL0210", declaration.Span,
                 $"'{contract.Name}.{declaration.Name}' has no body; a class fills an interface's " +
-                "slot with one");
+                "slot with one",
+                contract);
 
         var signature = symbol.ParameterTypes.ToList();
         if (containingType.ExplicitImplementations.Any(m =>
                 m.ExplicitInterface == contract && m.Name == symbol.Name && m.Accepts(signature)))
             diagnostics.Error("SL0211", declaration.Span,
                 $"'{containingType.Name}' already declares '{contract.Name}.{declaration.Name}' " +
-                "taking these parameter types");
+                "taking these parameter types",
+                containingType, contract);
 
         containingType.ExplicitImplementations.Add(symbol);
         scope.Module.Functions.Add(symbol);
@@ -311,11 +316,13 @@ public sealed partial class Binder
                     $"'{containingType.Name}.{declaration.Name}' is static and has no body, so " +
                     "it has to be 'static abstract': a requirement every implementing type " +
                     "supplies. A static member with a body is the interface's own, or with " +
-                    "'virtual' a default an implementing type may replace");
+                    "'virtual' a default an implementing type may replace",
+                    containingType);
             else if (isAbstract && isVirtual)
                 diagnostics.Error("SL0574", declaration.Span,
                     $"'{containingType.Name}.{declaration.Name}' cannot be both 'abstract' and " +
-                    "'virtual'; one has no body and the other is one");
+                    "'virtual'; one has no body and the other is one",
+                    containingType);
 
             return;
         }
@@ -378,7 +385,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0560", declaration.Span,
                 $"'{containingType.Name}' is an interface, and an operator is chosen from the " +
                 "operand types where it is written; write it 'static abstract' to require it " +
-                "of every implementing type, or 'static virtual' to give them one");
+                "of every implementing type, or 'static virtual' to give them one",
+                containingType);
             return;
         }
 
@@ -410,19 +418,22 @@ public sealed partial class Binder
             diagnostics.Error("SL0563", declaration.Span,
                 $"operator '{written}' is declared in '{containingType.Name}', so one of its " +
                 "operands has to be one; an operator over other people's types belongs to " +
-                "neither of them");
+                "neither of them",
+                containingType);
 
         if (OperatorNames.IsComparison(token) && !symbol.ReturnType.IsBool() &&
             !symbol.ReturnType.IsError())
             diagnostics.Error("SL0564", declaration.Span,
                 $"operator '{written}' answers a question, so it returns 'bool', not " +
-                $"'{symbol.ReturnType.Name}'");
+                $"'{symbol.ReturnType.Name}'",
+                symbol.ReturnType);
 
         var signature = symbol.ParameterTypes.ToList();
         if (containingType.Operators.Any(o => o.Name == symbol.Name && o.Accepts(signature)))
             diagnostics.Error("SL0211", declaration.Span,
                 $"'{containingType.Name}' already declares operator '{written}' for these " +
-                "operand types");
+                "operand types",
+                containingType);
 
         containingType.Operators.Add(symbol);
     }
@@ -495,7 +506,8 @@ public sealed partial class Binder
                 if (from.Equals(to))
                 {
                     diagnostics.Error("SL0615", conversion.Span,
-                        $"this converts '{from.Name}' to itself, which is what it already is");
+                        $"this converts '{from.Name}' to itself, which is what it already is",
+                        from);
                     continue;
                 }
 
@@ -507,7 +519,8 @@ public sealed partial class Binder
                     diagnostics.Error("SL0615", conversion.Span,
                         $"this converts '{from.Name}' to '{to.Name}', and neither is " +
                         $"'{type.Name}'; a conversion belongs to one of the two types it is " +
-                        "between, so that the two types are where a reader looks for it");
+                        "between, so that the two types are where a reader looks for it",
+                        from, to, type);
                     continue;
                 }
 
@@ -536,7 +549,8 @@ public sealed partial class Binder
                         $"'{from.Name}' already converts to '{to.Name}'" +
                         (conversion.IsImplicitConversion ? "" : " with a cast") +
                         "; a second answer to the same question is one the reader would have " +
-                        "to know about to predict what a cast does");
+                        "to know about to predict what a cast does",
+                        from, to);
                     continue;
                 }
 
@@ -544,7 +558,8 @@ public sealed partial class Binder
                 {
                     diagnostics.Error("SL0211", conversion.Span,
                         $"'{type.Name}' already declares a conversion from '{from.Name}' " +
-                        $"to '{to.Name}'");
+                        $"to '{to.Name}'",
+                        type, from, to);
                     continue;
                 }
 
@@ -602,7 +617,8 @@ public sealed partial class Binder
                 diagnostics.Error("SL0284", symbol.Span,
                     $"'{returned.Name}' holds a reference, so it cannot be returned across " +
                     $"{how}; C would copy its bytes and leave the count behind. Return a " +
-                    "struct of plain data, or a raw pointer");
+                    "struct of plain data, or a raw pointer",
+                    returned);
 
             foreach (var parameter in symbol.Parameters)
             {
@@ -613,7 +629,8 @@ public sealed partial class Binder
                 diagnostics.Error("SL0284", symbol.Span,
                     $"'{passed.Name}' holds a reference, so parameter '{parameter.Name}' " +
                     $"cannot cross {how}; C would copy its bytes and leave the count behind. " +
-                    "Pass a struct of plain data, or a raw pointer");
+                    "Pass a struct of plain data, or a raw pointer",
+                    passed);
             }
         }
     }
@@ -776,7 +793,8 @@ public sealed partial class Binder
                 diagnostics.Error("SL0491", parameter.Span,
                     $"parameter '{parameter.Name}' cannot be '{type.Name}' by value; C " +
                     "passes an array as a pointer and copying every element here would " +
-                    $"be neither. Write 'ref {type.Name}' or 'in {type.Name}'");
+                    $"be neither. Write 'ref {type.Name}' or 'in {type.Name}'",
+                    type);
 
             symbol.Parameters.Add(
                 new ParameterSymbol(parameter.Name, type, symbol.Parameters.Count)
@@ -972,7 +990,8 @@ public sealed partial class Binder
                         $"'{contract.Name}.{required.Name}' already gives '{parameter.Name}' a " +
                         "default, and a call fills one in from the declaration it can see; two " +
                         "of them would mean a call through the interface and a call through " +
-                        $"'{classType.Name}' passed different values. Leave this one off");
+                        $"'{classType.Name}' passed different values. Leave this one off",
+                        contract, classType);
                     parameter.Default = null;
                 }
             }
@@ -1064,7 +1083,8 @@ public sealed partial class Binder
              containingType.FindProperty(declaration.Name) is not null))
         {
             diagnostics.Error("SL0205", declaration.Span,
-                $"'{containingType.Name}' already declares a member named '{declaration.Name}'");
+                $"'{containingType.Name}' already declares a member named '{declaration.Name}'",
+                containingType);
             return;
         }
 
@@ -1098,7 +1118,8 @@ public sealed partial class Binder
             else if (!Suits(literal.Kind, type))
                 diagnostics.Error("SL0479", declaration.Value.Span,
                     $"'{declaration.Name}' is declared '{type.Name}', and " +
-                    $"{literal.Kind.Describe()} is not one");
+                    $"{literal.Kind.Describe()} is not one",
+                    type);
         }
         else
         {
@@ -1116,7 +1137,8 @@ public sealed partial class Binder
                 $"a 'const' holds a number, a bool, a char or an enum, and " +
                 $"'{type.Name}' is none of those. Write " +
                 $"'static readonly {type.Name} {declaration.Name} = ...' instead, " +
-                "which has storage rather than being inlined");
+                "which has storage rather than being inlined",
+                type);
 
             // Registered anyway, so that every use of it does not then report
             // an undefined name on top of the one real error.

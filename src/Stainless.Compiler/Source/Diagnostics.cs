@@ -209,12 +209,26 @@ public sealed record Diagnostic(Severity Severity, string Code, string Message, 
     }
 }
 
+/// <summary>Something a diagnostic can name.</summary>
+public interface IDiagnosticSubject
+{
+    /// <summary>
+    /// True when this is, or is built from, what an earlier error left in
+    /// place of something that could not be resolved.
+    /// </summary>
+    bool StandsForAnError { get; }
+}
+
 public sealed class DiagnosticBag
 {
     private readonly List<Diagnostic> _items = [];
     public IReadOnlyList<Diagnostic> Items => _items;
-    public bool HasErrors => _items.Any(d => d.Severity == Severity.Error);
-    public int ErrorCount => _items.Count(d => d.Severity == Severity.Error);
+
+    /// <summary>How many of <see cref="Items"/> are errors, kept as they are added and removed.</summary>
+    private int _errors;
+
+    public bool HasErrors => _errors > 0;
+    public int ErrorCount => _errors;
 
     private int _muted;
 
@@ -235,7 +249,14 @@ public sealed class DiagnosticBag
     public bool IsMuted => _muted > 0;
 
     /// <summary>Drops everything reported after the first <paramref name="count"/>.</summary>
-    public void RewindTo(int count) => _items.RemoveRange(count, _items.Count - count);
+    public void RewindTo(int count)
+    {
+        for (int i = count; i < _items.Count; i++)
+            if (_items[i].Severity == Severity.Error)
+                _errors--;
+
+        _items.RemoveRange(count, _items.Count - count);
+    }
 
     public readonly struct Mute : IDisposable
     {
@@ -287,18 +308,36 @@ public sealed class DiagnosticBag
         }
     }
 
-    public void Error(string code, SourceSpan span, string message)
+    /// <param name="about">
+    /// What the message names. One that stands for an error already reported
+    /// makes this a consequence of that error, and it is not said.
+    /// </param>
+    public void Error(string code, SourceSpan span, string message, params ReadOnlySpan<IDiagnosticSubject?> about)
     {
         Fresh(code);
-        if (_muted > 0 || IsCascade(message)) return;
+        if (IsConsequence(about)) return;
+        NotAboutTheErrorType(code, message);
+        if (_muted > 0) return;
         Keep(new Diagnostic(Severity.Error, code, message, span));
     }
 
-    public void Warning(string code, SourceSpan span, string message)
+    /// <inheritdoc cref="Error"/>
+    public void Warning(string code, SourceSpan span, string message, params ReadOnlySpan<IDiagnosticSubject?> about)
     {
         Fresh(code);
-        if (_muted > 0 || IsCascade(message)) return;
+        if (IsConsequence(about)) return;
+        NotAboutTheErrorType(code, message);
+        if (_muted > 0) return;
         Keep(new Diagnostic(Severity.Warning, code, message, span));
+    }
+
+    private static bool IsConsequence(ReadOnlySpan<IDiagnosticSubject?> about)
+    {
+        foreach (var subject in about)
+            if (subject is { StandsForAnError: true })
+                return true;
+
+        return false;
     }
 
     /// <summary>Reports, now, what was reported into a <see cref="Hold"/>.</summary>
@@ -311,9 +350,13 @@ public sealed class DiagnosticBag
     private void Keep(Diagnostic diagnostic)
     {
         if (_holding is not null)
+        {
             _holding.Add(diagnostic);
-        else
-            _items.Add(diagnostic);
+            return;
+        }
+
+        _items.Add(diagnostic);
+        if (diagnostic.Severity == Severity.Error) _errors++;
     }
 
     /// <summary>What the binder's stand-in for a type it could not resolve is called.</summary>
@@ -325,14 +368,16 @@ public sealed class DiagnosticBag
     /// The type is what a name that did not resolve became, and that failure
     /// was reported where it happened -- so "argument 1 expects '&lt;error&gt;'"
     /// tells the reader nothing but that the compiler has an internal name for
-    /// it. Dropped here rather than at each place a type is spelled into a
-    /// message, because there are hundreds of those and a new one would bring
-    /// the cascade straight back. Only once an error is already in the bag, so
-    /// that an error type with no root -- which would be a compiler bug -- is
-    /// still seen.
+    /// it. The place that would say it MUST ask <c>IsError()</c> of what it is
+    /// about and say nothing. One that does not is a compiler bug, and a debug
+    /// build, which every suite and the fuzzer run, stops on it here.
     /// </summary>
-    private bool IsCascade(string message) =>
-        message.Contains(ErrorTypeName, StringComparison.Ordinal) && HasErrors;
+    [System.Diagnostics.Conditional("DEBUG")]
+    private static void NotAboutTheErrorType(string code, string message)
+    {
+        if (message.Contains(ErrorTypeName, StringComparison.Ordinal))
+            throw new InternalCompilerError($"{code} names the error type: {message}");
+    }
 
     /// <summary>
     /// Catches a retired code being brought back. It is a debug assertion
@@ -346,7 +391,11 @@ public sealed class DiagnosticBag
             !RetiredDiagnostics.Codes.Contains(code),
             $"{code} was retired; see RetiredDiagnostics for what replaced it");
 
-    public void AddRange(DiagnosticBag other) => _items.AddRange(other._items);
+    public void AddRange(DiagnosticBag other)
+    {
+        _items.AddRange(other._items);
+        _errors += other._errors;
+    }
 
     /// <summary>
     /// Errors first, then by file and position, so output reads top-to-bottom.

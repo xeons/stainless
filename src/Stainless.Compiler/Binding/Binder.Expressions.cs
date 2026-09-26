@@ -167,7 +167,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0557", span,
                 $"'{enumType.Name}' is an enum, and an interpolation would have to write its " +
                 "number rather than its name -- nothing records a member's name yet. Cast it, " +
-                "as in '(long)value', or write the name you meant");
+                "as in '(long)value', or write the name you meant",
+                enumType);
             return new BoundErrorExpression(span);
         }
 
@@ -179,7 +180,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0557", span,
                 $"'{unit.Name}' is one code unit, not a character, so what it should write " +
                 "is not decided: '(char32)' writes the character its value names, and " +
-                "'(long)' writes the number");
+                "'(long)' writes the number",
+                unit);
             return new BoundErrorExpression(span);
         }
 
@@ -189,7 +191,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0557", span,
                 $"'{value.Type.Name}' has no text to write here. An interpolation takes a " +
                 "String or a number, a bool or a char; anything else needs a conversion " +
-                "written out, because there is no 'ToString' every type owes");
+                "written out, because there is no 'ToString' every type owes",
+                value.Type);
             return new BoundErrorExpression(span);
         }
 
@@ -229,7 +232,8 @@ public sealed partial class Binder
 
             diagnostics.Error("SL0753", formatSpan,
                 $"'{value.Type.Name}' is written as it is and takes no format; a format " +
-                "is for a number, or for a class that implements 'IFormattable'");
+                "is for a number, or for a class that implements 'IFormattable'",
+                value.Type);
             return new BoundErrorExpression(span);
         }
 
@@ -434,7 +438,8 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0569", syntax.Operand.Span,
                 $"'try' takes a 'Result', and this is '{operand.Type.Name}'; there is nothing " +
-                "here that could have failed");
+                "here that could have failed",
+                operand.Type);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -446,7 +451,8 @@ public sealed partial class Binder
                     ? "'try' passes a failure to the caller, so it belongs in a function"
                     : $"'{_context.Function.Name}' returns '{_context.Function.ReturnType.Name}', " +
                       "so a failure has nowhere to go. A function containing 'try' returns a " +
-                      "'Result'; use 'GetValueOrDefault' for a caller that has a sensible default");
+                      "'Result'; use 'GetValueOrDefault' for a caller that has a sensible default",
+                _context.Function.ReturnType);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -465,7 +471,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0571", syntax.Span,
                 $"this fails with '{carried.Name}' and '{_context.Function.Name}' fails with " +
                 $"'{wanted.Name}'. 'try' passes a failure on unchanged, so convert it first: " +
-                "check it and return the failure you mean");
+                "check it and return the failure you mean",
+                carried, wanted);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -585,7 +592,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0735", syntax.Span,
                 $"'with' makes a copy of a record with some of it changed, and " +
                 $"'{target.Type.Name}' is not a record; give it positional parameters, or " +
-                "write out the construction this would have made");
+                "write out the construction this would have made",
+                target.Type);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -603,7 +611,8 @@ public sealed partial class Binder
                 diagnostics.Error("SL0736", assignment.Span,
                     $"'{record.Name}' has no parameter or settable property named " +
                     $"'{assignment.Name}', so there is nothing for this to change; it takes " +
-                    $"{Listed(record.RecordParameters)}");
+                    $"{Listed(record.RecordParameters)}",
+                    record);
                 continue;
             }
 
@@ -706,7 +715,8 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0349", chosen.Span,
                 $"the arms of a conditional have no common type: one is " +
-                $"'{whenTrue.Type.Name}', the other '{whenFalse.Type.Name}'");
+                $"'{whenTrue.Type.Name}', the other '{whenFalse.Type.Name}'",
+                whenTrue.Type, whenFalse.Type);
             return new BoundErrorExpression(chosen.Span);
         }
 
@@ -834,7 +844,8 @@ public sealed partial class Binder
         if (here.BaseClass is not { } baseClass)
         {
             diagnostics.Error("SL0515", span,
-                $"'{here.Name}' derives from nothing, so it has no 'base'");
+                $"'{here.Name}' derives from nothing, so it has no 'base'",
+                here);
             return null;
         }
 
@@ -861,7 +872,8 @@ public sealed partial class Binder
         {
             diagnostics.Error(code, span,
                 $"'{subject.Name}' is a com interface and '{wanted.Name}' is not; all a COM " +
-                "reference can be asked is QueryInterface, and that names com interfaces");
+                "reference can be asked is QueryInterface, and that names com interfaces",
+                subject, wanted);
             return false;
         }
 
@@ -869,7 +881,8 @@ public sealed partial class Binder
         {
             diagnostics.Error(code, span,
                 $"'{subject.Name}' is not a COM reference, so there is no QueryInterface to " +
-                $"ask it whether it is a '{asked.Name}'");
+                $"ask it whether it is a '{asked.Name}'",
+                subject, asked);
             return false;
         }
 
@@ -881,7 +894,8 @@ public sealed partial class Binder
         {
             diagnostics.Error(code, span,
                 $"'{noUnknown.Name}' is '[NoUnknown]', so there is no QueryInterface to ask " +
-                $"whether '{subject.Name}' is a '{asked.Name}' and no IID to ask it with");
+                $"whether '{subject.Name}' is a '{asked.Name}' and no IID to ask it with",
+                noUnknown, subject, asked);
             return false;
         }
 
@@ -925,7 +939,8 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0612", syntax.Span,
                 $"'{asked.Name}' is a variant, and which case it holds is asked with 'is' or " +
-                "a 'switch'; 'as' is for an object that may or may not be of some class");
+                "a 'switch'; 'as' is for an object that may or may not be of some class",
+                asked);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -934,7 +949,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0612", syntax.Span,
                 $"'{value.Type.Name}' may already have died, so what it is cannot be asked " +
                 "directly; read it into an optional first, which is the check that makes it " +
-                "safe to look at");
+                "safe to look at",
+                value.Type);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -946,7 +962,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0612", syntax.Tested.Span,
                 $"'{tested.Name}' is not a class or an interface, so 'as' has nothing to ask " +
                 "and nothing to answer null with: every other type is known exactly where it " +
-                "is written");
+                "is written",
+                tested);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -958,7 +975,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0612", syntax.Span,
                 $"a QueryInterface for '{wanted.Name}' is a call the object answers, so 'as' " +
                 $"would ask it twice; cast it instead, as '({wanted.Name})...', which asks once " +
-                "and ends the program if the answer was no");
+                "and ends the program if the answer was no",
+                wanted);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -966,7 +984,8 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0612", syntax.Span,
                 $"'as' asks what an object really is, and '{value.Type.Name}' is not a " +
-                "reference to one");
+                "reference to one",
+                value.Type);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -983,7 +1002,8 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0612", syntax.Span,
                 $"no object is both a '{subjectClass.Name}' and a '{wantedClass.Name}': " +
-                "neither derives from the other, so this would always be null");
+                "neither derives from the other, so this would always be null",
+                subjectClass, wantedClass);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -992,7 +1012,8 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0612", syntax.Span,
                 $"'{sealedSubject.Name}' is sealed and does not implement '{contract.Name}', " +
-                "so this would always be null");
+                "so this would always be null",
+                sealedSubject, contract);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -1063,7 +1084,8 @@ public sealed partial class Binder
                 diagnostics.Error("SL0576", syntax.Span,
                     $"'{name}' belongs to an instance of '{inStatic.ContainingType.Name}', and " +
                     $"'{inStatic.Name}' is static, so there is no instance here. Take one as a " +
-                    "parameter, or drop the 'static'");
+                    "parameter, or drop the 'static'",
+                    inStatic.ContainingType);
                 return new BoundErrorExpression(syntax.Span);
             }
 
@@ -1201,7 +1223,8 @@ public sealed partial class Binder
             {
                 if (!target.Type.IsError())
                     diagnostics.Error("SL0231", syntax.Span,
-                        $"cannot dereference '{target.Type.Name}'; only pointers can be dereferenced");
+                        $"cannot dereference '{target.Type.Name}'; only pointers can be dereferenced",
+                        target.Type);
                 return new BoundErrorExpression(syntax.Span);
             }
             return new BoundDereference(syntax.Span, pointer.Element, target);
@@ -1230,7 +1253,8 @@ public sealed partial class Binder
         if (!valid)
         {
             diagnostics.Error("SL0232", syntax.Span,
-                $"operator '{syntax.Operator.FixedText()}' cannot be applied to '{operand.Type.Name}'");
+                $"operator '{syntax.Operator.FixedText()}' cannot be applied to '{operand.Type.Name}'",
+                operand.Type);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -1352,7 +1376,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0565", span,
                 $"no operator '{token.FixedText()}' takes '{left.Type.Name}' and " +
                 $"'{right.Type.Name}'; the ones declared take " +
-                string.Join(" and ", candidates.Select(Operands)));
+                string.Join(" and ", candidates.Select(Operands)),
+                [left.Type, right.Type, .. candidates.SelectMany(SignatureTypes)]);
             return new BoundErrorExpression(span);
         }
 
@@ -1361,7 +1386,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0566", span,
                 $"operator '{token.FixedText()}' is ambiguous for '{left.Type.Name}' and " +
                 $"'{right.Type.Name}': " + string.Join(" and ", fitting.Select(Operands)) +
-                " both accept them");
+                " both accept them",
+                [left.Type, right.Type, .. fitting.SelectMany(SignatureTypes)]);
             return new BoundErrorExpression(span);
         }
 
@@ -1388,7 +1414,8 @@ public sealed partial class Binder
         if (fitting.Count > 1)
         {
             diagnostics.Error("SL0566", span,
-                $"operator '{token.FixedText()}' is ambiguous for '{operand.Type.Name}'");
+                $"operator '{token.FixedText()}' is ambiguous for '{operand.Type.Name}'",
+                operand.Type);
             return new BoundErrorExpression(span);
         }
 
@@ -1451,7 +1478,8 @@ public sealed partial class Binder
             {
                 diagnostics.Error("SL0233", span,
                     $"operator '{token.FixedText()}' requires 'bool' operands, but got " +
-                    $"'{left.Type.Name}' and '{right.Type.Name}'");
+                    $"'{left.Type.Name}' and '{right.Type.Name}'",
+                    left.Type, right.Type);
                 return new BoundErrorExpression(span);
             }
             return new BoundBinary(span, PrimitiveTypeSymbol.Bool, left, op, right);
@@ -1508,7 +1536,8 @@ public sealed partial class Binder
                 _ => $"convert the '{other.Name}' to a String first",
             };
             diagnostics.Error("SL0292", span,
-                $"cannot apply '{token.FixedText()}' to 'String' and '{other.Name}'; {advice}");
+                $"cannot apply '{token.FixedText()}' to 'String' and '{other.Name}'; {advice}",
+                other);
             return new BoundErrorExpression(span);
         }
 
@@ -1528,7 +1557,8 @@ public sealed partial class Binder
             {
                 diagnostics.Error("SL0353", span,
                     $"'{left.Type.Name}' and '{right.Type.Name}' are different types and do not " +
-                    "compare; an enum converts only through an explicit cast");
+                    "compare; an enum converts only through an explicit cast",
+                    left.Type, right.Type);
                 return new BoundErrorExpression(span);
             }
 
@@ -1544,7 +1574,8 @@ public sealed partial class Binder
                     (bitwise
                         ? $"'{left.Type.Name}' is a choice among alternatives, not a set of bits. " +
                           "Mark it '[Flags]' if its members are meant to combine"
-                        : "an enum supports comparison, not arithmetic"));
+                        : "an enum supports comparison, not arithmetic"),
+                    left.Type);
                 return new BoundErrorExpression(span);
             }
 
@@ -1583,7 +1614,8 @@ public sealed partial class Binder
             right.Type is not PrimitiveTypeSymbol rightPrimitive)
         {
             diagnostics.Error("SL0234", span,
-                $"operator '{token.FixedText()}' cannot be applied to '{left.Type.Name}' and '{right.Type.Name}'");
+                $"operator '{token.FixedText()}' cannot be applied to '{left.Type.Name}' and '{right.Type.Name}'",
+                left.Type, right.Type);
             return new BoundErrorExpression(span);
         }
 
@@ -1652,7 +1684,8 @@ public sealed partial class Binder
         if (!leftPrimitive.IsNumeric || !rightPrimitive.IsNumeric)
         {
             diagnostics.Error("SL0234", span,
-                $"operator '{token.FixedText()}' cannot be applied to '{left.Type.Name}' and '{right.Type.Name}'");
+                $"operator '{token.FixedText()}' cannot be applied to '{left.Type.Name}' and '{right.Type.Name}'",
+                left.Type, right.Type);
             return new BoundErrorExpression(span);
         }
 
@@ -1685,7 +1718,8 @@ public sealed partial class Binder
             {
                 diagnostics.Error("SL0238", span,
                     $"'{left.Type.Name}' and '{right.Type.Name}' have no common type; " +
-                    "add an explicit cast to choose one");
+                    "add an explicit cast to choose one",
+                    left.Type, right.Type);
                 return new BoundErrorExpression(span);
             }
             common = found;
@@ -1848,7 +1882,8 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0349", syntax.Span,
                 $"the arms of a conditional have no common type: one is " +
-                $"'{whenTrue.Type.Name}', the other '{whenFalse.Type.Name}'");
+                $"'{whenTrue.Type.Name}', the other '{whenFalse.Type.Name}'",
+                whenTrue.Type, whenFalse.Type);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -1913,7 +1948,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0773", span,
                 $"a tuple of {draft.Elements.Count} written out cannot become '{target.Name}'; " +
                 "and it has an element that takes its type from where it is going, so it has " +
-                "no type of its own to be instead");
+                "no type of its own to be instead",
+                target);
             return new BoundErrorExpression(span);
         }
 
@@ -2038,7 +2074,8 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0761", syntax.Span,
                 $"'{type.Name}' is a type, not a value; reach a static member through it, as " +
-                $"in '{type.Name}.Create()', or make one with 'new'");
+                $"in '{type.Name}.Create()', or make one with 'new'",
+                type);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -2265,7 +2302,8 @@ public sealed partial class Binder
             $"'{type.Name}'" +
             (type is EnumTypeSymbol
                 ? "; an enum is a choice rather than a count, so step the integer behind it"
-                : ""));
+                : ""),
+            type);
         return false;
     }
 
@@ -2308,7 +2346,8 @@ public sealed partial class Binder
                 diagnostics.Error("SL0399", span,
                     $"this writes into a temporary '{temporary.Type.Name}', which would be " +
                     "discarded with the write; put the struct in a variable, change it there, " +
-                    "and store it back");
+                    "and store it back",
+                    temporary.Type);
                 return false;
             }
 
@@ -2428,7 +2467,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0556", span,
                 $"'{subscribed.ContainingType.Name}.{subscribed.Name}' is an event, so it takes " +
                 $"'+=' and '-=' and nothing else. '{syntax.Operator.FixedText()}' would " +
-                "replace the whole list of subscribers, which is not one subscriber's to do");
+                "replace the whole list of subscribers, which is not one subscriber's to do",
+                subscribed.ContainingType);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -2565,7 +2605,8 @@ public sealed partial class Binder
             if (target.Type is not (OptionalTypeSymbol or PointerTypeSymbol) && !unfilled)
             {
                 diagnostics.Error("SL0604", syntax.Target.Span,
-                    $"'{target.Type.Name}' cannot be nothing, so '??=' has nothing to fill in");
+                    $"'{target.Type.Name}' cannot be nothing, so '??=' has nothing to fill in",
+                    target.Type);
                 return new BoundErrorExpression(syntax.Span);
             }
 
@@ -2747,7 +2788,8 @@ public sealed partial class Binder
             if (property.Type is not (OptionalTypeSymbol or PointerTypeSymbol))
             {
                 diagnostics.Error("SL0604", syntax.Target.Span,
-                    $"'{property.Type.Name}' cannot be nothing, so '??=' has nothing to fill in");
+                    $"'{property.Type.Name}' cannot be nothing, so '??=' has nothing to fill in",
+                    property.Type);
                 return new BoundErrorExpression(syntax.Span);
             }
 
@@ -2823,7 +2865,8 @@ public sealed partial class Binder
                         ? "; add 'set;', or assign it in the static constructor of " +
                           $"'{property.ContainingType.Name}'"
                         : "; add 'set;', or assign it in a constructor of " +
-                          $"'{property.ContainingType.Name}'"));
+                          $"'{property.ContainingType.Name}'"),
+                property.ContainingType);
             return false;
         }
 
@@ -2835,7 +2878,8 @@ public sealed partial class Binder
                       $"anywhere but written only by '{property.ContainingType.Name}' and " +
                       "classes deriving from it"
                     : $"'{property.ContainingType.Name}.{property.Name}' can be read from " +
-                      "anywhere but only written inside its own module");
+                      "anywhere but only written inside its own module",
+                property.ContainingType);
             return false;
         }
 
@@ -2845,7 +2889,8 @@ public sealed partial class Binder
                 $"'{property.ContainingType.Name}.{property.Name}' is 'init', so it is written " +
                 "while its object is being made and not after: in an object initializer, a " +
                 $"'with', or on 'this' in a constructor or 'init' accessor of " +
-                $"'{property.ContainingType.Name}' or a class deriving from it");
+                $"'{property.ContainingType.Name}' or a class deriving from it",
+                property.ContainingType);
             return false;
         }
 
@@ -2869,7 +2914,8 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0399", span,
                 $"'{property.ContainingType.Name}.{property.Name}' is being set on a temporary " +
-                "struct, so the write would be discarded; assign to a variable first");
+                "struct, so the write would be discarded; assign to a variable first",
+                property.ContainingType);
             return false;
         }
 
@@ -3134,7 +3180,8 @@ public sealed partial class Binder
                     ? $"no indexer on '{target.Type.Name}' takes " +
                       $"({string.Join(", ", given.Select(i => i.Type.Name))})"
                     : $"cannot index '{target.Type.Name}'; only arrays, slices and pointers " +
-                      "support indexing, and this type declares no 'this[...]'");
+                      "support indexing, and this type declares no 'this[...]'",
+                target.Type);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -3145,7 +3192,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0241", syntax.Span,
                 $"'{target.Type.Name}' is indexed by one index, and there are " +
                 $"{given.Count} here; a type takes more than one only by declaring " +
-                "'this[...]' with that many");
+                "'this[...]' with that many",
+                target.Type);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -3154,7 +3202,8 @@ public sealed partial class Binder
         if (index.Type is not PrimitiveTypeSymbol { IsInteger: true })
         {
             diagnostics.Error("SL0242", syntax.Indices[0].Span,
-                $"an index must be an integer, but this is '{index.Type.Name}'");
+                $"an index must be an integer, but this is '{index.Type.Name}'",
+                index.Type);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -3172,7 +3221,8 @@ public sealed partial class Binder
             {
                 diagnostics.Error("SL0490", syntax.Indices[0].Span,
                     $"index {constant} is past the end of '{inline.Name}', which has " +
-                    $"{Counted(inline.Length, "element")}");
+                    $"{Counted(inline.Length, "element")}",
+                    inline);
                 return new BoundErrorExpression(syntax.Span);
             }
 
@@ -3242,7 +3292,8 @@ public sealed partial class Binder
         if (bound.Type is not PrimitiveTypeSymbol { IsInteger: true })
         {
             diagnostics.Error("SL0242", syntax.Span,
-                $"a slice bound must be an integer, but this is '{bound.Type.Name}'");
+                $"a slice bound must be an integer, but this is '{bound.Type.Name}'",
+                bound.Type);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -3275,7 +3326,8 @@ public sealed partial class Binder
                 $"an inline array cannot hold '{element.Name}', because it holds a " +
                 "counted reference and every copy of the array would have to retain " +
                 $"each element. Use '{element.Name}[]', which is one counted object " +
-                "rather than N of them");
+                "rather than N of them",
+                element);
             return ErrorTypeSymbol.Instance;
         }
 
@@ -3302,7 +3354,8 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0489", syntax.Length.Span,
                 $"'{element.Name}[{length}]' would be {bytes} bytes, which is more " +
-                "than a value can be");
+                "than a value can be",
+                element);
             return ErrorTypeSymbol.Instance;
         }
 

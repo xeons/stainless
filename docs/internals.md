@@ -236,6 +236,19 @@ because the cache would otherwise hand the instantiation to the real bind
 with its complaint lost. A constraint broken by a call written `n.Count()`
 went unreported that way.
 
+## The error type
+
+A type that could not be resolved becomes the error type, and that failure
+is reported where it happened. Everything that later meets it says nothing.
+A report names the types its message spells after the message, as
+`diagnostics.Error(code, span, message, target, argument.Type)`, and one that
+is or is built from the error type makes the report a consequence, which is
+dropped. Types are asked, rather than the message searched for `<error>`, so
+a message may say anything. A place that spells a type without naming it is a
+compiler bug, and a Debug build, which every suite and the fuzzer run, stops
+there with an internal compiler error. The fuzzer found 28 such places in
+its first ten minutes. `HasErrors` is a count kept as reports arrive.
+
 ## One object per type
 
 Two types are the same type exactly when they are the same object, so `==` is

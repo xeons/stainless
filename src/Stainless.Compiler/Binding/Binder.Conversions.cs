@@ -137,7 +137,8 @@ public sealed partial class Binder
             string written = tooLarge.Negative ? "-" + tooLarge.Magnitude : $"{tooLarge.Magnitude}";
             diagnostics.Error("SL0266", span,
                 $"{written} does not fit in '{target.Name}', so it cannot be one; the value is " +
-                "outside the range of that type rather than in need of a conversion");
+                "outside the range of that type rather than in need of a conversion",
+                target);
             return new BoundErrorExpression(span);
         }
 
@@ -178,7 +179,8 @@ public sealed partial class Binder
                     ? $"; an explicit cast '({target.Name})' would allow it"
                     : "";
             diagnostics.Error("SL0265", span,
-                $"cannot convert '{expression.Type.Name}' to '{target.Name}'{hint}");
+                $"cannot convert '{expression.Type.Name}' to '{target.Name}'{hint}",
+                expression.Type, target);
             return new BoundErrorExpression(span);
         }
 
@@ -222,7 +224,8 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0616", span,
                 $"two conversions turn '{expression.Type.Name}' into '{target.Name}', and " +
-                "nothing here says which was meant; one of them belongs somewhere else");
+                "nothing here says which was meant; one of them belongs somewhere else",
+                expression.Type, target);
             return new BoundErrorExpression(span);
         }
 
@@ -297,7 +300,8 @@ public sealed partial class Binder
 
             diagnostics.Error("SL0360", span,
                 $"'{group.Name}' is a function; it converts to a delegate type, " +
-                $"and '{target.Name}' is not one");
+                $"and '{target.Name}' is not one",
+                target);
             return new BoundErrorExpression(span);
         }
 
@@ -306,7 +310,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0360", span,
                 $"'{group.Name}' is a method, so it carries the object it was reached " +
                 $"through, and '{wanted.Name}' is a delegate -- one pointer, with nowhere " +
-                "to keep it. Declare the type 'closure' instead of 'delegate'");
+                "to keep it. Declare the type 'closure' instead of 'delegate'",
+                wanted);
             return new BoundErrorExpression(span);
         }
 
@@ -316,14 +321,16 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0361", span,
                 $"no overload of '{group.Name}' matches delegate '{wanted.Name}', " +
-                $"which is '{wanted.SignatureText}'");
+                $"which is '{wanted.SignatureText}'",
+                [wanted, wanted.ReturnType, .. wanted.Signature.Select(p => p.Type)]);
             return new BoundErrorExpression(span);
         }
 
         if (matches.Count > 1)
         {
             diagnostics.Error("SL0362", span,
-                $"'{group.Name}' is ambiguous for delegate '{wanted.Name}'");
+                $"'{group.Name}' is ambiguous for delegate '{wanted.Name}'",
+                wanted);
             return new BoundErrorExpression(span);
         }
 
@@ -356,14 +363,16 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0361", span,
                 $"no overload of '{group.Name}' matches closure '{wanted.Name}', " +
-                $"which is '{wanted.SignatureText}'");
+                $"which is '{wanted.SignatureText}'",
+                [wanted, wanted.ReturnType, .. wanted.Signature.Select(p => p.Type)]);
             return new BoundErrorExpression(span);
         }
 
         if (matches.Count > 1)
         {
             diagnostics.Error("SL0362", span,
-                $"'{group.Name}' is ambiguous for closure '{wanted.Name}'");
+                $"'{group.Name}' is ambiguous for closure '{wanted.Name}'",
+                wanted);
             return new BoundErrorExpression(span);
         }
 

@@ -632,7 +632,8 @@ public sealed partial class Binder
                     (IsValueType(argument)
                         ? $"'{argument.Name}' holds a counted reference, so its bytes are not " +
                           "all there is to it"
-                        : $"'{argument.Name}' is a counted reference"));
+                        : $"'{argument.Name}' is a counted reference"),
+                    argument);
                 return;
 
             case ConstraintKind.NotNull:
@@ -641,7 +642,8 @@ public sealed partial class Binder
                 diagnostics.Error("SL0328", span,
                     $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
                     $"'{parameter}' is constrained to 'notnull', and a '{argument.Name}' may be " +
-                    "null");
+                    "null",
+                    argument);
                 return;
 
             case ConstraintKind.Class:
@@ -650,7 +652,8 @@ public sealed partial class Binder
                 diagnostics.Error("SL0328", span,
                     $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
                     $"'{parameter}' is constrained to 'class', and '{argument.Name}' is a " +
-                    $"{KindOf(argument)}: it is copied rather than referenced, and is never null");
+                    $"{KindOf(argument)}: it is copied rather than referenced, and is never null",
+                    argument);
                 return;
 
             case ConstraintKind.Struct:
@@ -659,7 +662,8 @@ public sealed partial class Binder
                 diagnostics.Error("SL0328", span,
                     $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
                     $"'{parameter}' is constrained to 'struct', and '{argument.Name}' is a " +
-                    $"{KindOf(argument)}: it is a counted reference and may be null");
+                    $"{KindOf(argument)}: it is a counted reference and may be null",
+                    argument);
                 return;
 
             case ConstraintKind.Threadsafe:
@@ -669,7 +673,8 @@ public sealed partial class Binder
                     $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
                     $"'{parameter}' is constrained to 'threadsafe', and nothing about " +
                     $"'{argument.Name}' says how two threads may hold it. Declare it " +
-                    "'threadsafe' if it synchronizes itself, or pass a 'Mutex<T>' of it");
+                    "'threadsafe' if it synchronizes itself, or pass a 'Mutex<T>' of it",
+                    argument);
                 return;
 
             case ConstraintKind.New:
@@ -683,7 +688,8 @@ public sealed partial class Binder
                         $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
                         $"'{parameter}' is constrained to 'new()', and '{argument.Name}' has " +
                         $"required members, which 'new {parameter}()' has no way to set: " +
-                        $"{Listed(RequiredMembers(made))}");
+                        $"{Listed(RequiredMembers(made))}",
+                        argument);
                     return;
                 }
 
@@ -700,7 +706,8 @@ public sealed partial class Binder
                             $"'{argument.Name}' has no public constructor taking no arguments",
                         _ => $"'{argument.Name}' is a {KindOf(argument)}: 'new' allocates, and " +
                              "only a class is allocated",
-                    });
+                    },
+                    argument);
                 return;
         }
 
@@ -720,7 +727,8 @@ public sealed partial class Binder
                 (argument is ClassTypeSymbol implementer && implementer.Interfaces.Count > 0
                     ? "; it implements " +
                       string.Join(", ", implementer.Interfaces.Select(i => "'" + i.Name + "'"))
-                    : ""));
+                    : ""),
+                argument, contract);
             return;
         }
 
@@ -735,7 +743,8 @@ public sealed partial class Binder
 
             diagnostics.Error("SL0328", span,
                 $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because it " +
-                $"does not derive from '{baseClass.Name}'");
+                $"does not derive from '{baseClass.Name}'",
+                argument, baseClass);
             return;
         }
 
@@ -750,7 +759,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0329", constraint.Span,
                 $"'{required.Name}' cannot constrain '{parameter}': a constraint is an interface " +
                 "to implement, a class to derive from, 'class', 'struct' or 'new()', and " +
-                $"nothing derives from a {KindOf(required)}");
+                $"nothing derives from a {KindOf(required)}",
+                required);
 
     }
 

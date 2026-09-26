@@ -28,9 +28,15 @@ public enum PrimitiveKind
 /// A Stainless type. Layout follows the platform C rules exactly, which is the
 /// whole point of the ABI guarantee: a Stainless struct is a C struct.
 /// </summary>
-public abstract class TypeSymbol
+public abstract class TypeSymbol : Source.IDiagnosticSubject
 {
     public abstract string Name { get; }
+
+    /// <summary>
+    /// The error type, or a type built from it: what a name that did not
+    /// resolve became, which was reported where it happened.
+    /// </summary>
+    public virtual bool StandsForAnError => false;
 
     /// <summary>Size in bytes, or 0 for <c>void</c>.</summary>
     public abstract int Size { get; }
@@ -100,6 +106,7 @@ public sealed class ErrorTypeSymbol : TypeSymbol
     public static readonly ErrorTypeSymbol Instance = new();
     private ErrorTypeSymbol() { }
     public override string Name => Source.DiagnosticBag.ErrorTypeName;
+    public override bool StandsForAnError => true;
     public override int Size => 0;
     public override int Alignment => 1;
 }
@@ -191,6 +198,7 @@ public sealed class PointerTypeSymbol : TypeSymbol
 
     public TypeSymbol Element { get; }
     public override string Name => Element.Name + "*";
+    public override bool StandsForAnError => Element.StandsForAnError;
     public override int Size => TargetPlatform.Current.PointerWidth;
     public override int Alignment => TargetPlatform.Current.PointerWidth;
 }
@@ -220,6 +228,7 @@ public sealed class ArrayTypeSymbol : TypeSymbol
 
     public TypeSymbol Element { get; }
     public override string Name => Element.Name + "[]";
+    public override bool StandsForAnError => Element.StandsForAnError;
     public override int Size => TargetPlatform.Current.PointerWidth;
     public override int Alignment => TargetPlatform.Current.PointerWidth;
     public override bool IsManaged => true;
@@ -253,6 +262,7 @@ public sealed class FixedArrayTypeSymbol : TypeSymbol
     public int Length { get; }
 
     public override string Name => $"{Element.Name}[{Length}]";
+    public override bool StandsForAnError => Element.StandsForAnError;
 
     /// <summary>Every element, with no header and no padding between them.</summary>
     public override int Size => Element.Size * Length;
@@ -274,6 +284,7 @@ public sealed class OptionalTypeSymbol : TypeSymbol
 
     public TypeSymbol Element { get; }
     public override string Name => Element.Name + "?";
+    public override bool StandsForAnError => Element.StandsForAnError;
     public override int Size => TargetPlatform.Current.PointerWidth;
     public override int Alignment => TargetPlatform.Current.PointerWidth;
     public override bool IsManaged => true;
@@ -292,6 +303,7 @@ public sealed class WeakTypeSymbol : TypeSymbol
 
     public TypeSymbol Element { get; }
     public override string Name => "weak " + Element.Name + "?";
+    public override bool StandsForAnError => Element.StandsForAnError;
     public override int Size => TargetPlatform.Current.PointerWidth;
     public override int Alignment => TargetPlatform.Current.PointerWidth;
 }
@@ -638,6 +650,7 @@ public abstract class NamedTypeSymbol : TypeSymbol
         string.IsNullOrEmpty(ModuleName) ? SimpleName : ModuleName + "." + SimpleName;
 
     public override string Name => SimpleName;
+    public override bool StandsForAnError => TypeArguments.Any(a => a.StandsForAnError);
 
     internal bool LayoutComputed;
     private int _size;
@@ -1105,6 +1118,7 @@ public sealed class TupleTypeSymbol : StructTypeSymbol
     public static string FieldName(int index) => "Item" + (index + 1);
 
     public override string Name => "(" + string.Join(", ", Elements.Select(e => e.Name)) + ")";
+    public override bool StandsForAnError => Elements.Any(e => e.StandsForAnError);
 }
 
 public sealed class SliceTypeSymbol : StructTypeSymbol
@@ -1117,6 +1131,7 @@ public sealed class SliceTypeSymbol : StructTypeSymbol
     public const string LengthFieldName = "$length";
 
     public override string Name => Element.Name + "[:]";
+    public override bool StandsForAnError => Element.StandsForAnError;
 }
 
 /// <summary>

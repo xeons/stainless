@@ -270,7 +270,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0582", span,
                 $"'{type.Name}' cannot be 'threadsafe': the word says that operations on a " +
                 "type synchronize themselves, and this has none. A class, a struct or an " +
-                "interface may claim it");
+                "interface may claim it",
+                type);
             return;
         }
 
@@ -336,14 +337,16 @@ public sealed partial class Binder
                 "An incomplete type exists to be pointed at, and " +
                 (type is ClassTypeSymbol
                     ? "a class is already reached through a pointer this compiler has to lay out"
-                    : "this kind of type is nothing but its contents"));
+                    : "this kind of type is nothing but its contents"),
+                type);
             return;
         }
 
         if (declaration.TypeParameters.Count > 0)
         {
             diagnostics.Error("SL0523", declaration.Span,
-                $"'{type.Name}' has no body, so it has nothing for a type parameter to appear in");
+                $"'{type.Name}' has no body, so it has nothing for a type parameter to appear in",
+                type);
             return;
         }
 
@@ -376,7 +379,8 @@ public sealed partial class Binder
             else if (type is not ComInterfaceTypeSymbol)
                 diagnostics.Error("SL0528", declaration.Span,
                     $"'com' goes before 'interface' or 'class', and '{type.Name}' is neither; " +
-                    "a COM reference points at a vtable pointer, and only those two have one");
+                    "a COM reference points at a vtable pointer, and only those two have one",
+                    type);
         }
 
         if (type is not ClassTypeSymbol classType)
@@ -384,7 +388,8 @@ public sealed partial class Binder
             if (isAbstract || isSealed)
                 diagnostics.Error("SL0495", declaration.Span,
                     $"'{type.Name}' is not a class, so it cannot be " +
-                    $"'{(isAbstract ? "abstract" : "sealed")}'; only a class is derived from");
+                    $"'{(isAbstract ? "abstract" : "sealed")}'; only a class is derived from",
+                    type);
             return;
         }
 
@@ -392,7 +397,8 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0496", declaration.Span,
                 $"'{type.Name}' cannot be both 'abstract' and 'sealed': the first says it must " +
-                "be derived from and the second says it cannot be");
+                "be derived from and the second says it cannot be",
+                type);
             return;
         }
 

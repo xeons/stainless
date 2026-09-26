@@ -173,7 +173,8 @@ public sealed partial class Binder
                 $"'<{string.Join(", ", required.TypeArguments.Select(t => t.Name))}>': expected " +
                 $"'{required.ReturnType.Name} {required.Name}(" +
                 string.Join(", ", required.Parameters.Where(p => !p.IsThis).Select(Spelled)) +
-                ")'");
+                ")'",
+                classType, required.ContainingType, required.ReturnType);
 
         return found;
     }
@@ -200,7 +201,8 @@ public sealed partial class Binder
                 $"'{classType.Name}.{found.Name}' does not match what it overrides when both " +
                 $"are '<{string.Join(", ", root.TypeArguments.Select(t => t.Name))}>'; " +
                 $"expected '{root.ReturnType.Name} {root.Name}(" +
-                string.Join(", ", root.Parameters.Where(p => !p.IsThis).Select(Spelled)) + ")'");
+                string.Join(", ", root.Parameters.Where(p => !p.IsThis).Select(Spelled)) + ")'",
+                classType, root.ReturnType);
 
         return found;
     }
@@ -260,7 +262,8 @@ public sealed partial class Binder
             if (modifiers.HasFlag(Modifiers.Abstract) && !classType.IsAbstract)
                 diagnostics.Error("SL0505", template.Declaration.Span,
                     $"'{classType.Name}.{template.Name}' is abstract, so '{classType.Name}' " +
-                    "must be abstract too; a class with a method that has no body cannot be made");
+                    "must be abstract too; a class with a method that has no body cannot be made",
+                    classType);
 
             if (modifiers.HasFlag(Modifiers.Override))
             {
@@ -268,11 +271,13 @@ public sealed partial class Binder
                     diagnostics.Error("SL0499", template.Declaration.Span,
                         $"'{classType.Name}.{template.Name}' is marked 'override' and nothing " +
                         "it inherits is a generic method of that name, type parameters and " +
-                        "parameters");
+                        "parameters",
+                        classType);
                 else if (!inherited.IsDispatched)
                     diagnostics.Error("SL0500", template.Declaration.Span,
                         $"'{inherited.ContainingType!.Name}.{template.Name}' is not virtual, so " +
-                        "it cannot be overridden; mark it 'virtual' or 'abstract'");
+                        "it cannot be overridden; mark it 'virtual' or 'abstract'",
+                        inherited.ContainingType);
                 else
                     template.Overridden = inherited;
 
@@ -286,7 +291,8 @@ public sealed partial class Binder
                     (inherited.IsDispatched
                         ? "; write 'override' to replace it"
                         : ", which is not virtual; rename one of them, or mark the inherited " +
-                          "one 'virtual' and this one 'override'"));
+                          "one 'virtual' and this one 'override'"),
+                    classType, inherited.ContainingType);
         }
 
         if (classType.IsAbstract) return;
@@ -305,7 +311,8 @@ public sealed partial class Binder
                     diagnostics.Error("SL0504", classType.Span ?? declaration.Span,
                         $"'{classType.Name}' does not implement abstract " +
                         $"'{owner.Name}.{missing.Name}'; add 'public override' with the same " +
-                        "type parameters and parameters");
+                        "type parameters and parameters",
+                        classType, owner);
             }
     }
 
@@ -335,14 +342,16 @@ public sealed partial class Binder
                     $"{required.Parameters.Count} type parameter" +
                     (required.Parameters.Count == 1 ? "" : "s") +
                     $" and {required.Declaration.Parameters.Count} parameter" +
-                    (required.Declaration.Parameters.Count == 1 ? "" : "s"));
+                    (required.Declaration.Parameters.Count == 1 ? "" : "s"),
+                    classType, interfaceType);
                 continue;
             }
 
             if (!found.IsPublic)
                 diagnostics.Error("SL0306", found.Declaration.Span,
                     $"'{classType.Name}.{found.Name}' implements " +
-                    $"'{interfaceType.Name}.{required.Name}' and must therefore be public");
+                    $"'{interfaceType.Name}.{required.Name}' and must therefore be public",
+                    classType, interfaceType);
         }
     }
 }

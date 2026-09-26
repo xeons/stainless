@@ -115,7 +115,8 @@ public sealed partial class Binder
         bool returnsInt = entry.ReturnType is PrimitiveTypeSymbol { Kind: PrimitiveKind.Int };
         if (!returnsInt && !entry.ReturnType.IsVoid())
             diagnostics.Error("SL0281", entry.Span,
-                $"'Main' must return 'int' or 'void', not '{entry.ReturnType.Name}'");
+                $"'Main' must return 'int' or 'void', not '{entry.ReturnType.Name}'",
+                entry.ReturnType);
 
         // `Main()` or `Main(String[] args)`, and nothing else. The second is
         // how a program reads its command line; the name of the parameter is

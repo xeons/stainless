@@ -334,7 +334,8 @@ public sealed partial class Binder
         {
             diagnostics.Warning("SL0744", where,
                 "'@failure' names the error it is about, as in " +
-                $"'@failure {declared.Name}.Something what went wrong'");
+                $"'@failure {declared.Name}.Something what went wrong'",
+                declared);
             return;
         }
 
@@ -348,7 +349,8 @@ public sealed partial class Binder
 
         if (!cases.Contains(cased))
             diagnostics.Warning("SL0744", where,
-                $"'{declared.Name}' has no case named '{cased}'{Among(cases)}");
+                $"'{declared.Name}' has no case named '{cased}'{Among(cases)}",
+                declared);
     }
 
     private void CheckCref(DocTag tag, SourceSpan where)

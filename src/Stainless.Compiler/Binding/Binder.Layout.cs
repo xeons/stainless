@@ -236,7 +236,8 @@ public sealed partial class Binder
                 $"'{type.Name}' is '[Packed]' and has bit-fields, and the two together mean " +
                 "different things to different C compilers -- gcc packs the bits and MSVC keeps " +
                 "the storage unit. Until one of them is chosen and checked against it, this is " +
-                "refused rather than guessed");
+                "refused rather than guessed",
+                type);
 
         foreach (var field in type.Fields)
             LayOutStoredStruct(field, inProgress);

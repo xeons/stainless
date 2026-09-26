@@ -86,7 +86,8 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0778", syntax.Operand.Span,
                 $"'..' spreads the elements of an array, a slice or anything with a " +
-                $"'GetEnumerator()', and '{source.Type.Name}' is none of those");
+                $"'GetEnumerator()', and '{source.Type.Name}' is none of those",
+                source.Type);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -214,7 +215,8 @@ public sealed partial class Binder
 
         diagnostics.Error("SL0546", span,
             $"'{target.Name}' is not an array, a slice, or a class with 'Add', so an array " +
-            "literal cannot become one");
+            "literal cannot become one",
+            target);
         return new BoundErrorExpression(span);
     }
 
@@ -230,7 +232,8 @@ public sealed partial class Binder
             {
                 diagnostics.Error("SL0779", unmeasured.Span,
                     $"'{wanted.Name}' holds exactly {Counted(wanted.Length, "element")}, and this " +
-                    $"'..' has no length until it runs; only an inline array's is known here");
+                    $"'..' has no length until it runs; only an inline array's is known here",
+                    wanted);
                 return new BoundErrorExpression(span);
             }
 
@@ -240,7 +243,8 @@ public sealed partial class Binder
                     $"'{wanted.Name}' holds exactly {wanted.Length} " +
                     $"element{(wanted.Length == 1 ? "" : "s")}, and this literal has " +
                     $"{written}; an inline array is its elements, so there is " +
-                    "nowhere to keep a different number of them");
+                    "nowhere to keep a different number of them",
+                    wanted);
                 return new BoundErrorExpression(span);
             }
         }
@@ -328,7 +332,8 @@ public sealed partial class Binder
                     ? $"'{collection.Name}' has no 'Add' taking one element, so there is nothing " +
                       "for an array literal's elements to be added with"
                     : $"'{collection.Name}' has no constructor taking nothing, so there is " +
-                      "nothing for an array literal to start from");
+                      "nothing for an array literal to start from",
+                collection);
             return new BoundErrorExpression(span);
         }
 
@@ -422,7 +427,8 @@ public sealed partial class Binder
             {
                 diagnostics.Error("SL0778", spread.Span,
                     $"this '..' yields '{spread.Type.Name}', which does not convert to " +
-                    $"'{element.Name}', the element type here");
+                    $"'{element.Name}', the element type here",
+                    spread.Type, element);
                 failed = true;
                 continue;
             }
@@ -554,7 +560,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0549", next.Span,
                 $"this element is '{next.Type.Name}' and the ones before it are " +
                 $"'{element.Name}'; an array holds one type, so either make them agree " +
-                "or give the array a type of its own");
+                "or give the array a type of its own",
+                next.Type, element);
             return new BoundErrorExpression(draft.Span);
         }
 

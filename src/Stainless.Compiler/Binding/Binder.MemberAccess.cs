@@ -83,7 +83,8 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0604", span,
                 $"'{receiver.Type.Name}' cannot be nothing, so '{asking}' has no question to ask; " +
-                $"write {plain} instead");
+                $"write {plain} instead",
+                receiver.Type);
             return new BoundErrorExpression(span);
         }
 
@@ -134,7 +135,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0605", span,
                 $"{reached} is '{value.Type.Name}', which has no null to stand for the " +
                 "receiver having been nothing. Say what it is instead, with '?? something' " +
-                "after it, or ask with an 'if'");
+                "after it, or ask with an 'if'",
+                value.Type);
             return new BoundErrorExpression(span);
         }
 
@@ -167,7 +169,8 @@ public sealed partial class Binder
         if (left.Type is not (OptionalTypeSymbol or PointerTypeSymbol))
         {
             diagnostics.Error("SL0604", syntax.Left.Span,
-                $"'{left.Type.Name}' cannot be nothing, so '??' has nothing to fall back from");
+                $"'{left.Type.Name}' cannot be nothing, so '??' has nothing to fall back from",
+                left.Type);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -231,7 +234,8 @@ public sealed partial class Binder
             {
                 diagnostics.Error("SL0435", syntax.Span,
                     $"variant '{variantType.Name}' has no case named '{syntax.Member}'; it has " +
-                    Listed(variantType.Cases.Select(c => c.Name)));
+                    Listed(variantType.Cases.Select(c => c.Name)),
+                    variantType);
                 return new BoundErrorExpression(syntax.Span);
             }
 
@@ -297,7 +301,8 @@ public sealed partial class Binder
             {
                 diagnostics.Error("SL0576", syntax.Span,
                     $"'{staticOwner.Name}.{syntax.Member}' is not static, so it needs an " +
-                    "object to be reached through; name one instead of the type");
+                    "object to be reached through; name one instead of the type",
+                    staticOwner);
                 return new BoundErrorExpression(syntax.Span);
             }
         }
@@ -309,7 +314,8 @@ public sealed partial class Binder
                 return new BoundLiteral(syntax.Span, enumType, member.Value);
 
             diagnostics.Error("SL0355", syntax.Span,
-                $"enum '{enumType.Name}' has no member named '{syntax.Member}'");
+                $"enum '{enumType.Name}' has no member named '{syntax.Member}'",
+                enumType);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -318,7 +324,8 @@ public sealed partial class Binder
         if (!syntax.ThroughPointer && ConstructedTypeNamed(syntax.Target) is { } constructed)
         {
             diagnostics.Error("SL0247", syntax.Span,
-                $"'{constructed.Name}' has no static member named '{syntax.Member}'");
+                $"'{constructed.Name}' has no static member named '{syntax.Member}'",
+                constructed);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -353,7 +360,8 @@ public sealed partial class Binder
 
             diagnostics.Error("SL0313", syntax.Span,
                 $"'{inline.Name}' has no member named '{syntax.Member}'; " +
-                "an inline array has only 'Length', and is indexed");
+                "an inline array has only 'Length', and is indexed",
+                inline);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -368,7 +376,8 @@ public sealed partial class Binder
                 $"'{receiver.Type.Name}' has no member named '{syntax.Member}'; " +
                 (receiver.Type is SliceTypeSymbol
                     ? "a slice has only 'Length', and is indexed and sliced further"
-                    : "an array has only 'Length'"));
+                    : "an array has only 'Length'"),
+                receiver.Type);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -379,7 +388,8 @@ public sealed partial class Binder
         if (receiver.Type is not NamedTypeSymbol && receiver.Type.AsClass() is null)
         {
             diagnostics.Error("SL0247", syntax.Span,
-                $"'{receiver.Type.Name}' has no member named '{syntax.Member}'");
+                $"'{receiver.Type.Name}' has no member named '{syntax.Member}'",
+                receiver.Type);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -394,7 +404,8 @@ public sealed partial class Binder
                 diagnostics.Error("SL0248", syntax.Span,
                     $"'{receiver.Type.Name}' may already have died, so checking it against " +
                     $"null would prove nothing about the moment after; read it into a " +
-                    $"'{weakReceiver.Element.Name}?' first, and check that");
+                    $"'{weakReceiver.Element.Name}?' first, and check that",
+                    receiver.Type, weakReceiver.Element);
 
             // A check can only be about a name. Narrowing a field would prove
             // something about one evaluation and let it be read from another,
@@ -404,12 +415,14 @@ public sealed partial class Binder
                     $"'{receiver.Type.Name}' may be null, and this is not something a check " +
                     "can be about: a field or a call result may be a different value by the " +
                     $"time it is read. Put it in a local, check that against null, and reach " +
-                    $"'{syntax.Member}' through it");
+                    $"'{syntax.Member}' through it",
+                    receiver.Type);
 
             else
                 diagnostics.Error("SL0248", syntax.Span,
                     $"'{receiver.Type.Name}' may be null; check it against null before " +
-                    $"accessing '{syntax.Member}'");
+                    $"accessing '{syntax.Member}'",
+                    receiver.Type);
 
             return new BoundErrorExpression(syntax.Span);
         }
@@ -461,7 +474,8 @@ public sealed partial class Binder
                 };
 
             diagnostics.Error("SL0250", syntax.Span,
-                $"'{namedType.Name}.{syntax.Member}' is a method; call it with '()'");
+                $"'{namedType.Name}.{syntax.Member}' is a method; call it with '()'",
+                namedType);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -473,12 +487,14 @@ public sealed partial class Binder
                 $"'{namedType.Name}.{syntax.Member}' is an event, and an event has no value to " +
                 "read: what it holds is a list of subscribers, and only " +
                 $"'{subscribed.ContainingType.Name}' can see it. Subscribe with '+=' and " +
-                "unsubscribe with '-='");
+                "unsubscribe with '-='",
+                namedType, subscribed.ContainingType);
             return new BoundErrorExpression(syntax.Span);
         }
 
         diagnostics.Error("SL0247", syntax.Span,
-            $"'{namedType.Name}' has no member named '{syntax.Member}'");
+            $"'{namedType.Name}' has no member named '{syntax.Member}'",
+            namedType);
         return new BoundErrorExpression(syntax.Span);
     }
 
@@ -505,7 +521,8 @@ public sealed partial class Binder
                 ? $"'{pointed.Name}' points at '{pointed.Element.Name}', which has no members, " +
                   $"so '->{syntax.Member}' reaches nothing"
                 : $"'{receiver.Type.Name}' is not a pointer, so '->' does not apply to it; " +
-                  $"write '.{syntax.Member}'");
+                  $"write '.{syntax.Member}'",
+            receiver.Type);
 
         return null;
     }
@@ -552,7 +569,8 @@ public sealed partial class Binder
                 diagnostics.Error("SL0492", span,
                     $"'{member}' is ambiguous: {Counted(found.Count, "nameless member")} " +
                     $"of '{type.Name}' declare{(found.Count == 1 ? "s" : "")} it. Give one of " +
-                    "them a name, so that the one you mean can be said");
+                    "them a name, so that the one you mean can be said",
+                    type);
                 return new BoundErrorExpression(span);
             }
 
@@ -697,7 +715,8 @@ public sealed partial class Binder
         if (target is not VariantTypeSymbol variant)
         {
             diagnostics.Error("SL0413", span,
-                $"'{draft.Case}' names a variant's case, but '{target.Name}' is expected here");
+                $"'{draft.Case}' names a variant's case, but '{target.Name}' is expected here",
+                target);
             return new BoundErrorExpression(span);
         }
 
@@ -705,7 +724,8 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0435", span,
                 $"'{variant.Name}' has no case named '{draft.Case}'; it has " +
-                Listed(variant.Cases.Select(c => c.Name)));
+                Listed(variant.Cases.Select(c => c.Name)),
+                variant);
             return new BoundErrorExpression(span);
         }
 
@@ -726,7 +746,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0289", span,
                 $"'{variant.Name}.{variantCase.Name}' carries {Counted(fields.Count, "field")}, " +
                 $"but {Given(arguments.Count)}; " +
-                $"it is written '{variantCase.Signature}'");
+                $"it is written '{variantCase.Signature}'",
+                [variant, .. fields.Select(f => f.Type)]);
             return new BoundErrorExpression(span);
         }
 
@@ -764,13 +785,15 @@ public sealed partial class Binder
             if (variant.FindMethod(syntax.Member) is not null)
             {
                 diagnostics.Error("SL0250", syntax.Span,
-                    $"'{variant.Name}.{syntax.Member}' is a method; call it with '()'");
+                    $"'{variant.Name}.{syntax.Member}' is a method; call it with '()'",
+                    variant);
                 return new BoundErrorExpression(syntax.Span);
             }
 
             diagnostics.Error("SL0247", syntax.Span,
                 $"'{variant.Name}' has no case or field named '{syntax.Member}'; its cases are " +
-                Listed(variant.Cases.Select(c => c.Signature)));
+                Listed(variant.Cases.Select(c => c.Signature)),
+                variant);
             return new BoundErrorExpression(syntax.Span);
         }
 

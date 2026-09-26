@@ -127,7 +127,8 @@ public sealed partial class Binder
 
         if (!function.ReturnType.IsVoid() && !function.ReturnType.IsError() && EndIsReachable(body))
             diagnostics.Error("SL0217", function.Span,
-                $"not all paths through '{function.Name}' return a value of type '{function.ReturnType.Name}'");
+                $"not all paths through '{function.Name}' return a value of type '{function.ReturnType.Name}'",
+                function.ReturnType);
 
         CheckOutParametersAssigned(function, body);
 
@@ -157,7 +158,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0517", constructor.Span,
                 $"'{NearestConstructing(classType)!.Name}' has no constructor that takes no " +
                 $"arguments, so '{classType.Name}' has to say which one to run: write " +
-                "'base(...)' as the first statement of its constructor");
+                "'base(...)' as the first statement of its constructor",
+                classType);
             return body;
         }
 
@@ -271,14 +273,16 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0515", syntax.Span,
                 $"'{_context.Function.ContainingType!.Name}' is a struct, so there is nothing " +
-                "above it to construct; only a class derives from another");
+                "above it to construct; only a class derives from another",
+                _context.Function.ContainingType);
             return new BoundErrorExpression(syntax.Span);
         }
 
         if (classType.BaseClass is not { } baseClass)
         {
             diagnostics.Error("SL0515", syntax.Span,
-                $"'{classType.Name}' derives from nothing, so it has no base to construct");
+                $"'{classType.Name}' derives from nothing, so it has no base to construct",
+                classType);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -288,7 +292,8 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0517", syntax.Span,
                 $"nothing '{classType.Name}' derives from declares a constructor, so there is " +
-                "none to call; remove the 'base(...)'");
+                "none to call; remove the 'base(...)'",
+                classType);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -334,7 +339,8 @@ public sealed partial class Binder
         if (chosen == _context.Function)
         {
             diagnostics.Error("SL0521", syntax.Span,
-                $"this constructor of '{owner.Name}' delegates to itself");
+                $"this constructor of '{owner.Name}' delegates to itself",
+                owner);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -373,7 +379,8 @@ public sealed partial class Binder
 
                 diagnostics.Error("SL0521", start.Span,
                     $"the constructors of '{start.ContainingType!.Name}' delegate to each other " +
-                    "in a ring, so none of them ever builds anything");
+                    "in a ring, so none of them ever builds anything",
+                    start.ContainingType);
                 break;
             }
         }
@@ -2001,7 +2008,8 @@ public sealed partial class Binder
                     : type is StructTypeSymbol
                         ? "; a struct is several values, so pass its address, or one field " +
                           "per register"
-                        : ""));
+                        : ""),
+                type);
             return false;
         }
 
@@ -2013,7 +2021,8 @@ public sealed partial class Binder
                       $"'float' or a 'double', and this is '{type.Name}'"
                     : $"'{register.Name}' is an integer register, and '{type.Name}' belongs " +
                       "in a vector register; its bits would have to be converted to be " +
-                      "anything here, so convert them before the block");
+                      "anything here, so convert them before the block",
+                type);
             return false;
         }
 
@@ -2028,7 +2037,8 @@ public sealed partial class Binder
             "the value would not fit; name the wider register" +
             (type is PrimitiveTypeSymbol { Kind: PrimitiveKind.Double }
                 ? ", or write the literal with 'f' if it was meant to be a 'float'"
-                : ", or narrow the value with a cast first"));
+                : ", or narrow the value with a cast first"),
+            type);
         return false;
     }
 
@@ -2184,7 +2194,8 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0356", syntax.Collection.Span,
                 $"'{sequence.Type.Name}' cannot be iterated; it is not an array and has no " +
-                "'GetEnumerator()' method taking no arguments");
+                "'GetEnumerator()' method taking no arguments",
+                sequence.Type);
             return null;
         }
 
@@ -2207,7 +2218,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0357", syntax.Collection.Span,
                 $"'{sequence.Type.Name}.GetEnumerator()' returns '{getEnumerator.ReturnType.Name}', " +
                 "which is not an enumerator; that needs a 'bool MoveNext()' and a 'Current' " +
-                "returning the element");
+                "returning the element",
+                sequence.Type, getEnumerator.ReturnType);
             return null;
         }
 
@@ -2363,7 +2375,8 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0368", syntax.Span,
                 $"'{spawned.Function.Name}' returns '{spawned.Type.Name}', which needs a " +
-                $"conversion to '{target.Type.Name}'; assign it after the 'parallel' block instead");
+                $"conversion to '{target.Type.Name}'; assign it after the 'parallel' block instead",
+                spawned.Type, target.Type);
             return new BoundBlock(syntax.Span, []);
         }
 
@@ -2547,7 +2560,8 @@ public sealed partial class Binder
                 diagnostics.Error("SL0375", argument.Span,
                     $"a spawned call borrows its arguments, so this '{argument.Type.Name}' must be " +
                     "held in a variable or field first; a temporary is destroyed at the end of " +
-                    "this statement, before the job runs");
+                    "this statement, before the job runs",
+                    argument.Type);
                 ok = false;
                 continue;
             }

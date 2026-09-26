@@ -527,7 +527,8 @@ public sealed partial class Binder
 
         diagnostics.Error("SL0382", span,
             $"a lambda becomes a delegate or an interface with exactly one method, " +
-            $"and '{target.Name}' is neither");
+            $"and '{target.Name}' is neither",
+            target);
         return new BoundErrorExpression(span);
     }
 
@@ -858,7 +859,8 @@ public sealed partial class Binder
             {
                 diagnostics.Error("SL0765", syntax.ReturnType.Span,
                     $"this lambda returns '{written.Name}', and '{target}' returns " +
-                    $"'{returns.Name}'; a result written out is not converted");
+                    $"'{returns.Name}'; a result written out is not converted",
+                    written, returns);
                 return false;
             }
         }
@@ -1117,7 +1119,8 @@ public sealed partial class Binder
                 if (!written.IsError() && !written.Equals(type))
                     diagnostics.Error("SL0384", declared.Span,
                         $"parameter '{declared.Name}' is '{written.Name}', but the target " +
-                        $"expects '{type.Name}'");
+                        $"expects '{type.Name}'",
+                        written, type);
             }
 
             symbol.Parameters.Add(new ParameterSymbol(names[i], type, symbol.Parameters.Count));
@@ -1171,7 +1174,8 @@ public sealed partial class Binder
 
         if (!symbol.ReturnType.IsVoid() && EndIsReachable(body))
             diagnostics.Error("SL0217", syntax.Span,
-                $"not all paths through this lambda return a value of type '{symbol.ReturnType.Name}'");
+                $"not all paths through this lambda return a value of type '{symbol.ReturnType.Name}'",
+                symbol.ReturnType);
 
         return body;
     }
@@ -1201,7 +1205,8 @@ public sealed partial class Binder
         foreach (var binding in syntax.Sections.SelectMany(section => section.Bindings))
             diagnostics.Error("SL0438", binding.Span,
                 $"'case {binding.Case} {binding.Name}' matches a variant's case and binds what " +
-                $"it carries, and '{value.Type.Name}' is not a variant");
+                $"it carries, and '{value.Type.Name}' is not a variant",
+                value.Type);
 
         bool onText = _builtins.IsString(value.Type);
         bool onOrdinal = value.Type is PrimitiveTypeSymbol { IsInteger: true } or EnumTypeSymbol
@@ -1211,7 +1216,8 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0403", syntax.Value.Span,
                 $"'{value.Type.Name}' cannot be switched on; a switch needs a value with " +
-                "constant labels, so it takes an integer, 'char', 'bool', an enum or a String");
+                "constant labels, so it takes an integer, 'char', 'bool', an enum or a String",
+                value.Type);
             return new BoundBlock(syntax.Span, []);
         }
 
@@ -1269,7 +1275,8 @@ public sealed partial class Binder
                 {
                     diagnostics.Error("SL0404", label.Span,
                         $"a 'case' label must be a constant of type '{value.Type.Name}', " +
-                        "and this is not one");
+                        "and this is not one",
+                        value.Type);
                     continue;
                 }
 
@@ -1383,7 +1390,8 @@ public sealed partial class Binder
 
                 diagnostics.Error("SL0404", label.Span,
                     $"a 'case' label in a switch over '{variant.Name}' names one of its cases; " +
-                    "they are " + Listed(variant.Cases.Select(c => c.Name)));
+                    "they are " + Listed(variant.Cases.Select(c => c.Name)),
+                    variant);
             }
 
             foreach (var declared in section.Bindings)
@@ -1392,7 +1400,8 @@ public sealed partial class Binder
                 {
                     diagnostics.Error("SL0435", declared.Span,
                         $"variant '{variant.Name}' has no case named '{declared.Case}'; it has " +
-                        Listed(variant.Cases.Select(c => c.Name)));
+                        Listed(variant.Cases.Select(c => c.Name)),
+                        variant);
                     continue;
                 }
 
@@ -1484,7 +1493,8 @@ public sealed partial class Binder
                 $"this switch over '{variant.Name}' does not cover " +
                 Listed(missing.Select(c => "'" + c.Name + "'")) +
                 "; a variant is the choice between its cases, so a switch that leaves one out " +
-                "has no answer for it. Add the case, or a 'default'");
+                "has no answer for it. Add the case, or a 'default'",
+                variant);
 
         BoundStatement result = new BoundSwitch(syntax.Span, value, sections)
         {
@@ -1537,7 +1547,8 @@ public sealed partial class Binder
         {
             if (!expected.IsVoid())
                 diagnostics.Error("SL0223", syntax.Span,
-                    $"this function must return a value of type '{expected.Name}'");
+                    $"this function must return a value of type '{expected.Name}'",
+                    expected);
             return new BoundReturn(syntax.Span, null);
         }
 
@@ -1573,7 +1584,8 @@ public sealed partial class Binder
         if (!condition.Type.IsBool() && !condition.Type.IsError())
             diagnostics.Error("SL0227", syntax.Span,
                 $"a condition must be 'bool', but this is '{condition.Type.Name}'; " +
-                "Stainless has no implicit conversion to 'bool'");
+                "Stainless has no implicit conversion to 'bool'",
+                condition.Type);
         return condition;
     }
 }

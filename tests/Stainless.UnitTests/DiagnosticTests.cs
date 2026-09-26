@@ -221,17 +221,66 @@ public partial class DiagnosticTests
     }
 
     /// <summary>
-    /// But an error type with nothing before it to explain it is a compiler bug,
-    /// and hiding the only sign of that would be worse than the noise.
+    /// A message that names the error type is a place that forgot to ask
+    /// <c>IsError()</c> of what it is about, and a debug build stops there
+    /// rather than print the compiler's name for nothing.
     /// </summary>
     [Fact]
-    public void AnErrorTypeWithNoCauseIsStillReported()
+    public void NamingTheErrorTypeIsACompilerBug()
     {
         var bag = new DiagnosticBag();
-        bag.Error("SL0262", default, $"expects '{DiagnosticBag.ErrorTypeName}'");
-        bag.Error("SL0262", default, $"expects '{DiagnosticBag.ErrorTypeName}' again");
+        Assert.Throws<InternalCompilerError>(
+            () => bag.Error("SL0262", default, $"expects '{DiagnosticBag.ErrorTypeName}'"));
+    }
 
-        Assert.Single(bag.Items);
+    /// <summary>
+    /// Every case that must fail says only what is wrong: no message in it
+    /// names the error type, which is what a consequence of an earlier error
+    /// looks like when the place reporting it did not check.
+    /// </summary>
+    [Fact]
+    public void NoFailingCaseNamesTheErrorType()
+    {
+        string cases = Path.Combine(Repository.Root, "tests", "cases");
+        var failing = Directory.EnumerateDirectories(cases)
+            .Where(d => File.Exists(Path.Combine(d, "errors.txt")))
+            .Where(d => !Directory.Exists(Path.Combine(d, "library")))
+            .Order(StringComparer.Ordinal)
+            .ToList();
+
+        var named = new System.Collections.Concurrent.ConcurrentBag<string>();
+
+        Parallel.ForEach(failing, directory =>
+        {
+            string output = Path.Combine(Path.GetTempPath(), "stainless-error-type", Path.GetFileName(directory));
+            string defines = Path.Combine(directory, "defines.txt");
+            string target = Path.Combine(directory, "target.txt");
+
+            Driver.CompilationResult result;
+            try
+            {
+                result = new Driver.Compilation().Compile(new Driver.CompilationOptions
+                {
+                    SourcePaths = Directory.EnumerateFiles(directory, "*.sl").Order(StringComparer.Ordinal).ToList(),
+                    OutputPath = output + ".ll",
+                    IntermediateDirectory = output,
+                    EmitIrOnly = true,
+                    Defines = File.Exists(defines) ? File.ReadAllLines(defines).Where(l => l.Length > 0).ToList() : [],
+                    Target = File.Exists(target) ? Binding.TargetPlatform.Parse(File.ReadAllText(target).Trim()) : null,
+                });
+            }
+            catch (InternalCompilerError error)
+            {
+                named.Add($"{Path.GetFileName(directory)}: {error.Message}");
+                return;
+            }
+
+            foreach (var diagnostic in result.Diagnostics)
+                if (diagnostic.Message.Contains(DiagnosticBag.ErrorTypeName, StringComparison.Ordinal))
+                    named.Add($"{Path.GetFileName(directory)}: {diagnostic.Message}");
+        });
+
+        Assert.Empty(named.Order(StringComparer.Ordinal));
     }
 
     [Fact]

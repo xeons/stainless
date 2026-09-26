@@ -67,7 +67,8 @@ public sealed partial class Binder
                     $"parameter of the primary constructor of '{type.Name}', and a member body " +
                     "names it, so it would have to be kept after the constructor returns; what " +
                     "it refers to is the caller's and lives no longer than the call. Pass it " +
-                    "by value");
+                    "by value",
+                    type);
                 _refusedCaptures.Add((type, parameter.Name));
                 continue;
             }
@@ -189,7 +190,8 @@ public sealed partial class Binder
 
         diagnostics.Error("SL0785", constructor.Span,
             $"'{constructor.ContainingType.Name}' has a primary constructor, so every other " +
-            "constructor has to run it first: write ': this(...)' after the parameters");
+            "constructor has to run it first: write ': this(...)' after the parameters",
+            constructor.ContainingType);
     }
 
     /// <summary>
@@ -235,7 +237,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0576", span,
                 $"'{name}' is a parameter of the primary constructor of " +
                 $"'{owner.Name}', kept by each instance, and " +
-                $"'{_context.Function.Name}' is static, so there is no instance here");
+                $"'{_context.Function.Name}' is static, so there is no instance here",
+                owner);
             return new BoundErrorExpression(span);
         }
 

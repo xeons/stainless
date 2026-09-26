@@ -183,6 +183,20 @@ public class BinderTests
     public void ARedeclarationUnderlinesTheSecond() =>
         Assert.Equal(("SL0218", "int x = 2;"), One("int x = 1; int x = 2;"));
 
+    /// <summary>
+    /// Two constructors of one signature are one symbol, and were both emitted
+    /// under it. Constructors overload by their parameters, as methods do.
+    /// </summary>
+    [Theory]
+    [InlineData("public class C { public C() { } public C() { } }")]
+    [InlineData("public struct S { public S(int a) { } public S(int b) { } }")]
+    public void TwoConstructorsOfOneSignatureAreRefused(string declarations) =>
+        Assert.Equal(["SL0211"], Front.ModuleCodes(declarations));
+
+    [Fact]
+    public void AConstructorOverloadedByItsParametersIsFine() =>
+        Assert.Empty(Front.ModuleCodes("public class C { public C() { } public C(int a) { } }"));
+
     [Fact]
     public void ANonBooleanConditionUnderlinesTheCondition() =>
         Assert.Equal(("SL0227", "1"), One("if (1) { }"));

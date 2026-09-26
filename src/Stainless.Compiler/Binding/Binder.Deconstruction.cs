@@ -553,7 +553,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0608", value.Span,
                 $"'{value.Type.Name}' is not a tuple and has no 'Deconstruct' with " +
                 $"{Counted(arity, "'out' parameter")}, so it cannot be taken apart " +
-                $"into {arity}");
+                $"into {arity}",
+                value.Type);
             return null;
         }
 

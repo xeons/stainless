@@ -65,7 +65,8 @@ public sealed partial class Binder
             {
                 diagnostics.Error("SL0435", named.Span,
                     $"variant '{prefix.Name}' has no case named '{named.Member}'; it has " +
-                    Listed(prefix.Cases.Select(c => c.Name)));
+                    Listed(prefix.Cases.Select(c => c.Name)),
+                    prefix);
                 return new BoundErrorExpression(syntax.Span);
             }
 
@@ -185,7 +186,8 @@ public sealed partial class Binder
                         $"'{callee.Name.Text}' is an instance method of " +
                         $"'{enclosingStatic.ContainingType!.Name}', and '{enclosingStatic.Name}' " +
                         "is static, so there is no object to call it on. Take one as a " +
-                        "parameter, or make this a method");
+                        "parameter, or make this a method",
+                        enclosingStatic.ContainingType);
                     return new BoundErrorExpression(syntax.Span);
                 }
             }
@@ -253,7 +255,8 @@ public sealed partial class Binder
                     diagnostics.Error("SL0554", callee.Span,
                         $"'{raised.Name}' is declared by '{raised.ContainingType.Name}', and only " +
                         "the type that declares an event may raise it. A derived class raises " +
-                        "one through a protected method its base provides for that");
+                        "one through a protected method its base provides for that",
+                        raised.ContainingType);
                     return new BoundErrorExpression(syntax.Span);
                 }
 
@@ -288,7 +291,8 @@ public sealed partial class Binder
 
         diagnostics.Error("SL0253", syntax.Span,
             $"this expression is not callable: it is '{produced.Type.Name}', and only a " +
-            "delegate or a closure is called through");
+            "delegate or a closure is called through",
+            produced.Type);
         return new BoundErrorExpression(syntax.Span);
     }
 
@@ -331,7 +335,8 @@ public sealed partial class Binder
 
             diagnostics.Error("SL0576", callee.Span,
                 $"'{name}' is an instance method of '{enclosing.Name}', and there is no object " +
-                "here to call it on");
+                "here to call it on",
+                enclosing);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -822,7 +827,8 @@ public sealed partial class Binder
             if (!templates[0].IsPublic && type.ModuleName != _currentModule!.Name)
             {
                 diagnostics.Error("SL0257", member.Span,
-                    $"'{type.Name}.{member.Member}' is not public");
+                    $"'{type.Name}.{member.Member}' is not public",
+                    type);
                 return new BoundErrorExpression(syntax.Span);
             }
 
@@ -833,7 +839,8 @@ public sealed partial class Binder
             {
                 diagnostics.Error("SL0576", member.Span,
                     $"'{type.Name}.{member.Member}' is not static, so it needs an object to be " +
-                    "called on; name one instead of the type");
+                    "called on; name one instead of the type",
+                    type);
                 return new BoundErrorExpression(syntax.Span);
             }
 
@@ -849,7 +856,8 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0576", member.Span,
                 $"'{type.Name}.{member.Member}' is not static, so it needs an object to be " +
-                "called on; name one instead of the type");
+                "called on; name one instead of the type",
+                type);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -880,7 +888,8 @@ public sealed partial class Binder
         if (!member.ThroughPointer && ConstructedTypeNamed(member.Target) is { } constructed)
         {
             diagnostics.Error("SL0255", member.Span,
-                $"'{constructed.Name}' has no static method named '{member.Member}'");
+                $"'{constructed.Name}' has no static method named '{member.Member}'",
+                constructed);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -911,7 +920,8 @@ public sealed partial class Binder
         if (receiver.Type is OptionalTypeSymbol or WeakTypeSymbol)
         {
             diagnostics.Error("SL0254", member.Span,
-                $"'{receiver.Type.Name}' may be null; check it against null before calling '{member.Member}'");
+                $"'{receiver.Type.Name}' may be null; check it against null before calling '{member.Member}'",
+                receiver.Type);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -937,7 +947,8 @@ public sealed partial class Binder
 
             diagnostics.Error("SL0255", member.Span,
                 $"'{receiver.Type.Name}' has no method named '{member.Member}'" +
-                NoFreeFunctionEither(member.Member));
+                NoFreeFunctionEither(member.Member),
+                receiver.Type);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -1006,13 +1017,15 @@ public sealed partial class Binder
                     $"'{namedType.Name}.{member.Member}' is an event, and only " +
                     $"'{raised.ContainingType.Name}' may raise it -- from inside, by writing " +
                     $"'{member.Member}(...)'. From out here an event can only be subscribed to " +
-                    "with '+=' and unsubscribed from with '-='");
+                    "with '+=' and unsubscribed from with '-='",
+                    namedType, raised.ContainingType);
                 return new BoundErrorExpression(syntax.Span);
             }
 
             diagnostics.Error("SL0255", member.Span,
                 $"'{namedType.Name}' has no method named '{member.Member}'" +
-                NoFreeFunctionEither(member.Member));
+                NoFreeFunctionEither(member.Member),
+                namedType);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -1023,7 +1036,8 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0576", member.Span,
                 $"'{namedType.Name}.{member.Member}' is static, so it is called on the type " +
-                $"rather than on a value: write '{namedType.SimpleName}.{member.Member}(...)'");
+                $"rather than on a value: write '{namedType.SimpleName}.{member.Member}(...)'",
+                namedType);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -1043,7 +1057,8 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0398", member.Span,
                 $"'{member.Member}' is the {(method.ReturnType.IsVoid() ? "setter" : "getter")} of " +
-                $"property '{namedType.Name}.{accessed.Name}'; use the property itself");
+                $"property '{namedType.Name}.{accessed.Name}'; use the property itself",
+                namedType);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -1078,14 +1093,16 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0408", member.Span,
                 $"'{enumType.Name}' is a choice among alternatives, so it holds one value " +
-                "rather than a set of them; mark it '[Flags]' if its members are meant to combine");
+                "rather than a set of them; mark it '[Flags]' if its members are meant to combine",
+                enumType);
             return new BoundErrorExpression(syntax.Span);
         }
 
         if (arguments.Count != 1)
         {
             diagnostics.Error("SL0409", syntax.Span,
-                $"'HasFlag' takes one '{enumType.Name}', but {Given(arguments.Count)}");
+                $"'HasFlag' takes one '{enumType.Name}', but {Given(arguments.Count)}",
+                enumType);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -1094,7 +1111,8 @@ public sealed partial class Binder
         {
             if (!flag.Type.IsError())
                 diagnostics.Error("SL0409", syntax.Arguments[0].Span,
-                    $"'HasFlag' takes one '{enumType.Name}', but this is '{flag.Type.Name}'");
+                    $"'HasFlag' takes one '{enumType.Name}', but this is '{flag.Type.Name}'",
+                    enumType, flag.Type);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -1180,7 +1198,8 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0412", syntax.Span,
                 $"'{type.Name}.{member.Member}' takes {wanted} " +
-                $"argument{(wanted == 1 ? "" : "s")}, but {Given(arguments.Count)}");
+                $"argument{(wanted == 1 ? "" : "s")}, but {Given(arguments.Count)}",
+                type);
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -1481,7 +1500,8 @@ public sealed partial class Binder
 
         diagnostics.Error("SL0262", argument.Span,
             $"argument {index + 1} of '{name}' expects '{target.Name}', " +
-            $"but '{argument.Type.Name}' was given");
+            $"but '{argument.Type.Name}' was given",
+            target, argument.Type);
     }
 
     /// <summary>
@@ -1651,7 +1671,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0597", argument.Span,
                 $"argument {index + 1} of '{name}' is 'out {parameter.Type.Name} " +
                 $"{parameter.Name}', so the call must say so too: write 'out' before it, or " +
-                "'out var' to declare the variable right there");
+                "'out var' to declare the variable right there",
+                parameter.Type);
             return;
         }
 
@@ -1663,7 +1684,8 @@ public sealed partial class Binder
                     ? $"'ref {parameter.Type.Name} {parameter.Name}', which the caller has to " +
                       "have filled in already; write 'ref' rather than 'out'"
                     : $"'{parameter.Type.Name} {parameter.Name}', which is passed by value; " +
-                      "drop the 'out'"));
+                      "drop the 'out'"),
+                parameter.Type);
             return;
         }
 
@@ -1672,7 +1694,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0445", argument.Span,
                 $"argument {index + 1} of '{name}' is 'ref {parameter.Type.Name} " +
                 $"{parameter.Name}', so the call must say so too: write " +
-                "'ref' before it");
+                "'ref' before it",
+                parameter.Type);
             return;
         }
 
@@ -1684,7 +1707,8 @@ public sealed partial class Binder
                     ? $"'in {parameter.Type.Name} {parameter.Name}', which the callee promises " +
                       "not to write, so it is not passed with 'ref'"
                     : $"'{parameter.Type.Name} {parameter.Name}', which is passed by value; " +
-                      "drop the 'ref'"));
+                      "drop the 'ref'"),
+                parameter.Type);
             return;
         }
 
@@ -1698,7 +1722,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0447", argument.Span,
                 $"argument {index + 1} of '{name}' is '{word} {parameter.Type.Name}', and this " +
                 $"is '{actual.Type.Name}'. It is not converted, because the callee writes back " +
-                "through it and there would be nowhere for the result to go");
+                "through it and there would be nowhere for the result to go",
+                parameter.Type, actual.Type);
             return;
         }
 
