@@ -34,6 +34,7 @@
 module Forms.Platform.Win32;
 
 import Standard.Collections;
+import Standard.Text;
 import Forms.Drawing;
 import Forms.Platform;
 #if WINDOWS
@@ -556,9 +557,82 @@ public class TextEntryPeer : ControlPeer, ITextEntryPeer
         SetText(joined.ToText());
     }
 
-    public void CutToClipboard() => SendMessageW(Window, WmCut, 0u, 0);
-    public void CopyToClipboard() => SendMessageW(Window, WmCopy, 0u, 0);
-    public void PasteFromClipboard() => SendMessageW(Window, WmPaste, 0u, 0);
+    // Cut, copy and paste go through this library's clipboard rather than
+    // `WM_CUT`, `WM_COPY` and `WM_PASTE`. The `EDIT` control opens the
+    // clipboard once and, when another program is holding it -- a clipboard
+    // viewer reading what was just copied does, for a moment after every
+    // change -- does nothing and says nothing. This waits for it instead.
+    // What the control refuses is refused here too: nothing leaves a password
+    // box, and nothing changes a read-only one.
+
+    public void CutToClipboard()
+    {
+        if (HasStyle(EsReadOnly) || !CopySelection())
+            return;
+        ReplaceSelection("");
+    }
+
+    public void CopyToClipboard() => CopySelection();
+
+    public void PasteFromClipboard()
+    {
+        if (HasStyle(EsReadOnly))
+            return;
+        var text = ReadClipboardText();
+        if (text.IsEmpty)
+            return;
+
+        // As the control's own paste does: one line in a one-line box, and a
+        // multiline box's line breaks as the CRLF it keeps.
+        var lines = text.Replace("\r\n", "\n").Replace("\r", "\n");
+        if (!_multiline)
+        {
+            long end = lines.IndexOf('\n');
+            if (end >= 0)
+                lines = lines.Substring(0u, (nuint)end);
+        }
+        else
+        {
+            lines = lines.Replace("\n", "\r\n");
+        }
+        ReplaceSelection(lines);
+    }
+
+    bool HasStyle(uint style) =>
+        (Win32.User32.GetWindowLongPtrW(Window, GwlStyle) & (long)style) != 0;
+
+    /// Puts the selection on the clipboard, and answers whether there was one
+    /// to put there.
+    bool CopySelection()
+    {
+        if (HasStyle(EsPassword))
+            return false;
+
+        var (start, length) = GetSelection();
+        if (length <= 0)
+            return false;
+
+        int units = GetWindowTextLengthW(Window);
+        if (units <= 0 || start + length > units)
+            return false;
+        var buffer = new char16[(nuint)units + 1u];
+        int got = GetWindowTextW(Window, &buffer[0u], units + 1);
+        if (got < start + length)
+            return false;
+
+        var content = new ClipboardContent();
+        content.Text = Text.FromUtf16(&buffer[(nuint)start], (nuint)length);
+        WriteClipboard(content);
+        return true;
+    }
+
+    /// Replaces the selection as typing would, so it can be undone and the
+    /// control reports the change.
+    void ReplaceSelection(String text)
+    {
+        var units = text.ToUtf16();
+        SendMessageW(Window, EmReplaceSel, 1u, (long)(nuint)(void*)units.ToPointer());
+    }
 
     public override FSize PreferredSize
     {

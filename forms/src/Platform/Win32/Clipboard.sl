@@ -68,8 +68,9 @@ const uint DropEffectCopy = 1u;
 /// How many times, and how long apart, to try a clipboard another program is
 /// holding. A clipboard viewer reading what was just copied holds it for a
 /// moment, so a copy that tried once would sometimes silently do nothing.
+/// .NET's `Clipboard` waits as long: ten tries a tenth of a second apart.
 const int OpenAttempts = 10;
-const uint OpenRetryMilliseconds = 10u;
+const uint OpenRetryMilliseconds = 100u;
 
 // ============================================================ formats by name
 

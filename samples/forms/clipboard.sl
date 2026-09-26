@@ -373,10 +373,17 @@ public class MainForm : Form
             into[i] = dib[i];
         GlobalUnlock(block);
 
-        if (OpenClipboard(null) == 0)
+        // Patiently, as the library does: another program may be holding it.
+        int attempt = 0;
+        while (OpenClipboard(null) == 0)
         {
-            GlobalFree(block);
-            return false;
+            attempt++;
+            if (attempt == 10)
+            {
+                GlobalFree(block);
+                return false;
+            }
+            Sleep(100u);
         }
         EmptyClipboard();
         SetClipboardData(ClipboardDib, block);
