@@ -1824,9 +1824,11 @@ public class Circle : IShape
 double TotalArea(IShape a, IShape b) => a.Area() + b.Area();
 ```
 
-An interface declares method and property signatures and nothing else: no
-fields, no constructor, no destructor, no bodies. Every member is public
-whether or not the word is written, since the whole point is the contract.
+An interface declares methods and properties and nothing else: no fields, no
+constructor, no destructor. A member may carry a body, which is its default
+([§2.10.1](#2101-a-default-body-and-a-member-named-for-its-interface)). Every
+member is public whether or not the word is written, since the whole point is
+the contract.
 
 A class lists the interfaces it implements after `:`, and must supply a public
 member matching each signature exactly. A property is a pair of methods
@@ -1881,6 +1883,76 @@ The two methods share a name and are told apart by their parameters ([§7.1](07-
 through either reference reaches the right one, and a call on `Both` itself
 picks by argument type. A method of one interface may be overloaded as well:
 each overload is a slot of its own.
+
+### 2.10.1 A default body, and a member named for its interface
+
+**An interface member may have a body**, as in C# 8. A class that supplies the
+member gets its own in the slot; one that does not gets the body:
+
+```csharp
+public interface IGreeter
+{
+    String Name { get; }
+    String Greet() => "hello " + Name;
+    String Shout() => this.Greet() + "!";
+}
+
+public class Person : IGreeter
+{
+    public String Name => "ann";            // Greet and Shout are the defaults
+}
+```
+
+Inside a default, `this` is the object seen as the interface, so `Greet()`
+there dispatches like any call through an `IGreeter`. A default is the
+interface's and not the class's, as in C#: `new Person().Greet()` does not
+compile, and `((IGreeter)person).Greet()` does. It costs nothing a slot did not
+already cost — the default is an ordinary function, emitted once per interface
+(once per instantiation of a generic one), and its address is what goes in
+the table of every class that supplies nothing. An interface still has no
+state, so a default property is computed; `field` in one is refused (SL0300).
+
+**A member may be written under an interface's name**, `void IShape.Draw()`.
+It fills that interface's slot and is reached no other way — not by name on the
+class, not by a call inside it — which is how a class keeps two interfaces'
+same-named members apart, or keeps one out of its own surface:
+
+```csharp
+public class Crate : ISized
+{
+    public int Size => 1;                   // what a Crate says
+    int ISized.Size => 99;                  // what an ISized says
+}
+```
+
+It takes no modifier, since it is as visible as the interface and dispatched
+because the interface is (SL0795); it has to name an interface the type
+implements and a member of that interface (SL0794); and a property written
+this way has its accessors written out, since an automatic one would want
+storage named after a property the class may also have (SL0793). Its symbol
+carries the interface's name, so it never collides with a member written
+plainly.
+
+**An interface extending another may replace its default** the same way, and
+that is how two defaults for one member meet. The one that applies is the
+most specific: the one whose interface extends every other that supplies one.
+When no single one does, the class must decide by implementing the member
+itself, which is C#'s CS8705 (SL0796):
+
+```csharp
+public interface IA { String Which() => "A"; }
+public interface IB : IA { String IA.Which() => "B"; }
+public interface IC : IA { String IA.Which() => "C"; }
+
+public class OnlyB : IB { }                 // "B"
+public class Both : IB, IC { }              // SL0796: IB and IC tie
+public interface ID : IB, IC { String IA.Which() => "D"; }
+public class Merged : ID { }                // "D", which beats both
+```
+
+Written with no body in the extending interface, the member is abstract again,
+and a class below has to supply it. What a class or any of its bases supplies
+always wins over every default, whichever interface wrote it.
 
 ## 2.11 Arrays
 

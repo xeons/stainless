@@ -79,6 +79,96 @@ public class InterfaceTests
             }
             """));
 
+    // ------------------------------------------------------------- defaults
+
+    [Fact]
+    public void AMemberWithADefaultNeedNotBeImplemented() =>
+        Assert.Empty(Front.ModuleCodes(
+            """
+            public interface IGreeter { String Greet() => "hello"; }
+            public class Quiet : IGreeter { }
+            """));
+
+    [Fact]
+    public void ADefaultIsNotAMemberOfTheClass() =>
+        Assert.Equal(["SL0255"], Front.ModuleCodes(
+            """
+            public interface IGreeter { String Greet() => "hello"; }
+            public class Quiet : IGreeter { }
+            String Ask(Quiet quiet) => quiet.Greet();
+            """));
+
+    [Fact]
+    public void ADefaultSeesItsObjectAsTheInterface()
+    {
+        var program = Front.BindModule(
+            """
+            public interface IGreeter { String Name(); String Greet() => Name(); }
+            """, out var diagnostics);
+
+        Assert.Empty(Front.Codes(diagnostics));
+        var greet = program.Interfaces.Single(i => i.Name == "IGreeter").FindMethod("Greet")!;
+        Assert.IsType<InterfaceTypeSymbol>(greet.Parameters.Single(p => p.IsThis).Type);
+    }
+
+    [Fact]
+    public void AClassMemberWinsOverTheDefault()
+    {
+        var program = Front.BindModule(
+            """
+            public interface IGreeter { String Greet() => "hello"; }
+            public class Loud : IGreeter { public String Greet() => "HELLO"; }
+            """, out _);
+
+        var greeter = program.Interfaces.Single(i => i.Name == "IGreeter");
+        var loud = program.Classes.Single(c => c.Name == "Loud");
+        Assert.Same(loud.Methods.Single(), loud.ImplementationOf(greeter.Methods.Single()));
+    }
+
+    [Fact]
+    public void TheMostSpecificDefaultIsChosen()
+    {
+        var program = Front.BindModule(
+            """
+            public interface IA { String Which() => "A"; }
+            public interface IB : IA { String IA.Which() => "B"; }
+            public class OnlyB : IB { }
+            """, out var diagnostics);
+
+        Assert.Empty(Front.Codes(diagnostics));
+        var which = program.Interfaces.Single(i => i.Name == "IA").Methods.Single();
+        var chosen = program.Classes.Single(c => c.Name == "OnlyB").ImplementationOf(which)!;
+        Assert.Equal("IB", chosen.ContainingType!.Name);
+    }
+
+    [Fact]
+    public void TwoDefaultsNeitherMoreSpecificAreAmbiguous() =>
+        Assert.Equal(["SL0796"], Front.ModuleCodes(
+            """
+            public interface IA { String Which() => "A"; }
+            public interface IB : IA { String IA.Which() => "B"; }
+            public interface IC : IA { String IA.Which() => "C"; }
+            public class Both : IB, IC { }
+            """));
+
+    [Fact]
+    public void AnInterfaceMayTakeADefaultAwayAgain() =>
+        Assert.Equal(["SL0305"], Front.ModuleCodes(
+            """
+            public interface IA { String Which() => "A"; }
+            public interface IB : IA { String IA.Which(); }
+            public class OnlyB : IB { }
+            """));
+
+    [Fact]
+    public void AnExplicitMemberIsNotReachedByName() =>
+        Assert.Equal(["SL0255"], Front.ModuleCodes(
+            """
+            public interface IShape { double Area(); }
+            public class Square : IShape { double IShape.Area() => 1.0; }
+            double Measure(Square square) => square.Area();
+            """));
+
     // ------------------------------------------------------ covariant returns
 
     private const string Animals = """

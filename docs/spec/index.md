@@ -90,6 +90,7 @@ Primitives, `struct`, `class`, pointers, `variant`, `union`, `Result`, `interfac
   - [2.8.1 `Optional<T>` — a value, or none](02-types.md#281-optionalt--a-value-or-none)
 - [2.9 How the library reports failure](02-types.md#29-how-the-library-reports-failure)
 - [2.10 `interface` — a contract, dispatched dynamically](02-types.md#210-interface--a-contract-dispatched-dynamically)
+  - [2.10.1 A default body, and a member named for its interface](02-types.md#2101-a-default-body-and-a-member-named-for-its-interface)
 - [2.11 Arrays](02-types.md#211-arrays)
   - [2.11.1 `T[]` — a counted array](02-types.md#2111-t--a-counted-array)
   - [2.11.2 `T[N]` — an inline array](02-types.md#2112-tn--an-inline-array)

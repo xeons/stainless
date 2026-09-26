@@ -517,6 +517,13 @@ public abstract class NamedTypeSymbol : TypeSymbol
     public List<GenericFunctionTemplate> GenericMethods { get; } = [];
 
     /// <summary>
+    /// Members written under an interface's name -- <c>void IShape.Draw()</c>
+    /// -- and so kept out of <see cref="Methods"/>: nothing reaches one by
+    /// name, only through the interface whose slot it fills.
+    /// </summary>
+    public List<FunctionSymbol> ExplicitImplementations { get; } = [];
+
+    /// <summary>
     /// For a class, the interfaces it implements. For an interface, the ones it
     /// extends. Both are the same relation, so both live here.
     /// </summary>
@@ -653,6 +660,82 @@ public abstract class NamedTypeSymbol : TypeSymbol
         // "does not implement" would hide it.
         return overloads.FirstOrDefault(m => m.Accepts(wanted))
             ?? (overloads.Count == 1 ? overloads[0] : null);
+    }
+
+    /// <summary>
+    /// What a call through <paramref name="required"/> reaches on an object of
+    /// this type, or null when nothing does.
+    ///
+    /// C#'s interface mapping. Each type from this one to its root is asked in
+    /// turn, and within one the member written under the interface's name wins
+    /// over one that merely has the right name and parameters. Only when the
+    /// whole chain has neither does a default body count, and then the most
+    /// specific one: see <see cref="MostSpecificDefault"/>.
+    /// </summary>
+    public FunctionSymbol? ImplementationOf(FunctionSymbol required) =>
+        OwnImplementationOf(required) ?? MostSpecificDefault(required, out _);
+
+    /// <summary>The member of this type or a base that fills the slot, defaults aside.</summary>
+    public FunctionSymbol? OwnImplementationOf(FunctionSymbol required)
+    {
+        var wanted = required.ParameterTypes.ToList();
+        IEnumerable<NamedTypeSymbol> chain = this is ClassTypeSymbol classType
+            ? classType.SelfAndBases()
+            : [this];
+
+        foreach (var type in chain)
+        {
+            if (type.ExplicitImplementations.FirstOrDefault(m => m.ImplementedMember == required)
+                is { } named)
+                return named;
+
+            if (type.Methods.FirstOrDefault(m =>
+                    !m.IsStatic && m.Name == required.Name && m.Accepts(wanted)) is { } written)
+                return written;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// The default body a dispatch through <paramref name="required"/> falls
+    /// back on, or null when there is none or the answer is ambiguous.
+    ///
+    /// The candidates are the member itself, and every member an interface
+    /// this type implements writes under the member's interface's name. The
+    /// one chosen is the one whose interface extends every other candidate's.
+    /// When no single one does, <paramref name="tied"/> holds the ones none
+    /// other beats -- C#'s CS8705 -- and there is no default. A most specific
+    /// candidate with no body is a member re-declared abstract, and has none
+    /// either.
+    /// </summary>
+    public FunctionSymbol? MostSpecificDefault(
+        FunctionSymbol required, out IReadOnlyList<FunctionSymbol> tied)
+    {
+        tied = [];
+        if (required.ContainingType is not InterfaceTypeSymbol) return null;
+
+        var candidates = new List<FunctionSymbol> { required };
+        foreach (var implemented in this is InterfaceTypeSymbol self
+                     ? self.AllInterfaces().Prepend(self)
+                     : AllInterfaces())
+            candidates.AddRange(implemented.ExplicitImplementations
+                .Where(m => m.ImplementedMember == required));
+
+        var owners = candidates.Select(c => (NamedTypeSymbol)c.ContainingType!).ToList();
+        var best = candidates
+            .Where((c, i) => !owners.Where((o, j) => j != i && o != owners[i])
+                .Any(o => o.AllInterfaces().Contains(owners[i])))
+            .Distinct()
+            .ToList();
+
+        if (best.Count != 1)
+        {
+            tied = best;
+            return null;
+        }
+
+        return best[0].HasBody ? best[0] : null;
     }
 }
 
@@ -1074,8 +1157,15 @@ public sealed class InterfaceTypeSymbol : NamedTypeSymbol
     /// <summary>Program-wide index, used to key the per-class dispatch table.</summary>
     public int Id { get; internal set; } = -1;
 
+    /// <summary>
+    /// The members a dispatch through this interface can reach, in slot
+    /// order: every instance method as it was declared. A static member has no
+    /// object to be reached through, so it has no slot.
+    /// </summary>
+    public IEnumerable<FunctionSymbol> DispatchSlots => Methods.Where(m => !m.IsStatic);
+
     /// <summary>Position of a method in this interface's vtable.</summary>
-    public int SlotOf(FunctionSymbol method) => Methods.IndexOf(method);
+    public int SlotOf(FunctionSymbol method) => DispatchSlots.ToList().IndexOf(method);
 
     /// <summary>Also searches extended interfaces, nearest first.</summary>
     public override FunctionSymbol? FindMethod(string name) =>

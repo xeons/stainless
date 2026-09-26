@@ -1187,10 +1187,47 @@ public sealed partial class Binder
         FileScope scope, NamedTypeSymbol type, PropertyDeclSyntax declaration,
         bool hasPrimaryConstructor = false)
     {
+        // `String INamed.Name => ...`: the interface's property, supplied under
+        // its name and reached only through it.
+        InterfaceTypeSymbol? explicitInterface = null;
+        if (declaration.ExplicitInterface is { } named)
+        {
+            var resolved = ResolveType(named, scope);
+            if (resolved is not InterfaceTypeSymbol contract)
+            {
+                if (!resolved.IsError())
+                    diagnostics.Error("SL0794", named.Span,
+                        $"'{SpellType(named)}' is not an interface, so '{declaration.Name}' " +
+                        "cannot be named for it");
+                return;
+            }
+
+            explicitInterface = contract;
+
+            if ((declaration.Modifiers & (Modifiers.Public | Modifiers.Protected |
+                    Modifiers.Private | Modifiers.Virtual | Modifiers.Override |
+                    Modifiers.Abstract | Modifiers.Sealed | Modifiers.Static)) != Modifiers.None)
+                diagnostics.Error("SL0795", declaration.Span,
+                    $"'{contract.Name}.{declaration.Name}' is reached only through " +
+                    $"'{contract.Name}', so it takes no modifier: it is as visible as the " +
+                    "interface, and dispatched because the interface is");
+
+            // Storage would be named after the property, which the type may
+            // well declare under its own name too.
+            if (!type.IsContract && declaration.Accessors.Any(a => a.Body is null))
+            {
+                diagnostics.Error("SL0793", declaration.Span,
+                    $"'{contract.Name}.{declaration.Name}' is named for an interface, so its " +
+                    "accessors are written out: an automatic one would need storage, and a " +
+                    "member reached only through an interface has nowhere to name it");
+                return;
+            }
+        }
+
         // An indexer may be overloaded on what it takes -- `this[nuint]` and
         // `this[String]` are different questions -- so the name alone does not
         // decide whether one is already declared.
-        if (!declaration.IsIndexer &&
+        if (explicitInterface is null && !declaration.IsIndexer &&
             (type.FindStorage(declaration.Name) is not null ||
              type.FindProperty(declaration.Name) is not null))
         {
@@ -1234,17 +1271,23 @@ public sealed partial class Binder
         bool isAbstract = declaration.Modifiers.HasFlag(Modifiers.Abstract);
         bool wantsStorage = false;
 
-        if (isInterface || isAbstract)
+        if (isAbstract)
         {
             foreach (var accessor in declaration.Accessors.Where(a => a.Body is not null))
                 diagnostics.Error("SL0392", accessor.Span,
-                    isInterface
-                        ? $"'{type.Name}.{declaration.Name}' is an interface property, so its " +
-                          $"{(accessor.IsGetter ? "getter" : "setter")} cannot have a body; " +
-                          "interfaces declare signatures only"
-                        : $"'{type.Name}.{declaration.Name}' is abstract, so its " +
-                          $"{(accessor.IsGetter ? "getter" : "setter")} cannot have a body; " +
-                          "a derived class supplies one");
+                    $"'{type.Name}.{declaration.Name}' is abstract, so its " +
+                    $"{(accessor.IsGetter ? "getter" : "setter")} cannot have a body; " +
+                    "a derived class supplies one");
+        }
+        else if (isInterface)
+        {
+            // An accessor with a body is a default and one without is the
+            // contract, and neither owns anything: an interface has no state.
+            if (declaration.Accessors.Any(a => a.UsesField) || declaration.Initializer is not null)
+                diagnostics.Error("SL0300", declaration.Span,
+                    $"'{type.Name}.{declaration.Name}' is an interface property, and an " +
+                    "interface has no state, so there is no storage for 'field' or a value " +
+                    "to name");
         }
         else
         {
@@ -1364,12 +1407,14 @@ public sealed partial class Binder
             ContainingType = type,
             Span = declaration.Span,
             Documentation = declaration.Documentation,
-            IsPublic = declaration.Modifiers.HasFlag(Modifiers.Public) || isInterface,
+            IsPublic = (declaration.Modifiers.HasFlag(Modifiers.Public) || isInterface) &&
+                       explicitInterface is null,
             IsProtected = declaration.Modifiers.HasFlag(Modifiers.Protected),
             BackingField = backing,
             StaticBacking = sharedBacking,
             IsIndexer = declaration.IsIndexer,
             IsRequired = isRequired,
+            ExplicitInterface = explicitInterface,
         };
 
         // A property's dispatch is its accessors' -- they are the methods, and a
@@ -1382,7 +1427,7 @@ public sealed partial class Binder
             property.Setter = DeclareAccessor(
                 scope, type, property, setter, true, accessorModifiers, declaration.Indices);
 
-        type.Properties.Add(property);
+        if (explicitInterface is null) type.Properties.Add(property);
     }
 
     /// <summary>
@@ -1420,7 +1465,11 @@ public sealed partial class Binder
         var willTake = indices.Select(i => ResolveType(i.Type, scope)).ToList();
         if (isSetter) willTake.Add(property.Type);
 
-        if (type.Methods.Any(m => m.Name == name && m.Accepts(willTake)))
+        var taken = property.ExplicitInterface is null
+            ? type.Methods
+            : type.ExplicitImplementations.Where(m => m.ExplicitInterface == property.ExplicitInterface);
+
+        if (taken.Any(m => m.Name == name && m.Accepts(willTake)))
         {
             diagnostics.Error("SL0393", accessor.Span,
                 $"'{type.Name}' already declares a method named '{name}' taking these " +
@@ -1473,8 +1522,8 @@ public sealed partial class Binder
 
         if (!symbol.IsStatic)
         {
-            TypeSymbol thisType = type is ClassTypeSymbol reference
-                ? reference
+            TypeSymbol thisType = type is ClassTypeSymbol or InterfaceTypeSymbol
+                ? type
                 : new PointerTypeSymbol(type);
             symbol.Parameters.Add(new ParameterSymbol("this", thisType, 0) { IsThis = true });
         }
@@ -1489,7 +1538,16 @@ public sealed partial class Binder
             symbol.Parameters.Add(
                 new ParameterSymbol("value", property.Type, symbol.Parameters.Count));
 
-        type.Methods.Add(symbol);
+        if (property.ExplicitInterface is { } named)
+        {
+            symbol.ExplicitInterface = named;
+            type.ExplicitImplementations.Add(symbol);
+        }
+        else
+        {
+            type.Methods.Add(symbol);
+        }
+
         scope.Module.Functions.Add(symbol);
         return symbol;
     }

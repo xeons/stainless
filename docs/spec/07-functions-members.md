@@ -636,9 +636,12 @@ public interface INamed
 }
 ```
 
-Accessors and no bodies, exactly as an interface method is a signature and no
-body. A class implements it with a property of its own; whether that property is
-automatic or written makes no difference to the caller.
+Accessors with no bodies, exactly as an interface method with none is a
+signature. A class implements it with a property of its own; whether that
+property is automatic or written makes no difference to the caller. An
+accessor with a body is a default, as a method's is
+([§2.10.1](02-types.md#2101-a-default-body-and-a-member-named-for-its-interface)),
+and has no storage to reach: an interface has no state.
 
 **What a property is not**
 

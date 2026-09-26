@@ -850,7 +850,8 @@ that friction.
 
 ```
 mangled  := "_SL" path targs? params "z"? "E" ret
-path     := (len ident)+                    ; module segments, the type if any, then the name
+path     := (len ident)+ explicit? len ident ; module segments and the type if any, then the name
+explicit := "X" len ident                   ; the interface a member is written under
 targs    := "G" count type+                 ; an instantiated generic's arguments
 params   := type* | "v"                     ; "v" when there are none
 type     := prim
@@ -876,7 +877,10 @@ prim     := a  sbyte    s  short    i  int      l  long
 needs no separators: `App.Math.Add` becomes `3App4Math3Add`, and a method has
 its type between the module and its own name, as in `3Com7Greeter5Greet`. A
 constructor is named `4ctor`, a static constructor `5cctor` and a destructor
-`4dtor`. A variadic function has `z` before the terminator.
+`4dtor`. A variadic function has `z` before the terminator. A member written under an
+interface's name, `void IShape.Draw()`, has `X` and the interface's qualified
+name before its own, where no length could begin, so it never meets a member
+of the same name written plainly.
 
 `E` is both the enum prefix and the terminator before the return type, and the
 two never collide: an enum is always followed by a decimal length, and the

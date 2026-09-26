@@ -67,6 +67,9 @@ public static class RetiredDiagnostics
         // An overloaded interface method, refused until each overload took a
         // slot of its own.
         "SL0416",
+
+        // A body on an interface method, refused until one became its default.
+        "SL0301",
     };
 }
 

@@ -222,6 +222,19 @@ public sealed class FunctionSymbol
     /// <summary>The inherited method this one replaces, or null.</summary>
     public FunctionSymbol? Overridden { get; set; }
 
+    /// <summary>
+    /// The interface named in front of this member -- <c>IShape</c> in
+    /// <c>void IShape.Draw()</c> -- or null. Such a member is reached only
+    /// through that interface.
+    /// </summary>
+    public InterfaceTypeSymbol? ExplicitInterface { get; set; }
+
+    /// <summary>
+    /// For a member written under an interface's name, the member of that
+    /// interface whose slot it fills. Settled in pass 5.
+    /// </summary>
+    public FunctionSymbol? ImplementedMember { get; set; }
+
     /// <summary>True when a call to this goes through the vtable.</summary>
     public bool IsDispatched => VirtualSlot >= 0;
 
@@ -407,6 +420,9 @@ public sealed class PropertySymbol
 
     /// <summary>True when the setter is <c>init</c>.</summary>
     public bool IsInit => Setter?.IsInitAccessor == true;
+
+    /// <summary>The interface named in front of it, as on a method; or null.</summary>
+    public InterfaceTypeSymbol? ExplicitInterface { get; init; }
 
     /// <summary>True when the compiler supplies both the storage and the accessors.</summary>
     public bool IsAuto => BackingField is not null || StaticBacking is not null;

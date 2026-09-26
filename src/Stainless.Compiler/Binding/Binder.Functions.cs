@@ -76,14 +76,22 @@ public sealed partial class Binder
         // reason it is called by naming the type: there is no instance.
         if (containingType is not null && !declaration.IsOperator && !isStatic)
         {
-            // A method receives its instance: classes by reference, structs by pointer.
-            TypeSymbol thisType = containingType is ClassTypeSymbol c
-                ? c
+            // A method receives its instance: classes and interfaces by
+            // reference, structs by pointer. An interface's is the object a
+            // default body runs on, seen as the interface.
+            TypeSymbol thisType = containingType is ClassTypeSymbol or InterfaceTypeSymbol
+                ? containingType
                 : new PointerTypeSymbol(containingType);
             symbol.Parameters.Add(new ParameterSymbol("this", thisType, 0) { IsThis = true });
         }
 
         AddParameters(symbol, declaration.Parameters, scope);
+
+        if (declaration.ExplicitInterface is { } named)
+        {
+            DeclareExplicitMember(symbol, containingType, declaration, named, scope);
+            return;
+        }
 
         if (declaration.Linkage.IsCpp())
         {
@@ -136,25 +144,24 @@ public sealed partial class Binder
                 $"'{declaration.Name}' is both 'virtual' and 'override'; an override is " +
                 "dispatched because what it replaces was");
 
-        if (containingType is { IsContract: true })
+        // An interface method may have a body or not: one with a body is a
+        // default, what an implementing class that supplies none gets in its
+        // slot.
+        if (containingType is not { IsContract: true })
         {
-            if (declaration.Body is not null)
-                diagnostics.Error("SL0301", declaration.Span,
-                    $"'{declaration.Name}' is an interface method and cannot have a body; " +
-                    "interfaces declare signatures only");
-        }
-        else if (symbol.IsAbstract)
-        {
-            if (declaration.Body is not null)
-                diagnostics.Error("SL0498", declaration.Span,
-                    $"'{declaration.Name}' is abstract, so it cannot have a body; " +
-                    "a derived class supplies one");
-        }
-        else if (!declaration.Linkage.IsImport() && declaration.Body is null)
-        {
-            diagnostics.Error("SL0210", declaration.Span,
-                $"'{declaration.Name}' has no body; Stainless has no forward declarations, " +
-                "because declaration order never matters");
+            if (symbol.IsAbstract)
+            {
+                if (declaration.Body is not null)
+                    diagnostics.Error("SL0498", declaration.Span,
+                        $"'{declaration.Name}' is abstract, so it cannot have a body; " +
+                        "a derived class supplies one");
+            }
+            else if (!declaration.Linkage.IsImport() && declaration.Body is null)
+            {
+                diagnostics.Error("SL0210", declaration.Span,
+                    $"'{declaration.Name}' has no body; Stainless has no forward declarations, " +
+                    "because declaration order never matters");
+            }
         }
 
         if (containingType is null && CaseNamed(scope, declaration.Name) is { } shadowed)
@@ -206,6 +213,63 @@ public sealed partial class Binder
         }
 
         module.Functions.Add(symbol);
+    }
+
+    /// <summary>
+    /// <c>void IShape.Draw()</c>: a member that fills one interface's slot and
+    /// is reached no other way.
+    ///
+    /// Which member of the interface it stands for is settled in pass 5, once
+    /// every type knows what it implements. Here it is declared and kept out
+    /// of lookup.
+    /// </summary>
+    private void DeclareExplicitMember(
+        FunctionSymbol symbol, NamedTypeSymbol? containingType, FunctionDeclSyntax declaration,
+        TypeSyntax named, FileScope scope)
+    {
+        if (containingType is null)
+        {
+            diagnostics.Error("SL0794", declaration.Span,
+                $"'{declaration.Name}' is named for an interface at module level; only a member " +
+                "of a type that implements the interface can fill one of its slots");
+            return;
+        }
+
+        if (ResolveType(named, scope) is not InterfaceTypeSymbol contract)
+        {
+            if (!ResolveType(named, scope).IsError())
+                diagnostics.Error("SL0794", named.Span,
+                    $"'{SpellType(named)}' is not an interface, so '{declaration.Name}' cannot " +
+                    "be named for it");
+            return;
+        }
+
+        symbol.ExplicitInterface = contract;
+
+        // Reached only through the interface, so a word about who may call it
+        // or how it dispatches has nothing to describe.
+        if ((declaration.Modifiers & (Modifiers.Public | Modifiers.Protected |
+                Modifiers.Private | Modifiers.Virtual | Modifiers.Override |
+                Modifiers.Abstract | Modifiers.Sealed | Modifiers.Static)) != Modifiers.None)
+            diagnostics.Error("SL0795", declaration.Span,
+                $"'{contract.Name}.{declaration.Name}' is reached only through '{contract.Name}', " +
+                "so it takes no modifier: it is as visible as the interface, and dispatched " +
+                "because the interface is");
+
+        if (declaration.Body is null && !containingType.IsContract)
+            diagnostics.Error("SL0210", declaration.Span,
+                $"'{contract.Name}.{declaration.Name}' has no body; a class fills an interface's " +
+                "slot with one");
+
+        var signature = symbol.ParameterTypes.ToList();
+        if (containingType.ExplicitImplementations.Any(m =>
+                m.ExplicitInterface == contract && m.Name == symbol.Name && m.Accepts(signature)))
+            diagnostics.Error("SL0211", declaration.Span,
+                $"'{containingType.Name}' already declares '{contract.Name}.{declaration.Name}' " +
+                "taking these parameter types");
+
+        containingType.ExplicitImplementations.Add(symbol);
+        scope.Module.Functions.Add(symbol);
     }
 
     /// <summary>

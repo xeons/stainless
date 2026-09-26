@@ -1044,6 +1044,48 @@ public class ParserTests
     public void AConstraintWordWithMoreAfterItIsAType(string clause) =>
         Assert.Equal(ConstraintKind.Type, OnlyConstraint(clause).Kind);
 
+    // ----------------------------------------------- members named for an interface
+
+    private static Declaration OnlyMember(string member) =>
+        Assert.IsType<TypeDeclSyntax>(Front.Declaration("class C\n{\n    " + member + "\n}"))
+            .Members.Single();
+
+    [Theory]
+    [InlineData("void IShape.Draw() { }", "IShape", "Draw")]
+    [InlineData("String App.INamed.Name() => \"x\";", "App.INamed", "Name")]
+    [InlineData("int IList<T>.Count() => 0;", "IList", "Count")]
+    public void AMethodNamedForAnInterfaceIsRead(string member, string contract, string name)
+    {
+        var function = Assert.IsType<FunctionDeclSyntax>(OnlyMember(member));
+        var written = Assert.IsType<NamedTypeSyntax>(function.ExplicitInterface);
+
+        Assert.Equal(contract, written.Name.Text);
+        Assert.Equal(name, function.Name);
+    }
+
+    [Fact]
+    public void APropertyNamedForAnInterfaceIsRead()
+    {
+        var property = Assert.IsType<PropertyDeclSyntax>(OnlyMember("int ISized.Size => 1;"));
+        Assert.Equal("ISized", Assert.IsType<NamedTypeSyntax>(property.ExplicitInterface).Name.Text);
+        Assert.Equal("Size", property.Name);
+    }
+
+    [Fact]
+    public void AGenericMethodIsNotNamedForAnInterface()
+    {
+        var function = Assert.IsType<FunctionDeclSyntax>(OnlyMember("T Max<T>(T a, T b) => a;"));
+        Assert.Null(function.ExplicitInterface);
+        Assert.Equal(["T"], function.TypeParameters);
+    }
+
+    [Fact]
+    public void AFieldCannotBeNamedForAnInterface()
+    {
+        Front.Parse("module Test;\nclass C\n{\n    int IShape.Corners;\n}", out var diagnostics);
+        Assert.Equal(["SL0793"], Front.Codes(diagnostics));
+    }
+
     [Fact]
     public void UnmanagedAndNotnullRemainNames()
     {

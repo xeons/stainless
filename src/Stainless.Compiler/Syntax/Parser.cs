@@ -1963,7 +1963,21 @@ public sealed class Parser
         if (At(TokenKind.ThisKeyword) && Peek(1).Kind == TokenKind.OpenBracket)
             return ParseIndexer(start, modifiers, returnType, attributes ?? []);
 
-        string name = ExpectIdentifier();
+        // `void IShape.Draw()`: a member of an interface, supplied under that
+        // interface's name rather than the type's own.
+        TypeSyntax? explicitInterface = null;
+        string name;
+        if (linkage == LinkageKind.Stainless && AtWord &&
+            Peek(1).Kind is TokenKind.Dot or TokenKind.Less &&
+            Speculate(TryParseExplicitName, out var qualified) && qualified is not null)
+        {
+            explicitInterface = qualified.Interface;
+            name = qualified.Name;
+        }
+        else
+        {
+            name = ExpectIdentifier();
+        }
 
         // `int geometry::Area(int, int)`. Only a C++ declaration may be
         // qualified, because only C++ has a namespace to name.
@@ -2032,7 +2046,11 @@ public sealed class Parser
 
             return new FunctionDeclSyntax(
                 SpanFrom(start), modifiers, linkage, returnType, name, typeParameters,
-                constraints, parameters, isVariadic, body) { Namespace = enclosing };
+                constraints, parameters, isVariadic, body)
+            {
+                Namespace = enclosing,
+                ExplicitInterface = explicitInterface,
+            };
         }
 
         // `Type Name {` and `Type Name =>` are the two ways a property starts.
@@ -2043,8 +2061,16 @@ public sealed class Parser
                 _diagnostics.Error("SL0320", SpanFrom(start),
                     $"'{name}' is a property and cannot have type parameters");
 
-            return ParseProperty(start, modifiers, returnType, name, attributes ?? []);
+            var property = ParseProperty(start, modifiers, returnType, name, attributes ?? []);
+            return explicitInterface is not null && property is PropertyDeclSyntax declared
+                ? declared with { ExplicitInterface = explicitInterface }
+                : property;
         }
+
+        if (explicitInterface is not null)
+            _diagnostics.Error("SL0793", SpanFrom(start),
+                $"'{name}' is named for an interface, and only a method or a property can be: " +
+                "an interface has no fields");
 
         if (typeParameters.Count > 0)
             _diagnostics.Error("SL0320", SpanFrom(start),
@@ -2063,6 +2089,44 @@ public sealed class Parser
             Linkage = linkage,
         };
     }
+
+    private sealed record ExplicitName(TypeSyntax Interface, string Name);
+
+    /// <summary>
+    /// <c>IShape.Draw</c> or <c>IList&lt;T&gt;.Add</c> in front of a parameter
+    /// list or an accessor list. Null for anything else, including a generic
+    /// method's own <c>Name&lt;T&gt;(</c>.
+    /// </summary>
+    private ExplicitName? TryParseExplicitName()
+    {
+        var type = ParseType();
+
+        if (Match(TokenKind.Dot))
+        {
+            string member = ExpectIdentifier();
+            return AtMemberBody() ? new ExplicitName(type, member) : null;
+        }
+
+        // A qualified name the type parser read whole: its last part is the
+        // member, and what comes before it is the interface.
+        if (type is NamedTypeSyntax { Name.Parts.Count: > 1, TypeArguments.Count: 0 } named &&
+            AtMemberBody())
+        {
+            var parts = named.Name.Parts;
+            var owner = new QualifiedName(named.Name.Span, parts.Take(parts.Count - 1).ToList());
+            return new ExplicitName(new NamedTypeSyntax(named.Span, owner), parts[^1]);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// What may follow a member's name: parameters, accessors or an arrow --
+    /// or the end of a field, which is read so that it can be refused by name.
+    /// </summary>
+    private bool AtMemberBody() =>
+        AtAny(TokenKind.OpenParen, TokenKind.OpenBrace, TokenKind.EqualsGreater,
+              TokenKind.Semicolon, TokenKind.Equals);
 
     /// <summary>
     /// <c>public T this[nuint i] { get; set; }</c>.

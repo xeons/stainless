@@ -344,6 +344,13 @@ public sealed record FunctionDeclSyntax(
     /// </summary>
     public bool IsOperator { get; init; }
 
+    /// <summary>
+    /// <c>IShape</c> in <c>void IShape.Draw()</c>: the interface whose member
+    /// this is, supplied under that interface's name. Null for every member
+    /// written with a plain name.
+    /// </summary>
+    public TypeSyntax? ExplicitInterface { get; init; }
+
     /// <summary>Which operator, for the checks that depend on which.</summary>
     public TokenKind OperatorToken { get; init; }
 
@@ -457,6 +464,11 @@ public sealed record PropertyDeclSyntax(
     /// and a property with written accessors owns none.
     /// </summary>
     public ExpressionSyntax? Initializer { get; init; }
+
+    /// <summary>
+    /// The interface in <c>String INamed.Name =&gt; ...</c>, or null.
+    /// </summary>
+    public TypeSyntax? ExplicitInterface { get; init; }
 }
 
 /// <summary>

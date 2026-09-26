@@ -116,9 +116,10 @@ public sealed partial class LlvmEmitter
                 // in the virtual table: there is no body to point at, and no
                 // instance of this class to reach it through. A derived class
                 // fills the slot in its own table.
-                var slots = interfaceType.Methods
-                    .Select(classType.FindImplementation)
-                    .Select(found => found is null || found.IsAbstract
+                var slots = interfaceType.DispatchSlots
+                    .Select(classType.ImplementationOf)
+                    .Select(found => found is null || found.IsAbstract ||
+                                     found is { ContainingType: InterfaceTypeSymbol, HasBody: false }
                         ? "ptr null"
                         : $"ptr {Symbol(found)}")
                     .ToList();

@@ -97,6 +97,10 @@ public sealed partial class Binder
         }
         else
         {
+            // Measured once every name in the list is known, because a member
+            // written under one interface's name may be what satisfies another.
+            var toVerify = new List<(InterfaceTypeSymbol Contract, SourceSpan Span)>();
+
             for (int i = 0; i < listed.Implements.Count; i++)
             {
                 var written = listed.Implements[i];
@@ -158,9 +162,13 @@ public sealed partial class Binder
 
                 // Only a class has to supply implementations. An interface
                 // extending another merely widens its own contract.
-                if (classType is not null)
-                    VerifyImplements(classType, interfaceType, written.Span);
+                if (classType is not null) toVerify.Add((interfaceType, written.Span));
             }
+
+            ResolveExplicitMembers(type);
+
+            foreach (var (contract, span) in toVerify)
+                VerifyImplements(classType!, contract, span);
         }
 
         // Every class gets a table, base or no base: a class may declare the
@@ -1117,6 +1125,66 @@ public sealed partial class Binder
         };
     }
 
+    /// <summary>
+    /// Settles which interface member each member written under an
+    /// interface's name stands for: on a class, one it implements; on an
+    /// interface, one it extends, whose default this then replaces.
+    /// </summary>
+    private void ResolveExplicitMembers(NamedTypeSymbol type)
+    {
+        foreach (var member in type.ExplicitImplementations)
+        {
+            if (member.ExplicitInterface is not { } contract) continue;
+
+            if (!type.AllInterfaces().Contains(contract))
+            {
+                diagnostics.Error("SL0794", member.Span,
+                    $"'{type.Name}' does not {(type.IsContract ? "extend" : "implement")} " +
+                    $"'{contract.Name}', so it has no slot of '{contract.Name}' for " +
+                    $"'{member.Name}' to fill");
+                continue;
+            }
+
+            var signature = member.ParameterTypes.ToList();
+            var required = contract.Methods.FirstOrDefault(m =>
+                !m.IsStatic && m.Name == member.Name && m.Accepts(signature));
+
+            if (required is null)
+            {
+                diagnostics.Error("SL0794", member.Span,
+                    $"'{contract.Name}' declares no '{member.Name}' taking " +
+                    (signature.Count == 0
+                        ? "nothing"
+                        : string.Join(", ", signature.Select(t => $"'{t.Name}'"))) +
+                    $", so there is no slot for '{type.Name}' to fill under that name");
+                continue;
+            }
+
+            member.ImplementedMember = required;
+
+            if (!SameSignature(member, required))
+                diagnostics.Error("SL0307", member.Span,
+                    $"'{type.Name}.{contract.Name}.{member.Name}' does not match " +
+                    $"'{contract.Name}.{required.Name}'; expected " +
+                    $"'{required.ReturnType.Name} {required.Name}(" +
+                    string.Join(", ", required.Parameters.Where(p => !p.IsThis).Select(Spelled)) +
+                    ")'");
+        }
+    }
+
+    /// <summary>The same return type, and each parameter's type and mode.</summary>
+    private static bool SameSignature(FunctionSymbol found, FunctionSymbol required)
+    {
+        var wanted = required.Parameters.Where(p => !p.IsThis).ToList();
+        var actual = found.Parameters.Where(p => !p.IsThis).ToList();
+
+        return found.ReturnType.Equals(required.ReturnType) &&
+               wanted.Count == actual.Count &&
+               wanted.Zip(actual).All(pair =>
+                   pair.First.Type.Equals(pair.Second.Type) &&
+                   pair.First.Mode == pair.Second.Mode);
+    }
+
     private void VerifyImplements(
         ClassTypeSymbol classType, InterfaceTypeSymbol interfaceType, SourceSpan span)
     {
@@ -1129,9 +1197,29 @@ public sealed partial class Binder
             VerifyImplements(classType, inherited, span);
         }
 
-        foreach (var required in interfaceType.Methods)
+        foreach (var required in interfaceType.Methods.Where(m => !m.IsStatic))
         {
-            var found = classType.FindImplementation(required);
+            // What the class and its bases supply comes first; a default is
+            // what is left when they supply nothing.
+            var own = classType.OwnImplementationOf(required);
+            if (own is null)
+            {
+                if (classType.MostSpecificDefault(required, out var tied) is not null) continue;
+
+                if (tied.Count > 1)
+                {
+                    diagnostics.Error("SL0796", span,
+                        $"'{classType.Name}' does not implement " +
+                        $"'{interfaceType.Name}.{Describe(required)}', and " +
+                        string.Join(" and ", tied.Select(t => $"'{t.ContainingType!.Name}'")) +
+                        " each supply a default for it, neither more specific than the other; " +
+                        "implement it in the class, or write it under one interface's name in an " +
+                        "interface extending both");
+                    continue;
+                }
+            }
+
+            var found = own ?? classType.FindImplementation(required);
 
             // A missing property is one mistake, not two: the getter reports it
             // and the setter stays quiet.
@@ -1155,6 +1243,10 @@ public sealed partial class Binder
                 continue;
             }
 
+            // A member written under the interface's name was checked where
+            // its name was settled.
+            if (found.ExplicitInterface is not null) continue;
+
             if (!found.IsPublic)
             {
                 diagnostics.Error("SL0306", found.Span,
@@ -1163,17 +1255,12 @@ public sealed partial class Binder
             }
 
             var wanted = required.Parameters.Where(p => !p.IsThis).ToList();
-            var actual = found.Parameters.Where(p => !p.IsThis).ToList();
 
             // The mode is part of the match, not decoration on it. A method
             // taking an int cannot stand in for one taking a ref int: the two
             // are passed differently, and the vtable slot would hold a function
             // the caller is about to hand a pointer to.
-            if (!found.ReturnType.Equals(required.ReturnType) ||
-                wanted.Count != actual.Count ||
-                !wanted.Zip(actual).All(pair =>
-                    pair.First.Type.Equals(pair.Second.Type) &&
-                    pair.First.Mode == pair.Second.Mode))
+            if (!SameSignature(found, required))
             {
                 diagnostics.Error("SL0307", found.Span,
                     $"'{classType.Name}.{found.Name}' does not match " +

@@ -142,6 +142,14 @@ public static class Mangler
         if (function.ContainingType is not null)
             AppendIdentifier(sb, SymbolSafe(function.ContainingType.SimpleName));
 
+        // Where a name belongs, a letter cannot begin one, so a member written
+        // under an interface's name never meets one written plainly.
+        if (function.ExplicitInterface is { } named)
+        {
+            sb.Append('X');
+            AppendIdentifier(sb, SymbolSafe(named.QualifiedName));
+        }
+
         AppendIdentifier(sb, function.Kind switch
         {
             FunctionKind.Constructor => "ctor",

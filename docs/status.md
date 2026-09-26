@@ -470,7 +470,9 @@ last person to edit it -- the suite is the authority.
   two instantiations of one generic interface — `IEq<int>` and `IEq<String>` —
   because each interface has its own dispatch table and the overloads land in
   different slots. One interface may overload a method too, each overload a
-  slot of its own
+  slot of its own. A member may have a default body, and a member may be
+  written under its interface's name -- `void IShape.Draw()` -- to fill that
+  slot alone; two defaults meet by C#'s most-specific rule
 - Overloading by parameter type, on methods as well as module-level functions;
   a return type alone does not distinguish two of them
 - `Standard.Collections`: `List<T>`, `Dictionary<TKey, TValue>`, `HashSet<T>`,

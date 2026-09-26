@@ -231,7 +231,8 @@ public sealed partial class Binder
 
         // Every body this instantiation owns is bound later, under this same
         // substitution.
-        foreach (var method in type.Methods.Where(m => m.HasBody))
+        foreach (var method in type.Methods.Concat(type.ExplicitImplementations)
+                     .Where(m => m.HasBody))
             _pending.Enqueue((method, substitution));
 
         // Operators are deliberately not in `Methods` -- they have no receiver
