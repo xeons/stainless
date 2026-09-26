@@ -2624,7 +2624,17 @@ public sealed class Parser
                 return new DeconstructSyntax(SpanFrom(start), names, spans, value);
             }
 
+            case TokenKind.StaticKeyword when Peek(1).Kind != TokenKind.EqualsGreater &&
+                                              Peek(1).Kind != TokenKind.OpenParen:
+                return ParseLocalFunction(start);
+
             default:
+                // `int Square(int x) => x * x;`: a type, a name, maybe type
+                // parameters, and a parenthesis. Nothing else in a block starts
+                // that way, so the guess is the whole of the decision.
+                if (AtTypeStart() && Probe(AtLocalFunctionHead))
+                    return ParseLocalFunction(start);
+
                 // `checked { ... }`. Contextual, for the reason `closure` is:
                 // the word is a good enough name that a test in this very
                 // repository had a parameter called it. `checked(e)` is an
@@ -2651,6 +2661,43 @@ public sealed class Parser
 
                 return ParseSimpleStatement(requireSemicolon: true);
         }
+    }
+
+    /// <summary>Whether a type, a name and an opening parenthesis are next.</summary>
+    private bool AtLocalFunctionHead()
+    {
+        ParseType();
+        if (!At(TokenKind.Identifier) || _diagnostics.HasErrors) return false;
+        Advance();
+
+        if (At(TokenKind.Less)) ParseTypeParameterList();
+        return At(TokenKind.OpenParen) && !_diagnostics.HasErrors;
+    }
+
+    /// <summary>
+    /// A function declared in a block. <c>static</c> may come first, and is
+    /// the only modifier one takes: it promises the body reaches nothing of
+    /// the function around it.
+    /// </summary>
+    private StatementSyntax ParseLocalFunction(int start)
+    {
+        var modifiers = Match(TokenKind.StaticKeyword) ? Modifiers.Static : Modifiers.None;
+        var declared = ParseFunctionOrField(start, modifiers, LinkageKind.Stainless);
+
+        if (declared is FunctionDeclSyntax function)
+        {
+            if (function.Body is null)
+                _diagnostics.Error("SL0210", function.Span,
+                    $"'{function.Name}' has no body; a function declared in a block is " +
+                    "defined where it stands");
+
+            return new LocalFunctionSyntax(SpanFrom(start), function);
+        }
+
+        _diagnostics.Error("SL0770", SpanFrom(start),
+            "only a function may be declared 'static' in a block; a local variable lives " +
+            "in the frame it was declared in, and a 'static' one belongs at module level");
+        return new BlockSyntax(SpanFrom(start), []);
     }
 
     /// <summary>

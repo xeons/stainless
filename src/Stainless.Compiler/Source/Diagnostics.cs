@@ -223,6 +223,9 @@ public sealed class DiagnosticBag
     /// <summary>Whether a report made now would be dropped.</summary>
     public bool IsMuted => _muted > 0;
 
+    /// <summary>Drops everything reported after the first <paramref name="count"/>.</summary>
+    public void RewindTo(int count) => _items.RemoveRange(count, _items.Count - count);
+
     public readonly struct Mute : IDisposable
     {
         private readonly DiagnosticBag _bag;

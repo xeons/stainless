@@ -319,7 +319,7 @@ public sealed partial class Binder
     private BoundExpression? TryCapture(string name, SourceSpan span) =>
         _closures.Count == 0 ? null : CaptureFrom(_closures.Count - 1, name, span);
 
-    private BoundExpression? CaptureFrom(int index, string name, SourceSpan span)
+    private BoundExpression? CaptureFrom(int index, string name, SourceSpan span, bool variablesOnly = false)
     {
         var closure = _closures[index];
 
@@ -327,7 +327,7 @@ public sealed partial class Binder
             return new BoundFieldAccess(
                 span, new BoundThis(span, closure.Type!, closure.This!), already);
 
-        var outer = ResolveOutside(index, name, span);
+        var outer = ResolveOutside(index, name, span, variablesOnly);
         if (outer is null) return null;
 
         if (closure.IsStatic)
@@ -352,11 +352,22 @@ public sealed partial class Binder
         closure.Captured[name] = field;
         closure.Captures.Add((field, outer));
 
+        if (VariableOf(outer) is { } origin) _captureOrigins[field] = origin;
+
         return new BoundFieldAccess(span, new BoundThis(span, closure.Type, closure.This!), field);
     }
 
+    /// <summary>The variable an expression reads, when it reads one directly.</summary>
+    private object? VariableOf(BoundExpression expression) => expression switch
+    {
+        BoundLocalAccess local => local.Local,
+        BoundParameterAccess parameter => OriginOf(parameter.Parameter),
+        BoundFieldAccess field => _captureOrigins.GetValueOrDefault(field.Field),
+        _ => null,
+    };
+
     /// <summary>Reads a name in the context the closure at <paramref name="index"/> was written in.</summary>
-    private BoundExpression? ResolveOutside(int index, string name, SourceSpan span)
+    private BoundExpression? ResolveOutside(int index, string name, SourceSpan span, bool variablesOnly = false)
     {
         var closure = _closures[index];
 
@@ -368,8 +379,20 @@ public sealed partial class Binder
             is { } parameter)
             return new BoundParameterAccess(span, parameter);
 
+        // A lambda inside a local function reaches past it the way the local
+        // function itself does: through what every call passes it.
+        if (closure.OuterFunction is { } outerFunction &&
+            _localFunctionOf.GetValueOrDefault(outerFunction) is { } local2 &&
+            (outerFunction.Captures.Any(c => c.Name == name) ||
+             local2.Visible?.ContainsKey(name) == true))
+            return CaptureInto(local2, outerFunction, name, span) is { } hidden
+                ? new BoundParameterAccess(span, hidden)
+                : new BoundErrorExpression(span);
+
         // The lambda that encloses this one may be able to reach it.
-        if (index > 0) return CaptureFrom(index - 1, name, span);
+        if (index > 0) return CaptureFrom(index - 1, name, span, variablesOnly);
+
+        if (variablesOnly) return null;
 
         // Otherwise it may be a member of the object the lambda was written
         // inside. Reading it here rather than in the lambda body is what makes
@@ -435,6 +458,9 @@ public sealed partial class Binder
                 span, new BoundThis(span, closure.Type!, closure.This!), already);
 
         var outer = index > 0 ? CaptureThis(index - 1, span) : EnclosingThis(closure, span);
+
+        if (outer is null && index == 0 && TryGiveLocalFunctionThis(closure.OuterFunction, span))
+            return new BoundErrorExpression(span);
 
         if (outer is null)
         {
@@ -521,6 +547,15 @@ public sealed partial class Binder
     private BoundExpression BindLambda(BoundLambda lambda, TypeSymbol target, SourceSpan span)
     {
         var syntax = lambda.Syntax;
+
+        if (target is DelegateTypeSymbol && lambda.LocalFunction is { } named)
+        {
+            diagnostics.Error("SL0381", span,
+                $"'{named}' reads variables of the function around it, or its object, so it " +
+                "cannot become a delegate; a delegate is a bare function pointer with nowhere " +
+                "to keep them. Convert it to a closure instead");
+            return new BoundErrorExpression(span);
+        }
 
         if (target is ClosureTypeSymbol asMethodPointer)
             return BindLambdaAsMethodPointer(syntax, asMethodPointer, span);
@@ -671,8 +706,7 @@ public sealed partial class Binder
         _parallelDepth = savedParallel;
 
         // Whatever the trial built on the way, it does not keep.
-        _classes.RemoveRange(classes, _classes.Count - classes);
-        _functions.RemoveRange(functions, _functions.Count - functions);
+        DiscardGenerated(classes, functions);
         _closureCount = closureCount;
 
         return produced;
@@ -932,6 +966,8 @@ public sealed partial class Binder
         AddLambdaParameters(symbol, syntax, wanted);
 
         closureType.Methods.Add(symbol);
+        _generated.Add(closureType);
+        _generated.Add(symbol);
 
         var context = new ClosureContext
         {
@@ -997,6 +1033,8 @@ public sealed partial class Binder
         AddLambdaParameters(symbol, syntax, target.Signature);
 
         closureType.Methods.Add(symbol);
+        _generated.Add(closureType);
+        _generated.Add(symbol);
 
         // Consumed here so that a lambda nested inside this one is bound as an
         // ordinary lambda.
@@ -1067,6 +1105,7 @@ public sealed partial class Binder
         };
 
         AddLambdaParameters(symbol, syntax, target.Signature);
+        _generated.Add(symbol);
 
         var context = new ClosureContext
         {

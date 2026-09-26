@@ -314,6 +314,8 @@ public sealed partial class Binder(
         // member may be captured in one file and written in another.
         ReportCapturedMembersThatChange();
 
+        SealLocalFunctions();
+
         // Interface ids are assigned last, because instantiating a generic can
         // introduce a new interface at any point up to here.
         for (int id = 0; id < _interfaces.Count; id++) _interfaces[id].Id = id;

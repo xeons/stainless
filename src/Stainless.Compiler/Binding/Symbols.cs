@@ -41,6 +41,13 @@ public sealed class ParameterSymbol(string name, TypeSymbol type, int index)
     /// <summary>True for the implicit receiver of a method, constructor or destructor.</summary>
     public bool IsThis { get; init; }
 
+    /// <summary>
+    /// For a parameter no source wrote -- the value of a variable a local
+    /// function reads from around it -- that variable: a local, or the
+    /// parameter it came from. Null for every other parameter.
+    /// </summary>
+    public object? CaptureOrigin { get; init; }
+
     /// <summary>Where it was written, for a diagnostic about the parameter itself.</summary>
     public Source.SourceSpan? DeclaredSpan { get; init; }
 
@@ -219,6 +226,20 @@ public sealed class FunctionSymbol
     public bool IsDispatched => VirtualSlot >= 0;
 
     public List<ParameterSymbol> Parameters { get; } = [];
+
+    /// <summary>
+    /// A local function's hidden parameters while its body is bound: one per
+    /// variable it reads from around it. They join <see cref="Parameters"/>
+    /// once every body is bound, which is what the emitter sees.
+    /// </summary>
+    public List<ParameterSymbol> Captures { get; } = [];
+
+    /// <summary>
+    /// For a function declared in a block, where it was declared --
+    /// <c>Main.Square</c> -- which is the name it is linked under. Null for
+    /// every other function.
+    /// </summary>
+    public string? LocalPath { get; init; }
 
     /// <summary>
     /// The declared parameter types, without the implicit receiver. This is
@@ -662,6 +683,9 @@ public sealed class GenericFunctionTemplate(
     /// </summary>
     public IReadOnlyDictionary<string, TypeSymbol> OuterSubstitution { get; init; } =
         new Dictionary<string, TypeSymbol>(StringComparer.Ordinal);
+
+    /// <summary>The binder's record of a local function, for one declared in a block.</summary>
+    public object? Local { get; init; }
 
     public override string ToString() => $"{Name}<{string.Join(", ", Parameters)}>";
 }

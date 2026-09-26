@@ -523,6 +523,12 @@ public sealed class BoundLambda(SourceSpan span, TypeSymbol type, Syntax.LambdaS
     : BoundExpression(span, type)
 {
     public Syntax.LambdaSyntax Syntax { get; } = syntax;
+
+    /// <summary>
+    /// The local function this lambda stands for, when it was written as a
+    /// name rather than as a lambda.
+    /// </summary>
+    public string? LocalFunction { get; init; }
 }
 
 /// <summary>

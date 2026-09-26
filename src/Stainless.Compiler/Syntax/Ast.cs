@@ -745,6 +745,16 @@ public sealed record DeconstructSyntax(
     IReadOnlyList<SourceSpan> NameSpans,
     ExpressionSyntax Value) : StatementSyntax(Span);
 
+/// <summary>
+/// A function declared in a block: <c>int Square(int x) =&gt; x * x;</c>.
+///
+/// The declaration is an ordinary function's, so everything a function may
+/// say -- a body of either kind, type parameters, defaults, <c>params</c> --
+/// it says the same way. <c>static</c> is the one modifier it takes.
+/// </summary>
+public sealed record LocalFunctionSyntax(SourceSpan Span, FunctionDeclSyntax Declaration)
+    : StatementSyntax(Span);
+
 /// <summary>A local declaration. A null <see cref="Type"/> means <c>var</c>.</summary>
 public sealed record LocalDeclSyntax(
     SourceSpan Span,

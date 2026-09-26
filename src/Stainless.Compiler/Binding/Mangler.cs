@@ -147,7 +147,7 @@ public static class Mangler
             FunctionKind.Constructor => "ctor",
             FunctionKind.Destructor => "dtor",
             FunctionKind.StaticConstructor => "cctor",
-            _ => function.Name,
+            _ => function.LocalPath ?? function.Name,
         });
 
         // An instantiated generic carries its type arguments, so two

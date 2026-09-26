@@ -658,6 +658,39 @@ public class ParserTests
         return unit.Declarations.OfType<FunctionDeclSyntax>().Single().Body!.Statements[0];
     }
 
+    [Theory]
+    [InlineData("int Square(int x) => x * x;", false)]
+    [InlineData("int Square(int x) { return x * x; }", false)]
+    [InlineData("static int Square(int x) => x * x;", true)]
+    [InlineData("T Same<T>(T x) => x;", false)]
+    [InlineData("List<int> Make() => new List<int>();", false)]
+    [InlineData("(int, int) Pair() => (1, 2);", false)]
+    public void AFunctionMayBeDeclaredInABlock(string body, bool isStatic)
+    {
+        var statement = FirstStatement(body, out var diagnostics);
+
+        Assert.Empty(diagnostics.Items);
+        var local = Assert.IsType<LocalFunctionSyntax>(statement);
+        Assert.Equal(isStatic, local.Declaration.Modifiers.HasFlag(Modifiers.Static));
+    }
+
+    /// <summary>A type, a name and a parenthesis is a local function; nothing else is.</summary>
+    [Theory]
+    [InlineData("x = F(y);")]
+    [InlineData("F(y);")]
+    [InlineData("Console.WriteLine(y);")]
+    [InlineData("List<int> xs = new List<int>();")]
+    [InlineData("F<int>(y);")]
+    public void AStatementThatLooksLikeACallIsOne(string body) =>
+        Assert.IsNotType<LocalFunctionSyntax>(FirstStatement(body, out _));
+
+    [Fact]
+    public void AStaticLocalVariableIsRefused()
+    {
+        FirstStatement("static int count = 0;", out var diagnostics);
+        Assert.Contains("SL0770", Front.Codes(diagnostics));
+    }
+
     [Fact]
     public void AsmOperandsKeepTheirDirectionRegisterAndValue()
     {

@@ -433,6 +433,7 @@ public sealed partial class Binder
 
         _functions.Add(new BoundFunction(thunk, new BoundBlock(function.Span, [statement])));
         _thunks[function] = thunk;
+        if (_generated.Contains(function)) _generated.Add(thunk);
         return thunk;
     }
 

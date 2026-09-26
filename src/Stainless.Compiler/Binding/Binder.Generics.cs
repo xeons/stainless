@@ -322,6 +322,9 @@ public sealed partial class Binder
     private FunctionSymbol? InstantiateFunction(
         GenericFunctionTemplate template, IReadOnlyList<TypeSymbol> arguments, SourceSpan span)
     {
+        if (template.Local is LocalFunction local && arguments.Count == template.Parameters.Count)
+            return InstantiateLocalFunction(local, template, arguments, span);
+
         if (arguments.Count != template.Parameters.Count)
         {
             diagnostics.Error("SL0324", span,

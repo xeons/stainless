@@ -824,6 +824,9 @@ public sealed partial class Binder
     private bool NamesAValue(string name) =>
         LookupLocal(name) is not null ||
         _currentFunction?.Parameters.Any(p => p.Name == name && !p.IsThis) == true ||
+        _currentFunction?.Captures.Any(c => c.Name == name) == true ||
+        (_currentFunction is { } function &&
+         _localFunctionOf.GetValueOrDefault(function)?.Visible?.ContainsKey(name) == true) ||
         _currentFunction?.ContainingType?.FindField(name) is not null ||
         _currentFunction?.ContainingType?.FindProperty(name) is not null;
 

@@ -821,6 +821,9 @@ public sealed partial class Binder
         ReportReachingTheObject(syntax.Span);
 
         var parameter = _currentFunction?.Parameters.FirstOrDefault(p => p.IsThis);
+        if (parameter is null && TryGiveLocalFunctionThis(_currentFunction, syntax.Span))
+            return new BoundErrorExpression(syntax.Span);
+
         if (parameter is null)
         {
             diagnostics.Error("SL0228", syntax.Span,
@@ -1327,6 +1330,14 @@ public sealed partial class Binder
             if (_currentFunction?.Parameters.FirstOrDefault(p => p.Name == name && !p.IsThis) is { } parameter)
                 return Narrowed(new BoundParameterAccess(syntax.Span, parameter), parameter);
 
+            // A variable of the function around a local function: one of the
+            // hidden parameters every call passes it.
+            if (TryCaptureIntoLocalFunction(name, syntax.Span) is { } captured)
+                return captured;
+
+            if (LookupLocalFunction(name) is { } localFunction)
+                return LocalFunctionValue(localFunction, syntax.Span);
+
             // A constant the enclosing type declares, named without the type
             // in front of it -- which is how it reads inside its own methods,
             // and what C# does with the same declaration.
@@ -1347,6 +1358,11 @@ public sealed partial class Binder
                 (inStatic.ContainingType!.FindProperty(name) is not null ||
                  inStatic.ContainingType.FindField(name) is not null))
             {
+                // A local function is given the object when it turns out to
+                // need it; this binding is then thrown away.
+                if (TryGiveLocalFunctionThis(inStatic, syntax.Span))
+                    return new BoundErrorExpression(syntax.Span);
+
                 diagnostics.Error("SL0576", syntax.Span,
                     $"'{name}' belongs to an instance of '{inStatic.ContainingType.Name}', and " +
                     $"'{inStatic.Name}' is static, so there is no instance here. Take one as a " +
@@ -1391,8 +1407,8 @@ public sealed partial class Binder
         }
 
         // Not declared here, so a lambda body reaches outward and captures it.
-        if (parts.Count == 1 && TryCapture(parts[0], syntax.Span) is { } captured)
-            return captured;
+        if (parts.Count == 1 && TryCapture(parts[0], syntax.Span) is { } fromAround)
+            return fromAround;
 
         // A bare function name is a value only once it is known which delegate
         // it is becoming, so it stays a group until a conversion resolves it.
@@ -1416,6 +1432,9 @@ public sealed partial class Binder
         ReportReachingTheObject(span);
 
         var parameter = _currentFunction?.Parameters.FirstOrDefault(p => p.IsThis);
+        if (parameter is null && TryGiveLocalFunctionThis(_currentFunction, span))
+            return new BoundErrorExpression(span);
+
         return parameter is null ? null : Receiver(span, parameter);
     }
 
@@ -2444,6 +2463,15 @@ public sealed partial class Binder
             diagnostics.Error("SL0379", span,
                 $"'{owner.Static.Name}' is 'static readonly', so it is written once by its " +
                 "initializer and never again. Drop the 'readonly' if it is meant to change");
+            return false;
+        }
+
+        if (BaseOf(target) is BoundParameterAccess { Parameter.CaptureOrigin: not null } copied)
+        {
+            diagnostics.Error("SL0769", span,
+                $"'{copied.Parameter.Name}' belongs to the function around this local function, " +
+                "which is given its value at each call and not the variable itself; assigning " +
+                "it would change only that copy. Return the new value, or make it a field");
             return false;
         }
 

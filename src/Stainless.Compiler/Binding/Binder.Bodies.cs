@@ -64,6 +64,12 @@ public sealed partial class Binder
 
     private void BindFunctionBody(FunctionSymbol function)
     {
+        if (function.LocalPath is not null || _rebindable) BindFunctionBodyCore(function);
+        else BindFunctionBodyUntilSettled(function);
+    }
+
+    private void BindFunctionBodyCore(FunctionSymbol function)
+    {
         if (function.IsAutoAccessor) { BindAutoAccessor(function); return; }
         if (function.Event is not null) { BindEventAccessor(function); return; }
         if (function.Body is null) return;
@@ -1389,7 +1395,8 @@ public sealed partial class Binder
     private LocalSymbol DeclareLocal(string name, TypeSymbol type, bool isConst, SourceSpan span)
     {
         var local = new LocalSymbol(name, type, isConst);
-        if (LookupLocal(name) is not null)
+        if (LookupLocal(name) is not null ||
+            _localFunctionScopes.Count > 0 && _localFunctionScopes[^1].ContainsKey(name))
             diagnostics.Error("SL0218", span, $"'{name}' is already declared in this scope");
         else if (_currentFunction?.Parameters.Any(p => p.Name == name) == true)
             diagnostics.Error("SL0219", span, $"'{name}' is already the name of a parameter");
@@ -1405,6 +1412,10 @@ public sealed partial class Binder
         var statements = new List<BoundStatement>();
         var block = new BoundBlock(syntax.Span, statements);
 
+        var functions = new Dictionary<string, LocalFunction>(StringComparer.Ordinal);
+        _localFunctionScopes.Add(functions);
+        DeclareLocalFunctions(syntax, functions);
+
         foreach (var statement in syntax.Statements)
         {
             var bound = BindStatement(statement);
@@ -1412,6 +1423,7 @@ public sealed partial class Binder
             statements.Add(bound);
         }
 
+        _localFunctionScopes.RemoveAt(_localFunctionScopes.Count - 1);
         PopScope();
         return block;
     }
@@ -1433,6 +1445,7 @@ public sealed partial class Binder
     {
         BlockSyntax block => BindBlock(block),
         LocalDeclSyntax local => BindLocalDeclaration(local),
+        LocalFunctionSyntax function => BindLocalFunctionDeclaration(function),
         DeconstructSyntax taken => BindDeconstruct(taken),
         ExpressionStatementSyntax expression => BindExpressionStatement(expression),
         IfSyntax ifStatement => BindIf(ifStatement),

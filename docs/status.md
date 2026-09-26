@@ -270,6 +270,13 @@ last person to edit it -- the suite is the authority.
   because a call reads the static type's declaration and two values would make
   the same line mean two things. They cross a library boundary as the value they
   folded to
+- Local functions: declared in a block, called before or after the
+  declaration, recursive and mutually recursive, generic, `static`. What one
+  reads of the function around it is passed at each call as a hidden
+  parameter, so it sees current values, allocates nothing and may not assign
+  what it captured (SL0769); one that reads nothing is a plain function and a
+  `delegate`. Its list of captures is learned by binding, and a function whose
+  calls were bound against too short a list is bound again
 - `params` on the last parameter: `Sum(1, 2, 3)`, `Sum()` and `Sum(numbers)`
   all reach `int Sum(params int[] values)`, with C#'s preference for the
   declared form and generic inference from the elements. A `params T[:]`

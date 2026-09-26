@@ -125,6 +125,10 @@ public sealed partial class Binder
         if (BindDelegateTarget(syntax.Callee) is { } indirect)
             return BuildIndirectCall(syntax, indirect, arguments);
 
+        if (syntax.Callee is NameSyntax { Name.Parts.Count: 1 } near &&
+            LookupLocalFunction(near.Name.Text) is { } local)
+            return BindLocalFunctionCall(syntax, near, local, arguments);
+
         if (syntax.Callee is NameSyntax callee)
         {
             // A method of the enclosing type, called without a receiver.
@@ -287,6 +291,19 @@ public sealed partial class Binder
         CallSyntax syntax, NameSyntax callee, List<BoundExpression> arguments)
     {
         string name = callee.Name.Text;
+
+        if (callee.Name.Parts.Count == 1 && LookupLocalFunction(name) is { } local)
+        {
+            if (local.Template is null)
+            {
+                diagnostics.Error("SL0759", callee.Span,
+                    $"'{name}' is not generic, so it takes no type arguments; leave the " +
+                    "'<...>' off");
+                return new BoundErrorExpression(callee.Span);
+            }
+
+            return BindLocalFunctionCall(syntax, callee, local, arguments);
+        }
 
         if (callee.Name.Parts.Count == 1 && _currentFunction?.ContainingType is { } enclosing &&
             enclosing.GenericMethods.Where(m => m.Name == name).ToList() is { Count: > 0 } own)
@@ -572,6 +589,8 @@ public sealed partial class Binder
             $"'{local.Local.Name}' is a 'const'",
         BoundParameterAccess { Parameter.Mode: ParameterMode.In } parameter =>
             $"'{parameter.Parameter.Name}' is an 'in' parameter, which promises not to be written",
+        BoundParameterAccess { Parameter.CaptureOrigin: not null } copied =>
+            $"'{copied.Parameter.Name}' is a local function's copy of a variable around it",
         BoundStaticAccess { Static.IsReadonly: true } held =>
             $"'{held.Static.Name}' is a 'static readonly'",
         _ => null,
@@ -597,6 +616,12 @@ public sealed partial class Binder
                         p => p.Name == text && !p.IsThis) is { } parameter &&
                     IsCallableValue(parameter.Type))
                     return new BoundParameterAccess(name.Span, parameter);
+
+                if (_currentFunction is { } function &&
+                    (function.Captures.FirstOrDefault(c => c.Name == text)?.Type ??
+                     _localFunctionOf.GetValueOrDefault(function)?.Visible?.GetValueOrDefault(text).Type)
+                    is { } capturedType && IsCallableValue(capturedType))
+                    return TryCaptureIntoLocalFunction(text, name.Span);
 
                 if (_currentFunction?.ContainingType?.FindProperty(text) is { } property &&
                     IsCallableValue(property.Type))

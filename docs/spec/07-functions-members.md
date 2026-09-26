@@ -239,6 +239,81 @@ others, so nothing may follow them
 It crosses a library boundary: the metadata says which parameter gathers, and
 the consumer's call sites do the gathering.
 
+### 7.1.4 Local functions
+
+```csharp
+int Main()
+{
+    int factor = 3;
+    Console.WriteLine(Scale(5));            // 15: called before its declaration
+
+    factor = 10;
+    Console.WriteLine(Scale(5));            // 50: it reads factor as it is now
+    return 0;
+
+    int Scale(int x) => x * factor;
+}
+```
+
+**A function may be declared in a block**, with everything a function may
+have — a block or an arrow body, type parameters, defaults, `params`, `ref`
+and `out`. It is named from anywhere in its block, before its declaration as
+well as after, so two may call each other and one may call itself. Names are
+not overloaded, as in C#, and one may not share a name with a variable in its
+scope (SL0218).
+
+**What it reads of the function around it is passed at every call.** A local,
+a parameter, and the object of the method it is in each reach it as a
+parameter no source wrote, filled in at the call from the variable as it then
+stands. So the function sees what C#'s would — the current value, at each call
+— and costs what a call with a few more arguments costs: nothing is allocated,
+and one that reads nothing is an ordinary function, which becomes a `delegate`
+like any other.
+
+**It is capture by value, and so it may not assign what it captured**
+(SL0769). A copy per call is the model every closure here has
+([§2.15](02-types.md#215-lambdas-and-closures)); an assignment would change the
+copy and nothing else, and saying so beats a write that silently goes nowhere.
+Return the value, or keep it in a field. The object of the method is the one
+thing reached by reference, as it is from a method: `this` is passed, and a
+field written through it is written.
+
+**A call has to be able to see what the function reads** (SL0768). One made
+before a variable the function reads is declared has no value to pass —
+C# reports the same call as reading an unassigned variable.
+
+```
+error[SL0768]: 'Late' reads 'y' from around it, which every call passes it, and
+that 'y' is not in reach here -- it is declared later, or another variable has
+its name. Call it where the variable is in scope
+```
+
+**Named without a call, it is a value.** One that reads nothing is a function
+like a module-level one, and fits a `delegate` or a `closure`. One that reads
+something becomes a closure that calls it, and what it reads is copied when the
+closure is made — the rule for a lambda, because it is one; it cannot be a
+`delegate` (SL0381). A generic one is a value only through a call that settles
+its type arguments (SL0761).
+
+**`static` promises it reads nothing** from around it — no variable, no object
+— and each attempt is SL0767. It is the same promise a `static` lambda makes,
+written where the function is.
+
+**How the list of what it reads is worked out.** A call may be bound before the
+function it calls — it is declared later, or calls back into its caller — and
+each call has to pass what the callee reads. So the list is learned by binding
+the bodies, and where a call was bound against a shorter list than the callee
+ended up with, the function around them is bound again with what was learned.
+The lists only grow, so that settles, and a program that declares its local
+functions before using them is bound once. The one place this cannot happen is
+an initializer outside any function, where a use before the declaration is
+refused (SL0768).
+
+**The symbol says where it was declared**: `Scale` above is linked as
+`Main.Scale`, one inside a method as `Type.Method.Name`, one inside another as
+`Main.Outer.Inner`, so a debugger and the IR name it the way the source does.
+Its parameter list is its own and then what it captured, in that order.
+
 ## 7.2 `ref`, `in` and `out` parameters
 
 A parameter is a copy unless it says otherwise. `ref`, `in` and `out` say
