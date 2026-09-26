@@ -217,6 +217,15 @@ public class TargetTests
         Assert.Equal("i32", TargetPlatform.X86Linux.NativeIntType);
     }
 
+    /// <summary>clang's own default for i686 Linux has no SSE in some versions.</summary>
+    [Fact]
+    public void X86NamesAProcessorWithSse2()
+    {
+        Assert.Equal("pentium4", TargetPlatform.X86Linux.Cpu);
+        Assert.Equal("pentium4", TargetPlatform.X86Windows.Cpu);
+        Assert.Null(TargetPlatform.X64Linux.Cpu);
+    }
+
     // ------------------------------------------------------------- the names
 
     [Theory]

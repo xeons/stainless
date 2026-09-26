@@ -117,6 +117,12 @@ generated type no typedef of its own.
 bytes, `nint` and `nuint` are four bytes, and every header counted in words
 narrows with them — the object header to 12 and an array's to 16.
 
+The processor assumed is a Pentium 4, so SSE2 is there and a `float` or
+`double` is computed in an `xmm` register; only a return goes through the x87
+stack, as both systems' C ABI requires. It is named rather than left to clang,
+whose default for i686 Linux has been a plain i686 in some versions and a
+Pentium 4 in others.
+
 **`long`, `ulong` and `double` are aligned differently by the two systems.**
 MSVC keeps them on an eight-byte boundary, as every 64-bit ABI does; i386
 System V puts them on a four-byte one inside a struct, so

@@ -71,6 +71,9 @@ public sealed class Toolchain
 
             if (target.Architecture != host.Architecture || target.IsWindows != host.IsWindows)
                 yield return "--target=" + target.Triple;
+
+            if (target.Cpu is { } cpu)
+                yield return "-march=" + cpu;
         }
     }
 
@@ -84,7 +87,8 @@ public sealed class Toolchain
     /// whenever <c>--target</c> named another.
     /// </summary>
     private string EffectiveTriple =>
-        TargetArguments.FirstOrDefault() is { } named
+        TargetArguments.FirstOrDefault(a => a.StartsWith("--target=", StringComparison.Ordinal))
+            is { } named
             ? named["--target=".Length..]
             : TargetTriple;
 
@@ -592,6 +596,7 @@ public sealed class Toolchain
         string irPath, string objectPath, Binding.TargetPlatform target) =>
         Run(ClangPath, [
             "--target=" + target.Triple,
+            .. target.Cpu is { } cpu ? ["-march=" + cpu] : Array.Empty<string>(),
             "-c", irPath,
             "-o", objectPath,
             "-Wno-override-module",

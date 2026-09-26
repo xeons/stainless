@@ -72,6 +72,15 @@ public sealed record TargetPlatform
     /// <summary>What clang is told to build for.</summary>
     public required string Triple { get; init; }
 
+    /// <summary>
+    /// The processor clang is told to assume, or null for its own default.
+    /// A 32-bit x86 build MUST name one: clang 18 takes i686 Linux as a plain
+    /// i686, with no SSE, while clang 21 and every Windows clang take a
+    /// Pentium 4. Without SSE2 a <c>double</c> lives on the x87 stack, and an
+    /// <c>asm</c> operand in <c>xmm0</c> crashes clang 18's back end.
+    /// </summary>
+    public string? Cpu => Architecture == TargetArch.X86 ? "pentium4" : null;
+
     /// <summary>True for a Microsoft target, which differs in more than names:
     /// the x86 struct-return rule and the decorated symbol are both Windows'.</summary>
     public bool IsWindows => Triple.Contains("windows", StringComparison.Ordinal);
