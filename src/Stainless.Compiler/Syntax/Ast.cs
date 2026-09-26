@@ -911,6 +911,53 @@ public sealed record BinaryPatternSyntax(
 public sealed record NotPatternSyntax(SourceSpan Span, PatternSyntax Operand)
     : PatternSyntax(Span);
 
+/// <summary><c>var x</c> -- anything at all, null included, under a name.</summary>
+public sealed record VarPatternSyntax(SourceSpan Span, string Name, SourceSpan NameSpan)
+    : PatternSyntax(Span);
+
+/// <summary>
+/// <c>Point(0, var y)</c>, <c>{ Radius: &gt; 1 }</c>, <c>Circle { Radius: var r } c</c>
+/// -- a value taken apart, by position, by member, or both, with an optional
+/// type in front and an optional name after.
+///
+/// <c>var (a, b)</c> is this with no type and a <c>var</c> in each place.
+/// </summary>
+/// <param name="Positional">The parenthesised part, or null where there was none.</param>
+/// <param name="Properties">The braced part, or null where there was none.</param>
+public sealed record RecursivePatternSyntax(
+    SourceSpan Span,
+    TypeSyntax? Type,
+    IReadOnlyList<SubpatternSyntax>? Positional,
+    IReadOnlyList<SubpatternSyntax>? Properties,
+    string? Binding,
+    SourceSpan BindingSpan) : PatternSyntax(Span);
+
+/// <summary>
+/// One place in a positional or property pattern: <c>X: 0</c>, <c>Owner.Name:
+/// "a"</c>, or a positional one with no name at all.
+/// </summary>
+/// <param name="Path">The member names, dotted; empty for an unnamed position.</param>
+public sealed record SubpatternSyntax(
+    SourceSpan Span, IReadOnlyList<string> Path, SourceSpan PathSpan, PatternSyntax Pattern)
+    : SyntaxNode(Span);
+
+/// <summary>
+/// <c>[1, .., var last]</c> -- a sequence matched element by element, with at
+/// most one <see cref="SlicePatternSyntax"/> standing for the run between.
+/// </summary>
+public sealed record ListPatternSyntax(
+    SourceSpan Span,
+    IReadOnlyList<PatternSyntax> Elements,
+    string? Binding,
+    SourceSpan BindingSpan) : PatternSyntax(Span);
+
+/// <summary>
+/// <c>..</c> inside a list pattern, and <c>.. var rest</c>, which names the
+/// run it skipped.
+/// </summary>
+public sealed record SlicePatternSyntax(SourceSpan Span, PatternSyntax? Pattern)
+    : PatternSyntax(Span);
+
 /// <summary>
 /// One arm of a <c>switch</c> expression: <c>pattern =&gt; value</c>, with an
 /// optional <c>when</c> between them.
@@ -1196,29 +1243,18 @@ public sealed record CallSyntax(
 public sealed record BaseSyntax(SourceSpan Span) : ExpressionSyntax(Span);
 
 /// <summary>
-/// <c>value is Type</c>: whether the object really is one of those.
+/// <c>value is pattern</c>: whether the value matches, as a <c>bool</c>.
 ///
-/// The right side is a type rather than an expression, which is why this is not
-/// a <see cref="BinarySyntax"/>. It answers for a class by walking the object's
-/// base chain and for an interface by looking in its dispatch table, and it is
-/// how a downcast is made safe -- there being no exception for one to throw.
+/// The right side is a pattern rather than an expression, which is why this is
+/// not a <see cref="BinarySyntax"/>. <c>x is Circle c</c>, <c>x is not null</c>,
+/// <c>x is &gt; 0 and &lt; 10</c> and <c>x is { Radius: &gt; 1 }</c> are all
+/// this; what a pattern names is in scope where the test is known to have
+/// matched, which the binder works out from where the test stands.
 /// </summary>
-/// <param name="Binding">
-/// The name in <c>value is Circle c</c>, or null when the test only asks. It is
-/// in scope where the test succeeded and nowhere else, which is why it is
-/// carried here rather than being a declaration of its own: the statement that
-/// declares it is built by whatever the condition belongs to.
-/// </param>
-public sealed record TypeTestSyntax(
+public sealed record IsPatternSyntax(
     SourceSpan Span,
     ExpressionSyntax Value,
-    TypeSyntax Tested,
-    string? Binding,
-    SourceSpan BindingSpan) : ExpressionSyntax(Span)
-{
-    public TypeTestSyntax(SourceSpan span, ExpressionSyntax value, TypeSyntax tested)
-        : this(span, value, tested, null, span) { }
-}
+    PatternSyntax Pattern) : ExpressionSyntax(Span);
 
 public sealed record MemberAccessSyntax(
     SourceSpan Span,
@@ -1375,7 +1411,7 @@ public sealed record CastSyntax(SourceSpan Span, TypeSyntax Type, ExpressionSynt
 /// <summary>
 /// <c>value as Type</c>: the value as one of those, or null.
 ///
-/// The same question <see cref="TypeTestSyntax"/> asks, wanting the answer as a
+/// The same question <see cref="IsPatternSyntax"/> asks, wanting the answer as a
 /// value rather than as a branch. A cast ends the program when it was wrong and
 /// <c>is</c> only says yes or no, so this is what a chain of maybes is written
 /// with: <c>Parent() as Frame</c> passed straight on, or stored.

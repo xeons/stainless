@@ -64,7 +64,7 @@ public class ParserTests
         CallSyntax call =>
             $"(call {Render(call.Callee)}{string.Concat(call.Arguments.Select(a => " " + Render(a)))})",
         CastSyntax cast => $"(cast {Render(cast.Operand)})",
-        TypeTestSyntax test => $"(is {Render(test.Value)})",
+        IsPatternSyntax test => $"(is {Render(test.Value)} {Render(test.Pattern)})",
         NewSyntax made => made.Type is null ? "new()" : "new",
         ArrayLiteralSyntax array =>
             $"[{string.Join(" ", array.Elements.Select(Render))}]",
@@ -75,10 +75,37 @@ public class ParserTests
         _ => expression.GetType().Name,
     };
 
+    private static string Render(PatternSyntax pattern) => pattern switch
+    {
+        DiscardPatternSyntax => "_",
+        VarPatternSyntax named => $"(var {named.Name})",
+        ConstantPatternSyntax constant => Render(constant.Value),
+        RelationalPatternSyntax relational => $"({relational.Operator.FixedText()} {Render(relational.Value)})",
+        TypePatternSyntax typed => $"(type {Render(typed.Type)}{(typed.Binding is null ? "" : " " + typed.Binding)})",
+        NotPatternSyntax negated => $"(not {Render(negated.Operand)})",
+        BinaryPatternSyntax combined =>
+            $"({(combined.IsOr ? "or" : "and")} {Render(combined.Left)} {Render(combined.Right)})",
+        RecursivePatternSyntax recursive =>
+            "(match" + (recursive.Type is null ? "" : " " + Render(recursive.Type)) +
+            (recursive.Positional is null ? "" : " (" + string.Join(" ", recursive.Positional.Select(Render)) + ")") +
+            (recursive.Properties is null ? "" : " {" + string.Join(" ", recursive.Properties.Select(Render)) + "}") +
+            (recursive.Binding is null ? "" : " " + recursive.Binding) + ")",
+        ListPatternSyntax list =>
+            "[" + string.Join(" ", list.Elements.Select(Render)) + "]" +
+            (list.Binding is null ? "" : " " + list.Binding),
+        SlicePatternSyntax slice => slice.Pattern is null ? ".." : $"(.. {Render(slice.Pattern)})",
+        _ => pattern.GetType().Name,
+    };
+
+    private static string Render(SubpatternSyntax element) =>
+        (element.Path.Count == 0 ? "" : string.Join(".", element.Path) + ": ") + Render(element.Pattern);
+
     private static string Render(TypeSyntax type) => type switch
     {
         PrimitiveTypeSyntax primitive => primitive.Keyword.FixedText() ?? "?",
         NamedTypeSyntax named => named.Name.Text + Arguments(named.TypeArguments),
+        NullableTypeSyntax nullable => Render(nullable.Element) + "?",
+        ArrayTypeSyntax array => Render(array.Element) + "[]",
         _ => type.GetType().Name,
     };
 
@@ -447,9 +474,48 @@ public class ParserTests
     [Fact]
     public void ANullableTypeTestStaysOne()
     {
-        var test = Assert.IsType<TypeTestSyntax>(Front.Expression("x is Node? found"));
-        Assert.IsType<NullableTypeSyntax>(test.Tested);
+        var test = Assert.IsType<IsPatternSyntax>(Front.Expression("x is Node? found"));
+        var typed = Assert.IsType<TypePatternSyntax>(test.Pattern);
+        Assert.IsType<NullableTypeSyntax>(typed.Type);
     }
+
+    /// <summary>
+    /// What follows <c>is</c> is a pattern, and each shape of one parses to the
+    /// node it names.
+    /// </summary>
+    [Theory]
+    [InlineData("x is null", "(is x null)")]
+    [InlineData("x is not null", "(is x (not null))")]
+    [InlineData("x is > 5 and < 10", "(is x (and (> 5) (< 10)))")]
+    [InlineData("x is 1 or 2", "(is x (or 1 2))")]
+    [InlineData("x is Circle c", "(is x (type Circle c))")]
+    [InlineData("x is Level.Low", "(is x (. Level Low))")]
+    [InlineData("x is List<int>", "(is x (type List<int>))")]
+    [InlineData("x is int[]", "(is x (type int[]))")]
+    [InlineData("x is Circle { Radius: > 1 } c", "(is x (match Circle {Radius: (> 1)} c))")]
+    [InlineData("x is { Owner.Name: \"a\" }", "(is x (match {Owner.Name: a}))")]
+    [InlineData("x is { }", "(is x (match {}))")]
+    [InlineData("x is (1, _)", "(is x (match (1 _)))")]
+    [InlineData("x is (X: 1, Y: var y)", "(is x (match (X: 1 Y: (var y))))")]
+    [InlineData("x is Point(0, var y)", "(is x (match Point (0 (var y))))")]
+    [InlineData("x is var (a, b)", "(is x (match ((var a) (var b))))")]
+    [InlineData("x is var _", "(is x _)")]
+    [InlineData("x is (Circle or Square)", "(is x (or Circle Square))")]
+    [InlineData("x is [1, .., var last]", "(is x [1 .. (var last)])")]
+    [InlineData("x is [.. var rest] all", "(is x [(.. (var rest))] all)")]
+    [InlineData("x is []", "(is x [])")]
+    [InlineData("x is Value()", "(is x (call Value))")]
+    [InlineData("x is (byte)1", "(is x (cast 1))")]
+    public void APatternFollowsIs(string source, string shape) =>
+        Assert.Equal(shape, Shape(source));
+
+    /// <summary>A pattern ends where the expression around it goes on.</summary>
+    [Theory]
+    [InlineData("x is null && y", "(&& (is x null) y)")]
+    [InlineData("x is Node n || y", "(|| (is x (type Node n)) y)")]
+    [InlineData("!(x is 1 or 2)", "(! (is x (or 1 2)))")]
+    public void APatternStopsAtTheExpressionAroundIt(string source, string shape) =>
+        Assert.Equal(shape, Shape(source));
 
     [Fact]
     public void ATypeCollectsItsMembers()

@@ -158,7 +158,7 @@ public sealed partial class LlvmEmitter
             if (ConstantStaticText(symbol) is not null) continue;
 
             // A scope of its own, for what the initializer declares as it
-            // goes, such as an `out var`.
+            // goes: a name a pattern binds, an `out var`.
             PushScope();
             var value = EmitExpression(symbol.Initializer);
             string slot = "@" + StaticName(symbol);

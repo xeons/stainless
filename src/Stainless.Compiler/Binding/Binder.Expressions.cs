@@ -55,19 +55,8 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
-        // A name `is` makes is true in the rest of an `&&` and in the branch
-        // the condition guards. Under anything else -- `!`, `||`, an argument
-        // -- there is no such place, so the scope is hidden there.
-        var enclosing = _patterns;
-        if (syntax is not (TypeTestSyntax or BinarySyntax { Operator: TokenKind.AmpAmp }))
-            _patterns = null;
-
         try { return BindExpressionCore(syntax); }
-        finally
-        {
-            _patterns = enclosing;
-            _bindDepth--;
-        }
+        finally { _bindDepth--; }
     }
 
     private BoundExpression BindExpressionCore(ExpressionSyntax syntax) => syntax switch
@@ -76,7 +65,7 @@ public sealed partial class Binder
         NameSyntax name => BindName(name),
         ThisSyntax thisExpression => BindThis(thisExpression),
         BaseSyntax baseExpression => BindBaseValue(baseExpression),
-        TypeTestSyntax typeTest => BindTypeTest(typeTest),
+        IsPatternSyntax matched => BindIsPattern(matched),
         AsCastSyntax asCast => BindAsCast(asCast),
         SwitchExpressionSyntax chosen => BindSwitchExpression(chosen),
         UnarySyntax unary => BindUnary(unary),
@@ -894,116 +883,6 @@ public sealed partial class Binder
     }
 
     /// <summary>
-    /// <c>value is Type</c>: whether the object really is one of those.
-    ///
-    /// A test that could never be true is a mistake rather than a constant
-    /// false, and one that must be true is a redundancy worth saying so about.
-    /// </summary>
-    private BoundExpression BindTypeTest(TypeTestSyntax syntax)
-    {
-        // Whatever is being tested is bound outside the pattern scope: the one
-        // binding this `is` may make is its own, and an `is` nested in the
-        // value has no branch of its own to be true in.
-        var enclosing = _patterns;
-        _patterns = null;
-        var value = BindExpression(syntax.Value);
-        _patterns = enclosing;
-
-        // A case is not a type and would not resolve as one, so a variant is
-        // asked before the right side is resolved. A case wins over a class of
-        // the same name, because the value says which question was meant.
-        if (value.Type is VariantTypeSymbol variant &&
-            syntax.Tested is NamedTypeSyntax { Name.Parts: [var only], TypeArguments.Count: 0 } &&
-            variant.FindCase(only) is { } namedCase)
-            return BindVariantCaseTest(syntax, value, namedCase);
-
-        // Nothing else a variant could be asked: it is a value type, so it is
-        // never an object of some class, and the only question left is which
-        // of its cases it holds.
-        if (value.Type is VariantTypeSymbol whole &&
-            syntax.Tested is NamedTypeSyntax { Name.Parts: [var missing], TypeArguments.Count: 0 })
-        {
-            diagnostics.Error("SL0518", syntax.Span,
-                $"'{whole.Name}' is a variant and has no case named '{missing}'; " +
-                "what 'is' asks a variant is which case it holds, and those are " +
-                Listed(whole.Cases.Select(c => c.Name)));
-            return new BoundErrorExpression(syntax.Span);
-        }
-
-        var tested = ResolveType(syntax.Tested, _currentScope!);
-        if (value.Type.IsError() || tested.IsError()) return new BoundErrorExpression(syntax.Span);
-
-        if (tested is not NamedTypeSymbol { IsReferenceType: true } wanted)
-        {
-            diagnostics.Error("SL0518", syntax.Span,
-                $"'{tested.Name}' is not a class or an interface, so 'is' has nothing to ask: " +
-                "every other type is known exactly where it is written");
-            return new BoundErrorExpression(syntax.Span);
-        }
-
-        if (value.Type is WeakTypeSymbol)
-        {
-            diagnostics.Error("SL0518", syntax.Span,
-                $"'{value.Type.Name}' may already have died, so what it is cannot be asked " +
-                "directly; read it into a '" + wanted.Name + "?' first, which is the check " +
-                "that makes it safe to look at");
-            return new BoundErrorExpression(syntax.Span);
-        }
-
-        if (value.Type.AsReference() is not NamedTypeSymbol subject)
-        {
-            diagnostics.Error("SL0518", syntax.Span,
-                $"'is' asks what an object really is, and '{value.Type.Name}' is not a reference " +
-                "to one");
-            return new BoundErrorExpression(syntax.Span);
-        }
-
-        if (wanted is ComInterfaceTypeSymbol || subject is ComInterfaceTypeSymbol)
-        {
-            if (!CanAskCom("SL0518", syntax.Span, subject, wanted))
-                return new BoundErrorExpression(syntax.Span);
-
-            var asked = (ComInterfaceTypeSymbol)wanted;
-
-            if (syntax.Binding is not null)
-            {
-                diagnostics.Error("SL0587", syntax.BindingSpan,
-                    $"a QueryInterface for '{asked.Name}' is a call the object answers, and " +
-                    "answers again, so a name here would not be what the test asked about; " +
-                    $"cast it instead, as 'var {syntax.Binding} = ({asked.Name})...'");
-                return new BoundErrorExpression(syntax.Span);
-            }
-
-            // Deliberately no "always true" warning for the upward case. A
-            // class's base chain is the compiler's; an object's answer is its
-            // own, and even IUnknown -> IUnknown is a call it may refuse.
-            return new BoundTypeTest(syntax.Span, PrimitiveTypeSymbol.Bool, value, asked);
-        }
-
-        // Two classes in different families: no object is ever both.
-        if (subject is ClassTypeSymbol subjectClass && wanted is ClassTypeSymbol wantedClass)
-        {
-            if (!subjectClass.DerivesFrom(wantedClass) && !wantedClass.DerivesFrom(subjectClass))
-            {
-                diagnostics.Error("SL0518", syntax.Span,
-                    $"no object is both a '{subjectClass.Name}' and a '{wantedClass.Name}': " +
-                    "neither derives from the other");
-                return new BoundErrorExpression(syntax.Span);
-            }
-
-            // Upwards, the answer is settled by the type -- except through an
-            // optional, where it still says 'and not null'.
-            if (subjectClass.DerivesFrom(wantedClass) && value.Type is not OptionalTypeSymbol)
-                diagnostics.Warning("SL0520", syntax.Span,
-                    $"every '{subjectClass.Name}' is a '{wantedClass.Name}', so this is always true");
-        }
-
-        if (syntax.Binding is not null) return BindClassTestBinding(syntax, value, wanted);
-
-        return new BoundTypeTest(syntax.Span, PrimitiveTypeSymbol.Bool, value, wanted);
-    }
-
-    /// <summary>
     /// Whether an <c>is</c> or a type pattern can ask <paramref name="subject"/>
     /// whether it is a <paramref name="wanted"/>, where at least one of the two
     /// is COM. Reports under <paramref name="code"/> when it cannot.
@@ -1047,148 +926,6 @@ public sealed partial class Binder
         }
 
         return true;
-    }
-
-    /// <summary>
-    /// <c>v is Circle c</c> over a variant: the test is the tag test, and the
-    /// name is that case's payload.
-    ///
-    /// This is the whole reason the binding form exists. The bare
-    /// <c>if (v.Circle) { v.Radius }</c> narrowing needs a local or a
-    /// parameter to be about (SL0285), because a field or a call result could
-    /// be a different value by the time it is read. A binding says so
-    /// explicitly: the value is taken once, and what came out of it has a name
-    /// of its own.
-    /// </summary>
-    private BoundExpression BindVariantCaseTest(
-        TypeTestSyntax syntax, BoundExpression value, VariantCaseSymbol tested)
-    {
-        if (syntax.Binding is null)
-            return new BoundVariantTest(syntax.Span, PrimitiveTypeSymbol.Bool, value, tested);
-
-        if (tested.Payload is null)
-        {
-            diagnostics.Error("SL0586", syntax.BindingSpan,
-                $"case '{tested.Name}' carries nothing, so there is nothing for " +
-                $"'{syntax.Binding}' to be; the test on its own is the whole question");
-            return new BoundErrorExpression(syntax.Span);
-        }
-
-        if (PatternSubject(syntax, value, out var taking) is not { } subject)
-            return new BoundErrorExpression(syntax.Span);
-
-        return BindPatternOperand(syntax, taking,
-            new BoundVariantTest(syntax.Span, PrimitiveTypeSymbol.Bool, subject, tested),
-            tested.Payload, new BoundVariantPayload(syntax.BindingSpan, subject, tested, null));
-    }
-
-    /// <summary>
-    /// <c>x is Circle c</c> over a class: the test, and the downcast it proved.
-    ///
-    /// The cast checks the base chain a second time, which the test has just
-    /// walked. That is a few loads against a rule with no exception to it --
-    /// a <c>Downcast</c> is checked, always -- and the alternative is a second
-    /// kind of downcast whose safety lives somewhere else in the compiler.
-    /// </summary>
-    private BoundExpression BindClassTestBinding(
-        TypeTestSyntax syntax, BoundExpression value, NamedTypeSymbol wanted)
-    {
-        if (wanted is not ClassTypeSymbol)
-        {
-            diagnostics.Error("SL0587", syntax.BindingSpan,
-                $"'{wanted.Name}' is an interface, and a reference does not convert down to " +
-                $"one, so there is nothing for '{syntax.Binding}' to be; test without a name " +
-                "and reach the object through the interface it already has");
-            return new BoundErrorExpression(syntax.Span);
-        }
-
-        if (PatternSubject(syntax, value, out var taking) is not { } subject)
-            return new BoundErrorExpression(syntax.Span);
-
-        if (ClassifyConversion(subject.Type, wanted, explicitCast: true) is not { } kind)
-        {
-            diagnostics.Error("SL0587", syntax.BindingSpan,
-                $"'{subject.Type.Name}' does not convert to '{wanted.Name}', so the test can " +
-                $"be asked but its answer cannot be named");
-            return new BoundErrorExpression(syntax.Span);
-        }
-
-        return BindPatternOperand(syntax, taking,
-            new BoundTypeTest(syntax.Span, PrimitiveTypeSymbol.Bool, subject, wanted),
-            wanted, new BoundConversion(syntax.BindingSpan, wanted, subject, kind));
-    }
-
-    /// <summary>
-    /// The operand <c>x is T t</c> becomes, with <c>t</c> and the value tested
-    /// declared around the statement:
-    ///
-    /// <code>
-    /// (held = x) is T &amp;&amp; (t = (T)held, true)
-    /// </code>
-    ///
-    /// Nothing is evaluated outside the operand, so an <c>&amp;&amp;</c> that
-    /// stops before it evaluates none of it.
-    /// </summary>
-    private BoundExpression BindPatternOperand(
-        TypeTestSyntax syntax, BoundExpression? taking, BoundExpression test,
-        TypeSymbol type, BoundExpression value)
-    {
-        var patterns = _patterns!;
-        string name = syntax.Binding!;
-
-        if (patterns.Bindings.Any(b => b.Name == name) || LookupLocal(name) is not null)
-            diagnostics.Error("SL0218", syntax.BindingSpan,
-                $"'{name}' is already declared in this scope");
-        else if (_currentFunction?.Parameters.Any(p => p.Name == name) == true)
-            diagnostics.Error("SL0219", syntax.BindingSpan,
-                $"'{name}' is already the name of a parameter");
-
-        var local = new LocalSymbol(name, type, isConst: true);
-        patterns.Spills.Add(new BoundLocalDeclaration(syntax.BindingSpan, local, null));
-        patterns.Bindings.Add((name, local));
-
-        if (taking is not null)
-            test = new BoundSequence(syntax.Span, [taking], test);
-
-        var bind = new BoundSequence(syntax.BindingSpan,
-            [new BoundAssignment(
-                syntax.BindingSpan, new BoundLocalAccess(syntax.BindingSpan, local), value)],
-            new BoundLiteral(syntax.BindingSpan, PrimitiveTypeSymbol.Bool, true));
-
-        return new BoundBinary(
-            syntax.Span, PrimitiveTypeSymbol.Bool, test, BoundBinaryOp.LogicalAnd, bind);
-    }
-
-    /// <summary>
-    /// The value a test and its binding both read, evaluated once.
-    ///
-    /// A local or a parameter is already that. Anything else -- the field and
-    /// the call result this form exists for -- is held in a name of the
-    /// compiler's own, declared around the statement and assigned by
-    /// <paramref name="taking"/> where the test is evaluated.
-    /// </summary>
-    private BoundExpression? PatternSubject(
-        TypeTestSyntax syntax, BoundExpression value, out BoundExpression? taking)
-    {
-        taking = null;
-        if (_patterns is null)
-        {
-            diagnostics.Error("SL0585", syntax.BindingSpan,
-                $"'{syntax.Binding}' is in scope only where this test succeeded, and there is " +
-                "such a place only in the condition of an 'if' or a 'while', joined to the " +
-                "rest of it by '&&': write 'if (node.Payload is Number n && n.Held > 0)', and " +
-                "put anything else the branch needs inside it");
-            return null;
-        }
-
-        if (NarrowableSubject(value) is not null) return value;
-
-        var held = new LocalSymbol(SyntheticName("is"), value.Type, isConst: true);
-        _patterns.Spills.Add(new BoundLocalDeclaration(syntax.Value.Span, held, null));
-        taking = new BoundAssignment(
-            syntax.Value.Span, new BoundLocalAccess(syntax.Value.Span, held), value);
-
-        return new BoundLocalAccess(syntax.Value.Span, held);
     }
 
     /// <summary>
@@ -1424,6 +1161,17 @@ public sealed partial class Binder
         if (parts.Count == 1 && CouldBeVariantCase(parts[0]))
             return new BoundVariantDraft(syntax.Span, parts[0], []);
 
+        // A name a pattern binds is in scope only where the pattern is known to
+        // have matched, so one read anywhere else is the pattern's question.
+        if (parts.Count == 1 && _patternVariableNames.Contains(parts[0]))
+        {
+            diagnostics.Error("SL0585", syntax.Span,
+                $"'{parts[0]}' is named by a pattern, and here that pattern may not have " +
+                "matched: the name is in scope in the rest of an '&&' after the test, the " +
+                "branch the test guards, and after an 'if' whose other branch always leaves");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
         diagnostics.Error("SL0229", syntax.Span, $"'{syntax.Name.Text}' is not defined");
         return new BoundErrorExpression(syntax.Span);
     }
@@ -1568,22 +1316,11 @@ public sealed partial class Binder
         // `a || b` evaluates b only when a was false, and knows that instead.
         // Without this, `x != null && x.Next != null` -- the shape every walk
         // over a linked structure is written in -- could not be said at all.
-        BoundExpression right;
-        if (_patterns is { } patterns && syntax.Operator == TokenKind.AmpAmp)
-        {
-            // The right side runs only when the left was true, so what the left
-            // named is in scope there.
-            PushScope();
-            ExposePatternBindings(patterns);
-            right = BindRightOperand(syntax.Right, left, whenTrue: true);
-            PopScope();
-        }
-        else
-        {
-            right = syntax.Operator is TokenKind.AmpAmp or TokenKind.PipePipe
-                ? BindRightOperand(syntax.Right, left, whenTrue: syntax.Operator == TokenKind.AmpAmp)
-                : BindExpression(syntax.Right);
-        }
+        // The right side runs only when the left was true, or false, so what
+        // the left named in that outcome is in scope there.
+        var right = syntax.Operator is TokenKind.AmpAmp or TokenKind.PipePipe
+            ? BindRightOperand(syntax.Right, left, whenTrue: syntax.Operator == TokenKind.AmpAmp)
+            : BindExpression(syntax.Right);
 
         if (left.Type.IsError() || right.Type.IsError()) return new BoundErrorExpression(syntax.Span);
 
@@ -2049,7 +1786,8 @@ public sealed partial class Binder
         var written = new HashSet<object>();
         _writtenWitnesses.Add(written);
 
-        var right = BindUnderFacts(syntax, left, whenTrue);
+        var right = BindWhereAssigned(
+            left, whenTrue, () => BindUnderFacts(syntax, left, whenTrue), isExpression: true);
 
         _writtenWitnesses.RemoveAt(_writtenWitnesses.Count - 1);
         if (written.Count > 0) _writtenIn[right] = written;
@@ -2089,11 +1827,13 @@ public sealed partial class Binder
         var entry = SnapshotFacts();
 
         ApplyFacts(proves);
-        var whenTrue = BindExpression(syntax.WhenTrue);
+        var whenTrue = BindWhereAssigned(
+            condition, whenTrue: true, () => BindExpression(syntax.WhenTrue), isExpression: true);
 
         _variantFacts = new Dictionary<object, Fact>(entry);
         ApplyFacts(disproves);
-        var whenFalse = BindExpression(syntax.WhenFalse);
+        var whenFalse = BindWhereAssigned(
+            condition, whenTrue: false, () => BindExpression(syntax.WhenFalse), isExpression: true);
 
         _variantFacts = entry;
 

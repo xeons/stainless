@@ -345,10 +345,14 @@ public sealed partial class LlvmEmitter
         // is not a tag, and there is no table to put one in.
         if (statement.Sections.Any(section => section.Tests.Count > 0))
         {
+            // A test's temporaries are released in its own block: the next
+            // test's is also reached from here, and the sections from any of
+            // them.
             for (int i = 0; i < statement.Sections.Count; i++)
                 foreach (var test in statement.Sections[i].Tests)
                 {
                     var asked = EmitExpression(test);
+                    FlushTemporaries();
                     string next = NextLabel("switch.test");
                     Terminator($"br i1 {asked.Ref}, label %{bodies[i]}, label %{next}");
                     Label(next);

@@ -115,16 +115,17 @@ switch (level)
 }
 ```
 
-The value may be an integer, a `char`, a `bool`, an enum, a `String` or a
-variant. For everything but a variant, each label is a constant of that type and
-no two may name the same value. An enum, integer, char or bool switch becomes
+Where every label is a constant, the value may be an integer, a `char`, a
+`bool`, an enum, a `String` or a variant; with patterns
+([§9.1.1](#911-patterns)) it may be anything. For everything but a variant, a
+constant label is a constant of that type and no two may name the same value. An enum, integer, char or bool switch becomes
 one LLVM `switch` instruction, which decides for itself whether a jump table
 beats a chain of comparisons. A `String` switch compares in order against the
 runtime's string equality.
 
 **A switch over a variant names cases rather than values** ([§2.6](02-types.md#26-variant--a-value-that-is-one-of-several-things)). It is the one
-kind that may be exhaustive, and then needs no `default`; it is also the one
-where a label may bind what the case carries.
+kind that must be exhaustive or have a `default`, and it is where a label may
+bind what the case carries.
 
 ```csharp
 switch (shape)
@@ -168,25 +169,31 @@ for (nuint i = 0; i < values.Length; i++)
 
 A `default` is optional except over a variant, where leaving a case out without
 one is SL0436. Elsewhere a value that matches nothing falls past the whole
-statement: there is no exhaustiveness requirement on an enum, whose value need
-not be one of its members. There is no `goto case`. Each section has its own
-scope, so two sections may declare the same local name — which C# does not
-allow, having put the whole switch in one scope.
+statement: a statement over an enum need not name every member, as in C#,
+because the value need not be one of them. A statement whose labels cover every
+value it could hold — both bools, every case of a variant — ends a function
+the way one with a `default` does. There is no `goto case`. Each section has
+its own scope, so two sections may declare the same local name — which C# does
+not allow, having put the whole switch in one scope.
 
 ### 9.1.1 Patterns
 
-A `case` label is a pattern. Most of them are a constant, which is what makes a
-switch a jump table; the rest ask something a constant cannot.
+A `case` label is a pattern, and so is what follows `is` and each arm of a
+`switch` expression. Most labels are a constant, which is what makes a switch a
+jump table; the rest ask something a constant cannot.
 
 | | |
 |---|---|
-| a constant | `case 3:`, `case "text":`, `case Level.Low:` |
-| a variant's case | `case Circle:`, `case Circle c:` |
-| a type | `case Square:`, `case Square s:` |
-| a range | `case > 100:`, `case <= 0:` |
-| either | `case 1 or 2:`, `case > 0 and < 10:` |
-| neither | `case not 0:` |
-| anything | `case _:` |
+| a constant | `3`, `"text"`, `Level.Low`, `null` |
+| a variant's case | `Circle`, `Circle c` |
+| a type | `Square`, `Square s`, `List<int>` |
+| a range | `> 100`, `<= 0` |
+| either, both, neither | `1 or 2`, `> 0 and < 10`, `not null` |
+| anything | `_`, `var x` |
+| members | `{ Radius: > 1.0 }`, `{ Owner.Name: "ann" }`, `{ }` |
+| positions | `(0, var y)`, `Point(0, _)`, `Circle(var r)`, `var (a, b)` |
+| elements | `[]`, `[var first, ..]`, `[.., var last]`, `[1, .. var rest]` |
+| grouped | `(Circle or Square)` |
 | and a condition on any of them | `case Circle c when c.Radius > 10.0:` |
 
 ```csharp
@@ -199,9 +206,44 @@ switch (node)
 }
 ```
 
+**Everything nests.** A member, a position and an element each take a pattern
+of their own, so `{ Keeper: { Name: "ann" } owner }` and `(Circle(> 1.0), true)`
+are single patterns. A type written in front is asked first, and a name after
+the whole names what matched: `Circle { Radius: > 1.0 } big`.
+
+**Members** are fields and properties, read by name. `Owner.Name: "a"` is
+`Owner: { Name: "a" }`, which asks that the owner is there before it asks
+anything of it; `{ }` alone asks only that. A member that is a method is
+refused (SL0776) — a pattern reads, and a call belongs in a `when`.
+
+**Positions** are a tuple's elements, a variant case's payload fields in the
+order they were declared — `Circle(var r)`, `Ok(var value)` — or, for anything
+else, what its `Deconstruct` hands back ([§9.14](#914-assignment)). There are
+as many positions as the value has (SL0609), and a name written on one is
+checked against the element it stands for (SL0776).
+
+**Elements** are matched on an array, a slice, an inline array, or a type with
+a `Count` or `Length` and an integer indexer, `List<T>` among them. The length
+is read once and asked first; each element is then read by its index from
+whichever end it was written against, so `[.., var last]` reads one element.
+There is one `..` at most (SL0775). What `.. var rest` names is a slice of the
+same array ([§2.12](02-types.md#212-t--part-of-an-array)), which shares its storage
+rather than copying it — so only an array or a slice can give one, and naming
+the run of anything else is refused (SL0775). A `String` is not matched element
+by element (SL0774): its positions are bytes, and a pattern of characters over
+it would be a pattern of bytes that looked like something else.
+
+**A type is asked only of a reference.** An object is asked what class it is
+and a variant which case it holds; any other value is exactly what it was
+declared to be, so the one type it matches is its own — `(int count, _)` over
+an `(int, String)` names the first element — and any other is SL0438.
+
 **A pattern is a question, and every one of them becomes the `bool` that asks
-it** — a comparison, a tag test, or the `is` the language already had. There is
-no matching machinery underneath.
+it** — a comparison, a tag test, `is`, a member read, a length. There is no
+matching machinery underneath. A value a pattern reads more than once is held
+in a name for the length of the test, so a property's getter runs once however
+many questions are asked of what it returned, and a part is read only after
+what it is part of is known to be there.
 
 **A switch whose labels are all constants is unchanged**: one LLVM `switch`
 instruction, and a jump table if LLVM decides on one. A single pattern anywhere
@@ -212,13 +254,20 @@ else about the statement stays as it was — sections that may not fall through,
 
 **A name belongs to one label** (SL0619). A section reached by two of them has
 proved nothing about which, so there would be nothing for the name to be; the
-same rule refuses a name under `or`, `and` or `not`.
+same rule refuses a name under `or`, and a name under `not` in a label, which
+is assigned only where the label did not match. After `is` a name under `not`
+is fine: it is in scope where the test was false
+([§2.4.4](02-types.md#244-is-as-and-casting-down)).
 
 **A `when` runs after the pattern matched**, which is what makes it safe for the
 guard to read what the pattern named: the two are joined by `&&`, which
 short-circuits. A guarded label proves nothing about coverage, so a variant
 switch that covers a case only under a `when` still needs the case or a
 `default`.
+
+**A label nothing can reach is a warning** (SL0621): one whose every value an
+earlier unguarded label already matches, as `case (true, true):` after
+`case (true, _):`.
 
 ### 9.1.2 `switch` as an expression
 
@@ -252,18 +301,46 @@ and the statement it is named after.
 **It has to be exhaustive** (SL0620). A statement that matches nothing falls
 past itself; an expression that matched nothing would have no value to be, and
 there are no exceptions here to throw at the hole. So the arms end with `_`, or
-they cover every case of a variant.
+between them they cover every value: both bools, every case of a variant, every
+member of an enum, and the same again inside a tuple, a payload, a member or a
+list of any length.
+
+```csharp
+String Pair(bool a, bool b) => (a, b) switch
+{
+    (true, true)  => "both",
+    (true, false) => "the first",
+    (false, _)    => "not the first",
+};
+```
+
+Coverage is worked out from what each arm certainly matches, which is the
+question Maranget's algorithm asks: is some value matched by this and by none
+of those? What it does not follow — a range, a `when` — counts for nothing, so
+`< 0`, `0` and `> 0` over an `int` still need a `_`, where C# tracks the ranges
+and does not. The error names what is left out where that is a case, a member
+or a bool.
+
+**An enum is covered once every member is named**, which is where this parts
+from the statement. The value of an enum need not be one of its members — a
+cast can make any — and C# answers one with a `SwitchExpressionException`.
+There is nothing to throw here, so the program ends, with a message naming the
+enum, where such a value arrives; a switch that has a `_` never does. A
+`[Flags]` enum is never covered this way, because its values are combinations
+of its members.
 
 **The arms agree on a type**, the way a ternary's arms do: the first one decides
 it and the rest convert to it.
 
-**An arm nothing can reach is a warning** (SL0621), which is what an arm after
-`_` is.
+**An arm nothing can reach is a warning** (SL0621): an arm after `_`, or one
+whose every value the arms before it already match.
 
 It lowers to the value held in a name and a conditional per arm — `t is P1 ? e1
 : t is P2 ? e2 : e3` — so nothing written this way can do anything a chain of
 ternaries could not, and the arm a test fails falls into the next conditional
-rather than into a copy of the rest.
+rather than into a copy of the rest. Where the arms cover everything, the last
+one's test is not asked, because whatever reaches it matches; it is still run,
+for the names it assigns.
 
 ## 9.2 `parallel`, `spawn` and `for parallel`
 

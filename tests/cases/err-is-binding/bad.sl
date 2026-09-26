@@ -4,6 +4,7 @@
 module Bad;
 
 import Standard.Console;
+import Standard.Text;
 
 public interface ISpeaks { String Says(); }
 public class Animal : ISpeaks { public virtual String Says() { return "..."; } }
@@ -14,44 +15,45 @@ public variant Value
     Number(double Held);
 }
 
-// SL0585: the name needs somewhere to be true, and only the rest of an `&&`
-// and the branch or loop body it guards are such places.
+// SL0585: a name is in scope only where the pattern is known to have
+// matched -- the rest of an `&&`, the branch the test guards, and after an
+// `if` whose other branch always leaves. Read anywhere else, it may never
+// have been assigned.
 void OutsideAnIf(Value value)
 {
     bool ok = value is Number n;
-    Console.WriteLine(Text.FromBool(ok));
+    Console.WriteLine(Text.FromDouble(n.Held));
 }
 
 // Under an `||`, where the branch runs whether or not the test did.
 void UnderOr(Value value, bool flag)
 {
     if (flag || value is Number n)
-        Console.WriteLine("no");
+        Console.WriteLine(Text.FromDouble(n.Held));
 }
 
 // As an argument, which has no branch of its own.
 void AsAnArgument(Value value)
 {
     if (Holds(value is Number n))
-        Console.WriteLine("no");
+        Console.WriteLine(Text.FromDouble(n.Held));
 }
 
 bool Holds(bool truth) => truth;
 
-// And negated, where the name would be true in the branch that ruled it out.
+// Negated, where the name is assigned in the branch that did not run.
 void Negated(Value value)
 {
     if (!(value is Number n))
-        Console.WriteLine("no");
+        Console.WriteLine(Text.FromDouble(n.Held));
 }
 
-// A `do` runs its body before the test, so there is no pass in which the name
-// would be true. A `while` is fine, and is the case beside this one.
-void InADoWhile(Value value)
+// After a loop, which is left by failing the test that named it.
+void AfterAWhile(Value value)
 {
-    do
-        Console.WriteLine("no");
-    while (value is Number n);
+    while (value is Number n)
+        value = Value.Null;
+    Console.WriteLine(Text.FromDouble(n.Held));
 }
 
 // SL0586: a case that carries nothing has nothing to name.

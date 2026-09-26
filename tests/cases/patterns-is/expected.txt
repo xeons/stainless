@@ -1,0 +1,24 @@
+nothing
+big circle 2
+circle 0.5
+square 3
+some shape
+digit
+round
+other
+kept kept
+~kept
+not kept
+~lost
+not kept
+7
+-1
+narrowed circle
+present circle
+gone
+side 2
+passing pass0
+~pass0
+passing pass2
+~pass2
+end

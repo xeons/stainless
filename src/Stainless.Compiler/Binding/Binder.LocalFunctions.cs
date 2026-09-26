@@ -365,13 +365,11 @@ public sealed partial class Binder
         var savedClosures = new List<ClosureContext>(_closures);
         var savedLocalScopes = _localFunctionScopes;
         var savedSubstitution = _substitution;
-        var savedPatterns = _patterns;
         bool savedInitializing = _initializingField;
 
         _closures.Clear();
         _localFunctionScopes = [.. local.Scopes];
         _substitution = substitution;
-        _patterns = null;
         _initializingField = false;
         _parallelDepth = 0;
 
@@ -394,7 +392,6 @@ public sealed partial class Binder
         _closures.AddRange(savedClosures);
         _localFunctionScopes = savedLocalScopes;
         _substitution = savedSubstitution;
-        _patterns = savedPatterns;
         _initializingField = savedInitializing;
     }
 

@@ -1330,7 +1330,7 @@ public sealed partial class Binder
 
             PushScope();
             var body = new BoundBlock(section.Span,
-                section.Statements.Select(BindStatement).ToList());
+                BindStatementList(section.Statements));
             PopScope();
 
             // No fall-through, as in C#. A section that runs off its end is
@@ -1482,7 +1482,7 @@ public sealed partial class Binder
                     new BoundVariantPayload(boundSpan, value, bound, null)));
             }
 
-            statements.AddRange(section.Statements.Select(BindStatement));
+            statements.AddRange(BindStatementList(section.Statements));
             var body = new BoundBlock(section.Span, statements);
 
             PopScope();

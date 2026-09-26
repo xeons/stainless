@@ -1,0 +1,8 @@
+# A member of an enum left out, a [Flags] enum, a bool, part of a case, part
+# of a tuple, and a statement over a variant that leaves part of a case out.
+SL0620
+SL0620
+SL0620
+SL0620
+SL0620
+SL0436

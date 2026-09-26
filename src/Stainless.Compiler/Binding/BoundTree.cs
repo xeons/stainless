@@ -372,6 +372,13 @@ public sealed class BoundAssignment(SourceSpan span, BoundExpression target, Bou
 {
     public BoundExpression Target { get; } = target;
     public BoundExpression Value { get; } = value;
+
+    /// <summary>
+    /// The local this assignment brings into being, or null: a name a pattern
+    /// binds is declared by the store that gives it its value, because no
+    /// statement declares it.
+    /// </summary>
+    public LocalSymbol? DeclaresLocal { get; init; }
 }
 
 /// <summary>
@@ -763,6 +770,45 @@ public sealed class BoundTypeTest(
 {
     public BoundExpression Value { get; } = value;
     public NamedTypeSymbol Tested { get; } = tested;
+}
+
+/// <summary>
+/// <c>value is pattern</c>: the <see cref="Test"/> it lowered to, and what a
+/// condition built on it can learn.
+///
+/// The emitter evaluates <see cref="Test"/> and nothing else. The rest is for
+/// the binder: which names the pattern assigned when it matched and when it did
+/// not, and what it proved about <see cref="Subject"/> either way.
+/// </summary>
+public sealed class BoundIsPattern(SourceSpan span, BoundExpression subject, BoundExpression test)
+    : BoundExpression(span, test.Type)
+{
+    /// <summary>The value tested, as written.</summary>
+    public BoundExpression Subject { get; } = subject;
+
+    public BoundExpression Test { get; } = test;
+
+    public IReadOnlyList<LocalSymbol> AssignedWhenTrue { get; init; } = [];
+    public IReadOnlyList<LocalSymbol> AssignedWhenFalse { get; init; } = [];
+
+    /// <summary>The case the subject holds where the test was true, or false.</summary>
+    public VariantCaseSymbol? CaseWhenTrue { get; init; }
+    public VariantCaseSymbol? CaseWhenFalse { get; init; }
+
+    public bool NotNullWhenTrue { get; init; }
+    public bool NotNullWhenFalse { get; init; }
+}
+
+/// <summary>
+/// What a <c>switch</c> expression over an enum evaluates when the value is
+/// none of the members its arms named: the end of the program, with a message.
+/// The type is the switch's own, so the arm has somewhere to be.
+/// </summary>
+public sealed class BoundUnmatchedSwitch(SourceSpan span, TypeSymbol type, TypeSymbol subject)
+    : BoundExpression(span, type)
+{
+    /// <summary>The enum the value was supposed to be a member of.</summary>
+    public TypeSymbol Subject { get; } = subject;
 }
 
 public sealed class BoundConversion(

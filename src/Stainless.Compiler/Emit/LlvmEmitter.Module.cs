@@ -423,6 +423,7 @@ public sealed partial class LlvmEmitter
         // Ends the program, so the block after a call to one is unreachable and
         // LLVM may say so.
         Declare("sl_cast_failed", "declare void @sl_cast_failed(ptr, ptr) noreturn nounwind");
+        Declare("sl_switch_unmatched", "declare void @sl_switch_unmatched(ptr) noreturn nounwind");
         Declare("sl_com_retain", "declare void @sl_com_retain(ptr)");
         Declare("sl_com_release", "declare void @sl_com_release(ptr)");
         Declare("sl_com_query", "declare ptr @sl_com_query(ptr, ptr)");

@@ -75,8 +75,10 @@ internal sealed class StaticReferenceWalker
 
             case BoundConversion conversion: Visit(conversion.Operand); break;
             case BoundTypeTest test: Visit(test.Value); break;
+            case BoundIsPattern matched: Visit(matched.Test); break;
             case BoundVariantTest asked: Visit(asked.Value); break;
             case BoundVariantPayload payload: Visit(payload.Receiver); break;
+            case BoundSlice slice: Visit(slice.Target); Visit(slice.Start); Visit(slice.End); break;
 
             // A `switch` expression is a name and a chain of conditionals, and
             // a static initializer may be written as one.
@@ -243,7 +245,10 @@ internal sealed class CaptureWalker(LocalSymbol loopVariable)
                 Visit(conditional.WhenFalse);
                 break;
 
+            // A name a pattern declared belongs to the iteration that ran it.
             case BoundAssignment assignment:
+                if (assignment.DeclaresLocal is { } declared)
+                    _declared.Add(declared);
                 Assigned(assignment.Target);
                 Visit(assignment.Target); Visit(assignment.Value);
                 break;
@@ -268,8 +273,10 @@ internal sealed class CaptureWalker(LocalSymbol loopVariable)
 
             case BoundConversion conversion: Visit(conversion.Operand); break;
             case BoundTypeTest test: Visit(test.Value); break;
+            case BoundIsPattern matched: Visit(matched.Test); break;
             case BoundVariantTest asked: Visit(asked.Value); break;
             case BoundVariantPayload payload: Visit(payload.Receiver); break;
+            case BoundSlice slice: Visit(slice.Target); Visit(slice.Start); Visit(slice.End); break;
 
             // Held for the length of one expression, so it belongs to the
             // iteration that evaluates it.
@@ -291,7 +298,12 @@ internal sealed class CaptureWalker(LocalSymbol loopVariable)
                 break;
 
             case BoundDereference dereference: Visit(dereference.Operand); break;
-            case BoundAddressOf address: Visit(address.Operand); break;
+            case BoundAddressOf address:
+                if (address.DeclaresLocal is { } introduced)
+                    _declared.Add(introduced);
+                Visit(address.Operand);
+                break;
+
             case BoundNewArray array: Visit(array.Length); break;
             case BoundArrayLength length: Visit(length.Array); break;
 

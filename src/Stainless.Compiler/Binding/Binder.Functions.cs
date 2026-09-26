@@ -780,11 +780,8 @@ public sealed partial class Binder
         // a local, a parameter or a `this` to be.
         var savedScope = _currentScope;
         var savedFunction = _currentFunction;
-        var savedPatterns = _patterns;
-
         if (function.Scope is not null) _currentScope = function.Scope;
         _currentFunction = null;
-        _patterns = null;
 
         PushScope();
         var bound = BindConversion(BindExpression(written), parameter.Type, written.Span);
@@ -792,7 +789,6 @@ public sealed partial class Binder
 
         _currentScope = savedScope;
         _currentFunction = savedFunction;
-        _patterns = savedPatterns;
 
         if (bound.Type.IsError()) return null;
 

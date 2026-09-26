@@ -1,0 +1,17 @@
+empty
+just 9
+one to 3
+pair from 4
+4 and 3 more
+10
+20
+too short
+alpha..gamma
+ann first
+~ann
+~bo
+ends with di
+~cy
+~di
+nobody
+middle 8

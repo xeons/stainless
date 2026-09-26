@@ -3006,8 +3006,7 @@ public sealed class Parser
 
         // `_` matches anything. It is an ordinary identifier to the lexer, and
         // a pattern is the one place it means this.
-        if (AtWord && Current.Text == "_" &&
-            Peek(1).Kind is TokenKind.Colon or TokenKind.EqualsGreater or TokenKind.Comma)
+        if (AtWord && Current.Text == "_" && EndsPattern(Peek(1)))
         {
             Advance();
             return new DiscardPatternSyntax(SpanFrom(start));
@@ -3021,6 +3020,24 @@ public sealed class Parser
             var bound = ParsePatternConstant();
             return new RelationalPatternSyntax(SpanFrom(start), op, bound);
         }
+
+        // `var x` and `var (a, b)`.
+        if (At(TokenKind.VarKeyword) && Peek(1).Kind is TokenKind.Identifier or TokenKind.OpenParen)
+        {
+            Advance();
+            return ParseVarPattern(start);
+        }
+
+        if (At(TokenKind.OpenBracket))
+            return ParseListPattern(start);
+
+        // Read wherever it is written, so that one outside a list pattern is
+        // refused for what it is rather than as a stray dot.
+        if (AtDotDot())
+            return ParseSlicePattern(start);
+
+        if (At(TokenKind.OpenBrace))
+            return ParseRecursivePatternTail(start, null, null);
 
         if (At(TokenKind.OpenParen))
         {
@@ -3036,22 +3053,46 @@ public sealed class Parser
                     new CastSyntax(SpanFrom(start), castType, operand));
             }
 
-            Advance();
-            var inner = ParsePattern();
-            Expect(TokenKind.CloseParen);
-            return inner;
+            var elements = ParsePositionalClause();
+
+            // One unnamed pattern in parentheses, with nothing after it, is
+            // that pattern grouped; anything else takes a value apart.
+            if (elements is [{ Path.Count: 0 } only] && !At(TokenKind.OpenBrace) && !AtDesignation())
+                return only.Pattern;
+
+            return ParseRecursivePatternTail(start, null, elements);
         }
 
-        // `Square s` and `Circle c`: a type and a name for what it found. Two
-        // identifiers in a row is the whole of the test -- no expression starts
-        // that way -- and a qualified type is allowed, so the lookahead walks
-        // the dots first.
-        if (At(TokenKind.Identifier) && AtTypeThenName())
+        // A pattern led by a type: `Square s`, `Point(0, var y)`,
+        // `Circle { Radius: > 1 }`, `List<int>`. A plain name with nothing
+        // after it is left to the binder, which knows whether `Low` is a
+        // constant or a type.
+        if ((At(TokenKind.Identifier) || AtAny(PrimitiveKeywords)) &&
+            Speculate(() => (TypeSyntax?)ParseType(allowFixedLength: false), out var parsed) &&
+            parsed is not null)
         {
-            var type = ParseType();
-            var name = Current;
-            string binding = ExpectIdentifier();
-            return new TypePatternSyntax(SpanFrom(start), type, binding, name.Span);
+            var type = GiveBackConditionalQuestion(parsed);
+
+            if (AtDesignation())
+            {
+                var name = Advance();
+                return new TypePatternSyntax(
+                    SpanFrom(start), type, name.Text == "_" ? null : name.Text, name.Span);
+            }
+
+            // `Value()` stays a call, which is what a label that is not a
+            // constant has always been reported as.
+            if (type is NamedTypeSyntax && At(TokenKind.OpenParen) &&
+                Peek(1).Kind != TokenKind.CloseParen)
+                return ParseRecursivePatternTail(start, type, ParsePositionalClause());
+
+            if (At(TokenKind.OpenBrace))
+                return ParseRecursivePatternTail(start, type, null);
+
+            if (type is not NamedTypeSyntax { TypeArguments.Count: 0 })
+                return new TypePatternSyntax(SpanFrom(start), type, null, SpanFrom(start));
+
+            _pos = start;
         }
 
         // `case default:` is almost always a `default:` label written wrong,
@@ -3076,40 +3117,183 @@ public sealed class Parser
     /// </summary>
     private ExpressionSyntax ParsePatternConstant() => ParseBinary(TypeTestPrecedence);
 
+    /// <summary>Whether this token closes the pattern before it, so a <c>_</c> there is a discard.</summary>
+    private static bool EndsPattern(Token token) =>
+        token.Kind is TokenKind.Colon or TokenKind.EqualsGreater or TokenKind.Comma
+            or TokenKind.CloseParen or TokenKind.CloseBracket or TokenKind.CloseBrace
+            or TokenKind.Semicolon or TokenKind.AmpAmp or TokenKind.PipePipe
+            or TokenKind.Question or TokenKind.EndOfFile ||
+        token is { Kind: TokenKind.Identifier, IsVerbatim: false, Text: "and" or "or" or "when" };
+
     /// <summary>
-    /// Whether what follows is a type and then a name, which is what separates
-    /// <c>case Square s:</c> from <c>case Square:</c>.
+    /// Whether the next token names what a pattern matched. <c>and</c>,
+    /// <c>or</c> and <c>when</c> continue the pattern instead.
     /// </summary>
-    private bool AtTypeThenName()
+    private bool AtDesignation() =>
+        At(TokenKind.Identifier) &&
+        (Current.IsVerbatim || Current.Text is not ("and" or "or" or "when" or "not"));
+
+    /// <summary>Whether the next two tokens are <c>..</c>, written together.</summary>
+    private bool AtDotDot() =>
+        At(TokenKind.Dot) && Peek(1).Kind == TokenKind.Dot &&
+        Current.Span.End == Peek(1).Span.Start;
+
+    /// <summary>
+    /// What follows <c>var</c>: a name, <c>_</c>, or a parenthesised list of
+    /// those, which is a positional pattern with a <c>var</c> in each place.
+    /// </summary>
+    private PatternSyntax ParseVarPattern(int start)
     {
-        int at = 0;
-
-        // A qualified name: `Shapes.Square`.
-        while (Peek(at).Kind == TokenKind.Identifier && Peek(at + 1).Kind == TokenKind.Dot)
-            at += 2;
-
-        if (Peek(at).Kind != TokenKind.Identifier) return false;
-        at++;
-
-        // Type arguments, as one balanced group.
-        if (Peek(at).Kind == TokenKind.Less)
+        if (At(TokenKind.OpenParen))
         {
-            int depth = 0;
+            Advance();
+            var elements = new List<SubpatternSyntax>();
 
-            while (true)
+            do
             {
-                var kind = Peek(at).Kind;
-                if (kind == TokenKind.EndOfFile) return false;
-                if (kind == TokenKind.Less) depth++;
-                else if (kind == TokenKind.Greater) { depth--; at++; if (depth == 0) break; continue; }
-                else if (kind is TokenKind.Colon or TokenKind.EqualsGreater or TokenKind.Semicolon)
-                    return false;
-                at++;
+                int at = _pos;
+                var element = ParseVarPattern(at);
+                elements.Add(new SubpatternSyntax(SpanFrom(at), [], element.Span, element));
             }
+            while (Match(TokenKind.Comma))
+                ;
+
+            Expect(TokenKind.CloseParen);
+            return new RecursivePatternSyntax(SpanFrom(start), null, elements, null, null, default);
         }
 
-        return Peek(at).Kind == TokenKind.Identifier &&
-               (Peek(at).IsVerbatim || Peek(at).Text is not ("when" or "or" or "and"));
+        var name = Current;
+        string text = ExpectIdentifier();
+
+        return text == "_" && !name.IsVerbatim
+            ? new DiscardPatternSyntax(SpanFrom(start))
+            : new VarPatternSyntax(SpanFrom(start), text, name.Span);
+    }
+
+    /// <summary><c>(p1, X: p2)</c> -- the parenthesised part of a positional pattern.</summary>
+    private List<SubpatternSyntax> ParsePositionalClause()
+    {
+        Expect(TokenKind.OpenParen);
+        var elements = new List<SubpatternSyntax>();
+
+        while (!At(TokenKind.CloseParen) && !At(TokenKind.EndOfFile))
+        {
+            int at = _pos;
+            elements.Add(ParseSubpattern(at, named: false));
+            if (_pos == at)
+                Advance();
+            if (!Match(TokenKind.Comma))
+                break;
+        }
+
+        Expect(TokenKind.CloseParen);
+        return elements;
+    }
+
+    /// <summary><c>{ Radius: &gt; 1, Owner.Name: "a" }</c>.</summary>
+    private List<SubpatternSyntax> ParsePropertyClause()
+    {
+        Expect(TokenKind.OpenBrace);
+        var members = new List<SubpatternSyntax>();
+
+        while (!At(TokenKind.CloseBrace) && !At(TokenKind.EndOfFile))
+        {
+            int at = _pos;
+            members.Add(ParseSubpattern(at, named: true));
+            if (_pos == at)
+                Advance();
+            if (!Match(TokenKind.Comma))
+                break;
+        }
+
+        Expect(TokenKind.CloseBrace);
+        return members;
+    }
+
+    /// <summary>
+    /// One place in a positional or property pattern. A property one always
+    /// names its member, dotted through as many as it reaches; a positional
+    /// one may name its element.
+    /// </summary>
+    private SubpatternSyntax ParseSubpattern(int start, bool named)
+    {
+        var path = new List<string>();
+        var pathSpan = Current.Span;
+
+        bool hasName = named ||
+            At(TokenKind.Identifier) && Peek(1).Kind == TokenKind.Colon;
+
+        if (hasName)
+        {
+            path.Add(ExpectIdentifier());
+
+            while (named && At(TokenKind.Dot) && Peek(1).Kind == TokenKind.Identifier)
+            {
+                Advance();
+                path.Add(ExpectIdentifier());
+            }
+
+            pathSpan = SpanFrom(start);
+            Expect(TokenKind.Colon);
+        }
+
+        var pattern = ParsePattern();
+        return new SubpatternSyntax(SpanFrom(start), path, pathSpan, pattern);
+    }
+
+    /// <summary>What may follow a positional part or a type: members, then a name.</summary>
+    private PatternSyntax ParseRecursivePatternTail(
+        int start, TypeSyntax? type, List<SubpatternSyntax>? positional)
+    {
+        var properties = At(TokenKind.OpenBrace) ? ParsePropertyClause() : null;
+        var (binding, bindingSpan) = ParseOptionalDesignation();
+
+        return new RecursivePatternSyntax(
+            SpanFrom(start), type, positional, properties, binding, bindingSpan);
+    }
+
+    /// <summary>A name after a pattern, or none; <c>_</c> names nothing.</summary>
+    private (string? Name, SourceSpan Span) ParseOptionalDesignation()
+    {
+        if (!AtDesignation())
+            return (null, default);
+
+        var name = Advance();
+        return (name.Text == "_" && !name.IsVerbatim ? null : name.Text, name.Span);
+    }
+
+    /// <summary><c>..</c>, and the pattern after it when one follows.</summary>
+    private PatternSyntax ParseSlicePattern(int start)
+    {
+        Advance();
+        Advance();
+
+        var inner = EndsPattern(Current) ? null : ParsePattern();
+        return new SlicePatternSyntax(SpanFrom(start), inner);
+    }
+
+    /// <summary><c>[1, .., var last]</c>, and a name for the whole after it.</summary>
+    private PatternSyntax ParseListPattern(int start)
+    {
+        Expect(TokenKind.OpenBracket);
+        var elements = new List<PatternSyntax>();
+
+        while (!At(TokenKind.CloseBracket) && !At(TokenKind.EndOfFile))
+        {
+            int at = _pos;
+
+            elements.Add(ParsePattern());
+
+            if (_pos == at)
+                Advance();
+            if (!Match(TokenKind.Comma))
+                break;
+        }
+
+        Expect(TokenKind.CloseBracket);
+
+        var (binding, bindingSpan) = ParseOptionalDesignation();
+        return new ListPatternSyntax(SpanFrom(start), elements, binding, bindingSpan);
     }
 
     private StatementSyntax ParseSimpleStatement(bool requireSemicolon)
@@ -3571,25 +3755,14 @@ public sealed class Parser
 
         while (true)
         {
-            // `x is Shape` sits where a comparison does, and takes a type on the
-            // right rather than an expression -- which is the whole reason it is
-            // not an ordinary binary operator.
+            // `x is Shape` sits where a comparison does, and takes a pattern on
+            // the right rather than an expression -- which is the whole reason
+            // it is not an ordinary binary operator.
             if (At(TokenKind.IsKeyword) && TypeTestPrecedence >= minPrecedence)
             {
                 Advance();
-                var tested = GiveBackConditionalQuestion(ParseType());
-
-                // `x is Circle c` names what the test found. Nothing else in
-                // the grammar puts an identifier straight after an expression,
-                // so no lookahead is needed to tell the two apart.
-                if (At(TokenKind.Identifier))
-                {
-                    var name = Advance();
-                    left = new TypeTestSyntax(
-                        SpanFrom(start), left, tested, name.Text, name.Span);
-                }
-                else left = new TypeTestSyntax(SpanFrom(start), left, tested);
-
+                var pattern = ParsePattern();
+                left = new IsPatternSyntax(SpanFrom(start), left, pattern);
                 continue;
             }
 

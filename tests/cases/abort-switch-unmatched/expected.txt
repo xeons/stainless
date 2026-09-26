@@ -1,0 +1,2 @@
+blue
+stainless: a switch expression over 'Color' was given a value that is none of its members

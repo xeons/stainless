@@ -85,6 +85,7 @@ public sealed partial class Binder
         _variantFacts = [];
         _labels.Clear();
         _checkedArithmetic = false;
+        _patternVariableNames.Clear();
 
         // `base(...)` is only a statement at the very head of a constructor, so
         // the one place it may appear is found before anything is bound and
@@ -939,33 +940,16 @@ public sealed partial class Binder
     private readonly Dictionary<BoundExpression, HashSet<object>> _writtenIn = [];
 
     /// <summary>
-    /// What the <c>x is Case n</c> tests in one condition declare.
-    ///
-    /// The <see cref="Spills"/> are declarations with no value, put around the
-    /// statement: the thing tested, and each name. The operand assigns them
-    /// where it is evaluated, so a test an <c>&amp;&amp;</c> skips assigns
-    /// nothing. A name is in scope in the rest of the <c>&amp;&amp;</c> and in
-    /// the branch, which are the places it has been assigned.
+    /// Every name a pattern in this function has bound, so a read of one where
+    /// it is not in scope is reported as that rather than as an unknown name.
     /// </summary>
-    private sealed class PatternScope
-    {
-        public List<BoundStatement> Spills { get; } = [];
-
-        public List<(string Name, LocalSymbol Local)> Bindings { get; } = [];
-    }
+    private readonly HashSet<string> _patternVariableNames = new(StringComparer.Ordinal);
 
     /// <summary>
-    /// Non-null only while the condition of an `if` or a `while` is being
-    /// bound, and hidden beneath anything but an `is` or an `&&`.
+    /// The statement being bound directly in a block's list, which is the one
+    /// place an <c>if</c> may leave what its condition named in scope after it.
     /// </summary>
-    private PatternScope? _patterns;
-
-    /// <summary>Puts every name a condition has made so far into the innermost scope.</summary>
-    private void ExposePatternBindings(PatternScope patterns)
-    {
-        foreach (var (name, local) in patterns.Bindings)
-            _scopes[^1][name] = local;
-    }
+    private StatementSyntax? _listedStatement;
 
     /// <summary>
     /// The declaration a narrowed fact can be attached to.
@@ -1054,6 +1038,18 @@ public sealed partial class Binder
                     : [];
 
                 return (whenTrue, whenFalse);
+            }
+
+            // `x is P`, which says what it proved in either outcome.
+            case BoundIsPattern test when NarrowableSubject(test.Subject) is { } tested:
+            {
+                return (Proved(test.CaseWhenTrue, test.NotNullWhenTrue),
+                        Proved(test.CaseWhenFalse, test.NotNullWhenFalse));
+
+                Dictionary<object, Fact> Proved(VariantCaseSymbol? held, bool present) =>
+                    held is not null ? new() { [tested] = Fact.Holding(held) }
+                    : present && test.Subject.Type is OptionalTypeSymbol ? new() { [tested] = Fact.NotNull }
+                    : [];
             }
 
             // `x != null` and `x == null`, in either order. The whole of
@@ -1466,9 +1462,8 @@ public sealed partial class Binder
         _localFunctionScopes.Add(functions);
         DeclareLocalFunctions(syntax, functions);
 
-        foreach (var statement in syntax.Statements)
+        foreach (var bound in BindStatementList(syntax.Statements))
         {
-            var bound = BindStatement(statement);
             if (bound is BoundLocalDeclaration declaration) block.Locals.Add(declaration.Local);
             if (bound is BoundDeconstruct taken)
                 block.Locals.AddRange(taken.Declarations.Select(d => d.Local));
@@ -1478,6 +1473,25 @@ public sealed partial class Binder
         _localFunctionScopes.RemoveAt(_localFunctionScopes.Count - 1);
         PopScope();
         return block;
+    }
+
+    /// <summary>
+    /// The statements of a block or a switch section, each one marked as
+    /// standing in a list while it is bound.
+    /// </summary>
+    private List<BoundStatement> BindStatementList(IEnumerable<StatementSyntax> statements)
+    {
+        var bound = new List<BoundStatement>();
+
+        foreach (var statement in statements)
+        {
+            var enclosing = _listedStatement;
+            _listedStatement = statement;
+            bound.Add(BindStatement(statement));
+            _listedStatement = enclosing;
+        }
+
+        return bound;
     }
 
     private BoundStatement BindStatement(StatementSyntax syntax)
@@ -1677,83 +1691,71 @@ public sealed partial class Binder
 
     private BoundStatement BindIf(IfSyntax syntax)
     {
-        // A binding is offered only where one can be given a scope, which is
-        // the whole of a condition. Parentheses are not a node here, so
-        // `if ((x is Circle c))` arrives as the test itself and works too.
-        var outer = _patterns;
-        _patterns = new PatternScope();
+        bool listed = ReferenceEquals(_listedStatement, syntax);
+        _listedStatement = null;
 
         var condition = BindCondition(syntax.Condition);
 
-        var patterns = _patterns;
-        _patterns = outer;
-
         var (whenTrue, whenFalse) = ConditionFacts(condition);
+        var (assignedTrue, assignedFalse) = AssignedNames(condition);
 
         var entry = SnapshotFacts();
 
         ApplyFacts(whenTrue);
-        var then = BindPatternBranch(patterns, syntax.Then);
+        var then = BindWhereAssigned(condition, whenTrue: true, () => BindStatement(syntax.Then));
 
         _variantFacts = new Dictionary<object, Fact>(entry);
         ApplyFacts(whenFalse);
-        var otherwise = syntax.Else is null ? null : BindStatement(syntax.Else);
+        var otherwise = syntax.Else is null
+            ? null
+            : BindWhereAssigned(condition, whenTrue: false, () => BindStatement(syntax.Else));
 
         _variantFacts = entry;
 
         // A branch that always leaves proves its opposite for everything after
         // the `if`. This is what makes the early return read the way it should:
         // `if (!read.Ok) { return Fail(read.Error); }` and the rest of the
-        // function is holding a value.
+        // function is holding a value -- and `if (x is not Node n) return;`
+        // leaves `n` for the rest of the block.
         bool thenExits = AlwaysExits(then);
         bool elseExits = otherwise is not null && AlwaysExits(otherwise);
+        bool outlived = false;
 
-        if (thenExits && !elseExits) ApplyFacts(whenFalse);
-        else if (elseExits && !thenExits) ApplyFacts(whenTrue);
+        if (thenExits && !elseExits)
+        {
+            ApplyFacts(whenFalse);
+            if (listed)
+                ExposeNames(assignedFalse);
+            outlived = listed && assignedFalse.Count > 0;
+        }
+        else if (elseExits && !thenExits)
+        {
+            ApplyFacts(whenTrue);
+            if (listed)
+                ExposeNames(assignedTrue);
+            outlived = listed && assignedTrue.Count > 0;
+        }
 
         BoundStatement result = new BoundIf(syntax.Span, condition, then, otherwise);
 
-        return patterns.Spills.Count == 0
+        // What the condition named is released where the `if` ends, unless it
+        // stays in scope after it.
+        return outlived || assignedTrue.Count + assignedFalse.Count == 0
             ? result
-            : new BoundBlock(syntax.Span, [.. patterns.Spills, result]);
-    }
-
-    /// <summary>
-    /// The branch a condition proved, with what its tests named in scope.
-    ///
-    /// Only here and in the rest of the <c>&amp;&amp;</c>: in the other branch a
-    /// name may never have been assigned, and reading a case's payload there
-    /// would read one type's bytes as another.
-    /// </summary>
-    private BoundStatement BindPatternBranch(PatternScope patterns, StatementSyntax body)
-    {
-        if (patterns.Bindings.Count == 0) return BindStatement(body);
-
-        PushScope();
-        ExposePatternBindings(patterns);
-        var bound = BindStatement(body);
-        PopScope();
-        return bound;
+            : new BoundBlock(syntax.Span, [result]);
     }
 
     /// <summary>
     /// <c>while (c) { ... }</c>, and <c>while (x is Some v)</c> with it.
     ///
-    /// A binding is offered here for the reason it is offered on an <c>if</c>:
-    /// the body is the place the test proved. The names are declared around
-    /// the loop and assigned by the condition, so each pass takes the value
-    /// again and <c>continue</c> re-tests, which is what continuing a
-    /// <c>while</c> means.
+    /// What the condition names is in scope in the body, for the reason it is
+    /// in an <c>if</c>'s branch: the body is the place the test proved. The
+    /// condition assigns the names on every pass, so <c>continue</c> takes
+    /// them again, which is what continuing a <c>while</c> means.
     /// </summary>
     private BoundStatement BindWhile(WhileSyntax syntax)
     {
-        var outer = _patterns;
-        _patterns = new PatternScope();
-
         var condition = BindCondition(syntax.Condition);
-
-        var patterns = _patterns;
-        _patterns = outer;
 
         // A loop body runs again, so anything it assigns to is unknown inside it
         // however the loop was entered.
@@ -1763,17 +1765,20 @@ public sealed partial class Binder
         ApplyFacts(ConditionFacts(condition).WhenTrue);
 
         _loopDepth++;
-        var body = BindPatternBranch(patterns, syntax.Body);
+        var body = BindWhereAssigned(condition, whenTrue: true, () => BindStatement(syntax.Body));
         _loopDepth--;
 
         // Nothing the condition proved survives the loop: it is also left by
         // failing that same condition.
         _variantFacts = entry;
 
+        // And what it named is released where the loop ends.
         BoundStatement loop = new BoundWhile(syntax.Span, condition, body);
-        return patterns.Spills.Count == 0
+        var (assignedTrue, assignedFalse) = AssignedNames(condition);
+
+        return assignedTrue.Count + assignedFalse.Count == 0
             ? loop
-            : new BoundBlock(syntax.Span, [.. patterns.Spills, loop]);
+            : new BoundBlock(syntax.Span, [loop]);
     }
 
     /// <summary>
@@ -2093,7 +2098,9 @@ public sealed partial class Binder
         if (condition is not null) ApplyFacts(ConditionFacts(condition).WhenTrue);
 
         _loopDepth++;
-        var body = BindStatement(syntax.Body);
+        var body = condition is null
+            ? BindStatement(syntax.Body)
+            : BindWhereAssigned(condition, whenTrue: true, () => BindStatement(syntax.Body));
         _loopDepth--;
         _variantFacts = entry;
 

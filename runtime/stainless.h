@@ -351,6 +351,9 @@ SL_API SL_NORETURN void sl_divide_by_zero(void);
 SL_API SL_NORETURN void sl_divide_overflow(void);
 SL_API SL_NORETURN void sl_arithmetic_overflow(void);
 
+/* A switch expression over an enum given a value none of its members has. */
+SL_API SL_NORETURN void sl_switch_unmatched(const char *type);
+
 /* ----------------------------------------------------------- inheritance */
 
 /*

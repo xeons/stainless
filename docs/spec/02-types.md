@@ -806,19 +806,33 @@ if (shape is Square square)
 ```
 
 That is the cast written once instead of twice. The name is in scope wherever
-the test is known to have succeeded: the rest of an `&&` after it, and the
-branch the condition guards.
+the test is known to have come out the way that assigned it: the rest of an
+`&&` after it, and the branch or the arm of a conditional it guards. A name
+under `not` is assigned where the test is false, so it is in scope in the
+`else`, in the rest of an `||`, and after an `if` whose branch always leaves:
 
 ```csharp
 if (node.Next is Node next && next.Value > limit)
     Visit(next);
+
+if (shape is not Square square)
+    return 0.0;
+return square.Side;                     // the `if` returned wherever it was not
 ```
 
 The value tested is taken where the test is evaluated, so an `&&` that stops
 before the test takes nothing: in `ready && Load() is Square s`, `Load` is not
-called when `ready` is false. Anywhere else — under `!` or `||`, as an
-argument, after the `if` — the name would be in scope where the test may have
-failed or never run, and it is refused there (SL0585).
+called when `ready` is false. Read anywhere else — after an `||` the test may
+have lost, as an argument, after a loop — the name may never have been
+assigned, and it is refused there (SL0585). C# puts it in scope and refuses
+the read as unassigned; the effect is the same, and a name here is never
+visible where it could hold nothing.
+
+What follows `is` is any pattern, not only a type ([§9.1.1](09-statements-expressions.md#911-patterns)):
+`x is null`, `x is > 0 and < 10`, `pet is { Owner.Name: "ann" }`,
+`pair is (0, var y)`, `items is [var first, ..]`. `x is not null` and
+`x is { }` narrow a local `C?` exactly as `x != null` does
+([§2.5](#25-pointers-and-nullability)).
 
 A *class* is what may be named: `x is INamed n` is refused (SL0587), because a
 reference does not convert down to an interface and there would be nothing for
@@ -835,8 +849,12 @@ The condition is asked again on every pass, so the value it tests is taken
 again on every pass; `continue` re-takes and re-tests, as continuing a `while`
 means. `while (queue.TryDequeue() is Some got && got.Value != 0)` stops at the
 first zero. The name is gone after the loop, which is left by failing that same
-test. A `do ... while` is refused: its body runs before the test, so there is
-no place the binding would be true.
+test. A `do ... while` may name one, but nowhere is it in scope: the body runs
+before the test.
+
+A name holds what it names as a local does, and lets go of it where the
+statement it was declared in ends — the `if` or the loop, or the block, for a
+name an `if` leaves in scope after it.
 
 **An interface reference narrows to a class**, which is the same question asked
 the same way:
@@ -1094,6 +1112,7 @@ the same machinery and the same table:
 | `x != null ? x.V : d` | in the arm the check chose |
 | `if (x != null && x.Ok())` | on the right of `&&`, and inside the branch |
 | `while (x != null) { … }` | in the body |
+| `x is not null`, `x is { }`, `x is null` | as `!=` and `==` do |
 
 **Nothing that could have changed it survives.** An assignment takes the proof
 away, so does passing it by `ref` or `out`, and, inside a loop, either of those
@@ -1249,8 +1268,9 @@ A field or a call result carries no narrowing (SL0285), because either could be
 a different value by the time the payload is read. `is` says so explicitly: the
 value is evaluated once and what came out of it has a name. That name is a copy
 of the case's payload — the same struct `case Circle c:` binds — and it is in
-scope in the rest of an `&&` and the branch the test proved, and nowhere else
-(SL0585). A case
+scope where the test is known to have matched, and nowhere else (SL0585).
+`value is Number(var held)` takes the payload apart instead, a field per
+position ([§9.1.1](09-statements-expressions.md#911-patterns)). A case
 that carries nothing has nothing to name (SL0586); `if (value is Null)` is the
 whole question there.
 

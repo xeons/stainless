@@ -87,6 +87,19 @@ void sl_divide_by_zero(void)
 }
 
 /*
+ * A switch expression that names every member of an enum needs no `_`, and a
+ * value that is none of them is the one it has no arm for.
+ */
+void sl_switch_unmatched(const char *type)
+{
+    char message[256];
+    snprintf(message, sizeof message,
+             "a switch expression over '%s' was given a value that is none of its members",
+             type);
+    sl_fail(message);
+}
+
+/*
  * A class is its own type and every one it derives from. The chain is short by
  * construction -- single inheritance, and nothing generated -- so this is a walk
  * rather than a table of ancestors, and it costs a compare per level.

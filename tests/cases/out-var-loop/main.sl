@@ -56,5 +56,12 @@ int Main()
             Console.WriteLine("inner " + inner.Name);
     }
 
+    // Declared on the right of an `&&` whose left named something: the
+    // declaration belongs to the `if`, as the name does.
+    s_taken = 0;
+    Tracked? lead = new Tracked("lead");
+    if (lead is Tracked first && TakeNext(out var follow))
+        Console.WriteLine(first.Name + " then " + follow.Name);
+
     return 0;
 }

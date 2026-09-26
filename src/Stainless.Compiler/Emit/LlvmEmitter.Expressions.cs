@@ -108,6 +108,8 @@ public sealed partial class LlvmEmitter
                 return EmitExpression(sequence.Value);
             }
             case BoundTypeTest test: return EmitTypeTest(test);
+            case BoundIsPattern matched: return EmitExpression(matched.Test);
+            case BoundUnmatchedSwitch unmatched: return EmitUnmatchedSwitch(unmatched);
             case BoundUnary unary: return EmitUnary(unary);
             case BoundBinary binary: return EmitBinary(binary);
             case BoundConditional conditional: return EmitConditional(conditional);
@@ -622,8 +624,19 @@ public sealed partial class LlvmEmitter
     }
 
     /// <summary>
+    /// The arm a switch expression over an enum has for a value that is none
+    /// of its members. The call does not come back; the zero after it is only
+    /// so the conditional it is an arm of has something to merge.
+    /// </summary>
+    private Val EmitUnmatchedSwitch(BoundUnmatchedSwitch unmatched)
+    {
+        Line($"call void @sl_switch_unmatched(ptr {InternBytes(unmatched.Subject.Name)})");
+        return EmitExpression(new BoundDefault(unmatched.Span, unmatched.Type));
+    }
+
+    /// <summary>
     /// Gives a variable no statement declared a slot, cleared: the one an
-    /// <c>out var x</c> introduced.
+    /// <c>out var x</c> introduced, or a name a pattern binds.
     ///
     /// Cleared because the language has no definite-assignment analysis: a
     /// callee that returns without writing would otherwise leave the caller
@@ -671,6 +684,9 @@ public sealed partial class LlvmEmitter
             StoreBitField(unit, bitField.Field, bits);
             return bits;
         }
+
+        if (assignment.DeclaresLocal is { } declared)
+            DeclareExpressionLocal(declared);
 
         string address = EmitAddress(assignment.Target);
         var value = EmitExpression(assignment.Value);

@@ -108,10 +108,12 @@ last person to edit it -- the suite is the authority.
   `weak C?`, which may die between the check and the use; an assignment or a
   `ref` or `out` argument takes the proof away, including one in a later
   operand of the same `&&`, and so does one anywhere in a loop body
-- `is` with a name — `if (node.Payload is Circle c)`, for a variant's case or a
-  class — which is how a field or a call result gets at what a test found. The
-  value is evaluated once and the name is in scope where the test succeeded.
-  Over a `C?` it asks about the null and the class at once, so
+- `is` with any pattern — `if (node.Payload is Circle c)`, `x is not null`,
+  `n is > 0 and < 10`, `pet is { Keeper.Name: "ann" }` — which is how a field
+  or a call result gets at what a test found. The value is evaluated once and a
+  name is in scope wherever the test is known to have come out the way that
+  assigned it: `if (x is not Node n) return;` leaves `n` for the rest of the
+  block. Over a `C?` it asks about the null and the class at once, so
   `if (node.Next is Node n)` is the narrowing a field could not have
 - `as`, which asks what `is` asks and answers with a value: `x as C` is a `C?`,
   so the answer can be passed on, stored, or given a fallback --
@@ -225,16 +227,23 @@ last person to edit it -- the suite is the authority.
   can check, and refusing would leave someone who knows better with nothing to
   do but write it untruthfully. `where T : threadsafe` is the strict form, and
   there it is an error, because the library author asked
-- Patterns, in a `case` label and in a `switch` expression: a constant, a
-  variant's case, a type, a range (`> 100`), `or`/`and`/`not`, `_`, and a
-  `when` on any of them. Each becomes the `bool` that asks it -- a comparison,
-  a tag test or an `is` -- so there is no matching machinery underneath. A
+- Patterns, after `is`, in a `case` label and in a `switch` expression: a
+  constant, a variant's case, a type, a range (`> 100`), `or`/`and`/`not`,
+  `_`, `var`, members (`{ Owner.Name: "a" }`), positions (`(0, var y)`,
+  `Circle(var r)`, through a `Deconstruct`), elements (`[1, .., var last]`,
+  where `.. var rest` is a slice of the same array), and a `when` on any of
+  them. Each becomes the `bool` that asks it -- a comparison, a tag test, an
+  `is`, a member read -- so there is no matching machinery underneath. A
   switch whose labels are all constants is still one LLVM `switch` and a jump
   table; one with a pattern in it is a chain of tests
 - `switch` as an expression: `n switch { < 0 => "negative", _ => "large" }`,
   which must be exhaustive (SL0620) because it has to produce a value and there
-  is no exception to throw at a value that matched nothing. It lowers to the
-  value held in a name and a conditional per arm
+  is no exception to throw at a value that matched nothing. Coverage follows
+  bools, a variant's cases, an enum's members, and the same nested in tuples,
+  payloads, members and lists, and an arm nothing reaches is a warning
+  (SL0621). An enum whose members are all named needs no `_`, and a value that
+  is none of them ends the program. It lowers to the value held in a name and a
+  conditional per arm
 - A lambda with written parameter types has a type of its own, so `var doubled
   = (int x) => x * 2;` is a `closure int(int)` -- cached by signature, so two of
   a shape are one type, and a declared `closure` of that shape is
@@ -760,9 +769,15 @@ Being straight about the edges, roughly in the order they are worth adding:
   a mistake inside one is reported against its use. Definition-site checking
   would need constraints on operators too, which is a larger step.
 - **An interface method cannot be generic**, since dispatch gives it one slot.
-- **No `goto case`, and no exhaustiveness requirement on an enum**, whose value
-  need not be one of its members. A switch expression over one still needs a
-  `_` arm for that reason.
+- **No `goto case`, and no exhaustiveness requirement on a statement over an
+  enum**, whose value need not be one of its members. A switch expression over
+  one is covered by naming them all, and ends the program on a value that is
+  none of them, since there is no exception to throw.
+- **Coverage does not follow ranges.** `< 0`, `0` and `> 0` over an `int`
+  still need a `_`, and a `when` counts for nothing; C# tracks both.
+- **A `String` is not matched element by element.** Its positions are bytes,
+  so `text is ['a', ..]` would be a pattern of bytes posing as one of
+  characters, and is refused (SL0774).
 - **A lambda with nothing written needs something to be.** One that writes its
   parameter types out has a type of its own -- `var f = (int x) => x * 2;` is a
   closure -- but `var f = x => x;` has nothing to infer from and is refused

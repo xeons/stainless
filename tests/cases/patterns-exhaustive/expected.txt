@@ -1,0 +1,14 @@
+blue
+the first
+not the first
+flagged circle 2
+circle
+flat rect
+rect
+empty
+not a circle
+circle 1.5
+warm enough
+3
+minus
+plus
