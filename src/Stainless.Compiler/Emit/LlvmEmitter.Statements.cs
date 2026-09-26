@@ -311,21 +311,6 @@ public sealed partial class LlvmEmitter
     /// </summary>
     private bool _hasLabels;
 
-    /// <summary>Whether a statement holds a label or a switch section a <c>goto case</c> names.</summary>
-    private static bool ContainsLabel(BoundStatement statement) => statement switch
-    {
-        BoundLabel => true,
-        BoundBlock block => block.Statements.Any(ContainsLabel),
-        BoundIf branch => ContainsLabel(branch.Then) || branch.Else is not null && ContainsLabel(branch.Else),
-        BoundWhile loop => ContainsLabel(loop.Body),
-        BoundDoWhile loop => ContainsLabel(loop.Body),
-        BoundFor loop => loop.Initializer is not null && ContainsLabel(loop.Initializer) || ContainsLabel(loop.Body),
-        BoundSwitch chosen => chosen.Sections.Any(s => s.Entry is not null || ContainsLabel(s.Body)),
-        BoundParallel parallel => ContainsLabel(parallel.Body),
-        BoundParallelFor loop => ContainsLabel(loop.Body),
-        _ => false,
-    };
-
     /// <summary>
     /// The block name for a source label, one per label per function.
     ///

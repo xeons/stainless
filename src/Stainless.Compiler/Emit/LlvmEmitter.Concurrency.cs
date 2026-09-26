@@ -282,7 +282,7 @@ public sealed partial class LlvmEmitter
         var loop = thunk.Loop;
 
         ResetFunctionState();
-        _hasLabels = ContainsLabel(loop.Body);
+        _hasLabels = LabelFinder.Contains(loop.Body);
         _module.AppendLine(
             $"define internal void @{thunk.Name}(ptr %capture, i64 %start, i64 %end)"
             + FrameAttributes + " {");

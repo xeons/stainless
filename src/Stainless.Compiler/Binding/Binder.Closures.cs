@@ -155,70 +155,8 @@ public sealed partial class Binder
         if (!ReferenceEquals(property.Getter, function)) return;
 
         var fields = new HashSet<FieldSymbol>();
-        CollectFieldReads(body, fields);
+        new FieldReadCollector(fields).Visit(body);
         if (fields.Count > 0) _propertyReads[property] = fields;
-    }
-
-    private static void CollectFieldReads(BoundStatement? statement, HashSet<FieldSymbol> into)
-    {
-        switch (statement)
-        {
-            case null: return;
-            case BoundBlock block:
-                foreach (var inner in block.Statements) CollectFieldReads(inner, into);
-                break;
-            case BoundReturn returned: CollectFieldReads(returned.Value, into); break;
-            case BoundExpressionStatement expression:
-                CollectFieldReads(expression.Expression, into);
-                break;
-            case BoundLocalDeclaration declaration:
-                CollectFieldReads(declaration.Initializer, into);
-                break;
-            case BoundDeconstruct taken:
-                CollectFieldReads(taken.Expression, into);
-                break;
-            case BoundIf conditional:
-                CollectFieldReads(conditional.Condition, into);
-                CollectFieldReads(conditional.Then, into);
-                CollectFieldReads(conditional.Else, into);
-                break;
-        }
-    }
-
-    private static void CollectFieldReads(BoundExpression? expression, HashSet<FieldSymbol> into)
-    {
-        switch (expression)
-        {
-            case null: return;
-            case BoundFieldAccess field:
-                into.Add(field.Field);
-                CollectFieldReads(field.Receiver, into);
-                break;
-            case BoundCall call:
-                CollectFieldReads(call.Receiver, into);
-                foreach (var argument in call.Arguments) CollectFieldReads(argument, into);
-                break;
-            case BoundBinary binary:
-                CollectFieldReads(binary.Left, into);
-                CollectFieldReads(binary.Right, into);
-                break;
-            case BoundUnary unary: CollectFieldReads(unary.Operand, into); break;
-            case BoundConversion conversion: CollectFieldReads(conversion.Operand, into); break;
-            case BoundDereference dereference: CollectFieldReads(dereference.Operand, into); break;
-            case BoundConditional conditional:
-                CollectFieldReads(conditional.Condition, into);
-                CollectFieldReads(conditional.WhenTrue, into);
-                CollectFieldReads(conditional.WhenFalse, into);
-                break;
-            case BoundIndex index:
-                CollectFieldReads(index.Target, into);
-                CollectFieldReads(index.Index, into);
-                break;
-            case BoundSequence sequence:
-                foreach (var side in sequence.Before) CollectFieldReads(side, into);
-                CollectFieldReads(sequence.Value, into);
-                break;
-        }
     }
 
     /// <summary>

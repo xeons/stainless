@@ -1263,6 +1263,10 @@ public sealed partial class Binder
     /// <summary>
     /// Whether the parameter is certainly written by the time this statement is
     /// through, reporting any <c>return</c> reached before it was.
+    ///
+    /// A path that jumps away is through: it reaches nothing after it. What a
+    /// <c>break</c> or a <c>continue</c> held is kept for the statement it
+    /// leaves, which is where that path goes on.
     /// </summary>
     private bool Assigns(
         BoundStatement statement, ParameterSymbol target, bool assigned, FunctionSymbol owner)
@@ -1275,16 +1279,16 @@ public sealed partial class Binder
                 return assigned;
 
             case BoundExpressionStatement expression:
-                return assigned || Writes(expression.Expression, target);
+                return Evaluates(expression.Expression, target, assigned, owner);
 
             case BoundLocalDeclaration declaration:
-                return assigned || Writes(declaration.Initializer, target);
+                return Evaluates(declaration.Initializer, target, assigned, owner);
 
             case BoundDeconstruct taken:
-                return assigned || Writes(taken.Expression, target);
+                return Evaluates(taken.Expression, target, assigned, owner);
 
             case BoundReturn returned:
-                if (!assigned && !Writes(returned.Value, target))
+                if (!Evaluates(returned.Value, target, assigned, owner))
                     diagnostics.Error("SL0600", returned.Span,
                         $"'{owner.Name}' returns here without having written to " +
                         $"'{target.Name}', which is what 'out' promises the caller");
@@ -1292,37 +1296,63 @@ public sealed partial class Binder
                 // Nothing follows a return, so whatever it left is not read.
                 return true;
 
+            case BoundBreak:
+                if (_assignmentBreaks.Count > 0)
+                    _assignmentBreaks.Peek().Add(assigned);
+                return true;
+
+            case BoundContinue:
+                if (_assignmentContinues.Count > 0)
+                    _assignmentContinues.Peek().Add(assigned);
+                return true;
+
             case BoundIf branch:
             {
-                bool then = Assigns(branch.Then, target, assigned || Writes(branch.Condition, target), owner);
+                assigned = Evaluates(branch.Condition, target, assigned, owner);
+                bool then = Assigns(branch.Then, target, assigned, owner);
                 bool otherwise = branch.Else is null
-                    ? assigned || Writes(branch.Condition, target)
-                    : Assigns(branch.Else, target, assigned || Writes(branch.Condition, target), owner);
+                    ? assigned
+                    : Assigns(branch.Else, target, assigned, owner);
                 return then && otherwise;
             }
 
-            // A `do` body always runs, so what it writes is written. Every
-            // other loop may run no times at all.
+            // A `do` body always runs, and so does every loop's first test.
+            // Any other body may run no times at all, and whatever leaves one
+            // early has at least what the loop started with.
             case BoundDoWhile loop:
-                return Assigns(loop.Body, target, assigned, owner);
+            {
+                var (end, breaks, continues) = AssignsInLoop(loop.Body, target, assigned, owner);
+                bool tested = Evaluates(loop.Condition, target, end && continues.All(c => c), owner);
+                return tested && breaks.All(b => b);
+            }
 
             case BoundWhile loop:
-                Assigns(loop.Body, target, assigned, owner);
+                assigned = Evaluates(loop.Condition, target, assigned, owner);
+                AssignsInLoop(loop.Body, target, assigned, owner);
                 return assigned;
 
             case BoundFor loop:
-                Assigns(loop.Body, target, assigned, owner);
+                if (loop.Initializer is not null)
+                    assigned = Assigns(loop.Initializer, target, assigned, owner);
+                assigned = Evaluates(loop.Condition, target, assigned, owner);
+                AssignsInLoop(loop.Body, target, assigned, owner);
+                Evaluates(loop.Step, target, true, owner);
                 return assigned;
 
             case BoundSwitch chosen:
             {
+                assigned = Evaluates(chosen.Value, target, assigned, owner);
+
                 bool everyArm = chosen.IsExhaustive || chosen.Sections.Any(s => s.IsDefault);
                 bool all = everyArm && chosen.Sections.Count > 0;
 
+                var breaks = new List<bool>();
+                _assignmentBreaks.Push(breaks);
                 foreach (var section in chosen.Sections)
                     all &= Assigns(section.Body, target, assigned, owner);
+                _assignmentBreaks.Pop();
 
-                return assigned || all;
+                return assigned || all && breaks.All(b => b);
             }
 
             case BoundParallel parallel:
@@ -1337,51 +1367,49 @@ public sealed partial class Binder
                     o.IsOutput
                         ? o.Value is BoundParameterAccess written &&
                           ReferenceEquals(written.Parameter, target)
-                        : Writes(o.Value, target));
+                        : Evaluates(o.Value, target, false, owner));
 
             default:
                 return assigned;
         }
     }
 
+    /// <summary>What a loop's body ends with, and what each <c>break</c> and <c>continue</c> in it held.</summary>
+    private (bool End, List<bool> Breaks, List<bool> Continues) AssignsInLoop(
+        BoundStatement body, ParameterSymbol target, bool assigned, FunctionSymbol owner)
+    {
+        var breaks = new List<bool>();
+        var continues = new List<bool>();
+        _assignmentBreaks.Push(breaks);
+        _assignmentContinues.Push(continues);
+
+        bool end = Assigns(body, target, assigned, owner);
+
+        _assignmentContinues.Pop();
+        _assignmentBreaks.Pop();
+        return (end, breaks, continues);
+    }
+
+    private readonly Stack<List<bool>> _assignmentBreaks = new();
+    private readonly Stack<List<bool>> _assignmentContinues = new();
+
     /// <summary>
-    /// Whether evaluating this expression certainly writes the parameter --
-    /// by assignment, or by handing it on as somebody else's <c>out</c>.
+    /// Whether the parameter is certainly written once the expression has
+    /// been evaluated, reporting a <c>try</c> that can return before it was.
     /// </summary>
-    private static bool Writes(BoundExpression? expression, ParameterSymbol target) =>
-        expression switch
-        {
-            null => false,
+    private bool Evaluates(
+        BoundExpression? expression, ParameterSymbol target, bool assigned, FunctionSymbol owner)
+    {
+        var tracker = new OutWriteTracker(target, assigned);
+        tracker.Visit(expression);
 
-            BoundAssignment { Target: BoundParameterAccess written } assignment =>
-                ReferenceEquals(written.Parameter, target) || Writes(assignment.Value, target),
+        foreach (var early in tracker.EarlyReturns)
+            diagnostics.Error("SL0600", early,
+                $"'{owner.Name}' returns here if this fails, without having written to " +
+                $"'{target.Name}', which is what 'out' promises the caller");
 
-            BoundAssignment assignment => Writes(assignment.Value, target),
-
-            // `Inner(out mine)` is a write, because Inner is held to the same
-            // promise this function is.
-            BoundAddressOf { FromOutKeyword: true, Operand: BoundParameterAccess passed } =>
-                ReferenceEquals(passed.Parameter, target),
-
-            BoundCall call =>
-                Writes(call.Receiver, target) || call.Arguments.Any(a => Writes(a, target)),
-
-            BoundIndirectCall call =>
-                Writes(call.Target, target) || call.Arguments.Any(a => Writes(a, target)),
-
-            BoundConversion conversion => Writes(conversion.Operand, target),
-            BoundBinary binary => Writes(binary.Left, target) || Writes(binary.Right, target),
-            BoundLet held => Writes(held.Value, target) || Writes(held.Body, target),
-            BoundSequence sequence =>
-                sequence.Before.Any(e => Writes(e, target)) || Writes(sequence.Value, target),
-            BoundTupleCreate tuple => tuple.Elements.Any(e => Writes(e, target)),
-            BoundUnary unary => Writes(unary.Operand, target),
-
-            // Only the condition is certain: an arm may not be the one taken.
-            BoundConditional conditional => Writes(conditional.Condition, target),
-
-            _ => false,
-        };
+        return tracker.Written;
+    }
 
     // ------------------------------------------------------------ scopes
 

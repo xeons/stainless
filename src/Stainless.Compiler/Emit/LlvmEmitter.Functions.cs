@@ -33,7 +33,7 @@ public sealed partial class LlvmEmitter
     {
         var symbol = function.Symbol;
         ResetFunctionState();
-        _hasLabels = ContainsLabel(function.Body);
+        _hasLabels = LabelFinder.Contains(function.Body);
 
         var returnInfo = ClassifyResult(symbol.ReturnType);
         var parameterInfos = symbol.Parameters

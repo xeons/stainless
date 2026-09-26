@@ -394,7 +394,11 @@ callee has to.
 **The callee's half is checked** (SL0600). Every path out of the function
 either writes the parameter or is an error, and handing it straight on as
 somebody else's `out` counts as writing it — that callee is held to the same
-promise. This is the only definite-assignment analysis in the language, and it
+promise. A `try` whose failure returns before the write is such a path, and so
+is a `break` that leaves a loop or a switch early; what runs only sometimes —
+the right of `&&` or `||`, an arm of a conditional — writes nothing certain,
+and a loop's first test, which always runs, does. This is the only
+definite-assignment analysis in the language, and it
 is here because this is the one place it is load-bearing: an ordinary local
 read before it is written is still nobody's business but the author's, which is
 a gap, but a consistent one. A function containing a `goto` stands the check

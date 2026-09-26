@@ -15,68 +15,187 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 using Stainless.Source;
-using Stainless.Syntax;
 
 namespace Stainless.Binding;
 
-/// <summary>Finds the statics an initializer reads, so they can be ordered first.</summary>
-internal sealed class StaticReferenceWalker
-{
-    public HashSet<StaticSymbol> Found { get; } = [];
+/// <summary>
+/// Marks a property holding a node that is also reached through another child,
+/// so a walk MUST NOT visit it a second time.
+/// </summary>
+[AttributeUsage(AttributeTargets.Property)]
+public sealed class SharedSubtreeAttribute : Attribute;
 
-    /// <summary>A static constructor's body, statement by statement.</summary>
-    public void Visit(BoundStatement? statement)
+/// <summary>
+/// Visits a bound tree: every child of every node, each exactly once, in the
+/// order it is evaluated.
+///
+/// A walk overrides <see cref="Visit(BoundExpression?)"/> or
+/// <see cref="Visit(BoundStatement?)"/>, handles the nodes it is about, and
+/// calls the base to go on into the children. <see cref="VisitChildren(BoundExpression)"/>
+/// is the one place that knows what a node's children are, and it throws on a
+/// node it does not know, so a new node kind cannot be skipped by accident.
+/// A unit test holds every node type to it.
+/// </summary>
+public abstract class BoundTreeWalker
+{
+    public virtual void Visit(BoundStatement? statement)
+    {
+        if (statement is not null)
+            VisitChildren(statement);
+    }
+
+    public virtual void Visit(BoundExpression? expression)
+    {
+        if (expression is not null)
+            VisitChildren(expression);
+    }
+
+    protected void VisitAll(IReadOnlyList<BoundExpression> expressions)
+    {
+        foreach (var expression in expressions)
+            Visit(expression);
+    }
+
+    public void VisitChildren(BoundStatement statement)
     {
         switch (statement)
         {
-            case null: return;
-
             case BoundBlock block:
-                foreach (var inner in block.Statements) Visit(inner);
+                foreach (var inner in block.Statements)
+                    Visit(inner);
                 break;
 
-            case BoundLocalDeclaration declaration: Visit(declaration.Initializer); break;
-            case BoundExpressionStatement expression: Visit(expression.Expression); break;
-            case BoundDeconstruct taken: Visit(taken.Expression); break;
-            case BoundIf branch: Visit(branch.Condition); Visit(branch.Then); Visit(branch.Else); break;
-            case BoundWhile loop: Visit(loop.Condition); Visit(loop.Body); break;
+            case BoundLocalDeclaration declaration:
+                Visit(declaration.Initializer);
+                break;
+
+            case BoundExpressionStatement expression:
+                Visit(expression.Expression);
+                break;
+
+            case BoundDeconstruct taken:
+                foreach (var declaration in taken.Declarations)
+                    Visit(declaration);
+                Visit(taken.Expression);
+                break;
+
+            case BoundIf branch:
+                Visit(branch.Condition);
+                Visit(branch.Then);
+                Visit(branch.Else);
+                break;
+
+            case BoundWhile loop:
+                Visit(loop.Condition);
+                Visit(loop.Body);
+                break;
+
+            case BoundDoWhile loop:
+                Visit(loop.Body);
+                Visit(loop.Condition);
+                break;
 
             case BoundFor loop:
-                Visit(loop.Initializer); Visit(loop.Condition); Visit(loop.Step); Visit(loop.Body);
+                Visit(loop.Initializer);
+                Visit(loop.Condition);
+                Visit(loop.Body);
+                Visit(loop.Step);
                 break;
 
-            case BoundReturn returned: Visit(returned.Value); break;
+            case BoundSwitch chosen:
+                Visit(chosen.Value);
+                foreach (var section in chosen.Sections)
+                {
+                    VisitAll(section.Labels);
+                    VisitAll(section.Tests);
+                    Visit(section.Body);
+                }
+                break;
+
+            case BoundAsm assembly:
+                foreach (var operand in assembly.Operands)
+                    Visit(operand.Value);
+                break;
+
+            case BoundParallel parallel:
+                Visit(parallel.Body);
+                break;
+
+            case BoundSpawn spawn:
+                Visit(spawn.Target);
+                Visit(spawn.Call);
+                break;
+
+            case BoundParallelFor loop:
+                Visit(loop.Start);
+                Visit(loop.Limit);
+                Visit(loop.Stride);
+                Visit(loop.Body);
+                break;
+
+            case BoundReturn returned:
+                Visit(returned.Value);
+                break;
+
+            case BoundLabel or BoundGoto or BoundBreak or BoundContinue:
+                break;
+
+            default:
+                throw Unknown(statement, statement.Span);
         }
     }
 
-    public void Visit(BoundExpression? expression)
+    public void VisitChildren(BoundExpression expression)
     {
         switch (expression)
         {
-            case null: return;
-
-            case BoundStaticAccess access: Found.Add(access.Static); break;
-
-            case BoundFieldAccess field: Visit(field.Receiver); break;
-
-            // A static automatic property's getter reads its storage, so
-            // reading the property is reading the static.
-            case BoundCall call:
-                if (call.Function.Accessor?.StaticBacking is { } storage) Found.Add(storage);
-                Visit(call.Receiver);
-                foreach (var argument in call.Arguments) Visit(argument);
+            case BoundErrorExpression or BoundLiteral or BoundStringLiteral or BoundUtf8Literal
+                or BoundNullLiteral or BoundLocalAccess or BoundParameterAccess or BoundStaticAccess
+                or BoundConstantAccess or BoundDefault or BoundSizeof or BoundAlignof or BoundOffsetof
+                or BoundTypeof or BoundIidof or BoundEmbed or BoundThis or BoundFunctionReference
+                or BoundUnmatchedSwitch or BoundOutDraft or BoundLambda:
                 break;
 
-            case BoundIndirectCall call:
-                Visit(call.Target);
-                foreach (var argument in call.Arguments) Visit(argument);
+            case BoundInterpolatedString interpolated: VisitAll(interpolated.Parts); break;
+            case BoundFieldAccess field: Visit(field.Receiver); break;
+
+            case BoundCall call:
+                Visit(call.Receiver);
+                VisitAll(call.Arguments);
                 break;
 
             case BoundUnary unary: Visit(unary.Operand); break;
-            case BoundBinary binary: Visit(binary.Left); Visit(binary.Right); break;
+
+            case BoundBinary binary:
+                Visit(binary.Left);
+                Visit(binary.Right);
+                break;
+
+            case BoundIncrement stepped: Visit(stepped.Target); break;
+
+            case BoundPropertyIncrement stepped:
+                Visit(stepped.Receiver);
+                VisitAll(stepped.Arguments);
+                break;
+
+            case BoundAssignment assignment:
+                Visit(assignment.Target);
+                Visit(assignment.Value);
+                break;
+
+            case BoundPropertyAssignment written:
+                Visit(written.Receiver);
+                VisitAll(written.Indices);
+                Visit(written.Value);
+                break;
+
+            case BoundLet held:
+                Visit(held.Value);
+                Visit(held.Body);
+                break;
 
             case BoundSequence sequence:
-                foreach (var side in sequence.Before) Visit(side);
+                VisitAll(sequence.Before);
                 Visit(sequence.Value);
                 break;
 
@@ -86,50 +205,100 @@ internal sealed class StaticReferenceWalker
                 Visit(conditional.WhenFalse);
                 break;
 
-            case BoundAssignment assignment: Visit(assignment.Target); Visit(assignment.Value); break;
+            case BoundFunctionGroup group: Visit(group.Receiver); break;
+            case BoundArrayDraft draft: VisitAll(draft.Elements); break;
+            case BoundSpread spread: Visit(spread.Source); break;
+            case BoundArrayLiteral literal: VisitAll(literal.Elements); break;
+            case BoundTupleCreate tuple: VisitAll(tuple.Elements); break;
+            case BoundTupleDraft tuple: VisitAll(tuple.Elements); break;
+            case BoundVariantConstruction built: VisitAll(built.Arguments); break;
+            case BoundVariantDraft built: VisitAll(built.Arguments); break;
+            case BoundNewDraft created: VisitAll(created.Arguments); break;
 
-            case BoundPropertyAssignment written:
-                Visit(written.Receiver);
-                foreach (var index in written.Indices) Visit(index);
-                Visit(written.Value);
+            case BoundTry attempt:
+                Visit(attempt.Operand);
+                Visit(attempt.Test);
+                Visit(attempt.OnFailure);
+                Visit(attempt.OnSuccess);
                 break;
 
-            case BoundIncrement stepped: Visit(stepped.Target); break;
+            case BoundVariantTest test: Visit(test.Value); break;
+            case BoundVariantPayload payload: Visit(payload.Receiver); break;
 
-            case BoundPropertyIncrement stepped:
-                Visit(stepped.Receiver);
-                foreach (var index in stepped.Arguments) Visit(index);
+            case BoundClosure closure:
+                foreach (var (_, value) in closure.Captures)
+                    Visit(value);
                 break;
 
-            case BoundConversion conversion: Visit(conversion.Operand); break;
+            case BoundIndirectCall call:
+                Visit(call.Target);
+                VisitAll(call.Arguments);
+                break;
+
+            case BoundClosureCreate created: Visit(created.Receiver); break;
+
+            case BoundClosureEqual same:
+                Visit(same.Left);
+                Visit(same.Right);
+                break;
+
+            case BoundClosureCall call:
+                Visit(call.Target);
+                VisitAll(call.Arguments);
+                break;
+
             case BoundTypeTest test: Visit(test.Value); break;
             case BoundIsPattern matched: Visit(matched.Test); break;
-            case BoundVariantTest asked: Visit(asked.Value); break;
-            case BoundVariantPayload payload: Visit(payload.Receiver); break;
-            case BoundSlice slice: Visit(slice.Target); Visit(slice.Start); Visit(slice.End); break;
-
-            // A `switch` expression is a name and a chain of conditionals, and
-            // a static initializer may be written as one.
-            case BoundLet held: Visit(held.Value); Visit(held.Body); break;
-
-            case BoundTupleCreate tuple:
-                foreach (var element in tuple.Elements) Visit(element);
-                break;
-
-            case BoundNew created:
-                foreach (var argument in created.Arguments) Visit(argument);
-                break;
-
-            case BoundStructNew filled:
-                foreach (var argument in filled.Arguments) Visit(argument);
-                break;
-
+            case BoundConversion conversion: Visit(conversion.Operand); break;
+            case BoundNew created: VisitAll(created.Arguments); break;
+            case BoundStructNew filled: VisitAll(filled.Arguments); break;
             case BoundDereference dereference: Visit(dereference.Operand); break;
             case BoundAddressOf address: Visit(address.Operand); break;
             case BoundNewArray array: Visit(array.Length); break;
+
+            case BoundSlice slice:
+                Visit(slice.Target);
+                Visit(slice.Start);
+                Visit(slice.End);
+                break;
+
             case BoundArrayLength length: Visit(length.Array); break;
-            case BoundIndex index: Visit(index.Target); Visit(index.Index); break;
+
+            case BoundIndex index:
+                Visit(index.Target);
+                Visit(index.Index);
+                break;
+
+            default:
+                throw Unknown(expression, expression.Span);
         }
+    }
+
+    private static InternalCompilerError Unknown(object node, SourceSpan span) =>
+        new($"the bound tree walker has no case for {node.GetType().Name}", span);
+}
+
+/// <summary>Finds the statics an initializer reads, so they can be ordered first.</summary>
+internal sealed class StaticReferenceWalker : BoundTreeWalker
+{
+    public HashSet<StaticSymbol> Found { get; } = [];
+
+    public override void Visit(BoundExpression? expression)
+    {
+        switch (expression)
+        {
+            case BoundStaticAccess access:
+                Found.Add(access.Static);
+                break;
+
+            // A static automatic property's getter reads its storage, so
+            // reading the property is reading the static.
+            case BoundCall { Function.Accessor.StaticBacking: { } storage }:
+                Found.Add(storage);
+                break;
+        }
+
+        base.Visit(expression);
     }
 }
 
@@ -142,7 +311,7 @@ internal sealed class StaticReferenceWalker
 /// through, and a race for a variable being assigned. Assignments are collected
 /// separately so the binder can reject exactly those.
 /// </summary>
-internal sealed class CaptureWalker(LocalSymbol loopVariable)
+internal sealed class CaptureWalker(LocalSymbol loopVariable) : BoundTreeWalker
 {
     private readonly HashSet<object> _declared = [loopVariable];
     private readonly HashSet<object> _seen = [];
@@ -154,7 +323,8 @@ internal sealed class CaptureWalker(LocalSymbol loopVariable)
 
     private void Capture(object symbol)
     {
-        if (_declared.Contains(symbol) || !_seen.Add(symbol)) return;
+        if (_declared.Contains(symbol) || !_seen.Add(symbol))
+            return;
         _captures.Add(symbol);
     }
 
@@ -172,105 +342,59 @@ internal sealed class CaptureWalker(LocalSymbol loopVariable)
         }
     }
 
-    public void Visit(BoundStatement? statement)
+    public override void Visit(BoundStatement? statement)
     {
         switch (statement)
         {
-            case null: return;
-
             case BoundBlock block:
-                foreach (var inner in block.Statements) Visit(inner);
+                _declared.UnionWith(block.Locals);
                 break;
 
             case BoundLocalDeclaration declaration:
                 _declared.Add(declaration.Local);
-                Visit(declaration.Initializer);
-                break;
-
-            case BoundExpressionStatement expression: Visit(expression.Expression); break;
-
-            case BoundDeconstruct taken:
-                foreach (var declaration in taken.Declarations)
-                    _declared.Add(declaration.Local);
-                Visit(taken.Expression);
-                break;
-
-            case BoundIf branch:
-                Visit(branch.Condition); Visit(branch.Then); Visit(branch.Else);
-                break;
-
-            case BoundWhile loop:
-                Visit(loop.Condition); Visit(loop.Body);
                 break;
 
             case BoundFor loop:
-                foreach (var local in loop.Locals) _declared.Add(local);
-                Visit(loop.Initializer); Visit(loop.Condition); Visit(loop.Step); Visit(loop.Body);
-                break;
-
-            case BoundParallel nested: Visit(nested.Body); break;
-
-            case BoundSpawn spawn:
-                Visit(spawn.Target); Visit(spawn.Call);
+                _declared.UnionWith(loop.Locals);
                 break;
 
             case BoundParallelFor nested:
                 _declared.Add(nested.Variable);
-                Visit(nested.Start); Visit(nested.Limit); Visit(nested.Stride); Visit(nested.Body);
                 break;
 
-            case BoundReturn returned: Visit(returned.Value); break;
+            case BoundSwitch chosen:
+                foreach (var section in chosen.Sections)
+                    if (section.Binding is { } binding)
+                        _declared.Add(binding);
+                break;
 
             // An output is an assignment to its place, and every chunk of a
             // `for parallel` storing into one outside variable is the race the
             // rule exists for.
             case BoundAsm assembly:
                 foreach (var operand in assembly.Operands)
-                {
-                    if (operand.IsOutput) Assigned(operand.Value);
-                    Visit(operand.Value);
-                }
+                    if (operand.IsOutput)
+                        Assigned(operand.Value);
                 break;
         }
+
+        base.Visit(statement);
     }
 
-    public void Visit(BoundExpression? expression)
+    public override void Visit(BoundExpression? expression)
     {
         switch (expression)
         {
-            case null: return;
-
-            case BoundLocalAccess local: Capture(local.Local); break;
-            case BoundParameterAccess parameter: Capture(parameter.Parameter); break;
-            case BoundThis self: Capture(self.Parameter); break;
-
-            case BoundFieldAccess field: Visit(field.Receiver); break;
-
-            case BoundCall call:
-                Visit(call.Receiver);
-                foreach (var argument in call.Arguments) Visit(argument);
+            case BoundLocalAccess local:
+                Capture(local.Local);
                 break;
 
-            case BoundIndirectCall call:
-                Visit(call.Target);
-                foreach (var argument in call.Arguments) Visit(argument);
+            case BoundParameterAccess parameter:
+                Capture(parameter.Parameter);
                 break;
 
-            case BoundUnary unary: Visit(unary.Operand); break;
-
-            case BoundBinary binary:
-                Visit(binary.Left); Visit(binary.Right);
-                break;
-
-            case BoundSequence sequence:
-                foreach (var side in sequence.Before) Visit(side);
-                Visit(sequence.Value);
-                break;
-
-            case BoundConditional conditional:
-                Visit(conditional.Condition);
-                Visit(conditional.WhenTrue);
-                Visit(conditional.WhenFalse);
+            case BoundThis self:
+                Capture(self.Parameter);
                 break;
 
             // A name a pattern declared belongs to the iteration that ran it.
@@ -278,66 +402,133 @@ internal sealed class CaptureWalker(LocalSymbol loopVariable)
                 if (assignment.DeclaresLocal is { } declared)
                     _declared.Add(declared);
                 Assigned(assignment.Target);
-                Visit(assignment.Target); Visit(assignment.Value);
                 break;
 
             case BoundIncrement stepped:
                 Assigned(stepped.Target);
-                Visit(stepped.Target);
                 break;
-
-            // A property write goes through a method, so it changes the object
-            // rather than the captured variable naming it; only the reads count.
-            case BoundPropertyAssignment written:
-                Visit(written.Receiver);
-                foreach (var index in written.Indices) Visit(index);
-                Visit(written.Value);
-                break;
-
-            case BoundPropertyIncrement stepped:
-                Visit(stepped.Receiver);
-                foreach (var index in stepped.Arguments) Visit(index);
-                break;
-
-            case BoundConversion conversion: Visit(conversion.Operand); break;
-            case BoundTypeTest test: Visit(test.Value); break;
-            case BoundIsPattern matched: Visit(matched.Test); break;
-            case BoundVariantTest asked: Visit(asked.Value); break;
-            case BoundVariantPayload payload: Visit(payload.Receiver); break;
-            case BoundSlice slice: Visit(slice.Target); Visit(slice.Start); Visit(slice.End); break;
 
             // Held for the length of one expression, so it belongs to the
             // iteration that evaluates it.
             case BoundLet held:
                 _declared.Add(held.Local);
-                Visit(held.Value); Visit(held.Body);
                 break;
 
-            case BoundTupleCreate tuple:
-                foreach (var element in tuple.Elements) Visit(element);
+            case BoundTry attempt:
+                _declared.Add(attempt.Slot);
                 break;
 
-            case BoundNew created:
-                foreach (var argument in created.Arguments) Visit(argument);
-                break;
-
-            case BoundStructNew filled:
-                foreach (var argument in filled.Arguments) Visit(argument);
-                break;
-
-            case BoundDereference dereference: Visit(dereference.Operand); break;
-            case BoundAddressOf address:
-                if (address.DeclaresLocal is { } introduced)
-                    _declared.Add(introduced);
-                Visit(address.Operand);
-                break;
-
-            case BoundNewArray array: Visit(array.Length); break;
-            case BoundArrayLength length: Visit(length.Array); break;
-
-            case BoundIndex index:
-                Visit(index.Target); Visit(index.Index);
+            case BoundAddressOf { DeclaresLocal: { } introduced }:
+                _declared.Add(introduced);
                 break;
         }
+
+        base.Visit(expression);
+    }
+}
+
+/// <summary>
+/// Whether evaluating a tree certainly writes a parameter — by assignment, or by
+/// handing it on as somebody else's <c>out</c> — and each <c>try</c> that can
+/// return before it has.
+///
+/// The walk is in evaluation order. What only some paths run — the arms of a
+/// conditional, the right of <c>&amp;&amp;</c> and <c>||</c> — is looked into
+/// for a <c>try</c>, and what it writes is forgotten again afterwards.
+/// </summary>
+internal sealed class OutWriteTracker(ParameterSymbol target, bool written) : BoundTreeWalker
+{
+    public bool Written { get; private set; } = written;
+
+    public List<SourceSpan> EarlyReturns { get; } = [];
+
+    public override void Visit(BoundExpression? expression)
+    {
+        switch (expression)
+        {
+            case BoundAssignment { Target: BoundParameterAccess assigned } assignment
+                when ReferenceEquals(assigned.Parameter, target):
+                Visit(assignment.Value);
+                Written = true;
+                return;
+
+            // `Inner(out mine)` is a write, because Inner is held to the same
+            // promise this function is.
+            case BoundAddressOf { FromOutKeyword: true, Operand: BoundParameterAccess passed }
+                when ReferenceEquals(passed.Parameter, target):
+                Written = true;
+                return;
+
+            case BoundConditional conditional:
+                Visit(conditional.Condition);
+                Sometimes(conditional.WhenTrue);
+                Sometimes(conditional.WhenFalse);
+                return;
+
+            case BoundBinary { Operator: BoundBinaryOp.LogicalAnd or BoundBinaryOp.LogicalOr } logical:
+                Visit(logical.Left);
+                Sometimes(logical.Right);
+                return;
+
+            // The failure is a return, taken once the operand has been
+            // evaluated and before anything after it.
+            case BoundTry attempt:
+                Visit(attempt.Operand);
+                if (!Written)
+                    EarlyReturns.Add(attempt.Span);
+                Visit(attempt.Test);
+                Visit(attempt.OnSuccess);
+                return;
+        }
+
+        base.Visit(expression);
+    }
+
+    private void Sometimes(BoundExpression expression)
+    {
+        bool before = Written;
+        Visit(expression);
+        Written = before;
+    }
+}
+
+/// <summary>Every field a tree reads, through any receiver.</summary>
+internal sealed class FieldReadCollector(HashSet<FieldSymbol> into) : BoundTreeWalker
+{
+    public override void Visit(BoundExpression? expression)
+    {
+        if (expression is BoundFieldAccess field)
+            into.Add(field.Field);
+
+        base.Visit(expression);
+    }
+}
+
+/// <summary>Whether a function holds somewhere a jump lands: a label, or a switch section a <c>goto case</c> names.</summary>
+internal sealed class LabelFinder : BoundTreeWalker
+{
+    public bool Found { get; private set; }
+
+    public static bool Contains(BoundStatement statement)
+    {
+        var finder = new LabelFinder();
+        finder.Visit(statement);
+        return finder.Found;
+    }
+
+    public override void Visit(BoundStatement? statement)
+    {
+        if (Found)
+            return;
+
+        switch (statement)
+        {
+            case BoundLabel:
+            case BoundSwitch chosen when chosen.Sections.Any(s => s.Entry is not null):
+                Found = true;
+                return;
+        }
+
+        base.Visit(statement);
     }
 }

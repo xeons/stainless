@@ -86,6 +86,19 @@ kinds, the types it spells — throws an `InternalCompilerError` on a case it
 does not have, rather than emitting a zero. The driver reports one as a
 compiler bug, and the fuzzer records one as a finding under its problem.
 
+**One walker knows a node's children.** [BoundTreeWalker](../src/Stainless.Compiler/Binding/BoundTreeWalkers.cs)
+visits every child of every node exactly once, in evaluation order, and throws
+on a node kind it does not know. Every analysis that looks through a whole
+tree — which statics an initializer reads, what a `for parallel` body
+captures, which fields a getter reads, whether an `out` parameter is written,
+whether a function holds a label — is a subclass that
+handles the nodes it is about and calls the base for the rest, so none of them
+can skip a node kind by omission. A unit test fills every property of every
+node type with fresh nodes by reflection and requires the walk to return each
+exactly once; a property holding a node that another child already holds is
+marked `[SharedSubtree]` and is skipped. There is no general rewriter: nothing
+rewrites a whole tree, and the lowerings that rebuild a node rebuild one shape.
+
 **Both Windows and Linux are tested.** 352 cases, of which 13 are
 Windows-only and 2 are Linux-only, so Linux runs 339 and Windows 350, each
 skipping the other's. A case whose *subject* differs by platform — `Path.Join` writes a
@@ -151,6 +164,8 @@ ships in the same directory.
 | [Syntax/Lexer.cs](../src/Stainless.Compiler/Syntax/Lexer.cs) | tokens, and `#if` deciding which of them exist |
 | [Syntax/Parser.cs](../src/Stainless.Compiler/Syntax/Parser.cs) | recursive descent + precedence climbing |
 | [Binding/Binder.cs](../src/Stainless.Compiler/Binding/Binder.cs) | the eleven passes; one partial class over `Binder.*.cs`, a file per area — bodies, calls, closures, conversions, generics, inheritance, layout |
+| [Binding/BoundTree.cs](../src/Stainless.Compiler/Binding/BoundTree.cs) | the bound tree's nodes |
+| [Binding/BoundTreeWalkers.cs](../src/Stainless.Compiler/Binding/BoundTreeWalkers.cs) | the one walker over them, and the analyses built on it |
 | [Binding/TypeSystem.cs](../src/Stainless.Compiler/Binding/TypeSystem.cs) | types and C-rule layout |
 | [Binding/TargetPlatform.cs](../src/Stainless.Compiler/Binding/TargetPlatform.cs) | what `--target` and `--abi` parse to, and the host's defaults |
 | [Binding/EmbeddedFile.cs](../src/Stainless.Compiler/Binding/EmbeddedFile.cs) | what an `[Embed]` static holds: which sections a target already owns, and the assembly the object is written as |

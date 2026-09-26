@@ -797,7 +797,8 @@ public sealed class BoundTypeTest(
 public sealed class BoundIsPattern(SourceSpan span, BoundExpression subject, BoundExpression test)
     : BoundExpression(span, test.Type)
 {
-    /// <summary>The value tested, as written.</summary>
+    /// <summary>The value tested, as written. <see cref="Test"/> holds it too.</summary>
+    [SharedSubtree]
     public BoundExpression Subject { get; } = subject;
 
     public BoundExpression Test { get; } = test;
