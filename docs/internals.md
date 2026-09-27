@@ -279,24 +279,43 @@ whole, for whatever reads a program rather than running it.
 Each lowering makes exactly the core the binder used to make in place, so the
 emitter and its ownership rules see the same shapes: `foreach` becomes the
 indexed `for` or the enumerator's `while`; `?.` and `??` the receiver held in a
-`let` and a conditional on it; `x op= y`, `x ??= y` and the same on a property
-the place held where naming it again could differ, then read and written back;
-`with` the clone and its writes; an object initializer the object held in a
-`let` and its entries in order. A property written or stepped becomes its
-accessors' calls in a pass of its own after the rest, because whether the
-value a write produces is read depends on where the write ends up: where
-nothing reads it, it is the setter's call alone; where something does, the
-receiver, indices and value are held and the value handed on. The emitter
-has no case for a property write. Where one of these names a value it does not
-yet have -- a loop's element, a receiver known to be there, the object being
-initialized -- the semantic node holds a placeholder for it, and lowering puts
-in its place whatever holds the value.
+`let` and a conditional on it; `as` the value held, tested and converted;
+`x op= y`, `x ??= y` and the same on a property the place held where naming it
+again could differ, then read and written back; a store whose value runs code
+the object or array it lands in held while that code runs; `with` the clone
+and its writes; an object initializer the object held in a `let` and its
+entries in order; a collection expression the array literal it always was, or
+with a spread every part held in order and then the storage made, sized when
+every spread can say its count, and filled or added to; a deconstruction the
+targets' receivers and indices held, then the values, then the stores;
+`x[^1]` and `x[a..b]` on a type with a count, and an array sliced by a `Range`
+value, what is indexed, its count and the offsets each evaluated once; and the
+elements a call gives a `params` parameter the array, in the caller's frame
+for a slice unless a `spawn` outlives the statement. A property written or
+stepped becomes its accessors' calls, and how depends on whether the value a
+write produces is read: where nothing reads it, it is the setter's call alone;
+where something does, the receiver, indices and value are held and the value
+handed on. The emitter has no case for a property write. Where one of these
+names a value it does not yet have -- a loop's element, a receiver known to be
+there, the object being initialized, a tuple taken apart -- the semantic node
+holds a placeholder for it, and lowering puts in its place whatever holds the
+value.
+
+Binding still asks questions of what it binds -- whether an expression has an
+effect, whether reading it again is free, whether this statement made it -- and
+a semantic node MUST answer each as the core it lowers to would, or a warning,
+a hold or an owned reference changes with it. `x[^1]` on a type with a count
+stays the getter's call, so that a write through it still reaches the setter;
+only its receiver, read again for the count, is a semantic node.
 
 A node only the semantic tree holds derives from `BoundSemanticExpression` or
 `BoundSemanticStatement`, and counts itself as it is made; a body whose
-binding made none is already the core, and lowering hands it on untouched.
-Lowering the IDE and the standard library takes about 36 ms of a 1.37 s
-`emit-ir` in a Release build, most of it walking the bodies that do hold one.
+binding made none is already the core, and lowering hands it on untouched, as
+it does each statement in a body that has one where that statement made none.
+Lowering the IDE and the standard library takes about 37 ms of a 1.3 s
+`emit-ir` in a Release build. Most of that is the pass's first run: lowering
+the standard library alone takes 22 ms, and 3 ms when run again in the same
+process.
 
 **Matching is one lowering.** A switch statement, a switch expression and `is`
 are each a list of arms, and [DecisionBuilder](../src/Stainless.Compiler/Lowering/Decisions.cs)
