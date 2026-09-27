@@ -670,7 +670,10 @@ public sealed partial class Binder
     {
         bool outerRebindable = _rebindable;
         bool outerNeeded = _rebindNeeded;
+        var outerOwed = _owedAcrossRebinds;
+        var owed = new List<Diagnostic>();
         _rebindable = true;
+        _owedAcrossRebinds = owed;
 
         // Every round learns at least one capture, and there are finitely many
         // names; the bound is a guard against a mistake here, not a limit a
@@ -682,6 +685,7 @@ public sealed partial class Binder
             int closureCount = _closureCount;
             int memberCaptures = _memberCaptures.Count;
             int reported = diagnostics.Items.Count;
+            int owedBefore = owed.Count;
             var paths = new HashSet<string>(_localPaths, StringComparer.Ordinal);
 
             _rebindNeeded = false;
@@ -696,11 +700,14 @@ public sealed partial class Binder
             _closureCount = closureCount;
             _memberCaptures.RemoveRange(memberCaptures, _memberCaptures.Count - memberCaptures);
             diagnostics.RewindTo(reported);
+            for (int i = owedBefore; i < owed.Count; i++) diagnostics.Report(owed[i]);
             _localPaths.IntersectWith(paths);
         }
 
         _rebindable = outerRebindable;
         _rebindNeeded = outerNeeded;
+        _owedAcrossRebinds = outerOwed;
+        outerOwed?.AddRange(owed);
     }
 
     /// <summary>

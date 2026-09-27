@@ -416,4 +416,29 @@ public class ErrorTypeTests
             .Select(d => d.Code);
         Assert.DoesNotContain(code, named);
     }
+
+    /// <summary>
+    /// A body is bound again when a local function learns a capture late, and
+    /// what the first round reported is taken back. An instantiation made in
+    /// that round is cached, so what it reported MUST survive the rewind.
+    /// </summary>
+    [Fact]
+    public void AnInstantiationsErrorSurvivesARebind()
+    {
+        Front.BindSources(["""
+            module Rebound;
+            closure int Weigher<T>(Missing item);
+            T First<T>(T[] items, Weigher<T> weigh) => items[0];
+            int Main()
+            {
+                int limit = 1;
+                bool IsEven(int n) => n < limit && IsOdd(n);
+                bool IsOdd(int n) => IsEven(n);
+                int[] weights = [5];
+                return First(weights, w => w);
+            }
+            """], out var diagnostics);
+
+        Assert.Contains(diagnostics.Items, d => d.Code == "SL0276");
+    }
 }

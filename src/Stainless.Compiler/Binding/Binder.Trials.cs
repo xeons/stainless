@@ -120,7 +120,7 @@ public sealed partial class Binder
             }
             else
             {
-                foreach (var owed in trial.Owed) diagnostics.Report(owed);
+                foreach (var owed in trial.Owed) ReportOwed(owed);
             }
 
             return;
@@ -175,20 +175,36 @@ public sealed partial class Binder
 
     /// <summary>
     /// Keeps what an instantiation reports for the trial it was made in, until
-    /// the result is disposed; nothing, outside a trial.
+    /// the result is disposed. Outside a trial it is reported, and kept across
+    /// a rebind of the body it was made in, because the cache hands the next
+    /// round the instantiation without it.
     /// </summary>
-    private OwedScope OweToTrial() =>
-        _trial is { } trial ? new OwedScope(trial, diagnostics.Holding()) : default;
+    private OwedScope OweToTrial() => new(this, _trial, diagnostics.Holding());
 
-    private readonly struct OwedScope(Trial trial, DiagnosticBag.Hold hold) : IDisposable
+    private readonly struct OwedScope(Binder binder, Trial? trial, DiagnosticBag.Hold hold)
+        : IDisposable
     {
         public void Dispose()
         {
-            if (hold is null) return;
-
             hold.Dispose();
-            trial.Owed.AddRange(hold.Items);
+
+            if (trial is not null)
+            {
+                trial.Owed.AddRange(hold.Items);
+                return;
+            }
+
+            foreach (var owed in hold.Items) binder.ReportOwed(owed);
         }
+    }
+
+    /// <summary>What instantiations reported during the body being bound until settled.</summary>
+    private List<Diagnostic>? _owedAcrossRebinds;
+
+    private void ReportOwed(Diagnostic owed)
+    {
+        diagnostics.Report(owed);
+        _owedAcrossRebinds?.Add(owed);
     }
 
     /// <summary>Notes that a parameter is written, which a discarded trial takes back.</summary>
