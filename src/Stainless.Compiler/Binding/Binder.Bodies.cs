@@ -2087,7 +2087,7 @@ public sealed partial class Binder
 
         BoundStatement? initializer = syntax.Initializer is null ? null : BindStatement(syntax.Initializer);
         var condition = syntax.Condition is null ? null : BindCondition(syntax.Condition);
-        var step = syntax.Step is null ? null : BindExpression(syntax.Step);
+        var step = syntax.Step is null ? null : BindStep(syntax.Step);
 
         // The same rule a `while` obeys: what the body assigns to is unknown
         // inside it, and the condition proves nothing after it.
@@ -2109,6 +2109,27 @@ public sealed partial class Binder
 
         PopScope();
         return result;
+    }
+
+    /// <summary>
+    /// A <c>for</c>'s step, which is evaluated and dropped as an expression
+    /// statement is. A value with no type of its own is never made, and what it
+    /// was built from is evaluated for its effects; null when that is nothing.
+    /// </summary>
+    private BoundExpression? BindStep(ExpressionSyntax syntax)
+    {
+        var step = BindExpression(syntax);
+        if (RefuseUntyped(step))
+            return new BoundErrorExpression(syntax.Span);
+
+        if (step.Type is not (LambdaType or FunctionGroupType or ArrayDraftType or VariantDraftType or NullType))
+            return step;
+
+        diagnostics.Warning("SL0222", syntax.Span, "this expression has no effect; its result is discarded");
+
+        var parts = new List<BoundExpression>();
+        CollectDraftParts(step, parts);
+        return parts.Count == 0 ? null : new BoundSequence(syntax.Span, parts[..^1], parts[^1]);
     }
 
     /// <summary>
