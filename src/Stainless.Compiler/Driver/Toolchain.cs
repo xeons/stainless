@@ -511,6 +511,14 @@ public sealed class Toolchain
     {
         List<string> arguments = [.. TargetArguments, irPath];
 
+        // The lld-link beside clang rather than whichever linker clang would
+        // pick, which before clang 22 is Visual Studio's link.exe wherever
+        // Visual Studio is installed. The two disagree: link.exe drops a
+        // resource that holds no bytes, so the same program found it or not by
+        // what else was on the machine.
+        if (EffectiveTriple.Contains("windows-msvc", StringComparison.Ordinal) && HasLldLinkBesideClang)
+            arguments.Add("-fuse-ld=lld");
+
         // 32-bit Windows keeps the printf family inline in <stdio.h>, so a
         // program that calls one has no symbol to link against: the UCRT
         // import library exports `printf` for x64 and `_printf` for nothing.
@@ -601,6 +609,12 @@ public sealed class Toolchain
             "-o", objectPath,
             "-Wno-override-module",
         ]);
+
+    /// <summary>Whether <c>lld-link</c> ships beside clang, as it does in LLVM's Windows installer.</summary>
+    private bool HasLldLinkBesideClang =>
+        new[] { ClangPath, RealPath(ClangPath) }
+            .Select(Path.GetDirectoryName)
+            .Any(beside => beside is { Length: > 0 } && File.Exists(Path.Combine(beside, "lld-link.exe")));
 
     private string? _optPath;
     private bool _lookedForOpt;
