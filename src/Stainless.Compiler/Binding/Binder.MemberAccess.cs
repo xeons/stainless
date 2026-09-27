@@ -804,7 +804,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0286", syntax.Span,
                 $"'{name}' is known to be '{known.Name}' here, and '{known.Signature}' does " +
                 $"not carry '{syntax.Member}'; that field belongs to " +
-                Listed(carrying.Select(c => "'" + c.Name + "'")));
+                Listed(carrying.Select(c => "'" + c.Name + "'")),
+                [.. known.Fields.Select(f => f.Type)]);
             return new BoundErrorExpression(syntax.Span);
         }
 
