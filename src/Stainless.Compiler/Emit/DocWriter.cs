@@ -514,7 +514,7 @@ public static class DocWriter
                 : "<" + string.Join(", ", named.TypeArguments.Select(Render)) + ">"),
         PointerTypeSyntax pointer => Render(pointer.Element) + "*",
         ArrayTypeSyntax array => Render(array.Element) + "[]",
-        SliceTypeSyntax slice => Render(slice.Element) + "[:]",
+        SliceTypeSyntax slice => $"{(slice.IsReadOnly ? "ReadOnlySpan" : "Span")}<{Render(slice.Element)}>",
         FixedArrayTypeSyntax fixedArray =>
             Render(fixedArray.Element) + "[" + Render(fixedArray.Length) + "]",
         NullableTypeSyntax nullable => Render(nullable.Element) + "?",

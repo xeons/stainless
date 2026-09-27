@@ -772,7 +772,8 @@ public class MetadataTypeNameTests
     [InlineData("Lib.Point[]")]
     [InlineData("Lib.Point?")]
     [InlineData("weak Lib.Point?")]
-    [InlineData("Lib.Point[:]")]
+    [InlineData("Span<Lib.Point>")]
+    [InlineData("ReadOnlySpan<Lib.Point>")]
     [InlineData("(int, Lib.Point)")]
     public void RefusesANameNothingKnows(string name) =>
         Assert.Null(MetadataTypeNames.Read(name, _ => null));
@@ -785,9 +786,11 @@ public class MetadataTypeNameTests
     [Theory]
     [InlineData("int", new string[0])]
     [InlineData("char16[]", new string[0])]
-    [InlineData("int[:]", new string[0])]
+    [InlineData("Span<int>", new string[0])]
     [InlineData("Lib.Point", new[] { "Lib.Point" })]
-    [InlineData("Lib.Point[:]", new[] { "Lib.Point" })]
+    [InlineData("Span<Lib.Point>", new[] { "Lib.Point" })]
+    [InlineData("ReadOnlySpan<Lib.Point>", new[] { "Lib.Point" })]
+    [InlineData("(Span<Lib.A>, ReadOnlySpan<Lib.B>)", new[] { "Lib.A", "Lib.B" })]
     [InlineData("weak Lib.Node?", new[] { "Lib.Node" })]
     [InlineData("(int, Lib.Point)", new[] { "Lib.Point" })]
     [InlineData("(Lib.A, Lib.B[])", new[] { "Lib.A", "Lib.B" })]

@@ -92,7 +92,7 @@ public sealed class Md5 : HashAlgorithm
     public override nuint HashSizeInBytes => 16u;
 
     /// The digest of `data`, with no object to keep.
-    public static byte[] HashData(byte[:] data) => new Md5().ComputeHash(data);
+    public static byte[] HashData(ReadOnlySpan<byte> data) => new Md5().ComputeHash(data);
 
     protected override void InitializeState()
     {

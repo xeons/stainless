@@ -176,7 +176,7 @@ passes every argument.
 
 ```csharp
 int Sum(params int[] values) { ... }
-String Join(String separator, params String[:] parts) { ... }
+String Join(String separator, params ReadOnlySpan<String> parts) { ... }
 
 Sum(1, 2, 3);                     // the elements, one by one
 Sum();                            // none: an empty array
@@ -192,14 +192,14 @@ one.
 
 **What the gathering costs depends on what is asked for.** A `params T[]` is a
 new array per call, exactly as `[1, 2, 3]` would be, because the callee has
-been promised an array and may keep it. A `params T[:]` — C# 13's `params
-ReadOnlySpan<T>`, in this language's words — gathers into an array in the
-caller's frame: no allocation, and the elements are released when the
-statement ends. That is the one to write for a function that only reads what
-it was given.
+been promised an array and may keep it. A `params ReadOnlySpan<T>`, as in C#
+13, or a `params Span<T>` gathers into an array in the caller's frame: no
+allocation, and the elements are released when the statement ends. A
+`params ReadOnlySpan<T>` is the one to write for a function that only reads
+what it was given.
 
 **A slice of the frame may not be kept.** The slice counts the array it views
-([§2.12](02-types.md#212-t--part-of-an-array)), and nothing in a signature can
+([§2.12](02-types.md#212-spant-and-readonlyspant--part-of-an-array)), and nothing in a signature can
 promise not to keep one, so the frame checks on the way out: when the statement
 ends, a reference to its array that anything still holds stops the program with
 a message, rather than leave something pointing into a frame that is gone. A
@@ -223,7 +223,7 @@ items)` called as `First("x", "y")` is `First<String>`. Given no elements there
 is nothing to read, and the call is SL0327 unless the argument is written.
 
 What may not be `params` (SL0763): a parameter that is not the last, one passed
-by `ref`, `in` or `out`, one with a default, anything but a `T[]` or a `T[:]`,
+by `ref`, `in` or `out`, one with a default, anything but a `T[]` or a `Span<T>`,
 a delegate's or closure's parameter — a call through one passes exactly what the
 signature says — and a C function's, since C has nothing to gather with.
 
@@ -350,7 +350,15 @@ argument converts like a value one, because what it receives may be that
 temporary.
 
 **Writing to an `in` is refused** (SL0448), including through one of its fields.
-Passing one on as a `ref` is refused for the same reason (SL0444).
+Passing one on as a `ref`, or one of its fields, is refused for the same reason
+(SL0444), and so is calling a struct method that writes the struct it is called
+on, or setting one of its properties (SL0809). A struct method is given its
+receiver by pointer, so the call is a write exactly when the method's body is
+one, directly or through another method it calls on `this`. A method that only
+reads is called on the caller's storage with no copy. C# copies the receiver
+instead and lets the method change the copy, which keeps the promise by losing
+the write without a word; here the call is refused and says so. The same holds
+for a `static readonly`, a `const` and an element of a `ReadOnlySpan<T>`.
 
 **The mode is part of a signature.** Two overloads may not differ only in it
 (SL0211), a class does not implement `void Adjust(ref int)` with `void

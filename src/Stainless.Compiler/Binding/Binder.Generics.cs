@@ -103,7 +103,7 @@ public sealed partial class Binder
     private static string TypeIdentity(TypeSymbol type) => type switch
     {
         TupleTypeSymbol tuple => "(" + string.Join(",", tuple.Elements.Select(TypeIdentity)) + ")",
-        SliceTypeSymbol slice => TypeIdentity(slice.Element) + "[:]",
+        SliceTypeSymbol slice => $"{slice.Spelling}<{TypeIdentity(slice.Element)}>",
         NamedTypeSymbol named => named.QualifiedName,
         PointerTypeSymbol pointer => TypeIdentity(pointer.Element) + "*",
         ArrayTypeSymbol array => TypeIdentity(array.Element) + "[]",
@@ -912,7 +912,7 @@ public sealed partial class Binder
                 Infer(array.Element, actualArray.Element, parameters, inferred, scope);
                 break;
 
-            // `T[:]` matches a slice, and an array too: an array converts to a
+            // `Span<T>` matches a slice, and an array too: an array converts to a
             // slice of the whole of itself, so `Sort(numbers)` should infer T
             // from the array rather than refuse to look at it.
             case SliceTypeSyntax slice when actual is SliceTypeSymbol actualSlice:

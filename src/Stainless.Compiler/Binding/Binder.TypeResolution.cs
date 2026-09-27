@@ -42,7 +42,7 @@ public sealed partial class Binder
     }
 
     /// <summary>
-    /// <c>T[:]</c>, built once per element type.
+    /// <c>Span&lt;T&gt;</c>, built once per element type.
     ///
     /// The three fields are hidden storage: a slice is reached through indexing
     /// and Length, and naming the array it came from would let a caller keep the
@@ -81,15 +81,17 @@ public sealed partial class Binder
         return tuple;
     }
 
-    private SliceTypeSymbol SliceOf(TypeSymbol element)
+    private SliceTypeSymbol SliceOf(TypeSymbol element, bool readOnly)
     {
-        if (_slices.TryGetValue(element, out var existing)) return existing;
+        if (_slices.TryGetValue((element, readOnly), out var existing)) return existing;
 
+        string spelling = readOnly ? "ReadOnlySpan" : "Span";
         var slice = new SliceTypeSymbol
         {
             Element = element,
+            IsReadOnly = readOnly,
             SimpleName = MadeTypeName(Builtins.StandardModuleName,
-                element.Name + "[:]", () => TypeIdentity(element) + "[:]"),
+                $"{spelling}<{element.Name}>", () => $"{spelling}<{TypeIdentity(element)}>"),
             ModuleName = Builtins.StandardModuleName,
         };
 
@@ -102,7 +104,7 @@ public sealed partial class Binder
             SliceTypeSymbol.LengthFieldName, PrimitiveTypeSymbol.NUInt, slice, 2)
             { IsBackingField = true });
 
-        Remember(_slices, element, slice);
+        Remember(_slices, (element, readOnly), slice);
         _structs.Add(slice);
         ComputeLayout(slice, []);
         return slice;
@@ -176,11 +178,11 @@ public sealed partial class Binder
                 if (element.IsVoid())
                 {
                     diagnostics.Error("SL0451", sliceSyntax.Span,
-                        "there is no slice of 'void'");
+                        $"there is no '{(sliceSyntax.IsReadOnly ? "ReadOnlySpan" : "Span")}<void>'");
                     return ErrorTypeSymbol.Instance;
                 }
 
-                return SliceOf(element);
+                return SliceOf(element, sliceSyntax.IsReadOnly);
             }
 
             case ArrayTypeSyntax array:
@@ -584,7 +586,7 @@ public sealed partial class Binder
 
         // Every candidate of the right arity is tried, and one that infers but
         // then would not accept the arguments is not a candidate. Two templates
-        // may take one argument and differ in its shape -- `Sort(T[:])` and
+        // may take one argument and differ in its shape -- `Sort(Span<T>)` and
         // `Sort(IList<T>)` do -- and picking the first would make the second
         // unreachable.
         var fitting = new List<(GenericFunctionTemplate Template, List<TypeSymbol> Arguments)>();
@@ -753,7 +755,7 @@ public sealed partial class Binder
     /// Works out the type parameters that appear only in a lambda's result.
     ///
     /// The order matters, and is why this is a second pass rather than part of
-    /// the first. Given <c>Select&lt;T, R&gt;(T[:] items, IFunc&lt;T, R&gt; f)</c> and
+    /// the first. Given <c>Select&lt;T, R&gt;(Span&lt;T&gt; items, IFunc&lt;T, R&gt; f)</c> and
     /// <c>Select(numbers, n =&gt; n * 2)</c>: T comes from <c>numbers</c>, which
     /// makes the lambda's target <c>IFunc&lt;int, R&gt;</c>, which gives the lambda
     /// its parameter type, which lets its body be bound, which is what says

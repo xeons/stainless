@@ -28,9 +28,9 @@ import Standard.Bits;
 public static class HmacSha384
 {
     /// A keyed hash to append to.
-    public static Hmac Create(byte[:] key) => new Hmac(new Sha384(), key);
+    public static Hmac Create(ReadOnlySpan<byte> key) => new Hmac(new Sha384(), key);
 
     /// The MAC of `data` under `key`.
-    public static byte[] HashData(byte[:] key, byte[:] data) =>
+    public static byte[] HashData(ReadOnlySpan<byte> key, ReadOnlySpan<byte> data) =>
         Create(key).ComputeHash(data);
 }

@@ -772,6 +772,12 @@ public sealed partial class Binder
         if (from is ArrayTypeSymbol whole && to is SliceTypeSymbol asSlice)
             return whole.Element.Equals(asSlice.Element) ? ConversionKind.ArrayToSlice : null;
 
+        // A span, as the read-only view of the same elements. The two are laid
+        // out alike, so this is the same value.
+        if (from is SliceTypeSymbol { IsReadOnly: false } writable &&
+            to is SliceTypeSymbol { IsReadOnly: true } readOnly)
+            return writable.Element.Equals(readOnly.Element) ? ConversionKind.Identity : null;
+
         // A derived class is a base class. With single inheritance the base
         // subobject starts where the object does, so this is the same pointer
         // and emits nothing; the other direction is a check.

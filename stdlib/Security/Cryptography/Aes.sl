@@ -57,7 +57,7 @@ public sealed class Aes
     byte[] _schedule;
     nuint _rounds;
 
-    Aes(byte[:] key)
+    Aes(ReadOnlySpan<byte> key)
     {
         _forward = BuildSubstitutionBox();
         _reverse = new byte[256u];
@@ -80,7 +80,7 @@ public sealed class Aes
     /// AES-192 or AES-256.
     ///
     /// @failure CryptoError.KeyLength  `key` is not 16, 24 or 32 bytes
-    public static Result<Aes, CryptoError> FromKey(byte[:] key)
+    public static Result<Aes, CryptoError> FromKey(ReadOnlySpan<byte> key)
     {
         if (key.Length != 16u && key.Length != 24u && key.Length != 32u)
             return Fail(CryptoError.KeyLength);
@@ -154,7 +154,7 @@ public sealed class Aes
     ///                                   number of blocks
     /// @see CipherMode.Ecb
     /// @see Aes.DecryptEcb
-    public Result<byte[], CryptoError> EncryptEcb(byte[:] plaintext, PaddingMode padding)
+    public Result<byte[], CryptoError> EncryptEcb(ReadOnlySpan<byte> plaintext, PaddingMode padding)
     {
         var padded = AddPadding(plaintext, padding);
         if (!padded.Ok)
@@ -173,7 +173,7 @@ public sealed class Aes
     /// @failure CryptoError.Padding      the padding does not describe itself, which is usually
     ///                                   the wrong key
     /// @see Aes.EncryptEcb
-    public Result<byte[], CryptoError> DecryptEcb(byte[:] ciphertext, PaddingMode padding)
+    public Result<byte[], CryptoError> DecryptEcb(ReadOnlySpan<byte> ciphertext, PaddingMode padding)
     {
         if (ciphertext.Length == 0u || ciphertext.Length % BlockSize != 0u)
             return Fail(CryptoError.BlockLength);
@@ -196,7 +196,7 @@ public sealed class Aes
     ///                                   number of blocks
     /// @see Aes.DecryptCbc
     /// @seealso RandomNumberGenerator.GetBytes
-    public Result<byte[], CryptoError> EncryptCbc(byte[:] plaintext, byte[:] iv,
+    public Result<byte[], CryptoError> EncryptCbc(ReadOnlySpan<byte> plaintext, ReadOnlySpan<byte> iv,
                                                   PaddingMode padding)
     {
         if (iv.Length != BlockSize)
@@ -233,7 +233,7 @@ public sealed class Aes
     /// @failure CryptoError.BlockLength  the input is empty or not a whole number of blocks
     /// @failure CryptoError.Padding      the padding does not describe itself
     /// @see Aes.EncryptCbc
-    public Result<byte[], CryptoError> DecryptCbc(byte[:] ciphertext, byte[:] iv,
+    public Result<byte[], CryptoError> DecryptCbc(ReadOnlySpan<byte> ciphertext, ReadOnlySpan<byte> iv,
                                                   PaddingMode padding)
     {
         if (iv.Length != BlockSize)
@@ -269,7 +269,7 @@ public sealed class Aes
     ///
     /// @failure CryptoError.IvLength  `iv` is not one block
     /// @see Aes.DecryptCfb
-    public Result<byte[], CryptoError> EncryptCfb(byte[:] plaintext, byte[:] iv)
+    public Result<byte[], CryptoError> EncryptCfb(ReadOnlySpan<byte> plaintext, ReadOnlySpan<byte> iv)
     {
         if (iv.Length != BlockSize)
             return Fail(CryptoError.IvLength);
@@ -299,7 +299,7 @@ public sealed class Aes
     ///
     /// @failure CryptoError.IvLength  `iv` is not one block
     /// @see Aes.EncryptCfb
-    public Result<byte[], CryptoError> DecryptCfb(byte[:] ciphertext, byte[:] iv)
+    public Result<byte[], CryptoError> DecryptCfb(ReadOnlySpan<byte> ciphertext, ReadOnlySpan<byte> iv)
     {
         if (iv.Length != BlockSize)
             return Fail(CryptoError.IvLength);
@@ -337,7 +337,7 @@ public sealed class Aes
     /// is a random nonce in the high bytes and a block counter in the low.
     ///
     /// @failure CryptoError.IvLength  `counter` is not one block
-    public Result<byte[], CryptoError> ApplyCtr(byte[:] data, byte[:] counter) =>
+    public Result<byte[], CryptoError> ApplyCtr(ReadOnlySpan<byte> data, ReadOnlySpan<byte> counter) =>
         ApplyCounter(data, counter, 0u);
 
     /// The same, stepping only the bytes from `from` onward.
@@ -347,7 +347,7 @@ public sealed class Aes
     /// within the counter rather than walking into the nonce. That is the one
     /// difference between GCM's CTR and SP 800-38A's, and it is why this is a
     /// parameter rather than two loops.
-    Result<byte[], CryptoError> ApplyCounter(byte[:] data, byte[:] counter, nuint from)
+    Result<byte[], CryptoError> ApplyCounter(ReadOnlySpan<byte> data, ReadOnlySpan<byte> counter, nuint from)
     {
         if (counter.Length != BlockSize)
             return Fail(CryptoError.IvLength);
@@ -394,7 +394,7 @@ public sealed class Aes
 
     // -------------------------------------------------------------- padding
 
-    Result<byte[], CryptoError> AddPadding(byte[:] data, PaddingMode padding)
+    Result<byte[], CryptoError> AddPadding(ReadOnlySpan<byte> data, PaddingMode padding)
     {
         nuint remainder = data.Length % BlockSize;
 
@@ -576,7 +576,7 @@ public sealed class Aes
         }
     }
 
-    byte[] ExpandKey(byte[:] key)
+    byte[] ExpandKey(ReadOnlySpan<byte> key)
     {
         nuint words = 4u * (_rounds + 1u);
         nuint keyWords = key.Length / 4u;
@@ -705,7 +705,7 @@ public sealed class Aes
         return result;
     }
 
-    static byte[] CopyBytes(byte[:] data)
+    static byte[] CopyBytes(ReadOnlySpan<byte> data)
     {
         byte[] copy = new byte[data.Length];
         for (nuint i = 0u; i < data.Length; i++)

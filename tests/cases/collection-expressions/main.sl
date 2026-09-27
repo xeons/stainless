@@ -77,7 +77,7 @@ class Trace
     }
 }
 
-void Show(String label, int[:] numbers)
+void Show(String label, Span<int> numbers)
 {
     var text = label + ":";
     foreach (var n in numbers)
@@ -85,7 +85,7 @@ void Show(String label, int[:] numbers)
     Console.WriteLine(text);
 }
 
-int Sum(int[:] numbers)
+int Sum(Span<int> numbers)
 {
     int total = 0;
     foreach (var n in numbers)
@@ -95,7 +95,7 @@ int Sum(int[:] numbers)
 
 int Sum(IEnumerable<int> numbers) => -1;
 
-T[] Joined<T>(T[:] left, T[:] right) => [..left, ..right];
+T[] Joined<T>(Span<T> left, Span<T> right) => [..left, ..right];
 
 Node[] MakeNodes() => [new Node("a"), new Node("b")];
 

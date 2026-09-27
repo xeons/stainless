@@ -287,9 +287,9 @@ either end may be left out.
 ```csharp
 var numbers = new int[6];
 
-int[:] all    = numbers;          // an array is a slice of the whole of itself
-int[:] middle = numbers[1:4];     // elements 1, 2 and 3
-int[:] tail   = numbers[3:];      // to the end
+Span<int> all    = numbers;          // an array is a slice of the whole of itself
+Span<int> middle = numbers[1:4];     // elements 1, 2 and 3
+Span<int> tail   = numbers[3:];      // to the end
 
 Sort(numbers[2:5]);               // three of them, in place, nothing copied
 ```
@@ -304,7 +304,7 @@ array the way any struct field holds a reference. **A slice cannot dangle**: wha
 it points into is alive for as long as it is.
 
 ```csharp
-Trace[:] Middle()
+Span<Trace> Middle()
 {
     var traces = new Trace[3];
     ...
@@ -314,6 +314,17 @@ Trace[:] Middle()
 
 That is the trade. A slice costs a reference count per copy and is not a value C
 can be handed. What it buys is that there are no lifetimes to explain.
+
+A function that only reads takes a `ReadOnlySpan<T>`, which an array and a
+`Span<T>` both convert to, and which refuses a write through it where the write
+is written. `"hello"u8` is one.
+
+```csharp
+int Sum(ReadOnlySpan<int> values) { ... }
+
+Sum(numbers);                     // an array
+Sum(middle);                      // or a Span<int>
+```
 
 ### Collections
 

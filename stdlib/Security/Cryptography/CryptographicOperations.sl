@@ -40,7 +40,7 @@ public static class CryptographicOperations
     ///
     /// Unequal lengths answer false immediately, which leaks the length and
     /// nothing else; .NET does the same, and a length is not the secret.
-    public static bool FixedTimeEquals(byte[:] left, byte[:] right)
+    public static bool FixedTimeEquals(ReadOnlySpan<byte> left, ReadOnlySpan<byte> right)
     {
         if (left.Length != right.Length)
             return false;

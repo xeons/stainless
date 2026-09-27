@@ -39,9 +39,9 @@ public class InferenceTests
         public interface IPredicate<T> { bool Test(T value); }
         public interface IFold<A, T> { A Apply(A total, T value); }
 
-        public R Transform<T, R>(T[:] items, IFunc<T, R> f) { return f.Apply(items[0u]); }
-        public bool Keep<T>(T[:] items, IPredicate<T> p) { return p.Test(items[0u]); }
-        public A Fold<T, A>(T[:] items, A seed, IFold<A, T> f) { return f.Apply(seed, items[0u]); }
+        public R Transform<T, R>(Span<T> items, IFunc<T, R> f) { return f.Apply(items[0u]); }
+        public bool Keep<T>(Span<T> items, IPredicate<T> p) { return p.Test(items[0u]); }
+        public A Fold<T, A>(Span<T> items, A seed, IFold<A, T> f) { return f.Apply(seed, items[0u]); }
 
         """;
 
@@ -180,7 +180,7 @@ public class InferenceTests
     private const string Named = """
         public closure R Func<T, R>(T value);
 
-        public R Apply<T, R>(T[:] items, Func<T, R> f) { return f(items[0u]); }
+        public R Apply<T, R>(Span<T> items, Func<T, R> f) { return f(items[0u]); }
         public R Call<T, R>(Func<T, R> f, T value) { return f(value); }
         public nuint Shapes<T, R>(Func<T, R> f) { return 0u; }
 

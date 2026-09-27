@@ -46,7 +46,7 @@ String Describe(int age) => $"age {age}";
 struct Point { public int X; public int Y; }
 
 /// A generic where `default(T)` is the only value that can be named.
-T FirstOrNothing<T>(T[:] items)
+T FirstOrNothing<T>(Span<T> items)
 {
     if (items.Length == 0u)
         return default(T);

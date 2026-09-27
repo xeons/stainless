@@ -6,7 +6,7 @@
 // and a lambda's body is not.
 //
 // The three targets are all here because they are three different emissions: a
-// `T[]` allocates, a `T[N]` is a slot, and a `T[:]` goes through the array it
+// `T[]` allocates, a `T[N]` is a slot, and a `Span<T>` goes through the array it
 // is a view of.
 module ArrayLiterals;
 import Standard.Console;
@@ -23,7 +23,7 @@ void Show(String[] items)
     Console.WriteLine(line.ToText());
 }
 
-int Sum(int[:] slice)
+int Sum(Span<int> slice)
 {
     int total = 0;
     for (nuint i = 0u; i < slice.Length; i = i + 1u)

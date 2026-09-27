@@ -2329,6 +2329,11 @@ public sealed partial class Binder
         var target = BindExpression(syntax.Target);
         if (target.Type.IsError()) return new BoundBlock(syntax.Span, []);
 
+        if (RefusedThroughReadOnlySlice(target, syntax.Target.Span))
+            return new BoundBlock(syntax.Span, []);
+
+        NoteWriteTo(target);
+
         if (!target.IsLValue)
         {
             diagnostics.Error("SL0366", syntax.Target.Span,
@@ -2631,6 +2636,27 @@ public sealed partial class Binder
         BoundAddressOf address => BaseOf(address.Operand),
         _ => expression,
     };
+
+    /// <summary>
+    /// The read-only slice a write to this place would land in, or null when
+    /// it lands anywhere else.
+    /// </summary>
+    private static SliceTypeSymbol? ReadOnlySliceUnder(BoundExpression place) =>
+        BaseOf(place) is BoundIndex { Target.Type: SliceTypeSymbol { IsReadOnly: true } slice }
+            ? slice
+            : null;
+
+    /// <summary>Reports a write through a read-only slice, and answers whether there was one.</summary>
+    private bool RefusedThroughReadOnlySlice(BoundExpression place, SourceSpan span)
+    {
+        if (ReadOnlySliceUnder(place) is not { } slice) return false;
+
+        diagnostics.Error("SL0808", span,
+            $"this writes an element of a '{slice.Name}', which is a view that only reads; " +
+            $"take a 'Span<{slice.Element.Name}>' where the elements are meant to change",
+            slice);
+        return true;
+    }
 
     /// <summary>Strips conversions, so a widened loop variable still matches.</summary>
     private static BoundExpression Underlying(BoundExpression expression) =>

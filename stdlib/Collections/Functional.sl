@@ -53,7 +53,7 @@ module Standard.Collections;
 ///               is asked of it
 /// @see Collections.Select
 /// @seealso Collections.Count
-public List<T> Where<T>(T[:] items, Predicate<T> keep)
+public List<T> Where<T>(ReadOnlySpan<T> items, Predicate<T> keep)
 {
     var kept = new List<T>();
     foreach (var item in items)
@@ -75,7 +75,7 @@ public List<T> Where<T>(T[:] items, Predicate<T> keep)
 /// @typeparam T  the element type, which settles the transform's parameter
 /// @typeparam TResult  what the transform answers, and so what the result holds
 /// @see Collections.Where
-public List<TResult> Select<T, TResult>(T[:] items, Func<T, TResult> transform)
+public List<TResult> Select<T, TResult>(ReadOnlySpan<T> items, Func<T, TResult> transform)
 {
     var mapped = new List<TResult>();
     foreach (var item in items)
@@ -91,7 +91,7 @@ public List<TResult> Select<T, TResult>(T[:] items, Func<T, TResult> transform)
 /// @typeparam T  the element type, which the fold is given one of at a time
 /// @typeparam TAccumulate  what is carried along and answered, taken from the seed
 public TAccumulate Aggregate<T, TAccumulate>(
-    T[:] items, TAccumulate seed, Fold<TAccumulate, T> combine)
+    ReadOnlySpan<T> items, TAccumulate seed, Fold<TAccumulate, T> combine)
 {
     var total = seed;
     foreach (var item in items)
@@ -103,7 +103,7 @@ public TAccumulate Aggregate<T, TAccumulate>(
 ///
 /// @typeparam T  the element type; nothing is asked of it
 /// @see Collections.All
-public bool Any<T>(T[:] items, Predicate<T> test)
+public bool Any<T>(ReadOnlySpan<T> items, Predicate<T> test)
 {
     foreach (var item in items)
     {
@@ -118,7 +118,7 @@ public bool Any<T>(T[:] items, Predicate<T> test)
 ///
 /// @typeparam T  the element type; nothing is asked of it
 /// @see Collections.Any
-public bool All<T>(T[:] items, Predicate<T> test)
+public bool All<T>(ReadOnlySpan<T> items, Predicate<T> test)
 {
     foreach (var item in items)
     {
@@ -132,7 +132,7 @@ public bool All<T>(T[:] items, Predicate<T> test)
 ///
 /// @typeparam T  the element type; nothing is asked of it
 /// @see Collections.Where
-public nuint Count<T>(T[:] items, Predicate<T> test)
+public nuint Count<T>(ReadOnlySpan<T> items, Predicate<T> test)
 {
     nuint found = 0u;
     foreach (var item in items)
@@ -152,7 +152,7 @@ public nuint Count<T>(T[:] items, Predicate<T> test)
 /// @typeparam T  the element type, which is also the fallback's; nothing is
 ///               asked of it
 /// @see Collections.Find
-public T FirstOrDefault<T>(T[:] items, Predicate<T> test, T fallback)
+public T FirstOrDefault<T>(ReadOnlySpan<T> items, Predicate<T> test, T fallback)
 {
     foreach (var item in items)
     {
@@ -174,7 +174,7 @@ public T FirstOrDefault<T>(T[:] items, Predicate<T> test, T fallback)
 ///               asked of it
 /// @see Collections.FirstOrDefault
 /// @seealso Collections.FindIndex
-public Optional<T> Find<T>(T[:] items, Predicate<T> test)
+public Optional<T> Find<T>(ReadOnlySpan<T> items, Predicate<T> test)
 {
     foreach (var item in items)
     {
@@ -188,7 +188,7 @@ public Optional<T> Find<T>(T[:] items, Predicate<T> test)
 ///
 /// @typeparam T  the element type; nothing is asked of it
 /// @see Collections.Find
-public Optional<nuint> FindIndex<T>(T[:] items, Predicate<T> test)
+public Optional<nuint> FindIndex<T>(ReadOnlySpan<T> items, Predicate<T> test)
 {
     for (nuint i = 0u; i < items.Length; i++)
     {
@@ -202,7 +202,7 @@ public Optional<nuint> FindIndex<T>(T[:] items, Predicate<T> test)
 ///
 /// @typeparam T  the element type, which the action is handed one of at a time
 /// @see List.ForEach
-public void ForEach<T>(T[:] items, Action<T> body)
+public void ForEach<T>(ReadOnlySpan<T> items, Action<T> body)
 {
     foreach (var item in items)
         body(item);
@@ -212,7 +212,7 @@ public void ForEach<T>(T[:] items, Action<T> body)
 ///
 /// @typeparam T  the element type; nothing is asked of it
 /// @see Collections.Skip
-public List<T> Take<T>(T[:] items, nuint count)
+public List<T> Take<T>(ReadOnlySpan<T> items, nuint count)
 {
     var taken = new List<T>();
     nuint limit = count < items.Length ? count : items.Length;
@@ -225,7 +225,7 @@ public List<T> Take<T>(T[:] items, nuint count)
 ///
 /// @typeparam T  the element type; nothing is asked of it
 /// @see Collections.Take
-public List<T> Skip<T>(T[:] items, nuint count)
+public List<T> Skip<T>(ReadOnlySpan<T> items, nuint count)
 {
     var rest = new List<T>();
     for (nuint i = count; i < items.Length; i++)
@@ -370,7 +370,7 @@ public List<T> ToList<T>(IEnumerable<T> items)
 ///
 /// @typeparam T  the element type; nothing is asked of it
 /// @see Collections.ToArray
-public List<T> ToList<T>(T[:] items)
+public List<T> ToList<T>(ReadOnlySpan<T> items)
 {
     var all = new List<T>();
     foreach (var item in items)
@@ -407,7 +407,7 @@ public T[] ToArray<T>(IEnumerable<T> items)
 ///
 /// @typeparam T  the element type; nothing is asked of it
 /// @see Collections.ToList
-public T[] ToArray<T>(T[:] items)
+public T[] ToArray<T>(ReadOnlySpan<T> items)
 {
     var array = new T[items.Length];
     for (nuint i = 0u; i < items.Length; i++)
@@ -424,7 +424,7 @@ public T[] ToArray<T>(T[:] items)
 /// @typeparam T  the element type, which must answer whether it equals
 ///               another; that alone is what makes this O(n squared)
 /// @see HashSet
-public List<T> Distinct<T>(T[:] items) where T : IEquatable<T>
+public List<T> Distinct<T>(ReadOnlySpan<T> items) where T : IEquatable<T>
 {
     var seen = new List<T>();
     foreach (var item in items)
@@ -460,7 +460,7 @@ public List<T> Distinct<T>(IEnumerable<T> items) where T : IEquatable<T>
 /// @typeparam T  the element type; the comparer orders it, so nothing is asked
 ///               of it
 /// @see Collections.Sort
-public List<T> OrderBy<T>(T[:] items, Comparison<T> order)
+public List<T> OrderBy<T>(ReadOnlySpan<T> items, Comparison<T> order)
 {
     var copy = new T[items.Length];
     for (nuint i = 0u; i < items.Length; i++)

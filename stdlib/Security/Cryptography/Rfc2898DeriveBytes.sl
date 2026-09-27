@@ -53,7 +53,7 @@ public static class Rfc2898DeriveBytes
     /// @param hash        the HMAC's inner hash, `new Sha256()` for the usual answer
     /// @param length      how many bytes to derive
     /// @failure CryptoError.Parameter  `iterations` or `length` is zero
-    public static Result<byte[], CryptoError> Pbkdf2(byte[:] password, byte[:] salt,
+    public static Result<byte[], CryptoError> Pbkdf2(ReadOnlySpan<byte> password, ReadOnlySpan<byte> salt,
                                                      nuint iterations, IHashAlgorithm hash,
                                                      nuint length)
     {

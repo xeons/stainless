@@ -40,7 +40,7 @@ public static class Hkdf
     /// @param inputKey  the secret that is random but not uniform
     /// @param salt      a non-secret value, or empty for a block of zeros
     /// @see Hkdf.Expand
-    public static byte[] Extract(IHashAlgorithm hash, byte[:] inputKey, byte[:] salt)
+    public static byte[] Extract(IHashAlgorithm hash, ReadOnlySpan<byte> inputKey, ReadOnlySpan<byte> salt)
     {
         byte[] actual = salt.Length == 0u ? new byte[hash.HashSizeInBytes] : ToArray(salt);
         return new Hmac(hash, actual).ComputeHash(inputKey);
@@ -58,8 +58,8 @@ public static class Hkdf
     /// @param length     how many bytes to derive, at most 255 digests' worth
     /// @failure CryptoError.Parameter  `length` is zero, or past 255 times the digest size
     /// @see Hkdf.Extract
-    public static Result<byte[], CryptoError> Expand(IHashAlgorithm hash, byte[:] pseudoKey,
-                                                     byte[:] info, nuint length)
+    public static Result<byte[], CryptoError> Expand(IHashAlgorithm hash, ReadOnlySpan<byte> pseudoKey,
+                                                     ReadOnlySpan<byte> info, nuint length)
     {
         nuint macSize = hash.HashSizeInBytes;
         if (length == 0u || length > macSize * 255u)
@@ -105,15 +105,15 @@ public static class Hkdf
     /// @failure CryptoError.Parameter  `length` is zero, or past 255 times the digest size
     /// @see Hkdf.Extract
     /// @see Hkdf.Expand
-    public static Result<byte[], CryptoError> DeriveKey(IHashAlgorithm hash, byte[:] inputKey,
-                                                        byte[:] salt, byte[:] info,
+    public static Result<byte[], CryptoError> DeriveKey(IHashAlgorithm hash, ReadOnlySpan<byte> inputKey,
+                                                        ReadOnlySpan<byte> salt, ReadOnlySpan<byte> info,
                                                         nuint length)
     {
         byte[] pseudoKey = Extract(hash, inputKey, salt);
         return Expand(hash, pseudoKey, info, length);
     }
 
-    static byte[] ToArray(byte[:] data)
+    static byte[] ToArray(ReadOnlySpan<byte> data)
     {
         byte[] copy = new byte[data.Length];
         for (nuint i = 0u; i < data.Length; i++)

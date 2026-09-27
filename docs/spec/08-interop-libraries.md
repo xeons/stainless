@@ -373,7 +373,7 @@ missing:
 | a generic (SL0419) | a template emits nothing until it is instantiated, so a consumer with only the binary has nothing to instantiate. A generic crosses as source |
 | a class implementing an interface (SL0420) | a dispatch table is indexed by an interface id assigned across a whole program, and a library and its consumer are two different programs |
 | a variant (SL0441) | its cases are what a consumer would switch on, and the metadata carries layouts rather than cases |
-| a slice, `T[:]` | it is a type the compiler builds on demand rather than one the source declared, so there is no name for a consumer to resolve |
+| a slice, `Span<T>` | it is a type the compiler builds on demand rather than one the source declared, so there is no name for a consumer to resolve |
 
 **And anything reaching one of those through a field or a signature** is reported
 the same way (SL0477). A public struct with a variant field would otherwise be

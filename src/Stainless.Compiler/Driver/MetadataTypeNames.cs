@@ -33,11 +33,11 @@ public static class MetadataTypeNames
     /// How a compilation reading this name builds the structural types, which
     /// it has to intern rather than construct: a slice and a tuple are named
     /// types, so two of them made separately would not compare equal, and a
-    /// library's <c>int[:]</c> has to be the same symbol as the consumer's.
+    /// library's <c>Span&lt;int&gt;</c> has to be the same symbol as the consumer's.
     /// Null factories mean the reader only wants to know whether the name is
     /// one it could resolve, which is what the metadata writer asks.
     /// </summary>
-    public delegate TypeSymbol? SliceFactory(TypeSymbol element);
+    public delegate TypeSymbol? SliceFactory(TypeSymbol element, bool readOnly);
 
     public delegate TypeSymbol? TupleFactory(IReadOnlyList<TypeSymbol> elements);
 
@@ -53,9 +53,10 @@ public static class MetadataTypeNames
         // Before the named cases, which both of these are: a slice and a tuple
         // are structural, so what identifies one is what it is made of and not
         // the module it was first written in. Spelled as a name -- both are
-        // interned under `Standard` -- they would come out `Standard.int[:]`,
-        // which is a type in no source file and which nothing can read back.
-        SliceTypeSymbol slice => Write(slice.Element) + "[:]",
+        // interned under `Standard` -- they would come out
+        // `Standard.Span<int>`, which is a type in no source file and which
+        // nothing can read back.
+        SliceTypeSymbol slice => $"{slice.Spelling}<{Write(slice.Element)}>",
         TupleTypeSymbol tuple => "(" + string.Join(", ", tuple.Elements.Select(Write)) + ")",
 
         NamedTypeSymbol named => named.QualifiedName,
@@ -93,11 +94,16 @@ public static class MetadataTypeNames
                 ? element.MakeArrayType()
                 : null;
 
-        // `T[:]`, before `T[N]`, which it would otherwise look like.
-        if (name.EndsWith("[:]", StringComparison.Ordinal))
-            return Read(name[..^3], lookup, sliceOf, tupleOf) is { } element
-                ? sliceOf?.Invoke(element) ?? element
+        // Unqualified, so never a declared generic type, which is written
+        // with its module.
+        if (name.EndsWith('>') && (name.StartsWith("Span<", StringComparison.Ordinal) ||
+                                   name.StartsWith("ReadOnlySpan<", StringComparison.Ordinal)))
+        {
+            bool readOnly = name[0] == 'R';
+            return Read(name[(name.IndexOf('<') + 1)..^1], lookup, sliceOf, tupleOf) is { } element
+                ? sliceOf?.Invoke(element, readOnly) ?? element
                 : null;
+        }
 
         // `T[N]`: the length is part of the type, so it has to survive the trip.
         if (name.EndsWith(']') && name.LastIndexOf('[') is var open && open > 0 &&
@@ -132,7 +138,7 @@ public static class MetadataTypeNames
 
     /// <summary>
     /// The named types a written name is built out of, with every wrapper
-    /// peeled off and the primitives left out: what <c>(int, App.Point[:])</c>
+    /// peeled off and the primitives left out: what <c>(int, Span&lt;App.Point&gt;)</c>
     /// mentions is <c>App.Point</c>.
     ///
     /// The metadata writer asks this to find a public surface naming something
@@ -153,7 +159,7 @@ public static class MetadataTypeNames
                 mentioned.Add(name);
                 return Placeholder_;
             },
-            element => element,
+            (element, _) => element,
             elements => elements[0]);
 
         return mentioned;
@@ -177,8 +183,8 @@ public static class MetadataTypeNames
         {
             switch (inside[i])
             {
-                case '(' or '[': depth++; break;
-                case ')' or ']': depth--; break;
+                case '(' or '[' or '<': depth++; break;
+                case ')' or ']' or '>': depth--; break;
                 case ',' when depth == 0:
                     parts.Add(inside[start..i]);
                     start = i + 1;

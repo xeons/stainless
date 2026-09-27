@@ -134,7 +134,7 @@ public class TypeSystemTests
     [InlineData("int*")]
     [InlineData("byte**")]
     [InlineData("int[]")]
-    [InlineData("int[:]")]
+    [InlineData("Span<int>")]
     [InlineData("int[4]*")]
     [InlineData("(int, bool)")]
     [InlineData("Box<int>")]

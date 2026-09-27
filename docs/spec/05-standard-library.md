@@ -368,7 +368,8 @@ Sort(people, (a, b) => a.Age - b.Age);
 
 `Select`, `Where`, `Aggregate`, `Any`, `All`, `Count`, `Find`, `FirstOrDefault`,
 `FindIndex`, `ForEach`, `Take`, `Skip`, `Distinct`, `OrderBy`, `ToList` and
-`ToArray`, each over a `T[:]` — which an array converts to — and over any
+`ToArray`, each over a `ReadOnlySpan<T>` — which an array and a `Span<T>`
+convert to — and over any
 `IEnumerable<T>`. They are named as LINQ names them, so a reader arriving from
 C# has nothing to translate.
 
@@ -389,7 +390,7 @@ could not be removed from at all before this. `RemoveFirst(list, value)` is the
 generators, and there is no `yield` here; a name borrowed from a language that
 has one would imply otherwise.
 
-**Sorting is a stable merge sort**, over a `T[:]` or an `IList<T>`, either by
+**Sorting is a stable merge sort**, over a `Span<T>` or an `IList<T>`, either by
 `IComparable<T>` or by a `Comparison<T>` given at the call. Stability is the
 property worth the scratch array it costs: sorting by one key and then another
 is how a multi-key order gets built, and that only works if the second sort

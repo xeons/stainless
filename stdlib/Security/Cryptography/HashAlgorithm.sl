@@ -67,7 +67,7 @@ public abstract class HashAlgorithm : IHashAlgorithm
 
     public nuint BlockSizeInBytes => _block.Length;
 
-    public void AppendData(byte[:] data)
+    public void AppendData(ReadOnlySpan<byte> data)
     {
         nuint at = 0u;
         while (at < data.Length)
@@ -111,7 +111,7 @@ public abstract class HashAlgorithm : IHashAlgorithm
 
     /// The digest of `data` on its own. Resets first, so an object that has
     /// been appended to is still safe to ask.
-    public byte[] ComputeHash(byte[:] data)
+    public byte[] ComputeHash(ReadOnlySpan<byte> data)
     {
         Reset();
         AppendData(data);

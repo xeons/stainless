@@ -84,7 +84,7 @@ public enum ConversionKind
     TestedReference,
 
     /// <summary>
-    /// <c>T[]</c> -> <c>T[:]</c>: the whole array, as a slice of it. Implicit,
+    /// <c>T[]</c> -> <c>Span&lt;T&gt;</c>: the whole array, as a slice of it. Implicit,
     /// because a slice of everything is what an array already is and asking for
     /// a cast would put punctuation in front of every call that takes one.
     /// </summary>
@@ -213,7 +213,7 @@ public sealed class BoundStringLiteral(SourceSpan span, TypeSymbol type, string 
 
 /// <summary>
 /// The bytes of <c>"..."u8</c>, as a <c>byte[]</c> in read-only storage with
-/// an immortal count. The binder wraps it in the conversion to <c>byte[:]</c>,
+/// an immortal count. The binder wraps it in the conversion to <c>ReadOnlySpan&lt;byte&gt;</c>,
 /// which is the literal's type.
 /// </summary>
 public sealed class BoundUtf8Literal(SourceSpan span, TypeSymbol type, string value)
@@ -719,7 +719,7 @@ public sealed class BoundArrayLiteral(
     public IReadOnlyList<BoundExpression> Elements { get; } = elements;
 
     /// <summary>
-    /// True for the array behind a <c>params T[:]</c> call: it lives in the
+    /// True for the array behind a <c>params Span&lt;T&gt;</c> call: it lives in the
     /// caller's frame for the statement, and is checked on the way out for a
     /// reference anything kept.
     /// </summary>
@@ -728,7 +728,7 @@ public sealed class BoundArrayLiteral(
 
 /// <summary>
 /// What a call gave its <c>params</c> parameter element by element,
-/// gathered: into a <c>T[]</c> made for the call, or for a <c>T[:]</c>, into
+/// gathered: into a <c>T[]</c> made for the call, or for a <c>Span&lt;T&gt;</c>, into
 /// an array the slice views.
 /// </summary>
 public sealed class BoundParamsArray(
@@ -743,7 +743,7 @@ public sealed class BoundParamsArray(
 
     /// <summary>
     /// True where the array lives in the caller's frame for the statement,
-    /// which a <c>T[:]</c> is given unless the call outlives the statement.
+    /// which a <c>Span&lt;T&gt;</c> is given unless the call outlives the statement.
     /// </summary>
     public bool InFrame { get; set; }
 }

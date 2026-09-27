@@ -330,7 +330,7 @@ templates such as `class Node<T> { Node<T>? next; }`.
 may share a name, and a call tries each one of the right arity, keeping those
 that both infer and would accept the arguments; two survivors is an ambiguity
 (SL0453) and none is the inference error. `Standard.Collections` has both
-`Sort<T>(T[:])` and `Sort<T>(IList<T>)`, and `Sort(numbers)` and `Sort(list)`
+`Sort<T>(Span<T>)` and `Sort<T>(IList<T>)`, and `Sort(numbers)` and `Sort(list)`
 each reach the right one.
 
 **Generic methods** are supported too, including inside a generic type, where
@@ -394,7 +394,7 @@ A parameter that appears only in a **lambda's** result is inferred, because a
 lambda's body is something to read a type off:
 
 ```csharp
-public List<R> Select<T, R>(T[:] items, Func<T, R> transform) { ... }
+public List<R> Select<T, R>(ReadOnlySpan<T> items, Func<T, R> transform) { ... }
 
 var spelled = Select(numbers, n => Text.FromInteger((long)n));   // R is String
 ```

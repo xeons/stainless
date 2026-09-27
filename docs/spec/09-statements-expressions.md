@@ -257,7 +257,7 @@ a `Count` or `Length` and an integer indexer, `List<T>` among them. The length
 is read once and asked first; each element is then read by its index from
 whichever end it was written against, so `[.., var last]` reads one element.
 There is one `..` at most (SL0775). What `.. var rest` names is a slice of the
-same array ([§2.12](02-types.md#212-t--part-of-an-array)), which shares its storage
+same array ([§2.12](02-types.md#212-spant-and-readonlyspant--part-of-an-array)), which shares its storage
 rather than copying it, or, for a type, what its `Slice(start, length)` answers
 — `a[1..]` asks the same thing ([§9.17](#917--and-)). Naming the run of
 anything with neither is refused (SL0775). A `String` is not matched element
@@ -775,7 +775,7 @@ follows a whole operand can begin a negation.
 ## 9.8 `default(T)`
 
 ```csharp
-T FirstOrNothing<T>(T[:] items)
+T FirstOrNothing<T>(ReadOnlySpan<T> items)
 {
     if (items.Length == 0u)
         return default(T);
@@ -1191,9 +1191,9 @@ so `Id(new())` is SL0327 until the type argument is written: `Id<Point>(new())`.
 
 ```csharp
 int last = numbers[^1];                 // the last element
-int[:] inner = numbers[1..^1];          // all but the first and the last
-int[:] tail = numbers[^3..];            // the last three
-int[:] all = numbers[..];
+Span<int> inner = numbers[1..^1];          // all but the first and the last
+Span<int> tail = numbers[^3..];            // the last three
+Span<int> all = numbers[..];
 
 Index at = ^2;                          // kept, as C#'s System.Index
 Range middle = 1..^1;                   // and System.Range
@@ -1212,7 +1212,7 @@ slice or an inline array, `a[^n]` subtracts from the length the bounds check
 already loads, and the check that follows refuses `^0` and anything past the
 start by the same unsigned compare as any other index — reporting the `^n`
 that was written. `a[i..j]` is exactly the slice `a[i:j]` is
-([§2.12](02-types.md#212-t--part-of-an-array)): a view that shares the array,
+([§2.12](02-types.md#212-spant-and-readonlyspant--part-of-an-array)): a view that shares the array,
 bounds-checked the same way. Stainless's own `a[i:j]` stays, and takes `^` in
 either place too: `a[1:^1]`. On an inline array a constant `^n` is folded, so
 one outside it is SL0490 at compile time.

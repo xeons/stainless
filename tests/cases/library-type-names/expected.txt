@@ -4,3 +4,4 @@ pair 7 pair
 both 3 3
 mine 2
 assigned 4
+read-only 30 2

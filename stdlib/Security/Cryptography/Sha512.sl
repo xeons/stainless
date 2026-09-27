@@ -39,7 +39,7 @@ public sealed class Sha512 : Sha2Wide
     public override nuint HashSizeInBytes => 64u;
 
     /// The digest of `data`, with no object to keep.
-    public static byte[] HashData(byte[:] data) => new Sha512().ComputeHash(data);
+    public static byte[] HashData(ReadOnlySpan<byte> data) => new Sha512().ComputeHash(data);
 
     protected override void InitializeState()
     {

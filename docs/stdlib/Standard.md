@@ -364,7 +364,7 @@ The half-open run of positions between two `Index`es. What `a..b` makes
 when it is kept rather than used at once, as C#'s `System.Range` is.
 
     Range inner = 1..^1;
-    int[:] middle = numbers[inner];
+    Span<int> middle = numbers[inner];
 
 Either end may be left out: `..b` starts at the start and `a..` runs to
 the end.

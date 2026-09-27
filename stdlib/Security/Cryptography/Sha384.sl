@@ -42,7 +42,7 @@ public sealed class Sha384 : Sha2Wide
     public override nuint HashSizeInBytes => 48u;
 
     /// The digest of `data`, with no object to keep.
-    public static byte[] HashData(byte[:] data) => new Sha384().ComputeHash(data);
+    public static byte[] HashData(ReadOnlySpan<byte> data) => new Sha384().ComputeHash(data);
 
     protected override void InitializeState()
     {

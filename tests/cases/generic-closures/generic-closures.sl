@@ -33,7 +33,7 @@ public delegate int Orders<T>(T left, T right);
 
 // ------------------------------------------------------- what uses them
 
-public List<T> Kept<T>(T[:] items, Keeps<T> ok)
+public List<T> Kept<T>(Span<T> items, Keeps<T> ok)
 {
     var kept = new List<T>();
     foreach (var item in items)
@@ -48,7 +48,7 @@ public List<T> Kept<T>(T[:] items, Keeps<T> ok)
 /// binding the lambda's body -- which cannot happen until `T` has given the
 /// lambda its parameter type. The signature it is read off is the closure's
 /// own rather than an interface method's.
-public List<R> Turned<T, R>(T[:] items, Turns<T, R> change)
+public List<R> Turned<T, R>(Span<T> items, Turns<T, R> change)
 {
     var made = new List<R>();
     foreach (var item in items)
@@ -56,13 +56,13 @@ public List<R> Turned<T, R>(T[:] items, Turns<T, R> change)
     return made;
 }
 
-public void Each<T>(T[:] items, Takes<T> run)
+public void Each<T>(Span<T> items, Takes<T> run)
 {
     foreach (var item in items)
         run(item);
 }
 
-public A Folded<A, T>(T[:] items, A seed, Folds<A, T> step)
+public A Folded<A, T>(Span<T> items, A seed, Folds<A, T> step)
 {
     var total = seed;
     foreach (var item in items)
@@ -70,7 +70,7 @@ public A Folded<A, T>(T[:] items, A seed, Folds<A, T> step)
     return total;
 }
 
-public int Best<T>(T[:] items, Orders<T> order)
+public int Best<T>(Span<T> items, Orders<T> order)
 {
     int best = 0;
     for (nuint i = 1u; i < items.Length; i++)

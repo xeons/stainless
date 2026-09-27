@@ -529,14 +529,14 @@ file has them, so one checkout with CRLF and another with LF compile the same
 source to different strings. Here they compile to the same one.
 
 **`u8`** after a regular, verbatim or raw literal makes its UTF-8 bytes rather
-than a `String`. Its type is `byte[:]` — the language's view of bytes, where
-C#'s is `ReadOnlySpan<byte>` — over an array in read-only storage with an
-immortal count, laid out as an embedded file's is
+than a `String`. Its type is `ReadOnlySpan<byte>`, as C#'s is, over an array
+in read-only storage with an immortal count, laid out as an embedded file's is
 ([§8.7](08-interop-libraries.md#87-embedding-a-file)). Nothing is allocated,
 copying the slice counts nothing, and a NUL follows the bytes without being
-counted in them. **The array is not writable**: a store through the slice is a
-fault, as it is into a read-only `[Embed]`, because a slice has no read-only
-form to refuse it with. An interpolated string cannot take `u8` (SL0752),
+counted in them. **The bytes are not writable**, and the type says so: a store
+through the slice is refused where it is written (SL0808,
+[§2.12.1](02-types.md#2121-readonlyspant)) rather than faulting where it runs.
+An interpolated string cannot take `u8` (SL0752),
 since its bytes do not exist until it runs; `ToBytes()` on the `String` is
 that.
 

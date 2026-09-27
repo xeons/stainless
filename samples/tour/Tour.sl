@@ -435,7 +435,7 @@ void ShowArrays()
 /// one function. A tuple *is* a struct, so layout, both ABI classifiers and
 /// the walk that retains and releases what a value holds all apply to it with
 /// nothing written for tuples.
-(int, int) MinMax(int[:] numbers)
+(int, int) MinMax(ReadOnlySpan<int> numbers)
 {
     int low = numbers[0u];
     int high = numbers[0u];
@@ -477,7 +477,7 @@ void ShowTuples()
     PrintValue("holding references", split.Item1 + "/" + split.Item2);
 }
 
-long SumValues(int[:] values)
+long SumValues(ReadOnlySpan<int> values)
 {
     long total = 0;
     for (nuint i = 0u; i < values.Length; i++)
@@ -485,7 +485,7 @@ long SumValues(int[:] values)
     return total;
 }
 
-void FillValues(int[:] values, int with)
+void FillValues(Span<int> values, int with)
 {
     for (nuint i = 0u; i < values.Length; i++)
         values[i] = with;

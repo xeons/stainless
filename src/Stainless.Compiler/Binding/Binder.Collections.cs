@@ -182,7 +182,7 @@ public sealed partial class Binder
     ///
     /// <c>T[]</c> allocates; <c>T[N]</c> must match in length, because an
     /// inline array is its elements and there is nowhere to put a different
-    /// number of them; <c>T[:]</c> settles as the <c>T[]</c> it is a view of,
+    /// number of them; <c>Span&lt;T&gt;</c> settles as the <c>T[]</c> it is a view of,
     /// and the ordinary array-to-slice conversion does the rest. A class with
     /// <c>Add</c> is made and added to, and <c>IEnumerable&lt;T&gt;</c>,
     /// <c>IList&lt;T&gt;</c> and <c>IReadOnlyList&lt;T&gt;</c> are given a

@@ -64,7 +64,7 @@ public sealed class Sha256 : HashAlgorithm
     public override nuint HashSizeInBytes => 32u;
 
     /// The digest of `data`, with no object to keep.
-    public static byte[] HashData(byte[:] data) => new Sha256().ComputeHash(data);
+    public static byte[] HashData(ReadOnlySpan<byte> data) => new Sha256().ComputeHash(data);
 
     protected override void InitializeState()
     {

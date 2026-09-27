@@ -55,7 +55,7 @@ String Warmth(Color color) => color switch
 };
 
 /// Every length: none, one, and one followed by any number more.
-int Count(int[:] items) => items switch
+int Count(Span<int> items) => items switch
 {
     [] => 0,
     [_] => 1,

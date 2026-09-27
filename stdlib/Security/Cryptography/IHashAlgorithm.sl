@@ -52,7 +52,7 @@ public interface IHashAlgorithm
     nuint BlockSizeInBytes { get; }
 
     /// Adds bytes to what is being hashed.
-    void AppendData(byte[:] data);
+    void AppendData(ReadOnlySpan<byte> data);
 
     /// The digest of everything appended since the last reset, and a reset.
     /// Calling it twice in a row gives the digest of the empty input the

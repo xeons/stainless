@@ -47,7 +47,8 @@ public class ManglerTests
         public void TakePrim(int a) { }
         public void TakePointer(int* a) { }
         public void TakeArray(int[] a) { }
-        public void TakeSlice(int[:] a) { }
+        public void TakeSlice(Span<int> a) { }
+        public void TakeReadOnlySlice(ReadOnlySpan<int> a) { }
         public void TakeFixed3(ref int[3] a) { }
         public void TakeFixed4(ref int[4] a) { }
         public void TakeFixedLong(ref long[3] a) { }
@@ -130,7 +131,8 @@ public class ManglerTests
     [Fact]
     public void ASliceAndAVariantAreStructs()
     {
-        Assert.Contains("S15Standard_int___", Mangled("TakeSlice"));
+        Assert.Contains("S18Standard_Span_int_", Mangled("TakeSlice"));
+        Assert.Contains("S26Standard_ReadOnlySpan_int_", Mangled("TakeReadOnlySlice"));
         Assert.Contains("S8Test_Var", Mangled("TakeVariant"));
     }
 

@@ -315,8 +315,9 @@ last person to edit it -- the suite is the authority.
   calls were bound against too short a list is bound again
 - `params` on the last parameter: `Sum(1, 2, 3)`, `Sum()` and `Sum(numbers)`
   all reach `int Sum(params int[] values)`, with C#'s preference for the
-  declared form and generic inference from the elements. A `params T[:]`
-  gathers into an array in the caller's frame, so the call allocates nothing;
+  declared form and generic inference from the elements. A `params Span<T>` or
+  `params ReadOnlySpan<T>` gathers into an array in the caller's frame, so the
+  call allocates nothing;
   the frame checks when the statement ends that nothing kept a reference to it,
   and stops the program if something did. Misplaced, it is SL0763
 - Full operator set with C# precedence, short-circuit `&&` and `||`, the
@@ -340,7 +341,7 @@ last person to edit it -- the suite is the authority.
   `String` is UTF-8 by invariant
 - Every way C# writes a string: `"..."`, verbatim `@"..."`, raw `"""..."""`
   with its indentation taken off, and `u8` after any of them for the bytes as a
-  `byte[:]` in read-only storage. A line break inside one is one `\n` however
+  `ReadOnlySpan<byte>` in read-only storage. A line break inside one is one `\n` however
   the file was saved
 - Interpolation, `$"..."`, in each of those forms, joined in one allocation;
   `$$"""..."""` sets how many braces open a hole. A hole takes C#'s alignment
@@ -373,26 +374,33 @@ last person to edit it -- the suite is the authority.
   compile error
 - `T[]`: counted arrays, always bounds checked, elements released with the array
 - Collection expressions: `[1, 2, 3]` and `[..a, 0, ..b]`, taking their type
-  from where they are going — a `T[]`, a `T[N]` of matching length, a `T[:]`,
+  from where they are going — a `T[]`, a `T[N]` of matching length, a `Span<T>`,
   a class with `Add` and a constructor taking nothing, or `IEnumerable<T>`,
   `IList<T>` and `IReadOnlyList<T>` as a `List<T>` — or from their own elements
   when nothing else says, so `var xs = [1, 2, 3]` needs no type written out. A
   `..` spreads anything `foreach` walks; the elements are evaluated once, in
   order, and the array is allocated once at its exact size when every spread
-  can say its length. A `T[:]` target is a heap array, since nothing proves a
+  can say its length. A `Span<T>` target is a heap array, since nothing proves a
   frame one would not be kept
 - `T[N]`: an inline fixed-size array, which is C's and not C#'s — it *is* its
   elements rather than a reference to them, so a struct holding one is exactly
   as wide as the C struct it mirrors. The length is part of the type, so
   `.Length` is a constant and an out-of-range constant index is a compile error
   rather than an abort. `WIN32_FIND_DATAW` is 592 bytes here as it is there
-- `T[:]`: slices. `a[1:4]`, `a[3:]`, `a[:2]` and `a[:]` over an array or another
+- `Span<T>`: slices. `a[1:4]`, `a[3:]`, `a[:2]` and `a[:]` over an array or another
   slice, with half-open bounds; three words, so nothing allocates. A view rather
   than a copy — writing through one writes the array, and an index is checked
   against the slice's own length. Slicing a slice narrows it rather than nesting.
   It holds the array it came from, so it cannot dangle: what it points into is
   alive for as long as it is. An array converts to a slice of the whole of
   itself implicitly, and `foreach` walks one like an array
+- `ReadOnlySpan<T>`: the same view, refusing a write through it — an element
+  assigned, `++`'d, lent by `ref` or `out`, or given to a struct method that
+  writes its receiver. An array and a `Span<T>` convert to one, and cutting one
+  keeps it read-only. `Standard.Collections` takes one wherever it only reads
+- A struct method that writes its receiver cannot be called on an `in`
+  parameter, a `static readonly`, a `const` or a `ReadOnlySpan<T>` element; one
+  that only reads is called in place, with no copy
 - `^n` and `a..b`, as C# has them: `a[^1]`, `a[1..^1]`, `a[..2]`, and `^` in
   Stainless's own `a[1:^1]`. On an array, a slice and an inline array they are
   the index and the slice they spell, counted from the length the bounds check
@@ -498,7 +506,7 @@ last person to edit it -- the suite is the authority.
   array-backed — ARC cannot collect a cycle, so the linked list links by index
   rather than by reference — and every one of them walks itself when iterated
   rather than copying into a list first
-- **`Sort` is a stable merge sort**, over a `T[:]` or an `IList<T>`, by
+- **`Sort` is a stable merge sort**, over a `Span<T>` or an `IList<T>`, by
   `IComparable<T>` or by a `Comparison<T>` you pass. Stability is what lets a
   multi-key order be built by sorting twice. Alongside it: `Max`,
   `Min`, `IndexOf`, `RemoveFirst`, `RemoveWhere`, `Reverse`,

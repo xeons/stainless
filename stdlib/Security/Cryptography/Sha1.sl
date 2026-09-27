@@ -50,7 +50,7 @@ public sealed class Sha1 : HashAlgorithm
     public override nuint HashSizeInBytes => 20u;
 
     /// The digest of `data`, with no object to keep.
-    public static byte[] HashData(byte[:] data) => new Sha1().ComputeHash(data);
+    public static byte[] HashData(ReadOnlySpan<byte> data) => new Sha1().ComputeHash(data);
 
     protected override void InitializeState()
     {

@@ -55,7 +55,7 @@ class Holder
     }
 }
 
-T Last<T>(T[:] items) => items[^1];
+T Last<T>(Span<T> items) => items[^1];
 
 void Show(String label, long value) => Console.WriteLine(label + " " + Text.FromInteger(value));
 
@@ -73,7 +73,7 @@ public void Main()
     numbers[^3]++;
     Show("written", numbers[2] + numbers[3] + numbers[4]);
 
-    int[:] view = numbers[1:];
+    Span<int> view = numbers[1:];
     Show("slice", view[^1]);
 
     int[3] inline = [1, 2, 3];

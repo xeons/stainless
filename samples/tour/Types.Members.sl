@@ -237,7 +237,7 @@ public Box<T> CreateBox<T>(T value)
 }
 
 /// Two constraints at once, both interfaces the standard library defines.
-public nuint ComputeDigest<T>(T[:] items) where T : IHashable, IEquatable<T>
+public nuint ComputeDigest<T>(ReadOnlySpan<T> items) where T : IHashable, IEquatable<T>
 {
     nuint total = 0u;
     foreach (var item in items)

@@ -27,7 +27,7 @@ String Shape(int[] items) => items switch
                                 Text.FromInteger((long)rest.Length) + " more",
 };
 
-int Sum(int[:] items) => items switch
+int Sum(Span<int> items) => items switch
 {
     [] => 0,
     [var head, .. var tail] => head + Sum(tail),

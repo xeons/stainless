@@ -201,7 +201,7 @@ int Main()
 }
 
 /// Whether a slice is ordered smallest first.
-bool InOrder(int[:] items)
+bool InOrder(Span<int> items)
 {
     for (nuint i = 1u; i < items.Length; i++)
     {

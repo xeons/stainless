@@ -16,7 +16,7 @@ int SumArray(int[] values)
 
 /// A slice is a view: no copy, and the array it came from stays alive as long
 /// as the view does.
-int SumSlice(int[:] window)
+int SumSlice(ReadOnlySpan<int> window)
 {
     var total = 0;
     foreach (int value in window)

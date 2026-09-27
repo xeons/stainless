@@ -55,8 +55,11 @@ public sealed record PointerTypeSyntax(SourceSpan Span, TypeSyntax Element) : Ty
 /// <summary><c>T[]</c> — a counted array of T.</summary>
 public sealed record ArrayTypeSyntax(SourceSpan Span, TypeSyntax Element) : TypeSyntax(Span);
 
-/// <summary><c>T[:]</c> - part of an array, named as a value of its own.</summary>
-public sealed record SliceTypeSyntax(SourceSpan Span, TypeSyntax Element) : TypeSyntax(Span);
+/// <summary>
+/// <c>Span&lt;T&gt;</c> or <c>ReadOnlySpan&lt;T&gt;</c>: part of an array, named
+/// as a value of its own.
+/// </summary>
+public sealed record SliceTypeSyntax(SourceSpan Span, TypeSyntax Element, bool IsReadOnly) : TypeSyntax(Span);
 
 /// <summary>
 /// <c>T[N]</c>: an inline fixed-size array, laid out where it is written rather
@@ -271,7 +274,7 @@ public sealed record ParameterSyntax(
     ExpressionSyntax? Default = null) : SyntaxNode(Span)
 {
     /// <summary>
-    /// <c>params T[] name</c> or <c>params T[:] name</c>: a call may give the
+    /// <c>params T[] name</c> or <c>params Span&lt;T&gt; name</c>: a call may give the
     /// elements one by one, and they are gathered into the array or slice.
     /// </summary>
     public bool IsParams { get; init; }
@@ -1474,7 +1477,7 @@ public sealed record InitializerEntrySyntax(
 ///
 /// It has no type of its own. What it becomes is decided by where it is going,
 /// the way a lambda and a variant case name are (§2.14, §2.6): a <c>T[]</c>, a
-/// <c>T[N]</c> of matching length, a <c>T[:]</c>, or a class with <c>Add</c>.
+/// <c>T[N]</c> of matching length, a <c>Span&lt;T&gt;</c>, or a class with <c>Add</c>.
 /// With nothing to go on, the elements decide, so <c>var xs = [1, 2, 3];</c>
 /// is an <c>int[]</c>.
 /// </summary>

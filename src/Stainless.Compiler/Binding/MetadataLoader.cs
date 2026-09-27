@@ -30,9 +30,10 @@ namespace Stainless.Binding;
 /// code; this compilation only needs to know how to call it.
 /// </summary>
 /// <param name="sliceOf">
-/// How to reach this compilation's <c>T[:]</c>, and <paramref name="tupleOf"/>
-/// its <c>(A, B)</c>. Both are structural but named, so the binder interns
-/// them: a library's <c>int[:]</c> has to be the very symbol a consumer's own
+/// How to reach this compilation's <c>Span&lt;T&gt;</c> and
+/// <c>ReadOnlySpan&lt;T&gt;</c>, and <paramref name="tupleOf"/> its
+/// <c>(A, B)</c>. All are structural but named, so the binder interns them: a
+/// library's <c>Span&lt;int&gt;</c> has to be the very symbol a consumer's own
 /// source resolves to, or the two would not compare equal.
 /// </param>
 public sealed class MetadataLoader(

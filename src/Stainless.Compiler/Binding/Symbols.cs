@@ -78,7 +78,7 @@ public sealed class ParameterSymbol(string name, TypeSymbol type, int index)
 
     /// <summary>
     /// Declared <c>params</c>: a call may give the elements one by one. Only
-    /// the last parameter may be, and only a <c>T[]</c> or a <c>T[:]</c>.
+    /// the last parameter may be, and only a <c>T[]</c> or a <c>Span&lt;T&gt;</c>.
     /// </summary>
     public bool IsParams { get; init; }
 

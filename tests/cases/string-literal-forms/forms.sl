@@ -23,11 +23,11 @@ public class Template
 
 public struct Header
 {
-    public byte[:] Magic;
+    public ReadOnlySpan<byte> Magic;
     public int Version;
 }
 
-nuint CountBytes<T>(T[:] items)
+nuint CountBytes<T>(ReadOnlySpan<T> items)
 {
     nuint count = 0u;
     foreach (var item in items)
@@ -35,7 +35,7 @@ nuint CountBytes<T>(T[:] items)
     return count;
 }
 
-String DescribeBytes(byte[:] bytes)
+String DescribeBytes(ReadOnlySpan<byte> bytes)
 {
     var built = new StringBuilder();
     foreach (var b in bytes)
@@ -81,7 +81,7 @@ second");
         """);
 
     // Bytes, not a String: static, immortal and a view.
-    byte[:] greeting = "héllo"u8;
+    ReadOnlySpan<byte> greeting = "héllo"u8;
     Console.WriteLine($"{greeting.Length} bytes: {DescribeBytes(greeting)}");
     Console.WriteLine($"{DescribeBytes(greeting[1:3])}");
     Console.WriteLine($"{CountBytes("abc"u8)} {DescribeBytes(@"\n"u8)} {DescribeBytes("""{}"""u8)}");
@@ -92,7 +92,7 @@ second");
     var copy = header;
     Console.WriteLine($"{DescribeBytes(copy.Magic)} v{copy.Version}");
 
-    var views = new List<byte[:]>();
+    var views = new List<ReadOnlySpan<byte>>();
     views.Add("ab"u8);
     views.Add("cd"u8);
     nuint total = 0u;
@@ -100,7 +100,7 @@ second");
         total += view.Length;
     Console.WriteLine($"{total}");
 
-    IFunc<byte[:]> later = () => "later"u8;
+    IFunc<ReadOnlySpan<byte>> later = () => "later"u8;
     Console.WriteLine(DescribeBytes(later.Invoke()));
 
     // Keywords as names.

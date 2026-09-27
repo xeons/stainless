@@ -23,9 +23,20 @@ public struct Point
 
 // A slice and a tuple are structural but named, so the consumer has to reach
 // the very same symbol its own source resolves to rather than a second copy.
-public int[:] Tail(int[] numbers) { return numbers[1:]; }
+public Span<int> Tail(int[] numbers) { return numbers[1:]; }
 public (int, String) Pair(int n) { return (n, "pair"); }
-public (Point, int[:]) Both(int[] numbers)
+
+// And a read-only one is a second type, told apart from the first by name.
+public int Total(ReadOnlySpan<int> values)
+{
+    int total = 0;
+    foreach (int v in values)
+        total += v;
+    return total;
+}
+
+public ReadOnlySpan<byte> Magic() => "SL"u8;
+public (Point, Span<int>) Both(int[] numbers)
 {
     Point p;
     p.X = 1;

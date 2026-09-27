@@ -207,11 +207,11 @@ public class InterpolationTests
 
     /// <summary>
     /// <c>"..."u8</c> is a view of bytes, as C#'s is a <c>ReadOnlySpan</c>, so
-    /// it goes where a <c>byte[:]</c> goes and not where a String does.
+    /// it goes where a <c>ReadOnlySpan<byte></c> goes and not where a String does.
     /// </summary>
     [Fact]
     public void AUtf8LiteralIsAByteSlice() =>
-        Assert.Empty(Body("""byte[:] b = "abc"u8; var c = "x"u8; byte[:] d = c; nuint n = b.Length;"""));
+        Assert.Empty(Body("""ReadOnlySpan<byte> b = "abc"u8; var c = "x"u8; ReadOnlySpan<byte> d = c; nuint n = b.Length;"""));
 
     [Fact]
     public void AUtf8LiteralIsNotAString() =>
@@ -224,7 +224,7 @@ public class InterpolationTests
     [Fact]
     public void AUtf8LiteralIsStaticData()
     {
-        string ir = Front.ModuleIr("""public byte[:] Bytes() { return "hé"u8; }""");
+        string ir = Front.ModuleIr("""public ReadOnlySpan<byte> Bytes() { return "hé"u8; }""");
 
         Assert.Contains("= private unnamed_addr constant", ir, StringComparison.Ordinal);
         Assert.Contains("c\"h\\C3\\A9\\00\"", ir, StringComparison.Ordinal);

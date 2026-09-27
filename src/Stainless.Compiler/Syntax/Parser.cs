@@ -230,6 +230,14 @@ public sealed class Parser
         return new(_source, start, _tokens[_pos - 1].Span.End);
     }
 
+    /// <summary>
+    /// Each <c>T[:]</c> written as a type, reported once the file is parsed.
+    /// Reported as it is met, it would fail the speculation that tells a
+    /// declaration from an expression, and the declaration around it would
+    /// then read as nonsense.
+    /// </summary>
+    private readonly List<SourceSpan> _sliceSpellings = [];
+
     /// <summary>Each speculation that failed, by what was attempted and at which token.</summary>
     private readonly HashSet<(System.Reflection.MethodInfo Attempt, int Position)> _failedSpeculations = [];
 
@@ -262,6 +270,7 @@ public sealed class Parser
 
         int savedPos = _pos;
         int savedSplits = _splits.Count;
+        int savedSliceSpellings = _sliceSpellings.Count;
         int savedDepth = _depth;
         bool savedTooDeep = _tooDeep;
         var savedDiagnostics = _diagnostics;
@@ -281,6 +290,7 @@ public sealed class Parser
                 _tokens[index] = token;
             }
 
+            _sliceSpellings.RemoveRange(savedSliceSpellings, _sliceSpellings.Count - savedSliceSpellings);
             _failedSpeculations.Add(key);
             result = null;
             return false;
@@ -337,6 +347,11 @@ public sealed class Parser
             declarations.AddRange(ParseDeclaration(enclosingType: null));
             if (_pos == before) Advance();          // guarantee progress on malformed input
         }
+
+        foreach (var spelling in _sliceSpellings.Distinct())
+            _diagnostics.Error("SL0807", spelling,
+                "a slice's type is written 'Span<T>', or 'ReadOnlySpan<T>' where it is only " +
+                "read; '[:]' belongs to an expression, as in 'numbers[1:4]'");
 
         // The lexer is null only for the sub-parser over one interpolation's
         // hole, and that one parses an expression rather than a file.
@@ -2298,7 +2313,13 @@ public sealed class Parser
         {
             var name = ParseQualifiedName();
             var arguments = ParseTypeArgumentList();
-            type = new NamedTypeSyntax(SpanFrom(start), name, arguments);
+
+            // A slice is built by the compiler rather than declared, so its two
+            // names are recognised here, by arity: a `Span` with no type
+            // arguments is still whatever the program declared.
+            type = name.Parts is [var only] && arguments.Count == 1 && only is "Span" or "ReadOnlySpan"
+                ? new SliceTypeSyntax(SpanFrom(start), arguments[0], only == "ReadOnlySpan")
+                : new NamedTypeSyntax(SpanFrom(start), name, arguments);
         }
 
         while (true)
@@ -2326,15 +2347,16 @@ public sealed class Parser
                 continue;
             }
 
-            // `T[:]` is the slice of one. Nothing else can follow an open
-            // bracket with a colon, so this needs no lookahead beyond it.
+            // `T[:]` is recognised only to say how a slice is spelled. Nothing
+            // else can follow an open bracket with a colon.
             if (At(TokenKind.OpenBracket) && Peek(1).Kind == TokenKind.Colon &&
                 Peek(2).Kind == TokenKind.CloseBracket)
             {
                 Advance();
                 Advance();
                 Advance();
-                type = new SliceTypeSyntax(SpanFrom(start), type);
+                _sliceSpellings.Add(SpanFrom(start));
+                type = new SliceTypeSyntax(SpanFrom(start), type, IsReadOnly: false);
                 continue;
             }
 
@@ -4468,6 +4490,7 @@ public sealed class Parser
                 alignment = inner.ParseExpression();
 
             _accessorUsesField |= inner._accessorUsesField;
+            _sliceSpellings.AddRange(inner._sliceSpellings);
 
             // A limit reached inside the hole was reached here too, and this
             // parser has to stop as the inner one did or the rest of the file

@@ -21,7 +21,7 @@ public int SumAlpha()
     list.Add(p);
 
     (Point, int) pair = (p, 10);
-    Point[:] slice = new Point[1];
+    Span<Point> slice = new Point[1];
     slice[0] = p;
     var measure = (Point q) => q.X + q.Y;
     Func<Point, int> fn = q => q.Y;

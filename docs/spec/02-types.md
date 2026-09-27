@@ -280,7 +280,7 @@ public class Cache<T>
 ### 2.2.4 `(int, String)` — a tuple
 
 ```csharp
-(int, int) MinMax(int[:] numbers)
+(int, int) MinMax(ReadOnlySpan<int> numbers)
 {
     ...
     return (low, high);
@@ -300,7 +300,7 @@ any of them being written for tuples — the same bargain `closure` made
 ([§2.14.1](#2141-closure--a-method-and-the-object-it-belongs-to)).
 
 **It is structural.** `(int, String)` written in two modules is one type,
-interned by its element types the way `T[:]` is by its element. Nothing is
+interned by its element types the way `Span<T>` is by its element. Nothing is
 declared and nothing has to line up but the types.
 
 **The fields are `Item1` upwards, and have no names of their own.** Named
@@ -2037,11 +2037,11 @@ Show(["one", "two",]);                  // and from a parameter; the comma is fi
 
 **A literal has no type of its own.** What it becomes is decided by where it is
 going, exactly as for a lambda ([§2.15](#215-lambdas-and-closures)) and a bare variant case name ([§2.6](#26-variant--a-value-that-is-one-of-several-things)) — a
-`T[]`, a `T[N]` of matching length, or a `T[:]`:
+`T[]`, a `T[N]` of matching length, or a `Span<T>`:
 
 ```csharp
 int[3] fixed = [7, 8, 9];               // an inline array; the length is the type
-int total = Sum([10, 20, 30]);          // a T[:] parameter, through the array
+int total = Sum([10, 20, 30]);          // a Span<T> parameter, through the array
 ```
 
 Unlike those two it can also decide for itself, because its elements are values
@@ -2094,7 +2094,7 @@ array with it.
 The length is written in the type rather than after the name — `ushort[260]
 FileName`, not C's `ushort FileName[260]` — because Stainless writes the type
 first everywhere else, and because it puts `T[N]` in a series with `T[]` and
-`T[:]` rather than off to one side. A generated C header writes C's order,
+`Span<T>` rather than off to one side. A generated C header writes C's order,
 outermost length first: `int[3][2]` here is `int32_t x[2][3]` there.
 
 Because the length is part of the type it is known without a value to ask:
@@ -2133,7 +2133,7 @@ int[] both = [..first, 0, ..second];    // every element of each, in order
 List<String> names = ["ada", ..more];   // a class with Add
 IEnumerable<int> some = [1, 2, 3];      // given a List<int>
 int[5] five = [..three, 4, 5];          // an inline array's length is known
-int[:] view = [..numbers[1..], 99];     // an array, seen as a slice
+Span<int> view = [..numbers[1..], 99];     // an array, seen as a slice
 ```
 
 An array literal is C#'s collection expression. **`..e` spreads**: every
@@ -2144,7 +2144,7 @@ written in parentheses, `[(..n)]`, as in C#.
 
 **What one can become** is decided by where it is going, as for any literal:
 
-- a `T[]`, a `T[N]` or a `T[:]`, as above;
+- a `T[]`, a `T[N]` or a `Span<T>`, as above;
 - **a class with a constructor taking nothing and an `Add` taking one
   element** — `List<T>`, `HashSet<T>`, or a type of the program's own. It is
   made and then added to once per element, `Add` found by name as a collection
@@ -2174,15 +2174,15 @@ type. Anything else is walked by a generic function in the standard library,
 instantiated at the element types involved. A class target is added to in
 order and needs no buffer.
 
-**A slice gets a heap array.** `int[:] view = [1, 2, 3]` allocates the array it
-views. A `params T[:]` can put its array in the caller's frame because the call
+**A slice gets a heap array.** `Span<int> view = [1, 2, 3]` allocates the array it
+views. A `params Span<T>` can put its array in the caller's frame because the call
 is over by the end of the statement
 ([§7.1.3](07-functions-members.md#713-params)); a literal stored in a variable
 outlives its statement, and with no escape analysis nothing can prove that a
 frame array would not be kept past it, so none is attempted.
 
-**An array is preferred.** A literal fits a `T[]`, a `T[:]` or a `T[N]` better
-than a class or an interface, so `Sum([1, 2])` against `Sum(int[:])` and
+**An array is preferred.** A literal fits a `T[]`, a `Span<T>` or a `T[N]` better
+than a class or an interface, so `Sum([1, 2])` against `Sum(Span<int>)` and
 `Sum(IEnumerable<int>)` chooses the first, as C# prefers a span or an array.
 
 **It still decides for itself** where C# would refuse, and a spread offers what
@@ -2203,17 +2203,19 @@ for an array literal's elements to be added with
 A spread whose elements do not convert to the element type is SL0778 as well,
 and an inline array spread of the wrong length is SL0547.
 
-## 2.12 `T[:]` — part of an array
+## 2.12 `Span<T>` and `ReadOnlySpan<T>` — part of an array
 
-A slice names part of an array, as a value.
+A slice names part of an array, as a value. `Span<T>` is one that may be
+written through and `ReadOnlySpan<T>` one that may not; everything below holds
+for both, and the difference is [its own section](#2121-readonlyspant).
 
 ```csharp
 var numbers = new int[6];
 
-int[:] all    = numbers;          // an array is a slice of the whole of itself
-int[:] middle = numbers[1:4];     // elements 1, 2 and 3
-int[:] tail   = numbers[3:];      // to the end
-int[:] head   = numbers[:2];      // from the beginning
+Span<int> all    = numbers;          // an array is a slice of the whole of itself
+Span<int> middle = numbers[1:4];     // elements 1, 2 and 3
+Span<int> tail   = numbers[3:];      // to the end
+Span<int> head   = numbers[:2];      // from the beginning
 ```
 
 The bounds are half-open, as everywhere: `numbers[1:4]` has three elements.
@@ -2244,7 +2246,7 @@ way any struct field holds a reference: **a slice cannot dangle**, because what
 it points into is alive for as long as it is.
 
 ```csharp
-Trace[:] Middle()
+Span<Trace> Middle()
 {
     var traces = new Trace[3];
     ...
@@ -2266,6 +2268,47 @@ and `Standard.Collections` has `Sort` and `Reverse` over one:
 Sort(numbers);                // the whole of it
 Sort(numbers[2:5]);           // three of them, in place, nothing copied
 ```
+
+**The names are C#'s, and the type is not.** A C# `Span<T>` is a pointer and a
+length, kept from outliving its memory by the rules of a `ref struct`; this one
+holds its array and needs no such rules, so it may be a field, be captured, and
+be returned. The compiler builds both from their element rather than finding
+them declared anywhere, which is why they are recognised by name and by one
+type argument: a program's own `Span`, with none, is still its own. `T[:]` is not
+a type (SL0807); `[:]` belongs to an expression, where it cuts one.
+
+### 2.12.1 `ReadOnlySpan<T>`
+
+A view that promises not to write. An array and a `Span<T>` both convert to one
+implicitly, and nothing converts back:
+
+```csharp
+int Sum(ReadOnlySpan<int> values) { ... }
+
+Sum(numbers);                 // an array
+Sum(middle);                  // a Span<int>
+Sum(middle[1:]);              // and a slice of one
+```
+
+So a function that only reads takes a `ReadOnlySpan<T>`, which every caller can
+give it; `Standard.Collections` takes one wherever it reads and a `Span<T>`
+only where it writes, as `Sort` and `Reverse` do.
+
+**A write through one is refused**, however it is spelled. Assigning an
+element, `+=` and `++` on one, setting a field or a property of a struct
+element (SL0808), passing one by `ref` or `out` (SL0444), and calling a struct
+method that writes the element it is called on (SL0809) are all the same
+write. A method that only reads is called in place, with no copy.
+
+**Cutting one keeps it read-only**: `seen[1:3]` of a `ReadOnlySpan<int>` is
+another `ReadOnlySpan<int>`, so there is no way back to writing through a
+narrower view. The array underneath is not frozen — a `Span<T>` over the same
+elements still writes them, and the read-only view sees the change. What the
+type promises is that this view does not write, which is what a caller handing
+it over needs to know.
+
+`"..."u8` is a `ReadOnlySpan<byte>` ([§3](03-text.md)), since its bytes are in
+storage that cannot be written.
 
 ## 2.13 `enum` — a distinct type over an integer
 
@@ -2511,7 +2554,7 @@ return type, as it is off a lambda's body
 public closure bool Predicate<T>(T value);
 public closure R    Func<T, R>(T value);
 
-public List<T> Filter<T>(T[:] items, Predicate<T> keep) { ... }
+public List<T> Filter<T>(ReadOnlySpan<T> items, Predicate<T> keep) { ... }
 ```
 
 Each set of type arguments makes a real type, the way `Box<int>` does — there

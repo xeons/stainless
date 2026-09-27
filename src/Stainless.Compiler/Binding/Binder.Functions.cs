@@ -884,7 +884,7 @@ public sealed partial class Binder
             : symbol.Linkage != LinkageKind.Stainless ?
                 "a function that crosses to C takes what C passes, and C has no 'params'"
             : type is not (ArrayTypeSymbol or SliceTypeSymbol or ErrorTypeSymbol) ?
-                $"'params' gathers the elements into a 'T[]' or a 'T[:]', and " +
+                $"'params' gathers the elements into a 'T[]' or a 'Span<T>', and " +
                 $"'{type.Name}' is neither"
             : null;
 

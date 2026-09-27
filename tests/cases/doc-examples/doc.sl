@@ -418,9 +418,9 @@ String Slicing()
     for (nuint i = 0; i < numbers.Length; i = i + 1)
         numbers[i] = (int)i + 1;
 
-    int[:] all    = numbers;
-    int[:] middle = numbers[1:4];
-    int[:] tail   = numbers[3:];
+    Span<int> all    = numbers;
+    Span<int> middle = numbers[1:4];
+    Span<int> tail   = numbers[3:];
 
     Sort(numbers[2:5]);
 
@@ -500,7 +500,7 @@ String Bits()
 }
 
 // --- spec 2.11.1 array literals ------------------------------------------
-int SumSlice(int[:] slice)
+int SumSlice(Span<int> slice)
 {
     int total = 0;
     for (nuint i = 0u; i < slice.Length; i = i + 1u)

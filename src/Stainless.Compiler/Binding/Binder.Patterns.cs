@@ -1148,12 +1148,12 @@ public sealed partial class Binder
             case ArrayTypeSymbol array:
                 return (new BoundArrayLength(span, PrimitiveTypeSymbol.NUInt, viewed),
                         index => new BoundIndex(span, array.Element, viewed, index),
-                        (from, to) => new BoundSlice(span, SliceOf(array.Element), viewed, from, to));
+                        (from, to) => new BoundSlice(span, SliceOf(array.Element, readOnly: false), viewed, from, to));
 
             case SliceTypeSymbol slice:
                 return (new BoundArrayLength(span, PrimitiveTypeSymbol.NUInt, viewed),
                         index => new BoundIndex(span, slice.Element, viewed, index),
-                        (from, to) => new BoundSlice(span, SliceOf(slice.Element), viewed, from, to));
+                        (from, to) => new BoundSlice(span, SliceOf(slice.Element, slice.IsReadOnly), viewed, from, to));
 
             case FixedArrayTypeSymbol inline:
                 return (Index(span, inline.Length),

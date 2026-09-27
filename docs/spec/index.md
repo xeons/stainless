@@ -95,7 +95,7 @@ Primitives, `struct`, `class`, pointers, `variant`, `union`, `Result`, `interfac
   - [2.11.1 `T[]` — a counted array](02-types.md#2111-t--a-counted-array)
   - [2.11.2 `T[N]` — an inline array](02-types.md#2112-tn--an-inline-array)
   - [2.11.3 `[a, ..b]` — collection expressions](02-types.md#2113-a-b--collection-expressions)
-- [2.12 `T[:]` — part of an array](02-types.md#212-t--part-of-an-array)
+- [2.12 `Span<T>` and `ReadOnlySpan<T>` — part of an array](02-types.md#212-spant-and-readonlyspant--part-of-an-array)
 - [2.13 `enum` — a distinct type over an integer](02-types.md#213-enum--a-distinct-type-over-an-integer)
 - [2.14 `delegate` — a named function pointer](02-types.md#214-delegate--a-named-function-pointer)
   - [2.14.1 `closure` — a method and the object it belongs to](02-types.md#2141-closure--a-method-and-the-object-it-belongs-to)

@@ -73,7 +73,7 @@ public sealed class AesGcm
     /// A GCM box under `key`, which must be 16, 24 or 32 bytes.
     ///
     /// @failure CryptoError.KeyLength  `key` is not 16, 24 or 32 bytes
-    public static Result<AesGcm, CryptoError> FromKey(byte[:] key)
+    public static Result<AesGcm, CryptoError> FromKey(ReadOnlySpan<byte> key)
     {
         var cipher = Aes.FromKey(key);
         if (!cipher.Ok)
@@ -95,8 +95,8 @@ public sealed class AesGcm
     /// @failure CryptoError.NonceLength  `nonce` is empty
     /// @failure CryptoError.TagLength    `tag` is not `TagSize` long
     /// @see AesGcm.Decrypt
-    public Result<byte[], CryptoError> Encrypt(byte[:] nonce, byte[:] plaintext,
-                                               byte[:] associatedData, byte[] tag)
+    public Result<byte[], CryptoError> Encrypt(ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> plaintext,
+                                               ReadOnlySpan<byte> associatedData, byte[] tag)
     {
         if (nonce.Length == 0u)
             return Fail(CryptoError.NonceLength);
@@ -132,8 +132,8 @@ public sealed class AesGcm
     /// @failure CryptoError.AuthenticationFailed  the tag does not match, and no plaintext is
     ///                                            returned
     /// @see AesGcm.Encrypt
-    public Result<byte[], CryptoError> Decrypt(byte[:] nonce, byte[:] ciphertext,
-                                               byte[:] associatedData, byte[:] tag)
+    public Result<byte[], CryptoError> Decrypt(ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> ciphertext,
+                                               ReadOnlySpan<byte> associatedData, ReadOnlySpan<byte> tag)
     {
         if (nonce.Length == 0u)
             return Fail(CryptoError.NonceLength);
@@ -160,7 +160,7 @@ public sealed class AesGcm
     /// J0: the nonce and a one when the nonce is twelve bytes, and GHASH of
     /// the nonce otherwise -- which is the standard's rule and the reason
     /// twelve is the length everything uses.
-    byte[] ComputeInitialCounter(byte[:] nonce)
+    byte[] ComputeInitialCounter(ReadOnlySpan<byte> nonce)
     {
         byte[] counter = new byte[16u];
 
@@ -182,7 +182,7 @@ public sealed class AesGcm
     /// GHASH over the associated data and the ciphertext, enciphered under the
     /// first counter block. That last step is what stops GHASH -- which is a
     /// keyed hash and not a MAC on its own -- from being invertible.
-    byte[] ComputeTag(byte[:] associatedData, byte[:] ciphertext, byte[] keystream)
+    byte[] ComputeTag(ReadOnlySpan<byte> associatedData, ReadOnlySpan<byte> ciphertext, byte[] keystream)
     {
         byte[] accumulator = new byte[16u];
         UpdateGhash(accumulator, associatedData);
@@ -206,7 +206,7 @@ public sealed class AesGcm
     }
 
     /// `data` folded into the accumulator, a block at a time and zero-padded.
-    void UpdateGhash(byte[] accumulator, byte[:] data)
+    void UpdateGhash(byte[] accumulator, ReadOnlySpan<byte> data)
     {
         byte[] block = new byte[16u];
 

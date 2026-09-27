@@ -30,7 +30,7 @@ class Loud
 
 /// The shape a tuple is for: two answers that belong together, and no struct
 /// declared for the sake of one function.
-(int, int) MinMax(int[:] numbers)
+(int, int) MinMax(Span<int> numbers)
 {
     int low = numbers[0u];
     int high = numbers[0u];

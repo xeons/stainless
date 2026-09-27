@@ -11,7 +11,7 @@ public class Trace
     ~Trace() { Console.WriteLine("~" + Name); }
 }
 
-int Sum(int[:] values)
+int Sum(Span<int> values)
 {
     int total = 0;
     for (nuint i = 0; i < values.Length; i = i + 1)
@@ -19,7 +19,7 @@ int Sum(int[:] values)
     return total;
 }
 
-int SumEach(int[:] values)
+int SumEach(Span<int> values)
 {
     int total = 0;
     foreach (int v in values)
@@ -28,7 +28,7 @@ int SumEach(int[:] values)
 }
 
 // A slice is a view, so writing through one writes the array it came from.
-void Fill(int[:] values, int with)
+void Fill(Span<int> values, int with)
 {
     for (nuint i = 0; i < values.Length; i = i + 1)
         values[i] = with;
@@ -43,7 +43,7 @@ String Show(int[] values)
 }
 
 // The array outlives the function that made it, because the slice holds it.
-Trace[:] Middle()
+Span<Trace> Middle()
 {
     var traces = new Trace[3];
     traces[0] = new Trace("a");
@@ -68,12 +68,12 @@ int Main()
     Console.WriteLine(Text.FromInteger(Sum(numbers[:])));
     Console.WriteLine(Text.FromInteger(SumEach(numbers[2:5])));
 
-    int[:] window = numbers[1:5];
+    Span<int> window = numbers[1:5];
     Console.WriteLine(Text.FromInteger((int)window.Length) + " " +
                       Text.FromInteger(window[0]));
 
     // Slicing a slice narrows it: the same array, further in.
-    int[:] narrower = window[1:3];
+    Span<int> narrower = window[1:3];
     Console.WriteLine(Text.FromInteger(narrower[0]) + " " +
                       Text.FromInteger((int)narrower.Length));
 
@@ -81,7 +81,7 @@ int Main()
     Console.WriteLine(Show(numbers));
 
     // Three words: the array, where it starts, and how far it runs.
-    Console.WriteLine("sizeof=" + Text.FromInteger((int)sizeof(int[:])));
+    Console.WriteLine("sizeof=" + Text.FromInteger((int)sizeof(Span<int>)));
 
     Console.WriteLine("--- sorting ---");
     var values = new int[6];
@@ -105,7 +105,7 @@ int Main()
     Console.WriteLine("--- lifetime ---");
     {
         // The array the slice came from is gone from the source, and alive.
-        Trace[:] kept = Middle();
+        Span<Trace> kept = Middle();
         Console.WriteLine(kept[0].Name);
         Console.WriteLine("leaving");
     }

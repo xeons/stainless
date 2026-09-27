@@ -99,7 +99,7 @@ Rijndael that had others, and no standard uses them.
 #### FromKey *method*
 
 ```
-static Result<Aes, CryptoError> FromKey(byte[:] key)
+static Result<Aes, CryptoError> FromKey(ReadOnlySpan<byte> key)
 ```
 
 A cipher under `key`, which must be 16, 24 or 32 bytes -- AES-128,
@@ -162,7 +162,7 @@ One block deciphered in place, at `offset` in `block`.
 #### EncryptEcb *method*
 
 ```
-Result<byte[], CryptoError> EncryptEcb(byte[:] plaintext, PaddingMode padding)
+Result<byte[], CryptoError> EncryptEcb(ReadOnlySpan<byte> plaintext, PaddingMode padding)
 ```
 
 Every block on its own. See `CipherMode.Ecb` for why this is almost
@@ -179,7 +179,7 @@ always the wrong answer.
 #### DecryptEcb *method*
 
 ```
-Result<byte[], CryptoError> DecryptEcb(byte[:] ciphertext, PaddingMode padding)
+Result<byte[], CryptoError> DecryptEcb(ReadOnlySpan<byte> ciphertext, PaddingMode padding)
 ```
 
 The inverse of `EncryptEcb`.
@@ -196,7 +196,7 @@ The inverse of `EncryptEcb`.
 #### EncryptCbc *method*
 
 ```
-Result<byte[], CryptoError> EncryptCbc(byte[:] plaintext, byte[:] iv, PaddingMode padding)
+Result<byte[], CryptoError> EncryptCbc(ReadOnlySpan<byte> plaintext, ReadOnlySpan<byte> iv, PaddingMode padding)
 ```
 
 Chained blocks. `iv` must be one block and must never be reused with
@@ -215,7 +215,7 @@ it is not secret -- send it alongside the ciphertext.
 #### DecryptCbc *method*
 
 ```
-Result<byte[], CryptoError> DecryptCbc(byte[:] ciphertext, byte[:] iv, PaddingMode padding)
+Result<byte[], CryptoError> DecryptCbc(ReadOnlySpan<byte> ciphertext, ReadOnlySpan<byte> iv, PaddingMode padding)
 ```
 
 The inverse of `EncryptCbc`.
@@ -237,7 +237,7 @@ is the whole reason to authenticate a ciphertext before decrypting it.
 #### EncryptCfb *method*
 
 ```
-Result<byte[], CryptoError> EncryptCfb(byte[:] plaintext, byte[:] iv)
+Result<byte[], CryptoError> EncryptCfb(ReadOnlySpan<byte> plaintext, ReadOnlySpan<byte> iv)
 ```
 
 Cipher feedback over whole blocks, which is .NET's `CipherMode.CFB`
@@ -254,7 +254,7 @@ with a feedback size of 128 bits. No padding: the mode is a stream.
 #### DecryptCfb *method*
 
 ```
-Result<byte[], CryptoError> DecryptCfb(byte[:] ciphertext, byte[:] iv)
+Result<byte[], CryptoError> DecryptCfb(ReadOnlySpan<byte> ciphertext, ReadOnlySpan<byte> iv)
 ```
 
 The inverse of `EncryptCfb`.
@@ -270,7 +270,7 @@ The inverse of `EncryptCfb`.
 #### ApplyCtr *method*
 
 ```
-Result<byte[], CryptoError> ApplyCtr(byte[:] data, byte[:] counter)
+Result<byte[], CryptoError> ApplyCtr(ReadOnlySpan<byte> data, ReadOnlySpan<byte> counter)
 ```
 
 Counter mode, which is its own inverse: the same call decrypts.
@@ -345,7 +345,7 @@ the nonce is used directly rather than hashed.
 #### FromKey *method*
 
 ```
-static Result<AesGcm, CryptoError> FromKey(byte[:] key)
+static Result<AesGcm, CryptoError> FromKey(ReadOnlySpan<byte> key)
 ```
 
 A GCM box under `key`, which must be 16, 24 or 32 bytes.
@@ -359,7 +359,7 @@ A GCM box under `key`, which must be 16, 24 or 32 bytes.
 #### Encrypt *method*
 
 ```
-Result<byte[], CryptoError> Encrypt(byte[:] nonce, byte[:] plaintext, byte[:] associatedData, byte[] tag)
+Result<byte[], CryptoError> Encrypt(ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> plaintext, ReadOnlySpan<byte> associatedData, byte[] tag)
 ```
 
 The ciphertext, with the tag written into `tag`.
@@ -387,7 +387,7 @@ secret. Pass an empty array when there is none.
 #### Decrypt *method*
 
 ```
-Result<byte[], CryptoError> Decrypt(byte[:] nonce, byte[:] ciphertext, byte[:] associatedData, byte[:] tag)
+Result<byte[], CryptoError> Decrypt(ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> ciphertext, ReadOnlySpan<byte> associatedData, ReadOnlySpan<byte> tag)
 ```
 
 The plaintext, or `AuthenticationFailed` and nothing.
@@ -597,7 +597,7 @@ The two operations on a secret that are easy to write wrongly.
 #### FixedTimeEquals *method*
 
 ```
-static bool FixedTimeEquals(byte[:] left, byte[:] right)
+static bool FixedTimeEquals(ReadOnlySpan<byte> left, ReadOnlySpan<byte> right)
 ```
 
 Whether two byte strings are equal, in time that does not depend on
@@ -680,7 +680,7 @@ nuint BlockSizeInBytes { get; }
 #### AppendData *method*
 
 ```
-void AppendData(byte[:] data)
+void AppendData(ReadOnlySpan<byte> data)
 ```
 
 *No documentation.*
@@ -710,7 +710,7 @@ void Reset()
 #### ComputeHash *method*
 
 ```
-byte[] ComputeHash(byte[:] data)
+byte[] ComputeHash(ReadOnlySpan<byte> data)
 ```
 
 The digest of `data` on its own. Resets first, so an object that has
@@ -737,7 +737,7 @@ into several keys that reveal nothing about each other.
 #### Extract *method*
 
 ```
-static byte[] Extract(IHashAlgorithm hash, byte[:] inputKey, byte[:] salt)
+static byte[] Extract(IHashAlgorithm hash, ReadOnlySpan<byte> inputKey, ReadOnlySpan<byte> salt)
 ```
 
 The extract step: a uniformly random key from input that is random but
@@ -756,7 +756,7 @@ not uniform. `salt` may be empty, and then a block of zeros is used.
 #### Expand *method*
 
 ```
-static Result<byte[], CryptoError> Expand(IHashAlgorithm hash, byte[:] pseudoKey, byte[:] info, nuint length)
+static Result<byte[], CryptoError> Expand(IHashAlgorithm hash, ReadOnlySpan<byte> pseudoKey, ReadOnlySpan<byte> info, nuint length)
 ```
 
 The expand step: as many bytes as asked for, bound to `info`.
@@ -783,7 +783,7 @@ makes this worth using over a bare hash.
 #### DeriveKey *method*
 
 ```
-static Result<byte[], CryptoError> DeriveKey(IHashAlgorithm hash, byte[:] inputKey, byte[:] salt, byte[:] info, nuint length)
+static Result<byte[], CryptoError> DeriveKey(IHashAlgorithm hash, ReadOnlySpan<byte> inputKey, ReadOnlySpan<byte> salt, ReadOnlySpan<byte> info, nuint length)
 ```
 
 Extract and expand together, which is how HKDF is nearly always used.
@@ -856,7 +856,7 @@ nuint BlockSizeInBytes { get; }
 #### AppendData *method*
 
 ```
-void AppendData(byte[:] data)
+void AppendData(ReadOnlySpan<byte> data)
 ```
 
 *No documentation.*
@@ -886,7 +886,7 @@ void Reset()
 #### ComputeHash *method*
 
 ```
-byte[] ComputeHash(byte[:] data)
+byte[] ComputeHash(ReadOnlySpan<byte> data)
 ```
 
 The MAC of `data` under `key`, with no object to keep.
@@ -908,7 +908,7 @@ because a collision an attacker cannot compute without the key is no use.
 #### Create *method*
 
 ```
-static Hmac Create(byte[:] key)
+static Hmac Create(ReadOnlySpan<byte> key)
 ```
 
 A keyed hash to append to.
@@ -918,7 +918,7 @@ A keyed hash to append to.
 #### HashData *method*
 
 ```
-static byte[] HashData(byte[:] key, byte[:] data)
+static byte[] HashData(ReadOnlySpan<byte> key, ReadOnlySpan<byte> data)
 ```
 
 The MAC of `data` under `key`.
@@ -938,7 +938,7 @@ HMAC-SHA-1, as .NET spells `HMACSHA1`.
 #### Create *method*
 
 ```
-static Hmac Create(byte[:] key)
+static Hmac Create(ReadOnlySpan<byte> key)
 ```
 
 A keyed hash to append to.
@@ -948,7 +948,7 @@ A keyed hash to append to.
 #### HashData *method*
 
 ```
-static byte[] HashData(byte[:] key, byte[:] data)
+static byte[] HashData(ReadOnlySpan<byte> key, ReadOnlySpan<byte> data)
 ```
 
 The MAC of `data` under `key`.
@@ -968,7 +968,7 @@ HMAC-SHA-256, as .NET spells `HMACSHA256`. The default for anything new.
 #### Create *method*
 
 ```
-static Hmac Create(byte[:] key)
+static Hmac Create(ReadOnlySpan<byte> key)
 ```
 
 A keyed hash to append to.
@@ -978,7 +978,7 @@ A keyed hash to append to.
 #### HashData *method*
 
 ```
-static byte[] HashData(byte[:] key, byte[:] data)
+static byte[] HashData(ReadOnlySpan<byte> key, ReadOnlySpan<byte> data)
 ```
 
 The MAC of `data` under `key`.
@@ -998,7 +998,7 @@ HMAC-SHA-384, as .NET spells `HMACSHA384`.
 #### Create *method*
 
 ```
-static Hmac Create(byte[:] key)
+static Hmac Create(ReadOnlySpan<byte> key)
 ```
 
 A keyed hash to append to.
@@ -1008,7 +1008,7 @@ A keyed hash to append to.
 #### HashData *method*
 
 ```
-static byte[] HashData(byte[:] key, byte[:] data)
+static byte[] HashData(ReadOnlySpan<byte> key, ReadOnlySpan<byte> data)
 ```
 
 The MAC of `data` under `key`.
@@ -1028,7 +1028,7 @@ HMAC-SHA-512, as .NET spells `HMACSHA512`.
 #### Create *method*
 
 ```
-static Hmac Create(byte[:] key)
+static Hmac Create(ReadOnlySpan<byte> key)
 ```
 
 A keyed hash to append to.
@@ -1038,7 +1038,7 @@ A keyed hash to append to.
 #### HashData *method*
 
 ```
-static byte[] HashData(byte[:] key, byte[:] data)
+static byte[] HashData(ReadOnlySpan<byte> key, ReadOnlySpan<byte> data)
 ```
 
 The MAC of `data` under `key`.
@@ -1101,7 +1101,7 @@ which is why it is on the interface rather than inside.
 #### AppendData *method*
 
 ```
-void AppendData(byte[:] data)
+void AppendData(ReadOnlySpan<byte> data)
 ```
 
 Adds bytes to what is being hashed.
@@ -1174,7 +1174,7 @@ nuint HashSizeInBytes { get; }
 #### HashData *method*
 
 ```
-static byte[] HashData(byte[:] data)
+static byte[] HashData(ReadOnlySpan<byte> data)
 ```
 
 The digest of `data`, with no object to keep.
@@ -1319,7 +1319,7 @@ specifies it, and understand what it does not buy.
 #### Pbkdf2 *method*
 
 ```
-static Result<byte[], CryptoError> Pbkdf2(byte[:] password, byte[:] salt, nuint iterations, IHashAlgorithm hash, nuint length)
+static Result<byte[], CryptoError> Pbkdf2(ReadOnlySpan<byte> password, ReadOnlySpan<byte> salt, nuint iterations, IHashAlgorithm hash, nuint length)
 ```
 
 `length` bytes derived from `password` and `salt`.
@@ -1382,7 +1382,7 @@ nuint HashSizeInBytes { get; }
 #### HashData *method*
 
 ```
-static byte[] HashData(byte[:] data)
+static byte[] HashData(ReadOnlySpan<byte> data)
 ```
 
 The digest of `data`, with no object to keep.
@@ -1422,7 +1422,7 @@ nuint HashSizeInBytes { get; }
 #### HashData *method*
 
 ```
-static byte[] HashData(byte[:] data)
+static byte[] HashData(ReadOnlySpan<byte> data)
 ```
 
 The digest of `data`, with no object to keep.
@@ -1481,7 +1481,7 @@ nuint HashSizeInBytes { get; }
 #### HashData *method*
 
 ```
-static byte[] HashData(byte[:] data)
+static byte[] HashData(ReadOnlySpan<byte> data)
 ```
 
 The digest of `data`, with no object to keep.
@@ -1522,7 +1522,7 @@ nuint HashSizeInBytes { get; }
 #### HashData *method*
 
 ```
-static byte[] HashData(byte[:] data)
+static byte[] HashData(ReadOnlySpan<byte> data)
 ```
 
 The digest of `data`, with no object to keep.

@@ -12,7 +12,7 @@ public int Total(params int[] values)
     return total;
 }
 
-public String Joined(String separator, params String[:] parts)
+public String Joined(String separator, params Span<String> parts)
 {
     var joined = "";
     for (nuint i = 0; i < parts.Length; i++)

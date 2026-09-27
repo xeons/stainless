@@ -483,7 +483,7 @@ public class ParserTests
 
     [Theory]
     [InlineData("int F(params int[] values)", true)]
-    [InlineData("int F(params int[:] values)", true)]
+    [InlineData("int F(params Span<int> values)", true)]
     [InlineData("int F(ref params int[] values)", true)]
     [InlineData("int F(params values)", false)]
     [InlineData("int F(params values, int b)", false)]

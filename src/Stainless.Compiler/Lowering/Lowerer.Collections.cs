@@ -148,7 +148,7 @@ public sealed partial class Lowerer
     }
 
     /// <summary>
-    /// The array a <c>params</c> parameter is given; for a <c>T[:]</c>, viewed
+    /// The array a <c>params</c> parameter is given; for a <c>Span&lt;T&gt;</c>, viewed
     /// as the slice, and checked on the way out of the statement for a
     /// reference anything kept where it lives in the frame.
     /// </summary>

@@ -126,7 +126,7 @@ public sealed partial class Binder(
 
     /// <summary>Every array type asked for, by element; each needs a TypeInfo.</summary>
     private readonly Dictionary<TypeSymbol, ArrayTypeSymbol> _arrays = [];
-    private readonly Dictionary<TypeSymbol, SliceTypeSymbol> _slices = [];
+    private readonly Dictionary<(TypeSymbol Element, bool IsReadOnly), SliceTypeSymbol> _slices = [];
 
     /// <summary>Tuple types, by their element types.</summary>
     private readonly Dictionary<TypeList, TupleTypeSymbol> _tuples = [];
@@ -246,7 +246,7 @@ public sealed partial class Binder(
         {
             var loader = new MetadataLoader(
                 diagnostics, _builtins,
-                element => SliceOf(element),
+                (element, readOnly) => SliceOf(element, readOnly),
                 elements => TupleOf(elements));
             loader.RegisterIntrinsics(_modules.Values);
             loader.Load(references, _modules);
@@ -304,6 +304,7 @@ public sealed partial class Binder(
         // Last, because both halves of the question need every body bound: a
         // member may be captured in one file and written in another.
         ReportCapturedMembersThatChange();
+        ReportReadOnlyReceiversWritten();
 
         SealLocalFunctions();
 

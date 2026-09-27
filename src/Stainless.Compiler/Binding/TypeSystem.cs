@@ -1080,20 +1080,6 @@ public sealed class UnionTypeSymbol : StructTypeSymbol
 }
 
 /// <summary>
-/// <c>T[:]</c>: part of an array, as a value.
-///
-/// Three words -- the array, where in it this starts, and how many elements it
-/// runs for -- and it is a struct, in the type system as at runtime. So it
-/// copies, is passed, is returned and is laid out by everything that already
-/// knew how to do those to a struct, and it holds the array the way any struct
-/// field holds a reference: retained on a copy, released on a drop. A slice
-/// cannot dangle, because what it points into is alive for as long as it is.
-///
-/// What that costs is a reference count per copy, and being a value C cannot be
-/// handed. What it buys is that there are no lifetimes to explain: a slice is
-/// safe by the same rule everything else here is safe by.
-/// </summary>
-/// <summary>
 /// <c>(int, String)</c> — several values travelling as one.
 ///
 /// A struct, so layout, both ABI classifiers and the reference walk that
@@ -1124,16 +1110,36 @@ public sealed class TupleTypeSymbol : StructTypeSymbol
     public override bool StandsForAnError => Elements.Any(e => e.StandsForAnError);
 }
 
+/// <summary>
+/// <c>Span&lt;T&gt;</c>: part of an array, as a value. <c>ReadOnlySpan&lt;T&gt;</c>
+/// is laid out alike and refuses a write through it.
+///
+/// Three words -- the array, where in it this starts, and how many elements it
+/// runs for -- and it is a struct, in the type system as at runtime. So it
+/// copies, is passed, is returned and is laid out by everything that already
+/// knew how to do those to a struct, and it holds the array the way any struct
+/// field holds a reference: retained on a copy, released on a drop. A slice
+/// cannot dangle, because what it points into is alive for as long as it is.
+///
+/// What that costs is a reference count per copy, and being a value C cannot be
+/// handed. What it buys is that there are no lifetimes to explain: a slice is
+/// safe by the same rule everything else here is safe by.
+/// </summary>
 public sealed class SliceTypeSymbol : StructTypeSymbol
 {
     public required TypeSymbol Element { get; init; }
+
+    public required bool IsReadOnly { get; init; }
+
+    /// <summary>What the source calls it: <c>Span</c> or <c>ReadOnlySpan</c>.</summary>
+    public string Spelling => IsReadOnly ? "ReadOnlySpan" : "Span";
 
     /// <summary>The three fields, which the source cannot name.</summary>
     public const string ArrayFieldName = "$array";
     public const string OffsetFieldName = "$offset";
     public const string LengthFieldName = "$length";
 
-    public override string Name => Element.Name + "[:]";
+    public override string Name => $"{Spelling}<{Element.Name}>";
     public override bool StandsForAnError => Element.StandsForAnError;
 }
 

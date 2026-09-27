@@ -13,9 +13,9 @@ import Standard.Collections;
 /// Counts, and slices by start and length, as C# asks of a type.
 class Word
 {
-    String[:] _letters;
+    Span<String> _letters;
 
-    public Word(String[:] letters)
+    public Word(Span<String> letters)
     {
         _letters = letters;
     }
@@ -35,7 +35,7 @@ class Word
     }
 }
 
-String Joined(int[:] numbers)
+String Joined(Span<int> numbers)
 {
     var text = "";
     foreach (var n in numbers)
@@ -69,7 +69,7 @@ public void Main()
     Console.WriteLine(Joined(numbers[2:^2]));
 
     // A view: writing through it writes the array.
-    int[:] middle = numbers[1..^1];
+    Span<int> middle = numbers[1..^1];
     middle[0] = 20;
     middle[^1] = 50;
     Console.WriteLine(Joined(numbers));

@@ -45,7 +45,7 @@ public sealed class Hmac : IHashAlgorithm
 
     /// `hash` is used for both passes and is left reset. It belongs to this
     /// object afterwards: appending to it from outside would corrupt the MAC.
-    public Hmac(IHashAlgorithm hash, byte[:] key)
+    public Hmac(IHashAlgorithm hash, ReadOnlySpan<byte> key)
     {
         _inner = hash;
         _name = "HMAC-" + hash.Name;
@@ -85,7 +85,7 @@ public sealed class Hmac : IHashAlgorithm
 
     public nuint BlockSizeInBytes => _inner.BlockSizeInBytes;
 
-    public void AppendData(byte[:] data) => _inner.AppendData(data);
+    public void AppendData(ReadOnlySpan<byte> data) => _inner.AppendData(data);
 
     public byte[] GetHashAndReset()
     {
@@ -104,7 +104,7 @@ public sealed class Hmac : IHashAlgorithm
     }
 
     /// The MAC of `data` under `key`, with no object to keep.
-    public byte[] ComputeHash(byte[:] data)
+    public byte[] ComputeHash(ReadOnlySpan<byte> data)
     {
         Reset();
         AppendData(data);

@@ -6,6 +6,6 @@ module Bad;
 int Main()
 {
     int n = 1;
-    byte[:] bytes = $"n = {n}"u8;
+    ReadOnlySpan<byte> bytes = $"n = {n}"u8;
     return (int)bytes.Length;
 }

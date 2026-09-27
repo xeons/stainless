@@ -584,7 +584,8 @@ can answer rather than one added for safety — see §2.7 of the language spec.
 
 ### 2.5 Slice layout
 
-A `T[:]` is three words, and a struct like any other:
+A `Span<T>` or a `ReadOnlySpan<T>` is three words, and a struct like any other;
+the two are laid out alike:
 
 ```
   offset 0    array     T[], the object the elements live in

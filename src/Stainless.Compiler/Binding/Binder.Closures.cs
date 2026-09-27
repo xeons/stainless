@@ -547,7 +547,7 @@ public sealed partial class Binder
     ///
     /// This exists for one case, and it is the case that makes `Select` writable:
     /// a type parameter that appears nowhere but in the result of a lambda.
-    /// `Select&lt;T, R&gt;(T[:], IFunc&lt;T, R&gt;)` can work out T from the array, and then
+    /// `Select&lt;T, R&gt;(Span&lt;T&gt;, IFunc&lt;T, R&gt;)` can work out T from the array, and then
     /// nothing else mentions R -- so R has to come from the body, and the body
     /// cannot be bound until T has given it its parameter types. That ordering
     /// is the whole of the trick.

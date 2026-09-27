@@ -26,7 +26,7 @@ public int Main()
     list.Add(p);
 
     (Point, int) pair = (p, 2);
-    Point[:] slice = new Point[1];
+    Span<Point> slice = new Point[1];
     slice[0] = p;
     var measure = (Point q) => q.X + 2;
     Func<Point, String> fn = q => q.Name;

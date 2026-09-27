@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: 0BSD
 //
 // `params`: a call may give the last parameter's elements one by one. A
-// `T[]` is gathered into a new array; a `T[:]` into an array in the caller's
+// `T[]` is gathered into a new array; a `Span<T>` into an array in the caller's
 // frame, which costs no allocation.
 module Params;
 
@@ -16,7 +16,7 @@ int Sum(params int[] values)
     return total;
 }
 
-int SumSlice(params int[:] values)
+int SumSlice(params Span<int> values)
 {
     int total = 0;
     foreach (int value in values)
@@ -24,7 +24,7 @@ int SumSlice(params int[:] values)
     return total;
 }
 
-String Join(String separator, params String[:] parts)
+String Join(String separator, params Span<String> parts)
 {
     var joined = "";
     for (nuint i = 0; i < parts.Length; i++)
@@ -41,7 +41,7 @@ String Which(int value) => "one int";
 String Which(params int[] values) => "params of " + Text.FromInteger((long)values.Length);
 
 T First<T>(params T[] items) => items[0];
-nuint Count<T>(params T[:] items) => items.Length;
+nuint Count<T>(params Span<T> items) => items.Length;
 
 String Labelled(String label = "none", params int[] values) =>
     label + ":" + Text.FromInteger(Sum(values));
@@ -52,7 +52,7 @@ int Note(int value)
     return value;
 }
 
-String Ordered(int a, int b, params int[:] rest) =>
+String Ordered(int a, int b, params Span<int> rest) =>
     Text.FromInteger(a) + "," + Text.FromInteger(b) + "+" + Text.FromInteger((long)rest.Length);
 
 public struct Named
@@ -69,7 +69,7 @@ Named Make(String name, int rank)
     return made;
 }
 
-String Describe(params Named[:] all)
+String Describe(params Span<Named> all)
 {
     var text = "";
     foreach (Named one in all)
@@ -89,7 +89,7 @@ class Bag
 
     public int Total => _total;
 
-    public void Add(params int[:] values)
+    public void Add(params Span<int> values)
     {
         foreach (int value in values)
             _total += value;
@@ -98,12 +98,12 @@ class Bag
 
 // What the callee hands back lives as long as the statement, which is as
 // long as the frame's array does.
-int[:] Echo(params int[:] values) => values;
+Span<int> Echo(params Span<int> values) => values;
 
-nuint Lengths(params int[:][:] parts)
+nuint Lengths(params Span<Span<int>> parts)
 {
     nuint total = 0;
-    foreach (int[:] part in parts)
+    foreach (Span<int> part in parts)
         total += part.Length;
     return total;
 }

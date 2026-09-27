@@ -190,7 +190,7 @@ const nuint SmallRun = 16u;
 /// @typeparam T  the element type, which must order itself
 /// @see Collections.BinarySearch
 /// @seealso Collections.FindLowerBound
-public void Sort<T>(T[:] items) where T : IComparable<T>
+public void Sort<T>(Span<T> items) where T : IComparable<T>
 {
     if (items.Length < 2u)
         return;
@@ -219,7 +219,7 @@ public void Sort<T>(T[:] items) where T : IComparable<T>
 }
 
 /// Orders `[start, stop)` by insertion, which is what a short run wants.
-void SortRunByInsertion<T>(T[:] items, nuint start, nuint stop) where T : IComparable<T>
+void SortRunByInsertion<T>(Span<T> items, nuint start, nuint stop) where T : IComparable<T>
 {
     for (nuint i = start + 1u; i < stop; i++)
     {
@@ -241,7 +241,7 @@ void SortRunByInsertion<T>(T[:] items, nuint start, nuint stop) where T : ICompa
 /// `>` rather than `>=` when choosing the right half is what makes this
 /// stable: on a tie the left element goes first, and the left element is the
 /// one that was there first.
-void MergeRuns<T>(T[:] items, T[:] scratch, nuint low, nuint middle, nuint high)
+void MergeRuns<T>(Span<T> items, Span<T> scratch, nuint low, nuint middle, nuint high)
         where T : IComparable<T>
 {
     nuint left = low;
@@ -275,7 +275,7 @@ void MergeRuns<T>(T[:] items, T[:] scratch, nuint low, nuint middle, nuint high)
 /// @typeparam T  the element type; the comparer orders it, so nothing is asked
 ///               of it
 /// @see Collections.OrderBy
-public void Sort<T>(T[:] items, Comparison<T> order)
+public void Sort<T>(Span<T> items, Comparison<T> order)
 {
     if (items.Length < 2u)
         return;
@@ -303,7 +303,7 @@ public void Sort<T>(T[:] items, Comparison<T> order)
     }
 }
 
-void SortRunByInsertion<T>(T[:] items, nuint start, nuint stop, Comparison<T> order)
+void SortRunByInsertion<T>(Span<T> items, nuint start, nuint stop, Comparison<T> order)
 {
     for (nuint i = start + 1u; i < stop; i++)
     {
@@ -320,7 +320,7 @@ void SortRunByInsertion<T>(T[:] items, nuint start, nuint stop, Comparison<T> or
     }
 }
 
-void MergeRuns<T>(T[:] items, T[:] scratch, nuint low, nuint middle, nuint high,
+void MergeRuns<T>(Span<T> items, Span<T> scratch, nuint low, nuint middle, nuint high,
                 Comparison<T> order)
 {
     nuint left = low;
@@ -354,7 +354,7 @@ void MergeRuns<T>(T[:] items, T[:] scratch, nuint low, nuint middle, nuint high,
 /// @typeparam T  the element type, which must order itself
 /// @see Collections.FindLowerBound
 /// @seealso Collections.Sort
-public nuint BinarySearch<T>(T[:] items, T wanted) where T : IComparable<T>
+public nuint BinarySearch<T>(ReadOnlySpan<T> items, T wanted) where T : IComparable<T>
 {
     nuint low = 0u;
     nuint high = items.Length;
@@ -385,7 +385,7 @@ public nuint BinarySearch<T>(T[:] items, T wanted) where T : IComparable<T>
 ///
 /// @typeparam T  the element type, which must order itself
 /// @see Collections.BinarySearch
-public nuint FindLowerBound<T>(T[:] items, T wanted) where T : IComparable<T>
+public nuint FindLowerBound<T>(ReadOnlySpan<T> items, T wanted) where T : IComparable<T>
 {
     nuint low = 0u;
     nuint high = items.Length;
@@ -410,7 +410,7 @@ public nuint FindLowerBound<T>(T[:] items, T wanted) where T : IComparable<T>
 ///
 /// @typeparam T  the element type; nothing is asked of it
 /// @see List.Reverse
-public void Reverse<T>(T[:] items)
+public void Reverse<T>(Span<T> items)
 {
     if (items.Length < 2)
         return;

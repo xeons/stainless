@@ -265,7 +265,9 @@ public sealed partial class Binder
             return new BoundErrorExpression(span);
         }
 
-        return new BoundSlice(span, SliceOf(element), target, from, to)
+        // Narrowing a read-only slice cannot make its elements writable.
+        bool readOnly = target.Type is SliceTypeSymbol { IsReadOnly: true };
+        return new BoundSlice(span, SliceOf(element, readOnly), target, from, to)
         {
             StartOrigin = fromOrigin,
             EndOrigin = toOrigin,

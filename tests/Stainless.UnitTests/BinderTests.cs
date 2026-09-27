@@ -75,7 +75,7 @@ public class BinderTests
     [InlineData("int F(int a) => 1;\nint F(params int[] a) => 2;\nint G() => F(1);")]
     [InlineData("int F(int[] a) => 1;\nint F(params int[][] a) => 2;\nint G(int[] x) => F(x);")]
     [InlineData("int F(params int[] a) => 1;\nint F(params long[] a) => 2;\nint G() => F(1, 2);")]
-    [InlineData("int F(params int[:] a) => 1;\nint G() => F();")]
+    [InlineData("int F(params Span<int> a) => 1;\nint G() => F();")]
     [InlineData("int F(int a, params int[] b) => 1;\nint G() => F(b: [1], a: 2);")]
     public void AParamsCallResolvesWithoutAmbiguity(string module) =>
         Assert.Empty(Front.ModuleCodes(module));
@@ -87,6 +87,19 @@ public class BinderTests
     [InlineData("public delegate int D(params int[] a);")]
     public void AMisplacedParamsIsRefused(string module) =>
         Assert.Contains("SL0763", Front.ModuleCodes(module));
+
+    /// <summary>
+    /// Storage that may not be written may not be lent by 'ref' or 'out'
+    /// either, through a field of it as much as whole.
+    /// </summary>
+    [Theory]
+    [InlineData("void Bump(ref double d) { }\nvoid F(in P p) => Bump(ref p.X);")]
+    [InlineData("void Fill(out double d) { d = 0.0; }\nvoid F(in P p) => Fill(out p.X);")]
+    [InlineData("static readonly P s_p = new P(1.0);\nvoid Bump(ref double d) { }\nvoid F() => Bump(ref s_p.X);")]
+    [InlineData("void Bump(ref double d) { }\nvoid F(ReadOnlySpan<P> ps) => Bump(ref ps[0].X);")]
+    public void AReadOnlyPlaceIsNotLentThroughAField(string module) =>
+        Assert.Equal(["SL0444"], Front.ModuleCodes(
+            "public struct P { public double X; public P(double x) { X = x; } }\n" + module));
 
     // ------------------------------------------------------ where it points
 

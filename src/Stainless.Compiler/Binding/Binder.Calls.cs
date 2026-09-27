@@ -405,6 +405,7 @@ public sealed partial class Binder
         }
 
         ForgetWrittenThrough(target);
+        NoteWriteTo(target);
 
         return new BoundAddressOf(
             reference.Span, target.Type.MakePointerType(), target)
@@ -569,6 +570,7 @@ public sealed partial class Binder
         }
 
         ForgetWrittenThrough(target);
+        NoteWriteTo(target);
 
         return new BoundAddressOf(syntax.Span, target.Type.MakePointerType(), target)
         {
@@ -617,8 +619,10 @@ public sealed partial class Binder
     };
 
     /// <summary>Why this storage may not be written, or null when it may.</summary>
-    private static string? IsReadOnlyTarget(BoundExpression expression) => expression switch
+    private static string? IsReadOnlyTarget(BoundExpression expression) => BaseOf(expression) switch
     {
+        BoundIndex { Target.Type: SliceTypeSymbol { IsReadOnly: true } slice } =>
+            $"it is an element of a '{slice.Name}', which only reads",
         BoundLocalAccess { Local.IsConst: true } local =>
             $"'{local.Local.Name}' is a 'const'",
         BoundParameterAccess { Parameter.Mode: ParameterMode.In } parameter =>

@@ -665,10 +665,10 @@ public sealed partial class Binder
             new BoundLiteral(syntax.Span, PrimitiveTypeSymbol.Bool, syntax.Value),
         TokenKind.StringLiteral => new BoundStringLiteral(
             syntax.Span, _builtins.String, (string)syntax.Value!),
-        // `"..."u8` is a view of bytes that exist for the whole program, so
-        // its type is the view, as C#'s is a ReadOnlySpan<byte>.
+        // `"..."u8` is a view of bytes in read-only storage that exist for the
+        // whole program, so its type is a view that refuses a write.
         TokenKind.Utf8StringLiteral => new BoundConversion(
-            syntax.Span, SliceOf(PrimitiveTypeSymbol.Byte),
+            syntax.Span, SliceOf(PrimitiveTypeSymbol.Byte, readOnly: true),
             new BoundUtf8Literal(syntax.Span, ArrayOf(PrimitiveTypeSymbol.Byte), (string)syntax.Value!),
             ConversionKind.ArrayToSlice),
         TokenKind.NullKeyword => new BoundNullLiteral(syntax.Span, NullType.Instance),
@@ -1175,6 +1175,9 @@ public sealed partial class Binder
                 diagnostics.Error("SL0230", syntax.Span, "cannot take the address of a temporary value");
                 return new BoundErrorExpression(syntax.Span);
             }
+
+            // What a pointer is used for is not followed, so taking one is a write.
+            NoteWriteTo(target);
             return new BoundAddressOf(syntax.Span, target.Type.MakePointerType(), target);
         }
 
@@ -2277,6 +2280,8 @@ public sealed partial class Binder
     /// </summary>
     private bool Writable(BoundExpression target, SourceSpan span, string written)
     {
+        if (RefusedThroughReadOnlySlice(target, span)) return false;
+
         if (BaseOf(target) is BoundStaticAccess { Static.IsReadonly: true } owner)
         {
             diagnostics.Error("SL0379", span,
@@ -2325,6 +2330,7 @@ public sealed partial class Binder
             return false;
         }
 
+        NoteWriteTo(target);
         return true;
     }
 
@@ -2824,6 +2830,10 @@ public sealed partial class Binder
             return false;
         }
 
+        if (property.ContainingType is StructTypeSymbol && receiver is not null &&
+            RefusedThroughReadOnlySlice(receiver, span))
+            return false;
+
         // A struct's setter writes the receiver's own storage, so writing one
         // through a `static readonly` writes the static. A class's setter writes
         // the object rather than the static, and a readonly static may hold an
@@ -2847,6 +2857,20 @@ public sealed partial class Binder
                 "struct, so the write would be discarded; assign to a variable first",
                 property.ContainingType);
             return false;
+        }
+
+        if (property.ContainingType is StructTypeSymbol && receiver is not null)
+        {
+            if (IsReadOnlyTarget(receiver) is { } why)
+            {
+                diagnostics.Error("SL0809", span,
+                    $"setting '{property.ContainingType.Name}.{property.Name}' writes the struct " +
+                    $"it is set on, and {why}",
+                    property.ContainingType);
+                return false;
+            }
+
+            NoteWriteTo(receiver);
         }
 
         return true;

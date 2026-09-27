@@ -513,7 +513,7 @@ Doing it properly needs constraints on operators too.
 
 ### A borrowed slice
 
-`T[:]` retains the array it came from, which is what makes it impossible to
+`Span<T>` retains the array it came from, which is what makes it impossible to
 dangle and also what makes it cost a reference count per copy and keep a large
 array alive for a small view. A raw `(pointer, length)` view would do neither
 and needs a lifetime story the language does not have.

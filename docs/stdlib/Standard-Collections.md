@@ -2330,7 +2330,7 @@ The item the last `MoveNext` landed on.
 ### Aggregate *function*
 
 ```
-TAccumulate Aggregate<T, TAccumulate>(T[:] items, TAccumulate seed, Fold<TAccumulate, T> combine)
+TAccumulate Aggregate<T, TAccumulate>(ReadOnlySpan<T> items, TAccumulate seed, Fold<TAccumulate, T> combine)
 ```
 
 Everything folded into one value, left to right. The seed decides the
@@ -2363,7 +2363,7 @@ Everything folded into one value, left to right, over any sequence.
 ### All *function*
 
 ```
-bool All<T>(T[:] items, Predicate<T> test)
+bool All<T>(ReadOnlySpan<T> items, Predicate<T> test)
 ```
 
 Whether every element does. Stops at the first that does not, and is true
@@ -2397,7 +2397,7 @@ does not, and is true of an empty sequence.
 ### Any *function*
 
 ```
-bool Any<T>(T[:] items, Predicate<T> test)
+bool Any<T>(ReadOnlySpan<T> items, Predicate<T> test)
 ```
 
 Whether any element satisfies the predicate. Stops at the first that does.
@@ -2430,7 +2430,7 @@ the first that does, so the rest of the sequence is never walked.
 ### BinarySearch *function*
 
 ```
-nuint BinarySearch<T>(T[:] items, T wanted)
+nuint BinarySearch<T>(ReadOnlySpan<T> items, T wanted)
     where T : IComparable<T>
 ```
 
@@ -2470,7 +2470,7 @@ free function here for the reason `IndexOf` is.
 ### Count *function*
 
 ```
-nuint Count<T>(T[:] items, Predicate<T> test)
+nuint Count<T>(ReadOnlySpan<T> items, Predicate<T> test)
 ```
 
 How many satisfy the predicate.
@@ -2502,7 +2502,7 @@ How many satisfy the predicate, over any sequence. Walks all of it.
 ### Distinct *function*
 
 ```
-List<T> Distinct<T>(T[:] items)
+List<T> Distinct<T>(ReadOnlySpan<T> items)
     where T : IEquatable<T>
 ```
 
@@ -2541,7 +2541,7 @@ O(n squared) in comparisons, as the slice overload is.
 ### Find *function*
 
 ```
-Optional<T> Find<T>(T[:] items, Predicate<T> test)
+Optional<T> Find<T>(ReadOnlySpan<T> items, Predicate<T> test)
 ```
 
 The first element satisfying the predicate, if there is one.
@@ -2563,7 +2563,7 @@ treat a real answer as a miss.
 ### FindIndex *function*
 
 ```
-Optional<nuint> FindIndex<T>(T[:] items, Predicate<T> test)
+Optional<nuint> FindIndex<T>(ReadOnlySpan<T> items, Predicate<T> test)
 ```
 
 Where the first element satisfying the predicate is, if it is there.
@@ -2579,7 +2579,7 @@ Where the first element satisfying the predicate is, if it is there.
 ### FindLowerBound *function*
 
 ```
-nuint FindLowerBound<T>(T[:] items, T wanted)
+nuint FindLowerBound<T>(ReadOnlySpan<T> items, T wanted)
     where T : IComparable<T>
 ```
 
@@ -2598,7 +2598,7 @@ equal element when there is one.
 ### FirstOrDefault *function*
 
 ```
-T FirstOrDefault<T>(T[:] items, Predicate<T> test, T fallback)
+T FirstOrDefault<T>(ReadOnlySpan<T> items, Predicate<T> test, T fallback)
 ```
 
 The first element satisfying the predicate, or `fallback` if none does.
@@ -2637,7 +2637,7 @@ slice rather than a sequence.
 ### ForEach *function*
 
 ```
-void ForEach<T>(T[:] items, Action<T> body)
+void ForEach<T>(ReadOnlySpan<T> items, Action<T> body)
 ```
 
 Runs the action over every element.
@@ -2744,7 +2744,7 @@ The smallest item, by its own ordering. The list must not be empty.
 ### OrderBy *function*
 
 ```
-List<T> OrderBy<T>(T[:] items, Comparison<T> order)
+List<T> OrderBy<T>(ReadOnlySpan<T> items, Comparison<T> order)
 ```
 
 The elements ordered by what `order` says, leaving the input alone.
@@ -2827,7 +2827,7 @@ Walked from the end, so an index already passed cannot move.
 ### Reverse *function*
 
 ```
-void Reverse<T>(T[:] items)
+void Reverse<T>(Span<T> items)
 ```
 
 Reverses part of an array in place.
@@ -2843,7 +2843,7 @@ Reverses part of an array in place.
 ### Select *function*
 
 ```
-List<TResult> Select<T, TResult>(T[:] items, Func<T, TResult> transform)
+List<TResult> Select<T, TResult>(ReadOnlySpan<T> items, Func<T, TResult> transform)
 ```
 
 Every element put through the transform.
@@ -2883,7 +2883,7 @@ Every element put through the transform, over any sequence.
 ### Skip *function*
 
 ```
-List<T> Skip<T>(T[:] items, nuint count)
+List<T> Skip<T>(ReadOnlySpan<T> items, nuint count)
 ```
 
 Everything after the first `count` elements, or nothing if there are fewer.
@@ -2915,7 +2915,7 @@ Everything after the first `count`.
 ### Sort *function*
 
 ```
-void Sort<T>(T[:] items)
+void Sort<T>(Span<T> items)
     where T : IComparable<T>
 ```
 
@@ -2943,7 +2943,7 @@ would avoid it and would not be stable.
 ### Sort *function*
 
 ```
-void Sort<T>(T[:] items, Comparison<T> order)
+void Sort<T>(Span<T> items, Comparison<T> order)
 ```
 
 The same, ordered by a comparer rather than by the type itself.
@@ -2998,7 +2998,7 @@ The same, ordered by a comparer.
 ### Take *function*
 
 ```
-List<T> Take<T>(T[:] items, nuint count)
+List<T> Take<T>(ReadOnlySpan<T> items, nuint count)
 ```
 
 The first `count` elements, or all of them if there are fewer.
@@ -3050,7 +3050,7 @@ hands over. That is why `ToList` takes only the sequence too.
 ### ToArray *function*
 
 ```
-T[] ToArray<T>(T[:] items)
+T[] ToArray<T>(ReadOnlySpan<T> items)
 ```
 
 The same for a slice, which is not an `IEnumerable` and so does not collide.
@@ -3083,7 +3083,7 @@ Everything in the sequence, as a list. The one that makes a `Queue` or a
 ### ToList *function*
 
 ```
-List<T> ToList<T>(T[:] items)
+List<T> ToList<T>(ReadOnlySpan<T> items)
 ```
 
 And a slice, which an array converts to. Not an overload of the above by
@@ -3100,7 +3100,7 @@ accident: a slice is not an `IEnumerable`, so nothing is ever both.
 ### Where *function*
 
 ```
-List<T> Where<T>(T[:] items, Predicate<T> keep)
+List<T> Where<T>(ReadOnlySpan<T> items, Predicate<T> keep)
 ```
 
 The elements the predicate keeps, in the order they were in.
