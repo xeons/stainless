@@ -97,6 +97,7 @@ public sealed partial record IrFault(string Message, string? Function)
     private static bool IsToolChatter(string line) =>
         ErrorsGenerated.IsMatch(line) ||
         line.Contains("input module is broken", StringComparison.Ordinal) ||
+        line.Contains("Broken module found", StringComparison.Ordinal) ||
         line.Contains("-Woverride-module", StringComparison.Ordinal) ||
         StrippedDebugInfo(line);
 

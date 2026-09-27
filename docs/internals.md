@@ -66,10 +66,14 @@ first five minutes found two dozen crashes the suites had not, and a fixed one
 is pinned by an ordinary case like any other bug — the fuzzer's findings
 directory is not a test suite.
 
-**LLVM's verifier is the check on the emitter.** clang verifies every module it
-reads, before any pass runs, so every linked build and every end-to-end case is
-verified whatever `-O` says, and a module it refuses is reported as an internal
-compiler error naming the function rather than as clang's text. Debug
+**LLVM's verifier is the check on the emitter.** clang 21 and later verify every
+module they read, before any pass runs, so with one every linked build and
+every end-to-end case is verified whatever `-O` says, and a module it refuses is
+reported as an internal compiler error naming the function rather than as
+clang's text. An older release clang does not: its driver passes
+`-disable-llvm-verifier`, and clang 18 compiles a module that uses a value
+before defining it without a word. So CI, whose runners carry older LLVMs,
+sets `STAINLESS_VERIFY_IR=1`. Debug
 information is the exception: clang drops a description that fails the verifier
 with a warning and links the binary anyway, so the driver and the end-to-end
 runner fail the build on that warning. What never reaches clang is verified on
@@ -78,8 +82,9 @@ and every fuzz mutant — and `--verify-ir`, or `STAINLESS_VERIFY_IR=1`, runs it
 over an `emit-ir`.
 
 The verifier is `opt -passes=verify` where one is beside clang, which Debian's
-LLVM ships and the Windows installer does not, and clang otherwise, reading the
-module and writing bitcode to nowhere with every pass off. Either takes about a
+LLVM ships and the Windows installer does not, and `clang -cc1` otherwise,
+reading the module and emitting nothing. It is `-cc1` rather than the driver so
+that the driver's `-disable-llvm-verifier` is never passed. Either takes about a
 tenth of a second on a module holding the whole standard library, which is 5%
 of building `hello.sl`. It is not on by default, even in a Debug build of the
 compiler: every build that links is verified already, and all a default would

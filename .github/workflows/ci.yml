@@ -19,6 +19,8 @@ concurrency:
 env:
   DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
+  # The runners' clang is older than 21 and verifies nothing it links.
+  STAINLESS_VERIFY_IR: 1
 
 jobs:
   unit:

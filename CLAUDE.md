@@ -64,11 +64,12 @@ are both in `forms/`: a table that lives for the program is declared
 from a `sl_run_at_exit` hook -- registered after the statics were made, so the
 C runtime runs it before their teardown.
 
-**Invalid IR is a compiler bug, and LLVM's verifier finds it.** clang verifies
-every module it links, and a refusal is reported as an internal compiler error
-naming the function. `--verify-ir` or `STAINLESS_VERIFY_IR=1` verifies a module
-nothing links; the unit tests, the samples and the fuzzer verify every one they
-emit. See [docs/internals.md](docs/internals.md#building-and-testing).
+**Invalid IR is a compiler bug, and LLVM's verifier finds it.** clang 21 and
+later verify every module they link, and a refusal is reported as an internal
+compiler error naming the function; an older release clang verifies nothing and
+compiles a broken module silently. `--verify-ir` or `STAINLESS_VERIFY_IR=1`
+verifies explicitly, whatever the clang; CI sets it, and the unit tests, the
+samples and the fuzzer verify every module they emit. See [docs/internals.md](docs/internals.md#building-and-testing).
 
 **A crash is not a diagnostic, and the fuzzer finds them.** `dotnet run --project
 tests/Stainless.Fuzz -- fuzz --minutes 10` mutates the tree's own programs and

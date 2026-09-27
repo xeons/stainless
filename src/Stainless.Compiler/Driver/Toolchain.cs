@@ -637,11 +637,13 @@ public sealed class Toolchain
     /// Runs LLVM's verifier over a module, and returns what it found wrong, or
     /// null when nothing was.
     ///
-    /// <c>opt -passes=verify</c> where it is installed. Otherwise clang, told to
-    /// read the module and write it back as bitcode with every pass off: it
-    /// verifies what it reads, and writing bitcode to nowhere is the cheapest
-    /// output it has. Both take about a tenth of a second on a module holding
-    /// the whole standard library.
+    /// <c>opt -passes=verify</c> where it is installed. Otherwise clang's own
+    /// compiler, <c>-cc1</c>, reading the module and emitting nothing. It MUST
+    /// be <c>-cc1</c> and not the driver: a release build of the driver passes
+    /// <c>-disable-llvm-verifier</c>, and before clang 21 nothing else verified
+    /// IR it read, so clang 18 compiles a broken module without a word. Both
+    /// take about a tenth of a second on a module holding the whole standard
+    /// library.
     ///
     /// Invalid debug information is not an error to either tool. It is
     /// stripped with a warning and the build goes on without it, so that
@@ -652,11 +654,9 @@ public sealed class Toolchain
         var result = OptPath is { } opt
             ? Run(opt, ["-passes=verify", "-disable-output", "-"], ir)
             : Run(ClangPath, [
-                .. TargetArguments,
-                "-x", "ir", "-c", "-emit-llvm",
-                "-Xclang", "-disable-llvm-passes",
+                "-cc1", "-triple", EffectiveTriple,
+                "-x", "ir", "-emit-llvm-only",
                 "-Wno-override-module",
-                "-o", OperatingSystem.IsWindows() ? "NUL" : "/dev/null",
                 "-",
             ], ir);
 

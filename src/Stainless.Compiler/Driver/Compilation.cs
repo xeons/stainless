@@ -127,9 +127,10 @@ public sealed record CompilationOptions
     /// it, and report a fault as a compiler bug in the function it is in.
     /// <c>STAINLESS_VERIFY_IR</c> set to anything but <c>0</c> asks for it too.
     ///
-    /// A linked build is verified without this, because clang verifies what
-    /// it reads, and a fault it finds is reported the same way. What this adds
-    /// is an <c>emit-ir</c> build, which reaches no clang at all.
+    /// From clang 21 a linked build is verified without this, because clang
+    /// verifies what it reads, and a fault it finds is reported the same way.
+    /// An older release clang verifies nothing, and an <c>emit-ir</c> build
+    /// reaches no clang at all.
     /// </summary>
     public bool VerifyIr { get; init; }
 
@@ -970,7 +971,7 @@ public sealed class Compilation
                 return Failed(diagnostics);
             }
 
-            // clang verifies the module as it reads it, before any pass runs.
+            // clang 21 and later verify the module as they read it.
             if (IrFault.RejectedByClang(link.StandardError))
                 return Failure(IrFault.FromVerifier(link.StandardError, ir).Explain(irPath));
 
