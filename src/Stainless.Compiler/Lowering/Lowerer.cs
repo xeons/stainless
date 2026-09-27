@@ -97,6 +97,7 @@ public sealed partial class Lowerer : BoundTreeRewriter
         BoundPropertyIncrement stepped => LowerPropertyIncrement(stepped, discarded: false),
         BoundWith copied => LowerWith(copied),
         BoundObjectInitializer initialized => LowerObjectInitializer(initialized),
+        BoundCollection collection => LowerCollection(collection),
         _ => throw new Source.InternalCompilerError(
             $"lowering has no case for {expression.GetType().Name}", expression.Span),
     };

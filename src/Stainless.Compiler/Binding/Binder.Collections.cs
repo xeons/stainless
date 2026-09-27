@@ -33,9 +33,10 @@ namespace Stainless.Binding;
 /// </para>
 ///
 /// <para>
-/// With a <c>..</c> present, every element is evaluated first, in the order
-/// written, and held; then the storage is made, sized exactly when every
-/// <c>..</c> can say its count, and filled.
+/// Anything more than an array literal is settled as a <see cref="BoundCollection"/>
+/// and lowered. With a <c>..</c> present, every element is evaluated first,
+/// in the order written, and held; then the storage is made, sized exactly
+/// when every <c>..</c> can say its count, and filled.
 /// </para>
 /// </summary>
 public sealed partial class Binder
@@ -249,74 +250,65 @@ public sealed partial class Binder
             }
         }
 
-        var held = new List<HeldValue>();
-        if (ConvertParts(draft, element, held, holdEach: true) is not { } parts)
+        if (ConvertParts(draft, element) is not { } parts)
             return new BoundErrorExpression(span);
+
+        if (!parts.Any(p => p is BoundCollectionSpread))
+            return new BoundArrayLiteral(span, target, element, parts);
 
         // Nothing is spread that did not have its length in its type, so the
         // literal is the one it always was.
-        if (!parts.Any(p => p is BoundSpread))
-            return WithHeld(span, held, new BoundArrayLiteral(span, target, element, parts));
+        if (!parts.Any(IsWalked))
+            return new BoundCollection(span, target, element, CollectionForm.Literal, parts);
 
         var arrayType = (ArrayTypeSymbol)target;
-        if (parts.Any(p => p is BoundSpread spread && !IsCounted(spread.Source.Type)))
-            return WithHeld(span, held, BuildThroughArrayBuilder(parts, arrayType, span));
+        if (parts.Any(p => IsWalked(p) && !IsCounted(((BoundCollectionSpread)p).Source.Type)))
+            return GatherThroughArrayBuilder(parts, arrayType, span);
 
-        // Every length is known, so the array is made once at its size and
-        // filled from the front: `at` is where the next element goes.
-        BoundExpression total = Word(span, parts.Count(p => p is not BoundSpread));
-        foreach (var part in parts)
-            if (part is BoundSpread spread)
-                total = new BoundBinary(span, PrimitiveTypeSymbol.NUInt,
-                    total, BoundBinaryOp.Add, CountOf(spread.Source, span));
+        // Every length is known, so the array is made once at its size.
+        parts = parts.Select(p => IsWalked(p) ? Counting((BoundCollectionSpread)p, span) : p).ToList();
 
-        var made = new LocalSymbol(SyntheticName("array"), arrayType, isConst: false);
-        var at = new LocalSymbol(SyntheticName("at"), PrimitiveTypeSymbol.NUInt, isConst: false);
-        var madeRead = new BoundLocalAccess(span, made);
-        var atRead = new BoundLocalAccess(span, at);
-
-        var writes = new List<BoundExpression>();
+        var filled = new List<BoundExpression>(parts.Count);
         foreach (var part in parts)
         {
-            if (part is BoundSpread spread)
+            if (!IsWalked(part))
             {
-                if (SpreadHelper("CopySpreadElements", [element, spread.Source.Type], span) is not { } copy)
-                    return new BoundErrorExpression(span);
-
-                writes.Add(new BoundAssignment(span, atRead,
-                    new BoundCall(span, copy, null, [madeRead, atRead, spread.Source])));
+                filled.Add(part);
                 continue;
             }
 
-            writes.Add(new BoundAssignment(part.Span,
-                new BoundIndex(part.Span, element, madeRead, atRead), part));
-            writes.Add(new BoundAssignment(span, atRead,
-                new BoundBinary(span, PrimitiveTypeSymbol.NUInt, atRead, BoundBinaryOp.Add, Word(span, 1))));
+            var spread = (BoundCollectionSpread)part;
+            if (SpreadHelper("CopySpreadElements", [element, spread.Source.Type], span) is not { } copy)
+                return new BoundErrorExpression(span);
+
+            filled.Add(Walking(spread, copy));
         }
 
-        var filled = new BoundLet(span, made, new BoundNewArray(span, arrayType, total),
-            new BoundLet(span, at, Word(span, 0), new BoundSequence(span, writes, madeRead)));
-
-        return WithHeld(span, held, filled);
+        return new BoundCollection(span, arrayType, element, CollectionForm.Filled, filled);
     }
 
     /// <summary>
     /// An array from spreads not all of which can say how long they are:
     /// gathered into an <c>ArrayBuilder</c>, which grows as it goes.
     /// </summary>
-    private BoundExpression BuildThroughArrayBuilder(
+    private BoundExpression GatherThroughArrayBuilder(
         List<BoundExpression> parts, ArrayTypeSymbol arrayType, SourceSpan span)
     {
         if (_builtins.Standard.GenericTypes.GetValueOrDefault("ArrayBuilder") is not { } template ||
             Instantiate(template, [arrayType.Element], span) is not ClassTypeSymbol builder)
             return new BoundErrorExpression(span);
 
-        var constructor = builder.Constructors.First();
-        var creation = new BoundNew(span, builder, constructor,
-            [Word(span, parts.Count(p => p is not BoundSpread))]);
+        var add = builder.FindMethod("Add")!;
+        if (AddedParts(parts, builder, add, span) is not { } added)
+            return new BoundErrorExpression(span);
 
-        return AddEach(parts, builder, creation, builder.FindMethod("Add")!, span,
-            made => new BoundCall(span, builder.FindMethod("ToArray")!, made, []));
+        return new BoundCollection(span, arrayType, arrayType.Element, CollectionForm.Gathered, added)
+        {
+            Builder = builder,
+            Constructor = builder.Constructors.First(),
+            Add = add,
+            Finish = builder.FindMethod("ToArray")!,
+        };
     }
 
     /// <summary>
@@ -338,78 +330,84 @@ public sealed partial class Binder
         }
 
         var element = shape.Add.Parameters.First(p => !p.IsThis).Type;
-        bool spreads = draft.Elements.Any(p => p is BoundSpread);
 
-        var held = new List<HeldValue>();
-        if (ConvertParts(draft, element, held, holdEach: spreads) is not { } parts)
+        if (ConvertParts(draft, element) is not { } parts)
             return new BoundErrorExpression(span);
 
         // With room reserved when the count is known, as `new List<T>(n)` would.
-        BoundExpression creation;
-        if (shape.Sized is { } sized && parts.All(p => p is not BoundSpread s || IsCounted(s.Source.Type)))
-        {
-            BoundExpression total = Word(span, parts.Count(p => p is not BoundSpread));
-            foreach (var part in parts)
-                if (part is BoundSpread spread)
-                    total = new BoundBinary(span, PrimitiveTypeSymbol.NUInt,
-                        total, BoundBinaryOp.Add, CountOf(spread.Source, span));
+        var constructor = shape.Empty;
+        BoundPlaceholder? total = null;
+        BoundExpression? capacity = null;
 
-            var capacity = (PrimitiveTypeSymbol)sized.Parameters.First(p => !p.IsThis).Type;
-            creation = new BoundNew(span, collection, sized, [AsInteger(total, capacity)]);
-        }
-        else
+        if (shape.Sized is { } sized &&
+            parts.All(p => !IsWalked(p) || IsCounted(((BoundCollectionSpread)p).Source.Type)))
         {
-            creation = new BoundNew(span, collection, shape.Empty, []);
+            parts = parts.Select(p => IsWalked(p) ? Counting((BoundCollectionSpread)p, span) : p).ToList();
+
+            constructor = sized;
+            total = new BoundPlaceholder(span, PrimitiveTypeSymbol.NUInt);
+            capacity = AsInteger(total, (PrimitiveTypeSymbol)sized.Parameters.First(p => !p.IsThis).Type);
         }
 
         // A collection expression has no initializer to name anything in.
-        CheckRequiredMembers(collection, ((BoundNew)creation).Constructor, null, span);
+        CheckRequiredMembers(collection, constructor, null, span);
 
-        return WithHeld(span, held, AddEach(parts, collection, creation, shape.Add, span, made => made));
+        if (AddedParts(parts, collection, shape.Add, span) is not { } added)
+            return new BoundErrorExpression(span);
+
+        return new BoundCollection(span, collection, element, CollectionForm.Added, added)
+        {
+            Builder = collection,
+            Constructor = constructor,
+            Add = shape.Add,
+            Total = total,
+            Capacity = capacity,
+        };
     }
 
     /// <summary>
-    /// The object <paramref name="creation"/> makes, held in a name, with
-    /// <paramref name="add"/> called for every part and <paramref name="finish"/>
-    /// of the name as the value.
+    /// The parts of what is added to, in order: each element as <paramref name="add"/>
+    /// takes it, and each spread with the function that adds what it yields.
     /// </summary>
-    private BoundExpression AddEach(
-        List<BoundExpression> parts, ClassTypeSymbol type, BoundExpression creation,
-        FunctionSymbol add, SourceSpan span, Func<BoundExpression, BoundExpression> finish)
+    private List<BoundExpression>? AddedParts(
+        List<BoundExpression> parts, ClassTypeSymbol type, FunctionSymbol add, SourceSpan span)
     {
-        var made = new LocalSymbol(SyntheticName("made"), type, isConst: true);
-        var reading = new BoundLocalAccess(span, made);
         var element = add.Parameters.First(p => !p.IsThis).Type;
+        var added = new List<BoundExpression>(parts.Count);
 
-        var calls = new List<BoundExpression>();
         foreach (var part in parts)
         {
-            if (part is BoundSpread spread)
+            if (part is not BoundCollectionSpread spread)
             {
-                if (SpreadHelper("AddSpreadElements", [type, spread.Source.Type], span) is not { } each)
-                    return new BoundErrorExpression(span);
-
-                calls.Add(new BoundCall(span, each, null, [reading, spread.Source]));
+                added.Add(BindConversion(part, element, part.Span));
                 continue;
             }
 
-            calls.Add(new BoundCall(part.Span, add, reading, [BindConversion(part, element, part.Span)]));
+            if (!IsWalked(spread))
+            {
+                added.Add(new BoundCollectionSpread(spread.Span, spread.Type, spread.Source, spread.Walked)
+                {
+                    Elements = spread.Elements.Select(e => BindConversion(e, element, e.Span)).ToList(),
+                });
+                continue;
+            }
+
+            if (SpreadHelper("AddSpreadElements", [type, spread.Source.Type], span) is not { } each)
+                return null;
+
+            added.Add(Walking(spread, each));
         }
 
-        return new BoundLet(span, made, creation, new BoundSequence(span, calls, finish(reading)));
+        return added;
     }
 
     /// <summary>
-    /// Every part converted to the element type, with each inline array
-    /// spread written out as reads of its elements. With
-    /// <paramref name="holdEach"/> and a spread among them, every part is
-    /// evaluated into <paramref name="held"/> in the order written, before
-    /// anything is made. Null when a part does not fit, which is reported.
+    /// Every part converted to the element type. An inline array spread is
+    /// its elements, read from what it names; any other is walked. Null when
+    /// a part does not fit, which is reported.
     /// </summary>
-    private List<BoundExpression>? ConvertParts(
-        BoundArrayDraft draft, TypeSymbol element, List<HeldValue> held, bool holdEach)
+    private List<BoundExpression>? ConvertParts(BoundArrayDraft draft, TypeSymbol element)
     {
-        bool hold = holdEach && draft.Elements.Any(p => p is BoundSpread);
         var parts = new List<BoundExpression>();
         bool failed = false;
 
@@ -419,7 +417,7 @@ public sealed partial class Binder
             {
                 var converted = BindConversion(part, element, part.Span);
                 failed |= converted.Type.IsError();
-                parts.Add(hold && !converted.Type.IsError() ? HoldValue(converted, held, everything: true) : converted);
+                parts.Add(converted);
                 continue;
             }
 
@@ -433,24 +431,51 @@ public sealed partial class Binder
                 continue;
             }
 
-            var source = hold && !IsRepeatable(spread.Source)
-                ? HoldValue(spread.Source, held, everything: true)
-                : spread.Source;
+            // Held unless reading it again is free, so the placeholder is
+            // storage where what stands for it will be.
+            var source = spread.Source;
+            var walked = new BoundPlaceholder(source.Span, source.Type)
+            {
+                IsStorage = source.IsLValue || !IsRepeatable(source),
+            };
 
             if (source.Type is FixedArrayTypeSymbol inline)
             {
+                var elements = new List<BoundExpression>(inline.Length);
                 for (int i = 0; i < inline.Length; i++)
-                    parts.Add(BindConversion(
-                        new BoundIndex(spread.Span, inline.Element, source, Word(spread.Span, i)),
+                    elements.Add(BindConversion(
+                        new BoundIndex(spread.Span, inline.Element, walked, Word(spread.Span, i)),
                         element, spread.Span));
+
+                parts.Add(new BoundCollectionSpread(spread.Span, spread.Type, source, walked) { Elements = elements });
                 continue;
             }
 
-            parts.Add(new BoundSpread(spread.Span, spread.Type, source));
+            parts.Add(new BoundCollectionSpread(spread.Span, spread.Type, source, walked));
         }
 
         return failed ? null : parts;
     }
+
+    /// <summary>Whether a part is a spread walked at run time, rather than written out.</summary>
+    private static bool IsWalked(BoundExpression part) =>
+        part is BoundCollectionSpread { Source.Type: not FixedArrayTypeSymbol };
+
+    /// <summary>A spread that says how many it yields.</summary>
+    private BoundCollectionSpread Counting(BoundCollectionSpread spread, SourceSpan span) =>
+        new(spread.Span, spread.Type, spread.Source, spread.Walked)
+        {
+            Count = CountOf(spread.Walked, span),
+            Walk = spread.Walk,
+        };
+
+    /// <summary>A spread with the function that walks it.</summary>
+    private static BoundCollectionSpread Walking(BoundCollectionSpread spread, FunctionSymbol walk) =>
+        new(spread.Span, spread.Type, spread.Source, spread.Walked)
+        {
+            Count = spread.Count,
+            Walk = walk,
+        };
 
     /// <summary>Whether a spread of this type can say how many it will yield before it is walked.</summary>
     private static bool IsCounted(TypeSymbol type) =>

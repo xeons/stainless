@@ -257,6 +257,18 @@ public abstract class BoundTreeWalker
             case BoundArrayDraft draft: VisitAll(draft.Elements); break;
             case BoundSpread spread: Visit(spread.Source); break;
             case BoundArrayLiteral literal: VisitAll(literal.Elements); break;
+
+            case BoundCollection collection:
+                VisitAll(collection.Parts);
+                Visit(collection.Capacity);
+                break;
+
+            case BoundCollectionSpread spread:
+                Visit(spread.Source);
+                Visit(spread.Count);
+                VisitAll(spread.Elements);
+                break;
+
             case BoundTupleCreate tuple: VisitAll(tuple.Elements); break;
             case BoundTupleDraft tuple: VisitAll(tuple.Elements); break;
             case BoundVariantConstruction built: VisitAll(built.Arguments); break;

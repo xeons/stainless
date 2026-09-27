@@ -623,6 +623,39 @@ public abstract class BoundTreeRewriter
                     };
             }
 
+            case BoundCollection collection:
+            {
+                var parts = RewriteAll(collection.Parts);
+                var capacity = RewriteOptional(collection.Capacity);
+                return Same(collection.Parts, parts) && Same(collection.Capacity, capacity)
+                    ? collection
+                    : new BoundCollection(collection.Span, collection.Type, collection.ElementType,
+                        collection.Form, parts)
+                    {
+                        Builder = collection.Builder,
+                        Constructor = collection.Constructor,
+                        Add = collection.Add,
+                        Finish = collection.Finish,
+                        Total = collection.Total,
+                        Capacity = capacity,
+                    };
+            }
+
+            case BoundCollectionSpread spread:
+            {
+                var source = Rewrite(spread.Source);
+                var count = RewriteOptional(spread.Count);
+                var elements = RewriteAll(spread.Elements);
+                return Same(spread.Source, source) && Same(spread.Count, count) && Same(spread.Elements, elements)
+                    ? spread
+                    : new BoundCollectionSpread(spread.Span, spread.Type, source, spread.Walked)
+                    {
+                        Count = count,
+                        Walk = spread.Walk,
+                        Elements = elements,
+                    };
+            }
+
             case BoundTupleCreate tuple:
             {
                 var elements = RewriteAll(tuple.Elements);

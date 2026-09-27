@@ -696,6 +696,79 @@ public sealed class BoundArrayLiteral(
     public bool OnStack { get; set; }
 }
 
+/// <summary>How a <see cref="BoundCollection"/> makes what it becomes.</summary>
+public enum CollectionForm
+{
+    /// <summary>An array or an inline array, every spread an inline one, written out.</summary>
+    Literal,
+
+    /// <summary>An array made once at the size every spread says, and filled from the front.</summary>
+    Filled,
+
+    /// <summary>An array gathered into an <c>ArrayBuilder</c>, for a spread that cannot say its count.</summary>
+    Gathered,
+
+    /// <summary>A class made and added to.</summary>
+    Added,
+}
+
+/// <summary>
+/// A collection expression settled against its target, where it is more than
+/// an array literal: <c>[a, ..b]</c> as an array or an inline array, or
+/// <c>[a, b]</c> as a class with <c>Add</c>.
+///
+/// Where a spread is among the parts, every part is evaluated in the order
+/// written, and held, before anything is made.
+/// </summary>
+public sealed class BoundCollection(
+    SourceSpan span, TypeSymbol type, TypeSymbol elementType, CollectionForm form,
+    IReadOnlyList<BoundExpression> parts) : BoundSemanticExpression(span, type)
+{
+    public TypeSymbol ElementType { get; } = elementType;
+    public CollectionForm Form { get; } = form;
+
+    /// <summary>Each element converted to <see cref="ElementType"/>, or a <see cref="BoundCollectionSpread"/>.</summary>
+    public IReadOnlyList<BoundExpression> Parts { get; } = parts;
+
+    /// <summary>What is made and added to: the class, or the <c>ArrayBuilder</c>.</summary>
+    public ClassTypeSymbol? Builder { get; init; }
+
+    public FunctionSymbol? Constructor { get; init; }
+    public FunctionSymbol? Add { get; init; }
+
+    /// <summary>The builder's <c>ToArray</c>, for <see cref="CollectionForm.Gathered"/>.</summary>
+    public FunctionSymbol? Finish { get; init; }
+
+    /// <summary>How many elements there will be, as <see cref="Capacity"/> names it.</summary>
+    public BoundPlaceholder? Total { get; init; }
+
+    /// <summary>The argument to a constructor that takes a capacity, or null.</summary>
+    public BoundExpression? Capacity { get; init; }
+}
+
+/// <summary>
+/// <c>..source</c> in a <see cref="BoundCollection"/>: walked by a function
+/// of <c>ArrayBuilder.sl</c>, or, for an inline array, written out.
+/// </summary>
+public sealed class BoundCollectionSpread(
+    SourceSpan span, TypeSymbol elementType, BoundExpression source, BoundPlaceholder walked)
+    : BoundSemanticExpression(span, elementType)
+{
+    public BoundExpression Source { get; } = source;
+
+    /// <summary>The source, as <see cref="Count"/> and <see cref="Elements"/> name it.</summary>
+    public BoundPlaceholder Walked { get; } = walked;
+
+    /// <summary>How many it yields, as a <c>nuint</c>; null where that is not asked.</summary>
+    public BoundExpression? Count { get; init; }
+
+    /// <summary>The function that walks it into what is made; null for an inline array.</summary>
+    public FunctionSymbol? Walk { get; init; }
+
+    /// <summary>An inline array's elements, each read and converted.</summary>
+    public IReadOnlyList<BoundExpression> Elements { get; init; } = [];
+}
+
 public sealed class BoundLambda(SourceSpan span, TypeSymbol type, Syntax.LambdaSyntax syntax)
     : BoundExpression(span, type)
 {
