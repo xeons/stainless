@@ -1,0 +1,134 @@
+name: Release
+
+# A tag v<major>.<minor>.<count> releases the commit it names, and MUST be that
+# commit's version: VersionPrefix from Directory.Build.props, then the number
+# of commits reachable from it. Running this by hand releases the commit it
+# runs on and makes the tag. docs/releasing.md is the whole process.
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  version:
+    name: Decide the version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - id: version
+        name: Check the tag against the build
+        shell: bash
+        run: |
+          version="$(dotnet msbuild tools/Version.proj -nologo -t:ComputeStainlessVersion -getProperty:StainlessVersion | tr -d '[:space:]')"
+          prefix="$(dotnet msbuild tools/Version.proj -nologo -getProperty:VersionPrefix | tr -d '[:space:]')"
+          echo "this commit builds as $version"
+
+          if [ "$GITHUB_REF_TYPE" = tag ]; then
+            tag="$GITHUB_REF_NAME"
+            case "$tag" in
+              "v$prefix".*) ;;
+              *)
+                echo "::error::$tag does not start v$prefix, and VersionPrefix in Directory.Build.props is $prefix"
+                exit 1 ;;
+            esac
+            if [ "$tag" != "v$version" ]; then
+              echo "::error::$tag is on a commit that builds as $version; tag it v$version, or tag the commit that is $tag"
+              exit 1
+            fi
+          else
+            tag="v$version"
+          fi
+
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+  test:
+    name: Test
+    uses: ./.github/workflows/ci.yml
+
+  publish:
+    name: Publish ${{ matrix.rid }}
+    needs: [version, test]
+    strategy:
+      matrix:
+        include:
+          - rid: win-x64
+            os: windows-latest
+          - rid: linux-x64
+            os: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup
+
+      - name: Publish, smoke-test and package
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: .\tools\publish.ps1 -Runtime ${{ matrix.rid }}
+
+      - name: Publish, smoke-test and package
+        if: runner.os == 'Linux'
+        shell: bash
+        run: tools/publish.sh ${{ matrix.rid }}
+
+      - name: Check the archive carries the version
+        shell: bash
+        run: ls artifacts/stainless-${{ needs.version.outputs.version }}-${{ matrix.rid }}.*
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stainless-${{ matrix.rid }}
+          path: |
+            artifacts/stainless-*.zip
+            artifacts/stainless-*.tar.gz
+          if-no-files-found: error
+
+  release:
+    name: Create the release
+    needs: [version, publish]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Checksum the archives
+        working-directory: dist
+        run: sha256sum stainless-* > SHA256SUMS && cat SHA256SUMS
+
+      - name: Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.version.outputs.tag }}
+          VERSION: ${{ needs.version.outputs.version }}
+        run: |
+          gh release create "$TAG" dist/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "Stainless $VERSION" \
+            --generate-notes
