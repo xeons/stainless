@@ -222,6 +222,13 @@ public abstract class BoundTreeWalker
                 Visit(assignment.Value);
                 break;
 
+            case BoundMemberAssignment assignment:
+                Visit(assignment.Target);
+                Visit(assignment.Value);
+                break;
+
+            case BoundAs asked: Visit(asked.Value); break;
+
             case BoundPropertyAssignment written:
                 Visit(written.Receiver);
                 VisitAll(written.Indices);

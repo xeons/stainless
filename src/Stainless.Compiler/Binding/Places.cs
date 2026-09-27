@@ -23,8 +23,8 @@ internal readonly record struct HeldValue(LocalSymbol Local, BoundExpression Val
 
 /// <summary>
 /// A place, a receiver or a value made safe to name twice: what naming it
-/// again would evaluate is held in a <see cref="BoundLet"/> first. Binding
-/// asks it of what it writes as it binds; lowering asks it of what it lowers.
+/// again would evaluate is held in a <see cref="BoundLet"/> first. Lowering
+/// holds; binding asks only whether reading something again is free.
 /// </summary>
 /// <param name="newLocal">Makes the local a held value lives in, from a hint and a type.</param>
 internal sealed class Places(Func<string, TypeSymbol, LocalSymbol> newLocal)

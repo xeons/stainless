@@ -108,12 +108,7 @@ public sealed partial class Lowerer
     {
         BoundCompoundAssignment compound => LowerCompoundAssignment(compound, discarded: true),
 
-        BoundPropertyAssignment written => new BoundCall(written.Span, written.Property.Setter!,
-            RewriteOptional(written.Receiver),
-            [.. RewriteAll(written.Indices), Rewrite(written.Value)])
-        {
-            IsNonVirtual = written.IsNonVirtual,
-        },
+        BoundPropertyAssignment written => DiscardedPropertyAssignment(written),
 
         BoundPropertyIncrement stepped => LowerPropertyIncrement(stepped, discarded: true),
 
@@ -142,9 +137,11 @@ public sealed partial class Lowerer
     private BoundExpression LowerPropertyAssignment(BoundPropertyAssignment written)
     {
         var span = written.Span;
+        var kept = new List<HeldValue>();
+        var receiver = KeptWhileStoring(written, kept);
         var held = new List<(LocalSymbol Local, BoundExpression Value)>();
 
-        var receiver = written.Receiver is null ? null : Held(Rewrite(written.Receiver), "receiver", held);
+        receiver = receiver is null ? null : Held(Rewrite(receiver), "receiver", held);
         var indices = RewriteAll(written.Indices).Select(index => Held(index, "index", held)).ToList();
         var value = Held(Rewrite(written.Value), "stored", held);
 
@@ -153,7 +150,37 @@ public sealed partial class Lowerer
             IsNonVirtual = written.IsNonVirtual,
         };
 
-        return Around(span, held, new BoundSequence(span, [set], value));
+        return Places.WithHeld(span, kept, Around(span, held, new BoundSequence(span, [set], value)));
+    }
+
+    /// <summary>A property written where nothing reads the write: the setter's call alone.</summary>
+    private BoundExpression DiscardedPropertyAssignment(BoundPropertyAssignment written)
+    {
+        var kept = new List<HeldValue>();
+        var receiver = KeptWhileStoring(written, kept);
+
+        return Places.WithHeld(written.Span, kept, new BoundCall(written.Span, written.Property.Setter!,
+            RewriteOptional(receiver),
+            [.. RewriteAll(written.Indices), Rewrite(written.Value)])
+        {
+            IsNonVirtual = written.IsNonVirtual,
+        });
+    }
+
+    /// <summary>
+    /// The receiver of a write the source made, held in <paramref name="kept"/>
+    /// while a value that runs code is evaluated: that code may drop its last
+    /// other owner. What is held is lowered here, before anything that reads it.
+    /// </summary>
+    private BoundExpression? KeptWhileStoring(BoundPropertyAssignment written, List<HeldValue> kept)
+    {
+        if (!written.HoldsReceiver || written.Receiver is not { } receiver || Places.IsRepeatable(written.Value))
+            return written.Receiver;
+
+        receiver = Holds.HoldReceiver(receiver, kept, everything: false);
+        for (int i = 0; i < kept.Count; i++)
+            kept[i] = kept[i] with { Value = Rewrite(kept[i].Value) };
+        return receiver;
     }
 
     /// <summary>

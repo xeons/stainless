@@ -100,6 +100,36 @@ public sealed partial class Lowerer
     }
 
     /// <summary>
+    /// <c>let held = a in held.b = v</c>: what the store lands in, held while
+    /// the value runs, unless it is a variable only this statement could change.
+    /// </summary>
+    private BoundExpression LowerMemberAssignment(BoundMemberAssignment assignment)
+    {
+        var held = new List<HeldValue>();
+        var place = Holds.HoldPlace(assignment.Target, held, everything: false);
+        return Rewrite(Places.WithHeld(assignment.Span, held,
+            new BoundAssignment(assignment.Span, place, assignment.Value)));
+    }
+
+    /// <summary>
+    /// <c>let held = x in (held is C ? (C?)held : null)</c>. The name borrows:
+    /// whatever made the value is a temporary the statement will drop.
+    /// </summary>
+    private BoundExpression LowerAs(BoundAs asked)
+    {
+        var span = asked.Span;
+        var value = Rewrite(asked.Value);
+        var held = Synthetic("as", value.Type, isConst: true);
+        var reading = new BoundLocalAccess(asked.Value.Span, held);
+
+        return new BoundLet(span, held, value,
+            new BoundConditional(span, asked.Type,
+                new BoundTypeTest(span, PrimitiveTypeSymbol.Bool, reading, asked.Wanted),
+                new BoundConversion(span, asked.Type, reading, ConversionKind.TestedReference),
+                new BoundNullLiteral(span, asked.Type)));
+    }
+
+    /// <summary>
     /// <c>let held = target in let made = held.Clone() in (made.X = 1, ..., made)</c>.
     /// The target is held, so <c>Compute() with { X = 1 }</c> calls
     /// <c>Compute</c> once.

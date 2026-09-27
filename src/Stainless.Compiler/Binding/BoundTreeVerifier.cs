@@ -295,9 +295,9 @@ public static class BoundTreeVerifier
         /// it copies into a temporary first, and a write to that is lost.
         ///
         /// Not <see cref="BoundExpression.IsLValue"/>, which is what the
-        /// language lets a program write: the binder's own lowerings write
-        /// through names nothing else may, such as the one an object
-        /// initializer holds its object in.
+        /// language lets a program write: lowering writes through names
+        /// nothing else may, such as the one an object initializer holds its
+        /// object in.
         /// </summary>
         private static bool HasAddress(BoundExpression place) => place switch
         {

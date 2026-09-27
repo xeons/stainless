@@ -99,6 +99,8 @@ public sealed partial class Lowerer : BoundTreeRewriter
         BoundWith copied => LowerWith(copied),
         BoundObjectInitializer initialized => LowerObjectInitializer(initialized),
         BoundCollection collection => LowerCollection(collection),
+        BoundMemberAssignment assignment => LowerMemberAssignment(assignment),
+        BoundAs asked => LowerAs(asked),
         BoundParamsArray gathered => LowerParamsArray(gathered),
         BoundDeconstruction taken => LowerDeconstruction(taken, discarded: false),
         BoundRangeSlice sliced => LowerRangeSlice(sliced),

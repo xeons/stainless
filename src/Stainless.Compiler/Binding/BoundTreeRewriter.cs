@@ -557,6 +557,7 @@ public abstract class BoundTreeRewriter
                     {
                         IsNonVirtual = written.IsNonVirtual,
                         Indices = indices,
+                        HoldsReceiver = written.HoldsReceiver,
                     };
             }
 
@@ -595,6 +596,21 @@ public abstract class BoundTreeRewriter
                 return Same(taken.Target, target)
                     ? taken
                     : new BoundDeconstruction(taken.Span, taken.Type, target, taken.IsValue);
+            }
+
+            case BoundMemberAssignment assignment:
+            {
+                var target = Rewrite(assignment.Target);
+                var value = Rewrite(assignment.Value);
+                return Same(assignment.Target, target) && Same(assignment.Value, value)
+                    ? assignment
+                    : new BoundMemberAssignment(assignment.Span, target, value);
+            }
+
+            case BoundAs asked:
+            {
+                var value = Rewrite(asked.Value);
+                return Same(asked.Value, value) ? asked : new BoundAs(asked.Span, asked.Type, value, asked.Wanted);
             }
 
             case BoundObjectInitializer initialized:

@@ -1648,8 +1648,8 @@ public sealed partial class Binder
     /// </summary>
     private static bool Effective(BoundExpression expression) => expression switch
     {
-        BoundAssignment or BoundPropertyAssignment or BoundCompoundAssignment or BoundCall or BoundIndirectCall
-            or BoundClosureCall or BoundIncrement or BoundPropertyIncrement
+        BoundAssignment or BoundMemberAssignment or BoundPropertyAssignment or BoundCompoundAssignment
+            or BoundCall or BoundIndirectCall or BoundClosureCall or BoundIncrement or BoundPropertyIncrement
             or BoundNew or BoundStructNew or BoundErrorExpression => true,
 
         BoundLet held => Effective(held.Body),

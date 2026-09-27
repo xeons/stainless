@@ -424,6 +424,29 @@ public sealed class BoundAssignment(SourceSpan span, BoundExpression target, Bou
 }
 
 /// <summary>
+/// <c>a.b = v</c> or <c>a[i] = v</c> where the value runs code before the
+/// store. That code may drop the last other reference to what the store lands
+/// in, so lowering holds it -- the object, or the array -- while it runs.
+/// </summary>
+public sealed class BoundMemberAssignment(SourceSpan span, BoundExpression target, BoundExpression value)
+    : BoundSemanticExpression(span, target.Type)
+{
+    public BoundExpression Target { get; } = target;
+    public BoundExpression Value { get; } = value;
+}
+
+/// <summary>
+/// <c>x as C</c>: the value asked once whether it is a <c>C</c>, and that
+/// same reference, as a <c>C?</c>, where it is.
+/// </summary>
+public sealed class BoundAs(SourceSpan span, TypeSymbol type, BoundExpression value, NamedTypeSymbol wanted)
+    : BoundSemanticExpression(span, type)
+{
+    public BoundExpression Value { get; } = value;
+    public NamedTypeSymbol Wanted { get; } = wanted;
+}
+
+/// <summary>
 /// <c>new T(...) { X = 1, Y = 2 }</c> or <c>new T { a, b }</c>: an object made,
 /// then written to or added to entry by entry, and then the value.
 /// </summary>
@@ -530,6 +553,13 @@ public sealed class BoundPropertyAssignment(
     /// indexer's setter takes its indices before <c>value</c>.
     /// </summary>
     public IReadOnlyList<BoundExpression> Indices { get; init; } = [];
+
+    /// <summary>
+    /// True for a write as the source has it, whose receiver lowering holds
+    /// while a value that runs code is evaluated, for the reason a
+    /// <see cref="BoundMemberAssignment"/> holds its object.
+    /// </summary>
+    public bool HoldsReceiver { get; init; }
 }
 
 /// <summary>

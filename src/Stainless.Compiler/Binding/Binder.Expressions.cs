@@ -886,12 +886,8 @@ public sealed partial class Binder
     /// <c>is C c</c>: an answer that is a value can be passed on, stored, or
     /// given a fallback with <c>??</c>, where a branch can only be entered.
     ///
-    /// It is the test and the reference it proved, with nothing else in it. The
-    /// value is held in a <see cref="BoundLet"/> so that <c>Parent() as Frame</c>
-    /// calls <c>Parent</c> once, and the arm the test allows is the identical
-    /// pointer under the type the test bought -- no second check, because
-    /// unlike the cast in <c>is C c</c> this one is built here rather than
-    /// asked for through <see cref="ClassifyConversion"/>.
+    /// It is the test and the reference it proved, with nothing else in it, as a
+    /// <see cref="BoundAs"/>.
     ///
     /// A conversion that cannot fail does not get a test at all: <c>derived as
     /// Base</c> is the ordinary widening and emits nothing.
@@ -994,19 +990,7 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
-        // Read once, asked once, and the arm the test allows is that same
-        // pointer. The local borrows: whatever made the value is a temporary
-        // the statement will drop, and this only reads it in the meantime.
-        var held = new LocalSymbol(SyntheticName("as"), value.Type, isConst: true);
-        var reading = new BoundLocalAccess(syntax.Value.Span, held);
-
-        var body = new BoundConditional(
-            syntax.Span, result,
-            new BoundTypeTest(syntax.Span, PrimitiveTypeSymbol.Bool, reading, wanted),
-            new BoundConversion(syntax.Span, result, reading, ConversionKind.TestedReference),
-            new BoundNullLiteral(syntax.Span, result));
-
-        return new BoundLet(syntax.Span, held, value, body);
+        return new BoundAs(syntax.Span, result, value, wanted);
     }
 
     private BoundExpression BindName(NameSyntax syntax)
@@ -2558,13 +2542,12 @@ public sealed partial class Binder
 
         NoteMemberWritten(target);
 
-        var held = new List<HeldValue>();
-
         if (syntax.Operator == TokenKind.Equals)
         {
             var stored = BindConversion(value, target.Type, syntax.Value.Span);
-            var place = IsRepeatable(stored) ? target : HoldPlace(target, held, everything: false);
-            return WithHeld(syntax.Span, held, new BoundAssignment(syntax.Span, place, stored));
+            return IsRepeatable(stored) || target is not (BoundFieldAccess or BoundIndex)
+                ? new BoundAssignment(syntax.Span, target, stored)
+                : new BoundMemberAssignment(syntax.Span, target, stored);
         }
 
         // A compound assignment reads its place and writes it back. What the
@@ -2726,20 +2709,15 @@ public sealed partial class Binder
         // `base.P = x` reaches the setter this class replaced, as the read
         // reached the getter.
         var indices = property.IsIndexer ? read.Arguments : [];
-        var held = new List<HeldValue>();
-
         if (syntax.Operator == TokenKind.Equals)
         {
-            var stored = BindConversion(value, property.Type, syntax.Value.Span);
-            if (receiver is not null && !IsRepeatable(stored))
-                receiver = HoldReceiver(receiver, held, everything: false);
-
-            return WithHeld(syntax.Span, held, new BoundPropertyAssignment(
-                syntax.Span, receiver, property, stored)
+            return new BoundPropertyAssignment(
+                syntax.Span, receiver, property, BindConversion(value, property.Type, syntax.Value.Span))
             {
                 Indices = indices,
                 IsNonVirtual = read.IsNonVirtual,
-            });
+                HoldsReceiver = true,
+            };
         }
 
         // `p.X += 1` calls the getter and then the setter, on one receiver and
@@ -2900,21 +2878,6 @@ public sealed partial class Binder
         BoundDereference dereference => IsThisReceiver(dereference.Operand),
         _ => false,
     };
-
-    /// <summary>Holding for a place written as it is bound, with names of the binder's own.</summary>
-    private Places Holding => new((hint, type) => new LocalSymbol(SyntheticName(hint), type, isConst: false));
-
-    private BoundExpression HoldPlace(BoundExpression place, List<HeldValue> held, bool everything) =>
-        Holding.HoldPlace(place, held, everything);
-
-    private BoundExpression HoldReceiver(BoundExpression receiver, List<HeldValue> held, bool everything) =>
-        Holding.HoldReceiver(receiver, held, everything);
-
-    private BoundExpression HoldValue(BoundExpression value, List<HeldValue> held, bool everything) =>
-        Holding.HoldValue(value, held, everything);
-
-    private static BoundExpression WithHeld(SourceSpan span, List<HeldValue> held, BoundExpression body) =>
-        Places.WithHeld(span, held, body);
 
     private static bool IsRepeatable(BoundExpression expression) => Places.IsRepeatable(expression);
 
