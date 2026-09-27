@@ -377,6 +377,36 @@ public class ErrorTypeTests
         extern "C" int shared_depth;
         int Main() => 0;
         """)]
+    [InlineData("SL0307", """
+
+        module Nested; interface IWritable
+        {
+            void Write(source text);
+        } class Slot : IWritable
+        { public void Write(String text) { }
+        }
+        int Main() => 0;
+        """)]
+    [InlineData("SL0307", """
+
+        module Nested; interface IWritable
+        {
+            void Write(source text);
+        } class Slot : IWritable
+        { void IWritable.Write(String text) { }
+        }
+        int Main() => 0;
+        """)]
+    [InlineData("SL0502", """
+
+        module Overrides; class Base
+        {
+            public virtual void Write(source text) { }
+        } class Derived : Base
+        { public override void Write(String text) { }
+        }
+        int Main() => 0;
+        """)]
     public void AConsequenceIsNotReported(string code, params string[] sources)
     {
         Front.BindSources(sources, out var diagnostics);

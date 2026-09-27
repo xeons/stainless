@@ -174,7 +174,8 @@ public sealed partial class Binder
                 $"'{required.ReturnType.Name} {required.Name}(" +
                 string.Join(", ", required.Parameters.Where(p => !p.IsThis).Select(Spelled)) +
                 ")'",
-                classType, required.ContainingType, required.ReturnType);
+                [classType, required.ContainingType,
+                 .. SignatureTypes(required), .. SignatureTypes(found)]);
 
         return found;
     }
@@ -202,7 +203,7 @@ public sealed partial class Binder
                 $"are '<{string.Join(", ", root.TypeArguments.Select(t => t.Name))}>'; " +
                 $"expected '{root.ReturnType.Name} {root.Name}(" +
                 string.Join(", ", root.Parameters.Where(p => !p.IsThis).Select(Spelled)) + ")'",
-                classType, root.ReturnType);
+                [classType, .. SignatureTypes(root), .. SignatureTypes(found)]);
 
         return found;
     }

@@ -706,7 +706,7 @@ public sealed partial class Binder
                     ? $", or a return type that converts to '{inherited.ReturnType.Name}' " +
                       "without changing the reference"
                     : ""),
-                classType, inherited.ReturnType);
+                [classType, .. SignatureTypes(inherited), .. SignatureTypes(method)]);
             return false;
         }
 
@@ -1251,7 +1251,7 @@ public sealed partial class Binder
                     $"'{required.ReturnType.Name} {required.Name}(" +
                     string.Join(", ", required.Parameters.Where(p => !p.IsThis).Select(Spelled)) +
                     ")'",
-                    type, contract, required.ReturnType);
+                    [type, contract, .. SignatureTypes(required), .. SignatureTypes(member)]);
         }
     }
 
@@ -1368,7 +1368,7 @@ public sealed partial class Binder
                     $"'{interfaceType.Name}.{required.Name}'; expected " +
                     $"'{required.ReturnType.Name} {required.Name}(" +
                     string.Join(", ", wanted.Select(Spelled)) + ")'",
-                    classType, interfaceType, required.ReturnType);
+                    [classType, interfaceType, .. SignatureTypes(required), .. SignatureTypes(found)]);
             }
             else if (found.IsInitAccessor != required.IsInitAccessor)
             {
