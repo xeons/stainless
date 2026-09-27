@@ -293,6 +293,8 @@ public abstract class BoundTreeWalker
             case BoundSpread spread: Visit(spread.Source); break;
             case BoundArrayLiteral literal: VisitAll(literal.Elements); break;
 
+            case BoundParamsArray gathered: VisitAll(gathered.Elements); break;
+
             case BoundCollection collection:
                 VisitAll(collection.Parts);
                 Visit(collection.Capacity);

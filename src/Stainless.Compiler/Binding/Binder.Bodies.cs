@@ -2290,8 +2290,8 @@ public sealed partial class Binder
         // The caller's statement is over long before the worker is, so the
         // elements of a `params` slice go on the heap here.
         foreach (var argument in spawned.Arguments)
-            if (argument is BoundConversion { Operand: BoundArrayLiteral { OnStack: true } gathered })
-                gathered.OnStack = false;
+            if (argument is BoundParamsArray { InFrame: true } gathered)
+                gathered.InFrame = false;
 
         if (syntax.Target is null)
             return new BoundSpawn(syntax.Span, null, spawned);

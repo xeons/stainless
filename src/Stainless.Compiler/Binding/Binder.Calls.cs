@@ -1801,10 +1801,9 @@ public sealed partial class Binder
 
     /// <summary>
     /// Rewrites a call that uses the expanded form of a <c>params</c> parameter
-    /// into one that passes the array: the elements are gathered into a
-    /// <c>T[]</c> made for the call, or, for a <c>T[:]</c>, into an array in
-    /// the caller's frame. Answers the written arguments to go with the new
-    /// list; a call in the declared form is left as it was.
+    /// into one that passes the array, as a <see cref="BoundParamsArray"/>.
+    /// Answers the written arguments to go with the new list; a call in the
+    /// declared form is left as it was.
     /// </summary>
     private IReadOnlyList<ExpressionSyntax>? GatherParams(
         FunctionSymbol function, ref List<BoundExpression> arguments,
@@ -1826,11 +1825,12 @@ public sealed partial class Binder
         var span = count == 0 ? callSpan : SourceSpan.Merge(elements[0].Span, elements[^1].Span);
 
         var items = elements.Select(e => BindConversion(e, element, e.Span)).ToList();
-        BoundExpression packed = gathered.Type is SliceTypeSymbol slice
-            ? new BoundConversion(span, slice,
-                new BoundArrayLiteral(span, ArrayOf(element), element, items) { OnStack = true },
-                ConversionKind.ArrayToSlice)
-            : new BoundArrayLiteral(span, gathered.Type, element, items);
+        bool viewed = gathered.Type is SliceTypeSymbol;
+        var packed = new BoundParamsArray(span, gathered.Type,
+            viewed ? ArrayOf(element) : (ArrayTypeSymbol)gathered.Type, items)
+        {
+            InFrame = viewed,
+        };
 
         var rewritten = new List<BoundExpression>(arguments);
         rewritten.RemoveRange(at, count);

@@ -147,6 +147,24 @@ public sealed partial class Lowerer
         return total;
     }
 
+    /// <summary>
+    /// The array a <c>params</c> parameter is given; for a <c>T[:]</c>, viewed
+    /// as the slice, and checked on the way out of the statement for a
+    /// reference anything kept where it lives in the frame.
+    /// </summary>
+    private BoundExpression LowerParamsArray(BoundParamsArray gathered)
+    {
+        var literal = new BoundArrayLiteral(gathered.Span, gathered.Array, gathered.Array.Element,
+            RewriteAll(gathered.Elements))
+        {
+            OnStack = gathered.InFrame,
+        };
+
+        return gathered.Type is SliceTypeSymbol slice
+            ? new BoundConversion(gathered.Span, slice, literal, ConversionKind.ArrayToSlice)
+            : literal;
+    }
+
     private static BoundLiteral Word(SourceSpan span, int value) =>
         new(span, PrimitiveTypeSymbol.NUInt, (ulong)value);
 }

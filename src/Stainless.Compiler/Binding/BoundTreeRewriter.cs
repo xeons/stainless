@@ -701,6 +701,17 @@ public abstract class BoundTreeRewriter
                     };
             }
 
+            case BoundParamsArray gathered:
+            {
+                var elements = RewriteAll(gathered.Elements);
+                return Same(gathered.Elements, elements)
+                    ? gathered
+                    : new BoundParamsArray(gathered.Span, gathered.Type, gathered.Array, elements)
+                    {
+                        InFrame = gathered.InFrame,
+                    };
+            }
+
             case BoundCollection collection:
             {
                 var parts = RewriteAll(collection.Parts);

@@ -693,7 +693,29 @@ public sealed class BoundArrayLiteral(
     /// caller's frame for the statement, and is checked on the way out for a
     /// reference anything kept.
     /// </summary>
-    public bool OnStack { get; set; }
+    public bool OnStack { get; init; }
+}
+
+/// <summary>
+/// What a call gave its <c>params</c> parameter element by element,
+/// gathered: into a <c>T[]</c> made for the call, or for a <c>T[:]</c>, into
+/// an array the slice views.
+/// </summary>
+public sealed class BoundParamsArray(
+    SourceSpan span, TypeSymbol type, ArrayTypeSymbol array, IReadOnlyList<BoundExpression> elements)
+    : BoundSemanticExpression(span, type)
+{
+    /// <summary>The array made: the parameter's own type, or the one its slice views.</summary>
+    public ArrayTypeSymbol Array { get; } = array;
+
+    /// <summary>Each converted to the element type.</summary>
+    public IReadOnlyList<BoundExpression> Elements { get; } = elements;
+
+    /// <summary>
+    /// True where the array lives in the caller's frame for the statement,
+    /// which a <c>T[:]</c> is given unless the call outlives the statement.
+    /// </summary>
+    public bool InFrame { get; set; }
 }
 
 /// <summary>How a <see cref="BoundCollection"/> makes what it becomes.</summary>
