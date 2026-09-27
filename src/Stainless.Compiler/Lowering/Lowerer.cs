@@ -42,12 +42,11 @@ public sealed partial class Lowerer : BoundTreeRewriter
             return program;
 
         var lowerer = new Lowerer();
-        var accessors = new AccessorLowerer(lowerer);
         var functions = new List<BoundFunction>(program.Functions.Count);
 
         foreach (var function in program.Functions)
         {
-            var body = accessors.Rewrite(lowerer.Rewrite(function.Body));
+            var body = function.NeedsLowering ? lowerer.Rewrite(function.Body) : function.Body;
             functions.Add(ReferenceEquals(body, function.Body)
                 ? function
                 : new BoundFunction(function.Symbol, AsBlock(body)));
@@ -56,7 +55,7 @@ public sealed partial class Lowerer : BoundTreeRewriter
         var initializers = new Dictionary<StaticSymbol, BoundExpression>();
         foreach (var shared in program.Statics)
             if (shared.Initializer is { } initializer)
-                initializers[shared] = accessors.Rewrite(lowerer.Rewrite(initializer));
+                initializers[shared] = lowerer.Rewrite(initializer);
 
         var lowered = program with
         {
@@ -76,20 +75,30 @@ public sealed partial class Lowerer : BoundTreeRewriter
     {
         BoundSwitch chosen => LowerSwitch(chosen),
         BoundForEach loop => LowerForEach(loop),
-        _ => base.Rewrite(statement),
+        _ => LowerDropping(statement) ?? base.Rewrite(statement),
     };
 
     /// <inheritdoc cref="Rewrite(BoundStatement)"/>
     public override BoundExpression Rewrite(BoundExpression expression) => expression switch
     {
+        BoundSemanticExpression semantic => LowerSemantic(semantic),
+        BoundSequence sequence => Sequence(sequence, Rewrite(sequence.Value)),
+        _ => base.Rewrite(expression),
+    };
+
+    private BoundExpression LowerSemantic(BoundSemanticExpression expression) => expression switch
+    {
         BoundIsPattern matched => LowerIsPattern(matched),
         BoundSwitchExpression chosen => LowerSwitchExpression(chosen),
         BoundConditionalAccess asked => LowerConditionalAccess(asked),
         BoundNullFallback fallback => LowerNullFallback(fallback),
-        BoundCompoundAssignment compound => LowerCompoundAssignment(compound),
+        BoundCompoundAssignment compound => LowerCompoundAssignment(compound, discarded: false),
+        BoundPropertyAssignment written => LowerPropertyAssignment(written),
+        BoundPropertyIncrement stepped => LowerPropertyIncrement(stepped, discarded: false),
         BoundWith copied => LowerWith(copied),
         BoundObjectInitializer initialized => LowerObjectInitializer(initialized),
-        _ => base.Rewrite(expression),
+        _ => throw new Source.InternalCompilerError(
+            $"lowering has no case for {expression.GetType().Name}", expression.Span),
     };
 
     private static BoundBlock AsBlock(BoundStatement statement) =>

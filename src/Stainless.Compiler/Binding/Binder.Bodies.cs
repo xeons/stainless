@@ -78,6 +78,7 @@ public sealed partial class Binder
         if (!_boundFunctions.Add(function)) return;
 
         _patternVariableNames.Clear();
+        int semantic = SemanticNodes.Made;
 
         // `base(...)` is only a statement at the very head of a constructor, so
         // the one place it may appear is found before anything is bound and
@@ -133,7 +134,12 @@ public sealed partial class Binder
 
         CheckOutParametersAssigned(function, body);
 
-        _functions.Add(new BoundFunction(function, body));
+        // A constructor holds its field initializers too, which were bound
+        // somewhere else.
+        _functions.Add(new BoundFunction(function, body)
+        {
+            NeedsLowering = function.Kind == FunctionKind.Constructor || SemanticNodes.Made != semantic,
+        });
     }
 
     /// <summary>

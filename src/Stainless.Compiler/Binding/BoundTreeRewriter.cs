@@ -344,22 +344,7 @@ public abstract class BoundTreeRewriter
                 or BoundUnmatchedSwitch or BoundOutDraft or BoundLambda or BoundPlaceholder:
                 return expression;
 
-            case BoundInterpolatedString interpolated:
-            {
-                var parts = RewriteAll(interpolated.Parts);
-                return Same(interpolated.Parts, parts)
-                    ? interpolated
-                    : new BoundInterpolatedString(interpolated.Span, interpolated.Type, parts);
-            }
-
-            case BoundFieldAccess field:
-            {
-                var receiver = RewriteOptional(field.Receiver);
-                return Same(field.Receiver, receiver)
-                    ? field
-                    : new BoundFieldAccess(field.Span, receiver, field.Field);
-            }
-
+            // The commonest nodes first: a switch over types asks them in order.
             case BoundCall call:
             {
                 var receiver = RewriteOptional(call.Receiver);
@@ -370,6 +355,50 @@ public abstract class BoundTreeRewriter
                     {
                         IsNonVirtual = call.IsNonVirtual,
                         EvaluationOrder = call.EvaluationOrder,
+                    };
+            }
+
+            case BoundFieldAccess field:
+            {
+                var receiver = RewriteOptional(field.Receiver);
+                return Same(field.Receiver, receiver)
+                    ? field
+                    : new BoundFieldAccess(field.Span, receiver, field.Field);
+            }
+
+            case BoundConversion conversion:
+            {
+                var operand = Rewrite(conversion.Operand);
+                return Same(conversion.Operand, operand)
+                    ? conversion
+                    : new BoundConversion(conversion.Span, conversion.Type, operand, conversion.Kind)
+                    {
+                        IsChecked = conversion.IsChecked,
+                    };
+            }
+
+            case BoundBinary binary:
+            {
+                var left = Rewrite(binary.Left);
+                var right = Rewrite(binary.Right);
+                return Same(binary.Left, left) && Same(binary.Right, right)
+                    ? binary
+                    : new BoundBinary(binary.Span, binary.Type, left, binary.Operator, right)
+                    {
+                        IsChecked = binary.IsChecked,
+                    };
+            }
+
+            case BoundAssignment assignment:
+            {
+                var target = Rewrite(assignment.Target);
+                var value = Rewrite(assignment.Value);
+                return Same(assignment.Target, target) && Same(assignment.Value, value)
+                    ? assignment
+                    : new BoundAssignment(assignment.Span, target, value)
+                    {
+                        DeclaresLocal = assignment.DeclaresLocal,
+                        IsInitialization = assignment.IsInitialization,
                     };
             }
 
@@ -384,16 +413,71 @@ public abstract class BoundTreeRewriter
                     };
             }
 
-            case BoundBinary binary:
+            case BoundIndex index:
             {
-                var left = Rewrite(binary.Left);
-                var right = Rewrite(binary.Right);
-                return Same(binary.Left, left) && Same(binary.Right, right)
-                    ? binary
-                    : new BoundBinary(binary.Span, binary.Type, left, binary.Operator, right)
+                var target = Rewrite(index.Target);
+                var position = Rewrite(index.Index);
+                return Same(index.Target, target) && Same(index.Index, position)
+                    ? index
+                    : new BoundIndex(index.Span, index.Type, target, position) { Origin = index.Origin };
+            }
+
+            case BoundLet held:
+            {
+                var value = Rewrite(held.Value);
+                var body = Rewrite(held.Body);
+                return Same(held.Value, value) && Same(held.Body, body)
+                    ? held
+                    : new BoundLet(held.Span, held.Local, value, body) { IsOwned = held.IsOwned };
+            }
+
+            case BoundSequence sequence:
+            {
+                var before = RewriteAll(sequence.Before);
+                var value = Rewrite(sequence.Value);
+                return Same(sequence.Before, before) && Same(sequence.Value, value)
+                    ? sequence
+                    : new BoundSequence(sequence.Span, before, value);
+            }
+
+            case BoundConditional conditional:
+            {
+                var condition = Rewrite(conditional.Condition);
+                var whenTrue = Rewrite(conditional.WhenTrue);
+                var whenFalse = Rewrite(conditional.WhenFalse);
+                return Same(conditional.Condition, condition) && Same(conditional.WhenTrue, whenTrue) &&
+                       Same(conditional.WhenFalse, whenFalse)
+                    ? conditional
+                    : new BoundConditional(conditional.Span, conditional.Type, condition, whenTrue, whenFalse);
+            }
+
+            case BoundAddressOf address:
+            {
+                var operand = Rewrite(address.Operand);
+                return Same(address.Operand, operand)
+                    ? address
+                    : new BoundAddressOf(address.Span, address.Type, operand)
                     {
-                        IsChecked = binary.IsChecked,
+                        FromRefKeyword = address.FromRefKeyword,
+                        FromOutKeyword = address.FromOutKeyword,
+                        DeclaresLocal = address.DeclaresLocal,
                     };
+            }
+
+            case BoundArrayLength length:
+            {
+                var array = Rewrite(length.Array);
+                return Same(length.Array, array)
+                    ? length
+                    : new BoundArrayLength(length.Span, length.Type, array);
+            }
+
+            case BoundInterpolatedString interpolated:
+            {
+                var parts = RewriteAll(interpolated.Parts);
+                return Same(interpolated.Parts, parts)
+                    ? interpolated
+                    : new BoundInterpolatedString(interpolated.Span, interpolated.Type, parts);
             }
 
             case BoundIncrement stepped:
@@ -420,19 +504,6 @@ public abstract class BoundTreeRewriter
                     };
             }
 
-            case BoundAssignment assignment:
-            {
-                var target = Rewrite(assignment.Target);
-                var value = Rewrite(assignment.Value);
-                return Same(assignment.Target, target) && Same(assignment.Value, value)
-                    ? assignment
-                    : new BoundAssignment(assignment.Span, target, value)
-                    {
-                        DeclaresLocal = assignment.DeclaresLocal,
-                        IsInitialization = assignment.IsInitialization,
-                    };
-            }
-
             case BoundPropertyAssignment written:
             {
                 var receiver = RewriteOptional(written.Receiver);
@@ -446,24 +517,6 @@ public abstract class BoundTreeRewriter
                         IsNonVirtual = written.IsNonVirtual,
                         Indices = indices,
                     };
-            }
-
-            case BoundLet held:
-            {
-                var value = Rewrite(held.Value);
-                var body = Rewrite(held.Body);
-                return Same(held.Value, value) && Same(held.Body, body)
-                    ? held
-                    : new BoundLet(held.Span, held.Local, value, body) { IsOwned = held.IsOwned };
-            }
-
-            case BoundSequence sequence:
-            {
-                var before = RewriteAll(sequence.Before);
-                var value = Rewrite(sequence.Value);
-                return Same(sequence.Before, before) && Same(sequence.Value, value)
-                    ? sequence
-                    : new BoundSequence(sequence.Span, before, value);
             }
 
             case BoundObjectInitializer initialized:
@@ -530,17 +583,6 @@ public abstract class BoundTreeRewriter
                 return Same(fallback.Value, value) && Same(fallback.Fallback, otherwise)
                     ? fallback
                     : new BoundNullFallback(fallback.Span, fallback.Type, value, otherwise);
-            }
-
-            case BoundConditional conditional:
-            {
-                var condition = Rewrite(conditional.Condition);
-                var whenTrue = Rewrite(conditional.WhenTrue);
-                var whenFalse = Rewrite(conditional.WhenFalse);
-                return Same(conditional.Condition, condition) && Same(conditional.WhenTrue, whenTrue) &&
-                       Same(conditional.WhenFalse, whenFalse)
-                    ? conditional
-                    : new BoundConditional(conditional.Span, conditional.Type, condition, whenTrue, whenFalse);
             }
 
             case BoundFunctionGroup group:
@@ -759,17 +801,6 @@ public abstract class BoundTreeRewriter
                     : chosen;
             }
 
-            case BoundConversion conversion:
-            {
-                var operand = Rewrite(conversion.Operand);
-                return Same(conversion.Operand, operand)
-                    ? conversion
-                    : new BoundConversion(conversion.Span, conversion.Type, operand, conversion.Kind)
-                    {
-                        IsChecked = conversion.IsChecked,
-                    };
-            }
-
             case BoundNew created:
             {
                 var arguments = RewriteAll(created.Arguments);
@@ -800,19 +831,6 @@ public abstract class BoundTreeRewriter
                     : new BoundDereference(dereference.Span, dereference.Type, operand);
             }
 
-            case BoundAddressOf address:
-            {
-                var operand = Rewrite(address.Operand);
-                return Same(address.Operand, operand)
-                    ? address
-                    : new BoundAddressOf(address.Span, address.Type, operand)
-                    {
-                        FromRefKeyword = address.FromRefKeyword,
-                        FromOutKeyword = address.FromOutKeyword,
-                        DeclaresLocal = address.DeclaresLocal,
-                    };
-            }
-
             case BoundNewArray array:
             {
                 var length = Rewrite(array.Length);
@@ -833,23 +851,6 @@ public abstract class BoundTreeRewriter
                         StartOrigin = slice.StartOrigin,
                         EndOrigin = slice.EndOrigin,
                     };
-            }
-
-            case BoundArrayLength length:
-            {
-                var array = Rewrite(length.Array);
-                return Same(length.Array, array)
-                    ? length
-                    : new BoundArrayLength(length.Span, length.Type, array);
-            }
-
-            case BoundIndex index:
-            {
-                var target = Rewrite(index.Target);
-                var position = Rewrite(index.Index);
-                return Same(index.Target, target) && Same(index.Index, position)
-                    ? index
-                    : new BoundIndex(index.Span, index.Type, target, position) { Origin = index.Origin };
             }
 
             default:

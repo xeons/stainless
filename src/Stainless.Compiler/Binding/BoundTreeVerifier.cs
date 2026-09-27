@@ -74,9 +74,7 @@ public static class BoundTreeVerifier
     /// rewrites into the core and the emitter has no case for.
     /// </summary>
     private static bool IsSemanticOnly(object node) =>
-        node is BoundSwitch or BoundSwitchExpression or BoundIsPattern or BoundPlaceholder or BoundForEach
-            or BoundConditionalAccess or BoundNullFallback or BoundCompoundAssignment or BoundWith
-            or BoundObjectInitializer or BoundPropertyAssignment or BoundPropertyIncrement;
+        node is BoundSemanticExpression or BoundSemanticStatement or BoundPlaceholder;
 
     /// <summary>
     /// Whether a type is one binding settles or refuses, and so has no

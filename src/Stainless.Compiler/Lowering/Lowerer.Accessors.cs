@@ -35,14 +35,15 @@ namespace Stainless.Lowering;
 /// receiver and one set of indices, each evaluated once.
 /// </para>
 /// <para>
-/// A pass of its own after the rest of lowering, because whether a value is
-/// read depends on where the write ends up, and other lowerings make writes:
-/// <c>with</c>, an object initializer, a compound assignment.
+/// So whether an expression's value is read decides how it lowers, and the
+/// statements and expressions that drop a value lower it through
+/// <see cref="Discarded"/>.
 /// </para>
 /// </summary>
-internal sealed class AccessorLowerer(Lowerer lowerer) : BoundTreeRewriter
+public sealed partial class Lowerer
 {
-    public override BoundStatement Rewrite(BoundStatement statement)
+    /// <summary>A statement that drops a value, or null for any other.</summary>
+    private BoundStatement? LowerDropping(BoundStatement statement)
     {
         switch (statement)
         {
@@ -56,8 +57,8 @@ internal sealed class AccessorLowerer(Lowerer lowerer) : BoundTreeRewriter
 
             case BoundFor { Step: { } step } loop:
             {
-                var initializer = loop.Initializer is null ? null : Rewrite(loop.Initializer);
-                var condition = loop.Condition is null ? null : Rewrite(loop.Condition);
+                var initializer = RewriteOptional(loop.Initializer);
+                var condition = RewriteOptional(loop.Condition);
                 var body = Rewrite(loop.Body);
                 var stepped = Discarded(step);
 
@@ -73,26 +74,40 @@ internal sealed class AccessorLowerer(Lowerer lowerer) : BoundTreeRewriter
             case BoundDeconstruct taken:
             {
                 var declarations = taken.Declarations.Select(d => (BoundLocalDeclaration)Rewrite(d)).ToList();
-                return new BoundDeconstruct(taken.Span, declarations, Discarded(taken.Expression));
+                var expression = Discarded(taken.Expression);
+                return ReferenceEquals(expression, taken.Expression) &&
+                       declarations.SequenceEqual(taken.Declarations)
+                    ? taken
+                    : new BoundDeconstruct(taken.Span, declarations, expression);
             }
 
             default:
-                return base.Rewrite(statement);
+                return null;
         }
     }
 
-    public override BoundExpression Rewrite(BoundExpression expression) => expression switch
+    /// <summary>A sequence whose earlier parts are evaluated for what they do, rebuilt only if they changed.</summary>
+    private BoundSequence Sequence(BoundSequence sequence, BoundExpression value)
     {
-        BoundPropertyAssignment written => Written(written),
-        BoundPropertyIncrement stepped => Stepped(stepped, discarded: false),
-        BoundSequence sequence => new BoundSequence(sequence.Span,
-            sequence.Before.Select(Discarded).ToList(), Rewrite(sequence.Value)),
-        _ => base.Rewrite(expression),
-    };
+        List<BoundExpression>? before = null;
+        for (int i = 0; i < sequence.Before.Count; i++)
+        {
+            var side = Discarded(sequence.Before[i]);
+            if (before is null && !ReferenceEquals(side, sequence.Before[i]))
+                before = [.. sequence.Before.Take(i)];
+            before?.Add(side);
+        }
+
+        return before is null && ReferenceEquals(value, sequence.Value)
+            ? sequence
+            : new BoundSequence(sequence.Span, before ?? sequence.Before, value);
+    }
 
     /// <summary>An expression evaluated for what it does, its value dropped.</summary>
     private BoundExpression Discarded(BoundExpression expression) => expression switch
     {
+        BoundCompoundAssignment compound => LowerCompoundAssignment(compound, discarded: true),
+
         BoundPropertyAssignment written => new BoundCall(written.Span, written.Property.Setter!,
             RewriteOptional(written.Receiver),
             [.. RewriteAll(written.Indices), Rewrite(written.Value)])
@@ -100,24 +115,29 @@ internal sealed class AccessorLowerer(Lowerer lowerer) : BoundTreeRewriter
             IsNonVirtual = written.IsNonVirtual,
         },
 
-        BoundPropertyIncrement stepped => Stepped(stepped, discarded: true),
+        BoundPropertyIncrement stepped => LowerPropertyIncrement(stepped, discarded: true),
 
-        BoundSequence sequence => new BoundSequence(sequence.Span,
-            sequence.Before.Select(Discarded).ToList(), Discarded(sequence.Value)),
+        BoundSequence sequence => Sequence(sequence, Discarded(sequence.Value)),
 
-        BoundLet held => new BoundLet(held.Span, held.Local, Rewrite(held.Value), Discarded(held.Body))
-        {
-            IsOwned = held.IsOwned,
-        },
+        BoundLet held => Let(held),
 
         _ => Rewrite(expression),
     };
+
+    private BoundLet Let(BoundLet held)
+    {
+        var value = Rewrite(held.Value);
+        var body = Discarded(held.Body);
+        return ReferenceEquals(value, held.Value) && ReferenceEquals(body, held.Body)
+            ? held
+            : new BoundLet(held.Span, held.Local, value, body) { IsOwned = held.IsOwned };
+    }
 
     /// <summary>
     /// <c>let r = receiver in let i = index in let v = value in (set(r, i, v), v)</c>:
     /// what an assignment is where its value is read.
     /// </summary>
-    private BoundExpression Written(BoundPropertyAssignment written)
+    private BoundExpression LowerPropertyAssignment(BoundPropertyAssignment written)
     {
         var span = written.Span;
         var held = new List<(LocalSymbol Local, BoundExpression Value)>();
@@ -138,7 +158,7 @@ internal sealed class AccessorLowerer(Lowerer lowerer) : BoundTreeRewriter
     /// The getter, one more or one less, the setter: on one receiver and one
     /// set of indices, and with the value before or after as the result.
     /// </summary>
-    private BoundExpression Stepped(BoundPropertyIncrement stepped, bool discarded)
+    private BoundExpression LowerPropertyIncrement(BoundPropertyIncrement stepped, bool discarded)
     {
         var span = stepped.Span;
         var property = stepped.Property;
@@ -154,7 +174,7 @@ internal sealed class AccessorLowerer(Lowerer lowerer) : BoundTreeRewriter
             return Around(span, held, Set(Step(read, stepped)));
 
         // `++x` is the value after; `x++` the value before, which the step is made from.
-        var kept = lowerer.Synthetic(stepped.IsPrefix ? "now" : "was", property.Type);
+        var kept = Synthetic(stepped.IsPrefix ? "now" : "was", property.Type);
         var named = new BoundLocalAccess(span, kept);
 
         var body = stepped.IsPrefix
@@ -186,7 +206,7 @@ internal sealed class AccessorLowerer(Lowerer lowerer) : BoundTreeRewriter
         if (Places.IsFixed(value))
             return value;
 
-        var local = lowerer.Synthetic(hint, value.Type);
+        var local = Synthetic(hint, value.Type);
         held.Add((local, value));
         return new BoundLocalAccess(value.Span, local);
     }

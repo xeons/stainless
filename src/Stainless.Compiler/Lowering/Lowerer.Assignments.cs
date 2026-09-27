@@ -23,14 +23,15 @@ public sealed partial class Lowerer
 {
     private Places Holds => new((hint, type) => Synthetic(hint, type));
 
-    private BoundExpression LowerCompoundAssignment(BoundCompoundAssignment compound)
+    private BoundExpression LowerCompoundAssignment(BoundCompoundAssignment compound, bool discarded)
     {
         var span = compound.Span;
         var target = Rewrite(compound.Target);
         var held = new List<HeldValue>();
 
         if (compound.Property is { } property)
-            return Places.WithHeld(span, held, LowerPropertyCompound(compound, property, (BoundCall)target, held));
+            return Places.WithHeld(span, held,
+                LowerPropertyCompound(compound, property, (BoundCall)target, held, discarded));
 
         // The place is held only when naming it again could differ, which is
         // when something here has an effect.
@@ -56,7 +57,8 @@ public sealed partial class Lowerer
     /// answered nothing.
     /// </summary>
     private BoundExpression LowerPropertyCompound(
-        BoundCompoundAssignment compound, PropertySymbol property, BoundCall read, List<HeldValue> held)
+        BoundCompoundAssignment compound, PropertySymbol property, BoundCall read, List<HeldValue> held,
+        bool discarded)
     {
         var span = compound.Span;
         var receiver = read.Receiver;
@@ -72,12 +74,15 @@ public sealed partial class Lowerer
         var reread = new BoundCall(read.Span, read.Function, receiver, indices) { IsNonVirtual = read.IsNonVirtual };
 
         if (!compound.IsFallback)
-            return new BoundPropertyAssignment(span, receiver, property,
-                Rewrite(Replace(compound.Combined, compound.Current, reread)))
+        {
+            var written = new BoundPropertyAssignment(span, receiver, property,
+                Replace(compound.Combined, compound.Current, reread))
             {
                 Indices = indices,
                 IsNonVirtual = read.IsNonVirtual,
             };
+            return discarded ? Discarded(written) : LowerPropertyAssignment(written);
+        }
 
         var was = Synthetic("was", property.Type);
         var wasRead = new BoundLocalAccess(span, was);
@@ -86,11 +91,11 @@ public sealed partial class Lowerer
             new BoundConditional(span, property.Type,
                 new BoundBinary(span, PrimitiveTypeSymbol.Bool, wasRead,
                     BoundBinaryOp.Equal, new BoundNullLiteral(span, property.Type)),
-                new BoundPropertyAssignment(span, receiver, property, Rewrite(compound.Combined))
+                LowerPropertyAssignment(new BoundPropertyAssignment(span, receiver, property, compound.Combined)
                 {
                     Indices = indices,
                     IsNonVirtual = read.IsNonVirtual,
-                },
+                }),
                 wasRead));
     }
 
@@ -118,7 +123,7 @@ public sealed partial class Lowerer
         var named = new BoundLocalAccess(span, copy);
 
         var steps = copied.Assignments
-            .Select(BoundExpression (w) => new BoundPropertyAssignment(w.Span, named, w.Property, Rewrite(w.Value)))
+            .Select(w => Discarded(new BoundPropertyAssignment(w.Span, named, w.Property, w.Value)))
             .ToList();
 
         return new BoundLet(span, held, target,
@@ -136,7 +141,7 @@ public sealed partial class Lowerer
         var reading = new BoundLocalAccess(span, held);
 
         var writes = initialized.Writes
-            .Select(write => Rewrite(Replace(write, initialized.Made, reading)))
+            .Select(write => Discarded(Replace(write, initialized.Made, reading)))
             .ToList();
 
         return new BoundLet(span, held, Rewrite(initialized.Creation),

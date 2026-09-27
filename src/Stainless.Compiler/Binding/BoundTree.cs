@@ -162,6 +162,38 @@ public abstract class BoundExpression(SourceSpan span, TypeSymbol type)
     public virtual bool IsLValue => false;
 }
 
+/// <summary>
+/// An expression only the semantic tree holds, which lowering takes away.
+/// Each counts itself as it is made, so binding can tell a body that has none
+/// and lowering can hand such a body on as it is.
+/// </summary>
+public abstract class BoundSemanticExpression : BoundExpression
+{
+    protected BoundSemanticExpression(SourceSpan span, TypeSymbol type) : base(span, type) => SemanticNodes.Made++;
+}
+
+/// <inheritdoc cref="BoundSemanticExpression"/>
+public abstract class BoundSemanticStatement : BoundStatement
+{
+    protected BoundSemanticStatement(SourceSpan span) : base(span) => SemanticNodes.Made++;
+}
+
+/// <summary>
+/// How many semantic nodes have been made on this thread. A compilation binds
+/// on one thread, so the count before and after a body says whether it made any.
+/// </summary>
+internal static class SemanticNodes
+{
+    [ThreadStatic]
+    private static int t_made;
+
+    public static int Made
+    {
+        get => t_made;
+        set => t_made = value;
+    }
+}
+
 public sealed class BoundErrorExpression(SourceSpan span)
     : BoundExpression(span, ErrorTypeSymbol.Instance);
 
@@ -352,7 +384,7 @@ public sealed class BoundPropertyIncrement(
     PropertySymbol property,
     bool isPrefix,
     bool isIncrement,
-    IReadOnlyList<BoundExpression>? arguments = null) : BoundExpression(span, property.Type)
+    IReadOnlyList<BoundExpression>? arguments = null) : BoundSemanticExpression(span, property.Type)
 {
     public BoundExpression? Receiver { get; } = receiver;
     public PropertySymbol Property { get; } = property;
@@ -397,7 +429,7 @@ public sealed class BoundAssignment(SourceSpan span, BoundExpression target, Bou
 /// </summary>
 public sealed class BoundObjectInitializer(
     SourceSpan span, TypeSymbol type, BoundExpression creation, BoundPlaceholder made,
-    IReadOnlyList<BoundExpression> writes) : BoundExpression(span, type)
+    IReadOnlyList<BoundExpression> writes) : BoundSemanticExpression(span, type)
 {
     public BoundExpression Creation { get; } = creation;
 
@@ -414,7 +446,7 @@ public sealed class BoundObjectInitializer(
 /// </summary>
 public sealed class BoundWith(
     SourceSpan span, ClassTypeSymbol record, BoundExpression target, FunctionSymbol clone,
-    IReadOnlyList<BoundWithAssignment> assignments) : BoundExpression(span, record)
+    IReadOnlyList<BoundWithAssignment> assignments) : BoundSemanticExpression(span, record)
 {
     public ClassTypeSymbol Record { get; } = record;
     public BoundExpression Target { get; } = target;
@@ -442,7 +474,7 @@ public sealed class BoundWithAssignment(SourceSpan span, PropertySymbol property
 /// </summary>
 public sealed class BoundCompoundAssignment(
     SourceSpan span, TypeSymbol type, BoundExpression target, BoundPlaceholder current,
-    BoundExpression value, BoundExpression combined, bool isFallback) : BoundExpression(span, type)
+    BoundExpression value, BoundExpression combined, bool isFallback) : BoundSemanticExpression(span, type)
 {
     /// <summary>The place, or for a property the call to its getter that read it.</summary>
     public BoundExpression Target { get; } = target;
@@ -478,7 +510,7 @@ public sealed class BoundCompoundAssignment(
 /// </summary>
 public sealed class BoundPropertyAssignment(
     SourceSpan span, BoundExpression? receiver, PropertySymbol property, BoundExpression value)
-    : BoundExpression(span, property.Type)
+    : BoundSemanticExpression(span, property.Type)
 {
     /// <summary>Null for a static property, which is written by naming its type.</summary>
     public BoundExpression? Receiver { get; } = receiver;
@@ -544,7 +576,7 @@ public sealed class BoundLet(
 /// </summary>
 public sealed class BoundConditionalAccess(
     SourceSpan span, TypeSymbol type, BoundExpression receiver, BoundPlaceholder present,
-    BoundExpression access, BoundExpression whenNothing) : BoundExpression(span, type)
+    BoundExpression access, BoundExpression whenNothing) : BoundSemanticExpression(span, type)
 {
     /// <summary>The optional asked about.</summary>
     public BoundExpression Receiver { get; } = receiver;
@@ -565,7 +597,7 @@ public sealed class BoundConditionalAccess(
 /// </summary>
 public sealed class BoundNullFallback(
     SourceSpan span, TypeSymbol type, BoundExpression value, BoundExpression fallback)
-    : BoundExpression(span, type)
+    : BoundSemanticExpression(span, type)
 {
     public BoundExpression Value { get; } = value;
 
@@ -919,7 +951,7 @@ public sealed class BoundTypeTest(
 /// </summary>
 public sealed class BoundIsPattern(
     SourceSpan span, BoundExpression subject, BoundPlaceholder input, BoundPattern pattern)
-    : BoundExpression(span, PrimitiveTypeSymbol.Bool)
+    : BoundSemanticExpression(span, PrimitiveTypeSymbol.Bool)
 {
     /// <summary>The value tested, as written.</summary>
     public BoundExpression Subject { get; } = subject;
@@ -956,7 +988,7 @@ public sealed class BoundIsPattern(
 public sealed class BoundSwitchExpression(
     SourceSpan span, TypeSymbol type, BoundExpression subject, BoundPlaceholder input,
     IReadOnlyList<BoundSwitchArm> arms)
-    : BoundExpression(span, type)
+    : BoundSemanticExpression(span, type)
 {
     public BoundExpression Subject { get; } = subject;
 
@@ -1349,7 +1381,7 @@ public sealed class BoundGoto(SourceSpan span, LabelSymbol label) : BoundStateme
 /// </summary>
 public sealed class BoundForEach(
     SourceSpan span, BoundExpression collection, LocalSymbol variable, BoundPlaceholder element,
-    BoundExpression value, BoundStatement? deconstruction, BoundStatement body) : BoundStatement(span)
+    BoundExpression value, BoundStatement? deconstruction, BoundStatement body) : BoundSemanticStatement(span)
 {
     public BoundExpression Collection { get; } = collection;
 
@@ -1549,7 +1581,7 @@ public sealed class BoundSwitchSection(
 public sealed class BoundSwitch(
     SourceSpan span, BoundExpression subject, BoundPlaceholder input,
     IReadOnlyList<BoundSwitchSection> sections)
-    : BoundStatement(span)
+    : BoundSemanticStatement(span)
 {
     public BoundExpression Subject { get; } = subject;
 
@@ -1732,4 +1764,10 @@ public sealed class BoundFunction(FunctionSymbol symbol, BoundBlock body)
 {
     public FunctionSymbol Symbol { get; } = symbol;
     public BoundBlock Body { get; } = body;
+
+    /// <summary>
+    /// False when binding the body made nothing lowering takes away, so the
+    /// body is already the core and lowering hands it on as it is.
+    /// </summary>
+    public bool NeedsLowering { get; init; } = true;
 }
