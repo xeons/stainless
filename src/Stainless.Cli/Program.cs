@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using Stainless.Driver;
 using Stainless.Emit;
 
@@ -25,6 +26,8 @@ internal static class Program
     private static int Main(string[] args)
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
+        s_colorOutput = CanColor(Console.IsOutputRedirected, StdOutputHandle);
+        s_colorError = CanColor(Console.IsErrorRedirected, StdErrorHandle);
 
         if (args.Length == 0 || args[0] is "-h" or "--help" or "help")
         {
@@ -1113,7 +1116,7 @@ internal static class Program
 
     private static bool Report(CompilationResult result)
     {
-        bool color = !Console.IsErrorRedirected && !s_jsonDiagnostics;
+        bool color = s_colorError && !s_jsonDiagnostics;
 
         foreach (var diagnostic in result.Diagnostics)
         {
@@ -1147,6 +1150,42 @@ internal static class Program
     /// In JSON mode it goes out as a diagnostic with no file and no code, so a
     /// reader has one stream to read rather than a stream and a special case.
     /// </summary>
+    /// <summary>Whether standard output and standard error take ANSI colour.</summary>
+    private static bool s_colorOutput;
+    private static bool s_colorError;
+
+    private const int StdOutputHandle = -11;
+    private const int StdErrorHandle = -12;
+    private const uint EnableVirtualTerminalProcessing = 0x0004;
+
+    /// <summary>
+    /// Whether a stream may carry colour: it is a console, <c>NO_COLOR</c> is
+    /// unset, and on Windows the console agreed to interpret escape sequences.
+    /// cmd.exe prints them as text until a program asks, and a console too old
+    /// to understand the request refuses it.
+    /// </summary>
+    private static bool CanColor(bool redirected, int standardHandle)
+    {
+        if (redirected || Environment.GetEnvironmentVariable("NO_COLOR") is { Length: > 0 })
+            return false;
+        if (!OperatingSystem.IsWindows())
+            return true;
+
+        nint handle = GetStdHandle(standardHandle);
+        return GetConsoleMode(handle, out uint mode)
+            && ((mode & EnableVirtualTerminalProcessing) != 0
+                || SetConsoleMode(handle, mode | EnableVirtualTerminalProcessing));
+    }
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern nint GetStdHandle(int standardHandle);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern bool GetConsoleMode(nint console, out uint mode);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern bool SetConsoleMode(nint console, uint mode);
+
     private static void Error(string message)
     {
         if (s_jsonDiagnostics)
@@ -1156,19 +1195,19 @@ internal static class Program
             return;
         }
 
-        bool color = !Console.IsErrorRedirected;
+        bool color = s_colorError;
         Console.Error.WriteLine($"{(color ? "\u001b[1;31m" : "")}error{(color ? "\u001b[0m" : "")}: {message}");
     }
 
     private static void Note(string message)
     {
-        bool color = !Console.IsErrorRedirected;
+        bool color = s_colorError;
         Console.Error.WriteLine($"{(color ? "\u001b[1;36m" : "")}note{(color ? "\u001b[0m" : "")}: {message}");
     }
 
     private static void Success(string message)
     {
-        bool color = !Console.IsOutputRedirected;
+        bool color = s_colorOutput;
         Console.WriteLine($"{(color ? "\u001b[1;32m" : "")}ok{(color ? "\u001b[0m" : "")}: {message}");
     }
 

@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using Stainless.Driver;
 
@@ -116,8 +117,35 @@ namespace Stainless.Tests;
 /// </summary>
 internal static class Program
 {
+    /// <summary>
+    /// Asks a Windows console to interpret the colour codes this writes, which
+    /// cmd.exe otherwise prints as text. A redirected stream has no console
+    /// mode, and the request quietly fails.
+    /// </summary>
+    private static void EnableEscapeSequences()
+    {
+        const uint enableVirtualTerminalProcessing = 0x0004;
+        if (!OperatingSystem.IsWindows())
+            return;
+
+        nint handle = GetStdHandle(-11);
+        if (GetConsoleMode(handle, out uint mode))
+            SetConsoleMode(handle, mode | enableVirtualTerminalProcessing);
+    }
+
+    [DllImport("kernel32.dll")]
+    private static extern nint GetStdHandle(int standardHandle);
+
+    [DllImport("kernel32.dll")]
+    private static extern bool GetConsoleMode(nint console, out uint mode);
+
+    [DllImport("kernel32.dll")]
+    private static extern bool SetConsoleMode(nint console, uint mode);
+
     private static int Main(string[] args)
     {
+        EnableEscapeSequences();
+
         string root = FindCasesDirectory();
         if (root.Length == 0)
         {
