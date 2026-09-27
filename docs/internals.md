@@ -168,7 +168,7 @@ ships in the same directory.
       |   program is known before any body is checked. That single rule is
       |   what lets header files go away.
       v
-   bound tree  (fully typed; ARC and ABI decisions already made)
+   bound tree  (fully typed, every name resolved)
       |
       v   LlvmEmitter, with the classifier for the target's ABI
    textual LLVM IR
@@ -196,7 +196,8 @@ ships in the same directory.
 | [Emit/SysVAbi.cs](../src/Stainless.Compiler/Emit/SysVAbi.cs) | System V AMD64, which asks what is *in* a struct and cuts it into eightbytes |
 | [Emit/X86Abi.cs](../src/Stainless.Compiler/Emit/X86Abi.cs) | 32-bit x86, where every struct travels on the stack and the two systems differ on returns |
 | [Emit/Aapcs64Abi.cs](../src/Stainless.Compiler/Emit/Aapcs64Abi.cs) | ARM64 — one classifier, because Microsoft's ABI and ARM's agree about every shape asked |
-| [Emit/LlvmEmitter.cs](../src/Stainless.Compiler/Emit/LlvmEmitter.cs) | IR, retain/release insertion, metadata tables; partial over `LlvmEmitter.*.cs`, and where the four classifiers above are chosen between |
+| [Emit/LlvmEmitter.cs](../src/Stainless.Compiler/Emit/LlvmEmitter.cs) | IR, metadata tables; partial over `LlvmEmitter.*.cs`, and where the four classifiers above are chosen between |
+| [Emit/LlvmEmitter.Arc.cs](../src/Stainless.Compiler/Emit/LlvmEmitter.Arc.cs) | every retain and release: what each value owes, where it is moved, and what a scope drops |
 | [Emit/DebugInfo.cs](../src/Stainless.Compiler/Emit/DebugInfo.cs) | what `-g` writes for a debugger |
 | [Emit/CHeaderWriter.cs](../src/Stainless.Compiler/Emit/CHeaderWriter.cs) | the C header for a shared library |
 | [Emit/MetadataWriter.cs](../src/Stainless.Compiler/Emit/MetadataWriter.cs) | the module metadata a Stainless consumer binds against |
@@ -289,6 +290,31 @@ retains the new value *before* releasing the old, so self-assignment is safe.
 A parameter the body *writes to* is the one exception — it is retained on entry
 and released on exit, because otherwise its store would release a reference the
 caller still owns.
+
+**The emitter decides every count, and each value says what it owes.** A value
+the emitter produces is *owned* — a +1 that whoever receives it must store,
+return, merge or register for release at the end of the statement — or
+*borrowed*, or *uncounted*: null, a zero, an immortal literal. What each bound
+node yields is stated once, in `HoldOf` in
+[LlvmEmitter.Arc.cs](../src/Stainless.Compiler/Emit/LlvmEmitter.Arc.cs), and each
+node's emitter marks what it makes. A context that keeps a value — a local's
+initializer, an assignment whose value is discarded, a return, an element of a
+tuple, variant, closure or array literal, a conditional's arm, a slice's
+source — moves an owned one in and retains only a borrowed one; a context that
+reads registers an owned one for release when the statement ends. So
+`var b = Make();` is a call and a store, and counts nothing.
+
+A Debug build of the compiler checks the model as it goes: that each node made
+what `HoldOf` says it does, and that nothing owned is left unconsumed at the end
+of a statement or a function. A value dropped on the floor is an internal
+compiler error at the statement that dropped it, not a leak found at exit.
+
+Nothing owned is held unregistered across what can return: an aggregate that
+is being built is registered for release first and claimed back when it is
+complete, so a `try` returning between two elements lets go of the first.
+Retains and releases are relaxed and acquire-release atomics that LLVM cannot
+pair up, so the elision has to happen here; `tools/arccount.ps1` counts both,
+in the IR and at run time.
 
 ---
 

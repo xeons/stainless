@@ -1157,12 +1157,21 @@ choice Swift makes, because it eliminates most retain/release traffic:
 - **Returns are owned (+1).** A function returning a class reference transfers
   a +1 count to the caller, which is responsible for releasing it. A struct
   holding references is returned the same way, field by field.
-- **Locals are owned.** Storing into a local retains; the local is released at
-  scope exit, including on every early return. A struct local owns whatever is
-  inside it, and copying one retains each reference it holds.
-- **Fields are owned.** Assigning to a field retains the new value and releases
-  the old, in that order, so self-assignment is safe. The same order applies to
-  a whole struct assigned over another.
+- **Locals are owned.** A local is released at scope exit, including on every
+  early return. A struct local owns whatever is inside it, and copying one
+  retains each reference it holds.
+- **Fields are owned.** Assigning to a field stores the new value and then
+  releases the old, so self-assignment is safe and a destructor that reads the
+  field finds the new value. The same order applies to a whole struct assigned
+  over another.
+- **A +1 is moved, not copied.** A value an expression made — a call's result,
+  `new`, an array literal, a conditional whose arms made theirs — is stored into
+  the local, field, element or return slot that keeps it as it is. Only a
+  borrowed value is retained on the way in, so `var x = Make();` and
+  `return Make();` cost no count at all, and a `return` of a local hands over
+  the local's own reference rather than retaining it and releasing the local.
+  A null, a zero and a string literal count nothing, and are stored without a
+  retain.
 
 ## 6. Across a library boundary
 
