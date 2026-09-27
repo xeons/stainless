@@ -76,7 +76,7 @@ public static class BoundTreeVerifier
     private static bool IsSemanticOnly(object node) =>
         node is BoundSwitch or BoundSwitchExpression or BoundIsPattern or BoundPlaceholder or BoundForEach
             or BoundConditionalAccess or BoundNullFallback or BoundCompoundAssignment or BoundWith
-            or BoundObjectInitializer;
+            or BoundObjectInitializer or BoundPropertyAssignment or BoundPropertyIncrement;
 
     /// <summary>
     /// Whether a type is one binding settles or refuses, and so has no

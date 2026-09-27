@@ -42,11 +42,12 @@ public sealed partial class Lowerer : BoundTreeRewriter
             return program;
 
         var lowerer = new Lowerer();
+        var accessors = new AccessorLowerer(lowerer);
         var functions = new List<BoundFunction>(program.Functions.Count);
 
         foreach (var function in program.Functions)
         {
-            var body = lowerer.Rewrite(function.Body);
+            var body = accessors.Rewrite(lowerer.Rewrite(function.Body));
             functions.Add(ReferenceEquals(body, function.Body)
                 ? function
                 : new BoundFunction(function.Symbol, AsBlock(body)));
@@ -55,7 +56,7 @@ public sealed partial class Lowerer : BoundTreeRewriter
         var initializers = new Dictionary<StaticSymbol, BoundExpression>();
         foreach (var shared in program.Statics)
             if (shared.Initializer is { } initializer)
-                initializers[shared] = lowerer.Rewrite(initializer);
+                initializers[shared] = accessors.Rewrite(lowerer.Rewrite(initializer));
 
         var lowered = program with
         {

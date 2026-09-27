@@ -125,8 +125,6 @@ public sealed partial class LlvmEmitter
             case BoundClosureEqual same: return EmitClosureEqual(same);
             case BoundAssignment assignment: return EmitAssignment(assignment);
             case BoundIncrement increment: return EmitIncrement(increment);
-            case BoundPropertyIncrement stepped: return EmitPropertyIncrement(stepped);
-            case BoundPropertyAssignment written: return EmitPropertyAssignment(written);
             case BoundCall call: return EmitCall(call);
             case BoundNew newExpression: return EmitNew(newExpression);
             case BoundStructNew filled: return EmitStructNew(filled);
@@ -798,60 +796,6 @@ public sealed partial class LlvmEmitter
     }
 
     /// <summary>
-    /// Calls a setter, then hands back the value it was given.
-    ///
-    /// A setter returns nothing, but an assignment is an expression whose value
-    /// is what was stored — so the value is emitted here rather than inside a
-    /// call that would swallow it. Dispatch is resolved before the value for the
-    /// reason <see cref="EmitCall"/> resolves it before the arguments: the
-    /// value's own code must not be able to change which object is written.
-    /// </summary>
-    private Val EmitPropertyAssignment(BoundPropertyAssignment assignment)
-    {
-        var setter = assignment.Property.Setter!;
-
-        // A setter dispatches for the same reasons a getter does: it is an
-        // ordinary method, and `Node.Label = x` on a `Leaf` has to reach the
-        // setter the object really has. A static one has no object, and so
-        // nothing to dispatch on.
-        string? receiverRef = null;
-        string? virtualTarget = null;
-
-        if (assignment.Receiver is not null)
-        {
-            receiverRef = EmitExpression(assignment.Receiver).Ref;
-
-            // Not through the table for `base.P = x`: the override is what the
-            // object's table holds, so dispatching would call the setter this
-            // one is written inside.
-            virtualTarget = assignment.IsNonVirtual ? null
-                : setter.ContainingType is ComInterfaceTypeSymbol ? LoadComMethod(receiverRef, setter)
-                : setter.ContainingType is InterfaceTypeSymbol
-                    ? LoadInterfaceMethod(receiverRef, setter)
-                : setter.IsDispatched ? LoadVirtualMethod(receiverRef, setter)
-                : null;
-        }
-
-        // An indexer's indices come before `value`, in the order the setter
-        // declares them and the call site wrote them.
-        var indices = assignment.Indices.Select(EmitExpression).ToList();
-        var value = EmitExpression(assignment.Value);
-
-        var arguments = new List<string>();
-        if (receiverRef is not null) arguments.Add($"ptr {receiverRef}");
-
-        for (int i = 0; i < indices.Count; i++)
-            AppendArgument(indices[i], assignment.Indices[i].Type, arguments);
-
-        AppendArgument(value, assignment.Value.Type, arguments);
-
-        Line($"call void {virtualTarget ?? Symbol(setter)}" +
-             $"({string.Join(", ", arguments)})");
-
-        return value;
-    }
-
-    /// <summary>
     /// <c>++x</c>, <c>x++</c>, <c>--x</c> and <c>x--</c> over a place.
     ///
     /// The address is worked out once and then read, changed and written, which
@@ -882,69 +826,6 @@ public sealed partial class LlvmEmitter
         Line($"store {llvmType} {now.Ref}, ptr {address}");
         return increment.IsPrefix ? now : was;
     }
-
-    /// <summary>
-    /// The same over a property, which is a getter and a setter rather than an
-    /// address.
-    ///
-    /// The receiver is emitted once and used for both calls, so
-    /// <c>Next().Count++</c> reads and writes one object.
-    /// </summary>
-    private Val EmitPropertyIncrement(BoundPropertyIncrement increment)
-    {
-        var property = increment.Property;
-        var getter = property.Getter!;
-        var setter = property.Setter!;
-
-        string? receiverRef = null;
-        string? virtualGet = null;
-        string? virtualSet = null;
-
-        if (increment.Receiver is not null)
-        {
-            receiverRef = EmitExpression(increment.Receiver).Ref;
-            virtualGet = DispatchTarget(receiverRef, getter);
-            virtualSet = DispatchTarget(receiverRef, setter);
-        }
-
-        string llvmType = LlvmTypeOf(property.Type);
-
-        // An indexer's accessors take the indices as well as the receiver.
-        // They are emitted once and reused by both calls, so `grid[Next()]++`
-        // calls `Next` a single time and reads and writes the same element.
-        var indices = new List<string>();
-        for (int at = 0; at < increment.Arguments.Count; at++)
-        {
-            var argument = increment.Arguments[at];
-            AppendArgument(EmitExpression(argument), argument.Type, indices);
-        }
-
-        var readArguments = new List<string>();
-        if (receiverRef is not null) readArguments.Add($"ptr {receiverRef}");
-        readArguments.AddRange(indices);
-
-        var was = new Val(
-            Emit(llvmType,
-                $"call {llvmType} {virtualGet ?? Symbol(getter)}({string.Join(", ", readArguments)})"),
-            llvmType, property.Type);
-
-        var now = StepOne(was, increment.IsIncrement, increment.IsChecked, property.Type);
-
-        var arguments = new List<string>();
-        if (receiverRef is not null) arguments.Add($"ptr {receiverRef}");
-        arguments.AddRange(indices);
-        AppendArgument(now, property.Type, arguments);
-
-        Line($"call void {virtualSet ?? Symbol(setter)}({string.Join(", ", arguments)})");
-        return increment.IsPrefix ? now : was;
-    }
-
-    /// <summary>Where a call to this accessor goes, or null when it is not dispatched.</summary>
-    private string? DispatchTarget(string receiverRef, FunctionSymbol accessor) =>
-        accessor.ContainingType is ComInterfaceTypeSymbol ? LoadComMethod(receiverRef, accessor)
-        : accessor.ContainingType is InterfaceTypeSymbol ? LoadInterfaceMethod(receiverRef, accessor)
-        : accessor.IsDispatched ? LoadVirtualMethod(receiverRef, accessor)
-        : null;
 
     /// <summary>
     /// One more, or one less.

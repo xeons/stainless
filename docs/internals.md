@@ -282,7 +282,12 @@ indexed `for` or the enumerator's `while`; `?.` and `??` the receiver held in a
 `let` and a conditional on it; `x op= y`, `x ??= y` and the same on a property
 the place held where naming it again could differ, then read and written back;
 `with` the clone and its writes; an object initializer the object held in a
-`let` and its entries in order. Where one of these names a value it does not
+`let` and its entries in order. A property written or stepped becomes its
+accessors' calls in a pass of its own after the rest, because whether the
+value a write produces is read depends on where the write ends up: where
+nothing reads it, it is the setter's call alone; where something does, the
+receiver, indices and value are held and the value handed on. The emitter
+has no case for a property write. Where one of these names a value it does not
 yet have -- a loop's element, a receiver known to be there, the object being
 initialized -- the semantic node holds a placeholder for it, and lowering puts
 in its place whatever holds the value.
