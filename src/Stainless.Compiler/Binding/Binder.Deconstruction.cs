@@ -533,11 +533,19 @@ public sealed partial class Binder
             "Deconstruct");
         var syntax = new CallSyntax(span, member, arguments);
 
+        // Held rather than muted: a call that is kept can still hold an error,
+        // such as a 'new(...)' its parameter cannot make, and that is said.
         BoundExpression call;
         List<LocalSymbol> parts;
-        using (var trial = BeginTrial())
+        List<Diagnostic> said;
+        using (var trial = BeginTrial(quiet: false))
         {
-            call = BindCallOn(value, member, syntax);
+            using (var hold = diagnostics.Holding())
+            {
+                call = BindCallOn(value, member, syntax);
+                said = hold.Items;
+            }
+
             parts = call is BoundCall bound
                 ? bound.Arguments.OfType<BoundAddressOf>()
                     .Select(a => a.DeclaresLocal)
@@ -557,6 +565,9 @@ public sealed partial class Binder
                 value.Type);
             return null;
         }
+
+        foreach (var diagnostic in said)
+            diagnostics.Report(diagnostic);
 
         return (call, parts);
     }
