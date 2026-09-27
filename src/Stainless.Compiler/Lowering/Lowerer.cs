@@ -83,6 +83,7 @@ public sealed partial class Lowerer : BoundTreeRewriter
     {
         BoundSemanticExpression semantic => LowerSemantic(semantic),
         BoundSequence sequence => Sequence(sequence, Rewrite(sequence.Value)),
+        BoundPlaceholder name when _named.TryGetValue(name, out var reading) => reading,
         _ => base.Rewrite(expression),
     };
 
@@ -99,6 +100,8 @@ public sealed partial class Lowerer : BoundTreeRewriter
         BoundObjectInitializer initialized => LowerObjectInitializer(initialized),
         BoundCollection collection => LowerCollection(collection),
         BoundDeconstruction taken => LowerDeconstruction(taken, discarded: false),
+        BoundRangeSlice sliced => LowerRangeSlice(sliced),
+        BoundNamedValue named => LowerNamedValue(named),
         _ => throw new Source.InternalCompilerError(
             $"lowering has no case for {expression.GetType().Name}", expression.Span),
     };

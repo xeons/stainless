@@ -1657,6 +1657,7 @@ public sealed partial class Binder
         BoundConditionalAccess asked => Effective(asked.Access) || Effective(asked.WhenNothing),
         BoundNullFallback fallback => Effective(fallback.Fallback),
         BoundSwitchExpression chosen => chosen.Arms.Any(arm => Effective(arm.Value)),
+        BoundRangeSlice sliced => Effective(sliced.Access),
         _ => false,
     };
 

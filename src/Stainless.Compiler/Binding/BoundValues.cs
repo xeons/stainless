@@ -66,6 +66,7 @@ internal static class BoundValues
         BoundLet held => IsMade(held.Body),
         BoundSequence sequence => IsMade(sequence.Value),
         BoundDeconstruction taken => taken.IsValue,
+        BoundRangeSlice sliced => IsMade(sliced.Access),
         _ => false,
     };
 }

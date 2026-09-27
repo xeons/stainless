@@ -1346,6 +1346,56 @@ public sealed class BoundSlice(
     public IndexOrigin EndOrigin { get; init; }
 }
 
+/// <summary>
+/// <c>x[a..b]</c> where the range is taken apart as it runs: an array or a
+/// slice by a <c>Range</c> value, or a type with a <c>Count</c> or
+/// <c>Length</c> and a <c>Slice(start, length)</c>.
+///
+/// Lowering evaluates, in order and each once, what is sliced, its count,
+/// the range and the offset the run starts at, and then
+/// <see cref="Access"/>, which names each by its placeholder.
+/// </summary>
+public sealed class BoundRangeSlice(SourceSpan span, TypeSymbol type, BoundExpression access)
+    : BoundSemanticExpression(span, type)
+{
+    /// <summary>What is sliced, where <see cref="Access"/> names it as <see cref="Receiver"/>.</summary>
+    public BoundExpression? Target { get; init; }
+
+    public BoundPlaceholder? Receiver { get; init; }
+
+    /// <summary>The count of what is sliced, as a <c>nuint</c>, named as <see cref="Counted"/>.</summary>
+    public BoundExpression? Length { get; init; }
+
+    public BoundPlaceholder? Counted { get; init; }
+
+    /// <summary>A range known only as it runs, named as <see cref="Whole"/>.</summary>
+    public BoundExpression? Range { get; init; }
+
+    public BoundPlaceholder? Whole { get; init; }
+
+    /// <summary>Where the run starts, as a <c>nuint</c>, named as <see cref="From"/>.</summary>
+    public BoundExpression? Start { get; init; }
+
+    public BoundPlaceholder? From { get; init; }
+
+    /// <summary>The slice, or the call to <c>Slice</c>.</summary>
+    public BoundExpression Access { get; } = access;
+}
+
+/// <summary>
+/// A value read more than once, evaluated where it first stands: the
+/// receiver of <c>x[^1]</c> on a type with a <c>Count</c>, which the count
+/// then reads again as <see cref="Name"/>.
+/// </summary>
+public sealed class BoundNamedValue(SourceSpan span, BoundExpression value, BoundPlaceholder name)
+    : BoundSemanticExpression(span, value.Type)
+{
+    public BoundExpression Value { get; } = value;
+
+    /// <summary>What reads it after.</summary>
+    public BoundPlaceholder Name { get; } = name;
+}
+
 /// <summary>What a position in an array, a slice or an inline array counts from.</summary>
 public enum IndexOrigin
 {

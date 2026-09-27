@@ -560,6 +560,35 @@ public abstract class BoundTreeRewriter
                     };
             }
 
+            case BoundRangeSlice sliced:
+            {
+                var target = RewriteOptional(sliced.Target);
+                var length = RewriteOptional(sliced.Length);
+                var range = RewriteOptional(sliced.Range);
+                var start = RewriteOptional(sliced.Start);
+                var access = Rewrite(sliced.Access);
+                return Same(sliced.Target, target) && Same(sliced.Length, length) && Same(sliced.Range, range) &&
+                       Same(sliced.Start, start) && Same(sliced.Access, access)
+                    ? sliced
+                    : new BoundRangeSlice(sliced.Span, sliced.Type, access)
+                    {
+                        Target = target,
+                        Receiver = sliced.Receiver,
+                        Length = length,
+                        Counted = sliced.Counted,
+                        Range = range,
+                        Whole = sliced.Whole,
+                        Start = start,
+                        From = sliced.From,
+                    };
+            }
+
+            case BoundNamedValue named:
+            {
+                var value = Rewrite(named.Value);
+                return Same(named.Value, value) ? named : new BoundNamedValue(named.Span, value, named.Name);
+            }
+
             case BoundDeconstruction taken:
             {
                 var target = RewriteValues(RewriteTargets(taken.Target));

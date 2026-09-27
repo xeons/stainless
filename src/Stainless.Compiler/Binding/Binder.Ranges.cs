@@ -223,16 +223,17 @@ public sealed partial class Binder
             return MakeSlice(span, target, from, fromOrigin, to, toOrigin);
         }
 
-        // Read twice, once for each end, so held unless reading it is free.
-        var held = new List<HeldValue>();
-        var whole = IsRepeatable(range) ? range : HoldValue(range, held, everything: true);
+        // Read twice, once for each end.
+        var whole = Named(range);
         var fields = StandardRange;
 
         var slice = MakeSlice(span, target,
             new BoundFieldAccess(span, whole, fields.FindField("_start")!), IndexOrigin.Written,
             new BoundFieldAccess(span, whole, fields.FindField("_end")!), IndexOrigin.Written);
 
-        return WithHeld(span, held, slice);
+        return slice.Type.IsError()
+            ? slice
+            : new BoundRangeSlice(span, slice.Type, slice) { Range = range, Whole = whole };
     }
 
     /// <summary>A slice of an array or another slice, each end counted from where it says.</summary>
@@ -288,7 +289,14 @@ public sealed partial class Binder
         // Named once as the receiver and again for the count. The receiver is
         // evaluated first, so the count reads what it left behind, and the
         // call stays a call: a write through it reaches the setter.
-        var (receiver, again) = NameOnce(target);
+        BoundExpression receiver = target, again = target;
+        if (!IsRepeatable(target))
+        {
+            var name = new BoundPlaceholder(target.Span, target.Type);
+            receiver = new BoundNamedValue(target.Span, target, name);
+            again = name;
+        }
+
         var length = AsInteger(BindPropertyRead(span, again, counter), PrimitiveTypeSymbol.NUInt);
         var offset = OffsetIn(position, length, span);
         var indexType = (PrimitiveTypeSymbol)indexer.Parameters.First(p => !p.IsThis).Type;
@@ -315,26 +323,28 @@ public sealed partial class Binder
             return new BoundErrorExpression(span);
         }
 
-        var held = new List<HeldValue>();
-        var receiver = IsRepeatable(target) ? target : HoldValue(target, held, everything: true);
-        var length = HoldValue(
-            AsInteger(BindPropertyRead(span, receiver, counter), PrimitiveTypeSymbol.NUInt),
-            held, everything: true);
+        // What is sliced, its count, the range and where the run starts are
+        // each evaluated once, in that order, and named after.
+        var receiver = Named(target);
+        var length = AsInteger(BindPropertyRead(span, receiver, counter), PrimitiveTypeSymbol.NUInt);
+        var counted = new BoundPlaceholder(span, PrimitiveTypeSymbol.NUInt);
 
         BoundExpression start, end;
+        BoundPlaceholder? whole = null;
         if (range is BoundStructNew { Arguments: [var first, var last] })
         {
             (start, end) = (first, last);
         }
         else
         {
-            var whole = IsRepeatable(range) ? range : HoldValue(range, held, everything: true);
+            whole = Named(range);
             start = new BoundFieldAccess(span, whole, StandardRange.FindField("_start")!);
             end = new BoundFieldAccess(span, whole, StandardRange.FindField("_end")!);
         }
 
-        var from = HoldValue(OffsetIn(start, length, span), held, everything: true);
-        var to = OffsetIn(end, length, span);
+        var offset = OffsetIn(start, counted, span);
+        var from = new BoundPlaceholder(span, offset.Type);
+        var to = OffsetIn(end, counted, span);
         var count = new BoundBinary(span, PrimitiveTypeSymbol.NUInt, to, BoundBinaryOp.Subtract, from);
 
         var parameters = slice.Parameters.Where(p => !p.IsThis).ToList();
@@ -344,7 +354,17 @@ public sealed partial class Binder
             AsInteger(count, (PrimitiveTypeSymbol)parameters[1].Type),
         ]);
 
-        return WithHeld(span, held, call);
+        return new BoundRangeSlice(span, call.Type, call)
+        {
+            Target = target,
+            Receiver = receiver,
+            Length = length,
+            Counted = counted,
+            Range = whole is null ? null : range,
+            Whole = whole,
+            Start = offset,
+            From = from,
+        };
     }
 
     private BoundErrorExpression RefuseUncounted(NamedTypeSymbol named, SourceSpan span)
@@ -382,21 +402,11 @@ public sealed partial class Binder
     }
 
     /// <summary>
-    /// A value named twice without being evaluated twice: the first name
-    /// holds it, and the second reads what the first held.
+    /// What names a value read more than once, which lowering evaluates once
+    /// unless reading it again is free: storage where what stands for it will be.
     /// </summary>
-    private (BoundExpression First, BoundExpression Again) NameOnce(BoundExpression value)
-    {
-        if (IsRepeatable(value))
-            return (value, value);
-
-        var local = new LocalSymbol(SyntheticName("once"), value.Type, isConst: false);
-        bool made = value is BoundCall or BoundNew or BoundIndirectCall or BoundClosureCall;
-        var reading = new BoundLocalAccess(value.Span, local);
-
-        return (new BoundLet(value.Span, local, value, reading) { IsOwned = value.Type.NeedsArc() && !made },
-                reading);
-    }
+    private static BoundPlaceholder Named(BoundExpression value) =>
+        new(value.Span, value.Type) { IsStorage = !IsRepeatable(value) || value.IsLValue };
 
     /// <summary>A method's receiver: a struct by its address, anything else as it is.</summary>
     private static BoundExpression AsReceiver(BoundExpression receiver, NamedTypeSymbol type) =>

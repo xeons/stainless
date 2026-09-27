@@ -238,6 +238,18 @@ public abstract class BoundTreeWalker
                 Visit(sequence.Value);
                 break;
 
+            case BoundRangeSlice sliced:
+                Visit(sliced.Target);
+                Visit(sliced.Length);
+                Visit(sliced.Range);
+                Visit(sliced.Start);
+                Visit(sliced.Access);
+                break;
+
+            case BoundNamedValue named:
+                Visit(named.Value);
+                break;
+
             case BoundDeconstruction taken:
                 VisitTargets(taken.Target);
                 VisitValues(taken.Target);

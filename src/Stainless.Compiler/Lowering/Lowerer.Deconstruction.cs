@@ -117,7 +117,7 @@ public sealed partial class Lowerer
     /// <param name="wholes">What each enclosing tuple's placeholder stands for.</param>
     private BoundDeconstructionTarget SupplyDeconstruction(
         BoundDeconstructionTarget target, List<DeconstructionStep> steps,
-        List<(BoundPlaceholder Whole, BoundExpression Value)> wholes)
+        List<(BoundPlaceholder Name, BoundExpression Value)> wholes)
     {
         if (target.Kind != DeconstructionKind.Nested)
         {
@@ -145,12 +145,13 @@ public sealed partial class Lowerer
         return target with { Elements = target.Elements.Select(e => SupplyDeconstruction(e, steps, wholes)).ToList() };
     }
 
+    /// <summary>An expression with what each placeholder stands for put in its place.</summary>
     private static BoundExpression Substituted(
-        BoundExpression value, List<(BoundPlaceholder Whole, BoundExpression Value)> wholes)
+        BoundExpression expression, List<(BoundPlaceholder Name, BoundExpression Value)> names)
     {
-        foreach (var (whole, stands) in wholes)
-            value = Replace(value, whole, stands);
-        return value;
+        foreach (var (name, value) in names)
+            expression = Replace(expression, name, value);
+        return expression;
     }
 
     /// <summary>
