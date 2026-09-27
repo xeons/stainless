@@ -1,0 +1,78 @@
+local
+  11 11
+  ~Thing 11
+assigned
+  ~Thing 12
+  13
+  ~Thing 13
+chained
+  14 14
+  ~Thing 14
+conditional
+  chose 16
+  weighed 31
+  ~Thing 16
+  chose 15
+  weighed 32
+  ~Thing 17
+  ~Thing 15
+fallback
+  19 18 20
+  21
+  ~Thing 21
+  ~Thing 20
+  ~Thing 19
+  ~Thing 18
+switch
+  22
+  ~Thing 22
+  23
+  ~Thing 23
+  25
+  ~Thing 25
+struct
+  27 28 26
+  ~Thing 28
+  ~Thing 29
+  ~Thing 26
+  ~Thing 27
+weak
+  30
+  ~Thing 30
+collections
+  2 2
+  ~Thing 31
+  ~Thing 32
+closure
+  33
+  ~Thing 33
+partway
+  ~Thing 1
+  ~Thing 2
+  = 3
+  ~Thing 1
+  refused
+  ~Thing 3
+  ~Thing 4
+  = 7
+  ~Thing 3
+  refused
+  ~Thing 5
+  ~Thing 6
+  = 11
+  ~Thing 5
+  refused
+  ~Thing 7
+  ~Thing 70
+  = 77
+  ~Thing 7
+  refused
+  ~Thing 8
+  ~Thing 9
+  = 9
+  ~Thing 8
+  ~Thing 9
+  refused
+  ~Thing 10
+  = 10
+done

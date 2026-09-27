@@ -177,32 +177,26 @@ public sealed partial class LlvmEmitter
             // A scope of its own, for what the initializer declares as it
             // goes: a name a pattern binds, an `out var`.
             PushScope();
-            var value = EmitExpression(symbol.Initializer);
             string slot = "@" + StaticName(symbol);
 
-            if (symbol.Type is StructTypeSymbol structType)
+            // A readonly reference is immortal, so retain and release skip it
+            // for the rest of the program: a value that lives to process exit
+            // has no reference traffic, and therefore none to race over. What
+            // it owed is what making it immortal consumes.
+            if (symbol.Type.NeedsArc() && symbol.IsReadonly)
             {
-                // A struct that holds references is retained field by field,
-                // exactly as an assignment to one anywhere else is. The slot
-                // starts zeroed, so there is nothing for the store to release.
-                if (structType.CarriesReferences()) StoreInto(slot, value, symbol.Type);
-                else MemCopy(slot, value.Ref, structType.Size);
+                var kept = EmitOwnable(symbol.Initializer);
+                Consume(kept);
+                Line($"store ptr {kept.Ref}, ptr {slot}");
+                Line($"call void @sl_make_immortal(ptr {kept.Ref})");
             }
+
+            // Anything else is counted like any other slot, and a mutable
+            // reference cannot be immortal: a later assignment has to release
+            // what it is replacing. The slot starts zeroed.
             else
             {
-                Line($"store {value.LlvmType} {value.Ref}, ptr {slot}");
-
-                // A readonly one is immortal, so retain and release skip it for
-                // the rest of the program: a value that lives to process exit
-                // has no reference traffic, and therefore none to race over.
-                if (symbol.Type.NeedsArc() && symbol.IsReadonly)
-                    Line($"call void @sl_make_immortal(ptr {value.Ref})");
-
-                // A mutable one is counted like any other slot. It cannot be
-                // immortal, because a later assignment has to release what it
-                // is replacing, and an immortal object is never released.
-                else if (symbol.Type.NeedsArc())
-                    Retain(value.Ref, symbol.Type);
+                InitializeWith(slot, EmitOwned(symbol.Initializer), symbol.Type);
             }
 
             // The initializer's own temporaries go now; the static holds its
@@ -271,7 +265,8 @@ public sealed partial class LlvmEmitter
     /// it is stored -- which is what takes the reference traffic off a value
     /// every thread can see -- and an immortal object is one nothing releases,
     /// by construction. What it holds lives to process exit, and that is the
-    /// bargain the word makes.
+    /// bargain the word makes. A weak one is not made immortal, so it is let
+    /// go of either way.
     ///
     /// The slot is emptied rather than merely released. Reading one then is a
     /// null dereference where leaving the pointer would be a use after free,
@@ -282,6 +277,7 @@ public sealed partial class LlvmEmitter
     {
         var releasable = program.Statics
             .Where(s => s.Type.NeedsArc() && !s.IsReadonly
+                        || s.Type is WeakTypeSymbol
                         || s.Type is StructTypeSymbol structType && structType.CarriesReferences())
             .Reverse()
             .ToList();

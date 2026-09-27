@@ -174,14 +174,17 @@ public sealed partial class LlvmEmitter
             _slots[thunk.Fields[i]] = Emit("ptr",
                 $"getelementptr inbounds {thunk.BlockType}, ptr %block, i32 0, i32 {i}");
 
-        var result = EmitCall(thunk.Call);
-
         if (thunk.TargetType is not null)
         {
+            var result = EmitOwned(thunk.Call);
             string field = Emit("ptr",
                 $"getelementptr inbounds {thunk.BlockType}, ptr %block, i32 0, i32 {thunk.Fields.Count}");
             string destination = Emit("ptr", $"load ptr, ptr {field}");
-            StoreInto(destination, result, thunk.TargetType);
+            MoveInto(destination, result, thunk.TargetType);
+        }
+        else
+        {
+            EmitExpression(thunk.Call);
         }
 
         FlushTemporaries();
@@ -391,6 +394,7 @@ public sealed partial class LlvmEmitter
         _currentScope = null;
         _scopes.Clear();
         _pendingReleases.Clear();
+        _unsettled.Clear();
         _stackArrays.Clear();
         _clearedOnRelease.Clear();
         _loops.Clear();

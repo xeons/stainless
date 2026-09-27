@@ -17,6 +17,7 @@
 using System.Globalization;
 using System.Text;
 using Stainless.Binding;
+using Stainless.Source;
 using Stainless.Syntax;
 
 namespace Stainless.Emit;
@@ -31,6 +32,336 @@ namespace Stainless.Emit;
 /// </summary>
 public sealed partial class LlvmEmitter
 {
+    // ============================================================ ownership
+
+    /// <summary>
+    /// Emits an expression whose value the caller only reads. An owned value
+    /// is registered for release when the statement ends.
+    /// </summary>
+    private Val EmitExpression(BoundExpression expression) => Borrow(EmitOwnable(expression));
+
+    /// <summary>
+    /// Emits an expression whose value the caller keeps: +1, or nothing to
+    /// count. The caller MUST consume it before anything else is evaluated.
+    /// </summary>
+    private Val EmitOwned(BoundExpression expression) => Take(EmitOwnable(expression));
+
+    /// <summary>
+    /// Emits an expression and hands back whatever it owes. The caller MUST
+    /// pass an owned value to <see cref="Borrow"/> or <see cref="Take"/>, or
+    /// consume it in a way of its own and say so with <see cref="Consume"/>.
+    /// </summary>
+    private Val EmitOwnable(BoundExpression expression)
+    {
+        var value = EmitValue(expression);
+
+#if DEBUG
+        if (expression.Type.CarriesReferences() &&
+            (value.Hold == Hold.Owned) != (HoldOf(expression) == Hold.Owned))
+            throw new InternalCompilerError(
+                $"the emitter made a {value.Hold} value where {expression.GetType().Name} " +
+                $"yields a {HoldOf(expression)} one", expression.Span);
+#endif
+
+        return value;
+    }
+
+    /// <summary>
+    /// What an expression's value owes, from the node alone. The emitter of
+    /// each node decides this for itself, and a Debug build checks that the
+    /// two agree.
+    /// </summary>
+    private static Hold HoldOf(BoundExpression expression) => expression switch
+    {
+        BoundNullLiteral or BoundStringLiteral or BoundUtf8Literal
+            or BoundDefault or BoundUnmatchedSwitch => Hold.Uncounted,
+        BoundInterpolatedString { Parts.Count: 0 } => Hold.Uncounted,
+        BoundClosureCreate { Receiver: null } => Hold.Uncounted,
+
+        BoundCall or BoundIndirectCall or BoundClosureCall or BoundNew or BoundStructNew
+            or BoundClosure or BoundClosureCreate or BoundNewArray or BoundTupleCreate
+            or BoundVariantConstruction or BoundInterpolatedString or BoundSlice => Hold.Owned,
+
+        // One in the frame ends with its statement, so nothing may keep it.
+        BoundArrayLiteral literal => literal.OnStack ? Hold.Borrowed : Hold.Owned,
+
+        BoundConditional chosen =>
+            HoldOf(chosen.WhenTrue) == Hold.Uncounted && HoldOf(chosen.WhenFalse) == Hold.Uncounted
+                ? Hold.Uncounted
+                : Hold.Owned,
+
+        BoundSequence sequence => HoldOf(sequence.Value),
+        BoundLet held when HandsOnLocal(held) && HoldOf(held.Value) == Hold.Owned => Hold.Owned,
+        BoundLet held => HoldOf(held.Body),
+        BoundTry attempt => HoldOf(attempt.OnSuccess),
+        BoundConversion conversion => HoldOfConversion(conversion),
+        _ => Hold.Borrowed,
+    };
+
+    private static Hold HoldOfConversion(BoundConversion conversion) => conversion.Kind switch
+    {
+        ConversionKind.ArrayToSlice or ConversionKind.ComAdopt or ConversionKind.ComQuery => Hold.Owned,
+
+        // A strong reference out of a weak one is a new +1, or null.
+        ConversionKind.ReferenceToOptional when conversion.Operand.Type is WeakTypeSymbol => Hold.Owned,
+
+        _ when PassesOwnership(conversion) => HoldOf(conversion.Operand),
+        _ => Hold.Borrowed,
+    };
+
+    /// <summary>
+    /// True for a conversion whose value is the operand's own pointer, counted
+    /// the same way, so that what the operand owed the result owes instead.
+    ///
+    /// Not <c>ReferenceToWeak</c>: the same pointer, but a weak slot keeps it
+    /// with a weak count, and the strong one the operand owed is still owed.
+    /// </summary>
+    private static bool PassesOwnership(BoundConversion conversion) =>
+        conversion.Kind is ConversionKind.Identity or ConversionKind.PointerCast
+            or ConversionKind.NullToReference or ConversionKind.ClassToInterface
+            or ConversionKind.NarrowOptional or ConversionKind.Upcast
+            or ConversionKind.TestedReference or ConversionKind.Downcast
+            or ConversionKind.ComUpcast or ConversionKind.ReferenceToOptional
+        && !(conversion.Kind == ConversionKind.ReferenceToOptional
+             && conversion.Operand.Type is WeakTypeSymbol)
+        && CountedAlike(conversion.Operand.Type, conversion.Type);
+
+    /// <summary>True when a +1 of one type is a +1 of the other.</summary>
+    private static bool CountedAlike(TypeSymbol first, TypeSymbol second) =>
+        first.CarriesReferences() == second.CarriesReferences()
+        && (!first.CarriesReferences() || RetainOf(first) == RetainOf(second));
+
+    /// <summary>
+    /// True when a <c>let</c> evaluates to the very object it named, and
+    /// nothing in between replaces the name: an initializer's
+    /// <c>let made = new C() in (made.X = 1, made)</c>. What made the value
+    /// is then what the whole hands on.
+    /// </summary>
+    private static bool HandsOnLocal(BoundLet held) =>
+        !held.IsOwned && Yields(held.Body, held.Local) && !LocalWriteFinder.Writes(held.Body, held.Local);
+
+    private static bool Yields(BoundExpression expression, LocalSymbol local) => expression switch
+    {
+        BoundLocalAccess read => ReferenceEquals(read.Local, local),
+        BoundSequence sequence => Yields(sequence.Value, local),
+        BoundLet inner => Yields(inner.Body, local),
+        BoundConversion conversion => PassesOwnership(conversion) && Yields(conversion.Operand, local),
+        _ => false,
+    };
+
+    /// <summary>A value this code made at +1, which the caller now owes.</summary>
+    private Val Fresh(Val value)
+    {
+        if (!value.Type.CarriesReferences()) return value;
+
+        Unsettle(value.Ref);
+        return value with { Hold = Hold.Owned };
+    }
+
+    /// <summary>A value with nothing to count, which is moved and dropped for free.</summary>
+    private static Val Uncounted(Val value) => value with { Hold = Hold.Uncounted };
+
+    /// <summary>
+    /// The value to read and not keep: an owned one is registered for release
+    /// when the statement ends, and is borrowed from there.
+    /// </summary>
+    private Val Borrow(Val value)
+    {
+        if (value.Hold != Hold.Owned) return value;
+
+        Consume(value);
+        TrackTemporary(value.Ref, value.Type);
+        return value with { Hold = Hold.Borrowed };
+    }
+
+    /// <summary>
+    /// The value at +1: an owned one as it is, a borrowed one retained. A
+    /// borrowed struct is copied first, so that what is owned is at an address
+    /// nothing else writes -- the one it was read from may be written before
+    /// the copy is consumed.
+    /// </summary>
+    private Val Take(Val value)
+    {
+        switch (value.Hold)
+        {
+            case Hold.Owned:
+                Consume(value);
+                return value;
+            case Hold.Uncounted:
+                return value;
+        }
+
+        if (!value.Type.CarriesReferences()) return value;
+
+        if (value.Type is StructTypeSymbol structType)
+        {
+            string copy = Alloca(LlvmTypeOf(structType), "owned");
+            MemCopy(copy, value.Ref, structType.Size);
+            RetainFieldsAt(copy, structType);
+            return value with { Ref = copy, Hold = Hold.Owned };
+        }
+
+        Retain(value.Ref, value.Type);
+        return value with { Hold = Hold.Owned };
+    }
+
+    /// <summary>
+    /// Takes back a value <see cref="Borrow"/> registered for release, whose +1
+    /// the caller now hands on. Registering first is what releases it if a
+    /// <c>try</c> returns before it is handed on.
+    /// </summary>
+    private void Reclaim(Val registered)
+    {
+        int at = _pendingReleases.FindLastIndex(p => p.Ref == registered.Ref);
+        if (at < 0)
+            throw new InternalCompilerError($"{registered.Ref} is not waiting to be released");
+
+        _pendingReleases.RemoveAt(at);
+    }
+
+    /// <summary>
+    /// Registers an aggregate being built for release, so that a <c>try</c>
+    /// returning partway through lets go of what went in so far.
+    /// </summary>
+    private Val Building(Val made)
+    {
+        if (made.Type.CarriesReferences()) TrackTemporary(made.Ref, made.Type);
+        return made;
+    }
+
+    /// <summary>The aggregate <see cref="Building"/> began, finished and at +1.</summary>
+    private Val Built(Val made)
+    {
+        if (!made.Type.CarriesReferences()) return made;
+
+        Reclaim(made);
+        return Fresh(made);
+    }
+
+    /// <summary>
+    /// Says that an owned value has been consumed: stored, merged, returned,
+    /// or made immortal.
+    /// </summary>
+    private void Consume(Val value)
+    {
+#if DEBUG
+        if (value.Hold == Hold.Owned && !_unsettled.Remove(value.Ref))
+            throw new InternalCompilerError($"{value.Ref} was consumed twice");
+#endif
+    }
+
+    private void Unsettle(string reference)
+    {
+#if DEBUG
+        if (!_unsettled.Add(reference))
+            throw new InternalCompilerError($"{reference} was made owned twice");
+#endif
+    }
+
+    /// <summary>
+    /// Stores an owned value into a slot that owns what it holds, and drops
+    /// what the slot held. The value is stored before the old one is
+    /// released, so a destructor that reads the slot finds the new value.
+    /// </summary>
+    private void MoveInto(string slot, Val value, TypeSymbol targetType)
+    {
+        if (targetType is StructTypeSymbol structType)
+        {
+            if (structType.CarriesReferences()) ReleaseFieldsAt(slot, structType);
+            MemCopy(slot, value.Ref, structType.Size);
+            return;
+        }
+
+        if (targetType.IsManagedSlot())
+        {
+            string old = Emit("ptr", $"load ptr, ptr {slot}");
+            Line($"store ptr {value.Ref}, ptr {slot}");
+            Release(old, targetType);
+            return;
+        }
+
+        StoreUncounted(slot, value, targetType);
+    }
+
+    /// <summary>The same into a slot that holds nothing yet: zeroed storage.</summary>
+    private void InitializeWith(string slot, Val value, TypeSymbol targetType)
+    {
+        if (targetType is StructTypeSymbol structType)
+        {
+            MemCopy(slot, value.Ref, structType.Size);
+            return;
+        }
+
+        if (targetType.IsManagedSlot())
+        {
+            Line($"store ptr {value.Ref}, ptr {slot}");
+            return;
+        }
+
+        StoreUncounted(slot, value, targetType);
+    }
+
+    /// <summary>
+    /// Stores a value that is only borrowed: retain the new value, release the
+    /// old one, in that order, so <c>x = x</c> cannot destroy the object
+    /// mid-assignment.
+    /// </summary>
+    private void StoreInto(string slot, Val value, TypeSymbol targetType)
+    {
+        if (targetType is StructTypeSymbol structType)
+        {
+            if (structType.CarriesReferences())
+            {
+                RetainFieldsAt(value.Ref, structType);
+                ReleaseFieldsAt(slot, structType);
+            }
+
+            MemCopy(slot, value.Ref, structType.Size);
+            return;
+        }
+
+        if (targetType.IsManagedSlot())
+        {
+            Retain(value.Ref, targetType);
+            string old = Emit("ptr", $"load ptr, ptr {slot}");
+            Release(old, targetType);
+            Line($"store ptr {value.Ref}, ptr {slot}");
+            return;
+        }
+
+        StoreUncounted(slot, value, targetType);
+    }
+
+    /// <summary>
+    /// A value with nothing inside it to count. An inline array is held by
+    /// address, like a struct, and cannot hold a reference (SL0486), so the
+    /// whole of it is copied as bytes.
+    /// </summary>
+    private void StoreUncounted(string slot, Val value, TypeSymbol targetType)
+    {
+        if (targetType is FixedArrayTypeSymbol inline)
+        {
+            MemCopy(slot, value.Ref, inline.Size);
+            return;
+        }
+
+        Line($"store {LlvmTypeOf(targetType)} {value.Ref}, ptr {slot}");
+    }
+
+    /// <summary>
+    /// Emits an expression in a block of its own, whose temporaries are
+    /// released before it ends: the block that merges it is also reached from
+    /// somewhere it never ran, so a release there would not be dominated by
+    /// what it releases. What the expression yields is kept, at +1.
+    /// </summary>
+    private Val EmitBranch(BoundExpression expression)
+    {
+        int mark = _pendingReleases.Count;
+        var value = EmitOwned(expression);
+        FlushTemporaries(mark);
+        return value;
+    }
+
     // ============================================================ ARC
 
     private void PushScope() => _scopes.Add([]);
@@ -301,16 +632,4 @@ public sealed partial class LlvmEmitter
 
     private void Release(string value, TypeSymbol type) =>
         Line($"call void @{ReleaseOf(type)}(ptr {value})");
-
-    /// <summary>
-    /// Stores into an owning slot: retain the new value, release the old one, in
-    /// that order, so <c>x = x</c> cannot destroy the object mid-assignment.
-    /// </summary>
-    private void StoreManaged(string slot, string value, TypeSymbol type)
-    {
-        Retain(value, type);
-        string old = Emit("ptr", $"load ptr, ptr {slot}");
-        Release(old, type);
-        Line($"store ptr {value}, ptr {slot}");
-    }
 }

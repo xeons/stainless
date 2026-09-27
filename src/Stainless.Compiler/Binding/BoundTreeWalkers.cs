@@ -532,3 +532,35 @@ internal sealed class LabelFinder : BoundTreeWalker
         base.Visit(statement);
     }
 }
+
+/// <summary>
+/// Whether a tree replaces what a local holds: assigns the whole of it, or
+/// hands its address to something that may.
+/// </summary>
+internal sealed class LocalWriteFinder(LocalSymbol local) : BoundTreeWalker
+{
+    public bool Found { get; private set; }
+
+    public static bool Writes(BoundExpression expression, LocalSymbol local)
+    {
+        var finder = new LocalWriteFinder(local);
+        finder.Visit(expression);
+        return finder.Found;
+    }
+
+    public override void Visit(BoundExpression? expression)
+    {
+        if (Found)
+            return;
+
+        switch (expression)
+        {
+            case BoundAssignment { Target: BoundLocalAccess written } when ReferenceEquals(written.Local, local):
+            case BoundAddressOf { Operand: BoundLocalAccess lent } when ReferenceEquals(lent.Local, local):
+                Found = true;
+                return;
+        }
+
+        base.Visit(expression);
+    }
+}

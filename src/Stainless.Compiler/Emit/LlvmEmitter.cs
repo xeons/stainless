@@ -28,11 +28,36 @@ namespace Stainless.Emit;
 /// Struct values are always represented by a pointer to their storage, the way
 /// a C front end represents an lvalue, because aggregates in SSA registers make
 /// both ABI lowering and field access far harder than they need to be.
+///
+/// <see cref="Hold"/> says what the value owes, and matters only for a type
+/// that carries references.
 /// </summary>
-public readonly record struct Val(string Ref, string LlvmType, TypeSymbol Type)
+public readonly record struct Val(
+    string Ref, string LlvmType, TypeSymbol Type, Hold Hold = Hold.Borrowed)
 {
     public bool IsStructAddress => Type is StructTypeSymbol;
     public static readonly Val Void = new("", "void", PrimitiveTypeSymbol.Void);
+}
+
+/// <summary>What an emitted value owes the reference counts.</summary>
+public enum Hold
+{
+    /// <summary>+0: alive because something else holds it. Keeping it costs a retain.</summary>
+    Borrowed,
+
+    /// <summary>
+    /// +1: whoever receives it MUST consume it, by storing, returning or
+    /// merging it, or register it for release at the end of the statement. An
+    /// owned struct is at an address nothing else writes.
+    /// </summary>
+    Owned,
+
+    /// <summary>
+    /// Nothing to count: null, a zeroed value or an immortal literal. Keeping
+    /// it and dropping it are both free, so it is moved without a retain and
+    /// never registered for release.
+    /// </summary>
+    Uncounted,
 }
 
 /// <summary>
@@ -183,6 +208,12 @@ public sealed partial class LlvmEmitter(
 
     /// <summary>+1 values produced mid-statement, released once the statement completes.</summary>
     private readonly List<(string Ref, TypeSymbol Type)> _pendingReleases = [];
+
+    /// <summary>
+    /// Owned values made and not yet consumed or registered. Checked at the end
+    /// of every statement in a Debug build, where one left here is a leak.
+    /// </summary>
+    private readonly HashSet<string> _unsettled = [];
 
     /// <summary>The temporaries in <see cref="_pendingReleases"/> that are arrays in the frame.</summary>
     private readonly HashSet<string> _stackArrays = [];

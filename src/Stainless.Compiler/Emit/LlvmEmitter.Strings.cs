@@ -232,7 +232,7 @@ public sealed partial class LlvmEmitter
         // Nothing to join. The binder folds an all-literal interpolation to a
         // literal, so this is only the empty `$""`.
         if (count == 0)
-            return new Val(InternStringObject(""), "ptr", expression.Type);
+            return Uncounted(new Val(InternStringObject(""), "ptr", expression.Type));
 
         string slots = Emit("ptr", $"alloca [{count} x ptr], align {TargetPlatform.Current.PointerWidth}");
 
@@ -245,8 +245,7 @@ public sealed partial class LlvmEmitter
         }
 
         string joined = Emit("ptr", $"call ptr @sl_string_join(ptr {slots}, {Word} {count})");
-        TrackTemporary(joined, expression.Type);
-        return new Val(joined, "ptr", expression.Type);
+        return Fresh(new Val(joined, "ptr", expression.Type));
     }
 
     /// <summary>The immortal byte[] behind a <c>"..."u8</c>, one per distinct text.</summary>

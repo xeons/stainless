@@ -34,7 +34,13 @@ public sealed partial class LlvmEmitter
 {
     private Val EmitConversion(BoundConversion conversion)
     {
-        var operand = EmitExpression(conversion.Operand);
+        // What the operand owed the result owes, where the result is the same
+        // pointer counted the same way. An array becoming a slice is moved into
+        // it. Anything else only reads its operand.
+        bool passes = PassesOwnership(conversion);
+        var operand = passes ? EmitOwnable(conversion.Operand)
+            : conversion.Kind == ConversionKind.ArrayToSlice ? EmitOwned(conversion.Operand)
+            : EmitExpression(conversion.Operand);
         string to = LlvmTypeOf(conversion.Type);
         string from = operand.LlvmType;
 
@@ -64,7 +70,7 @@ public sealed partial class LlvmEmitter
             case ConversionKind.TestedReference:
                 // An interface reference is the very same pointer; the vtable is
                 // reached through the object's TypeInfo, not carried alongside it.
-                return new Val(operand.Ref, to, conversion.Type);
+                return Same();
 
             // Downwards the answer is not in the type, so it is asked of the
             // object. The pointer that comes back is the one that went in; what
@@ -89,23 +95,20 @@ public sealed partial class LlvmEmitter
                 Terminator("unreachable");
 
                 Label(good);
-                return new Val(operand.Ref, to, conversion.Type);
+                return Same();
             }
 
             // The pointer is unchanged; what changes is that ARC now owns
-            // it. Tracked as a temporary, so the +1 COM handed over is dropped
-            // at the end of the statement and what a variable keeps is the
-            // reference its own store retained.
+            // it, and the +1 COM handed over is this value's.
             case ConversionKind.ComAdopt:
-                TrackTemporary(operand.Ref, conversion.Type);
-                return new Val(operand.Ref, to, conversion.Type);
+                return Fresh(new Val(operand.Ref, to, conversion.Type));
 
             // A COM vtable begins with its base's slots, so a derived
             // reference already answers the base's calls at the same address.
             // The class Upcast above is the same property seen from the object
             // side rather than the table side.
             case ConversionKind.ComUpcast:
-                return new Val(operand.Ref, to, conversion.Type);
+                return Same();
 
             // The address of the tear-off inside the object. One add, at an
             // offset the layout fixed -- the only COM conversion that is not
@@ -157,15 +160,13 @@ public sealed partial class LlvmEmitter
 
                 Label(good);
 
-                // QueryInterface answered at +1, so this is a temporary the
-                // statement scope drops like any other.
-                TrackTemporary(found, conversion.Type);
-                return new Val(found, to, conversion.Type);
+                // QueryInterface answered at +1.
+                return Fresh(new Val(found, to, conversion.Type));
             }
 
             // The whole of an array, as a slice of it: offset zero, and the
-            // length the array already knows. The array is retained into the
-            // slice's field like anything a struct holds.
+            // length the array already knows. The slice owns the array as
+            // anything a struct holds is owned.
             case ConversionKind.ArrayToSlice:
             {
                 var type = (SliceTypeSymbol)conversion.Type;
@@ -179,10 +180,8 @@ public sealed partial class LlvmEmitter
                 Line($"store ptr {operand.Ref}, ptr {SliceField(slot, type, 0)}");
                 Line($"store {Word} 0, ptr {SliceField(slot, type, 1)}");
                 Line($"store {Word} {length}, ptr {SliceField(slot, type, 2)}");
-                Retain(operand.Ref, operand.Type);
 
-                TrackTemporary(slot, type);
-                return new Val(slot, "ptr", type);
+                return Fresh(new Val(slot, "ptr", type));
             }
 
             case ConversionKind.StringLiteralToPointer:
@@ -196,10 +195,9 @@ public sealed partial class LlvmEmitter
                 if (conversion.Operand.Type is WeakTypeSymbol)
                 {
                     string loaded = Emit("ptr", $"call ptr @sl_weak_load(ptr {operand.Ref})");
-                    TrackTemporary(loaded, conversion.Type);
-                    return new Val(loaded, "ptr", conversion.Type);
+                    return Fresh(new Val(loaded, "ptr", conversion.Type));
                 }
-                return new Val(operand.Ref, to, conversion.Type);
+                return Same();
 
             case ConversionKind.IntegerWiden:
                 if (conversion.IsChecked)
@@ -241,6 +239,10 @@ public sealed partial class LlvmEmitter
 
         Val Converted(string instruction) =>
             new(Emit(to, $"{instruction} {from} {operand.Ref} to {to}"), to, conversion.Type);
+
+        // The operand's own pointer. Where it passes ownership it owes what the
+        // operand owed; elsewhere EmitExpression has already registered that.
+        Val Same() => new(operand.Ref, to, conversion.Type, passes ? operand.Hold : Hold.Borrowed);
     }
 
     /// <summary>
@@ -584,14 +586,7 @@ public sealed partial class LlvmEmitter
             : $"br i1 {left.Ref}, label %{endLabel}, label %{rightLabel}");
 
         Label(rightLabel);
-
-        // Anything the right operand allocates is released here, at the end of
-        // its own block. Deferring it to the merge would emit a release the
-        // defining instruction does not dominate, since the merge is also
-        // reached when the right operand never ran.
-        int mark = _pendingReleases.Count;
-        var right = EmitExpression(binary.Right);
-        FlushTemporaries(mark);
+        var right = EmitBranch(binary.Right);
 
         string rightBlock = CurrentBlockLabel();
         Terminator($"br label %{endLabel}");
@@ -617,12 +612,12 @@ public sealed partial class LlvmEmitter
         Terminator($"br i1 {condition.Ref}, label %{trueLabel}, label %{falseLabel}");
 
         Label(trueLabel);
-        var whenTrue = EmitArm(expression.WhenTrue);
+        var whenTrue = EmitBranch(expression.WhenTrue);
         string trueBlock = CurrentBlockLabel();
         Terminator($"br label %{endLabel}");
 
         Label(falseLabel);
-        var whenFalse = EmitArm(expression.WhenFalse);
+        var whenFalse = EmitBranch(expression.WhenFalse);
         string falseBlock = CurrentBlockLabel();
         Terminator($"br label %{endLabel}");
 
@@ -636,34 +631,12 @@ public sealed partial class LlvmEmitter
         string result = Emit(llvmType,
             $"phi {llvmType} [ {whenTrue.Ref}, %{trueBlock} ], [ {whenFalse.Ref}, %{falseBlock} ]");
 
-        // The arms each left a +1 reference; the merged one is now the temporary.
-        if (expression.Type.NeedsArc() || expression.Type.CarriesReferences())
-            TrackTemporary(result, expression.Type);
-
-        return new Val(result, llvmType, expression.Type);
-    }
-
-    /// <summary>
-    /// Emits one arm of a conditional so that it leaves exactly one owned
-    /// reference behind and no temporaries of its own.
-    ///
-    /// Anything the arm allocated has to be released inside the arm's own block,
-    /// since the merge is also reached when the arm never ran and a release
-    /// there would not be dominated by its definition. Retaining first means the
-    /// surviving value is independent of whatever the flush destroys.
-    /// </summary>
-    private Val EmitArm(BoundExpression arm)
-    {
-        int mark = _pendingReleases.Count;
-        var value = EmitExpression(arm);
-
-        if (arm.Type.NeedsArc()) Retain(value.Ref, arm.Type);
-        else if (arm.Type is StructTypeSymbol structArm && structArm.CarriesReferences())
-            RetainFieldsAt(value.Ref, structArm);
-
-        FlushTemporaries(mark);
-
-        return value;
+        // Each arm left a +1, or a value with nothing to count, and the merge
+        // owes what they did.
+        var merged = new Val(result, llvmType, expression.Type);
+        return whenTrue.Hold == Hold.Uncounted && whenFalse.Hold == Hold.Uncounted
+            ? Uncounted(merged)
+            : Fresh(merged);
     }
 
     private string CurrentBlockLabel() => _currentBlock;

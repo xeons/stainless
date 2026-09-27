@@ -43,6 +43,22 @@ public sealed partial class LlvmEmitter
         if (_blockTerminated && statement is not BoundLabel)
             Label(NextLabel("dead"));
 
+#if DEBUG
+        int unsettled = _unsettled.Count;
+#endif
+
+        EmitStatementKind(statement);
+
+#if DEBUG
+        if (_unsettled.Count != unsettled)
+            throw new InternalCompilerError(
+                "an owned value was left unconsumed: nothing stored, returned or released it",
+                statement.Span);
+#endif
+    }
+
+    private void EmitStatementKind(BoundStatement statement)
+    {
         switch (statement)
         {
             case BoundBlock block: EmitBlock(block); break;
@@ -116,10 +132,13 @@ public sealed partial class LlvmEmitter
         else if (local.Type is StructTypeSymbol { } owning && owning.CarriesReferences())
             StartOwnedSlot(slot, local.Type, StructName(owning), declaration.Initializer is not null);
 
+        // Where a jump may land the slot may still hold what the last run of
+        // this declaration left, and the store releases it.
         if (declaration.Initializer is not null)
         {
-            var value = EmitExpression(declaration.Initializer);
-            StoreInto(slot, value, local.Type);
+            var value = EmitOwned(declaration.Initializer);
+            if (_hasLabels) MoveInto(slot, value, local.Type);
+            else InitializeWith(slot, value, local.Type);
         }
         else if (local.Type is StructTypeSymbol structType && !structType.CarriesReferences())
         {
@@ -159,7 +178,7 @@ public sealed partial class LlvmEmitter
 
     private void EmitExpressionStatement(BoundExpressionStatement statement)
     {
-        EmitExpression(statement.Expression);
+        EmitDiscarded(statement.Expression);
         FlushTemporaries();
     }
 
@@ -363,7 +382,7 @@ public sealed partial class LlvmEmitter
         Label(stepLabel);
         if (statement.Step is not null)
         {
-            EmitExpression(statement.Step);
+            EmitDiscarded(statement.Step);
             FlushTemporaries();
         }
         Terminator($"br label %{conditionLabel}");
@@ -515,18 +534,13 @@ public sealed partial class LlvmEmitter
             return;
         }
 
-        var value = EmitExpression(statement.Value);
-
-        // A returned reference is handed to the caller at +1.
-        if (value.Type.NeedsArc())
-            Retain(value.Ref, value.Type);
+        // Handed to the caller at +1, and a struct field by field: the caller
+        // receives a copy that owns what it holds, and this frame is about to
+        // release its own.
+        var value = EmitOwned(statement.Value);
 
         if (value.Type is StructTypeSymbol structType)
         {
-            // The same +1, field by field: the caller receives a copy that owns
-            // what it holds, and this frame is about to release its own.
-            if (structType.CarriesReferences()) RetainFieldsAt(value.Ref, structType);
-
             if (_sretSlot is not null)
             {
                 MemCopy(_sretSlot, value.Ref, structType.Size);

@@ -30,18 +30,23 @@ public sealed partial class LlvmEmitter
 {
     // ============================================================ expressions
 
-    private Val EmitExpression(BoundExpression expression)
+    /// <summary>The dispatch behind <see cref="EmitOwnable"/>.</summary>
+    private Val EmitValue(BoundExpression expression)
     {
         switch (expression)
         {
             case BoundLiteral literal: return EmitLiteral(literal);
+
+            // Immortal, so there is nothing to count: a retain or a release of
+            // one returns at once.
             case BoundStringLiteral text:
-                return new Val(InternStringObject(text.Value), "ptr", text.Type);
+                return Uncounted(new Val(InternStringObject(text.Value), "ptr", text.Type));
             case BoundUtf8Literal bytes:
-                return new Val(InternUtf8Array(bytes.Value), "ptr", bytes.Type);
+                return Uncounted(new Val(InternUtf8Array(bytes.Value), "ptr", bytes.Type));
             case BoundInterpolatedString interpolated:
                 return EmitInterpolatedString(interpolated);
-            case BoundNullLiteral nullLiteral: return new Val("null", "ptr", nullLiteral.Type);
+            case BoundNullLiteral nullLiteral:
+                return Uncounted(new Val("null", "ptr", nullLiteral.Type));
             case BoundConstantAccess constant: return EmitConstant(constant);
             case BoundStaticAccess shared: return EmitStaticAccess(shared);
             // All three answer a `nuint`, so all three are a word wide.
@@ -88,13 +93,11 @@ public sealed partial class LlvmEmitter
                     string slot = Alloca(llvmType, "zeroed");
                     Line($"store {llvmType} zeroinitializer, ptr {slot}");
 
-                    // Nothing to release: every reference in it is already null.
-                    // Nothing to retain either, which is why this is not tracked
-                    // as a temporary.
-                    return new Val(slot, "ptr", structType);
+                    // Every reference in it is null, so it owes nothing.
+                    return Uncounted(new Val(slot, "ptr", structType));
                 }
 
-                return new Val(ZeroOf(llvmType), llvmType, zeroed.Type);
+                return Uncounted(new Val(ZeroOf(llvmType), llvmType, zeroed.Type));
             }
 
             case BoundTupleCreate tuple: return EmitTupleCreate(tuple);
@@ -105,8 +108,8 @@ public sealed partial class LlvmEmitter
             // this exists.
             case BoundSequence sequence:
             {
-                foreach (var side in sequence.Before) EmitExpression(side);
-                return EmitExpression(sequence.Value);
+                foreach (var side in sequence.Before) EmitDiscarded(side);
+                return EmitOwnable(sequence.Value);
             }
             case BoundTypeTest test: return EmitTypeTest(test);
             case BoundIsPattern matched: return EmitExpression(matched.Test);
@@ -114,61 +117,7 @@ public sealed partial class LlvmEmitter
             case BoundUnary unary: return EmitUnary(unary);
             case BoundBinary binary: return EmitBinary(binary);
             case BoundConditional conditional: return EmitConditional(conditional);
-
-            case BoundLet held:
-            {
-                var value = EmitExpression(held.Value);
-
-                // Borrowed unless asked otherwise: whatever produced the value
-                // is already a temporary the statement will drop. An owned one
-                // is retained here and released with the statement's
-                // temporaries.
-                //
-                // A struct, a tuple, a variant and an inline array are all held
-                // by address, so the name is that address and there is nothing
-                // to copy. Everything else goes in a slot, because that is what
-                // a read of a local reads through.
-                //
-                // An owned one is a copy, taken now: the storage it came from
-                // may be written before the name is read.
-                if (held.IsOwned && held.Local.Type is StructTypeSymbol or FixedArrayTypeSymbol)
-                {
-                    var type = held.Local.Type;
-                    string llvmType = LlvmTypeOf(type);
-                    string copy = Alloca(llvmType, held.Local.Name);
-                    MemCopy(copy, value.Ref, type.Size);
-
-                    if (type is StructTypeSymbol owning && owning.CarriesReferences())
-                    {
-                        RetainFieldsAt(copy, owning);
-                        TrackTemporary(copy, owning);
-                    }
-
-                    _slots[held.Local] = copy;
-                }
-                else if (held.Local.Type is StructTypeSymbol or FixedArrayTypeSymbol)
-                {
-                    _slots[held.Local] = value.Ref;
-                }
-                else if (held.IsOwned && held.Local.Type.NeedsArc())
-                {
-                    Retain(value.Ref, held.Local.Type);
-                    TrackTemporary(value.Ref, held.Local.Type);
-
-                    string slot = Alloca("ptr", held.Local.Name);
-                    _slots[held.Local] = slot;
-                    Line($"store ptr {value.Ref}, ptr {slot}");
-                }
-                else
-                {
-                    string llvmType = LlvmTypeOf(held.Local.Type);
-                    string slot = Alloca(llvmType, held.Local.Name);
-                    _slots[held.Local] = slot;
-                    Line($"store {llvmType} {value.Ref}, ptr {slot}");
-                }
-
-                return EmitExpression(held.Body);
-            }
+            case BoundLet held: return EmitLet(held);
             case BoundFunctionReference reference:
                 return new Val(Symbol(reference.Function), "ptr", reference.Type);
             case BoundIndirectCall indirect: return EmitIndirectCall(indirect);
@@ -201,6 +150,104 @@ public sealed partial class LlvmEmitter
 
             default:
                 throw Unhandled(expression, expression.Span);
+        }
+    }
+
+    /// <summary>
+    /// <c>let x = value in body</c>.
+    ///
+    /// Borrowed unless asked otherwise: whatever produced the value is a
+    /// temporary the statement will drop. An owned one takes a +1 of its own,
+    /// released with the statement's temporaries, and holds a copy of a struct
+    /// taken now, because the storage it came from may be written before the
+    /// name is read.
+    ///
+    /// A struct, a tuple, a variant and an inline array are all held by
+    /// address, so the name is that address. Everything else goes in a slot,
+    /// because that is what a read of a local reads through.
+    /// </summary>
+    private Val EmitLet(BoundLet held)
+    {
+        var local = held.Local;
+        var type = local.Type;
+        bool byAddress = type is StructTypeSymbol or FixedArrayTypeSymbol;
+
+        if (held.IsOwned)
+        {
+            var kept = EmitOwned(held.Value);
+
+            if (byAddress && kept.Hold != Hold.Owned)
+            {
+                string copy = Alloca(LlvmTypeOf(type), local.Name);
+                MemCopy(copy, kept.Ref, type.Size);
+                kept = kept with { Ref = copy };
+            }
+
+            if (kept.Hold == Hold.Owned) TrackTemporary(kept.Ref, type);
+            Name(local, kept, byAddress);
+            return EmitOwnable(held.Body);
+        }
+
+        var value = EmitOwnable(held.Value);
+        bool handedOn = value.Hold == Hold.Owned && HandsOnLocal(held);
+
+        value = Borrow(value);
+        Name(local, value, byAddress);
+
+        var body = EmitOwnable(held.Body);
+        if (!handedOn) return body;
+
+        // The body is the object the value made, so its +1 is the body's.
+        Reclaim(value);
+        return Fresh(body);
+    }
+
+    /// <summary>Where a name a <c>let</c> binds is read from.</summary>
+    private void Name(LocalSymbol local, Val value, bool byAddress)
+    {
+        if (byAddress)
+        {
+            _slots[local] = value.Ref;
+            return;
+        }
+
+        string llvmType = LlvmTypeOf(local.Type);
+        string slot = Alloca(llvmType, local.Name);
+        _slots[local] = slot;
+        Line($"store {llvmType} {value.Ref}, ptr {slot}");
+    }
+
+    /// <summary>
+    /// Emits an expression for what it does, and keeps nothing it yields.
+    ///
+    /// An assignment is the reason: its value goes into the slot and nowhere
+    /// else, so an owned one is moved there rather than retained there and
+    /// released at the end of the statement.
+    /// </summary>
+    private void EmitDiscarded(BoundExpression expression)
+    {
+        switch (expression)
+        {
+            case BoundAssignment assignment
+                when assignment.Target is not BoundFieldAccess { Field.IsBitField: true }:
+            {
+                if (assignment.DeclaresLocal is { } declared)
+                    DeclareExpressionLocal(declared);
+
+                string address = EmitAddress(assignment.Target);
+                var value = EmitOwned(assignment.Value);
+                MoveInto(address, value, assignment.Target.Type);
+                return;
+            }
+
+            case BoundSequence sequence:
+                foreach (var side in sequence.Before) EmitDiscarded(side);
+                EmitDiscarded(sequence.Value);
+                return;
+
+            default:
+                EmitExpression(expression);
+                return;
         }
     }
 
@@ -583,52 +630,6 @@ public sealed partial class LlvmEmitter
         string address = EmitAddress(expression);
         string llvmType = LlvmTypeOf(expression.Type);
         return new Val(Emit(llvmType, $"load {llvmType}, ptr {address}"), llvmType, expression.Type);
-    }
-
-    private void StoreInto(string slot, Val value, TypeSymbol targetType)
-    {
-        if (targetType is StructTypeSymbol structType)
-        {
-            // Retain before release, for the reason StoreManaged does it: a
-            // struct assigned to itself must not destroy what it is copying.
-            if (structType.CarriesReferences())
-            {
-                RetainFieldsAt(value.Ref, structType);
-                ReleaseFieldsAt(slot, structType);
-            }
-
-            MemCopy(slot, value.Ref, structType.Size);
-            return;
-        }
-
-        if (targetType.IsManagedSlot())
-        {
-            StoreManaged(slot, value.Ref, targetType);
-            return;
-        }
-
-        // An inline array is held by address, like a struct, because it is its
-        // elements rather than a reference to them. So the whole of it moves,
-        // and each element that owns something is retained on the way.
-        if (targetType is FixedArrayTypeSymbol inline)
-        {
-            if (inline.Element.CarriesReferences())
-                for (int i = 0; i < inline.Length; i++)
-                {
-                    string source = Emit("ptr",
-                        $"getelementptr inbounds {LlvmTypeOf(inline.Element)}, " +
-                        $"ptr {value.Ref}, i64 {i}");
-                    string target = Emit("ptr",
-                        $"getelementptr inbounds {LlvmTypeOf(inline.Element)}, " +
-                        $"ptr {slot}, i64 {i}");
-                    StoreInto(target, new Val(source, "ptr", inline.Element), inline.Element);
-                }
-            else
-                MemCopy(slot, value.Ref, inline.Size);
-            return;
-        }
-
-        Line($"store {LlvmTypeOf(targetType)} {value.Ref}, ptr {slot}");
     }
 
     /// <summary>

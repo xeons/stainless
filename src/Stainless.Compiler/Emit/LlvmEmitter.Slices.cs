@@ -48,7 +48,12 @@ public sealed partial class LlvmEmitter
     private Val EmitSlice(BoundSlice expression)
     {
         var type = (SliceTypeSymbol)expression.Type;
-        var source = EmitExpression(expression.Target);
+
+        // The slice keeps the array the source holds, so the source is taken
+        // at +1 and its +1 handed on. It waits among the temporaries while the
+        // bounds are evaluated, where a `try` that returns releases it.
+        var source = EmitOwned(expression.Target);
+        if (source.Hold == Hold.Owned) TrackTemporary(source.Ref, source.Type);
 
         string array, baseOffset, sourceLength;
 
@@ -98,12 +103,8 @@ public sealed partial class LlvmEmitter
         Line($"store {Word} {Emit(Word, $"sub {Word} {to}, {from}")}, " +
              $"ptr {SliceField(slot, type, 2)}");
 
-        // The array is retained into the slice's field, exactly as a struct
-        // field retains what it holds; the slice is then a +1 temporary.
-        Line($"call void @sl_retain(ptr {array})");
-        TrackTemporary(slot, type);
-
-        return new Val(slot, "ptr", type);
+        if (source.Hold == Hold.Owned) Reclaim(source);
+        return Fresh(new Val(slot, "ptr", type));
     }
 
     /// <summary>
@@ -255,20 +256,15 @@ public sealed partial class LlvmEmitter
         if (closure.Receiver is null)
         {
             Line($"store ptr null, ptr {receiverSlot}, align 8");
-            TrackTemporary(slot, type);
-            return new Val(slot, "ptr", type);
+            return Uncounted(new Val(slot, "ptr", type));
         }
 
-        var receiver = EmitExpression(closure.Receiver);
-
-        // +1, and tracked, exactly as a struct-returning call's result is: what
-        // comes out of here owns its object until the statement ends or
-        // something stores it.
-        Retain(receiver.Ref, type.Receiver!.Type);
+        // What comes out of here owns its object, exactly as a struct-returning
+        // call's result does.
+        var receiver = EmitOwned(closure.Receiver);
         Line($"store ptr {receiver.Ref}, ptr {receiverSlot}, align {TargetPlatform.Current.PointerWidth}");
 
-        TrackTemporary(slot, type);
-        return new Val(slot, "ptr", type);
+        return Fresh(new Val(slot, "ptr", type));
     }
 
     /// <summary>
@@ -339,9 +335,7 @@ public sealed partial class LlvmEmitter
         if (returnInfo.Style == PassStyle.Indirect)
         {
             Line(invocation);
-            if (type.ReturnType.CarriesReferences())
-                TrackTemporary(sretSlot!, type.ReturnType);
-            return new Val(sretSlot!, "ptr", type.ReturnType);
+            return Fresh(new Val(sretSlot!, "ptr", type.ReturnType));
         }
 
         if (type.ReturnType.IsVoid())
@@ -375,14 +369,11 @@ public sealed partial class LlvmEmitter
             var structType = (StructTypeSymbol)returnType;
             string slot = Alloca(StructName(structType), "call.result");
             StoreCoerced(slot, result, returnInfo);
-            if (structType.CarriesReferences()) TrackTemporary(slot, structType);
-            return new Val(slot, "ptr", returnType);
+            return Fresh(new Val(slot, "ptr", returnType));
         }
 
-        // A returned reference arrives at +1 and is dropped when the statement ends.
-        if (returnType.NeedsArc()) TrackTemporary(result, returnType);
-
-        return new Val(result, returnInfo.LlvmType, returnType);
+        // A returned reference arrives at +1.
+        return Fresh(new Val(result, returnInfo.LlvmType, returnType));
     }
 
     private Val EmitIndirectCall(BoundIndirectCall call)
@@ -420,9 +411,7 @@ public sealed partial class LlvmEmitter
         if (returnInfo.Style == PassStyle.Indirect)
         {
             Line(invocation);
-            if (delegateType.ReturnType.CarriesReferences())
-                TrackTemporary(sretSlot!, delegateType.ReturnType);
-            return new Val(sretSlot!, "ptr", delegateType.ReturnType);
+            return Fresh(new Val(sretSlot!, "ptr", delegateType.ReturnType));
         }
 
         if (delegateType.ReturnType.IsVoid())
@@ -491,9 +480,7 @@ public sealed partial class LlvmEmitter
         if (returnInfo.Style == PassStyle.Indirect)
         {
             Line(invocation);
-            if (function.ReturnType.CarriesReferences())
-                TrackTemporary(sretSlot!, function.ReturnType);
-            return new Val(sretSlot!, "ptr", function.ReturnType);
+            return Fresh(new Val(sretSlot!, "ptr", function.ReturnType));
         }
 
         if (function.ReturnType.IsVoid())
@@ -502,23 +489,7 @@ public sealed partial class LlvmEmitter
             return Val.Void;
         }
 
-        string result = Emit(returnInfo.LlvmType, invocation);
-
-        if (returnInfo.Style == PassStyle.Coerce)
-        {
-            // Land the register-sized struct back in memory so it has an address.
-            var structType = (StructTypeSymbol)function.ReturnType;
-            string slot = Alloca(StructName(structType), "call.result");
-            StoreCoerced(slot, result, returnInfo);
-            if (structType.CarriesReferences()) TrackTemporary(slot, structType);
-            return new Val(slot, "ptr", function.ReturnType);
-        }
-
-        // A returned reference arrives at +1 and is dropped when the statement ends.
-        if (function.ReturnType.NeedsArc())
-            TrackTemporary(result, function.ReturnType);
-
-        return new Val(result, returnInfo.LlvmType, function.ReturnType);
+        return Landed(Emit(returnInfo.LlvmType, invocation), returnInfo, function.ReturnType);
     }
 
     /// <summary>
@@ -545,6 +516,7 @@ public sealed partial class LlvmEmitter
         var tuple = expression.Tuple;
         string slot = Alloca(StructName(tuple), "tuple");
         Line($"store {StructName(tuple)} zeroinitializer, ptr {slot}");
+        var made = Building(new Val(slot, "ptr", tuple));
 
         for (int i = 0; i < expression.Elements.Count; i++)
         {
@@ -553,11 +525,10 @@ public sealed partial class LlvmEmitter
                 $"getelementptr inbounds {StructName(tuple)}, ptr {slot}, " +
                 $"i32 0, i32 {FieldSlot(tuple, field)}");
 
-            StoreInto(target, EmitExpression(expression.Elements[i]), field.Type);
+            InitializeWith(target, EmitOwned(expression.Elements[i]), field.Type);
         }
 
-        if (tuple.CarriesReferences()) TrackTemporary(slot, tuple);
-        return new Val(slot, "ptr", tuple);
+        return Built(made);
     }
 
     private Val EmitVariantConstruction(BoundVariantConstruction expression)
@@ -567,6 +538,7 @@ public sealed partial class LlvmEmitter
         Line($"store {StructName(variant)} zeroinitializer, ptr {slot}");
 
         Line($"store i8 {expression.Case.Tag}, ptr {TagAddress(slot, variant)}");
+        var made = Building(new Val(slot, "ptr", variant));
 
         if (expression.Case.Payload is { } payload)
         {
@@ -579,12 +551,11 @@ public sealed partial class LlvmEmitter
                     $"getelementptr inbounds {StructName(payload)}, ptr {address}, " +
                     $"i32 0, i32 {FieldSlot(payload, field)}");
 
-                StoreInto(target, EmitExpression(expression.Arguments[i]), field.Type);
+                InitializeWith(target, EmitOwned(expression.Arguments[i]), field.Type);
             }
         }
 
-        if (variant.CarriesReferences()) TrackTemporary(slot, variant);
-        return new Val(slot, "ptr", variant);
+        return Built(made);
     }
 
     /// <summary>
@@ -619,13 +590,12 @@ public sealed partial class LlvmEmitter
         else if (held is StructTypeSymbol owning && owning.CarriesReferences())
             Line($"store {StructName(owning)} zeroinitializer, ptr {slot}");
 
-        var value = EmitExpression(expression.Operand);
-        StoreInto(slot, value, held);
+        InitializeWith(slot, EmitOwned(expression.Operand), held);
 
-        // The store took a reference, so something has to give it back. Both
+        // The slot owns what it holds, so something has to give it back. Both
         // arms read the payload out and whatever consumes it takes a reference
-        // of its own, and a return retains before it flushes -- so the end of
-        // the statement is where this slot stops owning what it holds.
+        // of its own, and a return takes its value before it flushes -- so the
+        // end of the statement is where this slot stops owning what it holds.
         if (held.CarriesReferences()) TrackTemporary(slot, held);
 
         var test = EmitExpression(expression.Test);
@@ -645,7 +615,7 @@ public sealed partial class LlvmEmitter
         _pendingReleases.AddRange(pending);
 
         Label(okLabel);
-        return EmitExpression(expression.OnSuccess);
+        return EmitOwnable(expression.OnSuccess);
     }
 
     private Val EmitVariantTest(BoundVariantTest expression)

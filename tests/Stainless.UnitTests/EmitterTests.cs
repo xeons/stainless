@@ -58,6 +58,10 @@ public class EmitterTests
     /// <summary>
     /// A local holding an object releases it at the end of its scope. Getting
     /// this wrong is a leak, which a test program does not notice.
+    ///
+    /// The +1 <c>new</c> made is the local's, moved in: a retain as it is
+    /// stored and a release as the statement ends would be a pair of atomics
+    /// that cancel.
     /// </summary>
     [Fact]
     public void ALocalReleasesWhatItHeld()
@@ -65,8 +69,88 @@ public class EmitterTests
         string body = Front.TestFunction(
             Front.ModuleIr("public class C { }\npublic void F() { var c = new C(); }"), "F");
 
-        Assert.Contains("call void @sl_retain(", body);
-        Assert.Contains("call void @sl_release(", body);
+        Assert.DoesNotContain("call void @sl_retain(", body);
+        Assert.Equal(1, Occurrences(body, "call void @sl_release("));
+    }
+
+    /// <summary>
+    /// A value that is already the caller's is handed back without a retain,
+    /// and one that is borrowed is retained once.
+    /// </summary>
+    [Fact]
+    public void AReturnMovesWhatItWasHanded()
+    {
+        string ir = Front.ModuleIr(
+            """
+            public class C { }
+            public C Make() { return new C(); }
+            public C Pass() { return Make(); }
+            public C Keep(C c) { return c; }
+            """);
+
+        string pass = Front.TestFunction(ir, "Pass");
+        Assert.DoesNotContain("sl_retain", pass);
+        Assert.DoesNotContain("sl_release", pass);
+
+        Assert.Equal(1, Occurrences(Front.TestFunction(ir, "Keep"), "call void @sl_retain("));
+    }
+
+    /// <summary>
+    /// A conditional merges one +1 from either arm: the arm that made its
+    /// value moves it, the arm that borrowed retains, and the local the merge
+    /// initializes takes it without another count.
+    /// </summary>
+    [Fact]
+    public void AConditionalMergesOneOwnedValue()
+    {
+        string body = Front.TestFunction(
+            Front.ModuleIr(
+                """
+                public class C { }
+                public void F(bool flag, C other) { var c = flag ? new C() : other; }
+                """),
+            "F");
+
+        Assert.Equal(1, Occurrences(body, "call void @sl_retain("));
+        Assert.Equal(1, Occurrences(body, "call void @sl_release("));
+    }
+
+    /// <summary>
+    /// A fresh value assigned as a statement is moved into its slot, which
+    /// releases only what the slot held before.
+    /// </summary>
+    [Fact]
+    public void AnAssignmentMovesAFreshValue()
+    {
+        string body = Front.TestFunction(
+            Front.ModuleIr(
+                """
+                public class C { }
+                public class Holder { public C? Held; }
+                public void F(Holder h) { h.Held = new C(); }
+                """),
+            "F");
+
+        Assert.DoesNotContain("call void @sl_retain(", body);
+        Assert.Equal(1, Occurrences(body, "call void @sl_release("));
+    }
+
+    /// <summary>
+    /// A null or a String literal has nothing to count, so storing one costs
+    /// no retain.
+    /// </summary>
+    [Fact]
+    public void AnUncountedValueIsStoredWithoutARetain()
+    {
+        string body = Front.TestFunction(
+            Front.ModuleIr(
+                """
+                public class Holder { public String? Name; }
+                public void F(Holder h) { h.Name = null; h.Name = "named"; }
+                """),
+            "F");
+
+        Assert.DoesNotContain("call void @sl_retain(", body);
     }
 
     /// <summary>

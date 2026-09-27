@@ -17,6 +17,7 @@
 using System.Globalization;
 using System.Text;
 using Stainless.Binding;
+using Stainless.Source;
 using Stainless.Syntax;
 
 namespace Stainless.Emit;
@@ -198,6 +199,12 @@ public sealed partial class LlvmEmitter
 
         EmitPendingJumps();
         PopScopeWithoutRelease();
+
+#if DEBUG
+        if (_unsettled.Count > 0)
+            throw new InternalCompilerError(
+                $"{_unsettled.Count} owned value(s) left unconsumed", function.Symbol.Span);
+#endif
 
         _module.AppendLine("entry:");
         _module.Append(_entryAllocas);

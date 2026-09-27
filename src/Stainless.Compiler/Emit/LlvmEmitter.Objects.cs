@@ -37,9 +37,14 @@ public sealed partial class LlvmEmitter
         if (classType.RuntimeFactory is not null)
         {
             string built = Emit("ptr", $"call ptr @{classType.RuntimeFactory}()");
-            TrackTemporary(built, classType);
-            return new Val(built, "ptr", classType);
+            return Fresh(new Val(built, "ptr", classType));
         }
+
+        // The arguments come first, as C#'s do, so that a `try` among them
+        // that returns has no half-made object to let go of.
+        var arguments = new List<string>();
+        if (expression.Constructor is not null)
+            AppendArguments(expression.Arguments, arguments, expression.EvaluationOrder);
 
         string instance = Emit("ptr",
             $"call ptr @sl_alloc(ptr @{Mangler.TypeInfoSymbol(classType)})");
@@ -50,14 +55,12 @@ public sealed partial class LlvmEmitter
 
         if (expression.Constructor is not null)
         {
-            var arguments = new List<string> { $"ptr {instance}" };
-            AppendArguments(expression.Arguments, arguments, expression.EvaluationOrder);
+            arguments.Insert(0, $"ptr {instance}");
             Line($"call void {Symbol(expression.Constructor)}({string.Join(", ", arguments)})");
         }
 
-        // sl_alloc already returns +1; the statement scope releases it.
-        TrackTemporary(instance, classType);
-        return new Val(instance, "ptr", classType);
+        // sl_alloc already returns +1.
+        return Fresh(new Val(instance, "ptr", classType));
     }
 
     /// <summary>
@@ -80,11 +83,8 @@ public sealed partial class LlvmEmitter
         AppendArguments(expression.Arguments, arguments, expression.EvaluationOrder);
         Line($"call void {Symbol(expression.Constructor)}({string.Join(", ", arguments)})");
 
-        // What the constructor stored is owned by the slot, so the statement
-        // drops it the way it drops any other struct temporary.
-        if (structType.CarriesReferences()) TrackTemporary(slot, structType);
-
-        return new Val(slot, "ptr", structType);
+        // What the constructor stored is owned by the slot.
+        return Fresh(new Val(slot, "ptr", structType));
     }
 
     /// <summary>
@@ -251,7 +251,7 @@ public sealed partial class LlvmEmitter
     /// Builds a closure: allocate the generated class, then copy each captured
     /// value into its field.
     ///
-    /// Capture is by value, so a captured reference is retained here and
+    /// Capture is by value, so a captured reference is kept here and
     /// released by the class's destroy hook -- which the emitter already writes
     /// for every class. The closure therefore owns what it captured and may
     /// outlive the scope that made it.
@@ -262,19 +262,19 @@ public sealed partial class LlvmEmitter
 
         string instance = Emit("ptr",
             $"call ptr @sl_alloc(ptr @{Mangler.TypeInfoSymbol(type)})");
+        var made = Building(new Val(instance, "ptr", closure.Type));
 
         foreach (var (field, value) in closure.Captures)
         {
-            var captured = EmitExpression(value);
+            var captured = EmitOwned(value);
             string address = Emit("ptr",
                 $"getelementptr inbounds i8, ptr {instance}, i64 " +
                 $"{ClassTypeSymbol.HeaderSize + field.Offset}");
 
-            StoreInto(address, captured, field.Type);
+            InitializeWith(address, captured, field.Type);
         }
 
-        TrackTemporary(instance, type);
-        return new Val(instance, "ptr", closure.Type);
+        return Built(made);
     }
 
     /// <summary>
@@ -302,7 +302,7 @@ public sealed partial class LlvmEmitter
                 var value = EmitExpression(expression.Elements[i]);
                 string at = Emit("ptr",
                     $"getelementptr inbounds {elementType}, ptr {slot}, i64 {i}");
-                StoreInto(at, value, expression.ElementType);
+                StoreUncounted(at, value, expression.ElementType);
             }
             return new Val(slot, "ptr", expression.Type);
         }
@@ -317,17 +317,25 @@ public sealed partial class LlvmEmitter
         string data = Emit("ptr",
             $"getelementptr inbounds i8, ptr {array}, i64 {ArrayTypeSymbol.HeaderSize}");
 
+        var made = new Val(array, "ptr", arrayType);
+        if (!expression.OnStack) Building(made);
+
         for (int i = 0; i < expression.Elements.Count; i++)
         {
-            var value = EmitExpression(expression.Elements[i]);
+            var value = EmitOwned(expression.Elements[i]);
             string at = Emit("ptr",
                 $"getelementptr inbounds {elementType}, ptr {data}, i64 {i}");
-            StoreInto(at, value, arrayType.Element);
+            InitializeWith(at, value, arrayType.Element);
         }
 
-        if (expression.OnStack) _stackArrays.Add(array);
+        if (!expression.OnStack) return Built(made);
+
+        // One in the frame ends when its statement does, whatever holds it, so
+        // it is only ever borrowed. It is registered after its elements, which
+        // may be slices of arrays in the frame too, so that it ends first.
+        _stackArrays.Add(array);
         TrackTemporary(array, arrayType);
-        return new Val(array, "ptr", arrayType);
+        return made;
     }
 
     /// <summary>
@@ -372,8 +380,7 @@ public sealed partial class LlvmEmitter
             $"call ptr @sl_array_alloc(ptr @{ArrayTypeInfoName(arrayType)}, " +
             $"{Word} {length.Ref}, {Word} {arrayType.Element.Size})");
 
-        TrackTemporary(array, arrayType);
-        return new Val(array, "ptr", arrayType);
+        return Fresh(new Val(array, "ptr", arrayType));
     }
 
     /// <summary>

@@ -29,12 +29,17 @@ static Noisy s_first = new Noisy("first");
 static List<Noisy> s_second = new List<Noisy>();
 static Noisy s_third = new Noisy("third");
 
+// Weak, so each holds a count of its own that teardown gives back.
+static weak Noisy? s_watching = s_first;
+static weak Noisy? s_later = null;
+
 // Never released: immortal from the moment it is stored.
 static readonly Noisy s_kept = new Noisy("readonly, and so kept");
 
 int Main()
 {
     s_second.Add(new Noisy("held by the list"));
+    s_later = s_third;
 
     Console.WriteLine("first  " + s_first.Tag);
     Console.WriteLine("third  " + s_third.Tag);
