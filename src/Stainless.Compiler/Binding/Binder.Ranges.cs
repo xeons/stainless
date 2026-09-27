@@ -223,17 +223,24 @@ public sealed partial class Binder
             return MakeSlice(span, target, from, fromOrigin, to, toOrigin);
         }
 
-        // Read twice, once for each end.
+        // Read twice, once for each end, and after what is sliced.
+        var receiver = Named(target);
         var whole = Named(range);
         var fields = StandardRange;
 
-        var slice = MakeSlice(span, target,
+        var slice = MakeSlice(span, receiver,
             new BoundFieldAccess(span, whole, fields.FindField("_start")!), IndexOrigin.Written,
             new BoundFieldAccess(span, whole, fields.FindField("_end")!), IndexOrigin.Written);
 
         return slice.Type.IsError()
             ? slice
-            : new BoundRangeSlice(span, slice.Type, slice) { Range = range, Whole = whole };
+            : new BoundRangeSlice(span, slice.Type, slice)
+            {
+                Target = target,
+                Receiver = receiver,
+                Range = range,
+                Whole = whole,
+            };
     }
 
     /// <summary>A slice of an array or another slice, each end counted from where it says.</summary>

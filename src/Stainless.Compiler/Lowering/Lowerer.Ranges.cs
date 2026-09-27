@@ -33,9 +33,14 @@ public sealed partial class Lowerer
         var held = new List<HeldValue>();
         var names = new List<(BoundPlaceholder Name, BoundExpression Value)>();
 
+        // What is sliced is held where it is read again, or where what is
+        // held after it would otherwise run first.
         if (sliced.Target is { } target)
             names.Add((sliced.Receiver!,
-                Places.IsRepeatable(target) ? target : Holds.HoldValue(target, held, everything: true)));
+                Places.IsRepeatable(target) ||
+                sliced.Length is null && (sliced.Range is null || Places.IsRepeatable(sliced.Range))
+                    ? target
+                    : Holds.HoldValue(target, held, everything: true)));
 
         if (sliced.Length is { } length)
             names.Add((sliced.Counted!, Holds.HoldValue(Substituted(length, names), held, everything: true)));

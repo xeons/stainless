@@ -45,6 +45,18 @@ String Joined(int[:] numbers)
 
 int[] Numbers() => [1, 2, 3, 4, 5, 6];
 
+int[] Announced(int[] numbers)
+{
+    Console.WriteLine("sliced");
+    return numbers;
+}
+
+Range Announced(Range range)
+{
+    Console.WriteLine("range");
+    return range;
+}
+
 public void Main()
 {
     int[] numbers = Numbers();
@@ -103,4 +115,7 @@ public void Main()
 
     foreach (var n in numbers[^3..])
         Console.WriteLine(Text.FromInteger(n));
+
+    // What is sliced is evaluated before the range, as it is written.
+    Console.WriteLine(Joined(Announced(numbers)[Announced(1..3)]));
 }
