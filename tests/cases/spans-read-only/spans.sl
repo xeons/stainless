@@ -75,7 +75,7 @@ int Main()
 
     Console.WriteLine(Text.FromInteger((int)Count(1, 2, 3)));
     Console.WriteLine(Text.FromInteger(Last(middle)));
-    Console.WriteLine(Text.FromInteger((int)BinarySearch(numbers, 4)));
+    Console.WriteLine(Text.FromInteger((int)BinarySearch(numbers, 4).GetValue()));
     Console.WriteLine(Text.FromInteger(Where(seen, n => n % 2 == 0).Count));
 
     ReadOnlySpan<byte> greeting = "hi"u8;

@@ -42,13 +42,6 @@ public sealed partial class Binder
     }
 
     /// <summary>
-    /// <c>Span&lt;T&gt;</c>, built once per element type.
-    ///
-    /// The three fields are hidden storage: a slice is reached through indexing
-    /// and Length, and naming the array it came from would let a caller keep the
-    /// whole of it alive on purpose and by accident alike.
-    /// </summary>
-    /// <summary>
     /// <c>(int, String)</c>, made the first time it is asked for.
     ///
     /// Interned by its element types, the way a slice is by its element: a
@@ -81,6 +74,16 @@ public sealed partial class Binder
         return tuple;
     }
 
+    /// <summary>
+    /// <c>Span&lt;T&gt;</c> or <c>ReadOnlySpan&lt;T&gt;</c>, built once per
+    /// element type.
+    ///
+    /// The members are the standard library's: <c>Standard.Span&lt;T&gt;</c> is
+    /// an ordinary generic struct, and this is its instantiation, made as a
+    /// slice so that indexing, cutting and the conversions still know it. A
+    /// referenced library names slices before any template can be read, so one
+    /// made that early is filled when pass 4 begins.
+    /// </summary>
     private SliceTypeSymbol SliceOf(TypeSymbol element, bool readOnly)
     {
         if (_slices.TryGetValue((element, readOnly), out var existing)) return existing;
@@ -93,22 +96,65 @@ public sealed partial class Binder
             SimpleName = MadeTypeName(Builtins.StandardModuleName,
                 $"{spelling}<{element.Name}>", () => $"{spelling}<{TypeIdentity(element)}>"),
             ModuleName = Builtins.StandardModuleName,
+            IsPublic = true,
+            TypeArguments = [element],
         };
 
-        slice.Fields.Add(new FieldSymbol(
-            SliceTypeSymbol.ArrayFieldName, ArrayOf(element), slice, 0) { IsBackingField = true });
-        slice.Fields.Add(new FieldSymbol(
-            SliceTypeSymbol.OffsetFieldName, PrimitiveTypeSymbol.NUInt, slice, 1)
-            { IsBackingField = true });
-        slice.Fields.Add(new FieldSymbol(
-            SliceTypeSymbol.LengthFieldName, PrimitiveTypeSymbol.NUInt, slice, 2)
-            { IsBackingField = true });
-
         Remember(_slices, (element, readOnly), slice);
-        _structs.Add(slice);
-        ComputeLayout(slice, []);
+
+        if (_slicesAwaitingTemplate is null)
+            CompleteSlice(slice);
+        else
+            _slicesAwaitingTemplate.Add(slice);
+
         return slice;
     }
+
+    /// <summary>Slices made before their templates could be read. Null once they can.</summary>
+    private List<SliceTypeSymbol>? _slicesAwaitingTemplate = [];
+
+    /// <summary>Fills every slice made so far, and every later one as it is made.</summary>
+    private void CompleteSlicesAwaitingTemplate()
+    {
+        var waiting = _slicesAwaitingTemplate!;
+        _slicesAwaitingTemplate = null;
+        foreach (var slice in waiting)
+            CompleteSlice(slice);
+    }
+
+    /// <summary>
+    /// Gives a slice its members from the standard library's declaration, or
+    /// only its three fields when there is no standard library to ask.
+    /// </summary>
+    private void CompleteSlice(SliceTypeSymbol slice)
+    {
+        if (SliceTemplate(slice.IsReadOnly) is { } template)
+        {
+            Instantiate(template, [slice.Element], template.Declaration.Span, filling: slice);
+            return;
+        }
+
+        slice.Fields.Add(new FieldSymbol(
+            "_array", ArrayOf(slice.Element), slice, SliceTypeSymbol.ArrayField));
+        slice.Fields.Add(new FieldSymbol(
+            "_offset", PrimitiveTypeSymbol.NUInt, slice, SliceTypeSymbol.OffsetField));
+        slice.Fields.Add(new FieldSymbol(
+            "_length", PrimitiveTypeSymbol.NUInt, slice, SliceTypeSymbol.LengthField));
+
+        _structs.Add(slice);
+        LayOutIfLate(slice);
+    }
+
+    /// <summary>The standard library's <c>Span&lt;T&gt;</c> or <c>ReadOnlySpan&lt;T&gt;</c>.</summary>
+    private GenericTypeTemplate? SliceTemplate(bool readOnly) =>
+        _modules.GetValueOrDefault(Builtins.StandardModuleName)?.GenericTypes
+            .GetValueOrDefault(readOnly ? "ReadOnlySpan" : "Span") is { Parameters.Count: 1 } template
+            ? template
+            : null;
+
+    private bool IsSliceTemplate(GenericTypeTemplate template) =>
+        ReferenceEquals(template, SliceTemplate(readOnly: false)) ||
+        ReferenceEquals(template, SliceTemplate(readOnly: true));
 
     /// <summary>
     /// Resolves a written type, and insists it is one a value can be made of.
@@ -589,7 +635,8 @@ public sealed partial class Binder
         // may take one argument and differ in its shape -- `Sort(Span<T>)` and
         // `Sort(IList<T>)` do -- and picking the first would make the second
         // unreachable.
-        var fitting = new List<(GenericFunctionTemplate Template, List<TypeSymbol> Arguments)>();
+        var fitting = new List<(GenericFunctionTemplate Template, List<TypeSymbol> Arguments,
+                                Dictionary<string, TypeSymbol> Inferred)>();
         Dictionary<string, TypeSymbol>? firstFailure = null;
         GenericFunctionTemplate? failed = null;
 
@@ -622,7 +669,7 @@ public sealed partial class Binder
 
             if (Accepts(candidate, inferred, arguments))
             {
-                fitting.Add((candidate, candidate.Parameters.Select(p => inferred[p]).ToList()));
+                fitting.Add((candidate, candidate.Parameters.Select(p => inferred[p]).ToList(), inferred));
                 trial.Accept();
             }
             else
@@ -633,6 +680,24 @@ public sealed partial class Binder
 
         if (fitting.Count == 1)
             return InstantiateFunction(fitting[0].Template, fitting[0].Arguments, syntax.Span);
+
+        // Several fit, and they are ranked as any overloads are: one that every
+        // argument converts to at least as well, and one better, is the call.
+        // `Trim(Span<T>, T)` and `Trim(ReadOnlySpan<T>, T)` both take a span,
+        // and the one that keeps it writable is the better fit.
+        if (fitting.Count > 1)
+        {
+            var parameters = fitting
+                .Select(f => ParameterTypesUnder(f.Template, f.Inferred, arguments))
+                .ToList();
+
+            for (int i = 0; i < fitting.Count; i++)
+            {
+                if (Enumerable.Range(0, fitting.Count)
+                    .All(j => j == i || IsBetter(parameters[i], parameters[j], arguments)))
+                    return InstantiateFunction(fitting[i].Template, fitting[i].Arguments, syntax.Span);
+            }
+        }
 
         if (fitting.Count > 1)
         {
@@ -1047,6 +1112,29 @@ public sealed partial class Binder
     /// than by instantiating: instantiating queues a body to be bound, and a
     /// candidate that loses should not leave one behind.
     /// </summary>
+    /// <summary>What each argument would convert to, were <paramref name="template"/> called with it.</summary>
+    private TypeSymbol?[] ParameterTypesUnder(
+        GenericFunctionTemplate template,
+        Dictionary<string, TypeSymbol> inferred,
+        List<BoundExpression> arguments)
+    {
+        var types = new TypeSymbol?[arguments.Count];
+
+        using (Enter(_context with { Substitution = inferred }))
+        {
+            for (int i = 0; i < arguments.Count; i++)
+            {
+                if (WrittenParameterType(template.Declaration.Parameters, arguments, i)
+                    is not { } written)
+                    break;
+
+                types[i] = ResolveType(written, template.Scope);
+            }
+        }
+
+        return types;
+    }
+
     private bool Accepts(
         GenericFunctionTemplate template,
         Dictionary<string, TypeSymbol> inferred,

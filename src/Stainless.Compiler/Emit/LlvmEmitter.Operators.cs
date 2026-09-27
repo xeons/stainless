@@ -177,9 +177,9 @@ public sealed partial class LlvmEmitter
                     $"i64 {RuntimeLayout.ArrayLength}");
                 string length = Emit(Word, $"load {Word}, ptr {lengthSlot}");
 
-                Line($"store ptr {operand.Ref}, ptr {SliceField(slot, type, 0)}");
-                Line($"store {Word} 0, ptr {SliceField(slot, type, 1)}");
-                Line($"store {Word} {length}, ptr {SliceField(slot, type, 2)}");
+                Line($"store ptr {operand.Ref}, ptr {SliceField(slot, type, SliceTypeSymbol.ArrayField)}");
+                Line($"store {Word} 0, ptr {SliceField(slot, type, SliceTypeSymbol.OffsetField)}");
+                Line($"store {Word} {length}, ptr {SliceField(slot, type, SliceTypeSymbol.LengthField)}");
 
                 return Fresh(new Val(slot, "ptr", type));
             }

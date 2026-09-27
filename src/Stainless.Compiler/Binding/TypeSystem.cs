@@ -627,8 +627,11 @@ public abstract class NamedTypeSymbol : TypeSymbol
     /// For an instantiated generic, the template it came from and the arguments
     /// it was built with. Inference reads these to match a pattern such as
     /// <c>IReadOnlyList&lt;T&gt;</c> against a concrete <c>List&lt;Money&gt;</c>.
+    ///
+    /// Settable because a slice may be made before its template can be read,
+    /// and is filled from it once it can.
     /// </summary>
-    public GenericTypeTemplate? Template { get; init; }
+    public GenericTypeTemplate? Template { get; set; }
     public IReadOnlyList<TypeSymbol> TypeArguments { get; init; } = [];
 
     /// <summary>This type's interfaces, and theirs, without duplicates.</summary>
@@ -1134,10 +1137,8 @@ public sealed class SliceTypeSymbol : StructTypeSymbol
     /// <summary>What the source calls it: <c>Span</c> or <c>ReadOnlySpan</c>.</summary>
     public string Spelling => IsReadOnly ? "ReadOnlySpan" : "Span";
 
-    /// <summary>The three fields, which the source cannot name.</summary>
-    public const string ArrayFieldName = "$array";
-    public const string OffsetFieldName = "$offset";
-    public const string LengthFieldName = "$length";
+    /// <summary>The fields, in the order the emitter reaches them by.</summary>
+    public const int ArrayField = 0, OffsetField = 1, LengthField = 2;
 
     public override string Name => $"{Spelling}<{Element.Name}>";
     public override bool StandsForAnError => Element.StandsForAnError;

@@ -32,6 +32,8 @@ public sealed partial class Binder
 
     private void DeclareMembers()
     {
+        CompleteSlicesAwaitingTemplate();
+
         // Delegate and closure signatures before anything else in this pass.
         //
         // An event's raise method takes the parameters of the closure it is

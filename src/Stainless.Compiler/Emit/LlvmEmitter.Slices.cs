@@ -35,7 +35,7 @@ public sealed partial class LlvmEmitter
     // A slice's offset and length are `nuint` fields, so both narrow with the
     // target. Loading one as i64 on a 32-bit build would read the field after it.
     private string SliceLength(string slice, SliceTypeSymbol type) =>
-        Emit(Word, $"load {Word}, ptr {SliceField(slice, type, 2)}");
+        Emit(Word, $"load {Word}, ptr {SliceField(slice, type, SliceTypeSymbol.LengthField)}");
 
     /// <summary>
     /// <c>a[from:to]</c>: the array this names, the offset into it, and how far
@@ -59,8 +59,8 @@ public sealed partial class LlvmEmitter
 
         if (expression.Target.Type is SliceTypeSymbol inner)
         {
-            array = Emit("ptr", $"load ptr, ptr {SliceField(source.Ref, inner, 0)}");
-            baseOffset = Emit(Word, $"load {Word}, ptr {SliceField(source.Ref, inner, 1)}");
+            array = Emit("ptr", $"load ptr, ptr {SliceField(source.Ref, inner, SliceTypeSymbol.ArrayField)}");
+            baseOffset = Emit(Word, $"load {Word}, ptr {SliceField(source.Ref, inner, SliceTypeSymbol.OffsetField)}");
             sourceLength = SliceLength(source.Ref, inner);
         }
         else
@@ -97,11 +97,11 @@ public sealed partial class LlvmEmitter
         Label(okLabel);
 
         string slot = Alloca(StructName(type), "slice");
-        Line($"store ptr {array}, ptr {SliceField(slot, type, 0)}");
+        Line($"store ptr {array}, ptr {SliceField(slot, type, SliceTypeSymbol.ArrayField)}");
         Line($"store {Word} {Emit(Word, $"add {Word} {baseOffset}, {from}")}, " +
-             $"ptr {SliceField(slot, type, 1)}");
+             $"ptr {SliceField(slot, type, SliceTypeSymbol.OffsetField)}");
         Line($"store {Word} {Emit(Word, $"sub {Word} {to}, {from}")}, " +
-             $"ptr {SliceField(slot, type, 2)}");
+             $"ptr {SliceField(slot, type, SliceTypeSymbol.LengthField)}");
 
         if (source.Hold == Hold.Owned) Reclaim(source);
         return Fresh(new Val(slot, "ptr", type));
@@ -190,8 +190,8 @@ public sealed partial class LlvmEmitter
         Terminator("unreachable");
 
         Label(okLabel);
-        string array = Emit("ptr", $"load ptr, ptr {SliceField(slice.Ref, type, 0)}");
-        string start = Emit(Word, $"load {Word}, ptr {SliceField(slice.Ref, type, 1)}");
+        string array = Emit("ptr", $"load ptr, ptr {SliceField(slice.Ref, type, SliceTypeSymbol.ArrayField)}");
+        string start = Emit(Word, $"load {Word}, ptr {SliceField(slice.Ref, type, SliceTypeSymbol.OffsetField)}");
         string data = Emit("ptr",
             $"getelementptr inbounds i8, ptr {array}, i64 {ArrayTypeSymbol.HeaderSize}");
 

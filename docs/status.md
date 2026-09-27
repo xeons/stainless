@@ -398,6 +398,18 @@ last person to edit it -- the suite is the authority.
   assigned, `++`'d, lent by `ref` or `out`, or given to a struct method that
   writes its receiver. An array and a `Span<T>` convert to one, and cutting one
   keeps it read-only. `Standard.Collections` takes one wherever it only reads
+- Both are structs in the standard library with C#'s members — two
+  constructors, `Empty`, `IsEmpty`, `Clear`, `Fill`, `CopyTo` (overlap-safe),
+  `TryCopyTo`, `Slice`, `ToArray`, `Overlaps`, `==` — and `Standard.Collections`
+  has C#'s `MemoryExtensions`, reached as `span.IndexOf(x)`: the `IndexOf` and
+  `Contains` families, `SequenceEqual`, `SequenceCompareTo`, `StartsWith`,
+  `EndsWith`, `CommonPrefixLength`, `Count`, `Replace`, `Sort(keys, items)`,
+  `Trim`. Missing against C#: a span over a pointer or `stackalloc`,
+  `GetPinnableReference`, a `Span<T>.Enumerator` type (`foreach` needs none),
+  `ToString` naming its element type, and the `char` and `SearchValues` forms
+- Generic overloads that both fit are ranked as any overloads are, so
+  `Trim(Span<T>)` and `Trim(ReadOnlySpan<T>)` are not ambiguous
+- `==` on two arrays of one type asks whether they are one array
 - A struct method that writes its receiver cannot be called on an `in`
   parameter, a `static readonly`, a `const` or a `ReadOnlySpan<T>` element; one
   that only reads is called in place, with no copy

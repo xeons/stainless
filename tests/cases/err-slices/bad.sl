@@ -17,8 +17,9 @@ int Main()
     var numbers = new int[4];
     Span<int> window = numbers[1:3];
 
-    // A slice has only Length.
+    // A slice's members are its struct's, and an array has only Length.
     int n = (int)window.Count;
+    int m = (int)numbers.Count;
 
     // Slicing something that is neither an array nor a slice.
     Point p;
@@ -30,5 +31,5 @@ int Main()
     // A slice does not convert back to an array on its own.
     int[] whole = window;
 
-    return n;
+    return n + m;
 }

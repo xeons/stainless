@@ -101,6 +101,24 @@ public class BinderTests
         Assert.Equal(["SL0444"], Front.ModuleCodes(
             "public struct P { public double X; public P(double x) { X = x; } }\n" + module));
 
+    /// <summary>
+    /// Generic overloads that both fit are ranked as any overloads are, and a
+    /// tie is still an ambiguity.
+    /// </summary>
+    [Theory]
+    [InlineData("int Pick<T>(Span<T> s) => 1;\nint Pick<T>(ReadOnlySpan<T> s) => 2;\nint F(Span<int> s) => Pick(s);", new string[0])]
+    [InlineData("int Pick<T>(Span<T> s) => 1;\nint Pick<T>(ReadOnlySpan<T> s) => 2;\nint F(int[] a) => Pick(a);", new string[0])]
+    [InlineData("int Pick<T>(T a, int b) => 1;\nint Pick<T>(int a, T b) => 2;\nint F() => Pick(1, 2);", new[] { "SL0453" })]
+    public void GenericOverloadsAreRanked(string module, string[] expected) =>
+        Assert.Equal(expected, Front.ModuleCodes(module));
+
+    [Theory]
+    [InlineData("bool F(int[] a, int[] b) => a == b;", new string[0])]
+    [InlineData("bool F(int[] a, int[] b) => a != b;", new string[0])]
+    [InlineData("bool F(int[] a, long[] b) => a == b;", new[] { "SL0234" })]
+    public void ArraysCompareByIdentity(string module, string[] expected) =>
+        Assert.Equal(expected, Front.ModuleCodes(module));
+
     // ------------------------------------------------------ where it points
 
     /// <summary>

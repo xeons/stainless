@@ -2026,6 +2026,10 @@ index and the length rather than corrupting memory.
 Arrays hold anything: `int[]`, `Point[]` (structs stored inline), `String[]`
 and `IShape[]` (references, each retained). `T[][]` is an array of arrays.
 
+**`==` asks whether two arrays are one array**, as for any reference; two arrays
+holding equal elements are not equal. `SequenceEqual` in `Standard.Collections`
+compares what they hold.
+
 **An array can be written out**, with the same allocation and a store per
 element — at a constant index, so nothing is bounds checked that need not be:
 
@@ -2269,13 +2273,41 @@ Sort(numbers);                // the whole of it
 Sort(numbers[2:5]);           // three of them, in place, nothing copied
 ```
 
-**The names are C#'s, and the type is not.** A C# `Span<T>` is a pointer and a
-length, kept from outliving its memory by the rules of a `ref struct`; this one
-holds its array and needs no such rules, so it may be a field, be captured, and
-be returned. The compiler builds both from their element rather than finding
-them declared anywhere, which is why they are recognised by name and by one
-type argument: a program's own `Span`, with none, is still its own. `T[:]` is not
-a type (SL0807); `[:]` belongs to an expression, where it cuts one.
+**The names are C#'s, and so are the members; the representation is not.** A C#
+`Span<T>` is a pointer and a length, kept from outliving its memory by the
+rules of a `ref struct`; this one holds its array and needs no such rules, so it
+may be a field, be captured, and be returned. There is no span over a pointer
+or over the stack for the same reason: there would be nothing to hold.
+
+Both are declared in the standard library, as `Standard.Span<T>` and
+`Standard.ReadOnlySpan<T>`, and the compiler knows them. What it supplies is
+what needs it: the layout, `Length`, indexing, cutting, `foreach`, list
+patterns, `params`, and the conversions from an array and from a `Span<T>` to a
+`ReadOnlySpan<T>`. The rest is ordinary library code, with C#'s names:
+
+```csharp
+var part = new Span<int>(numbers, 2, 3);     // or new Span<int>(numbers)
+part.Fill(0);
+part.Clear();
+part.CopyTo(other);                           // aborts when other is shorter
+part.TryCopyTo(other);                        // answers false instead
+part.Slice(1)   part.Slice(1, 1)   part.ToArray()   part.IsEmpty
+part.Overlaps(other)   part == other          // the same elements of one array
+Span<int>.Empty
+```
+
+What C# puts in `MemoryExtensions` is in `Standard.Collections`, as free
+functions that a call written on a span, or on an array, reaches:
+`IndexOf`, `LastIndexOf`, `IndexOfAny`, `IndexOfAnyExcept`, the `InRange`
+forms, `Contains`, `ContainsAny`, `ContainsAnyExcept`, `Count`,
+`SequenceEqual`, `SequenceCompareTo`, `StartsWith`, `EndsWith`,
+`CommonPrefixLength`, `Replace`, `Reverse`, `Sort` (and `Sort(keys, items)`),
+`BinarySearch`, `Trim`, `TrimStart` and `TrimEnd`. A position is an
+`Optional<nuint>` rather than -1 ([§2.8.1](#281-optionalt--a-value-or-none)).
+
+The names are recognised by one type argument: a program's own `Span`, with
+none, is still its own. `T[:]` is not a type (SL0807); `[:]` belongs to an
+expression, where it cuts one.
 
 ### 2.12.1 `ReadOnlySpan<T>`
 

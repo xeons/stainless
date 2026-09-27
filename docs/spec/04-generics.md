@@ -328,10 +328,14 @@ templates such as `class Node<T> { Node<T>? next; }`.
 
 **Generic functions overload on the shape of their parameters.** Two templates
 may share a name, and a call tries each one of the right arity, keeping those
-that both infer and would accept the arguments; two survivors is an ambiguity
-(SL0453) and none is the inference error. `Standard.Collections` has both
-`Sort<T>(Span<T>)` and `Sort<T>(IList<T>)`, and `Sort(numbers)` and `Sort(list)`
-each reach the right one.
+that both infer and would accept the arguments. Two or more survivors are
+ranked as any overloads are ([§7.1](07-functions-members.md#71-functions)): the one every
+argument converts to at least as well, and one argument better, is the call,
+and without one it is an ambiguity (SL0453). None is the inference error.
+`Standard.Collections` has both `Sort<T>(Span<T>)` and `Sort<T>(IList<T>)`, and
+`Sort(numbers)` and `Sort(list)` each reach the right one; it has `Trim` over a
+`Span<T>` and over a `ReadOnlySpan<T>`, and a `Span<T>` reaches the first,
+which keeps it writable.
 
 **Generic methods** are supported too, including inside a generic type, where
 the enclosing type's arguments are already fixed and only the method's own are

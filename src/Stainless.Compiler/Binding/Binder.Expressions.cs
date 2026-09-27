@@ -1555,6 +1555,11 @@ public sealed partial class Binder
             return new BoundBinary(span, PrimitiveTypeSymbol.Bool, comparableLeft, op, comparableRight);
         }
 
+        // Two arrays of one type are equal when they are one array, as in C#.
+        if (op is BoundBinaryOp.Equal or BoundBinaryOp.NotEqual &&
+            left.Type is ArrayTypeSymbol && left.Type.Equals(right.Type))
+            return new BoundBinary(span, PrimitiveTypeSymbol.Bool, left, op, right);
+
         // `first == one.Add`: one side is a method group or a lambda, which has
         // no type of its own, and the other is what settles it. Comparison is
         // the one place a closure has a context on the far side of the

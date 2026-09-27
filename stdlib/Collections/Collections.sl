@@ -344,17 +344,15 @@ void MergeRuns<T>(Span<T> items, Span<T> scratch, nuint low, nuint middle, nuint
         items[at] = scratch[at];
 }
 
-/// Where `wanted` is in an already-ordered slice, or the length when it is not
-/// there.
+/// Where `wanted` is in an already-ordered slice, if it is there at all.
 ///
-/// Two functions rather than one with a found flag, because the language has
-/// no `out` and a caller that wants the insertion point usually does not want
-/// the search, and the other way round.
+/// `FindLowerBound` answers where it would go instead: a caller that wants the
+/// insertion point usually does not want the search, and the other way round.
 ///
 /// @typeparam T  the element type, which must order itself
 /// @see Collections.FindLowerBound
 /// @seealso Collections.Sort
-public nuint BinarySearch<T>(ReadOnlySpan<T> items, T wanted) where T : IComparable<T>
+public Optional<nuint> BinarySearch<T>(ReadOnlySpan<T> items, T wanted) where T : IComparable<T>
 {
     nuint low = 0u;
     nuint high = items.Length;
@@ -365,7 +363,7 @@ public nuint BinarySearch<T>(ReadOnlySpan<T> items, T wanted) where T : ICompara
         int order = items[middle].CompareTo(wanted);
 
         if (order == 0)
-            return middle;
+            return Some(middle);
         if (order < 0)
         {
             low = middle + 1u;
@@ -376,7 +374,7 @@ public nuint BinarySearch<T>(ReadOnlySpan<T> items, T wanted) where T : ICompara
         }
     }
 
-    return items.Length;
+    return None;
 }
 
 /// The first index at which `wanted` could be inserted and leave the slice

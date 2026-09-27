@@ -142,10 +142,10 @@ int Main()
     // ------------------------------------------------------------ searching
 
     var ordered = [10, 20, 30, 40, 50];
-    printf("find30   = %llu\n", (ulong)BinarySearch(ordered, 30));
-    printf("find10   = %llu\n", (ulong)BinarySearch(ordered, 10));
-    printf("find50   = %llu\n", (ulong)BinarySearch(ordered, 50));
-    printf("find35   = %llu\n", (ulong)BinarySearch(ordered, 35));
+    printf("find30   = %llu\n", (ulong)BinarySearch(ordered, 30).GetValue());
+    printf("find10   = %llu\n", (ulong)BinarySearch(ordered, 10).GetValue());
+    printf("find50   = %llu\n", (ulong)BinarySearch(ordered, 50).GetValue());
+    printf("find35   = %llu\n", (ulong)BinarySearch(ordered, 35).GetValueOrDefault(99u));
     printf("bound35  = %llu\n", (ulong)FindLowerBound(ordered, 35));
     printf("bound0   = %llu\n", (ulong)FindLowerBound(ordered, 0));
     printf("bound99  = %llu\n", (ulong)FindLowerBound(ordered, 99));

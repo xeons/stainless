@@ -15,7 +15,7 @@ Interfaces are named with a leading I, as in C#.
 
 **Types** &nbsp; [Dictionary&lt;TKey, TValue&gt;](#dictionarytkey-tvalue-class) &middot; [DictionaryEnumerator&lt;TKey, TValue&gt;](#dictionaryenumeratortkey-tvalue-class) &middot; [HashSet&lt;T&gt;](#hashsett-class) &middot; [HashSetEnumerator&lt;T&gt;](#hashsetenumeratort-class) &middot; [IComparable&lt;T&gt;](#icomparablet-interface) &middot; [IEnumerable&lt;T&gt;](#ienumerablet-interface) &middot; [IEnumerator&lt;T&gt;](#ienumeratort-interface) &middot; [IEquatable&lt;T&gt;](#iequatablet-interface) &middot; [IHashable](#ihashable-interface) &middot; [IList&lt;T&gt;](#ilistt-interface) &middot; [IReadOnlyList&lt;T&gt;](#ireadonlylistt-interface) &middot; [KeyValuePair&lt;TKey, TValue&gt;](#keyvaluepairtkey-tvalue-class) &middot; [LinkedList&lt;T&gt;](#linkedlistt-class) &middot; [LinkedListEnumerator&lt;T&gt;](#linkedlistenumeratort-class) &middot; [List&lt;T&gt;](#listt-class) &middot; [ListEnumerator&lt;T&gt;](#listenumeratort-class) &middot; [OrderedDictionary&lt;TKey, TValue&gt;](#ordereddictionarytkey-tvalue-class) &middot; [Queue&lt;T&gt;](#queuet-class) &middot; [QueueEnumerator&lt;T&gt;](#queueenumeratort-class) &middot; [SortedList&lt;TKey, TValue&gt;](#sortedlisttkey-tvalue-class) &middot; [SortedListEnumerator&lt;TKey, TValue&gt;](#sortedlistenumeratortkey-tvalue-class) &middot; [Stack&lt;T&gt;](#stackt-class) &middot; [StackEnumerator&lt;T&gt;](#stackenumeratort-class)
 
-**Functions** &nbsp; [Aggregate](#aggregate-function) &middot; [Aggregate](#aggregate-function) &middot; [All](#all-function) &middot; [All](#all-function) &middot; [Any](#any-function) &middot; [Any](#any-function) &middot; [BinarySearch](#binarysearch-function) &middot; [Contains](#contains-function) &middot; [Count](#count-function) &middot; [Count](#count-function) &middot; [Distinct](#distinct-function) &middot; [Distinct](#distinct-function) &middot; [Find](#find-function) &middot; [FindIndex](#findindex-function) &middot; [FindLowerBound](#findlowerbound-function) &middot; [FirstOrDefault](#firstordefault-function) &middot; [FirstOrDefault](#firstordefault-function) &middot; [ForEach](#foreach-function) &middot; [ForEach](#foreach-function) &middot; [IndexOf](#indexof-function) &middot; [LastIndexOf](#lastindexof-function) &middot; [Max](#max-function) &middot; [Min](#min-function) &middot; [OrderBy](#orderby-function) &middot; [OrderBy](#orderby-function) &middot; [RemoveFirst](#removefirst-function) &middot; [RemoveWhere](#removewhere-function) &middot; [Reverse](#reverse-function) &middot; [Select](#select-function) &middot; [Select](#select-function) &middot; [Skip](#skip-function) &middot; [Skip](#skip-function) &middot; [Sort](#sort-function) &middot; [Sort](#sort-function) &middot; [Sort](#sort-function) &middot; [Sort](#sort-function) &middot; [Take](#take-function) &middot; [Take](#take-function) &middot; [ToArray](#toarray-function) &middot; [ToArray](#toarray-function) &middot; [ToList](#tolist-function) &middot; [ToList](#tolist-function) &middot; [Where](#where-function) &middot; [Where](#where-function)
+**Functions** &nbsp; [Aggregate](#aggregate-function) &middot; [Aggregate](#aggregate-function) &middot; [All](#all-function) &middot; [All](#all-function) &middot; [Any](#any-function) &middot; [Any](#any-function) &middot; [BinarySearch](#binarysearch-function) &middot; [CommonPrefixLength](#commonprefixlength-function) &middot; [Contains](#contains-function) &middot; [Contains](#contains-function) &middot; [ContainsAny](#containsany-function) &middot; [ContainsAny](#containsany-function) &middot; [ContainsAny](#containsany-function) &middot; [ContainsAnyExcept](#containsanyexcept-function) &middot; [ContainsAnyExcept](#containsanyexcept-function) &middot; [ContainsAnyExcept](#containsanyexcept-function) &middot; [ContainsAnyExcept](#containsanyexcept-function) &middot; [ContainsAnyExceptInRange](#containsanyexceptinrange-function) &middot; [ContainsAnyInRange](#containsanyinrange-function) &middot; [Count](#count-function) &middot; [Count](#count-function) &middot; [Count](#count-function) &middot; [Count](#count-function) &middot; [Distinct](#distinct-function) &middot; [Distinct](#distinct-function) &middot; [EndsWith](#endswith-function) &middot; [EndsWith](#endswith-function) &middot; [Find](#find-function) &middot; [FindIndex](#findindex-function) &middot; [FindLowerBound](#findlowerbound-function) &middot; [FirstOrDefault](#firstordefault-function) &middot; [FirstOrDefault](#firstordefault-function) &middot; [ForEach](#foreach-function) &middot; [ForEach](#foreach-function) &middot; [IndexOf](#indexof-function) &middot; [IndexOf](#indexof-function) &middot; [IndexOf](#indexof-function) &middot; [IndexOfAny](#indexofany-function) &middot; [IndexOfAny](#indexofany-function) &middot; [IndexOfAny](#indexofany-function) &middot; [IndexOfAnyExcept](#indexofanyexcept-function) &middot; [IndexOfAnyExcept](#indexofanyexcept-function) &middot; [IndexOfAnyExcept](#indexofanyexcept-function) &middot; [IndexOfAnyExcept](#indexofanyexcept-function) &middot; [IndexOfAnyExceptInRange](#indexofanyexceptinrange-function) &middot; [IndexOfAnyInRange](#indexofanyinrange-function) &middot; [LastIndexOf](#lastindexof-function) &middot; [LastIndexOf](#lastindexof-function) &middot; [LastIndexOf](#lastindexof-function) &middot; [LastIndexOfAny](#lastindexofany-function) &middot; [LastIndexOfAny](#lastindexofany-function) &middot; [LastIndexOfAny](#lastindexofany-function) &middot; [LastIndexOfAnyExcept](#lastindexofanyexcept-function) &middot; [LastIndexOfAnyExcept](#lastindexofanyexcept-function) &middot; [LastIndexOfAnyExcept](#lastindexofanyexcept-function) &middot; [LastIndexOfAnyExcept](#lastindexofanyexcept-function) &middot; [LastIndexOfAnyExceptInRange](#lastindexofanyexceptinrange-function) &middot; [LastIndexOfAnyInRange](#lastindexofanyinrange-function) &middot; [Max](#max-function) &middot; [Min](#min-function) &middot; [OrderBy](#orderby-function) &middot; [OrderBy](#orderby-function) &middot; [RemoveFirst](#removefirst-function) &middot; [RemoveWhere](#removewhere-function) &middot; [Replace](#replace-function) &middot; [Replace](#replace-function) &middot; [Reverse](#reverse-function) &middot; [Select](#select-function) &middot; [Select](#select-function) &middot; [SequenceCompareTo](#sequencecompareto-function) &middot; [SequenceEqual](#sequenceequal-function) &middot; [Skip](#skip-function) &middot; [Skip](#skip-function) &middot; [Sort](#sort-function) &middot; [Sort](#sort-function) &middot; [Sort](#sort-function) &middot; [Sort](#sort-function) &middot; [Sort](#sort-function) &middot; [Sort](#sort-function) &middot; [StartsWith](#startswith-function) &middot; [StartsWith](#startswith-function) &middot; [Take](#take-function) &middot; [Take](#take-function) &middot; [ToArray](#toarray-function) &middot; [ToArray](#toarray-function) &middot; [ToList](#tolist-function) &middot; [ToList](#tolist-function) &middot; [Trim](#trim-function) &middot; [Trim](#trim-function) &middot; [Trim](#trim-function) &middot; [Trim](#trim-function) &middot; [TrimEnd](#trimend-function) &middot; [TrimEnd](#trimend-function) &middot; [TrimEnd](#trimend-function) &middot; [TrimEnd](#trimend-function) &middot; [TrimStart](#trimstart-function) &middot; [TrimStart](#trimstart-function) &middot; [TrimStart](#trimstart-function) &middot; [TrimStart](#trimstart-function) &middot; [Where](#where-function) &middot; [Where](#where-function)
 
 ## Types
 
@@ -2430,16 +2430,14 @@ the first that does, so the rest of the sequence is never walked.
 ### BinarySearch *function*
 
 ```
-nuint BinarySearch<T>(ReadOnlySpan<T> items, T wanted)
+Optional<nuint> BinarySearch<T>(ReadOnlySpan<T> items, T wanted)
     where T : IComparable<T>
 ```
 
-Where `wanted` is in an already-ordered slice, or the length when it is not
-there.
+Where `wanted` is in an already-ordered slice, if it is there at all.
 
-Two functions rather than one with a found flag, because the language has
-no `out` and a caller that wants the insertion point usually does not want
-the search, and the other way round.
+`FindLowerBound` answers where it would go instead: a caller that wants the
+insertion point usually does not want the search, and the other way round.
 
 **Type parameters**
 
@@ -2447,7 +2445,22 @@ the search, and the other way round.
 
 **See also** &nbsp; [Collections.FindLowerBound](#findlowerbound-function) &middot; [Collections.Sort](#sort-function)
 
-<sub>[stdlib/Collections/Collections.sl:357](../../stdlib/Collections/Collections.sl#L357)</sub>
+<sub>[stdlib/Collections/Collections.sl:355](../../stdlib/Collections/Collections.sl#L355)</sub>
+
+### CommonPrefixLength *function*
+
+```
+nuint CommonPrefixLength<T>(ReadOnlySpan<T> span, ReadOnlySpan<T> other)
+    where T : IEquatable<T>
+```
+
+How many elements at the start the two have in common.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:209](../../stdlib/Collections/Spans.sl#L209)</sub>
 
 ### Contains *function*
 
@@ -2466,6 +2479,156 @@ free function here for the reason `IndexOf` is.
 **See also** &nbsp; [Collections.IndexOf](#indexof-function)
 
 <sub>[stdlib/Collections/Collections.sl:101](../../stdlib/Collections/Collections.sl#L101)</sub>
+
+### Contains *function*
+
+```
+bool Contains<T>(ReadOnlySpan<T> span, T value)
+    where T : IEquatable<T>
+```
+
+Whether any element equals `value`.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:69](../../stdlib/Collections/Spans.sl#L69)</sub>
+
+### ContainsAny *function*
+
+```
+bool ContainsAny<T>(ReadOnlySpan<T> span, T first, T second)
+    where T : IEquatable<T>
+```
+
+Whether any element equals either value.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:352](../../stdlib/Collections/Spans.sl#L352)</sub>
+
+### ContainsAny *function*
+
+```
+bool ContainsAny<T>(ReadOnlySpan<T> span, T first, T second, T third)
+    where T : IEquatable<T>
+```
+
+Whether any element equals any of the three.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:358](../../stdlib/Collections/Spans.sl#L358)</sub>
+
+### ContainsAny *function*
+
+```
+bool ContainsAny<T>(ReadOnlySpan<T> span, ReadOnlySpan<T> values)
+    where T : IEquatable<T>
+```
+
+Whether any element equals any of `values`.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:365](../../stdlib/Collections/Spans.sl#L365)</sub>
+
+### ContainsAnyExcept *function*
+
+```
+bool ContainsAnyExcept<T>(ReadOnlySpan<T> span, T value)
+    where T : IEquatable<T>
+```
+
+Whether any element is other than `value`.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:371](../../stdlib/Collections/Spans.sl#L371)</sub>
+
+### ContainsAnyExcept *function*
+
+```
+bool ContainsAnyExcept<T>(ReadOnlySpan<T> span, T first, T second)
+    where T : IEquatable<T>
+```
+
+Whether any element equals neither value.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:377](../../stdlib/Collections/Spans.sl#L377)</sub>
+
+### ContainsAnyExcept *function*
+
+```
+bool ContainsAnyExcept<T>(ReadOnlySpan<T> span, T first, T second, T third)
+    where T : IEquatable<T>
+```
+
+Whether any element equals none of the three.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:384](../../stdlib/Collections/Spans.sl#L384)</sub>
+
+### ContainsAnyExcept *function*
+
+```
+bool ContainsAnyExcept<T>(ReadOnlySpan<T> span, ReadOnlySpan<T> values)
+    where T : IEquatable<T>
+```
+
+Whether any element equals none of `values`.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:391](../../stdlib/Collections/Spans.sl#L391)</sub>
+
+### ContainsAnyExceptInRange *function*
+
+```
+bool ContainsAnyExceptInRange<T>(ReadOnlySpan<T> span, T low, T high)
+    where T : IComparable<T>
+```
+
+Whether any element is outside `low` to `high`.
+
+**Type parameters**
+
+- `T` — the element type, which must order itself
+
+<sub>[stdlib/Collections/Spans.sl:468](../../stdlib/Collections/Spans.sl#L468)</sub>
+
+### ContainsAnyInRange *function*
+
+```
+bool ContainsAnyInRange<T>(ReadOnlySpan<T> span, T low, T high)
+    where T : IComparable<T>
+```
+
+Whether any element is between `low` and `high`, both included.
+
+**Type parameters**
+
+- `T` — the element type, which must order itself
+
+<sub>[stdlib/Collections/Spans.sl:462](../../stdlib/Collections/Spans.sl#L462)</sub>
 
 ### Count *function*
 
@@ -2498,6 +2661,37 @@ How many satisfy the predicate, over any sequence. Walks all of it.
 **See also** &nbsp; [Collections.Where](#where-function)
 
 <sub>[stdlib/Collections/Functional.sl:316](../../stdlib/Collections/Functional.sl#L316)</sub>
+
+### Count *function*
+
+```
+nuint Count<T>(ReadOnlySpan<T> span, T value)
+    where T : IEquatable<T>
+```
+
+How many elements equal `value`.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:75](../../stdlib/Collections/Spans.sl#L75)</sub>
+
+### Count *function*
+
+```
+nuint Count<T>(ReadOnlySpan<T> span, ReadOnlySpan<T> value)
+    where T : IEquatable<T>
+```
+
+How many times `value` appears as a run of elements, counting runs that
+do not overlap. An empty `value` appears nowhere.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:130](../../stdlib/Collections/Spans.sl#L130)</sub>
 
 ### Distinct *function*
 
@@ -2537,6 +2731,36 @@ O(n squared) in comparisons, as the slice overload is.
 **See also** &nbsp; [HashSet](#hashsett-class)
 
 <sub>[stdlib/Collections/Functional.sl:443](../../stdlib/Collections/Functional.sl#L443)</sub>
+
+### EndsWith *function*
+
+```
+bool EndsWith<T>(ReadOnlySpan<T> span, ReadOnlySpan<T> value)
+    where T : IEquatable<T>
+```
+
+Whether `span` ends with the elements of `value`.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:197](../../stdlib/Collections/Spans.sl#L197)</sub>
+
+### EndsWith *function*
+
+```
+bool EndsWith<T>(ReadOnlySpan<T> span, T value)
+    where T : IEquatable<T>
+```
+
+Whether the last element equals `value`.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:203](../../stdlib/Collections/Spans.sl#L203)</sub>
 
 ### Find *function*
 
@@ -2593,7 +2817,7 @@ equal element when there is one.
 
 **See also** &nbsp; [Collections.BinarySearch](#binarysearch-function)
 
-<sub>[stdlib/Collections/Collections.sl:388](../../stdlib/Collections/Collections.sl#L388)</sub>
+<sub>[stdlib/Collections/Collections.sl:386](../../stdlib/Collections/Collections.sl#L386)</sub>
 
 ### FirstOrDefault *function*
 
@@ -2690,6 +2914,176 @@ has always answered this way; now they agree.
 
 <sub>[stdlib/Collections/Collections.sl:86](../../stdlib/Collections/Collections.sl#L86)</sub>
 
+### IndexOf *function*
+
+```
+Optional<nuint> IndexOf<T>(ReadOnlySpan<T> span, T value)
+    where T : IEquatable<T>
+```
+
+Where the first element equal to `value` is, if there is one.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+**See also** &nbsp; [Collections.LastIndexOf](#lastindexof-function)
+
+<sub>[stdlib/Collections/Spans.sl:42](../../stdlib/Collections/Spans.sl#L42)</sub>
+
+### IndexOf *function*
+
+```
+Optional<nuint> IndexOf<T>(ReadOnlySpan<T> span, ReadOnlySpan<T> value)
+    where T : IEquatable<T>
+```
+
+Where `value` first appears as a run of elements. An empty `value`
+appears at the start.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+**See also** &nbsp; [Collections.LastIndexOf](#lastindexof-function)
+
+<sub>[stdlib/Collections/Spans.sl:93](../../stdlib/Collections/Spans.sl#L93)</sub>
+
+### IndexOfAny *function*
+
+```
+Optional<nuint> IndexOfAny<T>(ReadOnlySpan<T> span, T first, T second)
+    where T : IEquatable<T>
+```
+
+Where the first element equal to either value is.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:226](../../stdlib/Collections/Spans.sl#L226)</sub>
+
+### IndexOfAny *function*
+
+```
+Optional<nuint> IndexOfAny<T>(ReadOnlySpan<T> span, T first, T second, T third)
+    where T : IEquatable<T>
+```
+
+Where the first element equal to any of the three is.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:233](../../stdlib/Collections/Spans.sl#L233)</sub>
+
+### IndexOfAny *function*
+
+```
+Optional<nuint> IndexOfAny<T>(ReadOnlySpan<T> span, ReadOnlySpan<T> values)
+    where T : IEquatable<T>
+```
+
+Where the first element equal to any of `values` is.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:240](../../stdlib/Collections/Spans.sl#L240)</sub>
+
+### IndexOfAnyExcept *function*
+
+```
+Optional<nuint> IndexOfAnyExcept<T>(ReadOnlySpan<T> span, T value)
+    where T : IEquatable<T>
+```
+
+Where the first element other than `value` is.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:282](../../stdlib/Collections/Spans.sl#L282)</sub>
+
+### IndexOfAnyExcept *function*
+
+```
+Optional<nuint> IndexOfAnyExcept<T>(ReadOnlySpan<T> span, T first, T second)
+    where T : IEquatable<T>
+```
+
+Where the first element equal to neither value is.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:289](../../stdlib/Collections/Spans.sl#L289)</sub>
+
+### IndexOfAnyExcept *function*
+
+```
+Optional<nuint> IndexOfAnyExcept<T>(ReadOnlySpan<T> span, T first, T second, T third)
+    where T : IEquatable<T>
+```
+
+Where the first element equal to none of the three is.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:296](../../stdlib/Collections/Spans.sl#L296)</sub>
+
+### IndexOfAnyExcept *function*
+
+```
+Optional<nuint> IndexOfAnyExcept<T>(ReadOnlySpan<T> span, ReadOnlySpan<T> values)
+    where T : IEquatable<T>
+```
+
+Where the first element equal to none of `values` is.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:303](../../stdlib/Collections/Spans.sl#L303)</sub>
+
+### IndexOfAnyExceptInRange *function*
+
+```
+Optional<nuint> IndexOfAnyExceptInRange<T>(ReadOnlySpan<T> span, T low, T high)
+    where T : IComparable<T>
+```
+
+Where the first element outside `low` to `high` is.
+
+**Type parameters**
+
+- `T` — the element type, which must order itself
+
+<sub>[stdlib/Collections/Spans.sl:420](../../stdlib/Collections/Spans.sl#L420)</sub>
+
+### IndexOfAnyInRange *function*
+
+```
+Optional<nuint> IndexOfAnyInRange<T>(ReadOnlySpan<T> span, T low, T high)
+    where T : IComparable<T>
+```
+
+Where the first element between `low` and `high`, both included, is.
+
+**Type parameters**
+
+- `T` — the element type, which must order itself
+
+<sub>[stdlib/Collections/Spans.sl:406](../../stdlib/Collections/Spans.sl#L406)</sub>
+
 ### LastIndexOf *function*
 
 ```
@@ -2706,6 +3100,176 @@ Where the *last* item equal to `wanted` is, if it is there at all.
 **See also** &nbsp; [Collections.IndexOf](#indexof-function)
 
 <sub>[stdlib/Collections/Collections.sl:110](../../stdlib/Collections/Collections.sl#L110)</sub>
+
+### LastIndexOf *function*
+
+```
+Optional<nuint> LastIndexOf<T>(ReadOnlySpan<T> span, T value)
+    where T : IEquatable<T>
+```
+
+Where the last element equal to `value` is, if there is one.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+**See also** &nbsp; [Collections.IndexOf](#indexof-function)
+
+<sub>[stdlib/Collections/Spans.sl:56](../../stdlib/Collections/Spans.sl#L56)</sub>
+
+### LastIndexOf *function*
+
+```
+Optional<nuint> LastIndexOf<T>(ReadOnlySpan<T> span, ReadOnlySpan<T> value)
+    where T : IEquatable<T>
+```
+
+Where `value` last appears as a run of elements. An empty `value`
+appears at the end.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+**See also** &nbsp; [Collections.IndexOf](#indexof-function)
+
+<sub>[stdlib/Collections/Spans.sl:112](../../stdlib/Collections/Spans.sl#L112)</sub>
+
+### LastIndexOfAny *function*
+
+```
+Optional<nuint> LastIndexOfAny<T>(ReadOnlySpan<T> span, T first, T second)
+    where T : IEquatable<T>
+```
+
+Where the last element equal to either value is.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:254](../../stdlib/Collections/Spans.sl#L254)</sub>
+
+### LastIndexOfAny *function*
+
+```
+Optional<nuint> LastIndexOfAny<T>(ReadOnlySpan<T> span, T first, T second, T third)
+    where T : IEquatable<T>
+```
+
+Where the last element equal to any of the three is.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:261](../../stdlib/Collections/Spans.sl#L261)</sub>
+
+### LastIndexOfAny *function*
+
+```
+Optional<nuint> LastIndexOfAny<T>(ReadOnlySpan<T> span, ReadOnlySpan<T> values)
+    where T : IEquatable<T>
+```
+
+Where the last element equal to any of `values` is.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:268](../../stdlib/Collections/Spans.sl#L268)</sub>
+
+### LastIndexOfAnyExcept *function*
+
+```
+Optional<nuint> LastIndexOfAnyExcept<T>(ReadOnlySpan<T> span, T value)
+    where T : IEquatable<T>
+```
+
+Where the last element other than `value` is.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:317](../../stdlib/Collections/Spans.sl#L317)</sub>
+
+### LastIndexOfAnyExcept *function*
+
+```
+Optional<nuint> LastIndexOfAnyExcept<T>(ReadOnlySpan<T> span, T first, T second)
+    where T : IEquatable<T>
+```
+
+Where the last element equal to neither value is.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:324](../../stdlib/Collections/Spans.sl#L324)</sub>
+
+### LastIndexOfAnyExcept *function*
+
+```
+Optional<nuint> LastIndexOfAnyExcept<T>(ReadOnlySpan<T> span, T first, T second, T third)
+    where T : IEquatable<T>
+```
+
+Where the last element equal to none of the three is.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:331](../../stdlib/Collections/Spans.sl#L331)</sub>
+
+### LastIndexOfAnyExcept *function*
+
+```
+Optional<nuint> LastIndexOfAnyExcept<T>(ReadOnlySpan<T> span, ReadOnlySpan<T> values)
+    where T : IEquatable<T>
+```
+
+Where the last element equal to none of `values` is.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:338](../../stdlib/Collections/Spans.sl#L338)</sub>
+
+### LastIndexOfAnyExceptInRange *function*
+
+```
+Optional<nuint> LastIndexOfAnyExceptInRange<T>(ReadOnlySpan<T> span, T low, T high)
+    where T : IComparable<T>
+```
+
+Where the last element outside `low` to `high` is.
+
+**Type parameters**
+
+- `T` — the element type, which must order itself
+
+<sub>[stdlib/Collections/Spans.sl:448](../../stdlib/Collections/Spans.sl#L448)</sub>
+
+### LastIndexOfAnyInRange *function*
+
+```
+Optional<nuint> LastIndexOfAnyInRange<T>(ReadOnlySpan<T> span, T low, T high)
+    where T : IComparable<T>
+```
+
+Where the last element between `low` and `high`, both included, is.
+
+**Type parameters**
+
+- `T` — the element type, which must order itself
+
+<sub>[stdlib/Collections/Spans.sl:434](../../stdlib/Collections/Spans.sl#L434)</sub>
 
 ### Max *function*
 
@@ -2824,6 +3388,38 @@ Walked from the end, so an index already passed cannot move.
 
 <sub>[stdlib/Collections/Collections.sl:155](../../stdlib/Collections/Collections.sl#L155)</sub>
 
+### Replace *function*
+
+```
+void Replace<T>(Span<T> span, T oldValue, T newValue)
+    where T : IEquatable<T>
+```
+
+Replaces every element equal to `oldValue` with `newValue`, in place.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:477](../../stdlib/Collections/Spans.sl#L477)</sub>
+
+### Replace *function*
+
+```
+void Replace<T>(ReadOnlySpan<T> source, Span<T> destination, T oldValue, T newValue)
+    where T : IEquatable<T>
+```
+
+Copies `source` into the start of `destination` with every element equal
+to `oldValue` replaced by `newValue`, aborting when `destination` is
+shorter.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:491](../../stdlib/Collections/Spans.sl#L491)</sub>
+
 ### Reverse *function*
 
 ```
@@ -2838,7 +3434,7 @@ Reverses part of an array in place.
 
 **See also** &nbsp; [List.Reverse](#reverse-method)
 
-<sub>[stdlib/Collections/Collections.sl:413](../../stdlib/Collections/Collections.sl#L413)</sub>
+<sub>[stdlib/Collections/Collections.sl:411](../../stdlib/Collections/Collections.sl#L411)</sub>
 
 ### Select *function*
 
@@ -2879,6 +3475,38 @@ Every element put through the transform, over any sequence.
 **See also** &nbsp; [Collections.Where](#where-function)
 
 <sub>[stdlib/Collections/Functional.sl:261](../../stdlib/Collections/Functional.sl#L261)</sub>
+
+### SequenceCompareTo *function*
+
+```
+int SequenceCompareTo<T>(ReadOnlySpan<T> span, ReadOnlySpan<T> other)
+    where T : IComparable<T>
+```
+
+How the two order element by element: negative when `span` comes first,
+zero when they are equal, positive when `other` does. A span that runs out
+first comes first.
+
+**Type parameters**
+
+- `T` — the element type, which must order itself
+
+<sub>[stdlib/Collections/Spans.sl:166](../../stdlib/Collections/Spans.sl#L166)</sub>
+
+### SequenceEqual *function*
+
+```
+bool SequenceEqual<T>(ReadOnlySpan<T> span, ReadOnlySpan<T> other)
+    where T : IEquatable<T>
+```
+
+Whether the two hold equal elements in the same order.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:148](../../stdlib/Collections/Spans.sl#L148)</sub>
 
 ### Skip *function*
 
@@ -2979,7 +3607,7 @@ is the cheaper trade, and it gets the array version's stability for free.
 
 - `T` — the element type, which must order itself
 
-<sub>[stdlib/Collections/Collections.sl:439](../../stdlib/Collections/Collections.sl#L439)</sub>
+<sub>[stdlib/Collections/Collections.sl:437](../../stdlib/Collections/Collections.sl#L437)</sub>
 
 ### Sort *function*
 
@@ -2993,7 +3621,70 @@ The same, ordered by a comparer.
 
 - `T` — the element type; the comparer orders it, so nothing is asked of it
 
-<sub>[stdlib/Collections/Collections.sl:459](../../stdlib/Collections/Collections.sl#L459)</sub>
+<sub>[stdlib/Collections/Collections.sl:457](../../stdlib/Collections/Collections.sl#L457)</sub>
+
+### Sort *function*
+
+```
+void Sort<TKey, TValue>(Span<TKey> keys, Span<TValue> items)
+    where TKey : IComparable<TKey>
+```
+
+Orders `keys` in place, smallest first, and moves each element of `items`
+to where its key went. The two MUST be the same length.
+
+**Type parameters**
+
+- `TKey` — the key type, which must order itself
+- `TValue` — the item type; nothing is asked of it
+
+<sub>[stdlib/Collections/Spans.sl:504](../../stdlib/Collections/Spans.sl#L504)</sub>
+
+### Sort *function*
+
+```
+void Sort<TKey, TValue>(Span<TKey> keys, Span<TValue> items, Comparison<TKey> order)
+```
+
+Orders `keys` in place by `order` and moves each element of `items` to
+where its key went. Stable. The two MUST be the same length.
+
+**Type parameters**
+
+- `TKey` — the key type
+- `TValue` — the item type; nothing is asked of it
+
+<sub>[stdlib/Collections/Spans.sl:512](../../stdlib/Collections/Spans.sl#L512)</sub>
+
+### StartsWith *function*
+
+```
+bool StartsWith<T>(ReadOnlySpan<T> span, ReadOnlySpan<T> value)
+    where T : IEquatable<T>
+```
+
+Whether `span` begins with the elements of `value`.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:185](../../stdlib/Collections/Spans.sl#L185)</sub>
+
+### StartsWith *function*
+
+```
+bool StartsWith<T>(ReadOnlySpan<T> span, T value)
+    where T : IEquatable<T>
+```
+
+Whether the first element equals `value`.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:191](../../stdlib/Collections/Spans.sl#L191)</sub>
 
 ### Take *function*
 
@@ -3096,6 +3787,189 @@ accident: a slice is not an `IEnumerable`, so nothing is ever both.
 **See also** &nbsp; [Collections.ToArray](#toarray-function)
 
 <sub>[stdlib/Collections/Functional.sl:373](../../stdlib/Collections/Functional.sl#L373)</sub>
+
+### Trim *function*
+
+```
+ReadOnlySpan<T> Trim<T>(ReadOnlySpan<T> span, T value)
+    where T : IEquatable<T>
+```
+
+Without the elements equal to `value` at either end.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:562](../../stdlib/Collections/Spans.sl#L562)</sub>
+
+### Trim *function*
+
+```
+ReadOnlySpan<T> Trim<T>(ReadOnlySpan<T> span, ReadOnlySpan<T> trimElements)
+    where T : IEquatable<T>
+```
+
+Without the elements equal to any of `trimElements` at either end.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:568](../../stdlib/Collections/Spans.sl#L568)</sub>
+
+### Trim *function*
+
+```
+Span<T> Trim<T>(Span<T> span, T value)
+    where T : IEquatable<T>
+```
+
+Without the elements equal to `value` at either end, still writable.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:610](../../stdlib/Collections/Spans.sl#L610)</sub>
+
+### Trim *function*
+
+```
+Span<T> Trim<T>(Span<T> span, ReadOnlySpan<T> trimElements)
+    where T : IEquatable<T>
+```
+
+Without the elements equal to any of `trimElements` at either end, still
+writable.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:616](../../stdlib/Collections/Spans.sl#L616)</sub>
+
+### TrimEnd *function*
+
+```
+ReadOnlySpan<T> TrimEnd<T>(ReadOnlySpan<T> span, T value)
+    where T : IEquatable<T>
+```
+
+Without the elements equal to `value` at the end.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:594](../../stdlib/Collections/Spans.sl#L594)</sub>
+
+### TrimEnd *function*
+
+```
+ReadOnlySpan<T> TrimEnd<T>(ReadOnlySpan<T> span, ReadOnlySpan<T> trimElements)
+    where T : IEquatable<T>
+```
+
+Without the elements equal to any of `trimElements` at the end.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:600](../../stdlib/Collections/Spans.sl#L600)</sub>
+
+### TrimEnd *function*
+
+```
+Span<T> TrimEnd<T>(Span<T> span, T value)
+    where T : IEquatable<T>
+```
+
+Without the elements equal to `value` at the end, still writable.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:641](../../stdlib/Collections/Spans.sl#L641)</sub>
+
+### TrimEnd *function*
+
+```
+Span<T> TrimEnd<T>(Span<T> span, ReadOnlySpan<T> trimElements)
+    where T : IEquatable<T>
+```
+
+Without the elements equal to any of `trimElements` at the end, still
+writable.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:647](../../stdlib/Collections/Spans.sl#L647)</sub>
+
+### TrimStart *function*
+
+```
+ReadOnlySpan<T> TrimStart<T>(ReadOnlySpan<T> span, T value)
+    where T : IEquatable<T>
+```
+
+Without the elements equal to `value` at the start.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:578](../../stdlib/Collections/Spans.sl#L578)</sub>
+
+### TrimStart *function*
+
+```
+ReadOnlySpan<T> TrimStart<T>(ReadOnlySpan<T> span, ReadOnlySpan<T> trimElements)
+    where T : IEquatable<T>
+```
+
+Without the elements equal to any of `trimElements` at the start.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:584](../../stdlib/Collections/Spans.sl#L584)</sub>
+
+### TrimStart *function*
+
+```
+Span<T> TrimStart<T>(Span<T> span, T value)
+    where T : IEquatable<T>
+```
+
+Without the elements equal to `value` at the start, still writable.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:625](../../stdlib/Collections/Spans.sl#L625)</sub>
+
+### TrimStart *function*
+
+```
+Span<T> TrimStart<T>(Span<T> span, ReadOnlySpan<T> trimElements)
+    where T : IEquatable<T>
+```
+
+Without the elements equal to any of `trimElements` at the start, still
+writable.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Spans.sl:632](../../stdlib/Collections/Spans.sl#L632)</sub>
 
 ### Where *function*
 

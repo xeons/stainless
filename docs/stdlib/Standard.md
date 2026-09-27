@@ -7,7 +7,7 @@ than library features, and so need no import to reach.
 
 ## Contents
 
-**Types** &nbsp; [Action&lt;T&gt;](#actiont-closure) &middot; [Comparison&lt;T&gt;](#comparisont-closure) &middot; [Fold&lt;TAccumulate, TSource&gt;](#foldtaccumulate-tsource-closure) &middot; [Func&lt;T, TResult&gt;](#funct-tresult-closure) &middot; [Index](#index-struct) &middot; [Optional&lt;T&gt;](#optionalt-variant) &middot; [Predicate&lt;T&gt;](#predicatet-closure) &middot; [Range](#range-struct) &middot; [Result&lt;T, TError&gt;](#resultt-terror-variant)
+**Types** &nbsp; [Action&lt;T&gt;](#actiont-closure) &middot; [Comparison&lt;T&gt;](#comparisont-closure) &middot; [Fold&lt;TAccumulate, TSource&gt;](#foldtaccumulate-tsource-closure) &middot; [Func&lt;T, TResult&gt;](#funct-tresult-closure) &middot; [Index](#index-struct) &middot; [Optional&lt;T&gt;](#optionalt-variant) &middot; [Predicate&lt;T&gt;](#predicatet-closure) &middot; [Range](#range-struct) &middot; [ReadOnlySpan&lt;T&gt;](#readonlyspant-struct) &middot; [Result&lt;T, TError&gt;](#resultt-terror-variant) &middot; [Span&lt;T&gt;](#spant-struct)
 
 ## Types
 
@@ -413,6 +413,176 @@ slice does.
 
 <sub>[stdlib/Standard/Range.sl:57](../../stdlib/Standard/Range.sl#L57)</sub>
 
+### ReadOnlySpan&lt;T&gt; *struct*
+
+```
+struct ReadOnlySpan<T>
+```
+
+Part of an array, as a value, which refuses a write through it. C#'s
+`System.ReadOnlySpan<T>`, and what a function that only reads takes: an
+array and a `Span<T>` both convert to one.
+
+    int Sum(ReadOnlySpan<int> values) { ... }
+
+Assigning an element, lending one by `ref` or `out`, and calling a struct
+method that writes one are refused where they are written. The array
+underneath is not frozen: a `Span<T>` over the same elements still writes
+them, and this sees the change.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+**See also** &nbsp; [Span](#spant-struct)
+
+<sub>[stdlib/Standard/ReadOnlySpan.sl:37](../../stdlib/Standard/ReadOnlySpan.sl#L37)</sub>
+
+#### Empty *property*
+
+```
+static ReadOnlySpan<T> Empty { get; }
+```
+
+A span of nothing.
+
+<sub>[stdlib/Standard/ReadOnlySpan.sl:69](../../stdlib/Standard/ReadOnlySpan.sl#L69)</sub>
+
+#### IsEmpty *property*
+
+```
+bool IsEmpty { get; }
+```
+
+Whether it has no elements.
+
+<sub>[stdlib/Standard/ReadOnlySpan.sl:72](../../stdlib/Standard/ReadOnlySpan.sl#L72)</sub>
+
+#### CopyTo *method*
+
+```
+void CopyTo(Span<T> destination)
+```
+
+Copies every element into the start of `destination`, aborting when it
+is shorter. The two may overlap: the elements land as they were before
+the copy began.
+
+**Parameters**
+
+- `destination` — where the elements go
+
+**See also** &nbsp; [ReadOnlySpan.TryCopyTo](#trycopyto-method)
+
+<sub>[stdlib/Standard/ReadOnlySpan.sl:80](../../stdlib/Standard/ReadOnlySpan.sl#L80)</sub>
+
+#### TryCopyTo *method*
+
+```
+bool TryCopyTo(Span<T> destination)
+```
+
+Copies every element into the start of `destination` when it is long
+enough, and answers whether it was.
+
+**Parameters**
+
+- `destination` — where the elements go
+
+**Returns** &nbsp; true when the elements were copied
+
+<sub>[stdlib/Standard/ReadOnlySpan.sl:102](../../stdlib/Standard/ReadOnlySpan.sl#L102)</sub>
+
+#### Slice *method*
+
+```
+ReadOnlySpan<T> Slice(nuint start)
+```
+
+The elements from `start` to the end, aborting when `start` is past it.
+
+**Parameters**
+
+- `start` — the first element of the result
+
+<sub>[stdlib/Standard/ReadOnlySpan.sl:113](../../stdlib/Standard/ReadOnlySpan.sl#L113)</sub>
+
+#### Slice *method*
+
+```
+ReadOnlySpan<T> Slice(nuint start, nuint length)
+```
+
+`length` elements from `start`, aborting when they run past the end.
+
+**Parameters**
+
+- `start` — the first element of the result
+- `length` — how many elements it covers
+
+<sub>[stdlib/Standard/ReadOnlySpan.sl:119](../../stdlib/Standard/ReadOnlySpan.sl#L119)</sub>
+
+#### ToArray *method*
+
+```
+T[] ToArray()
+```
+
+A new array holding a copy of the elements.
+
+<sub>[stdlib/Standard/ReadOnlySpan.sl:122](../../stdlib/Standard/ReadOnlySpan.sl#L122)</sub>
+
+#### Overlaps *method*
+
+```
+bool Overlaps(ReadOnlySpan<T> other)
+```
+
+Whether the two view any element in common.
+
+**Parameters**
+
+- `other` — the span to compare with
+
+<sub>[stdlib/Standard/ReadOnlySpan.sl:133](../../stdlib/Standard/ReadOnlySpan.sl#L133)</sub>
+
+#### Overlaps *method*
+
+```
+bool Overlaps(ReadOnlySpan<T> other, out nint elementOffset)
+```
+
+Whether the two view any element in common, and where `other` starts
+relative to this, in elements -- negative when it starts before.
+
+**Parameters**
+
+- `other` — the span to compare with
+- `elementOffset` — where `other` starts, counted from this one's start
+
+<sub>[stdlib/Standard/ReadOnlySpan.sl:142](../../stdlib/Standard/ReadOnlySpan.sl#L142)</sub>
+
+#### operator == *operator*
+
+```
+static bool operator ==(ReadOnlySpan<T> left, ReadOnlySpan<T> right)
+```
+
+Whether the two are the same elements of the same array: C#'s rule,
+which compares where they are rather than what they hold.
+
+<sub>[stdlib/Standard/ReadOnlySpan.sl:156](../../stdlib/Standard/ReadOnlySpan.sl#L156)</sub>
+
+#### operator != *operator*
+
+```
+static bool operator !=(ReadOnlySpan<T> left, ReadOnlySpan<T> right)
+```
+
+Whether the two are not the same elements of the same array.
+
+<sub>[stdlib/Standard/ReadOnlySpan.sl:161](../../stdlib/Standard/ReadOnlySpan.sl#L161)</sub>
+
 ### Result&lt;T, TError&gt; *variant*
 
 ```
@@ -485,4 +655,204 @@ The one reader that needs no proof, because it supplies its own: a
 caller with a sensible default has nothing to check.
 
 <sub>[stdlib/Standard/Result.sl:66](../../stdlib/Standard/Result.sl#L66)</sub>
+
+### Span&lt;T&gt; *struct*
+
+```
+struct Span<T>
+```
+
+Part of an array, as a value, which may be written through. C#'s
+`System.Span<T>`.
+
+    Span<int> middle = numbers[1:4];
+    middle.Fill(0);
+
+The compiler knows this struct: indexing, `Length`, cutting with `[a:b]`
+or `[a..b]`, `foreach`, and the conversions from an array and to a
+`ReadOnlySpan<T>` are its own, and the members here are the rest. Unlike
+C#'s it holds the array it views, so it may be stored and returned and
+cannot dangle.
+
+The searching C# puts in `MemoryExtensions` -- `IndexOf`, `Contains`,
+`SequenceEqual`, `Sort` and the rest -- is in `Standard.Collections`, as
+free functions taking a `ReadOnlySpan<T>` or a `Span<T>`, and a call written
+on a span reaches them.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+**See also** &nbsp; [ReadOnlySpan](#readonlyspant-struct)
+
+<sub>[stdlib/Standard/Span.sl:43](../../stdlib/Standard/Span.sl#L43)</sub>
+
+#### Empty *property*
+
+```
+static Span<T> Empty { get; }
+```
+
+A span of nothing.
+
+<sub>[stdlib/Standard/Span.sl:75](../../stdlib/Standard/Span.sl#L75)</sub>
+
+#### IsEmpty *property*
+
+```
+bool IsEmpty { get; }
+```
+
+Whether it has no elements.
+
+<sub>[stdlib/Standard/Span.sl:78](../../stdlib/Standard/Span.sl#L78)</sub>
+
+#### Clear *method*
+
+```
+void Clear()
+```
+
+Sets every element to `default(T)`, releasing whatever they held.
+
+<sub>[stdlib/Standard/Span.sl:81](../../stdlib/Standard/Span.sl#L81)</sub>
+
+#### Fill *method*
+
+```
+void Fill(T value)
+```
+
+Sets every element to `value`.
+
+**Parameters**
+
+- `value` — what each element becomes
+
+<sub>[stdlib/Standard/Span.sl:90](../../stdlib/Standard/Span.sl#L90)</sub>
+
+#### CopyTo *method*
+
+```
+void CopyTo(Span<T> destination)
+```
+
+Copies every element into the start of `destination`, aborting when it
+is shorter. The two may overlap: the elements land as they were before
+the copy began.
+
+**Parameters**
+
+- `destination` — where the elements go
+
+**See also** &nbsp; [Span.TryCopyTo](#trycopyto-method)
+
+<sub>[stdlib/Standard/Span.sl:102](../../stdlib/Standard/Span.sl#L102)</sub>
+
+#### TryCopyTo *method*
+
+```
+bool TryCopyTo(Span<T> destination)
+```
+
+Copies every element into the start of `destination` when it is long
+enough, and answers whether it was.
+
+**Parameters**
+
+- `destination` — where the elements go
+
+**Returns** &nbsp; true when the elements were copied
+
+<sub>[stdlib/Standard/Span.sl:113](../../stdlib/Standard/Span.sl#L113)</sub>
+
+#### Slice *method*
+
+```
+Span<T> Slice(nuint start)
+```
+
+The elements from `start` to the end, aborting when `start` is past it.
+
+**Parameters**
+
+- `start` — the first element of the result
+
+<sub>[stdlib/Standard/Span.sl:122](../../stdlib/Standard/Span.sl#L122)</sub>
+
+#### Slice *method*
+
+```
+Span<T> Slice(nuint start, nuint length)
+```
+
+`length` elements from `start`, aborting when they run past the end.
+
+**Parameters**
+
+- `start` — the first element of the result
+- `length` — how many elements it covers
+
+<sub>[stdlib/Standard/Span.sl:128](../../stdlib/Standard/Span.sl#L128)</sub>
+
+#### ToArray *method*
+
+```
+T[] ToArray()
+```
+
+A new array holding a copy of the elements.
+
+<sub>[stdlib/Standard/Span.sl:131](../../stdlib/Standard/Span.sl#L131)</sub>
+
+#### Overlaps *method*
+
+```
+bool Overlaps(ReadOnlySpan<T> other)
+```
+
+Whether the two view any element in common.
+
+**Parameters**
+
+- `other` — the span to compare with
+
+<sub>[stdlib/Standard/Span.sl:140](../../stdlib/Standard/Span.sl#L140)</sub>
+
+#### Overlaps *method*
+
+```
+bool Overlaps(ReadOnlySpan<T> other, out nint elementOffset)
+```
+
+Whether the two view any element in common, and where `other` starts
+relative to this, in elements -- negative when it starts before.
+
+**Parameters**
+
+- `other` — the span to compare with
+- `elementOffset` — where `other` starts, counted from this one's start
+
+<sub>[stdlib/Standard/Span.sl:151](../../stdlib/Standard/Span.sl#L151)</sub>
+
+#### operator == *operator*
+
+```
+static bool operator ==(Span<T> left, Span<T> right)
+```
+
+Whether the two are the same elements of the same array: C#'s rule,
+which compares where they are rather than what they hold.
+
+<sub>[stdlib/Standard/Span.sl:159](../../stdlib/Standard/Span.sl#L159)</sub>
+
+#### operator != *operator*
+
+```
+static bool operator !=(Span<T> left, Span<T> right)
+```
+
+Whether the two are not the same elements of the same array.
+
+<sub>[stdlib/Standard/Span.sl:166](../../stdlib/Standard/Span.sl#L166)</sub>
 

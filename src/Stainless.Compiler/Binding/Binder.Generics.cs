@@ -177,8 +177,13 @@ public sealed partial class Binder
     /// substituted in. Bodies are queued rather than bound here, because an
     /// instantiation can be requested from inside another one.
     /// </summary>
+    /// <param name="filling">
+    /// The symbol to fill rather than make: a slice, which exists before its
+    /// template is read.
+    /// </param>
     private NamedTypeSymbol Instantiate(
-        GenericTypeTemplate template, IReadOnlyList<TypeSymbol> arguments, SourceSpan span)
+        GenericTypeTemplate template, IReadOnlyList<TypeSymbol> arguments, SourceSpan span,
+        SliceTypeSymbol? filling = null)
     {
         if (arguments.Count != template.Parameters.Count)
         {
@@ -192,6 +197,10 @@ public sealed partial class Binder
         var key = new InstantiationKey(template, new TypeList(arguments));
         if (_instantiatedTypes.TryGetValue(key, out var existing)) return existing;
 
+        // `Standard.Span<int>` written out is the slice `Span<int>` is.
+        if (filling is null && IsSliceTemplate(template))
+            return SliceOf(arguments[0], template.Name == "ReadOnlySpan");
+
         using var owed = OweToTrial();
 
         if (RefuseRunawayInstantiation(template.Name, arguments, span))
@@ -203,7 +212,9 @@ public sealed partial class Binder
             () => template.Name + "<" + string.Join(", ", arguments.Select(TypeIdentity)) + ">");
         bool isPublic = declaration.Modifiers.HasFlag(Modifiers.Public);
 
-        NamedTypeSymbol type = declaration.Kind switch
+        if (filling is not null) filling.Template = template;
+
+        NamedTypeSymbol type = filling as NamedTypeSymbol ?? declaration.Kind switch
         {
             TypeDeclKind.Class => new ClassTypeSymbol
             {

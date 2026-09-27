@@ -390,6 +390,12 @@ could not be removed from at all before this. `RemoveFirst(list, value)` is the
 generators, and there is no `yield` here; a name borrowed from a language that
 has one would imply otherwise.
 
+**Spans have C#'s `MemoryExtensions` here** — `IndexOf`, `Contains`,
+`SequenceEqual`, `StartsWith`, `Trim` and the rest, listed in
+[§2.12](02-types.md#212-spant-and-readonlyspant--part-of-an-array) — taking a
+`ReadOnlySpan<T>` where they read and a `Span<T>` where they write, and a call
+written on a span or an array reaches them.
+
 **Sorting is a stable merge sort**, over a `Span<T>` or an `IList<T>`, either by
 `IComparable<T>` or by a `Comparison<T>` given at the call. Stability is the
 property worth the scratch array it costs: sorting by one key and then another
@@ -397,10 +403,10 @@ is how a multi-key order gets built, and that only works if the second sort
 leaves equal elements where the first put them. An in-place quicksort would
 save the allocation and lose that.
 
-`BinarySearch` finds a value in an ordered slice, returning the length when it
-is absent. `FindLowerBound` returns where it would go instead — two functions
-rather than one with a flag, because a caller usually wants one answer or the
-other, and now that `out` exists neither has to pretend otherwise.
+`BinarySearch` finds a value in an ordered slice, answering with an
+`Optional<nuint>` as `IndexOf` does. `FindLowerBound` returns where it would go
+instead — two functions rather than C#'s one negative number, because a caller
+usually wants one answer or the other.
 
 ## 5.6 `Standard.Env`, `Standard.Time` and `Standard.Random`
 

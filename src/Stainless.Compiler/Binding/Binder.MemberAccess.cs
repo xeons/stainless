@@ -344,17 +344,16 @@ public sealed partial class Binder
         }
 
         // An array's only member is its length, which lives in the header; a
-        // slice's is the one it carries, and it answers to the same name.
-        if (receiver.Type is ArrayTypeSymbol or SliceTypeSymbol)
-        {
-            if (syntax.Member == "Length")
-                return new BoundArrayLength(syntax.Span, PrimitiveTypeSymbol.NUInt, receiver);
+        // slice's is the one it carries, and it answers to the same name. A
+        // slice's other members are its struct's.
+        if (receiver.Type is ArrayTypeSymbol or SliceTypeSymbol && syntax.Member == "Length")
+            return new BoundArrayLength(syntax.Span, PrimitiveTypeSymbol.NUInt, receiver);
 
+        if (receiver.Type is ArrayTypeSymbol)
+        {
             diagnostics.Error("SL0313", syntax.Span,
                 $"'{receiver.Type.Name}' has no member named '{syntax.Member}'; " +
-                (receiver.Type is SliceTypeSymbol
-                    ? "a slice has only 'Length', and is indexed and sliced further"
-                    : "an array has only 'Length'"),
+                "an array has only 'Length'",
                 receiver.Type);
             return new BoundErrorExpression(syntax.Span);
         }
