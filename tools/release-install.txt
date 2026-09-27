@@ -1,0 +1,29 @@
+Installing Stainless
+====================
+
+`stainless` (`stainless.exe` on Windows) is the whole compiler: one
+self-contained file with the runtime and the standard library inside it. It
+needs no .NET install. Put this directory somewhere and add it to PATH.
+
+It does need clang, because it hands its LLVM IR to clang to compile and link.
+
+    Windows         winget install LLVM.LLVM
+    Debian, Ubuntu  sudo apt install clang
+
+STAINLESS_CLANG names the clang to use and always wins. Otherwise the first
+clang on PATH is used, then C:\Program Files\LLVM\bin on Windows, or
+/usr/bin/clang and /usr/local/bin/clang elsewhere. On Windows, clang also
+needs the Windows SDK and the MSVC libraries, which Visual Studio or its
+Build Tools install.
+
+Then:
+
+    stainless run samples/hello.sl
+    stainless run samples/tour
+    stainless --help
+
+bindings/ and forms/ are source, compiled into a program that names them.
+A GTK program on Linux needs the GTK 3 development packages and the libraries
+named on the command line; bindings/gtk/README.md has the list.
+
+docs/ is the language and the tools; README.md is the place to start.

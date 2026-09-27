@@ -37,3 +37,6 @@ shots/
 
 # The io test case writes its scratch files here when run from the repo root.
 stainless-io/
+
+# Release builds: tools/publish.ps1 and tools/publish.sh
+artifacts/
