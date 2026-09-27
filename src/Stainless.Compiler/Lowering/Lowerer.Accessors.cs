@@ -117,6 +117,8 @@ public sealed partial class Lowerer
 
         BoundPropertyIncrement stepped => LowerPropertyIncrement(stepped, discarded: true),
 
+        BoundDeconstruction taken => LowerDeconstruction(taken, discarded: true),
+
         BoundSequence sequence => Sequence(sequence, Discarded(sequence.Value)),
 
         BoundLet held => Let(held),

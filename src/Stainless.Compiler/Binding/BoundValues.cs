@@ -65,6 +65,7 @@ internal static class BoundValues
         BoundTupleCreate or BoundStructNew or BoundVariantConstruction => true,
         BoundLet held => IsMade(held.Body),
         BoundSequence sequence => IsMade(sequence.Value),
+        BoundDeconstruction taken => taken.IsValue,
         _ => false,
     };
 }

@@ -94,6 +94,47 @@ public abstract class BoundTreeRewriter
 
     private static bool Same<T>(T before, T after) where T : class? => ReferenceEquals(before, after);
 
+    /// <summary>A deconstruction's receivers and indices, in the order <see cref="BoundTreeWalker"/> visits them.</summary>
+    private BoundDeconstructionTarget RewriteTargets(BoundDeconstructionTarget target)
+    {
+        var place = RewriteOptional(target.Place);
+        var receiver = RewriteOptional(target.Receiver);
+        var indices = RewriteAll(target.Indices);
+        var elements = RewriteElements(target.Elements, RewriteTargets);
+
+        return Same(target.Place, place) && Same(target.Receiver, receiver) && Same(target.Indices, indices) &&
+               Same(target.Elements, elements)
+            ? target
+            : target with { Place = place, Receiver = receiver, Indices = indices, Elements = elements };
+    }
+
+    /// <summary>A deconstruction's values, after its targets.</summary>
+    private BoundDeconstructionTarget RewriteValues(BoundDeconstructionTarget target)
+    {
+        var value = RewriteOptional(target.Value);
+        var elements = RewriteElements(target.Elements, RewriteValues);
+
+        return Same(target.Value, value) && Same(target.Elements, elements)
+            ? target
+            : target with { Value = value, Elements = elements };
+    }
+
+    private static IReadOnlyList<BoundDeconstructionTarget> RewriteElements(
+        IReadOnlyList<BoundDeconstructionTarget> elements,
+        Func<BoundDeconstructionTarget, BoundDeconstructionTarget> rewrite)
+    {
+        List<BoundDeconstructionTarget>? rebuilt = null;
+        for (int i = 0; i < elements.Count; i++)
+        {
+            var rewritten = rewrite(elements[i]);
+            if (rebuilt is null && !ReferenceEquals(rewritten, elements[i]))
+                rebuilt = [.. elements.Take(i)];
+            rebuilt?.Add(rewritten);
+        }
+
+        return rebuilt ?? elements;
+    }
+
     private static bool Same<T>(IReadOnlyList<T> before, IReadOnlyList<T> after) =>
         ReferenceEquals(before, after);
 
@@ -517,6 +558,14 @@ public abstract class BoundTreeRewriter
                         IsNonVirtual = written.IsNonVirtual,
                         Indices = indices,
                     };
+            }
+
+            case BoundDeconstruction taken:
+            {
+                var target = RewriteValues(RewriteTargets(taken.Target));
+                return Same(taken.Target, target)
+                    ? taken
+                    : new BoundDeconstruction(taken.Span, taken.Type, target, taken.IsValue);
             }
 
             case BoundObjectInitializer initialized:

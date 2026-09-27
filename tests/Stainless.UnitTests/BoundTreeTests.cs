@@ -94,10 +94,13 @@ public class BoundTreeTests
     private static bool IsHolder(Type type) =>
         type == typeof(BoundSwitchSection) || type == typeof(BoundAsmOperand) ||
         type == typeof(BoundSwitchLabel) || type == typeof(BoundSwitchArm) ||
-        type == typeof(BoundWithAssignment);
+        type == typeof(BoundWithAssignment) || type == typeof(BoundDeconstructionTarget);
+
+    /// <summary>How deep holders of holders are filled, so a recursive one ends.</summary>
+    private const int HolderDepth = 2;
 
     /// <summary>Puts a fresh node in every property that holds nodes, and lists those a walk should reach.</summary>
-    private static void Fill(object owner, List<object> expected)
+    private static void Fill(object owner, List<object> expected, int depth = 0)
     {
         foreach (var property in owner.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
         {
@@ -108,7 +111,7 @@ public class BoundTreeTests
             bool shared = property.GetCustomAttribute<SharedSubtreeAttribute>() is not null ||
                           IsName(property.PropertyType);
             var into = shared ? [] : expected;
-            var value = Children(property.PropertyType, into);
+            var value = Children(property.PropertyType, into, depth);
             if (value is null)
             {
                 Assert.False(Mentions(property.PropertyType),
@@ -121,7 +124,7 @@ public class BoundTreeTests
     }
 
     /// <summary>A value for a property of this type holding fresh nodes, or null for one that holds none.</summary>
-    private static object? Children(Type type, List<object> expected)
+    private static object? Children(Type type, List<object> expected, int depth)
     {
         if (IsNode(type))
             return Node(type, expected);
@@ -129,7 +132,7 @@ public class BoundTreeTests
         if (IsHolder(type))
         {
             var part = RuntimeHelpers.GetUninitializedObject(type);
-            Fill(part, expected);
+            Fill(part, expected, depth + 1);
             return part;
         }
 
@@ -149,8 +152,11 @@ public class BoundTreeTests
             if (!Mentions(element))
                 return null;
 
+            if (IsHolder(element) && depth >= HolderDepth)
+                return list;
+
             for (int i = 0; i < 2; i++)
-                list.Add(Children(element, expected));
+                list.Add(Children(element, expected, depth));
             return list;
         }
 
@@ -413,6 +419,11 @@ public class BoundTreeTests
             "void F(int n, out int x)\n{\n    switch (n)\n    {\n        case 0:\n" +
             "            if (n > 0)\n                break;\n            x = 1;\n            break;\n" +
             "        default:\n            x = 2;\n            break;\n    }\n}"));
+
+    [Fact]
+    public void ADeconstructionWritesOut() =>
+        Assert.DoesNotContain("SL0600", OutCodes(
+            "void F(out int x)\n{\n    int y = 0;\n    (x, y) = (1, 2);\n}"));
 
     [Fact]
     public void TheRightOfAndIsNotCertain() =>

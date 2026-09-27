@@ -56,6 +56,24 @@ public abstract class BoundTreeWalker
             VisitChildren(pattern);
     }
 
+    /// <summary>What a deconstruction's targets evaluate before any value: receivers and indices, left to right.</summary>
+    private void VisitTargets(BoundDeconstructionTarget target)
+    {
+        Visit(target.Place);
+        Visit(target.Receiver);
+        VisitAll(target.Indices);
+        foreach (var element in target.Elements)
+            VisitTargets(element);
+    }
+
+    /// <summary>A deconstruction's values, in the order they are evaluated.</summary>
+    private void VisitValues(BoundDeconstructionTarget target)
+    {
+        Visit(target.Value);
+        foreach (var element in target.Elements)
+            VisitValues(element);
+    }
+
     protected void VisitAll(IReadOnlyList<BoundExpression> expressions)
     {
         foreach (var expression in expressions)
@@ -218,6 +236,11 @@ public abstract class BoundTreeWalker
             case BoundSequence sequence:
                 VisitAll(sequence.Before);
                 Visit(sequence.Value);
+                break;
+
+            case BoundDeconstruction taken:
+                VisitTargets(taken.Target);
+                VisitValues(taken.Target);
                 break;
 
             case BoundObjectInitializer initialized:
@@ -517,6 +540,12 @@ internal sealed class CaptureWalker(LocalSymbol loopVariable) : BoundTreeWalker
                 Assigned(compound.Target);
                 break;
 
+            case BoundDeconstruction taken:
+                base.Visit(expression);
+                foreach (var place in taken.Target.WrittenPlaces)
+                    Assigned(place);
+                return;
+
             // Held for the length of one expression, so it belongs to the
             // iteration that evaluates it.
             case BoundLet held:
@@ -578,6 +607,13 @@ internal sealed class OutWriteTracker(ParameterSymbol target, bool written) : Bo
 
             // `Inner(out mine)` is a write, because Inner is held to the same
             // promise this function is.
+            case BoundDeconstruction taken:
+                base.Visit(expression);
+                if (taken.Target.WrittenPlaces.Any(p => p is BoundParameterAccess assigned &&
+                                                   ReferenceEquals(assigned.Parameter, target)))
+                    Written = true;
+                return;
+
             case BoundAddressOf { FromOutKeyword: true, Operand: BoundParameterAccess passed }
                 when ReferenceEquals(passed.Parameter, target):
                 Written = true;

@@ -820,6 +820,100 @@ public sealed class BoundDeconstruct(
     public BoundExpression Expression { get; } = expression;
 }
 
+/// <summary>
+/// <c>(a, b) = (b, a)</c>, <c>var (x, y) = point</c>, and a <c>foreach</c>'s
+/// element taken apart: what each element of the left side is, and what it
+/// is given.
+///
+/// Lowering evaluates in C#'s order: the targets' receivers and indices left
+/// to right, then every value on the right, then the stores left to right.
+/// Nothing is stored until everything has been read, which is what makes a
+/// swap a swap.
+/// </summary>
+public sealed class BoundDeconstruction(
+    SourceSpan span, TypeSymbol type, BoundDeconstructionTarget target, bool isValue)
+    : BoundSemanticExpression(span, type)
+{
+    public BoundDeconstructionTarget Target { get; } = target;
+
+    /// <summary>True where the whole is read: its value is the tuple of what was stored.</summary>
+    public bool IsValue { get; } = isValue;
+}
+
+public enum DeconstructionKind { Discard, Declare, Place, Property, Nested }
+
+/// <summary>How a nested target's elements are given their values.</summary>
+public enum DeconstructionSupply
+{
+    /// <summary><c>(a, b) = (x, y)</c>: each element its own value, and no tuple made.</summary>
+    Elements,
+
+    /// <summary>A tuple, each element given one of its fields.</summary>
+    Tuple,
+
+    /// <summary>Anything else, taken apart by its <c>Deconstruct</c>.</summary>
+    Deconstruct,
+}
+
+/// <summary>One element of the left side of a <see cref="BoundDeconstruction"/>, and what it is given.</summary>
+public sealed record BoundDeconstructionTarget
+{
+    public BoundDeconstructionTarget(SourceSpan span, DeconstructionKind kind, TypeSymbol? type)
+    {
+        Span = span;
+        Kind = kind;
+        Type = type;
+    }
+
+    public SourceSpan Span { get; }
+    public DeconstructionKind Kind { get; }
+
+    /// <summary>
+    /// What an element is stored as; for a nested target whose whole is
+    /// read, the tuple of what it stored, and otherwise null.
+    /// </summary>
+    public TypeSymbol? Type { get; }
+
+    /// <summary>What a <see cref="DeconstructionKind.Declare"/> declares, and where its name is.</summary>
+    public LocalSymbol? Local { get; init; }
+
+    public SourceSpan NameSpan { get; init; }
+
+    /// <summary>The storage a <see cref="DeconstructionKind.Place"/> writes.</summary>
+    public BoundExpression? Place { get; init; }
+
+    public BoundExpression? Receiver { get; init; }
+    public PropertySymbol? Property { get; init; }
+    public IReadOnlyList<BoundExpression> Indices { get; init; } = [];
+    public bool IsNonVirtual { get; init; }
+
+    public IReadOnlyList<BoundDeconstructionTarget> Elements { get; init; } = [];
+
+    public DeconstructionSupply Supply { get; init; }
+
+    /// <summary>
+    /// What this is given: for an element, the value converted to
+    /// <see cref="Type"/>; for a nested target, the tuple or the call to
+    /// <c>Deconstruct</c>, and null for <see cref="DeconstructionSupply.Elements"/>.
+    /// </summary>
+    public BoundExpression? Value { get; init; }
+
+    /// <summary>
+    /// True when <see cref="Value"/> reads what no store here can reach, so it
+    /// need not be held unless reading it again does something.
+    /// </summary>
+    public bool IsStable { get; init; }
+
+    /// <summary>A tuple, as its elements' values read it.</summary>
+    public BoundPlaceholder? Whole { get; init; }
+
+    /// <summary>The storage every <see cref="DeconstructionKind.Place"/> here writes, left to right.</summary>
+    public IEnumerable<BoundExpression> WrittenPlaces =>
+        Kind == DeconstructionKind.Nested ? Elements.SelectMany(e => e.WrittenPlaces)
+        : Place is { } place ? [place]
+        : [];
+}
+
 public sealed class BoundVariantConstruction(
     SourceSpan span,
     TypeSymbol type,

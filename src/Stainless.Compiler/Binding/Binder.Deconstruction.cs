@@ -16,7 +16,6 @@
 
 using Stainless.Source;
 using Stainless.Syntax;
-using static Stainless.Binding.BoundValues;
 
 namespace Stainless.Binding;
 
@@ -25,10 +24,9 @@ namespace Stainless.Binding;
 /// <c>foreach</c> that takes each element apart.
 ///
 /// <para>
-/// It is lowered here, to lets and assignments the emitter already knows, in
-/// C#'s order: the targets' receivers and indices left to right, then every
-/// value on the right, then the stores left to right. Nothing is stored until
-/// everything has been read, which is what makes a swap a swap.
+/// Binding says what each element of the left side is and what it is given,
+/// as a <see cref="BoundDeconstruction"/>; lowering evaluates them in C#'s
+/// order and stores.
 /// </para>
 /// <para>
 /// A value that is not a tuple is taken apart by its <c>Deconstruct</c>, a
@@ -38,9 +36,7 @@ namespace Stainless.Binding;
 /// </summary>
 public sealed partial class Binder
 {
-    private enum DeconstructionKind { Discard, Declare, Place, Property, Nested }
-
-    /// <summary>One element of the left side, and what is stored into it.</summary>
+    /// <summary>One element of the left side while it is bound, and what it is given.</summary>
     private sealed class DeconstructionTarget(DeconstructionKind kind, SourceSpan span)
     {
         public DeconstructionKind Kind { get; } = kind;
@@ -51,10 +47,9 @@ public sealed partial class Binder
 
         public string Name { get; init; } = "";
         public SourceSpan NameSpan { get; init; }
+        public LocalSymbol? Local { get; set; }
 
-        /// <summary>The storage a <see cref="DeconstructionKind.Place"/> writes, held.</summary>
         public BoundExpression? Place { get; init; }
-
         public BoundExpression? Receiver { get; init; }
         public PropertySymbol? Property { get; init; }
         public IReadOnlyList<BoundExpression> Indices { get; init; } = [];
@@ -62,16 +57,12 @@ public sealed partial class Binder
 
         public List<DeconstructionTarget> Elements { get; } = [];
 
-        /// <summary>The value this element is given, already converted to <see cref="Type"/>.</summary>
-        public BoundExpression? Source { get; set; }
+        public DeconstructionSupply Supply { get; set; }
+        public BoundExpression? Value { get; set; }
+        public bool IsStable { get; set; }
+        public BoundPlaceholder? Whole { get; set; }
+        public TupleTypeSymbol? Stored { get; set; }
     }
-
-    /// <summary>
-    /// A value evaluated before any store: a let when it has a
-    /// <see cref="Local"/>, otherwise an expression run for what it does.
-    /// </summary>
-    private readonly record struct DeconstructionStep(
-        LocalSymbol? Local, BoundExpression Value, bool IsOwned);
 
     /// <summary><c>(int a, b) = t;</c>, where it stands as a statement.</summary>
     private BoundStatement BindDeconstructionStatement(AssignmentSyntax syntax)
@@ -143,10 +134,7 @@ public sealed partial class Binder
         }
     }
 
-    /// <summary>
-    /// The whole of a deconstruction: the locals it declares, and the
-    /// expression that evaluates everything and then stores it.
-    /// </summary>
+    /// <summary>The locals a deconstruction declares, and the deconstruction.</summary>
     /// <param name="value">
     /// A value already bound, which nothing the deconstruction writes can
     /// change; null to bind <paramref name="valueSyntax"/>.
@@ -155,51 +143,21 @@ public sealed partial class Binder
         TupleSyntax targetSyntax, ExpressionSyntax? valueSyntax, BoundExpression? value,
         SourceSpan span, DeconstructionUse use)
     {
-        var held = new List<HeldValue>();
-        if (BindDeconstructionTarget(targetSyntax, held, use) is not { } target) return null;
+        if (BindDeconstructionTarget(targetSyntax, use) is not { } target) return null;
 
-        var steps = new List<DeconstructionStep>();
-        if (!SupplyDeconstruction(target, valueSyntax, value, steps, stable: value is not null))
+        if (!SupplyDeconstruction(target, valueSyntax, value, stable: value is not null))
             return null;
 
         var declared = new List<BoundLocalDeclaration>();
-        var writes = new List<BoundExpression>();
-        WriteDeconstruction(target, declared, writes);
+        TypeSymbol? last = null;
+        DeclareDeconstructed(target, declared, use == DeconstructionUse.Value, ref last);
 
-        BoundExpression body;
-        if (use == DeconstructionUse.Value)
-        {
-            var result = DeconstructedValue(target);
-            body = writes.Count == 0 ? result : new BoundSequence(span, writes, result);
-        }
-        else if (writes.Count == 0)
-        {
-            // Every element was a discard, and the values are evaluated for
-            // what they do.
-            body = new BoundLiteral(span, PrimitiveTypeSymbol.Bool, true);
-        }
-        else
-        {
-            body = new BoundSequence(span, writes.Take(writes.Count - 1).ToList(), writes[^1]);
-        }
-
-        for (int i = steps.Count - 1; i >= 0; i--)
-        {
-            var step = steps[i];
-            body = step.Local is null
-                ? new BoundSequence(span, [step.Value], body)
-                : new BoundLet(span, step.Local, step.Value, body) { IsOwned = step.IsOwned };
-        }
-
-        return (declared, WithHeld(span, held, body));
+        var type = use == DeconstructionUse.Value ? target.Stored! : last ?? PrimitiveTypeSymbol.Bool;
+        return (declared, new BoundDeconstruction(span, type, Freeze(target), use == DeconstructionUse.Value));
     }
 
-    /// <summary>
-    /// The left side, with every receiver and index a store will need held in
-    /// <paramref name="held"/>, left to right.
-    /// </summary>
-    private DeconstructionTarget? BindDeconstructionTarget(
-        ExpressionSyntax syntax, List<HeldValue> held, DeconstructionUse use)
+    /// <summary>The left side: what each element is, and the storage it names.</summary>
+    private DeconstructionTarget? BindDeconstructionTarget(ExpressionSyntax syntax, DeconstructionUse use)
     {
         switch (syntax)
         {
@@ -210,7 +168,7 @@ public sealed partial class Binder
 
                 foreach (var element in tuple.Elements)
                 {
-                    if (BindDeconstructionTarget(element, held, use) is { } bound)
+                    if (BindDeconstructionTarget(element, use) is { } bound)
                     {
                         nested.Elements.Add(bound);
                     }
@@ -265,11 +223,11 @@ public sealed partial class Binder
             return null;
         }
 
-        return BindDeconstructionPlace(syntax, held);
+        return BindDeconstructionPlace(syntax);
     }
 
     /// <summary>An element that is somewhere to store: a variable, a field, an element or a property.</summary>
-    private DeconstructionTarget? BindDeconstructionPlace(ExpressionSyntax syntax, List<HeldValue> held)
+    private DeconstructionTarget? BindDeconstructionPlace(ExpressionSyntax syntax)
     {
         if (RefuseConditionalTarget(syntax)) return null;
 
@@ -293,7 +251,7 @@ public sealed partial class Binder
                 return new DeconstructionTarget(DeconstructionKind.Place, syntax.Span)
                 {
                     Type = property.Type,
-                    Place = HoldPlace(storage, held, everything: true),
+                    Place = storage,
                 };
             }
 
@@ -302,11 +260,9 @@ public sealed partial class Binder
             return new DeconstructionTarget(DeconstructionKind.Property, syntax.Span)
             {
                 Type = property.Type,
-                Receiver = receiver is null ? null : HoldReceiver(receiver, held, everything: true),
+                Receiver = receiver,
                 Property = property,
-                Indices = property.IsIndexer
-                    ? read.Arguments.Select(index => HoldValue(index, held, everything: true)).ToList()
-                    : [],
+                Indices = property.IsIndexer ? read.Arguments : [],
                 IsNonVirtual = read.IsNonVirtual,
             };
         }
@@ -320,22 +276,17 @@ public sealed partial class Binder
         return new DeconstructionTarget(DeconstructionKind.Place, syntax.Span)
         {
             Type = target.Type,
-            Place = HoldPlace(target, held, everything: true),
+            Place = target,
         };
     }
 
-    /// <summary>
-    /// Gives every element of <paramref name="target"/> its value, evaluating
-    /// into <paramref name="steps"/> whatever has to be read before the first
-    /// store.
-    /// </summary>
+    /// <summary>Gives every element of <paramref name="target"/> its value.</summary>
     /// <param name="stable">
     /// True when <paramref name="value"/> is a read of something the stores
-    /// cannot reach, so it need not be held again.
+    /// cannot reach.
     /// </param>
     private bool SupplyDeconstruction(
-        DeconstructionTarget target, ExpressionSyntax? valueSyntax, BoundExpression? value,
-        List<DeconstructionStep> steps, bool stable)
+        DeconstructionTarget target, ExpressionSyntax? valueSyntax, BoundExpression? value, bool stable)
     {
         // `(a, b) = (b, a)`: each element is its own value, so no tuple is made.
         if (target.Kind == DeconstructionKind.Nested && value is null &&
@@ -344,12 +295,11 @@ public sealed partial class Binder
             if (!DeconstructionCountsAgree(target, written.Elements.Count, "the tuple", written.Span))
                 return false;
 
+            target.Supply = DeconstructionSupply.Elements;
+
             bool supplied = true;
             for (int i = 0; i < written.Elements.Count; i++)
-            {
-                supplied &= SupplyDeconstruction(
-                    target.Elements[i], written.Elements[i], null, steps, stable: false);
-            }
+                supplied &= SupplyDeconstruction(target.Elements[i], written.Elements[i], null, stable: false);
 
             return supplied;
         }
@@ -358,20 +308,26 @@ public sealed partial class Binder
         if (value.Type.IsError()) return false;
 
         if (target.Kind != DeconstructionKind.Nested)
-            return SupplyDeconstructionElement(target, value, steps, stable);
+            return SupplyDeconstructionElement(target, value, stable);
 
         if (value.Type is TupleTypeSymbol tuple)
         {
             if (!DeconstructionCountsAgree(target, tuple.Elements.Count, $"'{tuple.Name}'", value.Span))
                 return false;
 
-            var whole = stable ? value : HoldDeconstructed(value, steps);
+            // Storage where what stands for it will be: a name it is held in,
+            // or the read itself.
+            var whole = new BoundPlaceholder(value.Span, value.Type) { IsStorage = !stable || value.IsLValue };
+            target.Supply = DeconstructionSupply.Tuple;
+            target.Value = value;
+            target.IsStable = stable;
+            target.Whole = whole;
 
             bool supplied = true;
             for (int i = 0; i < tuple.Elements.Count; i++)
             {
                 var field = new BoundFieldAccess(value.Span, whole, tuple.Fields[i]);
-                supplied &= SupplyDeconstruction(target.Elements[i], null, field, steps, stable: true);
+                supplied &= SupplyDeconstruction(target.Elements[i], null, field, stable: true);
             }
 
             return supplied;
@@ -380,13 +336,14 @@ public sealed partial class Binder
         if (BindDeconstructCall(value, target.Elements.Count, target.Span) is not var (call, parts))
             return false;
 
-        steps.Add(new DeconstructionStep(null, call, IsOwned: false));
+        target.Supply = DeconstructionSupply.Deconstruct;
+        target.Value = call;
 
         bool all = true;
         for (int i = 0; i < parts.Count; i++)
         {
             var part = new BoundLocalAccess(value.Span, parts[i]);
-            all &= SupplyDeconstruction(target.Elements[i], null, part, steps, stable: true);
+            all &= SupplyDeconstruction(target.Elements[i], null, part, stable: true);
         }
 
         return all;
@@ -403,9 +360,7 @@ public sealed partial class Binder
     }
 
     /// <summary>One element given one value, converted to what it is stored as.</summary>
-    private bool SupplyDeconstructionElement(
-        DeconstructionTarget target, BoundExpression value, List<DeconstructionStep> steps,
-        bool stable)
+    private bool SupplyDeconstructionElement(DeconstructionTarget target, BoundExpression value, bool stable)
     {
         if (value is BoundArrayDraft loose && target.Type is null)
             value = SettleArrayFromElements(loose);
@@ -431,76 +386,58 @@ public sealed partial class Binder
         var converted = BindConversion(value, target.Type, value.Span);
         if (converted.Type.IsError()) return false;
 
-        target.Source = stable && IsRepeatable(converted)
-            ? converted
-            : HoldDeconstructed(converted, steps);
+        target.Value = converted;
+        target.IsStable = stable;
         return true;
     }
 
     /// <summary>
-    /// A value read now and stored later. A copy is owned unless the value
-    /// is one this statement made, because a store before it is read may drop
-    /// what it came from.
+    /// Declares the locals, left to right, after every value was bound, so no
+    /// value can read a name it is about to give a value to. Notes the type
+    /// of the last store, and where the whole is read, the tuple of each
+    /// nested target's stores.
     /// </summary>
-    private BoundExpression HoldDeconstructed(BoundExpression value, List<DeconstructionStep> steps)
-    {
-        if (Places.IsFixed(value)) return value;
-
-        var local = new LocalSymbol(SyntheticName("taken"), value.Type, isConst: false);
-        bool owned = !IsMade(value) &&
-                     (value.Type.NeedsArc() || value.Type is StructTypeSymbol or FixedArrayTypeSymbol);
-        steps.Add(new DeconstructionStep(local, value, owned));
-        return new BoundLocalAccess(value.Span, local);
-    }
-
-    /// <summary>
-    /// The stores, left to right, and the locals they declare. Declared here,
-    /// after every value was bound, so no value can read a name it is about
-    /// to give a value to.
-    /// </summary>
-    private void WriteDeconstruction(
-        DeconstructionTarget target, List<BoundLocalDeclaration> declared, List<BoundExpression> writes)
+    private void DeclareDeconstructed(
+        DeconstructionTarget target, List<BoundLocalDeclaration> declared, bool read, ref TypeSymbol? last)
     {
         switch (target.Kind)
         {
             case DeconstructionKind.Nested:
                 foreach (var element in target.Elements)
-                    WriteDeconstruction(element, declared, writes);
+                    DeclareDeconstructed(element, declared, read, ref last);
+
+                if (read)
+                    target.Stored = TupleOf(target.Elements.Select(e => e.Stored ?? e.Type!).ToList());
                 break;
 
             case DeconstructionKind.Declare:
-            {
-                var local = DeclareLocal(target.Name, target.Type!, isConst: false, target.NameSpan);
-                declared.Add(new BoundLocalDeclaration(target.NameSpan, local, null));
-                writes.Add(new BoundAssignment(target.Span,
-                    new BoundLocalAccess(target.NameSpan, local), target.Source!));
-                break;
-            }
-
-            case DeconstructionKind.Place:
-                writes.Add(new BoundAssignment(target.Span, target.Place!, target.Source!));
+                target.Local = DeclareLocal(target.Name, target.Type!, isConst: false, target.NameSpan);
+                declared.Add(new BoundLocalDeclaration(target.NameSpan, target.Local, null));
+                last = target.Type;
                 break;
 
-            case DeconstructionKind.Property:
-                writes.Add(new BoundPropertyAssignment(
-                    target.Span, target.Receiver, target.Property!, target.Source!)
-                {
-                    Indices = target.Indices,
-                    IsNonVirtual = target.IsNonVirtual,
-                });
+            case DeconstructionKind.Place or DeconstructionKind.Property:
+                last = target.Type;
                 break;
         }
     }
 
-    /// <summary>What <c>(a, b) = t</c> evaluates to: the tuple of what was stored.</summary>
-    private BoundExpression DeconstructedValue(DeconstructionTarget target)
-    {
-        if (target.Kind != DeconstructionKind.Nested) return target.Source!;
-
-        var elements = target.Elements.Select(DeconstructedValue).ToList();
-        return new BoundTupleCreate(
-            target.Span, TupleOf(elements.Select(e => e.Type).ToList()), elements);
-    }
+    private static BoundDeconstructionTarget Freeze(DeconstructionTarget target) =>
+        new(target.Span, target.Kind, target.Stored ?? target.Type)
+        {
+            Local = target.Local,
+            NameSpan = target.NameSpan,
+            Place = target.Place,
+            Receiver = target.Receiver,
+            Property = target.Property,
+            Indices = target.Indices,
+            IsNonVirtual = target.IsNonVirtual,
+            Elements = target.Elements.Select(Freeze).ToList(),
+            Supply = target.Supply,
+            Value = target.Value,
+            IsStable = target.IsStable,
+            Whole = target.Whole,
+        };
 
     /// <summary>
     /// <c>value.Deconstruct(out var a, out var b)</c>, for a value that is not
