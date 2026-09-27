@@ -208,9 +208,16 @@ the GTK build reports three warnings the Windows one has no reason to.
 
 ## Getting started
 
-Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
-[LLVM/clang](https://llvm.org) — `winget install LLVM.LLVM` on Windows,
-`apt install clang` on Debian and Ubuntu.
+**To use it**, take the archive for your platform from
+[the releases](https://github.com/xeons/stainless/releases), unpack it, and put
+the directory on `PATH`. The compiler is one self-contained file and needs no
+.NET, but it does need [LLVM/clang](https://llvm.org):
+`winget install LLVM.LLVM` on Windows, `apt install clang` on Debian and
+Ubuntu. `INSTALL.txt` in the archive has the rest. There is a build for x64
+Windows and x64 Linux.
+
+**To build it from source**, it requires the
+[.NET 10 SDK](https://dotnet.microsoft.com/download) and clang as above.
 
 ```
 dotnet build Stainless.slnx
@@ -249,6 +256,7 @@ together.
 | **[Concurrency](docs/concurrency.md)** | Threading as it is, and where it is going. |
 | **[Packages](docs/packages.md)** | `stainless.json`, versions, resolution and the lock file. |
 | **[Building and internals](docs/internals.md)** | Building, testing, and how the compiler works. |
+| **[Releasing](docs/releasing.md)** | The version number, the published binary, and cutting a release. |
 | **[Coding style](docs/style.md)** | Naming, layout and members, for both languages here. |
 | **[TODO.md](TODO.md)** | What is being worked on next, and the known bugs. |
 

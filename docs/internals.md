@@ -23,6 +23,11 @@ dotnet test tests/Stainless.UnitTests           # 1,337 compiler unit tests
 `--shard=1/2` and `--shard=2/2` run alternate halves of the end-to-end cases,
 for a caller whose command has to finish inside a fixed time.
 
+[.github/workflows/ci.yml](../.github/workflows/ci.yml) runs both suites on
+Linux and Windows for every push and pull request to `master`, the end-to-end
+one in those two shards. How a build is numbered, published and released is
+[Releasing](releasing.md).
+
 The two suites ask different questions. An end-to-end case compiles, links and
 runs a program, which proves the whole pipeline and takes a fifth of a second;
 a unit test asks the front end alone — what did the lexer make of this, where

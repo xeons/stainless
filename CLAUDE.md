@@ -39,6 +39,7 @@ rather than the file you are looking at.
 dotnet build Stainless.slnx                     # the compiler; needed before almost anything
 dotnet run --project tests/Stainless.Tests      # end-to-end: compile, link, run
 dotnet test tests/Stainless.UnitTests           # the front end alone
+.\tools\publish.ps1                             # release archive in artifacts/; tools/publish.sh on Linux
 ```
 
 **A leak is not a crash, and `--leak-check` finds them.** The runtime counts
