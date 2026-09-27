@@ -215,6 +215,12 @@ public sealed partial class LlvmEmitter(
     /// </summary>
     private readonly HashSet<string> _unsettled = [];
 
+    /// <summary>
+    /// Owned <c>let</c>s whose one use is a store yet to be emitted, and the
+    /// value each registered for release.
+    /// </summary>
+    private readonly Dictionary<LocalSymbol, Val> _soleStores = [];
+
     /// <summary>The temporaries in <see cref="_pendingReleases"/> that are arrays in the frame.</summary>
     private readonly HashSet<string> _stackArrays = [];
 

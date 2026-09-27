@@ -601,9 +601,20 @@ public sealed partial class LlvmEmitter
     /// <summary>
     /// <c>a ? b : c</c>. Like the short-circuit operators this is branches and a
     /// phi, because only the chosen arm may run.
+    ///
+    /// Each arm leaves a +1 for the merge, unless both only read a value
+    /// where it already is, when the merge is borrowed as either read would
+    /// have been.
     /// </summary>
-    private Val EmitConditional(BoundConditional expression)
+    /// <param name="movesTrueArm">
+    /// True where the true arm reads a local whose +1 the caller hands to the
+    /// merge: the <c>held</c> of <c>a ?? b</c>.
+    /// </param>
+    private Val EmitConditional(BoundConditional expression, bool movesTrueArm)
     {
+        bool inPlace = !movesTrueArm
+            && ReadsInPlace(expression.WhenTrue) && ReadsInPlace(expression.WhenFalse);
+
         string trueLabel = NextLabel("cond.true");
         string falseLabel = NextLabel("cond.false");
         string endLabel = NextLabel("cond.end");
@@ -612,12 +623,14 @@ public sealed partial class LlvmEmitter
         Terminator($"br i1 {condition.Ref}, label %{trueLabel}, label %{falseLabel}");
 
         Label(trueLabel);
-        var whenTrue = EmitBranch(expression.WhenTrue);
+        var whenTrue = inPlace ? EmitInPlace(expression.WhenTrue)
+            : movesTrueArm ? EmitInPlace(expression.WhenTrue) with { Hold = Hold.Owned }
+            : EmitBranch(expression.WhenTrue);
         string trueBlock = CurrentBlockLabel();
         Terminator($"br label %{endLabel}");
 
         Label(falseLabel);
-        var whenFalse = EmitBranch(expression.WhenFalse);
+        var whenFalse = inPlace ? EmitInPlace(expression.WhenFalse) : EmitBranch(expression.WhenFalse);
         string falseBlock = CurrentBlockLabel();
         Terminator($"br label %{endLabel}");
 
@@ -631,12 +644,24 @@ public sealed partial class LlvmEmitter
         string result = Emit(llvmType,
             $"phi {llvmType} [ {whenTrue.Ref}, %{trueBlock} ], [ {whenFalse.Ref}, %{falseBlock} ]");
 
-        // Each arm left a +1, or a value with nothing to count, and the merge
-        // owes what they did.
+        // The merge owes what the arms left: nothing to count, borrowed
+        // values, or a +1 either way.
         var merged = new Val(result, llvmType, expression.Type);
-        return whenTrue.Hold == Hold.Uncounted && whenFalse.Hold == Hold.Uncounted
-            ? Uncounted(merged)
+        return whenTrue.Hold == Hold.Uncounted && whenFalse.Hold == Hold.Uncounted ? Uncounted(merged)
+            : inPlace ? merged
             : Fresh(merged);
+    }
+
+    /// <summary>An arm that <see cref="ReadsInPlace"/>, which makes nothing to release.</summary>
+    private Val EmitInPlace(BoundExpression arm)
+    {
+        int mark = _pendingReleases.Count;
+        var value = EmitExpression(arm);
+
+        if (_pendingReleases.Count != mark)
+            throw new InternalCompilerError("an arm read in place made a temporary", arm.Span);
+
+        return value;
     }
 
     private string CurrentBlockLabel() => _currentBlock;

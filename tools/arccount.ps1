@@ -65,7 +65,9 @@ function Measure-Ir([string]$path, [bool]$ownOnly) {
 
     foreach ($line in [System.IO.File]::ReadLines($path)) {
         if ($line.StartsWith("define ")) {
-            $counting = -not $ownOnly -or -not $line.Contains("Standard")
+            # By the symbol, not the line: a function of the program's own
+            # names Standard's types among its parameters.
+            $counting = -not $ownOnly -or $line -notmatch '@"?_SL(8Standard|[A-Za-z]+_Standard)'
             continue
         }
         if (-not $counting) { continue }

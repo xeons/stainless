@@ -395,6 +395,7 @@ public sealed partial class LlvmEmitter
         _scopes.Clear();
         _pendingReleases.Clear();
         _unsettled.Clear();
+        _soleStores.Clear();
         _stackArrays.Clear();
         _clearedOnRelease.Clear();
         _loops.Clear();

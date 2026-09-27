@@ -136,6 +136,27 @@ public class EmitterTests
     }
 
     /// <summary>
+    /// A swap holds each value with a reference of its own, and each store is
+    /// handed that reference: two retains and two releases, as the spec says.
+    /// </summary>
+    [Fact]
+    public void ASwapHandsEachHeldValueToItsStore()
+    {
+        string ir = Front.ModuleIr(
+            """
+            public class C { }
+            public void F(C x, C y) { var a = x; var b = y; (a, b) = (b, a); }
+            public void G(C x, C y) { var a = x; var b = y; }
+            """);
+
+        string swapped = Front.TestFunction(ir, "F");
+        string kept = Front.TestFunction(ir, "G");
+
+        foreach (string call in (string[])["call void @sl_retain(", "call void @sl_release("])
+            Assert.Equal(2, Occurrences(swapped, call) - Occurrences(kept, call));
+    }
+
+    /// <summary>
     /// A null or a String literal has nothing to count, so storing one costs
     /// no retain.
     /// </summary>

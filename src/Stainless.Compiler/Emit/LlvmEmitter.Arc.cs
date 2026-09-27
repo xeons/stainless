@@ -85,13 +85,16 @@ public sealed partial class LlvmEmitter
         // One in the frame ends with its statement, so nothing may keep it.
         BoundArrayLiteral literal => literal.OnStack ? Hold.Borrowed : Hold.Owned,
 
-        BoundConditional chosen =>
-            HoldOf(chosen.WhenTrue) == Hold.Uncounted && HoldOf(chosen.WhenFalse) == Hold.Uncounted
-                ? Hold.Uncounted
-                : Hold.Owned,
+        BoundConditional chosen when
+            HoldOf(chosen.WhenTrue) == Hold.Uncounted && HoldOf(chosen.WhenFalse) == Hold.Uncounted =>
+            Hold.Uncounted,
+        BoundConditional chosen when ReadsInPlace(chosen.WhenTrue) && ReadsInPlace(chosen.WhenFalse) =>
+            Hold.Borrowed,
+        BoundConditional => Hold.Owned,
 
         BoundSequence sequence => HoldOf(sequence.Value),
         BoundLet held when HandsOnLocal(held) && HoldOf(held.Value) == Hold.Owned => Hold.Owned,
+        BoundLet held when FallsBackFrom(held) && HoldOf(held.Value) == Hold.Owned => Hold.Owned,
         BoundLet held => HoldOf(held.Body),
         BoundTry attempt => HoldOf(attempt.OnSuccess),
         BoundConversion conversion => HoldOfConversion(conversion),
@@ -139,6 +142,43 @@ public sealed partial class LlvmEmitter
     /// </summary>
     private static bool HandsOnLocal(BoundLet held) =>
         !held.IsOwned && Yields(held.Body, held.Local) && !LocalWriteFinder.Writes(held.Body, held.Local);
+
+    /// <summary>
+    /// True for <c>a ?? b</c>, which the binder writes
+    /// <c>let held = a in (held != null ? held : b)</c>. Where <c>held</c> is
+    /// not null its +1 is the result's, and where it is null there is nothing
+    /// to release, so what made it is what the whole hands on either way.
+    /// </summary>
+    private static bool FallsBackFrom(BoundLet held) =>
+        !held.IsOwned
+        && held.Body is BoundConditional
+        {
+            Condition: BoundBinary
+            {
+                Operator: BoundBinaryOp.NotEqual,
+                Left: BoundLocalAccess tested,
+                Right: BoundNullLiteral,
+            },
+        } chosen
+        && ReferenceEquals(tested.Local, held.Local)
+        && Yields(chosen.WhenTrue, held.Local)
+        && !LocalWriteFinder.Writes(held.Body, held.Local);
+
+    /// <summary>
+    /// True for a value read from where it already is -- a local, a
+    /// parameter, a field of one, a static, a literal -- which makes no
+    /// temporary on the way. A conditional between two of them merges
+    /// borrowed values, as a read of either alone would have been.
+    /// </summary>
+    private static bool ReadsInPlace(BoundExpression expression) => expression switch
+    {
+        BoundLocalAccess or BoundParameterAccess or BoundThis or BoundStaticAccess => true,
+        BoundNullLiteral or BoundStringLiteral or BoundUtf8Literal or BoundDefault => true,
+        BoundFieldAccess { Field.IsBitField: false } field =>
+            field.Receiver is null || ReadsInPlace(field.Receiver),
+        BoundConversion conversion => PassesOwnership(conversion) && ReadsInPlace(conversion.Operand),
+        _ => false,
+    };
 
     private static bool Yields(BoundExpression expression, LocalSymbol local) => expression switch
     {
@@ -376,12 +416,34 @@ public sealed partial class LlvmEmitter
         if (_hasLabels) _clearedOnRelease.Add(slot);
     }
 
-    /// <summary>Releases every owned local from the innermost scope down to <paramref name="depth"/>.</summary>
-    private void ReleaseScopes(int depth)
+    /// <summary>
+    /// Releases every owned local from the innermost scope down to
+    /// <paramref name="depth"/>, except the one whose +1 a return is handing
+    /// to the caller.
+    /// </summary>
+    private void ReleaseScopes(int depth, string? handedOver = null)
     {
         for (int i = _scopes.Count - 1; i >= depth; i--)
             foreach (var (slot, type) in Enumerable.Reverse(_scopes[i]))
-                ReleaseSlot(slot, type);
+                if (slot != handedOver)
+                    ReleaseSlot(slot, type);
+    }
+
+    /// <summary>
+    /// The slot of the owned local an expression reads, directly or through a
+    /// conversion that passes ownership, or null. A return of one hands the
+    /// local's own +1 to the caller, which is a retain and a release fewer.
+    /// </summary>
+    private string? OwnedLocalSlot(BoundExpression expression)
+    {
+        while (expression is BoundConversion conversion && PassesOwnership(conversion))
+            expression = conversion.Operand;
+
+        if (expression is not BoundLocalAccess { Local: var local }) return null;
+        if (!local.Type.CarriesReferences()) return null;
+        if (!_slots.TryGetValue(local, out string? slot)) return null;
+
+        return _scopes.Any(scope => scope.Any(owned => owned.Slot == slot)) ? slot : null;
     }
 
     private void ReleaseCurrentScope()

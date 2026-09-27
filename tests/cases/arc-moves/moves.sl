@@ -74,6 +74,19 @@ Pair MakePair(int n) => new Pair(Make(n), Make(n + 1));
 
 Pair PassPair(Pair given) => given;
 
+Thing HandOver(int n)
+{
+    var made = Make(n);
+    var other = Make(n + 1);
+    return made;
+}
+
+Pair HandOverPair(int n)
+{
+    var pair = MakePair(n);
+    return pair;
+}
+
 Result<int, Woe> BuildTuple(bool fail)
 {
     var made = (Make(1), fail ? try Refuse() : Make(2));
@@ -145,6 +158,7 @@ int Main()
             var chosen = i == 0 ? Make(16) : borrowed;
             printf("  chose %d\n", chosen.N);
             printf("  weighed %d\n", Weigh(i == 0 ? borrowed : Make(17), chosen));
+            printf("  in place %d\n", Weigh(i == 0 ? borrowed : chosen, chosen));
         }
     }
 
@@ -179,6 +193,25 @@ int Main()
         var passed = PassPair(copy);
         var chosen = pair.First.N > 0 ? MakePair(28) : pair;
         printf("  %d %d %d\n", passed.Second.N, chosen.First.N, copy.First.N);
+    }
+
+    Console.WriteLine("handed over");
+    {
+        var kept = HandOver(34);
+        var pair = HandOverPair(36);
+        printf("  %d %d %d\n", kept.N, pair.First.N, pair.Second.N);
+    }
+
+    Console.WriteLine("bound");
+    {
+        var box = new Box();
+        box.Held = Make(38);
+        if (box.Held is Thing held)
+        {
+            box.Held = null;
+            printf("  still %d\n", held.N);
+        }
+        printf("  after\n");
     }
 
     Console.WriteLine("weak");

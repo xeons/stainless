@@ -564,3 +564,24 @@ internal sealed class LocalWriteFinder(LocalSymbol local) : BoundTreeWalker
         base.Visit(expression);
     }
 }
+
+/// <summary>How many times a tree names a local, reading or writing it.</summary>
+internal sealed class LocalUseCounter(LocalSymbol local) : BoundTreeWalker
+{
+    public int Count { get; private set; }
+
+    public static int Uses(BoundExpression expression, LocalSymbol local)
+    {
+        var counter = new LocalUseCounter(local);
+        counter.Visit(expression);
+        return counter.Count;
+    }
+
+    public override void Visit(BoundExpression? expression)
+    {
+        if (expression is BoundLocalAccess named && ReferenceEquals(named.Local, local))
+            Count++;
+
+        base.Visit(expression);
+    }
+}

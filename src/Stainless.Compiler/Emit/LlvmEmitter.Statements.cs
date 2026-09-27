@@ -536,8 +536,12 @@ public sealed partial class LlvmEmitter
 
         // Handed to the caller at +1, and a struct field by field: the caller
         // receives a copy that owns what it holds, and this frame is about to
-        // release its own.
-        var value = EmitOwned(statement.Value);
+        // release its own. A local this frame owns is handed over as it is,
+        // and left out of the releases below.
+        string? handedOver = OwnedLocalSlot(statement.Value);
+        var value = handedOver is not null
+            ? EmitOwnable(statement.Value)
+            : EmitOwned(statement.Value);
 
         if (value.Type is StructTypeSymbol structType)
         {
@@ -545,7 +549,7 @@ public sealed partial class LlvmEmitter
             {
                 MemCopy(_sretSlot, value.Ref, structType.Size);
                 FlushTemporaries();
-                ReleaseScopes(0);
+                ReleaseScopes(0, handedOver);
                 Terminator("ret void");
             }
             else
@@ -554,7 +558,7 @@ public sealed partial class LlvmEmitter
                 // travel in.
                 string coerced = LoadCoerced(value.Ref, returnInfo);
                 FlushTemporaries();
-                ReleaseScopes(0);
+                ReleaseScopes(0, handedOver);
                 Terminator($"ret {returnInfo.LlvmType} {coerced}");
             }
             return;
@@ -564,7 +568,7 @@ public sealed partial class LlvmEmitter
         string slot = Alloca(value.LlvmType, "ret");
         Line($"store {value.LlvmType} {value.Ref}, ptr {slot}");
         FlushTemporaries();
-        ReleaseScopes(0);
+        ReleaseScopes(0, handedOver);
         string result = Emit(value.LlvmType, $"load {value.LlvmType}, ptr {slot}");
         Terminator($"ret {value.LlvmType} {result}");
     }

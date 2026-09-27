@@ -11,10 +11,12 @@ chained
 conditional
   chose 16
   weighed 31
+  in place 31
   ~Thing 16
   chose 15
   weighed 32
   ~Thing 17
+  in place 30
   ~Thing 15
 fallback
   19 18 20
@@ -36,6 +38,16 @@ struct
   ~Thing 29
   ~Thing 26
   ~Thing 27
+handed over
+  ~Thing 35
+  34 36 37
+  ~Thing 36
+  ~Thing 37
+  ~Thing 34
+bound
+  still 38
+  ~Thing 38
+  after
 weak
   30
   ~Thing 30

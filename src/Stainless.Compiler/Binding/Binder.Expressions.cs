@@ -3073,7 +3073,7 @@ public sealed partial class Binder
     private static bool IsRepeatable(BoundExpression expression) => expression switch
     {
         BoundLiteral or BoundStringLiteral or BoundUtf8Literal or BoundNullLiteral => true,
-        BoundConstantAccess => true,
+        BoundConstantAccess or BoundDefault => true,
         BoundLocalAccess or BoundParameterAccess or BoundThis or BoundStaticAccess => true,
         BoundFieldAccess field => field.Receiver is null || IsRepeatable(field.Receiver),
         BoundIndex element => IsRepeatable(element.Target) && IsRepeatable(element.Index),

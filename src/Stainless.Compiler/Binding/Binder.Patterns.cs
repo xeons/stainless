@@ -1283,12 +1283,16 @@ public sealed partial class Binder
         if (pattern is null)
             return new BoundErrorExpression(syntax.Span);
 
+        // Borrowed where the name is given its value before anything but the
+        // type test has run: the name keeps a reference of its own from then
+        // on, and nothing before it could have released the one borrowed.
         var test = held is null
             ? pattern.Test
             : new BoundLet(syntax.Span, held, value, pattern.Test)
             {
                 IsOwned = !IsMade(value) &&
-                          (value.Type.NeedsArc() || value.Type is StructTypeSymbol or FixedArrayTypeSymbol),
+                          (value.Type.NeedsArc() && !BindsAtOnce(syntax.Pattern) ||
+                           value.Type is StructTypeSymbol or FixedArrayTypeSymbol),
             };
 
         return new BoundIsPattern(syntax.Span, value, test)
@@ -1301,6 +1305,10 @@ public sealed partial class Binder
             NotNullWhenFalse = pattern.NotNullWhenFalse,
         };
     }
+
+    /// <summary>Whether a pattern names its subject with nothing but a type test first.</summary>
+    private static bool BindsAtOnce(PatternSyntax pattern) =>
+        pattern is TypePatternSyntax { Binding: not null } or VarPatternSyntax;
 
     /// <summary>Whether a pattern reads its subject once at most, so it need not be held.</summary>
     private static bool ReadsSubjectOnce(PatternSyntax pattern) => pattern switch

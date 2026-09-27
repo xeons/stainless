@@ -630,7 +630,10 @@ internal static class Program
         if (exitCode == 0 && LeakFailure(directory, leaks) is { } leaked)
             return (false, leaked);
 
-        return (true, $"{actualOutput.Split('\n').Length} line(s) matched");
+        // With -v, what the tracker counted, which is how the case that makes
+        // the most reference traffic is found.
+        string counted = leaks is null ? "" : "\n" + leaks.Split('\n')[0];
+        return (true, $"{actualOutput.Split('\n').Length} line(s) matched{counted}");
     }
 
     /// <summary>

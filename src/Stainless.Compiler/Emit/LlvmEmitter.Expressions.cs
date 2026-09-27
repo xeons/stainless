@@ -116,7 +116,7 @@ public sealed partial class LlvmEmitter
             case BoundUnmatchedSwitch unmatched: return EmitUnmatchedSwitch(unmatched);
             case BoundUnary unary: return EmitUnary(unary);
             case BoundBinary binary: return EmitBinary(binary);
-            case BoundConditional conditional: return EmitConditional(conditional);
+            case BoundConditional conditional: return EmitConditional(conditional, movesTrueArm: false);
             case BoundLet held: return EmitLet(held);
             case BoundFunctionReference reference:
                 return new Val(Symbol(reference.Function), "ptr", reference.Type);
@@ -169,30 +169,29 @@ public sealed partial class LlvmEmitter
     private Val EmitLet(BoundLet held)
     {
         var local = held.Local;
-        var type = local.Type;
-        bool byAddress = type is StructTypeSymbol or FixedArrayTypeSymbol;
+        bool byAddress = IsHeldByAddress(local);
 
         if (held.IsOwned)
         {
-            var kept = EmitOwned(held.Value);
-
-            if (byAddress && kept.Hold != Hold.Owned)
-            {
-                string copy = Alloca(LlvmTypeOf(type), local.Name);
-                MemCopy(copy, kept.Ref, type.Size);
-                kept = kept with { Ref = copy };
-            }
-
-            if (kept.Hold == Hold.Owned) TrackTemporary(kept.Ref, type);
-            Name(local, kept, byAddress);
-            return EmitOwnable(held.Body);
+            NameLet(held);
+            var result = EmitOwnable(held.Body);
+            _soleStores.Remove(local);
+            return result;
         }
 
         var value = EmitOwnable(held.Value);
         bool handedOn = value.Hold == Hold.Owned && HandsOnLocal(held);
+        bool fallsBack = value.Hold == Hold.Owned && FallsBackFrom(held);
 
         value = Borrow(value);
         Name(local, value, byAddress);
+
+        if (fallsBack)
+        {
+            var merged = EmitConditional((BoundConditional)held.Body, movesTrueArm: true);
+            Reclaim(value);
+            return merged;
+        }
 
         var body = EmitOwnable(held.Body);
         if (!handedOn) return body;
@@ -201,6 +200,78 @@ public sealed partial class LlvmEmitter
         Reclaim(value);
         return Fresh(body);
     }
+
+    /// <summary>Gives the name a <c>let</c> binds its value, keeping nothing past the statement.</summary>
+    private void NameLet(BoundLet held)
+    {
+        var local = held.Local;
+        var type = local.Type;
+        bool byAddress = IsHeldByAddress(local);
+
+        if (!held.IsOwned)
+        {
+            Name(local, EmitExpression(held.Value), byAddress);
+            return;
+        }
+
+        var kept = EmitOwned(held.Value);
+
+        if (byAddress && kept.Hold != Hold.Owned)
+        {
+            string copy = Alloca(LlvmTypeOf(type), local.Name);
+            MemCopy(copy, kept.Ref, type.Size);
+            kept = kept with { Ref = copy };
+        }
+
+        if (kept.Hold == Hold.Owned)
+        {
+            TrackTemporary(kept.Ref, type);
+            if (IsSoleStore(held)) _soleStores[local] = kept;
+        }
+
+        Name(local, kept, byAddress);
+    }
+
+    /// <summary>
+    /// True when the one use of what an owned <c>let</c> holds is the whole
+    /// value of a store that every path through the body makes: a
+    /// deconstruction's <c>(a, b) = (b, a)</c>. The store is then handed the
+    /// let's own +1.
+    /// </summary>
+    private static bool IsSoleStore(BoundLet held) =>
+        LocalUseCounter.Uses(held.Body, held.Local) == 1 && StoresOnEveryPath(held.Body, held.Local);
+
+    private static bool StoresOnEveryPath(BoundExpression expression, LocalSymbol local) => expression switch
+    {
+        BoundAssignment assignment => ReadsOnly(assignment.Value, local),
+        BoundLet inner => StoresOnEveryPath(inner.Body, local),
+        BoundSequence sequence =>
+            sequence.Before.Any(side => StoresOnEveryPath(side, local))
+            || StoresOnEveryPath(sequence.Value, local),
+        _ => false,
+    };
+
+    /// <summary>True for a read of the local, through conversions that pass ownership.</summary>
+    private static bool ReadsOnly(BoundExpression expression, LocalSymbol local) => expression switch
+    {
+        BoundLocalAccess read => ReferenceEquals(read.Local, local),
+        BoundConversion conversion => PassesOwnership(conversion) && ReadsOnly(conversion.Operand, local),
+        _ => false,
+    };
+
+    /// <summary>The owned <c>let</c> a store's value reads for the last time, or null.</summary>
+    private LocalSymbol? SoleStoreOf(BoundExpression value)
+    {
+        while (value is BoundConversion conversion && PassesOwnership(conversion))
+            value = conversion.Operand;
+
+        return value is BoundLocalAccess { Local: var local } && _soleStores.ContainsKey(local)
+            ? local
+            : null;
+    }
+
+    private static bool IsHeldByAddress(LocalSymbol local) =>
+        local.Type is StructTypeSymbol or FixedArrayTypeSymbol;
 
     /// <summary>Where a name a <c>let</c> binds is read from.</summary>
     private void Name(LocalSymbol local, Val value, bool byAddress)
@@ -235,6 +306,16 @@ public sealed partial class LlvmEmitter
                     DeclareExpressionLocal(declared);
 
                 string address = EmitAddress(assignment.Target);
+
+                if (SoleStoreOf(assignment.Value) is { } last)
+                {
+                    var moved = EmitOwnable(assignment.Value);
+                    Reclaim(_soleStores[last]);
+                    _soleStores.Remove(last);
+                    MoveInto(address, moved, assignment.Target.Type);
+                    return;
+                }
+
                 var value = EmitOwned(assignment.Value);
                 MoveInto(address, value, assignment.Target.Type);
                 return;
@@ -243,6 +324,13 @@ public sealed partial class LlvmEmitter
             case BoundSequence sequence:
                 foreach (var side in sequence.Before) EmitDiscarded(side);
                 EmitDiscarded(sequence.Value);
+                return;
+
+            // What an assignment holds while its value is evaluated.
+            case BoundLet held:
+                NameLet(held);
+                EmitDiscarded(held.Body);
+                _soleStores.Remove(held.Local);
                 return;
 
             default:
