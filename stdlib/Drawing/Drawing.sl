@@ -727,6 +727,9 @@ delegate void  GdImageCopyResampledFn(void* destination, void* source,
 delegate void  GdImageCopyFn(void* destination, void* source,
                              int dx, int dy, int sx, int sy, int w, int h);
 delegate int   GdImagePaletteToTrueColorFn(void* image);
+delegate void* GdImageCreatePaletteFn(int width, int height);
+delegate int   GdImageColorAllocateAlphaFn(void* image, int r, int g, int b, int a);
+delegate void  GdImageColorTransparentFn(void* image, int index);
 
 extern "C"
 {
@@ -769,6 +772,9 @@ threadsafe sealed class Backend
     GdImageCopyResampledFn _resample;
     GdImageCopyFn _copy;
     GdImagePaletteToTrueColorFn _toTrueColor;
+    GdImageCreatePaletteFn _createPalette;
+    GdImageColorAllocateAlphaFn _allocateColour;
+    GdImageColorTransparentFn _transparent;
 
     public bool Ready;
 
@@ -817,6 +823,9 @@ threadsafe sealed class Backend
         _saveAlpha = (GdImageFlagFn)FindSymbol(library, "gdImageSaveAlpha", &complete);
         _resample = (GdImageCopyResampledFn)FindSymbol(library, "gdImageCopyResampled", &complete);
         _copy = (GdImageCopyFn)FindSymbol(library, "gdImageCopy", &complete);
+        _createPalette = (GdImageCreatePaletteFn)FindSymbol(library, "gdImageCreate", &complete);
+        _allocateColour = (GdImageColorAllocateAlphaFn)FindSymbol(library, "gdImageColorAllocateAlpha", &complete);
+        _transparent = (GdImageColorTransparentFn)FindSymbol(library, "gdImageColorTransparent", &complete);
 
         // 2.1.0 and later. Without it every decoded image is copied onto a
         // true colour one instead, which costs a second image for the length
@@ -1112,6 +1121,79 @@ threadsafe sealed class Backend
 
     // -------------------------------------------------------------- codecs
 
+    /// A palette copy of a picture with at most 256 colours, each kept exactly,
+    /// or null when it has more or has a pixel neither opaque nor invisible.
+    ///
+    /// libgd quantizes a truecolor picture to write a GIF, and 2.3.3 as Ubuntu
+    /// 24.04 ships it moves even a two-colour picture's red to 252, 2, 4.
+    /// Null leaves that quantizing to libgd, which is all a GIF can do then.
+    void* ExactPalette(void* image)
+    {
+        int width = GetWidth(image);
+        int height = GetHeight(image);
+        var colours = new int[256u];
+        int count = 0;
+        int invisible = -1;
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                int colour = _getPixel(image, x, y);
+                int alpha = (colour >> 24) & 0x7F;
+                if (alpha == 127)
+                {
+                    invisible = 0;
+                    continue;
+                }
+                if (alpha != 0)
+                    return null;
+                if (IndexOfColour(colours, count, colour) >= 0)
+                    continue;
+                if (count == 256 || count == 255 && invisible >= 0)
+                    return null;
+                colours[(nuint)count] = colour;
+                count++;
+            }
+        }
+
+        void* palette = _createPalette(width, height);
+        if (palette == null)
+            return null;
+
+        for (int at = 0; at < count; at++)
+        {
+            int colour = colours[(nuint)at];
+            _allocateColour(palette, (colour >> 16) & 0xFF, (colour >> 8) & 0xFF, colour & 0xFF, 0);
+        }
+        if (invisible >= 0)
+        {
+            invisible = _allocateColour(palette, 0, 0, 0, 127);
+            _transparent(palette, invisible);
+        }
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                int colour = _getPixel(image, x, y);
+                int index = ((colour >> 24) & 0x7F) == 127 ? invisible : IndexOfColour(colours, count, colour);
+                _setPixel(palette, x, y, index);
+            }
+        }
+        return palette;
+    }
+
+    static int IndexOfColour(int[] colours, int count, int colour)
+    {
+        for (int at = 0; at < count; at++)
+        {
+            if (colours[(nuint)at] == colour)
+                return at;
+        }
+        return -1;
+    }
+
     /// The encoded bytes, or an empty array for a failure. See the note on
     /// the Windows backend's `EncodeImage` for why empty rather than null.
     public byte[] EncodeImage(void* image, ImageFormat format, int quality)
@@ -1124,7 +1206,12 @@ threadsafe sealed class Backend
         if (format == ImageFormat.Jpeg)
             raw = _toJpeg(image, &size, quality < 0 ? 75 : quality);
         if (format == ImageFormat.Gif)
-            raw = _toGif(image, &size);
+        {
+            void* exact = ExactPalette(image);
+            raw = _toGif(exact != null ? exact : image, &size);
+            if (exact != null)
+                _destroy(exact);
+        }
         if (format == ImageFormat.Bmp && _toBmp != null)
             raw = _toBmp(image, &size, 0);
 
