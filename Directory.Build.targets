@@ -1,0 +1,19 @@
+<Project>
+
+  <!-- Stamps every assembly with the version tools/Version.proj computes. It is
+       reached through the MSBuild task so that one evaluation serves the whole
+       build, and git runs once. -->
+  <Target Name="StampStainlessVersion" BeforeTargets="GetAssemblyVersion">
+    <MSBuild Projects="$(MSBuildThisFileDirectory)tools\Version.proj"
+             Targets="ComputeStainlessVersion"
+             RemoveProperties="TargetFramework;RuntimeIdentifier;SelfContained;PublishSingleFile;PublishReadyToRun;_TargetPlatformIdentifier">
+      <Output TaskParameter="TargetOutputs" ItemName="_StainlessVersion" />
+    </MSBuild>
+
+    <PropertyGroup>
+      <Version>@(_StainlessVersion)</Version>
+      <InformationalVersion>%(_StainlessVersion.Informational)</InformationalVersion>
+    </PropertyGroup>
+  </Target>
+
+</Project>

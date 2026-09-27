@@ -9,6 +9,10 @@
     <RootNamespace>Stainless.Cli</RootNamespace>
     <!-- A compile is over in a second or two, too soon for what PGO instruments to pay back. -->
     <TieredPGO>false</TieredPGO>
+    <!-- Every comparison and conversion in the compiler is ordinal or invariant
+         already, and without ICU a published binary runs on a Linux that has
+         no libicu. -->
+    <InvariantGlobalization>true</InvariantGlobalization>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Stainless.Compiler\Stainless.Compiler.csproj" />

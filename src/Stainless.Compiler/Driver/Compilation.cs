@@ -844,7 +844,7 @@ public sealed class Compilation
         var debug = options.Debug
             ? new DebugInfo(
                 programSpan.File,
-                "Stainless " + typeof(Compilation).Assembly.GetName().Version?.ToString(3),
+                "Stainless " + CompilerVersion.Number,
                 options.DebugFormat ?? DefaultDebugFormat(target),
                 optimized: options.OptimizationLevel > 0)
             : null;

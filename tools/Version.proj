@@ -1,0 +1,78 @@
+<Project>
+
+  <!-- The version every assembly is stamped with, computed once per build.
+
+       VersionPrefix in Directory.Build.props is the major and minor. The third
+       part is the number of commits reachable from HEAD, so a commit has one
+       version and it only ever rises along a branch. The informational version
+       adds the short commit hash, and -dirty when the tree differs from it.
+
+       A tree with no history — a source archive, a shallow clone, no git —
+       builds as <prefix>.0. StainlessBuildNumber and StainlessCommit set on the
+       command line override what git would say.
+
+       Directory.Build.targets reaches this through the MSBuild task, so every
+       project in a build shares one evaluation and git runs once, not once per
+       project.
+
+         dotnet msbuild tools/Version.proj -t:ComputeStainlessVersion -getProperty:StainlessVersion
+  -->
+
+  <Import Project="$(MSBuildThisFileDirectory)..\Directory.Build.props" />
+
+  <PropertyGroup>
+    <StainlessRepository>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..'))</StainlessRepository>
+
+    <!-- A CI checkout is clean by construction. Only a local build asks. -->
+    <_StainlessDirtyFlag Condition="'$(CI)' != 'true'">--dirty</_StainlessDirtyFlag>
+  </PropertyGroup>
+
+  <Target Name="ComputeStainlessVersion" Returns="@(StainlessVersionResult)">
+    <Exec Condition="'$(StainlessBuildNumber)' == ''"
+          Command="git rev-parse --is-shallow-repository"
+          WorkingDirectory="$(StainlessRepository)"
+          ConsoleToMSBuild="true" IgnoreExitCode="true" EchoOff="true"
+          IgnoreStandardErrorWarningFormat="true"
+          StandardOutputImportance="low" StandardErrorImportance="low">
+      <Output TaskParameter="ConsoleOutput" PropertyName="_StainlessShallow" />
+      <Output TaskParameter="ExitCode" PropertyName="_StainlessShallowExit" />
+    </Exec>
+
+    <Exec Condition="'$(StainlessBuildNumber)' == '' and '$(_StainlessShallowExit)' == '0' and '$(_StainlessShallow)' == 'false'"
+          Command="git rev-list --count HEAD"
+          WorkingDirectory="$(StainlessRepository)"
+          ConsoleToMSBuild="true" IgnoreExitCode="true" EchoOff="true"
+          IgnoreStandardErrorWarningFormat="true"
+          StandardOutputImportance="low" StandardErrorImportance="low">
+      <Output TaskParameter="ConsoleOutput" PropertyName="_StainlessCount" />
+      <Output TaskParameter="ExitCode" PropertyName="_StainlessCountExit" />
+    </Exec>
+
+    <!-- The hash, and -dirty when a tracked file differs from it. Every tag is
+         excluded, so the answer is the bare hash and never a tag's name. -->
+    <Exec Condition="'$(StainlessCommit)' == ''"
+          Command="git describe --always --abbrev=7 --exclude=&quot;*&quot; $(_StainlessDirtyFlag)"
+          WorkingDirectory="$(StainlessRepository)"
+          ConsoleToMSBuild="true" IgnoreExitCode="true" EchoOff="true"
+          IgnoreStandardErrorWarningFormat="true"
+          StandardOutputImportance="low" StandardErrorImportance="low">
+      <Output TaskParameter="ConsoleOutput" PropertyName="_StainlessDescribe" />
+      <Output TaskParameter="ExitCode" PropertyName="_StainlessDescribeExit" />
+    </Exec>
+
+    <PropertyGroup>
+      <StainlessBuildNumber Condition="'$(StainlessBuildNumber)' == '' and '$(_StainlessCountExit)' == '0'">$(_StainlessCount.Trim())</StainlessBuildNumber>
+      <StainlessBuildNumber Condition="'$(StainlessBuildNumber)' == ''">0</StainlessBuildNumber>
+      <StainlessCommit Condition="'$(StainlessCommit)' == '' and '$(_StainlessDescribeExit)' == '0'">$(_StainlessDescribe.Trim())</StainlessCommit>
+
+      <StainlessVersion>$(VersionPrefix).$(StainlessBuildNumber)</StainlessVersion>
+      <StainlessInformationalVersion>$(StainlessVersion)</StainlessInformationalVersion>
+      <StainlessInformationalVersion Condition="'$(StainlessCommit)' != ''">$(StainlessVersion)+$(StainlessCommit)</StainlessInformationalVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <StainlessVersionResult Include="$(StainlessVersion)" Informational="$(StainlessInformationalVersion)" />
+    </ItemGroup>
+  </Target>
+
+</Project>

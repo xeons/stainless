@@ -22,8 +22,6 @@ namespace Stainless.Cli;
 
 internal static class Program
 {
-    private const string Version = "0.1.0";
-
     private static int Main(string[] args)
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
@@ -36,7 +34,7 @@ internal static class Program
 
         if (args[0] is "-v" or "--version" or "version")
         {
-            Console.WriteLine($"stainless {Version}");
+            Console.WriteLine($"stainless {CompilerVersion.Informational}");
             return 0;
         }
 
@@ -73,7 +71,7 @@ internal static class Program
     private static void PrintUsage()
     {
         Console.WriteLine($"""
-            stainless {Version} — the Stainless compiler
+            stainless {CompilerVersion.Informational} — the Stainless compiler
 
             USAGE
               stainless build [paths...] [options]   compile to a native executable
