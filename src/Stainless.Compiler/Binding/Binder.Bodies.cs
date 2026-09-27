@@ -1484,8 +1484,17 @@ public sealed partial class Binder
                 syntax.Span, new BoundErrorExpression(syntax.Span));
         }
 
-        try { return BindStatementCore(syntax); }
-        finally { _bindDepth--; }
+        try
+        {
+            int semantic = SemanticNodes.Made;
+            var bound = BindStatementCore(syntax);
+            bound.IsCore = SemanticNodes.Made == semantic;
+            return bound;
+        }
+        finally
+        {
+            _bindDepth--;
+        }
     }
 
     private BoundStatement BindStatementCore(StatementSyntax syntax) => syntax switch

@@ -1560,6 +1560,13 @@ public sealed class BoundThis(SourceSpan span, TypeSymbol type, ParameterSymbol 
 public abstract class BoundStatement(SourceSpan span)
 {
     public SourceSpan Span { get; } = span;
+
+    /// <summary>
+    /// True when binding the statement made nothing lowering takes away, so
+    /// lowering hands it on as it is. A statement rebuilt around new children
+    /// is not marked, and is walked.
+    /// </summary>
+    internal bool IsCore { get; set; }
 }
 
 public sealed class BoundBlock(SourceSpan span, IReadOnlyList<BoundStatement> statements)

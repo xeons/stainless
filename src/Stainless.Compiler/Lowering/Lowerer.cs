@@ -73,6 +73,7 @@ public sealed partial class Lowerer : BoundTreeRewriter
     /// <summary>Every construct lowering takes away, and where it goes instead.</summary>
     public override BoundStatement Rewrite(BoundStatement statement) => statement switch
     {
+        { IsCore: true } => statement,
         BoundSwitch chosen => LowerSwitch(chosen),
         BoundForEach loop => LowerForEach(loop),
         _ => LowerDropping(statement) ?? base.Rewrite(statement),

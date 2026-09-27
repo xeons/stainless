@@ -7,6 +7,8 @@
     <LangVersion>latest</LangVersion>
     <AssemblyName>stainless</AssemblyName>
     <RootNamespace>Stainless.Cli</RootNamespace>
+    <!-- A compile is over in a second or two, too soon for what PGO instruments to pay back. -->
+    <TieredPGO>false</TieredPGO>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Stainless.Compiler\Stainless.Compiler.csproj" />
