@@ -16,6 +16,7 @@
 
 using Stainless.Source;
 using Stainless.Syntax;
+using static Stainless.Binding.BoundValues;
 
 namespace Stainless.Binding;
 
@@ -939,22 +940,6 @@ public sealed partial class Binder
     private StatementSyntax? _listedStatement;
 
     /// <summary>
-    /// The declaration a narrowed fact can be attached to.
-    ///
-    /// Only a plain local or parameter qualifies. A field or a call result is
-    /// refused for the reason a compound assignment refuses a computed receiver:
-    /// the compiler would be proving something about one evaluation and letting
-    /// it be read from another. Putting the Result in a local first is the fix,
-    /// and it is what the code wants to say anyway.
-    /// </summary>
-    private static object? NarrowableSubject(BoundExpression expression) => expression switch
-    {
-        BoundLocalAccess local => local.Local,
-        BoundParameterAccess parameter => parameter.Parameter,
-        _ => null,
-    };
-
-    /// <summary>
     /// The subject of <c>x != null</c> or <c>null == x</c>, when one side is
     /// the null literal and the other is a narrowable optional.
     ///
@@ -1339,7 +1324,7 @@ public sealed partial class Binder
 
             case BoundSwitch chosen:
             {
-                assigned = Evaluates(chosen.Value, target, assigned, owner);
+                assigned = Evaluates(chosen.Subject, target, assigned, owner);
 
                 bool everyArm = chosen.IsExhaustive || chosen.Sections.Any(s => s.IsDefault);
                 bool all = everyArm && chosen.Sections.Count > 0;

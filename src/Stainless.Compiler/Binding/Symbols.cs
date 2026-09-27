@@ -138,6 +138,13 @@ public sealed class LabelSymbol(string name)
     public SourceSpan? FirstUse { get; set; }
 
     public bool IsUsed { get; set; }
+
+    /// <summary>
+    /// True for a label lowering made, which every jump to it reaches from
+    /// before it. Nothing can run a declaration twice by jumping there.
+    /// </summary>
+    public bool IsForwardOnly { get; init; }
+
     public override string ToString() => Name + ":";
 }
 

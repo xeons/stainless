@@ -71,7 +71,7 @@ public sealed partial class LlvmEmitter
             case BoundLabel label: EmitLabel(label); break;
             case BoundGoto jump: EmitGoto(jump); break;
             case BoundFor forStatement: EmitFor(forStatement); break;
-            case BoundSwitch switchStatement: EmitSwitch(switchStatement); break;
+            case BoundSwitchDispatch dispatch: EmitSwitchDispatch(dispatch); break;
             case BoundParallel parallel: EmitParallel(parallel); break;
             case BoundParallelFor parallelFor: EmitParallelFor(parallelFor); break;
             case BoundSpawn spawn: EmitSpawn(spawn); break;
@@ -126,6 +126,20 @@ public sealed partial class LlvmEmitter
         if (debug is not null && _debugScope is { } scope)
             DeclareVariable(slot, debug.LocalVariable(
                 local.Name, local.Type, declaration.Span, scope));
+
+        // What it holds is kept alive by what it was read from, and nothing
+        // here counts it or lets it go.
+        if (declaration.IsBorrowed)
+        {
+            var viewed = EmitOwnable(declaration.Initializer!);
+            if (viewed.Hold == Hold.Owned)
+                throw new InternalCompilerError(
+                    "a borrowed local was given a value that is owed", declaration.Span);
+
+            StoreUncounted(slot, viewed, local.Type);
+            FlushTemporaries();
+            return;
+        }
 
         if (local.Type.IsManagedSlot())
             StartOwnedSlot(slot, local.Type, "ptr", declaration.Initializer is not null);
@@ -395,131 +409,46 @@ public sealed partial class LlvmEmitter
     }
 
     /// <summary>
-    /// Emits a switch: one dispatch, then the sections.
+    /// A jump by a value to one of several labels: one LLVM <c>switch</c>,
+    /// which decides for itself whether a jump table beats comparisons -- it
+    /// judges that from the density of the values better than this compiler
+    /// would. A variant is dispatched by its tag, a byte.
     ///
-    /// An ordinal switch becomes a single LLVM <c>switch</c>, which is what
-    /// makes a jump table possible — LLVM decides between one and a chain of
-    /// comparisons from the density of the labels, which is a better judge than
-    /// this compiler would be. A String switch has no such instruction and
-    /// becomes a chain of calls to the runtime's comparison.
+    /// Each destination is reached the way a <c>goto</c> reaches its label,
+    /// by a block that lets go of whatever the scopes it leaves were holding.
     /// </summary>
-    private void EmitSwitch(BoundSwitch statement)
+    private void EmitSwitchDispatch(BoundSwitchDispatch dispatch)
     {
-        var value = EmitExpression(statement.Value);
+        var value = EmitExpression(dispatch.Value);
         FlushTemporaries();
 
-        string endLabel = NextLabel("switch.end");
-        var bodies = statement.Sections
-            .Select(section => section.Entry is { } entry ? LabelBlock(entry) : NextLabel("switch.section"))
-            .ToList();
-
-        int defaultIndex = statement.Sections.ToList().FindIndex(s => s.IsDefault);
-        string defaultLabel = defaultIndex < 0 ? endLabel : bodies[defaultIndex];
-
-        // A pattern section is reached by asking rather than by jumping: the
-        // tests run in order, and the first that says yes wins. It comes first
-        // because a pattern switch over a variant is still a chain -- a `when`
-        // is not a tag, and there is no table to put one in.
-        if (statement.Sections.Any(section => section.Tests.Count > 0))
+        string Jump(LabelSymbol label)
         {
-            // A test's temporaries are released in its own block: the next
-            // test's is also reached from here, and the sections from any of
-            // them.
-            for (int i = 0; i < statement.Sections.Count; i++)
-                foreach (var test in statement.Sections[i].Tests)
-                {
-                    var asked = EmitExpression(test);
-                    FlushTemporaries();
-                    string next = NextLabel("switch.test");
-                    Terminator($"br i1 {asked.Ref}, label %{bodies[i]}, label %{next}");
-                    Label(next);
-                }
-
-            Terminator($"br label %{defaultLabel}");
-
-            EmitSwitchBodies(statement, bodies, endLabel);
-            return;
+            string exit = NextLabel("dispatch");
+            _pendingJumps.Add(new PendingJump(exit, label, [.. _scopes], _debugLocation));
+            return exit;
         }
 
-        // A switch over a variant asks the tag, which is an ordinary LLVM switch
-        // over a byte -- so a jump table stays LLVM's decision here too.
-        if (statement.Value.Type is VariantTypeSymbol switched)
+        string otherwise = Jump(dispatch.Default);
+
+        if (value.Type is VariantTypeSymbol variant)
         {
             string tag = Emit("i8",
-                $"load i8, ptr {Emit("ptr", $"getelementptr inbounds {StructName(switched)}, " +
+                $"load i8, ptr {Emit("ptr", $"getelementptr inbounds {StructName(variant)}, " +
                                            $"ptr {value.Ref}, i32 0, i32 0")}");
 
-            var caseArms = new List<string>();
-            for (int i = 0; i < statement.Sections.Count; i++)
-                foreach (var matched in statement.Sections[i].Cases)
-                    caseArms.Add($"i8 {matched.Tag}, label %{bodies[i]}");
-
-            Terminator($"switch i8 {tag}, label %{defaultLabel} " +
-                       $"[ {string.Join(" ", caseArms)} ]");
-
-            EmitSwitchBodies(statement, bodies, endLabel);
+            var caseArms = dispatch.Arms.Select(arm => $"i8 {arm.Case!.Tag}, label %{Jump(arm.Target)}");
+            Terminator($"switch i8 {tag}, label %{otherwise} [ {string.Join(" ", caseArms)} ]");
             return;
         }
 
-        // A reference governor was spilled into a local by the binder, so it is
-        // alive across every one of these blocks.
-        if (statement.Value.Type.NeedsArc())
+        var arms = dispatch.Arms.Select(arm =>
         {
-            for (int i = 0; i < statement.Sections.Count; i++)
-                foreach (var label in statement.Sections[i].Labels)
-                {
-                    var text = EmitExpression(label);
-                    string same = Emit("i1",
-                        $"call i1 @sl_string_equals(ptr {value.Ref}, ptr {text.Ref})");
-                    string next = NextLabel("switch.test");
-                    Terminator($"br i1 {same}, label %{bodies[i]}, label %{next}");
-                    Label(next);
-                }
+            var constant = EmitLiteral(new BoundLiteral(dispatch.Span, dispatch.Value.Type, arm.Value));
+            return $"{constant.LlvmType} {constant.Ref}, label %{Jump(arm.Target)}";
+        }).ToList();
 
-            Terminator($"br label %{defaultLabel}");
-        }
-        else
-        {
-            var arms = new List<string>();
-            for (int i = 0; i < statement.Sections.Count; i++)
-                foreach (var label in statement.Sections[i].Labels)
-                {
-                    var constant = EmitExpression(label);
-                    arms.Add($"{constant.LlvmType} {constant.Ref}, label %{bodies[i]}");
-                }
-
-            Terminator($"switch {value.LlvmType} {value.Ref}, label %{defaultLabel} " +
-                       $"[ {string.Join(" ", arms)} ]");
-        }
-
-        EmitSwitchBodies(statement, bodies, endLabel);
-    }
-
-    /// <summary>
-    /// The sections themselves, once something has branched to them. Shared
-    /// because a variant switch reaches this point by a different route and
-    /// everything after the dispatch is the same.
-    /// </summary>
-    private void EmitSwitchBodies(
-        BoundSwitch statement, IReadOnlyList<string> bodies, string endLabel)
-    {
-        // `break` lands after the switch; `continue` still belongs to whatever
-        // loop encloses it, and unwinds to that loop's depth.
-        string continueLabel = _loops.Count > 0 ? _loops[^1].ContinueLabel : endLabel;
-        int continueDepth = _loops.Count > 0 ? _loops[^1].ContinueDepth : _scopes.Count;
-        _loops.Add((endLabel, _scopes.Count, continueLabel, continueDepth));
-
-        foreach (var (section, label) in statement.Sections.Zip(bodies))
-        {
-            Label(label);
-            if (section.Entry is { } entry) _labelScopes[entry] = [.. _scopes];
-            EmitStatement(section.Body);
-            if (!_blockTerminated) Terminator($"br label %{endLabel}");
-        }
-
-        _loops.RemoveAt(_loops.Count - 1);
-
-        Label(endLabel);
+        Terminator($"switch {value.LlvmType} {value.Ref}, label %{otherwise} [ {string.Join(" ", arms)} ]");
     }
 
     private void EmitReturn(BoundReturn statement)

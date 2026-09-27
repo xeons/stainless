@@ -16,6 +16,7 @@
 
 using Stainless.Source;
 using Stainless.Syntax;
+using static Stainless.Binding.BoundValues;
 
 namespace Stainless.Binding;
 
@@ -451,16 +452,6 @@ public sealed partial class Binder
         steps.Add(new DeconstructionStep(local, value, owned));
         return new BoundLocalAccess(value.Span, local);
     }
-
-    /// <summary>Whether a value is a temporary this statement made and will drop.</summary>
-    private static bool IsMade(BoundExpression value) => value switch
-    {
-        BoundCall or BoundNew or BoundIndirectCall or BoundClosureCall => true,
-        BoundTupleCreate or BoundStructNew or BoundVariantConstruction => true,
-        BoundLet held => IsMade(held.Body),
-        BoundSequence sequence => IsMade(sequence.Value),
-        _ => false,
-    };
 
     /// <summary>
     /// The stores, left to right, and the locals they declare. Declared here,

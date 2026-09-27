@@ -56,18 +56,44 @@ public class BoundTreeTests
         Fill(node, expected);
 
         var recorder = new Recorder();
-        if (node is BoundExpression expression)
-            recorder.VisitChildren(expression);
-        else
-            recorder.VisitChildren((BoundStatement)node);
+        Walk(recorder, node);
 
         Assert.Equal(expected.Count, recorder.Seen.Count);
         foreach (var child in expected)
             Assert.Single(recorder.Seen, seen => ReferenceEquals(seen, child));
     }
 
+    private static void Walk(BoundTreeWalker walker, object node)
+    {
+        switch (node)
+        {
+            case BoundExpression expression: walker.VisitChildren(expression); break;
+            case BoundStatement statement: walker.VisitChildren(statement); break;
+            default: walker.VisitChildren((BoundPattern)node); break;
+        }
+    }
+
+    private static object Rebuild(BoundTreeRewriter rewriter, object node) => node switch
+    {
+        BoundExpression expression => rewriter.RewriteChildren(expression),
+        BoundStatement statement => rewriter.RewriteChildren(statement),
+        _ => rewriter.RewriteChildren((BoundPattern)node),
+    };
+
     private static bool IsNode(Type type) =>
-        typeof(BoundExpression).IsAssignableFrom(type) || typeof(BoundStatement).IsAssignableFrom(type);
+        typeof(BoundExpression).IsAssignableFrom(type) || typeof(BoundStatement).IsAssignableFrom(type) ||
+        typeof(BoundPattern).IsAssignableFrom(type);
+
+    /// <summary>
+    /// A property that names a value rather than holding a child: the input a
+    /// pattern is asked of, which is what its expressions read.
+    /// </summary>
+    private static bool IsName(Type type) => type == typeof(BoundPatternInput);
+
+    /// <summary>A part of a node that is not a node, whose own properties hold its children.</summary>
+    private static bool IsHolder(Type type) =>
+        type == typeof(BoundSwitchSection) || type == typeof(BoundAsmOperand) ||
+        type == typeof(BoundSwitchLabel) || type == typeof(BoundSwitchArm);
 
     /// <summary>Puts a fresh node in every property that holds nodes, and lists those a walk should reach.</summary>
     private static void Fill(object owner, List<object> expected)
@@ -78,7 +104,8 @@ public class BoundTreeTests
             if (backing is null)
                 continue;
 
-            bool shared = property.GetCustomAttribute<SharedSubtreeAttribute>() is not null;
+            bool shared = property.GetCustomAttribute<SharedSubtreeAttribute>() is not null ||
+                          IsName(property.PropertyType);
             var into = shared ? [] : expected;
             var value = Children(property.PropertyType, into);
             if (value is null)
@@ -98,7 +125,7 @@ public class BoundTreeTests
         if (IsNode(type))
             return Node(type, expected);
 
-        if (type == typeof(BoundSwitchSection) || type == typeof(BoundAsmOperand))
+        if (IsHolder(type))
         {
             var part = RuntimeHelpers.GetUninitializedObject(type);
             Fill(part, expected);
@@ -132,16 +159,17 @@ public class BoundTreeTests
     /// <summary>A node of the type a property asks for, which a walk records and does not enter.</summary>
     private static object Node(Type wanted, List<object> expected)
     {
-        var concrete = wanted.IsAbstract
-            ? wanted == typeof(BoundStatement) ? typeof(BoundBreak) : typeof(BoundLiteral)
-            : wanted;
+        var concrete = !wanted.IsAbstract ? wanted
+            : wanted == typeof(BoundStatement) ? typeof(BoundBreak)
+            : wanted == typeof(BoundPattern) ? typeof(BoundDiscardPattern)
+            : typeof(BoundLiteral);
         var node = RuntimeHelpers.GetUninitializedObject(concrete);
         expected.Add(node);
         return node;
     }
 
     private static bool Mentions(Type type) =>
-        IsNode(type) || type == typeof(BoundSwitchSection) || type == typeof(BoundAsmOperand) ||
+        IsNode(type) || IsHolder(type) ||
         type.IsGenericType && type.GetGenericArguments().Any(Mentions);
 
     private static FieldInfo? BackingField(Type? type, string name)
@@ -166,6 +194,12 @@ public class BoundTreeTests
         {
             if (statement is not null)
                 Seen.Add(statement);
+        }
+
+        public override void Visit(BoundPattern? pattern)
+        {
+            if (pattern is not null)
+                Seen.Add(pattern);
         }
     }
 
@@ -192,9 +226,7 @@ public class BoundTreeTests
         FillScalars(node);
 
         var replacer = new Replacer(expected);
-        object rebuilt = node is BoundExpression expression
-            ? replacer.RewriteChildren(expression)
-            : replacer.RewriteChildren((BoundStatement)node);
+        object rebuilt = Rebuild(replacer, node);
 
         Assert.Equal(expected.Count, replacer.Seen.Count);
         foreach (var child in expected)
@@ -209,10 +241,7 @@ public class BoundTreeTests
         Assert.NotSame(node, rebuilt);
 
         var recorder = new Recorder();
-        if (rebuilt is BoundExpression rebuiltExpression)
-            recorder.VisitChildren(rebuiltExpression);
-        else
-            recorder.VisitChildren((BoundStatement)rebuilt);
+        Walk(recorder, rebuilt);
 
         Assert.Equal(replacer.Made.Count, recorder.Seen.Count);
         foreach (var child in replacer.Made)
@@ -232,9 +261,7 @@ public class BoundTreeTests
         FillScalars(node);
 
         var identity = new Replacer([]);
-        object rebuilt = node is BoundExpression expression
-            ? identity.RewriteChildren(expression)
-            : identity.RewriteChildren((BoundStatement)node);
+        object rebuilt = Rebuild(identity, node);
 
         Assert.Same(node, rebuilt);
     }
@@ -249,12 +276,11 @@ public class BoundTreeTests
             var backing = BackingField(owner.GetType(), property.Name);
             if (backing is null || Mentions(property.PropertyType))
             {
-                if (backing?.GetValue(owner) is { } holder &&
-                    (holder is BoundSwitchSection or BoundAsmOperand))
+                if (backing?.GetValue(owner) is { } holder && IsHolder(holder.GetType()))
                     FillScalars(holder);
                 if (backing?.GetValue(owner) is System.Collections.IEnumerable parts and not string)
                     foreach (var part in parts)
-                        if (part is BoundSwitchSection or BoundAsmOperand)
+                        if (part is not null && IsHolder(part.GetType()))
                             FillScalars(part);
                 continue;
             }
@@ -317,13 +343,13 @@ public class BoundTreeTests
             object? was = backing.GetValue(before);
             object? now = backing.GetValue(after);
 
-            if (Mentions(property.PropertyType))
+            if (Mentions(property.PropertyType) && !IsName(property.PropertyType))
             {
-                if (was is BoundSwitchSection or BoundAsmOperand)
+                if (was is not null && IsHolder(was.GetType()))
                     AssertSameScalars(was, now!);
                 else if (was is System.Collections.IEnumerable parts and not string)
                     foreach (var (part, rebuilt) in parts.Cast<object>().Zip(((System.Collections.IEnumerable)now!).Cast<object>()))
-                        if (part is BoundSwitchSection or BoundAsmOperand)
+                        if (IsHolder(part.GetType()))
                             AssertSameScalars(part, rebuilt);
                 continue;
             }
@@ -349,6 +375,9 @@ public class BoundTreeTests
 
         public override BoundStatement Rewrite(BoundStatement statement) =>
             (BoundStatement)Replace(statement);
+
+        public override BoundPattern Rewrite(BoundPattern pattern) =>
+            (BoundPattern)Replace(pattern);
 
         private object Replace(object node)
         {

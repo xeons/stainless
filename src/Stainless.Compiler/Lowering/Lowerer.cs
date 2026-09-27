@@ -75,6 +75,6 @@ public sealed partial class Lowerer : BoundTreeRewriter
             "lowering made a function body that is not a block", statement.Span);
 
     /// <summary>A local of lowering's own. A '$' cannot begin a source identifier.</summary>
-    private LocalSymbol Synthetic(string hint, TypeSymbol type, bool isConst = false) =>
+    internal LocalSymbol Synthetic(string hint, TypeSymbol type, bool isConst = false) =>
         new($"${hint}.{_synthetic++}", type, isConst);
 }

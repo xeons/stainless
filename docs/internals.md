@@ -266,6 +266,38 @@ compiler bug, and a Debug build, which every suite and the fuzzer run, stops
 there with an internal compiler error. The fuzzer found 28 such places in
 its first ten minutes. `HasErrors` is a count kept as reports arrive.
 
+## Lowering
+
+Binding says what a program means; lowering says how it runs. The tree the
+binder makes keeps each construct as it was written -- a switch is its subject
+and sections of patterns and guards, and a pattern is the questions it asks
+and the values it reads, as expressions over a placeholder for the value asked
+about. [Lowerer](../src/Stainless.Compiler/Lowering/Lowerer.cs) rewrites that
+into the core the emitter handles, as a new program: the semantic one is left
+whole, for whatever reads a program rather than running it.
+
+**Matching is one lowering.** A switch statement, a switch expression and `is`
+are each a list of arms, and [DecisionBuilder](../src/Stainless.Compiler/Lowering/Decisions.cs)
+builds every one of them into the same tree. The arms are asked in order, but a
+question is asked once on any path and its answer is remembered: a later arm
+asking for the same case, constant or null of the same value has it answered,
+and one asking for another case of a variant already known to hold this one is
+dropped. A value read from the subject -- a payload's field, a property, an
+element -- is read once on any path, and held in a name where reading it again
+would not be free. A pattern under `or` or `not` that asks more than one thing
+is asked whole. A tree can grow with the product of what its arms ask, so past
+a budget each arm is asked whole instead, which is the chain the arms would be
+without sharing and grows only with them.
+
+A statement's tree is written as jumps. A run of questions of one value
+against constants or a variant's cases is one `BoundSwitchDispatch`, an LLVM
+`switch`; any other question is an `if`; an arm that matched gives its names
+their values and jumps to its section, and `break` is a jump past the last
+section. The labels lowering makes are reached only from before them, so they
+do not make a function's declarations release on entry the way a label a
+`goto` can reach from below does. An expression's tree is conditionals, with
+`&&` and `||` where it answers a `bool`, which is every `is`.
+
 ## One object per type
 
 Two types are the same type exactly when they are the same object, so `==` is

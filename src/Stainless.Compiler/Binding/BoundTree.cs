@@ -382,6 +382,13 @@ public sealed class BoundAssignment(SourceSpan span, BoundExpression target, Bou
     /// statement declares it.
     /// </summary>
     public LocalSymbol? DeclaresLocal { get; init; }
+
+    /// <summary>
+    /// True when lowering knows the target holds nothing yet: a local declared
+    /// without a value and given one once on any path. The store then has
+    /// nothing to release.
+    /// </summary>
+    public bool IsInitialization { get; init; }
 }
 
 /// <summary>
@@ -787,21 +794,30 @@ public sealed class BoundTypeTest(
 }
 
 /// <summary>
-/// <c>value is pattern</c>: the <see cref="Test"/> it lowered to, and what a
-/// condition built on it can learn.
+/// <c>value is pattern</c>, and what a condition built on it can learn.
 ///
-/// The emitter evaluates <see cref="Test"/> and nothing else. The rest is for
-/// the binder: which names the pattern assigned when it matched and when it did
+/// Lowering turns it into the tests the pattern asks. The rest is for the
+/// binder: which names the pattern assigned when it matched and when it did
 /// not, and what it proved about <see cref="Subject"/> either way.
 /// </summary>
-public sealed class BoundIsPattern(SourceSpan span, BoundExpression subject, BoundExpression test)
-    : BoundExpression(span, test.Type)
+public sealed class BoundIsPattern(
+    SourceSpan span, BoundExpression subject, BoundPatternInput input, BoundPattern pattern)
+    : BoundExpression(span, PrimitiveTypeSymbol.Bool)
 {
-    /// <summary>The value tested, as written. <see cref="Test"/> holds it too.</summary>
-    [SharedSubtree]
+    /// <summary>The value tested, as written.</summary>
     public BoundExpression Subject { get; } = subject;
 
-    public BoundExpression Test { get; } = test;
+    /// <summary>How the pattern names <see cref="Subject"/>.</summary>
+    public BoundPatternInput Input { get; } = input;
+
+    public BoundPattern Pattern { get; } = pattern;
+
+    /// <summary>
+    /// True when the pattern names its subject with nothing but a type test
+    /// first, so the name keeps a reference of its own before anything could
+    /// release the one the subject borrowed.
+    /// </summary>
+    public bool BindsAtOnce { get; init; }
 
     public IReadOnlyList<LocalSymbol> AssignedWhenTrue { get; init; } = [];
     public IReadOnlyList<LocalSymbol> AssignedWhenFalse { get; init; } = [];
@@ -812,6 +828,45 @@ public sealed class BoundIsPattern(SourceSpan span, BoundExpression subject, Bou
 
     public bool NotNullWhenTrue { get; init; }
     public bool NotNullWhenFalse { get; init; }
+}
+
+/// <summary>
+/// <c>value switch { pattern when guard =&gt; result, ... }</c>.
+///
+/// Every arm's value is already converted to <see cref="BoundExpression.Type"/>.
+/// Lowering decides how the arms are reached.
+/// </summary>
+public sealed class BoundSwitchExpression(
+    SourceSpan span, TypeSymbol type, BoundExpression subject, BoundPatternInput input,
+    IReadOnlyList<BoundSwitchArm> arms)
+    : BoundExpression(span, type)
+{
+    public BoundExpression Subject { get; } = subject;
+
+    /// <summary>How every arm's pattern names <see cref="Subject"/>.</summary>
+    public BoundPatternInput Input { get; } = input;
+
+    public IReadOnlyList<BoundSwitchArm> Arms { get; } = arms;
+
+    /// <summary>
+    /// True when the arms cover every value, so the last is reached only by
+    /// what it matches. False when they cover an enum only by naming every
+    /// member, which leaves a value that is none of them.
+    /// </summary>
+    public bool IsTotal { get; init; }
+}
+
+/// <summary>One arm of a switch expression.</summary>
+public sealed class BoundSwitchArm(
+    SourceSpan span, BoundPattern pattern, BoundExpression? guard, BoundExpression value)
+{
+    public SourceSpan Span { get; } = span;
+    public BoundPattern Pattern { get; } = pattern;
+
+    /// <summary>The <c>when</c>, which reads what the pattern named.</summary>
+    public BoundExpression? Guard { get; } = guard;
+
+    public BoundExpression Value { get; } = value;
 }
 
 /// <summary>
@@ -1104,6 +1159,13 @@ public sealed class BoundLocalDeclaration(
 {
     public LocalSymbol Local { get; } = local;
     public BoundExpression? Initializer { get; } = initializer;
+
+    /// <summary>
+    /// True for a local of lowering's own that reads a value something else
+    /// keeps alive for as long as the local is in scope, and so counts nothing.
+    /// The initializer MUST be a value that is borrowed or needs no count.
+    /// </summary>
+    public bool IsBorrowed { get; init; }
 }
 
 public sealed class BoundExpressionStatement(SourceSpan span, BoundExpression expression)
@@ -1295,64 +1357,52 @@ public sealed class BoundParallelFor(
 }
 
 /// <summary>
-/// One arm of a switch: the constants that reach it, and what it runs. The
-/// labels are folded literals, so the emitter can put them straight into an
-/// LLVM <c>switch</c> without evaluating anything.
+/// One label of a switch section: <c>case pattern when guard:</c>. A constant
+/// label is a pattern too, the one that asks for equality.
 /// </summary>
-/// <summary>
-/// One section of a switch. A section reached by a constant has
-/// <see cref="BoundSwitchSection.Labels"/> and becomes an arm of an LLVM
-/// <c>switch</c>; one reached by a pattern has
-/// <see cref="BoundSwitchSection.Tests"/> and becomes a comparison in a chain.
-/// </summary>
-public sealed class BoundSwitchSection(
-    SourceSpan span, IReadOnlyList<BoundExpression> labels, bool isDefault, BoundStatement body)
+public sealed class BoundSwitchLabel(SourceSpan span, BoundPattern pattern, BoundExpression? guard)
 {
-    /// <summary>
-    /// The tests a pattern section is reached by, one per label. Empty for a
-    /// section whose labels are all constants, which is reached by a jump
-    /// table instead.
-    /// </summary>
-    public IReadOnlyList<BoundExpression> Tests { get; init; } = [];
-
     public SourceSpan Span { get; } = span;
-    public IReadOnlyList<BoundExpression> Labels { get; } = labels;
+    public BoundPattern Pattern { get; } = pattern;
+
+    /// <summary>The <c>when</c>, which reads what the pattern named.</summary>
+    public BoundExpression? Guard { get; } = guard;
+}
+
+/// <summary>One section of a switch: the labels that reach it, and what it runs.</summary>
+public sealed class BoundSwitchSection(
+    SourceSpan span, IReadOnlyList<BoundSwitchLabel> labels, bool isDefault, BoundStatement body)
+{
+    public SourceSpan Span { get; } = span;
+    public IReadOnlyList<BoundSwitchLabel> Labels { get; } = labels;
     public bool IsDefault { get; } = isDefault;
     public BoundStatement Body { get; } = body;
-
-    /// <summary>
-    /// For a switch over a variant: the cases that reach this section. They take
-    /// the place of <see cref="Labels"/>, which stays empty, because a case is
-    /// a tag rather than a value the switched expression could equal.
-    /// </summary>
-    public IReadOnlyList<VariantCaseSymbol> Cases { get; init; } = [];
 
     /// <summary>
     /// Where a <c>goto case</c> or <c>goto default</c> lands, or null when
     /// nothing jumps to this section.
     /// </summary>
     public LabelSymbol? Entry { get; set; }
-
-    /// <summary>
-    /// The local a matched case's payload is copied into, for <c>case Circle
-    /// c:</c>. Null for <c>case Circle:</c>, which narrows the switched value
-    /// instead and needs no second name for it.
-    /// </summary>
-    public LocalSymbol? Binding { get; init; }
 }
 
 /// <summary>
-/// A switch. Kept in the bound tree rather than lowered to a chain of ifs for
-/// two reasons: an integer switch becomes one LLVM <c>switch</c>, which decides
-/// for itself whether a jump table beats comparisons; and <c>break</c> has to
-/// mean this construct rather than an enclosing loop, which a lowering to ifs
-/// would lose.
+/// A switch statement: one value, and sections reached by the patterns on
+/// their labels, or by <c>default</c> where none matched.
+///
+/// Lowering decides how a section is reached -- one LLVM <c>switch</c> over
+/// constants or a variant's tag where it can, a tree of tests where it cannot
+/// -- and what <c>break</c> means inside one.
 /// </summary>
 public sealed class BoundSwitch(
-    SourceSpan span, BoundExpression value, IReadOnlyList<BoundSwitchSection> sections)
+    SourceSpan span, BoundExpression subject, BoundPatternInput input,
+    IReadOnlyList<BoundSwitchSection> sections)
     : BoundStatement(span)
 {
-    public BoundExpression Value { get; } = value;
+    public BoundExpression Subject { get; } = subject;
+
+    /// <summary>How every label's pattern names <see cref="Subject"/>.</summary>
+    public BoundPatternInput Input { get; } = input;
+
     public IReadOnlyList<BoundSwitchSection> Sections { get; } = sections;
 
     /// <summary>
@@ -1363,6 +1413,30 @@ public sealed class BoundSwitch(
     public bool IsExhaustive { get; init; }
 }
 
+/// <summary>One destination of a <see cref="BoundSwitchDispatch"/>.</summary>
+/// <param name="Value">The folded constant, for a dispatch over an integer, a char, a bool or an enum.</param>
+/// <param name="Case">The case, for a dispatch over a variant's tag.</param>
+public sealed record BoundDispatchArm(ulong Value, VariantCaseSymbol? Case, LabelSymbol Target);
+
+/// <summary>
+/// A jump to one of several labels by a value: one LLVM <c>switch</c>, which
+/// decides for itself whether a jump table beats comparisons. Lowering makes
+/// it from a run of tests of one value against constants, or of one variant
+/// against its cases; nothing is written as one.
+/// </summary>
+public sealed class BoundSwitchDispatch(
+    SourceSpan span, BoundExpression value, IReadOnlyList<BoundDispatchArm> arms, LabelSymbol otherwise)
+    : BoundStatement(span)
+{
+    /// <summary>The value, or the variant whose tag is asked.</summary>
+    public BoundExpression Value { get; } = value;
+
+    public IReadOnlyList<BoundDispatchArm> Arms { get; } = arms;
+
+    /// <summary>Where a value no arm names goes.</summary>
+    public LabelSymbol Default { get; } = otherwise;
+}
+
 public sealed class BoundReturn(SourceSpan span, BoundExpression? value) : BoundStatement(span)
 {
     public BoundExpression? Value { get; } = value;
@@ -1371,6 +1445,128 @@ public sealed class BoundReturn(SourceSpan span, BoundExpression? value) : Bound
 public sealed class BoundBreak(SourceSpan span) : BoundStatement(span);
 
 public sealed class BoundContinue(SourceSpan span) : BoundStatement(span);
+
+// ---------------------------------------------------------------- patterns
+
+/// <summary>
+/// The value a pattern is asked of, as the expressions inside the pattern
+/// name it. Lowering puts in its place whatever holds that value where the
+/// question is asked.
+/// </summary>
+public sealed class BoundPatternInput(SourceSpan span, TypeSymbol type) : BoundExpression(span, type)
+{
+    /// <summary>What stands for it is always a name for the value, or a read as steady as one.</summary>
+    public override bool IsLValue => true;
+}
+
+/// <summary>
+/// A pattern: a question about a value, the values read from it to ask
+/// further questions of, and the names it gives them. It says what matching
+/// means and nothing about how, which is lowering's to decide.
+/// </summary>
+public abstract class BoundPattern(SourceSpan span)
+{
+    public SourceSpan Span { get; } = span;
+}
+
+/// <summary><c>_</c>, and anything that asks nothing.</summary>
+public sealed class BoundDiscardPattern(SourceSpan span) : BoundPattern(span);
+
+/// <summary><c>var x</c>, and the name after a type or a list: the value, under a name.</summary>
+public sealed class BoundDeclarationPattern(SourceSpan span, LocalSymbol local, BoundExpression value)
+    : BoundPattern(span)
+{
+    public LocalSymbol Local { get; } = local;
+
+    /// <summary>What the name is given, read from the inputs around it.</summary>
+    public BoundExpression Value { get; } = value;
+}
+
+/// <summary>What a test asks, where two tests can be told to ask the same thing.</summary>
+public enum PatternTestKind
+{
+    /// <summary>Whether a variant holds a case. Two cases exclude each other.</summary>
+    Case,
+
+    /// <summary>Whether a value equals a constant. Two constants exclude each other.</summary>
+    Constant,
+
+    /// <summary>Whether a reference or an optional is null.</summary>
+    Null,
+
+    /// <summary>Whether an object is of a class or an interface.</summary>
+    Type,
+}
+
+/// <param name="Value">
+/// The case, the folded constant -- a <c>ulong</c>, or the text of a string --
+/// or the type; null for <see cref="PatternTestKind.Null"/>.
+/// </param>
+/// <param name="Negated">True when the test is true where the question's answer is no.</param>
+public sealed record PatternTestKey(PatternTestKind Kind, object? Value, bool Negated = false);
+
+/// <summary>
+/// <c>3</c>, <c>&gt; 0</c>, <c>null</c>, <c>Circle</c>, <c>Square</c>: a
+/// question about <see cref="Input"/>, as a <c>bool</c> expression over it.
+/// </summary>
+public sealed class BoundTestPattern(
+    SourceSpan span, BoundPatternInput input, BoundExpression test, PatternTestKey? key)
+    : BoundPattern(span)
+{
+    /// <summary>The value asked about.</summary>
+    public BoundPatternInput Input { get; } = input;
+
+    public BoundExpression Test { get; } = test;
+
+    /// <summary>What the test asks, or null for one no other test can be compared with.</summary>
+    public PatternTestKey? Key { get; } = key;
+}
+
+/// <summary>
+/// A value read from the inputs -- a field, a payload, a property, an
+/// element, the object as the class it was found to be -- and the pattern it
+/// has to match.
+/// </summary>
+public sealed class BoundReadPattern(
+    SourceSpan span, BoundPatternInput input, BoundExpression read, BoundPattern pattern)
+    : BoundPattern(span)
+{
+    /// <summary>How <see cref="Pattern"/> names the value read.</summary>
+    public BoundPatternInput Input { get; } = input;
+
+    public BoundExpression Read { get; } = read;
+    public BoundPattern Pattern { get; } = pattern;
+}
+
+/// <summary>
+/// Something done for what it leaves behind: the <c>Deconstruct</c> call a
+/// positional pattern makes, whose <c>out</c> locals the positions then read.
+/// </summary>
+public sealed class BoundEffectPattern(SourceSpan span, BoundExpression effect) : BoundPattern(span)
+{
+    public BoundExpression Effect { get; } = effect;
+}
+
+/// <summary><c>p and q</c>, and the parts of a pattern that all have to match, in order.</summary>
+public sealed class BoundAndPattern(SourceSpan span, IReadOnlyList<BoundPattern> parts)
+    : BoundPattern(span)
+{
+    public IReadOnlyList<BoundPattern> Parts { get; } = parts;
+}
+
+/// <summary><c>p or q</c>.</summary>
+public sealed class BoundOrPattern(SourceSpan span, BoundPattern left, BoundPattern right)
+    : BoundPattern(span)
+{
+    public BoundPattern Left { get; } = left;
+    public BoundPattern Right { get; } = right;
+}
+
+/// <summary><c>not p</c>.</summary>
+public sealed class BoundNotPattern(SourceSpan span, BoundPattern operand) : BoundPattern(span)
+{
+    public BoundPattern Operand { get; } = operand;
+}
 
 /// <summary>A fully bound function ready for emission.</summary>
 public sealed class BoundFunction(FunctionSymbol symbol, BoundBlock body)

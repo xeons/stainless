@@ -50,6 +50,12 @@ public abstract class BoundTreeWalker
             VisitChildren(expression);
     }
 
+    public virtual void Visit(BoundPattern? pattern)
+    {
+        if (pattern is not null)
+            VisitChildren(pattern);
+    }
+
     protected void VisitAll(IReadOnlyList<BoundExpression> expressions)
     {
         foreach (var expression in expressions)
@@ -103,13 +109,21 @@ public abstract class BoundTreeWalker
                 break;
 
             case BoundSwitch chosen:
-                Visit(chosen.Value);
+                Visit(chosen.Subject);
                 foreach (var section in chosen.Sections)
                 {
-                    VisitAll(section.Labels);
-                    VisitAll(section.Tests);
+                    foreach (var label in section.Labels)
+                    {
+                        Visit(label.Pattern);
+                        Visit(label.Guard);
+                    }
+
                     Visit(section.Body);
                 }
+                break;
+
+            case BoundSwitchDispatch dispatch:
+                Visit(dispatch.Value);
                 break;
 
             case BoundAsm assembly:
@@ -153,7 +167,7 @@ public abstract class BoundTreeWalker
                 or BoundNullLiteral or BoundLocalAccess or BoundParameterAccess or BoundStaticAccess
                 or BoundConstantAccess or BoundDefault or BoundSizeof or BoundAlignof or BoundOffsetof
                 or BoundTypeof or BoundIidof or BoundEmbed or BoundThis or BoundFunctionReference
-                or BoundUnmatchedSwitch or BoundOutDraft or BoundLambda:
+                or BoundUnmatchedSwitch or BoundOutDraft or BoundLambda or BoundPatternInput:
                 break;
 
             case BoundInterpolatedString interpolated: VisitAll(interpolated.Parts); break;
@@ -248,7 +262,20 @@ public abstract class BoundTreeWalker
                 break;
 
             case BoundTypeTest test: Visit(test.Value); break;
-            case BoundIsPattern matched: Visit(matched.Test); break;
+            case BoundIsPattern matched:
+                Visit(matched.Subject);
+                Visit(matched.Pattern);
+                break;
+
+            case BoundSwitchExpression chosen:
+                Visit(chosen.Subject);
+                foreach (var arm in chosen.Arms)
+                {
+                    Visit(arm.Pattern);
+                    Visit(arm.Guard);
+                    Visit(arm.Value);
+                }
+                break;
             case BoundConversion conversion: Visit(conversion.Operand); break;
             case BoundNew created: VisitAll(created.Arguments); break;
             case BoundStructNew filled: VisitAll(filled.Arguments); break;
@@ -271,6 +298,40 @@ public abstract class BoundTreeWalker
 
             default:
                 throw Unknown(expression, expression.Span);
+        }
+    }
+
+    public void VisitChildren(BoundPattern pattern)
+    {
+        switch (pattern)
+        {
+            case BoundDiscardPattern:
+                break;
+
+            case BoundDeclarationPattern named: Visit(named.Value); break;
+            case BoundTestPattern test: Visit(test.Test); break;
+
+            case BoundReadPattern read:
+                Visit(read.Read);
+                Visit(read.Pattern);
+                break;
+
+            case BoundEffectPattern effect: Visit(effect.Effect); break;
+
+            case BoundAndPattern both:
+                foreach (var part in both.Parts)
+                    Visit(part);
+                break;
+
+            case BoundOrPattern either:
+                Visit(either.Left);
+                Visit(either.Right);
+                break;
+
+            case BoundNotPattern negated: Visit(negated.Operand); break;
+
+            default:
+                throw Unknown(pattern, pattern.Span);
         }
     }
 
@@ -362,12 +423,6 @@ internal sealed class CaptureWalker(LocalSymbol loopVariable) : BoundTreeWalker
                 _declared.Add(nested.Variable);
                 break;
 
-            case BoundSwitch chosen:
-                foreach (var section in chosen.Sections)
-                    if (section.Binding is { } binding)
-                        _declared.Add(binding);
-                break;
-
             // An output is an assignment to its place, and every chunk of a
             // `for parallel` storing into one outside variable is the race the
             // rule exists for.
@@ -424,6 +479,15 @@ internal sealed class CaptureWalker(LocalSymbol loopVariable) : BoundTreeWalker
         }
 
         base.Visit(expression);
+    }
+
+    // A name a pattern declared belongs to the iteration that matched it.
+    public override void Visit(BoundPattern? pattern)
+    {
+        if (pattern is BoundDeclarationPattern named)
+            _declared.Add(named.Local);
+
+        base.Visit(pattern);
     }
 }
 
@@ -504,7 +568,11 @@ internal sealed class FieldReadCollector(HashSet<FieldSymbol> into) : BoundTreeW
     }
 }
 
-/// <summary>Whether a function holds somewhere a jump lands: a label, or a switch section a <c>goto case</c> names.</summary>
+/// <summary>
+/// Whether a function holds somewhere a jump can land from after it: a label,
+/// or a switch section a <c>goto case</c> names. A label lowering made is
+/// reached only from before it, and does not count.
+/// </summary>
 internal sealed class LabelFinder : BoundTreeWalker
 {
     public bool Found { get; private set; }
@@ -523,7 +591,7 @@ internal sealed class LabelFinder : BoundTreeWalker
 
         switch (statement)
         {
-            case BoundLabel:
+            case BoundLabel { Label.IsForwardOnly: false }:
             case BoundSwitch chosen when chosen.Sections.Any(s => s.Entry is not null):
                 Found = true;
                 return;

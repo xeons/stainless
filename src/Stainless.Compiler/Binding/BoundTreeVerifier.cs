@@ -73,10 +73,8 @@ public static class BoundTreeVerifier
     /// Whether a node is one only the semantic tree holds, which lowering
     /// rewrites into the core and the emitter has no case for.
     /// </summary>
-    private static bool IsSemanticOnly(object node) => node switch
-    {
-        _ => false,
-    };
+    private static bool IsSemanticOnly(object node) =>
+        node is BoundSwitch or BoundSwitchExpression or BoundIsPattern or BoundPatternInput;
 
     /// <summary>
     /// Whether a type is one binding settles or refuses, and so has no
@@ -110,22 +108,13 @@ public static class BoundTreeVerifier
                     Declare(declaration.Local, declaration.Span);
                     break;
 
-                case BoundSwitch chosen:
-                    foreach (var section in chosen.Sections)
-                    {
-                        if (section.Binding is { } binding)
-                            Declare(binding, section.Span);
-
-                        foreach (var label in section.Labels)
-                        {
-                            if (!IsConstant(label))
-                                throw Fault("a switch label that is not a constant", label.Span);
-                            if (!label.Type.Equals(chosen.Value.Type))
-                                throw Fault(
-                                    $"a label of '{label.Type.Name}' in a switch over " +
-                                    $"'{chosen.Value.Type.Name}'", label.Span);
-                        }
-                    }
+                case BoundSwitchDispatch dispatch:
+                    if (dispatch.Value.Type is not VariantTypeSymbol && !IsOrdinal(dispatch.Value.Type))
+                        throw Fault(
+                            $"a dispatch over '{dispatch.Value.Type.Name}', which has no constants to jump by",
+                            dispatch.Span);
+                    if (dispatch.Arms.Any(arm => arm.Case is null == dispatch.Value.Type is VariantTypeSymbol))
+                        throw Fault("a dispatch arm that is not what the value is", dispatch.Span);
                     break;
 
                 case BoundParallelFor loop:
@@ -192,6 +181,17 @@ public static class BoundTreeVerifier
                     Declare(held.Local, held.Span);
                     break;
 
+                case BoundPatternInput when _patterns == 0:
+                    throw Fault("a pattern's input read outside the pattern", expression.Span);
+
+                case BoundSwitchExpression chosen:
+                    foreach (var arm in chosen.Arms)
+                        if (!SameType(arm.Value.Type, chosen.Type))
+                            throw Fault(
+                                $"a switch of '{chosen.Type.Name}' with an arm of '{arm.Value.Type.Name}'",
+                                arm.Span);
+                    break;
+
                 case BoundTry attempt:
                     Declare(attempt.Slot, attempt.Span);
                     break;
@@ -235,6 +235,28 @@ public static class BoundTreeVerifier
             Representable(expression.Type, expression.Span);
             base.Visit(expression);
         }
+
+        /// <summary>How deep inside patterns the walk is, where an input may be read.</summary>
+        private int _patterns;
+
+        public override void Visit(BoundPattern? pattern)
+        {
+            if (pattern is null)
+                return;
+
+            if (form == BoundTreeForm.Lowered)
+                throw Fault($"{pattern.GetType().Name} survived lowering", pattern.Span);
+
+            if (pattern is BoundDeclarationPattern named)
+                Declare(named.Local, named.Span);
+
+            _patterns++;
+            base.Visit(pattern);
+            _patterns--;
+        }
+
+        private static bool IsOrdinal(TypeSymbol type) =>
+            type is PrimitiveTypeSymbol { IsInteger: true } or EnumTypeSymbol || type.IsBool();
 
         private void Declare(LocalSymbol local, SourceSpan span)
         {
@@ -281,13 +303,6 @@ public static class BoundTreeVerifier
             BoundFieldAccess field => field.Field.ContainingType is not StructTypeSymbol ||
                                       field.Receiver is not null && HasAddress(field.Receiver),
             BoundIndex element => element.Target.Type is not FixedArrayTypeSymbol || HasAddress(element.Target),
-            _ => false,
-        };
-
-        private static bool IsConstant(BoundExpression label) => label switch
-        {
-            BoundLiteral or BoundConstantAccess or BoundStringLiteral or BoundNullLiteral => true,
-            BoundConversion conversion => IsConstant(conversion.Operand),
             _ => false,
         };
 

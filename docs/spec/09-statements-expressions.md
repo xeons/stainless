@@ -269,19 +269,25 @@ and a variant which case it holds; any other value is exactly what it was
 declared to be, so the one type it matches is its own — `(int count, _)` over
 an `(int, String)` names the first element — and any other is SL0438.
 
-**A pattern is a question, and every one of them becomes the `bool` that asks
-it** — a comparison, a tag test, `is`, a member read, a length. There is no
-matching machinery underneath. A value a pattern reads more than once is held
-in a name for the length of the test, so a property's getter runs once however
-many questions are asked of what it returned, and a part is read only after
-what it is part of is known to be there.
+**A pattern is a question, and every one of them is asked by a `bool`** — a
+comparison, a tag test, `is`, a member read, a length. There is no matching
+machinery underneath. A value a pattern reads more than once is held in a name
+while it is asked about, so a property's getter runs once however many
+questions are asked of what it returned, and a part is read only after what it
+is part of is known to be there.
 
-**A switch whose labels are all constants is unchanged**: one LLVM `switch`
-instruction, and a jump table if LLVM decides on one. A single pattern anywhere
-in it turns the whole switch into a chain of tests asked in order, because a
-type, a range and a `when` are not values the governor could equal. Everything
-else about the statement stays as it was — sections that may not fall through,
-`break` that belongs to the switch, `continue` that passes through it.
+**The labels are asked in order, and each question once.** A later label that
+asks what an earlier one already asked of the same value — the same case of a
+variant, the same constant, null — has its answer, and one asking for another
+case of a variant already known to hold this one is not asked at all; a value
+read from the one switched on is read once on any path. A run of questions of
+one value against constants, or of one variant against its cases, is one LLVM
+`switch` instruction. So a switch whose labels are all constants is a jump
+table if LLVM decides on one, and a switch over a variant dispatches on its
+tag before it asks anything else, whatever its labels go on to ask. Everything
+else about the statement is the same with patterns as without — sections that
+may not fall through, `break` that belongs to the switch, `continue` that
+passes through it.
 
 **A name belongs to one label** (SL0619). A section reached by two of them has
 proved nothing about which, so there would be nothing for the name to be; the
@@ -366,12 +372,12 @@ it and the rest convert to it.
 **An arm nothing can reach is a warning** (SL0621): an arm after `_`, or one
 whose every value the arms before it already match.
 
-It lowers to the value held in a name and a conditional per arm — `t is P1 ? e1
-: t is P2 ? e2 : e3` — so nothing written this way can do anything a chain of
-ternaries could not, and the arm a test fails falls into the next conditional
-rather than into a copy of the rest. Where the arms cover everything, the last
-one's test is not asked, because whatever reaches it matches; it is still run,
-for the names it assigns.
+It is asked the way a statement's labels are, each question once, and written
+as conditionals: the value held in a name, and a ternary per question — so
+nothing written this way can do anything a chain of ternaries could not. An
+arm that two paths reach is chosen by its number rather than written twice.
+Where the arms cover everything, the last one's test is not asked, because
+whatever reaches it matches; it is still run, for the names it assigns.
 
 ## 9.2 `parallel`, `spawn` and `for parallel`
 

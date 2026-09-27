@@ -121,7 +121,7 @@ public sealed partial class Binder
         // computed needs the cast the author writes, here as anywhere else --
         // and an arm that does not fit then says so where it is written.
         if (target is PrimitiveTypeSymbol { IsNumeric: true } &&
-            expression is BoundConditional or BoundLet &&
+            expression is BoundConditional or BoundLet or BoundSwitchExpression &&
             ArmsAreLiterals(expression))
             return ConvertArms(expression, target, span);
 
@@ -458,16 +458,17 @@ public sealed partial class Binder
     /// <summary>
     /// Whether every value this could produce is written out as a number.
     ///
-    /// A conditional produces one of its arms and a switch expression is a
-    /// chain of conditionals held in a name, so neither has a value of its own
-    /// for a conversion to act on. Asking the arms is what makes
-    /// <c>nuint n = flag ? 1 : 2</c> mean what <c>nuint n = 1</c> means.
+    /// A conditional and a switch expression each produce one of their arms,
+    /// so neither has a value of its own for a conversion to act on. Asking
+    /// the arms is what makes <c>nuint n = flag ? 1 : 2</c> mean what
+    /// <c>nuint n = 1</c> means.
     /// </summary>
     private static bool ArmsAreLiterals(BoundExpression expression) => expression switch
     {
         BoundConditional choice =>
             ArmsAreLiterals(choice.WhenTrue) && ArmsAreLiterals(choice.WhenFalse),
         BoundLet held => ArmsAreLiterals(held.Body),
+        BoundSwitchExpression chosen => chosen.Arms.All(arm => ArmsAreLiterals(arm.Value)),
         _ => IntegerLiteral(expression) is not null ||
              expression is BoundLiteral { Type: PrimitiveTypeSymbol { IsNumeric: true } },
     };
@@ -486,6 +487,16 @@ public sealed partial class Binder
 
         BoundLet held => new BoundLet(
             held.Span, held.Local, held.Value, ConvertArms(held.Body, target, span)),
+
+        BoundSwitchExpression chosen => new BoundSwitchExpression(
+            chosen.Span, target, chosen.Subject, chosen.Input,
+            chosen.Arms
+                .Select(arm => new BoundSwitchArm(arm.Span, arm.Pattern, arm.Guard,
+                    ConvertArms(arm.Value, target, arm.Value.Span)))
+                .ToList())
+        {
+            IsTotal = chosen.IsTotal,
+        },
 
         _ => BindConversion(expression, target, span),
     };

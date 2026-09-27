@@ -16,6 +16,7 @@
 
 using Stainless.Source;
 using Stainless.Syntax;
+using static Stainless.Binding.BoundValues;
 
 namespace Stainless.Binding;
 
@@ -1187,12 +1188,8 @@ public sealed partial class Binder
 
     /// <summary>
     /// Binds a switch: one governing value, and sections whose labels are
-    /// constants of its type.
-    ///
-    /// A reference-typed governor is spilled into a hidden local first. The
-    /// comparisons span several basic blocks, and a local is owned storage the
-    /// ordinary scope machinery releases on every path out — including a
-    /// <c>return</c> from the middle of a section.
+    /// constants of its type. Each label is the pattern that asks for that
+    /// constant, which is what lets one lowering reach every kind of section.
     /// </summary>
     private BoundStatement BindSwitch(SwitchSyntax syntax)
     {
@@ -1226,17 +1223,7 @@ public sealed partial class Binder
             return new BoundBlock(syntax.Span, []);
         }
 
-        // The value is compared in one block and used in several, so a String
-        // has to outlive the comparison chain. A local does that for free.
-        BoundLocalDeclaration? spill = null;
-        if (value.Type.NeedsArc())
-        {
-            var held = DeclareLocal(
-                SyntheticName("switch"), value.Type, isConst: true, syntax.Value.Span);
-            spill = new BoundLocalDeclaration(syntax.Value.Span, held, value);
-            value = new BoundLocalAccess(syntax.Value.Span, held);
-        }
-
+        var input = new BoundPatternInput(syntax.Value.Span, value.Type);
         var sections = new List<BoundSwitchSection>();
         var seenOrdinals = new Dictionary<ulong, SourceSpan>();
         var seenText = new Dictionary<string, SourceSpan>(StringComparer.Ordinal);
@@ -1247,7 +1234,7 @@ public sealed partial class Binder
 
         foreach (var section in syntax.Sections)
         {
-            var labels = new List<BoundExpression>();
+            var labels = new List<BoundSwitchLabel>();
             int index = sections.Count;
 
             foreach (var label in section.Labels)
@@ -1269,7 +1256,7 @@ public sealed partial class Binder
                             $"this switch already has a case for \"{text.Value}\"");
                     else
                     {
-                        labels.Add(text);
+                        labels.Add(ConstantLabel(label.Span, input, text, text.Value));
                         frame.Cases[text.Value] = index;
                     }
 
@@ -1293,7 +1280,8 @@ public sealed partial class Binder
                     // The folded value, not the expression it was written as:
                     // `case -1:` is a negation, and an LLVM switch arm has to
                     // be a constant rather than an instruction.
-                    labels.Add(new BoundLiteral(label.Span, value.Type, bits));
+                    labels.Add(ConstantLabel(
+                        label.Span, input, new BoundLiteral(label.Span, value.Type, bits), bits));
                     frame.Cases[bits] = index;
                 }
             }
@@ -1330,10 +1318,17 @@ public sealed partial class Binder
         _context.SwitchDepth--;
         CloseSwitchFrame(frame, sections);
 
-        BoundStatement result = new BoundSwitch(syntax.Span, value, sections);
-        return spill is null
-            ? result
-            : new BoundBlock(syntax.Span, [spill, result]);
+        return new BoundSwitch(syntax.Span, value, input, sections);
+    }
+
+    /// <summary><c>case 3:</c>, as the pattern that asks for equality with the folded constant.</summary>
+    private BoundSwitchLabel ConstantLabel(
+        SourceSpan span, BoundPatternInput input, BoundExpression constant, object folded)
+    {
+        var test = BindBinaryOperation(span, input, BoundBinaryOp.Equal, constant, TokenKind.EqualsEquals);
+        return new BoundSwitchLabel(span,
+            new BoundTestPattern(span, input, test, new PatternTestKey(PatternTestKind.Constant, folded)),
+            null);
     }
 
     /// <summary>
@@ -1349,18 +1344,7 @@ public sealed partial class Binder
     private BoundStatement BindVariantSwitch(
         SwitchSyntax syntax, BoundExpression value, VariantTypeSymbol variant)
     {
-        // Narrowing is about a name, so one is made when there is not one
-        // already. It also gives the value somewhere to live for the length of
-        // the switch, which a variant holding a reference needs anyway.
-        BoundLocalDeclaration? spill = null;
-        if (NarrowableSubject(value) is null)
-        {
-            var held = DeclareLocal(
-                SyntheticName("switch"), variant, isConst: true, syntax.Value.Span);
-            spill = new BoundLocalDeclaration(syntax.Value.Span, held, value);
-            value = new BoundLocalAccess(syntax.Value.Span, held);
-        }
-
+        var input = new BoundPatternInput(syntax.Value.Span, value.Type);
         var subject = NarrowableSubject(value);
         var sections = new List<BoundSwitchSection>();
         var covered = new Dictionary<VariantCaseSymbol, SourceSpan>();
@@ -1459,18 +1443,26 @@ public sealed partial class Binder
 
             PushScope();
 
-            var statements = new List<BoundStatement>();
-            LocalSymbol? binding = null;
-
-            if (bound is not null)
+            var labels = new List<BoundSwitchLabel>();
+            foreach (var matched in cases)
             {
-                binding = DeclareLocal(boundName, bound.Payload!, isConst: true, boundSpan);
-                statements.Add(new BoundLocalDeclaration(boundSpan, binding,
-                    new BoundVariantPayload(boundSpan, value, bound, null)));
+                BoundPattern pattern = CaseTest(section.Span, input, matched);
+
+                if (ReferenceEquals(matched, bound))
+                {
+                    var binding = DeclareLocal(boundName, bound.Payload!, isConst: true, boundSpan);
+                    pattern = new BoundAndPattern(boundSpan,
+                    [
+                        pattern,
+                        new BoundDeclarationPattern(boundSpan, binding,
+                            new BoundVariantPayload(boundSpan, input, bound, null)),
+                    ]);
+                }
+
+                labels.Add(new BoundSwitchLabel(section.Span, pattern, null));
             }
 
-            statements.AddRange(BindStatementList(section.Statements));
-            var body = new BoundBlock(section.Span, statements);
+            var body = new BoundBlock(section.Span, BindStatementList(section.Statements));
 
             PopScope();
             _context.VariantFacts = saved;
@@ -1481,11 +1473,7 @@ public sealed partial class Binder
                     "'return', 'continue' or 'goto'. Stack the labels instead, as in " +
                     "'case Circle: case Rect:', when two cases share a body");
 
-            sections.Add(new BoundSwitchSection(section.Span, [], section.HasDefault, body)
-            {
-                Cases = cases,
-                Binding = binding,
-            });
+            sections.Add(new BoundSwitchSection(section.Span, labels, section.HasDefault, body));
         }
 
         _context.SwitchDepth--;
@@ -1501,12 +1489,10 @@ public sealed partial class Binder
                 "has no answer for it. Add the case, or a 'default'",
                 variant);
 
-        BoundStatement result = new BoundSwitch(syntax.Span, value, sections)
+        return new BoundSwitch(syntax.Span, value, input, sections)
         {
             IsExhaustive = missing.Count == 0,
         };
-
-        return spill is null ? result : new BoundBlock(syntax.Span, [spill, result]);
     }
 
     /// <summary>

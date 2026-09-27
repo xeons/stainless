@@ -762,6 +762,83 @@ public class EmitterTests
     /// newline, anything outside printable ASCII — and a carriage return is
     /// dropped, so a file saved with either line ending emits the same IR.
     /// </summary>
+    // ------------------------------------------------------------- matching
+
+    /// <summary>
+    /// A switch over constants of an integer, a char or an enum is one LLVM
+    /// <c>switch</c>, with an arm per label and nothing compared first, so a
+    /// jump table stays LLVM's decision. The patterns it is written with are
+    /// lowered by the same tree every other switch is.
+    /// </summary>
+    [Theory]
+    [InlineData("int", "1", "2", "3", "switch i32 ")]
+    [InlineData("char", "'a'", "'b'", "'c'", "switch i8 ")]
+    [InlineData("Level", "Level.Low", "Level.Mid", "Level.High", "switch i32 ")]
+    public void AConstantSwitchIsOneLlvmSwitch(string type, string first, string second, string third, string wanted)
+    {
+        string body = Front.TestFunction(Front.ModuleIr($$"""
+            public enum Level { Low, Mid, High }
+            public int F({{type}} value)
+            {
+                switch (value)
+                {
+                    case {{first}}: return 10;
+                    case {{second}}: case {{third}}: return 20;
+                    default: return 30;
+                }
+            }
+            """), "F");
+
+        Assert.Equal(1, Occurrences(body, wanted));
+        Assert.Equal(4, Occurrences(body, ", label %"));
+        Assert.DoesNotContain("icmp eq", body);
+    }
+
+    /// <summary>
+    /// A switch over a variant is one <c>switch</c> over its tag, whether its
+    /// labels name cases, name cases and bind their payloads, or are patterns
+    /// that ask the case first.
+    /// </summary>
+    [Theory]
+    [InlineData("case Circle c: return c.Radius; case Square: return 1.0;")]
+    [InlineData("case Circle { Radius: > 1.0 }: return 2.0; case Circle c: return c.Radius; case Square: return 1.0;")]
+    public void AVariantSwitchDispatchesOnItsTag(string sections)
+    {
+        string body = Front.TestFunction(Front.ModuleIr($$"""
+            public variant Shape { Circle(double Radius); Square(double Side); }
+            public double F(Shape shape)
+            {
+                switch (shape)
+                {
+                    {{sections}}
+                }
+                return 0.0;
+            }
+            """), "F");
+
+        Assert.Equal(1, Occurrences(body, "switch i8 "));
+    }
+
+    /// <summary>
+    /// A switch expression asks each question once on any path: a later arm
+    /// that asks for the same case as an earlier one is not asked again.
+    /// </summary>
+    [Fact]
+    public void ASwitchExpressionAsksACaseOnce()
+    {
+        string body = Front.TestFunction(Front.ModuleIr("""
+            public variant Shape { Circle(double Radius); Square(double Side); }
+            public double F(Shape shape) => shape switch
+            {
+                Circle { Radius: > 1.0 } => 2.0,
+                Circle c => c.Radius,
+                Square s => s.Side,
+            };
+            """), "F");
+
+        Assert.Equal(1, Occurrences(body, "icmp eq i8"));
+    }
+
     [Theory]
     [InlineData("mov rax, 1\r\nret", "mov rax, 1\\0Aret")]
     [InlineData(".ascii \"a\\b\"", ".ascii \\22a\\5Cb\\22")]

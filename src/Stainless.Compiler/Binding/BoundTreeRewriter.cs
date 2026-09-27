@@ -37,6 +37,8 @@ public abstract class BoundTreeRewriter
 
     public virtual BoundExpression Rewrite(BoundExpression expression) => RewriteChildren(expression);
 
+    public virtual BoundPattern Rewrite(BoundPattern pattern) => RewriteChildren(pattern);
+
     protected BoundStatement? RewriteOptional(BoundStatement? statement) =>
         statement is null ? null : Rewrite(statement);
 
@@ -75,6 +77,21 @@ public abstract class BoundTreeRewriter
         return rebuilt ?? statements;
     }
 
+    private IReadOnlyList<BoundPattern> RewriteAll(IReadOnlyList<BoundPattern> patterns)
+    {
+        List<BoundPattern>? rebuilt = null;
+
+        for (int i = 0; i < patterns.Count; i++)
+        {
+            var rewritten = Rewrite(patterns[i]);
+            if (rebuilt is null && !ReferenceEquals(rewritten, patterns[i]))
+                rebuilt = [.. patterns.Take(i)];
+            rebuilt?.Add(rewritten);
+        }
+
+        return rebuilt ?? patterns;
+    }
+
     private static bool Same<T>(T before, T after) where T : class? => ReferenceEquals(before, after);
 
     private static bool Same<T>(IReadOnlyList<T> before, IReadOnlyList<T> after) =>
@@ -102,7 +119,10 @@ public abstract class BoundTreeRewriter
                 var initializer = RewriteOptional(declaration.Initializer);
                 return Same(declaration.Initializer, initializer)
                     ? declaration
-                    : new BoundLocalDeclaration(declaration.Span, declaration.Local, initializer);
+                    : new BoundLocalDeclaration(declaration.Span, declaration.Local, initializer)
+                    {
+                        IsBorrowed = declaration.IsBorrowed,
+                    };
             }
 
             case BoundExpressionStatement expression:
@@ -177,16 +197,26 @@ public abstract class BoundTreeRewriter
 
             case BoundSwitch chosen:
             {
-                var value = Rewrite(chosen.Value);
+                var subject = Rewrite(chosen.Subject);
                 var sections = new List<BoundSwitchSection>();
-                bool changed = !Same(chosen.Value, value);
+                bool changed = !Same(chosen.Subject, subject);
 
                 foreach (var section in chosen.Sections)
                 {
-                    var labels = RewriteAll(section.Labels);
-                    var tests = RewriteAll(section.Tests);
+                    var labels = new List<BoundSwitchLabel>();
+                    bool labelsChanged = false;
+
+                    foreach (var label in section.Labels)
+                    {
+                        var pattern = Rewrite(label.Pattern);
+                        var guard = RewriteOptional(label.Guard);
+                        bool same = Same(label.Pattern, pattern) && Same(label.Guard, guard);
+                        labelsChanged |= !same;
+                        labels.Add(same ? label : new BoundSwitchLabel(label.Span, pattern, guard));
+                    }
+
                     var body = Rewrite(section.Body);
-                    if (Same(section.Labels, labels) && Same(section.Tests, tests) && Same(section.Body, body))
+                    if (!labelsChanged && Same(section.Body, body))
                     {
                         sections.Add(section);
                         continue;
@@ -195,16 +225,24 @@ public abstract class BoundTreeRewriter
                     changed = true;
                     sections.Add(new BoundSwitchSection(section.Span, labels, section.IsDefault, body)
                     {
-                        Tests = tests,
-                        Cases = section.Cases,
                         Entry = section.Entry,
-                        Binding = section.Binding,
                     });
                 }
 
                 return changed
-                    ? new BoundSwitch(chosen.Span, value, sections) { IsExhaustive = chosen.IsExhaustive }
+                    ? new BoundSwitch(chosen.Span, subject, chosen.Input, sections)
+                    {
+                        IsExhaustive = chosen.IsExhaustive,
+                    }
                     : chosen;
+            }
+
+            case BoundSwitchDispatch dispatch:
+            {
+                var value = Rewrite(dispatch.Value);
+                return Same(dispatch.Value, value)
+                    ? dispatch
+                    : new BoundSwitchDispatch(dispatch.Span, value, dispatch.Arms, dispatch.Default);
             }
 
             case BoundAsm assembly:
@@ -285,7 +323,7 @@ public abstract class BoundTreeRewriter
                 or BoundNullLiteral or BoundLocalAccess or BoundParameterAccess or BoundStaticAccess
                 or BoundConstantAccess or BoundDefault or BoundSizeof or BoundAlignof or BoundOffsetof
                 or BoundTypeof or BoundIidof or BoundEmbed or BoundThis or BoundFunctionReference
-                or BoundUnmatchedSwitch or BoundOutDraft or BoundLambda:
+                or BoundUnmatchedSwitch or BoundOutDraft or BoundLambda or BoundPatternInput:
                 return expression;
 
             case BoundInterpolatedString interpolated:
@@ -373,6 +411,7 @@ public abstract class BoundTreeRewriter
                     : new BoundAssignment(assignment.Span, target, value)
                     {
                         DeclaresLocal = assignment.DeclaresLocal,
+                        IsInitialization = assignment.IsInitialization,
                     };
             }
 
@@ -589,13 +628,13 @@ public abstract class BoundTreeRewriter
                     : new BoundTypeTest(test.Span, test.Type, value, test.Tested);
             }
 
-            // The subject is also inside the test, and is not rebuilt apart from it.
             case BoundIsPattern matched:
             {
-                var test = Rewrite(matched.Test);
-                return Same(matched.Test, test)
+                var subject = Rewrite(matched.Subject);
+                var pattern = Rewrite(matched.Pattern);
+                return Same(matched.Subject, subject) && Same(matched.Pattern, pattern)
                     ? matched
-                    : new BoundIsPattern(matched.Span, matched.Subject, test)
+                    : new BoundIsPattern(matched.Span, subject, matched.Input, pattern)
                     {
                         AssignedWhenTrue = matched.AssignedWhenTrue,
                         AssignedWhenFalse = matched.AssignedWhenFalse,
@@ -603,7 +642,37 @@ public abstract class BoundTreeRewriter
                         CaseWhenFalse = matched.CaseWhenFalse,
                         NotNullWhenTrue = matched.NotNullWhenTrue,
                         NotNullWhenFalse = matched.NotNullWhenFalse,
+                        BindsAtOnce = matched.BindsAtOnce,
                     };
+            }
+
+            case BoundSwitchExpression chosen:
+            {
+                var subject = Rewrite(chosen.Subject);
+                var arms = new List<BoundSwitchArm>();
+                bool changed = !Same(chosen.Subject, subject);
+
+                foreach (var arm in chosen.Arms)
+                {
+                    var pattern = Rewrite(arm.Pattern);
+                    var guard = RewriteOptional(arm.Guard);
+                    var value = Rewrite(arm.Value);
+                    if (Same(arm.Pattern, pattern) && Same(arm.Guard, guard) && Same(arm.Value, value))
+                    {
+                        arms.Add(arm);
+                        continue;
+                    }
+
+                    changed = true;
+                    arms.Add(new BoundSwitchArm(arm.Span, pattern, guard, value));
+                }
+
+                return changed
+                    ? new BoundSwitchExpression(chosen.Span, chosen.Type, subject, chosen.Input, arms)
+                    {
+                        IsTotal = chosen.IsTotal,
+                    }
+                    : chosen;
             }
 
             case BoundConversion conversion:
@@ -701,6 +770,76 @@ public abstract class BoundTreeRewriter
 
             default:
                 throw Unknown(expression, expression.Span);
+        }
+    }
+
+    // ------------------------------------------------------------ patterns
+
+    public BoundPattern RewriteChildren(BoundPattern pattern)
+    {
+        switch (pattern)
+        {
+            case BoundDiscardPattern:
+                return pattern;
+
+            case BoundDeclarationPattern named:
+            {
+                var value = Rewrite(named.Value);
+                return Same(named.Value, value)
+                    ? named
+                    : new BoundDeclarationPattern(named.Span, named.Local, value);
+            }
+
+            case BoundTestPattern test:
+            {
+                var condition = Rewrite(test.Test);
+                return Same(test.Test, condition)
+                    ? test
+                    : new BoundTestPattern(test.Span, test.Input, condition, test.Key);
+            }
+
+            case BoundReadPattern read:
+            {
+                var value = Rewrite(read.Read);
+                var inner = Rewrite(read.Pattern);
+                return Same(read.Read, value) && Same(read.Pattern, inner)
+                    ? read
+                    : new BoundReadPattern(read.Span, read.Input, value, inner);
+            }
+
+            case BoundEffectPattern effect:
+            {
+                var done = Rewrite(effect.Effect);
+                return Same(effect.Effect, done)
+                    ? effect
+                    : new BoundEffectPattern(effect.Span, done);
+            }
+
+            case BoundAndPattern both:
+            {
+                var parts = RewriteAll(both.Parts);
+                return Same(both.Parts, parts) ? both : new BoundAndPattern(both.Span, parts);
+            }
+
+            case BoundOrPattern either:
+            {
+                var left = Rewrite(either.Left);
+                var right = Rewrite(either.Right);
+                return Same(either.Left, left) && Same(either.Right, right)
+                    ? either
+                    : new BoundOrPattern(either.Span, left, right);
+            }
+
+            case BoundNotPattern negated:
+            {
+                var operand = Rewrite(negated.Operand);
+                return Same(negated.Operand, operand)
+                    ? negated
+                    : new BoundNotPattern(negated.Span, operand);
+            }
+
+            default:
+                throw Unknown(pattern, pattern.Span);
         }
     }
 

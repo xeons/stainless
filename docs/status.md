@@ -249,18 +249,20 @@ last person to edit it -- the suite is the authority.
   `_`, `var`, members (`{ Owner.Name: "a" }`), positions (`(0, var y)`,
   `Circle(var r)`, through a `Deconstruct`), elements (`[1, .., var last]`,
   where `.. var rest` is a slice of the same array), and a `when` on any of
-  them. Each becomes the `bool` that asks it -- a comparison, a tag test, an
-  `is`, a member read -- so there is no matching machinery underneath. A
-  switch whose labels are all constants is still one LLVM `switch` and a jump
-  table; one with a pattern in it is a chain of tests
+  them. Each is asked by a `bool` -- a comparison, a tag test, an `is`, a
+  member read -- and each question once: a switch, a switch expression and
+  `is` are lowered by one decision tree, which remembers what an earlier label
+  asked. A run of questions of one value against constants or a variant's
+  cases is one LLVM `switch`, so a switch of constants is a jump table and a
+  pattern switch over a variant dispatches on its tag
 - `switch` as an expression: `n switch { < 0 => "negative", _ => "large" }`,
   which must be exhaustive (SL0620) because it has to produce a value and there
   is no exception to throw at a value that matched nothing. Coverage follows
   bools, a variant's cases, an enum's members, and the same nested in tuples,
   payloads, members and lists, and an arm nothing reaches is a warning
   (SL0621). An enum whose members are all named needs no `_`, and a value that
-  is none of them ends the program. It lowers to the value held in a name and a
-  conditional per arm
+  is none of them ends the program. It lowers by the tree a statement does,
+  written as conditionals
 - A lambda with written parameter types has a type of its own, so `var doubled
   = (int x) => x * 2;` is a `closure int(int)` -- cached by signature, so two of
   a shape are one type, and a declared `closure` of that shape is

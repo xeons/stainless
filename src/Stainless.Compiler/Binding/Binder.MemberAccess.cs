@@ -16,6 +16,7 @@
 
 using Stainless.Source;
 using Stainless.Syntax;
+using static Stainless.Binding.BoundValues;
 
 namespace Stainless.Binding;
 

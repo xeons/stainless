@@ -112,7 +112,6 @@ public sealed partial class LlvmEmitter
                 return EmitOwnable(sequence.Value);
             }
             case BoundTypeTest test: return EmitTypeTest(test);
-            case BoundIsPattern matched: return EmitExpression(matched.Test);
             case BoundUnmatchedSwitch unmatched: return EmitUnmatchedSwitch(unmatched);
             case BoundUnary unary: return EmitUnary(unary);
             case BoundBinary binary: return EmitBinary(binary);
@@ -306,6 +305,13 @@ public sealed partial class LlvmEmitter
                     DeclareExpressionLocal(declared);
 
                 string address = EmitAddress(assignment.Target);
+
+                // The slot holds nothing yet, so there is nothing to let go of.
+                if (assignment.IsInitialization)
+                {
+                    InitializeWith(address, EmitOwned(assignment.Value), assignment.Target.Type);
+                    return;
+                }
 
                 if (SoleStoreOf(assignment.Value) is { } last)
                 {
