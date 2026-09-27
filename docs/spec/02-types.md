@@ -696,7 +696,9 @@ pedantic — an override written the obvious way,
 public override int Value { get => base.Value; }
 ```
 
-would otherwise call itself for ever. `base(...)` runs the base constructor, before this class's body: the base is
+would otherwise call itself for ever. A member the base declares `abstract`
+has no implementation there, so `base.M()` or `base.P` naming one is an
+error (SL0806) rather than a call to nothing. `base(...)` runs the base constructor, before this class's body: the base is
 built first, and a body that had already run would be reading fields nothing
 had set. Left out, the base's constructor taking no arguments is called for
 you, and there being none is an error rather than a class that skips it.

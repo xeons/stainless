@@ -1316,6 +1316,9 @@ public sealed partial class Binder
         CallSyntax syntax, FunctionSymbol function, BoundExpression? receiver,
         List<BoundExpression> arguments, bool nonVirtual = false)
     {
+        if (nonVirtual && function.IsAbstract)
+            return RefuseAbstractBase(function.Name, syntax.Span);
+
         var parameters = function.Parameters.Where(p => !p.IsThis).ToList();
         var written = GatherParams(function, ref arguments, syntax.Arguments, syntax.Span);
 
@@ -1343,6 +1346,15 @@ public sealed partial class Binder
         var converted = ConvertArguments(function, ordered, spans);
         return new BoundCall(syntax.Span, function, receiver, converted)
             { IsNonVirtual = nonVirtual, EvaluationOrder = WrittenOrder(map, converted.Count) };
+    }
+
+    /// <summary><c>base.M()</c> where the base only declares <c>M</c>: there is no body to call.</summary>
+    private BoundErrorExpression RefuseAbstractBase(string name, SourceSpan span)
+    {
+        diagnostics.Error("SL0806", span,
+            $"'{name}' is abstract where 'base' looks, so there is no body there to call; " +
+            "'base' names the implementation this class replaced, and this one replaces none");
+        return new BoundErrorExpression(span);
     }
 
     /// <summary>

@@ -2654,6 +2654,9 @@ public sealed partial class Binder
     {
         if (property.Getter is not { } getter) return new BoundErrorExpression(span);
 
+        if (nonVirtual && getter.IsAbstract)
+            return RefuseAbstractBase(property.Name, span);
+
         if (!CanReach(getter.IsPublic, getter.IsProtected, property.ContainingType))
         {
             diagnostics.Error("SL0249", span,
