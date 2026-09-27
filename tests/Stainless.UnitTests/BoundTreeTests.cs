@@ -88,12 +88,13 @@ public class BoundTreeTests
     /// A property that names a value rather than holding a child: the input a
     /// pattern is asked of, which is what its expressions read.
     /// </summary>
-    private static bool IsName(Type type) => type == typeof(BoundPatternInput);
+    private static bool IsName(Type type) => type == typeof(BoundPlaceholder);
 
     /// <summary>A part of a node that is not a node, whose own properties hold its children.</summary>
     private static bool IsHolder(Type type) =>
         type == typeof(BoundSwitchSection) || type == typeof(BoundAsmOperand) ||
-        type == typeof(BoundSwitchLabel) || type == typeof(BoundSwitchArm);
+        type == typeof(BoundSwitchLabel) || type == typeof(BoundSwitchArm) ||
+        type == typeof(BoundWithAssignment);
 
     /// <summary>Puts a fresh node in every property that holds nodes, and lists those a walk should reach.</summary>
     private static void Fill(object owner, List<object> expected)

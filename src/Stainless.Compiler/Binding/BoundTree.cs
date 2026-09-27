@@ -392,6 +392,83 @@ public sealed class BoundAssignment(SourceSpan span, BoundExpression target, Bou
 }
 
 /// <summary>
+/// <c>new T(...) { X = 1, Y = 2 }</c> or <c>new T { a, b }</c>: an object made,
+/// then written to or added to entry by entry, and then the value.
+/// </summary>
+public sealed class BoundObjectInitializer(
+    SourceSpan span, TypeSymbol type, BoundExpression creation, BoundPlaceholder made,
+    IReadOnlyList<BoundExpression> writes) : BoundExpression(span, type)
+{
+    public BoundExpression Creation { get; } = creation;
+
+    /// <summary>The object made, as each write names it.</summary>
+    public BoundPlaceholder Made { get; } = made;
+
+    /// <summary>Each entry: an assignment to a member, or a call to <c>Add</c>.</summary>
+    public IReadOnlyList<BoundExpression> Writes { get; } = writes;
+}
+
+/// <summary>
+/// <c>record with { X = 1 }</c>: a copy of a record, made by its clone, with
+/// the properties named given new values.
+/// </summary>
+public sealed class BoundWith(
+    SourceSpan span, ClassTypeSymbol record, BoundExpression target, FunctionSymbol clone,
+    IReadOnlyList<BoundWithAssignment> assignments) : BoundExpression(span, record)
+{
+    public ClassTypeSymbol Record { get; } = record;
+    public BoundExpression Target { get; } = target;
+
+    /// <summary>The copy, dispatched, so a derived record comes back whole.</summary>
+    public FunctionSymbol Clone { get; } = clone;
+
+    public IReadOnlyList<BoundWithAssignment> Assignments { get; } = assignments;
+}
+
+/// <summary>One property a <c>with</c> gives a new value, already converted to its type.</summary>
+public sealed class BoundWithAssignment(SourceSpan span, PropertySymbol property, BoundExpression value)
+{
+    public SourceSpan Span { get; } = span;
+    public PropertySymbol Property { get; } = property;
+    public BoundExpression Value { get; } = value;
+}
+
+/// <summary>
+/// <c>x op= y</c> and <c>x ??= y</c>, on a place or on a property: the place
+/// read, combined with the value, and written back.
+///
+/// Lowering names the place, or the property's receiver and indices, once:
+/// held where naming it again could evaluate something or reach elsewhere.
+/// </summary>
+public sealed class BoundCompoundAssignment(
+    SourceSpan span, TypeSymbol type, BoundExpression target, BoundPlaceholder current,
+    BoundExpression value, BoundExpression combined, bool isFallback) : BoundExpression(span, type)
+{
+    /// <summary>The place, or for a property the call to its getter that read it.</summary>
+    public BoundExpression Target { get; } = target;
+
+    /// <summary>The property written, or null for a place.</summary>
+    public PropertySymbol? Property { get; init; }
+
+    /// <summary>What the place holds before the write, as <see cref="Combined"/> names it.</summary>
+    public BoundPlaceholder Current { get; } = current;
+
+    /// <summary>The right side as written. <see cref="Combined"/> holds it too.</summary>
+    [SharedSubtree]
+    public BoundExpression Value { get; } = value;
+
+    /// <summary>
+    /// What is written: <c>x op y</c> converted back to the place's type, or
+    /// for <c>??=</c> the value alone, written only where the place held
+    /// nothing.
+    /// </summary>
+    public BoundExpression Combined { get; } = combined;
+
+    /// <summary>True for <c>??=</c>.</summary>
+    public bool IsFallback { get; } = isFallback;
+}
+
+/// <summary>
 /// Writes a property.
 ///
 /// A property read is simply a <see cref="BoundCall"/> to the getter, so it
@@ -454,6 +531,46 @@ public sealed class BoundLet(
     /// it evaluates in between may release that object's last other owner.
     /// </summary>
     public bool IsOwned { get; init; }
+}
+
+/// <summary>
+/// <c>a?.m</c>, <c>a?.M(x)</c>, <c>a?[i]</c>: the receiver asked whether it is
+/// there, and reached through only if it is -- with <c>?? b</c> after it,
+/// <see cref="WhenNothing"/> is <c>b</c>.
+///
+/// Lowering holds the receiver once, because it is read twice: once to ask,
+/// once to reach through. Without that, <c>Next()?.Name</c> would call
+/// <c>Next</c> twice and ask about one object while reading another.
+/// </summary>
+public sealed class BoundConditionalAccess(
+    SourceSpan span, TypeSymbol type, BoundExpression receiver, BoundPlaceholder present,
+    BoundExpression access, BoundExpression whenNothing) : BoundExpression(span, type)
+{
+    /// <summary>The optional asked about.</summary>
+    public BoundExpression Receiver { get; } = receiver;
+
+    /// <summary>The receiver known to be there, as <see cref="Access"/> names it.</summary>
+    public BoundPlaceholder Present { get; } = present;
+
+    public BoundExpression Access { get; } = access;
+
+    /// <summary>What the whole is when the receiver was nothing: null, or what <c>??</c> said.</summary>
+    public BoundExpression WhenNothing { get; } = whenNothing;
+}
+
+/// <summary>
+/// <c>a ?? b</c>: <c>a</c> where it is something, and <c>b</c>, evaluated only
+/// then, where it is nothing. The type is <c>a</c>'s element when <c>b</c> is
+/// not optional, since there is then something either way.
+/// </summary>
+public sealed class BoundNullFallback(
+    SourceSpan span, TypeSymbol type, BoundExpression value, BoundExpression fallback)
+    : BoundExpression(span, type)
+{
+    public BoundExpression Value { get; } = value;
+
+    /// <summary>Already converted to the type of the whole.</summary>
+    public BoundExpression Fallback { get; } = fallback;
 }
 
 /// <summary>
@@ -801,14 +918,14 @@ public sealed class BoundTypeTest(
 /// not, and what it proved about <see cref="Subject"/> either way.
 /// </summary>
 public sealed class BoundIsPattern(
-    SourceSpan span, BoundExpression subject, BoundPatternInput input, BoundPattern pattern)
+    SourceSpan span, BoundExpression subject, BoundPlaceholder input, BoundPattern pattern)
     : BoundExpression(span, PrimitiveTypeSymbol.Bool)
 {
     /// <summary>The value tested, as written.</summary>
     public BoundExpression Subject { get; } = subject;
 
     /// <summary>How the pattern names <see cref="Subject"/>.</summary>
-    public BoundPatternInput Input { get; } = input;
+    public BoundPlaceholder Input { get; } = input;
 
     public BoundPattern Pattern { get; } = pattern;
 
@@ -837,14 +954,14 @@ public sealed class BoundIsPattern(
 /// Lowering decides how the arms are reached.
 /// </summary>
 public sealed class BoundSwitchExpression(
-    SourceSpan span, TypeSymbol type, BoundExpression subject, BoundPatternInput input,
+    SourceSpan span, TypeSymbol type, BoundExpression subject, BoundPlaceholder input,
     IReadOnlyList<BoundSwitchArm> arms)
     : BoundExpression(span, type)
 {
     public BoundExpression Subject { get; } = subject;
 
     /// <summary>How every arm's pattern names <see cref="Subject"/>.</summary>
-    public BoundPatternInput Input { get; } = input;
+    public BoundPlaceholder Input { get; } = input;
 
     public IReadOnlyList<BoundSwitchArm> Arms { get; } = arms;
 
@@ -1222,6 +1339,42 @@ public sealed class BoundGoto(SourceSpan span, LabelSymbol label) : BoundStateme
 }
 
 /// <summary>
+/// <c>foreach (T x in collection) body</c>: the element each pass names, and
+/// the value <see cref="Variable"/> is given from it.
+///
+/// Lowering makes the loop: an index over an array or a slice, or the
+/// enumerator's <c>MoveNext</c> and <c>Current</c> for anything else. The
+/// collection is evaluated once, which fixes what is iterated and keeps it
+/// alive for the whole loop.
+/// </summary>
+public sealed class BoundForEach(
+    SourceSpan span, BoundExpression collection, LocalSymbol variable, BoundPlaceholder element,
+    BoundExpression value, BoundStatement? deconstruction, BoundStatement body) : BoundStatement(span)
+{
+    public BoundExpression Collection { get; } = collection;
+
+    /// <summary>The loop variable, one per pass.</summary>
+    public LocalSymbol Variable { get; } = variable;
+
+    /// <summary>The element as the collection yields it, as <see cref="Value"/> names it.</summary>
+    public BoundPlaceholder Element { get; } = element;
+
+    /// <summary>What the variable is given from the element, converted to its type.</summary>
+    public BoundExpression Value { get; } = value;
+
+    /// <summary><c>foreach (var (a, b) in pairs)</c>: the variable taken apart, or null.</summary>
+    public BoundStatement? Deconstruction { get; } = deconstruction;
+
+    public BoundStatement Body { get; } = body;
+
+    /// <summary>The enumerator's methods; null for an array or a slice, which are indexed.</summary>
+    public FunctionSymbol? GetEnumerator { get; init; }
+
+    public FunctionSymbol? MoveNext { get; init; }
+    public FunctionSymbol? Current { get; init; }
+}
+
+/// <summary>
 /// Kept in the bound tree rather than lowered to a while loop, so that
 /// <c>continue</c> still runs the step expression.
 /// </summary>
@@ -1394,14 +1547,14 @@ public sealed class BoundSwitchSection(
 /// -- and what <c>break</c> means inside one.
 /// </summary>
 public sealed class BoundSwitch(
-    SourceSpan span, BoundExpression subject, BoundPatternInput input,
+    SourceSpan span, BoundExpression subject, BoundPlaceholder input,
     IReadOnlyList<BoundSwitchSection> sections)
     : BoundStatement(span)
 {
     public BoundExpression Subject { get; } = subject;
 
     /// <summary>How every label's pattern names <see cref="Subject"/>.</summary>
-    public BoundPatternInput Input { get; } = input;
+    public BoundPlaceholder Input { get; } = input;
 
     public IReadOnlyList<BoundSwitchSection> Sections { get; } = sections;
 
@@ -1449,14 +1602,20 @@ public sealed class BoundContinue(SourceSpan span) : BoundStatement(span);
 // ---------------------------------------------------------------- patterns
 
 /// <summary>
-/// The value a pattern is asked of, as the expressions inside the pattern
-/// name it. Lowering puts in its place whatever holds that value where the
-/// question is asked.
+/// A value a construct names before lowering decides what holds it: the
+/// value a pattern is asked of, a loop's element, a receiver asked whether it
+/// is there. Lowering puts in its place whatever holds that value where the
+/// expression runs.
 /// </summary>
-public sealed class BoundPatternInput(SourceSpan span, TypeSymbol type) : BoundExpression(span, type)
+public sealed class BoundPlaceholder(SourceSpan span, TypeSymbol type) : BoundExpression(span, type)
 {
-    /// <summary>What stands for it is always a name for the value, or a read as steady as one.</summary>
-    public override bool IsLValue => true;
+    /// <summary>
+    /// Whether what stands for it is storage: a name for the value, or a read
+    /// as steady as one. False where it is a value seen as another type.
+    /// </summary>
+    public bool IsStorage { get; init; } = true;
+
+    public override bool IsLValue => IsStorage;
 }
 
 /// <summary>
@@ -1510,11 +1669,11 @@ public sealed record PatternTestKey(PatternTestKind Kind, object? Value, bool Ne
 /// question about <see cref="Input"/>, as a <c>bool</c> expression over it.
 /// </summary>
 public sealed class BoundTestPattern(
-    SourceSpan span, BoundPatternInput input, BoundExpression test, PatternTestKey? key)
+    SourceSpan span, BoundPlaceholder input, BoundExpression test, PatternTestKey? key)
     : BoundPattern(span)
 {
     /// <summary>The value asked about.</summary>
-    public BoundPatternInput Input { get; } = input;
+    public BoundPlaceholder Input { get; } = input;
 
     public BoundExpression Test { get; } = test;
 
@@ -1528,11 +1687,11 @@ public sealed class BoundTestPattern(
 /// has to match.
 /// </summary>
 public sealed class BoundReadPattern(
-    SourceSpan span, BoundPatternInput input, BoundExpression read, BoundPattern pattern)
+    SourceSpan span, BoundPlaceholder input, BoundExpression read, BoundPattern pattern)
     : BoundPattern(span)
 {
     /// <summary>How <see cref="Pattern"/> names the value read.</summary>
-    public BoundPatternInput Input { get; } = input;
+    public BoundPlaceholder Input { get; } = input;
 
     public BoundExpression Read { get; } = read;
     public BoundPattern Pattern { get; } = pattern;

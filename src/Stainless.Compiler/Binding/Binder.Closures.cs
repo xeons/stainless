@@ -1223,7 +1223,7 @@ public sealed partial class Binder
             return new BoundBlock(syntax.Span, []);
         }
 
-        var input = new BoundPatternInput(syntax.Value.Span, value.Type);
+        var input = new BoundPlaceholder(syntax.Value.Span, value.Type);
         var sections = new List<BoundSwitchSection>();
         var seenOrdinals = new Dictionary<ulong, SourceSpan>();
         var seenText = new Dictionary<string, SourceSpan>(StringComparer.Ordinal);
@@ -1323,7 +1323,7 @@ public sealed partial class Binder
 
     /// <summary><c>case 3:</c>, as the pattern that asks for equality with the folded constant.</summary>
     private BoundSwitchLabel ConstantLabel(
-        SourceSpan span, BoundPatternInput input, BoundExpression constant, object folded)
+        SourceSpan span, BoundPlaceholder input, BoundExpression constant, object folded)
     {
         var test = BindBinaryOperation(span, input, BoundBinaryOp.Equal, constant, TokenKind.EqualsEquals);
         return new BoundSwitchLabel(span,
@@ -1344,7 +1344,7 @@ public sealed partial class Binder
     private BoundStatement BindVariantSwitch(
         SwitchSyntax syntax, BoundExpression value, VariantTypeSymbol variant)
     {
-        var input = new BoundPatternInput(syntax.Value.Span, value.Type);
+        var input = new BoundPlaceholder(syntax.Value.Span, value.Type);
         var subject = NarrowableSubject(value);
         var sections = new List<BoundSwitchSection>();
         var covered = new Dictionary<VariantCaseSymbol, SourceSpan>();

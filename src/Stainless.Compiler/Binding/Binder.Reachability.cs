@@ -110,6 +110,15 @@ public sealed partial class Binder
                     return asked && !IsTrue(loop.Condition) || target.Broken;
                 }
 
+                // A collection may be empty, so the body may run no times.
+                case BoundForEach loop:
+                {
+                    Enter(isLoop: true);
+                    Walk(loop.Body, reachable);
+                    Leave();
+                    return reachable;
+                }
+
                 case BoundDoWhile loop:
                 {
                     var target = Enter(isLoop: true);

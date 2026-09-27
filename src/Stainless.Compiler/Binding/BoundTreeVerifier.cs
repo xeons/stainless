@@ -74,7 +74,9 @@ public static class BoundTreeVerifier
     /// rewrites into the core and the emitter has no case for.
     /// </summary>
     private static bool IsSemanticOnly(object node) =>
-        node is BoundSwitch or BoundSwitchExpression or BoundIsPattern or BoundPatternInput;
+        node is BoundSwitch or BoundSwitchExpression or BoundIsPattern or BoundPlaceholder or BoundForEach
+            or BoundConditionalAccess or BoundNullFallback or BoundCompoundAssignment or BoundWith
+            or BoundObjectInitializer;
 
     /// <summary>
     /// Whether a type is one binding settles or refuses, and so has no
@@ -106,6 +108,10 @@ public static class BoundTreeVerifier
             {
                 case BoundLocalDeclaration declaration:
                     Declare(declaration.Local, declaration.Span);
+                    break;
+
+                case BoundForEach loop:
+                    Declare(loop.Variable, loop.Span);
                     break;
 
                 case BoundSwitchDispatch dispatch:
@@ -181,9 +187,6 @@ public static class BoundTreeVerifier
                     Declare(held.Local, held.Span);
                     break;
 
-                case BoundPatternInput when _patterns == 0:
-                    throw Fault("a pattern's input read outside the pattern", expression.Span);
-
                 case BoundSwitchExpression chosen:
                     foreach (var arm in chosen.Arms)
                         if (!SameType(arm.Value.Type, chosen.Type))
@@ -203,6 +206,13 @@ public static class BoundTreeVerifier
                         throw Fault(
                             $"an assignment to {assignment.Target.GetType().Name}, which is not storage",
                             assignment.Span);
+                    break;
+
+                case BoundCompoundAssignment { Property: null } compound:
+                    if (!HasAddress(compound.Target))
+                        throw Fault(
+                            $"a compound assignment to {compound.Target.GetType().Name}, which is not storage",
+                            compound.Span);
                     break;
 
                 case BoundIncrement stepped:
@@ -236,9 +246,6 @@ public static class BoundTreeVerifier
             base.Visit(expression);
         }
 
-        /// <summary>How deep inside patterns the walk is, where an input may be read.</summary>
-        private int _patterns;
-
         public override void Visit(BoundPattern? pattern)
         {
             if (pattern is null)
@@ -250,9 +257,7 @@ public static class BoundTreeVerifier
             if (pattern is BoundDeclarationPattern named)
                 Declare(named.Local, named.Span);
 
-            _patterns++;
             base.Visit(pattern);
-            _patterns--;
         }
 
         private static bool IsOrdinal(TypeSymbol type) =>
@@ -300,6 +305,7 @@ public static class BoundTreeVerifier
         {
             BoundStaticAccess or BoundLocalAccess or BoundParameterAccess or BoundThis
                 or BoundDereference => true,
+            BoundPlaceholder standing => standing.IsStorage,
             BoundFieldAccess field => field.Field.ContainingType is not StructTypeSymbol ||
                                       field.Receiver is not null && HasAddress(field.Receiver),
             BoundIndex element => element.Target.Type is not FixedArrayTypeSymbol || HasAddress(element.Target),

@@ -108,6 +108,13 @@ public abstract class BoundTreeWalker
                 Visit(loop.Step);
                 break;
 
+            case BoundForEach loop:
+                Visit(loop.Collection);
+                Visit(loop.Value);
+                Visit(loop.Deconstruction);
+                Visit(loop.Body);
+                break;
+
             case BoundSwitch chosen:
                 Visit(chosen.Subject);
                 foreach (var section in chosen.Sections)
@@ -167,7 +174,7 @@ public abstract class BoundTreeWalker
                 or BoundNullLiteral or BoundLocalAccess or BoundParameterAccess or BoundStaticAccess
                 or BoundConstantAccess or BoundDefault or BoundSizeof or BoundAlignof or BoundOffsetof
                 or BoundTypeof or BoundIidof or BoundEmbed or BoundThis or BoundFunctionReference
-                or BoundUnmatchedSwitch or BoundOutDraft or BoundLambda or BoundPatternInput:
+                or BoundUnmatchedSwitch or BoundOutDraft or BoundLambda or BoundPlaceholder:
                 break;
 
             case BoundInterpolatedString interpolated: VisitAll(interpolated.Parts); break;
@@ -211,6 +218,33 @@ public abstract class BoundTreeWalker
             case BoundSequence sequence:
                 VisitAll(sequence.Before);
                 Visit(sequence.Value);
+                break;
+
+            case BoundObjectInitializer initialized:
+                Visit(initialized.Creation);
+                VisitAll(initialized.Writes);
+                break;
+
+            case BoundWith copied:
+                Visit(copied.Target);
+                foreach (var assignment in copied.Assignments)
+                    Visit(assignment.Value);
+                break;
+
+            case BoundCompoundAssignment compound:
+                Visit(compound.Target);
+                Visit(compound.Combined);
+                break;
+
+            case BoundConditionalAccess asked:
+                Visit(asked.Receiver);
+                Visit(asked.Access);
+                Visit(asked.WhenNothing);
+                break;
+
+            case BoundNullFallback fallback:
+                Visit(fallback.Value);
+                Visit(fallback.Fallback);
                 break;
 
             case BoundConditional conditional:
@@ -419,6 +453,10 @@ internal sealed class CaptureWalker(LocalSymbol loopVariable) : BoundTreeWalker
                 _declared.UnionWith(loop.Locals);
                 break;
 
+            case BoundForEach loop:
+                _declared.Add(loop.Variable);
+                break;
+
             case BoundParallelFor nested:
                 _declared.Add(nested.Variable);
                 break;
@@ -461,6 +499,10 @@ internal sealed class CaptureWalker(LocalSymbol loopVariable) : BoundTreeWalker
 
             case BoundIncrement stepped:
                 Assigned(stepped.Target);
+                break;
+
+            case BoundCompoundAssignment { Property: null } compound:
+                Assigned(compound.Target);
                 break;
 
             // Held for the length of one expression, so it belongs to the
@@ -513,6 +555,12 @@ internal sealed class OutWriteTracker(ParameterSymbol target, bool written) : Bo
             case BoundAssignment { Target: BoundParameterAccess assigned } assignment
                 when ReferenceEquals(assigned.Parameter, target):
                 Visit(assignment.Value);
+                Written = true;
+                return;
+
+            case BoundCompoundAssignment { Target: BoundParameterAccess assigned, IsFallback: false } compound
+                when ReferenceEquals(assigned.Parameter, target):
+                Visit(compound.Combined);
                 Written = true;
                 return;
 

@@ -151,7 +151,7 @@ internal sealed class DecisionBuilder(Lowerer lowerer, bool total)
     /// The tree for <paramref name="arms"/>, matching <paramref name="subject"/>
     /// as <paramref name="input"/> names it.
     /// </summary>
-    public Decision Build(IReadOnlyList<DecisionArm> arms, BoundPatternInput input, BoundExpression subject)
+    public Decision Build(IReadOnlyList<DecisionArm> arms, BoundPlaceholder input, BoundExpression subject)
     {
         var start = new Path();
         start.Values[input] = subject;
@@ -191,9 +191,9 @@ internal sealed class DecisionBuilder(Lowerer lowerer, bool total)
     private abstract record Step;
 
     /// <summary>A value read from the inputs, which <see cref="Output"/> then names.</summary>
-    private sealed record ReadStep(BoundPatternInput Output, BoundExpression Read) : Step;
+    private sealed record ReadStep(BoundPlaceholder Output, BoundExpression Read) : Step;
 
-    private sealed record TestStep(BoundPatternInput Input, BoundExpression Test, PatternTestKey? Key, bool Negated)
+    private sealed record TestStep(BoundPlaceholder Input, BoundExpression Test, PatternTestKey? Key, bool Negated)
         : Step;
 
     private sealed record EffectStep(BoundExpression Effect) : Step;
@@ -269,7 +269,7 @@ internal sealed class DecisionBuilder(Lowerer lowerer, bool total)
     /// </summary>
     internal sealed class Path
     {
-        public Dictionary<BoundPatternInput, BoundExpression> Values { get; } = [];
+        public Dictionary<BoundPlaceholder, BoundExpression> Values { get; } = [];
         public Dictionary<ExpressionKey, BoundExpression> Reads { get; } = [];
         public Dictionary<(ExpressionKey, PatternTestKind, object?), bool> Answers { get; } = [];
 
@@ -485,7 +485,7 @@ internal sealed class DecisionBuilder(Lowerer lowerer, bool total)
     private sealed class InputReplacer(Path path) : BoundTreeRewriter
     {
         public override BoundExpression Rewrite(BoundExpression expression) =>
-            expression is BoundPatternInput input
+            expression is BoundPlaceholder input
                 ? path.Values.TryGetValue(input, out var value)
                     ? value
                     : throw new InternalCompilerError("a pattern reads a value nothing read", input.Span)

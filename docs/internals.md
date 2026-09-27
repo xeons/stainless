@@ -276,6 +276,17 @@ about. [Lowerer](../src/Stainless.Compiler/Lowering/Lowerer.cs) rewrites that
 into the core the emitter handles, as a new program: the semantic one is left
 whole, for whatever reads a program rather than running it.
 
+Each lowering makes exactly the core the binder used to make in place, so the
+emitter and its ownership rules see the same shapes: `foreach` becomes the
+indexed `for` or the enumerator's `while`; `?.` and `??` the receiver held in a
+`let` and a conditional on it; `x op= y`, `x ??= y` and the same on a property
+the place held where naming it again could differ, then read and written back;
+`with` the clone and its writes; an object initializer the object held in a
+`let` and its entries in order. Where one of these names a value it does not
+yet have -- a loop's element, a receiver known to be there, the object being
+initialized -- the semantic node holds a placeholder for it, and lowering puts
+in its place whatever holds the value.
+
 **Matching is one lowering.** A switch statement, a switch expression and `is`
 are each a list of arms, and [DecisionBuilder](../src/Stainless.Compiler/Lowering/Decisions.cs)
 builds every one of them into the same tree. The arms are asked in order, but a

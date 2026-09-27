@@ -70,6 +70,27 @@ public sealed partial class Lowerer : BoundTreeRewriter
         return lowered;
     }
 
+    /// <summary>Every construct lowering takes away, and where it goes instead.</summary>
+    public override BoundStatement Rewrite(BoundStatement statement) => statement switch
+    {
+        BoundSwitch chosen => LowerSwitch(chosen),
+        BoundForEach loop => LowerForEach(loop),
+        _ => base.Rewrite(statement),
+    };
+
+    /// <inheritdoc cref="Rewrite(BoundStatement)"/>
+    public override BoundExpression Rewrite(BoundExpression expression) => expression switch
+    {
+        BoundIsPattern matched => LowerIsPattern(matched),
+        BoundSwitchExpression chosen => LowerSwitchExpression(chosen),
+        BoundConditionalAccess asked => LowerConditionalAccess(asked),
+        BoundNullFallback fallback => LowerNullFallback(fallback),
+        BoundCompoundAssignment compound => LowerCompoundAssignment(compound),
+        BoundWith copied => LowerWith(copied),
+        BoundObjectInitializer initialized => LowerObjectInitializer(initialized),
+        _ => base.Rewrite(expression),
+    };
+
     private static BoundBlock AsBlock(BoundStatement statement) =>
         statement as BoundBlock ?? throw new Source.InternalCompilerError(
             "lowering made a function body that is not a block", statement.Span);

@@ -28,7 +28,7 @@ namespace Stainless.Binding;
 /// A pattern is a question about a value, and binding one says what it asks:
 /// the tests, the values read to ask further questions of, and the names it
 /// gives. Each test and read is an expression over a
-/// <see cref="BoundPatternInput"/> standing for the value it is asked of.
+/// <see cref="BoundPlaceholder"/> standing for the value it is asked of.
 /// How the questions are asked -- in what order, which of them once for a
 /// whole switch, what is held where -- is lowering's to decide. One routine
 /// binds a pattern wherever it is written, so <c>x is (1, _)</c>,
@@ -108,7 +108,7 @@ public sealed partial class Binder
     // ================================================================ binding
 
     /// <summary>A whole pattern, against the value <paramref name="subject"/> stands for.</summary>
-    private PatternMatch? BindTopPattern(PatternSyntax syntax, BoundPatternInput subject, PatternSite site)
+    private PatternMatch? BindTopPattern(PatternSyntax syntax, BoundPlaceholder subject, PatternSite site)
     {
         var context = new PatternContext(site, syntax);
         var bound = BindPattern(syntax, subject, context);
@@ -129,7 +129,7 @@ public sealed partial class Binder
         return bound;
     }
 
-    private PatternMatch? BindPattern(PatternSyntax syntax, BoundPatternInput subject, PatternContext context)
+    private PatternMatch? BindPattern(PatternSyntax syntax, BoundPlaceholder subject, PatternContext context)
     {
         switch (syntax)
         {
@@ -227,7 +227,7 @@ public sealed partial class Binder
     /// <c>or</c> nowhere, because which side matched is not known.
     /// </summary>
     private PatternMatch? BindBinaryPattern(
-        BinaryPatternSyntax syntax, BoundPatternInput subject, PatternContext context)
+        BinaryPatternSyntax syntax, BoundPlaceholder subject, PatternContext context)
     {
         var left = BindPattern(syntax.Left, subject, context);
         var right = BindPattern(syntax.Right, subject, context);
@@ -295,12 +295,12 @@ public sealed partial class Binder
     /// A value read from the inputs, and what it has to match. The input
     /// itself is matched as it is: it is already a value the pattern holds.
     /// </summary>
-    private static PatternMatch? MatchRead(BoundExpression value, Func<BoundPatternInput, PatternMatch?> match)
+    private static PatternMatch? MatchRead(BoundExpression value, Func<BoundPlaceholder, PatternMatch?> match)
     {
-        if (value is BoundPatternInput input)
+        if (value is BoundPlaceholder input)
             return match(input);
 
-        var read = new BoundPatternInput(value.Span, value.Type);
+        var read = new BoundPlaceholder(value.Span, value.Type);
         var inner = match(read);
 
         return inner is null
@@ -316,7 +316,7 @@ public sealed partial class Binder
     /// may mean a type.
     /// </summary>
     private PatternMatch? BindConstantPattern(
-        ConstantPatternSyntax syntax, BoundPatternInput subject, PatternContext context)
+        ConstantPatternSyntax syntax, BoundPlaceholder subject, PatternContext context)
     {
         if (subject.Type is VariantTypeSymbol variant &&
             syntax.Value is NameSyntax { Name.Parts: [var only], TypeArguments: null } &&
@@ -363,7 +363,7 @@ public sealed partial class Binder
     }
 
     /// <summary><c>null</c>: the one question an optional can be asked without a type.</summary>
-    private PatternMatch? NullPattern(SourceSpan span, BoundPatternInput subject, BoundExpression nothing)
+    private PatternMatch? NullPattern(SourceSpan span, BoundPlaceholder subject, BoundExpression nothing)
     {
         var test = BindBinaryOperation(
             span, subject, BoundBinaryOp.Equal, nothing, TokenKind.EqualsEquals);
@@ -381,7 +381,7 @@ public sealed partial class Binder
     }
 
     /// <summary><c>subject != null</c>: an optional asked whether there is anything to look at.</summary>
-    private static BoundTestPattern PresentTest(SourceSpan span, BoundPatternInput subject) =>
+    private static BoundTestPattern PresentTest(SourceSpan span, BoundPlaceholder subject) =>
         new(span, subject,
             new BoundBinary(span, PrimitiveTypeSymbol.Bool, subject, BoundBinaryOp.NotEqual,
                 new BoundNullLiteral(span, subject.Type)),
@@ -422,7 +422,7 @@ public sealed partial class Binder
     /// being matched.
     /// </summary>
     private PatternMatch? BindTypePattern(
-        TypePatternSyntax syntax, BoundPatternInput subject, PatternContext context,
+        TypePatternSyntax syntax, BoundPlaceholder subject, PatternContext context,
         PatternSyntax? written = null)
     {
         if (BindPatternType(syntax.Type, syntax.Span, subject, context, written ?? syntax)
@@ -459,7 +459,7 @@ public sealed partial class Binder
     /// case, or the object under the type asked about.
     /// </summary>
     private BoundExpression? NamedValue(
-        TypeMatch match, BoundPatternInput subject, string name, SourceSpan span,
+        TypeMatch match, BoundPlaceholder subject, string name, SourceSpan span,
         PatternContext context)
     {
         if (match.Case is { } matched)
@@ -496,7 +496,7 @@ public sealed partial class Binder
     /// matched against is its own.
     /// </summary>
     private TypeMatch? BindPatternType(
-        TypeSyntax typeSyntax, SourceSpan span, BoundPatternInput subject, PatternContext context,
+        TypeSyntax typeSyntax, SourceSpan span, BoundPlaceholder subject, PatternContext context,
         PatternSyntax written)
     {
         bool inIs = context.Site == PatternSite.Is;
@@ -636,13 +636,13 @@ public sealed partial class Binder
     }
 
     /// <summary>Whether a variant holds a case.</summary>
-    private static BoundTestPattern CaseTest(SourceSpan span, BoundPatternInput subject, VariantCaseSymbol named) =>
+    private static BoundTestPattern CaseTest(SourceSpan span, BoundPlaceholder subject, VariantCaseSymbol named) =>
         new(span, subject, new BoundVariantTest(span, PrimitiveTypeSymbol.Bool, subject, named),
             new PatternTestKey(PatternTestKind.Case, named));
 
     /// <summary>A case of a variant, with what its payload's fields must match.</summary>
     private static PatternMatch CasePattern(
-        SourceSpan span, BoundPatternInput subject, VariantCaseSymbol named,
+        SourceSpan span, BoundPlaceholder subject, VariantCaseSymbol named,
         IReadOnlyList<SpaceMember> members) =>
         new(CaseTest(span, subject, named))
         {
@@ -660,7 +660,7 @@ public sealed partial class Binder
     /// <c>Deconstruct</c>, and by name through its fields and properties.
     /// </summary>
     private PatternMatch? BindRecursivePattern(
-        RecursivePatternSyntax syntax, BoundPatternInput subject, PatternContext context)
+        RecursivePatternSyntax syntax, BoundPlaceholder subject, PatternContext context)
     {
         if (subject.Type.IsError())
             return null;
@@ -728,7 +728,7 @@ public sealed partial class Binder
     /// against a value already known to be what the type asked.
     /// </summary>
     private PatternMatch? BindRecursiveParts(
-        RecursivePatternSyntax syntax, BoundPatternInput viewed, TypeMatch match,
+        RecursivePatternSyntax syntax, BoundPlaceholder viewed, TypeMatch match,
         PatternContext context)
     {
         var parts = new List<BoundPattern>();
@@ -807,7 +807,7 @@ public sealed partial class Binder
     /// </summary>
     private List<PatternVariable>? BindPositionalParts(
         RecursivePatternSyntax syntax, IReadOnlyList<SubpatternSyntax> positional,
-        BoundPatternInput viewed, TypeMatch match, PatternContext context,
+        BoundPlaceholder viewed, TypeMatch match, PatternContext context,
         List<BoundPattern> parts, List<SpaceMember> under, List<SpaceMember> over)
     {
         var values = new List<(object Key, string? Name, BoundExpression Value)>();
@@ -894,7 +894,7 @@ public sealed partial class Binder
 
     /// <summary>One member a property pattern reads: a payload's field, or a field or property.</summary>
     private BoundExpression? PatternMember(
-        SubpatternSyntax member, BoundPatternInput viewed, TypeMatch match)
+        SubpatternSyntax member, BoundPlaceholder viewed, TypeMatch match)
     {
         string name = member.Path[0];
 
@@ -940,7 +940,7 @@ public sealed partial class Binder
     /// rather than copying it, so only an array or a slice can give one.
     /// </summary>
     private PatternMatch? BindListPattern(
-        ListPatternSyntax syntax, BoundPatternInput subject, PatternContext context)
+        ListPatternSyntax syntax, BoundPlaceholder subject, PatternContext context)
     {
         if (subject.Type.IsError())
             return null;
@@ -987,7 +987,7 @@ public sealed partial class Binder
     }
 
     private PatternMatch? BindListParts(
-        ListPatternSyntax syntax, BoundPatternInput viewed, PatternContext context)
+        ListPatternSyntax syntax, BoundPlaceholder viewed, PatternContext context)
     {
         var span = syntax.Span;
 
@@ -1005,7 +1005,7 @@ public sealed partial class Binder
         int fixedCount = syntax.Elements.Count - (sliceAt < 0 ? 0 : 1);
 
         // The length is read once, and everything after it names it.
-        var counted = new BoundPatternInput(span, PrimitiveTypeSymbol.NUInt);
+        var counted = new BoundPlaceholder(span, PrimitiveTypeSymbol.NUInt);
 
         var parts = new List<BoundPattern>
         {
@@ -1234,7 +1234,7 @@ public sealed partial class Binder
         if (RefuseUntyped(value))
             return new BoundErrorExpression(syntax.Span);
 
-        var subject = new BoundPatternInput(syntax.Value.Span, value.Type);
+        var subject = new BoundPlaceholder(syntax.Value.Span, value.Type);
         var pattern = BindTopPattern(syntax.Pattern, subject, PatternSite.Is);
         if (pattern is null)
             return new BoundErrorExpression(syntax.Span);
@@ -1387,7 +1387,7 @@ public sealed partial class Binder
     /// </summary>
     private BoundStatement BindPatternSwitch(SwitchSyntax syntax, BoundExpression value)
     {
-        var subject = new BoundPatternInput(syntax.Value.Span, value.Type);
+        var subject = new BoundPlaceholder(syntax.Value.Span, value.Type);
         var sections = new List<BoundSwitchSection>();
         var covered = new Dictionary<VariantCaseSymbol, SourceSpan>();
         var rows = new List<Space>();
@@ -1555,7 +1555,7 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
-        var subject = new BoundPatternInput(syntax.Value.Span, value.Type);
+        var subject = new BoundPlaceholder(syntax.Value.Span, value.Type);
         var arms = new List<(PatternMatch Pattern, BoundExpression? Guard, BoundExpression Value)>();
         var covered = new Dictionary<VariantCaseSymbol, SourceSpan>();
         var rows = new List<Space>();

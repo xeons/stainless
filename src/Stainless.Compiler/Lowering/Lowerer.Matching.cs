@@ -42,19 +42,6 @@ namespace Stainless.Lowering;
 /// </summary>
 public sealed partial class Lowerer
 {
-    public override BoundStatement Rewrite(BoundStatement statement) => statement switch
-    {
-        BoundSwitch chosen => LowerSwitch(chosen),
-        _ => base.Rewrite(statement),
-    };
-
-    public override BoundExpression Rewrite(BoundExpression expression) => expression switch
-    {
-        BoundIsPattern matched => LowerIsPattern(matched),
-        BoundSwitchExpression chosen => LowerSwitchExpression(chosen),
-        _ => base.Rewrite(expression),
-    };
-
     internal static BoundExpression Not(BoundExpression condition) =>
         condition is BoundUnary { Operator: BoundUnaryOp.LogicalNot } negated
             ? negated.Operand
@@ -654,7 +641,7 @@ public sealed partial class Lowerer
         public override BoundStatement Rewrite(BoundStatement statement) => statement switch
         {
             BoundBreak => new BoundGoto(statement.Span, end),
-            BoundWhile or BoundDoWhile or BoundFor or BoundParallelFor or BoundParallel => statement,
+            BoundWhile or BoundDoWhile or BoundFor or BoundForEach or BoundParallelFor or BoundParallel => statement,
             _ => base.Rewrite(statement),
         };
 

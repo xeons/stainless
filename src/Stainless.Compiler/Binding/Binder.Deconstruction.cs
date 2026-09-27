@@ -444,7 +444,7 @@ public sealed partial class Binder
     /// </summary>
     private BoundExpression HoldDeconstructed(BoundExpression value, List<DeconstructionStep> steps)
     {
-        if (IsFixed(value)) return value;
+        if (Places.IsFixed(value)) return value;
 
         var local = new LocalSymbol(SyntheticName("taken"), value.Type, isConst: false);
         bool owned = !IsMade(value) &&

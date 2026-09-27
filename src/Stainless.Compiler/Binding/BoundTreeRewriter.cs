@@ -195,6 +195,24 @@ public abstract class BoundTreeRewriter
                 return rebuilt;
             }
 
+            case BoundForEach loop:
+            {
+                var collection = Rewrite(loop.Collection);
+                var value = Rewrite(loop.Value);
+                var deconstruction = RewriteOptional(loop.Deconstruction);
+                var body = Rewrite(loop.Body);
+                return Same(loop.Collection, collection) && Same(loop.Value, value) &&
+                       Same(loop.Deconstruction, deconstruction) && Same(loop.Body, body)
+                    ? loop
+                    : new BoundForEach(loop.Span, collection, loop.Variable, loop.Element, value,
+                        deconstruction, body)
+                    {
+                        GetEnumerator = loop.GetEnumerator,
+                        MoveNext = loop.MoveNext,
+                        Current = loop.Current,
+                    };
+            }
+
             case BoundSwitch chosen:
             {
                 var subject = Rewrite(chosen.Subject);
@@ -323,7 +341,7 @@ public abstract class BoundTreeRewriter
                 or BoundNullLiteral or BoundLocalAccess or BoundParameterAccess or BoundStaticAccess
                 or BoundConstantAccess or BoundDefault or BoundSizeof or BoundAlignof or BoundOffsetof
                 or BoundTypeof or BoundIidof or BoundEmbed or BoundThis or BoundFunctionReference
-                or BoundUnmatchedSwitch or BoundOutDraft or BoundLambda or BoundPatternInput:
+                or BoundUnmatchedSwitch or BoundOutDraft or BoundLambda or BoundPlaceholder:
                 return expression;
 
             case BoundInterpolatedString interpolated:
@@ -446,6 +464,72 @@ public abstract class BoundTreeRewriter
                 return Same(sequence.Before, before) && Same(sequence.Value, value)
                     ? sequence
                     : new BoundSequence(sequence.Span, before, value);
+            }
+
+            case BoundObjectInitializer initialized:
+            {
+                var creation = Rewrite(initialized.Creation);
+                var writes = RewriteAll(initialized.Writes);
+                return Same(initialized.Creation, creation) && Same(initialized.Writes, writes)
+                    ? initialized
+                    : new BoundObjectInitializer(initialized.Span, initialized.Type, creation,
+                        initialized.Made, writes);
+            }
+
+            case BoundWith copied:
+            {
+                var target = Rewrite(copied.Target);
+                var assignments = new List<BoundWithAssignment>();
+                bool changed = !Same(copied.Target, target);
+                foreach (var assignment in copied.Assignments)
+                {
+                    var value = Rewrite(assignment.Value);
+                    if (Same(assignment.Value, value))
+                    {
+                        assignments.Add(assignment);
+                        continue;
+                    }
+
+                    changed = true;
+                    assignments.Add(new BoundWithAssignment(assignment.Span, assignment.Property, value));
+                }
+
+                return changed
+                    ? new BoundWith(copied.Span, copied.Record, target, copied.Clone, assignments)
+                    : copied;
+            }
+
+            case BoundCompoundAssignment compound:
+            {
+                var target = Rewrite(compound.Target);
+                var combined = Rewrite(compound.Combined);
+                return Same(compound.Target, target) && Same(compound.Combined, combined)
+                    ? compound
+                    : new BoundCompoundAssignment(compound.Span, compound.Type, target, compound.Current,
+                        compound.Value, combined, compound.IsFallback)
+                    {
+                        Property = compound.Property,
+                    };
+            }
+
+            case BoundConditionalAccess asked:
+            {
+                var receiver = Rewrite(asked.Receiver);
+                var access = Rewrite(asked.Access);
+                var whenNothing = Rewrite(asked.WhenNothing);
+                return Same(asked.Receiver, receiver) && Same(asked.Access, access) &&
+                       Same(asked.WhenNothing, whenNothing)
+                    ? asked
+                    : new BoundConditionalAccess(asked.Span, asked.Type, receiver, asked.Present, access, whenNothing);
+            }
+
+            case BoundNullFallback fallback:
+            {
+                var value = Rewrite(fallback.Value);
+                var otherwise = Rewrite(fallback.Fallback);
+                return Same(fallback.Value, value) && Same(fallback.Fallback, otherwise)
+                    ? fallback
+                    : new BoundNullFallback(fallback.Span, fallback.Type, value, otherwise);
             }
 
             case BoundConditional conditional:

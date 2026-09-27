@@ -42,7 +42,7 @@ internal static class BoundValues
     /// <summary>Whether reading this again costs a load and cannot find something else.</summary>
     public static bool IsSteadyRead(BoundExpression value) => value switch
     {
-        BoundLocalAccess or BoundParameterAccess or BoundThis or BoundPatternInput => true,
+        BoundLocalAccess or BoundParameterAccess or BoundThis or BoundPlaceholder => true,
         BoundLiteral or BoundNullLiteral or BoundConstantAccess => true,
         BoundConversion { Kind: ConversionKind.NarrowOptional } narrowed => IsSteadyRead(narrowed.Operand),
         BoundVariantPayload payload => IsSteadyRead(payload.Receiver),

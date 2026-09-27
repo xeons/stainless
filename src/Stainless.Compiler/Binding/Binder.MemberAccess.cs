@@ -89,18 +89,9 @@ public sealed partial class Binder
             return new BoundErrorExpression(span);
         }
 
-        // Held once. The local borrows: the receiver is already a temporary
-        // the statement will drop, and this only reads it in the meantime.
-        var held = new LocalSymbol(SyntheticName("asked"), optional, isConst: false);
-        var reading = new BoundLocalAccess(target.Span, held);
-
-        var present = new BoundBinary(
-            span, PrimitiveTypeSymbol.Bool,
-            reading, BoundBinaryOp.NotEqual,
-            new BoundNullLiteral(span, optional));
-
-        var narrowed = new BoundConversion(
-            target.Span, optional.Element, reading, ConversionKind.NarrowOptional);
+        // The receiver as it is known to be once asked, which is a view of
+        // it under another type and not storage of its own.
+        var narrowed = new BoundPlaceholder(target.Span, optional.Element) { IsStorage = false };
 
         var value = reach(narrowed);
         if (value.Type.IsError())
@@ -141,8 +132,7 @@ public sealed partial class Binder
             return new BoundErrorExpression(span);
         }
 
-        return new BoundLet(span, held, receiver,
-            new BoundConditional(span, value.Type, present, value, whenNothing));
+        return new BoundConditionalAccess(span, value.Type, receiver, narrowed, value, whenNothing);
     }
 
     /// <summary>
@@ -175,14 +165,6 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
-        var held = new LocalSymbol(SyntheticName("held"), left.Type, isConst: false);
-        var reading = new BoundLocalAccess(syntax.Left.Span, held);
-
-        var present = new BoundBinary(
-            syntax.Span, PrimitiveTypeSymbol.Bool,
-            reading, BoundBinaryOp.NotEqual,
-            new BoundNullLiteral(syntax.Span, left.Type));
-
         var fallback = BindExpression(syntax.Right);
         if (fallback.Type.IsError()) return new BoundErrorExpression(syntax.Span);
 
@@ -193,13 +175,8 @@ public sealed partial class Binder
             ? optional.Element
             : left.Type;
 
-        BoundExpression value = result is OptionalTypeSymbol
-            ? reading
-            : new BoundConversion(syntax.Left.Span, result, reading, ConversionKind.NarrowOptional);
-
-        return new BoundLet(syntax.Span, held, left,
-            new BoundConditional(syntax.Span, result, present, value,
-                BindConversion(fallback, result, syntax.Right.Span)));
+        return new BoundNullFallback(syntax.Span, result, left,
+            BindConversion(fallback, result, syntax.Right.Span));
     }
 
     private BoundExpression BindMemberAccess(MemberAccessSyntax syntax)

@@ -500,10 +500,9 @@ public sealed partial class Binder
                 return new BoundErrorExpression(syntax.Span);
             }
 
-        // Held in a name, because every entry works on the same object and the
-        // construction may not be evaluated again.
-        var held = new LocalSymbol(SyntheticName("made"), type, isConst: true);
-        var reading = new BoundLocalAccess(syntax.Span, held);
+        // Every entry works on the same object, which the construction may
+        // not be asked to make again.
+        var reading = new BoundPlaceholder(syntax.Span, type);
 
         var writes = new List<BoundExpression>();
 
@@ -517,8 +516,7 @@ public sealed partial class Binder
             writes.Add(written);
         }
 
-        return new BoundLet(syntax.Span, held, creation,
-            new BoundSequence(syntax.Span, writes, reading));
+        return new BoundObjectInitializer(syntax.Span, type, creation, reading, writes);
     }
 
     /// <summary>

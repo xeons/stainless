@@ -576,10 +576,6 @@ public sealed partial class Binder
     /// its base comes back whole rather than as the base, and a value its base
     /// computed from a parameter is copied rather than computed again.
     /// </para>
-    /// <para>
-    /// The target is held in a <see cref="BoundLet"/>, so <c>Compute() with
-    /// { X = 1 }</c> calls <c>Compute</c> once.
-    /// </para>
     /// </remarks>
     private BoundExpression BindWith(WithSyntax syntax)
     {
@@ -600,7 +596,7 @@ public sealed partial class Binder
         // A positional parameter is a property with an init setter, and any
         // other property with a setter, init or not, may be named too.
         var given = new HashSet<string>(StringComparer.Ordinal);
-        var written = new List<(PropertySymbol Property, BoundExpression Value, SourceSpan Span)>();
+        var written = new List<BoundWithAssignment>();
 
         foreach (var assignment in syntax.Assignments)
         {
@@ -635,34 +631,13 @@ public sealed partial class Binder
                 continue;
             }
 
-            written.Add((property, BindConversion(value, property.Type, assignment.Value.Span),
-                         assignment.Span));
+            written.Add(new BoundWithAssignment(assignment.Span, property,
+                BindConversion(value, property.Type, assignment.Value.Span)));
         }
 
         if (diagnostics.HasErrors) return new BoundErrorExpression(syntax.Span);
 
-        var held = new LocalSymbol(SyntheticName("changed"), record, isConst: false);
-        BoundExpression copied = new BoundCall(
-            syntax.Span, clone, new BoundLocalAccess(syntax.Span, held), []);
-
-        // The clone is the target's own type or one derived from it, so this
-        // narrows nothing that needs asking.
-        if (!ReferenceEquals(clone.ReturnType, record))
-            copied = new BoundConversion(syntax.Span, record, copied, ConversionKind.PointerCast);
-
-        if (written.Count == 0)
-            return new BoundLet(syntax.Span, held, target, copied);
-
-        var made = new LocalSymbol(SyntheticName("made"), record, isConst: true);
-        var copy = new BoundLocalAccess(syntax.Span, made);
-
-        var steps = written
-            .Select(BoundExpression (w) => new BoundPropertyAssignment(w.Span, copy, w.Property, w.Value))
-            .ToList();
-
-        return new BoundLet(syntax.Span, held, target,
-            new BoundLet(syntax.Span, made, copied,
-                new BoundSequence(syntax.Span, steps, copy)));
+        return new BoundWith(syntax.Span, record, target, clone, written);
     }
 
     /// <summary>Names in a list, for a diagnostic that offers them.</summary>
@@ -2592,12 +2567,10 @@ public sealed partial class Binder
             return WithHeld(syntax.Span, held, new BoundAssignment(syntax.Span, place, stored));
         }
 
-        // A compound assignment reads its place and writes it back, so the place
-        // is worked out once and named twice. It is held only when naming it
-        // again could differ, which is when something here has an effect.
-        var stable = IsRepeatable(target) && IsRepeatable(value)
-            ? target
-            : HoldPlace(target, held, everything: true);
+        // A compound assignment reads its place and writes it back. What the
+        // place held is named here by a placeholder, and lowering decides
+        // what to hold so that it is worked out once.
+        var current = new BoundPlaceholder(syntax.Target.Span, target.Type);
 
         // `a ??= b` asks a question of the place rather than computing on it,
         // and the value is evaluated and stored only when there was nothing.
@@ -2615,21 +2588,15 @@ public sealed partial class Binder
                 return new BoundErrorExpression(syntax.Span);
             }
 
-            var absent = new BoundBinary(
-                syntax.Span, PrimitiveTypeSymbol.Bool,
-                stable, BoundBinaryOp.Equal,
-                new BoundNullLiteral(syntax.Span, target.Type));
-
-            return WithHeld(syntax.Span, held, new BoundConditional(syntax.Span, target.Type, absent,
-                new BoundAssignment(syntax.Span, stable,
-                    BindConversion(value, target.Type, syntax.Value.Span)),
-                stable));
+            return new BoundCompoundAssignment(syntax.Span, target.Type, target, current, value,
+                BindConversion(value, target.Type, syntax.Value.Span), isFallback: true);
         }
 
-        var combined = BindCompoundOperation(syntax, stable, value);
+        var combined = BindCompoundOperation(syntax, current, value);
         if (combined.Type.IsError()) return new BoundErrorExpression(syntax.Span);
 
-        return WithHeld(syntax.Span, held, new BoundAssignment(syntax.Span, stable, combined));
+        return new BoundCompoundAssignment(
+            syntax.Span, target.Type, target, current, value, combined, isFallback: false);
     }
 
     /// <summary>
@@ -2776,18 +2743,9 @@ public sealed partial class Binder
         }
 
         // `p.X += 1` calls the getter and then the setter, on one receiver and
-        // one set of indices, each evaluated once.
-        if (!(receiver is null || IsRepeatable(receiver)) || !indices.All(IsRepeatable) ||
-            !IsRepeatable(value))
-        {
-            if (receiver is not null) receiver = HoldReceiver(receiver, held, everything: true);
-            indices = indices.Select(index => HoldValue(index, held, everything: true)).ToList();
-        }
+        // one set of indices, which lowering evaluates once.
+        var current = new BoundPlaceholder(read.Span, property.Type) { IsStorage = false };
 
-        var reread = new BoundCall(read.Span, read.Function, receiver, indices)
-            { IsNonVirtual = read.IsNonVirtual };
-
-        BoundExpression written;
         if (syntax.Operator == TokenKind.QuestionQuestionEquals)
         {
             if (property.Type is not (OptionalTypeSymbol or PointerTypeSymbol))
@@ -2798,35 +2756,21 @@ public sealed partial class Binder
                 return new BoundErrorExpression(syntax.Span);
             }
 
-            // The getter is called once, and the setter only when it answered
-            // nothing.
-            var was = new LocalSymbol(SyntheticName("was"), property.Type, isConst: false);
-            var wasRead = new BoundLocalAccess(syntax.Span, was);
-            written = new BoundLet(syntax.Span, was, reread,
-                new BoundConditional(syntax.Span, property.Type,
-                    new BoundBinary(syntax.Span, PrimitiveTypeSymbol.Bool, wasRead,
-                        BoundBinaryOp.Equal, new BoundNullLiteral(syntax.Span, property.Type)),
-                    new BoundPropertyAssignment(syntax.Span, receiver, property,
-                        BindConversion(value, property.Type, syntax.Value.Span))
-                    {
-                        Indices = indices,
-                        IsNonVirtual = read.IsNonVirtual,
-                    },
-                    wasRead));
-        }
-        else
-        {
-            var combined = BindCompoundOperation(syntax, reread, value);
-            if (combined.Type.IsError()) return new BoundErrorExpression(syntax.Span);
-
-            written = new BoundPropertyAssignment(syntax.Span, receiver, property, combined)
+            return new BoundCompoundAssignment(syntax.Span, property.Type, read, current, value,
+                BindConversion(value, property.Type, syntax.Value.Span), isFallback: true)
             {
-                Indices = indices,
-                IsNonVirtual = read.IsNonVirtual,
+                Property = property,
             };
         }
 
-        return WithHeld(syntax.Span, held, written);
+        var combined = BindCompoundOperation(syntax, current, value);
+        if (combined.Type.IsError()) return new BoundErrorExpression(syntax.Span);
+
+        return new BoundCompoundAssignment(
+            syntax.Span, property.Type, read, current, value, combined, isFallback: false)
+        {
+            Property = property,
+        };
     }
 
     /// <summary>
@@ -2957,133 +2901,22 @@ public sealed partial class Binder
         _ => false,
     };
 
-    /// <summary>A value an assignment evaluates once and names again.</summary>
-    private readonly record struct HeldValue(LocalSymbol Local, BoundExpression Value, bool IsOwned);
+    /// <summary>Holding for a place written as it is bound, with names of the binder's own.</summary>
+    private Places Holding => new((hint, type) => new LocalSymbol(SyntheticName(hint), type, isConst: false));
 
-    /// <summary>
-    /// A place rewritten so that naming it again evaluates nothing, and
-    /// reaches the same storage whatever runs in between.
-    ///
-    /// With <paramref name="everything"/>, every receiver and index is held,
-    /// in the order written. Without it, only the object or array the store
-    /// lands in is held, which is what an assignment whose value runs code
-    /// needs: that code may release the object's last other owner.
-    /// </summary>
-    private BoundExpression HoldPlace(
-        BoundExpression place, List<HeldValue> held, bool everything)
-    {
-        switch (place)
-        {
-            case BoundFieldAccess { Receiver: { } receiver } field:
-                return new BoundFieldAccess(field.Span,
-                    field.Field.ContainingType is StructTypeSymbol
-                        ? HoldPlace(receiver, held, everything)
-                        : HoldContainer(receiver, held, everything),
-                    field.Field);
+    private BoundExpression HoldPlace(BoundExpression place, List<HeldValue> held, bool everything) =>
+        Holding.HoldPlace(place, held, everything);
 
-            case BoundIndex { Target.Type: FixedArrayTypeSymbol } element:
-                return new BoundIndex(element.Span, element.Type,
-                    HoldPlace(element.Target, held, everything),
-                    HoldValue(element.Index, held, everything))
-                    { Origin = element.Origin };
+    private BoundExpression HoldReceiver(BoundExpression receiver, List<HeldValue> held, bool everything) =>
+        Holding.HoldReceiver(receiver, held, everything);
 
-            case BoundIndex element:
-                return new BoundIndex(element.Span, element.Type,
-                    element.Target.Type is ArrayTypeSymbol
-                        ? HoldContainer(element.Target, held, everything)
-                        : HoldValue(element.Target, held, everything),
-                    HoldValue(element.Index, held, everything))
-                    { Origin = element.Origin };
+    private BoundExpression HoldValue(BoundExpression value, List<HeldValue> held, bool everything) =>
+        Holding.HoldValue(value, held, everything);
 
-            case BoundDereference dereference:
-                return new BoundDereference(dereference.Span, dereference.Type,
-                    HoldValue(dereference.Operand, held, everything));
+    private static BoundExpression WithHeld(SourceSpan span, List<HeldValue> held, BoundExpression body) =>
+        Places.WithHeld(span, held, body);
 
-            // A variable: naming it again names the same storage.
-            default:
-                return place;
-        }
-    }
-
-    /// <summary>
-    /// A property's receiver, held as <see cref="HoldPlace"/> holds a place:
-    /// a struct through its storage, an object as the reference.
-    /// </summary>
-    private BoundExpression HoldReceiver(
-        BoundExpression receiver, List<HeldValue> held, bool everything) =>
-        receiver is BoundAddressOf { Operand: { IsLValue: true } storage } address
-            ? new BoundAddressOf(address.Span, address.Type, HoldPlace(storage, held, everything))
-            : HoldContainer(receiver, held, everything);
-
-    /// <summary>
-    /// The reference to what a store lands in. Held even when nothing else
-    /// is, unless it is a local or a parameter, which nothing but this
-    /// statement's own assignments could change.
-    /// </summary>
-    private BoundExpression HoldContainer(
-        BoundExpression container, List<HeldValue> held, bool everything) =>
-        everything || container is not (BoundLocalAccess or BoundParameterAccess)
-            ? HoldValue(container, held, everything: true)
-            : container;
-
-    /// <summary>
-    /// A value evaluated now and read back later. A reference this statement
-    /// did not make is owned while held, since what runs in between may drop
-    /// every other reference to it.
-    /// </summary>
-    private BoundExpression HoldValue(
-        BoundExpression value, List<HeldValue> held, bool everything)
-    {
-        if (!everything || IsFixed(value)) return value;
-
-        var local = new LocalSymbol(SyntheticName("held"), value.Type, isConst: false);
-        bool made = value is BoundCall or BoundNew or BoundIndirectCall or BoundClosureCall;
-        held.Add(new HeldValue(local, value, value.Type.NeedsArc() && !made));
-        return new BoundLocalAccess(value.Span, local);
-    }
-
-    /// <summary>Whether a value is the same wherever and however often it is read.</summary>
-    private static bool IsFixed(BoundExpression expression) => expression switch
-    {
-        BoundLiteral or BoundStringLiteral or BoundUtf8Literal or BoundNullLiteral => true,
-        BoundConstantAccess => true,
-        BoundSizeof or BoundAlignof or BoundOffsetof or BoundThis => true,
-        BoundConversion conversion => IsFixed(conversion.Operand),
-        _ => false,
-    };
-
-    /// <summary>Binds each held value around what follows it, in the order held.</summary>
-    private static BoundExpression WithHeld(
-        SourceSpan span, List<HeldValue> held, BoundExpression body)
-    {
-        for (int i = held.Count - 1; i >= 0; i--)
-            body = new BoundLet(span, held[i].Local, held[i].Value, body) { IsOwned = held[i].IsOwned };
-
-        return body;
-    }
-
-    /// <summary>
-    /// True when evaluating this expression again has no consequences: it reads
-    /// storage or computes from constants, rather than doing anything.
-    ///
-    /// A call is deliberately absent, which is what makes this useful: it is
-    /// exactly the question a lowering has to ask before naming its operand
-    /// twice.
-    /// </summary>
-    private static bool IsRepeatable(BoundExpression expression) => expression switch
-    {
-        BoundLiteral or BoundStringLiteral or BoundUtf8Literal or BoundNullLiteral => true,
-        BoundConstantAccess or BoundDefault => true,
-        BoundLocalAccess or BoundParameterAccess or BoundThis or BoundStaticAccess => true,
-        BoundFieldAccess field => field.Receiver is null || IsRepeatable(field.Receiver),
-        BoundIndex element => IsRepeatable(element.Target) && IsRepeatable(element.Index),
-        BoundDereference dereference => IsRepeatable(dereference.Operand),
-        BoundAddressOf address => IsRepeatable(address.Operand),
-        BoundConversion conversion => IsRepeatable(conversion.Operand),
-        BoundUnary unary => IsRepeatable(unary.Operand),
-        BoundBinary binary => IsRepeatable(binary.Left) && IsRepeatable(binary.Right),
-        _ => false,
-    };
+    private static bool IsRepeatable(BoundExpression expression) => Places.IsRepeatable(expression);
 
     /// <summary>
     /// The accessor of an indexer that takes this index, or null.

@@ -1314,6 +1314,11 @@ public sealed partial class Binder
                 AssignsInLoop(loop.Body, target, assigned, owner);
                 return assigned;
 
+            case BoundForEach loop:
+                assigned = Evaluates(loop.Collection, target, assigned, owner);
+                AssignsInLoop(loop.Body, target, assigned, owner);
+                return assigned;
+
             case BoundFor loop:
                 if (loop.Initializer is not null)
                     assigned = Assigns(loop.Initializer, target, assigned, owner);
@@ -1637,12 +1642,15 @@ public sealed partial class Binder
     /// </summary>
     private static bool Effective(BoundExpression expression) => expression switch
     {
-        BoundAssignment or BoundPropertyAssignment or BoundCall or BoundIndirectCall
+        BoundAssignment or BoundPropertyAssignment or BoundCompoundAssignment or BoundCall or BoundIndirectCall
             or BoundClosureCall or BoundIncrement or BoundPropertyIncrement
             or BoundNew or BoundStructNew or BoundErrorExpression => true,
 
         BoundLet held => Effective(held.Body),
         BoundConditional chosen => Effective(chosen.WhenTrue) || Effective(chosen.WhenFalse),
+        BoundConditionalAccess asked => Effective(asked.Access) || Effective(asked.WhenNothing),
+        BoundNullFallback fallback => Effective(fallback.Fallback),
+        BoundSwitchExpression chosen => chosen.Arms.Any(arm => Effective(arm.Value)),
         _ => false,
     };
 
@@ -2088,101 +2096,69 @@ public sealed partial class Binder
     }
 
     /// <summary>
-    /// <c>foreach</c>, lowered here rather than in the emitter.
+    /// <c>foreach</c>: the collection, the element each pass names, and the
+    /// body. How it iterates is lowering's, and depends on what the
+    /// collection is.
     ///
-    /// An array iterates by index, which costs no allocation and no dispatch.
-    /// Anything else is asked for a <c>GetEnumerator()</c>, found by name rather
-    /// than by interface, so a type can be iterable without Standard.Collections
-    /// appearing anywhere in the program.
-    ///
-    /// The collection is evaluated once into a hidden local, which fixes the
-    /// semantics and keeps the object alive for the whole loop. Its name starts
-    /// with '$' so no source identifier can collide with it, and is numbered so
-    /// that nested loops do not collide with each other.
+    /// An array or a slice iterates by index, which costs no allocation and
+    /// no dispatch. Anything else is asked for a <c>GetEnumerator()</c>, found
+    /// by name rather than by interface, so a type can be iterable without
+    /// Standard.Collections appearing anywhere in the program.
     /// </summary>
     private BoundStatement BindForEach(ForEachSyntax syntax)
     {
         PushScope();
 
         var collection = BindExpression(syntax.Collection);
-        var statements = new List<BoundStatement>();
-        var outer = new BoundBlock(syntax.Span, statements);
-
         if (collection.Type.IsError())
         {
             PopScope();
-            return outer;
+            return new BoundBlock(syntax.Span, []);
         }
 
-        var sequence = DeclareLocal(
-            SyntheticName("sequence"), collection.Type, isConst: false, syntax.Collection.Span);
-        statements.Add(new BoundLocalDeclaration(syntax.Collection.Span, sequence, collection));
-        outer.Locals.Add(sequence);
+        TypeSymbol element;
+        (FunctionSymbol GetEnumerator, FunctionSymbol MoveNext, FunctionSymbol Current)? enumerator = null;
 
         if (collection.Type is ArrayTypeSymbol array)
-            statements.Add(BuildArrayLoop(syntax, sequence, array.Element));
+            element = array.Element;
         else if (collection.Type is SliceTypeSymbol slice)
-            statements.Add(BuildArrayLoop(syntax, sequence, slice.Element));
-        else if (BuildEnumeratorLoop(syntax, sequence, outer, statements) is { } loop)
-            statements.Add(loop);
+            element = slice.Element;
+        else if (FindEnumerator(syntax, collection.Type) is { } found)
+            (enumerator, element) = (found, found.Current.ReturnType);
+        else
+        {
+            PopScope();
+            return new BoundBlock(syntax.Span, []);
+        }
 
+        var input = new BoundPlaceholder(syntax.Span, element);
+        var (variable, value, deconstruction, body) = BindForEachBody(syntax, input);
         PopScope();
-        return outer;
-    }
 
-    /// <summary>The array fast path: an ordinary indexed <c>for</c>.</summary>
-    private BoundStatement BuildArrayLoop(
-        ForEachSyntax syntax, LocalSymbol sequence, TypeSymbol element)
-    {
-        PushScope();
-
-        var index = DeclareLocal(
-            SyntheticName("index"), PrimitiveTypeSymbol.NUInt, isConst: false, syntax.Span);
-        var initializer = new BoundLocalDeclaration(syntax.Span, index,
-            new BoundLiteral(syntax.Span, PrimitiveTypeSymbol.NUInt, 0UL));
-
-        var condition = new BoundBinary(syntax.Span, PrimitiveTypeSymbol.Bool,
-            new BoundLocalAccess(syntax.Span, index),
-            BoundBinaryOp.Less,
-            new BoundArrayLength(syntax.Span, PrimitiveTypeSymbol.NUInt,
-                new BoundLocalAccess(syntax.Span, sequence)));
-
-        var step = new BoundAssignment(syntax.Span,
-            new BoundLocalAccess(syntax.Span, index),
-            new BoundBinary(syntax.Span, PrimitiveTypeSymbol.NUInt,
-                new BoundLocalAccess(syntax.Span, index),
-                BoundBinaryOp.Add,
-                new BoundLiteral(syntax.Span, PrimitiveTypeSymbol.NUInt, 1UL)));
-
-        var item = new BoundIndex(syntax.Span, element,
-            new BoundLocalAccess(syntax.Span, sequence),
-            new BoundLocalAccess(syntax.Span, index));
-
-        var body = BindForEachBody(syntax, item);
-
-        var loop = new BoundFor(syntax.Span, initializer, condition, step, body);
-        loop.Locals.Add(index);
-
-        PopScope();
-        return loop;
+        return new BoundForEach(syntax.Span, collection, variable, input, value, deconstruction, body)
+        {
+            GetEnumerator = enumerator?.GetEnumerator,
+            MoveNext = enumerator?.MoveNext,
+            Current = enumerator?.Current,
+        };
     }
 
     /// <summary>
-    /// The general path: <c>while ($e.MoveNext()) { var x = $e.Current(); ... }</c>.
-    /// Putting MoveNext in the condition is what makes <c>continue</c> advance the
-    /// enumerator rather than spin on the same element.
+    /// What makes a collection that is not an array iterable: a
+    /// <c>GetEnumerator()</c>, whose result has a <c>bool MoveNext()</c> and a
+    /// <c>Current</c>.
     /// </summary>
-    private BoundStatement? BuildEnumeratorLoop(
-        ForEachSyntax syntax, LocalSymbol sequence, BoundBlock outer, List<BoundStatement> statements)
+    private (FunctionSymbol GetEnumerator, FunctionSymbol MoveNext, FunctionSymbol Current)? FindEnumerator(
+        ForEachSyntax syntax, TypeSymbol collection)
     {
-        if (sequence.Type is not NamedTypeSymbol source ||
+        if (collection is not NamedTypeSymbol source ||
             source.FindMethod("GetEnumerator") is not { } getEnumerator ||
             getEnumerator.Parameters.Count(p => !p.IsThis) != 0)
         {
             diagnostics.Error("SL0356", syntax.Collection.Span,
-                $"'{sequence.Type.Name}' cannot be iterated; it is not an array and has no " +
+                $"'{collection.Name}' cannot be iterated; it is not an array and has no " +
                 "'GetEnumerator()' method taking no arguments",
-                sequence.Type);
+                collection);
             return null;
         }
 
@@ -2203,35 +2179,23 @@ public sealed partial class Binder
             current.ReturnType.IsVoid())
         {
             diagnostics.Error("SL0357", syntax.Collection.Span,
-                $"'{sequence.Type.Name}.GetEnumerator()' returns '{getEnumerator.ReturnType.Name}', " +
+                $"'{collection.Name}.GetEnumerator()' returns '{getEnumerator.ReturnType.Name}', " +
                 "which is not an enumerator; that needs a 'bool MoveNext()' and a 'Current' " +
                 "returning the element",
-                sequence.Type, getEnumerator.ReturnType);
+                collection, getEnumerator.ReturnType);
             return null;
         }
 
-        var handle = DeclareLocal(
-            SyntheticName("enumerator"), getEnumerator.ReturnType, isConst: false, syntax.Span);
-        statements.Add(new BoundLocalDeclaration(syntax.Span, handle,
-            new BoundCall(syntax.Span, getEnumerator,
-                new BoundLocalAccess(syntax.Span, sequence), [])));
-        outer.Locals.Add(handle);
-
-        var condition = new BoundCall(syntax.Span, moveNext,
-            new BoundLocalAccess(syntax.Span, handle), []);
-
-        var element = new BoundCall(syntax.Span, current,
-            new BoundLocalAccess(syntax.Span, handle), []);
-
-        return new BoundWhile(syntax.Span, condition, BindForEachBody(syntax, element));
+        return (getEnumerator, moveNext, current);
     }
 
     /// <summary>
-    /// Declares the loop variable from the element expression, then binds the body
+    /// The loop variable, what it is given from the element, and the body
     /// around it. The variable lives inside the loop, so a managed element is
-    /// released at the end of each iteration rather than at the end of the loop.
+    /// released at the end of each pass rather than at the end of the loop.
     /// </summary>
-    private BoundStatement BindForEachBody(ForEachSyntax syntax, BoundExpression element)
+    private (LocalSymbol Variable, BoundExpression Value, BoundStatement? Deconstruction, BoundStatement Body)
+        BindForEachBody(ForEachSyntax syntax, BoundPlaceholder element)
     {
         PushScope();
         if (_context.VariantFacts.Count > 0) InvalidateAssignedIn(syntax.Body);
@@ -2249,28 +2213,16 @@ public sealed partial class Binder
             syntax.Deconstruction is null ? syntax.Name : SyntheticName("element"),
             type, isConst: false, syntax.Span);
 
-        var statements = new List<BoundStatement>
-        {
-            new BoundLocalDeclaration(syntax.Span, variable, value),
-        };
-
-        var block = new BoundBlock(syntax.Span, statements);
-        block.Locals.Add(variable);
-
-        if (syntax.Deconstruction is { } taken)
-        {
-            var parts = BindForEachDeconstruction(taken, variable, taken.Span);
-            if (parts is BoundDeconstruct declared)
-                block.Locals.AddRange(declared.Declarations.Select(d => d.Local));
-            statements.Add(parts);
-        }
+        var deconstruction = syntax.Deconstruction is { } taken
+            ? BindForEachDeconstruction(taken, variable, taken.Span)
+            : null;
 
         _context.LoopDepth++;
-        statements.Add(BindStatement(syntax.Body));
+        var body = BindStatement(syntax.Body);
         _context.LoopDepth--;
 
         PopScope();
-        return block;
+        return (variable, value, deconstruction, body);
     }
 
     /// <summary>
@@ -2447,6 +2399,18 @@ public sealed partial class Binder
                  Underlying(increment.Left) is BoundLocalAccess from && from.Local == variable)
         {
             stride = increment.Right;
+        }
+        else if (step is BoundCompoundAssignment
+                 {
+                     Property: null,
+                     IsFallback: false,
+                     Target: BoundLocalAccess compounded,
+                     Combined: BoundBinary { Operator: BoundBinaryOp.Add } added,
+                 } compound &&
+                 compounded.Local == variable &&
+                 ReferenceEquals(Underlying(added.Left), compound.Current))
+        {
+            stride = added.Right;
         }
         else
         {
