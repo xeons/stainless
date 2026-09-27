@@ -206,6 +206,9 @@ internal static class Program
             : $"\u001b[31m{failures.Count} failed\u001b[0m, {passed} passed{Skipped(skipped)} in {stopwatch.ElapsedMilliseconds} ms";
         Console.WriteLine(summary);
 
+        if (s_leakCheck)
+            Console.WriteLine($"{s_retains} retains and {s_releases} releases, over every case that finished");
+
         return failures.Count == 0 ? 0 : 1;
     }
 
@@ -278,6 +281,13 @@ internal static class Program
     /// case that may not answer zero says so with a leaks.txt of its own.
     /// </summary>
     private static bool s_leakCheck;
+
+    /// <summary>
+    /// The calls to sl_retain and sl_release every report counted, summed, which
+    /// is how a change to where the emitter puts them is measured.
+    /// </summary>
+    private static long s_retains;
+    private static long s_releases;
 
     private static (bool Ok, string Detail) RunCase(string directory, string workDirectory)
     {
@@ -751,6 +761,8 @@ internal static class Program
         if (counts.Count == 0) return "could not read the allocation report:\n" + report;
 
         int alive = counts.Sum(m => int.Parse(m.Groups[1].Value));
+        s_retains += Regex.Matches(report, @"retains=(\d+)").Sum(m => long.Parse(m.Groups[1].Value));
+        s_releases += Regex.Matches(report, @"releases=(\d+)").Sum(m => long.Parse(m.Groups[1].Value));
         int unrecorded = Regex.Matches(report, @"untracked=(\d+)")
             .Sum(m => int.Parse(m.Groups[1].Value));
 

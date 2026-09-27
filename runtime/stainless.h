@@ -316,16 +316,26 @@ SL_API void  sl_object_init(void *pointer, const SlTypeInfo *type);
  * reported rather than ignored, which is how the fourth of those was found --
  * it had been missed, and the count said so on the first run.
  *
- * Both compile to nothing unless SL_LEAK_CHECK is defined.
+ * The same build counts every call to sl_retain and sl_release, null and
+ * immortal ones included, because a call is what the compiler emitted and what
+ * it costs whether or not it changed a count.
+ *
+ * All four compile to nothing unless SL_LEAK_CHECK is defined.
  */
 #ifdef SL_LEAK_CHECK
 SL_API void sl_leak_record(void *object, size_t bytes);
 SL_API void sl_leak_forget(void *object);
+extern size_t sl_leak_retains;
+extern size_t sl_leak_releases;
 #define SL_LEAK_RECORD(object, bytes) sl_leak_record((object), (bytes))
 #define SL_LEAK_FORGET(object)        sl_leak_forget((object))
+#define SL_LEAK_RETAIN()  __atomic_fetch_add(&sl_leak_retains, 1, __ATOMIC_RELAXED)
+#define SL_LEAK_RELEASE() __atomic_fetch_add(&sl_leak_releases, 1, __ATOMIC_RELAXED)
 #else
 #define SL_LEAK_RECORD(object, bytes) ((void)0)
 #define SL_LEAK_FORGET(object)        ((void)0)
+#define SL_LEAK_RETAIN()              ((void)0)
+#define SL_LEAK_RELEASE()             ((void)0)
 #endif
 
 /*

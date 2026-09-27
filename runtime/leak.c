@@ -75,6 +75,9 @@ static size_t       sl_live_untracked;  /* freed without having been recorded */
 static SlMutex     *sl_live_gate;
 static int          sl_live_reporting;
 
+size_t sl_leak_retains;
+size_t sl_leak_releases;
+
 static size_t sl_live_slot(size_t capacity, const void *object)
 {
     /* The pointer's low bits are the allocator's alignment and say nothing, so
@@ -278,8 +281,11 @@ static void sl_leak_report(void)
         }
     }
 
-    fprintf(stderr, "stainless-leak: live=%zu bytes=%zu allocated=%zu untracked=%zu\n",
-            live, bytes, sl_live_serial, sl_live_untracked);
+    fprintf(stderr, "stainless-leak: live=%zu bytes=%zu allocated=%zu untracked=%zu "
+                    "retains=%zu releases=%zu\n",
+            live, bytes, sl_live_serial, sl_live_untracked,
+            __atomic_load_n(&sl_leak_retains, __ATOMIC_RELAXED),
+            __atomic_load_n(&sl_leak_releases, __ATOMIC_RELAXED));
 
     if (tally != NULL) {
         qsort(tally, kinds, sizeof(SlLeakTally), sl_leak_worst_first);

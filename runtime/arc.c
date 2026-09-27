@@ -215,6 +215,8 @@ static int sl_is_immortal(const SlObject *object)
 
 void sl_retain(void *pointer)
 {
+    SL_LEAK_RETAIN();
+
     SlObject *object = (SlObject *)pointer;
     if (object == NULL || sl_is_immortal(object)) return;
 
@@ -242,6 +244,8 @@ void sl_weak_release(void *pointer)
 
 void sl_release(void *pointer)
 {
+    SL_LEAK_RELEASE();
+
     SlObject *object = (SlObject *)pointer;
     if (object == NULL || sl_is_immortal(object)) return;
 
