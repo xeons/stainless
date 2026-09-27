@@ -169,6 +169,199 @@ public class BoundTreeTests
         }
     }
 
+    // ------------------------------------------------------------ the rewriter
+
+    /// <summary>
+    /// Every child of every node type is rebuilt, and rebuilt once, and the
+    /// rebuilt node holds exactly the new children and everything else the old
+    /// one held.
+    ///
+    /// Each child is replaced by a fresh node, which makes the rewriter build a
+    /// new node around them. A child it forgets, visits twice or leaves out of
+    /// the new node fails here, and so does a property -- a flag, a symbol, a
+    /// list of locals -- that the rebuild drops.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(NodeTypes))]
+    public void EveryChildIsRebuiltOnce(string typeName)
+    {
+        var type = Compiler.GetType(typeName)!;
+        var node = RuntimeHelpers.GetUninitializedObject(type);
+        var expected = new List<object>();
+        Fill(node, expected);
+        FillScalars(node);
+
+        var replacer = new Replacer(expected);
+        object rebuilt = node is BoundExpression expression
+            ? replacer.RewriteChildren(expression)
+            : replacer.RewriteChildren((BoundStatement)node);
+
+        Assert.Equal(expected.Count, replacer.Seen.Count);
+        foreach (var child in expected)
+            Assert.Single(replacer.Seen, seen => ReferenceEquals(seen, child));
+
+        if (expected.Count == 0)
+        {
+            Assert.Same(node, rebuilt);
+            return;
+        }
+
+        Assert.NotSame(node, rebuilt);
+
+        var recorder = new Recorder();
+        if (rebuilt is BoundExpression rebuiltExpression)
+            recorder.VisitChildren(rebuiltExpression);
+        else
+            recorder.VisitChildren((BoundStatement)rebuilt);
+
+        Assert.Equal(replacer.Made.Count, recorder.Seen.Count);
+        foreach (var child in replacer.Made)
+            Assert.Single(recorder.Seen, seen => ReferenceEquals(seen, child));
+
+        AssertSameScalars(node, rebuilt);
+    }
+
+    /// <summary>Unchanged children leave the node as it was.</summary>
+    [Theory]
+    [MemberData(nameof(NodeTypes))]
+    public void NothingChangedIsNothingCopied(string typeName)
+    {
+        var type = Compiler.GetType(typeName)!;
+        var node = RuntimeHelpers.GetUninitializedObject(type);
+        Fill(node, []);
+        FillScalars(node);
+
+        var identity = new Replacer([]);
+        object rebuilt = node is BoundExpression expression
+            ? identity.RewriteChildren(expression)
+            : identity.RewriteChildren((BoundStatement)node);
+
+        Assert.Same(node, rebuilt);
+    }
+
+    private static readonly Source.SourceText Scratch = new("rewritten.sl", "rewritten");
+
+    /// <summary>A value that is not a default in every property that holds no nodes.</summary>
+    private static void FillScalars(object owner)
+    {
+        foreach (var property in owner.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+        {
+            var backing = BackingField(owner.GetType(), property.Name);
+            if (backing is null || Mentions(property.PropertyType))
+            {
+                if (backing?.GetValue(owner) is { } holder &&
+                    (holder is BoundSwitchSection or BoundAsmOperand))
+                    FillScalars(holder);
+                if (backing?.GetValue(owner) is System.Collections.IEnumerable parts and not string)
+                    foreach (var part in parts)
+                        if (part is BoundSwitchSection or BoundAsmOperand)
+                            FillScalars(part);
+                continue;
+            }
+
+            // What a constructor works out from its other arguments is not
+            // the rewriter's to carry.
+            if (property.Name == nameof(BoundExpression.Type))
+                continue;
+
+            backing.SetValue(owner, Sample(property.PropertyType));
+        }
+    }
+
+    private static object? Sample(Type type)
+    {
+        if (type == typeof(bool)) return true;
+        if (type == typeof(int)) return 7;
+        if (type == typeof(ulong)) return 7ul;
+        if (type == typeof(string)) return "sample";
+        if (type == typeof(object)) return new object();
+        if (type.IsEnum)
+        {
+            var values = Enum.GetValues(type);
+            return values.Length > 1 ? values.GetValue(1) : values.GetValue(0);
+        }
+        if (type == typeof(Source.SourceSpan)) return new Source.SourceSpan(Scratch, 1, 3);
+
+        if (Nullable.GetUnderlyingType(type) is { } underlying)
+            return Sample(underlying);
+
+        if (type.IsGenericType && type.GetGenericTypeDefinition() is var definition &&
+            (definition == typeof(IReadOnlyList<>) || definition == typeof(List<>)))
+        {
+            var element = type.GetGenericArguments()[0];
+            var list = (System.Collections.IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(element))!;
+            for (int i = 0; i < 2; i++)
+                list.Add(Sample(element));
+            return list;
+        }
+
+        if (type.IsValueType)
+            return Activator.CreateInstance(type);
+
+        var concrete = type.IsAbstract
+            ? Compiler.GetTypes().First(t => !t.IsAbstract && type.IsAssignableFrom(t))
+            : type;
+        return RuntimeHelpers.GetUninitializedObject(concrete);
+    }
+
+    /// <summary>Every property that holds no nodes is the same object, or the same sequence, after the rebuild.</summary>
+    private static void AssertSameScalars(object before, object after)
+    {
+        foreach (var property in before.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+        {
+            var backing = BackingField(before.GetType(), property.Name);
+            if (backing is null || property.GetCustomAttribute<SharedSubtreeAttribute>() is not null ||
+                property.Name == nameof(BoundExpression.Type))
+                continue;
+
+            object? was = backing.GetValue(before);
+            object? now = backing.GetValue(after);
+
+            if (Mentions(property.PropertyType))
+            {
+                if (was is BoundSwitchSection or BoundAsmOperand)
+                    AssertSameScalars(was, now!);
+                else if (was is System.Collections.IEnumerable parts and not string)
+                    foreach (var (part, rebuilt) in parts.Cast<object>().Zip(((System.Collections.IEnumerable)now!).Cast<object>()))
+                        if (part is BoundSwitchSection or BoundAsmOperand)
+                            AssertSameScalars(part, rebuilt);
+                continue;
+            }
+
+            string where = $"{before.GetType().Name}.{property.Name}";
+            if (was is System.Collections.IEnumerable sequence and not string)
+                Assert.True(sequence.Cast<object?>().SequenceEqual(((System.Collections.IEnumerable)now!).Cast<object?>()),
+                    $"{where} was not carried over");
+            else
+                Assert.True(Equals(was, now), $"{where} was not carried over");
+        }
+    }
+
+    /// <summary>Replaces each child a test put in with a fresh node of the same kind.</summary>
+    private sealed class Replacer(List<object> children) : BoundTreeRewriter
+    {
+        public List<object> Seen { get; } = [];
+
+        public List<object> Made { get; } = [];
+
+        public override BoundExpression Rewrite(BoundExpression expression) =>
+            (BoundExpression)Replace(expression);
+
+        public override BoundStatement Rewrite(BoundStatement statement) =>
+            (BoundStatement)Replace(statement);
+
+        private object Replace(object node)
+        {
+            Seen.Add(node);
+            if (!children.Contains(node))
+                return node;
+
+            var fresh = RuntimeHelpers.GetUninitializedObject(node.GetType());
+            Made.Add(fresh);
+            return fresh;
+        }
+    }
+
     // ------------------------------------------------------------ 'out'
 
     private static string[] OutCodes(string function) =>
@@ -275,7 +468,7 @@ public class BoundTreeTests
             Statics = [],
             StaticConstructors = [],
             Initialization = [],
-        });
+        }, BoundTreeForm.Semantic);
     }
 
     [Fact]

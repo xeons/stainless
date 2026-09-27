@@ -18,10 +18,23 @@ using Stainless.Source;
 
 namespace Stainless.Binding;
 
+/// <summary>Which of the two trees a program's bodies are.</summary>
+public enum BoundTreeForm
+{
+    /// <summary>What binding makes: what the program means, close to how it is written.</summary>
+    Semantic,
+
+    /// <summary>What lowering makes of that: the smaller core the emitter handles.</summary>
+    Lowered,
+}
+
 /// <summary>
-/// Checks a program that bound without error against what the emitter assumes
-/// of it, and throws an <see cref="InternalCompilerError"/> at the first node
-/// that breaks a rule.
+/// Checks a program that bound without error against what lowering and the
+/// emitter assume of it, and throws an <see cref="InternalCompilerError"/> at
+/// the first node that breaks a rule.
+///
+/// It runs twice: once over what binding made, and once over what lowering
+/// made of it, which also MUST NOT hold a node lowering takes away.
 ///
 /// The emitter trusts the tree. A node it has no case for, a local it has no
 /// slot for, or a write to something that is not storage would each be a crash
@@ -43,15 +56,27 @@ public static class BoundTreeVerifier
             : false;
 #endif
 
-    public static void Verify(BoundProgram program)
+    public static void Verify(BoundProgram program, BoundTreeForm form)
     {
+        if (form == BoundTreeForm.Lowered && !program.IsLowered)
+            throw new InternalCompilerError("a program is checked as lowered before it was lowered");
+
         foreach (var function in program.Functions)
-            new FunctionVerifier(function.Symbol).Visit(function.Body);
+            new FunctionVerifier(function.Symbol, form).Visit(function.Body);
 
         foreach (var shared in program.Statics)
-            if (shared.Initializer is { } initializer)
-                new FunctionVerifier(null).Visit(initializer);
+            if (program.InitializerOf(shared) is { } initializer)
+                new FunctionVerifier(null, form).Visit(initializer);
     }
+
+    /// <summary>
+    /// Whether a node is one only the semantic tree holds, which lowering
+    /// rewrites into the core and the emitter has no case for.
+    /// </summary>
+    private static bool IsSemanticOnly(object node) => node switch
+    {
+        _ => false,
+    };
 
     /// <summary>
     /// Whether a type is one binding settles or refuses, and so has no
@@ -61,7 +86,7 @@ public static class BoundTreeVerifier
         type is ErrorTypeSymbol or LambdaType or ArrayDraftType or TupleDraftType
             or VariantDraftType or FunctionGroupType or DefaultLiteralType or NewDraftType;
 
-    private sealed class FunctionVerifier(FunctionSymbol? function) : BoundTreeWalker
+    private sealed class FunctionVerifier(FunctionSymbol? function, BoundTreeForm form) : BoundTreeWalker
     {
         private readonly HashSet<LocalSymbol> _declared = [];
 
@@ -73,11 +98,14 @@ public static class BoundTreeVerifier
 
         public override void Visit(BoundStatement? statement)
         {
+            if (statement is null)
+                return;
+
+            if (form == BoundTreeForm.Lowered && IsSemanticOnly(statement))
+                throw Fault($"{statement.GetType().Name} survived lowering", statement.Span);
+
             switch (statement)
             {
-                case null:
-                    return;
-
                 case BoundLocalDeclaration declaration:
                     Declare(declaration.Local, declaration.Span);
                     break;
@@ -131,6 +159,9 @@ public static class BoundTreeVerifier
 
             if (expression.Type is null)
                 throw Fault($"{expression.GetType().Name} has no type", expression.Span);
+
+            if (form == BoundTreeForm.Lowered && IsSemanticOnly(expression))
+                throw Fault($"{expression.GetType().Name} survived lowering", expression.Span);
 
             switch (expression)
             {

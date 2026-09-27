@@ -17,6 +17,7 @@
 using System.Globalization;
 using System.Text;
 using Stainless.Binding;
+using Stainless.Source;
 using Stainless.Syntax;
 
 namespace Stainless.Emit;
@@ -261,6 +262,9 @@ public sealed partial class LlvmEmitter(
 
     public string Emit(BoundProgram program)
     {
+        if (!program.IsLowered)
+            throw new InternalCompilerError("the emitter was handed a program that was not lowered");
+
         Header();
         StructTypes(program);
         RuntimeDeclarations();

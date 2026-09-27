@@ -18,6 +18,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Stainless.Binding;
 using Stainless.Emit;
+using Stainless.Lowering;
 using Stainless.Source;
 using Stainless.Syntax;
 
@@ -715,9 +716,11 @@ public sealed class Compilation
         // libraries it is most wanted for.
         bool needsEntryPoint = !options.Shared && !options.DocumentationOnly;
 
+        var phase = System.Diagnostics.Stopwatch.StartNew();
         var program = new Binder(
             diagnostics, requireEntryPoint: needsEntryPoint, references: references,
             cppAbi: options.CppAbi).Bind(units);
+        ReportPhase("bind", phase);
         if (diagnostics.HasErrors) return Failed(diagnostics);
 
         // Against the program's own first file rather than units[0], which is
@@ -832,6 +835,11 @@ public sealed class Compilation
             WarnAboutUnreadTypes(resourceBlob, target, diagnostics);
         }
 
+        // --- lower -------------------------------------------------------
+        phase.Restart();
+        program = Lowerer.Lower(program);
+        ReportPhase("lower", phase);
+
         // --- emit --------------------------------------------------------
         var debug = options.Debug
             ? new DebugInfo(
@@ -848,7 +856,9 @@ public sealed class Compilation
             sharedRuntime: options.NeedsSharedRuntime,
             abi: target.Abi,
             resourceBlob: resourceBlob);
+        phase.Restart();
         string ir = emitter.Emit(program);
+        ReportPhase("emit", phase);
 
         string output = options.OutputPath
             ?? DefaultOutputPath(program, options.SourcePaths, options.Shared);
@@ -1397,6 +1407,19 @@ public sealed class Compilation
 
     private static CompilationResult Failed(DiagnosticBag diagnostics) =>
         new() { Success = false, Diagnostics = diagnostics.Sorted().ToList() };
+
+    private static readonly bool s_reportsPhases =
+        Environment.GetEnvironmentVariable("STAINLESS_PHASE_TIMES") is { Length: > 0 } value && value != "0";
+
+    /// <summary>
+    /// How long a phase took, on stderr, when <c>STAINLESS_PHASE_TIMES</c> asks.
+    /// For measuring the compiler, not for anyone building with it.
+    /// </summary>
+    private static void ReportPhase(string name, System.Diagnostics.Stopwatch clock)
+    {
+        if (s_reportsPhases)
+            Console.Error.WriteLine($"phase {name}: {clock.Elapsed.TotalMilliseconds:F1} ms");
+    }
 
     private static CompilationResult Failure(string message) =>
         new() { Success = false, Diagnostics = [], DriverError = message };

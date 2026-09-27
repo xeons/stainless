@@ -18,6 +18,7 @@ using System.Text.RegularExpressions;
 using Stainless.Binding;
 using Stainless.Driver;
 using Stainless.Emit;
+using Stainless.Lowering;
 using Stainless.Source;
 using Stainless.Syntax;
 
@@ -121,6 +122,12 @@ internal static class Pipeline
                 bool shared = program.EntryPoint is null;
                 if (shared && program.Statics.Any(s => !s.IsImported && !s.HasConstantInitializer))
                     return Stopped(stage, diagnostics);
+
+                stage = "lower";
+                if (trace)
+                    Console.Error.WriteLine(stage);
+
+                program = Lowerer.Lower(program);
 
                 stage = "emit";
                 if (trace)

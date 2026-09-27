@@ -17,6 +17,7 @@
 using Stainless.Binding;
 using Stainless.Driver;
 using Stainless.Emit;
+using Stainless.Lowering;
 using Stainless.Source;
 using Stainless.Syntax;
 
@@ -300,7 +301,7 @@ public static class Front
         // a line would otherwise pass on one platform and fail on the other for
         // a reason that has nothing to do with what it is testing.
         return Verified(new LlvmEmitter(forSharedLibrary: true, abi: abi)
-            .Emit(program)
+            .Emit(Lowerer.Lower(program))
             .ReplaceLineEndings("\n"));
     }
 
@@ -327,7 +328,7 @@ public static class Front
 
         var debug = new DebugInfo(source, "Stainless tests", format, optimized);
         return Verified(new LlvmEmitter(forSharedLibrary: true, abi: abi, debug: debug)
-            .Emit(program)
+            .Emit(Lowerer.Lower(program))
             .ReplaceLineEndings("\n"));
     }
 

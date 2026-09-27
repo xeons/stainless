@@ -1,0 +1,80 @@
+// Stainless - an experimental general-purpose language.
+// Copyright (C) 2026 Brandon Scott
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+using Stainless.Binding;
+
+namespace Stainless.Lowering;
+
+/// <summary>
+/// Rewrites what binding made -- what the program means -- into the smaller
+/// core the emitter handles.
+///
+/// Binding checks a construct and says what it is; this says how it runs. A
+/// construct that has a lowering never reaches the emitter, and the verifier
+/// checks the lowered tree for any that did. The semantic program is left as
+/// it was: lowering makes new bodies, and a new program that holds them.
+/// </summary>
+public sealed partial class Lowerer : BoundTreeRewriter
+{
+    /// <summary>Numbers the locals a lowering introduces, so nested ones do not collide.</summary>
+    private int _synthetic;
+
+    private Lowerer()
+    {
+    }
+
+    public static BoundProgram Lower(BoundProgram program)
+    {
+        if (program.IsLowered)
+            return program;
+
+        var lowerer = new Lowerer();
+        var functions = new List<BoundFunction>(program.Functions.Count);
+
+        foreach (var function in program.Functions)
+        {
+            var body = lowerer.Rewrite(function.Body);
+            functions.Add(ReferenceEquals(body, function.Body)
+                ? function
+                : new BoundFunction(function.Symbol, AsBlock(body)));
+        }
+
+        var initializers = new Dictionary<StaticSymbol, BoundExpression>();
+        foreach (var shared in program.Statics)
+            if (shared.Initializer is { } initializer)
+                initializers[shared] = lowerer.Rewrite(initializer);
+
+        var lowered = program with
+        {
+            Functions = functions,
+            LoweredInitializers = initializers,
+            IsLowered = true,
+        };
+
+        if (BoundTreeVerifier.IsEnabled)
+            BoundTreeVerifier.Verify(lowered, BoundTreeForm.Lowered);
+
+        return lowered;
+    }
+
+    private static BoundBlock AsBlock(BoundStatement statement) =>
+        statement as BoundBlock ?? throw new Source.InternalCompilerError(
+            "lowering made a function body that is not a block", statement.Span);
+
+    /// <summary>A local of lowering's own. A '$' cannot begin a source identifier.</summary>
+    private LocalSymbol Synthetic(string hint, TypeSymbol type, bool isConst = false) =>
+        new($"${hint}.{_synthetic++}", type, isConst);
+}

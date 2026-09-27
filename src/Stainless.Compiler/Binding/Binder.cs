@@ -19,8 +19,11 @@ using Stainless.Syntax;
 
 namespace Stainless.Binding;
 
-/// <summary>The fully resolved program handed to the emitter.</summary>
-public sealed class BoundProgram
+/// <summary>
+/// The fully resolved program: what binding hands to lowering, and what
+/// lowering hands to the emitter.
+/// </summary>
+public sealed record BoundProgram
 {
     public required IReadOnlyList<ModuleSymbol> Modules { get; init; }
     public required IReadOnlyList<BoundFunction> Functions { get; init; }
@@ -69,6 +72,23 @@ public sealed class BoundProgram
     /// program embeds is as much an input to the build as a source file is.
     /// </summary>
     public IReadOnlyList<EmbeddedFile> Embeds { get; init; } = [];
+
+    /// <summary>
+    /// True once <see cref="Lowering.Lowerer"/> has rewritten the bodies into
+    /// the core the emitter handles. The emitter refuses a program that is not.
+    /// </summary>
+    public bool IsLowered { get; init; }
+
+    /// <summary>
+    /// Each static's initializer as lowered. A static's symbol keeps the one
+    /// binding made, which is what the program says rather than how it runs.
+    /// </summary>
+    public IReadOnlyDictionary<StaticSymbol, BoundExpression> LoweredInitializers { get; init; } =
+        new Dictionary<StaticSymbol, BoundExpression>();
+
+    /// <summary>What a static is initialized with, as the emitter is to run it.</summary>
+    public BoundExpression? InitializerOf(StaticSymbol shared) =>
+        LoweredInitializers.TryGetValue(shared, out var lowered) ? lowered : shared.Initializer;
 }
 
 /// <summary>One step before <c>Main</c>: a static's initializer, or a type's static constructor.</summary>
@@ -328,9 +348,9 @@ public sealed partial class Binder(
         };
 
         // A tree with an error in it is allowed to be unfinished, and is never
-        // emitted.
+        // lowered or emitted.
         if (BoundTreeVerifier.IsEnabled && !diagnostics.HasErrors)
-            BoundTreeVerifier.Verify(program);
+            BoundTreeVerifier.Verify(program, BoundTreeForm.Semantic);
 
         return program;
     }

@@ -1168,7 +1168,7 @@ public class BinderTests
     {
         var program = Front.BindBody(statement, out var diagnostics);
         Assert.Equal(["SL0222"], Front.Codes(diagnostics));
-        Front.Verified(new Stainless.Emit.LlvmEmitter(forSharedLibrary: true).Emit(program));
+        Front.Verified(new Stainless.Emit.LlvmEmitter(forSharedLibrary: true).Emit(Stainless.Lowering.Lowerer.Lower(program)));
     }
 
     /// <summary>The body of a lambda whose target returns nothing drops an unsettled value the same way.</summary>

@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 using Stainless.Emit;
+using Stainless.Lowering;
 using Stainless.Source;
 using Xunit;
 
@@ -241,7 +242,7 @@ public class SampleTests
         // And what it binds to is IR LLVM accepts. The samples are the largest
         // programs in the tree, and the only ones no end-to-end case builds.
         if (!diagnostics.HasErrors)
-            Front.Verified(new LlvmEmitter(forSharedLibrary: sample.Shared).Emit(program));
+            Front.Verified(new LlvmEmitter(forSharedLibrary: sample.Shared).Emit(Lowerer.Lower(program)));
     }
 
     /// <summary>

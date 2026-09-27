@@ -166,7 +166,7 @@ public sealed partial class LlvmEmitter
             }
 
             var symbol = step.Static!;
-            if (symbol.Initializer is null) continue;
+            if (program.InitializerOf(symbol) is not { } initializer) continue;
 
             // Already on the global, written by `StaticStorage`. Storing it
             // again would be the same value twice and would put a `--shared`
@@ -185,7 +185,7 @@ public sealed partial class LlvmEmitter
             // it owed is what making it immortal consumes.
             if (symbol.Type.NeedsArc() && symbol.IsReadonly)
             {
-                var kept = EmitOwnable(symbol.Initializer);
+                var kept = EmitOwnable(initializer);
                 Consume(kept);
                 Line($"store ptr {kept.Ref}, ptr {slot}");
                 Line($"call void @sl_make_immortal(ptr {kept.Ref})");
@@ -196,7 +196,7 @@ public sealed partial class LlvmEmitter
             // what it is replacing. The slot starts zeroed.
             else
             {
-                InitializeWith(slot, EmitOwned(symbol.Initializer), symbol.Type);
+                InitializeWith(slot, EmitOwned(initializer), symbol.Type);
             }
 
             // The initializer's own temporaries go now; the static holds its

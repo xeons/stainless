@@ -17,6 +17,7 @@
 using Stainless.Binding;
 using Stainless.Driver;
 using Stainless.Emit;
+using Stainless.Lowering;
 using Stainless.Source;
 using Stainless.Syntax;
 using Xunit;
@@ -494,7 +495,7 @@ public class EmbedTests
             Assert.False(diagnostics.HasErrors);
 
             string ir = Front.Verified(
-                new LlvmEmitter(forSharedLibrary: true).Emit(program).ReplaceLineEndings("\n"));
+                new LlvmEmitter(forSharedLibrary: true).Emit(Lowerer.Lower(program)).ReplaceLineEndings("\n"));
 
             Assert.Contains("module asm \".section \\22.stub\\22,\\22ax\\22,%progbits\"\n", ir);
             Assert.Contains("module asm \"_SLembed0:\"\n", ir);

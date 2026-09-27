@@ -92,7 +92,9 @@ where nothing declared it, a parameter of another function, a `for parallel`
 body reading what it did not capture, an assignment to something with no
 address, a switch label that is not a constant of the switched type, a
 conditional whose arms disagree with it, an inline array holding a counted
-reference. It is on in a Debug build of the compiler, which every suite and the
+reference. It runs twice, over what binding made and over what lowering made
+of it, and the second time it also refuses any node lowering exists to take
+away. It is on in a Debug build of the compiler, which every suite and the
 fuzzer run, and off in Release; `STAINLESS_VERIFY_BOUND` set to `0` or to
 anything else overrides either. It costs about 10 ms of a 210 ms bind for
 `hello.sl`, whose standard library it walks too, and about 30 ms of 670 ms for
@@ -114,8 +116,16 @@ handles the nodes it is about and calls the base for the rest, so none of them
 can skip a node kind by omission. A unit test fills every property of every
 node type with fresh nodes by reflection and requires the walk to return each
 exactly once; a property holding a node that another child already holds is
-marked `[SharedSubtree]` and is skipped. There is no general rewriter: nothing
-rewrites a whole tree, and the lowerings that rebuild a node rebuild one shape.
+marked `[SharedSubtree]` and is skipped.
+
+**One rewriter knows how to rebuild a node.** [BoundTreeRewriter](../src/Stainless.Compiler/Binding/BoundTreeRewriter.cs)
+goes through the same children in the same order and puts a node back
+together around whatever came back for them, carrying every flag, symbol and
+list the node held; a node none of whose children changed is handed back as
+it was, so a rewrite that has nothing to say about a body copies none of it.
+The same kind of reflection test fills every child of every node type with a
+fresh node, has each replaced, and requires the rebuilt node to hold exactly
+the replacements and everything else the old one held.
 
 **Both Windows and Linux are tested.** 352 cases, of which 13 are
 Windows-only and 2 are Linux-only, so Linux runs 339 and Windows 350, each
@@ -168,7 +178,11 @@ ships in the same directory.
       |   program is known before any body is checked. That single rule is
       |   what lets header files go away.
       v
-   bound tree  (fully typed, every name resolved)
+   semantic tree  (fully typed, every name resolved: what the program means)
+      |
+      v   Lowerer: each construct binding checked, rewritten into the core
+      |
+   lowered tree  (the smaller core the emitter handles)
       |
       v   LlvmEmitter, with the classifier for the target's ABI
    textual LLVM IR
@@ -184,7 +198,9 @@ ships in the same directory.
 | [Binding/Binder.cs](../src/Stainless.Compiler/Binding/Binder.cs) | the eleven passes; one partial class over `Binder.*.cs`, a file per area — bodies, calls, closures, conversions, generics, inheritance, layout |
 | [Binding/BoundTree.cs](../src/Stainless.Compiler/Binding/BoundTree.cs) | the bound tree's nodes |
 | [Binding/BoundTreeWalkers.cs](../src/Stainless.Compiler/Binding/BoundTreeWalkers.cs) | the one walker over them, and the analyses built on it |
-| [Binding/BoundTreeVerifier.cs](../src/Stainless.Compiler/Binding/BoundTreeVerifier.cs) | what the emitter relies on, checked after binding |
+| [Binding/BoundTreeRewriter.cs](../src/Stainless.Compiler/Binding/BoundTreeRewriter.cs) | the one rewriter over them, which lowering is built on |
+| [Binding/BoundTreeVerifier.cs](../src/Stainless.Compiler/Binding/BoundTreeVerifier.cs) | what lowering and the emitter rely on, checked after binding and again after lowering |
+| [Lowering/Lowerer.cs](../src/Stainless.Compiler/Lowering/Lowerer.cs) | the semantic tree into the core: a new program, with the bodies binding made left as they were |
 | [Binding/TypeSystem.cs](../src/Stainless.Compiler/Binding/TypeSystem.cs) | types and C-rule layout |
 | [Binding/TargetPlatform.cs](../src/Stainless.Compiler/Binding/TargetPlatform.cs) | what `--target` and `--abi` parse to, and the host's defaults |
 | [Binding/EmbeddedFile.cs](../src/Stainless.Compiler/Binding/EmbeddedFile.cs) | what an `[Embed]` static holds: which sections a target already owns, and the assembly the object is written as |
