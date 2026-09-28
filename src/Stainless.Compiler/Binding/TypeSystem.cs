@@ -1215,14 +1215,6 @@ public sealed class VariantTypeSymbol : StructTypeSymbol
     public VariantCaseSymbol? FindCase(string name) =>
         Cases.FirstOrDefault(c => c.Name == name);
 
-    /// <summary>
-    /// True when some case holds a counted reference, and so when copying and
-    /// dropping a value of this type has to consult the tag.
-    /// </summary>
-    public bool CasesCarryReferences =>
-        Cases.Any(c => c.Payload is not null && c.Payload.Fields
-            .Any(f => f.Type.CarriesReferences()));
-
     /// <summary>The cases not covered by <paramref name="covered"/>, in declaration order.</summary>
     public IEnumerable<VariantCaseSymbol> Uncovered(IEnumerable<VariantCaseSymbol> covered)
     {

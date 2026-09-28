@@ -36,12 +36,6 @@ public sealed partial class LlvmEmitter
     /// </summary>
     private static int VirtualTableOffset => RuntimeLayout.TypeInfoVTable;
 
-    /// <summary>
-    /// Where the base TypeInfo pointer sits, for the one case that has to write
-    /// it after the fact. See <see cref="PatchBasesAtStartup"/>.
-    /// </summary>
-    private const int BaseTypeInfoOffset = 64;
-
     private static string VirtualTableName(ClassTypeSymbol type) =>
         "_SLvtable_" + Mangler.SymbolSafe(type.QualifiedName);
 

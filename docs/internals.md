@@ -16,8 +16,8 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 352 end-to-end tests
-dotnet test tests/Stainless.UnitTests           # 1,337 compiler unit tests
+dotnet run --project tests/Stainless.Tests      # the end-to-end tests
+dotnet test tests/Stainless.UnitTests           # the compiler's unit tests
 ```
 
 `--shard=1/2` and `--shard=2/2` run alternate halves of the end-to-end cases,
@@ -137,9 +137,8 @@ The same kind of reflection test fills every child of every node type with a
 fresh node, has each replaced, and requires the rebuilt node to hold exactly
 the replacements and everything else the old one held.
 
-**Both Windows and Linux are tested.** 352 cases, of which 13 are
-Windows-only and 2 are Linux-only, so Linux runs 339 and Windows 350, each
-skipping the other's. A case whose *subject* differs by platform — `Path.Join` writes a
+**Both Windows and Linux are tested.** A case that is Windows-only or
+Linux-only says so in `platform.txt`, and each platform skips the other's. A case whose *subject* differs by platform — `Path.Join` writes a
 different separator, and `\x` is rooted on one and an ordinary name on the
 other — carries an `expected.linux.txt` beside its `expected.txt` rather than
 having the difference argued away.

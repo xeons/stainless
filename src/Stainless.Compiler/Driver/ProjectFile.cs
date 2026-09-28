@@ -747,9 +747,6 @@ public sealed record Dependency
     /// </summary>
     public DependencyLink Link { get; init; } = DependencyLink.Source;
 
-    [JsonIgnore] public bool IsPath => Path is not null;
-    [JsonIgnore] public bool IsGit => Git is not null;
-
     public VersionRequirement Requirement() =>
         Version is null
             ? VersionRequirement.Any
