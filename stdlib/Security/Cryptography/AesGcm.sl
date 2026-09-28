@@ -60,14 +60,21 @@ public sealed class AesGcm
     /// @value twelve bytes.
     public const nuint NonceSize = 12u;
 
-    Aes _cipher;
-    byte[] _hashKey;
+    private Aes _cipher;
+
+    /// The hash key H, as two big-endian halves.
+    private ulong _hashHigh;
+    private ulong _hashLow;
 
     AesGcm(Aes cipher)
     {
         _cipher = cipher;
-        _hashKey = new byte[16u];
-        cipher.EncryptBlock(_hashKey, 0u);
+
+        byte[] key = new byte[16u];
+        cipher.EncryptBlock(key, 0u);
+        _hashHigh = ReadBigDoubleWord(key, 0u);
+        _hashLow = ReadBigDoubleWord(key, 8u);
+        CryptographicOperations.ZeroMemory(key);
     }
 
     /// A GCM box under `key`, which must be 16, 24 or 32 bytes.
@@ -172,10 +179,16 @@ public sealed class AesGcm
             return counter;
         }
 
-        UpdateGhash(counter, nonce);
+        ulong high = 0u;
+        ulong low = 0u;
+        UpdateGhash(ref high, ref low, nonce);
+
         byte[] lengths = new byte[16u];
-        WriteLength(lengths, 8u, (ulong)nonce.Length * 8u);
-        UpdateGhash(counter, lengths);
+        WriteBigDoubleWord(lengths, 8u, (ulong)nonce.Length * 8u);
+        UpdateGhash(ref high, ref low, lengths);
+
+        WriteBigDoubleWord(counter, 0u, high);
+        WriteBigDoubleWord(counter, 8u, low);
         return counter;
     }
 
@@ -184,14 +197,15 @@ public sealed class AesGcm
     /// keyed hash and not a MAC on its own -- from being invertible.
     byte[] ComputeTag(ReadOnlySpan<byte> associatedData, ReadOnlySpan<byte> ciphertext, byte[] keystream)
     {
-        byte[] accumulator = new byte[16u];
-        UpdateGhash(accumulator, associatedData);
-        UpdateGhash(accumulator, ciphertext);
+        ulong high = 0u;
+        ulong low = 0u;
+        UpdateGhash(ref high, ref low, associatedData);
+        UpdateGhash(ref high, ref low, ciphertext);
 
         byte[] lengths = new byte[16u];
-        WriteLength(lengths, 0u, (ulong)associatedData.Length * 8u);
-        WriteLength(lengths, 8u, (ulong)ciphertext.Length * 8u);
-        UpdateGhash(accumulator, lengths);
+        WriteBigDoubleWord(lengths, 0u, (ulong)associatedData.Length * 8u);
+        WriteBigDoubleWord(lengths, 8u, (ulong)ciphertext.Length * 8u);
+        UpdateGhash(ref high, ref low, lengths);
 
         byte[] mask = new byte[16u];
         for (nuint i = 0u; i < 16u; i++)
@@ -199,83 +213,146 @@ public sealed class AesGcm
         _cipher.EncryptBlock(mask, 0u);
 
         byte[] tag = new byte[TagSize];
+        WriteBigDoubleWord(tag, 0u, high);
+        WriteBigDoubleWord(tag, 8u, low);
         for (nuint i = 0u; i < TagSize; i++)
-            tag[i] = (byte)(accumulator[i] ^ mask[i]);
+            tag[i] = (byte)(tag[i] ^ mask[i]);
 
+        CryptographicOperations.ZeroMemory(mask);
         return tag;
     }
 
-    /// `data` folded into the accumulator, a block at a time and zero-padded.
-    void UpdateGhash(byte[] accumulator, ReadOnlySpan<byte> data)
+    /// `data` folded into the accumulator `high`:`low` a block at a time, the
+    /// last block zero-padded.
+    void UpdateGhash(ref ulong high, ref ulong low, ReadOnlySpan<byte> data)
     {
-        byte[] block = new byte[16u];
+        ulong keyHigh = _hashHigh;
+        ulong keyLow = _hashLow;
+        ulong keyHighReversed = ReverseBits(keyHigh);
+        ulong keyLowReversed = ReverseBits(keyLow);
 
         for (nuint at = 0u; at < data.Length; at += 16u)
         {
-            nuint span = data.Length - at;
-            if (span > 16u)
-                span = 16u;
+            ulong first = 0u;
+            ulong second = 0u;
 
-            for (nuint i = 0u; i < 16u; i++)
-                block[i] = 0;
-
-            for (nuint i = 0u; i < span; i++)
-                block[i] = data[at + i];
-
-            for (nuint i = 0u; i < 16u; i++)
-                accumulator[i] = (byte)(accumulator[i] ^ block[i]);
-
-            MultiplyGhash(accumulator, _hashKey);
-        }
-    }
-
-    /// `left` times `right` in GF(2^128), bit by bit.
-    ///
-    /// The tabulated version is four times faster and leaks through the cache
-    /// the way an AES table does; this one is the shift-and-add definition,
-    /// which is what a reference implementation should be. 128 iterations per
-    /// block is the price.
-    static void MultiplyGhash(byte[] left, byte[] right)
-    {
-        byte[] product = new byte[16u];
-        byte[] running = new byte[16u];
-        for (nuint i = 0u; i < 16u; i++)
-            running[i] = right[i];
-
-        for (nuint bit = 0u; bit < 128u; bit++)
-        {
-            nuint at = bit / 8u;
-            uint mask = (uint)(0x80u >> (uint)(bit % 8u));
-
-            if (((uint)left[at] & mask) != 0u)
+            if (data.Length - at >= 16u)
             {
+                for (nuint i = 0u; i < 8u; i++)
+                {
+                    first = (first << 8) | (ulong)data[at + i];
+                    second = (second << 8) | (ulong)data[at + 8u + i];
+                }
+            }
+            else
+            {
+                nuint span = data.Length - at;
                 for (nuint i = 0u; i < 16u; i++)
-                    product[i] = (byte)(product[i] ^ running[i]);
+                {
+                    ulong octet = 0u;
+                    if (i < span)
+                        octet = (ulong)data[at + i];
+
+                    if (i < 8u)
+                        first = (first << 8) | octet;
+                    else
+                        second = (second << 8) | octet;
+                }
             }
 
-            bool odd = (running[15u] & 1u) != 0u;
-            for (nuint i = 16u; i > 0u; i--)
-            {
-                nuint index = i - 1u;
-                uint shifted = (uint)running[index] >> 1;
-                if (index > 0u)
-                    shifted |= ((uint)running[index - 1u] & 1u) << 7;
-                running[index] = (byte)shifted;
-            }
-
-            // The reduction polynomial, whose only set bits above the low byte
-            // are in the first: x^128 + x^7 + x^2 + x + 1.
-            if (odd)
-                running[0u] = (byte)(running[0u] ^ 0xE1u);
+            high ^= first;
+            low ^= second;
+            MultiplyGhash(ref high, ref low, keyHigh, keyLow, keyHighReversed, keyLowReversed);
         }
-
-        for (nuint i = 0u; i < 16u; i++)
-            left[i] = product[i];
     }
 
-    static void WriteLength(byte[] into, nuint at, ulong bits)
+    /// `high`:`low` times H in GF(2^128), as BearSSL's `ghash_ctmul64` does it.
+    ///
+    /// Karatsuba over carry-less 64-bit products. The high half of a product
+    /// is the low half of the product of the bit-reversed operands, reversed,
+    /// so every multiply keeps only its low 64 bits. No table and no branch
+    /// touches H or the data.
+    static void MultiplyGhash(ref ulong high, ref ulong low, ulong keyHigh, ulong keyLow,
+                              ulong keyHighReversed, ulong keyLowReversed)
     {
-        for (nuint i = 0u; i < 8u; i++)
-            into[at + i] = (byte)((bits >> (uint)(8u * (7u - i))) & 0xFFu);
+        ulong y1 = high;
+        ulong y0 = low;
+        ulong y2 = y0 ^ y1;
+        ulong y1r = ReverseBits(y1);
+        ulong y0r = ReverseBits(y0);
+        ulong y2r = y0r ^ y1r;
+        ulong h2 = keyLow ^ keyHigh;
+        ulong h2r = keyLowReversed ^ keyHighReversed;
+
+        ulong z0 = MultiplyCarryless(y0, keyLow);
+        ulong z1 = MultiplyCarryless(y1, keyHigh);
+        ulong z2 = MultiplyCarryless(y2, h2);
+        ulong z0h = MultiplyCarryless(y0r, keyLowReversed);
+        ulong z1h = MultiplyCarryless(y1r, keyHighReversed);
+        ulong z2h = MultiplyCarryless(y2r, h2r);
+        z2 ^= z0 ^ z1;
+        z2h ^= z0h ^ z1h;
+        z0h = ReverseBits(z0h) >> 1;
+        z1h = ReverseBits(z1h) >> 1;
+        z2h = ReverseBits(z2h) >> 1;
+
+        // The 256-bit product, lowest word first, shifted left by one because
+        // GCM's bit order is reflected.
+        ulong v0 = z0;
+        ulong v1 = z0h ^ z2;
+        ulong v2 = z1 ^ z2h;
+        ulong v3 = z1h;
+
+        v3 = (v3 << 1) | (v2 >> 63);
+        v2 = (v2 << 1) | (v1 >> 63);
+        v1 = (v1 << 1) | (v0 >> 63);
+        v0 = v0 << 1;
+
+        // Reduction by x^128 + x^7 + x^2 + x + 1, in the reflected order.
+        v2 ^= v0 ^ (v0 >> 1) ^ (v0 >> 2) ^ (v0 >> 7);
+        v1 ^= (v0 << 63) ^ (v0 << 62) ^ (v0 << 57);
+        v3 ^= v1 ^ (v1 >> 1) ^ (v1 >> 2) ^ (v1 >> 7);
+        v2 ^= (v1 << 63) ^ (v1 << 62) ^ (v1 << 57);
+
+        high = v3;
+        low = v2;
+    }
+
+    /// The low 64 bits of the carry-less product of `x` and `y`.
+    ///
+    /// Integer multiplies with holes: each operand is split four ways, every
+    /// fourth bit apiece, so the carries of each product land in bits that the
+    /// masks at the end discard. It relies on a multiply whose time does not
+    /// depend on its operands, which every x64 and ARMv8 core has.
+    static ulong MultiplyCarryless(ulong x, ulong y)
+    {
+        ulong x0 = x & 0x1111111111111111u;
+        ulong x1 = x & 0x2222222222222222u;
+        ulong x2 = x & 0x4444444444444444u;
+        ulong x3 = x & 0x8888888888888888u;
+        ulong y0 = y & 0x1111111111111111u;
+        ulong y1 = y & 0x2222222222222222u;
+        ulong y2 = y & 0x4444444444444444u;
+        ulong y3 = y & 0x8888888888888888u;
+
+        ulong z0 = (x0 * y0) ^ (x1 * y3) ^ (x2 * y2) ^ (x3 * y1);
+        ulong z1 = (x0 * y1) ^ (x1 * y0) ^ (x2 * y3) ^ (x3 * y2);
+        ulong z2 = (x0 * y2) ^ (x1 * y1) ^ (x2 * y0) ^ (x3 * y3);
+        ulong z3 = (x0 * y3) ^ (x1 * y2) ^ (x2 * y1) ^ (x3 * y0);
+
+        return (z0 & 0x1111111111111111u) | (z1 & 0x2222222222222222u) |
+               (z2 & 0x4444444444444444u) | (z3 & 0x8888888888888888u);
+    }
+
+    /// `value` with its 64 bits in the opposite order.
+    static ulong ReverseBits(ulong value)
+    {
+        ulong x = value;
+        x = ((x & 0x5555555555555555u) << 1) | ((x >> 1) & 0x5555555555555555u);
+        x = ((x & 0x3333333333333333u) << 2) | ((x >> 2) & 0x3333333333333333u);
+        x = ((x & 0x0F0F0F0F0F0F0F0Fu) << 4) | ((x >> 4) & 0x0F0F0F0F0F0F0F0Fu);
+        x = ((x & 0x00FF00FF00FF00FFu) << 8) | ((x >> 8) & 0x00FF00FF00FF00FFu);
+        x = ((x & 0x0000FFFF0000FFFFu) << 16) | ((x >> 16) & 0x0000FFFF0000FFFFu);
+        return RotateLeft(x, 32);
     }
 }
