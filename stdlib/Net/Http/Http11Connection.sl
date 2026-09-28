@@ -26,6 +26,7 @@ import Standard.IO;
 import Standard.Net;
 import Standard.Net.Security;
 import Standard.Text;
+import Standard.Time;
 
 /// An HTTP/1.1 connection (RFC 9112): one exchange at a time, kept alive
 /// between them unless either end says `close` or the framing needs the close
@@ -61,6 +62,12 @@ internal sealed class Http11Connection : IHttpConnection
     public String PoolKey => _key;
 
     public bool HasCarriedRequest => _requestCount > 1u;
+
+    public bool IsMultiplexed => false;
+
+    public bool TryReserveHttpStream() => false;
+
+    public bool HasHttpIdleTimeoutPassed(TimeSpan now, TimeSpan timeout) => false;
 
     public bool IsHttpConnectionAlive()
     {
@@ -103,7 +110,7 @@ internal sealed class Http11Connection : IHttpConnection
         {
             if (!writer.FlushHttpBuffer())
                 return Fail(FailHttpWrite());
-            if (_tcp.WaitToRead(ComputeHttpContinueWait(exchange.Deadline)))
+            if (_tcp.WaitToRead(ComputeHttpContinueMilliseconds(exchange.Deadline)))
             {
                 var interim = ReadHttpResponseHead(exchange);
                 if (!interim.Ok)
@@ -172,14 +179,6 @@ internal sealed class Http11Connection : IHttpConnection
                 "the request content was not the length it declared");
         }
         return HttpError.None;
-    }
-
-    private int ComputeHttpContinueWait(HttpDeadline deadline)
-    {
-        if (!deadline.IsBounded)
-            return HttpExpectContinueMilliseconds;
-        long left = deadline.RemainingMilliseconds;
-        return left < (long)HttpExpectContinueMilliseconds ? (int)left : HttpExpectContinueMilliseconds;
     }
 
     private HttpError FailHttpWrite()

@@ -22,17 +22,16 @@
 module Standard.Net.Http;
 
 import Standard.Collections;
+import Standard.Time;
 
 /// One connection to a server, whatever protocol it speaks.
 ///
-/// **This is where HTTP/2 slots in.** `Http11Connection` is the one
-/// implementation today. The connector offers TLS the protocols
-/// `CreateHttpApplicationProtocols` names and makes the connection ALPN
-/// agreed on; an
-/// `h2` connection will implement this interface too, carrying several
-/// exchanges at once where a 1.1 connection carries one, and everything
-/// above — the pool, redirects, cookies, decompression — is written against
-/// the interface and does not change.
+/// `Http11Connection` carries one exchange at a time and is lent to a
+/// request; `Http2Connection` carries many at once and is shared, a stream
+/// reserved for each. The connector offers TLS the protocols a request
+/// allows and makes the connection ALPN agreed on, and everything above —
+/// the pool, redirects, cookies, decompression — is written against this
+/// interface.
 internal interface IHttpConnection
 {
     /// The version this connection speaks.
@@ -45,8 +44,20 @@ internal interface IHttpConnection
     /// before any response may only mean the server had closed it.
     bool HasCarriedRequest { get; }
 
+    /// Whether it carries several exchanges at once, and so is shared rather
+    /// than lent.
+    bool IsMultiplexed { get; }
+
     /// Whether it still looks open: nothing unread and no end from the peer.
     bool IsHttpConnectionAlive();
+
+    /// Takes a place for one more exchange on a multiplexed connection.
+    /// False when it is full or closing, and always on one that is not
+    /// multiplexed.
+    bool TryReserveHttpStream();
+
+    /// Whether a multiplexed connection has had nothing to do for `timeout`.
+    bool HasHttpIdleTimeoutPassed(TimeSpan now, TimeSpan timeout);
 
     /// Sends `request` and reads the head of the response. The body is read
     /// through the response's content, which gives the connection back to its
@@ -54,17 +65,35 @@ internal interface IHttpConnection
     Result<HttpResponseMessage, HttpError> SendHttpRequest(HttpWireRequest request,
                                                           HttpExchange exchange);
 
-    /// Closes it, whatever it was doing.
+    /// Closes it: at once for HTTP/1.1, and for HTTP/2 once its streams
+    /// have ended, after a GOAWAY.
     void CloseHttpConnection();
 }
 
-/// The ALPN names TLS offers, most preferred first. `h2` joins this list when
-/// there is an HTTP/2 connection to make.
-internal List<String> CreateHttpApplicationProtocols()
+/// The ALPN names TLS offers, most preferred first: `h2` then `http/1.1`,
+/// as far as `choice` allows each.
+internal List<String> CreateHttpApplicationProtocols(HttpVersionChoice choice)
 {
     var protocols = new List<String>();
-    protocols.Add("http/1.1");
+    if (choice.AllowsHttp2)
+        protocols.Add("h2");
+    if (choice.AllowsHttp11)
+        protocols.Add("http/1.1");
     return protocols;
+}
+
+/// Which protocols a request may be sent in, once its version, its policy
+/// and its route have been weighed.
+internal sealed class HttpVersionChoice
+{
+    internal bool AllowsHttp11;
+    internal bool AllowsHttp2;
+
+    internal HttpVersionChoice(bool allowsHttp11, bool allowsHttp2)
+    {
+        AllowsHttp11 = allowsHttp11;
+        AllowsHttp2 = allowsHttp2;
+    }
 }
 
 /// One request in flight: its deadline, where its failure is reported, and
@@ -80,6 +109,11 @@ internal sealed class HttpExchange
     /// Whether the failure came before a byte of the response arrived, on a
     /// connection that had carried a request already.
     internal bool IsRetryable = false;
+
+    /// Whether the server said it never processed the request — a GOAWAY
+    /// below its stream, or REFUSED_STREAM — so that any method may be sent
+    /// again (RFC 9113 §8.7).
+    internal bool IsUnprocessed = false;
 
     internal HttpExchange(HttpDeadline deadline, HttpFailure failure, nuint maxHeaderBytes)
     {
@@ -97,6 +131,12 @@ internal sealed class HttpWireRequest
 
     /// Origin-form, `/path?query`, or absolute-form for a proxy.
     internal String Target;
+
+    /// What HTTP/2's pseudo-headers carry: the scheme, the authority as the
+    /// URI has it, and the path with its query.
+    internal String Scheme = "";
+    internal String Authority = "";
+    internal String Path = "/";
 
     internal HttpWireHeaders Fields = new HttpWireHeaders();
     internal HttpContent? Content;

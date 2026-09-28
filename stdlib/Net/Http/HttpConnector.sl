@@ -162,10 +162,14 @@ internal Result<TcpClient, HttpError> ConnectHttpSocket(String host, ushort port
 
 /// Opens a connection along `route`: TCP, a `CONNECT` tunnel through the
 /// proxy for https, and TLS for https, offering the ALPN names of the
-/// protocols this module speaks.
+/// protocols `choice` allows. Plain http is HTTP/2 only when `choice`
+/// allows nothing else, and then with prior knowledge (RFC 9113 §3.3).
+///
+/// @failure HttpError.VersionNegotiationFailure  HTTP/2 was required and
+///                                               ALPN chose otherwise
 internal Result<IHttpConnection, HttpError> OpenHttpConnection(
-    HttpRoute route, HttpClientHandler handler, HttpRequestMessage request, HttpExchange exchange,
-    HttpConnectionPool pool)
+    HttpRoute route, HttpClientHandler handler, HttpRequestMessage request, HttpVersionChoice choice,
+    HttpExchange exchange, HttpConnectionPool pool)
 {
     HttpFailure failure = exchange.Failure;
     String connectHost = route.Host;
@@ -200,12 +204,16 @@ internal Result<IHttpConnection, HttpError> OpenHttpConnection(
     }
 
     if (!route.IsHttps)
+    {
+        if (choice.AllowsHttp2 && !choice.AllowsHttp11)
+            return StartHttp2Connection(route.PoolKey, tcp, tcp, null, handler, exchange, pool);
         return Ok(new Http11Connection(route.PoolKey, tcp, tcp, null, pool));
+    }
 
     ApplyHttpSocketDeadline(tcp, exchange.Deadline);
     var options = new TlsClientOptions();
     options.TargetHost = route.Host;
-    options.ApplicationProtocols = CreateHttpApplicationProtocols();
+    options.ApplicationProtocols = CreateHttpApplicationProtocols(choice);
     options.CertificateValidator = handler.CreateHttpCertificateValidator(request);
     options.ClientCertificateChain = handler.ClientCertificates;
     options.ClientPrivateKey = handler.ClientCertificateKey;
@@ -224,13 +232,27 @@ internal Result<IHttpConnection, HttpError> OpenHttpConnection(
         failure.TlsErrorCode = secured.Error;
         failure.TlsAlert = alert;
         failure.SocketErrorCode = socketError;
+        if (secured.Error == TlsError.AlertReceived && alert == TlsAlertDescription.NoApplicationProtocol)
+        {
+            return Fail(failure.RecordHttpFailure(HttpError.VersionNegotiationFailure,
+                route.Host + " speaks none of the protocols offered in ALPN"));
+        }
         return Fail(failure.RecordHttpFailure(HttpError.TlsFailure,
             "the TLS handshake with " + route.Host + " failed: " + DescribeTlsError(secured.Error)));
     }
     TlsStream tls = secured.Value;
 
-    // The protocol ALPN agreed on decides the connection; h2 will be a second
-    // case here.
+    String? negotiated = tls.NegotiatedApplicationProtocol;
+    String agreed = negotiated ?? "";
+    if (agreed == "h2" && choice.AllowsHttp2)
+        return StartHttp2Connection(route.PoolKey, tcp, tls, tls, handler, exchange, pool);
+    if (!choice.AllowsHttp11)
+    {
+        tls.Close();
+        return Fail(failure.RecordHttpFailure(HttpError.VersionNegotiationFailure,
+            "HTTP/2 was required, and " + route.Host + " chose " +
+            (agreed.IsEmpty ? "no protocol" : agreed) + " in ALPN"));
+    }
     return Ok(new Http11Connection(route.PoolKey, tcp, tls, tls, pool));
 }
 

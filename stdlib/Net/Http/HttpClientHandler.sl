@@ -49,6 +49,11 @@ public class HttpClientHandler
 
     public HttpClientHandler() { }
 
+    // The pool is emptied here rather than when it goes, since an HTTP/2
+    // reader thread can hold the pool's last reference for a moment and MUST
+    // NOT be the one to release the connections that join it.
+    ~HttpClientHandler() { Dispose(); }
+
     /// Whether a `3xx` with a `Location` is followed.
     public bool AllowAutoRedirect { get; set; } = true;
 
@@ -103,8 +108,21 @@ public class HttpClientHandler
     /// Zero pools nothing; negative keeps connections for ever.
     public TimeSpan PooledConnectionIdleTimeout { get; set; } = TimeSpan.FromMinutes(1);
 
-    /// The most a response head may take, in KiB.
+    /// The most a response head may take, in KiB. HTTP/2 advertises it as
+    /// `SETTINGS_MAX_HEADER_LIST_SIZE`.
     public int MaxResponseHeadersLength { get; set; } = 64;
+
+    /// How much of a response body each HTTP/2 stream lets the server send
+    /// before the reader has read it, in bytes: the flow-control window,
+    /// between 65 535 and 2^31 − 1. .NET's starts at 65 535 and grows it as
+    /// it measures the connection; this one is fixed, so its default is a
+    /// window wide enough for a fast link, 1 MiB.
+    public int InitialHttp2StreamWindowSize { get; set; } = 1048576;
+
+    /// Whether a second HTTP/2 connection to a server is opened when every
+    /// stream the first allows is busy. When false, as by default, a request
+    /// waits for a stream to end.
+    public bool EnableMultipleHttp2Connections { get; set; } = false;
 
     /// Closes every idle connection. A response still being read keeps its
     /// connection until it is done with it, and that one is then closed too.
@@ -130,7 +148,8 @@ public class HttpClientHandler
         if (existing != null)
             return existing;
         int most = MaxConnectionsPerServer;
-        var made = new HttpConnectionPool(most <= 0 ? 1u : (nuint)most, PooledConnectionIdleTimeout);
+        var made = new HttpConnectionPool(most <= 0 ? 1u : (nuint)most, PooledConnectionIdleTimeout,
+                                          EnableMultipleHttp2Connections);
         _pool = made;
         return made;
     }
@@ -247,6 +266,11 @@ public class HttpClientHandler
             return Fail(routed.Error);
         HttpRoute route = routed.Value;
 
+        var chosen = ChooseHttpVersions(request, route, failure);
+        if (!chosen.Ok)
+            return Fail(chosen.Error);
+        HttpVersionChoice choice = chosen.Value;
+
         var built = BuildHttpWireRequest(request, uri, route, sameOrigin, defaults, failure);
         if (!built.Ok)
             return Fail(built.Error);
@@ -260,7 +284,8 @@ public class HttpClientHandler
         while (true)
         {
             attempt++;
-            HttpError reserved = pool.ReserveHttpConnection(key, deadline, allowIdle, out IHttpConnection? idle);
+            HttpError reserved = pool.ReserveHttpConnection(key, deadline, choice, allowIdle,
+                                                            out IHttpConnection? found);
             if (reserved != HttpError.None)
             {
                 String why = reserved == HttpError.Timeout
@@ -270,22 +295,27 @@ public class HttpClientHandler
             }
 
             IHttpConnection connection;
-            if (idle != null)
+            if (found != null)
             {
-                connection = idle;
+                connection = found;
             }
             else
             {
-                var opened = OpenHttpConnection(route, this, request, exchange, pool);
+                var opened = OpenHttpConnection(route, this, request, choice, exchange, pool);
                 if (!opened.Ok)
                 {
-                    pool.CancelHttpReservation(key);
+                    pool.CancelHttpReservation(key, choice);
                     return Fail(opened.Error);
                 }
                 connection = opened.Value;
+                // A connection that came up with no stream free is waited on
+                // like any other.
+                if (!pool.AddHttpConnection(key, connection, choice) && connection.IsMultiplexed)
+                    continue;
             }
 
             exchange.IsRetryable = false;
+            exchange.IsUnprocessed = false;
             var result = connection.SendHttpRequest(wire, exchange);
             if (result.Ok)
             {
@@ -301,15 +331,64 @@ public class HttpClientHandler
 
             pool.ReleaseHttpConnection(connection, false);
             HttpContent? content = wire.Content;
-            bool canRetry = attempt == 1u && exchange.IsRetryable &&
-                            result.Error == HttpError.ConnectionClosed && request.Method.IsIdempotent &&
-                            (content == null || content.RewindHttpContent());
-            if (!canRetry)
+            // A request the server never processed may go again whatever its
+            // method; one that met a connection closed under it, only once
+            // and only when it is idempotent.
+            bool mayRetry = result.Error == HttpError.ConnectionClosed &&
+                            ((exchange.IsUnprocessed && attempt <= 3u) ||
+                             (attempt == 1u && exchange.IsRetryable && request.Method.IsIdempotent));
+            if (!mayRetry || (content != null && !content.RewindHttpContent()))
                 return Fail(result.Error);
             failure.ResetHttpFailure();
             failure.RequestUri = uri;
             allowIdle = false;
         }
+    }
+
+    /// Which protocols `request` may go in along `route`: its version, its
+    /// policy, and what the route can carry. Plain http speaks HTTP/2 only
+    /// when nothing else will do, and a plain proxy never.
+    ///
+    /// @failure HttpError.VersionNegotiationFailure  nothing the policy
+    ///                                               allows can be used
+    private Result<HttpVersionChoice, HttpError> ChooseHttpVersions(HttpRequestMessage request, HttpRoute route,
+                                                                    HttpFailure failure)
+    {
+        int major = request.Version.Major;
+        HttpVersionPolicy policy = request.VersionPolicy;
+        bool http11 = false;
+        bool http2 = false;
+        if (major >= 3)
+        {
+            if (policy != HttpVersionPolicy.RequestVersionOrLower)
+            {
+                return Fail(failure.RecordHttpFailure(HttpError.VersionNegotiationFailure,
+                    "HTTP/" + request.Version.ToString(2) + " is not spoken, and the policy allows nothing lower"));
+            }
+            http11 = true;
+            http2 = true;
+        }
+        else if (major == 2)
+        {
+            http2 = true;
+            http11 = policy == HttpVersionPolicy.RequestVersionOrLower;
+        }
+        else
+        {
+            http11 = true;
+            http2 = policy == HttpVersionPolicy.RequestVersionOrHigher;
+        }
+
+        if (!route.IsHttps && http2 && (http11 || route.Proxy != null))
+        {
+            if (!http11)
+            {
+                return Fail(failure.RecordHttpFailure(HttpError.VersionNegotiationFailure,
+                    "HTTP/2 was required, and a plain proxy is spoken to in HTTP/1.1"));
+            }
+            http2 = false;
+        }
+        return Ok(new HttpVersionChoice(http11, http2));
     }
 
     /// Direct, or through the proxy this handler or `HttpClient.DefaultProxy`
@@ -364,6 +443,9 @@ public class HttpClientHandler
             target = uri.Scheme + "://" + uri.Authority + path;
 
         var wire = new HttpWireRequest(method, target);
+        wire.Scheme = uri.Scheme;
+        wire.Authority = uri.Authority;
+        wire.Path = path;
         HttpWireHeaders fields = wire.Fields;
         HttpRequestHeaders headers = request.Headers;
         String? host = headers.Host;
