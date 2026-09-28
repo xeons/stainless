@@ -478,12 +478,19 @@ internal sealed class TlsServerHandshake
 
     // ------------------------------------------------------ the client's turn
 
+    /// The client's Certificate, CertificateVerify and Finished.
+    ///
+    /// A client certificate that is missing or refused is reported only once
+    /// the Finished is read. The client sent the flight in one go, and a
+    /// server that closed with it unread would reset the connection and lose
+    /// its own alert.
     private TlsError ReadTlsClientFlight()
     {
         var schedule = _schedule;
         if (schedule == null)
             return TlsError.InternalError;
 
+        TlsError refusal = TlsError.None;
         var read = _connection.ReadTlsHandshakeMessage();
         if (!read.Ok)
             return read.Error;
@@ -502,13 +509,11 @@ internal sealed class TlsServerHandshake
             if (chain.Value.Count == 0u)
             {
                 if (_options.ClientCertificateRequired)
-                    return TlsError.CertificateRequired;
+                    refusal = TlsError.CertificateRequired;
             }
             else
             {
-                TlsError verdict = _options.ClientCertificateValidator(chain.Value, "");
-                if (verdict != TlsError.None)
-                    return verdict;
+                refusal = _options.ClientCertificateValidator(chain.Value, "");
                 var key = TlsPeerKey.ReadTlsPeerKey(chain.Value[0u]);
                 if (!key.Ok)
                     return key.Error;
@@ -526,7 +531,7 @@ internal sealed class TlsServerHandshake
                 if (!scheme.Ok)
                     return scheme.Error;
                 _transcript.AddTlsMessage(message);
-                _connection._mutuallyAuthenticated = true;
+                _connection._mutuallyAuthenticated = refusal == TlsError.None;
             }
 
             read = _connection.ReadTlsHandshakeMessage();
@@ -542,6 +547,8 @@ internal sealed class TlsServerHandshake
         TlsError finished = VerifyTlsFinished(message, expected);
         if (finished != TlsError.None)
             return finished;
+        if (refusal != TlsError.None)
+            return refusal;
         _transcript.AddTlsMessage(message);
 
         TlsError boundary = _connection.RequireTlsRecordBoundary();
