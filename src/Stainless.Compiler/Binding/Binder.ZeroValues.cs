@@ -166,7 +166,9 @@ public sealed partial class Binder
 
         foreach (var type in _classes.ToList())
         {
-            if (type.Constructors.Count > 0 || type.Span is not { } span) continue;
+            // A lambda's environment is filled by the code that makes it.
+            if (type.Constructors.Count > 0 || type.Span is not { } span || _generated.Contains(type))
+                continue;
 
             foreach (var field in FieldsNeedingValues(type))
             {
@@ -195,14 +197,15 @@ public sealed partial class Binder
 
     /// <summary>
     /// The fields of a type that a constructor has to write: those whose type
-    /// has no zero, less those an initializer writes and those a <c>new</c>
-    /// has to name.
+    /// has no zero, less those an initializer writes, those a <c>new</c> has
+    /// to name, and an event's storage, which the allocation fills.
     /// </summary>
     private static IEnumerable<FieldSymbol> FieldsNeedingValues(NamedTypeSymbol type)
     {
         var required = type.Properties
             .Where(p => p.IsRequired && p.BackingField is not null)
             .Select(p => p.BackingField!)
+            .Concat(type.Events.Select(e => e.BackingField).OfType<FieldSymbol>())
             .ToHashSet();
 
         return type.Fields.Where(f =>
