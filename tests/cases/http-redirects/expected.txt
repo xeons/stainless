@@ -1,0 +1,32 @@
+-- POST through each status
+301: 200, ended at GET /landing: GET /landing, Authorization none, Content-Length none, body []
+302: 200, ended at GET /landing: GET /landing, Authorization none, Content-Length none, body []
+303: 200, ended at GET /landing: GET /landing, Authorization none, Content-Length none, body []
+307: 200, ended at POST /landing: POST /landing, Authorization none, Content-Length 8, body [the body]
+308: 200, ended at POST /landing: POST /landing, Authorization none, Content-Length 8, body [the body]
+-- HEAD through each status
+301: 200, ended at HEAD /landing: 
+302: 200, ended at HEAD /landing: 
+303: 200, ended at HEAD /landing: 
+307: 200, ended at HEAD /landing: 
+308: 200, ended at HEAD /landing: 
+-- PUT through 303 and 307
+303: 200, ended at GET /landing: GET /landing, Authorization none, Content-Length none, body []
+307: 200, ended at PUT /landing: PUT /landing, Authorization none, Content-Length 8, body [put body]
+-- a body that cannot be sent twice
+307: 307, ended at POST /status/307: moved to /landing
+-- Locations
+relative: 200, ended at GET /docs/b?from=relative: GET /docs/b?from=relative, Authorization none, Content-Length none, body []
+rooted: 200, ended at GET /absolute: GET /absolute, Authorization none, Content-Length none, body []
+no Location: 302, ended at GET /nowhere: no Location
+ftp: 302, ended at GET /ftp: moved to ftp://example.com/file
+-- Authorization
+same origin: 200, ended at GET /absolute: GET /absolute, Authorization Bearer secret, Content-Length none, body []
+other origin: 200, ended at GET /landing: GET /landing, Authorization none, Content-Length none, body []
+-- limits
+loop: TooManyRedirects (more redirects than MaxAutomaticRedirections allows (50))
+one allowed, one taken: 200, ended at GET /absolute: GET /absolute, Authorization none, Content-Length none, body []
+one allowed, two needed: TooManyRedirects (more redirects than MaxAutomaticRedirections allows (1))
+not following: 301, ended at GET /to-root: moved to /absolute
+-- the other origin saw
+GET /landing

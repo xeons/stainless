@@ -1,0 +1,22 @@
+-- pinned
+first: 200 over TLS, request 1 of its connection
+callback: for /secure: CN=localhost, 1 in the chain, the default would trust it: false
+second: 200 over TLS, request 2 of its connection
+connections: 1
+-- redirects between schemes
+https to http: 302 go plain
+http to https: 200 reached over https
+-- not trusted
+no callback: TlsFailure, a TLS error given: true
+callback refuses: TlsFailure, a TLS error given: true
+accepting anything: 200 over TLS, request 1 of its connection
+-- the TLS server saw
+TLS, ALPN http/1.1
+GET /secure
+GET /secure
+GET /downgrade
+GET /upgrade
+TLS handshake failed: the peer sent a fatal alert
+TLS handshake failed: the peer sent a fatal alert
+TLS, ALPN http/1.1
+GET /secure

@@ -1,0 +1,18 @@
+-- decoded
+Accept-Encoding: gzip, deflate
+gzip: matches; Content-Encoding []; Content-Length removed
+deflate as zlib: matches; Content-Encoding []; Content-Length removed
+deflate as raw deflate: matches; Content-Encoding []; Content-Length removed
+gzip in chunks: matches; Content-Encoding []; Content-Length removed
+a coding not asked for: matches; Content-Encoding [br]; Content-Length kept
+corrupt: DecompressionFailed, with a reason: true
+streamed: matches
+after a streamed body: Accept-Encoding: gzip, deflate
+its connection reused: true
+-- gzip only
+Accept-Encoding: gzip
+deflate left alone: differs; Content-Encoding [deflate]; Content-Length kept
+asked for itself: Accept-Encoding: identity
+-- not decoded
+Accept-Encoding: (none)
+left as gzip, which unpacks by hand: true

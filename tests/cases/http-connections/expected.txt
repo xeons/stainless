@@ -1,0 +1,36 @@
+-- keep-alive
+first: served /a as request 1 of its connection
+second: served /b as request 2 of its connection
+third: served /c as request 3 of its connection
+accepted: 1
+-- Connection: close from the server
+closing: closing
+after: served /d as request 1 of its connection
+accepted: 2
+-- Connection: close from the client
+asked to close: served /e as request 2 of its connection
+after: served /f as request 1 of its connection
+accepted: 3
+-- a dead pooled connection
+GET before: served /drop-get as request 1 of its connection
+GET retried: served /drop-get as request 1 of its connection
+accepted: 5
+POST before: served /drop-post as request 1 of its connection
+POST not retried: ConnectionClosed (the connection ended before the response began)
+accepted: 6
+-- idle timeout
+first: served /g as request 1 of its connection
+at once: served /h as request 2 of its connection
+after idling: served /i as request 1 of its connection
+new connections: 2
+-- one connection per server
+held: true
+while held: Timeout (the request timed out waiting for a connection)
+held body: held rest!
+once free: served /k as request 2 of its connection
+new connections: 1
+-- timeouts
+slow body: Timeout (the request timed out while the body was being read)
+slow head: Timeout (the request timed out before the response began)
+-- nobody listening
+refused: ConnectFailure

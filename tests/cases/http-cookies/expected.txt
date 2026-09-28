@@ -1,0 +1,68 @@
+-- which cookies a host may set
+1 kept  http://www.example.com/dir/page  plain=1
+1 kept  http://www.example.com/dir/page  wide=2; Path=/; Domain=example.com
+1 kept  http://www.example.com/  dotted=3; Path=/; Domain=.EXAMPLE.com
+0 kept  http://www.example.com/  elsewhere=4; Domain=other.com
+0 kept  http://www.example.com/  sibling=4; Domain=api.example.com
+0 kept  http://www.example.com/  suffix=5; Domain=com
+0 kept  http://www.example.co.uk/  suffix=6; Domain=co.uk
+1 kept  http://co.uk/  itself=6; Domain=co.uk
+0 kept  http://www.example.com/  insecure=7; Secure
+1 kept  https://www.example.com/  secure=7; Secure; Path=/
+0 kept  http://www.example.com/  nameless
+0 kept  http://www.example.com/  =empty
+1 kept  http://www.example.com/  flags=8; HttpOnly; SameSite=Lax; Path=/
+1 kept  http://www.example.com/  docs=9; Path=/docs
+1 kept  http://127.0.0.1/  numeric=10; Domain=127.0.0.1
+0 kept  http://10.0.0.1/  numeric=11; Domain=0.0.1
+-- when they expire
+0 kept  http://www.example.com/  past=1; Expires=Wed, 21 Oct 2015 07:28:00 GMT
+1 kept  http://www.example.com/  future=1; Path=/; Expires=Wed, 21 Oct 2099 07:28:00 GMT
+1 kept  http://www.example.com/  ageWins=1; Path=/; Max-Age=3600; Expires=Wed, 21 Oct 2015 07:28:00 GMT
+1 kept  http://www.example.com/  dashes=1; Path=/; expires=Wednesday, 21-Oct-2099 07:28:00 GMT
+0 kept  http://www.example.com/  loose=1; Path=/; Expires=21 oct 99 7:28:00
+1 kept  http://www.example.com/  garbage=1; Path=/; Expires=not a date
+1 kept  http://www.example.com/  doomed=1; Path=/
+0 kept  http://www.example.com/  doomed=1; Path=/; Max-Age=0
+2 kept  http://www.example.com/  listed=1; Path=/; Expires=Thu, 01 Jan 2099 00:00:00 GMT, second=2; Path=/
+-- what is sent where
+  to http://www.example.com/: wide=2; dotted=3; flags=8; future=1; ageWins=1; dashes=1; garbage=1; listed=1; second=2
+  to http://www.example.com/dir/other: plain=1; wide=2; dotted=3; flags=8; future=1; ageWins=1; dashes=1; garbage=1; listed=1; second=2
+  to https://www.example.com/docs/guide: docs=9; wide=2; dotted=3; secure=7; flags=8; future=1; ageWins=1; dashes=1; garbage=1; listed=1; second=2
+  to http://www.example.com/docsx: wide=2; dotted=3; flags=8; future=1; ageWins=1; dashes=1; garbage=1; listed=1; second=2
+  to http://sub.example.com/: wide=2; dotted=3
+  to http://example.com/: wide=2; dotted=3
+  to http://notexample.com/: (none)
+  to http://127.0.0.1/: numeric=10
+-- as held
+  docs=9 domain www.example.com (host only) path /docs expires session
+  wide=2 domain example.com path / expires session
+  dotted=3 domain example.com path / expires session
+  secure=7 domain www.example.com (host only) path / secure expires session
+  flags=8 domain www.example.com (host only) path / httponly samesite Lax expires session
+  future=1 domain www.example.com (host only) path / expires 2099-10-21T07:28:00Z
+  ageWins=1 domain www.example.com (host only) path / expires in 60 minutes
+  dashes=1 domain www.example.com (host only) path / expires 2099-10-21T07:28:00Z
+  garbage=1 domain www.example.com (host only) path / expires session
+  listed=1 domain www.example.com (host only) path / expires 2099-01-01T00:00:00Z
+  second=2 domain www.example.com (host only) path / expires session
+-- replaced, keeping its place
+1 kept  http://www.example.com/  wide=changed; Path=/; Domain=example.com
+  to http://sub.example.com/: wide=changed; dotted=3
+-- added directly
+  without a domain: false
+  with one: true
+  for a URI: true
+  to http://www.example.org/x/z: b=2
+  to http://example.org/x/z: c=3; b=2
+-- through a server
+  /before got (none)
+  in
+  /app/page got pref=dark; session=abc
+  /other got session=abc
+  /landing got hop=1; session=abc
+  out
+  /app/page got pref=dark
+  in
+  /app/page got (none)
+  held while off: 1

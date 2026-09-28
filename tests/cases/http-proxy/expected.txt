@@ -1,0 +1,58 @@
+-- through the proxy
+http: origin served /page?x=1, no credentials
+  proxy: GET http://127.0.0.1:PORT/page?x=1
+https: origin served /secret, no credentials
+  proxy: CONNECT 127.0.0.1:PORT
+https again, same tunnel: origin served /again, no credentials
+-- credentials
+http: origin served /guarded, no credentials
+  proxy: GET http://127.0.0.1:PORT/guarded with Basic dXNlcjpzZWNyZXQ=
+https: origin served /guarded, no credentials
+  proxy: CONNECT 127.0.0.1:PORT with Basic dXNlcjpzZWNyZXQ=
+from the proxy's URI: origin served /userinfo, no credentials
+  proxy: GET http://127.0.0.1:PORT/userinfo with Basic dXNlcjpzZWNyZXQ=
+none, http: ProxyFailure 407 (the proxy wants credentials: 407 Proxy Authentication Required)
+  proxy: 407 for GET
+none, https: ProxyFailure 407 (the proxy wants credentials: 407 Proxy Authentication Required)
+  proxy: 407 for CONNECT
+-- around the proxy
+bypass list: origin served /direct, no credentials
+bypass on local: origin served /direct, no credentials
+UseProxy off: origin served /direct, no credentials
+DefaultProxy: origin served /default, no credentials
+  proxy: GET http://127.0.0.1:PORT/default
+DefaultProxy that is none: origin served /default, no credentials
+-- the TLS origin saw
+TLS, ALPN none
+GET /secret
+GET /again
+TLS, ALPN none
+GET /guarded
+-- the environment
+nothing set: no proxy
+http_proxy: http via http://proxy.example:3128/, https via none
+no scheme: http via none, https via http://proxy.example:8080/
+lower case first: http via http://lower.example:1/, https via none
+upper case alone: http via http://upper.example:2/, https via none
+upper case under CGI: no proxy
+all_proxy as the fallback: http via http://all.example:9/, https via http://secure.example:3/
+empty: no proxy
+socks: no proxy
+-- no_proxy
+  http://example.com/ direct
+  http://www.example.com/ direct
+  http://notexample.com/ proxied
+  http://a.internal/ direct
+  http://internal/ direct
+  http://x.wild.org/ direct
+  http://wild.org/ direct
+  http://10.20.30.40/ direct
+  http://11.0.0.1/ proxied
+  http://192.168.1.1/ direct
+  http://192.168.1.2/ proxied
+  http://[fd00::1]/ direct
+  http://host.test:8080/ direct
+  http://host.test:9090/ proxied
+  http://localhost/ direct
+  http://127.0.0.1:8080/ direct
+  http://anything.example/ direct

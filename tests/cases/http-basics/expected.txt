@@ -1,0 +1,159 @@
+-- GET
+HTTP/1.1 200 OK
+  X-Test: yes
+  (content) Content-Type: text/plain
+  (content) Content-Length: 12
+[hello, world]
+-- fields sent
+HTTP/1.1 200 OK
+  (content) Content-Length: 135
+[GET /echo?x=1&y=two HTTP/1.1
+Host: 127.0.0.1:PORT
+User-Agent: stainless-test/1.0
+X-Custom: one
+X-Custom: two
+Accept: text/plain
+body []]
+-- POST
+HTTP/1.1 200 OK
+  (content) Content-Length: 151
+[POST /echo HTTP/1.1
+Host: 127.0.0.1:PORT
+User-Agent: stainless-test/1.0
+Content-Type: text/plain; charset=utf-8
+Content-Length: 13
+body [a posted body]]
+-- PUT
+HTTP/1.1 200 OK
+  (content) Content-Length: 105
+[PUT /echo HTTP/1.1
+Host: 127.0.0.1:PORT
+User-Agent: stainless-test/1.0
+Content-Length: 9
+body [put bytes]]
+-- PATCH
+HTTP/1.1 200 OK
+  (content) Content-Length: 146
+[PATCH /echo HTTP/1.1
+Host: 127.0.0.1:PORT
+User-Agent: stainless-test/1.0
+Content-Type: application/json; charset=utf-8
+Content-Length: 2
+body [{}]]
+-- DELETE
+HTTP/1.1 200 OK
+  (content) Content-Length: 81
+[DELETE /echo HTTP/1.1
+Host: 127.0.0.1:PORT
+User-Agent: stainless-test/1.0
+body []]
+-- HEAD
+HTTP/1.1 200 OK
+  (content) Content-Length: 100
+[]
+-- OPTIONS
+HTTP/1.1 200 OK
+  (content) Content-Length: 82
+[OPTIONS /echo HTTP/1.1
+Host: 127.0.0.1:PORT
+User-Agent: stainless-test/1.0
+body []]
+-- custom method
+HTTP/1.1 200 OK
+  (content) Content-Length: 83
+[PROPFIND /echo HTTP/1.1
+Host: 127.0.0.1:PORT
+User-Agent: stainless-test/1.0
+body []]
+-- chunked response with trailers
+HTTP/1.1 200 OK
+  Transfer-Encoding: chunked
+  Trailer: X-Checksum
+[hello, chunky]
+  (trailer) X-Checksum: 42
+  (trailer) X-Other: 7
+-- chunked upload
+HTTP/1.1 201 Created
+  Location: /upload/1
+  (content) Content-Length: 158
+[POST /upload HTTP/1.1
+Host: 127.0.0.1:PORT
+User-Agent: stainless-test/1.0
+Transfer-Encoding: chunked
+(chunked)
+body [a body of unknown length, sent in chunks]]
+-- Expect: 100-continue
+HTTP/1.1 200 OK
+  (content) Content-Length: 183
+[POST /echo HTTP/1.1
+Host: 127.0.0.1:PORT
+User-Agent: stainless-test/1.0
+Content-Type: text/plain; charset=utf-8
+Content-Length: 24
+Expect: 100-continue
+body [after the interim answer]]
+-- 1xx skipped
+HTTP/1.1 200 OK
+  (content) Content-Length: 5
+[final]
+-- 204
+HTTP/1.1 204 No Content
+  (content) Content-Length: 0
+[]
+-- 304
+HTTP/1.1 304 Not Modified
+  ETag: "v1"
+  (content) Content-Length: 50
+[]
+-- after 304, same connection
+HTTP/1.1 200 OK
+  X-Test: yes
+  (content) Content-Type: text/plain
+  (content) Content-Length: 12
+[hello, world]
+-- read to the close
+HTTP/1.1 200 OK
+  (content) Content-Type: text/plain
+[read to the close]
+-- HTTP/1.0
+HTTP/1.0 200 OK
+  (content) Content-Length: 4
+[old!]
+-- ResponseHeadersRead
+[first second]
+headers came before the body: true
+-- EnsureSuccessStatusCode
+success: false
+ensured: false, the response status was 404 Not Found
+ensured 200: true
+-- convenience
+GetString: hello, world
+GetByteArray: 12
+GetStream: hello, world
+GetString 404: the response status was not a success
+-- server
+GET /hello
+GET /echo?x=1&y=two
+POST /echo
+PUT /echo
+PATCH /echo
+DELETE /echo
+HEAD /head
+OPTIONS /echo
+PROPFIND /echo
+GET /chunked
+POST /upload
+POST /echo
+GET /interim
+GET /no-content
+GET /not-modified
+GET /hello
+GET /until-close
+GET /http10
+GET /streamed
+GET /missing
+GET /hello
+GET /hello
+GET /hello
+GET /hello
+GET /missing
