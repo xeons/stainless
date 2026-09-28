@@ -1,0 +1,13 @@
+x25519-1 ok
+x25519-2 ok
+x25519-iterated-1 ok
+x25519-iterated-1000 ok
+x25519-alice-public ok
+x25519-bob-public ok
+x25519-alice-shared ok
+x25519-bob-shared ok
+x25519-low-order refused
+x25519-low-order refused
+x25519-low-order refused
+x25519-short-key refused
+x25519-generated-agree ok

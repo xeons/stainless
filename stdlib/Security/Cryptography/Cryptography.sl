@@ -138,6 +138,16 @@ ulong ReadLittleDoubleWord(byte[] block, nuint at)
     return (high << 32) | low;
 }
 
+/// Eight bytes as a little-endian doubleword, which is how Curve25519 reads
+/// a field element.
+ulong ReadLittleDoubleWord(ReadOnlySpan<byte> block, nuint at)
+{
+    ulong value = 0u;
+    for (nuint i = 8u; i > 0u; i--)
+        value = (value << 8) | (ulong)block[at + i - 1u];
+    return value;
+}
+
 /// A doubleword into eight little-endian bytes of `into`.
 void WriteLittleDoubleWord(byte[] into, nuint at, ulong value)
 {
