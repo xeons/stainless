@@ -1,0 +1,4 @@
+open late: 6 items, 250 cents
+8 15 true 2 7
+thank you, drawer 40
+derived 42

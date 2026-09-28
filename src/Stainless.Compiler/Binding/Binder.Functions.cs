@@ -254,7 +254,7 @@ public sealed partial class Binder
         // Reached only through the interface, so a word about who may call it
         // or how it dispatches has nothing to describe.
         if ((declaration.Modifiers & (Modifiers.Public | Modifiers.Protected |
-                Modifiers.Private | Modifiers.Virtual | Modifiers.Override |
+                Modifiers.Private | Modifiers.Internal | Modifiers.Virtual | Modifiers.Override |
                 Modifiers.Abstract | Modifiers.Sealed | Modifiers.Static)) != Modifiers.None)
             diagnostics.Error("SL0795", declaration.Span,
                 $"'{contract.Name}.{declaration.Name}' is reached only through '{contract.Name}', " +

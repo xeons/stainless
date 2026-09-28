@@ -100,7 +100,8 @@ Modules work like C# namespaces. Every file names its own with `module
 Shop.Catalog;` — never inferred from the path, so moving a file changes nothing
 — and several files may name the same module and merge into it. `public` decides
 what other modules may touch; an unmarked declaration is visible throughout its
-module and nowhere else, the way C#'s `internal` works. See
+module and nowhere else, the way C#'s `internal` works, and `internal` writes
+that down. See
 [§1 of the spec](docs/spec/01-modules.md) and [samples/shop](samples/shop) for a
 worked multi-file example.
 

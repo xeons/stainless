@@ -18,7 +18,10 @@ Everything below is covered by
 last person to edit it -- the suite is the authority.
 
 - Modules like C# namespaces: several files may share one, imports are per file,
-  `public` exports and an unmarked declaration is module-wide
+  `public` exports and an unmarked declaration is module-wide. `internal` writes
+  that default down, anywhere a visibility may go, and `protected internal` is
+  C#'s union and so the same as `protected`; a second visibility or a repeated
+  modifier is refused (SL0109)
 - Aliases, qualified names without an import, full order independence
 - `string` as a second spelling of `String`, declared as an alias in the
   auto-imported `Standard.Text`, so it needs no import and costs nothing

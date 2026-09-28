@@ -120,12 +120,26 @@ concession to the standard library.
 | Declaration | Visible to |
 |---|---|
 | `public class Book` | its module, and anything that can name the module |
-| `class Book` | its module only, across all of the module's files |
-| `protected int pages` | its class, and anything deriving from it, wherever that is |
+| `class Book`, `internal class Book` | its module only, across all of the module's files |
+| `protected int pages`, `protected internal int pages` | its module, and anything deriving from its class, wherever that is |
 
 The second row is C#'s `internal`, with the module playing the part of the
-assembly. There is nothing else — no friend declarations, no export lists, and
-no file-level privacy (C# only gained `file` in version 11).
+assembly, and `internal` is how it is written down: the word means exactly
+what its absence means. [The style](../style.md#23-visibility-is-written-down)
+writes it anyway, so that a reader never has to remember what a missing word
+means. There is nothing else — no friend declarations, no export lists, and
+no file-level privacy (C# only gained `file` in version 11). `private` is
+accepted wherever the others are and also means the module, because there is
+no narrower unit for it to name; on a setter it is the usual way to narrow one
+([§7](07-functions-members.md)).
+
+A declaration has one visibility, and each modifier is written once (SL0109).
+`public internal` and `public protected` contradict themselves, `private
+internal` names one visibility twice, and `static static` says nothing twice. The one pair that combines
+is `protected internal`, which is C#'s union of the two — its module, or a
+derived class — and so means what `protected` alone means here. C#'s
+`private protected`, a derived class *inside* the assembly, has no counterpart
+and is refused rather than read as one of its halves.
 
 Members follow the same rule: a field or method needs `public` for another
 module to touch it. `protected` ([§2.4.3](02-types.md#243-inheritance)) is the one addition, and

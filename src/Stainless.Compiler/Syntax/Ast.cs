@@ -142,6 +142,13 @@ public enum Modifiers
     /// object initializer, unless the constructor it runs says it does.
     /// </summary>
     Required = 1 << 11,
+
+    /// <summary>
+    /// Visible to its module and nowhere else: the visibility a declaration
+    /// has with no word at all, written down. With <c>protected</c> it is the
+    /// same union C# means, which is what <c>protected</c> alone already is.
+    /// </summary>
+    Internal = 1 << 12,
 }
 
 /// <summary>
@@ -435,6 +442,12 @@ public sealed record AccessorSyntax(
     /// is what gives a property with written accessors a backing field.
     /// </summary>
     public bool UsesField { get; init; }
+
+    /// <summary>
+    /// <c>private set</c> or <c>internal set</c>: reachable from its module
+    /// alone, whatever the property says.
+    /// </summary>
+    public bool IsNarrowed => (Modifiers & (Modifiers.Private | Modifiers.Internal)) != 0;
 }
 
 /// <summary>

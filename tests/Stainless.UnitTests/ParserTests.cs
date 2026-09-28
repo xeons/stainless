@@ -643,6 +643,61 @@ public class ParserTests
         Assert.Equal(required, type.Members[0].Modifiers.HasFlag(Modifiers.Required));
     }
 
+    [Theory]
+    [InlineData("internal class C { }")]
+    [InlineData("internal int Count() => 0;")]
+    [InlineData("internal const int Limit = 4;")]
+    [InlineData("internal enum Level { Low }")]
+    [InlineData("internal using Handle = void*;")]
+    [InlineData("internal extern \"C\" int abs(int value);")]
+    public void InternalIsAModifier(string declaration)
+    {
+        var unit = Front.Parse("module A;\n" + declaration, out var diagnostics);
+
+        Assert.Empty(Front.Codes(diagnostics));
+        Assert.True(unit.Declarations[0].Modifiers.HasFlag(Modifiers.Internal));
+    }
+
+    [Theory]
+    [InlineData("internal int X;")]
+    [InlineData("protected internal int X;")]
+    [InlineData("internal protected int X;")]
+    [InlineData("public int X { get; internal set; }")]
+    public void InternalIsAMemberModifier(string member)
+    {
+        Front.Parse("module A;\nclass C { " + member + " }", out var diagnostics);
+        Assert.Empty(Front.Codes(diagnostics));
+    }
+
+    [Theory]
+    [InlineData("public internal int X;")]
+    [InlineData("private internal int X;")]
+    [InlineData("public private int X;")]
+    [InlineData("public protected int X;")]
+    [InlineData("private protected int X;")]
+    [InlineData("internal internal int X;")]
+    [InlineData("static static int X;")]
+    [InlineData("public public int X;")]
+    public void AModifierIsWrittenOnceAndAVisibilityOnce(string member)
+    {
+        Front.Parse("module A;\nclass C { " + member + " }", out var diagnostics);
+        Assert.Equal(["SL0109"], Front.Codes(diagnostics));
+    }
+
+    [Fact]
+    public void AMemberOfAnExternBlockKeepsItsOwnVisibility()
+    {
+        var unit = Front.Parse(
+            "module A;\npublic extern \"C\" { int abs(int v); internal int labs(int v); }",
+            out var diagnostics);
+
+        Assert.Empty(Front.Codes(diagnostics));
+        Assert.True(unit.Declarations[0].Modifiers.HasFlag(Modifiers.Public));
+        Assert.Equal(
+            Modifiers.Internal,
+            unit.Declarations[1].Modifiers & (Modifiers.Public | Modifiers.Internal));
+    }
+
     [Fact]
     public void APrimaryParameterListIsAConstructor()
     {

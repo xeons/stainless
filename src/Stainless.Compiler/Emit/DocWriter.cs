@@ -420,7 +420,7 @@ public static class DocWriter
         foreach (var accessor in property.Accessors)
         {
             bool isSetter = !accessor.IsGetter;
-            if (isSetter && accessor.Modifiers.HasFlag(Modifiers.Private)) continue;
+            if (isSetter && accessor.IsNarrowed) continue;
             accessors.Add(!isSetter ? "get;" : accessor.IsInit ? "init;" : "set;");
         }
 

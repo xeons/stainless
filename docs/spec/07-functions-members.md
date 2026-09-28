@@ -531,6 +531,7 @@ with no braces at all is a property with only a getter.
 |---|---|---|
 | `public int X { get; set; }` | public | public |
 | `public int X { get; private set; }` | public | this module only |
+| `public int X { get; internal set; }` | public | this module only |
 | `int X { get; set; }` | this module only | this module only |
 
 There is no `private get`. The getter is what the word `public` on the property

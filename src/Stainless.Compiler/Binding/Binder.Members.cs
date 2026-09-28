@@ -1298,8 +1298,9 @@ public sealed partial class Binder
             explicitInterface = contract;
 
             if ((declaration.Modifiers & (Modifiers.Public | Modifiers.Protected |
-                    Modifiers.Private | Modifiers.Virtual | Modifiers.Override |
-                    Modifiers.Abstract | Modifiers.Sealed | Modifiers.Static)) != Modifiers.None)
+                    Modifiers.Private | Modifiers.Internal | Modifiers.Virtual |
+                    Modifiers.Override | Modifiers.Abstract | Modifiers.Sealed |
+                    Modifiers.Static)) != Modifiers.None)
                 diagnostics.Error("SL0795", declaration.Span,
                     $"'{contract.Name}.{declaration.Name}' is reached only through " +
                     $"'{contract.Name}', so it takes no modifier: it is as visible as the " +
@@ -1447,7 +1448,7 @@ public sealed partial class Binder
             {
                 CheckRequiredVisible(type, declaration.Name,
                     declaration.Modifiers.HasFlag(Modifiers.Public) &&
-                    !setter!.Modifiers.HasFlag(Modifiers.Private),
+                    !setter!.IsNarrowed,
                     declaration.Span);
             }
         }
@@ -1592,7 +1593,7 @@ public sealed partial class Binder
         // property's visibility means, so letting it differ would only make the
         // word 'public' on the property itself a lie.
         bool isPublic = property.IsPublic;
-        if (accessor.Modifiers.HasFlag(Modifiers.Private))
+        if (accessor.IsNarrowed)
         {
             if (isSetter) isPublic = false;
             else

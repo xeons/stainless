@@ -697,36 +697,96 @@ public sealed class Parser
     private Modifiers ParseModifiers()
     {
         var modifiers = Modifiers.None;
-        while (true)
+        while (ModifierAt() is var modifier and not Modifiers.None)
         {
-            switch (Current.Kind)
+            var written = Advance();
+
+            if ((modifiers & modifier) != Modifiers.None)
             {
-                case TokenKind.PublicKeyword: modifiers |= Modifiers.Public; Advance(); break;
-                case TokenKind.PrivateKeyword: modifiers |= Modifiers.Private; Advance(); break;
-                case TokenKind.ConstKeyword: modifiers |= Modifiers.Const; Advance(); break;
-                case TokenKind.ProtectedKeyword: modifiers |= Modifiers.Protected; Advance(); break;
-                case TokenKind.VirtualKeyword: modifiers |= Modifiers.Virtual; Advance(); break;
-                case TokenKind.OverrideKeyword: modifiers |= Modifiers.Override; Advance(); break;
-                case TokenKind.AbstractKeyword: modifiers |= Modifiers.Abstract; Advance(); break;
-                case TokenKind.SealedKeyword: modifiers |= Modifiers.Sealed; Advance(); break;
-                case TokenKind.StaticKeyword: modifiers |= Modifiers.Static; Advance(); break;
-                case TokenKind.ThreadsafeKeyword:
-                    modifiers |= Modifiers.Threadsafe; Advance(); break;
-
-                // `com` reads as a modifier and means a different kind of
-                // declaration; only `interface` and `class` may follow it,
-                // which ParseTypeDeclaration checks.
-                case TokenKind.ComKeyword: modifiers |= Modifiers.Com; Advance(); break;
-
-                case TokenKind.Identifier when AtRequiredModifier():
-                    modifiers |= Modifiers.Required;
-                    Advance();
-                    break;
-
-                default: return modifiers;
+                _diagnostics.Error("SL0109", written.Span,
+                    $"'{written.Text}' is already written on this declaration; say it once");
+                continue;
             }
+
+            if (VisibilityConflict(modifiers, modifier) is { } conflict)
+            {
+                _diagnostics.Error("SL0109", written.Span, conflict);
+                continue;
+            }
+
+            modifiers |= modifier;
         }
+
+        return modifiers;
     }
+
+    /// <summary>The modifier the current token is, or none.</summary>
+    private Modifiers ModifierAt() => Current.Kind switch
+    {
+        TokenKind.PublicKeyword => Modifiers.Public,
+        TokenKind.PrivateKeyword => Modifiers.Private,
+        TokenKind.InternalKeyword => Modifiers.Internal,
+        TokenKind.ProtectedKeyword => Modifiers.Protected,
+        TokenKind.ConstKeyword => Modifiers.Const,
+        TokenKind.VirtualKeyword => Modifiers.Virtual,
+        TokenKind.OverrideKeyword => Modifiers.Override,
+        TokenKind.AbstractKeyword => Modifiers.Abstract,
+        TokenKind.SealedKeyword => Modifiers.Sealed,
+        TokenKind.StaticKeyword => Modifiers.Static,
+        TokenKind.ThreadsafeKeyword => Modifiers.Threadsafe,
+
+        // `com` reads as a modifier and means a different kind of
+        // declaration; only `interface` and `class` may follow it, which
+        // ParseTypeDeclaration checks.
+        TokenKind.ComKeyword => Modifiers.Com,
+
+        TokenKind.Identifier when AtRequiredModifier() => Modifiers.Required,
+        _ => Modifiers.None,
+    };
+
+    /// <summary>
+    /// Why a visibility word cannot join those already written, or null when
+    /// it can. Each word names one visibility, and the one pair that combines
+    /// is <c>protected internal</c>: C#'s union of the two, which is what
+    /// <c>protected</c> means on its own here.
+    /// </summary>
+    private static string? VisibilityConflict(Modifiers written, Modifiers adding)
+    {
+        var already = written & Visibility;
+        if ((adding & Visibility) == Modifiers.None || already == Modifiers.None) return null;
+
+        var both = already | adding;
+        if (both == (Modifiers.Protected | Modifiers.Internal)) return null;
+
+        if (both == (Modifiers.Protected | Modifiers.Private))
+            return "'private protected' is C#'s derived classes inside the assembly, and there " +
+                   "is no such visibility here: 'protected' already reaches its module and " +
+                   "every derived class, and 'private' its module alone. Write one of them";
+
+        return $"'{VisibilityWord(already)}' and '{VisibilityWord(adding)}' each say who may " +
+               "see this, and a declaration has one visibility. Write one of them";
+    }
+
+    private const Modifiers Visibility =
+        Modifiers.Public | Modifiers.Private | Modifiers.Internal | Modifiers.Protected;
+
+    /// <summary>
+    /// A member of an <c>extern</c> block: the block's modifiers, with the
+    /// member's own visibility in place of the block's where it wrote one.
+    /// </summary>
+    private static Modifiers InsideBlock(Modifiers block, Modifiers member) =>
+        (member & Visibility) != Modifiers.None
+            ? (block & ~Visibility) | member
+            : block | member;
+
+    private static string VisibilityWord(Modifiers modifiers) => modifiers switch
+    {
+        Modifiers.Public => "public",
+        Modifiers.Private => "private",
+        Modifiers.Protected => "protected",
+        Modifiers.Internal => "internal",
+        _ => "protected internal",
+    };
 
     /// <summary>
     /// Whether <c>required</c> here is the modifier rather than a type of
@@ -746,8 +806,9 @@ public sealed class Parser
 
     private static bool IsModifierKeyword(TokenKind kind) => kind is
         TokenKind.PublicKeyword or TokenKind.PrivateKeyword or TokenKind.ProtectedKeyword or
-        TokenKind.VirtualKeyword or TokenKind.OverrideKeyword or TokenKind.AbstractKeyword or
-        TokenKind.SealedKeyword or TokenKind.StaticKeyword or TokenKind.ConstKeyword;
+        TokenKind.InternalKeyword or TokenKind.VirtualKeyword or TokenKind.OverrideKeyword or
+        TokenKind.AbstractKeyword or TokenKind.SealedKeyword or TokenKind.StaticKeyword or
+        TokenKind.ConstKeyword;
 
     /// <summary>
     /// <c>__stdcall</c> and its relatives, written after the linkage string.
@@ -813,7 +874,8 @@ public sealed class Parser
         //
         // A modifier written on the block belongs to every declaration in it,
         // which is the whole reason to write one there: a binding module that
-        // re-exports two hundred entry points should say 'public' once.
+        // re-exports two hundred entry points should say 'public' once. A
+        // member that writes its own visibility has that one instead.
         if (Match(TokenKind.OpenBrace))
         {
             var members = new List<Declaration>();
@@ -821,7 +883,7 @@ public sealed class Parser
             {
                 int before = _pos;
                 int memberStart = _pos;
-                var memberModifiers = modifiers | ParseModifiers();
+                var memberModifiers = InsideBlock(modifiers, ParseModifiers());
                 var memberConvention = ParseCallingConvention();
                 if (memberConvention == CallingConvention.Default)
                     memberConvention = blockConvention;
@@ -835,7 +897,7 @@ public sealed class Parser
         }
 
         // Single-declaration form: extern "C" int puts(byte* s);
-        var singleModifiers = modifiers | ParseModifiers();
+        var singleModifiers = InsideBlock(modifiers, ParseModifiers());
         var singleConvention = ParseCallingConvention();
         if (singleConvention == CallingConvention.Default) singleConvention = blockConvention;
 
@@ -1225,7 +1287,8 @@ public sealed class Parser
     private bool AtAnonymousMember()
     {
         int at = 0;
-        while (Peek(at).Kind is TokenKind.PublicKeyword or TokenKind.PrivateKeyword) at++;
+        while (Peek(at).Kind is TokenKind.PublicKeyword or TokenKind.PrivateKeyword
+               or TokenKind.InternalKeyword) at++;
 
         return Peek(at).Kind is TokenKind.StructKeyword or TokenKind.UnionKeyword &&
                Peek(at + 1).Kind == TokenKind.OpenBrace;
