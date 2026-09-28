@@ -691,4 +691,268 @@ public sealed class Rsa
             return None;
         return Some(number);
     }
+
+    // ------------------------------------------------------------ signatures
+
+    /// The signature of `data`'s hash.
+    ///
+    /// @param data           what to sign; it is hashed here
+    /// @param hashAlgorithm  the hash, which the verifier MUST use too
+    /// @param padding        PKCS #1 v1.5, or PSS with its salt length
+    /// @failure CryptoError.InvalidKey      this is a public key
+    /// @failure CryptoError.Unsupported     the hash is not one this module has
+    /// @failure CryptoError.MessageLength   the key is too small for the hash and padding
+    /// @failure CryptoError.NoEntropy       the platform would not supply randomness
+    /// @see Rsa.VerifyData
+    public Result<byte[], CryptoError> SignData(ReadOnlySpan<byte> data,
+                                                HashAlgorithmName hashAlgorithm,
+                                                RsaSignaturePadding padding)
+    {
+        IHashAlgorithm hash = try hashAlgorithm.CreateHashAlgorithm();
+        hash.AppendData(data);
+        return SignHash(hash.GetHashAndReset(), hashAlgorithm, padding);
+    }
+
+    /// The signature of a hash already computed.
+    ///
+    /// @param hash           the digest, exactly as long as `hashAlgorithm`'s
+    /// @param hashAlgorithm  the hash that made it
+    /// @param padding        PKCS #1 v1.5, or PSS with its salt length
+    /// @failure CryptoError.Parameter       `hash` is not the digest's length
+    /// @failure CryptoError.InvalidKey      this is a public key
+    /// @failure CryptoError.Unsupported     the hash is not one this module has
+    /// @failure CryptoError.MessageLength   the key is too small for the hash and padding
+    /// @failure CryptoError.NoEntropy       the platform would not supply randomness
+    /// @see Rsa.VerifyHash
+    public Result<byte[], CryptoError> SignHash(ReadOnlySpan<byte> hash,
+                                                HashAlgorithmName hashAlgorithm,
+                                                RsaSignaturePadding padding)
+    {
+        IHashAlgorithm algorithm = try hashAlgorithm.CreateHashAlgorithm();
+        if (hash.Length != algorithm.HashSizeInBytes)
+            return Fail(CryptoError.Parameter);
+        if (_privateKey == null)
+            return Fail(CryptoError.InvalidKey);
+
+        byte[] encoded;
+        if (padding.Mode == RsaSignaturePaddingMode.Pkcs1)
+        {
+            encoded = try EncodePkcs1Signature(hash, hashAlgorithm);
+        }
+        else
+        {
+            nuint salt = try ChoosePssSaltLength(padding, algorithm.HashSizeInBytes);
+            encoded = try EncodePss(hash, algorithm, salt);
+        }
+
+        return ApplyPrivateExponent(Limbs.FromBigEndian(encoded, _modulus.LimbCount));
+    }
+
+    /// Whether `signature` is this key's signature of `data`'s hash.
+    ///
+    /// **Never fails**: a signature that is malformed, the wrong length or
+    /// for another message is simply not valid, and an unknown hash is false.
+    ///
+    /// @param data           what was signed
+    /// @param signature      the signature, as long as the modulus
+    /// @param hashAlgorithm  the hash the signer used
+    /// @param padding        the encoding the signer used
+    /// @see Rsa.SignData
+    public bool VerifyData(ReadOnlySpan<byte> data, ReadOnlySpan<byte> signature,
+                           HashAlgorithmName hashAlgorithm, RsaSignaturePadding padding)
+    {
+        var created = hashAlgorithm.CreateHashAlgorithm();
+        if (!created.Ok)
+            return false;
+        IHashAlgorithm hash = created.Value;
+        hash.AppendData(data);
+        return VerifyHash(hash.GetHashAndReset(), signature, hashAlgorithm, padding);
+    }
+
+    /// Whether `signature` is this key's signature of a hash already
+    /// computed. Never fails, as `VerifyData` does not.
+    ///
+    /// @param hash           the digest
+    /// @param signature      the signature, as long as the modulus
+    /// @param hashAlgorithm  the hash that made the digest
+    /// @param padding        the encoding the signer used
+    public bool VerifyHash(ReadOnlySpan<byte> hash, ReadOnlySpan<byte> signature,
+                           HashAlgorithmName hashAlgorithm, RsaSignaturePadding padding)
+    {
+        var created = hashAlgorithm.CreateHashAlgorithm();
+        if (!created.Ok)
+            return false;
+        IHashAlgorithm algorithm = created.Value;
+        if (hash.Length != algorithm.HashSizeInBytes)
+            return false;
+
+        var number = ConvertToNumberBelowModulus(signature);
+        if (!number.Some)
+            return false;
+        byte[] encoded = Limbs.ToBigEndian(ApplyPublicExponent(number.Value), _modulusLength);
+
+        if (padding.Mode == RsaSignaturePaddingMode.Pkcs1)
+        {
+            var expected = EncodePkcs1Signature(hash, hashAlgorithm);
+            return expected.Ok && CryptographicOperations.FixedTimeEquals(encoded, expected.Value);
+        }
+        return VerifyPss(hash, encoded, algorithm, padding.PssSaltLength);
+    }
+
+    /// EMSA-PKCS1-v1_5 (RFC 8017 §9.2): `00 01 FF...FF 00 DigestInfo`, as
+    /// long as the modulus.
+    Result<byte[], CryptoError> EncodePkcs1Signature(ReadOnlySpan<byte> hash,
+                                                     HashAlgorithmName hashAlgorithm)
+    {
+        var prefix = hashAlgorithm.CreateDigestInfoPrefix();
+        if (!prefix.Some)
+            return Fail(CryptoError.Unsupported);
+        nuint length = prefix.Value.Length + hash.Length;
+        if (_modulusLength < length + 11u)
+            return Fail(CryptoError.MessageLength);
+
+        byte[] encoded = new byte[_modulusLength];
+        encoded[1u] = 0x01;
+        nuint separator = _modulusLength - length - 1u;
+        for (nuint i = 2u; i < separator; i++)
+            encoded[i] = 0xFF;
+        for (nuint i = 0u; i < prefix.Value.Length; i++)
+            encoded[separator + 1u + i] = prefix.Value[i];
+        for (nuint i = 0u; i < hash.Length; i++)
+            encoded[separator + 1u + prefix.Value.Length + i] = hash[i];
+        return Ok(encoded);
+    }
+
+    /// How many bytes of salt `padding` asks for with this key and a digest
+    /// of `hashLength` bytes.
+    Result<nuint, CryptoError> ChoosePssSaltLength(RsaSignaturePadding padding, nuint hashLength)
+    {
+        int asked = padding.PssSaltLength;
+        if (asked == RsaSignaturePadding.PssSaltLengthIsHashLength)
+            return Ok(hashLength);
+
+        nuint encodedLength = (_keySize - 1u + 7u) / 8u;
+        if (asked == RsaSignaturePadding.PssSaltLengthMax)
+        {
+            if (encodedLength < hashLength + 2u)
+                return Fail(CryptoError.MessageLength);
+            return Ok(encodedLength - hashLength - 2u);
+        }
+        return Ok((nuint)asked);
+    }
+
+    /// EMSA-PSS-ENCODE (RFC 8017 §9.1.1) with MGF1 over the same hash,
+    /// into `emLen` bytes for `emBits` one short of the modulus's.
+    Result<byte[], CryptoError> EncodePss(ReadOnlySpan<byte> hash, IHashAlgorithm algorithm,
+                                          nuint saltLength)
+    {
+        nuint hashLength = algorithm.HashSizeInBytes;
+        nuint encodedBits = _keySize - 1u;
+        nuint encodedLength = (encodedBits + 7u) / 8u;
+        if (encodedLength < hashLength + saltLength + 2u)
+            return Fail(CryptoError.MessageLength);
+
+        byte[] salt = new byte[saltLength];
+        if (!RandomNumberGenerator.Fill(salt))
+            return Fail(CryptoError.NoEntropy);
+
+        algorithm.Reset();
+        algorithm.AppendData(new byte[8u]);
+        algorithm.AppendData(hash);
+        algorithm.AppendData(salt);
+        byte[] digest = algorithm.GetHashAndReset();
+
+        nuint maskedLength = encodedLength - hashLength - 1u;
+        byte[] encoded = GenerateMask(algorithm, digest, maskedLength);
+        encoded[maskedLength - saltLength - 1u] ^= 0x01;
+        for (nuint i = 0u; i < saltLength; i++)
+            encoded[maskedLength - saltLength + i] ^= salt[i];
+        encoded[0u] &= (byte)(0xFFu >> (uint)(8u * encodedLength - encodedBits));
+
+        byte[] result = new byte[encodedLength];
+        for (nuint i = 0u; i < maskedLength; i++)
+            result[i] = encoded[i];
+        for (nuint i = 0u; i < hashLength; i++)
+            result[maskedLength + i] = digest[i];
+        result[encodedLength - 1u] = 0xBC;
+        return Ok(result);
+    }
+
+    /// EMSA-PSS-VERIFY (RFC 8017 §9.1.2) over the modulus-length `decoded`.
+    /// A `saltLength` of `PssSaltLengthMax` accepts any salt.
+    bool VerifyPss(ReadOnlySpan<byte> hash, byte[] decoded, IHashAlgorithm algorithm,
+                   int saltLength)
+    {
+        nuint hashLength = algorithm.HashSizeInBytes;
+        nuint encodedBits = _keySize - 1u;
+        nuint encodedLength = (encodedBits + 7u) / 8u;
+        if (encodedLength < hashLength + 2u)
+            return false;
+
+        // The encoding is one byte short of the modulus when emBits is a
+        // multiple of eight, and that byte MUST be zero.
+        nuint skip = _modulusLength - encodedLength;
+        if (skip == 1u && decoded[0u] != 0)
+            return false;
+        if (decoded[_modulusLength - 1u] != 0xBC)
+            return false;
+
+        nuint maskedLength = encodedLength - hashLength - 1u;
+        byte topMask = (byte)(0xFFu >> (uint)(8u * encodedLength - encodedBits));
+        if ((decoded[skip] & ~topMask) != 0)
+            return false;
+
+        ReadOnlySpan<byte> digest = decoded[skip + maskedLength:skip + maskedLength + hashLength];
+        byte[] block = GenerateMask(algorithm, digest, maskedLength);
+        for (nuint i = 0u; i < maskedLength; i++)
+            block[i] ^= decoded[skip + i];
+        block[0u] &= topMask;
+
+        nuint separator = 0u;
+        while (separator < maskedLength && block[separator] == 0)
+            separator++;
+        if (separator == maskedLength || block[separator] != 0x01)
+            return false;
+        nuint foundSalt = maskedLength - separator - 1u;
+
+        if (saltLength != RsaSignaturePadding.PssSaltLengthMax)
+        {
+            nuint wanted = saltLength == RsaSignaturePadding.PssSaltLengthIsHashLength
+                               ? hashLength
+                               : (nuint)saltLength;
+            if (foundSalt != wanted)
+                return false;
+        }
+
+        algorithm.Reset();
+        algorithm.AppendData(new byte[8u]);
+        algorithm.AppendData(hash);
+        algorithm.AppendData(block[maskedLength - foundSalt:]);
+        byte[] expected = algorithm.GetHashAndReset();
+        return CryptographicOperations.FixedTimeEquals(expected, digest);
+    }
+
+    /// MGF1 (RFC 8017 §B.2.1): `length` bytes from `seed`.
+    static byte[] GenerateMask(IHashAlgorithm hash, ReadOnlySpan<byte> seed, nuint length)
+    {
+        byte[] mask = new byte[length];
+        byte[] counter = new byte[4u];
+        nuint filled = 0u;
+        uint index = 0u;
+        while (filled < length)
+        {
+            WriteBigWord(counter, 0u, index);
+            hash.Reset();
+            hash.AppendData(seed);
+            hash.AppendData(counter);
+            byte[] block = hash.GetHashAndReset();
+            for (nuint i = 0u; i < block.Length && filled < length; i++)
+            {
+                mask[filled] = block[i];
+                filled++;
+            }
+            index++;
+        }
+        return mask;
+    }
 }

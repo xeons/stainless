@@ -106,4 +106,37 @@ public struct HashAlgorithmName
 
     public static bool operator !=(HashAlgorithmName left, HashAlgorithmName right) =>
         !left.Equals(right);
+
+    public String ToString() => Name;
+
+    /// The DER of a PKCS #1 `DigestInfo` up to the digest itself, which is
+    /// what a PKCS #1 v1.5 signature signs ahead of the hash (RFC 8017 §9.2).
+    internal Optional<byte[]> CreateDigestInfoPrefix()
+    {
+        switch (_kind)
+        {
+            case 1:
+                return Some([0x30, 0x21, 0x30, 0x09, 0x06, 0x05, 0x2B, 0x0E, 0x03, 0x02, 0x1A, 0x05,
+                             0x00, 0x04, 0x14]);
+            case 2:
+                return Some(CreateSha2DigestInfoPrefix(0x31, 0x01, 0x20));
+            case 3:
+                return Some(CreateSha2DigestInfoPrefix(0x41, 0x02, 0x30));
+            case 4:
+                return Some(CreateSha2DigestInfoPrefix(0x51, 0x03, 0x40));
+        }
+        return None;
+    }
+
+    /// The SHA-2 family's prefixes differ in three bytes: the outer length,
+    /// the last arc of the identifier, and the digest's length.
+    internal static byte[] CreateSha2DigestInfoPrefix(byte length, byte arc, byte digestLength)
+    {
+        byte[] prefix = [0x30, 0x00, 0x30, 0x0D, 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03,
+                         0x04, 0x02, 0x00, 0x05, 0x00, 0x04, 0x00];
+        prefix[1u] = length;
+        prefix[14u] = arc;
+        prefix[18u] = digestLength;
+        return prefix;
+    }
 }
