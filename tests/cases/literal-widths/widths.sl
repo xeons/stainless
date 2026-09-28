@@ -97,6 +97,13 @@ int Main()
     printf("%llu %d %d %llu %llu\n", (ulong)chosen, narrow, belowZero, (ulong)switched,
         (ulong)mixed);
 
+    // A literal beside a `uint` stays a `uint` rather than meeting it at
+    // `long`, which is also what keeps `nuint` the same on 32-bit targets.
+    uint counted = byteMask;
+    uint picked = flag ? counted : 300;
+    uint other = flag ? 300 : counted;
+    printf("%u %u\n", picked, other);
+
     // A `const` is a value inlined at every use, so it answers the same
     // question a literal does and needs no cast to reach a type that holds it.
     nuint limit = Limit;

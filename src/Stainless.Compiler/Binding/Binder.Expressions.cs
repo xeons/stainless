@@ -1902,7 +1902,17 @@ public sealed partial class Binder
         if (left.Type is PrimitiveTypeSymbol { IsNumeric: true } leftNumber &&
             right.Type is PrimitiveTypeSymbol { IsNumeric: true } rightNumber &&
             TryFindCommonType(leftNumber, rightNumber, out var common))
+        {
+            // `flag ? count : 138` stays the width `count` has. Widening both
+            // to a third type would make a 32-bit `nuint` meet an `int` at
+            // `long`, where a 64-bit one adopts the literal.
+            if (!common.Equals(left.Type) && !common.Equals(right.Type))
+            {
+                if (ConstantFits(right, left.Type)) return left.Type;
+                if (ConstantFits(left, right.Type)) return right.Type;
+            }
             return common;
+        }
 
         // Otherwise one arm must already be assignable to the other, which is
         // what covers C -> C?, C -> I and an integer literal adopting a width.
