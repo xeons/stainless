@@ -1,0 +1,53 @@
+-- h2 through TLS
+GET /hello: 200 in HTTP/2.0, hello over h2
+  set-cookie: a=1 | b=2
+  content-type: text/plain
+POST /echo: 200 in HTTP/2.0, POST of 12 bytes, checksum 6846904
+HEAD /head: 200, content-length 22, body ""
+GET /empty: 200 in HTTP/2.0, 
+GET /trailers: body before trailers
+  trailers: x-checksum 12345, x-status done
+GET /early: 200 in HTTP/2.0, after an interim response
+GET /fields: 200 in HTTP/2.0, :authority 127.0.0.1 and its port, :scheme https
+  x-mixed-case: Value
+  te: trailers
+  authorization: Bearer secret
+  cookie: first=1
+  cookie: second=2
+  cookie: a=1
+  cookie: b=2
+connections to the TLS server: 1
+-- past the 65 535-byte window
+300 000 bytes down: 300000 arrived, intact
+  the client sent the stream WINDOW_UPDATE: true
+300 000 bytes up: 200 in HTTP/2.0, POST of 300000 bytes, checksum 123214601
+  expected checksum 123214601
+  the client overran a window: false
+-- h2c with prior knowledge
+2.0 exact: 200 in HTTP/2.0, hello over h2
+2.0 or higher: 200 in HTTP/2.0, h2
+2.0 or lower: 200 in HTTP/1.1, http/1.1
+1.1 or higher: 200 in HTTP/1.1, http/1.1
+POST over h2c: 200 in HTTP/2.0, POST of 17 bytes, checksum 350970432
+-- versions and policies, a server offering h2 and http/1.1
+  1.1 RequestVersionOrLower: HTTP/1.1, the server saw http/1.1
+  1.1 RequestVersionOrHigher: HTTP/2.0, the server saw h2
+  1.1 RequestVersionExact: HTTP/1.1, the server saw http/1.1
+  2.0 RequestVersionOrLower: HTTP/2.0, the server saw h2
+  2.0 RequestVersionOrHigher: HTTP/2.0, the server saw h2
+  2.0 RequestVersionExact: HTTP/2.0, the server saw h2
+  3.0 RequestVersionOrLower: HTTP/2.0, the server saw h2
+  3.0 RequestVersionOrHigher: VersionNegotiationFailure
+  3.0 RequestVersionExact: VersionNegotiationFailure
+-- versions and policies, a server offering http/1.1 alone
+  1.1 RequestVersionOrLower: HTTP/1.1, the server saw http/1.1
+  1.1 RequestVersionOrHigher: HTTP/1.1, the server saw http/1.1
+  1.1 RequestVersionExact: HTTP/1.1, the server saw http/1.1
+  2.0 RequestVersionOrLower: HTTP/1.1, the server saw http/1.1
+  2.0 RequestVersionOrHigher: VersionNegotiationFailure
+  2.0 RequestVersionExact: VersionNegotiationFailure
+  3.0 RequestVersionOrLower: HTTP/1.1, the server saw http/1.1
+  3.0 RequestVersionOrHigher: VersionNegotiationFailure
+  3.0 RequestVersionExact: VersionNegotiationFailure
+-- the default is HTTP/1.1, as .NET's is
+GET with no version set: 200 in HTTP/1.1, http/1.1
