@@ -2,7 +2,7 @@
 
 <sub>Generated from the `///` blocks in the source by `stainless doc`. Edit the source, not this file.</sub>
 
-TLS 1.3, client and server, in Stainless and over any stream.
+TLS 1.3 and TLS 1.2, client and server, in Stainless and over any stream.
 
 ```csharp
 var options = new TlsClientOptions();
@@ -32,9 +32,23 @@ ALPN, server_name, KeyUpdate in both directions, the exporter, and the
 middlebox compatibility mode. Session tickets are read and handed to
 `TlsClientOptions.SessionTicketReceived`, and nothing yet offers one back.
 
-**What is not:** TLS 1.2, which `TlsProtocolVersion.Tls12` names so that
-options can already ask for it; resumption; a server that issues tickets;
-and 0-RTT data, which is never coming, since it is replayable by design.
+**TLS 1.2 (RFC 5246) is its modern subset**, for a peer without TLS 1.3:
+ECDHE over the same groups, the six AES-GCM and ChaCha20-Poly1305 suites
+(RFC 5289, RFC 7905), signatures with Ed25519 (RFC 8422), ECDSA, RSA-PSS
+or PKCS #1 v1.5, client certificates, ALPN, server_name, RFC 5705's
+exporter, and session tickets (RFC 5077) handed to the same handler. The
+extended master secret (RFC 7627) is REQUIRED of the peer: every current
+implementation has it, and without it a master secret binds only the
+randoms, which is the triple handshake attack. One ClientHello offers both
+versions and TLS 1.3 wins where both ends have it. A server that could
+have spoken TLS 1.3 writes the downgrade sentinel into a TLS 1.2 random,
+and a client that offered TLS 1.3 refuses a ServerHello that carries it.
+
+**What is not:** resumption, in either version; a server that issues
+tickets; in TLS 1.2, CBC suites, static RSA key exchange, finite-field
+DHE, compression and renegotiation, which is answered from either side
+with a no_renegotiation warning; and 0-RTT data, which is never coming,
+since it is replayable by design.
 
 **Certificates are judged by a `TlsCertificateValidator`**, a closure the
 options carry. The default is the platform's trust: an `X509Chain` from
@@ -48,6 +62,7 @@ against the leaf's key is always checked here.
 AEADs check their tags in constant time, and the padding of a TLS 1.3
 record is stripped by a scan over the whole record that selects by mask,
 so how much of a record was padding does not show in how long it took.
+TLS 1.2 has only AEAD suites, so there is no padding oracle to guard.
 Finished values are compared with `FixedTimeEquals`.
 
 **Blocking, one reader and one writer.** A read blocks until a record of
@@ -55,7 +70,8 @@ application data arrives, and one thread MAY read while another writes;
 every record written goes under one lock, because a read can write too:
 the alert that ends a connection it found at fault. The KeyUpdate a peer
 asks for is sent before the next application data written, as RFC 8446
-§4.6.3 allows, so a reader that never writes never answers one.
+§4.6.3 allows, so a reader that never writes never answers one. TLS 1.2
+has no KeyUpdate, and its keys last as long as the connection.
 
 ## Contents
 
@@ -74,9 +90,10 @@ enum TlsAlertDescription : byte
 What an alert says, with the numbers RFC 8446 §6 gives them.
 
 In TLS 1.3 every alert but `CloseNotify` and `UserCanceled` ends the
-connection, whatever level it was sent at.
+connection, whatever level it was sent at. In TLS 1.2 a warning-level
+`NoRenegotiation` or `UnrecognizedName` is passed over as well.
 
-<sub>[stdlib/Net/Security/TlsAlertDescription.sl:28](../../stdlib/Net/Security/TlsAlertDescription.sl#L28)</sub>
+<sub>[stdlib/Net/Security/TlsAlertDescription.sl:29](../../stdlib/Net/Security/TlsAlertDescription.sl#L29)</sub>
 
 #### CloseNotify *case*
 
@@ -86,7 +103,7 @@ CloseNotify = 0
 
 The sender will send nothing more. The orderly end of a connection.
 
-<sub>[stdlib/Net/Security/TlsAlertDescription.sl:31](../../stdlib/Net/Security/TlsAlertDescription.sl#L31)</sub>
+<sub>[stdlib/Net/Security/TlsAlertDescription.sl:32](../../stdlib/Net/Security/TlsAlertDescription.sl#L32)</sub>
 
 #### UnexpectedMessage *case*
 
@@ -96,7 +113,7 @@ UnexpectedMessage = 10
 
 A message arrived where the protocol allows none.
 
-<sub>[stdlib/Net/Security/TlsAlertDescription.sl:34](../../stdlib/Net/Security/TlsAlertDescription.sl#L34)</sub>
+<sub>[stdlib/Net/Security/TlsAlertDescription.sl:35](../../stdlib/Net/Security/TlsAlertDescription.sl#L35)</sub>
 
 #### BadRecordMac *case*
 
@@ -106,7 +123,7 @@ BadRecordMac = 20
 
 A record failed authentication.
 
-<sub>[stdlib/Net/Security/TlsAlertDescription.sl:37](../../stdlib/Net/Security/TlsAlertDescription.sl#L37)</sub>
+<sub>[stdlib/Net/Security/TlsAlertDescription.sl:38](../../stdlib/Net/Security/TlsAlertDescription.sl#L38)</sub>
 
 #### RecordOverflow *case*
 
@@ -116,7 +133,7 @@ RecordOverflow = 22
 
 A record was longer than the protocol allows.
 
-<sub>[stdlib/Net/Security/TlsAlertDescription.sl:40](../../stdlib/Net/Security/TlsAlertDescription.sl#L40)</sub>
+<sub>[stdlib/Net/Security/TlsAlertDescription.sl:41](../../stdlib/Net/Security/TlsAlertDescription.sl#L41)</sub>
 
 #### HandshakeFailure *case*
 
@@ -126,7 +143,7 @@ HandshakeFailure = 40
 
 No acceptable set of parameters could be agreed.
 
-<sub>[stdlib/Net/Security/TlsAlertDescription.sl:43](../../stdlib/Net/Security/TlsAlertDescription.sl#L43)</sub>
+<sub>[stdlib/Net/Security/TlsAlertDescription.sl:44](../../stdlib/Net/Security/TlsAlertDescription.sl#L44)</sub>
 
 #### BadCertificate *case*
 
@@ -136,7 +153,7 @@ BadCertificate = 42
 
 A certificate was corrupt or failed verification.
 
-<sub>[stdlib/Net/Security/TlsAlertDescription.sl:46](../../stdlib/Net/Security/TlsAlertDescription.sl#L46)</sub>
+<sub>[stdlib/Net/Security/TlsAlertDescription.sl:47](../../stdlib/Net/Security/TlsAlertDescription.sl#L47)</sub>
 
 #### UnsupportedCertificate *case*
 
@@ -146,7 +163,7 @@ UnsupportedCertificate = 43
 
 A certificate was of a type the sender cannot use.
 
-<sub>[stdlib/Net/Security/TlsAlertDescription.sl:49](../../stdlib/Net/Security/TlsAlertDescription.sl#L49)</sub>
+<sub>[stdlib/Net/Security/TlsAlertDescription.sl:50](../../stdlib/Net/Security/TlsAlertDescription.sl#L50)</sub>
 
 #### CertificateRevoked *case*
 
@@ -156,7 +173,7 @@ CertificateRevoked = 44
 
 A certificate was revoked by its signer.
 
-<sub>[stdlib/Net/Security/TlsAlertDescription.sl:52](../../stdlib/Net/Security/TlsAlertDescription.sl#L52)</sub>
+<sub>[stdlib/Net/Security/TlsAlertDescription.sl:53](../../stdlib/Net/Security/TlsAlertDescription.sl#L53)</sub>
 
 #### CertificateExpired *case*
 
@@ -166,7 +183,7 @@ CertificateExpired = 45
 
 A certificate was outside its validity period.
 
-<sub>[stdlib/Net/Security/TlsAlertDescription.sl:55](../../stdlib/Net/Security/TlsAlertDescription.sl#L55)</sub>
+<sub>[stdlib/Net/Security/TlsAlertDescription.sl:56](../../stdlib/Net/Security/TlsAlertDescription.sl#L56)</sub>
 
 #### CertificateUnknown *case*
 
@@ -176,7 +193,7 @@ CertificateUnknown = 46
 
 A certificate was refused for a reason with no alert of its own.
 
-<sub>[stdlib/Net/Security/TlsAlertDescription.sl:58](../../stdlib/Net/Security/TlsAlertDescription.sl#L58)</sub>
+<sub>[stdlib/Net/Security/TlsAlertDescription.sl:59](../../stdlib/Net/Security/TlsAlertDescription.sl#L59)</sub>
 
 #### IllegalParameter *case*
 
@@ -186,7 +203,7 @@ IllegalParameter = 47
 
 A field held a value the protocol forbids there.
 
-<sub>[stdlib/Net/Security/TlsAlertDescription.sl:61](../../stdlib/Net/Security/TlsAlertDescription.sl#L61)</sub>
+<sub>[stdlib/Net/Security/TlsAlertDescription.sl:62](../../stdlib/Net/Security/TlsAlertDescription.sl#L62)</sub>
 
 #### UnknownCa *case*
 
@@ -196,7 +213,7 @@ UnknownCa = 48
 
 A certificate chain led to no authority the sender trusts.
 
-<sub>[stdlib/Net/Security/TlsAlertDescription.sl:64](../../stdlib/Net/Security/TlsAlertDescription.sl#L64)</sub>
+<sub>[stdlib/Net/Security/TlsAlertDescription.sl:65](../../stdlib/Net/Security/TlsAlertDescription.sl#L65)</sub>
 
 #### AccessDenied *case*
 
@@ -206,7 +223,7 @@ AccessDenied = 49
 
 Valid credentials that the sender's policy refuses.
 
-<sub>[stdlib/Net/Security/TlsAlertDescription.sl:67](../../stdlib/Net/Security/TlsAlertDescription.sl#L67)</sub>
+<sub>[stdlib/Net/Security/TlsAlertDescription.sl:68](../../stdlib/Net/Security/TlsAlertDescription.sl#L68)</sub>
 
 #### DecodeError *case*
 
@@ -216,7 +233,7 @@ DecodeError = 50
 
 A message could not be parsed.
 
-<sub>[stdlib/Net/Security/TlsAlertDescription.sl:70](../../stdlib/Net/Security/TlsAlertDescription.sl#L70)</sub>
+<sub>[stdlib/Net/Security/TlsAlertDescription.sl:71](../../stdlib/Net/Security/TlsAlertDescription.sl#L71)</sub>
 
 #### DecryptError *case*
 
@@ -226,7 +243,7 @@ DecryptError = 51
 
 A signature or a `Finished` did not verify.
 
-<sub>[stdlib/Net/Security/TlsAlertDescription.sl:73](../../stdlib/Net/Security/TlsAlertDescription.sl#L73)</sub>
+<sub>[stdlib/Net/Security/TlsAlertDescription.sl:74](../../stdlib/Net/Security/TlsAlertDescription.sl#L74)</sub>
 
 #### ProtocolVersion *case*
 
@@ -236,7 +253,7 @@ ProtocolVersion = 70
 
 No protocol version was acceptable.
 
-<sub>[stdlib/Net/Security/TlsAlertDescription.sl:76](../../stdlib/Net/Security/TlsAlertDescription.sl#L76)</sub>
+<sub>[stdlib/Net/Security/TlsAlertDescription.sl:77](../../stdlib/Net/Security/TlsAlertDescription.sl#L77)</sub>
 
 #### InsufficientSecurity *case*
 
@@ -246,7 +263,7 @@ InsufficientSecurity = 71
 
 The parameters on offer were all too weak for the sender.
 
-<sub>[stdlib/Net/Security/TlsAlertDescription.sl:79](../../stdlib/Net/Security/TlsAlertDescription.sl#L79)</sub>
+<sub>[stdlib/Net/Security/TlsAlertDescription.sl:80](../../stdlib/Net/Security/TlsAlertDescription.sl#L80)</sub>
 
 #### InternalError *case*
 
@@ -256,7 +273,7 @@ InternalError = 80
 
 The sender failed for a reason of its own.
 
-<sub>[stdlib/Net/Security/TlsAlertDescription.sl:82](../../stdlib/Net/Security/TlsAlertDescription.sl#L82)</sub>
+<sub>[stdlib/Net/Security/TlsAlertDescription.sl:83](../../stdlib/Net/Security/TlsAlertDescription.sl#L83)</sub>
 
 #### InappropriateFallback *case*
 
@@ -266,7 +283,7 @@ InappropriateFallback = 86
 
 A retried connection offered less than the first one.
 
-<sub>[stdlib/Net/Security/TlsAlertDescription.sl:85](../../stdlib/Net/Security/TlsAlertDescription.sl#L85)</sub>
+<sub>[stdlib/Net/Security/TlsAlertDescription.sl:86](../../stdlib/Net/Security/TlsAlertDescription.sl#L86)</sub>
 
 #### UserCanceled *case*
 
@@ -277,7 +294,18 @@ UserCanceled = 90
 The sender is abandoning the handshake, and will follow this with
 `CloseNotify`. Not fatal.
 
-<sub>[stdlib/Net/Security/TlsAlertDescription.sl:89](../../stdlib/Net/Security/TlsAlertDescription.sl#L89)</sub>
+<sub>[stdlib/Net/Security/TlsAlertDescription.sl:90](../../stdlib/Net/Security/TlsAlertDescription.sl#L90)</sub>
+
+#### NoRenegotiation *case*
+
+```
+NoRenegotiation = 100
+```
+
+TLS 1.2 only: the sender will not renegotiate, and the connection
+goes on as it was. Sent as a warning.
+
+<sub>[stdlib/Net/Security/TlsAlertDescription.sl:94](../../stdlib/Net/Security/TlsAlertDescription.sl#L94)</sub>
 
 #### MissingExtension *case*
 
@@ -287,7 +315,7 @@ MissingExtension = 109
 
 A message lacked an extension that is required in it.
 
-<sub>[stdlib/Net/Security/TlsAlertDescription.sl:92](../../stdlib/Net/Security/TlsAlertDescription.sl#L92)</sub>
+<sub>[stdlib/Net/Security/TlsAlertDescription.sl:97](../../stdlib/Net/Security/TlsAlertDescription.sl#L97)</sub>
 
 #### UnsupportedExtension *case*
 
@@ -297,7 +325,7 @@ UnsupportedExtension = 110
 
 An extension arrived that the receiver never offered.
 
-<sub>[stdlib/Net/Security/TlsAlertDescription.sl:95](../../stdlib/Net/Security/TlsAlertDescription.sl#L95)</sub>
+<sub>[stdlib/Net/Security/TlsAlertDescription.sl:100](../../stdlib/Net/Security/TlsAlertDescription.sl#L100)</sub>
 
 #### UnrecognizedName *case*
 
@@ -307,7 +335,7 @@ UnrecognizedName = 112
 
 No certificate is configured for the name the client asked for.
 
-<sub>[stdlib/Net/Security/TlsAlertDescription.sl:98](../../stdlib/Net/Security/TlsAlertDescription.sl#L98)</sub>
+<sub>[stdlib/Net/Security/TlsAlertDescription.sl:103](../../stdlib/Net/Security/TlsAlertDescription.sl#L103)</sub>
 
 #### BadCertificateStatusResponse *case*
 
@@ -317,7 +345,7 @@ BadCertificateStatusResponse = 113
 
 An OCSP response was invalid.
 
-<sub>[stdlib/Net/Security/TlsAlertDescription.sl:101](../../stdlib/Net/Security/TlsAlertDescription.sl#L101)</sub>
+<sub>[stdlib/Net/Security/TlsAlertDescription.sl:106](../../stdlib/Net/Security/TlsAlertDescription.sl#L106)</sub>
 
 #### UnknownPskIdentity *case*
 
@@ -327,7 +355,7 @@ UnknownPskIdentity = 115
 
 No key matches the offered pre-shared key identity.
 
-<sub>[stdlib/Net/Security/TlsAlertDescription.sl:104](../../stdlib/Net/Security/TlsAlertDescription.sl#L104)</sub>
+<sub>[stdlib/Net/Security/TlsAlertDescription.sl:109](../../stdlib/Net/Security/TlsAlertDescription.sl#L109)</sub>
 
 #### CertificateRequired *case*
 
@@ -337,7 +365,7 @@ CertificateRequired = 116
 
 A server that requires a client certificate was sent none.
 
-<sub>[stdlib/Net/Security/TlsAlertDescription.sl:107](../../stdlib/Net/Security/TlsAlertDescription.sl#L107)</sub>
+<sub>[stdlib/Net/Security/TlsAlertDescription.sl:112](../../stdlib/Net/Security/TlsAlertDescription.sl#L112)</sub>
 
 #### NoApplicationProtocol *case*
 
@@ -347,7 +375,7 @@ NoApplicationProtocol = 120
 
 No application protocol offered by the client is supported.
 
-<sub>[stdlib/Net/Security/TlsAlertDescription.sl:110](../../stdlib/Net/Security/TlsAlertDescription.sl#L110)</sub>
+<sub>[stdlib/Net/Security/TlsAlertDescription.sl:115](../../stdlib/Net/Security/TlsAlertDescription.sl#L115)</sub>
 
 ### TlsCertificateValidator *closure*
 
@@ -380,9 +408,12 @@ A cipher suite, with the number IANA gives it.
 
 The names are IANA's in this library's casing: `TLS_AES_128_GCM_SHA256`
 is `TlsAes128GcmSha256`. A TLS 1.3 suite names the record protection and
-the hash of the key schedule, and nothing else.
+the hash of the key schedule, and nothing else. A TLS 1.2 suite also names
+the key exchange, which is always ECDHE here, and the kind of key the
+server's certificate MUST hold: ECDSA or Ed25519 for `Ecdsa`, RSA for
+`Rsa`. The two sets are disjoint, and one list holds both.
 
-<sub>[stdlib/Net/Security/TlsCipherSuite.sl:29](../../stdlib/Net/Security/TlsCipherSuite.sl#L29)</sub>
+<sub>[stdlib/Net/Security/TlsCipherSuite.sl:32](../../stdlib/Net/Security/TlsCipherSuite.sl#L32)</sub>
 
 #### TlsAes128GcmSha256 *case*
 
@@ -393,7 +424,7 @@ TlsAes128GcmSha256 = 4865
 AES-128 in GCM, with SHA-256. The suite every TLS 1.3 peer MUST
 implement.
 
-<sub>[stdlib/Net/Security/TlsCipherSuite.sl:33](../../stdlib/Net/Security/TlsCipherSuite.sl#L33)</sub>
+<sub>[stdlib/Net/Security/TlsCipherSuite.sl:36](../../stdlib/Net/Security/TlsCipherSuite.sl#L36)</sub>
 
 #### TlsAes256GcmSha384 *case*
 
@@ -403,7 +434,7 @@ TlsAes256GcmSha384 = 4866
 
 AES-256 in GCM, with SHA-384.
 
-<sub>[stdlib/Net/Security/TlsCipherSuite.sl:36](../../stdlib/Net/Security/TlsCipherSuite.sl#L36)</sub>
+<sub>[stdlib/Net/Security/TlsCipherSuite.sl:39](../../stdlib/Net/Security/TlsCipherSuite.sl#L39)</sub>
 
 #### TlsChaCha20Poly1305Sha256 *case*
 
@@ -414,7 +445,73 @@ TlsChaCha20Poly1305Sha256 = 4867
 ChaCha20 and Poly1305, with SHA-256. About three times as fast as the
 AES suites here, since AES runs in software.
 
-<sub>[stdlib/Net/Security/TlsCipherSuite.sl:40](../../stdlib/Net/Security/TlsCipherSuite.sl#L40)</sub>
+<sub>[stdlib/Net/Security/TlsCipherSuite.sl:43](../../stdlib/Net/Security/TlsCipherSuite.sl#L43)</sub>
+
+#### TlsEcdheEcdsaWithAes128GcmSha256 *case*
+
+```
+TlsEcdheEcdsaWithAes128GcmSha256 = 49195
+```
+
+TLS 1.2: ECDHE, an ECDSA or Ed25519 certificate, AES-128 in GCM and
+SHA-256. RFC 5289.
+
+<sub>[stdlib/Net/Security/TlsCipherSuite.sl:47](../../stdlib/Net/Security/TlsCipherSuite.sl#L47)</sub>
+
+#### TlsEcdheEcdsaWithAes256GcmSha384 *case*
+
+```
+TlsEcdheEcdsaWithAes256GcmSha384 = 49196
+```
+
+TLS 1.2: ECDHE, an ECDSA or Ed25519 certificate, AES-256 in GCM and
+SHA-384. RFC 5289.
+
+<sub>[stdlib/Net/Security/TlsCipherSuite.sl:51](../../stdlib/Net/Security/TlsCipherSuite.sl#L51)</sub>
+
+#### TlsEcdheRsaWithAes128GcmSha256 *case*
+
+```
+TlsEcdheRsaWithAes128GcmSha256 = 49199
+```
+
+TLS 1.2: ECDHE, an RSA certificate, AES-128 in GCM and SHA-256.
+RFC 5289.
+
+<sub>[stdlib/Net/Security/TlsCipherSuite.sl:55](../../stdlib/Net/Security/TlsCipherSuite.sl#L55)</sub>
+
+#### TlsEcdheRsaWithAes256GcmSha384 *case*
+
+```
+TlsEcdheRsaWithAes256GcmSha384 = 49200
+```
+
+TLS 1.2: ECDHE, an RSA certificate, AES-256 in GCM and SHA-384.
+RFC 5289.
+
+<sub>[stdlib/Net/Security/TlsCipherSuite.sl:59](../../stdlib/Net/Security/TlsCipherSuite.sl#L59)</sub>
+
+#### TlsEcdheRsaWithChaCha20Poly1305Sha256 *case*
+
+```
+TlsEcdheRsaWithChaCha20Poly1305Sha256 = 52392
+```
+
+TLS 1.2: ECDHE, an RSA certificate, ChaCha20 and Poly1305 with
+SHA-256. RFC 7905.
+
+<sub>[stdlib/Net/Security/TlsCipherSuite.sl:63](../../stdlib/Net/Security/TlsCipherSuite.sl#L63)</sub>
+
+#### TlsEcdheEcdsaWithChaCha20Poly1305Sha256 *case*
+
+```
+TlsEcdheEcdsaWithChaCha20Poly1305Sha256 = 52393
+```
+
+TLS 1.2: ECDHE, an ECDSA or Ed25519 certificate, ChaCha20 and
+Poly1305 with SHA-256. RFC 7905.
+
+<sub>[stdlib/Net/Security/TlsCipherSuite.sl:67](../../stdlib/Net/Security/TlsCipherSuite.sl#L67)</sub>
 
 ### TlsClientOptions *class*
 
@@ -463,10 +560,12 @@ ALPN protocol names to offer, most preferred first. Empty offers none.
 TlsProtocolVersion EnabledProtocols { get; set; }
 ```
 
-Which versions may be negotiated. TLS 1.2 is accepted here and not yet
-implemented, so only a TLS 1.3 server is reached.
+Which versions may be offered. A server that has TLS 1.3 gets it; one
+that has only TLS 1.2 gets that, and MUST negotiate the extended
+master secret. A version is offered only when `CipherSuites` holds a
+suite of it.
 
-<sub>[stdlib/Net/Security/TlsClientOptions.sl:48](../../stdlib/Net/Security/TlsClientOptions.sl#L48)</sub>
+<sub>[stdlib/Net/Security/TlsClientOptions.sl:50](../../stdlib/Net/Security/TlsClientOptions.sl#L50)</sub>
 
 #### CipherSuites *property*
 
@@ -474,9 +573,10 @@ implemented, so only a TLS 1.3 server is reached.
 List<TlsCipherSuite> CipherSuites { get; set; }
 ```
 
-Suites to offer, most preferred first.
+Suites to offer, most preferred first, of either version: each
+version's suites are offered only when that version is.
 
-<sub>[stdlib/Net/Security/TlsClientOptions.sl:52](../../stdlib/Net/Security/TlsClientOptions.sl#L52)</sub>
+<sub>[stdlib/Net/Security/TlsClientOptions.sl:55](../../stdlib/Net/Security/TlsClientOptions.sl#L55)</sub>
 
 #### KeyExchangeGroups *property*
 
@@ -484,9 +584,10 @@ Suites to offer, most preferred first.
 List<TlsNamedGroup> KeyExchangeGroups { get; set; }
 ```
 
-Groups to offer for the key exchange, most preferred first.
+Groups to offer for the key exchange, most preferred first. In TLS 1.2
+the server picks one of them for its ServerKeyExchange.
 
-<sub>[stdlib/Net/Security/TlsClientOptions.sl:55](../../stdlib/Net/Security/TlsClientOptions.sl#L55)</sub>
+<sub>[stdlib/Net/Security/TlsClientOptions.sl:59](../../stdlib/Net/Security/TlsClientOptions.sl#L59)</sub>
 
 #### KeyShareGroups *property*
 
@@ -498,7 +599,7 @@ Groups to send a key share for in the first ClientHello. Each MUST be
 in `KeyExchangeGroups`. A server that wants another group asks for it
 with a HelloRetryRequest, which costs a round trip.
 
-<sub>[stdlib/Net/Security/TlsClientOptions.sl:60](../../stdlib/Net/Security/TlsClientOptions.sl#L60)</sub>
+<sub>[stdlib/Net/Security/TlsClientOptions.sl:64](../../stdlib/Net/Security/TlsClientOptions.sl#L64)</sub>
 
 #### CertificateValidator *property*
 
@@ -511,7 +612,7 @@ the platform's root store does, for `TargetHost`.
 
 **See also** &nbsp; [ValidateTlsCertificateChainByDefault](#validatetlscertificatechainbydefault-function)
 
-<sub>[stdlib/Net/Security/TlsClientOptions.sl:66](../../stdlib/Net/Security/TlsClientOptions.sl#L66)</sub>
+<sub>[stdlib/Net/Security/TlsClientOptions.sl:70](../../stdlib/Net/Security/TlsClientOptions.sl#L70)</sub>
 
 #### ClientCertificateChain *property*
 
@@ -522,7 +623,7 @@ List<byte[]> ClientCertificateChain { get; set; }
 The client's certificates, DER, leaf first, sent when a server asks.
 Empty sends an empty Certificate, which a server MAY refuse.
 
-<sub>[stdlib/Net/Security/TlsClientOptions.sl:71](../../stdlib/Net/Security/TlsClientOptions.sl#L71)</sub>
+<sub>[stdlib/Net/Security/TlsClientOptions.sl:75](../../stdlib/Net/Security/TlsClientOptions.sl#L75)</sub>
 
 #### ClientPrivateKey *property*
 
@@ -532,7 +633,7 @@ TlsSigningKey? ClientPrivateKey { get; set; }
 
 The key of the client's leaf certificate.
 
-<sub>[stdlib/Net/Security/TlsClientOptions.sl:74](../../stdlib/Net/Security/TlsClientOptions.sl#L74)</sub>
+<sub>[stdlib/Net/Security/TlsClientOptions.sl:78](../../stdlib/Net/Security/TlsClientOptions.sl#L78)</sub>
 
 #### SessionTicketReceived *property*
 
@@ -540,10 +641,11 @@ The key of the client's leaf certificate.
 TlsSessionTicketHandler SessionTicketReceived { get; set; }
 ```
 
-Given each session ticket the server sends. Resumption is not
-implemented yet; this is where a cache would collect them.
+Given each session ticket the server sends, in either version.
+Resumption is not implemented yet; this is where a cache would
+collect them.
 
-<sub>[stdlib/Net/Security/TlsClientOptions.sl:78](../../stdlib/Net/Security/TlsClientOptions.sl#L78)</sub>
+<sub>[stdlib/Net/Security/TlsClientOptions.sl:83](../../stdlib/Net/Security/TlsClientOptions.sl#L83)</sub>
 
 #### LeaveInnerStreamOpen *property*
 
@@ -553,7 +655,7 @@ bool LeaveInnerStreamOpen { get; set; }
 
 Whether `Close` leaves the stream underneath open.
 
-<sub>[stdlib/Net/Security/TlsClientOptions.sl:81](../../stdlib/Net/Security/TlsClientOptions.sl#L81)</sub>
+<sub>[stdlib/Net/Security/TlsClientOptions.sl:86](../../stdlib/Net/Security/TlsClientOptions.sl#L86)</sub>
 
 ### TlsError *enum*
 
@@ -886,8 +988,8 @@ No version: what a set with nothing in it holds.
 Tls12 = 1
 ```
 
-TLS 1.2, RFC 5246. Named so that a set can hold it; no connection is
-made in it yet, and a peer that offers nothing newer is refused.
+TLS 1.2, RFC 5246, with ECDHE, AEAD suites and the extended master
+secret only.
 
 <sub>[stdlib/Net/Security/TlsProtocolVersion.sl:35](../../stdlib/Net/Security/TlsProtocolVersion.sl#L35)</sub>
 
@@ -958,10 +1060,12 @@ both ends name protocols and none is shared, the handshake fails with
 TlsProtocolVersion EnabledProtocols { get; set; }
 ```
 
-Which versions may be negotiated. TLS 1.2 is accepted here and not yet
-implemented, so a client that offers only TLS 1.2 is refused.
+Which versions may be negotiated: TLS 1.3 when the client offers it,
+else TLS 1.2, from a client that offers the extended master secret. A
+version is accepted only when `CipherSuites` holds a suite of it, and
+a TLS 1.2 suite only when it matches the kind of `PrivateKey`.
 
-<sub>[stdlib/Net/Security/TlsServerOptions.sl:51](../../stdlib/Net/Security/TlsServerOptions.sl#L51)</sub>
+<sub>[stdlib/Net/Security/TlsServerOptions.sl:53](../../stdlib/Net/Security/TlsServerOptions.sl#L53)</sub>
 
 #### CipherSuites *property*
 
@@ -971,7 +1075,7 @@ List<TlsCipherSuite> CipherSuites { get; set; }
 
 Suites to accept, most preferred first.
 
-<sub>[stdlib/Net/Security/TlsServerOptions.sl:55](../../stdlib/Net/Security/TlsServerOptions.sl#L55)</sub>
+<sub>[stdlib/Net/Security/TlsServerOptions.sl:57](../../stdlib/Net/Security/TlsServerOptions.sl#L57)</sub>
 
 #### KeyExchangeGroups *property*
 
@@ -979,10 +1083,10 @@ Suites to accept, most preferred first.
 List<TlsNamedGroup> KeyExchangeGroups { get; set; }
 ```
 
-Groups to accept, most preferred first. A client that sent no share
-in any of them is asked for one with a HelloRetryRequest.
+Groups to accept, most preferred first. A TLS 1.3 client that sent no
+share in any of them is asked for one with a HelloRetryRequest.
 
-<sub>[stdlib/Net/Security/TlsServerOptions.sl:59](../../stdlib/Net/Security/TlsServerOptions.sl#L59)</sub>
+<sub>[stdlib/Net/Security/TlsServerOptions.sl:61](../../stdlib/Net/Security/TlsServerOptions.sl#L61)</sub>
 
 #### ClientCertificateRequested *property*
 
@@ -992,7 +1096,7 @@ bool ClientCertificateRequested { get; set; }
 
 Whether to ask the client for a certificate. It MAY send none.
 
-<sub>[stdlib/Net/Security/TlsServerOptions.sl:62](../../stdlib/Net/Security/TlsServerOptions.sl#L62)</sub>
+<sub>[stdlib/Net/Security/TlsServerOptions.sl:64](../../stdlib/Net/Security/TlsServerOptions.sl#L64)</sub>
 
 #### ClientCertificateRequired *property*
 
@@ -1003,7 +1107,7 @@ bool ClientCertificateRequired { get; set; }
 Whether to ask for a client certificate and refuse a client that sends
 none, with `CertificateRequired`. Implies `ClientCertificateRequested`.
 
-<sub>[stdlib/Net/Security/TlsServerOptions.sl:66](../../stdlib/Net/Security/TlsServerOptions.sl#L66)</sub>
+<sub>[stdlib/Net/Security/TlsServerOptions.sl:68](../../stdlib/Net/Security/TlsServerOptions.sl#L68)</sub>
 
 #### ClientCertificateValidator *property*
 
@@ -1015,7 +1119,7 @@ Decides whether to trust a client's chain. The target host it is given
 is empty. The default trusts what the platform's root store does, for
 the client-authentication usage.
 
-<sub>[stdlib/Net/Security/TlsServerOptions.sl:71](../../stdlib/Net/Security/TlsServerOptions.sl#L71)</sub>
+<sub>[stdlib/Net/Security/TlsServerOptions.sl:73](../../stdlib/Net/Security/TlsServerOptions.sl#L73)</sub>
 
 #### LeaveInnerStreamOpen *property*
 
@@ -1025,7 +1129,7 @@ bool LeaveInnerStreamOpen { get; set; }
 
 Whether `Close` leaves the stream underneath open.
 
-<sub>[stdlib/Net/Security/TlsServerOptions.sl:75](../../stdlib/Net/Security/TlsServerOptions.sl#L75)</sub>
+<sub>[stdlib/Net/Security/TlsServerOptions.sl:77](../../stdlib/Net/Security/TlsServerOptions.sl#L77)</sub>
 
 ### TlsSessionTicket *class*
 
@@ -1033,12 +1137,24 @@ Whether `Close` leaves the stream underneath open.
 sealed class TlsSessionTicket
 ```
 
-A session ticket (RFC 8446 §4.6.1), and the pre-shared key it stands for.
+A session ticket (RFC 8446 §4.6.1, or RFC 5077 in TLS 1.2), and the key
+it stands for.
 
 Nothing here resumes a session yet. A cache can keep these now, and
 resumption will offer them back.
 
-<sub>[stdlib/Net/Security/TlsSessionTicket.sl:31](../../stdlib/Net/Security/TlsSessionTicket.sl#L31)</sub>
+<sub>[stdlib/Net/Security/TlsSessionTicket.sl:32](../../stdlib/Net/Security/TlsSessionTicket.sl#L32)</sub>
+
+#### Protocol *property*
+
+```
+TlsProtocolVersion Protocol { get; }
+```
+
+The version of the connection that issued it, which a resumption
+MUST use.
+
+<sub>[stdlib/Net/Security/TlsSessionTicket.sl:61](../../stdlib/Net/Security/TlsSessionTicket.sl#L61)</sub>
 
 #### CipherSuite *property*
 
@@ -1049,7 +1165,7 @@ TlsCipherSuite CipherSuite { get; }
 The suite of the connection that issued it, whose hash a resumption
 MUST use.
 
-<sub>[stdlib/Net/Security/TlsSessionTicket.sl:58](../../stdlib/Net/Security/TlsSessionTicket.sl#L58)</sub>
+<sub>[stdlib/Net/Security/TlsSessionTicket.sl:65](../../stdlib/Net/Security/TlsSessionTicket.sl#L65)</sub>
 
 #### TargetHost *property*
 
@@ -1059,7 +1175,7 @@ String TargetHost { get; }
 
 The name the connection was made to.
 
-<sub>[stdlib/Net/Security/TlsSessionTicket.sl:61](../../stdlib/Net/Security/TlsSessionTicket.sl#L61)</sub>
+<sub>[stdlib/Net/Security/TlsSessionTicket.sl:68](../../stdlib/Net/Security/TlsSessionTicket.sl#L68)</sub>
 
 #### Lifetime *property*
 
@@ -1067,9 +1183,10 @@ The name the connection was made to.
 uint Lifetime { get; }
 ```
 
-How many seconds the server will honour it for, at most a week.
+How many seconds the server will honour it for, at most a week. In
+TLS 1.2 it is the server's hint, and zero means it gave none.
 
-<sub>[stdlib/Net/Security/TlsSessionTicket.sl:64](../../stdlib/Net/Security/TlsSessionTicket.sl#L64)</sub>
+<sub>[stdlib/Net/Security/TlsSessionTicket.sl:72](../../stdlib/Net/Security/TlsSessionTicket.sl#L72)</sub>
 
 #### AgeAdd *property*
 
@@ -1077,9 +1194,10 @@ How many seconds the server will honour it for, at most a week.
 uint AgeAdd { get; }
 ```
 
-What obscures the ticket's age when it is offered back.
+What obscures the ticket's age when it is offered back. Zero in TLS
+1.2.
 
-<sub>[stdlib/Net/Security/TlsSessionTicket.sl:67](../../stdlib/Net/Security/TlsSessionTicket.sl#L67)</sub>
+<sub>[stdlib/Net/Security/TlsSessionTicket.sl:76](../../stdlib/Net/Security/TlsSessionTicket.sl#L76)</sub>
 
 #### Nonce *property*
 
@@ -1087,9 +1205,9 @@ What obscures the ticket's age when it is offered back.
 byte[] Nonce { get; }
 ```
 
-The per-ticket value the key is derived with.
+The per-ticket value the key is derived with. Empty in TLS 1.2.
 
-<sub>[stdlib/Net/Security/TlsSessionTicket.sl:70](../../stdlib/Net/Security/TlsSessionTicket.sl#L70)</sub>
+<sub>[stdlib/Net/Security/TlsSessionTicket.sl:79](../../stdlib/Net/Security/TlsSessionTicket.sl#L79)</sub>
 
 #### Ticket *property*
 
@@ -1099,7 +1217,7 @@ byte[] Ticket { get; }
 
 The server's opaque label for the session.
 
-<sub>[stdlib/Net/Security/TlsSessionTicket.sl:73](../../stdlib/Net/Security/TlsSessionTicket.sl#L73)</sub>
+<sub>[stdlib/Net/Security/TlsSessionTicket.sl:82](../../stdlib/Net/Security/TlsSessionTicket.sl#L82)</sub>
 
 #### ResumptionKey *property*
 
@@ -1108,9 +1226,10 @@ byte[] ResumptionKey { get; }
 ```
 
 The pre-shared key: HKDF-Expand-Label of the resumption master secret
-over the nonce. **A secret**, and to be kept as one.
+over the nonce, or in TLS 1.2 the master secret itself. **A secret**,
+and to be kept as one.
 
-<sub>[stdlib/Net/Security/TlsSessionTicket.sl:77](../../stdlib/Net/Security/TlsSessionTicket.sl#L77)</sub>
+<sub>[stdlib/Net/Security/TlsSessionTicket.sl:87](../../stdlib/Net/Security/TlsSessionTicket.sl#L87)</sub>
 
 #### MaxEarlyDataSize *property*
 
@@ -1121,7 +1240,7 @@ uint MaxEarlyDataSize { get; }
 How much 0-RTT data the server would take, or zero. 0-RTT is never
 sent by this library.
 
-<sub>[stdlib/Net/Security/TlsSessionTicket.sl:81](../../stdlib/Net/Security/TlsSessionTicket.sl#L81)</sub>
+<sub>[stdlib/Net/Security/TlsSessionTicket.sl:91](../../stdlib/Net/Security/TlsSessionTicket.sl#L91)</sub>
 
 ### TlsSessionTicketHandler *closure*
 
@@ -1144,10 +1263,11 @@ A signature algorithm and its hash, with the number IANA gives it.
 Each of the ECDSA schemes names its curve as well as its hash, and the
 RSA-PSS schemes are split by the kind of key: `RsaPssRsae` for a key
 published as `rsaEncryption` and `RsaPssPss` for one published as
-`RSASSA-PSS`. PKCS #1 v1.5 is accepted in certificates and never in a
-handshake signature.
+`RSASSA-PSS`. PKCS #1 v1.5 is accepted in certificates and in TLS 1.2's
+handshake signatures, and never in TLS 1.3's. In TLS 1.2 an ECDSA scheme
+names only its hash, and a key on either curve MAY sign with either.
 
-<sub>[stdlib/Net/Security/TlsSignatureScheme.sl:31](../../stdlib/Net/Security/TlsSignatureScheme.sl#L31)</sub>
+<sub>[stdlib/Net/Security/TlsSignatureScheme.sl:32](../../stdlib/Net/Security/TlsSignatureScheme.sl#L32)</sub>
 
 #### RsaPkcs1Sha256 *case*
 
@@ -1155,9 +1275,10 @@ handshake signature.
 RsaPkcs1Sha256 = 1025
 ```
 
-RSA with PKCS #1 v1.5 padding and SHA-256. Certificates only.
+RSA with PKCS #1 v1.5 padding and SHA-256. Certificates and TLS 1.2
+only.
 
-<sub>[stdlib/Net/Security/TlsSignatureScheme.sl:34](../../stdlib/Net/Security/TlsSignatureScheme.sl#L34)</sub>
+<sub>[stdlib/Net/Security/TlsSignatureScheme.sl:36](../../stdlib/Net/Security/TlsSignatureScheme.sl#L36)</sub>
 
 #### RsaPkcs1Sha384 *case*
 
@@ -1165,9 +1286,10 @@ RSA with PKCS #1 v1.5 padding and SHA-256. Certificates only.
 RsaPkcs1Sha384 = 1281
 ```
 
-RSA with PKCS #1 v1.5 padding and SHA-384. Certificates only.
+RSA with PKCS #1 v1.5 padding and SHA-384. Certificates and TLS 1.2
+only.
 
-<sub>[stdlib/Net/Security/TlsSignatureScheme.sl:37](../../stdlib/Net/Security/TlsSignatureScheme.sl#L37)</sub>
+<sub>[stdlib/Net/Security/TlsSignatureScheme.sl:40](../../stdlib/Net/Security/TlsSignatureScheme.sl#L40)</sub>
 
 #### RsaPkcs1Sha512 *case*
 
@@ -1175,9 +1297,10 @@ RSA with PKCS #1 v1.5 padding and SHA-384. Certificates only.
 RsaPkcs1Sha512 = 1537
 ```
 
-RSA with PKCS #1 v1.5 padding and SHA-512. Certificates only.
+RSA with PKCS #1 v1.5 padding and SHA-512. Certificates and TLS 1.2
+only.
 
-<sub>[stdlib/Net/Security/TlsSignatureScheme.sl:40](../../stdlib/Net/Security/TlsSignatureScheme.sl#L40)</sub>
+<sub>[stdlib/Net/Security/TlsSignatureScheme.sl:44](../../stdlib/Net/Security/TlsSignatureScheme.sl#L44)</sub>
 
 #### EcdsaSecp256r1Sha256 *case*
 
@@ -1187,7 +1310,7 @@ EcdsaSecp256r1Sha256 = 1027
 
 ECDSA on P-256 with SHA-256.
 
-<sub>[stdlib/Net/Security/TlsSignatureScheme.sl:43](../../stdlib/Net/Security/TlsSignatureScheme.sl#L43)</sub>
+<sub>[stdlib/Net/Security/TlsSignatureScheme.sl:47](../../stdlib/Net/Security/TlsSignatureScheme.sl#L47)</sub>
 
 #### EcdsaSecp384r1Sha384 *case*
 
@@ -1197,7 +1320,7 @@ EcdsaSecp384r1Sha384 = 1283
 
 ECDSA on P-384 with SHA-384.
 
-<sub>[stdlib/Net/Security/TlsSignatureScheme.sl:46](../../stdlib/Net/Security/TlsSignatureScheme.sl#L46)</sub>
+<sub>[stdlib/Net/Security/TlsSignatureScheme.sl:50](../../stdlib/Net/Security/TlsSignatureScheme.sl#L50)</sub>
 
 #### EcdsaSecp521r1Sha512 *case*
 
@@ -1208,7 +1331,7 @@ EcdsaSecp521r1Sha512 = 1539
 ECDSA on P-521 with SHA-512. Named and never offered: there is no
 P-521 here.
 
-<sub>[stdlib/Net/Security/TlsSignatureScheme.sl:50](../../stdlib/Net/Security/TlsSignatureScheme.sl#L50)</sub>
+<sub>[stdlib/Net/Security/TlsSignatureScheme.sl:54](../../stdlib/Net/Security/TlsSignatureScheme.sl#L54)</sub>
 
 #### RsaPssRsaeSha256 *case*
 
@@ -1218,7 +1341,7 @@ RsaPssRsaeSha256 = 2052
 
 RSA-PSS with SHA-256, for an `rsaEncryption` key.
 
-<sub>[stdlib/Net/Security/TlsSignatureScheme.sl:53](../../stdlib/Net/Security/TlsSignatureScheme.sl#L53)</sub>
+<sub>[stdlib/Net/Security/TlsSignatureScheme.sl:57](../../stdlib/Net/Security/TlsSignatureScheme.sl#L57)</sub>
 
 #### RsaPssRsaeSha384 *case*
 
@@ -1228,7 +1351,7 @@ RsaPssRsaeSha384 = 2053
 
 RSA-PSS with SHA-384, for an `rsaEncryption` key.
 
-<sub>[stdlib/Net/Security/TlsSignatureScheme.sl:56](../../stdlib/Net/Security/TlsSignatureScheme.sl#L56)</sub>
+<sub>[stdlib/Net/Security/TlsSignatureScheme.sl:60](../../stdlib/Net/Security/TlsSignatureScheme.sl#L60)</sub>
 
 #### RsaPssRsaeSha512 *case*
 
@@ -1238,7 +1361,7 @@ RsaPssRsaeSha512 = 2054
 
 RSA-PSS with SHA-512, for an `rsaEncryption` key.
 
-<sub>[stdlib/Net/Security/TlsSignatureScheme.sl:59](../../stdlib/Net/Security/TlsSignatureScheme.sl#L59)</sub>
+<sub>[stdlib/Net/Security/TlsSignatureScheme.sl:63](../../stdlib/Net/Security/TlsSignatureScheme.sl#L63)</sub>
 
 #### Ed25519 *case*
 
@@ -1248,7 +1371,7 @@ Ed25519 = 2055
 
 Ed25519, RFC 8032.
 
-<sub>[stdlib/Net/Security/TlsSignatureScheme.sl:62](../../stdlib/Net/Security/TlsSignatureScheme.sl#L62)</sub>
+<sub>[stdlib/Net/Security/TlsSignatureScheme.sl:66](../../stdlib/Net/Security/TlsSignatureScheme.sl#L66)</sub>
 
 #### Ed448 *case*
 
@@ -1258,7 +1381,7 @@ Ed448 = 2056
 
 Ed448. Named and never offered.
 
-<sub>[stdlib/Net/Security/TlsSignatureScheme.sl:65](../../stdlib/Net/Security/TlsSignatureScheme.sl#L65)</sub>
+<sub>[stdlib/Net/Security/TlsSignatureScheme.sl:69](../../stdlib/Net/Security/TlsSignatureScheme.sl#L69)</sub>
 
 #### RsaPssPssSha256 *case*
 
@@ -1268,7 +1391,7 @@ RsaPssPssSha256 = 2057
 
 RSA-PSS with SHA-256, for an `RSASSA-PSS` key.
 
-<sub>[stdlib/Net/Security/TlsSignatureScheme.sl:68](../../stdlib/Net/Security/TlsSignatureScheme.sl#L68)</sub>
+<sub>[stdlib/Net/Security/TlsSignatureScheme.sl:72](../../stdlib/Net/Security/TlsSignatureScheme.sl#L72)</sub>
 
 #### RsaPssPssSha384 *case*
 
@@ -1278,7 +1401,7 @@ RsaPssPssSha384 = 2058
 
 RSA-PSS with SHA-384, for an `RSASSA-PSS` key.
 
-<sub>[stdlib/Net/Security/TlsSignatureScheme.sl:71](../../stdlib/Net/Security/TlsSignatureScheme.sl#L71)</sub>
+<sub>[stdlib/Net/Security/TlsSignatureScheme.sl:75](../../stdlib/Net/Security/TlsSignatureScheme.sl#L75)</sub>
 
 #### RsaPssPssSha512 *case*
 
@@ -1288,7 +1411,7 @@ RsaPssPssSha512 = 2059
 
 RSA-PSS with SHA-512, for an `RSASSA-PSS` key.
 
-<sub>[stdlib/Net/Security/TlsSignatureScheme.sl:74](../../stdlib/Net/Security/TlsSignatureScheme.sl#L74)</sub>
+<sub>[stdlib/Net/Security/TlsSignatureScheme.sl:78](../../stdlib/Net/Security/TlsSignatureScheme.sl#L78)</sub>
 
 ### TlsSigningKey *class*
 
@@ -1296,8 +1419,9 @@ RSA-PSS with SHA-512, for an `RSASSA-PSS` key.
 sealed class TlsSigningKey
 ```
 
-The private key that signs a CertificateVerify: Ed25519, ECDSA on P-256
-or P-384, or RSA with PSS.
+The private key that signs a CertificateVerify or a TLS 1.2
+ServerKeyExchange: Ed25519, ECDSA on P-256 or P-384, or RSA, with PSS or,
+in TLS 1.2 only, PKCS #1 v1.5.
 
     var key = try TlsSigningKey.ImportFromPem(File.ReadAllText("server.key"));
     options.PrivateKey = key;
@@ -1305,7 +1429,7 @@ or P-384, or RSA with PSS.
 It MUST be the key of the leaf certificate it is configured beside; a
 mismatch is found by the peer, as a signature that does not verify.
 
-<sub>[stdlib/Net/Security/TlsSigningKey.sl:36](../../stdlib/Net/Security/TlsSigningKey.sl#L36)</sub>
+<sub>[stdlib/Net/Security/TlsSigningKey.sl:37](../../stdlib/Net/Security/TlsSigningKey.sl#L37)</sub>
 
 #### FromEd25519PrivateKey *method*
 
@@ -1319,7 +1443,7 @@ An Ed25519 key from its 32-byte seed, RFC 8032's private key.
 
 - [CryptoError.KeyLength](Standard-Security-Cryptography.md#keylength-case) — `privateKey` is not 32 bytes
 
-<sub>[stdlib/Net/Security/TlsSigningKey.sl:54](../../stdlib/Net/Security/TlsSigningKey.sl#L54)</sub>
+<sub>[stdlib/Net/Security/TlsSigningKey.sl:55](../../stdlib/Net/Security/TlsSigningKey.sl#L55)</sub>
 
 #### FromECDsa *method*
 
@@ -1334,7 +1458,7 @@ P-384.
 
 - [CryptoError.InvalidKey](Standard-Security-Cryptography.md#invalidkey-case) — `key` is a public key
 
-<sub>[stdlib/Net/Security/TlsSigningKey.sl:66](../../stdlib/Net/Security/TlsSigningKey.sl#L66)</sub>
+<sub>[stdlib/Net/Security/TlsSigningKey.sl:67](../../stdlib/Net/Security/TlsSigningKey.sl#L67)</sub>
 
 #### FromRsa *method*
 
@@ -1349,7 +1473,7 @@ An RSA key published as `rsaEncryption`, which signs with the
 
 - [CryptoError.InvalidKey](Standard-Security-Cryptography.md#invalidkey-case) — `key` is a public key
 
-<sub>[stdlib/Net/Security/TlsSigningKey.sl:79](../../stdlib/Net/Security/TlsSigningKey.sl#L79)</sub>
+<sub>[stdlib/Net/Security/TlsSigningKey.sl:80](../../stdlib/Net/Security/TlsSigningKey.sl#L80)</sub>
 
 #### FromRsaPss *method*
 
@@ -1364,7 +1488,7 @@ An RSA key published as `RSASSA-PSS`, which signs with the
 
 - [CryptoError.InvalidKey](Standard-Security-Cryptography.md#invalidkey-case) — `key` is a public key
 
-<sub>[stdlib/Net/Security/TlsSigningKey.sl:90](../../stdlib/Net/Security/TlsSigningKey.sl#L90)</sub>
+<sub>[stdlib/Net/Security/TlsSigningKey.sl:91](../../stdlib/Net/Security/TlsSigningKey.sl#L91)</sub>
 
 #### ImportFromPem *method*
 
@@ -1382,7 +1506,7 @@ used; certificates beside it are passed over.
 - [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) — a key of another algorithm, or an encrypted one
 - [CryptoError.InvalidKey](Standard-Security-Cryptography.md#invalidkey-case) — the numbers are not a consistent key
 
-<sub>[stdlib/Net/Security/TlsSigningKey.sl:105](../../stdlib/Net/Security/TlsSigningKey.sl#L105)</sub>
+<sub>[stdlib/Net/Security/TlsSigningKey.sl:106](../../stdlib/Net/Security/TlsSigningKey.sl#L106)</sub>
 
 #### ImportPkcs8PrivateKey *method*
 
@@ -1398,7 +1522,7 @@ The key in an unencrypted PKCS #8 `PrivateKeyInfo`, DER.
 - [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) — a key of another algorithm
 - [CryptoError.InvalidKey](Standard-Security-Cryptography.md#invalidkey-case) — the numbers are not a consistent key
 
-<sub>[stdlib/Net/Security/TlsSigningKey.sl:139](../../stdlib/Net/Security/TlsSigningKey.sl#L139)</sub>
+<sub>[stdlib/Net/Security/TlsSigningKey.sl:140](../../stdlib/Net/Security/TlsSigningKey.sl#L140)</sub>
 
 ### TlsSocket *class*
 
@@ -1795,11 +1919,11 @@ On failure the alert has been sent and `inner` closed, unless
 **Fails with**
 
 - [TlsError.CertificateRefused](#certificaterefused-case) — the validator refused the chain
-- [TlsError.ProtocolVersion](#protocolversion-case) — the server does not speak TLS 1.3
+- [TlsError.ProtocolVersion](#protocolversion-case) — the server speaks no version `EnabledProtocols` holds
 - [TlsError.AlertReceived](#alertreceived-case) — the server refused, and said why in an alert
 - [TlsError.Io](#io-case) — the stream underneath failed
 
-<sub>[stdlib/Net/Security/TlsStream.sl:74](../../stdlib/Net/Security/TlsStream.sl#L74)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:75](../../stdlib/Net/Security/TlsStream.sl#L75)</sub>
 
 #### AuthenticateAsClient *method*
 
@@ -1820,7 +1944,7 @@ when it refused.
 
 - [TlsError.AlertReceived](#alertreceived-case) — the server refused, and `alertReceived` says why
 
-<sub>[stdlib/Net/Security/TlsStream.sl:89](../../stdlib/Net/Security/TlsStream.sl#L89)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:90](../../stdlib/Net/Security/TlsStream.sl#L90)</sub>
 
 #### AuthenticateAsServer *method*
 
@@ -1846,7 +1970,7 @@ On failure the alert has been sent and `inner` closed, unless
 - [TlsError.CertificateRequired](#certificaterequired-case) — a client certificate was required and none came
 - [TlsError.InternalError](#internalerror-case) — no certificate or no key is configured
 
-<sub>[stdlib/Net/Security/TlsStream.sl:118](../../stdlib/Net/Security/TlsStream.sl#L118)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:119](../../stdlib/Net/Security/TlsStream.sl#L119)</sub>
 
 #### AuthenticateAsServer *method*
 
@@ -1867,7 +1991,7 @@ when it refused.
 
 - [TlsError.AlertReceived](#alertreceived-case) — the client refused, and `alertReceived` says why
 
-<sub>[stdlib/Net/Security/TlsStream.sl:133](../../stdlib/Net/Security/TlsStream.sl#L133)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:134](../../stdlib/Net/Security/TlsStream.sl#L134)</sub>
 
 #### IsServer *property*
 
@@ -1877,7 +2001,7 @@ bool IsServer { get; }
 
 Whether this end is the server.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:151](../../stdlib/Net/Security/TlsStream.sl#L151)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:152](../../stdlib/Net/Security/TlsStream.sl#L152)</sub>
 
 #### NegotiatedProtocol *property*
 
@@ -1885,9 +2009,9 @@ Whether this end is the server.
 TlsProtocolVersion NegotiatedProtocol { get; }
 ```
 
-The version negotiated. Always TLS 1.3 for now.
+The version negotiated: `Tls13` or `Tls12`.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:154](../../stdlib/Net/Security/TlsStream.sl#L154)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:155](../../stdlib/Net/Security/TlsStream.sl#L155)</sub>
 
 #### CipherSuite *property*
 
@@ -1897,7 +2021,7 @@ TlsCipherSuite CipherSuite { get; }
 
 The suite negotiated.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:157](../../stdlib/Net/Security/TlsStream.sl#L157)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:158](../../stdlib/Net/Security/TlsStream.sl#L158)</sub>
 
 #### KeyExchangeGroup *property*
 
@@ -1907,7 +2031,7 @@ TlsNamedGroup KeyExchangeGroup { get; }
 
 The group the key exchange was made in.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:160](../../stdlib/Net/Security/TlsStream.sl#L160)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:161](../../stdlib/Net/Security/TlsStream.sl#L161)</sub>
 
 #### SignatureScheme *property*
 
@@ -1915,9 +2039,10 @@ The group the key exchange was made in.
 TlsSignatureScheme SignatureScheme { get; }
 ```
 
-The scheme the server signed its CertificateVerify with.
+The scheme the server signed its CertificateVerify with, or in TLS 1.2
+its ServerKeyExchange.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:163](../../stdlib/Net/Security/TlsStream.sl#L163)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:165](../../stdlib/Net/Security/TlsStream.sl#L165)</sub>
 
 #### NegotiatedApplicationProtocol *property*
 
@@ -1927,7 +2052,7 @@ String? NegotiatedApplicationProtocol { get; }
 
 The ALPN protocol agreed, or null when there was none.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:166](../../stdlib/Net/Security/TlsStream.sl#L166)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:168](../../stdlib/Net/Security/TlsStream.sl#L168)</sub>
 
 #### TargetHostName *property*
 
@@ -1938,7 +2063,7 @@ String TargetHostName { get; }
 On a client, the name it asked for; on a server, the name in the
 client's server_name, or empty.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:170](../../stdlib/Net/Security/TlsStream.sl#L170)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:172](../../stdlib/Net/Security/TlsStream.sl#L172)</sub>
 
 #### RemoteCertificate *property*
 
@@ -1949,7 +2074,7 @@ byte[] RemoteCertificate { get; }
 The peer's leaf certificate, DER, or empty when it sent none — which
 only a client can do.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:174](../../stdlib/Net/Security/TlsStream.sl#L174)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:176](../../stdlib/Net/Security/TlsStream.sl#L176)</sub>
 
 #### RemoteCertificateChain *property*
 
@@ -1959,7 +2084,7 @@ List<byte[]> RemoteCertificateChain { get; }
 
 The peer's certificates as it sent them, DER, leaf first.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:185](../../stdlib/Net/Security/TlsStream.sl#L185)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:187](../../stdlib/Net/Security/TlsStream.sl#L187)</sub>
 
 #### IsMutuallyAuthenticated *property*
 
@@ -1969,7 +2094,7 @@ bool IsMutuallyAuthenticated { get; }
 
 Whether the client presented a certificate that was accepted.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:188](../../stdlib/Net/Security/TlsStream.sl#L188)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:190](../../stdlib/Net/Security/TlsStream.sl#L190)</sub>
 
 #### TlsErrorCode *property*
 
@@ -1979,7 +2104,7 @@ TlsError TlsErrorCode { get; }
 
 The exact failure, or `None`.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:191](../../stdlib/Net/Security/TlsStream.sl#L191)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:193](../../stdlib/Net/Security/TlsStream.sl#L193)</sub>
 
 #### AlertDescription *property*
 
@@ -1990,7 +2115,7 @@ TlsAlertDescription AlertDescription { get; }
 The alert the peer ended the connection with, when `TlsErrorCode` is
 `AlertReceived`.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:195](../../stdlib/Net/Security/TlsStream.sl#L195)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:197](../../stdlib/Net/Security/TlsStream.sl#L197)</sub>
 
 #### InnerStream *property*
 
@@ -2000,7 +2125,7 @@ IStream InnerStream { get; }
 
 The stream underneath.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:198](../../stdlib/Net/Security/TlsStream.sl#L198)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:200](../../stdlib/Net/Security/TlsStream.sl#L200)</sub>
 
 #### ExportKeyingMaterial *method*
 
@@ -2008,21 +2133,21 @@ The stream underneath.
 Result<byte[], TlsError> ExportKeyingMaterial(String label, ReadOnlySpan<byte> context, nuint length)
 ```
 
-Keying material for a protocol above this one (RFC 8446 §7.5): the
-same bytes at both ends for the same label and context, and no use to
-anyone else.
+Keying material for a protocol above this one (RFC 8446 §7.5, or RFC
+5705 in TLS 1.2): the same bytes at both ends for the same label and
+context, and no use to anyone else.
 
 **Parameters**
 
 - `label` — names the use, as the protocol that wants it defines
-- `context` — bound into the result; empty when the protocol has none
-- `length` — how many bytes, at most 255 digests' worth
+- `context` — bound into the result; empty when the protocol has none, which in TLS 1.2 is RFC 5705's "no context"
+- `length` — how many bytes, at most 255 digests' worth in TLS 1.3
 
 **Fails with**
 
 - [TlsError.Closed](#closed-case) — the stream is closed
 
-<sub>[stdlib/Net/Security/TlsStream.sl:210](../../stdlib/Net/Security/TlsStream.sl#L210)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:213](../../stdlib/Net/Security/TlsStream.sl#L213)</sub>
 
 #### UpdateTrafficKeys *method*
 
@@ -2037,9 +2162,10 @@ without being asked, before one has protected 2^24 records.
 **Fails with**
 
 - [TlsError.Closed](#closed-case) — the stream is closed or failed
+- [TlsError.ProtocolVersion](#protocolversion-case) — the connection is TLS 1.2, which has no KeyUpdate
 - [TlsError.Io](#io-case) — the stream underneath failed
 
-<sub>[stdlib/Net/Security/TlsStream.sl:225](../../stdlib/Net/Security/TlsStream.sl#L225)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:235](../../stdlib/Net/Security/TlsStream.sl#L235)</sub>
 
 #### CanRead *property*
 
@@ -2049,7 +2175,7 @@ bool CanRead { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsStream.sl:230](../../stdlib/Net/Security/TlsStream.sl#L230)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:240](../../stdlib/Net/Security/TlsStream.sl#L240)</sub>
 
 #### CanWrite *property*
 
@@ -2059,7 +2185,7 @@ bool CanWrite { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsStream.sl:232](../../stdlib/Net/Security/TlsStream.sl#L232)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:242](../../stdlib/Net/Security/TlsStream.sl#L242)</sub>
 
 #### CanSeek *property*
 
@@ -2069,7 +2195,7 @@ bool CanSeek { get; }
 
 A connection has no position.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:235](../../stdlib/Net/Security/TlsStream.sl#L235)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:245](../../stdlib/Net/Security/TlsStream.sl#L245)</sub>
 
 #### Read *method*
 
@@ -2080,7 +2206,7 @@ nuint Read(byte[] buffer, nuint offset, nuint count)
 Reads up to `count` bytes of application data. Zero means the peer
 sent close_notify, or a failure, which `Error` tells apart.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:239](../../stdlib/Net/Security/TlsStream.sl#L239)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:249](../../stdlib/Net/Security/TlsStream.sl#L249)</sub>
 
 #### Write *method*
 
@@ -2091,7 +2217,7 @@ nuint Write(byte[] buffer, nuint offset, nuint count)
 Writes all `count` bytes as application data, and answers `count`, or
 zero on a failure.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:248](../../stdlib/Net/Security/TlsStream.sl#L248)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:258](../../stdlib/Net/Security/TlsStream.sl#L258)</sub>
 
 #### Position *property*
 
@@ -2101,7 +2227,7 @@ long Position { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsStream.sl:255](../../stdlib/Net/Security/TlsStream.sl#L255)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:265](../../stdlib/Net/Security/TlsStream.sl#L265)</sub>
 
 #### Length *property*
 
@@ -2111,7 +2237,7 @@ long Length { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsStream.sl:257](../../stdlib/Net/Security/TlsStream.sl#L257)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:267](../../stdlib/Net/Security/TlsStream.sl#L267)</sub>
 
 #### Seek *method*
 
@@ -2121,7 +2247,7 @@ bool Seek(long offset, SeekOrigin origin)
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsStream.sl:259](../../stdlib/Net/Security/TlsStream.sl#L259)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:269](../../stdlib/Net/Security/TlsStream.sl#L269)</sub>
 
 #### Flush *method*
 
@@ -2132,7 +2258,7 @@ void Flush()
 Flushes the stream underneath. Every `Write` has already sent its
 records.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:263](../../stdlib/Net/Security/TlsStream.sl#L263)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:273](../../stdlib/Net/Security/TlsStream.sl#L273)</sub>
 
 #### Close *method*
 
@@ -2143,7 +2269,7 @@ void Close()
 Sends close_notify and closes the stream underneath, unless
 `LeaveInnerStreamOpen`. Idempotent, and the destructor calls it.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:267](../../stdlib/Net/Security/TlsStream.sl#L267)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:277](../../stdlib/Net/Security/TlsStream.sl#L277)</sub>
 
 #### Error *property*
 
@@ -2153,7 +2279,7 @@ IOError Error { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsStream.sl:269](../../stdlib/Net/Security/TlsStream.sl#L269)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:279](../../stdlib/Net/Security/TlsStream.sl#L279)</sub>
 
 ## Functions
 
@@ -2167,7 +2293,7 @@ A sentence describing a TLS error, for a message a person will read.
 
 **See also** &nbsp; [TlsError](#tlserror-enum)
 
-<sub>[stdlib/Net/Security/Security.sl:174](../../stdlib/Net/Security/Security.sl#L174)</sub>
+<sub>[stdlib/Net/Security/Security.sl:213](../../stdlib/Net/Security/Security.sl#L213)</sub>
 
 ### DiscardTlsSessionTicket *function*
 
@@ -2177,7 +2303,7 @@ void DiscardTlsSessionTicket(TlsSessionTicket ticket)
 
 What a client does with a ticket when no handler is configured: nothing.
 
-<sub>[stdlib/Net/Security/TlsSessionTicket.sl:85](../../stdlib/Net/Security/TlsSessionTicket.sl#L85)</sub>
+<sub>[stdlib/Net/Security/TlsSessionTicket.sl:95](../../stdlib/Net/Security/TlsSessionTicket.sl#L95)</sub>
 
 ### ValidateTlsCertificateChainByDefault *function*
 
