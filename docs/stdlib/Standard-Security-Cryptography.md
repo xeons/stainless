@@ -18,8 +18,9 @@ var signature = try Ed25519.Sign(signingKey, message);
 
 **The shape is `System.Security.Cryptography`'s**, so a program being
 ported finds the names where it left them: `Sha256`, `Hmac`, `Aes`,
-`AesGcm`, `ChaCha20Poly1305`, `Rfc2898DeriveBytes.Pbkdf2`,
-`RandomNumberGenerator.Fill`, `CryptographicOperations.FixedTimeEquals`.
+`AesGcm`, `ChaCha20Poly1305`, `Rfc2898DeriveBytes.Pbkdf2`, `ECDsa`,
+`ECDiffieHellman`, `RandomNumberGenerator.Fill`,
+`CryptographicOperations.FixedTimeEquals`.
 `Blake2b`, `Scrypt` and `Argon2id` are not in .NET and follow the same
 shape. Three things about it differ, and each is a rule this language
 already has rather than a choice made here:
@@ -36,6 +37,8 @@ already has rather than a choice made here:
 - **`Create()` is `new`.** `SHA256.Create()` exists because .NET's is an
   abstract class over a CryptoAPI implementation chosen at run time. There
   is one implementation here, so `new Sha256()` is the whole of it.
+  `ECDsa.Create` and `ECDiffieHellman.Create` keep the name, because they
+  make a key and can fail.
 
 **The ciphers and MACs are constant time in software.** AES is bitsliced
 and its S-box is a logic circuit, GHASH multiplies with integer multiplies
@@ -47,33 +50,42 @@ lengths. `FixedTimeEquals` is the comparison to use on anything secret.
 Three things that claim does not cover. **It is timing and cache only**:
 nothing here resists power analysis, electromagnetic emanation or fault
 injection, which want masking and hardware this library does not have.
-**It rests on the multiply**: GHASH and Poly1305 assume a multiply whose
-time does not depend on its operands, which is true of every x64 and ARMv8
-core and not of some older and embedded ones. **The memory-hard password
-hashes index memory by the password**, which is what makes them memory
-hard: all of scrypt's second half, and Argon2id's after its first half.
+**It rests on the multiply**: GHASH, Poly1305 and every curve assume a
+multiply whose time does not depend on its operands, which is true of every
+x64 and ARMv8 core and not of some older and embedded ones. **The
+memory-hard password hashes index memory by the password**, which is what
+makes them memory hard: all of scrypt's second half, and Argon2id's after
+its first half.
 
 Nothing uses AES-NI, which the language cannot spell, so AES runs at a
 small fraction of what the hardware could give. `ChaCha20Poly1305` is
 about three times as fast as `AesGcm` here, and is the one to choose
 where a format leaves the choice open.
 
-**Public-key is constant time wherever a secret is involved.** `X25519`
-whole, and `Ed25519` signing and key generation, whose scalar
-multiplication reads its table by mask; every secret-dependent choice there
-is a mask passed through `OpaqueCopy`, so the optimiser cannot turn it back
-into a branch. `Ed25519.Verify` is variable time and touches nothing
-secret.
+**Public-key is Curve25519, P-256 and P-384.** `X25519` and
+`ECDiffieHellman` agree keys; `Ed25519` and `ECDsa` sign. The NIST curves
+are fixed-width Montgomery multiplication in 64-bit limbs held inline, with
+the complete formulas of Renes, Costello and Batina so that no point is a
+special case, and keys travel as `ECParameters`, SEC 1 points, SEC 1 and
+PKCS #8 private keys, `SubjectPublicKeyInfo` and PEM.
 
-**Public-key is Curve25519 and nothing else.** `X25519` agrees keys and
-`Ed25519` signs, over the one curve whose arithmetic needs no general
-bignum. RSA, ECDsa over the NIST curves, and X.509 all rest on
-arbitrary-precision integer arithmetic, which this standard library does
-not have; see TODO.md for the shape that would take.
+**Every operation on a private scalar or a nonce is constant time**: key
+generation, agreement and signing on every curve. A scalar multiplication
+reads the whole of its table and keeps one entry with a mask, an inversion
+is an exponentiation by a public exponent, and every conditional subtraction
+is a mask passed through `OpaqueCopy`, so the optimiser cannot turn it back
+into a branch. A random or RFC 6979 candidate outside `[1, n - 1]` is drawn
+again, which shows only that a number nobody uses was out of range.
+Verification and the checking of a public point read nothing secret and are
+written for speed.
+
+RSA is not here yet; it wants an arbitrary-precision integer, and TODO.md
+carries the note. X.509 is `Standard.Formats.Asn1` and a signature check,
+which is enough to verify a certificate and not yet a path validator.
 
 ## Contents
 
-**Types** &nbsp; [Aes](#aes-class) &middot; [AesGcm](#aesgcm-class) &middot; [Argon2id](#argon2id-class) &middot; [Blake2b](#blake2b-class) &middot; [ChaCha20](#chacha20-class) &middot; [ChaCha20Poly1305](#chacha20poly1305-class) &middot; [CipherMode](#ciphermode-enum) &middot; [CryptoError](#cryptoerror-enum) &middot; [CryptographicOperations](#cryptographicoperations-class) &middot; [Ed25519](#ed25519-class) &middot; [HashAlgorithm](#hashalgorithm-class) &middot; [Hkdf](#hkdf-class) &middot; [Hmac](#hmac-class) &middot; [HmacMd5](#hmacmd5-class) &middot; [HmacSha1](#hmacsha1-class) &middot; [HmacSha256](#hmacsha256-class) &middot; [HmacSha384](#hmacsha384-class) &middot; [HmacSha512](#hmacsha512-class) &middot; [IHashAlgorithm](#ihashalgorithm-interface) &middot; [Md5](#md5-class) &middot; [PaddingMode](#paddingmode-enum) &middot; [PemEncoding](#pemencoding-class) &middot; [PemFields](#pemfields-struct) &middot; [Poly1305](#poly1305-class) &middot; [RandomNumberGenerator](#randomnumbergenerator-class) &middot; [Rfc2898DeriveBytes](#rfc2898derivebytes-class) &middot; [Scrypt](#scrypt-class) &middot; [Sha1](#sha1-class) &middot; [Sha256](#sha256-class) &middot; [Sha2Wide](#sha2wide-class) &middot; [Sha384](#sha384-class) &middot; [Sha512](#sha512-class) &middot; [X25519](#x25519-class)
+**Types** &nbsp; [Aes](#aes-class) &middot; [AesGcm](#aesgcm-class) &middot; [Argon2id](#argon2id-class) &middot; [Blake2b](#blake2b-class) &middot; [ChaCha20](#chacha20-class) &middot; [ChaCha20Poly1305](#chacha20poly1305-class) &middot; [CipherMode](#ciphermode-enum) &middot; [CryptoError](#cryptoerror-enum) &middot; [CryptographicOperations](#cryptographicoperations-class) &middot; [DsaSignatureFormat](#dsasignatureformat-enum) &middot; [ECCurve](#eccurve-struct) &middot; [ECCurve.NamedCurves](#eccurvenamedcurves-class) &middot; [ECDiffieHellman](#ecdiffiehellman-class) &middot; [ECDsa](#ecdsa-class) &middot; [ECParameters](#ecparameters-struct) &middot; [ECPoint](#ecpoint-struct) &middot; [Ed25519](#ed25519-class) &middot; [HashAlgorithm](#hashalgorithm-class) &middot; [HashAlgorithmName](#hashalgorithmname-struct) &middot; [Hkdf](#hkdf-class) &middot; [Hmac](#hmac-class) &middot; [HmacMd5](#hmacmd5-class) &middot; [HmacSha1](#hmacsha1-class) &middot; [HmacSha256](#hmacsha256-class) &middot; [HmacSha384](#hmacsha384-class) &middot; [HmacSha512](#hmacsha512-class) &middot; [IHashAlgorithm](#ihashalgorithm-interface) &middot; [Md5](#md5-class) &middot; [PaddingMode](#paddingmode-enum) &middot; [PemEncoding](#pemencoding-class) &middot; [PemFields](#pemfields-struct) &middot; [Poly1305](#poly1305-class) &middot; [RandomNumberGenerator](#randomnumbergenerator-class) &middot; [Rfc2898DeriveBytes](#rfc2898derivebytes-class) &middot; [Scrypt](#scrypt-class) &middot; [Sha1](#sha1-class) &middot; [Sha256](#sha256-class) &middot; [Sha2Wide](#sha2wide-class) &middot; [Sha384](#sha384-class) &middot; [Sha512](#sha512-class) &middot; [X25519](#x25519-class)
 
 ## Types
 
@@ -1226,6 +1238,1164 @@ moved; this clears the one buffer it is given and nothing else.
 
 <sub>[stdlib/Security/Cryptography/CryptographicOperations.sl:63](../../stdlib/Security/Cryptography/CryptographicOperations.sl#L63)</sub>
 
+### DsaSignatureFormat *enum*
+
+```
+enum DsaSignatureFormat
+```
+
+How the two numbers of a DSA or ECDSA signature, `r` and `s`, are laid out
+as bytes: .NET's `DSASignatureFormat`.
+
+<sub>[stdlib/Security/Cryptography/DsaSignatureFormat.sl:26](../../stdlib/Security/Cryptography/DsaSignatureFormat.sl#L26)</sub>
+
+#### IeeeP1363FixedFieldConcatenation *case*
+
+```
+IeeeP1363FixedFieldConcatenation
+```
+
+`r` then `s`, each big-endian and as wide as the group order: 64 bytes
+for P-256 and 96 for P-384. What JOSE, WebAuthn and .NET's default use.
+
+<sub>[stdlib/Security/Cryptography/DsaSignatureFormat.sl:30](../../stdlib/Security/Cryptography/DsaSignatureFormat.sl#L30)</sub>
+
+#### Rfc3279DerSequence *case*
+
+```
+Rfc3279DerSequence
+```
+
+A DER `SEQUENCE` of two `INTEGER`s, as RFC 3279 defines it. What X.509,
+TLS and OpenSSL use; its length varies by a few bytes.
+
+<sub>[stdlib/Security/Cryptography/DsaSignatureFormat.sl:34](../../stdlib/Security/Cryptography/DsaSignatureFormat.sl#L34)</sub>
+
+### ECCurve *struct*
+
+```
+struct ECCurve
+```
+
+An elliptic curve, named by its object identifier: .NET's `ECCurve`,
+for named curves.
+
+```csharp
+var key = try ECDsa.Create(ECCurve.NamedCurves.NistP256);
+```
+
+**Any identifier can be held, and two can be used**: P-256 and P-384,
+which are what TLS, X.509 and FIPS 186-5 use. A key on any other curve —
+`secp256k1`, P-521, a curve given by explicit parameters — is refused
+with `CryptoError.Unsupported` when a key is made or imported, so a
+certificate naming one reads cleanly and fails where it is used.
+
+The zero value names no curve.
+
+<sub>[stdlib/Security/Cryptography/ECCurve.sl:38](../../stdlib/Security/Cryptography/ECCurve.sl#L38)</sub>
+
+#### IsNamed *property*
+
+```
+bool IsNamed { get; }
+```
+
+Whether this names a curve, which every curve but the zero value does.
+
+<sub>[stdlib/Security/Cryptography/ECCurve.sl:61](../../stdlib/Security/Cryptography/ECCurve.sl#L61)</sub>
+
+#### OidValue *property*
+
+```
+String OidValue { get; }
+```
+
+The curve's object identifier, dotted, or empty for the zero value.
+
+<sub>[stdlib/Security/Cryptography/ECCurve.sl:64](../../stdlib/Security/Cryptography/ECCurve.sl#L64)</sub>
+
+#### FriendlyName *property*
+
+```
+String FriendlyName { get; }
+```
+
+.NET's name for the curve — `nistP256`, `nistP384` — or empty for a
+curve this module has no arithmetic for.
+
+<sub>[stdlib/Security/Cryptography/ECCurve.sl:68](../../stdlib/Security/Cryptography/ECCurve.sl#L68)</sub>
+
+#### CreateFromValue *method*
+
+```
+static ECCurve CreateFromValue(String oidValue)
+```
+
+The curve named by `oidValue`, supported or not.
+
+**Parameters**
+
+- `oidValue` — a dotted object identifier, as a certificate carries it
+
+**See also** &nbsp; [ECCurve.CreateFromFriendlyName](#createfromfriendlyname-method)
+
+<sub>[stdlib/Security/Cryptography/ECCurve.sl:87](../../stdlib/Security/Cryptography/ECCurve.sl#L87)</sub>
+
+#### CreateFromFriendlyName *method*
+
+```
+static ECCurve CreateFromFriendlyName(String friendlyName)
+```
+
+The curve a name means: `nistP256`, `secp256r1`, `prime256v1` or
+`P-256`, and `nistP384`, `secp384r1` or `P-384`. Any other name gives
+the zero value, which names no curve.
+
+**Parameters**
+
+- `friendlyName` — what the curve is called, with its case as written here
+
+**See also** &nbsp; [ECCurve.CreateFromValue](#createfromvalue-method)
+
+<sub>[stdlib/Security/Cryptography/ECCurve.sl:95](../../stdlib/Security/Cryptography/ECCurve.sl#L95)</sub>
+
+#### Equals *method*
+
+```
+bool Equals(ECCurve other)
+```
+
+Whether both name the same curve.
+
+<sub>[stdlib/Security/Cryptography/ECCurve.sl:116](../../stdlib/Security/Cryptography/ECCurve.sl#L116)</sub>
+
+### ECCurve.NamedCurves *class*
+
+```
+class ECCurve.NamedCurves
+```
+
+The curves this module has arithmetic for.
+
+<sub>[stdlib/Security/Cryptography/ECCurve.sl:50](../../stdlib/Security/Cryptography/ECCurve.sl#L50)</sub>
+
+#### NistP256 *property*
+
+```
+static ECCurve NistP256 { get; }
+```
+
+NIST P-256, also called `secp256r1` and `prime256v1`: OID
+1.2.840.10045.3.1.7.
+
+<sub>[stdlib/Security/Cryptography/ECCurve.sl:54](../../stdlib/Security/Cryptography/ECCurve.sl#L54)</sub>
+
+#### NistP384 *property*
+
+```
+static ECCurve NistP384 { get; }
+```
+
+NIST P-384, also called `secp384r1`: OID 1.3.132.0.34.
+
+<sub>[stdlib/Security/Cryptography/ECCurve.sl:57](../../stdlib/Security/Cryptography/ECCurve.sl#L57)</sub>
+
+### ECDiffieHellman *class*
+
+```
+sealed class ECDiffieHellman
+```
+
+Elliptic-curve Diffie-Hellman over P-256 or P-384: SP 800-56A's ECC CDH
+primitive, in .NET's `ECDiffieHellman` shape.
+
+```csharp
+var mine = try ECDiffieHellman.Create(ECCurve.NamedCurves.NistP256);
+send(mine.PublicKey);
+byte[] shared = try mine.DeriveRawSecretAgreement(received);
+```
+
+**Points travel in SEC 1 form**, the one TLS key shares and X9.63 use:
+`PublicKey` is `04 X Y`, and a point from the other party may be that or
+compressed. Every such point is checked before it is used — on the curve,
+not at infinity, each coordinate below `p` — so an invalid-curve attack
+has nothing to work with.
+
+**The secret is the shared point's x coordinate, raw.** It is not a key:
+run it through a KDF, as TLS 1.3 does with HKDF, or ask for one of the
+`DeriveKeyFrom*` forms. The scalar multiplication behind it is constant
+time.
+
+**See also** &nbsp; [ECDsa](#ecdsa-class)
+
+<sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:45](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L45)</sub>
+
+#### Create *method*
+
+```
+static Result<ECDiffieHellman, CryptoError> Create()
+```
+
+A new key on P-256.
+
+**Fails with**
+
+- [CryptoError.NoEntropy](#noentropy-case) — the platform supplied no random bytes
+
+<sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:57](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L57)</sub>
+
+#### Create *method*
+
+```
+static Result<ECDiffieHellman, CryptoError> Create(ECCurve curve)
+```
+
+A new key on `curve`.
+
+**Parameters**
+
+- `curve` — P-256 or P-384
+
+**Fails with**
+
+- [CryptoError.Unsupported](#unsupported-case) — `curve` is another curve
+- [CryptoError.NoEntropy](#noentropy-case) — the platform supplied no random bytes
+
+<sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:65](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L65)</sub>
+
+#### Create *method*
+
+```
+static Result<ECDiffieHellman, CryptoError> Create(ECParameters parameters)
+```
+
+The key `parameters` describe: private when `D` is set, and public
+otherwise.
+
+**Parameters**
+
+- `parameters` — the curve, the point and perhaps the scalar
+
+**Fails with**
+
+- [CryptoError.Unsupported](#unsupported-case) — the curve is not P-256 or P-384
+- [CryptoError.InvalidPoint](#invalidpoint-case) — the point is not on the curve
+- [CryptoError.InvalidKey](#invalidkey-case) — the scalar is not in `[1, n - 1]` or does not give the point
+
+<sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:81](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L81)</sub>
+
+#### KeySize *property*
+
+```
+nuint KeySize { get; }
+```
+
+The size of the key in bits: 256 or 384.
+
+<sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:90](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L90)</sub>
+
+#### PublicKey *property*
+
+```
+byte[] PublicKey { get; }
+```
+
+The public point in SEC 1's uncompressed form, `04 X Y`: 65 bytes for
+P-256 and 97 for P-384. What a TLS key share carries.
+
+<sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:94](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L94)</sub>
+
+#### ImportParameters *method*
+
+```
+Result<bool, CryptoError> ImportParameters(ECParameters parameters)
+```
+
+Replaces the key with the one `parameters` describe. On failure the
+key is unchanged.
+
+**Parameters**
+
+- `parameters` — the curve, the point and perhaps the scalar
+
+**Fails with**
+
+- [CryptoError.Unsupported](#unsupported-case) — the curve is not P-256 or P-384
+- [CryptoError.InvalidPoint](#invalidpoint-case) — the point is not on the curve
+- [CryptoError.InvalidKey](#invalidkey-case) — the scalar is not in `[1, n - 1]` or does not give the point
+
+<sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:104](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L104)</sub>
+
+#### ExportParameters *method*
+
+```
+Result<ECParameters, CryptoError> ExportParameters(bool includePrivateParameters)
+```
+
+The key's numbers.
+
+**Parameters**
+
+- `includePrivateParameters` — whether to include `D`
+
+**Fails with**
+
+- [CryptoError.InvalidKey](#invalidkey-case) — `D` was asked for and this is a public key
+
+<sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:117](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L117)</sub>
+
+#### DeriveRawSecretAgreement *method*
+
+```
+Result<byte[], CryptoError> DeriveRawSecretAgreement(ReadOnlySpan<byte> otherPartyPublicKey)
+```
+
+The shared secret with the holder of `otherPartyPublicKey`: the x
+coordinate of `d * Q`, as wide as the field.
+
+**Parameters**
+
+- `otherPartyPublicKey` — the other party's point in SEC 1 form, on this key's curve
+
+**Fails with**
+
+- [CryptoError.InvalidPoint](#invalidpoint-case) — the point is malformed, on another curve, or not on the curve at all
+- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key, or the result is the point at infinity
+
+**See also** &nbsp; [ECDiffieHellman.PublicKey](#publickey-property)
+
+<sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:132](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L132)</sub>
+
+#### DeriveKeyFromHash *method*
+
+```
+Result<byte[], CryptoError> DeriveKeyFromHash(ReadOnlySpan<byte> otherPartyPublicKey, HashAlgorithmName hashAlgorithm)
+```
+
+`hashAlgorithm` over the shared secret: .NET's `DeriveKeyFromHash` with
+nothing before or after it.
+
+**Parameters**
+
+- `otherPartyPublicKey` — the other party's point in SEC 1 form
+- `hashAlgorithm` — the hash
+
+**Fails with**
+
+- [CryptoError.InvalidPoint](#invalidpoint-case) — the point does not check
+- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key, or the result is infinity
+- [CryptoError.Unsupported](#unsupported-case) — `hashAlgorithm` is the zero value
+
+<sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:143](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L143)</sub>
+
+#### DeriveKeyFromHash *method*
+
+```
+Result<byte[], CryptoError> DeriveKeyFromHash(ReadOnlySpan<byte> otherPartyPublicKey, HashAlgorithmName hashAlgorithm, ReadOnlySpan<byte> secretPrepend, ReadOnlySpan<byte> secretAppend)
+```
+
+`hashAlgorithm` over `secretPrepend`, the shared secret and
+`secretAppend`.
+
+**Parameters**
+
+- `otherPartyPublicKey` — the other party's point in SEC 1 form
+- `hashAlgorithm` — the hash
+- `secretPrepend` — what to hash before the secret
+- `secretAppend` — what to hash after it
+
+**Fails with**
+
+- [CryptoError.InvalidPoint](#invalidpoint-case) — the point does not check
+- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key, or the result is infinity
+- [CryptoError.Unsupported](#unsupported-case) — `hashAlgorithm` is the zero value
+
+<sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:157](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L157)</sub>
+
+#### DeriveKeyFromHmac *method*
+
+```
+Result<byte[], CryptoError> DeriveKeyFromHmac(ReadOnlySpan<byte> otherPartyPublicKey, HashAlgorithmName hashAlgorithm, ReadOnlySpan<byte> hmacKey)
+```
+
+HMAC under `hmacKey` over the shared secret.
+
+**Parameters**
+
+- `otherPartyPublicKey` — the other party's point in SEC 1 form
+- `hashAlgorithm` — the hash under the HMAC
+- `hmacKey` — the HMAC key
+
+**Fails with**
+
+- [CryptoError.InvalidPoint](#invalidpoint-case) — the point does not check
+- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key, or the result is infinity
+- [CryptoError.Unsupported](#unsupported-case) — `hashAlgorithm` is the zero value
+
+<sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:184](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L184)</sub>
+
+#### DeriveKeyFromHmac *method*
+
+```
+Result<byte[], CryptoError> DeriveKeyFromHmac(ReadOnlySpan<byte> otherPartyPublicKey, HashAlgorithmName hashAlgorithm, ReadOnlySpan<byte> hmacKey, ReadOnlySpan<byte> secretPrepend, ReadOnlySpan<byte> secretAppend)
+```
+
+HMAC under `hmacKey` over `secretPrepend`, the shared secret and
+`secretAppend`.
+
+**Parameters**
+
+- `otherPartyPublicKey` — the other party's point in SEC 1 form
+- `hashAlgorithm` — the hash under the HMAC
+- `hmacKey` — the HMAC key
+- `secretPrepend` — what to authenticate before the secret
+- `secretAppend` — what to authenticate after it
+
+**Fails with**
+
+- [CryptoError.InvalidPoint](#invalidpoint-case) — the point does not check
+- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key, or the result is infinity
+- [CryptoError.Unsupported](#unsupported-case) — `hashAlgorithm` is the zero value
+
+<sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:200](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L200)</sub>
+
+#### ImportSubjectPublicKeyInfo *method*
+
+```
+Result<nuint, CryptoError> ImportSubjectPublicKeyInfo(ReadOnlySpan<byte> source)
+```
+
+Replaces the key with the public key in an RFC 5480
+`SubjectPublicKeyInfo`. On failure the key is unchanged.
+
+**Parameters**
+
+- `source` — the DER, perhaps with more after it
+
+**Returns** &nbsp; how many bytes of `source` the structure took
+
+**Fails with**
+
+- [CryptoError.Encoding](#encoding-case) — not a `SubjectPublicKeyInfo` for an EC key
+- [CryptoError.Unsupported](#unsupported-case) — a curve other than P-256 and P-384
+- [CryptoError.InvalidPoint](#invalidpoint-case) — the point is not on the curve
+
+<sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:231](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L231)</sub>
+
+#### ExportSubjectPublicKeyInfo *method*
+
+```
+byte[] ExportSubjectPublicKeyInfo()
+```
+
+The public key as an RFC 5480 `SubjectPublicKeyInfo`, in DER.
+
+<sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:241](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L241)</sub>
+
+#### ExportSubjectPublicKeyInfoPem *method*
+
+```
+String ExportSubjectPublicKeyInfoPem()
+```
+
+The public key as a `PUBLIC KEY` PEM block.
+
+<sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:244](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L244)</sub>
+
+#### ImportECPrivateKey *method*
+
+```
+Result<nuint, CryptoError> ImportECPrivateKey(ReadOnlySpan<byte> source)
+```
+
+Replaces the key with the private key in an RFC 5915 `ECPrivateKey`,
+which MUST name its curve. On failure the key is unchanged.
+
+**Parameters**
+
+- `source` — the DER, perhaps with more after it
+
+**Returns** &nbsp; how many bytes of `source` the structure took
+
+**Fails with**
+
+- [CryptoError.Encoding](#encoding-case) — not an `ECPrivateKey`, or one with no curve
+- [CryptoError.Unsupported](#unsupported-case) — a curve other than P-256 and P-384
+- [CryptoError.InvalidKey](#invalidkey-case) — the scalar is not in `[1, n - 1]`, or does not give the public point beside it
+- [CryptoError.InvalidPoint](#invalidpoint-case) — the public point is not on the curve
+
+<sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:257](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L257)</sub>
+
+#### ExportECPrivateKey *method*
+
+```
+Result<byte[], CryptoError> ExportECPrivateKey()
+```
+
+The private key as an RFC 5915 `ECPrivateKey`, in DER.
+
+**Fails with**
+
+- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
+
+<sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:269](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L269)</sub>
+
+#### ExportECPrivateKeyPem *method*
+
+```
+Result<String, CryptoError> ExportECPrivateKeyPem()
+```
+
+The private key as an `EC PRIVATE KEY` PEM block.
+
+**Fails with**
+
+- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
+
+<sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:274](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L274)</sub>
+
+#### ImportPkcs8PrivateKey *method*
+
+```
+Result<nuint, CryptoError> ImportPkcs8PrivateKey(ReadOnlySpan<byte> source)
+```
+
+Replaces the key with the private key in an unencrypted PKCS #8
+`PrivateKeyInfo`. On failure the key is unchanged.
+
+**Parameters**
+
+- `source` — the DER, perhaps with more after it
+
+**Returns** &nbsp; how many bytes of `source` the structure took
+
+**Fails with**
+
+- [CryptoError.Encoding](#encoding-case) — not a `PrivateKeyInfo` for an EC key
+- [CryptoError.Unsupported](#unsupported-case) — a curve other than P-256 and P-384
+- [CryptoError.InvalidKey](#invalidkey-case) — the scalar is not in `[1, n - 1]`, or does not give the public point beside it
+- [CryptoError.InvalidPoint](#invalidpoint-case) — the public point is not on the curve
+
+<sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:292](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L292)</sub>
+
+#### ExportPkcs8PrivateKey *method*
+
+```
+Result<byte[], CryptoError> ExportPkcs8PrivateKey()
+```
+
+The private key as an unencrypted PKCS #8 `PrivateKeyInfo`, in DER.
+
+**Fails with**
+
+- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
+
+<sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:304](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L304)</sub>
+
+#### ExportPkcs8PrivateKeyPem *method*
+
+```
+Result<String, CryptoError> ExportPkcs8PrivateKeyPem()
+```
+
+The private key as a `PRIVATE KEY` PEM block.
+
+**Fails with**
+
+- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
+
+<sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:309](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L309)</sub>
+
+#### ImportFromPem *method*
+
+```
+Result<bool, CryptoError> ImportFromPem(String input)
+```
+
+Replaces the key with the first `PUBLIC KEY`, `EC PRIVATE KEY` or
+`PRIVATE KEY` block in `input`. Blocks with other labels are passed
+over. On failure the key is unchanged.
+
+**Parameters**
+
+- `input` — PEM text
+
+**Fails with**
+
+- [CryptoError.Encoding](#encoding-case) — no such block, or one whose contents are not what its label says
+- [CryptoError.Unsupported](#unsupported-case) — an encrypted key, or a curve other than P-256 and P-384
+- [CryptoError.InvalidKey](#invalidkey-case) — the key does not check
+
+<sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:327](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L327)</sub>
+
+### ECDsa *class*
+
+```
+sealed class ECDsa
+```
+
+ECDSA over P-256 or P-384: FIPS 186-5's signature, in .NET's `ECDsa`
+shape.
+
+```csharp
+var key = try ECDsa.Create(ECCurve.NamedCurves.NistP256);
+byte[] signature = try key.SignData(message, HashAlgorithmName.Sha256);
+bool genuine = key.VerifyData(message, signature, HashAlgorithmName.Sha256);
+
+var verifier = try ECDsa.Create(ECCurve.NamedCurves.NistP256);
+try verifier.ImportSubjectPublicKeyInfo(publicKeyDer);
+```
+
+**Signing is deterministic**: the nonce is RFC 6979's, derived by HMAC
+from the key and the hash, so the same key and message always give the
+same signature and no weak random number can leak the key. Signing is
+constant time: the scalar multiplication, the inversion and the nonce
+derivation run the same operations and touch the same addresses whatever
+the key and nonce are.
+
+**Verifying is variable time**, which is safe because everything it reads
+is public, and it never fails: a signature that is malformed, out of
+range or simply wrong is `false`.
+
+A key made by `Create` is checked, and so is every key imported: a public
+point on the curve and not at infinity, a private scalar in `[1, n - 1]`
+that gives the public point beside it.
+
+**See also** &nbsp; [ECDiffieHellman](#ecdiffiehellman-class)
+
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:54](../../stdlib/Security/Cryptography/ECDsa.sl#L54)</sub>
+
+#### Create *method*
+
+```
+static Result<ECDsa, CryptoError> Create()
+```
+
+A new key on P-256.
+
+**Fails with**
+
+- [CryptoError.NoEntropy](#noentropy-case) — the platform supplied no random bytes
+
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:66](../../stdlib/Security/Cryptography/ECDsa.sl#L66)</sub>
+
+#### Create *method*
+
+```
+static Result<ECDsa, CryptoError> Create(ECCurve curve)
+```
+
+A new key on `curve`.
+
+**Parameters**
+
+- `curve` — P-256 or P-384
+
+**Fails with**
+
+- [CryptoError.Unsupported](#unsupported-case) — `curve` is another curve
+- [CryptoError.NoEntropy](#noentropy-case) — the platform supplied no random bytes
+
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:73](../../stdlib/Security/Cryptography/ECDsa.sl#L73)</sub>
+
+#### Create *method*
+
+```
+static Result<ECDsa, CryptoError> Create(ECParameters parameters)
+```
+
+The key `parameters` describe: private when `D` is set, and public
+otherwise.
+
+**Parameters**
+
+- `parameters` — the curve, the point and perhaps the scalar
+
+**Fails with**
+
+- [CryptoError.Unsupported](#unsupported-case) — the curve is not P-256 or P-384
+- [CryptoError.InvalidPoint](#invalidpoint-case) — the point is not on the curve
+- [CryptoError.InvalidKey](#invalidkey-case) — the scalar is not in `[1, n - 1]` or does not give the point
+
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:89](../../stdlib/Security/Cryptography/ECDsa.sl#L89)</sub>
+
+#### KeySize *property*
+
+```
+nuint KeySize { get; }
+```
+
+The size of the key in bits: 256 or 384.
+
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:98](../../stdlib/Security/Cryptography/ECDsa.sl#L98)</sub>
+
+#### ImportParameters *method*
+
+```
+Result<bool, CryptoError> ImportParameters(ECParameters parameters)
+```
+
+Replaces the key with the one `parameters` describe. On failure the
+key is unchanged.
+
+**Parameters**
+
+- `parameters` — the curve, the point and perhaps the scalar
+
+**Fails with**
+
+- [CryptoError.Unsupported](#unsupported-case) — the curve is not P-256 or P-384
+- [CryptoError.InvalidPoint](#invalidpoint-case) — the point is not on the curve
+- [CryptoError.InvalidKey](#invalidkey-case) — the scalar is not in `[1, n - 1]` or does not give the point
+
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:108](../../stdlib/Security/Cryptography/ECDsa.sl#L108)</sub>
+
+#### ExportParameters *method*
+
+```
+Result<ECParameters, CryptoError> ExportParameters(bool includePrivateParameters)
+```
+
+The key's numbers.
+
+**Parameters**
+
+- `includePrivateParameters` — whether to include `D`
+
+**Fails with**
+
+- [CryptoError.InvalidKey](#invalidkey-case) — `D` was asked for and this is a public key
+
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:121](../../stdlib/Security/Cryptography/ECDsa.sl#L121)</sub>
+
+#### SignHash *method*
+
+```
+Result<byte[], CryptoError> SignHash(ReadOnlySpan<byte> hash)
+```
+
+The signature of a hash already computed, as `r` then `s`.
+
+The nonce's HMAC uses the hash whose length `hash` has — SHA-1,
+SHA-256, SHA-384 or SHA-512 — and the curve's own for any other length.
+
+**Parameters**
+
+- `hash` — the digest of the message
+
+**Fails with**
+
+- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
+
+**See also** &nbsp; [ECDsa.VerifyHash](#verifyhash-method)
+
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:134](../../stdlib/Security/Cryptography/ECDsa.sl#L134)</sub>
+
+#### SignHash *method*
+
+```
+Result<byte[], CryptoError> SignHash(ReadOnlySpan<byte> hash, DsaSignatureFormat signatureFormat)
+```
+
+The signature of a hash already computed, in `signatureFormat`.
+
+**Parameters**
+
+- `hash` — the digest of the message
+- `signatureFormat` — how to lay out `r` and `s`
+
+**Fails with**
+
+- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
+
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:142](../../stdlib/Security/Cryptography/ECDsa.sl#L142)</sub>
+
+#### SignData *method*
+
+```
+Result<byte[], CryptoError> SignData(ReadOnlySpan<byte> data, HashAlgorithmName hashAlgorithm)
+```
+
+The signature of `data` hashed with `hashAlgorithm`, as `r` then `s`.
+
+**Parameters**
+
+- `data` — the message
+- `hashAlgorithm` — the hash, which the nonce's HMAC uses too
+
+**Fails with**
+
+- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
+- [CryptoError.Unsupported](#unsupported-case) — `hashAlgorithm` is the zero value
+
+**See also** &nbsp; [ECDsa.VerifyData](#verifydata-method)
+
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:174](../../stdlib/Security/Cryptography/ECDsa.sl#L174)</sub>
+
+#### SignData *method*
+
+```
+Result<byte[], CryptoError> SignData(ReadOnlySpan<byte> data, HashAlgorithmName hashAlgorithm, DsaSignatureFormat signatureFormat)
+```
+
+The signature of `data` hashed with `hashAlgorithm`, in
+`signatureFormat`.
+
+**Parameters**
+
+- `data` — the message
+- `hashAlgorithm` — the hash, which the nonce's HMAC uses too
+- `signatureFormat` — how to lay out `r` and `s`
+
+**Fails with**
+
+- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
+- [CryptoError.Unsupported](#unsupported-case) — `hashAlgorithm` is the zero value
+
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:186](../../stdlib/Security/Cryptography/ECDsa.sl#L186)</sub>
+
+#### VerifyHash *method*
+
+```
+bool VerifyHash(ReadOnlySpan<byte> hash, ReadOnlySpan<byte> signature)
+```
+
+Whether `signature`, as `r` then `s`, signs `hash` under this key.
+
+**Parameters**
+
+- `hash` — the digest of the message
+- `signature` — `r` then `s`, each as wide as the order
+
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:212](../../stdlib/Security/Cryptography/ECDsa.sl#L212)</sub>
+
+#### VerifyHash *method*
+
+```
+bool VerifyHash(ReadOnlySpan<byte> hash, ReadOnlySpan<byte> signature, DsaSignatureFormat signatureFormat)
+```
+
+Whether `signature`, laid out as `signatureFormat` says, signs `hash`
+under this key.
+
+**Parameters**
+
+- `hash` — the digest of the message
+- `signature` — the signature
+- `signatureFormat` — how `r` and `s` are laid out
+
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:221](../../stdlib/Security/Cryptography/ECDsa.sl#L221)</sub>
+
+#### VerifyData *method*
+
+```
+bool VerifyData(ReadOnlySpan<byte> data, ReadOnlySpan<byte> signature, HashAlgorithmName hashAlgorithm)
+```
+
+Whether `signature`, as `r` then `s`, signs `data` hashed with
+`hashAlgorithm`.
+
+**Parameters**
+
+- `data` — the message
+- `signature` — `r` then `s`, each as wide as the order
+- `hashAlgorithm` — the hash the signer used
+
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:248](../../stdlib/Security/Cryptography/ECDsa.sl#L248)</sub>
+
+#### VerifyData *method*
+
+```
+bool VerifyData(ReadOnlySpan<byte> data, ReadOnlySpan<byte> signature, HashAlgorithmName hashAlgorithm, DsaSignatureFormat signatureFormat)
+```
+
+Whether `signature`, laid out as `signatureFormat` says, signs `data`
+hashed with `hashAlgorithm`.
+
+**Parameters**
+
+- `data` — the message
+- `signature` — the signature
+- `hashAlgorithm` — the hash the signer used
+- `signatureFormat` — how `r` and `s` are laid out
+
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:260](../../stdlib/Security/Cryptography/ECDsa.sl#L260)</sub>
+
+#### GetMaxSignatureSize *method*
+
+```
+nuint GetMaxSignatureSize(DsaSignatureFormat signatureFormat)
+```
+
+The most bytes a signature in `signatureFormat` can take: 64 or 96 for
+the fixed-width form, and 72 or 104 for DER.
+
+**Parameters**
+
+- `signatureFormat` — the layout
+
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:274](../../stdlib/Security/Cryptography/ECDsa.sl#L274)</sub>
+
+#### ImportSubjectPublicKeyInfo *method*
+
+```
+Result<nuint, CryptoError> ImportSubjectPublicKeyInfo(ReadOnlySpan<byte> source)
+```
+
+Replaces the key with the public key in an RFC 5480
+`SubjectPublicKeyInfo`. On failure the key is unchanged.
+
+**Parameters**
+
+- `source` — the DER, perhaps with more after it
+
+**Returns** &nbsp; how many bytes of `source` the structure took
+
+**Fails with**
+
+- [CryptoError.Encoding](#encoding-case) — not a `SubjectPublicKeyInfo` for an EC key
+- [CryptoError.Unsupported](#unsupported-case) — a curve other than P-256 and P-384
+- [CryptoError.InvalidPoint](#invalidpoint-case) — the point is not on the curve
+
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:292](../../stdlib/Security/Cryptography/ECDsa.sl#L292)</sub>
+
+#### ExportSubjectPublicKeyInfo *method*
+
+```
+byte[] ExportSubjectPublicKeyInfo()
+```
+
+The public key as an RFC 5480 `SubjectPublicKeyInfo`, in DER.
+
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:302](../../stdlib/Security/Cryptography/ECDsa.sl#L302)</sub>
+
+#### ExportSubjectPublicKeyInfoPem *method*
+
+```
+String ExportSubjectPublicKeyInfoPem()
+```
+
+The public key as a `PUBLIC KEY` PEM block.
+
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:305](../../stdlib/Security/Cryptography/ECDsa.sl#L305)</sub>
+
+#### ImportECPrivateKey *method*
+
+```
+Result<nuint, CryptoError> ImportECPrivateKey(ReadOnlySpan<byte> source)
+```
+
+Replaces the key with the private key in an RFC 5915 `ECPrivateKey`,
+which MUST name its curve. On failure the key is unchanged.
+
+**Parameters**
+
+- `source` — the DER, perhaps with more after it
+
+**Returns** &nbsp; how many bytes of `source` the structure took
+
+**Fails with**
+
+- [CryptoError.Encoding](#encoding-case) — not an `ECPrivateKey`, or one with no curve
+- [CryptoError.Unsupported](#unsupported-case) — a curve other than P-256 and P-384
+- [CryptoError.InvalidKey](#invalidkey-case) — the scalar is not in `[1, n - 1]`, or does not give the public point beside it
+- [CryptoError.InvalidPoint](#invalidpoint-case) — the public point is not on the curve
+
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:318](../../stdlib/Security/Cryptography/ECDsa.sl#L318)</sub>
+
+#### ExportECPrivateKey *method*
+
+```
+Result<byte[], CryptoError> ExportECPrivateKey()
+```
+
+The private key as an RFC 5915 `ECPrivateKey`, in DER.
+
+**Fails with**
+
+- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
+
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:330](../../stdlib/Security/Cryptography/ECDsa.sl#L330)</sub>
+
+#### ExportECPrivateKeyPem *method*
+
+```
+Result<String, CryptoError> ExportECPrivateKeyPem()
+```
+
+The private key as an `EC PRIVATE KEY` PEM block.
+
+**Fails with**
+
+- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
+
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:335](../../stdlib/Security/Cryptography/ECDsa.sl#L335)</sub>
+
+#### ImportPkcs8PrivateKey *method*
+
+```
+Result<nuint, CryptoError> ImportPkcs8PrivateKey(ReadOnlySpan<byte> source)
+```
+
+Replaces the key with the private key in an unencrypted PKCS #8
+`PrivateKeyInfo`. On failure the key is unchanged.
+
+**Parameters**
+
+- `source` — the DER, perhaps with more after it
+
+**Returns** &nbsp; how many bytes of `source` the structure took
+
+**Fails with**
+
+- [CryptoError.Encoding](#encoding-case) — not a `PrivateKeyInfo` for an EC key
+- [CryptoError.Unsupported](#unsupported-case) — a curve other than P-256 and P-384
+- [CryptoError.InvalidKey](#invalidkey-case) — the scalar is not in `[1, n - 1]`, or does not give the public point beside it
+- [CryptoError.InvalidPoint](#invalidpoint-case) — the public point is not on the curve
+
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:353](../../stdlib/Security/Cryptography/ECDsa.sl#L353)</sub>
+
+#### ExportPkcs8PrivateKey *method*
+
+```
+Result<byte[], CryptoError> ExportPkcs8PrivateKey()
+```
+
+The private key as an unencrypted PKCS #8 `PrivateKeyInfo`, in DER.
+
+**Fails with**
+
+- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
+
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:365](../../stdlib/Security/Cryptography/ECDsa.sl#L365)</sub>
+
+#### ExportPkcs8PrivateKeyPem *method*
+
+```
+Result<String, CryptoError> ExportPkcs8PrivateKeyPem()
+```
+
+The private key as a `PRIVATE KEY` PEM block.
+
+**Fails with**
+
+- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
+
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:370](../../stdlib/Security/Cryptography/ECDsa.sl#L370)</sub>
+
+#### ImportFromPem *method*
+
+```
+Result<bool, CryptoError> ImportFromPem(String input)
+```
+
+Replaces the key with the first `PUBLIC KEY`, `EC PRIVATE KEY` or
+`PRIVATE KEY` block in `input`. Blocks with other labels are passed
+over. On failure the key is unchanged.
+
+**Parameters**
+
+- `input` — PEM text
+
+**Fails with**
+
+- [CryptoError.Encoding](#encoding-case) — no such block, or one whose contents are not what its label says
+- [CryptoError.Unsupported](#unsupported-case) — an encrypted key, or a curve other than P-256 and P-384
+- [CryptoError.InvalidKey](#invalidkey-case) — the key does not check
+
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:388](../../stdlib/Security/Cryptography/ECDsa.sl#L388)</sub>
+
+### ECParameters *struct*
+
+```
+struct ECParameters
+```
+
+An elliptic-curve key as its numbers: .NET's `ECParameters`.
+
+```csharp
+var parameters = new ECParameters(ECCurve.NamedCurves.NistP256,
+                                  new ECPoint(x, y), d);
+var key = try ECDsa.Create(parameters);
+```
+
+`D` is empty for a public key. `Q`'s coordinates may be empty when `D` is
+not, and the public point is then computed from `D`; when both are given
+they MUST agree.
+
+**Make one with a constructor.** The zero value's arrays are not arrays
+yet, and reading one aborts.
+
+<sub>[stdlib/Security/Cryptography/ECParameters.sl:38](../../stdlib/Security/Cryptography/ECParameters.sl#L38)</sub>
+
+#### Curve *field*
+
+```
+ECCurve Curve
+```
+
+Which curve the key is on.
+
+<sub>[stdlib/Security/Cryptography/ECParameters.sl:41](../../stdlib/Security/Cryptography/ECParameters.sl#L41)</sub>
+
+#### Q *field*
+
+```
+ECPoint Q
+```
+
+The public point.
+
+<sub>[stdlib/Security/Cryptography/ECParameters.sl:44](../../stdlib/Security/Cryptography/ECParameters.sl#L44)</sub>
+
+#### D *field*
+
+```
+byte[] D
+```
+
+The private scalar, big-endian and as wide as the curve's order, or
+empty.
+
+<sub>[stdlib/Security/Cryptography/ECParameters.sl:48](../../stdlib/Security/Cryptography/ECParameters.sl#L48)</sub>
+
+### ECPoint *struct*
+
+```
+struct ECPoint
+```
+
+A point on an elliptic curve, as its two affine coordinates: .NET's
+`ECPoint`.
+
+Each coordinate is big-endian and exactly as wide as the curve's field —
+32 bytes for P-256, 48 for P-384 — leading zeros included.
+
+**Make one with its constructor.** The zero value's arrays are not arrays
+yet, and reading one aborts.
+
+<sub>[stdlib/Security/Cryptography/ECPoint.sl:32](../../stdlib/Security/Cryptography/ECPoint.sl#L32)</sub>
+
+#### X *field*
+
+```
+byte[] X
+```
+
+The x coordinate.
+
+<sub>[stdlib/Security/Cryptography/ECPoint.sl:35](../../stdlib/Security/Cryptography/ECPoint.sl#L35)</sub>
+
+#### Y *field*
+
+```
+byte[] Y
+```
+
+The y coordinate.
+
+<sub>[stdlib/Security/Cryptography/ECPoint.sl:38](../../stdlib/Security/Cryptography/ECPoint.sl#L38)</sub>
+
 ### Ed25519 *class*
 
 ```
@@ -1464,6 +2634,129 @@ The digest of `data` on its own. Resets first, so an object that has
 been appended to is still safe to ask.
 
 <sub>[stdlib/Security/Cryptography/HashAlgorithm.sl:114](../../stdlib/Security/Cryptography/HashAlgorithm.sl#L114)</sub>
+
+### HashAlgorithmName *struct*
+
+```
+struct HashAlgorithmName
+```
+
+Which hash a signature or a key derivation uses, as .NET's
+`HashAlgorithmName` names it.
+
+```csharp
+var signature = try key.SignData(message, HashAlgorithmName.Sha256);
+```
+
+The zero value names no hash, and everything given it answers
+`CryptoError.Unsupported`.
+
+<sub>[stdlib/Security/Cryptography/HashAlgorithmName.sl:33](../../stdlib/Security/Cryptography/HashAlgorithmName.sl#L33)</sub>
+
+#### Sha1 *property*
+
+```
+static HashAlgorithmName Sha1 { get; }
+```
+
+SHA-1, for verifying what older systems signed. Nothing new SHOULD be
+signed with it.
+
+<sub>[stdlib/Security/Cryptography/HashAlgorithmName.sl:44](../../stdlib/Security/Cryptography/HashAlgorithmName.sl#L44)</sub>
+
+#### Sha256 *property*
+
+```
+static HashAlgorithmName Sha256 { get; }
+```
+
+SHA-256.
+
+<sub>[stdlib/Security/Cryptography/HashAlgorithmName.sl:47](../../stdlib/Security/Cryptography/HashAlgorithmName.sl#L47)</sub>
+
+#### Sha384 *property*
+
+```
+static HashAlgorithmName Sha384 { get; }
+```
+
+SHA-384.
+
+<sub>[stdlib/Security/Cryptography/HashAlgorithmName.sl:50](../../stdlib/Security/Cryptography/HashAlgorithmName.sl#L50)</sub>
+
+#### Sha512 *property*
+
+```
+static HashAlgorithmName Sha512 { get; }
+```
+
+SHA-512.
+
+<sub>[stdlib/Security/Cryptography/HashAlgorithmName.sl:53](../../stdlib/Security/Cryptography/HashAlgorithmName.sl#L53)</sub>
+
+#### Name *property*
+
+```
+String Name { get; }
+```
+
+The name .NET gives it — `SHA256` — and empty for the zero value.
+
+<sub>[stdlib/Security/Cryptography/HashAlgorithmName.sl:56](../../stdlib/Security/Cryptography/HashAlgorithmName.sl#L56)</sub>
+
+#### HashSizeInBytes *property*
+
+```
+nuint HashSizeInBytes { get; }
+```
+
+How many bytes its digest is, and zero for the zero value.
+
+<sub>[stdlib/Security/Cryptography/HashAlgorithmName.sl:72](../../stdlib/Security/Cryptography/HashAlgorithmName.sl#L72)</sub>
+
+#### CreateHashAlgorithm *method*
+
+```
+Result<IHashAlgorithm, CryptoError> CreateHashAlgorithm()
+```
+
+A fresh hash of this kind, to append to or to key an `Hmac` with.
+
+**Fails with**
+
+- [CryptoError.Unsupported](#unsupported-case) — this is the zero value
+
+<sub>[stdlib/Security/Cryptography/HashAlgorithmName.sl:90](../../stdlib/Security/Cryptography/HashAlgorithmName.sl#L90)</sub>
+
+#### Equals *method*
+
+```
+bool Equals(HashAlgorithmName other)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Security/Cryptography/HashAlgorithmName.sl:102](../../stdlib/Security/Cryptography/HashAlgorithmName.sl#L102)</sub>
+
+#### operator == *operator*
+
+```
+static bool operator ==(HashAlgorithmName left, HashAlgorithmName right)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Security/Cryptography/HashAlgorithmName.sl:104](../../stdlib/Security/Cryptography/HashAlgorithmName.sl#L104)</sub>
+
+#### operator != *operator*
+
+```
+static bool operator !=(HashAlgorithmName left, HashAlgorithmName right)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Security/Cryptography/HashAlgorithmName.sl:107](../../stdlib/Security/Cryptography/HashAlgorithmName.sl#L107)</sub>
 
 ### Hkdf *class*
 

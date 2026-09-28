@@ -35,8 +35,9 @@
 ///
 /// **The shape is `System.Security.Cryptography`'s**, so a program being
 /// ported finds the names where it left them: `Sha256`, `Hmac`, `Aes`,
-/// `AesGcm`, `ChaCha20Poly1305`, `Rfc2898DeriveBytes.Pbkdf2`,
-/// `RandomNumberGenerator.Fill`, `CryptographicOperations.FixedTimeEquals`.
+/// `AesGcm`, `ChaCha20Poly1305`, `Rfc2898DeriveBytes.Pbkdf2`, `ECDsa`,
+/// `ECDiffieHellman`, `RandomNumberGenerator.Fill`,
+/// `CryptographicOperations.FixedTimeEquals`.
 /// `Blake2b`, `Scrypt` and `Argon2id` are not in .NET and follow the same
 /// shape. Three things about it differ, and each is a rule this language
 /// already has rather than a choice made here:
@@ -53,6 +54,8 @@
 /// - **`Create()` is `new`.** `SHA256.Create()` exists because .NET's is an
 ///   abstract class over a CryptoAPI implementation chosen at run time. There
 ///   is one implementation here, so `new Sha256()` is the whole of it.
+///   `ECDsa.Create` and `ECDiffieHellman.Create` keep the name, because they
+///   make a key and can fail.
 ///
 /// **The ciphers and MACs are constant time in software.** AES is bitsliced
 /// and its S-box is a logic circuit, GHASH multiplies with integer multiplies
@@ -64,29 +67,38 @@
 /// Three things that claim does not cover. **It is timing and cache only**:
 /// nothing here resists power analysis, electromagnetic emanation or fault
 /// injection, which want masking and hardware this library does not have.
-/// **It rests on the multiply**: GHASH and Poly1305 assume a multiply whose
-/// time does not depend on its operands, which is true of every x64 and ARMv8
-/// core and not of some older and embedded ones. **The memory-hard password
-/// hashes index memory by the password**, which is what makes them memory
-/// hard: all of scrypt's second half, and Argon2id's after its first half.
+/// **It rests on the multiply**: GHASH, Poly1305 and every curve assume a
+/// multiply whose time does not depend on its operands, which is true of every
+/// x64 and ARMv8 core and not of some older and embedded ones. **The
+/// memory-hard password hashes index memory by the password**, which is what
+/// makes them memory hard: all of scrypt's second half, and Argon2id's after
+/// its first half.
 ///
 /// Nothing uses AES-NI, which the language cannot spell, so AES runs at a
 /// small fraction of what the hardware could give. `ChaCha20Poly1305` is
 /// about three times as fast as `AesGcm` here, and is the one to choose
 /// where a format leaves the choice open.
 ///
-/// **Public-key is constant time wherever a secret is involved.** `X25519`
-/// whole, and `Ed25519` signing and key generation, whose scalar
-/// multiplication reads its table by mask; every secret-dependent choice there
-/// is a mask passed through `OpaqueCopy`, so the optimiser cannot turn it back
-/// into a branch. `Ed25519.Verify` is variable time and touches nothing
-/// secret.
+/// **Public-key is Curve25519, P-256 and P-384.** `X25519` and
+/// `ECDiffieHellman` agree keys; `Ed25519` and `ECDsa` sign. The NIST curves
+/// are fixed-width Montgomery multiplication in 64-bit limbs held inline, with
+/// the complete formulas of Renes, Costello and Batina so that no point is a
+/// special case, and keys travel as `ECParameters`, SEC 1 points, SEC 1 and
+/// PKCS #8 private keys, `SubjectPublicKeyInfo` and PEM.
 ///
-/// **Public-key is Curve25519 and nothing else.** `X25519` agrees keys and
-/// `Ed25519` signs, over the one curve whose arithmetic needs no general
-/// bignum. RSA, ECDsa over the NIST curves, and X.509 all rest on
-/// arbitrary-precision integer arithmetic, which this standard library does
-/// not have; see TODO.md for the shape that would take.
+/// **Every operation on a private scalar or a nonce is constant time**: key
+/// generation, agreement and signing on every curve. A scalar multiplication
+/// reads the whole of its table and keeps one entry with a mask, an inversion
+/// is an exponentiation by a public exponent, and every conditional subtraction
+/// is a mask passed through `OpaqueCopy`, so the optimiser cannot turn it back
+/// into a branch. A random or RFC 6979 candidate outside `[1, n - 1]` is drawn
+/// again, which shows only that a number nobody uses was out of range.
+/// Verification and the checking of a public point read nothing secret and are
+/// written for speed.
+///
+/// RSA is not here yet; it wants an arbitrary-precision integer, and TODO.md
+/// carries the note. X.509 is `Standard.Formats.Asn1` and a signature check,
+/// which is enough to verify a certificate and not yet a path validator.
 module Standard.Security.Cryptography;
 
 import Standard.Text;

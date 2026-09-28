@@ -547,7 +547,7 @@ decision about what to write.
 
 ### Public-key cryptography
 
-`Standard.Security.Cryptography` is the symmetric half and is complete: MD5,
+`Standard.Security.Cryptography`'s symmetric half is complete: MD5,
 SHA-1, SHA-256, SHA-384, SHA-512, BLAKE2b, HMAC over any of them, PBKDF2, HKDF,
 scrypt, Argon2id, AES in ECB, CBC, CFB and CTR, AES-GCM, ChaCha20-Poly1305, the
 platform's entropy, and a constant-time comparison. Every answer is pinned
@@ -557,21 +557,27 @@ against a published vector by `tests/cases/cryptography`, `crypto-aes`,
 **Curve25519 is there**: `X25519` for key agreement and `Ed25519` for
 signatures, constant time on secrets, pinned against RFC 7748 and RFC 8032 by
 `tests/cases/crypto-25519` on x64 and x86. Its field is five 51-bit limbs over
-`Bits.MultiplyHigh`, which is why it needed no bignum. That covers
-ECDiffieHellman for every protocol that uses X25519 — TLS 1.3, SSH, WireGuard.
+`Bits.MultiplyHigh`.
 
-**RSA, ECDsa over the NIST curves and X.509 are not there, and none of them is
-the work.** The work underneath all three is an arbitrary-precision integer:
-addition, multiplication, modular exponentiation with a Montgomery ladder, and
-an inverse -- in constant time, because the whole point of the exponent is that
-it is secret. That is a module of its own, it is the thing a mistake in is
-invisible, and half of it is worse than none.
+**`ECDsa` and `ECDiffieHellman` are done, for P-256 and P-384.** They needed
+no bignum: a curve's numbers are a fixed width, so the arithmetic is four or six
+64-bit limbs held inline, constant time wherever a secret is involved, and
+pinned by `tests/cases/crypto-ecc` against RFC 6979, NIST's CDH vectors,
+Wycheproof and OpenSSL. What is left on that side:
 
-The honest alternatives are to write it, to bind to a library that has
-(bcrypt on Windows, OpenSSL elsewhere, and then two backends to keep honest),
-or to say that this standard library does the symmetric half and Curve25519
-and expects a program needing RSA or a NIST curve to reach outside. **The third is what is happening
-and it should be a decision rather than a gap.**
+- **P-521.** Nine limbs and a field whose prime is a Mersenne number, so it
+  wants a reduction of its own rather than the Montgomery one.
+- **A precomputed table for the generator.** Signing and key generation
+  multiply the base point, which never changes, and a fixed table of its
+  multiples would make them roughly four times faster.
+- **X.509 path validation.** Verifying one certificate's signature is here;
+  names, validity, key usage and chains are not.
+
+**RSA is not there, and neither is the work.** The work underneath RSA is an
+arbitrary-precision integer: addition, multiplication, modular exponentiation
+with a Montgomery ladder, and an inverse -- in constant time, because the whole
+point of the exponent is that it is secret. That is a module of its own, it is
+the thing a mistake in is invisible, and half of it is worse than none.
 
 ### Case mapping beyond ASCII
 

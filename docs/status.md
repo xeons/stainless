@@ -675,17 +675,20 @@ last person to edit it -- the suite is the authority.
   pointer-to-delegate cast are what a resolved symbol is called through. No
   text -- a font is where the two backends stop agreeing
 - `Standard.Security.Cryptography`: the symmetric half, complete, and
-  Curve25519. MD5, SHA-1, SHA-256, SHA-384, SHA-512 and BLAKE2b, HMAC over any
-  of them, PBKDF2, HKDF, scrypt, Argon2id, AES in ECB, CBC, CFB and CTR,
+  elliptic curves. MD5, SHA-1, SHA-256, SHA-384, SHA-512 and BLAKE2b, HMAC over
+  any of them, PBKDF2, HKDF, scrypt, Argon2id, AES in ECB, CBC, CFB and CTR,
   AES-GCM, ChaCha20-Poly1305 with its two halves, the platform's entropy and a
   constant-time comparison, in `System.Security.Cryptography`'s shape with a
   `Result` where .NET throws. Every cipher and MAC is constant time in
   software: AES is bitsliced four blocks at a time, as BearSSL's `aes_ct64`
   is, and GHASH multiplies without a table. X25519 key agreement (RFC 7748)
-  and Ed25519 signatures (RFC 8032), constant time wherever a secret is
-  involved; verification is strict and cofactorless. Every answer is pinned
-  against a published test vector. Not RSA, ECDsa over the NIST curves or
-  X.509, which want a constant-time bignum the library does not have.
+  and Ed25519 signatures (RFC 8032); `ECDsa` and `ECDiffieHellman` on P-256
+  and P-384 with RFC 6979 deterministic signatures in P1363 and DER form, SEC 1
+  points compressed or not, and keys through `ECParameters`, SEC 1, PKCS #8,
+  `SubjectPublicKeyInfo` and PEM, byte-for-byte with OpenSSL. Constant time
+  wherever a private scalar or a nonce is involved; a P-256 signature or
+  agreement is about 0.4 ms on x64. Every answer is pinned against a published
+  test vector. Not RSA or X.509.
   `PemEncoding` finds RFC 7468 blocks in surrounding text and writes them
 - `Standard.Formats.Asn1`: BER and DER in `System.Formats.Asn1`'s shape, with
   a `Result` where .NET throws. `AsnReader` covers every type X.509 uses —
