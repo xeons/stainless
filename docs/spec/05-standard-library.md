@@ -54,7 +54,7 @@ own for the linker to drop.
 | `Standard.Time` | `DateTimeOffset`, `TimeSpan`, `DateTime` and the monotonic `Stopwatch` | on request |
 | `Standard.Random` | xoshiro256**, seeded by you or by the operating system | on request |
 | `Standard.Drawing` | raster images: decode, draw, encode ([§5.12](#512-standarddrawing)) | on request |
-| `Standard.Security.Cryptography` | hashes, MACs, key derivation, AES, PEM ([§5.13](#513-standardsecuritycryptography)) | on request |
+| `Standard.Security.Cryptography` | hashes, MACs, key derivation, AES, ChaCha20-Poly1305, X25519, Ed25519, PEM ([§5.13](#513-standardsecuritycryptography)) | on request |
 | `Standard.Formats.Asn1` | ASN.1 in BER and DER, read and written ([§5.15](#515-standardformatsasn1)) | on request |
 | `Standard.Media.Audio` | playing and recording sound ([§5.14](#514-standardmediaaudio)) | on request |
 | `Standard.Com` | `Guid` and `IUnknown`, for `com interface` ([§8.5](08-interop-libraries.md#85-com)) | on request |
@@ -925,6 +925,8 @@ it meant. A polygon therefore takes its points as a flat `int[]`.
 var digest = Sha256.HashData(Encoding.CreateUtf8().GetBytes("hello"));
 var mac    = HmacSha256.HashData(key, message);
 var box    = try AesGcm.FromKey(key);
+var shared = try X25519.DeriveSharedSecret(myPrivateKey, theirPublicKey);
+var signed = try Ed25519.Sign(signingKey, message);
 ```
 
 **The shape is `System.Security.Cryptography`'s**, so a program being ported
@@ -941,19 +943,36 @@ here.
 | MACs | `Hmac` over any of them, and `HmacSha256` and its siblings |
 | derivation | `Rfc2898DeriveBytes.Pbkdf2`, `Hkdf`, `Scrypt`, `Argon2id` |
 | ciphers | `Aes` in ECB, CBC, CFB and CTR; `AesGcm`; `ChaCha20`, `Poly1305` and `ChaCha20Poly1305` |
+| key agreement | `X25519` (RFC 7748) |
+| signatures | `Ed25519` (RFC 8032, pure) |
 | text | `PemEncoding`: RFC 7468 blocks found in text and written at 64 columns |
 | the rest | `RandomNumberGenerator`, `CryptographicOperations.FixedTimeEquals` |
 
 Every answer is pinned against a published test vector — FIPS-180 and RFC 1321
 for the digests, RFC 2202 and 4231 for HMAC, RFC 6070 for PBKDF2, RFC 5869 for
 HKDF, FIPS-197 for the AES blocks, SP 800-38A for the modes and the GCM
-specification's own case 3 — by `tests/cases/cryptography`, and every vector
-of RFC 8439 by `tests/cases/crypto-chacha`, and RFC 7914's scrypt, RFC
-7693's BLAKE2b and RFC 9106's Argon2id by `tests/cases/crypto-kdf`.
+specification's own case 3 — by `tests/cases/cryptography`, every vector
+of RFC 8439 by `tests/cases/crypto-chacha`, RFC 7914's scrypt, RFC 7693's
+BLAKE2b and RFC 9106's Argon2id by `tests/cases/crypto-kdf`, and RFC 7748 and
+RFC 8032's own vectors by `tests/cases/crypto-25519`, which runs again as a
+32-bit x86 program.
 
-**What is not there is public-key.** RSA, ECDsa, ECDiffieHellman and X.509 all
-rest on arbitrary-precision integer arithmetic, which this standard library
-does not have; [TODO.md](../../TODO.md) carries the shape that would take.
+**What is constant time.** `FixedTimeEquals`, all of `X25519`, and `Ed25519`
+signing: no branch and no memory index there depends on a secret, and every
+secret-dependent choice is a mask passed through `Bits.OpaqueCopy`.
+`Ed25519.Verify` is variable time and touches only public data. AES is
+table-driven and is not constant time; the module's own documentation says
+what it is fit for.
+
+**Verification is strict and cofactorless.** An S at or above the group order
+is refused, as is a public key that is not the one canonical encoding of a
+point on the curve, and the equation checked is [S]B = R + [k]A rather than
+that multiplied by the cofactor. RFC 8032 §5.1.7 allows either.
+
+**What is not there is the rest of public-key.** RSA, ECDsa over the NIST
+curves and X.509 all rest on arbitrary-precision integer arithmetic, which this
+standard library does not have; [TODO.md](../../TODO.md) carries the shape that
+would take.
 
 ## 5.14 `Standard.Media.Audio`
 

@@ -19,8 +19,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-/// Hashes, message authentication codes, key derivation, and block and stream
-/// ciphers.
+/// Hashes, message authentication codes, key derivation, block and stream
+/// ciphers, key agreement and signatures.
 ///
 /// ```csharp
 /// var digest = Sha256.HashData(Encoding.CreateUtf8().GetBytes("hello"));
@@ -28,6 +28,9 @@
 ///
 /// var cipher = try Aes.FromKey(key);
 /// var sealed = try cipher.EncryptCbc(plaintext, iv, PaddingMode.Pkcs7);
+///
+/// var shared = try X25519.DeriveSharedSecret(myPrivateKey, theirPublicKey);
+/// var signature = try Ed25519.Sign(signingKey, message);
 /// ```
 ///
 /// **The shape is `System.Security.Cryptography`'s**, so a program being
@@ -51,23 +54,33 @@
 ///   abstract class over a CryptoAPI implementation chosen at run time. There
 ///   is one implementation here, so `new Sha256()` is the whole of it.
 ///
-/// **This is a software implementation and makes no constant-time claim
-/// beyond the obvious.** `FixedTimeEquals` is constant time and is the one
-/// comparison a caller should use on a secret. The AES here is a byte-oriented
-/// reference implementation with a table-driven S-box, which is the shape that
-/// is known to leak through the data cache on a machine an attacker shares. It
-/// is right for a file, a protocol and a password store, and it is not the
-/// thing to put under a remote attacker who can time it. AES-NI and a
-/// bitsliced fallback are what would answer that, and neither is written —
-/// TODO.md carries the note. **`ChaCha20Poly1305` is the answer that is
-/// written**: it has no table and no branch on a secret, so it is constant
-/// time in software, and it is what to choose where timing matters.
+/// **What is constant time, and what is not.** This is a software
+/// implementation, so the claim is about the code as written: no branch and
+/// no memory index depends on a secret.
 ///
-/// **What is not here yet is public-key.** RSA, ECDsa, ECDiffieHellman and
-/// X.509 all rest on arbitrary-precision integer arithmetic, which this
-/// standard library does not have; see TODO.md for the shape that would take.
-/// So this module is the symmetric half, and it is complete: every hash, MAC,
-/// key derivation and cipher .NET ships that does not need a bignum.
+/// - **Constant time:** `FixedTimeEquals`, which is the one comparison a
+///   caller should use on a secret; `ChaCha20Poly1305` and its two halves,
+///   which have no table and no branch on a secret; `X25519` whole; and
+///   `Ed25519` signing and key generation, whose scalar multiplication reads
+///   its table by mask.
+///   Every secret-dependent choice there is a mask passed through
+///   `OpaqueCopy`, so the optimiser cannot turn it back into a branch.
+/// - **Variable time, on public data only:** `Ed25519.Verify`, which touches
+///   nothing secret.
+/// - **Not constant time: AES.** It is a byte-oriented reference
+///   implementation with a table-driven S-box, which is the shape known to
+///   leak through the data cache on a machine an attacker shares. It is right
+///   for a file, a protocol and a password store, and it is not the thing to
+///   put under a remote attacker who can time it. AES-NI and a bitsliced
+///   fallback are what would answer that, and neither is written — TODO.md
+///   carries the note. The GHASH under `AesGcm` branches on its data too.
+///   Where timing matters, choose `ChaCha20Poly1305`.
+///
+/// **Public-key is Curve25519 and nothing else.** `X25519` agrees keys and
+/// `Ed25519` signs, over the one curve whose arithmetic needs no general
+/// bignum. RSA, ECDsa over the NIST curves, and X.509 all rest on
+/// arbitrary-precision integer arithmetic, which this standard library does
+/// not have; see TODO.md for the shape that would take.
 module Standard.Security.Cryptography;
 
 import Standard.Text;

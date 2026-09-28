@@ -554,8 +554,14 @@ platform's entropy, and a constant-time comparison. Every answer is pinned
 against a published vector by `tests/cases/cryptography`, `crypto-chacha` and
 `crypto-kdf`.
 
-**RSA, ECDsa, ECDiffieHellman and X.509 are not there, and none of them is the
-work.** The work underneath all four is an arbitrary-precision integer:
+**Curve25519 is there**: `X25519` for key agreement and `Ed25519` for
+signatures, constant time on secrets, pinned against RFC 7748 and RFC 8032 by
+`tests/cases/crypto-25519` on x64 and x86. Its field is five 51-bit limbs over
+`Bits.MultiplyHigh`, which is why it needed no bignum. That covers
+ECDiffieHellman for every protocol that uses X25519 — TLS 1.3, SSH, WireGuard.
+
+**RSA, ECDsa over the NIST curves and X.509 are not there, and none of them is
+the work.** The work underneath all three is an arbitrary-precision integer:
 addition, multiplication, modular exponentiation with a Montgomery ladder, and
 an inverse -- in constant time, because the whole point of the exponent is that
 it is secret. That is a module of its own, it is the thing a mistake in is
@@ -563,8 +569,8 @@ invisible, and half of it is worse than none.
 
 The honest alternatives are to write it, to bind to a library that has
 (bcrypt on Windows, OpenSSL elsewhere, and then two backends to keep honest),
-or to say that this standard library does the symmetric half and expects a
-program needing a signature to reach outside. **The third is what is happening
+or to say that this standard library does the symmetric half and Curve25519
+and expects a program needing RSA or a NIST curve to reach outside. **The third is what is happening
 and it should be a decision rather than a gap.**
 
 ### AES that does not leak through the cache

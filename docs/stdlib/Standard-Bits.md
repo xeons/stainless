@@ -102,7 +102,7 @@ ulong MultiplyHigh(ulong left, ulong right)
 The high 64 bits of the 128-bit product of `left` and `right`; `left * right`
 is the low 64.
 
-**See also** &nbsp; [Math.BigMul](Standard-Math.md#bigmul-function)
+**See also** &nbsp; [Standard.Math.BigMul](Standard-Math.md#bigmul-function)
 
 <sub>[stdlib/Bits.sl:90](../../stdlib/Bits.sl#L90)</sub>
 

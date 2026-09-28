@@ -31,7 +31,7 @@ One page per module. Each lists every public type, function, property, case and 
 | [Standard.Random](Standard-Random.md) | Pseudo-random numbers. |
 | [Standard.Reflection](Standard-Reflection.md) | Reading the metadata the compiler laid down. |
 | [Standard.Resources](Standard-Resources.md) | What a program carries inside itself, on every platform. |
-| [Standard.Security.Cryptography](Standard-Security-Cryptography.md) | Hashes, message authentication codes, key derivation, and block and stream |
+| [Standard.Security.Cryptography](Standard-Security-Cryptography.md) | Hashes, message authentication codes, key derivation, block and stream |
 | [Standard.Text](Standard-Text.md) | The rest of `String`. |
 | [Standard.Threading](Standard-Threading.md) | Locks, atomics and the job pool. |
 | [Standard.Time](Standard-Time.md) | Time, of the two kinds that must not be confused. |

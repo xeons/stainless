@@ -668,14 +668,18 @@ last person to edit it -- the suite is the authority.
   in Stainless like the rest of the library: `delegate __stdcall` and the
   pointer-to-delegate cast are what a resolved symbol is called through. No
   text -- a font is where the two backends stop agreeing
-- `Standard.Security.Cryptography`: the symmetric half, complete. MD5, SHA-1,
-  SHA-256, SHA-384, SHA-512 and BLAKE2b, HMAC over any of them, PBKDF2, HKDF,
-  scrypt, Argon2id, AES in ECB, CBC, CFB and CTR, AES-GCM, ChaCha20-Poly1305
-  with its two halves, the platform's entropy and a constant-time comparison,
-  in `System.Security.Cryptography`'s shape with a `Result` where .NET throws.
-  Every answer is pinned against a published test vector. Not public-key,
-  which wants a constant-time bignum the library does not have.
-  `PemEncoding` finds RFC 7468 blocks in surrounding text and writes them
+- `Standard.Security.Cryptography`: the symmetric half, complete, and
+  Curve25519. MD5, SHA-1, SHA-256, SHA-384, SHA-512 and BLAKE2b, HMAC over any
+  of them, PBKDF2, HKDF, scrypt, Argon2id, AES in ECB, CBC, CFB and CTR,
+  AES-GCM, ChaCha20-Poly1305 with its two halves, the platform's entropy and a
+  constant-time comparison, in `System.Security.Cryptography`'s shape with a
+  `Result` where .NET throws. X25519 key agreement (RFC 7748) and Ed25519
+  signatures (RFC 8032), constant time wherever a secret is involved;
+  verification is strict and cofactorless. Every answer is pinned against a
+  published test vector. Not RSA, ECDsa over the NIST curves or X.509, which
+  want a constant-time bignum the library does not have. AES is table-driven
+  and not constant time. `PemEncoding` finds RFC 7468 blocks in surrounding
+  text and writes them
 - `Standard.Formats.Asn1`: BER and DER in `System.Formats.Asn1`'s shape, with
   a `Result` where .NET throws. `AsnReader` covers every type X.509 uses —
   integers raw or as `long`, bit and octet strings, identifiers, eight

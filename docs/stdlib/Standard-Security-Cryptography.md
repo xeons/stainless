@@ -2,8 +2,8 @@
 
 <sub>Generated from the `///` blocks in the source by `stainless doc`. Edit the source, not this file.</sub>
 
-Hashes, message authentication codes, key derivation, and block and stream
-ciphers.
+Hashes, message authentication codes, key derivation, block and stream
+ciphers, key agreement and signatures.
 
 ```csharp
 var digest = Sha256.HashData(Encoding.CreateUtf8().GetBytes("hello"));
@@ -11,6 +11,9 @@ Console.WriteLine(Convert.ToHexString(digest));
 
 var cipher = try Aes.FromKey(key);
 var sealed = try cipher.EncryptCbc(plaintext, iv, PaddingMode.Pkcs7);
+
+var shared = try X25519.DeriveSharedSecret(myPrivateKey, theirPublicKey);
+var signature = try Ed25519.Sign(signingKey, message);
 ```
 
 **The shape is `System.Security.Cryptography`'s**, so a program being
@@ -34,27 +37,37 @@ already has rather than a choice made here:
   abstract class over a CryptoAPI implementation chosen at run time. There
   is one implementation here, so `new Sha256()` is the whole of it.
 
-**This is a software implementation and makes no constant-time claim
-beyond the obvious.** `FixedTimeEquals` is constant time and is the one
-comparison a caller should use on a secret. The AES here is a byte-oriented
-reference implementation with a table-driven S-box, which is the shape that
-is known to leak through the data cache on a machine an attacker shares. It
-is right for a file, a protocol and a password store, and it is not the
-thing to put under a remote attacker who can time it. AES-NI and a
-bitsliced fallback are what would answer that, and neither is written —
-TODO.md carries the note. **`ChaCha20Poly1305` is the answer that is
-written**: it has no table and no branch on a secret, so it is constant
-time in software, and it is what to choose where timing matters.
+**What is constant time, and what is not.** This is a software
+implementation, so the claim is about the code as written: no branch and
+no memory index depends on a secret.
 
-**What is not here yet is public-key.** RSA, ECDsa, ECDiffieHellman and
-X.509 all rest on arbitrary-precision integer arithmetic, which this
-standard library does not have; see TODO.md for the shape that would take.
-So this module is the symmetric half, and it is complete: every hash, MAC,
-key derivation and cipher .NET ships that does not need a bignum.
+- **Constant time:** `FixedTimeEquals`, which is the one comparison a
+  caller should use on a secret; `ChaCha20Poly1305` and its two halves,
+  which have no table and no branch on a secret; `X25519` whole; and
+  `Ed25519` signing and key generation, whose scalar multiplication reads
+  its table by mask.
+  Every secret-dependent choice there is a mask passed through
+  `OpaqueCopy`, so the optimiser cannot turn it back into a branch.
+- **Variable time, on public data only:** `Ed25519.Verify`, which touches
+  nothing secret.
+- **Not constant time: AES.** It is a byte-oriented reference
+  implementation with a table-driven S-box, which is the shape known to
+  leak through the data cache on a machine an attacker shares. It is right
+  for a file, a protocol and a password store, and it is not the thing to
+  put under a remote attacker who can time it. AES-NI and a bitsliced
+  fallback are what would answer that, and neither is written — TODO.md
+  carries the note. The GHASH under `AesGcm` branches on its data too.
+  Where timing matters, choose `ChaCha20Poly1305`.
+
+**Public-key is Curve25519 and nothing else.** `X25519` agrees keys and
+`Ed25519` signs, over the one curve whose arithmetic needs no general
+bignum. RSA, ECDsa over the NIST curves, and X.509 all rest on
+arbitrary-precision integer arithmetic, which this standard library does
+not have; see TODO.md for the shape that would take.
 
 ## Contents
 
-**Types** &nbsp; [Aes](#aes-class) &middot; [AesGcm](#aesgcm-class) &middot; [Argon2id](#argon2id-class) &middot; [Blake2b](#blake2b-class) &middot; [ChaCha20](#chacha20-class) &middot; [ChaCha20Poly1305](#chacha20poly1305-class) &middot; [CipherMode](#ciphermode-enum) &middot; [CryptoError](#cryptoerror-enum) &middot; [CryptographicOperations](#cryptographicoperations-class) &middot; [HashAlgorithm](#hashalgorithm-class) &middot; [Hkdf](#hkdf-class) &middot; [Hmac](#hmac-class) &middot; [HmacMd5](#hmacmd5-class) &middot; [HmacSha1](#hmacsha1-class) &middot; [HmacSha256](#hmacsha256-class) &middot; [HmacSha384](#hmacsha384-class) &middot; [HmacSha512](#hmacsha512-class) &middot; [IHashAlgorithm](#ihashalgorithm-interface) &middot; [Md5](#md5-class) &middot; [PaddingMode](#paddingmode-enum) &middot; [PemEncoding](#pemencoding-class) &middot; [PemFields](#pemfields-struct) &middot; [Poly1305](#poly1305-class) &middot; [RandomNumberGenerator](#randomnumbergenerator-class) &middot; [Rfc2898DeriveBytes](#rfc2898derivebytes-class) &middot; [Scrypt](#scrypt-class) &middot; [Sha1](#sha1-class) &middot; [Sha256](#sha256-class) &middot; [Sha2Wide](#sha2wide-class) &middot; [Sha384](#sha384-class) &middot; [Sha512](#sha512-class)
+**Types** &nbsp; [Aes](#aes-class) &middot; [AesGcm](#aesgcm-class) &middot; [Argon2id](#argon2id-class) &middot; [Blake2b](#blake2b-class) &middot; [ChaCha20](#chacha20-class) &middot; [ChaCha20Poly1305](#chacha20poly1305-class) &middot; [CipherMode](#ciphermode-enum) &middot; [CryptoError](#cryptoerror-enum) &middot; [CryptographicOperations](#cryptographicoperations-class) &middot; [Ed25519](#ed25519-class) &middot; [HashAlgorithm](#hashalgorithm-class) &middot; [Hkdf](#hkdf-class) &middot; [Hmac](#hmac-class) &middot; [HmacMd5](#hmacmd5-class) &middot; [HmacSha1](#hmacsha1-class) &middot; [HmacSha256](#hmacsha256-class) &middot; [HmacSha384](#hmacsha384-class) &middot; [HmacSha512](#hmacsha512-class) &middot; [IHashAlgorithm](#ihashalgorithm-interface) &middot; [Md5](#md5-class) &middot; [PaddingMode](#paddingmode-enum) &middot; [PemEncoding](#pemencoding-class) &middot; [PemFields](#pemfields-struct) &middot; [Poly1305](#poly1305-class) &middot; [RandomNumberGenerator](#randomnumbergenerator-class) &middot; [Rfc2898DeriveBytes](#rfc2898derivebytes-class) &middot; [Scrypt](#scrypt-class) &middot; [Sha1](#sha1-class) &middot; [Sha256](#sha256-class) &middot; [Sha2Wide](#sha2wide-class) &middot; [Sha384](#sha384-class) &middot; [Sha512](#sha512-class) &middot; [X25519](#x25519-class)
 
 ## Types
 
@@ -1197,6 +1210,157 @@ in a register, a copy made along the way, or memory the allocator has
 moved; this clears the one buffer it is given and nothing else.
 
 <sub>[stdlib/Security/Cryptography/CryptographicOperations.sl:63](../../stdlib/Security/Cryptography/CryptographicOperations.sl#L63)</sub>
+
+### Ed25519 *class*
+
+```
+class Ed25519
+```
+
+Ed25519 (RFC 8032): signatures over edwards25519 with SHA-512, which is
+what SSH, TLS 1.3, minisign and most new protocols sign with.
+
+```csharp
+byte[] privateKey = Ed25519.GeneratePrivateKey();
+byte[] publicKey = try Ed25519.GetPublicKey(privateKey);
+byte[] signature = try Ed25519.Sign(privateKey, message);
+bool genuine = Ed25519.Verify(publicKey, message, signature);
+```
+
+This is pure Ed25519, the RFC's first variant: the message is signed as
+it is, with no context string and no prehash. A private key is the RFC's
+32-byte seed, a public key 32 bytes and a signature 64. Signing is
+deterministic, so the same key and message always give the same
+signature and no randomness is needed to sign.
+
+**Verification is strict and cofactorless.** A signature whose S is not
+below the group order is refused, as is a public key that is not the one
+canonical encoding of a point on the curve. The check is
+[S]B = R + [k]A, the equation RFC 8032 §5.1.7 names as sufficient, rather
+than the same multiplied through by the cofactor 8. The two differ only on
+a signature crafted with a component of small order, which no honest
+signer makes; a protocol that needs every implementation to agree on such
+signatures must specify one or the other.
+
+**Constant time where the data is secret.** Signing multiplies by a
+secret scalar with a fixed window read by mask, and reduces and combines
+scalars with fixed loops. Verification touches nothing secret and uses a
+faster variable-time multiplication.
+
+<sub>[stdlib/Security/Cryptography/Ed25519.sl:57](../../stdlib/Security/Cryptography/Ed25519.sl#L57)</sub>
+
+#### PrivateKeySize *constant*
+
+```
+const nuint PrivateKeySize = 32
+```
+
+The length of a private key: the RFC's seed.
+
+**Value** &nbsp; thirty-two bytes.
+
+<sub>[stdlib/Security/Cryptography/Ed25519.sl:62](../../stdlib/Security/Cryptography/Ed25519.sl#L62)</sub>
+
+#### PublicKeySize *constant*
+
+```
+const nuint PublicKeySize = 32
+```
+
+The length of a public key.
+
+**Value** &nbsp; thirty-two bytes.
+
+<sub>[stdlib/Security/Cryptography/Ed25519.sl:67](../../stdlib/Security/Cryptography/Ed25519.sl#L67)</sub>
+
+#### SignatureSize *constant*
+
+```
+const nuint SignatureSize = 64
+```
+
+The length of a signature: R, then S.
+
+**Value** &nbsp; sixty-four bytes.
+
+<sub>[stdlib/Security/Cryptography/Ed25519.sl:72](../../stdlib/Security/Cryptography/Ed25519.sl#L72)</sub>
+
+#### GeneratePrivateKey *method*
+
+```
+static byte[] GeneratePrivateKey()
+```
+
+A new private key: 32 bytes from `RandomNumberGenerator`.
+
+Aborts if the platform supplies no entropy, as
+`RandomNumberGenerator.GetBytes` does.
+
+<sub>[stdlib/Security/Cryptography/Ed25519.sl:78](../../stdlib/Security/Cryptography/Ed25519.sl#L78)</sub>
+
+#### GetPublicKey *method*
+
+```
+static Result<byte[], CryptoError> GetPublicKey(ReadOnlySpan<byte> privateKey)
+```
+
+The public key that goes with `privateKey`.
+
+**Parameters**
+
+- `privateKey` — the 32-byte seed
+
+**Fails with**
+
+- [CryptoError.KeyLength](#keylength-case) — `privateKey` is not `PrivateKeySize` long
+
+<sub>[stdlib/Security/Cryptography/Ed25519.sl:84](../../stdlib/Security/Cryptography/Ed25519.sl#L84)</sub>
+
+#### Sign *method*
+
+```
+static Result<byte[], CryptoError> Sign(ReadOnlySpan<byte> privateKey, ReadOnlySpan<byte> message)
+```
+
+The 64-byte signature of `message` under `privateKey`.
+
+**Parameters**
+
+- `privateKey` — the 32-byte seed
+- `message` — the bytes to sign, of any length
+
+**Fails with**
+
+- [CryptoError.KeyLength](#keylength-case) — `privateKey` is not `PrivateKeySize` long
+
+**See also** &nbsp; [Ed25519.Verify](#verify-method)
+
+<sub>[stdlib/Security/Cryptography/Ed25519.sl:104](../../stdlib/Security/Cryptography/Ed25519.sl#L104)</sub>
+
+#### Verify *method*
+
+```
+static bool Verify(ReadOnlySpan<byte> publicKey, ReadOnlySpan<byte> message, ReadOnlySpan<byte> signature)
+```
+
+Whether `signature` is `publicKey`'s signature of `message`.
+
+A key or signature of the wrong length answers false, as does a key
+that is not a canonical point encoding and a signature whose S is not
+below the group order. The equation checked is the cofactorless one;
+the type's own documentation says what that means.
+
+**Parameters**
+
+- `publicKey` — the signer's 32-byte key
+- `message` — the bytes that were signed
+- `signature` — the 64 bytes `Sign` produced
+
+**Returns** &nbsp; true only for a valid signature
+
+**See also** &nbsp; [Ed25519.Sign](#sign-method)
+
+<sub>[stdlib/Security/Cryptography/Ed25519.sl:154](../../stdlib/Security/Cryptography/Ed25519.sl#L154)</sub>
 
 ### HashAlgorithm *class*
 
@@ -2432,4 +2596,127 @@ static byte[] HashData(ReadOnlySpan<byte> data)
 The digest of `data`, with no object to keep.
 
 <sub>[stdlib/Security/Cryptography/Sha512.sl:42](../../stdlib/Security/Cryptography/Sha512.sl#L42)</sub>
+
+### X25519 *class*
+
+```
+class X25519
+```
+
+X25519 (RFC 7748): Diffie-Hellman over Curve25519, which is what TLS 1.3,
+SSH, WireGuard and Signal agree keys with.
+
+```csharp
+byte[] mine = X25519.GeneratePrivateKey();
+byte[] shared = try X25519.DeriveSharedSecret(mine, theirPublicKey);
+byte[] key = try Hkdf.DeriveKey(new Sha256(), shared, salt, info, 32u);
+```
+
+Every key is 32 bytes, and so is the shared secret. **The shared secret is
+not a key.** It is a point on a curve, not uniformly random bytes, and it
+MUST go through a key derivation such as `Hkdf` before it keys anything.
+
+.NET has no X25519; `ECDiffieHellman` there is over the NIST curves. The
+shape here is the RFC's: a private key is any 32 bytes, clamped as it is
+used, and a public key is the u-coordinate of a point.
+
+**Constant time.** The Montgomery ladder runs 255 steps whatever the key,
+and each step's swap is a mask rather than a branch. The only test on the
+result is the all-zero check, and what it reveals the failure reveals
+anyway.
+
+<sub>[stdlib/Security/Cryptography/X25519.sl:49](../../stdlib/Security/Cryptography/X25519.sl#L49)</sub>
+
+#### PrivateKeySize *constant*
+
+```
+const nuint PrivateKeySize = 32
+```
+
+The length of a private key.
+
+**Value** &nbsp; thirty-two bytes.
+
+<sub>[stdlib/Security/Cryptography/X25519.sl:54](../../stdlib/Security/Cryptography/X25519.sl#L54)</sub>
+
+#### PublicKeySize *constant*
+
+```
+const nuint PublicKeySize = 32
+```
+
+The length of a public key.
+
+**Value** &nbsp; thirty-two bytes.
+
+<sub>[stdlib/Security/Cryptography/X25519.sl:59](../../stdlib/Security/Cryptography/X25519.sl#L59)</sub>
+
+#### SharedSecretSize *constant*
+
+```
+const nuint SharedSecretSize = 32
+```
+
+The length of a shared secret.
+
+**Value** &nbsp; thirty-two bytes.
+
+<sub>[stdlib/Security/Cryptography/X25519.sl:64](../../stdlib/Security/Cryptography/X25519.sl#L64)</sub>
+
+#### GeneratePrivateKey *method*
+
+```
+static byte[] GeneratePrivateKey()
+```
+
+A new private key: 32 bytes from `RandomNumberGenerator`.
+
+Aborts if the platform supplies no entropy, as
+`RandomNumberGenerator.GetBytes` does.
+
+<sub>[stdlib/Security/Cryptography/X25519.sl:70](../../stdlib/Security/Cryptography/X25519.sl#L70)</sub>
+
+#### GetPublicKey *method*
+
+```
+static Result<byte[], CryptoError> GetPublicKey(ReadOnlySpan<byte> privateKey)
+```
+
+The public key that goes with `privateKey`: the private key times the
+base point, whose u-coordinate is 9.
+
+**Parameters**
+
+- `privateKey` — thirty-two bytes, clamped as they are used
+
+**Fails with**
+
+- [CryptoError.KeyLength](#keylength-case) — `privateKey` is not `PrivateKeySize` long
+
+<sub>[stdlib/Security/Cryptography/X25519.sl:77](../../stdlib/Security/Cryptography/X25519.sl#L77)</sub>
+
+#### DeriveSharedSecret *method*
+
+```
+static Result<byte[], CryptoError> DeriveSharedSecret(ReadOnlySpan<byte> privateKey, ReadOnlySpan<byte> publicKey)
+```
+
+The secret both sides arrive at: `privateKey` times the peer's public
+key.
+
+A public key of small order gives zero whatever the private key, which
+would let the peer choose the secret. RFC 7748 §6.1 has that checked,
+and it is refused here.
+
+**Parameters**
+
+- `privateKey` — this side's key
+- `publicKey` — the peer's key; its top bit is ignored, as the RFC requires
+
+**Fails with**
+
+- [CryptoError.KeyLength](#keylength-case) — either key is not 32 bytes
+- [CryptoError.InvalidKey](#invalidkey-case) — `publicKey` is of small order, and the secret came out zero
+
+<sub>[stdlib/Security/Cryptography/X25519.sl:100](../../stdlib/Security/Cryptography/X25519.sl#L100)</sub>
 
