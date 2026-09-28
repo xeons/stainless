@@ -155,6 +155,8 @@ What ships and how: threading, collections, environment, math, concurrency, I/O,
 - [5.13 `Standard.Security.Cryptography`](05-standard-library.md#513-standardsecuritycryptography)
 - [5.14 `Standard.Media.Audio`](05-standard-library.md#514-standardmediaaudio)
 - [5.15 `Standard.Formats.Asn1`](05-standard-library.md#515-standardformatsasn1)
+- [5.16 `Standard.Security.Cryptography.X509Certificates`](05-standard-library.md#516-standardsecuritycryptographyx509certificates)
+- [5.17 `Standard.Net.Security`](05-standard-library.md#517-standardnetsecurity)
 
 ### [6. Attributes and reflection](06-attributes-reflection.md)
 

@@ -33,6 +33,7 @@ One page per module. Each lists every public type, function, property, case and 
 | [Standard.Reflection](Standard-Reflection.md) | Reading the metadata the compiler laid down. |
 | [Standard.Resources](Standard-Resources.md) | What a program carries inside itself, on every platform. |
 | [Standard.Security.Cryptography](Standard-Security-Cryptography.md) | Hashes, message authentication codes, key derivation, block and stream |
+| [Standard.Security.Cryptography.X509Certificates](Standard-Security-Cryptography-X509Certificates.md) | X.509 certificates: reading them, checking a host name against one, |
 | [Standard.Text](Standard-Text.md) | The rest of `String`. |
 | [Standard.Threading](Standard-Threading.md) | Locks, atomics and the job pool. |
 | [Standard.Time](Standard-Time.md) | Time, of the two kinds that must not be confused. |

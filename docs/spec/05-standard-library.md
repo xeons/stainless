@@ -50,12 +50,13 @@ own for the linker to drop.
 | `Standard.Xml` | XML, in the same two layers ([§5.10](#510-standardjson-and-standardxml)) | on request |
 | `Standard.Resources` | what a `.rc` folded into the binary, read back on every platform ([§2.2 of packages.md](../packages.md#22-resources)) | on request |
 | `Standard.Net` | TCP and UDP sockets, the same on every platform | on request |
-| `Standard.Net.Security` | TLS 1.3, client and server, over any stream ([§5.16](#516-standardnetsecurity)) | on request |
+| `Standard.Net.Security` | TLS 1.3, client and server, over any stream ([§5.17](#517-standardnetsecurity)) | on request |
 | `Standard.Env` | the command line, the environment, the working directory | on request |
 | `Standard.Time` | `DateTimeOffset`, `TimeSpan`, `DateTime` and the monotonic `Stopwatch` | on request |
 | `Standard.Random` | xoshiro256**, seeded by you or by the operating system | on request |
 | `Standard.Drawing` | raster images: decode, draw, encode ([§5.12](#512-standarddrawing)) | on request |
 | `Standard.Security.Cryptography` | hashes, MACs, key derivation, AES, ChaCha20-Poly1305, X25519, Ed25519, ECDSA and ECDH, RSA, PEM ([§5.13](#513-standardsecuritycryptography)) | on request |
+| `Standard.Security.Cryptography.X509Certificates` | certificates, host names, chains, the root store, making certificates ([§5.16](#516-standardsecuritycryptographyx509certificates)) | on request |
 | `Standard.Formats.Asn1` | ASN.1 in BER and DER, read and written ([§5.15](#515-standardformatsasn1)) | on request |
 | `Standard.Media.Audio` | playing and recording sound ([§5.14](#514-standardmediaaudio)) | on request |
 | `Standard.Com` | `Guid` and `IUnknown`, for `com interface` ([§8.5](08-interop-libraries.md#85-com)) | on request |
@@ -1017,8 +1018,8 @@ message rather than failing. Verifying, encrypting and choosing primes are not,
 and need not be. `tests/cases/crypto-rsa` pins it against Wycheproof and
 against OpenSSL, byte for byte, and `x86-crypto-rsa` repeats it on 32-bit x86.
 
-**What is not there** is X.509 path validation; [TODO.md](../../TODO.md)
-carries the note.
+X.509 certificates, chains and the root store are the next module,
+[§5.16](#516-standardsecuritycryptographyx509certificates).
 
 ## 5.14 `Standard.Media.Audio`
 
@@ -1087,7 +1088,52 @@ their contents octets. Which identifier means what belongs to the format that
 uses it. `tests/cases/asn1` pins X.690's own examples, a refusal for every
 `AsnError`, and a walk of a certificate OpenSSL made.
 
-## 5.16 `Standard.Net.Security`
+## 5.16 `Standard.Security.Cryptography.X509Certificates`
+
+```csharp
+var leaf = try X509Certificate2.FromPem(pem);
+var chain = new X509Chain();
+chain.ChainPolicy.ExtraStore.AddRange(intermediates);
+chain.ChainPolicy.ApplicationPolicy.Add(X509EnhancedKeyUsageExtension.ServerAuthenticationOid);
+bool trusted = chain.Build(leaf) && leaf.MatchesHostname("www.example.com");
+```
+
+**The shape is .NET's**, with a `Result` where .NET throws, and every
+failure a `CryptoError`: a certificate that does not parse is `Encoding`
+whatever was wrong with it. A chain that does not validate is not a failure
+of the call; `Build` answers `false` and `StatusFlags` says why, in .NET's
+`X509ChainStatusFlags`.
+
+**Reading is strict and complete.** The DER is held to the letter and every
+extension the module knows is decoded as the certificate is read, so a
+malformed key usage is a certificate that does not parse rather than a
+surprise later. What browsers tolerate is tolerated: serial numbers of up to
+20 octets that are zero or negative, an explicit `critical FALSE`, a
+`PrintableString` holding `*` or `@`.
+
+**Host names never fall back to the common name**, which no current browser
+does. A wildcard is the whole left-most label, stands for one label, and needs
+two after it; an address matches only an address entry, as bytes.
+
+**A chain is built, not just checked.** Every issuer whose name and key
+identifier fit is tried in turn, anchors first, so a cross-signed
+intermediate or a second CA of the same name is found when the first leads
+nowhere. Along the chosen path it checks validity at the policy's time,
+every signature, basic constraints and path length, key usage and extended
+key usage, name constraints over the leaf's DNS and IP names, and critical
+extensions it does not understand. There is no revocation: asking for it
+fails the chain with `RevocationStatusUnknown` rather than passing silently.
+
+`X509Store.Open(StoreName.Root)` is crypt32's store on Windows, loaded by
+name so that no program links it, and the system PEM bundle elsewhere; each
+is read once per process. `CertificateRequest` makes certificates signed by
+Ed25519, ECDSA or RSA through an `X509SignatureGenerator`.
+`tests/cases/x509` pins every field, thumbprint and host name against
+OpenSSL's reading of a small PKI and of Let's Encrypt's roots and
+intermediates, a status flag for each broken chain, and certificates made
+here that OpenSSL verifies.
+
+## 5.17 `Standard.Net.Security`
 
 ```csharp
 var options = new TlsClientOptions();

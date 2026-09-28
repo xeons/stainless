@@ -570,8 +570,6 @@ Wycheproof and OpenSSL. What is left on that side:
 - **A precomputed table for the generator.** Signing and key generation
   multiply the base point, which never changes, and a fixed table of its
   multiples would make them roughly four times faster.
-- **X.509 path validation.** Verifying one certificate's signature is here;
-  names, validity, key usage and chains are not.
 
 **RSA is done**: `Rsa` generates keys, signs and verifies with PKCS #1 v1.5
 and PSS, encrypts with OAEP and PKCS #1 v1.5 (decrypting the latter with
@@ -589,6 +587,25 @@ What is left on the RSA side:
   does, would take that away at the cost of a lock. A dedicated squaring saves
   about a quarter of each exponentiation, and 32-bit limbs on a 32-bit target
   would spare x86, now at twice x64's time, its emulated 64-bit products.
+
+**X.509 is done**: `Standard.Security.Cryptography.X509Certificates` reads
+certificates strictly, matches host names by RFC 6125, builds and validates
+chains through cross-signed and alternative issuers, reads the platform's
+roots, and makes certificates signed by any of the three key types, pinned by
+`tests/cases/x509` against OpenSSL's reading of the same files. What is left:
+
+- **Revocation.** No CRL is fetched or read and no OCSP responder is asked,
+  and neither is OCSP stapling looked at; a chain asked for revocation says it
+  could not check. CRLite-style pushed revocation would suit a library with
+  no network cache better than either.
+- **Policies.** Certificate policies are read past and never required, so
+  `policyConstraints`, `policyMappings` and `inhibitAnyPolicy` are unsupported
+  when critical, as RFC 5280 then requires.
+- **Name constraints beyond DNS and IP.** Directory-name, e-mail and URI
+  subtrees are read and not enforced, and only the leaf's alternative names
+  are checked against them.
+- **PKCS #10 and PKCS #12.** `CertificateRequest` makes certificates and not
+  signing requests, and there is no reading of a `.pfx`.
 
 ### Case mapping beyond ASCII
 

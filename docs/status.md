@@ -697,7 +697,17 @@ last person to edit it -- the suite is the authority.
   rejection), and keys in PKCS #1, PKCS #8, X.509 and PEM, over a
   constant-time Montgomery bignum with a blinded, fault-checked CRT private
   operation — 3 ms to sign with a 2048-bit key on x64, 0.05 ms to verify.
-  Not X.509 certificates.
+- `Standard.Security.Cryptography.X509Certificates`: X.509 in .NET's shape.
+  `X509Certificate2` reads DER and PEM strictly by RFC 5280, with the
+  leniencies browsers have, and decodes basic constraints, key usage,
+  extended key usage, alternative names, key identifiers and name constraints
+  as it reads; `MatchesHostname` follows RFC 6125 and the CA/Browser Forum,
+  with no fall-back to the common name. `X509Chain` builds through
+  alternatives and cross-signs and checks validity, signatures (Ed25519,
+  ECDSA, RSA PKCS #1 v1.5 and PSS), basic constraints and path length, key
+  usages and name constraints. `X509Store` reads crypt32's stores on Windows,
+  loaded by name, and the system bundle elsewhere. `CertificateRequest` makes
+  certificates OpenSSL accepts. No revocation.
   `PemEncoding` finds RFC 7468 blocks in surrounding text and writes them
 - `Standard.Formats.Asn1`: BER and DER in `System.Formats.Asn1`'s shape, with
   a `Result` where .NET throws. `AsnReader` covers every type X.509 uses —
@@ -706,7 +716,7 @@ last person to edit it -- the suite is the authority.
   DER to its one encoding; `AsnWriter` writes DER and sorts a SET OF. Times are
   seconds in a `long`, since a `GeneralizedTime` outlives `DateTimeOffset`.
   Indefinite lengths and constructed strings are refused. The foundation for
-  X.509, which is not written yet, and for TLS's certificate handling
+  X.509 and for TLS's certificate handling
 - `Standard.Net.Security`: TLS 1.3 (RFC 8446), client and server, in
   Stainless over any `IStream`, in `System.Net.Security`'s shape: `TlsStream`
   is `SslStream`, and `TlsSocket` owns its TCP connection too. All three AEAD

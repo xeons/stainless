@@ -102,8 +102,8 @@ generation's search, which throws away candidates as soon as they fail and
 so reveals only things about numbers it does not keep; and exporting a
 private key, since DER writes each number in the fewest bytes it takes.
 
-X.509 is `Standard.Formats.Asn1` and a signature check, which is
-enough to verify a certificate and not yet a path validator.
+Certificates, chains and the platform's roots are
+`Standard.Security.Cryptography.X509Certificates`.
 
 ## Contents
 
