@@ -1,0 +1,185 @@
+good version ok
+good serial ok
+good serial bytes ok
+good signature algorithm ok
+good subject ok
+good issuer ok
+good not before ok
+good not after ok
+good not before as DateTimeOffset ok
+good thumbprint ok
+good sha-256 thumbprint ok
+good sha-512 hash ok
+good subject steps ok
+good subject first type ok
+good subject first value ok
+good subject encoded first ok
+good organization ok
+good no email ok
+good key algorithm ok
+good key ok
+good key is not RSA ok
+good extensions ok
+good extension order ok
+good basic constraints ok
+good key usage ok
+good extended key usage ok
+good subject key identifier ok
+good authority key identifier ok
+good alternative names ok
+good extension by identifier ok
+good from der ok
+good raw data ok
+good pem round trip ok
+good is not self-issued ok
+intermediate path length ok
+intermediate key usage ok
+root name quotes a comma ok
+root is self-issued ok
+issuer names compare ok
+ip addresses ok
+ip v4 ok
+ip v6 ok
+ip uri ok
+ip email ok
+ip dns ok
+nc critical ok
+nc permitted dns ok
+nc permitted ip ok
+nc excluded dns ok
+nc excluded ip ok
+unknown extension kept ok
+rsa signature algorithm ok
+rsa key algorithm ok
+rsa modulus ok
+rsa exponent ok
+rsa thumbprint ok
+rsa key size ok
+rsa-pss signature algorithm ok
+rsa-pss thumbprint ok
+p-256 signature algorithm ok
+p-256 curve ok
+p-256 point ok
+p-256 key ok
+p-256 thumbprint ok
+isrg x1 subject ok
+isrg x1 serial ok
+isrg x1 thumbprint ok
+isrg x1 sha-256 ok
+isrg x1 4096-bit ok
+isrg x2 thumbprint ok
+isrg x2 curve ok
+e6 subject ok
+e6 thumbprint ok
+e6 extensions ok
+r10 thumbprint ok
+r10 sha-256 ok
+bundle added ok
+bundle count ok
+bundle round trip ok
+bundle refuses a bad block ok
+refuses empty ok
+refuses truncated ok
+refuses trailing data ok
+refuses a signature algorithm that differs ok
+version is where it is expected ok
+refuses version 4 ok
+refuses pem with no certificate block ok
+host 'www.example.com' matches ok
+host 'example.com' matches ok
+host 'WWW.Example.COM' matches ok
+host 'www.example.com.' matches ok
+host 'other.example.com' refused ok
+host 'www.example.com.evil' refused ok
+host 'wwww.example.com' refused ok
+host '' refused ok
+host '.' refused ok
+host 'www..example.com' refused ok
+host '*.example.com' refused ok
+host 'www.example.com..' refused ok
+host 'foo.example.com' matches ok
+host 'FOO.EXAMPLE.COM.' matches ok
+host 'b.a.example.com' matches ok
+host 'example.com' refused ok
+host 'a.b.example.com' refused ok
+host '.example.com' refused ok
+host '*.example.com' refused ok
+host wildcard refused when wildcards are not allowed ok
+host '192.0.2.1' matches ok
+host '2001:db8::1' matches ok
+host '[2001:db8::1]' matches ok
+host '2001:DB8:0:0:0:0:0:1' matches ok
+host '2001:0db8::0:1' matches ok
+host 'ip.example.com' matches ok
+host '192.0.2.2' refused ok
+host '192.0.2.01' refused ok
+host '192.0.2' refused ok
+host '192.0.2.1.' refused ok
+host '::ffff:192.0.2.1' refused ok
+host '2001:db8::1::' refused ok
+host '2001:db8:::1' refused ok
+host '[2001:db8::1' refused ok
+host '198.51.100.7' matches ok
+host '198.51.100.8' refused ok
+host 'Stainless Test Root' refused ok
+chain good ok: NoError
+chain expired ok: NotTimeValid
+chain not yet valid ok: NotTimeValid
+chain wrong extended key usage ok: NotValidForUsage
+chain key usage without a signature ok: NotValidForUsage
+chain wildcard ok: NoError
+chain ip ok: NoError
+chain unknown critical extension ok: InvalidExtension, HasNotSupportedCriticalExtension
+chain issuer that is not a CA ok: InvalidBasicConstraints
+chain path length exceeded ok: InvalidBasicConstraints
+chain issuer without certificate signing ok: NotValidForUsage
+chain name constraints met ok: NoError
+chain name not permitted ok: HasNotPermittedNameConstraint
+chain name excluded ok: HasExcludedNameConstraint
+chain address not permitted ok: HasNotPermittedNameConstraint
+chain wildcard over an excluded name ok: HasExcludedNameConstraint
+chain cross-signed ok: NoError
+chain no intermediate ok: PartialChain
+chain untrusted root ok: UntrustedRoot
+chain anchor is the leaf ok: NoError
+chain intermediate as anchor ok: NoError
+chain cyclic ok: Cyclic, PartialChain
+chain tampered signature ok
+chain rsa ok: NoError
+chain rsa-pss ok: NoError
+chain p-256 ok: NoError
+chain isrg x1 to r10 ok: NoError
+chain isrg x2 to e6 ok: NoError
+elements run leaf to root ok
+only the leaf is out of time ok
+chain status names the flag ok
+client leaf with no policy ok
+client leaf for a client ok
+revocation asked for ok
+everything expired ok
+minted authority subject ok
+minted authority is self-issued ok
+minted authority serial length ok
+minted leaf serial ok
+minted leaf issuer ok
+minted leaf not after ok
+minted leaf algorithm ok
+minted leaf extensions ok
+minted leaf names ok
+minted key identifiers agree ok
+minted chain ok
+minted leaf reads back ok
+minted leaf outside the constraints ok
+minted ecdsa algorithm ok
+minted ecdsa chain ok
+minted rsa-pss algorithm ok
+minted rsa-pss chain ok
+minted rsa algorithm ok
+minted rsa chain ok
+request with no private key refuses to self-sign ok
+request refuses an issuer that is not a CA ok
+request refuses the wrong issuer key ok
+request refuses validity past the issuer's ok
+request refuses a zero serial number ok
+request with an extension twice does not read back ok
+name builder refuses a three-letter country ok

@@ -1,0 +1,5 @@
+more than 20 roots: true
+every root reads back: true
+most roots are self-issued: true
+opened twice, the same: true
+intermediates open: true
