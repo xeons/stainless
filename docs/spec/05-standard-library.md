@@ -50,6 +50,7 @@ own for the linker to drop.
 | `Standard.Xml` | XML, in the same two layers ([§5.10](#510-standardjson-and-standardxml)) | on request |
 | `Standard.Resources` | what a `.rc` folded into the binary, read back on every platform ([§2.2 of packages.md](../packages.md#22-resources)) | on request |
 | `Standard.Net` | TCP and UDP sockets, the same on every platform | on request |
+| `Standard.Net.Security` | TLS 1.3, client and server, over any stream ([§5.16](#516-standardnetsecurity)) | on request |
 | `Standard.Env` | the command line, the environment, the working directory | on request |
 | `Standard.Time` | `DateTimeOffset`, `TimeSpan`, `DateTime` and the monotonic `Stopwatch` | on request |
 | `Standard.Random` | xoshiro256**, seeded by you or by the operating system | on request |
@@ -1085,6 +1086,49 @@ Object identifiers are dotted strings, and `Oid` converts them to and from
 their contents octets. Which identifier means what belongs to the format that
 uses it. `tests/cases/asn1` pins X.690's own examples, a refusal for every
 `AsnError`, and a walk of a certificate OpenSSL made.
+
+## 5.16 `Standard.Net.Security`
+
+```csharp
+var options = new TlsClientOptions();
+options.TargetHost = "example.com";
+options.CertificateValidator = PinnedLeaf;
+var tls = try TlsSocket.Connect("example.com", 443u, options);
+
+var server = new TlsServerOptions();
+server.CertificateChain.Add(leafDer);
+server.PrivateKey = try TlsSigningKey.ImportFromPem(keyPem);
+var accepted = try TlsStream.AuthenticateAsServer(tcpClient, server);
+```
+
+TLS 1.3 (RFC 8446), client and server, written in Stainless over the
+cryptography module. **The shape is `System.Net.Security`'s**: `TlsStream` is
+`SslStream`, an `IStream` over another, and `AuthenticateAsClient` and
+`AuthenticateAsServer` are static methods that answer a
+`Result<TlsStream, TlsError>` where .NET throws. `TlsSocket` owns the TCP
+connection as well. Each `TlsError` is also the alert sent to the peer, and a
+failure the peer found arrives as `AlertReceived`, with its
+`TlsAlertDescription` beside it.
+
+All three AEAD suites, X25519, P-256 and P-384 with a HelloRetryRequest when
+the client's guess was wrong, and certificates on Ed25519, ECDSA and RSA-PSS
+keys, for a client as well as a server. ALPN, server_name, KeyUpdate and the
+exporter are there; session tickets are read and handed to a handler, and
+nothing offers one back yet. **Not TLS 1.2**, which `TlsProtocolVersion`
+names so that options can ask for it already, and **never 0-RTT**.
+
+**Trust is the program's.** A `TlsCertificateValidator` is given the peer's
+chain and the name asked for, and answers `TlsError.None` or the refusal to
+send. There is no X.509 path validation yet, so the default validator refuses
+everything rather than trusting anything; a program pins the certificate it
+expects. The CertificateVerify signature against the leaf is checked here
+whatever the validator says.
+
+`tests/cases/tls13-rfc8448` replays RFC 8448's 1-RTT trace against both
+halves: the client writes the trace's records byte for byte and verifies its
+RSA-PSS signature, and the server writes the trace's ServerHello and a flight
+the trace's keys open. `tls13-handshake` runs every suite, group and key over
+the loopback, and `tls13-refusals` pins the alert for each refusal.
 
 ---
 

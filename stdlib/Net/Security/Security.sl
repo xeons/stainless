@@ -21,7 +21,57 @@
 
 /// TLS 1.3, client and server, in Stainless and over any stream.
 ///
-/// DRAFT
+/// ```csharp
+/// var options = new TlsClientOptions();
+/// options.CertificateValidator = PinnedLeaf;
+/// options.ApplicationProtocols.Add("http/1.1");
+/// var tls = try TlsSocket.Connect("example.com", 443u, options);
+/// tls.Write(request, 0u, request.Length);
+///
+/// var server = new TlsServerOptions();
+/// server.CertificateChain.Add(leafDer);
+/// server.PrivateKey = try TlsSigningKey.ImportFromPem(keyPem);
+/// var accepted = try TlsSocket.Accept(listener, server);
+/// ```
+///
+/// **The shape is `System.Net.Security`'s.** `TlsStream` is `SslStream`: an
+/// `IStream` over another `IStream`, so it runs over a `TcpClient`, a proxy's
+/// tunnel or anything else that carries bytes in order. It is made by
+/// `AuthenticateAsClient` or `AuthenticateAsServer`, which return a `Result`
+/// where .NET throws. `TlsSocket` owns its TCP connection as well, for the
+/// common case.
+///
+/// **What is implemented** is RFC 8446 whole, less resumption: the three
+/// AEAD suites; key exchange over X25519, P-256 and P-384, with a
+/// HelloRetryRequest when the client guessed the wrong group; certificates
+/// signed with Ed25519, ECDSA on P-256 or P-384, or RSA-PSS, on either side;
+/// ALPN, server_name, KeyUpdate in both directions, the exporter, and the
+/// middlebox compatibility mode. Session tickets are read and handed to
+/// `TlsClientOptions.SessionTicketReceived`, and nothing yet offers one back.
+///
+/// **What is not:** TLS 1.2, which `TlsProtocolVersion.Tls12` names so that
+/// options can already ask for it; resumption; a server that issues tickets;
+/// and 0-RTT data, which is never coming, since it is replayable by design.
+///
+/// **Certificates are judged by a `TlsCertificateValidator`**, a closure the
+/// options carry. The default refuses every chain, because X.509 path
+/// validation is not in the library yet and a default that trusted anything
+/// would be worse than none; a program pins the certificate it expects, or
+/// supplies its own policy. The validator decides whom to trust; the
+/// CertificateVerify signature against the leaf's key is always checked here.
+///
+/// **The record layer is constant time where a secret is involved.** The
+/// AEADs check their tags in constant time, and the padding of a TLS 1.3
+/// record is stripped by a scan over the whole record that selects by mask,
+/// so how much of a record was padding does not show in how long it took.
+/// Finished values are compared with `FixedTimeEquals`.
+///
+/// **Blocking, one reader and one writer.** A read blocks until a record of
+/// application data arrives, and one thread MAY read while another writes;
+/// every record written goes under one lock, because a read can write too:
+/// the alert that ends a connection it found at fault. The KeyUpdate a peer
+/// asks for is sent before the next application data written, as RFC 8446
+/// §4.6.3 allows, so a reader that never writes never answers one.
 module Standard.Net.Security;
 
 import Standard.Collections;

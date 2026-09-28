@@ -706,7 +706,20 @@ last person to edit it -- the suite is the authority.
   DER to its one encoding; `AsnWriter` writes DER and sorts a SET OF. Times are
   seconds in a `long`, since a `GeneralizedTime` outlives `DateTimeOffset`.
   Indefinite lengths and constructed strings are refused. The foundation for
-  X.509 and TLS, neither of which is written
+  X.509, which is not written yet, and for TLS's certificate handling
+- `Standard.Net.Security`: TLS 1.3 (RFC 8446), client and server, in
+  Stainless over any `IStream`, in `System.Net.Security`'s shape: `TlsStream`
+  is `SslStream`, and `TlsSocket` owns its TCP connection too. All three AEAD
+  suites; X25519, P-256 and P-384, with a HelloRetryRequest when the client
+  guessed wrong; certificates on Ed25519, ECDSA or RSA-PSS keys, a client's
+  as well as a server's; ALPN, server_name, KeyUpdate, the exporter, and the
+  middlebox compatibility mode. RFC 8448's 1-RTT trace is replayed against
+  both halves byte for byte, and both have been run against OpenSSL 3.5 in
+  every suite, group and key type. Over the loopback, with both ends in one
+  process, ChaCha20-Poly1305 moves about 340 MB/s and AES-GCM about 130.
+  Certificates are judged by a validator the program supplies, because X.509
+  path validation is not written, and the default one refuses everything.
+  Not TLS 1.2, not resumption, and never 0-RTT
 - `Standard.Media.Audio`: playing and recording interleaved PCM, and reading and
   writing WAV. WASAPI on Windows and ALSA elsewhere, both reached by name at the
   first device rather than linked, so a machine with neither answers
@@ -1046,12 +1059,14 @@ Being straight about the edges, roughly in the order they are worth adding:
   (SL0486, SL0491). The first is the same question a union cannot answer; the
   second is because C decays an array parameter to a pointer and Stainless has
   no decay, so `ref T[N]` is the spelling that lines up.
-- **Sockets are blocking, and there is no TLS.** `Standard.Net` has one
+- **Sockets are blocking.** `Standard.Net` has one
   socket's worth of waiting — `WaitToRead`, `WaitToWrite` and a non-blocking
   mode — and nothing that waits on many at once, so a server that holds a
   thousand connections wants a thread each. There is no `select` or `epoll`
-  over a set, no async, and nothing encrypted: a program that needs TLS reaches
-  for the platform's own through `extern "C"`. `Socket.Connect` on a socket
+  over a set, and no async; `Standard.Net.Security`'s TLS is blocking in the
+  same way. **TLS is 1.3 only, and trusts nothing by default**: there is no
+  TLS 1.2, no resumption, and no X.509 path validation, so a client pins its
+  server's certificate or supplies a validator of its own. `Socket.Connect` on a socket
   that is already open tries one address rather than all of them, because a
   socket whose connect failed cannot be reused and that one is already made —
   `Socket.OpenConnected(host, port, ...)` is the form that tries each.
