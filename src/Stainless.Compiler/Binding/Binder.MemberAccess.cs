@@ -199,6 +199,16 @@ public sealed partial class Binder
             if (importedModule.Statics.TryGetValue(syntax.Member, out var shared) && shared.IsPublic)
                 return new BoundStaticAccess(syntax.Span, shared);
 
+            // `Env.GetEnvironmentVariable` as a value: a group, as the bare name
+            // would be, until a conversion says which delegate it becomes.
+            var functions = importedModule.Functions
+                .Where(f => f.Name == syntax.Member && f.ContainingType is null &&
+                            (f.IsPublic || ReferenceEquals(importedModule, _currentModule)))
+                .ToList();
+            if (functions.Count > 0)
+                return new BoundFunctionGroup(syntax.Span, FunctionGroupType.Instance,
+                    $"{importedModule.Name}.{syntax.Member}", functions);
+
             diagnostics.Error("SL0246", syntax.Span,
                 $"module '{importedModule.Name}' has no public member named '{syntax.Member}'");
             return new BoundErrorExpression(syntax.Span);

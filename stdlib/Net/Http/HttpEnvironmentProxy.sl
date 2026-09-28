@@ -61,7 +61,7 @@ public sealed class HttpEnvironmentProxy : IWebProxy
     /// The proxy this process's environment names, or null when it names
     /// none.
     public static IWebProxy? FromEnvironment() =>
-        FromEnvironment((String name) => GetEnvironmentVariable(name));
+        FromEnvironment(Env.GetEnvironmentVariable);
 
     /// The proxy the variables `read` answers name, or null when they name
     /// none.

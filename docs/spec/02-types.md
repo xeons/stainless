@@ -2499,6 +2499,10 @@ double Pick(double value) => value + 1.0;
 Transform picked = Pick;      // the int one
 ```
 
+A function of another module is named the same way with its module in front,
+`Transform t = Numbers.Double;`, whether or not the module is imported; only a
+public one is reached from outside it.
+
 `null` is a delegate's null function pointer, and compares as you would expect:
 
 ```csharp
