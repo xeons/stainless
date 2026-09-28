@@ -1389,7 +1389,7 @@ bool Equals(ECCurve other)
 
 Whether both name the same curve.
 
-<sub>[stdlib/Security/Cryptography/ECCurve.sl:116](../../stdlib/Security/Cryptography/ECCurve.sl#L116)</sub>
+<sub>[stdlib/Security/Cryptography/ECCurve.sl:117](../../stdlib/Security/Cryptography/ECCurve.sl#L117)</sub>
 
 ### ECCurve.NamedCurves *class*
 
