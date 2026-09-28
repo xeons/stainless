@@ -1,0 +1,21 @@
+Sun, 06 Nov 1994 08:49:37 GMT
+Sat, 28 Feb 2026 23:05:09 GMT
+Thu, 01 Jan 1970 00:00:00 GMT
+"Sun, 06 Nov 1994 08:49:37 GMT" -> 1994-11-06T08:49:37Z
+"Sunday, 06-Nov-94 08:49:37 GMT" -> 1994-11-06T08:49:37Z
+"Sun Nov  6 08:49:37 1994" -> 1994-11-06T08:49:37Z
+"Sun Nov 16 08:49:37 1994" -> 1994-11-16T08:49:37Z
+"Thursday, 01-Jan-70 00:00:00 GMT" -> 1970-01-01T00:00:00Z
+"Friday, 31-Dec-69 23:59:59 GMT" -> 2069-12-31T23:59:59Z
+"Fri, 04 Jul 2031 12:00:01 GMT" -> 2031-07-04T12:00:01Z
+"" -> Malformed
+"Sun, 06 Nov 1994 08:49:37 UTC" -> Malformed
+"Sun, 06 nov 1994 08:49:37 GMT" -> Malformed
+"Xyz, 06 Nov 1994 08:49:37 GMT" -> Malformed
+"Sun, 6 Nov 1994 08:49:37 GMT" -> Malformed
+"Sun, 31 Feb 1994 08:49:37 GMT" -> OutOfRange
+"Sun, 06 Nov 1994 24:00:00 GMT" -> OutOfRange
+"Sun, 06 Nov 1994 08-49-37 GMT" -> Malformed
+"Someday, 06-Nov-94 08:49:37 GMT" -> Malformed
+"Sunday, 06-Nov-1994 08:49:37 GMT" -> Malformed
+"Sun Nov 6 08:49:37 1994" -> Malformed

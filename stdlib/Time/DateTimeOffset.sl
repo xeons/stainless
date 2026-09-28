@@ -152,6 +152,27 @@ public struct DateTimeOffset
         return ParseIso8601(text);
     }
 
+    /// RFC 9110's HTTP-date, the IMF-fixdate form every sender writes:
+    /// `Sun, 06 Nov 1994 08:49:37 GMT`.
+    ///
+    /// @see DateTimeOffset.ParseHttpDate
+    public String FormatHttpDate() => FormatHttpDateText(this);
+
+    /// An HTTP-date back to an instant, in any of the three forms RFC 9110
+    /// requires a recipient to read: IMF-fixdate, the obsolete RFC 850 form
+    /// `Sunday, 06-Nov-94 08:49:37 GMT`, and C's asctime,
+    /// `Sun Nov  6 08:49:37 1994`.
+    ///
+    /// Strict about the shape, as `ParseIso` is: a month's name in the wrong
+    /// case, a zone other than `GMT`, or a missing field is refused. The day's
+    /// name is checked for being one, not for being the right one.
+    ///
+    /// @failure TimeError.Malformed   none of the three shapes
+    /// @failure TimeError.OutOfRange  the right shape, and no real moment
+    /// @see DateTimeOffset.FormatHttpDate
+    public static Result<DateTimeOffset, TimeError> ParseHttpDate(String text) =>
+        ParseHttpDateText(text);
+
     /// How far ahead of UTC the local zone was at this instant. Negative west
     /// of Greenwich.
     public TimeSpan Offset =>

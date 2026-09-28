@@ -278,3 +278,192 @@ int ParseDigits(String text, nuint start, nuint count)
     }
     return value;
 }
+
+// ------------------------------------------------------------ HTTP-date
+
+/// The three-letter name HTTP-dates use for a `DayOfWeek`, Sunday being 0.
+String GetHttpDayName(int dayOfWeek)
+{
+    switch (dayOfWeek)
+    {
+        case 0: return "Sun";
+        case 1: return "Mon";
+        case 2: return "Tue";
+        case 3: return "Wed";
+        case 4: return "Thu";
+        case 5: return "Fri";
+        default: return "Sat";
+    }
+}
+
+String GetHttpMonthName(int month)
+{
+    switch (month)
+    {
+        case 1: return "Jan";
+        case 2: return "Feb";
+        case 3: return "Mar";
+        case 4: return "Apr";
+        case 5: return "May";
+        case 6: return "Jun";
+        case 7: return "Jul";
+        case 8: return "Aug";
+        case 9: return "Sep";
+        case 10: return "Oct";
+        case 11: return "Nov";
+        default: return "Dec";
+    }
+}
+
+/// The month the three letters at `start` name, 1 to 12, or -1. Case
+/// matters, as RFC 9110's grammar writes them.
+int ParseHttpMonthName(String text, nuint start)
+{
+    switch (text.Substring(start, 3u))
+    {
+        case "Jan": return 1;
+        case "Feb": return 2;
+        case "Mar": return 3;
+        case "Apr": return 4;
+        case "May": return 5;
+        case "Jun": return 6;
+        case "Jul": return 7;
+        case "Aug": return 8;
+        case "Sep": return 9;
+        case "Oct": return 10;
+        case "Nov": return 11;
+        case "Dec": return 12;
+    }
+    return -1;
+}
+
+bool IsHttpDayName(String name)
+{
+    switch (name)
+    {
+        case "Mon":
+        case "Tue":
+        case "Wed":
+        case "Thu":
+        case "Fri":
+        case "Sat":
+        case "Sun":
+            return true;
+    }
+    return false;
+}
+
+bool IsHttpLongDayName(String name)
+{
+    switch (name)
+    {
+        case "Monday":
+        case "Tuesday":
+        case "Wednesday":
+        case "Thursday":
+        case "Friday":
+        case "Saturday":
+        case "Sunday":
+            return true;
+    }
+    return false;
+}
+
+/// RFC 9110's IMF-fixdate: `Sun, 06 Nov 1994 08:49:37 GMT`.
+String FormatHttpDateText(DateTimeOffset at)
+{
+    var when = at.UtcDateTime;
+    var text = new StringBuilder();
+    text.Append(GetHttpDayName(when.DayOfWeek));
+    text.Append(", ");
+    text.Append(PadNumber((long)when.Day, 2u));
+    text.Append(" ");
+    text.Append(GetHttpMonthName(when.Month));
+    text.Append(" ");
+    text.Append(PadNumber((long)when.Year, 4u));
+    text.Append(" ");
+    text.Append(PadNumber((long)when.Hour, 2u));
+    text.Append(":");
+    text.Append(PadNumber((long)when.Minute, 2u));
+    text.Append(":");
+    text.Append(PadNumber((long)when.Second, 2u));
+    text.Append(" GMT");
+    return text.ToText();
+}
+
+/// Any of RFC 9110's three HTTP-date forms: IMF-fixdate, RFC 850's, and
+/// asctime's.
+Result<DateTimeOffset, TimeError> ParseHttpDateText(String text)
+{
+    nuint length = text.ByteLength();
+    if (length == 29u && text.GetByteAt(3u) == (byte)',')
+        return ParseImfFixdate(text);
+    if (length == 24u && text.GetByteAt(3u) == (byte)' ')
+        return ParseAsctimeDate(text);
+
+    long comma = text.IndexOf(',');
+    if (comma > 0 && IsHttpLongDayName(text.Substring(0u, (nuint)comma)))
+        return ParseRfc850Date(text, (nuint)comma);
+    return Fail(TimeError.Malformed);
+}
+
+/// `Sun, 06 Nov 1994 08:49:37 GMT`.
+Result<DateTimeOffset, TimeError> ParseImfFixdate(String text)
+{
+    if (!IsHttpDayName(text.Substring(0u, 3u)) || text.GetByteAt(4u) != (byte)' ' ||
+        text.GetByteAt(7u) != (byte)' ' || text.GetByteAt(11u) != (byte)' ' ||
+        text.GetByteAt(16u) != (byte)' ' || text.Substring(25u) != " GMT")
+        return Fail(TimeError.Malformed);
+
+    int day = ParseDigits(text, 5u, 2u);
+    int month = ParseHttpMonthName(text, 8u);
+    int year = ParseDigits(text, 12u, 4u);
+    return BuildHttpDate(year, month, day, text, 17u);
+}
+
+/// `Sunday, 06-Nov-94 08:49:37 GMT`. A two-digit year from 70 is in the
+/// 1900s, and one below it in the 2000s.
+Result<DateTimeOffset, TimeError> ParseRfc850Date(String text, nuint comma)
+{
+    nuint at = comma + 1u;
+    if (text.ByteLength() != at + 23u || text.GetByteAt(at) != (byte)' ' ||
+        text.GetByteAt(at + 3u) != (byte)'-' || text.GetByteAt(at + 7u) != (byte)'-' ||
+        text.GetByteAt(at + 10u) != (byte)' ' || text.Substring(at + 19u) != " GMT")
+        return Fail(TimeError.Malformed);
+
+    int day = ParseDigits(text, at + 1u, 2u);
+    int month = ParseHttpMonthName(text, at + 4u);
+    int year = ParseDigits(text, at + 8u, 2u);
+    if (year >= 0)
+        year += year >= 70 ? 1900 : 2000;
+    return BuildHttpDate(year, month, day, text, at + 11u);
+}
+
+/// `Sun Nov  6 08:49:37 1994`, the day padded with a space.
+Result<DateTimeOffset, TimeError> ParseAsctimeDate(String text)
+{
+    if (!IsHttpDayName(text.Substring(0u, 3u)) || text.GetByteAt(7u) != (byte)' ' ||
+        text.GetByteAt(10u) != (byte)' ' || text.GetByteAt(19u) != (byte)' ')
+        return Fail(TimeError.Malformed);
+
+    int day = text.GetByteAt(8u) == (byte)' ' ? ParseDigits(text, 9u, 1u) : ParseDigits(text, 8u, 2u);
+    int month = ParseHttpMonthName(text, 4u);
+    int year = ParseDigits(text, 20u, 4u);
+    return BuildHttpDate(year, month, day, text, 11u);
+}
+
+/// The instant of a date and the `HH:MM:SS` at `timeAt` in `text`.
+Result<DateTimeOffset, TimeError> BuildHttpDate(int year, int month, int day, String text,
+                                                nuint timeAt)
+{
+    if (text.GetByteAt(timeAt + 2u) != (byte)':' || text.GetByteAt(timeAt + 5u) != (byte)':')
+        return Fail(TimeError.Malformed);
+    int hour = ParseDigits(text, timeAt, 2u);
+    int minute = ParseDigits(text, timeAt + 3u, 2u);
+    int second = ParseDigits(text, timeAt + 6u, 2u);
+    if (year < 0 || month < 0 || day < 0 || hour < 0 || minute < 0 || second < 0)
+        return Fail(TimeError.Malformed);
+    if (day < 1 || day > DaysInMonth(year, month) || hour > 23 || minute > 59 || second > 60)
+        return Fail(TimeError.OutOfRange);
+    return Ok(DateTimeOffset.FromUtc(year, month, day, hour, minute, second));
+}
