@@ -357,12 +357,11 @@ The prototype that made the survey in §8 was switched by
   fields' types, which the metadata carries for layout, so a consumer decides it
   without the source. A library's templates are instantiated by the consumer,
   who is told at the instantiation.
-- **Reflection.** `CreateInstance` and `CreateArrayInto` make zeroed objects
-  and arrays through `byte*`, and their documentation already says the result is
-  not a value of its type until filled. They stay as they are: they are pointer
-  APIs, whose obligations are the caller's, and `Json.PopulateObject` fills in
-  place instead. A deserializer target that `Json` makes from nothing wants its
-  never-null fields `required`, which `Json` MUST then fill or fail.
+- **Reflection.** `CreateInstance` and `CreateArrayInto` made zeroed objects
+  and arrays through `byte*`. They were changed rather than left: see §12.
+  A deserializer target that `Json` makes from nothing wants its never-null
+  fields set by its constructor or `required`, which `Json` MUST then fill or
+  fail.
 - **`[Embed]`.** A `byte[]` the linker makes, never null.
 - **Events.** Their storage is an array the allocation fills and the compiler
   grows; it is exempt, and never holds an empty slot.
@@ -420,3 +419,26 @@ from it:
   rather than naming a "none" curve.
 - **`Json` array fields that may be absent** are `T[]?`; the element columns of
   a field's metadata look through the optional, which they had not.
+- **Reflection did not stay as it was.** §10 had left `CreateInstance` and
+  `CreateArrayInto` making zeroed storage, as pointer APIs whose obligations
+  were the caller's; that left `Json` handing out objects with nulls in their
+  never-null fields, patched only for `String`. Two shapes were weighed. One
+  filled each never-null field with an empty value — `""`, an empty array, a
+  nested struct recursively — and refused a type with a class, interface or
+  closure field it could not fill; it was rejected because it invents values
+  a `required` member exists to refuse, and cannot fill the one kind of field
+  a deserializer most needs to. The other, taken, makes an object only by
+  running the constructor `new T()` would, through a `create` function the
+  compiler puts in a reflected class's `TypeInfo`; what that constructor leaves
+  — `required` members, a new array's elements — is written by a `fill`
+  callback and checked, from new `SL_FIELD_NO_ZERO`, `SL_FIELD_REQUIRED` and
+  `SL_FIELD_ELEMENT_NO_ZERO` bits in the field table, before anything is handed
+  out. There is no longer any way to make a zeroed object. `Json` builds on it
+  and fails with `MissingMember` rather than storing an incomplete object.
+- **A static read through a call was not ordered.** `static String A = F();`
+  with `F` reading a later static read its zero; the sort now follows calls,
+  constructors, closures and delegates through every body, and a static that
+  reaches itself that way is SL0378 as one naming itself is.
+- **An activated com class could leave a `required` member null**, since a
+  class factory writes no initializer. It is SL0611 unless the empty
+  constructor is `[SetsRequiredMembers]`.

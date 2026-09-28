@@ -310,10 +310,17 @@ public sealed partial class Binder
     /// </summary>
     private void OrderStatics()
     {
-        foreach (var (symbol, _) in _staticSyntax)
-            CollectStaticDependencies(symbol, symbol.Initializer);
+        var bodies = new Dictionary<FunctionSymbol, BoundBlock>();
+        foreach (var function in _functions)
+            bodies.TryAdd(function.Symbol, function.Body);
+        var methods = _functions
+            .Where(f => f.Symbol.ContainingType is not null)
+            .ToLookup(f => f.Symbol.ContainingType!, f => f.Symbol);
 
-        _initialization = SortInitialization();
+        foreach (var (symbol, _) in _staticSyntax)
+            CollectStaticDependencies(symbol, symbol.Initializer, bodies, methods);
+
+        _initialization = SortInitialization(bodies, methods);
         _staticOrder = _initialization
             .Select(step => step.Static)
             .OfType<StaticSymbol>()
@@ -375,12 +382,19 @@ public sealed partial class Binder
         scope.Module.Functions.Add(symbol);
     }
 
-    private static void CollectStaticDependencies(StaticSymbol owner, BoundExpression? expression)
+    private static void CollectStaticDependencies(
+        StaticSymbol owner, BoundExpression? expression,
+        IReadOnlyDictionary<FunctionSymbol, BoundBlock> bodies,
+        ILookup<NamedTypeSymbol, FunctionSymbol> methods)
     {
-        var walker = new StaticReferenceWalker();
+        var walker = new StaticReferenceWalker(bodies, methods);
         walker.Visit(expression);
 
         foreach (var referenced in walker.Found)
+            if (!owner.DependsOn.Contains(referenced))
+                owner.DependsOn.Add(referenced);
+
+        foreach (var referenced in walker.FoundLater)
             if (referenced != owner && !owner.DependsOn.Contains(referenced))
                 owner.DependsOn.Add(referenced);
     }
@@ -390,7 +404,9 @@ public sealed partial class Binder
     /// before what it reads. A cycle is reported here rather than left to
     /// produce a zero at run time.
     /// </summary>
-    private List<StaticInitialization> SortInitialization()
+    private List<StaticInitialization> SortInitialization(
+        IReadOnlyDictionary<FunctionSymbol, BoundBlock> bodies,
+        ILookup<NamedTypeSymbol, FunctionSymbol> methods)
     {
         var ordered = new List<StaticInitialization>();
         var done = new HashSet<object>();
@@ -400,7 +416,7 @@ public sealed partial class Binder
             .Where(f => f.Symbol.Kind == FunctionKind.StaticConstructor)
             .ToDictionary(f => f.Symbol, f =>
             {
-                var walker = new StaticReferenceWalker();
+                var walker = new StaticReferenceWalker(bodies, methods);
                 walker.Visit(f.Body);
                 return walker.Found;
             });

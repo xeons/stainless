@@ -429,27 +429,83 @@ public abstract class BoundTreeWalker
         new($"the bound tree walker has no case for {node.GetType().Name}", span);
 }
 
-/// <summary>Finds the statics an initializer reads, so they can be ordered first.</summary>
-internal sealed class StaticReferenceWalker : BoundTreeWalker
+/// <summary>
+/// Finds the statics an initializer reads, so they can be ordered first.
+///
+/// Given the program's bodies, it reads through what the initializer calls or
+/// constructs, since a static read there is read before the initializer
+/// finishes as surely as one written in it. A virtual call is followed to the
+/// body it names, not to its overrides.
+///
+/// A closure or delegate the initializer makes may run then or much later, so
+/// what it reads is kept apart in <see cref="FoundLater"/>: ordered first
+/// where it is another static, and not a cycle where it is the static itself,
+/// which a window procedure naming the slot that holds it is.
+/// </summary>
+internal sealed class StaticReferenceWalker(
+    IReadOnlyDictionary<FunctionSymbol, BoundBlock>? bodies = null,
+    ILookup<NamedTypeSymbol, FunctionSymbol>? methods = null) : BoundTreeWalker
 {
+    private readonly HashSet<FunctionSymbol> _followed = [];
+    private readonly HashSet<FunctionSymbol> _followedLater = [];
+    private bool _later;
+
+    /// <summary>The statics read before the initializer finishes.</summary>
     public HashSet<StaticSymbol> Found { get; } = [];
+
+    /// <summary>The statics read by a closure or delegate it makes.</summary>
+    public HashSet<StaticSymbol> FoundLater { get; } = [];
 
     public override void Visit(BoundExpression? expression)
     {
         switch (expression)
         {
             case BoundStaticAccess access:
-                Found.Add(access.Static);
+                Record(access.Static);
                 break;
 
             // A static automatic property's getter reads its storage, so
             // reading the property is reading the static.
             case BoundCall { Function.Accessor.StaticBacking: { } storage }:
-                Found.Add(storage);
+                Record(storage);
+                break;
+
+            case BoundCall call:
+                Follow(call.Function, _later);
+                break;
+
+            case BoundNew { Constructor: { } constructor }:
+                Follow(constructor, _later);
+                break;
+
+            case BoundFunctionReference reference:
+                Follow(reference.Function, later: true);
+                break;
+
+            case BoundClosureCreate created:
+                Follow(created.Function, later: true);
+                break;
+
+            case BoundClosure closure when methods is not null:
+                foreach (var method in methods[closure.ClosureType])
+                    Follow(method, later: true);
                 break;
         }
 
         base.Visit(expression);
+    }
+
+    private void Record(StaticSymbol read) => (_later ? FoundLater : Found).Add(read);
+
+    private void Follow(FunctionSymbol function, bool later)
+    {
+        if (bodies is null || !(later ? _followedLater : _followed).Add(function)) return;
+        if (!bodies.TryGetValue(function, out var body)) return;
+
+        bool outer = _later;
+        _later = later;
+        Visit(body);
+        _later = outer;
     }
 }
 

@@ -550,7 +550,18 @@ C++ cannot do this and calls the result a fiasco. Swift avoids it by making
 every static lazy and paying a guard check on every access — a check that has to
 become atomic the moment threads exist. Stainless compiles the whole program at
 once, so it simply reads the dependency graph: no guard, no per-access cost, and
-a **compile error** on a cycle rather than a zero at run time.
+a **compile error** on a cycle rather than a zero at run time (SL0378).
+
+**A static read through a call counts.** The graph follows what an initializer
+calls or constructs through every body the program has, so
+`static String A = Describe();` runs after whatever `Describe` reads — and an
+initializer that reaches its own static that way is the same cycle as one
+naming it. A closure or delegate the initializer makes is followed too, and
+what it reads is ordered first, but reaching the static itself that way is not
+a cycle: a window procedure stored in the slot it later reads runs long after
+the slot is filled. A virtual call is followed to the body it names, not to its
+overrides. The walk cannot know which branch a call will take, so a read on a
+path that never runs during initialization still orders, or still refuses.
 
 A `readonly` static's reference is made immortal as it is stored, so it is
 never destroyed and never has its count touched again. A mutable one is counted

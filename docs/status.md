@@ -95,7 +95,14 @@ last person to edit it -- the suite is the authority.
   does storage a property only fills with `field ??=`. Generic bodies are judged
   per instantiation. `Array.Create` and `Array.Repeat` make an array whole, and
   `Standard.Unchecked`'s `NewUninitializedArray` and `ClearElement` are the
-  collections' storage, compiling to what `new T[n]` and `default(T)` did
+  collections' storage, compiling to what `new T[n]` and `default(T)` did.
+  Reflection holds to it: `CreateInstance` runs the constructor `new T()`
+  would, a `required` member or a new array's elements are filled through a
+  `fill` that is checked before anything is handed out, and a writer refuses a
+  null for a field whose type has no zero value. A com class a factory can
+  activate may not leave a `required` member to it (SL0611), and a static read
+  through a call in another static's initializer is ordered, or is a cycle
+  (SL0378), like one read directly
 - `T[]?` and `Notify?`: an array reference and a closure that may be absent,
   narrowed by a check as `C?` is. The array is `C?`'s one pointer; the closure
   is its own two words with a null function word, compared with `null` as both,
@@ -789,9 +796,13 @@ last person to edit it -- the suite is the authority.
   `PopulateObject` writes them. Reading fills an object the program made rather than
   allocating one, so a constructor has established the type's invariants before
   a single field is overwritten, and a field the document does not mention keeps
-  what the constructor chose. Arrays and collections are left out of the
-  mapping: the field tables record that a field is an array and nothing about
-  its elements, so a type holding one wants the document layer
+  what the constructor chose. A nested object or array element the reader does
+  make is made by its constructor and stored only once every `required` member
+  was in the document and nothing that may not be null is: otherwise the call
+  fails with `JsonError.MissingMember` and what was made is released.
+  Collections are left out of the mapping: a `List<T>` is filled through `Add`,
+  which nothing in reflection can call, so a type holding one wants the
+  document layer
 - `Optional<T>`, a variant in `Standard`: a value or none, for the types `T?`
   cannot describe. `C?` is a nullable reference and costs nothing, but a value
   type has no spare bit to be null with — so `nuint?` is refused and this is
@@ -1044,7 +1055,10 @@ Being straight about the edges, roughly in the order they are worth adding:
   what writing an automatic property's storage silently skips.
   `Field.IsPropertyStorage` is how the two are told apart. `FindType` looks
   a `[Reflect]` type up by its qualified name, so a document can say which type
-  it wants where `typeof` cannot. **Methods and interfaces carry no metadata.**
+  it wants where `typeof` cannot, and `CreateInstance` makes one as `new` would.
+  Each field records whether its type has a zero value and whether it is
+  `required`, which is what lets reflection refuse a null and check what it
+  makes. **Methods and interfaces carry no metadata.**
   That is what stops a serializer filling a `List<T>`: its storage is private
   and the way in is `Add`, which nothing here can call. An array is described
   and does round-trip.

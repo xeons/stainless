@@ -1,0 +1,2 @@
+# a static that reaches itself through a call
+SL0378
