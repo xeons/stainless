@@ -73,6 +73,50 @@ public struct Field
     /// @see Type.FindProperty
     public bool IsPropertyStorage => (sl_field_flags(Handle) & 1u) != 0u;
 
+    /// True when zero bytes are a value of the field's type (§2.16).
+    ///
+    /// False for a `String`, a class, an interface, an array or a closure that
+    /// is never null, and for a struct holding one. Reflection never leaves
+    /// such a field zero: `WriteAggregate` refuses a null for it, and an
+    /// object it makes has it written by the constructor or checked before it
+    /// is handed out.
+    ///
+    /// @see IsNullable
+    public bool HasZeroValue => (sl_field_flags(Handle) & 2u) == 0u;
+
+    /// True for a reference that may hold null: a `String?`, `C?`, `I?` or
+    /// `T[]?`. False for one that is never null, and for anything that is not
+    /// a reference.
+    public bool IsNullable
+    {
+        get
+        {
+            switch (Kind)
+            {
+                case KindString:
+                case KindClass:
+                case KindInterface:
+                case KindArray:
+                    return HasZeroValue;
+                default:
+                    return false;
+            }
+        }
+    }
+
+    /// True when whoever makes an instance MUST give this field a value: it is
+    /// `required`, or is the storage of a `required` property, and the
+    /// constructor `CreateInstance` runs is not `[SetsRequiredMembers]`.
+    ///
+    /// Only a required field whose type has no zero value can be checked, by
+    /// asking whether it is null. One of a value type is the maker's word.
+    public bool IsRequired => (sl_field_flags(Handle) & 4u) != 0u;
+
+    /// True for an array field whose elements have a zero value, so an array
+    /// made for it by `CreateArrayInto` is complete before anything is written.
+    /// True for a field that is not an array.
+    public bool ElementHasZeroValue => (sl_field_flags(Handle) & 8u) == 0u;
+
     /// True when an attribute of this name is written on the field.
     public bool HasAttribute(String name)
     {

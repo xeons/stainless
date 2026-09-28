@@ -62,4 +62,15 @@ public enum JsonError
 
     /// A type with no field tables to map onto.
     NotReflected,
+
+    /// Something the reader made -- a nested object, or an array and its
+    /// elements -- lacks a value its type cannot do without: a `required`
+    /// member the document does not give a value of its type, or a member or
+    /// element whose type is never null that nothing filled. What was made is
+    /// discarded.
+    MissingMember,
+
+    /// The document needs an object made, and its type has no public
+    /// parameterless constructor to make it with.
+    NotCreatable,
 }

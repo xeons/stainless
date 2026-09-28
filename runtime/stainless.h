@@ -162,6 +162,22 @@ typedef struct SlFieldInfo {
 #define SL_FIELD_PROPERTY 1u
 
 /*
+ * Zero bytes in this field are not a value of its type (§2.16): a reference
+ * that is never null, or an aggregate holding one. Reflection MUST NOT leave
+ * such a field zero, nor write a null into it.
+ */
+#define SL_FIELD_NO_ZERO 2u
+
+/*
+ * Whoever makes an instance MUST give this field a value: it is `required`,
+ * and the constructor the type's `create` runs does not set it.
+ */
+#define SL_FIELD_REQUIRED 4u
+
+/* An array field whose elements' zero bytes are not a value of their type. */
+#define SL_FIELD_ELEMENT_NO_ZERO 8u
+
+/*
  * A property, which is a pair of functions rather than a place.
  *
  * This exists because writing a field is not the same as setting a property.
@@ -187,11 +203,14 @@ typedef struct SlPropertyInfo {
     const void        *setter;      /* NULL for a read-only one */
     size_t             attributeCount;
     const SlAttribute *attributes;
-    uint32_t           flags;       /* SL_PROPERTY_PUBLIC */
+    uint32_t           flags;       /* SL_PROPERTY_* */
 } SlPropertyInfo;
 
 /* A property anything can reach, rather than its class and module only. */
 #define SL_PROPERTY_PUBLIC 1u
+
+/* A property whose type has no zero value, so its setter MUST NOT get null. */
+#define SL_PROPERTY_NO_ZERO 2u
 
 /*
  * An enum, described for reflection: its members' names and values, and the
@@ -271,6 +290,14 @@ struct SlTypeInfo {
     const SlEnumInfo       *enumeration;
     size_t                  eventCount;
     const SlEventInfo      *events;
+
+    /*
+     * For a reflected class that `new C()` could make, a function making one
+     * the same way: allocated, events given their empty lists, the public
+     * parameterless constructor run. NULL for everything else. It is the only
+     * way reflection makes an object, so one it makes is a value of its type.
+     */
+    void             *(*create)(void);
 };
 
 typedef struct SlObject {
@@ -855,8 +882,21 @@ SL_API void sl_write_text(void *instance, const void *field,
                           const void *bytes, size_t length);
 SL_API void sl_write_reference(void *instance, const void *field, void *value);
 
-/* SL_FIELD_* -- whether this field is an automatic property's storage. */
+/* SL_FIELD_* -- property storage, no zero value, required. */
 SL_API uint32_t sl_field_flags(const void *field);
+
+/*
+ * Whether an instance made by `create` holds a value in every field its
+ * constructor left to the maker: each SL_FIELD_REQUIRED field whose type has
+ * no zero value. And whether an array's element does, which nothing
+ * constructed. Inline structs are walked; a field this cannot see inside --
+ * a closure, a tuple, a struct with no metadata -- is not complete.
+ */
+SL_API _Bool sl_type_is_complete(const void *type, const void *instance);
+SL_API _Bool sl_field_element_is_complete(const void *field, const void *address);
+
+/* Stores a reference at an address, retaining it and releasing what was there. */
+SL_API void  sl_write_at_reference(void *address, void *value);
 
 /* ---------------------------------------------------------- properties */
 
@@ -943,8 +983,12 @@ SL_API void sl_types_register(SlTypeBlock *block);
  */
 SL_API const void *sl_type_find(const char *name);
 
-/* Allocates a zeroed instance of a reflected type, for a deserializer. */
-SL_API void *sl_type_make(const void *type);
+/*
+ * A new instance through the type's `create`, as `new C()` would make it; NULL
+ * for a type that has none. There is no way to make a zeroed one.
+ */
+SL_API void *sl_type_create(const void *type);
+SL_API _Bool sl_type_can_create(const void *type);
 
 /* ---------------------------------------------------------------- Console */
 

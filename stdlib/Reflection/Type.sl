@@ -74,6 +74,12 @@ public struct Type
     /// field answers false.
     public bool Exists => Handle != null;
 
+    /// True when `CreateInstance` can make one: a reflected class that is not
+    /// abstract, with a public parameterless constructor or none at all.
+    ///
+    /// @see CreateInstance
+    public bool CanCreateInstance => sl_type_can_create(Handle);
+
     /// The field of that name, or a handle of null. Names are compared whole,
     /// so a serializer looking up what a document named does one pass.
     public Field FindField(String name)

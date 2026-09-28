@@ -48,10 +48,12 @@ public sealed record ModuleMetadata
     public bool SharedRuntime { get; init; }
 
     /// <summary>
-    /// Bumped whenever the shape below changes. A consumer refuses a version it
-    /// does not know rather than reading fields that have moved.
+    /// Bumped whenever the shape below changes, or the shape of the runtime
+    /// tables the library's binary holds: a TypeInfo read past its end is a
+    /// pointer nobody wrote. A consumer refuses a version it does not know
+    /// rather than reading fields that have moved.
     /// </summary>
-    public const int CurrentVersion = 4;
+    public const int CurrentVersion = 5;
 
     public int Version { get; init; } = CurrentVersion;
 

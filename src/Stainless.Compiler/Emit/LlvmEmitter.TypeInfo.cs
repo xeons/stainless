@@ -167,7 +167,8 @@ public sealed partial class LlvmEmitter
                 $"{{ {Word} {classType.InstanceSize}, ptr @{DestroyName(classType)}, " +
                 $"ptr {nameConstant}, ptr {tables}, {Metadata(classType, ClassTypeSymbol.HeaderSize)}, " +
                 $"ptr {baseInfo}, ptr {vtable}, ptr {comLayout}, " +
-                $"{PropertyTable(classType)}, ptr null, {EventTable(classType)} }}");
+                $"{PropertyTable(classType)}, ptr null, {EventTable(classType)}, " +
+                $"ptr {ReflectedMaker(classType)} }}");
         }
 
         PatchBasesAtStartup(patched);
@@ -182,7 +183,8 @@ public sealed partial class LlvmEmitter
                 $"@{ArrayTypeInfoName(arrayType)} = internal constant %SlTypeInfo " +
                 $"{{ {Word} {ArrayTypeSymbol.HeaderSize}, ptr @{ArrayDestroyName(arrayType)}, " +
                 $"ptr {nameConstant}, ptr null, {Word} 0, ptr null, {Word} 0, ptr null, " +
-                $"ptr null, ptr null, ptr null, {Word} 0, ptr null, ptr null, {Word} 0, ptr null }}");
+                $"ptr null, ptr null, ptr null, {Word} 0, ptr null, ptr null, {Word} 0, ptr null, " +
+                "ptr null }");
         }
 
         foreach (var structType in program.Modules
@@ -197,7 +199,7 @@ public sealed partial class LlvmEmitter
                 $"@{StructTypeInfoName(structType)} = internal constant %SlTypeInfo " +
                 $"{{ {Word} {structType.Size}, ptr null, ptr {nameConstant}, ptr null, " +
                 $"{Metadata(structType, 0)}, ptr null, ptr null, ptr null, " +
-                $"{PropertyTable(structType)}, ptr null, {Word} 0, ptr null }}");
+                $"{PropertyTable(structType)}, ptr null, {Word} 0, ptr null, ptr null }}");
         }
 
         if (program.Classes.Count > 0 || program.Arrays.Count > 0) _module.AppendLine();
@@ -317,15 +319,11 @@ public sealed partial class LlvmEmitter
             // appended: building a row emits its own attribute tables, and
             // StringBuilder's interpolation handler appends as it goes, so a
             // lazy sequence here would nest one constant inside another.
+            var required = RequiredOfMaker(type);
             var rows = reflected.Select(field =>
             {
                 string attributes = AttributeTable(field.Attributes);
-
-                // SL_FIELD_PROPERTY. An automatic property's storage is a
-                // field named after the property, so this is the only thing
-                // telling a walk over the table that writing it would go
-                // straight past the setter.
-                int flags = field.IsBackingField ? 1 : 0;
+                int flags = FieldFlags(field, required.Contains(field));
 
                 return $"%SlFieldInfo {{ ptr {InternBytes(field.Name)}, " +
                        $"{Word} {fieldBase + field.Offset}, i32 {(int)KindOf(field.Type)}, " +
@@ -343,6 +341,141 @@ public sealed partial class LlvmEmitter
 
         return $"{Word} {reflected.Count}, ptr {fields}, {typeAttributes}";
     }
+
+    /// <summary>
+    /// The SL_FIELD_* bits of one row of a field table.
+    ///
+    /// SL_FIELD_PROPERTY: an automatic property's storage is a field named
+    /// after the property, so this is the only thing telling a walk over the
+    /// table that writing it would go straight past the setter.
+    /// SL_FIELD_NO_ZERO and SL_FIELD_ELEMENT_NO_ZERO: zero bytes there are not
+    /// a value of the type (§2.16), so reflection MUST NOT leave them zero.
+    /// Storage a property fills on first use may start empty, so it has a zero.
+    /// SL_FIELD_REQUIRED: the maker of an instance MUST supply it.
+    /// </summary>
+    private static int FieldFlags(FieldSymbol field, bool required)
+    {
+        int flags = field.IsBackingField ? 1 : 0;
+        if (!field.IsFilledOnFirstUse && !ZeroValues.HasZeroValue(field.Type))
+            flags |= 2;
+        if (required)
+            flags |= 4;
+        if ((field.Type.NonNullForm() ?? field.Type) is ArrayTypeSymbol array &&
+            !ZeroValues.HasZeroValue(array.Element))
+            flags |= 8;
+        return flags;
+    }
+
+    /// <summary>
+    /// The fields whoever makes an instance of <paramref name="type"/> has to
+    /// give a value: each <c>required</c> field or property's storage, bases
+    /// included. None when the constructor <see cref="ReflectedMaker"/> runs is
+    /// <c>[SetsRequiredMembers]</c>, which answers for all of them. A struct is
+    /// made zeroed, with no constructor, so all of its are.
+    /// </summary>
+    private static HashSet<FieldSymbol> RequiredOfMaker(NamedTypeSymbol type)
+    {
+        if (type is ClassTypeSymbol made &&
+            FindMakerConstructor(made, out var constructor) &&
+            constructor?.SetsRequiredMembers == true)
+            return [];
+
+        var levels = type is ClassTypeSymbol classType
+            ? classType.SelfAndBases().Cast<NamedTypeSymbol>().ToList()
+            : [type];
+
+        var required = new HashSet<FieldSymbol>();
+        foreach (var level in levels)
+        {
+            required.UnionWith(level.Fields.Where(f => f.IsRequired));
+            required.UnionWith(level.Properties
+                .Where(p => p.IsRequired && p.BackingField is not null)
+                .Select(p => p.BackingField!));
+        }
+        return required;
+    }
+
+    /// <summary>
+    /// Whether <c>new C()</c> could make one, and the constructor it would run.
+    ///
+    /// The public parameterless constructor, or, for a class that declares
+    /// none, its nearest base's, as <c>new</c> itself chooses. False for an
+    /// abstract class, a com class (its class factory makes those), a class the
+    /// runtime builds, and one whose constructors all take arguments or are
+    /// its module's own. <paramref name="constructor"/> is null where there is
+    /// none to run at all.
+    /// </summary>
+    private static bool FindMakerConstructor(ClassTypeSymbol type, out FunctionSymbol? constructor)
+    {
+        constructor = null;
+        if (type.IsAbstract || type.IsCom || type.RuntimeFactory is not null)
+            return false;
+
+        for (var level = type; level is not null; level = level.BaseClass)
+        {
+            if (level.Constructors.Count == 0)
+                continue;
+
+            constructor = level.Constructors
+                .FirstOrDefault(c => !c.IsVariadic && !c.Parameters.Any(p => !p.IsThis));
+            return constructor is { IsPublic: true };
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// The TypeInfo's <c>create</c>: a function making an instance of a
+    /// reflected class as <c>new C()</c> does, or null where it could not.
+    ///
+    /// It is what <c>Reflection.CreateInstance</c> calls, so an object made by
+    /// reflection has had its constructor run and its events given their empty
+    /// lists, and is a value of its type rather than zeroed memory: §2.16 holds
+    /// for it as for any other. Only a reflected class has one, because only a
+    /// reflected class can be found by name.
+    /// </summary>
+    private string ReflectedMaker(ClassTypeSymbol classType)
+    {
+        if (!classType.IsReflected || !FindMakerConstructor(classType, out var constructor))
+            return "null";
+
+        string name = "@_SLmake_" + Mangler.SymbolSafe(classType.QualifiedName);
+        var body = new StringBuilder();
+        body.AppendLine();
+        body.AppendLine($"define internal ptr {name}(){FrameAttributes} {{");
+        body.AppendLine("entry:");
+        body.AppendLine(
+            $"  %object = call ptr @sl_alloc(ptr @{Mangler.TypeInfoSymbol(classType)})");
+
+        // As InitializeEvents does for `new`: an event's list is never null.
+        int slot = 0;
+        for (var level = classType; level is not null; level = level.BaseClass)
+            foreach (var declared in level.Events)
+            {
+                if (declared.BackingField is not { } field) continue;
+                if (field.Type is not ArrayTypeSymbol arrayType) continue;
+
+                body.AppendLine(
+                    $"  %event{slot} = call ptr @sl_array_alloc(" +
+                    $"ptr @{ArrayTypeInfoName(arrayType)}, {Word} 0, " +
+                    $"{Word} {arrayType.Element.Size})");
+                body.AppendLine(
+                    $"  %eventat{slot} = getelementptr inbounds i8, ptr %object, " +
+                    $"i64 {ClassTypeSymbol.HeaderSize + field.Offset}");
+                body.AppendLine($"  store ptr %event{slot}, ptr %eventat{slot}");
+                slot++;
+            }
+
+        if (constructor is not null)
+            body.AppendLine($"  call void {Symbol(constructor)}(ptr %object)");
+
+        body.AppendLine("  ret ptr %object");
+        body.AppendLine("}");
+        _makers.Append(body);
+        return name;
+    }
+
+    private readonly StringBuilder _makers = new();
 
     /// <summary>
     /// The property table's count-and-pointer pair, or a zero pair.
@@ -402,7 +535,11 @@ public sealed partial class LlvmEmitter
 
             // SL_PROPERTY_PUBLIC, so a tool listing what a caller can set --
             // a form designer's grid -- can leave out what a caller cannot.
+            // SL_PROPERTY_NO_ZERO, so a setter is never handed a null its type
+            // refuses.
             int flags = property.IsPublic ? 1 : 0;
+            if (!ZeroValues.HasZeroValue(property.Type))
+                flags |= 2;
 
             return $"%SlPropertyInfo {{ ptr {InternBytes(property.Name)}, " +
                    $"i32 {(int)KindOf(property.Type)}, ptr {NestedTypeInfo(property.Type)}, " +
@@ -553,7 +690,7 @@ public sealed partial class LlvmEmitter
         _metadata.AppendLine(
             $"{info} = internal constant %SlTypeInfo {{ {Word} {type.Size}, ptr null, " +
             $"ptr {name}, ptr null, {Word} 0, ptr null, {attributes}, ptr null, ptr null, " +
-            $"ptr null, {Word} 0, ptr null, ptr {members}, {Word} 0, ptr null }}");
+            $"ptr null, {Word} 0, ptr null, ptr {members}, {Word} 0, ptr null, ptr null }}");
         return info;
     }
 

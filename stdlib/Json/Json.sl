@@ -37,6 +37,16 @@
 /// instance the program made, and there is no `Deserialize<T>` that makes one:
 /// the caller writes `new T()` itself, where the constructor it wants is in
 /// reach.
+///
+/// **What it makes inside that object, it makes as `new` would.** A nested
+/// object the document describes and the field lacks, and each object element
+/// of an array it allocates, is made by `Reflection.CreateInstance`, which
+/// runs the type's public parameterless constructor. The document then fills
+/// it, and it is stored only if it is complete: every `required` member named
+/// by the document with a value of its type, and nothing whose type has no
+/// zero value left null. Otherwise the whole call fails with
+/// `JsonError.MissingMember`, and what was made is released rather than left
+/// reachable.
 module Standard.Json;
 
 import Standard.Collections;
@@ -59,6 +69,8 @@ public String DescribeJsonError(JsonError error)
         case JsonError.TooDeep: return "nested too deeply";
         case JsonError.NotAnObject: return "the document is not an object";
         case JsonError.NotReflected: return "the type carries no field metadata";
+        case JsonError.MissingMember: return "a member the type cannot do without is missing";
+        case JsonError.NotCreatable: return "an object the document needs cannot be made";
         default: return "unknown error";
     }
 }
@@ -951,10 +963,10 @@ public attribute JsonIgnore { }
 /// field is null.
 ///
 /// Off by default, and opt-in per field rather than per call, because the type
-/// is what knows whether it is safe. An object made this way is **zeroed**:
-/// every reference in it starts null, and only the document fills them. Mark a
-/// field with this when the document is what decides whether the object is
-/// there, and leave it alone when the constructor already made one.
+/// is what knows whether the document may decide the object is there. It is
+/// made as `new T()` would make it and then filled, so its type needs a
+/// public parameterless constructor. A `required` field needs no mark: the
+/// document MUST supply it, so it is always made.
 public attribute JsonCreate { }
 
 /// The document a value would produce, as a `JsonValue`.
@@ -1065,6 +1077,9 @@ JsonValue BuildFieldValue(byte* instance, Field field)
 {
     int kind = field.Kind;
 
+    if (Reflection.IsFieldNull(instance, field))
+        return JsonValue.Null;
+
     if (kind == KindString)
         return JsonValue.Text(Reflection.ReadText(instance, field));
     if (kind == KindBool)
@@ -1104,7 +1119,11 @@ JsonValue BuildArrayValue(byte* instance, Field field)
     {
         byte* at = Reflection.GetElementAddress(array, field, i);
 
-        if (kind == KindString)
+        if (Reflection.IsElementNull(at, field))
+        {
+            items.Add(JsonValue.Null);
+        }
+        else if (kind == KindString)
         {
             items.Add(JsonValue.Text(Reflection.ReadTextAt(at)));
         }
@@ -1134,12 +1153,18 @@ JsonValue BuildArrayValue(byte* instance, Field field)
 /// The object is the program's, made the ordinary way, so its constructor has
 /// already run and its invariants already hold. A field the document does not
 /// mention is left alone, which is what makes this safe: the value that stays
-/// is the one the constructor chose.
+/// is the one the constructor chose. A member of the wrong type is skipped the
+/// same way, and a `null` clears a field whose type allows one.
 ///
 /// A nested object is filled in place and never replaced, for the same reason.
-/// A document naming a nested object the constructor left null is skipped
-/// rather than allocated into, since nothing here could give the rest of that
-/// object's fields a value.
+/// A document naming a nested object the constructor left null is skipped,
+/// unless the field is `[JsonCreate]` or `required`; then the object is made
+/// as `new` would make it, filled, and stored only once it is complete.
+///
+/// **A failure part-way leaves what was already written.** Every field the
+/// object holds is still a value of its type, but not every one the document
+/// named has been read. Nothing the call made and could not complete is
+/// reachable from it.
 ///
 /// @typeparam T  a `[Reflect]` type, whose field tables say what there is to fill
 /// @failure JsonError.Unexpected        a character that cannot start what is expected, or an
@@ -1155,6 +1180,9 @@ JsonValue BuildArrayValue(byte* instance, Field field)
 /// @failure JsonError.TrailingContent   a second value after the first
 /// @failure JsonError.NotAnObject       the document is not an object
 /// @failure JsonError.NotReflected      `T` carries no field tables
+/// @failure JsonError.MissingMember     something made here lacks a value its type needs
+/// @failure JsonError.NotCreatable      the document needs an object of a type with no
+///                                      public parameterless constructor
 /// @see Json.Serialize
 public JsonError PopulateObject<T>(T value, String text)
 {
@@ -1167,9 +1195,15 @@ public JsonError PopulateObject<T>(T value, String text)
 
 /// The same, from a document already parsed.
 ///
+/// `required` members of `value` itself are not asked for: the `new` that
+/// made it was refused unless it gave them values.
+///
 /// @typeparam T  a `[Reflect]` type, whose field tables say what there is to fill
-/// @failure JsonError.NotAnObject   the document is not an object
-/// @failure JsonError.NotReflected  `T` carries no field tables
+/// @failure JsonError.NotAnObject    the document is not an object
+/// @failure JsonError.NotReflected   `T` carries no field tables
+/// @failure JsonError.MissingMember  something made here lacks a value its type needs
+/// @failure JsonError.NotCreatable   the document needs an object of a type with no
+///                                   public parameterless constructor
 /// @see Json.Serialize
 public JsonError PopulateObject<T>(T value, JsonValue document)
 {
@@ -1180,86 +1214,154 @@ public JsonError PopulateObject<T>(T value, JsonValue document)
     if (!document.Object)
         return JsonError.NotAnObject;
 
-    FillInstance((byte*)value, type, document.Members);
-    return JsonError.None;
+    var filling = new Filling();
+    FillInstance((byte*)value, type, document.Members, false, filling);
+    return filling.Failure;
 }
 
-void FillInstance(byte* instance, Type type, JsonObject members)
+/// Why a fill stopped, shared by every level of it and by the closures
+/// reflection calls back into.
+class Filling
+{
+    public JsonError Failure;
+
+    public Filling() => Failure = JsonError.None;
+
+    public bool Failed => Failure != JsonError.None;
+
+    /// The first reason wins, as the parser's does.
+    public void RecordFailure(JsonError why)
+    {
+        if (Failure == JsonError.None)
+            Failure = why;
+    }
+}
+
+/// Fills an instance from a document's members, and answers whether it could.
+///
+/// `made` is true for storage this module made, whose `required` members the
+/// document MUST name with a value of their type.
+bool FillInstance(byte* instance, Type type, JsonObject members, bool made, Filling filling)
 {
     for (nuint i = 0u; i < type.FieldCount; i++)
     {
         var field = type.GetFieldAt(i);
-        if (field.HasAttribute("JsonIgnore"))
-            continue;
-
-        if (!CanRepresent(field))
-            continue;
+        bool written = false;
 
         // A call result cannot carry a narrowing -- it could answer
         // differently the second time -- so the name is what holds it.
-        if (members.IndexOf(GetFieldName(field)) is Some at)
+        if (!field.HasAttribute("JsonIgnore") && CanRepresent(field) &&
+            members.IndexOf(GetFieldName(field)) is Some at)
         {
-            FillField(instance, field, members.GetValueAt(at.Value));
+            written = FillField(instance, field, members.GetValueAt(at.Value), made, filling);
+            if (filling.Failed)
+                return false;
+        }
+
+        if (made && field.IsRequired && !written)
+        {
+            filling.RecordFailure(JsonError.MissingMember);
+            return false;
         }
     }
+    return true;
 }
 
-void FillField(byte* instance, Field field, JsonValue value)
+/// Writes one field from a value, and answers whether it did.
+bool FillField(byte* instance, Field field, JsonValue value, bool made, Filling filling)
 {
     int kind = field.Kind;
 
+    if (IsNull(value) && field.IsNullable)
+    {
+        Reflection.WriteAggregate(instance, field, null);
+        return true;
+    }
+
     if (kind == KindString)
     {
-        if (value.Text)
-            Reflection.WriteText(instance, field, value.Value);
-        return;
+        if (!value.Text)
+            return false;
+        Reflection.WriteText(instance, field, value.Value);
+        return true;
     }
 
     if (kind == KindBool)
     {
-        if (value.Bool)
-            Reflection.WriteBool(instance, field, value.Value);
-        return;
+        if (!value.Bool)
+            return false;
+        Reflection.WriteBool(instance, field, value.Value);
+        return true;
     }
 
     if (field.IsFloating)
     {
-        if (value.Number)
-            Reflection.WriteDouble(instance, field, value.Value);
-        return;
+        if (!value.Number)
+            return false;
+        Reflection.WriteDouble(instance, field, value.Value);
+        return true;
     }
 
     if (field.IsInteger)
     {
-        if (value.Number && IsWithinLong(value.Value))
-            Reflection.WriteInteger(instance, field, (long)value.Value);
-        return;
+        if (!value.Number || !IsWithinLong(value.Value))
+            return false;
+        Reflection.WriteInteger(instance, field, (long)value.Value);
+        return true;
     }
 
     if (field.IsWalkable)
     {
-        byte* nested = Reflection.ReadAggregate(instance, field);
+        if (!value.Object)
+            return false;
 
-        // A field the constructor left empty, which the type has said the
-        // document may fill.
-        if (nested == null && field.HasAttribute("JsonCreate") && !IsNull(value))
+        // A struct field is storage in this one. It holds a value unless it
+        // is required and this module made the object around it.
+        if (kind == KindStruct)
         {
-            nested = Reflection.CreateInstanceInto(instance, field);
+            return FillInstance(instance + field.Offset, field.FieldType, value.Members,
+                                made && field.IsRequired, filling);
         }
 
-        if (nested == null)
-            return;
+        byte* nested = Reflection.ReadAggregate(instance, field);
+        if (nested != null)
+            return FillInstance(nested, field.FieldType, value.Members, false, filling);
 
-        if (value.Object)
-            FillInstance(nested, field.FieldType, value.Members);
-        return;
+        if (!field.HasAttribute("JsonCreate") && !field.IsRequired)
+            return false;
+
+        return CreateMemberInto(instance, field, value.Members, filling);
     }
 
     if (CanRepresentArray(field))
-        FillArray(instance, field, value);
+        return FillArray(instance, field, value, filling);
+
+    return false;
 }
 
-/// Fills an array field, element by element, as far as both go.
+/// Makes a class field's object, fills it from `members`, and stores it if it
+/// came out complete.
+bool CreateMemberInto(byte* instance, Field field, JsonObject members, Filling filling)
+{
+    var inner = field.FieldType;
+    if (!inner.CanCreateInstance)
+    {
+        filling.RecordFailure(JsonError.NotCreatable);
+        return false;
+    }
+
+    byte* made = Reflection.CreateInstanceInto(instance, field,
+        (byte* fresh) => FillInstance(fresh, inner, members, true, filling));
+    if (made == null)
+    {
+        filling.RecordFailure(JsonError.MissingMember);
+        return false;
+    }
+    return true;
+}
+
+/// Fills an array field, element by element, as far as both go, and answers
+/// whether it wrote one.
 ///
 /// **An array the object already has is not replaced.** Its length is the one
 /// the constructor chose, and a document with more elements than that fills
@@ -1276,77 +1378,80 @@ void FillField(byte* instance, Field field, JsonValue value)
 /// length field naming a number nothing has paid for yet, and a JSON array has
 /// no such thing.
 ///
-/// Every element of an array made here holds a value, whatever the document
-/// had in its place. A String element is `""` where the item was not text. A
-/// class element is made zeroed, as `[JsonCreate]` makes one; it and a struct
-/// element have their String fields set to `""` before the item fills them,
-/// and their other reference fields carry the hazard that attribute names.
-void FillArray(byte* instance, Field field, JsonValue value)
+/// Every element of an array made here is what the document gave it. An
+/// object element is made as `new` would make it and then filled. An element
+/// the document gives no value of its type keeps its zero where that is a
+/// value -- `0`, `false`, or null for a `String?` -- and otherwise the array
+/// is discarded and the call fails with `JsonError.MissingMember`.
+bool FillArray(byte* instance, Field field, JsonValue value, Filling filling)
 {
     if (!value.Array)
-        return;
+        return false;
 
+    var items = value.Items;
     byte* array = Reflection.ReadArray(instance, field);
-    bool made = false;
-    if (array == null)
+    if (array != null)
+        return FillElements(array, field, items, false, filling);
+
+    byte* made = Reflection.CreateArrayInto(instance, field, items.Count,
+        (byte* fresh) => FillElements(fresh, field, items, true, filling));
+    if (made == null)
     {
-        // Stored before it is filled, so the field owns it: a failure
-        // part-way through leaves a short array rather than a leak, and the
-        // reference the allocation answered with is dropped inside rather
-        // than left for this caller to remember.
-        array = Reflection.CreateArrayInto(instance, field, value.Items.Count);
-        if (array == null)
-            return;
-
-        made = true;
+        filling.RecordFailure(JsonError.MissingMember);
+        return false;
     }
+    return true;
+}
 
+/// Writes an array's elements from a document's items, and answers whether
+/// nothing failed. `made` is true for an array this module allocated, whose
+/// object elements are made here rather than filled in place.
+bool FillElements(byte* array, Field field, List<JsonValue> items, bool made, Filling filling)
+{
     nuint length = Reflection.GetArrayLength(array);
     int kind = field.ElementKind;
+    var element = field.ElementType;
 
-    for (nuint i = 0u; i < value.Items.Count && i < length; i++)
+    for (nuint i = 0u; i < items.Count && i < length; i++)
     {
         byte* at = Reflection.GetElementAddress(array, field, i);
-        var item = value.Items[i];
+        var item = items[i];
 
         if (kind == KindString)
         {
             if (item.Text)
-            {
                 Reflection.WriteTextAt(at, item.Value);
-            }
-            else if (made)
-            {
-                Reflection.WriteTextAt(at, "");
-            }
         }
         else if (kind == KindBool)
         {
             if (item.Bool)
-            {
                 Reflection.WriteBoolAt(at, item.Value);
-            }
         }
         else if (kind == KindFloat || kind == KindDouble)
         {
             if (item.Number)
-            {
                 Reflection.WriteDoubleAt(at, field, item.Value);
-            }
         }
-        else if (kind == KindClass || kind == KindStruct)
+        else if (kind == KindStruct)
         {
-            byte* nested = Reflection.ReadAggregateAt(at, field);
-            if (made)
-            {
-                if (nested == null)
-                    nested = CreateElementAt(at, field.ElementType);
-                if (nested != null)
-                    ClearTextFields(nested, field.ElementType);
-            }
+            if (item.Object && !FillInstance(at, element, item.Members, made, filling))
+                return false;
+        }
+        else if (kind == KindClass)
+        {
+            if (!item.Object)
+                continue;
 
-            if (nested != null && item.Object)
-                FillInstance(nested, field.ElementType, item.Members);
+            byte* nested = Reflection.ReadAggregateAt(at, field);
+            if (nested != null)
+            {
+                if (!FillInstance(nested, element, item.Members, false, filling))
+                    return false;
+            }
+            else if (made && !CreateElement(at, field, item.Members, filling))
+            {
+                return false;
+            }
         }
         else
         {
@@ -1354,28 +1459,26 @@ void FillArray(byte* instance, Field field, JsonValue value)
                 Reflection.WriteIntegerAt(at, field, (long)item.Value);
         }
     }
+    return true;
 }
 
-/// Makes a zeroed object of `type` into an empty class element, answering it.
-/// The element takes the allocation's reference, so nothing is released.
-byte* CreateElementAt(byte* at, Type type)
+/// Makes a class element's object, fills it from `members`, and stores it at
+/// `at` if it came out complete.
+bool CreateElement(byte* at, Field field, JsonObject members, Filling filling)
 {
-    byte* element = Reflection.CreateInstance(type);
-    if (element == null)
-        return null;
-
-    byte** slot = (byte**)at;
-    *slot = element;
-    return element;
-}
-
-/// Sets every String field of a zeroed instance to `""`.
-void ClearTextFields(byte* instance, Type type)
-{
-    for (nuint i = 0u; i < type.FieldCount; i++)
+    var element = field.ElementType;
+    if (!element.CanCreateInstance)
     {
-        var field = type.GetFieldAt(i);
-        if (field.Kind == KindString)
-            Reflection.WriteText(instance, field, "");
+        filling.RecordFailure(JsonError.NotCreatable);
+        return false;
     }
+
+    byte* made = Reflection.CreateElementAt(at, field,
+        (byte* fresh) => FillInstance(fresh, element, members, true, filling));
+    if (made == null)
+    {
+        filling.RecordFailure(JsonError.MissingMember);
+        return false;
+    }
+    return true;
 }

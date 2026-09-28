@@ -21,6 +21,16 @@ instance the program made, and there is no `Deserialize<T>` that makes one:
 the caller writes `new T()` itself, where the constructor it wants is in
 reach.
 
+**What it makes inside that object, it makes as `new` would.** A nested
+object the document describes and the field lacks, and each object element
+of an array it allocates, is made by `Reflection.CreateInstance`, which
+runs the type's public parameterless constructor. The document then fills
+it, and it is stored only if it is complete: every `required` member named
+by the document with a value of its type, and nothing whose type has no
+zero value left null. Otherwise the whole call fails with
+`JsonError.MissingMember`, and what was made is released rather than left
+reachable.
+
 ## Contents
 
 **Types** &nbsp; [JsonCreate](#jsoncreate-attribute) &middot; [JsonError](#jsonerror-enum) &middot; [JsonIgnore](#jsonignore-attribute) &middot; [JsonName](#jsonname-attribute) &middot; [JsonObject](#jsonobject-class) &middot; [JsonValue](#jsonvalue-variant)
@@ -41,12 +51,12 @@ Lets a reader make this field's object when the document has one and the
 field is null.
 
 Off by default, and opt-in per field rather than per call, because the type
-is what knows whether it is safe. An object made this way is **zeroed**:
-every reference in it starts null, and only the document fills them. Mark a
-field with this when the document is what decides whether the object is
-there, and leave it alone when the constructor already made one.
+is what knows whether the document may decide the object is there. It is
+made as `new T()` would make it and then filled, so its type needs a
+public parameterless constructor. A `required` field needs no mark: the
+document MUST supply it, so it is always made.
 
-<sub>[stdlib/Json/Json.sl:958](../../stdlib/Json/Json.sl#L958)</sub>
+<sub>[stdlib/Json/Json.sl:970](../../stdlib/Json/Json.sl#L970)</sub>
 
 ### JsonError *enum*
 
@@ -160,6 +170,31 @@ A type with no field tables to map onto.
 
 <sub>[stdlib/Json/JsonError.sl:64](../../stdlib/Json/JsonError.sl#L64)</sub>
 
+#### MissingMember *case*
+
+```
+MissingMember
+```
+
+Something the reader made -- a nested object, or an array and its
+elements -- lacks a value its type cannot do without: a `required`
+member the document does not give a value of its type, or a member or
+element whose type is never null that nothing filled. What was made is
+discarded.
+
+<sub>[stdlib/Json/JsonError.sl:71](../../stdlib/Json/JsonError.sl#L71)</sub>
+
+#### NotCreatable *case*
+
+```
+NotCreatable
+```
+
+The document needs an object made, and its type has no public
+parameterless constructor to make it with.
+
+<sub>[stdlib/Json/JsonError.sl:75](../../stdlib/Json/JsonError.sl#L75)</sub>
+
 ### JsonIgnore *attribute*
 
 ```
@@ -168,7 +203,7 @@ attribute JsonIgnore
 
 Leaves the field out of the document entirely, in both directions.
 
-<sub>[stdlib/Json/Json.sl:948](../../stdlib/Json/Json.sl#L948)</sub>
+<sub>[stdlib/Json/Json.sl:960](../../stdlib/Json/Json.sl#L960)</sub>
 
 ### JsonName *attribute*
 
@@ -178,7 +213,7 @@ attribute JsonName
 
 The name this field has in the document, when it differs from the field's.
 
-<sub>[stdlib/Json/Json.sl:945](../../stdlib/Json/Json.sl#L945)</sub>
+<sub>[stdlib/Json/Json.sl:957](../../stdlib/Json/Json.sl#L957)</sub>
 
 ### JsonObject *class*
 
@@ -385,7 +420,7 @@ JsonValue CreateJsonArray()
 
 An empty array, ready to add to.
 
-<sub>[stdlib/Json/Json.sl:77](../../stdlib/Json/Json.sl#L77)</sub>
+<sub>[stdlib/Json/Json.sl:89](../../stdlib/Json/Json.sl#L89)</sub>
 
 ### CreateJsonNumber *function*
 
@@ -399,7 +434,7 @@ Not `FromInteger`: `Standard.Text` is imported everywhere and has one of
 those, and two functions of a name reached without a prefix is an ambiguity
 at every call rather than at this declaration.
 
-<sub>[stdlib/Json/Json.sl:87](../../stdlib/Json/Json.sl#L87)</sub>
+<sub>[stdlib/Json/Json.sl:99](../../stdlib/Json/Json.sl#L99)</sub>
 
 ### CreateJsonObject *function*
 
@@ -409,7 +444,7 @@ JsonValue CreateJsonObject()
 
 An empty object, ready to add to.
 
-<sub>[stdlib/Json/Json.sl:80](../../stdlib/Json/Json.sl#L80)</sub>
+<sub>[stdlib/Json/Json.sl:92](../../stdlib/Json/Json.sl#L92)</sub>
 
 ### DescribeJsonError *function*
 
@@ -419,7 +454,7 @@ String DescribeJsonError(JsonError error)
 
 A sentence describing an error, for a message a person will read.
 
-<sub>[stdlib/Json/Json.sl:48](../../stdlib/Json/Json.sl#L48)</sub>
+<sub>[stdlib/Json/Json.sl:58](../../stdlib/Json/Json.sl#L58)</sub>
 
 ### GetBoolOrDefault *function*
 
@@ -430,7 +465,7 @@ bool GetBoolOrDefault(JsonValue value, bool fallback)
 The value of a `Bool`, or the fallback. A `Number` of 1 is not true here;
 only the JSON literals are.
 
-<sub>[stdlib/Json/Json.sl:134](../../stdlib/Json/Json.sl#L134)</sub>
+<sub>[stdlib/Json/Json.sl:146](../../stdlib/Json/Json.sl#L146)</sub>
 
 ### GetIntegerOrDefault *function*
 
@@ -444,7 +479,7 @@ Truncation, not rounding: `3.9` is 3. JSON has one number type, so this is
 how a field that is conceptually an integer is read back. A value past what
 a `long` holds answers the fallback, as a value of the wrong type does.
 
-<sub>[stdlib/Json/Json.sl:118](../../stdlib/Json/Json.sl#L118)</sub>
+<sub>[stdlib/Json/Json.sl:130](../../stdlib/Json/Json.sl#L130)</sub>
 
 ### GetItems *function*
 
@@ -454,7 +489,7 @@ List<JsonValue> GetItems(JsonValue value)
 
 The elements of an `Array`, or an empty list.
 
-<sub>[stdlib/Json/Json.sl:153](../../stdlib/Json/Json.sl#L153)</sub>
+<sub>[stdlib/Json/Json.sl:165](../../stdlib/Json/Json.sl#L165)</sub>
 
 ### GetMembers *function*
 
@@ -464,7 +499,7 @@ JsonObject GetMembers(JsonValue value)
 
 The members of an `Object`, or an empty one.
 
-<sub>[stdlib/Json/Json.sl:145](../../stdlib/Json/Json.sl#L145)</sub>
+<sub>[stdlib/Json/Json.sl:157](../../stdlib/Json/Json.sl#L157)</sub>
 
 ### GetNumberOrDefault *function*
 
@@ -475,7 +510,7 @@ double GetNumberOrDefault(JsonValue value, double fallback)
 The value of a `Number`, or the fallback for anything else. A JSON number
 is a double, so a large integer has already lost precision by here.
 
-<sub>[stdlib/Json/Json.sl:106](../../stdlib/Json/Json.sl#L106)</sub>
+<sub>[stdlib/Json/Json.sl:118](../../stdlib/Json/Json.sl#L118)</sub>
 
 ### GetTextOrDefault *function*
 
@@ -485,7 +520,7 @@ String GetTextOrDefault(JsonValue value, String fallback)
 
 The text of a `Text`, or the fallback for anything else.
 
-<sub>[stdlib/Json/Json.sl:97](../../stdlib/Json/Json.sl#L97)</sub>
+<sub>[stdlib/Json/Json.sl:109](../../stdlib/Json/Json.sl#L109)</sub>
 
 ### IsNull *function*
 
@@ -495,7 +530,7 @@ bool IsNull(JsonValue value)
 
 True for the one case that carries nothing.
 
-<sub>[stdlib/Json/Json.sl:142](../../stdlib/Json/Json.sl#L142)</sub>
+<sub>[stdlib/Json/Json.sl:154](../../stdlib/Json/Json.sl#L154)</sub>
 
 ### Parse *function*
 
@@ -519,7 +554,7 @@ something else by.
 
 **See also** &nbsp; [Json.ToJsonText](#tojsontext-function)
 
-<sub>[stdlib/Json/Json.sl:722](../../stdlib/Json/Json.sl#L722)</sub>
+<sub>[stdlib/Json/Json.sl:734](../../stdlib/Json/Json.sl#L734)</sub>
 
 ### PopulateObject *function*
 
@@ -532,12 +567,18 @@ Fills an object's fields from a document.
 The object is the program's, made the ordinary way, so its constructor has
 already run and its invariants already hold. A field the document does not
 mention is left alone, which is what makes this safe: the value that stays
-is the one the constructor chose.
+is the one the constructor chose. A member of the wrong type is skipped the
+same way, and a `null` clears a field whose type allows one.
 
 A nested object is filled in place and never replaced, for the same reason.
-A document naming a nested object the constructor left null is skipped
-rather than allocated into, since nothing here could give the rest of that
-object's fields a value.
+A document naming a nested object the constructor left null is skipped,
+unless the field is `[JsonCreate]` or `required`; then the object is made
+as `new` would make it, filled, and stored only once it is complete.
+
+**A failure part-way leaves what was already written.** Every field the
+object holds is still a value of its type, but not every one the document
+named has been read. Nothing the call made and could not complete is
+reachable from it.
 
 **Type parameters**
 
@@ -554,10 +595,12 @@ object's fields a value.
 - [JsonError.TrailingContent](#trailingcontent-case) — a second value after the first
 - [JsonError.NotAnObject](#notanobject-case) — the document is not an object
 - [JsonError.NotReflected](#notreflected-case) — `T` carries no field tables
+- [JsonError.MissingMember](#missingmember-case) — something made here lacks a value its type needs
+- [JsonError.NotCreatable](#notcreatable-case) — the document needs an object of a type with no public parameterless constructor
 
 **See also** &nbsp; [Json.Serialize](#serialize-function)
 
-<sub>[stdlib/Json/Json.sl:1159](../../stdlib/Json/Json.sl#L1159)</sub>
+<sub>[stdlib/Json/Json.sl:1187](../../stdlib/Json/Json.sl#L1187)</sub>
 
 ### PopulateObject *function*
 
@@ -567,6 +610,9 @@ JsonError PopulateObject<T>(T value, JsonValue document)
 
 The same, from a document already parsed.
 
+`required` members of `value` itself are not asked for: the `new` that
+made it was refused unless it gave them values.
+
 **Type parameters**
 
 - `T` — a `[Reflect]` type, whose field tables say what there is to fill
@@ -575,10 +621,12 @@ The same, from a document already parsed.
 
 - [JsonError.NotAnObject](#notanobject-case) — the document is not an object
 - [JsonError.NotReflected](#notreflected-case) — `T` carries no field tables
+- [JsonError.MissingMember](#missingmember-case) — something made here lacks a value its type needs
+- [JsonError.NotCreatable](#notcreatable-case) — the document needs an object of a type with no public parameterless constructor
 
 **See also** &nbsp; [Json.Serialize](#serialize-function)
 
-<sub>[stdlib/Json/Json.sl:1174](../../stdlib/Json/Json.sl#L1174)</sub>
+<sub>[stdlib/Json/Json.sl:1208](../../stdlib/Json/Json.sl#L1208)</sub>
 
 ### Serialize *function*
 
@@ -594,7 +642,7 @@ The document as text.
 
 **See also** &nbsp; [Json.PopulateObject](#populateobject-function)
 
-<sub>[stdlib/Json/Json.sl:977](../../stdlib/Json/Json.sl#L977)</sub>
+<sub>[stdlib/Json/Json.sl:989](../../stdlib/Json/Json.sl#L989)</sub>
 
 ### SerializeIndented *function*
 
@@ -610,7 +658,7 @@ The same, indented.
 
 **See also** &nbsp; [Json.Serialize](#serialize-function)
 
-<sub>[stdlib/Json/Json.sl:983](../../stdlib/Json/Json.sl#L983)</sub>
+<sub>[stdlib/Json/Json.sl:995](../../stdlib/Json/Json.sl#L995)</sub>
 
 ### ToJsonText *function*
 
@@ -626,7 +674,7 @@ value absent rather than as some other number.
 
 **See also** &nbsp; [Json.Parse](#parse-function) &middot; [Json.ToJsonTextIndented](#tojsontextindented-function)
 
-<sub>[stdlib/Json/Json.sl:748](../../stdlib/Json/Json.sl#L748)</sub>
+<sub>[stdlib/Json/Json.sl:760](../../stdlib/Json/Json.sl#L760)</sub>
 
 ### ToJsonTextIndented *function*
 
@@ -638,7 +686,7 @@ The document as text, indented two spaces a level.
 
 **See also** &nbsp; [Json.ToJsonText](#tojsontext-function)
 
-<sub>[stdlib/Json/Json.sl:758](../../stdlib/Json/Json.sl#L758)</sub>
+<sub>[stdlib/Json/Json.sl:770](../../stdlib/Json/Json.sl#L770)</sub>
 
 ### ToJsonValue *function*
 
@@ -658,7 +706,7 @@ struct rather than stopping at it. A field of a kind with no JSON spelling
 
 **See also** &nbsp; [Json.Serialize](#serialize-function)
 
-<sub>[stdlib/Json/Json.sl:968](../../stdlib/Json/Json.sl#L968)</sub>
+<sub>[stdlib/Json/Json.sl:980](../../stdlib/Json/Json.sl#L980)</sub>
 
 ## Constants
 
@@ -678,5 +726,5 @@ the alternative to a limit is a crash that looks like a compiler bug.
 
 **See also** &nbsp; [JsonError.TooDeep](#toodeep-case)
 
-<sub>[stdlib/Json/Json.sl:74](../../stdlib/Json/Json.sl#L74)</sub>
+<sub>[stdlib/Json/Json.sl:86](../../stdlib/Json/Json.sl#L86)</sub>
 

@@ -1,0 +1,5 @@
+# 5: the Bell and the Ticket `CreateInstance` answered, and what they hold --
+# the Bell's subscriber list and the Listener in it, the Ticket's Code. The
+# caller owns the reference `CreateInstance` answers and has no way to give it
+# back, which type-by-name counts too.
+5

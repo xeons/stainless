@@ -868,9 +868,23 @@ never null, so its constructor chose a length for it
 ([§2.16.2](02-types.md#2162-fields)).
 
 A nested object the constructor left null is skipped, unless the field carries
-`[JsonCreate]` — opt-in per field, because the type is what knows whether an
-object made from a document rather than a constructor is safe. What such an
-object starts as is zeroed, so only the document gives its fields values.
+`[JsonCreate]` or is `required` — opt-in per field, because the type is what
+knows whether the document may decide the object is there. Such an object is
+made as `new` would make it, by its public parameterless constructor
+([§6.6.1](06-attributes-reflection.md#661-making-an-object)), and so is each
+object element of an array the reader allocates. The document then fills it,
+and it is stored only once it is complete: **every `required` member given by
+the document with a value of its type, and nothing whose type has no zero
+value left null.** An element the document gives no value of its type keeps
+its zero where that is a value — `0`, `false`, null for a `String?` — and
+otherwise the array is incomplete. Anything incomplete fails the whole call
+with `JsonError.MissingMember` and is released rather than left reachable; a
+type with no constructor to make it with is `JsonError.NotCreatable`. What was
+filled before the failure stays filled.
+
+`required` members of the object handed to `PopulateObject` are not asked for:
+the `new` that made it was refused unless it set them. A `null` in the document
+clears a member whose type allows one.
 
 **What XML reads**: elements, attributes, text, CDATA, comments, the five
 predefined entities and numeric character references, and a declaration or

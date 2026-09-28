@@ -3206,10 +3206,15 @@ the collections' storage — `List<T>`, `Dictionary`, `HashSet`, `Queue`,
 `Stack`, `SortedList`, `LinkedList`, and the sort's scratch — and not a way
 round the rule for anything else.
 
-`Reflection.CreateInstance` and `CreateArrayInto` make zeroed storage too, as
-`byte*` APIs whose obligations are already the caller's
-([§6.6](06-attributes-reflection.md#66-writing-a-field)). A type `Json` makes
-from nothing wants its never-null fields `required`, or nullable.
+**Reflection holds to the rule too**
+([§6.6.1](06-attributes-reflection.md#661-making-an-object)). It makes an
+object only by running the constructor `new T()` would, a `required` member or
+a new array's elements only through a `fill` that is checked before the object
+or array is handed out, and its writers refuse a null for a field whose type
+has none. The field tables record which fields those are, so the check needs
+no source. `Json` builds on it: what it makes inside an object it fills is
+stored only once the document has given every `required` member and left
+nothing null that may not be.
 
 ### 2.16.4 Generics
 

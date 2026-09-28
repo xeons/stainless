@@ -277,6 +277,8 @@ struct TypeInfo {
     const SlEnumInfo      *enumeration;     /* an enum's members; else NULL      */
     size_t                 eventCount;      /* public events of a [Reflect] class */
     const SlEventInfo     *events;
+
+    void               *(*create)(void);    /* `new C()`, for reflection; or NULL */
 };
 ```
 
@@ -305,7 +307,7 @@ struct SlFieldInfo {
     const SlTypeInfo  *elementType;
     size_t             elementSize;   /* the stride, which is what indexes one */
 
-    uint32_t           flags;         /* SL_FIELD_PROPERTY: automatic storage  */
+    uint32_t           flags;         /* SL_FIELD_*, below                    */
 };
 
 struct SlPropertyInfo {
@@ -316,7 +318,7 @@ struct SlPropertyInfo {
     const void        *setter;        /* NULL for a read-only one       */
     size_t             attributeCount;
     const SlAttribute *attributes;
-    uint32_t           flags;         /* SL_PROPERTY_PUBLIC                 */
+    uint32_t           flags;         /* SL_PROPERTY_PUBLIC, _NO_ZERO       */
 };
 
 struct SlEnumInfo {
@@ -331,6 +333,23 @@ struct SlEventInfo {
     const char *handlerType;          /* the delegate, qualified */
 };
 ```
+
+**A field's `flags` say what reflection may do to it.** `SL_FIELD_PROPERTY`
+(1) marks an automatic property's storage. `SL_FIELD_NO_ZERO` (2) marks a
+field whose type has no zero value ([§2.16](spec/02-types.md#216-zero-values)),
+into which the runtime's writers refuse a null; `SL_FIELD_ELEMENT_NO_ZERO` (8)
+says the same of an array field's elements. `SL_FIELD_REQUIRED` (4) marks a
+`required` member the constructor `create` runs does not set, which whoever
+makes an instance MUST supply. `SL_PROPERTY_NO_ZERO` (2) does for a
+property's setter what `SL_FIELD_NO_ZERO` does for a field.
+
+**`create` is the only way reflection makes an object.** For a reflected
+class that `new C()` could make — not abstract, not a com class, with a public
+parameterless constructor or none — it is a function that allocates one,
+gives its events their empty lists and runs that constructor, exactly as
+`new` does. Everything else has NULL, including a struct's, an enum's and an
+array's `TypeInfo`, so nothing can ask for an object of a type that has no
+object header. There is no entry point that makes a zeroed one.
 
 **An enum is its integer.** A field or property of an enum type records the
 underlying kind, so the integer accessors read and write it; its `type`
@@ -351,11 +370,14 @@ Indexers and static properties are not in the table: the first takes arguments
 nothing could supply and the second has no instance.
 
 `base`, `vtable`, `com`, the element columns, `flags`, the property pair,
-`enumeration` and the event pair are all **appended** rather than inserted, so
-every offset the compiler hard-codes — `interfaces` at 24, above all — goes on
-meaning what it meant. `base` sits at offset 64, `vtable` at 72, `com` at 80,
-`propertyCount` at 88, `properties` at 96, `enumeration` at 104, `eventCount`
-at 112 and `events` at 120.
+`enumeration`, the event pair and `create` are all **appended** rather than
+inserted, so every offset the compiler hard-codes — `interfaces` at 24, above
+all — goes on meaning what it meant. `base` sits at offset 64, `vtable` at 72,
+`com` at 80, `propertyCount` at 88, `properties` at 96, `enumeration` at 104,
+`eventCount` at 112, `events` at 120 and `create` at 128. A library built
+before `create` was appended has a shorter record, which is why the metadata
+version moved with it and such a library is refused rather than read past its
+end.
 
 Because a class reference is a plain pointer, it can cross the C boundary as
 `void*` — but C code must call `sl_retain` / `sl_release` to participate in

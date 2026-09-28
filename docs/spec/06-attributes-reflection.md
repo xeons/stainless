@@ -203,7 +203,7 @@ the other direction, and it is a search:
 var type = FindType("App.Button");        // the qualified name
 if (type.Exists)
 {
-    byte* made = CreateInstance(type);
+    byte* made = CreateInstance(type);      // as `new` would, or null
     SetInteger(made, type.FindProperty("Left"), 40);
 }
 ```
@@ -262,7 +262,11 @@ into source — the form designer's Events list.
 A reflected type's `TypeInfo` gains six entries — a field count and table, an
 attribute count and table, and a property count and table — and each
 `SlFieldInfo` records a name, offset, kind, nested type, its own attributes and
-a flag saying whether it is property storage. Each `SlPropertyInfo` records a
+flags saying whether it is property storage, whether its type or its
+elements' type has a zero value ([§2.16](02-types.md#216-zero-values)), and
+whether it is `required`. A reflected class that `new` could make also gets a
+function that makes one, which is what `CreateInstance` calls
+([§6.6.1](#661-making-an-object)). Each `SlPropertyInfo` records a
 name, kind, nested type, its getter and setter, and its attributes. A class's
 public events follow as name-and-delegate pairs, and an enum a reflected member
 names gets a `TypeInfo` of its own carrying its members. All of it
@@ -327,13 +331,59 @@ own. A **slice** is deliberately not described: it is three words rather than a
 reference, so its elements are not where this arithmetic would look, and
 answering as though they were would be worse than answering nothing.
 
-`Reflection.CreateInstance(type)` allocates a zeroed instance and `CreateInstanceInto(instance,
-field)` puts one straight into a class field, for a reader that has a document
-and a field holding nothing. **Every reference in what comes back starts
-null**, including one whose type says it cannot be — so it is safe to fill and
-unsafe to hand out until it has been. There is deliberately no cast from
-`byte*` to a typed reference: that would be a hole available everywhere, to
-solve a problem that only exists inside a deserializer.
+**A writer never puts a null where the type says there is none.**
+`WriteAggregate` and `SetAggregate` refuse a null for a field or property
+whose type has no zero value, and leave it as it was. `Field.HasZeroValue`,
+`Field.IsNullable` and `Property.HasZeroValue` say which those are, and
+`IsFieldNull` and `IsElementNull` tell a nullable one holding null from one
+holding `""`, which `ReadText` answers for both.
+
+### 6.6.1 Making an object
+
+**Reflection makes an object only the way `new` does.** `CreateInstance(type)`
+runs the type's public parameterless constructor, as `new T()` would, and
+answers null for a type `new T()` could not make: one that is abstract, a
+struct, a com class, or has only constructors that take arguments.
+`Type.CanCreateInstance` asks in advance. Because the constructor ran, every
+field it writes holds a value, and §2.16 already holds every constructor to
+writing each field whose type has no zero value.
+
+What a constructor leaves to its caller — a `required` member — is the maker's.
+`CreateInstance(type)` answers null for a type that has one, as `new T()` with
+no initializer is refused. The overload taking `fill` is the one for that:
+
+```csharp
+byte* made = CreateInstance(type, (byte* fresh) =>
+{
+    WriteText(fresh, type.FindField("Code"), "A-1");
+    return true;
+});
+```
+
+It makes the object, hands it to `fill`, and answers it only if `fill`
+answered true and no required member whose type has no zero value is still
+null. Otherwise it releases the object and answers null, so nothing half-made
+is ever handed out. A required member of a value type cannot be asked — its
+zero is a value — and is `fill`'s word. `Field.IsRequired` says which members
+the maker owes, and is false for all of them when the constructor is
+`[SetsRequiredMembers]`.
+
+`CreateInstanceInto(instance, field)` does the same and stores the object in a
+class field, which then owns it; with `fill`, the field is written only with an
+object that came out complete. `CreateElementAt(address, field, fill)` does it
+for a class element of an array.
+
+**An array is made the same way.** `CreateArrayInto(instance, field, count)`
+answers null unless the elements have a zero value (`Field.ElementHasZeroValue`):
+numbers, `bool`s, nullable references. Otherwise the overload taking `fill`
+hands the new array to it, then asks every element whose type has no zero
+value whether it is still null — walking into a struct element's fields — and
+stores the array only if none is.
+
+**There is no way to make a zeroed object**, and the runtime has no entry point
+that could. What this does not close is the `byte*` itself: an address can be
+cast to any reference type ([§8](08-interop-libraries.md)), and what a program
+writes through one is its own affair.
 
 ## 6.7 What is not there yet
 

@@ -60,6 +60,11 @@ public struct Property
     /// only. The table lists both.
     public bool IsPublic => (sl_property_flags(Handle) & 1u) != 0u;
 
+    /// True when zero bytes are a value of the property's type. False for a
+    /// reference that is never null, and `SetAggregate` refuses a null for
+    /// one.
+    public bool HasZeroValue => (sl_property_flags(Handle) & 2u) == 0u;
+
     /// False for a write-only property, and for one whose getter this build
     /// did not emit.
     public bool CanRead => sl_property_can_read(Handle);

@@ -28,6 +28,19 @@
 ///
 /// A type carries metadata only when it is marked [Reflect]. Nothing else does,
 /// so nothing else pays for it.
+///
+/// **Nothing here makes a value its type does not allow** (§2.16). An object
+/// is made only the way `new C()` makes one, by running its public
+/// parameterless constructor, so every field that constructor writes holds a
+/// value. What the constructor leaves to its caller -- a `required` member --
+/// and the elements of a new array are the maker's to fill: the overloads
+/// taking `fill` hand the new storage to it, then check that no field or
+/// element whose type has no zero value is still null, and release the lot
+/// and answer null if one is. A zeroed object is not on offer at all, and a
+/// writer refuses a null for a field that is never null.
+///
+/// The accessors still take a `byte*`, and what a program does with one is
+/// its own affair: a pointer can be cast to anything.
 module Standard.Reflection;
 
 /// Marks a class or struct to carry field metadata in the binary.
@@ -68,7 +81,11 @@ extern "C"
     void   sl_write_text(byte* instance, byte* field, byte* bytes, nuint length);
     void   sl_write_reference(byte* instance, byte* field, byte* value);
 
-    byte*  sl_type_make(byte* type);
+    byte*  sl_type_create(byte* type);
+    bool   sl_type_can_create(byte* type);
+    bool   sl_type_is_complete(byte* type, byte* instance);
+    bool   sl_field_element_is_complete(byte* field, byte* address);
+    void   sl_write_at_reference(byte* address, byte* value);
     void   sl_release(byte* object);
 
     byte*  sl_string_data(byte* text);
@@ -327,6 +344,22 @@ public String ReadText(byte* instance, Field field)
     return CopyCountedText(raw);
 }
 
+/// True when a reference field holds null, which only a nullable one can.
+/// `ReadText` answers `""` for such a String, so this is how to tell.
+public bool IsFieldNull(byte* instance, Field field)
+{
+    switch (field.Kind)
+    {
+        case KindString:
+        case KindClass:
+        case KindInterface:
+        case KindArray:
+            return sl_read_reference(instance, field.Handle) == null;
+        default:
+            return false;
+    }
+}
+
 // A copy of a String reached as a raw pointer. Its length is the byte length
 // the String records, so an embedded NUL does not end it.
 String CopyCountedText(byte* raw)
@@ -422,23 +455,74 @@ public Type FindType(String name)
     return result;
 }
 
-/// Makes a zeroed instance of a type, for a reader that has a type and no
-/// constructor to call.
+/// Makes an instance of a reflected class as `new T()` would: allocated, its
+/// events given empty lists, and its public parameterless constructor run.
 ///
-/// **Every reference field starts null**, including one whose type says it
-/// cannot be. What comes back is safe to fill and unsafe to hand out until it
-/// has been: prefer making the object the ordinary way and filling it, which
-/// is what `Json.PopulateObject` does and why it is the one that needs no warning.
+/// Null when `type` cannot be made that way (`Type.CanCreateInstance`
+/// answers which), and when it has a member `IsRequired` says the maker
+/// MUST supply, since `new T()` with nothing to supply it would be refused
+/// too. The overload taking `fill` is the one for that.
 ///
-/// @see CreateInstanceInto
+/// The caller owns the answer's reference, and nothing here takes it back:
+/// store it with `WriteAggregate`, or prefer `CreateInstanceInto`.
+///
+///     var type = FindType("App.Button");
+///     byte* made = CreateInstance(type);
+///
+/// @see Type.CanCreateInstance
+/// @seealso CreateInstanceInto
 public byte* CreateInstance(Type type)
 {
-    return sl_type_make(type.Handle);
+    if (HasRequiredField(type))
+        return null;
+    return sl_type_create(type.Handle);
 }
 
-/// Points a reference field at an object made by `CreateInstance`, releasing whatever it
-/// held. The field takes a reference of its own, so the caller still owns
-/// theirs.
+/// Makes an instance as `new T()` would, hands it to `fill`, and answers it
+/// only if it is then complete.
+///
+/// Complete means `fill` answered true and no member the maker MUST supply
+/// whose type has no zero value is still null. Otherwise the object is
+/// released and the answer is null, so nothing half-made is ever handed out.
+/// A required member of a value type cannot be asked, and is `fill`'s word.
+///
+/// `fill` MUST NOT keep the address it is given: an object that does not come
+/// out complete is gone when this returns.
+///
+/// @param type  the class to make
+/// @param fill  writes what the constructor left, and answers whether it could
+/// @returns the object, which the caller owns, or null
+/// @see CreateInstanceInto
+public byte* CreateInstance(Type type, Func<byte*, bool> fill)
+{
+    byte* made = sl_type_create(type.Handle);
+    if (made == null)
+        return null;
+
+    if (!fill(made) || !sl_type_is_complete(type.Handle, made))
+    {
+        sl_release(made);
+        return null;
+    }
+    return made;
+}
+
+/// True when a type has a member the maker MUST supply.
+bool HasRequiredField(Type type)
+{
+    for (nuint i = 0u; i < type.FieldCount; i++)
+    {
+        if (type.GetFieldAt(i).IsRequired)
+            return true;
+    }
+    return false;
+}
+
+/// Points a reference field at an object, releasing whatever it held. The
+/// field takes a reference of its own, so the caller still owns theirs.
+///
+/// **A null for a field that is never null is refused**, and the field keeps
+/// what it had: `Field.HasZeroValue` says which those are.
 ///
 /// @see CreateInstance
 /// @seealso ReadAggregate
@@ -447,20 +531,11 @@ public void WriteAggregate(byte* instance, Field field, byte* value)
     sl_write_reference(instance, field.Handle, value);
 }
 
-/// Makes an object of a class field's own type and stores it in that field,
-/// answering its address. Null when the field is not a class, or its type
-/// carries no metadata.
+/// Makes an object of a class field's own type as `CreateInstance` does,
+/// stores it in that field, and answers its address. Null, with the field
+/// untouched, when the field is not a class or its type cannot be made.
 ///
-/// **The object is zeroed**, so every reference field in it starts null --
-/// including one whose type says it cannot be. That is the whole hazard: an
-/// object made this way is not yet a value of its type, and is only safe once
-/// whatever fills it has filled the fields that may not be null.
-///
-/// It exists because a deserializer holding a document for a nested object,
-/// and a field holding nothing, otherwise has nowhere to put it. Use it where
-/// the document is the thing that decides, and prefer a constructor that made
-/// the object already: `Json.PopulateObject` fills in place and only reaches for
-/// this where a field is marked to say so.
+/// The field owns the object; the caller has nothing to release.
 ///
 /// @see CreateInstance
 public byte* CreateInstanceInto(byte* instance, Field field)
@@ -468,17 +543,58 @@ public byte* CreateInstanceInto(byte* instance, Field field)
     if (field.Kind != KindClass)
         return null;
 
-    var inner = field.FieldType;
-    if (!inner.Exists)
+    byte* made = CreateInstance(field.FieldType);
+    return StoreCreatedObject(instance, field, made);
+}
+
+/// The same, with `fill` run and the object checked before it is stored, as
+/// `CreateInstance(type, fill)` does. The field is written only with an object
+/// that is complete, so a failed fill leaves it as it was.
+///
+/// @param instance  the object holding the field
+/// @param field     a class field, whose type is what is made
+/// @param fill      writes what the constructor left, and answers whether it could
+/// @returns the object, now owned by the field, or null
+/// @see CreateInstance
+public byte* CreateInstanceInto(byte* instance, Field field, Func<byte*, bool> fill)
+{
+    if (field.Kind != KindClass)
         return null;
 
-    byte* made = sl_type_make(inner.Handle);
+    byte* made = CreateInstance(field.FieldType, fill);
+    return StoreCreatedObject(instance, field, made);
+}
+
+// The field takes a reference of its own; the allocation's is dropped, which
+// leaves the field the only owner.
+byte* StoreCreatedObject(byte* instance, Field field, byte* made)
+{
     if (made == null)
         return null;
 
-    // The field takes a reference of its own; this one was the allocation's,
-    // and letting it go leaves the field the only owner.
     sl_write_reference(instance, field.Handle, made);
+    sl_release(made);
+    return made;
+}
+
+/// Makes an object for a class element of an array, as `CreateInstance`
+/// does, and stores it at `address`, releasing what the element held.
+///
+/// @param address  where the element sits, from `GetElementAddress`
+/// @param field    the array field, whose element type is what is made
+/// @param fill     writes what the constructor left, and answers whether it could
+/// @returns the object, now owned by the array, or null with the element untouched
+/// @see CreateArrayInto
+public byte* CreateElementAt(byte* address, Field field, Func<byte*, bool> fill)
+{
+    if (field.ElementKind != KindClass)
+        return null;
+
+    byte* made = CreateInstance(field.ElementType, fill);
+    if (made == null)
+        return null;
+
+    sl_write_at_reference(address, made);
     sl_release(made);
     return made;
 }
@@ -502,23 +618,16 @@ public byte* ReadArray(byte* instance, Field field)
 /// Makes an array of `count` elements for an array field and stores it there,
 /// answering its address.
 ///
-/// **The one thing about an array that could not be done here.** Elements
-/// could be read and written, and the stride made that possible without
-/// knowing the element type -- but there was no way to *make* one, so a
-/// document that said how many elements it had could only be read into an
-/// array that already happened to be that long. That is the whole of why a
-/// reader could round-trip an array and not fill one.
+/// The elements are zero, so this is only for elements that have a zero
+/// value (`Field.ElementHasZeroValue`): numbers, `bool`s, nullable references.
+/// For anything else it answers null, and the overload taking `fill` is the
+/// one to use.
 ///
-/// The elements are zero, which for a reference means null, so the array is
-/// safe to write into in any order and safe to abandon half-filled.
-///
-/// **It stores the array rather than handing it over**, for the reason
-/// `CreateInstanceInto` does: the reference an allocation answers with is
-/// owned by whoever received it, this module keeps `sl_release` to itself, and
-/// so a caller outside it had no way to let go of what `CreateArray` gave
-/// them. Writing it into the field here, and dropping the allocation's
-/// reference here, leaves the field the only owner and the caller nothing to
-/// remember.
+/// **It stores the array rather than handing it over.** The reference an
+/// allocation answers with is owned by whoever received it, and this module
+/// keeps `sl_release` to itself; writing it into the field here and dropping
+/// the allocation's reference leaves the field the only owner and the caller
+/// nothing to remember.
 ///
 /// Null for a field that is not an array, and for one whose array type the
 /// build recorded nothing for.
@@ -527,6 +636,30 @@ public byte* ReadArray(byte* instance, Field field)
 /// @seealso WriteAggregate
 public byte* CreateArrayInto(byte* instance, Field field, nuint count)
 {
+    if (field.Kind != KindArray || !field.ElementHasZeroValue)
+        return null;
+
+    return StoreCreatedObject(instance, field, sl_field_new_array(field.Handle, count));
+}
+
+/// Makes an array of `count` elements, hands it to `fill`, and stores it in
+/// the field only if every element then holds a value of its type.
+///
+/// The elements start as zero bytes. `fill` writes them -- `WriteTextAt`,
+/// `CreateElementAt`, or through `ReadAggregateAt` for a struct element --
+/// and answers whether it could. Then every element whose type has no zero
+/// value is asked whether it is still null, walking into a struct element's
+/// fields; if one is, or `fill` answered false, the array is released and the
+/// field keeps what it had. `fill` MUST NOT keep the address it is given.
+///
+/// @param instance  the object holding the field
+/// @param field     an array field
+/// @param count     how many elements
+/// @param fill      writes every element, and answers whether it could
+/// @returns the array, now owned by the field, or null
+/// @see CreateElementAt
+public byte* CreateArrayInto(byte* instance, Field field, nuint count, Func<byte*, bool> fill)
+{
     if (field.Kind != KindArray)
         return null;
 
@@ -534,11 +667,28 @@ public byte* CreateArrayInto(byte* instance, Field field, nuint count)
     if (made == null)
         return null;
 
-    // The field takes a reference of its own; this one was the allocation's,
-    // and letting it go leaves the field the only owner.
-    sl_write_reference(instance, field.Handle, made);
-    sl_release(made);
-    return made;
+    if (!fill(made) || !AreElementsComplete(made, field))
+    {
+        sl_release(made);
+        return null;
+    }
+    return StoreCreatedObject(instance, field, made);
+}
+
+// Whether every element of an array holds a value of its type.
+bool AreElementsComplete(byte* array, Field field)
+{
+    if (field.ElementHasZeroValue)
+        return true;
+
+    nuint length = sl_array_length(array);
+    for (nuint i = 0u; i < length; i++)
+    {
+        byte* at = sl_array_data(array) + i * field.ElementSize;
+        if (!sl_field_element_is_complete(field.Handle, at))
+            return false;
+    }
+    return true;
 }
 
 /// How many elements an array has. Zero for null.
@@ -586,6 +736,25 @@ public double ReadDoubleAt(byte* address, Field field)
 /// Reads an element of a `bool` array. Takes no field, a `bool` being one byte
 /// whatever array it is in.
 public bool ReadBoolAt(byte* address) => sl_read_at_bool(address);
+
+/// True when a reference element holds null, which only an element of a
+/// nullable type can. `ReadTextAt` answers `""` for such a String.
+///
+/// @param address  where the element sits, from `GetElementAddress`
+/// @param field    the array field, which supplies the element kind
+public bool IsElementNull(byte* address, Field field)
+{
+    switch (field.ElementKind)
+    {
+        case KindString:
+        case KindClass:
+        case KindInterface:
+        case KindArray:
+            return sl_read_at_reference(address) == null;
+        default:
+            return false;
+    }
+}
 
 /// Reads a String element, as a copy of all its bytes.
 public String ReadTextAt(byte* address)

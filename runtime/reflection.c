@@ -214,10 +214,18 @@ void sl_write_bool(void *instance, const void *field, _Bool value)
 /*
  * Retain before release, for the reason every owning store in the emitter does
  * it: writing a field back to itself must not destroy the value on the way.
+ * A null for a field that is never null is refused, leaving the field as it was.
  */
 void sl_write_reference(void *instance, const void *field, void *value)
 {
-    void **slot = (void **)sl_field_slot(instance, field);
+    if (value == NULL && (((const SlFieldInfo *)field)->flags & SL_FIELD_NO_ZERO)) return;
+
+    sl_write_at_reference(sl_field_slot(instance, field), value);
+}
+
+void sl_write_at_reference(void *address, void *value)
+{
+    void **slot = (void **)address;
 
     sl_retain(value);
     sl_release(*slot);
@@ -241,14 +249,76 @@ void sl_write_text(void *instance, const void *field,
     sl_release(text);
 }
 
-/*
- * A zeroed instance, for a deserializer that has a type and no constructor to
- * call. Every reference field starts null, so what comes back is only safe to
- * hand out once the caller has filled the ones that may not be.
- */
-void *sl_type_make(const void *type)
+void *sl_type_create(const void *type)
 {
-    return sl_alloc((const SlTypeInfo *)type);
+    const SlTypeInfo *info = (const SlTypeInfo *)type;
+    if (info == NULL || info->create == NULL) return NULL;
+    return info->create();
+}
+
+_Bool sl_type_can_create(const void *type)
+{
+    return type != NULL && ((const SlTypeInfo *)type)->create != NULL;
+}
+
+/*
+ * Whether storage of this kind holds a value. A reference is asked whether it
+ * is null; a struct with metadata is asked field by field, none of which any
+ * constructor wrote; anything else with no zero value cannot be seen into.
+ */
+static _Bool sl_slot_is_complete(const uint8_t *address, uint32_t kind,
+                                 uint32_t noZero, const SlTypeInfo *type)
+{
+    size_t i;
+
+    if (!noZero) return 1;
+
+    switch (kind) {
+        case SL_KIND_STRING:
+        case SL_KIND_CLASS:
+        case SL_KIND_INTERFACE:
+        case SL_KIND_ARRAY:
+            return *(void *const *)address != NULL;
+
+        case SL_KIND_STRUCT:
+            if (type == NULL || type->fieldCount == 0) return 0;
+            for (i = 0; i < type->fieldCount; i++) {
+                const SlFieldInfo *inner = &type->fields[i];
+                if (!sl_slot_is_complete(address + inner->offset, inner->kind,
+                                         inner->flags & SL_FIELD_NO_ZERO, inner->type))
+                    return 0;
+            }
+            return 1;
+
+        default:
+            return 0;
+    }
+}
+
+/*
+ * A field the constructor did not leave to the maker was written by it, as
+ * §2.16 requires of every constructor, so only the required ones are asked.
+ */
+_Bool sl_type_is_complete(const void *type, const void *instance)
+{
+    const SlTypeInfo *info = (const SlTypeInfo *)type;
+    size_t i;
+
+    for (i = 0; i < info->fieldCount; i++) {
+        const SlFieldInfo *field = &info->fields[i];
+        if (!(field->flags & SL_FIELD_REQUIRED)) continue;
+        if (!sl_slot_is_complete((const uint8_t *)instance + field->offset, field->kind,
+                                 field->flags & SL_FIELD_NO_ZERO, field->type))
+            return 0;
+    }
+    return 1;
+}
+
+_Bool sl_field_element_is_complete(const void *field, const void *address)
+{
+    const SlFieldInfo *info = (const SlFieldInfo *)field;
+    return sl_slot_is_complete((const uint8_t *)address, info->elementKind,
+                               info->flags & SL_FIELD_ELEMENT_NO_ZERO, info->elementType);
 }
 
 /* ------------------------------------------------------ array elements */
@@ -289,6 +359,10 @@ size_t sl_field_element_size(const void *field)
  * Null when the field is not an array, or is one the compiler recorded no type
  * for. The caller writes the result through sl_write_reference, which retains
  * it, so the array is owned by the object it was written into.
+ *
+ * The elements are zero bytes. For an element type with no zero value the
+ * caller MUST fill every one before the array is reachable, which
+ * Standard.Reflection checks with sl_field_element_is_complete.
  */
 void *sl_field_new_array(const void *field, size_t length)
 {
@@ -629,6 +703,7 @@ void sl_property_set_reference(void *instance, const void *property, void *value
     const SlPropertyInfo *info = (const SlPropertyInfo *)property;
     const void *setter = info->setter;
     if (setter == NULL) return;
+    if (value == NULL && (info->flags & SL_PROPERTY_NO_ZERO)) return;
 
     switch (info->kind) {
         case SL_KIND_STRING:

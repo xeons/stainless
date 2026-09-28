@@ -343,6 +343,8 @@ public sealed partial class LlvmEmitter(
             _module.Append(_metadata);
         }
 
+        _module.Append(_makers);
+
         // The one attribute group, and only under -g. See FrameAttributes.
         if (debug is not null)
         {

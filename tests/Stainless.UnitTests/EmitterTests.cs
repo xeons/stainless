@@ -993,4 +993,99 @@ public class EmitterTests
         Assert.Contains(exported, l => l.Contains("@_SL4Test6Circle4Area", StringComparison.Ordinal));
         Assert.DoesNotContain(exported, l => l.Contains("@_SL8Standard", StringComparison.Ordinal));
     }
+
+    // ------------------------------------------------------------ reflection
+
+    /// <summary>
+    /// A field table says, per field, whether zero bytes are a value of its
+    /// type, whether its elements' are, and whether the maker MUST supply it.
+    /// Reflection refuses a null and checks what it makes by these bits alone,
+    /// so a wrong one is a null handed out with nothing to notice.
+    /// </summary>
+    [Fact]
+    public void AFieldTableSaysWhichFieldsHaveNoZeroValue()
+    {
+        string ir = Front.ModuleIr("""
+            import Standard.Reflection;
+            [Reflect]
+            public class C
+            {
+                public String Name;
+                public String? Nick;
+                public int Count;
+                public required String Title;
+                public String[] Tags;
+                public int[]? Counts;
+                public required int Rank { get; set; }
+                public C() { Name = ""; Tags = []; }
+            }
+            """);
+
+        // PROPERTY 1, NO_ZERO 2, REQUIRED 4, ELEMENT_NO_ZERO 8.
+        Assert.Equal([2, 0, 0, 6, 10, 0, 5], FieldFlags(ir, "C"));
+    }
+
+    /// <summary>
+    /// A constructor marked <c>[SetsRequiredMembers]</c> answers for every
+    /// required member, so reflection, which runs it, is asked for none.
+    /// </summary>
+    [Fact]
+    public void AConstructorSettingRequiredMembersLeavesTheMakerNone()
+    {
+        string ir = Front.ModuleIr("""
+            import Standard.Reflection;
+            [Reflect]
+            public class C
+            {
+                public required String Title;
+                [SetsRequiredMembers]
+                public C() { Title = ""; }
+            }
+            """);
+
+        Assert.Equal([2], FieldFlags(ir, "C"));
+    }
+
+    /// <summary>
+    /// A reflected class <c>new C()</c> could make has a maker that runs the
+    /// constructor, and one it could not has none, so reflection has no way
+    /// to make it at all.
+    /// </summary>
+    [Fact]
+    public void OnlyAClassNewCouldMakeHasAMaker()
+    {
+        string ir = Front.ModuleIr("""
+            import Standard.Reflection;
+            [Reflect]
+            public class Made { public String Name; public Made() { Name = ""; } }
+            [Reflect]
+            public class Argued { public String Name; public Argued(String name) { Name = name; } }
+            [Reflect]
+            public abstract class Abstract { public int X; }
+            """);
+
+        string maker = Front.Function(ir, "@_SLmake_Test_Made(");
+        Assert.Contains("call ptr @sl_alloc(ptr @_SLtiTest_Made)", maker);
+        Assert.Matches(@"call void @_SL4Test4Made\S*\(ptr %object\)", maker);
+
+        Assert.EndsWith("ptr @_SLmake_Test_Made }", TypeInfoLine(ir, "Made"));
+        Assert.EndsWith("ptr null }", TypeInfoLine(ir, "Argued"));
+        Assert.EndsWith("ptr null }", TypeInfoLine(ir, "Abstract"));
+    }
+
+    private static string TypeInfoLine(string ir, string type) =>
+        ir.Split('\n').Single(l => l.StartsWith($"@_SLtiTest_{type} = ", StringComparison.Ordinal));
+
+    /// <summary>The flags column of each row of a reflected class's field table.</summary>
+    private static List<int> FieldFlags(string ir, string type)
+    {
+        string info = TypeInfoLine(ir, type);
+        var table = System.Text.RegularExpressions.Regex.Match(info, @"ptr (@\.meta\.fields\.\d+)")
+            .Groups[1].Value;
+        string rows = ir.Split('\n').Single(l => l.StartsWith(table + " = ", StringComparison.Ordinal));
+
+        return System.Text.RegularExpressions.Regex.Matches(rows, @"i32 (\d+) }")
+            .Select(m => int.Parse(m.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture))
+            .ToList();
+    }
 }

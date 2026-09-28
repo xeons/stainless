@@ -145,17 +145,32 @@ public int Main()
     Decode("delete-is-fine", "\"\u007f\"");
 
     // --------------------------------------------------------- the mapping
-    // A null array is made at the document's length; every element of it
-    // is a real value of its type, whatever the document held there.
+    // A null array is made at the document's length, and each object in it
+    // by its constructor, so a member the document leaves out is the
+    // constructor's.
     var holder = new Holder();
     var failure = Json.PopulateObject(holder,
-        "{\"Items\":[{\"Label\":\"a\",\"Size\":1},7,{\"Size\":3}]," +
-        "\"Tags\":[\"x\",4,null]}");
+        "{\"Items\":[{\"Label\":\"a\",\"Size\":1},{\"Size\":3}]," +
+        "\"Tags\":[\"x\",\"y\"]}");
     Say("populate", Json.DescribeJsonError(failure));
     Say("items", Json.Serialize(holder));
-    Say("item-label", holder.Items![1u].Label + "|" + holder.Items![2u].Label + "|");
-    Say("tag-lengths", Text.FromInteger((long)holder.Tags![1u].ByteLength())
-        + "/" + Text.FromInteger((long)holder.Tags![2u].ByteLength()));
+
+    // An element the document gives nothing of its type is not invented: an
+    // `Item` and a `String` are never null, so the array is discarded.
+    var wrongItem = new Holder();
+    failure = Json.PopulateObject(wrongItem, "{\"Items\":[{\"Label\":\"a\"},7]}");
+    Say("wrong-item", Json.DescribeJsonError(failure) + "/" +
+        (wrongItem.Items == null ? "none" : "kept"));
+
+    var wrongTag = new Holder();
+    failure = Json.PopulateObject(wrongTag, "{\"Tags\":[\"x\",4]}");
+    Say("wrong-tag", Json.DescribeJsonError(failure) + "/" +
+        (wrongTag.Tags == null ? "none" : "kept"));
+
+    var nullTag = new Holder();
+    failure = Json.PopulateObject(nullTag, "{\"Tags\":[\"x\",null]}");
+    Say("null-tag", Json.DescribeJsonError(failure) + "/" +
+        (nullTag.Tags == null ? "none" : "kept"));
 
     // A number past the field's reach is skipped, as a wrong type is.
     var ranged = new Holder();

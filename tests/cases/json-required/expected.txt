@@ -1,0 +1,11 @@
+complete = no error: {"Id":"7","Customer":{"Name":"Ada","Contact":{"Email":"ada@example.com","Phones":[]},"Note":null},"Lines":[{"Sku":"A","Quantity":2,"Options":[]},{"Sku":"B","Quantity":1,"Options":[]}],"Payments":[{"Currency":"EUR","Cents":250}],"Aliases":["a",null],"Seal":null}
+no-name = a member the type cannot do without is missing: customer none, lines none, payments none
+no-email = a member the type cannot do without is missing: customer none, lines none, payments none
+no-contact = a member the type cannot do without is missing: customer none, lines none, payments none
+no-note = a member the type cannot do without is missing: customer none, lines none, payments none
+wrong-type = a member the type cannot do without is missing: customer none, lines none, payments none
+bad-element = a member the type cannot do without is missing: customer none, lines none, payments none
+bad-struct = a member the type cannot do without is missing: customer none, lines none, payments none
+partial = a member the type cannot do without is missing: customer kept, lines none, payments none
+not-creatable = an object the document needs cannot be made: customer none, lines none, payments none
+null-customer = no error
