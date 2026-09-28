@@ -25,18 +25,18 @@ module Standard.Threading;
 /// started", "should this stop" -- are what it is for.
 public threadsafe class AtomicBool
 {
-    long _cell;
+    AtomicCell _cell;
 
     /// A flag starting at `initial`.
     public AtomicBool(bool initial)
     {
-        _cell = 0;
+        _cell.Value = 0;
         if (initial)
-            _cell = 1;
+            _cell.Value = 1;
     }
 
     /// The flag now. Cheap enough to read in a spin loop's condition.
-    public bool Read() => sl_atomic_load(&_cell) != 0;
+    public bool Read() => sl_atomic_load(&_cell.Value) != 0;
 
     /// Sets the flag, losing whatever it was. `Exchange` is the one to use
     /// when exactly one thread must win.
@@ -47,7 +47,7 @@ public threadsafe class AtomicBool
         long raw = 0;
         if (value)
             raw = 1;
-        sl_atomic_store(&_cell, raw);
+        sl_atomic_store(&_cell.Value, raw);
     }
 
     /// Sets the flag and returns what it was, which is how one thread wins a race.
@@ -56,6 +56,6 @@ public threadsafe class AtomicBool
         long raw = 0;
         if (value)
             raw = 1;
-        return sl_atomic_exchange(&_cell, raw) != 0;
+        return sl_atomic_exchange(&_cell.Value, raw) != 0;
     }
 }

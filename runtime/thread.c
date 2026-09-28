@@ -434,47 +434,53 @@ void sl_tls_set(size_t slot, void *value)
  * Sequentially consistent throughout. Weaker orderings are worth having only
  * once something measures as too slow, and getting them wrong is invisible
  * until it is expensive.
+ *
+ * A 64-bit cell MUST be eight-aligned. i386 System V aligns a long long to
+ * four, and without being told otherwise the compiler hands the operation to
+ * libatomic, which a 32-bit Linux system need not have.
  */
+
+typedef long long SlAtomicCell __attribute__((aligned(8)));
 
 long long sl_atomic_load(const long long *cell)
 {
-    return __atomic_load_n(cell, __ATOMIC_SEQ_CST);
+    return __atomic_load_n((const SlAtomicCell *)cell, __ATOMIC_SEQ_CST);
 }
 
 void sl_atomic_store(long long *cell, long long value)
 {
-    __atomic_store_n(cell, value, __ATOMIC_SEQ_CST);
+    __atomic_store_n((SlAtomicCell *)cell, value, __ATOMIC_SEQ_CST);
 }
 
 long long sl_atomic_add(long long *cell, long long delta)
 {
-    return __atomic_add_fetch(cell, delta, __ATOMIC_SEQ_CST);
+    return __atomic_add_fetch((SlAtomicCell *)cell, delta, __ATOMIC_SEQ_CST);
 }
 
 long long sl_atomic_exchange(long long *cell, long long value)
 {
-    return __atomic_exchange_n(cell, value, __ATOMIC_SEQ_CST);
+    return __atomic_exchange_n((SlAtomicCell *)cell, value, __ATOMIC_SEQ_CST);
 }
 
 _Bool sl_atomic_compare_exchange(long long *cell, long long *expected, long long desired)
 {
     return __atomic_compare_exchange_n(
-        cell, expected, desired, 0, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
+        (SlAtomicCell *)cell, expected, desired, 0, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
 }
 
 long long sl_atomic_and(long long *cell, long long mask)
 {
-    return __atomic_and_fetch(cell, mask, __ATOMIC_SEQ_CST);
+    return __atomic_and_fetch((SlAtomicCell *)cell, mask, __ATOMIC_SEQ_CST);
 }
 
 long long sl_atomic_or(long long *cell, long long mask)
 {
-    return __atomic_or_fetch(cell, mask, __ATOMIC_SEQ_CST);
+    return __atomic_or_fetch((SlAtomicCell *)cell, mask, __ATOMIC_SEQ_CST);
 }
 
 long long sl_atomic_xor(long long *cell, long long mask)
 {
-    return __atomic_xor_fetch(cell, mask, __ATOMIC_SEQ_CST);
+    return __atomic_xor_fetch((SlAtomicCell *)cell, mask, __ATOMIC_SEQ_CST);
 }
 
 /*

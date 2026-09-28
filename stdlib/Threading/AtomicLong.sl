@@ -23,6 +23,14 @@ module Standard.Threading;
 
 // ------------------------------------------------------------------ atomics
 
+/// What an `AtomicLong` or `AtomicBool` holds. A `long` is only four-aligned on
+/// i386 System V, and an eight-byte atomic MUST be eight-aligned to be one.
+[Align(8)]
+struct AtomicCell
+{
+    public long Value;
+}
+
 /// A 64-bit counter that several threads may touch at once.
 ///
 /// Every operation is sequentially consistent. Weaker orderings are worth
@@ -34,55 +42,55 @@ module Standard.Threading;
 /// interface only. A shared counter wants 64 bits anyway.
 public threadsafe class AtomicLong
 {
-    long _cell;
+    AtomicCell _cell;
 
     /// A counter starting at `initial`.
-    public AtomicLong(long initial) => _cell = initial;
+    public AtomicLong(long initial) => _cell.Value = initial;
 
     /// The value now. A read of a moving counter is stale the moment it is
     /// returned, so this is for reporting; `Add` and `CompareExchange` are
     /// what a decision is built on.
     ///
     /// @see AtomicLong.CompareExchange
-    public long Read() => sl_atomic_load(&_cell);
+    public long Read() => sl_atomic_load(&_cell.Value);
 
     /// Overwrites the value, losing whatever was there. `Exchange` is the one
     /// that tells you what it replaced.
     ///
     /// @see AtomicLong.Exchange
-    public void Write(long value) => sl_atomic_store(&_cell, value);
+    public void Write(long value) => sl_atomic_store(&_cell.Value, value);
 
     /// Adds and returns the new value, so two threads never see the same result.
-    public long Add(long delta) => sl_atomic_add(&_cell, delta);
+    public long Add(long delta) => sl_atomic_add(&_cell.Value, delta);
 
     /// Adds one and returns the new value, so two threads never see the same
     /// number. Note that this is not C's `++`, which answers the old one.
-    public long Increment() => sl_atomic_add(&_cell, 1);
+    public long Increment() => sl_atomic_add(&_cell.Value, 1);
 
     /// Subtracts one and returns the new value. A reference count reaching
     /// zero is exactly one thread's result.
-    public long Decrement() => sl_atomic_add(&_cell, -1);
+    public long Decrement() => sl_atomic_add(&_cell.Value, -1);
 
     /// Stores `value` and returns what was there before.
-    public long Exchange(long value) => sl_atomic_exchange(&_cell, value);
+    public long Exchange(long value) => sl_atomic_exchange(&_cell.Value, value);
 
     /// Stores `desired` only if the current value is `expected`, and reports
     /// whether it did. The building block for anything lock-free.
     public bool CompareExchange(long expected, long desired)
     {
         long witness = expected;
-        return sl_atomic_compare_exchange(&_cell, &witness, desired);
+        return sl_atomic_compare_exchange(&_cell.Value, &witness, desired);
     }
 
     /// Bitwise, for a set of flags several threads maintain. Each returns the
     /// new value, as `Add` does.
     ///
     /// @param mask  the bits to keep; every bit outside it is cleared
-    public long And(long mask) => sl_atomic_and(&_cell, mask);
+    public long And(long mask) => sl_atomic_and(&_cell.Value, mask);
 
     /// Sets the bits in `mask`, returning the new value.
-    public long Or(long mask) => sl_atomic_or(&_cell, mask);
+    public long Or(long mask) => sl_atomic_or(&_cell.Value, mask);
 
     /// Flips the bits in `mask`, returning the new value.
-    public long Xor(long mask) => sl_atomic_xor(&_cell, mask);
+    public long Xor(long mask) => sl_atomic_xor(&_cell.Value, mask);
 }

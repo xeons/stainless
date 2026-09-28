@@ -1183,7 +1183,11 @@ SL_API void   sl_tls_free(size_t slot);
 SL_API void  *sl_tls_get(size_t slot);
 SL_API void   sl_tls_set(size_t slot, void *value);
 
-/* Sequentially consistent. The language exposes these as Atomic<T>. */
+/*
+ * Sequentially consistent. The language exposes these as AtomicLong and
+ * AtomicBool. A 64-bit cell MUST be eight-aligned, which on i386 System V a
+ * long long is not by default.
+ */
 SL_API long long sl_atomic_load(const long long *cell);
 SL_API void      sl_atomic_store(long long *cell, long long value);
 SL_API long long sl_atomic_add(long long *cell, long long delta);
