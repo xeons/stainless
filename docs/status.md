@@ -737,6 +737,16 @@ last person to edit it -- the suite is the authority.
   root store trusts it, through `X509Chain`, for the host name asked for; a
   program may supply its own validator instead. Not resumption in either
   version, and never 0-RTT
+- `Standard.Net.Http`: an HTTP/1.1 client in `System.Net.Http`'s shape,
+  blocking, with a `Result` where .NET throws. Connections pooled per route
+  with a per-server limit and an idle timeout, one timeout over the whole
+  request, a retry of an idempotent request whose pooled connection had been
+  closed, strict parsing of responses, chunked bodies both ways, redirects,
+  RFC 6265 cookies, gzip and deflate, and HTTP proxies with `CONNECT` tunnels
+  and the curl environment variables. Over https it trusts what the TLS
+  module trusts, or what `ServerCertificateCustomValidationCallback` decides.
+  Not HTTP/2, which will be a second `IHttpConnection` chosen by ALPN; not
+  authentication beyond Basic to a proxy; and no timeout on name resolution
 - `Standard.Media.Audio`: playing and recording interleaved PCM, and reading and
   writing WAV. WASAPI on Windows and ALSA elsewhere, both reached by name at the
   first device rather than linked, so a machine with neither answers
@@ -1080,10 +1090,11 @@ Being straight about the edges, roughly in the order they are worth adding:
   socket's worth of waiting — `WaitToRead`, `WaitToWrite` and a non-blocking
   mode — and nothing that waits on many at once, so a server that holds a
   thousand connections wants a thread each. There is no `select` or `epoll`
-  over a set, and no async; `Standard.Net.Security`'s TLS is blocking in the
-  same way. **TLS has no resumption**, and certificates are never checked for
-  revocation. TLS 1.2 is there for peers without TLS 1.3, and only with
-  ECDHE, an AEAD and the extended master secret. `Socket.Connect` on a socket
+  over a set, and no async; `Standard.Net.Security`'s TLS and
+  `Standard.Net.Http`'s client are blocking in the same way. **TLS has no
+  resumption**, and certificates are never checked for revocation. TLS 1.2
+  is there for peers without TLS 1.3, and only with ECDHE, an AEAD and the
+  extended master secret. `Socket.Connect` on a socket
   that is already open tries one address rather than all of them, because a
   socket whose connect failed cannot be reused and that one is already made —
   `Socket.OpenConnected(host, port, ...)` is the form that tries each.

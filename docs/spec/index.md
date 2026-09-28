@@ -157,6 +157,7 @@ What ships and how: threading, collections, environment, math, concurrency, I/O,
 - [5.15 `Standard.Formats.Asn1`](05-standard-library.md#515-standardformatsasn1)
 - [5.16 `Standard.Security.Cryptography.X509Certificates`](05-standard-library.md#516-standardsecuritycryptographyx509certificates)
 - [5.17 `Standard.Net.Security`](05-standard-library.md#517-standardnetsecurity)
+- [5.18 `Standard.Net.Http`](05-standard-library.md#518-standardnethttp)
 
 ### [6. Attributes and reflection](06-attributes-reflection.md)
 

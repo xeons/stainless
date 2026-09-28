@@ -51,6 +51,7 @@ own for the linker to drop.
 | `Standard.Resources` | what a `.rc` folded into the binary, read back on every platform ([§2.2 of packages.md](../packages.md#22-resources)) | on request |
 | `Standard.Net` | TCP and UDP sockets, the same on every platform | on request |
 | `Standard.Net.Security` | TLS 1.3 and 1.2, client and server, over any stream ([§5.17](#517-standardnetsecurity)) | on request |
+| `Standard.Net.Http` | an HTTP/1.1 client: pooled connections, redirects, cookies, decompression, proxies ([§5.18](#518-standardnethttp)) | on request |
 | `Standard.Env` | the command line, the environment, the working directory | on request |
 | `Standard.Time` | `DateTimeOffset`, `TimeSpan`, `DateTime` and the monotonic `Stopwatch` | on request |
 | `Standard.Random` | xoshiro256**, seeded by you or by the operating system | on request |
@@ -1192,6 +1193,72 @@ vectors, and its key block and records against values computed
 independently. `tls13-handshake` and `tls12-handshake` run every suite, group
 and key over the loopback, and `tls13-refusals` and `tls12-refusals` pin the
 alert for each refusal.
+
+## 5.18 `Standard.Net.Http`
+
+```csharp
+var client = new HttpClient();
+client.Timeout = TimeSpan.FromSeconds(10);
+String page = try client.GetString("https://example.com/");
+
+var request = new HttpRequestMessage(HttpMethod.Post, "https://example.com/items");
+request.Content = new StringContent(json, null, "application/json");
+var response = client.Send(request, HttpCompletionOption.ResponseContentRead,
+                           out HttpFailure failure);
+```
+
+An HTTP/1.1 client (RFC 9112) over TCP and TLS. **The shape is
+`System.Net.Http`'s, blocking**: `SendAsync` is `Send`, `GetStringAsync` is
+`GetString`, and so on, and each answers a `Result<…, HttpError>` where .NET
+throws. `HttpError` is the case — `Timeout`, `ConnectFailure`, `TlsFailure`,
+`InvalidResponse`, `TooManyRedirects`, `ProxyFailure` and the rest — and the
+overloads taking `out HttpFailure` say more: the socket error, the TLS error
+and alert, the status a proxy refused with, the decompressor's error.
+
+`HttpClientHandler` is where the behaviour is, with .NET's names and
+defaults. **Connections are pooled** per scheme, host, port and proxy, held
+to `MaxConnectionsPerServer`, dropped after `PooledConnectionIdleTimeout`, and
+given back only once a body has been read to its end; a response disposed
+before then closes its connection. A request that fails before any byte of
+the answer on a pooled connection is sent once more on a new one when its
+method is idempotent. **`HttpClient.Timeout` covers the whole request**: the
+connect is made without blocking and waited for, and every read and write
+after it is given what is left. Name resolution is the one step it cannot
+cover, since the platform's resolver takes no timeout.
+
+**Responses are parsed strictly**, because each leniency is a way to smuggle
+one message inside another: a malformed status line, a folded field, a field
+with whitespace before its colon, a bare CR, a head over its limits, a chunk
+size that is not hexadecimal, two `Content-Length`s that disagree, and a
+`Content-Length` beside a `Transfer-Encoding` are all refused as
+`InvalidResponse` or `ResponseTooLarge`. Bodies are framed by length, by
+chunks with their trailer in `TrailingHeaders`, or by the close; 1xx answers
+are skipped, and HEAD, 204 and 304 have no body whatever they declare.
+
+Redirects follow RFC 9110: 301, 302 and 303 become `GET` without a body, 307
+and 308 keep both when the body can be sent twice, `Authorization` is dropped
+once a redirect leaves the origin, and https to http is not followed.
+`CookieContainer` is RFC 6265 with a short built-in list of public suffixes
+rather than the Public Suffix List. `AutomaticDecompression` undoes gzip and
+deflate — zlib or raw, as browsers accept — as the body is read. Proxies are
+HTTP proxies: absolute-form for http, a `CONNECT` tunnel carrying the TLS for
+https, Basic `Proxy-Authorization`, and `HttpClient.DefaultProxy` read from
+`http_proxy`, `https_proxy`, `all_proxy` and `no_proxy` as curl reads them.
+`DateTimeOffset.FormatHttpDate` and `ParseHttpDate` in `Standard.Time` write
+and read the HTTP-date the fields use.
+
+**Certificates are the TLS module's to judge** unless
+`ServerCertificateCustomValidationCallback` is set, and then the callback is
+told what the default would have answered, as .NET passes `SslPolicyErrors`.
+
+**HTTP/2 is not here yet, and has a place.** Each connection is an
+`IHttpConnection`; TLS offers ALPN `http/1.1` today, and an `h2` connection
+will be a second implementation chosen by what ALPN agrees on, beneath a pool,
+redirects, cookies and decompression that do not change.
+
+`tests/cases/http-*` and `https-basics` run the client against scripted
+servers on the loopback, a small proxy among them; nothing in the suite
+reaches the network.
 
 ---
 

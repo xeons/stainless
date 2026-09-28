@@ -620,6 +620,43 @@ trip is exact and anything else is refused rather than half-read.
 
 <sub>[stdlib/Time/DateTimeOffset.sl:150](../../stdlib/Time/DateTimeOffset.sl#L150)</sub>
 
+#### FormatHttpDate *method*
+
+```
+String FormatHttpDate()
+```
+
+RFC 9110's HTTP-date, the IMF-fixdate form every sender writes:
+`Sun, 06 Nov 1994 08:49:37 GMT`.
+
+**See also** &nbsp; [DateTimeOffset.ParseHttpDate](#parsehttpdate-method)
+
+<sub>[stdlib/Time/DateTimeOffset.sl:159](../../stdlib/Time/DateTimeOffset.sl#L159)</sub>
+
+#### ParseHttpDate *method*
+
+```
+static Result<DateTimeOffset, TimeError> ParseHttpDate(String text)
+```
+
+An HTTP-date back to an instant, in any of the three forms RFC 9110
+requires a recipient to read: IMF-fixdate, the obsolete RFC 850 form
+`Sunday, 06-Nov-94 08:49:37 GMT`, and C's asctime,
+`Sun Nov  6 08:49:37 1994`.
+
+Strict about the shape, as `ParseIso` is: a month's name in the wrong
+case, a zone other than `GMT`, or a missing field is refused. The day's
+name is checked for being one, not for being the right one.
+
+**Fails with**
+
+- [TimeError.Malformed](#malformed-case) — none of the three shapes
+- [TimeError.OutOfRange](#outofrange-case) — the right shape, and no real moment
+
+**See also** &nbsp; [DateTimeOffset.FormatHttpDate](#formathttpdate-method)
+
+<sub>[stdlib/Time/DateTimeOffset.sl:173](../../stdlib/Time/DateTimeOffset.sl#L173)</sub>
+
 #### Offset *property*
 
 ```
@@ -629,7 +666,7 @@ TimeSpan Offset { get; }
 How far ahead of UTC the local zone was at this instant. Negative west
 of Greenwich.
 
-<sub>[stdlib/Time/DateTimeOffset.sl:157](../../stdlib/Time/DateTimeOffset.sl#L157)</sub>
+<sub>[stdlib/Time/DateTimeOffset.sl:178](../../stdlib/Time/DateTimeOffset.sl#L178)</sub>
 
 #### operator - *operator*
 
@@ -639,7 +676,7 @@ static TimeSpan operator -(DateTimeOffset later, DateTimeOffset earlier)
 
 How long apart two instants are. Negative if the right one is later.
 
-<sub>[stdlib/Time/DateTimeOffset.sl:161](../../stdlib/Time/DateTimeOffset.sl#L161)</sub>
+<sub>[stdlib/Time/DateTimeOffset.sl:182](../../stdlib/Time/DateTimeOffset.sl#L182)</sub>
 
 #### operator + *operator*
 
@@ -650,7 +687,7 @@ static DateTimeOffset operator +(DateTimeOffset at, TimeSpan span)
 An instant moved forward by a length of time. Exact nanoseconds, so a
 day added is 24 hours and not a calendar day.
 
-<sub>[stdlib/Time/DateTimeOffset.sl:168](../../stdlib/Time/DateTimeOffset.sl#L168)</sub>
+<sub>[stdlib/Time/DateTimeOffset.sl:189](../../stdlib/Time/DateTimeOffset.sl#L189)</sub>
 
 #### operator - *operator*
 
@@ -660,7 +697,7 @@ static DateTimeOffset operator -(DateTimeOffset at, TimeSpan span)
 
 An instant moved back by a length of time.
 
-<sub>[stdlib/Time/DateTimeOffset.sl:176](../../stdlib/Time/DateTimeOffset.sl#L176)</sub>
+<sub>[stdlib/Time/DateTimeOffset.sl:197](../../stdlib/Time/DateTimeOffset.sl#L197)</sub>
 
 #### operator == *operator*
 
@@ -670,7 +707,7 @@ static bool operator ==(DateTimeOffset left, DateTimeOffset right)
 
 Whether the two name the same nanosecond.
 
-<sub>[stdlib/Time/DateTimeOffset.sl:184](../../stdlib/Time/DateTimeOffset.sl#L184)</sub>
+<sub>[stdlib/Time/DateTimeOffset.sl:205](../../stdlib/Time/DateTimeOffset.sl#L205)</sub>
 
 #### operator != *operator*
 
@@ -680,7 +717,7 @@ static bool operator !=(DateTimeOffset left, DateTimeOffset right)
 
 Whether they name different nanoseconds.
 
-<sub>[stdlib/Time/DateTimeOffset.sl:190](../../stdlib/Time/DateTimeOffset.sl#L190)</sub>
+<sub>[stdlib/Time/DateTimeOffset.sl:211](../../stdlib/Time/DateTimeOffset.sl#L211)</sub>
 
 #### operator &lt; *operator*
 
@@ -690,7 +727,7 @@ static bool operator <(DateTimeOffset left, DateTimeOffset right)
 
 Whether `left` is the earlier.
 
-<sub>[stdlib/Time/DateTimeOffset.sl:196](../../stdlib/Time/DateTimeOffset.sl#L196)</sub>
+<sub>[stdlib/Time/DateTimeOffset.sl:217](../../stdlib/Time/DateTimeOffset.sl#L217)</sub>
 
 #### operator &gt; *operator*
 
@@ -700,7 +737,7 @@ static bool operator >(DateTimeOffset left, DateTimeOffset right)
 
 Whether `left` is the later.
 
-<sub>[stdlib/Time/DateTimeOffset.sl:202](../../stdlib/Time/DateTimeOffset.sl#L202)</sub>
+<sub>[stdlib/Time/DateTimeOffset.sl:223](../../stdlib/Time/DateTimeOffset.sl#L223)</sub>
 
 #### operator &lt;= *operator*
 
@@ -710,7 +747,7 @@ static bool operator <=(DateTimeOffset left, DateTimeOffset right)
 
 Whether `left` is no later than `right`.
 
-<sub>[stdlib/Time/DateTimeOffset.sl:208](../../stdlib/Time/DateTimeOffset.sl#L208)</sub>
+<sub>[stdlib/Time/DateTimeOffset.sl:229](../../stdlib/Time/DateTimeOffset.sl#L229)</sub>
 
 #### operator &gt;= *operator*
 
@@ -720,7 +757,7 @@ static bool operator >=(DateTimeOffset left, DateTimeOffset right)
 
 Whether `left` is no earlier than `right`.
 
-<sub>[stdlib/Time/DateTimeOffset.sl:214](../../stdlib/Time/DateTimeOffset.sl#L214)</sub>
+<sub>[stdlib/Time/DateTimeOffset.sl:235](../../stdlib/Time/DateTimeOffset.sl#L235)</sub>
 
 #### Compare *method*
 
@@ -731,7 +768,7 @@ static int Compare(DateTimeOffset left, DateTimeOffset right)
 -1, 0 or 1, for sorting. The operators answer the question a program
 usually has; this answers the one a sort has.
 
-<sub>[stdlib/Time/DateTimeOffset.sl:221](../../stdlib/Time/DateTimeOffset.sl#L221)</sub>
+<sub>[stdlib/Time/DateTimeOffset.sl:242](../../stdlib/Time/DateTimeOffset.sl#L242)</sub>
 
 ### Stopwatch *class*
 
