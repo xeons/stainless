@@ -693,5 +693,6 @@ int Main()
     if (!walked.Ok)
         Console.WriteLine($"certificate FAIL: {DescribeAsnError(walked.Error)}");
 
+    PemTests();
     return 0;
 }

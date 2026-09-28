@@ -165,3 +165,28 @@ certificate end ok
 ecdsa r and s ok
 rewrite certificate ok
 rewritten bytes ok
+pem label ok
+pem data is the der ok
+pem location ok
+pem label location ok
+pem write matches openssl ok
+pem in text ok
+pem in text starts ok
+pem refuses mismatched end ok
+pem after mismatch ok
+pem refuses glued begin ok
+pem refuses glued end ok
+pem refuses bad base64 ok
+pem refuses url alphabet ok
+pem refuses short group ok
+pem refuses bad label ok
+pem second block ok
+pem empty ok
+pem empty found ok
+pem wraps at 64 ok
+label CERTIFICATE ok
+label X509 CRL ok
+label empty ok
+label double space ok
+label leading hyphen ok
+label trailing space ok
