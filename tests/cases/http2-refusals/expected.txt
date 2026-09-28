@@ -1,0 +1,34 @@
+the first frame is not SETTINGS: ProtocolError PROTOCOL_ERROR (HTTP/2 PROTOCOL_ERROR: the server's first frame was not SETTINGS)
+    the peer saw: GOAWAY PROTOCOL_ERROR
+SETTINGS of seven octets: ProtocolError FRAME_SIZE_ERROR (HTTP/2 FRAME_SIZE_ERROR: SETTINGS not a multiple of six octets)
+    the peer saw: GOAWAY FRAME_SIZE_ERROR
+SETTINGS with ENABLE_PUSH 1: ProtocolError PROTOCOL_ERROR (HTTP/2 PROTOCOL_ERROR: the server set ENABLE_PUSH)
+    the peer saw: GOAWAY PROTOCOL_ERROR
+a frame past SETTINGS_MAX_FRAME_SIZE: ProtocolError FRAME_SIZE_ERROR (HTTP/2 FRAME_SIZE_ERROR: a frame was larger than SETTINGS_MAX_FRAME_SIZE)
+    the peer saw: GOAWAY FRAME_SIZE_ERROR
+HEADERS interrupted before CONTINUATION: ProtocolError PROTOCOL_ERROR (HTTP/2 PROTOCOL_ERROR: a header block was interrupted)
+    the peer saw: GOAWAY PROTOCOL_ERROR
+PUSH_PROMISE with push disabled: ProtocolError PROTOCOL_ERROR (HTTP/2 PROTOCOL_ERROR: the server sent PUSH_PROMISE with push disabled)
+    the peer saw: GOAWAY PROTOCOL_ERROR
+DATA on a stream already ended: 200 ""
+    the peer saw: GOAWAY STREAM_CLOSED
+DATA past the stream's window: ProtocolError FLOW_CONTROL_ERROR (the server sent DATA past the stream's window)
+    the peer saw: RST_STREAM on stream 1, FLOW_CONTROL_ERROR; GOAWAY NO_ERROR
+a header block HPACK cannot decode: ProtocolError COMPRESSION_ERROR (HTTP/2 COMPRESSION_ERROR: a header block could not be decoded)
+    the peer saw: GOAWAY COMPRESSION_ERROR
+an upper-case field name: InvalidResponse (the field name 'Content-Type' has upper-case letters)
+    the peer saw: RST_STREAM on stream 1, PROTOCOL_ERROR; GOAWAY NO_ERROR
+a connection-specific field: InvalidResponse (the connection-specific field 'connection')
+    the peer saw: RST_STREAM on stream 1, PROTOCOL_ERROR; GOAWAY NO_ERROR
+a response without :status: InvalidResponse (a response without :status)
+    the peer saw: RST_STREAM on stream 1, PROTOCOL_ERROR; GOAWAY NO_ERROR
+a body short of its content-length: InvalidResponse (the response's body was not the length its content-length declared)
+    the peer saw: GOAWAY NO_ERROR
+a WINDOW_UPDATE of zero: ProtocolError PROTOCOL_ERROR (HTTP/2 PROTOCOL_ERROR: a WINDOW_UPDATE of zero)
+    the peer saw: GOAWAY PROTOCOL_ERROR
+HEADERS on a stream the server opened: ProtocolError PROTOCOL_ERROR (HTTP/2 PROTOCOL_ERROR: HEADERS on a stream never opened)
+    the peer saw: GOAWAY PROTOCOL_ERROR
+RST_STREAM on a stream never opened: ProtocolError PROTOCOL_ERROR (HTTP/2 PROTOCOL_ERROR: RST_STREAM on a stream never opened)
+    the peer saw: GOAWAY PROTOCOL_ERROR
+an unknown frame type, then a response: 200 "fine"
+    the peer saw: GOAWAY NO_ERROR

@@ -1,0 +1,36 @@
+-- six threads, one connection
+  thread 0: 200 /hold/0 on conn 1
+  thread 1: 200 /hold/1 on conn 1
+  thread 2: 200 /hold/2 on conn 1
+  thread 3: 200 /hold/3 on conn 1
+  thread 4: 200 /hold/4 on conn 1
+  thread 5: 200 /hold/5 on conn 1
+connections: 1
+streams open at once, at most: 6
+PING answered: true
+-- MAX_CONCURRENT_STREAMS 1
+  thread 0: 200 slow on conn 1
+  thread 1: 200 slow on conn 1
+  thread 2: 200 slow on conn 1
+connections: 1
+streams open at once, at most: 1
+-- GOAWAY with a request unprocessed
+  the first request: 200 first on conn 1, stream 1
+  the second, sent again: 200 POST a POST on conn 2, stream 1
+connections: 2
+-- streams the server resets
+  RST_STREAM INTERNAL_ERROR: ProtocolError, code 2 (the server reset the stream with INTERNAL_ERROR)
+  REFUSED_STREAM, then: 200 accepted on conn 1, stream 5
+  the connection after: 200 quick on conn 1, stream 7
+connections: 1
+-- one stream times out, the others carry on
+  alongside it: 200 quick on conn 1, stream 3
+  the silent one: Timeout (the request timed out waiting for the response)
+  the server saw RST_STREAM CANCEL: true
+  after it: 200 quick on conn 1, stream 5
+connections: 1
+-- a streamed body held back by a 65 535-byte window
+  read 10000 bytes; the server stopped at 65 535
+  closed early, the server saw RST_STREAM CANCEL: true
+  the connection after: 200 quick on conn 1, stream 3
+connections: 1
