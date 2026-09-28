@@ -9,6 +9,6 @@ T Largest<T>(T[] values) where T : IComparable<T> { return values[0]; }
 
 int Main()
 {
-    Largest(new Plain[2]);
+    Largest(new Plain[0]);
     return 0;
 }

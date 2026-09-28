@@ -352,10 +352,7 @@ public class Pad
 /// are not plugged in costing nothing.
 public Pad[] CreateAllPads()
 {
-    Pad[] pads = new Pad[XUSER_MAX_COUNT];
-    for (nuint i = 0u; i < pads.Length; i++)
-        pads[i] = new Pad((uint)i);
-    return pads;
+    return Array.Create(XUSER_MAX_COUNT, (i) => new Pad((uint)i));
 }
 
 /// How many of `pads` found a controller, after polling every one.

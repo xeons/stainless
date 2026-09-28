@@ -37,10 +37,7 @@ String Shape(ReadOnlySpan<int> values) => values switch
 // A fresh span, handed to a parameter that only reads it.
 Span<Trace> Made()
 {
-    var traces = new Trace[3];
-    traces[0] = new Trace("a");
-    traces[1] = new Trace("b");
-    traces[2] = new Trace("c");
+    Trace[] traces = [new Trace("a"), new Trace("b"), new Trace("c")];
     return traces[1:];
 }
 

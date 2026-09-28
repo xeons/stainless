@@ -306,12 +306,7 @@ public class ProjectFile
         if (extra.Length == 0u)
             return shared;
 
-        var answer = new String[shared.Length + extra.Length];
-        for (nuint i = 0u; i < shared.Length; i++)
-            answer[i] = shared[i];
-        for (nuint i = 0u; i < extra.Length; i++)
-            answer[shared.Length + i] = extra[i];
-        return answer;
+        return [..shared, ..extra];
     }
 }
 
@@ -471,17 +466,16 @@ Result<String[], String> ReadTextArray(JsonObject members, String name, String p
             return Fail("'" + path + "': '" + name + "' is a list, [ ... ]");
 
         var items = value.Items;
-        var answer = new String[items.Count];
+        var answer = new List<String>(items.Count);
 
-        for (nuint i = 0u; i < items.Count; i++)
+        foreach (var item in items)
         {
-            var item = items[i];
             if (!item.Text)
                 return Fail("'" + path + "': every entry in '" + name + "' is a string");
-            answer[i] = item.Value;
+            answer.Add(item.Value);
         }
 
-        return Ok(answer);
+        return Ok(answer.ToArray());
     }
 
     return Ok([]);

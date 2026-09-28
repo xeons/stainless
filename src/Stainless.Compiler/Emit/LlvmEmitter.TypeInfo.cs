@@ -432,7 +432,9 @@ public sealed partial class LlvmEmitter
     /// </summary>
     private string ElementColumns(TypeSymbol type)
     {
-        if (type is not ArrayTypeSymbol array) return $"i32 0, ptr null, {Word} 0";
+        // A `T[]?` is the same array when it holds one.
+        if ((type.NonNullForm() ?? type) is not ArrayTypeSymbol array)
+            return $"i32 0, ptr null, {Word} 0";
 
         return $"i32 {(int)KindOf(array.Element)}, " +
                $"ptr {NestedTypeInfo(array.Element)}, " +

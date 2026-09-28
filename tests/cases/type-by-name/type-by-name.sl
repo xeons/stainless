@@ -130,13 +130,7 @@ public int Main()
     Say("cross-module", Text.FromBool(FindType("TypeByName.Slider").Exists));
 
     // --------------------------------------------- building from a document
-    var settings = new String[6];
-    settings[0u] = "Left";
-    settings[1u] = "40";
-    settings[2u] = "Caption";
-    settings[3u] = "OK";
-    settings[4u] = "Enabled";
-    settings[5u] = "true";
+    String[] settings = ["Left", "40", "Caption", "OK", "Enabled", "true"];
 
     byte* raw = Build("TypeByName.Button", settings);
     Say("built", Text.FromBool(raw != null));
@@ -152,9 +146,7 @@ public int Main()
     Say("layouts", Text.FromInteger((long)counted.Layouts));
     Say("caption-direct", counted.Caption);
 
-    var sliderSettings = new String[2];
-    sliderSettings[0u] = "Value";
-    sliderSettings[1u] = "2.5";
+    String[] sliderSettings = ["Value", "2.5"];
 
     byte* sliderRaw = Build("TypeByName.Slider", sliderSettings);
     var slider = (Slider)sliderRaw;

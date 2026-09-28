@@ -63,9 +63,7 @@ int Main()
     printf("firstOdd=%d\n", firstOdd);
 
     // A managed element: each is retained for the iteration and released after.
-    var items = new Item[2];
-    items[0] = new Item("alpha");
-    items[1] = new Item("beta");
+    Item[] items = [new Item("alpha"), new Item("beta")];
     foreach (Item item in items)
         Console.WriteLine(item.Name);
 

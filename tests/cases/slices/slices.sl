@@ -45,10 +45,7 @@ String Show(int[] values)
 // The array outlives the function that made it, because the slice holds it.
 Span<Trace> Middle()
 {
-    var traces = new Trace[3];
-    traces[0] = new Trace("a");
-    traces[1] = new Trace("b");
-    traces[2] = new Trace("c");
+    Trace[] traces = [new Trace("a"), new Trace("b"), new Trace("c")];
     return traces[1:2];
 }
 
@@ -95,10 +92,7 @@ int Main()
     Reverse(values[2:5]);
     Console.WriteLine(Show(values));
 
-    var words = new String[3];
-    words[0] = "pear";
-    words[1] = "apple";
-    words[2] = "fig";
+    String[] words = ["pear", "apple", "fig"];
     Sort(words);
     Console.WriteLine(words[0] + "," + words[1] + "," + words[2]);
 

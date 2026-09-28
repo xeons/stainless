@@ -189,23 +189,23 @@ public Guid FileOpenDialogId() => Com.ParseGuid("DC1C5A9C-E88A-4DDE-A5A1-60F82A2
 public Guid FileSaveDialogId() => Com.ParseGuid("C0B4E2F3-BA21-4773-8DBA-335EC946EB8B");
 
 /// The `FilterSpec` array an `IFileDialog` wants, built from the same
-/// label-and-pattern pairs `BuildFilter` takes.
+/// label-and-pattern pairs `BuildFilter` takes, already in UTF-16.
 ///
 /// Simpler than the old filter in every way: an array of two pointers each,
 /// rather than one buffer of NUL-separated text with a double NUL at the end.
-/// The `Utf16String`s go in `held` because the specs point into them, and the
-/// caller keeps that alive for as long as it uses the specs.
-public FilterSpec[] BuildFilterSpecs(String[] pairs, Utf16String[] held)
+/// The specs point into `held`, so the caller MUST keep it alive for as long
+/// as it uses them.
+///
+///     Utf16String[] held = Array.Create(pairs.Length, (i) => pairs[i].ToUtf16());
+///     FilterSpec[] specs = BuildFilterSpecs(held);
+public FilterSpec[] BuildFilterSpecs(Utf16String[] held)
 {
-    nuint count = pairs.Length / 2u;
+    nuint count = held.Length / 2u;
     var specs = new FilterSpec[count];
 
     for (nuint i = 0u; i < count; i++)
     {
-        held[i * 2u]      = pairs[i * 2u].ToUtf16();
-        held[i * 2u + 1u] = pairs[i * 2u + 1u].ToUtf16();
-
-        specs[i].Name    = held[i * 2u].ToPointer();
+        specs[i].Name = held[i * 2u].ToPointer();
         specs[i].Pattern = held[i * 2u + 1u].ToPointer();
     }
     return specs;
@@ -227,8 +227,8 @@ int PrepareDialog(IFileDialog dialog, HWND owner, String title,
 
     if (filterPairs.Length >= 2u)
     {
-        var held = new Utf16String[filterPairs.Length];
-        var specs = BuildFilterSpecs(filterPairs, held);
+        Utf16String[] held = Array.Create(filterPairs.Length, (i) => filterPairs[i].ToUtf16());
+        var specs = BuildFilterSpecs(held);
         dialog.SetFileTypes((uint)specs.Length, &specs[0]);
     }
 

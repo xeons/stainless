@@ -89,8 +89,8 @@ public class Item
 public class Holder
 {
     public String Name;
-    public Item[] Items;
-    public String[] Tags;
+    public Item[]? Items;
+    public String[]? Tags;
     public long Big;
     public int Small;
 
@@ -153,9 +153,9 @@ public int Main()
         "\"Tags\":[\"x\",4,null]}");
     Say("populate", Json.DescribeJsonError(failure));
     Say("items", Json.Serialize(holder));
-    Say("item-label", holder.Items[1u].Label + "|" + holder.Items[2u].Label + "|");
-    Say("tag-lengths", Text.FromInteger((long)holder.Tags[1u].ByteLength())
-        + "/" + Text.FromInteger((long)holder.Tags[2u].ByteLength()));
+    Say("item-label", holder.Items![1u].Label + "|" + holder.Items![2u].Label + "|");
+    Say("tag-lengths", Text.FromInteger((long)holder.Tags![1u].ByteLength())
+        + "/" + Text.FromInteger((long)holder.Tags![2u].ByteLength()));
 
     // A number past the field's reach is skipped, as a wrong type is.
     var ranged = new Holder();

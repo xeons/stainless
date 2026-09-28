@@ -57,7 +57,7 @@ class Registry
 
     public Registry()
     {
-        _names = new String[4];
+        _names = ["", "", "", ""];
         _used = 0;
     }
 

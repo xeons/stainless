@@ -4,6 +4,7 @@ module Constraints;
 import Standard.Console;
 import Standard.Collections;    // IComparable<T> lives here
 import Standard.Threading;
+import Standard.Unchecked;
 
 public interface IDescribable
 {
@@ -66,7 +67,7 @@ public class Ranked<T> where T : IComparable<T>, IDescribable
 
     public Ranked(nuint capacity)
     {
-        _items = new T[capacity];
+        _items = NewUninitializedArray<T>(capacity);
         _count = 0;
     }
 
@@ -159,8 +160,7 @@ long Counted<T>(T shared, long times) where T : threadsafe { return times; }
 
 void Kinds()
 {
-    var dogs = new Dog[1];
-    dogs[0] = new Dog();
+    Dog[] dogs = [new Dog()];
     Console.WriteLine("class=" + FirstOf(dogs).Says());
 
     Point p;
@@ -187,10 +187,7 @@ void Kinds()
 
 int Main()
 {
-    var prices = new Money[3];
-    prices[0] = new Money(250);
-    prices[1] = new Money(999);
-    prices[2] = new Money(125);
+    Money[] prices = [new Money(250), new Money(999), new Money(125)];
     Console.WriteLine("largest=" + Largest(prices).Describe());
 
     var ranked = new Ranked<Money>(3);

@@ -142,7 +142,7 @@ void ShowConcurrent(String origin, Http2TestServer server)
 {
     Console.WriteLine("-- six threads, one connection");
     HttpClient client = CreateHttp2Client(1048576, TimeSpan.FromSeconds(8));
-    var results = new String[6u];
+    String[] results = Array.Repeat("", 6u);
     var threads = new List<Thread>();
     for (nuint i = 0u; i < 6u; i++)
     {
@@ -164,7 +164,7 @@ void ShowSerialised(String origin, Http2TestServer server)
 {
     Console.WriteLine("-- MAX_CONCURRENT_STREAMS 1");
     HttpClient client = CreateHttp2Client(1048576, TimeSpan.FromSeconds(8));
-    var results = new String[3u];
+    String[] results = Array.Repeat("", 3u);
     var threads = new List<Thread>();
     for (nuint i = 0u; i < 3u; i++)
     {
@@ -185,7 +185,7 @@ void ShowMultipleConnections(String origin, Http2TestServer server)
     Console.WriteLine("-- MAX_CONCURRENT_STREAMS 1, with EnableMultipleHttp2Connections");
     HttpClient client = CreateHttp2Client(1048576, TimeSpan.FromSeconds(8));
     client.Handler.EnableMultipleHttp2Connections = true;
-    var results = new String[3u];
+    String[] results = Array.Repeat("", 3u);
     var threads = new List<Thread>();
     for (nuint i = 0u; i < 3u; i++)
     {
@@ -206,7 +206,7 @@ void ShowGoAway(String origin, Http2TestServer server)
 {
     Console.WriteLine("-- GOAWAY with a request unprocessed");
     HttpClient client = CreateHttp2Client(1048576, TimeSpan.FromSeconds(8));
-    var results = new String[1u];
+    String[] results = Array.Repeat("", 1u);
     var first = new Thread(() => results[0u] = FetchText(client, origin + "/first"));
     AwaitCondition(() => server.StreamsSeen >= 1);
     var request = new HttpRequestMessage(HttpMethod.Post, origin + "/second");
@@ -236,7 +236,7 @@ void ShowTimeout(String origin, Http2TestServer server)
 {
     Console.WriteLine("-- one stream times out, the others carry on");
     HttpClient client = CreateHttp2Client(1048576, TimeSpan.FromSeconds(1));
-    var results = new String[1u];
+    String[] results = Array.Repeat("", 1u);
     var silent = new Thread(() => results[0u] = FetchText(client, origin + "/silent"));
     AwaitCondition(() => server.StreamsSeen >= 1);
     Console.WriteLine("  alongside it: " + FetchText(client, origin + "/quick"));

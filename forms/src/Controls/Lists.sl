@@ -74,10 +74,7 @@ public abstract class ListControl : WindowedControl
     {
         get
         {
-            var all = new String[_items.Count];
-            for (nuint i = 0u; i < _items.Count; i++)
-                all[i] = _items[i];
-            return all;
+            return _items.ToArray();
         }
         set
         {

@@ -9,6 +9,7 @@ module Indexers;
 import Standard.Console;
 import Standard.Text;
 import Standard.Collections;
+import Standard.Unchecked;
 
 String N(long v) => Text.FromInteger(v);
 
@@ -17,7 +18,7 @@ public class Box<T>
 {
     T[] _cells;
 
-    public Box(nuint size) => _cells = new T[size];
+    public Box(nuint size) => _cells = NewUninitializedArray<T>(size);
 
     public T this[nuint at]
     {

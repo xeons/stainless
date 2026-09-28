@@ -110,7 +110,6 @@ public sealed partial class Binder
         PushScope();
         var body = BindBlock(function.Body);
         PopScope();
-        SettleUnsetLocals(body);
         ReportUnavailableMembers(body);
 
         // What a getter reads, so that capturing the property can be tested
@@ -127,8 +126,9 @@ public sealed partial class Binder
             body = WithFieldInitializers(function, body);
             body = WithBaseConstruction(function, body);
             body = WithPrimaryCaptures(function, body);
-            CheckConstructorAssignsFields(function, body);
         }
+
+        SettleUnsetLocals(body);
 
         if (!function.ReturnType.IsVoid() && !function.ReturnType.IsError() && EndIsReachable(body))
             diagnostics.Error("SL0217", function.Span,
@@ -1314,6 +1314,10 @@ public sealed partial class Binder
             case BoundExpressionStatement expression:
                 return Evaluates(expression.Expression, target, assigned);
 
+            // Declared again each time a loop comes round to it.
+            case BoundLocalDeclaration declaration when target.IsDeclaredBy(declaration.Local):
+                return false;
+
             case BoundLocalDeclaration declaration:
                 return Evaluates(declaration.Initializer, target, assigned);
 
@@ -1404,7 +1408,10 @@ public sealed partial class Binder
                         ? target.IsPlace(o.Value)
                         : Evaluates(o.Value, target, false));
 
+            // Whatever else it holds may still read the place.
             default:
+                if (target.ChecksReads)
+                    new PlaceWriteTracker(target, assigned).Visit(statement);
                 return assigned;
         }
     }
@@ -1681,8 +1688,8 @@ public sealed partial class Binder
         }
 
         var local = DeclareLocal(syntax.Name, type, syntax.IsConst, syntax.Span);
-        if (initializer is null && syntax.Type is not null)
-            NoteUnsetLocal(local, syntax.Span, syntax.Type);
+        if (initializer is null)
+            NoteUnsetLocal(local);
         return new BoundLocalDeclaration(syntax.Span, local, initializer);
     }
 

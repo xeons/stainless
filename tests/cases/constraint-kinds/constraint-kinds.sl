@@ -2,6 +2,7 @@
 module ConstraintKinds;
 
 import Standard.Console;
+import Standard.Unchecked;
 
 public struct Pixel
 {
@@ -41,8 +42,8 @@ public class Label
 // None of its values is null, so a lookup can answer with one directly.
 public class Registry<TKey, TValue> where TKey : notnull where TValue : notnull
 {
-    TKey[] _keys = new TKey[4];
-    TValue[] _values = new TValue[4];
+    TKey[] _keys = NewUninitializedArray<TKey>(4u);
+    TValue[] _values = NewUninitializedArray<TValue>(4u);
     nuint _count;
 
     public void Add(TKey key, TValue value)

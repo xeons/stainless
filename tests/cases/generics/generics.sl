@@ -2,6 +2,7 @@
 module Generics;
 
 import Standard.Console;
+import Standard.Unchecked;
 
 public class Box<T>
 {
@@ -29,7 +30,7 @@ public class List<T>
 
     public List()
     {
-        _items = new T[2];
+        _items = NewUninitializedArray<T>(2u);
         _count = 0;
     }
 
@@ -39,7 +40,7 @@ public class List<T>
     {
         if (_count == _items.Length)
         {
-            var bigger = new T[_count * 2];
+            var bigger = NewUninitializedArray<T>(_count * 2);
             for (nuint i = 0; i < _count; i = i + 1)
                 bigger[i] = _items[i];
             _items = bigger;

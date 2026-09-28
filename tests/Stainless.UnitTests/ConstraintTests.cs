@@ -242,7 +242,7 @@ public class ConstraintTests
     [Theory]
     [InlineData("var n = Size(\"text\");")]
     [InlineData("var n = Size(new Dog());")]
-    [InlineData("Holder h; var n = Size(h);")]
+    [InlineData("Holder h; h.Text = \"\"; var n = Size(h);")]
     [InlineData("var n = Size((1, \"text\"));")]
     public void UnmanagedRefusesAnythingCounted(string body) =>
         Assert.Contains("SL0328", With(

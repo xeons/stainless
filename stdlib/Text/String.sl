@@ -21,6 +21,7 @@
 
 module Standard.Text;
 
+import Standard;
 import Standard.Limits;
 
 /// Immutable UTF-8 text.
@@ -393,20 +394,21 @@ public class String
             at = (nuint)found + separator.ByteLength();
         }
 
-        var result = new String[parts];
-        nuint index = 0;
+        var starts = new nuint[parts];
+        var ends = new nuint[parts];
         at = 0;
 
-        while (index + 1 < parts)
+        for (nuint index = 0; index + 1 < parts; index++)
         {
             long found = this.IndexOf(separator, at);
-            result[index] = this.Substring(at, (nuint)found - at);
+            starts[index] = at;
+            ends[index] = (nuint)found;
             at = (nuint)found + separator.ByteLength();
-            index++;
         }
 
-        result[index] = this.Substring(at);
-        return result;
+        starts[parts - 1] = at;
+        ends[parts - 1] = this.ByteLength();
+        return CutBetween(starts, ends);
     }
 
     /// This text cut at every occurrence of one code unit.
@@ -422,7 +424,8 @@ public class String
                 parts = parts + 1;
         }
 
-        var result = new String[parts];
+        var starts = new nuint[parts];
+        var ends = new nuint[parts];
         nuint index = 0;
         nuint start = 0;
 
@@ -430,14 +433,16 @@ public class String
         {
             if (mine[i] == separator)
             {
-                result[index] = this.Substring(start, i - start);
+                starts[index] = start;
+                ends[index] = i;
                 index++;
                 start = i + 1;
             }
         }
 
-        result[index] = this.Substring(start);
-        return result;
+        starts[index] = start;
+        ends[index] = size;
+        return CutBetween(starts, ends);
     }
 
     /// This text cut into lines, on "\n" or "\r\n".
@@ -462,7 +467,8 @@ public class String
                 lines = lines + 1;
         }
 
-        var result = new String[lines];
+        var starts = new nuint[lines];
+        var ends = new nuint[lines];
         nuint index = 0;
         nuint start = 0;
 
@@ -474,7 +480,8 @@ public class String
             nuint end = i;
             if (end > start && mine[end - 1] == 13)
                 end = end - 1;
-            result[index] = this.Substring(start, end - start);
+            starts[index] = start;
+            ends[index] = end;
             index++;
             start = i + 1;
         }
@@ -484,10 +491,15 @@ public class String
             nuint end = size;
             if (end > start && mine[end - 1] == 13)
                 end = end - 1;
-            result[index] = this.Substring(start, end - start);
+            starts[index] = start;
+            ends[index] = end;
         }
-        return result;
+        return CutBetween(starts, ends);
     }
+
+    /// The parts of this text from each start to the end beside it.
+    private String[] CutBetween(nuint[] starts, nuint[] ends) =>
+        Array.Create(starts.Length, (i) => this.Substring(starts[i], ends[i] - starts[i]));
 
     // ------------------------------------------------------------------ case
 

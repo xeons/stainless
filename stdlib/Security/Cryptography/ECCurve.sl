@@ -37,7 +37,7 @@ module Standard.Security.Cryptography;
 /// The zero value names no curve.
 public struct ECCurve
 {
-    private String _oid;
+    private String? _oid;
     private bool _isNamed;
 
     ECCurve(String oid)
@@ -61,7 +61,7 @@ public struct ECCurve
     public bool IsNamed => _isNamed;
 
     /// The curve's object identifier, dotted, or empty for the zero value.
-    public String OidValue => _isNamed ? _oid : "";
+    public String OidValue => _oid ?? "";
 
     /// .NET's name for the curve — `nistP256`, `nistP384` — or empty for a
     /// curve this module has no arithmetic for.
@@ -69,9 +69,7 @@ public struct ECCurve
     {
         get
         {
-            if (!_isNamed)
-                return "";
-            switch (_oid)
+            switch (OidValue)
             {
                 case "1.2.840.10045.3.1.7": return "nistP256";
                 case "1.3.132.0.34": return "nistP384";
@@ -108,14 +106,12 @@ public struct ECCurve
                 return new ECCurve("1.3.132.0.34");
         }
 
-        ECCurve none = new ECCurve("");
-        none._isNamed = false;
-        return none;
+        return default(ECCurve);
     }
 
     /// Whether both name the same curve.
     public bool Equals(ECCurve other) =>
-        _isNamed == other._isNamed && (!_isNamed || _oid == other._oid);
+        _isNamed == other._isNamed && OidValue == other.OidValue;
 }
 
 /// The arithmetic for `curve`, or `CryptoError.Unsupported`.

@@ -24,7 +24,7 @@ public class Pair<TFirst, TSecond> : Labelled<TFirst>
 int Main()
 {
     var labelled = new Labelled<int>();
-    var pair = new Pair<String, double>();
+    var pair = new Pair<String?, double>();
     Console.WriteLine(labelled.Label + " " + Text.FromInteger(labelled.Count));
     Console.WriteLine(pair.Label + " " + Text.FromInteger(pair.Count + pair.Extra));
     return 0;

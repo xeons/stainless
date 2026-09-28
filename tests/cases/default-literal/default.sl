@@ -32,7 +32,7 @@ Node? ReturnsNothing()
 
 T Blank<T>() => default;
 
-bool IsBlank<T>(T value) where T : class => value == default;
+bool IsBlank<T>(T value) where T : zeroable => value == default;
 
 int Bumped(int start = default) => start + 1;
 
@@ -52,7 +52,7 @@ public int Main()
 
     Node named = new Node("named");
     Node? held = named;
-    Console.WriteLine($"d {number == default} {held == default} {IsBlank<Node>(named)}");
+    Console.WriteLine($"d {number == default} {held == default} {IsBlank<Node?>(held)}");
 
     long wide = (long)default;
     bool flag = true;

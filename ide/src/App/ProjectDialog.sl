@@ -302,12 +302,7 @@ public class ProjectDialog : Form
                 kept.Add(trimmed);
         }
 
-        var answer = new String[kept.Count];
-        for (nuint i = 0u; i < kept.Count; i++)
-        {
-            answer[i] = kept[i];
-        }
-        return answer;
+        return kept.ToArray();
     }
 
     void OnOk(Control sender)

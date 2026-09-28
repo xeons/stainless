@@ -1341,10 +1341,7 @@ String KindName(StopKind kind)
 /// The arguments from `from` onwards, as their own array.
 String[] ArgumentsFrom(String[] args, nuint from)
 {
-    String[] rest = new String[args.Length - from];
-    for (nuint i = from; i < args.Length; i++)
-        rest[i - from] = args[i];
-    return rest;
+    return args[from:].ToArray();
 }
 
 int PrintUsage()

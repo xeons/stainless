@@ -60,7 +60,7 @@ int Main()
     var numbers = new int[3];
     printf("count=%d\n", (int)util.CountOf(numbers));
 
-    var words = new String[5];
+    String[] words = ["a", "b", "c", "d", "e"];
     printf("wordCount=%d\n", (int)util.CountOf(words));
 
     var rich = util.Bigger(new Money(500), new Money(250));

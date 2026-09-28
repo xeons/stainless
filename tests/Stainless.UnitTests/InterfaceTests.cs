@@ -435,9 +435,17 @@ public class InterfaceTests
     public void AnOverrideMayNotReturnSomethingElse(string declared, string written) =>
         Assert.Equal(["SL0502"], Front.ModuleCodes(Animals +
             $$"""
-            public class Shelter { public virtual {{declared}} Adopt() => default; }
-            public class Kennel : Shelter { public override {{written}} Adopt() => default; }
+            public class Shelter { public virtual {{declared}} Adopt() => {{Made(declared)}}; }
+            public class Kennel : Shelter { public override {{written}} Adopt() => {{Made(written)}}; }
             """));
+
+    /// <summary>A value of each type these tests return, which a `Dog` has no zero of.</summary>
+    private static string Made(string type) => type switch
+    {
+        "Dog" or "Animal" => "new Dog()",
+        "Dog?" => "null",
+        _ => "0",
+    };
 
     [Fact]
     public void ACallThroughTheDerivedTypeSeesTheNarrowerType() =>
@@ -469,8 +477,8 @@ public class InterfaceTests
     public void AWritablePropertyMayNotNarrowItsType() =>
         Assert.Equal(["SL0502"], Front.ModuleCodes(Animals +
             """
-            public class Shelter { public virtual Animal Pet { get; set; } }
-            public class Kennel : Shelter { public override Dog Pet { get; set; } }
+            public class Shelter { public virtual Animal Pet { get; set; } = new Animal(); }
+            public class Kennel : Shelter { public override Dog Pet { get; set; } = new Dog(); }
             """));
 
     [Fact]

@@ -139,6 +139,25 @@ public sealed class Parser
     /// <summary>Whether the accessor being parsed has named <c>field</c>.</summary>
     private bool _accessorUsesField;
 
+    /// <summary>
+    /// Where the accessor being parsed names <c>field</c>, and where it names
+    /// it as what <c>??=</c> fills. The two are one set when nothing reads the
+    /// storage but to fill it on first use.
+    /// </summary>
+    private readonly HashSet<int> _fieldMentions = [];
+    private readonly HashSet<int> _fieldFills = [];
+
+    /// <summary>Starts watching a new accessor's use of <c>field</c>.</summary>
+    private void BeginAccessor()
+    {
+        _accessorUsesField = false;
+        _fieldMentions.Clear();
+        _fieldFills.Clear();
+    }
+
+    /// <summary>Whether the accessor just parsed reads <c>field</c> only to fill it with <c>??=</c>.</summary>
+    private bool AccessorOnlyFillsField => _fieldMentions.SetEquals(_fieldFills);
+
     // ------------------------------------------------------------ token helpers
 
     private Token Current => Peek(0);
@@ -2219,7 +2238,7 @@ public sealed class Parser
     private List<AccessorSyntax> ArrowGetter(int start)
     {
         Expect(TokenKind.EqualsGreater);
-        _accessorUsesField = false;
+        BeginAccessor();
         var getter = ParseArrowBody(isGetter: true);
         Expect(TokenKind.Semicolon);
         return
@@ -2227,6 +2246,7 @@ public sealed class Parser
             new AccessorSyntax(SpanFrom(start), Modifiers.None, IsGetter: true, getter)
             {
                 UsesField = _accessorUsesField,
+                OnlyFillsField = AccessorOnlyFillsField,
             },
         ];
     }
@@ -2258,7 +2278,7 @@ public sealed class Parser
 
             string word = Advance().Text;
             bool isGetter = word == "get";
-            _accessorUsesField = false;
+            BeginAccessor();
 
             // A block body stands on its own; a bare accessor and an arrow body
             // are both statements and end at a semicolon.
@@ -2270,6 +2290,7 @@ public sealed class Parser
                 {
                     IsInit = word == "init",
                     UsesField = _accessorUsesField,
+                    OnlyFillsField = AccessorOnlyFillsField,
                 });
                 continue;
             }
@@ -2282,6 +2303,7 @@ public sealed class Parser
             {
                 IsInit = word == "init",
                 UsesField = _accessorUsesField,
+                OnlyFillsField = AccessorOnlyFillsField,
             });
         }
 
@@ -3884,6 +3906,9 @@ public sealed class Parser
         if (AtAny(AssignmentOperators))
         {
             var op = Advance().Kind;
+            if (op == TokenKind.QuestionQuestionEquals && left is FieldKeywordSyntax filled)
+                _fieldFills.Add(filled.Span.Start);
+
             var right = ParseAssignment();               // right-associative
             return new AssignmentSyntax(SpanFrom(start), left, op, right);
         }
@@ -4640,6 +4665,8 @@ public sealed class Parser
                 alignment = inner.ParseExpression();
 
             _accessorUsesField |= inner._accessorUsesField;
+            _fieldMentions.UnionWith(inner._fieldMentions);
+            _fieldFills.UnionWith(inner._fieldFills);
             _sliceSpellings.AddRange(inner._sliceSpellings);
 
             // A limit reached inside the hole was reached here too, and this
@@ -4925,7 +4952,9 @@ public sealed class Parser
                 {
                     Advance();
                     _accessorUsesField = true;
-                    return new FieldKeywordSyntax(SpanFrom(start), _accessorProperty);
+                    var storage = new FieldKeywordSyntax(SpanFrom(start), _accessorProperty);
+                    _fieldMentions.Add(storage.Span.Start);
+                    return storage;
                 }
 
                 // Just the one identifier. A following '.' is postfix member access,

@@ -273,7 +273,13 @@ public sealed partial class Binder
             return;
         }
 
-        CheckStaticPropertyHasValue(symbol, declaration);
+        // Its `default` is the parser's rather than the program's, so it is
+        // said once, as the missing value it is.
+        if (StaticPropertyStartsWithoutValue(symbol, declaration))
+        {
+            symbol.Initializer = new BoundDefault(declaration.Span, symbol.Type);
+            return;
+        }
 
         if (declaration.Value is null)
         {

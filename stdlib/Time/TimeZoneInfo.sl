@@ -881,7 +881,7 @@ public sealed class TimeZoneInfo : IEquatable<TimeZoneInfo>, IHashable
 
         // The key, the standard name, the daylight name and the display name,
         // each ended by a NUL.
-        var parts = new String[4];
+        String[] parts = ["", "", "", ""];
         nuint start = 0u;
         for (nuint part = 0u; part < 4u; part++)
         {

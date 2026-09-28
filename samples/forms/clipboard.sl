@@ -170,15 +170,11 @@ public class MainForm : Form
     /// need not exist.
     static String[] SampleFiles()
     {
-        var paths = new String[2u];
 #if WINDOWS
-        paths[0u] = "C:\\Stainless\\notes.txt";
-        paths[1u] = "C:\\Stainless\\a folder\\naïve.png";
+        return ["C:\\Stainless\\notes.txt", "C:\\Stainless\\a folder\\naïve.png"];
 #else
-        paths[0u] = "/tmp/stainless/notes.txt";
-        paths[1u] = "/tmp/stainless/a folder/naïve.png";
+        return ["/tmp/stainless/notes.txt", "/tmp/stainless/a folder/naïve.png"];
 #endif
-        return paths;
     }
 
     // ------------------------------------------------------------ self test

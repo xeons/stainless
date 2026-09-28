@@ -564,6 +564,12 @@ public sealed class StaticSymbol(string name, TypeSymbol type, string moduleName
     /// </summary>
     public bool IsPropertyStorage { get; init; }
 
+    /// <summary>
+    /// A property's storage its accessors read only to fill with
+    /// <c>field ??= ...</c>, so it may start empty whatever its type says.
+    /// </summary>
+    public bool IsFilledOnFirstUse { get; init; }
+
     /// <summary>What a diagnostic calls it: the property, for a property's storage.</summary>
     public string DisplayName => IsPropertyStorage ? Name[..^1] : Name;
 

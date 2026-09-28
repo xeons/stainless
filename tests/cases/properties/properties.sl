@@ -47,7 +47,7 @@ public class Control
 
     /// An automatic one. Its storage *is* a field named 'Name', which is the
     /// case that used to be indistinguishable.
-    public String Name { get; set; }
+    public String Name { get; set; } = "";
 
     /// Read-only, so `CanWrite` is false and a loader can say so rather than
     /// silently dropping what a document asked for.

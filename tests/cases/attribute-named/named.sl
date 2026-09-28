@@ -26,7 +26,7 @@ public class Row
 {
     /// Positional, then named.
     [Column("full_name", Width = 32)]
-    public String Name;
+    public String Name = "";
 
     /// Every field named, and one of them skipped.
     [Column(Name = "age", Hidden = true)]
@@ -34,11 +34,11 @@ public class Row
 
     /// Only the one field that has no sensible default.
     [Column("city")]
-    public String City;
+    public String City = "";
 
     /// All three positionally, which is what naming them is an alternative to.
     [Column("zip", 5, false)]
-    public String Postcode;
+    public String Postcode = "";
 }
 
 /// A field nobody wrote a value for holds its type's default, and says so:

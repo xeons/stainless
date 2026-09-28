@@ -97,8 +97,8 @@ public class Person
 public class Sparse
 {
     public String Name;
-    public String[] Tags;
-    public int[] Counts;
+    public String[]? Tags;
+    public int[]? Counts;
 
     public Sparse() => Name = "kept";
 }
@@ -115,12 +115,10 @@ public class Bag
     public Bag()
     {
         Name = "kept";
-        Tags = new String[2];
+        Tags = ["", ""];
         More = new List<String>();
         Untagged = new Plain();
         Counts = new int[2];
-        Tags[0u] = "";
-        Tags[1u] = "";
     }
 }
 

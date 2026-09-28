@@ -30,10 +30,10 @@ public class Person
     int _made = 0;
 
     /// An automatic getter beside a setter that does work.
-    public String Name { get; set => field = value.Trim(); }
+    public String Name { get; set => field = value.Trim(); } = "";
 
-    /// Filled on first use and kept: the storage starts empty whatever the
-    /// type says, and `??=` is how an accessor fills it.
+    /// Filled on first use and kept: nothing reads the storage but `??=`, so
+    /// it may start empty whatever the type says.
     public Node Badge { get => field ??= MakeBadge(); }
 
     /// Both accessors written, both naming the storage.
@@ -84,7 +84,7 @@ public struct Temperature
 /// And on a generic type, once per instantiation.
 public class Slot<T>
 {
-    public T Value { get; set => field = value; }
+    public required T Value { get; set => field = value; }
     public int Writes { get => field; private set => field = value; }
 
     public void Put(T value)
@@ -116,7 +116,7 @@ int Main()
     t.Celsius = -500.0;
     Console.WriteLine(Text.FromDouble(t.Celsius));
 
-    var slot = new Slot<String>();
+    var slot = new Slot<String> { Value = "" };
     slot.Put("a");
     slot.Put("b");
     Console.WriteLine(slot.Value + " " + Text.FromInteger(slot.Writes));

@@ -1470,6 +1470,12 @@ public sealed partial class Binder
                 "property, which is the one that owns a field",
                 type);
 
+        // Storage nothing reads but to fill it on first use, with `field ??=`,
+        // may start empty: nothing can see it that way.
+        bool filledOnFirstUse = wantsStorage && getter.Body is not null &&
+            declaration.Initializer is null && setter is not { Body: null } &&
+            declaration.Accessors.Where(a => a.UsesField).All(a => a.OnlyFillsField);
+
         FieldSymbol? backing = null;
         StaticSymbol? sharedBacking = null;
         if (wantsStorage && isStatic)
@@ -1483,6 +1489,7 @@ public sealed partial class Binder
                 ContainingType = type,
                 Span = declaration.Span,
                 IsPropertyStorage = true,
+                IsFilledOnFirstUse = filledOnFirstUse,
             };
 
             type.Statics.Add(sharedBacking);
@@ -1504,6 +1511,7 @@ public sealed partial class Binder
                 InitializerSyntax =
                     CheckedPropertyInitializer(type, declaration, hasPrimaryConstructor),
                 InitializerScope = scope,
+                IsFilledOnFirstUse = filledOnFirstUse,
             };
             type.Fields.Add(backing);
         }

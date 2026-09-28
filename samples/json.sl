@@ -14,7 +14,7 @@ public attribute JsonIgnore { }
 [Reflect]
 public class Person
 {
-    [JsonName("full_name")] public String Name;
+    [JsonName("full_name")] public required String Name;
     [JsonName("age")]       public int    Years;
                             public bool Active;
                             public double Rating;
@@ -88,8 +88,7 @@ public String SerializeToJson<T>(T value)
 
 int Main()
 {
-    var person = new Person();
-    person.Name = "Ada Lovelace";
+    var person = new Person { Name = "Ada Lovelace" };
     person.Years = 36;
     person.Active = true;
     person.Rating = 9.5;

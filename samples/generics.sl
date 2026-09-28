@@ -2,6 +2,7 @@
 module Generics;
 
 import Standard.Console;
+import Standard.Unchecked;
 
 // A generic class. Nothing in it is checked until it is instantiated.
 public class Box<T>
@@ -11,7 +12,9 @@ public class Box<T>
     public T Value { get; set; }
 }
 
-// A growable list built on arrays.
+// A growable list built on arrays. The slots past `_count` are not items
+// yet, which is what `Standard.Unchecked` is for: they are written before they
+// are read.
 public class List<T>
 {
     T[] _items;
@@ -19,7 +22,7 @@ public class List<T>
 
     public List()
     {
-        _items = new T[4];
+        _items = NewUninitializedArray<T>(4u);
         _count = 0;
     }
 
@@ -29,7 +32,7 @@ public class List<T>
     {
         if (_count == _items.Length)
         {
-            var bigger = new T[_count * 2];
+            var bigger = NewUninitializedArray<T>(_count * 2);
             for (nuint i = 0; i < _count; i++)
                 bigger[i] = _items[i];
             _items = bigger;

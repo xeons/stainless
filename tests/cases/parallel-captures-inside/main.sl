@@ -30,7 +30,7 @@ int Main()
     }
     Console.WriteLine($"{slots[0]} {slots[1]} {slots[2]}");
 
-    var texts = new String[4];
+    String[] texts = Array.Repeat("", 4u);
     for parallel (int i = 0; i < 4; i++)
         texts[i] = $"{label}{i * scale}";
     Console.WriteLine($"{texts[0]} {texts[1]} {texts[3]}");

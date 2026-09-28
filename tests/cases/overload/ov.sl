@@ -18,7 +18,7 @@ int Main()
     printf("%d\n", Describe(7));
     printf("%d\n", Describe(2.5));
     var numbers = new int[3];
-    var words = new String[2];
+    String[] words = ["a", "b"];
     printf("%d %d %d\n", Count(), Count(numbers), Count(words));
     return 0;
 }

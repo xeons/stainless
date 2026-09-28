@@ -2,6 +2,7 @@
 // samples/shop/src/Shop/Bundles.sl  ->  module Shop.Bundles
 module Shop.Bundles;
 
+import Standard.Unchecked;
 import Shop.Catalog;
 import Shop.Pricing;
 
@@ -10,13 +11,15 @@ import Shop.Pricing;
 public class Bundle : IPriced
 {
     String _name;
-    IPriced[] _items;          // an array of interface references
+    // An array of interface references. The slots past `_count` are not
+    // items yet, and are written before they are read.
+    IPriced[] _items;
     nuint _count;
 
     public Bundle(String label, nuint capacity)
     {
         _name = label;
-        _items = new IPriced[capacity];
+        _items = NewUninitializedArray<IPriced>(capacity);
         _count = 0;
     }
 

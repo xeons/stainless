@@ -67,7 +67,7 @@ int Main()
     printf("squares=%d\n", squareTotal);
 
     // A managed result, stored into an array element by the worker.
-    var names = new String[4];
+    String[] names = Array.Repeat("", 4u);
     parallel
     {
         for (int i = 0; i < 4; i = i + 1)

@@ -36,9 +36,7 @@ int Main()
 
     // Arrays of references retain their elements and release them on death.
     {
-        var tracked = new Tracker[2];
-        tracked[0] = new Tracker(1);
-        tracked[1] = new Tracker(2);
+        Tracker[] tracked = [new Tracker(1), new Tracker(2)];
         Console.WriteLine("ids=" + Text.FromInteger(tracked[0].Id + tracked[1].Id));
         Console.WriteLine("dropping array");
     }

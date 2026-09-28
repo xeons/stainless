@@ -397,6 +397,12 @@ public sealed class FieldSymbol(string name, TypeSymbol type, NamedTypeSymbol co
     public bool IsRequired { get; init; }
 
     /// <summary>
+    /// A property's storage its accessors read only to fill with
+    /// <c>field ??= ...</c>, so it may start empty whatever its type says.
+    /// </summary>
+    public bool IsFilledOnFirstUse { get; init; }
+
+    /// <summary>
     /// True for the hidden copy of a primary constructor parameter that a
     /// member body names. Named after the parameter, laid out after the
     /// declared fields and destroyed with them.

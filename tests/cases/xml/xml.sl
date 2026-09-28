@@ -88,9 +88,7 @@ public class Settings
         Retries = 0;
         Internal = 77;
         Primary = new Endpoint();
-        Hosts = new String[2];
-        Hosts[0u] = "";
-        Hosts[1u] = "";
+        Hosts = ["", ""];
     }
 }
 

@@ -75,9 +75,7 @@ int Main()
 
     Console.WriteLine("-- array");
     {
-        var cells = new Holder[2];
-        cells[0] = Wrap(new Tracked(6), 60);
-        cells[1] = Wrap(new Tracked(7), 70);
+        Holder[] cells = [Wrap(new Tracked(6), 60), Wrap(new Tracked(7), 70)];
         Console.WriteLine("stored " + Text.FromInteger(cells[1].Item.Id));
     }
 

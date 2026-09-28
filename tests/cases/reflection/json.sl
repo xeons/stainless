@@ -14,7 +14,7 @@ public attribute JsonIgnore { }
 [Reflect]
 public class Person
 {
-    [JsonName("full_name")] public String Name;
+    [JsonName("full_name")] public required String Name;
     [JsonName("age")]       public int    Years;
                             public bool Active;
                             public double Rating;
@@ -22,7 +22,7 @@ public class Person
 
     // A property's backing field is ordinary storage, so a reflected type sees
     // it under the property's own name and carries the annotation with it.
-    [JsonName("city")]      public String City { get; set; }
+    [JsonName("city")]      public required String City { get; set; }
 }
 
 [Reflect]
@@ -92,13 +92,11 @@ public String ToJson<T>(T value)
 
 int Main()
 {
-    var person = new Person();
-    person.Name = "Ada Lovelace";
+    var person = new Person { Name = "Ada Lovelace", City = "London" };
     person.Years = 36;
     person.Active = true;
     person.Rating = 9.5;
     person.Internal = 999;
-    person.City = "London";
 
     Console.WriteLine(ToJson(person));
 

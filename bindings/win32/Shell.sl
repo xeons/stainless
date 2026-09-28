@@ -34,6 +34,7 @@ module Win32.Shell;
 #pragma comment(lib, "user32")
 #pragma comment(lib, "ole32")
 
+import Standard.Collections;
 import Standard.Com;
 import Standard.Text;
 import Win32;
@@ -309,9 +310,8 @@ public Result<IShellItem, ComError> GetArrayItem(IShellItemArray items, uint ind
 public String[] GetArrayPaths(IShellItemArray items)
 {
     nuint count = (nuint)GetArrayCount(items);
-    var paths = new String[count];
+    var paths = new List<String>(count);
 
-    nuint found = 0u;
     for (nuint i = 0u; i < count; i++)
     {
         var got = GetArrayItem(items, (uint)i);
@@ -319,21 +319,11 @@ public String[] GetArrayPaths(IShellItemArray items)
             continue;
 
         String path = GetItemPath(got.Value);
-        if (path.IsEmpty)
-            continue;
-
-        paths[found] = path;
-        found++;
+        if (!path.IsEmpty)
+            paths.Add(path);
     }
 
-    if (found == count)
-        return paths;
-
-    // Some items had no path, so the array is longer than what was found.
-    var exact = new String[found];
-    for (nuint i = 0u; i < found; i++)
-        exact[i] = paths[i];
-    return exact;
+    return paths.ToArray();
 }
 
 #endif

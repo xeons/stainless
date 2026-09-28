@@ -1035,32 +1035,14 @@ public class ButtonPanel : Panel
         var second = EffectiveOrder == ButtonOrder.CloseOkCancel ? OkButton : CancelButton;
         var third = EffectiveOrder == ButtonOrder.CloseOkCancel ? CancelButton : OkButton;
 
-        nuint present = 0u;
-        if (first.Visible)
-            present++;
-        if (second.Visible)
-            present++;
-        if (third.Visible)
-            present++;
-
-        var packed = new Button[present];
-        nuint at = 0u;
-        if (first.Visible)
+        Button[] candidates = [first, second, third];
+        var packed = new List<Button>(3u);
+        foreach (var button in candidates)
         {
-            packed[at] = first;
-            at++;
+            if (button.Visible)
+                packed.Add(button);
         }
-        if (second.Visible)
-        {
-            packed[at] = second;
-            at++;
-        }
-        if (third.Visible)
-        {
-            packed[at] = third;
-            at++;
-        }
-        return packed;
+        return packed.ToArray();
     }
 
     /// How wide one button should be: what it asks for, never below the 75

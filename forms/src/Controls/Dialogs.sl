@@ -91,13 +91,8 @@ public abstract class FileDialog
     /// pattern alternating.
     protected String[] BuildFilterPairs()
     {
-        var flat = new String[_filters.Count * 2u];
-        for (nuint i = 0u; i < _filters.Count; i++)
-        {
-            flat[i * 2u] = _filters[i].Description;
-            flat[i * 2u + 1u] = _filters[i].Patterns;
-        }
-        return flat;
+        return Array.Create(_filters.Count * 2u, (i) =>
+            i % 2u == 0u ? _filters[i / 2u].Description : _filters[i / 2u].Patterns);
     }
 
     /// The window the dialog should sit over, or null for none.

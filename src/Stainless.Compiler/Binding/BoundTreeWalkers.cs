@@ -595,10 +595,23 @@ internal sealed class CaptureWalker(LocalSymbol loopVariable) : BoundTreeWalker
     }
 }
 
+/// <summary>What an expression is to a place whose reads are checked.</summary>
+internal enum PlaceUse
+{
+    /// <summary>Nothing to do with it; what is inside is looked at.</summary>
+    Other,
+
+    /// <summary>A read of the place, or of something reached through it.</summary>
+    Read,
+
+    /// <summary>Storage beside the place, reached through what holds it; nothing inside is a read.</summary>
+    Beside,
+}
+
 /// <summary>
-/// A place definite assignment asks about — an <c>out</c> parameter, or a
-/// field a constructor has to give a value — and what is said of a path that
-/// leaves before writing it.
+/// A place definite assignment asks about — an <c>out</c> parameter, a
+/// field a constructor has to give a value, or a local declared without one
+/// — and what is said of a path that leaves before writing it, or reads it.
 /// </summary>
 internal abstract class AssignedPlace
 {
@@ -607,6 +620,20 @@ internal abstract class AssignedPlace
 
     /// <summary>Whether a call or a property write stores into the place, as an auto-property's setter does.</summary>
     public virtual bool IsWrittenBy(BoundExpression write) => false;
+
+    /// <summary>Whether a read of the place before it is written is reported.</summary>
+    public virtual bool ChecksReads => false;
+
+    /// <summary>Whether this declaration makes the place anew, unwritten.</summary>
+    public virtual bool IsDeclaredBy(LocalSymbol local) => false;
+
+    /// <summary>What an expression is to the place, when reads are checked.</summary>
+    public virtual PlaceUse UseOf(BoundExpression expression) => PlaceUse.Other;
+
+    /// <summary>A read reached before the place was written.</summary>
+    public virtual void ReportRead(SourceSpan span)
+    {
+    }
 
     /// <summary>A <c>return</c> reached before the place was written.</summary>
     public abstract void ReportReturn(SourceSpan span);
@@ -650,8 +677,17 @@ internal sealed class PlaceWriteTracker(AssignedPlace target, bool written) : Bo
                 Written = true;
                 return;
 
-            case BoundCall or BoundPropertyAssignment when target.IsWrittenBy(expression):
-                base.Visit(expression);
+            // The receiver is where the write lands, so it is not read.
+            case BoundPropertyAssignment assigned when target.IsWrittenBy(expression):
+                foreach (var index in assigned.Indices)
+                    Visit(index);
+                Visit(assigned.Value);
+                Written = true;
+                return;
+
+            case BoundCall call when target.IsWrittenBy(expression):
+                foreach (var argument in call.Arguments)
+                    Visit(argument);
                 Written = true;
                 return;
 
@@ -687,6 +723,22 @@ internal sealed class PlaceWriteTracker(AssignedPlace target, bool written) : Bo
                 Visit(attempt.Test);
                 Visit(attempt.OnSuccess);
                 return;
+        }
+
+        // A chain of fields is one read, or none: its receivers are not
+        // reads of their own.
+        if (target.ChecksReads && expression is not null)
+        {
+            switch (target.UseOf(expression))
+            {
+                case PlaceUse.Read:
+                    if (!Written)
+                        target.ReportRead(expression.Span);
+                    return;
+
+                case PlaceUse.Beside:
+                    return;
+            }
         }
 
         base.Visit(expression);

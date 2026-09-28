@@ -183,8 +183,7 @@ int Main(String[] args)
     printf("sameOrder = %d\n", SameOrder(deck, again));
 
     // Any array, not just one of longs.
-    var words = new String[4];
-    words[0u] = "a"; words[1u] = "b"; words[2u] = "c"; words[3u] = "d";
+    String[] words = ["a", "b", "c", "d"];
     new Random(7).Shuffle(words);
     var rejoined = new StringBuilder();
     for (nuint i = 0u; i < words.Length; i++)

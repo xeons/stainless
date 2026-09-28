@@ -59,25 +59,16 @@ public class SearchBox
     Button _clear;
     Label _status;
 
-    // The subscribers. Empty closures would be a null function pointer, so
-    // whether anyone is listening is a flag rather than a comparison.
-    SearchRequested _onSearch;
-    bool _hasSearch;
-
-    TextChanged _onChanged;
-    bool _hasChanged;
-
-    SearchAllowed _allowed;
-    bool _hasAllowed;
+    // The subscribers, each null until someone listens.
+    SearchRequested? _onSearch;
+    TextChanged? _onChanged;
+    SearchAllowed? _allowed;
 
     int _searches;
 
     public SearchBox(String prompt)
     {
         _searches = 0;
-        _hasSearch = false;
-        _hasChanged = false;
-        _hasAllowed = false;
 
         _root = new Box(true, 4);
 
@@ -137,14 +128,12 @@ public class SearchBox
     public void OnSearch(SearchRequested handler)
     {
         _onSearch = handler;
-        _hasSearch = true;
     }
 
     /// Runs on every keystroke.
     public void OnChanged(TextChanged handler)
     {
         _onChanged = handler;
-        _hasChanged = true;
     }
 
     /// Asked before a search runs. Answering false stops it, and the control
@@ -153,7 +142,6 @@ public class SearchBox
     public void OnAllowed(SearchAllowed handler)
     {
         _allowed = handler;
-        _hasAllowed = true;
     }
 
     // ------------------------------------------------------------- the wiring
@@ -169,7 +157,7 @@ public class SearchBox
             return;
         }
 
-        if (_hasAllowed && !_allowed(text))
+        if (_allowed is { } allowed && !allowed(text))
         {
             _status.SetText("refused: " + text);
             return;
@@ -178,22 +166,22 @@ public class SearchBox
         _searches = _searches + 1;
         _status.SetText("searched for " + text);
 
-        if (_hasSearch)
-            _onSearch(text);
+        if (_onSearch is { } searched)
+            searched(text);
     }
 
     void ClearSearch()
     {
         _field.SetText("");
         _status.SetText("");
-        if (_hasChanged)
-            _onChanged("");
+        if (_onChanged is { } changed)
+            changed("");
     }
 
     void OnFieldChanged()
     {
-        if (_hasChanged)
-            _onChanged(_field.GetText());
+        if (_onChanged is { } changed)
+            changed(_field.GetText());
     }
 }
 

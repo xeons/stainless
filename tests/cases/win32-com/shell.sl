@@ -138,8 +138,8 @@ void Run()
     // Not with PickFolders set, which is why the options above use two flags
     // that do not conflict: the shell refuses a type list on a folder picker,
     // and it is right to.
-    var held = new Utf16String[4];
-    var specs = Dialogs.BuildFilterSpecs(["Text", "*.txt", "All", "*.*"], held);
+    Utf16String[] held = ["Text".ToUtf16(), "*.txt".ToUtf16(), "All".ToUtf16(), "*.*".ToUtf16()];
+    var specs = Dialogs.BuildFilterSpecs(held);
     Say("filters set    ",
         Com.Succeeded(dialog.SetFileTypes((uint)specs.Length, &specs[0])));
 

@@ -49,7 +49,7 @@ public class Shape
     /// What it is called.
     ///
     /// @value the name, never empty
-    public String Name { get; set; }
+    public String Name { get; set; } = "";
 }
 
 /// Reads one properly, and warns about nothing.

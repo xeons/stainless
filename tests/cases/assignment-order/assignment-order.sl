@@ -239,8 +239,7 @@ public int Main()
     var box = new Box<long>(2u);
     box[Log("box", 1)] += 6L;
     box[Log("box", 1)] -= (long)Log("step", 2);
-    var shapes = new Shape[1];
-    shapes[0] = new Shape();
+    Shape[] shapes = [new Shape()];
     shapes[Log("shape", 0)].Origin.X += Log("dx", 5);
     shapes[Log("shape", 0)].Origin.Y = Log("dy", 6);
     Console.WriteLine($"box {box[1]} shape {shapes[0].Origin.X} {shapes[0].Origin.Y}");

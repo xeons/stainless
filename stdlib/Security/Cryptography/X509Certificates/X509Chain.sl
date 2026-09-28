@@ -148,12 +148,12 @@ public sealed class X509Chain
         ExtendPath(path);
 
         _status = X509ChainStatusFlags.NoError;
-        _elements = new X509ChainElement[_bestPath.Count];
+        var chosen = _bestPath;
+        var flags = _bestFlags;
+        _elements = Array.Create(chosen.Count,
+            (i) => new X509ChainElement(chosen[i], flags[i]));
         for (nuint i = 0u; i < _bestPath.Count; i++)
-        {
-            _elements[i] = new X509ChainElement(_bestPath[i], _bestFlags[i]);
             _status = _status | _bestFlags[i];
-        }
         if (_cyclic && !_bestAnchored)
             _status = _status | X509ChainStatusFlags.Cyclic;
 

@@ -304,6 +304,7 @@ public sealed partial class Binder(
         BuildVarianceTables();      //          and a table for each interface a class stands for
         CheckConstructorDelegation();
         CheckClassesWithoutConstructors();
+        CheckConstructorsAssignFields();
         ResolveRemainingAliases();
         CheckDocumentation();       //          and every '@tag' says something true
 

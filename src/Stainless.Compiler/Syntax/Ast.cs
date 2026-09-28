@@ -450,6 +450,12 @@ public sealed record AccessorSyntax(
     public bool UsesField { get; init; }
 
     /// <summary>
+    /// True when every mention of <c>field</c> is what a <c>??=</c> fills, so
+    /// nothing here reads the storage before it holds a value.
+    /// </summary>
+    public bool OnlyFillsField { get; init; }
+
+    /// <summary>
     /// <c>private set</c> or <c>internal set</c>: reachable from its module
     /// alone, whatever the property says.
     /// </summary>

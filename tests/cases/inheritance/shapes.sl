@@ -304,10 +304,7 @@ int Main()
         + ", name " + once.Name);
 
     // --- an array of the base, holding three different classes --------------
-    Shape[] every = new Shape[3];
-    every[0] = square;
-    every[1] = circle;
-    every[2] = polygon;
+    Shape[] every = [square, circle, polygon];
 
     double total = 0.0;
     foreach (Shape one in every)

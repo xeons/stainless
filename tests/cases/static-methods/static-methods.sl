@@ -165,10 +165,7 @@ public int Main()
 
     // Named without being called, which makes it a delegate like any other
     // function name.
-    var values = new Small[3];
-    values[0] = Small.Of(1);
-    values[1] = Small.Of(2);
-    values[2] = Small.Of(3);
+    Small[] values = [Small.Of(1), Small.Of(2), Small.Of(3)];
     printf("delegate = %d\n", Total(values, Added));
 
     return 0;

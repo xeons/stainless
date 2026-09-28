@@ -44,7 +44,7 @@ public class Account : IIdentified
             field = "@" + value;
             this.Owner = value;
         }
-    }
+    } = "";
 
     public Account() { }
 
@@ -88,7 +88,7 @@ public record Point(int X, int Y)
 
 public class Box<T>
 {
-    public T Content { get; init; }
+    public required T Content { get; init; }
 }
 
 String Describe(Point p) =>

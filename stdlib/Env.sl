@@ -95,14 +95,7 @@ public String GetArgument(nuint index)
 }
 
 /// Every argument, as an array. The same thing `Main(String[] args)` receives.
-public String[] GetArguments()
-{
-    nuint count = sl_args_count();
-    var all = new String[count];
-    for (nuint i = 0u; i < count; i++)
-        all[i] = sl_args_at(i);
-    return all;
-}
+public String[] GetArguments() => Array.Create(sl_args_count(), (i) => sl_args_at(i));
 
 /// The program's own path, as the operating system gave it. That is not
 /// necessarily where the executable is: a shell may pass a bare name, and on

@@ -146,12 +146,7 @@ void SetReady(byte* argument)
 
 Thread[] StartAll(Job body, int count)
 {
-    var pool = new Thread[(nuint)count];
-    for (int i = 0; i < count; i++)
-    {
-        pool[(nuint)i] = new Thread(body, null);
-    }
-    return pool;
+    return Array.Create((nuint)count, (i) => new Thread(body, null));
 }
 
 void JoinAll(Thread[] pool)

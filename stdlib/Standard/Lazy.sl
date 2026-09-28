@@ -43,7 +43,9 @@ extern "C"
 public threadsafe class Lazy<T>
 {
     Func<T> _factory;
-    T _value;
+
+    // Optional because a `T` may have no zero value to start as.
+    Optional<T> _value;
     bool _created;
     LazyThreadSafetyMode _mode;
 
@@ -121,7 +123,7 @@ public threadsafe class Lazy<T>
     T MadeAlone()
     {
         if (_created)
-            return _value;
+            return _value.GetValue();
         if (_makingOn != 0u)
             sl_fail("Lazy.Value: the factory read the value it is making");
 
@@ -129,7 +131,7 @@ public threadsafe class Lazy<T>
         _value = _factory();
         _created = true;
         _makingOn = 0u;
-        return _value;
+        return _value.GetValue();
     }
 
     /// Run by whoever asks, kept by the first to finish.
@@ -139,7 +141,7 @@ public threadsafe class Lazy<T>
         bool created = _created;
         sl_mutex_unlock(_lock);
         if (created)
-            return _value;
+            return _value.GetValue();
 
         T made = _factory();
 
@@ -150,7 +152,7 @@ public threadsafe class Lazy<T>
             _created = true;
         }
         sl_mutex_unlock(_lock);
-        return _value;
+        return _value.GetValue();
     }
 
     /// Run once, under the lock, while any other thread asking waits.
@@ -172,6 +174,6 @@ public threadsafe class Lazy<T>
             _makingOn = 0u;
         }
         sl_mutex_unlock(_lock);
-        return _value;
+        return _value.GetValue();
     }
 }
