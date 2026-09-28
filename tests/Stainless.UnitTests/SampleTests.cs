@@ -91,6 +91,7 @@ public class SampleTests
         new("stress", ["samples/stress.sl"]),
         new("strings", ["samples/strings.sl"]),
         new("wc", ["samples/wc.sl"]),
+        new("http-get", ["samples/http-get.sl"]),
         new("audio", ["samples/audio/audio.sl"]),
         new("interop", ["samples/interop/interop.sl"]),
 
