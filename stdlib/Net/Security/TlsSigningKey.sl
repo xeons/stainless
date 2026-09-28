@@ -25,8 +25,9 @@ import Standard.Collections;
 import Standard.Formats.Asn1;
 import Standard.Security.Cryptography;
 
-/// The private key that signs a CertificateVerify: Ed25519, ECDSA on P-256
-/// or P-384, or RSA with PSS.
+/// The private key that signs a CertificateVerify or a TLS 1.2
+/// ServerKeyExchange: Ed25519, ECDSA on P-256 or P-384, or RSA, with PSS or,
+/// in TLS 1.2 only, PKCS #1 v1.5.
 ///
 ///     var key = try TlsSigningKey.ImportFromPem(File.ReadAllText("server.key"));
 ///     options.PrivateKey = key;
@@ -200,6 +201,26 @@ public sealed class TlsSigningKey
         return None;
     }
 
+    /// The TLS 1.2 scheme this key signs with for a peer that accepts
+    /// `offered`, or none. An ECDSA key prefers the hash of its own curve.
+    internal Optional<TlsSignatureScheme> SelectTls12Scheme(List<TlsSignatureScheme> offered)
+    {
+        var mine = new List<TlsSignatureScheme>();
+        if (_kind == TlsKeyKind.EcdsaP384)
+            mine.Add(TlsSignatureScheme.EcdsaSecp384r1Sha384);
+        var defaults = CreateDefaultTls12SignatureSchemes();
+        for (nuint i = 0u; i < defaults.Count; i++)
+            mine.Add(defaults[i]);
+
+        for (nuint i = 0u; i < mine.Count; i++)
+        {
+            TlsSignatureScheme scheme = mine[i];
+            if (IsTls12SchemeForKey(scheme, _kind) && offered.Contains(scheme))
+                return Some(scheme);
+        }
+        return None;
+    }
+
     /// The signature of `content` under `scheme`.
     internal Result<byte[], TlsError> SignTlsContent(
         TlsSignatureScheme scheme, ReadOnlySpan<byte> content)
@@ -234,7 +255,7 @@ public sealed class TlsSigningKey
                 if (rsa == null)
                     return Fail(TlsError.InternalError);
                 var signed = rsa.SignData(
-                    content, GetTlsSchemeHash(scheme), RsaSignaturePadding.Pss);
+                    content, GetTlsSchemeHash(scheme), GetTlsSchemeRsaPadding(scheme));
                 if (!signed.Ok)
                     return Fail(TlsError.InternalError);
                 return Ok(signed.Value);

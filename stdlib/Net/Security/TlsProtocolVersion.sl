@@ -30,8 +30,8 @@ public enum TlsProtocolVersion
     /// No version: what a set with nothing in it holds.
     None = 0,
 
-    /// TLS 1.2, RFC 5246. Named so that a set can hold it; no connection is
-    /// made in it yet, and a peer that offers nothing newer is refused.
+    /// TLS 1.2, RFC 5246, with ECDHE, AEAD suites and the extended master
+    /// secret only.
     Tls12 = 1,
 
     /// TLS 1.3, RFC 8446.

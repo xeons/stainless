@@ -38,10 +38,11 @@ internal struct TlsRecord
 /// The record layer of RFC 8446 §5 over a stream: framing, the limits, and
 /// protection in each direction once a key is installed.
 ///
-/// It knows nothing of the handshake. What it is told is when a key changes
-/// and whether a change_cipher_spec may be dropped; the version-specific
-/// part is `TlsRecordCipher`, which TLS 1.2's explicit-nonce protection
-/// would sit beside.
+/// It knows nothing of the handshake. What it is told is when a key changes,
+/// whether a change_cipher_spec may be dropped, and whether the version is
+/// TLS 1.2. In TLS 1.2 every record after a change_cipher_spec is
+/// protected whatever its type, the type is not hidden, and the
+/// change_cipher_spec itself is handed up, since it is what changes the key.
 internal sealed class TlsRecordLayer
 {
     private IStream _inner;
@@ -64,6 +65,9 @@ internal sealed class TlsRecordLayer
     /// protect its alert with.
     internal bool _plaintextAlertAllowed;
 
+    /// Whether the version negotiated is TLS 1.2.
+    internal bool _isTls12;
+
     internal TlsRecordLayer(IStream inner)
     {
         _inner = inner;
@@ -75,6 +79,7 @@ internal sealed class TlsRecordLayer
         _plaintextVersion = TlsLegacyVersion;
         _changeCipherSpecAllowed = false;
         _plaintextAlertAllowed = true;
+        _isTls12 = false;
     }
 
     internal IStream Inner => _inner;
@@ -114,17 +119,16 @@ internal sealed class TlsRecordLayer
             nuint at = _inputStart;
             var type = (TlsContentType)_input[at];
             nuint length = ((nuint)_input[at + 3u] << 8) | (nuint)_input[at + 4u];
+            bool protectedRecord = type == TlsContentType.ApplicationData ||
+                                   (_isTls12 && _readCipher != null);
 
             switch (type)
             {
                 case TlsContentType.ChangeCipherSpec:
                 case TlsContentType.Alert:
                 case TlsContentType.Handshake:
-                    if (length > TlsMaxPlaintext)
-                        return Fail(TlsError.RecordOverflow);
-                    break;
                 case TlsContentType.ApplicationData:
-                    if (length > TlsMaxCiphertext)
+                    if (length > (protectedRecord ? TlsMaxCiphertext : TlsMaxPlaintext))
                         return Fail(TlsError.RecordOverflow);
                     break;
                 default:
@@ -137,6 +141,9 @@ internal sealed class TlsRecordLayer
             at = _inputStart;
             _inputStart += TlsRecordHeaderSize + length;
             nuint body = at + TlsRecordHeaderSize;
+
+            if (_isTls12)
+                return OpenTls12Record(type, at, length);
 
             var cipher = _readCipher;
             if (type == TlsContentType.ChangeCipherSpec)
@@ -168,6 +175,43 @@ internal sealed class TlsRecordLayer
                 return Fail(opened.Error);
             return UnwrapTlsInnerPlaintext(opened.Value);
         }
+    }
+
+    /// A TLS 1.2 record, opened when a read key is installed. A
+    /// change_cipher_spec is always plaintext, and is handed up.
+    private Result<TlsRecord, TlsError> OpenTls12Record(
+        TlsContentType type, nuint at, nuint length)
+    {
+        nuint body = at + TlsRecordHeaderSize;
+        var cipher = _readCipher;
+        TlsRecord record;
+        record.Type = type;
+        if (cipher == null || type == TlsContentType.ChangeCipherSpec)
+        {
+            if (cipher != null || type == TlsContentType.ApplicationData)
+                return Fail(TlsError.UnexpectedMessage);
+            if (type == TlsContentType.ChangeCipherSpec && (length != 1u || _input[body] != 1))
+                return Fail(TlsError.UnexpectedMessage);
+            if (length == 0u)
+                return Fail(TlsError.UnexpectedMessage);
+            record.Data = _input;
+            record.Offset = body;
+            record.Length = length;
+            return Ok(record);
+        }
+
+        var opened = cipher.OpenTls12Record(_input, at, length);
+        if (!opened.Ok)
+            return Fail(opened.Error);
+        byte[] plaintext = opened.Value;
+        if (plaintext.Length > TlsMaxPlaintext)
+            return Fail(TlsError.RecordOverflow);
+        if (plaintext.Length == 0u && type != TlsContentType.ApplicationData)
+            return Fail(TlsError.UnexpectedMessage);
+        record.Data = plaintext;
+        record.Offset = 0u;
+        record.Length = plaintext.Length;
+        return Ok(record);
     }
 
     /// The content type and content of a TLSInnerPlaintext: the last nonzero
@@ -265,6 +309,13 @@ internal sealed class TlsRecordLayer
     private TlsError WriteTlsRecord(TlsContentType type, byte[] data, nuint offset, nuint length)
     {
         var cipher = _writeCipher;
+        if (cipher != null && cipher.IsTls12)
+        {
+            var sealedRecord = cipher.SealTls12Record(type, data, offset, length);
+            if (!sealedRecord.Ok)
+                return sealedRecord.Error;
+            return WriteAllTlsBytes(sealedRecord.Value);
+        }
         if (cipher == null)
         {
             var plain = new byte[TlsRecordHeaderSize + length];
@@ -288,8 +339,8 @@ internal sealed class TlsRecordLayer
         return WriteAllTlsBytes(protectedRecord.Value);
     }
 
-    /// The compatibility change_cipher_spec of RFC 8446 Appendix D.4, which
-    /// is never protected.
+    /// A change_cipher_spec: TLS 1.2's, or the compatibility one of RFC 8446
+    /// Appendix D.4. Neither is ever protected.
     internal TlsError WriteTlsChangeCipherSpec()
     {
         var record = new byte[6u];

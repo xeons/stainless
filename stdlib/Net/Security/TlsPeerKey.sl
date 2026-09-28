@@ -64,6 +64,23 @@ internal bool IsTlsSchemeForKey(TlsSignatureScheme scheme, TlsKeyKind kind)
     return false;
 }
 
+/// Whether a key of `kind` signs with `scheme` in TLS 1.2, where an ECDSA
+/// scheme names only its hash and not its curve, and PKCS #1 v1.5 is allowed.
+internal bool IsTls12SchemeForKey(TlsSignatureScheme scheme, TlsKeyKind kind)
+{
+    switch (scheme)
+    {
+        case TlsSignatureScheme.EcdsaSecp256r1Sha256:
+        case TlsSignatureScheme.EcdsaSecp384r1Sha384:
+            return kind == TlsKeyKind.EcdsaP256 || kind == TlsKeyKind.EcdsaP384;
+        case TlsSignatureScheme.RsaPkcs1Sha256:
+        case TlsSignatureScheme.RsaPkcs1Sha384:
+        case TlsSignatureScheme.RsaPkcs1Sha512:
+            return kind == TlsKeyKind.Rsa;
+    }
+    return IsTlsSchemeForKey(scheme, kind);
+}
+
 /// The hash `scheme` signs with. Ed25519 hashes internally, and answers
 /// SHA-512 here only to have an answer.
 internal HashAlgorithmName GetTlsSchemeHash(TlsSignatureScheme scheme)
@@ -73,13 +90,29 @@ internal HashAlgorithmName GetTlsSchemeHash(TlsSignatureScheme scheme)
         case TlsSignatureScheme.EcdsaSecp384r1Sha384:
         case TlsSignatureScheme.RsaPssRsaeSha384:
         case TlsSignatureScheme.RsaPssPssSha384:
+        case TlsSignatureScheme.RsaPkcs1Sha384:
             return HashAlgorithmName.Sha384;
         case TlsSignatureScheme.RsaPssRsaeSha512:
         case TlsSignatureScheme.RsaPssPssSha512:
+        case TlsSignatureScheme.RsaPkcs1Sha512:
         case TlsSignatureScheme.Ed25519:
             return HashAlgorithmName.Sha512;
     }
     return HashAlgorithmName.Sha256;
+}
+
+/// The RSA padding `scheme` signs with: PKCS #1 v1.5 for the `RsaPkcs1`
+/// schemes, and PSS for the rest.
+internal RsaSignaturePadding GetTlsSchemeRsaPadding(TlsSignatureScheme scheme)
+{
+    switch (scheme)
+    {
+        case TlsSignatureScheme.RsaPkcs1Sha256:
+        case TlsSignatureScheme.RsaPkcs1Sha384:
+        case TlsSignatureScheme.RsaPkcs1Sha512:
+            return RsaSignaturePadding.Pkcs1;
+    }
+    return RsaSignaturePadding.Pss;
 }
 
 /// What a CertificateVerify signs (RFC 8446 §4.4.3): 64 spaces, a context
@@ -216,13 +249,29 @@ internal sealed class TlsPeerKey
         return Fail(TlsError.UnsupportedCertificate);
     }
 
-    /// Whether `signature` is this key's, under `scheme`, of `content`.
+    /// Whether `signature` is this key's, under the TLS 1.3 `scheme`, of
+    /// `content`.
     internal bool VerifyTlsSignature(TlsSignatureScheme scheme, ReadOnlySpan<byte> content,
                                      ReadOnlySpan<byte> signature)
     {
         if (!IsTlsSchemeForKey(scheme, _kind))
             return false;
+        return VerifyTlsSignatureUnderScheme(scheme, content, signature);
+    }
 
+    /// Whether `signature` is this key's, under the TLS 1.2 `scheme`, of
+    /// `content`.
+    internal bool VerifyTls12Signature(TlsSignatureScheme scheme, ReadOnlySpan<byte> content,
+                                       ReadOnlySpan<byte> signature)
+    {
+        if (!IsTls12SchemeForKey(scheme, _kind))
+            return false;
+        return VerifyTlsSignatureUnderScheme(scheme, content, signature);
+    }
+
+    private bool VerifyTlsSignatureUnderScheme(
+        TlsSignatureScheme scheme, ReadOnlySpan<byte> content, ReadOnlySpan<byte> signature)
+    {
         switch (_kind)
         {
             case TlsKeyKind.Ed25519:
@@ -245,7 +294,7 @@ internal sealed class TlsPeerKey
                 if (rsa == null)
                     return false;
                 return rsa.VerifyData(content, signature, GetTlsSchemeHash(scheme),
-                                      RsaSignaturePadding.Pss);
+                                      GetTlsSchemeRsaPadding(scheme));
             }
         }
         return false;

@@ -67,7 +67,8 @@ public sealed class TlsStream : IStream
     /// @param inner    the connection to the server
     /// @param options  what to offer, and how to judge the certificate
     /// @failure TlsError.CertificateRefused   the validator refused the chain
-    /// @failure TlsError.ProtocolVersion      the server does not speak TLS 1.3
+    /// @failure TlsError.ProtocolVersion      the server speaks no version
+    ///                                        `EnabledProtocols` holds
     /// @failure TlsError.AlertReceived        the server refused, and said why
     ///                                        in an alert
     /// @failure TlsError.Io                   the stream underneath failed
@@ -150,8 +151,8 @@ public sealed class TlsStream : IStream
     /// Whether this end is the server.
     public bool IsServer => _connection._isServer;
 
-    /// The version negotiated. Always TLS 1.3 for now.
-    public TlsProtocolVersion NegotiatedProtocol => TlsProtocolVersion.Tls13;
+    /// The version negotiated: `Tls13` or `Tls12`.
+    public TlsProtocolVersion NegotiatedProtocol => _connection._protocol;
 
     /// The suite negotiated.
     public TlsCipherSuite CipherSuite => _connection._cipherSuite;
@@ -159,7 +160,8 @@ public sealed class TlsStream : IStream
     /// The group the key exchange was made in.
     public TlsNamedGroup KeyExchangeGroup => _connection._group;
 
-    /// The scheme the server signed its CertificateVerify with.
+    /// The scheme the server signed its CertificateVerify with, or in TLS 1.2
+    /// its ServerKeyExchange.
     public TlsSignatureScheme SignatureScheme => _connection._signatureScheme;
 
     /// The ALPN protocol agreed, or null when there was none.
@@ -199,19 +201,25 @@ public sealed class TlsStream : IStream
 
     // --------------------------------------------------------- key material
 
-    /// Keying material for a protocol above this one (RFC 8446 §7.5): the
-    /// same bytes at both ends for the same label and context, and no use to
-    /// anyone else.
+    /// Keying material for a protocol above this one (RFC 8446 §7.5, or RFC
+    /// 5705 in TLS 1.2): the same bytes at both ends for the same label and
+    /// context, and no use to anyone else.
     ///
     /// @param label    names the use, as the protocol that wants it defines
-    /// @param context  bound into the result; empty when the protocol has none
-    /// @param length   how many bytes, at most 255 digests' worth
+    /// @param context  bound into the result; empty when the protocol has none,
+    ///                 which in TLS 1.2 is RFC 5705's "no context"
+    /// @param length   how many bytes, at most 255 digests' worth in TLS 1.3
     /// @failure TlsError.Closed  the stream is closed
     public Result<byte[], TlsError> ExportKeyingMaterial(
         String label, ReadOnlySpan<byte> context, nuint length)
     {
+        if (_connection.IsClosed || !_connection._handshakeComplete)
+            return Fail(TlsError.Closed);
+        var legacy = _connection._tls12Schedule;
+        if (legacy != null)
+            return Ok(legacy.ExportTlsKeyingMaterial(label, context, length));
         var schedule = _connection._schedule;
-        if (schedule == null || _connection.IsClosed)
+        if (schedule == null)
             return Fail(TlsError.Closed);
         return Ok(schedule.ExportTlsKeyingMaterial(label, context, length));
     }
@@ -220,8 +228,10 @@ public sealed class TlsStream : IStream
     /// peer to do the same when `requestPeerUpdate`. Keys are also updated
     /// without being asked, before one has protected 2^24 records.
     ///
-    /// @failure TlsError.Closed  the stream is closed or failed
-    /// @failure TlsError.Io      the stream underneath failed
+    /// @failure TlsError.Closed           the stream is closed or failed
+    /// @failure TlsError.ProtocolVersion  the connection is TLS 1.2, which has
+    ///                                    no KeyUpdate
+    /// @failure TlsError.Io               the stream underneath failed
     public TlsError UpdateTrafficKeys(bool requestPeerUpdate) =>
         _connection.SendTlsKeyUpdate(requestPeerUpdate);
 

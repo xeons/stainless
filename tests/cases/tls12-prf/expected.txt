@@ -1,0 +1,14 @@
+prf sha256: ok
+prf sha384: ok
+extended master secret: ok
+key block, AES-128-GCM: ok
+key block, ChaCha20-Poly1305: ok
+client finished: ok
+AES-GCM client record 0: ok
+AES-GCM client record 1: ok
+ChaCha20 server record 0: ok
+ChaCha20 server record 1: ok
+AES-GCM client records open: ok
+ChaCha20 server records open: ok
+AES-GCM tampered record refused: ok
+records out of order refused: ok

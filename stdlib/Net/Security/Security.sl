@@ -114,6 +114,20 @@ internal const uint TlsLegacyVersion = 0x0303u;
 
 internal const uint TlsVersion13 = 0x0304u;
 
+/// TLS 1.2's version, which is also TLS 1.3's `legacy_version`.
+internal const uint TlsVersion12 = 0x0303u;
+
+/// How long a TLS 1.2 Finished's `verify_data` is.
+internal const nuint Tls12VerifyDataLength = 12u;
+
+internal const nuint Tls12MasterSecretLength = 48u;
+
+/// The explicit part of an AES-GCM record's nonce in TLS 1.2 (RFC 5288).
+internal const nuint Tls12ExplicitNonceLength = 8u;
+
+/// TLS_EMPTY_RENEGOTIATION_INFO_SCSV, RFC 5746 §3.3.
+internal const uint TlsRenegotiationInfoScsv = 0x00FFu;
+
 // ------------------------------------------------------------------ wire enums
 
 internal enum TlsContentType : byte
@@ -127,14 +141,18 @@ internal enum TlsContentType : byte
 
 internal enum TlsHandshakeType : byte
 {
+    HelloRequest = 0,
     ClientHello = 1,
     ServerHello = 2,
     NewSessionTicket = 4,
     EndOfEarlyData = 5,
     EncryptedExtensions = 8,
     Certificate = 11,
+    ServerKeyExchange = 12,
     CertificateRequest = 13,
+    ServerHelloDone = 14,
     CertificateVerify = 15,
+    ClientKeyExchange = 16,
     Finished = 20,
     KeyUpdate = 24,
     MessageHash = 254,
@@ -146,6 +164,7 @@ internal enum TlsExtensionType : ushort
     MaxFragmentLength = 1,
     StatusRequest = 5,
     SupportedGroups = 10,
+    EcPointFormats = 11,
     SignatureAlgorithms = 13,
     UseSrtp = 14,
     Heartbeat = 15,
@@ -154,6 +173,9 @@ internal enum TlsExtensionType : ushort
     ClientCertificateType = 19,
     ServerCertificateType = 20,
     Padding = 21,
+    EncryptThenMac = 22,
+    ExtendedMasterSecret = 23,
+    SessionTicket = 35,
     PreSharedKey = 41,
     EarlyData = 42,
     SupportedVersions = 43,
@@ -164,6 +186,7 @@ internal enum TlsExtensionType : ushort
     PostHandshakeAuth = 49,
     SignatureAlgorithmsCert = 50,
     KeyShare = 51,
+    RenegotiationInfo = 65281,
 }
 
 // ------------------------------------------------------------------ errors
@@ -268,14 +291,21 @@ internal bool MapTlsErrorToAlert(TlsError error, out TlsAlertDescription alert)
 
 // ------------------------------------------------------------------ suites
 
-/// The suites this end implements, most preferred first. ChaCha20 leads
-/// because AES runs in software here and is the slower of the two.
+/// The suites this end implements, most preferred first: TLS 1.3's, then
+/// TLS 1.2's. ChaCha20 leads because AES runs in software here and is the
+/// slower of the two.
 internal List<TlsCipherSuite> CreateDefaultTlsCipherSuites()
 {
     var suites = new List<TlsCipherSuite>();
     suites.Add(TlsCipherSuite.TlsChaCha20Poly1305Sha256);
     suites.Add(TlsCipherSuite.TlsAes128GcmSha256);
     suites.Add(TlsCipherSuite.TlsAes256GcmSha384);
+    suites.Add(TlsCipherSuite.TlsEcdheEcdsaWithChaCha20Poly1305Sha256);
+    suites.Add(TlsCipherSuite.TlsEcdheRsaWithChaCha20Poly1305Sha256);
+    suites.Add(TlsCipherSuite.TlsEcdheEcdsaWithAes128GcmSha256);
+    suites.Add(TlsCipherSuite.TlsEcdheRsaWithAes128GcmSha256);
+    suites.Add(TlsCipherSuite.TlsEcdheEcdsaWithAes256GcmSha384);
+    suites.Add(TlsCipherSuite.TlsEcdheRsaWithAes256GcmSha384);
     return suites;
 }
 
@@ -288,13 +318,64 @@ internal List<TlsNamedGroup> CreateDefaultTlsGroups()
     return groups;
 }
 
-internal bool IsImplementedTlsCipherSuite(TlsCipherSuite suite)
+internal bool IsImplementedTlsCipherSuite(TlsCipherSuite suite) =>
+    IsTls13CipherSuite(suite) || IsTls12CipherSuite(suite);
+
+internal bool IsTls13CipherSuite(TlsCipherSuite suite)
 {
     switch (suite)
     {
         case TlsCipherSuite.TlsAes128GcmSha256:
         case TlsCipherSuite.TlsAes256GcmSha384:
         case TlsCipherSuite.TlsChaCha20Poly1305Sha256:
+            return true;
+    }
+    return false;
+}
+
+internal bool IsTls12CipherSuite(TlsCipherSuite suite)
+{
+    switch (suite)
+    {
+        case TlsCipherSuite.TlsEcdheEcdsaWithAes128GcmSha256:
+        case TlsCipherSuite.TlsEcdheEcdsaWithAes256GcmSha384:
+        case TlsCipherSuite.TlsEcdheEcdsaWithChaCha20Poly1305Sha256:
+        case TlsCipherSuite.TlsEcdheRsaWithAes128GcmSha256:
+        case TlsCipherSuite.TlsEcdheRsaWithAes256GcmSha384:
+        case TlsCipherSuite.TlsEcdheRsaWithChaCha20Poly1305Sha256:
+            return true;
+    }
+    return false;
+}
+
+/// Whether the TLS 1.2 `suite` wants a server key of `kind`: RSA for the
+/// `Rsa` suites, and ECDSA or Ed25519 (RFC 8422) for the `Ecdsa` ones.
+internal bool IsTls12SuiteForKey(TlsCipherSuite suite, TlsKeyKind kind)
+{
+    switch (suite)
+    {
+        case TlsCipherSuite.TlsEcdheRsaWithAes128GcmSha256:
+        case TlsCipherSuite.TlsEcdheRsaWithAes256GcmSha384:
+        case TlsCipherSuite.TlsEcdheRsaWithChaCha20Poly1305Sha256:
+            return kind == TlsKeyKind.Rsa || kind == TlsKeyKind.RsaPss;
+        case TlsCipherSuite.TlsEcdheEcdsaWithAes128GcmSha256:
+        case TlsCipherSuite.TlsEcdheEcdsaWithAes256GcmSha384:
+        case TlsCipherSuite.TlsEcdheEcdsaWithChaCha20Poly1305Sha256:
+            return kind == TlsKeyKind.EcdsaP256 || kind == TlsKeyKind.EcdsaP384 ||
+                   kind == TlsKeyKind.Ed25519;
+    }
+    return false;
+}
+
+/// Whether `suite` protects records with ChaCha20-Poly1305 rather than
+/// AES-GCM.
+internal bool IsTlsChaChaCipherSuite(TlsCipherSuite suite)
+{
+    switch (suite)
+    {
+        case TlsCipherSuite.TlsChaCha20Poly1305Sha256:
+        case TlsCipherSuite.TlsEcdheEcdsaWithChaCha20Poly1305Sha256:
+        case TlsCipherSuite.TlsEcdheRsaWithChaCha20Poly1305Sha256:
             return true;
     }
     return false;
@@ -312,15 +393,32 @@ internal bool IsImplementedTlsGroup(TlsNamedGroup group)
     return false;
 }
 
-/// The hash of the key schedule under `suite`.
-internal HashAlgorithmName GetTlsSuiteHash(TlsCipherSuite suite) =>
-    suite == TlsCipherSuite.TlsAes256GcmSha384
-        ? HashAlgorithmName.Sha384
-        : HashAlgorithmName.Sha256;
+/// The hash of the key schedule under `suite`: HKDF's in TLS 1.3, the
+/// PRF's in TLS 1.2.
+internal HashAlgorithmName GetTlsSuiteHash(TlsCipherSuite suite)
+{
+    switch (suite)
+    {
+        case TlsCipherSuite.TlsAes256GcmSha384:
+        case TlsCipherSuite.TlsEcdheEcdsaWithAes256GcmSha384:
+        case TlsCipherSuite.TlsEcdheRsaWithAes256GcmSha384:
+            return HashAlgorithmName.Sha384;
+    }
+    return HashAlgorithmName.Sha256;
+}
 
 /// How long the record key of `suite` is.
-nuint GetTlsSuiteKeyLength(TlsCipherSuite suite) =>
-    suite == TlsCipherSuite.TlsAes128GcmSha256 ? 16u : 32u;
+internal nuint GetTlsSuiteKeyLength(TlsCipherSuite suite)
+{
+    switch (suite)
+    {
+        case TlsCipherSuite.TlsAes128GcmSha256:
+        case TlsCipherSuite.TlsEcdheEcdsaWithAes128GcmSha256:
+        case TlsCipherSuite.TlsEcdheRsaWithAes128GcmSha256:
+            return 16u;
+    }
+    return 32u;
+}
 
 /// The signature schemes this end can verify in a `CertificateVerify`, most
 /// preferred first.
@@ -349,6 +447,12 @@ internal List<TlsSignatureScheme> CreateDefaultTlsCertificateSignatureSchemes()
     schemes.Add(TlsSignatureScheme.RsaPkcs1Sha512);
     return schemes;
 }
+
+/// The schemes this end can verify in a TLS 1.2 ServerKeyExchange or
+/// CertificateVerify: TLS 1.3's, and PKCS #1 v1.5 last, as RFC 8446 §4.2.3
+/// requires of a list that one ClientHello offers for both versions.
+internal List<TlsSignatureScheme> CreateDefaultTls12SignatureSchemes() =>
+    CreateDefaultTlsCertificateSignatureSchemes();
 
 // ------------------------------------------------------------------ bytes
 

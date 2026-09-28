@@ -23,10 +23,12 @@ module Standard.Net.Security;
 
 import Standard.Collections;
 
-/// A ClientHello, read (RFC 8446 §4.1.2): the fields a server chooses by, and
-/// what a client offered, for checking the server's answers against.
+/// A ClientHello, read (RFC 8446 §4.1.2, RFC 5246 §7.4.1.2): the fields a
+/// server chooses by, and what a client offered, for checking the server's
+/// answers against.
 internal sealed class TlsClientHello
 {
+    internal uint _legacyVersion = 0u;
     internal byte[] _random = new byte[0u];
     internal byte[] _sessionId = new byte[0u];
     internal List<uint> _cipherSuites = new List<uint>();
@@ -51,6 +53,18 @@ internal sealed class TlsClientHello
     internal bool _hasPreSharedKey = false;
     internal bool _hasEarlyData = false;
 
+    // TLS 1.2's extensions.
+    internal bool _hasExtendedMasterSecret = false;
+    internal bool _hasRenegotiationInfo = false;
+    internal byte[] _renegotiationInfo = new byte[0u];
+    internal bool _hasEcPointFormats = false;
+    internal bool _offersUncompressedPoints = false;
+
+    /// Whether the client asked for secure renegotiation (RFC 5746), with the
+    /// extension or with the signalling suite.
+    internal bool SignalsTlsRenegotiationInfo =>
+        _hasRenegotiationInfo || _cipherSuites.Contains(TlsRenegotiationInfoScsv);
+
     /// The key share offered in `group`, or an empty array.
     internal byte[] FindTlsKeyShare(TlsNamedGroup group)
     {
@@ -74,7 +88,7 @@ internal sealed class TlsClientHello
         var hello = new TlsClientHello();
         var reader = new TlsReader(message, 4u, message.Length - 4u);
 
-        reader.ReadUInt16();
+        hello._legacyVersion = reader.ReadUInt16();
         hello._random = reader.ReadArray(32u);
         hello._sessionId = reader.ReadVectorArray(1u, 0u, 32u);
 
@@ -226,6 +240,27 @@ internal sealed class TlsClientHello
             case TlsExtensionType.EarlyData:
                 _hasEarlyData = true;
                 return TlsError.None;
+
+            case TlsExtensionType.ExtendedMasterSecret:
+                _hasExtendedMasterSecret = true;
+                break;
+
+            case TlsExtensionType.RenegotiationInfo:
+                _hasRenegotiationInfo = true;
+                _renegotiationInfo = data.ReadVectorArray(1u, 0u, 255u);
+                break;
+
+            case TlsExtensionType.EcPointFormats:
+            {
+                _hasEcPointFormats = true;
+                byte[] formats = data.ReadVectorArray(1u, 1u, 255u);
+                for (nuint i = 0u; i < formats.Length; i++)
+                {
+                    if (formats[i] == 0)
+                        _offersUncompressedPoints = true;
+                }
+                break;
+            }
 
             default:
                 return TlsError.None;

@@ -128,7 +128,7 @@ internal sealed class TlsServerHandshake
         for (nuint i = 0u; i < suites.Count && !foundSuite; i++)
         {
             TlsCipherSuite suite = suites[i];
-            if (IsImplementedTlsCipherSuite(suite) && _hello._cipherSuites.Contains((uint)suite))
+            if (IsTls13CipherSuite(suite) && _hello._cipherSuites.Contains((uint)suite))
             {
                 _suite = suites[i];
                 foundSuite = true;

@@ -24,7 +24,8 @@ module Standard.Net.Security;
 /// What an alert says, with the numbers RFC 8446 §6 gives them.
 ///
 /// In TLS 1.3 every alert but `CloseNotify` and `UserCanceled` ends the
-/// connection, whatever level it was sent at.
+/// connection, whatever level it was sent at. In TLS 1.2 a warning-level
+/// `NoRenegotiation` or `UnrecognizedName` is passed over as well.
 public enum TlsAlertDescription : byte
 {
     /// The sender will send nothing more. The orderly end of a connection.
@@ -87,6 +88,10 @@ public enum TlsAlertDescription : byte
     /// The sender is abandoning the handshake, and will follow this with
     /// `CloseNotify`. Not fatal.
     UserCanceled = 90,
+
+    /// TLS 1.2 only: the sender will not renegotiate, and the connection
+    /// goes on as it was. Sent as a warning.
+    NoRenegotiation = 100,
 
     /// A message lacked an extension that is required in it.
     MissingExtension = 109,

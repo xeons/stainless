@@ -45,6 +45,7 @@ internal sealed class TlsConnection
 
     // What the handshake settled.
     internal bool _handshakeComplete;
+    internal TlsProtocolVersion _protocol;
     internal TlsCipherSuite _cipherSuite;
     internal TlsNamedGroup _group;
     internal TlsSignatureScheme _signatureScheme;
@@ -53,6 +54,7 @@ internal sealed class TlsConnection
     internal List<byte[]> _remoteChain;
     internal bool _mutuallyAuthenticated;
     internal TlsKeySchedule? _schedule;
+    internal Tls12KeySchedule? _tls12Schedule;
     internal byte[] _readTrafficSecret;
     internal byte[] _writeTrafficSecret;
     internal TlsSessionTicketHandler _ticketHandler;
@@ -79,6 +81,7 @@ internal sealed class TlsConnection
         _handshakeOutput = new TlsBuffer(4096u);
         _writeLock = new Mutex<int>(0);
         _handshakeComplete = false;
+        _protocol = TlsProtocolVersion.Tls13;
         _cipherSuite = TlsCipherSuite.TlsAes128GcmSha256;
         _group = TlsNamedGroup.X25519;
         _signatureScheme = TlsSignatureScheme.Ed25519;
@@ -87,6 +90,7 @@ internal sealed class TlsConnection
         _remoteChain = new List<byte[]>();
         _mutuallyAuthenticated = false;
         _schedule = null;
+        _tls12Schedule = null;
         _readTrafficSecret = new byte[0u];
         _writeTrafficSecret = new byte[0u];
         _ticketHandler = DiscardTlsSessionTicket;
@@ -104,6 +108,16 @@ internal sealed class TlsConnection
     internal IStream Inner => _records.Inner;
 
     internal bool IsClosed => _closed;
+
+    /// Whether the version negotiated is TLS 1.2.
+    internal bool IsTls12 => _protocol == TlsProtocolVersion.Tls12;
+
+    /// Settles on TLS 1.2, for the rest of the connection.
+    internal void SelectTls12()
+    {
+        _protocol = TlsProtocolVersion.Tls12;
+        _records._isTls12 = true;
+    }
 
     // ------------------------------------------------------------- handshake
 
@@ -165,6 +179,35 @@ internal sealed class TlsConnection
         return Ok(message);
     }
 
+    /// Reads TLS 1.2's change_cipher_spec, which MUST come next and MUST NOT
+    /// fall inside a handshake message.
+    internal TlsError ReadTlsChangeCipherSpec()
+    {
+        while (true)
+        {
+            if (_handshakeInput.Length > 0u)
+                return TlsError.UnexpectedMessage;
+            var record = _records.ReadTlsRecord();
+            if (!record.Ok)
+                return record.Error;
+            TlsRecord got = record.Value;
+            switch (got.Type)
+            {
+                case TlsContentType.ChangeCipherSpec:
+                    return TlsError.None;
+                case TlsContentType.Alert:
+                {
+                    TlsError alerted = ProcessTlsAlert(got);
+                    if (alerted != TlsError.None)
+                        return alerted;
+                    break;
+                }
+                default:
+                    return TlsError.UnexpectedMessage;
+            }
+        }
+    }
+
     /// Refuses a handshake message that runs on past a change of key: RFC
     /// 8446 §5.1 requires each key change to fall at a record boundary.
     internal TlsError RequireTlsRecordBoundary()
@@ -215,6 +258,18 @@ internal sealed class TlsConnection
         return error;
     }
 
+    /// Sends a warning that ends nothing, such as TLS 1.2's no_renegotiation.
+    private TlsError SendTlsWarningAlert(TlsAlertDescription description)
+    {
+        var held = _writeLock.Enter();
+        if (_alertSent)
+            return TlsError.None;
+        var alert = new byte[2u];
+        alert[0u] = 1;
+        alert[1u] = (byte)description;
+        return _records.WriteTlsRecords(TlsContentType.Alert, alert, 0u, 2u);
+    }
+
     private void SendTlsAlert(TlsAlertDescription description)
     {
         var held = _writeLock.Enter();
@@ -235,11 +290,21 @@ internal sealed class TlsConnection
         if (record.Length != 2u)
             return TlsError.Decode;
 
+        bool isWarning = record.Data[record.Offset] == 1;
         var description = (TlsAlertDescription)record.Data[record.Offset + 1u];
         switch (description)
         {
             case TlsAlertDescription.UserCanceled:
                 return TlsError.None;
+            case TlsAlertDescription.NoRenegotiation:
+            case TlsAlertDescription.UnrecognizedName:
+                if (IsTls12 && isWarning)
+                    return TlsError.None;
+                _alertReceived = description;
+                _alertSent = true;
+                if (_error == TlsError.None)
+                    _error = TlsError.AlertReceived;
+                return TlsError.AlertReceived;
             case TlsAlertDescription.CloseNotify:
                 _closeNotifyReceived = true;
                 if (!_handshakeComplete)
@@ -390,6 +455,14 @@ internal sealed class TlsConnection
                 return TlsError.None;
 
             var type = (TlsHandshakeType)bytes[0u];
+            if (IsTls12)
+            {
+                TlsError refused = RefuseTlsRenegotiation(type);
+                if (refused != TlsError.None)
+                    return refused;
+                continue;
+            }
+
             var reader = new TlsReader(bytes, 4u, bytes.Length - 4u);
             switch (type)
             {
@@ -413,6 +486,19 @@ internal sealed class TlsConnection
                     return TlsError.UnexpectedMessage;
             }
         }
+    }
+
+    /// Answers a TLS 1.2 HelloRequest to a client, or ClientHello to a
+    /// server, with a no_renegotiation warning, and goes on as before (RFC
+    /// 5246 §7.2.2). Any other handshake message after the handshake is
+    /// refused.
+    private TlsError RefuseTlsRenegotiation(TlsHandshakeType type)
+    {
+        TlsHandshakeType asking = _isServer ? TlsHandshakeType.ClientHello
+                                            : TlsHandshakeType.HelloRequest;
+        if (type != asking)
+            return TlsError.UnexpectedMessage;
+        return SendTlsWarningAlert(TlsAlertDescription.NoRenegotiation);
     }
 
     private TlsError ProcessTlsKeyUpdate(TlsReader reader)
@@ -484,8 +570,12 @@ internal sealed class TlsConnection
 
     /// Sends a KeyUpdate and moves to the next write key, when the peer
     /// asked for one or the key has protected as much as it safely can.
+    /// TLS 1.2 has no way to change a key short of renegotiation, so its
+    /// keys are used until the connection ends.
     private TlsError UpdateTlsWriteKeyWhenDue()
     {
+        if (IsTls12)
+            return TlsError.None;
         if (!_keyUpdateOwed && _records.WriteSequence < TlsKeyUsageLimit)
             return TlsError.None;
         _keyUpdateOwed = false;
@@ -498,6 +588,8 @@ internal sealed class TlsConnection
     {
         if (!_handshakeComplete || _closed || _error != TlsError.None)
             return TlsError.Closed;
+        if (IsTls12)
+            return TlsError.ProtocolVersion;
         var schedule = _schedule;
         if (schedule == null)
             return TlsError.InternalError;
