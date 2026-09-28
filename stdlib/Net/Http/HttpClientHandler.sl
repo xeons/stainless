@@ -27,6 +27,7 @@ import Standard.IO.Compression;
 import Standard.Limits;
 import Standard.Net.Security;
 import Standard.Text;
+import Standard.Threading;
 import Standard.Time;
 
 /// What a client does between a request and the wire: connections and their
@@ -43,6 +44,7 @@ import Standard.Time;
 public class HttpClientHandler
 {
     private HttpConnectionPool? _pool;
+    private Mutex<int> _poolLock = new Mutex<int>(0);
     private bool _disposed = false;
     private HttpServerCertificateValidator _certificateCallback = AcceptHttpCertificateByDefault;
     private bool _hasCertificateCallback = false;
@@ -128,8 +130,12 @@ public class HttpClientHandler
     /// connection until it is done with it, and that one is then closed too.
     public void Dispose()
     {
-        _disposed = true;
-        var pool = _pool;
+        HttpConnectionPool? pool = null;
+        {
+            var held = _poolLock.Enter();
+            _disposed = true;
+            pool = _pool;
+        }
         if (pool != null)
             pool.CloseAllHttpConnections();
     }
@@ -142,8 +148,11 @@ public class HttpClientHandler
         return check.ValidateHttpCertificateChain;
     }
 
+    /// The pool, made by the first request. Several threads MAY send the
+    /// first requests at once, and they MUST all get the one pool.
     private HttpConnectionPool EnsureHttpPool()
     {
+        var held = _poolLock.Enter();
         var existing = _pool;
         if (existing != null)
             return existing;
