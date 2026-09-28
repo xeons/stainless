@@ -966,12 +966,13 @@ every key length, and all eighteen cases of the GCM specification by
 vectors by `tests/cases/crypto-25519`. The AES and Curve25519 cases run again
 as 32-bit x86 programs.
 
-**What is constant time.** `FixedTimeEquals`, all of `X25519`, and `Ed25519`
-signing: no branch and no memory index there depends on a secret, and every
-secret-dependent choice is a mask passed through `Bits.OpaqueCopy`.
-`Ed25519.Verify` is variable time and touches only public data. AES is
-table-driven and is not constant time; the module's own documentation says
-what it is fit for.
+**What is constant time.** Every cipher and MAC — AES bitsliced, GHASH
+without a table, ChaCha20, Poly1305 — along with `FixedTimeEquals`, all of
+`X25519`, and `Ed25519` signing: no branch and no memory index there depends on
+a secret, and every secret-dependent choice is a mask passed through
+`Bits.OpaqueCopy`. `Ed25519.Verify` is variable time and touches only public
+data. The claim is timing and cache only; the module's own documentation says
+what it does not cover.
 
 **Verification is strict and cofactorless.** An S at or above the group order
 is refused, as is a public key that is not the one canonical encoding of a
