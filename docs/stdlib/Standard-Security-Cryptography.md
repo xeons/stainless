@@ -50,7 +50,7 @@ key derivation and cipher .NET ships that does not need a bignum.
 
 ## Contents
 
-**Types** &nbsp; [Aes](#aes-class) &middot; [AesGcm](#aesgcm-class) &middot; [CipherMode](#ciphermode-enum) &middot; [CryptoError](#cryptoerror-enum) &middot; [CryptographicOperations](#cryptographicoperations-class) &middot; [HashAlgorithm](#hashalgorithm-class) &middot; [Hkdf](#hkdf-class) &middot; [Hmac](#hmac-class) &middot; [HmacMd5](#hmacmd5-class) &middot; [HmacSha1](#hmacsha1-class) &middot; [HmacSha256](#hmacsha256-class) &middot; [HmacSha384](#hmacsha384-class) &middot; [HmacSha512](#hmacsha512-class) &middot; [IHashAlgorithm](#ihashalgorithm-interface) &middot; [Md5](#md5-class) &middot; [PaddingMode](#paddingmode-enum) &middot; [RandomNumberGenerator](#randomnumbergenerator-class) &middot; [Rfc2898DeriveBytes](#rfc2898derivebytes-class) &middot; [Sha1](#sha1-class) &middot; [Sha256](#sha256-class) &middot; [Sha2Wide](#sha2wide-class) &middot; [Sha384](#sha384-class) &middot; [Sha512](#sha512-class)
+**Types** &nbsp; [Aes](#aes-class) &middot; [AesGcm](#aesgcm-class) &middot; [CipherMode](#ciphermode-enum) &middot; [CryptoError](#cryptoerror-enum) &middot; [CryptographicOperations](#cryptographicoperations-class) &middot; [HashAlgorithm](#hashalgorithm-class) &middot; [Hkdf](#hkdf-class) &middot; [Hmac](#hmac-class) &middot; [HmacMd5](#hmacmd5-class) &middot; [HmacSha1](#hmacsha1-class) &middot; [HmacSha256](#hmacsha256-class) &middot; [HmacSha384](#hmacsha384-class) &middot; [HmacSha512](#hmacsha512-class) &middot; [IHashAlgorithm](#ihashalgorithm-interface) &middot; [Md5](#md5-class) &middot; [PaddingMode](#paddingmode-enum) &middot; [PemEncoding](#pemencoding-class) &middot; [PemFields](#pemfields-struct) &middot; [RandomNumberGenerator](#randomnumbergenerator-class) &middot; [Rfc2898DeriveBytes](#rfc2898derivebytes-class) &middot; [Sha1](#sha1-class) &middot; [Sha256](#sha256-class) &middot; [Sha2Wide](#sha2wide-class) &middot; [Sha384](#sha384-class) &middot; [Sha512](#sha512-class)
 
 ## Types
 
@@ -1235,6 +1235,168 @@ AnsiX923
 ANSI X9.23: zeros, and the last byte is the count.
 
 <sub>[stdlib/Security/Cryptography/PaddingMode.sl:45](../../stdlib/Security/Cryptography/PaddingMode.sl#L45)</sub>
+
+### PemEncoding *class*
+
+```
+class PemEncoding
+```
+
+The textual encoding of RFC 7468: DER in base64, between two boundary
+lines that name what it is.
+
+```csharp
+if (PemEncoding.Find(text) is Some found)
+{
+    var reader = new AsnReader(found.Value.Data, AsnEncodingRules.Der);
+    ...
+}
+String pem = PemEncoding.Write("CERTIFICATE", der);
+```
+
+As .NET's `PemEncoding`: a block may sit anywhere in surrounding text, the
+base64 may be wrapped at any width and with CRLF or LF, and a block whose
+`END` label is not its `BEGIN` label is not a block. `Find` passes over
+anything malformed and answers the first block that is whole.
+
+<sub>[stdlib/Security/Cryptography/PemEncoding.sl:43](../../stdlib/Security/Cryptography/PemEncoding.sl#L43)</sub>
+
+#### Find *method*
+
+```
+static Optional<PemFields> Find(String text)
+```
+
+The first well-formed block in `text`.
+
+**Parameters**
+
+- `text` — where to look
+
+**Returns** &nbsp; the block, or `None` when there is no well-formed one
+
+**See also** &nbsp; [PemEncoding.Write](#write-method)
+
+<sub>[stdlib/Security/Cryptography/PemEncoding.sl:50](../../stdlib/Security/Cryptography/PemEncoding.sl#L50)</sub>
+
+#### Find *method*
+
+```
+static Optional<PemFields> Find(String text, nuint start)
+```
+
+The first well-formed block in `text` at or after byte `start`, which
+is how to walk a file of several: pass the end of the last one's
+`Location`.
+
+A `BEGIN` boundary MUST start the text or follow whitespace, and an
+`END` boundary MUST end it or be followed by whitespace. Between them is
+base64 in the standard alphabet, padded, with whitespace anywhere.
+
+**Parameters**
+
+- `text` — where to look
+- `start` — the byte to look from; past the end finds nothing
+
+**Returns** &nbsp; the block, or `None` when there is no well-formed one
+
+<sub>[stdlib/Security/Cryptography/PemEncoding.sl:63](../../stdlib/Security/Cryptography/PemEncoding.sl#L63)</sub>
+
+#### Write *method*
+
+```
+static String Write(String label, ReadOnlySpan<byte> data)
+```
+
+`data` as a PEM block: the boundaries, and base64 in lines of 64
+separated by `\n`. No newline follows the `END` boundary.
+
+**Parameters**
+
+- `label` — what the data is; MUST be valid, which `IsValidLabel` answers, and aborts when it is not
+- `data` — the bytes to encode, usually DER
+
+**See also** &nbsp; [PemEncoding.Find](#find-method)
+
+<sub>[stdlib/Security/Cryptography/PemEncoding.sl:129](../../stdlib/Security/Cryptography/PemEncoding.sl#L129)</sub>
+
+#### IsValidLabel *method*
+
+```
+static bool IsValidLabel(String label)
+```
+
+Whether RFC 7468 allows `label`: printable ASCII other than `-`, with a
+single space or hyphen allowed between two such characters. Empty is
+allowed.
+
+<sub>[stdlib/Security/Cryptography/PemEncoding.sl:155](../../stdlib/Security/Cryptography/PemEncoding.sl#L155)</sub>
+
+### PemFields *struct*
+
+```
+struct PemFields
+```
+
+One PEM block that `PemEncoding.Find` found: its label, its data decoded,
+and where each part is in the text it was found in.
+
+Every `Range` counts bytes of the text's UTF-8, which for the block itself
+is ASCII and so counts characters too.
+
+<sub>[stdlib/Security/Cryptography/PemFields.sl:29](../../stdlib/Security/Cryptography/PemFields.sl#L29)</sub>
+
+#### Label *property*
+
+```
+String Label { get; }
+```
+
+What follows `BEGIN `: `CERTIFICATE`, `PRIVATE KEY`.
+
+<sub>[stdlib/Security/Cryptography/PemFields.sl:47](../../stdlib/Security/Cryptography/PemFields.sl#L47)</sub>
+
+#### Data *property*
+
+```
+byte[] Data { get; }
+```
+
+The base64 between the boundaries, decoded.
+
+<sub>[stdlib/Security/Cryptography/PemFields.sl:50](../../stdlib/Security/Cryptography/PemFields.sl#L50)</sub>
+
+#### Location *property*
+
+```
+Range Location { get; }
+```
+
+The whole block, from the first `-` of `-----BEGIN` to the last of
+`-----END ...-----`. Its end is where to look for the next one.
+
+<sub>[stdlib/Security/Cryptography/PemFields.sl:54](../../stdlib/Security/Cryptography/PemFields.sl#L54)</sub>
+
+#### LabelLocation *property*
+
+```
+Range LabelLocation { get; }
+```
+
+Where the label is, in the `BEGIN` boundary.
+
+<sub>[stdlib/Security/Cryptography/PemFields.sl:57](../../stdlib/Security/Cryptography/PemFields.sl#L57)</sub>
+
+#### Base64Location *property*
+
+```
+Range Base64Location { get; }
+```
+
+Where the base64 is, from its first character to its last, whitespace
+inside it included and around it not.
+
+<sub>[stdlib/Security/Cryptography/PemFields.sl:61](../../stdlib/Security/Cryptography/PemFields.sl#L61)</sub>
 
 ### RandomNumberGenerator *class*
 

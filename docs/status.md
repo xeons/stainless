@@ -673,7 +673,16 @@ last person to edit it -- the suite is the authority.
   CBC, CFB and CTR, AES-GCM, the platform's entropy and a constant-time
   comparison, in `System.Security.Cryptography`'s shape with a `Result` where
   .NET throws. Every answer is pinned against a published test vector. Not
-  public-key, which wants a constant-time bignum the library does not have
+  public-key, which wants a constant-time bignum the library does not have.
+  `PemEncoding` finds RFC 7468 blocks in surrounding text and writes them
+- `Standard.Formats.Asn1`: BER and DER in `System.Formats.Asn1`'s shape, with
+  a `Result` where .NET throws. `AsnReader` covers every type X.509 uses —
+  integers raw or as `long`, bit and octet strings, identifiers, eight
+  character-string types, both times, explicit and implicit tags — and holds
+  DER to its one encoding; `AsnWriter` writes DER and sorts a SET OF. Times are
+  seconds in a `long`, since a `GeneralizedTime` outlives `DateTimeOffset`.
+  Indefinite lengths and constructed strings are refused. The foundation for
+  X.509 and TLS, neither of which is written
 - `Standard.Media.Audio`: playing and recording interleaved PCM, and reading and
   writing WAV. WASAPI on Windows and ALSA elsewhere, both reached by name at the
   first device rather than linked, so a machine with neither answers

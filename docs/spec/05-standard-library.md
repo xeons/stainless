@@ -53,7 +53,8 @@ own for the linker to drop.
 | `Standard.Time` | `DateTimeOffset`, `TimeSpan`, `DateTime` and the monotonic `Stopwatch` | on request |
 | `Standard.Random` | xoshiro256**, seeded by you or by the operating system | on request |
 | `Standard.Drawing` | raster images: decode, draw, encode ([§5.12](#512-standarddrawing)) | on request |
-| `Standard.Security.Cryptography` | hashes, MACs, key derivation, AES ([§5.13](#513-standardsecuritycryptography)) | on request |
+| `Standard.Security.Cryptography` | hashes, MACs, key derivation, AES, PEM ([§5.13](#513-standardsecuritycryptography)) | on request |
+| `Standard.Formats.Asn1` | ASN.1 in BER and DER, read and written ([§5.15](#515-standardformatsasn1)) | on request |
 | `Standard.Media.Audio` | playing and recording sound ([§5.14](#514-standardmediaaudio)) | on request |
 | `Standard.Com` | `Guid` and `IUnknown`, for `com interface` ([§8.5](08-interop-libraries.md#85-com)) | on request |
 | `Standard` | `Result<T, TError>`, `[Flags]`, and the rest of what the language itself reads | automatically |
@@ -895,6 +896,7 @@ here.
 | MACs | `Hmac` over any of them, and `HmacSha256` and its siblings |
 | derivation | `Rfc2898DeriveBytes.Pbkdf2`, `Hkdf` |
 | ciphers | `Aes` in ECB, CBC, CFB and CTR; `AesGcm` |
+| text | `PemEncoding`: RFC 7468 blocks found in text and written at 64 columns |
 | the rest | `RandomNumberGenerator`, `CryptographicOperations.FixedTimeEquals` |
 
 Every answer is pinned against a published test vector — FIPS-180 and RFC 1321
@@ -932,6 +934,46 @@ and has been an emulation on top of WASAPI since Vista, so it adds a buffer of
 latency to reach the same mixer and does not work inside an app container. A
 program that wants a game engine's mixing and 3D positioning wants
 `Win32.XAudio2`, which is bound separately.
+
+## 5.15 `Standard.Formats.Asn1`
+
+```csharp
+var certificate = try new AsnReader(der, AsnEncodingRules.Der).ReadSequence();
+var signed = try certificate.ReadSequence();
+
+var writer = new AsnWriter();
+writer.PushSequence();
+writer.WriteInteger(2);
+writer.WriteObjectIdentifier("1.2.840.10045.4.3.2");
+writer.PopSequence();
+byte[] encoded = writer.Encode();
+```
+
+**The shape is `System.Formats.Asn1`'s**, with a `Result` where .NET throws.
+`AsnReader` reads one value after another and hands back a nested reader for a
+`SEQUENCE` or a `SET OF`; a read that fails leaves the reader where it was.
+`AsnWriter` writes DER only, with `PushSequence` and `PopSequence` in place of
+.NET's `using` scope. An implicit tag is the optional last argument of every
+read and write, and an explicit one is a sequence opened with the context tag.
+
+**Nothing aborts on input.** Every length is checked against the value that
+contains it, so a nested reader cannot see past its parent. DER is held
+strictly: minimal lengths and tag numbers, no redundant `INTEGER` octet, a
+`BOOLEAN` of `0x00` or `0xFF`, zero unused bits, primitive strings, and times
+in exactly their canonical form. BER is read where it is cheap; an indefinite
+length and a constructed string answer `AsnError.Unsupported`. SET OF order is
+not checked on reading and is sorted on writing.
+
+**A time is seconds since 1970 in a `long`**, because a `GeneralizedTime`
+reaches 9999 and a `DateTimeOffset` ends in 2262.
+`ConvertAsnTimeToDateTimeOffset` crosses over where it can and answers
+`OutOfRange` where it cannot. A `UTCTime` year follows RFC 5280: `50` to `99`
+are the 1900s, `00` to `49` the 2000s.
+
+Object identifiers are dotted strings, and `Oid` converts them to and from
+their contents octets. Which identifier means what belongs to the format that
+uses it. `tests/cases/asn1` pins X.690's own examples, a refusal for every
+`AsnError`, and a walk of a certificate OpenSSL made.
 
 ---
 

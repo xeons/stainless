@@ -154,6 +154,7 @@ What ships and how: threading, collections, environment, math, concurrency, I/O,
 - [5.12 `Standard.Drawing`](05-standard-library.md#512-standarddrawing)
 - [5.13 `Standard.Security.Cryptography`](05-standard-library.md#513-standardsecuritycryptography)
 - [5.14 `Standard.Media.Audio`](05-standard-library.md#514-standardmediaaudio)
+- [5.15 `Standard.Formats.Asn1`](05-standard-library.md#515-standardformatsasn1)
 
 ### [6. Attributes and reflection](06-attributes-reflection.md)
 

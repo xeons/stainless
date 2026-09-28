@@ -18,6 +18,7 @@ One page per module. Each lists every public type, function, property, case and 
 | [Standard.Encoding](Standard-Encoding.md) | Text as bytes, in whichever encoding somebody else chose. |
 | [Standard.Env](Standard-Env.md) | What the program was started with and what surrounds it. |
 | [Standard.File](Standard-File.md) | Whole-file operations. |
+| [Standard.Formats.Asn1](Standard-Formats-Asn1.md) | ASN.1 values in BER and DER, as X.509, PKCS and TLS carry them. |
 | [Standard.IO](Standard-IO.md) | Streams, and the vocabulary the rest of the I/O modules share. |
 | [Standard.Json](Standard-Json.md) | JSON, in two layers. |
 | [Standard.Limits](Standard-Limits.md) | What each number type holds. |

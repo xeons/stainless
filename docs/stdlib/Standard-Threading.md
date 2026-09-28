@@ -169,7 +169,7 @@ It is `long` rather than generic because atomics are not: `Atomic<T>` would
 need a constraint saying T is an integer, and Stainless constrains by
 interface only. A shared counter wants 64 bits anyway.
 
-<sub>[stdlib/Threading/AtomicLong.sl:35](../../stdlib/Threading/AtomicLong.sl#L35)</sub>
+<sub>[stdlib/Threading/AtomicLong.sl:43](../../stdlib/Threading/AtomicLong.sl#L43)</sub>
 
 #### Read *method*
 
@@ -183,7 +183,7 @@ what a decision is built on.
 
 **See also** &nbsp; [AtomicLong.CompareExchange](#compareexchange-method)
 
-<sub>[stdlib/Threading/AtomicLong.sl:47](../../stdlib/Threading/AtomicLong.sl#L47)</sub>
+<sub>[stdlib/Threading/AtomicLong.sl:55](../../stdlib/Threading/AtomicLong.sl#L55)</sub>
 
 #### Write *method*
 
@@ -196,7 +196,7 @@ that tells you what it replaced.
 
 **See also** &nbsp; [AtomicLong.Exchange](#exchange-method)
 
-<sub>[stdlib/Threading/AtomicLong.sl:53](../../stdlib/Threading/AtomicLong.sl#L53)</sub>
+<sub>[stdlib/Threading/AtomicLong.sl:61](../../stdlib/Threading/AtomicLong.sl#L61)</sub>
 
 #### Add *method*
 
@@ -206,7 +206,7 @@ long Add(long delta)
 
 Adds and returns the new value, so two threads never see the same result.
 
-<sub>[stdlib/Threading/AtomicLong.sl:56](../../stdlib/Threading/AtomicLong.sl#L56)</sub>
+<sub>[stdlib/Threading/AtomicLong.sl:64](../../stdlib/Threading/AtomicLong.sl#L64)</sub>
 
 #### Increment *method*
 
@@ -217,7 +217,7 @@ long Increment()
 Adds one and returns the new value, so two threads never see the same
 number. Note that this is not C's `++`, which answers the old one.
 
-<sub>[stdlib/Threading/AtomicLong.sl:60](../../stdlib/Threading/AtomicLong.sl#L60)</sub>
+<sub>[stdlib/Threading/AtomicLong.sl:68](../../stdlib/Threading/AtomicLong.sl#L68)</sub>
 
 #### Decrement *method*
 
@@ -228,7 +228,7 @@ long Decrement()
 Subtracts one and returns the new value. A reference count reaching
 zero is exactly one thread's result.
 
-<sub>[stdlib/Threading/AtomicLong.sl:64](../../stdlib/Threading/AtomicLong.sl#L64)</sub>
+<sub>[stdlib/Threading/AtomicLong.sl:72](../../stdlib/Threading/AtomicLong.sl#L72)</sub>
 
 #### Exchange *method*
 
@@ -238,7 +238,7 @@ long Exchange(long value)
 
 Stores `value` and returns what was there before.
 
-<sub>[stdlib/Threading/AtomicLong.sl:67](../../stdlib/Threading/AtomicLong.sl#L67)</sub>
+<sub>[stdlib/Threading/AtomicLong.sl:75](../../stdlib/Threading/AtomicLong.sl#L75)</sub>
 
 #### CompareExchange *method*
 
@@ -249,7 +249,7 @@ bool CompareExchange(long expected, long desired)
 Stores `desired` only if the current value is `expected`, and reports
 whether it did. The building block for anything lock-free.
 
-<sub>[stdlib/Threading/AtomicLong.sl:71](../../stdlib/Threading/AtomicLong.sl#L71)</sub>
+<sub>[stdlib/Threading/AtomicLong.sl:79](../../stdlib/Threading/AtomicLong.sl#L79)</sub>
 
 #### And *method*
 
@@ -264,7 +264,7 @@ new value, as `Add` does.
 
 - `mask` — the bits to keep; every bit outside it is cleared
 
-<sub>[stdlib/Threading/AtomicLong.sl:81](../../stdlib/Threading/AtomicLong.sl#L81)</sub>
+<sub>[stdlib/Threading/AtomicLong.sl:89](../../stdlib/Threading/AtomicLong.sl#L89)</sub>
 
 #### Or *method*
 
@@ -274,7 +274,7 @@ long Or(long mask)
 
 Sets the bits in `mask`, returning the new value.
 
-<sub>[stdlib/Threading/AtomicLong.sl:84](../../stdlib/Threading/AtomicLong.sl#L84)</sub>
+<sub>[stdlib/Threading/AtomicLong.sl:92](../../stdlib/Threading/AtomicLong.sl#L92)</sub>
 
 #### Xor *method*
 
@@ -284,7 +284,7 @@ long Xor(long mask)
 
 Flips the bits in `mask`, returning the new value.
 
-<sub>[stdlib/Threading/AtomicLong.sl:87](../../stdlib/Threading/AtomicLong.sl#L87)</sub>
+<sub>[stdlib/Threading/AtomicLong.sl:95](../../stdlib/Threading/AtomicLong.sl#L95)</sub>
 
 ### AutoResetEvent *class*
 
