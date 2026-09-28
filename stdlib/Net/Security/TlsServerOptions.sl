@@ -66,7 +66,8 @@ public sealed class TlsServerOptions
     public bool ClientCertificateRequired { get; set; } = false;
 
     /// Decides whether to trust a client's chain. The target host it is given
-    /// is empty. The default refuses every chain.
+    /// is empty. The default trusts what the platform's root store does, for
+    /// the client-authentication usage.
     public TlsCertificateValidator ClientCertificateValidator { get; set; } =
         ValidateTlsCertificateChainByDefault;
 

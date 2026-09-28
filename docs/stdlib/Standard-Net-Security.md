@@ -37,11 +37,12 @@ options can already ask for it; resumption; a server that issues tickets;
 and 0-RTT data, which is never coming, since it is replayable by design.
 
 **Certificates are judged by a `TlsCertificateValidator`**, a closure the
-options carry. The default refuses every chain, because X.509 path
-validation is not in the library yet and a default that trusted anything
-would be worse than none; a program pins the certificate it expects, or
-supplies its own policy. The validator decides whom to trust; the
-CertificateVerify signature against the leaf's key is always checked here.
+options carry. The default is the platform's trust: an `X509Chain` from
+the peer's certificates to a root in the system store, the
+server-authentication usage, and the host name the client asked for. A
+program that pins a certificate, or trusts a private CA, supplies its own.
+The validator decides whom to trust; the CertificateVerify signature
+against the leaf's key is always checked here.
 
 **The record layer is constant time where a secret is involved.** The
 AEADs check their tags in constant time, and the padding of a TLS 1.3
@@ -367,7 +368,7 @@ and `UnknownCertificateAuthority` are the precise refusals and
 The validator is asked before the CertificateVerify signature is checked,
 and the signature is then checked against the leaf whatever it answered.
 
-<sub>[stdlib/Net/Security/TlsCertificateValidator.sl:38](../../stdlib/Net/Security/TlsCertificateValidator.sl#L38)</sub>
+<sub>[stdlib/Net/Security/TlsCertificateValidator.sl:39](../../stdlib/Net/Security/TlsCertificateValidator.sl#L39)</sub>
 
 ### TlsCipherSuite *enum*
 
@@ -505,8 +506,8 @@ with a HelloRetryRequest, which costs a round trip.
 TlsCertificateValidator CertificateValidator { get; set; }
 ```
 
-Decides whether to trust the server's chain. The default refuses every
-chain until X.509 validation is in this library.
+Decides whether to trust the server's chain. The default trusts what
+the platform's root store does, for `TargetHost`.
 
 **See also** &nbsp; [ValidateTlsCertificateChainByDefault](#validatetlscertificatechainbydefault-function)
 
@@ -1011,9 +1012,10 @@ TlsCertificateValidator ClientCertificateValidator { get; set; }
 ```
 
 Decides whether to trust a client's chain. The target host it is given
-is empty. The default refuses every chain.
+is empty. The default trusts what the platform's root store does, for
+the client-authentication usage.
 
-<sub>[stdlib/Net/Security/TlsServerOptions.sl:70](../../stdlib/Net/Security/TlsServerOptions.sl#L70)</sub>
+<sub>[stdlib/Net/Security/TlsServerOptions.sl:71](../../stdlib/Net/Security/TlsServerOptions.sl#L71)</sub>
 
 #### LeaveInnerStreamOpen *property*
 
@@ -1023,7 +1025,7 @@ bool LeaveInnerStreamOpen { get; set; }
 
 Whether `Close` leaves the stream underneath open.
 
-<sub>[stdlib/Net/Security/TlsServerOptions.sl:74](../../stdlib/Net/Security/TlsServerOptions.sl#L74)</sub>
+<sub>[stdlib/Net/Security/TlsServerOptions.sl:75](../../stdlib/Net/Security/TlsServerOptions.sl#L75)</sub>
 
 ### TlsSessionTicket *class*
 
@@ -2165,7 +2167,7 @@ A sentence describing a TLS error, for a message a person will read.
 
 **See also** &nbsp; [TlsError](#tlserror-enum)
 
-<sub>[stdlib/Net/Security/Security.sl:173](../../stdlib/Net/Security/Security.sl#L173)</sub>
+<sub>[stdlib/Net/Security/Security.sl:174](../../stdlib/Net/Security/Security.sl#L174)</sub>
 
 ### DiscardTlsSessionTicket *function*
 
@@ -2183,17 +2185,19 @@ What a client does with a ticket when no handler is configured: nothing.
 TlsError ValidateTlsCertificateChainByDefault(List<byte[]> chain, String targetHost)
 ```
 
-The validator used when none is configured. **It refuses every chain.**
+The validator used when none is configured: the platform's trust.
 
-X.509 path validation is not in this library yet, and a default that
-trusted anything would be an invitation to a machine in the middle. A
-program that has pinned its peer's certificate, or accepts any for a
-test, supplies its own.
+The leaf MUST reach a root in the system store (crypt32's on Windows, the
+system bundle elsewhere) through the peer's other certificates and the
+system's intermediates, pass every check `X509Chain` makes now, carry the
+server-authentication usage — client authentication when a server is
+judging a client — and, for a server, be valid for `targetHost`.
+Revocation is not checked; `X509Chain` says why.
 
 **Parameters**
 
 - `chain` — the peer's certificates, DER, leaf first
-- `targetHost` — the name the certificate must be valid for
+- `targetHost` — the name the certificate must be valid for, or empty when a server is judging a client
 
-<sub>[stdlib/Net/Security/TlsCertificateValidator.sl:49](../../stdlib/Net/Security/TlsCertificateValidator.sl#L49)</sub>
+<sub>[stdlib/Net/Security/TlsCertificateValidator.sl:53](../../stdlib/Net/Security/TlsCertificateValidator.sl#L53)</sub>
 

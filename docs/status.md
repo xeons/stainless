@@ -727,9 +727,9 @@ last person to edit it -- the suite is the authority.
   both halves byte for byte, and both have been run against OpenSSL 3.5 in
   every suite, group and key type. Over the loopback, with both ends in one
   process, ChaCha20-Poly1305 moves about 340 MB/s and AES-GCM about 130.
-  Certificates are judged by a validator the program supplies, because X.509
-  path validation is not written, and the default one refuses everything.
-  Not TLS 1.2, not resumption, and never 0-RTT
+  By default a certificate is trusted as the platform's root store trusts it,
+  through `X509Chain`, for the host name asked for; a program may supply its
+  own validator instead. Not TLS 1.2, not resumption, and never 0-RTT
 - `Standard.Media.Audio`: playing and recording interleaved PCM, and reading and
   writing WAV. WASAPI on Windows and ALSA elsewhere, both reached by name at the
   first device rather than linked, so a machine with neither answers
@@ -1074,9 +1074,8 @@ Being straight about the edges, roughly in the order they are worth adding:
   mode — and nothing that waits on many at once, so a server that holds a
   thousand connections wants a thread each. There is no `select` or `epoll`
   over a set, and no async; `Standard.Net.Security`'s TLS is blocking in the
-  same way. **TLS is 1.3 only, and trusts nothing by default**: there is no
-  TLS 1.2, no resumption, and no X.509 path validation, so a client pins its
-  server's certificate or supplies a validator of its own. `Socket.Connect` on a socket
+  same way. **TLS is 1.3 only**: there is no TLS 1.2 and no resumption, and
+  certificates are never checked for revocation. `Socket.Connect` on a socket
   that is already open tries one address rather than all of them, because a
   socket whose connect failed cannot be reused and that one is already made —
   `Socket.OpenConnected(host, port, ...)` is the form that tries each.

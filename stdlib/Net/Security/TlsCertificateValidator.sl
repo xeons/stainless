@@ -22,6 +22,7 @@
 module Standard.Net.Security;
 
 import Standard.Collections;
+import Standard.Security.Cryptography.X509Certificates;
 
 /// Decides whether the peer's certificate chain is to be trusted.
 ///
@@ -37,18 +38,60 @@ import Standard.Collections;
 /// and the signature is then checked against the leaf whatever it answered.
 public closure TlsError TlsCertificateValidator(List<byte[]> chain, String targetHost);
 
-/// The validator used when none is configured. **It refuses every chain.**
+/// The validator used when none is configured: the platform's trust.
 ///
-/// X.509 path validation is not in this library yet, and a default that
-/// trusted anything would be an invitation to a machine in the middle. A
-/// program that has pinned its peer's certificate, or accepts any for a
-/// test, supplies its own.
+/// The leaf MUST reach a root in the system store (crypt32's on Windows, the
+/// system bundle elsewhere) through the peer's other certificates and the
+/// system's intermediates, pass every check `X509Chain` makes now, carry the
+/// server-authentication usage — client authentication when a server is
+/// judging a client — and, for a server, be valid for `targetHost`.
+/// Revocation is not checked; `X509Chain` says why.
 ///
 /// @param chain       the peer's certificates, DER, leaf first
-/// @param targetHost  the name the certificate must be valid for
+/// @param targetHost  the name the certificate must be valid for, or empty
+///                    when a server is judging a client
 public TlsError ValidateTlsCertificateChainByDefault(List<byte[]> chain, String targetHost)
 {
-    // X.509: build an X509Chain from `chain`, validate it against the system
-    // store and `targetHost`, and map its status to TlsError here.
-    return TlsError.UnknownCertificateAuthority;
+    if (chain.Count == 0u)
+        return TlsError.CertificateRequired;
+
+    var leaf = X509Certificate2.FromDer(chain[0u]);
+    if (!leaf.Ok)
+        return TlsError.UnsupportedCertificate;
+
+    var path = new X509Chain();
+    for (nuint i = 1u; i < chain.Count; i++)
+    {
+        // A certificate that does not parse cannot be on any path, and the
+        // leaf is judged by the path that is found without it.
+        var issuer = X509Certificate2.FromDer(chain[i]);
+        if (issuer.Ok)
+            path.ChainPolicy.ExtraStore.Add(issuer.Value);
+    }
+
+    path.ChainPolicy.ApplicationPolicy.Add(targetHost.IsEmpty
+        ? X509EnhancedKeyUsageExtension.ClientAuthenticationOid
+        : X509EnhancedKeyUsageExtension.ServerAuthenticationOid);
+
+    if (!path.Build(leaf.Value))
+        return TlsErrorForChainStatus(path.StatusFlags);
+
+    if (!targetHost.IsEmpty && !leaf.Value.MatchesHostname(targetHost))
+        return TlsError.CertificateRefused;
+
+    return TlsError.None;
+}
+
+/// The refusal a failed chain is sent as: the precise alert where there is
+/// one, and `bad_certificate` for the rest.
+TlsError TlsErrorForChainStatus(X509ChainStatusFlags status)
+{
+    if ((status & X509ChainStatusFlags.NotTimeValid) != X509ChainStatusFlags.NoError)
+        return TlsError.CertificateExpired;
+
+    X509ChainStatusFlags unanchored = X509ChainStatusFlags.UntrustedRoot | X509ChainStatusFlags.PartialChain;
+    if ((status & unanchored) != X509ChainStatusFlags.NoError)
+        return TlsError.UnknownCertificateAuthority;
+
+    return TlsError.CertificateRefused;
 }

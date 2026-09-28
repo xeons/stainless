@@ -54,11 +54,12 @@
 /// and 0-RTT data, which is never coming, since it is replayable by design.
 ///
 /// **Certificates are judged by a `TlsCertificateValidator`**, a closure the
-/// options carry. The default refuses every chain, because X.509 path
-/// validation is not in the library yet and a default that trusted anything
-/// would be worse than none; a program pins the certificate it expects, or
-/// supplies its own policy. The validator decides whom to trust; the
-/// CertificateVerify signature against the leaf's key is always checked here.
+/// options carry. The default is the platform's trust: an `X509Chain` from
+/// the peer's certificates to a root in the system store, the
+/// server-authentication usage, and the host name the client asked for. A
+/// program that pins a certificate, or trusts a private CA, supplies its own.
+/// The validator decides whom to trust; the CertificateVerify signature
+/// against the leaf's key is always checked here.
 ///
 /// **The record layer is constant time where a secret is involved.** The
 /// AEADs check their tags in constant time, and the padding of a TLS 1.3

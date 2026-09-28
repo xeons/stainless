@@ -59,8 +59,8 @@ public sealed class TlsClientOptions
     /// with a HelloRetryRequest, which costs a round trip.
     public List<TlsNamedGroup> KeyShareGroups { get; set; } = CreateDefaultTlsKeyShareGroups();
 
-    /// Decides whether to trust the server's chain. The default refuses every
-    /// chain until X.509 validation is in this library.
+    /// Decides whether to trust the server's chain. The default trusts what
+    /// the platform's root store does, for `TargetHost`.
     ///
     /// @see ValidateTlsCertificateChainByDefault
     public TlsCertificateValidator CertificateValidator { get; set; } =

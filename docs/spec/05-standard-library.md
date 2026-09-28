@@ -1165,10 +1165,11 @@ names so that options can ask for it already, and **never 0-RTT**.
 
 **Trust is the program's.** A `TlsCertificateValidator` is given the peer's
 chain and the name asked for, and answers `TlsError.None` or the refusal to
-send. There is no X.509 path validation yet, so the default validator refuses
-everything rather than trusting anything; a program pins the certificate it
-expects. The CertificateVerify signature against the leaf is checked here
-whatever the validator says.
+send. The default is the platform's: an `X509Chain` to a root in the system
+store ([§5.16](#516-standardsecuritycryptographyx509certificates)), the
+server-authentication usage, and the host name asked for. A program that pins
+a certificate or trusts a private CA supplies its own. The CertificateVerify
+signature against the leaf is checked here whatever the validator says.
 
 `tests/cases/tls13-rfc8448` replays RFC 8448's 1-RTT trace against both
 halves: the client writes the trace's records byte for byte and verifies its
