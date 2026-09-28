@@ -70,8 +70,12 @@ public class HttpRequestMessage
     /// The body, or null for none.
     public HttpContent? Content { get; set; }
 
-    /// The version asked for. Every request is sent as HTTP/1.1 for now.
+    /// The version asked for, HTTP/1.1 unless set, as .NET's is.
+    /// `VersionPolicy` says how strictly it is kept to.
     public Version Version { get; set; } = HttpVersion.Version11;
+
+    /// Whether a lower or a higher version than `Version` may be used.
+    public HttpVersionPolicy VersionPolicy { get; set; } = HttpVersionPolicy.RequestVersionOrLower;
 
     /// Disposes the content.
     public void Dispose()

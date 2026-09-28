@@ -80,4 +80,13 @@ public enum HttpError
 
     /// The client or its handler has been disposed.
     Disposed,
+
+    /// The HTTP/2 server broke the protocol, ending the connection, or reset
+    /// the stream; `HttpFailure.ProtocolErrorCode` says with which code.
+    ProtocolError,
+
+    /// The request's `VersionPolicy` ruled out every version the server or
+    /// the route would speak: HTTP/2 required and refused in ALPN, or asked
+    /// of a plain proxy.
+    VersionNegotiationFailure,
 }

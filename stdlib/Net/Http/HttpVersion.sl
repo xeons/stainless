@@ -27,10 +27,14 @@ public static class HttpVersion
     /// HTTP/1.0, which a server may still answer in.
     public static readonly Version Version10 = new Version(1, 0);
 
-    /// HTTP/1.1, which every request here is sent in.
+    /// HTTP/1.1, which a request asks for unless it says otherwise.
     public static readonly Version Version11 = new Version(1, 1);
 
-    /// HTTP/2, which is not spoken yet: a request asking for it is sent as
-    /// HTTP/1.1.
+    /// HTTP/2, which a request is sent in when its `VersionPolicy` allows it
+    /// and the server agrees.
     public static readonly Version Version20 = new Version(2, 0);
+
+    /// HTTP/3, which is not spoken: a request asking for it is sent in HTTP/2
+    /// or lower when its policy allows, and refused when it does not.
+    public static readonly Version Version30 = new Version(3, 0);
 }

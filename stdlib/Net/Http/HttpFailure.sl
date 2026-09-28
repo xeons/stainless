@@ -61,6 +61,10 @@ public sealed class HttpFailure
     /// The decompressor's error, when `Error` is `DecompressionFailed`.
     public CompressionError CompressionErrorCode { get; set; } = CompressionError.None;
 
+    /// The HTTP/2 error code the stream was reset with, or the connection
+    /// ended with, when `Error` is `ProtocolError`; zero, NO_ERROR, otherwise.
+    public long ProtocolErrorCode { get; set; } = 0;
+
     /// The URI of the request that failed.
     public Uri? RequestUri { get; set; }
 
@@ -81,6 +85,7 @@ public sealed class HttpFailure
         TlsErrorCode = TlsError.None;
         TlsAlert = TlsAlertDescription.CloseNotify;
         CompressionErrorCode = CompressionError.None;
+        ProtocolErrorCode = 0;
     }
 
     /// The failure in words: the message, or the case described when there

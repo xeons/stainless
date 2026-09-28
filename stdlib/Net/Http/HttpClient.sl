@@ -103,6 +103,14 @@ public class HttpClient
     /// The handler requests go through.
     public HttpClientHandler Handler => _handler;
 
+    /// The version the methods that make their own request ask for — `Get`,
+    /// `Post`, `GetString` and the rest. HTTP/1.1 unless set, as .NET's is;
+    /// a request made by the caller keeps its own.
+    public Version DefaultRequestVersion { get; set; } = HttpVersion.Version11;
+
+    /// The policy those requests are made with.
+    public HttpVersionPolicy DefaultVersionPolicy { get; set; } = HttpVersionPolicy.RequestVersionOrLower;
+
     // ------------------------------------------------------------- sending
 
     /// Sends `request` and reads the whole response.
@@ -173,19 +181,19 @@ public class HttpClient
 
     /// `GET` of `requestUri`, with the whole body read.
     public Result<HttpResponseMessage, HttpError> Get(String requestUri) =>
-        Send(new HttpRequestMessage(HttpMethod.Get, requestUri));
+        Send(CreateHttpRequest(HttpMethod.Get, requestUri, null));
 
     /// `GET` of `requestUri`, with the whole body read.
     public Result<HttpResponseMessage, HttpError> Get(Uri requestUri) =>
-        Send(new HttpRequestMessage(HttpMethod.Get, requestUri));
+        Send(CreateHttpRequest(HttpMethod.Get, requestUri, null));
 
     /// `GET` of `requestUri`, returning when `completionOption` says.
     public Result<HttpResponseMessage, HttpError> Get(String requestUri, HttpCompletionOption completionOption) =>
-        Send(new HttpRequestMessage(HttpMethod.Get, requestUri), completionOption);
+        Send(CreateHttpRequest(HttpMethod.Get, requestUri, null), completionOption);
 
     /// `GET` of `requestUri`, returning when `completionOption` says.
     public Result<HttpResponseMessage, HttpError> Get(Uri requestUri, HttpCompletionOption completionOption) =>
-        Send(new HttpRequestMessage(HttpMethod.Get, requestUri), completionOption);
+        Send(CreateHttpRequest(HttpMethod.Get, requestUri, null), completionOption);
 
     /// The body of a `GET` as text.
     ///
@@ -227,35 +235,35 @@ public class HttpClient
 
     /// `POST` of `content` to `requestUri`.
     public Result<HttpResponseMessage, HttpError> Post(String requestUri, HttpContent? content) =>
-        Send(CreateHttpRequestWithContent(HttpMethod.Post, requestUri, content));
+        Send(CreateHttpRequest(HttpMethod.Post, requestUri, content));
 
     /// `POST` of `content` to `requestUri`.
     public Result<HttpResponseMessage, HttpError> Post(Uri requestUri, HttpContent? content) =>
-        Send(CreateHttpRequestWithContent(HttpMethod.Post, requestUri, content));
+        Send(CreateHttpRequest(HttpMethod.Post, requestUri, content));
 
     /// `PUT` of `content` to `requestUri`.
     public Result<HttpResponseMessage, HttpError> Put(String requestUri, HttpContent? content) =>
-        Send(CreateHttpRequestWithContent(HttpMethod.Put, requestUri, content));
+        Send(CreateHttpRequest(HttpMethod.Put, requestUri, content));
 
     /// `PUT` of `content` to `requestUri`.
     public Result<HttpResponseMessage, HttpError> Put(Uri requestUri, HttpContent? content) =>
-        Send(CreateHttpRequestWithContent(HttpMethod.Put, requestUri, content));
+        Send(CreateHttpRequest(HttpMethod.Put, requestUri, content));
 
     /// `PATCH` of `content` to `requestUri`.
     public Result<HttpResponseMessage, HttpError> Patch(String requestUri, HttpContent? content) =>
-        Send(CreateHttpRequestWithContent(HttpMethod.Patch, requestUri, content));
+        Send(CreateHttpRequest(HttpMethod.Patch, requestUri, content));
 
     /// `PATCH` of `content` to `requestUri`.
     public Result<HttpResponseMessage, HttpError> Patch(Uri requestUri, HttpContent? content) =>
-        Send(CreateHttpRequestWithContent(HttpMethod.Patch, requestUri, content));
+        Send(CreateHttpRequest(HttpMethod.Patch, requestUri, content));
 
     /// `DELETE` of `requestUri`.
     public Result<HttpResponseMessage, HttpError> Delete(String requestUri) =>
-        Send(new HttpRequestMessage(HttpMethod.Delete, requestUri));
+        Send(CreateHttpRequest(HttpMethod.Delete, requestUri, null));
 
     /// `DELETE` of `requestUri`.
     public Result<HttpResponseMessage, HttpError> Delete(Uri requestUri) =>
-        Send(new HttpRequestMessage(HttpMethod.Delete, requestUri));
+        Send(CreateHttpRequest(HttpMethod.Delete, requestUri, null));
 
     /// Refuses further requests, and disposes the handler unless it was made
     /// to be shared.
@@ -267,6 +275,26 @@ public class HttpClient
         if (_disposeHandler)
             _handler.Dispose();
     }
+
+    /// A request for one of the methods that make their own, with the
+    /// default version and policy.
+    private HttpRequestMessage CreateHttpRequest(HttpMethod method, String requestUri, HttpContent? content)
+    {
+        var request = new HttpRequestMessage(method, requestUri);
+        request.Content = content;
+        request.Version = DefaultRequestVersion;
+        request.VersionPolicy = DefaultVersionPolicy;
+        return request;
+    }
+
+    private HttpRequestMessage CreateHttpRequest(HttpMethod method, Uri requestUri, HttpContent? content)
+    {
+        var request = new HttpRequestMessage(method, requestUri);
+        request.Content = content;
+        request.Version = DefaultRequestVersion;
+        request.VersionPolicy = DefaultVersionPolicy;
+        return request;
+    }
 }
 
 /// Where `HttpClient.DefaultProxy` keeps its answer once it has one.
@@ -275,22 +303,6 @@ internal sealed class HttpDefaultProxySlot
     internal IWebProxy? Proxy = null;
 
     internal HttpDefaultProxySlot() { }
-}
-
-internal HttpRequestMessage CreateHttpRequestWithContent(HttpMethod method, String requestUri,
-                                                         HttpContent? content)
-{
-    var request = new HttpRequestMessage(method, requestUri);
-    request.Content = content;
-    return request;
-}
-
-internal HttpRequestMessage CreateHttpRequestWithContent(HttpMethod method, Uri requestUri,
-                                                         HttpContent? content)
-{
-    var request = new HttpRequestMessage(method, requestUri);
-    request.Content = content;
-    return request;
 }
 
 internal Result<String, HttpError> ReadHttpSuccessString(Result<HttpResponseMessage, HttpError> sent)

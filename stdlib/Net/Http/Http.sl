@@ -123,6 +123,8 @@ public String DescribeHttpError(HttpError error)
         case HttpError.UnsuccessfulStatusCode: return "the response status was not a success";
         case HttpError.ContentFailure: return "reading or writing the content failed";
         case HttpError.Disposed: return "the client has been disposed";
+        case HttpError.ProtocolError: return "the server broke HTTP/2 or reset the stream";
+        case HttpError.VersionNegotiationFailure: return "no HTTP version the request allows could be used";
     }
     return "an unknown error";
 }
