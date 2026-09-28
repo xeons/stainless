@@ -87,6 +87,7 @@ FRect  CreateRectangleFromEdges(int left, int top, int right, int bottom)
 
 extern "C"
 {
+    [DoesNotReturn]
     void sl_fail(byte* message);
 
     /// `SetWindowLongPtrW` in the shape subclassing needs it: taking and

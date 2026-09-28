@@ -30,6 +30,7 @@ import Standard.Collections;
 
 extern "C"
 {
+    [DoesNotReturn]
     void sl_fail(byte* message);
 
     // The arguments stay the runtime's: the entry point hands it argv before

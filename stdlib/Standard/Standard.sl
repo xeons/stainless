@@ -122,6 +122,7 @@ public closure int Comparison<in T>(T left, T right);
 
 /// Aborts with a message. The same call a container makes when it is asked for
 /// something it does not have.
+[DoesNotReturn]
 extern "C" void sl_fail(byte* message);
 
 /// A subscription that does not keep its subscriber alive; see runtime/arc.c.

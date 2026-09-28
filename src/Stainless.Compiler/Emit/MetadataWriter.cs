@@ -498,6 +498,7 @@ public static class MetadataWriter
         IsInit = function.IsInitAccessor,
         IsRequired = function.Accessor?.IsRequired == true,
         SetsRequiredMembers = function.SetsRequiredMembers,
+        DoesNotReturn = function.DoesNotReturn,
         Module = function.ContainingType is null ? function.ModuleName : null,
         Parameters = function.Parameters
             .Where(p => !p.IsThis)

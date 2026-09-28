@@ -413,6 +413,9 @@ public sealed record MetadataFunction
     /// <summary>A constructor marked <c>[SetsRequiredMembers]</c>.</summary>
     public bool SetsRequiredMembers { get; init; }
 
+    /// <summary>A function marked <c>[DoesNotReturn]</c>.</summary>
+    public bool DoesNotReturn { get; init; }
+
     /// <summary>The module a free function belongs to; null for a method.</summary>
     public string? Module { get; init; }
 }

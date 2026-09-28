@@ -44,6 +44,7 @@ extern "C"
     long sl_time_from_parts(long year, long month, long day, long hour,
                             long minute, long second, long nanosecond, bool local);
     long sl_time_zone_offset(long nanoseconds);
+    [DoesNotReturn]
     void sl_fail(byte* message);
 }
 

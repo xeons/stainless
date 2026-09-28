@@ -46,6 +46,10 @@ public sealed partial class Binder
                     CheckWhereClauses(method.Constraints, method.TypeParameters,
                         declaration.TypeParameters, template.Scope, $"'{method.Name}'",
                         method.Modifiers.HasFlag(Modifiers.Override));
+
+                foreach (var member in declaration.Members.OfType<FunctionDeclSyntax>()
+                             .Where(m => m.TypeParameters.Count == 0 && m.Constraints.Count > 0))
+                    CheckMemberWhereClauses(member, declaration, template);
             }
 
             foreach (var template in module.GenericFunctions.Where(f => f.Local is null))
@@ -58,6 +62,97 @@ public sealed partial class Binder
                     CheckWhereClauses(template.Declaration.Constraints, template.Parameters, [],
                         template.Scope, $"'{template.Name}'",
                         template.Declaration.Modifiers.HasFlag(Modifiers.Override));
+        }
+    }
+
+    /// <summary>
+    /// A <c>where</c> on a member that is not generic itself, which
+    /// constrains its type's parameters. Such a member is left out of an
+    /// instantiation whose arguments fail it, so it MUST be one nothing else
+    /// needs: not virtual, not an override, and not a contract's.
+    /// </summary>
+    private void CheckMemberWhereClauses(
+        FunctionDeclSyntax member, TypeDeclSyntax declaration, GenericTypeTemplate template)
+    {
+        bool dispatched = declaration.Kind == TypeDeclKind.Interface ||
+            member.Modifiers.HasFlag(Modifiers.Virtual) ||
+            member.Modifiers.HasFlag(Modifiers.Abstract) ||
+            member.Modifiers.HasFlag(Modifiers.Override) ||
+            member.ExplicitInterface is not null;
+
+        if (dispatched)
+        {
+            diagnostics.Error("SL0331", member.Constraints[0].Span,
+                $"'{member.Name}' is dispatched, so every '{template.Name}' has it whatever its " +
+                "arguments; only a member an instantiation can leave out may have a 'where' of " +
+                "its own");
+            return;
+        }
+
+        CheckWhereClauses(member.Constraints, [], declaration.TypeParameters, template.Scope,
+            $"'{member.Name}'", isOverride: false);
+    }
+
+    /// <summary>Members of instantiations whose own <c>where</c> their arguments meet.</summary>
+    private readonly HashSet<FunctionSymbol> _availableMembers = [];
+
+    /// <summary>
+    /// Why a member of an instantiation does not exist for its type's
+    /// arguments, or null when it does. Worked out once and kept.
+    /// </summary>
+    private string? MemberUnavailability(FunctionSymbol member)
+    {
+        if (member.MemberConstraints.Count == 0) return null;
+        if (member.Unavailable is not null || _availableMembers.Contains(member))
+            return member.Unavailable;
+        if (member.ContainingType is not { Template: { } template } type) return null;
+
+        var substitution = new Dictionary<string, TypeSymbol>(StringComparer.Ordinal);
+        for (int i = 0; i < template.Parameters.Count && i < type.TypeArguments.Count; i++)
+            substitution[template.Parameters[i]] = type.TypeArguments[i];
+
+        using (Enter(_context with { Substitution = substitution, File = template.Scope }))
+            member.Unavailable = UnmetMemberConstraint(member, substitution, template.Scope);
+
+        if (member.Unavailable is null) _availableMembers.Add(member);
+        return member.Unavailable;
+    }
+
+    /// <summary>A call to a member its type's arguments leave out, reported where it is written.</summary>
+    private void ReportUnavailableMembers(BoundStatement body)
+    {
+        var finder = new ConstrainedMemberFinder();
+        finder.Visit(body);
+
+        foreach (var (member, span) in finder.Found)
+        {
+            if (MemberUnavailability(member) is not { } why) continue;
+
+            diagnostics.Error("SL0816", span,
+                $"'{member.ContainingType!.Name}' has no '{member.Name}': {why}",
+                member.ContainingType);
+        }
+    }
+
+    /// <summary>Every call and method reference to a member with a <c>where</c> of its own.</summary>
+    private sealed class ConstrainedMemberFinder : BoundTreeWalker
+    {
+        public List<(FunctionSymbol Member, SourceSpan Span)> Found { get; } = [];
+
+        public override void Visit(BoundExpression? expression)
+        {
+            var member = expression switch
+            {
+                BoundCall call => call.Function,
+                BoundFunctionReference reference => reference.Function,
+                BoundClosureCreate made => made.Function,
+                _ => null,
+            };
+
+            if (member is { MemberConstraints.Count: > 0 })
+                Found.Add((member, expression!.Span));
+
+            base.Visit(expression);
         }
     }
 
@@ -119,6 +214,13 @@ public sealed partial class Binder
         var written = new List<string>();
         ConstraintSyntax? baseClass = null;
         var kind = clause.Constraints.FirstOrDefault(c => IsKindConstraint(c.Kind));
+
+        // A reference of any kind is never null, so it has no zero to give.
+        if (kind is { Kind: ConstraintKind.Class } &&
+            clause.Constraints.FirstOrDefault(c => c.Kind == ConstraintKind.Zeroable) is { } zeroable)
+            diagnostics.Error("SL0581", zeroable.Span,
+                "'class' and 'zeroable' contradict each other: a class, interface or array " +
+                "reference is never null, so it has no zero value");
 
         foreach (var constraint in clause.Constraints)
         {
@@ -291,6 +393,7 @@ public sealed partial class Binder
         ConstraintKind.NotNull => "notnull",
         ConstraintKind.Default => "default",
         ConstraintKind.New => "new()",
+        ConstraintKind.Zeroable => "zeroable",
         _ => "threadsafe",
     };
 }

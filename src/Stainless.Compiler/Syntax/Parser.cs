@@ -256,6 +256,13 @@ public sealed class Parser
     /// </summary>
     private readonly List<SourceSpan> _sliceSpellings = [];
 
+    /// <summary>
+    /// Whether each type being parsed, innermost last, has type parameters: a
+    /// member of a generic type may constrain them with a <c>where</c> of its
+    /// own.
+    /// </summary>
+    private readonly Stack<bool> _typeIsGeneric = new();
+
     /// <summary>Drops the spellings met since the count was taken, whose tokens are to be read again.</summary>
     private void ForgetSliceSpellings(int count) =>
         _sliceSpellings.RemoveRange(count, _sliceSpellings.Count - count);
@@ -454,9 +461,14 @@ public sealed class Parser
 
         if (At(TokenKind.ExternKeyword) || At(TokenKind.ExportKeyword))
         {
-            RejectAttributes(attributes, "an 'extern' or 'export' declaration, whose shape " +
-                                         "belongs to the other language");
-            return ParseLinkageDeclaration(start, modifiers);
+            // `[DoesNotReturn] extern "C" void abort();` says something the C
+            // declaration cannot, and is read here rather than kept.
+            bool doesNotReturn = At(TokenKind.ExternKeyword) && attributes.Any(IsDoesNotReturn);
+            RejectAttributes(attributes.Where(a => !(doesNotReturn && IsDoesNotReturn(a))).ToList(),
+                "an 'extern' or 'export' declaration, whose shape belongs to the other language");
+
+            var declared = ParseLinkageDeclaration(start, modifiers);
+            return doesNotReturn ? declared.Select(MarkDoesNotReturn).ToList() : declared;
         }
 
         if (AtRecord())
@@ -590,6 +602,22 @@ public sealed class Parser
             RejectAttributes(attributes, "a function");
 
         return [member];
+    }
+
+    /// <summary><c>[DoesNotReturn]</c>, which takes nothing.</summary>
+    private static bool IsDoesNotReturn(AttributeSyntax attribute) =>
+        attribute.Name.Last == "DoesNotReturn" && attribute.Arguments.Count == 0;
+
+    /// <summary>Puts <c>[DoesNotReturn]</c> on the function it was written above.</summary>
+    private Declaration MarkDoesNotReturn(Declaration declaration)
+    {
+        if (declaration is FunctionDeclSyntax function)
+            return function with { DoesNotReturn = true };
+
+        _diagnostics.Error("SL0728", declaration.Span,
+            "'[DoesNotReturn]' says a call never comes back, so it can only be written on an " +
+            "'extern' function; this declares a value");
+        return declaration;
     }
 
     /// <summary><c>[SetsRequiredMembers]</c>, which takes nothing.</summary>
@@ -899,13 +927,21 @@ public sealed class Parser
             {
                 int before = _pos;
                 int memberStart = _pos;
+                var memberAttributes = ParseAttributeLists();
+                bool doesNotReturn = isExtern && memberAttributes.Any(IsDoesNotReturn);
+                RejectAttributes(
+                    memberAttributes.Where(a => !(doesNotReturn && IsDoesNotReturn(a))).ToList(),
+                    "an 'extern' or 'export' declaration, whose shape belongs to the other " +
+                    "language");
+
                 var memberModifiers = InsideBlock(modifiers, ParseModifiers());
                 var memberConvention = ParseCallingConvention();
                 if (memberConvention == CallingConvention.Default)
                     memberConvention = blockConvention;
 
-                members.Add(WithConvention(
-                    ParseFunctionOrField(memberStart, memberModifiers, linkage), memberConvention));
+                var member = WithConvention(
+                    ParseFunctionOrField(memberStart, memberModifiers, linkage), memberConvention);
+                members.Add(doesNotReturn ? MarkDoesNotReturn(member) : member);
                 if (_pos == before) Advance();
             }
             Expect(TokenKind.CloseBrace);
@@ -1199,7 +1235,11 @@ public sealed class Parser
                 continue;
             }
 
-            foreach (var member in ParseDeclaration(enclosingType: name))
+            _typeIsGeneric.Push(typeParameters.Count > 0);
+            var parsed = ParseDeclaration(enclosingType: name);
+            _typeIsGeneric.Pop();
+
+            foreach (var member in parsed)
             {
                 // A type declared inside another is lifted out beside it and
                 // named for where it was written, so `Outer.Inner` is its name
@@ -1918,7 +1958,10 @@ public sealed class Parser
                 Expect(TokenKind.Semicolon);
             }
 
-            if (constraints.Count > 0 && typeParameters.Count == 0)
+            // A member of a generic type may constrain the type's parameters:
+            // it exists only for the arguments that meet them.
+            if (constraints.Count > 0 && typeParameters.Count == 0 &&
+                !(_typeIsGeneric.TryPeek(out bool inGeneric) && inGeneric))
                 _diagnostics.Error("SL0331", SpanFrom(start),
                     $"'{name}' is not generic, so it cannot have a 'where' clause");
 
@@ -2542,10 +2585,15 @@ public sealed class Parser
 
         // Contextual, as in C#: a type of that name is still a type when it
         // is qualified or given arguments.
-        if (AtWord && Current.Text is "unmanaged" or "notnull" &&
+        if (AtWord && Current.Text is "unmanaged" or "notnull" or "zeroable" &&
             Peek(1).Kind is not (TokenKind.Less or TokenKind.Dot))
         {
-            var kind = Advance().Text == "unmanaged" ? ConstraintKind.Unmanaged : ConstraintKind.NotNull;
+            var kind = Advance().Text switch
+            {
+                "unmanaged" => ConstraintKind.Unmanaged,
+                "notnull" => ConstraintKind.NotNull,
+                _ => ConstraintKind.Zeroable,
+            };
             return new ConstraintSyntax(SpanFrom(start), kind, null);
         }
 
@@ -2627,6 +2675,7 @@ public sealed class Parser
         ConstraintKind.NotNull => "notnull",
         ConstraintKind.Default => "default",
         ConstraintKind.New => "new()",
+        ConstraintKind.Zeroable => "zeroable",
         _ => "threadsafe",
     };
 

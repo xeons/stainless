@@ -128,6 +128,7 @@ import Standard.Bits;
 
 extern "C"
 {
+    [DoesNotReturn]
     void sl_fail(byte* message);
     bool sl_random_bytes(byte* buffer, nuint length);
     void sl_zero_memory(byte* buffer, nuint length);

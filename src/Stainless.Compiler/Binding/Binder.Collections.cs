@@ -139,6 +139,8 @@ public sealed partial class Binder
         FixedArrayTypeSymbol inline => inline.Element,
         ClassTypeSymbol collection => CollectionShapeOf(collection)?.Add.Parameters.First(p => !p.IsThis).Type,
         InterfaceTypeSymbol wanted when IsListInterface(wanted) => wanted.TypeArguments[0],
+        OptionalTypeSymbol { Element: ArrayTypeSymbol or ClassTypeSymbol } optional =>
+            CollectionElementOf(optional.Element),
         _ => null,
     };
 
@@ -198,6 +200,10 @@ public sealed partial class Binder
 
             case ArrayTypeSymbol or FixedArrayTypeSymbol:
                 return SettleArray(draft, target, span);
+
+            // What an optional may hold, made and then held.
+            case OptionalTypeSymbol { Element: ArrayTypeSymbol or ClassTypeSymbol } optional:
+                return BindConversion(BindArraySettle(draft, optional.Element, span), target, span);
 
             case ClassTypeSymbol collection:
                 return SettleCollection(draft, collection, span);

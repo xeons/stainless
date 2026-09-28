@@ -111,6 +111,7 @@ public sealed partial class Binder
         var body = BindBlock(function.Body);
         PopScope();
         SettleUnsetLocals(body);
+        ReportUnavailableMembers(body);
 
         // What a getter reads, so that capturing the property can be tested
         // against what is written the way capturing a field already is.
@@ -1033,7 +1034,8 @@ public sealed partial class Binder
 
                 Dictionary<object, Fact> Proved(VariantCaseSymbol? held, bool present) =>
                     held is not null ? new() { [tested] = Fact.Holding(held) }
-                    : present && test.Subject.Type is OptionalTypeSymbol ? new() { [tested] = Fact.NotNull }
+                    : present && test.Subject.Type.NonNullForm() is not null
+                        ? new() { [tested] = Fact.NotNull }
                     : [];
             }
 
@@ -1049,6 +1051,17 @@ public sealed partial class Binder
                 return test.Operator == BoundBinaryOp.NotEqual
                     ? (proved, [])
                     : ([], proved);
+            }
+
+            // The same of a nullable closure, whose null is compared as both
+            // words.
+            case BoundClosureEqual { ClosureType.IsNullable: true } test
+                when (test.Right is BoundDefault ? test.Left : test.Left is BoundDefault ? test.Right
+                         : null) is { } other &&
+                     NarrowableSubject(other) is { } checkedClosure:
+            {
+                var proved = new Dictionary<object, Fact> { [checkedClosure] = Fact.NotNull };
+                return test.Negated ? (proved, []) : ([], proved);
             }
 
             case BoundUnary { Operator: BoundUnaryOp.LogicalNot } negation:
@@ -1291,6 +1304,12 @@ public sealed partial class Binder
                 foreach (var inner in block.Statements)
                     assigned = Assigns(inner, target, assigned);
                 return assigned;
+
+            // Nothing follows a call that never returns, so nothing after it
+            // can read what it left.
+            case BoundExpressionStatement { Expression: BoundCall { Function.DoesNotReturn: true } } ended:
+                Evaluates(ended.Expression, target, assigned);
+                return true;
 
             case BoundExpressionStatement expression:
                 return Evaluates(expression.Expression, target, assigned);

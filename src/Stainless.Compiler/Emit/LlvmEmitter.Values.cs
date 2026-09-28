@@ -84,9 +84,15 @@ public sealed partial class LlvmEmitter
         _ => "ptr",     // pointers, class references, optionals and weak references
     };
 
+    /// <summary>
+    /// A nullable closure is spelled as the closure it may hold: the two are
+    /// one layout, and one name keeps a conversion between them free.
+    /// </summary>
     private static string StructName(StructTypeSymbol type) =>
-        (type is UnionTypeSymbol ? "%union." : "%struct.") +
-        Mangler.SymbolSafe(type.QualifiedName);
+        type is ClosureTypeSymbol { NonNullable: { } held }
+            ? StructName(held)
+            : (type is UnionTypeSymbol ? "%union." : "%struct.") +
+              Mangler.SymbolSafe(type.QualifiedName);
 
     private static string DestroyName(ClassTypeSymbol type) => Mangler.DestroySymbol(type);
 

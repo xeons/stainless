@@ -831,12 +831,11 @@ public sealed partial class Binder
     /// </summary>
     private BoundExpression Narrowed(BoundExpression access, object subject)
     {
-        if (access.Type is not OptionalTypeSymbol optional) return access;
+        if (access.Type.NonNullForm() is not { } held) return access;
         if (!_context.VariantFacts.TryGetValue(subject, out var fact)) return access;
         if (!fact.ProvesNotNull) return access;
 
-        return new BoundConversion(
-            access.Span, optional.Element, access, ConversionKind.NarrowOptional);
+        return new BoundConversion(access.Span, held, access, ConversionKind.NarrowOptional);
     }
 
     /// <summary>

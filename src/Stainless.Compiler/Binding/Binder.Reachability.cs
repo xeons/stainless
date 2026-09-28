@@ -83,6 +83,9 @@ public sealed partial class Binder
                 case BoundReturn:
                     return false;
 
+                case BoundExpressionStatement { Expression: BoundCall { Function.DoesNotReturn: true } }:
+                    return false;
+
                 case BoundBreak:
                     if (reachable && _targets.Count > 0)
                         _targets[^1].Broken = true;

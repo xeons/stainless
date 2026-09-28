@@ -934,7 +934,13 @@ public sealed class ClosureTypeSymbol : StructTypeSymbol
     public const string FunctionFieldName = "$function";
     public const string ReceiverFieldName = "$receiver";
 
-    public TypeSymbol ReturnType { get; set; } = PrimitiveTypeSymbol.Void;
+    public TypeSymbol ReturnType
+    {
+        get => NonNullable?.ReturnType ?? _returnType;
+        set => _returnType = value;
+    }
+
+    private TypeSymbol _returnType = PrimitiveTypeSymbol.Void;
 
     /// <summary>
     /// The signature as written, which never includes the receiver.
@@ -944,7 +950,46 @@ public sealed class ClosureTypeSymbol : StructTypeSymbol
     /// objects behind them are. It is part of the *call*, where it goes in
     /// first, because that is where a Stainless method already expects it.
     /// </summary>
-    public List<ParameterSymbol> Signature { get; } = [];
+    public List<ParameterSymbol> Signature => NonNullable?.Signature ?? _signature;
+
+    private readonly List<ParameterSymbol> _signature = [];
+
+    /// <summary>
+    /// For <c>Notify?</c>, the <c>Notify</c> it may hold; null for a closure
+    /// that is never null.
+    ///
+    /// **The same two words**, so it is a closure type of its own rather than
+    /// an <see cref="OptionalTypeSymbol"/>, whose value is one pointer. Its
+    /// null is a null function word, and nothing may call it until a check
+    /// has said there is one. Made only by <see cref="MakeNullable"/>.
+    /// </summary>
+    public ClosureTypeSymbol? NonNullable { get; private init; }
+
+    /// <summary>True for <c>Notify?</c>.</summary>
+    public bool IsNullable => NonNullable is not null;
+
+    private ClosureTypeSymbol? _nullable;
+
+    /// <summary><c>Notify?</c>: the one nullable form of this closure.</summary>
+    public ClosureTypeSymbol MakeNullable()
+    {
+        if (NonNullable is not null) return this;
+
+        return Intern(ref _nullable, () =>
+        {
+            var nullable = new ClosureTypeSymbol
+            {
+                SimpleName = SimpleName + "?",
+                ModuleName = ModuleName,
+                IsPublic = IsPublic,
+                TypeArguments = TypeArguments,
+                Span = Span,
+                NonNullable = this,
+            };
+            nullable.AddFields((ClassTypeSymbol)Receiver!.Type);
+            return nullable;
+        });
+    }
 
     public FieldSymbol? Function { get; set; }
     public FieldSymbol? Receiver { get; set; }
@@ -1733,6 +1778,18 @@ public static class TypeExtensions
     /// </summary>
     public static bool IsReferenceOrContainsReferences(this TypeSymbol type) =>
         type.IsReferenceType || type.CarriesReferences();
+
+    /// <summary>
+    /// What a check against null proves a nullable value holds: <c>C</c> for
+    /// <c>C?</c> and <c>T[]?</c>'s <c>T[]</c>, <c>Notify</c> for
+    /// <c>Notify?</c>. Null for a type no check narrows.
+    /// </summary>
+    public static TypeSymbol? NonNullForm(this TypeSymbol type) => type switch
+    {
+        OptionalTypeSymbol optional => optional.Element,
+        ClosureTypeSymbol { NonNullable: { } held } => held,
+        _ => null,
+    };
 
     /// <summary>The type a reference points at, or null.</summary>
     public static TypeSymbol? AsReference(this TypeSymbol type) => type switch

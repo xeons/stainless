@@ -67,6 +67,8 @@ public sealed partial class Binder
             Body = declaration.Body,
             Span = declaration.Span,
             Scope = scope,
+            MemberConstraints = declaration.TypeParameters.Count == 0 ? declaration.Constraints : [],
+            DoesNotReturn = declaration.DoesNotReturn,
         };
 
         // An operator has no receiver: it is static, and every operand is

@@ -61,6 +61,7 @@ import Forms.Drawing;
 
 /// Aborts with a message, for a mistake in the calling program rather than a
 /// value to hand back. The same one `Standard.Collections` uses.
+[DoesNotReturn]
 extern "C" void sl_fail(byte* message);
 
 // ============================================================ system colours

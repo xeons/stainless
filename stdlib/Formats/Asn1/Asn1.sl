@@ -59,6 +59,7 @@ module Standard.Formats.Asn1;
 
 import Standard.Time;
 
+[DoesNotReturn]
 extern "C" void sl_fail(byte* message);
 
 /// A sentence describing an error, for a message a person will read.

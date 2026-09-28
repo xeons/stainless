@@ -35,6 +35,7 @@ module Standard.Random;
 
 extern "C"
 {
+    [DoesNotReturn]
     void sl_fail(byte* message);
 
     long sl_random_seed();

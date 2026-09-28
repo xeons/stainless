@@ -197,6 +197,9 @@ public sealed partial class LlvmEmitter
     {
         EmitDiscarded(statement.Expression);
         FlushTemporaries();
+
+        if (statement.Expression is BoundCall { Function.DoesNotReturn: true })
+            Terminator("unreachable");
     }
 
     private void EmitIf(BoundIf statement)

@@ -1,0 +1,3 @@
+# Box<String> has no Reset; a virtual member may not have a where of its own.
+SL0816
+SL0331

@@ -91,10 +91,6 @@ public variant Optional<T>
             return held.Value;
 
         sl_fail("Optional.GetValue: there is no value");
-
-        // Unreachable: `sl_fail` ends the program, and an `extern` has no way
-        // to say so. The tail has to be some expression of type T.
-        return default(T);
     }
 
     /// The value if there is one, and `fallback` if there is not.

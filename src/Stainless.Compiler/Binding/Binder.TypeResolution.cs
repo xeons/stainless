@@ -269,15 +269,22 @@ public sealed partial class Binder
             {
                 var element = ResolveType(nullable.Element, scope);
                 if (element.IsError()) return element;
-                if (element is not NamedTypeSymbol { IsReferenceType: true } referenceType)
+
+                // A closure's null is its function word, so `Notify?` is the
+                // closure's own two words with a zero allowed in them.
+                if (element is ClosureTypeSymbol closure)
+                    return closure.MakeNullable();
+
+                if (element is not (NamedTypeSymbol { IsReferenceType: true } or ArrayTypeSymbol))
                 {
                     diagnostics.Error("SL0271", syntax.Span,
-                        $"'{element.Name}?' is not valid; only class and interface references can " +
-                        $"be optional (a '{element.Name}' is a value and is never null)",
+                        $"'{element.Name}?' is not valid; only class, interface and array " +
+                        $"references can be optional (a '{element.Name}' is a value and is never " +
+                        "null)",
                         element);
                     return ErrorTypeSymbol.Instance;
                 }
-                return referenceType.MakeOptionalType();
+                return element.MakeOptionalType();
             }
 
             case WeakTypeSyntax weak:

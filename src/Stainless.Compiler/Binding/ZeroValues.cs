@@ -58,7 +58,11 @@ internal static class ZeroValues
             case UnionTypeSymbol:
                 return null;
 
-            // Its function word is null, and nothing asks before calling it.
+            // Its function word is null, and nothing asks before calling it,
+            // unless it is `Notify?`, whose null is asked about.
+            case ClosureTypeSymbol { IsNullable: true }:
+                return null;
+
             case ClosureTypeSymbol:
                 return (path, type);
 

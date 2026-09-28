@@ -59,6 +59,17 @@ public sealed partial class Binder
         if (expression is BoundStringLiteral literal && IsBytePointer(target))
             return new BoundConversion(span, target, literal, ConversionKind.StringLiteralToPointer);
 
+        // A method or a lambda becomes the closure a `Notify?` may hold, and
+        // that closure becomes the nullable one for nothing.
+        if (target is ClosureTypeSymbol { NonNullable: { } held } &&
+            expression is BoundFunctionGroup or BoundLambda)
+        {
+            var made = BindConversion(expression, held, span);
+            return made.Type.IsError()
+                ? made
+                : new BoundConversion(span, target, made, ConversionKind.Identity);
+        }
+
         // A function name becomes a delegate by naming the overload that matches.
         if (expression is BoundFunctionGroup group)
             return BindFunctionReference(group, target, span);
@@ -212,7 +223,11 @@ public sealed partial class Binder
         if (kind == ConversionKind.Identity && expression.Type.Equals(target)) return expression;
 
         // Null adopts the target type rather than being converted at runtime.
-        if (expression is BoundNullLiteral) return new BoundNullLiteral(span, target);
+        // A closure's null is two zero words, which is its zero value.
+        if (expression is BoundNullLiteral)
+            return target is ClosureTypeSymbol
+                ? new BoundDefault(span, target)
+                : new BoundNullLiteral(span, target);
 
         return new BoundConversion(span, target, expression, kind.Value);
     }
@@ -768,7 +783,15 @@ public sealed partial class Binder
         // function pointer, so a null one is exactly C's null callback.
         if (from is NullType)
             return to is PointerTypeSymbol or OptionalTypeSymbol or WeakTypeSymbol or DelegateTypeSymbol
+                or ClosureTypeSymbol { IsNullable: true }
                 ? ConversionKind.NullToReference
+                : null;
+
+        // `Notify?` to `Notify` discards the check, as `C?` to `C` does.
+        if (from is ClosureTypeSymbol { IsNullable: true } &&
+            to is ClosureTypeSymbol { IsNullable: false } held)
+            return explicitCast && ClassifyConversion(from, held.MakeNullable(), false) is not null
+                ? ConversionKind.Identity
                 : null;
 
         // Two closure types of the same signature are the same two words, and
@@ -912,6 +935,13 @@ public sealed partial class Binder
             (presentingOptional.ComInterfaces.Contains(optionalPresented) ||
              optionalPresented == _builtins.Unknown))
             return ConversionKind.ComTearOff;
+
+        // T[] -> T[]?, and back only by a cast, as a class reference is.
+        if (from is ArrayTypeSymbol && to is OptionalTypeSymbol { Element: ArrayTypeSymbol } toArray)
+            return from.Equals(toArray.Element) ? ConversionKind.ReferenceToOptional : null;
+
+        if (from is OptionalTypeSymbol { Element: ArrayTypeSymbol } fromArray && to is ArrayTypeSymbol)
+            return explicitCast && fromArray.Element.Equals(to) ? ConversionKind.PointerCast : null;
 
         if (from is WeakTypeSymbol fromWeak && to is OptionalTypeSymbol weakTarget)
             return fromWeak.Element.Equals(weakTarget.Element) ? ConversionKind.ReferenceToOptional : null;

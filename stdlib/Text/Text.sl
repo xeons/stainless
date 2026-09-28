@@ -82,7 +82,9 @@ extern "C"
     byte* memcpy(byte* to, byte* from, nuint count);
     byte* memmove(byte* to, byte* from, nuint count);
 
+    [DoesNotReturn]
     void sl_fail(byte* message);
+    [DoesNotReturn]
     void sl_array_bounds_fail(nuint index, nuint length);
 }
 

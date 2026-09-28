@@ -52,6 +52,11 @@ public sealed partial class Binder
                 while (PendingCount > 0)
                 {
                     var (function, substitution) = _pending[_pendingBound++];
+
+                    // A member whose own `where` these arguments fail is not
+                    // part of this instantiation, so its body is not either.
+                    if (MemberUnavailability(function) is not null) continue;
+
                     using (Enter(_context with { Substitution = substitution }))
                         BindFunctionBody(function);
                 }
@@ -642,7 +647,7 @@ public sealed partial class Binder
             case ConstraintKind.Unmanaged:
                 if (IsUnmanaged(argument)) return;
 
-                diagnostics.Error("SL0328", span,
+                ReportUnmetConstraint("SL0328", span,
                     $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
                     $"'{parameter}' is constrained to 'unmanaged', and " +
                     (IsValueType(argument)
@@ -652,10 +657,20 @@ public sealed partial class Binder
                     argument);
                 return;
 
+            case ConstraintKind.Zeroable:
+                if (ZeroValues.FindNullInZero(argument) is not { } found) return;
+
+                ReportUnmetConstraint("SL0815", span,
+                    $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
+                    $"'{parameter}' is constrained to 'zeroable', and '{argument.Name}' has no " +
+                    $"zero value: {ExplainNullInZero(found)}",
+                    argument);
+                return;
+
             case ConstraintKind.NotNull:
                 if (!IsNullable(argument)) return;
 
-                diagnostics.Error("SL0328", span,
+                ReportUnmetConstraint("SL0328", span,
                     $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
                     $"'{parameter}' is constrained to 'notnull', and a '{argument.Name}' may be " +
                     "null",
@@ -665,7 +680,7 @@ public sealed partial class Binder
             case ConstraintKind.Class:
                 if (IsReferenceType(argument)) return;
 
-                diagnostics.Error("SL0328", span,
+                ReportUnmetConstraint("SL0328", span,
                     $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
                     $"'{parameter}' is constrained to 'class', and '{argument.Name}' is a " +
                     $"{KindOf(argument)}: it is copied rather than referenced, and is never null",
@@ -675,7 +690,7 @@ public sealed partial class Binder
             case ConstraintKind.Struct:
                 if (IsValueType(argument)) return;
 
-                diagnostics.Error("SL0328", span,
+                ReportUnmetConstraint("SL0328", span,
                     $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
                     $"'{parameter}' is constrained to 'struct', and '{argument.Name}' is a " +
                     $"{KindOf(argument)}: it is a counted reference and may be null",
@@ -685,7 +700,7 @@ public sealed partial class Binder
             case ConstraintKind.Threadsafe:
                 if (IsSendable(argument)) return;
 
-                diagnostics.Error("SL0328", span,
+                ReportUnmetConstraint("SL0328", span,
                     $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
                     $"'{parameter}' is constrained to 'threadsafe', and nothing about " +
                     $"'{argument.Name}' says how two threads may hold it. Declare it " +
@@ -700,7 +715,7 @@ public sealed partial class Binder
                     made.Constructors.FirstOrDefault(c => !c.Parameters.Any(p => !p.IsThis)) is
                         not { SetsRequiredMembers: true })
                 {
-                    diagnostics.Error("SL0328", span,
+                    ReportUnmetConstraint("SL0328", span,
                         $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
                         $"'{parameter}' is constrained to 'new()', and '{argument.Name}' has " +
                         $"required members, which 'new {parameter}()' has no way to set: " +
@@ -711,7 +726,7 @@ public sealed partial class Binder
 
                 if (IsDefaultConstructible(argument)) return;
 
-                diagnostics.Error("SL0328", span,
+                ReportUnmetConstraint("SL0328", span,
                     $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
                     $"'{parameter}' is constrained to 'new()', and " +
                     argument switch
@@ -737,7 +752,7 @@ public sealed partial class Binder
         {
             if (Satisfies(argument, contract)) return;
 
-            diagnostics.Error("SL0328", span,
+            ReportUnmetConstraint("SL0328", span,
                 $"'{argument.Name}' cannot be used as '{parameter}' in {owner} " +
                 $"because it does not implement '{contract.Name}'" +
                 (argument is ClassTypeSymbol implementer && implementer.Interfaces.Count > 0
@@ -757,7 +772,7 @@ public sealed partial class Binder
             if (argument is ClassTypeSymbol derived &&
                 derived.SelfAndBases().Contains(baseClass)) return;
 
-            diagnostics.Error("SL0328", span,
+            ReportUnmetConstraint("SL0328", span,
                 $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because it " +
                 $"does not derive from '{baseClass.Name}'",
                 argument, baseClass);
@@ -781,6 +796,42 @@ public sealed partial class Binder
     }
 
     /// <summary>
+    /// Where <see cref="VerifyConstraint"/> puts what it finds instead of
+    /// reporting it, while <see cref="UnmetMemberConstraint"/> is asking.
+    /// </summary>
+    private List<string>? _unmetConstraints;
+
+    private void ReportUnmetConstraint(
+        string code, SourceSpan span, string message, params TypeSymbol[] subjects)
+    {
+        if (_unmetConstraints is null)
+            diagnostics.Error(code, span, message, subjects);
+        else if (!subjects.Any(s => s.StandsForAnError))
+            _unmetConstraints.Add(message);
+    }
+
+    /// <summary>
+    /// Why a member's own <c>where</c> is not met by the arguments its type
+    /// was instantiated with, or null when it is.
+    /// </summary>
+    private string? UnmetMemberConstraint(
+        FunctionSymbol member, Dictionary<string, TypeSymbol> substitution, FileScope scope)
+    {
+        _unmetConstraints = [];
+        try
+        {
+            using (diagnostics.Muted())
+                VerifyConstraints(member.MemberConstraints, [], substitution, scope,
+                    $"'{member.Name}'", member.Span);
+            return _unmetConstraints.FirstOrDefault();
+        }
+        finally
+        {
+            _unmetConstraints = null;
+        }
+    }
+
+    /// <summary>
     /// What <c>unmanaged</c> asks for: a value whose bytes are the whole of
     /// it, so it may be copied, compared and handed to C as bytes.
     /// </summary>
@@ -791,7 +842,8 @@ public sealed partial class Binder
 
     /// <summary>What <c>notnull</c> refuses: a type one of whose values is null.</summary>
     private static bool IsNullable(TypeSymbol type) =>
-        type is OptionalTypeSymbol or WeakTypeSymbol or PointerTypeSymbol or DelegateTypeSymbol;
+        type is OptionalTypeSymbol or WeakTypeSymbol or PointerTypeSymbol or DelegateTypeSymbol
+            or ClosureTypeSymbol { IsNullable: true };
 
     /// <summary>Reference types: what may be null and is reference counted.</summary>
     private bool IsReferenceType(TypeSymbol type) =>

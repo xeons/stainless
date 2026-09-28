@@ -85,6 +85,7 @@ public FRect  CreateRectangle(int x, int y, int width, int height)
 
 extern "C"
 {
+    [DoesNotReturn]
     void sl_fail(byte* message);
 }
 

@@ -383,8 +383,11 @@ public sealed partial class Binder
     /// <summary><c>subject != null</c>: an optional asked whether there is anything to look at.</summary>
     private static BoundTestPattern PresentTest(SourceSpan span, BoundPlaceholder subject) =>
         new(span, subject,
-            new BoundBinary(span, PrimitiveTypeSymbol.Bool, subject, BoundBinaryOp.NotEqual,
-                new BoundNullLiteral(span, subject.Type)),
+            subject.Type is ClosureTypeSymbol closure
+                ? new BoundClosureEqual(span, closure, subject, new BoundDefault(span, closure),
+                    negated: true)
+                : new BoundBinary(span, PrimitiveTypeSymbol.Bool, subject, BoundBinaryOp.NotEqual,
+                    new BoundNullLiteral(span, subject.Type)),
             new PatternTestKey(PatternTestKind.Null, null, Negated: true));
 
     /// <summary>What a folded constant is, as far as coverage is concerned.</summary>
@@ -673,12 +676,11 @@ public sealed partial class Binder
                 return null;
             match = typed;
         }
-        else if (subject.Type is OptionalTypeSymbol optional)
+        else if (subject.Type.NonNullForm() is { } held)
         {
             match = new TypeMatch(
                 PresentTest(syntax.Span, subject),
-                new BoundConversion(syntax.Span, optional.Element, subject,
-                    ConversionKind.NarrowOptional),
+                new BoundConversion(syntax.Span, held, subject, ConversionKind.NarrowOptional),
                 null, InstanceKey.Instance);
         }
         else if (subject.Type is WeakTypeSymbol or VariantTypeSymbol)
@@ -713,7 +715,7 @@ public sealed partial class Binder
         if (parts is null)
             return null;
 
-        bool notNull = subject.Type is OptionalTypeSymbol || subject.Type.AsReference() is not null;
+        bool notNull = subject.Type.NonNullForm() is not null || subject.Type.AsReference() is not null;
 
         return parts with
         {

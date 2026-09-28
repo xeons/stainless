@@ -59,6 +59,7 @@ public static class MetadataTypeNames
         SliceTypeSymbol slice => $"{slice.Spelling}<{Write(slice.Element)}>",
         TupleTypeSymbol tuple => "(" + string.Join(", ", tuple.Elements.Select(Write)) + ")",
 
+        ClosureTypeSymbol { NonNullable: { } held } => Write(held) + "?",
         NamedTypeSymbol named => named.QualifiedName,
         _ => "void",
     };
@@ -85,9 +86,12 @@ public static class MetadataTypeNames
         }
 
         if (name.EndsWith('?'))
-            return Read(name[..^1], lookup, sliceOf, tupleOf) is { } element
-                ? element.MakeOptionalType()
-                : null;
+            return Read(name[..^1], lookup, sliceOf, tupleOf) switch
+            {
+                ClosureTypeSymbol closure => closure.MakeNullable(),
+                { } element => element.MakeOptionalType(),
+                null => null,
+            };
 
         if (name.EndsWith("[]", StringComparison.Ordinal))
             return Read(name[..^2], lookup, sliceOf, tupleOf) is { } element

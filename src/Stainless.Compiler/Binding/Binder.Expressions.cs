@@ -1594,9 +1594,11 @@ public sealed partial class Binder
             return new BoundBinary(span, PrimitiveTypeSymbol.Bool, comparableLeft, op, comparableRight);
         }
 
-        // Two arrays of one type are equal when they are one array, as in C#.
+        // Two arrays of one type are equal when they are one array, as in C#,
+        // and an optional one is compared with the array it may hold.
         if (op is BoundBinaryOp.Equal or BoundBinaryOp.NotEqual &&
-            left.Type is ArrayTypeSymbol && left.Type.Equals(right.Type))
+            (left.Type.NonNullForm() ?? left.Type) is ArrayTypeSymbol leftArray &&
+            leftArray.Equals(right.Type.NonNullForm() ?? right.Type))
             return new BoundBinary(span, PrimitiveTypeSymbol.Bool, left, op, right);
 
         // `first == one.Add`: one side is a method group or a lambda, which has
@@ -1608,6 +1610,18 @@ public sealed partial class Binder
             if (left.Type is ClosureTypeSymbol && right is BoundFunctionGroup or BoundLambda)
                 right = BindConversion(right, left.Type, span);
             else if (right.Type is ClosureTypeSymbol && left is BoundFunctionGroup or BoundLambda)
+                left = BindConversion(left, right.Type, span);
+        }
+
+        // A nullable closure against null, or against the closure it may
+        // hold: both are two words, and null is two zero ones.
+        if (op is BoundBinaryOp.Equal or BoundBinaryOp.NotEqual)
+        {
+            if (left.Type is ClosureTypeSymbol { IsNullable: true } &&
+                right.Type is NullType or ClosureTypeSymbol)
+                right = BindConversion(right, left.Type, span);
+            else if (right.Type is ClosureTypeSymbol { IsNullable: true } &&
+                     left.Type is NullType or ClosureTypeSymbol)
                 left = BindConversion(left, right.Type, span);
         }
 
@@ -1887,6 +1901,12 @@ public sealed partial class Binder
             return new BoundConditional(
                 syntax.Span, TupleDraftType.Instance, condition, whenTrue, whenFalse);
 
+        // `flag ? [1, 2] : null` waits for the optional both arms can be.
+        if (whenTrue is BoundArrayDraft && whenFalse is BoundNullLiteral ||
+            whenFalse is BoundArrayDraft && whenTrue is BoundNullLiteral)
+            return new BoundConditional(
+                syntax.Span, ArrayDraftType.Instance, condition, whenTrue, whenFalse);
+
         if (type is null)
         {
             diagnostics.Error("SL0349", syntax.Span,
@@ -2082,8 +2102,8 @@ public sealed partial class Binder
         if (operand.Type is WeakTypeSymbol weak)
             operand = BindConversion(operand, weak.Element.MakeOptionalType(), syntax.Span);
 
-        return operand.Type is OptionalTypeSymbol optional
-            ? new BoundConversion(syntax.Span, optional.Element, operand, ConversionKind.NarrowOptional)
+        return operand.Type.NonNullForm() is { } held
+            ? new BoundConversion(syntax.Span, held, operand, ConversionKind.NarrowOptional)
             : operand;
     }
 

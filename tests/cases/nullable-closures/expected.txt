@@ -1,0 +1,9 @@
+false
+true 12
+false 12
+empty
+lambda 3
+lambda 4
+true false
+none <2>
+22

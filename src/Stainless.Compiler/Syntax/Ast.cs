@@ -365,6 +365,12 @@ public sealed record FunctionDeclSyntax(
     public TokenKind OperatorToken { get; init; }
 
     /// <summary>
+    /// <c>[DoesNotReturn]</c> on an <c>extern</c> function: a call to it
+    /// never comes back.
+    /// </summary>
+    public bool DoesNotReturn { get; init; }
+
+    /// <summary>
     /// True for <c>static implicit operator Money(long)</c> and its explicit
     /// twin. A conversion is an operator whose name is a type rather than a
     /// punctuation mark, which is why it is a flag here rather than another
@@ -578,6 +584,12 @@ public enum ConstraintKind
     /// say it is unconstrained.
     /// </summary>
     Default,
+
+    /// <summary>
+    /// <c>zeroable</c>: a type whose zero value is a value of it, so a body
+    /// may write <c>default(T)</c> and <c>new T[n]</c>.
+    /// </summary>
+    Zeroable,
 }
 
 /// <summary>

@@ -653,12 +653,12 @@ public sealed partial class Binder
                 string text = name.Name.Parts[0];
 
                 if (LookupLocal(text) is { } local && IsCallableValue(local.Type))
-                    return new BoundLocalAccess(name.Span, local);
+                    return Narrowed(new BoundLocalAccess(name.Span, local), local);
 
                 if (_context.Function?.Parameters.FirstOrDefault(
                         p => p.Name == text && !p.IsThis) is { } parameter &&
                     IsCallableValue(parameter.Type))
-                    return new BoundParameterAccess(name.Span, parameter);
+                    return Narrowed(new BoundParameterAccess(name.Span, parameter), parameter);
 
                 if (_context.Function is { } function &&
                     (function.Captures.FirstOrDefault(c => c.Name == text)?.Type ??
@@ -712,6 +712,15 @@ public sealed partial class Binder
     private BoundExpression BuildIndirectCall(
         CallSyntax syntax, BoundExpression target, List<BoundExpression> arguments)
     {
+        if (target.Type is ClosureTypeSymbol { IsNullable: true } maybe)
+        {
+            diagnostics.Error("SL0248", syntax.Callee.Span,
+                $"'{maybe.Name}' may be null, so it cannot be called until a check says it holds " +
+                $"a closure: test it against null, or name what it holds with 'is {{ }} handler'",
+                maybe);
+            return new BoundErrorExpression(syntax.Span);
+        }
+
         if (target.Type is ClosureTypeSymbol closure)
             return BuildClosureCall(syntax, closure, target, arguments);
 

@@ -81,6 +81,7 @@ import Standard.Convert;
 import Standard.Formats.Asn1;
 import Standard.Security.Cryptography;
 
+[DoesNotReturn]
 extern "C" void sl_fail(byte* message);
 
 // --------------------------------------------------------------- reading

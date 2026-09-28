@@ -40,6 +40,7 @@ import Forms.Drawing;
 import Forms.Platform;
 
 /// Aborts with a message, for a mistake in the calling program.
+[DoesNotReturn]
 extern "C" void sl_fail(byte* message);
 
 // =========================================================== graphic control

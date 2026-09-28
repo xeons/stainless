@@ -74,7 +74,7 @@ public sealed partial class Binder
         if (ZeroValues.FindNullInZero(type) is not { } found) return;
 
         ReportNoZeroValue("SL0810", span, "default", MentionsTypeArgument(written), type, found,
-            $"'{type.Name}' has no zero value: {Explain(found)}, so 'default' would hand out a " +
+            $"'{type.Name}' has no zero value: {ExplainNullInZero(found)}, so 'default' would hand out a " +
             "null where the type says there is none. Build the value with a constructor, or " +
             "make the reference nullable");
     }
@@ -88,7 +88,7 @@ public sealed partial class Binder
 
         ReportNoZeroValue("SL0812", span, "new-array", MentionsTypeArgument(written), element, found,
             $"'new {element.Name}[n]' would start every element as a zero, and '{element.Name}' " +
-            $"has none: {Explain(found)}. Write the elements out, as '[a, b, c]', fill it with " +
+            $"has none: {ExplainNullInZero(found)}. Write the elements out, as '[a, b, c]', fill it with " +
             "'Array.Create(n, i => ...)', or collect them in a 'List'");
     }
 
@@ -131,7 +131,7 @@ public sealed partial class Binder
             ReportNoZeroValue("SL0811", pending.Span, category, pending.Generic,
                 pending.Local.Type, found,
                 $"'{pending.Local.Name}' is declared without a value, and '{pending.Local.Type.Name}' " +
-                $"has no zero value: {Explain(found)}. Give it one where it is declared, or " +
+                $"has no zero value: {ExplainNullInZero(found)}. Give it one where it is declared, or " +
                 "assign the whole of it on every path before it is read",
                 quiet: finder.Touch == LocalTouch.Whole);
         }
@@ -176,7 +176,7 @@ public sealed partial class Binder
                 ReportNoZeroValue("SL0813", span, "field-no-constructor", type.Template is not null,
                     field.Type, found,
                     $"'{type.Name}' has no constructor, so nothing gives '{field.Name}' a value, and " +
-                    $"'{field.Type.Name}' has no zero value: {Explain(found)}. Give the field an " +
+                    $"'{field.Type.Name}' has no zero value: {ExplainNullInZero(found)}. Give the field an " +
                     "initializer, mark it 'required', or write a constructor that assigns it");
             }
         }
@@ -192,7 +192,7 @@ public sealed partial class Binder
         ReportNoZeroValue("SL0814", declaration.Span, "static-property",
             _context.Substitution.Count > 0, symbol.Type, found,
             $"'{symbol.DisplayName}' has no '= value', so it would start as the zero of " +
-            $"'{symbol.Type.Name}', which has none: {Explain(found)}. Give it an initializer");
+            $"'{symbol.Type.Name}', which has none: {ExplainNullInZero(found)}. Give it an initializer");
     }
 
     /// <summary>
@@ -243,10 +243,18 @@ public sealed partial class Binder
         _context.Substitution.Count > 0 &&
         (written is null || MentionsUnknown(written, _context.Substitution.Keys.ToHashSet(), []));
 
-    private static string Explain((string Path, TypeSymbol Slot) found) =>
-        found.Slot is ClosureTypeSymbol
-            ? $"'{found.Path}' is the closure '{found.Slot.Name}', whose zero has no function to call"
-            : $"'{found.Path}' is a '{found.Slot.Name}', which is never null";
+    private static string ExplainNullInZero((string Path, TypeSymbol Slot) found)
+    {
+        bool itself = found.Path == found.Slot.Name;
+        return found.Slot is ClosureTypeSymbol
+            ? itself
+                ? $"the zero of the closure '{found.Slot.Name}' has no function to call"
+                : $"'{found.Path}' is the closure '{found.Slot.Name}', whose zero has no " +
+                  "function to call"
+            : itself
+                ? $"a '{found.Slot.Name}' is never null"
+                : $"'{found.Path}' is a '{found.Slot.Name}', which is never null";
+    }
 
     private void ReportNoZeroValue(
         string code, SourceSpan span, string category, bool generic, TypeSymbol type,
@@ -295,7 +303,7 @@ public sealed partial class Binder
         public override void ReportReturn(SourceSpan span) =>
             binder.ReportNoZeroValue("SL0813", span, "field", generic, field.Type, found,
                 $"'{constructor.ContainingType!.Name}' can be made without '{field.Name}' being " +
-                $"written, and '{field.Type.Name}' has no zero value: {Explain(found)}. Assign it " +
+                $"written, and '{field.Type.Name}' has no zero value: {ExplainNullInZero(found)}. Assign it " +
                 "on every path through the constructor, or give it an initializer");
 
         public override void ReportEarlyReturn(SourceSpan span) => ReportReturn(span);

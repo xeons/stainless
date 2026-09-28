@@ -283,6 +283,25 @@ public sealed class FunctionSymbol
     /// <summary>The body to bind, or null for an <c>extern "C"</c> declaration.</summary>
     public BlockSyntax? Body { get; init; }
 
+    /// <summary>
+    /// A member's own <c>where</c>, constraining its generic type's
+    /// parameters: <c>void Clear() where T : zeroable</c>. Empty for most.
+    /// </summary>
+    public IReadOnlyList<WhereClauseSyntax> MemberConstraints { get; init; } = [];
+
+    /// <summary>
+    /// Why this member of an instantiation does not exist, or null when it
+    /// does: its type's arguments fail its own <c>where</c>. Its body is never
+    /// bound, and a call to it is SL0816.
+    /// </summary>
+    public string? Unavailable { get; set; }
+
+    /// <summary>
+    /// <c>[DoesNotReturn]</c>: a call to this never comes back, so nothing
+    /// after it is reached.
+    /// </summary>
+    public bool DoesNotReturn { get; set; }
+
     /// <summary>Where the declaration came from, for diagnostics.</summary>
     public required Source.SourceSpan Span { get; init; }
 

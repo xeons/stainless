@@ -538,6 +538,7 @@ public sealed class MetadataLoader(
             MetadataAccessor = described.Accessor,
             IsInitAccessor = described.IsInit,
             SetsRequiredMembers = described.SetsRequiredMembers,
+            DoesNotReturn = described.DoesNotReturn,
         };
 
         if (containingType is not null && !described.IsStatic)
