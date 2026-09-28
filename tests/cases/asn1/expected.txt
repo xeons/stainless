@@ -1,0 +1,167 @@
+integer 128 ok
+integer 0 ok
+integer 127 ok
+integer 256 ok
+integer -128 ok
+integer -129 ok
+integer -9223372036854775808 ok
+integer ulong max ok
+oid write ok
+oid 1.2.840.113549 ok
+oid 2.999.3 ok
+bit string write ok
+bit string 0A3B5F291CD ok
+bit string empty ok
+boolean null octets enumerated ok
+printable string ok
+explicit and implicit tags ok
+set of sorted ok
+tag number 200 ok
+utc time 1991 ok
+generalized time 9999 ok
+length 200 ok
+length 200 size ok
+pushed length 309 ok
+pushed tail ok
+pushed read ok
+writer closed ok
+round trip boolean ok
+round trip long ok
+round trip ulong ok
+round trip unsigned bytes ok
+round trip integer bytes ok
+round trip null ok
+round trip bit string ok
+round trip octet string ok
+round trip oid ok
+round trip enumerated ok
+round trip utf8 ok
+t61 is latin-1 ok
+round trip t61 ok
+bmp is ucs-2 ok
+round trip bmp ok
+round trip universal ok
+round trip ia5 ok
+round trip visible ok
+round trip numeric ok
+round trip utc 1950 ok
+round trip generalized 0001 ok
+peek application tag ok
+tag text ok
+round trip set of ok
+round trip end ok
+utc 50 is 1950 ok
+utc 49 is 2049 ok
+generalized 9999 ok
+9999 is past DateTimeOffset ok
+1991 as DateTimeOffset ok
+utc refuses 1949 ok
+utc refuses 2050 ok
+generalized refuses 10000 ok
+refused writes wrote nothing ok
+fraction dropped ok
+der fraction trailing zero ok
+der fraction comma ok
+ber fraction comma ok
+der utc offset ok
+ber utc offset ok
+ber local time ok
+der local time ok
+month 13 ok
+february 30 ok
+february 29 2001 ok
+february 29 2000 ok
+utc without zone ok
+second 60 ok
+empty input ok
+contents cut short ok
+high tag unterminated ok
+length octets cut short ok
+huge length ok
+nested past parent ok
+boolean of two ok
+empty integer ok
+null with contents ok
+length ff ok
+empty bit string ok
+boolean as integer ok
+primitive sequence ok
+constructed integer ok
+wrong implicit tag ok
+right implicit tag ok
+integer leading zero ok
+integer leading ff ok
+der long length ok
+ber long length ok
+der length leading zero ok
+der boolean 01 ok
+ber boolean 01 ok
+high form for small tag ok
+tag padded ok
+oid padded ok
+der unused bits set ok
+ber unused bits set ok
+der constructed octets ok
+integer past long ok
+negative as ulong ok
+oid arc past ulong ok
+dotted arc past ulong ok
+tag past int ok
+printable at sign ok
+utf8 overlong ok
+utf8 surrogate ok
+utf8 cut short ok
+bmp odd length ok
+bmp surrogate ok
+universal past 10ffff ok
+ia5 high bit ok
+numeric letter ok
+write printable at sign ok
+write bmp emoji ok
+write t61 beyond latin-1 ok
+first null ok
+trailing data ok
+write two values as one ok
+indefinite length ok
+ber constructed octets ok
+integer as string type ok
+eight unused bits ok
+unused bits and no octet ok
+oid unterminated ok
+dotted trailing dot ok
+dotted first arc 3 ok
+dotted second arc 40 ok
+dotted leading zero ok
+dotted one arc ok
+write bad oid ok
+write unused bit set ok
+write nine unused ok
+write integer bytes padded ok
+refusals wrote nothing ok
+refused read ok
+then read as boolean ok
+describe ok
+certificate is one value ok
+tbs 357 bytes
+version 3
+serial 1f2e3d4c5b6a7988
+signature 1.2.840.10045.4.3.2
+issuer 2.5.4.6=GB, 2.5.4.10=Stainless, 2.5.4.3=asn1.example
+not before 1767225600 2026-01-01T00:00:00Z
+not after 2524608000 2050-01-01T00:00:00Z
+subject 2.5.4.6=GB, 2.5.4.10=Stainless, 2.5.4.3=asn1.example
+key 1.2.840.10045.2.1 1.2.840.10045.3.1.7
+key bits 520, first octet 04
+extension 2.5.29.14 critical false 22 bytes
+extension end ok
+extension 2.5.29.35 critical false 24 bytes
+extension end ok
+extension 2.5.29.19 critical true 5 bytes
+extension end ok
+tbs end ok
+signed with 1.2.840.10045.4.3.2
+signature 71 bytes, 0 unused
+certificate end ok
+ecdsa r and s ok
+rewrite certificate ok
+rewritten bytes ok

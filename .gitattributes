@@ -14,3 +14,4 @@
 # LF would change the program built from it. `text=auto` guesses from content
 # and would guess right about most of these, which is not the same as always.
 *.bin binary
+*.der binary
