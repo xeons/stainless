@@ -979,7 +979,8 @@ public sealed class ClosureTypeSymbol : StructTypeSymbol
     /// <summary><c>Notify?</c>: the one nullable form of this closure.</summary>
     public ClosureTypeSymbol MakeNullable()
     {
-        if (NonNullable is not null) return this;
+        if (NonNullable is not null)
+            return this;
 
         return Intern(ref _nullable, () =>
         {

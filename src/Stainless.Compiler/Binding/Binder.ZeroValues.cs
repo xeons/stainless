@@ -44,7 +44,8 @@ public sealed partial class Binder
     /// </summary>
     private void CheckDefaultHasZero(SourceSpan span, TypeSymbol type)
     {
-        if (InUncheckedModule || ZeroValues.FindNullInZero(type) is not { } found) return;
+        if (InUncheckedModule || ZeroValues.FindNullInZero(type) is not { } found)
+            return;
 
         ReportNoZeroValue("SL0810", span,
             $"'{type.Name}' has no zero value: {ExplainNullInZero(found)}, so 'default' would " +
@@ -60,8 +61,10 @@ public sealed partial class Binder
     private void CheckArrayElementHasZero(
         SourceSpan span, TypeSymbol element, BoundExpression length)
     {
-        if (InUncheckedModule || FoldSwitchLabel(length) == 0) return;
-        if (ZeroValues.FindNullInZero(element) is not { } found) return;
+        if (InUncheckedModule || FoldSwitchLabel(length) == 0)
+            return;
+        if (ZeroValues.FindNullInZero(element) is not { } found)
+            return;
 
         ReportNoZeroValue("SL0812", span,
             $"'new {element.Name}[n]' would start every element as a zero, and " +
@@ -79,7 +82,8 @@ public sealed partial class Binder
     /// <summary>A local declared with no value, judged once its body has been bound.</summary>
     private void NoteUnsetLocal(LocalSymbol local)
     {
-        if (local.Type.IsError() || ZeroValues.HasZeroValue(local.Type)) return;
+        if (local.Type.IsError() || ZeroValues.HasZeroValue(local.Type))
+            return;
         Remember(_unsetLocals, local);
     }
 
@@ -91,7 +95,8 @@ public sealed partial class Binder
     /// </summary>
     private void SettleUnsetLocals(BoundBlock body)
     {
-        if (_unsetLocals.Count == 0) return;
+        if (_unsetLocals.Count == 0)
+            return;
 
         // A `goto` reaches a statement from where the walk does not look, so
         // it stands down, as it does for `out`.
@@ -99,9 +104,11 @@ public sealed partial class Binder
 
         foreach (var local in _unsetLocals.ToList())
         {
-            if (DeclaringBlockFinder.Find(body, local) is not { } block) continue;
+            if (DeclaringBlockFinder.Find(body, local) is not { } block)
+                continue;
             _unsetLocals.Remove(local);
-            if (jumps) continue;
+            if (jumps)
+                continue;
 
             var reported = new HashSet<int>();
             foreach (var slot in SlotsWithoutZero(local.Type))
@@ -189,7 +196,8 @@ public sealed partial class Binder
 
         public override PlaceUse UseOf(BoundExpression expression)
         {
-            if (PathOf(expression) is not { } path) return PlaceUse.Other;
+            if (PathOf(expression) is not { } path)
+                return PlaceUse.Other;
             return IsOnTheWay(path) || GoesThrough(path) ? PlaceUse.Read : PlaceUse.Beside;
         }
 
@@ -259,7 +267,8 @@ public sealed partial class Binder
 
         public override void Visit(BoundStatement? statement)
         {
-            if (_found is not null) return;
+            if (_found is not null)
+                return;
 
             if (statement is BoundBlock block &&
                 block.Statements.Any(s => s is BoundLocalDeclaration declared &&
@@ -289,10 +298,14 @@ public sealed partial class Binder
 
         foreach (var bound in _functions.ToList())
         {
-            if (bound.Symbol.Kind != FunctionKind.Constructor) continue;
-            if (bound.Symbol.ContainingType is not { } type) continue;
-            if (_delegated.ContainsKey(bound.Symbol)) continue;
-            if (JumpFinder.Contains(bound.Body)) continue;
+            if (bound.Symbol.Kind != FunctionKind.Constructor)
+                continue;
+            if (bound.Symbol.ContainingType is not { } type)
+                continue;
+            if (_delegated.ContainsKey(bound.Symbol))
+                continue;
+            if (JumpFinder.Contains(bound.Body))
+                continue;
 
             // A field of a struct with no zero value may be written whole, or
             // a field at a time as a local is.
@@ -326,8 +339,10 @@ public sealed partial class Binder
     private bool HelperWrites(FunctionSymbol helper, FieldSymbol[] path)
     {
         var key = (helper, string.Join('.', path.Select(f => f.Name)));
-        if (_helperWrites.TryGetValue(key, out bool known)) return known;
-        if (_boundBodies?.GetValueOrDefault(helper) is not { } body) return false;
+        if (_helperWrites.TryGetValue(key, out bool known))
+            return known;
+        if (_boundBodies?.GetValueOrDefault(helper) is not { } body)
+            return false;
 
         _helperWrites[key] = false;
         var place = new ConstructorFieldPlace(this, path, owner: null);
@@ -484,7 +499,8 @@ public sealed partial class Binder
 
         public override void Visit(BoundStatement? statement)
         {
-            if (_found) return;
+            if (_found)
+                return;
 
             if (statement is BoundLabel or BoundGoto)
             {
@@ -507,11 +523,13 @@ public sealed partial class Binder
     private bool StaticPropertyStartsWithoutValue(
         StaticSymbol symbol, Syntax.StaticDeclSyntax declaration)
     {
-        if (!symbol.IsPropertyStorage) return false;
+        if (!symbol.IsPropertyStorage)
+            return false;
         if (declaration.Value is not Syntax.DefaultSyntax { Type: null } made ||
             made.Span != declaration.Span)
             return false;
-        if (ZeroValues.FindNullInZero(symbol.Type) is not { } found) return false;
+        if (ZeroValues.FindNullInZero(symbol.Type) is not { } found)
+            return false;
 
         if (!symbol.IsFilledOnFirstUse)
             ReportNoZeroValue("SL0814", declaration.Span,

@@ -2,6 +2,7 @@ false
 true 12
 false 12
 empty
+true false
 lambda 3
 lambda 4
 true false

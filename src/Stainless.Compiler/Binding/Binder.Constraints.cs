@@ -48,7 +48,8 @@ public sealed partial class Binder
                         method.Modifiers.HasFlag(Modifiers.Override));
 
                 foreach (var member in declaration.Members.OfType<FunctionDeclSyntax>()
-                             .Where(m => m.TypeParameters.Count == 0 && m.Constraints.Count > 0))
+                             .Where(m => m.TypeParameters.Count == 0 &&
+                                         m.Constraints.Count > 0))
                     CheckMemberWhereClauses(member, declaration, template);
             }
 
@@ -102,10 +103,12 @@ public sealed partial class Binder
     /// </summary>
     private string? MemberUnavailability(FunctionSymbol member)
     {
-        if (member.MemberConstraints.Count == 0) return null;
+        if (member.MemberConstraints.Count == 0)
+            return null;
         if (member.Unavailable is not null || _availableMembers.Contains(member))
             return member.Unavailable;
-        if (member.ContainingType is not { Template: { } template } type) return null;
+        if (member.ContainingType is not { Template: { } template } type)
+            return null;
 
         var substitution = new Dictionary<string, TypeSymbol>(StringComparer.Ordinal);
         for (int i = 0; i < template.Parameters.Count && i < type.TypeArguments.Count; i++)
@@ -114,11 +117,33 @@ public sealed partial class Binder
         using (Enter(_context with { Substitution = substitution, File = template.Scope }))
             member.Unavailable = UnmetMemberConstraint(member, substitution, template.Scope);
 
-        if (member.Unavailable is null) _availableMembers.Add(member);
+        if (member.Unavailable is null)
+        {
+            _availableMembers.Add(member);
+            return null;
+        }
+
+        // An interface's table has a slot for it whatever the arguments, so
+        // it cannot be the member an instantiation leaves out.
+        if (type.AllInterfaces()
+                .SelectMany(i => i.Methods)
+                .FirstOrDefault(required =>
+                    ReferenceEquals(type.FindImplementation(required), member))
+            is { } implemented)
+            diagnostics.Error("SL0331", member.Span,
+                $"'{member.Name}' implements " +
+                $"'{implemented.ContainingType!.Name}.{implemented.Name}', so every " +
+                $"'{type.Name}' has it whatever its arguments; only a member an instantiation " +
+                "can leave out may have a 'where' of its own",
+                type);
+
         return member.Unavailable;
     }
 
-    /// <summary>A call to a member its type's arguments leave out, reported where it is written.</summary>
+    /// <summary>
+    /// A call to a member its type's arguments leave out, reported where it
+    /// is written.
+    /// </summary>
     private void ReportUnavailableMembers(BoundStatement body)
     {
         var finder = new ConstrainedMemberFinder();
@@ -126,7 +151,8 @@ public sealed partial class Binder
 
         foreach (var (member, span) in finder.Found)
         {
-            if (MemberUnavailability(member) is not { } why) continue;
+            if (MemberUnavailability(member) is not { } why)
+                continue;
 
             diagnostics.Error("SL0816", span,
                 $"'{member.ContainingType!.Name}' has no '{member.Name}': {why}",
@@ -134,7 +160,10 @@ public sealed partial class Binder
         }
     }
 
-    /// <summary>Every call and method reference to a member with a <c>where</c> of its own.</summary>
+    /// <summary>
+    /// Every call and method reference to a member with a <c>where</c> of its
+    /// own.
+    /// </summary>
     private sealed class ConstrainedMemberFinder : BoundTreeWalker
     {
         public List<(FunctionSymbol Member, SourceSpan Span)> Found { get; } = [];

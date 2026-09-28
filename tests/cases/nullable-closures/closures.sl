@@ -60,6 +60,7 @@ int Main()
     Notify? local = null;
     if (local == null)
         Console.WriteLine("empty");
+    Console.WriteLine($"{local is null} {local is { }}");
 
     local = (v) => { Console.WriteLine($"lambda {v}"); };
     if (local != null)

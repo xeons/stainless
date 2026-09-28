@@ -55,7 +55,8 @@ public sealed partial class Binder
 
                     // A member whose own `where` these arguments fail is not
                     // part of this instantiation, so its body is not either.
-                    if (MemberUnavailability(function) is not null) continue;
+                    if (MemberUnavailability(function) is not null)
+                        continue;
 
                     using (Enter(_context with { Substitution = substitution }))
                         BindFunctionBody(function);
@@ -658,7 +659,8 @@ public sealed partial class Binder
                 return;
 
             case ConstraintKind.Zeroable:
-                if (ZeroValues.FindNullInZero(argument) is not { } found) return;
+                if (ZeroValues.FindNullInZero(argument) is not { } found)
+                    return;
 
                 ReportUnmetConstraint("SL0815", span,
                     $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +

@@ -288,10 +288,7 @@ ClipboardContent SnapshotContent(ClipboardContent content)
                                         CopyBytes(picture.Pixels));
     }
 
-    var files = new String[content.Files.Length];
-    for (nuint i = 0u; i < files.Length; i++)
-        files[i] = content.Files[i];
-    copy.Files = files;
+    copy.Files = [..content.Files];
 
     for (nuint i = 0u; i < content.Custom.Count; i++)
     {

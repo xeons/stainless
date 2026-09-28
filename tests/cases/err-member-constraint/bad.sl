@@ -25,9 +25,23 @@ public class Shelf<T>
     }
 }
 
+public interface IResettable
+{
+    void Reset();
+}
+
+// An interface's table has a slot for Reset in every instantiation.
+public class Tray<T> : IResettable
+{
+    public void Reset() where T : zeroable
+    {
+    }
+}
+
 int Main()
 {
     var text = new Box<String>("kept");
     text.Reset();
+    IResettable tray = new Tray<String>();
     return 0;
 }
