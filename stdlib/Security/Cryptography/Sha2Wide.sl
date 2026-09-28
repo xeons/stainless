@@ -69,11 +69,19 @@ public abstract class Sha2Wide : HashAlgorithm
         ];
     }
 
+    /// The schedule is an inline array and the block is read in place, so a
+    /// block allocates nothing and passes no counted reference to a helper.
     protected override void CompressBlock(byte[] block)
     {
-        ulong[] schedule = new ulong[80u];
+        ulong[80] schedule;
         for (nuint i = 0u; i < 16u; i++)
-            schedule[i] = ReadBigDoubleWord(block, i * 8u);
+        {
+            nuint at = i * 8u;
+            ulong word = 0u;
+            for (nuint k = 0u; k < 8u; k++)
+                word = (word << 8) | (ulong)block[at + k];
+            schedule[i] = word;
+        }
 
         for (nuint i = 16u; i < 80u; i++)
         {

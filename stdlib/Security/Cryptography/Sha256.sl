@@ -78,11 +78,17 @@ public sealed class Sha256 : HashAlgorithm
         _state[7u] = 0x5BE0CD19u;
     }
 
+    /// The schedule is an inline array and the block is read in place, so a
+    /// block allocates nothing and passes no counted reference to a helper.
     protected override void CompressBlock(byte[] block)
     {
-        uint[] schedule = new uint[64u];
+        uint[64] schedule;
         for (nuint i = 0u; i < 16u; i++)
-            schedule[i] = ReadBigWord(block, i * 4u);
+        {
+            nuint at = i * 4u;
+            schedule[i] = ((uint)block[at] << 24) | ((uint)block[at + 1u] << 16) |
+                          ((uint)block[at + 2u] << 8) | (uint)block[at + 3u];
+        }
 
         for (nuint i = 16u; i < 64u; i++)
         {
