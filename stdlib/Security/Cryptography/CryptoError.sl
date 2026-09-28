@@ -69,4 +69,30 @@ public enum CryptoError
 
     /// The platform would not supply entropy.
     NoEntropy,
+
+    /// A key that is the right length and still not a key: an RSA modulus
+    /// that is even or too small, a private key whose parts disagree, a
+    /// scalar of zero or not below the group order, or a Diffie-Hellman
+    /// result that is the identity.
+    InvalidKey,
+
+    /// A signature that does not verify, or is not a well-formed signature
+    /// at all. The two are deliberately not told apart.
+    InvalidSignature,
+
+    /// A point that is not on the curve, is the point at infinity where one
+    /// is not allowed, or is encoded in a form this does not read.
+    InvalidPoint,
+
+    /// A key or signature whose DER, PEM or other encoding does not parse,
+    /// or parses as something other than what was asked for.
+    Encoding,
+
+    /// A message too long for the key: more than an RSA modulus can carry
+    /// under the padding asked for.
+    MessageLength,
+
+    /// A well-formed request this does not implement: a curve, a hash or a
+    /// padding mode it has no code for.
+    Unsupported,
 }
