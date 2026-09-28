@@ -62,4 +62,8 @@ public enum IOError
 
     /// The platform said something this enum has no name for.
     Unknown = 9,
+
+    /// The bytes do not follow the format they claim to — a corrupt or
+    /// truncated compressed stream, say. .NET's `InvalidDataException`.
+    InvalidData = 10,
 }

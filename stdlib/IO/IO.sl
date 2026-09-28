@@ -66,6 +66,7 @@ public String DescribeIOError(IOError error)
         case IOError.Invalid:        return "the request made no sense";
         case IOError.EndOfFile:      return "the end of the file";
         case IOError.Closed:         return "the stream is closed";
+        case IOError.InvalidData:    return "the data is not in the format it claims";
         default:                     return "it failed for an unknown reason";
     }
 }
