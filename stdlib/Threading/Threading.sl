@@ -136,13 +136,9 @@ public delegate void Job(byte* argument);
 
 // ------------------------------------------------------------------ threads
 
-/// Work with nothing to pass in and nothing to hand back: what a `Thread` runs.
-///
-/// A closure rather than a delegate, because the point of it is to carry what
-/// it captured -- and capture is by value, so it may outlive the scope that
-/// built it. That is the whole reason a closure is safe here where a pointer to
-/// a local is not.
-public closure void Action();
+// What a `Thread` runs is `Standard.Action`: a closure rather than a delegate,
+// because it carries what it captured, and capture is by value, so it may
+// outlive the scope that built it.
 
 /// A closure with an address.
 ///

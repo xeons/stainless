@@ -44,6 +44,7 @@ extern "C"
     long sl_time_from_parts(long year, long month, long day, long hour,
                             long minute, long second, long nanosecond, bool local);
     long sl_time_zone_offset(long nanoseconds);
+    void sl_fail(byte* message);
 }
 
 // The conversion factors, public so that a count of nanoseconds bound for a C

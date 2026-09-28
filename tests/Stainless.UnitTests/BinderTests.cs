@@ -112,6 +112,55 @@ public class BinderTests
     public void GenericOverloadsAreRanked(string module, string[] expected) =>
         Assert.Equal(expected, Front.ModuleCodes(module));
 
+    /// <summary>
+    /// A generic type or delegate is declared once per number of type
+    /// parameters, as C#'s <c>Func</c> and <c>Action</c> are.
+    /// </summary>
+    [Theory]
+    [InlineData("public closure R Maker<R>();\npublic closure R Maker<T, R>(T value);\nint F(Maker<int> a, Maker<int, int> b) => a() + b(1);", new string[0])]
+    [InlineData("public struct Box<T> { public T A; }\npublic struct Box<T, U> { public T A; public U B; }\nint F(Box<int> a, Box<int, long> b) => a.A;", new string[0])]
+    [InlineData("public struct Box<T> { public T A; }\npublic struct Box<U> { public U A; }", new[] { "SL0201" })]
+    [InlineData("public struct Pair { public int A; }\npublic struct Pair<T> { public T A; }\nint F(Pair a, Pair<int> b) => a.A + b.A;", new string[0])]
+    [InlineData("public struct Box<T> { public T A; }\nint F(Box<int, int> b) => 0;", new[] { "SL0323" })]
+    public void AGenericNameIsDeclaredOncePerArity(string module, string[] expected) =>
+        Assert.Equal(expected, Front.ModuleCodes(module));
+
+    /// <summary>
+    /// A lambda fits a delegate whose result its body's converts to, and
+    /// between two it fits, the one whose result it produces is chosen.
+    /// </summary>
+    [Theory]
+    [InlineData("int Pick<T>(T x, Func<T, int> f) => 1;\nint Pick<T>(T x, Func<T, double> f) => 2;\nint G() => Pick(1, (n) => n + 1);", new string[0])]
+    [InlineData("int Pick<T>(T x, Func<T, int> f) => 1;\nint Pick<T>(T x, Func<T, double> f) => 2;\nint G() => Pick(1, (n) => 0.5);", new string[0])]
+    [InlineData("int Pick(Func<int, int> f) => 1;\nint G() => Pick((n) => 0.5);", new[] { "SL0262" })]
+    public void ALambdaIsRankedByWhatItReturns(string module, string[] expected) =>
+        Assert.Equal(expected, Front.ModuleCodes(module));
+
+    /// <summary>A conditional of two variant cases takes the type it is going to.</summary>
+    [Fact]
+    public void AConditionalOfTwoCasesIsTargetTyped() =>
+        Assert.Empty(Front.ModuleCodes(
+            "public enum Why { Bad }\nResult<int, Why> Check(bool good) => good ? Ok(1) : Fail(Why.Bad);"));
+
+    /// <summary>An array literal's elements say what a generic parameter is.</summary>
+    [Theory]
+    [InlineData("T First<T>(ReadOnlySpan<T> items) => items[0];\nint G() => First([1, 2, 3]);", new string[0])]
+    [InlineData("nuint Count<T>(T[] items) => items.Length;\nnuint G() => Count([\"a\", \"b\"]);", new string[0])]
+    public void AnArrayLiteralInfersItsElementType(string module, string[] expected) =>
+        Assert.Equal(expected, Front.ModuleCodes(module));
+
+    /// <summary>
+    /// A struct keeps the promise an interface makes, and is still never a
+    /// reference to one.
+    /// </summary>
+    [Theory]
+    [InlineData("public interface IArea { double Area(); }\npublic struct Sq : IArea { public double S; public double Area() => S * S; }\ndouble M<T>(T shape) where T : IArea => shape.Area();\ndouble G(Sq s) => M(s);", new string[0])]
+    [InlineData("public interface IArea { double Area(); }\npublic struct Sq : IArea { public double S; public double Area() => S * S; }\nIArea G(Sq s) => s;", new[] { "SL0302" })]
+    [InlineData("public interface IArea { double Area(); }\npublic struct Sq : IArea { public double S; }", new[] { "SL0305" })]
+    [InlineData("public interface IArea { double Area(); }\npublic struct Sq : IArea { public double S; double Area() => S; }", new[] { "SL0306" })]
+    public void AStructImplementsAnInterfaceWithoutBecomingOne(string module, string[] expected) =>
+        Assert.Equal(expected, Front.ModuleCodes(module));
+
     [Theory]
     [InlineData("bool F(int[] a, int[] b) => a == b;", new string[0])]
     [InlineData("bool F(int[] a, int[] b) => a != b;", new string[0])]
@@ -551,9 +600,9 @@ public class BinderTests
     }
 
     /// <summary>
-    /// Two declarations of one name, of every pair of kinds, in one file and in
-    /// two: one of them loses, is reported, and nothing after pass 2 goes
-    /// looking for a symbol it never made.
+    /// Two declarations of one name and arity, of every pair of kinds, in one
+    /// file and in two: one of them loses, is reported, and nothing after pass
+    /// 2 goes looking for a symbol it never made.
     ///
     /// Each later pass used to find a declaration's type by its name, which is
     /// the winner's -- so a delegate losing to a struct was cast to a delegate,
@@ -569,10 +618,13 @@ public class BinderTests
         string firstSource = s_declarationKinds.Single(k => k.Kind == first).Source.Replace("$", "N");
         string secondSource = s_declarationKinds.Single(k => k.Kind == second).Source.Replace("$", "N");
 
-        // The one pairing that is not a duplicate: a type declared twice in its
-        // own module, which is a later part adding behaviour to the first.
+        // Two pairings are not duplicates: a type declared twice in its own
+        // module, which is a later part adding behaviour to the first, and a
+        // generic beside a type of another arity, as `Action<T>` is beside
+        // `Action`.
         string[] parts = ["class", "struct", "union", "variant", "interface", "com", "attribute"];
         bool addsToTheFirst = first == second && parts.Contains(first);
+        bool anotherArity = first.StartsWith("generic") != second.StartsWith("generic");
 
         string[] reported = ["SL0201", "SL0550", "SL0551", "SL0552"];
 
@@ -582,7 +634,9 @@ public class BinderTests
                      Front.FilesCodes(firstSource, secondSource),
                  })
         {
-            if (!addsToTheFirst)
+            if (anotherArity)
+                Assert.DoesNotContain(codes, reported.Contains);
+            else if (!addsToTheFirst)
                 Assert.Contains(codes, reported.Contains);
         }
     }

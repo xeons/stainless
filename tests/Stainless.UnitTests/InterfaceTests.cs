@@ -197,10 +197,17 @@ public class InterfaceTests
         Assert.Empty(Front.ModuleCodes(Additive + Money));
 
     [Fact]
-    public void AStructMayNotImplementAnInterfaceAnObjectAnswers() =>
-        Assert.Equal(["SL0302"], Front.ModuleCodes(
+    public void AStructMayImplementAnInterfaceAnObjectAnswers() =>
+        Assert.Empty(Front.ModuleCodes(
             "public interface IShape { double Area(); }\n" +
             "public struct Flat : IShape { public double Area() => 0.0; }"));
+
+    [Fact]
+    public void AStructIsNeverAReferenceToAnInterface() =>
+        Assert.Equal(["SL0302"], Front.ModuleCodes(
+            "public interface IShape { double Area(); }\n" +
+            "public struct Flat : IShape { public double Area() => 0.0; }\n" +
+            "IShape Held(Flat flat) => flat;"));
 
     [Fact]
     public void AStaticRequirementMustBeSupplied() =>

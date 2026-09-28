@@ -16,9 +16,6 @@ made:
 greeter destroyed
   dropped
 iidof is stable: true
-iidof data1: 1787767828
-iidof data2: 39742
-iidof data3: 19797
-iidof data4: 143 66
+iidof: 6a8f2c14-9b3e-4d55-8f21-7c0e5a913d42
 end of Main
 greeter destroyed

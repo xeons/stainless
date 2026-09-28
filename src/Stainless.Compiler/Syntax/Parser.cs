@@ -905,15 +905,13 @@ public sealed class Parser
         var kind = TypeDeclKind.Class;
         if (At(TokenKind.StructKeyword))
         {
-            // A record is a key and a set element, and it is those by declaring
-            // IEquatable and IHashable. A struct implements no interface: an
-            // interface reference is counted and a struct has no header to
-            // count. What a record would be without them is a struct with a
-            // constructor, which is already writable.
+            // What a record struct would generate is writable by hand, since a
+            // struct may implement IEquatable and IHashable; the generating is
+            // what is missing.
             _diagnostics.Error("SL0734", SpanFrom(_pos),
-                "a record implements 'IEquatable' and 'IHashable', and a struct implements " +
-                "no interface, so there is no 'record struct'; write 'record' for a class, " +
-                "or a struct with a constructor and an 'Equals' of its own");
+                "there is no 'record struct' yet; write 'record' for a class, or a struct " +
+                "with a constructor, 'Equals' and 'GetHashCode' of its own, which may " +
+                "implement 'IEquatable' and 'IHashable' as a record's would");
             Advance();
         }
         else if (At(TokenKind.ClassKeyword))

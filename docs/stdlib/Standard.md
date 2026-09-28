@@ -7,9 +7,67 @@ than library features, and so need no import to reach.
 
 ## Contents
 
-**Types** &nbsp; [Action&lt;T&gt;](#actiont-closure) &middot; [Comparison&lt;T&gt;](#comparisont-closure) &middot; [Fold&lt;TAccumulate, TSource&gt;](#foldtaccumulate-tsource-closure) &middot; [Func&lt;T, TResult&gt;](#funct-tresult-closure) &middot; [Index](#index-struct) &middot; [Optional&lt;T&gt;](#optionalt-variant) &middot; [Predicate&lt;T&gt;](#predicatet-closure) &middot; [Range](#range-struct) &middot; [ReadOnlySpan&lt;T&gt;](#readonlyspant-struct) &middot; [Result&lt;T, TError&gt;](#resultt-terror-variant) &middot; [Span&lt;T&gt;](#spant-struct)
+**Types** &nbsp; [Action](#action-closure) &middot; [Action&lt;T1, T2, T3, T4&gt;](#actiont1-t2-t3-t4-closure) &middot; [Action&lt;T1, T2, T3&gt;](#actiont1-t2-t3-closure) &middot; [Action&lt;T1, T2&gt;](#actiont1-t2-closure) &middot; [Action&lt;T&gt;](#actiont-closure) &middot; [Comparison&lt;T&gt;](#comparisont-closure) &middot; [Fold&lt;TAccumulate, TSource&gt;](#foldtaccumulate-tsource-closure) &middot; [Func&lt;T, TResult&gt;](#funct-tresult-closure) &middot; [Func&lt;T1, T2, T3, T4, TResult&gt;](#funct1-t2-t3-t4-tresult-closure) &middot; [Func&lt;T1, T2, T3, TResult&gt;](#funct1-t2-t3-tresult-closure) &middot; [Func&lt;T1, T2, TResult&gt;](#funct1-t2-tresult-closure) &middot; [Func&lt;TResult&gt;](#functresult-closure) &middot; [Guid](#guid-struct) &middot; [Index](#index-struct) &middot; [Lazy&lt;T&gt;](#lazyt-class) &middot; [LazyThreadSafetyMode](#lazythreadsafetymode-enum) &middot; [Optional&lt;T&gt;](#optionalt-variant) &middot; [ParseError](#parseerror-enum) &middot; [Predicate&lt;T&gt;](#predicatet-closure) &middot; [Range](#range-struct) &middot; [ReadOnlySpan&lt;T&gt;](#readonlyspant-struct) &middot; [Result&lt;T, TError&gt;](#resultt-terror-variant) &middot; [Span&lt;T&gt;](#spant-struct) &middot; [Uri](#uri-class) &middot; [UriKind](#urikind-enum) &middot; [UriPartial](#uripartial-enum) &middot; [Version](#version-struct)
 
 ## Types
+
+### Action *closure*
+
+```
+closure void Action()
+```
+
+Does something and returns nothing.
+
+<sub>[stdlib/Standard/Standard.sl:80](../../stdlib/Standard/Standard.sl#L80)</sub>
+
+### Action&lt;T1, T2, T3, T4&gt; *closure*
+
+```
+closure void Action<in T1, in T2, in T3, in T4>(T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+```
+
+Does something with four values and returns nothing.
+
+**Type parameters**
+
+- `T1` — the first thing handed to it
+- `T2` — the second
+- `T3` — the third
+- `T4` — the fourth
+
+<sub>[stdlib/Standard/Standard.sl:101](../../stdlib/Standard/Standard.sl#L101)</sub>
+
+### Action&lt;T1, T2, T3&gt; *closure*
+
+```
+closure void Action<in T1, in T2, in T3>(T1 arg1, T2 arg2, T3 arg3)
+```
+
+Does something with three values and returns nothing.
+
+**Type parameters**
+
+- `T1` — the first thing handed to it
+- `T2` — the second
+- `T3` — the third
+
+<sub>[stdlib/Standard/Standard.sl:93](../../stdlib/Standard/Standard.sl#L93)</sub>
+
+### Action&lt;T1, T2&gt; *closure*
+
+```
+closure void Action<in T1, in T2>(T1 arg1, T2 arg2)
+```
+
+Does something with two values and returns nothing.
+
+**Type parameters**
+
+- `T1` — the first thing handed to it
+- `T2` — the second
+
+<sub>[stdlib/Standard/Standard.sl:86](../../stdlib/Standard/Standard.sl#L86)</sub>
 
 ### Action&lt;T&gt; *closure*
 
@@ -23,7 +81,7 @@ Does something with a T and returns nothing.
 
 - `T` — what is handed to it
 
-<sub>[stdlib/Standard/Standard.sl:48](../../stdlib/Standard/Standard.sl#L48)</sub>
+<sub>[stdlib/Standard/Standard.sl:77](../../stdlib/Standard/Standard.sl#L77)</sub>
 
 ### Comparison&lt;T&gt; *closure*
 
@@ -41,7 +99,7 @@ that implements no interface be sorted at all.
 
 - `T` — what is being ordered
 
-<sub>[stdlib/Standard/Standard.sl:66](../../stdlib/Standard/Standard.sl#L66)</sub>
+<sub>[stdlib/Standard/Standard.sl:119](../../stdlib/Standard/Standard.sl#L119)</sub>
 
 ### Fold&lt;TAccumulate, TSource&gt; *closure*
 
@@ -62,7 +120,7 @@ because a fold is the one shape that carries something along with it.
 - `TAccumulate` — what is carried along, and what the fold answers with
 - `TSource` — what is folded over
 
-<sub>[stdlib/Standard/Standard.sl:57](../../stdlib/Standard/Standard.sl#L57)</sub>
+<sub>[stdlib/Standard/Standard.sl:110](../../stdlib/Standard/Standard.sl#L110)</sub>
 
 ### Func&lt;T, TResult&gt; *closure*
 
@@ -78,6 +136,303 @@ Turns a T into a TResult. The transform half of `Select`.
 - `TResult` — what comes out
 
 <sub>[stdlib/Standard/Standard.sl:38](../../stdlib/Standard/Standard.sl#L38)</sub>
+
+### Func&lt;T1, T2, T3, T4, TResult&gt; *closure*
+
+```
+closure TResult Func<in T1, in T2, in T3, in T4, out TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+```
+
+Turns four values into a TResult.
+
+**Type parameters**
+
+- `T1` — the first thing that goes in
+- `T2` — the second
+- `T3` — the third
+- `T4` — the fourth
+- `TResult` — what comes out
+
+<sub>[stdlib/Standard/Standard.sl:67](../../stdlib/Standard/Standard.sl#L67)</sub>
+
+### Func&lt;T1, T2, T3, TResult&gt; *closure*
+
+```
+closure TResult Func<in T1, in T2, in T3, out TResult>(T1 arg1, T2 arg2, T3 arg3)
+```
+
+Turns three values into a TResult.
+
+**Type parameters**
+
+- `T1` — the first thing that goes in
+- `T2` — the second
+- `T3` — the third
+- `TResult` — what comes out
+
+<sub>[stdlib/Standard/Standard.sl:58](../../stdlib/Standard/Standard.sl#L58)</sub>
+
+### Func&lt;T1, T2, TResult&gt; *closure*
+
+```
+closure TResult Func<in T1, in T2, out TResult>(T1 arg1, T2 arg2)
+```
+
+Turns two values into a TResult. The combining half of `Zip`.
+
+**Type parameters**
+
+- `T1` — the first thing that goes in
+- `T2` — the second
+- `TResult` — what comes out
+
+<sub>[stdlib/Standard/Standard.sl:50](../../stdlib/Standard/Standard.sl#L50)</sub>
+
+### Func&lt;TResult&gt; *closure*
+
+```
+closure TResult Func<out TResult>()
+```
+
+Produces a TResult from nothing.
+
+**Type parameters**
+
+- `TResult` — what comes out
+
+<sub>[stdlib/Standard/Standard.sl:43](../../stdlib/Standard/Standard.sl#L43)</sub>
+
+### Guid *struct*
+
+```
+struct Guid : IEquatable<Guid>, IComparable<Guid>, IHashable
+```
+
+A 128-bit identifier: C#'s `System.Guid`, and COM's `GUID`.
+
+    var id = Guid.NewGuid();
+    String text = id.ToString();             // 36 characters, in lower case
+
+Laid out as C's `GUID` is -- a 32-bit `_a`, two 16-bit `_b` and `_c`, and
+eight bytes `_d` -- so a `Guid*` is what a COM function takes. The compiler
+declares that layout, because `iidof` and the COM machinery name the type;
+this declaration adds the rest. `ToByteArray` and the constructor from
+bytes use the layout's byte order, as .NET's do, so a value round-trips
+with a .NET program byte for byte; two compare as their text does.
+
+<sub>[stdlib/Standard/Guid.sl:43](../../stdlib/Standard/Guid.sl#L43)</sub>
+
+#### Empty *property*
+
+```
+static Guid Empty { get; }
+```
+
+All zeros.
+
+<sub>[stdlib/Standard/Guid.sl:47](../../stdlib/Standard/Guid.sl#L47)</sub>
+
+#### AllBitsSet *property*
+
+```
+static Guid AllBitsSet { get; }
+```
+
+All ones, the largest.
+
+<sub>[stdlib/Standard/Guid.sl:50](../../stdlib/Standard/Guid.sl#L50)</sub>
+
+#### NewGuid *method*
+
+```
+static Guid NewGuid()
+```
+
+A random one: version 4, 122 random bits. Aborts if the platform will
+supply no entropy, as `RandomNumberGenerator` does.
+
+<sub>[stdlib/Standard/Guid.sl:132](../../stdlib/Standard/Guid.sl#L132)</sub>
+
+#### CreateVersion7 *method*
+
+```
+static Guid CreateVersion7()
+```
+
+A version 7 one: the time in milliseconds first, then random bits, so
+one made later sorts later.
+
+<sub>[stdlib/Standard/Guid.sl:136](../../stdlib/Standard/Guid.sl#L136)</sub>
+
+#### Version *property*
+
+```
+int Version { get; }
+```
+
+Which layout of RFC 9562 this is: 4 for random, 7 for time-ordered.
+
+<sub>[stdlib/Standard/Guid.sl:146](../../stdlib/Standard/Guid.sl#L146)</sub>
+
+#### Variant *property*
+
+```
+int Variant { get; }
+```
+
+The variant bits, 0b10 for every one this makes.
+
+<sub>[stdlib/Standard/Guid.sl:149](../../stdlib/Standard/Guid.sl#L149)</sub>
+
+#### ToByteArray *method*
+
+```
+byte[] ToByteArray()
+```
+
+The sixteen bytes in .NET's order, which is this layout's.
+
+<sub>[stdlib/Standard/Guid.sl:161](../../stdlib/Standard/Guid.sl#L161)</sub>
+
+#### TryWriteBytes *method*
+
+```
+bool TryWriteBytes(Span<byte> destination)
+```
+
+Writes the sixteen bytes in .NET's order when there is room, and answers
+whether there was.
+
+<sub>[stdlib/Standard/Guid.sl:177](../../stdlib/Standard/Guid.sl#L177)</sub>
+
+#### ToString *method*
+
+```
+String ToString()
+```
+
+Hyphenated, in lower case.
+
+<sub>[stdlib/Standard/Guid.sl:187](../../stdlib/Standard/Guid.sl#L187)</sub>
+
+#### ToString *method*
+
+```
+String ToString(String format)
+```
+
+In one of C#'s formats: `N` for 32 digits, `D` for hyphens between the
+groups, `B` for that in braces, `P` in parentheses. Aborts on any other.
+
+**Parameters**
+
+- `format` — "N", "D", "B" or "P", in either case
+
+<sub>[stdlib/Standard/Guid.sl:193](../../stdlib/Standard/Guid.sl#L193)</sub>
+
+#### Parse *method*
+
+```
+static Result<Guid, ParseError> Parse(String text)
+```
+
+Reads any of the formats `ToString` writes, in either case.
+
+**Parameters**
+
+- `text` — 32 hex digits, with or without hyphens, braces or parentheses
+
+<sub>[stdlib/Standard/Guid.sl:226](../../stdlib/Standard/Guid.sl#L226)</sub>
+
+#### Equals *method*
+
+```
+bool Equals(Guid other)
+```
+
+Whether the two are the same sixteen bytes.
+
+<sub>[stdlib/Standard/Guid.sl:276](../../stdlib/Standard/Guid.sl#L276)</sub>
+
+#### CompareTo *method*
+
+```
+int CompareTo(Guid other)
+```
+
+Byte by byte in text order, which is the order their text sorts in.
+
+<sub>[stdlib/Standard/Guid.sl:279](../../stdlib/Standard/Guid.sl#L279)</sub>
+
+#### GetHashCode *method*
+
+```
+nuint GetHashCode()
+```
+
+*No documentation.*
+
+<sub>[stdlib/Standard/Guid.sl:291](../../stdlib/Standard/Guid.sl#L291)</sub>
+
+#### operator == *operator*
+
+```
+static bool operator ==(Guid left, Guid right)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Standard/Guid.sl:299](../../stdlib/Standard/Guid.sl#L299)</sub>
+
+#### operator != *operator*
+
+```
+static bool operator !=(Guid left, Guid right)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Standard/Guid.sl:300](../../stdlib/Standard/Guid.sl#L300)</sub>
+
+#### operator &lt; *operator*
+
+```
+static bool operator <(Guid left, Guid right)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Standard/Guid.sl:301](../../stdlib/Standard/Guid.sl#L301)</sub>
+
+#### operator &gt; *operator*
+
+```
+static bool operator >(Guid left, Guid right)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Standard/Guid.sl:302](../../stdlib/Standard/Guid.sl#L302)</sub>
+
+#### operator &lt;= *operator*
+
+```
+static bool operator <=(Guid left, Guid right)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Standard/Guid.sl:303](../../stdlib/Standard/Guid.sl#L303)</sub>
+
+#### operator &gt;= *operator*
+
+```
+static bool operator >=(Guid left, Guid right)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Standard/Guid.sl:304](../../stdlib/Standard/Guid.sl#L304)</sub>
 
 ### Index *struct*
 
@@ -158,6 +513,88 @@ static Index operator Identifier(nuint value)
 A position counted from the start, so `Index i = 3;` reads as it does in C#.
 
 <sub>[stdlib/Standard/Index.sl:64](../../stdlib/Standard/Index.sl#L64)</sub>
+
+### Lazy&lt;T&gt; *class*
+
+```
+threadsafe class Lazy<T>
+```
+
+A value made the first time it is asked for: C#'s `System.Lazy<T>`.
+
+    var table = new Lazy<Dictionary<String, int>>(() => LoadTable());
+    int n = table.Value.GetValue("key");     // loaded here, once
+
+By default the factory runs once however many threads ask at once, and the
+others wait for it; `LazyThreadSafetyMode` says otherwise. A factory that
+reads the `Value` it is making aborts, where C#'s throws.
+
+**Type parameters**
+
+- `T` — what is made; nothing is asked of it
+
+<sub>[stdlib/Standard/Lazy.sl:43](../../stdlib/Standard/Lazy.sl#L43)</sub>
+
+#### IsValueCreated *property*
+
+```
+bool IsValueCreated { get; }
+```
+
+Whether the value has been made yet.
+
+<sub>[stdlib/Standard/Lazy.sl:89](../../stdlib/Standard/Lazy.sl#L89)</sub>
+
+#### Value *property*
+
+```
+T Value { get; }
+```
+
+The value, made now if it has not been.
+
+<sub>[stdlib/Standard/Lazy.sl:104](../../stdlib/Standard/Lazy.sl#L104)</sub>
+
+### LazyThreadSafetyMode *enum*
+
+```
+enum LazyThreadSafetyMode
+```
+
+How a `Lazy<T>` behaves when two threads ask for its value at once.
+
+<sub>[stdlib/Standard/LazyThreadSafetyMode.sl:25](../../stdlib/Standard/LazyThreadSafetyMode.sl#L25)</sub>
+
+#### None *case*
+
+```
+None
+```
+
+Not at all: it is for one thread, and costs no lock.
+
+<sub>[stdlib/Standard/LazyThreadSafetyMode.sl:28](../../stdlib/Standard/LazyThreadSafetyMode.sl#L28)</sub>
+
+#### PublicationOnly *case*
+
+```
+PublicationOnly
+```
+
+Each may run the factory, and the first to finish is the value everyone
+gets.
+
+<sub>[stdlib/Standard/LazyThreadSafetyMode.sl:32](../../stdlib/Standard/LazyThreadSafetyMode.sl#L32)</sub>
+
+#### ExecutionAndPublication *case*
+
+```
+ExecutionAndPublication
+```
+
+The factory runs once, and the others wait for it. The default.
+
+<sub>[stdlib/Standard/LazyThreadSafetyMode.sl:35](../../stdlib/Standard/LazyThreadSafetyMode.sl#L35)</sub>
 
 ### Optional&lt;T&gt; *variant*
 
@@ -340,6 +777,47 @@ Runs `action` on the value, if there is one.
 
 <sub>[stdlib/Standard/Optional.sl:164](../../stdlib/Standard/Optional.sl#L164)</sub>
 
+### ParseError *enum*
+
+```
+enum ParseError
+```
+
+Why text could not be read as a value: what C#'s `FormatException` and
+`OverflowException` say, as the error of a `Result`.
+
+<sub>[stdlib/Standard/ParseError.sl:27](../../stdlib/Standard/ParseError.sl#L27)</sub>
+
+#### Empty *case*
+
+```
+Empty
+```
+
+There was nothing to read.
+
+<sub>[stdlib/Standard/ParseError.sl:30](../../stdlib/Standard/ParseError.sl#L30)</sub>
+
+#### Malformed *case*
+
+```
+Malformed
+```
+
+Not the shape the value is written in.
+
+<sub>[stdlib/Standard/ParseError.sl:33](../../stdlib/Standard/ParseError.sl#L33)</sub>
+
+#### OutOfRange *case*
+
+```
+OutOfRange
+```
+
+The right shape, and a number in it too large to hold.
+
+<sub>[stdlib/Standard/ParseError.sl:36](../../stdlib/Standard/ParseError.sl#L36)</sub>
+
 ### Predicate&lt;T&gt; *closure*
 
 ```
@@ -352,7 +830,7 @@ Answers a question about a T.
 
 - `T` — what the question is about
 
-<sub>[stdlib/Standard/Standard.sl:43](../../stdlib/Standard/Standard.sl#L43)</sub>
+<sub>[stdlib/Standard/Standard.sl:72](../../stdlib/Standard/Standard.sl#L72)</sub>
 
 ### Range *struct*
 
@@ -855,4 +1333,731 @@ static bool operator !=(Span<T> left, Span<T> right)
 Whether the two are not the same elements of the same array.
 
 <sub>[stdlib/Standard/Span.sl:166](../../stdlib/Standard/Span.sl#L166)</sub>
+
+### Uri *class*
+
+```
+sealed class Uri : IEquatable<Uri>, IHashable
+```
+
+A URI, read by RFC 3986: C#'s `System.Uri`.
+
+    var page = new Uri("https://example.com/docs/guide/intro.html?v=2#top");
+    page.Host;                               // "example.com"
+    new Uri(page, "../api/").AbsoluteUri;    // "https://example.com/docs/api/"
+
+An absolute one is kept in its normal form: the scheme and host in lower
+case, `.` and `..` segments resolved, the scheme's default port dropped,
+and a character that may not appear escaped. A Windows path or a UNC path
+reads as a `file:` URI, as in C#. A relative one is kept as written, and
+asking it for a part only an absolute URI has aborts, where C#'s throws.
+
+`TryCreate` answers with a `Result`; the constructors abort on what is not a
+URI, as C#'s throw.
+
+<sub>[stdlib/Standard/Uri.sl:40](../../stdlib/Standard/Uri.sl#L40)</sub>
+
+#### TryCreate *method*
+
+```
+static Result<Uri, ParseError> TryCreate(String text, UriKind kind)
+```
+
+`text` read as `kind` says, or why it could not be.
+
+<sub>[stdlib/Standard/Uri.sl:92](../../stdlib/Standard/Uri.sl#L92)</sub>
+
+#### TryCreate *method*
+
+```
+static Result<Uri, ParseError> TryCreate(Uri baseUri, String relative)
+```
+
+`relative` resolved against `baseUri`, or why it could not be.
+
+<sub>[stdlib/Standard/Uri.sl:103](../../stdlib/Standard/Uri.sl#L103)</sub>
+
+#### IsWellFormedUriString *method*
+
+```
+static bool IsWellFormedUriString(String text, UriKind kind)
+```
+
+Whether `text` reads as `kind` says.
+
+<sub>[stdlib/Standard/Uri.sl:113](../../stdlib/Standard/Uri.sl#L113)</sub>
+
+#### UriSchemeHttp *property*
+
+```
+static String UriSchemeHttp { get; }
+```
+
+*No documentation.*
+
+<sub>[stdlib/Standard/Uri.sl:130](../../stdlib/Standard/Uri.sl#L130)</sub>
+
+#### UriSchemeHttps *property*
+
+```
+static String UriSchemeHttps { get; }
+```
+
+*No documentation.*
+
+<sub>[stdlib/Standard/Uri.sl:131](../../stdlib/Standard/Uri.sl#L131)</sub>
+
+#### UriSchemeFile *property*
+
+```
+static String UriSchemeFile { get; }
+```
+
+*No documentation.*
+
+<sub>[stdlib/Standard/Uri.sl:132](../../stdlib/Standard/Uri.sl#L132)</sub>
+
+#### UriSchemeFtp *property*
+
+```
+static String UriSchemeFtp { get; }
+```
+
+*No documentation.*
+
+<sub>[stdlib/Standard/Uri.sl:133](../../stdlib/Standard/Uri.sl#L133)</sub>
+
+#### UriSchemeMailto *property*
+
+```
+static String UriSchemeMailto { get; }
+```
+
+*No documentation.*
+
+<sub>[stdlib/Standard/Uri.sl:134](../../stdlib/Standard/Uri.sl#L134)</sub>
+
+#### UriSchemeWs *property*
+
+```
+static String UriSchemeWs { get; }
+```
+
+*No documentation.*
+
+<sub>[stdlib/Standard/Uri.sl:135](../../stdlib/Standard/Uri.sl#L135)</sub>
+
+#### UriSchemeWss *property*
+
+```
+static String UriSchemeWss { get; }
+```
+
+*No documentation.*
+
+<sub>[stdlib/Standard/Uri.sl:136](../../stdlib/Standard/Uri.sl#L136)</sub>
+
+#### CheckSchemeName *method*
+
+```
+static bool CheckSchemeName(String name)
+```
+
+Whether `name` is a scheme: a letter, then letters, digits, `+`, `-` and `.`.
+
+<sub>[stdlib/Standard/Uri.sl:155](../../stdlib/Standard/Uri.sl#L155)</sub>
+
+#### EscapeDataString *method*
+
+```
+static String EscapeDataString(String text)
+```
+
+`text` with everything but letters, digits and `-._~` escaped, as a
+query value or a path segment needs.
+
+<sub>[stdlib/Standard/Uri.sl:424](../../stdlib/Standard/Uri.sl#L424)</sub>
+
+#### UnescapeDataString *method*
+
+```
+static String UnescapeDataString(String text)
+```
+
+`text` with every `%XX` replaced by the byte it stands for.
+
+<sub>[stdlib/Standard/Uri.sl:439](../../stdlib/Standard/Uri.sl#L439)</sub>
+
+#### IsAbsoluteUri *property*
+
+```
+bool IsAbsoluteUri { get; }
+```
+
+Whether it names a scheme.
+
+<sub>[stdlib/Standard/Uri.sl:491](../../stdlib/Standard/Uri.sl#L491)</sub>
+
+#### OriginalString *property*
+
+```
+String OriginalString { get; }
+```
+
+What it was made from, unchanged.
+
+<sub>[stdlib/Standard/Uri.sl:494](../../stdlib/Standard/Uri.sl#L494)</sub>
+
+#### Scheme *property*
+
+```
+String Scheme { get; }
+```
+
+`https`, in lower case.
+
+<sub>[stdlib/Standard/Uri.sl:497](../../stdlib/Standard/Uri.sl#L497)</sub>
+
+#### UserInfo *property*
+
+```
+String UserInfo { get; }
+```
+
+What came before an `@` in the authority, or "".
+
+<sub>[stdlib/Standard/Uri.sl:507](../../stdlib/Standard/Uri.sl#L507)</sub>
+
+#### Host *property*
+
+```
+String Host { get; }
+```
+
+The host, in lower case, bracketed when it is an IPv6 address.
+
+<sub>[stdlib/Standard/Uri.sl:517](../../stdlib/Standard/Uri.sl#L517)</sub>
+
+#### Port *property*
+
+```
+int Port { get; }
+```
+
+The port, the scheme's default when none was written, and -1 when the
+scheme has none.
+
+<sub>[stdlib/Standard/Uri.sl:528](../../stdlib/Standard/Uri.sl#L528)</sub>
+
+#### IsDefaultPort *property*
+
+```
+bool IsDefaultPort { get; }
+```
+
+Whether the port is the one the scheme means anyway.
+
+<sub>[stdlib/Standard/Uri.sl:538](../../stdlib/Standard/Uri.sl#L538)</sub>
+
+#### Authority *property*
+
+```
+String Authority { get; }
+```
+
+The host, and the port when it is not the default.
+
+<sub>[stdlib/Standard/Uri.sl:548](../../stdlib/Standard/Uri.sl#L548)</sub>
+
+#### AbsolutePath *property*
+
+```
+String AbsolutePath { get; }
+```
+
+The path, escaped, `/` when an authority was given with none.
+
+<sub>[stdlib/Standard/Uri.sl:558](../../stdlib/Standard/Uri.sl#L558)</sub>
+
+#### Query *property*
+
+```
+String Query { get; }
+```
+
+`?` and what follows it up to the fragment, or "".
+
+<sub>[stdlib/Standard/Uri.sl:568](../../stdlib/Standard/Uri.sl#L568)</sub>
+
+#### Fragment *property*
+
+```
+String Fragment { get; }
+```
+
+`#` and what follows it, or "".
+
+<sub>[stdlib/Standard/Uri.sl:578](../../stdlib/Standard/Uri.sl#L578)</sub>
+
+#### PathAndQuery *property*
+
+```
+String PathAndQuery { get; }
+```
+
+The path and the query.
+
+<sub>[stdlib/Standard/Uri.sl:588](../../stdlib/Standard/Uri.sl#L588)</sub>
+
+#### AbsoluteUri *property*
+
+```
+String AbsoluteUri { get; }
+```
+
+The whole of it, in normal form.
+
+<sub>[stdlib/Standard/Uri.sl:598](../../stdlib/Standard/Uri.sl#L598)</sub>
+
+#### Segments *property*
+
+```
+String[] Segments { get; }
+```
+
+The path's segments, each with the `/` that ends it: `/a/b` is `/`,
+`a/` and `b`.
+
+<sub>[stdlib/Standard/Uri.sl:609](../../stdlib/Standard/Uri.sl#L609)</sub>
+
+#### IsFile *property*
+
+```
+bool IsFile { get; }
+```
+
+Whether the scheme is `file`.
+
+<sub>[stdlib/Standard/Uri.sl:630](../../stdlib/Standard/Uri.sl#L630)</sub>
+
+#### IsUnc *property*
+
+```
+bool IsUnc { get; }
+```
+
+Whether it is a `file:` URI naming a machine, as a UNC path does.
+
+<sub>[stdlib/Standard/Uri.sl:640](../../stdlib/Standard/Uri.sl#L640)</sub>
+
+#### IsLoopback *property*
+
+```
+bool IsLoopback { get; }
+```
+
+Whether the host is this machine.
+
+<sub>[stdlib/Standard/Uri.sl:650](../../stdlib/Standard/Uri.sl#L650)</sub>
+
+#### LocalPath *property*
+
+```
+String LocalPath { get; }
+```
+
+The path as the operating system writes it, unescaped: a Windows path
+or a UNC path for a `file:` URI there, and the path elsewhere.
+
+<sub>[stdlib/Standard/Uri.sl:662](../../stdlib/Standard/Uri.sl#L662)</sub>
+
+#### GetLeftPart *method*
+
+```
+String GetLeftPart(UriPartial part)
+```
+
+As much of it as `part` says, from the left.
+
+**Parameters**
+
+- `part` — up to the scheme, the authority, the path or the query
+
+<sub>[stdlib/Standard/Uri.sl:686](../../stdlib/Standard/Uri.sl#L686)</sub>
+
+#### IsBaseOf *method*
+
+```
+bool IsBaseOf(Uri uri)
+```
+
+Whether `uri` is at or below where this points: the same scheme and
+authority, and a path inside this one's directory.
+
+**Parameters**
+
+- `uri` — the URI that may be below this one
+
+<sub>[stdlib/Standard/Uri.sl:708](../../stdlib/Standard/Uri.sl#L708)</sub>
+
+#### MakeRelativeUri *method*
+
+```
+Uri MakeRelativeUri(Uri uri)
+```
+
+The relative URI that `uri` is from here: `uri` itself when the two do
+not share a scheme and authority.
+
+**Parameters**
+
+- `uri` — where the result leads, resolved against this
+
+<sub>[stdlib/Standard/Uri.sl:726](../../stdlib/Standard/Uri.sl#L726)</sub>
+
+#### ToString *method*
+
+```
+String ToString()
+```
+
+The whole of it in normal form, or a relative one as it was written.
+
+<sub>[stdlib/Standard/Uri.sl:750](../../stdlib/Standard/Uri.sl#L750)</sub>
+
+#### Equals *method*
+
+```
+bool Equals(Uri other)
+```
+
+Whether the two name the same resource: equal in everything but the
+fragment and the user, as C# compares them.
+
+<sub>[stdlib/Standard/Uri.sl:754](../../stdlib/Standard/Uri.sl#L754)</sub>
+
+#### GetHashCode *method*
+
+```
+nuint GetHashCode()
+```
+
+*No documentation.*
+
+<sub>[stdlib/Standard/Uri.sl:764](../../stdlib/Standard/Uri.sl#L764)</sub>
+
+#### operator == *operator*
+
+```
+static bool operator ==(Uri left, Uri right)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Standard/Uri.sl:773](../../stdlib/Standard/Uri.sl#L773)</sub>
+
+#### operator != *operator*
+
+```
+static bool operator !=(Uri left, Uri right)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Standard/Uri.sl:774](../../stdlib/Standard/Uri.sl#L774)</sub>
+
+### UriKind *enum*
+
+```
+enum UriKind
+```
+
+What a `Uri` is allowed to be read as.
+
+<sub>[stdlib/Standard/UriKind.sl:25](../../stdlib/Standard/UriKind.sl#L25)</sub>
+
+#### RelativeOrAbsolute *case*
+
+```
+RelativeOrAbsolute
+```
+
+Either: absolute when it names a scheme, relative when it does not.
+
+<sub>[stdlib/Standard/UriKind.sl:28](../../stdlib/Standard/UriKind.sl#L28)</sub>
+
+#### Absolute *case*
+
+```
+Absolute
+```
+
+With a scheme, as `https://example.com/`.
+
+<sub>[stdlib/Standard/UriKind.sl:31](../../stdlib/Standard/UriKind.sl#L31)</sub>
+
+#### Relative *case*
+
+```
+Relative
+```
+
+Without one, as `../images/logo.png`.
+
+<sub>[stdlib/Standard/UriKind.sl:34](../../stdlib/Standard/UriKind.sl#L34)</sub>
+
+### UriPartial *enum*
+
+```
+enum UriPartial
+```
+
+How much of a `Uri` `GetLeftPart` keeps.
+
+<sub>[stdlib/Standard/UriPartial.sl:25](../../stdlib/Standard/UriPartial.sl#L25)</sub>
+
+#### Scheme *case*
+
+```
+Scheme
+```
+
+`https://`.
+
+<sub>[stdlib/Standard/UriPartial.sl:28](../../stdlib/Standard/UriPartial.sl#L28)</sub>
+
+#### Authority *case*
+
+```
+Authority
+```
+
+`https://user@example.com:8080`.
+
+<sub>[stdlib/Standard/UriPartial.sl:31](../../stdlib/Standard/UriPartial.sl#L31)</sub>
+
+#### Path *case*
+
+```
+Path
+```
+
+And the path.
+
+<sub>[stdlib/Standard/UriPartial.sl:34](../../stdlib/Standard/UriPartial.sl#L34)</sub>
+
+#### Query *case*
+
+```
+Query
+```
+
+And the query.
+
+<sub>[stdlib/Standard/UriPartial.sl:37](../../stdlib/Standard/UriPartial.sl#L37)</sub>
+
+### Version *struct*
+
+```
+struct Version : IEquatable<Version>, IComparable<Version>, IHashable
+```
+
+A version number of two to four parts: C#'s `System.Version`.
+
+    var version = Version.Parse("1.4.2").GetValue();
+    if (version >= new Version(1, 4)) { ... }
+
+`Build` and `Revision` are -1 when the version was written without them,
+and a version without a part comes before one with it: 1.4 is before 1.4.0.
+
+<sub>[stdlib/Standard/Version.sl:34](../../stdlib/Standard/Version.sl#L34)</sub>
+
+#### Major *property*
+
+```
+int Major { get; }
+```
+
+The first part.
+
+<sub>[stdlib/Standard/Version.sl:37](../../stdlib/Standard/Version.sl#L37)</sub>
+
+#### Minor *property*
+
+```
+int Minor { get; }
+```
+
+The second part.
+
+<sub>[stdlib/Standard/Version.sl:40](../../stdlib/Standard/Version.sl#L40)</sub>
+
+#### Build *property*
+
+```
+int Build { get; }
+```
+
+The third part, or -1 when there is none.
+
+<sub>[stdlib/Standard/Version.sl:43](../../stdlib/Standard/Version.sl#L43)</sub>
+
+#### Revision *property*
+
+```
+int Revision { get; }
+```
+
+The fourth part, or -1 when there is none.
+
+<sub>[stdlib/Standard/Version.sl:46](../../stdlib/Standard/Version.sl#L46)</sub>
+
+#### MajorRevision *property*
+
+```
+short MajorRevision { get; }
+```
+
+The high 16 bits of `Revision`.
+
+<sub>[stdlib/Standard/Version.sl:68](../../stdlib/Standard/Version.sl#L68)</sub>
+
+#### MinorRevision *property*
+
+```
+short MinorRevision { get; }
+```
+
+The low 16 bits of `Revision`.
+
+<sub>[stdlib/Standard/Version.sl:71](../../stdlib/Standard/Version.sl#L71)</sub>
+
+#### Parse *method*
+
+```
+static Result<Version, ParseError> Parse(String text)
+```
+
+Reads two to four parts separated by dots.
+
+**Parameters**
+
+- `text` — the version, as `ToString` writes it
+
+<sub>[stdlib/Standard/Version.sl:76](../../stdlib/Standard/Version.sl#L76)</sub>
+
+#### ToString *method*
+
+```
+String ToString()
+```
+
+The parts that were given, joined by dots.
+
+<sub>[stdlib/Standard/Version.sl:98](../../stdlib/Standard/Version.sl#L98)</sub>
+
+#### ToString *method*
+
+```
+String ToString(int fieldCount)
+```
+
+The first `fieldCount` parts, joined by dots. Aborts when that is more
+parts than there are.
+
+**Parameters**
+
+- `fieldCount` — from 0 to 4
+
+<sub>[stdlib/Standard/Version.sl:104](../../stdlib/Standard/Version.sl#L104)</sub>
+
+#### Equals *method*
+
+```
+bool Equals(Version other)
+```
+
+Whether the two have the same parts.
+
+<sub>[stdlib/Standard/Version.sl:122](../../stdlib/Standard/Version.sl#L122)</sub>
+
+#### CompareTo *method*
+
+```
+int CompareTo(Version other)
+```
+
+Part by part, a missing part first.
+
+<sub>[stdlib/Standard/Version.sl:126](../../stdlib/Standard/Version.sl#L126)</sub>
+
+#### GetHashCode *method*
+
+```
+nuint GetHashCode()
+```
+
+*No documentation.*
+
+<sub>[stdlib/Standard/Version.sl:135](../../stdlib/Standard/Version.sl#L135)</sub>
+
+#### operator == *operator*
+
+```
+static bool operator ==(Version left, Version right)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Standard/Version.sl:138](../../stdlib/Standard/Version.sl#L138)</sub>
+
+#### operator != *operator*
+
+```
+static bool operator !=(Version left, Version right)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Standard/Version.sl:139](../../stdlib/Standard/Version.sl#L139)</sub>
+
+#### operator &lt; *operator*
+
+```
+static bool operator <(Version left, Version right)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Standard/Version.sl:140](../../stdlib/Standard/Version.sl#L140)</sub>
+
+#### operator &gt; *operator*
+
+```
+static bool operator >(Version left, Version right)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Standard/Version.sl:141](../../stdlib/Standard/Version.sl#L141)</sub>
+
+#### operator &lt;= *operator*
+
+```
+static bool operator <=(Version left, Version right)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Standard/Version.sl:142](../../stdlib/Standard/Version.sl#L142)</sub>
+
+#### operator &gt;= *operator*
+
+```
+static bool operator >=(Version left, Version right)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Standard/Version.sl:143](../../stdlib/Standard/Version.sl#L143)</sub>
 

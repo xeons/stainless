@@ -15,7 +15,7 @@ using Me = Me;                                  // SL0522
 public class Nope;                              // SL0523
 public union Never;                             // SL0523 (and SL0467, which is also true)
 public struct Generic<T>;                       // SL0523
-public struct Implements__ : IThing;            // SL0302, which says it all
+public struct Implements__ : IThing;            // SL0305: nothing to answer Go
 
 public interface IThing { int Go(); }
 

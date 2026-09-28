@@ -5,7 +5,7 @@ public struct Rect
 {
     public int Width { get; set; }
 
-    // A struct has no constructor, so nothing could ever fill this in.
+    // No constructor is declared, so nothing could ever fill this in.
     public int Height { get; }
 }
 

@@ -316,21 +316,30 @@ public sealed partial class Binder
     }
 
     /// <summary>
-    /// A class's own text through <c>IFormattable.ToText</c>, or null when the
-    /// value's type does not implement it. The call goes through the
-    /// interface, so a derived class's override is the one that writes.
+    /// A value's own text through <c>IFormattable.ToText</c>, or null when its
+    /// type does not implement it. A class's call goes through the interface,
+    /// so a derived class's override is the one that writes.
     /// </summary>
     private BoundExpression? AsFormattable(BoundExpression value, string format, SourceSpan span)
     {
+        var formattable = _builtins.Formattable;
+        var toText = formattable.FindMethod("ToText")!;
+
+        // A struct is never a reference to the interface, so its own method is
+        // called, on the value where it is.
+        if (value.Type is StructTypeSymbol structType && structType.AllInterfaces().Contains(formattable) &&
+            structType.FindImplementation(toText) is { } own)
+            return new BoundCall(span, own,
+                new BoundAddressOf(span, structType.MakePointerType(), value),
+                [new BoundStringLiteral(span, _builtins.String, format)]);
+
         if (value.Type is not (ClassTypeSymbol or InterfaceTypeSymbol))
             return null;
 
-        var formattable = _builtins.Formattable;
         if (!IsImplicitlyConvertible(value, formattable)) return null;
 
-        var method = formattable.FindMethod("ToText")!;
         var receiver = BindConversion(value, formattable, span);
-        return new BoundCall(span, method, receiver,
+        return new BoundCall(span, toText, receiver,
             [new BoundStringLiteral(span, _builtins.String, format)]);
     }
 
@@ -1859,7 +1868,8 @@ public sealed partial class Binder
 
         // Both arms wait for where the whole is going, and settle there.
         if (IsTargetTyped(whenTrue) && IsTargetTyped(whenFalse) ||
-            whenTrue is BoundArrayDraft && whenFalse is BoundArrayDraft)
+            whenTrue is BoundArrayDraft && whenFalse is BoundArrayDraft ||
+            whenTrue is BoundVariantDraft && whenFalse is BoundVariantDraft)
             return new BoundConditional(syntax.Span, type, condition, whenTrue, whenFalse);
 
         return new BoundConditional(
@@ -2784,7 +2794,10 @@ public sealed partial class Binder
                 _context.Function is { Kind: FunctionKind.Constructor } ctor &&
                 ctor.ContainingType == property.ContainingType)
             {
-                storage = new BoundFieldAccess(span, receiver, field);
+                // A struct's accessor takes its receiver by address, and the
+                // backing field is in the struct itself.
+                var holder = receiver is BoundAddressOf { Operand: var place } ? place : receiver;
+                storage = new BoundFieldAccess(span, holder, field);
                 return true;
             }
 

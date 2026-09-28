@@ -921,7 +921,9 @@ standard library uses as a local.
 The conditional `a ? b : c` evaluates only the arm it selects, and groups to
 the right, so `a ? b : c ? d : e` reads as `a ? b : (c ? d : e)`. Its arms must
 meet at one type: the same type, a common numeric type, or one that the other
-converts to implicitly.
+converts to implicitly. Two arms that have no type until they are told one --
+`default`, `new(...)`, array literals, and variant cases such as
+`ok ? Ok(value) : Fail(why)` -- take the type the whole is going to.
 
 Conditions must be `bool`; there is no implicit int-to-bool conversion.
 There are no implicit narrowing conversions. Widening integer conversions and

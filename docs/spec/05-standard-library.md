@@ -62,6 +62,24 @@ is the measure of how completely the compiler is leaving the job to the linker.
 | `Standard.Com` | `Guid` and `IUnknown`, for `com interface` ([§8.5](08-interop-libraries.md#85-com)) | on request |
 | `Standard` | `Result<T, TError>`, `[Flags]`, and the rest of what the language itself reads | automatically |
 
+### 5.1.1 What `Standard` holds
+
+`Standard` is imported everywhere, so what is in it is the language's own
+vocabulary: `Optional`, `Result`, `Index`, `Range`, `Span<T>` and
+`ReadOnlySpan<T>` ([§2.12](02-types.md#212-spant-and-readonlyspant--part-of-an-array)),
+the `Func`, `Action`, `Predicate` and `Comparison` a lambda becomes, and C#'s
+everyday values:
+
+| | |
+|---|---|
+| `Guid` | 128 bits, laid out as COM's `GUID` so a `Guid*` is what a COM function takes; `NewGuid`, `CreateVersion7`, `Parse` and the `N`, `D`, `B` and `P` formats; `ToByteArray` in .NET's byte order |
+| `Version` | two to four parts, `Parse`, ordered part by part with a missing part first |
+| `Uri` | RFC 3986: kept normal, resolved against a base, escaped and unescaped; `Host`, `Port`, `AbsolutePath`, `Segments`, `MakeRelativeUri`, `IsBaseOf`; a Windows or UNC path reads as a `file:` URI |
+| `Lazy<T>` | made on first ask, once, with C#'s three `LazyThreadSafetyMode`s |
+
+Each parses into a `Result` with a `ParseError` rather than throwing, and a
+constructor given what cannot be one aborts, as C#'s throws.
+
 ## 5.2 `Standard.Threading`
 
 Locks, atomics and a job pool, over the runtime in
@@ -366,12 +384,32 @@ long total = Aggregate(numbers, (long)0, (sum, n) => sum + (long)n);
 Sort(people, (a, b) => a.Age - b.Age);
 ```
 
-`Select`, `Where`, `Aggregate`, `Any`, `All`, `Count`, `Find`, `FirstOrDefault`,
-`FindIndex`, `ForEach`, `Take`, `Skip`, `Distinct`, `OrderBy`, `ToList` and
-`ToArray`, each over a `ReadOnlySpan<T>` — which an array and a `Span<T>`
-convert to — and over any
-`IEnumerable<T>`. They are named as LINQ names them, so a reader arriving from
-C# has nothing to translate.
+LINQ's operators, each over a `ReadOnlySpan<T>` — which an array and a
+`Span<T>` convert to — and over any `IEnumerable<T>`, named as LINQ names
+them, so a reader arriving from C# has nothing to translate:
+
+| | |
+|---|---|
+| filtering and shaping | `Where`, `Select`, `SelectMany`, `Distinct`, `DistinctBy` |
+| one element | `First`, `Last`, `Single` and their `OrDefault` forms, `ElementAt`, `ElementAtOrDefault`, `Find`, `FindIndex` |
+| asking | `Any`, `All`, `Count`, `Contains`, `SequenceEqual` |
+| reducing | `Sum`, `Average`, `Min`, `Max`, `MinBy`, `MaxBy`, `Aggregate` |
+| ordering | `OrderBy`, `OrderByDescending`, `Order`, `OrderDescending`, then `ThenBy` and `ThenByDescending` |
+| grouping and gathering | `GroupBy`, `ToDictionary`, `ToHashSet`, `ToList`, `ToArray` |
+| cutting | `Take`, `Skip`, `TakeWhile`, `SkipWhile`, `TakeLast`, `SkipLast`, `Chunk` |
+| joining and comparing | `Concat`, `Append`, `Prepend`, `Zip`, `Union`, `Intersect`, `Except` and their `By` forms |
+| making | `Enumerable.Range`, `Enumerable.Repeat`, `Enumerable.Empty` |
+
+Where C# throws — `First` of nothing, `Single` of two, `Average` of nothing,
+`ToDictionary` given a key twice — these abort, as an index out of range
+does, and an integer `Sum` is `checked`. An `OrDefault` form takes the value to
+answer instead, since a struct has no null. `Sum` and `Average` come for
+`int`, `long`, `float` and `double`, each with a selector form, and a lambda
+picks between those by what it returns
+([§4.4](04-generics.md#44-what-is-and-is-not-supported)). `OrderBy` answers
+with an `OrderedList<T>`, a `List<T>` that remembers its order so that
+`ThenBy` can break its ties; `GroupBy` with `Grouping<TKey, T>`s, each a
+sequence with its `Key`, in the order their keys were first met.
 
 **`Find` and `FindIndex` answer with an `Optional`** ([§2.8.1](02-types.md#281-optionalt--a-value-or-none)), and so does
 `Collections.IndexOf`: a length standing in for "not there" is the sentinel
@@ -474,6 +512,37 @@ It is **not cryptographic** — xoshiro256** is fast and its whole future
 follows from its state, which is what makes a seeded run reproducible and what
 makes it unfit for a key. `Random.FillSecureBytes` goes straight to the platform's
 source for that.
+
+### 5.6.1 Dates, times of day and time zones
+
+`DateOnly` and `TimeOnly` are C#'s: a Gregorian date from 0001-01-01 to
+9999-12-31, and a time of day to the nanosecond, each a struct that sorts and
+keys a set. Both are written and read as ISO 8601 — `2026-09-30`, `14:30:00` —
+rather than in a culture's form, and a date that does not exist, or an hour of
+24, aborts where C# throws. `DayOfWeek` is an `int`, 0 for Sunday, as
+`DateTime.DayOfWeek` is.
+
+**`TimeZoneInfo` is the platform's zones.** On Linux and macOS it reads the IANA
+database from `/usr/share/zoneinfo` (or `TZDIR`) itself, TZif file and POSIX
+rule both, and names each zone as that database does. On Windows it asks the
+system for each zone's rule by the year, and names zones by their registry
+keys; an IANA name finds the zone it maps to through the ICU that Windows 10
+carries, as `TryConvertIanaIdToWindowsId` does.
+
+```csharp
+if (TimeZoneInfo.FindSystemTimeZoneById("Europe/Paris") is Ok paris)
+{
+    DateTime there = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, paris.Value);
+    TimeSpan offset = paris.Value.GetUtcOffset(DateTimeOffset.UtcNow);
+}
+```
+
+`DateTimeOffset` here is an instant with no offset of its own, so what a zone
+converts one to is the `DateTime` its clocks read, where C# answers with a
+`DateTimeOffset` carrying the offset. The other way, `ConvertTimeToUtc`, is a
+`Result`: a wall-clock time the zone skips is `TimeError.Invalid`, where C#
+throws, and one it reads twice is taken as standard time, as C# takes it.
+`IsInvalidTime` and `IsAmbiguousTime` ask the same thing without converting.
 
 ## 5.7 `Standard.Math`
 

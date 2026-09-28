@@ -245,10 +245,10 @@ promise, checked where `Money` says it implements `IAdditive<Money>` (SL0305),
 and the default a `static virtual` member falls back on — found by `T.Twice`
 when `Money` declares no `Twice` of its own.
 
-**A struct may implement such an interface** when every member of it is
-static, since nothing about one is reached through a reference. An interface
-with an instance member is still refused to a struct (SL0302), for the reason
-[§2.10](02-types.md#210-interface--a-contract-dispatched-dynamically) gives.
+**A struct may implement such an interface**, as it may any other
+([§2.10](02-types.md#210-interface--a-contract-dispatched-dynamically)): a
+static requirement is a promise about the type, and an instance one is met by
+the struct's own member where a generic reaches it.
 
 **Reached through a type parameter, not through the interface** (SL0797),
 which is C#'s rule: `IAdditive<Money>.Zero` names a requirement, and the
@@ -326,6 +326,12 @@ generic delegates and closures ([§2.14.1](02-types.md#2141-closure--a-method-an
 generic types nested in one another (`List<Box<int>>`), and self-referential
 templates such as `class Node<T> { Node<T>? next; }`.
 
+**A generic name is declared once per number of type parameters**, as C#'s
+are: `Func<TResult>`, `Func<T, TResult>` and `Func<T1, T2, TResult>` are three
+declarations, and a non-generic `Action` sits beside `Action<T>`. The number
+written at the use is which one is meant; two of one name and one arity are a
+duplicate (SL0201), and a count that matches none is SL0323.
+
 **Generic functions overload on the shape of their parameters.** Two templates
 may share a name, and a call tries each one of the right arity, keeping those
 that both infer and would accept the arguments. Two or more survivors are
@@ -336,6 +342,17 @@ and without one it is an ambiguity (SL0453). None is the inference error.
 `Sort(numbers)` and `Sort(list)` each reach the right one; it has `Trim` over a
 `Span<T>` and over a `ReadOnlySpan<T>`, and a `Span<T>` reaches the first,
 which keeps it writable.
+
+**A lambda is ranked by what it returns**, as in C#. Its body is read with the
+parameters each candidate would give it: a body whose result does not convert
+to a delegate's is not that delegate, and between two that take the same
+parameters, the one whose result is exactly the body's, or converts better
+from it, wins. So `Sum(items, i => i.Count)` and `Sum(items, i => i.Price)`
+reach the `int` and the `double` overload of `Sum`.
+
+**An array literal's elements are a type to infer from.** `ToList([1, 2, 3])`
+reads `T` as `int`, because the elements agree on one, as they would for
+`var numbers = [1, 2, 3]`.
 
 **Generic methods** are supported too, including inside a generic type, where
 the enclosing type's arguments are already fixed and only the method's own are

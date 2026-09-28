@@ -1,0 +1,22 @@
+version 1.4.2 1.4 2 -1 yes yes yes
+sorted 1.4 1.4.2 1.10 2.0 yes
+guid v4 v7 variant 2 36 yes 16
+00112233-4455-6677-8899-aabbccddeeff 00112233445566778899aabbccddeeff {00112233-4455-6677-8899-aabbccddeeff} (00112233-4455-6677-8899-aabbccddeeff)
+bytes 51 0 85 255 yes yes yes yes ffffffffffffffffffffffffffffffff
+lazy no value value yes 1
+modes 42 7 9 yes
+uri https://User@example.com/docs/guide/intro.html?v=2#top
+https User example.com 443 yes /docs/guide/intro.html ?v=2 #top https://User@example.com
+[/][docs/][guide/][intro.html]
+http://a/b/c/g http://a/b/c/g http://a/g http://a/b/c/d;p?y http://a/b/c/g#s http://a/b/ http://a/b/g http://a/g http://a/b/c/h 
+http://localhost:8080/a%20b%20c 8080 yes /a b c
+file:///C:/Temp/my%20file.txt yes file://server/share/x.txt
+no ../images/logo.png a%20b%26c%3Dd%2F%C3%A9 a b&c=d/é
+yes no yes
+../api/list.html?x=1 yes no yes 25
+date 2024-01-31 2024-02-29 2025-01-31 2025-02-28 3 31 738915
+0001-01-01 9999-12-31 yes 2024-12-25
+2024/1/31
+time 22:30:00 01:30:00 1 yes 3h00m00.000s 01:02:03.45
+07:05:09.25 yes 23:59:59.999999999
+2024-01-31T08:15:00 2020-06-01 2025-01-01

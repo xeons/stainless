@@ -417,13 +417,15 @@ public class EmitterTests
             }
         }
 
-        // Every '@name' used in a constant must be one of those.
+        // Every '@name' used in a constant must be one of those. The bytes of
+        // a string constant are text, and an '@' among them names nothing.
         foreach (string line in AllLines(ir))
         {
             if (!line.StartsWith("@", StringComparison.Ordinal)) continue;
 
-            for (int at = line.IndexOf('@', 1); at > 0; at = line.IndexOf('@', at + 1))
-                Assert.Contains(NameAt(line, at), defined);
+            string code = System.Text.RegularExpressions.Regex.Replace(line, "c\"[^\"]*\"", "c\"\"");
+            for (int at = code.IndexOf('@', 1); at > 0; at = code.IndexOf('@', at + 1))
+                Assert.Contains(NameAt(code, at), defined);
         }
     }
 

@@ -35,4 +35,10 @@ public enum TimeError
     /// The right shape and not a real moment: the 31st of February, a month of
     /// 13, an hour of 24.
     OutOfRange,
+
+    /// No time zone of that name, or none with a readable definition.
+    NotFound,
+
+    /// A wall-clock time the zone skips, as when its clocks go forward.
+    Invalid,
 }

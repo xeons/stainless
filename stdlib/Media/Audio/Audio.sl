@@ -317,23 +317,12 @@ threadsafe sealed class Backend
 
     public void LeaveApartment() => _uninitialize();
 
-    /// `CLSID_MMDeviceEnumerator`, written out: a GUID is sixteen bytes and
-    /// there is nothing to parse it with that would not be larger than this.
+    /// `CLSID_MMDeviceEnumerator`, written out rather than parsed, so there is
+    /// no failure to handle for a constant.
     Guid EnumeratorClassId()
     {
-        Guid id;
-        id.Data1 = 0xBCDE0395u;
-        id.Data2 = 0xE52Fu;
-        id.Data3 = 0x467Cu;
-        id.Data4[0u] = 0x8E;
-        id.Data4[1u] = 0x3D;
-        id.Data4[2u] = 0xC4;
-        id.Data4[3u] = 0x57;
-        id.Data4[4u] = 0x92;
-        id.Data4[5u] = 0x91;
-        id.Data4[6u] = 0x69;
-        id.Data4[7u] = 0x2E;
-        return id;
+        return new Guid(0xBCDE0395u, (ushort)0xE52F, (ushort)0x467C,
+            (byte)0x8E, (byte)0x3D, (byte)0xC4, (byte)0x57, (byte)0x92, (byte)0x91, (byte)0x69, (byte)0x2E);
     }
 
     /// The device enumerator, or null.

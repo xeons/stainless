@@ -806,16 +806,40 @@ public sealed class ModuleSymbol(string name)
 
     public Dictionary<string, NamedTypeSymbol> Types { get; } = new(StringComparer.Ordinal);
 
-    /// <summary>Generic declarations, awaiting instantiation.</summary>
     /// <summary>
     /// Generic delegates and closures, kept apart from
     /// <see cref="GenericTypes"/> because they instantiate differently: there
-    /// is a signature to resolve rather than members to declare.
+    /// is a signature to resolve rather than members to declare. Filed under
+    /// <see cref="GenericKey"/>.
     /// </summary>
     public Dictionary<string, GenericDelegateTemplate> GenericDelegates { get; } =
         new(StringComparer.Ordinal);
 
+    /// <summary>Generic declarations, awaiting instantiation. Filed under <see cref="GenericKey"/>.</summary>
     public Dictionary<string, GenericTypeTemplate> GenericTypes { get; } = new(StringComparer.Ordinal);
+
+    /// <summary>
+    /// What a generic declaration is filed under: its name and how many type
+    /// parameters it takes. C# lets <c>Func&lt;T, R&gt;</c> and
+    /// <c>Func&lt;A, B, R&gt;</c> share a name, and so does this.
+    /// </summary>
+    public static string GenericKey(string name, int arity) => $"{name}`{arity}";
+
+    /// <summary>The generic type of that name taking <paramref name="arity"/> parameters, or the first of any arity.</summary>
+    public GenericTypeTemplate? FindGenericType(string name, int? arity) =>
+        arity is { } count
+            ? GenericTypes.GetValueOrDefault(GenericKey(name, count))
+            : GenericTypes.Values.FirstOrDefault(t => t.Name == name);
+
+    /// <summary>The generic delegate of that name taking <paramref name="arity"/> parameters, or the first of any arity.</summary>
+    public GenericDelegateTemplate? FindGenericDelegate(string name, int? arity) =>
+        arity is { } count
+            ? GenericDelegates.GetValueOrDefault(GenericKey(name, count))
+            : GenericDelegates.Values.FirstOrDefault(t => t.Name == name);
+
+    /// <summary>Whether a generic type or delegate of any arity has this name.</summary>
+    public bool DeclaresGeneric(string name) =>
+        FindGenericType(name, null) is not null || FindGenericDelegate(name, null) is not null;
     public List<GenericFunctionTemplate> GenericFunctions { get; } = [];
     public List<FunctionSymbol> Functions { get; } = [];
 

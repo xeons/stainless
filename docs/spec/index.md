@@ -138,11 +138,13 @@ Monomorphization, constraints, and what is and is not supported.
 What ships and how: threading, collections, environment, math, concurrency, I/O, processes, JSON and XML, images, cryptography and sound.
 
 - [5.1 What ships, and how](05-standard-library.md#51-what-ships-and-how)
+  - [5.1.1 What `Standard` holds](05-standard-library.md#511-what-standard-holds)
 - [5.2 `Standard.Threading`](05-standard-library.md#52-standardthreading)
 - [5.3 Interfaces are named with a leading I](05-standard-library.md#53-interfaces-are-named-with-a-leading-i)
 - [5.4 `Standard.Collections`](05-standard-library.md#54-standardcollections)
 - [5.5 Doing something to every element](05-standard-library.md#55-doing-something-to-every-element)
 - [5.6 `Standard.Env`, `Standard.Time` and `Standard.Random`](05-standard-library.md#56-standardenv-standardtime-and-standardrandom)
+  - [5.6.1 Dates, times of day and time zones](05-standard-library.md#561-dates-times-of-day-and-time-zones)
 - [5.7 `Standard.Math`](05-standard-library.md#57-standardmath)
 - [5.8 `Standard.Concurrent`](05-standard-library.md#58-standardconcurrent)
 - [5.9 `Standard.IO`, `File`, `Directory` and `Path`](05-standard-library.md#59-standardio-file-directory-and-path)

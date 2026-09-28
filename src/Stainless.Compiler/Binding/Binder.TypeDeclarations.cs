@@ -58,7 +58,7 @@ public sealed partial class Binder
                             $"'{declaration.Name}' has no body, so it has nothing for a type " +
                             "parameter to appear in");
                     else
-                        module.GenericTypes[declaration.Name] =
+                        module.GenericTypes[ModuleSymbol.GenericKey(declaration.Name, declaration.TypeParameters.Count)] =
                             new GenericTypeTemplate(declaration.Name, scope, declaration);
                     continue;
                 }
@@ -169,7 +169,7 @@ public sealed partial class Binder
                 // arguments, exactly as a generic class does.
                 if (declaration.TypeParameters.Count > 0)
                 {
-                    module.GenericDelegates[declaration.Name] =
+                    module.GenericDelegates[ModuleSymbol.GenericKey(declaration.Name, declaration.TypeParameters.Count)] =
                         new GenericDelegateTemplate(declaration.Name, scope, declaration);
                     continue;
                 }
@@ -240,10 +240,20 @@ public sealed partial class Binder
             _ => throw new ArgumentException("not a type declaration", nameof(declaration)),
         };
 
-        if (!module.Types.ContainsKey(name) &&
-            !module.GenericTypes.ContainsKey(name) &&
-            !module.GenericDelegates.ContainsKey(name) &&
-            !module.Aliases.ContainsKey(name))
+        // A name may be declared once per number of type parameters, as in C#:
+        // `Action`, `Action<T>` and `Action<T1, T2>` are three declarations.
+        int arity = declaration switch
+        {
+            TypeDeclSyntax type => type.TypeParameters.Count,
+            DelegateDeclSyntax declared => declared.TypeParameters.Count,
+            _ => 0,
+        };
+
+        bool taken = arity == 0
+            ? module.Types.ContainsKey(name) || module.Aliases.ContainsKey(name)
+            : module.GenericTypes.ContainsKey(ModuleSymbol.GenericKey(name, arity)) ||
+              module.GenericDelegates.ContainsKey(ModuleSymbol.GenericKey(name, arity));
+        if (!taken)
             return true;
 
         diagnostics.Error("SL0201", declaration.Span,
@@ -441,12 +451,17 @@ public sealed partial class Binder
 
         if (declaration.Implements.Count > 0)
         {
-            if (!SpansDeclarations(existing))
+            // A struct's interfaces say nothing about its layout, so a later
+            // declaration may carry them as a class's may carry its base list.
+            bool takesList = SpansDeclarations(existing) ||
+                             existing is StructTypeSymbol and not (VariantTypeSymbol or UnionTypeSymbol);
+
+            if (!takesList)
                 diagnostics.Error("SL0551", declaration.Span,
                     $"'{declaration.Name}' is already declared in this module, so this " +
-                    "declaration may add members but not a base list; only a class takes its " +
-                    "base list from a declaration other than the first");
-            else if (_typeSyntax[existing].Declaration.Implements.Count > 0 ||
+                    "declaration may add members but not a base list; only a class or a struct " +
+                    "takes its base list from a declaration other than the first");
+            else if (_typeSyntax.TryGetValue(existing, out var first) && first.Declaration.Implements.Count > 0 ||
                      _baseListSyntax.ContainsKey(existing))
                 diagnostics.Error("SL0551", declaration.Span,
                     $"'{declaration.Name}' already says what it derives from in another " +

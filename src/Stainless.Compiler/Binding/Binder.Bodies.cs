@@ -154,11 +154,16 @@ public sealed partial class Binder
     /// </summary>
     private BoundBlock WithBaseConstruction(FunctionSymbol constructor, BoundBlock body)
     {
+        // Taken first, whatever this constructor is: left set by a struct's
+        // `: this(...)`, it would tell the next class to skip its base.
+        bool explicitChain = _boundExplicitChain;
+        _boundExplicitChain = false;
+
         if (constructor.ContainingType is not ClassTypeSymbol classType) return body;
         if (classType.BaseClass is null) return body;
 
         // Written out; BindBaseConstruction already put it first.
-        if (_boundExplicitChain) { _boundExplicitChain = false; return body; }
+        if (explicitChain) return body;
 
         if (!TryImplicitBaseConstructor(classType, out var chained))
         {

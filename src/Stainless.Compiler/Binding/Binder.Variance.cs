@@ -342,9 +342,11 @@ public sealed partial class Binder
             {
                 var arguments = constructed.TypeArguments;
                 var ofTemplate =
-                    (FindGenericType(constructed.Name, scope) is { Declaration.Kind: TypeDeclKind.Interface } contract
+                    (FindGenericType(constructed.Name, scope, arguments.Count)
+                        is { Declaration.Kind: TypeDeclKind.Interface } contract
                         ? contract.Declaration.TypeParameterVariance
-                        : FindGenericDelegate(constructed.Name, scope)?.Declaration.TypeParameterVariance)
+                        : FindGenericDelegate(constructed.Name, scope, arguments.Count)?
+                            .Declaration.TypeParameterVariance)
                     ?? [];
 
                 for (int i = 0; i < arguments.Count; i++)

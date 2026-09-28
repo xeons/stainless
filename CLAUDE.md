@@ -126,7 +126,7 @@ them off does not fail cleanly (see below).
 
 | | |
 |---|---|
-| `runtime/` | fourteen C files, embedded in the compiler as resources |
+| `runtime/` | sixteen C files, embedded in the compiler as resources |
 | `stdlib/` | the standard library, in Stainless, also embedded: a folder per module, a file per public type |
 | `bindings/win32`, `bindings/gtk`, `bindings/linux` | platform APIs, compiled only by a program that asks |
 | `forms/` | a GUI framework, one control layer over a Win32 and a GTK backend |

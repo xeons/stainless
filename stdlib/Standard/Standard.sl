@@ -37,6 +37,35 @@ module Standard;
 /// @typeparam TResult  what comes out
 public closure TResult Func<in T, out TResult>(T value);
 
+/// Produces a TResult from nothing.
+///
+/// @typeparam TResult  what comes out
+public closure TResult Func<out TResult>();
+
+/// Turns two values into a TResult. The combining half of `Zip`.
+///
+/// @typeparam T1       the first thing that goes in
+/// @typeparam T2       the second
+/// @typeparam TResult  what comes out
+public closure TResult Func<in T1, in T2, out TResult>(T1 arg1, T2 arg2);
+
+/// Turns three values into a TResult.
+///
+/// @typeparam T1       the first thing that goes in
+/// @typeparam T2       the second
+/// @typeparam T3       the third
+/// @typeparam TResult  what comes out
+public closure TResult Func<in T1, in T2, in T3, out TResult>(T1 arg1, T2 arg2, T3 arg3);
+
+/// Turns four values into a TResult.
+///
+/// @typeparam T1       the first thing that goes in
+/// @typeparam T2       the second
+/// @typeparam T3       the third
+/// @typeparam T4       the fourth
+/// @typeparam TResult  what comes out
+public closure TResult Func<in T1, in T2, in T3, in T4, out TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4);
+
 /// Answers a question about a T.
 ///
 /// @typeparam T  what the question is about
@@ -46,6 +75,30 @@ public closure bool Predicate<in T>(T value);
 ///
 /// @typeparam T  what is handed to it
 public closure void Action<in T>(T value);
+
+/// Does something and returns nothing.
+public closure void Action();
+
+/// Does something with two values and returns nothing.
+///
+/// @typeparam T1  the first thing handed to it
+/// @typeparam T2  the second
+public closure void Action<in T1, in T2>(T1 arg1, T2 arg2);
+
+/// Does something with three values and returns nothing.
+///
+/// @typeparam T1  the first thing handed to it
+/// @typeparam T2  the second
+/// @typeparam T3  the third
+public closure void Action<in T1, in T2, in T3>(T1 arg1, T2 arg2, T3 arg3);
+
+/// Does something with four values and returns nothing.
+///
+/// @typeparam T1  the first thing handed to it
+/// @typeparam T2  the second
+/// @typeparam T3  the third
+/// @typeparam T4  the fourth
+public closure void Action<in T1, in T2, in T3, in T4>(T1 arg1, T2 arg2, T3 arg3, T4 arg4);
 
 /// Folds one element into a running total. Two parameters rather than one,
 /// because a fold is the one shape that carries something along with it.

@@ -680,7 +680,8 @@ public sealed partial class Binder
                     break;
 
                 case PropertyDeclSyntax property:
-                    DeclareProperty(scope, type, property, declaration.PrimaryParameters.Count > 0);
+                    DeclareProperty(scope, type, property, declaration.PrimaryParameters.Count > 0,
+                        declaration.Members.Any(m => m is ConstructorDeclSyntax));
                     break;
 
                 case EventDeclSyntax declared:
@@ -1277,7 +1278,7 @@ public sealed partial class Binder
     /// </summary>
     private void DeclareProperty(
         FileScope scope, NamedTypeSymbol type, PropertyDeclSyntax declaration,
-        bool hasPrimaryConstructor = false)
+        bool hasPrimaryConstructor = false, bool declaresConstructor = false)
     {
         // `String INamed.Name => ...`: the interface's property, supplied under
         // its name and reached only through it.
@@ -1410,14 +1411,15 @@ public sealed partial class Binder
 
             wantsStorage = getterIsAuto || usesField;
 
-            // A struct has no constructor, so a get-only automatic property on
-            // one has no moment at which it could ever be given a value.
+            // A get-only automatic property is assigned by a constructor, so on
+            // a struct that declares none it could never be given a value.
             if (wantsStorage && setter is null && type is StructTypeSymbol &&
+                !declaresConstructor && !hasPrimaryConstructor &&
                 !declaration.Modifiers.HasFlag(Modifiers.Static))
                 diagnostics.Error("SL0401", declaration.Span,
                     $"'{type.Name}.{declaration.Name}' could never be assigned: it is automatic " +
-                    "and has no setter, and a struct has no constructor to fill it in; add " +
-                    "'set;', or give it a body that computes the value",
+                    $"and has no setter, and '{type.Name}' declares no constructor to fill it " +
+                    "in; add one, add 'set;', or give it a body that computes the value",
                     type);
         }
 

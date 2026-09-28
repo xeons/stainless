@@ -294,7 +294,7 @@ public sealed partial class Binder
     private BoundExpression GatherThroughArrayBuilder(
         List<BoundExpression> parts, ArrayTypeSymbol arrayType, SourceSpan span)
     {
-        if (_builtins.Standard.GenericTypes.GetValueOrDefault("ArrayBuilder") is not { } template ||
+        if (_builtins.Standard.FindGenericType("ArrayBuilder", 1) is not { } template ||
             Instantiate(template, [arrayType.Element], span) is not ClassTypeSymbol builder)
             return new BoundErrorExpression(span);
 
@@ -548,7 +548,7 @@ public sealed partial class Binder
         type.Template?.Name is "IEnumerable" or "IList" or "IReadOnlyList";
 
     private static GenericTypeTemplate? ListTemplateFor(InterfaceTypeSymbol type) =>
-        type.Template?.Module.GenericTypes.GetValueOrDefault("List");
+        type.Template?.Module.FindGenericType("List", 1);
 
     /// <summary>
     /// The type an array literal takes when nothing else says: the one type
@@ -565,6 +565,28 @@ public sealed partial class Binder
             return new BoundErrorExpression(draft.Span);
         }
 
+        var (element, disagreeing) = AgreeOnElementType(draft);
+        if (disagreeing is null)
+            return BindArraySettle(draft, ArrayOf(element), draft.Span);
+
+        diagnostics.Error("SL0549", disagreeing.Span,
+            $"this element is '{disagreeing.Type.Name}' and the ones before it are " +
+            $"'{element.Name}'; an array holds one type, so either make them agree " +
+            "or give the array a type of its own",
+            disagreeing.Type, element);
+        return new BoundErrorExpression(draft.Span);
+    }
+
+    /// <summary>The one type every element of a non-empty array literal reaches, or null.</summary>
+    private TypeSymbol? AgreedElementType(BoundArrayDraft draft) =>
+        draft.Elements.Count != 0 && AgreeOnElementType(draft) is (var element, null) ? element : null;
+
+    /// <summary>
+    /// The type the elements of a non-empty array literal agree on, and the
+    /// first that reaches it not, with what the ones before it agreed on.
+    /// </summary>
+    private (TypeSymbol Element, BoundExpression? Disagreeing) AgreeOnElementType(BoundArrayDraft draft)
+    {
         var element = draft.Elements[0].Type;
         for (int i = 1; i < draft.Elements.Count; i++)
         {
@@ -582,14 +604,9 @@ public sealed partial class Binder
                 continue;
             }
 
-            diagnostics.Error("SL0549", next.Span,
-                $"this element is '{next.Type.Name}' and the ones before it are " +
-                $"'{element.Name}'; an array holds one type, so either make them agree " +
-                "or give the array a type of its own",
-                next.Type, element);
-            return new BoundErrorExpression(draft.Span);
+            return (element, next);
         }
 
-        return BindArraySettle(draft, ArrayOf(element), draft.Span);
+        return (element, null);
     }
 }

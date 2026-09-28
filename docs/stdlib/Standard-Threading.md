@@ -17,26 +17,11 @@ the object's *contents*, which nothing synchronizes on its behalf.
 
 ## Contents
 
-**Types** &nbsp; [Action](#action-closure) &middot; [AtomicBool](#atomicbool-class) &middot; [AtomicInt](#atomicint-class) &middot; [AtomicLong](#atomiclong-class) &middot; [AutoResetEvent](#autoresetevent-class) &middot; [Barrier](#barrier-class) &middot; [CountdownEvent](#countdownevent-class) &middot; [Future&lt;T&gt;](#futuret-class) &middot; [Guard&lt;T&gt;](#guardt-class) &middot; [IConsumer&lt;T&gt;](#iconsumert-interface) &middot; [IProducer&lt;T&gt;](#iproducert-interface) &middot; [Job](#job-delegate) &middot; [ManualResetEvent](#manualresetevent-class) &middot; [Monitor&lt;T&gt;](#monitort-class) &middot; [MonitorGuard&lt;T&gt;](#monitorguardt-class) &middot; [Mutex&lt;T&gt;](#mutext-class) &middot; [ReadGuard&lt;T&gt;](#readguardt-class) &middot; [ReaderWriterLock&lt;T&gt;](#readerwriterlockt-class) &middot; [Semaphore](#semaphore-class) &middot; [SpinWait](#spinwait-class) &middot; [TaskScope](#taskscope-class) &middot; [Thread](#thread-class) &middot; [WriteGuard&lt;T&gt;](#writeguardt-class)
+**Types** &nbsp; [AtomicBool](#atomicbool-class) &middot; [AtomicInt](#atomicint-class) &middot; [AtomicLong](#atomiclong-class) &middot; [AutoResetEvent](#autoresetevent-class) &middot; [Barrier](#barrier-class) &middot; [CountdownEvent](#countdownevent-class) &middot; [Future&lt;T&gt;](#futuret-class) &middot; [Guard&lt;T&gt;](#guardt-class) &middot; [IConsumer&lt;T&gt;](#iconsumert-interface) &middot; [IProducer&lt;T&gt;](#iproducert-interface) &middot; [Job](#job-delegate) &middot; [ManualResetEvent](#manualresetevent-class) &middot; [Monitor&lt;T&gt;](#monitort-class) &middot; [MonitorGuard&lt;T&gt;](#monitorguardt-class) &middot; [Mutex&lt;T&gt;](#mutext-class) &middot; [ReadGuard&lt;T&gt;](#readguardt-class) &middot; [ReaderWriterLock&lt;T&gt;](#readerwriterlockt-class) &middot; [Semaphore](#semaphore-class) &middot; [SpinWait](#spinwait-class) &middot; [TaskScope](#taskscope-class) &middot; [Thread](#thread-class) &middot; [WriteGuard&lt;T&gt;](#writeguardt-class)
 
 **Functions** &nbsp; [CurrentId](#currentid-function) &middot; [ProcessorCount](#processorcount-function) &middot; [Sleep](#sleep-function) &middot; [StartPool](#startpool-function) &middot; [WorkerCount](#workercount-function) &middot; [Yield](#yield-function)
 
 ## Types
-
-### Action *closure*
-
-```
-closure void Action()
-```
-
-Work with nothing to pass in and nothing to hand back: what a `Thread` runs.
-
-A closure rather than a delegate, because the point of it is to carry what
-it captured -- and capture is by value, so it may outlive the scope that
-built it. That is the whole reason a closure is safe here where a pointer to
-a local is not.
-
-<sub>[stdlib/Threading/Threading.sl:145](../../stdlib/Threading/Threading.sl#L145)</sub>
 
 ### AtomicBool *class*
 
@@ -1304,7 +1289,7 @@ nuint CurrentId()
 An identifier for the calling thread, unique among those running. It is the
 OS's number and means nothing across a restart.
 
-<sub>[stdlib/Threading/Threading.sl:195](../../stdlib/Threading/Threading.sl#L195)</sub>
+<sub>[stdlib/Threading/Threading.sl:191](../../stdlib/Threading/Threading.sl#L191)</sub>
 
 ### ProcessorCount *function*
 
@@ -1314,7 +1299,7 @@ nuint ProcessorCount()
 
 How many hardware threads the machine reports.
 
-<sub>[stdlib/Threading/Threading.sl:219](../../stdlib/Threading/Threading.sl#L219)</sub>
+<sub>[stdlib/Threading/Threading.sl:215](../../stdlib/Threading/Threading.sl#L215)</sub>
 
 ### Sleep *function*
 
@@ -1325,7 +1310,7 @@ void Sleep(ulong milliseconds)
 Stops the calling thread for at least this long. It may be longer: this is
 the scheduler's floor, not a timer.
 
-<sub>[stdlib/Threading/Threading.sl:188](../../stdlib/Threading/Threading.sl#L188)</sub>
+<sub>[stdlib/Threading/Threading.sl:184](../../stdlib/Threading/Threading.sl#L184)</sub>
 
 ### StartPool *function*
 
@@ -1338,7 +1323,7 @@ automatically. Passing zero sizes it from the processor count.
 
 **See also** &nbsp; [Threading.ProcessorCount](#processorcount-function)
 
-<sub>[stdlib/Threading/Threading.sl:225](../../stdlib/Threading/Threading.sl#L225)</sub>
+<sub>[stdlib/Threading/Threading.sl:221](../../stdlib/Threading/Threading.sl#L221)</sub>
 
 ### WorkerCount *function*
 
@@ -1350,7 +1335,7 @@ How many threads the pool is running. Zero until the first scope starts it.
 
 **See also** &nbsp; [Threading.StartPool](#startpool-function)
 
-<sub>[stdlib/Threading/Threading.sl:216](../../stdlib/Threading/Threading.sl#L216)</sub>
+<sub>[stdlib/Threading/Threading.sl:212](../../stdlib/Threading/Threading.sl#L212)</sub>
 
 ### Yield *function*
 
@@ -1360,5 +1345,5 @@ void Yield()
 
 Offers the rest of this thread's slice to anything else that is ready.
 
-<sub>[stdlib/Threading/Threading.sl:191](../../stdlib/Threading/Threading.sl#L191)</sub>
+<sub>[stdlib/Threading/Threading.sl:187](../../stdlib/Threading/Threading.sl#L187)</sub>
 

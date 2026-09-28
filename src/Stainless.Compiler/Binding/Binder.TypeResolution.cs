@@ -147,10 +147,8 @@ public sealed partial class Binder
 
     /// <summary>The standard library's <c>Span&lt;T&gt;</c> or <c>ReadOnlySpan&lt;T&gt;</c>.</summary>
     private GenericTypeTemplate? SliceTemplate(bool readOnly) =>
-        _modules.GetValueOrDefault(Builtins.StandardModuleName)?.GenericTypes
-            .GetValueOrDefault(readOnly ? "ReadOnlySpan" : "Span") is { Parameters.Count: 1 } template
-            ? template
-            : null;
+        _modules.GetValueOrDefault(Builtins.StandardModuleName)?
+            .FindGenericType(readOnly ? "ReadOnlySpan" : "Span", 1);
 
     private bool IsSliceTemplate(GenericTypeTemplate template) =>
         ReferenceEquals(template, SliceTemplate(readOnly: false)) ||
@@ -358,7 +356,7 @@ public sealed partial class Binder
             if (module.Aliases.TryGetValue(parts[0], out var ownAlias)) return ResolveAlias(ownAlias);
 
             // Naming a generic without arguments is a common slip; say so plainly.
-            if (module.GenericTypes.TryGetValue(parts[0], out var template))
+            if (module.FindGenericType(parts[0], null) is { } template)
             {
                 diagnostics.Error("SL0325", syntax.Span,
                     $"'{template.Name}' is generic and needs type arguments, " +
@@ -452,10 +450,17 @@ public sealed partial class Binder
 
         // A generic delegate or closure is looked for first, because it is a
         // template of its own kind and would not be found among the types.
-        if (FindGenericDelegate(syntax.Name, scope) is { } signature)
+        if (FindGenericDelegate(syntax.Name, scope, arguments.Count) is { } signature)
             return InstantiateDelegate(signature, arguments, syntax.Span);
 
-        var template = FindGenericType(syntax.Name, scope);
+        var template = FindGenericType(syntax.Name, scope, arguments.Count);
+
+        // The right name with the wrong number of arguments is reported as that,
+        // by whichever declaration of the name there is.
+        if (template is null && FindGenericDelegate(syntax.Name, scope, null) is { } misfit)
+            return InstantiateDelegate(misfit, arguments, syntax.Span);
+        template ??= FindGenericType(syntax.Name, scope, null);
+
         if (template is null)
         {
             diagnostics.Error("SL0326", syntax.Span,
@@ -472,17 +477,17 @@ public sealed partial class Binder
     }
 
     /// <summary>The generic delegate or closure of that name in scope, or null.</summary>
-    private GenericDelegateTemplate? FindGenericDelegate(QualifiedName name, FileScope scope)
+    /// <param name="arity">How many type arguments were written, or null to take any.</param>
+    private GenericDelegateTemplate? FindGenericDelegate(QualifiedName name, FileScope scope, int? arity)
     {
         var module = scope.Module;
 
         if (name.Parts.Count == 1)
         {
-            if (module.GenericDelegates.TryGetValue(name.Parts[0], out var local)) return local;
+            if (module.FindGenericDelegate(name.Parts[0], arity) is { } local) return local;
 
             return scope.ImportedModules
-                .Select(m => m.GenericDelegates.TryGetValue(name.Parts[0], out var t) && t.IsPublic
-                    ? t : null)
+                .Select(m => m.FindGenericDelegate(name.Parts[0], arity) is { IsPublic: true } t ? t : null)
                 .FirstOrDefault(t => t is not null);
         }
 
@@ -490,7 +495,7 @@ public sealed partial class Binder
         if (scope.Imports.TryGetValue(owner, out var target) ||
             _modules.TryGetValue(owner, out target))
         {
-            if (target.GenericDelegates.TryGetValue(name.Last, out var found) &&
+            if (target.FindGenericDelegate(name.Last, arity) is { } found &&
                 (target == module || found.IsPublic))
                 return found;
         }
@@ -517,15 +522,16 @@ public sealed partial class Binder
         return null;
     }
 
-    private GenericTypeTemplate? FindGenericType(QualifiedName name, FileScope scope)
+    /// <param name="arity">How many type arguments were written, or null to take any.</param>
+    private GenericTypeTemplate? FindGenericType(QualifiedName name, FileScope scope, int? arity)
     {
         var module = scope.Module;
         if (name.Parts.Count == 1)
         {
-            if (module.GenericTypes.TryGetValue(name.Parts[0], out var local)) return local;
+            if (module.FindGenericType(name.Parts[0], arity) is { } local) return local;
 
             return scope.ImportedModules
-                .Select(m => m.GenericTypes.TryGetValue(name.Parts[0], out var t) && t.IsPublic ? t : null)
+                .Select(m => m.FindGenericType(name.Parts[0], arity) is { IsPublic: true } t ? t : null)
                 .FirstOrDefault(t => t is not null);
         }
 
@@ -533,7 +539,7 @@ public sealed partial class Binder
         if (scope.Imports.TryGetValue(moduleName, out var target) ||
             _modules.TryGetValue(moduleName, out target))
         {
-            if (target.GenericTypes.TryGetValue(name.Last, out var found) &&
+            if (target.FindGenericType(name.Last, arity) is { } found &&
                 (target == module || found.IsPublic))
                 return found;
         }
@@ -628,7 +634,10 @@ public sealed partial class Binder
                         IsGathering(c.Declaration.Parameters, arguments))
             .ToList();
 
-        if (viable.Count == 0) viable = [candidates[0]];
+        // None has the call's arity, so the closest reports it: the one that
+        // takes the most of what was written, whatever order they came in.
+        if (viable.Count == 0)
+            viable = [candidates.MinBy(c => Math.Abs(c.Declaration.Parameters.Count - arguments.Count))!];
 
         // Every candidate of the right arity is tried, and one that infers but
         // then would not accept the arguments is not a candidate. Two templates
@@ -767,9 +776,15 @@ public sealed partial class Binder
             for (int i = 0; i < given.Count; i++)
                 inferred[candidate.Parameters[i]] = given[i];
 
+        // An array literal says nothing of its own type, but its elements agree
+        // on one, and `ToList([1, 2])` is a list of int for that reason.
         for (int i = 0; i < arguments.Count; i++)
             if (WrittenParameterType(candidate.Declaration.Parameters, arguments, i) is { } wanted)
-                Infer(wanted, arguments[i].Type, names, inferred, candidate.Scope);
+                Infer(wanted,
+                    arguments[i] is BoundArrayDraft draft && AgreedElementType(draft) is { } element
+                        ? ArrayOf(element)
+                        : arguments[i].Type,
+                    names, inferred, candidate.Scope);
 
         // A lambda has no type of its own, so the loop above learned nothing
         // from one. Anything still unknown may yet be readable off a lambda's
@@ -865,7 +880,8 @@ public sealed partial class Binder
                 // or a generic interface with one method, which is what the
                 // library used before closures could be generic. They differ
                 // only in where the signature is written down.
-                if (Callable(written.Name, candidate.Scope) is not { } shape) continue;
+                if (Callable(written.Name, candidate.Scope, written.TypeArguments.Count) is not { } shape)
+                    continue;
                 if (shape.Names.Count != written.TypeArguments.Count) continue;
                 if (lambda is not null && shape.Parameters.Count != lambda.Syntax.Parameters.Count)
                     continue;
@@ -986,15 +1002,15 @@ public sealed partial class Binder
     /// a constructed type with one unresolved argument is an error type entire
     /// -- and it is exactly that position this is trying to fill.
     /// </summary>
-    private CallableShape? Callable(QualifiedName name, FileScope scope)
+    private CallableShape? Callable(QualifiedName name, FileScope scope, int arity)
     {
-        if (FindGenericDelegate(name, scope) is { } signature)
+        if (FindGenericDelegate(name, scope, arity) is { } signature)
             return new CallableShape(
                 signature.Parameters,
                 signature.Declaration.ReturnType,
                 signature.Declaration.Parameters);
 
-        if (FindGenericType(name, scope) is not { } template) return null;
+        if (FindGenericType(name, scope, arity) is not { } template) return null;
         if (template.Declaration.Kind != TypeDeclKind.Interface) return null;
 
         var methods = template.Declaration.Members.OfType<FunctionDeclSyntax>().ToList();

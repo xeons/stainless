@@ -387,9 +387,10 @@ implementation, and a default that printed a type name would be worse than
 nothing. **`IFormattable` is the opt-in instead.** It is in `Standard.Text`,
 it has one method, `String ToText(String format)`, and a class that implements
 it has text to write: the hole calls it through the interface, so an override
-answers, and hands it the hole's format or `""`. A struct implements no
-interface ([§2.2](02-types.md#22-struct--value-type-c-layout)), so a struct's
-text is a method it names, called in the hole.
+answers, and hands it the hole's format or `""`. A struct may implement it
+too, and its own `ToText` is called on the value in place, since a struct is
+never a reference to the interface
+([§2.10](02-types.md#210-interface--a-contract-dispatched-dynamically)).
 
 Two refusals are worth the words they take. A **`char` or `char16` is one code
 unit, not a character** ([§2.1](02-types.md#21-primitives)), so which of the two meanings was wanted has to

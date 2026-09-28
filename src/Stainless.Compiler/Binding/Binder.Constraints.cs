@@ -206,7 +206,7 @@ public sealed partial class Binder
     {
         if (type is NamedTypeSyntax { TypeArguments.Count: > 0 } constructed &&
             MentionsAny(type, inScope))
-            return FindGenericType(constructed.Name, scope);
+            return FindGenericType(constructed.Name, scope, constructed.TypeArguments.Count);
 
         if (MentionsAny(type, inScope)) return null;
 

@@ -51,6 +51,11 @@ public sealed partial class Binder
 
         foreach (var (type, entry) in _typeSyntax.Where(e => !e.Key.IsContract))
             ResolveImplements(type, entry.Declaration, entry.Scope);
+
+        // A type the compiler declared, given its interfaces by a declaration
+        // in source: `Guid`, whose layout is COM's.
+        foreach (var (type, entry) in _baseListSyntax.Where(e => !_typeSyntax.ContainsKey(e.Key)).ToList())
+            ResolveImplements(type, entry.Declaration, entry.Scope);
     }
 
     /// <summary>
@@ -83,9 +88,12 @@ public sealed partial class Binder
             ? elsewhere
             : (declaration, scope);
 
-        // A struct may implement an interface all of whose members are static:
-        // that is a promise about the type, and no reference to one is ever
-        // made. A variant or a union may not, since neither declares members.
+        // A struct may implement an interface: that is a promise about the
+        // type, kept by its members, and it is what lets one be a dictionary
+        // key or be sorted. What it may not do is become a reference to the
+        // interface, which is a counted pointer; a generic reaches the members
+        // directly, since each instantiation knows the struct it was made for.
+        // A variant or a union may not, since neither declares members.
         if (type is VariantTypeSymbol or UnionTypeSymbol && listed.Implements.Count > 0)
         {
             string kind = type is VariantTypeSymbol ? "variant" : "union";
@@ -105,17 +113,6 @@ public sealed partial class Binder
                 var written = listed.Implements[i];
                 var resolved = ResolveType(written, listedScope);
                 if (resolved.IsError()) continue;
-
-                if (type is StructTypeSymbol && !StaticOnly(resolved))
-                {
-                    diagnostics.Error("SL0302", written.Span,
-                        $"struct '{type.Name}' cannot implement '{resolved.Name}', which has " +
-                        "members an object answers; an interface reference is a counted " +
-                        "pointer, and a struct is a plain C value. A struct implements only " +
-                        "an interface whose members are all static",
-                        type, resolved);
-                    continue;
-                }
 
                 // A class in the list is the base class, and only the first name
                 // may be one -- which is what makes `: Base, IShape` read the way
@@ -1273,9 +1270,47 @@ public sealed partial class Binder
     /// static: what a struct may implement, since nothing about it is reached
     /// through an object.
     /// </summary>
-    private static bool StaticOnly(TypeSymbol type) =>
-        type is InterfaceTypeSymbol contract &&
-        contract.AllInterfaces().Prepend(contract).All(i => i.Methods.All(m => m.IsStatic));
+    /// <summary>
+    /// A struct's instance members against an interface's: each required one
+    /// present, public and of the same shape. There is no default to fall back
+    /// on and no dispatch table to fill, since nothing reaches a struct through
+    /// the interface.
+    /// </summary>
+    private void VerifyStructImplements(
+        StructTypeSymbol structType, InterfaceTypeSymbol interfaceType, SourceSpan span)
+    {
+        foreach (var required in interfaceType.Methods.Where(m => !m.IsStatic))
+        {
+            if (structType.FindImplementation(required) is not { } found)
+            {
+                diagnostics.Error("SL0305", span,
+                    required.Accessor is { } declared
+                        ? $"'{structType.Name}' does not implement property " +
+                          $"'{interfaceType.Name}.{declared.Name}'; add 'public {declared.Type.Name} " +
+                          $"{declared.Name} {{ get;{(declared.Setter is null ? "" : " set;")} }}'"
+                        : $"'{structType.Name}' does not implement '{interfaceType.Name}.{required.Name}'; " +
+                          $"add 'public {required.ReturnType.Name} {required.Name}(" +
+                          string.Join(", ", required.Parameters.Where(p => !p.IsThis)
+                              .Select(p => p.Type.Name + " " + p.Name)) + ")'",
+                    [structType, interfaceType, .. SignatureTypes(required)]);
+                continue;
+            }
+
+            if (!found.IsPublic)
+                diagnostics.Error("SL0306", found.Span,
+                    $"'{structType.Name}.{found.Name}' implements " +
+                    $"'{interfaceType.Name}.{required.Name}' and must therefore be public",
+                    structType, interfaceType);
+
+            if (!SameSignature(found, required))
+                diagnostics.Error("SL0307", found.Span,
+                    $"'{structType.Name}.{found.Name}' does not match " +
+                    $"'{interfaceType.Name}.{required.Name}'; expected " +
+                    $"'{required.ReturnType.Name} {required.Name}(" +
+                    string.Join(", ", required.Parameters.Where(p => !p.IsThis).Select(Spelled)) + ")'",
+                    [structType, interfaceType, .. SignatureTypes(required), .. SignatureTypes(found)]);
+        }
+    }
 
     private void VerifyImplements(
         NamedTypeSymbol implementer, InterfaceTypeSymbol interfaceType, SourceSpan span)
@@ -1290,6 +1325,12 @@ public sealed partial class Binder
         }
 
         VerifyStaticRequirements(implementer, interfaceType, span);
+
+        if (implementer is StructTypeSymbol structType)
+        {
+            VerifyStructImplements(structType, interfaceType, span);
+            return;
+        }
 
         if (implementer is not ClassTypeSymbol classType) return;
 

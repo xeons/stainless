@@ -30,6 +30,25 @@ public sealed partial class Binder
 {
     // ------------------------------------------------------------ conversions
 
+    /// <summary>
+    /// Reports a struct given where an interface it implements is wanted, and
+    /// answers whether it was one. The struct keeps the promise and still
+    /// cannot become a reference, which is the part C# would box.
+    /// </summary>
+    private bool RefusedStructAsInterface(TypeSymbol from, TypeSymbol to, SourceSpan span)
+    {
+        if (from is not StructTypeSymbol structType || to is not InterfaceTypeSymbol contract ||
+            !structType.AllInterfaces().Contains(contract))
+            return false;
+
+        diagnostics.Error("SL0302", span,
+            $"'{structType.Name}' implements '{contract.Name}' and still cannot be one: an " +
+            "interface reference is a counted pointer, and a struct is a plain C value. A " +
+            $"generic parameter 'T' with 'where T : {contract.Name}' takes it, with no copy",
+            structType, contract);
+        return true;
+    }
+
     private BoundExpression BindConversion(BoundExpression expression, TypeSymbol target, SourceSpan span)
     {
         if (expression.Type.IsError() || target.IsError()) return expression;
@@ -72,7 +91,8 @@ public sealed partial class Binder
 
         if (expression is BoundConditional
             {
-                Type: DefaultLiteralType or NewDraftType or ArrayDraftType or TupleDraftType,
+                Type: DefaultLiteralType or NewDraftType or ArrayDraftType or TupleDraftType
+                    or VariantDraftType,
             } waiting)
             return new BoundConditional(span, target, waiting.Condition,
                 BindConversion(waiting.WhenTrue, target, waiting.WhenTrue.Span),
@@ -167,6 +187,9 @@ public sealed partial class Binder
                 diagnostics.Error("SL0527", span, CodeUnitMessage(expression, fromUnit, toUnit));
                 return new BoundErrorExpression(span);
             }
+
+            if (RefusedStructAsInterface(expression.Type, target, span))
+                return new BoundErrorExpression(span);
 
             // A double literal handed to a float is the one C# habit the cast
             // hint would send the wrong way: the fix is the suffix, not a cast.

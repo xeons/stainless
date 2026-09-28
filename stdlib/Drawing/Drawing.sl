@@ -579,27 +579,16 @@ threadsafe sealed class Backend
     {
         // The four differ only in the last byte of the first field, which is
         // why they are built rather than written out four times.
-        uint first = 0x557CF406u;                       // PNG
-        if (format == ImageFormat.Jpeg)
-            first = 0x557CF401u;
-        if (format == ImageFormat.Bmp)
-            first = 0x557CF400u;
-        if (format == ImageFormat.Gif)
-            first = 0x557CF402u;
+        uint first = format switch
+        {
+            ImageFormat.Jpeg => 0x557CF401u,
+            ImageFormat.Bmp => 0x557CF400u,
+            ImageFormat.Gif => 0x557CF402u,
+            _ => 0x557CF406u,                           // PNG
+        };
 
-        Guid id;
-        id.Data1 = first;
-        id.Data2 = (ushort)0x1A04;
-        id.Data3 = (ushort)0x11D3;
-        id.Data4[0u] = (byte)0x9A;
-        id.Data4[1u] = (byte)0x73;
-        id.Data4[2u] = (byte)0x00;
-        id.Data4[3u] = (byte)0x00;
-        id.Data4[4u] = (byte)0xF8;
-        id.Data4[5u] = (byte)0x1E;
-        id.Data4[6u] = (byte)0xF3;
-        id.Data4[7u] = (byte)0x2E;
-        return id;
+        return new Guid(first, (ushort)0x1A04, (ushort)0x11D3,
+            (byte)0x9A, (byte)0x73, (byte)0x00, (byte)0x00, (byte)0xF8, (byte)0x1E, (byte)0xF3, (byte)0x2E);
     }
 
     /// An empty stream, for one about to be written into.

@@ -2,20 +2,20 @@
 
 <sub>Generated from the `///` blocks in the source by `stainless doc`. Edit the source, not this file.</sub>
 
-The Stainless standard collections.
+Reducing a sequence to one value: LINQ's `Sum`, `Average`, `Min`, `Max`,
+`MinBy`, `MaxBy` and the `Aggregate` that takes no seed.
 
-Unlike Standard.Text, nothing here needs runtime support: it is ordinary
-Stainless, compiled alongside your program. Generic declarations cost nothing
-until they are instantiated, so importing this module and using none of it
-emits no code at all.
-
-Interfaces are named with a leading I, as in C#.
+`Sum` and `Average` are written once per numeric type -- `int`, `long`,
+`float` and `double` -- as C#'s are, since there is no constraint that says
+"a number". An integer `Sum` is `checked` and aborts on overflow, where
+C#'s throws; an `Average` of nothing aborts, as C#'s throws, and a `Sum` of
+nothing is zero. `Min` and `Max` of nothing abort.
 
 ## Contents
 
-**Types** &nbsp; [Dictionary&lt;TKey, TValue&gt;](#dictionarytkey-tvalue-class) &middot; [DictionaryEnumerator&lt;TKey, TValue&gt;](#dictionaryenumeratortkey-tvalue-class) &middot; [HashSet&lt;T&gt;](#hashsett-class) &middot; [HashSetEnumerator&lt;T&gt;](#hashsetenumeratort-class) &middot; [IComparable&lt;T&gt;](#icomparablet-interface) &middot; [IEnumerable&lt;T&gt;](#ienumerablet-interface) &middot; [IEnumerator&lt;T&gt;](#ienumeratort-interface) &middot; [IEquatable&lt;T&gt;](#iequatablet-interface) &middot; [IHashable](#ihashable-interface) &middot; [IList&lt;T&gt;](#ilistt-interface) &middot; [IReadOnlyList&lt;T&gt;](#ireadonlylistt-interface) &middot; [KeyValuePair&lt;TKey, TValue&gt;](#keyvaluepairtkey-tvalue-class) &middot; [LinkedList&lt;T&gt;](#linkedlistt-class) &middot; [LinkedListEnumerator&lt;T&gt;](#linkedlistenumeratort-class) &middot; [List&lt;T&gt;](#listt-class) &middot; [ListEnumerator&lt;T&gt;](#listenumeratort-class) &middot; [OrderedDictionary&lt;TKey, TValue&gt;](#ordereddictionarytkey-tvalue-class) &middot; [Queue&lt;T&gt;](#queuet-class) &middot; [QueueEnumerator&lt;T&gt;](#queueenumeratort-class) &middot; [SortedList&lt;TKey, TValue&gt;](#sortedlisttkey-tvalue-class) &middot; [SortedListEnumerator&lt;TKey, TValue&gt;](#sortedlistenumeratortkey-tvalue-class) &middot; [Stack&lt;T&gt;](#stackt-class) &middot; [StackEnumerator&lt;T&gt;](#stackenumeratort-class)
+**Types** &nbsp; [Dictionary&lt;TKey, TValue&gt;](#dictionarytkey-tvalue-class) &middot; [DictionaryEnumerator&lt;TKey, TValue&gt;](#dictionaryenumeratortkey-tvalue-class) &middot; [Enumerable](#enumerable-class) &middot; [Grouping&lt;TKey, TElement&gt;](#groupingtkey-telement-class) &middot; [HashSet&lt;T&gt;](#hashsett-class) &middot; [HashSetEnumerator&lt;T&gt;](#hashsetenumeratort-class) &middot; [IComparable&lt;T&gt;](#icomparablet-interface) &middot; [IEnumerable&lt;T&gt;](#ienumerablet-interface) &middot; [IEnumerator&lt;T&gt;](#ienumeratort-interface) &middot; [IEquatable&lt;T&gt;](#iequatablet-interface) &middot; [IHashable](#ihashable-interface) &middot; [IList&lt;T&gt;](#ilistt-interface) &middot; [IReadOnlyList&lt;T&gt;](#ireadonlylistt-interface) &middot; [KeyValuePair&lt;TKey, TValue&gt;](#keyvaluepairtkey-tvalue-class) &middot; [LinkedList&lt;T&gt;](#linkedlistt-class) &middot; [LinkedListEnumerator&lt;T&gt;](#linkedlistenumeratort-class) &middot; [List&lt;T&gt;](#listt-class) &middot; [ListEnumerator&lt;T&gt;](#listenumeratort-class) &middot; [OrderedDictionary&lt;TKey, TValue&gt;](#ordereddictionarytkey-tvalue-class) &middot; [OrderedList&lt;T&gt;](#orderedlistt-class) &middot; [Queue&lt;T&gt;](#queuet-class) &middot; [QueueEnumerator&lt;T&gt;](#queueenumeratort-class) &middot; [SortedList&lt;TKey, TValue&gt;](#sortedlisttkey-tvalue-class) &middot; [SortedListEnumerator&lt;TKey, TValue&gt;](#sortedlistenumeratortkey-tvalue-class) &middot; [Stack&lt;T&gt;](#stackt-class) &middot; [StackEnumerator&lt;T&gt;](#stackenumeratort-class)
 
-**Functions** &nbsp; [Aggregate](#aggregate-function) &middot; [Aggregate](#aggregate-function) &middot; [All](#all-function) &middot; [All](#all-function) &middot; [Any](#any-function) &middot; [Any](#any-function) &middot; [BinarySearch](#binarysearch-function) &middot; [CommonPrefixLength](#commonprefixlength-function) &middot; [Contains](#contains-function) &middot; [Contains](#contains-function) &middot; [ContainsAny](#containsany-function) &middot; [ContainsAny](#containsany-function) &middot; [ContainsAny](#containsany-function) &middot; [ContainsAnyExcept](#containsanyexcept-function) &middot; [ContainsAnyExcept](#containsanyexcept-function) &middot; [ContainsAnyExcept](#containsanyexcept-function) &middot; [ContainsAnyExcept](#containsanyexcept-function) &middot; [ContainsAnyExceptInRange](#containsanyexceptinrange-function) &middot; [ContainsAnyInRange](#containsanyinrange-function) &middot; [Count](#count-function) &middot; [Count](#count-function) &middot; [Count](#count-function) &middot; [Count](#count-function) &middot; [Distinct](#distinct-function) &middot; [Distinct](#distinct-function) &middot; [EndsWith](#endswith-function) &middot; [EndsWith](#endswith-function) &middot; [Find](#find-function) &middot; [FindIndex](#findindex-function) &middot; [FindLowerBound](#findlowerbound-function) &middot; [FirstOrDefault](#firstordefault-function) &middot; [FirstOrDefault](#firstordefault-function) &middot; [ForEach](#foreach-function) &middot; [ForEach](#foreach-function) &middot; [IndexOf](#indexof-function) &middot; [IndexOf](#indexof-function) &middot; [IndexOf](#indexof-function) &middot; [IndexOfAny](#indexofany-function) &middot; [IndexOfAny](#indexofany-function) &middot; [IndexOfAny](#indexofany-function) &middot; [IndexOfAnyExcept](#indexofanyexcept-function) &middot; [IndexOfAnyExcept](#indexofanyexcept-function) &middot; [IndexOfAnyExcept](#indexofanyexcept-function) &middot; [IndexOfAnyExcept](#indexofanyexcept-function) &middot; [IndexOfAnyExceptInRange](#indexofanyexceptinrange-function) &middot; [IndexOfAnyInRange](#indexofanyinrange-function) &middot; [LastIndexOf](#lastindexof-function) &middot; [LastIndexOf](#lastindexof-function) &middot; [LastIndexOf](#lastindexof-function) &middot; [LastIndexOfAny](#lastindexofany-function) &middot; [LastIndexOfAny](#lastindexofany-function) &middot; [LastIndexOfAny](#lastindexofany-function) &middot; [LastIndexOfAnyExcept](#lastindexofanyexcept-function) &middot; [LastIndexOfAnyExcept](#lastindexofanyexcept-function) &middot; [LastIndexOfAnyExcept](#lastindexofanyexcept-function) &middot; [LastIndexOfAnyExcept](#lastindexofanyexcept-function) &middot; [LastIndexOfAnyExceptInRange](#lastindexofanyexceptinrange-function) &middot; [LastIndexOfAnyInRange](#lastindexofanyinrange-function) &middot; [Max](#max-function) &middot; [Min](#min-function) &middot; [OrderBy](#orderby-function) &middot; [OrderBy](#orderby-function) &middot; [RemoveFirst](#removefirst-function) &middot; [RemoveWhere](#removewhere-function) &middot; [Replace](#replace-function) &middot; [Replace](#replace-function) &middot; [Reverse](#reverse-function) &middot; [Select](#select-function) &middot; [Select](#select-function) &middot; [SequenceCompareTo](#sequencecompareto-function) &middot; [SequenceEqual](#sequenceequal-function) &middot; [Skip](#skip-function) &middot; [Skip](#skip-function) &middot; [Sort](#sort-function) &middot; [Sort](#sort-function) &middot; [Sort](#sort-function) &middot; [Sort](#sort-function) &middot; [Sort](#sort-function) &middot; [Sort](#sort-function) &middot; [StartsWith](#startswith-function) &middot; [StartsWith](#startswith-function) &middot; [Take](#take-function) &middot; [Take](#take-function) &middot; [ToArray](#toarray-function) &middot; [ToArray](#toarray-function) &middot; [ToList](#tolist-function) &middot; [ToList](#tolist-function) &middot; [Trim](#trim-function) &middot; [Trim](#trim-function) &middot; [Trim](#trim-function) &middot; [Trim](#trim-function) &middot; [TrimEnd](#trimend-function) &middot; [TrimEnd](#trimend-function) &middot; [TrimEnd](#trimend-function) &middot; [TrimEnd](#trimend-function) &middot; [TrimStart](#trimstart-function) &middot; [TrimStart](#trimstart-function) &middot; [TrimStart](#trimstart-function) &middot; [TrimStart](#trimstart-function) &middot; [Where](#where-function) &middot; [Where](#where-function)
+**Functions** &nbsp; [Aggregate](#aggregate-function) &middot; [Aggregate](#aggregate-function) &middot; [Aggregate](#aggregate-function) &middot; [Aggregate](#aggregate-function) &middot; [All](#all-function) &middot; [All](#all-function) &middot; [Any](#any-function) &middot; [Any](#any-function) &middot; [Any](#any-function) &middot; [Any](#any-function) &middot; [Append](#append-function) &middot; [Append](#append-function) &middot; [Average](#average-function) &middot; [Average](#average-function) &middot; [Average](#average-function) &middot; [Average](#average-function) &middot; [Average](#average-function) &middot; [Average](#average-function) &middot; [Average](#average-function) &middot; [Average](#average-function) &middot; [Average](#average-function) &middot; [Average](#average-function) &middot; [Average](#average-function) &middot; [Average](#average-function) &middot; [Average](#average-function) &middot; [Average](#average-function) &middot; [Average](#average-function) &middot; [Average](#average-function) &middot; [BinarySearch](#binarysearch-function) &middot; [Chunk](#chunk-function) &middot; [Chunk](#chunk-function) &middot; [CommonPrefixLength](#commonprefixlength-function) &middot; [Concat](#concat-function) &middot; [Concat](#concat-function) &middot; [Contains](#contains-function) &middot; [Contains](#contains-function) &middot; [Contains](#contains-function) &middot; [ContainsAny](#containsany-function) &middot; [ContainsAny](#containsany-function) &middot; [ContainsAny](#containsany-function) &middot; [ContainsAnyExcept](#containsanyexcept-function) &middot; [ContainsAnyExcept](#containsanyexcept-function) &middot; [ContainsAnyExcept](#containsanyexcept-function) &middot; [ContainsAnyExcept](#containsanyexcept-function) &middot; [ContainsAnyExceptInRange](#containsanyexceptinrange-function) &middot; [ContainsAnyInRange](#containsanyinrange-function) &middot; [Count](#count-function) &middot; [Count](#count-function) &middot; [Count](#count-function) &middot; [Count](#count-function) &middot; [Count](#count-function) &middot; [Distinct](#distinct-function) &middot; [Distinct](#distinct-function) &middot; [DistinctBy](#distinctby-function) &middot; [DistinctBy](#distinctby-function) &middot; [ElementAt](#elementat-function) &middot; [ElementAt](#elementat-function) &middot; [ElementAtOrDefault](#elementatordefault-function) &middot; [ElementAtOrDefault](#elementatordefault-function) &middot; [EndsWith](#endswith-function) &middot; [EndsWith](#endswith-function) &middot; [Except](#except-function) &middot; [Except](#except-function) &middot; [ExceptBy](#exceptby-function) &middot; [ExceptBy](#exceptby-function) &middot; [Find](#find-function) &middot; [FindIndex](#findindex-function) &middot; [FindLowerBound](#findlowerbound-function) &middot; [First](#first-function) &middot; [First](#first-function) &middot; [First](#first-function) &middot; [First](#first-function) &middot; [FirstOrDefault](#firstordefault-function) &middot; [FirstOrDefault](#firstordefault-function) &middot; [FirstOrDefault](#firstordefault-function) &middot; [FirstOrDefault](#firstordefault-function) &middot; [ForEach](#foreach-function) &middot; [ForEach](#foreach-function) &middot; [GroupBy](#groupby-function) &middot; [GroupBy](#groupby-function) &middot; [GroupBy](#groupby-function) &middot; [GroupBy](#groupby-function) &middot; [IndexOf](#indexof-function) &middot; [IndexOf](#indexof-function) &middot; [IndexOf](#indexof-function) &middot; [IndexOfAny](#indexofany-function) &middot; [IndexOfAny](#indexofany-function) &middot; [IndexOfAny](#indexofany-function) &middot; [IndexOfAnyExcept](#indexofanyexcept-function) &middot; [IndexOfAnyExcept](#indexofanyexcept-function) &middot; [IndexOfAnyExcept](#indexofanyexcept-function) &middot; [IndexOfAnyExcept](#indexofanyexcept-function) &middot; [IndexOfAnyExceptInRange](#indexofanyexceptinrange-function) &middot; [IndexOfAnyInRange](#indexofanyinrange-function) &middot; [Intersect](#intersect-function) &middot; [Intersect](#intersect-function) &middot; [IntersectBy](#intersectby-function) &middot; [IntersectBy](#intersectby-function) &middot; [Last](#last-function) &middot; [Last](#last-function) &middot; [Last](#last-function) &middot; [Last](#last-function) &middot; [LastIndexOf](#lastindexof-function) &middot; [LastIndexOf](#lastindexof-function) &middot; [LastIndexOf](#lastindexof-function) &middot; [LastIndexOfAny](#lastindexofany-function) &middot; [LastIndexOfAny](#lastindexofany-function) &middot; [LastIndexOfAny](#lastindexofany-function) &middot; [LastIndexOfAnyExcept](#lastindexofanyexcept-function) &middot; [LastIndexOfAnyExcept](#lastindexofanyexcept-function) &middot; [LastIndexOfAnyExcept](#lastindexofanyexcept-function) &middot; [LastIndexOfAnyExcept](#lastindexofanyexcept-function) &middot; [LastIndexOfAnyExceptInRange](#lastindexofanyexceptinrange-function) &middot; [LastIndexOfAnyInRange](#lastindexofanyinrange-function) &middot; [LastOrDefault](#lastordefault-function) &middot; [LastOrDefault](#lastordefault-function) &middot; [LastOrDefault](#lastordefault-function) &middot; [LastOrDefault](#lastordefault-function) &middot; [Max](#max-function) &middot; [Max](#max-function) &middot; [Max](#max-function) &middot; [Max](#max-function) &middot; [Max](#max-function) &middot; [MaxBy](#maxby-function) &middot; [MaxBy](#maxby-function) &middot; [Min](#min-function) &middot; [Min](#min-function) &middot; [Min](#min-function) &middot; [Min](#min-function) &middot; [Min](#min-function) &middot; [MinBy](#minby-function) &middot; [MinBy](#minby-function) &middot; [Order](#order-function) &middot; [Order](#order-function) &middot; [OrderBy](#orderby-function) &middot; [OrderBy](#orderby-function) &middot; [OrderBy](#orderby-function) &middot; [OrderBy](#orderby-function) &middot; [OrderByDescending](#orderbydescending-function) &middot; [OrderByDescending](#orderbydescending-function) &middot; [OrderDescending](#orderdescending-function) &middot; [OrderDescending](#orderdescending-function) &middot; [Prepend](#prepend-function) &middot; [Prepend](#prepend-function) &middot; [RemoveFirst](#removefirst-function) &middot; [RemoveWhere](#removewhere-function) &middot; [Replace](#replace-function) &middot; [Replace](#replace-function) &middot; [Reverse](#reverse-function) &middot; [Select](#select-function) &middot; [Select](#select-function) &middot; [SelectMany](#selectmany-function) &middot; [SelectMany](#selectmany-function) &middot; [SequenceCompareTo](#sequencecompareto-function) &middot; [SequenceEqual](#sequenceequal-function) &middot; [SequenceEqual](#sequenceequal-function) &middot; [Single](#single-function) &middot; [Single](#single-function) &middot; [Single](#single-function) &middot; [Single](#single-function) &middot; [SingleOrDefault](#singleordefault-function) &middot; [SingleOrDefault](#singleordefault-function) &middot; [SingleOrDefault](#singleordefault-function) &middot; [SingleOrDefault](#singleordefault-function) &middot; [Skip](#skip-function) &middot; [Skip](#skip-function) &middot; [SkipLast](#skiplast-function) &middot; [SkipLast](#skiplast-function) &middot; [SkipWhile](#skipwhile-function) &middot; [SkipWhile](#skipwhile-function) &middot; [Sort](#sort-function) &middot; [Sort](#sort-function) &middot; [Sort](#sort-function) &middot; [Sort](#sort-function) &middot; [Sort](#sort-function) &middot; [Sort](#sort-function) &middot; [StartsWith](#startswith-function) &middot; [StartsWith](#startswith-function) &middot; [Sum](#sum-function) &middot; [Sum](#sum-function) &middot; [Sum](#sum-function) &middot; [Sum](#sum-function) &middot; [Sum](#sum-function) &middot; [Sum](#sum-function) &middot; [Sum](#sum-function) &middot; [Sum](#sum-function) &middot; [Sum](#sum-function) &middot; [Sum](#sum-function) &middot; [Sum](#sum-function) &middot; [Sum](#sum-function) &middot; [Sum](#sum-function) &middot; [Sum](#sum-function) &middot; [Sum](#sum-function) &middot; [Sum](#sum-function) &middot; [Take](#take-function) &middot; [Take](#take-function) &middot; [TakeLast](#takelast-function) &middot; [TakeLast](#takelast-function) &middot; [TakeWhile](#takewhile-function) &middot; [TakeWhile](#takewhile-function) &middot; [ThenBy](#thenby-function) &middot; [ThenBy](#thenby-function) &middot; [ThenByDescending](#thenbydescending-function) &middot; [ToArray](#toarray-function) &middot; [ToArray](#toarray-function) &middot; [ToDictionary](#todictionary-function) &middot; [ToDictionary](#todictionary-function) &middot; [ToDictionary](#todictionary-function) &middot; [ToDictionary](#todictionary-function) &middot; [ToHashSet](#tohashset-function) &middot; [ToHashSet](#tohashset-function) &middot; [ToList](#tolist-function) &middot; [ToList](#tolist-function) &middot; [Trim](#trim-function) &middot; [Trim](#trim-function) &middot; [Trim](#trim-function) &middot; [Trim](#trim-function) &middot; [TrimEnd](#trimend-function) &middot; [TrimEnd](#trimend-function) &middot; [TrimEnd](#trimend-function) &middot; [TrimEnd](#trimend-function) &middot; [TrimStart](#trimstart-function) &middot; [TrimStart](#trimstart-function) &middot; [TrimStart](#trimstart-function) &middot; [TrimStart](#trimstart-function) &middot; [Union](#union-function) &middot; [Union](#union-function) &middot; [UnionBy](#unionby-function) &middot; [UnionBy](#unionby-function) &middot; [Where](#where-function) &middot; [Where](#where-function) &middot; [Zip](#zip-function) &middot; [Zip](#zip-function) &middot; [Zip](#zip-function) &middot; [Zip](#zip-function)
 
 ## Types
 
@@ -314,6 +314,129 @@ KeyValuePair<TKey, TValue> Current { get; }
 The entry the last `MoveNext` landed on, as a freshly built `KeyValuePair`.
 
 <sub>[stdlib/Collections/DictionaryEnumerator.sl:66](../../stdlib/Collections/DictionaryEnumerator.sl#L66)</sub>
+
+### Enumerable *class*
+
+```
+class Enumerable
+```
+
+Sequences made from nothing: C#'s `Enumerable.Range`, `Repeat` and `Empty`.
+
+    foreach (int i in Enumerable.Range(1, 10)) { ... }
+
+Each answers with a list, as everything here does.
+
+<sub>[stdlib/Collections/Enumerable.sl:29](../../stdlib/Collections/Enumerable.sl#L29)</sub>
+
+#### Range *method*
+
+```
+static List<int> Range(int start, int count)
+```
+
+`count` integers counting up from `start`. Aborts when the last would
+not fit in an `int`.
+
+**Parameters**
+
+- `start` — the first integer
+- `count` — how many there are
+
+<sub>[stdlib/Collections/Enumerable.sl:36](../../stdlib/Collections/Enumerable.sl#L36)</sub>
+
+#### Repeat *method*
+
+```
+static List<T> Repeat<T>(T element, nuint count)
+```
+
+`element`, `count` times over.
+
+**Parameters**
+
+- `element` — what is repeated
+- `count` — how many times
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Enumerable.sl:49](../../stdlib/Collections/Enumerable.sl#L49)</sub>
+
+#### Empty *method*
+
+```
+static List<T> Empty<T>()
+```
+
+A list of nothing.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Enumerable.sl:60](../../stdlib/Collections/Enumerable.sl#L60)</sub>
+
+### Grouping&lt;TKey, TElement&gt; *class*
+
+```
+class Grouping<TKey, TElement> : IEnumerable<TElement>
+```
+
+The elements `GroupBy` put together under one key: C#'s `IGrouping`.
+
+    foreach (var group in GroupBy(people, (p) => p.City))
+        Console.WriteLine(group.Key + ": " + Text.FromInteger((int)group.Count));
+
+A sequence of its own, so every operator here works on one.
+
+**Type parameters**
+
+- `TKey` — what the elements share
+- `TElement` — what was grouped
+
+<sub>[stdlib/Collections/Grouping.sl:33](../../stdlib/Collections/Grouping.sl#L33)</sub>
+
+#### Key *property*
+
+```
+TKey Key { get; }
+```
+
+What every element here was grouped by.
+
+<sub>[stdlib/Collections/Grouping.sl:44](../../stdlib/Collections/Grouping.sl#L44)</sub>
+
+#### Count *property*
+
+```
+nuint Count { get; }
+```
+
+How many elements share the key.
+
+<sub>[stdlib/Collections/Grouping.sl:47](../../stdlib/Collections/Grouping.sl#L47)</sub>
+
+#### this[] *indexer*
+
+```
+TElement this[nuint index] { get; }
+```
+
+The element at `index`, in the order they were met, aborting past the end.
+
+<sub>[stdlib/Collections/Grouping.sl:50](../../stdlib/Collections/Grouping.sl#L50)</sub>
+
+#### GetEnumerator *method*
+
+```
+IEnumerator<TElement> GetEnumerator()
+```
+
+Walks the elements in the order they were met.
+
+<sub>[stdlib/Collections/Grouping.sl:53](../../stdlib/Collections/Grouping.sl#L53)</sub>
 
 ### HashSet&lt;T&gt; *class*
 
@@ -740,7 +863,7 @@ Drops every item, leaving a length of zero.
 ### IReadOnlyList&lt;T&gt; *interface*
 
 ```
-interface IReadOnlyList<out T>
+interface IReadOnlyList<out T> : IEnumerable<T>
 ```
 
 A sequence that knows its length and can be indexed, and cannot be changed
@@ -751,13 +874,17 @@ list behind it may well be a `List<T>` that someone else is still adding
 to. Take this as a parameter type where a function reads and does not
 write, which says so in the signature.
 
+It is a sequence too, as C#'s is, so anything that walks one walks this --
+and a function taking an `IReadOnlyList<T>` is the closer fit for a list
+than one taking an `IEnumerable<T>`.
+
 **Type parameters**
 
 - `T` — the element type; nothing is asked of it
 
 **See also** &nbsp; [IList](#ilistt-interface)
 
-<sub>[stdlib/Collections/IReadOnlyList.sl:36](../../stdlib/Collections/IReadOnlyList.sl#L36)</sub>
+<sub>[stdlib/Collections/IReadOnlyList.sl:40](../../stdlib/Collections/IReadOnlyList.sl#L40)</sub>
 
 #### Count *property*
 
@@ -767,7 +894,7 @@ nuint Count { get; }
 
 How many items there are.
 
-<sub>[stdlib/Collections/IReadOnlyList.sl:39](../../stdlib/Collections/IReadOnlyList.sl#L39)</sub>
+<sub>[stdlib/Collections/IReadOnlyList.sl:43](../../stdlib/Collections/IReadOnlyList.sl#L43)</sub>
 
 #### IsEmpty *property*
 
@@ -777,7 +904,7 @@ bool IsEmpty { get; }
 
 Whether there are none.
 
-<sub>[stdlib/Collections/IReadOnlyList.sl:42](../../stdlib/Collections/IReadOnlyList.sl#L42)</sub>
+<sub>[stdlib/Collections/IReadOnlyList.sl:46](../../stdlib/Collections/IReadOnlyList.sl#L46)</sub>
 
 #### this[] *indexer*
 
@@ -788,7 +915,7 @@ T this[nuint index] { get; }
 The item at `index`, counting from zero. An index at or past `Count`
 aborts with the same message an array overrun gives.
 
-<sub>[stdlib/Collections/IReadOnlyList.sl:46](../../stdlib/Collections/IReadOnlyList.sl#L46)</sub>
+<sub>[stdlib/Collections/IReadOnlyList.sl:50](../../stdlib/Collections/IReadOnlyList.sl#L50)</sub>
 
 ### KeyValuePair&lt;TKey, TValue&gt; *class*
 
@@ -1742,6 +1869,35 @@ Drops every entry, leaving a count of zero.
 
 <sub>[stdlib/Collections/OrderedDictionary.sl:150](../../stdlib/Collections/OrderedDictionary.sl#L150)</sub>
 
+### OrderedList&lt;T&gt; *class*
+
+```
+class OrderedList<T> : List<T>
+```
+
+A list `OrderBy` made, which remembers the order so that `ThenBy` can
+break its ties: C#'s `IOrderedEnumerable`.
+
+    var sorted = ThenBy(OrderBy(people, (p) => p.Surname), (p) => p.Given);
+
+It is a `List<T>`, and anything that takes one takes it.
+
+**Type parameters**
+
+- `T` — the element type
+
+<sub>[stdlib/Collections/OrderedList.sl:32](../../stdlib/Collections/OrderedList.sl#L32)</sub>
+
+#### Order *property*
+
+```
+Comparison<T> Order { get; }
+```
+
+The order the elements are in.
+
+<sub>[stdlib/Collections/OrderedList.sl:42](../../stdlib/Collections/OrderedList.sl#L42)</sub>
+
 ### Queue&lt;T&gt; *class*
 
 ```
@@ -2330,6 +2486,36 @@ The item the last `MoveNext` landed on.
 ### Aggregate *function*
 
 ```
+T Aggregate<T>(ReadOnlySpan<T> items, Func<T, T, T> combine)
+```
+
+Folds the elements from the first, aborting when there are none: the
+first element is the seed, and `combine` takes it and each one after.
+
+**Type parameters**
+
+- `T` — the element type; `combine` does the work
+
+<sub>[stdlib/Collections/Aggregates.sl:734](../../stdlib/Collections/Aggregates.sl#L734)</sub>
+
+### Aggregate *function*
+
+```
+T Aggregate<T>(IEnumerable<T> items, Func<T, T, T> combine)
+```
+
+Folds the elements from the first, aborting when there are none: the
+first element is the seed, and `combine` takes it and each one after.
+
+**Type parameters**
+
+- `T` — the element type; `combine` does the work
+
+<sub>[stdlib/Collections/Aggregates.sl:752](../../stdlib/Collections/Aggregates.sl#L752)</sub>
+
+### Aggregate *function*
+
+```
 TAccumulate Aggregate<T, TAccumulate>(ReadOnlySpan<T> items, TAccumulate seed, Fold<TAccumulate, T> combine)
 ```
 
@@ -2397,6 +2583,34 @@ does not, and is true of an empty sequence.
 ### Any *function*
 
 ```
+bool Any<T>(ReadOnlySpan<T> items)
+```
+
+Whether there are any elements at all.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Elements.sl:179](../../stdlib/Collections/Elements.sl#L179)</sub>
+
+### Any *function*
+
+```
+bool Any<T>(IEnumerable<T> items)
+```
+
+Whether there are any elements at all.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Elements.sl:300](../../stdlib/Collections/Elements.sl#L300)</sub>
+
+### Any *function*
+
+```
 bool Any<T>(ReadOnlySpan<T> items, Predicate<T> test)
 ```
 
@@ -2427,6 +2641,234 @@ the first that does, so the rest of the sequence is never walked.
 
 <sub>[stdlib/Collections/Functional.sl:287](../../stdlib/Collections/Functional.sl#L287)</sub>
 
+### Append *function*
+
+```
+List<T> Append<T>(ReadOnlySpan<T> items, T element)
+```
+
+The elements, then `element`.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Combining.sl:50](../../stdlib/Collections/Combining.sl#L50)</sub>
+
+### Append *function*
+
+```
+List<T> Append<T>(IEnumerable<T> items, T element)
+```
+
+The elements, then `element`.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Combining.sl:297](../../stdlib/Collections/Combining.sl#L297)</sub>
+
+### Average *function*
+
+```
+double Average(ReadOnlySpan<int> items)
+```
+
+The mean of the elements, aborting when there are none.
+
+<sub>[stdlib/Collections/Aggregates.sl:55](../../stdlib/Collections/Aggregates.sl#L55)</sub>
+
+### Average *function*
+
+```
+double Average<T>(ReadOnlySpan<T> items, Func<T, int> selector)
+```
+
+The mean of what `selector` gives for each element, aborting when there
+are none.
+
+**Type parameters**
+
+- `T` — the element type; the selector reads the number off it
+
+<sub>[stdlib/Collections/Aggregates.sl:73](../../stdlib/Collections/Aggregates.sl#L73)</sub>
+
+### Average *function*
+
+```
+double Average(IEnumerable<int> items)
+```
+
+The mean of the elements, aborting when there are none.
+
+<sub>[stdlib/Collections/Aggregates.sl:108](../../stdlib/Collections/Aggregates.sl#L108)</sub>
+
+### Average *function*
+
+```
+double Average<T>(IEnumerable<T> items, Func<T, int> selector)
+```
+
+The mean of what `selector` gives for each element, aborting when there
+are none.
+
+**Type parameters**
+
+- `T` — the element type; the selector reads the number off it
+
+<sub>[stdlib/Collections/Aggregates.sl:126](../../stdlib/Collections/Aggregates.sl#L126)</sub>
+
+### Average *function*
+
+```
+double Average(ReadOnlySpan<long> items)
+```
+
+The mean of the elements, aborting when there are none.
+
+<sub>[stdlib/Collections/Aggregates.sl:161](../../stdlib/Collections/Aggregates.sl#L161)</sub>
+
+### Average *function*
+
+```
+double Average<T>(ReadOnlySpan<T> items, Func<T, long> selector)
+```
+
+The mean of what `selector` gives for each element, aborting when there
+are none.
+
+**Type parameters**
+
+- `T` — the element type; the selector reads the number off it
+
+<sub>[stdlib/Collections/Aggregates.sl:179](../../stdlib/Collections/Aggregates.sl#L179)</sub>
+
+### Average *function*
+
+```
+double Average(IEnumerable<long> items)
+```
+
+The mean of the elements, aborting when there are none.
+
+<sub>[stdlib/Collections/Aggregates.sl:214](../../stdlib/Collections/Aggregates.sl#L214)</sub>
+
+### Average *function*
+
+```
+double Average<T>(IEnumerable<T> items, Func<T, long> selector)
+```
+
+The mean of what `selector` gives for each element, aborting when there
+are none.
+
+**Type parameters**
+
+- `T` — the element type; the selector reads the number off it
+
+<sub>[stdlib/Collections/Aggregates.sl:232](../../stdlib/Collections/Aggregates.sl#L232)</sub>
+
+### Average *function*
+
+```
+float Average(ReadOnlySpan<float> items)
+```
+
+The mean of the elements, aborting when there are none.
+
+<sub>[stdlib/Collections/Aggregates.sl:267](../../stdlib/Collections/Aggregates.sl#L267)</sub>
+
+### Average *function*
+
+```
+float Average<T>(ReadOnlySpan<T> items, Func<T, float> selector)
+```
+
+The mean of what `selector` gives for each element, aborting when there
+are none.
+
+**Type parameters**
+
+- `T` — the element type; the selector reads the number off it
+
+<sub>[stdlib/Collections/Aggregates.sl:285](../../stdlib/Collections/Aggregates.sl#L285)</sub>
+
+### Average *function*
+
+```
+float Average(IEnumerable<float> items)
+```
+
+The mean of the elements, aborting when there are none.
+
+<sub>[stdlib/Collections/Aggregates.sl:320](../../stdlib/Collections/Aggregates.sl#L320)</sub>
+
+### Average *function*
+
+```
+float Average<T>(IEnumerable<T> items, Func<T, float> selector)
+```
+
+The mean of what `selector` gives for each element, aborting when there
+are none.
+
+**Type parameters**
+
+- `T` — the element type; the selector reads the number off it
+
+<sub>[stdlib/Collections/Aggregates.sl:338](../../stdlib/Collections/Aggregates.sl#L338)</sub>
+
+### Average *function*
+
+```
+double Average(ReadOnlySpan<double> items)
+```
+
+The mean of the elements, aborting when there are none.
+
+<sub>[stdlib/Collections/Aggregates.sl:373](../../stdlib/Collections/Aggregates.sl#L373)</sub>
+
+### Average *function*
+
+```
+double Average<T>(ReadOnlySpan<T> items, Func<T, double> selector)
+```
+
+The mean of what `selector` gives for each element, aborting when there
+are none.
+
+**Type parameters**
+
+- `T` — the element type; the selector reads the number off it
+
+<sub>[stdlib/Collections/Aggregates.sl:391](../../stdlib/Collections/Aggregates.sl#L391)</sub>
+
+### Average *function*
+
+```
+double Average(IEnumerable<double> items)
+```
+
+The mean of the elements, aborting when there are none.
+
+<sub>[stdlib/Collections/Aggregates.sl:426](../../stdlib/Collections/Aggregates.sl#L426)</sub>
+
+### Average *function*
+
+```
+double Average<T>(IEnumerable<T> items, Func<T, double> selector)
+```
+
+The mean of what `selector` gives for each element, aborting when there
+are none.
+
+**Type parameters**
+
+- `T` — the element type; the selector reads the number off it
+
+<sub>[stdlib/Collections/Aggregates.sl:444](../../stdlib/Collections/Aggregates.sl#L444)</sub>
+
 ### BinarySearch *function*
 
 ```
@@ -2447,6 +2889,36 @@ insertion point usually does not want the search, and the other way round.
 
 <sub>[stdlib/Collections/Collections.sl:355](../../stdlib/Collections/Collections.sl#L355)</sub>
 
+### Chunk *function*
+
+```
+List<T[]> Chunk<T>(ReadOnlySpan<T> items, nuint size)
+```
+
+The elements in arrays of `size`, the last holding what is left. Aborts
+when `size` is zero.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Combining.sl:99](../../stdlib/Collections/Combining.sl#L99)</sub>
+
+### Chunk *function*
+
+```
+List<T[]> Chunk<T>(IEnumerable<T> items, nuint size)
+```
+
+The elements in arrays of `size`, the last holding what is left. Aborts
+when `size` is zero.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Combining.sl:346](../../stdlib/Collections/Combining.sl#L346)</sub>
+
 ### CommonPrefixLength *function*
 
 ```
@@ -2461,6 +2933,34 @@ How many elements at the start the two have in common.
 - `T` — the element type, which must answer whether it equals another
 
 <sub>[stdlib/Collections/Spans.sl:209](../../stdlib/Collections/Spans.sl#L209)</sub>
+
+### Concat *function*
+
+```
+List<T> Concat<T>(ReadOnlySpan<T> first, ReadOnlySpan<T> second)
+```
+
+The elements of `first`, then those of `second`.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Combining.sl:37](../../stdlib/Collections/Combining.sl#L37)</sub>
+
+### Concat *function*
+
+```
+List<T> Concat<T>(IEnumerable<T> first, IEnumerable<T> second)
+```
+
+The elements of `first`, then those of `second`.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Combining.sl:284](../../stdlib/Collections/Combining.sl#L284)</sub>
 
 ### Contains *function*
 
@@ -2479,6 +2979,21 @@ free function here for the reason `IndexOf` is.
 **See also** &nbsp; [Collections.IndexOf](#indexof-function)
 
 <sub>[stdlib/Collections/Collections.sl:101](../../stdlib/Collections/Collections.sl#L101)</sub>
+
+### Contains *function*
+
+```
+bool Contains<T>(IEnumerable<T> items, T value)
+    where T : IEquatable<T>
+```
+
+Whether any element equals `value`.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Elements.sl:321](../../stdlib/Collections/Elements.sl#L321)</sub>
 
 ### Contains *function*
 
@@ -2633,6 +3148,20 @@ Whether any element is between `low` and `high`, both included.
 ### Count *function*
 
 ```
+nuint Count<T>(IEnumerable<T> items)
+```
+
+How many elements there are, walking them to find out.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Elements.sl:310](../../stdlib/Collections/Elements.sl#L310)</sub>
+
+### Count *function*
+
+```
 nuint Count<T>(ReadOnlySpan<T> items, Predicate<T> test)
 ```
 
@@ -2732,6 +3261,94 @@ O(n squared) in comparisons, as the slice overload is.
 
 <sub>[stdlib/Collections/Functional.sl:443](../../stdlib/Collections/Functional.sl#L443)</sub>
 
+### DistinctBy *function*
+
+```
+List<T> DistinctBy<T, TKey>(ReadOnlySpan<T> items, Func<T, TKey> keySelector)
+    where TKey : IEquatable<TKey>, IHashable
+```
+
+The first element of each key `keySelector` gives, in order.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+- `TKey` — the key, which a `HashSet` must be able to hold
+
+<sub>[stdlib/Collections/Combining.sl:186](../../stdlib/Collections/Combining.sl#L186)</sub>
+
+### DistinctBy *function*
+
+```
+List<T> DistinctBy<T, TKey>(IEnumerable<T> items, Func<T, TKey> keySelector)
+    where TKey : IEquatable<TKey>, IHashable
+```
+
+The first element of each key `keySelector` gives, in order.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+- `TKey` — the key, which a `HashSet` must be able to hold
+
+<sub>[stdlib/Collections/Combining.sl:433](../../stdlib/Collections/Combining.sl#L433)</sub>
+
+### ElementAt *function*
+
+```
+T ElementAt<T>(ReadOnlySpan<T> items, nuint index)
+```
+
+The element at `index`, aborting past the end.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Elements.sl:168](../../stdlib/Collections/Elements.sl#L168)</sub>
+
+### ElementAt *function*
+
+```
+T ElementAt<T>(IEnumerable<T> items, nuint index)
+```
+
+The element at `index`, aborting past the end.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Elements.sl:269](../../stdlib/Collections/Elements.sl#L269)</sub>
+
+### ElementAtOrDefault *function*
+
+```
+T ElementAtOrDefault<T>(ReadOnlySpan<T> items, nuint index, T fallback)
+```
+
+The element at `index`, or `fallback` past the end.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Elements.sl:173](../../stdlib/Collections/Elements.sl#L173)</sub>
+
+### ElementAtOrDefault *function*
+
+```
+T ElementAtOrDefault<T>(IEnumerable<T> items, nuint index, T fallback)
+```
+
+The element at `index`, or `fallback` past the end.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Elements.sl:285](../../stdlib/Collections/Elements.sl#L285)</sub>
+
 ### EndsWith *function*
 
 ```
@@ -2761,6 +3378,68 @@ Whether the last element equals `value`.
 - `T` — the element type, which must answer whether it equals another
 
 <sub>[stdlib/Collections/Spans.sl:203](../../stdlib/Collections/Spans.sl#L203)</sub>
+
+### Except *function*
+
+```
+List<T> Except<T>(ReadOnlySpan<T> first, ReadOnlySpan<T> second)
+    where T : IEquatable<T>, IHashable
+```
+
+The distinct elements of `first` that are not in `second`.
+
+**Type parameters**
+
+- `T` — the element type, which a `HashSet` must be able to hold
+
+<sub>[stdlib/Collections/Combining.sl:256](../../stdlib/Collections/Combining.sl#L256)</sub>
+
+### Except *function*
+
+```
+List<T> Except<T>(IEnumerable<T> first, IEnumerable<T> second)
+    where T : IEquatable<T>, IHashable
+```
+
+The distinct elements of `first` that are not in `second`.
+
+**Type parameters**
+
+- `T` — the element type, which a `HashSet` must be able to hold
+
+<sub>[stdlib/Collections/Combining.sl:503](../../stdlib/Collections/Combining.sl#L503)</sub>
+
+### ExceptBy *function*
+
+```
+List<T> ExceptBy<T, TKey>(ReadOnlySpan<T> first, ReadOnlySpan<TKey> keys, Func<T, TKey> keySelector)
+    where TKey : IEquatable<TKey>, IHashable
+```
+
+The distinct elements of `first` whose key is not among `keys`.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+- `TKey` — the key, which a `HashSet` must be able to hold
+
+<sub>[stdlib/Collections/Combining.sl:263](../../stdlib/Collections/Combining.sl#L263)</sub>
+
+### ExceptBy *function*
+
+```
+List<T> ExceptBy<T, TKey>(IEnumerable<T> first, IEnumerable<TKey> keys, Func<T, TKey> keySelector)
+    where TKey : IEquatable<TKey>, IHashable
+```
+
+The distinct elements of `first` whose key is not among `keys`.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+- `TKey` — the key, which a `HashSet` must be able to hold
+
+<sub>[stdlib/Collections/Combining.sl:510](../../stdlib/Collections/Combining.sl#L510)</sub>
 
 ### Find *function*
 
@@ -2818,6 +3497,98 @@ equal element when there is one.
 **See also** &nbsp; [Collections.BinarySearch](#binarysearch-function)
 
 <sub>[stdlib/Collections/Collections.sl:386](../../stdlib/Collections/Collections.sl#L386)</sub>
+
+### First *function*
+
+```
+T First<T>(ReadOnlySpan<T> items)
+```
+
+The first element, aborting when there is none.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+**See also** &nbsp; [Collections.FirstOrDefault](#firstordefault-function)
+
+<sub>[stdlib/Collections/Elements.sl:39](../../stdlib/Collections/Elements.sl#L39)</sub>
+
+### First *function*
+
+```
+T First<T>(ReadOnlySpan<T> items, Predicate<T> test)
+```
+
+The first element the predicate accepts, aborting when there is none.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+**See also** &nbsp; [Collections.Find](#find-function)
+
+<sub>[stdlib/Collections/Elements.sl:50](../../stdlib/Collections/Elements.sl#L50)</sub>
+
+### First *function*
+
+```
+T First<T>(IEnumerable<T> items)
+```
+
+The first element, aborting when there is none.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+**See also** &nbsp; [Collections.FirstOrDefault](#firstordefault-function)
+
+<sub>[stdlib/Collections/Elements.sl:187](../../stdlib/Collections/Elements.sl#L187)</sub>
+
+### First *function*
+
+```
+T First<T>(IEnumerable<T> items, Predicate<T> test)
+```
+
+The first element the predicate accepts, aborting when there is none.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+**See also** &nbsp; [Collections.Find](#find-function)
+
+<sub>[stdlib/Collections/Elements.sl:199](../../stdlib/Collections/Elements.sl#L199)</sub>
+
+### FirstOrDefault *function*
+
+```
+T FirstOrDefault<T>(ReadOnlySpan<T> items, T fallback)
+```
+
+The first element, or `fallback` when there is none.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Elements.sl:64](../../stdlib/Collections/Elements.sl#L64)</sub>
+
+### FirstOrDefault *function*
+
+```
+T FirstOrDefault<T>(IEnumerable<T> items, T fallback)
+```
+
+The first element, or `fallback` when there is none.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Elements.sl:213](../../stdlib/Collections/Elements.sl#L213)</sub>
 
 ### FirstOrDefault *function*
 
@@ -2889,6 +3660,76 @@ Runs the action over every element of any sequence.
 **See also** &nbsp; [List.ForEach](#foreach-method)
 
 <sub>[stdlib/Collections/Functional.sl:349](../../stdlib/Collections/Functional.sl#L349)</sub>
+
+### GroupBy *function*
+
+```
+List<Grouping<TKey, T>> GroupBy<T, TKey>(ReadOnlySpan<T> items, Func<T, TKey> keySelector)
+    where TKey : IEquatable<TKey>, IHashable
+```
+
+The elements put together by the key `keySelector` gives each, the groups
+in the order their keys were first met.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+- `TKey` — the key, which a `Dictionary` must be able to hold
+
+<sub>[stdlib/Collections/Grouping.sl:63](../../stdlib/Collections/Grouping.sl#L63)</sub>
+
+### GroupBy *function*
+
+```
+List<Grouping<TKey, TElement>> GroupBy<T, TKey, TElement>(ReadOnlySpan<T> items, Func<T, TKey> keySelector, Func<T, TElement> elementSelector)
+    where TKey : IEquatable<TKey>, IHashable
+```
+
+What `elementSelector` makes of each element, put together by the key
+`keySelector` gives it.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+- `TKey` — the key, which a `Dictionary` must be able to hold
+- `TElement` — what is grouped
+
+<sub>[stdlib/Collections/Grouping.sl:73](../../stdlib/Collections/Grouping.sl#L73)</sub>
+
+### GroupBy *function*
+
+```
+List<Grouping<TKey, T>> GroupBy<T, TKey>(IEnumerable<T> items, Func<T, TKey> keySelector)
+    where TKey : IEquatable<TKey>, IHashable
+```
+
+The elements put together by the key `keySelector` gives each, the groups
+in the order their keys were first met.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+- `TKey` — the key, which a `Dictionary` must be able to hold
+
+<sub>[stdlib/Collections/Grouping.sl:139](../../stdlib/Collections/Grouping.sl#L139)</sub>
+
+### GroupBy *function*
+
+```
+List<Grouping<TKey, TElement>> GroupBy<T, TKey, TElement>(IEnumerable<T> items, Func<T, TKey> keySelector, Func<T, TElement> elementSelector)
+    where TKey : IEquatable<TKey>, IHashable
+```
+
+What `elementSelector` makes of each element, put together by the key
+`keySelector` gives it.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+- `TKey` — the key, which a `Dictionary` must be able to hold
+- `TElement` — what is grouped
+
+<sub>[stdlib/Collections/Grouping.sl:149](../../stdlib/Collections/Grouping.sl#L149)</sub>
 
 ### IndexOf *function*
 
@@ -3084,6 +3925,124 @@ Where the first element between `low` and `high`, both included, is.
 
 <sub>[stdlib/Collections/Spans.sl:406](../../stdlib/Collections/Spans.sl#L406)</sub>
 
+### Intersect *function*
+
+```
+List<T> Intersect<T>(ReadOnlySpan<T> first, ReadOnlySpan<T> second)
+    where T : IEquatable<T>, IHashable
+```
+
+The distinct elements of `first` that are also in `second`.
+
+**Type parameters**
+
+- `T` — the element type, which a `HashSet` must be able to hold
+
+<sub>[stdlib/Collections/Combining.sl:230](../../stdlib/Collections/Combining.sl#L230)</sub>
+
+### Intersect *function*
+
+```
+List<T> Intersect<T>(IEnumerable<T> first, IEnumerable<T> second)
+    where T : IEquatable<T>, IHashable
+```
+
+The distinct elements of `first` that are also in `second`.
+
+**Type parameters**
+
+- `T` — the element type, which a `HashSet` must be able to hold
+
+<sub>[stdlib/Collections/Combining.sl:477](../../stdlib/Collections/Combining.sl#L477)</sub>
+
+### IntersectBy *function*
+
+```
+List<T> IntersectBy<T, TKey>(ReadOnlySpan<T> first, ReadOnlySpan<TKey> keys, Func<T, TKey> keySelector)
+    where TKey : IEquatable<TKey>, IHashable
+```
+
+The distinct elements of `first` whose key is among `keys`.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+- `TKey` — the key, which a `HashSet` must be able to hold
+
+<sub>[stdlib/Collections/Combining.sl:237](../../stdlib/Collections/Combining.sl#L237)</sub>
+
+### IntersectBy *function*
+
+```
+List<T> IntersectBy<T, TKey>(IEnumerable<T> first, IEnumerable<TKey> keys, Func<T, TKey> keySelector)
+    where TKey : IEquatable<TKey>, IHashable
+```
+
+The distinct elements of `first` whose key is among `keys`.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+- `TKey` — the key, which a `HashSet` must be able to hold
+
+<sub>[stdlib/Collections/Combining.sl:484](../../stdlib/Collections/Combining.sl#L484)</sub>
+
+### Last *function*
+
+```
+T Last<T>(ReadOnlySpan<T> items)
+```
+
+The last element, aborting when there is none.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Elements.sl:70](../../stdlib/Collections/Elements.sl#L70)</sub>
+
+### Last *function*
+
+```
+T Last<T>(ReadOnlySpan<T> items, Predicate<T> test)
+```
+
+The last element the predicate accepts, aborting when there is none.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Elements.sl:80](../../stdlib/Collections/Elements.sl#L80)</sub>
+
+### Last *function*
+
+```
+T Last<T>(IEnumerable<T> items)
+```
+
+The last element, aborting when there is none.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Elements.sl:223](../../stdlib/Collections/Elements.sl#L223)</sub>
+
+### Last *function*
+
+```
+T Last<T>(IEnumerable<T> items, Predicate<T> test)
+```
+
+The last element the predicate accepts, aborting when there is none.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Elements.sl:228](../../stdlib/Collections/Elements.sl#L228)</sub>
+
 ### LastIndexOf *function*
 
 ```
@@ -3271,6 +4230,128 @@ Where the last element between `low` and `high`, both included, is.
 
 <sub>[stdlib/Collections/Spans.sl:434](../../stdlib/Collections/Spans.sl#L434)</sub>
 
+### LastOrDefault *function*
+
+```
+T LastOrDefault<T>(ReadOnlySpan<T> items, T fallback)
+```
+
+The last element, or `fallback` when there is none.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Elements.sl:94](../../stdlib/Collections/Elements.sl#L94)</sub>
+
+### LastOrDefault *function*
+
+```
+T LastOrDefault<T>(ReadOnlySpan<T> items, Predicate<T> test, T fallback)
+```
+
+The last element the predicate accepts, or `fallback` when there is none.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Elements.sl:100](../../stdlib/Collections/Elements.sl#L100)</sub>
+
+### LastOrDefault *function*
+
+```
+T LastOrDefault<T>(IEnumerable<T> items, T fallback)
+```
+
+The last element, or `fallback` when there is none.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Elements.sl:233](../../stdlib/Collections/Elements.sl#L233)</sub>
+
+### LastOrDefault *function*
+
+```
+T LastOrDefault<T>(IEnumerable<T> items, Predicate<T> test, T fallback)
+```
+
+The last element the predicate accepts, or `fallback` when there is none.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Elements.sl:238](../../stdlib/Collections/Elements.sl#L238)</sub>
+
+### Max *function*
+
+```
+T Max<T>(ReadOnlySpan<T> items)
+    where T : IComparable<T>
+```
+
+The largest element, by its own ordering, aborting when there are none. The
+first of equals wins.
+
+**Type parameters**
+
+- `T` — the element type, which must order itself
+
+<sub>[stdlib/Collections/Aggregates.sl:531](../../stdlib/Collections/Aggregates.sl#L531)</sub>
+
+### Max *function*
+
+```
+TResult Max<T, TResult>(ReadOnlySpan<T> items, Func<T, TResult> selector)
+    where TResult : IComparable<TResult>
+```
+
+The largest of what `selector` gives for each element, aborting when there
+are none.
+
+**Type parameters**
+
+- `T` — the element type; the selector reads the value off it
+- `TResult` — what is compared, which must order itself
+
+<sub>[stdlib/Collections/Aggregates.sl:551](../../stdlib/Collections/Aggregates.sl#L551)</sub>
+
+### Max *function*
+
+```
+T Max<T>(IEnumerable<T> items)
+    where T : IComparable<T>
+```
+
+The largest element, by its own ordering, aborting when there are none. The
+first of equals wins.
+
+**Type parameters**
+
+- `T` — the element type, which must order itself
+
+<sub>[stdlib/Collections/Aggregates.sl:665](../../stdlib/Collections/Aggregates.sl#L665)</sub>
+
+### Max *function*
+
+```
+TResult Max<T, TResult>(IEnumerable<T> items, Func<T, TResult> selector)
+    where TResult : IComparable<TResult>
+```
+
+The largest of what `selector` gives for each element, aborting when there
+are none.
+
+**Type parameters**
+
+- `T` — the element type; the selector reads the value off it
+- `TResult` — what is compared, which must order itself
+
+<sub>[stdlib/Collections/Aggregates.sl:685](../../stdlib/Collections/Aggregates.sl#L685)</sub>
+
 ### Max *function*
 
 ```
@@ -3287,6 +4368,106 @@ The largest item, by its own ordering. The list must not be empty.
 **See also** &nbsp; [Collections.Min](#min-function)
 
 <sub>[stdlib/Collections/Collections.sl:42](../../stdlib/Collections/Collections.sl#L42)</sub>
+
+### MaxBy *function*
+
+```
+T MaxBy<T, TKey>(ReadOnlySpan<T> items, Func<T, TKey> keySelector)
+    where TKey : IComparable<TKey>
+```
+
+The element whose key is the largest, aborting when there are none. The
+first of equal keys wins.
+
+**Type parameters**
+
+- `T` — the element type; the key selector reads the key off it
+- `TKey` — the key, which must order itself
+
+<sub>[stdlib/Collections/Aggregates.sl:573](../../stdlib/Collections/Aggregates.sl#L573)</sub>
+
+### MaxBy *function*
+
+```
+T MaxBy<T, TKey>(IEnumerable<T> items, Func<T, TKey> keySelector)
+    where TKey : IComparable<TKey>
+```
+
+The element whose key is the largest, aborting when there are none. The
+first of equal keys wins.
+
+**Type parameters**
+
+- `T` — the element type; the key selector reads the key off it
+- `TKey` — the key, which must order itself
+
+<sub>[stdlib/Collections/Aggregates.sl:707](../../stdlib/Collections/Aggregates.sl#L707)</sub>
+
+### Min *function*
+
+```
+T Min<T>(ReadOnlySpan<T> items)
+    where T : IComparable<T>
+```
+
+The smallest element, by its own ordering, aborting when there are none. The
+first of equals wins.
+
+**Type parameters**
+
+- `T` — the element type, which must order itself
+
+<sub>[stdlib/Collections/Aggregates.sl:464](../../stdlib/Collections/Aggregates.sl#L464)</sub>
+
+### Min *function*
+
+```
+TResult Min<T, TResult>(ReadOnlySpan<T> items, Func<T, TResult> selector)
+    where TResult : IComparable<TResult>
+```
+
+The smallest of what `selector` gives for each element, aborting when there
+are none.
+
+**Type parameters**
+
+- `T` — the element type; the selector reads the value off it
+- `TResult` — what is compared, which must order itself
+
+<sub>[stdlib/Collections/Aggregates.sl:484](../../stdlib/Collections/Aggregates.sl#L484)</sub>
+
+### Min *function*
+
+```
+T Min<T>(IEnumerable<T> items)
+    where T : IComparable<T>
+```
+
+The smallest element, by its own ordering, aborting when there are none. The
+first of equals wins.
+
+**Type parameters**
+
+- `T` — the element type, which must order itself
+
+<sub>[stdlib/Collections/Aggregates.sl:598](../../stdlib/Collections/Aggregates.sl#L598)</sub>
+
+### Min *function*
+
+```
+TResult Min<T, TResult>(IEnumerable<T> items, Func<T, TResult> selector)
+    where TResult : IComparable<TResult>
+```
+
+The smallest of what `selector` gives for each element, aborting when there
+are none.
+
+**Type parameters**
+
+- `T` — the element type; the selector reads the value off it
+- `TResult` — what is compared, which must order itself
+
+<sub>[stdlib/Collections/Aggregates.sl:618](../../stdlib/Collections/Aggregates.sl#L618)</sub>
 
 ### Min *function*
 
@@ -3305,10 +4486,74 @@ The smallest item, by its own ordering. The list must not be empty.
 
 <sub>[stdlib/Collections/Collections.sl:60](../../stdlib/Collections/Collections.sl#L60)</sub>
 
+### MinBy *function*
+
+```
+T MinBy<T, TKey>(ReadOnlySpan<T> items, Func<T, TKey> keySelector)
+    where TKey : IComparable<TKey>
+```
+
+The element whose key is the smallest, aborting when there are none. The
+first of equal keys wins.
+
+**Type parameters**
+
+- `T` — the element type; the key selector reads the key off it
+- `TKey` — the key, which must order itself
+
+<sub>[stdlib/Collections/Aggregates.sl:506](../../stdlib/Collections/Aggregates.sl#L506)</sub>
+
+### MinBy *function*
+
+```
+T MinBy<T, TKey>(IEnumerable<T> items, Func<T, TKey> keySelector)
+    where TKey : IComparable<TKey>
+```
+
+The element whose key is the smallest, aborting when there are none. The
+first of equal keys wins.
+
+**Type parameters**
+
+- `T` — the element type; the key selector reads the key off it
+- `TKey` — the key, which must order itself
+
+<sub>[stdlib/Collections/Aggregates.sl:640](../../stdlib/Collections/Aggregates.sl#L640)</sub>
+
+### Order *function*
+
+```
+OrderedList<T> Order<T>(ReadOnlySpan<T> items)
+    where T : IComparable<T>
+```
+
+The elements by their own ordering, smallest first, stably.
+
+**Type parameters**
+
+- `T` — the element type, which must order itself
+
+<sub>[stdlib/Collections/OrderedList.sl:107](../../stdlib/Collections/OrderedList.sl#L107)</sub>
+
+### Order *function*
+
+```
+OrderedList<T> Order<T>(IEnumerable<T> items)
+    where T : IComparable<T>
+```
+
+The elements by their own ordering, smallest first, stably.
+
+**Type parameters**
+
+- `T` — the element type, which must order itself
+
+<sub>[stdlib/Collections/OrderedList.sl:136](../../stdlib/Collections/OrderedList.sl#L136)</sub>
+
 ### OrderBy *function*
 
 ```
-List<T> OrderBy<T>(ReadOnlySpan<T> items, Comparison<T> order)
+OrderedList<T> OrderBy<T>(ReadOnlySpan<T> items, Comparison<T> order)
 ```
 
 The elements ordered by what `order` says, leaving the input alone.
@@ -3328,7 +4573,7 @@ the reason `Sort` is.
 ### OrderBy *function*
 
 ```
-List<T> OrderBy<T>(IEnumerable<T> items, Comparison<T> order)
+OrderedList<T> OrderBy<T>(IEnumerable<T> items, Comparison<T> order)
 ```
 
 The elements ordered by what `order` says, over any sequence, leaving the
@@ -3340,7 +4585,133 @@ input alone. Copies into an array first, so it costs one.
 
 **See also** &nbsp; [Collections.Sort](#sort-function)
 
-<sub>[stdlib/Collections/Functional.sl:479](../../stdlib/Collections/Functional.sl#L479)</sub>
+<sub>[stdlib/Collections/Functional.sl:472](../../stdlib/Collections/Functional.sl#L472)</sub>
+
+### OrderBy *function*
+
+```
+OrderedList<T> OrderBy<T, TKey>(ReadOnlySpan<T> items, Func<T, TKey> keySelector)
+    where TKey : IComparable<TKey>
+```
+
+The elements by the key `keySelector` gives, smallest first, stably.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+- `TKey` — the key, which must order itself
+
+**See also** &nbsp; [Collections.ThenBy](#thenby-function)
+
+<sub>[stdlib/Collections/OrderedList.sl:92](../../stdlib/Collections/OrderedList.sl#L92)</sub>
+
+### OrderBy *function*
+
+```
+OrderedList<T> OrderBy<T, TKey>(IEnumerable<T> items, Func<T, TKey> keySelector)
+    where TKey : IComparable<TKey>
+```
+
+The elements by the key `keySelector` gives, smallest first, stably.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+- `TKey` — the key, which must order itself
+
+**See also** &nbsp; [Collections.ThenBy](#thenby-function)
+
+<sub>[stdlib/Collections/OrderedList.sl:121](../../stdlib/Collections/OrderedList.sl#L121)</sub>
+
+### OrderByDescending *function*
+
+```
+OrderedList<T> OrderByDescending<T, TKey>(ReadOnlySpan<T> items, Func<T, TKey> keySelector)
+    where TKey : IComparable<TKey>
+```
+
+The elements by the key `keySelector` gives, largest first, stably.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+- `TKey` — the key, which must order itself
+
+<sub>[stdlib/Collections/OrderedList.sl:100](../../stdlib/Collections/OrderedList.sl#L100)</sub>
+
+### OrderByDescending *function*
+
+```
+OrderedList<T> OrderByDescending<T, TKey>(IEnumerable<T> items, Func<T, TKey> keySelector)
+    where TKey : IComparable<TKey>
+```
+
+The elements by the key `keySelector` gives, largest first, stably.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+- `TKey` — the key, which must order itself
+
+<sub>[stdlib/Collections/OrderedList.sl:129](../../stdlib/Collections/OrderedList.sl#L129)</sub>
+
+### OrderDescending *function*
+
+```
+OrderedList<T> OrderDescending<T>(ReadOnlySpan<T> items)
+    where T : IComparable<T>
+```
+
+The elements by their own ordering, largest first, stably.
+
+**Type parameters**
+
+- `T` — the element type, which must order itself
+
+<sub>[stdlib/Collections/OrderedList.sl:113](../../stdlib/Collections/OrderedList.sl#L113)</sub>
+
+### OrderDescending *function*
+
+```
+OrderedList<T> OrderDescending<T>(IEnumerable<T> items)
+    where T : IComparable<T>
+```
+
+The elements by their own ordering, largest first, stably.
+
+**Type parameters**
+
+- `T` — the element type, which must order itself
+
+<sub>[stdlib/Collections/OrderedList.sl:142](../../stdlib/Collections/OrderedList.sl#L142)</sub>
+
+### Prepend *function*
+
+```
+List<T> Prepend<T>(ReadOnlySpan<T> items, T element)
+```
+
+`element`, then the elements.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Combining.sl:60](../../stdlib/Collections/Combining.sl#L60)</sub>
+
+### Prepend *function*
+
+```
+List<T> Prepend<T>(IEnumerable<T> items, T element)
+```
+
+`element`, then the elements.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Combining.sl:307](../../stdlib/Collections/Combining.sl#L307)</sub>
 
 ### RemoveFirst *function*
 
@@ -3476,6 +4847,36 @@ Every element put through the transform, over any sequence.
 
 <sub>[stdlib/Collections/Functional.sl:261](../../stdlib/Collections/Functional.sl#L261)</sub>
 
+### SelectMany *function*
+
+```
+List<TResult> SelectMany<T, TResult>(ReadOnlySpan<T> items, Func<T, IEnumerable<TResult>> select)
+```
+
+Every element of what `select` makes of each element, one after another.
+
+**Type parameters**
+
+- `T` — the element type
+- `TResult` — the element type of what `select` makes
+
+<sub>[stdlib/Collections/Combining.sl:171](../../stdlib/Collections/Combining.sl#L171)</sub>
+
+### SelectMany *function*
+
+```
+List<TResult> SelectMany<T, TResult>(IEnumerable<T> items, Func<T, IEnumerable<TResult>> select)
+```
+
+Every element of what `select` makes of each element, one after another.
+
+**Type parameters**
+
+- `T` — the element type
+- `TResult` — the element type of what `select` makes
+
+<sub>[stdlib/Collections/Combining.sl:418](../../stdlib/Collections/Combining.sl#L418)</sub>
+
 ### SequenceCompareTo *function*
 
 ```
@@ -3496,6 +4897,21 @@ first comes first.
 ### SequenceEqual *function*
 
 ```
+bool SequenceEqual<T>(IEnumerable<T> first, IEnumerable<T> second)
+    where T : IEquatable<T>
+```
+
+Whether the two hold equal elements in the same order.
+
+**Type parameters**
+
+- `T` — the element type, which must answer whether it equals another
+
+<sub>[stdlib/Collections/Elements.sl:334](../../stdlib/Collections/Elements.sl#L334)</sub>
+
+### SequenceEqual *function*
+
+```
 bool SequenceEqual<T>(ReadOnlySpan<T> span, ReadOnlySpan<T> other)
     where T : IEquatable<T>
 ```
@@ -3507,6 +4923,124 @@ Whether the two hold equal elements in the same order.
 - `T` — the element type, which must answer whether it equals another
 
 <sub>[stdlib/Collections/Spans.sl:148](../../stdlib/Collections/Spans.sl#L148)</sub>
+
+### Single *function*
+
+```
+T Single<T>(ReadOnlySpan<T> items)
+```
+
+The only element, aborting when there is not exactly one.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Elements.sl:113](../../stdlib/Collections/Elements.sl#L113)</sub>
+
+### Single *function*
+
+```
+T Single<T>(ReadOnlySpan<T> items, Predicate<T> test)
+```
+
+The only element the predicate accepts, aborting when there is not
+exactly one.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Elements.sl:124](../../stdlib/Collections/Elements.sl#L124)</sub>
+
+### Single *function*
+
+```
+T Single<T>(IEnumerable<T> items)
+```
+
+The only element, aborting when there is not exactly one.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Elements.sl:244](../../stdlib/Collections/Elements.sl#L244)</sub>
+
+### Single *function*
+
+```
+T Single<T>(IEnumerable<T> items, Predicate<T> test)
+```
+
+The only element the predicate accepts, aborting when there is not
+exactly one.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Elements.sl:250](../../stdlib/Collections/Elements.sl#L250)</sub>
+
+### SingleOrDefault *function*
+
+```
+T SingleOrDefault<T>(ReadOnlySpan<T> items, T fallback)
+```
+
+The only element, `fallback` when there is none, and an abort when there
+is more than one.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Elements.sl:136](../../stdlib/Collections/Elements.sl#L136)</sub>
+
+### SingleOrDefault *function*
+
+```
+T SingleOrDefault<T>(ReadOnlySpan<T> items, Predicate<T> test, T fallback)
+```
+
+The only element the predicate accepts, `fallback` when there is none,
+and an abort when there is more than one.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Elements.sl:147](../../stdlib/Collections/Elements.sl#L147)</sub>
+
+### SingleOrDefault *function*
+
+```
+T SingleOrDefault<T>(IEnumerable<T> items, T fallback)
+```
+
+The only element, `fallback` when there is none, and an abort when there
+is more than one.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Elements.sl:256](../../stdlib/Collections/Elements.sl#L256)</sub>
+
+### SingleOrDefault *function*
+
+```
+T SingleOrDefault<T>(IEnumerable<T> items, Predicate<T> test, T fallback)
+```
+
+The only element the predicate accepts, `fallback` when there is none,
+and an abort when there is more than one.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Elements.sl:263](../../stdlib/Collections/Elements.sl#L263)</sub>
 
 ### Skip *function*
 
@@ -3538,7 +5072,63 @@ Everything after the first `count`.
 
 **See also** &nbsp; [Collections.Take](#take-function)
 
-<sub>[stdlib/Collections/Functional.sl:506](../../stdlib/Collections/Functional.sl#L506)</sub>
+<sub>[stdlib/Collections/Functional.sl:495](../../stdlib/Collections/Functional.sl#L495)</sub>
+
+### SkipLast *function*
+
+```
+List<T> SkipLast<T>(ReadOnlySpan<T> items, nuint count)
+```
+
+All but the last `count` elements, or nothing if there are fewer.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Combining.sl:160](../../stdlib/Collections/Combining.sl#L160)</sub>
+
+### SkipLast *function*
+
+```
+List<T> SkipLast<T>(IEnumerable<T> items, nuint count)
+```
+
+All but the last `count` elements, or nothing if there are fewer.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Combining.sl:407](../../stdlib/Collections/Combining.sl#L407)</sub>
+
+### SkipWhile *function*
+
+```
+List<T> SkipWhile<T>(ReadOnlySpan<T> items, Predicate<T> skip)
+```
+
+The elements from the first the predicate refuses.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Combining.sl:133](../../stdlib/Collections/Combining.sl#L133)</sub>
+
+### SkipWhile *function*
+
+```
+List<T> SkipWhile<T>(IEnumerable<T> items, Predicate<T> skip)
+```
+
+The elements from the first the predicate refuses.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Combining.sl:380](../../stdlib/Collections/Combining.sl#L380)</sub>
 
 ### Sort *function*
 
@@ -3686,6 +5276,198 @@ Whether the first element equals `value`.
 
 <sub>[stdlib/Collections/Spans.sl:191](../../stdlib/Collections/Spans.sl#L191)</sub>
 
+### Sum *function*
+
+```
+int Sum(ReadOnlySpan<int> items)
+```
+
+The total of the elements; zero when there are none.
+
+<sub>[stdlib/Collections/Aggregates.sl:35](../../stdlib/Collections/Aggregates.sl#L35)</sub>
+
+### Sum *function*
+
+```
+int Sum<T>(ReadOnlySpan<T> items, Func<T, int> selector)
+```
+
+The total of what `selector` gives for each element; zero when there are none.
+
+**Type parameters**
+
+- `T` — the element type; the selector reads the number off it
+
+<sub>[stdlib/Collections/Aggregates.sl:46](../../stdlib/Collections/Aggregates.sl#L46)</sub>
+
+### Sum *function*
+
+```
+int Sum(IEnumerable<int> items)
+```
+
+The total of the elements; zero when there are none.
+
+<sub>[stdlib/Collections/Aggregates.sl:88](../../stdlib/Collections/Aggregates.sl#L88)</sub>
+
+### Sum *function*
+
+```
+int Sum<T>(IEnumerable<T> items, Func<T, int> selector)
+```
+
+The total of what `selector` gives for each element; zero when there are none.
+
+**Type parameters**
+
+- `T` — the element type; the selector reads the number off it
+
+<sub>[stdlib/Collections/Aggregates.sl:99](../../stdlib/Collections/Aggregates.sl#L99)</sub>
+
+### Sum *function*
+
+```
+long Sum(ReadOnlySpan<long> items)
+```
+
+The total of the elements; zero when there are none.
+
+<sub>[stdlib/Collections/Aggregates.sl:141](../../stdlib/Collections/Aggregates.sl#L141)</sub>
+
+### Sum *function*
+
+```
+long Sum<T>(ReadOnlySpan<T> items, Func<T, long> selector)
+```
+
+The total of what `selector` gives for each element; zero when there are none.
+
+**Type parameters**
+
+- `T` — the element type; the selector reads the number off it
+
+<sub>[stdlib/Collections/Aggregates.sl:152](../../stdlib/Collections/Aggregates.sl#L152)</sub>
+
+### Sum *function*
+
+```
+long Sum(IEnumerable<long> items)
+```
+
+The total of the elements; zero when there are none.
+
+<sub>[stdlib/Collections/Aggregates.sl:194](../../stdlib/Collections/Aggregates.sl#L194)</sub>
+
+### Sum *function*
+
+```
+long Sum<T>(IEnumerable<T> items, Func<T, long> selector)
+```
+
+The total of what `selector` gives for each element; zero when there are none.
+
+**Type parameters**
+
+- `T` — the element type; the selector reads the number off it
+
+<sub>[stdlib/Collections/Aggregates.sl:205](../../stdlib/Collections/Aggregates.sl#L205)</sub>
+
+### Sum *function*
+
+```
+float Sum(ReadOnlySpan<float> items)
+```
+
+The total of the elements; zero when there are none.
+
+<sub>[stdlib/Collections/Aggregates.sl:247](../../stdlib/Collections/Aggregates.sl#L247)</sub>
+
+### Sum *function*
+
+```
+float Sum<T>(ReadOnlySpan<T> items, Func<T, float> selector)
+```
+
+The total of what `selector` gives for each element; zero when there are none.
+
+**Type parameters**
+
+- `T` — the element type; the selector reads the number off it
+
+<sub>[stdlib/Collections/Aggregates.sl:258](../../stdlib/Collections/Aggregates.sl#L258)</sub>
+
+### Sum *function*
+
+```
+float Sum(IEnumerable<float> items)
+```
+
+The total of the elements; zero when there are none.
+
+<sub>[stdlib/Collections/Aggregates.sl:300](../../stdlib/Collections/Aggregates.sl#L300)</sub>
+
+### Sum *function*
+
+```
+float Sum<T>(IEnumerable<T> items, Func<T, float> selector)
+```
+
+The total of what `selector` gives for each element; zero when there are none.
+
+**Type parameters**
+
+- `T` — the element type; the selector reads the number off it
+
+<sub>[stdlib/Collections/Aggregates.sl:311](../../stdlib/Collections/Aggregates.sl#L311)</sub>
+
+### Sum *function*
+
+```
+double Sum(ReadOnlySpan<double> items)
+```
+
+The total of the elements; zero when there are none.
+
+<sub>[stdlib/Collections/Aggregates.sl:353](../../stdlib/Collections/Aggregates.sl#L353)</sub>
+
+### Sum *function*
+
+```
+double Sum<T>(ReadOnlySpan<T> items, Func<T, double> selector)
+```
+
+The total of what `selector` gives for each element; zero when there are none.
+
+**Type parameters**
+
+- `T` — the element type; the selector reads the number off it
+
+<sub>[stdlib/Collections/Aggregates.sl:364](../../stdlib/Collections/Aggregates.sl#L364)</sub>
+
+### Sum *function*
+
+```
+double Sum(IEnumerable<double> items)
+```
+
+The total of the elements; zero when there are none.
+
+<sub>[stdlib/Collections/Aggregates.sl:406](../../stdlib/Collections/Aggregates.sl#L406)</sub>
+
+### Sum *function*
+
+```
+double Sum<T>(IEnumerable<T> items, Func<T, double> selector)
+```
+
+The total of what `selector` gives for each element; zero when there are none.
+
+**Type parameters**
+
+- `T` — the element type; the selector reads the number off it
+
+<sub>[stdlib/Collections/Aggregates.sl:417](../../stdlib/Collections/Aggregates.sl#L417)</sub>
+
 ### Take *function*
 
 ```
@@ -3716,7 +5498,111 @@ The first `count` elements, or all of them if there are fewer.
 
 **See also** &nbsp; [Collections.Skip](#skip-function)
 
-<sub>[stdlib/Collections/Functional.sl:490](../../stdlib/Collections/Functional.sl#L490)</sub>
+<sub>[stdlib/Collections/Functional.sl:479](../../stdlib/Collections/Functional.sl#L479)</sub>
+
+### TakeLast *function*
+
+```
+List<T> TakeLast<T>(ReadOnlySpan<T> items, nuint count)
+```
+
+The last `count` elements, or all of them if there are fewer.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Combining.sl:150](../../stdlib/Collections/Combining.sl#L150)</sub>
+
+### TakeLast *function*
+
+```
+List<T> TakeLast<T>(IEnumerable<T> items, nuint count)
+```
+
+The last `count` elements, or all of them if there are fewer.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Combining.sl:397](../../stdlib/Collections/Combining.sl#L397)</sub>
+
+### TakeWhile *function*
+
+```
+List<T> TakeWhile<T>(ReadOnlySpan<T> items, Predicate<T> keep)
+```
+
+The elements up to the first the predicate refuses.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Combining.sl:118](../../stdlib/Collections/Combining.sl#L118)</sub>
+
+### TakeWhile *function*
+
+```
+List<T> TakeWhile<T>(IEnumerable<T> items, Predicate<T> keep)
+```
+
+The elements up to the first the predicate refuses.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+<sub>[stdlib/Collections/Combining.sl:365](../../stdlib/Collections/Combining.sl#L365)</sub>
+
+### ThenBy *function*
+
+```
+OrderedList<T> ThenBy<T, TKey>(OrderedList<T> items, Func<T, TKey> keySelector)
+    where TKey : IComparable<TKey>
+```
+
+The elements of an ordered list, ties broken by the key `keySelector`
+gives, smallest first.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+- `TKey` — the key, which must order itself
+
+<sub>[stdlib/Collections/OrderedList.sl:68](../../stdlib/Collections/OrderedList.sl#L68)</sub>
+
+### ThenBy *function*
+
+```
+OrderedList<T> ThenBy<T>(OrderedList<T> items, Comparison<T> order)
+```
+
+The elements of an ordered list, ties broken by `order`.
+
+**Type parameters**
+
+- `T` — the element type; the comparison orders it
+
+<sub>[stdlib/Collections/OrderedList.sl:84](../../stdlib/Collections/OrderedList.sl#L84)</sub>
+
+### ThenByDescending *function*
+
+```
+OrderedList<T> ThenByDescending<T, TKey>(OrderedList<T> items, Func<T, TKey> keySelector)
+    where TKey : IComparable<TKey>
+```
+
+The elements of an ordered list, ties broken by the key `keySelector`
+gives, largest first.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+- `TKey` — the key, which must order itself
+
+<sub>[stdlib/Collections/OrderedList.sl:77](../../stdlib/Collections/OrderedList.sl#L77)</sub>
 
 ### ToArray *function*
 
@@ -3753,6 +5639,106 @@ The same for a slice, which is not an `IEnumerable` and so does not collide.
 **See also** &nbsp; [Collections.ToList](#tolist-function)
 
 <sub>[stdlib/Collections/Functional.sl:410](../../stdlib/Collections/Functional.sl#L410)</sub>
+
+### ToDictionary *function*
+
+```
+Dictionary<TKey, T> ToDictionary<T, TKey>(ReadOnlySpan<T> items, Func<T, TKey> keySelector)
+    where TKey : IEquatable<TKey>, IHashable
+```
+
+A dictionary from the key `keySelector` gives each element to the element,
+aborting on a key given twice.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+- `TKey` — the key, which a `Dictionary` must be able to hold
+
+<sub>[stdlib/Collections/Grouping.sl:100](../../stdlib/Collections/Grouping.sl#L100)</sub>
+
+### ToDictionary *function*
+
+```
+Dictionary<TKey, TValue> ToDictionary<T, TKey, TValue>(ReadOnlySpan<T> items, Func<T, TKey> keySelector, Func<T, TValue> valueSelector)
+    where TKey : IEquatable<TKey>, IHashable
+```
+
+A dictionary from the key `keySelector` gives each element to what
+`valueSelector` makes of it, aborting on a key given twice.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+- `TKey` — the key, which a `Dictionary` must be able to hold
+- `TValue` — the value
+
+<sub>[stdlib/Collections/Grouping.sl:110](../../stdlib/Collections/Grouping.sl#L110)</sub>
+
+### ToDictionary *function*
+
+```
+Dictionary<TKey, T> ToDictionary<T, TKey>(IEnumerable<T> items, Func<T, TKey> keySelector)
+    where TKey : IEquatable<TKey>, IHashable
+```
+
+A dictionary from the key `keySelector` gives each element to the element,
+aborting on a key given twice.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+- `TKey` — the key, which a `Dictionary` must be able to hold
+
+<sub>[stdlib/Collections/Grouping.sl:176](../../stdlib/Collections/Grouping.sl#L176)</sub>
+
+### ToDictionary *function*
+
+```
+Dictionary<TKey, TValue> ToDictionary<T, TKey, TValue>(IEnumerable<T> items, Func<T, TKey> keySelector, Func<T, TValue> valueSelector)
+    where TKey : IEquatable<TKey>, IHashable
+```
+
+A dictionary from the key `keySelector` gives each element to what
+`valueSelector` makes of it, aborting on a key given twice.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+- `TKey` — the key, which a `Dictionary` must be able to hold
+- `TValue` — the value
+
+<sub>[stdlib/Collections/Grouping.sl:186](../../stdlib/Collections/Grouping.sl#L186)</sub>
+
+### ToHashSet *function*
+
+```
+HashSet<T> ToHashSet<T>(ReadOnlySpan<T> items)
+    where T : IEquatable<T>, IHashable
+```
+
+The distinct elements, as a set.
+
+**Type parameters**
+
+- `T` — the element type, which a `HashSet` must be able to hold
+
+<sub>[stdlib/Collections/Grouping.sl:126](../../stdlib/Collections/Grouping.sl#L126)</sub>
+
+### ToHashSet *function*
+
+```
+HashSet<T> ToHashSet<T>(IEnumerable<T> items)
+    where T : IEquatable<T>, IHashable
+```
+
+The distinct elements, as a set.
+
+**Type parameters**
+
+- `T` — the element type, which a `HashSet` must be able to hold
+
+<sub>[stdlib/Collections/Grouping.sl:202](../../stdlib/Collections/Grouping.sl#L202)</sub>
 
 ### ToList *function*
 
@@ -3971,6 +5957,68 @@ writable.
 
 <sub>[stdlib/Collections/Spans.sl:632](../../stdlib/Collections/Spans.sl#L632)</sub>
 
+### Union *function*
+
+```
+List<T> Union<T>(ReadOnlySpan<T> first, ReadOnlySpan<T> second)
+    where T : IEquatable<T>, IHashable
+```
+
+The distinct elements of both, first's first.
+
+**Type parameters**
+
+- `T` — the element type, which a `HashSet` must be able to hold
+
+<sub>[stdlib/Collections/Combining.sl:202](../../stdlib/Collections/Combining.sl#L202)</sub>
+
+### Union *function*
+
+```
+List<T> Union<T>(IEnumerable<T> first, IEnumerable<T> second)
+    where T : IEquatable<T>, IHashable
+```
+
+The distinct elements of both, first's first.
+
+**Type parameters**
+
+- `T` — the element type, which a `HashSet` must be able to hold
+
+<sub>[stdlib/Collections/Combining.sl:449](../../stdlib/Collections/Combining.sl#L449)</sub>
+
+### UnionBy *function*
+
+```
+List<T> UnionBy<T, TKey>(ReadOnlySpan<T> first, ReadOnlySpan<T> second, Func<T, TKey> keySelector)
+    where TKey : IEquatable<TKey>, IHashable
+```
+
+The distinct elements of both, by key, first's first.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+- `TKey` — the key, which a `HashSet` must be able to hold
+
+<sub>[stdlib/Collections/Combining.sl:209](../../stdlib/Collections/Combining.sl#L209)</sub>
+
+### UnionBy *function*
+
+```
+List<T> UnionBy<T, TKey>(IEnumerable<T> first, IEnumerable<T> second, Func<T, TKey> keySelector)
+    where TKey : IEquatable<TKey>, IHashable
+```
+
+The distinct elements of both, by key, first's first.
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+- `TKey` — the key, which a `HashSet` must be able to hold
+
+<sub>[stdlib/Collections/Combining.sl:456](../../stdlib/Collections/Combining.sl#L456)</sub>
+
 ### Where *function*
 
 ```
@@ -4006,4 +6054,68 @@ The same, for anything with a `GetEnumerator()` that names its shape --
 **See also** &nbsp; [Collections.Select](#select-function)
 
 <sub>[stdlib/Collections/Functional.sl:245](../../stdlib/Collections/Functional.sl#L245)</sub>
+
+### Zip *function*
+
+```
+List<(TFirst, TSecond)> Zip<TFirst, TSecond>(ReadOnlySpan<TFirst> first, ReadOnlySpan<TSecond> second)
+```
+
+Pairs of elements at the same position, as long as the shorter lasts.
+
+**Type parameters**
+
+- `TFirst` — the first sequence's element type
+- `TSecond` — the second's
+
+<sub>[stdlib/Collections/Combining.sl:73](../../stdlib/Collections/Combining.sl#L73)</sub>
+
+### Zip *function*
+
+```
+List<TResult> Zip<TFirst, TSecond, TResult>(ReadOnlySpan<TFirst> first, ReadOnlySpan<TSecond> second, Func<TFirst, TSecond, TResult> combine)
+```
+
+What `combine` makes of the elements at each position, as long as the
+shorter lasts.
+
+**Type parameters**
+
+- `TFirst` — the first sequence's element type
+- `TSecond` — the second's
+- `TResult` — what `combine` makes
+
+<sub>[stdlib/Collections/Combining.sl:82](../../stdlib/Collections/Combining.sl#L82)</sub>
+
+### Zip *function*
+
+```
+List<(TFirst, TSecond)> Zip<TFirst, TSecond>(IEnumerable<TFirst> first, IEnumerable<TSecond> second)
+```
+
+Pairs of elements at the same position, as long as the shorter lasts.
+
+**Type parameters**
+
+- `TFirst` — the first sequence's element type
+- `TSecond` — the second's
+
+<sub>[stdlib/Collections/Combining.sl:320](../../stdlib/Collections/Combining.sl#L320)</sub>
+
+### Zip *function*
+
+```
+List<TResult> Zip<TFirst, TSecond, TResult>(IEnumerable<TFirst> first, IEnumerable<TSecond> second, Func<TFirst, TSecond, TResult> combine)
+```
+
+What `combine` makes of the elements at each position, as long as the
+shorter lasts.
+
+**Type parameters**
+
+- `TFirst` — the first sequence's element type
+- `TSecond` — the second's
+- `TResult` — what `combine` makes
+
+<sub>[stdlib/Collections/Combining.sl:329](../../stdlib/Collections/Combining.sl#L329)</sub>
 

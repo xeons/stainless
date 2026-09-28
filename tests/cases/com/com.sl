@@ -154,14 +154,10 @@ public void Main()
     Guid* first = iidof(IGreeter);
     Guid* again = iidof(IGreeter);
     Console.WriteLine("iidof is stable: " + Text.FromBool(first == again));
-    // Every part of it, not only the first. `Guid` is built by the compiler
-    // rather than bound from source, so its field indices and offsets are
-    // written by hand and each one has to be checked.
-    Console.WriteLine("iidof data1: " + Text.FromInteger((long)first->Data1));
-    Console.WriteLine("iidof data2: " + Text.FromInteger((long)first->Data2));
-    Console.WriteLine("iidof data3: " + Text.FromInteger((long)first->Data3));
-    Console.WriteLine("iidof data4: " + Text.FromInteger((long)first->Data4[0u]) +
-                      " " + Text.FromInteger((long)first->Data4[7u]));
+    // Every part of it, not only the first. `Guid`'s layout is built by the
+    // compiler rather than bound from source, so its field indices and offsets
+    // are written by hand, and the text reads each of the four fields.
+    Console.WriteLine("iidof: " + first->ToString());
 
     Console.WriteLine("end of Main");
 }

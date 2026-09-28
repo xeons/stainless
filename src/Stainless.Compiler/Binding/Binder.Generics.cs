@@ -956,7 +956,8 @@ public sealed partial class Binder
             // `Func<T, TResult>` against a `Func<int, String>` held in a
             // variable: the same template, so the arguments line up.
             case NamedTypeSyntax { TypeArguments.Count: > 0 } signature
-                when FindGenericDelegate(signature.Name, scope) is { } delegateTemplate &&
+                when FindGenericDelegate(signature.Name, scope, signature.TypeArguments.Count)
+                         is { } delegateTemplate &&
                      actual is NamedTypeSymbol delegateType &&
                      _delegateTemplates.GetValueOrDefault(delegateType) == delegateTemplate &&
                      delegateType.TypeArguments.Count == signature.TypeArguments.Count:
@@ -967,7 +968,7 @@ public sealed partial class Binder
 
             case NamedTypeSyntax { TypeArguments.Count: > 0 } constructed:
             {
-                var template = FindGenericType(constructed.Name, scope);
+                var template = FindGenericType(constructed.Name, scope, constructed.TypeArguments.Count);
                 if (template is null) break;
 
                 foreach (var candidate in InferenceCandidates(actual))

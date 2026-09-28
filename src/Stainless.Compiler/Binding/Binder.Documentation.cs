@@ -531,20 +531,17 @@ public sealed partial class Binder
     {
         if (parts.Count == 1)
         {
-            if (_context.File!.Module.GenericTypes.TryGetValue(parts[0], out var here))
+            if (_context.File!.Module.FindGenericType(parts[0], null) is { } here)
                 return here;
 
             foreach (var imported in _context.File.ImportedModules)
-                if (imported.GenericTypes.TryGetValue(parts[0], out var there) && there.IsPublic)
+                if (imported.FindGenericType(parts[0], null) is { IsPublic: true } there)
                     return there;
 
             return null;
         }
 
-        return ModuleNamed(parts.Take(parts.Count - 1).ToList()) is { } module &&
-               module.GenericTypes.TryGetValue(parts[^1], out var qualified)
-            ? qualified
-            : null;
+        return ModuleNamed(parts.Take(parts.Count - 1).ToList())?.FindGenericType(parts[^1], null);
     }
 
     /// <summary>Whether a type declaration declares something of this name.</summary>
@@ -581,8 +578,7 @@ public sealed partial class Binder
         module.Functions.Any(f => f.Name == member) ||
         module.GenericFunctions.Any(f => f.Name == member) ||
         module.Types.ContainsKey(member) ||
-        module.GenericTypes.ContainsKey(member) ||
-        module.GenericDelegates.ContainsKey(member) ||
+        module.DeclaresGeneric(member) ||
         module.Aliases.ContainsKey(member) ||
         module.Constants.ContainsKey(member) ||
         module.Statics.ContainsKey(member);

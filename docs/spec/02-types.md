@@ -1080,17 +1080,16 @@ every type owes ([§3.7](03-text.md#37-conversions)), and a record is not the
 place to invent one — every class would then owe an implementation, for a
 default that printed a type name.
 
-**There is no `record struct`.** What makes a record a dictionary key is the
-`IEquatable` and `IHashable` it declares, and a struct implements no interface:
-an interface reference is counted and a struct has no header to count it in
-([§2.2](#22-struct--value-type-c-layout)). A record without those two would be
-a struct with a constructor and an `Equals`, which is already writable
-([§2.2.1](#221-a-structs-constructor)).
+**There is no `record struct` yet.** A struct may implement the
+`IEquatable` and `IHashable` a record declares
+([§2.10](#210-interface--a-contract-dispatched-dynamically)), so nothing stands
+in its way but the generating; until then, it is a struct with a constructor,
+an `Equals` and a `GetHashCode` ([§2.2.1](#221-a-structs-constructor)).
 
 ```
-error[SL0734]: a record implements 'IEquatable' and 'IHashable', and a struct
-implements no interface, so there is no 'record struct'; write 'record' for a
-class, or a struct with a constructor and an 'Equals' of its own
+error[SL0734]: there is no 'record struct' yet; write 'record' for a class, or
+a struct with a constructor, 'Equals' and 'GetHashCode' of its own, which may
+implement 'IEquatable' and 'IHashable' as a record's would
 ```
 
 **A record may derive from a record**, and then it is one type with more in
@@ -1885,11 +1884,26 @@ reached through the object rather than carried alongside it. So `IShape?`,
 `weak IShape?`, ARC and the calling convention all behave exactly as they do for
 a class, and passing a `IShape` costs the same as passing any reference.
 
-A `struct` cannot implement an interface an object answers: an interface
-reference is counted, and a struct is a plain C value with nowhere to keep a
-count. One whose members are all static it may, because nothing about it is
-reached through a reference
-([§4.3.1](04-generics.md#431-static-abstract--a-promise-about-the-type)).
+**A `struct` may implement an interface too**, and keeps the promise with
+members of its own. What it may not do is become a reference to one (SL0302):
+an interface reference is counted, and a struct is a plain C value with
+nowhere to keep a count. A struct is taken where a generic parameter
+`T : IShape` is, and every call on it is to its own member, in place, with no
+copy and no dispatch; C# would box it instead. Implementing one adds nothing
+to its layout, so it crosses `extern "C"` as it did before.
+
+```csharp
+public struct Square : IShape { public double Side; public double Area() => Side * Side; }
+
+double Measure<T>(T shape) where T : IShape => shape.Area();   // fine
+IShape held = square;                                          // SL0302
+```
+
+That is what lets a struct be a dictionary key or be sorted: `Guid`,
+`DateOnly` and `Version` are structs implementing `IEquatable<T>`,
+`IComparable<T>` and `IHashable`. A later declaration of a struct
+([§1.2.1](01-modules.md#121-and-so-may-a-type)) may carry its interface list,
+since the list says nothing about the layout.
 
 Dispatch is four constant-offset loads with no search and no branch — see
 [abi.md](../abi.md) for the tables. An interface reference can be asked what it

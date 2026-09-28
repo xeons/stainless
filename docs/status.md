@@ -410,6 +410,28 @@ last person to edit it -- the suite is the authority.
 - Generic overloads that both fit are ranked as any overloads are, so
   `Trim(Span<T>)` and `Trim(ReadOnlySpan<T>)` are not ambiguous
 - `==` on two arrays of one type asks whether they are one array
+- A struct implements interfaces — `IEquatable`, `IComparable`, `IHashable`,
+  `IFormattable` and any other — with members of its own, and is reached
+  through a generic parameter in place; it is never a reference to one
+  (SL0302), so its layout is untouched and it still crosses `extern "C"`
+- A generic name is declared once per arity, as C#'s `Func<TResult>`,
+  `Func<T, TResult>` and `Func<T1, T2, TResult>` are; `Standard` has `Func`
+  and `Action` to four arguments
+- A lambda is ranked by what its body returns, so `Sum(items, i => i.Count)`
+  and `Sum(items, i => i.Price)` reach the `int` and the `double` overload;
+  an array literal's elements are a type to infer from; two variant cases in a
+  conditional take the type it is going to
+- LINQ's operators over a span and over any sequence: `First`, `Last`,
+  `Single`, `ElementAt`, `Sum`, `Average`, `Min`, `Max`, `MinBy`, `MaxBy`,
+  `GroupBy`, `ToDictionary`, `ToHashSet`, `OrderBy` and `OrderByDescending`
+  with `ThenBy`, `Zip`, `Concat`, `Chunk`, the `While` and `Last` cuts, the set
+  operators and their `By` forms, `SelectMany`, `Enumerable.Range` and
+  `Repeat`. Where C# throws they abort
+- C#'s everyday values in `Standard`: `Guid` (COM's layout, so one `Guid` does
+  for both), `Version`, `Uri` by RFC 3986 and `Lazy<T>`; and in
+  `Standard.Time`, `DateOnly`, `TimeOnly` and `TimeZoneInfo` — the IANA
+  database on Linux and macOS, the system's zones on Windows, with IANA names
+  mapped through ICU there
 - A struct method that writes its receiver cannot be called on an `in`
   parameter, a `static readonly`, a `const` or a `ReadOnlySpan<T>` element; one
   that only reads is called in place, with no copy
@@ -534,13 +556,11 @@ last person to edit it -- the suite is the authority.
   so a function need not be wrapped in a static class to exist and there is
   nothing a `this` modifier would add. A member always wins, so nothing a type
   declares can be shadowed by somebody else's function
-- **Combinators**, over an array, a slice or any `IEnumerable<T>`: `Select`,
-  `Where`, `Aggregate`, `Any`, `All`, `Count`, `Find`, `FirstOrDefault`,
-  `FindIndex`, `ForEach`, `Take`, `Skip`, `Distinct`, `OrderBy`, `ToList` and
-  `ToArray`, under the names LINQ gave them. Each takes a generic
-  `closure` — `Func<T, TResult>`, `Predicate<T>`, `Action<T>`,
-  `Fold<TAccumulate, TSource>`, `Comparison<T>` — so a lambda and a method
-  that already exists are the same thing:
+- **Combinators**, over an array, a slice or any `IEnumerable<T>`: LINQ's
+  operators under the names LINQ gave them, from `Select` and `Where` to
+  `GroupBy`, `ThenBy` and `Zip` — the list is in the spec's §5.5. Each takes a
+  generic `closure` — `Func`, `Predicate`, `Action`, `Fold`, `Comparison` — so
+  a lambda and a method that already exists are the same thing:
 
   ```csharp
   var adults = Where(people, p => p.Age >= 18);

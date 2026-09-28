@@ -460,15 +460,8 @@ public List<T> Distinct<T>(IEnumerable<T> items) where T : IEquatable<T>
 /// @typeparam T  the element type; the comparer orders it, so nothing is asked
 ///               of it
 /// @see Collections.Sort
-public List<T> OrderBy<T>(ReadOnlySpan<T> items, Comparison<T> order)
-{
-    var copy = new T[items.Length];
-    for (nuint i = 0u; i < items.Length; i++)
-        copy[i] = items[i];
-
-    Sort(copy, order);
-    return ToList(copy);
-}
+public OrderedList<T> OrderBy<T>(ReadOnlySpan<T> items, Comparison<T> order) =>
+    SortedBy(items.ToArray(), order);
 
 /// The elements ordered by what `order` says, over any sequence, leaving the
 /// input alone. Copies into an array first, so it costs one.
@@ -476,12 +469,8 @@ public List<T> OrderBy<T>(ReadOnlySpan<T> items, Comparison<T> order)
 /// @typeparam T  the element type; the comparer orders it, so nothing is asked
 ///               of it
 /// @see Collections.Sort
-public List<T> OrderBy<T>(IEnumerable<T> items, Comparison<T> order)
-{
-    var copy = ToArray(items);
-    Sort(copy, order);
-    return ToList(copy);
-}
+public OrderedList<T> OrderBy<T>(IEnumerable<T> items, Comparison<T> order) =>
+    SortedBy(ToArray(items), order);
 
 /// The first `count` elements, or all of them if there are fewer.
 ///

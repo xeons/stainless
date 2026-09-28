@@ -1,0 +1,17 @@
+UTC base 0.000s dst no iana yes
+  july 2026-07-01 12:00:00 0.000s no, january 2026-01-15 12:00:00 0.000s no
+America/New_York base -5h00m00.000s dst yes iana yes
+  july 2026-07-01 08:00:00 -4h00m00.000s yes, january 2026-01-15 07:00:00 -5h00m00.000s no
+Australia/Sydney base 10h00m00.000s dst yes iana yes
+  july 2026-07-01 22:00:00 10h00m00.000s no, january 2026-01-15 23:00:00 11h00m00.000s yes
+Asia/Kolkata base 5h30m00.000s dst no iana yes
+  july 2026-07-01 17:30:00 5h30m00.000s no, january 2026-01-15 17:30:00 5h30m00.000s no
+Europe/Paris base 1h00m00.000s dst yes iana yes
+  july 2026-07-01 14:00:00 2h00m00.000s yes, january 2026-01-15 13:00:00 1h00m00.000s no
+Nowhere/Special not found
+gap yes yes, overlap yes 2026-11-01T06:30:00Z, ordinary no no
+change 2026-03-08 01:59:00 2026-03-08 03:00:00
+far -4h00m00.000s past -5h00m00.000s
+paris 2026-07-04 15:00:00
+from utc 2026-12-25 07:00:00 2026-12-25 17:30:00
+(UTC+05:00) Mars 5h00m00.000s no yes

@@ -1071,6 +1071,17 @@ SL_API long long sl_time_from_parts(long long year, long long month, long long d
 /* How far ahead of UTC the local zone is at that moment, in seconds. */
 SL_API long long sl_time_zone_offset(long long nanoseconds);
 
+/*
+ * Time zones, for Standard.Time.TimeZoneInfo: the local zone's name, and on
+ * Windows a zone's rules for a run of years with its names, and the mapping
+ * between IANA and Windows names. Each name is UTF-8 into the buffer,
+ * and the length is answered, or -1.
+ */
+SL_API long long sl_tz_local_name(char *buffer, size_t size);
+SL_API long long sl_tz_windows_zone(const char *id, long long index, long long firstYear,
+                                    long long count, long long *rules, char *names, size_t size);
+SL_API long long sl_tz_map_id(const char *id, _Bool toWindows, char *buffer, size_t size);
+
 /* ------------------------------------------------------------- entropy */
 
 /*

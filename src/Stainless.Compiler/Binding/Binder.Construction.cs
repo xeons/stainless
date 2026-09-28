@@ -873,7 +873,7 @@ public sealed partial class Binder
         // A name that is no generic type may be a generic function, and the
         // call is where that is settled.
         var name = new QualifiedName(target.Span, parts);
-        if (FindGenericType(name, _context.File!) is null)
+        if (FindGenericType(name, _context.File!, null) is null)
             return null;
 
         // Asked several times of one expression, and reported once. A generic

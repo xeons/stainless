@@ -70,9 +70,11 @@ public sealed class Builtins
     public ModuleSymbol Bits { get; }
 
     /// <summary>
-    /// <c>Guid</c>: 16 bytes, laid out as every existing COM header lays one
-    /// out, so a <c>Guid*</c> passed to a C function is the <c>GUID*</c> it
-    /// expects.
+    /// <c>Standard.Guid</c>: 16 bytes, laid out as every existing COM header
+    /// lays one out, so a <c>Guid*</c> passed to a C function is the
+    /// <c>GUID*</c> it expects. Its layout is declared here, because a COM
+    /// signature built here names it; its members are the standard library's,
+    /// in a second declaration of the type.
     /// </summary>
     public StructTypeSymbol Guid { get; }
 
@@ -380,11 +382,12 @@ public sealed class Builtins
         //
         // Guid is a plain struct with C's layout: a 32-bit field, two 16-bit
         // ones and eight bytes, which is what every COM header and every
-        // registry entry agrees a GUID is.
+        // registry entry agrees a GUID is. It lives in Standard, as C#'s does
+        // in System, and the fields are that module's alone.
         Guid = new StructTypeSymbol
         {
             SimpleName = "Guid",
-            ModuleName = ComModuleName,
+            ModuleName = StandardModuleName,
             IsPublic = true,
         };
         // The last argument is the field's *index*, and the offset is set after
@@ -392,17 +395,17 @@ public sealed class Builtins
         // nothing else fills either in. The two are not the same number past the
         // first field, and a `Guid` laid out as though they were reaches one
         // member off.
-        Guid.Fields.Add(new FieldSymbol("Data1", PrimitiveTypeSymbol.UInt, Guid, 0)
-            { IsPublic = true, Offset = 0 });
-        Guid.Fields.Add(new FieldSymbol("Data2", PrimitiveTypeSymbol.UShort, Guid, 1)
-            { IsPublic = true, Offset = 4 });
-        Guid.Fields.Add(new FieldSymbol("Data3", PrimitiveTypeSymbol.UShort, Guid, 2)
-            { IsPublic = true, Offset = 6 });
+        Guid.Fields.Add(new FieldSymbol("_a", PrimitiveTypeSymbol.UInt, Guid, 0)
+            { Offset = 0 });
+        Guid.Fields.Add(new FieldSymbol("_b", PrimitiveTypeSymbol.UShort, Guid, 1)
+            { Offset = 4 });
+        Guid.Fields.Add(new FieldSymbol("_c", PrimitiveTypeSymbol.UShort, Guid, 2)
+            { Offset = 6 });
         Guid.Fields.Add(new FieldSymbol(
-            "Data4", PrimitiveTypeSymbol.Byte.MakeFixedArrayType(8), Guid, 3)
-            { IsPublic = true, Offset = 8 });
+            "_d", PrimitiveTypeSymbol.Byte.MakeFixedArrayType(8), Guid, 3)
+            { Offset = 8 });
         Guid.SetLayout(16, 4);
-        Com.Types[Guid.SimpleName] = Guid;
+        Standard.Types[Guid.SimpleName] = Guid;
 
         // IUnknown, whose three methods are slots 0, 1 and 2 of every COM
         // vtable. They are declared here rather than in source because the

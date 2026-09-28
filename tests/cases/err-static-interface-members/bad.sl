@@ -27,12 +27,6 @@ public interface IPlus
 // Supplies nothing for the requirement.
 public class Empty : IZero<Empty> { }                    // SL0305
 
-// A struct cannot implement an interface an object answers.
-public struct Flat : IShape                              // SL0302
-{
-    public double Area() => 0.0;
-}
-
 public class Counted : IZero<Counted>
 {
     public static Counted Zero => new Counted();

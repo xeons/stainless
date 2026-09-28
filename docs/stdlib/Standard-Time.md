@@ -20,13 +20,295 @@ is not the reason anything here will go wrong.
 
 ## Contents
 
-**Types** &nbsp; [DateTime](#datetime-struct) &middot; [DateTimeOffset](#datetimeoffset-struct) &middot; [Stopwatch](#stopwatch-class) &middot; [TimeError](#timeerror-enum) &middot; [TimeSpan](#timespan-struct)
+**Types** &nbsp; [DateOnly](#dateonly-struct) &middot; [DateTime](#datetime-struct) &middot; [DateTimeOffset](#datetimeoffset-struct) &middot; [Stopwatch](#stopwatch-class) &middot; [TimeError](#timeerror-enum) &middot; [TimeOnly](#timeonly-struct) &middot; [TimeSpan](#timespan-struct) &middot; [TimeZoneInfo](#timezoneinfo-class)
 
 **Functions** &nbsp; [DaysInMonth](#daysinmonth-function) &middot; [IsLeapYear](#isleapyear-function)
 
 **Constants** &nbsp; [NanosecondsPerDay](#nanosecondsperday-constant) &middot; [NanosecondsPerHour](#nanosecondsperhour-constant) &middot; [NanosecondsPerMicrosecond](#nanosecondspermicrosecond-constant) &middot; [NanosecondsPerMillisecond](#nanosecondspermillisecond-constant) &middot; [NanosecondsPerMinute](#nanosecondsperminute-constant) &middot; [NanosecondsPerSecond](#nanosecondspersecond-constant)
 
 ## Types
+
+### DateOnly *struct*
+
+```
+struct DateOnly : IEquatable<DateOnly>, IComparable<DateOnly>, IHashable
+```
+
+A date and no time: C#'s `System.DateOnly`.
+
+    var due = new DateOnly(2026, 9, 30).AddMonths(1);  // 2026-10-30
+
+From 0001-01-01 to 9999-12-31 in the Gregorian calendar, as C#'s. A date
+outside that, or a day its month does not have, aborts where C# throws.
+Written and read as ISO 8601, `2026-09-30`, rather than in a culture's form.
+
+<sub>[stdlib/Time/DateOnly.sl:64](../../stdlib/Time/DateOnly.sl#L64)</sub>
+
+#### MinValue *property*
+
+```
+static DateOnly MinValue { get; }
+```
+
+0001-01-01.
+
+<sub>[stdlib/Time/DateOnly.sl:77](../../stdlib/Time/DateOnly.sl#L77)</sub>
+
+#### MaxValue *property*
+
+```
+static DateOnly MaxValue { get; }
+```
+
+9999-12-31.
+
+<sub>[stdlib/Time/DateOnly.sl:80](../../stdlib/Time/DateOnly.sl#L80)</sub>
+
+#### FromDayNumber *method*
+
+```
+static DateOnly FromDayNumber(int dayNumber)
+```
+
+The date `dayNumber` days after 0001-01-01. Aborts outside the range.
+
+<sub>[stdlib/Time/DateOnly.sl:83](../../stdlib/Time/DateOnly.sl#L83)</sub>
+
+#### FromDateTime *method*
+
+```
+static DateOnly FromDateTime(DateTime when)
+```
+
+The date part of `when`.
+
+<sub>[stdlib/Time/DateOnly.sl:93](../../stdlib/Time/DateOnly.sl#L93)</sub>
+
+#### DayNumber *property*
+
+```
+int DayNumber { get; }
+```
+
+Days since 0001-01-01.
+
+<sub>[stdlib/Time/DateOnly.sl:96](../../stdlib/Time/DateOnly.sl#L96)</sub>
+
+#### Year *property*
+
+```
+int Year { get; }
+```
+
+The year, 1 to 9999.
+
+<sub>[stdlib/Time/DateOnly.sl:101](../../stdlib/Time/DateOnly.sl#L101)</sub>
+
+#### Month *property*
+
+```
+int Month { get; }
+```
+
+The month, 1 to 12.
+
+<sub>[stdlib/Time/DateOnly.sl:104](../../stdlib/Time/DateOnly.sl#L104)</sub>
+
+#### Day *property*
+
+```
+int Day { get; }
+```
+
+The day of the month, 1 to 31.
+
+<sub>[stdlib/Time/DateOnly.sl:107](../../stdlib/Time/DateOnly.sl#L107)</sub>
+
+#### DayOfWeek *property*
+
+```
+int DayOfWeek { get; }
+```
+
+The day of the week, 0 for Sunday through 6 for Saturday, as
+`DateTime.DayOfWeek` counts. 0001-01-01 was a Monday.
+
+<sub>[stdlib/Time/DateOnly.sl:111](../../stdlib/Time/DateOnly.sl#L111)</sub>
+
+#### DayOfYear *property*
+
+```
+int DayOfYear { get; }
+```
+
+The day of the year, 1 to 366.
+
+<sub>[stdlib/Time/DateOnly.sl:114](../../stdlib/Time/DateOnly.sl#L114)</sub>
+
+#### AddDays *method*
+
+```
+DateOnly AddDays(int days)
+```
+
+`days` later, or earlier when negative. Aborts outside the range.
+
+<sub>[stdlib/Time/DateOnly.sl:118](../../stdlib/Time/DateOnly.sl#L118)</sub>
+
+#### AddMonths *method*
+
+```
+DateOnly AddMonths(int months)
+```
+
+`months` later, the day kept or, where the month is shorter, its last.
+
+<sub>[stdlib/Time/DateOnly.sl:121](../../stdlib/Time/DateOnly.sl#L121)</sub>
+
+#### AddYears *method*
+
+```
+DateOnly AddYears(int years)
+```
+
+`years` later, 29 February becoming the 28th in a year without one.
+
+<sub>[stdlib/Time/DateOnly.sl:131](../../stdlib/Time/DateOnly.sl#L131)</sub>
+
+#### ToDateTime *method*
+
+```
+DateTime ToDateTime(TimeOnly time)
+```
+
+The date and `time` together.
+
+<sub>[stdlib/Time/DateOnly.sl:134](../../stdlib/Time/DateOnly.sl#L134)</sub>
+
+#### Deconstruct *method*
+
+```
+void Deconstruct(out int year, out int month, out int day)
+```
+
+The year, month and day.
+
+<sub>[stdlib/Time/DateOnly.sl:150](../../stdlib/Time/DateOnly.sl#L150)</sub>
+
+#### ToString *method*
+
+```
+String ToString()
+```
+
+`2026-09-30`.
+
+<sub>[stdlib/Time/DateOnly.sl:159](../../stdlib/Time/DateOnly.sl#L159)</sub>
+
+#### Parse *method*
+
+```
+static Result<DateOnly, TimeError> Parse(String text)
+```
+
+Reads `yyyy-MM-dd`.
+
+**Fails with**
+
+- [TimeError.Malformed](#malformed-case) — not that shape
+- [TimeError.OutOfRange](#outofrange-case) — that shape and no real date
+
+<sub>[stdlib/Time/DateOnly.sl:166](../../stdlib/Time/DateOnly.sl#L166)</sub>
+
+#### Equals *method*
+
+```
+bool Equals(DateOnly other)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Time/DateOnly.sl:181](../../stdlib/Time/DateOnly.sl#L181)</sub>
+
+#### CompareTo *method*
+
+```
+int CompareTo(DateOnly other)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Time/DateOnly.sl:182](../../stdlib/Time/DateOnly.sl#L182)</sub>
+
+#### GetHashCode *method*
+
+```
+nuint GetHashCode()
+```
+
+*No documentation.*
+
+<sub>[stdlib/Time/DateOnly.sl:183](../../stdlib/Time/DateOnly.sl#L183)</sub>
+
+#### operator == *operator*
+
+```
+static bool operator ==(DateOnly left, DateOnly right)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Time/DateOnly.sl:185](../../stdlib/Time/DateOnly.sl#L185)</sub>
+
+#### operator != *operator*
+
+```
+static bool operator !=(DateOnly left, DateOnly right)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Time/DateOnly.sl:186](../../stdlib/Time/DateOnly.sl#L186)</sub>
+
+#### operator &lt; *operator*
+
+```
+static bool operator <(DateOnly left, DateOnly right)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Time/DateOnly.sl:187](../../stdlib/Time/DateOnly.sl#L187)</sub>
+
+#### operator &gt; *operator*
+
+```
+static bool operator >(DateOnly left, DateOnly right)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Time/DateOnly.sl:188](../../stdlib/Time/DateOnly.sl#L188)</sub>
+
+#### operator &lt;= *operator*
+
+```
+static bool operator <=(DateOnly left, DateOnly right)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Time/DateOnly.sl:189](../../stdlib/Time/DateOnly.sl#L189)</sub>
+
+#### operator &gt;= *operator*
+
+```
+static bool operator >=(DateOnly left, DateOnly right)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Time/DateOnly.sl:190](../../stdlib/Time/DateOnly.sl#L190)</sub>
 
 ### DateTime *struct*
 
@@ -538,6 +820,350 @@ The right shape and not a real moment: the 31st of February, a month of
 
 <sub>[stdlib/Time/TimeError.sl:37](../../stdlib/Time/TimeError.sl#L37)</sub>
 
+#### NotFound *case*
+
+```
+NotFound
+```
+
+No time zone of that name, or none with a readable definition.
+
+<sub>[stdlib/Time/TimeError.sl:40](../../stdlib/Time/TimeError.sl#L40)</sub>
+
+#### Invalid *case*
+
+```
+Invalid
+```
+
+A wall-clock time the zone skips, as when its clocks go forward.
+
+<sub>[stdlib/Time/TimeError.sl:43](../../stdlib/Time/TimeError.sl#L43)</sub>
+
+### TimeOnly *struct*
+
+```
+struct TimeOnly : IEquatable<TimeOnly>, IComparable<TimeOnly>, IHashable
+```
+
+A time of day and no date: C#'s `System.TimeOnly`.
+
+    var opens = new TimeOnly(9, 30);
+    var closes = opens.Add(TimeSpan.FromHours(8));   // 17:30
+
+To the nanosecond, from midnight to one nanosecond before the next.
+Adding wraps round midnight, and a part out of range aborts where C#
+throws. Written and read as `HH:mm:ss`, with a fraction when there is one.
+
+<sub>[stdlib/Time/TimeOnly.sl:34](../../stdlib/Time/TimeOnly.sl#L34)</sub>
+
+#### MinValue *property*
+
+```
+static TimeOnly MinValue { get; }
+```
+
+Midnight.
+
+<sub>[stdlib/Time/TimeOnly.sl:60](../../stdlib/Time/TimeOnly.sl#L60)</sub>
+
+#### MaxValue *property*
+
+```
+static TimeOnly MaxValue { get; }
+```
+
+One nanosecond before midnight.
+
+<sub>[stdlib/Time/TimeOnly.sl:63](../../stdlib/Time/TimeOnly.sl#L63)</sub>
+
+#### FromTimeSpan *method*
+
+```
+static TimeOnly FromTimeSpan(TimeSpan span)
+```
+
+The time `span` after midnight. Aborts unless it is within one day.
+
+<sub>[stdlib/Time/TimeOnly.sl:66](../../stdlib/Time/TimeOnly.sl#L66)</sub>
+
+#### FromDateTime *method*
+
+```
+static TimeOnly FromDateTime(DateTime when)
+```
+
+The time part of `when`.
+
+<sub>[stdlib/Time/TimeOnly.sl:76](../../stdlib/Time/TimeOnly.sl#L76)</sub>
+
+#### ToTimeSpan *method*
+
+```
+TimeSpan ToTimeSpan()
+```
+
+How long after midnight it is.
+
+<sub>[stdlib/Time/TimeOnly.sl:82](../../stdlib/Time/TimeOnly.sl#L82)</sub>
+
+#### Hour *property*
+
+```
+int Hour { get; }
+```
+
+The hour, 0 to 23.
+
+<sub>[stdlib/Time/TimeOnly.sl:85](../../stdlib/Time/TimeOnly.sl#L85)</sub>
+
+#### Minute *property*
+
+```
+int Minute { get; }
+```
+
+The minute, 0 to 59.
+
+<sub>[stdlib/Time/TimeOnly.sl:88](../../stdlib/Time/TimeOnly.sl#L88)</sub>
+
+#### Second *property*
+
+```
+int Second { get; }
+```
+
+The second, 0 to 59.
+
+<sub>[stdlib/Time/TimeOnly.sl:91](../../stdlib/Time/TimeOnly.sl#L91)</sub>
+
+#### Millisecond *property*
+
+```
+int Millisecond { get; }
+```
+
+The millisecond, 0 to 999.
+
+<sub>[stdlib/Time/TimeOnly.sl:94](../../stdlib/Time/TimeOnly.sl#L94)</sub>
+
+#### Microsecond *property*
+
+```
+int Microsecond { get; }
+```
+
+The microsecond within the millisecond, 0 to 999.
+
+<sub>[stdlib/Time/TimeOnly.sl:97](../../stdlib/Time/TimeOnly.sl#L97)</sub>
+
+#### Nanosecond *property*
+
+```
+int Nanosecond { get; }
+```
+
+The nanosecond within the microsecond, 0 to 999.
+
+<sub>[stdlib/Time/TimeOnly.sl:100](../../stdlib/Time/TimeOnly.sl#L100)</sub>
+
+#### Ticks *property*
+
+```
+long Ticks { get; }
+```
+
+Hundreds of nanoseconds since midnight, as C# counts ticks.
+
+<sub>[stdlib/Time/TimeOnly.sl:103](../../stdlib/Time/TimeOnly.sl#L103)</sub>
+
+#### Add *method*
+
+```
+TimeOnly Add(TimeSpan span)
+```
+
+`span` later, round midnight as often as it takes.
+
+<sub>[stdlib/Time/TimeOnly.sl:106](../../stdlib/Time/TimeOnly.sl#L106)</sub>
+
+#### Add *method*
+
+```
+TimeOnly Add(TimeSpan span, out int wrappedDays)
+```
+
+`span` later, and how many midnights were passed: negative going back.
+
+<sub>[stdlib/Time/TimeOnly.sl:113](../../stdlib/Time/TimeOnly.sl#L113)</sub>
+
+#### AddHours *method*
+
+```
+TimeOnly AddHours(double hours)
+```
+
+`hours` later, round midnight.
+
+<sub>[stdlib/Time/TimeOnly.sl:130](../../stdlib/Time/TimeOnly.sl#L130)</sub>
+
+#### AddMinutes *method*
+
+```
+TimeOnly AddMinutes(double minutes)
+```
+
+`minutes` later, round midnight.
+
+<sub>[stdlib/Time/TimeOnly.sl:134](../../stdlib/Time/TimeOnly.sl#L134)</sub>
+
+#### IsBetween *method*
+
+```
+bool IsBetween(TimeOnly start, TimeOnly end)
+```
+
+Whether this is from `start` up to but not including `end`, going round
+midnight when `end` is earlier than `start`.
+
+<sub>[stdlib/Time/TimeOnly.sl:139](../../stdlib/Time/TimeOnly.sl#L139)</sub>
+
+#### Deconstruct *method*
+
+```
+void Deconstruct(out int hour, out int minute, out int second)
+```
+
+The hour, minute and second.
+
+<sub>[stdlib/Time/TimeOnly.sl:145](../../stdlib/Time/TimeOnly.sl#L145)</sub>
+
+#### ToString *method*
+
+```
+String ToString()
+```
+
+`HH:mm:ss`, and the fraction of a second when there is one.
+
+<sub>[stdlib/Time/TimeOnly.sl:153](../../stdlib/Time/TimeOnly.sl#L153)</sub>
+
+#### Parse *method*
+
+```
+static Result<TimeOnly, TimeError> Parse(String text)
+```
+
+Reads `HH:mm`, `HH:mm:ss` or `HH:mm:ss.fffffffff`.
+
+**Fails with**
+
+- [TimeError.Malformed](#malformed-case) — not one of those shapes
+- [TimeError.OutOfRange](#outofrange-case) — that shape and no real time
+
+<sub>[stdlib/Time/TimeOnly.sl:171](../../stdlib/Time/TimeOnly.sl#L171)</sub>
+
+#### Equals *method*
+
+```
+bool Equals(TimeOnly other)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Time/TimeOnly.sl:203](../../stdlib/Time/TimeOnly.sl#L203)</sub>
+
+#### CompareTo *method*
+
+```
+int CompareTo(TimeOnly other)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Time/TimeOnly.sl:204](../../stdlib/Time/TimeOnly.sl#L204)</sub>
+
+#### GetHashCode *method*
+
+```
+nuint GetHashCode()
+```
+
+*No documentation.*
+
+<sub>[stdlib/Time/TimeOnly.sl:206](../../stdlib/Time/TimeOnly.sl#L206)</sub>
+
+#### operator - *operator*
+
+```
+static TimeSpan operator -(TimeOnly later, TimeOnly earlier)
+```
+
+How long from `earlier` to `later`, going forward round midnight, so
+never negative.
+
+<sub>[stdlib/Time/TimeOnly.sl:210](../../stdlib/Time/TimeOnly.sl#L210)</sub>
+
+#### operator == *operator*
+
+```
+static bool operator ==(TimeOnly left, TimeOnly right)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Time/TimeOnly.sl:216](../../stdlib/Time/TimeOnly.sl#L216)</sub>
+
+#### operator != *operator*
+
+```
+static bool operator !=(TimeOnly left, TimeOnly right)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Time/TimeOnly.sl:217](../../stdlib/Time/TimeOnly.sl#L217)</sub>
+
+#### operator &lt; *operator*
+
+```
+static bool operator <(TimeOnly left, TimeOnly right)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Time/TimeOnly.sl:218](../../stdlib/Time/TimeOnly.sl#L218)</sub>
+
+#### operator &gt; *operator*
+
+```
+static bool operator >(TimeOnly left, TimeOnly right)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Time/TimeOnly.sl:219](../../stdlib/Time/TimeOnly.sl#L219)</sub>
+
+#### operator &lt;= *operator*
+
+```
+static bool operator <=(TimeOnly left, TimeOnly right)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Time/TimeOnly.sl:220](../../stdlib/Time/TimeOnly.sl#L220)</sub>
+
+#### operator &gt;= *operator*
+
+```
+static bool operator >=(TimeOnly left, TimeOnly right)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Time/TimeOnly.sl:221](../../stdlib/Time/TimeOnly.sl#L221)</sub>
+
 ### TimeSpan *struct*
 
 ```
@@ -855,6 +1481,334 @@ the way a log line wants it.
 
 <sub>[stdlib/Time/TimeSpan.sl:202](../../stdlib/Time/TimeSpan.sl#L202)</sub>
 
+### TimeZoneInfo *class*
+
+```
+sealed class TimeZoneInfo : IEquatable<TimeZoneInfo>, IHashable
+```
+
+A time zone, and the rules that move its clocks: C#'s `System.TimeZoneInfo`.
+
+    if (TimeZoneInfo.FindSystemTimeZoneById("Europe/Paris") is Ok paris)
+        var there = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, paris.Value);
+
+On Linux and macOS the zones are the IANA database's, read from
+`/usr/share/zoneinfo` (or `TZDIR`), and named as it names them. On Windows
+they are the system's, named by their registry keys, and an IANA name finds
+the zone it maps to where Windows carries ICU to map it.
+
+`DateTimeOffset` here is an instant with no offset of its own, so a time
+converted into a zone is the `DateTime` its clocks read, where C# answers
+with a `DateTimeOffset` carrying the offset. A wall-clock time the zone
+skips is `TimeError.Invalid`, where C# throws; one it passes twice is read
+as standard time, as C# reads it.
+
+<sub>[stdlib/Time/TimeZoneInfo.sl:87](../../stdlib/Time/TimeZoneInfo.sl#L87)</sub>
+
+#### Utc *property*
+
+```
+static TimeZoneInfo Utc { get; }
+```
+
+Coordinated Universal Time.
+
+<sub>[stdlib/Time/TimeZoneInfo.sl:125](../../stdlib/Time/TimeZoneInfo.sl#L125)</sub>
+
+#### Local *property*
+
+```
+static TimeZoneInfo Local { get; }
+```
+
+The zone this machine is set to, or UTC when it cannot say.
+
+<sub>[stdlib/Time/TimeZoneInfo.sl:139](../../stdlib/Time/TimeZoneInfo.sl#L139)</sub>
+
+#### FindSystemTimeZoneById *method*
+
+```
+static Result<TimeZoneInfo, TimeError> FindSystemTimeZoneById(String id)
+```
+
+The zone named `id`: an IANA name on Linux and macOS, a registry key
+name on Windows, and an IANA name there too where Windows can map it.
+
+**Fails with**
+
+- [TimeError.NotFound](#notfound-case) — no zone of that name
+
+<sub>[stdlib/Time/TimeZoneInfo.sl:178](../../stdlib/Time/TimeZoneInfo.sl#L178)</sub>
+
+#### GetSystemTimeZones *method*
+
+```
+static List<TimeZoneInfo> GetSystemTimeZones()
+```
+
+Every zone the system knows, by offset and then by name.
+
+<sub>[stdlib/Time/TimeZoneInfo.sl:203](../../stdlib/Time/TimeZoneInfo.sl#L203)</sub>
+
+#### CreateCustomTimeZone *method*
+
+```
+static TimeZoneInfo CreateCustomTimeZone(String id, TimeSpan baseUtcOffset, String displayName, String standardName)
+```
+
+A zone of one offset and no daylight time.
+
+<sub>[stdlib/Time/TimeZoneInfo.sl:236](../../stdlib/Time/TimeZoneInfo.sl#L236)</sub>
+
+#### TryConvertIanaIdToWindowsId *method*
+
+```
+static bool TryConvertIanaIdToWindowsId(String ianaId, out String windowsId)
+```
+
+The Windows key name an IANA name maps to, where Windows carries ICU
+to ask. Never, elsewhere.
+
+<sub>[stdlib/Time/TimeZoneInfo.sl:249](../../stdlib/Time/TimeZoneInfo.sl#L249)</sub>
+
+#### TryConvertWindowsIdToIanaId *method*
+
+```
+static bool TryConvertWindowsIdToIanaId(String windowsId, out String ianaId)
+```
+
+The IANA name a Windows key name maps to, where Windows carries ICU to
+ask. Never, elsewhere.
+
+<sub>[stdlib/Time/TimeZoneInfo.sl:254](../../stdlib/Time/TimeZoneInfo.sl#L254)</sub>
+
+#### ConvertTime *method*
+
+```
+static DateTime ConvertTime(DateTimeOffset instant, TimeZoneInfo destination)
+```
+
+What the clocks in `destination` read at `instant`.
+
+<sub>[stdlib/Time/TimeZoneInfo.sl:268](../../stdlib/Time/TimeZoneInfo.sl#L268)</sub>
+
+#### ConvertTime *method*
+
+```
+static Result<DateTime, TimeError> ConvertTime(DateTime wallClock, TimeZoneInfo source, TimeZoneInfo destination)
+```
+
+What the clocks in `destination` read when those in `source` read
+`wallClock`.
+
+**Fails with**
+
+- [TimeError.Invalid](#invalid-case) — `source` skips that time
+
+<sub>[stdlib/Time/TimeZoneInfo.sl:275](../../stdlib/Time/TimeZoneInfo.sl#L275)</sub>
+
+#### ConvertTimeToUtc *method*
+
+```
+static Result<DateTimeOffset, TimeError> ConvertTimeToUtc(DateTime wallClock, TimeZoneInfo source)
+```
+
+The instant at which the clocks in `source` read `wallClock`.
+
+**Fails with**
+
+- [TimeError.Invalid](#invalid-case) — `source` skips that time
+
+<sub>[stdlib/Time/TimeZoneInfo.sl:286](../../stdlib/Time/TimeZoneInfo.sl#L286)</sub>
+
+#### ConvertTimeFromUtc *method*
+
+```
+static DateTime ConvertTimeFromUtc(DateTime utc, TimeZoneInfo destination)
+```
+
+What the clocks in `destination` read when UTC reads `utc`.
+
+<sub>[stdlib/Time/TimeZoneInfo.sl:298](../../stdlib/Time/TimeZoneInfo.sl#L298)</sub>
+
+#### ConvertTimeBySystemTimeZoneId *method*
+
+```
+static Result<DateTime, TimeError> ConvertTimeBySystemTimeZoneId(DateTimeOffset instant, String id)
+```
+
+What the clocks in the zone named `id` read at `instant`.
+
+**Fails with**
+
+- [TimeError.NotFound](#notfound-case) — no zone of that name
+
+<sub>[stdlib/Time/TimeZoneInfo.sl:308](../../stdlib/Time/TimeZoneInfo.sl#L308)</sub>
+
+#### Id *property*
+
+```
+String Id { get; }
+```
+
+What it is called: an IANA name or a Windows key name.
+
+<sub>[stdlib/Time/TimeZoneInfo.sl:318](../../stdlib/Time/TimeZoneInfo.sl#L318)</sub>
+
+#### DisplayName *property*
+
+```
+String DisplayName { get; }
+```
+
+How a person would recognise it, with its offset.
+
+<sub>[stdlib/Time/TimeZoneInfo.sl:321](../../stdlib/Time/TimeZoneInfo.sl#L321)</sub>
+
+#### StandardName *property*
+
+```
+String StandardName { get; }
+```
+
+What standard time there is called.
+
+<sub>[stdlib/Time/TimeZoneInfo.sl:324](../../stdlib/Time/TimeZoneInfo.sl#L324)</sub>
+
+#### DaylightName *property*
+
+```
+String DaylightName { get; }
+```
+
+What daylight time there is called.
+
+<sub>[stdlib/Time/TimeZoneInfo.sl:327](../../stdlib/Time/TimeZoneInfo.sl#L327)</sub>
+
+#### HasIanaId *property*
+
+```
+bool HasIanaId { get; }
+```
+
+Whether `Id` is an IANA name.
+
+<sub>[stdlib/Time/TimeZoneInfo.sl:330](../../stdlib/Time/TimeZoneInfo.sl#L330)</sub>
+
+#### BaseUtcOffset *property*
+
+```
+TimeSpan BaseUtcOffset { get; }
+```
+
+How far ahead of UTC standard time is, as the zone keeps it now.
+
+<sub>[stdlib/Time/TimeZoneInfo.sl:333](../../stdlib/Time/TimeZoneInfo.sl#L333)</sub>
+
+#### SupportsDaylightSavingTime *property*
+
+```
+bool SupportsDaylightSavingTime { get; }
+```
+
+Whether its clocks have changed for daylight time since 1970, which
+is as far back as every platform's data reaches: India's clocks did
+in the 1940s, and India's zone is still one that does not.
+
+<sub>[stdlib/Time/TimeZoneInfo.sl:351](../../stdlib/Time/TimeZoneInfo.sl#L351)</sub>
+
+#### GetUtcOffset *method*
+
+```
+TimeSpan GetUtcOffset(DateTimeOffset instant)
+```
+
+How far ahead of UTC the clocks are at `instant`.
+
+<sub>[stdlib/Time/TimeZoneInfo.sl:367](../../stdlib/Time/TimeZoneInfo.sl#L367)</sub>
+
+#### GetUtcOffset *method*
+
+```
+TimeSpan GetUtcOffset(DateTime wallClock)
+```
+
+How far ahead of UTC the clocks are when they read `wallClock`:
+standard time where they read it twice, and the offset before the
+change where they skip it.
+
+<sub>[stdlib/Time/TimeZoneInfo.sl:373](../../stdlib/Time/TimeZoneInfo.sl#L373)</sub>
+
+#### IsDaylightSavingTime *method*
+
+```
+bool IsDaylightSavingTime(DateTimeOffset instant)
+```
+
+Whether the clocks keep daylight time at `instant`.
+
+<sub>[stdlib/Time/TimeZoneInfo.sl:382](../../stdlib/Time/TimeZoneInfo.sl#L382)</sub>
+
+#### IsDaylightSavingTime *method*
+
+```
+bool IsDaylightSavingTime(DateTime wallClock)
+```
+
+Whether the clocks keep daylight time when they read `wallClock`.
+
+<sub>[stdlib/Time/TimeZoneInfo.sl:385](../../stdlib/Time/TimeZoneInfo.sl#L385)</sub>
+
+#### IsAmbiguousTime *method*
+
+```
+bool IsAmbiguousTime(DateTime wallClock)
+```
+
+Whether the clocks read `wallClock` twice, as they do when they go back.
+
+<sub>[stdlib/Time/TimeZoneInfo.sl:392](../../stdlib/Time/TimeZoneInfo.sl#L392)</sub>
+
+#### IsInvalidTime *method*
+
+```
+bool IsInvalidTime(DateTime wallClock)
+```
+
+Whether the clocks never read `wallClock`, as when they go forward.
+
+<sub>[stdlib/Time/TimeZoneInfo.sl:395](../../stdlib/Time/TimeZoneInfo.sl#L395)</sub>
+
+#### ToString *method*
+
+```
+String ToString()
+```
+
+The display name.
+
+<sub>[stdlib/Time/TimeZoneInfo.sl:398](../../stdlib/Time/TimeZoneInfo.sl#L398)</sub>
+
+#### Equals *method*
+
+```
+bool Equals(TimeZoneInfo other)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Time/TimeZoneInfo.sl:400](../../stdlib/Time/TimeZoneInfo.sl#L400)</sub>
+
+#### GetHashCode *method*
+
+```
+nuint GetHashCode()
+```
+
+*No documentation.*
+
+<sub>[stdlib/Time/TimeZoneInfo.sl:402](../../stdlib/Time/TimeZoneInfo.sl#L402)</sub>
+
 ## Functions
 
 ### DaysInMonth *function*
@@ -872,7 +1826,7 @@ How many days a month has, which for February depends on the year.
 
 **See also** &nbsp; [Time.IsLeapYear](#isleapyear-function)
 
-<sub>[stdlib/Time/Time.sl:165](../../stdlib/Time/Time.sl#L165)</sub>
+<sub>[stdlib/Time/Time.sl:166](../../stdlib/Time/Time.sl#L166)</sub>
 
 ### IsLeapYear *function*
 
@@ -882,7 +1836,7 @@ bool IsLeapYear(int year)
 
 Whether a year has 366 days, by the Gregorian rule.
 
-<sub>[stdlib/Time/Time.sl:151](../../stdlib/Time/Time.sl#L151)</sub>
+<sub>[stdlib/Time/Time.sl:152](../../stdlib/Time/Time.sl#L152)</sub>
 
 ## Constants
 
@@ -896,7 +1850,7 @@ Nanoseconds in a day, which is 24 hours exactly. A calendar day across a
 daylight-saving change is not this, and nothing here pretends otherwise:
 add a day to a `DateTimeOffset` and you have added 24 hours.
 
-<sub>[stdlib/Time/Time.sl:70](../../stdlib/Time/Time.sl#L70)</sub>
+<sub>[stdlib/Time/Time.sl:71](../../stdlib/Time/Time.sl#L71)</sub>
 
 ### NanosecondsPerHour *constant*
 
@@ -906,7 +1860,7 @@ const long NanosecondsPerHour = 3600000000000
 
 Nanoseconds in an hour.
 
-<sub>[stdlib/Time/Time.sl:65](../../stdlib/Time/Time.sl#L65)</sub>
+<sub>[stdlib/Time/Time.sl:66](../../stdlib/Time/Time.sl#L66)</sub>
 
 ### NanosecondsPerMicrosecond *constant*
 
@@ -916,7 +1870,7 @@ const long NanosecondsPerMicrosecond = 1000
 
 Nanoseconds in a microsecond.
 
-<sub>[stdlib/Time/Time.sl:53](../../stdlib/Time/Time.sl#L53)</sub>
+<sub>[stdlib/Time/Time.sl:54](../../stdlib/Time/Time.sl#L54)</sub>
 
 ### NanosecondsPerMillisecond *constant*
 
@@ -926,7 +1880,7 @@ const long NanosecondsPerMillisecond = 1000000
 
 Nanoseconds in a millisecond.
 
-<sub>[stdlib/Time/Time.sl:56](../../stdlib/Time/Time.sl#L56)</sub>
+<sub>[stdlib/Time/Time.sl:57](../../stdlib/Time/Time.sl#L57)</sub>
 
 ### NanosecondsPerMinute *constant*
 
@@ -936,7 +1890,7 @@ const long NanosecondsPerMinute = 60000000000
 
 Nanoseconds in a minute.
 
-<sub>[stdlib/Time/Time.sl:62](../../stdlib/Time/Time.sl#L62)</sub>
+<sub>[stdlib/Time/Time.sl:63](../../stdlib/Time/Time.sl#L63)</sub>
 
 ### NanosecondsPerSecond *constant*
 
@@ -946,5 +1900,5 @@ const long NanosecondsPerSecond = 1000000000
 
 Nanoseconds in a second.
 
-<sub>[stdlib/Time/Time.sl:59](../../stdlib/Time/Time.sl#L59)</sub>
+<sub>[stdlib/Time/Time.sl:60](../../stdlib/Time/Time.sl#L60)</sub>
 

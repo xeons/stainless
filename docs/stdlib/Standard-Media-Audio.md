@@ -805,7 +805,7 @@ String BackendName()
 What is behind it, for a program that reports what it found. `""` when
 there is nothing.
 
-<sub>[stdlib/Media/Audio/Audio.sl:650](../../stdlib/Media/Audio/Audio.sl#L650)</sub>
+<sub>[stdlib/Media/Audio/Audio.sl:639](../../stdlib/Media/Audio/Audio.sl#L639)</sub>
 
 ### CanPlay *function*
 
@@ -816,7 +816,7 @@ bool CanPlay()
 Whether anything can play. False on a machine that has the library and no
 device, which is what a headless server is.
 
-<sub>[stdlib/Media/Audio/Audio.sl:635](../../stdlib/Media/Audio/Audio.sl#L635)</sub>
+<sub>[stdlib/Media/Audio/Audio.sl:624](../../stdlib/Media/Audio/Audio.sl#L624)</sub>
 
 ### CanRecord *function*
 
@@ -826,7 +826,7 @@ bool CanRecord()
 
 Whether anything can record.
 
-<sub>[stdlib/Media/Audio/Audio.sl:642](../../stdlib/Media/Audio/Audio.sl#L642)</sub>
+<sub>[stdlib/Media/Audio/Audio.sl:631](../../stdlib/Media/Audio/Audio.sl#L631)</sub>
 
 ### IsAvailable *function*
 
@@ -840,7 +840,7 @@ call is where the cost is.
 **Ask before trying.** A game wants to say "no audio device" at startup
 rather than in the middle of a level, and this is how it finds out.
 
-<sub>[stdlib/Media/Audio/Audio.sl:631](../../stdlib/Media/Audio/Audio.sl#L631)</sub>
+<sub>[stdlib/Media/Audio/Audio.sl:620](../../stdlib/Media/Audio/Audio.sl#L620)</sub>
 
 ### PlayClip *function*
 
@@ -864,7 +864,7 @@ tens of milliseconds and this does it every time.
 
 **See also** &nbsp; [AudioPlayer](#audioplayer-class)
 
-<sub>[stdlib/Media/Audio/Audio.sl:677](../../stdlib/Media/Audio/Audio.sl#L677)</sub>
+<sub>[stdlib/Media/Audio/Audio.sl:666](../../stdlib/Media/Audio/Audio.sl#L666)</sub>
 
 ### RecordClip *function*
 
@@ -886,5 +886,5 @@ sound as it arrives, wants an `AudioRecorder`.
 
 **See also** &nbsp; [AudioRecorder](#audiorecorder-class)
 
-<sub>[stdlib/Media/Audio/Audio.sl:709](../../stdlib/Media/Audio/Audio.sl#L709)</sub>
+<sub>[stdlib/Media/Audio/Audio.sl:698](../../stdlib/Media/Audio/Audio.sl#L698)</sub>
 

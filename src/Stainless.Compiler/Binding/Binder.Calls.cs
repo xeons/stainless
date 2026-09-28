@@ -1514,6 +1514,9 @@ public sealed partial class Binder
             return;
         }
 
+        if (RefusedStructAsInterface(argument.Type, target, argument.Span))
+            return;
+
         diagnostics.Error("SL0262", argument.Span,
             $"argument {index + 1} of '{name}' expects '{target.Name}', " +
             $"but '{argument.Type.Name}' was given",
@@ -1549,10 +1552,12 @@ public sealed partial class Binder
             {
                 DelegateTypeSymbol signature =>
                     signature.Signature.Count == lambda.Syntax.Parameters.Count &&
-                    WrittenResultFits(lambda.Syntax, signature.ReturnType),
+                    WrittenResultFits(lambda.Syntax, signature.ReturnType) &&
+                    ProducedResultFits(lambda.Syntax, signature),
                 ClosureTypeSymbol bound =>
                     bound.Signature.Count == lambda.Syntax.Parameters.Count &&
-                    WrittenResultFits(lambda.Syntax, bound.ReturnType),
+                    WrittenResultFits(lambda.Syntax, bound.ReturnType) &&
+                    ProducedResultFits(lambda.Syntax, bound),
                 InterfaceTypeSymbol functional => SingleMethodOf(functional) is { } only &&
                     only.Parameters.Count(p => !p.IsThis) == lambda.Syntax.Parameters.Count &&
                     WrittenResultFits(lambda.Syntax, only.ReturnType),
@@ -1562,7 +1567,8 @@ public sealed partial class Binder
         // A conditional whose arms both wait fits where each of them would.
         if (argument is BoundConditional
             {
-                Type: DefaultLiteralType or NewDraftType or ArrayDraftType or TupleDraftType,
+                Type: DefaultLiteralType or NewDraftType or ArrayDraftType or TupleDraftType
+                    or VariantDraftType,
             } either)
             return IsImplicitlyConvertible(either.WhenTrue, target) &&
                    IsImplicitlyConvertible(either.WhenFalse, target);
@@ -1633,6 +1639,59 @@ public sealed partial class Binder
 
         var written = ResolveTypeQuietly(syntax.ReturnType, _context.File!, allowVoid: true);
         return written.IsError() || written.Equals(returns);
+    }
+
+    /// <summary>
+    /// Whether what a lambda's body produces converts to what the delegate
+    /// returns, as C# asks: <c>i =&gt; i.Price</c> is not a
+    /// <c>Func&lt;Item, int&gt;</c> when the price is a <c>double</c>. A body
+    /// that cannot be probed, or a delegate that returns nothing, is not held
+    /// against the lambda here; binding it says what is wrong.
+    /// </summary>
+    private bool ProducedResultFits(LambdaSyntax syntax, TypeSymbol target)
+    {
+        if (syntax.ReturnType is not null) return true;
+        if (CallShapeOf(target) is not { } shape || shape.Result.IsVoid()) return true;
+        if (shape.Parameters.Any(p => p.IsError())) return true;
+
+        return ProbeLambdaResult(syntax, shape.Parameters) is not { } produced ||
+               produced.IsError() ||
+               ClassifyConversion(produced, shape.Result, explicitCast: false) is not null;
+    }
+
+    /// <summary>What a delegate or closure takes and returns, or null for any other type.</summary>
+    private static (IReadOnlyList<TypeSymbol> Parameters, TypeSymbol Result)? CallShapeOf(TypeSymbol type) =>
+        type switch
+        {
+            DelegateTypeSymbol wanted => (wanted.Signature.Select(p => p.Type).ToList(), wanted.ReturnType),
+            ClosureTypeSymbol bound => (bound.Signature.Select(p => p.Type).ToList(), bound.ReturnType),
+            _ => null,
+        };
+
+    /// <summary>
+    /// C#'s better conversion from a lambda: between two delegates taking the
+    /// same parameters, the one whose result the body produces, or converts to
+    /// better, and one with a result over one without. Zero when that does not
+    /// decide it.
+    /// </summary>
+    private int CompareLambdaResults(BoundLambda lambda, TypeSymbol first, TypeSymbol second)
+    {
+        if (lambda.Syntax.ReturnType is not null) return 0;
+        if (CallShapeOf(first) is not { } one || CallShapeOf(second) is not { } other) return 0;
+        if (!one.Parameters.SequenceEqual(other.Parameters)) return 0;
+        if (ProbeLambdaResult(lambda.Syntax, one.Parameters) is not { } produced || produced.IsError())
+            return 0;
+
+        if (one.Result.IsVoid() != other.Result.IsVoid())
+            return one.Result.IsVoid() ? -1 : 1;
+
+        bool oneExact = one.Result.Equals(produced);
+        bool otherExact = other.Result.Equals(produced);
+        if (oneExact != otherExact) return oneExact ? 1 : -1;
+
+        bool oneToOther = ClassifyConversion(one.Result, other.Result, explicitCast: false) is not null;
+        bool otherToOne = ClassifyConversion(other.Result, one.Result, explicitCast: false) is not null;
+        return oneToOther == otherToOne ? 0 : oneToOther ? 1 : -1;
     }
 
     /// <summary>
@@ -2296,6 +2355,9 @@ public sealed partial class Binder
 
         if (argument.Type.Equals(first)) return 1;
         if (argument.Type.Equals(second)) return -1;
+
+        if (argument is BoundLambda lambda && CompareLambdaResults(lambda, first, second) is not 0 and var byResult)
+            return byResult;
 
         // An array literal is an array first, as C# prefers a span or an
         // array to a type it would have to call `Add` on.

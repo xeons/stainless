@@ -31,9 +31,13 @@ module Standard.Collections;
 /// to. Take this as a parameter type where a function reads and does not
 /// write, which says so in the signature.
 ///
+/// It is a sequence too, as C#'s is, so anything that walks one walks this --
+/// and a function taking an `IReadOnlyList<T>` is the closer fit for a list
+/// than one taking an `IEnumerable<T>`.
+///
 /// @typeparam T  the element type; nothing is asked of it
 /// @see IList
-public interface IReadOnlyList<out T>
+public interface IReadOnlyList<out T> : IEnumerable<T>
 {
     /// How many items there are.
     nuint Count { get; }
