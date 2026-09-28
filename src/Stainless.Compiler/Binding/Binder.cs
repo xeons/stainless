@@ -303,6 +303,7 @@ public sealed partial class Binder(
         NumberGenericVirtualSlots();//          and a slot for each dispatched generic instantiation
         BuildVarianceTables();      //          and a table for each interface a class stands for
         CheckConstructorDelegation();
+        CheckClassesWithoutConstructors();
         ResolveRemainingAliases();
         CheckDocumentation();       //          and every '@tag' says something true
 

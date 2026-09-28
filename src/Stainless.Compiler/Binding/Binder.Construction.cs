@@ -998,6 +998,7 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
+        CheckArrayElementHasZero(syntax.Span, element, syntax.ElementType);
         return new BoundNewArray(syntax.Span, ArrayOf(element),
             BindConversion(length, PrimitiveTypeSymbol.NUInt, syntax.Length.Span));
     }

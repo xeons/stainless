@@ -2059,6 +2059,7 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
+        CheckDefaultHasZero(syntax.Span, type, syntax.Type);
         return new BoundDefault(syntax.Span, type);
     }
 
@@ -2134,6 +2135,7 @@ public sealed partial class Binder
             return new BoundErrorExpression(span);
         }
 
+        CheckDefaultHasZero(span, target, null);
         return new BoundDefault(span, target);
     }
 

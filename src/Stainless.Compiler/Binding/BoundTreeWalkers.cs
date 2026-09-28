@@ -596,7 +596,27 @@ internal sealed class CaptureWalker(LocalSymbol loopVariable) : BoundTreeWalker
 }
 
 /// <summary>
-/// Whether evaluating a tree certainly writes a parameter — by assignment, or by
+/// A place definite assignment asks about — an <c>out</c> parameter, or a
+/// field a constructor has to give a value — and what is said of a path that
+/// leaves before writing it.
+/// </summary>
+internal abstract class AssignedPlace
+{
+    /// <summary>Whether this expression names the place.</summary>
+    public abstract bool IsPlace(BoundExpression expression);
+
+    /// <summary>Whether a call or a property write stores into the place, as an auto-property's setter does.</summary>
+    public virtual bool IsWrittenBy(BoundExpression write) => false;
+
+    /// <summary>A <c>return</c> reached before the place was written.</summary>
+    public abstract void ReportReturn(SourceSpan span);
+
+    /// <summary>A <c>try</c> whose failure returns before the place was written.</summary>
+    public abstract void ReportEarlyReturn(SourceSpan span);
+}
+
+/// <summary>
+/// Whether evaluating a tree certainly writes a place — by assignment, or by
 /// handing it on as somebody else's <c>out</c> — and each <c>try</c> that can
 /// return before it has.
 ///
@@ -604,7 +624,7 @@ internal sealed class CaptureWalker(LocalSymbol loopVariable) : BoundTreeWalker
 /// conditional, the right of <c>&amp;&amp;</c> and <c>||</c> — is looked into
 /// for a <c>try</c>, and what it writes is forgotten again afterwards.
 /// </summary>
-internal sealed class OutWriteTracker(ParameterSymbol target, bool written) : BoundTreeWalker
+internal sealed class PlaceWriteTracker(AssignedPlace target, bool written) : BoundTreeWalker
 {
     public bool Written { get; private set; } = written;
 
@@ -614,15 +634,24 @@ internal sealed class OutWriteTracker(ParameterSymbol target, bool written) : Bo
     {
         switch (expression)
         {
-            case BoundAssignment { Target: BoundParameterAccess assigned } assignment
-                when ReferenceEquals(assigned.Parameter, target):
+            case BoundAssignment assignment when target.IsPlace(assignment.Target):
                 Visit(assignment.Value);
                 Written = true;
                 return;
 
-            case BoundCompoundAssignment { Target: BoundParameterAccess assigned, IsFallback: false } compound
-                when ReferenceEquals(assigned.Parameter, target):
+            case BoundMemberAssignment assignment when target.IsPlace(assignment.Target):
+                Visit(assignment.Value);
+                Written = true;
+                return;
+
+            case BoundCompoundAssignment { IsFallback: false } compound
+                when target.IsPlace(compound.Target):
                 Visit(compound.Combined);
+                Written = true;
+                return;
+
+            case BoundCall or BoundPropertyAssignment when target.IsWrittenBy(expression):
+                base.Visit(expression);
                 Written = true;
                 return;
 
@@ -630,13 +659,11 @@ internal sealed class OutWriteTracker(ParameterSymbol target, bool written) : Bo
             // promise this function is.
             case BoundDeconstruction taken:
                 base.Visit(expression);
-                if (taken.Target.WrittenPlaces.Any(p => p is BoundParameterAccess assigned &&
-                                                   ReferenceEquals(assigned.Parameter, target)))
+                if (taken.Target.WrittenPlaces.Any(target.IsPlace))
                     Written = true;
                 return;
 
-            case BoundAddressOf { FromOutKeyword: true, Operand: BoundParameterAccess passed }
-                when ReferenceEquals(passed.Parameter, target):
+            case BoundAddressOf { FromOutKeyword: true } passed when target.IsPlace(passed.Operand):
                 Written = true;
                 return;
 

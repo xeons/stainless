@@ -110,6 +110,7 @@ public sealed partial class Binder
         PushScope();
         var body = BindBlock(function.Body);
         PopScope();
+        SettleUnsetLocals(body);
 
         // What a getter reads, so that capturing the property can be tested
         // against what is written the way capturing a field already is.
@@ -125,6 +126,7 @@ public sealed partial class Binder
             body = WithFieldInitializers(function, body);
             body = WithBaseConstruction(function, body);
             body = WithPrimaryCaptures(function, body);
+            CheckConstructorAssignsFields(function, body);
         }
 
         if (!function.ReturnType.IsVoid() && !function.ReturnType.IsError() && EndIsReachable(body))
@@ -1247,45 +1249,61 @@ public sealed partial class Binder
         if (_context.Jumps.Labels.Count > 0 || _context.Jumps.Jumps.Count > 0) return;
 
         foreach (var parameter in outward)
-            if (!Assigns(body, parameter, false, function) && EndIsReachable(body))
+            if (!Assigns(body, new OutParameterPlace(parameter, function, diagnostics), false) &&
+                EndIsReachable(body))
                 diagnostics.Error("SL0600", function.Span,
                     $"'{function.Name}' can return without writing to '{parameter.Name}', " +
                     "which is what 'out' promises the caller. Assign it on every path, or " +
                     "make it 'ref' and let the caller decide what it starts as");
     }
 
+    /// <summary>An <c>out</c> parameter, which every path out of its function writes.</summary>
+    private sealed class OutParameterPlace(
+        ParameterSymbol parameter, FunctionSymbol owner, DiagnosticBag diagnostics) : AssignedPlace
+    {
+        public override bool IsPlace(BoundExpression expression) =>
+            expression is BoundParameterAccess named && ReferenceEquals(named.Parameter, parameter);
+
+        public override void ReportReturn(SourceSpan span) =>
+            diagnostics.Error("SL0600", span,
+                $"'{owner.Name}' returns here without having written to " +
+                $"'{parameter.Name}', which is what 'out' promises the caller");
+
+        public override void ReportEarlyReturn(SourceSpan span) =>
+            diagnostics.Error("SL0600", span,
+                $"'{owner.Name}' returns here if this fails, without having written to " +
+                $"'{parameter.Name}', which is what 'out' promises the caller");
+    }
+
     /// <summary>
-    /// Whether the parameter is certainly written by the time this statement is
+    /// Whether the place is certainly written by the time this statement is
     /// through, reporting any <c>return</c> reached before it was.
     ///
     /// A path that jumps away is through: it reaches nothing after it. What a
     /// <c>break</c> or a <c>continue</c> held is kept for the statement it
     /// leaves, which is where that path goes on.
     /// </summary>
-    private bool Assigns(
-        BoundStatement statement, ParameterSymbol target, bool assigned, FunctionSymbol owner)
+    private bool Assigns(BoundStatement statement, AssignedPlace target, bool assigned)
     {
         switch (statement)
         {
             case BoundBlock block:
                 foreach (var inner in block.Statements)
-                    assigned = Assigns(inner, target, assigned, owner);
+                    assigned = Assigns(inner, target, assigned);
                 return assigned;
 
             case BoundExpressionStatement expression:
-                return Evaluates(expression.Expression, target, assigned, owner);
+                return Evaluates(expression.Expression, target, assigned);
 
             case BoundLocalDeclaration declaration:
-                return Evaluates(declaration.Initializer, target, assigned, owner);
+                return Evaluates(declaration.Initializer, target, assigned);
 
             case BoundDeconstruct taken:
-                return Evaluates(taken.Expression, target, assigned, owner);
+                return Evaluates(taken.Expression, target, assigned);
 
             case BoundReturn returned:
-                if (!Evaluates(returned.Value, target, assigned, owner))
-                    diagnostics.Error("SL0600", returned.Span,
-                        $"'{owner.Name}' returns here without having written to " +
-                        $"'{target.Name}', which is what 'out' promises the caller");
+                if (!Evaluates(returned.Value, target, assigned))
+                    target.ReportReturn(returned.Span);
 
                 // Nothing follows a return, so whatever it left is not read.
                 return true;
@@ -1302,11 +1320,11 @@ public sealed partial class Binder
 
             case BoundIf branch:
             {
-                assigned = Evaluates(branch.Condition, target, assigned, owner);
-                bool then = Assigns(branch.Then, target, assigned, owner);
+                assigned = Evaluates(branch.Condition, target, assigned);
+                bool then = Assigns(branch.Then, target, assigned);
                 bool otherwise = branch.Else is null
                     ? assigned
-                    : Assigns(branch.Else, target, assigned, owner);
+                    : Assigns(branch.Else, target, assigned);
                 return then && otherwise;
             }
 
@@ -1315,32 +1333,32 @@ public sealed partial class Binder
             // early has at least what the loop started with.
             case BoundDoWhile loop:
             {
-                var (end, breaks, continues) = AssignsInLoop(loop.Body, target, assigned, owner);
-                bool tested = Evaluates(loop.Condition, target, end && continues.All(c => c), owner);
+                var (end, breaks, continues) = AssignsInLoop(loop.Body, target, assigned);
+                bool tested = Evaluates(loop.Condition, target, end && continues.All(c => c));
                 return tested && breaks.All(b => b);
             }
 
             case BoundWhile loop:
-                assigned = Evaluates(loop.Condition, target, assigned, owner);
-                AssignsInLoop(loop.Body, target, assigned, owner);
+                assigned = Evaluates(loop.Condition, target, assigned);
+                AssignsInLoop(loop.Body, target, assigned);
                 return assigned;
 
             case BoundForEach loop:
-                assigned = Evaluates(loop.Collection, target, assigned, owner);
-                AssignsInLoop(loop.Body, target, assigned, owner);
+                assigned = Evaluates(loop.Collection, target, assigned);
+                AssignsInLoop(loop.Body, target, assigned);
                 return assigned;
 
             case BoundFor loop:
                 if (loop.Initializer is not null)
-                    assigned = Assigns(loop.Initializer, target, assigned, owner);
-                assigned = Evaluates(loop.Condition, target, assigned, owner);
-                AssignsInLoop(loop.Body, target, assigned, owner);
-                Evaluates(loop.Step, target, true, owner);
+                    assigned = Assigns(loop.Initializer, target, assigned);
+                assigned = Evaluates(loop.Condition, target, assigned);
+                AssignsInLoop(loop.Body, target, assigned);
+                Evaluates(loop.Step, target, true);
                 return assigned;
 
             case BoundSwitch chosen:
             {
-                assigned = Evaluates(chosen.Subject, target, assigned, owner);
+                assigned = Evaluates(chosen.Subject, target, assigned);
 
                 bool everyArm = chosen.IsExhaustive || chosen.Sections.Any(s => s.IsDefault);
                 bool all = everyArm && chosen.Sections.Count > 0;
@@ -1348,14 +1366,14 @@ public sealed partial class Binder
                 var breaks = new List<bool>();
                 _assignmentBreaks.Push(breaks);
                 foreach (var section in chosen.Sections)
-                    all &= Assigns(section.Body, target, assigned, owner);
+                    all &= Assigns(section.Body, target, assigned);
                 _assignmentBreaks.Pop();
 
                 return assigned || all && breaks.All(b => b);
             }
 
             case BoundParallel parallel:
-                Assigns(parallel.Body, target, assigned, owner);
+                Assigns(parallel.Body, target, assigned);
                 return assigned;
 
             // An output is stored once the block has run, which is as certain
@@ -1364,9 +1382,8 @@ public sealed partial class Binder
             case BoundAsm assembly:
                 return assigned || assembly.IsIncomplete || assembly.Operands.Any(o =>
                     o.IsOutput
-                        ? o.Value is BoundParameterAccess written &&
-                          ReferenceEquals(written.Parameter, target)
-                        : Evaluates(o.Value, target, false, owner));
+                        ? target.IsPlace(o.Value)
+                        : Evaluates(o.Value, target, false));
 
             default:
                 return assigned;
@@ -1375,14 +1392,14 @@ public sealed partial class Binder
 
     /// <summary>What a loop's body ends with, and what each <c>break</c> and <c>continue</c> in it held.</summary>
     private (bool End, List<bool> Breaks, List<bool> Continues) AssignsInLoop(
-        BoundStatement body, ParameterSymbol target, bool assigned, FunctionSymbol owner)
+        BoundStatement body, AssignedPlace target, bool assigned)
     {
         var breaks = new List<bool>();
         var continues = new List<bool>();
         _assignmentBreaks.Push(breaks);
         _assignmentContinues.Push(continues);
 
-        bool end = Assigns(body, target, assigned, owner);
+        bool end = Assigns(body, target, assigned);
 
         _assignmentContinues.Pop();
         _assignmentBreaks.Pop();
@@ -1393,19 +1410,16 @@ public sealed partial class Binder
     private readonly Stack<List<bool>> _assignmentContinues = new();
 
     /// <summary>
-    /// Whether the parameter is certainly written once the expression has
-    /// been evaluated, reporting a <c>try</c> that can return before it was.
+    /// Whether the place is certainly written once the expression has been
+    /// evaluated, reporting a <c>try</c> that can return before it was.
     /// </summary>
-    private bool Evaluates(
-        BoundExpression? expression, ParameterSymbol target, bool assigned, FunctionSymbol owner)
+    private static bool Evaluates(BoundExpression? expression, AssignedPlace target, bool assigned)
     {
-        var tracker = new OutWriteTracker(target, assigned);
+        var tracker = new PlaceWriteTracker(target, assigned);
         tracker.Visit(expression);
 
         foreach (var early in tracker.EarlyReturns)
-            diagnostics.Error("SL0600", early,
-                $"'{owner.Name}' returns here if this fails, without having written to " +
-                $"'{target.Name}', which is what 'out' promises the caller");
+            target.ReportEarlyReturn(early);
 
         return tracker.Written;
     }
@@ -1648,6 +1662,8 @@ public sealed partial class Binder
         }
 
         var local = DeclareLocal(syntax.Name, type, syntax.IsConst, syntax.Span);
+        if (initializer is null && syntax.Type is not null)
+            NoteUnsetLocal(local, syntax.Span, syntax.Type);
         return new BoundLocalDeclaration(syntax.Span, local, initializer);
     }
 

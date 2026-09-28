@@ -273,6 +273,8 @@ public sealed partial class Binder
             return;
         }
 
+        CheckStaticPropertyHasValue(symbol, declaration);
+
         if (declaration.Value is null)
         {
             diagnostics.Error("SL0376", declaration.Span,
