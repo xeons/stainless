@@ -297,7 +297,11 @@ internal sealed class TlsClientHandshake
         byte[] sessionId = reader.ReadVectorArray(1u, 0u, 32u);
         uint suite = reader.ReadUInt16();
         uint compression = reader.ReadByte();
-        TlsReader extensions = reader.ReadVector(2u, 0u, 65535u);
+
+        // A TLS 1.2 ServerHello MAY end here, with no extensions at all.
+        TlsReader extensions = reader.IsAtEnd
+            ? new TlsReader(message, message.Length, 0u)
+            : reader.ReadVector(2u, 0u, 65535u);
         if (reader.Failed || !reader.IsAtEnd)
             return TlsError.Decode;
 

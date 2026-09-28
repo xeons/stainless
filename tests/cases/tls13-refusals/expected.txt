@@ -1,0 +1,58 @@
+certificate refused:
+  client: the certificate was refused, alert CloseNotify
+  server: the peer sent a fatal alert, alert BadCertificate
+default validator:
+  client: the certificate's issuer is not trusted, alert CloseNotify
+  server: the peer sent a fatal alert, alert UnknownCa
+no common suite:
+  client: the peer sent a fatal alert, alert HandshakeFailure
+  server: no cipher suite in common, alert CloseNotify
+no common group:
+  client: the peer sent a fatal alert, alert HandshakeFailure
+  server: no key-exchange group in common, alert CloseNotify
+tampered record:
+  server read: a record failed authentication
+  client read 0: the peer sent a fatal alert, alert BadRecordMac
+wrong client Finished:
+  client heard: DecryptError
+  client: the peer sent a fatal alert
+  server: a signature or Finished did not verify
+Finished before ServerHello:
+  client: a message arrived out of order
+  fake server heard: alert 10, fatal
+record cut short:
+  client: the connection is closed
+  fake server heard: nothing
+plaintext record over 2^14:
+  client: a record was too long
+  fake server heard: alert 22, fatal
+empty handshake record:
+  client: a message arrived out of order
+  fake server heard: alert 10, fatal
+unknown record type:
+  client: a message arrived out of order
+  fake server heard: alert 10, fatal
+change_cipher_spec of the wrong value:
+  client: a message arrived out of order
+  fake server heard: alert 10, fatal
+TLS 1.2 ServerHello:
+  client: no protocol version in common
+  fake server heard: alert 70, fatal
+TLS 1.2 ServerHello with the downgrade sentinel:
+  client: a message held a forbidden value
+  fake server heard: alert 47, fatal
+ServerHello with an extension never offered:
+  client: an extension arrived that was never offered
+  fake server heard: alert 110, fatal
+TLS 1.2 ClientHello:
+  server: no protocol version in common
+  fake client heard: alert 70
+change_cipher_spec before a ClientHello:
+  server: a message arrived out of order
+  fake client heard: alert 10
+application data before a handshake:
+  server: a message arrived out of order
+  fake client heard: alert 10
+protected record over 2^14 + 256:
+  server read: a record was too long
+  client read 0: the peer sent a fatal alert, alert RecordOverflow
