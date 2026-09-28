@@ -670,10 +670,11 @@ last person to edit it -- the suite is the authority.
   text -- a font is where the two backends stop agreeing
 - `Standard.Security.Cryptography`: the symmetric half, complete. MD5, SHA-1,
   SHA-256, SHA-384 and SHA-512, HMAC over any of them, PBKDF2, HKDF, AES in ECB,
-  CBC, CFB and CTR, AES-GCM, the platform's entropy and a constant-time
-  comparison, in `System.Security.Cryptography`'s shape with a `Result` where
-  .NET throws. Every answer is pinned against a published test vector. Not
-  public-key, which wants a constant-time bignum the library does not have.
+  CBC, CFB and CTR, AES-GCM, ChaCha20-Poly1305 with its two halves, the
+  platform's entropy and a constant-time comparison, in
+  `System.Security.Cryptography`'s shape with a `Result` where .NET throws.
+  Every answer is pinned against a published test vector. Not public-key,
+  which wants a constant-time bignum the library does not have.
   `PemEncoding` finds RFC 7468 blocks in surrounding text and writes them
 - `Standard.Formats.Asn1`: BER and DER in `System.Formats.Asn1`'s shape, with
   a `Result` where .NET throws. `AsnReader` covers every type X.509 uses —

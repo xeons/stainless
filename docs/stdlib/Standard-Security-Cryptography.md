@@ -2,7 +2,8 @@
 
 <sub>Generated from the `///` blocks in the source by `stainless doc`. Edit the source, not this file.</sub>
 
-Hashes, message authentication codes, key derivation and block ciphers.
+Hashes, message authentication codes, key derivation, and block and stream
+ciphers.
 
 ```csharp
 var digest = Sha256.HashData(Encoding.CreateUtf8().GetBytes("hello"));
@@ -14,10 +15,10 @@ var sealed = try cipher.EncryptCbc(plaintext, iv, PaddingMode.Pkcs7);
 
 **The shape is `System.Security.Cryptography`'s**, so a program being
 ported finds the names where it left them: `Sha256`, `Hmac`, `Aes`,
-`AesGcm`, `Rfc2898DeriveBytes.Pbkdf2`, `RandomNumberGenerator.Fill`,
-`CryptographicOperations.FixedTimeEquals`. Three things about it differ,
-and each is a rule this language already has rather than a choice made
-here:
+`AesGcm`, `ChaCha20Poly1305`, `Rfc2898DeriveBytes.Pbkdf2`,
+`RandomNumberGenerator.Fill`, `CryptographicOperations.FixedTimeEquals`.
+Three things about it differ, and each is a rule this language already has
+rather than a choice made here:
 
 - **The casing is the house rule's**, not .NET's. `SHA256` is `Sha256` and
   `HMACSHA256` is `HmacSha256`, because an acronym longer than two letters
@@ -39,8 +40,10 @@ reference implementation with a table-driven S-box, which is the shape that
 is known to leak through the data cache on a machine an attacker shares. It
 is right for a file, a protocol and a password store, and it is not the
 thing to put under a remote attacker who can time it. AES-NI and a
-bitsliced fallback are what would answer that, and neither is written --
-TODO.md carries the note.
+bitsliced fallback are what would answer that, and neither is written —
+TODO.md carries the note. **`ChaCha20Poly1305` is the answer that is
+written**: it has no table and no branch on a secret, so it is constant
+time in software, and it is what to choose where timing matters.
 
 **What is not here yet is public-key.** RSA, ECDsa, ECDiffieHellman and
 X.509 all rest on arbitrary-precision integer arithmetic, which this
@@ -50,7 +53,7 @@ key derivation and cipher .NET ships that does not need a bignum.
 
 ## Contents
 
-**Types** &nbsp; [Aes](#aes-class) &middot; [AesGcm](#aesgcm-class) &middot; [CipherMode](#ciphermode-enum) &middot; [CryptoError](#cryptoerror-enum) &middot; [CryptographicOperations](#cryptographicoperations-class) &middot; [HashAlgorithm](#hashalgorithm-class) &middot; [Hkdf](#hkdf-class) &middot; [Hmac](#hmac-class) &middot; [HmacMd5](#hmacmd5-class) &middot; [HmacSha1](#hmacsha1-class) &middot; [HmacSha256](#hmacsha256-class) &middot; [HmacSha384](#hmacsha384-class) &middot; [HmacSha512](#hmacsha512-class) &middot; [IHashAlgorithm](#ihashalgorithm-interface) &middot; [Md5](#md5-class) &middot; [PaddingMode](#paddingmode-enum) &middot; [PemEncoding](#pemencoding-class) &middot; [PemFields](#pemfields-struct) &middot; [RandomNumberGenerator](#randomnumbergenerator-class) &middot; [Rfc2898DeriveBytes](#rfc2898derivebytes-class) &middot; [Sha1](#sha1-class) &middot; [Sha256](#sha256-class) &middot; [Sha2Wide](#sha2wide-class) &middot; [Sha384](#sha384-class) &middot; [Sha512](#sha512-class)
+**Types** &nbsp; [Aes](#aes-class) &middot; [AesGcm](#aesgcm-class) &middot; [ChaCha20](#chacha20-class) &middot; [ChaCha20Poly1305](#chacha20poly1305-class) &middot; [CipherMode](#ciphermode-enum) &middot; [CryptoError](#cryptoerror-enum) &middot; [CryptographicOperations](#cryptographicoperations-class) &middot; [HashAlgorithm](#hashalgorithm-class) &middot; [Hkdf](#hkdf-class) &middot; [Hmac](#hmac-class) &middot; [HmacMd5](#hmacmd5-class) &middot; [HmacSha1](#hmacsha1-class) &middot; [HmacSha256](#hmacsha256-class) &middot; [HmacSha384](#hmacsha384-class) &middot; [HmacSha512](#hmacsha512-class) &middot; [IHashAlgorithm](#ihashalgorithm-interface) &middot; [Md5](#md5-class) &middot; [PaddingMode](#paddingmode-enum) &middot; [Poly1305](#poly1305-class) &middot; [RandomNumberGenerator](#randomnumbergenerator-class) &middot; [Rfc2898DeriveBytes](#rfc2898derivebytes-class) &middot; [Sha1](#sha1-class) &middot; [Sha256](#sha256-class) &middot; [Sha2Wide](#sha2wide-class) &middot; [Sha384](#sha384-class) &middot; [Sha512](#sha512-class)
 
 ## Types
 
@@ -409,6 +412,233 @@ The plaintext, or `AuthenticationFailed` and nothing.
 
 <sub>[stdlib/Security/Cryptography/AesGcm.sl:135](../../stdlib/Security/Cryptography/AesGcm.sl#L135)</sub>
 
+### ChaCha20 *class*
+
+```
+sealed class ChaCha20
+```
+
+ChaCha20, the stream cipher of RFC 8439: a 256-bit key, a 96-bit nonce and
+a 32-bit block counter.
+
+```csharp
+var cipher = try ChaCha20.FromKey(key);
+var sealed = try cipher.ApplyKeystream(nonce, 1u, plaintext);
+var opened = try cipher.ApplyKeystream(nonce, 1u, sealed);
+```
+
+**This is encryption without authentication.** Anyone can flip a bit of
+the ciphertext and the same bit of the plaintext flips. `ChaCha20Poly1305`
+is the construction to use; this is here for a protocol that specifies the
+bare cipher, and for the block vectors that pin it.
+
+**It is constant time by construction.** The whole cipher is additions,
+rotations and exclusive-ors on 32-bit words, with no table and no branch on
+the key, which is why it is the software answer to AES's cache leak.
+
+The nonce MUST NOT repeat under one key. A repeated nonce gives the same
+keystream twice, and the XOR of two ciphertexts is then the XOR of the two
+plaintexts.
+
+**See also** &nbsp; [ChaCha20Poly1305](#chacha20poly1305-class)
+
+<sub>[stdlib/Security/Cryptography/ChaCha20.sl:52](../../stdlib/Security/Cryptography/ChaCha20.sl#L52)</sub>
+
+#### KeySize *constant*
+
+```
+const nuint KeySize = 32
+```
+
+**Value** &nbsp; thirty-two bytes.
+
+<sub>[stdlib/Security/Cryptography/ChaCha20.sl:55](../../stdlib/Security/Cryptography/ChaCha20.sl#L55)</sub>
+
+#### NonceSize *constant*
+
+```
+const nuint NonceSize = 12
+```
+
+**Value** &nbsp; twelve bytes.
+
+<sub>[stdlib/Security/Cryptography/ChaCha20.sl:58](../../stdlib/Security/Cryptography/ChaCha20.sl#L58)</sub>
+
+#### BlockSize *constant*
+
+```
+const nuint BlockSize = 64
+```
+
+What one counter value covers.
+
+**Value** &nbsp; sixty-four bytes.
+
+<sub>[stdlib/Security/Cryptography/ChaCha20.sl:63](../../stdlib/Security/Cryptography/ChaCha20.sl#L63)</sub>
+
+#### FromKey *method*
+
+```
+static Result<ChaCha20, CryptoError> FromKey(ReadOnlySpan<byte> key)
+```
+
+A cipher under `key`, which must be 32 bytes.
+
+**Fails with**
+
+- [CryptoError.KeyLength](#keylength-case) — `key` is not 32 bytes
+
+<sub>[stdlib/Security/Cryptography/ChaCha20.sl:79](../../stdlib/Security/Cryptography/ChaCha20.sl#L79)</sub>
+
+#### ApplyKeystream *method*
+
+```
+Result<byte[], CryptoError> ApplyKeystream(ReadOnlySpan<byte> nonce, uint counter, ReadOnlySpan<byte> input)
+```
+
+`input` exclusive-ored with the keystream that begins at block
+`counter`. The same call encrypts and decrypts.
+
+RFC 8439 starts at one when block zero has another use, as it has in
+the AEAD construction, and at zero otherwise.
+
+**Parameters**
+
+- `nonce` — twelve bytes, never to repeat under this key
+- `counter` — the block the keystream starts at
+- `input` — the plaintext or the ciphertext
+
+**Fails with**
+
+- [CryptoError.NonceLength](#noncelength-case) — `nonce` is not twelve bytes
+- [CryptoError.Parameter](#parameter-case) — `input` runs past block 2^32 - 1, where the counter would wrap
+
+<sub>[stdlib/Security/Cryptography/ChaCha20.sl:98](../../stdlib/Security/Cryptography/ChaCha20.sl#L98)</sub>
+
+### ChaCha20Poly1305 *class*
+
+```
+sealed class ChaCha20Poly1305
+```
+
+ChaCha20-Poly1305: the AEAD of RFC 8439 §2.8, as .NET's
+`ChaCha20Poly1305`, and with exactly `AesGcm`'s shape.
+
+```csharp
+var box = try ChaCha20Poly1305.FromKey(key);
+byte[] tag = new byte[16u];
+var sealed = try box.Encrypt(nonce, plaintext, associated, tag);
+var opened = try box.Decrypt(nonce, sealed, associated, tag);
+```
+
+**It is AES-GCM's alternative where AES would leak.** Every step is
+additions, rotations and exclusive-ors on words, with no table and no
+branch on a secret, so it is constant time in software where the AES here
+is not. TLS 1.3, WireGuard and SSH all offer it for that reason.
+
+**The nonce MUST NOT repeat under one key.** A repeat reuses the keystream
+and the one-time Poly1305 key both, which gives away the XOR of the two
+plaintexts and lets an attacker forge. Twelve random bytes per message is
+safe to about 2^32 messages; a counter is better where one can be kept.
+
+`Decrypt` returns `CryptoError.AuthenticationFailed` and no plaintext when
+the tag does not match. The tag is checked before anything is deciphered.
+
+**See also** &nbsp; [AesGcm](#aesgcm-class)
+
+<sub>[stdlib/Security/Cryptography/ChaCha20Poly1305.sl:53](../../stdlib/Security/Cryptography/ChaCha20Poly1305.sl#L53)</sub>
+
+#### TagSize *constant*
+
+```
+const nuint TagSize = 16
+```
+
+**Value** &nbsp; sixteen bytes.
+
+<sub>[stdlib/Security/Cryptography/ChaCha20Poly1305.sl:56](../../stdlib/Security/Cryptography/ChaCha20Poly1305.sl#L56)</sub>
+
+#### NonceSize *constant*
+
+```
+const nuint NonceSize = 12
+```
+
+The only length RFC 8439 defines.
+
+**Value** &nbsp; twelve bytes.
+
+<sub>[stdlib/Security/Cryptography/ChaCha20Poly1305.sl:61](../../stdlib/Security/Cryptography/ChaCha20Poly1305.sl#L61)</sub>
+
+#### FromKey *method*
+
+```
+static Result<ChaCha20Poly1305, CryptoError> FromKey(ReadOnlySpan<byte> key)
+```
+
+A box under `key`, which must be 32 bytes.
+
+**Fails with**
+
+- [CryptoError.KeyLength](#keylength-case) — `key` is not 32 bytes
+
+<sub>[stdlib/Security/Cryptography/ChaCha20Poly1305.sl:73](../../stdlib/Security/Cryptography/ChaCha20Poly1305.sl#L73)</sub>
+
+#### Encrypt *method*
+
+```
+Result<byte[], CryptoError> Encrypt(ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> plaintext, ReadOnlySpan<byte> associatedData, byte[] tag)
+```
+
+The ciphertext, with the tag written into `tag`.
+
+`associatedData` is authenticated and not encrypted — a message header,
+a record number, anything the recipient must be sure of and that is not
+secret. Pass an empty array when there is none.
+
+**Parameters**
+
+- `nonce` — twelve bytes, never to repeat under this key
+- `plaintext` — the message to encipher
+- `associatedData` — authenticated and not encrypted; empty when there is none
+- `tag` — a `TagSize` array the tag is written into
+
+**Fails with**
+
+- [CryptoError.NonceLength](#noncelength-case) — `nonce` is not twelve bytes
+- [CryptoError.TagLength](#taglength-case) — `tag` is not `TagSize` long
+- [CryptoError.Parameter](#parameter-case) — `plaintext` is longer than the 256 GiB the counter covers
+
+**See also** &nbsp; [ChaCha20Poly1305.Decrypt](#decrypt-method)
+
+<sub>[stdlib/Security/Cryptography/ChaCha20Poly1305.sl:96](../../stdlib/Security/Cryptography/ChaCha20Poly1305.sl#L96)</sub>
+
+#### Decrypt *method*
+
+```
+Result<byte[], CryptoError> Decrypt(ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> ciphertext, ReadOnlySpan<byte> associatedData, ReadOnlySpan<byte> tag)
+```
+
+The plaintext, or `AuthenticationFailed` and nothing.
+
+**Parameters**
+
+- `nonce` — the one the message was enciphered under
+- `ciphertext` — the message to open
+- `associatedData` — the same bytes the sender authenticated
+- `tag` — the tag the sender sent
+
+**Fails with**
+
+- [CryptoError.NonceLength](#noncelength-case) — `nonce` is not twelve bytes
+- [CryptoError.TagLength](#taglength-case) — `tag` is not `TagSize` long
+- [CryptoError.Parameter](#parameter-case) — `ciphertext` is longer than the counter covers
+- [CryptoError.AuthenticationFailed](#authenticationfailed-case) — the tag does not match, and no plaintext is returned
+
+**See also** &nbsp; [ChaCha20Poly1305.Encrypt](#encrypt-method)
+
+<sub>[stdlib/Security/Cryptography/ChaCha20Poly1305.sl:128](../../stdlib/Security/Cryptography/ChaCha20Poly1305.sl#L128)</sub>
+
 ### CipherMode *enum*
 
 ```
@@ -515,7 +745,7 @@ NonceLength
 ```
 
 The nonce is not a length this mode takes. AES-GCM takes any non-empty
-nonce and wants twelve bytes.
+nonce and wants twelve bytes; ChaCha20 takes twelve and nothing else.
 
 <sub>[stdlib/Security/Cryptography/CryptoError.sl:46](../../stdlib/Security/Cryptography/CryptoError.sl#L46)</sub>
 
@@ -569,10 +799,11 @@ handling it at all is the mistake AEAD exists to prevent.
 Parameter
 ```
 
-An iteration count of zero, or an output length of zero, where neither
-is meaningful.
+A parameter outside the range the algorithm defines: an iteration count
+or an output length of zero, or more data than a stream cipher's counter
+covers.
 
-<sub>[stdlib/Security/Cryptography/CryptoError.sl:66](../../stdlib/Security/Cryptography/CryptoError.sl#L66)</sub>
+<sub>[stdlib/Security/Cryptography/CryptoError.sl:67](../../stdlib/Security/Cryptography/CryptoError.sl#L67)</sub>
 
 #### NoEntropy *case*
 
@@ -582,7 +813,7 @@ NoEntropy
 
 The platform would not supply entropy.
 
-<sub>[stdlib/Security/Cryptography/CryptoError.sl:69](../../stdlib/Security/Cryptography/CryptoError.sl#L69)</sub>
+<sub>[stdlib/Security/Cryptography/CryptoError.sl:70](../../stdlib/Security/Cryptography/CryptoError.sl#L70)</sub>
 
 ### CryptographicOperations *class*
 
@@ -620,14 +851,15 @@ nothing else; .NET does the same, and a length is not the secret.
 static void ZeroMemory(byte[] buffer)
 ```
 
-Overwrites `buffer` with zeros, in a way the optimiser may not remove
-however little is read afterwards.
+Overwrites `buffer` with zeros.
 
-A key that is overwritten is not in the next core dump. It may still be
-in a register, a copy made along the way, or memory the allocator has
-moved; this clears the one buffer it is given and nothing else.
+**Not a guarantee.** An optimiser is entitled to remove a write nothing
+reads, and this is an ordinary loop in an ordinary language -- .NET's
+version is a compiler intrinsic and this one is not. It is worth doing
+because a key that is overwritten is a key that is not in the next core
+dump, and it is not worth relying on.
 
-<sub>[stdlib/Security/Cryptography/CryptographicOperations.sl:63](../../stdlib/Security/Cryptography/CryptographicOperations.sl#L63)</sub>
+<sub>[stdlib/Security/Cryptography/CryptographicOperations.sl:62](../../stdlib/Security/Cryptography/CryptographicOperations.sl#L62)</sub>
 
 ### HashAlgorithm *class*
 
@@ -1235,167 +1467,106 @@ ANSI X9.23: zeros, and the last byte is the count.
 
 <sub>[stdlib/Security/Cryptography/PaddingMode.sl:45](../../stdlib/Security/Cryptography/PaddingMode.sl#L45)</sub>
 
-### PemEncoding *class*
+### Poly1305 *class*
 
 ```
-class PemEncoding
+sealed class Poly1305
 ```
 
-The textual encoding of RFC 7468: DER in base64, between two boundary
-lines that name what it is.
+Poly1305, the one-time authenticator of RFC 8439 §2.5: a 32-byte key and a
+message give a 16-byte tag.
 
 ```csharp
-if (PemEncoding.Find(text) is Some found)
-{
-    var reader = new AsnReader(found.Value.Data, AsnEncodingRules.Der);
-    ...
-}
-String pem = PemEncoding.Write("CERTIFICATE", der);
+var tag = try Poly1305.ComputeTag(oneTimeKey, message);
 ```
 
-As .NET's `PemEncoding`: a block may sit anywhere in surrounding text, the
-base64 may be wrapped at any width and with CRLF or LF, and a block whose
-`END` label is not its `BEGIN` label is not a block. `Find` passes over
-anything malformed and answers the first block that is whole.
+**A key MUST authenticate one message and no more.** Two tags under one key
+give an attacker enough to forge a third. `ChaCha20Poly1305` derives a
+fresh key from every nonce, which is how this is meant to be used; a key
+from anywhere else has to come with the same guarantee.
 
-<sub>[stdlib/Security/Cryptography/PemEncoding.sl:43](../../stdlib/Security/Cryptography/PemEncoding.sl#L43)</sub>
+The arithmetic is modulo 2^130 - 5 in five 26-bit limbs, so every product
+fits a `ulong` and nothing needs a 128-bit multiply. It is constant time:
+the final reduction selects with a mask rather than a branch.
 
-#### Find *method*
+**See also** &nbsp; [ChaCha20Poly1305](#chacha20poly1305-class)
+
+<sub>[stdlib/Security/Cryptography/Poly1305.sl:46](../../stdlib/Security/Cryptography/Poly1305.sl#L46)</sub>
+
+#### KeySize *constant*
 
 ```
-static Optional<PemFields> Find(String text)
+const nuint KeySize = 32
 ```
 
-The first well-formed block in `text`.
+**Value** &nbsp; thirty-two bytes: `r`, then `s`.
+
+<sub>[stdlib/Security/Cryptography/Poly1305.sl:49](../../stdlib/Security/Cryptography/Poly1305.sl#L49)</sub>
+
+#### TagSize *constant*
+
+```
+const nuint TagSize = 16
+```
+
+**Value** &nbsp; sixteen bytes.
+
+<sub>[stdlib/Security/Cryptography/Poly1305.sl:52](../../stdlib/Security/Cryptography/Poly1305.sl#L52)</sub>
+
+#### FromKey *method*
+
+```
+static Result<Poly1305, CryptoError> FromKey(ReadOnlySpan<byte> key)
+```
+
+An authenticator under `key`, which must be 32 bytes and MUST NOT
+have been used before.
+
+**Fails with**
+
+- [CryptoError.KeyLength](#keylength-case) — `key` is not 32 bytes
+
+<sub>[stdlib/Security/Cryptography/Poly1305.sl:89](../../stdlib/Security/Cryptography/Poly1305.sl#L89)</sub>
+
+#### ComputeTag *method*
+
+```
+static Result<byte[], CryptoError> ComputeTag(ReadOnlySpan<byte> key, ReadOnlySpan<byte> message)
+```
+
+The tag of `message` under `key`, with no object to keep.
 
 **Parameters**
 
-- `text` — where to look
+- `key` — thirty-two bytes, used for this message only
+- `message` — what to authenticate
 
-**Returns** &nbsp; the block, or `None` when there is no well-formed one
+**Fails with**
 
-**See also** &nbsp; [PemEncoding.Write](#write-method)
+- [CryptoError.KeyLength](#keylength-case) — `key` is not 32 bytes
 
-<sub>[stdlib/Security/Cryptography/PemEncoding.sl:50](../../stdlib/Security/Cryptography/PemEncoding.sl#L50)</sub>
+<sub>[stdlib/Security/Cryptography/Poly1305.sl:101](../../stdlib/Security/Cryptography/Poly1305.sl#L101)</sub>
 
-#### Find *method*
-
-```
-static Optional<PemFields> Find(String text, nuint start)
-```
-
-The first well-formed block in `text` at or after byte `start`, which
-is how to walk a file of several: pass the end of the last one's
-`Location`.
-
-A `BEGIN` boundary MUST start the text or follow whitespace, and an
-`END` boundary MUST end it or be followed by whitespace. Between them is
-base64 in the standard alphabet, padded, with whitespace anywhere.
-
-**Parameters**
-
-- `text` — where to look
-- `start` — the byte to look from; past the end finds nothing
-
-**Returns** &nbsp; the block, or `None` when there is no well-formed one
-
-<sub>[stdlib/Security/Cryptography/PemEncoding.sl:63](../../stdlib/Security/Cryptography/PemEncoding.sl#L63)</sub>
-
-#### Write *method*
+#### AppendData *method*
 
 ```
-static String Write(String label, ReadOnlySpan<byte> data)
+void AppendData(ReadOnlySpan<byte> data)
 ```
 
-`data` as a PEM block: the boundaries, and base64 in lines of 64
-separated by `\n`. No newline follows the `END` boundary.
+Adds bytes to what is being authenticated.
 
-**Parameters**
+<sub>[stdlib/Security/Cryptography/Poly1305.sl:112](../../stdlib/Security/Cryptography/Poly1305.sl#L112)</sub>
 
-- `label` — what the data is; MUST be valid, which `IsValidLabel` answers, and aborts when it is not
-- `data` — the bytes to encode, usually DER
-
-**See also** &nbsp; [PemEncoding.Find](#find-method)
-
-<sub>[stdlib/Security/Cryptography/PemEncoding.sl:129](../../stdlib/Security/Cryptography/PemEncoding.sl#L129)</sub>
-
-#### IsValidLabel *method*
+#### GetTag *method*
 
 ```
-static bool IsValidLabel(String label)
+byte[] GetTag()
 ```
 
-Whether RFC 7468 allows `label`: printable ASCII other than `-`, with a
-single space or hyphen allowed between two such characters. Empty is
-allowed.
+The tag of everything appended. **The key is erased**, so the object
+MUST NOT be used afterwards: it has done the one thing it may do.
 
-<sub>[stdlib/Security/Cryptography/PemEncoding.sl:155](../../stdlib/Security/Cryptography/PemEncoding.sl#L155)</sub>
-
-### PemFields *struct*
-
-```
-struct PemFields
-```
-
-One PEM block that `PemEncoding.Find` found: its label, its data decoded,
-and where each part is in the text it was found in.
-
-Every `Range` counts bytes of the text's UTF-8, which for the block itself
-is ASCII and so counts characters too.
-
-<sub>[stdlib/Security/Cryptography/PemFields.sl:29](../../stdlib/Security/Cryptography/PemFields.sl#L29)</sub>
-
-#### Label *property*
-
-```
-String Label { get; }
-```
-
-What follows `BEGIN `: `CERTIFICATE`, `PRIVATE KEY`.
-
-<sub>[stdlib/Security/Cryptography/PemFields.sl:47](../../stdlib/Security/Cryptography/PemFields.sl#L47)</sub>
-
-#### Data *property*
-
-```
-byte[] Data { get; }
-```
-
-The base64 between the boundaries, decoded.
-
-<sub>[stdlib/Security/Cryptography/PemFields.sl:50](../../stdlib/Security/Cryptography/PemFields.sl#L50)</sub>
-
-#### Location *property*
-
-```
-Range Location { get; }
-```
-
-The whole block, from the first `-` of `-----BEGIN` to the last of
-`-----END ...-----`. Its end is where to look for the next one.
-
-<sub>[stdlib/Security/Cryptography/PemFields.sl:54](../../stdlib/Security/Cryptography/PemFields.sl#L54)</sub>
-
-#### LabelLocation *property*
-
-```
-Range LabelLocation { get; }
-```
-
-Where the label is, in the `BEGIN` boundary.
-
-<sub>[stdlib/Security/Cryptography/PemFields.sl:57](../../stdlib/Security/Cryptography/PemFields.sl#L57)</sub>
-
-#### Base64Location *property*
-
-```
-Range Base64Location { get; }
-```
-
-Where the base64 is, from its first character to its last, whitespace
-inside it included and around it not.
-
-<sub>[stdlib/Security/Cryptography/PemFields.sl:61](../../stdlib/Security/Cryptography/PemFields.sl#L61)</sub>
+<sub>[stdlib/Security/Cryptography/Poly1305.sl:128](../../stdlib/Security/Cryptography/Poly1305.sl#L128)</sub>
 
 ### RandomNumberGenerator *class*
 

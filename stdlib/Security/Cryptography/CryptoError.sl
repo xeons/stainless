@@ -42,7 +42,7 @@ public enum CryptoError
     IvLength,
 
     /// The nonce is not a length this mode takes. AES-GCM takes any non-empty
-    /// nonce and wants twelve bytes.
+    /// nonce and wants twelve bytes; ChaCha20 takes twelve and nothing else.
     NonceLength,
 
     /// The authentication tag is not a length this mode produces.
@@ -61,8 +61,9 @@ public enum CryptoError
     /// handling it at all is the mistake AEAD exists to prevent.
     AuthenticationFailed,
 
-    /// An iteration count of zero, or an output length of zero, where neither
-    /// is meaningful.
+    /// A parameter outside the range the algorithm defines: an iteration count
+    /// or an output length of zero, or more data than a stream cipher's counter
+    /// covers.
     Parameter,
 
     /// The platform would not supply entropy.

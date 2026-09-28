@@ -19,7 +19,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-/// Hashes, message authentication codes, key derivation and block ciphers.
+/// Hashes, message authentication codes, key derivation, and block and stream
+/// ciphers.
 ///
 /// ```csharp
 /// var digest = Sha256.HashData(Encoding.CreateUtf8().GetBytes("hello"));
@@ -31,10 +32,10 @@
 ///
 /// **The shape is `System.Security.Cryptography`'s**, so a program being
 /// ported finds the names where it left them: `Sha256`, `Hmac`, `Aes`,
-/// `AesGcm`, `Rfc2898DeriveBytes.Pbkdf2`, `RandomNumberGenerator.Fill`,
-/// `CryptographicOperations.FixedTimeEquals`. Three things about it differ,
-/// and each is a rule this language already has rather than a choice made
-/// here:
+/// `AesGcm`, `ChaCha20Poly1305`, `Rfc2898DeriveBytes.Pbkdf2`,
+/// `RandomNumberGenerator.Fill`, `CryptographicOperations.FixedTimeEquals`.
+/// Three things about it differ, and each is a rule this language already has
+/// rather than a choice made here:
 ///
 /// - **The casing is the house rule's**, not .NET's. `SHA256` is `Sha256` and
 ///   `HMACSHA256` is `HmacSha256`, because an acronym longer than two letters
@@ -56,8 +57,10 @@
 /// is known to leak through the data cache on a machine an attacker shares. It
 /// is right for a file, a protocol and a password store, and it is not the
 /// thing to put under a remote attacker who can time it. AES-NI and a
-/// bitsliced fallback are what would answer that, and neither is written --
-/// TODO.md carries the note.
+/// bitsliced fallback are what would answer that, and neither is written —
+/// TODO.md carries the note. **`ChaCha20Poly1305` is the answer that is
+/// written**: it has no table and no branch on a secret, so it is constant
+/// time in software, and it is what to choose where timing matters.
 ///
 /// **What is not here yet is public-key.** RSA, ECDsa, ECDiffieHellman and
 /// X.509 all rest on arbitrary-precision integer arithmetic, which this
@@ -124,4 +127,19 @@ void WriteBigDoubleWord(byte[] into, nuint at, ulong value)
 {
     WriteBigWord(into, at, (uint)((value >> 32) & 0xFFFFFFFFu));
     WriteBigWord(into, at + 4u, (uint)(value & 0xFFFFFFFFu));
+}
+
+/// Eight bytes as a little-endian doubleword, for BLAKE2b and Argon2.
+ulong ReadLittleDoubleWord(byte[] block, nuint at)
+{
+    ulong low = (ulong)ReadLittleWord(block, at);
+    ulong high = (ulong)ReadLittleWord(block, at + 4u);
+    return (high << 32) | low;
+}
+
+/// A doubleword into eight little-endian bytes of `into`.
+void WriteLittleDoubleWord(byte[] into, nuint at, ulong value)
+{
+    WriteLittleWord(into, at, (uint)(value & 0xFFFFFFFFu));
+    WriteLittleWord(into, at + 4u, (uint)((value >> 32) & 0xFFFFFFFFu));
 }
