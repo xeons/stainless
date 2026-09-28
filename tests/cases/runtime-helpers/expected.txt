@@ -1,0 +1,24 @@
+byte: false
+double: false
+Colour: false
+int*: false
+Thing: true
+Thing?: true
+String: true
+int[]: true
+Plain: false
+Holder: true
+Outer: true
+Watcher: true
+(int, long): false
+(int, String): true
+int[4]: false
+Plain[2]: false
+Func<int, int>: true
+Shape: false
+Labelled: true
+Optional<int>: false
+Optional<String>: true
+Span<int>: true
+inside, int: false
+inside, Thing: true

@@ -452,6 +452,10 @@ last person to edit it -- the suite is the authority.
   another type parameter, `class`, `struct`, `unmanaged`, `notnull`, `default`,
   `new()` and `threadsafe`, each clause checked where it is written as well as
   against every argument
+- `RuntimeHelpers.IsReferenceOrContainsReferences<T>()`, C#'s, is a constant
+  per instantiation, and an `if` on a constant emits only the arm it takes. So
+  a generic copy is one `memmove` for elements that hold no counted reference
+  and a counting loop for the rest, with nothing of the other left in either
 - `enum`, strongly typed: a distinct type over an integer that never converts
   implicitly in either direction, with an optional underlying type
   (`enum Level : byte`). A property, field or local may share its enum's name,

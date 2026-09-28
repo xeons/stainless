@@ -201,6 +201,17 @@ public sealed partial class LlvmEmitter
 
     private void EmitIf(BoundIf statement)
     {
+        // A label in the arm not taken could still be jumped to, so a function
+        // with one keeps both.
+        if (!_hasLabels && ConstantCondition(statement.Condition) is { } taken)
+        {
+            if (taken)
+                EmitStatement(statement.Then);
+            else if (statement.Else is not null)
+                EmitStatement(statement.Else);
+            return;
+        }
+
         var condition = EmitExpression(statement.Condition);
         FlushTemporaries();
 
@@ -223,6 +234,35 @@ public sealed partial class LlvmEmitter
 
         Label(endLabel);
     }
+
+    /// <summary>
+    /// The value of a condition known without running it, or null. Each
+    /// instantiation of a generic has its own constants, such as
+    /// <c>RuntimeHelpers.IsReferenceOrContainsReferences&lt;T&gt;()</c>, and
+    /// the arm an <c>if</c> on one does not take emits nothing.
+    /// </summary>
+    private static bool? ConstantCondition(BoundExpression condition) => condition switch
+    {
+        BoundLiteral { Value: bool value } => value,
+        BoundConstantAccess { Constant.Value: bool value } => value,
+        BoundUnary { Operator: BoundUnaryOp.LogicalNot } negated =>
+            ConstantCondition(negated.Operand) is { } operand ? !operand : null,
+        BoundBinary { Operator: BoundBinaryOp.LogicalAnd } both =>
+            ConstantCondition(both.Left) switch
+            {
+                false => false,
+                true => ConstantCondition(both.Right),
+                null => null,
+            },
+        BoundBinary { Operator: BoundBinaryOp.LogicalOr } either =>
+            ConstantCondition(either.Left) switch
+            {
+                true => true,
+                false => ConstantCondition(either.Right),
+                null => null,
+            },
+        _ => null,
+    };
 
     private void EmitWhile(BoundWhile statement)
     {

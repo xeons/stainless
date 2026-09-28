@@ -74,6 +74,7 @@ everyday values:
 | `Version` | two to four parts, `Parse`, ordered part by part with a missing part first |
 | `Uri` | RFC 3986: kept normal, resolved against a base, escaped and unescaped; `Host`, `Port`, `AbsolutePath`, `Segments`, `MakeRelativeUri`, `IsBaseOf`; a Windows or UNC path reads as a `file:` URI |
 | `Lazy<T>` | made on first ask, once, with C#'s three `LazyThreadSafetyMode`s |
+| `RuntimeHelpers` | `IsReferenceOrContainsReferences<T>()`, a constant per instantiation ([§4.3](04-generics.md#43-what-a-constraint-does-and-does-not-do)) |
 
 Each parses into a `Result` with a `ParseError` rather than throwing, and a
 constructor given what cannot be one aborts, as C#'s throws.

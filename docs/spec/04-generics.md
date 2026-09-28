@@ -175,6 +175,29 @@ void CopyBytes<T>(T* to, T* from, nuint count) where T : unmanaged
 }
 ```
 
+**A generic that takes any `T` may ask instead.**
+`RuntimeHelpers.IsReferenceOrContainsReferences<T>()` is C#'s, and answers
+false exactly where `unmanaged` would pass. Each instantiation is compiled
+on its own, so the compiler answers the call as a constant where it is bound,
+and an `if` whose condition is a constant emits only the arm it takes.
+`Span<T>.CopyTo` is one body and two programs:
+
+```csharp
+if (!RuntimeHelpers.IsReferenceOrContainsReferences<T>())
+{
+    memmove(to, from, count * sizeof(T));   // Span<byte>: this and nothing else
+}
+else
+{
+    for (nuint i = 0; i < count; i++)       // Span<String>: this, counting each
+        target[i] = source[i];
+}
+```
+
+Both arms are still bound for every `T`, so each MUST be valid for any type.
+A function that holds a label keeps both arms, since the one not taken could
+still be jumped into.
+
 **`notnull` is narrower than C#'s**, because nullability here is in the type
 rather than an annotation beside it: a `String` is never null and a `String?`
 may be, so the second is refused where C# would warn.

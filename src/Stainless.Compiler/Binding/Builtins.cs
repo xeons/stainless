@@ -223,6 +223,19 @@ public sealed class Builtins
     public FunctionSymbol HashText => Found(ref _hashText, Standard, "HashText",
         PrimitiveTypeSymbol.NUInt, String);
 
+    /// <summary>
+    /// True for an instantiation of
+    /// <c>Standard.RuntimeHelpers.IsReferenceOrContainsReferences&lt;T&gt;</c>,
+    /// which the binder answers with a constant per type argument.
+    /// </summary>
+    public bool IsReferenceQuery(FunctionSymbol function) =>
+        function.Template is
+        {
+            Name: "IsReferenceOrContainsReferences",
+            ContainingType: { SimpleName: "RuntimeHelpers", ModuleName: StandardModuleName },
+        } &&
+        function.TypeArguments.Count == 1;
+
     // The runtime's weak subscription cell, which the accessors and thunks
     // written for every event call. See runtime/arc.c.
 

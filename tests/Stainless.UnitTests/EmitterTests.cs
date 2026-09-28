@@ -507,6 +507,60 @@ public class EmitterTests
         Assert.DoesNotContain("sl_divide_by_zero", body);
     }
 
+    // ------------------------------------------------------------- generics
+
+    private const string CopyAll = """
+        extern "C" byte* memmove(byte* to, byte* from, nuint count);
+
+        public class C { }
+
+        public void CopyAll<T>(T[] to, T[] from)
+        {
+            if (!RuntimeHelpers.IsReferenceOrContainsReferences<T>())
+            {
+                if (from.Length != 0u)
+                    memmove((byte*)&to[0u], (byte*)&from[0u], from.Length * sizeof(T));
+            }
+            else
+            {
+                for (nuint i = 0u; i < from.Length; i++)
+                    to[i] = from[i];
+            }
+        }
+
+        public void CopyBytes(byte[] to, byte[] from) => CopyAll(to, from);
+        public void CopyObjects(C[] to, C[] from) => CopyAll(to, from);
+        """;
+
+    /// <summary>
+    /// Each instantiation answers the question with a constant, and the arm
+    /// an <c>if</c> on it does not take emits nothing: the bytes' copy is a
+    /// <c>memmove</c> with no loop beside it.
+    /// </summary>
+    [Fact]
+    public void AReferenceFreeInstantiationKeepsOnlyItsArm()
+    {
+        string body = Front.Function(Front.ModuleIr(CopyAll), "@_SL4Test7CopyAllG1h");
+
+        Assert.Contains("call ptr @memmove(", body);
+        Assert.DoesNotContain("for.", body);
+        Assert.DoesNotContain("IsReferenceOrContainsReferences", body);
+    }
+
+    /// <summary>
+    /// And the instantiation over a class keeps the loop, which counts every
+    /// reference it copies, and has no <c>memmove</c> to go wrong.
+    /// </summary>
+    [Fact]
+    public void AReferenceInstantiationKeepsOnlyTheLoop()
+    {
+        string body = Front.Function(Front.ModuleIr(CopyAll), "@_SL4Test7CopyAllG1C6Test_C");
+
+        Assert.DoesNotContain("memmove", body);
+        Assert.Contains("for.body", body);
+        Assert.Contains("call void @sl_retain(", body);
+    }
+
     // ----------------------------------------------------------- bit-fields
 
     /// <summary>

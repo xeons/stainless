@@ -1726,6 +1726,14 @@ public static class TypeExtensions
         };
     }
 
+    /// <summary>
+    /// What <c>RuntimeHelpers.IsReferenceOrContainsReferences&lt;T&gt;</c>
+    /// answers: false only where a value's bytes are the whole of it, so a
+    /// copy, a comparison or a clear of those bytes keeps no count out of step.
+    /// </summary>
+    public static bool IsReferenceOrContainsReferences(this TypeSymbol type) =>
+        type.IsReferenceType || type.CarriesReferences();
+
     /// <summary>The type a reference points at, or null.</summary>
     public static TypeSymbol? AsReference(this TypeSymbol type) => type switch
     {

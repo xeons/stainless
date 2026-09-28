@@ -1361,6 +1361,10 @@ public sealed partial class Binder
         var (ordered, spans) = Arrange(
             function, parameters, arguments, written, map, syntax.Span);
 
+        if (_builtins.IsReferenceQuery(function))
+            return new BoundLiteral(syntax.Span, PrimitiveTypeSymbol.Bool,
+                function.TypeArguments[0].IsReferenceOrContainsReferences());
+
         var converted = ConvertArguments(function, ordered, spans);
         return new BoundCall(syntax.Span, function, receiver, converted)
             { IsNonVirtual = nonVirtual, EvaluationOrder = WrittenOrder(map, converted.Count) };
