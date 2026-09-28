@@ -1666,6 +1666,9 @@ public sealed partial class Binder
             or BoundCall or BoundIndirectCall or BoundClosureCall or BoundIncrement or BoundPropertyIncrement
             or BoundNew or BoundStructNew or BoundErrorExpression => true,
 
+        // It returns on a failure, whatever its operand is.
+        BoundTry => true,
+
         BoundLet held => Effective(held.Body),
         BoundConditional chosen => Effective(chosen.WhenTrue) || Effective(chosen.WhenFalse),
         BoundConditionalAccess asked => Effective(asked.Access) || Effective(asked.WhenNothing),

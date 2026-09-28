@@ -1256,6 +1256,16 @@ public class BinderTests
         Front.Verified(new Stainless.Emit.LlvmEmitter(forSharedLibrary: true).Emit(Stainless.Lowering.Lowerer.Lower(program)));
     }
 
+    /// <summary>
+    /// A `try` standing as a statement returns on a failure, which is an
+    /// effect whatever the value it drops.
+    /// </summary>
+    [Fact]
+    public void ATryAsAStatementHasAnEffect() =>
+        Assert.DoesNotContain("SL0222", Front.ModuleCodes(
+            "Result<int, int> Step() => Ok(1);\n" +
+            "Result<bool, int> Run() { try Step(); return Ok(true); }"));
+
     /// <summary>The body of a lambda whose target returns nothing drops an unsettled value the same way.</summary>
     [Theory]
     [InlineData("() => (int x) => x")]
