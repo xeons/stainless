@@ -54,7 +54,7 @@ own for the linker to drop.
 | `Standard.Time` | `DateTimeOffset`, `TimeSpan`, `DateTime` and the monotonic `Stopwatch` | on request |
 | `Standard.Random` | xoshiro256**, seeded by you or by the operating system | on request |
 | `Standard.Drawing` | raster images: decode, draw, encode ([§5.12](#512-standarddrawing)) | on request |
-| `Standard.Security.Cryptography` | hashes, MACs, key derivation, AES, ChaCha20-Poly1305, X25519, Ed25519, ECDSA and ECDH, PEM ([§5.13](#513-standardsecuritycryptography)) | on request |
+| `Standard.Security.Cryptography` | hashes, MACs, key derivation, AES, ChaCha20-Poly1305, X25519, Ed25519, ECDSA and ECDH, RSA, PEM ([§5.13](#513-standardsecuritycryptography)) | on request |
 | `Standard.Formats.Asn1` | ASN.1 in BER and DER, read and written ([§5.15](#515-standardformatsasn1)) | on request |
 | `Standard.Media.Audio` | playing and recording sound ([§5.14](#514-standardmediaaudio)) | on request |
 | `Standard.Com` | `Guid` and `IUnknown`, for `com interface` ([§8.5](08-interop-libraries.md#85-com)) | on request |
@@ -946,6 +946,7 @@ here.
 | key agreement | `X25519` (RFC 7748); `ECDiffieHellman` on P-256 and P-384 |
 | signatures | `Ed25519` (RFC 8032, pure); `ECDsa` on P-256 and P-384 |
 | elliptic curves | `ECCurve`, `ECParameters`, `ECPoint`, `HashAlgorithmName`, `DsaSignatureFormat` |
+| public key | `Rsa`, with `RsaParameters`, `HashAlgorithmName`, `RsaSignaturePadding` and `RsaEncryptionPadding` |
 | text | `PemEncoding`: RFC 7468 blocks found in text and written at 64 columns |
 | the rest | `RandomNumberGenerator`, `CryptographicOperations.FixedTimeEquals` |
 
@@ -991,9 +992,31 @@ imported is checked. RFC 6979's own vectors, NIST's CDH vectors, a spread of
 Wycheproof's and keys, signatures and secrets made by OpenSSL pin it, in
 `tests/cases/crypto-ecc`.
 
-**What is not there is RSA**, which rests on an arbitrary-precision integer
-this standard library does not have; [TODO.md](../../TODO.md) carries the
-shape that would take.
+**`Rsa` is RFC 8017 over a constant-time bignum.** Signatures in PKCS #1 v1.5
+and PSS, encryption in OAEP and PKCS #1 v1.5, keys generated as FIPS 186-5
+§A.1.3 describes, and keys read and written as PKCS #1, PKCS #8, X.509
+`SubjectPublicKeyInfo` and PEM through `Standard.Formats.Asn1`. It differs from
+.NET's `RSA` in one more way than the rest of the module: an `Rsa` always holds
+a key, so an import is a static method that answers one —
+`Rsa.ImportFromPem(pem)` — rather than a method that changes one.
+
+```csharp
+var key = try Rsa.Create(2048);
+byte[] signature = try key.SignData(data, HashAlgorithmName.Sha256, RsaSignaturePadding.Pss);
+bool genuine = key.VerifyData(data, signature, HashAlgorithmName.Sha256, RsaSignaturePadding.Pss);
+```
+
+**Everything done with a secret is constant time**: the Montgomery
+exponentiation reads its whole window table for every window, the private
+operation is blinded and its result checked against the public key before it
+is released, OAEP decodes under masks, and PKCS #1 v1.5 decryption uses
+implicit rejection, so a badly padded ciphertext decrypts to a synthetic
+message rather than failing. Verifying, encrypting and choosing primes are not,
+and need not be. `tests/cases/crypto-rsa` pins it against Wycheproof and
+against OpenSSL, byte for byte, and `x86-crypto-rsa` repeats it on 32-bit x86.
+
+**What is not there** is X.509 path validation; [TODO.md](../../TODO.md)
+carries the note.
 
 ## 5.14 `Standard.Media.Audio`
 

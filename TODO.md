@@ -573,11 +573,22 @@ Wycheproof and OpenSSL. What is left on that side:
 - **X.509 path validation.** Verifying one certificate's signature is here;
   names, validity, key usage and chains are not.
 
-**RSA is not there, and neither is the work.** The work underneath RSA is an
-arbitrary-precision integer: addition, multiplication, modular exponentiation
-with a Montgomery ladder, and an inverse -- in constant time, because the whole
-point of the exponent is that it is secret. That is a module of its own, it is
-the thing a mistake in is invisible, and half of it is worse than none.
+**RSA is done**: `Rsa` generates keys, signs and verifies with PKCS #1 v1.5
+and PSS, encrypts with OAEP and PKCS #1 v1.5 (decrypting the latter with
+implicit rejection), and reads and writes PKCS #1, PKCS #8, X.509 and PEM. It
+stands on `Limbs` and `MontgomeryModulus`, a constant-time bignum of 64-bit
+limbs, and `tests/cases/crypto-rsa` pins it against Wycheproof and OpenSSL.
+
+What is left on the RSA side:
+
+- **Encrypted PKCS #8** (PBES2 over PBKDF2 or scrypt, with AES-CBC), which
+  `ImportFromPem` refuses as `Unsupported`; and multi-prime keys, which are
+  refused the same way.
+- **Speed.** Half of a private operation is inverting the blinding factor by
+  Fermat modulo each prime; a pair kept and squared between uses, as OpenSSL
+  does, would take that away at the cost of a lock. A dedicated squaring saves
+  about a quarter of each exponentiation, and 32-bit limbs on a 32-bit target
+  would spare x86, now at twice x64's time, its emulated 64-bit products.
 
 ### Case mapping beyond ASCII
 

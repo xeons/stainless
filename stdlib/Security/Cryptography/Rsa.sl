@@ -100,8 +100,9 @@ public sealed class Rsa
     /// each passing Miller-Rabin with random bases as many times as Table B.1
     /// asks; `d` is `65537^-1 mod lcm(p - 1, q - 1)` and at least `2^half`.
     ///
-    /// **The time taken is random**, since it is a search: about a quarter of
-    /// a second for 2048 bits and several seconds for 4096 on a current x64.
+    /// **The time taken is random**, since it is a search: from a few tens to
+    /// a few hundred milliseconds for 2048 bits on a current x64, and from
+    /// under one second to several for 4096.
     /// A candidate is thrown away as soon as a small prime divides it or a
     /// Miller-Rabin round finds a witness, so the time reveals something
     /// about numbers that are not kept. What is kept is handled in constant

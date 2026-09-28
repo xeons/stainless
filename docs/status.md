@@ -688,7 +688,12 @@ last person to edit it -- the suite is the authority.
   `SubjectPublicKeyInfo` and PEM, byte-for-byte with OpenSSL. Constant time
   wherever a private scalar or a nonce is involved; a P-256 signature or
   agreement is about 0.4 ms on x64. Every answer is pinned against a published
-  test vector. Not RSA or X.509.
+  test vector. **RSA** is there too: key generation, PKCS #1 v1.5 and PSS
+  signatures, OAEP and PKCS #1 v1.5 encryption (the latter with implicit
+  rejection), and keys in PKCS #1, PKCS #8, X.509 and PEM, over a
+  constant-time Montgomery bignum with a blinded, fault-checked CRT private
+  operation — 3 ms to sign with a 2048-bit key on x64, 0.05 ms to verify.
+  Not X.509 certificates.
   `PemEncoding` finds RFC 7468 blocks in surrounding text and writes them
 - `Standard.Formats.Asn1`: BER and DER in `System.Formats.Asn1`'s shape, with
   a `Result` where .NET throws. `AsnReader` covers every type X.509 uses —

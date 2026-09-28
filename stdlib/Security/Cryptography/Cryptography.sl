@@ -27,16 +27,20 @@
 /// Console.WriteLine(Convert.ToHexString(digest));
 ///
 /// var cipher = try Aes.FromKey(key);
-/// var sealed = try cipher.EncryptCbc(plaintext, iv, PaddingMode.Pkcs7);
+/// var encrypted = try cipher.EncryptCbc(plaintext, iv, PaddingMode.Pkcs7);
 ///
 /// var shared = try X25519.DeriveSharedSecret(myPrivateKey, theirPublicKey);
 /// var signature = try Ed25519.Sign(signingKey, message);
+///
+/// var signer = try Rsa.ImportFromPem(pem);
+/// var rsaSignature = try signer.SignData(data, HashAlgorithmName.Sha256,
+///                                        RsaSignaturePadding.Pss);
 /// ```
 ///
 /// **The shape is `System.Security.Cryptography`'s**, so a program being
 /// ported finds the names where it left them: `Sha256`, `Hmac`, `Aes`,
 /// `AesGcm`, `ChaCha20Poly1305`, `Rfc2898DeriveBytes.Pbkdf2`, `ECDsa`,
-/// `ECDiffieHellman`, `RandomNumberGenerator.Fill`,
+/// `ECDiffieHellman`, `Rsa`, `RandomNumberGenerator.Fill`,
 /// `CryptographicOperations.FixedTimeEquals`.
 /// `Blake2b`, `Scrypt` and `Argon2id` are not in .NET and follow the same
 /// shape. Three things about it differ, and each is a rule this language
@@ -79,7 +83,7 @@
 /// about three times as fast as `AesGcm` here, and is the one to choose
 /// where a format leaves the choice open.
 ///
-/// **Public-key is Curve25519, P-256 and P-384.** `X25519` and
+/// **Public-key is RSA, Curve25519, P-256 and P-384.** `X25519` and
 /// `ECDiffieHellman` agree keys; `Ed25519` and `ECDsa` sign. The NIST curves
 /// are fixed-width Montgomery multiplication in 64-bit limbs held inline, with
 /// the complete formulas of Renes, Costello and Batina so that no point is a
@@ -96,9 +100,27 @@
 /// Verification and the checking of a public point read nothing secret and are
 /// written for speed.
 ///
-/// RSA is not here yet; it wants an arbitrary-precision integer, and TODO.md
-/// carries the note. X.509 is `Standard.Formats.Asn1` and a signature check,
-/// which is enough to verify a certificate and not yet a path validator.
+/// **`Rsa` is the public-key half**, over a constant-time bignum of 64-bit
+/// limbs: signatures in PKCS #1 v1.5 and PSS, encryption in OAEP and PKCS #1
+/// v1.5, key generation, and keys in PKCS #1, PKCS #8, X.509 and PEM.
+///
+/// **What is constant time there, exactly.** Every operation that touches a
+/// private key runs in time, and reads memory at addresses, fixed by the
+/// key's size: the Montgomery exponentiation reads all sixteen entries of its
+/// window table for every window, a reduction or an inverse runs a fixed count
+/// of steps, and a selection is a mask rather than a branch. The private
+/// operation is blinded by a fresh random factor and its result is checked
+/// against the public key before it is released. OAEP decoding and PKCS #1
+/// v1.5 decoding run under masks with one verdict at the end, and the latter
+/// uses implicit rejection, so a bad padding is not even a failure. Three
+/// things are not constant time, and none handles a secret an attacker can
+/// choose: verifying and encrypting, which use only the public key; key
+/// generation's search, which throws away candidates as soon as they fail and
+/// so reveals only things about numbers it does not keep; and exporting a
+/// private key, since DER writes each number in the fewest bytes it takes.
+///
+/// X.509 is `Standard.Formats.Asn1` and a signature check, which is
+/// enough to verify a certificate and not yet a path validator.
 module Standard.Security.Cryptography;
 
 import Standard.Text;
