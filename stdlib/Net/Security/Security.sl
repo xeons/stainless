@@ -183,7 +183,7 @@ public String DescribeTlsError(TlsError error)
         case TlsError.RecordOverflow: return "a record was too long";
         case TlsError.IllegalParameter: return "a message held a forbidden value";
         case TlsError.CertificateRefused: return "the certificate was refused";
-        case TlsError.UnsupportedCertificate: return "the certificate's key is of an unsupported type";
+        case TlsError.UnsupportedCertificate: return "the certificate's key is unsupported";
         case TlsError.CertificateExpired: return "the certificate has expired or is not yet valid";
         case TlsError.UnknownCertificateAuthority: return "the certificate's issuer is not trusted";
         case TlsError.CertificateRequired: return "a client certificate was required";
@@ -313,7 +313,9 @@ internal bool IsImplementedTlsGroup(TlsNamedGroup group)
 
 /// The hash of the key schedule under `suite`.
 internal HashAlgorithmName GetTlsSuiteHash(TlsCipherSuite suite) =>
-    suite == TlsCipherSuite.TlsAes256GcmSha384 ? HashAlgorithmName.Sha384 : HashAlgorithmName.Sha256;
+    suite == TlsCipherSuite.TlsAes256GcmSha384
+        ? HashAlgorithmName.Sha384
+        : HashAlgorithmName.Sha256;
 
 /// How long the record key of `suite` is.
 nuint GetTlsSuiteKeyLength(TlsCipherSuite suite) =>

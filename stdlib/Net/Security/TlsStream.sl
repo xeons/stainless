@@ -56,7 +56,8 @@ public sealed class TlsStream : IStream
 
     ~TlsStream() { Close(); }
 
-    internal static TlsStream WrapTlsConnection(TlsConnection connection) => new TlsStream(connection);
+    internal static TlsStream WrapTlsConnection(
+        TlsConnection connection) => new TlsStream(connection);
 
     /// Runs the client's handshake over `inner`.
     ///
@@ -70,7 +71,8 @@ public sealed class TlsStream : IStream
     /// @failure TlsError.AlertReceived        the server refused, and said why
     ///                                        in an alert
     /// @failure TlsError.Io                   the stream underneath failed
-    public static Result<TlsStream, TlsError> AuthenticateAsClient(IStream inner, TlsClientOptions options)
+    public static Result<TlsStream, TlsError> AuthenticateAsClient(
+        IStream inner, TlsClientOptions options)
     {
         return AuthenticateAsClient(inner, options, out TlsAlertDescription alert);
     }
@@ -84,8 +86,8 @@ public sealed class TlsStream : IStream
     ///                       `AlertReceived`, and `CloseNotify` otherwise
     /// @failure TlsError.AlertReceived  the server refused, and `alertReceived`
     ///                                  says why
-    public static Result<TlsStream, TlsError> AuthenticateAsClient(IStream inner, TlsClientOptions options,
-                                                                   out TlsAlertDescription alertReceived)
+    public static Result<TlsStream, TlsError> AuthenticateAsClient(
+        IStream inner, TlsClientOptions options, out TlsAlertDescription alertReceived)
     {
         var connection = new TlsConnection(inner, false, options.LeaveInnerStreamOpen);
         var handshake = new TlsClientHandshake(connection, options, options.TargetHost);
@@ -113,7 +115,8 @@ public sealed class TlsStream : IStream
     ///                                           required and none came
     /// @failure TlsError.InternalError           no certificate or no key is
     ///                                           configured
-    public static Result<TlsStream, TlsError> AuthenticateAsServer(IStream inner, TlsServerOptions options)
+    public static Result<TlsStream, TlsError> AuthenticateAsServer(
+        IStream inner, TlsServerOptions options)
     {
         return AuthenticateAsServer(inner, options, out TlsAlertDescription alert);
     }
@@ -127,8 +130,8 @@ public sealed class TlsStream : IStream
     ///                       `AlertReceived`, and `CloseNotify` otherwise
     /// @failure TlsError.AlertReceived  the client refused, and `alertReceived`
     ///                                  says why
-    public static Result<TlsStream, TlsError> AuthenticateAsServer(IStream inner, TlsServerOptions options,
-                                                                   out TlsAlertDescription alertReceived)
+    public static Result<TlsStream, TlsError> AuthenticateAsServer(
+        IStream inner, TlsServerOptions options, out TlsAlertDescription alertReceived)
     {
         var connection = new TlsConnection(inner, true, options.LeaveInnerStreamOpen);
         var handshake = new TlsServerHandshake(connection, options);
@@ -204,7 +207,8 @@ public sealed class TlsStream : IStream
     /// @param context  bound into the result; empty when the protocol has none
     /// @param length   how many bytes, at most 255 digests' worth
     /// @failure TlsError.Closed  the stream is closed
-    public Result<byte[], TlsError> ExportKeyingMaterial(String label, ReadOnlySpan<byte> context, nuint length)
+    public Result<byte[], TlsError> ExportKeyingMaterial(
+        String label, ReadOnlySpan<byte> context, nuint length)
     {
         var schedule = _connection._schedule;
         if (schedule == null || _connection.IsClosed)

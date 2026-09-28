@@ -113,10 +113,10 @@ bool AreSame(byte[] left, byte[] right)
 
 void Check(String name, byte[] actual, String expected)
 {
-    if (AreSame(actual, Hex(expected)))
-        Console.WriteLine(name + ": ok");
-    else
-        Console.WriteLine(name + ": MISMATCH " + Convert.ToHexString(actual, false));
+    String verdict = AreSame(actual, Hex(expected))
+        ? "ok"
+        : "MISMATCH " + Convert.ToHexString(actual, false);
+    Console.WriteLine(name + ": " + verdict);
 }
 
 void Say(String name, bool value) => Console.WriteLine(name + ": " + (value ? "yes" : "no"));
@@ -160,17 +160,22 @@ void CheckKeySchedule()
     Check("c ap traffic", schedule.ClientApplicationTraffic, ClientApplicationTraffic);
     Check("s ap traffic", schedule.ServerApplicationTraffic, ServerApplicationTraffic);
     Check("exp master", schedule.ExporterMaster, ExporterMaster);
-    Check("server application key", schedule.ExpandLabel(schedule.ServerApplicationTraffic, "key", 16u),
-          ServerApplicationKey);
-    Check("server application iv", schedule.ExpandLabel(schedule.ServerApplicationTraffic, "iv", 12u),
-          ServerApplicationIv);
-    Check("client application key", schedule.ExpandLabel(schedule.ClientApplicationTraffic, "key", 16u),
-          ClientApplicationKey);
-    Check("client application iv", schedule.ExpandLabel(schedule.ClientApplicationTraffic, "iv", 12u),
-          ClientApplicationIv);
+    Check(
+        "server application key",
+        schedule.ExpandLabel(schedule.ServerApplicationTraffic, "key", 16u), ServerApplicationKey);
+    Check(
+        "server application iv", schedule.ExpandLabel(schedule.ServerApplicationTraffic, "iv", 12u),
+        ServerApplicationIv);
+    Check(
+        "client application key",
+        schedule.ExpandLabel(schedule.ClientApplicationTraffic, "key", 16u), ClientApplicationKey);
+    Check(
+        "client application iv", schedule.ExpandLabel(schedule.ClientApplicationTraffic, "iv", 12u),
+        ClientApplicationIv);
 
-    Check("client finished", schedule.ComputeFinished(schedule.ClientHandshakeTraffic,
-                                                      schedule.HashTranscript(throughServerFinished)),
+    byte[] serverFinishedHash = schedule.HashTranscript(throughServerFinished);
+    Check("client finished",
+          schedule.ComputeFinished(schedule.ClientHandshakeTraffic, serverFinishedHash),
           ClientFinishedData);
     byte[] throughClientFinished = JoinBytes(throughServerFinished, Hex(ClientFinished));
     Check("hash through client Finished", schedule.HashTranscript(throughClientFinished),
@@ -186,12 +191,17 @@ void CheckRecords()
 {
     byte[] opened = OpenTlsTestRecord(Hex(ServerHandshakeTraffic), Hex(ServerFlightRecord));
     Check("open server flight", opened, ServerFlight + "16");
-    Check("seal server flight", SealTlsTestRecord(Hex(ServerHandshakeTraffic), 0x16, Hex(ServerFlight)),
+    Check("seal server flight",
+          SealTlsTestRecord(Hex(ServerHandshakeTraffic), 0x16, Hex(ServerFlight)),
           ServerFlightRecord);
-    Check("seal client Finished", SealTlsTestRecord(Hex(ClientHandshakeTraffic), 0x16, Hex(ClientFinished)),
-          ClientFinishedRecord);
-    Check("seal ticket", SealTlsTestRecord(Hex(ServerApplicationTraffic), 0x16, Hex(NewSessionTicket)),
-          NewSessionTicketRecord);
+    Check(
+        "seal client Finished",
+        SealTlsTestRecord(Hex(ClientHandshakeTraffic), 0x16, Hex(ClientFinished)),
+        ClientFinishedRecord);
+    Check(
+        "seal ticket",
+        SealTlsTestRecord(Hex(ServerApplicationTraffic), 0x16, Hex(NewSessionTicket)),
+        NewSessionTicketRecord);
 }
 
 // ------------------------------------------------------------------ client
@@ -214,10 +224,10 @@ void ReportTicket(TlsSessionTicket ticket)
 
 void CheckClient()
 {
-    byte[] script = JoinBytes(JoinBytes(JoinBytes(JoinBytes(Hex(ServerHelloRecord), Hex(ServerFlightRecord)),
-                                                  Hex(NewSessionTicketRecord)),
-                                        Hex(ServerApplicationRecord)),
-                              Hex(ServerAlertRecord));
+    byte[] script = JoinBytes(Hex(ServerHelloRecord), Hex(ServerFlightRecord));
+    script = JoinBytes(script, Hex(NewSessionTicketRecord));
+    script = JoinBytes(script, Hex(ServerApplicationRecord));
+    script = JoinBytes(script, Hex(ServerAlertRecord));
     var stream = new ScriptedStream(script);
 
     var options = new TlsClientOptions();
@@ -299,13 +309,16 @@ void CheckServer()
     // the stream ended where the client's Finished should be.
     var stream = new ScriptedStream(Hex(ClientHelloRecord));
     var accepted = TlsStream.AuthenticateAsServer(stream, options);
-    Console.WriteLine("server handshake: " + (accepted.Ok ? "done" : DescribeTlsError(accepted.Error)));
+    Console.WriteLine(
+        "server handshake: " + (accepted.Ok ? "done" : DescribeTlsError(accepted.Error)));
 
     byte[] written = stream.Written;
     byte[] serverHelloRecord = Hex(ServerHelloRecord);
-    Check("server ServerHello", SliceBytes(written, 0u, serverHelloRecord.Length), ServerHelloRecord);
+    Check(
+        "server ServerHello", SliceBytes(written, 0u, serverHelloRecord.Length), ServerHelloRecord);
 
-    byte[] rest = SliceBytes(written, serverHelloRecord.Length, written.Length - serverHelloRecord.Length);
+    byte[] rest = SliceBytes(
+        written, serverHelloRecord.Length, written.Length - serverHelloRecord.Length);
     byte[] flight = OpenTlsTestRecord(Hex(ServerHandshakeTraffic), rest);
     Say("server flight opens under the trace's key", flight.Length > 0u);
     if (flight.Length == 0u)
@@ -320,24 +333,29 @@ void CheckServer()
     nuint verifyAt = extensionsLength + certificateMessage.Length;
     nuint verifyLength = 4u + (((nuint)flight[verifyAt + 2u] << 8) | (nuint)flight[verifyAt + 3u]);
     byte[] verify = SliceBytes(flight, verifyAt, verifyLength);
-    Say("server CertificateVerify is rsa_pss_rsae_sha256", verify[4u] == 0x08 && verify[5u] == 0x04);
+    Say(
+        "server CertificateVerify is rsa_pss_rsae_sha256", verify[4u] == 0x08 && verify[5u] == 0x04
+    );
 
     var schedule = new TlsTestKeySchedule();
-    byte[] throughCertificate = JoinBytes(JoinBytes(JoinBytes(Hex(ClientHello), Hex(ServerHello)), extensions),
-                                          certificate);
+    byte[] throughCertificate = JoinBytes(
+        JoinBytes(JoinBytes(Hex(ClientHello), Hex(ServerHello)), extensions), certificate);
     byte[] content = new byte[64u];
     for (nuint i = 0u; i < 64u; i++)
         content[i] = 0x20;
-    content = JoinBytes(JoinBytes(content, "TLS 1.3, server CertificateVerify"u8.ToArray()), new byte[1u]);
+    content = JoinBytes(
+        JoinBytes(content, "TLS 1.3, server CertificateVerify"u8.ToArray()), new byte[1u]);
     content = JoinBytes(content, schedule.HashTranscript(throughCertificate));
     var peer = Rsa.ImportRsaPublicKey(rsa.Value.ExportRsaPublicKey());
     Say("server signature verifies",
         peer.Ok && peer.Value.VerifyData(content, SliceBytes(verify, 8u, verify.Length - 8u),
                                          HashAlgorithmName.Sha256, RsaSignaturePadding.Pss));
 
-    byte[] finished = SliceBytes(flight, verifyAt + verifyLength, flight.Length - verifyAt - verifyLength);
-    byte[] expected = schedule.ComputeFinished(Hex(ServerHandshakeTraffic),
-                                               schedule.HashTranscript(JoinBytes(throughCertificate, verify)));
+    byte[] finished = SliceBytes(
+        flight, verifyAt + verifyLength, flight.Length - verifyAt - verifyLength);
+    byte[] expected = schedule.ComputeFinished(
+        Hex(ServerHandshakeTraffic), schedule.HashTranscript(JoinBytes(throughCertificate, verify))
+    );
     Check("server Finished", finished, "14000020" + Convert.ToHexString(expected, false) + "16");
 }
 

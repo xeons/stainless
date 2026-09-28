@@ -51,8 +51,6 @@ internal sealed class TlsClientHello
     internal bool _hasPreSharedKey = false;
     internal bool _hasEarlyData = false;
 
-    internal bool OfferedTlsExtension(TlsExtensionType type) => _extensionTypes.Contains((uint)type);
-
     /// The key share offered in `group`, or an empty array.
     internal byte[] FindTlsKeyShare(TlsNamedGroup group)
     {

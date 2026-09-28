@@ -47,7 +47,8 @@ internal sealed class TlsClientHandshake
     private List<TlsSignatureScheme> _requestedSchemes;
     private TlsPeerKey? _serverKey;
 
-    internal TlsClientHandshake(TlsConnection connection, TlsClientOptions options, String targetHost)
+    internal TlsClientHandshake(
+        TlsConnection connection, TlsClientOptions options, String targetHost)
     {
         _connection = connection;
         _options = options;
@@ -145,7 +146,8 @@ internal sealed class TlsClientHandshake
         List<TlsNamedGroup> wanted = _options.KeyShareGroups;
         for (nuint i = 0u; i < wanted.Count; i++)
         {
-            if (!_options.KeyExchangeGroups.Contains(wanted[i]) || !IsImplementedTlsGroup(wanted[i]))
+            TlsNamedGroup group = wanted[i];
+            if (!_options.KeyExchangeGroups.Contains(group) || !IsImplementedTlsGroup(group))
                 return TlsError.InternalError;
             var share = TlsKeyShare.GenerateTlsKeyShare(wanted[i]);
             if (!share.Ok)
@@ -238,14 +240,16 @@ internal sealed class TlsClientHandshake
         WriteTlsSignatureSchemes(message, CreateDefaultTlsSignatureSchemes());
         EndTlsExtension(message, signaturesAt);
 
-        nuint certificateSignaturesAt = BeginTlsExtension(message, TlsExtensionType.SignatureAlgorithmsCert);
+        nuint certificateSignaturesAt = BeginTlsExtension(
+            message, TlsExtensionType.SignatureAlgorithmsCert);
         WriteTlsSignatureSchemes(message, CreateDefaultTlsCertificateSignatureSchemes());
         EndTlsExtension(message, certificateSignaturesAt);
 
         List<String> protocols = _options.ApplicationProtocols;
         if (protocols.Count > 0u)
         {
-            nuint at = BeginTlsExtension(message, TlsExtensionType.ApplicationLayerProtocolNegotiation);
+            nuint at = BeginTlsExtension(
+                message, TlsExtensionType.ApplicationLayerProtocolNegotiation);
             nuint listAt = message.BeginVector(2u);
             for (nuint i = 0u; i < protocols.Count; i++)
             {
@@ -404,7 +408,8 @@ internal sealed class TlsClientHandshake
             _schedule = schedule;
         }
         _transcript.AddTlsMessage(message);
-        schedule.DeriveHandshakeSecrets(shared.Value, _transcript.ComputeTlsTranscriptHash(schedule));
+        schedule.DeriveHandshakeSecrets(
+            shared.Value, _transcript.ComputeTlsTranscriptHash(schedule));
 
         _connection._cipherSuite = cipherSuite;
         _connection._group = mine.Group;
@@ -413,7 +418,8 @@ internal sealed class TlsClientHandshake
         TlsError boundary = _connection.RequireTlsRecordBoundary();
         if (boundary != TlsError.None)
             return boundary;
-        var reading = schedule.CreateTlsRecordCipher(cipherSuite, schedule._serverHandshakeTrafficSecret);
+        var reading = schedule.CreateTlsRecordCipher(
+            cipherSuite, schedule._serverHandshakeTrafficSecret);
         if (!reading.Ok)
             return reading.Error;
         _connection._records.InstallTlsReadCipher(reading.Value);
@@ -422,8 +428,8 @@ internal sealed class TlsClientHandshake
 
     /// Answers a HelloRetryRequest with a second ClientHello: one share, in
     /// the group asked for, and the cookie echoed (RFC 8446 §4.1.4).
-    private TlsError RetryTlsClientHello(byte[] retry, TlsCipherSuite suite, uint group, bool hasCookie,
-                                         byte[] cookie)
+    private TlsError RetryTlsClientHello(
+        byte[] retry, TlsCipherSuite suite, uint group, bool hasCookie, byte[] cookie)
     {
         if (_retried)
             return TlsError.UnexpectedMessage;
@@ -604,8 +610,9 @@ internal sealed class TlsClientHandshake
         message = read.Value;
         if ((TlsHandshakeType)message[0u] != TlsHandshakeType.CertificateVerify)
             return TlsError.UnexpectedMessage;
-        var scheme = VerifyTlsCertificateVerify(message, key.Value, _transcript.ComputeTlsTranscriptHash(schedule),
-                                                true, CreateDefaultTlsSignatureSchemes());
+        var scheme = VerifyTlsCertificateVerify(
+            message, key.Value, _transcript.ComputeTlsTranscriptHash(schedule), true,
+            CreateDefaultTlsSignatureSchemes());
         if (!scheme.Ok)
             return scheme.Error;
         _connection._signatureScheme = scheme.Value;
@@ -617,8 +624,8 @@ internal sealed class TlsClientHandshake
         message = read.Value;
         if ((TlsHandshakeType)message[0u] != TlsHandshakeType.Finished)
             return TlsError.UnexpectedMessage;
-        byte[] expected = schedule.ComputeTlsFinished(schedule._serverHandshakeTrafficSecret,
-                                                      _transcript.ComputeTlsTranscriptHash(schedule));
+        byte[] expected = schedule.ComputeTlsFinished(
+            schedule._serverHandshakeTrafficSecret, _transcript.ComputeTlsTranscriptHash(schedule));
         TlsError finished = VerifyTlsFinished(message, expected);
         if (finished != TlsError.None)
             return finished;
@@ -700,8 +707,8 @@ internal sealed class TlsClientHandshake
                 return authenticated;
         }
 
-        byte[] verifyData = schedule.ComputeTlsFinished(schedule._clientHandshakeTrafficSecret,
-                                                        _transcript.ComputeTlsTranscriptHash(schedule));
+        byte[] verifyData = schedule.ComputeTlsFinished(
+            schedule._clientHandshakeTrafficSecret, _transcript.ComputeTlsTranscriptHash(schedule));
         byte[] finished = BuildTlsFinished(verifyData);
         _transcript.AddTlsMessage(finished);
         _connection.QueueTlsHandshakeMessage(finished);
@@ -740,7 +747,8 @@ internal sealed class TlsClientHandshake
         if (!scheme.Some || key == null)
             return TlsError.None;
 
-        byte[] content = BuildTlsSignedContent(false, _transcript.ComputeTlsTranscriptHash(schedule));
+        byte[] content = BuildTlsSignedContent(
+            false, _transcript.ComputeTlsTranscriptHash(schedule));
         var signature = key.SignTlsContent(scheme.Value, content);
         if (!signature.Ok)
             return signature.Error;
@@ -759,8 +767,8 @@ internal sealed class TlsClientHandshake
 /// `offered` is what the reader sent in its own hello, for the rule that an
 /// entry's extensions MUST answer ones it offered. An empty chain is allowed
 /// only when `mayBeEmpty`, which is a client answering a CertificateRequest.
-internal Result<List<byte[]>, TlsError> ReadTlsCertificateMessage(byte[] message, TlsClientHello offered,
-                                                                   bool mayBeEmpty, byte[] context)
+internal Result<List<byte[]>, TlsError> ReadTlsCertificateMessage(
+    byte[] message, TlsClientHello offered, bool mayBeEmpty, byte[] context)
 {
     var reader = new TlsReader(message, 4u, message.Length - 4u);
     byte[] receivedContext = reader.ReadVectorArray(1u, 0u, 255u);
@@ -816,10 +824,9 @@ internal byte[] BuildTlsCertificateMessage(byte[] context, List<byte[]> chain)
 
 /// Checks a CertificateVerify against `key` and the transcript hash through
 /// the Certificate, and answers the scheme it used.
-internal Result<TlsSignatureScheme, TlsError> VerifyTlsCertificateVerify(byte[] message, TlsPeerKey key,
-                                                                        byte[] transcriptHash,
-                                                                        bool signedByServer,
-                                                                        List<TlsSignatureScheme> offered)
+internal Result<TlsSignatureScheme, TlsError> VerifyTlsCertificateVerify(
+    byte[] message, TlsPeerKey key, byte[] transcriptHash, bool signedByServer,
+    List<TlsSignatureScheme> offered)
 {
     var reader = new TlsReader(message, 4u, message.Length - 4u);
     var scheme = (TlsSignatureScheme)(ushort)reader.ReadUInt16();

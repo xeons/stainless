@@ -159,7 +159,8 @@ internal sealed class TlsPeerKey
     }
 
     /// The key in a DER `SubjectPublicKeyInfo`.
-    internal static Result<TlsPeerKey, TlsError> ReadTlsSubjectPublicKeyInfo(ReadOnlySpan<byte> info)
+    internal static Result<TlsPeerKey, TlsError> ReadTlsSubjectPublicKeyInfo(
+        ReadOnlySpan<byte> info)
     {
         var document = new AsnReader(info, AsnEncodingRules.Der);
         var outer = document.ReadSequence();

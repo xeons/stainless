@@ -43,7 +43,8 @@ internal sealed class TlsRecordCipher
     }
 
     /// The protection `suite` names under `key` and `iv`.
-    internal static Result<TlsRecordCipher, TlsError> Create(TlsCipherSuite suite, byte[] key, byte[] iv)
+    internal static Result<TlsRecordCipher, TlsError> Create(
+        TlsCipherSuite suite, byte[] key, byte[] iv)
     {
         if (suite == TlsCipherSuite.TlsChaCha20Poly1305Sha256)
         {

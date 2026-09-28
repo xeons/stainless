@@ -85,8 +85,8 @@ internal sealed class TlsKeySchedule
 
     /// HKDF-Expand-Label: HKDF-Expand with the label and context laid out as
     /// an `HkdfLabel`, whose label is prefixed with "tls13 ".
-    internal byte[] ExpandTlsLabel(ReadOnlySpan<byte> secret, String label, ReadOnlySpan<byte> context,
-                                   nuint length)
+    internal byte[] ExpandTlsLabel(
+        ReadOnlySpan<byte> secret, String label, ReadOnlySpan<byte> context, nuint length)
     {
         var info = new TlsBuffer(64u);
         info.WriteUInt16((uint)length);
@@ -112,12 +112,15 @@ internal sealed class TlsKeySchedule
 
     /// The handshake secret, from the (EC)DHE shared secret, and the two
     /// handshake traffic secrets over the hash through ServerHello.
-    internal void DeriveHandshakeSecrets(ReadOnlySpan<byte> sharedSecret, ReadOnlySpan<byte> helloHash)
+    internal void DeriveHandshakeSecrets(
+        ReadOnlySpan<byte> sharedSecret, ReadOnlySpan<byte> helloHash)
     {
         byte[] derived = DeriveTlsSecret(_earlySecret, "derived", HashTlsBytes(new byte[0u]));
         _handshakeSecret = Hkdf.Extract(CreateTlsHash(), sharedSecret, derived);
-        _clientHandshakeTrafficSecret = DeriveTlsSecret(_handshakeSecret, "c hs traffic", helloHash);
-        _serverHandshakeTrafficSecret = DeriveTlsSecret(_handshakeSecret, "s hs traffic", helloHash);
+        _clientHandshakeTrafficSecret = DeriveTlsSecret(
+            _handshakeSecret, "c hs traffic", helloHash);
+        _serverHandshakeTrafficSecret = DeriveTlsSecret(
+            _handshakeSecret, "s hs traffic", helloHash);
     }
 
     /// The master secret, and the application traffic and exporter secrets
@@ -126,8 +129,10 @@ internal sealed class TlsKeySchedule
     {
         byte[] derived = DeriveTlsSecret(_handshakeSecret, "derived", HashTlsBytes(new byte[0u]));
         _masterSecret = Hkdf.Extract(CreateTlsHash(), new byte[_hashLength], derived);
-        _clientApplicationTrafficSecret = DeriveTlsSecret(_masterSecret, "c ap traffic", serverFinishedHash);
-        _serverApplicationTrafficSecret = DeriveTlsSecret(_masterSecret, "s ap traffic", serverFinishedHash);
+        _clientApplicationTrafficSecret = DeriveTlsSecret(
+            _masterSecret, "c ap traffic", serverFinishedHash);
+        _serverApplicationTrafficSecret = DeriveTlsSecret(
+            _masterSecret, "s ap traffic", serverFinishedHash);
         _exporterMasterSecret = DeriveTlsSecret(_masterSecret, "exp master", serverFinishedHash);
     }
 
@@ -139,10 +144,11 @@ internal sealed class TlsKeySchedule
     }
 
     /// The record key and IV a traffic secret yields under `suite`.
-    internal Result<TlsRecordCipher, TlsError> CreateTlsRecordCipher(TlsCipherSuite suite,
-                                                                     ReadOnlySpan<byte> trafficSecret)
+    internal Result<TlsRecordCipher, TlsError> CreateTlsRecordCipher(
+        TlsCipherSuite suite, ReadOnlySpan<byte> trafficSecret)
     {
-        byte[] key = ExpandTlsLabel(trafficSecret, "key", new byte[0u], GetTlsSuiteKeyLength(suite));
+        byte[] key = ExpandTlsLabel(
+            trafficSecret, "key", new byte[0u], GetTlsSuiteKeyLength(suite));
         byte[] iv = ExpandTlsLabel(trafficSecret, "iv", new byte[0u], 12u);
         return TlsRecordCipher.Create(suite, key, iv);
     }
@@ -153,7 +159,8 @@ internal sealed class TlsKeySchedule
 
     /// The `verify_data` of a Finished: an HMAC, under the key the base
     /// secret yields, of the transcript hash.
-    internal byte[] ComputeTlsFinished(ReadOnlySpan<byte> baseSecret, ReadOnlySpan<byte> transcriptHash)
+    internal byte[] ComputeTlsFinished(
+        ReadOnlySpan<byte> baseSecret, ReadOnlySpan<byte> transcriptHash)
     {
         byte[] finishedKey = ExpandTlsLabel(baseSecret, "finished", new byte[0u], _hashLength);
         return new Hmac(CreateTlsHash(), finishedKey).ComputeHash(transcriptHash);

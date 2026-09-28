@@ -126,7 +126,8 @@ class ServerView
 
 /// How the server echoes: it reads `expect` bytes, writes them back, and
 /// then reads once more, which returns zero at the client's close_notify.
-Thread StartEchoServer(TcpListener listener, TlsServerOptions options, nuint expect, ServerView view)
+Thread StartEchoServer(
+    TcpListener listener, TlsServerOptions options, nuint expect, ServerView view)
 {
     return new Thread(() =>
     {
@@ -151,7 +152,8 @@ Thread StartEchoServer(TcpListener listener, TlsServerOptions options, nuint exp
         view.Echoed = socket.Write(data, 0u, data.Length) == data.Length || data.Length == 0u;
 
         var rest = new byte[16u];
-        view.SawEnd = socket.Read(rest, 0u, rest.Length) == 0u && socket.TlsErrorCode == TlsError.None;
+        nuint after = socket.Read(rest, 0u, rest.Length);
+        view.SawEnd = after == 0u && socket.TlsErrorCode == TlsError.None;
         socket.Close();
     });
 }
@@ -188,7 +190,8 @@ TlsSocket? Exchange(TlsServerOptions serverOptions, TlsClientOptions clientOptio
                                       out TlsAlertDescription alert);
     if (!connected.Ok)
     {
-        Console.WriteLine("  client: " + DescribeTlsError(connected.Error) + ", alert " + $"{alert}");
+        Console.WriteLine(
+            "  client: " + DescribeTlsError(connected.Error) + ", alert " + $"{alert}");
         server.Join();
         listener.Close();
         return null;
@@ -279,7 +282,8 @@ void CheckEverySuiteGroupAndKey()
                     Console.WriteLine(line + "failed, server " + view.Outcome);
                     continue;
                 }
-                bool agreed = socket.CipherSuite == suites[s] && socket.KeyExchangeGroup == groups[g];
+                bool agreed = socket.CipherSuite == suites[s] &&
+                              socket.KeyExchangeGroup == groups[g];
                 Console.WriteLine(line + (agreed && view.Echoed && view.SawEnd ? "ok " : "WRONG ") +
                                   $"{socket.SignatureScheme}");
             }
@@ -298,8 +302,8 @@ void CheckLargeTransferAndKeyUpdate()
         return;
     TcpListener listener = listening.Value;
     var view = new ServerView();
-    Thread server = StartEchoServer(listener, CreateServerOptions(P256Certificate, P256Key), payload.Length,
-                                    view);
+    Thread server = StartEchoServer(
+        listener, CreateServerOptions(P256Certificate, P256Key), payload.Length, view);
 
     var connected = TlsSocket.Connect("127.0.0.1", listener.LocalEndPoint.Port,
                                       CreateClientOptions(P256Certificate));
@@ -315,7 +319,8 @@ void CheckLargeTransferAndKeyUpdate()
     client.Write(payload, 102400u, payload.Length - 102400u);
     byte[] back = ReadExactly(client, payload.Length);
     Console.WriteLine("key update: " + DescribeTlsError(updated));
-    Console.WriteLine("large transfer: " + Text.FromInteger((long)view.Received) + " bytes each way, " +
+    Console.WriteLine("large transfer: " + Text.FromInteger((long)view.Received) +
+                      " bytes each way, " +
                       (AreSame(back, payload) ? "intact" : "CORRUPT"));
     client.Close();
     server.Join();
@@ -335,7 +340,8 @@ void CheckApplicationProtocols()
     if (socket != null)
     {
         var chosen = socket.NegotiatedApplicationProtocol;
-        Console.WriteLine("alpn: client " + (chosen == null ? "none" : chosen) + ", server " + view.Protocol);
+        Console.WriteLine(
+            "alpn: client " + (chosen == null ? "none" : chosen) + ", server " + view.Protocol);
     }
 
     TlsServerOptions picky = CreateServerOptions(Ed25519Certificate, Ed25519Key);
@@ -350,7 +356,8 @@ void CheckApplicationProtocols()
     TlsServerOptions quiet = CreateServerOptions(Ed25519Certificate, Ed25519Key);
     quiet.ApplicationProtocols.Add("h2");
     var none = new ServerView();
-    var plain = Exchange(quiet, CreateClientOptions(Ed25519Certificate), CreatePattern(10u, 1u), none);
+    var plain = Exchange(
+        quiet, CreateClientOptions(Ed25519Certificate), CreatePattern(10u, 1u), none);
     Console.WriteLine("alpn offered by the server only: " + none.Protocol);
 }
 
@@ -359,13 +366,16 @@ void CheckServerName()
     TlsClientOptions client = CreateClientOptions(Ed25519Certificate);
     client.TargetHost = "tls.example.test";
     var view = new ServerView();
-    Exchange(CreateServerOptions(Ed25519Certificate, Ed25519Key), client, CreatePattern(10u, 1u), view);
+    Exchange(
+        CreateServerOptions(Ed25519Certificate, Ed25519Key), client, CreatePattern(10u, 1u), view);
     Console.WriteLine("server saw the name: " + view.Host);
 
     TlsClientOptions literal = CreateClientOptions(Ed25519Certificate);
     literal.TargetHost = "127.0.0.1";
     var unnamed = new ServerView();
-    Exchange(CreateServerOptions(Ed25519Certificate, Ed25519Key), literal, CreatePattern(10u, 1u), unnamed);
+    Exchange(
+        CreateServerOptions(Ed25519Certificate, Ed25519Key), literal, CreatePattern(10u, 1u),
+        unnamed);
     Console.WriteLine("an address is not sent as a name: '" + unnamed.Host + "'");
 }
 
@@ -417,7 +427,8 @@ void CheckExportedKeys()
         return;
     TcpListener listener = listening.Value;
     var view = new ServerView();
-    Thread server = StartEchoServer(listener, CreateServerOptions(Ed25519Certificate, Ed25519Key), 0u, view);
+    Thread server = StartEchoServer(
+        listener, CreateServerOptions(Ed25519Certificate, Ed25519Key), 0u, view);
     var connected = TlsSocket.Connect("127.0.0.1", listener.LocalEndPoint.Port,
                                       CreateClientOptions(Ed25519Certificate));
     if (connected.Ok)

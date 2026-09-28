@@ -73,7 +73,8 @@ Result<TlsRecordCipher, TlsError> CreateTlsTestCipher(byte[] trafficSecret)
     return schedule.CreateTlsRecordCipher(TlsCipherSuite.TlsAes128GcmSha256, trafficSecret);
 }
 
-public void FixTlsTestClientHello(TlsClientOptions options, byte[] clientHello, byte[] x25519PrivateKey)
+public void FixTlsTestClientHello(
+    TlsClientOptions options, byte[] clientHello, byte[] x25519PrivateKey)
 {
     options._fixedClientHello = clientHello;
     options._fixedX25519PrivateKey = x25519PrivateKey;

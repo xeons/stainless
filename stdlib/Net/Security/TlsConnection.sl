@@ -184,8 +184,8 @@ internal sealed class TlsConnection
         if (_handshakeOutput.Length == 0u)
             return TlsError.None;
         var held = _writeLock.Enter();
-        TlsError written = _records.WriteTlsRecords(TlsContentType.Handshake, _handshakeOutput.Storage,
-                                                    0u, _handshakeOutput.Length);
+        TlsError written = _records.WriteTlsRecords(
+            TlsContentType.Handshake, _handshakeOutput.Storage, 0u, _handshakeOutput.Length);
         _handshakeOutput.Clear();
         return written;
     }

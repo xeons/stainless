@@ -51,7 +51,8 @@ public sealed class TlsSigningKey
     /// An Ed25519 key from its 32-byte seed, RFC 8032's private key.
     ///
     /// @failure CryptoError.KeyLength  `privateKey` is not 32 bytes
-    public static Result<TlsSigningKey, CryptoError> FromEd25519PrivateKey(ReadOnlySpan<byte> privateKey)
+    public static Result<TlsSigningKey, CryptoError> FromEd25519PrivateKey(
+        ReadOnlySpan<byte> privateKey)
     {
         if (privateKey.Length != Ed25519.PrivateKeySize)
             return Fail(CryptoError.KeyLength);
@@ -135,7 +136,8 @@ public sealed class TlsSigningKey
     /// @failure CryptoError.Encoding     not a `PrivateKeyInfo`
     /// @failure CryptoError.Unsupported  a key of another algorithm
     /// @failure CryptoError.InvalidKey   the numbers are not a consistent key
-    public static Result<TlsSigningKey, CryptoError> ImportPkcs8PrivateKey(ReadOnlySpan<byte> source)
+    public static Result<TlsSigningKey, CryptoError> ImportPkcs8PrivateKey(
+        ReadOnlySpan<byte> source)
     {
         var document = new AsnReader(source, AsnEncodingRules.Der);
         var outer = document.ReadSequence();
@@ -199,7 +201,8 @@ public sealed class TlsSigningKey
     }
 
     /// The signature of `content` under `scheme`.
-    internal Result<byte[], TlsError> SignTlsContent(TlsSignatureScheme scheme, ReadOnlySpan<byte> content)
+    internal Result<byte[], TlsError> SignTlsContent(
+        TlsSignatureScheme scheme, ReadOnlySpan<byte> content)
     {
         switch (_kind)
         {
@@ -230,7 +233,8 @@ public sealed class TlsSigningKey
                 var rsa = _rsa;
                 if (rsa == null)
                     return Fail(TlsError.InternalError);
-                var signed = rsa.SignData(content, GetTlsSchemeHash(scheme), RsaSignaturePadding.Pss);
+                var signed = rsa.SignData(
+                    content, GetTlsSchemeHash(scheme), RsaSignaturePadding.Pss);
                 if (!signed.Ok)
                     return Fail(TlsError.InternalError);
                 return Ok(signed.Value);

@@ -1332,7 +1332,7 @@ P-384.
 
 - [CryptoError.InvalidKey](Standard-Security-Cryptography.md#invalidkey-case) — `key` is a public key
 
-<sub>[stdlib/Net/Security/TlsSigningKey.sl:65](../../stdlib/Net/Security/TlsSigningKey.sl#L65)</sub>
+<sub>[stdlib/Net/Security/TlsSigningKey.sl:66](../../stdlib/Net/Security/TlsSigningKey.sl#L66)</sub>
 
 #### FromRsa *method*
 
@@ -1347,7 +1347,7 @@ An RSA key published as `rsaEncryption`, which signs with the
 
 - [CryptoError.InvalidKey](Standard-Security-Cryptography.md#invalidkey-case) — `key` is a public key
 
-<sub>[stdlib/Net/Security/TlsSigningKey.sl:78](../../stdlib/Net/Security/TlsSigningKey.sl#L78)</sub>
+<sub>[stdlib/Net/Security/TlsSigningKey.sl:79](../../stdlib/Net/Security/TlsSigningKey.sl#L79)</sub>
 
 #### FromRsaPss *method*
 
@@ -1362,7 +1362,7 @@ An RSA key published as `RSASSA-PSS`, which signs with the
 
 - [CryptoError.InvalidKey](Standard-Security-Cryptography.md#invalidkey-case) — `key` is a public key
 
-<sub>[stdlib/Net/Security/TlsSigningKey.sl:89](../../stdlib/Net/Security/TlsSigningKey.sl#L89)</sub>
+<sub>[stdlib/Net/Security/TlsSigningKey.sl:90](../../stdlib/Net/Security/TlsSigningKey.sl#L90)</sub>
 
 #### ImportFromPem *method*
 
@@ -1380,7 +1380,7 @@ used; certificates beside it are passed over.
 - [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) — a key of another algorithm, or an encrypted one
 - [CryptoError.InvalidKey](Standard-Security-Cryptography.md#invalidkey-case) — the numbers are not a consistent key
 
-<sub>[stdlib/Net/Security/TlsSigningKey.sl:104](../../stdlib/Net/Security/TlsSigningKey.sl#L104)</sub>
+<sub>[stdlib/Net/Security/TlsSigningKey.sl:105](../../stdlib/Net/Security/TlsSigningKey.sl#L105)</sub>
 
 #### ImportPkcs8PrivateKey *method*
 
@@ -1396,7 +1396,7 @@ The key in an unencrypted PKCS #8 `PrivateKeyInfo`, DER.
 - [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) — a key of another algorithm
 - [CryptoError.InvalidKey](Standard-Security-Cryptography.md#invalidkey-case) — the numbers are not a consistent key
 
-<sub>[stdlib/Net/Security/TlsSigningKey.sl:138](../../stdlib/Net/Security/TlsSigningKey.sl#L138)</sub>
+<sub>[stdlib/Net/Security/TlsSigningKey.sl:139](../../stdlib/Net/Security/TlsSigningKey.sl#L139)</sub>
 
 ### TlsSocket *class*
 
@@ -1459,7 +1459,7 @@ server sent when it refused.
 
 - [TlsError.AlertReceived](#alertreceived-case) — the server refused, and `alertReceived` says why
 
-<sub>[stdlib/Net/Security/TlsSocket.sl:72](../../stdlib/Net/Security/TlsSocket.sl#L72)</sub>
+<sub>[stdlib/Net/Security/TlsSocket.sl:73](../../stdlib/Net/Security/TlsSocket.sl#L73)</sub>
 
 #### Accept *method*
 
@@ -1480,7 +1480,7 @@ Accepts a connection from `listener` and runs the server's handshake.
 - [TlsError.NoCommonCipherSuite](#nocommonciphersuite-case) — no suite on both lists
 - [TlsError.NoApplicationProtocol](#noapplicationprotocol-case) — no ALPN name on both lists
 
-<sub>[stdlib/Net/Security/TlsSocket.sl:101](../../stdlib/Net/Security/TlsSocket.sl#L101)</sub>
+<sub>[stdlib/Net/Security/TlsSocket.sl:102](../../stdlib/Net/Security/TlsSocket.sl#L102)</sub>
 
 #### Accept *method*
 
@@ -1501,7 +1501,7 @@ alert the client sent when it refused.
 
 - [TlsError.AlertReceived](#alertreceived-case) — the client refused, and `alertReceived` says why
 
-<sub>[stdlib/Net/Security/TlsSocket.sl:113](../../stdlib/Net/Security/TlsSocket.sl#L113)</sub>
+<sub>[stdlib/Net/Security/TlsSocket.sl:115](../../stdlib/Net/Security/TlsSocket.sl#L115)</sub>
 
 #### Client *property*
 
@@ -1512,7 +1512,7 @@ TcpClient Client { get; }
 The TCP connection underneath, for timeouts and end points. Reading
 or writing it directly corrupts the TLS stream.
 
-<sub>[stdlib/Net/Security/TlsSocket.sl:134](../../stdlib/Net/Security/TlsSocket.sl#L134)</sub>
+<sub>[stdlib/Net/Security/TlsSocket.sl:136](../../stdlib/Net/Security/TlsSocket.sl#L136)</sub>
 
 #### Stream *property*
 
@@ -1522,7 +1522,7 @@ TlsStream Stream { get; }
 
 The TLS stream.
 
-<sub>[stdlib/Net/Security/TlsSocket.sl:137](../../stdlib/Net/Security/TlsSocket.sl#L137)</sub>
+<sub>[stdlib/Net/Security/TlsSocket.sl:139](../../stdlib/Net/Security/TlsSocket.sl#L139)</sub>
 
 #### IsServer *property*
 
@@ -1532,7 +1532,7 @@ bool IsServer { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsSocket.sl:139](../../stdlib/Net/Security/TlsSocket.sl#L139)</sub>
+<sub>[stdlib/Net/Security/TlsSocket.sl:141](../../stdlib/Net/Security/TlsSocket.sl#L141)</sub>
 
 #### NegotiatedProtocol *property*
 
@@ -1542,7 +1542,7 @@ TlsProtocolVersion NegotiatedProtocol { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsSocket.sl:141](../../stdlib/Net/Security/TlsSocket.sl#L141)</sub>
+<sub>[stdlib/Net/Security/TlsSocket.sl:143](../../stdlib/Net/Security/TlsSocket.sl#L143)</sub>
 
 #### CipherSuite *property*
 
@@ -1552,7 +1552,7 @@ TlsCipherSuite CipherSuite { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsSocket.sl:143](../../stdlib/Net/Security/TlsSocket.sl#L143)</sub>
+<sub>[stdlib/Net/Security/TlsSocket.sl:145](../../stdlib/Net/Security/TlsSocket.sl#L145)</sub>
 
 #### KeyExchangeGroup *property*
 
@@ -1562,7 +1562,7 @@ TlsNamedGroup KeyExchangeGroup { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsSocket.sl:145](../../stdlib/Net/Security/TlsSocket.sl#L145)</sub>
+<sub>[stdlib/Net/Security/TlsSocket.sl:147](../../stdlib/Net/Security/TlsSocket.sl#L147)</sub>
 
 #### SignatureScheme *property*
 
@@ -1572,7 +1572,7 @@ TlsSignatureScheme SignatureScheme { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsSocket.sl:147](../../stdlib/Net/Security/TlsSocket.sl#L147)</sub>
+<sub>[stdlib/Net/Security/TlsSocket.sl:149](../../stdlib/Net/Security/TlsSocket.sl#L149)</sub>
 
 #### NegotiatedApplicationProtocol *property*
 
@@ -1582,7 +1582,7 @@ String? NegotiatedApplicationProtocol { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsSocket.sl:149](../../stdlib/Net/Security/TlsSocket.sl#L149)</sub>
+<sub>[stdlib/Net/Security/TlsSocket.sl:151](../../stdlib/Net/Security/TlsSocket.sl#L151)</sub>
 
 #### TargetHostName *property*
 
@@ -1592,7 +1592,7 @@ String TargetHostName { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsSocket.sl:151](../../stdlib/Net/Security/TlsSocket.sl#L151)</sub>
+<sub>[stdlib/Net/Security/TlsSocket.sl:153](../../stdlib/Net/Security/TlsSocket.sl#L153)</sub>
 
 #### RemoteCertificate *property*
 
@@ -1602,7 +1602,7 @@ byte[] RemoteCertificate { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsSocket.sl:153](../../stdlib/Net/Security/TlsSocket.sl#L153)</sub>
+<sub>[stdlib/Net/Security/TlsSocket.sl:155](../../stdlib/Net/Security/TlsSocket.sl#L155)</sub>
 
 #### RemoteCertificateChain *property*
 
@@ -1612,7 +1612,7 @@ List<byte[]> RemoteCertificateChain { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsSocket.sl:155](../../stdlib/Net/Security/TlsSocket.sl#L155)</sub>
+<sub>[stdlib/Net/Security/TlsSocket.sl:157](../../stdlib/Net/Security/TlsSocket.sl#L157)</sub>
 
 #### TlsErrorCode *property*
 
@@ -1622,7 +1622,7 @@ TlsError TlsErrorCode { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsSocket.sl:157](../../stdlib/Net/Security/TlsSocket.sl#L157)</sub>
+<sub>[stdlib/Net/Security/TlsSocket.sl:159](../../stdlib/Net/Security/TlsSocket.sl#L159)</sub>
 
 #### AlertDescription *property*
 
@@ -1632,7 +1632,7 @@ TlsAlertDescription AlertDescription { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsSocket.sl:159](../../stdlib/Net/Security/TlsSocket.sl#L159)</sub>
+<sub>[stdlib/Net/Security/TlsSocket.sl:161](../../stdlib/Net/Security/TlsSocket.sl#L161)</sub>
 
 #### CanRead *property*
 
@@ -1642,7 +1642,7 @@ bool CanRead { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsSocket.sl:161](../../stdlib/Net/Security/TlsSocket.sl#L161)</sub>
+<sub>[stdlib/Net/Security/TlsSocket.sl:163](../../stdlib/Net/Security/TlsSocket.sl#L163)</sub>
 
 #### CanWrite *property*
 
@@ -1652,7 +1652,7 @@ bool CanWrite { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsSocket.sl:163](../../stdlib/Net/Security/TlsSocket.sl#L163)</sub>
+<sub>[stdlib/Net/Security/TlsSocket.sl:165](../../stdlib/Net/Security/TlsSocket.sl#L165)</sub>
 
 #### CanSeek *property*
 
@@ -1662,7 +1662,7 @@ bool CanSeek { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsSocket.sl:165](../../stdlib/Net/Security/TlsSocket.sl#L165)</sub>
+<sub>[stdlib/Net/Security/TlsSocket.sl:167](../../stdlib/Net/Security/TlsSocket.sl#L167)</sub>
 
 #### Read *method*
 
@@ -1672,7 +1672,7 @@ nuint Read(byte[] buffer, nuint offset, nuint count)
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsSocket.sl:167](../../stdlib/Net/Security/TlsSocket.sl#L167)</sub>
+<sub>[stdlib/Net/Security/TlsSocket.sl:169](../../stdlib/Net/Security/TlsSocket.sl#L169)</sub>
 
 #### Write *method*
 
@@ -1682,7 +1682,7 @@ nuint Write(byte[] buffer, nuint offset, nuint count)
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsSocket.sl:169](../../stdlib/Net/Security/TlsSocket.sl#L169)</sub>
+<sub>[stdlib/Net/Security/TlsSocket.sl:172](../../stdlib/Net/Security/TlsSocket.sl#L172)</sub>
 
 #### Position *property*
 
@@ -1692,7 +1692,7 @@ long Position { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsSocket.sl:171](../../stdlib/Net/Security/TlsSocket.sl#L171)</sub>
+<sub>[stdlib/Net/Security/TlsSocket.sl:175](../../stdlib/Net/Security/TlsSocket.sl#L175)</sub>
 
 #### Length *property*
 
@@ -1702,7 +1702,7 @@ long Length { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsSocket.sl:173](../../stdlib/Net/Security/TlsSocket.sl#L173)</sub>
+<sub>[stdlib/Net/Security/TlsSocket.sl:177](../../stdlib/Net/Security/TlsSocket.sl#L177)</sub>
 
 #### Seek *method*
 
@@ -1712,7 +1712,7 @@ bool Seek(long offset, SeekOrigin origin)
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsSocket.sl:175](../../stdlib/Net/Security/TlsSocket.sl#L175)</sub>
+<sub>[stdlib/Net/Security/TlsSocket.sl:179](../../stdlib/Net/Security/TlsSocket.sl#L179)</sub>
 
 #### Flush *method*
 
@@ -1722,7 +1722,7 @@ void Flush()
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsSocket.sl:177](../../stdlib/Net/Security/TlsSocket.sl#L177)</sub>
+<sub>[stdlib/Net/Security/TlsSocket.sl:181](../../stdlib/Net/Security/TlsSocket.sl#L181)</sub>
 
 #### Close *method*
 
@@ -1732,7 +1732,7 @@ void Close()
 
 Sends close_notify and closes the TCP connection. Idempotent.
 
-<sub>[stdlib/Net/Security/TlsSocket.sl:180](../../stdlib/Net/Security/TlsSocket.sl#L180)</sub>
+<sub>[stdlib/Net/Security/TlsSocket.sl:184](../../stdlib/Net/Security/TlsSocket.sl#L184)</sub>
 
 #### Error *property*
 
@@ -1742,7 +1742,7 @@ IOError Error { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsSocket.sl:182](../../stdlib/Net/Security/TlsSocket.sl#L182)</sub>
+<sub>[stdlib/Net/Security/TlsSocket.sl:186](../../stdlib/Net/Security/TlsSocket.sl#L186)</sub>
 
 ### TlsStream *class*
 
@@ -1797,7 +1797,7 @@ On failure the alert has been sent and `inner` closed, unless
 - [TlsError.AlertReceived](#alertreceived-case) — the server refused, and said why in an alert
 - [TlsError.Io](#io-case) — the stream underneath failed
 
-<sub>[stdlib/Net/Security/TlsStream.sl:73](../../stdlib/Net/Security/TlsStream.sl#L73)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:74](../../stdlib/Net/Security/TlsStream.sl#L74)</sub>
 
 #### AuthenticateAsClient *method*
 
@@ -1818,7 +1818,7 @@ when it refused.
 
 - [TlsError.AlertReceived](#alertreceived-case) — the server refused, and `alertReceived` says why
 
-<sub>[stdlib/Net/Security/TlsStream.sl:87](../../stdlib/Net/Security/TlsStream.sl#L87)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:89](../../stdlib/Net/Security/TlsStream.sl#L89)</sub>
 
 #### AuthenticateAsServer *method*
 
@@ -1844,7 +1844,7 @@ On failure the alert has been sent and `inner` closed, unless
 - [TlsError.CertificateRequired](#certificaterequired-case) — a client certificate was required and none came
 - [TlsError.InternalError](#internalerror-case) — no certificate or no key is configured
 
-<sub>[stdlib/Net/Security/TlsStream.sl:116](../../stdlib/Net/Security/TlsStream.sl#L116)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:118](../../stdlib/Net/Security/TlsStream.sl#L118)</sub>
 
 #### AuthenticateAsServer *method*
 
@@ -1865,7 +1865,7 @@ when it refused.
 
 - [TlsError.AlertReceived](#alertreceived-case) — the client refused, and `alertReceived` says why
 
-<sub>[stdlib/Net/Security/TlsStream.sl:130](../../stdlib/Net/Security/TlsStream.sl#L130)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:133](../../stdlib/Net/Security/TlsStream.sl#L133)</sub>
 
 #### IsServer *property*
 
@@ -1875,7 +1875,7 @@ bool IsServer { get; }
 
 Whether this end is the server.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:148](../../stdlib/Net/Security/TlsStream.sl#L148)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:151](../../stdlib/Net/Security/TlsStream.sl#L151)</sub>
 
 #### NegotiatedProtocol *property*
 
@@ -1885,7 +1885,7 @@ TlsProtocolVersion NegotiatedProtocol { get; }
 
 The version negotiated. Always TLS 1.3 for now.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:151](../../stdlib/Net/Security/TlsStream.sl#L151)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:154](../../stdlib/Net/Security/TlsStream.sl#L154)</sub>
 
 #### CipherSuite *property*
 
@@ -1895,7 +1895,7 @@ TlsCipherSuite CipherSuite { get; }
 
 The suite negotiated.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:154](../../stdlib/Net/Security/TlsStream.sl#L154)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:157](../../stdlib/Net/Security/TlsStream.sl#L157)</sub>
 
 #### KeyExchangeGroup *property*
 
@@ -1905,7 +1905,7 @@ TlsNamedGroup KeyExchangeGroup { get; }
 
 The group the key exchange was made in.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:157](../../stdlib/Net/Security/TlsStream.sl#L157)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:160](../../stdlib/Net/Security/TlsStream.sl#L160)</sub>
 
 #### SignatureScheme *property*
 
@@ -1915,7 +1915,7 @@ TlsSignatureScheme SignatureScheme { get; }
 
 The scheme the server signed its CertificateVerify with.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:160](../../stdlib/Net/Security/TlsStream.sl#L160)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:163](../../stdlib/Net/Security/TlsStream.sl#L163)</sub>
 
 #### NegotiatedApplicationProtocol *property*
 
@@ -1925,7 +1925,7 @@ String? NegotiatedApplicationProtocol { get; }
 
 The ALPN protocol agreed, or null when there was none.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:163](../../stdlib/Net/Security/TlsStream.sl#L163)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:166](../../stdlib/Net/Security/TlsStream.sl#L166)</sub>
 
 #### TargetHostName *property*
 
@@ -1936,7 +1936,7 @@ String TargetHostName { get; }
 On a client, the name it asked for; on a server, the name in the
 client's server_name, or empty.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:167](../../stdlib/Net/Security/TlsStream.sl#L167)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:170](../../stdlib/Net/Security/TlsStream.sl#L170)</sub>
 
 #### RemoteCertificate *property*
 
@@ -1947,7 +1947,7 @@ byte[] RemoteCertificate { get; }
 The peer's leaf certificate, DER, or empty when it sent none — which
 only a client can do.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:171](../../stdlib/Net/Security/TlsStream.sl#L171)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:174](../../stdlib/Net/Security/TlsStream.sl#L174)</sub>
 
 #### RemoteCertificateChain *property*
 
@@ -1957,7 +1957,7 @@ List<byte[]> RemoteCertificateChain { get; }
 
 The peer's certificates as it sent them, DER, leaf first.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:182](../../stdlib/Net/Security/TlsStream.sl#L182)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:185](../../stdlib/Net/Security/TlsStream.sl#L185)</sub>
 
 #### IsMutuallyAuthenticated *property*
 
@@ -1967,7 +1967,7 @@ bool IsMutuallyAuthenticated { get; }
 
 Whether the client presented a certificate that was accepted.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:185](../../stdlib/Net/Security/TlsStream.sl#L185)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:188](../../stdlib/Net/Security/TlsStream.sl#L188)</sub>
 
 #### TlsErrorCode *property*
 
@@ -1977,7 +1977,7 @@ TlsError TlsErrorCode { get; }
 
 The exact failure, or `None`.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:188](../../stdlib/Net/Security/TlsStream.sl#L188)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:191](../../stdlib/Net/Security/TlsStream.sl#L191)</sub>
 
 #### AlertDescription *property*
 
@@ -1988,7 +1988,7 @@ TlsAlertDescription AlertDescription { get; }
 The alert the peer ended the connection with, when `TlsErrorCode` is
 `AlertReceived`.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:192](../../stdlib/Net/Security/TlsStream.sl#L192)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:195](../../stdlib/Net/Security/TlsStream.sl#L195)</sub>
 
 #### InnerStream *property*
 
@@ -1998,7 +1998,7 @@ IStream InnerStream { get; }
 
 The stream underneath.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:195](../../stdlib/Net/Security/TlsStream.sl#L195)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:198](../../stdlib/Net/Security/TlsStream.sl#L198)</sub>
 
 #### ExportKeyingMaterial *method*
 
@@ -2020,7 +2020,7 @@ anyone else.
 
 - [TlsError.Closed](#closed-case) — the stream is closed
 
-<sub>[stdlib/Net/Security/TlsStream.sl:207](../../stdlib/Net/Security/TlsStream.sl#L207)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:210](../../stdlib/Net/Security/TlsStream.sl#L210)</sub>
 
 #### UpdateTrafficKeys *method*
 
@@ -2037,7 +2037,7 @@ without being asked, before one has protected 2^24 records.
 - [TlsError.Closed](#closed-case) — the stream is closed or failed
 - [TlsError.Io](#io-case) — the stream underneath failed
 
-<sub>[stdlib/Net/Security/TlsStream.sl:221](../../stdlib/Net/Security/TlsStream.sl#L221)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:225](../../stdlib/Net/Security/TlsStream.sl#L225)</sub>
 
 #### CanRead *property*
 
@@ -2047,7 +2047,7 @@ bool CanRead { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsStream.sl:226](../../stdlib/Net/Security/TlsStream.sl#L226)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:230](../../stdlib/Net/Security/TlsStream.sl#L230)</sub>
 
 #### CanWrite *property*
 
@@ -2057,7 +2057,7 @@ bool CanWrite { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsStream.sl:228](../../stdlib/Net/Security/TlsStream.sl#L228)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:232](../../stdlib/Net/Security/TlsStream.sl#L232)</sub>
 
 #### CanSeek *property*
 
@@ -2067,7 +2067,7 @@ bool CanSeek { get; }
 
 A connection has no position.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:231](../../stdlib/Net/Security/TlsStream.sl#L231)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:235](../../stdlib/Net/Security/TlsStream.sl#L235)</sub>
 
 #### Read *method*
 
@@ -2078,7 +2078,7 @@ nuint Read(byte[] buffer, nuint offset, nuint count)
 Reads up to `count` bytes of application data. Zero means the peer
 sent close_notify, or a failure, which `Error` tells apart.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:235](../../stdlib/Net/Security/TlsStream.sl#L235)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:239](../../stdlib/Net/Security/TlsStream.sl#L239)</sub>
 
 #### Write *method*
 
@@ -2089,7 +2089,7 @@ nuint Write(byte[] buffer, nuint offset, nuint count)
 Writes all `count` bytes as application data, and answers `count`, or
 zero on a failure.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:244](../../stdlib/Net/Security/TlsStream.sl#L244)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:248](../../stdlib/Net/Security/TlsStream.sl#L248)</sub>
 
 #### Position *property*
 
@@ -2099,7 +2099,7 @@ long Position { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsStream.sl:251](../../stdlib/Net/Security/TlsStream.sl#L251)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:255](../../stdlib/Net/Security/TlsStream.sl#L255)</sub>
 
 #### Length *property*
 
@@ -2109,7 +2109,7 @@ long Length { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsStream.sl:253](../../stdlib/Net/Security/TlsStream.sl#L253)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:257](../../stdlib/Net/Security/TlsStream.sl#L257)</sub>
 
 #### Seek *method*
 
@@ -2119,7 +2119,7 @@ bool Seek(long offset, SeekOrigin origin)
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsStream.sl:255](../../stdlib/Net/Security/TlsStream.sl#L255)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:259](../../stdlib/Net/Security/TlsStream.sl#L259)</sub>
 
 #### Flush *method*
 
@@ -2130,7 +2130,7 @@ void Flush()
 Flushes the stream underneath. Every `Write` has already sent its
 records.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:259](../../stdlib/Net/Security/TlsStream.sl#L259)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:263](../../stdlib/Net/Security/TlsStream.sl#L263)</sub>
 
 #### Close *method*
 
@@ -2141,7 +2141,7 @@ void Close()
 Sends close_notify and closes the stream underneath, unless
 `LeaveInnerStreamOpen`. Idempotent, and the destructor calls it.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:263](../../stdlib/Net/Security/TlsStream.sl#L263)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:267](../../stdlib/Net/Security/TlsStream.sl#L267)</sub>
 
 #### Error *property*
 
@@ -2151,7 +2151,7 @@ IOError Error { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsStream.sl:265](../../stdlib/Net/Security/TlsStream.sl#L265)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:269](../../stdlib/Net/Security/TlsStream.sl#L269)</sub>
 
 ## Functions
 

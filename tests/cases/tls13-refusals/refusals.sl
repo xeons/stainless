@@ -41,7 +41,8 @@ TlsServerOptions CreateServerOptions()
 
 TlsError AcceptAnyCertificate(List<byte[]> chain, String targetHost) => TlsError.None;
 
-TlsError RefuseEveryCertificate(List<byte[]> chain, String targetHost) => TlsError.CertificateRefused;
+TlsError RefuseEveryCertificate(List<byte[]> chain, String targetHost) =>
+    TlsError.CertificateRefused;
 
 TlsClientOptions CreateClientOptions()
 {
@@ -83,14 +84,16 @@ Thread StartServer(TcpListener listener, TlsServerOptions options, ServerView vi
     });
 }
 
-void Report(String what, Result<TlsSocket, TlsError> client, TlsAlertDescription alert, ServerView view)
+void Report(
+    String what, Result<TlsSocket, TlsError> client, TlsAlertDescription alert, ServerView view)
 {
     Console.WriteLine(what + ":");
-    if (client.Ok)
-        Console.WriteLine("  client: connected");
-    else
-        Console.WriteLine("  client: " + DescribeTlsError(client.Error) + ", alert " + $"{alert}");
-    Console.WriteLine("  server: " + view.Outcome + (view.Alert.ByteLength() > 0u ? ", alert " + view.Alert : ""));
+    String outcome = client.Ok
+        ? "connected"
+        : DescribeTlsError(client.Error) + ", alert " + $"{alert}";
+    Console.WriteLine("  client: " + outcome);
+    String alertSeen = view.Alert.ByteLength() > 0u ? ", alert " + view.Alert : "";
+    Console.WriteLine("  server: " + view.Outcome + alertSeen);
 }
 
 void CheckRealPeers(String what, TlsServerOptions serverOptions, TlsClientOptions clientOptions)
@@ -123,7 +126,8 @@ class TamperingStream : IStream
     public bool CanRead => _inner.CanRead;
     public bool CanWrite => _inner.CanWrite;
     public bool CanSeek => false;
-    public nuint Read(byte[] buffer, nuint offset, nuint count) => _inner.Read(buffer, offset, count);
+    public nuint Read(byte[] buffer, nuint offset, nuint count) =>
+        _inner.Read(buffer, offset, count);
 
     public nuint Write(byte[] buffer, nuint offset, nuint count)
     {
@@ -168,7 +172,8 @@ void CheckTamperedRecord()
     server.Join();
     Console.WriteLine("tampered record:");
     Console.WriteLine("  server read: " + view.ReadError);
-    Console.WriteLine("  client read " + Text.FromInteger((long)got) + ": " + DescribeTlsError(tls.TlsErrorCode) +
+    Console.WriteLine("  client read " + Text.FromInteger((long)got) + ": " +
+                      DescribeTlsError(tls.TlsErrorCode) +
                       ", alert " + $"{tls.AlertDescription}");
     tls.Close();
     listener.Close();
@@ -214,7 +219,8 @@ Thread StartFakeServer(TcpListener listener, byte[] reply, FakeServerView view)
         var buffer = new byte[4096u];
 
         // The ClientHello: one record, whose length is in its header.
-        while (received.Count < 5u || received.Count < 5u + (((nuint)received[3u] << 8) | (nuint)received[4u]))
+        while (received.Count < 5u ||
+               received.Count < 5u + (((nuint)received[3u] << 8) | (nuint)received[4u]))
         {
             nuint got = peer.Read(buffer, 0u, buffer.Length);
             if (got == 0u)
@@ -280,7 +286,8 @@ byte[] BuildLegacyServerHello(String tail)
 void CheckFakeServers()
 {
     CheckFakeServer("Finished before ServerHello",
-                    Bytes("1603030024" + "14000020" + "0000000000000000000000000000000000000000000000000000000000000000"));
+                    Bytes("1603030024" + "14000020" +
+                          "0000000000000000000000000000000000000000000000000000000000000000"));
     CheckFakeServer("record cut short", Bytes("1603030050" + "0200004c0303"));
     CheckFakeServer("plaintext record over 2^14", Bytes("1603034001" + "02"));
     CheckFakeServer("empty handshake record", Bytes("1603030000"));
@@ -317,10 +324,10 @@ void CheckFakeClient(String what, byte[] bytes)
     server.Join();
     Console.WriteLine(what + ":");
     Console.WriteLine("  server: " + view.Outcome);
-    if (got == 7u && reply[0u] == 21)
-        Console.WriteLine("  fake client heard: alert " + Text.FromInteger((long)reply[6u]));
-    else
-        Console.WriteLine("  fake client heard: " + Text.FromInteger((long)got) + " bytes");
+    String heard = got == 7u && reply[0u] == 21
+        ? "alert " + Text.FromInteger((long)reply[6u])
+        : Text.FromInteger((long)got) + " bytes";
+    Console.WriteLine("  fake client heard: " + heard);
     peer.Close();
     listener.Close();
 }
@@ -370,7 +377,8 @@ void CheckOversizedProtectedRecord()
     Console.WriteLine("protected record over 2^14 + 256:");
     Console.WriteLine("  server read: " + view.ReadError);
     Console.WriteLine("  client read " + Text.FromInteger((long)got) + ": " +
-                      DescribeTlsError(client.Value.TlsErrorCode) + ", alert " + $"{client.Value.AlertDescription}");
+                      DescribeTlsError(client.Value.TlsErrorCode) + ", alert " +
+                      $"{client.Value.AlertDescription}");
     tcp.Value.Close();
     listener.Close();
 }

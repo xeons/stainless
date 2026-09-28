@@ -56,7 +56,8 @@ public sealed class TlsSocket : IStream
     /// @failure TlsError.Io                  the TCP connection could not be made
     /// @failure TlsError.CertificateRefused  the validator refused the chain
     /// @failure TlsError.AlertReceived       the server refused
-    public static Result<TlsSocket, TlsError> Connect(String host, ushort port, TlsClientOptions options) =>
+    public static Result<TlsSocket, TlsError> Connect(
+        String host, ushort port, TlsClientOptions options) =>
         Connect(host, port, options, out TlsAlertDescription alert);
 
     /// Connects and runs the client's handshake, and reports the alert the
@@ -69,8 +70,8 @@ public sealed class TlsSocket : IStream
     ///                       `AlertReceived`, and `CloseNotify` otherwise
     /// @failure TlsError.AlertReceived  the server refused, and `alertReceived`
     ///                                  says why
-    public static Result<TlsSocket, TlsError> Connect(String host, ushort port, TlsClientOptions options,
-                                                      out TlsAlertDescription alertReceived)
+    public static Result<TlsSocket, TlsError> Connect(
+        String host, ushort port, TlsClientOptions options, out TlsAlertDescription alertReceived)
     {
         alertReceived = TlsAlertDescription.CloseNotify;
         var connected = TcpClient.Connect(host, port);
@@ -98,7 +99,8 @@ public sealed class TlsSocket : IStream
     /// @failure TlsError.Io                     the accept failed
     /// @failure TlsError.NoCommonCipherSuite    no suite on both lists
     /// @failure TlsError.NoApplicationProtocol  no ALPN name on both lists
-    public static Result<TlsSocket, TlsError> Accept(TcpListener listener, TlsServerOptions options) =>
+    public static Result<TlsSocket, TlsError> Accept(
+        TcpListener listener, TlsServerOptions options) =>
         Accept(listener, options, out TlsAlertDescription alert);
 
     /// Accepts a connection and runs the server's handshake, and reports the
@@ -164,9 +166,11 @@ public sealed class TlsSocket : IStream
 
     public bool CanSeek => false;
 
-    public nuint Read(byte[] buffer, nuint offset, nuint count) => _stream.Read(buffer, offset, count);
+    public nuint Read(byte[] buffer, nuint offset, nuint count) => _stream.Read(
+        buffer, offset, count);
 
-    public nuint Write(byte[] buffer, nuint offset, nuint count) => _stream.Write(buffer, offset, count);
+    public nuint Write(byte[] buffer, nuint offset, nuint count) => _stream.Write(
+        buffer, offset, count);
 
     public long Position => -1;
 
