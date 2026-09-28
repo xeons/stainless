@@ -604,7 +604,10 @@ internal enum PlaceUse
     /// <summary>A read of the place, or of something reached through it.</summary>
     Read,
 
-    /// <summary>Storage beside the place, reached through what holds it; nothing inside is a read.</summary>
+    /// <summary>
+    /// Storage beside the place, reached through what holds it; nothing inside
+    /// is a read.
+    /// </summary>
     Beside,
 }
 

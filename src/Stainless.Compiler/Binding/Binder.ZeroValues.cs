@@ -38,7 +38,10 @@ public sealed partial class Binder
     /// <summary>Whether the body being bound is one the rule does not reach.</summary>
     private bool InUncheckedModule => _context.Function?.ModuleName == UncheckedModuleName;
 
-    /// <summary><c>default(T)</c>, or a bare <c>default</c> going to <paramref name="type"/>.</summary>
+    /// <summary>
+    /// <c>default(T)</c>, or a bare <c>default</c> going to
+    /// <paramref name="type"/>.
+    /// </summary>
     private void CheckDefaultHasZero(SourceSpan span, TypeSymbol type)
     {
         if (InUncheckedModule || ZeroValues.FindNullInZero(type) is not { } found) return;
@@ -54,7 +57,8 @@ public sealed partial class Binder
     /// <c>new T[n]</c>, whose elements start as the zero of <c>T</c>. A length
     /// that is the constant zero makes no element to be one.
     /// </summary>
-    private void CheckArrayElementHasZero(SourceSpan span, TypeSymbol element, BoundExpression length)
+    private void CheckArrayElementHasZero(
+        SourceSpan span, TypeSymbol element, BoundExpression length)
     {
         if (InUncheckedModule || FoldSwitchLabel(length) == 0) return;
         if (ZeroValues.FindNullInZero(element) is not { } found) return;
@@ -117,7 +121,8 @@ public sealed partial class Binder
     }
 
     private static void CollectSlotsWithoutZero(
-        TypeSymbol type, List<FieldSymbol> path, List<FieldSymbol[]> into, HashSet<TypeSymbol> walked)
+        TypeSymbol type, List<FieldSymbol> path, List<FieldSymbol[]> into,
+        HashSet<TypeSymbol> walked)
     {
         if (type is not StructTypeSymbol composite ||
             type is VariantTypeSymbol or ClosureTypeSymbol or UnionTypeSymbol ||
@@ -152,7 +157,10 @@ public sealed partial class Binder
             local.Type);
     }
 
-    /// <summary>One slot of a local declared without a value, as definite assignment asks about it.</summary>
+    /// <summary>
+    /// One slot of a local declared without a value, as definite assignment
+    /// asks about it.
+    /// </summary>
     private sealed class UnsetLocalPlace(
         Binder binder, LocalSymbol local, FieldSymbol[] slot, HashSet<int> reported) : AssignedPlace
     {
@@ -167,11 +175,15 @@ public sealed partial class Binder
         // So does an automatic property's setter, which writes its storage.
         public override bool IsWrittenBy(BoundExpression write) => write switch
         {
-            BoundPropertyAssignment { Property.BackingField: { } backing, Receiver: { } receiver } =>
-                PathOf(receiver) is { } path && IsOnTheWay([.. path, backing]),
-            BoundCall { Function.Accessor.BackingField: { } backing, Receiver: { } receiver } call =>
-                call.Function.ReturnType.IsVoid() && PathOf(receiver) is { } path &&
-                IsOnTheWay([.. path, backing]),
+            BoundPropertyAssignment
+                {
+                    Property.BackingField: { } backing, Receiver: { } receiver,
+                } => PathOf(receiver) is { } path && IsOnTheWay([.. path, backing]),
+            BoundCall
+                {
+                    Function.Accessor.BackingField: { } backing, Receiver: { } receiver,
+                } call => call.Function.ReturnType.IsVoid() && PathOf(receiver) is { } path &&
+                          IsOnTheWay([.. path, backing]),
             _ => false,
         };
 
@@ -195,7 +207,10 @@ public sealed partial class Binder
         {
         }
 
-        /// <summary>The fields from the local to this expression, or null when it is not one of its fields.</summary>
+        /// <summary>
+        /// The fields from the local to this expression, or null when it is not
+        /// one of them.
+        /// </summary>
         private List<FieldSymbol>? PathOf(BoundExpression expression)
         {
             switch (expression)
@@ -203,7 +218,8 @@ public sealed partial class Binder
                 case BoundLocalAccess named when ReferenceEquals(named.Local, local):
                     return [];
 
-                case BoundFieldAccess { Receiver: { } receiver } access when PathOf(receiver) is { } path:
+                case BoundFieldAccess { Receiver: { } receiver } access
+                    when PathOf(receiver) is { } path:
                     path.Add(access.Field);
                     return path;
 
@@ -220,11 +236,13 @@ public sealed partial class Binder
 
         /// <summary>The path is the slot or leads to it.</summary>
         private bool IsOnTheWay(List<FieldSymbol> path) =>
-            path.Count <= slot.Length && path.Select((f, i) => ReferenceEquals(f, slot[i])).All(b => b);
+            path.Count <= slot.Length &&
+            path.Select((f, i) => ReferenceEquals(f, slot[i])).All(b => b);
 
         /// <summary>The path passes through the slot to something it holds.</summary>
         private bool GoesThrough(List<FieldSymbol> path) =>
-            path.Count > slot.Length && slot.Select((f, i) => ReferenceEquals(f, path[i])).All(b => b);
+            path.Count > slot.Length &&
+            slot.Select((f, i) => ReferenceEquals(f, path[i])).All(b => b);
     }
 
     /// <summary>The block whose statements declare a local, however deep in a body it is.</summary>
@@ -296,7 +314,7 @@ public sealed partial class Binder
     /// <summary>Each bound body by its function, while constructors are being checked.</summary>
     private Dictionary<FunctionSymbol, BoundBlock>? _boundBodies;
 
-    /// <summary>Whether a helper writes a field on every path, as far as it has been asked.</summary>
+    /// <summary>Whether a helper writes a field on every path, as far as asked.</summary>
     private readonly Dictionary<(FunctionSymbol, string), bool> _helperWrites = [];
 
     /// <summary>
@@ -324,7 +342,8 @@ public sealed partial class Binder
         foreach (var type in _classes.ToList())
         {
             // A lambda's environment is filled by the code that makes it.
-            if (type.Constructors.Count > 0 || type.Span is not { } span || _generated.Contains(type))
+            if (type.Constructors.Count > 0 || type.Span is not { } span ||
+                _generated.Contains(type))
                 continue;
 
             foreach (var field in FieldsNeedingValues(type, setsRequired: false))
@@ -332,9 +351,9 @@ public sealed partial class Binder
                 var found = FindNullInField(type, field);
                 ReportNoZeroValue("SL0813", span,
                     $"'{type.Name}' has no constructor, so nothing gives '{field.Name}' a value, " +
-                    $"and '{field.Type.Name}' has no zero value: {ExplainNullInZero(found)}. Give " +
-                    "the field an initializer, mark it 'required', or write a constructor that " +
-                    "assigns it",
+                    $"and '{field.Type.Name}' has no zero value: " +
+                    $"{ExplainNullInZero(found)}. Give the field an initializer, mark it " +
+                    "'required', or write a constructor that assigns it",
                     field.Type);
             }
         }
@@ -349,7 +368,8 @@ public sealed partial class Binder
     /// For a <c>[SetsRequiredMembers]</c> constructor, which takes back what
     /// <c>required</c> gave to every <c>new</c>.
     /// </param>
-    private static IEnumerable<FieldSymbol> FieldsNeedingValues(NamedTypeSymbol type, bool setsRequired)
+    private static IEnumerable<FieldSymbol> FieldsNeedingValues(
+        NamedTypeSymbol type, bool setsRequired)
     {
         var required = type.Properties
             .Where(p => p.IsRequired && p.BackingField is not null)
@@ -368,9 +388,11 @@ public sealed partial class Binder
     /// definite assignment asks about it.
     /// </summary>
     /// <param name="path">The field, then the fields inside it on the way to the slot.</param>
-    /// <param name="owner">The constructor, or null when a helper is being asked on its behalf.</param>
-    private sealed class ConstructorFieldPlace(Binder binder, FieldSymbol[] path, FunctionSymbol? owner)
-        : AssignedPlace
+    /// <param name="owner">
+    /// The constructor, or null when a helper is being asked on its behalf.
+    /// </param>
+    private sealed class ConstructorFieldPlace(
+        Binder binder, FieldSymbol[] path, FunctionSymbol? owner) : AssignedPlace
     {
         /// <summary>A path through a helper that returned before writing the field.</summary>
         public bool LeftEarly { get; private set; }
@@ -415,16 +437,23 @@ public sealed partial class Binder
 
         public override void ReportEarlyReturn(SourceSpan span) => ReportReturn(span);
 
-        /// <summary>The fields from this object to the expression, or null when it is not one of them.</summary>
+        /// <summary>
+        /// The fields from this object to the expression, or null when it is
+        /// not one of them.
+        /// </summary>
         private static List<FieldSymbol>? PathOf(BoundExpression expression) => expression switch
         {
-            BoundFieldAccess { Receiver: { } receiver } access when IsSelf(receiver) => [access.Field],
+            BoundFieldAccess { Receiver: { } receiver } access when IsSelf(receiver) =>
+                [access.Field],
             BoundFieldAccess { Receiver: { } receiver } access when PathOf(receiver) is { } inner =>
                 [.. inner, access.Field],
             _ => null,
         };
 
-        /// <summary>A method of the field's own type with one body: not public, protected or dispatched.</summary>
+        /// <summary>
+        /// A method of the field's own type with one body: not public,
+        /// protected or dispatched.
+        /// </summary>
         private bool IsHelper(FunctionSymbol method) =>
             method.Kind == FunctionKind.Method && !method.IsStatic && !method.IsPublic &&
             !method.IsProtected && !method.IsVirtual && method.Body is not null &&
@@ -496,7 +525,8 @@ public sealed partial class Binder
     // ------------------------------------------------------------ saying so
 
     /// <summary>Where a field's zero breaks a promise, named from the type that holds it.</summary>
-    private static (string Path, TypeSymbol Slot) FindNullInField(NamedTypeSymbol type, FieldSymbol field)
+    private static (string Path, TypeSymbol Slot) FindNullInField(
+        NamedTypeSymbol type, FieldSymbol field)
     {
         var found = ZeroValues.FindNullInZero(field.Type)!.Value;
         return ($"{type.Name}.{field.Name}{found.Path[field.Type.Name.Length..]}", found.Slot);
@@ -515,28 +545,7 @@ public sealed partial class Binder
                 : $"'{found.Path}' is a '{found.Slot.Name}', which is never null";
     }
 
-    private static readonly string? s_migrationLog =
-        Environment.GetEnvironmentVariable("STAINLESS_ZERO_VALUES_LOG");
-
-    private void ReportNoZeroValue(string code, SourceSpan span, string message, TypeSymbol about)
-    {
-        if (s_migrationLog is not null && !diagnostics.IsMuted)
-        {
-            var (line, column) = span.File.GetLineColumn(span.Start);
-            lock (typeof(ZeroValues))
-                System.IO.File.AppendAllText(s_migrationLog,
-                    $"{code}\t{span.File.Path}\t{line}\t{column}\t{message}\n");
-        }
-
-        if (ZeroValuesAreErrors)
-            diagnostics.Error(code, span, message, about);
-        else
-            diagnostics.Warning(code, span, message, about);
-    }
-
-    /// <summary>
-    /// Whether a finding stops the build: a warning while the tree is brought
-    /// to the rule, and an error from then on.
-    /// </summary>
-    private static bool ZeroValuesAreErrors => false;
+    private void ReportNoZeroValue(
+        string code, SourceSpan span, string message, TypeSymbol about) =>
+        diagnostics.Error(code, span, message, about);
 }

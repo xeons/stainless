@@ -19,7 +19,7 @@ namespace Stainless.Binding;
 /// <summary>
 /// Whether a type has a zero value: whether storage left as zero bytes is a
 /// value of the type. It has none when those bytes would hold a null in a
-/// reference whose type says it is never null. See docs/design/zero-values.md.
+/// reference whose type says it is never null: §2.16 of the specification.
 /// </summary>
 internal static class ZeroValues
 {
@@ -67,21 +67,31 @@ internal static class ZeroValues
             // A zero tag is the first case, with its payload zeroed.
             case VariantTypeSymbol variant:
             {
-                if (!walked.Add(type)) return null;
-                var first = variant.Cases.FirstOrDefault(c => c.Tag == 0);
-                if (first is null) return null;
+                if (!walked.Add(type) ||
+                    variant.Cases.FirstOrDefault(c => c.Tag == 0) is not { } first)
+                    return null;
+
                 foreach (var field in first.Fields)
-                    if (FindNullInZero(field.Type, walked, $"{path}.{first.Name}.{field.Name}") is { } found)
+                {
+                    string inside = $"{path}.{first.Name}.{field.Name}";
+                    if (FindNullInZero(field.Type, walked, inside) is { } found)
                         return found;
+                }
+
                 return null;
             }
 
             case StructTypeSymbol structType:
             {
-                if (!walked.Add(type)) return null;
+                if (!walked.Add(type))
+                    return null;
+
                 foreach (var field in structType.Fields)
+                {
                     if (FindNullInZero(field.Type, walked, $"{path}.{field.Name}") is { } found)
                         return found;
+                }
+
                 return null;
             }
 
