@@ -46,16 +46,18 @@ public sealed class TlsServerOptions
     /// `NoApplicationProtocol`.
     public List<String> ApplicationProtocols { get; set; } = new List<String>();
 
-    /// Which versions may be negotiated. TLS 1.2 is accepted here and not yet
-    /// implemented, so a client that offers only TLS 1.2 is refused.
+    /// Which versions may be negotiated: TLS 1.3 when the client offers it,
+    /// else TLS 1.2, from a client that offers the extended master secret. A
+    /// version is accepted only when `CipherSuites` holds a suite of it, and
+    /// a TLS 1.2 suite only when it matches the kind of `PrivateKey`.
     public TlsProtocolVersion EnabledProtocols { get; set; } =
         TlsProtocolVersion.Tls12 | TlsProtocolVersion.Tls13;
 
     /// Suites to accept, most preferred first.
     public List<TlsCipherSuite> CipherSuites { get; set; } = CreateDefaultTlsCipherSuites();
 
-    /// Groups to accept, most preferred first. A client that sent no share
-    /// in any of them is asked for one with a HelloRetryRequest.
+    /// Groups to accept, most preferred first. A TLS 1.3 client that sent no
+    /// share in any of them is asked for one with a HelloRetryRequest.
     public List<TlsNamedGroup> KeyExchangeGroups { get; set; } = CreateDefaultTlsGroups();
 
     /// Whether to ask the client for a certificate. It MAY send none.

@@ -24,11 +24,9 @@ module Standard.Net.Security;
 import Standard.Collections;
 import Standard.Security.Cryptography;
 
-/// The server's side of a TLS 1.3 handshake (RFC 8446 §4), run once over a
-/// fresh connection.
-///
-/// A ClientHello without supported_versions, or without TLS 1.3 in it, is
-/// where TLS 1.2 plugs in; `ChooseTlsServerVersion` refuses it today.
+/// The server's side of a handshake, run once over a fresh connection: TLS
+/// 1.3 (RFC 8446 §4) here, and TLS 1.2 handed to `Tls12ServerHandshake`
+/// when `ChooseTlsServerVersion` settles on it.
 internal sealed class TlsServerHandshake
 {
     private TlsConnection _connection;
@@ -68,7 +66,7 @@ internal sealed class TlsServerHandshake
         var key = _options.PrivateKey;
         if (key == null || _options.CertificateChain.Count == 0u)
             return TlsError.InternalError;
-        if (!_options.EnabledProtocols.HasFlag(TlsProtocolVersion.Tls13))
+        if (!AcceptsTls13 && !AcceptsTls12)
             return TlsError.ProtocolVersion;
 
         var read = _connection.ReadTlsHandshakeMessage();
@@ -78,6 +76,19 @@ internal sealed class TlsServerHandshake
         if ((TlsHandshakeType)first[0u] != TlsHandshakeType.ClientHello)
             return TlsError.UnexpectedMessage;
         _connection._records._changeCipherSpecAllowed = true;
+
+        var parsed = TlsClientHello.ParseTlsClientHello(first);
+        if (!parsed.Ok)
+            return parsed.Error;
+        var version = ChooseTlsServerVersion(parsed.Value);
+        if (!version.Ok)
+            return version.Error;
+        if (version.Value == TlsProtocolVersion.Tls12)
+        {
+            _connection.SelectTls12();
+            var legacy = new Tls12ServerHandshake(_connection, _options, parsed.Value, key);
+            return legacy.RunTls12ServerHandshake(first, AcceptsTls13);
+        }
 
         TlsError step = ReadTlsClientHello(first, key);
         if (step != TlsError.None)
@@ -108,6 +119,33 @@ internal sealed class TlsServerHandshake
     }
 
     // ------------------------------------------------------------ ClientHello
+
+    private bool AcceptsTls13 =>
+        _options.EnabledProtocols.HasFlag(TlsProtocolVersion.Tls13) &&
+        HasTlsSuiteForVersion(_options.CipherSuites, true);
+
+    private bool AcceptsTls12 =>
+        _options.EnabledProtocols.HasFlag(TlsProtocolVersion.Tls12) &&
+        HasTlsSuiteForVersion(_options.CipherSuites, false);
+
+    /// The version to speak with the client that sent `hello`: TLS 1.3 when
+    /// both ends have it, else TLS 1.2. A client with supported_versions is
+    /// taken at its list alone (RFC 8446 §4.2.1), and one without at its
+    /// `legacy_version`.
+    private Result<TlsProtocolVersion, TlsError> ChooseTlsServerVersion(TlsClientHello hello)
+    {
+        if (hello._hasSupportedVersions)
+        {
+            if (AcceptsTls13 && hello._supportedVersions.Contains(TlsVersion13))
+                return Ok(TlsProtocolVersion.Tls13);
+            if (AcceptsTls12 && hello._supportedVersions.Contains(TlsVersion12))
+                return Ok(TlsProtocolVersion.Tls12);
+            return Fail(TlsError.ProtocolVersion);
+        }
+        if (AcceptsTls12 && hello._legacyVersion >= TlsVersion12)
+            return Ok(TlsProtocolVersion.Tls12);
+        return Fail(TlsError.ProtocolVersion);
+    }
 
     /// Reads a ClientHello and chooses the version, suite, group, signature
     /// scheme and application protocol, each by this server's preference.
