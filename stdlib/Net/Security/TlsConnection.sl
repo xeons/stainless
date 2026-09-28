@@ -62,6 +62,8 @@ internal sealed class TlsConnection
     // How it ended, or is ending.
     internal TlsError _error;
     internal TlsAlertDescription _alertReceived;
+    /// The last warning passed over rather than ending the connection.
+    internal TlsAlertDescription _warningReceived;
     private bool _alertSent;
     private bool _closeNotifyReceived;
     private bool _closed;
@@ -96,6 +98,7 @@ internal sealed class TlsConnection
         _ticketHandler = DiscardTlsSessionTicket;
         _error = TlsError.None;
         _alertReceived = TlsAlertDescription.CloseNotify;
+        _warningReceived = TlsAlertDescription.CloseNotify;
         _alertSent = false;
         _closeNotifyReceived = false;
         _closed = false;
@@ -254,7 +257,12 @@ internal sealed class TlsConnection
         if (_error == TlsError.None)
             _error = error;
         if (MapTlsErrorToAlert(error, out TlsAlertDescription alert) && !_alertSent)
+        {
+            // certificate_required is TLS 1.3's; TLS 1.2 says handshake_failure.
+            if (IsTls12 && alert == TlsAlertDescription.CertificateRequired)
+                alert = TlsAlertDescription.HandshakeFailure;
             SendTlsAlert(alert);
+        }
         return error;
     }
 
@@ -295,11 +303,15 @@ internal sealed class TlsConnection
         switch (description)
         {
             case TlsAlertDescription.UserCanceled:
+                _warningReceived = description;
                 return TlsError.None;
             case TlsAlertDescription.NoRenegotiation:
             case TlsAlertDescription.UnrecognizedName:
                 if (IsTls12 && isWarning)
+                {
+                    _warningReceived = description;
                     return TlsError.None;
+                }
                 _alertReceived = description;
                 _alertSent = true;
                 if (_error == TlsError.None)
@@ -563,8 +575,8 @@ internal sealed class TlsConnection
         if (schedule == null)
             return TlsError.InternalError;
         byte[] key = schedule.DeriveTlsResumptionKey(nonce);
-        _ticketHandler(new TlsSessionTicket(_cipherSuite, _targetHost, lifetime, ageAdd, nonce,
-                                            ticket, key, maxEarlyData));
+        _ticketHandler(new TlsSessionTicket(TlsProtocolVersion.Tls13, _cipherSuite, _targetHost,
+                                            lifetime, ageAdd, nonce, ticket, key, maxEarlyData));
         return TlsError.None;
     }
 

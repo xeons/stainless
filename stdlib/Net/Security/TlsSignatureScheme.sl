@@ -26,17 +26,21 @@ module Standard.Net.Security;
 /// Each of the ECDSA schemes names its curve as well as its hash, and the
 /// RSA-PSS schemes are split by the kind of key: `RsaPssRsae` for a key
 /// published as `rsaEncryption` and `RsaPssPss` for one published as
-/// `RSASSA-PSS`. PKCS #1 v1.5 is accepted in certificates and never in a
-/// handshake signature.
+/// `RSASSA-PSS`. PKCS #1 v1.5 is accepted in certificates and in TLS 1.2's
+/// handshake signatures, and never in TLS 1.3's. In TLS 1.2 an ECDSA scheme
+/// names only its hash, and a key on either curve MAY sign with either.
 public enum TlsSignatureScheme : ushort
 {
-    /// RSA with PKCS #1 v1.5 padding and SHA-256. Certificates only.
+    /// RSA with PKCS #1 v1.5 padding and SHA-256. Certificates and TLS 1.2
+    /// only.
     RsaPkcs1Sha256 = 0x0401,
 
-    /// RSA with PKCS #1 v1.5 padding and SHA-384. Certificates only.
+    /// RSA with PKCS #1 v1.5 padding and SHA-384. Certificates and TLS 1.2
+    /// only.
     RsaPkcs1Sha384 = 0x0501,
 
-    /// RSA with PKCS #1 v1.5 padding and SHA-512. Certificates only.
+    /// RSA with PKCS #1 v1.5 padding and SHA-512. Certificates and TLS 1.2
+    /// only.
     RsaPkcs1Sha512 = 0x0601,
 
     /// ECDSA on P-256 with SHA-256.

@@ -24,16 +24,19 @@ module Standard.Net.Security;
 import Standard.Collections;
 import Standard.Security.Cryptography;
 
-/// The client's side of a TLS 1.3 handshake (RFC 8446 §4), run once over a
-/// fresh connection.
+/// The client's side of a handshake, run once over a fresh connection: TLS
+/// 1.3 (RFC 8446 §4) here, and TLS 1.2 handed to `Tls12ClientHandshake`.
 ///
-/// A TLS 1.2 client would share the ClientHello and part ways at the
-/// ServerHello: `ReadTlsServerHello` is where a ServerHello without
-/// supported_versions arrives, and is refused today.
+/// One ClientHello offers both versions. The two part ways at the
+/// ServerHello: one without supported_versions is TLS 1.2's, and is checked
+/// for the downgrade sentinel before anything else is read from it.
 internal sealed class TlsClientHandshake
 {
     private TlsConnection _connection;
     private TlsClientOptions _options;
+    private bool _offersTls13;
+    private bool _offersTls12;
+    private Tls12ClientHandshake? _tls12;
     private TlsTranscript _transcript;
     private TlsClientHello _offered;
     private byte[] _clientHello;
@@ -52,6 +55,11 @@ internal sealed class TlsClientHandshake
     {
         _connection = connection;
         _options = options;
+        _offersTls13 = options.EnabledProtocols.HasFlag(TlsProtocolVersion.Tls13) &&
+                       HasTlsSuiteForVersion(options.CipherSuites, true);
+        _offersTls12 = options.EnabledProtocols.HasFlag(TlsProtocolVersion.Tls12) &&
+                       HasTlsSuiteForVersion(options.CipherSuites, false);
+        _tls12 = null;
         _transcript = new TlsTranscript();
         _offered = new TlsClientHello();
         _clientHello = new byte[0u];
@@ -74,7 +82,7 @@ internal sealed class TlsClientHandshake
     /// sent yet.
     internal TlsError RunTlsClientHandshake()
     {
-        if (!_options.EnabledProtocols.HasFlag(TlsProtocolVersion.Tls13))
+        if (!_offersTls13 && !_offersTls12)
             return TlsError.ProtocolVersion;
 
         TlsError step = SendTlsClientHello();
@@ -83,6 +91,9 @@ internal sealed class TlsClientHandshake
         step = ReadTlsServerHello();
         if (step != TlsError.None)
             return step;
+        var legacy = _tls12;
+        if (legacy != null)
+            return legacy.RunTls12ClientHandshake();
         step = ReadTlsEncryptedExtensions();
         if (step != TlsError.None)
             return step;
@@ -134,6 +145,8 @@ internal sealed class TlsClientHandshake
     private TlsError GenerateTlsKeyShares()
     {
         _shares.Clear();
+        if (!_offersTls13)
+            return TlsError.None;
         if (_options._fixedX25519PrivateKey.Length > 0u)
         {
             var fixedShare = TlsKeyShare.CreateTlsX25519KeyShare(_options._fixedX25519PrivateKey);
@@ -173,8 +186,10 @@ internal sealed class TlsClientHandshake
                 : RandomNumberGenerator.GetBytes(32u);
             // Middlebox compatibility mode (RFC 8446 Appendix D.4): a
             // non-empty session id, and a change_cipher_spec before the
-            // second flight.
-            sessionId = RandomNumberGenerator.GetBytes(32u);
+            // second flight. A TLS 1.2 server would read it as an offer to
+            // resume, so a client of TLS 1.2 alone sends none.
+            if (_offersTls13)
+                sessionId = RandomNumberGenerator.GetBytes(32u);
         }
 
         var message = new TlsBuffer(512u);
@@ -188,9 +203,11 @@ internal sealed class TlsClientHandshake
         nuint suitesAt = message.BeginVector(2u);
         for (nuint i = 0u; i < suites.Count; i++)
         {
-            if (!IsImplementedTlsCipherSuite(suites[i]))
+            TlsCipherSuite suite = suites[i];
+            if (!IsImplementedTlsCipherSuite(suite))
                 return Fail(TlsError.InternalError);
-            message.WriteUInt16((uint)suites[i]);
+            if (IsTls13CipherSuite(suite) ? _offersTls13 : _offersTls12)
+                message.WriteUInt16((uint)suite);
         }
         message.EndVector(suitesAt, 2u);
         message.WriteByte(1u);
@@ -211,11 +228,18 @@ internal sealed class TlsClientHandshake
             EndTlsExtension(message, at);
         }
 
-        nuint versionsAt = BeginTlsExtension(message, TlsExtensionType.SupportedVersions);
-        nuint versionListAt = message.BeginVector(1u);
-        message.WriteUInt16(TlsVersion13);
-        message.EndVector(versionListAt, 1u);
-        EndTlsExtension(message, versionsAt);
+        // A client of TLS 1.2 alone sends no supported_versions at all, as a
+        // TLS 1.2 client would.
+        if (_offersTls13)
+        {
+            nuint versionsAt = BeginTlsExtension(message, TlsExtensionType.SupportedVersions);
+            nuint versionListAt = message.BeginVector(1u);
+            message.WriteUInt16(TlsVersion13);
+            if (_offersTls12)
+                message.WriteUInt16(TlsVersion12);
+            message.EndVector(versionListAt, 1u);
+            EndTlsExtension(message, versionsAt);
+        }
 
         nuint groupsAt = BeginTlsExtension(message, TlsExtensionType.SupportedGroups);
         nuint groupListAt = message.BeginVector(2u);
@@ -224,26 +248,56 @@ internal sealed class TlsClientHandshake
         message.EndVector(groupListAt, 2u);
         EndTlsExtension(message, groupsAt);
 
-        nuint sharesAt = BeginTlsExtension(message, TlsExtensionType.KeyShare);
-        nuint shareListAt = message.BeginVector(2u);
-        for (nuint i = 0u; i < _shares.Count; i++)
+        if (_offersTls13)
         {
-            message.WriteUInt16((uint)_shares[i].Group);
-            nuint keyAt = message.BeginVector(2u);
-            message.WriteBytes(_shares[i].PublicKey);
-            message.EndVector(keyAt, 2u);
+            nuint sharesAt = BeginTlsExtension(message, TlsExtensionType.KeyShare);
+            nuint shareListAt = message.BeginVector(2u);
+            for (nuint i = 0u; i < _shares.Count; i++)
+            {
+                message.WriteUInt16((uint)_shares[i].Group);
+                nuint keyAt = message.BeginVector(2u);
+                message.WriteBytes(_shares[i].PublicKey);
+                message.EndVector(keyAt, 2u);
+            }
+            message.EndVector(shareListAt, 2u);
+            EndTlsExtension(message, sharesAt);
         }
-        message.EndVector(shareListAt, 2u);
-        EndTlsExtension(message, sharesAt);
 
         nuint signaturesAt = BeginTlsExtension(message, TlsExtensionType.SignatureAlgorithms);
-        WriteTlsSignatureSchemes(message, CreateDefaultTlsSignatureSchemes());
+        WriteTlsSignatureSchemes(message, _offersTls12 ? CreateDefaultTls12SignatureSchemes()
+                                                       : CreateDefaultTlsSignatureSchemes());
         EndTlsExtension(message, signaturesAt);
 
-        nuint certificateSignaturesAt = BeginTlsExtension(
-            message, TlsExtensionType.SignatureAlgorithmsCert);
-        WriteTlsSignatureSchemes(message, CreateDefaultTlsCertificateSignatureSchemes());
-        EndTlsExtension(message, certificateSignaturesAt);
+        if (_offersTls13)
+        {
+            nuint certificateSignaturesAt = BeginTlsExtension(
+                message, TlsExtensionType.SignatureAlgorithmsCert);
+            WriteTlsSignatureSchemes(message, CreateDefaultTlsCertificateSignatureSchemes());
+            EndTlsExtension(message, certificateSignaturesAt);
+        }
+
+        if (_offersTls12)
+        {
+            // Uncompressed points only; the extended master secret, which a
+            // TLS 1.2 server MUST answer; secure renegotiation, as the empty
+            // renegotiation_info of RFC 5746, since this end never
+            // renegotiates; and an empty session_ticket, so that a server
+            // MAY send a ticket.
+            nuint formatsAt = BeginTlsExtension(message, TlsExtensionType.EcPointFormats);
+            message.WriteByte(1u);
+            message.WriteByte(0u);
+            EndTlsExtension(message, formatsAt);
+
+            nuint masterAt = BeginTlsExtension(message, TlsExtensionType.ExtendedMasterSecret);
+            EndTlsExtension(message, masterAt);
+
+            nuint renegotiationAt = BeginTlsExtension(message, TlsExtensionType.RenegotiationInfo);
+            message.WriteByte(0u);
+            EndTlsExtension(message, renegotiationAt);
+
+            nuint ticketAt = BeginTlsExtension(message, TlsExtensionType.SessionTicket);
+            EndTlsExtension(message, ticketAt);
+        }
 
         List<String> protocols = _options.ApplicationProtocols;
         if (protocols.Count > 0u)
@@ -265,10 +319,13 @@ internal sealed class TlsClientHandshake
         }
 
         // psk_dhe_ke, so that a server sends tickets for a later resumption.
-        nuint modesAt = BeginTlsExtension(message, TlsExtensionType.PskKeyExchangeModes);
-        message.WriteByte(1u);
-        message.WriteByte(1u);
-        EndTlsExtension(message, modesAt);
+        if (_offersTls13)
+        {
+            nuint modesAt = BeginTlsExtension(message, TlsExtensionType.PskKeyExchangeModes);
+            message.WriteByte(1u);
+            message.WriteByte(1u);
+            EndTlsExtension(message, modesAt);
+        }
 
         if (_retried && _offered._hasCookie)
         {
@@ -292,8 +349,20 @@ internal sealed class TlsClientHandshake
         if (!read.Ok)
             return read.Error;
         byte[] message = read.Value;
+
+        // A HelloRequest is passed over while a handshake is under way (RFC
+        // 5246 §7.4.1.1).
+        while ((TlsHandshakeType)message[0u] == TlsHandshakeType.HelloRequest && _offersTls12)
+        {
+            read = _connection.ReadTlsHandshakeMessage();
+            if (!read.Ok)
+                return read.Error;
+            message = read.Value;
+        }
         if ((TlsHandshakeType)message[0u] != TlsHandshakeType.ServerHello)
             return TlsError.UnexpectedMessage;
+        if (!HasTlsSupportedVersionsExtension(message))
+            return ReadTls12ServerHello(message);
 
         var reader = new TlsReader(message, 4u, message.Length - 4u);
         uint legacyVersion = reader.ReadUInt16();
@@ -361,19 +430,16 @@ internal sealed class TlsClientHandshake
         }
 
         if (!hasVersion)
-        {
-            // A server that chose TLS 1.2 or older. TLS 1.2 plugs in here;
-            // until it does, the one thing to check is a downgrade.
-            if (AreTlsBytesEqual(random[24u:][:7u], CreateTlsDowngradeSentinel()))
-                return TlsError.IllegalParameter;
-            return TlsError.ProtocolVersion;
-        }
+            return TlsError.InternalError;
         if (selectedVersion != TlsVersion13 || legacyVersion != TlsLegacyVersion)
             return TlsError.IllegalParameter;
         if (!AreTlsBytesEqual(sessionId, _offered._sessionId))
             return TlsError.IllegalParameter;
-        if (!_offered._cipherSuites.Contains(suite) || compression != 0u)
+        if (!_offered._cipherSuites.Contains(suite) || compression != 0u ||
+            !IsTls13CipherSuite((TlsCipherSuite)(ushort)suite))
+        {
             return TlsError.IllegalParameter;
+        }
         if (_retried && suite != _retrySuite)
             return TlsError.IllegalParameter;
         if (!hasShare)
@@ -424,6 +490,26 @@ internal sealed class TlsClientHandshake
             return reading.Error;
         _connection._records.InstallTlsReadCipher(reading.Value);
         return TlsError.None;
+    }
+
+    /// A ServerHello that chose TLS 1.2 or older. A client that offered TLS
+    /// 1.3 first looks for the downgrade sentinel (RFC 8446 §4.1.3), which is
+    /// the only defence against a machine in the middle that stripped TLS
+    /// 1.3 from the ClientHello.
+    private TlsError ReadTls12ServerHello(byte[] message)
+    {
+        if (message.Length >= 4u + 2u + 32u && _offersTls13)
+        {
+            ReadOnlySpan<byte> random = message[6u:][:32u];
+            if (AreTlsBytesEqual(random[24u:][:7u], CreateTlsDowngradeSentinel()))
+                return TlsError.IllegalParameter;
+        }
+        if (!_offersTls12 || _retried)
+            return TlsError.ProtocolVersion;
+
+        var legacy = new Tls12ClientHandshake(_connection, _options, _transcript, _offered);
+        _tls12 = legacy;
+        return legacy.ReadTls12ServerHello(message);
     }
 
     /// Answers a HelloRetryRequest with a second ClientHello: one share, in
@@ -761,6 +847,41 @@ internal sealed class TlsClientHandshake
 }
 
 // ------------------------------------------------ messages both sides share
+
+/// Whether `suites` holds one of TLS 1.3's suites, or else one of TLS 1.2's.
+internal bool HasTlsSuiteForVersion(List<TlsCipherSuite> suites, bool tls13)
+{
+    for (nuint i = 0u; i < suites.Count; i++)
+    {
+        if (tls13 ? IsTls13CipherSuite(suites[i]) : IsTls12CipherSuite(suites[i]))
+            return true;
+    }
+    return false;
+}
+
+/// Whether a hello message holds supported_versions, which is what makes a
+/// ServerHello TLS 1.3's. A message too short to say answers false, and is
+/// refused by the reader it then goes to.
+internal bool HasTlsSupportedVersionsExtension(byte[] message)
+{
+    var reader = new TlsReader(message, 4u, message.Length - 4u);
+    reader.ReadUInt16();
+    reader.ReadSpan(32u);
+    reader.ReadVector(1u, 0u, 32u);
+    reader.ReadUInt16();
+    reader.ReadByte();
+    if (reader.Failed || reader.IsAtEnd)
+        return false;
+    TlsReader extensions = reader.ReadVector(2u, 0u, 65535u);
+    while (!extensions.IsAtEnd && !extensions.Failed)
+    {
+        uint type = extensions.ReadUInt16();
+        extensions.ReadVector(2u, 0u, 65535u);
+        if (!extensions.Failed && type == (uint)TlsExtensionType.SupportedVersions)
+            return true;
+    }
+    return false;
+}
 
 /// Reads a Certificate message into its chain of DER certificates.
 ///

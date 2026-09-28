@@ -24,12 +24,14 @@ module Standard.Net.Security;
 /// Receives each session ticket a server sends after the handshake.
 public closure void TlsSessionTicketHandler(TlsSessionTicket ticket);
 
-/// A session ticket (RFC 8446 §4.6.1), and the pre-shared key it stands for.
+/// A session ticket (RFC 8446 §4.6.1, or RFC 5077 in TLS 1.2), and the key
+/// it stands for.
 ///
 /// Nothing here resumes a session yet. A cache can keep these now, and
 /// resumption will offer them back.
 public sealed class TlsSessionTicket
 {
+    private TlsProtocolVersion _protocol;
     private TlsCipherSuite _cipherSuite;
     private String _targetHost;
     private uint _lifetime;
@@ -39,10 +41,11 @@ public sealed class TlsSessionTicket
     private byte[] _resumptionKey;
     private uint _maxEarlyDataSize;
 
-    internal TlsSessionTicket(TlsCipherSuite cipherSuite, String targetHost, uint lifetime,
-                              uint ageAdd, byte[] nonce, byte[] ticket, byte[] resumptionKey,
-                              uint maxEarlyDataSize)
+    internal TlsSessionTicket(TlsProtocolVersion protocol, TlsCipherSuite cipherSuite,
+                              String targetHost, uint lifetime, uint ageAdd, byte[] nonce,
+                              byte[] ticket, byte[] resumptionKey, uint maxEarlyDataSize)
     {
+        _protocol = protocol;
         _cipherSuite = cipherSuite;
         _targetHost = targetHost;
         _lifetime = lifetime;
@@ -53,6 +56,10 @@ public sealed class TlsSessionTicket
         _maxEarlyDataSize = maxEarlyDataSize;
     }
 
+    /// The version of the connection that issued it, which a resumption
+    /// MUST use.
+    public TlsProtocolVersion Protocol => _protocol;
+
     /// The suite of the connection that issued it, whose hash a resumption
     /// MUST use.
     public TlsCipherSuite CipherSuite => _cipherSuite;
@@ -60,20 +67,23 @@ public sealed class TlsSessionTicket
     /// The name the connection was made to.
     public String TargetHost => _targetHost;
 
-    /// How many seconds the server will honour it for, at most a week.
+    /// How many seconds the server will honour it for, at most a week. In
+    /// TLS 1.2 it is the server's hint, and zero means it gave none.
     public uint Lifetime => _lifetime;
 
-    /// What obscures the ticket's age when it is offered back.
+    /// What obscures the ticket's age when it is offered back. Zero in TLS
+    /// 1.2.
     public uint AgeAdd => _ageAdd;
 
-    /// The per-ticket value the key is derived with.
+    /// The per-ticket value the key is derived with. Empty in TLS 1.2.
     public byte[] Nonce => _nonce;
 
     /// The server's opaque label for the session.
     public byte[] Ticket => _ticket;
 
     /// The pre-shared key: HKDF-Expand-Label of the resumption master secret
-    /// over the nonce. **A secret**, and to be kept as one.
+    /// over the nonce, or in TLS 1.2 the master secret itself. **A secret**,
+    /// and to be kept as one.
     public byte[] ResumptionKey => _resumptionKey;
 
     /// How much 0-RTT data the server would take, or zero. 0-RTT is never

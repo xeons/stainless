@@ -56,7 +56,8 @@ internal sealed class TlsRecordCipher
 
     /// The TLS 1.3 protection `suite` names under `key` and `iv`.
     internal static Result<TlsRecordCipher, TlsError> Create(
-        TlsCipherSuite suite, byte[] key, byte[] iv) => CreateTlsRecordCipher(suite, key, iv, false);
+        TlsCipherSuite suite, byte[] key, byte[] iv) =>
+        CreateTlsRecordCipher(suite, key, iv, false);
 
     /// The TLS 1.2 protection `suite` names under `key` and `iv`, which is 4
     /// bytes of salt for AES-GCM and 12 for ChaCha20.
@@ -221,8 +222,9 @@ internal sealed class TlsRecordCipher
         var type = (TlsContentType)input[at];
         nuint cipherLength = bodyLength - _explicitNonceLength - TlsAeadTagSize;
         byte[] additional = BuildTls12AdditionalData(type, cipherLength);
-        ReadOnlySpan<byte> ciphertext = input[body + _explicitNonceLength:][:cipherLength];
-        ReadOnlySpan<byte> tag = input[body + _explicitNonceLength + cipherLength:][:TlsAeadTagSize];
+        nuint cipherAt = body + _explicitNonceLength;
+        ReadOnlySpan<byte> ciphertext = input[cipherAt:][:cipherLength];
+        ReadOnlySpan<byte> tag = input[cipherAt + cipherLength:][:TlsAeadTagSize];
 
         Result<byte[], CryptoError> opened = Fail(CryptoError.Parameter);
         var gcm = _aesGcm;

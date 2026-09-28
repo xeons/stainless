@@ -45,6 +45,12 @@ internal sealed class TlsTranscript
     internal byte[] ComputeTlsTranscriptHash(TlsKeySchedule schedule) =>
         schedule.HashTlsBytes(_messages.Written);
 
+    internal byte[] ComputeTls12TranscriptHash(Tls12KeySchedule schedule) =>
+        schedule.HashTlsBytes(_messages.Written);
+
+    /// The messages themselves, which a TLS 1.2 CertificateVerify signs.
+    internal ReadOnlySpan<byte> Messages => _messages.Written;
+
     /// Replaces the first ClientHello with the synthetic `message_hash`
     /// message that stands for it after a HelloRetryRequest.
     internal void ReplaceWithTlsMessageHash(TlsKeySchedule schedule)

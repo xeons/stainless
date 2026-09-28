@@ -43,15 +43,19 @@ public sealed class TlsClientOptions
     /// ALPN protocol names to offer, most preferred first. Empty offers none.
     public List<String> ApplicationProtocols { get; set; } = new List<String>();
 
-    /// Which versions may be negotiated. TLS 1.2 is accepted here and not yet
-    /// implemented, so only a TLS 1.3 server is reached.
+    /// Which versions may be offered. A server that has TLS 1.3 gets it; one
+    /// that has only TLS 1.2 gets that, and MUST negotiate the extended
+    /// master secret. A version is offered only when `CipherSuites` holds a
+    /// suite of it.
     public TlsProtocolVersion EnabledProtocols { get; set; } =
         TlsProtocolVersion.Tls12 | TlsProtocolVersion.Tls13;
 
-    /// Suites to offer, most preferred first.
+    /// Suites to offer, most preferred first, of either version: each
+    /// version's suites are offered only when that version is.
     public List<TlsCipherSuite> CipherSuites { get; set; } = CreateDefaultTlsCipherSuites();
 
-    /// Groups to offer for the key exchange, most preferred first.
+    /// Groups to offer for the key exchange, most preferred first. In TLS 1.2
+    /// the server picks one of them for its ServerKeyExchange.
     public List<TlsNamedGroup> KeyExchangeGroups { get; set; } = CreateDefaultTlsGroups();
 
     /// Groups to send a key share for in the first ClientHello. Each MUST be
@@ -73,8 +77,9 @@ public sealed class TlsClientOptions
     /// The key of the client's leaf certificate.
     public TlsSigningKey? ClientPrivateKey { get; set; }
 
-    /// Given each session ticket the server sends. Resumption is not
-    /// implemented yet; this is where a cache would collect them.
+    /// Given each session ticket the server sends, in either version.
+    /// Resumption is not implemented yet; this is where a cache would
+    /// collect them.
     public TlsSessionTicketHandler SessionTicketReceived { get; set; } = DiscardTlsSessionTicket;
 
     /// Whether `Close` leaves the stream underneath open.
