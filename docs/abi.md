@@ -248,6 +248,9 @@ offset 24  +----------------------+
 
 A class reference is a pointer to **offset 0** (the header). The header is
 three pointer-width words: 24 bytes on a 64-bit target and 12 on a 32-bit one.
+A field is aligned by its offset in the object, as though the header were the
+first member of a C struct, so an eight-aligned field on a 32-bit target sits
+at 16 and not at 12.
 It is `SlObject` in `runtime/stainless.h`, whose three fields are two `size_t`
 and a pointer, so both halves move together. `TypeInfo` is a static, per-class constant — with
 one exception, on Windows only, noted under `base` below:

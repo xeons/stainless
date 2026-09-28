@@ -113,7 +113,13 @@ public sealed partial class Binder
             return;
         }
 
-        int offset = 0, alignment = 1;
+        // A class's fields follow the object header, and a field is aligned by
+        // where it sits in the object rather than in the fields alone: the
+        // header is three words, which is not a multiple of eight on a 32-bit
+        // target or of sixteen on a 64-bit one. Offsets are still stored from
+        // the end of the header.
+        int start = type is ClassTypeSymbol ? ClassTypeSymbol.HeaderSize : 0;
+        int offset = start, alignment = 1;
 
         // A derived class's fields begin where its base's end, so the base
         // subobject is a prefix of the derived one and starts at the same
@@ -122,7 +128,7 @@ public sealed partial class Binder
         if (type is ClassTypeSymbol { BaseClass: { } inheritedFrom })
         {
             ComputeLayout(inheritedFrom, inProgress);
-            offset = inheritedFrom.FieldsSize;
+            offset = start + inheritedFrom.FieldsSize;
             alignment = Math.Max(alignment, inheritedFrom.FieldsAlignment);
         }
 
@@ -134,7 +140,7 @@ public sealed partial class Binder
             // before it ended, and the type asks nothing of its own address.
             int fieldAlignment = type.IsPacked ? 1 : Math.Max(1, field.Type.Alignment);
             offset = TypeExtensions.AlignTo(offset, fieldAlignment);
-            field.Offset = offset;
+            field.Offset = offset - start;
             offset += field.Type.Size;
             alignment = Math.Max(alignment, fieldAlignment);
         }
@@ -152,7 +158,7 @@ public sealed partial class Binder
         // its own padding. C++ and Rust settle it the same way.
         int size = type is StructTypeSymbol && type.Fields.Count == 0
             ? 1
-            : TypeExtensions.AlignTo(offset, alignment);
+            : TypeExtensions.AlignTo(offset, alignment) - start;
 
         type.SetLayout(size, alignment);
         inProgress.Remove(type);
