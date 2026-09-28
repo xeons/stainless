@@ -126,13 +126,12 @@ public sealed class ChaCha20
         state[14u] = ReadLittleWord(nonceBytes, 4u);
         state[15u] = ReadLittleWord(nonceBytes, 8u);
 
-        uint[] working = new uint[16u];
         byte[] keystream = new byte[BlockSize];
         byte[] output = new byte[input.Length];
 
         for (nuint at = 0u; at < input.Length; at += BlockSize)
         {
-            ComputeBlock(state, working, keystream);
+            ComputeBlock(state, keystream);
             state[12u]++;
 
             nuint span = input.Length - at;
@@ -144,48 +143,123 @@ public sealed class ChaCha20
         }
 
         for (nuint i = 0u; i < 16u; i++)
-        {
             state[i] = 0u;
-            working[i] = 0u;
-        }
+
         CryptographicOperations.ZeroMemory(keystream);
         return output;
     }
 
     /// Twenty rounds over `state`, added back to it, serialized little-endian
-    /// into `into`. `working` is scratch of sixteen words.
-    static void ComputeBlock(uint[] state, uint[] working, byte[] into)
+    /// into `into`. The words are locals so they can live in registers.
+    static void ComputeBlock(uint[] state, byte[] into)
     {
-        for (nuint i = 0u; i < 16u; i++)
-            working[i] = state[i];
+        uint x0 = state[0u];
+        uint x1 = state[1u];
+        uint x2 = state[2u];
+        uint x3 = state[3u];
+        uint x4 = state[4u];
+        uint x5 = state[5u];
+        uint x6 = state[6u];
+        uint x7 = state[7u];
+        uint x8 = state[8u];
+        uint x9 = state[9u];
+        uint x10 = state[10u];
+        uint x11 = state[11u];
+        uint x12 = state[12u];
+        uint x13 = state[13u];
+        uint x14 = state[14u];
+        uint x15 = state[15u];
 
         for (nuint round = 0u; round < 10u; round++)
         {
-            MixQuarter(working, 0u, 4u, 8u, 12u);
-            MixQuarter(working, 1u, 5u, 9u, 13u);
-            MixQuarter(working, 2u, 6u, 10u, 14u);
-            MixQuarter(working, 3u, 7u, 11u, 15u);
+            x0 += x4;
+            x12 = RotateLeft(x12 ^ x0, 16);
+            x8 += x12;
+            x4 = RotateLeft(x4 ^ x8, 12);
+            x0 += x4;
+            x12 = RotateLeft(x12 ^ x0, 8);
+            x8 += x12;
+            x4 = RotateLeft(x4 ^ x8, 7);
 
-            MixQuarter(working, 0u, 5u, 10u, 15u);
-            MixQuarter(working, 1u, 6u, 11u, 12u);
-            MixQuarter(working, 2u, 7u, 8u, 13u);
-            MixQuarter(working, 3u, 4u, 9u, 14u);
+            x1 += x5;
+            x13 = RotateLeft(x13 ^ x1, 16);
+            x9 += x13;
+            x5 = RotateLeft(x5 ^ x9, 12);
+            x1 += x5;
+            x13 = RotateLeft(x13 ^ x1, 8);
+            x9 += x13;
+            x5 = RotateLeft(x5 ^ x9, 7);
+
+            x2 += x6;
+            x14 = RotateLeft(x14 ^ x2, 16);
+            x10 += x14;
+            x6 = RotateLeft(x6 ^ x10, 12);
+            x2 += x6;
+            x14 = RotateLeft(x14 ^ x2, 8);
+            x10 += x14;
+            x6 = RotateLeft(x6 ^ x10, 7);
+
+            x3 += x7;
+            x15 = RotateLeft(x15 ^ x3, 16);
+            x11 += x15;
+            x7 = RotateLeft(x7 ^ x11, 12);
+            x3 += x7;
+            x15 = RotateLeft(x15 ^ x3, 8);
+            x11 += x15;
+            x7 = RotateLeft(x7 ^ x11, 7);
+
+            x0 += x5;
+            x15 = RotateLeft(x15 ^ x0, 16);
+            x10 += x15;
+            x5 = RotateLeft(x5 ^ x10, 12);
+            x0 += x5;
+            x15 = RotateLeft(x15 ^ x0, 8);
+            x10 += x15;
+            x5 = RotateLeft(x5 ^ x10, 7);
+
+            x1 += x6;
+            x12 = RotateLeft(x12 ^ x1, 16);
+            x11 += x12;
+            x6 = RotateLeft(x6 ^ x11, 12);
+            x1 += x6;
+            x12 = RotateLeft(x12 ^ x1, 8);
+            x11 += x12;
+            x6 = RotateLeft(x6 ^ x11, 7);
+
+            x2 += x7;
+            x13 = RotateLeft(x13 ^ x2, 16);
+            x8 += x13;
+            x7 = RotateLeft(x7 ^ x8, 12);
+            x2 += x7;
+            x13 = RotateLeft(x13 ^ x2, 8);
+            x8 += x13;
+            x7 = RotateLeft(x7 ^ x8, 7);
+
+            x3 += x4;
+            x14 = RotateLeft(x14 ^ x3, 16);
+            x9 += x14;
+            x4 = RotateLeft(x4 ^ x9, 12);
+            x3 += x4;
+            x14 = RotateLeft(x14 ^ x3, 8);
+            x9 += x14;
+            x4 = RotateLeft(x4 ^ x9, 7);
         }
 
-        for (nuint i = 0u; i < 16u; i++)
-            WriteLittleWord(into, i * 4u, working[i] + state[i]);
-    }
-
-    /// The quarter round of RFC 8439 §2.1, on four words of `x`.
-    static void MixQuarter(uint[] x, nuint a, nuint b, nuint c, nuint d)
-    {
-        x[a] += x[b];
-        x[d] = RotateLeft(x[d] ^ x[a], 16);
-        x[c] += x[d];
-        x[b] = RotateLeft(x[b] ^ x[c], 12);
-        x[a] += x[b];
-        x[d] = RotateLeft(x[d] ^ x[a], 8);
-        x[c] += x[d];
-        x[b] = RotateLeft(x[b] ^ x[c], 7);
+        WriteLittleWord(into, 0u, x0 + state[0u]);
+        WriteLittleWord(into, 4u, x1 + state[1u]);
+        WriteLittleWord(into, 8u, x2 + state[2u]);
+        WriteLittleWord(into, 12u, x3 + state[3u]);
+        WriteLittleWord(into, 16u, x4 + state[4u]);
+        WriteLittleWord(into, 20u, x5 + state[5u]);
+        WriteLittleWord(into, 24u, x6 + state[6u]);
+        WriteLittleWord(into, 28u, x7 + state[7u]);
+        WriteLittleWord(into, 32u, x8 + state[8u]);
+        WriteLittleWord(into, 36u, x9 + state[9u]);
+        WriteLittleWord(into, 40u, x10 + state[10u]);
+        WriteLittleWord(into, 44u, x11 + state[11u]);
+        WriteLittleWord(into, 48u, x12 + state[12u]);
+        WriteLittleWord(into, 52u, x13 + state[13u]);
+        WriteLittleWord(into, 56u, x14 + state[14u]);
+        WriteLittleWord(into, 60u, x15 + state[15u]);
     }
 }

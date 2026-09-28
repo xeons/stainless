@@ -98,7 +98,8 @@ public sealed class Poly1305
     /// @param key      thirty-two bytes, used for this message only
     /// @param message  what to authenticate
     /// @failure CryptoError.KeyLength  `key` is not 32 bytes
-    public static Result<byte[], CryptoError> ComputeTag(ReadOnlySpan<byte> key, ReadOnlySpan<byte> message)
+    public static Result<byte[], CryptoError> ComputeTag(ReadOnlySpan<byte> key,
+                                                         ReadOnlySpan<byte> message)
     {
         if (key.Length != KeySize)
             return Fail(CryptoError.KeyLength);

@@ -1557,7 +1557,7 @@ void AppendData(ReadOnlySpan<byte> data)
 
 Adds bytes to what is being authenticated.
 
-<sub>[stdlib/Security/Cryptography/Poly1305.sl:112](../../stdlib/Security/Cryptography/Poly1305.sl#L112)</sub>
+<sub>[stdlib/Security/Cryptography/Poly1305.sl:113](../../stdlib/Security/Cryptography/Poly1305.sl#L113)</sub>
 
 #### GetTag *method*
 
@@ -1568,7 +1568,7 @@ byte[] GetTag()
 The tag of everything appended. **The key is erased**, so the object
 MUST NOT be used afterwards: it has done the one thing it may do.
 
-<sub>[stdlib/Security/Cryptography/Poly1305.sl:128](../../stdlib/Security/Cryptography/Poly1305.sl#L128)</sub>
+<sub>[stdlib/Security/Cryptography/Poly1305.sl:129](../../stdlib/Security/Cryptography/Poly1305.sl#L129)</sub>
 
 ### RandomNumberGenerator *class*
 
