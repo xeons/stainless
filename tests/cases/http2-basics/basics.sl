@@ -7,10 +7,12 @@ module Http2Basics;
 
 import Standard.Collections;
 import Standard.Console;
+import Standard.Net;
 import Standard.Net.Http;
 import Standard.Net.Security;
 import Standard.Security.Cryptography;
 import Standard.Text;
+import Standard.Threading;
 import Standard.Time;
 
 [Embed("ed25519.crt.pem")] static readonly byte[] ServerCertificate;
@@ -276,6 +278,36 @@ int Main()
     ShowMatrix(fallback, refusing.Origin);
     fallback.Dispose();
 
+    Console.WriteLine("-- Expect: 100-continue");
+    var expecting = CreateVersioned(HttpMethod.Post, secure.Origin + "/echo", HttpVersion.Version20,
+                                    HttpVersionPolicy.RequestVersionExact);
+    expecting.Headers.ExpectContinue = true;
+    expecting.Content = new StringContent("after the go-ahead");
+    SendAndShow("POST expecting 100", client, expecting);
+    Console.WriteLine("  the server said 100 first: " + Text.FromBool(secure.HasLogged("sent 100")));
+
+    Console.WriteLine("-- through a proxy");
+    TunnelProxy? tunnelStarted = TunnelProxy.StartTunnelling();
+    if (tunnelStarted == null)
+        return 1;
+    TunnelProxy tunnel = tunnelStarted;
+    var proxiedHandler = new HttpClientHandler();
+    proxiedHandler.ServerCertificateCustomValidationCallback =
+        HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+    proxiedHandler.Proxy = new WebProxy(tunnel.Origin);
+    var proxied = new HttpClient(proxiedHandler);
+    proxied.Timeout = TimeSpan.FromSeconds(8);
+    SendAndShow("https in a CONNECT tunnel", proxied,
+                CreateVersioned(HttpMethod.Get, secure.Origin + "/version", HttpVersion.Version20,
+                                HttpVersionPolicy.RequestVersionExact));
+    SendAndShow("http in absolute form, 2.0 required", proxied,
+                CreateVersioned(HttpMethod.Get, plain.Origin + "/version", HttpVersion.Version20,
+                                HttpVersionPolicy.RequestVersionExact));
+    proxied.Dispose();
+    tunnel.StopTunnelling();
+    foreach (var line in tunnel.Log)
+        Console.WriteLine("  the proxy saw: " + line);
+
     Console.WriteLine("-- the default is HTTP/1.1, as .NET's is");
     HttpClient defaults = CreateTrustingClient();
     ShowResponse("GET with no version set", defaults.Get(secure.Origin + "/version"), new HttpFailure());
@@ -286,6 +318,131 @@ int Main()
     plain.StopServing();
     refusing.StopServing();
     return 0;
+}
+
+/// A proxy that does nothing but CONNECT: it reads the request head, dials
+/// the target, says 200, and copies both ways until either end stops.
+class TunnelProxy
+{
+    private TcpListener _listener;
+    private AtomicBool _stopping = new AtomicBool(false);
+    private Mutex<int> _lock = new Mutex<int>(0);
+    private List<TcpClient> _sockets = new List<TcpClient>();
+    private List<Thread> _threads = new List<Thread>();
+    private Thread? _acceptor;
+    public List<String> Log = new List<String>();
+
+    private TunnelProxy(TcpListener listener) => _listener = listener;
+
+    public static TunnelProxy? StartTunnelling()
+    {
+        var listening = TcpListener.Listen("127.0.0.1", 0u);
+        if (!listening.Ok)
+            return null;
+        var proxy = new TunnelProxy(listening.Value);
+        proxy._acceptor = new Thread(() => proxy.AcceptTunnels());
+        return proxy;
+    }
+
+    public String Origin => "http://127.0.0.1:" + Text.FromInteger((long)_listener.LocalEndPoint.Port);
+
+    public void StopTunnelling()
+    {
+        _stopping.Write(true);
+        if (_acceptor is Thread acceptor)
+            acceptor.Join();
+        {
+            var held = _lock.Enter();
+            foreach (var socket in _sockets)
+                socket.Underlying.Shutdown(SocketShutdown.Both);
+        }
+        foreach (var thread in _threads)
+            thread.Join();
+        foreach (var socket in _sockets)
+            socket.Close();
+        _listener.Close();
+    }
+
+    private void AcceptTunnels()
+    {
+        while (!this._stopping.Read())
+        {
+            if (!this._listener.Pending(10))
+                continue;
+            TcpClient client = this._listener.Accept();
+            this.KeepSocket(client);
+            this._threads.Add(new Thread(() => this.ServeTunnel(client)));
+        }
+    }
+
+    private void KeepSocket(TcpClient socket)
+    {
+        var held = this._lock.Enter();
+        this._sockets.Add(socket);
+    }
+
+    private void ServeTunnel(TcpClient client)
+    {
+        var head = new StringBuilder();
+        var one = new byte[1u];
+        while (!head.ToText().EndsWith("\r\n\r\n"))
+        {
+            if (client.Read(one, 0u, 1u) == 0u)
+                return;
+            head.AppendByte(one[0u]);
+        }
+        String[] words = head.ToText().Split(' ');
+        if (words.Length < 2u || words[0u] != "CONNECT")
+            return;
+        String target = words[1u];
+        {
+            var held = this._lock.Enter();
+            this.Log.Add("CONNECT to the TLS server");
+        }
+        String[] parts = target.Split(':');
+        if (parts.Length != 2u)
+            return;
+        var dialled = TcpClient.Connect(parts[0u], ParsePort(parts[1u]));
+        if (!dialled.Ok)
+            return;
+        TcpClient server = dialled.Value;
+        this.KeepSocket(server);
+        client.SendText("HTTP/1.1 200 Connection Established\r\n\r\n");
+        var upstream = new Thread(() => CopyTunnel(client, server));
+        CopyTunnel(server, client);
+        upstream.Join();
+    }
+}
+
+ushort ParsePort(String text)
+{
+    uint value = 0u;
+    for (nuint i = 0u; i < text.ByteLength(); i++)
+        value = value * 10u + (uint)(text.GetByteAt(i) - (byte)'0');
+    return (ushort)value;
+}
+
+/// Copies `from` into `to` until `from` ends, then ends `to`.
+void CopyTunnel(TcpClient from, TcpClient to)
+{
+    var block = new byte[16384u];
+    while (true)
+    {
+        nuint got = from.Read(block, 0u, block.Length);
+        if (got == 0u)
+            break;
+        nuint at = 0u;
+        while (at < got)
+        {
+            nuint wrote = to.Write(block, at, got - at);
+            if (wrote == 0u)
+                break;
+            at += wrote;
+        }
+        if (at < got)
+            break;
+    }
+    to.Underlying.Shutdown(SocketShutdown.Send);
 }
 
 HttpRequestMessage CreateEchoRequest(String origin)

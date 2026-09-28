@@ -686,7 +686,17 @@ internal void AcceptHttp2TestHeaders(Http2TestPeer peer, uint id, Http2Buffer bl
     peer.Record.NoteHttp2TestEvent(peer.Label + ": stream " + Text.FromInteger((long)id) + " " +
                                    request.Method + " " + request.Path);
     if (endStream)
+    {
         DispatchHttp2TestRequest(peer, stream);
+    }
+    else if (request.GetField("expect") == "100-continue")
+    {
+        var interim = new List<String>();
+        interim.Add(":status");
+        interim.Add("100");
+        WriteHttp2TestHeaders(peer, id, interim, false);
+        peer.Record.NoteHttp2TestEvent(peer.Label + ": stream " + Text.FromInteger((long)id) + " sent 100");
+    }
 }
 
 internal void AcceptHttp2TestData(Http2TestPeer peer, Http2Frame frame)

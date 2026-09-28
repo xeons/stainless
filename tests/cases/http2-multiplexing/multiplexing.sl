@@ -51,6 +51,11 @@ Http2TestReply RouteStreams(Http2TestRequest request, Scene scene)
 {
     String where = "conn " + Text.FromInteger((long)request.Connection) + ", stream " +
                    Text.FromInteger((long)request.Stream);
+    if (request.Path.StartsWith("/together/"))
+    {
+        return Http2TestReply.CreateText(200, request.Path + " on conn " + Text.FromInteger((long)request.Connection))
+                             .WaitUntil(() => scene.StreamsSeen >= 3, 5000);
+    }
     if (request.Path.StartsWith("/hold/"))
     {
         return Http2TestReply.CreateText(200, request.Path + " on conn " + Text.FromInteger((long)request.Connection))
@@ -175,6 +180,28 @@ void ShowSerialised(String origin, Http2TestServer server)
     client.Dispose();
 }
 
+void ShowMultipleConnections(String origin, Http2TestServer server)
+{
+    Console.WriteLine("-- MAX_CONCURRENT_STREAMS 1, with EnableMultipleHttp2Connections");
+    HttpClient client = CreateHttp2Client(1048576, TimeSpan.FromSeconds(8));
+    client.Handler.EnableMultipleHttp2Connections = true;
+    var results = new String[3u];
+    var threads = new List<Thread>();
+    for (nuint i = 0u; i < 3u; i++)
+    {
+        nuint index = i;
+        threads.Add(new Thread(() => results[index] = FetchText(client, origin + "/together/" +
+                                                                 Text.FromInteger((long)index))));
+    }
+    foreach (var thread in threads)
+        thread.Join();
+    for (nuint i = 0u; i < 3u; i++)
+        Console.WriteLine("  thread " + Text.FromInteger((long)i) + ": " + (results[i].StartsWith("200 /together/")
+                                                                            ? "200, together" : results[i]));
+    Console.WriteLine("connections: " + Text.FromInteger((long)server.Accepts));
+    client.Dispose();
+}
+
 void ShowGoAway(String origin, Http2TestServer server)
 {
     Console.WriteLine("-- GOAWAY with a request unprocessed");
@@ -281,10 +308,10 @@ int Main()
 
     var scenes = new List<Scene>();
     var servers = new List<Http2TestServer>();
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i < 7; i++)
     {
         var scene = new Scene();
-        Http2TestServer? started = StartScene(scene, tls, i == 1 ? 1u : 0u, i == 0);
+        Http2TestServer? started = StartScene(scene, tls, i == 1 || i == 6 ? 1u : 0u, i == 0);
         if (started == null)
             return 1;
         scenes.Add(scene);
@@ -293,6 +320,7 @@ int Main()
 
     ShowConcurrent(servers[0u].Origin, servers[0u]);
     ShowSerialised(servers[1u].Origin, servers[1u]);
+    ShowMultipleConnections(servers[6u].Origin, servers[6u]);
     ShowGoAway(servers[2u].Origin, servers[2u]);
     ShowResets(servers[3u].Origin, servers[3u]);
     ShowTimeout(servers[4u].Origin, servers[4u]);

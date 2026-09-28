@@ -14,6 +14,11 @@ PING answered: true
   thread 2: 200 slow on conn 1
 connections: 1
 streams open at once, at most: 1
+-- MAX_CONCURRENT_STREAMS 1, with EnableMultipleHttp2Connections
+  thread 0: 200, together
+  thread 1: 200, together
+  thread 2: 200, together
+connections: 3
 -- GOAWAY with a request unprocessed
   the first request: 200 first on conn 1, stream 1
   the second, sent again: 200 POST a POST on conn 2, stream 1
