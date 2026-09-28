@@ -558,8 +558,8 @@ public class PropertyGrid : Panel
                 break;
 
             case GridRowKind.Text:
-                if (FindLive() != null)
-                    SetText((byte*)((WindowedControl)FindLive()), row.Reflected, typed);
+                if (FindLive() is WindowedControl live)
+                    SetText((byte*)live, row.Reflected, typed);
                 designer.StoreComponentProperty(component, row.Name, FormValue.FromText(typed));
                 break;
 
@@ -587,7 +587,8 @@ public class PropertyGrid : Panel
                     Message("'" + typed + "' is not a number.");
                     break;
                 }
-                SetDouble((byte*)((WindowedControl)FindLive()), row.Reflected, read.Value);
+                if (FindLive() is WindowedControl live)
+                    SetDouble((byte*)live, row.Reflected, read.Value);
                 designer.StoreComponentProperty(component, row.Name, FormValue.FromName(typed.Trim()));
                 break;
             }
