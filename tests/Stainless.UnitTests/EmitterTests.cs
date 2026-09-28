@@ -157,6 +157,26 @@ public class EmitterTests
     }
 
     /// <summary>
+    /// A conditional over values that run no code runs none itself, so storing
+    /// one into an element needs no hold on the array while it is found. A
+    /// hold there was a retain and a release per store, in the loop where
+    /// such a store usually is.
+    /// </summary>
+    [Fact]
+    public void StoringAConditionalHoldsNothing()
+    {
+        string body = Front.TestFunction(
+            Front.ModuleIr(
+                """
+                public class Holder { public int[] Items; public Holder() { Items = new int[4]; } }
+                public void F(Holder h, int x) { h.Items[0] = x > 0 ? x : -1; }
+                """),
+            "F");
+
+        Assert.DoesNotContain("call void @sl_retain(", body);
+    }
+
+    /// <summary>
     /// A null or a String literal has nothing to count, so storing one costs
     /// no retain.
     /// </summary>

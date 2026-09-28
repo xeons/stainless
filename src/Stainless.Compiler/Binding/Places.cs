@@ -151,6 +151,8 @@ internal sealed class Places(Func<string, TypeSymbol, LocalSymbol> newLocal)
         BoundConversion conversion => IsRepeatable(conversion.Operand),
         BoundUnary unary => IsRepeatable(unary.Operand),
         BoundBinary binary => IsRepeatable(binary.Left) && IsRepeatable(binary.Right),
+        BoundConditional chosen => IsRepeatable(chosen.Condition) && IsRepeatable(chosen.WhenTrue) &&
+                                   IsRepeatable(chosen.WhenFalse),
         _ => false,
     };
 }
