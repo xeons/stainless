@@ -153,7 +153,8 @@ internal sealed class Http2ResponseBody : IHttpBodyStream
     private bool _finished = false;
     private HttpError _httpError = HttpError.None;
 
-    internal Http2ResponseBody(Http2Connection connection, Http2Stream stream, HttpExchange exchange,
+    internal Http2ResponseBody(Http2Connection connection, Http2Stream stream,
+                               HttpExchange exchange,
                                HttpResponseHeaders trailers)
     {
         _connection = connection;
@@ -180,7 +181,8 @@ internal sealed class Http2ResponseBody : IHttpBodyStream
             return 0u;
         if (offset > buffer.Length || count > buffer.Length - offset)
             return 0u;
-        nuint got = _connection.Multiplexer.ReadHttp2Body(_stream, _exchange, buffer, offset, count);
+        nuint got = _connection.Multiplexer.ReadHttp2Body(_stream, _exchange, buffer, offset,
+                                                          count);
         if (got > 0u)
             return got;
 
@@ -234,7 +236,8 @@ internal sealed class Http2RequestBody : IStream
     private HttpExchange _exchange;
     private bool _failed = false;
 
-    internal Http2RequestBody(Http2Multiplexer multiplexer, Http2Stream stream, HttpExchange exchange)
+    internal Http2RequestBody(Http2Multiplexer multiplexer, Http2Stream stream,
+                              HttpExchange exchange)
     {
         _multiplexer = multiplexer;
         _stream = stream;

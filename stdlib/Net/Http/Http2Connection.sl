@@ -101,7 +101,8 @@ internal sealed class Http2Connection : IHttpConnection
         if (exchange.Deadline.HasExpired)
         {
             _multiplexer.CancelHttp2Reservation();
-            return Fail(failure.RecordHttpFailure(HttpError.Timeout, "the request timed out before it was sent"));
+            return Fail(failure.RecordHttpFailure(HttpError.Timeout,
+                                                  "the request timed out before it was sent"));
         }
 
         HttpContent? content = request.Content;
@@ -125,13 +126,15 @@ internal sealed class Http2Connection : IHttpConnection
     /// Sends the body, after waiting for 100 (Continue) when asked to. A body
     /// cut short by the stream's end is not a failure here: the response, or
     /// the stream's own failure, says what happened.
-    private HttpError SendHttp2RequestBody(HttpWireRequest request, HttpContent content, Http2Stream stream,
+    private HttpError SendHttp2RequestBody(HttpWireRequest request, HttpContent content,
+                                           Http2Stream stream,
                                            HttpExchange exchange)
     {
         HttpFailure failure = exchange.Failure;
         if (request.ExpectContinue)
         {
-            _multiplexer.WaitForHttp2Continue(stream, ComputeHttpContinueMilliseconds(exchange.Deadline));
+            _multiplexer.WaitForHttp2Continue(stream,
+                                              ComputeHttpContinueMilliseconds(exchange.Deadline));
             if (_multiplexer.HasHttp2FinalHead(stream))
                 return HttpError.None;
         }
@@ -148,7 +151,8 @@ internal sealed class Http2Connection : IHttpConnection
         }
         if (!request.IsChunked && request.DeclaredLength != counted.CountedBytes)
         {
-            _multiplexer.CancelHttp2Stream(stream, "the request content was not the length it declared");
+            _multiplexer.CancelHttp2Stream(stream,
+                                           "the request content was not the length it declared");
             return failure.RecordHttpFailure(HttpError.ContentFailure,
                 "the request content was not the length it declared");
         }
@@ -194,8 +198,8 @@ internal sealed class Http2Connection : IHttpConnection
 /// be: the preface, SETTINGS, the reader thread, and the wait for the peer's
 /// SETTINGS.
 internal Result<IHttpConnection, HttpError> StartHttp2Connection(
-    String key, TcpClient tcp, IStream stream, TlsStream? tls, HttpClientHandler handler, HttpExchange exchange,
-    HttpConnectionPool pool)
+    String key, TcpClient tcp, IStream stream, TlsStream? tls, HttpClientHandler handler,
+    HttpExchange exchange, HttpConnectionPool pool)
 {
     HttpFailure failure = exchange.Failure;
     long window = (long)handler.InitialHttp2StreamWindowSize;
@@ -203,7 +207,8 @@ internal Result<IHttpConnection, HttpError> StartHttp2Connection(
         window = Http2DefaultWindowSize;
     if (window > Http2MaxWindowSize)
         window = Http2MaxWindowSize;
-    var multiplexer = new Http2Multiplexer(key, tcp, stream, tls, pool, window, exchange.MaxHeaderBytes);
+    var multiplexer = new Http2Multiplexer(key, tcp, stream, tls, pool, window,
+                                           exchange.MaxHeaderBytes);
 
     ApplyHttpSocketDeadline(tcp, exchange.Deadline);
     if (!multiplexer.SendHttp2Preface())
@@ -212,7 +217,10 @@ internal Result<IHttpConnection, HttpError> StartHttp2Connection(
         multiplexer.CloseHttp2Transport();
         failure.SocketErrorCode = socketError;
         if (exchange.Deadline.HasExpired || socketError == SocketError.TimedOut)
-            return Fail(failure.RecordHttpFailure(HttpError.Timeout, "the request timed out sending the HTTP/2 preface"));
+        {
+            return Fail(failure.RecordHttpFailure(HttpError.Timeout,
+                "the request timed out sending the HTTP/2 preface"));
+        }
         return Fail(failure.RecordHttpFailure(HttpError.ConnectionClosed,
             "the connection closed before the HTTP/2 preface was sent"));
     }
@@ -353,7 +361,8 @@ internal String CheckHttp2Field(String name, String value)
 
 /// A response's head: exactly one `:status` of three digits, before every
 /// other field, and no other pseudo-header. Empty, or what is wrong.
-internal String ParseHttp2ResponseHead(List<HpackField> fields, HttpWireHeaders head, out int status)
+internal String ParseHttp2ResponseHead(List<HpackField> fields, HttpWireHeaders head,
+                                       out int status)
 {
     status = 0;
     bool regular = false;

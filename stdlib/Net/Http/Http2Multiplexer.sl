@@ -151,7 +151,8 @@ internal sealed threadsafe class Http2Multiplexer
         settings.Add((uint)Http2Setting.MaxHeaderListSize);
         settings.Add((uint)_maxHeaderListSize);
         WriteHttp2Settings(output, settings);
-        WriteHttp2WindowUpdate(output, 0u, (uint)(Http2ConnectionReceiveWindow - Http2DefaultWindowSize));
+        WriteHttp2WindowUpdate(output, 0u,
+                               (uint)(Http2ConnectionReceiveWindow - Http2DefaultWindowSize));
         {
             var held = _state.Enter();
             _receiveWindow = Http2ConnectionReceiveWindow;
@@ -290,7 +291,8 @@ internal sealed threadsafe class Http2Multiplexer
     /// Sends `count` bytes of a request body as DATA, waiting for window
     /// where there is none. False when the stream or the connection failed,
     /// or the deadline ran out, which the stream then records.
-    internal bool WriteHttp2Body(Http2Stream stream, HttpExchange exchange, byte[] buffer, nuint offset,
+    internal bool WriteHttp2Body(Http2Stream stream, HttpExchange exchange, byte[] buffer,
+                                 nuint offset,
                                  nuint count)
     {
         nuint done = 0u;
@@ -318,7 +320,7 @@ internal sealed threadsafe class Http2Multiplexer
                     }
                     if (!WaitForHttp2Change(held, exchange.Deadline))
                     {
-                        ResetHttp2StreamLocked(stream, (uint)Http2ErrorCode.Cancel, HttpError.Timeout,
+                        ResetHttp2StreamLocked(stream, Http2ErrorCode.Cancel, HttpError.Timeout,
                                                "the request timed out waiting to send its body");
                         timedOut = true;
                         break;
@@ -369,7 +371,8 @@ internal sealed threadsafe class Http2Multiplexer
     {
         var deadline = new HttpDeadline(TimeSpan.FromMilliseconds((long)milliseconds));
         var held = _state.Enter();
-        while (!stream.HasContinue && !stream.HasFinalHead && stream.Error == HttpError.None && !stream.IsReset)
+        while (!stream.HasContinue && !stream.HasFinalHead && stream.Error == HttpError.None
+               && !stream.IsReset)
         {
             if (!WaitForHttp2Change(held, deadline))
                 return;
@@ -393,7 +396,7 @@ internal sealed threadsafe class Http2Multiplexer
             {
                 if (!WaitForHttp2Change(held, exchange.Deadline))
                 {
-                    ResetHttp2StreamLocked(stream, (uint)Http2ErrorCode.Cancel, HttpError.Timeout,
+                    ResetHttp2StreamLocked(stream, Http2ErrorCode.Cancel, HttpError.Timeout,
                                            "the request timed out waiting for the response");
                     break;
                 }
@@ -429,17 +432,19 @@ internal sealed threadsafe class Http2Multiplexer
 
     /// Up to `count` bytes of the body, waiting for some. Zero at the end,
     /// on a failure, or when the deadline runs out.
-    internal nuint ReadHttp2Body(Http2Stream stream, HttpExchange exchange, byte[] buffer, nuint offset,
+    internal nuint ReadHttp2Body(Http2Stream stream, HttpExchange exchange, byte[] buffer,
+                                 nuint offset,
                                  nuint count)
     {
         nuint got = 0u;
         {
             var held = _state.Enter();
-            while (stream.BufferedBytes == 0u && !stream.RemoteClosed && stream.Error == HttpError.None)
+            while (stream.BufferedBytes == 0u && !stream.RemoteClosed
+                   && stream.Error == HttpError.None)
             {
                 if (!WaitForHttp2Change(held, exchange.Deadline))
                 {
-                    ResetHttp2StreamLocked(stream, (uint)Http2ErrorCode.Cancel, HttpError.Timeout,
+                    ResetHttp2StreamLocked(stream, Http2ErrorCode.Cancel, HttpError.Timeout,
                                            "the request timed out while the body was being read");
                     break;
                 }
@@ -457,7 +462,8 @@ internal sealed threadsafe class Http2Multiplexer
     /// The body has been read to its end, or failed: what it ended with,
     /// the trailers copied out, and the stream reset if this end had not
     /// finished sending.
-    internal HttpError FinishHttp2Body(Http2Stream stream, HttpExchange exchange, HttpResponseHeaders trailers)
+    internal HttpError FinishHttp2Body(Http2Stream stream, HttpExchange exchange,
+                                       HttpResponseHeaders trailers)
     {
         HttpError error = HttpError.None;
         {
@@ -476,7 +482,7 @@ internal sealed threadsafe class Http2Multiplexer
             }
             if (!stream.IsReleased && !stream.LocalClosed)
             {
-                ResetHttp2StreamLocked(stream, (uint)Http2ErrorCode.Cancel, HttpError.None,
+                ResetHttp2StreamLocked(stream, Http2ErrorCode.Cancel, HttpError.None,
                                        "the request body was not sent");
             }
         }
@@ -493,7 +499,8 @@ internal sealed threadsafe class Http2Multiplexer
             var held = _state.Enter();
             if (!stream.IsReleased)
             {
-                ResetHttp2StreamLocked(stream, (uint)Http2ErrorCode.Cancel, HttpError.ConnectionClosed, message);
+                ResetHttp2StreamLocked(stream, Http2ErrorCode.Cancel, HttpError.ConnectionClosed,
+                                       message);
             }
             else
             {
@@ -584,7 +591,8 @@ internal sealed threadsafe class Http2Multiplexer
     {
         while (true)
         {
-            Http2ReadStatus status = _frames.ReadHttp2Frame(Http2DefaultMaxFrameSize, out Http2Frame? read);
+            Http2ReadStatus status = _frames.ReadHttp2Frame(Http2DefaultMaxFrameSize,
+                                                            out Http2Frame? read);
             if (status == Http2ReadStatus.EndOfStream || status == Http2ReadStatus.Failed)
             {
                 EndHttp2ConnectionOnRead(status);
@@ -592,7 +600,8 @@ internal sealed threadsafe class Http2Multiplexer
             }
             if (status == Http2ReadStatus.TooLarge)
             {
-                FailHttp2Connection(Http2ErrorCode.FrameSizeError, "a frame was larger than SETTINGS_MAX_FRAME_SIZE");
+                FailHttp2Connection(Http2ErrorCode.FrameSizeError,
+                                    "a frame was larger than SETTINGS_MAX_FRAME_SIZE");
                 break;
             }
             var frame = (Http2Frame)read;
@@ -618,7 +627,8 @@ internal sealed threadsafe class Http2Multiplexer
         }
         if (status == Http2ReadStatus.EndOfStream)
         {
-            EndHttp2Connection(HttpError.ConnectionClosed, "the server closed the HTTP/2 connection", 0u);
+            EndHttp2Connection(HttpError.ConnectionClosed,
+                               "the server closed the HTTP/2 connection", 0u);
             return;
         }
         if (_tls is TlsStream tls)
@@ -626,7 +636,8 @@ internal sealed threadsafe class Http2Multiplexer
             TlsError tlsError = tls.TlsErrorCode;
             if (tlsError != TlsError.None && tlsError != TlsError.Io && tlsError != TlsError.Closed)
             {
-                EndHttp2Connection(HttpError.TlsFailure, DescribeTlsError(tlsError) + " on the HTTP/2 connection", 0u);
+                EndHttp2Connection(HttpError.TlsFailure, DescribeTlsError(tlsError)
+                                   + " on the HTTP/2 connection", 0u);
                 return;
             }
         }
@@ -638,7 +649,8 @@ internal sealed threadsafe class Http2Multiplexer
     {
         if (_headerStreamId != 0u &&
             (frame.Type != Http2FrameType.Continuation || frame.StreamId != _headerStreamId))
-            return FailHttp2Connection(Http2ErrorCode.ProtocolError, "a header block was interrupted");
+            return FailHttp2Connection(Http2ErrorCode.ProtocolError,
+                                       "a header block was interrupted");
 
         bool settled = true;
         {
@@ -646,7 +658,8 @@ internal sealed threadsafe class Http2Multiplexer
             settled = _settingsReceived;
         }
         if (!settled && (frame.Type != Http2FrameType.Settings || frame.HasFlag(Http2FlagAck)))
-            return FailHttp2Connection(Http2ErrorCode.ProtocolError, "the server's first frame was not SETTINGS");
+            return FailHttp2Connection(Http2ErrorCode.ProtocolError,
+                                       "the server's first frame was not SETTINGS");
 
         switch (frame.Type)
         {
@@ -656,7 +669,8 @@ internal sealed threadsafe class Http2Multiplexer
             case Http2FrameType.RstStream: return ProcessHttp2RstStream(frame);
             case Http2FrameType.Settings: return ProcessHttp2Settings(frame);
             case Http2FrameType.PushPromise:
-                return FailHttp2Connection(Http2ErrorCode.ProtocolError, "the server sent PUSH_PROMISE with push disabled");
+                return FailHttp2Connection(Http2ErrorCode.ProtocolError,
+                                           "the server sent PUSH_PROMISE with push disabled");
             case Http2FrameType.Ping: return ProcessHttp2Ping(frame);
             case Http2FrameType.GoAway: return ProcessHttp2GoAway(frame);
             case Http2FrameType.WindowUpdate: return ProcessHttp2WindowUpdate(frame);
@@ -738,7 +752,8 @@ internal sealed threadsafe class Http2Multiplexer
         return CheckHttp2Problem(problem, code);
     }
 
-    private String ApplyHttp2DataLocked(Http2Frame frame, nuint from, nuint length, out Http2ErrorCode code)
+    private String ApplyHttp2DataLocked(Http2Frame frame, nuint from, nuint length,
+                                        out Http2ErrorCode code)
     {
         code = Http2ErrorCode.NoError;
         long size = (long)frame.Length;
@@ -749,7 +764,8 @@ internal sealed threadsafe class Http2Multiplexer
         }
         _receiveWindow -= size;
 
-        Http2Stream? found = FindHttp2FrameStreamLocked(frame.StreamId, "DATA", out String problem, out code);
+        Http2Stream? found = FindHttp2FrameStreamLocked(frame.StreamId, "DATA", out String problem,
+                                                        out code);
         if (found == null)
         {
             CreditHttp2ConnectionLocked(size);
@@ -760,20 +776,21 @@ internal sealed threadsafe class Http2Multiplexer
         if (stream.RemoteClosed)
         {
             CreditHttp2ConnectionLocked(size);
-            ResetHttp2StreamLocked(stream, (uint)Http2ErrorCode.StreamClosed, HttpError.None, "DATA after END_STREAM");
+            ResetHttp2StreamLocked(stream, Http2ErrorCode.StreamClosed, HttpError.None,
+                                   "DATA after END_STREAM");
             return "";
         }
         if (!stream.HasFinalHead)
         {
             CreditHttp2ConnectionLocked(size);
-            ResetHttp2StreamLocked(stream, (uint)Http2ErrorCode.ProtocolError, HttpError.InvalidResponse,
+            ResetHttp2StreamLocked(stream, Http2ErrorCode.ProtocolError, HttpError.InvalidResponse,
                                    "the response sent DATA before its head");
             return "";
         }
         if (size > stream.ReceiveWindow)
         {
             CreditHttp2ConnectionLocked(size);
-            ResetHttp2StreamLocked(stream, (uint)Http2ErrorCode.FlowControlError, HttpError.ProtocolError,
+            ResetHttp2StreamLocked(stream, Http2ErrorCode.FlowControlError, HttpError.ProtocolError,
                                    "the server sent DATA past the stream's window");
             return "";
         }
@@ -790,6 +807,11 @@ internal sealed threadsafe class Http2Multiplexer
             {
                 CreditHttp2WindowsLocked(stream, (long)length);
             }
+            else if (length == frame.Length)
+            {
+                stream.Chunks.Enqueue(frame.Payload);
+                stream.BufferedBytes += length;
+            }
             else
             {
                 var chunk = new byte[length];
@@ -798,9 +820,10 @@ internal sealed threadsafe class Http2Multiplexer
                 stream.BufferedBytes += length;
             }
         }
-        if (stream.DeclaredLength >= 0 && !stream.IsHeadRequest && stream.ReceivedLength > stream.DeclaredLength)
+        if (stream.DeclaredLength >= 0 && !stream.IsHeadRequest
+            && stream.ReceivedLength > stream.DeclaredLength)
         {
-            ResetHttp2StreamLocked(stream, (uint)Http2ErrorCode.ProtocolError, HttpError.InvalidResponse,
+            ResetHttp2StreamLocked(stream, Http2ErrorCode.ProtocolError, HttpError.InvalidResponse,
                                    "the response's body was longer than its content-length");
             return "";
         }
@@ -815,13 +838,15 @@ internal sealed threadsafe class Http2Multiplexer
     {
         stream.RemoteClosed = true;
         bool bodyExpected = !stream.IsHeadRequest && stream.Status != 304 && stream.Status != 204;
-        if (bodyExpected && stream.DeclaredLength >= 0 && stream.ReceivedLength != stream.DeclaredLength)
+        if (bodyExpected && stream.DeclaredLength >= 0
+            && stream.ReceivedLength != stream.DeclaredLength)
         {
             String message = "the response's body was not the length its content-length declared";
             stream.FailHttp2Stream(HttpError.InvalidResponse, message, 0u);
             if (!stream.LocalClosed)
             {
-                ResetHttp2StreamLocked(stream, (uint)Http2ErrorCode.ProtocolError, HttpError.InvalidResponse,
+                ResetHttp2StreamLocked(stream, Http2ErrorCode.ProtocolError,
+                                       HttpError.InvalidResponse,
                                        message);
                 return;
             }
@@ -836,11 +861,13 @@ internal sealed threadsafe class Http2Multiplexer
         if (id == 0u)
             return FailHttp2Connection(Http2ErrorCode.ProtocolError, "HEADERS on stream 0");
         if (!RemoveHttp2Padding(frame, 0u, out nuint from, out nuint length))
-            return FailHttp2Connection(Http2ErrorCode.ProtocolError, "HEADERS padded past its length");
+            return FailHttp2Connection(Http2ErrorCode.ProtocolError,
+                                       "HEADERS padded past its length");
         if (frame.HasFlag(Http2FlagPriority))
         {
             if (length < 5u)
-                return FailHttp2Connection(Http2ErrorCode.FrameSizeError, "HEADERS too short for its priority");
+                return FailHttp2Connection(Http2ErrorCode.FrameSizeError,
+                                           "HEADERS too short for its priority");
             from += 5u;
             length -= 5u;
         }
@@ -858,7 +885,8 @@ internal sealed threadsafe class Http2Multiplexer
     private bool ProcessHttp2Continuation(Http2Frame frame)
     {
         if (_headerStreamId == 0u)
-            return FailHttp2Connection(Http2ErrorCode.ProtocolError, "CONTINUATION with no header block open");
+            return FailHttp2Connection(Http2ErrorCode.ProtocolError,
+                                       "CONTINUATION with no header block open");
         _headerBlock.WriteArray(frame.Payload, 0u, frame.Length);
         if (_headerBlock.Length > Http2MaxHeaderBlockLength)
             return FailHttp2Connection(Http2ErrorCode.EnhanceYourCalm, "a header block past 1 MiB");
@@ -874,9 +902,11 @@ internal sealed threadsafe class Http2Multiplexer
     private bool CompleteHttp2HeaderBlock(uint id)
     {
         var fields = new List<HpackField>();
-        HpackStatus decoded = _decoder.DecodeHpackHeaderBlock(_headerBlock.Storage, 0u, _headerBlock.Length, fields);
+        HpackStatus decoded = _decoder.DecodeHpackHeaderBlock(_headerBlock.Storage, 0u,
+                                                              _headerBlock.Length, fields);
         if (decoded == HpackStatus.Malformed)
-            return FailHttp2Connection(Http2ErrorCode.CompressionError, "a header block could not be decoded");
+            return FailHttp2Connection(Http2ErrorCode.CompressionError,
+                                       "a header block could not be decoded");
         String problem = "";
         Http2ErrorCode code = Http2ErrorCode.NoError;
         {
@@ -887,23 +917,26 @@ internal sealed threadsafe class Http2Multiplexer
         return CheckHttp2Problem(problem, code);
     }
 
-    private String ApplyHttp2HeaderBlockLocked(uint id, List<HpackField> fields, HpackStatus decoded,
+    private String ApplyHttp2HeaderBlockLocked(uint id, List<HpackField> fields,
+                                               HpackStatus decoded,
                                                out Http2ErrorCode code)
     {
-        Http2Stream? found = FindHttp2FrameStreamLocked(id, "HEADERS", out String problem, out code);
+        Http2Stream? found = FindHttp2FrameStreamLocked(id, "HEADERS", out String problem,
+                                                        out code);
         if (found == null)
             return problem;
         Http2Stream stream = found;
         stream.HasHeardFromPeer = true;
         if (stream.RemoteClosed)
         {
-            ResetHttp2StreamLocked(stream, (uint)Http2ErrorCode.StreamClosed, HttpError.None, "HEADERS after END_STREAM");
+            ResetHttp2StreamLocked(stream, Http2ErrorCode.StreamClosed, HttpError.None,
+                                   "HEADERS after END_STREAM");
             return "";
         }
         if (decoded == HpackStatus.TooLarge)
         {
-            ResetHttp2StreamLocked(stream, (uint)Http2ErrorCode.Cancel, HttpError.ResponseTooLarge,
-                                   "the response's fields came to more than MaxResponseHeadersLength");
+            ResetHttp2StreamLocked(stream, Http2ErrorCode.Cancel, HttpError.ResponseTooLarge,
+                                   "the response's fields were past MaxResponseHeadersLength");
             return "";
         }
 
@@ -920,7 +953,8 @@ internal sealed threadsafe class Http2Multiplexer
                 malformed = ReadHttp2ContentLength(head, out declared);
             if (!malformed.IsEmpty)
             {
-                ResetHttp2StreamLocked(stream, (uint)Http2ErrorCode.ProtocolError, HttpError.InvalidResponse,
+                ResetHttp2StreamLocked(stream, Http2ErrorCode.ProtocolError,
+                                       HttpError.InvalidResponse,
                                        malformed);
                 return "";
             }
@@ -943,7 +977,8 @@ internal sealed threadsafe class Http2Multiplexer
                 malformed = "trailers did not end the stream";
             if (!malformed.IsEmpty)
             {
-                ResetHttp2StreamLocked(stream, (uint)Http2ErrorCode.ProtocolError, HttpError.InvalidResponse,
+                ResetHttp2StreamLocked(stream, Http2ErrorCode.ProtocolError,
+                                       HttpError.InvalidResponse,
                                        malformed);
                 return "";
             }
@@ -964,7 +999,7 @@ internal sealed threadsafe class Http2Multiplexer
         Http2Stream? found = FindHttp2StreamLocked(frame.StreamId);
         if (found != null)
         {
-            ResetHttp2StreamLocked(found, (uint)Http2ErrorCode.FrameSizeError, HttpError.ProtocolError,
+            ResetHttp2StreamLocked(found, Http2ErrorCode.FrameSizeError, HttpError.ProtocolError,
                                    "a PRIORITY frame was not five octets");
             held.PulseAll();
         }
@@ -976,7 +1011,8 @@ internal sealed threadsafe class Http2Multiplexer
         if (frame.StreamId == 0u)
             return FailHttp2Connection(Http2ErrorCode.ProtocolError, "RST_STREAM on stream 0");
         if (frame.Length != 4u)
-            return FailHttp2Connection(Http2ErrorCode.FrameSizeError, "RST_STREAM was not four octets");
+            return FailHttp2Connection(Http2ErrorCode.FrameSizeError,
+                                       "RST_STREAM was not four octets");
         String problem = "";
         Http2ErrorCode code = Http2ErrorCode.NoError;
         {
@@ -1004,13 +1040,14 @@ internal sealed threadsafe class Http2Multiplexer
         if (reason == (uint)Http2ErrorCode.RefusedStream && !stream.HasFinalHead)
         {
             stream.IsUnprocessed = true;
-            stream.FailHttp2Stream(HttpError.ConnectionClosed, "the server refused the stream (REFUSED_STREAM)",
+            stream.FailHttp2Stream(HttpError.ConnectionClosed,
+                                   "the server refused the stream (REFUSED_STREAM)",
                                    reason);
         }
         else if (reason != (uint)Http2ErrorCode.NoError || !stream.RemoteClosed)
         {
-            stream.FailHttp2Stream(HttpError.ProtocolError,
-                                   "the server reset the stream with " + DescribeHttp2ErrorCode(reason), reason);
+            String message = "the server reset the stream with " + DescribeHttp2ErrorCode(reason);
+            stream.FailHttp2Stream(HttpError.ProtocolError, message, reason);
         }
         ReleaseHttp2StreamLocked(stream);
         if (stream.Error != HttpError.None)
@@ -1025,11 +1062,13 @@ internal sealed threadsafe class Http2Multiplexer
         if (frame.HasFlag(Http2FlagAck))
         {
             if (frame.Length != 0u)
-                return FailHttp2Connection(Http2ErrorCode.FrameSizeError, "a SETTINGS acknowledgement with a payload");
+                return FailHttp2Connection(Http2ErrorCode.FrameSizeError,
+                                           "a SETTINGS acknowledgement with a payload");
             return true;
         }
         if (frame.Length % 6u != 0u)
-            return FailHttp2Connection(Http2ErrorCode.FrameSizeError, "SETTINGS not a multiple of six octets");
+            return FailHttp2Connection(Http2ErrorCode.FrameSizeError,
+                                       "SETTINGS not a multiple of six octets");
         String problem = "";
         Http2ErrorCode code = Http2ErrorCode.NoError;
         {
@@ -1084,7 +1123,8 @@ internal sealed threadsafe class Http2Multiplexer
                     break;
                 }
                 case 5u:
-                    if ((nuint)value < Http2DefaultMaxFrameSize || (nuint)value > Http2MaxAllowedFrameSize)
+                    if ((nuint)value < Http2DefaultMaxFrameSize
+                        || (nuint)value > Http2MaxAllowedFrameSize)
                     {
                         code = Http2ErrorCode.ProtocolError;
                         return "MAX_FRAME_SIZE out of range";
@@ -1121,7 +1161,8 @@ internal sealed threadsafe class Http2Multiplexer
         if (frame.StreamId != 0u)
             return FailHttp2Connection(Http2ErrorCode.ProtocolError, "GOAWAY on a stream");
         if (frame.Length < 8u)
-            return FailHttp2Connection(Http2ErrorCode.FrameSizeError, "GOAWAY shorter than eight octets");
+            return FailHttp2Connection(Http2ErrorCode.FrameSizeError,
+                                       "GOAWAY shorter than eight octets");
         uint lastStreamId = frame.ReadHttp2Word(0u) & Http2MaxStreamId;
         uint code = frame.ReadHttp2Word(4u);
 
@@ -1139,7 +1180,7 @@ internal sealed threadsafe class Http2Multiplexer
                     continue;
                 stream.IsUnprocessed = true;
                 stream.FailHttp2Stream(HttpError.ConnectionClosed,
-                                       "the server sent GOAWAY before it processed the request", 0u);
+                                       "the server sent GOAWAY before processing the request", 0u);
                 stream.IsReset = true;
                 ReleaseHttp2StreamLocked(stream);
             }
@@ -1154,13 +1195,14 @@ internal sealed threadsafe class Http2Multiplexer
     private bool ProcessHttp2WindowUpdate(Http2Frame frame)
     {
         if (frame.Length != 4u)
-            return FailHttp2Connection(Http2ErrorCode.FrameSizeError, "WINDOW_UPDATE was not four octets");
+            return FailHttp2Connection(Http2ErrorCode.FrameSizeError,
+                                       "WINDOW_UPDATE was not four octets");
         String problem = "";
         Http2ErrorCode code = Http2ErrorCode.NoError;
+        long increment = (long)(frame.ReadHttp2Word(0u) & Http2MaxStreamId);
         {
             var held = _state.Enter();
-            problem = ApplyHttp2WindowUpdateLocked(frame.StreamId, (long)(frame.ReadHttp2Word(0u) & Http2MaxStreamId),
-                                                   out code);
+            problem = ApplyHttp2WindowUpdateLocked(frame.StreamId, increment, out code);
             held.PulseAll();
         }
         return CheckHttp2Problem(problem, code);
@@ -1196,14 +1238,14 @@ internal sealed threadsafe class Http2Multiplexer
         Http2Stream stream = found;
         if (increment == 0)
         {
-            ResetHttp2StreamLocked(stream, (uint)Http2ErrorCode.ProtocolError, HttpError.ProtocolError,
+            ResetHttp2StreamLocked(stream, Http2ErrorCode.ProtocolError, HttpError.ProtocolError,
                                    "the server sent a WINDOW_UPDATE of zero");
             return "";
         }
         stream.SendWindow += increment;
         if (stream.SendWindow > Http2MaxWindowSize)
         {
-            ResetHttp2StreamLocked(stream, (uint)Http2ErrorCode.FlowControlError, HttpError.ProtocolError,
+            ResetHttp2StreamLocked(stream, Http2ErrorCode.FlowControlError, HttpError.ProtocolError,
                                    "the server took a stream's window past 2^31 - 1");
         }
         return "";
@@ -1231,7 +1273,8 @@ internal sealed threadsafe class Http2Multiplexer
             WriteHttp2GoAway(frame, lastStreamId, (uint)code, message);
             SendHttp2GoAwayPatiently(frame);
         }
-        EndHttp2Connection(HttpError.ProtocolError, "HTTP/2 " + DescribeHttp2ErrorCode((uint)code) + ": " + message,
+        EndHttp2Connection(HttpError.ProtocolError, "HTTP/2 "
+                           + DescribeHttp2ErrorCode((uint)code) + ": " + message,
                            (uint)code);
         return false;
     }
@@ -1294,12 +1337,14 @@ internal sealed threadsafe class Http2Multiplexer
         if (_endCode != 0u)
             failure.ProtocolErrorCode = (long)_endCode;
         HttpError error = _endError == HttpError.None ? HttpError.ConnectionClosed : _endError;
-        return failure.RecordHttpFailure(error, _endMessage.IsEmpty ? "the HTTP/2 connection closed" : _endMessage);
+        String message = _endMessage.IsEmpty ? "the HTTP/2 connection closed" : _endMessage;
+        return failure.RecordHttpFailure(error, message);
     }
 
     /// A write failed: the socket goes, and the reader ends every stream.
     private void FailHttp2Transport() =>
-        EndHttp2Connection(HttpError.ConnectionClosed, "the HTTP/2 connection failed while a request was sent", 0u);
+        EndHttp2Connection(HttpError.ConnectionClosed,
+                           "the HTTP/2 connection failed while a request was sent", 0u);
 
     // ------------------------------------------------------------ streams
 
@@ -1312,14 +1357,16 @@ internal sealed threadsafe class Http2Multiplexer
 
     /// Resets `stream` with `code` unless it is over already, failing it
     /// with `error` unless that is `None`, and gives back what it held.
-    private void ResetHttp2StreamLocked(Http2Stream stream, uint code, HttpError error, String message)
+    private void ResetHttp2StreamLocked(Http2Stream stream, Http2ErrorCode code, HttpError error,
+                                        String message)
     {
         if (error != HttpError.None)
-            stream.FailHttp2Stream(error, message, error == HttpError.ProtocolError ? code : 0u);
+            stream.FailHttp2Stream(error, message,
+                                   error == HttpError.ProtocolError ? (uint)code : 0u);
         if (!stream.IsReleased && stream.Id != 0u && !_ended)
         {
             var frame = new Http2Buffer(16u);
-            WriteHttp2RstStream(frame, stream.Id, code);
+            WriteHttp2RstStream(frame, stream.Id, (uint)code);
             _control.Add(frame.ToArray());
             _resetStreams.Add(stream.Id);
             if (_resetStreams.Count > Http2RememberedResets)
@@ -1356,7 +1403,8 @@ internal sealed threadsafe class Http2Multiplexer
     private void CreditHttp2WindowsLocked(Http2Stream stream, long count)
     {
         stream.UnacknowledgedBytes += count;
-        if (!stream.RemoteClosed && !stream.IsReset && stream.UnacknowledgedBytes >= _streamWindow / 2)
+        if (!stream.RemoteClosed && !stream.IsReset
+            && stream.UnacknowledgedBytes >= _streamWindow / 2)
         {
             var frame = new Http2Buffer(16u);
             WriteHttp2WindowUpdate(frame, stream.Id, (uint)stream.UnacknowledgedBytes);

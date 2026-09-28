@@ -134,7 +134,8 @@ internal sealed class HpackDecoder
     private HpackField? FindHpackIndexedField(ulong index)
     {
         if (index <= (ulong)HpackStaticTableLength)
-            return new HpackField(GetHpackStaticName((nuint)index), GetHpackStaticValue((nuint)index));
+            return new HpackField(GetHpackStaticName((nuint)index),
+                                  GetHpackStaticValue((nuint)index));
         ulong dynamic = index - (ulong)HpackStaticTableLength;
         if (dynamic > (ulong)_table.Count)
             return null;

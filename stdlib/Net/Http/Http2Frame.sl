@@ -279,7 +279,8 @@ internal sealed class Http2Buffer
     }
 
     /// Appends a frame header.
-    internal void WriteHttp2FrameHeader(nuint length, Http2FrameType type, uint flags, uint streamId)
+    internal void WriteHttp2FrameHeader(nuint length, Http2FrameType type, uint flags,
+                                        uint streamId)
     {
         WriteUInt24((uint)length);
         WriteByte((uint)type);
@@ -351,16 +352,19 @@ internal void WriteHttp2GoAway(Http2Buffer output, uint lastStreamId, uint code,
     output.WriteText(debug);
 }
 
-internal void WriteHttp2Data(Http2Buffer output, uint streamId, byte[] data, nuint offset, nuint count,
+internal void WriteHttp2Data(Http2Buffer output, uint streamId, byte[] data, nuint offset,
+                             nuint count,
                              bool endStream)
 {
-    output.WriteHttp2FrameHeader(count, Http2FrameType.Data, endStream ? Http2FlagEndStream : 0u, streamId);
+    output.WriteHttp2FrameHeader(count, Http2FrameType.Data, endStream ? Http2FlagEndStream : 0u,
+                                 streamId);
     output.WriteArray(data, offset, count);
 }
 
 /// Appends a header block as one HEADERS frame and as many CONTINUATION
 /// frames after it as `maxFrameSize` needs.
-internal void WriteHttp2HeaderBlock(Http2Buffer output, uint streamId, Http2Buffer block, bool endStream,
+internal void WriteHttp2HeaderBlock(Http2Buffer output, uint streamId, Http2Buffer block,
+                                    bool endStream,
                                     nuint maxFrameSize)
 {
     nuint total = block.Length;

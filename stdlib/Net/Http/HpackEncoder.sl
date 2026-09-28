@@ -110,7 +110,8 @@ internal sealed class HpackEncoder
 
     /// Appends one field as a literal represented as `indexing` says, its
     /// name by index where a table has it.
-    internal void EncodeHpackLiteral(Http2Buffer output, String name, String value, HpackIndexing indexing)
+    internal void EncodeHpackLiteral(Http2Buffer output, String name, String value,
+                                     HpackIndexing indexing)
     {
         nuint nameIndex = FindHpackStaticName(name);
         if (nameIndex == 0u)
