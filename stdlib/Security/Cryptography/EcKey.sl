@@ -100,11 +100,8 @@ sealed class EcKey
         {
             encoded = new byte[1u + 2u * size];
             encoded[0u] = 0x04;
-            for (nuint i = 0u; i < size; i++)
-            {
-                encoded[1u + i] = parameters.Q.X[i];
-                encoded[1u + size + i] = parameters.Q.Y[i];
-            }
+            parameters.Q.X[:size].CopyTo(encoded[1u:]);
+            parameters.Q.Y[:size].CopyTo(encoded[1u + size:]);
         }
 
         if (parameters.D.Length == 0u)
@@ -141,8 +138,7 @@ sealed class EcKey
             return Fail(CryptoError.InvalidKey);
 
         byte[] padded = new byte[size];
-        for (nuint i = 0u; i < scalar.Length; i++)
-            padded[size - scalar.Length + i] = scalar[i];
+        scalar.CopyTo(padded[size - scalar.Length:]);
         EcElement value = ReadEcElement(padded);
         CryptographicOperations.ZeroMemory(padded);
 

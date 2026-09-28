@@ -405,8 +405,7 @@ EcElement ReduceEcHashToScalar(ReadOnlySpan<byte> hash, ref EcDomain domain)
     nuint size = domain.Size;
     nuint take = hash.Length < size ? hash.Length : size;
     byte[] padded = new byte[size];
-    for (nuint i = 0u; i < take; i++)
-        padded[size - take + i] = hash[i];
+    hash[:take].CopyTo(padded[size - take:]);
     return ReduceEcElementOnce(ReadEcElement(padded), ref domain.Order);
 }
 
@@ -515,8 +514,7 @@ Optional<byte[]> DecodeDerEcSignature(ReadOnlySpan<byte> der, nuint size)
             return None;
 
         nuint end = (half + 1u) * size;
-        for (nuint i = 0u; i < magnitude.Length; i++)
-            fixedWidth[end - magnitude.Length + i] = magnitude[i];
+        magnitude.CopyTo(fixedWidth[end - magnitude.Length:]);
     }
 
     if (pair.VerifyEndOfData() != AsnError.None)
@@ -582,11 +580,9 @@ sealed class EcNonceGenerator
             while (filled < _size)
             {
                 _value = ComputeMac(_value);
-                for (nuint i = 0u; i < _value.Length && filled < _size; i++)
-                {
-                    candidate[filled] = _value[i];
-                    filled++;
-                }
+                nuint take = _size - filled < _value.Length ? _size - filled : _value.Length;
+                _value[:take].CopyTo(candidate[filled:]);
+                filled += take;
             }
 
             EcElement nonce = ReadEcElement(candidate);

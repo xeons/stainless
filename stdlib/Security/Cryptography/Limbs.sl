@@ -82,11 +82,8 @@ static class Limbs
 
     // ------------------------------------------------------------ moving
 
-    static void Copy(ulong* to, ulong* from, nuint count)
-    {
-        for (nuint i = 0u; i < count; i++)
-            to[i] = from[i];
-    }
+    static void Copy(ulong* to, ulong* from, nuint count) =>
+        memmove((byte*)to, (byte*)from, count * sizeof(ulong));
 
     static void Clear(ulong* to, nuint count)
     {

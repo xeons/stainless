@@ -3824,7 +3824,7 @@ zeros where the number is shorter. `Exponent` has none.
 
 **See also** &nbsp; [Rsa.Create](#create-method)
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:314](../../stdlib/Security/Cryptography/Rsa.sl#L314)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:308](../../stdlib/Security/Cryptography/Rsa.sl#L308)</sub>
 
 #### ExportRsaPublicKey *method*
 
@@ -3834,7 +3834,7 @@ byte[] ExportRsaPublicKey()
 
 The public key as a PKCS #1 `RSAPublicKey` (RFC 8017 §A.1.1), DER.
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:344](../../stdlib/Security/Cryptography/Rsa.sl#L344)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:338](../../stdlib/Security/Cryptography/Rsa.sl#L338)</sub>
 
 #### ExportRsaPrivateKey *method*
 
@@ -3848,7 +3848,7 @@ The private key as a PKCS #1 `RSAPrivateKey` (RFC 8017 §A.1.2), DER.
 
 - [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:354](../../stdlib/Security/Cryptography/Rsa.sl#L354)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:348](../../stdlib/Security/Cryptography/Rsa.sl#L348)</sub>
 
 #### ExportSubjectPublicKeyInfo *method*
 
@@ -3859,7 +3859,7 @@ byte[] ExportSubjectPublicKeyInfo()
 The public key as an X.509 `SubjectPublicKeyInfo` (RFC 5280 §4.1),
 DER: what a certificate carries and what `PUBLIC KEY` PEM holds.
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:366](../../stdlib/Security/Cryptography/Rsa.sl#L366)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:360](../../stdlib/Security/Cryptography/Rsa.sl#L360)</sub>
 
 #### ExportPkcs8PrivateKey *method*
 
@@ -3874,7 +3874,7 @@ DER: what `PRIVATE KEY` PEM holds.
 
 - [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:383](../../stdlib/Security/Cryptography/Rsa.sl#L383)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:377](../../stdlib/Security/Cryptography/Rsa.sl#L377)</sub>
 
 #### ImportRsaPublicKey *method*
 
@@ -3893,7 +3893,7 @@ A key from a PKCS #1 `RSAPublicKey`, DER.
 - [CryptoError.Encoding](#encoding-case) — `source` is not one `RSAPublicKey`
 - [CryptoError.InvalidKey](#invalidkey-case) — the numbers are not an RSA key
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:407](../../stdlib/Security/Cryptography/Rsa.sl#L407)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:401](../../stdlib/Security/Cryptography/Rsa.sl#L401)</sub>
 
 #### ImportRsaPrivateKey *method*
 
@@ -3913,7 +3913,7 @@ A key from a PKCS #1 `RSAPrivateKey`, DER.
 - [CryptoError.Unsupported](#unsupported-case) — a multi-prime key, version 1
 - [CryptoError.InvalidKey](#invalidkey-case) — the numbers are not a consistent RSA key
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:422](../../stdlib/Security/Cryptography/Rsa.sl#L422)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:416](../../stdlib/Security/Cryptography/Rsa.sl#L416)</sub>
 
 #### ImportSubjectPublicKeyInfo *method*
 
@@ -3932,7 +3932,7 @@ A key from an X.509 `SubjectPublicKeyInfo`, DER.
 - [CryptoError.Encoding](#encoding-case) — `source` is not one `SubjectPublicKeyInfo` holding an RSA key
 - [CryptoError.InvalidKey](#invalidkey-case) — the numbers are not an RSA key
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:437](../../stdlib/Security/Cryptography/Rsa.sl#L437)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:431](../../stdlib/Security/Cryptography/Rsa.sl#L431)</sub>
 
 #### ImportPkcs8PrivateKey *method*
 
@@ -3953,7 +3953,7 @@ passed over.
 - [CryptoError.Encoding](#encoding-case) — `source` is not one `PrivateKeyInfo` holding an RSA key
 - [CryptoError.InvalidKey](#invalidkey-case) — the numbers are not a consistent RSA key
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:461](../../stdlib/Security/Cryptography/Rsa.sl#L461)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:455](../../stdlib/Security/Cryptography/Rsa.sl#L455)</sub>
 
 #### ExportRsaPublicKeyPem *method*
 
@@ -3963,7 +3963,7 @@ String ExportRsaPublicKeyPem()
 
 The public key as PKCS #1 in PEM: `-----BEGIN RSA PUBLIC KEY-----`.
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:607](../../stdlib/Security/Cryptography/Rsa.sl#L607)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:601](../../stdlib/Security/Cryptography/Rsa.sl#L601)</sub>
 
 #### ExportRsaPrivateKeyPem *method*
 
@@ -3977,7 +3977,7 @@ The private key as PKCS #1 in PEM: `-----BEGIN RSA PRIVATE KEY-----`.
 
 - [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:613](../../stdlib/Security/Cryptography/Rsa.sl#L613)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:607](../../stdlib/Security/Cryptography/Rsa.sl#L607)</sub>
 
 #### ExportSubjectPublicKeyInfoPem *method*
 
@@ -3987,7 +3987,7 @@ String ExportSubjectPublicKeyInfoPem()
 
 The public key as X.509 in PEM: `-----BEGIN PUBLIC KEY-----`.
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:622](../../stdlib/Security/Cryptography/Rsa.sl#L622)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:616](../../stdlib/Security/Cryptography/Rsa.sl#L616)</sub>
 
 #### ExportPkcs8PrivateKeyPem *method*
 
@@ -4001,7 +4001,7 @@ The private key as PKCS #8 in PEM: `-----BEGIN PRIVATE KEY-----`.
 
 - [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:628](../../stdlib/Security/Cryptography/Rsa.sl#L628)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:622](../../stdlib/Security/Cryptography/Rsa.sl#L622)</sub>
 
 #### ImportFromPem *method*
 
@@ -4023,7 +4023,7 @@ of other kinds: `RSA PUBLIC KEY`, `RSA PRIVATE KEY`, `PUBLIC KEY` or
 - [CryptoError.Unsupported](#unsupported-case) — the block is an `ENCRYPTED PRIVATE KEY`
 - [CryptoError.InvalidKey](#invalidkey-case) — the numbers are not a consistent RSA key
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:645](../../stdlib/Security/Cryptography/Rsa.sl#L645)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:639](../../stdlib/Security/Cryptography/Rsa.sl#L639)</sub>
 
 #### SignData *method*
 
@@ -4048,7 +4048,7 @@ The signature of `data`'s hash.
 
 **See also** &nbsp; [Rsa.VerifyData](#verifydata-method)
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:742](../../stdlib/Security/Cryptography/Rsa.sl#L742)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:736](../../stdlib/Security/Cryptography/Rsa.sl#L736)</sub>
 
 #### SignHash *method*
 
@@ -4074,7 +4074,7 @@ The signature of a hash already computed.
 
 **See also** &nbsp; [Rsa.VerifyHash](#verifyhash-method)
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:762](../../stdlib/Security/Cryptography/Rsa.sl#L762)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:756](../../stdlib/Security/Cryptography/Rsa.sl#L756)</sub>
 
 #### VerifyData *method*
 
@@ -4096,7 +4096,7 @@ for another message is simply not valid, and an unknown hash is false.
 
 **See also** &nbsp; [Rsa.SignData](#signdata-method)
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:796](../../stdlib/Security/Cryptography/Rsa.sl#L796)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:790](../../stdlib/Security/Cryptography/Rsa.sl#L790)</sub>
 
 #### VerifyHash *method*
 
@@ -4114,7 +4114,7 @@ computed. Never fails, as `VerifyData` does not.
 - `hashAlgorithm` — the hash that made the digest
 - `padding` — the encoding the signer used
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:814](../../stdlib/Security/Cryptography/Rsa.sl#L814)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:808](../../stdlib/Security/Cryptography/Rsa.sl#L808)</sub>
 
 #### Encrypt *method*
 
@@ -4137,7 +4137,7 @@ Result<byte[], CryptoError> Encrypt(ReadOnlySpan<byte> data, RsaEncryptionPaddin
 
 **See also** &nbsp; [Rsa.Decrypt](#decrypt-method)
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:1005](../../stdlib/Security/Cryptography/Rsa.sl#L1005)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:993](../../stdlib/Security/Cryptography/Rsa.sl#L993)</sub>
 
 #### Decrypt *method*
 
@@ -4172,7 +4172,7 @@ treat what comes back as untrusted and check it by other means.
 
 **See also** &nbsp; [Rsa.Encrypt](#encrypt-method)
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:1090](../../stdlib/Security/Cryptography/Rsa.sl#L1090)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:1074](../../stdlib/Security/Cryptography/Rsa.sl#L1074)</sub>
 
 ### RsaEncryptionPadding *struct*
 

@@ -116,11 +116,5 @@ class RsaPrivateKey
         return result;
     }
 
-    static ulong[] CopyLimbs(ulong[] value)
-    {
-        ulong[] copy = new ulong[value.Length];
-        for (nuint i = 0u; i < value.Length; i++)
-            copy[i] = value[i];
-        return copy;
-    }
+    static ulong[] CopyLimbs(ulong[] value) => value[:].ToArray();
 }

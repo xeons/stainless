@@ -291,13 +291,7 @@ public sealed class Rsa
         return Limbs.MaskIfZero(difference);
     }
 
-    static ulong[] CopyNumber(ulong[] value)
-    {
-        ulong[] copy = new ulong[value.Length];
-        for (nuint i = 0u; i < value.Length; i++)
-            copy[i] = value[i];
-        return copy;
-    }
+    static ulong[] CopyNumber(ulong[] value) => value[:].ToArray();
 
     // ------------------------------------------------------------ parameters
 
@@ -851,10 +845,8 @@ public sealed class Rsa
         nuint separator = _modulusLength - length - 1u;
         for (nuint i = 2u; i < separator; i++)
             encoded[i] = 0xFF;
-        for (nuint i = 0u; i < prefix.Value.Length; i++)
-            encoded[separator + 1u + i] = prefix.Value[i];
-        for (nuint i = 0u; i < hash.Length; i++)
-            encoded[separator + 1u + prefix.Value.Length + i] = hash[i];
+        prefix.Value[:].CopyTo(encoded[separator + 1u:]);
+        hash.CopyTo(encoded[separator + 1u + prefix.Value.Length:]);
         return Ok(encoded);
     }
 
@@ -905,10 +897,8 @@ public sealed class Rsa
         encoded[0u] &= (byte)(0xFFu >> (uint)(8u * encodedLength - encodedBits));
 
         byte[] result = new byte[encodedLength];
-        for (nuint i = 0u; i < maskedLength; i++)
-            result[i] = encoded[i];
-        for (nuint i = 0u; i < hashLength; i++)
-            result[maskedLength + i] = digest[i];
+        encoded[:maskedLength].CopyTo(result);
+        digest[:hashLength].CopyTo(result[maskedLength:]);
         result[encodedLength - 1u] = 0xBC;
         return Ok(result);
     }
@@ -981,11 +971,9 @@ public sealed class Rsa
             hash.AppendData(seed);
             hash.AppendData(counter);
             byte[] block = hash.GetHashAndReset();
-            for (nuint i = 0u; i < block.Length && filled < length; i++)
-            {
-                mask[filled] = block[i];
-                filled++;
-            }
+            nuint take = length - filled < block.Length ? length - filled : block.Length;
+            block[:take].CopyTo(mask[filled:]);
+            filled += take;
             index++;
         }
         return mask;
@@ -1027,8 +1015,7 @@ public sealed class Rsa
                 while (one[0u] == 0);
                 encoded[i] = one[0u];
             }
-            for (nuint i = 0u; i < data.Length; i++)
-                encoded[separator + 1u + i] = data[i];
+            data.CopyTo(encoded[separator + 1u:]);
         }
         else
         {
@@ -1042,11 +1029,9 @@ public sealed class Rsa
             byte[] labelHash = hash.GetHashAndReset();
             nuint blockLength = k - hashLength - 1u;
             byte[] block = new byte[blockLength];
-            for (nuint i = 0u; i < hashLength; i++)
-                block[i] = labelHash[i];
+            labelHash[:hashLength].CopyTo(block);
             block[blockLength - data.Length - 1u] = 0x01;
-            for (nuint i = 0u; i < data.Length; i++)
-                block[blockLength - data.Length + i] = data[i];
+            data.CopyTo(block[blockLength - data.Length:]);
 
             byte[] seed = new byte[hashLength];
             if (!RandomNumberGenerator.Fill(seed))
@@ -1057,8 +1042,7 @@ public sealed class Rsa
             byte[] seedMask = GenerateMask(hash, block, hashLength);
             for (nuint i = 0u; i < hashLength; i++)
                 encoded[1u + i] = (byte)(seed[i] ^ seedMask[i]);
-            for (nuint i = 0u; i < blockLength; i++)
-                encoded[1u + hashLength + i] = block[i];
+            block[:].CopyTo(encoded[1u + hashLength:]);
         }
 
         ulong[] number = Limbs.FromBigEndian(encoded, _modulus.LimbCount);
@@ -1248,11 +1232,9 @@ public sealed class Rsa
             mac.AppendData(labelBytes);
             mac.AppendData(bitLength);
             byte[] block = mac.GetHashAndReset();
-            for (nuint i = 0u; i < block.Length && filled < length; i++)
-            {
-                output[filled] = block[i];
-                filled++;
-            }
+            nuint take = length - filled < block.Length ? length - filled : block.Length;
+            block[:take].CopyTo(output[filled:]);
+            filled += take;
             index++;
         }
         return output;

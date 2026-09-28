@@ -209,8 +209,7 @@ static class RsaKeyGenerator
     static ulong[] CopyLimbs(ulong[] value, nuint count)
     {
         ulong[] copy = new ulong[count];
-        for (nuint i = 0u; i < count && i < value.Length; i++)
-            copy[i] = value[i];
+        value[:count < value.Length ? count : value.Length].CopyTo(copy);
         return copy;
     }
 
