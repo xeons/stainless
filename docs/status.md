@@ -965,7 +965,8 @@ last person to edit it -- the suite is the authority.
   `?? fallback` and says so (SL0605) rather than inventing a zero a caller
   cannot tell from a real one. A receiver that cannot be nothing is refused,
   `a?.b.c` is an error where `a?.b?.c` is the question actually being asked,
-  and neither is written through (SL0762). `x!` is `(C)x`, checking nothing
+  and neither is written through (SL0762). `x!` is `(C)x`, and a null there
+  stops the program rather than being trusted
 - `default(T)` is the zeroed value of a type, for generic code that cannot
   write a literal for a type it does not know, and a bare `default` is the
   same with the type taken from where it is going. Only a type with a zero value

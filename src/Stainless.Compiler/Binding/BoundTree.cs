@@ -130,6 +130,13 @@ public enum ConversionKind
     NarrowOptional,
 
     /// <summary>
+    /// <c>C?</c> -> <c>C</c> where nothing has proven it: <c>x!</c> and the
+    /// explicit cast. The same pointer, once it has been checked; a null aborts
+    /// here, so it is never stored where a <c>C</c> is trusted.
+    /// </summary>
+    AssertPresent,
+
+    /// <summary>
     /// <c>byte*</c> -> a com interface, explicit: adopting a reference that COM
     /// activation wrote through a <c>void**</c>.
     ///

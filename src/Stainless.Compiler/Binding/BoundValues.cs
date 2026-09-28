@@ -44,7 +44,8 @@ internal static class BoundValues
     {
         BoundLocalAccess or BoundParameterAccess or BoundThis or BoundPlaceholder => true,
         BoundLiteral or BoundNullLiteral or BoundConstantAccess => true,
-        BoundConversion { Kind: ConversionKind.NarrowOptional } narrowed => IsSteadyRead(narrowed.Operand),
+        BoundConversion { Kind: ConversionKind.NarrowOptional or ConversionKind.AssertPresent } narrowed
+            => IsSteadyRead(narrowed.Operand),
         BoundVariantPayload payload => IsSteadyRead(payload.Receiver),
         BoundFieldAccess { Receiver: { } receiver } field =>
             receiver.Type is StructTypeSymbol && IsSteadyRead(receiver) && !field.Field.IsBitField,

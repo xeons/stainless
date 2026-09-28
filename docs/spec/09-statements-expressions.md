@@ -762,15 +762,15 @@ rather than a chain that silently swallows the whole expression.
 `??` binds looser than `||`, so `a ?? b || c` is `a ?? (b || c)`: the fallback
 is the whole of what follows, which is what it looks like.
 
-**`x!` takes a `C?` as the `C` it holds, and checks nothing.** It is the cast
-`(C)x` ([§2.5](02-types.md#25-pointers-and-nullability)) with C#'s spelling, and like the cast it emits nothing: the
-same pointer is used as a different type. It is for the place where the
-program knows something a check cannot prove, such as a field another method
-has just filled. A null that gets through is not trapped: reaching through it
-is a read at address zero, which the platform ends the program for, and a `C`
-that is null is a broken promise every later reader trusts. Where the program
-does not know, `if (x != null)`, `is C c` or `??` is the question to ask
-instead. On a `weak C?` it reads strongly first, and on anything that cannot be
+**`x!` takes a `C?` as the `C` it holds, and stops the program if it holds
+nothing.** It is the cast `(C)x` ([§2.5](02-types.md#25-pointers-and-nullability)) with C#'s spelling, and like the
+cast it checks: a null aborts at the `!`, as a failed cast or an index out of
+bounds does, rather than being stored where a `C` is trusted by every reader
+after it. The check is one comparison, and the optimiser removes it where it
+can already see the value is there. It is for the place where the program
+knows something a check cannot prove, such as a field another method has just
+filled. Where the program does not know, `if (x != null)`, `is C c` or `??` is
+the question to ask instead. On a `weak C?` it reads strongly first, and on anything that cannot be
 null it changes nothing, so a generic body may write it for a `T` that is only
 sometimes a `C?`.
 

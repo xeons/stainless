@@ -122,7 +122,7 @@ public sealed partial class LlvmEmitter
     private static bool PassesOwnership(BoundConversion conversion) =>
         conversion.Kind is ConversionKind.Identity or ConversionKind.PointerCast
             or ConversionKind.NullToReference or ConversionKind.ClassToInterface
-            or ConversionKind.NarrowOptional or ConversionKind.Upcast
+            or ConversionKind.NarrowOptional or ConversionKind.AssertPresent or ConversionKind.Upcast
             or ConversionKind.TestedReference or ConversionKind.Downcast
             or ConversionKind.ComUpcast or ConversionKind.ReferenceToOptional
         && !(conversion.Kind == ConversionKind.ReferenceToOptional

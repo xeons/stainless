@@ -75,6 +75,24 @@ public sealed partial class LlvmEmitter
             // Downwards the answer is not in the type, so it is asked of the
             // object. The pointer that comes back is the one that went in; what
             // the check buys is that it really points at one of those.
+            // `x!` and `(C)x`: a null stops here rather than being trusted by
+            // every reader after it.
+            case ConversionKind.AssertPresent:
+            {
+                string present = Emit("i1", $"icmp ne ptr {operand.Ref}, null");
+                string good = NextLabel("present.ok");
+                string bad = NextLabel("present.bad");
+                Terminator($"br i1 {present}, label %{good}, label %{bad}");
+
+                Label(bad);
+                Line($"call void @sl_cast_failed(ptr null, " +
+                     $"ptr {InternBytes(conversion.Type is NamedTypeSymbol named ? named.QualifiedName : conversion.Type.Name)})");
+                Terminator("unreachable");
+
+                Label(good);
+                return Same();
+            }
+
             case ConversionKind.Downcast:
             {
                 var wanted = (ClassTypeSymbol)conversion.Type;

@@ -1291,8 +1291,8 @@ if (node.Next is Node n)
 ```
 
 A third is `x!`, or the cast `(Node)x` it is short for, which asserts rather
-than asks: nothing is checked, and a null that gets through is a crash at its
-first use ([§9.7](09-statements-expressions.md#97----and-)).
+than asks: a null stops the program there, with the type it was asserted to
+be ([§9.7](09-statements-expressions.md#97----and-)).
 
 **`T[]?` and `Notify?` are narrowed the same way.** An array is a reference, so
 `T[]?` is `C?`'s pointer with an array behind it. A closure is two words, and

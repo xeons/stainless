@@ -941,7 +941,7 @@ public sealed partial class Binder
             return from.Equals(toArray.Element) ? ConversionKind.ReferenceToOptional : null;
 
         if (from is OptionalTypeSymbol { Element: ArrayTypeSymbol } fromArray && to is ArrayTypeSymbol)
-            return explicitCast && fromArray.Element.Equals(to) ? ConversionKind.PointerCast : null;
+            return explicitCast && fromArray.Element.Equals(to) ? ConversionKind.AssertPresent : null;
 
         if (from is WeakTypeSymbol fromWeak && to is OptionalTypeSymbol weakTarget)
             return fromWeak.Element.Equals(weakTarget.Element) ? ConversionKind.ReferenceToOptional : null;
@@ -964,7 +964,7 @@ public sealed partial class Binder
         if (from is OptionalTypeSymbol fromOptional && to is NamedTypeSymbol { IsReferenceType: true })
         {
             if (!explicitCast) return null;
-            if (fromOptional.Element.Equals(to)) return ConversionKind.PointerCast;
+            if (fromOptional.Element.Equals(to)) return ConversionKind.AssertPresent;
 
             // I? -> C, which loses the null and asks the object what it is, on
             // the same terms as the interface-to-class rule above.
@@ -977,7 +977,7 @@ public sealed partial class Binder
             // Derived? -> Base loses the null and nothing else; Base? -> Derived
             // loses the null and checks what is left.
             return fromOptional.Element is ClassTypeSymbol optionalSource && to is ClassTypeSymbol castTarget
-                ? optionalSource.DerivesFrom(castTarget) ? ConversionKind.PointerCast
+                ? optionalSource.DerivesFrom(castTarget) ? ConversionKind.AssertPresent
                   : castTarget.DerivesFrom(optionalSource) ? ConversionKind.Downcast
                   : null
                 : null;

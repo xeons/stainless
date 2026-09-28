@@ -2084,8 +2084,8 @@ public sealed partial class Binder
     }
 
     /// <summary>
-    /// <c>x!</c>: a <c>C?</c> taken as the <c>C</c> it holds, checking nothing,
-    /// exactly as <c>(C)x</c> does. On anything that cannot be null it is the
+    /// <c>x!</c>: a <c>C?</c> taken as the <c>C</c> it holds, aborting if it is
+    /// null, exactly as <c>(C)x</c> does. On anything that cannot be null it is the
     /// operand unchanged, as C# has it, so a generic body may write it for a
     /// parameter that is only sometimes a <c>C?</c>.
     /// </summary>
@@ -2103,7 +2103,7 @@ public sealed partial class Binder
             operand = BindConversion(operand, weak.Element.MakeOptionalType(), syntax.Span);
 
         return operand.Type.NonNullForm() is { } held
-            ? new BoundConversion(syntax.Span, held, operand, ConversionKind.NarrowOptional)
+            ? new BoundConversion(syntax.Span, held, operand, ConversionKind.AssertPresent)
             : operand;
     }
 
