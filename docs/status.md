@@ -935,20 +935,18 @@ Being straight about the edges, roughly in the order they are worth adding:
   and does round-trip.
 - **An indexer has no automatic form.** `{ get; set; }` would have nothing to
   find storage for.
-- **The compiler prunes no dead code; the linker does.** Every stdlib module is
-  compiled with your program whether or not it is imported, and only generics
-  are free — an uninstantiated template emits nothing, but a non-generic
-  function or class is emitted either way. What saves the binary is that
-  everything goes into its own section and the linker discards what nothing
-  reached: hello-world calls `puts` and returns, so it reaches *no* standard
-  library function at all, and the linker throws every one of them away.
+- **The compiler prunes no dead code; LLVM and the linker do.** Every stdlib
+  module is compiled with your program whether or not it is imported, and only
+  generics are free — an uninstantiated template emits nothing, but a
+  non-generic function or class is emitted either way. Everything not exported
+  has internal linkage, so an optimised build's first LLVM passes delete what
+  nothing references before the expensive ones see it. A debug build keeps it
+  all, and there every function's own section lets the linker discard it.
 
-  The compile is what nothing saves. The IR is the full size however little of
-  it is used, so every build pays to emit and optimise the whole library, and
-  each thing added to the library is added to every program that never mentions
-  it. A reachability pass from `Main` is the real answer, and the fact that the
-  stripped binary comes out identical however much the library grows is the
-  measure of how completely the compiler is leaving the job to the linker.
+  What nothing saves is the front end. Every build parses, binds and emits the
+  whole library as IR, about a second of a hello-world build, and each thing
+  added to the library is added to every program that never mentions it. A
+  reachability pass from `Main` is the real answer to that part.
 - **Unoptimized ARC.** Retain/release traffic is correct but redundant, and a
   redundant pair costs more since the counts became atomic. The +0/+1 dataflow
   pass that removes the pair around a borrow is the fix.

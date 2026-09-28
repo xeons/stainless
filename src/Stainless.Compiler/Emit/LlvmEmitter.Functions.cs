@@ -90,7 +90,9 @@ public sealed partial class LlvmEmitter
                     || symbol.Kind == FunctionKind.Constructor)
                 && symbol.ContainingType is null or { IsPublic: true }
                 && symbol.TypeArguments.Count == 0);
-        string linkage = exported || symbol.IsPublic ? "" : "internal ";
+        // Everything else is internal, which is what lets LLVM delete what
+        // nothing references before optimizing it rather than after.
+        string linkage = exported ? "" : "internal ";
 
         // Windows exports only what a binary marks, so a library's declared API
         // has to say so here. Elsewhere default visibility already exports it.

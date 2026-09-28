@@ -107,10 +107,9 @@ public sealed class Toolchain
     /// <summary>
     /// The linker argument that drops sections nothing referenced.
     ///
-    /// Nothing prunes dead code in the compiler yet, so every stdlib function is
-    /// emitted whether or not a program calls it. Splitting each into its own
-    /// section lets the linker do what the compiler has not: it takes about a
-    /// quarter off a hello-world binary, and costs a flag.
+    /// Every stdlib function is emitted whether or not a program calls it. At
+    /// -O2 LLVM deletes the internal ones nothing references; at -O0 it keeps
+    /// them all, and a section per function lets the linker drop them instead.
     /// </summary>
     private string DeadStripArgument =>
         EffectiveTriple.Contains("windows-msvc", StringComparison.Ordinal) ? "-Wl,/OPT:REF"
