@@ -717,19 +717,26 @@ last person to edit it -- the suite is the authority.
   seconds in a `long`, since a `GeneralizedTime` outlives `DateTimeOffset`.
   Indefinite lengths and constructed strings are refused. The foundation for
   X.509 and for TLS's certificate handling
-- `Standard.Net.Security`: TLS 1.3 (RFC 8446), client and server, in
-  Stainless over any `IStream`, in `System.Net.Security`'s shape: `TlsStream`
-  is `SslStream`, and `TlsSocket` owns its TCP connection too. All three AEAD
-  suites; X25519, P-256 and P-384, with a HelloRetryRequest when the client
-  guessed wrong; certificates on Ed25519, ECDSA or RSA-PSS keys, a client's
-  as well as a server's; ALPN, server_name, KeyUpdate, the exporter, and the
-  middlebox compatibility mode. RFC 8448's 1-RTT trace is replayed against
-  both halves byte for byte, and both have been run against OpenSSL 3.5 in
-  every suite, group and key type. Over the loopback, with both ends in one
-  process, ChaCha20-Poly1305 moves about 340 MB/s and AES-GCM about 130.
-  By default a certificate is trusted as the platform's root store trusts it,
-  through `X509Chain`, for the host name asked for; a program may supply its
-  own validator instead. Not TLS 1.2, not resumption, and never 0-RTT
+- `Standard.Net.Security`: TLS 1.3 (RFC 8446) and TLS 1.2 (RFC 5246), client
+  and server, in Stainless over any `IStream`, in `System.Net.Security`'s
+  shape: `TlsStream` is `SslStream`, and `TlsSocket` owns its TCP connection
+  too. TLS 1.3 has all three AEAD suites; X25519, P-256 and P-384, with a
+  HelloRetryRequest when the client guessed wrong; certificates on Ed25519,
+  ECDSA or RSA-PSS keys, a client's as well as a server's; ALPN,
+  server_name, KeyUpdate, the exporter, and the middlebox compatibility mode.
+  TLS 1.2 is ECDHE with the six AES-GCM and ChaCha20-Poly1305 suites, signed
+  with Ed25519, ECDSA, RSA-PSS or PKCS #1 v1.5, and the extended master
+  secret required of the peer; no CBC, no static RSA, no DHE, no
+  renegotiation. One ClientHello offers both, TLS 1.3 wins where both ends
+  have it, and the downgrade sentinel is written and checked. RFC 8448's
+  1-RTT trace is replayed against both TLS 1.3 halves byte for byte, TLS
+  1.2's PRF against its published vectors, and both versions have been run
+  against OpenSSL 3.5 in every suite, group and key type. Over the loopback,
+  with both ends in one process, ChaCha20-Poly1305 moves about 340 MB/s and
+  AES-GCM about 130. By default a certificate is trusted as the platform's
+  root store trusts it, through `X509Chain`, for the host name asked for; a
+  program may supply its own validator instead. Not resumption in either
+  version, and never 0-RTT
 - `Standard.Media.Audio`: playing and recording interleaved PCM, and reading and
   writing WAV. WASAPI on Windows and ALSA elsewhere, both reached by name at the
   first device rather than linked, so a machine with neither answers
@@ -1074,8 +1081,9 @@ Being straight about the edges, roughly in the order they are worth adding:
   mode — and nothing that waits on many at once, so a server that holds a
   thousand connections wants a thread each. There is no `select` or `epoll`
   over a set, and no async; `Standard.Net.Security`'s TLS is blocking in the
-  same way. **TLS is 1.3 only**: there is no TLS 1.2 and no resumption, and
-  certificates are never checked for revocation. `Socket.Connect` on a socket
+  same way. **TLS has no resumption**, and certificates are never checked for
+  revocation. TLS 1.2 is there for peers without TLS 1.3, and only with
+  ECDHE, an AEAD and the extended master secret. `Socket.Connect` on a socket
   that is already open tries one address rather than all of them, because a
   socket whose connect failed cannot be reused and that one is already made —
   `Socket.OpenConnected(host, port, ...)` is the form that tries each.

@@ -19,7 +19,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-/// TLS 1.3, client and server, in Stainless and over any stream.
+/// TLS 1.3 and TLS 1.2, client and server, in Stainless and over any stream.
 ///
 /// ```csharp
 /// var options = new TlsClientOptions();
@@ -49,9 +49,23 @@
 /// middlebox compatibility mode. Session tickets are read and handed to
 /// `TlsClientOptions.SessionTicketReceived`, and nothing yet offers one back.
 ///
-/// **What is not:** TLS 1.2, which `TlsProtocolVersion.Tls12` names so that
-/// options can already ask for it; resumption; a server that issues tickets;
-/// and 0-RTT data, which is never coming, since it is replayable by design.
+/// **TLS 1.2 (RFC 5246) is its modern subset**, for a peer without TLS 1.3:
+/// ECDHE over the same groups, the six AES-GCM and ChaCha20-Poly1305 suites
+/// (RFC 5289, RFC 7905), signatures with Ed25519 (RFC 8422), ECDSA, RSA-PSS
+/// or PKCS #1 v1.5, client certificates, ALPN, server_name, RFC 5705's
+/// exporter, and session tickets (RFC 5077) handed to the same handler. The
+/// extended master secret (RFC 7627) is REQUIRED of the peer: every current
+/// implementation has it, and without it a master secret binds only the
+/// randoms, which is the triple handshake attack. One ClientHello offers both
+/// versions and TLS 1.3 wins where both ends have it. A server that could
+/// have spoken TLS 1.3 writes the downgrade sentinel into a TLS 1.2 random,
+/// and a client that offered TLS 1.3 refuses a ServerHello that carries it.
+///
+/// **What is not:** resumption, in either version; a server that issues
+/// tickets; in TLS 1.2, CBC suites, static RSA key exchange, finite-field
+/// DHE, compression and renegotiation, which is answered from either side
+/// with a no_renegotiation warning; and 0-RTT data, which is never coming,
+/// since it is replayable by design.
 ///
 /// **Certificates are judged by a `TlsCertificateValidator`**, a closure the
 /// options carry. The default is the platform's trust: an `X509Chain` from
@@ -65,6 +79,7 @@
 /// AEADs check their tags in constant time, and the padding of a TLS 1.3
 /// record is stripped by a scan over the whole record that selects by mask,
 /// so how much of a record was padding does not show in how long it took.
+/// TLS 1.2 has only AEAD suites, so there is no padding oracle to guard.
 /// Finished values are compared with `FixedTimeEquals`.
 ///
 /// **Blocking, one reader and one writer.** A read blocks until a record of
@@ -72,7 +87,8 @@
 /// every record written goes under one lock, because a read can write too:
 /// the alert that ends a connection it found at fault. The KeyUpdate a peer
 /// asks for is sent before the next application data written, as RFC 8446
-/// §4.6.3 allows, so a reader that never writes never answers one.
+/// §4.6.3 allows, so a reader that never writes never answers one. TLS 1.2
+/// has no KeyUpdate, and its keys last as long as the connection.
 module Standard.Net.Security;
 
 import Standard.Collections;

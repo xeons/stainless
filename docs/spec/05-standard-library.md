@@ -50,7 +50,7 @@ own for the linker to drop.
 | `Standard.Xml` | XML, in the same two layers ([§5.10](#510-standardjson-and-standardxml)) | on request |
 | `Standard.Resources` | what a `.rc` folded into the binary, read back on every platform ([§2.2 of packages.md](../packages.md#22-resources)) | on request |
 | `Standard.Net` | TCP and UDP sockets, the same on every platform | on request |
-| `Standard.Net.Security` | TLS 1.3, client and server, over any stream ([§5.17](#517-standardnetsecurity)) | on request |
+| `Standard.Net.Security` | TLS 1.3 and 1.2, client and server, over any stream ([§5.17](#517-standardnetsecurity)) | on request |
 | `Standard.Env` | the command line, the environment, the working directory | on request |
 | `Standard.Time` | `DateTimeOffset`, `TimeSpan`, `DateTime` and the monotonic `Stopwatch` | on request |
 | `Standard.Random` | xoshiro256**, seeded by you or by the operating system | on request |
@@ -1147,8 +1147,8 @@ server.PrivateKey = try TlsSigningKey.ImportFromPem(keyPem);
 var accepted = try TlsStream.AuthenticateAsServer(tcpClient, server);
 ```
 
-TLS 1.3 (RFC 8446), client and server, written in Stainless over the
-cryptography module. **The shape is `System.Net.Security`'s**: `TlsStream` is
+TLS 1.3 (RFC 8446) and TLS 1.2 (RFC 5246), client and server, written in
+Stainless over the cryptography module. **The shape is `System.Net.Security`'s**: `TlsStream` is
 `SslStream`, an `IStream` over another, and `AuthenticateAsClient` and
 `AuthenticateAsServer` are static methods that answer a
 `Result<TlsStream, TlsError>` where .NET throws. `TlsSocket` owns the TCP
@@ -1156,12 +1156,25 @@ connection as well. Each `TlsError` is also the alert sent to the peer, and a
 failure the peer found arrives as `AlertReceived`, with its
 `TlsAlertDescription` beside it.
 
-All three AEAD suites, X25519, P-256 and P-384 with a HelloRetryRequest when
-the client's guess was wrong, and certificates on Ed25519, ECDSA and RSA-PSS
-keys, for a client as well as a server. ALPN, server_name, KeyUpdate and the
-exporter are there; session tickets are read and handed to a handler, and
-nothing offers one back yet. **Not TLS 1.2**, which `TlsProtocolVersion`
-names so that options can ask for it already, and **never 0-RTT**.
+In TLS 1.3: all three AEAD suites, X25519, P-256 and P-384 with a
+HelloRetryRequest when the client's guess was wrong, and certificates on
+Ed25519, ECDSA and RSA-PSS keys, for a client as well as a server. ALPN,
+server_name, KeyUpdate and the exporter are there; session tickets are read
+and handed to a handler, and nothing offers one back yet. **Never 0-RTT.**
+
+**TLS 1.2 is the modern subset of it.** ECDHE over the same three groups,
+with the six AES-GCM and ChaCha20-Poly1305 suites of RFC 5289 and RFC 7905,
+signed with Ed25519 (RFC 8422), ECDSA, RSA-PSS or PKCS #1 v1.5; client
+certificates, ALPN, server_name, the exporter of RFC 5705, and session
+tickets handed to the same handler. **The extended master secret of RFC 7627
+is required** of the peer, whichever end it is, since without it a master
+secret binds nothing but the randoms. There is no CBC, no static RSA, no
+DHE, no compression, and no renegotiation: a request for one from either
+side is answered with a `no_renegotiation` warning. `EnabledProtocols`
+decides what is offered and accepted; a ClientHello offers both versions,
+TLS 1.3 wins wherever both ends have it, and a server that could have
+spoken TLS 1.3 writes the downgrade sentinel into a TLS 1.2 random, which a
+client that offered TLS 1.3 checks. `NegotiatedProtocol` says which it was.
 
 **Trust is the program's.** A `TlsCertificateValidator` is given the peer's
 chain and the name asked for, and answers `TlsError.None` or the refusal to
@@ -1174,8 +1187,11 @@ signature against the leaf is checked here whatever the validator says.
 `tests/cases/tls13-rfc8448` replays RFC 8448's 1-RTT trace against both
 halves: the client writes the trace's records byte for byte and verifies its
 RSA-PSS signature, and the server writes the trace's ServerHello and a flight
-the trace's keys open. `tls13-handshake` runs every suite, group and key over
-the loopback, and `tls13-refusals` pins the alert for each refusal.
+the trace's keys open. `tls12-prf` checks TLS 1.2's PRF against its published
+vectors, and its key block and records against values computed
+independently. `tls13-handshake` and `tls12-handshake` run every suite, group
+and key over the loopback, and `tls13-refusals` and `tls12-refusals` pin the
+alert for each refusal.
 
 ---
 

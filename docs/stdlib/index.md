@@ -26,7 +26,7 @@ One page per module. Each lists every public type, function, property, case and 
 | [Standard.Math](Standard-Math.md) | Arithmetic that is not an operator. |
 | [Standard.Media.Audio](Standard-Media-Audio.md) | Sound out of the machine, and sound into it. |
 | [Standard.Net](Standard-Net.md) | Sockets, the same on every platform. |
-| [Standard.Net.Security](Standard-Net-Security.md) | TLS 1.3, client and server, in Stainless and over any stream. |
+| [Standard.Net.Security](Standard-Net-Security.md) | TLS 1.3 and TLS 1.2, client and server, in Stainless and over any stream. |
 | [Standard.Path](Standard-Path.md) | Taking paths apart and putting them together. |
 | [Standard.Process](Standard-Process.md) | Running another program. |
 | [Standard.Random](Standard-Random.md) | Pseudo-random numbers. |
