@@ -559,7 +559,9 @@ because a Stainless `double` *is* a C `double`.
 `nuint` and `double`, resolved by argument type. Alongside them are the usual
 transcendentals, `Floor`/`Ceiling`/`Round`/`Truncate`, `IsNaN`/`IsInfinity`/
 `IsFinite`, `Lerp` and `IsNear`, `RadiansToDegrees` and `DegreesToRadians`, the integer
-`GreatestCommonDivisor`, `LeastCommonMultiple` and `DivideCeiling`, and the bit
+`GreatestCommonDivisor`, `LeastCommonMultiple` and `DivideCeiling`, `BigMul` for
+the whole product of two integers (a 64-bit one from two 32-bit ones, and the
+high half of a 128-bit one with the low half in an `out`), and the bit
 functions `PopCount`, `LeadingZeroCount`, `TrailingZeroCount`, `IsPowerOfTwo` and
 `RoundUpToPowerOfTwo`.
 

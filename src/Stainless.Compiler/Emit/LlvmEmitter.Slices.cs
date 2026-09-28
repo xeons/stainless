@@ -425,6 +425,8 @@ public sealed partial class LlvmEmitter
 
     private Val EmitCall(BoundCall call)
     {
+        if (TryEmitInlineIntrinsic(call, out var inline)) return inline;
+
         var function = call.Function;
         var returnInfo = ClassifyResult(function.ReturnType);
 

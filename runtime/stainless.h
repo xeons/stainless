@@ -1096,6 +1096,13 @@ SL_API long long sl_tz_map_id(const char *id, _Bool toWindows, char *buffer, siz
 SL_API _Bool     sl_random_bytes(void *buffer, size_t length);
 SL_API long long sl_random_seed(void);
 
+/*
+ * Overwrites a buffer with zeros in a way no optimiser may remove: each store
+ * is through a volatile pointer, so it happens whether or not anything reads
+ * the buffer again.
+ */
+SL_API void      sl_zero_memory(void *buffer, size_t length);
+
 /* -------------------------------------------------------------- threading */
 
 /*

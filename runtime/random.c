@@ -53,6 +53,13 @@
 #  endif
 #endif
 
+void sl_zero_memory(void *buffer, size_t length)
+{
+    volatile unsigned char *at = (volatile unsigned char *)buffer;
+    for (size_t i = 0; i < length; i++)
+        at[i] = 0;
+}
+
 /*
  * Fills a buffer with bytes from the platform's entropy source, reporting
  * whether it managed.

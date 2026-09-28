@@ -599,8 +599,9 @@ last person to edit it -- the suite is the authority.
   it — see [docs/concurrency.md](concurrency.md) §11
 - `Standard.Math`: the C library's floating point, plus `Abs`/`Min`/`Max`/
   `Clamp`/`Sign` overloaded across `int`, `long`, `nuint` and `double`,
-  `IsNaN`/`IsInfinity`/`IsFinite`, `GreatestCommonDivisor` and
-  `LeastCommonMultiple`. Counting and rotating bits is `Standard.Bits`, as it
+  `IsNaN`/`IsInfinity`/`IsFinite`, `GreatestCommonDivisor`,
+  `LeastCommonMultiple`, and `BigMul` for a product wider than its operands,
+  128 bits as a high and a low half. Counting and rotating bits is `Standard.Bits`, as it
   is `BitOperations` and not `Math` in .NET. A module is a scope, so
   `Math.Sqrt(x)` needs no static class
 - `Standard.Concurrent`: `ConcurrentQueue<T>`, `ConcurrentStack<T>`,
@@ -711,7 +712,10 @@ last person to edit it -- the suite is the authority.
 - `Standard.Bits`: `PopCount`, `LeadingZeroCount`, `TrailingZeroCount`,
   `RotateLeft`, `RotateRight`, `Log2`, `IsPowerOfTwo` and
   `RoundUpToPowerOfTwo`, over the target's own instructions. A rotate is
-  defined for a count of zero, which the pair of shifts it replaces is not
+  defined for a count of zero, which the pair of shifts it replaces is not.
+  `MultiplyHigh` is the top half of a 64-bit product, and `OpaqueCopy` hands
+  back a value the optimiser can see nothing of, which is how constant-time
+  code keeps a mask from being turned back into a branch
 - `Standard.Limits`: what each number type holds, named rather than spelled --
   `MaxInt`, `MinLong`, `MaxNUInt` and the rest, the pointer-width ones written
   per target

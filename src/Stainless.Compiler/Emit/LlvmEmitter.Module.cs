@@ -623,7 +623,7 @@ public sealed partial class LlvmEmitter
 
         foreach (var function in program.ExternalFunctions)
         {
-            if (defined.Contains(function.MangledName))
+            if (defined.Contains(function.MangledName) || Builtins.InlineIntrinsics.Contains(function.MangledName))
                 continue;
 
             var returnInfo = ClassifyResult(function.ReturnType);

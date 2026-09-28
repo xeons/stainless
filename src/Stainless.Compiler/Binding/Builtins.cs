@@ -511,7 +511,31 @@ public sealed class Builtins
             ("high", uint32), ("low", uint32), ("by", uint32));
         Intrinsic("FunnelShiftRight", uint64, "llvm.fshr.i64",
             ("high", uint64), ("low", uint64), ("by", uint64));
+
+        // No LLVM intrinsic answers these, so the emitter writes each inline.
+        // See LlvmEmitter.Intrinsics.
+        Intrinsic("MultiplyHighBits", uint64, MultiplyHighIntrinsic,
+            ("left", uint64), ("right", uint64));
+        Intrinsic("OpaqueBits", uint32, OpaqueIntrinsic32, ("value", uint32));
+        Intrinsic("OpaqueBits", uint64, OpaqueIntrinsic64, ("value", uint64));
     }
+
+    /// <summary>The high 64 bits of a 64-by-64 multiply.</summary>
+    public const string MultiplyHighIntrinsic = "sl.multiply_high.i64";
+
+    /// <summary>
+    /// The value unchanged, through an empty asm block the optimiser cannot see
+    /// into, so a mask built from a secret stays a mask and is not turned back
+    /// into the branch constant-time code was written to avoid.
+    /// </summary>
+    public const string OpaqueIntrinsic32 = "sl.opaque.i32";
+    public const string OpaqueIntrinsic64 = "sl.opaque.i64";
+
+    /// <summary>The runtime symbols the emitter writes inline rather than calls.</summary>
+    public static readonly IReadOnlySet<string> InlineIntrinsics = new HashSet<string>(StringComparer.Ordinal)
+    {
+        MultiplyHighIntrinsic, OpaqueIntrinsic32, OpaqueIntrinsic64,
+    };
 
     public bool IsString(TypeSymbol type) => ReferenceEquals(type, String);
 

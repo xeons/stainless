@@ -849,6 +849,25 @@ public class EmitterTests
         Assert.Equal(escaped, Emit.LlvmEmitter.AsmString(text));
 
     /// <summary>
+    /// The high half of a product and the optimisation barrier are written
+    /// inline, never as calls to a symbol that nothing defines.
+    /// </summary>
+    [Fact]
+    public void InlineIntrinsicsLeaveNoCallBehind()
+    {
+        string ir = Front.ModuleIr("""
+            import Standard.Bits;
+            public ulong High(ulong a, ulong b) => MultiplyHigh(a, b);
+            public ulong Hidden(ulong a) => OpaqueCopy(a);
+            """);
+
+        Assert.Contains("mul i128", ir);
+        Assert.Contains("asm \"\", \"=r,0\"", ir);
+        Assert.DoesNotContain("@sl.multiply_high", ir);
+        Assert.DoesNotContain("@sl.opaque", ir);
+    }
+
+    /// <summary>
     /// A library built for Stainless consumers exports what its metadata
     /// describes. The standard library compiled in beside it stays internal:
     /// a consumer compiles its own.

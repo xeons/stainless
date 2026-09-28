@@ -31,6 +31,8 @@
 /// are written out, since C has no such library.
 module Standard.Math;
 
+import Standard.Bits;
+
 extern "C"
 {
     double sqrt(double x);
@@ -373,4 +375,42 @@ public long LeastCommonMultiple(long a, long b)
     if (a == 0 || b == 0)
         return 0;
     return Abs(a / GreatestCommonDivisor(a, b) * b);
+}
+
+// ------------------------------------------------------------ wide products
+
+/// The whole 64-bit product of two 32-bit values, which `a * b` would wrap.
+public ulong BigMul(uint a, uint b) => (ulong)a * (ulong)b;
+
+/// The whole 64-bit product of two 32-bit values, which `a * b` would wrap.
+public long BigMul(int a, int b) => (long)a * (long)b;
+
+/// The high 64 bits of the 128-bit product, with the low 64 in `low`.
+///
+/// @param a    one factor
+/// @param b    the other
+/// @param low  receives the low 64 bits, which is what `a * b` alone answers
+public ulong BigMul(ulong a, ulong b, out ulong low)
+{
+    low = a * b;
+    return MultiplyHigh(a, b);
+}
+
+/// The high 64 bits of the signed 128-bit product, with the low 64 in `low`.
+///
+/// @param a    one factor
+/// @param b    the other
+/// @param low  receives the low 64 bits, which is what `a * b` alone answers
+public long BigMul(long a, long b, out long low)
+{
+    low = a * b;
+
+    // The unsigned product, less each factor wherever the other is negative:
+    // a negative value read as unsigned is 2^64 more than itself.
+    ulong high = MultiplyHigh((ulong)a, (ulong)b);
+    if (a < 0)
+        high -= (ulong)b;
+    if (b < 0)
+        high -= (ulong)a;
+    return (long)high;
 }

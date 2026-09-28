@@ -81,6 +81,28 @@ public uint RotateRight(uint value, int by) =>
 public ulong RotateRight(ulong value, int by) =>
     FunnelShiftRight(value, value, (ulong)by);
 
+// --------------------------------------------------------------- multiplying
+
+/// The high 64 bits of the 128-bit product of `left` and `right`; `left * right`
+/// is the low 64.
+///
+/// @see Math.BigMul
+public ulong MultiplyHigh(ulong left, ulong right) => MultiplyHighBits(left, right);
+
+// ------------------------------------------------------------ constant time
+
+/// `value`, unchanged, as a value the optimiser knows nothing about.
+///
+/// For constant-time code. A mask computed from a secret — all ones or all
+/// zeros — is exactly what an optimiser recognises and turns back into a
+/// branch, which is the leak the mask was written to avoid. Passing it through
+/// this first leaves the optimiser nothing to recognise. It costs no
+/// instruction.
+public uint OpaqueCopy(uint value) => OpaqueBits(value);
+
+/// `value`, unchanged, as a value the optimiser knows nothing about.
+public ulong OpaqueCopy(ulong value) => OpaqueBits(value);
+
 // -------------------------------------------------------------- powers of two
 
 /// The position of the highest set bit, which is the floor of the base-2
