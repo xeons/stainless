@@ -1,0 +1,62 @@
+ed25519 TlsAes128GcmSha256 X25519: ok Ed25519
+ed25519 TlsAes128GcmSha256 Secp256r1: ok Ed25519
+ed25519 TlsAes128GcmSha256 Secp384r1: ok Ed25519
+ed25519 TlsAes256GcmSha384 X25519: ok Ed25519
+ed25519 TlsAes256GcmSha384 Secp256r1: ok Ed25519
+ed25519 TlsAes256GcmSha384 Secp384r1: ok Ed25519
+ed25519 TlsChaCha20Poly1305Sha256 X25519: ok Ed25519
+ed25519 TlsChaCha20Poly1305Sha256 Secp256r1: ok Ed25519
+ed25519 TlsChaCha20Poly1305Sha256 Secp384r1: ok Ed25519
+p-256 TlsAes128GcmSha256 X25519: ok EcdsaSecp256r1Sha256
+p-256 TlsAes128GcmSha256 Secp256r1: ok EcdsaSecp256r1Sha256
+p-256 TlsAes128GcmSha256 Secp384r1: ok EcdsaSecp256r1Sha256
+p-256 TlsAes256GcmSha384 X25519: ok EcdsaSecp256r1Sha256
+p-256 TlsAes256GcmSha384 Secp256r1: ok EcdsaSecp256r1Sha256
+p-256 TlsAes256GcmSha384 Secp384r1: ok EcdsaSecp256r1Sha256
+p-256 TlsChaCha20Poly1305Sha256 X25519: ok EcdsaSecp256r1Sha256
+p-256 TlsChaCha20Poly1305Sha256 Secp256r1: ok EcdsaSecp256r1Sha256
+p-256 TlsChaCha20Poly1305Sha256 Secp384r1: ok EcdsaSecp256r1Sha256
+p-384 TlsAes128GcmSha256 X25519: ok EcdsaSecp384r1Sha384
+p-384 TlsAes128GcmSha256 Secp256r1: ok EcdsaSecp384r1Sha384
+p-384 TlsAes128GcmSha256 Secp384r1: ok EcdsaSecp384r1Sha384
+p-384 TlsAes256GcmSha384 X25519: ok EcdsaSecp384r1Sha384
+p-384 TlsAes256GcmSha384 Secp256r1: ok EcdsaSecp384r1Sha384
+p-384 TlsAes256GcmSha384 Secp384r1: ok EcdsaSecp384r1Sha384
+p-384 TlsChaCha20Poly1305Sha256 X25519: ok EcdsaSecp384r1Sha384
+p-384 TlsChaCha20Poly1305Sha256 Secp256r1: ok EcdsaSecp384r1Sha384
+p-384 TlsChaCha20Poly1305Sha256 Secp384r1: ok EcdsaSecp384r1Sha384
+rsa TlsAes128GcmSha256 X25519: ok RsaPssRsaeSha256
+rsa TlsAes128GcmSha256 Secp256r1: ok RsaPssRsaeSha256
+rsa TlsAes128GcmSha256 Secp384r1: ok RsaPssRsaeSha256
+rsa TlsAes256GcmSha384 X25519: ok RsaPssRsaeSha256
+rsa TlsAes256GcmSha384 Secp256r1: ok RsaPssRsaeSha256
+rsa TlsAes256GcmSha384 Secp384r1: ok RsaPssRsaeSha256
+rsa TlsChaCha20Poly1305Sha256 X25519: ok RsaPssRsaeSha256
+rsa TlsChaCha20Poly1305Sha256 Secp256r1: ok RsaPssRsaeSha256
+rsa TlsChaCha20Poly1305Sha256 Secp384r1: ok RsaPssRsaeSha256
+rsa-pss TlsAes128GcmSha256 X25519: ok RsaPssPssSha256
+rsa-pss TlsAes128GcmSha256 Secp256r1: ok RsaPssPssSha256
+rsa-pss TlsAes128GcmSha256 Secp384r1: ok RsaPssPssSha256
+rsa-pss TlsAes256GcmSha384 X25519: ok RsaPssPssSha256
+rsa-pss TlsAes256GcmSha384 Secp256r1: ok RsaPssPssSha256
+rsa-pss TlsAes256GcmSha384 Secp384r1: ok RsaPssPssSha256
+rsa-pss TlsChaCha20Poly1305Sha256 X25519: ok RsaPssPssSha256
+rsa-pss TlsChaCha20Poly1305Sha256 Secp256r1: ok RsaPssPssSha256
+rsa-pss TlsChaCha20Poly1305Sha256 Secp384r1: ok RsaPssPssSha256
+key update: no error
+large transfer: 307200 bytes each way, intact
+server saw close_notify: yes
+alpn: client http/1.1, server http/1.1
+alpn mismatch:
+  client: the peer sent a fatal alert, alert NoApplicationProtocol
+  server: no application protocol in common
+alpn offered by the server only: none
+server saw the name: tls.example.test
+an address is not sent as a name: ''
+retry from Secp256r1 to X25519: X25519, echoed
+retry from X25519 to Secp384r1: Secp384r1, echoed
+client certificate: ok, client leaf, mutual
+no client certificate:
+  client read: the peer sent a fatal alert, alert CertificateRequired
+  server: a client certificate was required
+exported keys agree: yes

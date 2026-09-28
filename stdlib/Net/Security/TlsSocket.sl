@@ -56,8 +56,23 @@ public sealed class TlsSocket : IStream
     /// @failure TlsError.Io                  the TCP connection could not be made
     /// @failure TlsError.CertificateRefused  the validator refused the chain
     /// @failure TlsError.AlertReceived       the server refused
-    public static Result<TlsSocket, TlsError> Connect(String host, ushort port, TlsClientOptions options)
+    public static Result<TlsSocket, TlsError> Connect(String host, ushort port, TlsClientOptions options) =>
+        Connect(host, port, options, out TlsAlertDescription alert);
+
+    /// Connects and runs the client's handshake, and reports the alert the
+    /// server sent when it refused.
+    ///
+    /// @param host           the name or address to reach
+    /// @param port           the port to reach it on
+    /// @param options        what to offer, and how to judge the certificate
+    /// @param alertReceived  the server's alert when the failure is
+    ///                       `AlertReceived`, and `CloseNotify` otherwise
+    /// @failure TlsError.AlertReceived  the server refused, and `alertReceived`
+    ///                                  says why
+    public static Result<TlsSocket, TlsError> Connect(String host, ushort port, TlsClientOptions options,
+                                                      out TlsAlertDescription alertReceived)
     {
+        alertReceived = TlsAlertDescription.CloseNotify;
         var connected = TcpClient.Connect(host, port);
         if (!connected.Ok)
             return Fail(TlsError.Io);
@@ -67,6 +82,7 @@ public sealed class TlsSocket : IStream
         var connection = new TlsConnection(client, false, false);
         var handshake = new TlsClientHandshake(connection, options, target);
         TlsError failed = handshake.RunTlsClientHandshake();
+        alertReceived = connection._alertReceived;
         if (failed != TlsError.None)
         {
             connection.AbandonTls(failed);
@@ -82,14 +98,29 @@ public sealed class TlsSocket : IStream
     /// @failure TlsError.Io                     the accept failed
     /// @failure TlsError.NoCommonCipherSuite    no suite on both lists
     /// @failure TlsError.NoApplicationProtocol  no ALPN name on both lists
-    public static Result<TlsSocket, TlsError> Accept(TcpListener listener, TlsServerOptions options)
+    public static Result<TlsSocket, TlsError> Accept(TcpListener listener, TlsServerOptions options) =>
+        Accept(listener, options, out TlsAlertDescription alert);
+
+    /// Accepts a connection and runs the server's handshake, and reports the
+    /// alert the client sent when it refused.
+    ///
+    /// @param listener       where connections arrive
+    /// @param options        the certificate, the key, and what to accept
+    /// @param alertReceived  the client's alert when the failure is
+    ///                       `AlertReceived`, and `CloseNotify` otherwise
+    /// @failure TlsError.AlertReceived  the client refused, and `alertReceived`
+    ///                                  says why
+    public static Result<TlsSocket, TlsError> Accept(TcpListener listener, TlsServerOptions options,
+                                                     out TlsAlertDescription alertReceived)
     {
+        alertReceived = TlsAlertDescription.CloseNotify;
         TcpClient client = listener.Accept();
         if (!client.IsConnected)
             return Fail(TlsError.Io);
         var connection = new TlsConnection(client, true, false);
         var handshake = new TlsServerHandshake(connection, options);
         TlsError failed = handshake.RunTlsServerHandshake();
+        alertReceived = connection._alertReceived;
         if (failed != TlsError.None)
         {
             connection.AbandonTls(failed);
