@@ -231,6 +231,11 @@ public sealed partial class Binder
                     ResolveOverload(outerMethods, arguments, callee.Span, callee.Name.Text, syntax.Arguments);
                 if (outerMethod is null) return new BoundErrorExpression(syntax.Span);
 
+                // A static one is called on nothing, so there is no object to
+                // capture; a lambda in a static initializer has none to give.
+                if (outerMethod.IsStatic)
+                    return BuildCall(syntax, outerMethod, receiver: null, arguments);
+
                 var captured = CaptureThis(_context.Closures.Count - 1, callee.Span);
                 if (captured.Type.IsError()) return new BoundErrorExpression(syntax.Span);
                 return BuildCall(syntax, outerMethod, captured, arguments);
