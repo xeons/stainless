@@ -36,6 +36,11 @@ public struct DateTimeOffset
 {
     /// Nanoseconds since 1970-01-01 UTC, negative before it. The whole of the
     /// value, and the thing to hand a C API that wants an epoch count.
+    ///
+    /// A `long` of nanoseconds reaches from 1677 to 2262. An instant outside
+    /// that is held at the nearer end rather than wrapped, so the year 9999
+    /// that a certificate writes for "never" compares as later than any real
+    /// date.
     public long Nanoseconds;
 
     /// What time it is now. It can go backwards between two calls; use `Stopwatch`
@@ -68,7 +73,7 @@ public struct DateTimeOffset
     public static DateTimeOffset FromUnixTimeSeconds(long seconds)
     {
         DateTimeOffset at;
-        at.Nanoseconds = seconds * NanosecondsPerSecond;
+        at.Nanoseconds = MultiplySaturating(seconds, NanosecondsPerSecond);
         return at;
     }
 
@@ -77,7 +82,7 @@ public struct DateTimeOffset
     public static DateTimeOffset FromUnixTimeMilliseconds(long milliseconds)
     {
         DateTimeOffset at;
-        at.Nanoseconds = milliseconds * NanosecondsPerMillisecond;
+        at.Nanoseconds = MultiplySaturating(milliseconds, NanosecondsPerMillisecond);
         return at;
     }
 

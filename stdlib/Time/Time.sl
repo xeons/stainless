@@ -70,6 +70,19 @@ public const long NanosecondsPerHour = 3600000000000;
 /// add a day to a `DateTimeOffset` and you have added 24 hours.
 public const long NanosecondsPerDay = 86400000000000;
 
+/// `value * factor` for a positive factor, held at the ends of a `long` rather
+/// than wrapped. An instant is a count of nanoseconds, and one that wrapped
+/// would put the year 9999 before 1970.
+long MultiplySaturating(long value, long factor)
+{
+    long most = 9223372036854775807L / factor;
+    if (value > most)
+        return 9223372036854775807L;
+    if (value < -most)
+        return -9223372036854775807L - 1L;
+    return value * factor;
+}
+
 /// A duration written the way a log line wants it: `1h02m03.004s`, with the
 /// leading units dropped when they are zero.
 String FormatTimeSpan(TimeSpan span)

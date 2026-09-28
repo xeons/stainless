@@ -46,6 +46,7 @@
 
 #include "stainless.h"
 
+#include <limits.h>
 #include <time.h>
 
 #ifdef _WIN32
@@ -309,12 +310,25 @@ _Bool sl_time_parts(long long nanoseconds, _Bool local, long long *parts)
  * the answer is the parts read as UTC less the zone's offset near that
  * instant, which is right everywhere but inside a daylight-saving change.
  */
+/*
+ * Seconds and a nanosecond as nanoseconds since the epoch, held at the ends of
+ * what a long long can count -- about 1677 to 2262 -- rather than overflowing,
+ * which in C is undefined. A certificate that never expires says 9999.
+ */
+static long long nanoseconds_at(long long seconds, long long nanosecond)
+{
+    const long long most = LLONG_MAX / 1000000000LL - 1;
+    if (seconds > most) return LLONG_MAX;
+    if (seconds < -most) return LLONG_MIN;
+    return seconds * 1000000000LL + nanosecond;
+}
+
 long long sl_time_from_parts(long long year, long long month, long long day,
                              long long hour, long long minute, long long second,
                              long long nanosecond, _Bool local)
 {
     long long asUtc = seconds_from_civil(year, month, day, hour, minute, second);
-    if (!local) return asUtc * 1000000000LL + nanosecond;
+    if (!local) return nanoseconds_at(asUtc, nanosecond);
 
     struct tm broken;
     broken.tm_year  = (int)(year - 1900);
@@ -331,17 +345,17 @@ long long sl_time_from_parts(long long year, long long month, long long day,
 
     time_t when = mktime(&broken);
     if (when != (time_t)-1 || broken.tm_wday != -1)
-        return (long long)when * 1000000000LL + nanosecond;
+        return nanoseconds_at((long long)when, nanosecond);
 
     long long seconds;
 #ifdef _WIN32
     if (utc_from_local(asUtc, &seconds))
-        return seconds * 1000000000LL + nanosecond;
+        return nanoseconds_at(seconds, nanosecond);
 #endif
 
-    seconds = asUtc - sl_time_zone_offset(asUtc * 1000000000LL);
-    seconds = asUtc - sl_time_zone_offset(seconds * 1000000000LL);
-    return seconds * 1000000000LL + nanosecond;
+    seconds = asUtc - sl_time_zone_offset(nanoseconds_at(asUtc, 0));
+    seconds = asUtc - sl_time_zone_offset(nanoseconds_at(seconds, 0));
+    return nanoseconds_at(seconds, nanosecond);
 }
 
 /* The local zone's offset from UTC at a given moment, in seconds. */
