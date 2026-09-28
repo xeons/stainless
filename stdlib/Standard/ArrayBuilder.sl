@@ -47,8 +47,7 @@ class ArrayBuilder<T>
         if (_count == _items.Length)
         {
             var grown = new T[_items.Length * 2u];
-            for (nuint i = 0u; i < _count; i++)
-                grown[i] = _items[i];
+            _items[:_count].CopyTo(grown);
             _items = grown;
         }
 
@@ -62,10 +61,7 @@ class ArrayBuilder<T>
         if (_count == _items.Length)
             return _items;
 
-        var exact = new T[_count];
-        for (nuint i = 0u; i < _count; i++)
-            exact[i] = _items[i];
-        return exact;
+        return _items[:_count].ToArray();
     }
 }
 

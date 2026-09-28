@@ -1376,6 +1376,19 @@ doubles rather than chasing its own growing end.
 
 <sub>[stdlib/Collections/List.sl:141](../../stdlib/Collections/List.sl#L141)</sub>
 
+#### AddRange *method*
+
+```
+void AddRange(ReadOnlySpan<T> items)
+```
+
+Appends every element of a span, in its order: one copy, and a
+`memmove` for elements that hold no counted reference.
+
+**See also** &nbsp; [List.InsertRange](#insertrange-method)
+
+<sub>[stdlib/Collections/List.sl:147](../../stdlib/Collections/List.sl#L147)</sub>
+
 #### Insert *method*
 
 ```
@@ -1387,7 +1400,7 @@ Inserts at a position, moving everything after it up one.
 `index == Count` appends, which is what makes a loop that inserts in
 order need no special case at the end.
 
-<sub>[stdlib/Collections/List.sl:147](../../stdlib/Collections/List.sl#L147)</sub>
+<sub>[stdlib/Collections/List.sl:153](../../stdlib/Collections/List.sl#L153)</sub>
 
 #### RemoveAt *method*
 
@@ -1403,7 +1416,7 @@ its removal, which is a leak that only shows up under a profiler.
 
 **See also** &nbsp; [List.Add](#add-method) &middot; [List.RemoveRange](#removerange-method)
 
-<sub>[stdlib/Collections/List.sl:170](../../stdlib/Collections/List.sl#L170)</sub>
+<sub>[stdlib/Collections/List.sl:173](../../stdlib/Collections/List.sl#L173)</sub>
 
 #### RemoveRange *method*
 
@@ -1415,7 +1428,7 @@ Removes `count` items from `index` onwards.
 
 **See also** &nbsp; [List.RemoveAt](#removeat-method)
 
-<sub>[stdlib/Collections/List.sl:185](../../stdlib/Collections/List.sl#L185)</sub>
+<sub>[stdlib/Collections/List.sl:186](../../stdlib/Collections/List.sl#L186)</sub>
 
 #### RemoveAll *method*
 
@@ -1428,7 +1441,7 @@ Removes every item the predicate accepts, and answers how many went.
 One pass that compacts in place, so removing half a list costs one
 traversal rather than one shuffle per removal.
 
-<sub>[stdlib/Collections/List.sl:204](../../stdlib/Collections/List.sl#L204)</sub>
+<sub>[stdlib/Collections/List.sl:202](../../stdlib/Collections/List.sl#L202)</sub>
 
 #### Reverse *method*
 
@@ -1438,7 +1451,7 @@ void Reverse()
 
 Reverses the list in place.
 
-<sub>[stdlib/Collections/List.sl:224](../../stdlib/Collections/List.sl#L224)</sub>
+<sub>[stdlib/Collections/List.sl:221](../../stdlib/Collections/List.sl#L221)</sub>
 
 #### ToArray *method*
 
@@ -1450,7 +1463,7 @@ The items as a new array, which the caller owns.
 
 **See also** &nbsp; [List.CopyTo](#copyto-method)
 
-<sub>[stdlib/Collections/List.sl:237](../../stdlib/Collections/List.sl#L237)</sub>
+<sub>[stdlib/Collections/List.sl:234](../../stdlib/Collections/List.sl#L234)</sub>
 
 #### CopyTo *method*
 
@@ -1462,7 +1475,7 @@ Copies the items into `into`, starting at `at`.
 
 **See also** &nbsp; [List.ToArray](#toarray-method)
 
-<sub>[stdlib/Collections/List.sl:248](../../stdlib/Collections/List.sl#L248)</sub>
+<sub>[stdlib/Collections/List.sl:239](../../stdlib/Collections/List.sl#L239)</sub>
 
 #### GetRange *method*
 
@@ -1474,7 +1487,7 @@ A new list holding `count` items from `index` onwards.
 
 **See also** &nbsp; [List.Slice](#slice-method)
 
-<sub>[stdlib/Collections/List.sl:259](../../stdlib/Collections/List.sl#L259)</sub>
+<sub>[stdlib/Collections/List.sl:249](../../stdlib/Collections/List.sl#L249)</sub>
 
 #### Find *method*
 
@@ -1487,7 +1500,7 @@ none -- which is `null` for a reference type, as it is in .NET.
 
 **See also** &nbsp; [List.FindIndex](#findindex-method) &middot; [List.FindLast](#findlast-method)
 
-<sub>[stdlib/Collections/List.sl:275](../../stdlib/Collections/List.sl#L275)</sub>
+<sub>[stdlib/Collections/List.sl:265](../../stdlib/Collections/List.sl#L265)</sub>
 
 #### FindLast *method*
 
@@ -1499,7 +1512,7 @@ The last item the predicate accepts, or `default(T)`.
 
 **See also** &nbsp; [List.Find](#find-method)
 
-<sub>[stdlib/Collections/List.sl:288](../../stdlib/Collections/List.sl#L288)</sub>
+<sub>[stdlib/Collections/List.sl:278](../../stdlib/Collections/List.sl#L278)</sub>
 
 #### FindAll *method*
 
@@ -1511,7 +1524,7 @@ Every item the predicate accepts, in order.
 
 **See also** &nbsp; [List.Find](#find-method)
 
-<sub>[stdlib/Collections/List.sl:301](../../stdlib/Collections/List.sl#L301)</sub>
+<sub>[stdlib/Collections/List.sl:291](../../stdlib/Collections/List.sl#L291)</sub>
 
 #### FindIndex *method*
 
@@ -1529,7 +1542,7 @@ because C#'s shape is a workaround for a type it does not have.
 
 **See also** &nbsp; [List.FindLastIndex](#findlastindex-method) &middot; [Collections.IndexOf](#indexof-function)
 
-<sub>[stdlib/Collections/List.sl:322](../../stdlib/Collections/List.sl#L322)</sub>
+<sub>[stdlib/Collections/List.sl:312](../../stdlib/Collections/List.sl#L312)</sub>
 
 #### FindLastIndex *method*
 
@@ -1541,7 +1554,7 @@ Where the last item the predicate accepts is, or `None`.
 
 **See also** &nbsp; [List.FindIndex](#findindex-method)
 
-<sub>[stdlib/Collections/List.sl:335](../../stdlib/Collections/List.sl#L335)</sub>
+<sub>[stdlib/Collections/List.sl:325](../../stdlib/Collections/List.sl#L325)</sub>
 
 #### Exists *method*
 
@@ -1553,7 +1566,7 @@ Whether any item is accepted by the predicate.
 
 **See also** &nbsp; [List.TrueForAll](#trueforall-method)
 
-<sub>[stdlib/Collections/List.sl:348](../../stdlib/Collections/List.sl#L348)</sub>
+<sub>[stdlib/Collections/List.sl:338](../../stdlib/Collections/List.sl#L338)</sub>
 
 #### TrueForAll *method*
 
@@ -1565,7 +1578,7 @@ Whether every item is.
 
 **See also** &nbsp; [List.Exists](#exists-method)
 
-<sub>[stdlib/Collections/List.sl:353](../../stdlib/Collections/List.sl#L353)</sub>
+<sub>[stdlib/Collections/List.sl:343](../../stdlib/Collections/List.sl#L343)</sub>
 
 #### ForEach *method*
 
@@ -1579,7 +1592,7 @@ The list is read as it goes, so an action that adds to it is a loop
 that does not end. .NET throws for this; there is nothing to throw
 here, and saying so is the whole of what can be done about it.
 
-<sub>[stdlib/Collections/List.sl:368](../../stdlib/Collections/List.sl#L368)</sub>
+<sub>[stdlib/Collections/List.sl:358](../../stdlib/Collections/List.sl#L358)</sub>
 
 #### EnsureCapacity *method*
 
@@ -1592,7 +1605,7 @@ afterwards. Never shrinks.
 
 **See also** &nbsp; [List.TrimExcess](#trimexcess-method) &middot; [List.Capacity](#capacity-property)
 
-<sub>[stdlib/Collections/List.sl:381](../../stdlib/Collections/List.sl#L381)</sub>
+<sub>[stdlib/Collections/List.sl:371](../../stdlib/Collections/List.sl#L371)</sub>
 
 #### TrimExcess *method*
 
@@ -1604,7 +1617,7 @@ Gives back the room past `Count`.
 
 **See also** &nbsp; [List.EnsureCapacity](#ensurecapacity-method)
 
-<sub>[stdlib/Collections/List.sl:391](../../stdlib/Collections/List.sl#L391)</sub>
+<sub>[stdlib/Collections/List.sl:381](../../stdlib/Collections/List.sl#L381)</sub>
 
 #### Slice *method*
 
@@ -1617,7 +1630,7 @@ since ranges arrived, and the two are the same call.
 
 **See also** &nbsp; [List.GetRange](#getrange-method)
 
-<sub>[stdlib/Collections/List.sl:401](../../stdlib/Collections/List.sl#L401)</sub>
+<sub>[stdlib/Collections/List.sl:391](../../stdlib/Collections/List.sl#L391)</sub>
 
 #### InsertRange *method*
 
@@ -1628,11 +1641,25 @@ void InsertRange(nuint index, IEnumerable<T> items)
 Inserts every item of another sequence at `index`, in its order.
 
 Collected first, for the reason `AddRange` gives, and then moved into
-place with one shift of the tail rather than one per item.
+place with one shift of the tail rather than one per item. Another
+`List<T>` is copied from directly rather than walked.
 
 **See also** &nbsp; [List.AddRange](#addrange-method)
 
-<sub>[stdlib/Collections/List.sl:409](../../stdlib/Collections/List.sl#L409)</sub>
+<sub>[stdlib/Collections/List.sl:400](../../stdlib/Collections/List.sl#L400)</sub>
+
+#### InsertRange *method*
+
+```
+void InsertRange(nuint index, ReadOnlySpan<T> items)
+```
+
+Inserts every element of a span at `index`, in its order. A span over
+this list's own storage is copied out first.
+
+**See also** &nbsp; [List.AddRange](#addrange-method)
+
+<sub>[stdlib/Collections/List.sl:421](../../stdlib/Collections/List.sl#L421)</sub>
 
 #### AsReadOnly *method*
 
@@ -1647,7 +1674,7 @@ wrapper for the same reason this answers an interface: what it buys is a
 signature that says "I will not write to this", and neither stops the
 owner writing to it meanwhile.
 
-<sub>[stdlib/Collections/List.sl:442](../../stdlib/Collections/List.sl#L442)</sub>
+<sub>[stdlib/Collections/List.sl:448](../../stdlib/Collections/List.sl#L448)</sub>
 
 #### GetEnumerator *method*
 
@@ -1661,7 +1688,7 @@ copy, so changing the list during a walk changes what the walk sees.
 
 **See also** &nbsp; [ListEnumerator](#listenumeratort-class)
 
-<sub>[stdlib/Collections/List.sl:449](../../stdlib/Collections/List.sl#L449)</sub>
+<sub>[stdlib/Collections/List.sl:455](../../stdlib/Collections/List.sl#L455)</sub>
 
 #### Clear *method*
 
@@ -1673,7 +1700,7 @@ Drops every item. The backing array is replaced rather than merely
 forgotten, so any references it held are released now instead of
 lingering until the slots are overwritten.
 
-<sub>[stdlib/Collections/List.sl:454](../../stdlib/Collections/List.sl#L454)</sub>
+<sub>[stdlib/Collections/List.sl:460](../../stdlib/Collections/List.sl#L460)</sub>
 
 ### ListEnumerator&lt;T&gt; *class*
 
@@ -2024,7 +2051,7 @@ during a walk invalidates it.
 
 **See also** &nbsp; [QueueEnumerator](#queueenumeratort-class) &middot; [Queue.ToList](#tolist-method)
 
-<sub>[stdlib/Collections/Queue.sl:138](../../stdlib/Collections/Queue.sl#L138)</sub>
+<sub>[stdlib/Collections/Queue.sl:137](../../stdlib/Collections/Queue.sl#L137)</sub>
 
 ### QueueEnumerator&lt;T&gt; *class*
 
@@ -2887,7 +2914,7 @@ insertion point usually does not want the search, and the other way round.
 
 **See also** &nbsp; [Collections.FindLowerBound](#findlowerbound-function) &middot; [Collections.Sort](#sort-function)
 
-<sub>[stdlib/Collections/Collections.sl:355](../../stdlib/Collections/Collections.sl#L355)</sub>
+<sub>[stdlib/Collections/Collections.sl:353](../../stdlib/Collections/Collections.sl#L353)</sub>
 
 ### Chunk *function*
 
@@ -3241,7 +3268,7 @@ this is the one to reach for at the sizes a chain works at.
 
 **See also** &nbsp; [HashSet](#hashsett-class)
 
-<sub>[stdlib/Collections/Functional.sl:427](../../stdlib/Collections/Functional.sl#L427)</sub>
+<sub>[stdlib/Collections/Functional.sl:421](../../stdlib/Collections/Functional.sl#L421)</sub>
 
 ### Distinct *function*
 
@@ -3259,7 +3286,7 @@ O(n squared) in comparisons, as the slice overload is.
 
 **See also** &nbsp; [HashSet](#hashsett-class)
 
-<sub>[stdlib/Collections/Functional.sl:443](../../stdlib/Collections/Functional.sl#L443)</sub>
+<sub>[stdlib/Collections/Functional.sl:437](../../stdlib/Collections/Functional.sl#L437)</sub>
 
 ### DistinctBy *function*
 
@@ -3496,7 +3523,7 @@ equal element when there is one.
 
 **See also** &nbsp; [Collections.BinarySearch](#binarysearch-function)
 
-<sub>[stdlib/Collections/Collections.sl:386](../../stdlib/Collections/Collections.sl#L386)</sub>
+<sub>[stdlib/Collections/Collections.sl:384](../../stdlib/Collections/Collections.sl#L384)</sub>
 
 ### First *function*
 
@@ -4568,7 +4595,7 @@ the reason `Sort` is.
 
 **See also** &nbsp; [Collections.Sort](#sort-function)
 
-<sub>[stdlib/Collections/Functional.sl:463](../../stdlib/Collections/Functional.sl#L463)</sub>
+<sub>[stdlib/Collections/Functional.sl:457](../../stdlib/Collections/Functional.sl#L457)</sub>
 
 ### OrderBy *function*
 
@@ -4585,7 +4612,7 @@ input alone. Copies into an array first, so it costs one.
 
 **See also** &nbsp; [Collections.Sort](#sort-function)
 
-<sub>[stdlib/Collections/Functional.sl:472](../../stdlib/Collections/Functional.sl#L472)</sub>
+<sub>[stdlib/Collections/Functional.sl:466](../../stdlib/Collections/Functional.sl#L466)</sub>
 
 ### OrderBy *function*
 
@@ -4805,7 +4832,7 @@ Reverses part of an array in place.
 
 **See also** &nbsp; [List.Reverse](#reverse-method)
 
-<sub>[stdlib/Collections/Collections.sl:411](../../stdlib/Collections/Collections.sl#L411)</sub>
+<sub>[stdlib/Collections/Collections.sl:409](../../stdlib/Collections/Collections.sl#L409)</sub>
 
 ### Select *function*
 
@@ -5072,7 +5099,7 @@ Everything after the first `count`.
 
 **See also** &nbsp; [Collections.Take](#take-function)
 
-<sub>[stdlib/Collections/Functional.sl:495](../../stdlib/Collections/Functional.sl#L495)</sub>
+<sub>[stdlib/Collections/Functional.sl:489](../../stdlib/Collections/Functional.sl#L489)</sub>
 
 ### SkipLast *function*
 
@@ -5177,7 +5204,7 @@ type that implements nothing at all:
 
 **See also** &nbsp; [Collections.OrderBy](#orderby-function)
 
-<sub>[stdlib/Collections/Collections.sl:278](../../stdlib/Collections/Collections.sl#L278)</sub>
+<sub>[stdlib/Collections/Collections.sl:277](../../stdlib/Collections/Collections.sl#L277)</sub>
 
 ### Sort *function*
 
@@ -5197,7 +5224,7 @@ is the cheaper trade, and it gets the array version's stability for free.
 
 - `T` — the element type, which must order itself
 
-<sub>[stdlib/Collections/Collections.sl:437](../../stdlib/Collections/Collections.sl#L437)</sub>
+<sub>[stdlib/Collections/Collections.sl:435](../../stdlib/Collections/Collections.sl#L435)</sub>
 
 ### Sort *function*
 
@@ -5211,7 +5238,7 @@ The same, ordered by a comparer.
 
 - `T` — the element type; the comparer orders it, so nothing is asked of it
 
-<sub>[stdlib/Collections/Collections.sl:457](../../stdlib/Collections/Collections.sl#L457)</sub>
+<sub>[stdlib/Collections/Collections.sl:455](../../stdlib/Collections/Collections.sl#L455)</sub>
 
 ### Sort *function*
 
@@ -5498,7 +5525,7 @@ The first `count` elements, or all of them if there are fewer.
 
 **See also** &nbsp; [Collections.Skip](#skip-function)
 
-<sub>[stdlib/Collections/Functional.sl:479](../../stdlib/Collections/Functional.sl#L479)</sub>
+<sub>[stdlib/Collections/Functional.sl:473](../../stdlib/Collections/Functional.sl#L473)</sub>
 
 ### TakeLast *function*
 
@@ -5638,7 +5665,7 @@ The same for a slice, which is not an `IEnumerable` and so does not collide.
 
 **See also** &nbsp; [Collections.ToList](#tolist-function)
 
-<sub>[stdlib/Collections/Functional.sl:410](../../stdlib/Collections/Functional.sl#L410)</sub>
+<sub>[stdlib/Collections/Functional.sl:407](../../stdlib/Collections/Functional.sl#L407)</sub>
 
 ### ToDictionary *function*
 

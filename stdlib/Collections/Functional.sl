@@ -397,10 +397,7 @@ public List<T> ToList<T>(ReadOnlySpan<T> items)
 public T[] ToArray<T>(IEnumerable<T> items)
 {
     var all = ToList(items);
-    var array = new T[all.Count];
-    for (nuint i = 0u; i < all.Count; i++)
-        array[i] = all[i];
-    return array;
+    return all.ToArray();
 }
 
 /// The same for a slice, which is not an `IEnumerable` and so does not collide.
@@ -409,10 +406,7 @@ public T[] ToArray<T>(IEnumerable<T> items)
 /// @see Collections.ToList
 public T[] ToArray<T>(ReadOnlySpan<T> items)
 {
-    var array = new T[items.Length];
-    for (nuint i = 0u; i < items.Length; i++)
-        array[i] = items[i];
-    return array;
+    return items.ToArray();
 }
 
 /// The elements, in order, with later repeats left out.

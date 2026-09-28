@@ -184,6 +184,25 @@ void ChangeLists()
     Console.WriteLine("tag list: " + ShowTags(tags.ToArray()));
     tags.Clear();
     Console.WriteLine("cleared");
+
+    // Wrapped round the ring before it grows, so growing copies two runs.
+    var queue = new Queue<int>();
+    for (int i = 0; i < 6; i++)
+        queue.Enqueue(i);
+    for (int i = 0; i < 4; i++)
+        queue.Dequeue();
+    for (int i = 6; i < 16; i++)
+        queue.Enqueue(i);
+    Console.WriteLine("queue: " + ShowList(queue.ToList(), (n) => Text.FromInteger(n)));
+
+    var stack = new Stack<String>();
+    for (int i = 0; i < 12; i++)
+        stack.Push(Text.FromInteger(i));
+    Console.WriteLine("stack: " + ShowList(stack.ToList(), (s) => s));
+
+    int[] spread = [..queue.ToList(), 99];
+    Console.WriteLine("spread: " + Text.FromInteger((long)spread.Length) + " " +
+        Text.FromInteger(spread[12u]));
 }
 
 int Main()

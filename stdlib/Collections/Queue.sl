@@ -117,11 +117,10 @@ public class Queue<T> : IEnumerable<T>
     /// @see Queue.GetEnumerator
     public List<T> ToList()
     {
-        var result = new List<T>();
-        for (nuint i = 0; i < _count; i++)
-        {
-            result.Add(_items[(_head + i) & (_items.Length - 1)]);
-        }
+        var result = new List<T>(_count);
+        nuint first = FirstRunLength;
+        result.AddRange(_items[_head:_head + first]);
+        result.AddRange(_items[:_count - first]);
         return result;
     }
 
@@ -140,11 +139,13 @@ public class Queue<T> : IEnumerable<T>
     void GrowStorage()
     {
         var bigger = new T[_items.Length * 2];
-        for (nuint i = 0; i < _count; i++)
-        {
-            bigger[i] = _items[(_head + i) & (_items.Length - 1)];
-        }
+        nuint first = FirstRunLength;
+        _items[_head:_head + first].CopyTo(bigger);
+        _items[:_count - first].CopyTo(bigger[first:]);
         _items = bigger;
         _head = 0;
     }
+
+    /// How many items run from the head before the ring wraps to the start.
+    nuint FirstRunLength => _count < _items.Length - _head ? _count : _items.Length - _head;
 }

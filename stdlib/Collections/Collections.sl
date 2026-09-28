@@ -261,8 +261,7 @@ void MergeRuns<T>(Span<T> items, Span<T> scratch, nuint low, nuint middle, nuint
         }
     }
 
-    for (nuint at = low; at < high; at++)
-        items[at] = scratch[at];
+    scratch[low:high].CopyTo(items[low:]);
 }
 
 /// The same, ordered by a comparer rather than by the type itself.
@@ -340,8 +339,7 @@ void MergeRuns<T>(Span<T> items, Span<T> scratch, nuint low, nuint middle, nuint
         }
     }
 
-    for (nuint at = low; at < high; at++)
-        items[at] = scratch[at];
+    scratch[low:high].CopyTo(items[low:]);
 }
 
 /// Where `wanted` is in an already-ordered slice, if it is there at all.

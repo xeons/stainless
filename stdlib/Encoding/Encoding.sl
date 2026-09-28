@@ -76,10 +76,8 @@ abstract class TailDecoder : IDecoder
             return "";
 
         var joined = new byte[total];
-        for (nuint i = 0u; i < _heldCount; i++)
-            joined[i] = _held[i];
-        for (nuint i = 0u; i < count; i++)
-            joined[_heldCount + i] = bytes[index + i];
+        _held[:_heldCount].CopyTo(joined);
+        bytes[index:index + count].CopyTo(joined[_heldCount:]);
 
         // Nothing is held back on a flush: what is unfinished then is never
         // going to be finished, and the encoding turns it into U+FFFD.
@@ -90,17 +88,12 @@ abstract class TailDecoder : IDecoder
         nuint usable = total - tail;
 
         _heldCount = tail;
-        for (nuint i = 0u; i < tail; i++)
-            _held[i] = joined[usable + i];
+        joined[usable:].CopyTo(_held);
 
         if (usable == 0u)
             return "";
 
-        var ready = new byte[usable];
-        for (nuint i = 0u; i < usable; i++)
-            ready[i] = joined[i];
-
-        return _encoding.GetString(ready);
+        return _encoding.GetString(joined[:usable].ToArray());
     }
 
     public void Reset()
@@ -121,10 +114,7 @@ class WholeDecoder : IDecoder
         if (count == 0u)
             return "";
 
-        var ready = new byte[count];
-        for (nuint i = 0u; i < count; i++)
-            ready[i] = bytes[index + i];
-        return _encoding.GetString(ready);
+        return _encoding.GetString(bytes[index:index + count].ToArray());
     }
 
     public void Reset() { }
@@ -366,8 +356,5 @@ byte[] CopyBytesFrom(byte[] bytes, nuint at)
     if (at >= bytes.Length)
         return [];
 
-    var rest = new byte[bytes.Length - at];
-    for (nuint i = 0; i < rest.Length; i++)
-        rest[i] = bytes[at + i];
-    return rest;
+    return bytes[at:].ToArray();
 }

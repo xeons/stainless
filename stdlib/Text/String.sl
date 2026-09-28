@@ -662,10 +662,8 @@ public class String
     {
         nuint size = this.ByteLength();
         var bytes = new byte[size];
-        var mine = this.ToPointer();
-
-        for (nuint i = 0; i < size; i++)
-            bytes[i] = mine[i];
+        if (size != 0u)
+            memcpy(&bytes[0u], this.ToPointer(), size);
         return bytes;
     }
 

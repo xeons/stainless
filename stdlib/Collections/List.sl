@@ -140,6 +140,12 @@ public class List<T> : IList<T>, IEnumerable<T>
     /// @see List.InsertRange
     public void AddRange(IEnumerable<T> items) => InsertRange(_count, items);
 
+    /// Appends every element of a span, in its order: one copy, and a
+    /// `memmove` for elements that hold no counted reference.
+    ///
+    /// @see List.InsertRange
+    public void AddRange(ReadOnlySpan<T> items) => InsertRange(_count, items);
+
     /// Inserts at a position, moving everything after it up one.
     ///
     /// `index == Count` appends, which is what makes a loop that inserts in
@@ -151,10 +157,7 @@ public class List<T> : IList<T>, IEnumerable<T>
         if (_count == _items.Length)
             GrowStorage();
 
-        // Backwards, so a slot is read before the copy that overwrites it.
-        for (nuint i = _count; i > index; i--)
-            _items[i] = _items[i - 1u];
-
+        _items[index:_count].CopyTo(_items[index + 1u:]);
         _items[index] = item;
         _count++;
     }
@@ -172,9 +175,7 @@ public class List<T> : IList<T>, IEnumerable<T>
         if (index >= _count)
             sl_array_bounds_fail(index, _count);
 
-        for (nuint i = index; i + 1u < _count; i++)
-            _items[i] = _items[i + 1u];
-
+        _items[index + 1u:_count].CopyTo(_items[index:]);
         _count--;
         _items[_count] = default(T);
     }
@@ -189,11 +190,8 @@ public class List<T> : IList<T>, IEnumerable<T>
         if (index > _count || count > _count - index)
             sl_array_bounds_fail(RangeEnd(index, count), _count);
 
-        for (nuint i = index; i + count < _count; i++)
-            _items[i] = _items[i + count];
-
-        for (nuint i = _count - count; i < _count; i++)
-            _items[i] = default(T);
+        _items[index + count:_count].CopyTo(_items[index:]);
+        _items[_count - count:_count].Clear();
         _count = _count - count;
     }
 
@@ -214,8 +212,7 @@ public class List<T> : IList<T>, IEnumerable<T>
         }
 
         nuint removed = _count - kept;
-        for (nuint i = kept; i < _count; i++)
-            _items[i] = default(T);
+        _items[kept:_count].Clear();
         _count = kept;
         return removed;
     }
@@ -234,13 +231,7 @@ public class List<T> : IList<T>, IEnumerable<T>
     /// The items as a new array, which the caller owns.
     ///
     /// @see List.CopyTo
-    public T[] ToArray()
-    {
-        var answer = new T[_count];
-        for (nuint i = 0; i < _count; i++)
-            answer[i] = _items[i];
-        return answer;
-    }
+    public T[] ToArray() => _items[:_count].ToArray();
 
     /// Copies the items into `into`, starting at `at`.
     ///
@@ -249,8 +240,7 @@ public class List<T> : IList<T>, IEnumerable<T>
     {
         if (at > into.Length || _count > into.Length - at)
             sl_array_bounds_fail(RangeEnd(at, _count), into.Length);
-        for (nuint i = 0; i < _count; i++)
-            into[at + i] = _items[i];
+        _items[:_count].CopyTo(into[at:]);
     }
 
     /// A new list holding `count` items from `index` onwards.
@@ -262,8 +252,8 @@ public class List<T> : IList<T>, IEnumerable<T>
             sl_array_bounds_fail(RangeEnd(index, count), _count);
 
         var answer = new List<T>(count);
-        for (nuint i = 0; i < count; i++)
-            answer.Add(_items[index + i]);
+        _items[index:index + count].CopyTo(answer._items);
+        answer._count = count;
         return answer;
     }
 
@@ -403,7 +393,8 @@ public class List<T> : IList<T>, IEnumerable<T>
     /// Inserts every item of another sequence at `index`, in its order.
     ///
     /// Collected first, for the reason `AddRange` gives, and then moved into
-    /// place with one shift of the tail rather than one per item.
+    /// place with one shift of the tail rather than one per item. Another
+    /// `List<T>` is copied from directly rather than walked.
     ///
     /// @see List.AddRange
     public void InsertRange(nuint index, IEnumerable<T> items)
@@ -411,26 +402,41 @@ public class List<T> : IList<T>, IEnumerable<T>
         if (index > _count)
             sl_array_bounds_fail(index, _count);
 
-        var added = new List<T>();
-        foreach (var item in items)
+        if (items is List<T> list)
         {
-            added.Add(item);
+            InsertRange(index, list._items[:list._count]);
+            return;
         }
 
-        nuint count = added._count;
+        var added = new List<T>();
+        foreach (var item in items)
+            added.Add(item);
+        InsertRange(index, added._items[:added._count]);
+    }
+
+    /// Inserts every element of a span at `index`, in its order. A span over
+    /// this list's own storage is copied out first.
+    ///
+    /// @see List.AddRange
+    public void InsertRange(nuint index, ReadOnlySpan<T> items)
+    {
+        if (index > _count)
+            sl_array_bounds_fail(index, _count);
+
+        nuint count = items.Length;
         if (count == 0u)
             return;
+        if (items.Overlaps(_items))
+            items = items.ToArray();
+
         // Doubling, as `Add` grows, so a loop of small ranges stays linear.
         nuint needed = _count + count;
         if (needed > _items.Length)
             ResizeStorage(needed > _items.Length * 2u ? needed : _items.Length * 2u);
 
-        // Backwards, so a slot is read before the copy that overwrites it.
-        for (nuint i = _count; i > index; i--)
-            _items[i - 1u + count] = _items[i - 1u];
-        for (nuint i = 0u; i < count; i++)
-            _items[index + i] = added._items[i];
-        _count = _count + count;
+        _items[index:_count].CopyTo(_items[index + count:]);
+        items.CopyTo(_items[index:]);
+        _count = needed;
     }
 
     /// This list seen as something that cannot be changed through it.
@@ -462,8 +468,7 @@ public class List<T> : IList<T>, IEnumerable<T>
     void ResizeStorage(nuint room)
     {
         var bigger = new T[room];
-        for (nuint i = 0; i < _count; i++)
-            bigger[i] = _items[i];
+        _items[:_count].CopyTo(bigger);
         _items = bigger;
     }
 }

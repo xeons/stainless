@@ -121,8 +121,7 @@ public class Stack<T> : IEnumerable<T>
     void GrowStorage()
     {
         var bigger = new T[_items.Length * 2];
-        for (nuint i = 0; i < _count; i++)
-            bigger[i] = _items[i];
+        _items[:_count].CopyTo(bigger);
         _items = bigger;
     }
 }
