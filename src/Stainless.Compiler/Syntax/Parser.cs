@@ -198,19 +198,31 @@ public sealed class Parser
     private Token Expect(TokenKind kind)
     {
         if (At(kind)) return Advance();
-        if (!_tooDeep)
-            _diagnostics.Error("SL0100", Current.Span,
-                $"expected {kind.Describe()}, found {Current.Kind.Describe()}");
+        ReportExpected("SL0100", $"expected {kind.Describe()}, found {Current.Kind.Describe()}");
         return new Token(kind, Current.Span, kind.FixedText() ?? "");
     }
 
     private string ExpectIdentifier()
     {
         if (At(TokenKind.Identifier)) return Advance().Text;
-        if (!_tooDeep)
-            _diagnostics.Error("SL0101", Current.Span,
-                $"expected an identifier, found {Current.Kind.Describe()}");
+        ReportExpected("SL0101", $"expected an identifier, found {Current.Kind.Describe()}");
         return "?";
+    }
+
+    /// <summary>
+    /// Where the last missing token was reported, and into which bag, so
+    /// recovery that retries there says it once. The bag is part of it because
+    /// a speculative parse reports into one of its own, and what it said MUST
+    /// NOT silence the real parse at the same place.
+    /// </summary>
+    private (DiagnosticBag? Bag, int At) _lastExpected = (null, -1);
+
+    private void ReportExpected(string code, string message)
+    {
+        if (_tooDeep) return;
+        if (ReferenceEquals(_lastExpected.Bag, _diagnostics) && _lastExpected.At == Current.Span.Start) return;
+        _lastExpected = (_diagnostics, Current.Span.Start);
+        _diagnostics.Error(code, Current.Span, message);
     }
 
     /// <summary>
@@ -1181,7 +1193,7 @@ public sealed class Parser
             // type first, a property opens a brace, and a variant has no
             // constructor, because its cases are how one is built.
             if (kind == TypeDeclKind.Variant && At(TokenKind.Identifier) &&
-                Peek(1).Kind is TokenKind.OpenParen or TokenKind.Semicolon)
+                Peek(1).Kind is TokenKind.OpenParen or TokenKind.Semicolon or TokenKind.Comma)
             {
                 cases.Add(ParseVariantCase());
                 continue;
@@ -1342,7 +1354,19 @@ public sealed class Parser
                 $"case '{name}' cannot be variadic; a case's parameters are the fields it " +
                 "carries, and a value has a fixed number of them");
 
-        Expect(TokenKind.Semicolon);
+        // An enum separates its members with commas, and a case written the
+        // same way is one mistake, not the several a member parse would find.
+        if (At(TokenKind.Comma))
+        {
+            _diagnostics.Error("SL0100", Current.Span,
+                $"case '{name}' ends with ';', not ','; a variant's cases are declarations, not a list");
+            Advance();
+        }
+        else
+        {
+            Expect(TokenKind.Semicolon);
+        }
+
         return new VariantCaseSyntax(SpanFrom(start), name, parameters)
         {
             Documentation = documentation,

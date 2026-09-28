@@ -1263,4 +1263,19 @@ public class ParserTests
                     out var diagnostics);
         Assert.Empty(diagnostics.Items);
     }
+
+    /// <summary>
+    /// A variant case ended with an enum's comma is one mistake, and is
+    /// reported once with what to write, not as a pile of missing tokens at
+    /// the same place.
+    /// </summary>
+    [Fact]
+    public void AVariantCaseEndedWithACommaIsOneError()
+    {
+        Front.Parse("module Test;\npublic variant Shape\n{\n    Dot,\n    Circle(double Radius);\n}",
+                    out var diagnostics);
+        var error = Assert.Single(diagnostics.Items);
+        Assert.Equal("SL0100", error.Code);
+        Assert.Contains("ends with ';'", error.Message);
+    }
 }
