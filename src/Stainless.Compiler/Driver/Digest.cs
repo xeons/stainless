@@ -143,6 +143,10 @@ public static class Digest
             type.DestroySymbol ?? "",
         };
 
+        // Only when set, so the digest of every other type is what it was.
+        // Whether `|` and `HasFlag` compile against an enum depends on it.
+        if (type.IsFlags) parts.Add("flags");
+
         // Slot by slot, in order, and the count with them. A derived class in
         // another binary copied this table and appended after it, so both what
         // is in a slot and how many there are are things it compiled in.

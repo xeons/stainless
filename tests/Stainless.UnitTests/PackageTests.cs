@@ -221,6 +221,27 @@ public class DigestTests
     /// A public field's name is how it is read, so renaming one is a change to
     /// the surface even though no machine code moves.
     /// </summary>
+    /// <summary>
+    /// Whether an enum is <c>[Flags]</c> decides whether <c>|</c> compiles
+    /// against it, so adding or removing the marker is a change to the surface.
+    /// </summary>
+    [Fact]
+    public void MovesWhenAnEnumBecomesFlags()
+    {
+        MetadataType Access(bool flags) => new()
+        {
+            Kind = MetadataKind.Enum,
+            Module = "M",
+            Name = "Access",
+            Size = 4,
+            Alignment = 4,
+            Underlying = "int",
+            IsFlags = flags,
+        };
+
+        Assert.NotEqual(Metadata(Access(false)).AbiDigest, Metadata(Access(true)).AbiDigest);
+    }
+
     [Fact]
     public void MovesWhenAFieldIsRenamed() =>
         Assert.NotEqual(
