@@ -40,6 +40,8 @@ module Standard.Security.Cryptography;
 /// run it through a KDF, as TLS 1.3 does with HKDF, or ask for one of the
 /// `DeriveKeyFrom*` forms. The scalar multiplication behind it is constant
 /// time.
+///
+/// @see ECDsa
 public sealed class ECDiffieHellman
 {
     private EcKey _key;

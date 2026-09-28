@@ -200,6 +200,25 @@ sealed class EcKey
         return Ok(secret);
     }
 
+    /// The signature of `hash` as `r` then `s`, with the nonce RFC 6979 derives
+    /// through HMAC over `nonceHash`.
+    ///
+    /// @failure CryptoError.InvalidKey   this key has no private scalar
+    /// @failure CryptoError.Unsupported  `nonceHash` is the zero value
+    public Result<byte[], CryptoError> SignHash(ReadOnlySpan<byte> hash,
+                                                HashAlgorithmName nonceHash)
+    {
+        if (!_hasPrivateKey)
+            return Fail(CryptoError.InvalidKey);
+        if (nonceHash.HashSizeInBytes == 0u)
+            return Fail(CryptoError.Unsupported);
+        return Ok(SignEcHash(hash, _privateScalar, nonceHash, ref _domain));
+    }
+
+    /// Whether `r` and `s` sign `hash` under this key.
+    public bool VerifyHash(ReadOnlySpan<byte> hash, ReadOnlySpan<byte> r, ReadOnlySpan<byte> s) =>
+        VerifyEcHashVariableTime(hash, r, s, _publicPoint, ref _domain);
+
     // ------------------------------------------------------------ parameters
 
     /// The key's numbers, with `D` empty unless `includePrivate` is set.
