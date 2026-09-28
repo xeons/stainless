@@ -365,9 +365,31 @@ public sealed partial class Binder
             return;
         }
 
-        if (!Resolves(tag.Name))
+        if (!Resolves(tag.Name) && !NamesOmittedModule(tag.Name))
             diagnostics.Warning("SL0745", where,
                 $"'{tag.Name}' is not a type, a member or a module this file can see");
+    }
+
+    /// <summary>
+    /// Whether a cref points into a standard-library module this program does
+    /// not reach, by its full name or by its last segment. Such a module was
+    /// never parsed, so there is nothing to resolve against and nothing wrong.
+    /// </summary>
+    private bool NamesOmittedModule(string cref)
+    {
+        if (omittedModules is null) return false;
+
+        foreach (string module in omittedModules)
+        {
+            if (cref == module || cref.StartsWith(module + ".", StringComparison.Ordinal))
+                return true;
+
+            string shortName = ShortName(module);
+            if (cref == shortName || cref.StartsWith(shortName + ".", StringComparison.Ordinal))
+                return true;
+        }
+
+        return false;
     }
 
     // ======================================================== what tags mean

@@ -86,7 +86,7 @@ public ulong RotateRight(ulong value, int by) =>
 /// The high 64 bits of the 128-bit product of `left` and `right`; `left * right`
 /// is the low 64.
 ///
-/// @see Math.BigMul
+/// @see Standard.Math.BigMul
 public ulong MultiplyHigh(ulong left, ulong right) => MultiplyHighBits(left, right);
 
 // ------------------------------------------------------------ constant time

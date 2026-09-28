@@ -84,6 +84,35 @@ public class LibraryClosureTests
     public void AModuleNamedOnlyInACommentIsNotReached() =>
         Assert.DoesNotContain("Standard.Json", Reached("module App; // Standard.Json.Parse\n"));
 
+    /// <summary>
+    /// A documentation link from a reached module into one the program never
+    /// reaches is not a mistake in the library, and a program MUST NOT be
+    /// warned about it. `Standard.Bits` is a root and links to `Standard.Math`.
+    /// </summary>
+    [Theory]
+    [InlineData("module App; int Main() { return 0; }")]
+    [InlineData("module App; import Standard.Math; int Main() { return (int)Math.Abs(-1); }")]
+    public void TheLibraryWarnsAboutNothingWhateverTheProgramReaches(string program)
+    {
+        string directory = Path.Combine(Path.GetTempPath(), "stainless-closure-warnings",
+            Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(directory);
+        string source = Path.Combine(directory, "app.sl");
+        File.WriteAllText(source, program);
+
+        var result = new Compilation().Compile(new CompilationOptions
+        {
+            SourcePaths = [source],
+            OutputPath = Path.Combine(directory, "app.ll"),
+            IntermediateDirectory = directory,
+            EmitIrOnly = true,
+        });
+
+        Assert.Empty(result.Diagnostics
+            .Where(d => d.Span.File is not null && d.Span.File.Path.StartsWith("<standard>"))
+            .Select(d => d.Render(color: false)));
+    }
+
     [Fact]
     public void TheScanReadsTheModuleAndItsImports()
     {

@@ -677,8 +677,14 @@ public sealed class Compilation
         // Documentation of the library wants all of it, and a referenced
         // library's metadata can name a standard type its consumer never
         // imported, so both keep everything.
+        var omittedModules = new HashSet<string>(StringComparer.Ordinal);
         if (!options.DocumentStandardLibrary && options.References.Count == 0)
-            libraryFiles = LibraryClosure.ReachedFiles(libraryFiles, own);
+        {
+            var reachedFiles = LibraryClosure.ReachedFiles(libraryFiles, own);
+            omittedModules.UnionWith(libraryFiles.Select(f => f.ModuleName));
+            omittedModules.ExceptWith(reachedFiles.Select(f => f.ModuleName));
+            libraryFiles = reachedFiles;
+        }
 
         foreach (var file in libraryFiles)
             units.Add(file.Parse(diagnostics));
@@ -737,7 +743,7 @@ public sealed class Compilation
         var phase = System.Diagnostics.Stopwatch.StartNew();
         var program = new Binder(
             diagnostics, requireEntryPoint: needsEntryPoint, references: references,
-            cppAbi: target.Abi).Bind(units);
+            cppAbi: target.Abi, omittedModules: omittedModules).Bind(units);
         ReportPhase("bind", phase);
         if (diagnostics.HasErrors) return Failed(diagnostics);
 

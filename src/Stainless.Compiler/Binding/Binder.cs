@@ -106,11 +106,16 @@ public sealed record StaticInitialization(StaticSymbol? Static, FunctionSymbol? 
 /// False when building a library, which has no <c>Main</c> and must not be
 /// warned about one.
 /// </param>
+/// <param name="omittedModules">
+/// The standard-library modules the program does not reach and so were never
+/// parsed. A documentation link into one is not wrong, only out of sight.
+/// </param>
 public sealed partial class Binder(
     DiagnosticBag diagnostics,
     bool requireEntryPoint = true,
     CppAbi? cppAbi = null,
-    IReadOnlyList<Driver.ModuleMetadata>? references = null)
+    IReadOnlyList<Driver.ModuleMetadata>? references = null,
+    IReadOnlySet<string>? omittedModules = null)
 {
     private readonly Builtins _builtins = new();
 
