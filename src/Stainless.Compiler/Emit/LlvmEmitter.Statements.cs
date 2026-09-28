@@ -154,9 +154,12 @@ public sealed partial class LlvmEmitter
             if (_hasLabels) MoveInto(slot, value, local.Type);
             else InitializeWith(slot, value, local.Type);
         }
-        else if (local.Type is StructTypeSymbol structType && !structType.CarriesReferences())
+        else if (!local.Type.IsManagedSlot()
+                 && !(local.Type is StructTypeSymbol { } counted && counted.CarriesReferences()))
         {
-            Line($"store {StructName(structType)} zeroinitializer, ptr {slot}");
+            // A local with no initializer holds its type's zero, as `default`
+            // does. There is no definite-assignment check to refuse the read.
+            Line($"store {llvmType} zeroinitializer, ptr {slot}");
         }
 
         FlushTemporaries();

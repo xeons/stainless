@@ -788,6 +788,12 @@ array is zeroed ([§2.11.1](02-types.md#2111-t--a-counted-array)), so `new C[1][
 a `C`, and `Standard.Collections` kept exactly such an array around to blank a
 vacated slot with. This is that, spelled.
 
+**A local declared without a value holds this too.** `ulong total;` is zero
+and `uint[8] words;` is eight zeros, each time the declaration runs, as a
+struct local's fields already were. C# refuses the read instead; there is no
+definite-assignment analysis here, and a zero is the one answer that does not
+change from run to run.
+
 `default(void)` is the one refusal (SL0603): `void` is the absence of a value,
 so there is none of it to zero.
 
