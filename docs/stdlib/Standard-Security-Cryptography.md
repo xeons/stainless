@@ -10,16 +10,20 @@ var digest = Sha256.HashData(Encoding.CreateUtf8().GetBytes("hello"));
 Console.WriteLine(Convert.ToHexString(digest));
 
 var cipher = try Aes.FromKey(key);
-var sealed = try cipher.EncryptCbc(plaintext, iv, PaddingMode.Pkcs7);
+var encrypted = try cipher.EncryptCbc(plaintext, iv, PaddingMode.Pkcs7);
 
 var shared = try X25519.DeriveSharedSecret(myPrivateKey, theirPublicKey);
 var signature = try Ed25519.Sign(signingKey, message);
+
+var signer = try Rsa.ImportFromPem(pem);
+var rsaSignature = try signer.SignData(data, HashAlgorithmName.Sha256,
+                                       RsaSignaturePadding.Pss);
 ```
 
 **The shape is `System.Security.Cryptography`'s**, so a program being
 ported finds the names where it left them: `Sha256`, `Hmac`, `Aes`,
 `AesGcm`, `ChaCha20Poly1305`, `Rfc2898DeriveBytes.Pbkdf2`, `ECDsa`,
-`ECDiffieHellman`, `RandomNumberGenerator.Fill`,
+`ECDiffieHellman`, `Rsa`, `RandomNumberGenerator.Fill`,
 `CryptographicOperations.FixedTimeEquals`.
 `Blake2b`, `Scrypt` and `Argon2id` are not in .NET and follow the same
 shape. Three things about it differ, and each is a rule this language
@@ -62,7 +66,7 @@ small fraction of what the hardware could give. `ChaCha20Poly1305` is
 about three times as fast as `AesGcm` here, and is the one to choose
 where a format leaves the choice open.
 
-**Public-key is Curve25519, P-256 and P-384.** `X25519` and
+**Public-key is RSA, Curve25519, P-256 and P-384.** `X25519` and
 `ECDiffieHellman` agree keys; `Ed25519` and `ECDsa` sign. The NIST curves
 are fixed-width Montgomery multiplication in 64-bit limbs held inline, with
 the complete formulas of Renes, Costello and Batina so that no point is a
@@ -79,13 +83,31 @@ again, which shows only that a number nobody uses was out of range.
 Verification and the checking of a public point read nothing secret and are
 written for speed.
 
-RSA is not here yet; it wants an arbitrary-precision integer, and TODO.md
-carries the note. X.509 is `Standard.Formats.Asn1` and a signature check,
-which is enough to verify a certificate and not yet a path validator.
+**`Rsa` is the public-key half**, over a constant-time bignum of 64-bit
+limbs: signatures in PKCS #1 v1.5 and PSS, encryption in OAEP and PKCS #1
+v1.5, key generation, and keys in PKCS #1, PKCS #8, X.509 and PEM.
+
+**What is constant time there, exactly.** Every operation that touches a
+private key runs in time, and reads memory at addresses, fixed by the
+key's size: the Montgomery exponentiation reads all sixteen entries of its
+window table for every window, a reduction or an inverse runs a fixed count
+of steps, and a selection is a mask rather than a branch. The private
+operation is blinded by a fresh random factor and its result is checked
+against the public key before it is released. OAEP decoding and PKCS #1
+v1.5 decoding run under masks with one verdict at the end, and the latter
+uses implicit rejection, so a bad padding is not even a failure. Three
+things are not constant time, and none handles a secret an attacker can
+choose: verifying and encrypting, which use only the public key; key
+generation's search, which throws away candidates as soon as they fail and
+so reveals only things about numbers it does not keep; and exporting a
+private key, since DER writes each number in the fewest bytes it takes.
+
+X.509 is `Standard.Formats.Asn1` and a signature check, which is
+enough to verify a certificate and not yet a path validator.
 
 ## Contents
 
-**Types** &nbsp; [Aes](#aes-class) &middot; [AesGcm](#aesgcm-class) &middot; [Argon2id](#argon2id-class) &middot; [Blake2b](#blake2b-class) &middot; [ChaCha20](#chacha20-class) &middot; [ChaCha20Poly1305](#chacha20poly1305-class) &middot; [CipherMode](#ciphermode-enum) &middot; [CryptoError](#cryptoerror-enum) &middot; [CryptographicOperations](#cryptographicoperations-class) &middot; [DsaSignatureFormat](#dsasignatureformat-enum) &middot; [ECCurve](#eccurve-struct) &middot; [ECCurve.NamedCurves](#eccurvenamedcurves-class) &middot; [ECDiffieHellman](#ecdiffiehellman-class) &middot; [ECDsa](#ecdsa-class) &middot; [ECParameters](#ecparameters-struct) &middot; [ECPoint](#ecpoint-struct) &middot; [Ed25519](#ed25519-class) &middot; [HashAlgorithm](#hashalgorithm-class) &middot; [HashAlgorithmName](#hashalgorithmname-struct) &middot; [Hkdf](#hkdf-class) &middot; [Hmac](#hmac-class) &middot; [HmacMd5](#hmacmd5-class) &middot; [HmacSha1](#hmacsha1-class) &middot; [HmacSha256](#hmacsha256-class) &middot; [HmacSha384](#hmacsha384-class) &middot; [HmacSha512](#hmacsha512-class) &middot; [IHashAlgorithm](#ihashalgorithm-interface) &middot; [Md5](#md5-class) &middot; [PaddingMode](#paddingmode-enum) &middot; [PemEncoding](#pemencoding-class) &middot; [PemFields](#pemfields-struct) &middot; [Poly1305](#poly1305-class) &middot; [RandomNumberGenerator](#randomnumbergenerator-class) &middot; [Rfc2898DeriveBytes](#rfc2898derivebytes-class) &middot; [Scrypt](#scrypt-class) &middot; [Sha1](#sha1-class) &middot; [Sha256](#sha256-class) &middot; [Sha2Wide](#sha2wide-class) &middot; [Sha384](#sha384-class) &middot; [Sha512](#sha512-class) &middot; [X25519](#x25519-class)
+**Types** &nbsp; [Aes](#aes-class) &middot; [AesGcm](#aesgcm-class) &middot; [Argon2id](#argon2id-class) &middot; [Blake2b](#blake2b-class) &middot; [ChaCha20](#chacha20-class) &middot; [ChaCha20Poly1305](#chacha20poly1305-class) &middot; [CipherMode](#ciphermode-enum) &middot; [CryptoError](#cryptoerror-enum) &middot; [CryptographicOperations](#cryptographicoperations-class) &middot; [DsaSignatureFormat](#dsasignatureformat-enum) &middot; [ECCurve](#eccurve-struct) &middot; [ECCurve.NamedCurves](#eccurvenamedcurves-class) &middot; [ECDiffieHellman](#ecdiffiehellman-class) &middot; [ECDsa](#ecdsa-class) &middot; [ECParameters](#ecparameters-struct) &middot; [ECPoint](#ecpoint-struct) &middot; [Ed25519](#ed25519-class) &middot; [HashAlgorithm](#hashalgorithm-class) &middot; [HashAlgorithmName](#hashalgorithmname-struct) &middot; [Hkdf](#hkdf-class) &middot; [Hmac](#hmac-class) &middot; [HmacMd5](#hmacmd5-class) &middot; [HmacSha1](#hmacsha1-class) &middot; [HmacSha256](#hmacsha256-class) &middot; [HmacSha384](#hmacsha384-class) &middot; [HmacSha512](#hmacsha512-class) &middot; [IHashAlgorithm](#ihashalgorithm-interface) &middot; [Md5](#md5-class) &middot; [PaddingMode](#paddingmode-enum) &middot; [PemEncoding](#pemencoding-class) &middot; [PemFields](#pemfields-struct) &middot; [Poly1305](#poly1305-class) &middot; [RandomNumberGenerator](#randomnumbergenerator-class) &middot; [Rfc2898DeriveBytes](#rfc2898derivebytes-class) &middot; [Rsa](#rsa-class) &middot; [RsaEncryptionPadding](#rsaencryptionpadding-struct) &middot; [RsaEncryptionPaddingMode](#rsaencryptionpaddingmode-enum) &middot; [RsaParameters](#rsaparameters-class) &middot; [RsaSignaturePadding](#rsasignaturepadding-struct) &middot; [RsaSignaturePaddingMode](#rsasignaturepaddingmode-enum) &middot; [Scrypt](#scrypt-class) &middot; [Sha1](#sha1-class) &middot; [Sha256](#sha256-class) &middot; [Sha2Wide](#sha2wide-class) &middot; [Sha384](#sha384-class) &middot; [Sha512](#sha512-class) &middot; [X25519](#x25519-class)
 
 ## Types
 
@@ -2662,7 +2684,7 @@ static HashAlgorithmName Sha1 { get; }
 SHA-1, for verifying what older systems signed. Nothing new SHOULD be
 signed with it.
 
-<sub>[stdlib/Security/Cryptography/HashAlgorithmName.sl:44](../../stdlib/Security/Cryptography/HashAlgorithmName.sl#L44)</sub>
+<sub>[stdlib/Security/Cryptography/HashAlgorithmName.sl:70](../../stdlib/Security/Cryptography/HashAlgorithmName.sl#L70)</sub>
 
 #### Sha256 *property*
 
@@ -2672,7 +2694,7 @@ static HashAlgorithmName Sha256 { get; }
 
 SHA-256.
 
-<sub>[stdlib/Security/Cryptography/HashAlgorithmName.sl:47](../../stdlib/Security/Cryptography/HashAlgorithmName.sl#L47)</sub>
+<sub>[stdlib/Security/Cryptography/HashAlgorithmName.sl:73](../../stdlib/Security/Cryptography/HashAlgorithmName.sl#L73)</sub>
 
 #### Sha384 *property*
 
@@ -2682,7 +2704,7 @@ static HashAlgorithmName Sha384 { get; }
 
 SHA-384.
 
-<sub>[stdlib/Security/Cryptography/HashAlgorithmName.sl:50](../../stdlib/Security/Cryptography/HashAlgorithmName.sl#L50)</sub>
+<sub>[stdlib/Security/Cryptography/HashAlgorithmName.sl:76](../../stdlib/Security/Cryptography/HashAlgorithmName.sl#L76)</sub>
 
 #### Sha512 *property*
 
@@ -2692,7 +2714,7 @@ static HashAlgorithmName Sha512 { get; }
 
 SHA-512.
 
-<sub>[stdlib/Security/Cryptography/HashAlgorithmName.sl:53](../../stdlib/Security/Cryptography/HashAlgorithmName.sl#L53)</sub>
+<sub>[stdlib/Security/Cryptography/HashAlgorithmName.sl:79](../../stdlib/Security/Cryptography/HashAlgorithmName.sl#L79)</sub>
 
 #### Name *property*
 
@@ -2702,7 +2724,7 @@ String Name { get; }
 
 The name .NET gives it — `SHA256` — and empty for the zero value.
 
-<sub>[stdlib/Security/Cryptography/HashAlgorithmName.sl:56](../../stdlib/Security/Cryptography/HashAlgorithmName.sl#L56)</sub>
+<sub>[stdlib/Security/Cryptography/HashAlgorithmName.sl:82](../../stdlib/Security/Cryptography/HashAlgorithmName.sl#L82)</sub>
 
 #### HashSizeInBytes *property*
 
@@ -2712,7 +2734,7 @@ nuint HashSizeInBytes { get; }
 
 How many bytes its digest is, and zero for the zero value.
 
-<sub>[stdlib/Security/Cryptography/HashAlgorithmName.sl:72](../../stdlib/Security/Cryptography/HashAlgorithmName.sl#L72)</sub>
+<sub>[stdlib/Security/Cryptography/HashAlgorithmName.sl:98](../../stdlib/Security/Cryptography/HashAlgorithmName.sl#L98)</sub>
 
 #### CreateHashAlgorithm *method*
 
@@ -2726,7 +2748,7 @@ A fresh hash of this kind, to append to or to key an `Hmac` with.
 
 - [CryptoError.Unsupported](#unsupported-case) — this is the zero value
 
-<sub>[stdlib/Security/Cryptography/HashAlgorithmName.sl:90](../../stdlib/Security/Cryptography/HashAlgorithmName.sl#L90)</sub>
+<sub>[stdlib/Security/Cryptography/HashAlgorithmName.sl:116](../../stdlib/Security/Cryptography/HashAlgorithmName.sl#L116)</sub>
 
 #### Equals *method*
 
@@ -2736,7 +2758,7 @@ bool Equals(HashAlgorithmName other)
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/HashAlgorithmName.sl:102](../../stdlib/Security/Cryptography/HashAlgorithmName.sl#L102)</sub>
+<sub>[stdlib/Security/Cryptography/HashAlgorithmName.sl:128](../../stdlib/Security/Cryptography/HashAlgorithmName.sl#L128)</sub>
 
 #### operator == *operator*
 
@@ -2746,7 +2768,7 @@ static bool operator ==(HashAlgorithmName left, HashAlgorithmName right)
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/HashAlgorithmName.sl:104](../../stdlib/Security/Cryptography/HashAlgorithmName.sl#L104)</sub>
+<sub>[stdlib/Security/Cryptography/HashAlgorithmName.sl:130](../../stdlib/Security/Cryptography/HashAlgorithmName.sl#L130)</sub>
 
 #### operator != *operator*
 
@@ -2756,7 +2778,17 @@ static bool operator !=(HashAlgorithmName left, HashAlgorithmName right)
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/HashAlgorithmName.sl:107](../../stdlib/Security/Cryptography/HashAlgorithmName.sl#L107)</sub>
+<sub>[stdlib/Security/Cryptography/HashAlgorithmName.sl:133](../../stdlib/Security/Cryptography/HashAlgorithmName.sl#L133)</sub>
+
+#### ToString *method*
+
+```
+String ToString()
+```
+
+*No documentation.*
+
+<sub>[stdlib/Security/Cryptography/HashAlgorithmName.sl:136](../../stdlib/Security/Cryptography/HashAlgorithmName.sl#L136)</sub>
 
 ### Hkdf *class*
 
@@ -3645,6 +3677,927 @@ job is to make one attack per password rather than one per database.
 **See also** &nbsp; [Argon2id](#argon2id-class) &middot; [Scrypt](#scrypt-class)
 
 <sub>[stdlib/Security/Cryptography/Rfc2898DeriveBytes.sl:57](../../stdlib/Security/Cryptography/Rfc2898DeriveBytes.sl#L57)</sub>
+
+### Rsa *class*
+
+```
+sealed class Rsa
+```
+
+An RSA key, public or private: signatures and encryption under RFC 8017,
+and the key formats of PKCS #1, PKCS #8 and X.509.
+
+```csharp
+var key = try Rsa.Create(2048);
+byte[] signature = try key.SignData(message, HashAlgorithmName.Sha256,
+                                    RsaSignaturePadding.Pss);
+
+var peer = try Rsa.ImportFromPem(pem);
+bool genuine = peer.VerifyData(message, signature, HashAlgorithmName.Sha256,
+                               RsaSignaturePadding.Pss);
+```
+
+**The shape is .NET's `RSA`**, with two differences that follow from
+failing by `Result`. An `Rsa` always holds a key, so what .NET does with
+`RSA.Create()` and an `Import` method is a static method here that answers
+the key: `Rsa.ImportFromPem(pem)` rather than `rsa.ImportFromPem(pem)`. And
+a DER import takes exactly one value, where .NET reports how many bytes it
+read and ignores the rest.
+
+**What is constant time.** Every operation on a secret — the private
+exponentiation, the reduction of its input modulo each prime, the
+recombination, the inverse of the blinding factor, OAEP and PKCS #1 v1.5
+decoding after decryption, and the generation of `d` from the primes — runs
+in time and touches memory in a pattern fixed by the key's size alone. The
+public operations, verifying and encrypting, are not constant time and do
+not need to be. Key generation rejects candidates in variable time; see
+`Create(int)`.
+
+**The private operation is blinded and checked.** Its input is multiplied
+by `r^e` for a fresh random `r`, so the exponentiation never sees a value
+the caller chose, and its result is raised to `e` again and compared with
+the input before it is used, so a fault in the arithmetic cannot leak a
+prime through a wrong signature.
+
+An `Rsa` is not changed by anything after it is made, so one MAY be used
+from several threads at once.
+
+<sub>[stdlib/Security/Cryptography/Rsa.sl:67](../../stdlib/Security/Cryptography/Rsa.sl#L67)</sub>
+
+#### KeySize *property*
+
+```
+int KeySize { get; }
+```
+
+The modulus's size in bits: 2048 for a 2048-bit key.
+
+<sub>[stdlib/Security/Cryptography/Rsa.sl:89](../../stdlib/Security/Cryptography/Rsa.sl#L89)</sub>
+
+#### HasPrivateKey *property*
+
+```
+bool HasPrivateKey { get; }
+```
+
+Whether this holds the private key as well as the public one.
+
+<sub>[stdlib/Security/Cryptography/Rsa.sl:92](../../stdlib/Security/Cryptography/Rsa.sl#L92)</sub>
+
+#### Create *method*
+
+```
+static Result<Rsa, CryptoError> Create(int keySizeInBits)
+```
+
+A new key of `keySizeInBits` bits, with public exponent 65537.
+
+FIPS 186-5 §A.1.3: two random probable primes of half the size each,
+at least `sqrt(2) * 2^(half - 1)`, at least `2^(half - 100)` apart,
+each passing Miller-Rabin with random bases as many times as Table B.1
+asks; `d` is `65537^-1 mod lcm(p - 1, q - 1)` and at least `2^half`.
+
+**The time taken is random**, since it is a search: from a few tens to
+a few hundred milliseconds for 2048 bits on a current x64, and from
+under one second to several for 4096.
+A candidate is thrown away as soon as a small prime divides it or a
+Miller-Rabin round finds a witness, so the time reveals something
+about numbers that are not kept. What is kept is handled in constant
+time, `d` included.
+
+**Parameters**
+
+- `keySizeInBits` — a multiple of 64 from 512 to 16384; 2048 or more for anything new
+
+**Fails with**
+
+- [CryptoError.KeyLength](#keylength-case) — `keySizeInBits` is not a size this makes
+- [CryptoError.NoEntropy](#noentropy-case) — the platform would not supply randomness
+
+<sub>[stdlib/Security/Cryptography/Rsa.sl:115](../../stdlib/Security/Cryptography/Rsa.sl#L115)</sub>
+
+#### Create *method*
+
+```
+static Result<Rsa, CryptoError> Create(RsaParameters parameters)
+```
+
+The key `parameters` describes: public when it has only `Modulus` and
+`Exponent`, private when it has all eight.
+
+A private key is checked before it is accepted: `p * q` MUST be `n`,
+and `d`, `DP`, `DQ` and `InverseQ` MUST agree with `e`, `p` and `q`.
+A key that is only nearly right would sign wrongly, and a wrong
+signature from a CRT key is enough to factor its modulus.
+
+**Parameters**
+
+- `parameters` — the numbers, big-endian; leading zeros are ignored
+
+**Fails with**
+
+- [CryptoError.InvalidKey](#invalidkey-case) — a number is missing, out of range or inconsistent with the others
+
+**See also** &nbsp; [Rsa.ExportParameters](#exportparameters-method)
+
+<sub>[stdlib/Security/Cryptography/Rsa.sl:143](../../stdlib/Security/Cryptography/Rsa.sl#L143)</sub>
+
+#### ExportParameters *method*
+
+```
+Result<RsaParameters, CryptoError> ExportParameters(bool includePrivateParameters)
+```
+
+The key's numbers.
+
+`Modulus` and `D` are the modulus's length in bytes, and `P`, `Q`,
+`DP`, `DQ` and `InverseQ` half of it rounded up, each with leading
+zeros where the number is shorter. `Exponent` has none.
+
+**Parameters**
+
+- `includePrivateParameters` — whether to include the six private numbers
+
+**Fails with**
+
+- [CryptoError.InvalidKey](#invalidkey-case) — the private numbers were asked for, and this is a public key
+
+**See also** &nbsp; [Rsa.Create](#create-method)
+
+<sub>[stdlib/Security/Cryptography/Rsa.sl:314](../../stdlib/Security/Cryptography/Rsa.sl#L314)</sub>
+
+#### ExportRsaPublicKey *method*
+
+```
+byte[] ExportRsaPublicKey()
+```
+
+The public key as a PKCS #1 `RSAPublicKey` (RFC 8017 §A.1.1), DER.
+
+<sub>[stdlib/Security/Cryptography/Rsa.sl:344](../../stdlib/Security/Cryptography/Rsa.sl#L344)</sub>
+
+#### ExportRsaPrivateKey *method*
+
+```
+Result<byte[], CryptoError> ExportRsaPrivateKey()
+```
+
+The private key as a PKCS #1 `RSAPrivateKey` (RFC 8017 §A.1.2), DER.
+
+**Fails with**
+
+- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
+
+<sub>[stdlib/Security/Cryptography/Rsa.sl:354](../../stdlib/Security/Cryptography/Rsa.sl#L354)</sub>
+
+#### ExportSubjectPublicKeyInfo *method*
+
+```
+byte[] ExportSubjectPublicKeyInfo()
+```
+
+The public key as an X.509 `SubjectPublicKeyInfo` (RFC 5280 §4.1),
+DER: what a certificate carries and what `PUBLIC KEY` PEM holds.
+
+<sub>[stdlib/Security/Cryptography/Rsa.sl:366](../../stdlib/Security/Cryptography/Rsa.sl#L366)</sub>
+
+#### ExportPkcs8PrivateKey *method*
+
+```
+Result<byte[], CryptoError> ExportPkcs8PrivateKey()
+```
+
+The private key as an unencrypted PKCS #8 `PrivateKeyInfo` (RFC 5208),
+DER: what `PRIVATE KEY` PEM holds.
+
+**Fails with**
+
+- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
+
+<sub>[stdlib/Security/Cryptography/Rsa.sl:383](../../stdlib/Security/Cryptography/Rsa.sl#L383)</sub>
+
+#### ImportRsaPublicKey *method*
+
+```
+static Result<Rsa, CryptoError> ImportRsaPublicKey(ReadOnlySpan<byte> source)
+```
+
+A key from a PKCS #1 `RSAPublicKey`, DER.
+
+**Parameters**
+
+- `source` — exactly one DER value
+
+**Fails with**
+
+- [CryptoError.Encoding](#encoding-case) — `source` is not one `RSAPublicKey`
+- [CryptoError.InvalidKey](#invalidkey-case) — the numbers are not an RSA key
+
+<sub>[stdlib/Security/Cryptography/Rsa.sl:407](../../stdlib/Security/Cryptography/Rsa.sl#L407)</sub>
+
+#### ImportRsaPrivateKey *method*
+
+```
+static Result<Rsa, CryptoError> ImportRsaPrivateKey(ReadOnlySpan<byte> source)
+```
+
+A key from a PKCS #1 `RSAPrivateKey`, DER.
+
+**Parameters**
+
+- `source` — exactly one DER value
+
+**Fails with**
+
+- [CryptoError.Encoding](#encoding-case) — `source` is not one `RSAPrivateKey`
+- [CryptoError.Unsupported](#unsupported-case) — a multi-prime key, version 1
+- [CryptoError.InvalidKey](#invalidkey-case) — the numbers are not a consistent RSA key
+
+<sub>[stdlib/Security/Cryptography/Rsa.sl:422](../../stdlib/Security/Cryptography/Rsa.sl#L422)</sub>
+
+#### ImportSubjectPublicKeyInfo *method*
+
+```
+static Result<Rsa, CryptoError> ImportSubjectPublicKeyInfo(ReadOnlySpan<byte> source)
+```
+
+A key from an X.509 `SubjectPublicKeyInfo`, DER.
+
+**Parameters**
+
+- `source` — exactly one DER value
+
+**Fails with**
+
+- [CryptoError.Encoding](#encoding-case) — `source` is not one `SubjectPublicKeyInfo` holding an RSA key
+- [CryptoError.InvalidKey](#invalidkey-case) — the numbers are not an RSA key
+
+<sub>[stdlib/Security/Cryptography/Rsa.sl:437](../../stdlib/Security/Cryptography/Rsa.sl#L437)</sub>
+
+#### ImportPkcs8PrivateKey *method*
+
+```
+static Result<Rsa, CryptoError> ImportPkcs8PrivateKey(ReadOnlySpan<byte> source)
+```
+
+A key from an unencrypted PKCS #8 `PrivateKeyInfo` or
+`OneAsymmetricKey`, DER. Attributes and an embedded public key are
+passed over.
+
+**Parameters**
+
+- `source` — exactly one DER value
+
+**Fails with**
+
+- [CryptoError.Encoding](#encoding-case) — `source` is not one `PrivateKeyInfo` holding an RSA key
+- [CryptoError.InvalidKey](#invalidkey-case) — the numbers are not a consistent RSA key
+
+<sub>[stdlib/Security/Cryptography/Rsa.sl:461](../../stdlib/Security/Cryptography/Rsa.sl#L461)</sub>
+
+#### ExportRsaPublicKeyPem *method*
+
+```
+String ExportRsaPublicKeyPem()
+```
+
+The public key as PKCS #1 in PEM: `-----BEGIN RSA PUBLIC KEY-----`.
+
+<sub>[stdlib/Security/Cryptography/Rsa.sl:607](../../stdlib/Security/Cryptography/Rsa.sl#L607)</sub>
+
+#### ExportRsaPrivateKeyPem *method*
+
+```
+Result<String, CryptoError> ExportRsaPrivateKeyPem()
+```
+
+The private key as PKCS #1 in PEM: `-----BEGIN RSA PRIVATE KEY-----`.
+
+**Fails with**
+
+- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
+
+<sub>[stdlib/Security/Cryptography/Rsa.sl:613](../../stdlib/Security/Cryptography/Rsa.sl#L613)</sub>
+
+#### ExportSubjectPublicKeyInfoPem *method*
+
+```
+String ExportSubjectPublicKeyInfoPem()
+```
+
+The public key as X.509 in PEM: `-----BEGIN PUBLIC KEY-----`.
+
+<sub>[stdlib/Security/Cryptography/Rsa.sl:622](../../stdlib/Security/Cryptography/Rsa.sl#L622)</sub>
+
+#### ExportPkcs8PrivateKeyPem *method*
+
+```
+Result<String, CryptoError> ExportPkcs8PrivateKeyPem()
+```
+
+The private key as PKCS #8 in PEM: `-----BEGIN PRIVATE KEY-----`.
+
+**Fails with**
+
+- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
+
+<sub>[stdlib/Security/Cryptography/Rsa.sl:628](../../stdlib/Security/Cryptography/Rsa.sl#L628)</sub>
+
+#### ImportFromPem *method*
+
+```
+static Result<Rsa, CryptoError> ImportFromPem(String input)
+```
+
+The one RSA key in `input`, which may hold other text and PEM blocks
+of other kinds: `RSA PUBLIC KEY`, `RSA PRIVATE KEY`, `PUBLIC KEY` or
+`PRIVATE KEY`, as .NET's `ImportFromPem` reads.
+
+**Parameters**
+
+- `input` — text holding exactly one key block
+
+**Fails with**
+
+- [CryptoError.Encoding](#encoding-case) — no key block, more than one, or one that does not parse
+- [CryptoError.Unsupported](#unsupported-case) — the block is an `ENCRYPTED PRIVATE KEY`
+- [CryptoError.InvalidKey](#invalidkey-case) — the numbers are not a consistent RSA key
+
+<sub>[stdlib/Security/Cryptography/Rsa.sl:645](../../stdlib/Security/Cryptography/Rsa.sl#L645)</sub>
+
+#### SignData *method*
+
+```
+Result<byte[], CryptoError> SignData(ReadOnlySpan<byte> data, HashAlgorithmName hashAlgorithm, RsaSignaturePadding padding)
+```
+
+The signature of `data`'s hash.
+
+**Parameters**
+
+- `data` — what to sign; it is hashed here
+- `hashAlgorithm` — the hash, which the verifier MUST use too
+- `padding` — PKCS #1 v1.5, or PSS with its salt length
+
+**Fails with**
+
+- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
+- [CryptoError.Unsupported](#unsupported-case) — the hash is not one this module has
+- [CryptoError.MessageLength](#messagelength-case) — the key is too small for the hash and padding
+- [CryptoError.NoEntropy](#noentropy-case) — the platform would not supply randomness
+
+**See also** &nbsp; [Rsa.VerifyData](#verifydata-method)
+
+<sub>[stdlib/Security/Cryptography/Rsa.sl:742](../../stdlib/Security/Cryptography/Rsa.sl#L742)</sub>
+
+#### SignHash *method*
+
+```
+Result<byte[], CryptoError> SignHash(ReadOnlySpan<byte> hash, HashAlgorithmName hashAlgorithm, RsaSignaturePadding padding)
+```
+
+The signature of a hash already computed.
+
+**Parameters**
+
+- `hash` — the digest, exactly as long as `hashAlgorithm`'s
+- `hashAlgorithm` — the hash that made it
+- `padding` — PKCS #1 v1.5, or PSS with its salt length
+
+**Fails with**
+
+- [CryptoError.Parameter](#parameter-case) — `hash` is not the digest's length
+- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
+- [CryptoError.Unsupported](#unsupported-case) — the hash is not one this module has
+- [CryptoError.MessageLength](#messagelength-case) — the key is too small for the hash and padding
+- [CryptoError.NoEntropy](#noentropy-case) — the platform would not supply randomness
+
+**See also** &nbsp; [Rsa.VerifyHash](#verifyhash-method)
+
+<sub>[stdlib/Security/Cryptography/Rsa.sl:762](../../stdlib/Security/Cryptography/Rsa.sl#L762)</sub>
+
+#### VerifyData *method*
+
+```
+bool VerifyData(ReadOnlySpan<byte> data, ReadOnlySpan<byte> signature, HashAlgorithmName hashAlgorithm, RsaSignaturePadding padding)
+```
+
+Whether `signature` is this key's signature of `data`'s hash.
+
+**Never fails**: a signature that is malformed, the wrong length or
+for another message is simply not valid, and an unknown hash is false.
+
+**Parameters**
+
+- `data` — what was signed
+- `signature` — the signature, as long as the modulus
+- `hashAlgorithm` — the hash the signer used
+- `padding` — the encoding the signer used
+
+**See also** &nbsp; [Rsa.SignData](#signdata-method)
+
+<sub>[stdlib/Security/Cryptography/Rsa.sl:796](../../stdlib/Security/Cryptography/Rsa.sl#L796)</sub>
+
+#### VerifyHash *method*
+
+```
+bool VerifyHash(ReadOnlySpan<byte> hash, ReadOnlySpan<byte> signature, HashAlgorithmName hashAlgorithm, RsaSignaturePadding padding)
+```
+
+Whether `signature` is this key's signature of a hash already
+computed. Never fails, as `VerifyData` does not.
+
+**Parameters**
+
+- `hash` — the digest
+- `signature` — the signature, as long as the modulus
+- `hashAlgorithm` — the hash that made the digest
+- `padding` — the encoding the signer used
+
+<sub>[stdlib/Security/Cryptography/Rsa.sl:814](../../stdlib/Security/Cryptography/Rsa.sl#L814)</sub>
+
+#### Encrypt *method*
+
+```
+Result<byte[], CryptoError> Encrypt(ReadOnlySpan<byte> data, RsaEncryptionPadding padding)
+```
+
+`data` encrypted to this key.
+
+**Parameters**
+
+- `data` — at most the modulus's length less 11 bytes under PKCS #1 v1.5, or less twice the digest and 2 under OAEP
+- `padding` — OAEP with its hash and label, or PKCS #1 v1.5
+
+**Fails with**
+
+- [CryptoError.MessageLength](#messagelength-case) — `data` is too long for the key and padding
+- [CryptoError.Unsupported](#unsupported-case) — OAEP's hash is not one this module has
+- [CryptoError.NoEntropy](#noentropy-case) — the platform would not supply randomness
+
+**See also** &nbsp; [Rsa.Decrypt](#decrypt-method)
+
+<sub>[stdlib/Security/Cryptography/Rsa.sl:1005](../../stdlib/Security/Cryptography/Rsa.sl#L1005)</sub>
+
+#### Decrypt *method*
+
+```
+Result<byte[], CryptoError> Decrypt(ReadOnlySpan<byte> data, RsaEncryptionPadding padding)
+```
+
+`data` decrypted with this key.
+
+**OAEP** decodes in constant time and fails with one error however the
+encoding is wrong, so the failure says nothing about the plaintext.
+
+**PKCS #1 v1.5 never fails on bad padding.** It uses implicit rejection
+(draft-irtf-cfrg-rsa-guidance, as OpenSSL 3.2 does): a ciphertext whose
+padding is wrong decrypts to a random-looking message derived from the
+ciphertext and the key, the same every time, in the same time as a
+valid one. That is what closes Bleichenbacher's oracle; the caller MUST
+treat what comes back as untrusted and check it by other means.
+
+**Parameters**
+
+- `data` — the ciphertext, exactly as long as the modulus
+- `padding` — what it was encrypted with
+
+**Fails with**
+
+- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
+- [CryptoError.MessageLength](#messagelength-case) — `data` is not the modulus's length, or not below it
+- [CryptoError.Padding](#padding-case) — OAEP only: the ciphertext is not a valid encoding under this key and label
+- [CryptoError.Unsupported](#unsupported-case) — OAEP's hash is not one this module has
+- [CryptoError.NoEntropy](#noentropy-case) — the platform would not supply randomness
+
+**See also** &nbsp; [Rsa.Encrypt](#encrypt-method)
+
+<sub>[stdlib/Security/Cryptography/Rsa.sl:1090](../../stdlib/Security/Cryptography/Rsa.sl#L1090)</sub>
+
+### RsaEncryptionPadding *struct*
+
+```
+struct RsaEncryptionPadding
+```
+
+How an RSA ciphertext is encoded: OAEP with a hash and a label, or
+PKCS #1 v1.5.
+
+.NET's `RSAEncryptionPadding`, as a value. OAEP masks with MGF1 over the
+same hash that digests the label, which is the only combination .NET
+offers.
+
+**See also** &nbsp; [Rsa.Encrypt](#encrypt-method)
+
+<sub>[stdlib/Security/Cryptography/RsaEncryptionPadding.sl:32](../../stdlib/Security/Cryptography/RsaEncryptionPadding.sl#L32)</sub>
+
+#### Pkcs1 *property*
+
+```
+static RsaEncryptionPadding Pkcs1 { get; }
+```
+
+PKCS #1 v1.5.
+
+<sub>[stdlib/Security/Cryptography/RsaEncryptionPadding.sl:46](../../stdlib/Security/Cryptography/RsaEncryptionPadding.sl#L46)</sub>
+
+#### OaepSha1 *property*
+
+```
+static RsaEncryptionPadding OaepSha1 { get; }
+```
+
+OAEP over SHA-1, which is still sound here: OAEP needs the hash to be
+one-way, not collision-resistant.
+
+<sub>[stdlib/Security/Cryptography/RsaEncryptionPadding.sl:52](../../stdlib/Security/Cryptography/RsaEncryptionPadding.sl#L52)</sub>
+
+#### OaepSha256 *property*
+
+```
+static RsaEncryptionPadding OaepSha256 { get; }
+```
+
+OAEP over SHA-256.
+
+<sub>[stdlib/Security/Cryptography/RsaEncryptionPadding.sl:55](../../stdlib/Security/Cryptography/RsaEncryptionPadding.sl#L55)</sub>
+
+#### OaepSha384 *property*
+
+```
+static RsaEncryptionPadding OaepSha384 { get; }
+```
+
+OAEP over SHA-384.
+
+<sub>[stdlib/Security/Cryptography/RsaEncryptionPadding.sl:58](../../stdlib/Security/Cryptography/RsaEncryptionPadding.sl#L58)</sub>
+
+#### OaepSha512 *property*
+
+```
+static RsaEncryptionPadding OaepSha512 { get; }
+```
+
+OAEP over SHA-512.
+
+<sub>[stdlib/Security/Cryptography/RsaEncryptionPadding.sl:61](../../stdlib/Security/Cryptography/RsaEncryptionPadding.sl#L61)</sub>
+
+#### Mode *property*
+
+```
+RsaEncryptionPaddingMode Mode { get; }
+```
+
+Which encoding.
+
+<sub>[stdlib/Security/Cryptography/RsaEncryptionPadding.sl:64](../../stdlib/Security/Cryptography/RsaEncryptionPadding.sl#L64)</sub>
+
+#### OaepHashAlgorithm *property*
+
+```
+HashAlgorithmName OaepHashAlgorithm { get; }
+```
+
+The hash OAEP uses for the label and for MGF1. An empty name for
+PKCS #1 v1.5.
+
+<sub>[stdlib/Security/Cryptography/RsaEncryptionPadding.sl:68](../../stdlib/Security/Cryptography/RsaEncryptionPadding.sl#L68)</sub>
+
+#### OaepLabel *property*
+
+```
+byte[] OaepLabel { get; }
+```
+
+The OAEP label, empty unless one was given.
+
+<sub>[stdlib/Security/Cryptography/RsaEncryptionPadding.sl:71](../../stdlib/Security/Cryptography/RsaEncryptionPadding.sl#L71)</sub>
+
+#### CreateOaep *method*
+
+```
+static RsaEncryptionPadding CreateOaep(HashAlgorithmName hashAlgorithm)
+```
+
+OAEP over `hashAlgorithm`, with an empty label.
+
+<sub>[stdlib/Security/Cryptography/RsaEncryptionPadding.sl:74](../../stdlib/Security/Cryptography/RsaEncryptionPadding.sl#L74)</sub>
+
+#### CreateOaep *method*
+
+```
+static RsaEncryptionPadding CreateOaep(HashAlgorithmName hashAlgorithm, ReadOnlySpan<byte> label)
+```
+
+OAEP over `hashAlgorithm`, bound to `label`: a ciphertext decrypts only
+under the label it was made with. The label is not secret and is not
+carried in the ciphertext.
+
+**Parameters**
+
+- `hashAlgorithm` — the hash for the label and for MGF1
+- `label` — any bytes, copied
+
+<sub>[stdlib/Security/Cryptography/RsaEncryptionPadding.sl:83](../../stdlib/Security/Cryptography/RsaEncryptionPadding.sl#L83)</sub>
+
+### RsaEncryptionPaddingMode *enum*
+
+```
+enum RsaEncryptionPaddingMode
+```
+
+Which of RFC 8017's two encryption encodings an RSA ciphertext uses.
+
+<sub>[stdlib/Security/Cryptography/RsaEncryptionPaddingMode.sl:25](../../stdlib/Security/Cryptography/RsaEncryptionPaddingMode.sl#L25)</sub>
+
+#### Pkcs1 *case*
+
+```
+Pkcs1
+```
+
+RSAES-PKCS1-v1_5 (RFC 8017 §7.2), for talking to what cannot do
+better. Its decryption is Bleichenbacher's oracle unless handled with
+care; see `Rsa.Decrypt` for how it is here.
+
+<sub>[stdlib/Security/Cryptography/RsaEncryptionPaddingMode.sl:30](../../stdlib/Security/Cryptography/RsaEncryptionPaddingMode.sl#L30)</sub>
+
+#### Oaep *case*
+
+```
+Oaep
+```
+
+RSAES-OAEP (RFC 8017 §7.1), the one to choose.
+
+<sub>[stdlib/Security/Cryptography/RsaEncryptionPaddingMode.sl:33](../../stdlib/Security/Cryptography/RsaEncryptionPaddingMode.sl#L33)</sub>
+
+### RsaParameters *class*
+
+```
+sealed class RsaParameters
+```
+
+The numbers of an RSA key, each big-endian and unsigned.
+
+```csharp
+var key = try Rsa.Create(new RsaParameters { Modulus = n, Exponent = e });
+```
+
+.NET's `RSAParameters`. A public key has `Modulus` and `Exponent` and
+nothing else; a private key has all eight. A number that is absent is an
+empty array, which is what every field starts as.
+
+**A class, where .NET's is a struct.** A struct's zero value would hold
+null arrays, and an array here cannot be asked whether it is null; a class
+gives every field an empty array to start from.
+
+`Rsa.ExportParameters` gives `D` as many bytes as `Modulus` and the five
+CRT values half as many, rounded up, with leading zeros where a value is
+shorter, as .NET does; `Rsa.Create` takes any length and ignores leading
+zeros.
+
+**See also** &nbsp; [Rsa.Create](#create-method) &middot; [Rsa.ExportParameters](#exportparameters-method)
+
+<sub>[stdlib/Security/Cryptography/RsaParameters.sl:45](../../stdlib/Security/Cryptography/RsaParameters.sl#L45)</sub>
+
+#### Modulus *field*
+
+```
+byte[] Modulus
+```
+
+`n`.
+
+<sub>[stdlib/Security/Cryptography/RsaParameters.sl:48](../../stdlib/Security/Cryptography/RsaParameters.sl#L48)</sub>
+
+#### Exponent *field*
+
+```
+byte[] Exponent
+```
+
+`e`, the public exponent.
+
+<sub>[stdlib/Security/Cryptography/RsaParameters.sl:51](../../stdlib/Security/Cryptography/RsaParameters.sl#L51)</sub>
+
+#### D *field*
+
+```
+byte[] D
+```
+
+`d`, the private exponent.
+
+<sub>[stdlib/Security/Cryptography/RsaParameters.sl:54](../../stdlib/Security/Cryptography/RsaParameters.sl#L54)</sub>
+
+#### P *field*
+
+```
+byte[] P
+```
+
+`p`, the first prime.
+
+<sub>[stdlib/Security/Cryptography/RsaParameters.sl:57](../../stdlib/Security/Cryptography/RsaParameters.sl#L57)</sub>
+
+#### Q *field*
+
+```
+byte[] Q
+```
+
+`q`, the second prime.
+
+<sub>[stdlib/Security/Cryptography/RsaParameters.sl:60](../../stdlib/Security/Cryptography/RsaParameters.sl#L60)</sub>
+
+#### DP *field*
+
+```
+byte[] DP
+```
+
+`d mod (p - 1)`.
+
+<sub>[stdlib/Security/Cryptography/RsaParameters.sl:63](../../stdlib/Security/Cryptography/RsaParameters.sl#L63)</sub>
+
+#### DQ *field*
+
+```
+byte[] DQ
+```
+
+`d mod (q - 1)`.
+
+<sub>[stdlib/Security/Cryptography/RsaParameters.sl:66](../../stdlib/Security/Cryptography/RsaParameters.sl#L66)</sub>
+
+#### InverseQ *field*
+
+```
+byte[] InverseQ
+```
+
+`q^-1 mod p`.
+
+<sub>[stdlib/Security/Cryptography/RsaParameters.sl:69](../../stdlib/Security/Cryptography/RsaParameters.sl#L69)</sub>
+
+### RsaSignaturePadding *struct*
+
+```
+struct RsaSignaturePadding
+```
+
+How an RSA signature is encoded: PKCS #1 v1.5, or PSS with a salt length.
+
+.NET's `RSASignaturePadding`, as a value. PSS masks with MGF1 over the same
+hash that digests the message, which is the only combination .NET offers
+and the one every protocol uses.
+
+**See also** &nbsp; [Rsa.SignData](#signdata-method)
+
+<sub>[stdlib/Security/Cryptography/RsaSignaturePadding.sl:31](../../stdlib/Security/Cryptography/RsaSignaturePadding.sl#L31)</sub>
+
+#### PssSaltLengthIsHashLength *constant*
+
+```
+const int PssSaltLengthIsHashLength = -1
+```
+
+A salt as long as the hash's digest, which is what `Pss` uses.
+
+<sub>[stdlib/Security/Cryptography/RsaSignaturePadding.sl:34](../../stdlib/Security/Cryptography/RsaSignaturePadding.sl#L34)</sub>
+
+#### PssSaltLengthMax *constant*
+
+```
+const int PssSaltLengthMax = -2
+```
+
+The longest salt the key leaves room for. Verifying under it accepts
+a salt of any length.
+
+<sub>[stdlib/Security/Cryptography/RsaSignaturePadding.sl:38](../../stdlib/Security/Cryptography/RsaSignaturePadding.sl#L38)</sub>
+
+#### Pkcs1 *property*
+
+```
+static RsaSignaturePadding Pkcs1 { get; }
+```
+
+PKCS #1 v1.5.
+
+<sub>[stdlib/Security/Cryptography/RsaSignaturePadding.sl:50](../../stdlib/Security/Cryptography/RsaSignaturePadding.sl#L50)</sub>
+
+#### Pss *property*
+
+```
+static RsaSignaturePadding Pss { get; }
+```
+
+PSS with a salt as long as the digest: RFC 8017's recommendation.
+
+<sub>[stdlib/Security/Cryptography/RsaSignaturePadding.sl:54](../../stdlib/Security/Cryptography/RsaSignaturePadding.sl#L54)</sub>
+
+#### Mode *property*
+
+```
+RsaSignaturePaddingMode Mode { get; }
+```
+
+Which encoding.
+
+<sub>[stdlib/Security/Cryptography/RsaSignaturePadding.sl:58](../../stdlib/Security/Cryptography/RsaSignaturePadding.sl#L58)</sub>
+
+#### PssSaltLength *property*
+
+```
+int PssSaltLength { get; }
+```
+
+The PSS salt's length in bytes, or one of the two constants. Zero for
+PKCS #1 v1.5.
+
+<sub>[stdlib/Security/Cryptography/RsaSignaturePadding.sl:62](../../stdlib/Security/Cryptography/RsaSignaturePadding.sl#L62)</sub>
+
+#### CreatePss *method*
+
+```
+static Result<RsaSignaturePadding, CryptoError> CreatePss(int saltLength)
+```
+
+PSS with a salt of `saltLength` bytes.
+
+**Parameters**
+
+- `saltLength` — bytes of salt, or `PssSaltLengthIsHashLength`, or `PssSaltLengthMax`
+
+**Fails with**
+
+- [CryptoError.Parameter](#parameter-case) — `saltLength` is negative and neither constant
+
+<sub>[stdlib/Security/Cryptography/RsaSignaturePadding.sl:69](../../stdlib/Security/Cryptography/RsaSignaturePadding.sl#L69)</sub>
+
+#### Equals *method*
+
+```
+bool Equals(RsaSignaturePadding other)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Security/Cryptography/RsaSignaturePadding.sl:76](../../stdlib/Security/Cryptography/RsaSignaturePadding.sl#L76)</sub>
+
+#### operator == *operator*
+
+```
+static bool operator ==(RsaSignaturePadding left, RsaSignaturePadding right)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Security/Cryptography/RsaSignaturePadding.sl:79](../../stdlib/Security/Cryptography/RsaSignaturePadding.sl#L79)</sub>
+
+#### operator != *operator*
+
+```
+static bool operator !=(RsaSignaturePadding left, RsaSignaturePadding right)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Security/Cryptography/RsaSignaturePadding.sl:82](../../stdlib/Security/Cryptography/RsaSignaturePadding.sl#L82)</sub>
+
+### RsaSignaturePaddingMode *enum*
+
+```
+enum RsaSignaturePaddingMode
+```
+
+Which of RFC 8017's two signature encodings an RSA signature uses.
+
+<sub>[stdlib/Security/Cryptography/RsaSignaturePaddingMode.sl:25](../../stdlib/Security/Cryptography/RsaSignaturePaddingMode.sl#L25)</sub>
+
+#### Pkcs1 *case*
+
+```
+Pkcs1
+```
+
+RSASSA-PKCS1-v1_5 (RFC 8017 §8.2): deterministic, and what most
+certificates carry.
+
+<sub>[stdlib/Security/Cryptography/RsaSignaturePaddingMode.sl:29](../../stdlib/Security/Cryptography/RsaSignaturePaddingMode.sl#L29)</sub>
+
+#### Pss *case*
+
+```
+Pss
+```
+
+RSASSA-PSS (RFC 8017 §8.1): randomized, with a security proof, and
+the one to choose where nothing else decides.
+
+<sub>[stdlib/Security/Cryptography/RsaSignaturePaddingMode.sl:33](../../stdlib/Security/Cryptography/RsaSignaturePaddingMode.sl#L33)</sub>
 
 ### Scrypt *class*
 

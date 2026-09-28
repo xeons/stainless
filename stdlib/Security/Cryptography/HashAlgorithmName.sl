@@ -39,6 +39,32 @@ public struct HashAlgorithmName
         _kind = kind;
     }
 
+    /// The hash .NET calls `name` — `SHA256` and the rest — or the zero value
+    /// for a name this has no code for, which everything then refuses.
+    ///
+    /// @param name  `SHA1`, `SHA256`, `SHA384` or `SHA512`
+    public HashAlgorithmName(String name)
+    {
+        switch (name)
+        {
+            case "SHA1":
+                _kind = 1;
+                break;
+            case "SHA256":
+                _kind = 2;
+                break;
+            case "SHA384":
+                _kind = 3;
+                break;
+            case "SHA512":
+                _kind = 4;
+                break;
+            default:
+                _kind = 0;
+                break;
+        }
+    }
+
     /// SHA-1, for verifying what older systems signed. Nothing new SHOULD be
     /// signed with it.
     public static HashAlgorithmName Sha1 => new HashAlgorithmName(1);
