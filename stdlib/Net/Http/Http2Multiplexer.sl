@@ -1315,7 +1315,7 @@ internal sealed threadsafe class Http2Multiplexer
     private void ResetHttp2StreamLocked(Http2Stream stream, uint code, HttpError error, String message)
     {
         if (error != HttpError.None)
-            stream.FailHttp2Stream(error, message, 0u);
+            stream.FailHttp2Stream(error, message, error == HttpError.ProtocolError ? code : 0u);
         if (!stream.IsReleased && stream.Id != 0u && !_ended)
         {
             var frame = new Http2Buffer(16u);

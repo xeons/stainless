@@ -807,6 +807,10 @@ internal void RespondToHttp2TestRequest(Http2TestPeer peer, Http2TestStream stre
     }
     bool hasBody = reply.Body.Length > 0u && stream.Request.Method != "HEAD";
     bool hasTrailers = !reply.TrailerFields.IsEmpty;
+    // A stream is counted closed before its last frame goes, so that the
+    // client's next stream can never be counted beside it.
+    if (!hasBody && !hasTrailers)
+        CloseHttp2TestStream(peer, stream);
     WriteHttp2TestHeaders(peer, id, head, !hasBody && !hasTrailers);
     if (hasBody && !SendHttp2TestBody(peer, stream, reply.Body, !hasTrailers))
     {
@@ -814,7 +818,10 @@ internal void RespondToHttp2TestRequest(Http2TestPeer peer, Http2TestStream stre
         return;
     }
     if (hasTrailers)
+    {
+        CloseHttp2TestStream(peer, stream);
         WriteHttp2TestHeaders(peer, id, reply.TrailerFields, true);
+    }
     CloseHttp2TestStream(peer, stream);
 }
 
@@ -886,6 +893,8 @@ internal bool SendHttp2TestBody(Http2TestPeer peer, Http2TestStream stream, byte
         }
         var frame = new Http2Buffer(part + 16u);
         bool last = sent + part == body.Length;
+        if (last && endStream)
+            CloseHttp2TestStream(peer, stream);
         WriteHttp2Data(frame, stream.Request.Stream, body, sent, part, last && endStream);
         peer.WriteHttp2TestFrames(frame);
         sent += part;
