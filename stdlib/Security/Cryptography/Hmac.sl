@@ -58,13 +58,11 @@ public sealed class Hmac : IHashAlgorithm
             hash.Reset();
             hash.AppendData(key);
             byte[] digest = hash.GetHashAndReset();
-            for (nuint i = 0u; i < digest.Length; i++)
-                shortened[i] = digest[i];
+            digest[:].CopyTo(shortened);
         }
         else
         {
-            for (nuint i = 0u; i < key.Length; i++)
-                shortened[i] = key[i];
+            key.CopyTo(shortened);
         }
 
         _innerPad = new byte[blockSize];

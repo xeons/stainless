@@ -1007,7 +1007,7 @@ Opens a `SEQUENCE`, which lasts until the matching `PopSequence`.
 
 **See also** &nbsp; [AsnWriter.PopSequence](#popsequence-method)
 
-<sub>[stdlib/Formats/Asn1/AsnWriter.sl:89](../../stdlib/Formats/Asn1/AsnWriter.sl#L89)</sub>
+<sub>[stdlib/Formats/Asn1/AsnWriter.sl:86](../../stdlib/Formats/Asn1/AsnWriter.sl#L86)</sub>
 
 #### PopSequence *method*
 
@@ -1017,7 +1017,7 @@ void PopSequence()
 
 Closes the innermost `PushSequence`.
 
-<sub>[stdlib/Formats/Asn1/AsnWriter.sl:95](../../stdlib/Formats/Asn1/AsnWriter.sl#L95)</sub>
+<sub>[stdlib/Formats/Asn1/AsnWriter.sl:92](../../stdlib/Formats/Asn1/AsnWriter.sl#L92)</sub>
 
 #### PushSetOf *method*
 
@@ -1033,7 +1033,7 @@ Opens a `SET OF`, which lasts until the matching `PopSetOf`.
 
 **See also** &nbsp; [AsnWriter.PopSetOf](#popsetof-method)
 
-<sub>[stdlib/Formats/Asn1/AsnWriter.sl:104](../../stdlib/Formats/Asn1/AsnWriter.sl#L104)</sub>
+<sub>[stdlib/Formats/Asn1/AsnWriter.sl:101](../../stdlib/Formats/Asn1/AsnWriter.sl#L101)</sub>
 
 #### PopSetOf *method*
 
@@ -1044,7 +1044,7 @@ void PopSetOf()
 Closes the innermost `PushSetOf`, sorting its elements into the order
 DER requires.
 
-<sub>[stdlib/Formats/Asn1/AsnWriter.sl:111](../../stdlib/Formats/Asn1/AsnWriter.sl#L111)</sub>
+<sub>[stdlib/Formats/Asn1/AsnWriter.sl:108](../../stdlib/Formats/Asn1/AsnWriter.sl#L108)</sub>
 
 #### WriteEncodedValue *method*
 
@@ -1062,7 +1062,7 @@ Its tag and length are checked; its contents are not.
 
 **Returns** &nbsp; `AsnError.None`, or why `encoded` is not one DER value
 
-<sub>[stdlib/Formats/Asn1/AsnWriter.sl:122](../../stdlib/Formats/Asn1/AsnWriter.sl#L122)</sub>
+<sub>[stdlib/Formats/Asn1/AsnWriter.sl:119](../../stdlib/Formats/Asn1/AsnWriter.sl#L119)</sub>
 
 #### WriteBoolean *method*
 
@@ -1077,7 +1077,7 @@ A `BOOLEAN`: `0xFF` for true, as DER requires.
 - `value` — what to write
 - `tag` — the tag in place of `BOOLEAN`
 
-<sub>[stdlib/Formats/Asn1/AsnWriter.sl:139](../../stdlib/Formats/Asn1/AsnWriter.sl#L139)</sub>
+<sub>[stdlib/Formats/Asn1/AsnWriter.sl:136](../../stdlib/Formats/Asn1/AsnWriter.sl#L136)</sub>
 
 #### WriteNull *method*
 
@@ -1091,7 +1091,7 @@ A `NULL`.
 
 - `tag` — the tag in place of `NULL`
 
-<sub>[stdlib/Formats/Asn1/AsnWriter.sl:148](../../stdlib/Formats/Asn1/AsnWriter.sl#L148)</sub>
+<sub>[stdlib/Formats/Asn1/AsnWriter.sl:145](../../stdlib/Formats/Asn1/AsnWriter.sl#L145)</sub>
 
 #### WriteInteger *method*
 
@@ -1106,7 +1106,7 @@ An `INTEGER`, in the fewest octets that hold it.
 - `value` — what to write
 - `tag` — the tag in place of `INTEGER`
 
-<sub>[stdlib/Formats/Asn1/AsnWriter.sl:157](../../stdlib/Formats/Asn1/AsnWriter.sl#L157)</sub>
+<sub>[stdlib/Formats/Asn1/AsnWriter.sl:154](../../stdlib/Formats/Asn1/AsnWriter.sl#L154)</sub>
 
 #### WriteInteger *method*
 
@@ -1122,7 +1122,7 @@ its top bit is set.
 - `value` — what to write
 - `tag` — the tag in place of `INTEGER`
 
-<sub>[stdlib/Formats/Asn1/AsnWriter.sl:167](../../stdlib/Formats/Asn1/AsnWriter.sl#L167)</sub>
+<sub>[stdlib/Formats/Asn1/AsnWriter.sl:164](../../stdlib/Formats/Asn1/AsnWriter.sl#L164)</sub>
 
 #### WriteIntegerBytes *method*
 
@@ -1142,7 +1142,7 @@ already minimal.
 
 **See also** &nbsp; [AsnWriter.WriteIntegerUnsigned](#writeintegerunsigned-method)
 
-<sub>[stdlib/Formats/Asn1/AsnWriter.sl:185](../../stdlib/Formats/Asn1/AsnWriter.sl#L185)</sub>
+<sub>[stdlib/Formats/Asn1/AsnWriter.sl:182](../../stdlib/Formats/Asn1/AsnWriter.sl#L182)</sub>
 
 #### WriteIntegerUnsigned *method*
 
@@ -1162,7 +1162,7 @@ read as negative.
 
 **See also** &nbsp; [AsnWriter.WriteIntegerBytes](#writeintegerbytes-method)
 
-<sub>[stdlib/Formats/Asn1/AsnWriter.sl:211](../../stdlib/Formats/Asn1/AsnWriter.sl#L211)</sub>
+<sub>[stdlib/Formats/Asn1/AsnWriter.sl:208](../../stdlib/Formats/Asn1/AsnWriter.sl#L208)</sub>
 
 #### WriteEnumeratedValue *method*
 
@@ -1177,7 +1177,7 @@ An `ENUMERATED`.
 - `value` — what to write
 - `tag` — the tag in place of `ENUMERATED`
 
-<sub>[stdlib/Formats/Asn1/AsnWriter.sl:226](../../stdlib/Formats/Asn1/AsnWriter.sl#L226)</sub>
+<sub>[stdlib/Formats/Asn1/AsnWriter.sl:222](../../stdlib/Formats/Asn1/AsnWriter.sl#L222)</sub>
 
 #### WriteObjectIdentifier *method*
 
@@ -1196,7 +1196,7 @@ An `OBJECT IDENTIFIER`, from its dotted form.
 
 **See also** &nbsp; [Oid.FromDottedString](#fromdottedstring-method)
 
-<sub>[stdlib/Formats/Asn1/AsnWriter.sl:237](../../stdlib/Formats/Asn1/AsnWriter.sl#L237)</sub>
+<sub>[stdlib/Formats/Asn1/AsnWriter.sl:233](../../stdlib/Formats/Asn1/AsnWriter.sl#L233)</sub>
 
 #### WriteBitString *method*
 
@@ -1215,7 +1215,7 @@ not part of it.
 
 **Returns** &nbsp; `AsnError.OutOfRange` for more than seven unused bits, `AsnError.Malformed` for unused bits and no octet, and `AsnError.NonMinimalEncoding` when an unused bit is not zero
 
-<sub>[stdlib/Formats/Asn1/AsnWriter.sl:259](../../stdlib/Formats/Asn1/AsnWriter.sl#L259)</sub>
+<sub>[stdlib/Formats/Asn1/AsnWriter.sl:255](../../stdlib/Formats/Asn1/AsnWriter.sl#L255)</sub>
 
 #### WriteOctetString *method*
 
@@ -1230,7 +1230,7 @@ An `OCTET STRING`.
 - `value` — the octets
 - `tag` — the tag in place of `OCTET STRING`
 
-<sub>[stdlib/Formats/Asn1/AsnWriter.sl:283](../../stdlib/Formats/Asn1/AsnWriter.sl#L283)</sub>
+<sub>[stdlib/Formats/Asn1/AsnWriter.sl:279](../../stdlib/Formats/Asn1/AsnWriter.sl#L279)</sub>
 
 #### WriteCharacterString *method*
 
@@ -1250,7 +1250,7 @@ The types and what each may hold are `AsnReader.ReadCharacterString`'s.
 
 **Returns** &nbsp; `AsnError.BadStringContent` for a character the type cannot hold, `AsnError.Unsupported` for a type that is not a character string
 
-<sub>[stdlib/Formats/Asn1/AsnWriter.sl:300](../../stdlib/Formats/Asn1/AsnWriter.sl#L300)</sub>
+<sub>[stdlib/Formats/Asn1/AsnWriter.sl:296](../../stdlib/Formats/Asn1/AsnWriter.sl#L296)</sub>
 
 #### WriteUtcTime *method*
 
@@ -1269,7 +1269,7 @@ A `UTCTime`, as `YYMMDDhhmmssZ`.
 
 **See also** &nbsp; [AsnWriter.WriteGeneralizedTime](#writegeneralizedtime-method)
 
-<sub>[stdlib/Formats/Asn1/AsnWriter.sl:322](../../stdlib/Formats/Asn1/AsnWriter.sl#L322)</sub>
+<sub>[stdlib/Formats/Asn1/AsnWriter.sl:318](../../stdlib/Formats/Asn1/AsnWriter.sl#L318)</sub>
 
 #### WriteGeneralizedTime *method*
 
@@ -1288,7 +1288,7 @@ A `GeneralizedTime`, as `YYYYMMDDhhmmssZ`.
 
 **See also** &nbsp; [AsnWriter.WriteUtcTime](#writeutctime-method)
 
-<sub>[stdlib/Formats/Asn1/AsnWriter.sl:338](../../stdlib/Formats/Asn1/AsnWriter.sl#L338)</sub>
+<sub>[stdlib/Formats/Asn1/AsnWriter.sl:334](../../stdlib/Formats/Asn1/AsnWriter.sl#L334)</sub>
 
 ### Oid *class*
 

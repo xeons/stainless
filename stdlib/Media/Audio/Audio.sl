@@ -726,8 +726,7 @@ public Result<AudioClip, AudioError> RecordClip(AudioFormat format, double secon
         if (take > read)
             take = read;
 
-        for (nuint i = 0u; i < take; i++)
-            samples[filled + i] = chunk[i];
+        chunk[:take].CopyTo(samples[filled:]);
 
         filled += take;
     }
@@ -740,8 +739,5 @@ public Result<AudioClip, AudioError> RecordClip(AudioFormat format, double secon
     if (filled == samples.Length)
         return Ok(new AudioClip(format, samples));
 
-    byte[] trimmed = new byte[filled];
-    for (nuint i = 0u; i < filled; i++)
-        trimmed[i] = samples[i];
-    return Ok(new AudioClip(format, trimmed));
+    return Ok(new AudioClip(format, samples[:filled].ToArray()));
 }

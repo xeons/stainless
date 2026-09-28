@@ -672,7 +672,7 @@ bool CanRead { get; }
 
 Always true.
 
-<sub>[stdlib/IO/MemoryStream.sl:58](../../stdlib/IO/MemoryStream.sl#L58)</sub>
+<sub>[stdlib/IO/MemoryStream.sl:57](../../stdlib/IO/MemoryStream.sl#L57)</sub>
 
 #### CanWrite *property*
 
@@ -682,7 +682,7 @@ bool CanWrite { get; }
 
 Always true.
 
-<sub>[stdlib/IO/MemoryStream.sl:60](../../stdlib/IO/MemoryStream.sl#L60)</sub>
+<sub>[stdlib/IO/MemoryStream.sl:59](../../stdlib/IO/MemoryStream.sl#L59)</sub>
 
 #### CanSeek *property*
 
@@ -692,7 +692,7 @@ bool CanSeek { get; }
 
 Always true.
 
-<sub>[stdlib/IO/MemoryStream.sl:62](../../stdlib/IO/MemoryStream.sl#L62)</sub>
+<sub>[stdlib/IO/MemoryStream.sl:61](../../stdlib/IO/MemoryStream.sl#L61)</sub>
 
 #### Read *method*
 
@@ -704,7 +704,7 @@ Reads up to `count` bytes into `buffer` at `offset`, answering how
 many it read. Zero means the position has reached the end; there is no
 failure to distinguish it from.
 
-<sub>[stdlib/IO/MemoryStream.sl:67](../../stdlib/IO/MemoryStream.sl#L67)</sub>
+<sub>[stdlib/IO/MemoryStream.sl:66](../../stdlib/IO/MemoryStream.sl#L66)</sub>
 
 #### Write *method*
 
@@ -718,7 +718,7 @@ needed and answering `count`.
 Writing over the middle replaces those bytes rather than inserting, so
 the length only grows when the position passes the old end.
 
-<sub>[stdlib/IO/MemoryStream.sl:86](../../stdlib/IO/MemoryStream.sl#L86)</sub>
+<sub>[stdlib/IO/MemoryStream.sl:84](../../stdlib/IO/MemoryStream.sl#L84)</sub>
 
 #### WriteText *method*
 
@@ -728,7 +728,7 @@ void WriteText(String text)
 
 Appends the UTF-8 bytes of `text`.
 
-<sub>[stdlib/IO/MemoryStream.sl:102](../../stdlib/IO/MemoryStream.sl#L102)</sub>
+<sub>[stdlib/IO/MemoryStream.sl:99](../../stdlib/IO/MemoryStream.sl#L99)</sub>
 
 #### Position *property*
 
@@ -738,7 +738,7 @@ long Position { get; }
 
 Where the next read or write will happen.
 
-<sub>[stdlib/IO/MemoryStream.sl:117](../../stdlib/IO/MemoryStream.sl#L117)</sub>
+<sub>[stdlib/IO/MemoryStream.sl:112](../../stdlib/IO/MemoryStream.sl#L112)</sub>
 
 #### Length *property*
 
@@ -749,7 +749,7 @@ long Length { get; }
 How many bytes have been written, measured to the furthest the
 position has ever reached -- not the capacity of the buffer behind it.
 
-<sub>[stdlib/IO/MemoryStream.sl:120](../../stdlib/IO/MemoryStream.sl#L120)</sub>
+<sub>[stdlib/IO/MemoryStream.sl:115](../../stdlib/IO/MemoryStream.sl#L115)</sub>
 
 #### Seek *method*
 
@@ -762,7 +762,7 @@ Moves the position, answering whether it worked.
 Unlike a file, seeking past the end is refused: there is nothing there
 to leave a gap in.
 
-<sub>[stdlib/IO/MemoryStream.sl:126](../../stdlib/IO/MemoryStream.sl#L126)</sub>
+<sub>[stdlib/IO/MemoryStream.sl:121](../../stdlib/IO/MemoryStream.sl#L121)</sub>
 
 #### Flush *method*
 
@@ -772,7 +772,7 @@ void Flush()
 
 Does nothing. There is nothing behind the buffer to push bytes to.
 
-<sub>[stdlib/IO/MemoryStream.sl:141](../../stdlib/IO/MemoryStream.sl#L141)</sub>
+<sub>[stdlib/IO/MemoryStream.sl:136](../../stdlib/IO/MemoryStream.sl#L136)</sub>
 
 #### Close *method*
 
@@ -782,7 +782,7 @@ void Close()
 
 Nothing to release; a memory stream stays usable after it.
 
-<sub>[stdlib/IO/MemoryStream.sl:144](../../stdlib/IO/MemoryStream.sl#L144)</sub>
+<sub>[stdlib/IO/MemoryStream.sl:139](../../stdlib/IO/MemoryStream.sl#L139)</sub>
 
 #### Error *property*
 
@@ -792,7 +792,7 @@ IOError Error { get; }
 
 Always `None`. Nothing a memory stream does can fail.
 
-<sub>[stdlib/IO/MemoryStream.sl:147](../../stdlib/IO/MemoryStream.sl#L147)</sub>
+<sub>[stdlib/IO/MemoryStream.sl:142](../../stdlib/IO/MemoryStream.sl#L142)</sub>
 
 #### ToArray *method*
 
@@ -802,7 +802,7 @@ byte[] ToArray()
 
 A copy of what has been written, from the start to the high-water mark.
 
-<sub>[stdlib/IO/MemoryStream.sl:150](../../stdlib/IO/MemoryStream.sl#L150)</sub>
+<sub>[stdlib/IO/MemoryStream.sl:145](../../stdlib/IO/MemoryStream.sl#L145)</sub>
 
 #### ToText *method*
 
@@ -812,7 +812,7 @@ String ToText()
 
 The contents as text, read as UTF-8.
 
-<sub>[stdlib/IO/MemoryStream.sl:159](../../stdlib/IO/MemoryStream.sl#L159)</sub>
+<sub>[stdlib/IO/MemoryStream.sl:151](../../stdlib/IO/MemoryStream.sl#L151)</sub>
 
 ### SeekOrigin *enum*
 
@@ -1242,7 +1242,7 @@ A sentence describing an error, for a message a person will read.
 
 **See also** &nbsp; [IOError](#ioerror-enum)
 
-<sub>[stdlib/IO/IO.sl:56](../../stdlib/IO/IO.sl#L56)</sub>
+<sub>[stdlib/IO/IO.sl:57](../../stdlib/IO/IO.sl#L57)</sub>
 
 ### ReadTextToEnd *function*
 
@@ -1260,7 +1260,7 @@ Reads a stream to its end and reads the bytes as UTF-8.
 
 **See also** &nbsp; [IO.ReadToEnd](#readtoend-function)
 
-<sub>[stdlib/IO/IO.sl:111](../../stdlib/IO/IO.sl#L111)</sub>
+<sub>[stdlib/IO/IO.sl:112](../../stdlib/IO/IO.sl#L112)</sub>
 
 ### ReadToEnd *function*
 
@@ -1278,7 +1278,7 @@ Reads a stream to its end.
 
 **See also** &nbsp; [IO.ReadTextToEnd](#readtexttoend-function)
 
-<sub>[stdlib/IO/IO.sl:84](../../stdlib/IO/IO.sl#L84)</sub>
+<sub>[stdlib/IO/IO.sl:85](../../stdlib/IO/IO.sl#L85)</sub>
 
 ### SplitLines *function*
 
@@ -1291,5 +1291,5 @@ empty line, which is what a trailing newline produces.
 
 **Returns** &nbsp; the lines, each without its ending
 
-<sub>[stdlib/IO/IO.sl:126](../../stdlib/IO/IO.sl#L126)</sub>
+<sub>[stdlib/IO/IO.sl:127](../../stdlib/IO/IO.sl#L127)</sub>
 

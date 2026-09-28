@@ -48,6 +48,7 @@ extern "C"
     long  sl_file_position(byte* handle);
     long  sl_file_length(byte* handle);
     int   sl_file_flush(byte* handle);
+    byte* memcpy(byte* to, byte* from, nuint count);
 }
 
 /// A sentence describing an error, for a message a person will read.

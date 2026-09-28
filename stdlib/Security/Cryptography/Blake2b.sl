@@ -146,8 +146,7 @@ public sealed class Blake2b : IHashAlgorithm
             if (take > 128u - _used)
                 take = 128u - _used;
 
-            for (nuint i = 0u; i < take; i++)
-                _block[_used + i] = data[at + i];
+            data[at:at + take].CopyTo(_block[_used:]);
 
             _used += take;
             at += take;
@@ -165,9 +164,7 @@ public sealed class Blake2b : IHashAlgorithm
         for (nuint i = 0u; i < 8u; i++)
             WriteLittleDoubleWord(whole, i * 8u, _state[i]);
 
-        byte[] digest = new byte[_hashSize];
-        for (nuint i = 0u; i < _hashSize; i++)
-            digest[i] = whole[i];
+        byte[] digest = whole[:_hashSize].ToArray();
 
         CryptographicOperations.ZeroMemory(whole);
         Reset();
@@ -190,8 +187,7 @@ public sealed class Blake2b : IHashAlgorithm
 
         if (_key.Length > 0u)
         {
-            for (nuint i = 0u; i < _key.Length; i++)
-                _block[i] = _key[i];
+            _key[:].CopyTo(_block);
             _used = 128u;
         }
     }

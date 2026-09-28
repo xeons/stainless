@@ -74,10 +74,7 @@ public sealed class AsnWriter
         if (_depth > 0u)
             sl_fail("AsnWriter.Encode: a Push has no Pop, so a length is not yet known");
 
-        var encoded = new byte[_length];
-        for (nuint i = 0u; i < _length; i++)
-            encoded[i] = _buffer[i];
-        return encoded;
+        return _buffer[:_length].ToArray();
     }
 
     // ------------------------------------------------------------ structure
@@ -212,8 +209,7 @@ public sealed class AsnWriter
         ReadOnlySpan<byte> magnitude, Optional<Asn1Tag> tag = default(Optional<Asn1Tag>))
     {
         var padded = new byte[magnitude.Length + 1u];
-        for (nuint i = 0u; i < magnitude.Length; i++)
-            padded[i + 1u] = magnitude[i];
+        magnitude.CopyTo(padded[1u:]);
         byte[] contents = TrimUnsignedMagnitude(padded);
         WritePrimitiveHeader(tag, Asn1Tag.Integer, contents.Length);
         AppendSpan(contents);
@@ -500,12 +496,10 @@ public sealed class AsnWriter
         nuint written = 0u;
         for (nuint i = 0u; i < count; i++)
         {
-            for (nuint k = 0u; k < lengths[i]; k++)
-                sorted[written + k] = _buffer[offsets[i] + k];
+            _buffer[offsets[i]:offsets[i] + lengths[i]].CopyTo(sorted[written:]);
             written += lengths[i];
         }
-        for (nuint i = 0u; i < sorted.Length; i++)
-            _buffer[start + i] = sorted[i];
+        sorted[:].CopyTo(_buffer[start:]);
     }
 
     private int CompareSetOfElements(nuint left, nuint leftLength, nuint right, nuint rightLength)
@@ -590,8 +584,7 @@ public sealed class AsnWriter
         if (capacity < needed)
             capacity = needed;
         var grown = new byte[capacity];
-        for (nuint i = 0u; i < _length; i++)
-            grown[i] = _buffer[i];
+        _buffer[:_length].CopyTo(grown);
         _buffer = grown;
     }
 
@@ -605,8 +598,7 @@ public sealed class AsnWriter
     private void AppendSpan(ReadOnlySpan<byte> values)
     {
         EnsureCapacity(_length + values.Length);
-        for (nuint i = 0u; i < values.Length; i++)
-            _buffer[_length + i] = values[i];
+        values.CopyTo(_buffer[_length:]);
         _length += values.Length;
     }
 }

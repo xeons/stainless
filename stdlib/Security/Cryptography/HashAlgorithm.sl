@@ -77,8 +77,7 @@ public abstract class HashAlgorithm : IHashAlgorithm
             if (take > room)
                 take = room;
 
-            for (nuint i = 0u; i < take; i++)
-                _block[_used + i] = data[at + i];
+            data[at:at + take].CopyTo(_block[_used:]);
 
             _used += take;
             at += take;
@@ -101,9 +100,7 @@ public abstract class HashAlgorithm : IHashAlgorithm
 
     public void Reset()
     {
-        for (nuint i = 0u; i < _block.Length; i++)
-            _block[i] = 0;
-
+        CryptographicOperations.ZeroMemory(_block);
         _used = 0u;
         _byteCount = 0u;
         InitializeState();

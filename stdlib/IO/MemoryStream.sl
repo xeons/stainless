@@ -48,8 +48,7 @@ public class MemoryStream : IStream
     public MemoryStream(byte[] initial)
     {
         _bytes = new byte[initial.Length + 1];
-        for (nuint i = 0; i < initial.Length; i++)
-            _bytes[i] = initial[i];
+        initial[:].CopyTo(_bytes);
         _length = initial.Length;
         _at = 0;
     }
@@ -72,8 +71,7 @@ public class MemoryStream : IStream
         nuint available = _length - _at;
         nuint taking = count < available ? count : available;
 
-        for (nuint i = 0; i < taking; i++)
-            buffer[offset + i] = _bytes[_at + i];
+        _bytes[_at:_at + taking].CopyTo(buffer[offset:]);
         _at = _at + taking;
         return taking;
     }
@@ -89,8 +87,7 @@ public class MemoryStream : IStream
             return 0;
 
         EnsureCapacity(_at + count);
-        for (nuint i = 0; i < count; i++)
-            _bytes[_at + i] = buffer[offset + i];
+        buffer[offset:offset + count].CopyTo(_bytes[_at:]);
 
         _at = _at + count;
         if (_at > _length)
@@ -103,10 +100,8 @@ public class MemoryStream : IStream
     {
         nuint size = text.ByteLength();
         EnsureCapacity(_at + size);
-
-        var source = text.ToPointer();
-        for (nuint i = 0; i < size; i++)
-            _bytes[_at + i] = source[i];
+        if (size != 0u)
+            memcpy(&_bytes[_at], text.ToPointer(), size);
 
         _at = _at + size;
         if (_at > _length)
@@ -149,10 +144,7 @@ public class MemoryStream : IStream
     /// A copy of what has been written, from the start to the high-water mark.
     public byte[] ToArray()
     {
-        var copy = new byte[_length];
-        for (nuint i = 0; i < _length; i++)
-            copy[i] = _bytes[i];
-        return copy;
+        return _bytes[:_length].ToArray();
     }
 
     /// The contents as text, read as UTF-8.
@@ -173,8 +165,7 @@ public class MemoryStream : IStream
             size = size * 2;
 
         var bigger = new byte[size];
-        for (nuint i = 0; i < _length; i++)
-            bigger[i] = _bytes[i];
+        _bytes[:_length].CopyTo(bigger);
         _bytes = bigger;
     }
 }

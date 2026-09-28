@@ -224,8 +224,8 @@ class SpanSource : IStream
     {
         nuint available = _data.Length - _at;
         nuint taking = count < available ? count : available;
-        for (nuint i = 0; i < taking; i++)
-            buffer[offset + i] = _data[_at + i];
+        if (taking != 0u)
+            _data[_at:_at + taking].CopyTo(buffer[offset:]);
         _at += taking;
         return taking;
     }

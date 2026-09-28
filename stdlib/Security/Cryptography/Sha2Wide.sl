@@ -139,9 +139,6 @@ public abstract class Sha2Wide : HashAlgorithm
         if (HashSizeInBytes == 64u)
             return whole;
 
-        byte[] digest = new byte[HashSizeInBytes];
-        for (nuint i = 0u; i < digest.Length; i++)
-            digest[i] = whole[i];
-        return digest;
+        return whole[:HashSizeInBytes].ToArray();
     }
 }

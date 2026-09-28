@@ -98,9 +98,7 @@ public static class Wav
                 // is one no device will take.
                 size -= size % format.BytesPerFrame;
 
-                byte[] samples = new byte[size];
-                for (nuint i = 0u; i < size; i++)
-                    samples[i] = bytes[body + i];
+                byte[] samples = bytes[body:body + size].ToArray();
 
                 return Ok(new AudioClip(format, samples));
             }
@@ -140,8 +138,7 @@ public static class Wav
         WriteMark(file, 36u, "data");
         WriteUInt(file, 40u, (uint)samples.Length);
 
-        for (nuint i = 0u; i < samples.Length; i++)
-            file[44u + i] = samples[i];
+        samples[:].CopyTo(file[44u:]);
 
         return file;
     }

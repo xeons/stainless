@@ -719,7 +719,7 @@ byte[] GetHashAndReset()
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/Blake2b.sl:157](../../stdlib/Security/Cryptography/Blake2b.sl#L157)</sub>
+<sub>[stdlib/Security/Cryptography/Blake2b.sl:156](../../stdlib/Security/Cryptography/Blake2b.sl#L156)</sub>
 
 #### Reset *method*
 
@@ -729,7 +729,7 @@ void Reset()
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/Blake2b.sl:177](../../stdlib/Security/Cryptography/Blake2b.sl#L177)</sub>
+<sub>[stdlib/Security/Cryptography/Blake2b.sl:174](../../stdlib/Security/Cryptography/Blake2b.sl#L174)</sub>
 
 #### ComputeHash *method*
 
@@ -740,7 +740,7 @@ byte[] ComputeHash(ReadOnlySpan<byte> data)
 The digest of `data` on its own. Resets first, so an object that has
 been appended to is still safe to ask.
 
-<sub>[stdlib/Security/Cryptography/Blake2b.sl:201](../../stdlib/Security/Cryptography/Blake2b.sl#L201)</sub>
+<sub>[stdlib/Security/Cryptography/Blake2b.sl:197](../../stdlib/Security/Cryptography/Blake2b.sl#L197)</sub>
 
 ### ChaCha20 *class*
 
@@ -2634,7 +2634,7 @@ byte[] GetHashAndReset()
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/HashAlgorithm.sl:95](../../stdlib/Security/Cryptography/HashAlgorithm.sl#L95)</sub>
+<sub>[stdlib/Security/Cryptography/HashAlgorithm.sl:94](../../stdlib/Security/Cryptography/HashAlgorithm.sl#L94)</sub>
 
 #### Reset *method*
 
@@ -2644,7 +2644,7 @@ void Reset()
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/HashAlgorithm.sl:102](../../stdlib/Security/Cryptography/HashAlgorithm.sl#L102)</sub>
+<sub>[stdlib/Security/Cryptography/HashAlgorithm.sl:101](../../stdlib/Security/Cryptography/HashAlgorithm.sl#L101)</sub>
 
 #### ComputeHash *method*
 
@@ -2655,7 +2655,7 @@ byte[] ComputeHash(ReadOnlySpan<byte> data)
 The digest of `data` on its own. Resets first, so an object that has
 been appended to is still safe to ask.
 
-<sub>[stdlib/Security/Cryptography/HashAlgorithm.sl:114](../../stdlib/Security/Cryptography/HashAlgorithm.sl#L114)</sub>
+<sub>[stdlib/Security/Cryptography/HashAlgorithm.sl:111](../../stdlib/Security/Cryptography/HashAlgorithm.sl#L111)</sub>
 
 ### HashAlgorithmName *struct*
 
@@ -2874,7 +2874,7 @@ Extract and expand together, which is how HKDF is nearly always used.
 
 **See also** &nbsp; [Hkdf.Extract](#extract-method) &middot; [Hkdf.Expand](#expand-method)
 
-<sub>[stdlib/Security/Cryptography/Hkdf.sl:108](../../stdlib/Security/Cryptography/Hkdf.sl#L108)</sub>
+<sub>[stdlib/Security/Cryptography/Hkdf.sl:107](../../stdlib/Security/Cryptography/Hkdf.sl#L107)</sub>
 
 ### Hmac *class*
 
@@ -2903,7 +2903,7 @@ String Name { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/Hmac.sl:82](../../stdlib/Security/Cryptography/Hmac.sl#L82)</sub>
+<sub>[stdlib/Security/Cryptography/Hmac.sl:80](../../stdlib/Security/Cryptography/Hmac.sl#L80)</sub>
 
 #### HashSizeInBytes *property*
 
@@ -2913,7 +2913,7 @@ nuint HashSizeInBytes { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/Hmac.sl:84](../../stdlib/Security/Cryptography/Hmac.sl#L84)</sub>
+<sub>[stdlib/Security/Cryptography/Hmac.sl:82](../../stdlib/Security/Cryptography/Hmac.sl#L82)</sub>
 
 #### BlockSizeInBytes *property*
 
@@ -2923,7 +2923,7 @@ nuint BlockSizeInBytes { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/Hmac.sl:86](../../stdlib/Security/Cryptography/Hmac.sl#L86)</sub>
+<sub>[stdlib/Security/Cryptography/Hmac.sl:84](../../stdlib/Security/Cryptography/Hmac.sl#L84)</sub>
 
 #### AppendData *method*
 
@@ -2933,7 +2933,7 @@ void AppendData(ReadOnlySpan<byte> data)
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/Hmac.sl:88](../../stdlib/Security/Cryptography/Hmac.sl#L88)</sub>
+<sub>[stdlib/Security/Cryptography/Hmac.sl:86](../../stdlib/Security/Cryptography/Hmac.sl#L86)</sub>
 
 #### GetHashAndReset *method*
 
@@ -2943,7 +2943,7 @@ byte[] GetHashAndReset()
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/Hmac.sl:90](../../stdlib/Security/Cryptography/Hmac.sl#L90)</sub>
+<sub>[stdlib/Security/Cryptography/Hmac.sl:88](../../stdlib/Security/Cryptography/Hmac.sl#L88)</sub>
 
 #### Reset *method*
 
@@ -2953,7 +2953,7 @@ void Reset()
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/Hmac.sl:100](../../stdlib/Security/Cryptography/Hmac.sl#L100)</sub>
+<sub>[stdlib/Security/Cryptography/Hmac.sl:98](../../stdlib/Security/Cryptography/Hmac.sl#L98)</sub>
 
 #### ComputeHash *method*
 
@@ -2963,7 +2963,7 @@ byte[] ComputeHash(ReadOnlySpan<byte> data)
 
 The MAC of `data` under `key`, with no object to keep.
 
-<sub>[stdlib/Security/Cryptography/Hmac.sl:107](../../stdlib/Security/Cryptography/Hmac.sl#L107)</sub>
+<sub>[stdlib/Security/Cryptography/Hmac.sl:105](../../stdlib/Security/Cryptography/Hmac.sl#L105)</sub>
 
 ### HmacMd5 *class*
 

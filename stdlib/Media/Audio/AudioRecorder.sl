@@ -362,8 +362,7 @@ public sealed class AudioRecorder
         if (take == 0u)
             return 0u;
 
-        for (nuint i = 0u; i < take; i++)
-            buffer[i] = _spill[_spillAt + i];
+        _spill[_spillAt:_spillAt + take].CopyTo(buffer);
 
         _spillAt += take;
         return take;

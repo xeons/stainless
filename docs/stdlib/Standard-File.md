@@ -29,7 +29,7 @@ Adds `text` to the end, creating the file if it is not there.
 - [IOError.IsADirectory](Standard-IO.md#isadirectory-case) — the path names a directory
 - [IOError.Unknown](Standard-IO.md#unknown-case) — the write or the close failed for a reason with no case of its own, a full disk among them
 
-<sub>[stdlib/File.sl:277](../../stdlib/File.sl#L277)</sub>
+<sub>[stdlib/File.sl:274](../../stdlib/File.sl#L274)</sub>
 
 ### Copy *function*
 
@@ -52,7 +52,7 @@ for something that will not fit in memory.
 - [IOError.IsADirectory](Standard-IO.md#isadirectory-case) — either path names a directory
 - [IOError.Unknown](Standard-IO.md#unknown-case) — the read or the write failed for a reason with no case of its own
 
-<sub>[stdlib/File.sl:298](../../stdlib/File.sl#L298)</sub>
+<sub>[stdlib/File.sl:295](../../stdlib/File.sl#L295)</sub>
 
 ### Delete *function*
 
@@ -168,7 +168,7 @@ producing no final empty line.
 
 **See also** &nbsp; [File.WriteAllLines](#writealllines-function)
 
-<sub>[stdlib/File.sl:186](../../stdlib/File.sl#L186)</sub>
+<sub>[stdlib/File.sl:183](../../stdlib/File.sl#L183)</sub>
 
 ### ReadAllText *function*
 
@@ -188,7 +188,7 @@ dropped: it says how the text is stored and is not part of it.
 
 **See also** &nbsp; [File.WriteAllText](#writealltext-function)
 
-<sub>[stdlib/File.sl:164](../../stdlib/File.sl#L164)</sub>
+<sub>[stdlib/File.sl:161](../../stdlib/File.sl#L161)</sub>
 
 ### WriteAllBytes *function*
 
@@ -204,7 +204,7 @@ Replaces the file with `data`, creating it if needed.
 - [IOError.IsADirectory](Standard-IO.md#isadirectory-case) — the path names a directory
 - [IOError.Unknown](Standard-IO.md#unknown-case) — the write or the close failed for a reason with no case of its own, a full disk among them
 
-<sub>[stdlib/File.sl:212](../../stdlib/File.sl#L212)</sub>
+<sub>[stdlib/File.sl:209](../../stdlib/File.sl#L209)</sub>
 
 ### WriteAllLines *function*
 
@@ -221,7 +221,7 @@ fails.
 - [IOError.IsADirectory](Standard-IO.md#isadirectory-case) — the path names a directory
 - [IOError.Unknown](Standard-IO.md#unknown-case) — a write or the close failed for a reason with no case of its own, a full disk among them
 
-<sub>[stdlib/File.sl:250](../../stdlib/File.sl#L250)</sub>
+<sub>[stdlib/File.sl:247](../../stdlib/File.sl#L247)</sub>
 
 ### WriteAllText *function*
 
@@ -239,5 +239,5 @@ Replaces the file with `text`, written as UTF-8.
 
 **See also** &nbsp; [File.ReadAllText](#readalltext-function)
 
-<sub>[stdlib/File.sl:231](../../stdlib/File.sl#L231)</sub>
+<sub>[stdlib/File.sl:228](../../stdlib/File.sl#L228)</sub>
 

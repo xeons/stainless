@@ -42,7 +42,7 @@ public static class Hkdf
     /// @see Hkdf.Expand
     public static byte[] Extract(IHashAlgorithm hash, ReadOnlySpan<byte> inputKey, ReadOnlySpan<byte> salt)
     {
-        byte[] actual = salt.Length == 0u ? new byte[hash.HashSizeInBytes] : ToArray(salt);
+        byte[] actual = salt.Length == 0u ? new byte[hash.HashSizeInBytes] : salt.ToArray();
         return new Hmac(hash, actual).ComputeHash(inputKey);
     }
 
@@ -85,8 +85,7 @@ public static class Hkdf
             if (take > macSize)
                 take = macSize;
 
-            for (nuint i = 0u; i < take; i++)
-                derived[filled + i] = previous[i];
+            previous[:take].CopyTo(derived[filled:]);
 
             filled += take;
             index++;
@@ -111,13 +110,5 @@ public static class Hkdf
     {
         byte[] pseudoKey = Extract(hash, inputKey, salt);
         return Expand(hash, pseudoKey, info, length);
-    }
-
-    static byte[] ToArray(ReadOnlySpan<byte> data)
-    {
-        byte[] copy = new byte[data.Length];
-        for (nuint i = 0u; i < data.Length; i++)
-            copy[i] = data[i];
-        return copy;
     }
 }

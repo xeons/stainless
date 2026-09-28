@@ -122,17 +122,17 @@ public Result<byte[], IOError> ReadAllBytes(String path)
     // else means the size was a hint and the file has more.
     while (file.Error == IOError.None)
     {
-        var more = new byte[KeepReading];
-        nuint arrived = file.Read(more, 0, KeepReading);
+        // Doubling, so a file much longer than its size said costs linear time.
+        if (got == data.Length)
+        {
+            var grown = new byte[got < KeepReading ? got + KeepReading : got * 2u];
+            data[:got].CopyTo(grown);
+            data = grown;
+        }
+
+        nuint arrived = file.Read(data, got, data.Length - got);
         if (arrived == 0u)
             break;
-
-        var grown = new byte[got + arrived];
-        for (nuint i = 0u; i < got; i++)
-            grown[i] = data[i];
-        for (nuint i = 0u; i < arrived; i++)
-            grown[got + i] = more[i];
-        data = grown;
         got = got + arrived;
     }
 
@@ -146,10 +146,7 @@ public Result<byte[], IOError> ReadAllBytes(String path)
     if (got == data.Length)
         return Ok(data);
 
-    var exact = new byte[got];
-    for (nuint i = 0; i < got; i++)
-        exact[i] = data[i];
-    return Ok(exact);
+    return Ok(data[:got].ToArray());
 }
 
 /// The whole file as text, read as UTF-8. A byte order mark at the start is

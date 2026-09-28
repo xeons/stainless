@@ -758,7 +758,7 @@ samples, and the pad byte an odd length is followed by.
 
 **See also** &nbsp; [Wav.Decode](#decode-method)
 
-<sub>[stdlib/Media/Audio/Wav.sl:120](../../stdlib/Media/Audio/Wav.sl#L120)</sub>
+<sub>[stdlib/Media/Audio/Wav.sl:118](../../stdlib/Media/Audio/Wav.sl#L118)</sub>
 
 #### FromFile *method*
 
@@ -776,7 +776,7 @@ A `.wav` on disk, read.
 
 **See also** &nbsp; [Wav.Save](#save-method)
 
-<sub>[stdlib/Media/Audio/Wav.sl:158](../../stdlib/Media/Audio/Wav.sl#L158)</sub>
+<sub>[stdlib/Media/Audio/Wav.sl:155](../../stdlib/Media/Audio/Wav.sl#L155)</sub>
 
 #### Save *method*
 
@@ -792,7 +792,7 @@ A clip written to a `.wav` on disk.
 
 **See also** &nbsp; [Wav.FromFile](#fromfile-method)
 
-<sub>[stdlib/Media/Audio/Wav.sl:171](../../stdlib/Media/Audio/Wav.sl#L171)</sub>
+<sub>[stdlib/Media/Audio/Wav.sl:168](../../stdlib/Media/Audio/Wav.sl#L168)</sub>
 
 ## Functions
 

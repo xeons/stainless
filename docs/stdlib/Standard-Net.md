@@ -1084,7 +1084,7 @@ String ReceiveText()
 The same, read as UTF-8. Anything malformed becomes U+FFFD, because the
 result is a `String` and a `String` is valid UTF-8 by invariant.
 
-<sub>[stdlib/Net/TcpClient.sl:180](../../stdlib/Net/TcpClient.sl#L180)</sub>
+<sub>[stdlib/Net/TcpClient.sl:176](../../stdlib/Net/TcpClient.sl#L176)</sub>
 
 #### WaitToRead *method*
 
@@ -1096,7 +1096,7 @@ Waits up to `milliseconds` for something to read, answering whether
 there is. A peer that closed counts as readable -- the read that
 follows returns zero, which is how the ending is seen.
 
-<sub>[stdlib/Net/TcpClient.sl:191](../../stdlib/Net/TcpClient.sl#L191)</sub>
+<sub>[stdlib/Net/TcpClient.sl:187](../../stdlib/Net/TcpClient.sl#L187)</sub>
 
 #### WaitToWrite *method*
 
@@ -1107,7 +1107,7 @@ bool WaitToWrite(int milliseconds)
 Waits up to `milliseconds` for room to write, answering whether there
 is. Only interesting once a send has filled the kernel's buffer.
 
-<sub>[stdlib/Net/TcpClient.sl:195](../../stdlib/Net/TcpClient.sl#L195)</sub>
+<sub>[stdlib/Net/TcpClient.sl:191](../../stdlib/Net/TcpClient.sl#L191)</sub>
 
 #### CanRead *property*
 
@@ -1117,7 +1117,7 @@ bool CanRead { get; }
 
 True while the connection is open and the peer has not finished.
 
-<sub>[stdlib/Net/TcpClient.sl:200](../../stdlib/Net/TcpClient.sl#L200)</sub>
+<sub>[stdlib/Net/TcpClient.sl:196](../../stdlib/Net/TcpClient.sl#L196)</sub>
 
 #### CanWrite *property*
 
@@ -1128,7 +1128,7 @@ bool CanWrite { get; }
 True while the connection is open. A peer that finished sending can
 still be written to, until it closes for real.
 
-<sub>[stdlib/Net/TcpClient.sl:204](../../stdlib/Net/TcpClient.sl#L204)</sub>
+<sub>[stdlib/Net/TcpClient.sl:200](../../stdlib/Net/TcpClient.sl#L200)</sub>
 
 #### CanSeek *property*
 
@@ -1138,7 +1138,7 @@ bool CanSeek { get; }
 
 A connection has no position to move to.
 
-<sub>[stdlib/Net/TcpClient.sl:207](../../stdlib/Net/TcpClient.sl#L207)</sub>
+<sub>[stdlib/Net/TcpClient.sl:203](../../stdlib/Net/TcpClient.sl#L203)</sub>
 
 #### Read *method*
 
@@ -1153,7 +1153,7 @@ Fewer than asked for is normal and not an error: a stream delivers what
 has arrived. Zero means the peer finished, and `Error` distinguishes
 that from a failure.
 
-<sub>[stdlib/Net/TcpClient.sl:215](../../stdlib/Net/TcpClient.sl#L215)</sub>
+<sub>[stdlib/Net/TcpClient.sl:211](../../stdlib/Net/TcpClient.sl#L211)</sub>
 
 #### Write *method*
 
@@ -1164,7 +1164,7 @@ nuint Write(byte[] buffer, nuint offset, nuint count)
 Writes up to `count` bytes from `buffer` at `offset`, answering how
 many went. A short write is normal; `SendAll` is the one that loops.
 
-<sub>[stdlib/Net/TcpClient.sl:228](../../stdlib/Net/TcpClient.sl#L228)</sub>
+<sub>[stdlib/Net/TcpClient.sl:224](../../stdlib/Net/TcpClient.sl#L224)</sub>
 
 #### Position *property*
 
@@ -1174,7 +1174,7 @@ long Position { get; }
 
 Not a position, and not pretended to be one.
 
-<sub>[stdlib/Net/TcpClient.sl:234](../../stdlib/Net/TcpClient.sl#L234)</sub>
+<sub>[stdlib/Net/TcpClient.sl:230](../../stdlib/Net/TcpClient.sl#L230)</sub>
 
 #### Length *property*
 
@@ -1184,7 +1184,7 @@ long Length { get; }
 
 Not a length either. A connection does not know how much is coming.
 
-<sub>[stdlib/Net/TcpClient.sl:236](../../stdlib/Net/TcpClient.sl#L236)</sub>
+<sub>[stdlib/Net/TcpClient.sl:232](../../stdlib/Net/TcpClient.sl#L232)</sub>
 
 #### Seek *method*
 
@@ -1194,7 +1194,7 @@ bool Seek(long offset, SeekOrigin origin)
 
 Always false. There is nowhere to seek to on a connection.
 
-<sub>[stdlib/Net/TcpClient.sl:239](../../stdlib/Net/TcpClient.sl#L239)</sub>
+<sub>[stdlib/Net/TcpClient.sl:235](../../stdlib/Net/TcpClient.sl#L235)</sub>
 
 #### Flush *method*
 
@@ -1204,7 +1204,7 @@ void Flush()
 
 Nothing is buffered here; the kernel decides when bytes leave.
 
-<sub>[stdlib/Net/TcpClient.sl:242](../../stdlib/Net/TcpClient.sl#L242)</sub>
+<sub>[stdlib/Net/TcpClient.sl:238](../../stdlib/Net/TcpClient.sl#L238)</sub>
 
 #### Close *method*
 
@@ -1216,7 +1216,7 @@ Ends the connection politely: shuts both directions down first, so the
 peer sees an ending rather than a reset, then closes. Idempotent, and
 the destructor calls it.
 
-<sub>[stdlib/Net/TcpClient.sl:247](../../stdlib/Net/TcpClient.sl#L247)</sub>
+<sub>[stdlib/Net/TcpClient.sl:243](../../stdlib/Net/TcpClient.sl#L243)</sub>
 
 #### Error *property*
 
@@ -1227,7 +1227,7 @@ IOError Error { get; }
 The socket error as the nearest `IOError`, so that a reader which knows
 nothing about sockets still gets something it can act on.
 
-<sub>[stdlib/Net/TcpClient.sl:257](../../stdlib/Net/TcpClient.sl#L257)</sub>
+<sub>[stdlib/Net/TcpClient.sl:253](../../stdlib/Net/TcpClient.sl#L253)</sub>
 
 ### TcpListener *class*
 

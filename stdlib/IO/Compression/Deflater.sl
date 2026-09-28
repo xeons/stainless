@@ -250,9 +250,7 @@ class Deflater
 
     void CopyIntoWindow(ReadOnlySpan<byte> data, nuint from, nuint count, nuint to)
     {
-        byte[] window = _window;
-        for (nuint i = 0; i < count; i++)
-            window[to + i] = data[from + i];
+        data[from:from + count].CopyTo(_window[to:]);
     }
 
     // Moves the upper window down over the lower, and forgets every position

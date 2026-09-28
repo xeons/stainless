@@ -81,9 +81,7 @@ public static class Rfc2898DeriveBytes
             mac.AppendData(counter);
             byte[] block = mac.GetHashAndReset();
 
-            byte[] running = new byte[macSize];
-            for (nuint i = 0u; i < macSize; i++)
-                running[i] = block[i];
+            byte[] running = block[:macSize].ToArray();
 
             for (nuint round = 1u; round < iterations; round++)
             {
@@ -96,8 +94,7 @@ public static class Rfc2898DeriveBytes
             if (take > macSize)
                 take = macSize;
 
-            for (nuint i = 0u; i < take; i++)
-                derived[filled + i] = running[i];
+            running[:take].CopyTo(derived[filled:]);
 
             CryptographicOperations.ZeroMemory(running);
             filled += take;

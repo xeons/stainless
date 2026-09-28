@@ -377,8 +377,7 @@ public sealed class Aes
                 // makes it removable without ambiguity.
                 nuint added = BlockSize - remainder;
                 byte[] output = new byte[data.Length + added];
-                for (nuint i = 0u; i < data.Length; i++)
-                    output[i] = data[i];
+                data.CopyTo(output);
                 for (nuint i = data.Length; i < output.Length; i++)
                     output[i] = (byte)added;
                 return Ok(output);
@@ -391,8 +390,7 @@ public sealed class Aes
                     added = BlockSize - remainder;
 
                 byte[] output = new byte[data.Length + added];
-                for (nuint i = 0u; i < data.Length; i++)
-                    output[i] = data[i];
+                data.CopyTo(output);
                 return Ok(output);
             }
 
@@ -400,8 +398,7 @@ public sealed class Aes
             {
                 nuint added = BlockSize - remainder;
                 byte[] output = new byte[data.Length + added];
-                for (nuint i = 0u; i < data.Length; i++)
-                    output[i] = data[i];
+                data.CopyTo(output);
                 output[output.Length - 1u] = (byte)added;
                 return Ok(output);
             }
@@ -438,10 +435,7 @@ public sealed class Aes
             }
         }
 
-        byte[] output = new byte[data.Length - added];
-        for (nuint i = 0u; i < output.Length; i++)
-            output[i] = data[i];
-        return Ok(output);
+        return Ok(data[:data.Length - added].ToArray());
     }
 
     // ------------------------------------------------------------ the cipher
@@ -978,11 +972,5 @@ public sealed class Aes
         return (uint)q[0u];
     }
 
-    static byte[] CopyBytes(ReadOnlySpan<byte> data)
-    {
-        byte[] copy = new byte[data.Length];
-        for (nuint i = 0u; i < data.Length; i++)
-            copy[i] = data[i];
-        return copy;
-    }
+    static byte[] CopyBytes(ReadOnlySpan<byte> data) => data.ToArray();
 }

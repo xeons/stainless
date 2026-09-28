@@ -144,9 +144,7 @@ public static class Scrypt
 
         for (nuint i = 0u; i < cost; i++)
         {
-            nuint start = i * words;
-            for (nuint k = 0u; k < words; k++)
-                memory[start + k] = current[k];
+            current[:words].CopyTo(memory[i * words:]);
 
             MixBlocks(current, next, blockSize, mixing);
             uint[] swap = current;
