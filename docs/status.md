@@ -449,7 +449,8 @@ last person to edit it -- the suite is the authority.
   against every argument
 - `enum`, strongly typed: a distinct type over an integer that never converts
   implicitly in either direction, with an optional underlying type
-  (`enum Level : byte`)
+  (`enum Level : byte`). A property, field or local may share its enum's name,
+  and `Color.Red` still names the member, as C#'s Color Color rule has it
 - `[Flags]` enums: `|`, `&`, `^` and `~` on an enum whose members are bits,
   producing that same enum rather than its number, plus `HasFlag`. The marker
   needs no import, because it is a rule about enums rather than a library

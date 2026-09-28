@@ -1,0 +1,4 @@
+red true
+green
+a blue brush
+a green parameter

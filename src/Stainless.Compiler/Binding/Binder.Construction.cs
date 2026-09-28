@@ -908,11 +908,34 @@ public sealed partial class Binder
         _context.Function?.ContainingType?.FindProperty(name) is not null ||
         _context.Function?.ContainingType?.PrimaryCaptures.ContainsKey(name) == true;
 
-    private EnumTypeSymbol? ResolveEnumPrefix(ExpressionSyntax target)
+    /// <summary>
+    /// The type of the local, parameter, field or property <paramref name="name"/>
+    /// names, in the order <see cref="NamesAValue"/> finds them; null when it
+    /// names none.
+    /// </summary>
+    private TypeSymbol? TypeOfValueNamed(string name) =>
+        LookupLocal(name)?.Type ??
+        _context.Function?.Parameters.FirstOrDefault(p => p.Name == name && !p.IsThis)?.Type ??
+        _context.Function?.ContainingType?.FindField(name)?.Type ??
+        _context.Function?.ContainingType?.FindProperty(name)?.Type;
+
+    private EnumTypeSymbol? ResolveEnumPrefix(ExpressionSyntax target, string member)
     {
         if (FlattenName(target) is not { } parts) return null;
 
-        if (NamesAValue(parts[0])) return null;
+        if (NamesAValue(parts[0]))
+        {
+            // C#'s Color Color rule: a property `TagClass` of type `TagClass`
+            // leaves `TagClass.Universal` naming the enum's member, because a
+            // value of that type has no member of that name to reach.
+            if (parts.Count == 1 && TypeNamed(parts) is EnumTypeSymbol same &&
+                TypeOfValueNamed(parts[0]) == same && same.FindMember(member) is not null)
+            {
+                return same;
+            }
+
+            return null;
+        }
 
         // `Widget.State` is one name when `State` is nested in `Widget`, and a
         // module and a type when it is not. TypeNamed tries them in that order.

@@ -286,7 +286,7 @@ public sealed partial class Binder
         }
 
         // `Color.Red` names a constant of an enum type, not a member of a value.
-        if (!syntax.ThroughPointer && ResolveEnumPrefix(syntax.Target) is { } enumType)
+        if (!syntax.ThroughPointer && ResolveEnumPrefix(syntax.Target, syntax.Member) is { } enumType)
         {
             if (enumType.FindMember(syntax.Member) is { } member)
                 return new BoundLiteral(syntax.Span, enumType, member.Value);
