@@ -955,4 +955,271 @@ public sealed class Rsa
         }
         return mask;
     }
+
+    // ------------------------------------------------------------ encryption
+
+    /// `data` encrypted to this key.
+    ///
+    /// @param data     at most the modulus's length less 11 bytes under PKCS #1
+    ///                 v1.5, or less twice the digest and 2 under OAEP
+    /// @param padding  OAEP with its hash and label, or PKCS #1 v1.5
+    /// @failure CryptoError.MessageLength  `data` is too long for the key and padding
+    /// @failure CryptoError.Unsupported    OAEP's hash is not one this module has
+    /// @failure CryptoError.NoEntropy      the platform would not supply randomness
+    /// @see Rsa.Decrypt
+    public Result<byte[], CryptoError> Encrypt(ReadOnlySpan<byte> data,
+                                               RsaEncryptionPadding padding)
+    {
+        nuint k = _modulusLength;
+        byte[] encoded = new byte[k];
+
+        if (padding.Mode == RsaEncryptionPaddingMode.Pkcs1)
+        {
+            if (k < 11u || data.Length > k - 11u)
+                return Fail(CryptoError.MessageLength);
+
+            // 00 02, random non-zero padding, 00, the message.
+            encoded[1u] = 0x02;
+            nuint separator = k - data.Length - 1u;
+            byte[] one = new byte[1u];
+            for (nuint i = 2u; i < separator; i++)
+            {
+                do
+                {
+                    if (!RandomNumberGenerator.Fill(one))
+                        return Fail(CryptoError.NoEntropy);
+                }
+                while (one[0u] == 0);
+                encoded[i] = one[0u];
+            }
+            for (nuint i = 0u; i < data.Length; i++)
+                encoded[separator + 1u + i] = data[i];
+        }
+        else
+        {
+            IHashAlgorithm hash = try padding.OaepHashAlgorithm.CreateHashAlgorithm();
+            nuint hashLength = hash.HashSizeInBytes;
+            if (k < 2u * hashLength + 2u || data.Length > k - 2u * hashLength - 2u)
+                return Fail(CryptoError.MessageLength);
+
+            // 00, masked seed, masked (label hash, zeros, 01, message).
+            hash.AppendData(padding.OaepLabel);
+            byte[] labelHash = hash.GetHashAndReset();
+            nuint blockLength = k - hashLength - 1u;
+            byte[] block = new byte[blockLength];
+            for (nuint i = 0u; i < hashLength; i++)
+                block[i] = labelHash[i];
+            block[blockLength - data.Length - 1u] = 0x01;
+            for (nuint i = 0u; i < data.Length; i++)
+                block[blockLength - data.Length + i] = data[i];
+
+            byte[] seed = new byte[hashLength];
+            if (!RandomNumberGenerator.Fill(seed))
+                return Fail(CryptoError.NoEntropy);
+            byte[] blockMask = GenerateMask(hash, seed, blockLength);
+            for (nuint i = 0u; i < blockLength; i++)
+                block[i] ^= blockMask[i];
+            byte[] seedMask = GenerateMask(hash, block, hashLength);
+            for (nuint i = 0u; i < hashLength; i++)
+                encoded[1u + i] = (byte)(seed[i] ^ seedMask[i]);
+            for (nuint i = 0u; i < blockLength; i++)
+                encoded[1u + hashLength + i] = block[i];
+        }
+
+        ulong[] number = Limbs.FromBigEndian(encoded, _modulus.LimbCount);
+        CryptographicOperations.ZeroMemory(encoded);
+        return Ok(Limbs.ToBigEndian(ApplyPublicExponent(number), k));
+    }
+
+    /// `data` decrypted with this key.
+    ///
+    /// **OAEP** decodes in constant time and fails with one error however the
+    /// encoding is wrong, so the failure says nothing about the plaintext.
+    ///
+    /// **PKCS #1 v1.5 never fails on bad padding.** It uses implicit rejection
+    /// (draft-irtf-cfrg-rsa-guidance, as OpenSSL 3.2 does): a ciphertext whose
+    /// padding is wrong decrypts to a random-looking message derived from the
+    /// ciphertext and the key, the same every time, in the same time as a
+    /// valid one. That is what closes Bleichenbacher's oracle; the caller MUST
+    /// treat what comes back as untrusted and check it by other means.
+    ///
+    /// @param data     the ciphertext, exactly as long as the modulus
+    /// @param padding  what it was encrypted with
+    /// @failure CryptoError.InvalidKey     this is a public key
+    /// @failure CryptoError.MessageLength  `data` is not the modulus's length, or not below it
+    /// @failure CryptoError.Padding        OAEP only: the ciphertext is not a valid encoding
+    ///                                     under this key and label
+    /// @failure CryptoError.Unsupported    OAEP's hash is not one this module has
+    /// @failure CryptoError.NoEntropy      the platform would not supply randomness
+    /// @see Rsa.Encrypt
+    public Result<byte[], CryptoError> Decrypt(ReadOnlySpan<byte> data,
+                                               RsaEncryptionPadding padding)
+    {
+        if (_privateKey is not RsaPrivateKey key)
+            return Fail(CryptoError.InvalidKey);
+        var number = ConvertToNumberBelowModulus(data);
+        if (!number.Some)
+            return Fail(CryptoError.MessageLength);
+
+        if (padding.Mode == RsaEncryptionPaddingMode.Pkcs1)
+        {
+            if (_modulusLength < 11u)
+                return Fail(CryptoError.MessageLength);
+            byte[] encoded = try ApplyPrivateExponent(number.Value);
+            byte[] message = DecodePkcs1Encryption(encoded, data, key);
+            CryptographicOperations.ZeroMemory(encoded);
+            return Ok(message);
+        }
+
+        IHashAlgorithm hash = try padding.OaepHashAlgorithm.CreateHashAlgorithm();
+        if (_modulusLength < 2u * hash.HashSizeInBytes + 2u)
+            return Fail(CryptoError.Padding);
+        byte[] decrypted = try ApplyPrivateExponent(number.Value);
+        var decoded = DecodeOaep(decrypted, hash, padding.OaepLabel);
+        CryptographicOperations.ZeroMemory(decrypted);
+        return decoded;
+    }
+
+    /// EME-OAEP decoding (RFC 8017 §7.1.2 step 3), in constant time up to the
+    /// single branch on the combined verdict.
+    Result<byte[], CryptoError> DecodeOaep(byte[] encoded, IHashAlgorithm hash, byte[] label)
+    {
+        nuint k = _modulusLength;
+        nuint hashLength = hash.HashSizeInBytes;
+        nuint blockLength = k - hashLength - 1u;
+
+        hash.AppendData(label);
+        byte[] labelHash = hash.GetHashAndReset();
+
+        ReadOnlySpan<byte> maskedBlock = encoded[1u + hashLength:];
+        byte[] seedMask = GenerateMask(hash, maskedBlock, hashLength);
+        byte[] seed = new byte[hashLength];
+        for (nuint i = 0u; i < hashLength; i++)
+            seed[i] = (byte)(encoded[1u + i] ^ seedMask[i]);
+        byte[] block = GenerateMask(hash, seed, blockLength);
+        for (nuint i = 0u; i < blockLength; i++)
+            block[i] ^= maskedBlock[i];
+
+        ulong good = Limbs.MaskIfZero((ulong)encoded[0u]);
+        ulong difference = 0ul;
+        for (nuint i = 0u; i < hashLength; i++)
+            difference |= (ulong)(block[i] ^ labelHash[i]);
+        good &= Limbs.MaskIfZero(difference);
+
+        // The first byte past the label hash that is not zero MUST be 01.
+        ulong found = 0ul;
+        ulong wrong = 0ul;
+        ulong start = 0ul;
+        for (nuint i = hashLength; i < blockLength; i++)
+        {
+            ulong value = (ulong)block[i];
+            ulong isZero = Limbs.MaskIfZero(value);
+            ulong first = ~found & ~isZero;
+            start = ((ulong)(i + 1u) & first) | (start & ~first);
+            wrong |= first & ~Limbs.MaskIfEqual(value, 1ul);
+            found |= ~isZero;
+        }
+        good &= found & ~wrong;
+
+        CryptographicOperations.ZeroMemory(seed);
+        if (good == 0ul)
+        {
+            CryptographicOperations.ZeroMemory(block);
+            return Fail(CryptoError.Padding);
+        }
+
+        byte[] message = block[(nuint)start:].ToArray();
+        CryptographicOperations.ZeroMemory(block);
+        return Ok(message);
+    }
+
+    /// EME-PKCS1-v1_5 decoding with implicit rejection, as OpenSSL 3.2 has
+    /// it: a synthetic message from HMAC-SHA-256 under a key derived from
+    /// `d` and the ciphertext stands in for a badly padded one, chosen by
+    /// mask so the time is the same either way.
+    byte[] DecodePkcs1Encryption(byte[] encoded, ReadOnlySpan<byte> ciphertext, RsaPrivateKey key)
+    {
+        nuint k = _modulusLength;
+
+        byte[] exponent = Limbs.ToBigEndian(key.Exponent, k);
+        byte[] exponentHash = Sha256.HashData(exponent);
+        CryptographicOperations.ZeroMemory(exponent);
+        byte[] derivationKey = new Hmac(new Sha256(), exponentHash).ComputeHash(ciphertext);
+        CryptographicOperations.ZeroMemory(exponentHash);
+
+        byte[] synthetic = ComputeRejectionBytes(derivationKey, "message", k);
+        byte[] candidates = ComputeRejectionBytes(derivationKey, "length", 256u);
+        CryptographicOperations.ZeroMemory(derivationKey);
+
+        // The last of 128 candidate lengths that is short enough, each masked
+        // to the bits the longest possible message needs.
+        ulong longest = (ulong)(k - 10u);
+        ulong spread = longest;
+        spread |= spread >> 1;
+        spread |= spread >> 2;
+        spread |= spread >> 4;
+        spread |= spread >> 8;
+        ulong syntheticLength = 0ul;
+        for (nuint i = 0u; i < 256u; i += 2u)
+        {
+            ulong candidate = (((ulong)candidates[i] << 8) | (ulong)candidates[i + 1u]) & spread;
+            ulong shorter = Limbs.MaskFromBit((candidate - longest) >> 63);
+            syntheticLength = (candidate & shorter) | (syntheticLength & ~shorter);
+        }
+
+        ulong good = Limbs.MaskIfZero((ulong)encoded[0u]) &
+                     Limbs.MaskIfEqual((ulong)encoded[1u], 2ul);
+        ulong found = 0ul;
+        ulong separator = 0ul;
+        for (nuint i = 2u; i < k; i++)
+        {
+            ulong isZero = Limbs.MaskIfZero((ulong)encoded[i]);
+            ulong first = ~found & isZero;
+            separator = ((ulong)i & first) | (separator & ~first);
+            found |= isZero;
+        }
+
+        // At least eight bytes of padding; no separator leaves it at zero.
+        good &= ~Limbs.MaskFromBit((separator - 10ul) >> 63);
+
+        ulong start = ((separator + 1ul) & good) | (((ulong)k - syntheticLength) & ~good);
+        nuint from = (nuint)start;
+        byte[] message = new byte[k - from];
+        byte keep = (byte)(good & 0xFFul);
+        for (nuint i = from; i < k; i++)
+            message[i - from] = (byte)((encoded[i] & keep) | (synthetic[i] & ~keep));
+
+        CryptographicOperations.ZeroMemory(synthetic);
+        return message;
+    }
+
+    /// The pseudo-random function implicit rejection draws from: HMAC-SHA-256
+    /// over a two-byte counter, `label`, and the output length in bits.
+    static byte[] ComputeRejectionBytes(byte[] key, String label, nuint length)
+    {
+        var mac = new Hmac(new Sha256(), key);
+        byte[] labelBytes = label.ToBytes();
+        nuint bits = length * 8u;
+        byte[] bitLength = [(byte)((bits >> 8) & 0xFFu), (byte)(bits & 0xFFu)];
+        byte[] output = new byte[length];
+        byte[] counter = new byte[2u];
+        nuint filled = 0u;
+        uint index = 0u;
+        while (filled < length)
+        {
+            counter[0u] = (byte)((index >> 8) & 0xFFu);
+            counter[1u] = (byte)(index & 0xFFu);
+            mac.AppendData(counter);
+            mac.AppendData(labelBytes);
+            mac.AppendData(bitLength);
+            byte[] block = mac.GetHashAndReset();
+            for (nuint i = 0u; i < block.Length && filled < length; i++)
+            {
+                output[filled] = block[i];
+                filled++;
+            }
+            index++;
+        }
+        return output;
+    }
 }

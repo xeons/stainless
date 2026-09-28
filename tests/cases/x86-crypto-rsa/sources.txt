@@ -1,0 +1,2 @@
+tests/cases/crypto-rsa/vectors.sl
+tests/cases/crypto-rsa/wycheproof.sl
