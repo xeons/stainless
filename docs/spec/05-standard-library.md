@@ -894,7 +894,7 @@ here.
 |---|---|
 | hashes | `Md5`, `Sha1`, `Sha256`, `Sha384`, `Sha512`, over `IHashAlgorithm` |
 | MACs | `Hmac` over any of them, and `HmacSha256` and its siblings |
-| derivation | `Rfc2898DeriveBytes.Pbkdf2`, `Hkdf` |
+| derivation | `Rfc2898DeriveBytes.Pbkdf2`, `Hkdf`, `Scrypt` |
 | ciphers | `Aes` in ECB, CBC, CFB and CTR; `AesGcm`; `ChaCha20`, `Poly1305` and `ChaCha20Poly1305` |
 | text | `PemEncoding`: RFC 7468 blocks found in text and written at 64 columns |
 | the rest | `RandomNumberGenerator`, `CryptographicOperations.FixedTimeEquals` |
@@ -903,7 +903,8 @@ Every answer is pinned against a published test vector — FIPS-180 and RFC 1321
 for the digests, RFC 2202 and 4231 for HMAC, RFC 6070 for PBKDF2, RFC 5869 for
 HKDF, FIPS-197 for the AES blocks, SP 800-38A for the modes and the GCM
 specification's own case 3 — by `tests/cases/cryptography`, and every vector
-of RFC 8439 by `tests/cases/crypto-chacha`.
+of RFC 8439 by `tests/cases/crypto-chacha`, and RFC 7914's scrypt by
+`tests/cases/crypto-kdf`.
 
 **What is not there is public-key.** RSA, ECDsa, ECDiffieHellman and X.509 all
 rest on arbitrary-precision integer arithmetic, which this standard library

@@ -34,8 +34,9 @@
 /// ported finds the names where it left them: `Sha256`, `Hmac`, `Aes`,
 /// `AesGcm`, `ChaCha20Poly1305`, `Rfc2898DeriveBytes.Pbkdf2`,
 /// `RandomNumberGenerator.Fill`, `CryptographicOperations.FixedTimeEquals`.
-/// Three things about it differ, and each is a rule this language already has
-/// rather than a choice made here:
+/// `Scrypt` is not in .NET and follows the same shape. Three things about it
+/// differ, and each is a rule this language already has rather than a choice
+/// made here:
 ///
 /// - **The casing is the house rule's**, not .NET's. `SHA256` is `Sha256` and
 ///   `HMACSHA256` is `HmacSha256`, because an acronym longer than two letters

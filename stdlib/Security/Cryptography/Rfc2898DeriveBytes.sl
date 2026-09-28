@@ -34,10 +34,9 @@ import Standard.Bits;
 /// over the years -- OWASP's 2023 figure is 600,000 for HMAC-SHA-256, and a
 /// count from an old program is a count that has stopped meaning anything.
 ///
-/// **This is the weakest of the modern password hashes and the only one
-/// here.** PBKDF2 costs an attacker with a GPU very much less than it costs a
-/// server, because it needs no memory. scrypt and Argon2 exist to close that
-/// gap and neither is written; TODO.md carries them. Use PBKDF2 where a format
+/// **This is the weakest of the modern password hashes.** PBKDF2 costs an
+/// attacker with a GPU very much less than it costs a server, because it needs
+/// no memory. `Scrypt` exists to close that gap. Use PBKDF2 where a format
 /// specifies it, and understand what it does not buy.
 public static class Rfc2898DeriveBytes
 {
@@ -53,6 +52,7 @@ public static class Rfc2898DeriveBytes
     /// @param hash        the HMAC's inner hash, `new Sha256()` for the usual answer
     /// @param length      how many bytes to derive
     /// @failure CryptoError.Parameter  `iterations` or `length` is zero
+    /// @see Scrypt
     public static Result<byte[], CryptoError> Pbkdf2(ReadOnlySpan<byte> password, ReadOnlySpan<byte> salt,
                                                      nuint iterations, IHashAlgorithm hash,
                                                      nuint length)

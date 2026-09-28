@@ -1,0 +1,13 @@
+scrypt-16 ok
+scrypt-1024 ok
+scrypt-16384 ok
+scrypt-1048576 ok
+scrypt-short ok
+scrypt-cost-odd ok
+scrypt-cost-one ok
+scrypt-block-zero ok
+scrypt-parallel-zero ok
+scrypt-length-zero ok
+scrypt-width ok
+scrypt-cost-for-width ok
+scrypt-memory ok

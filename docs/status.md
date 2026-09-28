@@ -669,9 +669,9 @@ last person to edit it -- the suite is the authority.
   pointer-to-delegate cast are what a resolved symbol is called through. No
   text -- a font is where the two backends stop agreeing
 - `Standard.Security.Cryptography`: the symmetric half, complete. MD5, SHA-1,
-  SHA-256, SHA-384 and SHA-512, HMAC over any of them, PBKDF2, HKDF, AES in ECB,
-  CBC, CFB and CTR, AES-GCM, ChaCha20-Poly1305 with its two halves, the
-  platform's entropy and a constant-time comparison, in
+  SHA-256, SHA-384 and SHA-512, HMAC over any of them, PBKDF2, HKDF, scrypt,
+  AES in ECB, CBC, CFB and CTR, AES-GCM, ChaCha20-Poly1305 with its two
+  halves, the platform's entropy and a constant-time comparison, in
   `System.Security.Cryptography`'s shape with a `Result` where .NET throws.
   Every answer is pinned against a published test vector. Not public-key,
   which wants a constant-time bignum the library does not have.

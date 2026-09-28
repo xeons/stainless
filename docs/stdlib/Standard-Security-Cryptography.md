@@ -17,8 +17,9 @@ var sealed = try cipher.EncryptCbc(plaintext, iv, PaddingMode.Pkcs7);
 ported finds the names where it left them: `Sha256`, `Hmac`, `Aes`,
 `AesGcm`, `ChaCha20Poly1305`, `Rfc2898DeriveBytes.Pbkdf2`,
 `RandomNumberGenerator.Fill`, `CryptographicOperations.FixedTimeEquals`.
-Three things about it differ, and each is a rule this language already has
-rather than a choice made here:
+`Scrypt` is not in .NET and follows the same shape. Three things about it
+differ, and each is a rule this language already has rather than a choice
+made here:
 
 - **The casing is the house rule's**, not .NET's. `SHA256` is `Sha256` and
   `HMACSHA256` is `HmacSha256`, because an acronym longer than two letters
@@ -53,7 +54,7 @@ key derivation and cipher .NET ships that does not need a bignum.
 
 ## Contents
 
-**Types** &nbsp; [Aes](#aes-class) &middot; [AesGcm](#aesgcm-class) &middot; [ChaCha20](#chacha20-class) &middot; [ChaCha20Poly1305](#chacha20poly1305-class) &middot; [CipherMode](#ciphermode-enum) &middot; [CryptoError](#cryptoerror-enum) &middot; [CryptographicOperations](#cryptographicoperations-class) &middot; [HashAlgorithm](#hashalgorithm-class) &middot; [Hkdf](#hkdf-class) &middot; [Hmac](#hmac-class) &middot; [HmacMd5](#hmacmd5-class) &middot; [HmacSha1](#hmacsha1-class) &middot; [HmacSha256](#hmacsha256-class) &middot; [HmacSha384](#hmacsha384-class) &middot; [HmacSha512](#hmacsha512-class) &middot; [IHashAlgorithm](#ihashalgorithm-interface) &middot; [Md5](#md5-class) &middot; [PaddingMode](#paddingmode-enum) &middot; [Poly1305](#poly1305-class) &middot; [RandomNumberGenerator](#randomnumbergenerator-class) &middot; [Rfc2898DeriveBytes](#rfc2898derivebytes-class) &middot; [Sha1](#sha1-class) &middot; [Sha256](#sha256-class) &middot; [Sha2Wide](#sha2wide-class) &middot; [Sha384](#sha384-class) &middot; [Sha512](#sha512-class)
+**Types** &nbsp; [Aes](#aes-class) &middot; [AesGcm](#aesgcm-class) &middot; [ChaCha20](#chacha20-class) &middot; [ChaCha20Poly1305](#chacha20poly1305-class) &middot; [CipherMode](#ciphermode-enum) &middot; [CryptoError](#cryptoerror-enum) &middot; [CryptographicOperations](#cryptographicoperations-class) &middot; [HashAlgorithm](#hashalgorithm-class) &middot; [Hkdf](#hkdf-class) &middot; [Hmac](#hmac-class) &middot; [HmacMd5](#hmacmd5-class) &middot; [HmacSha1](#hmacsha1-class) &middot; [HmacSha256](#hmacsha256-class) &middot; [HmacSha384](#hmacsha384-class) &middot; [HmacSha512](#hmacsha512-class) &middot; [IHashAlgorithm](#ihashalgorithm-interface) &middot; [Md5](#md5-class) &middot; [PaddingMode](#paddingmode-enum) &middot; [Poly1305](#poly1305-class) &middot; [RandomNumberGenerator](#randomnumbergenerator-class) &middot; [Rfc2898DeriveBytes](#rfc2898derivebytes-class) &middot; [Scrypt](#scrypt-class) &middot; [Sha1](#sha1-class) &middot; [Sha256](#sha256-class) &middot; [Sha2Wide](#sha2wide-class) &middot; [Sha384](#sha384-class) &middot; [Sha512](#sha512-class)
 
 ## Types
 
@@ -800,10 +801,11 @@ Parameter
 ```
 
 A parameter outside the range the algorithm defines: an iteration count
-or an output length of zero, or more data than a stream cipher's counter
-covers.
+or an output length of zero, a cost that is not a power of two or asks
+for more memory than is allowed, or more data than a stream cipher's
+counter covers.
 
-<sub>[stdlib/Security/Cryptography/CryptoError.sl:67](../../stdlib/Security/Cryptography/CryptoError.sl#L67)</sub>
+<sub>[stdlib/Security/Cryptography/CryptoError.sl:68](../../stdlib/Security/Cryptography/CryptoError.sl#L68)</sub>
 
 #### NoEntropy *case*
 
@@ -813,7 +815,7 @@ NoEntropy
 
 The platform would not supply entropy.
 
-<sub>[stdlib/Security/Cryptography/CryptoError.sl:70](../../stdlib/Security/Cryptography/CryptoError.sl#L70)</sub>
+<sub>[stdlib/Security/Cryptography/CryptoError.sl:71](../../stdlib/Security/Cryptography/CryptoError.sl#L71)</sub>
 
 ### CryptographicOperations *class*
 
@@ -1640,13 +1642,12 @@ it cost you. The number is the whole security argument, and it has to rise
 over the years -- OWASP's 2023 figure is 600,000 for HMAC-SHA-256, and a
 count from an old program is a count that has stopped meaning anything.
 
-**This is the weakest of the modern password hashes and the only one
-here.** PBKDF2 costs an attacker with a GPU very much less than it costs a
-server, because it needs no memory. scrypt and Argon2 exist to close that
-gap and neither is written; TODO.md carries them. Use PBKDF2 where a format
+**This is the weakest of the modern password hashes.** PBKDF2 costs an
+attacker with a GPU very much less than it costs a server, because it needs
+no memory. `Scrypt` exists to close that gap. Use PBKDF2 where a format
 specifies it, and understand what it does not buy.
 
-<sub>[stdlib/Security/Cryptography/Rfc2898DeriveBytes.sl:42](../../stdlib/Security/Cryptography/Rfc2898DeriveBytes.sl#L42)</sub>
+<sub>[stdlib/Security/Cryptography/Rfc2898DeriveBytes.sl:41](../../stdlib/Security/Cryptography/Rfc2898DeriveBytes.sl#L41)</sub>
 
 #### Pbkdf2 *method*
 
@@ -1672,7 +1673,81 @@ job is to make one attack per password rather than one per database.
 
 - [CryptoError.Parameter](#parameter-case) — `iterations` or `length` is zero
 
+**See also** &nbsp; [Scrypt](#scrypt-class)
+
 <sub>[stdlib/Security/Cryptography/Rfc2898DeriveBytes.sl:56](../../stdlib/Security/Cryptography/Rfc2898DeriveBytes.sl#L56)</sub>
+
+### Scrypt *class*
+
+```
+class Scrypt
+```
+
+scrypt (RFC 7914): a password hash that costs memory as well as time.
+
+```csharp
+var key = try Scrypt.DeriveKey(password, salt, 32768u, 8u, 1u, 32u);
+```
+
+**Memory is the point.** PBKDF2 is a loop an attacker runs on a thousand
+GPU cores at once. scrypt fills 128 · `blockSize` · `cost` bytes and reads
+them back in an order it cannot predict, so each guess needs that memory
+for its whole duration, and memory is what a GPU has least of per core.
+`cost` = 2^15 with `blockSize` = 8 is 32 MiB, which is the usual interactive
+answer. Raise `cost` rather than `parallelism`: the passes run one after
+another here, so `parallelism` buys time and no memory.
+
+**The second pass reads memory at addresses derived from the password.**
+That is what makes it memory-hard, and it is also a cache-timing channel:
+an attacker who shares the machine and can watch the cache learns
+something about the password. It is inherent in scrypt. `Argon2id`
+spends its first half on addresses that do not depend on the password,
+which is why RFC 9106 prefers it.
+
+Built on `Rfc2898DeriveBytes.Pbkdf2` over HMAC-SHA-256 and the Salsa20/8
+core, as the RFC defines it.
+
+**See also** &nbsp; [Rfc2898DeriveBytes](#rfc2898derivebytes-class)
+
+<sub>[stdlib/Security/Cryptography/Scrypt.sl:54](../../stdlib/Security/Cryptography/Scrypt.sl#L54)</sub>
+
+#### MaxMemoryBytes *constant*
+
+```
+const ulong MaxMemoryBytes = 4294967296
+```
+
+The most working memory a derivation may ask for: 4 GiB, which is
+`cost` = 2^22 at `blockSize` = 8. Parameters read from a stored hash
+are input like any other, and this bounds what one can make a call
+allocate.
+
+**Value** &nbsp; 2^32 bytes.
+
+<sub>[stdlib/Security/Cryptography/Scrypt.sl:62](../../stdlib/Security/Cryptography/Scrypt.sl#L62)</sub>
+
+#### DeriveKey *method*
+
+```
+static Result<byte[], CryptoError> DeriveKey(ReadOnlySpan<byte> password, ReadOnlySpan<byte> salt, nuint cost, nuint blockSize, nuint parallelism, nuint length)
+```
+
+`length` bytes derived from `password` and `salt`.
+
+**Parameters**
+
+- `password` — the secret to stretch
+- `salt` — at least sixteen random bytes, stored beside the result
+- `cost` — N, the number of blocks the memory holds; a power of two greater than one
+- `blockSize` — r, the width of a block in 128-byte units; 8 is the usual answer
+- `parallelism` — p, how many independent passes to run, one after another here
+- `length` — how many bytes to derive
+
+**Fails with**
+
+- [CryptoError.Parameter](#parameter-case) — `cost` is not a power of two above one; `blockSize`, `parallelism` or `length` is zero; `blockSize` times `parallelism` reaches 2^30; `cost` reaches 2^(16 · `blockSize`); `length` is past (2^32 - 1) · 32; or the memory needed is past `MaxMemoryBytes`
+
+<sub>[stdlib/Security/Cryptography/Scrypt.sl:78](../../stdlib/Security/Cryptography/Scrypt.sl#L78)</sub>
 
 ### Sha1 *class*
 
