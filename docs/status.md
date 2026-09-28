@@ -735,6 +735,15 @@ last person to edit it -- the suite is the authority.
   `StreamReader` decodes a buffer at a time through an `IDecoder` that keeps
   whatever character the buffer ended in the middle of, so it streams rather
   than reading the whole thing
+- `Standard.IO.Compression`: deflate, gzip and zlib as `DeflateStream`,
+  `GZipStream` and `ZLibStream` over any `IStream`, with `Crc32`, `Adler32`
+  and one-shot `CompressGZip`/`DecompressGZip` and their siblings, in
+  `System.IO.Compression`'s shape. The compressor is zlib's design — hash
+  chains, lazy matching, and each block stored, fixed or dynamic, whichever is
+  smallest — and lands within a percent of zlib's size at each level, in one
+  and a half to four times its time. The decompressor refuses a corrupt stream
+  with a reason rather than trusting it, and reads concatenated gzip members
+  as `gzip -d` does
 - Raw pointers, `sizeof`, `alignof`, `offsetof`, `typeof`, casts, `new`, `this`.
   The three layout questions answer exactly what C's do, which is how a binding
   checks itself against a header; `offsetof` on a class counts from the

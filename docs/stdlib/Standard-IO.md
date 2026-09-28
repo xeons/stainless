@@ -505,6 +505,17 @@ The platform said something this enum has no name for.
 
 <sub>[stdlib/IO/IOError.sl:64](../../stdlib/IO/IOError.sl#L64)</sub>
 
+#### InvalidData *case*
+
+```
+InvalidData = 10
+```
+
+The bytes do not follow the format they claim to — a corrupt or
+truncated compressed stream, say. .NET's `InvalidDataException`.
+
+<sub>[stdlib/IO/IOError.sl:68](../../stdlib/IO/IOError.sl#L68)</sub>
+
 ### IStream *interface*
 
 ```
@@ -1249,7 +1260,7 @@ Reads a stream to its end and reads the bytes as UTF-8.
 
 **See also** &nbsp; [IO.ReadToEnd](#readtoend-function)
 
-<sub>[stdlib/IO/IO.sl:110](../../stdlib/IO/IO.sl#L110)</sub>
+<sub>[stdlib/IO/IO.sl:111](../../stdlib/IO/IO.sl#L111)</sub>
 
 ### ReadToEnd *function*
 
@@ -1267,7 +1278,7 @@ Reads a stream to its end.
 
 **See also** &nbsp; [IO.ReadTextToEnd](#readtexttoend-function)
 
-<sub>[stdlib/IO/IO.sl:83](../../stdlib/IO/IO.sl#L83)</sub>
+<sub>[stdlib/IO/IO.sl:84](../../stdlib/IO/IO.sl#L84)</sub>
 
 ### SplitLines *function*
 
@@ -1280,5 +1291,5 @@ empty line, which is what a trailing newline produces.
 
 **Returns** &nbsp; the lines, each without its ending
 
-<sub>[stdlib/IO/IO.sl:125](../../stdlib/IO/IO.sl#L125)</sub>
+<sub>[stdlib/IO/IO.sl:126](../../stdlib/IO/IO.sl#L126)</sub>
 

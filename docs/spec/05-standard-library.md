@@ -38,6 +38,7 @@ own for the linker to drop.
 | `Standard.Limits` | what each number type holds, named rather than spelled | on request |
 | `Standard.Reflection` | `[Reflect]`, `typeof`, the field tables | on request |
 | `Standard.IO` | streams, `IOError`, and the readers and writers over them | on request |
+| `Standard.IO.Compression` | deflate, gzip and zlib, as streams and one-shot calls ([§5.9.2](#592-standardiocompression)) | on request |
 | `Standard.File` | whole-file operations | on request |
 | `Standard.Directory` | making, removing and listing | on request |
 | `Standard.Path` | taking paths apart, by the platform's rules | on request |
@@ -748,6 +749,50 @@ Signals.StartWatching();
 while (!Signals.Interrupted)
     DoAPieceOfWork();
 ```
+
+### 5.9.2 `Standard.IO.Compression`
+
+```csharp
+import Standard.IO.Compression;
+
+var file = try FileStream.OpenRead("log.gz");
+var text = try IO.ReadTextToEnd(new GZipStream(file, CompressionMode.Decompress));
+
+byte[] packed = Compression.CompressZLib(data, CompressionLevel.SmallestSize);
+var unpacked = Compression.DecompressZLib(packed);      // Result<byte[], CompressionError>
+```
+
+RFC 1951, 1952 and 1950, in `System.IO.Compression`'s shape: `DeflateStream`,
+`GZipStream` and `ZLibStream` wrap another `IStream`, made with a
+`CompressionMode` or a `CompressionLevel` and a `leaveOpen` flag. A
+compressing stream writes output as it fills and the final block and trailer
+on `Close`; a decompressing one reads its source only when a symbol needs
+bits. `Crc32` and `Adler32` are public, because zip and PNG want them too.
+
+**Failure is the IO module's third shape.** A stream carries `Error`, and data
+that breaks its format — a reserved block type, an over-subscribed or
+incomplete code, a distance before the start, a stored length that disagrees
+with its complement, a checksum or length that does not match — reads as
+`IOError.InvalidData`, which is .NET's `InvalidDataException`. The exact
+reason is a `CompressionError` in `CompressionErrorCode` beside it, as
+`TcpClient` keeps the exact socket error beside the rounded one. Over memory
+the data is the only thing that can be wrong, so the one-shot
+`DecompressGZip`, `DecompressZLib` and `DecompressDeflate` return
+`Result<byte[], CompressionError>`. Nothing a stream contains can make the
+decoder abort, loop or read out of bounds.
+
+**Decompressing reads ahead**, in blocks of 16 KiB, so bytes after the
+compressed data on the same source may be consumed. For a file, or an HTTP
+body behind a stream that stops at its length or its last chunk, that is
+nothing; it is why raw deflate cannot be followed by other data on one
+stream, as in .NET. Concatenated gzip members read as one stream.
+
+The levels are zlib's: `Fastest` is greedy matching over chains of four,
+`Optimal` lazy matching over 128, `SmallestSize` over 4096, and
+`NoCompression` stored blocks. Each block is written as stored, fixed or
+dynamic Huffman, whichever is smallest, with codes limited to fifteen bits.
+On a megabyte of mixed data the sizes are within a percent of zlib's at each
+level, in one and a half to four times the time.
 
 ## 5.10 `Standard.Json` and `Standard.Xml`
 

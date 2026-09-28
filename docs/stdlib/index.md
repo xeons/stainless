@@ -20,6 +20,7 @@ One page per module. Each lists every public type, function, property, case and 
 | [Standard.File](Standard-File.md) | Whole-file operations. |
 | [Standard.Formats.Asn1](Standard-Formats-Asn1.md) | ASN.1 values in BER and DER, as X.509, PKCS and TLS carry them. |
 | [Standard.IO](Standard-IO.md) | Streams, and the vocabulary the rest of the I/O modules share. |
+| [Standard.IO.Compression](Standard-IO-Compression.md) | Deflate, gzip and zlib: RFC 1951, 1952 and 1950, as streams and as |
 | [Standard.Json](Standard-Json.md) | JSON, in two layers. |
 | [Standard.Limits](Standard-Limits.md) | What each number type holds. |
 | [Standard.Math](Standard-Math.md) | Arithmetic that is not an operator. |
