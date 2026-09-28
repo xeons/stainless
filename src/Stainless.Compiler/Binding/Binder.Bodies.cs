@@ -2154,7 +2154,13 @@ public sealed partial class Binder
     {
         PushScope();
 
+        // `foreach (var n in [1, 2, 3])`: nothing says what the literal is, so
+        // its elements do, as they do for `var`.
         var collection = BindExpression(syntax.Collection);
+        if (collection is BoundArrayDraft loose)
+            collection = SettleArrayFromElements(loose);
+        else if (collection is BoundConditional { Type: ArrayDraftType } chosen)
+            collection = SettleArraysFromElements(chosen);
         if (collection.Type.IsError())
         {
             PopScope();

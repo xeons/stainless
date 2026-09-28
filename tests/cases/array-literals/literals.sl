@@ -89,6 +89,12 @@ public void Main()
     String[] none = [];
     Console.WriteLine("empty " + Text.FromInteger((long)none.Length));
 
+    // Walked where it is written: its elements say what it is, as for `var`.
+    long walked = 0;
+    foreach (var step in [1, 20, 300L])
+        walked += step;
+    Console.WriteLine("walked " + Text.FromInteger(walked));
+
     // Counted like anything else: the objects survive the locals that made
     // them, and die when the array does.
     Console.WriteLine("build:");

@@ -8,6 +8,7 @@ sum 60
 points 2
 first kept
 empty 0
+walked 321
 build:
   held 1 2
   dropping:
