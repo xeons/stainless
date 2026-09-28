@@ -737,16 +737,24 @@ last person to edit it -- the suite is the authority.
   root store trusts it, through `X509Chain`, for the host name asked for; a
   program may supply its own validator instead. Not resumption in either
   version, and never 0-RTT
-- `Standard.Net.Http`: an HTTP/1.1 client in `System.Net.Http`'s shape,
-  blocking, with a `Result` where .NET throws. Connections pooled per route
-  with a per-server limit and an idle timeout, one timeout over the whole
-  request, a retry of an idempotent request whose pooled connection had been
-  closed, strict parsing of responses, chunked bodies both ways, redirects,
-  RFC 6265 cookies, gzip and deflate, and HTTP proxies with `CONNECT` tunnels
-  and the curl environment variables. Over https it trusts what the TLS
-  module trusts, or what `ServerCertificateCustomValidationCallback` decides.
-  Not HTTP/2, which will be a second `IHttpConnection` chosen by ALPN; not
-  authentication beyond Basic to a proxy; and no timeout on name resolution
+- `Standard.Net.Http`: an HTTP/1.1 and HTTP/2 client in `System.Net.Http`'s
+  shape, blocking, with a `Result` where .NET throws. Connections pooled per
+  route with a per-server limit and an idle timeout, one timeout over the
+  whole request, a retry of an idempotent request whose pooled connection had
+  been closed, strict parsing of responses, chunked bodies both ways,
+  redirects, RFC 6265 cookies, gzip and deflate, and HTTP proxies with
+  `CONNECT` tunnels and the curl environment variables. Over https it trusts
+  what the TLS module trusts, or what `ServerCertificateCustomValidationCallback`
+  decides. HTTP/2 is chosen as .NET chooses it — by `Version` and
+  `VersionPolicy`, which default to 1.1 — through ALPN `h2` or, for plain
+  http, prior knowledge; one connection is shared by concurrent requests
+  with a reader thread each, HPACK and flow control both ways, and GOAWAY
+  and REFUSED_STREAM send unprocessed requests again. It has fetched pages
+  from Google, Cloudflare, GitHub, Wikipedia and nghttpx, and has run
+  against nginx in h2 and h2c. Not HTTP/3; not server push, which it
+  refuses; no dynamic sizing of the HTTP/2 window, which is fixed at 1 MiB
+  unless set; not authentication beyond Basic to a proxy; and no timeout on
+  name resolution
 - `Standard.Media.Audio`: playing and recording interleaved PCM, and reading and
   writing WAV. WASAPI on Windows and ALSA elsewhere, both reached by name at the
   first device rather than linked, so a machine with neither answers

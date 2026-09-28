@@ -50,7 +50,8 @@ public enum HttpError
     /// says which.
     TlsFailure,
 
-    /// The response broke HTTP/1.1's syntax or framing.
+    /// The response was malformed: HTTP/1.1's syntax or framing broken, or an
+    /// HTTP/2 head or body its stream was reset for.
     InvalidResponse,
 
     /// The response head or body was over its limit.

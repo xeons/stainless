@@ -51,7 +51,7 @@ own for the linker to drop.
 | `Standard.Resources` | what a `.rc` folded into the binary, read back on every platform ([§2.2 of packages.md](../packages.md#22-resources)) | on request |
 | `Standard.Net` | TCP and UDP sockets, the same on every platform | on request |
 | `Standard.Net.Security` | TLS 1.3 and 1.2, client and server, over any stream ([§5.17](#517-standardnetsecurity)) | on request |
-| `Standard.Net.Http` | an HTTP/1.1 client: pooled connections, redirects, cookies, decompression, proxies ([§5.18](#518-standardnethttp)) | on request |
+| `Standard.Net.Http` | an HTTP/1.1 and HTTP/2 client: pooled and multiplexed connections, redirects, cookies, decompression, proxies ([§5.18](#518-standardnethttp)) | on request |
 | `Standard.Env` | the command line, the environment, the working directory | on request |
 | `Standard.Time` | `DateTimeOffset`, `TimeSpan`, `DateTime` and the monotonic `Stopwatch` | on request |
 | `Standard.Random` | xoshiro256**, seeded by you or by the operating system | on request |
@@ -1207,7 +1207,7 @@ var response = client.Send(request, HttpCompletionOption.ResponseContentRead,
                            out HttpFailure failure);
 ```
 
-An HTTP/1.1 client (RFC 9112) over TCP and TLS. **The shape is
+An HTTP/1.1 (RFC 9112) and HTTP/2 (RFC 9113) client over TCP and TLS. **The shape is
 `System.Net.Http`'s, blocking**: `SendAsync` is `Send`, `GetStringAsync` is
 `GetString`, and so on, and each answers a `Result<…, HttpError>` where .NET
 throws. `HttpError` is the case — `Timeout`, `ConnectFailure`, `TlsFailure`,
@@ -1251,13 +1251,57 @@ and read the HTTP-date the fields use.
 `ServerCertificateCustomValidationCallback` is set, and then the callback is
 told what the default would have answered, as .NET passes `SslPolicyErrors`.
 
-**HTTP/2 is not here yet, and has a place.** Each connection is an
-`IHttpConnection`; TLS offers ALPN `http/1.1` today, and an `h2` connection
-will be a second implementation chosen by what ALPN agrees on, beneath a pool,
-redirects, cookies and decompression that do not change.
+**HTTP/2 (RFC 9113) is the second kind of connection**, beneath the same
+pool, redirects, cookies and decompression. **Which version a request goes
+in follows .NET exactly**: `HttpRequestMessage.Version` is 1.1 and
+`VersionPolicy` is `RequestVersionOrLower` unless set, so a request uses h2
+only when it asks. `HttpClient.DefaultRequestVersion` and
+`DefaultVersionPolicy` set what `Get`, `Post` and the rest ask for.
 
-`tests/cases/http-*` and `https-basics` run the client against scripted
-servers on the loopback, a small proxy among them; nothing in the suite
+```csharp
+var client = new HttpClient();
+client.DefaultRequestVersion = HttpVersion.Version20;   // h2 where ALPN agrees
+```
+
+| Version | Policy | https | http |
+|---|---|---|---|
+| 1.1 | `RequestVersionOrLower`, `RequestVersionExact` | 1.1 | 1.1 |
+| 1.1 | `RequestVersionOrHigher` | h2 if ALPN agrees, else 1.1 | 1.1 |
+| 2.0 | `RequestVersionOrLower` | h2 if ALPN agrees, else 1.1 | 1.1 |
+| 2.0 | `RequestVersionOrHigher`, `RequestVersionExact` | h2, or `VersionNegotiationFailure` | h2 with prior knowledge |
+
+TLS offers `h2` then `http/1.1`, as far as the policy allows each. Plain http
+never upgrades: HTTP/2 is spoken there only when nothing else will do, from
+the first byte. Through a plain proxy a request is always HTTP/1.1; through a
+`CONNECT` tunnel it is https as above. 3.0 is not spoken, and is taken as 2.0
+when the policy allows lower.
+
+**An HTTP/2 connection is shared**, a stream for each request, up to the
+server's `MAX_CONCURRENT_STREAMS`; a request past it waits for a stream to
+end, or opens a second connection when `EnableMultipleHttp2Connections` is
+set. One reader thread per connection applies each frame to its stream, and
+ends with the connection. HPACK keeps a dynamic table both ways with
+Huffman coding, and never indexes `authorization`, `proxy-authorization` or
+`cookie`. Flow control is kept at both levels in both directions: a request
+body waits for window, and a response body gives window back as it is read,
+so one read slowly holds its server back without holding the connection up.
+`InitialHttp2StreamWindowSize` is that window, fixed at 1 MiB unless set,
+since .NET's 65 535 relies on growing it by measurement, which is not here.
+
+A GOAWAY lets the streams it covers finish and sends the rest again on a new
+connection, as it does a stream the server refused with REFUSED_STREAM,
+whatever the method, since neither was processed. A timeout or a body closed
+early resets its stream with CANCEL and leaves the connection to the others.
+A peer that breaks the protocol ends the connection with GOAWAY and the
+error RFC 9113 names, `ProtocolError`; a malformed response — upper-case or
+connection-specific fields, a missing `:status`, a body unlike its
+`content-length` — resets its stream and is `InvalidResponse`.
+`HttpFailure.ProtocolErrorCode` carries the code. Server push is refused, and
+`Dispose` sends GOAWAY and closes each connection once its streams are done.
+
+`tests/cases/http-*`, `http2-*` and `https-basics` run the client against
+scripted servers on the loopback, a small proxy among them; `hpack` checks
+every example of RFC 7541 Appendix C byte for byte. Nothing in the suite
 reaches the network.
 
 ---

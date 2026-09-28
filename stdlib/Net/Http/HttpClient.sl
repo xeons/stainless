@@ -117,7 +117,7 @@ public class HttpClient
     ///
     /// @failure HttpError.Timeout           `Timeout` ran out
     /// @failure HttpError.ConnectFailure    no connection could be made
-    /// @failure HttpError.InvalidResponse   the server broke HTTP/1.1
+    /// @failure HttpError.InvalidResponse   the response was malformed
     /// @failure HttpError.InvalidRequest    the request has no absolute URI
     ///                                      and there is no `BaseAddress`
     public Result<HttpResponseMessage, HttpError> Send(HttpRequestMessage request) =>

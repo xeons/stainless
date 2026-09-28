@@ -2,7 +2,7 @@
 
 <sub>Generated from the `///` blocks in the source by `stainless doc`. Edit the source, not this file.</sub>
 
-An HTTP/1.1 client, over TCP or TLS, in `System.Net.Http`'s shape.
+An HTTP/1.1 and HTTP/2 client, over TCP or TLS, as `System.Net.Http`.
 
 ```csharp
 var client = new HttpClient();
@@ -21,30 +21,43 @@ throws `HttpRequestException`, a call here returns
 `Result<…, HttpError>`; the overloads taking `out HttpFailure` say more —
 the socket error, the TLS error, the status a proxy refused with.
 
-**What is implemented** is HTTP/1.1 (RFC 9112) over TCP and TLS 1.3:
-keep-alive with a pool of connections per server, request bodies of known
-length or chunked, responses framed by length, by chunks (with trailers)
-or by the connection closing, `Expect: 100-continue`, redirects, cookies
-(RFC 6265), gzip and deflate, proxies over HTTP with `CONNECT` tunnels, and
-one timeout that covers the whole of a request.
+**What is implemented** is HTTP/1.1 (RFC 9112) and HTTP/2 (RFC 9113) over
+TCP and TLS: keep-alive with a pool of connections per server, request
+bodies of known length or chunked, responses framed by length, by chunks
+(with trailers) or by the connection closing, `Expect: 100-continue`,
+redirects, cookies (RFC 6265), gzip and deflate, proxies over HTTP with
+`CONNECT` tunnels, and one timeout that covers the whole of a request.
 
-**What is not:** HTTP/2 and HTTP/3, authentication other than Basic to a
-proxy, a proxy spoken to over TLS, and a timeout on name resolution, which
-the platform's resolver does not offer.
+**What is not:** HTTP/3, server push, authentication other than Basic to
+a proxy, a proxy spoken to over TLS, and a timeout on name resolution,
+which the platform's resolver does not offer.
 
-**HTTP/2 slots in beside the 1.1 connection.** Each connection is an
-`IHttpConnection`, and TLS offers the ALPN names of the protocols this
-module speaks. Today that is `http/1.1` alone; a connection that agrees on
-`h2` will be made as a second implementation of the same interface, and
-the pool, the redirects, the cookies and the decompression above it will
-not change.
+**HTTP/2 is used as .NET uses it: when the request asks.**
+`HttpRequestMessage.Version` is 1.1 and `VersionPolicy` is
+`RequestVersionOrLower` unless set, which is HTTP/1.1; ask for 2.0, or
+set `HttpClient.DefaultRequestVersion`, and TLS offers ALPN `h2` then
+`http/1.1` and the connection is whichever the server chose. Plain http
+speaks HTTP/2 only when the policy allows nothing else, with prior
+knowledge. `HttpVersionPolicy` has the whole table.
+
+**An HTTP/2 connection carries every request to its server at once**, a
+stream each, up to the server's limit, with a reader thread of its own
+that ends when the connection does. Flow control holds a body read slowly
+to its window without holding up the others; a timeout, or a body closed
+early, resets only its stream. A request the server never processed — a
+GOAWAY below its stream, or REFUSED_STREAM — is sent again on a new
+connection whatever its method.
 
 **Responses are parsed strictly.** A status line that is not
 `HTTP/1.x NNN reason`, a folded header, a header line or block over its
 limit, a chunk size that is not hexadecimal or does not fit, two
 disagreeing `Content-Length`s, and a `Content-Length` beside a
 `Transfer-Encoding` are all refused as `HttpError.InvalidResponse`, since
-each is how one message is smuggled inside another.
+each is how one message is smuggled inside another. In HTTP/2 a field
+with upper-case letters or one that belongs to a single connection, a
+missing `:status` and a body unlike its `content-length` reset the stream
+and are `InvalidResponse`; a peer that breaks the framing is sent GOAWAY
+and every stream on it fails with `ProtocolError`.
 
 **Certificates are judged by the TLS module's validator** unless
 `HttpClientHandler.ServerCertificateCustomValidationCallback` is set, in
@@ -55,7 +68,7 @@ a lock; a request and its response belong to the thread that sent it.
 
 ## Contents
 
-**Types** &nbsp; [ByteArrayContent](#bytearraycontent-class) &middot; [Cookie](#cookie-class) &middot; [CookieContainer](#cookiecontainer-class) &middot; [DecompressionMethods](#decompressionmethods-enum) &middot; [FormUrlEncodedContent](#formurlencodedcontent-class) &middot; [HttpClient](#httpclient-class) &middot; [HttpClientHandler](#httpclienthandler-class) &middot; [HttpCompletionOption](#httpcompletionoption-enum) &middot; [HttpContent](#httpcontent-class) &middot; [HttpContentHeaders](#httpcontentheaders-class) &middot; [HttpEnvironmentProxy](#httpenvironmentproxy-class) &middot; [HttpEnvironmentVariableReader](#httpenvironmentvariablereader-closure) &middot; [HttpError](#httperror-enum) &middot; [HttpFailure](#httpfailure-class) &middot; [HttpHeaders](#httpheaders-class) &middot; [HttpMethod](#httpmethod-class) &middot; [HttpRequestHeaders](#httprequestheaders-class) &middot; [HttpRequestMessage](#httprequestmessage-class) &middot; [HttpResponseHeaders](#httpresponseheaders-class) &middot; [HttpResponseMessage](#httpresponsemessage-class) &middot; [HttpServerCertificateValidator](#httpservercertificatevalidator-closure) &middot; [HttpStatusCode](#httpstatuscode-enum) &middot; [HttpVersion](#httpversion-class) &middot; [IWebProxy](#iwebproxy-interface) &middot; [MediaTypeHeaderValue](#mediatypeheadervalue-class) &middot; [MultipartContent](#multipartcontent-class) &middot; [MultipartFormDataContent](#multipartformdatacontent-class) &middot; [NetworkCredential](#networkcredential-class) &middot; [StreamContent](#streamcontent-class) &middot; [StringContent](#stringcontent-class) &middot; [WebProxy](#webproxy-class)
+**Types** &nbsp; [ByteArrayContent](#bytearraycontent-class) &middot; [Cookie](#cookie-class) &middot; [CookieContainer](#cookiecontainer-class) &middot; [DecompressionMethods](#decompressionmethods-enum) &middot; [FormUrlEncodedContent](#formurlencodedcontent-class) &middot; [HttpClient](#httpclient-class) &middot; [HttpClientHandler](#httpclienthandler-class) &middot; [HttpCompletionOption](#httpcompletionoption-enum) &middot; [HttpContent](#httpcontent-class) &middot; [HttpContentHeaders](#httpcontentheaders-class) &middot; [HttpEnvironmentProxy](#httpenvironmentproxy-class) &middot; [HttpEnvironmentVariableReader](#httpenvironmentvariablereader-closure) &middot; [HttpError](#httperror-enum) &middot; [HttpFailure](#httpfailure-class) &middot; [HttpHeaders](#httpheaders-class) &middot; [HttpMethod](#httpmethod-class) &middot; [HttpRequestHeaders](#httprequestheaders-class) &middot; [HttpRequestMessage](#httprequestmessage-class) &middot; [HttpResponseHeaders](#httpresponseheaders-class) &middot; [HttpResponseMessage](#httpresponsemessage-class) &middot; [HttpServerCertificateValidator](#httpservercertificatevalidator-closure) &middot; [HttpStatusCode](#httpstatuscode-enum) &middot; [HttpVersion](#httpversion-class) &middot; [HttpVersionPolicy](#httpversionpolicy-enum) &middot; [IWebProxy](#iwebproxy-interface) &middot; [MediaTypeHeaderValue](#mediatypeheadervalue-class) &middot; [MultipartContent](#multipartcontent-class) &middot; [MultipartFormDataContent](#multipartformdatacontent-class) &middot; [NetworkCredential](#networkcredential-class) &middot; [StreamContent](#streamcontent-class) &middot; [StringContent](#stringcontent-class) &middot; [WebProxy](#webproxy-class)
 
 **Functions** &nbsp; [DescribeHttpError](#describehttperror-function)
 
@@ -487,6 +500,28 @@ The handler requests go through.
 
 <sub>[stdlib/Net/Http/HttpClient.sl:104](../../stdlib/Net/Http/HttpClient.sl#L104)</sub>
 
+#### DefaultRequestVersion *property*
+
+```
+Version DefaultRequestVersion { get; set; }
+```
+
+The version the methods that make their own request ask for — `Get`,
+`Post`, `GetString` and the rest. HTTP/1.1 unless set, as .NET's is;
+a request made by the caller keeps its own.
+
+<sub>[stdlib/Net/Http/HttpClient.sl:109](../../stdlib/Net/Http/HttpClient.sl#L109)</sub>
+
+#### DefaultVersionPolicy *property*
+
+```
+HttpVersionPolicy DefaultVersionPolicy { get; set; }
+```
+
+The policy those requests are made with.
+
+<sub>[stdlib/Net/Http/HttpClient.sl:112](../../stdlib/Net/Http/HttpClient.sl#L112)</sub>
+
 #### Send *method*
 
 ```
@@ -499,10 +534,10 @@ Sends `request` and reads the whole response.
 
 - [HttpError.Timeout](#timeout-case) — `Timeout` ran out
 - [HttpError.ConnectFailure](#connectfailure-case) — no connection could be made
-- [HttpError.InvalidResponse](#invalidresponse-case) — the server broke HTTP/1.1
+- [HttpError.InvalidResponse](#invalidresponse-case) — the response was malformed
 - [HttpError.InvalidRequest](#invalidrequest-case) — the request has no absolute URI and there is no `BaseAddress`
 
-<sub>[stdlib/Net/Http/HttpClient.sl:115](../../stdlib/Net/Http/HttpClient.sl#L115)</sub>
+<sub>[stdlib/Net/Http/HttpClient.sl:123](../../stdlib/Net/Http/HttpClient.sl#L123)</sub>
 
 #### Send *method*
 
@@ -516,7 +551,7 @@ Sends `request`, returning when `completionOption` says.
 
 - [HttpError.Timeout](#timeout-case) — `Timeout` ran out
 
-<sub>[stdlib/Net/Http/HttpClient.sl:121](../../stdlib/Net/Http/HttpClient.sl#L121)</sub>
+<sub>[stdlib/Net/Http/HttpClient.sl:129](../../stdlib/Net/Http/HttpClient.sl#L129)</sub>
 
 #### Send *method*
 
@@ -540,7 +575,7 @@ went wrong in `failure` when it fails.
 - [HttpError.TooManyRedirects](#toomanyredirects-case) — more than the handler allows
 - [HttpError.ResponseTooLarge](#responsetoolarge-case) — past `MaxResponseContentBufferSize`
 
-<sub>[stdlib/Net/Http/HttpClient.sl:135](../../stdlib/Net/Http/HttpClient.sl#L135)</sub>
+<sub>[stdlib/Net/Http/HttpClient.sl:143](../../stdlib/Net/Http/HttpClient.sl#L143)</sub>
 
 #### Get *method*
 
@@ -550,7 +585,7 @@ Result<HttpResponseMessage, HttpError> Get(String requestUri)
 
 `GET` of `requestUri`, with the whole body read.
 
-<sub>[stdlib/Net/Http/HttpClient.sl:175](../../stdlib/Net/Http/HttpClient.sl#L175)</sub>
+<sub>[stdlib/Net/Http/HttpClient.sl:183](../../stdlib/Net/Http/HttpClient.sl#L183)</sub>
 
 #### Get *method*
 
@@ -560,7 +595,7 @@ Result<HttpResponseMessage, HttpError> Get(Uri requestUri)
 
 `GET` of `requestUri`, with the whole body read.
 
-<sub>[stdlib/Net/Http/HttpClient.sl:179](../../stdlib/Net/Http/HttpClient.sl#L179)</sub>
+<sub>[stdlib/Net/Http/HttpClient.sl:187](../../stdlib/Net/Http/HttpClient.sl#L187)</sub>
 
 #### Get *method*
 
@@ -570,7 +605,7 @@ Result<HttpResponseMessage, HttpError> Get(String requestUri, HttpCompletionOpti
 
 `GET` of `requestUri`, returning when `completionOption` says.
 
-<sub>[stdlib/Net/Http/HttpClient.sl:183](../../stdlib/Net/Http/HttpClient.sl#L183)</sub>
+<sub>[stdlib/Net/Http/HttpClient.sl:191](../../stdlib/Net/Http/HttpClient.sl#L191)</sub>
 
 #### Get *method*
 
@@ -580,7 +615,7 @@ Result<HttpResponseMessage, HttpError> Get(Uri requestUri, HttpCompletionOption 
 
 `GET` of `requestUri`, returning when `completionOption` says.
 
-<sub>[stdlib/Net/Http/HttpClient.sl:187](../../stdlib/Net/Http/HttpClient.sl#L187)</sub>
+<sub>[stdlib/Net/Http/HttpClient.sl:195](../../stdlib/Net/Http/HttpClient.sl#L195)</sub>
 
 #### GetString *method*
 
@@ -594,7 +629,7 @@ The body of a `GET` as text.
 
 - [HttpError.UnsuccessfulStatusCode](#unsuccessfulstatuscode-case) — the status was not 2xx
 
-<sub>[stdlib/Net/Http/HttpClient.sl:193](../../stdlib/Net/Http/HttpClient.sl#L193)</sub>
+<sub>[stdlib/Net/Http/HttpClient.sl:201](../../stdlib/Net/Http/HttpClient.sl#L201)</sub>
 
 #### GetString *method*
 
@@ -608,7 +643,7 @@ The body of a `GET` as text.
 
 - [HttpError.UnsuccessfulStatusCode](#unsuccessfulstatuscode-case) — the status was not 2xx
 
-<sub>[stdlib/Net/Http/HttpClient.sl:199](../../stdlib/Net/Http/HttpClient.sl#L199)</sub>
+<sub>[stdlib/Net/Http/HttpClient.sl:207](../../stdlib/Net/Http/HttpClient.sl#L207)</sub>
 
 #### GetByteArray *method*
 
@@ -622,7 +657,7 @@ The body of a `GET` as bytes.
 
 - [HttpError.UnsuccessfulStatusCode](#unsuccessfulstatuscode-case) — the status was not 2xx
 
-<sub>[stdlib/Net/Http/HttpClient.sl:205](../../stdlib/Net/Http/HttpClient.sl#L205)</sub>
+<sub>[stdlib/Net/Http/HttpClient.sl:213](../../stdlib/Net/Http/HttpClient.sl#L213)</sub>
 
 #### GetByteArray *method*
 
@@ -636,7 +671,7 @@ The body of a `GET` as bytes.
 
 - [HttpError.UnsuccessfulStatusCode](#unsuccessfulstatuscode-case) — the status was not 2xx
 
-<sub>[stdlib/Net/Http/HttpClient.sl:211](../../stdlib/Net/Http/HttpClient.sl#L211)</sub>
+<sub>[stdlib/Net/Http/HttpClient.sl:219](../../stdlib/Net/Http/HttpClient.sl#L219)</sub>
 
 #### GetStream *method*
 
@@ -651,7 +686,7 @@ arrives.
 
 - [HttpError.UnsuccessfulStatusCode](#unsuccessfulstatuscode-case) — the status was not 2xx
 
-<sub>[stdlib/Net/Http/HttpClient.sl:218](../../stdlib/Net/Http/HttpClient.sl#L218)</sub>
+<sub>[stdlib/Net/Http/HttpClient.sl:226](../../stdlib/Net/Http/HttpClient.sl#L226)</sub>
 
 #### GetStream *method*
 
@@ -666,7 +701,7 @@ arrives.
 
 - [HttpError.UnsuccessfulStatusCode](#unsuccessfulstatuscode-case) — the status was not 2xx
 
-<sub>[stdlib/Net/Http/HttpClient.sl:225](../../stdlib/Net/Http/HttpClient.sl#L225)</sub>
+<sub>[stdlib/Net/Http/HttpClient.sl:233](../../stdlib/Net/Http/HttpClient.sl#L233)</sub>
 
 #### Post *method*
 
@@ -676,7 +711,7 @@ Result<HttpResponseMessage, HttpError> Post(String requestUri, HttpContent? cont
 
 `POST` of `content` to `requestUri`.
 
-<sub>[stdlib/Net/Http/HttpClient.sl:229](../../stdlib/Net/Http/HttpClient.sl#L229)</sub>
+<sub>[stdlib/Net/Http/HttpClient.sl:237](../../stdlib/Net/Http/HttpClient.sl#L237)</sub>
 
 #### Post *method*
 
@@ -686,7 +721,7 @@ Result<HttpResponseMessage, HttpError> Post(Uri requestUri, HttpContent? content
 
 `POST` of `content` to `requestUri`.
 
-<sub>[stdlib/Net/Http/HttpClient.sl:233](../../stdlib/Net/Http/HttpClient.sl#L233)</sub>
+<sub>[stdlib/Net/Http/HttpClient.sl:241](../../stdlib/Net/Http/HttpClient.sl#L241)</sub>
 
 #### Put *method*
 
@@ -696,7 +731,7 @@ Result<HttpResponseMessage, HttpError> Put(String requestUri, HttpContent? conte
 
 `PUT` of `content` to `requestUri`.
 
-<sub>[stdlib/Net/Http/HttpClient.sl:237](../../stdlib/Net/Http/HttpClient.sl#L237)</sub>
+<sub>[stdlib/Net/Http/HttpClient.sl:245](../../stdlib/Net/Http/HttpClient.sl#L245)</sub>
 
 #### Put *method*
 
@@ -706,7 +741,7 @@ Result<HttpResponseMessage, HttpError> Put(Uri requestUri, HttpContent? content)
 
 `PUT` of `content` to `requestUri`.
 
-<sub>[stdlib/Net/Http/HttpClient.sl:241](../../stdlib/Net/Http/HttpClient.sl#L241)</sub>
+<sub>[stdlib/Net/Http/HttpClient.sl:249](../../stdlib/Net/Http/HttpClient.sl#L249)</sub>
 
 #### Patch *method*
 
@@ -716,7 +751,7 @@ Result<HttpResponseMessage, HttpError> Patch(String requestUri, HttpContent? con
 
 `PATCH` of `content` to `requestUri`.
 
-<sub>[stdlib/Net/Http/HttpClient.sl:245](../../stdlib/Net/Http/HttpClient.sl#L245)</sub>
+<sub>[stdlib/Net/Http/HttpClient.sl:253](../../stdlib/Net/Http/HttpClient.sl#L253)</sub>
 
 #### Patch *method*
 
@@ -726,7 +761,7 @@ Result<HttpResponseMessage, HttpError> Patch(Uri requestUri, HttpContent? conten
 
 `PATCH` of `content` to `requestUri`.
 
-<sub>[stdlib/Net/Http/HttpClient.sl:249](../../stdlib/Net/Http/HttpClient.sl#L249)</sub>
+<sub>[stdlib/Net/Http/HttpClient.sl:257](../../stdlib/Net/Http/HttpClient.sl#L257)</sub>
 
 #### Delete *method*
 
@@ -736,7 +771,7 @@ Result<HttpResponseMessage, HttpError> Delete(String requestUri)
 
 `DELETE` of `requestUri`.
 
-<sub>[stdlib/Net/Http/HttpClient.sl:253](../../stdlib/Net/Http/HttpClient.sl#L253)</sub>
+<sub>[stdlib/Net/Http/HttpClient.sl:261](../../stdlib/Net/Http/HttpClient.sl#L261)</sub>
 
 #### Delete *method*
 
@@ -746,7 +781,7 @@ Result<HttpResponseMessage, HttpError> Delete(Uri requestUri)
 
 `DELETE` of `requestUri`.
 
-<sub>[stdlib/Net/Http/HttpClient.sl:257](../../stdlib/Net/Http/HttpClient.sl#L257)</sub>
+<sub>[stdlib/Net/Http/HttpClient.sl:265](../../stdlib/Net/Http/HttpClient.sl#L265)</sub>
 
 #### Dispose *method*
 
@@ -757,7 +792,7 @@ void Dispose()
 Refuses further requests, and disposes the handler unless it was made
 to be shared.
 
-<sub>[stdlib/Net/Http/HttpClient.sl:262](../../stdlib/Net/Http/HttpClient.sl#L262)</sub>
+<sub>[stdlib/Net/Http/HttpClient.sl:270](../../stdlib/Net/Http/HttpClient.sl#L270)</sub>
 
 ### HttpClientHandler *class*
 
@@ -777,7 +812,7 @@ pool, proxies, TLS, redirects, cookies and decompression.
 a request is sent; the pool is made with the ones in force at the first
 request and keeps them.
 
-<sub>[stdlib/Net/Http/HttpClientHandler.sl:43](../../stdlib/Net/Http/HttpClientHandler.sl#L43)</sub>
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:44](../../stdlib/Net/Http/HttpClientHandler.sl#L44)</sub>
 
 #### AllowAutoRedirect *property*
 
@@ -787,7 +822,7 @@ bool AllowAutoRedirect { get; set; }
 
 Whether a `3xx` with a `Location` is followed.
 
-<sub>[stdlib/Net/Http/HttpClientHandler.sl:53](../../stdlib/Net/Http/HttpClientHandler.sl#L53)</sub>
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:60](../../stdlib/Net/Http/HttpClientHandler.sl#L60)</sub>
 
 #### MaxAutomaticRedirections *property*
 
@@ -798,7 +833,7 @@ int MaxAutomaticRedirections { get; set; }
 How many redirects one request may follow before it fails with
 `TooManyRedirects`.
 
-<sub>[stdlib/Net/Http/HttpClientHandler.sl:57](../../stdlib/Net/Http/HttpClientHandler.sl#L57)</sub>
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:64](../../stdlib/Net/Http/HttpClientHandler.sl#L64)</sub>
 
 #### AutomaticDecompression *property*
 
@@ -808,7 +843,7 @@ DecompressionMethods AutomaticDecompression { get; set; }
 
 Which codings are asked for with `Accept-Encoding` and undone.
 
-<sub>[stdlib/Net/Http/HttpClientHandler.sl:60](../../stdlib/Net/Http/HttpClientHandler.sl#L60)</sub>
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:67](../../stdlib/Net/Http/HttpClientHandler.sl#L67)</sub>
 
 #### UseCookies *property*
 
@@ -818,7 +853,7 @@ bool UseCookies { get; set; }
 
 Whether `CookieContainer` is sent and filled.
 
-<sub>[stdlib/Net/Http/HttpClientHandler.sl:63](../../stdlib/Net/Http/HttpClientHandler.sl#L63)</sub>
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:70](../../stdlib/Net/Http/HttpClientHandler.sl#L70)</sub>
 
 #### CookieContainer *property*
 
@@ -828,7 +863,7 @@ CookieContainer CookieContainer { get; set; }
 
 The cookies sent and received.
 
-<sub>[stdlib/Net/Http/HttpClientHandler.sl:66](../../stdlib/Net/Http/HttpClientHandler.sl#L66)</sub>
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:73](../../stdlib/Net/Http/HttpClientHandler.sl#L73)</sub>
 
 #### UseProxy *property*
 
@@ -838,7 +873,7 @@ bool UseProxy { get; set; }
 
 Whether a proxy is used at all.
 
-<sub>[stdlib/Net/Http/HttpClientHandler.sl:69](../../stdlib/Net/Http/HttpClientHandler.sl#L69)</sub>
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:76](../../stdlib/Net/Http/HttpClientHandler.sl#L76)</sub>
 
 #### Proxy *property*
 
@@ -848,7 +883,7 @@ IWebProxy? Proxy { get; set; }
 
 The proxy, or null for `HttpClient.DefaultProxy`.
 
-<sub>[stdlib/Net/Http/HttpClientHandler.sl:72](../../stdlib/Net/Http/HttpClientHandler.sl#L72)</sub>
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:79](../../stdlib/Net/Http/HttpClientHandler.sl#L79)</sub>
 
 #### ServerCertificateCustomValidationCallback *property*
 
@@ -859,7 +894,7 @@ HttpServerCertificateValidator ServerCertificateCustomValidationCallback { get; 
 Decides whether to trust a server's certificate, in place of the TLS
 module's validator, which it is told the answer of.
 
-<sub>[stdlib/Net/Http/HttpClientHandler.sl:76](../../stdlib/Net/Http/HttpClientHandler.sl#L76)</sub>
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:83](../../stdlib/Net/Http/HttpClientHandler.sl#L83)</sub>
 
 #### DangerousAcceptAnyServerCertificateValidator *property*
 
@@ -871,7 +906,7 @@ A callback that trusts every certificate. For a test against a server
 with a throwaway certificate, and nothing else: it makes TLS encryption
 without authentication, which a machine in the middle defeats.
 
-<sub>[stdlib/Net/Http/HttpClientHandler.sl:89](../../stdlib/Net/Http/HttpClientHandler.sl#L89)</sub>
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:96](../../stdlib/Net/Http/HttpClientHandler.sl#L96)</sub>
 
 #### ClientCertificates *property*
 
@@ -881,7 +916,7 @@ List<byte[]> ClientCertificates { get; set; }
 
 The client's certificates, DER, leaf first, sent when a server asks.
 
-<sub>[stdlib/Net/Http/HttpClientHandler.sl:93](../../stdlib/Net/Http/HttpClientHandler.sl#L93)</sub>
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:100](../../stdlib/Net/Http/HttpClientHandler.sl#L100)</sub>
 
 #### ClientCertificateKey *property*
 
@@ -891,7 +926,7 @@ TlsSigningKey? ClientCertificateKey { get; set; }
 
 The key of the client's leaf certificate.
 
-<sub>[stdlib/Net/Http/HttpClientHandler.sl:96](../../stdlib/Net/Http/HttpClientHandler.sl#L96)</sub>
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:103](../../stdlib/Net/Http/HttpClientHandler.sl#L103)</sub>
 
 #### MaxConnectionsPerServer *property*
 
@@ -902,7 +937,7 @@ int MaxConnectionsPerServer { get; set; }
 The most connections open to one server at once. A request past it
 waits, within its timeout, for one to be free.
 
-<sub>[stdlib/Net/Http/HttpClientHandler.sl:100](../../stdlib/Net/Http/HttpClientHandler.sl#L100)</sub>
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:107](../../stdlib/Net/Http/HttpClientHandler.sl#L107)</sub>
 
 #### PooledConnectionIdleTimeout *property*
 
@@ -913,7 +948,7 @@ TimeSpan PooledConnectionIdleTimeout { get; set; }
 How long a connection may sit idle in the pool and still be reused.
 Zero pools nothing; negative keeps connections for ever.
 
-<sub>[stdlib/Net/Http/HttpClientHandler.sl:104](../../stdlib/Net/Http/HttpClientHandler.sl#L104)</sub>
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:111](../../stdlib/Net/Http/HttpClientHandler.sl#L111)</sub>
 
 #### MaxResponseHeadersLength *property*
 
@@ -921,9 +956,36 @@ Zero pools nothing; negative keeps connections for ever.
 int MaxResponseHeadersLength { get; set; }
 ```
 
-The most a response head may take, in KiB.
+The most a response head may take, in KiB. HTTP/2 advertises it as
+`SETTINGS_MAX_HEADER_LIST_SIZE`.
 
-<sub>[stdlib/Net/Http/HttpClientHandler.sl:107](../../stdlib/Net/Http/HttpClientHandler.sl#L107)</sub>
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:115](../../stdlib/Net/Http/HttpClientHandler.sl#L115)</sub>
+
+#### InitialHttp2StreamWindowSize *property*
+
+```
+int InitialHttp2StreamWindowSize { get; set; }
+```
+
+How much of a response body each HTTP/2 stream lets the server send
+before the reader has read it, in bytes: the flow-control window,
+between 65 535 and 2^31 − 1. .NET's starts at 65 535 and grows it as
+it measures the connection; this one is fixed, so its default is a
+window wide enough for a fast link, 1 MiB.
+
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:122](../../stdlib/Net/Http/HttpClientHandler.sl#L122)</sub>
+
+#### EnableMultipleHttp2Connections *property*
+
+```
+bool EnableMultipleHttp2Connections { get; set; }
+```
+
+Whether a second HTTP/2 connection to a server is opened when every
+stream the first allows is busy. When false, as by default, a request
+waits for a stream to end.
+
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:127](../../stdlib/Net/Http/HttpClientHandler.sl#L127)</sub>
 
 #### Dispose *method*
 
@@ -934,7 +996,7 @@ void Dispose()
 Closes every idle connection. A response still being read keeps its
 connection until it is done with it, and that one is then closed too.
 
-<sub>[stdlib/Net/Http/HttpClientHandler.sl:111](../../stdlib/Net/Http/HttpClientHandler.sl#L111)</sub>
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:131](../../stdlib/Net/Http/HttpClientHandler.sl#L131)</sub>
 
 ### HttpCompletionOption *enum*
 
@@ -1391,9 +1453,10 @@ says which.
 InvalidResponse
 ```
 
-The response broke HTTP/1.1's syntax or framing.
+The response was malformed: HTTP/1.1's syntax or framing broken, or an
+HTTP/2 head or body its stream was reset for.
 
-<sub>[stdlib/Net/Http/HttpError.sl:54](../../stdlib/Net/Http/HttpError.sl#L54)</sub>
+<sub>[stdlib/Net/Http/HttpError.sl:55](../../stdlib/Net/Http/HttpError.sl#L55)</sub>
 
 #### ResponseTooLarge *case*
 
@@ -1403,7 +1466,7 @@ ResponseTooLarge
 
 The response head or body was over its limit.
 
-<sub>[stdlib/Net/Http/HttpError.sl:57](../../stdlib/Net/Http/HttpError.sl#L57)</sub>
+<sub>[stdlib/Net/Http/HttpError.sl:58](../../stdlib/Net/Http/HttpError.sl#L58)</sub>
 
 #### TooManyRedirects *case*
 
@@ -1413,7 +1476,7 @@ TooManyRedirects
 
 More redirects than `HttpClientHandler.MaxAutomaticRedirections`.
 
-<sub>[stdlib/Net/Http/HttpError.sl:60](../../stdlib/Net/Http/HttpError.sl#L60)</sub>
+<sub>[stdlib/Net/Http/HttpError.sl:61](../../stdlib/Net/Http/HttpError.sl#L61)</sub>
 
 #### ProxyFailure *case*
 
@@ -1424,7 +1487,7 @@ ProxyFailure
 The proxy could not be reached, refused the tunnel, or asked for
 credentials it was not given; `HttpFailure.StatusCode` says which.
 
-<sub>[stdlib/Net/Http/HttpError.sl:64](../../stdlib/Net/Http/HttpError.sl#L64)</sub>
+<sub>[stdlib/Net/Http/HttpError.sl:65](../../stdlib/Net/Http/HttpError.sl#L65)</sub>
 
 #### DecompressionFailed *case*
 
@@ -1434,7 +1497,7 @@ DecompressionFailed
 
 A gzip or deflate body was corrupt.
 
-<sub>[stdlib/Net/Http/HttpError.sl:67](../../stdlib/Net/Http/HttpError.sl#L67)</sub>
+<sub>[stdlib/Net/Http/HttpError.sl:68](../../stdlib/Net/Http/HttpError.sl#L68)</sub>
 
 #### InvalidRequest *case*
 
@@ -1446,7 +1509,7 @@ The request cannot be sent as it is: a relative URI with no
 `BaseAddress`, a scheme other than http or https, a header value with
 a line break in it.
 
-<sub>[stdlib/Net/Http/HttpError.sl:72](../../stdlib/Net/Http/HttpError.sl#L72)</sub>
+<sub>[stdlib/Net/Http/HttpError.sl:73](../../stdlib/Net/Http/HttpError.sl#L73)</sub>
 
 #### UnsuccessfulStatusCode *case*
 
@@ -1456,7 +1519,7 @@ UnsuccessfulStatusCode
 
 `EnsureSuccessStatusCode` found a status outside 200–299.
 
-<sub>[stdlib/Net/Http/HttpError.sl:75](../../stdlib/Net/Http/HttpError.sl#L75)</sub>
+<sub>[stdlib/Net/Http/HttpError.sl:76](../../stdlib/Net/Http/HttpError.sl#L76)</sub>
 
 #### ContentFailure *case*
 
@@ -1467,7 +1530,7 @@ ContentFailure
 The request content could not be read, or the response content could
 not be written where it was asked to go.
 
-<sub>[stdlib/Net/Http/HttpError.sl:79](../../stdlib/Net/Http/HttpError.sl#L79)</sub>
+<sub>[stdlib/Net/Http/HttpError.sl:80](../../stdlib/Net/Http/HttpError.sl#L80)</sub>
 
 #### Disposed *case*
 
@@ -1477,7 +1540,30 @@ Disposed
 
 The client or its handler has been disposed.
 
-<sub>[stdlib/Net/Http/HttpError.sl:82](../../stdlib/Net/Http/HttpError.sl#L82)</sub>
+<sub>[stdlib/Net/Http/HttpError.sl:83](../../stdlib/Net/Http/HttpError.sl#L83)</sub>
+
+#### ProtocolError *case*
+
+```
+ProtocolError
+```
+
+The HTTP/2 server broke the protocol, ending the connection, or reset
+the stream; `HttpFailure.ProtocolErrorCode` says with which code.
+
+<sub>[stdlib/Net/Http/HttpError.sl:87](../../stdlib/Net/Http/HttpError.sl#L87)</sub>
+
+#### VersionNegotiationFailure *case*
+
+```
+VersionNegotiationFailure
+```
+
+The request's `VersionPolicy` ruled out every version the server or
+the route would speak: HTTP/2 required and refused in ALPN, or asked
+of a plain proxy.
+
+<sub>[stdlib/Net/Http/HttpError.sl:92](../../stdlib/Net/Http/HttpError.sl#L92)</sub>
 
 ### HttpFailure *class*
 
@@ -1568,6 +1654,17 @@ The decompressor's error, when `Error` is `DecompressionFailed`.
 
 <sub>[stdlib/Net/Http/HttpFailure.sl:62](../../stdlib/Net/Http/HttpFailure.sl#L62)</sub>
 
+#### ProtocolErrorCode *property*
+
+```
+long ProtocolErrorCode { get; set; }
+```
+
+The HTTP/2 error code the stream was reset with, or the connection
+ended with, when `Error` is `ProtocolError`; zero, NO_ERROR, otherwise.
+
+<sub>[stdlib/Net/Http/HttpFailure.sl:66](../../stdlib/Net/Http/HttpFailure.sl#L66)</sub>
+
 #### RequestUri *property*
 
 ```
@@ -1576,7 +1673,7 @@ Uri? RequestUri { get; set; }
 
 The URI of the request that failed.
 
-<sub>[stdlib/Net/Http/HttpFailure.sl:65](../../stdlib/Net/Http/HttpFailure.sl#L65)</sub>
+<sub>[stdlib/Net/Http/HttpFailure.sl:69](../../stdlib/Net/Http/HttpFailure.sl#L69)</sub>
 
 #### ToString *method*
 
@@ -1587,7 +1684,7 @@ String ToString()
 The failure in words: the message, or the case described when there
 is none.
 
-<sub>[stdlib/Net/Http/HttpFailure.sl:88](../../stdlib/Net/Http/HttpFailure.sl#L88)</sub>
+<sub>[stdlib/Net/Http/HttpFailure.sl:93](../../stdlib/Net/Http/HttpFailure.sl#L93)</sub>
 
 ### HttpHeaders *class*
 
@@ -2088,9 +2185,20 @@ The body, or null for none.
 Version Version { get; set; }
 ```
 
-The version asked for. Every request is sent as HTTP/1.1 for now.
+The version asked for, HTTP/1.1 unless set, as .NET's is.
+`VersionPolicy` says how strictly it is kept to.
 
-<sub>[stdlib/Net/Http/HttpRequestMessage.sl:74](../../stdlib/Net/Http/HttpRequestMessage.sl#L74)</sub>
+<sub>[stdlib/Net/Http/HttpRequestMessage.sl:75](../../stdlib/Net/Http/HttpRequestMessage.sl#L75)</sub>
+
+#### VersionPolicy *property*
+
+```
+HttpVersionPolicy VersionPolicy { get; set; }
+```
+
+Whether a lower or a higher version than `Version` may be used.
+
+<sub>[stdlib/Net/Http/HttpRequestMessage.sl:78](../../stdlib/Net/Http/HttpRequestMessage.sl#L78)</sub>
 
 #### Dispose *method*
 
@@ -2100,7 +2208,7 @@ void Dispose()
 
 Disposes the content.
 
-<sub>[stdlib/Net/Http/HttpRequestMessage.sl:77](../../stdlib/Net/Http/HttpRequestMessage.sl#L77)</sub>
+<sub>[stdlib/Net/Http/HttpRequestMessage.sl:81](../../stdlib/Net/Http/HttpRequestMessage.sl#L81)</sub>
 
 #### ToString *method*
 
@@ -2110,7 +2218,7 @@ String ToString()
 
 The method and the URI.
 
-<sub>[stdlib/Net/Http/HttpRequestMessage.sl:85](../../stdlib/Net/Http/HttpRequestMessage.sl#L85)</sub>
+<sub>[stdlib/Net/Http/HttpRequestMessage.sl:89](../../stdlib/Net/Http/HttpRequestMessage.sl#L89)</sub>
 
 ### HttpResponseHeaders *class*
 
@@ -3032,6 +3140,63 @@ The protocol versions a message can name.
 
 <sub>[stdlib/Net/Http/HttpVersion.sl:25](../../stdlib/Net/Http/HttpVersion.sl#L25)</sub>
 
+### HttpVersionPolicy *enum*
+
+```
+enum HttpVersionPolicy
+```
+
+How strictly `HttpRequestMessage.Version` is kept to: .NET's
+`HttpVersionPolicy`.
+
+| Version | Policy | https | http |
+|---|---|---|---|
+| 1.1 | `RequestVersionOrLower` | HTTP/1.1 | HTTP/1.1 |
+| 1.1 | `RequestVersionOrHigher` | h2 if ALPN agrees, else 1.1 | HTTP/1.1 |
+| 1.1 | `RequestVersionExact` | HTTP/1.1 | HTTP/1.1 |
+| 2.0 | `RequestVersionOrLower` | h2 if ALPN agrees, else 1.1 | HTTP/1.1 |
+| 2.0 | `RequestVersionOrHigher` | h2, or a failure | h2 with prior knowledge |
+| 2.0 | `RequestVersionExact` | h2, or a failure | h2 with prior knowledge |
+
+Plain http never upgrades: HTTP/2 is used there only when the request
+will take nothing else, and then it is spoken from the first byte. A
+request through a plain proxy is always HTTP/1.1, since the proxy is
+spoken to in absolute form; through a `CONNECT` tunnel it is https as
+above. A version this module does not speak — 3.0 — is taken as 2.0 when
+the policy lets it be lower, and refused otherwise.
+
+<sub>[stdlib/Net/Http/HttpVersionPolicy.sl:42](../../stdlib/Net/Http/HttpVersionPolicy.sl#L42)</sub>
+
+#### RequestVersionOrLower *case*
+
+```
+RequestVersionOrLower
+```
+
+The version asked for, or a lower one the server prefers. The default.
+
+<sub>[stdlib/Net/Http/HttpVersionPolicy.sl:45](../../stdlib/Net/Http/HttpVersionPolicy.sl#L45)</sub>
+
+#### RequestVersionOrHigher *case*
+
+```
+RequestVersionOrHigher
+```
+
+The version asked for, or a higher one the server offers.
+
+<sub>[stdlib/Net/Http/HttpVersionPolicy.sl:48](../../stdlib/Net/Http/HttpVersionPolicy.sl#L48)</sub>
+
+#### RequestVersionExact *case*
+
+```
+RequestVersionExact
+```
+
+The version asked for and no other.
+
+<sub>[stdlib/Net/Http/HttpVersionPolicy.sl:51](../../stdlib/Net/Http/HttpVersionPolicy.sl#L51)</sub>
+
 ### IWebProxy *interface*
 
 ```
@@ -3439,5 +3604,5 @@ A sentence describing an HTTP error, for a message a person will read.
 
 **See also** &nbsp; [HttpError](#httperror-enum)
 
-<sub>[stdlib/Net/Http/Http.sl:107](../../stdlib/Net/Http/Http.sl#L107)</sub>
+<sub>[stdlib/Net/Http/Http.sl:120](../../stdlib/Net/Http/Http.sl#L120)</sub>
 

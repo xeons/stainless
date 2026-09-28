@@ -19,7 +19,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-/// An HTTP/1.1 client, over TCP or TLS, in `System.Net.Http`'s shape.
+/// An HTTP/1.1 and HTTP/2 client, over TCP or TLS, as `System.Net.Http`.
 ///
 /// ```csharp
 /// var client = new HttpClient();
@@ -38,30 +38,43 @@
 /// `Result<…, HttpError>`; the overloads taking `out HttpFailure` say more —
 /// the socket error, the TLS error, the status a proxy refused with.
 ///
-/// **What is implemented** is HTTP/1.1 (RFC 9112) over TCP and TLS 1.3:
-/// keep-alive with a pool of connections per server, request bodies of known
-/// length or chunked, responses framed by length, by chunks (with trailers)
-/// or by the connection closing, `Expect: 100-continue`, redirects, cookies
-/// (RFC 6265), gzip and deflate, proxies over HTTP with `CONNECT` tunnels, and
-/// one timeout that covers the whole of a request.
+/// **What is implemented** is HTTP/1.1 (RFC 9112) and HTTP/2 (RFC 9113) over
+/// TCP and TLS: keep-alive with a pool of connections per server, request
+/// bodies of known length or chunked, responses framed by length, by chunks
+/// (with trailers) or by the connection closing, `Expect: 100-continue`,
+/// redirects, cookies (RFC 6265), gzip and deflate, proxies over HTTP with
+/// `CONNECT` tunnels, and one timeout that covers the whole of a request.
 ///
-/// **What is not:** HTTP/2 and HTTP/3, authentication other than Basic to a
-/// proxy, a proxy spoken to over TLS, and a timeout on name resolution, which
-/// the platform's resolver does not offer.
+/// **What is not:** HTTP/3, server push, authentication other than Basic to
+/// a proxy, a proxy spoken to over TLS, and a timeout on name resolution,
+/// which the platform's resolver does not offer.
 ///
-/// **HTTP/2 slots in beside the 1.1 connection.** Each connection is an
-/// `IHttpConnection`, and TLS offers the ALPN names of the protocols this
-/// module speaks. Today that is `http/1.1` alone; a connection that agrees on
-/// `h2` will be made as a second implementation of the same interface, and
-/// the pool, the redirects, the cookies and the decompression above it will
-/// not change.
+/// **HTTP/2 is used as .NET uses it: when the request asks.**
+/// `HttpRequestMessage.Version` is 1.1 and `VersionPolicy` is
+/// `RequestVersionOrLower` unless set, which is HTTP/1.1; ask for 2.0, or
+/// set `HttpClient.DefaultRequestVersion`, and TLS offers ALPN `h2` then
+/// `http/1.1` and the connection is whichever the server chose. Plain http
+/// speaks HTTP/2 only when the policy allows nothing else, with prior
+/// knowledge. `HttpVersionPolicy` has the whole table.
+///
+/// **An HTTP/2 connection carries every request to its server at once**, a
+/// stream each, up to the server's limit, with a reader thread of its own
+/// that ends when the connection does. Flow control holds a body read slowly
+/// to its window without holding up the others; a timeout, or a body closed
+/// early, resets only its stream. A request the server never processed — a
+/// GOAWAY below its stream, or REFUSED_STREAM — is sent again on a new
+/// connection whatever its method.
 ///
 /// **Responses are parsed strictly.** A status line that is not
 /// `HTTP/1.x NNN reason`, a folded header, a header line or block over its
 /// limit, a chunk size that is not hexadecimal or does not fit, two
 /// disagreeing `Content-Length`s, and a `Content-Length` beside a
 /// `Transfer-Encoding` are all refused as `HttpError.InvalidResponse`, since
-/// each is how one message is smuggled inside another.
+/// each is how one message is smuggled inside another. In HTTP/2 a field
+/// with upper-case letters or one that belongs to a single connection, a
+/// missing `:status` and a body unlike its `content-length` reset the stream
+/// and are `InvalidResponse`; a peer that breaks the framing is sent GOAWAY
+/// and every stream on it fails with `ProtocolError`.
 ///
 /// **Certificates are judged by the TLS module's validator** unless
 /// `HttpClientHandler.ServerCertificateCustomValidationCallback` is set, in
