@@ -915,8 +915,7 @@ object, and a static method has nowhere to put one.
 
 **A `const`** belongs to the type in the same way and is not storage at all: it
 is inlined at every use ([§9.3](09-statements-expressions.md#93-const-and-static)),
-so it needs no initializer to be run — and a `--shared` library, which has no
-entry point to run one from (SL0380), may have it whatever its value.
+so it needs no initializer to be run.
 `Aes.BlockSize` is reached by the type's name from outside and by its own name
 from within.
 
@@ -946,8 +945,7 @@ public static class Registry
 ```
 
 With no `= value` the storage starts as its type's zero, which a global is born
-holding, so it needs no code to run and a `--shared` library may have one. With
-one, it is ordered with every other static's initializer, and an initializer
+holding, so it needs no code to run. With one, it is ordered with every other static's initializer, and an initializer
 that reads the property is ordered after it. A get-only one is written by its
 type's static constructor and nowhere else.
 

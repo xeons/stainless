@@ -41,13 +41,9 @@ public sealed partial class LlvmEmitter
     /// The LLVM constant a static can carry on the global itself, or null for
     /// one that needs code to run.
     ///
-    /// <b>This is what lets a <c>--shared</c> library have statics at all.</b>
-    /// Initializers run from the entry point and a library has none (SL0380) --
-    /// but <c>static bool tried = false</c> and <c>static Backend? loaded =
-    /// null</c> have nothing to run: they are a zero and a null pointer, and a
-    /// global can be born holding them. Without this, no module compiled into
-    /// every program could remember anything, which is what `Standard.Drawing`
-    /// found when it tried to cache the imaging library it had loaded.
+    /// <c>static bool tried = false</c> and <c>static Backend? loaded = null</c>
+    /// have nothing to run: they are a zero and a null pointer, and a global
+    /// can be born holding them.
     ///
     /// Literals only, and never a managed reference with a value. A string
     /// literal is an object that has to be made; <c>null</c> is a pointer that
@@ -208,7 +204,9 @@ public sealed partial class LlvmEmitter
 
         // And the undoing, registered here rather than called from the entry
         // point so that a program which calls exit() is torn down too.
-        if (_hasStaticTeardown)
+        if (_hasStaticTeardown && forSharedLibrary)
+            Emit("i32", $"call i32 @atexit(ptr @{StaticTeardownName})");
+        else if (_hasStaticTeardown)
             Line($"call void @sl_run_at_exit(ptr @{StaticTeardownName})");
 
         Terminator("ret void");
@@ -219,6 +217,13 @@ public sealed partial class LlvmEmitter
         _module.Append(_body);
         _module.AppendLine("}");
         _module.AppendLine();
+
+        // A library has no entry point, so it initializes as it is loaded: from
+        // the C runtime's DllMain on Windows and from .init_array elsewhere.
+        // Last, after the runtime's own constructors. On Windows this runs
+        // under the loader lock, so an initializer MUST NOT wait on a thread.
+        if (forSharedLibrary)
+            _startup.Add((65535, StaticInitializerName));
     }
 
     /// <summary>

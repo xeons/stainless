@@ -1,0 +1,3 @@
+library loaded
+names=1 length=8 held=1
+library torn down

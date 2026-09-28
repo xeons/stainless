@@ -743,28 +743,6 @@ public sealed class Compilation
                 "this library exports nothing; mark a function 'export \"C\"' to add it to the " +
                 "export table");
 
-        // Static initializers run from the entry point, and a library has none.
-        // Better to say so than to hand back a library whose statics are zero.
-        //
-        // A variable declared `extern "C"` is not one of these. It has no
-        // initializer to run -- the storage is defined elsewhere and this names
-        // it -- so there is nothing for a missing entry point to fail to do.
-        // `Standard.Resources` declares two, so without this exception no
-        // --shared build would compile at all.
-        // A static whose value is a constant is written onto the global itself
-        // and needs no entry point -- see StaticSymbol.HasConstantInitializer.
-        // Without that exception a module compiled into every program could
-        // remember nothing, which is what stopped `Standard.Drawing` caching
-        // the imaging library it had loaded.
-        var uninitialized = program.Statics
-            .Where(s => !s.IsImported && !s.HasConstantInitializer)
-            .ToList();
-        if (options.Shared && uninitialized.Count > 0)
-            diagnostics.Error("SL0380", uninitialized[0].Span,
-                $"'{uninitialized[0].DisplayName}' is a static, and a --shared library has no " +
-                "entry point to initialize one from; hold the value behind an exported " +
-                "function instead, or build this module into an executable");
-
         if (diagnostics.HasErrors) return Failed(diagnostics);
 
         // --- document ----------------------------------------------------

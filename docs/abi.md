@@ -1127,10 +1127,13 @@ it costs no reference traffic for the rest of the program and is never
 destroyed. A mutable one is counted like any other slot, since replacing what it
 holds has to release the old value.
 
-A `--shared` library has no entry point to call `_SLstatics` from, so a static
-in one whose value needs code is rejected at compile time (SL0380) rather than
-left zeroed. A `const`, in a module or in a type, has no storage and is inlined
-wherever it is used, so it is not a static and a library may carry one.
+A `--shared` library has no entry point, so `_SLstatics` is the last entry in
+its `llvm.global_ctors` and runs as the library is loaded, after the runtime's
+own constructors. It registers `_SLstaticsdown` with the C library's `atexit`
+directly rather than through `sl_run_at_exit`, so that the hook belongs to the
+library's module and runs when that is unloaded. A `const`, in a module or in
+a type, has no storage and is inlined wherever it is used, so it is not a
+static.
 
 ## 5. Ownership convention
 

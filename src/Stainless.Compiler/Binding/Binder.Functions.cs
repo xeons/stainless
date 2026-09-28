@@ -1065,8 +1065,7 @@ public sealed partial class Binder
     ///
     /// The two differ only in where the symbol is filed. A constant is inlined
     /// at every use and has no storage, so unlike a <c>static</c> it needs no
-    /// moment at which to be initialized -- which is what lets a type in a
-    /// <c>--shared</c> library carry one (SL0380 refuses the static).
+    /// moment at which to be initialized.
     /// </summary>
     private void DeclareGlobalConstant(
         FileScope scope, GlobalConstDeclSyntax declaration,

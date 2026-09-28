@@ -484,11 +484,8 @@ public sealed class Aes
 nuint blocks = length / Aes.BlockSize;          // and the type's name outside
 ```
 
-A constant is shared state a `--shared` library may always carry, and for the
-reason a static often may not: it is inlined rather than stored, so there is
-nothing to initialize and no entry point needed to do it
-([§7.6](07-functions-members.md#76-static-members) is where `static` runs into
-that). The one place it does not reach is an inline array's length, `T[N]`,
+A constant is inlined rather than stored, so there is nothing to initialize.
+The one place it does not reach is an inline array's length, `T[N]`,
 which is settled during layout — before any type has its members — so a length
 there must still be a literal or a module-level `const`.
 
@@ -572,11 +569,9 @@ read a mutable static.** A table that lives for the program is declared
 reports back into is emptied by its owner, from a hook registered after the
 statics were made and so run before their teardown.
 
-A `--shared` library has no entry point to initialize statics from, so a static
-in one is an error (SL0380) rather than a silently zeroed global — unless the
-global can be born holding its value: `null`, `default(T)`, or a literal of a
-type that is not counted, so `static int Counter = 0;` is allowed and a
-`String` literal is not.
+A `--shared` library has no entry point, so its statics are initialized as it
+is loaded and torn down as it is unloaded, in the same order. On Windows the
+loader runs them under its lock, so an initializer MUST NOT wait on a thread.
 
 ## 9.4 `foreach`
 

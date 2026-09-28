@@ -98,12 +98,9 @@ public struct Rgba
 
     public bool Equals(Rgba other) => Packed == other.Packed;
 
-    /// **Properties rather than `static readonly` fields**, which is not a
-    /// style choice. A static needs an entry point to be initialized from and a
-    /// `--shared` library has none (SL0380) -- and this module is compiled into
-    /// every program, including every shared library anybody builds. A property
-    /// is a function, so there is nothing to initialize and nothing to go
-    /// wrong; the six of them fold to four bytes each.
+    /// Properties rather than `static readonly` fields: this module is compiled
+    /// into every program, and a property runs nothing at startup. Each folds
+    /// to four bytes.
     public static Rgba Transparent => Rgba.FromArgb((byte)0, (byte)0, (byte)0, (byte)0);
     public static Rgba Black       => Rgba.FromRgb((byte)0, (byte)0, (byte)0);
     public static Rgba White       => Rgba.FromRgb((byte)255, (byte)255, (byte)255);

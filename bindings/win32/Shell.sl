@@ -95,10 +95,9 @@ public String GetFolderPath(int folder)
 // still name the same places, but they stopped being added to: Downloads and
 // SavedGames have no number, and never will. These are the current answer.
 //
-// Each is a function rather than a `static readonly`, because a `--shared`
-// build has no entry point to run a static initializer from (SL0380) and these
-// modules should compile either way. The cost is one `CLSIDFromString` per
-// lookup, against a shell call that is thousands of times dearer.
+// Each is a function rather than a `static readonly`, so a program that never
+// asks pays nothing at startup. The cost is one `CLSIDFromString` per lookup,
+// against a shell call that is thousands of times dearer.
 
 /// `FOLDERID_Desktop`.
 public Guid DesktopId() => Com.ParseGuid("B4BFCC3A-DB2C-424C-B029-7FE99A87C641");

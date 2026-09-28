@@ -573,11 +573,8 @@ public sealed class StaticSymbol(string name, TypeSymbol type, string moduleName
     /// Whether this static's value can be written on the global itself, with
     /// no code to run.
     ///
-    /// <b>What makes a static legal in a <c>--shared</c> library.</b>
-    /// Initializers run from the entry point and a library has none (SL0380),
-    /// so the question is whether there is anything to run: <c>= false</c> and
-    /// <c>= null</c> are a zero and a null pointer, and a global can be born
-    /// holding them.
+    /// <c>= false</c> and <c>= null</c> are a zero and a null pointer, and a
+    /// global can be born holding them.
     ///
     /// Four shapes and no more: <c>null</c>, <c>default(T)</c>, a literal of a
     /// type that is not counted, and <c>[Embed]</c>, whose object is made by the

@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: 0BSD
 //
-// A static carrying an `[Embed]`, in a library built --shared. A library has
-// no entry point to run an initializer from (SL0380), so this compiles only
-// because the static is born holding the object's address — there is no code
-// to run, and nothing is refused.
+// A static carrying an `[Embed]`, in a library built --shared. The static is
+// born holding the object's address, so there is no code to run.
 module Library.Banner;
 
 import Standard.Text;

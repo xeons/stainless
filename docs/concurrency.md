@@ -307,11 +307,11 @@ literal lives in read-only storage, and storing the marker again would fault.
 
 ### 3.3 Libraries
 
-A `--shared` build has no entry point, so there is nothing to run the
-initializers from. A static in a library is a compile error (SL0380) rather
-than a silently zeroed global; hold the value behind an exported function
-instead. The exception is a static whose value is a literal — a number, `null`,
-`default` — which the global is simply born holding, so there is nothing to run.
+A `--shared` build has no entry point, so its initializers run as it is
+loaded: from the C runtime's `DllMain` on Windows and from `.init_array`
+elsewhere. On Windows that is under the loader lock, and an initializer that
+starts a thread and waits for it deadlocks. A library's statics are torn down
+as it is unloaded, by an `atexit` hook registered from the library itself.
 
 ---
 

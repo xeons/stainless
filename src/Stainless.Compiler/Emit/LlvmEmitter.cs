@@ -247,9 +247,9 @@ public sealed partial class LlvmEmitter(
     ///
     /// A module may define <c>llvm.global_ctors</c> only once, so everything
     /// that wants in records itself here and <see cref="StartupTable"/> emits
-    /// the one array at the end. Two things want in today: binding string
-    /// literals to their type on Windows, and registering this binary's
-    /// reflected types so that one can be found by name.
+    /// the one array at the end: binding string literals to their type on
+    /// Windows, registering this binary's reflected types so that one can be
+    /// found by name, and a library's static initializer.
     /// </summary>
     private readonly List<(int Priority, string Name)> _startup = [];
 

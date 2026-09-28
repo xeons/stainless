@@ -104,14 +104,10 @@ static String Empty { get; }
 
 Text with no bytes in it.
 
-A property rather than a static field, and the reason is worth knowing:
-a `--shared` library has no entry point to run a static's initializer
-from (SL0380), so a field here would have made the whole standard
-library unusable in one. This costs nothing either way -- a string
-literal is one interned object, so every `String.Empty` is the same
-object that every `""` already was.
+A string literal is one interned object, so every `String.Empty` is the
+same object that every `""` already was.
 
-<sub>[stdlib/Text/String.sl:55](../../stdlib/Text/String.sl#L55)</sub>
+<sub>[stdlib/Text/String.sl:51](../../stdlib/Text/String.sl#L51)</sub>
 
 #### StartsWith *method*
 
@@ -121,7 +117,7 @@ bool StartsWith(String prefix)
 
 True when this text begins with `prefix`. An empty prefix always does.
 
-<sub>[stdlib/Text/String.sl:60](../../stdlib/Text/String.sl#L60)</sub>
+<sub>[stdlib/Text/String.sl:56](../../stdlib/Text/String.sl#L56)</sub>
 
 #### EndsWith *method*
 
@@ -131,7 +127,7 @@ bool EndsWith(String suffix)
 
 True when this text ends with `suffix`. An empty suffix always does.
 
-<sub>[stdlib/Text/String.sl:69](../../stdlib/Text/String.sl#L69)</sub>
+<sub>[stdlib/Text/String.sl:65](../../stdlib/Text/String.sl#L65)</sub>
 
 #### Contains *method*
 
@@ -143,7 +139,7 @@ True when `value` appears anywhere in this text.
 
 **See also** &nbsp; [String.IndexOf](#indexof-method)
 
-<sub>[stdlib/Text/String.sl:81](../../stdlib/Text/String.sl#L81)</sub>
+<sub>[stdlib/Text/String.sl:77](../../stdlib/Text/String.sl#L77)</sub>
 
 #### Contains *method*
 
@@ -154,7 +150,7 @@ bool Contains(char value)
 True when this single code unit appears. Only meaningful for ASCII: a
 `char` above 127 is one byte of a sequence rather than a character.
 
-<sub>[stdlib/Text/String.sl:88](../../stdlib/Text/String.sl#L88)</sub>
+<sub>[stdlib/Text/String.sl:84](../../stdlib/Text/String.sl#L84)</sub>
 
 #### IndexOf *method*
 
@@ -169,7 +165,7 @@ begins with the empty string.
 
 **See also** &nbsp; [String.LastIndexOf](#lastindexof-method) &middot; [Text.NotFound](#notfound-constant)
 
-<sub>[stdlib/Text/String.sl:102](../../stdlib/Text/String.sl#L102)</sub>
+<sub>[stdlib/Text/String.sl:98](../../stdlib/Text/String.sl#L98)</sub>
 
 #### IndexOf *method*
 
@@ -179,7 +175,7 @@ long IndexOf(String value, nuint start)
 
 Where `value` first appears at or after `start`, or `NotFound`.
 
-<sub>[stdlib/Text/String.sl:108](../../stdlib/Text/String.sl#L108)</sub>
+<sub>[stdlib/Text/String.sl:104](../../stdlib/Text/String.sl#L104)</sub>
 
 #### LastIndexOf *method*
 
@@ -191,7 +187,7 @@ Where `value` last appears, or `NotFound`.
 
 **See also** &nbsp; [String.IndexOf](#indexof-method)
 
-<sub>[stdlib/Text/String.sl:135](../../stdlib/Text/String.sl#L135)</sub>
+<sub>[stdlib/Text/String.sl:131](../../stdlib/Text/String.sl#L131)</sub>
 
 #### IndexOf *method*
 
@@ -201,7 +197,7 @@ long IndexOf(char value)
 
 Where this code unit first appears, or `NotFound`.
 
-<sub>[stdlib/Text/String.sl:157](../../stdlib/Text/String.sl#L157)</sub>
+<sub>[stdlib/Text/String.sl:153](../../stdlib/Text/String.sl#L153)</sub>
 
 #### LastIndexOf *method*
 
@@ -211,7 +207,7 @@ long LastIndexOf(char value)
 
 Where this code unit last appears, or `NotFound`.
 
-<sub>[stdlib/Text/String.sl:171](../../stdlib/Text/String.sl#L171)</sub>
+<sub>[stdlib/Text/String.sl:167](../../stdlib/Text/String.sl#L167)</sub>
 
 #### Substring *method*
 
@@ -221,7 +217,7 @@ String Substring(nuint start)
 
 Everything from `start` to the end. A `start` past the end gives "".
 
-<sub>[stdlib/Text/String.sl:186](../../stdlib/Text/String.sl#L186)</sub>
+<sub>[stdlib/Text/String.sl:182](../../stdlib/Text/String.sl#L182)</sub>
 
 #### SubstringBefore *method*
 
@@ -233,7 +229,7 @@ The text before the first `separator`, or all of it when there is none.
 
 **See also** &nbsp; [String.SubstringAfter](#substringafter-method)
 
-<sub>[stdlib/Text/String.sl:197](../../stdlib/Text/String.sl#L197)</sub>
+<sub>[stdlib/Text/String.sl:193](../../stdlib/Text/String.sl#L193)</sub>
 
 #### SubstringAfter *method*
 
@@ -245,7 +241,7 @@ The text after the first `separator`, or "" when there is none.
 
 **See also** &nbsp; [String.SubstringBefore](#substringbefore-method) &middot; [String.SubstringAfterLast](#substringafterlast-method)
 
-<sub>[stdlib/Text/String.sl:209](../../stdlib/Text/String.sl#L209)</sub>
+<sub>[stdlib/Text/String.sl:205](../../stdlib/Text/String.sl#L205)</sub>
 
 #### SubstringAfterLast *method*
 
@@ -257,7 +253,7 @@ The text after the last `separator`, or all of it when there is none.
 
 **See also** &nbsp; [String.SubstringAfter](#substringafter-method)
 
-<sub>[stdlib/Text/String.sl:220](../../stdlib/Text/String.sl#L220)</sub>
+<sub>[stdlib/Text/String.sl:216](../../stdlib/Text/String.sl#L216)</sub>
 
 #### Trim *method*
 
@@ -269,7 +265,7 @@ This text without leading or trailing ASCII whitespace.
 
 **See also** &nbsp; [String.TrimStart](#trimstart-method) &middot; [String.TrimEnd](#trimend-method)
 
-<sub>[stdlib/Text/String.sl:234](../../stdlib/Text/String.sl#L234)</sub>
+<sub>[stdlib/Text/String.sl:230](../../stdlib/Text/String.sl#L230)</sub>
 
 #### TrimStart *method*
 
@@ -279,7 +275,7 @@ String TrimStart()
 
 This text without leading ASCII whitespace.
 
-<sub>[stdlib/Text/String.sl:240](../../stdlib/Text/String.sl#L240)</sub>
+<sub>[stdlib/Text/String.sl:236](../../stdlib/Text/String.sl#L236)</sub>
 
 #### TrimEnd *method*
 
@@ -289,7 +285,7 @@ String TrimEnd()
 
 This text without trailing ASCII whitespace.
 
-<sub>[stdlib/Text/String.sl:255](../../stdlib/Text/String.sl#L255)</sub>
+<sub>[stdlib/Text/String.sl:251](../../stdlib/Text/String.sl#L251)</sub>
 
 #### Replace *method*
 
@@ -304,7 +300,7 @@ again: replacing "a" with "aa" terminates.
 
 **See also** &nbsp; [StringBuilder.ReplaceAll](#replaceall-method)
 
-<sub>[stdlib/Text/String.sl:277](../../stdlib/Text/String.sl#L277)</sub>
+<sub>[stdlib/Text/String.sl:273](../../stdlib/Text/String.sl#L273)</sub>
 
 #### Repeat *method*
 
@@ -314,7 +310,7 @@ String Repeat(nuint count)
 
 This text `count` times over. Zero gives "".
 
-<sub>[stdlib/Text/String.sl:304](../../stdlib/Text/String.sl#L304)</sub>
+<sub>[stdlib/Text/String.sl:300](../../stdlib/Text/String.sl#L300)</sub>
 
 #### PadLeft *method*
 
@@ -326,7 +322,7 @@ Spaces on the left until the text is `width` bytes. Never truncates.
 
 **See also** &nbsp; [String.PadRight](#padright-method)
 
-<sub>[stdlib/Text/String.sl:320](../../stdlib/Text/String.sl#L320)</sub>
+<sub>[stdlib/Text/String.sl:316](../../stdlib/Text/String.sl#L316)</sub>
 
 #### PadRight *method*
 
@@ -338,7 +334,7 @@ Spaces on the right until the text is `width` bytes. Never truncates.
 
 **See also** &nbsp; [String.PadLeft](#padleft-method)
 
-<sub>[stdlib/Text/String.sl:331](../../stdlib/Text/String.sl#L331)</sub>
+<sub>[stdlib/Text/String.sl:327](../../stdlib/Text/String.sl#L327)</sub>
 
 #### PadLeft *method*
 
@@ -354,7 +350,7 @@ of more than one byte pads by whole copies and may fall short of the
 width rather than overshoot it. A single character is the sane case and
 the one to use.
 
-<sub>[stdlib/Text/String.sl:346](../../stdlib/Text/String.sl#L346)</sub>
+<sub>[stdlib/Text/String.sl:342](../../stdlib/Text/String.sl#L342)</sub>
 
 #### PadRight *method*
 
@@ -368,7 +364,7 @@ Measured in bytes, so a multi-byte `with` pads by whole copies and may
 fall short of the width rather than overshoot it. An empty `with`
 answers the string unchanged, since no number of copies would reach.
 
-<sub>[stdlib/Text/String.sl:361](../../stdlib/Text/String.sl#L361)</sub>
+<sub>[stdlib/Text/String.sl:357](../../stdlib/Text/String.sl#L357)</sub>
 
 #### Split *method*
 
@@ -385,7 +381,7 @@ gives the original back.
 
 **See also** &nbsp; [String.Join](#join-method) &middot; [String.SplitLines](#splitlines-method)
 
-<sub>[stdlib/Text/String.sl:382](../../stdlib/Text/String.sl#L382)</sub>
+<sub>[stdlib/Text/String.sl:378](../../stdlib/Text/String.sl#L378)</sub>
 
 #### Split *method*
 
@@ -395,7 +391,7 @@ String[] Split(char separator)
 
 This text cut at every occurrence of one code unit.
 
-<sub>[stdlib/Text/String.sl:417](../../stdlib/Text/String.sl#L417)</sub>
+<sub>[stdlib/Text/String.sl:413](../../stdlib/Text/String.sl#L413)</sub>
 
 #### SplitLines *method*
 
@@ -411,7 +407,7 @@ opposite of what `Split` does, and the reason this is not `Split('\n')`.
 
 **See also** &nbsp; [String.Split](#split-method)
 
-<sub>[stdlib/Text/String.sl:454](../../stdlib/Text/String.sl#L454)</sub>
+<sub>[stdlib/Text/String.sl:450](../../stdlib/Text/String.sl#L450)</sub>
 
 #### ToUpperAscii *method*
 
@@ -424,7 +420,7 @@ as it was. See the note at the top of this file.
 
 **See also** &nbsp; [String.ToLowerAscii](#tolowerascii-method) &middot; [String.EqualsIgnoreCaseAscii](#equalsignorecaseascii-method)
 
-<sub>[stdlib/Text/String.sl:503](../../stdlib/Text/String.sl#L503)</sub>
+<sub>[stdlib/Text/String.sl:499](../../stdlib/Text/String.sl#L499)</sub>
 
 #### ToLowerAscii *method*
 
@@ -436,7 +432,7 @@ This text with every ASCII letter lowercased.
 
 **See also** &nbsp; [String.ToUpperAscii](#toupperascii-method)
 
-<sub>[stdlib/Text/String.sl:511](../../stdlib/Text/String.sl#L511)</sub>
+<sub>[stdlib/Text/String.sl:507](../../stdlib/Text/String.sl#L507)</sub>
 
 #### EqualsIgnoreCaseAscii *method*
 
@@ -446,7 +442,7 @@ bool EqualsIgnoreCaseAscii(String other)
 
 True when the two texts differ only in the case of ASCII letters.
 
-<sub>[stdlib/Text/String.sl:517](../../stdlib/Text/String.sl#L517)</sub>
+<sub>[stdlib/Text/String.sl:513](../../stdlib/Text/String.sl#L513)</sub>
 
 #### CompareTo *method*
 
@@ -460,7 +456,7 @@ Comparing UTF-8 byte by byte happens to order by code point as well,
 because the encoding was designed so that it would. It is not a
 linguistic ordering and does not claim to be one.
 
-<sub>[stdlib/Text/String.sl:541](../../stdlib/Text/String.sl#L541)</sub>
+<sub>[stdlib/Text/String.sl:537](../../stdlib/Text/String.sl#L537)</sub>
 
 #### GetByteAt *method*
 
@@ -476,7 +472,7 @@ string's. Check the length first, or slice instead.
 
 **See also** &nbsp; [String.GetCodePointAt](#getcodepointat-method)
 
-<sub>[stdlib/Text/String.sl:570](../../stdlib/Text/String.sl#L570)</sub>
+<sub>[stdlib/Text/String.sl:566](../../stdlib/Text/String.sl#L566)</sub>
 
 #### GetCodePointAt *method*
 
@@ -493,7 +489,7 @@ short, an overlong form, a surrogate or a value past U+10FFFF.
 
 **See also** &nbsp; [String.SkipCodePoint](#skipcodepoint-method)
 
-<sub>[stdlib/Text/String.sl:583](../../stdlib/Text/String.sl#L583)</sub>
+<sub>[stdlib/Text/String.sl:579](../../stdlib/Text/String.sl#L579)</sub>
 
 #### SkipCodePoint *method*
 
@@ -516,7 +512,7 @@ each byte reading as U+FFFD. `CodePointCount` counts the same steps.
 
 **See also** &nbsp; [String.GetCodePointAt](#getcodepointat-method)
 
-<sub>[stdlib/Text/String.sl:618](../../stdlib/Text/String.sl#L618)</sub>
+<sub>[stdlib/Text/String.sl:614](../../stdlib/Text/String.sl#L614)</sub>
 
 #### Join *method*
 
@@ -533,7 +529,7 @@ happens.
 
 **See also** &nbsp; [String.Split](#split-method)
 
-<sub>[stdlib/Text/String.sl:640](../../stdlib/Text/String.sl#L640)</sub>
+<sub>[stdlib/Text/String.sl:636](../../stdlib/Text/String.sl#L636)</sub>
 
 #### ToBytes *method*
 
@@ -548,7 +544,7 @@ so handing out the storage would let one be changed through the other.
 
 **See also** &nbsp; [Text.FromBytes](#frombytes-function)
 
-<sub>[stdlib/Text/String.sl:665](../../stdlib/Text/String.sl#L665)</sub>
+<sub>[stdlib/Text/String.sl:661](../../stdlib/Text/String.sl#L661)</sub>
 
 ### StringBuilder *class*
 

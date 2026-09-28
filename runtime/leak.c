@@ -138,8 +138,12 @@ static void sl_leak_report(void);
  *
  * And the lazy form had a race: two threads reaching their first allocation
  * together would both see a null gate and both make one.
+ *
+ * At the first priority a program may use, so that it runs before a library's
+ * statics, which are initialized from a constructor at the last. They
+ * allocate, and they register a teardown that has to run before the report.
  */
-__attribute__((constructor))
+__attribute__((constructor(101)))
 static void sl_leak_start(void)
 {
     sl_live_gate = (SlMutex *)sl_mutex_new();

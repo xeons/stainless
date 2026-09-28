@@ -760,14 +760,11 @@ bool Equals(Rgba other)
 static Rgba Transparent { get; }
 ```
 
-**Properties rather than `static readonly` fields**, which is not a
-style choice. A static needs an entry point to be initialized from and a
-`--shared` library has none (SL0380) -- and this module is compiled into
-every program, including every shared library anybody builds. A property
-is a function, so there is nothing to initialize and nothing to go
-wrong; the six of them fold to four bytes each.
+Properties rather than `static readonly` fields: this module is compiled
+into every program, and a property runs nothing at startup. Each folds
+to four bytes.
 
-<sub>[stdlib/Drawing/Rgba.sl:107](../../stdlib/Drawing/Rgba.sl#L107)</sub>
+<sub>[stdlib/Drawing/Rgba.sl:104](../../stdlib/Drawing/Rgba.sl#L104)</sub>
 
 #### Black *property*
 
@@ -777,7 +774,7 @@ static Rgba Black { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Drawing/Rgba.sl:108](../../stdlib/Drawing/Rgba.sl#L108)</sub>
+<sub>[stdlib/Drawing/Rgba.sl:105](../../stdlib/Drawing/Rgba.sl#L105)</sub>
 
 #### White *property*
 
@@ -787,7 +784,7 @@ static Rgba White { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Drawing/Rgba.sl:109](../../stdlib/Drawing/Rgba.sl#L109)</sub>
+<sub>[stdlib/Drawing/Rgba.sl:106](../../stdlib/Drawing/Rgba.sl#L106)</sub>
 
 #### Red *property*
 
@@ -797,7 +794,7 @@ static Rgba Red { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Drawing/Rgba.sl:110](../../stdlib/Drawing/Rgba.sl#L110)</sub>
+<sub>[stdlib/Drawing/Rgba.sl:107](../../stdlib/Drawing/Rgba.sl#L107)</sub>
 
 #### Green *property*
 
@@ -807,7 +804,7 @@ static Rgba Green { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Drawing/Rgba.sl:111](../../stdlib/Drawing/Rgba.sl#L111)</sub>
+<sub>[stdlib/Drawing/Rgba.sl:108](../../stdlib/Drawing/Rgba.sl#L108)</sub>
 
 #### Blue *property*
 
@@ -817,5 +814,5 @@ static Rgba Blue { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Drawing/Rgba.sl:112](../../stdlib/Drawing/Rgba.sl#L112)</sub>
+<sub>[stdlib/Drawing/Rgba.sl:109](../../stdlib/Drawing/Rgba.sl#L109)</sub>
 

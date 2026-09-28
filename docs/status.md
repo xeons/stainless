@@ -842,8 +842,7 @@ last person to edit it -- the suite is the authority.
   write a literal for a type it does not know, and a bare `default` is the
   same with the type taken from where it is going. Not a new hole in the null
   discipline: a fresh array is zeroed, so `new C[1][0]` was the spelling before
-  it. `String.Empty` is a static property rather than a field, because a
-  `--shared` library has no entry point to initialize a static from
+  it. `String.Empty` is a static property rather than a field
 - `new(...)` with the type left off, taken from a declared local, a field, a
   return, an argument, an element or the other arm of a conditional; with
   nothing to take it from it is SL0756
@@ -987,14 +986,11 @@ Being straight about the edges, roughly in the order they are worth adding:
   discovered. The metadata describes layouts and the reflection tables describe
   fields, and a variant's shape is neither — it is its cases, which nothing yet
   writes down. Its tag is also one byte, so 255 cases is the limit.
-- **A `--shared` library cannot have a static**, of a module or of a type,
-  unless its value is a literal — a number, `null`, `default` — or an
-  `[Embed]`, that the global can simply be born holding: there is no entry
-  point to run any
-  other
-  initializer from (SL0380). There is no
-  per-thread storage either. An automatic static property with no `= value`
-  starts at zero and is one a library may have.
+- **A `--shared` library initializes its statics as it is loaded**, from the
+  C runtime's `DllMain` on Windows and from `.init_array` elsewhere, and tears
+  them down as it is unloaded. On Windows that runs under the loader lock, so
+  an initializer that starts a thread and waits for it deadlocks. There is no
+  per-thread storage.
 - **An enum does not become its number at `extern "C"`.** It crosses as exactly
   its underlying integer where the declaration names the enum, but a
   `[Flags] enum : uint` will not pass to a `uint` parameter without a cast, which

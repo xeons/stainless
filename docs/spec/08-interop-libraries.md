@@ -925,10 +925,8 @@ reads it. `.incbin` is given the length the file had when it was checked, so a
 file that shrank in between is an assembler error rather than a length word
 promising bytes that are not there.
 
-**A static with an `[Embed]` has nothing to initialize**, which is what makes
-one legal in a `--shared` library ([§8.2](#82-building-a-shared-library)):
-initializers run from the entry point and a library has none (SL0380), but this
-global is born holding the object's address. The address is a relocation in
+**A static with an `[Embed]` has nothing to initialize**: the global is born
+holding the object's address. The address is a relocation in
 writable data, which every loader applies, so the only work is the linker's.
 
 ### Rebuilding
