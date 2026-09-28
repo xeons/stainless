@@ -847,4 +847,35 @@ public class EmitterTests
     [InlineData("\tnop # é", "\\09nop # \\C3\\A9")]
     public void AsmTextIsEscapedForAnLlvmString(string text, string escaped) =>
         Assert.Equal(escaped, Emit.LlvmEmitter.AsmString(text));
+
+    /// <summary>
+    /// A library built for Stainless consumers exports what its metadata
+    /// describes. The standard library compiled in beside it stays internal:
+    /// a consumer compiles its own.
+    /// </summary>
+    [Fact]
+    public void AMetadataLibraryExportsOnlyItsOwnModules()
+    {
+        var program = Front.Bind("""
+            module Test;
+            public class Circle
+            {
+                public double Radius;
+                public virtual double Area() => Radius * Radius;
+            }
+            """, out var diagnostics, shared: true);
+        Assert.False(diagnostics.HasErrors);
+
+        string ir = new Emit.LlvmEmitter(forSharedLibrary: true, consumerModules: new HashSet<string> { "Test" })
+            .Emit(Lowering.Lowerer.Lower(program));
+
+        var exported = ir.Split('\n')
+            .Where(l => l.StartsWith("define ", StringComparison.Ordinal)
+                        && !l.StartsWith("define internal", StringComparison.Ordinal)
+                        && l.Contains("@_SL", StringComparison.Ordinal))
+            .ToList();
+
+        Assert.Contains(exported, l => l.Contains("@_SL4Test6Circle4Area", StringComparison.Ordinal));
+        Assert.DoesNotContain(exported, l => l.Contains("@_SL8Standard", StringComparison.Ordinal));
+    }
 }

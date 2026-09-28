@@ -828,9 +828,17 @@ public sealed class Compilation
                 optimized: options.OptimizationLevel > 0)
             : null;
 
+        // What this library declares, as against the standard library compiled
+        // in beside it: the metadata describes these and nothing else.
+        var ownModules = units
+            .Skip(standardUnits)
+            .Select(u => u.ModuleName?.Text)
+            .OfType<string>()
+            .ToHashSet(StringComparer.Ordinal);
+
         var emitter = new LlvmEmitter(
             forSharedLibrary: options.Shared,
-            forStainlessConsumers: options.MetadataPath is not null,
+            consumerModules: options.MetadataPath is not null ? ownModules : null,
             debug: debug,
             sharedRuntime: options.NeedsSharedRuntime,
             abi: target.Abi,
@@ -985,12 +993,6 @@ public sealed class Compilation
         {
             metadataPath = Path.GetFullPath(options.MetadataPath);
             Directory.CreateDirectory(Path.GetDirectoryName(metadataPath) ?? ".");
-            var ownModules = units
-                .Skip(standardUnits)
-                .Select(u => u.ModuleName?.Text)
-                .OfType<string>()
-                .ToHashSet(StringComparer.Ordinal);
-
             File.WriteAllText(metadataPath,
                 MetadataWriter.Write(
                         program, Path.GetFileName(output), ownModules, diagnostics,

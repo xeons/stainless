@@ -668,7 +668,7 @@ public sealed partial class LlvmEmitter
         // calling this one -- the object is taken apart from the outside in, and
         // this is where the outside stops. So a library's public classes hand
         // theirs out, and everything else keeps it to itself.
-        bool exported = forSharedLibrary && forStainlessConsumers && classType.IsPublic;
+        bool exported = DescribedToConsumers(classType.ModuleName) && classType.IsPublic;
 
         string linkage = exported
             ? TargetPlatform.Current.IsWindows ? "dllexport " : ""

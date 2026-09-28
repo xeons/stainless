@@ -84,7 +84,7 @@ public sealed partial class LlvmEmitter
         // still cannot reach it -- what keeps it protected is the binder, and
         // the export only means the linker can find it.
         bool exported = symbol.Linkage is LinkageKind.ExportC or LinkageKind.ExportCpp
-            || (forStainlessConsumers && symbol.Linkage == LinkageKind.Stainless
+            || (DescribedToConsumers(symbol.ModuleName) && symbol.Linkage == LinkageKind.Stainless
                 && !symbol.IsExternal
                 && (symbol.IsPublic || symbol.IsProtected
                     || symbol.Kind == FunctionKind.Constructor)

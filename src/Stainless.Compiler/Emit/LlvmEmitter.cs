@@ -70,6 +70,12 @@ public enum Hold
 /// When true, <c>export "C"</c> functions are marked <c>dllexport</c> so they
 /// reach a Windows DLL's export table, and no C <c>main</c> is emitted.
 /// </param>
+/// <param name="consumerModules">
+/// The modules another Stainless compilation binds against through this
+/// library's metadata, or null when there is no metadata. Their public surface
+/// is exported. The standard library is never among them: a consumer compiles
+/// its own.
+/// </param>
 /// <param name="debug">
 /// The debug metadata graph to describe this program into, or null to emit no
 /// debug information at all. When it is present every instruction carries a
@@ -83,7 +89,7 @@ public enum Hold
 /// cannot, because the address has to come from the import address table.
 /// </param>
 public sealed partial class LlvmEmitter(
-    bool forSharedLibrary = false, bool forStainlessConsumers = false,
+    bool forSharedLibrary = false, IReadOnlySet<string>? consumerModules = null,
     DebugInfo? debug = null, bool sharedRuntime = false,
     CppAbi abi = CppAbi.Microsoft, byte[]? resourceBlob = null)
 {
@@ -134,6 +140,10 @@ public sealed partial class LlvmEmitter(
     /// everything after that argument is somebody else's.
     /// </summary>
     private static string Word => Binding.TargetPlatform.Current.NativeIntType;
+
+    /// <summary>Whether a declaration in this module is part of the library's metadata surface.</summary>
+    private bool DescribedToConsumers(string moduleName) =>
+        forSharedLibrary && consumerModules is not null && consumerModules.Contains(moduleName);
 
     private readonly StringBuilder _module = new();
     private readonly StringBuilder _body = new();

@@ -143,7 +143,7 @@ public sealed partial class LlvmEmitter
             // A library's public classes are allocated through this table by
             // whoever consumes them, so it has to leave the binary.
             string kind = patchBase ? "global" : "constant";
-            string visibility = forSharedLibrary && forStainlessConsumers && classType.IsPublic
+            string visibility = DescribedToConsumers(classType.ModuleName) && classType.IsPublic
                 ? TargetPlatform.Current.IsWindows ? $"dllexport {kind}" : kind
                 : $"internal {kind}";
 
