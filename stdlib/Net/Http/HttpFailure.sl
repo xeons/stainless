@@ -83,11 +83,7 @@ public sealed class HttpFailure
         CompressionErrorCode = CompressionError.None;
     }
 
-    /// The failure in words: the case, and the message when there is one.
-    public String ToString()
-    {
-        if (Message.IsEmpty)
-            return DescribeHttpError(Error);
-        return DescribeHttpError(Error) + ": " + Message;
-    }
+    /// The failure in words: the message, or the case described when there
+    /// is none.
+    public String ToString() => Message.IsEmpty ? DescribeHttpError(Error) : Message;
 }

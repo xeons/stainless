@@ -303,6 +303,3 @@ internal enum HttpCopyOutcome
     ReadFailed,
     WriteFailed,
 }
-
-/// `text`'s bytes as the sequence it is: what a header block is written as.
-internal byte[] ConvertHttpTextToBytes(String text) => text.ToBytes();

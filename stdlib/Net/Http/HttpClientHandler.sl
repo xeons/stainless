@@ -1,0 +1,539 @@
+// Stainless - an experimental general-purpose language.
+// Copyright (C) 2026 Brandon Scott
+//
+// This file is part of the Stainless runtime library. It is free
+// software: you can redistribute it and/or modify it under the terms of
+// the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any
+// later version.
+//
+// It is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or
+// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+// for more details.
+//
+// As an additional permission under section 7 of that License, compiling
+// a program with Stainless does not by itself place that program under
+// the GNU General Public License. See LICENSE.RUNTIME.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+module Standard.Net.Http;
+
+import Standard.Collections;
+import Standard.IO;
+import Standard.IO.Compression;
+import Standard.Limits;
+import Standard.Net.Security;
+import Standard.Text;
+import Standard.Time;
+
+/// What a client does between a request and the wire: connections and their
+/// pool, proxies, TLS, redirects, cookies and decompression.
+///
+///     var handler = new HttpClientHandler();
+///     handler.AutomaticDecompression = DecompressionMethods.All;
+///     handler.MaxConnectionsPerServer = 4;
+///     var client = new HttpClient(handler);
+///
+/// .NET's `HttpClientHandler`, and its defaults. Its settings are read when
+/// a request is sent; the pool is made with the ones in force at the first
+/// request and keeps them.
+public class HttpClientHandler
+{
+    private HttpConnectionPool? _pool;
+    private bool _disposed = false;
+    private HttpServerCertificateValidator _certificateCallback = AcceptHttpCertificateByDefault;
+    private bool _hasCertificateCallback = false;
+
+    public HttpClientHandler() { }
+
+    /// Whether a `3xx` with a `Location` is followed.
+    public bool AllowAutoRedirect { get; set; } = true;
+
+    /// How many redirects one request may follow before it fails with
+    /// `TooManyRedirects`.
+    public int MaxAutomaticRedirections { get; set; } = 50;
+
+    /// Which codings are asked for with `Accept-Encoding` and undone.
+    public DecompressionMethods AutomaticDecompression { get; set; } = DecompressionMethods.None;
+
+    /// Whether `CookieContainer` is sent and filled.
+    public bool UseCookies { get; set; } = true;
+
+    /// The cookies sent and received.
+    public CookieContainer CookieContainer { get; set; } = new CookieContainer();
+
+    /// Whether a proxy is used at all.
+    public bool UseProxy { get; set; } = true;
+
+    /// The proxy, or null for `HttpClient.DefaultProxy`.
+    public IWebProxy? Proxy { get; set; }
+
+    /// Decides whether to trust a server's certificate, in place of the TLS
+    /// module's validator, which it is told the answer of.
+    public HttpServerCertificateValidator ServerCertificateCustomValidationCallback
+    {
+        get => _certificateCallback;
+        set
+        {
+            _certificateCallback = value;
+            _hasCertificateCallback = true;
+        }
+    }
+
+    /// A callback that trusts every certificate. For a test against a server
+    /// with a throwaway certificate, and nothing else: it makes TLS encryption
+    /// without authentication, which a machine in the middle defeats.
+    public static HttpServerCertificateValidator DangerousAcceptAnyServerCertificateValidator =>
+        AcceptAnyHttpCertificate;
+
+    /// The client's certificates, DER, leaf first, sent when a server asks.
+    public List<byte[]> ClientCertificates { get; set; } = new List<byte[]>();
+
+    /// The key of the client's leaf certificate.
+    public TlsSigningKey? ClientCertificateKey { get; set; }
+
+    /// The most connections open to one server at once. A request past it
+    /// waits, within its timeout, for one to be free.
+    public int MaxConnectionsPerServer { get; set; } = Limits.MaxInt;
+
+    /// How long a connection may sit idle in the pool and still be reused.
+    /// Zero pools nothing; negative keeps connections for ever.
+    public TimeSpan PooledConnectionIdleTimeout { get; set; } = TimeSpan.FromMinutes(1);
+
+    /// The most a response head may take, in KiB.
+    public int MaxResponseHeadersLength { get; set; } = 64;
+
+    /// Closes every idle connection. A response still being read keeps its
+    /// connection until it is done with it, and that one is then closed too.
+    public void Dispose()
+    {
+        _disposed = true;
+        var pool = _pool;
+        if (pool != null)
+            pool.CloseAllHttpConnections();
+    }
+
+    internal TlsCertificateValidator CreateHttpCertificateValidator(HttpRequestMessage request)
+    {
+        if (!_hasCertificateCallback)
+            return ValidateTlsCertificateChainByDefault;
+        var check = new HttpCertificateCheck(request, _certificateCallback);
+        return check.ValidateHttpCertificateChain;
+    }
+
+    private HttpConnectionPool EnsureHttpPool()
+    {
+        var existing = _pool;
+        if (existing != null)
+            return existing;
+        int most = MaxConnectionsPerServer;
+        var made = new HttpConnectionPool(most <= 0 ? 1u : (nuint)most, PooledConnectionIdleTimeout);
+        _pool = made;
+        return made;
+    }
+
+    // ------------------------------------------------------------- sending
+
+    /// Sends `request` to its absolute `RequestUri`, following redirects, and
+    /// reads the body into memory unless `option` says to stream it.
+    internal Result<HttpResponseMessage, HttpError> SendHttpRequest(
+        HttpRequestMessage request, HttpCompletionOption option, HttpDeadline deadline,
+        HttpFailure failure, HttpRequestHeaders defaults, long maxBufferSize)
+    {
+        if (_disposed)
+            return Fail(failure.RecordHttpFailure(HttpError.Disposed, "the handler has been disposed"));
+        HttpConnectionPool pool = EnsureHttpPool();
+
+        Uri first = (Uri)request.RequestUri;
+        nuint redirects = 0u;
+        HttpResponseMessage response = new HttpResponseMessage();
+        while (true)
+        {
+            Uri uri = (Uri)request.RequestUri;
+            failure.RequestUri = uri;
+            bool sameOrigin = IsHttpSameOrigin(first, uri);
+            var sent = SendHttpRequestOnce(request, uri, sameOrigin, deadline, failure, defaults, pool);
+            if (!sent.Ok)
+                return Fail(sent.Error);
+            response = sent.Value;
+            response.RequestMessage = request;
+
+            if (UseCookies)
+            {
+                var now = DateTimeOffset.UtcNow;
+                foreach (var header in response.Headers.GetValues("set-cookie"))
+                    CookieContainer.StoreHttpSetCookie(uri, header, now);
+            }
+
+            if (!AllowAutoRedirect)
+                break;
+            if (FindHttpRedirectTarget(response, uri) is not Uri target)
+                break;
+
+            int status = (int)response.StatusCode;
+            HttpMethod method = request.Method;
+            HttpContent? content = request.Content;
+            if (status == 307 || status == 308)
+            {
+                if (content != null && !content.RewindHttpContent())
+                    break;
+            }
+            else if (method.Method != "HEAD")
+            {
+                method = HttpMethod.Get;
+                content = null;
+            }
+
+            redirects++;
+            if (redirects > (nuint)MaxAutomaticRedirections || MaxAutomaticRedirections <= 0)
+            {
+                response.Dispose();
+                return Fail(failure.RecordHttpFailure(HttpError.TooManyRedirects,
+                    "more redirects than MaxAutomaticRedirections allows (" +
+                    Text.FromInteger((long)MaxAutomaticRedirections) + ")"));
+            }
+
+            DiscardHttpResponseBody(response);
+            request.RequestUri = target;
+            request.Method = method;
+            request.Content = content;
+        }
+
+        if (AutomaticDecompression != DecompressionMethods.None)
+            DecodeHttpResponse(response);
+
+        if (option == HttpCompletionOption.ResponseHeadersRead)
+        {
+            deadline.RemoveHttpDeadline();
+            return Ok(response);
+        }
+
+        HttpError buffered = response.Content.LoadIntoBuffer(maxBufferSize);
+        if (buffered != HttpError.None)
+        {
+            response.Dispose();
+            if (buffered == HttpError.ResponseTooLarge)
+            {
+                failure.RecordHttpFailure(buffered, "the body was longer than " +
+                                          Text.FromInteger(maxBufferSize) + " bytes");
+            }
+            else if (buffered == HttpError.DecompressionFailed && response.Content is HttpResponseContent decoded)
+            {
+                failure.CompressionErrorCode = decoded.HttpCompressionError;
+                failure.RecordHttpFailure(buffered, "the body was not valid " +
+                                          DescribeHttpContentCoding(response));
+            }
+            else if (failure.Error != buffered)
+            {
+                failure.RecordHttpFailure(buffered, "the body could not be read");
+            }
+            return Fail(buffered);
+        }
+        return Ok(response);
+    }
+
+    /// One hop: a route, a connection from the pool or a new one, and one
+    /// retry on a new connection when a pooled one turns out to have been
+    /// closed and the request may safely be sent again.
+    private Result<HttpResponseMessage, HttpError> SendHttpRequestOnce(
+        HttpRequestMessage request, Uri uri, bool sameOrigin, HttpDeadline deadline,
+        HttpFailure failure, HttpRequestHeaders defaults, HttpConnectionPool pool)
+    {
+        var routed = ChooseHttpRoute(uri, failure);
+        if (!routed.Ok)
+            return Fail(routed.Error);
+        HttpRoute route = routed.Value;
+
+        var built = BuildHttpWireRequest(request, uri, route, sameOrigin, defaults, failure);
+        if (!built.Ok)
+            return Fail(built.Error);
+        HttpWireRequest wire = built.Value;
+
+        nuint headerLimit = MaxResponseHeadersLength <= 0 ? 1024u : (nuint)MaxResponseHeadersLength * 1024u;
+        var exchange = new HttpExchange(deadline, failure, headerLimit);
+        String key = route.PoolKey;
+        bool allowIdle = true;
+        nuint attempt = 0u;
+        while (true)
+        {
+            attempt++;
+            HttpError reserved = pool.ReserveHttpConnection(key, deadline, allowIdle, out IHttpConnection? idle);
+            if (reserved != HttpError.None)
+            {
+                String why = reserved == HttpError.Timeout
+                    ? "the request timed out waiting for a connection"
+                    : "the handler has been disposed";
+                return Fail(failure.RecordHttpFailure(reserved, why));
+            }
+
+            IHttpConnection connection;
+            if (idle != null)
+            {
+                connection = idle;
+            }
+            else
+            {
+                var opened = OpenHttpConnection(route, this, request, exchange, pool);
+                if (!opened.Ok)
+                {
+                    pool.CancelHttpReservation(key);
+                    return Fail(opened.Error);
+                }
+                connection = opened.Value;
+            }
+
+            exchange.IsRetryable = false;
+            var result = connection.SendHttpRequest(wire, exchange);
+            if (result.Ok)
+            {
+                HttpResponseMessage answered = result.Value;
+                if (route.Proxy == null || route.IsHttps ||
+                    answered.StatusCode != HttpStatusCode.ProxyAuthenticationRequired)
+                    return result;
+                DiscardHttpResponseBody(answered);
+                failure.StatusCode = HttpStatusCode.ProxyAuthenticationRequired;
+                return Fail(failure.RecordHttpFailure(HttpError.ProxyFailure,
+                    "the proxy wants credentials: 407 " + answered.ReasonPhrase));
+            }
+
+            pool.ReleaseHttpConnection(connection, false);
+            HttpContent? content = wire.Content;
+            bool canRetry = attempt == 1u && exchange.IsRetryable &&
+                            result.Error == HttpError.ConnectionClosed && request.Method.IsIdempotent &&
+                            (content == null || content.RewindHttpContent());
+            if (!canRetry)
+                return Fail(result.Error);
+            failure.ResetHttpFailure();
+            failure.RequestUri = uri;
+            allowIdle = false;
+        }
+    }
+
+    /// Direct, or through the proxy this handler or `HttpClient.DefaultProxy`
+    /// names for `uri`.
+    private Result<HttpRoute, HttpError> ChooseHttpRoute(Uri uri, HttpFailure failure)
+    {
+        String scheme = uri.Scheme;
+        if (scheme != "http" && scheme != "https")
+        {
+            return Fail(failure.RecordHttpFailure(HttpError.InvalidRequest,
+                "the scheme '" + scheme + "' is not http or https"));
+        }
+        String host = GetHttpBareHost(uri);
+        int port = uri.Port;
+        if (host.IsEmpty || port <= 0 || port > 65535)
+            return Fail(failure.RecordHttpFailure(HttpError.InvalidRequest, "the URI names no host"));
+        var route = new HttpRoute(scheme, host, (ushort)port);
+
+        if (!UseProxy)
+            return Ok(route);
+        IWebProxy? chosen = Proxy;
+        IWebProxy proxy = chosen != null ? chosen : HttpClient.DefaultProxy;
+        if (proxy.IsBypassed(uri))
+            return Ok(route);
+        if (proxy.GetProxy(uri) is not Uri address || address.Equals(uri))
+            return Ok(route);
+        if (address.Scheme != "http")
+        {
+            return Fail(failure.RecordHttpFailure(HttpError.ProxyFailure,
+                "the proxy '" + address.ToString() + "' is not an http proxy"));
+        }
+        route.Proxy = address;
+        var fromAddress = ReadHttpProxyCredentials(address);
+        route.ProxyCredentials = fromAddress != null ? fromAddress : proxy.Credentials;
+        return Ok(route);
+    }
+
+    /// Every field the request is sent with, in the order it is sent.
+    private Result<HttpWireRequest, HttpError> BuildHttpWireRequest(
+        HttpRequestMessage request, Uri uri, HttpRoute route, bool sameOrigin,
+        HttpRequestHeaders defaults, HttpFailure failure)
+    {
+        HttpMethod method = request.Method;
+        if (!IsHttpToken(method.Method))
+            return Fail(failure.RecordHttpFailure(HttpError.InvalidRequest, "the method is not a token"));
+
+        String path = uri.PathAndQuery;
+        if (path.IsEmpty)
+            path = "/";
+        String target = path;
+        if (route.Proxy != null && !route.IsHttps)
+            target = uri.Scheme + "://" + uri.Authority + path;
+
+        var wire = new HttpWireRequest(method, target);
+        HttpWireHeaders fields = wire.Fields;
+        HttpRequestHeaders headers = request.Headers;
+        String? host = headers.Host;
+        fields.AppendHttpValue("Host", host != null ? host : uri.Authority);
+
+        foreach (var field in defaults.Fields)
+        {
+            if (!headers.Contains(field.Name))
+                AddHttpRequestField(fields, field, sameOrigin);
+        }
+        foreach (var field in headers.Fields)
+            AddHttpRequestField(fields, field, sameOrigin);
+
+        if (AutomaticDecompression != DecompressionMethods.None && !fields.Contains("Accept-Encoding"))
+        {
+            bool gzip = AutomaticDecompression.HasFlag(DecompressionMethods.GZip);
+            bool deflate = AutomaticDecompression.HasFlag(DecompressionMethods.Deflate);
+            fields.AppendHttpValue("Accept-Encoding", gzip && deflate ? "gzip, deflate" : gzip ? "gzip" : "deflate");
+        }
+
+        if (UseCookies)
+        {
+            String cookies = CookieContainer.GetCookieHeader(uri);
+            if (!cookies.IsEmpty)
+            {
+                String? given = fields.GetJoinedHttpValue("cookie");
+                fields.SetHttpValue("Cookie", given == null ? cookies : given + "; " + cookies);
+            }
+        }
+
+        if (route.Proxy != null && !route.IsHttps && route.ProxyCredentials is NetworkCredential credentials)
+            fields.AppendHttpValue("Proxy-Authorization", FormatHttpBasicCredentials(credentials));
+
+        HttpContent? content = request.Content;
+        if (content != null)
+        {
+            wire.Content = content;
+            foreach (var field in content.Headers.Fields)
+            {
+                if (field.Key == "content-length")
+                    continue;
+                foreach (var value in field.Values)
+                    fields.AppendHttpValue(field.Name, value);
+            }
+            var length = content.Headers.ContentLength;
+            if (headers.TransferEncodingChunked || length is not Some known)
+            {
+                wire.IsChunked = true;
+                fields.AppendHttpValue("Transfer-Encoding", "chunked");
+            }
+            else
+            {
+                wire.DeclaredLength = known.Value;
+                fields.AppendHttpValue("Content-Length", Text.FromInteger(known.Value));
+            }
+            if (headers.ExpectContinue)
+            {
+                wire.ExpectContinue = true;
+                fields.AppendHttpValue("Expect", "100-continue");
+            }
+        }
+        else if (method.Method == "POST" || method.Method == "PUT" || method.Method == "PATCH")
+        {
+            fields.AppendHttpValue("Content-Length", "0");
+        }
+
+        foreach (var field in fields.Fields)
+        {
+            foreach (var value in field.Values)
+            {
+                if (!IsHttpFieldValue(value))
+                {
+                    return Fail(failure.RecordHttpFailure(HttpError.InvalidRequest,
+                        "the field '" + field.Name + "' has a control character in it"));
+                }
+            }
+        }
+        return Ok(wire);
+    }
+
+    /// Copies one request field onto the wire, leaving out what this handler
+    /// decides itself, and `Authorization` once a redirect has left the
+    /// origin it was meant for.
+    private void AddHttpRequestField(HttpWireHeaders fields, HttpHeaderField field, bool sameOrigin)
+    {
+        switch (field.Key)
+        {
+            case "host":
+            case "transfer-encoding":
+            case "content-length":
+                return;
+            case "expect":
+                return;
+            case "authorization":
+                if (!sameOrigin)
+                    return;
+                break;
+        }
+        foreach (var value in field.Values)
+            fields.AppendHttpValue(field.Name, value);
+    }
+
+    /// Replaces a response's body with the body decoded, when it was coded
+    /// with one coding this handler was asked to undo.
+    private void DecodeHttpResponse(HttpResponseMessage response)
+    {
+        if (response.Content is not HttpResponseContent content)
+            return;
+        String[] codings = content.Headers.ContentEncoding;
+        if (codings.Length != 1u)
+            return;
+        String coding = codings[0u].ToLowerAscii();
+        IStream raw = content.RawHttpBody;
+        if ((coding == "gzip" || coding == "x-gzip") && AutomaticDecompression.HasFlag(DecompressionMethods.GZip))
+            content.DecodeHttpContent(new GZipStream(raw, CompressionMode.Decompress));
+        else if (coding == "deflate" && AutomaticDecompression.HasFlag(DecompressionMethods.Deflate))
+            content.DecodeHttpContent(new HttpDeflateDecoder(raw));
+        else
+            return;
+        content.Headers.Remove("Content-Encoding");
+        content.Headers.Remove("Content-Length");
+    }
+}
+
+/// The coding a response's content declared, for a message.
+internal String DescribeHttpContentCoding(HttpResponseMessage response)
+{
+    String? coding = response.Content.Headers.GetFirstHttpValue("content-encoding");
+    return coding == null ? "compressed data" : coding;
+}
+
+/// Whether two URIs share a scheme, a host and a port.
+internal bool IsHttpSameOrigin(Uri first, Uri second) =>
+    first.Scheme == second.Scheme && first.Host == second.Host && first.Port == second.Port;
+
+/// Where a response redirects to, resolved against `from`, or null when it is
+/// not a redirect to follow: not a 301, 302, 303, 307 or 308, no `Location`,
+/// a scheme other than http or https, or https to http.
+internal Uri? FindHttpRedirectTarget(HttpResponseMessage response, Uri from)
+{
+    switch ((int)response.StatusCode)
+    {
+        case 301:
+        case 302:
+        case 303:
+        case 307:
+        case 308:
+            break;
+        default:
+            return null;
+    }
+    String? location = response.Headers.GetFirstHttpValue("location");
+    if (location == null)
+        return null;
+    if (Uri.TryCreate(from, location) is not Ok resolved)
+        return null;
+    Uri target = resolved.Value;
+    String scheme = target.Scheme;
+    if (scheme != "http" && scheme != "https")
+        return null;
+    if (from.Scheme == "https" && scheme == "http")
+        return null;
+    return target;
+}
+
+/// Reads and drops what is left of a body nobody wants, so that its
+/// connection can be reused, then releases it.
+internal void DiscardHttpResponseBody(HttpResponseMessage response)
+{
+    if (response.Content is HttpResponseContent content)
+        DrainHttpBody(content.RawHttpBody);
+    response.Dispose();
+}

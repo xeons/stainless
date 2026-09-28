@@ -190,14 +190,6 @@ internal sealed class HttpBufferedReader
         return taken;
     }
 
-    /// The next byte without taking it, or -1 at the end or on a failure.
-    internal int PeekHttpByte()
-    {
-        if (_start == _end && !FillHttpBuffer())
-            return -1;
-        return (int)_buffer[_start];
-    }
-
     private void TakeHttpBytes(nuint count)
     {
         _start += count;

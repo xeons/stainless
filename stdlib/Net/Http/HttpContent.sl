@@ -171,8 +171,6 @@ public abstract class HttpContent
 
     // ------------------------------------------------------------ for the module
 
-    internal bool IsHttpContentBuffered => _buffered;
-
     internal bool TryComputeHttpContentLength(out long length)
     {
         if (_buffered)
