@@ -35,7 +35,7 @@ unknown record type:
 change_cipher_spec of the wrong value:
   client: a message arrived out of order
   fake server heard: alert 10, fatal
-TLS 1.2 ServerHello:
+TLS 1.2 ServerHello to a TLS 1.3 client:
   client: no protocol version in common
   fake server heard: alert 70, fatal
 TLS 1.2 ServerHello with the downgrade sentinel:
@@ -44,7 +44,7 @@ TLS 1.2 ServerHello with the downgrade sentinel:
 ServerHello with an extension never offered:
   client: an extension arrived that was never offered
   fake server heard: alert 110, fatal
-TLS 1.2 ClientHello:
+TLS 1.2 ClientHello to a TLS 1.3 server:
   server: no protocol version in common
   fake client heard: alert 70
 change_cipher_spec before a ClientHello:

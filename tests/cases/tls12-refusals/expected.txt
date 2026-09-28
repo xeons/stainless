@@ -1,0 +1,51 @@
+ClientHello without the extended master secret:
+  server: the handshake failed
+  fake client heard: alert 40
+ClientHello offering only CBC suites:
+  server: no cipher suite in common
+  fake client heard: alert 40
+ClientHello offering only groups not implemented:
+  server: no key-exchange group in common
+  fake client heard: alert 40
+ClientHello renegotiating from the start:
+  server: the handshake failed
+  fake client heard: alert 40
+ClientHello without signature_algorithms:
+  server: the handshake failed
+  fake client heard: alert 40
+ClientHello with compressed points only:
+  server: a message held a forbidden value
+  fake client heard: alert 47
+ServerHello without the extended master secret:
+  client: the handshake failed
+  fake server heard: alert 40, fatal
+ServerKeyExchange in a group never offered:
+  client: a message held a forbidden value
+  fake server heard: alert 47, fatal
+ServerKeyExchange with a wrong signature:
+  client: a signature or Finished did not verify
+  fake server heard: alert 51, fatal
+downgrade sentinel to a client of TLS 1.3 too:
+  client: a message held a forbidden value
+  fake server heard: alert 47, fatal
+downgrade sentinel to a client of TLS 1.2 alone:
+  client: the connection is closed
+  fake server heard: nothing
+change_cipher_spec in place of a Certificate:
+  client: a message arrived out of order
+  fake server heard: alert 10, fatal
+tampered record:
+  server read: a record failed authentication
+  client read 0: the peer sent a fatal alert, alert BadRecordMac
+wrong client Finished:
+  client heard: DecryptError
+  client: the peer sent a fatal alert
+  server: a signature or Finished did not verify
+client asks to renegotiate:
+  sent: no error
+  server answered: NoRenegotiation
+  echo after: 10 bytes, no error
+  server: ok, read ended: no error
+server asks to renegotiate:
+  client read 4 bytes, no error
+  server heard: NoRenegotiation, then no error

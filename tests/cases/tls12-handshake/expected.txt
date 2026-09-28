@@ -1,0 +1,74 @@
+ed25519 TlsEcdheEcdsaWithAes128GcmSha256 X25519: ok Ed25519
+ed25519 TlsEcdheEcdsaWithAes128GcmSha256 Secp256r1: ok Ed25519
+ed25519 TlsEcdheEcdsaWithAes128GcmSha256 Secp384r1: ok Ed25519
+ed25519 TlsEcdheEcdsaWithAes256GcmSha384 X25519: ok Ed25519
+ed25519 TlsEcdheEcdsaWithAes256GcmSha384 Secp256r1: ok Ed25519
+ed25519 TlsEcdheEcdsaWithAes256GcmSha384 Secp384r1: ok Ed25519
+ed25519 TlsEcdheEcdsaWithChaCha20Poly1305Sha256 X25519: ok Ed25519
+ed25519 TlsEcdheEcdsaWithChaCha20Poly1305Sha256 Secp256r1: ok Ed25519
+ed25519 TlsEcdheEcdsaWithChaCha20Poly1305Sha256 Secp384r1: ok Ed25519
+p-256 TlsEcdheEcdsaWithAes128GcmSha256 X25519: ok EcdsaSecp256r1Sha256
+p-256 TlsEcdheEcdsaWithAes128GcmSha256 Secp256r1: ok EcdsaSecp256r1Sha256
+p-256 TlsEcdheEcdsaWithAes128GcmSha256 Secp384r1: ok EcdsaSecp256r1Sha256
+p-256 TlsEcdheEcdsaWithAes256GcmSha384 X25519: ok EcdsaSecp256r1Sha256
+p-256 TlsEcdheEcdsaWithAes256GcmSha384 Secp256r1: ok EcdsaSecp256r1Sha256
+p-256 TlsEcdheEcdsaWithAes256GcmSha384 Secp384r1: ok EcdsaSecp256r1Sha256
+p-256 TlsEcdheEcdsaWithChaCha20Poly1305Sha256 X25519: ok EcdsaSecp256r1Sha256
+p-256 TlsEcdheEcdsaWithChaCha20Poly1305Sha256 Secp256r1: ok EcdsaSecp256r1Sha256
+p-256 TlsEcdheEcdsaWithChaCha20Poly1305Sha256 Secp384r1: ok EcdsaSecp256r1Sha256
+p-384 TlsEcdheEcdsaWithAes128GcmSha256 X25519: ok EcdsaSecp384r1Sha384
+p-384 TlsEcdheEcdsaWithAes128GcmSha256 Secp256r1: ok EcdsaSecp384r1Sha384
+p-384 TlsEcdheEcdsaWithAes128GcmSha256 Secp384r1: ok EcdsaSecp384r1Sha384
+p-384 TlsEcdheEcdsaWithAes256GcmSha384 X25519: ok EcdsaSecp384r1Sha384
+p-384 TlsEcdheEcdsaWithAes256GcmSha384 Secp256r1: ok EcdsaSecp384r1Sha384
+p-384 TlsEcdheEcdsaWithAes256GcmSha384 Secp384r1: ok EcdsaSecp384r1Sha384
+p-384 TlsEcdheEcdsaWithChaCha20Poly1305Sha256 X25519: ok EcdsaSecp384r1Sha384
+p-384 TlsEcdheEcdsaWithChaCha20Poly1305Sha256 Secp256r1: ok EcdsaSecp384r1Sha384
+p-384 TlsEcdheEcdsaWithChaCha20Poly1305Sha256 Secp384r1: ok EcdsaSecp384r1Sha384
+rsa TlsEcdheRsaWithAes128GcmSha256 X25519: ok RsaPssRsaeSha256
+rsa TlsEcdheRsaWithAes128GcmSha256 Secp256r1: ok RsaPssRsaeSha256
+rsa TlsEcdheRsaWithAes128GcmSha256 Secp384r1: ok RsaPssRsaeSha256
+rsa TlsEcdheRsaWithAes256GcmSha384 X25519: ok RsaPssRsaeSha256
+rsa TlsEcdheRsaWithAes256GcmSha384 Secp256r1: ok RsaPssRsaeSha256
+rsa TlsEcdheRsaWithAes256GcmSha384 Secp384r1: ok RsaPssRsaeSha256
+rsa TlsEcdheRsaWithChaCha20Poly1305Sha256 X25519: ok RsaPssRsaeSha256
+rsa TlsEcdheRsaWithChaCha20Poly1305Sha256 Secp256r1: ok RsaPssRsaeSha256
+rsa TlsEcdheRsaWithChaCha20Poly1305Sha256 Secp384r1: ok RsaPssRsaeSha256
+rsa-pss TlsEcdheRsaWithAes128GcmSha256 X25519: ok RsaPssPssSha256
+rsa-pss TlsEcdheRsaWithAes128GcmSha256 Secp256r1: ok RsaPssPssSha256
+rsa-pss TlsEcdheRsaWithAes128GcmSha256 Secp384r1: ok RsaPssPssSha256
+rsa-pss TlsEcdheRsaWithAes256GcmSha384 X25519: ok RsaPssPssSha256
+rsa-pss TlsEcdheRsaWithAes256GcmSha384 Secp256r1: ok RsaPssPssSha256
+rsa-pss TlsEcdheRsaWithAes256GcmSha384 Secp384r1: ok RsaPssPssSha256
+rsa-pss TlsEcdheRsaWithChaCha20Poly1305Sha256 X25519: ok RsaPssPssSha256
+rsa-pss TlsEcdheRsaWithChaCha20Poly1305Sha256 Secp256r1: ok RsaPssPssSha256
+rsa-pss TlsEcdheRsaWithChaCha20Poly1305Sha256 Secp384r1: ok RsaPssPssSha256
+key update in TLS 1.2: no protocol version in common
+large transfer: 307200 bytes each way, intact
+server saw close_notify: yes
+alpn: client http/1.1, server http/1.1
+alpn mismatch:
+  client: the peer sent a fatal alert, alert NoApplicationProtocol
+  server: no application protocol in common
+server saw the name: tls.example.test
+client certificate: ok, client leaf, mutual
+no client certificate:
+  client: the peer sent a fatal alert, alert HandshakeFailure
+  server: a client certificate was required
+exported keys agree: yes
+client 1.2+1.3, server 1.2+1.3:
+  Tls13, TlsChaCha20Poly1305Sha256
+client 1.2, server 1.2:
+  Tls12, TlsEcdheEcdsaWithChaCha20Poly1305Sha256
+client 1.2+1.3, server 1.2:
+  Tls12, TlsEcdheEcdsaWithChaCha20Poly1305Sha256
+client 1.2, server 1.2+1.3:
+  Tls12, TlsEcdheEcdsaWithChaCha20Poly1305Sha256
+client 1.3, server 1.2:
+  client: the peer sent a fatal alert, alert ProtocolVersion
+  server: no protocol version in common
+client 1.2, server 1.3:
+  client: the peer sent a fatal alert, alert ProtocolVersion
+  server: no protocol version in common
+server 1.2+1.3 to a 1.2 client: Tls12, sentinel written
+server 1.2 to a 1.2 client: Tls12, sentinel absent

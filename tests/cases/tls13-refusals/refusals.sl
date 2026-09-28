@@ -257,7 +257,10 @@ Thread StartFakeServer(TcpListener listener, byte[] reply, FakeServerView view)
 
 byte[] Bytes(String hex) => Convert.FromHexString(hex).GetValueOrDefault(new byte[0u]);
 
-void CheckFakeServer(String what, byte[] reply)
+void CheckFakeServer(String what, byte[] reply) =>
+    CheckFakeServer(what, reply, CreateClientOptions());
+
+void CheckFakeServer(String what, byte[] reply, TlsClientOptions options)
 {
     var listening = TcpListener.Listen("127.0.0.1", 0u);
     if (!listening.Ok)
@@ -265,7 +268,7 @@ void CheckFakeServer(String what, byte[] reply)
     TcpListener listener = listening.Value;
     var view = new FakeServerView();
     Thread server = StartFakeServer(listener, reply, view);
-    var client = TlsSocket.Connect("127.0.0.1", listener.LocalEndPoint.Port, CreateClientOptions(),
+    var client = TlsSocket.Connect("127.0.0.1", listener.LocalEndPoint.Port, options,
                                    out TlsAlertDescription alert);
     server.Join();
     listener.Close();
@@ -293,27 +296,34 @@ void CheckFakeServers()
     CheckFakeServer("empty handshake record", Bytes("1603030000"));
     CheckFakeServer("unknown record type", Bytes("1803030001" + "00"));
     CheckFakeServer("change_cipher_spec of the wrong value", Bytes("1403030001" + "02"));
-    CheckFakeServer("TLS 1.2 ServerHello", BuildLegacyServerHello("0000000000000000"));
+    TlsClientOptions tls13Only = CreateClientOptions();
+    tls13Only.EnabledProtocols = TlsProtocolVersion.Tls13;
+    CheckFakeServer("TLS 1.2 ServerHello to a TLS 1.3 client",
+                    BuildLegacyServerHello("0000000000000000"), tls13Only);
     CheckFakeServer("TLS 1.2 ServerHello with the downgrade sentinel",
                     BuildLegacyServerHello("444f574e47524401"));
+    // encrypt_then_mac, which a client of AEAD suites alone never offers.
     CheckFakeServer("ServerHello with an extension never offered",
-                    Bytes("1603030030" + "0200002c" + "0303" +
+                    Bytes("1603030036" + "02000032" + "0303" +
                           "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f" +
-                          "00" + "1301" + "00" + "0004" + "0017" + "0000"));
+                          "00" + "1301" + "00" + "000a" + "002b00020304" + "0016" + "0000"));
 }
 
 // ------------------------------------------------------------ a fake client
 
 /// Connects, writes `bytes` by hand to a real server, and reads what comes
 /// back, which should be an alert.
-void CheckFakeClient(String what, byte[] bytes)
+void CheckFakeClient(String what, byte[] bytes) =>
+    CheckFakeClient(what, bytes, CreateServerOptions());
+
+void CheckFakeClient(String what, byte[] bytes, TlsServerOptions options)
 {
     var listening = TcpListener.Listen("127.0.0.1", 0u);
     if (!listening.Ok)
         return;
     TcpListener listener = listening.Value;
     var view = new ServerView();
-    Thread server = StartServer(listener, CreateServerOptions(), view);
+    Thread server = StartServer(listener, options, view);
     var tcp = TcpClient.Connect("127.0.0.1", listener.LocalEndPoint.Port);
     if (!tcp.Ok)
         return;
@@ -335,10 +345,13 @@ void CheckFakeClient(String what, byte[] bytes)
 void CheckFakeClients()
 {
     // A ClientHello with no extensions: TLS 1.2 at most.
-    CheckFakeClient("TLS 1.2 ClientHello",
+    TlsServerOptions tls13Only = CreateServerOptions();
+    tls13Only.EnabledProtocols = TlsProtocolVersion.Tls13;
+    CheckFakeClient("TLS 1.2 ClientHello to a TLS 1.3 server",
                     Bytes("160301002d" + "01000029" + "0303" +
                           "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f" +
-                          "00" + "0002c02f" + "0100"));
+                          "00" + "0002c02f" + "0100"),
+                    tls13Only);
     CheckFakeClient("change_cipher_spec before a ClientHello", Bytes("1403030001" + "01"));
     CheckFakeClient("application data before a handshake", Bytes("1703030005" + "0102030405"));
 }
