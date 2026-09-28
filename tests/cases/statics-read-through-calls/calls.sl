@@ -14,11 +14,11 @@ public class Label
 
 public static class Settings
 {
-    public static readonly String Called = Describe();
-    public static readonly Label Constructed = new Label();
-    public static readonly String Closed = Apply((String given) => given + Suffix);
+    public static String Called = Describe();
+    public static Label Constructed = new Label();
+    public static String Closed = Apply((String given) => given + Suffix);
 
-    public static readonly String Suffix = "late";
+    public static String Suffix = "late";
 
     static String Describe() => Suffix + "!";
     static String Apply(Func<String, String> make) => make("closed-");
