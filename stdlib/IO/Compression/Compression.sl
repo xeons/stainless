@@ -70,3 +70,171 @@ extern "C"
     byte* memmove(byte* to, byte* from, nuint count);
 }
 
+// ---------------------------------------------------------------- one-shot
+
+/// `data` as raw deflate at `CompressionLevel.Optimal`.
+///
+/// @see Compression.DecompressDeflate
+public byte[] CompressDeflate(ReadOnlySpan<byte> data) =>
+    CompressWithFormat(data, CompressionFormat.Raw, CompressionLevel.Optimal);
+
+/// `data` as raw deflate at `level`.
+///
+/// @param data   what to compress
+/// @param level  how hard to work at it
+public byte[] CompressDeflate(ReadOnlySpan<byte> data, CompressionLevel level) =>
+    CompressWithFormat(data, CompressionFormat.Raw, level);
+
+/// `data` as one gzip member at `CompressionLevel.Optimal`.
+///
+/// @see Compression.DecompressGZip
+public byte[] CompressGZip(ReadOnlySpan<byte> data) =>
+    CompressWithFormat(data, CompressionFormat.GZip, CompressionLevel.Optimal);
+
+/// `data` as one gzip member at `level`.
+///
+/// @param data   what to compress
+/// @param level  how hard to work at it
+public byte[] CompressGZip(ReadOnlySpan<byte> data, CompressionLevel level) =>
+    CompressWithFormat(data, CompressionFormat.GZip, level);
+
+/// `data` as a zlib stream at `CompressionLevel.Optimal`.
+///
+/// @see Compression.DecompressZLib
+public byte[] CompressZLib(ReadOnlySpan<byte> data) =>
+    CompressWithFormat(data, CompressionFormat.ZLib, CompressionLevel.Optimal);
+
+/// `data` as a zlib stream at `level`.
+///
+/// @param data   what to compress
+/// @param level  how hard to work at it
+public byte[] CompressZLib(ReadOnlySpan<byte> data, CompressionLevel level) =>
+    CompressWithFormat(data, CompressionFormat.ZLib, level);
+
+/// What raw deflate `data` expands to. Bytes after the final block are
+/// ignored.
+///
+/// @failure CompressionError.Truncated             the data ends inside a block
+/// @failure CompressionError.InvalidBlockType      a block of the reserved type
+/// @failure CompressionError.StoredLengthMismatch  a stored block's length and
+///                                                 complement disagree
+/// @failure CompressionError.InvalidCodeLengths    a dynamic block's code is
+///                                                 unusable
+/// @failure CompressionError.InvalidCode           a pattern no code stands for
+/// @failure CompressionError.InvalidDistance       a match before the start
+public Result<byte[], CompressionError> DecompressDeflate(ReadOnlySpan<byte> data) =>
+    DecompressWithFormat(data, CompressionFormat.Raw);
+
+/// What gzip `data` expands to, every member of it in order.
+///
+/// @failure CompressionError.Truncated             the data ends inside a
+///                                                 member
+/// @failure CompressionError.InvalidHeader         not a gzip header, or its
+///                                                 CRC does not match
+/// @failure CompressionError.InvalidBlockType      a block of the reserved type
+/// @failure CompressionError.StoredLengthMismatch  a stored block's length and
+///                                                 complement disagree
+/// @failure CompressionError.InvalidCodeLengths    a dynamic block's code is
+///                                                 unusable
+/// @failure CompressionError.InvalidCode           a pattern no code stands for
+/// @failure CompressionError.InvalidDistance       a match before the start
+/// @failure CompressionError.ChecksumMismatch      the CRC-32 does not match
+/// @failure CompressionError.LengthMismatch        the length does not match
+public Result<byte[], CompressionError> DecompressGZip(ReadOnlySpan<byte> data) =>
+    DecompressWithFormat(data, CompressionFormat.GZip);
+
+/// What zlib `data` expands to. Bytes after the trailer are ignored.
+///
+/// @failure CompressionError.Truncated             the data ends early
+/// @failure CompressionError.InvalidHeader         not a zlib header
+/// @failure CompressionError.DictionaryRequired    it needs a preset dictionary
+/// @failure CompressionError.InvalidBlockType      a block of the reserved type
+/// @failure CompressionError.StoredLengthMismatch  a stored block's length and
+///                                                 complement disagree
+/// @failure CompressionError.InvalidCodeLengths    a dynamic block's code is
+///                                                 unusable
+/// @failure CompressionError.InvalidCode           a pattern no code stands for
+/// @failure CompressionError.InvalidDistance       a match before the start
+/// @failure CompressionError.ChecksumMismatch      the Adler-32 does not match
+public Result<byte[], CompressionError> DecompressZLib(ReadOnlySpan<byte> data) =>
+    DecompressWithFormat(data, CompressionFormat.ZLib);
+
+byte[] CompressWithFormat(ReadOnlySpan<byte> data, CompressionFormat format,
+                          CompressionLevel level)
+{
+    var sink = new MemoryStream();
+    var deflater = new Deflater(sink, format, level);
+    deflater.WriteData(data);
+    deflater.Finish();
+    return sink.ToArray();
+}
+
+Result<byte[], CompressionError> DecompressWithFormat(ReadOnlySpan<byte> data,
+                                                      CompressionFormat format)
+{
+    var inflater = new Inflater(new SpanSource(data), format);
+    nuint capacity = data.Length * 4;
+    if (capacity < 4096u)
+        capacity = 4096;
+
+    var output = new byte[capacity];
+    nuint length = 0;
+    for (;;)
+    {
+        if (length == output.Length)
+        {
+            var bigger = new byte[output.Length * 2];
+            memcpy(&bigger[0], &output[0], length);
+            output = bigger;
+        }
+
+        nuint got = inflater.Read(output, length, output.Length - length);
+        if (got == 0)
+            break;
+        length += got;
+    }
+
+    CompressionError failure = inflater.DataError;
+    if (failure != CompressionError.None)
+        return Fail(failure);
+
+    var exact = new byte[length];
+    if (length > 0)
+        memcpy(&exact[0], &output[0], length);
+    return Ok(exact);
+}
+
+// A read-only stream over a span, for the one-shot calls to decompress from.
+class SpanSource : IStream
+{
+    ReadOnlySpan<byte> _data;
+    nuint _at;
+
+    SpanSource(ReadOnlySpan<byte> data)
+    {
+        _data = data;
+        _at = 0;
+    }
+
+    public bool CanRead => true;
+    public bool CanWrite => false;
+    public bool CanSeek => false;
+
+    public nuint Read(byte[] buffer, nuint offset, nuint count)
+    {
+        nuint available = _data.Length - _at;
+        nuint taking = count < available ? count : available;
+        for (nuint i = 0; i < taking; i++)
+            buffer[offset + i] = _data[_at + i];
+        _at += taking;
+        return taking;
+    }
+
+    public nuint Write(byte[] buffer, nuint offset, nuint count) => 0;
+    public long Position => -1;
+    public long Length => -1;
+    public bool Seek(long offset, SeekOrigin origin) => false;
+    public void Flush() { }
+    public void Close() { }
+    public IOError Error => IOError.None;
+}

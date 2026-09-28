@@ -1,0 +1,3 @@
+# The deflate case, built for 32-bit x86: a 32-bit nuint under every
+# window position, and 64-bit bit buffers split across two registers.
+tests/cases/compression-deflate/deflate.sl

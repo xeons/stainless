@@ -1,0 +1,13 @@
+gzip-9 ok
+gzip-1 ok
+gzip-two-members ok
+python-zlib ok
+python-deflate ok
+gzip-header-fields ok
+stream-gzip-9 ok
+stream-two-members ok
+stream-zlib ok
+stream-deflate ok
+gzip-header-crc ok
+gzip-trailing-zeros ok
+gzip-broken-member ok

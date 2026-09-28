@@ -15,3 +15,8 @@
 # and would guess right about most of these, which is not the same as always.
 *.bin binary
 *.der binary
+
+# Compressed fixtures are bytes for the same reason.
+*.gz binary
+*.zlib binary
+*.deflate binary
