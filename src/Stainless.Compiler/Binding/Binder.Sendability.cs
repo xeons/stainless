@@ -104,9 +104,7 @@ public sealed partial class Binder
     /// True for an enum marked <c>[Flags]</c>: a set of bits rather than a
     /// choice among alternatives, and so something <c>|</c> can combine.
     /// </summary>
-    private bool IsFlags(TypeSymbol type) =>
-        type is EnumTypeSymbol enumType &&
-        enumType.Attributes.Any(a => a.Type == _builtins.Flags);
+    private static bool IsFlags(TypeSymbol type) => type is EnumTypeSymbol { IsFlags: true };
 
     /// <summary>
     /// Warns about a value that would be reachable from two threads at once.

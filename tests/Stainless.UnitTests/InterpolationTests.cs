@@ -65,16 +65,15 @@ public class InterpolationTests
     public void ACodeUnitNeedsToSayWhichItMeans(string body) =>
         Assert.Contains("SL0557", Body(body));
 
-    /// <summary>
-    /// An enum would have to write its number, since nothing records a
-    /// member's name. Saying so beats printing a 1 nobody asked for.
-    /// </summary>
-    [Fact]
-    public void AnEnumIsRefusedWithItsReason() =>
-        Assert.Contains("SL0557", Front.ModuleCodes("""
-            public enum Level { Low, High }
-            int Main() { String s = $"{Level.High}"; return 0; }
-            """));
+    /// <summary>An enum writes its member's name, and takes no format.</summary>
+    [Theory]
+    [InlineData("""String s = $"{Level.High}";""", new string[0])]
+    [InlineData("""String s = Level.High.ToText();""", new string[0])]
+    [InlineData("""String s = $"{Level.High:X}";""", new[] { "SL0753" })]
+    [InlineData("""String s = Level.High.ToText("G");""", new[] { "SL0260" })]
+    public void AnEnumWritesItsName(string body, string[] codes) =>
+        Assert.Equal(codes, Front.ModuleCodes(
+            "public enum Level { Low, High }\nint Main() { " + body + " return 0; }"));
 
     /// <summary>
     /// And anything with no text at all. There is no universal ToString, and

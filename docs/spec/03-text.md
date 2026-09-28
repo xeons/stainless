@@ -378,6 +378,7 @@ An interpolation with no holes is a literal, and costs what one costs.
 | `float`, `double` | `Text.FromDouble` |
 | `bool` | `true` or `false` |
 | `char32` | the character it names, not its number |
+| an enum | its member's name, or the names of its set flags ([§2.13](02-types.md#213-enum--a-distinct-type-over-an-integer)) |
 | a class that implements `IFormattable` | its own `ToText(format)` |
 
 Anything else is refused (SL0557) rather than given a default. There is no
@@ -392,11 +393,13 @@ too, and its own `ToText` is called on the value in place, since a struct is
 never a reference to the interface
 ([§2.10](02-types.md#210-interface--a-contract-dispatched-dynamically)).
 
-Two refusals are worth the words they take. A **`char` or `char16` is one code
+One refusal is worth the words it takes. A **`char` or `char16` is one code
 unit, not a character** ([§2.1](02-types.md#21-primitives)), so which of the two meanings was wanted has to
-be said: `(char32)c` writes the character, `(long)c` writes the number. And an
-**enum** would have to write its number, because nothing records a member's
-name yet; the error says so rather than printing a `1`.
+be said: `(char32)c` writes the character, `(long)c` writes the number.
+
+An **enum** writes what C#'s would: `Color.Green` is `Green`, a `[Flags]`
+value is its set flags joined by `", "`, and a value no name covers is its
+number. `value.ToText()` is the same text outside a string.
 
 **Braces.** `{{` and `}}` are how a literal brace is written. A lone `}` closes
 nothing and is refused (SL0554), because it is far more often the end of a hole
@@ -466,6 +469,9 @@ program, as an index out of range does.
 A class that implements `IFormattable` receives the format as written and
 decides what it means, so `{when:yyyy-MM-dd}` is the class's business and is
 not checked.
+
+An enum takes no format, so `{level:D}` is SL0753 too. Its number is a cast
+away — `{(int)level:D}` — which is also where a reader looks for it.
 
 **A conditional in a hole is parenthesised** (SL0755), as in C#. The `:` that
 starts a format is found by the lexer — the format is not code, and

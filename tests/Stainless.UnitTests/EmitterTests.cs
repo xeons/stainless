@@ -74,6 +74,28 @@ public class EmitterTests
     }
 
     /// <summary>
+    /// An enum's text is one function however often it is written, a switch
+    /// with a literal for each named value, and nothing for an enum nobody
+    /// writes.
+    /// </summary>
+    [Fact]
+    public void AnEnumWrittenTwiceHasOneTextFunction()
+    {
+        string ir = Front.ModuleIr(
+            """
+            public enum Level { Low, High, Same = 1 }
+            public enum Unused { Nothing }
+            public String F(Level level) => $"{level} {Level.High}" + level.ToText();
+            """);
+
+        Assert.Equal(1, Occurrences(ir, "define private ptr @_SLtextE"));
+        Assert.Equal(3, Occurrences(Front.TestFunction(ir, "F"), "call ptr @_SLtextE"));
+        Assert.Contains("switch i32 %value, label %unnamed [", ir);
+        Assert.Equal(2, Occurrences(ir, ", label %named."));
+        Assert.DoesNotContain("Unused", ir);
+    }
+
+    /// <summary>
     /// A value that is already the caller's is handed back without a retain,
     /// and one that is borrowed is retained once.
     /// </summary>

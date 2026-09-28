@@ -1,0 +1,9 @@
+Low High 5
+Cold Warm -5
+First Top 1
+Blue Busy
+None | ReadWrite | Read, Execute
+ReadWrite, Execute | 16
+0 | Bold, Italic, Underline
+5
+High [   Red] [Green ] <Green>

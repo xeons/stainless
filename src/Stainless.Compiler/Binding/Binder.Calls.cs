@@ -935,6 +935,20 @@ public sealed partial class Binder
         if (receiver.Type is EnumTypeSymbol flagsEnum && member.Member == "HasFlag")
             return BindHasFlag(syntax, member, receiver, flagsEnum, arguments);
 
+        // `ToText` is the other: the text an interpolation writes, as a
+        // String of its own.
+        if (receiver.Type is EnumTypeSymbol named && member.Member == "ToText")
+        {
+            if (arguments.Count == 0)
+                return EnumText(receiver, named, syntax.Span);
+
+            diagnostics.Error("SL0260", syntax.Span,
+                $"'{named.Name}.ToText' takes no arguments, but {Given(arguments.Count)}; " +
+                "an enum's text has no format",
+                named);
+            return new BoundErrorExpression(syntax.Span);
+        }
+
         if (member.TypeArguments is not null && receiver.Type is not NamedTypeSymbol)
         {
             return TryBindAsFreeFunction(syntax, member, receiver, arguments)

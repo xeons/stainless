@@ -159,18 +159,8 @@ public sealed partial class Binder
         if (_builtins.IsString(value.Type)) return value;
         if (AsFormattable(value, "", span) is { } written) return written;
 
-        // An enum is a distinct type and does not become its integer on its own
-        // (SL0410), and writing the number would rarely be what was wanted
-        // anyway -- the member's name would be, and nothing records those yet.
         if (value.Type is EnumTypeSymbol enumType)
-        {
-            diagnostics.Error("SL0557", span,
-                $"'{enumType.Name}' is an enum, and an interpolation would have to write its " +
-                "number rather than its name -- nothing records a member's name yet. Cast it, " +
-                "as in '(long)value', or write the name you meant",
-                enumType);
-            return new BoundErrorExpression(span);
-        }
+            return EnumText(value, enumType, span);
 
         // A code unit is not a character, and the cast that says which is
         // meant is the same one SL0527 asks for everywhere else.
@@ -367,6 +357,39 @@ public sealed partial class Binder
 
         var literal = new BoundLiteral(span, PrimitiveTypeSymbol.Int, unchecked((ulong)width));
         return new BoundCall(span, _builtins.TextAlignText, receiver: null, [text, literal]);
+    }
+
+    private readonly Dictionary<EnumTypeSymbol, FunctionSymbol> _enumTexts = [];
+
+    /// <summary>
+    /// An enum value as its member's name: what <c>$"{value}"</c> and
+    /// <c>value.ToText()</c> both write, and what .NET's <c>Enum.ToString</c>
+    /// writes. A value one member has is that member's name, the first
+    /// declared where two share it. A <c>[Flags]</c> value is the members
+    /// that cover it, largest first, written smallest first and joined by
+    /// <c>", "</c>. Anything else is the number.
+    ///
+    /// The call is to a function the emitter writes, one per enum formatted.
+    /// </summary>
+    private BoundExpression EnumText(
+        BoundExpression value, EnumTypeSymbol enumType, SourceSpan span)
+    {
+        if (!_enumTexts.TryGetValue(enumType, out var function))
+        {
+            function = new FunctionSymbol
+            {
+                Name = "ToText",
+                ModuleName = enumType.ModuleName,
+                ReturnType = _builtins.String,
+                Linkage = LinkageKind.Stainless,
+                Span = enumType.Span ?? span,
+                TextOfEnum = enumType,
+            };
+            function.Parameters.Add(new ParameterSymbol("value", enumType, 0));
+            _enumTexts[enumType] = function;
+        }
+
+        return new BoundCall(span, function, receiver: null, [value]);
     }
 
     /// <summary>

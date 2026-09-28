@@ -2425,8 +2425,39 @@ strongly typed as a single one. On an enum without the marker they are rejected,
 and the error suggests the marker.
 
 `HasFlag(f)` is `(value & f) == f` written out, which is why it means *all* the
-named bits and not any of them. It is the one member an enum has: enums declare
-no methods, so this is the language spelling the test rather than a call.
+named bits and not any of them. Enums declare no methods, so this is the
+language spelling the test rather than a call.
+
+**An enum's text is its member's name**, as C#'s `ToString` writes it.
+`value.ToText()` is that text as a `String`, and `$"{value}"` writes the same
+([§3.8](03-text.md#38-interpolation)):
+
+| The value | Written |
+|---|---|
+| one member's | its name, and the first declared where two members share a value |
+| a `[Flags]` value no one member has | the members that cover it, joined by `", "` |
+| `0` of a `[Flags]` enum with no zero member | `0` |
+| anything no name covers | the number, signed if the underlying type is |
+
+```csharp
+$"{Access.Read | Access.Execute}"                   // Read, Execute
+$"{Access.Read | Access.Write | Access.Execute}"    // All
+$"{(Access)8}"                                      // 8
+Color.Green.ToText()                                // Green
+```
+
+The flags are taken the way .NET takes them: from the largest member down,
+each one whose bits are all still set, so a member that is itself a
+combination is named in place of its parts. They are written smallest first.
+If any bit is left over, no name covers the value and the number is written
+instead. `ToText` and `HasFlag` are the members an enum has, and neither takes
+a format.
+
+The text costs one function per enum that a program writes, emitted where it is
+needed: a `switch` from each named value to a literal, which returns without
+allocating, and the runtime for the rest. A library's enum carries its names
+and its `[Flags]` in the metadata, so a consumer writes one exactly as the
+library would.
 
 `[Flags]` needs no import. It is a rule about enums rather than a library to opt
 into, unlike `[Reflect]`, which comes with the subsystem it belongs to.

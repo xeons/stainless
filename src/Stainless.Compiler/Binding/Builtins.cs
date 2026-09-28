@@ -64,6 +64,9 @@ public sealed class Builtins
     /// </summary>
     public const string StandardModuleName = "Standard";
 
+    /// <summary>The qualified name of <c>[Flags]</c>, which an enum is asked for.</summary>
+    public const string FlagsName = StandardModuleName + ".Flags";
+
     public ModuleSymbol Text { get; }
     public ModuleSymbol Standard { get; }
     public ModuleSymbol Com { get; }

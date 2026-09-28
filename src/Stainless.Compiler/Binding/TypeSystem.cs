@@ -1042,6 +1042,12 @@ public sealed class EnumTypeSymbol : NamedTypeSymbol
 
     public EnumMemberSymbol? FindMember(string name) =>
         Members.FirstOrDefault(m => m.Name == name);
+
+    /// <summary>
+    /// Marked <c>[Flags]</c>: a set of bits rather than a choice among
+    /// alternatives. Settled in pass 6, with the rest of the attributes.
+    /// </summary>
+    public bool IsFlags => Attributes.Any(a => a.Type.QualifiedName == Builtins.FlagsName);
 }
 
 public class StructTypeSymbol : NamedTypeSymbol

@@ -248,6 +248,86 @@ public sealed partial class LlvmEmitter
         return Fresh(new Val(joined, "ptr", expression.Type));
     }
 
+    private readonly List<FunctionSymbol> _enumTexts = [];
+    private readonly HashSet<FunctionSymbol> _enumTextsAsked = [];
+
+    /// <summary>
+    /// The text of each enum something wrote: a switch from every named value
+    /// to its name as a literal, and <c>sl_enum_text</c> for the rest -- a
+    /// combination of flags, or a number. Private to the module, so a library
+    /// and its consumer each have their own.
+    /// </summary>
+    private void EmitEnumTexts()
+    {
+        foreach (var function in _enumTexts)
+        {
+            var enumType = function.TextOfEnum!;
+            var underlying = enumType.UnderlyingType;
+            string type = LlvmTypeOf(underlying);
+            int width = underlying.Bits;
+            ulong mask = width >= 64 ? ulong.MaxValue : (1UL << width) - 1;
+
+            // The first declared of two members with one value is its name.
+            var named = enumType.Members
+                .GroupBy(m => m.Value & mask)
+                .Select(g => (Value: g.Key, g.First().Name))
+                .ToList();
+
+            string parameter = Declared(ClassifyParameter(function.Parameters[0])).Single();
+
+            _module.AppendLine();
+            _module.AppendLine($"define private ptr {Symbol(function)}({parameter} %value) {{");
+            _module.AppendLine("entry:");
+            _module.AppendLine($"  switch {type} %value, label %unnamed [");
+            for (int i = 0; i < named.Count; i++)
+                _module.AppendLine(
+                    $"    {type} {FormatInteger(named[i].Value, underlying)}, label %named.{i}");
+            _module.AppendLine("  ]");
+
+            for (int i = 0; i < named.Count; i++)
+            {
+                _module.AppendLine($"named.{i}:");
+                _module.AppendLine($"  ret ptr {InternStringObject(named[i].Name)}");
+            }
+
+            // Largest first, which is the order flags are taken in.
+            var flags = enumType.IsFlags
+                ? named.Where(m => m.Value != 0).OrderByDescending(m => m.Value).ToList()
+                : [];
+
+            string values = "null";
+            string names = "null";
+            if (flags.Count > 0)
+            {
+                values = "@" + NextMetadataName("flagvalues");
+                names = "@" + NextMetadataName("flagnames");
+                var valueCells = flags.Select(f => $"i64 {unchecked((long)f.Value)}");
+                var nameCells = flags.Select(f => $"ptr {InternStringObject(f.Name)}");
+                _metadata.AppendLine(
+                    $"{values} = private constant [{flags.Count} x i64] " +
+                    $"[{string.Join(", ", valueCells)}]");
+                _metadata.AppendLine(
+                    $"{names} = private constant [{flags.Count} x ptr] " +
+                    $"[{string.Join(", ", nameCells)}]");
+            }
+
+            _module.AppendLine("unnamed:");
+            string bits = "%value";
+            if (width < 64)
+            {
+                bits = "%bits";
+                _module.AppendLine($"  %bits = zext {type} %value to i64");
+            }
+
+            _module.AppendLine(
+                $"  %text = call ptr @sl_enum_text(i64 {bits}, i32 {width}, " +
+                $"i32 {(underlying.IsSigned ? 1 : 0)}, ptr {values}, ptr {names}, " +
+                $"{Word} {flags.Count})");
+            _module.AppendLine("  ret ptr %text");
+            _module.AppendLine("}");
+        }
+    }
+
     /// <summary>The immortal byte[] behind a <c>"..."u8</c>, one per distinct text.</summary>
     private string InternUtf8Array(string text)
     {

@@ -237,6 +237,56 @@ void *sl_string_join(void *const *parts, size_t count)
     return joined;
 }
 
+/*
+ * The flags are taken greedily from the largest, as .NET takes them, so a
+ * member that is itself a combination is named in place of its parts. They are
+ * written smallest first, which is the reverse, so the text is filled from its
+ * end on a second pass that makes the same choices.
+ */
+void *sl_enum_text(uint64_t bits, int32_t width, int32_t isSigned,
+                   const uint64_t *flags, void *const *names, size_t count)
+{
+    uint64_t rest   = bits;
+    size_t   length = 0;
+    size_t   found  = 0;
+    for (size_t i = 0; i < count; i += 1) {
+        if ((rest & flags[i]) != flags[i]) continue;
+
+        rest &= ~flags[i];
+        length += ((SlString *)names[i])->byteLength;
+        found += 1;
+    }
+
+    if (found > 0 && rest == 0) {
+        length += (found - 1) * 2;
+        SlString *text = sl_string_new(length);
+        uint8_t  *at   = sl_string_data(text) + length;
+
+        rest = bits;
+        for (size_t i = 0; i < count; i += 1) {
+            if ((rest & flags[i]) != flags[i]) continue;
+
+            if (rest != bits) {
+                at -= 2;
+                memcpy(at, ", ", 2);
+            }
+            rest &= ~flags[i];
+
+            SlString *name = (SlString *)names[i];
+            at -= name->byteLength;
+            memcpy(at, sl_string_data(name), name->byteLength);
+        }
+        return text;
+    }
+
+    if (isSigned && width < 64) {
+        int shift = 64 - width;
+        return sl_string_from_integer((long long)((int64_t)(bits << shift) >> shift));
+    }
+    if (isSigned) return sl_string_from_integer((long long)bits);
+    return sl_string_from_unsigned(bits);
+}
+
 void *sl_string_concat(void *leftPointer, void *rightPointer)
 {
     SlString *left  = (SlString *)leftPointer;

@@ -366,6 +366,13 @@ public sealed class FunctionSymbol
     public bool IsExternal { get; init; }
 
     /// <summary>
+    /// The enum whose members' names this writes, or null. Such a function has
+    /// no body and no declaration: the emitter writes one for each enum a
+    /// program formats, as a switch over the enum's values.
+    /// </summary>
+    public EnumTypeSymbol? TextOfEnum { get; init; }
+
+    /// <summary>
     /// The property this accessor belongs to, as the metadata named it. The
     /// property symbol itself is rebuilt from the accessor pair afterwards.
     /// </summary>

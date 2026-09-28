@@ -409,6 +409,10 @@ public sealed partial class LlvmEmitter
         Declare("sl_string_join",
             $"declare noalias ptr @sl_string_join(ptr, {Word}) nounwind");
 
+        // An enum value no single member names. See EmitEnumTexts.
+        Declare("sl_enum_text",
+            $"declare noalias ptr @sl_enum_text(i64, i32, i32, ptr, ptr, {Word}) nounwind");
+
         Declare("sl_args_set", "declare void @sl_args_set(i32, ptr) nounwind");
         Declare("sl_console_start", "declare void @sl_console_start() nounwind");
 

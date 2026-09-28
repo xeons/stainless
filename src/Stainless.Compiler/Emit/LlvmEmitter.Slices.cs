@@ -428,6 +428,8 @@ public sealed partial class LlvmEmitter
         if (TryEmitInlineIntrinsic(call, out var inline)) return inline;
 
         var function = call.Function;
+        if (function.TextOfEnum is not null && _enumTextsAsked.Add(function))
+            _enumTexts.Add(function);
         var returnInfo = ClassifyResult(function.ReturnType);
 
         var arguments = new List<string>();

@@ -466,6 +466,7 @@ public static class MetadataWriter
         Size = type.Size,
         Alignment = type.Alignment,
         Underlying = MetadataTypeNames.Write(type.UnderlyingType),
+        IsFlags = type.IsFlags,
         Members = type.Members
             .Select(m => new MetadataEnumMember { Name = m.Name, Value = m.Value })
             .ToList(),

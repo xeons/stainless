@@ -213,6 +213,13 @@ public sealed record MetadataType
     public List<MetadataEnumMember> Members { get; init; } = [];
 
     /// <summary>
+    /// An enum marked <c>[Flags]</c>. It crosses because what it permits is
+    /// the consumer's to check: <c>|</c> on its members, <c>HasFlag</c>, and
+    /// its text as the flags that are set.
+    /// </summary>
+    public bool IsFlags { get; init; }
+
+    /// <summary>
     /// The TypeInfo symbol a consumer allocates through. A class is made with
     /// <c>sl_alloc(TypeInfo*)</c>, so the library's table has to be reachable by
     /// name rather than rebuilt on the other side — rebuilding it would give the

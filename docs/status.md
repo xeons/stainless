@@ -350,7 +350,9 @@ last person to edit it -- the suite is the authority.
   `$$"""..."""` sets how many braces open a hole. A hole takes C#'s alignment
   and .NET's standard numeric formats, `{price,10:N2}`, with the format
   checked when the program compiles, and a class that implements
-  `IFormattable` writes itself
+  `IFormattable` writes itself. An enum writes its member's name, or a
+  `[Flags]` value its set flags joined by `", "`, as .NET's `Enum.ToString`
+  does, and `value.ToText()` is the same text as a `String`
 - `@name`: a keyword as a name, exported and mangled as the bare word
 - A string API to go with it: `StartsWith`, `Contains`, `IndexOf`,
   `LastIndexOf`, `Substring`, `SubstringBefore`/`SubstringAfter`/`SubstringAfterLast`, `Trim`, `Replace`,
@@ -456,7 +458,8 @@ last person to edit it -- the suite is the authority.
   and `Color.Red` still names the member, as C#'s Color Color rule has it
 - `[Flags]` enums: `|`, `&`, `^` and `~` on an enum whose members are bits,
   producing that same enum rather than its number, plus `HasFlag`. The marker
-  needs no import, because it is a rule about enums rather than a library
+  needs no import, because it is a rule about enums rather than a library, and
+  it crosses in a library's metadata with the members' names
 - `ref`, `in` and `out` parameters: the caller's storage rather than a copy of
   it. `ref` is writable and `in` is not; `out` is writable and *must* be
   written, which is the promise that lets the caller pass a variable holding

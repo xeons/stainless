@@ -304,6 +304,7 @@ public sealed partial class LlvmEmitter(
         // After the functions, because a thunk clobbers the per-function state
         // the one that asked for it is still using.
         EmitThunks();
+        EmitEnumTexts();
 
         foreach (var classType in program.Classes)
             EmitDestroyThunk(classType);

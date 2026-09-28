@@ -631,6 +631,12 @@ SL_API void  *sl_string_concat(void *left, void *right);
 /* Several strings into one, in a single allocation: what an interpolated
  * string lowers to. A null part contributes nothing. */
 SL_API void  *sl_string_join(void *const *parts, size_t count);
+
+/* An enum value that no single member has, as .NET's Enum.ToString writes it:
+ * the [Flags] members that cover it joined by ", ", or else the number. `bits`
+ * is the value at `width` bits, and the flags are nonzero, largest first. */
+SL_API void  *sl_enum_text(uint64_t bits, int32_t width, int32_t isSigned,
+                           const uint64_t *flags, void *const *names, size_t count);
 SL_API _Bool  sl_string_equals(void *left, void *right);
 SL_API void  *sl_string_substring(void *pointer, size_t start, size_t length);
 

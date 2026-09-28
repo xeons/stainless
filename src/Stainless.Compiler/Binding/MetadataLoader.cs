@@ -410,6 +410,9 @@ public sealed class MetadataLoader(
             foreach (var member in described.Members)
                 enumType.Members.Add(new EnumMemberSymbol(member.Name, enumType, member.Value));
 
+            if (described.IsFlags)
+                enumType.Attributes.Add(new AppliedAttribute(builtins.Flags, []));
+
             return;
         }
 

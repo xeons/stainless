@@ -132,6 +132,13 @@ public static class Mangler
         if (function.Linkage is LinkageKind.ExternC or LinkageKind.ExportC)
             return Decorated(function);
 
+        if (function.TextOfEnum is { } enumType)
+        {
+            var text = new StringBuilder("_SLtext");
+            AppendType(text, enumType);
+            return text.ToString();
+        }
+
         var sb = new StringBuilder("_SL");
 
         foreach (string segment in function.ModuleName.Split('.', StringSplitOptions.RemoveEmptyEntries))
