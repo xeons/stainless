@@ -67,11 +67,6 @@ public static class CppMangler
                 : CppAbi.Itanium
             : OperatingSystem.IsWindows() ? CppAbi.Microsoft : CppAbi.Itanium;
 
-    public static CppAbi AbiFor(string targetTriple) =>
-        targetTriple.Contains("msvc", StringComparison.OrdinalIgnoreCase)
-            ? CppAbi.Microsoft
-            : CppAbi.Itanium;
-
     /// <summary>
     /// The linker name for a C++ function.
     ///

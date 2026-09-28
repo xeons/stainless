@@ -390,4 +390,35 @@ public class TargetTests
             Assert.Empty(Front.Codes(diagnostics));
             Assert.Null(ModuleDefinition.For(program));
         });
+
+    // ------------------------------------------------------------ exporting
+
+    private const string Exported = """export "C" int Answer() => 42;""";
+
+    /// <summary>The target decides, not the machine compiling.</summary>
+    [Fact]
+    public void AWindowsLibraryMarksItsExports() =>
+        Under(TargetPlatform.X64Windows, () =>
+            Assert.Contains("define dllexport i32 @Answer", Front.ModuleIr(Exported)));
+
+    [Fact]
+    public void ALinuxLibraryExportsByVisibility() =>
+        Under(TargetPlatform.X64Linux, () =>
+        {
+            string ir = Front.ModuleIr(Exported, CppAbi.Itanium);
+            Assert.Contains("define i32 @Answer", ir);
+            Assert.DoesNotContain("dllexport", ir);
+        });
+
+    /// <summary>Bit-fields are laid out by the target's C ABI.</summary>
+    [Fact]
+    public void ALinuxTargetPacksBitFieldsAcrossTypes() =>
+        Under(TargetPlatform.X64Linux, () =>
+        {
+            var program = Front.Bind("""
+                module Test;
+                public struct Mixed { public int A : 3; public byte B : 2; }
+                """, out _, shared: true);
+            Assert.Equal(4, program.Structs.Single(s => s.Name == "Mixed").Size);
+        });
 }

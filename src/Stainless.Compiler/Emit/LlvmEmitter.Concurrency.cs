@@ -660,7 +660,7 @@ public sealed partial class LlvmEmitter
         bool exported = forSharedLibrary && forStainlessConsumers && classType.IsPublic;
 
         string linkage = exported
-            ? OperatingSystem.IsWindows() ? "dllexport " : ""
+            ? TargetPlatform.Current.IsWindows ? "dllexport " : ""
             : "internal ";
 
         _module.AppendLine($"define {linkage}void @{DestroyName(classType)}(ptr %obj)"

@@ -97,7 +97,7 @@ public sealed partial class LlvmEmitter
             // Windows needs dllimport on data. A function the linker can reach
             // through a generated thunk; a constant it cannot, because the
             // address has to come from the import address table.
-            _module.AppendLine(OperatingSystem.IsWindows()
+            _module.AppendLine(TargetPlatform.Current.IsWindows
                 ? $"@{imported} = external dllimport constant %SlTypeInfo"
                 : $"@{imported} = external constant %SlTypeInfo");
 
@@ -116,7 +116,7 @@ public sealed partial class LlvmEmitter
                      .OfType<string>()
                      .Distinct(StringComparer.Ordinal)
                      .Order(StringComparer.Ordinal))
-            _module.AppendLine(OperatingSystem.IsWindows()
+            _module.AppendLine(TargetPlatform.Current.IsWindows
                 ? $"declare dllimport void @{destroy}(ptr)"
                 : $"declare void @{destroy}(ptr)");
 
@@ -135,7 +135,7 @@ public sealed partial class LlvmEmitter
             // a constant initializer -- it is written at startup instead, and
             // the table has to be writable to be written to. ELF needs none of
             // this: a relocation into another shared object is ordinary there.
-            bool patchBase = OperatingSystem.IsWindows() &&
+            bool patchBase = TargetPlatform.Current.IsWindows &&
                              classType.BaseClass is { IsReferenced: true };
 
             if (patchBase) patched.Add(classType);
@@ -144,7 +144,7 @@ public sealed partial class LlvmEmitter
             // whoever consumes them, so it has to leave the binary.
             string kind = patchBase ? "global" : "constant";
             string visibility = forSharedLibrary && forStainlessConsumers && classType.IsPublic
-                ? OperatingSystem.IsWindows() ? $"dllexport {kind}" : kind
+                ? TargetPlatform.Current.IsWindows ? $"dllexport {kind}" : kind
                 : $"internal {kind}";
 
             string baseInfo = classType.BaseClass is { } derivedFrom && !patchBase

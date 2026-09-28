@@ -720,7 +720,7 @@ public sealed class Compilation
         var phase = System.Diagnostics.Stopwatch.StartNew();
         var program = new Binder(
             diagnostics, requireEntryPoint: needsEntryPoint, references: references,
-            cppAbi: options.CppAbi).Bind(units);
+            cppAbi: target.Abi).Bind(units);
         ReportPhase("bind", phase);
         if (diagnostics.HasErrors) return Failed(diagnostics);
 

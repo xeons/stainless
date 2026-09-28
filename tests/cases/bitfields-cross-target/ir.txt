@@ -1,0 +1,2 @@
+# Itanium's four bytes, not Microsoft's eight.
+%struct.Bits_Mixed = type { [4 x i8] }

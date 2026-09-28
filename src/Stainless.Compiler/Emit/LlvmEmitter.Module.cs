@@ -380,7 +380,7 @@ public sealed partial class LlvmEmitter
         // The runtime's own tables. When it is a shared library on Windows
         // these are reached through the import address table, and only the
         // declaration can say so.
-        string runtimeConstant = sharedRuntime && OperatingSystem.IsWindows()
+        string runtimeConstant = sharedRuntime && TargetPlatform.Current.IsWindows
             ? "external dllimport constant"
             : "external constant";
 

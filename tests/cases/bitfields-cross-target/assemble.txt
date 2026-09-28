@@ -1,0 +1,2 @@
+# Built to an x86-64 Linux object file and not run, so that a Windows host
+# is asked for a layout it does not use itself.

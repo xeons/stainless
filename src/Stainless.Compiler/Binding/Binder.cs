@@ -114,8 +114,8 @@ public sealed partial class Binder(
 {
     private readonly Builtins _builtins = new();
 
-    /// <summary>The C++ ABI names are mangled for, defaulting to the host's.</summary>
-    private readonly CppAbi _cppAbi = cppAbi ?? CppMangler.HostAbi;
+    /// <summary>The C++ ABI names are mangled and bit-fields laid out for, defaulting to the target's.</summary>
+    private readonly CppAbi _cppAbi = cppAbi ?? TargetPlatform.Current.Abi;
     private readonly Dictionary<string, ModuleSymbol> _modules = new(StringComparer.Ordinal);
     private readonly List<(FileScope Scope, CompilationUnitSyntax Unit)> _units = [];
     private readonly List<BoundFunction> _functions = [];

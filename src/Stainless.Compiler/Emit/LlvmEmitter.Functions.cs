@@ -105,7 +105,7 @@ public sealed partial class LlvmEmitter
         // them here as well would export both. See ModuleDefinition.
         string storage = forSharedLibrary
                          && exported
-                         && OperatingSystem.IsWindows()
+                         && TargetPlatform.Current.IsWindows
                          && !Mangler.IsDecorated(symbol)
             ? "dllexport "
             : "";

@@ -113,7 +113,7 @@ public sealed partial class LlvmEmitter
         // written once at startup, and the literal has to be writable to be
         // written to. Everywhere else the loader relocates it and the literal
         // stays where a constant belongs.
-        bool bindAtStartup = sharedRuntime && OperatingSystem.IsWindows();
+        bool bindAtStartup = sharedRuntime && TargetPlatform.Current.IsWindows;
 
         string storage = bindAtStartup ? "private unnamed_addr global" : "private unnamed_addr constant";
         string typeField = bindAtStartup ? "ptr null" : "ptr @sl_string_type_info";
