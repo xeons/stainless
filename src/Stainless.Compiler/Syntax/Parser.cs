@@ -244,6 +244,10 @@ public sealed class Parser
     /// </summary>
     private readonly List<SourceSpan> _sliceSpellings = [];
 
+    /// <summary>Drops the spellings met since the count was taken, whose tokens are to be read again.</summary>
+    private void ForgetSliceSpellings(int count) =>
+        _sliceSpellings.RemoveRange(count, _sliceSpellings.Count - count);
+
     /// <summary>Each speculation that failed, by what was attempted and at which token.</summary>
     private readonly HashSet<(System.Reflection.MethodInfo Attempt, int Position)> _failedSpeculations = [];
 
@@ -296,7 +300,7 @@ public sealed class Parser
                 _tokens[index] = token;
             }
 
-            _sliceSpellings.RemoveRange(savedSliceSpellings, _sliceSpellings.Count - savedSliceSpellings);
+            ForgetSliceSpellings(savedSliceSpellings);
             _failedSpeculations.Add(key);
             result = null;
             return false;
@@ -3304,6 +3308,7 @@ public sealed class Parser
         // `Circle { Radius: > 1 }`, `List<int>`. A plain name with nothing
         // after it is left to the binder, which knows whether `Low` is a
         // constant or a type.
+        int sliceSpellings = _sliceSpellings.Count;
         if ((At(TokenKind.Identifier) || AtAny(PrimitiveKeywords)) &&
             Speculate(() => (TypeSyntax?)ParseType(allowFixedLength: false), out var parsed) &&
             parsed is not null)
@@ -3330,6 +3335,7 @@ public sealed class Parser
                 return new TypePatternSyntax(SpanFrom(start), type, null, SpanFrom(start));
 
             _pos = start;
+            ForgetSliceSpellings(sliceSpellings);
         }
 
         // `case default:` is almost always a `default:` label written wrong,
@@ -3960,6 +3966,7 @@ public sealed class Parser
 
         int savedPos = _pos;
         int savedSplits = _splits.Count;
+        int savedSliceSpellings = _sliceSpellings.Count;
         int savedDepth = _depth;
         bool savedTooDeep = _tooDeep;
         int taken = _bracketsTakenAsConditional;
@@ -3977,6 +3984,7 @@ public sealed class Parser
 
         _pos = savedPos;
         RestoreSplits(savedSplits);
+        ForgetSliceSpellings(savedSliceSpellings);
         _depth = savedDepth;
         _tooDeep = savedTooDeep;
         _diagnostics = savedDiagnostics;
@@ -4330,6 +4338,7 @@ public sealed class Parser
     {
         int savedPos = _pos;
         int savedSplits = _splits.Count;
+        int savedSliceSpellings = _sliceSpellings.Count;
         int savedDepth = _depth;
         bool savedTooDeep = _tooDeep;
         var savedDiagnostics = _diagnostics;
@@ -4352,6 +4361,7 @@ public sealed class Parser
             {
                 _pos = savedPos;
                 RestoreSplits(savedSplits);
+                ForgetSliceSpellings(savedSliceSpellings);
                 _tooDeep = savedTooDeep;
             }
         }

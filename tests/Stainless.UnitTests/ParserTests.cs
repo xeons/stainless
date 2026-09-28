@@ -360,6 +360,29 @@ public class ParserTests
     public void SliceBoundsMayBeOmitted(string source, string shape) =>
         Assert.Equal(shape, Shape(source));
 
+    /// <summary>
+    /// A statement that opens with <c>a[:]</c> is tried as a declaration of a
+    /// <c>T[:]</c> first. That guess is put back when it fails, and so is its
+    /// complaint about how a slice is spelled.
+    /// </summary>
+    [Theory]
+    [InlineData("a[:].CopyTo(b);")]
+    [InlineData("a[:][0u] = 1;")]
+    [InlineData("a[:][1:].CopyTo(b);")]
+    public void AWholeSliceOpeningAStatementIsAnExpression(string statement)
+    {
+        Front.Parse($"module A;\nvoid F(int[] a, int[] b) {{ {statement} }}", out var diagnostics);
+        Assert.DoesNotContain(diagnostics.Items, d => d.Code == "SL0807");
+    }
+
+    /// <summary>And a slice's type written that way is still told how it is spelled.</summary>
+    [Fact]
+    public void ASliceTypeWrittenWithBracketsIsStillRefused()
+    {
+        Front.Parse("module A;\nvoid F(int[] a) { int[:] c = a[:]; }", out var diagnostics);
+        Assert.Contains(diagnostics.Items, d => d.Code == "SL0807");
+    }
+
     // ------------------------------------------------- indexes and ranges
 
     /// <summary>
