@@ -5,6 +5,11 @@
 //
 //   stainless run samples/http-get.sl -- http://example.com/
 //   stainless run samples/http-get.sl -- --gzip https://example.com/
+//   stainless run samples/http-get.sl -- --http2 https://example.com/
+//
+// `--http2` asks for HTTP/2 and takes HTTP/1.1 when the server will not agree
+// to h2 in ALPN; `--http2-only` takes nothing else, and speaks h2 with prior
+// knowledge to an http URL.
 //
 // An https URL is trusted by the TLS module's validator, so it reaches a real
 // site once that validator checks X.509 chains against the platform's roots;
@@ -19,17 +24,31 @@ import Standard.Time;
 int Main(String[] args)
 {
     bool gzip = false;
+    Version version = HttpVersion.Version11;
+    HttpVersionPolicy policy = HttpVersionPolicy.RequestVersionOrLower;
     String url = "";
     foreach (var argument in args)
     {
-        if (argument == "--gzip")
-            gzip = true;
-        else
-            url = argument;
+        switch (argument)
+        {
+            case "--gzip":
+                gzip = true;
+                break;
+            case "--http2":
+                version = HttpVersion.Version20;
+                break;
+            case "--http2-only":
+                version = HttpVersion.Version20;
+                policy = HttpVersionPolicy.RequestVersionExact;
+                break;
+            default:
+                url = argument;
+                break;
+        }
     }
     if (url.IsEmpty)
     {
-        Console.WriteError("usage: http-get [--gzip] <url>");
+        Console.WriteError("usage: http-get [--gzip] [--http2 | --http2-only] <url>");
         return 2;
     }
 
@@ -40,8 +59,10 @@ int Main(String[] args)
     client.Timeout = TimeSpan.FromSeconds(30);
     client.DefaultRequestHeaders.UserAgent = "stainless-http-get/1.0";
 
-    var sent = client.Send(new HttpRequestMessage(HttpMethod.Get, url),
-                           HttpCompletionOption.ResponseContentRead, out HttpFailure failure);
+    var request = new HttpRequestMessage(HttpMethod.Get, url);
+    request.Version = version;
+    request.VersionPolicy = policy;
+    var sent = client.Send(request, HttpCompletionOption.ResponseContentRead, out HttpFailure failure);
     if (!sent.Ok)
     {
         Console.WriteError("http-get: " + failure.ToString());
