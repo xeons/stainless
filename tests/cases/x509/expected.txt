@@ -183,3 +183,4 @@ request refuses validity past the issuer's ok
 request refuses a zero serial number ok
 request with an extension twice does not read back ok
 name builder refuses a three-letter country ok
+a twin of an anchor is an untrusted root ok

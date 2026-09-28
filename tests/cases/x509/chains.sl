@@ -2,6 +2,7 @@
 module X509Case;
 
 import Standard.Console;
+import Standard.Security.Cryptography;
 import Standard.Security.Cryptography.X509Certificates;
 
 /// Builds a chain for `leaf` against `anchors` alone, through `extra`, for a
@@ -177,4 +178,23 @@ void CheckPolicyChoices()
           !chain.Build(LoadFixture("good", GoodPem)) &&
           chain.StatusFlags == X509ChainStatusFlags.NotTimeValid &&
           chain.ChainElements[2u].StatusFlags == X509ChainStatusFlags.NoError);
+}
+
+/// A self-signed certificate is its own root, untrusted when it is no anchor,
+/// and is not chained to an anchor that only shares its name. A developer's
+/// `CN=localhost` in the system store is that anchor on some machines.
+Result<bool, CryptoError> CheckTwinRoots()
+{
+    var trustedKey = try X509SignatureGenerator.CreateForEd25519(CreateFilledBytes(32u, 0x33));
+    var strangerKey = try X509SignatureGenerator.CreateForEd25519(CreateFilledBytes(32u, 0x44));
+    var trusted = try MintAuthority(trustedKey, "Twin", HashAlgorithmName.Sha256);
+    var stranger = try MintAuthority(strangerKey, "Twin", HashAlgorithmName.Sha256);
+
+    var chain = new X509Chain();
+    chain.ChainPolicy.TrustMode = X509ChainTrustMode.CustomRootTrust;
+    chain.ChainPolicy.CustomTrustStore.Add(trusted);
+    bool built = chain.Build(stranger);
+    Check("a twin of an anchor is an untrusted root",
+          !built && chain.StatusFlags == X509ChainStatusFlags.UntrustedRoot);
+    return Ok(true);
 }

@@ -120,6 +120,8 @@ public int Main()
     MatchHostnames();
     BuildChains();
     CreateRequests();
+    if (!CheckTwinRoots().Ok)
+        Console.WriteLine("twin roots FAIL: could not mint");
     return 0;
 }
 

@@ -176,7 +176,7 @@ public sealed class X509Chain
         bool extended = false;
         if (path.Count < MaximumLength)
         {
-            foreach (X509Certificate2 candidate in FindIssuers(last))
+            foreach (X509Certificate2 candidate in OrderIssuers(last, FindIssuers(last)))
             {
                 if (_candidatesTried >= MaximumCandidates)
                     break;
@@ -227,6 +227,40 @@ public sealed class X509Chain
         }
         return found;
     }
+
+    /// `candidates` with those whose key verifies `certificate`'s signature
+    /// first. A name is only a claim, and a store can hold two certificates
+    /// of one name — a developer's `CN=localhost` beside a test's.
+    ///
+    /// A self-issued certificate that verifies under its own key and under no
+    /// candidate's is a root in its own right, untrusted unless it is an
+    /// anchor, and is not chained to a stranger that shares its name. Anything
+    /// else keeps the candidates that do not verify, after the ones that do,
+    /// so a tampered certificate is still reported as a bad signature.
+    private static List<X509Certificate2> OrderIssuers(X509Certificate2 certificate,
+                                                      List<X509Certificate2> candidates)
+    {
+        var verified = new List<X509Certificate2>();
+        var claimed = new List<X509Certificate2>();
+        foreach (X509Certificate2 candidate in candidates)
+        {
+            if (IsSignedBy(certificate, candidate))
+                verified.Add(candidate);
+            else
+                claimed.Add(candidate);
+        }
+
+        if (verified.Count == 0u && certificate.IsSelfIssued && IsSignedBy(certificate, certificate))
+            return verified;
+
+        foreach (X509Certificate2 candidate in claimed)
+            verified.Add(candidate);
+        return verified;
+    }
+
+    private static bool IsSignedBy(X509Certificate2 certificate, X509Certificate2 issuer) =>
+        SignatureVerifier.Verify(certificate.SignatureAlgorithm, certificate.SignatureParameters,
+                                 issuer.PublicKey, certificate.SignedPart, certificate.Signature);
 
     private static bool CouldHaveIssued(X509Certificate2 issuer, X509Certificate2 certificate)
     {
