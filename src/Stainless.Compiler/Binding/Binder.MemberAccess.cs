@@ -223,7 +223,7 @@ public sealed partial class Binder
         // `Aes.BlockSize` -- a value inlined here, belonging to the type.
         // Before the statics, because a constant has no storage to read and
         // the two cannot collide: SL0205 refuses a type that declares both.
-        if (!syntax.ThroughPointer && ResolveTypePrefix(syntax.Target) is { } constantOwner &&
+        if (!syntax.ThroughPointer && ResolveTypePrefix(syntax.Target, syntax.Member) is { } constantOwner &&
             constantOwner.FindConstant(syntax.Member) is { } inlined)
         {
             if (!CanReach(inlined.IsPublic, isProtected: false, constantOwner))
@@ -240,7 +240,7 @@ public sealed partial class Binder
         // delegate to say which overload was meant -- the same thing a bare
         // function name is.
         // `Counter.Total` -- storage that belongs to the type.
-        if (!syntax.ThroughPointer && ResolveTypePrefix(syntax.Target) is { } holder &&
+        if (!syntax.ThroughPointer && ResolveTypePrefix(syntax.Target, syntax.Member) is { } holder &&
             holder.FindStatic(syntax.Member) is { } onType)
         {
             if (!CanReach(onType.IsPublic, isProtected: false, holder))
@@ -256,7 +256,7 @@ public sealed partial class Binder
         // `Config.Retries` where Retries is a static property: two static
         // methods wearing the spelling of a field, exactly as an instance
         // property is.
-        if (!syntax.ThroughPointer && ResolveTypePrefix(syntax.Target) is { } propertyOwner &&
+        if (!syntax.ThroughPointer && ResolveTypePrefix(syntax.Target, syntax.Member) is { } propertyOwner &&
             FindStaticProperty(propertyOwner, syntax.Member, syntax.Target) is { } onTheType)
         {
             if (RefuseStaticRequirement(onTheType.Getter!, propertyOwner, syntax.Span))
@@ -265,7 +265,7 @@ public sealed partial class Binder
             return BindPropertyRead(syntax.Span, receiver: null, onTheType);
         }
 
-        if (!syntax.ThroughPointer && ResolveTypePrefix(syntax.Target) is { } staticOwner &&
+        if (!syntax.ThroughPointer && ResolveTypePrefix(syntax.Target, syntax.Member) is { } staticOwner &&
             staticOwner.FindMethods(syntax.Member).ToList() is { Count: > 0 } declared)
         {
             var statics = declared.Where(m => m.IsStatic).ToList();

@@ -829,15 +829,37 @@ public sealed partial class Binder
             : null;
     }
 
-    private NamedTypeSymbol? ResolveTypePrefix(ExpressionSyntax target)
+    private NamedTypeSymbol? ResolveTypePrefix(ExpressionSyntax target, string member)
     {
         if (ConstructedTypeNamed(target) is { } constructed)
             return constructed as NamedTypeSymbol;
         if (FlattenName(target) is not { } parts) return null;
-        if (NamesAValue(parts[0])) return null;
+
+        if (NamesAValue(parts[0]))
+        {
+            // C#'s Color Color rule, as for an enum: a property `PublicKey` of
+            // type `PublicKey` leaves `PublicKey.Create()` naming the type's
+            // static, because a value of that type has no instance member of
+            // that name to reach.
+            if (parts.Count == 1 && TypeNamed(parts) is NamedTypeSymbol same &&
+                TypeOfValueNamed(parts[0]) == same && HasStaticMember(same, member))
+            {
+                return same;
+            }
+
+            return null;
+        }
 
         return TypeNamed(parts) as NamedTypeSymbol;
     }
+
+    private static bool HasStaticMember(NamedTypeSymbol type, string member) =>
+        type.FindMethods(member).Any(m => m.IsStatic) ||
+        type.GenericMethods.Any(m => m.Name == member &&
+                                   m.Declaration.Modifiers.HasFlag(Modifiers.Static)) ||
+        type.FindStatic(member) is not null ||
+        type.FindConstant(member) is not null ||
+        type.FindProperty(member) is { Getter.IsStatic: true };
 
     /// <summary>
     /// The instantiation a <c>Box&lt;int&gt;</c> or

@@ -2390,7 +2390,10 @@ interop all need that cast written out. That is the trade, made deliberately.
 **A member may be named for its enum type**, as C# allows. Inside `struct Pen`
 with a property `public Color Color`, `Color.Red` is still the enum's member:
 a value of type `Color` has no member named `Red` to reach, so the name can
-only mean the type. The same holds for a field, a parameter or a local.
+only mean the type. The same holds for a field, a parameter or a local, and
+for a class or struct: with a property `public PublicKey PublicKey`,
+`PublicKey.Create()` calls the type's static, because a value of the type has
+no instance member of that name to reach.
 
 Enums compare and do not compute:
 

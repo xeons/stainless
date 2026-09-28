@@ -86,7 +86,7 @@ public sealed partial class Binder
         // did not exist. `Helper.Take(() => 5)` said "'Helper' is not defined",
         // which is true of nothing and sends the reader to the wrong file.
         if (syntax.Callee is MemberAccessSyntax { ThroughPointer: false } onType &&
-            ResolveTypePrefix(onType.Target) is { } staticOwner &&
+            ResolveTypePrefix(onType.Target, onType.Member) is { } staticOwner &&
             (staticOwner.FindMethods(onType.Member).ToList() is { Count: > 0 } named2
                  && (named2.Any(m => m.IsStatic) || ResolveModulePrefix(onType.Target) is null)
              || staticOwner.GenericMethods.Any(m => m.Name == onType.Member)
@@ -97,7 +97,7 @@ public sealed partial class Binder
         // `K.Handler(2)` and `Module.s_handler(2)`: a static holding a closure
         // or a delegate, reached through the type or the module that owns it.
         if (syntax.Callee is MemberAccessSyntax { ThroughPointer: false } held &&
-            (ResolveTypePrefix(held.Target) is not null || ResolveModulePrefix(held.Target) is { } holder &&
+            (ResolveTypePrefix(held.Target, held.Member) is not null || ResolveModulePrefix(held.Target) is { } holder &&
                 !holder.FindFunctions(held.Member).Any()) &&
             BindCallableValue(held) is { } heldValue)
             return BuildIndirectCall(syntax, heldValue, arguments);
