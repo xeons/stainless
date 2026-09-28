@@ -1,0 +1,33 @@
+bytes forward:  [0 1 0 1 2 3 4 5 8 9]
+bytes backward: [3 4 5 6 7 8 9 7 8 9]
+too short: refused
+fits: copied [3 4 5]
+empty copy: [3 4 5] 0
+fill: [3 4 9 9 9 9 9 9 8 9]
+clear: [3 4 0 0 0 0 0 0 8 9]
+to array: [4 0 0]
+points forward:  [0/0 0/0 1/100 2/200 3/300 5/500]
+points backward: [1/100 2/200 3/300 5/500 3/300 5/500]
+fill: [1/100 7/70 7/70 7/70 3/300 5/500]
+clear: [1/100 0/0 0/0 0/0 3/300 5/500]
+tags copied: [1 2 3 4]
+tags forward: [1 1 2 3]
+tags backward: [1 2 3 3]
+~Tag 4
+fill: [1 1 1 1]
+clear: [- - - -]
+named: [1a 1a 2b]
+~Tag 1
+~Tag 2
+~Tag 3
+byte list: [99 7 7 7 2 3 5 6 7 8 9 99 7 7 7 2 3 5 6 7 8 9] [99 7 7 7 2 3 5 6 7 8 9 99 7 7 7 2 3 5 6 7 8 9]
+copied into: [0 99 7 7 7 2 3 5 6 7 8 9 99 7 7 7 2 3 5 6 7 8 9 0]
+point list: [42/42 0/0 42/42 0/0 1/-1 3/-3 4/-4 5/-5 1/-1 3/-3 4/-4 5/-5]
+~Tag 10
+~Tag 11
+~Tag 12
+tag list: [20 13 14 20 13 14]
+~Tag 20
+~Tag 13
+~Tag 14
+cleared

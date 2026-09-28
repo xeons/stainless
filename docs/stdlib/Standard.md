@@ -946,13 +946,16 @@ Copies every element into the start of `destination`, aborting when it
 is shorter. The two may overlap: the elements land as they were before
 the copy began.
 
+**Elements that hold no counted reference move as one `memmove`**;
+the rest are copied one at a time, so every count stays right.
+
 **Parameters**
 
 - `destination` — where the elements go
 
 **See also** &nbsp; [ReadOnlySpan.TryCopyTo](#trycopyto-method)
 
-<sub>[stdlib/Standard/ReadOnlySpan.sl:80](../../stdlib/Standard/ReadOnlySpan.sl#L80)</sub>
+<sub>[stdlib/Standard/ReadOnlySpan.sl:83](../../stdlib/Standard/ReadOnlySpan.sl#L83)</sub>
 
 #### TryCopyTo *method*
 
@@ -969,7 +972,7 @@ enough, and answers whether it was.
 
 **Returns** &nbsp; true when the elements were copied
 
-<sub>[stdlib/Standard/ReadOnlySpan.sl:102](../../stdlib/Standard/ReadOnlySpan.sl#L102)</sub>
+<sub>[stdlib/Standard/ReadOnlySpan.sl:113](../../stdlib/Standard/ReadOnlySpan.sl#L113)</sub>
 
 #### Slice *method*
 
@@ -983,7 +986,7 @@ The elements from `start` to the end, aborting when `start` is past it.
 
 - `start` — the first element of the result
 
-<sub>[stdlib/Standard/ReadOnlySpan.sl:113](../../stdlib/Standard/ReadOnlySpan.sl#L113)</sub>
+<sub>[stdlib/Standard/ReadOnlySpan.sl:124](../../stdlib/Standard/ReadOnlySpan.sl#L124)</sub>
 
 #### Slice *method*
 
@@ -998,7 +1001,7 @@ ReadOnlySpan<T> Slice(nuint start, nuint length)
 - `start` — the first element of the result
 - `length` — how many elements it covers
 
-<sub>[stdlib/Standard/ReadOnlySpan.sl:119](../../stdlib/Standard/ReadOnlySpan.sl#L119)</sub>
+<sub>[stdlib/Standard/ReadOnlySpan.sl:130](../../stdlib/Standard/ReadOnlySpan.sl#L130)</sub>
 
 #### ToArray *method*
 
@@ -1008,7 +1011,7 @@ T[] ToArray()
 
 A new array holding a copy of the elements.
 
-<sub>[stdlib/Standard/ReadOnlySpan.sl:122](../../stdlib/Standard/ReadOnlySpan.sl#L122)</sub>
+<sub>[stdlib/Standard/ReadOnlySpan.sl:133](../../stdlib/Standard/ReadOnlySpan.sl#L133)</sub>
 
 #### Overlaps *method*
 
@@ -1022,7 +1025,7 @@ Whether the two view any element in common.
 
 - `other` — the span to compare with
 
-<sub>[stdlib/Standard/ReadOnlySpan.sl:133](../../stdlib/Standard/ReadOnlySpan.sl#L133)</sub>
+<sub>[stdlib/Standard/ReadOnlySpan.sl:143](../../stdlib/Standard/ReadOnlySpan.sl#L143)</sub>
 
 #### Overlaps *method*
 
@@ -1038,7 +1041,7 @@ relative to this, in elements -- negative when it starts before.
 - `other` — the span to compare with
 - `elementOffset` — where `other` starts, counted from this one's start
 
-<sub>[stdlib/Standard/ReadOnlySpan.sl:142](../../stdlib/Standard/ReadOnlySpan.sl#L142)</sub>
+<sub>[stdlib/Standard/ReadOnlySpan.sl:152](../../stdlib/Standard/ReadOnlySpan.sl#L152)</sub>
 
 #### operator == *operator*
 
@@ -1049,7 +1052,7 @@ static bool operator ==(ReadOnlySpan<T> left, ReadOnlySpan<T> right)
 Whether the two are the same elements of the same array: C#'s rule,
 which compares where they are rather than what they hold.
 
-<sub>[stdlib/Standard/ReadOnlySpan.sl:156](../../stdlib/Standard/ReadOnlySpan.sl#L156)</sub>
+<sub>[stdlib/Standard/ReadOnlySpan.sl:166](../../stdlib/Standard/ReadOnlySpan.sl#L166)</sub>
 
 #### operator != *operator*
 
@@ -1059,7 +1062,7 @@ static bool operator !=(ReadOnlySpan<T> left, ReadOnlySpan<T> right)
 
 Whether the two are not the same elements of the same array.
 
-<sub>[stdlib/Standard/ReadOnlySpan.sl:161](../../stdlib/Standard/ReadOnlySpan.sl#L161)</sub>
+<sub>[stdlib/Standard/ReadOnlySpan.sl:171](../../stdlib/Standard/ReadOnlySpan.sl#L171)</sub>
 
 ### Result&lt;T, TError&gt; *variant*
 
@@ -1247,7 +1250,7 @@ Sets every element to `value`.
 
 - `value` — what each element becomes
 
-<sub>[stdlib/Standard/Span.sl:90](../../stdlib/Standard/Span.sl#L90)</sub>
+<sub>[stdlib/Standard/Span.sl:100](../../stdlib/Standard/Span.sl#L100)</sub>
 
 #### CopyTo *method*
 
@@ -1265,7 +1268,7 @@ the copy began.
 
 **See also** &nbsp; [Span.TryCopyTo](#trycopyto-method)
 
-<sub>[stdlib/Standard/Span.sl:102](../../stdlib/Standard/Span.sl#L102)</sub>
+<sub>[stdlib/Standard/Span.sl:138](../../stdlib/Standard/Span.sl#L138)</sub>
 
 #### TryCopyTo *method*
 
@@ -1282,7 +1285,7 @@ enough, and answers whether it was.
 
 **Returns** &nbsp; true when the elements were copied
 
-<sub>[stdlib/Standard/Span.sl:113](../../stdlib/Standard/Span.sl#L113)</sub>
+<sub>[stdlib/Standard/Span.sl:149](../../stdlib/Standard/Span.sl#L149)</sub>
 
 #### Slice *method*
 
@@ -1296,7 +1299,7 @@ The elements from `start` to the end, aborting when `start` is past it.
 
 - `start` — the first element of the result
 
-<sub>[stdlib/Standard/Span.sl:122](../../stdlib/Standard/Span.sl#L122)</sub>
+<sub>[stdlib/Standard/Span.sl:158](../../stdlib/Standard/Span.sl#L158)</sub>
 
 #### Slice *method*
 
@@ -1311,7 +1314,7 @@ Span<T> Slice(nuint start, nuint length)
 - `start` — the first element of the result
 - `length` — how many elements it covers
 
-<sub>[stdlib/Standard/Span.sl:128](../../stdlib/Standard/Span.sl#L128)</sub>
+<sub>[stdlib/Standard/Span.sl:164](../../stdlib/Standard/Span.sl#L164)</sub>
 
 #### ToArray *method*
 
@@ -1321,7 +1324,7 @@ T[] ToArray()
 
 A new array holding a copy of the elements.
 
-<sub>[stdlib/Standard/Span.sl:131](../../stdlib/Standard/Span.sl#L131)</sub>
+<sub>[stdlib/Standard/Span.sl:167](../../stdlib/Standard/Span.sl#L167)</sub>
 
 #### Overlaps *method*
 
@@ -1335,7 +1338,7 @@ Whether the two view any element in common.
 
 - `other` — the span to compare with
 
-<sub>[stdlib/Standard/Span.sl:140](../../stdlib/Standard/Span.sl#L140)</sub>
+<sub>[stdlib/Standard/Span.sl:176](../../stdlib/Standard/Span.sl#L176)</sub>
 
 #### Overlaps *method*
 
@@ -1351,7 +1354,7 @@ relative to this, in elements -- negative when it starts before.
 - `other` — the span to compare with
 - `elementOffset` — where `other` starts, counted from this one's start
 
-<sub>[stdlib/Standard/Span.sl:151](../../stdlib/Standard/Span.sl#L151)</sub>
+<sub>[stdlib/Standard/Span.sl:187](../../stdlib/Standard/Span.sl#L187)</sub>
 
 #### operator == *operator*
 
@@ -1362,7 +1365,7 @@ static bool operator ==(Span<T> left, Span<T> right)
 Whether the two are the same elements of the same array: C#'s rule,
 which compares where they are rather than what they hold.
 
-<sub>[stdlib/Standard/Span.sl:159](../../stdlib/Standard/Span.sl#L159)</sub>
+<sub>[stdlib/Standard/Span.sl:195](../../stdlib/Standard/Span.sl#L195)</sub>
 
 #### operator != *operator*
 
@@ -1372,7 +1375,7 @@ static bool operator !=(Span<T> left, Span<T> right)
 
 Whether the two are not the same elements of the same array.
 
-<sub>[stdlib/Standard/Span.sl:166](../../stdlib/Standard/Span.sl#L166)</sub>
+<sub>[stdlib/Standard/Span.sl:202](../../stdlib/Standard/Span.sl#L202)</sub>
 
 ### Uri *class*
 

@@ -151,6 +151,14 @@ extern "C"
 
 extern "C" int memcmp(byte* left, byte* right, nuint count);
 
+// What a span's copies and clears call for elements that hold no counted
+// reference. See `RuntimeHelpers.IsReferenceOrContainsReferences`.
+extern "C"
+{
+    byte* memmove(byte* to, byte* from, nuint count);
+    byte* memset(byte* to, int value, nuint count);
+}
+
 int CompareLong(long left, long right)
 {
     if (left < right)

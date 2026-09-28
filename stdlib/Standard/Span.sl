@@ -80,8 +80,18 @@ public struct Span<T>
     /// Sets every element to `default(T)`, releasing whatever they held.
     public void Clear()
     {
-        for (nuint i = 0u; i < _length; i++)
-            this[i] = default(T);
+        if (_length == 0u)
+            return;
+
+        if (!RuntimeHelpers.IsReferenceOrContainsReferences<T>())
+        {
+            memset((byte*)&_array[_offset], 0, _length * sizeof(T));
+        }
+        else
+        {
+            for (nuint i = 0u; i < _length; i++)
+                this[i] = default(T);
+        }
     }
 
     /// Sets every element to `value`.
@@ -89,8 +99,34 @@ public struct Span<T>
     /// @param value  what each element becomes
     public void Fill(T value)
     {
-        for (nuint i = 0u; i < _length; i++)
-            this[i] = value;
+        if (_length == 0u)
+            return;
+
+        if (!RuntimeHelpers.IsReferenceOrContainsReferences<T>())
+        {
+            // The first element, then what is filled so far copied after
+            // itself, doubling each time.
+            this[0u] = value;
+            var start = (byte*)&_array[_offset];
+            if (sizeof(T) == 1u)
+            {
+                memset(start, (int)*start, _length);
+                return;
+            }
+
+            nuint filled = 1u;
+            while (filled < _length)
+            {
+                nuint step = filled < _length - filled ? filled : _length - filled;
+                memmove(start + filled * sizeof(T), start, step * sizeof(T));
+                filled += step;
+            }
+        }
+        else
+        {
+            for (nuint i = 0u; i < _length; i++)
+                this[i] = value;
+        }
     }
 
     /// Copies every element into the start of `destination`, aborting when it

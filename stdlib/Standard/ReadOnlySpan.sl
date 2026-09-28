@@ -75,23 +75,34 @@ public struct ReadOnlySpan<T>
     /// is shorter. The two may overlap: the elements land as they were before
     /// the copy began.
     ///
+    /// **Elements that hold no counted reference move as one `memmove`**;
+    /// the rest are copied one at a time, so every count stays right.
+    ///
     /// @param destination  where the elements go
     /// @see ReadOnlySpan.TryCopyTo
     public void CopyTo(Span<T> destination)
     {
         Span<T> target = destination[:_length];
+        if (_length == 0u)
+            return;
 
-        // Front to back would overwrite what is still to be read when the
-        // target starts inside the source.
-        if (_length != 0u && target._array == _array && target._offset > _offset)
+        if (!RuntimeHelpers.IsReferenceOrContainsReferences<T>())
         {
+            memmove((byte*)&target._array[target._offset], (byte*)&_array[_offset],
+                _length * sizeof(T));
+        }
+        else if (target._array == _array && target._offset > _offset)
+        {
+            // Front to back would overwrite what is still to be read when the
+            // target starts inside the source.
             for (nuint i = _length; i > 0u; i--)
                 target[i - 1u] = this[i - 1u];
-            return;
         }
-
-        for (nuint i = 0u; i < _length; i++)
-            target[i] = this[i];
+        else
+        {
+            for (nuint i = 0u; i < _length; i++)
+                target[i] = this[i];
+        }
     }
 
     /// Copies every element into the start of `destination` when it is long
@@ -122,8 +133,7 @@ public struct ReadOnlySpan<T>
     public T[] ToArray()
     {
         var copy = new T[_length];
-        for (nuint i = 0u; i < _length; i++)
-            copy[i] = this[i];
+        CopyTo(copy);
         return copy;
     }
 
