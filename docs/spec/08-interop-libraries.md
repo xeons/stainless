@@ -638,10 +638,13 @@ function that makes it, and `Com.GetClassObject` answers that table with an
 `IClassFactory`. **Adding a class to a server is declaring one** — there is no
 registration call, and the factory is not written by hand.
 
-Activation passes no arguments, so an activatable class needs a constructor
-taking none. A class with no constructor at all is fine — its fields are the
-zeroes the allocator wrote — but one that has constructors and no empty one is
-refused where it is declared (SL0611) rather than where it could not be made.
+Activation passes no arguments and writes no initializer, so an activatable
+class needs a constructor taking none, and nothing `required` left for the
+maker to set. A class with no constructor at all is fine — §2.16 has already
+held its fields to initializers — but one that has constructors and no empty
+one, or a `required` member its empty one is not `[SetsRequiredMembers]` for,
+is refused where it is declared (SL0611) rather than activated with a null
+where its type says there is none.
 
 `DllGetClassObject` is the whole of what an in-process server must export, and
 `Com.CanUnloadNow` is the other half of the pair. It answers from a count the

@@ -886,14 +886,16 @@ public sealed partial class Binder
 
     /// <summary>
     /// Every com class carrying a CLSID can be made by a class factory, and a
-    /// class factory has no arguments to pass.
+    /// class factory has no arguments to pass and no initializer to write.
     ///
     /// After the attribute pass rather than with the other com class checks,
     /// because the CLSID this turns on is read from <c>[Guid]</c> and folded
-    /// there. A class with no constructor at all is fine -- its fields are the
-    /// zeroes the allocator wrote -- but one that has constructors and no empty
-    /// one could never be activated, and saying so where it is declared beats
-    /// leaving a host to find `CreateInstance` returning nothing useful.
+    /// there. A class with no constructor at all is fine -- SL0813 has already
+    /// held its fields to initializers -- but one that has constructors and no
+    /// empty one could never be activated, and one with <c>required</c>
+    /// members would be activated with them unset: a null where its type says
+    /// there is none. Saying so where it is declared beats leaving a host to
+    /// find either.
     /// </summary>
     private void CheckActivatableClasses()
     {
@@ -901,13 +903,31 @@ public sealed partial class Binder
         {
             if (type is not ClassTypeSymbol { IsCom: true, Clsid: not null } classType)
                 continue;
-            if (classType.Constructors.Count == 0) continue;
-            if (classType.Constructors.Any(c => !c.Parameters.Any(p => !p.IsThis))) continue;
+
+            var empty = classType.Constructors
+                .FirstOrDefault(c => !c.Parameters.Any(p => !p.IsThis));
+            if (classType.Constructors.Count > 0 && empty is null)
+            {
+                diagnostics.Error("SL0611", classType.Span ?? entry.Declaration.Span,
+                    $"'{classType.Name}' has a '[Guid]', so a class factory can be asked to make " +
+                    "one, and a class factory has no arguments to pass. Give it a constructor " +
+                    "taking none, or drop the '[Guid]' and hand the object out instead",
+                    classType);
+                continue;
+            }
+
+            var required = RequiredMembers(classType);
+            if (required.Count == 0 || empty?.SetsRequiredMembers == true)
+                continue;
 
             diagnostics.Error("SL0611", classType.Span ?? entry.Declaration.Span,
                 $"'{classType.Name}' has a '[Guid]', so a class factory can be asked to make " +
-                "one, and a class factory has no arguments to pass. Give it a constructor " +
-                "taking none, or drop the '[Guid]' and hand the object out instead",
+                "one, and a class factory has nothing to give its required " +
+                $"{(required.Count == 1 ? "member" : "members")} " +
+                $"{string.Join(", ", required.Select(n => $"'{n}'"))}. " +
+                $"Set {(required.Count == 1 ? "it" : "them")} in a " +
+                "constructor taking none and mark it '[SetsRequiredMembers]', or drop " +
+                "'required'",
                 classType);
         }
     }
