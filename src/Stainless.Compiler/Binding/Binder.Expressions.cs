@@ -1487,7 +1487,14 @@ public sealed partial class Binder
         // address behind its back -- which is the whole reason to declare one.
         // Nothing built in is reachable this way: a primitive, a String and an
         // array declare no operators, so the lookup fails at once for them.
-        if (FindBinaryOperator(span, token, left, right) is { } overloaded) return overloaded;
+        //
+        // A comparison with `null` is never the type's to answer: its operator
+        // takes two references that are there, and the question is whether
+        // one is. It is the address test, as `is null` is in C#.
+        bool againstNull = op is BoundBinaryOp.Equal or BoundBinaryOp.NotEqual &&
+                           (left.Type is NullType || right.Type is NullType);
+        if (!againstNull && FindBinaryOperator(span, token, left, right) is { } overloaded)
+            return overloaded;
 
         // Pointer arithmetic: p + i, p - i.
         if (left.Type is PointerTypeSymbol && op is BoundBinaryOp.Add or BoundBinaryOp.Subtract &&

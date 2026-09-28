@@ -221,6 +221,14 @@ int Main()
     printf("byValue   = %d\n", left == right);
     printf("different = %d\n", left != new Tag("other"));
 
+    // Against `null` the question is whether there is one, which the declared
+    // operator cannot answer: its operands are references that are there.
+    Tag? maybe = null;
+    printf("isNull    = %d\n", maybe == null);
+    printf("notNull   = %d\n", maybe != null);
+    maybe = left;
+    printf("present   = %d\n", maybe is not null && maybe != null);
+
     // ---------------------------------------------------------------- bits
 
     var low = Of(0x0Fu);
