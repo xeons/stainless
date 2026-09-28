@@ -75,7 +75,7 @@ public sealed partial class LlvmEmitter
     private string SizeOfType(string llvmType)
     {
         string past = Emit("ptr", $"getelementptr {llvmType}, ptr null, i32 1");
-        return Emit("i64", $"ptrtoint ptr {past} to i64");
+        return Emit(Word, $"ptrtoint ptr {past} to {Word}");
     }
 
     private void EmitParallel(BoundParallel statement)
@@ -264,11 +264,19 @@ public sealed partial class LlvmEmitter
         string name = $"_SLrange.{_nextThunk++}";
         _thunks.Add(new RangeThunk(name, captureType, statement));
 
+        // The runtime counts in size_t. The loop's own arithmetic stays 64-bit,
+        // because the variable may be a long whatever the word is.
+        string words = Word == "i64" ? count : Emit(Word, $"trunc i64 {count} to {Word}");
+
         string scope = Emit("ptr", "call ptr @sl_scope_begin()");
-        Line($"call void @sl_parallel_range(ptr {scope}, {Word} {count}, " +
+        Line($"call void @sl_parallel_range(ptr {scope}, {Word} {words}, " +
              $"ptr @{name}, ptr {capture})");
         Line($"call void @sl_scope_end(ptr {scope})");
     }
+
+    /// <summary>A size_t from the runtime, as the i64 the loop counts in.</summary>
+    private string WidenWord(string value) =>
+        Word == "i64" ? value : Emit("i64", $"zext {Word} {value} to i64");
 
     /// <summary>Evaluates an integer expression as an i64, signed or not as its type says.</summary>
     private string WidenToLong(BoundExpression expression)
@@ -287,7 +295,7 @@ public sealed partial class LlvmEmitter
         ResetFunctionState();
         _hasLabels = LabelFinder.Contains(loop.Body);
         _module.AppendLine(
-            $"define internal void @{thunk.Name}(ptr %capture, i64 %start, i64 %end)"
+            $"define internal void @{thunk.Name}(ptr %capture, {Word} %start.word, {Word} %end.word)"
             + FrameAttributes + " {");
         _body.Clear();
         _blockTerminated = false;
@@ -309,13 +317,16 @@ public sealed partial class LlvmEmitter
             }
         }
 
+        string start = WidenWord("%start.word");
+        string end = WidenWord("%end.word");
+
         string firstField = Emit("ptr",
             $"getelementptr inbounds {thunk.CaptureType}, ptr %capture, i32 0, i32 {loop.Captures.Count}");
-        string first = Emit(Word, $"load {Word}, ptr {firstField}");
+        string first = Emit("i64", $"load i64, ptr {firstField}");
 
         string strideField = Emit("ptr",
             $"getelementptr inbounds {thunk.CaptureType}, ptr %capture, i32 0, i32 {loop.Captures.Count + 1}");
-        string stride = Emit(Word, $"load {Word}, ptr {strideField}");
+        string stride = Emit("i64", $"load i64, ptr {strideField}");
 
         // The loop variable belongs to this chunk, not to the parent.
         string variableType = LlvmTypeOf(loop.Variable.Type);
@@ -323,7 +334,7 @@ public sealed partial class LlvmEmitter
         _slots[loop.Variable] = variableSlot;
 
         string index = Alloca("i64", "chunk");
-        Line($"store i64 %start, ptr {index}");
+        Line($"store i64 {start}, ptr {index}");
 
         string conditionLabel = NextLabel("chunk.cond");
         string bodyLabel = NextLabel("chunk.body");
@@ -332,8 +343,8 @@ public sealed partial class LlvmEmitter
         Terminator($"br label %{conditionLabel}");
 
         Label(conditionLabel);
-        string current = Emit(Word, $"load {Word}, ptr {index}");
-        string more = Emit("i1", $"icmp ult i64 {current}, %end");
+        string current = Emit("i64", $"load i64, ptr {index}");
+        string more = Emit("i1", $"icmp ult i64 {current}, {end}");
         Terminator($"br i1 {more}, label %{bodyLabel}, label %{endLabel}");
 
         Label(bodyLabel);
