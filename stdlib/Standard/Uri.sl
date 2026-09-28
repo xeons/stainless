@@ -80,9 +80,11 @@ public sealed class Uri : IEquatable<Uri>, IHashable
             sl_fail("Uri: the base is not absolute");
 
         _original = relative._original;
+        _scheme = "";
         _userInfo = "";
         _host = "";
         _port = -1;
+        _path = "";
         _query = "";
         _fragment = "";
         Resolve(baseUri, relative);

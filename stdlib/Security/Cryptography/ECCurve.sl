@@ -108,7 +108,8 @@ public struct ECCurve
                 return new ECCurve("1.3.132.0.34");
         }
 
-        ECCurve none;
+        ECCurve none = new ECCurve("");
+        none._isNamed = false;
         return none;
     }
 
