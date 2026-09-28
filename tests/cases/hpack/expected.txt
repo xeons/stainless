@@ -1,0 +1,209 @@
+ok: built tests\cases\hpack\HpackCases.exe in 2279 ms
+
+-- C.2 field representations
+C.2.1: encoded as the RFC
+  decoded: Decoded, custom-key: custom-header
+    [1] (s = 55) custom-key: custom-header
+    size: 55
+C.2.2: encoded as the RFC
+  decoded: Decoded, :path: /sample/path
+    size: 0
+C.2.3: encoded as the RFC
+  decoded: Decoded, password: secret
+    size: 0
+C.2.4: encoded as the RFC
+  decoded: Decoded, :method: GET
+    size: 0
+-- C.3 requests, no Huffman
+C.3.1: encoded as the RFC
+  decoded: Decoded
+    :method: GET
+    :scheme: http
+    :path: /
+    :authority: www.example.com
+  the fields encoded: true
+  decoder's table:
+    [1] (s = 57) :authority: www.example.com
+    size: 57
+  encoder's table agrees: true
+C.3.2: encoded as the RFC
+  decoded: Decoded
+    :method: GET
+    :scheme: http
+    :path: /
+    :authority: www.example.com
+    cache-control: no-cache
+  the fields encoded: true
+  decoder's table:
+    [1] (s = 53) cache-control: no-cache
+    [2] (s = 57) :authority: www.example.com
+    size: 110
+  encoder's table agrees: true
+C.3.3: encoded as the RFC
+  decoded: Decoded
+    :method: GET
+    :scheme: https
+    :path: /index.html
+    :authority: www.example.com
+    custom-key: custom-value
+  the fields encoded: true
+  decoder's table:
+    [1] (s = 54) custom-key: custom-value
+    [2] (s = 53) cache-control: no-cache
+    [3] (s = 57) :authority: www.example.com
+    size: 164
+  encoder's table agrees: true
+-- C.4 requests, Huffman
+C.4.1: encoded as the RFC
+  decoded: Decoded
+    :method: GET
+    :scheme: http
+    :path: /
+    :authority: www.example.com
+  the fields encoded: true
+  decoder's table:
+    [1] (s = 57) :authority: www.example.com
+    size: 57
+  encoder's table agrees: true
+C.4.2: encoded as the RFC
+  decoded: Decoded
+    :method: GET
+    :scheme: http
+    :path: /
+    :authority: www.example.com
+    cache-control: no-cache
+  the fields encoded: true
+  decoder's table:
+    [1] (s = 53) cache-control: no-cache
+    [2] (s = 57) :authority: www.example.com
+    size: 110
+  encoder's table agrees: true
+C.4.3: encoded as the RFC
+  decoded: Decoded
+    :method: GET
+    :scheme: https
+    :path: /index.html
+    :authority: www.example.com
+    custom-key: custom-value
+  the fields encoded: true
+  decoder's table:
+    [1] (s = 54) custom-key: custom-value
+    [2] (s = 53) cache-control: no-cache
+    [3] (s = 57) :authority: www.example.com
+    size: 164
+  encoder's table agrees: true
+-- C.5 responses, no Huffman, a 256-octet table
+C.5.1: encoded as the RFC
+  decoded: Decoded
+    :status: 302
+    cache-control: private
+    date: Mon, 21 Oct 2013 20:13:21 GMT
+    location: https://www.example.com
+  the fields encoded: true
+  decoder's table:
+    [1] (s = 63) location: https://www.example.com
+    [2] (s = 65) date: Mon, 21 Oct 2013 20:13:21 GMT
+    [3] (s = 52) cache-control: private
+    [4] (s = 42) :status: 302
+    size: 222
+  encoder's table agrees: true
+C.5.2: encoded as the RFC
+  decoded: Decoded
+    :status: 307
+    cache-control: private
+    date: Mon, 21 Oct 2013 20:13:21 GMT
+    location: https://www.example.com
+  the fields encoded: true
+  decoder's table:
+    [1] (s = 42) :status: 307
+    [2] (s = 63) location: https://www.example.com
+    [3] (s = 65) date: Mon, 21 Oct 2013 20:13:21 GMT
+    [4] (s = 52) cache-control: private
+    size: 222
+  encoder's table agrees: true
+C.5.3: encoded as the RFC
+  decoded: Decoded
+    :status: 200
+    cache-control: private
+    date: Mon, 21 Oct 2013 20:13:22 GMT
+    location: https://www.example.com
+    content-encoding: gzip
+    set-cookie: foo=ASDJKHQKBZXOQWEOPIUAXQWEOIU; max-age=3600; version=1
+  the fields encoded: true
+  decoder's table:
+    [1] (s = 98) set-cookie: foo=ASDJKHQKBZXOQWEOPIUAXQWEOIU; max-age=3600; version=1
+    [2] (s = 52) content-encoding: gzip
+    [3] (s = 65) date: Mon, 21 Oct 2013 20:13:22 GMT
+    size: 215
+  encoder's table agrees: true
+-- C.6 responses, Huffman, a 256-octet table
+C.6.1: encoded as the RFC
+  decoded: Decoded
+    :status: 302
+    cache-control: private
+    date: Mon, 21 Oct 2013 20:13:21 GMT
+    location: https://www.example.com
+  the fields encoded: true
+  decoder's table:
+    [1] (s = 63) location: https://www.example.com
+    [2] (s = 65) date: Mon, 21 Oct 2013 20:13:21 GMT
+    [3] (s = 52) cache-control: private
+    [4] (s = 42) :status: 302
+    size: 222
+  encoder's table agrees: true
+C.6.2: encoded as the RFC
+  decoded: Decoded
+    :status: 307
+    cache-control: private
+    date: Mon, 21 Oct 2013 20:13:21 GMT
+    location: https://www.example.com
+  the fields encoded: true
+  decoder's table:
+    [1] (s = 42) :status: 307
+    [2] (s = 63) location: https://www.example.com
+    [3] (s = 65) date: Mon, 21 Oct 2013 20:13:21 GMT
+    [4] (s = 52) cache-control: private
+    size: 222
+  encoder's table agrees: true
+C.6.3: encoded as the RFC
+  decoded: Decoded
+    :status: 200
+    cache-control: private
+    date: Mon, 21 Oct 2013 20:13:22 GMT
+    location: https://www.example.com
+    content-encoding: gzip
+    set-cookie: foo=ASDJKHQKBZXOQWEOPIUAXQWEOIU; max-age=3600; version=1
+  the fields encoded: true
+  decoder's table:
+    [1] (s = 98) set-cookie: foo=ASDJKHQKBZXOQWEOPIUAXQWEOIU; max-age=3600; version=1
+    [2] (s = 52) content-encoding: gzip
+    [3] (s = 65) date: Mon, 21 Oct 2013 20:13:22 GMT
+    size: 215
+  encoder's table agrees: true
+-- Huffman
+each of 256 byte values alone: 256 round trips
+all 256 twice over in one string: same
+the empty string: same
+"a" is 1f, "www.example.com" is f1e3c2e5f23a6ba0ab90f4ff
+-- the decoder refuses
+index 0: Malformed (table 0 entries, max 4096)
+an index past both tables: Malformed (table 0 entries, max 4096)
+a name index past both tables: Malformed (table 0 entries, max 4096)
+a size update past the limit: Malformed (table 0 entries, max 4096)
+a size update after a field: Malformed, :method: GET (table 0 entries, max 4096)
+an integer past 2^32: Malformed (table 0 entries, max 4096)
+an integer cut off: Malformed (table 0 entries, max 4096)
+a string past the block: Malformed (table 0 entries, max 4096)
+Huffman holding EOS: Malformed (table 0 entries, max 4096)
+Huffman padded past 7 bits: Malformed (table 0 entries, max 4096)
+Huffman padded with zeros: Malformed (table 0 entries, max 4096)
+Huffman padded rightly: Decoded, a: a (table 0 entries, max 4096)
+-- limits
+a list over 70 octets: TooLarge, a: b, c: d (table 3 entries, max 4096)
+a size update to 0 then 256: Decoded, :method: GET (table 0 entries, max 256)
+-- the encoder
+secrets never indexed: 1f080e4261736963206332566a636d56301f110469643d311f220a42617369632065413d3d4007782d706c61696e046b657074
+  entries kept: 1
+shrunk to 0 and grown to the default: 203fe11f4007782d706c61696e046b657074
+  decoded: Decoded, table max 4096
+a value past half the table is not indexed: first octet 00, entries 1
