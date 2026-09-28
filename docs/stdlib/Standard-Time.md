@@ -464,7 +464,12 @@ long Nanoseconds
 Nanoseconds since 1970-01-01 UTC, negative before it. The whole of the
 value, and the thing to hand a C API that wants an epoch count.
 
-<sub>[stdlib/Time/DateTimeOffset.sl:39](../../stdlib/Time/DateTimeOffset.sl#L39)</sub>
+A `long` of nanoseconds reaches from 1677 to 2262. An instant outside
+that is held at the nearer end rather than wrapped, so the year 9999
+that a certificate writes for "never" compares as later than any real
+date.
+
+<sub>[stdlib/Time/DateTimeOffset.sl:44](../../stdlib/Time/DateTimeOffset.sl#L44)</sub>
 
 #### UtcNow *property*
 
@@ -477,7 +482,7 @@ to measure how long something took.
 
 **See also** &nbsp; [Stopwatch](#stopwatch-class)
 
-<sub>[stdlib/Time/DateTimeOffset.sl:45](../../stdlib/Time/DateTimeOffset.sl#L45)</sub>
+<sub>[stdlib/Time/DateTimeOffset.sl:50](../../stdlib/Time/DateTimeOffset.sl#L50)</sub>
 
 #### UnixEpoch *property*
 
@@ -487,7 +492,7 @@ static DateTimeOffset UnixEpoch { get; }
 
 1970-01-01 00:00:00 UTC, which is where the count starts.
 
-<sub>[stdlib/Time/DateTimeOffset.sl:56](../../stdlib/Time/DateTimeOffset.sl#L56)</sub>
+<sub>[stdlib/Time/DateTimeOffset.sl:61](../../stdlib/Time/DateTimeOffset.sl#L61)</sub>
 
 #### FromUnixTimeSeconds *method*
 
@@ -498,7 +503,7 @@ static DateTimeOffset FromUnixTimeSeconds(long seconds)
 An instant from whole seconds since the epoch -- what a `time_t`, a
 file timestamp and most C APIs carry.
 
-<sub>[stdlib/Time/DateTimeOffset.sl:68](../../stdlib/Time/DateTimeOffset.sl#L68)</sub>
+<sub>[stdlib/Time/DateTimeOffset.sl:73](../../stdlib/Time/DateTimeOffset.sl#L73)</sub>
 
 #### FromUnixTimeMilliseconds *method*
 
@@ -509,7 +514,7 @@ static DateTimeOffset FromUnixTimeMilliseconds(long milliseconds)
 An instant from milliseconds since the epoch, which is what JavaScript
 and most JSON APIs use.
 
-<sub>[stdlib/Time/DateTimeOffset.sl:77](../../stdlib/Time/DateTimeOffset.sl#L77)</sub>
+<sub>[stdlib/Time/DateTimeOffset.sl:82](../../stdlib/Time/DateTimeOffset.sl#L82)</sub>
 
 #### FromUtc *method*
 
@@ -519,7 +524,7 @@ static DateTimeOffset FromUtc(int year, int month, int day, int hour, int minute
 
 A UTC date and time as an instant.
 
-<sub>[stdlib/Time/DateTimeOffset.sl:85](../../stdlib/Time/DateTimeOffset.sl#L85)</sub>
+<sub>[stdlib/Time/DateTimeOffset.sl:90](../../stdlib/Time/DateTimeOffset.sl#L90)</sub>
 
 #### FromLocal *method*
 
@@ -533,7 +538,7 @@ decides.
 
 **See also** &nbsp; [DateTimeOffset.FromUtc](#fromutc-method)
 
-<sub>[stdlib/Time/DateTimeOffset.sl:99](../../stdlib/Time/DateTimeOffset.sl#L99)</sub>
+<sub>[stdlib/Time/DateTimeOffset.sl:104](../../stdlib/Time/DateTimeOffset.sl#L104)</sub>
 
 #### ToUnixTimeSeconds *method*
 
@@ -544,7 +549,7 @@ long ToUnixTimeSeconds()
 Whole seconds since the epoch, rounded toward the epoch. This is what a
 file's modification time is, and what most C APIs speak.
 
-<sub>[stdlib/Time/DateTimeOffset.sl:110](../../stdlib/Time/DateTimeOffset.sl#L110)</sub>
+<sub>[stdlib/Time/DateTimeOffset.sl:115](../../stdlib/Time/DateTimeOffset.sl#L115)</sub>
 
 #### ToUnixTimeMilliseconds *method*
 
@@ -554,7 +559,7 @@ long ToUnixTimeMilliseconds()
 
 Whole milliseconds since the epoch, rounded toward the epoch.
 
-<sub>[stdlib/Time/DateTimeOffset.sl:113](../../stdlib/Time/DateTimeOffset.sl#L113)</sub>
+<sub>[stdlib/Time/DateTimeOffset.sl:118](../../stdlib/Time/DateTimeOffset.sl#L118)</sub>
 
 #### UtcDateTime *property*
 
@@ -564,7 +569,7 @@ DateTime UtcDateTime { get; }
 
 This instant as a date and time in UTC.
 
-<sub>[stdlib/Time/DateTimeOffset.sl:116](../../stdlib/Time/DateTimeOffset.sl#L116)</sub>
+<sub>[stdlib/Time/DateTimeOffset.sl:121](../../stdlib/Time/DateTimeOffset.sl#L121)</sub>
 
 #### LocalDateTime *property*
 
@@ -577,7 +582,7 @@ believes about daylight saving.
 
 **See also** &nbsp; [DateTimeOffset.UtcDateTime](#utcdatetime-property)
 
-<sub>[stdlib/Time/DateTimeOffset.sl:122](../../stdlib/Time/DateTimeOffset.sl#L122)</sub>
+<sub>[stdlib/Time/DateTimeOffset.sl:127](../../stdlib/Time/DateTimeOffset.sl#L127)</sub>
 
 #### FormatIso *method*
 
@@ -589,7 +594,7 @@ ISO 8601, to the second: `2026-09-05T14:30:00Z`.
 
 **See also** &nbsp; [DateTimeOffset.ParseIso](#parseiso-method)
 
-<sub>[stdlib/Time/DateTimeOffset.sl:127](../../stdlib/Time/DateTimeOffset.sl#L127)</sub>
+<sub>[stdlib/Time/DateTimeOffset.sl:132](../../stdlib/Time/DateTimeOffset.sl#L132)</sub>
 
 #### ParseIso *method*
 
@@ -613,7 +618,7 @@ trip is exact and anything else is refused rather than half-read.
 
 **See also** &nbsp; [DateTimeOffset.FormatIso](#formatiso-method)
 
-<sub>[stdlib/Time/DateTimeOffset.sl:145](../../stdlib/Time/DateTimeOffset.sl#L145)</sub>
+<sub>[stdlib/Time/DateTimeOffset.sl:150](../../stdlib/Time/DateTimeOffset.sl#L150)</sub>
 
 #### Offset *property*
 
@@ -624,7 +629,7 @@ TimeSpan Offset { get; }
 How far ahead of UTC the local zone was at this instant. Negative west
 of Greenwich.
 
-<sub>[stdlib/Time/DateTimeOffset.sl:152](../../stdlib/Time/DateTimeOffset.sl#L152)</sub>
+<sub>[stdlib/Time/DateTimeOffset.sl:157](../../stdlib/Time/DateTimeOffset.sl#L157)</sub>
 
 #### operator - *operator*
 
@@ -634,7 +639,7 @@ static TimeSpan operator -(DateTimeOffset later, DateTimeOffset earlier)
 
 How long apart two instants are. Negative if the right one is later.
 
-<sub>[stdlib/Time/DateTimeOffset.sl:156](../../stdlib/Time/DateTimeOffset.sl#L156)</sub>
+<sub>[stdlib/Time/DateTimeOffset.sl:161](../../stdlib/Time/DateTimeOffset.sl#L161)</sub>
 
 #### operator + *operator*
 
@@ -645,7 +650,7 @@ static DateTimeOffset operator +(DateTimeOffset at, TimeSpan span)
 An instant moved forward by a length of time. Exact nanoseconds, so a
 day added is 24 hours and not a calendar day.
 
-<sub>[stdlib/Time/DateTimeOffset.sl:163](../../stdlib/Time/DateTimeOffset.sl#L163)</sub>
+<sub>[stdlib/Time/DateTimeOffset.sl:168](../../stdlib/Time/DateTimeOffset.sl#L168)</sub>
 
 #### operator - *operator*
 
@@ -655,7 +660,7 @@ static DateTimeOffset operator -(DateTimeOffset at, TimeSpan span)
 
 An instant moved back by a length of time.
 
-<sub>[stdlib/Time/DateTimeOffset.sl:171](../../stdlib/Time/DateTimeOffset.sl#L171)</sub>
+<sub>[stdlib/Time/DateTimeOffset.sl:176](../../stdlib/Time/DateTimeOffset.sl#L176)</sub>
 
 #### operator == *operator*
 
@@ -665,7 +670,7 @@ static bool operator ==(DateTimeOffset left, DateTimeOffset right)
 
 Whether the two name the same nanosecond.
 
-<sub>[stdlib/Time/DateTimeOffset.sl:179](../../stdlib/Time/DateTimeOffset.sl#L179)</sub>
+<sub>[stdlib/Time/DateTimeOffset.sl:184](../../stdlib/Time/DateTimeOffset.sl#L184)</sub>
 
 #### operator != *operator*
 
@@ -675,7 +680,7 @@ static bool operator !=(DateTimeOffset left, DateTimeOffset right)
 
 Whether they name different nanoseconds.
 
-<sub>[stdlib/Time/DateTimeOffset.sl:185](../../stdlib/Time/DateTimeOffset.sl#L185)</sub>
+<sub>[stdlib/Time/DateTimeOffset.sl:190](../../stdlib/Time/DateTimeOffset.sl#L190)</sub>
 
 #### operator &lt; *operator*
 
@@ -685,7 +690,7 @@ static bool operator <(DateTimeOffset left, DateTimeOffset right)
 
 Whether `left` is the earlier.
 
-<sub>[stdlib/Time/DateTimeOffset.sl:191](../../stdlib/Time/DateTimeOffset.sl#L191)</sub>
+<sub>[stdlib/Time/DateTimeOffset.sl:196](../../stdlib/Time/DateTimeOffset.sl#L196)</sub>
 
 #### operator &gt; *operator*
 
@@ -695,7 +700,7 @@ static bool operator >(DateTimeOffset left, DateTimeOffset right)
 
 Whether `left` is the later.
 
-<sub>[stdlib/Time/DateTimeOffset.sl:197](../../stdlib/Time/DateTimeOffset.sl#L197)</sub>
+<sub>[stdlib/Time/DateTimeOffset.sl:202](../../stdlib/Time/DateTimeOffset.sl#L202)</sub>
 
 #### operator &lt;= *operator*
 
@@ -705,7 +710,7 @@ static bool operator <=(DateTimeOffset left, DateTimeOffset right)
 
 Whether `left` is no later than `right`.
 
-<sub>[stdlib/Time/DateTimeOffset.sl:203](../../stdlib/Time/DateTimeOffset.sl#L203)</sub>
+<sub>[stdlib/Time/DateTimeOffset.sl:208](../../stdlib/Time/DateTimeOffset.sl#L208)</sub>
 
 #### operator &gt;= *operator*
 
@@ -715,7 +720,7 @@ static bool operator >=(DateTimeOffset left, DateTimeOffset right)
 
 Whether `left` is no earlier than `right`.
 
-<sub>[stdlib/Time/DateTimeOffset.sl:209](../../stdlib/Time/DateTimeOffset.sl#L209)</sub>
+<sub>[stdlib/Time/DateTimeOffset.sl:214](../../stdlib/Time/DateTimeOffset.sl#L214)</sub>
 
 #### Compare *method*
 
@@ -726,7 +731,7 @@ static int Compare(DateTimeOffset left, DateTimeOffset right)
 -1, 0 or 1, for sorting. The operators answer the question a program
 usually has; this answers the one a sort has.
 
-<sub>[stdlib/Time/DateTimeOffset.sl:216](../../stdlib/Time/DateTimeOffset.sl#L216)</sub>
+<sub>[stdlib/Time/DateTimeOffset.sl:221](../../stdlib/Time/DateTimeOffset.sl#L221)</sub>
 
 ### Stopwatch *class*
 
@@ -1826,7 +1831,7 @@ How many days a month has, which for February depends on the year.
 
 **See also** &nbsp; [Time.IsLeapYear](#isleapyear-function)
 
-<sub>[stdlib/Time/Time.sl:166](../../stdlib/Time/Time.sl#L166)</sub>
+<sub>[stdlib/Time/Time.sl:179](../../stdlib/Time/Time.sl#L179)</sub>
 
 ### IsLeapYear *function*
 
@@ -1836,7 +1841,7 @@ bool IsLeapYear(int year)
 
 Whether a year has 366 days, by the Gregorian rule.
 
-<sub>[stdlib/Time/Time.sl:152](../../stdlib/Time/Time.sl#L152)</sub>
+<sub>[stdlib/Time/Time.sl:165](../../stdlib/Time/Time.sl#L165)</sub>
 
 ## Constants
 

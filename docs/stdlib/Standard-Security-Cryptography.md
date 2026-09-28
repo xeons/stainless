@@ -620,15 +620,14 @@ nothing else; .NET does the same, and a length is not the secret.
 static void ZeroMemory(byte[] buffer)
 ```
 
-Overwrites `buffer` with zeros.
+Overwrites `buffer` with zeros, in a way the optimiser may not remove
+however little is read afterwards.
 
-**Not a guarantee.** An optimiser is entitled to remove a write nothing
-reads, and this is an ordinary loop in an ordinary language -- .NET's
-version is a compiler intrinsic and this one is not. It is worth doing
-because a key that is overwritten is a key that is not in the next core
-dump, and it is not worth relying on.
+A key that is overwritten is not in the next core dump. It may still be
+in a register, a copy made along the way, or memory the allocator has
+moved; this clears the one buffer it is given and nothing else.
 
-<sub>[stdlib/Security/Cryptography/CryptographicOperations.sl:62](../../stdlib/Security/Cryptography/CryptographicOperations.sl#L62)</sub>
+<sub>[stdlib/Security/Cryptography/CryptographicOperations.sl:63](../../stdlib/Security/Cryptography/CryptographicOperations.sl#L63)</sub>
 
 ### HashAlgorithm *class*
 

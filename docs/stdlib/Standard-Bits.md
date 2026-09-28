@@ -22,7 +22,7 @@ because it is a small number and arithmetic on it should not be unsigned.
 
 ## Contents
 
-**Functions** &nbsp; [IsPowerOfTwo](#ispoweroftwo-function) &middot; [IsPowerOfTwo](#ispoweroftwo-function) &middot; [LeadingZeroCount](#leadingzerocount-function) &middot; [LeadingZeroCount](#leadingzerocount-function) &middot; [Log2](#log2-function) &middot; [Log2](#log2-function) &middot; [PopCount](#popcount-function) &middot; [PopCount](#popcount-function) &middot; [RotateLeft](#rotateleft-function) &middot; [RotateLeft](#rotateleft-function) &middot; [RotateRight](#rotateright-function) &middot; [RotateRight](#rotateright-function) &middot; [RoundUpToPowerOfTwo](#rounduptopoweroftwo-function) &middot; [RoundUpToPowerOfTwo](#rounduptopoweroftwo-function) &middot; [TrailingZeroCount](#trailingzerocount-function) &middot; [TrailingZeroCount](#trailingzerocount-function)
+**Functions** &nbsp; [IsPowerOfTwo](#ispoweroftwo-function) &middot; [IsPowerOfTwo](#ispoweroftwo-function) &middot; [LeadingZeroCount](#leadingzerocount-function) &middot; [LeadingZeroCount](#leadingzerocount-function) &middot; [Log2](#log2-function) &middot; [Log2](#log2-function) &middot; [MultiplyHigh](#multiplyhigh-function) &middot; [OpaqueCopy](#opaquecopy-function) &middot; [OpaqueCopy](#opaquecopy-function) &middot; [PopCount](#popcount-function) &middot; [PopCount](#popcount-function) &middot; [RotateLeft](#rotateleft-function) &middot; [RotateLeft](#rotateleft-function) &middot; [RotateRight](#rotateright-function) &middot; [RotateRight](#rotateright-function) &middot; [RoundUpToPowerOfTwo](#rounduptopoweroftwo-function) &middot; [RoundUpToPowerOfTwo](#rounduptopoweroftwo-function) &middot; [TrailingZeroCount](#trailingzerocount-function) &middot; [TrailingZeroCount](#trailingzerocount-function)
 
 ## Functions
 
@@ -35,7 +35,7 @@ bool IsPowerOfTwo(uint value)
 Whether exactly one bit is set, which is what makes a number a power of
 two. Zero is not one.
 
-<sub>[stdlib/Bits.sl:99](../../stdlib/Bits.sl#L99)</sub>
+<sub>[stdlib/Bits.sl:121](../../stdlib/Bits.sl#L121)</sub>
 
 ### IsPowerOfTwo *function*
 
@@ -45,7 +45,7 @@ bool IsPowerOfTwo(ulong value)
 
 Whether exactly one bit is set. Zero is not a power of two.
 
-<sub>[stdlib/Bits.sl:102](../../stdlib/Bits.sl#L102)</sub>
+<sub>[stdlib/Bits.sl:124](../../stdlib/Bits.sl#L124)</sub>
 
 ### LeadingZeroCount *function*
 
@@ -81,7 +81,7 @@ Zero has no logarithm and no set bit to point at. This answers 0 for it,
 as .NET does, rather than failing: every caller that reaches here with a
 zero is sizing something and wants the smallest answer.
 
-<sub>[stdlib/Bits.sl:92](../../stdlib/Bits.sl#L92)</sub>
+<sub>[stdlib/Bits.sl:114](../../stdlib/Bits.sl#L114)</sub>
 
 ### Log2 *function*
 
@@ -91,7 +91,46 @@ int Log2(ulong value)
 
 The position of the highest set bit. Zero answers 0.
 
-<sub>[stdlib/Bits.sl:95](../../stdlib/Bits.sl#L95)</sub>
+<sub>[stdlib/Bits.sl:117](../../stdlib/Bits.sl#L117)</sub>
+
+### MultiplyHigh *function*
+
+```
+ulong MultiplyHigh(ulong left, ulong right)
+```
+
+The high 64 bits of the 128-bit product of `left` and `right`; `left * right`
+is the low 64.
+
+**See also** &nbsp; [Math.BigMul](Standard-Math.md#bigmul-function)
+
+<sub>[stdlib/Bits.sl:90](../../stdlib/Bits.sl#L90)</sub>
+
+### OpaqueCopy *function*
+
+```
+uint OpaqueCopy(uint value)
+```
+
+`value`, unchanged, as a value the optimiser knows nothing about.
+
+For constant-time code. A mask computed from a secret — all ones or all
+zeros — is exactly what an optimiser recognises and turns back into a
+branch, which is the leak the mask was written to avoid. Passing it through
+this first leaves the optimiser nothing to recognise. It costs no
+instruction.
+
+<sub>[stdlib/Bits.sl:101](../../stdlib/Bits.sl#L101)</sub>
+
+### OpaqueCopy *function*
+
+```
+ulong OpaqueCopy(ulong value)
+```
+
+`value`, unchanged, as a value the optimiser knows nothing about.
+
+<sub>[stdlib/Bits.sl:104](../../stdlib/Bits.sl#L104)</sub>
 
 ### PopCount *function*
 
@@ -169,7 +208,7 @@ type holds answers zero, which is the wrap the shift produces and the only
 answer available -- a caller sizing a table from untrusted input MUST check
 for it.
 
-<sub>[stdlib/Bits.sl:110](../../stdlib/Bits.sl#L110)</sub>
+<sub>[stdlib/Bits.sl:132](../../stdlib/Bits.sl#L132)</sub>
 
 ### RoundUpToPowerOfTwo *function*
 
@@ -180,7 +219,7 @@ ulong RoundUpToPowerOfTwo(ulong value)
 The smallest power of two that is not below `value`. Zero and one both
 answer one, and a value above the largest power of two answers zero.
 
-<sub>[stdlib/Bits.sl:119](../../stdlib/Bits.sl#L119)</sub>
+<sub>[stdlib/Bits.sl:141](../../stdlib/Bits.sl#L141)</sub>
 
 ### TrailingZeroCount *function*
 
