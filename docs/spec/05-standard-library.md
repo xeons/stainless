@@ -12,23 +12,19 @@ compiled alongside your program.
 to emit until it is instantiated. That covers `List<T>`, `Dictionary<TKey, TValue>`,
 `Mutex<T>`, every container and every concurrent one.
 
-**A non-generic function or class is emitted whether or not it is used**, and
-that is a real cost the compiler should not be charging: every stdlib module is
-compiled with your program whether you import it or not. A hello-world that
-calls `puts` and returns emits **every standard-library function and reaches
-none of them** — the whole of `Standard.Net`, `Standard.Encoding`,
-`Standard.Text`, `Standard.Math`, `Standard.Collections` and the rest. Nothing
-in the compiler prunes them: there is no reachability pass.
+**A module is compiled only if the program reaches it**: by an `import`, or by
+a qualified name such as `Standard.Json.Parse` that spells it, from the program
+or from a module that was itself reached. `Standard`, `Standard.Text` and
+`Standard.Collections` are always reached, because the compiler relies on them
+without an import. Every file of the library is lexed, which is what finding
+the qualified names costs; nothing else of an unreached module is paid for.
 
-What saves it is the linker. Every function and datum goes in a section of its
-own and the linker drops the ones nothing reached, so the binary is the size it
-should be. The IR is not: compile time pays for all of it, and a reachability
-pass from `Main` would fix that. It is not done.
-
-Each thing written in Stainless since — the text library, the sockets, the
-threading — has grown what a program that imports none of them must compile,
-and the stripped binary has come out the same size every time. That invariance
-is the measure of how completely the compiler is leaving the job to the linker.
+**Within a reached module, a non-generic function or class is emitted whether or
+not it is used.** Nothing prunes below the module: there is no reachability pass
+from `Main`. What saves the binary is LLVM and the linker. Everything not
+exported has internal linkage, so an optimised build deletes what nothing
+references before optimising it, and every function goes in a section of its
+own for the linker to drop.
 
 | Module | Contents | Imported |
 |---|---|---|

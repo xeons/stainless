@@ -41,11 +41,17 @@ public sealed class Parser
 
     public Parser(
         SourceText source, DiagnosticBag diagnostics, IReadOnlyCollection<string>? symbols = null)
+        : this(LexedSource.Of(source, diagnostics, symbols), diagnostics)
     {
-        _source = source;
+    }
+
+    /// <summary>A parser over a file already lexed, whose tokens it takes as they are.</summary>
+    public Parser(LexedSource lexed, DiagnosticBag diagnostics)
+    {
+        _source = lexed.Source;
         _diagnostics = diagnostics;
-        _lexer = new Lexer(source, diagnostics, symbols);
-        _tokens = _lexer.Tokenize();
+        _lexer = lexed.Lexer;
+        _tokens = lexed.Tokens;
 
         // The lexer gave up on the rest of the file and has said why; what it
         // did not read would otherwise come back as a message per open brace.

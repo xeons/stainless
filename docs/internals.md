@@ -203,6 +203,8 @@ ships in the same directory.
 | Component | Role |
 |---|---|
 | [Syntax/Lexer.cs](../src/Stainless.Compiler/Syntax/Lexer.cs) | tokens, and `#if` deciding which of them exist |
+| [Syntax/LexedSource.cs](../src/Stainless.Compiler/Syntax/LexedSource.cs) | a file lexed and not yet parsed, with the module it declares and the modules its imports and qualified names reach |
+| [Driver/LibraryClosure.cs](../src/Stainless.Compiler/Driver/LibraryClosure.cs) | which standard-library modules a program reaches; the rest are lexed and never parsed |
 | [Syntax/Parser.cs](../src/Stainless.Compiler/Syntax/Parser.cs) | recursive descent + precedence climbing |
 | [Binding/Binder.cs](../src/Stainless.Compiler/Binding/Binder.cs) | the eleven passes; one partial class over `Binder.*.cs`, a file per area — bodies, calls, closures, conversions, generics, inheritance, layout |
 | [Binding/BoundTree.cs](../src/Stainless.Compiler/Binding/BoundTree.cs) | the bound tree's nodes |

@@ -934,18 +934,16 @@ Being straight about the edges, roughly in the order they are worth adding:
   and does round-trip.
 - **An indexer has no automatic form.** `{ get; set; }` would have nothing to
   find storage for.
-- **The compiler prunes no dead code; LLVM and the linker do.** Every stdlib
-  module is compiled with your program whether or not it is imported, and only
-  generics are free — an uninstantiated template emits nothing, but a
-  non-generic function or class is emitted either way. Everything not exported
-  has internal linkage, so an optimised build's first LLVM passes delete what
-  nothing references before the expensive ones see it. A debug build keeps it
-  all, and there every function's own section lets the linker discard it.
-
-  What nothing saves is the front end. Every build parses, binds and emits the
-  whole library as IR, about a second of a hello-world build, and each thing
-  added to the library is added to every program that never mentions it. A
-  reachability pass from `Main` is the real answer to that part.
+- **The compiler prunes modules, not functions.** A standard-library module is
+  compiled only if the program reaches it, by an import or by a qualified name,
+  directly or through a module it reached; every file of the library is still
+  lexed. `Standard`, `Standard.Text` and `Standard.Collections` are always
+  reached, and are most of what a hello-world compiles. Within a reached module
+  every non-generic function is emitted. Everything not exported has internal
+  linkage, so an optimised build's first LLVM passes delete what nothing
+  references before the expensive ones see it; a debug build keeps it all, and
+  there every function's own section lets the linker discard it. A reachability
+  pass from `Main` is what would prune below the module.
 - **Unoptimized ARC.** Retain/release traffic is correct but redundant, and a
   redundant pair costs more since the counts became atomic. The +0/+1 dataflow
   pass that removes the pair around a borrow is the fix.

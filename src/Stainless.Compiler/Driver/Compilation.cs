@@ -624,7 +624,11 @@ public sealed class Compilation
         }
 
         var symbols = BuildSymbols(options);
+        var parsing = System.Diagnostics.Stopwatch.StartNew();
 
+        // Every file is lexed, and a library file is parsed only if the program
+        // reaches its module. See LibraryClosure.
+        var libraryFiles = new List<LexedSource>();
         foreach (var (name, text) in StandardLibrary.Sources())
         {
             string path = name;
@@ -651,14 +655,10 @@ public sealed class Compilation
                 }
             }
 
-            units.Add(new Parser(new SourceText(path, text), diagnostics, symbols)
-                .ParseCompilationUnit());
+            libraryFiles.Add(LexedSource.Of(new SourceText(path, text), diagnostics, symbols));
         }
 
-        // Everything after this point is the program's own, which is what a
-        // library's metadata describes.
-        int standardUnits = units.Count;
-
+        var own = new List<LexedSource>();
         foreach (string path in options.SourcePaths)
         {
             SourceText source;
@@ -671,9 +671,26 @@ public sealed class Compilation
                 return Failure($"could not read '{path}': {e.Message}");
             }
 
-            units.Add(new Parser(source, diagnostics, symbols).ParseCompilationUnit());
+            own.Add(LexedSource.Of(source, diagnostics, symbols));
         }
 
+        // Documentation of the library wants all of it, and a referenced
+        // library's metadata can name a standard type its consumer never
+        // imported, so both keep everything.
+        if (!options.DocumentStandardLibrary && options.References.Count == 0)
+            libraryFiles = LibraryClosure.ReachedFiles(libraryFiles, own);
+
+        foreach (var file in libraryFiles)
+            units.Add(file.Parse(diagnostics));
+
+        // Everything after this point is the program's own, which is what a
+        // library's metadata describes.
+        int standardUnits = units.Count;
+
+        foreach (var file in own)
+            units.Add(file.Parse(diagnostics));
+
+        ReportPhase("parse", parsing);
         if (diagnostics.HasErrors) return Failed(diagnostics);
 
         // --- bind --------------------------------------------------------

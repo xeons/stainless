@@ -331,7 +331,7 @@ Sum(middle);                      // or a Span<int>
 `Standard.Collections` is written in Stainless and compiled with your program.
 A generic costs nothing until you instantiate it; a non-generic declaration is
 emitted either way — see [dead code](status.md#what-does-not-exist-yet) in
-what is implemented.
+what is implemented. A module you never reach is not compiled at all.
 
 ```csharp
 import Standard.Collections;

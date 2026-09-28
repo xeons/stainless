@@ -524,21 +524,12 @@ and needs a lifetime story the language does not have.
 
 ### A reachability pass from `Main`
 
-The standard library is compiled with every program and nothing prunes it. A
-hello-world that calls `puts` and returns emits **every standard-library
-function and reaches none of them**.
-
-What saves the binary is the linker: every function goes in a section of its
-own and the ones nothing reached are dropped. What nothing saves is the
-compile, which pays for all of it — binding, emitting, and then handing clang
-several times the text it needs.
-
-Writing the library in Stainless is what made this worth doing rather than
-worth noting. Every addition since — text, then sockets, then threading — has
-grown what a program that uses none of it must compile, and the stripped binary
-has come out the same size each time. The suite has roughly doubled in wall
-time over those three. The linker's answer is free; the compiler's lack of one
-is what the build is paying for.
+Only the standard-library modules a program reaches are compiled, but within
+one every non-generic function is bound, lowered and emitted, and the three
+always reached — `Standard`, `Standard.Text` and `Standard.Collections` — are
+most of the library a hello-world pays for. LLVM deletes what nothing
+references in an optimised build, because it is internal; a debug build hands
+all of it to the linker.
 
 It is also the honest explanation for a number that gets quoted about ARC:
 counting `sl_retain`/`sl_release` in a module counts mostly calls in functions
