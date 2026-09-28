@@ -39,6 +39,14 @@ import Standard.Bits;
 /// HMAC over the ciphertext and check it with `FixedTimeEquals` before
 /// decrypting anything.
 ///
+/// **It is constant time.** The cipher is bitsliced, as BearSSL's `aes_ct64`
+/// is: four blocks are spread across eight 64-bit words, one word for each bit
+/// position of every byte, and the S-box is the Boyar–Peralta logic circuit
+/// rather than a table. Nothing is indexed by, and nothing branches on, the
+/// key or the data. ECB, CTR and the decrypting half of CBC and CFB run four
+/// blocks in each pass. CBC and CFB encryption chain each block into the next,
+/// so they run one block per pass at the cost of four.
+///
 /// The one-shot methods are .NET 6's `EncryptCbc` and friends rather than its
 /// older `CreateEncryptor`/`ICryptoTransform` pair. A transform object exists
 /// to stream a message larger than memory; `CryptoStream` is the piece that
@@ -52,18 +60,16 @@ public sealed class Aes
     /// Rijndael that had others, and no standard uses them.
     public const nuint BlockSize = 16u;
 
-    byte[] _forward;
-    byte[] _reverse;
-    byte[] _schedule;
-    nuint _rounds;
+    /// Four blocks, which is what one pass of the bitsliced cipher carries.
+    private const nuint BatchSize = 64u;
+
+    /// Eight words per round key, already bitsliced and repeated across the
+    /// four blocks, so adding a round key is eight exclusive-ors.
+    private ulong[] _schedule;
+    private nuint _rounds;
 
     Aes(ReadOnlySpan<byte> key)
     {
-        _forward = BuildSubstitutionBox();
-        _reverse = new byte[256u];
-        for (nuint i = 0u; i < 256u; i++)
-            _reverse[(nuint)_forward[i]] = (byte)i;
-
         // Written out rather than as a ternary: `nuint` is four bytes on a
         // 32-bit target and eight on a 64-bit one, and the arms of a ternary
         // over unsuffixed literals meet at a type that is neither.
@@ -73,7 +79,7 @@ public sealed class Aes
         else if (key.Length == 24u)
             _rounds = 12u;
 
-        _schedule = ExpandKey(key);
+        _schedule = ExpandKey(key, _rounds);
     }
 
     /// A cipher under `key`, which must be 16, 24 or 32 bytes -- AES-128,
@@ -95,7 +101,9 @@ public sealed class Aes
         byte[] key = new byte[32u];
         if (!sl_random_bytes(&key[0u], key.Length))
             sl_fail("Aes.Create: the platform supplied no entropy".ToPointer());
-        return new Aes(key);
+        var cipher = new Aes(key);
+        CryptographicOperations.ZeroMemory(key);
+        return cipher;
     }
 
     /// How many rounds this key length runs: 10, 12 or 14.
@@ -109,41 +117,11 @@ public sealed class Aes
     /// implementing a mode this class does not have needs the same door.
     /// **Not a way to encrypt a message**: a bare block cipher applied twice
     /// to the same input gives the same output, which is what a mode exists to
-    /// fix.
-    public void EncryptBlock(byte[] block, nuint offset)
-    {
-        AddRoundKey(block, offset, 0u);
-
-        for (nuint round = 1u; round < _rounds; round++)
-        {
-            SubstituteBytes(block, offset, _forward);
-            ShiftRows(block, offset);
-            MixColumns(block, offset);
-            AddRoundKey(block, offset, round);
-        }
-
-        SubstituteBytes(block, offset, _forward);
-        ShiftRows(block, offset);
-        AddRoundKey(block, offset, _rounds);
-    }
+    /// fix. One block costs a pass that could have carried four.
+    public void EncryptBlock(byte[] block, nuint offset) => EncryptBlocks(block, offset, 1u);
 
     /// One block deciphered in place, at `offset` in `block`.
-    public void DecryptBlock(byte[] block, nuint offset)
-    {
-        AddRoundKey(block, offset, _rounds);
-
-        for (nuint round = _rounds - 1u; round > 0u; round--)
-        {
-            UnshiftRows(block, offset);
-            SubstituteBytes(block, offset, _reverse);
-            AddRoundKey(block, offset, round);
-            UnmixColumns(block, offset);
-        }
-
-        UnshiftRows(block, offset);
-        SubstituteBytes(block, offset, _reverse);
-        AddRoundKey(block, offset, 0u);
-    }
+    public void DecryptBlock(byte[] block, nuint offset) => DecryptBlocks(block, offset, 1u);
 
     // ------------------------------------------------------------------ ECB
 
@@ -161,9 +139,7 @@ public sealed class Aes
             return Fail(padded.Error);
 
         byte[] output = padded.Value;
-        for (nuint at = 0u; at < output.Length; at += BlockSize)
-            EncryptBlock(output, at);
-
+        EncryptWholeBlocks(output);
         return Ok(output);
     }
 
@@ -179,8 +155,8 @@ public sealed class Aes
             return Fail(CryptoError.BlockLength);
 
         byte[] output = CopyBytes(ciphertext);
-        for (nuint at = 0u; at < output.Length; at += BlockSize)
-            DecryptBlock(output, at);
+        for (nuint at = 0u; at < output.Length; at += BatchSize)
+            DecryptBlocks(output, at, CountBatchBlocks(output.Length - at));
 
         return RemovePadding(output, padding);
     }
@@ -207,17 +183,15 @@ public sealed class Aes
             return Fail(padded.Error);
 
         byte[] output = padded.Value;
-        byte[] chain = CopyBytes(iv);
-
         for (nuint at = 0u; at < output.Length; at += BlockSize)
         {
             for (nuint i = 0u; i < BlockSize; i++)
-                output[at + i] = (byte)(output[at + i] ^ chain[i]);
+            {
+                byte previous = at == 0u ? iv[i] : output[at - BlockSize + i];
+                output[at + i] = (byte)(output[at + i] ^ previous);
+            }
 
-            EncryptBlock(output, at);
-
-            for (nuint i = 0u; i < BlockSize; i++)
-                chain[i] = output[at + i];
+            EncryptBlocks(output, at, 1u);
         }
 
         return Ok(output);
@@ -241,23 +215,16 @@ public sealed class Aes
         if (ciphertext.Length == 0u || ciphertext.Length % BlockSize != 0u)
             return Fail(CryptoError.BlockLength);
 
+        // Every block is deciphered before any is unchained, which is what
+        // lets four go through at once; `ciphertext` still holds the chain.
         byte[] output = CopyBytes(ciphertext);
-        byte[] chain = CopyBytes(iv);
-        byte[] carry = new byte[BlockSize];
+        for (nuint at = 0u; at < output.Length; at += BatchSize)
+            DecryptBlocks(output, at, CountBatchBlocks(output.Length - at));
 
-        for (nuint at = 0u; at < output.Length; at += BlockSize)
-        {
-            for (nuint i = 0u; i < BlockSize; i++)
-                carry[i] = output[at + i];
-
-            DecryptBlock(output, at);
-
-            for (nuint i = 0u; i < BlockSize; i++)
-            {
-                output[at + i] = (byte)(output[at + i] ^ chain[i]);
-                chain[i] = carry[i];
-            }
-        }
+        for (nuint i = 0u; i < BlockSize; i++)
+            output[i] = (byte)(output[i] ^ iv[i]);
+        for (nuint i = BlockSize; i < output.Length; i++)
+            output[i] = (byte)(output[i] ^ ciphertext[i - BlockSize]);
 
         return RemovePadding(output, padding);
     }
@@ -279,7 +246,7 @@ public sealed class Aes
 
         for (nuint at = 0u; at < output.Length; at += BlockSize)
         {
-            EncryptBlock(chain, 0u);
+            EncryptBlocks(chain, 0u, 1u);
 
             nuint span = output.Length - at;
             if (span > BlockSize)
@@ -292,6 +259,7 @@ public sealed class Aes
             }
         }
 
+        CryptographicOperations.ZeroMemory(chain);
         return Ok(output);
     }
 
@@ -304,25 +272,20 @@ public sealed class Aes
         if (iv.Length != BlockSize)
             return Fail(CryptoError.IvLength);
 
-        byte[] output = CopyBytes(ciphertext);
-        byte[] chain = CopyBytes(iv);
+        // Each block's keystream is the encipherment of the ciphertext block
+        // before it, so all of it is known before any is made.
+        nuint blocks = (ciphertext.Length + BlockSize - 1u) / BlockSize;
+        byte[] keystream = new byte[blocks * BlockSize];
+        for (nuint i = 0u; i < keystream.Length; i++)
+            keystream[i] = i < BlockSize ? iv[i] : ciphertext[i - BlockSize];
 
-        for (nuint at = 0u; at < output.Length; at += BlockSize)
-        {
-            EncryptBlock(chain, 0u);
+        EncryptWholeBlocks(keystream);
 
-            nuint span = output.Length - at;
-            if (span > BlockSize)
-                span = BlockSize;
+        byte[] output = new byte[ciphertext.Length];
+        for (nuint i = 0u; i < output.Length; i++)
+            output[i] = (byte)(ciphertext[i] ^ keystream[i]);
 
-            for (nuint i = 0u; i < span; i++)
-            {
-                byte enciphered = output[at + i];
-                output[at + i] = (byte)(enciphered ^ chain[i]);
-                chain[i] = enciphered;
-            }
-        }
-
+        CryptographicOperations.ZeroMemory(keystream);
         return Ok(output);
     }
 
@@ -354,23 +317,26 @@ public sealed class Aes
 
         byte[] output = CopyBytes(data);
         byte[] position = CopyBytes(counter);
-        byte[] keystream = new byte[BlockSize];
+        byte[] keystream = new byte[BatchSize];
 
-        for (nuint at = 0u; at < output.Length; at += BlockSize)
+        for (nuint at = 0u; at < output.Length; at += BatchSize)
         {
-            for (nuint i = 0u; i < BlockSize; i++)
-                keystream[i] = position[i];
+            nuint count = CountBatchBlocks(output.Length - at);
+            for (nuint block = 0u; block < count; block++)
+            {
+                for (nuint i = 0u; i < BlockSize; i++)
+                    keystream[block * BlockSize + i] = position[i];
+                IncrementCounter(position, from);
+            }
 
-            EncryptBlock(keystream, 0u);
+            EncryptBlocks(keystream, 0u, count);
 
             nuint span = output.Length - at;
-            if (span > BlockSize)
-                span = BlockSize;
+            if (span > BatchSize)
+                span = BatchSize;
 
             for (nuint i = 0u; i < span; i++)
                 output[at + i] = (byte)(output[at + i] ^ keystream[i]);
-
-            IncrementCounter(position, from);
         }
 
         CryptographicOperations.ZeroMemory(keystream);
@@ -379,7 +345,7 @@ public sealed class Aes
 
     /// One added to a big-endian counter in `block`, from byte `from` to the
     /// end. GCM increments only the last four bytes, which is what `from` is
-    /// for.
+    /// for. The counter is public, so the early return leaks nothing.
     static void IncrementCounter(byte[] block, nuint from)
     {
         nuint at = block.Length;
@@ -479,230 +445,537 @@ public sealed class Aes
     }
 
     // ------------------------------------------------------------ the cipher
+    //
+    // Bit `b` of every byte of four blocks is in `q[b]`, at position
+    // 16 * row + 4 * column + block. A row is sixteen bits, so ShiftRows moves
+    // nibbles within one and MixColumns rotates the rows past each other.
 
-    void AddRoundKey(byte[] block, nuint offset, nuint round)
+    /// Every block of `data` enciphered in place, four to a pass. The length
+    /// MUST be a whole number of blocks.
+    void EncryptWholeBlocks(byte[] data)
     {
-        nuint at = round * BlockSize;
-        for (nuint i = 0u; i < BlockSize; i++)
-            block[offset + i] = (byte)(block[offset + i] ^ _schedule[at + i]);
+        for (nuint at = 0u; at < data.Length; at += BatchSize)
+            EncryptBlocks(data, at, CountBatchBlocks(data.Length - at));
     }
 
-    static void SubstituteBytes(byte[] block, nuint offset, byte[] box)
+    /// `count` blocks from `offset` enciphered in place, in one pass. `count`
+    /// MUST be one to four.
+    void EncryptBlocks(byte[] data, nuint offset, nuint count)
     {
-        for (nuint i = 0u; i < BlockSize; i++)
-            block[offset + i] = box[(nuint)block[offset + i]];
+        ulong[8] q;
+        LoadBlocks(ref q, data, offset, count);
+        EncryptState(ref q);
+        StoreBlocks(ref q, data, offset, count);
     }
 
-    /// The state is column-major, so row `r` is bytes r, r+4, r+8, r+12.
-    static void ShiftRows(byte[] s, nuint at)
+    /// `count` blocks from `offset` deciphered in place, in one pass.
+    void DecryptBlocks(byte[] data, nuint offset, nuint count)
     {
-        byte carry = s[at + 1u];
-        s[at + 1u] = s[at + 5u];
-        s[at + 5u] = s[at + 9u];
-        s[at + 9u] = s[at + 13u];
-        s[at + 13u] = carry;
-
-        carry = s[at + 2u];
-        s[at + 2u] = s[at + 10u];
-        s[at + 10u] = carry;
-        carry = s[at + 6u];
-        s[at + 6u] = s[at + 14u];
-        s[at + 14u] = carry;
-
-        carry = s[at + 15u];
-        s[at + 15u] = s[at + 11u];
-        s[at + 11u] = s[at + 7u];
-        s[at + 7u] = s[at + 3u];
-        s[at + 3u] = carry;
+        ulong[8] q;
+        LoadBlocks(ref q, data, offset, count);
+        DecryptState(ref q);
+        StoreBlocks(ref q, data, offset, count);
     }
 
-    static void UnshiftRows(byte[] s, nuint at)
+    /// How many blocks the next pass carries, with `remaining` bytes to go.
+    static nuint CountBatchBlocks(nuint remaining)
     {
-        byte carry = s[at + 13u];
-        s[at + 13u] = s[at + 9u];
-        s[at + 9u] = s[at + 5u];
-        s[at + 5u] = s[at + 1u];
-        s[at + 1u] = carry;
-
-        carry = s[at + 2u];
-        s[at + 2u] = s[at + 10u];
-        s[at + 10u] = carry;
-        carry = s[at + 6u];
-        s[at + 6u] = s[at + 14u];
-        s[at + 14u] = carry;
-
-        carry = s[at + 3u];
-        s[at + 3u] = s[at + 7u];
-        s[at + 7u] = s[at + 11u];
-        s[at + 11u] = s[at + 15u];
-        s[at + 15u] = carry;
+        nuint blocks = (remaining + BlockSize - 1u) / BlockSize;
+        if (blocks > 4u)
+            return 4u;
+        return blocks;
     }
 
-    static void MixColumns(byte[] s, nuint at)
+    void EncryptState(ref ulong[8] q)
     {
-        for (nuint column = 0u; column < 4u; column++)
-        {
-            nuint c = at + column * 4u;
-            byte a0 = s[c];
-            byte a1 = s[c + 1u];
-            byte a2 = s[c + 2u];
-            byte a3 = s[c + 3u];
-
-            s[c] = (byte)(MultiplyByTwo(a0) ^ MultiplyByTwo(a1) ^ a1 ^ a2 ^ a3);
-            s[c + 1u] = (byte)(a0 ^ MultiplyByTwo(a1) ^ MultiplyByTwo(a2) ^ a2 ^ a3);
-            s[c + 2u] = (byte)(a0 ^ a1 ^ MultiplyByTwo(a2) ^ MultiplyByTwo(a3) ^ a3);
-            s[c + 3u] = (byte)(MultiplyByTwo(a0) ^ a0 ^ a1 ^ a2 ^ MultiplyByTwo(a3));
-        }
-    }
-
-    static void UnmixColumns(byte[] s, nuint at)
-    {
-        for (nuint column = 0u; column < 4u; column++)
-        {
-            nuint c = at + column * 4u;
-            byte a0 = s[c];
-            byte a1 = s[c + 1u];
-            byte a2 = s[c + 2u];
-            byte a3 = s[c + 3u];
-
-            s[c] = (byte)(MultiplyInField(a0, 14) ^ MultiplyInField(a1, 11) ^
-                          MultiplyInField(a2, 13) ^ MultiplyInField(a3, 9));
-            s[c + 1u] = (byte)(MultiplyInField(a0, 9) ^ MultiplyInField(a1, 14) ^
-                               MultiplyInField(a2, 11) ^ MultiplyInField(a3, 13));
-            s[c + 2u] = (byte)(MultiplyInField(a0, 13) ^ MultiplyInField(a1, 9) ^
-                               MultiplyInField(a2, 14) ^ MultiplyInField(a3, 11));
-            s[c + 3u] = (byte)(MultiplyInField(a0, 11) ^ MultiplyInField(a1, 13) ^
-                               MultiplyInField(a2, 9) ^ MultiplyInField(a3, 14));
-        }
-    }
-
-    byte[] ExpandKey(ReadOnlySpan<byte> key)
-    {
-        nuint words = 4u * (_rounds + 1u);
-        nuint keyWords = key.Length / 4u;
-        byte[] schedule = new byte[words * 4u];
-
-        for (nuint i = 0u; i < key.Length; i++)
-            schedule[i] = key[i];
-
-        byte constant = 1;
-
-        for (nuint i = keyWords; i < words; i++)
-        {
-            nuint previous = (i - 1u) * 4u;
-            byte t0 = schedule[previous];
-            byte t1 = schedule[previous + 1u];
-            byte t2 = schedule[previous + 2u];
-            byte t3 = schedule[previous + 3u];
-
-            if (i % keyWords == 0u)
-            {
-                // RotWord, SubWord, and the round constant on the first byte.
-                byte carry = t0;
-                t0 = _forward[(nuint)t1];
-                t1 = _forward[(nuint)t2];
-                t2 = _forward[(nuint)t3];
-                t3 = _forward[(nuint)carry];
-
-                t0 = (byte)(t0 ^ constant);
-                constant = MultiplyByTwo(constant);
-            }
-            else if (keyWords > 6u && i % keyWords == 4u)
-            {
-                // AES-256 substitutes without rotating every fourth word.
-                t0 = _forward[(nuint)t0];
-                t1 = _forward[(nuint)t1];
-                t2 = _forward[(nuint)t2];
-                t3 = _forward[(nuint)t3];
-            }
-
-            nuint back = (i - keyWords) * 4u;
-            nuint here = i * 4u;
-            schedule[here] = (byte)(schedule[back] ^ t0);
-            schedule[here + 1u] = (byte)(schedule[back + 1u] ^ t1);
-            schedule[here + 2u] = (byte)(schedule[back + 2u] ^ t2);
-            schedule[here + 3u] = (byte)(schedule[back + 3u] ^ t3);
-        }
-
-        return schedule;
-    }
-
-    /// The S-box, derived rather than transcribed.
-    ///
-    /// It is defined as the multiplicative inverse in GF(2^8) followed by an
-    /// affine transform, and computing it is twenty lines where copying it is
-    /// 256 hex constants that nothing would catch a typo in. The cost is a
-    /// table built per cipher object, which is a few thousand instructions
-    /// once.
-    static byte[] BuildSubstitutionBox()
-    {
-        byte[] box = new byte[256u];
-        box[0u] = 0x63;
-
-        for (nuint i = 1u; i < 256u; i++)
-        {
-            uint inverse = (uint)InvertInField((byte)i);
-            uint folded = inverse ^ RotateOctet(inverse, 1u) ^ RotateOctet(inverse, 2u) ^
-                          RotateOctet(inverse, 3u) ^ RotateOctet(inverse, 4u) ^ 0x63u;
-            box[i] = (byte)(folded & 0xFFu);
-        }
-
-        return box;
-    }
-
-    static uint RotateOctet(uint value, uint by) =>
-        ((value << by) | (value >> (8u - by))) & 0xFFu;
-
-    /// x times 2 in GF(2^8) with the AES polynomial, which is the only
-    /// multiplication the forward direction needs.
-    static byte MultiplyByTwo(byte value)
-    {
-        uint doubled = (uint)value << 1;
-        if ((value & 0x80u) != 0u)
-            doubled ^= 0x1Bu;
-        return (byte)(doubled & 0xFFu);
-    }
-
-    /// A full GF(2^8) multiply, for the inverse mix columns.
-    static byte MultiplyInField(byte left, byte right)
-    {
-        uint result = 0u;
-        uint a = (uint)left;
-        uint b = (uint)right;
+        ulong[] schedule = _schedule;
+        nuint rounds = _rounds;
 
         for (nuint i = 0u; i < 8u; i++)
+            q[i] ^= schedule[i];
+
+        for (nuint round = 1u; round < rounds; round++)
         {
-            if ((b & 1u) != 0u)
-                result ^= a;
+            SubstituteBytes(ref q);
+            ShiftRows(ref q);
+            MixColumns(ref q);
 
-            bool overflowed = (a & 0x80u) != 0u;
-            a = (a << 1) & 0xFFu;
-            if (overflowed)
-                a ^= 0x1Bu;
-
-            b >>= 1;
+            nuint at = round * 8u;
+            for (nuint i = 0u; i < 8u; i++)
+                q[i] ^= schedule[at + i];
         }
 
-        return (byte)(result & 0xFFu);
+        SubstituteBytes(ref q);
+        ShiftRows(ref q);
+
+        nuint last = rounds * 8u;
+        for (nuint i = 0u; i < 8u; i++)
+            q[i] ^= schedule[last + i];
     }
 
-    /// The multiplicative inverse, as a^254 -- which it is, because the group
-    /// has 255 elements.
-    static byte InvertInField(byte value)
+    void DecryptState(ref ulong[8] q)
     {
-        if (value == 0)
-            return 0;
+        ulong[] schedule = _schedule;
+        nuint rounds = _rounds;
 
-        byte result = 1;
-        byte power = value;
+        nuint last = rounds * 8u;
+        for (nuint i = 0u; i < 8u; i++)
+            q[i] ^= schedule[last + i];
 
-        for (nuint bit = 1u; bit < 8u; bit++)
+        for (nuint round = rounds - 1u; round > 0u; round--)
         {
-            power = MultiplyInField(power, power);
-            result = MultiplyInField(result, power);
+            UnshiftRows(ref q);
+            UnsubstituteBytes(ref q);
+
+            nuint at = round * 8u;
+            for (nuint i = 0u; i < 8u; i++)
+                q[i] ^= schedule[at + i];
+
+            UnmixColumns(ref q);
         }
 
-        return result;
+        UnshiftRows(ref q);
+        UnsubstituteBytes(ref q);
+
+        for (nuint i = 0u; i < 8u; i++)
+            q[i] ^= schedule[i];
+    }
+
+    /// `count` blocks of `data` from `offset` into the bitsliced state, as
+    /// little-endian words. A block past `count` is zeros, and its result is
+    /// thrown away.
+    static void LoadBlocks(ref ulong[8] q, byte[] data, nuint offset, nuint count)
+    {
+        for (nuint block = 0u; block < 4u; block++)
+        {
+            uint[4] words;
+            if (block < count)
+            {
+                nuint at = offset + block * BlockSize;
+                for (nuint i = 0u; i < BlockSize; i++)
+                    words[i / 4u] |= (uint)data[at + i] << (int)(8u * (i % 4u));
+            }
+
+            q[block] = SpreadWord(words[0u]) | (SpreadWord(words[2u]) << 8);
+            q[block + 4u] = SpreadWord(words[1u]) | (SpreadWord(words[3u]) << 8);
+        }
+
+        Orthogonalize(ref q);
+    }
+
+    /// The inverse of `LoadBlocks`, writing `count` blocks back.
+    static void StoreBlocks(ref ulong[8] q, byte[] data, nuint offset, nuint count)
+    {
+        Orthogonalize(ref q);
+
+        for (nuint block = 0u; block < count; block++)
+        {
+            uint[4] words;
+            words[0u] = GatherWord(q[block]);
+            words[1u] = GatherWord(q[block + 4u]);
+            words[2u] = GatherWord(q[block] >> 8);
+            words[3u] = GatherWord(q[block + 4u] >> 8);
+
+            nuint at = offset + block * BlockSize;
+            for (nuint i = 0u; i < BlockSize; i++)
+                data[at + i] = (byte)(words[i / 4u] >> (int)(8u * (i % 4u)));
+        }
+    }
+
+    /// The four bytes of `word` moved to the low byte of each 16-bit lane.
+    static ulong SpreadWord(uint word)
+    {
+        ulong x = (ulong)word;
+        x = (x | (x << 16)) & 0x0000FFFF0000FFFFu;
+        x = (x | (x << 8)) & 0x00FF00FF00FF00FFu;
+        return x;
+    }
+
+    /// The inverse of `SpreadWord`, ignoring the high byte of each lane.
+    static uint GatherWord(ulong spread)
+    {
+        ulong x = spread & 0x00FF00FF00FF00FFu;
+        x = (x | (x >> 8)) & 0x0000FFFF0000FFFFu;
+        return (uint)x | (uint)(x >> 16);
+    }
+
+    /// Transposes the eight words as eight-by-eight bit matrices, which moves
+    /// between one byte per lane and one bit position per word. It is its own
+    /// inverse.
+    static void Orthogonalize(ref ulong[8] q)
+    {
+        SwapBits(ref q[0u], ref q[1u], 0x5555555555555555u, 1);
+        SwapBits(ref q[2u], ref q[3u], 0x5555555555555555u, 1);
+        SwapBits(ref q[4u], ref q[5u], 0x5555555555555555u, 1);
+        SwapBits(ref q[6u], ref q[7u], 0x5555555555555555u, 1);
+
+        SwapBits(ref q[0u], ref q[2u], 0x3333333333333333u, 2);
+        SwapBits(ref q[1u], ref q[3u], 0x3333333333333333u, 2);
+        SwapBits(ref q[4u], ref q[6u], 0x3333333333333333u, 2);
+        SwapBits(ref q[5u], ref q[7u], 0x3333333333333333u, 2);
+
+        SwapBits(ref q[0u], ref q[4u], 0x0F0F0F0F0F0F0F0Fu, 4);
+        SwapBits(ref q[1u], ref q[5u], 0x0F0F0F0F0F0F0F0Fu, 4);
+        SwapBits(ref q[2u], ref q[6u], 0x0F0F0F0F0F0F0F0Fu, 4);
+        SwapBits(ref q[3u], ref q[7u], 0x0F0F0F0F0F0F0F0Fu, 4);
+    }
+
+    /// The bits of `high` under `mask` exchanged with the bits of `low` one
+    /// `shift` above them.
+    static void SwapBits(ref ulong low, ref ulong high, ulong mask, int shift)
+    {
+        ulong a = low;
+        ulong b = high;
+        low = (a & mask) | ((b & mask) << shift);
+        high = ((a >> shift) & mask) | (b & ~mask);
+    }
+
+    /// The S-box on all 64 bytes at once, as the circuit of Boyar and Peralta,
+    /// "A new combinational logic minimization technique with applications to
+    /// cryptology" (2009). The names are the paper's: `x0` is the high bit.
+    static void SubstituteBytes(ref ulong[8] q)
+    {
+        ulong x0 = q[7u];
+        ulong x1 = q[6u];
+        ulong x2 = q[5u];
+        ulong x3 = q[4u];
+        ulong x4 = q[3u];
+        ulong x5 = q[2u];
+        ulong x6 = q[1u];
+        ulong x7 = q[0u];
+
+        // The top linear transformation.
+        ulong y14 = x3 ^ x5;
+        ulong y13 = x0 ^ x6;
+        ulong y9 = x0 ^ x3;
+        ulong y8 = x0 ^ x5;
+        ulong t0 = x1 ^ x2;
+        ulong y1 = t0 ^ x7;
+        ulong y4 = y1 ^ x3;
+        ulong y12 = y13 ^ y14;
+        ulong y2 = y1 ^ x0;
+        ulong y5 = y1 ^ x6;
+        ulong y3 = y5 ^ y8;
+        ulong t1 = x4 ^ y12;
+        ulong y15 = t1 ^ x5;
+        ulong y20 = t1 ^ x1;
+        ulong y6 = y15 ^ x7;
+        ulong y10 = y15 ^ t0;
+        ulong y11 = y20 ^ y9;
+        ulong y7 = x7 ^ y11;
+        ulong y17 = y10 ^ y11;
+        ulong y19 = y10 ^ y8;
+        ulong y16 = t0 ^ y11;
+        ulong y21 = y13 ^ y16;
+        ulong y18 = x0 ^ y16;
+
+        // The nonlinear middle: inversion in GF(2^4)^2.
+        ulong t2 = y12 & y15;
+        ulong t3 = y3 & y6;
+        ulong t4 = t3 ^ t2;
+        ulong t5 = y4 & x7;
+        ulong t6 = t5 ^ t2;
+        ulong t7 = y13 & y16;
+        ulong t8 = y5 & y1;
+        ulong t9 = t8 ^ t7;
+        ulong t10 = y2 & y7;
+        ulong t11 = t10 ^ t7;
+        ulong t12 = y9 & y11;
+        ulong t13 = y14 & y17;
+        ulong t14 = t13 ^ t12;
+        ulong t15 = y8 & y10;
+        ulong t16 = t15 ^ t12;
+        ulong t17 = t4 ^ t14;
+        ulong t18 = t6 ^ t16;
+        ulong t19 = t9 ^ t14;
+        ulong t20 = t11 ^ t16;
+        ulong t21 = t17 ^ y20;
+        ulong t22 = t18 ^ y19;
+        ulong t23 = t19 ^ y21;
+        ulong t24 = t20 ^ y18;
+
+        ulong t25 = t21 ^ t22;
+        ulong t26 = t21 & t23;
+        ulong t27 = t24 ^ t26;
+        ulong t28 = t25 & t27;
+        ulong t29 = t28 ^ t22;
+        ulong t30 = t23 ^ t24;
+        ulong t31 = t22 ^ t26;
+        ulong t32 = t31 & t30;
+        ulong t33 = t32 ^ t24;
+        ulong t34 = t23 ^ t33;
+        ulong t35 = t27 ^ t33;
+        ulong t36 = t24 & t35;
+        ulong t37 = t36 ^ t34;
+        ulong t38 = t27 ^ t36;
+        ulong t39 = t29 & t38;
+        ulong t40 = t25 ^ t39;
+
+        ulong t41 = t40 ^ t37;
+        ulong t42 = t29 ^ t33;
+        ulong t43 = t29 ^ t40;
+        ulong t44 = t33 ^ t37;
+        ulong t45 = t42 ^ t41;
+        ulong z0 = t44 & y15;
+        ulong z1 = t37 & y6;
+        ulong z2 = t33 & x7;
+        ulong z3 = t43 & y16;
+        ulong z4 = t40 & y1;
+        ulong z5 = t29 & y7;
+        ulong z6 = t42 & y11;
+        ulong z7 = t45 & y17;
+        ulong z8 = t41 & y10;
+        ulong z9 = t44 & y12;
+        ulong z10 = t37 & y3;
+        ulong z11 = t33 & y4;
+        ulong z12 = t43 & y13;
+        ulong z13 = t40 & y5;
+        ulong z14 = t29 & y2;
+        ulong z15 = t42 & y9;
+        ulong z16 = t45 & y14;
+        ulong z17 = t41 & y8;
+
+        // The bottom linear transformation, with the affine constant folded
+        // into the four complements.
+        ulong t46 = z15 ^ z16;
+        ulong t47 = z10 ^ z11;
+        ulong t48 = z5 ^ z13;
+        ulong t49 = z9 ^ z10;
+        ulong t50 = z2 ^ z12;
+        ulong t51 = z2 ^ z5;
+        ulong t52 = z7 ^ z8;
+        ulong t53 = z0 ^ z3;
+        ulong t54 = z6 ^ z7;
+        ulong t55 = z16 ^ z17;
+        ulong t56 = z12 ^ t48;
+        ulong t57 = t50 ^ t53;
+        ulong t58 = z4 ^ t46;
+        ulong t59 = z3 ^ t54;
+        ulong t60 = t46 ^ t57;
+        ulong t61 = z14 ^ t57;
+        ulong t62 = t52 ^ t58;
+        ulong t63 = t49 ^ t58;
+        ulong t64 = z4 ^ t59;
+        ulong t65 = t61 ^ t62;
+        ulong t66 = z1 ^ t63;
+        ulong s0 = t59 ^ t63;
+        ulong s6 = t56 ^ ~t62;
+        ulong s7 = t48 ^ ~t60;
+        ulong t67 = t64 ^ t65;
+        ulong s3 = t53 ^ t66;
+        ulong s4 = t51 ^ t66;
+        ulong s5 = t47 ^ t65;
+        ulong s1 = t64 ^ ~s3;
+        ulong s2 = t55 ^ ~t67;
+
+        q[7u] = s0;
+        q[6u] = s1;
+        q[5u] = s2;
+        q[4u] = s3;
+        q[3u] = s4;
+        q[2u] = s5;
+        q[1u] = s6;
+        q[0u] = s7;
+    }
+
+    /// The inverse S-box. Inversion in the field is its own inverse, so the
+    /// forward circuit between two applications of the inverse affine map is
+    /// the whole of it.
+    static void UnsubstituteBytes(ref ulong[8] q)
+    {
+        UndoAffineMap(ref q);
+        SubstituteBytes(ref q);
+        UndoAffineMap(ref q);
+    }
+
+    /// The inverse of the S-box's affine map, constant included: bit `i` is
+    /// bits `i + 2`, `i + 5` and `i + 7` of the input, after 0x63 is removed.
+    static void UndoAffineMap(ref ulong[8] q)
+    {
+        ulong q0 = ~q[0u];
+        ulong q1 = ~q[1u];
+        ulong q2 = q[2u];
+        ulong q3 = q[3u];
+        ulong q4 = q[4u];
+        ulong q5 = ~q[5u];
+        ulong q6 = ~q[6u];
+        ulong q7 = q[7u];
+
+        q[7u] = q1 ^ q4 ^ q6;
+        q[6u] = q0 ^ q3 ^ q5;
+        q[5u] = q7 ^ q2 ^ q4;
+        q[4u] = q6 ^ q1 ^ q3;
+        q[3u] = q5 ^ q0 ^ q2;
+        q[2u] = q4 ^ q7 ^ q1;
+        q[1u] = q3 ^ q6 ^ q0;
+        q[0u] = q2 ^ q5 ^ q7;
+    }
+
+    /// Row `r` rotated left by `r` columns, a column being four bits.
+    static void ShiftRows(ref ulong[8] q)
+    {
+        for (nuint i = 0u; i < 8u; i++)
+        {
+            ulong x = q[i];
+            q[i] = (x & 0x000000000000FFFFu) |
+                   ((x & 0x00000000FFF00000u) >> 4) | ((x & 0x00000000000F0000u) << 12) |
+                   ((x & 0x0000FF0000000000u) >> 8) | ((x & 0x000000FF00000000u) << 8) |
+                   ((x & 0xF000000000000000u) >> 12) | ((x & 0x0FFF000000000000u) << 4);
+        }
+    }
+
+    static void UnshiftRows(ref ulong[8] q)
+    {
+        for (nuint i = 0u; i < 8u; i++)
+        {
+            ulong x = q[i];
+            q[i] = (x & 0x000000000000FFFFu) |
+                   ((x & 0x000000000FFF0000u) << 4) | ((x & 0x00000000F0000000u) >> 12) |
+                   ((x & 0x000000FF00000000u) << 8) | ((x & 0x0000FF0000000000u) >> 8) |
+                   ((x & 0x000F000000000000u) << 12) | ((x & 0xFFF0000000000000u) >> 4);
+        }
+    }
+
+    /// Each output row is 2·a + 3·b + c + d over the rows below it. Rotating a
+    /// word right by 16 brings the next row down, and by 32 the one after, so
+    /// the column is never taken apart; doubling in the field is a shift of the
+    /// bit planes with the polynomial's taps where the top bit lands.
+    static void MixColumns(ref ulong[8] q)
+    {
+        ulong q0 = q[0u];
+        ulong q1 = q[1u];
+        ulong q2 = q[2u];
+        ulong q3 = q[3u];
+        ulong q4 = q[4u];
+        ulong q5 = q[5u];
+        ulong q6 = q[6u];
+        ulong q7 = q[7u];
+        ulong r0 = RotateRight(q0, 16);
+        ulong r1 = RotateRight(q1, 16);
+        ulong r2 = RotateRight(q2, 16);
+        ulong r3 = RotateRight(q3, 16);
+        ulong r4 = RotateRight(q4, 16);
+        ulong r5 = RotateRight(q5, 16);
+        ulong r6 = RotateRight(q6, 16);
+        ulong r7 = RotateRight(q7, 16);
+
+        q[0u] = q7 ^ r7 ^ r0 ^ RotateRight(q0 ^ r0, 32);
+        q[1u] = q0 ^ r0 ^ q7 ^ r7 ^ r1 ^ RotateRight(q1 ^ r1, 32);
+        q[2u] = q1 ^ r1 ^ r2 ^ RotateRight(q2 ^ r2, 32);
+        q[3u] = q2 ^ r2 ^ q7 ^ r7 ^ r3 ^ RotateRight(q3 ^ r3, 32);
+        q[4u] = q3 ^ r3 ^ q7 ^ r7 ^ r4 ^ RotateRight(q4 ^ r4, 32);
+        q[5u] = q4 ^ r4 ^ r5 ^ RotateRight(q5 ^ r5, 32);
+        q[6u] = q5 ^ r5 ^ r6 ^ RotateRight(q6 ^ r6, 32);
+        q[7u] = q6 ^ r6 ^ r7 ^ RotateRight(q7 ^ r7, 32);
+    }
+
+    /// 14·a + 11·b + 13·c + 9·d, the same way: 14·q + 11·r for the row and
+    /// the row below it, and 13·q + 9·r rotated by two rows for the others.
+    static void UnmixColumns(ref ulong[8] q)
+    {
+        ulong q0 = q[0u];
+        ulong q1 = q[1u];
+        ulong q2 = q[2u];
+        ulong q3 = q[3u];
+        ulong q4 = q[4u];
+        ulong q5 = q[5u];
+        ulong q6 = q[6u];
+        ulong q7 = q[7u];
+        ulong r0 = RotateRight(q0, 16);
+        ulong r1 = RotateRight(q1, 16);
+        ulong r2 = RotateRight(q2, 16);
+        ulong r3 = RotateRight(q3, 16);
+        ulong r4 = RotateRight(q4, 16);
+        ulong r5 = RotateRight(q5, 16);
+        ulong r6 = RotateRight(q6, 16);
+        ulong r7 = RotateRight(q7, 16);
+
+        q[0u] = q5 ^ q6 ^ q7 ^ r0 ^ r5 ^ r7 ^ RotateRight(q0 ^ q5 ^ q6 ^ r0 ^ r5, 32);
+        q[1u] = q0 ^ q5 ^ r0 ^ r1 ^ r5 ^ r6 ^ r7 ^ RotateRight(q1 ^ q5 ^ q7 ^ r1 ^ r5 ^ r6, 32);
+        q[2u] = q0 ^ q1 ^ q6 ^ r1 ^ r2 ^ r6 ^ r7 ^ RotateRight(q0 ^ q2 ^ q6 ^ r2 ^ r6 ^ r7, 32);
+        q[3u] = q0 ^ q1 ^ q2 ^ q5 ^ q6 ^ r0 ^ r2 ^ r3 ^ r5 ^
+                RotateRight(q0 ^ q1 ^ q3 ^ q5 ^ q6 ^ q7 ^ r0 ^ r3 ^ r5 ^ r7, 32);
+        q[4u] = q1 ^ q2 ^ q3 ^ q5 ^ r1 ^ r3 ^ r4 ^ r5 ^ r6 ^ r7 ^
+                RotateRight(q1 ^ q2 ^ q4 ^ q5 ^ q7 ^ r1 ^ r4 ^ r5 ^ r6, 32);
+        q[5u] = q2 ^ q3 ^ q4 ^ q6 ^ r2 ^ r4 ^ r5 ^ r6 ^ r7 ^
+                RotateRight(q2 ^ q3 ^ q5 ^ q6 ^ r2 ^ r5 ^ r6 ^ r7, 32);
+        q[6u] = q3 ^ q4 ^ q5 ^ q7 ^ r3 ^ r5 ^ r6 ^ r7 ^
+                RotateRight(q3 ^ q4 ^ q6 ^ q7 ^ r3 ^ r6 ^ r7, 32);
+        q[7u] = q4 ^ q5 ^ q6 ^ r4 ^ r6 ^ r7 ^ RotateRight(q4 ^ q5 ^ q7 ^ r4 ^ r7, 32);
+    }
+
+    // ------------------------------------------------------------ the key
+
+    /// The FIPS-197 key expansion, bitsliced a round key at a time.
+    ///
+    /// The words are little-endian, so RotWord is a rotate right by eight.
+    /// SubWord goes through the same circuit as the data, so the key never
+    /// indexes a table either; the branches are on the word's position, which
+    /// is public.
+    static ulong[] ExpandKey(ReadOnlySpan<byte> key, nuint rounds)
+    {
+        nuint keyWords = key.Length / 4u;
+        nuint words = 4u * (rounds + 1u);
+
+        uint[60] schedule;
+        for (nuint i = 0u; i < key.Length; i++)
+            schedule[i / 4u] |= (uint)key[i] << (int)(8u * (i % 4u));
+
+        uint word = schedule[keyWords - 1u];
+        uint constant = 1u;
+        nuint position = 0u;
+        for (nuint i = keyWords; i < words; i++)
+        {
+            if (position == 0u)
+            {
+                word = SubstituteWord(RotateRight(word, 8)) ^ constant;
+                constant = (constant << 1) ^ ((constant >> 7) * 0x11Bu);
+            }
+            else if (keyWords > 6u && position == 4u)
+            {
+                word = SubstituteWord(word);
+            }
+
+            word ^= schedule[i - keyWords];
+            schedule[i] = word;
+
+            position++;
+            if (position == keyWords)
+                position = 0u;
+        }
+
+        // Four copies of a round key, bitsliced, are eight words in which every
+        // nibble is all ones or all zeros; they are what the rounds add.
+        ulong[] expanded = new ulong[8u * (rounds + 1u)];
+        ulong[8] q;
+        for (nuint round = 0u; round <= rounds; round++)
+        {
+            nuint at = round * 4u;
+            ulong low = SpreadWord(schedule[at]) | (SpreadWord(schedule[at + 2u]) << 8);
+            ulong high = SpreadWord(schedule[at + 1u]) | (SpreadWord(schedule[at + 3u]) << 8);
+            for (nuint i = 0u; i < 4u; i++)
+            {
+                q[i] = low;
+                q[i + 4u] = high;
+            }
+
+            Orthogonalize(ref q);
+            for (nuint i = 0u; i < 8u; i++)
+                expanded[round * 8u + i] = q[i];
+        }
+
+        return expanded;
+    }
+
+    /// The S-box on each byte of `word`, through the bitsliced circuit.
+    static uint SubstituteWord(uint word)
+    {
+        ulong[8] q;
+        q[0u] = (ulong)word;
+        Orthogonalize(ref q);
+        SubstituteBytes(ref q);
+        Orthogonalize(ref q);
+        return (uint)q[0u];
     }
 
     static byte[] CopyBytes(ReadOnlySpan<byte> data)

@@ -1,0 +1,3 @@
+# The AES case, built for 32-bit x86, where every 64-bit word of the
+# bitsliced state and of GHASH is a pair of registers.
+tests/cases/crypto-aes/aes.sl
