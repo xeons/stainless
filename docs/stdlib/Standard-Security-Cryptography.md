@@ -1085,6 +1085,74 @@ The platform would not supply entropy.
 
 <sub>[stdlib/Security/Cryptography/CryptoError.sl:71](../../stdlib/Security/Cryptography/CryptoError.sl#L71)</sub>
 
+#### InvalidKey *case*
+
+```
+InvalidKey
+```
+
+A key that is the right length and still not a key: an RSA modulus
+that is even or too small, a private key whose parts disagree, a
+scalar of zero or not below the group order, or a Diffie-Hellman
+result that is the identity.
+
+<sub>[stdlib/Security/Cryptography/CryptoError.sl:77](../../stdlib/Security/Cryptography/CryptoError.sl#L77)</sub>
+
+#### InvalidSignature *case*
+
+```
+InvalidSignature
+```
+
+A signature that does not verify, or is not a well-formed signature
+at all. The two are deliberately not told apart.
+
+<sub>[stdlib/Security/Cryptography/CryptoError.sl:81](../../stdlib/Security/Cryptography/CryptoError.sl#L81)</sub>
+
+#### InvalidPoint *case*
+
+```
+InvalidPoint
+```
+
+A point that is not on the curve, is the point at infinity where one
+is not allowed, or is encoded in a form this does not read.
+
+<sub>[stdlib/Security/Cryptography/CryptoError.sl:85](../../stdlib/Security/Cryptography/CryptoError.sl#L85)</sub>
+
+#### Encoding *case*
+
+```
+Encoding
+```
+
+A key or signature whose DER, PEM or other encoding does not parse,
+or parses as something other than what was asked for.
+
+<sub>[stdlib/Security/Cryptography/CryptoError.sl:89](../../stdlib/Security/Cryptography/CryptoError.sl#L89)</sub>
+
+#### MessageLength *case*
+
+```
+MessageLength
+```
+
+A message too long for the key: more than an RSA modulus can carry
+under the padding asked for.
+
+<sub>[stdlib/Security/Cryptography/CryptoError.sl:93](../../stdlib/Security/Cryptography/CryptoError.sl#L93)</sub>
+
+#### Unsupported *case*
+
+```
+Unsupported
+```
+
+A well-formed request this does not implement: a curve, a hash or a
+padding mode it has no code for.
+
+<sub>[stdlib/Security/Cryptography/CryptoError.sl:97](../../stdlib/Security/Cryptography/CryptoError.sl#L97)</sub>
+
 ### CryptographicOperations *class*
 
 ```
