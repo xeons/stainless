@@ -7,7 +7,7 @@ than library features, and so need no import to reach.
 
 ## Contents
 
-**Types** &nbsp; [Action](#action-closure) &middot; [Action&lt;T1, T2, T3, T4&gt;](#actiont1-t2-t3-t4-closure) &middot; [Action&lt;T1, T2, T3&gt;](#actiont1-t2-t3-closure) &middot; [Action&lt;T1, T2&gt;](#actiont1-t2-closure) &middot; [Action&lt;T&gt;](#actiont-closure) &middot; [Comparison&lt;T&gt;](#comparisont-closure) &middot; [Fold&lt;TAccumulate, TSource&gt;](#foldtaccumulate-tsource-closure) &middot; [Func&lt;T, TResult&gt;](#funct-tresult-closure) &middot; [Func&lt;T1, T2, T3, T4, TResult&gt;](#funct1-t2-t3-t4-tresult-closure) &middot; [Func&lt;T1, T2, T3, TResult&gt;](#funct1-t2-t3-tresult-closure) &middot; [Func&lt;T1, T2, TResult&gt;](#funct1-t2-tresult-closure) &middot; [Func&lt;TResult&gt;](#functresult-closure) &middot; [Guid](#guid-struct) &middot; [Index](#index-struct) &middot; [Lazy&lt;T&gt;](#lazyt-class) &middot; [LazyThreadSafetyMode](#lazythreadsafetymode-enum) &middot; [Optional&lt;T&gt;](#optionalt-variant) &middot; [ParseError](#parseerror-enum) &middot; [Predicate&lt;T&gt;](#predicatet-closure) &middot; [Range](#range-struct) &middot; [ReadOnlySpan&lt;T&gt;](#readonlyspant-struct) &middot; [Result&lt;T, TError&gt;](#resultt-terror-variant) &middot; [RuntimeHelpers](#runtimehelpers-class) &middot; [Span&lt;T&gt;](#spant-struct) &middot; [Uri](#uri-class) &middot; [UriKind](#urikind-enum) &middot; [UriPartial](#uripartial-enum) &middot; [Version](#version-struct)
+**Types** &nbsp; [Action](#action-closure) &middot; [Action&lt;T1, T2, T3, T4&gt;](#actiont1-t2-t3-t4-closure) &middot; [Action&lt;T1, T2, T3&gt;](#actiont1-t2-t3-closure) &middot; [Action&lt;T1, T2&gt;](#actiont1-t2-closure) &middot; [Action&lt;T&gt;](#actiont-closure) &middot; [Array](#array-class) &middot; [Comparison&lt;T&gt;](#comparisont-closure) &middot; [Fold&lt;TAccumulate, TSource&gt;](#foldtaccumulate-tsource-closure) &middot; [Func&lt;T, TResult&gt;](#funct-tresult-closure) &middot; [Func&lt;T1, T2, T3, T4, TResult&gt;](#funct1-t2-t3-t4-tresult-closure) &middot; [Func&lt;T1, T2, T3, TResult&gt;](#funct1-t2-t3-tresult-closure) &middot; [Func&lt;T1, T2, TResult&gt;](#funct1-t2-tresult-closure) &middot; [Func&lt;TResult&gt;](#functresult-closure) &middot; [Guid](#guid-struct) &middot; [Index](#index-struct) &middot; [Lazy&lt;T&gt;](#lazyt-class) &middot; [LazyThreadSafetyMode](#lazythreadsafetymode-enum) &middot; [Optional&lt;T&gt;](#optionalt-variant) &middot; [ParseError](#parseerror-enum) &middot; [Predicate&lt;T&gt;](#predicatet-closure) &middot; [Range](#range-struct) &middot; [ReadOnlySpan&lt;T&gt;](#readonlyspant-struct) &middot; [Result&lt;T, TError&gt;](#resultt-terror-variant) &middot; [RuntimeHelpers](#runtimehelpers-class) &middot; [Span&lt;T&gt;](#spant-struct) &middot; [Uri](#uri-class) &middot; [UriKind](#urikind-enum) &middot; [UriPartial](#uripartial-enum) &middot; [Version](#version-struct)
 
 ## Types
 
@@ -82,6 +82,68 @@ Does something with a T and returns nothing.
 - `T` — what is handed to it
 
 <sub>[stdlib/Standard/Standard.sl:77](../../stdlib/Standard/Standard.sl#L77)</sub>
+
+### Array *class*
+
+```
+class Array
+```
+
+Arrays made whole: every element given its value as the array is made.
+
+    String[] names = Array.Create(count, (i) => $"item {i}");
+    int[] zeros = Array.Repeat(0, 16);
+
+`new T[n]` starts every element as the zero of `T`, and a `T` holding a
+reference that is never null has no zero (§2.11.1). These are what such an
+array is made with instead; an array literal, `[a, b, c]`, is the other
+way, and a `List<T>` and its `ToArray` the way for a count not known in
+advance.
+
+<sub>[stdlib/Standard/Array.sl:36](../../stdlib/Standard/Array.sl#L36)</sub>
+
+#### Create *method*
+
+```
+static T[] Create<T>(nuint count, Func<nuint, T> make)
+```
+
+`count` elements, the element at `i` being `make(i)`, called in order
+from zero. No element is ever seen before it has its value.
+
+**Parameters**
+
+- `count` — how many elements
+- `make` — the element at an index
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+**Returns** &nbsp; the array
+
+<sub>[stdlib/Standard/Array.sl:45](../../stdlib/Standard/Array.sl#L45)</sub>
+
+#### Repeat *method*
+
+```
+static T[] Repeat<T>(T value, nuint count)
+```
+
+`count` copies of `value`.
+
+**Parameters**
+
+- `value` — what each element is
+- `count` — how many elements
+
+**Type parameters**
+
+- `T` — the element type; nothing is asked of it
+
+**Returns** &nbsp; the array
+
+<sub>[stdlib/Standard/Array.sl:59](../../stdlib/Standard/Array.sl#L59)</sub>
 
 ### Comparison&lt;T&gt; *closure*
 
@@ -543,7 +605,7 @@ bool IsValueCreated { get; }
 
 Whether the value has been made yet.
 
-<sub>[stdlib/Standard/Lazy.sl:89](../../stdlib/Standard/Lazy.sl#L89)</sub>
+<sub>[stdlib/Standard/Lazy.sl:91](../../stdlib/Standard/Lazy.sl#L91)</sub>
 
 #### Value *property*
 
@@ -553,7 +615,7 @@ T Value { get; }
 
 The value, made now if it has not been.
 
-<sub>[stdlib/Standard/Lazy.sl:104](../../stdlib/Standard/Lazy.sl#L104)</sub>
+<sub>[stdlib/Standard/Lazy.sl:106](../../stdlib/Standard/Lazy.sl#L106)</sub>
 
 ### LazyThreadSafetyMode *enum*
 
@@ -707,7 +769,7 @@ bargain `Result.GetValueOrDefault` makes.
 
 **See also** &nbsp; [Optional.GetValue](#getvalue-method)
 
-<sub>[stdlib/Standard/Optional.sl:107](../../stdlib/Standard/Optional.sl#L107)</sub>
+<sub>[stdlib/Standard/Optional.sl:103](../../stdlib/Standard/Optional.sl#L103)</sub>
 
 #### Coalesce *method*
 
@@ -721,7 +783,7 @@ This one if it holds anything, and `other` if it does not.
 A lambda would allocate a closure to save an evaluation, which is the
 wrong way round at the sizes this is used at.
 
-<sub>[stdlib/Standard/Optional.sl:119](../../stdlib/Standard/Optional.sl#L119)</sub>
+<sub>[stdlib/Standard/Optional.sl:115](../../stdlib/Standard/Optional.sl#L115)</sub>
 
 #### Select *method*
 
@@ -740,7 +802,7 @@ the point: it is the `if` that would otherwise be written by hand.
 
 - `TResult` — what `transform` produces
 
-<sub>[stdlib/Standard/Optional.sl:134](../../stdlib/Standard/Optional.sl#L134)</sub>
+<sub>[stdlib/Standard/Optional.sl:130](../../stdlib/Standard/Optional.sl#L130)</sub>
 
 #### SelectMany *method*
 
@@ -755,7 +817,7 @@ would otherwise nest one inside the other.
 
 - `TResult` — what the transform's own optional holds
 
-<sub>[stdlib/Standard/Optional.sl:145](../../stdlib/Standard/Optional.sl#L145)</sub>
+<sub>[stdlib/Standard/Optional.sl:141](../../stdlib/Standard/Optional.sl#L141)</sub>
 
 #### Where *method*
 
@@ -765,7 +827,7 @@ Optional<T> Where(Predicate<T> keep)
 
 This one when it holds something `keep` accepts, and none otherwise.
 
-<sub>[stdlib/Standard/Optional.sl:153](../../stdlib/Standard/Optional.sl#L153)</sub>
+<sub>[stdlib/Standard/Optional.sl:149](../../stdlib/Standard/Optional.sl#L149)</sub>
 
 #### InvokeIfPresent *method*
 
@@ -775,7 +837,7 @@ void InvokeIfPresent(Action<T> action)
 
 Runs `action` on the value, if there is one.
 
-<sub>[stdlib/Standard/Optional.sl:164](../../stdlib/Standard/Optional.sl#L164)</sub>
+<sub>[stdlib/Standard/Optional.sl:160](../../stdlib/Standard/Optional.sl#L160)</sub>
 
 ### ParseError *enum*
 
@@ -914,7 +976,7 @@ them, and this sees the change.
 
 **See also** &nbsp; [Span](#spant-struct)
 
-<sub>[stdlib/Standard/ReadOnlySpan.sl:37](../../stdlib/Standard/ReadOnlySpan.sl#L37)</sub>
+<sub>[stdlib/Standard/ReadOnlySpan.sl:39](../../stdlib/Standard/ReadOnlySpan.sl#L39)</sub>
 
 #### Empty *property*
 
@@ -924,7 +986,7 @@ static ReadOnlySpan<T> Empty { get; }
 
 A span of nothing.
 
-<sub>[stdlib/Standard/ReadOnlySpan.sl:69](../../stdlib/Standard/ReadOnlySpan.sl#L69)</sub>
+<sub>[stdlib/Standard/ReadOnlySpan.sl:72](../../stdlib/Standard/ReadOnlySpan.sl#L72)</sub>
 
 #### IsEmpty *property*
 
@@ -934,7 +996,7 @@ bool IsEmpty { get; }
 
 Whether it has no elements.
 
-<sub>[stdlib/Standard/ReadOnlySpan.sl:72](../../stdlib/Standard/ReadOnlySpan.sl#L72)</sub>
+<sub>[stdlib/Standard/ReadOnlySpan.sl:75](../../stdlib/Standard/ReadOnlySpan.sl#L75)</sub>
 
 #### CopyTo *method*
 
@@ -955,7 +1017,7 @@ the rest are copied one at a time, so every count stays right.
 
 **See also** &nbsp; [ReadOnlySpan.TryCopyTo](#trycopyto-method)
 
-<sub>[stdlib/Standard/ReadOnlySpan.sl:83](../../stdlib/Standard/ReadOnlySpan.sl#L83)</sub>
+<sub>[stdlib/Standard/ReadOnlySpan.sl:86](../../stdlib/Standard/ReadOnlySpan.sl#L86)</sub>
 
 #### TryCopyTo *method*
 
@@ -972,7 +1034,7 @@ enough, and answers whether it was.
 
 **Returns** &nbsp; true when the elements were copied
 
-<sub>[stdlib/Standard/ReadOnlySpan.sl:113](../../stdlib/Standard/ReadOnlySpan.sl#L113)</sub>
+<sub>[stdlib/Standard/ReadOnlySpan.sl:116](../../stdlib/Standard/ReadOnlySpan.sl#L116)</sub>
 
 #### Slice *method*
 
@@ -986,7 +1048,7 @@ The elements from `start` to the end, aborting when `start` is past it.
 
 - `start` — the first element of the result
 
-<sub>[stdlib/Standard/ReadOnlySpan.sl:124](../../stdlib/Standard/ReadOnlySpan.sl#L124)</sub>
+<sub>[stdlib/Standard/ReadOnlySpan.sl:127](../../stdlib/Standard/ReadOnlySpan.sl#L127)</sub>
 
 #### Slice *method*
 
@@ -1001,7 +1063,7 @@ ReadOnlySpan<T> Slice(nuint start, nuint length)
 - `start` — the first element of the result
 - `length` — how many elements it covers
 
-<sub>[stdlib/Standard/ReadOnlySpan.sl:130](../../stdlib/Standard/ReadOnlySpan.sl#L130)</sub>
+<sub>[stdlib/Standard/ReadOnlySpan.sl:133](../../stdlib/Standard/ReadOnlySpan.sl#L133)</sub>
 
 #### ToArray *method*
 
@@ -1011,7 +1073,7 @@ T[] ToArray()
 
 A new array holding a copy of the elements.
 
-<sub>[stdlib/Standard/ReadOnlySpan.sl:133](../../stdlib/Standard/ReadOnlySpan.sl#L133)</sub>
+<sub>[stdlib/Standard/ReadOnlySpan.sl:136](../../stdlib/Standard/ReadOnlySpan.sl#L136)</sub>
 
 #### Overlaps *method*
 
@@ -1025,7 +1087,7 @@ Whether the two view any element in common.
 
 - `other` — the span to compare with
 
-<sub>[stdlib/Standard/ReadOnlySpan.sl:143](../../stdlib/Standard/ReadOnlySpan.sl#L143)</sub>
+<sub>[stdlib/Standard/ReadOnlySpan.sl:146](../../stdlib/Standard/ReadOnlySpan.sl#L146)</sub>
 
 #### Overlaps *method*
 
@@ -1041,7 +1103,7 @@ relative to this, in elements -- negative when it starts before.
 - `other` — the span to compare with
 - `elementOffset` — where `other` starts, counted from this one's start
 
-<sub>[stdlib/Standard/ReadOnlySpan.sl:152](../../stdlib/Standard/ReadOnlySpan.sl#L152)</sub>
+<sub>[stdlib/Standard/ReadOnlySpan.sl:155](../../stdlib/Standard/ReadOnlySpan.sl#L155)</sub>
 
 #### operator == *operator*
 
@@ -1052,7 +1114,7 @@ static bool operator ==(ReadOnlySpan<T> left, ReadOnlySpan<T> right)
 Whether the two are the same elements of the same array: C#'s rule,
 which compares where they are rather than what they hold.
 
-<sub>[stdlib/Standard/ReadOnlySpan.sl:166](../../stdlib/Standard/ReadOnlySpan.sl#L166)</sub>
+<sub>[stdlib/Standard/ReadOnlySpan.sl:169](../../stdlib/Standard/ReadOnlySpan.sl#L169)</sub>
 
 #### operator != *operator*
 
@@ -1062,7 +1124,7 @@ static bool operator !=(ReadOnlySpan<T> left, ReadOnlySpan<T> right)
 
 Whether the two are not the same elements of the same array.
 
-<sub>[stdlib/Standard/ReadOnlySpan.sl:171](../../stdlib/Standard/ReadOnlySpan.sl#L171)</sub>
+<sub>[stdlib/Standard/ReadOnlySpan.sl:174](../../stdlib/Standard/ReadOnlySpan.sl#L174)</sub>
 
 ### Result&lt;T, TError&gt; *variant*
 
@@ -1216,7 +1278,7 @@ static Span<T> Empty { get; }
 
 A span of nothing.
 
-<sub>[stdlib/Standard/Span.sl:75](../../stdlib/Standard/Span.sl#L75)</sub>
+<sub>[stdlib/Standard/Span.sl:76](../../stdlib/Standard/Span.sl#L76)</sub>
 
 #### IsEmpty *property*
 
@@ -1226,17 +1288,21 @@ bool IsEmpty { get; }
 
 Whether it has no elements.
 
-<sub>[stdlib/Standard/Span.sl:78](../../stdlib/Standard/Span.sl#L78)</sub>
+<sub>[stdlib/Standard/Span.sl:79](../../stdlib/Standard/Span.sl#L79)</sub>
 
 #### Clear *method*
 
 ```
 void Clear()
+    where T : zeroable
 ```
 
 Sets every element to `default(T)`, releasing whatever they held.
 
-<sub>[stdlib/Standard/Span.sl:81](../../stdlib/Standard/Span.sl#L81)</sub>
+Only for a `T` with a zero value: a span of `String` has no `Clear`,
+since there is nothing its elements could be set to.
+
+<sub>[stdlib/Standard/Span.sl:85](../../stdlib/Standard/Span.sl#L85)</sub>
 
 #### Fill *method*
 
@@ -1250,7 +1316,7 @@ Sets every element to `value`.
 
 - `value` — what each element becomes
 
-<sub>[stdlib/Standard/Span.sl:100](../../stdlib/Standard/Span.sl#L100)</sub>
+<sub>[stdlib/Standard/Span.sl:104](../../stdlib/Standard/Span.sl#L104)</sub>
 
 #### CopyTo *method*
 
@@ -1268,7 +1334,7 @@ the copy began.
 
 **See also** &nbsp; [Span.TryCopyTo](#trycopyto-method)
 
-<sub>[stdlib/Standard/Span.sl:138](../../stdlib/Standard/Span.sl#L138)</sub>
+<sub>[stdlib/Standard/Span.sl:142](../../stdlib/Standard/Span.sl#L142)</sub>
 
 #### TryCopyTo *method*
 
@@ -1285,7 +1351,7 @@ enough, and answers whether it was.
 
 **Returns** &nbsp; true when the elements were copied
 
-<sub>[stdlib/Standard/Span.sl:149](../../stdlib/Standard/Span.sl#L149)</sub>
+<sub>[stdlib/Standard/Span.sl:153](../../stdlib/Standard/Span.sl#L153)</sub>
 
 #### Slice *method*
 
@@ -1299,7 +1365,7 @@ The elements from `start` to the end, aborting when `start` is past it.
 
 - `start` — the first element of the result
 
-<sub>[stdlib/Standard/Span.sl:158](../../stdlib/Standard/Span.sl#L158)</sub>
+<sub>[stdlib/Standard/Span.sl:162](../../stdlib/Standard/Span.sl#L162)</sub>
 
 #### Slice *method*
 
@@ -1314,7 +1380,7 @@ Span<T> Slice(nuint start, nuint length)
 - `start` — the first element of the result
 - `length` — how many elements it covers
 
-<sub>[stdlib/Standard/Span.sl:164](../../stdlib/Standard/Span.sl#L164)</sub>
+<sub>[stdlib/Standard/Span.sl:168](../../stdlib/Standard/Span.sl#L168)</sub>
 
 #### ToArray *method*
 
@@ -1324,7 +1390,7 @@ T[] ToArray()
 
 A new array holding a copy of the elements.
 
-<sub>[stdlib/Standard/Span.sl:167](../../stdlib/Standard/Span.sl#L167)</sub>
+<sub>[stdlib/Standard/Span.sl:171](../../stdlib/Standard/Span.sl#L171)</sub>
 
 #### Overlaps *method*
 
@@ -1338,7 +1404,7 @@ Whether the two view any element in common.
 
 - `other` — the span to compare with
 
-<sub>[stdlib/Standard/Span.sl:176](../../stdlib/Standard/Span.sl#L176)</sub>
+<sub>[stdlib/Standard/Span.sl:180](../../stdlib/Standard/Span.sl#L180)</sub>
 
 #### Overlaps *method*
 
@@ -1354,7 +1420,7 @@ relative to this, in elements -- negative when it starts before.
 - `other` — the span to compare with
 - `elementOffset` — where `other` starts, counted from this one's start
 
-<sub>[stdlib/Standard/Span.sl:187](../../stdlib/Standard/Span.sl#L187)</sub>
+<sub>[stdlib/Standard/Span.sl:191](../../stdlib/Standard/Span.sl#L191)</sub>
 
 #### operator == *operator*
 
@@ -1365,7 +1431,7 @@ static bool operator ==(Span<T> left, Span<T> right)
 Whether the two are the same elements of the same array: C#'s rule,
 which compares where they are rather than what they hold.
 
-<sub>[stdlib/Standard/Span.sl:195](../../stdlib/Standard/Span.sl#L195)</sub>
+<sub>[stdlib/Standard/Span.sl:199](../../stdlib/Standard/Span.sl#L199)</sub>
 
 #### operator != *operator*
 
@@ -1375,7 +1441,7 @@ static bool operator !=(Span<T> left, Span<T> right)
 
 Whether the two are not the same elements of the same array.
 
-<sub>[stdlib/Standard/Span.sl:202](../../stdlib/Standard/Span.sl#L202)</sub>
+<sub>[stdlib/Standard/Span.sl:206](../../stdlib/Standard/Span.sl#L206)</sub>
 
 ### Uri *class*
 

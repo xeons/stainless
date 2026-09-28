@@ -109,6 +109,9 @@ whether it is a local going out of scope, a field of a class being destroyed,
 or an element of an array. That is Swift's model, and it is what lets a value
 type own something.
 
+**It has no zero value** ([§2.16](#216-zero-values)): `Holder value;` is
+allowed, and `value.Text` is written before `value` is read.
+
 What it costs is the C guarantee, and only for the structs that use it. Such a
 struct is still laid out as C would lay it out, but it can no longer be handed
 *to* C, because a C caller would copy the bytes and leave the count behind. The
@@ -152,12 +155,15 @@ copied on assignment like any other struct, and a struct of plain data is still
 the bytes C expects: a constructor adds no header and no hidden field.
 
 **The slot is zeroed first.** A field the constructor did not write holds what
-`Point value;` would have left there, so the two ways of making one agree.
+`Point value;` would have left there, so the two ways of making one agree. A
+field whose type has no zero value MUST be written on every path through every
+constructor (SL0813, [§2.16.2](#2162-fields)).
 
 **A constructor taking no arguments is refused** (SL0738). `Point value;`
 declares one and runs nothing, so such a constructor would run for some of them
 and not for others — a rule the reader cannot see at the point of use. The zero
-value is what an unconstructed struct is, and that stays true.
+value is what an unconstructed struct is, and that stays true — for a struct
+that has one.
 
 **`new` on a struct that declares no constructor is refused** (SL0245), rather
 than meaning the zero value. A struct with no constructor is written
@@ -548,6 +554,11 @@ field, and this is that field's initializer.
 **A class that declares no constructor gets one**, taking no arguments, so that
 there is a head for the initializers to be at. `new Counter()` meant that
 already; what is new is that something runs.
+
+**A field with no initializer is written by every constructor** when its type
+has no zero value: a `String` field that no path writes would be read as a
+null. A private helper the constructor calls counts, as does `required`
+(SL0813, [§2.16.2](#2162-fields)).
 
 **A constructor that chains to `this(...)` does not run them**, because the one
 it delegates to already did, and running them twice would undo whatever that
@@ -1190,6 +1201,8 @@ which nothing else in that position does.
 | `T*` | raw pointer, unmanaged, C-compatible, nullable, unsafe to dereference |
 | `C` (class) | strong reference, never null, ARC-managed |
 | `C?` | optional strong reference, may be null |
+| `T[]?` | an array that may be absent; the same pointer as `T[]` |
+| `Notify?` | a closure that may hold nothing; the same two words as `Notify` |
 | `weak C?` | non-owning reference; becomes null when the object dies |
 
 A `weak C?` is assigned like any other reference — `child.Owner = parent;` —
@@ -1280,6 +1293,22 @@ if (node.Next is Node n)
 A third is `x!`, or the cast `(Node)x` it is short for, which asserts rather
 than asks: nothing is checked, and a null that gets through is a crash at its
 first use ([§9.7](09-statements-expressions.md#97----and-)).
+
+**`T[]?` and `Notify?` are narrowed the same way.** An array is a reference, so
+`T[]?` is `C?`'s pointer with an array behind it. A closure is two words, and
+its null is a null function word: `Notify?` is those two words, compared with
+`null` as both, and a call through one is refused until a check has said there
+is a function to call (SL0248):
+
+```csharp
+Notify? handler = null;
+if (handler is { } run)
+    run(5);
+```
+
+Only a class, an interface, an array and a closure may be optional; `nuint?` and
+a struct's `Point?` are SL0271, and `Optional<T>` is what says "a value or none"
+for them ([§2.8.1](#281-optionalt--a-value-or-none)).
 
 **A `weak C?` is never narrowed.** It may die between the check and the use,
 which is the whole of what weak means, so no check could establish anything
@@ -1718,7 +1747,7 @@ in one — `Ok(try P(a) + try P(b))` — and each returns on its own failure.
 ### 2.8.1 `Optional<T>` — a value, or none
 
 `C?` is a nullable reference: the null is the pointer, so it costs nothing and
-the compiler narrows it ([§2.5](#25-pointers-and-nullability)). A **value type has no spare bit to be null
+the compiler narrows it ([§2.5](#25-pointers-and-nullability)), and so is `T[]?`. A **value type has no spare bit to be null
 with**, so `nuint?` is refused (SL0271), and what used to stand in was a magic
 number — a lookup answering with the largest `nuint` there is, and every caller
 agreeing to read that as "not there".
@@ -2030,7 +2059,10 @@ for (int i = 0; i < (int)numbers.Length; i++)
 
 An array is a reference counted object, like a class: `numbers.Length` is O(1),
 assignment shares rather than copies, and the elements are released when the
-array dies. A new array is always zeroed.
+array dies. A new array is always zeroed, so `new T[n]` is refused for a `T`
+that has no zero value — `new String[3]` would be three nulls — and
+`Array.Create`, `Array.Repeat` or a literal makes one instead
+([§2.16.3](#2163-arrays)).
 
 **Every index is bounds checked.** The index is compared unsigned against the
 length, so one compare covers both ends — a negative index becomes a very large
@@ -2266,8 +2298,7 @@ it points into is alive for as long as it is.
 ```csharp
 Span<Trace> Middle()
 {
-    var traces = new Trace[3];
-    ...
+    Trace[] traces = [new Trace("a"), new Trace("b"), new Trace("c")];
     return traces[1:2];       // the array outlives the function
 }
 ```
@@ -2318,6 +2349,12 @@ forms, `Contains`, `ContainsAny`, `ContainsAnyExcept`, `Count`,
 `CommonPrefixLength`, `Replace`, `Reverse`, `Sort` (and `Sort(keys, items)`),
 `BinarySearch`, `Trim`, `TrimStart` and `TrimEnd`. A position is an
 `Optional<nuint>` rather than -1 ([§2.8.1](#281-optionalt--a-value-or-none)).
+
+`Clear` is declared `where T : zeroable`
+([§4.3.3](04-generics.md#433-a-members-own-where)): it sets every element to
+the zero of `T`, so a `Span<String>` has no `Clear`, and a span of references
+that may be cleared is a `Span<C?>`. The empty span is the zero of the type —
+its array is a `T[]?`, never read while its length is zero.
 
 The names are recognised by one type argument: a program's own `Span`, with
 none, is still its own. `T[:]` is not a type (SL0807); `[:]` belongs to an
@@ -2636,6 +2673,10 @@ return type, as it is off a lambda's body
 - **Not inferrable by `var`** (SL0553), for the reason a bare function name is
   not: `counter.Add` names a method, and which closure type it becomes is what
   the declaration says.
+- **Not empty.** A closure's zero would call address zero, so it has no zero
+  value ([§2.16](#216-zero-values)). One that may hold nothing is a `Notify?`,
+  which a check narrows to the `Notify` it holds
+  ([§2.5](#25-pointers-and-nullability)).
 
 **A closure may be generic**, and a delegate may too:
 
@@ -3000,6 +3041,192 @@ A closure is a class, so crossing a thread boundary with one warns unless it is
 declared `threadsafe` ([§9.5](09-statements-expressions.md#95-what-may-cross-a-thread-boundary)) — which it cannot be, having no declaration to
 write the word on. That is the right answer rather than an oversight: a closure
 holds captured state, and nothing synchronizes it.
+
+## 2.16 Zero values
+
+`String`, a class, an interface and `T[]` are never null
+([§2.5](#25-pointers-and-nullability)), and every read of one trusts that.
+Storage left as zero bytes would put a null in exactly such a slot, so **a type
+whose zero would hold a null in a never-null reference has no zero value, and
+nothing may make one.** Such a value is built by a constructor or an
+initializer, and an array of them by something that supplies every element.
+
+```csharp
+public struct Holder { public byte[] Data; public int Count; }
+
+Holder held = default;                  // error[SL0810]
+String[] names = new String[3];         // error[SL0812]
+```
+
+```
+error[SL0810]: 'Holder' has no zero value: 'Holder.Data' is a 'byte[]', which
+is never null, so 'default' would hand out a null where the type says there is
+none. Build the value with a constructor, or make the reference nullable
+```
+
+**Which types have one:**
+
+| Type | Zero value |
+|---|---|
+| a primitive, an enum, a pointer, a `delegate` | yes; a delegate's is its `null` |
+| `C?`, `String?`, `T[]?`, `Notify?`, `weak C?` | yes: null is one of its values |
+| a class, an interface, a com interface, `String`, `T[]` | no: never null |
+| a `closure` | no: its function word would be null, and a call does not ask |
+| a struct, a tuple, a record struct | when every field has one |
+| `T[N]` | when `T` has one, which it always does, since an inline array holds no counted reference (SL0486) |
+| a `union` | yes: it holds no counted reference |
+| a `variant` | when its first case, whose tag is zero, has one: `Optional<String>`'s zero is `None`, and `Result<String, TError>` has none |
+| `Span<T>`, `ReadOnlySpan<T>` | yes: the empty span, whose array is a `T[]?` |
+
+Everything `unmanaged` has one, so nothing the rule refuses crosses to C, and
+a type's answer follows from its fields' types, so a library's consumer knows
+it from the metadata.
+
+**What is refused, and what is written instead:**
+
+| Refused | | Instead |
+|---|---|---|
+| `default(T)`, or a bare `default` | SL0810 | a constructor, or a nullable type |
+| a local read before each slot of it that has no zero value is written | SL0811 | assign it on every path first ([§2.16.1](#2161-locals)) |
+| `new T[n]` | SL0812 | `[a, b, c]`, `Array.Create`, `Array.Repeat`, a `List<T>` ([§2.16.3](#2163-arrays)) |
+| a constructor that can finish without writing such a field | SL0813 | write it, or give it an initializer or `required` ([§2.16.2](#2162-fields)) |
+| an automatic static property with no `= value` | SL0814 | give it one |
+
+### 2.16.1 Locals
+
+`Holder held;` is allowed. What is refused is reading it before each slot of
+it that has no zero value has been written, on every path: C#'s definite
+assignment, taken a field at a time.
+
+```csharp
+Holder made;
+made.Count = 3;                         // an int has a zero; this is optional
+made.Data = [1, 2];                     // a byte[] has none; this is not
+return made;                            // every slot written
+```
+
+Writing the whole of it writes every slot, and so does passing it as an `out`.
+Writing a field writes the slots inside it, and an automatic property's setter
+writes its storage. A read of the whole, a `ref` to it, a method called on it,
+or a read of a field not yet written is the error:
+
+```
+error[SL0811]: 'made' is read here before 'made.Data' has been assigned, and
+'byte[]' has no zero value: a 'byte[]' is never null. Assign it on every path
+before this, or give it a value where it is declared
+```
+
+A field that has a zero value is read whenever it likes, written or not. The
+storage is still zeroed where it is declared, which is what a release of a slot
+nothing wrote relies on; what changes is that nothing can read the zero. The
+walk stands down in a function that uses `goto`, as the one for `out` does
+([§7.2.1](07-functions-members.md#721-out)).
+
+### 2.16.2 Fields
+
+**Every constructor writes every field whose type has no zero value, on every
+path through it** (SL0813), unless something already does:
+
+- an initializer ([§2.4.1](#241-a-field-with-a-value)), which runs at its head;
+- `: this(...)`, which hands the whole obligation to the constructor it calls;
+- `required` on the field or its property, which moves it to every `new`
+  ([§7.3.2](07-functions-members.md#732-required--set-by-whoever-makes-one)) —
+  and a `[SetsRequiredMembers]` constructor moves it back;
+- a primary constructor, for the parameters it keeps;
+- a property's storage that nothing reads but `field ??= ...`, which fills it
+  on first use ([§7.3.3](07-functions-members.md#733-field--the-propertys-own-storage)).
+
+A `return` before the write is the error, and so is a `try` that can return
+before it. A field of a struct type may be written whole or a field at a time,
+as a local may. An event's storage is the compiler's, and is exempt.
+
+**A call to one of the type's own private methods is followed**, as though its
+body were written at the call. That is how a form is built — the designer's
+half is one call:
+
+```csharp
+public MainForm()
+{
+    InitializeComponent();              // writes _save, _open and the rest
+}
+```
+
+A private method has one body, so following it is exact; a method still being
+asked about, because it calls itself, answers that it writes nothing. A
+public, protected or virtual one is not followed: an override could write
+nothing. Nothing is written on the helper to say what it does — the body says
+it.
+
+**A class with no constructor has only its initializers**, so a field with
+neither is reported at the class.
+
+**`this` escaping a constructor is the one gap left open.** A base constructor
+that calls a virtual method, or a constructor that hands `this` to something
+before every field is written, can have a field read as null. Swift closes it
+by forbidding any use of `self` until every field is set, which would refuse
+every form here: `base(...)` dispatches. C#, Java and Kotlin leave it open, and
+so does this.
+
+### 2.16.3 Arrays
+
+`new T[n]` for a `T` with no zero value is refused (SL0812). `new T[0]` has no
+element to be a zero, and stays legal for every `T`. What replaces the rest
+depends on what the site is doing:
+
+| The site | Written |
+|---|---|
+| a fixed set of elements | an array literal, `[a, b, c]` |
+| `n` elements, each computed | `Array.Create(n, (i) => ...)`, which calls the lambda in order from zero, so no element is seen before it has its value |
+| `n` copies of one value | `Array.Repeat(value, n)` |
+| an unknown number, collected | a `List<T>` and its `ToArray()`, or a collection expression with spreads ([§2.11.3](#2113-a-b--collection-expressions)) |
+
+```csharp
+String[] names = Array.Create(count, (i) => $"item {i}");
+int[] sevens = Array.Repeat(7, 4u);
+```
+
+`Array` is a static class in `Standard`, so both are in reach everywhere.
+
+**Room for elements that are not yet values** is the one thing none of these
+make, and it is what a collection keeps. `Standard.Unchecked` has exactly that
+and nothing else:
+
+```csharp
+import Standard.Unchecked;
+
+T[] storage = NewUninitializedArray<T>(capacity);   // every slot zero bytes
+ClearElement(storage, index);                        // released, and zero again
+```
+
+Each compiles to what `new T[n]` and `default(T)` compile to, so `List<int>`
+pays nothing per element, and the rule does not reach inside the module. The
+obligation moves to whoever imports it: **a slot MUST be written before it is
+read, and SHOULD be cleared when it is vacated.** Nothing checks either. It is
+the collections' storage — `List<T>`, `Dictionary`, `HashSet`, `Queue`,
+`Stack`, `SortedList`, `LinkedList`, and the sort's scratch — and not a way
+round the rule for anything else.
+
+`Reflection.CreateInstance` and `CreateArrayInto` make zeroed storage too, as
+`byte*` APIs whose obligations are already the caller's
+([§6.6](06-attributes-reflection.md#66-writing-a-field)). A type `Json` makes
+from nothing wants its never-null fields `required`, or nullable.
+
+### 2.16.4 Generics
+
+**Checked per instantiation**, as everything in a template is
+([§4.3](04-generics.md#43-what-a-constraint-does-and-does-not-do)):
+`default(T)` in `Box<T>` is nothing in `Box<int>` and SL0810 in `Box<String>`,
+reported in the template with the instantiation named. A template says what it
+needs with `where T : zeroable` (SL0815), and a member that needs it says so in
+a `where` of its own, so an instantiation that fails it simply lacks that
+member (SL0816, [§4.3.3](04-generics.md#433-a-members-own-where)):
+
+```csharp
+public void Clear() where T : zeroable      // Span<String> has no Clear
+```
+
+**Not in scope:** an `enum` with no member at zero, and a `variant` whose
+cases leave tag zero unused. Their zero names nothing, but it is not a null.
 
 ---
 

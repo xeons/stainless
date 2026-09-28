@@ -630,10 +630,14 @@ it is laid out, released by the destructor and reflected like any field — so a
 automatic `get;` may sit beside a written `set` that says `field`. On a static
 property, the storage is a static.
 
-The storage of a reference-typed property starts out null whatever its type
-says, so `field ??= ...` is allowed on it: that is how an accessor fills it on
-first use. A lambda written in an accessor reaches `field` through the object,
-so it reads what is there when it runs.
+The storage is written by a constructor, an initializer or `required` like
+any field whose type has no zero value
+([§2.16.2](02-types.md#2162-fields)) — with one exception. **Storage its
+accessors read only to fill, with `field ??= ...`, may start empty** whatever
+the type says: nothing reads it before the `??=` has asked, so the null is
+never seen. That is how `Badge` above fills itself on first use. A lambda
+written in an accessor reaches `field` through the object, so it reads what is
+there when it runs.
 
 **`field` is contextual.** It means the storage only inside an accessor of a
 property, and is an ordinary name everywhere else. `@field` is the ordinary name

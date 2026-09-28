@@ -1361,7 +1361,7 @@ The curve named by `oidValue`, supported or not.
 
 **See also** &nbsp; [ECCurve.CreateFromFriendlyName](#createfromfriendlyname-method)
 
-<sub>[stdlib/Security/Cryptography/ECCurve.sl:87](../../stdlib/Security/Cryptography/ECCurve.sl#L87)</sub>
+<sub>[stdlib/Security/Cryptography/ECCurve.sl:85](../../stdlib/Security/Cryptography/ECCurve.sl#L85)</sub>
 
 #### CreateFromFriendlyName *method*
 
@@ -1379,7 +1379,7 @@ the zero value, which names no curve.
 
 **See also** &nbsp; [ECCurve.CreateFromValue](#createfromvalue-method)
 
-<sub>[stdlib/Security/Cryptography/ECCurve.sl:95](../../stdlib/Security/Cryptography/ECCurve.sl#L95)</sub>
+<sub>[stdlib/Security/Cryptography/ECCurve.sl:93](../../stdlib/Security/Cryptography/ECCurve.sl#L93)</sub>
 
 #### Equals *method*
 
@@ -1389,7 +1389,7 @@ bool Equals(ECCurve other)
 
 Whether both name the same curve.
 
-<sub>[stdlib/Security/Cryptography/ECCurve.sl:117](../../stdlib/Security/Cryptography/ECCurve.sl#L117)</sub>
+<sub>[stdlib/Security/Cryptography/ECCurve.sl:113](../../stdlib/Security/Cryptography/ECCurve.sl#L113)</sub>
 
 ### ECCurve.NamedCurves *class*
 

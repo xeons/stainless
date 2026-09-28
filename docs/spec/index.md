@@ -101,6 +101,11 @@ Primitives, `struct`, `class`, pointers, `variant`, `union`, `Result`, `interfac
   - [2.14.1 `closure` — a method and the object it belongs to](02-types.md#2141-closure--a-method-and-the-object-it-belongs-to)
   - [2.14.2 `event` — several subscribers behind one name](02-types.md#2142-event--several-subscribers-behind-one-name)
 - [2.15 Lambdas and closures](02-types.md#215-lambdas-and-closures)
+- [2.16 Zero values](02-types.md#216-zero-values)
+  - [2.16.1 Locals](02-types.md#2161-locals)
+  - [2.16.2 Fields](02-types.md#2162-fields)
+  - [2.16.3 Arrays](02-types.md#2163-arrays)
+  - [2.16.4 Generics](02-types.md#2164-generics)
 
 ### [3. Text](03-text.md)
 
@@ -127,6 +132,7 @@ Monomorphization, constraints, and what is and is not supported.
 - [4.3 What a constraint does, and does not, do](04-generics.md#43-what-a-constraint-does-and-does-not-do)
   - [4.3.1 `static abstract` — a promise about the type](04-generics.md#431-static-abstract--a-promise-about-the-type)
   - [4.3.2 `in` and `out` — when one instantiation stands for another](04-generics.md#432-in-and-out--when-one-instantiation-stands-for-another)
+  - [4.3.3 A member's own `where`](04-generics.md#433-a-members-own-where)
 - [4.4 What is and is not supported](04-generics.md#44-what-is-and-is-not-supported)
   - [4.4.1 Writing type arguments at a call](04-generics.md#441-writing-type-arguments-at-a-call)
   - [4.4.2 Inferring from a lambda](04-generics.md#442-inferring-from-a-lambda)

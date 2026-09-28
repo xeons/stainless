@@ -1868,7 +1868,7 @@ How many days a month has, which for February depends on the year.
 
 **See also** &nbsp; [Time.IsLeapYear](#isleapyear-function)
 
-<sub>[stdlib/Time/Time.sl:179](../../stdlib/Time/Time.sl#L179)</sub>
+<sub>[stdlib/Time/Time.sl:180](../../stdlib/Time/Time.sl#L180)</sub>
 
 ### IsLeapYear *function*
 
@@ -1878,7 +1878,7 @@ bool IsLeapYear(int year)
 
 Whether a year has 366 days, by the Gregorian rule.
 
-<sub>[stdlib/Time/Time.sl:165](../../stdlib/Time/Time.sl#L165)</sub>
+<sub>[stdlib/Time/Time.sl:166](../../stdlib/Time/Time.sl#L166)</sub>
 
 ## Constants
 
@@ -1892,7 +1892,7 @@ Nanoseconds in a day, which is 24 hours exactly. A calendar day across a
 daylight-saving change is not this, and nothing here pretends otherwise:
 add a day to a `DateTimeOffset` and you have added 24 hours.
 
-<sub>[stdlib/Time/Time.sl:71](../../stdlib/Time/Time.sl#L71)</sub>
+<sub>[stdlib/Time/Time.sl:72](../../stdlib/Time/Time.sl#L72)</sub>
 
 ### NanosecondsPerHour *constant*
 
@@ -1902,7 +1902,7 @@ const long NanosecondsPerHour = 3600000000000
 
 Nanoseconds in an hour.
 
-<sub>[stdlib/Time/Time.sl:66](../../stdlib/Time/Time.sl#L66)</sub>
+<sub>[stdlib/Time/Time.sl:67](../../stdlib/Time/Time.sl#L67)</sub>
 
 ### NanosecondsPerMicrosecond *constant*
 
@@ -1912,7 +1912,7 @@ const long NanosecondsPerMicrosecond = 1000
 
 Nanoseconds in a microsecond.
 
-<sub>[stdlib/Time/Time.sl:54](../../stdlib/Time/Time.sl#L54)</sub>
+<sub>[stdlib/Time/Time.sl:55](../../stdlib/Time/Time.sl#L55)</sub>
 
 ### NanosecondsPerMillisecond *constant*
 
@@ -1922,7 +1922,7 @@ const long NanosecondsPerMillisecond = 1000000
 
 Nanoseconds in a millisecond.
 
-<sub>[stdlib/Time/Time.sl:57](../../stdlib/Time/Time.sl#L57)</sub>
+<sub>[stdlib/Time/Time.sl:58](../../stdlib/Time/Time.sl#L58)</sub>
 
 ### NanosecondsPerMinute *constant*
 
@@ -1932,7 +1932,7 @@ const long NanosecondsPerMinute = 60000000000
 
 Nanoseconds in a minute.
 
-<sub>[stdlib/Time/Time.sl:63](../../stdlib/Time/Time.sl#L63)</sub>
+<sub>[stdlib/Time/Time.sl:64](../../stdlib/Time/Time.sl#L64)</sub>
 
 ### NanosecondsPerSecond *constant*
 
@@ -1942,5 +1942,5 @@ const long NanosecondsPerSecond = 1000000000
 
 Nanoseconds in a second.
 
-<sub>[stdlib/Time/Time.sl:60](../../stdlib/Time/Time.sl#L60)</sub>
+<sub>[stdlib/Time/Time.sl:61](../../stdlib/Time/Time.sl#L61)</sub>
 

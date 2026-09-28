@@ -95,8 +95,8 @@ public class Table<TKey, TValue> where TKey : IComparable<TKey> where TValue : I
 ```
 
 An interface is not the only thing that may follow the colon: a base class,
-another type parameter, `class`, `struct`, `unmanaged`, `notnull`, `new()` and
-`threadsafe` may too, and
+another type parameter, `class`, `struct`, `unmanaged`, `notnull`, `zeroable`,
+`new()` and `threadsafe` may too, and
 [§4.3](#43-what-a-constraint-does-and-does-not-do) lists what each demands.
 
 `where` is a **contextual** keyword, as it is in C#: it is read as one only in
@@ -148,7 +148,8 @@ error at the use site and a signature that states its requirements.
 | `new()` | a **class**, not abstract, with a public constructor taking no arguments — or with no constructor declared, which is given one ([§2.4.1](02-types.md#241-a-field-with-a-value)) | |
 | `threadsafe` | a type that says more than one thread may hold it ([§9.5](09-statements-expressions.md#95-what-may-cross-a-thread-boundary)) | |
 | `unmanaged` | a value type with no counted reference anywhere in it: a primitive, an enum, a pointer, a delegate, or a struct or tuple of those | |
-| `notnull` | a type none of whose values is null: not a `C?`, a `weak C?`, a pointer or a delegate | |
+| `notnull` | a type none of whose values is null: not a `C?`, a `T[]?`, a `Notify?`, a `weak C?`, a pointer or a delegate | |
+| `zeroable` | a type that has a zero value, so a body may write `default(T)` and `new T[n]` ([§2.16](02-types.md#216-zero-values)) | |
 | `default` | nothing; written on an `override`, see below | |
 
 Several are separated by commas in one clause, and several clauses by repeating
@@ -157,9 +158,21 @@ Several are separated by commas in one clause, and several clauses by repeating
 the order carries no meaning, but a fixed one means every clause reads the same
 way. A parameter is one kind, so two of those words contradict each other, and
 `struct` and `unmanaged` each contradict `new()` and a base class (SL0581).
-`unmanaged` and `notnull` are contextual, as in C#: they are read as
-constraints only where a constraint is, and a type of either name is still
-named with arguments or a qualifier.
+`unmanaged`, `notnull` and `zeroable` are contextual, as in C#: they are read
+as constraints only where a constraint is, and a type of any of those names is
+still named with arguments or a qualifier.
+
+**`zeroable` is what `default(T)` needs.** A type with no zero value — a
+`String`, a class, a struct holding either — fails it (SL0815), as SL0328
+reports the others. `unmanaged` implies it, and `class` contradicts it
+(SL0581): every reference that is not optional is never null. `default` would
+read better and is taken; it is the override constraint below.
+
+```
+error[SL0815]: 'String' cannot be used as 'T' in 'ZeroOf' because 'T' is
+constrained to 'zeroable', and 'String' has no zero value: a 'String' is never
+null
+```
 
 **`unmanaged` is what makes bytes safe to move.** A value that passes it is
 all of what it holds, so a template may copy it through a `byte*`, take
@@ -340,6 +353,40 @@ read and written both, so neither word may reach them. A static member is not
 reached through a reference and is not checked. `in` and `out` may be written
 only on an interface's or a delegate's parameters (SL0800); a class or struct
 holds what it holds, and a function has nothing to convert.
+
+### 4.3.3 A member's own `where`
+
+A member of a generic type may constrain the **type's** parameters with a
+clause of its own. It then exists only in the instantiations whose arguments
+meet it:
+
+```csharp
+public struct Span<T>
+{
+    public void Clear() where T : zeroable { ... }
+}
+
+Span<int> numbers = ...;
+numbers.Clear();                            // fine
+Span<String> names = ...;
+names.Clear();                              // error[SL0816]
+```
+
+```
+error[SL0816]: 'Span<String>' has no 'Clear': 'String' cannot be used as 'T' in
+'Clear' because 'T' is constrained to 'zeroable', and 'String' has no zero
+value: a 'String' is never null
+```
+
+The member of an instantiation that fails is not bound, so its body is never
+checked against arguments it was not written for, and naming it is the error —
+at the call, where C# and Rust report it. Rust's `impl<T: Default>` and Swift's
+conditional extension are the same idea; without it, `Span<String>` itself
+would be refused for a method it never calls.
+
+A dispatched member — virtual, abstract, an override, an interface's — is in
+every instantiation's table, so it may not have one (SL0331), and neither may a
+member of a type that is not generic.
 
 ## 4.4 What is and is not supported
 
@@ -541,14 +588,16 @@ instantiation can fill.
 ## 4.5 A worked example
 
 ```csharp
+import Standard.Unchecked;
+
 public class List<T>
 {
-    T[] items;
+    T[] items;                          // past `count`, not items yet
     nuint count;
 
     public List()
     {
-        items = new T[2];
+        items = NewUninitializedArray<T>(2u);
         count = 0;
     }
 
@@ -558,7 +607,7 @@ public class List<T>
     {
         if (count == items.Length)
         {
-            var bigger = new T[count * 2];
+            var bigger = NewUninitializedArray<T>(count * 2);
             for (nuint i = 0; i < count; i++)
                 bigger[i] = items[i];
             items = bigger;
@@ -570,6 +619,11 @@ public class List<T>
     public T At(nuint index) => items[index];
 }
 ```
+
+`new T[2]` would be refused for a `List<String>`, whose elements have no zero
+to start as ([§2.16](02-types.md#216-zero-values)). The storage past `count`
+holds no items, so it comes from `Standard.Unchecked`, and the class keeps the
+promise that module asks for: a slot is written before it is read.
 
 ---
 

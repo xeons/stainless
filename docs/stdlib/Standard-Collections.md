@@ -37,7 +37,7 @@ class says so by implementing `IEquatable<T>` and `IHashable`.
 - `TKey` — what an entry is found by: equatable and hashable, and the two must agree, since a probe hashes to a slot and then compares
 - `TValue` — what an entry holds; nothing is asked of it
 
-<sub>[stdlib/Collections/Dictionary.sl:50](../../stdlib/Collections/Dictionary.sl#L50)</sub>
+<sub>[stdlib/Collections/Dictionary.sl:53](../../stdlib/Collections/Dictionary.sl#L53)</sub>
 
 #### Count *property*
 
@@ -47,7 +47,7 @@ nuint Count { get; }
 
 How many entries there are. O(1) -- it is a counter, not a scan.
 
-<sub>[stdlib/Collections/Dictionary.sl:69](../../stdlib/Collections/Dictionary.sl#L69)</sub>
+<sub>[stdlib/Collections/Dictionary.sl:72](../../stdlib/Collections/Dictionary.sl#L72)</sub>
 
 #### IsEmpty *property*
 
@@ -57,7 +57,7 @@ bool IsEmpty { get; }
 
 True when there are no entries.
 
-<sub>[stdlib/Collections/Dictionary.sl:72](../../stdlib/Collections/Dictionary.sl#L72)</sub>
+<sub>[stdlib/Collections/Dictionary.sl:75](../../stdlib/Collections/Dictionary.sl#L75)</sub>
 
 #### Capacity *property*
 
@@ -68,7 +68,7 @@ nuint Capacity { get; }
 The number of slots the table has. Always a power of two, so the hash is
 reduced with a mask rather than a division.
 
-<sub>[stdlib/Collections/Dictionary.sl:76](../../stdlib/Collections/Dictionary.sl#L76)</sub>
+<sub>[stdlib/Collections/Dictionary.sl:79](../../stdlib/Collections/Dictionary.sl#L79)</sub>
 
 #### ContainsKey *method*
 
@@ -83,7 +83,7 @@ One probe, but reach for `TryGetValue` when the value is what is wanted:
 
 **See also** &nbsp; [Dictionary.TryGetValue](#trygetvalue-method)
 
-<sub>[stdlib/Collections/Dictionary.sl:100](../../stdlib/Collections/Dictionary.sl#L100)</sub>
+<sub>[stdlib/Collections/Dictionary.sl:103](../../stdlib/Collections/Dictionary.sl#L103)</sub>
 
 #### TryGetValue *method*
 
@@ -106,7 +106,7 @@ to collide with a real value the way `GetValueOrDefault` has.
 
 **See also** &nbsp; [Dictionary.GetValue](#getvalue-method) &middot; [Dictionary.GetValueOrDefault](#getvalueordefault-method)
 
-<sub>[stdlib/Collections/Dictionary.sl:117](../../stdlib/Collections/Dictionary.sl#L117)</sub>
+<sub>[stdlib/Collections/Dictionary.sl:120](../../stdlib/Collections/Dictionary.sl#L120)</sub>
 
 #### GetValue *method*
 
@@ -125,7 +125,7 @@ is the question and this is not.
 
 **See also** &nbsp; [Dictionary.TryGetValue](#trygetvalue-method)
 
-<sub>[stdlib/Collections/Dictionary.sl:135](../../stdlib/Collections/Dictionary.sl#L135)</sub>
+<sub>[stdlib/Collections/Dictionary.sl:138](../../stdlib/Collections/Dictionary.sl#L138)</sub>
 
 #### GetValueOrDefault *method*
 
@@ -137,7 +137,7 @@ The value for `key`, or `fallback` when there is none.
 
 **See also** &nbsp; [Dictionary.TryGetValue](#trygetvalue-method)
 
-<sub>[stdlib/Collections/Dictionary.sl:146](../../stdlib/Collections/Dictionary.sl#L146)</sub>
+<sub>[stdlib/Collections/Dictionary.sl:149](../../stdlib/Collections/Dictionary.sl#L149)</sub>
 
 #### this[] *indexer*
 
@@ -173,7 +173,7 @@ exists for the same reason.
 
 **See also** &nbsp; [Dictionary.TryGetValue](#trygetvalue-method) &middot; [Dictionary.SetValue](#setvalue-method)
 
-<sub>[stdlib/Collections/Dictionary.sl:182](../../stdlib/Collections/Dictionary.sl#L182)</sub>
+<sub>[stdlib/Collections/Dictionary.sl:185](../../stdlib/Collections/Dictionary.sl#L185)</sub>
 
 #### SetValue *method*
 
@@ -185,7 +185,7 @@ Adds the key or replaces what it maps to.
 
 **See also** &nbsp; [Dictionary.Add](#add-method)
 
-<sub>[stdlib/Collections/Dictionary.sl:201](../../stdlib/Collections/Dictionary.sl#L201)</sub>
+<sub>[stdlib/Collections/Dictionary.sl:204](../../stdlib/Collections/Dictionary.sl#L204)</sub>
 
 #### Add *method*
 
@@ -199,7 +199,7 @@ Adds the key, or reports that it was already there and changes nothing.
 
 **See also** &nbsp; [Dictionary.SetValue](#setvalue-method) &middot; [Dictionary.Remove](#remove-method)
 
-<sub>[stdlib/Collections/Dictionary.sl:229](../../stdlib/Collections/Dictionary.sl#L229)</sub>
+<sub>[stdlib/Collections/Dictionary.sl:232](../../stdlib/Collections/Dictionary.sl#L232)</sub>
 
 #### Remove *method*
 
@@ -211,7 +211,7 @@ Removes the key, reporting whether it was there.
 
 **See also** &nbsp; [Dictionary.Add](#add-method)
 
-<sub>[stdlib/Collections/Dictionary.sl:240](../../stdlib/Collections/Dictionary.sl#L240)</sub>
+<sub>[stdlib/Collections/Dictionary.sl:243](../../stdlib/Collections/Dictionary.sl#L243)</sub>
 
 #### Clear *method*
 
@@ -222,7 +222,7 @@ void Clear()
 Drops every entry. The arrays are replaced rather than blanked, so
 anything they held is released now.
 
-<sub>[stdlib/Collections/Dictionary.sl:281](../../stdlib/Collections/Dictionary.sl#L281)</sub>
+<sub>[stdlib/Collections/Dictionary.sl:284](../../stdlib/Collections/Dictionary.sl#L284)</sub>
 
 #### GetKeys *method*
 
@@ -239,7 +239,7 @@ is written in between.
 
 **See also** &nbsp; [Dictionary.GetValues](#getvalues-method)
 
-<sub>[stdlib/Collections/Dictionary.sl:297](../../stdlib/Collections/Dictionary.sl#L297)</sub>
+<sub>[stdlib/Collections/Dictionary.sl:300](../../stdlib/Collections/Dictionary.sl#L300)</sub>
 
 #### GetValues *method*
 
@@ -253,7 +253,7 @@ Values are not distinct: a value stored under two keys appears twice.
 
 **See also** &nbsp; [Dictionary.GetKeys](#getkeys-method)
 
-<sub>[stdlib/Collections/Dictionary.sl:313](../../stdlib/Collections/Dictionary.sl#L313)</sub>
+<sub>[stdlib/Collections/Dictionary.sl:316](../../stdlib/Collections/Dictionary.sl#L316)</sub>
 
 #### GetEnumerator *method*
 
@@ -270,7 +270,7 @@ cursor.
 
 **See also** &nbsp; [DictionaryEnumerator](#dictionaryenumeratortkey-tvalue-class) &middot; [OrderedDictionary](#ordereddictionarytkey-tvalue-class)
 
-<sub>[stdlib/Collections/Dictionary.sl:333](../../stdlib/Collections/Dictionary.sl#L333)</sub>
+<sub>[stdlib/Collections/Dictionary.sl:336](../../stdlib/Collections/Dictionary.sl#L336)</sub>
 
 ### DictionaryEnumerator&lt;TKey, TValue&gt; *class*
 
@@ -453,7 +453,7 @@ The same table as `Dictionary`, without the values.
 
 - `T` — what the set holds: equatable and hashable, and the two must agree, since membership is a hash to a slot and a comparison
 
-<sub>[stdlib/Collections/HashSet.sl:32](../../stdlib/Collections/HashSet.sl#L32)</sub>
+<sub>[stdlib/Collections/HashSet.sl:34](../../stdlib/Collections/HashSet.sl#L34)</sub>
 
 #### Count *property*
 
@@ -995,7 +995,7 @@ steadily does not grow without bound.
 
 - `T` — what a node holds; nothing is asked of it, and a node is named by its handle rather than by its value
 
-<sub>[stdlib/Collections/LinkedList.sl:50](../../stdlib/Collections/LinkedList.sl#L50)</sub>
+<sub>[stdlib/Collections/LinkedList.sl:52](../../stdlib/Collections/LinkedList.sl#L52)</sub>
 
 #### Count *property*
 
@@ -1291,7 +1291,7 @@ exactly as in .NET.
 
 - `T` — the element type, constrained not at all so that a `List<Control>` stays possible
 
-<sub>[stdlib/Collections/List.sl:51](../../stdlib/Collections/List.sl#L51)</sub>
+<sub>[stdlib/Collections/List.sl:52](../../stdlib/Collections/List.sl#L52)</sub>
 
 #### Count *property*
 
@@ -1302,7 +1302,7 @@ nuint Count { get; }
 How many items are in the list -- not how many it has room for, which
 is `Capacity`.
 
-<sub>[stdlib/Collections/List.sl:74](../../stdlib/Collections/List.sl#L74)</sub>
+<sub>[stdlib/Collections/List.sl:77](../../stdlib/Collections/List.sl#L77)</sub>
 
 #### IsEmpty *property*
 
@@ -1312,7 +1312,7 @@ bool IsEmpty { get; }
 
 Whether there is nothing in it.
 
-<sub>[stdlib/Collections/List.sl:77](../../stdlib/Collections/List.sl#L77)</sub>
+<sub>[stdlib/Collections/List.sl:80](../../stdlib/Collections/List.sl#L80)</sub>
 
 #### Capacity *property*
 
@@ -1326,7 +1326,7 @@ Settable, as in .NET: assigning reallocates to exactly that size. A
 value below `Count` is ignored rather than truncating, because losing
 items is not what anyone means by reserving room.
 
-<sub>[stdlib/Collections/List.sl:84](../../stdlib/Collections/List.sl#L84)</sub>
+<sub>[stdlib/Collections/List.sl:87](../../stdlib/Collections/List.sl#L87)</sub>
 
 #### this[] *indexer*
 
@@ -1344,7 +1344,7 @@ methods beside it and they are gone: two spellings of one operation is
 how a codebase ends up using the longer one everywhere, which is what
 had happened here.
 
-<sub>[stdlib/Collections/List.sl:104](../../stdlib/Collections/List.sl#L104)</sub>
+<sub>[stdlib/Collections/List.sl:107](../../stdlib/Collections/List.sl#L107)</sub>
 
 #### Add *method*
 
@@ -1359,7 +1359,7 @@ single one can cost a copy of everything so far.
 
 **See also** &nbsp; [List.RemoveAt](#removeat-method) &middot; [List.AddRange](#addrange-method)
 
-<sub>[stdlib/Collections/List.sl:127](../../stdlib/Collections/List.sl#L127)</sub>
+<sub>[stdlib/Collections/List.sl:130](../../stdlib/Collections/List.sl#L130)</sub>
 
 #### AddRange *method*
 
@@ -1374,7 +1374,7 @@ doubles rather than chasing its own growing end.
 
 **See also** &nbsp; [List.InsertRange](#insertrange-method)
 
-<sub>[stdlib/Collections/List.sl:141](../../stdlib/Collections/List.sl#L141)</sub>
+<sub>[stdlib/Collections/List.sl:144](../../stdlib/Collections/List.sl#L144)</sub>
 
 #### AddRange *method*
 
@@ -1387,7 +1387,7 @@ Appends every element of a span, in its order: one copy, and a
 
 **See also** &nbsp; [List.InsertRange](#insertrange-method)
 
-<sub>[stdlib/Collections/List.sl:147](../../stdlib/Collections/List.sl#L147)</sub>
+<sub>[stdlib/Collections/List.sl:150](../../stdlib/Collections/List.sl#L150)</sub>
 
 #### Insert *method*
 
@@ -1400,7 +1400,7 @@ Inserts at a position, moving everything after it up one.
 `index == Count` appends, which is what makes a loop that inserts in
 order need no special case at the end.
 
-<sub>[stdlib/Collections/List.sl:153](../../stdlib/Collections/List.sl#L153)</sub>
+<sub>[stdlib/Collections/List.sl:156](../../stdlib/Collections/List.sl#L156)</sub>
 
 #### RemoveAt *method*
 
@@ -1416,7 +1416,7 @@ its removal, which is a leak that only shows up under a profiler.
 
 **See also** &nbsp; [List.Add](#add-method) &middot; [List.RemoveRange](#removerange-method)
 
-<sub>[stdlib/Collections/List.sl:173](../../stdlib/Collections/List.sl#L173)</sub>
+<sub>[stdlib/Collections/List.sl:176](../../stdlib/Collections/List.sl#L176)</sub>
 
 #### RemoveRange *method*
 
@@ -1428,7 +1428,7 @@ Removes `count` items from `index` onwards.
 
 **See also** &nbsp; [List.RemoveAt](#removeat-method)
 
-<sub>[stdlib/Collections/List.sl:186](../../stdlib/Collections/List.sl#L186)</sub>
+<sub>[stdlib/Collections/List.sl:189](../../stdlib/Collections/List.sl#L189)</sub>
 
 #### RemoveAll *method*
 
@@ -1441,7 +1441,7 @@ Removes every item the predicate accepts, and answers how many went.
 One pass that compacts in place, so removing half a list costs one
 traversal rather than one shuffle per removal.
 
-<sub>[stdlib/Collections/List.sl:202](../../stdlib/Collections/List.sl#L202)</sub>
+<sub>[stdlib/Collections/List.sl:206](../../stdlib/Collections/List.sl#L206)</sub>
 
 #### Reverse *method*
 
@@ -1451,7 +1451,7 @@ void Reverse()
 
 Reverses the list in place.
 
-<sub>[stdlib/Collections/List.sl:221](../../stdlib/Collections/List.sl#L221)</sub>
+<sub>[stdlib/Collections/List.sl:226](../../stdlib/Collections/List.sl#L226)</sub>
 
 #### ToArray *method*
 
@@ -1463,7 +1463,7 @@ The items as a new array, which the caller owns.
 
 **See also** &nbsp; [List.CopyTo](#copyto-method)
 
-<sub>[stdlib/Collections/List.sl:234](../../stdlib/Collections/List.sl#L234)</sub>
+<sub>[stdlib/Collections/List.sl:239](../../stdlib/Collections/List.sl#L239)</sub>
 
 #### CopyTo *method*
 
@@ -1475,7 +1475,7 @@ Copies the items into `into`, starting at `at`.
 
 **See also** &nbsp; [List.ToArray](#toarray-method)
 
-<sub>[stdlib/Collections/List.sl:239](../../stdlib/Collections/List.sl#L239)</sub>
+<sub>[stdlib/Collections/List.sl:244](../../stdlib/Collections/List.sl#L244)</sub>
 
 #### GetRange *method*
 
@@ -1487,32 +1487,35 @@ A new list holding `count` items from `index` onwards.
 
 **See also** &nbsp; [List.Slice](#slice-method)
 
-<sub>[stdlib/Collections/List.sl:249](../../stdlib/Collections/List.sl#L249)</sub>
+<sub>[stdlib/Collections/List.sl:254](../../stdlib/Collections/List.sl#L254)</sub>
 
 #### Find *method*
 
 ```
-T Find(Predicate<T> matches)
+Optional<T> Find(Predicate<T> matches)
 ```
 
-The first item the predicate accepts, or `default(T)` when there is
-none -- which is `null` for a reference type, as it is in .NET.
+The first item the predicate accepts, or `None`.
+
+**An `Optional<T>`, where .NET answers `default(T)`.** A `T` that is
+never null has no default to answer with, and one that has a default
+cannot tell "not found" from "found the zero".
 
 **See also** &nbsp; [List.FindIndex](#findindex-method) &middot; [List.FindLast](#findlast-method)
 
-<sub>[stdlib/Collections/List.sl:265](../../stdlib/Collections/List.sl#L265)</sub>
+<sub>[stdlib/Collections/List.sl:273](../../stdlib/Collections/List.sl#L273)</sub>
 
 #### FindLast *method*
 
 ```
-T FindLast(Predicate<T> matches)
+Optional<T> FindLast(Predicate<T> matches)
 ```
 
-The last item the predicate accepts, or `default(T)`.
+The last item the predicate accepts, or `None`.
 
 **See also** &nbsp; [List.Find](#find-method)
 
-<sub>[stdlib/Collections/List.sl:278](../../stdlib/Collections/List.sl#L278)</sub>
+<sub>[stdlib/Collections/List.sl:286](../../stdlib/Collections/List.sl#L286)</sub>
 
 #### FindAll *method*
 
@@ -1524,7 +1527,7 @@ Every item the predicate accepts, in order.
 
 **See also** &nbsp; [List.Find](#find-method)
 
-<sub>[stdlib/Collections/List.sl:291](../../stdlib/Collections/List.sl#L291)</sub>
+<sub>[stdlib/Collections/List.sl:299](../../stdlib/Collections/List.sl#L299)</sub>
 
 #### FindIndex *method*
 
@@ -1542,7 +1545,7 @@ because C#'s shape is a workaround for a type it does not have.
 
 **See also** &nbsp; [List.FindLastIndex](#findlastindex-method) &middot; [Collections.IndexOf](#indexof-function)
 
-<sub>[stdlib/Collections/List.sl:312](../../stdlib/Collections/List.sl#L312)</sub>
+<sub>[stdlib/Collections/List.sl:320](../../stdlib/Collections/List.sl#L320)</sub>
 
 #### FindLastIndex *method*
 
@@ -1554,7 +1557,7 @@ Where the last item the predicate accepts is, or `None`.
 
 **See also** &nbsp; [List.FindIndex](#findindex-method)
 
-<sub>[stdlib/Collections/List.sl:325](../../stdlib/Collections/List.sl#L325)</sub>
+<sub>[stdlib/Collections/List.sl:333](../../stdlib/Collections/List.sl#L333)</sub>
 
 #### Exists *method*
 
@@ -1566,7 +1569,7 @@ Whether any item is accepted by the predicate.
 
 **See also** &nbsp; [List.TrueForAll](#trueforall-method)
 
-<sub>[stdlib/Collections/List.sl:338](../../stdlib/Collections/List.sl#L338)</sub>
+<sub>[stdlib/Collections/List.sl:346](../../stdlib/Collections/List.sl#L346)</sub>
 
 #### TrueForAll *method*
 
@@ -1578,7 +1581,7 @@ Whether every item is.
 
 **See also** &nbsp; [List.Exists](#exists-method)
 
-<sub>[stdlib/Collections/List.sl:343](../../stdlib/Collections/List.sl#L343)</sub>
+<sub>[stdlib/Collections/List.sl:351](../../stdlib/Collections/List.sl#L351)</sub>
 
 #### ForEach *method*
 
@@ -1592,7 +1595,7 @@ The list is read as it goes, so an action that adds to it is a loop
 that does not end. .NET throws for this; there is nothing to throw
 here, and saying so is the whole of what can be done about it.
 
-<sub>[stdlib/Collections/List.sl:358](../../stdlib/Collections/List.sl#L358)</sub>
+<sub>[stdlib/Collections/List.sl:366](../../stdlib/Collections/List.sl#L366)</sub>
 
 #### EnsureCapacity *method*
 
@@ -1605,7 +1608,7 @@ afterwards. Never shrinks.
 
 **See also** &nbsp; [List.TrimExcess](#trimexcess-method) &middot; [List.Capacity](#capacity-property)
 
-<sub>[stdlib/Collections/List.sl:371](../../stdlib/Collections/List.sl#L371)</sub>
+<sub>[stdlib/Collections/List.sl:379](../../stdlib/Collections/List.sl#L379)</sub>
 
 #### TrimExcess *method*
 
@@ -1617,7 +1620,7 @@ Gives back the room past `Count`.
 
 **See also** &nbsp; [List.EnsureCapacity](#ensurecapacity-method)
 
-<sub>[stdlib/Collections/List.sl:381](../../stdlib/Collections/List.sl#L381)</sub>
+<sub>[stdlib/Collections/List.sl:389](../../stdlib/Collections/List.sl#L389)</sub>
 
 #### Slice *method*
 
@@ -1630,7 +1633,7 @@ since ranges arrived, and the two are the same call.
 
 **See also** &nbsp; [List.GetRange](#getrange-method)
 
-<sub>[stdlib/Collections/List.sl:391](../../stdlib/Collections/List.sl#L391)</sub>
+<sub>[stdlib/Collections/List.sl:399](../../stdlib/Collections/List.sl#L399)</sub>
 
 #### InsertRange *method*
 
@@ -1646,7 +1649,7 @@ place with one shift of the tail rather than one per item. Another
 
 **See also** &nbsp; [List.AddRange](#addrange-method)
 
-<sub>[stdlib/Collections/List.sl:400](../../stdlib/Collections/List.sl#L400)</sub>
+<sub>[stdlib/Collections/List.sl:408](../../stdlib/Collections/List.sl#L408)</sub>
 
 #### InsertRange *method*
 
@@ -1659,7 +1662,7 @@ this list's own storage is copied out first.
 
 **See also** &nbsp; [List.AddRange](#addrange-method)
 
-<sub>[stdlib/Collections/List.sl:421](../../stdlib/Collections/List.sl#L421)</sub>
+<sub>[stdlib/Collections/List.sl:429](../../stdlib/Collections/List.sl#L429)</sub>
 
 #### AsReadOnly *method*
 
@@ -1674,7 +1677,7 @@ wrapper for the same reason this answers an interface: what it buys is a
 signature that says "I will not write to this", and neither stops the
 owner writing to it meanwhile.
 
-<sub>[stdlib/Collections/List.sl:448](../../stdlib/Collections/List.sl#L448)</sub>
+<sub>[stdlib/Collections/List.sl:456](../../stdlib/Collections/List.sl#L456)</sub>
 
 #### GetEnumerator *method*
 
@@ -1688,7 +1691,7 @@ copy, so changing the list during a walk changes what the walk sees.
 
 **See also** &nbsp; [ListEnumerator](#listenumeratort-class)
 
-<sub>[stdlib/Collections/List.sl:455](../../stdlib/Collections/List.sl#L455)</sub>
+<sub>[stdlib/Collections/List.sl:463](../../stdlib/Collections/List.sl#L463)</sub>
 
 #### Clear *method*
 
@@ -1700,7 +1703,7 @@ Drops every item. The backing array is replaced rather than merely
 forgotten, so any references it held are released now instead of
 lingering until the slots are overwritten.
 
-<sub>[stdlib/Collections/List.sl:460](../../stdlib/Collections/List.sl#L460)</sub>
+<sub>[stdlib/Collections/List.sl:468](../../stdlib/Collections/List.sl#L468)</sub>
 
 ### ListEnumerator&lt;T&gt; *class*
 
@@ -1941,7 +1944,7 @@ the front of it.
 
 - `T` — what the queue holds; nothing is asked of it
 
-<sub>[stdlib/Collections/Queue.sl:33](../../stdlib/Collections/Queue.sl#L33)</sub>
+<sub>[stdlib/Collections/Queue.sl:35](../../stdlib/Collections/Queue.sl#L35)</sub>
 
 #### Count *property*
 
@@ -2114,7 +2117,7 @@ built once, rather than a counter updated in a loop.
 
 **See also** &nbsp; [Dictionary](#dictionarytkey-tvalue-class)
 
-<sub>[stdlib/Collections/SortedList.sl:37](../../stdlib/Collections/SortedList.sl#L37)</sub>
+<sub>[stdlib/Collections/SortedList.sl:39](../../stdlib/Collections/SortedList.sl#L39)</sub>
 
 #### Count *property*
 
@@ -2124,7 +2127,7 @@ nuint Count { get; }
 
 How many entries there are. O(1).
 
-<sub>[stdlib/Collections/SortedList.sl:53](../../stdlib/Collections/SortedList.sl#L53)</sub>
+<sub>[stdlib/Collections/SortedList.sl:55](../../stdlib/Collections/SortedList.sl#L55)</sub>
 
 #### IsEmpty *property*
 
@@ -2134,7 +2137,7 @@ bool IsEmpty { get; }
 
 True when there are no entries.
 
-<sub>[stdlib/Collections/SortedList.sl:56](../../stdlib/Collections/SortedList.sl#L56)</sub>
+<sub>[stdlib/Collections/SortedList.sl:58](../../stdlib/Collections/SortedList.sl#L58)</sub>
 
 #### IndexOfKey *method*
 
@@ -2148,7 +2151,7 @@ offset by one so the two cases stay apart: a result below zero means
 
 **See also** &nbsp; [SortedList.TryGetValue](#trygetvalue-method)
 
-<sub>[stdlib/Collections/SortedList.sl:63](../../stdlib/Collections/SortedList.sl#L63)</sub>
+<sub>[stdlib/Collections/SortedList.sl:65](../../stdlib/Collections/SortedList.sl#L65)</sub>
 
 #### ContainsKey *method*
 
@@ -2161,7 +2164,7 @@ when the value is what is wanted, rather than searching twice.
 
 **See also** &nbsp; [SortedList.TryGetValue](#trygetvalue-method)
 
-<sub>[stdlib/Collections/SortedList.sl:92](../../stdlib/Collections/SortedList.sl#L92)</sub>
+<sub>[stdlib/Collections/SortedList.sl:94](../../stdlib/Collections/SortedList.sl#L94)</sub>
 
 #### GetKeyAt *method*
 
@@ -2173,7 +2176,7 @@ The key at a position in the ordering, counting from the smallest.
 
 **See also** &nbsp; [SortedList.GetValueAt](#getvalueat-method)
 
-<sub>[stdlib/Collections/SortedList.sl:97](../../stdlib/Collections/SortedList.sl#L97)</sub>
+<sub>[stdlib/Collections/SortedList.sl:99](../../stdlib/Collections/SortedList.sl#L99)</sub>
 
 #### GetValueAt *method*
 
@@ -2186,7 +2189,7 @@ same index. Aborts past the end.
 
 **See also** &nbsp; [SortedList.GetKeyAt](#getkeyat-method)
 
-<sub>[stdlib/Collections/SortedList.sl:108](../../stdlib/Collections/SortedList.sl#L108)</sub>
+<sub>[stdlib/Collections/SortedList.sl:110](../../stdlib/Collections/SortedList.sl#L110)</sub>
 
 #### TryGetValue *method*
 
@@ -2200,7 +2203,7 @@ that is not there is an outcome rather than a mistake.
 
 **See also** &nbsp; [SortedList.GetValue](#getvalue-method) &middot; [SortedList.GetValueOrDefault](#getvalueordefault-method)
 
-<sub>[stdlib/Collections/SortedList.sl:121](../../stdlib/Collections/SortedList.sl#L121)</sub>
+<sub>[stdlib/Collections/SortedList.sl:123](../../stdlib/Collections/SortedList.sl#L123)</sub>
 
 #### GetValue *method*
 
@@ -2215,7 +2218,7 @@ the question where it might not be, and `GetValueOrDefault` where a default will
 
 **See also** &nbsp; [SortedList.TryGetValue](#trygetvalue-method) &middot; [SortedList.GetValueOrDefault](#getvalueordefault-method)
 
-<sub>[stdlib/Collections/SortedList.sl:136](../../stdlib/Collections/SortedList.sl#L136)</sub>
+<sub>[stdlib/Collections/SortedList.sl:138](../../stdlib/Collections/SortedList.sl#L138)</sub>
 
 #### GetValueOrDefault *method*
 
@@ -2231,7 +2234,7 @@ tells them apart.
 
 **See also** &nbsp; [SortedList.TryGetValue](#trygetvalue-method)
 
-<sub>[stdlib/Collections/SortedList.sl:151](../../stdlib/Collections/SortedList.sl#L151)</sub>
+<sub>[stdlib/Collections/SortedList.sl:153](../../stdlib/Collections/SortedList.sl#L153)</sub>
 
 #### SetValue *method*
 
@@ -2247,7 +2250,7 @@ poor choice for a map that is written in a loop.
 
 **See also** &nbsp; [SortedList.Remove](#remove-method)
 
-<sub>[stdlib/Collections/SortedList.sl:166](../../stdlib/Collections/SortedList.sl#L166)</sub>
+<sub>[stdlib/Collections/SortedList.sl:168](../../stdlib/Collections/SortedList.sl#L168)</sub>
 
 #### Remove *method*
 
@@ -2260,7 +2263,7 @@ is O(n) like `SetValue` on a new key.
 
 **See also** &nbsp; [SortedList.SetValue](#setvalue-method)
 
-<sub>[stdlib/Collections/SortedList.sl:196](../../stdlib/Collections/SortedList.sl#L196)</sub>
+<sub>[stdlib/Collections/SortedList.sl:198](../../stdlib/Collections/SortedList.sl#L198)</sub>
 
 #### Clear *method*
 
@@ -2365,7 +2368,7 @@ Last in, first out. The top is the end of the array, so nothing moves.
 
 - `T` — what the stack holds; nothing is asked of it
 
-<sub>[stdlib/Collections/Stack.sl:29](../../stdlib/Collections/Stack.sl#L29)</sub>
+<sub>[stdlib/Collections/Stack.sl:31](../../stdlib/Collections/Stack.sl#L31)</sub>
 
 #### Count *property*
 
@@ -2523,7 +2526,7 @@ first element is the seed, and `combine` takes it and each one after.
 
 - `T` — the element type; `combine` does the work
 
-<sub>[stdlib/Collections/Aggregates.sl:734](../../stdlib/Collections/Aggregates.sl#L734)</sub>
+<sub>[stdlib/Collections/Aggregates.sl:732](../../stdlib/Collections/Aggregates.sl#L732)</sub>
 
 ### Aggregate *function*
 
@@ -2538,7 +2541,7 @@ first element is the seed, and `combine` takes it and each one after.
 
 - `T` — the element type; `combine` does the work
 
-<sub>[stdlib/Collections/Aggregates.sl:752](../../stdlib/Collections/Aggregates.sl#L752)</sub>
+<sub>[stdlib/Collections/Aggregates.sl:747](../../stdlib/Collections/Aggregates.sl#L747)</sub>
 
 ### Aggregate *function*
 
@@ -2619,7 +2622,7 @@ Whether there are any elements at all.
 
 - `T` — the element type; nothing is asked of it
 
-<sub>[stdlib/Collections/Elements.sl:179](../../stdlib/Collections/Elements.sl#L179)</sub>
+<sub>[stdlib/Collections/Elements.sl:176](../../stdlib/Collections/Elements.sl#L176)</sub>
 
 ### Any *function*
 
@@ -2633,7 +2636,7 @@ Whether there are any elements at all.
 
 - `T` — the element type; nothing is asked of it
 
-<sub>[stdlib/Collections/Elements.sl:300](../../stdlib/Collections/Elements.sl#L300)</sub>
+<sub>[stdlib/Collections/Elements.sl:294](../../stdlib/Collections/Elements.sl#L294)</sub>
 
 ### Any *function*
 
@@ -2914,7 +2917,7 @@ insertion point usually does not want the search, and the other way round.
 
 **See also** &nbsp; [Collections.FindLowerBound](#findlowerbound-function) &middot; [Collections.Sort](#sort-function)
 
-<sub>[stdlib/Collections/Collections.sl:353](../../stdlib/Collections/Collections.sl#L353)</sub>
+<sub>[stdlib/Collections/Collections.sl:356](../../stdlib/Collections/Collections.sl#L356)</sub>
 
 ### Chunk *function*
 
@@ -2959,7 +2962,7 @@ How many elements at the start the two have in common.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:209](../../stdlib/Collections/Spans.sl#L209)</sub>
+<sub>[stdlib/Collections/Spans.sl:211](../../stdlib/Collections/Spans.sl#L211)</sub>
 
 ### Concat *function*
 
@@ -3005,7 +3008,7 @@ free function here for the reason `IndexOf` is.
 
 **See also** &nbsp; [Collections.IndexOf](#indexof-function)
 
-<sub>[stdlib/Collections/Collections.sl:101](../../stdlib/Collections/Collections.sl#L101)</sub>
+<sub>[stdlib/Collections/Collections.sl:104](../../stdlib/Collections/Collections.sl#L104)</sub>
 
 ### Contains *function*
 
@@ -3020,7 +3023,7 @@ Whether any element equals `value`.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Elements.sl:321](../../stdlib/Collections/Elements.sl#L321)</sub>
+<sub>[stdlib/Collections/Elements.sl:315](../../stdlib/Collections/Elements.sl#L315)</sub>
 
 ### Contains *function*
 
@@ -3035,7 +3038,7 @@ Whether any element equals `value`.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:69](../../stdlib/Collections/Spans.sl#L69)</sub>
+<sub>[stdlib/Collections/Spans.sl:71](../../stdlib/Collections/Spans.sl#L71)</sub>
 
 ### ContainsAny *function*
 
@@ -3050,7 +3053,7 @@ Whether any element equals either value.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:352](../../stdlib/Collections/Spans.sl#L352)</sub>
+<sub>[stdlib/Collections/Spans.sl:354](../../stdlib/Collections/Spans.sl#L354)</sub>
 
 ### ContainsAny *function*
 
@@ -3065,7 +3068,7 @@ Whether any element equals any of the three.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:358](../../stdlib/Collections/Spans.sl#L358)</sub>
+<sub>[stdlib/Collections/Spans.sl:360](../../stdlib/Collections/Spans.sl#L360)</sub>
 
 ### ContainsAny *function*
 
@@ -3080,7 +3083,7 @@ Whether any element equals any of `values`.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:365](../../stdlib/Collections/Spans.sl#L365)</sub>
+<sub>[stdlib/Collections/Spans.sl:367](../../stdlib/Collections/Spans.sl#L367)</sub>
 
 ### ContainsAnyExcept *function*
 
@@ -3095,7 +3098,7 @@ Whether any element is other than `value`.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:371](../../stdlib/Collections/Spans.sl#L371)</sub>
+<sub>[stdlib/Collections/Spans.sl:373](../../stdlib/Collections/Spans.sl#L373)</sub>
 
 ### ContainsAnyExcept *function*
 
@@ -3110,7 +3113,7 @@ Whether any element equals neither value.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:377](../../stdlib/Collections/Spans.sl#L377)</sub>
+<sub>[stdlib/Collections/Spans.sl:379](../../stdlib/Collections/Spans.sl#L379)</sub>
 
 ### ContainsAnyExcept *function*
 
@@ -3125,7 +3128,7 @@ Whether any element equals none of the three.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:384](../../stdlib/Collections/Spans.sl#L384)</sub>
+<sub>[stdlib/Collections/Spans.sl:386](../../stdlib/Collections/Spans.sl#L386)</sub>
 
 ### ContainsAnyExcept *function*
 
@@ -3140,7 +3143,7 @@ Whether any element equals none of `values`.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:391](../../stdlib/Collections/Spans.sl#L391)</sub>
+<sub>[stdlib/Collections/Spans.sl:393](../../stdlib/Collections/Spans.sl#L393)</sub>
 
 ### ContainsAnyExceptInRange *function*
 
@@ -3155,7 +3158,7 @@ Whether any element is outside `low` to `high`.
 
 - `T` — the element type, which must order itself
 
-<sub>[stdlib/Collections/Spans.sl:468](../../stdlib/Collections/Spans.sl#L468)</sub>
+<sub>[stdlib/Collections/Spans.sl:470](../../stdlib/Collections/Spans.sl#L470)</sub>
 
 ### ContainsAnyInRange *function*
 
@@ -3170,7 +3173,7 @@ Whether any element is between `low` and `high`, both included.
 
 - `T` — the element type, which must order itself
 
-<sub>[stdlib/Collections/Spans.sl:462](../../stdlib/Collections/Spans.sl#L462)</sub>
+<sub>[stdlib/Collections/Spans.sl:464](../../stdlib/Collections/Spans.sl#L464)</sub>
 
 ### Count *function*
 
@@ -3184,7 +3187,7 @@ How many elements there are, walking them to find out.
 
 - `T` — the element type; nothing is asked of it
 
-<sub>[stdlib/Collections/Elements.sl:310](../../stdlib/Collections/Elements.sl#L310)</sub>
+<sub>[stdlib/Collections/Elements.sl:304](../../stdlib/Collections/Elements.sl#L304)</sub>
 
 ### Count *function*
 
@@ -3231,7 +3234,7 @@ How many elements equal `value`.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:75](../../stdlib/Collections/Spans.sl#L75)</sub>
+<sub>[stdlib/Collections/Spans.sl:77](../../stdlib/Collections/Spans.sl#L77)</sub>
 
 ### Count *function*
 
@@ -3247,7 +3250,7 @@ do not overlap. An empty `value` appears nowhere.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:130](../../stdlib/Collections/Spans.sl#L130)</sub>
+<sub>[stdlib/Collections/Spans.sl:132](../../stdlib/Collections/Spans.sl#L132)</sub>
 
 ### Distinct *function*
 
@@ -3332,7 +3335,7 @@ The element at `index`, aborting past the end.
 
 - `T` — the element type; nothing is asked of it
 
-<sub>[stdlib/Collections/Elements.sl:168](../../stdlib/Collections/Elements.sl#L168)</sub>
+<sub>[stdlib/Collections/Elements.sl:165](../../stdlib/Collections/Elements.sl#L165)</sub>
 
 ### ElementAt *function*
 
@@ -3346,7 +3349,7 @@ The element at `index`, aborting past the end.
 
 - `T` — the element type; nothing is asked of it
 
-<sub>[stdlib/Collections/Elements.sl:269](../../stdlib/Collections/Elements.sl#L269)</sub>
+<sub>[stdlib/Collections/Elements.sl:264](../../stdlib/Collections/Elements.sl#L264)</sub>
 
 ### ElementAtOrDefault *function*
 
@@ -3360,7 +3363,7 @@ The element at `index`, or `fallback` past the end.
 
 - `T` — the element type; nothing is asked of it
 
-<sub>[stdlib/Collections/Elements.sl:173](../../stdlib/Collections/Elements.sl#L173)</sub>
+<sub>[stdlib/Collections/Elements.sl:170](../../stdlib/Collections/Elements.sl#L170)</sub>
 
 ### ElementAtOrDefault *function*
 
@@ -3374,7 +3377,7 @@ The element at `index`, or `fallback` past the end.
 
 - `T` — the element type; nothing is asked of it
 
-<sub>[stdlib/Collections/Elements.sl:285](../../stdlib/Collections/Elements.sl#L285)</sub>
+<sub>[stdlib/Collections/Elements.sl:279](../../stdlib/Collections/Elements.sl#L279)</sub>
 
 ### EndsWith *function*
 
@@ -3389,7 +3392,7 @@ Whether `span` ends with the elements of `value`.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:197](../../stdlib/Collections/Spans.sl#L197)</sub>
+<sub>[stdlib/Collections/Spans.sl:199](../../stdlib/Collections/Spans.sl#L199)</sub>
 
 ### EndsWith *function*
 
@@ -3404,7 +3407,7 @@ Whether the last element equals `value`.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:203](../../stdlib/Collections/Spans.sl#L203)</sub>
+<sub>[stdlib/Collections/Spans.sl:205](../../stdlib/Collections/Spans.sl#L205)</sub>
 
 ### Except *function*
 
@@ -3523,7 +3526,7 @@ equal element when there is one.
 
 **See also** &nbsp; [Collections.BinarySearch](#binarysearch-function)
 
-<sub>[stdlib/Collections/Collections.sl:384](../../stdlib/Collections/Collections.sl#L384)</sub>
+<sub>[stdlib/Collections/Collections.sl:387](../../stdlib/Collections/Collections.sl#L387)</sub>
 
 ### First *function*
 
@@ -3571,7 +3574,7 @@ The first element, aborting when there is none.
 
 **See also** &nbsp; [Collections.FirstOrDefault](#firstordefault-function)
 
-<sub>[stdlib/Collections/Elements.sl:187](../../stdlib/Collections/Elements.sl#L187)</sub>
+<sub>[stdlib/Collections/Elements.sl:184](../../stdlib/Collections/Elements.sl#L184)</sub>
 
 ### First *function*
 
@@ -3587,7 +3590,7 @@ The first element the predicate accepts, aborting when there is none.
 
 **See also** &nbsp; [Collections.Find](#find-function)
 
-<sub>[stdlib/Collections/Elements.sl:199](../../stdlib/Collections/Elements.sl#L199)</sub>
+<sub>[stdlib/Collections/Elements.sl:195](../../stdlib/Collections/Elements.sl#L195)</sub>
 
 ### FirstOrDefault *function*
 
@@ -3601,7 +3604,7 @@ The first element, or `fallback` when there is none.
 
 - `T` — the element type; nothing is asked of it
 
-<sub>[stdlib/Collections/Elements.sl:64](../../stdlib/Collections/Elements.sl#L64)</sub>
+<sub>[stdlib/Collections/Elements.sl:63](../../stdlib/Collections/Elements.sl#L63)</sub>
 
 ### FirstOrDefault *function*
 
@@ -3615,7 +3618,7 @@ The first element, or `fallback` when there is none.
 
 - `T` — the element type; nothing is asked of it
 
-<sub>[stdlib/Collections/Elements.sl:213](../../stdlib/Collections/Elements.sl#L213)</sub>
+<sub>[stdlib/Collections/Elements.sl:208](../../stdlib/Collections/Elements.sl#L208)</sub>
 
 ### FirstOrDefault *function*
 
@@ -3780,7 +3783,7 @@ has always answered this way; now they agree.
 
 **See also** &nbsp; [Collections.Contains](#contains-function) &middot; [OrderedDictionary.IndexOf](#indexof-method)
 
-<sub>[stdlib/Collections/Collections.sl:86](../../stdlib/Collections/Collections.sl#L86)</sub>
+<sub>[stdlib/Collections/Collections.sl:89](../../stdlib/Collections/Collections.sl#L89)</sub>
 
 ### IndexOf *function*
 
@@ -3797,7 +3800,7 @@ Where the first element equal to `value` is, if there is one.
 
 **See also** &nbsp; [Collections.LastIndexOf](#lastindexof-function)
 
-<sub>[stdlib/Collections/Spans.sl:42](../../stdlib/Collections/Spans.sl#L42)</sub>
+<sub>[stdlib/Collections/Spans.sl:44](../../stdlib/Collections/Spans.sl#L44)</sub>
 
 ### IndexOf *function*
 
@@ -3815,7 +3818,7 @@ appears at the start.
 
 **See also** &nbsp; [Collections.LastIndexOf](#lastindexof-function)
 
-<sub>[stdlib/Collections/Spans.sl:93](../../stdlib/Collections/Spans.sl#L93)</sub>
+<sub>[stdlib/Collections/Spans.sl:95](../../stdlib/Collections/Spans.sl#L95)</sub>
 
 ### IndexOfAny *function*
 
@@ -3830,7 +3833,7 @@ Where the first element equal to either value is.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:226](../../stdlib/Collections/Spans.sl#L226)</sub>
+<sub>[stdlib/Collections/Spans.sl:228](../../stdlib/Collections/Spans.sl#L228)</sub>
 
 ### IndexOfAny *function*
 
@@ -3845,7 +3848,7 @@ Where the first element equal to any of the three is.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:233](../../stdlib/Collections/Spans.sl#L233)</sub>
+<sub>[stdlib/Collections/Spans.sl:235](../../stdlib/Collections/Spans.sl#L235)</sub>
 
 ### IndexOfAny *function*
 
@@ -3860,7 +3863,7 @@ Where the first element equal to any of `values` is.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:240](../../stdlib/Collections/Spans.sl#L240)</sub>
+<sub>[stdlib/Collections/Spans.sl:242](../../stdlib/Collections/Spans.sl#L242)</sub>
 
 ### IndexOfAnyExcept *function*
 
@@ -3875,7 +3878,7 @@ Where the first element other than `value` is.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:282](../../stdlib/Collections/Spans.sl#L282)</sub>
+<sub>[stdlib/Collections/Spans.sl:284](../../stdlib/Collections/Spans.sl#L284)</sub>
 
 ### IndexOfAnyExcept *function*
 
@@ -3890,7 +3893,7 @@ Where the first element equal to neither value is.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:289](../../stdlib/Collections/Spans.sl#L289)</sub>
+<sub>[stdlib/Collections/Spans.sl:291](../../stdlib/Collections/Spans.sl#L291)</sub>
 
 ### IndexOfAnyExcept *function*
 
@@ -3905,7 +3908,7 @@ Where the first element equal to none of the three is.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:296](../../stdlib/Collections/Spans.sl#L296)</sub>
+<sub>[stdlib/Collections/Spans.sl:298](../../stdlib/Collections/Spans.sl#L298)</sub>
 
 ### IndexOfAnyExcept *function*
 
@@ -3920,7 +3923,7 @@ Where the first element equal to none of `values` is.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:303](../../stdlib/Collections/Spans.sl#L303)</sub>
+<sub>[stdlib/Collections/Spans.sl:305](../../stdlib/Collections/Spans.sl#L305)</sub>
 
 ### IndexOfAnyExceptInRange *function*
 
@@ -3935,7 +3938,7 @@ Where the first element outside `low` to `high` is.
 
 - `T` — the element type, which must order itself
 
-<sub>[stdlib/Collections/Spans.sl:420](../../stdlib/Collections/Spans.sl#L420)</sub>
+<sub>[stdlib/Collections/Spans.sl:422](../../stdlib/Collections/Spans.sl#L422)</sub>
 
 ### IndexOfAnyInRange *function*
 
@@ -3950,7 +3953,7 @@ Where the first element between `low` and `high`, both included, is.
 
 - `T` — the element type, which must order itself
 
-<sub>[stdlib/Collections/Spans.sl:406](../../stdlib/Collections/Spans.sl#L406)</sub>
+<sub>[stdlib/Collections/Spans.sl:408](../../stdlib/Collections/Spans.sl#L408)</sub>
 
 ### Intersect *function*
 
@@ -4026,7 +4029,7 @@ The last element, aborting when there is none.
 
 - `T` — the element type; nothing is asked of it
 
-<sub>[stdlib/Collections/Elements.sl:70](../../stdlib/Collections/Elements.sl#L70)</sub>
+<sub>[stdlib/Collections/Elements.sl:69](../../stdlib/Collections/Elements.sl#L69)</sub>
 
 ### Last *function*
 
@@ -4040,7 +4043,7 @@ The last element the predicate accepts, aborting when there is none.
 
 - `T` — the element type; nothing is asked of it
 
-<sub>[stdlib/Collections/Elements.sl:80](../../stdlib/Collections/Elements.sl#L80)</sub>
+<sub>[stdlib/Collections/Elements.sl:79](../../stdlib/Collections/Elements.sl#L79)</sub>
 
 ### Last *function*
 
@@ -4054,7 +4057,7 @@ The last element, aborting when there is none.
 
 - `T` — the element type; nothing is asked of it
 
-<sub>[stdlib/Collections/Elements.sl:223](../../stdlib/Collections/Elements.sl#L223)</sub>
+<sub>[stdlib/Collections/Elements.sl:218](../../stdlib/Collections/Elements.sl#L218)</sub>
 
 ### Last *function*
 
@@ -4068,7 +4071,7 @@ The last element the predicate accepts, aborting when there is none.
 
 - `T` — the element type; nothing is asked of it
 
-<sub>[stdlib/Collections/Elements.sl:228](../../stdlib/Collections/Elements.sl#L228)</sub>
+<sub>[stdlib/Collections/Elements.sl:223](../../stdlib/Collections/Elements.sl#L223)</sub>
 
 ### LastIndexOf *function*
 
@@ -4085,7 +4088,7 @@ Where the *last* item equal to `wanted` is, if it is there at all.
 
 **See also** &nbsp; [Collections.IndexOf](#indexof-function)
 
-<sub>[stdlib/Collections/Collections.sl:110](../../stdlib/Collections/Collections.sl#L110)</sub>
+<sub>[stdlib/Collections/Collections.sl:113](../../stdlib/Collections/Collections.sl#L113)</sub>
 
 ### LastIndexOf *function*
 
@@ -4102,7 +4105,7 @@ Where the last element equal to `value` is, if there is one.
 
 **See also** &nbsp; [Collections.IndexOf](#indexof-function)
 
-<sub>[stdlib/Collections/Spans.sl:56](../../stdlib/Collections/Spans.sl#L56)</sub>
+<sub>[stdlib/Collections/Spans.sl:58](../../stdlib/Collections/Spans.sl#L58)</sub>
 
 ### LastIndexOf *function*
 
@@ -4120,7 +4123,7 @@ appears at the end.
 
 **See also** &nbsp; [Collections.IndexOf](#indexof-function)
 
-<sub>[stdlib/Collections/Spans.sl:112](../../stdlib/Collections/Spans.sl#L112)</sub>
+<sub>[stdlib/Collections/Spans.sl:114](../../stdlib/Collections/Spans.sl#L114)</sub>
 
 ### LastIndexOfAny *function*
 
@@ -4135,7 +4138,7 @@ Where the last element equal to either value is.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:254](../../stdlib/Collections/Spans.sl#L254)</sub>
+<sub>[stdlib/Collections/Spans.sl:256](../../stdlib/Collections/Spans.sl#L256)</sub>
 
 ### LastIndexOfAny *function*
 
@@ -4150,7 +4153,7 @@ Where the last element equal to any of the three is.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:261](../../stdlib/Collections/Spans.sl#L261)</sub>
+<sub>[stdlib/Collections/Spans.sl:263](../../stdlib/Collections/Spans.sl#L263)</sub>
 
 ### LastIndexOfAny *function*
 
@@ -4165,7 +4168,7 @@ Where the last element equal to any of `values` is.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:268](../../stdlib/Collections/Spans.sl#L268)</sub>
+<sub>[stdlib/Collections/Spans.sl:270](../../stdlib/Collections/Spans.sl#L270)</sub>
 
 ### LastIndexOfAnyExcept *function*
 
@@ -4180,7 +4183,7 @@ Where the last element other than `value` is.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:317](../../stdlib/Collections/Spans.sl#L317)</sub>
+<sub>[stdlib/Collections/Spans.sl:319](../../stdlib/Collections/Spans.sl#L319)</sub>
 
 ### LastIndexOfAnyExcept *function*
 
@@ -4195,7 +4198,7 @@ Where the last element equal to neither value is.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:324](../../stdlib/Collections/Spans.sl#L324)</sub>
+<sub>[stdlib/Collections/Spans.sl:326](../../stdlib/Collections/Spans.sl#L326)</sub>
 
 ### LastIndexOfAnyExcept *function*
 
@@ -4210,7 +4213,7 @@ Where the last element equal to none of the three is.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:331](../../stdlib/Collections/Spans.sl#L331)</sub>
+<sub>[stdlib/Collections/Spans.sl:333](../../stdlib/Collections/Spans.sl#L333)</sub>
 
 ### LastIndexOfAnyExcept *function*
 
@@ -4225,7 +4228,7 @@ Where the last element equal to none of `values` is.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:338](../../stdlib/Collections/Spans.sl#L338)</sub>
+<sub>[stdlib/Collections/Spans.sl:340](../../stdlib/Collections/Spans.sl#L340)</sub>
 
 ### LastIndexOfAnyExceptInRange *function*
 
@@ -4240,7 +4243,7 @@ Where the last element outside `low` to `high` is.
 
 - `T` — the element type, which must order itself
 
-<sub>[stdlib/Collections/Spans.sl:448](../../stdlib/Collections/Spans.sl#L448)</sub>
+<sub>[stdlib/Collections/Spans.sl:450](../../stdlib/Collections/Spans.sl#L450)</sub>
 
 ### LastIndexOfAnyInRange *function*
 
@@ -4255,7 +4258,7 @@ Where the last element between `low` and `high`, both included, is.
 
 - `T` — the element type, which must order itself
 
-<sub>[stdlib/Collections/Spans.sl:434](../../stdlib/Collections/Spans.sl#L434)</sub>
+<sub>[stdlib/Collections/Spans.sl:436](../../stdlib/Collections/Spans.sl#L436)</sub>
 
 ### LastOrDefault *function*
 
@@ -4269,7 +4272,7 @@ The last element, or `fallback` when there is none.
 
 - `T` — the element type; nothing is asked of it
 
-<sub>[stdlib/Collections/Elements.sl:94](../../stdlib/Collections/Elements.sl#L94)</sub>
+<sub>[stdlib/Collections/Elements.sl:92](../../stdlib/Collections/Elements.sl#L92)</sub>
 
 ### LastOrDefault *function*
 
@@ -4283,7 +4286,7 @@ The last element the predicate accepts, or `fallback` when there is none.
 
 - `T` — the element type; nothing is asked of it
 
-<sub>[stdlib/Collections/Elements.sl:100](../../stdlib/Collections/Elements.sl#L100)</sub>
+<sub>[stdlib/Collections/Elements.sl:98](../../stdlib/Collections/Elements.sl#L98)</sub>
 
 ### LastOrDefault *function*
 
@@ -4297,7 +4300,7 @@ The last element, or `fallback` when there is none.
 
 - `T` — the element type; nothing is asked of it
 
-<sub>[stdlib/Collections/Elements.sl:233](../../stdlib/Collections/Elements.sl#L233)</sub>
+<sub>[stdlib/Collections/Elements.sl:228](../../stdlib/Collections/Elements.sl#L228)</sub>
 
 ### LastOrDefault *function*
 
@@ -4311,7 +4314,7 @@ The last element the predicate accepts, or `fallback` when there is none.
 
 - `T` — the element type; nothing is asked of it
 
-<sub>[stdlib/Collections/Elements.sl:238](../../stdlib/Collections/Elements.sl#L238)</sub>
+<sub>[stdlib/Collections/Elements.sl:233](../../stdlib/Collections/Elements.sl#L233)</sub>
 
 ### Max *function*
 
@@ -4327,7 +4330,7 @@ first of equals wins.
 
 - `T` — the element type, which must order itself
 
-<sub>[stdlib/Collections/Aggregates.sl:531](../../stdlib/Collections/Aggregates.sl#L531)</sub>
+<sub>[stdlib/Collections/Aggregates.sl:528](../../stdlib/Collections/Aggregates.sl#L528)</sub>
 
 ### Max *function*
 
@@ -4344,7 +4347,7 @@ are none.
 - `T` — the element type; the selector reads the value off it
 - `TResult` — what is compared, which must order itself
 
-<sub>[stdlib/Collections/Aggregates.sl:551](../../stdlib/Collections/Aggregates.sl#L551)</sub>
+<sub>[stdlib/Collections/Aggregates.sl:547](../../stdlib/Collections/Aggregates.sl#L547)</sub>
 
 ### Max *function*
 
@@ -4360,7 +4363,7 @@ first of equals wins.
 
 - `T` — the element type, which must order itself
 
-<sub>[stdlib/Collections/Aggregates.sl:665](../../stdlib/Collections/Aggregates.sl#L665)</sub>
+<sub>[stdlib/Collections/Aggregates.sl:661](../../stdlib/Collections/Aggregates.sl#L661)</sub>
 
 ### Max *function*
 
@@ -4377,7 +4380,7 @@ are none.
 - `T` — the element type; the selector reads the value off it
 - `TResult` — what is compared, which must order itself
 
-<sub>[stdlib/Collections/Aggregates.sl:685](../../stdlib/Collections/Aggregates.sl#L685)</sub>
+<sub>[stdlib/Collections/Aggregates.sl:682](../../stdlib/Collections/Aggregates.sl#L682)</sub>
 
 ### Max *function*
 
@@ -4394,41 +4397,41 @@ The largest item, by its own ordering. The list must not be empty.
 
 **See also** &nbsp; [Collections.Min](#min-function)
 
-<sub>[stdlib/Collections/Collections.sl:42](../../stdlib/Collections/Collections.sl#L42)</sub>
+<sub>[stdlib/Collections/Collections.sl:45](../../stdlib/Collections/Collections.sl#L45)</sub>
 
 ### MaxBy *function*
 
 ```
-T MaxBy<T, TKey>(ReadOnlySpan<T> items, Func<T, TKey> keySelector)
+Optional<T> MaxBy<T, TKey>(ReadOnlySpan<T> items, Func<T, TKey> keySelector)
     where TKey : IComparable<TKey>
 ```
 
-The element whose key is the largest, aborting when there are none. The
-first of equal keys wins.
+The element whose key is the largest, or none when there are no elements.
+The first of equal keys wins.
 
 **Type parameters**
 
 - `T` — the element type; the key selector reads the key off it
 - `TKey` — the key, which must order itself
 
-<sub>[stdlib/Collections/Aggregates.sl:573](../../stdlib/Collections/Aggregates.sl#L573)</sub>
+<sub>[stdlib/Collections/Aggregates.sl:568](../../stdlib/Collections/Aggregates.sl#L568)</sub>
 
 ### MaxBy *function*
 
 ```
-T MaxBy<T, TKey>(IEnumerable<T> items, Func<T, TKey> keySelector)
+Optional<T> MaxBy<T, TKey>(IEnumerable<T> items, Func<T, TKey> keySelector)
     where TKey : IComparable<TKey>
 ```
 
-The element whose key is the largest, aborting when there are none. The
-first of equal keys wins.
+The element whose key is the largest, or none when there are no elements.
+The first of equal keys wins.
 
 **Type parameters**
 
 - `T` — the element type; the key selector reads the key off it
 - `TKey` — the key, which must order itself
 
-<sub>[stdlib/Collections/Aggregates.sl:707](../../stdlib/Collections/Aggregates.sl#L707)</sub>
+<sub>[stdlib/Collections/Aggregates.sl:704](../../stdlib/Collections/Aggregates.sl#L704)</sub>
 
 ### Min *function*
 
@@ -4461,7 +4464,7 @@ are none.
 - `T` — the element type; the selector reads the value off it
 - `TResult` — what is compared, which must order itself
 
-<sub>[stdlib/Collections/Aggregates.sl:484](../../stdlib/Collections/Aggregates.sl#L484)</sub>
+<sub>[stdlib/Collections/Aggregates.sl:483](../../stdlib/Collections/Aggregates.sl#L483)</sub>
 
 ### Min *function*
 
@@ -4477,7 +4480,7 @@ first of equals wins.
 
 - `T` — the element type, which must order itself
 
-<sub>[stdlib/Collections/Aggregates.sl:598](../../stdlib/Collections/Aggregates.sl#L598)</sub>
+<sub>[stdlib/Collections/Aggregates.sl:592](../../stdlib/Collections/Aggregates.sl#L592)</sub>
 
 ### Min *function*
 
@@ -4494,7 +4497,7 @@ are none.
 - `T` — the element type; the selector reads the value off it
 - `TResult` — what is compared, which must order itself
 
-<sub>[stdlib/Collections/Aggregates.sl:618](../../stdlib/Collections/Aggregates.sl#L618)</sub>
+<sub>[stdlib/Collections/Aggregates.sl:613](../../stdlib/Collections/Aggregates.sl#L613)</sub>
 
 ### Min *function*
 
@@ -4511,41 +4514,41 @@ The smallest item, by its own ordering. The list must not be empty.
 
 **See also** &nbsp; [Collections.Max](#max-function)
 
-<sub>[stdlib/Collections/Collections.sl:60](../../stdlib/Collections/Collections.sl#L60)</sub>
+<sub>[stdlib/Collections/Collections.sl:63](../../stdlib/Collections/Collections.sl#L63)</sub>
 
 ### MinBy *function*
 
 ```
-T MinBy<T, TKey>(ReadOnlySpan<T> items, Func<T, TKey> keySelector)
+Optional<T> MinBy<T, TKey>(ReadOnlySpan<T> items, Func<T, TKey> keySelector)
     where TKey : IComparable<TKey>
 ```
 
-The element whose key is the smallest, aborting when there are none. The
-first of equal keys wins.
+The element whose key is the smallest, or none when there are no elements.
+The first of equal keys wins.
 
 **Type parameters**
 
 - `T` — the element type; the key selector reads the key off it
 - `TKey` — the key, which must order itself
 
-<sub>[stdlib/Collections/Aggregates.sl:506](../../stdlib/Collections/Aggregates.sl#L506)</sub>
+<sub>[stdlib/Collections/Aggregates.sl:504](../../stdlib/Collections/Aggregates.sl#L504)</sub>
 
 ### MinBy *function*
 
 ```
-T MinBy<T, TKey>(IEnumerable<T> items, Func<T, TKey> keySelector)
+Optional<T> MinBy<T, TKey>(IEnumerable<T> items, Func<T, TKey> keySelector)
     where TKey : IComparable<TKey>
 ```
 
-The element whose key is the smallest, aborting when there are none. The
-first of equal keys wins.
+The element whose key is the smallest, or none when there are no elements.
+The first of equal keys wins.
 
 **Type parameters**
 
 - `T` — the element type; the key selector reads the key off it
 - `TKey` — the key, which must order itself
 
-<sub>[stdlib/Collections/Aggregates.sl:640](../../stdlib/Collections/Aggregates.sl#L640)</sub>
+<sub>[stdlib/Collections/Aggregates.sl:635](../../stdlib/Collections/Aggregates.sl#L635)</sub>
 
 ### Order *function*
 
@@ -4760,7 +4763,7 @@ does not demand of every element.
 
 **See also** &nbsp; [Collections.RemoveWhere](#removewhere-function) &middot; [List.RemoveAt](#removeat-method)
 
-<sub>[stdlib/Collections/Collections.sl:131](../../stdlib/Collections/Collections.sl#L131)</sub>
+<sub>[stdlib/Collections/Collections.sl:134](../../stdlib/Collections/Collections.sl#L134)</sub>
 
 ### RemoveWhere *function*
 
@@ -4784,7 +4787,7 @@ Walked from the end, so an index already passed cannot move.
 
 **See also** &nbsp; [Collections.RemoveFirst](#removefirst-function) &middot; [List.RemoveAll](#removeall-method)
 
-<sub>[stdlib/Collections/Collections.sl:155](../../stdlib/Collections/Collections.sl#L155)</sub>
+<sub>[stdlib/Collections/Collections.sl:158](../../stdlib/Collections/Collections.sl#L158)</sub>
 
 ### Replace *function*
 
@@ -4799,7 +4802,7 @@ Replaces every element equal to `oldValue` with `newValue`, in place.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:477](../../stdlib/Collections/Spans.sl#L477)</sub>
+<sub>[stdlib/Collections/Spans.sl:479](../../stdlib/Collections/Spans.sl#L479)</sub>
 
 ### Replace *function*
 
@@ -4816,7 +4819,7 @@ shorter.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:491](../../stdlib/Collections/Spans.sl#L491)</sub>
+<sub>[stdlib/Collections/Spans.sl:493](../../stdlib/Collections/Spans.sl#L493)</sub>
 
 ### Reverse *function*
 
@@ -4832,7 +4835,7 @@ Reverses part of an array in place.
 
 **See also** &nbsp; [List.Reverse](#reverse-method)
 
-<sub>[stdlib/Collections/Collections.sl:409](../../stdlib/Collections/Collections.sl#L409)</sub>
+<sub>[stdlib/Collections/Collections.sl:412](../../stdlib/Collections/Collections.sl#L412)</sub>
 
 ### Select *function*
 
@@ -4919,7 +4922,7 @@ first comes first.
 
 - `T` — the element type, which must order itself
 
-<sub>[stdlib/Collections/Spans.sl:166](../../stdlib/Collections/Spans.sl#L166)</sub>
+<sub>[stdlib/Collections/Spans.sl:168](../../stdlib/Collections/Spans.sl#L168)</sub>
 
 ### SequenceEqual *function*
 
@@ -4934,7 +4937,7 @@ Whether the two hold equal elements in the same order.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Elements.sl:334](../../stdlib/Collections/Elements.sl#L334)</sub>
+<sub>[stdlib/Collections/Elements.sl:328](../../stdlib/Collections/Elements.sl#L328)</sub>
 
 ### SequenceEqual *function*
 
@@ -4949,7 +4952,7 @@ Whether the two hold equal elements in the same order.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:148](../../stdlib/Collections/Spans.sl#L148)</sub>
+<sub>[stdlib/Collections/Spans.sl:150](../../stdlib/Collections/Spans.sl#L150)</sub>
 
 ### Single *function*
 
@@ -4963,7 +4966,7 @@ The only element, aborting when there is not exactly one.
 
 - `T` — the element type; nothing is asked of it
 
-<sub>[stdlib/Collections/Elements.sl:113](../../stdlib/Collections/Elements.sl#L113)</sub>
+<sub>[stdlib/Collections/Elements.sl:111](../../stdlib/Collections/Elements.sl#L111)</sub>
 
 ### Single *function*
 
@@ -4978,7 +4981,7 @@ exactly one.
 
 - `T` — the element type; nothing is asked of it
 
-<sub>[stdlib/Collections/Elements.sl:124](../../stdlib/Collections/Elements.sl#L124)</sub>
+<sub>[stdlib/Collections/Elements.sl:122](../../stdlib/Collections/Elements.sl#L122)</sub>
 
 ### Single *function*
 
@@ -4992,7 +4995,7 @@ The only element, aborting when there is not exactly one.
 
 - `T` — the element type; nothing is asked of it
 
-<sub>[stdlib/Collections/Elements.sl:244](../../stdlib/Collections/Elements.sl#L244)</sub>
+<sub>[stdlib/Collections/Elements.sl:239](../../stdlib/Collections/Elements.sl#L239)</sub>
 
 ### Single *function*
 
@@ -5007,7 +5010,7 @@ exactly one.
 
 - `T` — the element type; nothing is asked of it
 
-<sub>[stdlib/Collections/Elements.sl:250](../../stdlib/Collections/Elements.sl#L250)</sub>
+<sub>[stdlib/Collections/Elements.sl:245](../../stdlib/Collections/Elements.sl#L245)</sub>
 
 ### SingleOrDefault *function*
 
@@ -5022,7 +5025,7 @@ is more than one.
 
 - `T` — the element type; nothing is asked of it
 
-<sub>[stdlib/Collections/Elements.sl:136](../../stdlib/Collections/Elements.sl#L136)</sub>
+<sub>[stdlib/Collections/Elements.sl:133](../../stdlib/Collections/Elements.sl#L133)</sub>
 
 ### SingleOrDefault *function*
 
@@ -5037,7 +5040,7 @@ and an abort when there is more than one.
 
 - `T` — the element type; nothing is asked of it
 
-<sub>[stdlib/Collections/Elements.sl:147](../../stdlib/Collections/Elements.sl#L147)</sub>
+<sub>[stdlib/Collections/Elements.sl:144](../../stdlib/Collections/Elements.sl#L144)</sub>
 
 ### SingleOrDefault *function*
 
@@ -5052,7 +5055,7 @@ is more than one.
 
 - `T` — the element type; nothing is asked of it
 
-<sub>[stdlib/Collections/Elements.sl:256](../../stdlib/Collections/Elements.sl#L256)</sub>
+<sub>[stdlib/Collections/Elements.sl:251](../../stdlib/Collections/Elements.sl#L251)</sub>
 
 ### SingleOrDefault *function*
 
@@ -5067,7 +5070,7 @@ and an abort when there is more than one.
 
 - `T` — the element type; nothing is asked of it
 
-<sub>[stdlib/Collections/Elements.sl:263](../../stdlib/Collections/Elements.sl#L263)</sub>
+<sub>[stdlib/Collections/Elements.sl:258](../../stdlib/Collections/Elements.sl#L258)</sub>
 
 ### Skip *function*
 
@@ -5183,7 +5186,7 @@ would avoid it and would not be stable.
 
 **See also** &nbsp; [Collections.BinarySearch](#binarysearch-function) &middot; [Collections.FindLowerBound](#findlowerbound-function)
 
-<sub>[stdlib/Collections/Collections.sl:193](../../stdlib/Collections/Collections.sl#L193)</sub>
+<sub>[stdlib/Collections/Collections.sl:196](../../stdlib/Collections/Collections.sl#L196)</sub>
 
 ### Sort *function*
 
@@ -5204,7 +5207,7 @@ type that implements nothing at all:
 
 **See also** &nbsp; [Collections.OrderBy](#orderby-function)
 
-<sub>[stdlib/Collections/Collections.sl:277](../../stdlib/Collections/Collections.sl#L277)</sub>
+<sub>[stdlib/Collections/Collections.sl:280](../../stdlib/Collections/Collections.sl#L280)</sub>
 
 ### Sort *function*
 
@@ -5224,7 +5227,7 @@ is the cheaper trade, and it gets the array version's stability for free.
 
 - `T` — the element type, which must order itself
 
-<sub>[stdlib/Collections/Collections.sl:435](../../stdlib/Collections/Collections.sl#L435)</sub>
+<sub>[stdlib/Collections/Collections.sl:438](../../stdlib/Collections/Collections.sl#L438)</sub>
 
 ### Sort *function*
 
@@ -5238,7 +5241,7 @@ The same, ordered by a comparer.
 
 - `T` — the element type; the comparer orders it, so nothing is asked of it
 
-<sub>[stdlib/Collections/Collections.sl:455](../../stdlib/Collections/Collections.sl#L455)</sub>
+<sub>[stdlib/Collections/Collections.sl:456](../../stdlib/Collections/Collections.sl#L456)</sub>
 
 ### Sort *function*
 
@@ -5255,7 +5258,7 @@ to where its key went. The two MUST be the same length.
 - `TKey` — the key type, which must order itself
 - `TValue` — the item type; nothing is asked of it
 
-<sub>[stdlib/Collections/Spans.sl:504](../../stdlib/Collections/Spans.sl#L504)</sub>
+<sub>[stdlib/Collections/Spans.sl:506](../../stdlib/Collections/Spans.sl#L506)</sub>
 
 ### Sort *function*
 
@@ -5271,7 +5274,7 @@ where its key went. Stable. The two MUST be the same length.
 - `TKey` — the key type
 - `TValue` — the item type; nothing is asked of it
 
-<sub>[stdlib/Collections/Spans.sl:512](../../stdlib/Collections/Spans.sl#L512)</sub>
+<sub>[stdlib/Collections/Spans.sl:514](../../stdlib/Collections/Spans.sl#L514)</sub>
 
 ### StartsWith *function*
 
@@ -5286,7 +5289,7 @@ Whether `span` begins with the elements of `value`.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:185](../../stdlib/Collections/Spans.sl#L185)</sub>
+<sub>[stdlib/Collections/Spans.sl:187](../../stdlib/Collections/Spans.sl#L187)</sub>
 
 ### StartsWith *function*
 
@@ -5301,7 +5304,7 @@ Whether the first element equals `value`.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:191](../../stdlib/Collections/Spans.sl#L191)</sub>
+<sub>[stdlib/Collections/Spans.sl:193](../../stdlib/Collections/Spans.sl#L193)</sub>
 
 ### Sum *function*
 
@@ -5814,7 +5817,7 @@ Without the elements equal to `value` at either end.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:562](../../stdlib/Collections/Spans.sl#L562)</sub>
+<sub>[stdlib/Collections/Spans.sl:564](../../stdlib/Collections/Spans.sl#L564)</sub>
 
 ### Trim *function*
 
@@ -5829,7 +5832,7 @@ Without the elements equal to any of `trimElements` at either end.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:568](../../stdlib/Collections/Spans.sl#L568)</sub>
+<sub>[stdlib/Collections/Spans.sl:570](../../stdlib/Collections/Spans.sl#L570)</sub>
 
 ### Trim *function*
 
@@ -5844,7 +5847,7 @@ Without the elements equal to `value` at either end, still writable.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:610](../../stdlib/Collections/Spans.sl#L610)</sub>
+<sub>[stdlib/Collections/Spans.sl:612](../../stdlib/Collections/Spans.sl#L612)</sub>
 
 ### Trim *function*
 
@@ -5860,7 +5863,7 @@ writable.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:616](../../stdlib/Collections/Spans.sl#L616)</sub>
+<sub>[stdlib/Collections/Spans.sl:618](../../stdlib/Collections/Spans.sl#L618)</sub>
 
 ### TrimEnd *function*
 
@@ -5875,7 +5878,7 @@ Without the elements equal to `value` at the end.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:594](../../stdlib/Collections/Spans.sl#L594)</sub>
+<sub>[stdlib/Collections/Spans.sl:596](../../stdlib/Collections/Spans.sl#L596)</sub>
 
 ### TrimEnd *function*
 
@@ -5890,7 +5893,7 @@ Without the elements equal to any of `trimElements` at the end.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:600](../../stdlib/Collections/Spans.sl#L600)</sub>
+<sub>[stdlib/Collections/Spans.sl:602](../../stdlib/Collections/Spans.sl#L602)</sub>
 
 ### TrimEnd *function*
 
@@ -5905,7 +5908,7 @@ Without the elements equal to `value` at the end, still writable.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:641](../../stdlib/Collections/Spans.sl#L641)</sub>
+<sub>[stdlib/Collections/Spans.sl:643](../../stdlib/Collections/Spans.sl#L643)</sub>
 
 ### TrimEnd *function*
 
@@ -5921,7 +5924,7 @@ writable.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:647](../../stdlib/Collections/Spans.sl#L647)</sub>
+<sub>[stdlib/Collections/Spans.sl:649](../../stdlib/Collections/Spans.sl#L649)</sub>
 
 ### TrimStart *function*
 
@@ -5936,7 +5939,7 @@ Without the elements equal to `value` at the start.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:578](../../stdlib/Collections/Spans.sl#L578)</sub>
+<sub>[stdlib/Collections/Spans.sl:580](../../stdlib/Collections/Spans.sl#L580)</sub>
 
 ### TrimStart *function*
 
@@ -5951,7 +5954,7 @@ Without the elements equal to any of `trimElements` at the start.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:584](../../stdlib/Collections/Spans.sl#L584)</sub>
+<sub>[stdlib/Collections/Spans.sl:586](../../stdlib/Collections/Spans.sl#L586)</sub>
 
 ### TrimStart *function*
 
@@ -5966,7 +5969,7 @@ Without the elements equal to `value` at the start, still writable.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:625](../../stdlib/Collections/Spans.sl#L625)</sub>
+<sub>[stdlib/Collections/Spans.sl:627](../../stdlib/Collections/Spans.sl#L627)</sub>
 
 ### TrimStart *function*
 
@@ -5982,7 +5985,7 @@ writable.
 
 - `T` — the element type, which must answer whether it equals another
 
-<sub>[stdlib/Collections/Spans.sl:632](../../stdlib/Collections/Spans.sl#L632)</sub>
+<sub>[stdlib/Collections/Spans.sl:634](../../stdlib/Collections/Spans.sl#L634)</sub>
 
 ### Union *function*
 

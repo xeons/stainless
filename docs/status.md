@@ -83,6 +83,28 @@ last person to edit it -- the suite is the authority.
   may hold a reference, and copying one then retains what it holds — the cost
   is that it is no longer a value C can be handed, which the compiler checks at
   every `extern "C"` and `export "C"`
+- No zero value for a type whose zero would hold a null in a never-null
+  reference: a class, an interface, `String`, `T[]`, a `closure`, or a struct,
+  tuple or first variant case holding one. `default` of one (SL0810), a local
+  read before each such slot of it is written (SL0811), `new T[n]` (SL0812), a
+  constructor that can leave such a field unwritten (SL0813) and a static
+  property with no value (SL0814) are errors. Locals are held to C#'s definite
+  assignment a field at a time; a constructor's calls to the type's own private
+  methods are followed, so `InitializeComponent()` counts; an initializer,
+  `: this(...)`, `required` and a primary constructor discharge a field, and so
+  does storage a property only fills with `field ??=`. Generic bodies are judged
+  per instantiation. `Array.Create` and `Array.Repeat` make an array whole, and
+  `Standard.Unchecked`'s `NewUninitializedArray` and `ClearElement` are the
+  collections' storage, compiling to what `new T[n]` and `default(T)` did
+- `T[]?` and `Notify?`: an array reference and a closure that may be absent,
+  narrowed by a check as `C?` is. The array is `C?`'s one pointer; the closure
+  is its own two words with a null function word, compared with `null` as both,
+  and never called until a check says it holds one (SL0248)
+- `where T : zeroable`, and a `where` on a member of a generic type that
+  constrains the type's parameters: the member exists only in instantiations
+  that meet it, so `Span<String>` has no `Clear` (SL0815, SL0816)
+- `[DoesNotReturn]` on an `extern` function: nothing after a call to it is
+  reached, so `sl_fail` ends a function that needs no `return` after it
 - `union`: C's, every member at offset zero, with the size and alignment C
   computes. No member may hold a counted reference, because a union does not
   record which one is live. `[Packed]` and `[Align]` apply as they do to a
@@ -935,9 +957,8 @@ last person to edit it -- the suite is the authority.
   and neither is written through (SL0762). `x!` is `(C)x`, checking nothing
 - `default(T)` is the zeroed value of a type, for generic code that cannot
   write a literal for a type it does not know, and a bare `default` is the
-  same with the type taken from where it is going. Not a new hole in the null
-  discipline: a fresh array is zeroed, so `new C[1][0]` was the spelling before
-  it. `String.Empty` is a static property rather than a field
+  same with the type taken from where it is going. Only a type with a zero value
+  has one; `String.Empty` is a static property rather than a field
 - `new(...)` with the type left off, taken from a declared local, a field, a
   return, an argument, an element or the other arm of a conditional; with
   nothing to take it from it is SL0756
@@ -1136,8 +1157,12 @@ Being straight about the edges, roughly in the order they are worth adding:
   definite-assignment analysis with it: every path out of the function has to
   write the parameter (SL0600), and the caller's storage is cleared before the
   call so that a hole in that produces a zero rather than whatever the stack
-  held. An ordinary local read before it is written is still nobody's business
-  but the author's.
+  held. A local whose type has a zero value may still be read before it is
+  written, and reads the zero.
+- **`this` can escape a constructor.** A base constructor that calls a virtual
+  method, or a constructor that hands `this` away before writing every field,
+  can have a never-null field read as null. C#, Java and Kotlin leave the same
+  gap; closing it as Swift does would refuse every form's `base(...)`.
 
 ---
 

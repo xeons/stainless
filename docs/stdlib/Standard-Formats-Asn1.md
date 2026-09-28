@@ -1790,7 +1790,7 @@ An ASN.1 time as a `DateTimeOffset`, where one can hold it.
 
 **See also** &nbsp; [AsnReader.ReadGeneralizedTime](#readgeneralizedtime-method)
 
-<sub>[stdlib/Formats/Asn1/Asn1.sl:90](../../stdlib/Formats/Asn1/Asn1.sl#L90)</sub>
+<sub>[stdlib/Formats/Asn1/Asn1.sl:91](../../stdlib/Formats/Asn1/Asn1.sl#L91)</sub>
 
 ### DescribeAsnError *function*
 
@@ -1800,5 +1800,5 @@ String DescribeAsnError(AsnError error)
 
 A sentence describing an error, for a message a person will read.
 
-<sub>[stdlib/Formats/Asn1/Asn1.sl:65](../../stdlib/Formats/Asn1/Asn1.sl#L65)</sub>
+<sub>[stdlib/Formats/Asn1/Asn1.sl:66](../../stdlib/Formats/Asn1/Asn1.sl#L66)</sub>
 

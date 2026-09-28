@@ -20,6 +20,20 @@ with an unmangled name so C and C++ can call it:
 export "C" int stainless_add(int a, int b) => a + b;
 ```
 
+**`[DoesNotReturn]` says a C function never comes back** — `abort`, `exit`,
+the runtime's `sl_fail`. Nothing after a call to one is reached, so a function
+whose last statement is that call needs no `return` after it, and definite
+assignment asks nothing of what follows. It is taken on the other language's
+word, so it goes on an `extern` and nowhere else (SL0728):
+
+```csharp
+extern "C"
+{
+    [DoesNotReturn]
+    void abort();
+}
+```
+
 **A declaration joins the module it was written in**, as an ordinary member,
 and so is private to that module unless it says `public`. That is what a binding
 library is made of: a module of `public extern "C"` declarations is one another

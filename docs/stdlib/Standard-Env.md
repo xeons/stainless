@@ -22,7 +22,7 @@ nuint ArgumentCount()
 
 How many arguments the program was given, not counting its own name.
 
-<sub>[stdlib/Env.sl:86](../../stdlib/Env.sl#L86)</sub>
+<sub>[stdlib/Env.sl:87](../../stdlib/Env.sl#L87)</sub>
 
 ### CurrentDirectory *function*
 
@@ -34,7 +34,7 @@ The directory relative paths are resolved against.
 
 **See also** &nbsp; [Env.SetCurrentDirectory](#setcurrentdirectory-function)
 
-<sub>[stdlib/Env.sl:298](../../stdlib/Env.sl#L298)</sub>
+<sub>[stdlib/Env.sl:292](../../stdlib/Env.sl#L292)</sub>
 
 ### GetArgument *function*
 
@@ -44,7 +44,7 @@ String GetArgument(nuint index)
 
 One argument, counting from zero. Aborts past the end, as an array does.
 
-<sub>[stdlib/Env.sl:89](../../stdlib/Env.sl#L89)</sub>
+<sub>[stdlib/Env.sl:90](../../stdlib/Env.sl#L90)</sub>
 
 ### GetArguments *function*
 
@@ -54,7 +54,7 @@ String[] GetArguments()
 
 Every argument, as an array. The same thing `Main(String[] args)` receives.
 
-<sub>[stdlib/Env.sl:97](../../stdlib/Env.sl#L97)</sub>
+<sub>[stdlib/Env.sl:98](../../stdlib/Env.sl#L98)</sub>
 
 ### GetEnvironmentVariable *function*
 
@@ -71,7 +71,7 @@ most callers want.
 
 **See also** &nbsp; [Env.GetEnvironmentVariableOrDefault](#getenvironmentvariableordefault-function)
 
-<sub>[stdlib/Env.sl:122](../../stdlib/Env.sl#L122)</sub>
+<sub>[stdlib/Env.sl:116](../../stdlib/Env.sl#L116)</sub>
 
 ### GetEnvironmentVariableNames *function*
 
@@ -85,7 +85,7 @@ The block is one run of NUL-terminated wide strings ending in an empty one.
 A name beginning with `=` is Windows' per-drive working directory (`=C:`),
 which is not a variable anybody set.
 
-<sub>[stdlib/Env.sl:220](../../stdlib/Env.sl#L220)</sub>
+<sub>[stdlib/Env.sl:214](../../stdlib/Env.sl#L214)</sub>
 
 ### GetEnvironmentVariableOrDefault *function*
 
@@ -102,7 +102,7 @@ A variable's value, or `fallback` when it is not set.
 
 **See also** &nbsp; [Env.GetEnvironmentVariable](#getenvironmentvariable-function)
 
-<sub>[stdlib/Env.sl:165](../../stdlib/Env.sl#L165)</sub>
+<sub>[stdlib/Env.sl:159](../../stdlib/Env.sl#L159)</sub>
 
 ### GetProcessPath *function*
 
@@ -114,7 +114,7 @@ The program's own path, as the operating system gave it. That is not
 necessarily where the executable is: a shell may pass a bare name, and on
 Linux nothing guarantees any relationship at all.
 
-<sub>[stdlib/Env.sl:109](../../stdlib/Env.sl#L109)</sub>
+<sub>[stdlib/Env.sl:103](../../stdlib/Env.sl#L103)</sub>
 
 ### HasEnvironmentVariable *function*
 
@@ -124,7 +124,7 @@ bool HasEnvironmentVariable(String name)
 
 Whether a variable is set, whatever it is set to.
 
-<sub>[stdlib/Env.sl:174](../../stdlib/Env.sl#L174)</sub>
+<sub>[stdlib/Env.sl:168](../../stdlib/Env.sl#L168)</sub>
 
 ### RemoveEnvironmentVariable *function*
 
@@ -137,7 +137,7 @@ one that was never set is not a failure.
 
 **See also** &nbsp; [Env.SetEnvironmentVariable](#setenvironmentvariable-function)
 
-<sub>[stdlib/Env.sl:195](../../stdlib/Env.sl#L195)</sub>
+<sub>[stdlib/Env.sl:189](../../stdlib/Env.sl#L189)</sub>
 
 ### SetCurrentDirectory *function*
 
@@ -150,7 +150,7 @@ path is not a directory, or is not reachable.
 
 **See also** &nbsp; [Env.CurrentDirectory](#currentdirectory-function)
 
-<sub>[stdlib/Env.sl:318](../../stdlib/Env.sl#L318)</sub>
+<sub>[stdlib/Env.sl:312](../../stdlib/Env.sl#L312)</sub>
 
 ### SetEnvironmentVariable *function*
 
@@ -174,5 +174,5 @@ An empty value leaves the variable set and empty, on both platforms, and
 
 **See also** &nbsp; [Env.RemoveEnvironmentVariable](#removeenvironmentvariable-function)
 
-<sub>[stdlib/Env.sl:188](../../stdlib/Env.sl#L188)</sub>
+<sub>[stdlib/Env.sl:182](../../stdlib/Env.sl#L182)</sub>
 

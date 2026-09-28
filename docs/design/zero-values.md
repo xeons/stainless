@@ -2,9 +2,10 @@
 
 # Zero values
 
-A design, not yet the language. It settles how the rule below is to be
-enforced and what replaces each thing it takes away. A prototype of the check
-is in the compiler, off by default; §9 says how to run it.
+The rationale behind [§2.16 of the specification](../spec/02-types.md#216-zero-values),
+which is the rule as the language has it. This note is what was weighed on
+the way there: the survey, the alternatives rejected, and where the
+implementation departed from the design (§12).
 
 ---
 
@@ -328,31 +329,25 @@ then the call sites tree by tree, then warnings become errors.
 
 ## 9. Diagnostics
 
-Provisional numbers, written here without their `SL` so that the unit tests,
-which hold every documented code to a pinning case, do not yet count them.
-The prototype reports the first five as `SL` and the number. Each MUST be
-pinned by an `errors.txt` case, and written with its `SL`, when it is turned on.
+Each is pinned by an `errors.txt` case: `err-zero-default`, `err-zero-local`,
+`err-zero-array`, `err-zero-constructor`, `err-zero-static`, `err-zeroable`
+and `err-member-constraint`.
 
 | Code | Says |
 |---|---|
-| 0810 | `default` for a type with no zero value, naming the slot: *'Holder' has no zero value: 'Holder.Data' is a 'byte[]', which is never null* |
-| 0811 | a local read, or passed by `ref`, before every field is assigned |
-| 0812 | `new T[n]` for such an element, pointing at `Array.Create`, a literal and `List` |
-| 0813 | a constructor that can finish without writing such a field, at the path that does; or a field no constructor could write |
-| 0814 | a static property of such a type with no value |
-| 0815 | an argument that fails `zeroable`, as SL0328 reports the others |
-| 0816 | a member whose own `where` its type's arguments fail, named at the call |
+| SL0810 | `default` for a type with no zero value, naming the slot: *'Holder' has no zero value: 'Holder.Data' is a 'byte[]', which is never null* |
+| SL0811 | a local read, or passed by `ref`, before every field is assigned |
+| SL0812 | `new T[n]` for such an element, pointing at `Array.Create`, a literal and `List` |
+| SL0813 | a constructor that can finish without writing such a field, at the path that does; or a field no constructor could write |
+| SL0814 | a static property of such a type with no value |
+| SL0815 | an argument that fails `zeroable`, as SL0328 reports the others |
+| SL0816 | a member whose own `where` its type's arguments fail, named at the call |
 
 Inside an instantiation each names the instantiation, as a constraint failure
 does.
 
-**The prototype.** `STAINLESS_ZERO_VALUES=warn` or `error` reports 0810–0814
-as the table has them; `log` reports nothing. `STAINLESS_ZERO_VALUES_LOG=path`
-appends one tab-separated line per finding, and one per template site whose
-type names a type parameter whatever it was instantiated with. It does not yet
-follow private helpers (§4.2), does not track fields of a local separately
-(§4.1; it records what first touches the local), and has neither `zeroable` nor
-member constraints. Off, it costs one test per site.
+The prototype that made the survey in §8 was switched by
+`STAINLESS_ZERO_VALUES`; it is gone, and the rule is always on.
 
 ## 10. Interactions
 
@@ -381,3 +376,47 @@ member constraints. Off, it costs one test per site.
 Two neighbouring holes with the same shape and a different cause: an `enum`
 with no zero member, whose zero names nothing, and a `variant` with no case at
 tag 0. Neither is a null, and neither is decided here.
+
+## 12. As implemented
+
+The rule is on, as errors, and the tree was brought to it in the same change.
+Where the implementation settled something this note left open, or departed
+from it:
+
+- **The survey, again.** Re-run on the tree after the crypto, TLS and HTTP
+  work landed, with the prototype's first-touch categories, it counted 197
+  sites: 78 in the standard library, 10 in `forms/`, 6 in the IDE, 2 in
+  `debug/`, 16 in the samples, 8 in the bindings and 77 in the test cases.
+  Once locals were tracked a field at a time and constructors followed their
+  helpers, what was actually refused came to about 100, most of them test
+  cases writing `new String[n]` and filling it.
+- **`Notify?` is a closure type of its own**, a twin of `Notify` with the same
+  two fields and the same LLVM type, rather than an optional wrapping one. An
+  optional is one pointer everywhere the emitter looks; the twin is a struct
+  every existing path already handles, and only the binder's narrowing,
+  comparison with `null` and call checks learn about it.
+- **A struct field of a class is written a field at a time**, as a local is:
+  `TimeZoneInfo` writes `_rule.StandardName` and `_rule.DaylightName` in its
+  constructor, and §4.2 said nothing either way.
+- **An automatic property's setter writes its storage** for a struct local,
+  as it does for a constructor, so `Slot s; s.Item = x;` is a whole write.
+- **Storage a property reads only through `field ??=` may start empty.** The
+  specification had said that a reference-typed property's storage starts null
+  whatever its type says; the pattern that relies on it, filling on first use,
+  never reads the null, so the parser records whether every mention of `field`
+  in an accessor is what `??=` fills, and such storage is exempt from SL0813
+  and SL0814. Any other read of `field` makes it an ordinary field again.
+- **A member `where` on a dispatched member is SL0331**, the code for a `where`
+  that has nothing to constrain: a virtual, abstract, override or interface
+  member is in every instantiation's table, so it cannot be left out.
+- **`class, zeroable` is SL0581**, the contradiction every other pair of kinds
+  gets: a reference that is not optional is never null.
+- **`MinBy` and `MaxBy` had aborted on an empty sequence**, not answered
+  `default(T)`; they now answer `None`. `Min`, `Max` and `Aggregate` keep
+  aborting, and take their seed from the first element.
+- **`Span.Clear` of references** was what a test used to watch releases
+  happen; that test now clears a `Span<Trace?>`.
+- **`ECCurve` keeps its zero value**, "no curve", by making `_oid` a `String?`
+  rather than naming a "none" curve.
+- **`Json` array fields that may be absent** are `T[]?`; the element columns of
+  a field's metadata look through the optional, which they had not.

@@ -61,6 +61,7 @@ own for the linker to drop.
 | `Standard.Formats.Asn1` | ASN.1 in BER and DER, read and written ([§5.15](#515-standardformatsasn1)) | on request |
 | `Standard.Media.Audio` | playing and recording sound ([§5.14](#514-standardmediaaudio)) | on request |
 | `Standard.Com` | `Guid` and `IUnknown`, for `com interface` ([§8.5](08-interop-libraries.md#85-com)) | on request |
+| `Standard.Unchecked` | storage whose slots are not values yet, for a collection ([§2.16.3](02-types.md#2163-arrays)) | on request |
 | `Standard` | `Result<T, TError>`, `[Flags]`, and the rest of what the language itself reads | automatically |
 
 ### 5.1.1 What `Standard` holds
@@ -77,6 +78,7 @@ everyday values:
 | `Version` | two to four parts, `Parse`, ordered part by part with a missing part first |
 | `Uri` | RFC 3986: kept normal, resolved against a base, escaped and unescaped; `Host`, `Port`, `AbsolutePath`, `Segments`, `MakeRelativeUri`, `IsBaseOf`; a Windows or UNC path reads as a `file:` URI |
 | `Lazy<T>` | made on first ask, once, with C#'s three `LazyThreadSafetyMode`s |
+| `Array` | `Create(count, (i) => ...)` and `Repeat(value, count)`, which make an array whole ([§2.16.3](02-types.md#2163-arrays)) |
 | `RuntimeHelpers` | `IsReferenceOrContainsReferences<T>()`, a constant per instantiation ([§4.3](04-generics.md#43-what-a-constraint-does-and-does-not-do)) |
 
 Each parses into a `Result` with a `ParseError` rather than throwing, and a
@@ -417,7 +419,10 @@ sequence with its `Key`, in the order their keys were first met.
 `Collections.IndexOf`: a length standing in for "not there" is the sentinel
 that type exists to retire, and `Optional`'s own documentation names `IndexOf`
 as the example. `FirstOrDefault` is still there for the caller who has a sensible
-default and nothing to check.
+default and nothing to check. So do `List.Find` and `List.FindLast`, where
+.NET's answer `default(T)`, and `MinBy` and `MaxBy`, which answer `None` for an
+empty sequence rather than aborting: a `T` that is never null has no default to
+answer with ([§2.16](02-types.md#216-zero-values)).
 
 `RemoveWhere(list, predicate)` removes every item the predicate accepts.
 A predicate rather than a value, which is what makes it work for a `T` that
@@ -855,6 +860,12 @@ says exactly what is there.
 chose: a document with more elements fills what fits and stops, one with fewer
 leaves the rest alone. Allocating from the document would mean a message
 deciding how much memory to take.
+
+**An array that may be absent is a `T[]?`.** One the constructor left null is
+written as `null`, and made at the document's length when the document gives
+one, which is the one place a message sizes an allocation. A `T[]` field is
+never null, so its constructor chose a length for it
+([§2.16.2](02-types.md#2162-fields)).
 
 A nested object the constructor left null is skipped, unless the field carries
 `[JsonCreate]` — opt-in per field, because the type is what knows whether an

@@ -770,7 +770,7 @@ follows a whole operand can begin a negation.
 ## 9.8 `default(T)`
 
 ```csharp
-T FirstOrNothing<T>(ReadOnlySpan<T> items)
+T FirstOrNothing<T>(ReadOnlySpan<T> items) where T : zeroable
 {
     if (items.Length == 0u)
         return default(T);
@@ -779,20 +779,22 @@ T FirstOrNothing<T>(ReadOnlySpan<T> items)
 ```
 
 The value a type's storage holds before anything is put in it: zero for a
-number, `false`, null for a reference or a pointer, and every field of a struct
-the same way down. It exists for generic code, which cannot write a literal for
-a type it does not know.
+number, `false`, null for an optional reference or a pointer, and every field
+of a struct the same way down. It exists for generic code, which cannot write a
+literal for a type it does not know.
 
-**It is not a new hole in the null discipline**, even for a class. A fresh
-array is zeroed ([§2.11.1](02-types.md#2111-t--a-counted-array)), so `new C[1][0]` already handed back a null typed as
-a `C`, and `Standard.Collections` kept exactly such an array around to blank a
-vacated slot with. This is that, spelled.
+**Only a type that has a zero value has one to give** (SL0810). A `String`, a
+class and an array are never null, so their zero is not a value of them, and
+neither is a struct's that holds one ([§2.16](02-types.md#216-zero-values)).
+`default(T)` in a template is judged for each `T` it is instantiated with, and
+`where T : zeroable` says in the signature that it needs one.
 
 **A local declared without a value holds this too.** `ulong total;` is zero
 and `uint[8] words;` is eight zeros, each time the declaration runs, as a
-struct local's fields already were. C# refuses the read instead; there is no
-definite-assignment analysis here, and a zero is the one answer that does not
-change from run to run.
+struct local's fields already were. A local whose type has no zero value is
+held to C#'s definite assignment instead: each slot of it that has none is
+written, on every path, before it is read
+([§2.16.1](02-types.md#2161-locals)).
 
 `default(void)` is the one refusal (SL0603): `void` is the absence of a value,
 so there is none of it to zero.
