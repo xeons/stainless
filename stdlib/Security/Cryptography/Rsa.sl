@@ -93,6 +93,40 @@ public sealed class Rsa
 
     // ------------------------------------------------------------ making one
 
+    /// A new key of `keySizeInBits` bits, with public exponent 65537.
+    ///
+    /// FIPS 186-5 §A.1.3: two random probable primes of half the size each,
+    /// at least `sqrt(2) * 2^(half - 1)`, at least `2^(half - 100)` apart,
+    /// each passing Miller-Rabin with random bases as many times as Table B.1
+    /// asks; `d` is `65537^-1 mod lcm(p - 1, q - 1)` and at least `2^half`.
+    ///
+    /// **The time taken is random**, since it is a search: about a quarter of
+    /// a second for 2048 bits and several seconds for 4096 on a current x64.
+    /// A candidate is thrown away as soon as a small prime divides it or a
+    /// Miller-Rabin round finds a witness, so the time reveals something
+    /// about numbers that are not kept. What is kept is handled in constant
+    /// time, `d` included.
+    ///
+    /// @param keySizeInBits  a multiple of 64 from 512 to 16384; 2048 or more
+    ///                       for anything new
+    /// @failure CryptoError.KeyLength  `keySizeInBits` is not a size this makes
+    /// @failure CryptoError.NoEntropy  the platform would not supply randomness
+    public static Result<Rsa, CryptoError> Create(int keySizeInBits)
+    {
+        if (keySizeInBits < (int)MinimumKeySize || keySizeInBits > (int)MaximumKeySize ||
+            keySizeInBits % 64 != 0)
+        {
+            return Fail(CryptoError.KeyLength);
+        }
+
+        ulong[][] parts = try RsaKeyGenerator.GenerateKeyParts((nuint)keySizeInBits);
+        ulong[] exponent = [RsaKeyGenerator.PublicExponent];
+        var privateKey = new RsaPrivateKey(parts[1u], parts[2u], parts[3u], parts[4u], parts[5u],
+                                           parts[6u]);
+        return Ok(new Rsa(new MontgomeryModulus(parts[0u]), exponent, (nuint)keySizeInBits,
+                          privateKey));
+    }
+
     /// The key `parameters` describes: public when it has only `Modulus` and
     /// `Exponent`, private when it has all eight.
     ///

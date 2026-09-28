@@ -131,3 +131,6 @@ even modulus ok
 small modulus ok
 exponent of one ok
 even exponent ok
+key size 1000 ok
+key size 256 ok
+generated 2048 ok
