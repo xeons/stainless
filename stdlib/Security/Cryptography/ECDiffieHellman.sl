@@ -217,4 +217,119 @@ public sealed class ECDiffieHellman
         CryptographicOperations.ZeroMemory(secret.Value);
         return Ok(mac.GetHashAndReset());
     }
+
+    // ------------------------------------------------------------ key formats
+
+    /// Replaces the key with the public key in an RFC 5480
+    /// `SubjectPublicKeyInfo`. On failure the key is unchanged.
+    ///
+    /// @param source  the DER, perhaps with more after it
+    /// @returns how many bytes of `source` the structure took
+    /// @failure CryptoError.Encoding      not a `SubjectPublicKeyInfo` for an EC key
+    /// @failure CryptoError.Unsupported   a curve other than P-256 and P-384
+    /// @failure CryptoError.InvalidPoint  the point is not on the curve
+    public Result<nuint, CryptoError> ImportSubjectPublicKeyInfo(ReadOnlySpan<byte> source)
+    {
+        var key = EcKey.ImportSubjectPublicKeyInfo(source, out nuint bytesRead);
+        if (!key.Ok)
+            return Fail(key.Error);
+        _key = key.Value;
+        return Ok(bytesRead);
+    }
+
+    /// The public key as an RFC 5480 `SubjectPublicKeyInfo`, in DER.
+    public byte[] ExportSubjectPublicKeyInfo() => _key.ExportSubjectPublicKeyInfo();
+
+    /// The public key as a `PUBLIC KEY` PEM block.
+    public String ExportSubjectPublicKeyInfoPem() =>
+        PemEncoding.Write("PUBLIC KEY", _key.ExportSubjectPublicKeyInfo());
+
+    /// Replaces the key with the private key in an RFC 5915 `ECPrivateKey`,
+    /// which MUST name its curve. On failure the key is unchanged.
+    ///
+    /// @param source  the DER, perhaps with more after it
+    /// @returns how many bytes of `source` the structure took
+    /// @failure CryptoError.Encoding      not an `ECPrivateKey`, or one with no curve
+    /// @failure CryptoError.Unsupported   a curve other than P-256 and P-384
+    /// @failure CryptoError.InvalidKey    the scalar is not in `[1, n - 1]`, or does
+    ///                                    not give the public point beside it
+    /// @failure CryptoError.InvalidPoint  the public point is not on the curve
+    public Result<nuint, CryptoError> ImportECPrivateKey(ReadOnlySpan<byte> source)
+    {
+        var key = EcKey.ImportECPrivateKey(source, out nuint bytesRead);
+        if (!key.Ok)
+            return Fail(key.Error);
+        _key = key.Value;
+        return Ok(bytesRead);
+    }
+
+    /// The private key as an RFC 5915 `ECPrivateKey`, in DER.
+    ///
+    /// @failure CryptoError.InvalidKey  this is a public key
+    public Result<byte[], CryptoError> ExportECPrivateKey() => _key.ExportECPrivateKey();
+
+    /// The private key as an `EC PRIVATE KEY` PEM block.
+    ///
+    /// @failure CryptoError.InvalidKey  this is a public key
+    public Result<String, CryptoError> ExportECPrivateKeyPem()
+    {
+        var der = _key.ExportECPrivateKey();
+        if (!der.Ok)
+            return Fail(der.Error);
+        return Ok(PemEncoding.Write("EC PRIVATE KEY", der.Value));
+    }
+
+    /// Replaces the key with the private key in an unencrypted PKCS #8
+    /// `PrivateKeyInfo`. On failure the key is unchanged.
+    ///
+    /// @param source  the DER, perhaps with more after it
+    /// @returns how many bytes of `source` the structure took
+    /// @failure CryptoError.Encoding      not a `PrivateKeyInfo` for an EC key
+    /// @failure CryptoError.Unsupported   a curve other than P-256 and P-384
+    /// @failure CryptoError.InvalidKey    the scalar is not in `[1, n - 1]`, or does
+    ///                                    not give the public point beside it
+    /// @failure CryptoError.InvalidPoint  the public point is not on the curve
+    public Result<nuint, CryptoError> ImportPkcs8PrivateKey(ReadOnlySpan<byte> source)
+    {
+        var key = EcKey.ImportPkcs8PrivateKey(source, out nuint bytesRead);
+        if (!key.Ok)
+            return Fail(key.Error);
+        _key = key.Value;
+        return Ok(bytesRead);
+    }
+
+    /// The private key as an unencrypted PKCS #8 `PrivateKeyInfo`, in DER.
+    ///
+    /// @failure CryptoError.InvalidKey  this is a public key
+    public Result<byte[], CryptoError> ExportPkcs8PrivateKey() => _key.ExportPkcs8PrivateKey();
+
+    /// The private key as a `PRIVATE KEY` PEM block.
+    ///
+    /// @failure CryptoError.InvalidKey  this is a public key
+    public Result<String, CryptoError> ExportPkcs8PrivateKeyPem()
+    {
+        var der = _key.ExportPkcs8PrivateKey();
+        if (!der.Ok)
+            return Fail(der.Error);
+        return Ok(PemEncoding.Write("PRIVATE KEY", der.Value));
+    }
+
+    /// Replaces the key with the first `PUBLIC KEY`, `EC PRIVATE KEY` or
+    /// `PRIVATE KEY` block in `input`. Blocks with other labels are passed
+    /// over. On failure the key is unchanged.
+    ///
+    /// @param input  PEM text
+    /// @failure CryptoError.Encoding     no such block, or one whose contents are not
+    ///                                   what its label says
+    /// @failure CryptoError.Unsupported  an encrypted key, or a curve other than P-256
+    ///                                   and P-384
+    /// @failure CryptoError.InvalidKey   the key does not check
+    public Result<bool, CryptoError> ImportFromPem(String input)
+    {
+        var key = EcKey.ImportFromPem(input);
+        if (!key.Ok)
+            return Fail(key.Error);
+        _key = key.Value;
+        return Ok(true);
+    }
 }

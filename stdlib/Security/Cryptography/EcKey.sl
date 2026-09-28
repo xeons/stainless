@@ -21,6 +21,8 @@
 
 module Standard.Security.Cryptography;
 
+import Standard.Formats.Asn1;
+
 /// A key on P-256 or P-384, private or public only: what `ECDsa` and
 /// `ECDiffieHellman` both hold, and the formats both read and write.
 ///
@@ -29,6 +31,8 @@ module Standard.Security.Cryptography;
 /// public point is the one it gives.
 sealed class EcKey
 {
+    private static readonly String s_publicKeyAlgorithm = "1.2.840.10045.2.1";
+
     private EcDomain _domain;
     private ECCurve _curve;
     private bool _hasPrivateKey;
@@ -243,6 +247,317 @@ sealed class EcKey
         byte[] scalar = new byte[_domain.Size];
         WriteEcElement(_privateScalar, _domain.Size, scalar, 0u);
         return scalar;
+    }
+
+    // --------------------------------------------------- SubjectPublicKeyInfo
+
+    /// RFC 5480's `SubjectPublicKeyInfo`: `id-ecPublicKey`, the curve's
+    /// identifier, and the point uncompressed.
+    public byte[] ExportSubjectPublicKeyInfo()
+    {
+        var writer = new AsnWriter();
+        writer.PushSequence();
+        WriteAlgorithmIdentifier(writer);
+        writer.WriteBitString(_publicKey);
+        writer.PopSequence();
+        return writer.Encode();
+    }
+
+    void WriteAlgorithmIdentifier(AsnWriter writer)
+    {
+        writer.PushSequence();
+        writer.WriteObjectIdentifier(s_publicKeyAlgorithm);
+        writer.WriteObjectIdentifier(_curve.OidValue);
+        writer.PopSequence();
+    }
+
+    /// The key a `SubjectPublicKeyInfo` holds, and how many bytes it took.
+    public static Result<EcKey, CryptoError> ImportSubjectPublicKeyInfo(
+        ReadOnlySpan<byte> source, out nuint bytesRead)
+    {
+        bytesRead = 0u;
+        var document = new AsnReader(source, AsnEncodingRules.Der);
+        var whole = document.ReadEncodedValue();
+        if (!whole.Ok)
+            return Fail(CryptoError.Encoding);
+
+        var outer = new AsnReader(whole.Value, AsnEncodingRules.Der).ReadSequence();
+        if (!outer.Ok)
+            return Fail(CryptoError.Encoding);
+        AsnReader info = outer.Value;
+
+        var curve = ReadAlgorithmIdentifier(info);
+        if (!curve.Ok)
+            return Fail(curve.Error);
+        var domain = CreateEcDomainForCurve(curve.Value);
+        if (!domain.Ok)
+            return Fail(domain.Error);
+
+        var point = info.ReadBitString(out int unused);
+        if (!point.Ok || unused != 0 || info.VerifyEndOfData() != AsnError.None)
+            return Fail(CryptoError.Encoding);
+
+        var key = CreateFromPublic(curve.Value, domain.Value, point.Value);
+        if (key.Ok)
+            bytesRead = whole.Value.Length;
+        return key;
+    }
+
+    /// The curve an `AlgorithmIdentifier` for `id-ecPublicKey` names.
+    static Result<ECCurve, CryptoError> ReadAlgorithmIdentifier(AsnReader reader)
+    {
+        var sequence = reader.ReadSequence();
+        if (!sequence.Ok)
+            return Fail(CryptoError.Encoding);
+        AsnReader algorithm = sequence.Value;
+
+        var oid = algorithm.ReadObjectIdentifier();
+        if (!oid.Ok || oid.Value != s_publicKeyAlgorithm)
+            return Fail(CryptoError.Encoding);
+
+        var curve = ReadNamedCurve(algorithm);
+        if (!curve.Ok)
+            return curve;
+        if (algorithm.VerifyEndOfData() != AsnError.None)
+            return Fail(CryptoError.Encoding);
+        return curve;
+    }
+
+    /// RFC 5480's `ECParameters`: a named curve. Explicit parameters are valid
+    /// and unsupported; anything else is not an encoding of one.
+    static Result<ECCurve, CryptoError> ReadNamedCurve(AsnReader reader)
+    {
+        var tag = reader.PeekTag();
+        if (!tag.Ok)
+            return Fail(CryptoError.Encoding);
+        if (tag.Value == Asn1Tag.Sequence)
+            return Fail(CryptoError.Unsupported);
+
+        var oid = reader.ReadObjectIdentifier();
+        if (!oid.Ok)
+            return Fail(CryptoError.Encoding);
+        return Ok(ECCurve.CreateFromValue(oid.Value));
+    }
+
+    // ------------------------------------------------------------ ECPrivateKey
+
+    /// RFC 5915's `ECPrivateKey`: version 1, the scalar, and the curve and the
+    /// point in their tagged fields, as OpenSSL writes it.
+    ///
+    /// @failure CryptoError.InvalidKey  there is no private scalar
+    public Result<byte[], CryptoError> ExportECPrivateKey()
+    {
+        if (!_hasPrivateKey)
+            return Fail(CryptoError.InvalidKey);
+        return Ok(EncodeECPrivateKey(true));
+    }
+
+    byte[] EncodeECPrivateKey(bool includeCurve)
+    {
+        byte[] scalar = ExportPrivateScalar();
+        var writer = new AsnWriter();
+        writer.PushSequence();
+        writer.WriteInteger(1);
+        writer.WriteOctetString(scalar);
+        if (includeCurve)
+        {
+            writer.PushSequence(new Asn1Tag(TagClass.ContextSpecific, 0, true));
+            writer.WriteObjectIdentifier(_curve.OidValue);
+            writer.PopSequence();
+        }
+        writer.PushSequence(new Asn1Tag(TagClass.ContextSpecific, 1, true));
+        writer.WriteBitString(_publicKey);
+        writer.PopSequence();
+        writer.PopSequence();
+        CryptographicOperations.ZeroMemory(scalar);
+        return writer.Encode();
+    }
+
+    /// The key an `ECPrivateKey` holds, and how many bytes it took.
+    public static Result<EcKey, CryptoError> ImportECPrivateKey(ReadOnlySpan<byte> source,
+                                                                out nuint bytesRead)
+    {
+        bytesRead = 0u;
+        var whole = new AsnReader(source, AsnEncodingRules.Der).ReadEncodedValue();
+        if (!whole.Ok)
+            return Fail(CryptoError.Encoding);
+
+        ECCurve none;
+        var key = ReadECPrivateKey(whole.Value, none);
+        if (key.Ok)
+            bytesRead = whole.Value.Length;
+        return key;
+    }
+
+    /// An `ECPrivateKey`, on `outerCurve` when that names one, which is how
+    /// PKCS #8 carries it. A curve inside MUST then agree with it.
+    static Result<EcKey, CryptoError> ReadECPrivateKey(ReadOnlySpan<byte> encoded,
+                                                       ECCurve outerCurve)
+    {
+        var outer = new AsnReader(encoded, AsnEncodingRules.Der).ReadSequence();
+        if (!outer.Ok)
+            return Fail(CryptoError.Encoding);
+        AsnReader sequence = outer.Value;
+
+        var version = sequence.ReadInt64();
+        if (!version.Ok || version.Value != 1)
+            return Fail(CryptoError.Encoding);
+
+        var scalar = sequence.ReadOctetString();
+        if (!scalar.Ok)
+            return Fail(CryptoError.Encoding);
+
+        ECCurve curve = outerCurve;
+        var curveTag = new Asn1Tag(TagClass.ContextSpecific, 0, true);
+        var pointTag = new Asn1Tag(TagClass.ContextSpecific, 1, true);
+        if (sequence.HasData && sequence.PeekTag().GetValueOrDefault(Asn1Tag.Null) == curveTag)
+        {
+            var wrapper = sequence.ReadSequence(curveTag);
+            if (!wrapper.Ok)
+                return Fail(CryptoError.Encoding);
+            AsnReader parameters = wrapper.Value;
+            var named = ReadNamedCurve(parameters);
+            if (!named.Ok)
+                return Fail(named.Error);
+            if (parameters.VerifyEndOfData() != AsnError.None)
+                return Fail(CryptoError.Encoding);
+            if (outerCurve.IsNamed && !outerCurve.Equals(named.Value))
+                return Fail(CryptoError.Encoding);
+            curve = named.Value;
+        }
+
+        ReadOnlySpan<byte> point = new byte[0u];
+        if (sequence.HasData && sequence.PeekTag().GetValueOrDefault(Asn1Tag.Null) == pointTag)
+        {
+            var wrapper = sequence.ReadSequence(pointTag);
+            if (!wrapper.Ok)
+                return Fail(CryptoError.Encoding);
+            AsnReader inner = wrapper.Value;
+            var bits = inner.ReadBitString(out int unused);
+            if (!bits.Ok || unused != 0 || inner.VerifyEndOfData() != AsnError.None)
+                return Fail(CryptoError.Encoding);
+            point = bits.Value;
+        }
+
+        if (sequence.VerifyEndOfData() != AsnError.None)
+            return Fail(CryptoError.Encoding);
+        if (!curve.IsNamed)
+            return Fail(CryptoError.Encoding);
+
+        var domain = CreateEcDomainForCurve(curve);
+        if (!domain.Ok)
+            return Fail(domain.Error);
+        return CreateFromPrivate(curve, domain.Value, scalar.Value, point);
+    }
+
+    // ------------------------------------------------------------------ PKCS #8
+
+    /// PKCS #8's `PrivateKeyInfo`, unencrypted: version 0, the algorithm and
+    /// curve, and an `ECPrivateKey` without the curve, as OpenSSL writes it.
+    ///
+    /// @failure CryptoError.InvalidKey  there is no private scalar
+    public Result<byte[], CryptoError> ExportPkcs8PrivateKey()
+    {
+        if (!_hasPrivateKey)
+            return Fail(CryptoError.InvalidKey);
+
+        byte[] inner = EncodeECPrivateKey(false);
+        var writer = new AsnWriter();
+        writer.PushSequence();
+        writer.WriteInteger(0);
+        WriteAlgorithmIdentifier(writer);
+        writer.WriteOctetString(inner);
+        writer.PopSequence();
+        CryptographicOperations.ZeroMemory(inner);
+        return Ok(writer.Encode());
+    }
+
+    /// The key a PKCS #8 `PrivateKeyInfo` or `OneAsymmetricKey` holds, and how
+    /// many bytes it took. Attributes and a trailing public key are passed
+    /// over.
+    public static Result<EcKey, CryptoError> ImportPkcs8PrivateKey(ReadOnlySpan<byte> source,
+                                                                   out nuint bytesRead)
+    {
+        bytesRead = 0u;
+        var whole = new AsnReader(source, AsnEncodingRules.Der).ReadEncodedValue();
+        if (!whole.Ok)
+            return Fail(CryptoError.Encoding);
+
+        var outer = new AsnReader(whole.Value, AsnEncodingRules.Der).ReadSequence();
+        if (!outer.Ok)
+            return Fail(CryptoError.Encoding);
+        AsnReader info = outer.Value;
+
+        var version = info.ReadInt64();
+        if (!version.Ok || (version.Value != 0 && version.Value != 1))
+            return Fail(CryptoError.Encoding);
+
+        var curve = ReadAlgorithmIdentifier(info);
+        if (!curve.Ok)
+            return Fail(curve.Error);
+
+        var inner = info.ReadOctetString();
+        if (!inner.Ok)
+            return Fail(CryptoError.Encoding);
+
+        while (info.HasData)
+        {
+            var tag = info.PeekTag();
+            if (!tag.Ok || tag.Value.TagClass != TagClass.ContextSpecific)
+                return Fail(CryptoError.Encoding);
+            if (!info.ReadEncodedValue().Ok)
+                return Fail(CryptoError.Encoding);
+        }
+
+        var key = ReadECPrivateKey(inner.Value, curve.Value);
+        if (key.Ok)
+            bytesRead = whole.Value.Length;
+        return key;
+    }
+
+    // ---------------------------------------------------------------------- PEM
+
+    /// The first key in `text` labelled `PUBLIC KEY`, `EC PRIVATE KEY` or
+    /// `PRIVATE KEY`. Blocks with any other label, such as OpenSSL's
+    /// `EC PARAMETERS`, are passed over.
+    ///
+    /// @failure CryptoError.Encoding     no such block, or its contents are not
+    ///                                   the one structure its label names
+    /// @failure CryptoError.Unsupported  the first key is `ENCRYPTED PRIVATE KEY`
+    public static Result<EcKey, CryptoError> ImportFromPem(String text)
+    {
+        nuint at = 0u;
+        while (true)
+        {
+            var found = PemEncoding.Find(text, at);
+            if (!found.Some)
+                return Fail(CryptoError.Encoding);
+
+            PemFields block = found.Value;
+            at = block.Location.End.Value;
+            nuint bytesRead = 0u;
+            Result<EcKey, CryptoError> key;
+            switch (block.Label)
+            {
+                case "PUBLIC KEY":
+                    key = ImportSubjectPublicKeyInfo(block.Data, out bytesRead);
+                    break;
+                case "EC PRIVATE KEY":
+                    key = ImportECPrivateKey(block.Data, out bytesRead);
+                    break;
+                case "PRIVATE KEY":
+                    key = ImportPkcs8PrivateKey(block.Data, out bytesRead);
+                    break;
+                case "ENCRYPTED PRIVATE KEY":
+                    return Fail(CryptoError.Unsupported);
+                default:
+                    continue;
+            }
+
+            if (key.Ok && bytesRead != block.Data.Length)
+                return Fail(CryptoError.Encoding);
+            return key;
+        }
     }
 }
 

@@ -1,0 +1,147 @@
+p256 public from private ok
+p256 sha1 sample ok
+p256 sha1 sample verifies ok
+p256 sha256 sample ok
+p256 sha256 sample verifies ok
+p256 sha384 sample ok
+p256 sha384 sample verifies ok
+p256 sha512 sample ok
+p256 sha512 sample verifies ok
+p256 sha1 test ok
+p256 sha1 test verifies ok
+p256 sha256 test ok
+p256 sha256 test verifies ok
+p256 sha384 test ok
+p256 sha384 test verifies ok
+p256 sha512 test ok
+p256 sha512 test verifies ok
+p256 sign hash ok
+p384 public from private ok
+p384 sha1 sample ok
+p384 sha1 sample verifies ok
+p384 sha256 sample ok
+p384 sha256 sample verifies ok
+p384 sha384 sample ok
+p384 sha384 sample verifies ok
+p384 sha512 sample ok
+p384 sha512 sample verifies ok
+p384 sha1 test ok
+p384 sha1 test verifies ok
+p384 sha256 test ok
+p384 sha256 test verifies ok
+p384 sha384 test ok
+p384 sha384 test verifies ok
+p384 sha512 test ok
+p384 sha512 test verifies ok
+cdh p256 count 0 ok
+cdh p256 count 1 ok
+cdh p256 count 2 ok
+cdh p384 count 0 ok
+cdh p384 count 1 ok
+cdh p384 count 2 ok
+wycheproof ecdsa p256 ok
+wycheproof ecdsa p384 ok
+wycheproof ecdh p256 ok
+wycheproof ecdh p384 ok
+der both padded ok
+der unpadded ok
+der to p1363 ok
+der verifies ok
+der is not p1363 ok
+p1363 is not der ok
+der with trailing byte refused ok
+der negative integer refused ok
+max sizes p256 ok
+p384 der verifies ok
+max sizes p384 ok
+p384 der fits ok
+p256 import sec1 pem ok
+p256 sec1 pem ok
+p256 pkcs8 pem ok
+p256 spki pem ok
+p256 pkcs8 bytes read ok
+p256 pkcs8 der to sec1 der ok
+p256 sec1 der ok
+p256 sec1 der to pkcs8 der ok
+p256 parameters round trip ok
+p256 import compressed ok
+p256 compressed to uncompressed ok
+p256 openssl signature verifies ok
+p256 openssl signature is for its message ok
+p256 openssl agreement ok
+p256 ecdh spki pem ok
+p384 import sec1 pem ok
+p384 sec1 pem ok
+p384 pkcs8 pem ok
+p384 spki pem ok
+p384 pkcs8 bytes read ok
+p384 pkcs8 der to sec1 der ok
+p384 sec1 der ok
+p384 sec1 der to pkcs8 der ok
+p384 parameters round trip ok
+p384 import compressed ok
+p384 compressed to uncompressed ok
+p384 openssl signature verifies ok
+p384 openssl signature is for its message ok
+p384 openssl agreement ok
+p384 ecdh spki pem ok
+certificate algorithm ok
+certificate key ok
+certificate signature ok
+off-curve point ok
+infinity ok
+coordinate of p ok
+hybrid form ok
+truncated point ok
+point on another curve ok
+compressed generator ok
+compressed x of p ok
+q off the curve ok
+q of the wrong width ok
+no q and no d ok
+public key agrees ok
+d of zero ok
+d of n ok
+d above n ok
+d too short ok
+d of n - 1 is -G ok
+q that d does not give ok
+secp256k1 ok
+unknown friendly name ok
+friendly names ok
+rsa spki ok
+failed import keeps the key ok
+secp256k1 spki ok
+empty der ok
+no pem ok
+encrypted pem ok
+sec1 with another point ok
+signature verifies ok
+tampered signature ok
+tampered message ok
+another hash ok
+another key ok
+r and s of zero ok
+r of n ok
+s of n ok
+short signature ok
+public key verifies ok
+public key signs ok
+public key exports d ok
+public key exports sec1 ok
+no hash signs ok
+no hash verifies ok
+nistP256 keys differ ok
+nistP256 parties agree ok
+nistP256 hashed agreement ok
+nistP256 hmac agreement ok
+nistP256 key size ok
+nistP256 generated signature ok
+nistP256 deterministic ok
+nistP384 keys differ ok
+nistP384 parties agree ok
+nistP384 hashed agreement ok
+nistP384 hmac agreement ok
+nistP384 key size ok
+nistP384 generated signature ok
+nistP384 deterministic ok

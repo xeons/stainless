@@ -1,0 +1,4 @@
+# The crypto-ecc case, built for 32-bit x86: the limb arithmetic leans on
+# 64-bit multiplies that the target has to build from 32-bit ones.
+tests/cases/crypto-ecc/ecc.sl
+tests/cases/crypto-ecc/wycheproof.sl
