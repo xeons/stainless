@@ -42,7 +42,7 @@ import Standard.Bits;
 ///
 /// **It is constant time by construction.** The whole cipher is additions,
 /// rotations and exclusive-ors on 32-bit words, with no table and no branch on
-/// the key, which is why it is the software answer to AES's cache leak.
+/// the key, which is also what makes it fast without hardware support.
 ///
 /// The nonce MUST NOT repeat under one key. A repeated nonce gives the same
 /// keystream twice, and the XOR of two ciphertexts is then the XOR of the two

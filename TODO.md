@@ -551,8 +551,8 @@ decision about what to write.
 SHA-1, SHA-256, SHA-384, SHA-512, BLAKE2b, HMAC over any of them, PBKDF2, HKDF,
 scrypt, Argon2id, AES in ECB, CBC, CFB and CTR, AES-GCM, ChaCha20-Poly1305, the
 platform's entropy, and a constant-time comparison. Every answer is pinned
-against a published vector by `tests/cases/cryptography`, `crypto-chacha` and
-`crypto-kdf`.
+against a published vector by `tests/cases/cryptography`, `crypto-aes`,
+`crypto-chacha` and `crypto-kdf`.
 
 **Curve25519 is there**: `X25519` for key agreement and `Ed25519` for
 signatures, constant time on secrets, pinned against RFC 7748 and RFC 8032 by
@@ -572,18 +572,6 @@ The honest alternatives are to write it, to bind to a library that has
 or to say that this standard library does the symmetric half and Curve25519
 and expects a program needing RSA or a NIST curve to reach outside. **The third is what is happening
 and it should be a decision rather than a gap.**
-
-### AES that does not leak through the cache
-
-The AES here is byte-oriented with a table-driven S-box, which is the shape
-that is known to leak a key to an attacker who can watch the data cache. It is
-right for a file, a protocol and a password store, and it is not the thing to
-put under a remote attacker who can time it.
-
-The two answers are AES-NI, which is an intrinsic the language has no way to
-spell, and a bitsliced fallback, which is a rewrite of the cipher that never
-indexes a table by a secret. Both are real work; the doc block on the module
-says plainly which one it is, which is the least that should be true.
 
 ### Case mapping beyond ASCII
 

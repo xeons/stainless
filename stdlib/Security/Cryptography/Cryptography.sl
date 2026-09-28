@@ -54,27 +54,33 @@
 ///   abstract class over a CryptoAPI implementation chosen at run time. There
 ///   is one implementation here, so `new Sha256()` is the whole of it.
 ///
-/// **What is constant time, and what is not.** This is a software
-/// implementation, so the claim is about the code as written: no branch and
-/// no memory index depends on a secret.
+/// **The ciphers and MACs are constant time in software.** AES is bitsliced
+/// and its S-box is a logic circuit, GHASH multiplies with integer multiplies
+/// rather than a table, and ChaCha20, Poly1305, the SHA-2 family and BLAKE2b
+/// are arithmetic on words. None indexes memory by a key or by data, and none
+/// branches on either, so the time and the cache lines touched depend only on
+/// lengths. `FixedTimeEquals` is the comparison to use on anything secret.
 ///
-/// - **Constant time:** `FixedTimeEquals`, which is the one comparison a
-///   caller should use on a secret; `ChaCha20Poly1305` and its two halves,
-///   which have no table and no branch on a secret; `X25519` whole; and
-///   `Ed25519` signing and key generation, whose scalar multiplication reads
-///   its table by mask.
-///   Every secret-dependent choice there is a mask passed through
-///   `OpaqueCopy`, so the optimiser cannot turn it back into a branch.
-/// - **Variable time, on public data only:** `Ed25519.Verify`, which touches
-///   nothing secret.
-/// - **Not constant time: AES.** It is a byte-oriented reference
-///   implementation with a table-driven S-box, which is the shape known to
-///   leak through the data cache on a machine an attacker shares. It is right
-///   for a file, a protocol and a password store, and it is not the thing to
-///   put under a remote attacker who can time it. AES-NI and a bitsliced
-///   fallback are what would answer that, and neither is written — TODO.md
-///   carries the note. The GHASH under `AesGcm` branches on its data too.
-///   Where timing matters, choose `ChaCha20Poly1305`.
+/// Three things that claim does not cover. **It is timing and cache only**:
+/// nothing here resists power analysis, electromagnetic emanation or fault
+/// injection, which want masking and hardware this library does not have.
+/// **It rests on the multiply**: GHASH and Poly1305 assume a multiply whose
+/// time does not depend on its operands, which is true of every x64 and ARMv8
+/// core and not of some older and embedded ones. **The memory-hard password
+/// hashes index memory by the password**, which is what makes them memory
+/// hard: all of scrypt's second half, and Argon2id's after its first half.
+///
+/// Nothing uses AES-NI, which the language cannot spell, so AES runs at a
+/// small fraction of what the hardware could give. `ChaCha20Poly1305` is
+/// about three times as fast as `AesGcm` here, and is the one to choose
+/// where a format leaves the choice open.
+///
+/// **Public-key is constant time wherever a secret is involved.** `X25519`
+/// whole, and `Ed25519` signing and key generation, whose scalar
+/// multiplication reads its table by mask; every secret-dependent choice there
+/// is a mask passed through `OpaqueCopy`, so the optimiser cannot turn it back
+/// into a branch. `Ed25519.Verify` is variable time and touches nothing
+/// secret.
 ///
 /// **Public-key is Curve25519 and nothing else.** `X25519` agrees keys and
 /// `Ed25519` signs, over the one curve whose arithmetic needs no general

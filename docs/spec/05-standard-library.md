@@ -948,14 +948,23 @@ here.
 | text | `PemEncoding`: RFC 7468 blocks found in text and written at 64 columns |
 | the rest | `RandomNumberGenerator`, `CryptographicOperations.FixedTimeEquals` |
 
+**The ciphers and MACs are constant time in software.** AES is bitsliced, four
+blocks at a time with a logic circuit for the S-box, as BearSSL's `aes_ct64`
+is; GHASH multiplies with integer multiplies rather than a table; the rest is
+arithmetic on words. Nothing indexes memory by a key or by data, or branches
+on either. The claim is about timing and the cache, not power or
+electromagnetic analysis, and it assumes a multiply whose time does not depend
+on its operands.
+
 Every answer is pinned against a published test vector — FIPS-180 and RFC 1321
 for the digests, RFC 2202 and 4231 for HMAC, RFC 6070 for PBKDF2, RFC 5869 for
-HKDF, FIPS-197 for the AES blocks, SP 800-38A for the modes and the GCM
-specification's own case 3 — by `tests/cases/cryptography`, every vector
-of RFC 8439 by `tests/cases/crypto-chacha`, RFC 7914's scrypt, RFC 7693's
-BLAKE2b and RFC 9106's Argon2id by `tests/cases/crypto-kdf`, and RFC 7748 and
-RFC 8032's own vectors by `tests/cases/crypto-25519`, which runs again as a
-32-bit x86 program.
+HKDF — by `tests/cases/cryptography`; FIPS-197, SP 800-38A for every mode at
+every key length, and all eighteen cases of the GCM specification by
+`tests/cases/crypto-aes`; every vector of RFC 8439 by
+`tests/cases/crypto-chacha`; RFC 7914's scrypt, RFC 7693's BLAKE2b and RFC
+9106's Argon2id by `tests/cases/crypto-kdf`; and RFC 7748 and RFC 8032's own
+vectors by `tests/cases/crypto-25519`. The AES and Curve25519 cases run again
+as 32-bit x86 programs.
 
 **What is constant time.** `FixedTimeEquals`, all of `X25519`, and `Ed25519`
 signing: no branch and no memory index there depends on a secret, and every

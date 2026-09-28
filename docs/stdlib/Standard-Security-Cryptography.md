@@ -37,27 +37,33 @@ already has rather than a choice made here:
   abstract class over a CryptoAPI implementation chosen at run time. There
   is one implementation here, so `new Sha256()` is the whole of it.
 
-**What is constant time, and what is not.** This is a software
-implementation, so the claim is about the code as written: no branch and
-no memory index depends on a secret.
+**The ciphers and MACs are constant time in software.** AES is bitsliced
+and its S-box is a logic circuit, GHASH multiplies with integer multiplies
+rather than a table, and ChaCha20, Poly1305, the SHA-2 family and BLAKE2b
+are arithmetic on words. None indexes memory by a key or by data, and none
+branches on either, so the time and the cache lines touched depend only on
+lengths. `FixedTimeEquals` is the comparison to use on anything secret.
 
-- **Constant time:** `FixedTimeEquals`, which is the one comparison a
-  caller should use on a secret; `ChaCha20Poly1305` and its two halves,
-  which have no table and no branch on a secret; `X25519` whole; and
-  `Ed25519` signing and key generation, whose scalar multiplication reads
-  its table by mask.
-  Every secret-dependent choice there is a mask passed through
-  `OpaqueCopy`, so the optimiser cannot turn it back into a branch.
-- **Variable time, on public data only:** `Ed25519.Verify`, which touches
-  nothing secret.
-- **Not constant time: AES.** It is a byte-oriented reference
-  implementation with a table-driven S-box, which is the shape known to
-  leak through the data cache on a machine an attacker shares. It is right
-  for a file, a protocol and a password store, and it is not the thing to
-  put under a remote attacker who can time it. AES-NI and a bitsliced
-  fallback are what would answer that, and neither is written — TODO.md
-  carries the note. The GHASH under `AesGcm` branches on its data too.
-  Where timing matters, choose `ChaCha20Poly1305`.
+Three things that claim does not cover. **It is timing and cache only**:
+nothing here resists power analysis, electromagnetic emanation or fault
+injection, which want masking and hardware this library does not have.
+**It rests on the multiply**: GHASH and Poly1305 assume a multiply whose
+time does not depend on its operands, which is true of every x64 and ARMv8
+core and not of some older and embedded ones. **The memory-hard password
+hashes index memory by the password**, which is what makes them memory
+hard: all of scrypt's second half, and Argon2id's after its first half.
+
+Nothing uses AES-NI, which the language cannot spell, so AES runs at a
+small fraction of what the hardware could give. `ChaCha20Poly1305` is
+about three times as fast as `AesGcm` here, and is the one to choose
+where a format leaves the choice open.
+
+**Public-key is constant time wherever a secret is involved.** `X25519`
+whole, and `Ed25519` signing and key generation, whose scalar
+multiplication reads its table by mask; every secret-dependent choice there
+is a mask passed through `OpaqueCopy`, so the optimiser cannot turn it back
+into a branch. `Ed25519.Verify` is variable time and touches nothing
+secret.
 
 **Public-key is Curve25519 and nothing else.** `X25519` agrees keys and
 `Ed25519` signs, over the one curve whose arithmetic needs no general
@@ -92,6 +98,14 @@ a bit-flipping attack on the block after the one they touched. Reach for
 HMAC over the ciphertext and check it with `FixedTimeEquals` before
 decrypting anything.
 
+**It is constant time.** The cipher is bitsliced, as BearSSL's `aes_ct64`
+is: four blocks are spread across eight 64-bit words, one word for each bit
+position of every byte, and the S-box is the Boyar–Peralta logic circuit
+rather than a table. Nothing is indexed by, and nothing branches on, the
+key or the data. ECB, CTR and the decrypting half of CBC and CFB run four
+blocks in each pass. CBC and CFB encryption chain each block into the next,
+so they run one block per pass at the cost of four.
+
 The one-shot methods are .NET 6's `EncryptCbc` and friends rather than its
 older `CreateEncryptor`/`ICryptoTransform` pair. A transform object exists
 to stream a message larger than memory; `CryptoStream` is the piece that
@@ -100,7 +114,7 @@ would be a shape with no user.
 
 **See also** &nbsp; [AesGcm](#aesgcm-class)
 
-<sub>[stdlib/Security/Cryptography/Aes.sl:49](../../stdlib/Security/Cryptography/Aes.sl#L49)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:57](../../stdlib/Security/Cryptography/Aes.sl#L57)</sub>
 
 #### BlockSize *constant*
 
@@ -111,7 +125,7 @@ const nuint BlockSize = 16
 One block, for every key length. AES is a 128-bit block cipher; it is
 Rijndael that had others, and no standard uses them.
 
-<sub>[stdlib/Security/Cryptography/Aes.sl:53](../../stdlib/Security/Cryptography/Aes.sl#L53)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:61](../../stdlib/Security/Cryptography/Aes.sl#L61)</sub>
 
 #### FromKey *method*
 
@@ -126,7 +140,7 @@ AES-192 or AES-256.
 
 - [CryptoError.KeyLength](#keylength-case) — `key` is not 16, 24 or 32 bytes
 
-<sub>[stdlib/Security/Cryptography/Aes.sl:83](../../stdlib/Security/Cryptography/Aes.sl#L83)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:89](../../stdlib/Security/Cryptography/Aes.sl#L89)</sub>
 
 #### Create *method*
 
@@ -138,7 +152,7 @@ A cipher under a fresh 256-bit key from the platform, which is what
 .NET's `Aes.Create()` gives. Aborts if the machine will supply no
 entropy, which is a broken machine rather than an outcome to plan for.
 
-<sub>[stdlib/Security/Cryptography/Aes.sl:93](../../stdlib/Security/Cryptography/Aes.sl#L93)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:99](../../stdlib/Security/Cryptography/Aes.sl#L99)</sub>
 
 #### Rounds *property*
 
@@ -148,7 +162,7 @@ nuint Rounds { get; }
 
 How many rounds this key length runs: 10, 12 or 14.
 
-<sub>[stdlib/Security/Cryptography/Aes.sl:102](../../stdlib/Security/Cryptography/Aes.sl#L102)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:110](../../stdlib/Security/Cryptography/Aes.sl#L110)</sub>
 
 #### EncryptBlock *method*
 
@@ -162,9 +176,9 @@ Public because AES-GCM and a CTR keystream are built on it and a caller
 implementing a mode this class does not have needs the same door.
 **Not a way to encrypt a message**: a bare block cipher applied twice
 to the same input gives the same output, which is what a mode exists to
-fix.
+fix. One block costs a pass that could have carried four.
 
-<sub>[stdlib/Security/Cryptography/Aes.sl:113](../../stdlib/Security/Cryptography/Aes.sl#L113)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:121](../../stdlib/Security/Cryptography/Aes.sl#L121)</sub>
 
 #### DecryptBlock *method*
 
@@ -174,7 +188,7 @@ void DecryptBlock(byte[] block, nuint offset)
 
 One block deciphered in place, at `offset` in `block`.
 
-<sub>[stdlib/Security/Cryptography/Aes.sl:131](../../stdlib/Security/Cryptography/Aes.sl#L131)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:124](../../stdlib/Security/Cryptography/Aes.sl#L124)</sub>
 
 #### EncryptEcb *method*
 
@@ -191,7 +205,7 @@ always the wrong answer.
 
 **See also** &nbsp; [CipherMode.Ecb](#ecb-case) &middot; [Aes.DecryptEcb](#decryptecb-method)
 
-<sub>[stdlib/Security/Cryptography/Aes.sl:157](../../stdlib/Security/Cryptography/Aes.sl#L157)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:135](../../stdlib/Security/Cryptography/Aes.sl#L135)</sub>
 
 #### DecryptEcb *method*
 
@@ -208,7 +222,7 @@ The inverse of `EncryptEcb`.
 
 **See also** &nbsp; [Aes.EncryptEcb](#encryptecb-method)
 
-<sub>[stdlib/Security/Cryptography/Aes.sl:176](../../stdlib/Security/Cryptography/Aes.sl#L176)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:152](../../stdlib/Security/Cryptography/Aes.sl#L152)</sub>
 
 #### EncryptCbc *method*
 
@@ -227,7 +241,7 @@ it is not secret -- send it alongside the ciphertext.
 
 **See also** &nbsp; [Aes.DecryptCbc](#decryptcbc-method) &middot; [RandomNumberGenerator.GetBytes](#getbytes-method)
 
-<sub>[stdlib/Security/Cryptography/Aes.sl:199](../../stdlib/Security/Cryptography/Aes.sl#L199)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:175](../../stdlib/Security/Cryptography/Aes.sl#L175)</sub>
 
 #### DecryptCbc *method*
 
@@ -249,7 +263,7 @@ is the whole reason to authenticate a ciphertext before decrypting it.
 
 **See also** &nbsp; [Aes.EncryptCbc](#encryptcbc-method)
 
-<sub>[stdlib/Security/Cryptography/Aes.sl:236](../../stdlib/Security/Cryptography/Aes.sl#L236)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:210](../../stdlib/Security/Cryptography/Aes.sl#L210)</sub>
 
 #### EncryptCfb *method*
 
@@ -266,7 +280,7 @@ with a feedback size of 128 bits. No padding: the mode is a stream.
 
 **See also** &nbsp; [Aes.DecryptCfb](#decryptcfb-method)
 
-<sub>[stdlib/Security/Cryptography/Aes.sl:272](../../stdlib/Security/Cryptography/Aes.sl#L272)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:239](../../stdlib/Security/Cryptography/Aes.sl#L239)</sub>
 
 #### DecryptCfb *method*
 
@@ -282,7 +296,7 @@ The inverse of `EncryptCfb`.
 
 **See also** &nbsp; [Aes.EncryptCfb](#encryptcfb-method)
 
-<sub>[stdlib/Security/Cryptography/Aes.sl:302](../../stdlib/Security/Cryptography/Aes.sl#L302)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:270](../../stdlib/Security/Cryptography/Aes.sl#L270)</sub>
 
 #### ApplyCtr *method*
 
@@ -302,7 +316,7 @@ is a random nonce in the high bytes and a block counter in the low.
 
 - [CryptoError.IvLength](#ivlength-case) — `counter` is not one block
 
-<sub>[stdlib/Security/Cryptography/Aes.sl:340](../../stdlib/Security/Cryptography/Aes.sl#L340)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:303](../../stdlib/Security/Cryptography/Aes.sl#L303)</sub>
 
 ### AesGcm *class*
 
@@ -371,7 +385,7 @@ A GCM box under `key`, which must be 16, 24 or 32 bytes.
 
 - [CryptoError.KeyLength](#keylength-case) — `key` is not 16, 24 or 32 bytes
 
-<sub>[stdlib/Security/Cryptography/AesGcm.sl:76](../../stdlib/Security/Cryptography/AesGcm.sl#L76)</sub>
+<sub>[stdlib/Security/Cryptography/AesGcm.sl:83](../../stdlib/Security/Cryptography/AesGcm.sl#L83)</sub>
 
 #### Encrypt *method*
 
@@ -399,7 +413,7 @@ secret. Pass an empty array when there is none.
 
 **See also** &nbsp; [AesGcm.Decrypt](#decrypt-method)
 
-<sub>[stdlib/Security/Cryptography/AesGcm.sl:98](../../stdlib/Security/Cryptography/AesGcm.sl#L98)</sub>
+<sub>[stdlib/Security/Cryptography/AesGcm.sl:105](../../stdlib/Security/Cryptography/AesGcm.sl#L105)</sub>
 
 #### Decrypt *method*
 
@@ -424,7 +438,7 @@ The plaintext, or `AuthenticationFailed` and nothing.
 
 **See also** &nbsp; [AesGcm.Encrypt](#encrypt-method)
 
-<sub>[stdlib/Security/Cryptography/AesGcm.sl:135](../../stdlib/Security/Cryptography/AesGcm.sl#L135)</sub>
+<sub>[stdlib/Security/Cryptography/AesGcm.sl:142](../../stdlib/Security/Cryptography/AesGcm.sl#L142)</sub>
 
 ### Argon2id *class*
 
@@ -716,7 +730,7 @@ bare cipher, and for the block vectors that pin it.
 
 **It is constant time by construction.** The whole cipher is additions,
 rotations and exclusive-ors on 32-bit words, with no table and no branch on
-the key, which is why it is the software answer to AES's cache leak.
+the key, which is also what makes it fast without hardware support.
 
 The nonce MUST NOT repeat under one key. A repeated nonce gives the same
 keystream twice, and the XOR of two ciphertexts is then the XOR of the two
@@ -813,10 +827,11 @@ var sealed = try box.Encrypt(nonce, plaintext, associated, tag);
 var opened = try box.Decrypt(nonce, sealed, associated, tag);
 ```
 
-**It is AES-GCM's alternative where AES would leak.** Every step is
-additions, rotations and exclusive-ors on words, with no table and no
-branch on a secret, so it is constant time in software where the AES here
-is not. TLS 1.3, WireGuard and SSH all offer it for that reason.
+**It is AES-GCM's alternative where there is no AES in hardware.** Every
+step is additions, rotations and exclusive-ors on words, with no table and
+no branch on a secret, so it is constant time and fast in software; here it
+runs about three times as fast as `AesGcm`. TLS 1.3, WireGuard and SSH all
+offer it for that reason.
 
 **The nonce MUST NOT repeat under one key.** A repeat reuses the keystream
 and the one-time Poly1305 key both, which gives away the XOR of the two
@@ -828,7 +843,7 @@ the tag does not match. The tag is checked before anything is deciphered.
 
 **See also** &nbsp; [AesGcm](#aesgcm-class)
 
-<sub>[stdlib/Security/Cryptography/ChaCha20Poly1305.sl:53](../../stdlib/Security/Cryptography/ChaCha20Poly1305.sl#L53)</sub>
+<sub>[stdlib/Security/Cryptography/ChaCha20Poly1305.sl:54](../../stdlib/Security/Cryptography/ChaCha20Poly1305.sl#L54)</sub>
 
 #### TagSize *constant*
 
@@ -838,7 +853,7 @@ const nuint TagSize = 16
 
 **Value** &nbsp; sixteen bytes.
 
-<sub>[stdlib/Security/Cryptography/ChaCha20Poly1305.sl:56](../../stdlib/Security/Cryptography/ChaCha20Poly1305.sl#L56)</sub>
+<sub>[stdlib/Security/Cryptography/ChaCha20Poly1305.sl:57](../../stdlib/Security/Cryptography/ChaCha20Poly1305.sl#L57)</sub>
 
 #### NonceSize *constant*
 
@@ -850,7 +865,7 @@ The only length RFC 8439 defines.
 
 **Value** &nbsp; twelve bytes.
 
-<sub>[stdlib/Security/Cryptography/ChaCha20Poly1305.sl:61](../../stdlib/Security/Cryptography/ChaCha20Poly1305.sl#L61)</sub>
+<sub>[stdlib/Security/Cryptography/ChaCha20Poly1305.sl:62](../../stdlib/Security/Cryptography/ChaCha20Poly1305.sl#L62)</sub>
 
 #### FromKey *method*
 
@@ -864,7 +879,7 @@ A box under `key`, which must be 32 bytes.
 
 - [CryptoError.KeyLength](#keylength-case) — `key` is not 32 bytes
 
-<sub>[stdlib/Security/Cryptography/ChaCha20Poly1305.sl:73](../../stdlib/Security/Cryptography/ChaCha20Poly1305.sl#L73)</sub>
+<sub>[stdlib/Security/Cryptography/ChaCha20Poly1305.sl:74](../../stdlib/Security/Cryptography/ChaCha20Poly1305.sl#L74)</sub>
 
 #### Encrypt *method*
 
@@ -893,7 +908,7 @@ secret. Pass an empty array when there is none.
 
 **See also** &nbsp; [ChaCha20Poly1305.Decrypt](#decrypt-method)
 
-<sub>[stdlib/Security/Cryptography/ChaCha20Poly1305.sl:96](../../stdlib/Security/Cryptography/ChaCha20Poly1305.sl#L96)</sub>
+<sub>[stdlib/Security/Cryptography/ChaCha20Poly1305.sl:97](../../stdlib/Security/Cryptography/ChaCha20Poly1305.sl#L97)</sub>
 
 #### Decrypt *method*
 
@@ -919,7 +934,7 @@ The plaintext, or `AuthenticationFailed` and nothing.
 
 **See also** &nbsp; [ChaCha20Poly1305.Encrypt](#encrypt-method)
 
-<sub>[stdlib/Security/Cryptography/ChaCha20Poly1305.sl:128](../../stdlib/Security/Cryptography/ChaCha20Poly1305.sl#L128)</sub>
+<sub>[stdlib/Security/Cryptography/ChaCha20Poly1305.sl:129](../../stdlib/Security/Cryptography/ChaCha20Poly1305.sl#L129)</sub>
 
 ### CipherMode *enum*
 
