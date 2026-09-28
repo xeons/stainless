@@ -215,8 +215,11 @@ internal sealed class Tls12ClientHandshake
         var key = TlsPeerKey.ReadTlsPeerKey(chain.Value[0u]);
         if (!key.Ok)
             return key.Error;
-        if (!IsTls12SuiteForKey(_suite, key.Value.Kind))
+        if (!IsTls12SuiteForKey(_suite, key.Value.Kind) ||
+            !IsTls12KeyOnSupportedCurve(key.Value.Kind, _offered._supportedGroups))
+        {
             return TlsError.UnsupportedCertificate;
+        }
         _serverKey = key.Value;
         _connection._remoteChain = chain.Value;
 

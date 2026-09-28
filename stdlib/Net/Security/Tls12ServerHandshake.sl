@@ -99,9 +99,13 @@ internal sealed class Tls12ServerHandshake
         if (_hello._hasEcPointFormats && !_hello._offersUncompressedPoints)
             return TlsError.IllegalParameter;
 
+        // A certificate on a curve the client did not name is one it cannot
+        // use, which leaves no suite for this key.
+        bool keyUsable = !_hello._hasSupportedGroups ||
+                         IsTls12KeyOnSupportedCurve(_key.Kind, _hello._supportedGroups);
         bool foundSuite = false;
         List<TlsCipherSuite> suites = _options.CipherSuites;
-        for (nuint i = 0u; i < suites.Count && !foundSuite; i++)
+        for (nuint i = 0u; i < suites.Count && !foundSuite && keyUsable; i++)
         {
             TlsCipherSuite suite = suites[i];
             if (IsTls12CipherSuite(suite) && IsTls12SuiteForKey(suite, _key.Kind) &&

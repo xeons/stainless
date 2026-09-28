@@ -275,14 +275,18 @@ void CheckEverySuiteGroupAndKey()
         {
             for (nuint g = 0u; g < groups.Count; g++)
             {
+                // The server picks the group in TLS 1.2, and the client MUST
+                // name the curve of an ECDSA certificate, so it is the
+                // server's list that is narrowed.
                 TlsClientOptions client = CreateClientOptions(ChooseCertificateForKey(key));
                 client.CipherSuites.Clear();
                 client.CipherSuites.Add(suites[s]);
-                client.KeyExchangeGroups.Clear();
-                client.KeyExchangeGroups.Add(groups[g]);
+                TlsServerOptions server = CreateServerOptionsForKey(key);
+                server.KeyExchangeGroups.Clear();
+                server.KeyExchangeGroups.Add(groups[g]);
 
                 var view = new ServerView();
-                var socket = Exchange(CreateServerOptionsForKey(key), client, payload, view);
+                var socket = Exchange(server, client, payload, view);
                 String line = DescribeKey(key) + " " + $"{suites[s]}" + " " + $"{groups[g]}" + ": ";
                 if (socket == null)
                 {
@@ -391,6 +395,19 @@ void CheckClientCertificate()
     Console.WriteLine("no client certificate:");
     Exchange(demanding, CreateClientOptions(RsaCertificate), CreatePattern(100u, 2u), refused);
     Console.WriteLine("  server: " + refused.Outcome);
+}
+
+/// A P-256 certificate is of no use to a client that did not name P-256,
+/// so the server has no suite it can choose.
+void CheckCertificateCurve()
+{
+    TlsClientOptions client = CreateClientOptions(P256Certificate);
+    client.KeyExchangeGroups.Clear();
+    client.KeyExchangeGroups.Add(TlsNamedGroup.X25519);
+    var view = new ServerView();
+    Console.WriteLine("p-256 certificate to a client naming X25519 alone:");
+    Exchange(CreateServerOptions(P256Certificate, P256Key), client, CreatePattern(10u, 1u), view);
+    Console.WriteLine("  server: " + view.Outcome);
 }
 
 void CheckExportedKeys()
@@ -515,6 +532,7 @@ int Main()
     CheckApplicationProtocols();
     CheckServerName();
     CheckClientCertificate();
+    CheckCertificateCurve();
     CheckExportedKeys();
 
     TlsProtocolVersion both = TlsProtocolVersion.Tls12 | TlsProtocolVersion.Tls13;

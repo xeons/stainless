@@ -55,6 +55,9 @@ client certificate: ok, client leaf, mutual
 no client certificate:
   client: the peer sent a fatal alert, alert HandshakeFailure
   server: a client certificate was required
+p-256 certificate to a client naming X25519 alone:
+  client: the peer sent a fatal alert, alert HandshakeFailure
+  server: no cipher suite in common
 exported keys agree: yes
 client 1.2+1.3, server 1.2+1.3:
   Tls13, TlsChaCha20Poly1305Sha256

@@ -367,6 +367,21 @@ internal bool IsTls12SuiteForKey(TlsCipherSuite suite, TlsKeyKind kind)
     return false;
 }
 
+/// Whether a TLS 1.2 certificate key of `kind` is on a curve the client
+/// named in supported_groups, as RFC 8422 §5.1.1 requires of an ECDSA key.
+/// Ed25519 and RSA are not constrained by the list.
+internal bool IsTls12KeyOnSupportedCurve(TlsKeyKind kind, List<uint> supportedGroups)
+{
+    switch (kind)
+    {
+        case TlsKeyKind.EcdsaP256:
+            return supportedGroups.Contains((uint)TlsNamedGroup.Secp256r1);
+        case TlsKeyKind.EcdsaP384:
+            return supportedGroups.Contains((uint)TlsNamedGroup.Secp384r1);
+    }
+    return true;
+}
+
 /// Whether `suite` protects records with ChaCha20-Poly1305 rather than
 /// AES-GCM.
 internal bool IsTlsChaChaCipherSuite(TlsCipherSuite suite)
