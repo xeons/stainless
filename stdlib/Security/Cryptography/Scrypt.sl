@@ -50,6 +50,7 @@ import Standard.Bits;
 /// Built on `Rfc2898DeriveBytes.Pbkdf2` over HMAC-SHA-256 and the Salsa20/8
 /// core, as the RFC defines it.
 ///
+/// @see Argon2id
 /// @see Rfc2898DeriveBytes
 public static class Scrypt
 {

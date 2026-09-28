@@ -62,9 +62,9 @@ public enum CryptoError
     AuthenticationFailed,
 
     /// A parameter outside the range the algorithm defines: an iteration count
-    /// or an output length of zero, a cost that is not a power of two or asks
-    /// for more memory than is allowed, or more data than a stream cipher's
-    /// counter covers.
+    /// or an output length of zero, a salt too short, a cost that is not a
+    /// power of two or asks for more memory than is allowed, or more data than
+    /// a stream cipher's counter covers.
     Parameter,
 
     /// The platform would not supply entropy.

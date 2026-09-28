@@ -17,9 +17,9 @@ var sealed = try cipher.EncryptCbc(plaintext, iv, PaddingMode.Pkcs7);
 ported finds the names where it left them: `Sha256`, `Hmac`, `Aes`,
 `AesGcm`, `ChaCha20Poly1305`, `Rfc2898DeriveBytes.Pbkdf2`,
 `RandomNumberGenerator.Fill`, `CryptographicOperations.FixedTimeEquals`.
-`Scrypt` is not in .NET and follows the same shape. Three things about it
-differ, and each is a rule this language already has rather than a choice
-made here:
+`Blake2b`, `Scrypt` and `Argon2id` are not in .NET and follow the same
+shape. Three things about it differ, and each is a rule this language
+already has rather than a choice made here:
 
 - **The casing is the house rule's**, not .NET's. `SHA256` is `Sha256` and
   `HMACSHA256` is `HmacSha256`, because an acronym longer than two letters
@@ -54,7 +54,7 @@ key derivation and cipher .NET ships that does not need a bignum.
 
 ## Contents
 
-**Types** &nbsp; [Aes](#aes-class) &middot; [AesGcm](#aesgcm-class) &middot; [ChaCha20](#chacha20-class) &middot; [ChaCha20Poly1305](#chacha20poly1305-class) &middot; [CipherMode](#ciphermode-enum) &middot; [CryptoError](#cryptoerror-enum) &middot; [CryptographicOperations](#cryptographicoperations-class) &middot; [HashAlgorithm](#hashalgorithm-class) &middot; [Hkdf](#hkdf-class) &middot; [Hmac](#hmac-class) &middot; [HmacMd5](#hmacmd5-class) &middot; [HmacSha1](#hmacsha1-class) &middot; [HmacSha256](#hmacsha256-class) &middot; [HmacSha384](#hmacsha384-class) &middot; [HmacSha512](#hmacsha512-class) &middot; [IHashAlgorithm](#ihashalgorithm-interface) &middot; [Md5](#md5-class) &middot; [PaddingMode](#paddingmode-enum) &middot; [Poly1305](#poly1305-class) &middot; [RandomNumberGenerator](#randomnumbergenerator-class) &middot; [Rfc2898DeriveBytes](#rfc2898derivebytes-class) &middot; [Scrypt](#scrypt-class) &middot; [Sha1](#sha1-class) &middot; [Sha256](#sha256-class) &middot; [Sha2Wide](#sha2wide-class) &middot; [Sha384](#sha384-class) &middot; [Sha512](#sha512-class)
+**Types** &nbsp; [Aes](#aes-class) &middot; [AesGcm](#aesgcm-class) &middot; [Argon2id](#argon2id-class) &middot; [Blake2b](#blake2b-class) &middot; [ChaCha20](#chacha20-class) &middot; [ChaCha20Poly1305](#chacha20poly1305-class) &middot; [CipherMode](#ciphermode-enum) &middot; [CryptoError](#cryptoerror-enum) &middot; [CryptographicOperations](#cryptographicoperations-class) &middot; [HashAlgorithm](#hashalgorithm-class) &middot; [Hkdf](#hkdf-class) &middot; [Hmac](#hmac-class) &middot; [HmacMd5](#hmacmd5-class) &middot; [HmacSha1](#hmacsha1-class) &middot; [HmacSha256](#hmacsha256-class) &middot; [HmacSha384](#hmacsha384-class) &middot; [HmacSha512](#hmacsha512-class) &middot; [IHashAlgorithm](#ihashalgorithm-interface) &middot; [Md5](#md5-class) &middot; [PaddingMode](#paddingmode-enum) &middot; [Poly1305](#poly1305-class) &middot; [RandomNumberGenerator](#randomnumbergenerator-class) &middot; [Rfc2898DeriveBytes](#rfc2898derivebytes-class) &middot; [Scrypt](#scrypt-class) &middot; [Sha1](#sha1-class) &middot; [Sha256](#sha256-class) &middot; [Sha2Wide](#sha2wide-class) &middot; [Sha384](#sha384-class) &middot; [Sha512](#sha512-class)
 
 ## Types
 
@@ -412,6 +412,274 @@ The plaintext, or `AuthenticationFailed` and nothing.
 **See also** &nbsp; [AesGcm.Encrypt](#encrypt-method)
 
 <sub>[stdlib/Security/Cryptography/AesGcm.sl:135](../../stdlib/Security/Cryptography/AesGcm.sl#L135)</sub>
+
+### Argon2id *class*
+
+```
+class Argon2id
+```
+
+Argon2id (RFC 9106), version 0x13: the password hash RFC 9106 recommends,
+and the one to choose where no format decides.
+
+```csharp
+var key = try Argon2id.DeriveKey(password, salt, 3u, 65536u, 4u, 32u);
+```
+
+**Memory and passes are the cost.** `memoryKiB` is what each guess has to
+hold, `iterations` how many times it is walked. RFC 9106 §4 gives two
+starting points: 2 GiB and one pass where the memory can be spared, and
+64 MiB and three passes where it cannot. Raise memory before passes.
+
+**Half of it is data-independent and half is not, and that is the design.**
+The first half of the first pass chooses which blocks to mix from a counter,
+as Argon2i does, so a cache-timing attacker watching it learns nothing
+about the password. Everything after chooses them from the data, as Argon2d
+does, which is what makes a trade of memory for time expensive and is also
+a timing channel in principle. That second half is inherent in Argon2id.
+
+**The lanes are computed one after another.** `parallelism` is part of the
+function, so it changes the answer and has to match whatever else computes
+it, but here it buys no speed.
+
+**See also** &nbsp; [Blake2b](#blake2b-class) &middot; [Scrypt](#scrypt-class)
+
+<sub>[stdlib/Security/Cryptography/Argon2id.sl:54](../../stdlib/Security/Cryptography/Argon2id.sl#L54)</sub>
+
+#### MaxMemoryKiB *constant*
+
+```
+const nuint MaxMemoryKiB = 4194304
+```
+
+The most memory a derivation may ask for: 4 GiB. Parameters read from
+a stored hash are input like any other, and this bounds what one can
+make a call allocate.
+
+**Value** &nbsp; 2^22 KiB.
+
+<sub>[stdlib/Security/Cryptography/Argon2id.sl:61](../../stdlib/Security/Cryptography/Argon2id.sl#L61)</sub>
+
+#### MinSaltSize *constant*
+
+```
+const nuint MinSaltSize = 8
+```
+
+The shortest salt. RFC 9106 recommends sixteen random bytes.
+
+**Value** &nbsp; eight bytes.
+
+<sub>[stdlib/Security/Cryptography/Argon2id.sl:66](../../stdlib/Security/Cryptography/Argon2id.sl#L66)</sub>
+
+#### DeriveKey *method*
+
+```
+static Result<byte[], CryptoError> DeriveKey(ReadOnlySpan<byte> password, ReadOnlySpan<byte> salt, nuint iterations, nuint memoryKiB, nuint parallelism, nuint length)
+```
+
+`length` bytes derived from `password` and `salt`.
+
+**Parameters**
+
+- `password` — the secret to stretch
+- `salt` — at least `MinSaltSize` random bytes, sixteen recommended, stored beside the result
+- `iterations` — t, how many passes over the memory
+- `memoryKiB` — m, how many kibibytes to fill; at least eight per lane
+- `parallelism` — p, how many lanes, computed one after another here
+- `length` — how many bytes to derive, at least four
+
+**Fails with**
+
+- [CryptoError.Parameter](#parameter-case) — a parameter is outside RFC 9106 §3.1, `salt` is shorter than `MinSaltSize`, or `memoryKiB` is past `MaxMemoryKiB`
+
+<sub>[stdlib/Security/Cryptography/Argon2id.sl:80](../../stdlib/Security/Cryptography/Argon2id.sl#L80)</sub>
+
+#### DeriveKey *method*
+
+```
+static Result<byte[], CryptoError> DeriveKey(ReadOnlySpan<byte> password, ReadOnlySpan<byte> salt, nuint iterations, nuint memoryKiB, nuint parallelism, nuint length, ReadOnlySpan<byte> secret, ReadOnlySpan<byte> associatedData)
+```
+
+`length` bytes derived from `password` and `salt`, bound to a secret
+kept apart from the stored hashes and to associated data.
+
+`secret` is a pepper: a key the server holds outside the database, so
+that a stolen table of hashes cannot be attacked without it as well.
+
+**Parameters**
+
+- `password` — the secret to stretch
+- `salt` — at least `MinSaltSize` random bytes, stored beside the result
+- `iterations` — t, how many passes over the memory
+- `memoryKiB` — m, how many kibibytes to fill; at least eight per lane
+- `parallelism` — p, how many lanes, computed one after another here
+- `length` — how many bytes to derive, at least four
+- `secret` — K, a key held apart from the hashes; empty for none
+- `associatedData` — X, bound into the result and not secret; empty for none
+
+**Fails with**
+
+- [CryptoError.Parameter](#parameter-case) — a parameter is outside RFC 9106 §3.1, `salt` is shorter than `MinSaltSize`, or `memoryKiB` is past `MaxMemoryKiB`
+
+<sub>[stdlib/Security/Cryptography/Argon2id.sl:104](../../stdlib/Security/Cryptography/Argon2id.sl#L104)</sub>
+
+### Blake2b *class*
+
+```
+sealed class Blake2b : IHashAlgorithm
+```
+
+BLAKE2b (RFC 7693): a hash as strong as SHA-3 and faster than SHA-256, with
+a key and a digest length of its own.
+
+```csharp
+var digest = Blake2b.HashData(data);
+var mac = try Blake2b.FromKey(key, 32u);
+mac.AppendData(message);
+var tag = mac.GetHashAndReset();
+```
+
+**A keyed BLAKE2b is a MAC on its own.** It is not a Merkle-Damgård hash,
+so it cannot be extended the way `Sha256.HashData(key + message)` can, and
+HMAC's two passes buy nothing. The key goes in its own first block.
+
+**The digest length is a parameter, not a truncation.** BLAKE2b-256 is not
+the first half of BLAKE2b-512: the length is mixed into the initial state,
+so every length is its own function.
+
+Not in .NET. It is here because Argon2 is built on it, and it fits
+`IHashAlgorithm` as it is, so `Hmac` takes it like any other.
+
+**See also** &nbsp; [Argon2id](#argon2id-class)
+
+<sub>[stdlib/Security/Cryptography/Blake2b.sl:51](../../stdlib/Security/Cryptography/Blake2b.sl#L51)</sub>
+
+#### MaxHashSize *constant*
+
+```
+const nuint MaxHashSize = 64
+```
+
+The longest digest, and the one `new Blake2b()` gives.
+
+**Value** &nbsp; sixty-four bytes.
+
+<sub>[stdlib/Security/Cryptography/Blake2b.sl:56](../../stdlib/Security/Cryptography/Blake2b.sl#L56)</sub>
+
+#### MaxKeySize *constant*
+
+```
+const nuint MaxKeySize = 64
+```
+
+The longest key.
+
+**Value** &nbsp; sixty-four bytes.
+
+<sub>[stdlib/Security/Cryptography/Blake2b.sl:61](../../stdlib/Security/Cryptography/Blake2b.sl#L61)</sub>
+
+#### FromKey *method*
+
+```
+static Result<Blake2b, CryptoError> FromKey(ReadOnlySpan<byte> key, nuint hashSize)
+```
+
+A BLAKE2b under `key` giving `hashSize` bytes. An empty key is the
+unkeyed hash of that length.
+
+**Parameters**
+
+- `key` — at most `MaxKeySize` bytes; empty for none
+- `hashSize` — one to `MaxHashSize` bytes of digest
+
+**Fails with**
+
+- [CryptoError.KeyLength](#keylength-case) — `key` is longer than `MaxKeySize`
+- [CryptoError.Parameter](#parameter-case) — `hashSize` is zero or past `MaxHashSize`
+
+<sub>[stdlib/Security/Cryptography/Blake2b.sl:112](../../stdlib/Security/Cryptography/Blake2b.sl#L112)</sub>
+
+#### HashData *method*
+
+```
+static byte[] HashData(ReadOnlySpan<byte> data)
+```
+
+The BLAKE2b-512 digest of `data`, with no object to keep.
+
+<sub>[stdlib/Security/Cryptography/Blake2b.sl:122](../../stdlib/Security/Cryptography/Blake2b.sl#L122)</sub>
+
+#### Name *property*
+
+```
+String Name { get; }
+```
+
+`BLAKE2b-512`, or the length this one was made with, in bits.
+
+<sub>[stdlib/Security/Cryptography/Blake2b.sl:125](../../stdlib/Security/Cryptography/Blake2b.sl#L125)</sub>
+
+#### HashSizeInBytes *property*
+
+```
+nuint HashSizeInBytes { get; }
+```
+
+*No documentation.*
+
+<sub>[stdlib/Security/Cryptography/Blake2b.sl:127](../../stdlib/Security/Cryptography/Blake2b.sl#L127)</sub>
+
+#### BlockSizeInBytes *property*
+
+```
+nuint BlockSizeInBytes { get; }
+```
+
+*No documentation.*
+
+<sub>[stdlib/Security/Cryptography/Blake2b.sl:129](../../stdlib/Security/Cryptography/Blake2b.sl#L129)</sub>
+
+#### AppendData *method*
+
+```
+void AppendData(ReadOnlySpan<byte> data)
+```
+
+*No documentation.*
+
+<sub>[stdlib/Security/Cryptography/Blake2b.sl:131](../../stdlib/Security/Cryptography/Blake2b.sl#L131)</sub>
+
+#### GetHashAndReset *method*
+
+```
+byte[] GetHashAndReset()
+```
+
+*No documentation.*
+
+<sub>[stdlib/Security/Cryptography/Blake2b.sl:157](../../stdlib/Security/Cryptography/Blake2b.sl#L157)</sub>
+
+#### Reset *method*
+
+```
+void Reset()
+```
+
+*No documentation.*
+
+<sub>[stdlib/Security/Cryptography/Blake2b.sl:177](../../stdlib/Security/Cryptography/Blake2b.sl#L177)</sub>
+
+#### ComputeHash *method*
+
+```
+byte[] ComputeHash(ReadOnlySpan<byte> data)
+```
+
+The digest of `data` on its own. Resets first, so an object that has
+been appended to is still safe to ask.
+
+<sub>[stdlib/Security/Cryptography/Blake2b.sl:201](../../stdlib/Security/Cryptography/Blake2b.sl#L201)</sub>
 
 ### ChaCha20 *class*
 
@@ -801,9 +1069,9 @@ Parameter
 ```
 
 A parameter outside the range the algorithm defines: an iteration count
-or an output length of zero, a cost that is not a power of two or asks
-for more memory than is allowed, or more data than a stream cipher's
-counter covers.
+or an output length of zero, a salt too short, a cost that is not a
+power of two or asks for more memory than is allowed, or more data than
+a stream cipher's counter covers.
 
 <sub>[stdlib/Security/Cryptography/CryptoError.sl:68](../../stdlib/Security/Cryptography/CryptoError.sl#L68)</sub>
 
@@ -1644,8 +1912,8 @@ count from an old program is a count that has stopped meaning anything.
 
 **This is the weakest of the modern password hashes.** PBKDF2 costs an
 attacker with a GPU very much less than it costs a server, because it needs
-no memory. `Scrypt` exists to close that gap. Use PBKDF2 where a format
-specifies it, and understand what it does not buy.
+no memory. `Argon2id` and `Scrypt` exist to close that gap. Use PBKDF2
+where a format specifies it, and understand what it does not buy.
 
 <sub>[stdlib/Security/Cryptography/Rfc2898DeriveBytes.sl:41](../../stdlib/Security/Cryptography/Rfc2898DeriveBytes.sl#L41)</sub>
 
@@ -1673,9 +1941,9 @@ job is to make one attack per password rather than one per database.
 
 - [CryptoError.Parameter](#parameter-case) — `iterations` or `length` is zero
 
-**See also** &nbsp; [Scrypt](#scrypt-class)
+**See also** &nbsp; [Argon2id](#argon2id-class) &middot; [Scrypt](#scrypt-class)
 
-<sub>[stdlib/Security/Cryptography/Rfc2898DeriveBytes.sl:56](../../stdlib/Security/Cryptography/Rfc2898DeriveBytes.sl#L56)</sub>
+<sub>[stdlib/Security/Cryptography/Rfc2898DeriveBytes.sl:57](../../stdlib/Security/Cryptography/Rfc2898DeriveBytes.sl#L57)</sub>
 
 ### Scrypt *class*
 
@@ -1707,9 +1975,9 @@ which is why RFC 9106 prefers it.
 Built on `Rfc2898DeriveBytes.Pbkdf2` over HMAC-SHA-256 and the Salsa20/8
 core, as the RFC defines it.
 
-**See also** &nbsp; [Rfc2898DeriveBytes](#rfc2898derivebytes-class)
+**See also** &nbsp; [Argon2id](#argon2id-class) &middot; [Rfc2898DeriveBytes](#rfc2898derivebytes-class)
 
-<sub>[stdlib/Security/Cryptography/Scrypt.sl:54](../../stdlib/Security/Cryptography/Scrypt.sl#L54)</sub>
+<sub>[stdlib/Security/Cryptography/Scrypt.sl:55](../../stdlib/Security/Cryptography/Scrypt.sl#L55)</sub>
 
 #### MaxMemoryBytes *constant*
 
@@ -1724,7 +1992,7 @@ allocate.
 
 **Value** &nbsp; 2^32 bytes.
 
-<sub>[stdlib/Security/Cryptography/Scrypt.sl:62](../../stdlib/Security/Cryptography/Scrypt.sl#L62)</sub>
+<sub>[stdlib/Security/Cryptography/Scrypt.sl:63](../../stdlib/Security/Cryptography/Scrypt.sl#L63)</sub>
 
 #### DeriveKey *method*
 
@@ -1747,7 +2015,7 @@ static Result<byte[], CryptoError> DeriveKey(ReadOnlySpan<byte> password, ReadOn
 
 - [CryptoError.Parameter](#parameter-case) — `cost` is not a power of two above one; `blockSize`, `parallelism` or `length` is zero; `blockSize` times `parallelism` reaches 2^30; `cost` reaches 2^(16 · `blockSize`); `length` is past (2^32 - 1) · 32; or the memory needed is past `MaxMemoryBytes`
 
-<sub>[stdlib/Security/Cryptography/Scrypt.sl:78](../../stdlib/Security/Cryptography/Scrypt.sl#L78)</sub>
+<sub>[stdlib/Security/Cryptography/Scrypt.sl:79](../../stdlib/Security/Cryptography/Scrypt.sl#L79)</sub>
 
 ### Sha1 *class*
 

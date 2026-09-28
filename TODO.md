@@ -548,10 +548,11 @@ decision about what to write.
 ### Public-key cryptography
 
 `Standard.Security.Cryptography` is the symmetric half and is complete: MD5,
-SHA-1, SHA-256, SHA-384, SHA-512, HMAC over any of them, PBKDF2, HKDF, scrypt,
-AES in ECB, CBC, CFB and CTR, AES-GCM, ChaCha20-Poly1305, the platform's
-entropy, and a constant-time comparison. Every answer is pinned against a published vector by
-`tests/cases/cryptography`.
+SHA-1, SHA-256, SHA-384, SHA-512, BLAKE2b, HMAC over any of them, PBKDF2, HKDF,
+scrypt, Argon2id, AES in ECB, CBC, CFB and CTR, AES-GCM, ChaCha20-Poly1305, the
+platform's entropy, and a constant-time comparison. Every answer is pinned
+against a published vector by `tests/cases/cryptography`, `crypto-chacha` and
+`crypto-kdf`.
 
 **RSA, ECDsa, ECDiffieHellman and X.509 are not there, and none of them is the
 work.** The work underneath all four is an arbitrary-precision integer:
@@ -565,9 +566,6 @@ The honest alternatives are to write it, to bind to a library that has
 or to say that this standard library does the symmetric half and expects a
 program needing a signature to reach outside. **The third is what is happening
 and it should be a decision rather than a gap.**
-
-One smaller thing is also absent and is not blocked on any of that: Argon2,
-which RFC 9106 prefers to scrypt for its data-independent first half.
 
 ### AES that does not leak through the cache
 
