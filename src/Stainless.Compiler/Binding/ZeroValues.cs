@@ -48,11 +48,6 @@ internal static class ZeroValues
             case OptionalTypeSymbol or WeakTypeSymbol or PointerTypeSymbol or DelegateTypeSymbol:
                 return null;
 
-            // An empty slice: its length is zero, so its array word is never
-            // read. The array field MUST become `T[]?` when that exists.
-            case SliceTypeSymbol:
-                return null;
-
             // A union may not hold a counted reference, so its bytes hold
             // none to be null.
             case UnionTypeSymbol:

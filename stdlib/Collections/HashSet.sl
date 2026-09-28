@@ -21,6 +21,8 @@
 
 module Standard.Collections;
 
+import Standard.Unchecked;
+
 // ----------------------------------------------------------------- hash set
 
 /// A set of distinct values, with membership in constant time.
@@ -33,15 +35,13 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable
 {
     T[] _items;
     bool[] _filled;
-    T[] _noItem;
     nuint _count;
 
     /// An empty set with room for a few items before it first grows.
     public HashSet()
     {
-        _items = new T[8];
+        _items = NewUninitializedArray<T>(8);
         _filled = new bool[8];
-        _noItem = new T[1];
         _count = 0;
     }
 
@@ -124,7 +124,7 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable
             i = j;
         }
 
-        _items[i] = _noItem[0];
+        ClearElement(_items, i);
         _filled[i] = false;
         _count--;
         return true;
@@ -134,7 +134,7 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable
     /// anything they held is released now.
     public void Clear()
     {
-        _items = new T[8];
+        _items = NewUninitializedArray<T>(8);
         _filled = new bool[8];
         _count = 0;
     }
@@ -212,7 +212,7 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable
         var oldItems = _items;
         var oldFilled = _filled;
 
-        _items = new T[oldItems.Length * 2];
+        _items = NewUninitializedArray<T>(oldItems.Length * 2);
         _filled = new bool[oldFilled.Length * 2];
         _count = 0;
 

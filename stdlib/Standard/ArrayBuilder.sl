@@ -21,6 +21,8 @@
 
 module Standard;
 
+import Standard.Unchecked;
+
 // What a collection expression lowers to when it has a `..` in it. Nothing
 // here is public: the compiler calls these, and a program writes `[..a, b]`.
 
@@ -37,7 +39,7 @@ class ArrayBuilder<T>
     /// @param capacity  the elements already known to be coming
     public ArrayBuilder(nuint capacity)
     {
-        _items = new T[capacity < 4u ? 4u : capacity];
+        _items = NewUninitializedArray<T>(capacity < 4u ? 4u : capacity);
         _count = 0u;
     }
 
@@ -46,7 +48,7 @@ class ArrayBuilder<T>
     {
         if (_count == _items.Length)
         {
-            var grown = new T[_items.Length * 2u];
+            var grown = NewUninitializedArray<T>(_items.Length * 2u);
             _items[:_count].CopyTo(grown);
             _items = grown;
         }

@@ -463,16 +463,15 @@ public double Average<T>(IEnumerable<T> items, Func<T, double> selector)
 /// @typeparam T  the element type, which must order itself
 public T Min<T>(ReadOnlySpan<T> items) where T : IComparable<T>
 {
-    bool any = false;
-    T best = default(T);
-    foreach (var item in items)
-    {
-        if (!any || item.CompareTo(best) < 0)
-            best = item;
-        any = true;
-    }
-    if (!any)
+    if (items.Length == 0u)
         sl_fail("Min: the sequence is empty");
+
+    T best = items[0u];
+    for (nuint i = 1u; i < items.Length; i++)
+    {
+        if (items[i].CompareTo(best) < 0)
+            best = items[i];
+    }
     return best;
 }
 
@@ -484,43 +483,41 @@ public T Min<T>(ReadOnlySpan<T> items) where T : IComparable<T>
 public TResult Min<T, TResult>(ReadOnlySpan<T> items, Func<T, TResult> selector)
     where TResult : IComparable<TResult>
 {
-    bool any = false;
-    TResult best = default(TResult);
-    foreach (var item in items)
-    {
-        var value = selector(item);
-        if (!any || value.CompareTo(best) < 0)
-            best = value;
-        any = true;
-    }
-    if (!any)
+    if (items.Length == 0u)
         sl_fail("Min: the sequence is empty");
+
+    TResult best = selector(items[0u]);
+    for (nuint i = 1u; i < items.Length; i++)
+    {
+        var value = selector(items[i]);
+        if (value.CompareTo(best) < 0)
+            best = value;
+    }
     return best;
 }
 
-/// The element whose key is the smallest, aborting when there are none. The
-/// first of equal keys wins.
+/// The element whose key is the smallest, or none when there are no elements.
+/// The first of equal keys wins.
 ///
 /// @typeparam T     the element type; the key selector reads the key off it
 /// @typeparam TKey  the key, which must order itself
-public T MinBy<T, TKey>(ReadOnlySpan<T> items, Func<T, TKey> keySelector)
+public Optional<T> MinBy<T, TKey>(ReadOnlySpan<T> items, Func<T, TKey> keySelector)
     where TKey : IComparable<TKey>
 {
-    bool any = false;
-    T best = default(T);
-    TKey bestKey = default(TKey);
-    foreach (var item in items)
+    if (items.Length == 0u)
+        return None;
+
+    T best = items[0u];
+    TKey bestKey = keySelector(best);
+    for (nuint i = 1u; i < items.Length; i++)
     {
-        var key = keySelector(item);
-        if (!any || key.CompareTo(bestKey) < 0)
+        var key = keySelector(items[i]);
+        if (key.CompareTo(bestKey) < 0)
         {
-            best = item;
+            best = items[i];
             bestKey = key;
         }
-        any = true;
     }
-    if (!any)
-        sl_fail("MinBy: the sequence is empty");
     return best;
 }
 
@@ -530,16 +527,15 @@ public T MinBy<T, TKey>(ReadOnlySpan<T> items, Func<T, TKey> keySelector)
 /// @typeparam T  the element type, which must order itself
 public T Max<T>(ReadOnlySpan<T> items) where T : IComparable<T>
 {
-    bool any = false;
-    T best = default(T);
-    foreach (var item in items)
-    {
-        if (!any || item.CompareTo(best) > 0)
-            best = item;
-        any = true;
-    }
-    if (!any)
+    if (items.Length == 0u)
         sl_fail("Max: the sequence is empty");
+
+    T best = items[0u];
+    for (nuint i = 1u; i < items.Length; i++)
+    {
+        if (items[i].CompareTo(best) > 0)
+            best = items[i];
+    }
     return best;
 }
 
@@ -551,43 +547,41 @@ public T Max<T>(ReadOnlySpan<T> items) where T : IComparable<T>
 public TResult Max<T, TResult>(ReadOnlySpan<T> items, Func<T, TResult> selector)
     where TResult : IComparable<TResult>
 {
-    bool any = false;
-    TResult best = default(TResult);
-    foreach (var item in items)
-    {
-        var value = selector(item);
-        if (!any || value.CompareTo(best) > 0)
-            best = value;
-        any = true;
-    }
-    if (!any)
+    if (items.Length == 0u)
         sl_fail("Max: the sequence is empty");
+
+    TResult best = selector(items[0u]);
+    for (nuint i = 1u; i < items.Length; i++)
+    {
+        var value = selector(items[i]);
+        if (value.CompareTo(best) > 0)
+            best = value;
+    }
     return best;
 }
 
-/// The element whose key is the largest, aborting when there are none. The
-/// first of equal keys wins.
+/// The element whose key is the largest, or none when there are no elements.
+/// The first of equal keys wins.
 ///
 /// @typeparam T     the element type; the key selector reads the key off it
 /// @typeparam TKey  the key, which must order itself
-public T MaxBy<T, TKey>(ReadOnlySpan<T> items, Func<T, TKey> keySelector)
+public Optional<T> MaxBy<T, TKey>(ReadOnlySpan<T> items, Func<T, TKey> keySelector)
     where TKey : IComparable<TKey>
 {
-    bool any = false;
-    T best = default(T);
-    TKey bestKey = default(TKey);
-    foreach (var item in items)
+    if (items.Length == 0u)
+        return None;
+
+    T best = items[0u];
+    TKey bestKey = keySelector(best);
+    for (nuint i = 1u; i < items.Length; i++)
     {
-        var key = keySelector(item);
-        if (!any || key.CompareTo(bestKey) > 0)
+        var key = keySelector(items[i]);
+        if (key.CompareTo(bestKey) > 0)
         {
-            best = item;
+            best = items[i];
             bestKey = key;
         }
-        any = true;
     }
-    if (!any)
-        sl_fail("MaxBy: the sequence is empty");
     return best;
 }
 
@@ -597,16 +591,17 @@ public T MaxBy<T, TKey>(ReadOnlySpan<T> items, Func<T, TKey> keySelector)
 /// @typeparam T  the element type, which must order itself
 public T Min<T>(IEnumerable<T> items) where T : IComparable<T>
 {
-    bool any = false;
-    T best = default(T);
-    foreach (var item in items)
-    {
-        if (!any || item.CompareTo(best) < 0)
-            best = item;
-        any = true;
-    }
-    if (!any)
+    var walk = items.GetEnumerator();
+    if (!walk.MoveNext())
         sl_fail("Min: the sequence is empty");
+
+    T best = walk.Current;
+    while (walk.MoveNext())
+    {
+        T item = walk.Current;
+        if (item.CompareTo(best) < 0)
+            best = item;
+    }
     return best;
 }
 
@@ -618,43 +613,44 @@ public T Min<T>(IEnumerable<T> items) where T : IComparable<T>
 public TResult Min<T, TResult>(IEnumerable<T> items, Func<T, TResult> selector)
     where TResult : IComparable<TResult>
 {
-    bool any = false;
-    TResult best = default(TResult);
-    foreach (var item in items)
-    {
-        var value = selector(item);
-        if (!any || value.CompareTo(best) < 0)
-            best = value;
-        any = true;
-    }
-    if (!any)
+    var walk = items.GetEnumerator();
+    if (!walk.MoveNext())
         sl_fail("Min: the sequence is empty");
+
+    TResult best = selector(walk.Current);
+    while (walk.MoveNext())
+    {
+        var value = selector(walk.Current);
+        if (value.CompareTo(best) < 0)
+            best = value;
+    }
     return best;
 }
 
-/// The element whose key is the smallest, aborting when there are none. The
-/// first of equal keys wins.
+/// The element whose key is the smallest, or none when there are no elements.
+/// The first of equal keys wins.
 ///
 /// @typeparam T     the element type; the key selector reads the key off it
 /// @typeparam TKey  the key, which must order itself
-public T MinBy<T, TKey>(IEnumerable<T> items, Func<T, TKey> keySelector)
+public Optional<T> MinBy<T, TKey>(IEnumerable<T> items, Func<T, TKey> keySelector)
     where TKey : IComparable<TKey>
 {
-    bool any = false;
-    T best = default(T);
-    TKey bestKey = default(TKey);
-    foreach (var item in items)
+    var walk = items.GetEnumerator();
+    if (!walk.MoveNext())
+        return None;
+
+    T best = walk.Current;
+    TKey bestKey = keySelector(best);
+    while (walk.MoveNext())
     {
+        T item = walk.Current;
         var key = keySelector(item);
-        if (!any || key.CompareTo(bestKey) < 0)
+        if (key.CompareTo(bestKey) < 0)
         {
             best = item;
             bestKey = key;
         }
-        any = true;
     }
-    if (!any)
-        sl_fail("MinBy: the sequence is empty");
     return best;
 }
 
@@ -664,16 +660,17 @@ public T MinBy<T, TKey>(IEnumerable<T> items, Func<T, TKey> keySelector)
 /// @typeparam T  the element type, which must order itself
 public T Max<T>(IEnumerable<T> items) where T : IComparable<T>
 {
-    bool any = false;
-    T best = default(T);
-    foreach (var item in items)
-    {
-        if (!any || item.CompareTo(best) > 0)
-            best = item;
-        any = true;
-    }
-    if (!any)
+    var walk = items.GetEnumerator();
+    if (!walk.MoveNext())
         sl_fail("Max: the sequence is empty");
+
+    T best = walk.Current;
+    while (walk.MoveNext())
+    {
+        T item = walk.Current;
+        if (item.CompareTo(best) > 0)
+            best = item;
+    }
     return best;
 }
 
@@ -685,43 +682,44 @@ public T Max<T>(IEnumerable<T> items) where T : IComparable<T>
 public TResult Max<T, TResult>(IEnumerable<T> items, Func<T, TResult> selector)
     where TResult : IComparable<TResult>
 {
-    bool any = false;
-    TResult best = default(TResult);
-    foreach (var item in items)
-    {
-        var value = selector(item);
-        if (!any || value.CompareTo(best) > 0)
-            best = value;
-        any = true;
-    }
-    if (!any)
+    var walk = items.GetEnumerator();
+    if (!walk.MoveNext())
         sl_fail("Max: the sequence is empty");
+
+    TResult best = selector(walk.Current);
+    while (walk.MoveNext())
+    {
+        var value = selector(walk.Current);
+        if (value.CompareTo(best) > 0)
+            best = value;
+    }
     return best;
 }
 
-/// The element whose key is the largest, aborting when there are none. The
-/// first of equal keys wins.
+/// The element whose key is the largest, or none when there are no elements.
+/// The first of equal keys wins.
 ///
 /// @typeparam T     the element type; the key selector reads the key off it
 /// @typeparam TKey  the key, which must order itself
-public T MaxBy<T, TKey>(IEnumerable<T> items, Func<T, TKey> keySelector)
+public Optional<T> MaxBy<T, TKey>(IEnumerable<T> items, Func<T, TKey> keySelector)
     where TKey : IComparable<TKey>
 {
-    bool any = false;
-    T best = default(T);
-    TKey bestKey = default(TKey);
-    foreach (var item in items)
+    var walk = items.GetEnumerator();
+    if (!walk.MoveNext())
+        return None;
+
+    T best = walk.Current;
+    TKey bestKey = keySelector(best);
+    while (walk.MoveNext())
     {
+        T item = walk.Current;
         var key = keySelector(item);
-        if (!any || key.CompareTo(bestKey) > 0)
+        if (key.CompareTo(bestKey) > 0)
         {
             best = item;
             bestKey = key;
         }
-        any = true;
     }
-    if (!any)
-        sl_fail("MaxBy: the sequence is empty");
     return best;
 }
 
@@ -733,15 +731,12 @@ public T MaxBy<T, TKey>(IEnumerable<T> items, Func<T, TKey> keySelector)
 /// @typeparam T  the element type; `combine` does the work
 public T Aggregate<T>(ReadOnlySpan<T> items, Func<T, T, T> combine)
 {
-    bool any = false;
-    T total = default(T);
-    foreach (var item in items)
-    {
-        total = any ? combine(total, item) : item;
-        any = true;
-    }
-    if (!any)
+    if (items.Length == 0u)
         sl_fail("Aggregate: the sequence is empty");
+
+    T total = items[0u];
+    for (nuint i = 1u; i < items.Length; i++)
+        total = combine(total, items[i]);
     return total;
 }
 
@@ -751,14 +746,12 @@ public T Aggregate<T>(ReadOnlySpan<T> items, Func<T, T, T> combine)
 /// @typeparam T  the element type; `combine` does the work
 public T Aggregate<T>(IEnumerable<T> items, Func<T, T, T> combine)
 {
-    bool any = false;
-    T total = default(T);
-    foreach (var item in items)
-    {
-        total = any ? combine(total, item) : item;
-        any = true;
-    }
-    if (!any)
+    var walk = items.GetEnumerator();
+    if (!walk.MoveNext())
         sl_fail("Aggregate: the sequence is empty");
+
+    T total = walk.Current;
+    while (walk.MoveNext())
+        total = combine(total, walk.Current);
     return total;
 }

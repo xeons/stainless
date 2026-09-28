@@ -55,7 +55,6 @@ public T First<T>(ReadOnlySpan<T> items, Predicate<T> test)
             return item;
     }
     sl_fail("First: no element matches");
-    return default(T);
 }
 
 /// The first element, or `fallback` when there is none.
@@ -85,7 +84,6 @@ public T Last<T>(ReadOnlySpan<T> items, Predicate<T> test)
             return items[i - 1u];
     }
     sl_fail("Last: no element matches");
-    return default(T);
 }
 
 /// The last element, or `fallback` when there is none.
@@ -126,7 +124,6 @@ public T Single<T>(ReadOnlySpan<T> items, Predicate<T> test)
     if (FindOnly(items, test) is Some only)
         return items[only.Value];
     sl_fail("Single: no element matches");
-    return default(T);
 }
 
 /// The only element, `fallback` when there is none, and an abort when there
@@ -189,7 +186,6 @@ public T First<T>(IEnumerable<T> items)
     foreach (var item in items)
         return item;
     sl_fail("First: the sequence is empty");
-    return default(T);
 }
 
 /// The first element the predicate accepts, aborting when there is none.
@@ -204,7 +200,6 @@ public T First<T>(IEnumerable<T> items, Predicate<T> test)
             return item;
     }
     sl_fail("First: no element matches");
-    return default(T);
 }
 
 /// The first element, or `fallback` when there is none.
@@ -276,7 +271,6 @@ public T ElementAt<T>(IEnumerable<T> items, nuint index)
         at++;
     }
     sl_array_bounds_fail(index, at);
-    return default(T);
 }
 
 /// The element at `index`, or `fallback` past the end.

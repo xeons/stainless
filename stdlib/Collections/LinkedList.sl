@@ -21,6 +21,8 @@
 
 module Standard.Collections;
 
+import Standard.Unchecked;
+
 // ------------------------------------------------------------- linked list
 
 /// A doubly linked list whose links are indices into a pool rather than
@@ -52,7 +54,6 @@ public class LinkedList<T> : IEnumerable<T>
     T[] _items;
     nint[] _next;
     nint[] _previous;
-    T[] _blank;
 
     nint _head;
     nint _tail;
@@ -63,10 +64,9 @@ public class LinkedList<T> : IEnumerable<T>
     /// An empty list with a small pool, grown as nodes are needed.
     public LinkedList()
     {
-        _items = new T[8];
+        _items = NewUninitializedArray<T>(8);
         _next = new nint[8];
         _previous = new nint[8];
-        _blank = new T[1];
         _head = -1;
         _tail = -1;
         _free = -1;
@@ -227,7 +227,7 @@ public class LinkedList<T> : IEnumerable<T>
             _tail = before;
         }
 
-        _items[at] = _blank[0];
+        ClearElement(_items, at);
         _previous[at] = -1;
         _next[at] = _free;
         _free = handle;
@@ -265,7 +265,7 @@ public class LinkedList<T> : IEnumerable<T>
     /// out is dead afterwards.
     public void Clear()
     {
-        _items = new T[8];
+        _items = NewUninitializedArray<T>(8);
         _next = new nint[8];
         _previous = new nint[8];
         _head = -1;
@@ -324,7 +324,7 @@ public class LinkedList<T> : IEnumerable<T>
     {
         nuint size = _items.Length * 2;
 
-        var biggerItems = new T[size];
+        var biggerItems = NewUninitializedArray<T>(size);
         var biggerNext = new nint[size];
         var biggerPrevious = new nint[size];
 

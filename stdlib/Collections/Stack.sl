@@ -21,6 +21,8 @@
 
 module Standard.Collections;
 
+import Standard.Unchecked;
+
 // ------------------------------------------------------------------- stack
 
 /// Last in, first out. The top is the end of the array, so nothing moves.
@@ -29,14 +31,12 @@ module Standard.Collections;
 public class Stack<T> : IEnumerable<T>
 {
     T[] _items;
-    T[] _blank;
     nuint _count;
 
     /// An empty stack with room for a few items before it first grows.
     public Stack()
     {
-        _items = new T[8];
-        _blank = new T[1];
+        _items = NewUninitializedArray<T>(8);
         _count = 0;
     }
 
@@ -75,7 +75,7 @@ public class Stack<T> : IEnumerable<T>
 
         _count--;
         var item = _items[_count];
-        _items[_count] = _blank[0];
+        ClearElement(_items, _count);
         return item;
     }
 
@@ -93,7 +93,7 @@ public class Stack<T> : IEnumerable<T>
     /// anything it held is released now.
     public void Clear()
     {
-        _items = new T[8];
+        _items = NewUninitializedArray<T>(8);
         _count = 0;
     }
 
@@ -120,7 +120,7 @@ public class Stack<T> : IEnumerable<T>
 
     void GrowStorage()
     {
-        var bigger = new T[_items.Length * 2];
+        var bigger = NewUninitializedArray<T>(_items.Length * 2);
         _items[:_count].CopyTo(bigger);
         _items = bigger;
     }

@@ -21,6 +21,8 @@
 
 module Standard;
 
+import Standard.Unchecked;
+
 /// Part of an array, as a value, which refuses a write through it. C#'s
 /// `System.ReadOnlySpan<T>`, and what a function that only reads takes: an
 /// array and a `Span<T>` both convert to one.
@@ -37,7 +39,8 @@ module Standard;
 public struct ReadOnlySpan<T>
 {
     // The compiler reaches these by position, so the order MUST NOT change.
-    private T[] _array;
+    // The array is null in the empty span, whose length says it is never read.
+    private T[]? _array;
     private nuint _offset;
     private nuint _length;
 
@@ -88,7 +91,7 @@ public struct ReadOnlySpan<T>
 
         if (!RuntimeHelpers.IsReferenceOrContainsReferences<T>())
         {
-            memmove((byte*)&target._array[target._offset], (byte*)&_array[_offset],
+            memmove((byte*)&target._array![target._offset], (byte*)&_array![_offset],
                 _length * sizeof(T));
         }
         else if (target._array == _array && target._offset > _offset)
@@ -132,7 +135,7 @@ public struct ReadOnlySpan<T>
     /// A new array holding a copy of the elements.
     public T[] ToArray()
     {
-        var copy = new T[_length];
+        var copy = NewUninitializedArray<T>(_length);
         CopyTo(copy);
         return copy;
     }

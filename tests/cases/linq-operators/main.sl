@@ -74,8 +74,8 @@ int Main()
 
     Console.WriteLine("by " + Text.FromInteger(people.Sum((p) => p.Age)) + " " +
         Text.FromDouble(people.Average((p) => (double)p.Age)) + " " +
-        Text.FromInteger(people.Max((p) => p.Age)) + " " + people.MinBy((p) => p.Age).Name + " " +
-        people.MaxBy((p) => p.Age).Name + " " + Text.FromInteger(numbers.Aggregate((a, b) => a * b)));
+        Text.FromInteger(people.Max((p) => p.Age)) + " " + people.MinBy((p) => p.Age).GetValue().Name + " " +
+        people.MaxBy((p) => p.Age).GetValue().Name + " " + Text.FromInteger(numbers.Aggregate((a, b) => a * b)));
 
     // Ordering.
     Console.WriteLine("order " + Show(numbers.Order()) + " " + Show(list.OrderDescending()) + " " +

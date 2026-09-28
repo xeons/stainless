@@ -21,6 +21,8 @@
 
 module Standard.Collections;
 
+import Standard.Unchecked;
+
 // ------------------------------------------------------------------- queue
 
 /// First in, first out, over a circular buffer.
@@ -33,15 +35,13 @@ module Standard.Collections;
 public class Queue<T> : IEnumerable<T>
 {
     T[] _items;
-    T[] _blank;
     nuint _head;
     nuint _count;
 
     /// An empty queue with room for a few items before it first grows.
     public Queue()
     {
-        _items = new T[8];
-        _blank = new T[1];
+        _items = NewUninitializedArray<T>(8);
         _head = 0;
         _count = 0;
     }
@@ -87,7 +87,7 @@ public class Queue<T> : IEnumerable<T>
 
         // Blanked rather than left behind, so a reference is released now and
         // not when the slot is eventually written over.
-        _items[_head] = _blank[0];
+        ClearElement(_items, _head);
         _head = (_head + 1) & (_items.Length - 1);
         _count--;
         return item;
@@ -107,7 +107,7 @@ public class Queue<T> : IEnumerable<T>
     /// anything it held is released now.
     public void Clear()
     {
-        _items = new T[8];
+        _items = NewUninitializedArray<T>(8);
         _head = 0;
         _count = 0;
     }
@@ -138,7 +138,7 @@ public class Queue<T> : IEnumerable<T>
 
     void GrowStorage()
     {
-        var bigger = new T[_items.Length * 2];
+        var bigger = NewUninitializedArray<T>(_items.Length * 2);
         nuint first = FirstRunLength;
         _items[_head:_head + first].CopyTo(bigger);
         _items[:_count - first].CopyTo(bigger[first:]);

@@ -29,8 +29,11 @@
 /// Interfaces are named with a leading I, as in C#.
 module Standard.Collections;
 
+import Standard.Unchecked;
+
 /// Aborts with an index and a bound. Shared with the array bounds check, so a
 /// list overrun reads the same as an array overrun.
+[DoesNotReturn]
 extern "C" void sl_array_bounds_fail(nuint index, nuint length);
 
 // ---------------------------------------------------------------- algorithms
@@ -195,7 +198,7 @@ public void Sort<T>(Span<T> items) where T : IComparable<T>
     if (items.Length < 2u)
         return;
 
-    var scratch = new T[items.Length];
+    var scratch = NewUninitializedArray<T>(items.Length);
 
     for (nuint start = 0u; start < items.Length; start += SmallRun)
     {
@@ -279,7 +282,7 @@ public void Sort<T>(Span<T> items, Comparison<T> order)
     if (items.Length < 2u)
         return;
 
-    var scratch = new T[items.Length];
+    var scratch = NewUninitializedArray<T>(items.Length);
 
     for (nuint start = 0u; start < items.Length; start += SmallRun)
     {
@@ -438,9 +441,7 @@ public void Sort<T>(IList<T> items) where T : IComparable<T>
     if (count < 2u)
         return;
 
-    var flat = new T[count];
-    for (nuint i = 0u; i < count; i++)
-        flat[i] = items[i];
+    T[] flat = Array.Create(count, (i) => items[i]);
 
     Sort(flat);
 
@@ -458,9 +459,7 @@ public void Sort<T>(IList<T> items, Comparison<T> order)
     if (count < 2u)
         return;
 
-    var flat = new T[count];
-    for (nuint i = 0u; i < count; i++)
-        flat[i] = items[i];
+    T[] flat = Array.Create(count, (i) => items[i]);
 
     Sort(flat, order);
 

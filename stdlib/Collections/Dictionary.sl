@@ -31,8 +31,11 @@
 /// fill up with markers that only a rehash can clear.
 module Standard.Collections;
 
+import Standard.Unchecked;
+
 /// Aborts with a message. Used where a container is asked for something it does
 /// not have, which is a mistake in the caller rather than a value to return.
+[DoesNotReturn]
 extern "C" void sl_fail(byte* message);
 
 // -------------------------------------------------------------- dictionary
@@ -59,8 +62,8 @@ public class Dictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
     /// An empty dictionary with room for a few entries before it first grows.
     public Dictionary()
     {
-        _keys = new TKey[8];
-        _values = new TValue[8];
+        _keys = NewUninitializedArray<TKey>(8);
+        _values = NewUninitializedArray<TValue>(8);
         _filled = new bool[8];
         _count = 0;
     }
@@ -269,8 +272,8 @@ public class Dictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
 
         // Cleared rather than merely abandoned: a slot still holding its old
         // reference keeps that object alive for as long as the table lives.
-        _keys[i] = default(TKey);
-        _values[i] = default(TValue);
+        ClearElement(_keys, i);
+        ClearElement(_values, i);
         _filled[i] = false;
         _count--;
         return true;
@@ -280,8 +283,8 @@ public class Dictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
     /// anything they held is released now.
     public void Clear()
     {
-        _keys = new TKey[8];
-        _values = new TValue[8];
+        _keys = NewUninitializedArray<TKey>(8);
+        _values = NewUninitializedArray<TValue>(8);
         _filled = new bool[8];
         _count = 0;
     }
@@ -349,8 +352,8 @@ public class Dictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
         var oldValues = _values;
         var oldFilled = _filled;
 
-        _keys = new TKey[oldKeys.Length * 2];
-        _values = new TValue[oldValues.Length * 2];
+        _keys = NewUninitializedArray<TKey>(oldKeys.Length * 2);
+        _values = NewUninitializedArray<TValue>(oldValues.Length * 2);
         _filled = new bool[oldFilled.Length * 2];
         _count = 0;
 

@@ -22,6 +22,7 @@
 module Standard.Collections;
 
 import Standard.Limits;
+import Standard.Unchecked;
 
 /// A growable list backed by a single array, doubling when it fills.
 ///
@@ -50,6 +51,8 @@ import Standard.Limits;
 ///               `List<Control>` stays possible
 public class List<T> : IList<T>, IEnumerable<T>
 {
+    // Slots from `_count` on are zero bytes and not yet items: written before
+    // they are read, and cleared as they are vacated.
     T[] _items;
     nuint _count;
 
@@ -57,7 +60,7 @@ public class List<T> : IList<T>, IEnumerable<T>
     /// first few `Add`s do not grow it.
     public List()
     {
-        _items = new T[4];
+        _items = NewUninitializedArray<T>(4u);
         _count = 0;
     }
 
@@ -65,7 +68,7 @@ public class List<T> : IList<T>, IEnumerable<T>
     /// the size is known and the doubling would be waste.
     public List(nuint capacity)
     {
-        _items = new T[capacity < 1u ? 1u : capacity];
+        _items = NewUninitializedArray<T>(capacity < 1u ? 1u : capacity);
         _count = 0;
     }
 
@@ -177,7 +180,7 @@ public class List<T> : IList<T>, IEnumerable<T>
 
         _items[index + 1u:_count].CopyTo(_items[index:]);
         _count--;
-        _items[_count] = default(T);
+        ClearElement(_items, _count);
     }
 
     /// Removes `count` items from `index` onwards.
@@ -191,7 +194,8 @@ public class List<T> : IList<T>, IEnumerable<T>
             sl_array_bounds_fail(RangeEnd(index, count), _count);
 
         _items[index + count:_count].CopyTo(_items[index:]);
-        _items[_count - count:_count].Clear();
+        for (nuint i = _count - count; i < _count; i++)
+            ClearElement(_items, i);
         _count = _count - count;
     }
 
@@ -212,7 +216,8 @@ public class List<T> : IList<T>, IEnumerable<T>
         }
 
         nuint removed = _count - kept;
-        _items[kept:_count].Clear();
+        for (nuint i = kept; i < _count; i++)
+            ClearElement(_items, i);
         _count = kept;
         return removed;
     }
@@ -257,32 +262,35 @@ public class List<T> : IList<T>, IEnumerable<T>
         return answer;
     }
 
-    /// The first item the predicate accepts, or `default(T)` when there is
-    /// none -- which is `null` for a reference type, as it is in .NET.
+    /// The first item the predicate accepts, or `None`.
+    ///
+    /// **An `Optional<T>`, where .NET answers `default(T)`.** A `T` that is
+    /// never null has no default to answer with, and one that has a default
+    /// cannot tell "not found" from "found the zero".
     ///
     /// @see List.FindIndex
     /// @seealso List.FindLast
-    public T Find(Predicate<T> matches)
+    public Optional<T> Find(Predicate<T> matches)
     {
         for (nuint i = 0; i < _count; i++)
         {
             if (matches(_items[i]))
                 return _items[i];
         }
-        return default(T);
+        return None;
     }
 
-    /// The last item the predicate accepts, or `default(T)`.
+    /// The last item the predicate accepts, or `None`.
     ///
     /// @see List.Find
-    public T FindLast(Predicate<T> matches)
+    public Optional<T> FindLast(Predicate<T> matches)
     {
         for (nuint i = _count; i > 0u; i--)
         {
             if (matches(_items[i - 1u]))
                 return _items[i - 1u];
         }
-        return default(T);
+        return None;
     }
 
     /// Every item the predicate accepts, in order.
@@ -459,7 +467,7 @@ public class List<T> : IList<T>, IEnumerable<T>
     /// lingering until the slots are overwritten.
     public void Clear()
     {
-        _items = new T[4];
+        _items = NewUninitializedArray<T>(4u);
         _count = 0;
     }
 
@@ -467,7 +475,7 @@ public class List<T> : IList<T>, IEnumerable<T>
 
     void ResizeStorage(nuint room)
     {
-        var bigger = new T[room];
+        var bigger = NewUninitializedArray<T>(room);
         _items[:_count].CopyTo(bigger);
         _items = bigger;
     }

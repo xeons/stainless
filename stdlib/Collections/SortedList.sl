@@ -21,6 +21,8 @@
 
 module Standard.Collections;
 
+import Standard.Unchecked;
+
 // ------------------------------------------------------------- sorted list
 
 /// A map kept in key order, over two parallel arrays.
@@ -44,8 +46,8 @@ public class SortedList<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
     /// An empty map with room for a few entries before it first grows.
     public SortedList()
     {
-        _keys = new TKey[8];
-        _values = new TValue[8];
+        _keys = NewUninitializedArray<TKey>(8);
+        _values = NewUninitializedArray<TValue>(8);
         _count = 0;
     }
 
@@ -209,10 +211,8 @@ public class SortedList<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
 
         // The vacated slot still refers to the last entry; blanking it releases
         // that reference now rather than at the next insertion.
-        var noKeys = new TKey[1];
-        var noValues = new TValue[1];
-        _keys[_count] = noKeys[0];
-        _values[_count] = noValues[0];
+        ClearElement(_keys, _count);
+        ClearElement(_values, _count);
         return true;
     }
 
@@ -220,8 +220,8 @@ public class SortedList<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
     /// anything they held is released now.
     public void Clear()
     {
-        _keys = new TKey[8];
-        _values = new TValue[8];
+        _keys = NewUninitializedArray<TKey>(8);
+        _values = NewUninitializedArray<TValue>(8);
         _count = 0;
     }
 
@@ -263,8 +263,8 @@ public class SortedList<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
 
     void GrowStorage()
     {
-        var biggerKeys = new TKey[_keys.Length * 2];
-        var biggerValues = new TValue[_values.Length * 2];
+        var biggerKeys = NewUninitializedArray<TKey>(_keys.Length * 2);
+        var biggerValues = NewUninitializedArray<TValue>(_values.Length * 2);
 
         for (nuint i = 0; i < _count; i++)
         {

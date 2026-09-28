@@ -74,9 +74,10 @@ int Main()
     Standard.Span<int> named = whole;
     Console.WriteLine(Text.FromInteger((int)named.Length));
 
-    // Clearing releases what the elements held.
-    Trace[] traces = [new Trace("a"), new Trace("b")];
-    var held = new Span<Trace>(traces);
+    // Clearing releases what the elements held. Only an element with a zero
+    // value can be cleared, so these are optional.
+    Trace?[] traces = [new Trace("a"), new Trace("b")];
+    var held = new Span<Trace?>(traces);
     held.Clear();
     Console.WriteLine("cleared");
     return 0;

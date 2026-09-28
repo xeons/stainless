@@ -43,7 +43,8 @@ module Standard;
 public struct Span<T>
 {
     // The compiler reaches these by position, so the order MUST NOT change.
-    private T[] _array;
+    // The array is null in the empty span, whose length says it is never read.
+    private T[]? _array;
     private nuint _offset;
     private nuint _length;
 
@@ -78,14 +79,17 @@ public struct Span<T>
     public bool IsEmpty => _length == 0u;
 
     /// Sets every element to `default(T)`, releasing whatever they held.
-    public void Clear()
+    ///
+    /// Only for a `T` with a zero value: a span of `String` has no `Clear`,
+    /// since there is nothing its elements could be set to.
+    public void Clear() where T : zeroable
     {
         if (_length == 0u)
             return;
 
         if (!RuntimeHelpers.IsReferenceOrContainsReferences<T>())
         {
-            memset((byte*)&_array[_offset], 0, _length * sizeof(T));
+            memset((byte*)&_array![_offset], 0, _length * sizeof(T));
         }
         else
         {
@@ -107,7 +111,7 @@ public struct Span<T>
             // The first element, then what is filled so far copied after
             // itself, doubling each time.
             this[0u] = value;
-            var start = (byte*)&_array[_offset];
+            var start = (byte*)&_array![_offset];
             if (sizeof(T) == 1u)
             {
                 memset(start, (int)*start, _length);

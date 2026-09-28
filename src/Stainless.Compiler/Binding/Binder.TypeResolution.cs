@@ -135,7 +135,7 @@ public sealed partial class Binder
         }
 
         slice.Fields.Add(new FieldSymbol(
-            "_array", ArrayOf(slice.Element), slice, SliceTypeSymbol.ArrayField));
+            "_array", ArrayOf(slice.Element).MakeOptionalType(), slice, SliceTypeSymbol.ArrayField));
         slice.Fields.Add(new FieldSymbol(
             "_offset", PrimitiveTypeSymbol.NUInt, slice, SliceTypeSymbol.OffsetField));
         slice.Fields.Add(new FieldSymbol(
