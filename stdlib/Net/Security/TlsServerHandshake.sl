@@ -206,7 +206,7 @@ internal sealed class TlsServerHandshake
         var retry = new TlsBuffer(128u);
         nuint body = BeginTlsHandshakeMessage(retry, TlsHandshakeType.ServerHello);
         retry.WriteUInt16(TlsLegacyVersion);
-        retry.WriteBytes(s_helloRetryRequestRandom);
+        retry.WriteBytes(CreateTlsHelloRetryRequestRandom());
         nuint sessionAt = retry.BeginVector(1u);
         retry.WriteBytes(_hello._sessionId);
         retry.EndVector(sessionAt, 1u);

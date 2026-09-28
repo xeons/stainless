@@ -301,14 +301,14 @@ internal List<TlsSignatureScheme> CreateDefaultTlsCertificateSignatureSchemes()
 
 /// SHA-256 of "HelloRetryRequest": the random of a ServerHello that is a
 /// HelloRetryRequest.
-internal static readonly byte[] s_helloRetryRequestRandom = [
+internal byte[] CreateTlsHelloRetryRequestRandom() => [
     0xCF, 0x21, 0xAD, 0x74, 0xE5, 0x9A, 0x61, 0x11, 0xBE, 0x1D, 0x8C, 0x02, 0x1E, 0x65, 0xB8, 0x91,
     0xC2, 0xA2, 0x11, 0x16, 0x7A, 0xBB, 0x8C, 0x5E, 0x07, 0x9E, 0x09, 0xE2, 0xC8, 0xA8, 0x33, 0x9C,
 ];
 
 /// The first seven bytes of the last eight of a ServerHello random from a
 /// server that could have spoken TLS 1.3 and chose an older version.
-internal static readonly byte[] s_downgradeSentinel = [0x44, 0x4F, 0x57, 0x4E, 0x47, 0x52, 0x44];
+internal byte[] CreateTlsDowngradeSentinel() => [0x44, 0x4F, 0x57, 0x4E, 0x47, 0x52, 0x44];
 
 /// Whether two views hold the same bytes. Not constant time; for anything
 /// secret use `CryptographicOperations.FixedTimeEquals`.

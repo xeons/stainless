@@ -1,0 +1,46 @@
+x25519 shared secret: ok
+early secret: ok
+hash through ServerHello: ok
+handshake secret: ok
+c hs traffic: ok
+s hs traffic: ok
+server handshake key: ok
+server handshake iv: ok
+client handshake key: ok
+client handshake iv: ok
+server finished: ok
+hash through server Finished: ok
+master secret: ok
+c ap traffic: ok
+s ap traffic: ok
+exp master: ok
+server application key: ok
+server application iv: ok
+client application key: ok
+client application iv: ok
+client finished: ok
+hash through client Finished: ok
+res master: ok
+resumption key: ok
+open server flight: ok
+seal server flight: ok
+seal client Finished: ok
+seal ticket: ok
+validator: 1 certificate of 432 bytes for 'server'
+client: TlsAes128GcmSha256 X25519 RsaPssRsaeSha256
+client wrote ClientHello and Finished: ok
+client application record: ok
+ticket: lifetime 30, 178 bytes, early data 1024
+ticket nonce: ok
+ticket resumption key: ok
+server application data: ok
+after close_notify: 0 bytes, no error
+client close_notify: ok
+server handshake: the connection is closed
+server ServerHello: ok
+server flight opens under the trace's key: yes
+server EncryptedExtensions: ok
+server Certificate: ok
+server CertificateVerify is rsa_pss_rsae_sha256: yes
+server signature verifies: yes
+server Finished: ok

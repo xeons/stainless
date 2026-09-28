@@ -301,7 +301,7 @@ internal sealed class TlsClientHandshake
         if (reader.Failed || !reader.IsAtEnd)
             return TlsError.Decode;
 
-        bool isRetry = AreTlsBytesEqual(random, s_helloRetryRequestRandom);
+        bool isRetry = AreTlsBytesEqual(random, CreateTlsHelloRetryRequestRandom());
 
         // Read the extensions first: whether this is TLS 1.3 at all is in
         // them.
@@ -356,7 +356,7 @@ internal sealed class TlsClientHandshake
         {
             // A server that chose TLS 1.2 or older. TLS 1.2 plugs in here;
             // until it does, the one thing to check is a downgrade.
-            if (AreTlsBytesEqual(random[24u:][:7u], s_downgradeSentinel))
+            if (AreTlsBytesEqual(random[24u:][:7u], CreateTlsDowngradeSentinel()))
                 return TlsError.IllegalParameter;
             return TlsError.ProtocolVersion;
         }
