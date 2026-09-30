@@ -71,6 +71,8 @@ public sealed class TlsStream : IStream
     ///                                        `EnabledProtocols` holds
     /// @failure TlsError.AlertReceived        the server refused, and said why
     ///                                        in an alert
+    /// @failure TlsError.InternalError        `TargetHost` is empty and no
+    ///                                        `CertificateValidator` was set
     /// @failure TlsError.Io                   the stream underneath failed
     public static Result<TlsStream, TlsError> AuthenticateAsClient(
         IStream inner, TlsClientOptions options)
@@ -209,7 +211,10 @@ public sealed class TlsStream : IStream
     /// @param context  bound into the result; empty when the protocol has none,
     ///                 which in TLS 1.2 is RFC 5705's "no context"
     /// @param length   how many bytes, at most 255 digests' worth in TLS 1.3
-    /// @failure TlsError.Closed  the stream is closed
+    /// @failure TlsError.Closed         the stream is closed
+    /// @failure TlsError.InternalError  in TLS 1.3, a label over 249 bytes or a
+    ///                                  length over 255 digests; in TLS 1.2, a
+    ///                                  context over 65535 bytes
     public Result<byte[], TlsError> ExportKeyingMaterial(
         String label, ReadOnlySpan<byte> context, nuint length)
     {
@@ -217,11 +222,11 @@ public sealed class TlsStream : IStream
             return Fail(TlsError.Closed);
         var legacy = _connection._tls12Schedule;
         if (legacy != null)
-            return Ok(legacy.ExportTlsKeyingMaterial(label, context, length));
+            return legacy.ExportTlsKeyingMaterial(label, context, length);
         var schedule = _connection._schedule;
         if (schedule == null)
             return Fail(TlsError.Closed);
-        return Ok(schedule.ExportTlsKeyingMaterial(label, context, length));
+        return schedule.ExportTlsKeyingMaterial(label, context, length);
     }
 
     /// Moves this end to its next write key with a KeyUpdate, and asks the

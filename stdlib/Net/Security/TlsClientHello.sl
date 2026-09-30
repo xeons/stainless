@@ -33,15 +33,17 @@ internal sealed class TlsClientHello
     internal byte[] _sessionId = new byte[0u];
     internal List<uint> _cipherSuites = new List<uint>();
     internal bool _nullCompressionOnly = false;
-    internal List<uint> _extensionTypes = new List<uint>();
+    internal TlsCodePointSet _extensionTypes = new TlsCodePointSet();
 
     internal bool _hasSupportedVersions = false;
     internal List<uint> _supportedVersions = new List<uint>();
     internal bool _hasSupportedGroups = false;
     internal List<uint> _supportedGroups = new List<uint>();
+    private TlsCodePointSet _supportedGroupSet = new TlsCodePointSet();
     internal bool _hasKeyShare = false;
     internal List<uint> _keyShareGroups = new List<uint>();
     internal List<byte[]> _keyShareKeys = new List<byte[]>();
+    private TlsCodePointSet _keyShareGroupSet = new TlsCodePointSet();
     internal bool _hasSignatureAlgorithms = false;
     internal List<TlsSignatureScheme> _signatureAlgorithms = new List<TlsSignatureScheme>();
     internal String _serverName = "";
@@ -115,11 +117,8 @@ internal sealed class TlsClientHello
                 TlsReader data = extensions.ReadVector(2u, 0u, 65535u);
                 if (extensions.Failed)
                     return Fail(TlsError.Decode);
-                if (hello._extensionTypes.Contains(type))
+                if (hello._hasPreSharedKey || !hello._extensionTypes.Add(type))
                     return Fail(TlsError.IllegalParameter);
-                if (hello._hasPreSharedKey)
-                    return Fail(TlsError.IllegalParameter);
-                hello._extensionTypes.Add(type);
 
                 TlsError parsed = hello.ParseTlsClientExtension(type, data);
                 if (parsed != TlsError.None)
@@ -132,7 +131,7 @@ internal sealed class TlsClientHello
 
         for (nuint i = 0u; i < hello._keyShareGroups.Count; i++)
         {
-            if (!hello._supportedGroups.Contains(hello._keyShareGroups[i]))
+            if (!hello._supportedGroupSet.Contains(hello._keyShareGroups[i]))
                 return Fail(TlsError.IllegalParameter);
         }
         return Ok(hello);
@@ -180,7 +179,11 @@ internal sealed class TlsClientHello
                 if (groups.Remaining % 2u != 0u)
                     return TlsError.Decode;
                 while (!groups.IsAtEnd)
-                    _supportedGroups.Add(groups.ReadUInt16());
+                {
+                    uint group = groups.ReadUInt16();
+                    _supportedGroups.Add(group);
+                    _supportedGroupSet.Add(group);
+                }
                 break;
             }
 
@@ -194,7 +197,7 @@ internal sealed class TlsClientHello
                     byte[] key = shares.ReadVectorArray(2u, 1u, 65535u);
                     if (shares.Failed)
                         break;
-                    if (_keyShareGroups.Contains(group))
+                    if (!_keyShareGroupSet.Add(group))
                         return TlsError.IllegalParameter;
                     _keyShareGroups.Add(group);
                     _keyShareKeys.Add(key);

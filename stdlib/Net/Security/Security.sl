@@ -65,7 +65,8 @@
 /// tickets; in TLS 1.2, CBC suites, static RSA key exchange, finite-field
 /// DHE, compression and renegotiation, which is answered from either side
 /// with a no_renegotiation warning; and 0-RTT data, which is never coming,
-/// since it is replayable by design.
+/// since it is replayable by design. A server skips what a client sends of
+/// it unasked, as RFC 8446 section 4.2.10 requires.
 ///
 /// **Certificates are judged by a `TlsCertificateValidator`**, a closure the
 /// options carry. The default is the platform's trust: an `X509Chain` from
@@ -73,7 +74,15 @@
 /// server-authentication usage, and the host name the client asked for. A
 /// program that pins a certificate, or trusts a private CA, supplies its own.
 /// The validator decides whom to trust; the CertificateVerify signature
-/// against the leaf's key is always checked here.
+/// against the leaf's key is then checked here, and a refused chain's key is
+/// never used. A client MUST have a `TargetHost` or a validator of its own:
+/// with neither, the handshake fails with `InternalError` before it starts.
+///
+/// **What a peer can make this end do is bounded**: repeated extensions are
+/// found in linear time, a run of more than 32 records that carry nothing
+/// ends the connection, an RSA key over 8192 bits or with an exponent over 33
+/// bits is refused, and a sequence number never wraps. Secrets are
+/// overwritten once they are done with, and all of them at `Close`.
 ///
 /// **The record layer is constant time where a secret is involved.** The
 /// AEADs check their tags in constant time, and the padding of a TLS 1.3
@@ -123,6 +132,25 @@ internal const nuint TlsMaxHandshakeMessage = 262144u;
 /// Records written under one key before it is replaced. RFC 8446 §5.5 puts
 /// AES-GCM's limit at 2^24.5 full records; this is 2^24, for every suite.
 internal const ulong TlsKeyUsageLimit = 16777216u;
+
+/// Records in a row that carry nothing for the reader: empty application
+/// data, warning alerts, and the TLS 1.2 renegotiation requests answered
+/// with a warning. Past this many the peer is refused, since each one costs
+/// this end work and gives the reader nothing.
+internal const nuint TlsMaxEmptyRecords = 32u;
+
+/// How many bytes of protected records a server skips as rejected 0-RTT
+/// data. RFC 8446 section 4.2.10 has it skip up to the most it would
+/// accept; this server accepts none, so this is what 2^14 bytes of early
+/// data take, even in two records.
+internal const nuint TlsMaxSkippedEarlyData = 33280u;
+
+/// The largest RSA modulus and public exponent a peer's certificate may
+/// carry, in bits. Verifying costs their product, and 8192 and 33 cover every
+/// key in use.
+internal const nuint TlsMaxRsaModulusBits = 8192u;
+
+internal const nuint TlsMaxRsaExponentBits = 33u;
 
 /// What a TLS 1.3 message carries as `legacy_version`, and as the version in
 /// a supported_versions list.

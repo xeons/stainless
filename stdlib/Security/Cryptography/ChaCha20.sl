@@ -31,8 +31,8 @@ import Standard.Bits;
 ///
 /// ```csharp
 /// var cipher = try ChaCha20.FromKey(key);
-/// var sealed = try cipher.ApplyKeystream(nonce, 1u, plaintext);
-/// var opened = try cipher.ApplyKeystream(nonce, 1u, sealed);
+/// var encrypted = try cipher.ApplyKeystream(nonce, 1u, plaintext);
+/// var opened = try cipher.ApplyKeystream(nonce, 1u, encrypted);
 /// ```
 ///
 /// **This is encryption without authentication.** Anyone can flip a bit of
@@ -72,6 +72,8 @@ public sealed class ChaCha20
             _key[i] = ReadLittleWord(copy, i * 4u);
         CryptographicOperations.ZeroMemory(copy);
     }
+
+    ~ChaCha20() => CryptographicOperations.ZeroMemory(_key);
 
     /// A cipher under `key`, which must be 32 bytes.
     ///
@@ -142,9 +144,7 @@ public sealed class ChaCha20
                 output[at + i] = (byte)(input[at + i] ^ keystream[i]);
         }
 
-        for (nuint i = 0u; i < 16u; i++)
-            state[i] = 0u;
-
+        CryptographicOperations.ZeroMemory(state);
         CryptographicOperations.ZeroMemory(keystream);
         return output;
     }

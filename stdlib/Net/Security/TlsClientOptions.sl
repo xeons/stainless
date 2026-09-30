@@ -38,6 +38,11 @@ public sealed class TlsClientOptions
     /// The server's name: sent as server_name unless it is a literal
     /// address, and handed to the validator as the name the certificate MUST
     /// be valid for.
+    ///
+    /// **It MUST NOT be empty unless `CertificateValidator` has been set.**
+    /// The default validator has no name to check the certificate against,
+    /// so a handshake with neither fails with `InternalError` before anything
+    /// is sent. `TlsSocket.Connect` fills an empty one in with its host.
     public String TargetHost { get; set; } = "";
 
     /// ALPN protocol names to offer, most preferred first. Empty offers none.
@@ -64,11 +69,19 @@ public sealed class TlsClientOptions
     public List<TlsNamedGroup> KeyShareGroups { get; set; } = CreateDefaultTlsKeyShareGroups();
 
     /// Decides whether to trust the server's chain. The default trusts what
-    /// the platform's root store does, for `TargetHost`.
+    /// the platform's root store does, for `TargetHost`. A validator that is
+    /// set, whatever it is, is given an empty `TargetHost` as it stands.
     ///
     /// @see ValidateTlsCertificateChainByDefault
-    public TlsCertificateValidator CertificateValidator { get; set; } =
-        ValidateTlsCertificateChainByDefault;
+    public TlsCertificateValidator CertificateValidator
+    {
+        get => _certificateValidator;
+        set
+        {
+            _certificateValidator = value;
+            _hasCertificateValidatorSet = true;
+        }
+    }
 
     /// The client's certificates, DER, leaf first, sent when a server asks.
     /// Empty sends an empty Certificate, which a server MAY refuse.
@@ -84,6 +97,9 @@ public sealed class TlsClientOptions
 
     /// Whether `Close` leaves the stream underneath open.
     public bool LeaveInnerStreamOpen { get; set; } = false;
+
+    private TlsCertificateValidator _certificateValidator = ValidateTlsCertificateChainByDefault;
+    internal bool _hasCertificateValidatorSet = false;
 
     // Test hooks: fixed randomness, a fixed X25519 share, and a ClientHello
     // sent verbatim. Empty means unset. Reachable only inside this module.

@@ -1,0 +1,4 @@
+3 streams reset: 3 abandoned; then 204, x-late: yes
+    the peer saw: 3 RST_STREAM; GOAWAY NO_ERROR
+200 streams reset: 200 abandoned; then 204, x-late: yes
+    the peer saw: 200 RST_STREAM; GOAWAY NO_ERROR

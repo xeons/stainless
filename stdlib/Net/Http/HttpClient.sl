@@ -34,9 +34,9 @@ import Standard.Time;
 ///     String body = try response.Content.ReadAsString();
 ///
 /// One client is meant to be made once and used for many requests, so that
-/// its handler's connections are reused. `Timeout` covers each request whole
-/// — connecting, TLS, sending, redirects, and reading the body unless the
-/// body is streamed.
+/// its handler's connections are reused. `Timeout` covers each request
+/// whole: connecting, TLS, sending, redirects, and reading the body unless
+/// the body is streamed, each read of the socket given what is left of it.
 public class HttpClient
 {
     // Mutable rather than readonly, so that what it holds is released at exit.

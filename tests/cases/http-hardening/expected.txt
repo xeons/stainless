@@ -1,0 +1,64 @@
+-- a body longer than its Content-Length
+small: ContentFailure (the request content was longer than the length it declared)
+large: ContentFailure (the request content was longer than the length it declared)
+  server: (nothing), declared (none), within it: yes, smuggled request seen: no
+  server: POST /large HTTP/1.1, declared 20000, within it: yes, smuggled request seen: no
+-- a head sent a byte at a time
+700 ms timeout: Timeout, within 1500 ms: yes
+-- 103 while waiting for 100 (Continue)
+client: 200 [final]
+  server got the body: [0123456789abcdefghij]
+-- redirects
+DELETE through 301: DELETE
+DELETE through 302: DELETE
+DELETE through 303: GET
+PUT through 301: PUT
+PUT through 302: PUT
+PUT through 303: GET
+POST through 301: GET
+POST through 302: GET
+POST through 303: GET
+HEAD through 301: HEAD
+HEAD through 302: HEAD
+HEAD through 303: HEAD
+fields set by hand: 200 []
+a Location with a malformed host: 302 []
+  second: DELETE /landed HTTP/1.1; Host second; Cookie (none); Authorization (none); Proxy-Authorization (none)
+  second: DELETE /landed HTTP/1.1; Host second; Cookie (none); Authorization (none); Proxy-Authorization (none)
+  second: GET /landed HTTP/1.1; Host second; Cookie (none); Authorization (none); Proxy-Authorization (none)
+  second: PUT /landed HTTP/1.1; Host second; Cookie (none); Authorization (none); Proxy-Authorization (none); body [payload]
+  second: PUT /landed HTTP/1.1; Host second; Cookie (none); Authorization (none); Proxy-Authorization (none); body [payload]
+  second: GET /landed HTTP/1.1; Host second; Cookie (none); Authorization (none); Proxy-Authorization (none)
+  second: GET /landed HTTP/1.1; Host second; Cookie (none); Authorization (none); Proxy-Authorization (none)
+  second: GET /landed HTTP/1.1; Host second; Cookie (none); Authorization (none); Proxy-Authorization (none)
+  second: GET /landed HTTP/1.1; Host second; Cookie (none); Authorization (none); Proxy-Authorization (none)
+  second: HEAD /landed HTTP/1.1; Host second; Cookie (none); Authorization (none); Proxy-Authorization (none)
+  second: HEAD /landed HTTP/1.1; Host second; Cookie (none); Authorization (none); Proxy-Authorization (none)
+  second: HEAD /landed HTTP/1.1; Host second; Cookie (none); Authorization (none); Proxy-Authorization (none)
+  first: GET /302/away HTTP/1.1; Host first.example; Cookie session=for-first; Authorization Bearer for-first; Proxy-Authorization (none)
+  second: GET /landed HTTP/1.1; Host second; Cookie (none); Authorization (none); Proxy-Authorization (none)
+-- hosts
+http://victim.example\r\nX-Injected:1/: refused
+http://a b.example/: refused
+http://a:b:80/: refused
+http://a\b/: refused
+http://[::1/: refused
+http://x]y/: refused
+http://tab\there/: refused
+http://del\x7Fhere/: refused
+http://[::1]:8080/: host [::1]
+http://example.com:8080/: host example.com
+http://user@example.com/: host example.com
+//bad host/ against http://example.com/a/: refused
+-- a multipart part with CR LF in a field
+client: InvalidRequest (the request content has a control character in a part's field)
+  server saw the injected field: no
+-- the environment
+under CGI: http direct, https http://proxy.example:3128/
+example.com with an unreadable port bypassed: no
+other.example:8080 bypassed: yes
+-- cookie limits
+millennium expires in 400 days
+huge expires in 400 days
+one host: 50 held, oldest kept: no, newest kept: yes
+five hosts, 100 in all: 100 held, first host keeps 0, last keeps 30

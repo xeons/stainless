@@ -4,6 +4,7 @@ module Asn1Case;
 import Standard.Console;
 import Standard.Convert;
 import Standard.Security.Cryptography;
+import Standard.Time;
 
 // certificate.pem is certificate.der as OpenSSL wrote it: LF line ends, 64
 // columns and a newline after the END boundary.
@@ -115,4 +116,34 @@ void PemTests()
     Check("label double space", !PemEncoding.IsValidLabel("A  B"));
     Check("label leading hyphen", !PemEncoding.IsValidLabel("-A"));
     Check("label trailing space", !PemEncoding.IsValidLabel("A "));
+    PemTimeTests();
+}
+
+/// Finding is one forward pass. A bound of a second is some hundred times
+/// what either takes, and a small fraction of what a search that rescans
+/// the text for each boundary takes.
+void PemTimeTests()
+{
+    var unclosed = new StringBuilder();
+    for (nuint i = 0u; i < 16000u; i++)
+        unclosed.Append("-----BEGIN A-----\n");
+    unclosed.Append("-----END B-----\n");
+    String text = unclosed.ToText();
+    var watch = new Stopwatch();
+    bool none = PemEncoding.Find(text).IsEmpty;
+    Check("pem many unclosed boundaries", none && watch.Elapsed.TotalMilliseconds < 1000.0);
+
+    var blocks = new StringBuilder();
+    for (nuint i = 0u; i < 20000u; i++)
+        blocks.Append("-----BEGIN X-----\nAQID\n-----END X-----\n");
+    byte[] utf8 = blocks.ToText().ToBytes();
+    watch = new Stopwatch();
+    nuint count = 0u;
+    nuint at = 0u;
+    while (PemEncoding.FindUtf8(utf8, at) is Some block)
+    {
+        count++;
+        at = block.Value.Location.End.Value;
+    }
+    Check("pem many blocks", count == 20000u && watch.Elapsed.TotalMilliseconds < 1000.0);
 }

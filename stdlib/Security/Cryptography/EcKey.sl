@@ -48,6 +48,8 @@ sealed class EcKey
         _publicKey = EncodeEcPoint(x, y, domain.Size);
     }
 
+    ~EcKey() => sl_zero_memory((byte*)&_privateScalar.Limbs[0u], 6u * 8u);
+
     /// The size of the key in bits: 256 or 384.
     public nuint KeySize => _domain.Size * 8u;
 
@@ -523,9 +525,10 @@ sealed class EcKey
     public static Result<EcKey, CryptoError> ImportFromPem(String text)
     {
         nuint at = 0u;
+        byte[] bytes = text.ToBytes();
         while (true)
         {
-            var found = PemEncoding.Find(text, at);
+            var found = PemEncoding.FindUtf8(bytes, at);
             if (!found.Some)
                 return Fail(CryptoError.Encoding);
 

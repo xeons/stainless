@@ -548,9 +548,5 @@ static class Limbs
     }
 
     /// Overwrites `limbs` with zeros.
-    static void ZeroMemory(ulong[] limbs)
-    {
-        for (nuint i = 0u; i < limbs.Length; i++)
-            limbs[i] = 0ul;
-    }
+    static void ZeroMemory(ulong[] limbs) => CryptographicOperations.ZeroMemory(limbs);
 }

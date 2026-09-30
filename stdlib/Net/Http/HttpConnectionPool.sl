@@ -66,11 +66,17 @@ internal sealed class HttpConnectionPool
     /// either make and hand to `AddHttpConnection` or give back with
     /// `CancelHttpReservation`.
     ///
+    /// `mayAddHttp2` false makes a request wait for a stream on a busy
+    /// shared connection even when `allowsMultipleHttp2` would let it open
+    /// another: a request that has already opened one that came up with no
+    /// stream free MUST NOT open more, or a server allowing no streams would
+    /// have it open connections without end.
+    ///
     /// @failure HttpError.Timeout   the route stayed at its limit until the
     ///                              deadline
     /// @failure HttpError.Disposed  the pool has been closed
     internal HttpError ReserveHttpConnection(String key, HttpDeadline deadline, HttpVersionChoice choice,
-                                             bool allowIdle, out IHttpConnection? found)
+                                             bool allowIdle, bool mayAddHttp2, out IHttpConnection? found)
     {
         found = null;
         var closing = new List<IHttpConnection>();
@@ -95,7 +101,7 @@ internal sealed class HttpConnectionPool
                         break;
                     }
                     bool opening = _opening.GetValueOrDefault(key, 0u) > 0u && !_http11Only.Contains(key);
-                    if ((busy && !_allowsMultipleHttp2) || (opening && !busy))
+                    if ((busy && (!_allowsMultipleHttp2 || !mayAddHttp2)) || (opening && !busy))
                         wait = true;
                 }
                 // A request that may use HTTP/2 tries for it before it takes an
@@ -133,23 +139,37 @@ internal sealed class HttpConnectionPool
 
     /// Takes a connection that `ReserveHttpConnection` made a place for. A
     /// multiplexed one joins the shared connections, and a stream on it is
-    /// reserved for the caller when it answers true.
-    internal bool AddHttpConnection(String key, IHttpConnection connection, HttpVersionChoice choice)
+    /// reserved for the caller when it answers true. Once the pool has been
+    /// closed, the connection is closed rather than added, and the answer is
+    /// `Disposed`.
+    internal HttpError AddHttpConnection(String key, IHttpConnection connection, HttpVersionChoice choice,
+                                         out bool reserved)
     {
-        var held = _lock.Enter();
-        EndHttpOpening(key, choice);
-        bool reserved = false;
-        if (connection.IsMultiplexed)
+        reserved = false;
+        bool close = false;
         {
-            _shared.Add(connection);
-            reserved = connection.TryReserveHttpStream();
+            var held = _lock.Enter();
+            EndHttpOpening(key, choice);
+            if (_disposed)
+            {
+                ForgetHttpConnection(key);
+                close = true;
+            }
+            else if (connection.IsMultiplexed)
+            {
+                _shared.Add(connection);
+                reserved = connection.TryReserveHttpStream();
+            }
+            else if (choice.AllowsHttp2 && !_http11Only.Contains(key))
+            {
+                _http11Only.Add(key);
+            }
+            held.PulseAll();
         }
-        else if (choice.AllowsHttp2 && !_http11Only.Contains(key))
-        {
-            _http11Only.Add(key);
-        }
-        held.PulseAll();
-        return reserved;
+        if (!close)
+            return HttpError.None;
+        connection.CloseHttpConnection();
+        return HttpError.Disposed;
     }
 
     /// Gives back a place `ReserveHttpConnection` made, for a connection that

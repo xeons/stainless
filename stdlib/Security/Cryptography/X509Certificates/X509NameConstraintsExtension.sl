@@ -28,12 +28,12 @@ import Standard.Security.Cryptography;
 /// Which names a CA may issue for: RFC 5280 §4.2.1.10, `2.5.29.30`. Not in
 /// .NET, which reads the extension only through the platform's chain.
 ///
-/// DNS names and IP address ranges are read out and enforced by
-/// `X509Chain` over the leaf's subject alternative names: a name is
-/// refused when it is inside an excluded subtree, or when there are
-/// permitted subtrees of its kind and it is inside none of them. Subtrees
-/// of the other kinds — directory names, e-mail addresses, URIs — are
-/// checked to be well-formed and are not enforced.
+/// DNS names, IP address ranges, directory names and e-mail addresses are
+/// read out and enforced by `X509Chain`: a name is refused when it is inside
+/// an excluded subtree, or when there are permitted subtrees of its kind and
+/// it is inside none of them. Subtrees of the other kinds, URIs among them,
+/// are checked to be well-formed and are not enforced, so a critical
+/// extension holding one is an extension this module does not support.
 ///
 /// A range is an address followed by a mask of the same length: eight bytes
 /// for IPv4, thirty-two for IPv6.
@@ -43,6 +43,11 @@ public sealed class X509NameConstraintsExtension : X509Extension
     private byte[][] _permittedIPRanges;
     private String[] _excludedDnsNames;
     private byte[][] _excludedIPRanges;
+    private X500DistinguishedName[] _permittedDirectoryNames;
+    private X500DistinguishedName[] _excludedDirectoryNames;
+    private String[] _permittedEmailAddresses;
+    private String[] _excludedEmailAddresses;
+    private bool _hasUnenforcedSubtrees;
 
     /// The extension with these subtrees.
     ///
@@ -59,19 +64,30 @@ public sealed class X509NameConstraintsExtension : X509Extension
         : this(EncodeNameConstraints(permittedDnsNames, permittedIPRanges, excludedDnsNames,
                                      excludedIPRanges),
                critical, permittedDnsNames, permittedIPRanges, excludedDnsNames,
-               excludedIPRanges)
+               excludedIPRanges, new X500DistinguishedName[0u], new X500DistinguishedName[0u],
+               new String[0u], new String[0u], false)
     {
     }
 
     private X509NameConstraintsExtension(ReadOnlySpan<byte> rawData, bool critical,
                                          String[] permittedDnsNames, byte[][] permittedIPRanges,
-                                         String[] excludedDnsNames, byte[][] excludedIPRanges)
+                                         String[] excludedDnsNames, byte[][] excludedIPRanges,
+                                         X500DistinguishedName[] permittedDirectoryNames,
+                                         X500DistinguishedName[] excludedDirectoryNames,
+                                         String[] permittedEmailAddresses,
+                                         String[] excludedEmailAddresses,
+                                         bool hasUnenforcedSubtrees)
     {
         base("2.5.29.30", rawData, critical);
         _permittedDnsNames = permittedDnsNames;
         _permittedIPRanges = permittedIPRanges;
         _excludedDnsNames = excludedDnsNames;
         _excludedIPRanges = excludedIPRanges;
+        _permittedDirectoryNames = permittedDirectoryNames;
+        _excludedDirectoryNames = excludedDirectoryNames;
+        _permittedEmailAddresses = permittedEmailAddresses;
+        _excludedEmailAddresses = excludedEmailAddresses;
+        _hasUnenforcedSubtrees = hasUnenforcedSubtrees;
     }
 
     /// The permitted DNS subtrees.
@@ -86,9 +102,35 @@ public sealed class X509NameConstraintsExtension : X509Extension
     /// The excluded address ranges.
     public byte[][] ExcludedIPRanges => _excludedIPRanges;
 
+    /// The permitted directory subtrees.
+    public X500DistinguishedName[] PermittedDirectoryNames => _permittedDirectoryNames;
+
+    /// The excluded directory subtrees.
+    public X500DistinguishedName[] ExcludedDirectoryNames => _excludedDirectoryNames;
+
+    /// The permitted e-mail subtrees: a mailbox, a host, or with a leading
+    /// `.` every host under a domain.
+    public String[] PermittedEmailAddresses => _permittedEmailAddresses;
+
+    /// The excluded e-mail subtrees.
+    public String[] ExcludedEmailAddresses => _excludedEmailAddresses;
+
+    /// Whether a subtree is of a kind this module does not enforce: a URI,
+    /// an `otherName`, an X.400 address, an EDI party or a registered
+    /// identifier.
+    internal bool HasUnenforcedSubtrees => _hasUnenforcedSubtrees;
+
+    /// Whether there is a DNS subtree, permitted or excluded.
+    internal bool HasDnsConstraints =>
+        _permittedDnsNames.Length > 0u || _excludedDnsNames.Length > 0u;
+
+    /// Whether there is an e-mail subtree, permitted or excluded.
+    internal bool HasEmailConstraints =>
+        _permittedEmailAddresses.Length > 0u || _excludedEmailAddresses.Length > 0u;
+
     /// Whether the normalized DNS name `name` is allowed. A wildcard name
-    /// `*.stem` is allowed only when every name it could stand for is: its
-    /// stem must be permitted, and no excluded subtree may lie under it.
+    /// `*.stem` is allowed only when every name it could stand for is: each
+    /// is permitted, and no excluded subtree may lie under it.
     internal X509ChainStatusFlags CheckDnsName(String name)
     {
         bool wildcard = name.StartsWith("*.");
@@ -111,8 +153,89 @@ public sealed class X509NameConstraintsExtension : X509Extension
         {
             if (IsDnsNameInSubtree(stem, permitted))
                 return X509ChainStatusFlags.NoError;
+            // `*.example.com` stands only for names below `.example.com`.
+            if (wildcard && permitted.StartsWith(".") &&
+                permitted.Substring(1u).ToLowerAscii() == stem)
+            {
+                return X509ChainStatusFlags.NoError;
+            }
         }
         return X509ChainStatusFlags.HasNotPermittedNameConstraint;
+    }
+
+    /// Whether the directory name `name` is allowed. An empty name names
+    /// nothing and is allowed.
+    internal X509ChainStatusFlags CheckDirectoryName(X500DistinguishedName name)
+    {
+        if (name.IsEmpty)
+            return X509ChainStatusFlags.NoError;
+        foreach (X500DistinguishedName excluded in _excludedDirectoryNames)
+        {
+            if (name.IsInSubtree(excluded))
+                return X509ChainStatusFlags.HasExcludedNameConstraint;
+        }
+
+        if (_permittedDirectoryNames.Length == 0u)
+            return X509ChainStatusFlags.NoError;
+        foreach (X500DistinguishedName permitted in _permittedDirectoryNames)
+        {
+            if (name.IsInSubtree(permitted))
+                return X509ChainStatusFlags.NoError;
+        }
+        return X509ChainStatusFlags.HasNotPermittedNameConstraint;
+    }
+
+    /// Whether the e-mail address `address` is allowed. One that is not
+    /// `local@host` with a DNS host is refused when there is any e-mail
+    /// subtree at all.
+    internal X509ChainStatusFlags CheckEmailAddress(String address)
+    {
+        if (!HasEmailConstraints)
+            return X509ChainStatusFlags.NoError;
+
+        long at = address.LastIndexOf('@');
+        if (at <= 0)
+            return X509ChainStatusFlags.HasNotPermittedNameConstraint;
+        String local = address.Substring(0u, (nuint)at);
+        var host = NormalizeDnsName(address.Substring((nuint)at + 1u), false);
+        if (!host.Some)
+            return X509ChainStatusFlags.HasNotPermittedNameConstraint;
+
+        foreach (String excluded in _excludedEmailAddresses)
+        {
+            if (IsEmailAddressInSubtree(local, host.Value, excluded))
+                return X509ChainStatusFlags.HasExcludedNameConstraint;
+        }
+
+        if (_permittedEmailAddresses.Length == 0u)
+            return X509ChainStatusFlags.NoError;
+        foreach (String permitted in _permittedEmailAddresses)
+        {
+            if (IsEmailAddressInSubtree(local, host.Value, permitted))
+                return X509ChainStatusFlags.NoError;
+        }
+        return X509ChainStatusFlags.HasNotPermittedNameConstraint;
+    }
+
+    /// RFC 5280 section 4.2.1.10: a constraint with `@` is one mailbox, whose
+    /// local part compares exactly; one with a leading `.` is every host
+    /// below that domain; any other is every mailbox on that one host.
+    private static bool IsEmailAddressInSubtree(String local, String host, String constraint)
+    {
+        long at = constraint.LastIndexOf('@');
+        if (at >= 0)
+        {
+            if (constraint.Substring(0u, (nuint)at) != local)
+                return false;
+            var wanted = NormalizeDnsName(constraint.Substring((nuint)at + 1u), false);
+            return wanted.Some && wanted.Value == host;
+        }
+
+        String subtree = constraint.ToLowerAscii();
+        if (subtree.StartsWith("."))
+            return host.EndsWith(subtree) && host.ByteLength() > subtree.ByteLength();
+        var normalized = NormalizeDnsName(subtree, false);
+        return normalized.Some && normalized.Value == host;
     }
 
     /// Whether `address` is allowed.
@@ -191,35 +314,36 @@ public sealed class X509NameConstraintsExtension : X509Extension
         if (document.VerifyEndOfData() != AsnError.None)
             return Fail(CryptoError.Encoding);
 
-        var permittedDnsNames = new List<String>();
-        var permittedIPRanges = new List<byte[]>();
-        var excludedDnsNames = new List<String>();
-        var excludedIPRanges = new List<byte[]>();
+        var permitted = new GeneralSubtrees();
+        var excluded = new GeneralSubtrees();
         if (sequence.HasData &&
             try ConvertAsnResult(sequence.PeekTag()) == CreateContextTag(0, true))
         {
-            AsnReader permitted =
+            AsnReader subtrees =
                 try ConvertAsnResult(sequence.ReadSequence(CreateContextTag(0, true)));
-            try ReadGeneralSubtrees(permitted, permittedDnsNames, permittedIPRanges);
+            try ReadGeneralSubtrees(subtrees, permitted);
         }
         if (sequence.HasData)
         {
-            AsnReader excluded =
+            AsnReader subtrees =
                 try ConvertAsnResult(sequence.ReadSequence(CreateContextTag(1, true)));
-            try ReadGeneralSubtrees(excluded, excludedDnsNames, excludedIPRanges);
+            try ReadGeneralSubtrees(subtrees, excluded);
         }
         if (sequence.VerifyEndOfData() != AsnError.None)
             return Fail(CryptoError.Encoding);
 
         return Ok(new X509NameConstraintsExtension(
-            rawData, critical, permittedDnsNames.ToArray(), permittedIPRanges.ToArray(),
-            excludedDnsNames.ToArray(), excludedIPRanges.ToArray()));
+            rawData, critical, permitted.DnsNames.ToArray(), permitted.IPRanges.ToArray(),
+            excluded.DnsNames.ToArray(), excluded.IPRanges.ToArray(),
+            permitted.DirectoryNames.ToArray(), excluded.DirectoryNames.ToArray(),
+            permitted.EmailAddresses.ToArray(), excluded.EmailAddresses.ToArray(),
+            permitted.HasUnenforced || excluded.HasUnenforced));
     }
 
     /// `GeneralSubtrees`: one or more `GeneralSubtree`, whose minimum and
     /// maximum RFC 5280 fixes and this reads past.
-    private static Result<bool, CryptoError> ReadGeneralSubtrees(
-        AsnReader subtrees, List<String> dnsNames, List<byte[]> ipRanges)
+    private static Result<bool, CryptoError> ReadGeneralSubtrees(AsnReader subtrees,
+                                                                 GeneralSubtrees into)
     {
         if (!subtrees.HasData)
             return Fail(CryptoError.Encoding);
@@ -232,9 +356,17 @@ public sealed class X509NameConstraintsExtension : X509Extension
 
             switch (tag.TagValue)
             {
+                case 1:
+                    into.EmailAddresses.Add(
+                        try X509SubjectAlternativeNameExtension.ReadGeneralNameText(subtree, 1));
+                    break;
                 case 2:
-                    dnsNames.Add(
+                    into.DnsNames.Add(
                         try X509SubjectAlternativeNameExtension.ReadGeneralNameText(subtree, 2));
+                    break;
+                case 4:
+                    into.DirectoryNames.Add(
+                        try X509SubjectAlternativeNameExtension.ReadGeneralNameDirectory(subtree));
                     break;
                 case 7:
                 {
@@ -242,10 +374,11 @@ public sealed class X509NameConstraintsExtension : X509Extension
                         try ConvertAsnResult(subtree.ReadOctetString(CreateContextTag(7, false)));
                     if (range.Length != 8u && range.Length != 32u)
                         return Fail(CryptoError.Encoding);
-                    ipRanges.Add(range.ToArray());
+                    into.IPRanges.Add(range.ToArray());
                     break;
                 }
                 default:
+                    into.HasUnenforced = true;
                     try ConvertAsnResult(subtree.ReadEncodedValue());
                     break;
             }
@@ -255,5 +388,24 @@ public sealed class X509NameConstraintsExtension : X509Extension
                 try ConvertAsnResult(subtree.ReadEncodedValue());
         }
         return Ok(true);
+    }
+}
+
+/// The subtrees of one side of a name constraints extension, as they are read.
+internal sealed class GeneralSubtrees
+{
+    internal List<String> DnsNames;
+    internal List<byte[]> IPRanges;
+    internal List<X500DistinguishedName> DirectoryNames;
+    internal List<String> EmailAddresses;
+    internal bool HasUnenforced;
+
+    internal GeneralSubtrees()
+    {
+        DnsNames = new List<String>();
+        IPRanges = new List<byte[]>();
+        DirectoryNames = new List<X500DistinguishedName>();
+        EmailAddresses = new List<String>();
+        HasUnenforced = false;
     }
 }

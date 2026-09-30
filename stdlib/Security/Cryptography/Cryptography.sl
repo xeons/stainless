@@ -119,6 +119,12 @@
 /// so reveals only things about numbers it does not keep; and exporting a
 /// private key, since DER writes each number in the fewest bytes it takes.
 ///
+/// **Key material is overwritten when the object holding it is destroyed.**
+/// Every cipher, MAC, hash and private key here clears its keys, schedules
+/// and state in its destructor, through a write the optimiser may not remove.
+/// An array the caller passed in is the caller's to clear, with
+/// `CryptographicOperations.ZeroMemory`.
+///
 /// Certificates, chains and the platform's roots are
 /// `Standard.Security.Cryptography.X509Certificates`.
 module Standard.Security.Cryptography;

@@ -27,9 +27,9 @@ import Standard.Security.Cryptography;
 
 /// The names the certificate is for: RFC 5280 §4.2.1.6, `2.5.29.17`.
 ///
-/// Four kinds of name are read out: DNS names, IP addresses as their four or
-/// sixteen bytes, URIs and e-mail addresses. The other kinds — a directory
-/// name, an `otherName`, a registered identifier — are checked to be
+/// Five kinds of name are read out: DNS names, IP addresses as their four or
+/// sixteen bytes, URIs, e-mail addresses and directory names. The other
+/// kinds, an `otherName` or a registered identifier, are checked to be
 /// well-formed and are otherwise left in `RawData`.
 ///
 /// @see SubjectAlternativeNameBuilder
@@ -40,16 +40,19 @@ public sealed class X509SubjectAlternativeNameExtension : X509Extension
     private byte[][] _ipAddresses;
     private String[] _uris;
     private String[] _emailAddresses;
+    private X500DistinguishedName[] _directoryNames;
 
     internal X509SubjectAlternativeNameExtension(ReadOnlySpan<byte> rawData, bool critical,
                                                  String[] dnsNames, byte[][] ipAddresses,
-                                                 String[] uris, String[] emailAddresses)
+                                                 String[] uris, String[] emailAddresses,
+                                                 X500DistinguishedName[] directoryNames)
     {
         base("2.5.29.17", rawData, critical);
         _dnsNames = dnsNames;
         _ipAddresses = ipAddresses;
         _uris = uris;
         _emailAddresses = emailAddresses;
+        _directoryNames = directoryNames;
     }
 
     /// The `dNSName` entries, as written.
@@ -64,6 +67,9 @@ public sealed class X509SubjectAlternativeNameExtension : X509Extension
     /// The `rfc822Name` entries.
     public String[] EmailAddresses => _emailAddresses;
 
+    /// The `directoryName` entries.
+    public X500DistinguishedName[] DirectoryNames => _directoryNames;
+
     internal static Result<X509SubjectAlternativeNameExtension, CryptoError> DecodeExtension(
         ReadOnlySpan<byte> rawData, bool critical)
     {
@@ -76,6 +82,7 @@ public sealed class X509SubjectAlternativeNameExtension : X509Extension
         var ipAddresses = new List<byte[]>();
         var uris = new List<String>();
         var emailAddresses = new List<String>();
+        var directoryNames = new List<X500DistinguishedName>();
         while (names.HasData)
         {
             Asn1Tag tag = try ConvertAsnResult(names.PeekTag());
@@ -89,6 +96,9 @@ public sealed class X509SubjectAlternativeNameExtension : X509Extension
                     break;
                 case 2:
                     dnsNames.Add(try ReadGeneralNameText(names, 2));
+                    break;
+                case 4:
+                    directoryNames.Add(try ReadGeneralNameDirectory(names));
                     break;
                 case 6:
                     uris.Add(try ReadGeneralNameText(names, 6));
@@ -112,7 +122,18 @@ public sealed class X509SubjectAlternativeNameExtension : X509Extension
 
         return Ok(new X509SubjectAlternativeNameExtension(
             rawData, critical, dnsNames.ToArray(), ipAddresses.ToArray(), uris.ToArray(),
-            emailAddresses.ToArray()));
+            emailAddresses.ToArray(), directoryNames.ToArray()));
+    }
+
+    /// A `directoryName`: a `Name` under the explicit context tag 4.
+    internal static Result<X500DistinguishedName, CryptoError> ReadGeneralNameDirectory(
+        AsnReader names)
+    {
+        AsnReader wrapper = try ConvertAsnResult(names.ReadSequence(CreateContextTag(4, true)));
+        ReadOnlySpan<byte> name = try ConvertAsnResult(wrapper.ReadEncodedValue());
+        if (wrapper.VerifyEndOfData() != AsnError.None)
+            return Fail(CryptoError.Encoding);
+        return X500DistinguishedName.FromDer(name);
     }
 
     /// An `IA5String` name under its implicit context tag.

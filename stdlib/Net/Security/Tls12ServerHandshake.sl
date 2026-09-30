@@ -315,7 +315,8 @@ internal sealed class Tls12ServerHandshake
     /// A client certificate that is missing or refused is reported only once
     /// the whole flight is read. The client sent it in one go, and a server
     /// that closed with it unread would reset the connection and lose its
-    /// own alert.
+    /// own alert. The CertificateVerify of a refused chain is read and not
+    /// checked.
     private TlsError ReadTls12ClientFlight()
     {
         var schedule = _schedule;
@@ -324,6 +325,7 @@ internal sealed class Tls12ServerHandshake
             return TlsError.InternalError;
 
         TlsError refusal = TlsError.None;
+        bool verifyExpected = false;
         TlsPeerKey? clientKey = null;
         if (_certificateRequested)
         {
@@ -342,12 +344,17 @@ internal sealed class Tls12ServerHandshake
             }
             else
             {
+                verifyExpected = true;
                 refusal = _options.ClientCertificateValidator(chain.Value, "");
-                var key = TlsPeerKey.ReadTlsPeerKey(chain.Value[0u]);
-                if (!key.Ok)
-                    return key.Error;
-                clientKey = key.Value;
                 _connection._remoteChain = chain.Value;
+                // A refused chain's key is never used.
+                if (refusal == TlsError.None)
+                {
+                    var key = TlsPeerKey.ReadTlsPeerKey(chain.Value[0u]);
+                    if (!key.Ok)
+                        return key.Error;
+                    clientKey = key.Value;
+                }
             }
         }
 
@@ -359,14 +366,16 @@ internal sealed class Tls12ServerHandshake
         if (reader.Failed || !reader.IsAtEnd)
             return TlsError.Decode;
         var premaster = share.DeriveTlsSharedSecret(point);
+        share.WipeTlsPrivateKey();
         if (!premaster.Ok)
             return premaster.Error;
         _transcript.AddTlsMessage(exchange.Value);
         schedule.DeriveTlsExtendedMasterSecret(
             premaster.Value, _transcript.ComputeTls12TranscriptHash(schedule));
+        CryptographicOperations.ZeroMemory(premaster.Value);
         _connection._tls12Schedule = schedule;
 
-        if (clientKey != null)
+        if (verifyExpected)
         {
             var read = ReadTls12ClientMessage(TlsHandshakeType.CertificateVerify);
             if (!read.Ok)
@@ -376,21 +385,24 @@ internal sealed class Tls12ServerHandshake
             byte[] signature = verifying.ReadVectorArray(2u, 0u, 65535u);
             if (verifying.Failed || !verifying.IsAtEnd)
                 return TlsError.Decode;
-            if (!CreateDefaultTls12SignatureSchemes().Contains(scheme) ||
-                !IsTls12SchemeForKey(scheme, clientKey.Kind))
+            if (clientKey != null)
             {
-                return TlsError.IllegalParameter;
+                if (!CreateDefaultTls12SignatureSchemes().Contains(scheme) ||
+                    !IsTls12SchemeForKey(scheme, clientKey.Kind))
+                {
+                    return TlsError.IllegalParameter;
+                }
+                if (!clientKey.VerifyTls12Signature(scheme, _transcript.Messages, signature))
+                    return TlsError.DecryptError;
+                _connection._mutuallyAuthenticated = true;
             }
-            if (!clientKey.VerifyTls12Signature(scheme, _transcript.Messages, signature))
-                return TlsError.DecryptError;
             _transcript.AddTlsMessage(read.Value);
-            _connection._mutuallyAuthenticated = refusal == TlsError.None;
         }
 
         TlsError changed = _connection.ReadTlsChangeCipherSpec();
         if (changed != TlsError.None)
             return changed;
-        var reading = schedule.CreateTls12RecordCipher(_suite, true);
+        var reading = schedule.TakeTls12RecordCipher(_suite, true);
         if (!reading.Ok)
             return reading.Error;
         _connection._records.InstallTlsReadCipher(reading.Value);
@@ -430,7 +442,7 @@ internal sealed class Tls12ServerHandshake
         TlsError sent = _connection.WriteTlsChangeCipherSpec();
         if (sent != TlsError.None)
             return sent;
-        var writing = schedule.CreateTls12RecordCipher(_suite, false);
+        var writing = schedule.TakeTls12RecordCipher(_suite, false);
         if (!writing.Ok)
             return writing.Error;
         _connection.InstallTlsWriteCipher(writing.Value);

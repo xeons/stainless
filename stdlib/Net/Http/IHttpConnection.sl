@@ -115,6 +115,11 @@ internal sealed class HttpExchange
     /// again (RFC 9113 §8.7).
     internal bool IsUnprocessed = false;
 
+    /// Whether a body with `Expect: 100-continue` is sent without waiting,
+    /// after a wait on an earlier connection met a socket readable with no
+    /// response on it.
+    internal bool SkipsContinueWait = false;
+
     internal HttpExchange(HttpDeadline deadline, HttpFailure failure, nuint maxHeaderBytes)
     {
         Deadline = deadline;

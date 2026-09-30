@@ -82,6 +82,8 @@ public sealed class Poly1305
         CryptographicOperations.ZeroMemory(copy);
     }
 
+    ~Poly1305() => EraseState();
+
     /// An authenticator under `key`, which must be 32 bytes and MUST NOT
     /// have been used before.
     ///
@@ -160,7 +162,7 @@ public sealed class Poly1305
         h1 += carry;
 
         // h + 5 - 2^130, which is h - p, and is the answer when it is not
-        // negative. The choice is a mask, not a branch.
+        // negative. The choice is a mask, opaque so that it stays one.
         ulong g0 = h0 + 5u;
         carry = g0 >> 26;
         g0 &= LimbMask;
@@ -175,7 +177,7 @@ public sealed class Poly1305
         g3 &= LimbMask;
         ulong g4 = h4 + carry - 0x4000000u;
 
-        ulong keep = (g4 >> 63) - 1u;
+        ulong keep = OpaqueCopy((g4 >> 63) - 1u);
         ulong discard = ~keep;
         h0 = (h0 & discard) | (g0 & keep);
         h1 = (h1 & discard) | (g1 & keep);
@@ -199,17 +201,17 @@ public sealed class Poly1305
         sum = w3 + _pad[3u] + (sum >> 32);
         WriteLittleWord(tag, 12u, (uint)(sum & WordMask));
 
-        for (nuint i = 0u; i < 5u; i++)
-        {
-            _r[i] = 0u;
-            _accumulator[i] = 0u;
-        }
-
-        for (nuint i = 0u; i < 4u; i++)
-            _pad[i] = 0u;
-
-        CryptographicOperations.ZeroMemory(_block);
+        EraseState();
         return tag;
+    }
+
+    /// The key, the accumulator and the pending block overwritten.
+    void EraseState()
+    {
+        CryptographicOperations.ZeroMemory(_r);
+        CryptographicOperations.ZeroMemory(_pad);
+        CryptographicOperations.ZeroMemory(_accumulator);
+        CryptographicOperations.ZeroMemory(_block);
     }
 
     /// `_block` added to the accumulator, which is then multiplied by `r`.

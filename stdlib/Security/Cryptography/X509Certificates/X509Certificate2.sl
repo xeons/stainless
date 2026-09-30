@@ -153,7 +153,8 @@ public sealed class X509Certificate2
         {
             AsnReader explicitVersion = try ConvertAsnResult(tbs.ReadSequence(CreateContextTag(0, true)));
             version = try ConvertAsnResult(explicitVersion.ReadInt64());
-            if (explicitVersion.VerifyEndOfData() != AsnError.None || version < 0 || version > 2)
+            // Version 1 is the DEFAULT, which DER leaves out.
+            if (explicitVersion.VerifyEndOfData() != AsnError.None || version < 1 || version > 2)
                 return Fail(CryptoError.Encoding);
         }
 
@@ -227,7 +228,8 @@ public sealed class X509Certificate2
     public static Result<X509Certificate2, CryptoError> FromPem(String text)
     {
         nuint at = 0u;
-        while (PemEncoding.Find(text, at) is Some block)
+        byte[] bytes = text.ToBytes();
+        while (PemEncoding.FindUtf8(bytes, at) is Some block)
         {
             if (block.Value.Label == "CERTIFICATE")
                 return FromDer(block.Value.Data);
@@ -383,7 +385,9 @@ public sealed class X509Certificate2
     ///   given as its `xn--` form.
     /// - A wildcard is only the whole left-most label, `*.example.com`; it
     ///   stands for exactly one non-empty label, and is honoured only with at
-    ///   least two labels after it, so `*.com` matches nothing.
+    ///   least two labels after it, so `*.com` matches nothing. Nor does a
+    ///   wildcard over a common second-level label under a country code,
+    ///   `*.co.uk` or `*.com.au`; other public suffixes are not known.
     /// - An address — dotted IPv4, or IPv6 with or without brackets —
     ///   matches only an `iPAddress` entry, compared as bytes, and never a DNS
     ///   name that spells it.

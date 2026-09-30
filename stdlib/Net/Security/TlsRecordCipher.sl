@@ -92,10 +92,20 @@ internal sealed class TlsRecordCipher
     /// How many records this key has protected or opened.
     internal ulong Sequence => _sequence;
 
+    /// Whether the sequence number is at its last value, which no record
+    /// MAY use: the next would wrap and repeat a nonce (RFC 8446 section
+    /// 5.3). TLS 1.3 updates its keys long before; TLS 1.2 cannot.
+    internal bool IsTlsSequenceExhausted => _sequence == 0xFFFFFFFFFFFFFFFFul;
+
+    /// Sets the sequence number, for a test of what happens at its end.
+    internal void SetTlsSequence(ulong sequence) => _sequence = sequence;
+
     /// Seals `inner` into a whole record, header and all: the header is the
     /// associated data, so it is written first.
     internal Result<byte[], TlsError> SealTlsRecord(byte[] inner, nuint innerLength)
     {
+        if (IsTlsSequenceExhausted)
+            return Fail(TlsError.InternalError);
         nuint bodyLength = innerLength + TlsAeadTagSize;
         var record = new byte[TlsRecordHeaderSize + bodyLength];
         record[0u] = (byte)TlsContentType.ApplicationData;
@@ -137,6 +147,8 @@ internal sealed class TlsRecordCipher
     {
         if (bodyLength < TlsAeadTagSize + 1u)
             return Fail(TlsError.BadRecordMac);
+        if (IsTlsSequenceExhausted)
+            return Fail(TlsError.InternalError);
 
         ComputeTlsNonce();
         nuint cipherLength = bodyLength - TlsAeadTagSize;
@@ -169,6 +181,8 @@ internal sealed class TlsRecordCipher
     internal Result<byte[], TlsError> SealTls12Record(
         TlsContentType type, byte[] data, nuint offset, nuint length)
     {
+        if (IsTlsSequenceExhausted)
+            return Fail(TlsError.InternalError);
         nuint bodyLength = _explicitNonceLength + length + TlsAeadTagSize;
         var record = new byte[TlsRecordHeaderSize + bodyLength];
         record[0u] = (byte)type;
@@ -213,6 +227,8 @@ internal sealed class TlsRecordCipher
     {
         if (bodyLength < _explicitNonceLength + TlsAeadTagSize)
             return Fail(TlsError.BadRecordMac);
+        if (IsTlsSequenceExhausted)
+            return Fail(TlsError.InternalError);
 
         ComputeTlsNonce();
         nuint body = at + TlsRecordHeaderSize;

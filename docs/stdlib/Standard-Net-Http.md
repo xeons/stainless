@@ -46,7 +46,10 @@ that ends when the connection does. Flow control holds a body read slowly
 to its window without holding up the others; a timeout, or a body closed
 early, resets only its stream. A request the server never processed — a
 GOAWAY below its stream, or REFUSED_STREAM — is sent again on a new
-connection whatever its method.
+connection whatever its method. Every write is bounded by the timeout of
+the request making it, and one that times out part-way ends the
+connection; a peer that provokes more PING and SETTINGS answers than it
+reads is sent GOAWAY with ENHANCE_YOUR_CALM.
 
 **Responses are parsed strictly.** A status line that is not
 `HTTP/1.x NNN reason`, a folded header, a header line or block over its
@@ -58,6 +61,13 @@ with upper-case letters or one that belongs to a single connection, a
 missing `:status` and a body unlike its `content-length` reset the stream
 and are `InvalidResponse`; a peer that breaks the framing is sent GOAWAY
 and every stream on it fails with `ProtocolError`.
+
+**Requests are held to what they declare.** A body longer than its
+`Content-Length` fails with `ContentFailure` before a byte past the
+length is written, since the server would read the excess as another
+request, and the connection is closed. A host with a control byte, a
+space or a delimiter in it is not a URI, and a multipart part with a
+control character in a field fails with `InvalidRequest`.
 
 **Certificates are judged by the TLS module's validator** unless
 `HttpClientHandler.ServerCertificateCustomValidationCallback` is set, in
@@ -251,11 +261,17 @@ is accepted.
 
 **`Path` limits a cookie to part of a site**, `Secure` to https,
 and `Expires` or `Max-Age` to a time. A cookie set from http cannot be
-`Secure`. `HttpOnly` and `SameSite` are kept and not acted on.
+`Secure`. `HttpOnly` and `SameSite` are kept and not acted on. A
+`Max-Age` longer than 400 days is taken as 400 days, as RFC 6265bis
+has it.
+
+**It holds at most `PerDomainCapacity` cookies for one domain and
+`Capacity` in all**, 50 and 3000 by default. A cookie past either limit
+makes room by removing what has expired, then the oldest.
 
 One container MAY be shared by several clients and threads.
 
-<sub>[stdlib/Net/Http/CookieContainer.sl:51](../../stdlib/Net/Http/CookieContainer.sl#L51)</sub>
+<sub>[stdlib/Net/Http/CookieContainer.sl:57](../../stdlib/Net/Http/CookieContainer.sl#L57)</sub>
 
 #### Count *property*
 
@@ -265,7 +281,7 @@ nuint Count { get; }
 
 How many cookies it holds, expired ones included until next looked at.
 
-<sub>[stdlib/Net/Http/CookieContainer.sl:60](../../stdlib/Net/Http/CookieContainer.sl#L60)</sub>
+<sub>[stdlib/Net/Http/CookieContainer.sl:66](../../stdlib/Net/Http/CookieContainer.sl#L66)</sub>
 
 #### MaxCookieSize *property*
 
@@ -275,7 +291,28 @@ nuint MaxCookieSize { get; set; }
 
 The most bytes a cookie's name and value may take together.
 
-<sub>[stdlib/Net/Http/CookieContainer.sl:70](../../stdlib/Net/Http/CookieContainer.sl#L70)</sub>
+<sub>[stdlib/Net/Http/CookieContainer.sl:76](../../stdlib/Net/Http/CookieContainer.sl#L76)</sub>
+
+#### Capacity *property*
+
+```
+nuint Capacity { get; set; }
+```
+
+The most cookies held in all. At least one is always kept.
+
+<sub>[stdlib/Net/Http/CookieContainer.sl:79](../../stdlib/Net/Http/CookieContainer.sl#L79)</sub>
+
+#### PerDomainCapacity *property*
+
+```
+nuint PerDomainCapacity { get; set; }
+```
+
+The most cookies held for one domain, or one host. At least one is
+always kept.
+
+<sub>[stdlib/Net/Http/CookieContainer.sl:83](../../stdlib/Net/Http/CookieContainer.sl#L83)</sub>
 
 #### Add *method*
 
@@ -287,7 +324,7 @@ Stores `cookie`, which MUST name its `Domain`, replacing one of the
 same name, domain and path. False when it names no domain or no name,
 or has already expired.
 
-<sub>[stdlib/Net/Http/CookieContainer.sl:75](../../stdlib/Net/Http/CookieContainer.sl#L75)</sub>
+<sub>[stdlib/Net/Http/CookieContainer.sl:88](../../stdlib/Net/Http/CookieContainer.sl#L88)</sub>
 
 #### Add *method*
 
@@ -299,7 +336,7 @@ Stores `cookie` as though `uri` had set it: its domain, if it names
 one, MUST contain `uri`'s host, and it defaults to that host and to the
 directory of `uri`'s path. False when it is refused.
 
-<sub>[stdlib/Net/Http/CookieContainer.sl:91](../../stdlib/Net/Http/CookieContainer.sl#L91)</sub>
+<sub>[stdlib/Net/Http/CookieContainer.sl:104](../../stdlib/Net/Http/CookieContainer.sl#L104)</sub>
 
 #### GetCookies *method*
 
@@ -309,7 +346,7 @@ List<Cookie> GetCookies(Uri uri)
 
 The cookies that would be sent to `uri`, longest path first.
 
-<sub>[stdlib/Net/Http/CookieContainer.sl:99](../../stdlib/Net/Http/CookieContainer.sl#L99)</sub>
+<sub>[stdlib/Net/Http/CookieContainer.sl:112](../../stdlib/Net/Http/CookieContainer.sl#L112)</sub>
 
 #### GetAllCookies *method*
 
@@ -319,7 +356,7 @@ List<Cookie> GetAllCookies()
 
 Every cookie held that has not expired.
 
-<sub>[stdlib/Net/Http/CookieContainer.sl:102](../../stdlib/Net/Http/CookieContainer.sl#L102)</sub>
+<sub>[stdlib/Net/Http/CookieContainer.sl:115](../../stdlib/Net/Http/CookieContainer.sl#L115)</sub>
 
 #### GetCookieHeader *method*
 
@@ -330,7 +367,7 @@ String GetCookieHeader(Uri uri)
 What a request to `uri` sends as its `Cookie` field: `a=1; b=2`, or
 empty when nothing applies.
 
-<sub>[stdlib/Net/Http/CookieContainer.sl:115](../../stdlib/Net/Http/CookieContainer.sl#L115)</sub>
+<sub>[stdlib/Net/Http/CookieContainer.sl:128](../../stdlib/Net/Http/CookieContainer.sl#L128)</sub>
 
 #### SetCookies *method*
 
@@ -344,7 +381,7 @@ them. A comma inside an `Expires` date does not separate. Answers how
 many are held afterwards: a malformed or refused one is skipped, and an
 expired one only removes what it names.
 
-<sub>[stdlib/Net/Http/CookieContainer.sl:134](../../stdlib/Net/Http/CookieContainer.sl#L134)</sub>
+<sub>[stdlib/Net/Http/CookieContainer.sl:147](../../stdlib/Net/Http/CookieContainer.sl#L147)</sub>
 
 ### DecompressionMethods *enum*
 
@@ -430,9 +467,9 @@ Sends requests and receives responses: .NET's `HttpClient`, blocking.
     String body = try response.Content.ReadAsString();
 
 One client is meant to be made once and used for many requests, so that
-its handler's connections are reused. `Timeout` covers each request whole
-— connecting, TLS, sending, redirects, and reading the body unless the
-body is streamed.
+its handler's connections are reused. `Timeout` covers each request
+whole: connecting, TLS, sending, redirects, and reading the body unless
+the body is streamed, each read of the socket given what is left of it.
 
 <sub>[stdlib/Net/Http/HttpClient.sl:40](../../stdlib/Net/Http/HttpClient.sl#L40)</sub>
 
@@ -820,9 +857,13 @@ request and keeps them.
 bool AllowAutoRedirect { get; set; }
 ```
 
-Whether a `3xx` with a `Location` is followed.
+Whether a `3xx` with a `Location` is followed. A 303 makes any method
+but HEAD a `GET` without a body; a 301 or a 302 does so to `POST`
+alone; a 307 or a 308 keeps the method and the body. Once a redirect
+leaves the first origin, `Authorization`, a `Cookie` set by hand and
+a `Host` override are not sent.
 
-<sub>[stdlib/Net/Http/HttpClientHandler.sl:60](../../stdlib/Net/Http/HttpClientHandler.sl#L60)</sub>
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:64](../../stdlib/Net/Http/HttpClientHandler.sl#L64)</sub>
 
 #### MaxAutomaticRedirections *property*
 
@@ -833,7 +874,7 @@ int MaxAutomaticRedirections { get; set; }
 How many redirects one request may follow before it fails with
 `TooManyRedirects`.
 
-<sub>[stdlib/Net/Http/HttpClientHandler.sl:64](../../stdlib/Net/Http/HttpClientHandler.sl#L64)</sub>
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:68](../../stdlib/Net/Http/HttpClientHandler.sl#L68)</sub>
 
 #### AutomaticDecompression *property*
 
@@ -843,7 +884,7 @@ DecompressionMethods AutomaticDecompression { get; set; }
 
 Which codings are asked for with `Accept-Encoding` and undone.
 
-<sub>[stdlib/Net/Http/HttpClientHandler.sl:67](../../stdlib/Net/Http/HttpClientHandler.sl#L67)</sub>
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:71](../../stdlib/Net/Http/HttpClientHandler.sl#L71)</sub>
 
 #### UseCookies *property*
 
@@ -853,7 +894,7 @@ bool UseCookies { get; set; }
 
 Whether `CookieContainer` is sent and filled.
 
-<sub>[stdlib/Net/Http/HttpClientHandler.sl:70](../../stdlib/Net/Http/HttpClientHandler.sl#L70)</sub>
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:74](../../stdlib/Net/Http/HttpClientHandler.sl#L74)</sub>
 
 #### CookieContainer *property*
 
@@ -863,7 +904,7 @@ CookieContainer CookieContainer { get; set; }
 
 The cookies sent and received.
 
-<sub>[stdlib/Net/Http/HttpClientHandler.sl:73](../../stdlib/Net/Http/HttpClientHandler.sl#L73)</sub>
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:77](../../stdlib/Net/Http/HttpClientHandler.sl#L77)</sub>
 
 #### UseProxy *property*
 
@@ -873,7 +914,7 @@ bool UseProxy { get; set; }
 
 Whether a proxy is used at all.
 
-<sub>[stdlib/Net/Http/HttpClientHandler.sl:76](../../stdlib/Net/Http/HttpClientHandler.sl#L76)</sub>
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:80](../../stdlib/Net/Http/HttpClientHandler.sl#L80)</sub>
 
 #### Proxy *property*
 
@@ -883,7 +924,7 @@ IWebProxy? Proxy { get; set; }
 
 The proxy, or null for `HttpClient.DefaultProxy`.
 
-<sub>[stdlib/Net/Http/HttpClientHandler.sl:79](../../stdlib/Net/Http/HttpClientHandler.sl#L79)</sub>
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:83](../../stdlib/Net/Http/HttpClientHandler.sl#L83)</sub>
 
 #### ServerCertificateCustomValidationCallback *property*
 
@@ -894,7 +935,7 @@ HttpServerCertificateValidator ServerCertificateCustomValidationCallback { get; 
 Decides whether to trust a server's certificate, in place of the TLS
 module's validator, which it is told the answer of.
 
-<sub>[stdlib/Net/Http/HttpClientHandler.sl:83](../../stdlib/Net/Http/HttpClientHandler.sl#L83)</sub>
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:87](../../stdlib/Net/Http/HttpClientHandler.sl#L87)</sub>
 
 #### DangerousAcceptAnyServerCertificateValidator *property*
 
@@ -906,7 +947,7 @@ A callback that trusts every certificate. For a test against a server
 with a throwaway certificate, and nothing else: it makes TLS encryption
 without authentication, which a machine in the middle defeats.
 
-<sub>[stdlib/Net/Http/HttpClientHandler.sl:96](../../stdlib/Net/Http/HttpClientHandler.sl#L96)</sub>
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:100](../../stdlib/Net/Http/HttpClientHandler.sl#L100)</sub>
 
 #### ClientCertificates *property*
 
@@ -916,7 +957,7 @@ List<byte[]> ClientCertificates { get; set; }
 
 The client's certificates, DER, leaf first, sent when a server asks.
 
-<sub>[stdlib/Net/Http/HttpClientHandler.sl:100](../../stdlib/Net/Http/HttpClientHandler.sl#L100)</sub>
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:104](../../stdlib/Net/Http/HttpClientHandler.sl#L104)</sub>
 
 #### ClientCertificateKey *property*
 
@@ -926,7 +967,7 @@ TlsSigningKey? ClientCertificateKey { get; set; }
 
 The key of the client's leaf certificate.
 
-<sub>[stdlib/Net/Http/HttpClientHandler.sl:103](../../stdlib/Net/Http/HttpClientHandler.sl#L103)</sub>
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:107](../../stdlib/Net/Http/HttpClientHandler.sl#L107)</sub>
 
 #### MaxConnectionsPerServer *property*
 
@@ -937,7 +978,7 @@ int MaxConnectionsPerServer { get; set; }
 The most connections open to one server at once. A request past it
 waits, within its timeout, for one to be free.
 
-<sub>[stdlib/Net/Http/HttpClientHandler.sl:107](../../stdlib/Net/Http/HttpClientHandler.sl#L107)</sub>
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:111](../../stdlib/Net/Http/HttpClientHandler.sl#L111)</sub>
 
 #### PooledConnectionIdleTimeout *property*
 
@@ -948,7 +989,7 @@ TimeSpan PooledConnectionIdleTimeout { get; set; }
 How long a connection may sit idle in the pool and still be reused.
 Zero pools nothing; negative keeps connections for ever.
 
-<sub>[stdlib/Net/Http/HttpClientHandler.sl:111](../../stdlib/Net/Http/HttpClientHandler.sl#L111)</sub>
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:115](../../stdlib/Net/Http/HttpClientHandler.sl#L115)</sub>
 
 #### MaxResponseHeadersLength *property*
 
@@ -959,7 +1000,7 @@ int MaxResponseHeadersLength { get; set; }
 The most a response head may take, in KiB. HTTP/2 advertises it as
 `SETTINGS_MAX_HEADER_LIST_SIZE`.
 
-<sub>[stdlib/Net/Http/HttpClientHandler.sl:115](../../stdlib/Net/Http/HttpClientHandler.sl#L115)</sub>
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:119](../../stdlib/Net/Http/HttpClientHandler.sl#L119)</sub>
 
 #### InitialHttp2StreamWindowSize *property*
 
@@ -973,7 +1014,7 @@ between 65 535 and 2^31 − 1. .NET's starts at 65 535 and grows it as
 it measures the connection; this one is fixed, so its default is a
 window wide enough for a fast link, 1 MiB.
 
-<sub>[stdlib/Net/Http/HttpClientHandler.sl:122](../../stdlib/Net/Http/HttpClientHandler.sl#L122)</sub>
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:126](../../stdlib/Net/Http/HttpClientHandler.sl#L126)</sub>
 
 #### EnableMultipleHttp2Connections *property*
 
@@ -985,7 +1026,7 @@ Whether a second HTTP/2 connection to a server is opened when every
 stream the first allows is busy. When false, as by default, a request
 waits for a stream to end.
 
-<sub>[stdlib/Net/Http/HttpClientHandler.sl:127](../../stdlib/Net/Http/HttpClientHandler.sl#L127)</sub>
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:131](../../stdlib/Net/Http/HttpClientHandler.sl#L131)</sub>
 
 #### Dispose *method*
 
@@ -996,7 +1037,7 @@ void Dispose()
 Closes every idle connection. A response still being read keeps its
 connection until it is done with it, and that one is then closed too.
 
-<sub>[stdlib/Net/Http/HttpClientHandler.sl:131](../../stdlib/Net/Http/HttpClientHandler.sl#L131)</sub>
+<sub>[stdlib/Net/Http/HttpClientHandler.sl:135](../../stdlib/Net/Http/HttpClientHandler.sl#L135)</sub>
 
 ### HttpCompletionOption *enum*
 
@@ -1274,7 +1315,9 @@ curl reads them: `http_proxy` for http requests, `https_proxy` for https,
 `all_proxy` for either when its own is unset, and `no_proxy` for the
 exceptions. Upper-case `HTTP_PROXY` is ignored when `REQUEST_METHOD` is
 set, because a CGI program finds a request's `Proxy` header there
-("httpoxy"). A value without a scheme is taken as `http://`; one naming any
+("httpoxy"). Names are matched with their case exactly, on Windows too,
+where the environment itself would answer `http_proxy` with `HTTP_PROXY`.
+A value without a scheme is taken as `http://`; one naming any
 other scheme is ignored, since only HTTP proxies are spoken to.
 
 **`no_proxy`** is a comma-separated list: `*` for everything; a domain,
@@ -1285,7 +1328,7 @@ which matches itself and every name below it, with or without a leading
 **A loopback destination always goes direct** — `localhost`, 127/8, `::1`
 — since no proxy elsewhere can reach this machine's loopback.
 
-<sub>[stdlib/Net/Http/HttpEnvironmentProxy.sl:52](../../stdlib/Net/Http/HttpEnvironmentProxy.sl#L52)</sub>
+<sub>[stdlib/Net/Http/HttpEnvironmentProxy.sl:54](../../stdlib/Net/Http/HttpEnvironmentProxy.sl#L54)</sub>
 
 #### FromEnvironment *method*
 
@@ -1296,7 +1339,7 @@ static IWebProxy? FromEnvironment()
 The proxy this process's environment names, or null when it names
 none.
 
-<sub>[stdlib/Net/Http/HttpEnvironmentProxy.sl:63](../../stdlib/Net/Http/HttpEnvironmentProxy.sl#L63)</sub>
+<sub>[stdlib/Net/Http/HttpEnvironmentProxy.sl:65](../../stdlib/Net/Http/HttpEnvironmentProxy.sl#L65)</sub>
 
 #### FromEnvironment *method*
 
@@ -1307,7 +1350,7 @@ static IWebProxy? FromEnvironment(HttpEnvironmentVariableReader read)
 The proxy the variables `read` answers name, or null when they name
 none.
 
-<sub>[stdlib/Net/Http/HttpEnvironmentProxy.sl:68](../../stdlib/Net/Http/HttpEnvironmentProxy.sl#L68)</sub>
+<sub>[stdlib/Net/Http/HttpEnvironmentProxy.sl:73](../../stdlib/Net/Http/HttpEnvironmentProxy.sl#L73)</sub>
 
 #### HttpProxy *property*
 
@@ -1317,7 +1360,7 @@ Uri? HttpProxy { get; }
 
 The proxy for http requests, or null.
 
-<sub>[stdlib/Net/Http/HttpEnvironmentProxy.sl:88](../../stdlib/Net/Http/HttpEnvironmentProxy.sl#L88)</sub>
+<sub>[stdlib/Net/Http/HttpEnvironmentProxy.sl:93](../../stdlib/Net/Http/HttpEnvironmentProxy.sl#L93)</sub>
 
 #### HttpsProxy *property*
 
@@ -1327,7 +1370,7 @@ Uri? HttpsProxy { get; }
 
 The proxy for https requests, or null.
 
-<sub>[stdlib/Net/Http/HttpEnvironmentProxy.sl:91](../../stdlib/Net/Http/HttpEnvironmentProxy.sl#L91)</sub>
+<sub>[stdlib/Net/Http/HttpEnvironmentProxy.sl:96](../../stdlib/Net/Http/HttpEnvironmentProxy.sl#L96)</sub>
 
 #### Credentials *property*
 
@@ -1337,7 +1380,7 @@ NetworkCredential? Credentials { get; set; }
 
 The credentials in the proxy URI's user information, when it had any.
 
-<sub>[stdlib/Net/Http/HttpEnvironmentProxy.sl:94](../../stdlib/Net/Http/HttpEnvironmentProxy.sl#L94)</sub>
+<sub>[stdlib/Net/Http/HttpEnvironmentProxy.sl:99](../../stdlib/Net/Http/HttpEnvironmentProxy.sl#L99)</sub>
 
 #### GetProxy *method*
 
@@ -1347,7 +1390,7 @@ Uri? GetProxy(Uri destination)
 
 *No documentation.*
 
-<sub>[stdlib/Net/Http/HttpEnvironmentProxy.sl:96](../../stdlib/Net/Http/HttpEnvironmentProxy.sl#L96)</sub>
+<sub>[stdlib/Net/Http/HttpEnvironmentProxy.sl:101](../../stdlib/Net/Http/HttpEnvironmentProxy.sl#L101)</sub>
 
 #### IsBypassed *method*
 
@@ -1357,7 +1400,7 @@ bool IsBypassed(Uri host)
 
 *No documentation.*
 
-<sub>[stdlib/Net/Http/HttpEnvironmentProxy.sl:103](../../stdlib/Net/Http/HttpEnvironmentProxy.sl#L103)</sub>
+<sub>[stdlib/Net/Http/HttpEnvironmentProxy.sl:108](../../stdlib/Net/Http/HttpEnvironmentProxy.sl#L108)</sub>
 
 ### HttpEnvironmentVariableReader *closure*
 
@@ -2085,9 +2128,10 @@ Whether `Expect` holds `100-continue`: the body waits for the server's
 String? Host { get; set; }
 ```
 
-`Host`, when it should differ from the request URI's authority.
+`Host`, when it should differ from the request URI's authority. Sent
+to the request's origin and dropped by a redirect to another.
 
-<sub>[stdlib/Net/Http/HttpRequestHeaders.sl:88](../../stdlib/Net/Http/HttpRequestHeaders.sl#L88)</sub>
+<sub>[stdlib/Net/Http/HttpRequestHeaders.sl:89](../../stdlib/Net/Http/HttpRequestHeaders.sl#L89)</sub>
 
 #### Referrer *property*
 
@@ -2097,7 +2141,7 @@ String? Referrer { get; set; }
 
 `Referer`, as the field is spelt.
 
-<sub>[stdlib/Net/Http/HttpRequestHeaders.sl:95](../../stdlib/Net/Http/HttpRequestHeaders.sl#L95)</sub>
+<sub>[stdlib/Net/Http/HttpRequestHeaders.sl:96](../../stdlib/Net/Http/HttpRequestHeaders.sl#L96)</sub>
 
 #### TransferEncodingChunked *property*
 
@@ -2107,7 +2151,7 @@ bool TransferEncodingChunked { get; set; }
 
 Whether the body is sent chunked even when its length is known.
 
-<sub>[stdlib/Net/Http/HttpRequestHeaders.sl:102](../../stdlib/Net/Http/HttpRequestHeaders.sl#L102)</sub>
+<sub>[stdlib/Net/Http/HttpRequestHeaders.sl:103](../../stdlib/Net/Http/HttpRequestHeaders.sl#L103)</sub>
 
 #### UserAgent *property*
 
@@ -2117,7 +2161,7 @@ String? UserAgent { get; set; }
 
 `User-Agent`.
 
-<sub>[stdlib/Net/Http/HttpRequestHeaders.sl:109](../../stdlib/Net/Http/HttpRequestHeaders.sl#L109)</sub>
+<sub>[stdlib/Net/Http/HttpRequestHeaders.sl:110](../../stdlib/Net/Http/HttpRequestHeaders.sl#L110)</sub>
 
 ### HttpRequestMessage *class*
 
@@ -3349,9 +3393,11 @@ RFC 2046's `multipart`.
     parts.Add(new ByteArrayContent(image));
 
 The length is known when every part's is, and the whole can be sent again
-when every part can.
+when every part can. A part with a control character in one of its
+fields fails the request with `InvalidRequest`, before any of it is
+written.
 
-<sub>[stdlib/Net/Http/MultipartContent.sl:37](../../stdlib/Net/Http/MultipartContent.sl#L37)</sub>
+<sub>[stdlib/Net/Http/MultipartContent.sl:39](../../stdlib/Net/Http/MultipartContent.sl#L39)</sub>
 
 #### Boundary *property*
 
@@ -3361,7 +3407,7 @@ String Boundary { get; }
 
 The boundary between parts.
 
-<sub>[stdlib/Net/Http/MultipartContent.sl:59](../../stdlib/Net/Http/MultipartContent.sl#L59)</sub>
+<sub>[stdlib/Net/Http/MultipartContent.sl:61](../../stdlib/Net/Http/MultipartContent.sl#L61)</sub>
 
 #### Parts *property*
 
@@ -3371,7 +3417,7 @@ List<HttpContent> Parts { get; }
 
 The parts, in order.
 
-<sub>[stdlib/Net/Http/MultipartContent.sl:62](../../stdlib/Net/Http/MultipartContent.sl#L62)</sub>
+<sub>[stdlib/Net/Http/MultipartContent.sl:64](../../stdlib/Net/Http/MultipartContent.sl#L64)</sub>
 
 #### Add *method*
 
@@ -3381,7 +3427,7 @@ void Add(HttpContent content)
 
 Adds a part after the others.
 
-<sub>[stdlib/Net/Http/MultipartContent.sl:65](../../stdlib/Net/Http/MultipartContent.sl#L65)</sub>
+<sub>[stdlib/Net/Http/MultipartContent.sl:67](../../stdlib/Net/Http/MultipartContent.sl#L67)</sub>
 
 #### Dispose *method*
 
@@ -3391,7 +3437,7 @@ override void Dispose()
 
 Disposes every part.
 
-<sub>[stdlib/Net/Http/MultipartContent.sl:125](../../stdlib/Net/Http/MultipartContent.sl#L125)</sub>
+<sub>[stdlib/Net/Http/MultipartContent.sl:129](../../stdlib/Net/Http/MultipartContent.sl#L129)</sub>
 
 ### MultipartFormDataContent *class*
 
@@ -3604,5 +3650,5 @@ A sentence describing an HTTP error, for a message a person will read.
 
 **See also** &nbsp; [HttpError](#httperror-enum)
 
-<sub>[stdlib/Net/Http/Http.sl:120](../../stdlib/Net/Http/Http.sl#L120)</sub>
+<sub>[stdlib/Net/Http/Http.sl:130](../../stdlib/Net/Http/Http.sl#L130)</sub>
 

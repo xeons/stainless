@@ -110,16 +110,15 @@ internal sealed class Tls12ClientHandshake
             return TlsError.IllegalParameter;
 
         bool extendedMasterSecret = false;
-        var seen = new List<uint>();
+        var seen = new TlsCodePointSet();
         while (!extensions.IsAtEnd)
         {
             uint type = extensions.ReadUInt16();
             TlsReader data = extensions.ReadVector(2u, 0u, 65535u);
             if (extensions.Failed)
                 return TlsError.Decode;
-            if (seen.Contains(type))
+            if (!seen.Add(type))
                 return TlsError.IllegalParameter;
-            seen.Add(type);
             if (!_offered._extensionTypes.Contains(type))
                 return TlsError.UnsupportedExtension;
 
@@ -342,6 +341,7 @@ internal sealed class Tls12ClientHandshake
         if (!share.Ok)
             return share.Error;
         var premaster = share.Value.DeriveTlsSharedSecret(_serverPoint);
+        share.Value.WipeTlsPrivateKey();
         if (!premaster.Ok)
             return premaster.Error;
 
@@ -355,6 +355,7 @@ internal sealed class Tls12ClientHandshake
 
         schedule.DeriveTlsExtendedMasterSecret(
             premaster.Value, _transcript.ComputeTls12TranscriptHash(schedule));
+        CryptographicOperations.ZeroMemory(premaster.Value);
         _connection._tls12Schedule = schedule;
 
         if (scheme.Some && key != null)
@@ -372,7 +373,7 @@ internal sealed class Tls12ClientHandshake
         sent = _connection.WriteTlsChangeCipherSpec();
         if (sent != TlsError.None)
             return sent;
-        var writing = schedule.CreateTls12RecordCipher(_suite, true);
+        var writing = schedule.TakeTls12RecordCipher(_suite, true);
         if (!writing.Ok)
             return writing.Error;
         _connection.InstallTlsWriteCipher(writing.Value);
@@ -422,7 +423,7 @@ internal sealed class Tls12ClientHandshake
         TlsError changed = _connection.ReadTlsChangeCipherSpec();
         if (changed != TlsError.None)
             return changed;
-        var reading = schedule.CreateTls12RecordCipher(_suite, false);
+        var reading = schedule.TakeTls12RecordCipher(_suite, false);
         if (!reading.Ok)
             return reading.Error;
         _connection._records.InstallTlsReadCipher(reading.Value);
@@ -445,21 +446,16 @@ internal sealed class Tls12ClientHandshake
         return TlsError.None;
     }
 
-    /// The next handshake message, which MUST be of `type`. A HelloRequest
-    /// is passed over while a handshake is under way (RFC 5246 §7.4.1.1).
+    /// The next handshake message, which MUST be of `type`. The connection
+    /// passes over a HelloRequest (RFC 5246 section 7.4.1.1).
     private Result<byte[], TlsError> ReadTls12HandshakeMessage(TlsHandshakeType type)
     {
-        while (true)
-        {
-            var read = _connection.ReadTlsHandshakeMessage();
-            if (!read.Ok)
-                return read;
-            var got = (TlsHandshakeType)read.Value[0u];
-            if (got == type)
-                return read;
-            if (got != TlsHandshakeType.HelloRequest)
-                return Fail(TlsError.UnexpectedMessage);
-        }
+        var read = _connection.ReadTlsHandshakeMessage();
+        if (!read.Ok)
+            return read;
+        if ((TlsHandshakeType)read.Value[0u] != type)
+            return Fail(TlsError.UnexpectedMessage);
+        return read;
     }
 }
 

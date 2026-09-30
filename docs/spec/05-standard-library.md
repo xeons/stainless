@@ -49,7 +49,7 @@ own for the linker to drop.
 | `Standard.Json` | JSON, as a document or onto a type ([§5.10](#510-standardjson-and-standardxml)) | on request |
 | `Standard.Xml` | XML, in the same two layers ([§5.10](#510-standardjson-and-standardxml)) | on request |
 | `Standard.Resources` | what a `.rc` folded into the binary, read back on every platform ([section 2.3 of packages.md](../packages.md#23-resources)) | on request |
-| `Standard.Net` | TCP and UDP sockets, the same on every platform | on request |
+| `Standard.Net` | TCP and UDP sockets, the same on every platform: a connect tries every address a name resolves to, within a limit if given; an accepted socket blocks whatever its listener does; no socket is inherited by a child process; a UDP receive is not failed by an earlier send to a closed port | on request |
 | `Standard.Net.Security` | TLS 1.3 and 1.2, client and server, over any stream ([§5.17](#517-standardnetsecurity)) | on request |
 | `Standard.Net.Http` | an HTTP/1.1 and HTTP/2 client: pooled and multiplexed connections, redirects, cookies, decompression, proxies ([§5.18](#518-standardnethttp)) | on request |
 | `Standard.Env` | the command line, the environment, the working directory | on request |
@@ -986,7 +986,7 @@ here.
 | elliptic curves | `ECCurve`, `ECParameters`, `ECPoint`, `HashAlgorithmName`, `DsaSignatureFormat` |
 | public key | `Rsa`, with `RsaParameters`, `HashAlgorithmName`, `RsaSignaturePadding` and `RsaEncryptionPadding` |
 | text | `PemEncoding`: RFC 7468 blocks found in text and written at 64 columns |
-| the rest | `RandomNumberGenerator`, `CryptographicOperations.FixedTimeEquals` |
+| the rest | `RandomNumberGenerator`, `CryptographicOperations.FixedTimeEquals` and `ZeroMemory` |
 
 **The ciphers and MACs are constant time in software.** AES is bitsliced, four
 blocks at a time with a logic circuit for the S-box, as BearSSL's `aes_ct64`
@@ -1011,7 +1011,9 @@ without a table, ChaCha20, Poly1305 — along with `FixedTimeEquals`, all of
 `X25519`, `Ed25519` signing, and everything `ECDsa` and `ECDiffieHellman` do
 with a private scalar or a nonce: no branch and no memory index there depends
 on a secret, and every secret-dependent choice is a mask passed through
-`Bits.OpaqueCopy`. Verification, for both signature schemes, is variable time
+`Bits.OpaqueCopy`. Removing PKCS #7 or ANSI X9.23 padding after CBC or ECB is
+the same: the whole last block is examined under masks and there is one
+verdict, so the time does not say which byte was wrong. Verification, for both signature schemes, is variable time
 and touches only public data. The claim is timing and cache only; the module's
 own documentation says what it does not cover.
 
@@ -1019,12 +1021,42 @@ own documentation says what it does not cover.
 group order is refused, as is a public key that is not the one canonical
 encoding of a point on the curve, and the equation checked is [S]B = R + [k]A
 rather than that multiplied by the cofactor. RFC 8032 §5.1.7 allows either.
+A public key of small order, one whose eightfold multiple is the identity, is
+refused too, as libsodium refuses it: no secret stands behind such a key, and
+under the identity R = B and S = 1 sign every message. RFC 8032 does not ask
+for that check.
+
+**Every length and every cost has a ceiling**, and passing one is
+`CryptoError.Parameter` before anything is allocated. `AesGcm` takes at most
+2^36 - 32 bytes of text, past which its 32-bit counter would wrap onto the
+block that masks the tag, and less than 2^61 bytes of associated data;
+`ChaCha20` stops where its block counter would wrap. PBKDF2 derives at most
+2^32 - 1 digests, where its block index would wrap. `Scrypt` holds V and B
+together within `MaxMemoryBytes`, 4 GiB, and N * r * p within `MaxWork`, 2^30.
+`Argon2id` holds memory within `MaxMemoryKiB`, 4 GiB, passes times memory
+within `MaxWorkKiB`, 2^28 KiB, and its output within `MaxLength`, 1 MiB. The
+work limits are minutes of computation, and exist because the parameters of a
+stored password hash are input like any other.
+
+**Key material is overwritten when the object holding it is destroyed.**
+`Aes`, `AesGcm`, `ChaCha20`, `Poly1305`, `Hmac`, the SHA-1, SHA-2 and MD5
+hashes (whose state holds `Hmac`'s keyed pad), `Blake2b`, the NIST-curve keys
+and the RSA private key each clear their keys, schedules and state in their
+destructors, through a write the optimiser may not remove. PBKDF2 and HKDF
+clear each intermediate block as they go. That covers what the library copied;
+an array the caller passed in is the caller's to clear, with
+`CryptographicOperations.ZeroMemory`, and a copy the compiler left in a
+register or on the stack is not reached. An object stored in a `static
+readonly` is immortal and never destroyed, so its key stays in memory until
+the process ends.
 
 **The NIST curves are fixed-width arithmetic, not a bignum.** P-256 and P-384
 are Montgomery multiplication over four or six 64-bit limbs held inline, with
 the complete addition formulas of Renes, Costello and Batina, so no point is a
 special case. Signatures are RFC 6979's, so the same key and message always
-sign the same. Keys travel as `ECParameters`, SEC 1 points, SEC 1 and PKCS #8
+sign the same. `ECDsa.SignHash(hash)` has only a digest, so it chooses the
+nonce's HMAC by the digest's length; the overload that names the hash is the
+one that gives the same bytes as another RFC 6979 implementation. Keys travel as `ECParameters`, SEC 1 points, SEC 1 and PKCS #8
 private keys, `SubjectPublicKeyInfo` and PEM, and every point and scalar
 imported is checked. RFC 6979's own vectors, NIST's CDH vectors, a spread of
 Wycheproof's and keys, signatures and secrets made by OpenSSL pin it, in
@@ -1037,6 +1069,12 @@ and PSS, encryption in OAEP and PKCS #1 v1.5, keys generated as FIPS 186-5
 .NET's `RSA` in one more way than the rest of the module: an `Rsa` always holds
 a key, so an import is a static method that answers one —
 `Rsa.ImportFromPem(pem)` — rather than a method that changes one.
+
+**Sizes are bounded.** Every key read or built from its numbers has a modulus
+of 1024 to 8192 bits and a public exponent of at most 33 bits, as in
+BoringSSL, so that one verification with a key from the network costs a few
+milliseconds and no more; `Rsa.Create(int)` makes 2048 to 8192. The PEM search
+under `PemEncoding.Find` and `FindUtf8` is one forward pass over the text.
 
 ```csharp
 var key = try Rsa.Create(2048);
@@ -1144,24 +1182,42 @@ extension the module knows is decoded as the certificate is read, so a
 malformed key usage is a certificate that does not parse rather than a
 surprise later. What browsers tolerate is tolerated: serial numbers of up to
 20 octets that are zero or negative, an explicit `critical FALSE`, a
-`PrintableString` holding `*` or `@`.
+`PrintableString` holding `*` or `@`. An explicit version 1, the DEFAULT, is
+not DER and is refused.
 
 **Host names never fall back to the common name**, which no current browser
 does. A wildcard is the whole left-most label, stands for one label, and needs
-two after it; an address matches only an address entry, as bytes.
+two after it; an address matches only an address entry, as bytes. There is no
+public suffix list: a wildcard over a common second-level label under a
+two-letter country code, `*.co.uk` or `*.com.au`, matches nothing, and any
+other public suffix is taken for a name.
 
 **A chain is built, not just checked.** Every issuer whose name and key
 identifier fit is tried in turn, anchors first, so a cross-signed
 intermediate or a second CA of the same name is found when the first leads
-nowhere. Along the chosen path it checks validity at the policy's time,
-every signature, basic constraints and path length, key usage and extended
-key usage, name constraints over the leaf's DNS and IP names, and critical
-extensions it does not understand. There is no revocation: asking for it
-fails the chain with `RevocationStatusUnknown` rather than passing silently.
+nowhere. Along the chosen path it checks validity at the moment of the
+`Build`, or at `VerificationTime` when that was set; every signature, with
+SHA-1 (RSASSA-PSS over SHA-1 included) and RSA keys under 2048 bits reported
+as `HasWeakSignature`; basic constraints and path length; key usage and
+extended key usage, a TLS leaf's key usage allowing a digital signature;
+name constraints over the DNS names, addresses, e-mail addresses and
+directory names of every certificate below the constraining CA, subjects
+included; and critical extensions it does not understand, which include name
+constraints holding a URI or another kind of subtree it does not enforce.
+There is no revocation: asking for it fails the chain with
+`RevocationStatusUnknown` rather than passing silently.
+
+**The work of a `Build` is bounded**, since its certificates usually come
+from the network: at most eight certificates in a path, 128 candidates tried,
+the first 64 of the extra store read, and 100 signatures verified, each pair
+of certificate and issuer once. A signature the budget leaves unverified does
+not verify. With the RSA bounds above, the worst a crafted chain can cost is
+about half a second.
 
 `X509Store.Open(StoreName.Root)` is crypt32's store on Windows, loaded by
-name so that no program links it, and the system PEM bundle elsewhere; each
-is read once per process. `CertificateRequest` makes certificates signed by
+name so that no program links it, less whatever the user's or the machine's
+`Disallowed` store holds, and the system PEM bundle elsewhere; each is read
+once per process. `CertificateRequest` makes certificates signed by
 Ed25519, ECDSA or RSA through an `X509SignatureGenerator`.
 `tests/cases/x509` pins every field, thumbprint and host name against
 OpenSSL's reading of a small PKI and of Let's Encrypt's roots and
@@ -1217,8 +1273,34 @@ chain and the name asked for, and answers `TlsError.None` or the refusal to
 send. The default is the platform's: an `X509Chain` to a root in the system
 store ([§5.16](#516-standardsecuritycryptographyx509certificates)), the
 server-authentication usage, and the host name asked for. A program that pins
-a certificate or trusts a private CA supplies its own. The CertificateVerify
-signature against the leaf is checked here whatever the validator says.
+a certificate or trusts a private CA supplies its own. A server judges a
+client's chain with `ValidateTlsClientCertificateChainByDefault`, which wants
+the client-authentication usage and has no name to match. The CertificateVerify
+signature against the leaf is checked after the validator accepts, and never
+after it refuses: a refused chain's key is not used for anything.
+
+**A client MUST have a name to check, or a validator of its own.** An empty
+`TargetHost` with the default validator fails with `InternalError` before
+anything is sent, and the default validator refuses an empty name however it
+is reached. `TlsSocket.Connect` fills an empty `TargetHost` in with its host.
+
+**What a peer can make this end do is bounded.** A ClientHello's extensions
+and key shares are checked for repeats with a bitmap, so one of 64 KiB parses
+in well under a millisecond. More than 32 records in a row that carry nothing
+-- empty application data, warning alerts, TLS 1.2 renegotiation requests --
+end the connection with `unexpected_message`. An RSA key in a certificate is
+refused over 8192 bits or with an exponent over 33 bits. A sequence number is
+never allowed to wrap. A server skips up to 32.5 KiB of 0-RTT data a client
+sends although it was never accepted (RFC 8446 section 4.2.10). An exporter
+asked for more than it can give, a label or a context too long for its length
+prefix, fails with `InternalError` rather than truncating.
+
+**Secrets are overwritten when they are done with**: the ECDHE shared secret
+and the X25519 private key once they are agreed, the handshake secrets once
+both Finished messages are, the old traffic secret at each KeyUpdate, the TLS
+1.2 premaster secret and key block once they are used, and the rest at
+`Close`. A NIST curve's private key is inside its `ECDiffieHellman` and is
+dropped rather than overwritten, and so are the AEADs' expanded keys.
 
 `tests/cases/tls13-rfc8448` replays RFC 8448's 1-RTT trace against both
 halves: the client writes the trace's records byte for byte and verifies its
@@ -1227,7 +1309,8 @@ the trace's keys open. `tls12-prf` checks TLS 1.2's PRF against its published
 vectors, and its key block and records against values computed
 independently. `tls13-handshake` and `tls12-handshake` run every suite, group
 and key over the loopback, and `tls13-refusals` and `tls12-refusals` pin the
-alert for each refusal.
+alert for each refusal. `tls-hardening` and `tls-hardening-internals` pin the
+limits above.
 
 ## 5.18 `Standard.Net.Http`
 
@@ -1257,9 +1340,14 @@ given back only once a body has been read to its end; a response disposed
 before then closes its connection. A request that fails before any byte of
 the answer on a pooled connection is sent once more on a new one when its
 method is idempotent. **`HttpClient.Timeout` covers the whole request**: the
-connect is made without blocking and waited for, and every read and write
-after it is given what is left. Name resolution is the one step it cannot
-cover, since the platform's resolver takes no timeout.
+connect is made without blocking and waited for, trying each address the name
+resolves to with an equal share of what is left, and every read and write
+after it is given what is left, including each read of the response head, of
+the TLS handshake and of a proxy's answer to `CONNECT`, so a peer sending a
+byte at a time cannot stretch it. Name resolution is the one step it cannot
+cover, since the platform's resolver takes no timeout. A host holding a control byte, a space,
+or one of `/ ? # @ \` is refused before anything connects, since it would
+split the request line or the `CONNECT` authority it is written into.
 
 **Responses are parsed strictly**, because each leniency is a way to smuggle
 one message inside another: a malformed status line, a folded field, a field
@@ -1268,17 +1356,37 @@ size that is not hexadecimal, two `Content-Length`s that disagree, and a
 `Content-Length` beside a `Transfer-Encoding` are all refused as
 `InvalidResponse` or `ResponseTooLarge`. Bodies are framed by length, by
 chunks with their trailer in `TrailingHeaders`, or by the close; 1xx answers
-are skipped, and HEAD, 204 and 304 have no body whatever they declare.
+are skipped, and HEAD, 204 and 304 have no body whatever they declare. A
+body sent with `Expect: 100-continue` waits for 100, or for the continue
+time to pass; another 1xx such as 103 is read past rather than taken as the
+answer.
 
-Redirects follow RFC 9110: 301, 302 and 303 become `GET` without a body, 307
-and 308 keep both when the body can be sent twice, `Authorization` is dropped
-once a redirect leaves the origin, and https to http is not followed.
-`CookieContainer` is RFC 6265 with a short built-in list of public suffixes
-rather than the Public Suffix List. `AutomaticDecompression` undoes gzip and
+**Requests are held to what they declare**, for the same reason. A body
+longer than its `Content-Length` fails with `ContentFailure` before a byte
+past the length is written, and its connection is closed; a multipart part
+with a control character in a field fails with `InvalidRequest`. `Uri`
+refuses a host with a control byte, a space, DEL, or any of `/ ? # @ \ [ ]`
+and `:` outside a bracketed IPv6 literal, so no host can end a request line
+or a `CONNECT`.
+
+Redirects follow RFC 9110 as browsers and .NET do: 303 makes any method but
+HEAD a `GET` without a body, 301 and 302 do so to `POST` alone, and every
+other method, like 307 and 308, keeps its method and its body when the body
+can be sent twice. Once a redirect leaves the origin, `Authorization`, a
+`Cookie` set by hand and a `Host` override are dropped; a hand-set
+`Proxy-Authorization` goes only to a plain proxy of the first origin. https
+to http is not followed. `CookieContainer` is RFC 6265 with a short built-in
+list of public suffixes rather than the Public Suffix List; it holds at most
+`PerDomainCapacity` cookies for a domain and `Capacity` in all, 50 and 3000,
+evicting what has expired and then the oldest, and takes a `Max-Age` past 400
+days as 400 days (RFC 6265bis). `AutomaticDecompression` undoes gzip and
 deflate — zlib or raw, as browsers accept — as the body is read. Proxies are
 HTTP proxies: absolute-form for http, a `CONNECT` tunnel carrying the TLS for
 https, Basic `Proxy-Authorization`, and `HttpClient.DefaultProxy` read from
 `http_proxy`, `https_proxy`, `all_proxy` and `no_proxy` as curl reads them.
+Variable names are matched case and all, on Windows too, so that under CGI
+`HTTP_PROXY`, which is a request's `Proxy` header, is never taken for
+`http_proxy`; a `no_proxy` entry with a port that cannot be read is ignored.
 `DateTimeOffset.FormatHttpDate` and `ParseHttpDate` in `Standard.Time` write
 and read the HTTP-date the fields use.
 
@@ -1314,7 +1422,9 @@ when the policy allows lower.
 **An HTTP/2 connection is shared**, a stream for each request, up to the
 server's `MAX_CONCURRENT_STREAMS`; a request past it waits for a stream to
 end, or opens a second connection when `EnableMultipleHttp2Connections` is
-set. One reader thread per connection applies each frame to its stream, and
+set; a request whose new connection comes up allowing no streams waits on
+it rather than opening another. One reader thread per connection applies each
+frame to its stream, and
 ends with the connection. HPACK keeps a dynamic table both ways with
 Huffman coding, and never indexes `authorization`, `proxy-authorization` or
 `cookie`. Flow control is kept at both levels in both directions: a request
@@ -1333,6 +1443,31 @@ connection-specific fields, a missing `:status`, a body unlike its
 `content-length` — resets its stream and is `InvalidResponse`.
 `HttpFailure.ProtocolErrorCode` carries the code. Server push is refused, and
 `Dispose` sends GOAWAY and closes each connection once its streams are done.
+
+**A peer that stops reading cannot hold a request past its timeout.** Each
+write on the connection sets the socket's send timeout from the deadline of
+the request making it, a request waiting behind another's write waits no
+longer than its own deadline, and a write that times out part-way ends the
+connection, since a partial frame leaves the peer unable to find the next.
+What the reader thread owes the peer, SETTINGS and PING acknowledgements,
+WINDOW_UPDATEs and RST_STREAMs, is queued for whichever request writes next;
+when nobody is writing the reader writes it, and a write of it that takes
+longer than 5 seconds ends the connection.
+The queue holds at most 1000 acknowledgements and 64 KiB; a peer that
+provokes more is sent GOAWAY with ENHANCE_YOUR_CALM (RFC 9113 section 10.5,
+the PING and SETTINGS floods of CVE-2019-9512 and CVE-2019-9515).
+WINDOW_UPDATEs for one stream are merged while they wait.
+
+Frames on a stream this end reset are dropped however many streams have been
+reset since, DATA credited back to the connection's window and a header block
+still decoded, so that the HPACK tables stay in step. A frame after the
+peer's own END_STREAM remains a STREAM_CLOSED connection error while its
+stream is among the last 128 the peer ended. When `SETTINGS_HEADER_TABLE_SIZE`
+changes more than once before the next header block, that block announces
+the smallest size and then the last (RFC 7541 section 4.2), and no SETTINGS
+acknowledgement goes out ahead of a block encoded under the old size. A
+connection whose stream identifiers run out takes no new stream, and sends
+GOAWAY and closes once the last of them is done.
 
 `tests/cases/http-*`, `http2-*` and `https-basics` run the client against
 scripted servers on the loopback, a small proxy among them; `hpack` checks

@@ -63,7 +63,10 @@
 /// to its window without holding up the others; a timeout, or a body closed
 /// early, resets only its stream. A request the server never processed — a
 /// GOAWAY below its stream, or REFUSED_STREAM — is sent again on a new
-/// connection whatever its method.
+/// connection whatever its method. Every write is bounded by the timeout of
+/// the request making it, and one that times out part-way ends the
+/// connection; a peer that provokes more PING and SETTINGS answers than it
+/// reads is sent GOAWAY with ENHANCE_YOUR_CALM.
 ///
 /// **Responses are parsed strictly.** A status line that is not
 /// `HTTP/1.x NNN reason`, a folded header, a header line or block over its
@@ -75,6 +78,13 @@
 /// missing `:status` and a body unlike its `content-length` reset the stream
 /// and are `InvalidResponse`; a peer that breaks the framing is sent GOAWAY
 /// and every stream on it fails with `ProtocolError`.
+///
+/// **Requests are held to what they declare.** A body longer than its
+/// `Content-Length` fails with `ContentFailure` before a byte past the
+/// length is written, since the server would read the excess as another
+/// request, and the connection is closed. A host with a control byte, a
+/// space or a delimiter in it is not a URI, and a multipart part with a
+/// control character in a field fails with `InvalidRequest`.
 ///
 /// **Certificates are judged by the TLS module's validator** unless
 /// `HttpClientHandler.ServerCertificateCustomValidationCallback` is set, in

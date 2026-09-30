@@ -107,7 +107,7 @@ internal sealed class Http2Connection : IHttpConnection
 
         HttpContent? content = request.Content;
         var stream = new Http2Stream(request.Method.Method == "HEAD");
-        if (!_multiplexer.OpenHttp2Stream(stream, fields, content == null))
+        if (!_multiplexer.OpenHttp2Stream(stream, fields, content == null, exchange.Deadline))
             return Fail(_multiplexer.ReportHttp2StreamFailure(stream, exchange));
 
         if (content != null)
@@ -140,10 +140,17 @@ internal sealed class Http2Connection : IHttpConnection
         }
 
         var body = new Http2RequestBody(_multiplexer, stream, exchange);
-        var counted = new HttpCountingStream(body);
+        var counted = new HttpCountingStream(body, request.IsChunked ? -1 : request.DeclaredLength);
         HttpError written = content.WriteHttpContent(counted);
         if (body.HasFailed)
             return HttpError.None;
+        if (counted.HasOverflowed)
+        {
+            _multiplexer.CancelHttp2Stream(stream,
+                                           "the request content was longer than it declared");
+            return failure.RecordHttpFailure(HttpError.ContentFailure,
+                "the request content was longer than the length it declared");
+        }
         if (written != HttpError.None)
         {
             _multiplexer.CancelHttp2Stream(stream, "the request content could not be read");
@@ -156,7 +163,7 @@ internal sealed class Http2Connection : IHttpConnection
             return failure.RecordHttpFailure(HttpError.ContentFailure,
                 "the request content was not the length it declared");
         }
-        _multiplexer.EndHttp2RequestBody(stream);
+        _multiplexer.EndHttp2RequestBody(stream, exchange.Deadline);
         return HttpError.None;
     }
 
@@ -225,9 +232,8 @@ internal Result<IHttpConnection, HttpError> StartHttp2Connection(
             "the connection closed before the HTTP/2 preface was sent"));
     }
     // The reader blocks for as long as the connection lives; each request
-    // keeps its own deadline instead.
+    // keeps its own deadline instead, and each write sets the send timeout.
     tcp.Underlying.SetReceiveTimeout(0);
-    tcp.Underlying.SetSendTimeout(0);
 
     var connection = new Http2Connection(multiplexer);
     connection.StartHttp2Reader();

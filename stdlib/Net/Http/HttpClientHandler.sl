@@ -56,7 +56,11 @@ public class HttpClientHandler
     // NOT be the one to release the connections that join it.
     ~HttpClientHandler() { Dispose(); }
 
-    /// Whether a `3xx` with a `Location` is followed.
+    /// Whether a `3xx` with a `Location` is followed. A 303 makes any method
+    /// but HEAD a `GET` without a body; a 301 or a 302 does so to `POST`
+    /// alone; a 307 or a 308 keeps the method and the body. Once a redirect
+    /// leaves the first origin, `Authorization`, a `Cookie` set by hand and
+    /// a `Host` override are not sent.
     public bool AllowAutoRedirect { get; set; } = true;
 
     /// How many redirects one request may follow before it fails with
@@ -204,15 +208,20 @@ public class HttpClientHandler
             int status = (int)response.StatusCode;
             HttpMethod method = request.Method;
             HttpContent? content = request.Content;
-            if (status == 307 || status == 308)
-            {
-                if (content != null && !content.RewindHttpContent())
-                    break;
-            }
-            else if (method.Method != "HEAD")
+            // 303 makes anything but HEAD a GET; 301 and 302 do so to POST
+            // alone, as browsers and .NET do. Every other method goes again
+            // as it was, with its body.
+            bool becomesGet = status == 303
+                ? method.Method != "HEAD"
+                : (status == 301 || status == 302) && method.Method == "POST";
+            if (becomesGet)
             {
                 method = HttpMethod.Get;
                 content = null;
+            }
+            else if (content != null && !content.RewindHttpContent())
+            {
+                break;
             }
 
             redirects++;
@@ -289,11 +298,12 @@ public class HttpClientHandler
         var exchange = new HttpExchange(deadline, failure, headerLimit);
         String key = route.PoolKey;
         bool allowIdle = true;
+        bool mayAddHttp2 = true;
         nuint attempt = 0u;
         while (true)
         {
             attempt++;
-            HttpError reserved = pool.ReserveHttpConnection(key, deadline, choice, allowIdle,
+            HttpError reserved = pool.ReserveHttpConnection(key, deadline, choice, allowIdle, mayAddHttp2,
                                                             out IHttpConnection? found);
             if (reserved != HttpError.None)
             {
@@ -317,10 +327,16 @@ public class HttpClientHandler
                     return Fail(opened.Error);
                 }
                 connection = opened.Value;
+                HttpError added = pool.AddHttpConnection(key, connection, choice, out bool streamReserved);
+                if (added != HttpError.None)
+                    return Fail(failure.RecordHttpFailure(added, "the handler has been disposed"));
                 // A connection that came up with no stream free is waited on
-                // like any other.
-                if (!pool.AddHttpConnection(key, connection, choice) && connection.IsMultiplexed)
+                // like any other, and no more are opened for this request.
+                if (!streamReserved && connection.IsMultiplexed)
+                {
+                    mayAddHttp2 = false;
                     continue;
+                }
             }
 
             exchange.IsRetryable = false;
@@ -414,6 +430,8 @@ public class HttpClientHandler
         int port = uri.Port;
         if (host.IsEmpty || port <= 0 || port > 65535)
             return Fail(failure.RecordHttpFailure(HttpError.InvalidRequest, "the URI names no host"));
+        if (!IsHttpHostValid(uri.Host))
+            return Fail(failure.RecordHttpFailure(HttpError.InvalidRequest, "the URI's host is malformed"));
         var route = new HttpRoute(scheme, host, (ushort)port);
 
         if (!UseProxy)
@@ -457,16 +475,22 @@ public class HttpClientHandler
         wire.Path = path;
         HttpWireHeaders fields = wire.Fields;
         HttpRequestHeaders headers = request.Headers;
-        String? host = headers.Host;
+        // A Host override was meant for the first origin, not for another.
+        String? host = sameOrigin ? headers.Host : null;
         fields.AppendHttpValue("Host", host != null ? host : uri.Authority);
 
+        // A hand-set Proxy-Authorization goes only to a plain proxy of the
+        // first origin that the handler has no credentials for; anywhere
+        // else it would reach a server or another proxy.
+        bool plainProxy = route.Proxy != null && !route.IsHttps;
+        bool keepsProxyAuthorization = plainProxy && sameOrigin && route.ProxyCredentials == null;
         foreach (var field in defaults.Fields)
         {
             if (!headers.Contains(field.Name))
-                AddHttpRequestField(fields, field, sameOrigin);
+                AddHttpRequestField(fields, field, sameOrigin, keepsProxyAuthorization);
         }
         foreach (var field in headers.Fields)
-            AddHttpRequestField(fields, field, sameOrigin);
+            AddHttpRequestField(fields, field, sameOrigin, keepsProxyAuthorization);
 
         if (AutomaticDecompression != DecompressionMethods.None && !fields.Contains("Accept-Encoding"))
         {
@@ -485,7 +509,7 @@ public class HttpClientHandler
             }
         }
 
-        if (route.Proxy != null && !route.IsHttps && route.ProxyCredentials is NetworkCredential credentials)
+        if (plainProxy && route.ProxyCredentials is NetworkCredential credentials)
             fields.AppendHttpValue("Proxy-Authorization", FormatHttpBasicCredentials(credentials));
 
         HttpContent? content = request.Content;
@@ -536,20 +560,26 @@ public class HttpClientHandler
     }
 
     /// Copies one request field onto the wire, leaving out what this handler
-    /// decides itself, and `Authorization` once a redirect has left the
-    /// origin it was meant for.
-    private void AddHttpRequestField(HttpWireHeaders fields, HttpHeaderField field, bool sameOrigin)
+    /// decides itself, `Authorization` and `Cookie` once a redirect has left
+    /// the origin they were meant for, and `Proxy-Authorization` unless
+    /// `keepsProxyAuthorization`.
+    private void AddHttpRequestField(HttpWireHeaders fields, HttpHeaderField field, bool sameOrigin,
+                                     bool keepsProxyAuthorization)
     {
         switch (field.Key)
         {
             case "host":
             case "transfer-encoding":
             case "content-length":
-                return;
             case "expect":
                 return;
             case "authorization":
+            case "cookie":
                 if (!sameOrigin)
+                    return;
+                break;
+            case "proxy-authorization":
+                if (!keepsProxyAuthorization)
                     return;
                 break;
         }
@@ -584,6 +614,27 @@ internal String DescribeHttpContentCoding(HttpResponseMessage response)
 {
     String? coding = response.Content.Headers.GetFirstHttpValue("content-encoding");
     return coding == null ? "compressed data" : coding;
+}
+
+/// Whether `host`, as a URI has it, can go in a request line and a `Host`
+/// field: no control byte, space or DEL, none of `/ ? # @ \`, and brackets
+/// and colons only in a bracketed IPv6 literal.
+internal bool IsHttpHostValid(String host)
+{
+    nuint length = host.ByteLength();
+    bool bracketed = length >= 2u && host.GetByteAt(0u) == (byte)'[' &&
+                     host.GetByteAt(length - 1u) == (byte)']';
+    nuint start = bracketed ? 1u : 0u;
+    nuint end = bracketed ? length - 1u : length;
+    for (nuint i = start; i < end; i++)
+    {
+        byte c = host.GetByteAt(i);
+        if (c <= (byte)' ' || c == 0x7F || "/?#@\\[]".Contains((char)c))
+            return false;
+        if (c == (byte)':' && !bracketed)
+            return false;
+    }
+    return true;
 }
 
 /// Whether two URIs share a scheme, a host and a port.

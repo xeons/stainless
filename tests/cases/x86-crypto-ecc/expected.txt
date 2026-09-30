@@ -16,6 +16,9 @@ p256 sha384 test verifies ok
 p256 sha512 test ok
 p256 sha512 test verifies ok
 p256 sign hash ok
+p256 sign hash named ok
+p256 sign hash named der ok
+p256 sign hash unnamed ok
 p384 public from private ok
 p384 sha1 sample ok
 p384 sha1 sample verifies ok

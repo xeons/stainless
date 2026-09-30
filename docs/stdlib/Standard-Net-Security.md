@@ -48,7 +48,8 @@ and a client that offered TLS 1.3 refuses a ServerHello that carries it.
 tickets; in TLS 1.2, CBC suites, static RSA key exchange, finite-field
 DHE, compression and renegotiation, which is answered from either side
 with a no_renegotiation warning; and 0-RTT data, which is never coming,
-since it is replayable by design.
+since it is replayable by design. A server skips what a client sends of
+it unasked, as RFC 8446 section 4.2.10 requires.
 
 **Certificates are judged by a `TlsCertificateValidator`**, a closure the
 options carry. The default is the platform's trust: an `X509Chain` from
@@ -56,7 +57,15 @@ the peer's certificates to a root in the system store, the
 server-authentication usage, and the host name the client asked for. A
 program that pins a certificate, or trusts a private CA, supplies its own.
 The validator decides whom to trust; the CertificateVerify signature
-against the leaf's key is always checked here.
+against the leaf's key is then checked here, and a refused chain's key is
+never used. A client MUST have a `TargetHost` or a validator of its own:
+with neither, the handshake fails with `InternalError` before it starts.
+
+**What a peer can make this end do is bounded**: repeated extensions are
+found in linear time, a run of more than 32 records that carry nothing
+ends the connection, an RSA key over 8192 bits or with an exponent over 33
+bits is refused, and a sequence number never wraps. Secrets are
+overwritten once they are done with, and all of them at `Close`.
 
 **The record layer is constant time where a secret is involved.** The
 AEADs check their tags in constant time, and the padding of a TLS 1.3
@@ -77,7 +86,7 @@ has no KeyUpdate, and its keys last as long as the connection.
 
 **Types** &nbsp; [TlsAlertDescription](#tlsalertdescription-enum) &middot; [TlsCertificateValidator](#tlscertificatevalidator-closure) &middot; [TlsCipherSuite](#tlsciphersuite-enum) &middot; [TlsClientOptions](#tlsclientoptions-class) &middot; [TlsError](#tlserror-enum) &middot; [TlsNamedGroup](#tlsnamedgroup-enum) &middot; [TlsProtocolVersion](#tlsprotocolversion-enum) &middot; [TlsServerOptions](#tlsserveroptions-class) &middot; [TlsSessionTicket](#tlssessionticket-class) &middot; [TlsSessionTicketHandler](#tlssessiontickethandler-closure) &middot; [TlsSignatureScheme](#tlssignaturescheme-enum) &middot; [TlsSigningKey](#tlssigningkey-class) &middot; [TlsSocket](#tlssocket-class) &middot; [TlsStream](#tlsstream-class)
 
-**Functions** &nbsp; [DescribeTlsError](#describetlserror-function) &middot; [DiscardTlsSessionTicket](#discardtlssessionticket-function) &middot; [ValidateTlsCertificateChainByDefault](#validatetlscertificatechainbydefault-function)
+**Functions** &nbsp; [DescribeTlsError](#describetlserror-function) &middot; [DiscardTlsSessionTicket](#discardtlssessionticket-function) &middot; [ValidateTlsCertificateChainByDefault](#validatetlscertificatechainbydefault-function) &middot; [ValidateTlsClientCertificateChainByDefault](#validatetlsclientcertificatechainbydefault-function)
 
 ## Types
 
@@ -386,17 +395,18 @@ closure TlsError TlsCertificateValidator(List<byte[]> chain, String targetHost)
 Decides whether the peer's certificate chain is to be trusted.
 
 `chain` is the certificates as the peer sent them, each in DER, the leaf
-first. `targetHost` is the name the client asked for: what a server
-certificate MUST be valid for, and empty when a server is judging a client.
-The answer is `TlsError.None` to go on; anything else ends the handshake
-and is sent to the peer as that error's alert, so `CertificateExpired`
-and `UnknownCertificateAuthority` are the precise refusals and
+first. On a client `targetHost` is the name it asked for, which a server
+certificate MUST be valid for; on a server it is empty. The answer is
+`TlsError.None` to go on; anything else ends the handshake and is sent to
+the peer as that error's alert, so `CertificateExpired` and
+`UnknownCertificateAuthority` are the precise refusals and
 `CertificateRefused` the general one.
 
-The validator is asked before the CertificateVerify signature is checked,
-and the signature is then checked against the leaf whatever it answered.
+The validator is asked before the CertificateVerify signature is checked.
+A refusal ends the handshake without that check; an acceptance is followed
+by it, against the leaf.
 
-<sub>[stdlib/Net/Security/TlsCertificateValidator.sl:39](../../stdlib/Net/Security/TlsCertificateValidator.sl#L39)</sub>
+<sub>[stdlib/Net/Security/TlsCertificateValidator.sl:40](../../stdlib/Net/Security/TlsCertificateValidator.sl#L40)</sub>
 
 ### TlsCipherSuite *enum*
 
@@ -542,7 +552,12 @@ The server's name: sent as server_name unless it is a literal
 address, and handed to the validator as the name the certificate MUST
 be valid for.
 
-<sub>[stdlib/Net/Security/TlsClientOptions.sl:41](../../stdlib/Net/Security/TlsClientOptions.sl#L41)</sub>
+**It MUST NOT be empty unless `CertificateValidator` has been set.**
+The default validator has no name to check the certificate against,
+so a handshake with neither fails with `InternalError` before anything
+is sent. `TlsSocket.Connect` fills an empty one in with its host.
+
+<sub>[stdlib/Net/Security/TlsClientOptions.sl:46](../../stdlib/Net/Security/TlsClientOptions.sl#L46)</sub>
 
 #### ApplicationProtocols *property*
 
@@ -552,7 +567,7 @@ List<String> ApplicationProtocols { get; set; }
 
 ALPN protocol names to offer, most preferred first. Empty offers none.
 
-<sub>[stdlib/Net/Security/TlsClientOptions.sl:44](../../stdlib/Net/Security/TlsClientOptions.sl#L44)</sub>
+<sub>[stdlib/Net/Security/TlsClientOptions.sl:49](../../stdlib/Net/Security/TlsClientOptions.sl#L49)</sub>
 
 #### EnabledProtocols *property*
 
@@ -565,7 +580,7 @@ that has only TLS 1.2 gets that, and MUST negotiate the extended
 master secret. A version is offered only when `CipherSuites` holds a
 suite of it.
 
-<sub>[stdlib/Net/Security/TlsClientOptions.sl:50](../../stdlib/Net/Security/TlsClientOptions.sl#L50)</sub>
+<sub>[stdlib/Net/Security/TlsClientOptions.sl:55](../../stdlib/Net/Security/TlsClientOptions.sl#L55)</sub>
 
 #### CipherSuites *property*
 
@@ -576,7 +591,7 @@ List<TlsCipherSuite> CipherSuites { get; set; }
 Suites to offer, most preferred first, of either version: each
 version's suites are offered only when that version is.
 
-<sub>[stdlib/Net/Security/TlsClientOptions.sl:55](../../stdlib/Net/Security/TlsClientOptions.sl#L55)</sub>
+<sub>[stdlib/Net/Security/TlsClientOptions.sl:60](../../stdlib/Net/Security/TlsClientOptions.sl#L60)</sub>
 
 #### KeyExchangeGroups *property*
 
@@ -587,7 +602,7 @@ List<TlsNamedGroup> KeyExchangeGroups { get; set; }
 Groups to offer for the key exchange, most preferred first. In TLS 1.2
 the server picks one of them for its ServerKeyExchange.
 
-<sub>[stdlib/Net/Security/TlsClientOptions.sl:59](../../stdlib/Net/Security/TlsClientOptions.sl#L59)</sub>
+<sub>[stdlib/Net/Security/TlsClientOptions.sl:64](../../stdlib/Net/Security/TlsClientOptions.sl#L64)</sub>
 
 #### KeyShareGroups *property*
 
@@ -599,7 +614,7 @@ Groups to send a key share for in the first ClientHello. Each MUST be
 in `KeyExchangeGroups`. A server that wants another group asks for it
 with a HelloRetryRequest, which costs a round trip.
 
-<sub>[stdlib/Net/Security/TlsClientOptions.sl:64](../../stdlib/Net/Security/TlsClientOptions.sl#L64)</sub>
+<sub>[stdlib/Net/Security/TlsClientOptions.sl:69](../../stdlib/Net/Security/TlsClientOptions.sl#L69)</sub>
 
 #### CertificateValidator *property*
 
@@ -608,11 +623,12 @@ TlsCertificateValidator CertificateValidator { get; set; }
 ```
 
 Decides whether to trust the server's chain. The default trusts what
-the platform's root store does, for `TargetHost`.
+the platform's root store does, for `TargetHost`. A validator that is
+set, whatever it is, is given an empty `TargetHost` as it stands.
 
 **See also** &nbsp; [ValidateTlsCertificateChainByDefault](#validatetlscertificatechainbydefault-function)
 
-<sub>[stdlib/Net/Security/TlsClientOptions.sl:70](../../stdlib/Net/Security/TlsClientOptions.sl#L70)</sub>
+<sub>[stdlib/Net/Security/TlsClientOptions.sl:76](../../stdlib/Net/Security/TlsClientOptions.sl#L76)</sub>
 
 #### ClientCertificateChain *property*
 
@@ -623,7 +639,7 @@ List<byte[]> ClientCertificateChain { get; set; }
 The client's certificates, DER, leaf first, sent when a server asks.
 Empty sends an empty Certificate, which a server MAY refuse.
 
-<sub>[stdlib/Net/Security/TlsClientOptions.sl:75](../../stdlib/Net/Security/TlsClientOptions.sl#L75)</sub>
+<sub>[stdlib/Net/Security/TlsClientOptions.sl:88](../../stdlib/Net/Security/TlsClientOptions.sl#L88)</sub>
 
 #### ClientPrivateKey *property*
 
@@ -633,7 +649,7 @@ TlsSigningKey? ClientPrivateKey { get; set; }
 
 The key of the client's leaf certificate.
 
-<sub>[stdlib/Net/Security/TlsClientOptions.sl:78](../../stdlib/Net/Security/TlsClientOptions.sl#L78)</sub>
+<sub>[stdlib/Net/Security/TlsClientOptions.sl:91](../../stdlib/Net/Security/TlsClientOptions.sl#L91)</sub>
 
 #### SessionTicketReceived *property*
 
@@ -645,7 +661,7 @@ Given each session ticket the server sends, in either version.
 Resumption is not implemented yet; this is where a cache would
 collect them.
 
-<sub>[stdlib/Net/Security/TlsClientOptions.sl:83](../../stdlib/Net/Security/TlsClientOptions.sl#L83)</sub>
+<sub>[stdlib/Net/Security/TlsClientOptions.sl:96](../../stdlib/Net/Security/TlsClientOptions.sl#L96)</sub>
 
 #### LeaveInnerStreamOpen *property*
 
@@ -655,7 +671,7 @@ bool LeaveInnerStreamOpen { get; set; }
 
 Whether `Close` leaves the stream underneath open.
 
-<sub>[stdlib/Net/Security/TlsClientOptions.sl:86](../../stdlib/Net/Security/TlsClientOptions.sl#L86)</sub>
+<sub>[stdlib/Net/Security/TlsClientOptions.sl:99](../../stdlib/Net/Security/TlsClientOptions.sl#L99)</sub>
 
 ### TlsError *enum*
 
@@ -1119,7 +1135,9 @@ Decides whether to trust a client's chain. The target host it is given
 is empty. The default trusts what the platform's root store does, for
 the client-authentication usage.
 
-<sub>[stdlib/Net/Security/TlsServerOptions.sl:73](../../stdlib/Net/Security/TlsServerOptions.sl#L73)</sub>
+**See also** &nbsp; [ValidateTlsClientCertificateChainByDefault](#validatetlsclientcertificatechainbydefault-function)
+
+<sub>[stdlib/Net/Security/TlsServerOptions.sl:75](../../stdlib/Net/Security/TlsServerOptions.sl#L75)</sub>
 
 #### LeaveInnerStreamOpen *property*
 
@@ -1129,7 +1147,7 @@ bool LeaveInnerStreamOpen { get; set; }
 
 Whether `Close` leaves the stream underneath open.
 
-<sub>[stdlib/Net/Security/TlsServerOptions.sl:77](../../stdlib/Net/Security/TlsServerOptions.sl#L77)</sub>
+<sub>[stdlib/Net/Security/TlsServerOptions.sl:79](../../stdlib/Net/Security/TlsServerOptions.sl#L79)</sub>
 
 ### TlsSessionTicket *class*
 
@@ -1522,7 +1540,7 @@ The key in an unencrypted PKCS #8 `PrivateKeyInfo`, DER.
 - [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) -- a key of another algorithm
 - [CryptoError.InvalidKey](Standard-Security-Cryptography.md#invalidkey-case) -- the numbers are not a consistent key
 
-<sub>[stdlib/Net/Security/TlsSigningKey.sl:140](../../stdlib/Net/Security/TlsSigningKey.sl#L140)</sub>
+<sub>[stdlib/Net/Security/TlsSigningKey.sl:141](../../stdlib/Net/Security/TlsSigningKey.sl#L141)</sub>
 
 ### TlsSocket *class*
 
@@ -1921,9 +1939,10 @@ On failure the alert has been sent and `inner` closed, unless
 - [TlsError.CertificateRefused](#certificaterefused-case) -- the validator refused the chain
 - [TlsError.ProtocolVersion](#protocolversion-case) -- the server speaks no version `EnabledProtocols` holds
 - [TlsError.AlertReceived](#alertreceived-case) -- the server refused, and said why in an alert
+- [TlsError.InternalError](#internalerror-case) -- `TargetHost` is empty and no `CertificateValidator` was set
 - [TlsError.Io](#io-case) -- the stream underneath failed
 
-<sub>[stdlib/Net/Security/TlsStream.sl:75](../../stdlib/Net/Security/TlsStream.sl#L75)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:77](../../stdlib/Net/Security/TlsStream.sl#L77)</sub>
 
 #### AuthenticateAsClient *method*
 
@@ -1944,7 +1963,7 @@ when it refused.
 
 - [TlsError.AlertReceived](#alertreceived-case) -- the server refused, and `alertReceived` says why
 
-<sub>[stdlib/Net/Security/TlsStream.sl:90](../../stdlib/Net/Security/TlsStream.sl#L90)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:92](../../stdlib/Net/Security/TlsStream.sl#L92)</sub>
 
 #### AuthenticateAsServer *method*
 
@@ -1970,7 +1989,7 @@ On failure the alert has been sent and `inner` closed, unless
 - [TlsError.CertificateRequired](#certificaterequired-case) -- a client certificate was required and none came
 - [TlsError.InternalError](#internalerror-case) -- no certificate or no key is configured
 
-<sub>[stdlib/Net/Security/TlsStream.sl:119](../../stdlib/Net/Security/TlsStream.sl#L119)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:121](../../stdlib/Net/Security/TlsStream.sl#L121)</sub>
 
 #### AuthenticateAsServer *method*
 
@@ -1991,7 +2010,7 @@ when it refused.
 
 - [TlsError.AlertReceived](#alertreceived-case) -- the client refused, and `alertReceived` says why
 
-<sub>[stdlib/Net/Security/TlsStream.sl:134](../../stdlib/Net/Security/TlsStream.sl#L134)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:136](../../stdlib/Net/Security/TlsStream.sl#L136)</sub>
 
 #### IsServer *property*
 
@@ -2001,7 +2020,7 @@ bool IsServer { get; }
 
 Whether this end is the server.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:152](../../stdlib/Net/Security/TlsStream.sl#L152)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:154](../../stdlib/Net/Security/TlsStream.sl#L154)</sub>
 
 #### NegotiatedProtocol *property*
 
@@ -2011,7 +2030,7 @@ TlsProtocolVersion NegotiatedProtocol { get; }
 
 The version negotiated: `Tls13` or `Tls12`.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:155](../../stdlib/Net/Security/TlsStream.sl#L155)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:157](../../stdlib/Net/Security/TlsStream.sl#L157)</sub>
 
 #### CipherSuite *property*
 
@@ -2021,7 +2040,7 @@ TlsCipherSuite CipherSuite { get; }
 
 The suite negotiated.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:158](../../stdlib/Net/Security/TlsStream.sl#L158)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:160](../../stdlib/Net/Security/TlsStream.sl#L160)</sub>
 
 #### KeyExchangeGroup *property*
 
@@ -2031,7 +2050,7 @@ TlsNamedGroup KeyExchangeGroup { get; }
 
 The group the key exchange was made in.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:161](../../stdlib/Net/Security/TlsStream.sl#L161)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:163](../../stdlib/Net/Security/TlsStream.sl#L163)</sub>
 
 #### SignatureScheme *property*
 
@@ -2042,7 +2061,7 @@ TlsSignatureScheme SignatureScheme { get; }
 The scheme the server signed its CertificateVerify with, or in TLS 1.2
 its ServerKeyExchange.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:165](../../stdlib/Net/Security/TlsStream.sl#L165)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:167](../../stdlib/Net/Security/TlsStream.sl#L167)</sub>
 
 #### NegotiatedApplicationProtocol *property*
 
@@ -2052,7 +2071,7 @@ String? NegotiatedApplicationProtocol { get; }
 
 The ALPN protocol agreed, or null when there was none.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:168](../../stdlib/Net/Security/TlsStream.sl#L168)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:170](../../stdlib/Net/Security/TlsStream.sl#L170)</sub>
 
 #### TargetHostName *property*
 
@@ -2063,7 +2082,7 @@ String TargetHostName { get; }
 On a client, the name it asked for; on a server, the name in the
 client's server_name, or empty.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:172](../../stdlib/Net/Security/TlsStream.sl#L172)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:174](../../stdlib/Net/Security/TlsStream.sl#L174)</sub>
 
 #### RemoteCertificate *property*
 
@@ -2074,7 +2093,7 @@ byte[] RemoteCertificate { get; }
 The peer's leaf certificate, DER, or empty when it sent none — which
 only a client can do.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:176](../../stdlib/Net/Security/TlsStream.sl#L176)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:178](../../stdlib/Net/Security/TlsStream.sl#L178)</sub>
 
 #### RemoteCertificateChain *property*
 
@@ -2084,7 +2103,7 @@ List<byte[]> RemoteCertificateChain { get; }
 
 The peer's certificates as it sent them, DER, leaf first.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:187](../../stdlib/Net/Security/TlsStream.sl#L187)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:189](../../stdlib/Net/Security/TlsStream.sl#L189)</sub>
 
 #### IsMutuallyAuthenticated *property*
 
@@ -2094,7 +2113,7 @@ bool IsMutuallyAuthenticated { get; }
 
 Whether the client presented a certificate that was accepted.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:190](../../stdlib/Net/Security/TlsStream.sl#L190)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:192](../../stdlib/Net/Security/TlsStream.sl#L192)</sub>
 
 #### TlsErrorCode *property*
 
@@ -2104,7 +2123,7 @@ TlsError TlsErrorCode { get; }
 
 The exact failure, or `None`.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:193](../../stdlib/Net/Security/TlsStream.sl#L193)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:195](../../stdlib/Net/Security/TlsStream.sl#L195)</sub>
 
 #### AlertDescription *property*
 
@@ -2115,7 +2134,7 @@ TlsAlertDescription AlertDescription { get; }
 The alert the peer ended the connection with, when `TlsErrorCode` is
 `AlertReceived`.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:197](../../stdlib/Net/Security/TlsStream.sl#L197)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:199](../../stdlib/Net/Security/TlsStream.sl#L199)</sub>
 
 #### InnerStream *property*
 
@@ -2125,7 +2144,7 @@ IStream InnerStream { get; }
 
 The stream underneath.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:200](../../stdlib/Net/Security/TlsStream.sl#L200)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:202](../../stdlib/Net/Security/TlsStream.sl#L202)</sub>
 
 #### ExportKeyingMaterial *method*
 
@@ -2146,8 +2165,9 @@ context, and no use to anyone else.
 **Fails with**
 
 - [TlsError.Closed](#closed-case) -- the stream is closed
+- [TlsError.InternalError](#internalerror-case) -- in TLS 1.3, a label over 249 bytes or a length over 255 digests; in TLS 1.2, a context over 65535 bytes
 
-<sub>[stdlib/Net/Security/TlsStream.sl:213](../../stdlib/Net/Security/TlsStream.sl#L213)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:218](../../stdlib/Net/Security/TlsStream.sl#L218)</sub>
 
 #### UpdateTrafficKeys *method*
 
@@ -2165,7 +2185,7 @@ without being asked, before one has protected 2^24 records.
 - [TlsError.ProtocolVersion](#protocolversion-case) -- the connection is TLS 1.2, which has no KeyUpdate
 - [TlsError.Io](#io-case) -- the stream underneath failed
 
-<sub>[stdlib/Net/Security/TlsStream.sl:235](../../stdlib/Net/Security/TlsStream.sl#L235)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:240](../../stdlib/Net/Security/TlsStream.sl#L240)</sub>
 
 #### CanRead *property*
 
@@ -2175,7 +2195,7 @@ bool CanRead { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsStream.sl:240](../../stdlib/Net/Security/TlsStream.sl#L240)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:245](../../stdlib/Net/Security/TlsStream.sl#L245)</sub>
 
 #### CanWrite *property*
 
@@ -2185,7 +2205,7 @@ bool CanWrite { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsStream.sl:242](../../stdlib/Net/Security/TlsStream.sl#L242)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:247](../../stdlib/Net/Security/TlsStream.sl#L247)</sub>
 
 #### CanSeek *property*
 
@@ -2195,7 +2215,7 @@ bool CanSeek { get; }
 
 A connection has no position.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:245](../../stdlib/Net/Security/TlsStream.sl#L245)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:250](../../stdlib/Net/Security/TlsStream.sl#L250)</sub>
 
 #### Read *method*
 
@@ -2206,7 +2226,7 @@ nuint Read(byte[] buffer, nuint offset, nuint count)
 Reads up to `count` bytes of application data. Zero means the peer
 sent close_notify, or a failure, which `Error` tells apart.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:249](../../stdlib/Net/Security/TlsStream.sl#L249)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:254](../../stdlib/Net/Security/TlsStream.sl#L254)</sub>
 
 #### Write *method*
 
@@ -2217,7 +2237,7 @@ nuint Write(byte[] buffer, nuint offset, nuint count)
 Writes all `count` bytes as application data, and answers `count`, or
 zero on a failure.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:258](../../stdlib/Net/Security/TlsStream.sl#L258)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:263](../../stdlib/Net/Security/TlsStream.sl#L263)</sub>
 
 #### Position *property*
 
@@ -2227,7 +2247,7 @@ long Position { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsStream.sl:265](../../stdlib/Net/Security/TlsStream.sl#L265)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:270](../../stdlib/Net/Security/TlsStream.sl#L270)</sub>
 
 #### Length *property*
 
@@ -2237,7 +2257,7 @@ long Length { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsStream.sl:267](../../stdlib/Net/Security/TlsStream.sl#L267)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:272](../../stdlib/Net/Security/TlsStream.sl#L272)</sub>
 
 #### Seek *method*
 
@@ -2247,7 +2267,7 @@ bool Seek(long offset, SeekOrigin origin)
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsStream.sl:269](../../stdlib/Net/Security/TlsStream.sl#L269)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:274](../../stdlib/Net/Security/TlsStream.sl#L274)</sub>
 
 #### Flush *method*
 
@@ -2258,7 +2278,7 @@ void Flush()
 Flushes the stream underneath. Every `Write` has already sent its
 records.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:273](../../stdlib/Net/Security/TlsStream.sl#L273)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:278](../../stdlib/Net/Security/TlsStream.sl#L278)</sub>
 
 #### Close *method*
 
@@ -2269,7 +2289,7 @@ void Close()
 Sends close_notify and closes the stream underneath, unless
 `LeaveInnerStreamOpen`. Idempotent, and the destructor calls it.
 
-<sub>[stdlib/Net/Security/TlsStream.sl:277](../../stdlib/Net/Security/TlsStream.sl#L277)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:282](../../stdlib/Net/Security/TlsStream.sl#L282)</sub>
 
 #### Error *property*
 
@@ -2279,7 +2299,7 @@ IOError Error { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Net/Security/TlsStream.sl:279](../../stdlib/Net/Security/TlsStream.sl#L279)</sub>
+<sub>[stdlib/Net/Security/TlsStream.sl:284](../../stdlib/Net/Security/TlsStream.sl#L284)</sub>
 
 ## Functions
 
@@ -2293,7 +2313,7 @@ A sentence describing a TLS error, for a message a person will read.
 
 **See also** &nbsp; [TlsError](#tlserror-enum)
 
-<sub>[stdlib/Net/Security/Security.sl:213](../../stdlib/Net/Security/Security.sl#L213)</sub>
+<sub>[stdlib/Net/Security/Security.sl:241](../../stdlib/Net/Security/Security.sl#L241)</sub>
 
 ### DiscardTlsSessionTicket *function*
 
@@ -2311,19 +2331,42 @@ What a client does with a ticket when no handler is configured: nothing.
 TlsError ValidateTlsCertificateChainByDefault(List<byte[]> chain, String targetHost)
 ```
 
-The validator used when none is configured: the platform's trust.
+The validator a client uses when none is configured: the platform's
+trust, for a server.
 
 The leaf MUST reach a root in the system store (crypt32's on Windows, the
 system bundle elsewhere) through the peer's other certificates and the
 system's intermediates, pass every check `X509Chain` makes now, carry the
-server-authentication usage — client authentication when a server is
-judging a client — and, for a server, be valid for `targetHost`.
+server-authentication usage, and be valid for `targetHost`. An empty
+`targetHost` is refused, since no certificate can be checked against it.
 Revocation is not checked; `X509Chain` says why.
 
 **Parameters**
 
-- `chain` -- the peer's certificates, DER, leaf first
-- `targetHost` -- the name the certificate must be valid for, or empty when a server is judging a client
+- `chain` -- the server's certificates, DER, leaf first
+- `targetHost` -- the name the certificate must be valid for
 
-<sub>[stdlib/Net/Security/TlsCertificateValidator.sl:53](../../stdlib/Net/Security/TlsCertificateValidator.sl#L53)</sub>
+**See also** &nbsp; [ValidateTlsClientCertificateChainByDefault](#validatetlsclientcertificatechainbydefault-function)
+
+<sub>[stdlib/Net/Security/TlsCertificateValidator.sl:55](../../stdlib/Net/Security/TlsCertificateValidator.sl#L55)</sub>
+
+### ValidateTlsClientCertificateChainByDefault *function*
+
+```
+TlsError ValidateTlsClientCertificateChainByDefault(List<byte[]> chain, String targetHost)
+```
+
+The validator a server uses when none is configured: the platform's
+trust, for a client.
+
+As `ValidateTlsCertificateChainByDefault`, with the client-authentication
+usage in place of the server's and no name to match. `targetHost` is not
+read.
+
+**Parameters**
+
+- `chain` -- the client's certificates, DER, leaf first
+- `targetHost` -- not read; a server passes an empty string
+
+<sub>[stdlib/Net/Security/TlsCertificateValidator.sl:71](../../stdlib/Net/Security/TlsCertificateValidator.sl#L71)</sub>
 

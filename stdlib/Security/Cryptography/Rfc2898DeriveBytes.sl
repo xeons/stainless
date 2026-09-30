@@ -51,14 +51,15 @@ public static class Rfc2898DeriveBytes
     /// @param iterations  how many HMAC passes; the whole security argument
     /// @param hash        the HMAC's inner hash, `new Sha256()` for the usual answer
     /// @param length      how many bytes to derive
-    /// @failure CryptoError.Parameter  `iterations` or `length` is zero
+    /// @failure CryptoError.Parameter  `iterations` or `length` is zero, or `length` is past
+    ///                                 (2^32 - 1) digests, where the block index would wrap
     /// @see Argon2id
     /// @see Scrypt
     public static Result<byte[], CryptoError> Pbkdf2(ReadOnlySpan<byte> password, ReadOnlySpan<byte> salt,
                                                      nuint iterations, IHashAlgorithm hash,
                                                      nuint length)
     {
-        if (iterations == 0u || length == 0u)
+        if (iterations == 0u || length == 0u || !IsLengthAllowed(length, hash.HashSizeInBytes))
             return Fail(CryptoError.Parameter);
 
         var mac = new Hmac(hash, password);
@@ -85,10 +86,13 @@ public static class Rfc2898DeriveBytes
 
             for (nuint round = 1u; round < iterations; round++)
             {
-                block = mac.ComputeHash(block);
+                byte[] next = mac.ComputeHash(block);
+                CryptographicOperations.ZeroMemory(block);
+                block = next;
                 for (nuint i = 0u; i < macSize; i++)
                     running[i] = (byte)(running[i] ^ block[i]);
             }
+            CryptographicOperations.ZeroMemory(block);
 
             nuint take = length - filled;
             if (take > macSize)
@@ -103,4 +107,9 @@ public static class Rfc2898DeriveBytes
 
         return Ok(derived);
     }
+
+    /// Whether `length` bytes fit in (2^32 - 1) blocks of `macSize`, the most
+    /// a 32-bit block index can number.
+    static bool IsLengthAllowed(nuint length, nuint macSize) =>
+        (ulong)length <= 0xFFFFFFFFul * (ulong)macSize;
 }

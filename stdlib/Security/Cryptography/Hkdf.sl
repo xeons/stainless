@@ -79,7 +79,9 @@ public static class Hkdf
             mac.AppendData(previous);
             mac.AppendData(info);
             mac.AppendData(counter);
-            previous = mac.GetHashAndReset();
+            byte[] next = mac.GetHashAndReset();
+            CryptographicOperations.ZeroMemory(previous);
+            previous = next;
 
             nuint take = length - filled;
             if (take > macSize)
@@ -91,6 +93,7 @@ public static class Hkdf
             index++;
         }
 
+        CryptographicOperations.ZeroMemory(previous);
         return Ok(derived);
     }
 
@@ -109,6 +112,8 @@ public static class Hkdf
                                                         nuint length)
     {
         byte[] pseudoKey = Extract(hash, inputKey, salt);
-        return Expand(hash, pseudoKey, info, length);
+        var derived = Expand(hash, pseudoKey, info, length);
+        CryptographicOperations.ZeroMemory(pseudoKey);
+        return derived;
     }
 }

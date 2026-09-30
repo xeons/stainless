@@ -61,6 +61,9 @@ public abstract class HashAlgorithm : IHashAlgorithm
         _bigEndianLength = bigEndianLength;
     }
 
+    /// The block may hold key material, since `Hmac` appends its padded key.
+    ~HashAlgorithm() => CryptographicOperations.ZeroMemory(_block);
+
     public abstract String Name { get; }
 
     public abstract nuint HashSizeInBytes { get; }

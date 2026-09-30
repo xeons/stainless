@@ -44,6 +44,20 @@ byte[] FlipBit(byte[] data, nuint bit)
     return flipped;
 }
 
+/// Whether `signature` verifies under `publicKey` for any of 64 one-byte
+/// messages.
+bool AcceptsForgery(byte[] publicKey, byte[] signature)
+{
+    byte[] message = new byte[1u];
+    for (nuint i = 0u; i < 64u; i++)
+    {
+        message[0u] = (byte)i;
+        if (Ed25519.Verify(publicKey, message, signature))
+            return true;
+    }
+    return false;
+}
+
 // ------------------------------------------------------------------ X25519
 
 void KeyAgreement()
@@ -222,15 +236,25 @@ void Signatures()
     CheckRefused("ed25519-s-not-reduced", Ed25519.Verify(publicKey, message, widened));
 
     // The identity has two encodings, y = 1 and y = p + 1. R = B and S = 1
-    // is a signature of anything under it, since [1]B = B + [k]O. The
-    // canonical encoding is accepted, because RFC 8032 does not refuse a
-    // small-order key; the other MUST NOT be.
+    // is a signature of anything under it, since [1]B = B + [k]O. Both are
+    // refused: the canonical one as a key of small order, the other as a
+    // non-canonical encoding.
     byte[] forged = Hex("5866666666666666666666666666666666666666666666666666666666666666" +
                         "0100000000000000000000000000000000000000000000000000000000000000");
     byte[] identity = Hex("0100000000000000000000000000000000000000000000000000000000000000");
     byte[] identityAgain = Hex("eeffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f");
-    CheckTrue("ed25519-identity-key", Ed25519.Verify(identity, message, forged));
+    CheckRefused("ed25519-identity-key", Ed25519.Verify(identity, message, forged));
     CheckRefused("ed25519-non-canonical-key", Ed25519.Verify(identityAgain, message, forged));
+
+    // Points of order 2, 4 and 8. The same forgery holds under one of them
+    // whenever the order divides k, which one message in eight or more
+    // manages; across 64 messages at least one would get through.
+    CheckRefused("ed25519-order-2-key", AcceptsForgery(
+        Hex("ecffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f"), forged));
+    CheckRefused("ed25519-order-4-key", AcceptsForgery(
+        Hex("0000000000000000000000000000000000000000000000000000000000000000"), forged));
+    CheckRefused("ed25519-order-8-key", AcceptsForgery(
+        Hex("c7176a703d4dd84fba3c0b760d10670f2a2053fa2c39ccc64ec7fd7792ac037a"), forged));
 
     // y = 2 has no x on the curve.
     byte[] offCurve = Hex("0200000000000000000000000000000000000000000000000000000000000000");

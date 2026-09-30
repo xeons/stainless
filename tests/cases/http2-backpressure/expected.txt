@@ -1,0 +1,6 @@
+stalled: returned before the peer read again: true; Timeout (the request timed out sending its body), within 2 s: true
+    the whole body reached the peer: false
+second: returned before the peer read again: true
+    the GET: Timeout (the request timed out before it was sent), within 1 s: true
+flood: returned before the peer read again: true; ProtocolError ENHANCE_YOUR_CALM (HTTP/2 ENHANCE_YOUR_CALM: the server sent control frames faster than it read the answers)
+    PING acks the peer read, at most 1000: true

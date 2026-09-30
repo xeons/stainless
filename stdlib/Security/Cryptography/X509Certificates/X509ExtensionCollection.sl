@@ -73,13 +73,21 @@ public sealed class X509ExtensionCollection
     /// Each extension in turn.
     public IEnumerator<X509Extension> GetEnumerator() => _items.GetEnumerator();
 
-    /// Whether a critical extension is one this module does not understand.
+    /// Whether a critical extension is one this module does not understand,
+    /// or name constraints with a subtree of a kind it does not enforce.
     internal bool ContainsUnsupportedCriticalExtension()
     {
         foreach (X509Extension extension in _items)
         {
-            if (extension.Critical && !IsUnderstoodExtension(extension.Oid))
+            if (!extension.Critical)
+                continue;
+            if (!IsUnderstoodExtension(extension.Oid))
                 return true;
+            if (extension is X509NameConstraintsExtension constraints &&
+                constraints.HasUnenforcedSubtrees)
+            {
+                return true;
+            }
         }
         return false;
     }

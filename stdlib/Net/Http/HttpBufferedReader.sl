@@ -59,12 +59,18 @@ internal sealed class HttpBufferedReader
     private bool _failed = false;
     private bool _ended = false;
     private ulong _consumed = 0u;
+    private weak Http11Connection? _deadlineOwner;
 
     internal HttpBufferedReader(IStream inner, nuint capacity)
     {
         _inner = inner;
         _buffer = new byte[capacity];
     }
+
+    /// Has `owner` set the socket's timeouts before every read of the
+    /// stream, so that each read gets what is left of the deadline rather
+    /// than all of it.
+    internal void BindHttpDeadline(Http11Connection owner) => _deadlineOwner = owner;
 
     internal IStream Inner => _inner;
 
@@ -105,6 +111,8 @@ internal sealed class HttpBufferedReader
             _end = held;
         }
 
+        if (!ApplyHttpReadDeadline())
+            return false;
         nuint got = _inner.Read(_buffer, _end, _buffer.Length - _end);
         if (got == 0u)
         {
@@ -166,7 +174,7 @@ internal sealed class HttpBufferedReader
         {
             if (count >= _buffer.Length)
             {
-                if (_ended || _failed)
+                if (_ended || _failed || !ApplyHttpReadDeadline())
                     return 0u;
                 nuint direct = _inner.Read(buffer, offset, count);
                 if (direct == 0u)
@@ -188,6 +196,16 @@ internal sealed class HttpBufferedReader
         memcpy(&buffer[offset], &_buffer[_start], taken);
         TakeHttpBytes(taken);
         return taken;
+    }
+
+    /// False, and failed, when the deadline has passed.
+    private bool ApplyHttpReadDeadline()
+    {
+        Http11Connection? owner = _deadlineOwner;
+        if (owner == null || owner.ApplyHttpDeadline())
+            return true;
+        _failed = true;
+        return false;
     }
 
     private void TakeHttpBytes(nuint count)

@@ -59,6 +59,8 @@ public sealed class Sha256 : HashAlgorithm
         InitializeState();
     }
 
+    ~Sha256() => CryptographicOperations.ZeroMemory(_state);
+
     public override String Name => "SHA-256";
 
     public override nuint HashSizeInBytes => 32u;

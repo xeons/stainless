@@ -23,6 +23,7 @@ module Standard.Net.Security;
 
 import Standard.Collections;
 import Standard.IO;
+import Standard.Security.Cryptography;
 import Standard.Threading;
 
 /// Everything a TLS connection is once the record layer is under it: the
@@ -69,6 +70,14 @@ internal sealed class TlsConnection
     private bool _closed;
     private bool _keyUpdateOwed;
 
+    /// Whether a HelloRequest is passed over during the handshake: on a
+    /// client that offered TLS 1.2, until a TLS 1.3 ServerHello (RFC 5246
+    /// section 7.4.1.1).
+    internal bool _skipsHelloRequest;
+
+    /// Records in a row that gave the reader nothing.
+    private nuint _emptyRecords;
+
     // Application data read and not yet handed out.
     private byte[] _plaintext;
     private nuint _plaintextOffset;
@@ -103,6 +112,8 @@ internal sealed class TlsConnection
         _closeNotifyReceived = false;
         _closed = false;
         _keyUpdateOwed = false;
+        _skipsHelloRequest = false;
+        _emptyRecords = 0u;
         _plaintext = new byte[0u];
         _plaintextOffset = 0u;
         _plaintextLength = 0u;
@@ -125,7 +136,8 @@ internal sealed class TlsConnection
     // ------------------------------------------------------------- handshake
 
     /// The next whole handshake message, header and all, reassembled from as
-    /// many records as it took.
+    /// many records as it took. A HelloRequest is passed over when
+    /// `_skipsHelloRequest`.
     internal Result<byte[], TlsError> ReadTlsHandshakeMessage()
     {
         while (true)
@@ -133,8 +145,19 @@ internal sealed class TlsConnection
             var message = TakeTlsHandshakeMessage();
             if (!message.Ok)
                 return Fail(message.Error);
-            if (message.Value.Length > 0u)
-                return message;
+            byte[] bytes = message.Value;
+            if (bytes.Length > 0u)
+            {
+                if (!IsSkippedTlsHelloRequest(bytes))
+                {
+                    _emptyRecords = 0u;
+                    return message;
+                }
+                TlsError skipped = SkipTlsHelloRequest(bytes);
+                if (skipped != TlsError.None)
+                    return Fail(skipped);
+                continue;
+            }
 
             var record = _records.ReadTlsRecord();
             if (!record.Ok)
@@ -183,13 +206,12 @@ internal sealed class TlsConnection
     }
 
     /// Reads TLS 1.2's change_cipher_spec, which MUST come next and MUST NOT
-    /// fall inside a handshake message.
+    /// fall inside a handshake message. A HelloRequest before it is passed
+    /// over when `_skipsHelloRequest`.
     internal TlsError ReadTlsChangeCipherSpec()
     {
         while (true)
         {
-            if (_handshakeInput.Length > 0u)
-                return TlsError.UnexpectedMessage;
             var record = _records.ReadTlsRecord();
             if (!record.Ok)
                 return record.Error;
@@ -197,17 +219,63 @@ internal sealed class TlsConnection
             switch (got.Type)
             {
                 case TlsContentType.ChangeCipherSpec:
+                    if (_handshakeInput.Length > 0u)
+                        return TlsError.UnexpectedMessage;
                     return TlsError.None;
                 case TlsContentType.Alert:
                 {
+                    if (_handshakeInput.Length > 0u)
+                        return TlsError.UnexpectedMessage;
                     TlsError alerted = ProcessTlsAlert(got);
                     if (alerted != TlsError.None)
                         return alerted;
                     break;
                 }
+                case TlsContentType.Handshake:
+                {
+                    if (!_skipsHelloRequest)
+                        return TlsError.UnexpectedMessage;
+                    _handshakeInput.WriteArray(got.Data, got.Offset, got.Length);
+                    TlsError skipped = SkipTlsHelloRequests();
+                    if (skipped != TlsError.None)
+                        return skipped;
+                    break;
+                }
                 default:
                     return TlsError.UnexpectedMessage;
             }
+        }
+    }
+
+    /// Whether `message` is a HelloRequest to be passed over.
+    private bool IsSkippedTlsHelloRequest(byte[] message) =>
+        _skipsHelloRequest && (TlsHandshakeType)message[0u] == TlsHandshakeType.HelloRequest;
+
+    /// Passes over a HelloRequest, which MUST be empty, and counts it.
+    private TlsError SkipTlsHelloRequest(byte[] message)
+    {
+        if (message.Length != 4u)
+            return TlsError.Decode;
+        return CountTlsEmptyRecord();
+    }
+
+    /// Passes over every whole HelloRequest in the reassembly buffer, where
+    /// nothing else may be.
+    private TlsError SkipTlsHelloRequests()
+    {
+        while (true)
+        {
+            var message = TakeTlsHandshakeMessage();
+            if (!message.Ok)
+                return message.Error;
+            byte[] bytes = message.Value;
+            if (bytes.Length == 0u)
+                return TlsError.None;
+            if (!IsSkippedTlsHelloRequest(bytes))
+                return TlsError.UnexpectedMessage;
+            TlsError skipped = SkipTlsHelloRequest(bytes);
+            if (skipped != TlsError.None)
+                return skipped;
         }
     }
 
@@ -302,21 +370,17 @@ internal sealed class TlsConnection
         var description = (TlsAlertDescription)record.Data[record.Offset + 1u];
         switch (description)
         {
+            // A closure alert in TLS 1.3, whatever its level; in TLS 1.2 the
+            // level decides (RFC 5246 section 7.2).
             case TlsAlertDescription.UserCanceled:
-                _warningReceived = description;
-                return TlsError.None;
+                if (isWarning || !IsTls12)
+                    return PassOverTlsWarning(description);
+                return EndOnTlsAlert(description);
             case TlsAlertDescription.NoRenegotiation:
             case TlsAlertDescription.UnrecognizedName:
                 if (IsTls12 && isWarning)
-                {
-                    _warningReceived = description;
-                    return TlsError.None;
-                }
-                _alertReceived = description;
-                _alertSent = true;
-                if (_error == TlsError.None)
-                    _error = TlsError.AlertReceived;
-                return TlsError.AlertReceived;
+                    return PassOverTlsWarning(description);
+                return EndOnTlsAlert(description);
             case TlsAlertDescription.CloseNotify:
                 _closeNotifyReceived = true;
                 if (!_handshakeComplete)
@@ -327,12 +391,36 @@ internal sealed class TlsConnection
                 }
                 return TlsError.Closed;
             default:
-                _alertReceived = description;
-                _alertSent = true;
-                if (_error == TlsError.None)
-                    _error = TlsError.AlertReceived;
-                return TlsError.AlertReceived;
+                return EndOnTlsAlert(description);
         }
+    }
+
+    /// Records a warning that ends nothing, and counts it against the run of
+    /// records that carry nothing.
+    private TlsError PassOverTlsWarning(TlsAlertDescription description)
+    {
+        _warningReceived = description;
+        return CountTlsEmptyRecord();
+    }
+
+    /// Records a fatal alert. Nothing is sent back after one.
+    private TlsError EndOnTlsAlert(TlsAlertDescription description)
+    {
+        _alertReceived = description;
+        _alertSent = true;
+        if (_error == TlsError.None)
+            _error = TlsError.AlertReceived;
+        return TlsError.AlertReceived;
+    }
+
+    /// Counts a record that gave the reader nothing, and refuses the peer
+    /// once more than `TlsMaxEmptyRecords` have come in a row.
+    private TlsError CountTlsEmptyRecord()
+    {
+        _emptyRecords++;
+        if (_emptyRecords > TlsMaxEmptyRecords)
+            return TlsError.UnexpectedMessage;
+        return TlsError.None;
     }
 
     // ------------------------------------------------------ application data
@@ -360,15 +448,28 @@ internal sealed class TlsConnection
             switch (got.Type)
             {
                 case TlsContentType.ApplicationData:
+                {
                     if (_handshakeInput.Length > 0u)
                     {
                         FailTls(TlsError.UnexpectedMessage);
                         return 0u;
                     }
+                    if (got.Length == 0u)
+                    {
+                        TlsError counted = CountTlsEmptyRecord();
+                        if (counted != TlsError.None)
+                        {
+                            FailTls(counted);
+                            return 0u;
+                        }
+                        break;
+                    }
+                    _emptyRecords = 0u;
                     _plaintext = got.Data;
                     _plaintextOffset = got.Offset;
                     _plaintextLength = got.Length;
                     break;
+                }
 
                 case TlsContentType.Alert:
                 {
@@ -434,11 +535,11 @@ internal sealed class TlsConnection
             if (chunk > 64u * TlsMaxPlaintext)
                 chunk = 64u * TlsMaxPlaintext;
 
-            TlsError written = WriteTlsRecordsUnderLock(TlsContentType.ApplicationData, buffer,
-                                                        offset + done, chunk);
+            TlsError written = WriteTlsApplicationChunk(buffer, offset + done, chunk);
             if (written != TlsError.None)
             {
-                _error = written;
+                if (_error == TlsError.None)
+                    _error = written;
                 return 0u;
             }
             done += chunk;
@@ -446,11 +547,17 @@ internal sealed class TlsConnection
         return count;
     }
 
-    private TlsError WriteTlsRecordsUnderLock(TlsContentType type, byte[] data, nuint offset,
-                                              nuint length)
+    /// Writes one run of application data under the lock, unless the reader
+    /// has ended the connection since the last run: nothing MAY follow an
+    /// alert.
+    private TlsError WriteTlsApplicationChunk(byte[] data, nuint offset, nuint length)
     {
         var held = _writeLock.Enter();
-        return _records.WriteTlsRecords(type, data, offset, length);
+        if (_error != TlsError.None)
+            return _error;
+        if (_alertSent || _closed)
+            return TlsError.Closed;
+        return _records.WriteTlsRecords(TlsContentType.ApplicationData, data, offset, length);
     }
 
     // ---------------------------------------------------- after the handshake
@@ -510,6 +617,9 @@ internal sealed class TlsConnection
                                             : TlsHandshakeType.HelloRequest;
         if (type != asking)
             return TlsError.UnexpectedMessage;
+        TlsError counted = CountTlsEmptyRecord();
+        if (counted != TlsError.None)
+            return counted;
         return SendTlsWarningAlert(TlsAlertDescription.NoRenegotiation);
     }
 
@@ -527,7 +637,9 @@ internal sealed class TlsConnection
         var schedule = _schedule;
         if (schedule == null)
             return TlsError.InternalError;
-        _readTrafficSecret = schedule.UpdateTlsTrafficSecret(_readTrafficSecret);
+        byte[] previous = _readTrafficSecret;
+        _readTrafficSecret = schedule.UpdateTlsTrafficSecret(previous);
+        CryptographicOperations.ZeroMemory(previous);
         var cipher = schedule.CreateTlsRecordCipher(_cipherSuite, _readTrafficSecret);
         if (!cipher.Ok)
             return cipher.Error;
@@ -552,16 +664,15 @@ internal sealed class TlsConnection
             return TlsError.IllegalParameter;
 
         uint maxEarlyData = 0u;
-        var seen = new List<uint>();
+        var seen = new TlsCodePointSet();
         while (!extensions.IsAtEnd)
         {
             uint type = extensions.ReadUInt16();
             TlsReader data = extensions.ReadVector(2u, 0u, 65535u);
             if (extensions.Failed)
                 return TlsError.Decode;
-            if (seen.Contains(type))
+            if (!seen.Add(type))
                 return TlsError.IllegalParameter;
-            seen.Add(type);
 
             if (type == (uint)TlsExtensionType.EarlyData)
             {
@@ -616,7 +727,9 @@ internal sealed class TlsConnection
         if (written != TlsError.None)
             return written;
 
-        _writeTrafficSecret = schedule.UpdateTlsTrafficSecret(_writeTrafficSecret);
+        byte[] previous = _writeTrafficSecret;
+        _writeTrafficSecret = schedule.UpdateTlsTrafficSecret(previous);
+        CryptographicOperations.ZeroMemory(previous);
         var cipher = schedule.CreateTlsRecordCipher(_cipherSuite, _writeTrafficSecret);
         if (!cipher.Ok)
             return cipher.Error;
@@ -634,7 +747,7 @@ internal sealed class TlsConnection
             return;
         if (_handshakeComplete && !_alertSent)
             SendTlsAlert(TlsAlertDescription.CloseNotify);
-        _closed = true;
+        WipeTlsConnectionSecrets();
         if (!_leaveInnerStreamOpen)
             _records.Inner.Close();
     }
@@ -643,8 +756,24 @@ internal sealed class TlsConnection
     internal void AbandonTls(TlsError error)
     {
         FailTls(error);
-        _closed = true;
+        WipeTlsConnectionSecrets();
         if (!_leaveInnerStreamOpen)
             _records.Inner.Close();
+    }
+
+    /// Marks the connection closed and overwrites every secret it holds,
+    /// under the write lock so that no record is being sealed meanwhile.
+    private void WipeTlsConnectionSecrets()
+    {
+        var held = _writeLock.Enter();
+        _closed = true;
+        CryptographicOperations.ZeroMemory(_readTrafficSecret);
+        CryptographicOperations.ZeroMemory(_writeTrafficSecret);
+        var schedule = _schedule;
+        if (schedule != null)
+            schedule.WipeTlsSecrets();
+        var legacy = _tls12Schedule;
+        if (legacy != null)
+            legacy.WipeTlsSecrets();
     }
 }

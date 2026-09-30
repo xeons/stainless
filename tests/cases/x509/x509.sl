@@ -122,6 +122,7 @@ public int Main()
     CreateRequests();
     if (!CheckTwinRoots().Ok)
         Console.WriteLine("twin roots FAIL: could not mint");
+    CheckHardening();
     return 0;
 }
 

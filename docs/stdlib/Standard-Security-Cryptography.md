@@ -102,6 +102,12 @@ generation's search, which throws away candidates as soon as they fail and
 so reveals only things about numbers it does not keep; and exporting a
 private key, since DER writes each number in the fewest bytes it takes.
 
+**Key material is overwritten when the object holding it is destroyed.**
+Every cipher, MAC, hash and private key here clears its keys, schedules
+and state in its destructor, through a write the optimiser may not remove.
+An array the caller passed in is the caller's to clear, with
+`CryptographicOperations.ZeroMemory`.
+
 Certificates, chains and the platform's roots are
 `Standard.Security.Cryptography.X509Certificates`.
 
@@ -121,8 +127,8 @@ AES, in ECB, CBC, CFB and CTR.
 
 ```csharp
 var cipher = try Aes.FromKey(key);          // 16, 24 or 32 bytes
-var sealed = try cipher.EncryptCbc(plaintext, iv, PaddingMode.Pkcs7);
-var opened = try cipher.DecryptCbc(sealed, iv, PaddingMode.Pkcs7);
+var encrypted = try cipher.EncryptCbc(plaintext, iv, PaddingMode.Pkcs7);
+var opened = try cipher.DecryptCbc(encrypted, iv, PaddingMode.Pkcs7);
 ```
 
 **None of these modes authenticates anything.** A ciphertext an attacker
@@ -138,7 +144,9 @@ position of every byte, and the S-box is the Boyar–Peralta logic circuit
 rather than a table. Nothing is indexed by, and nothing branches on, the
 key or the data. ECB, CTR and the decrypting half of CBC and CFB run four
 blocks in each pass. CBC and CFB encryption chain each block into the next,
-so they run one block per pass at the cost of four.
+so they run one block per pass at the cost of four. Removing padding is
+constant time as well: the whole last block is examined and there is one
+verdict.
 
 The one-shot methods are .NET 6's `EncryptCbc` and friends rather than its
 older `CreateEncryptor`/`ICryptoTransform` pair. A transform object exists
@@ -148,7 +156,7 @@ would be a shape with no user.
 
 **See also** &nbsp; [AesGcm](#aesgcm-class)
 
-<sub>[stdlib/Security/Cryptography/Aes.sl:57](../../stdlib/Security/Cryptography/Aes.sl#L57)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:59](../../stdlib/Security/Cryptography/Aes.sl#L59)</sub>
 
 #### BlockSize *constant*
 
@@ -159,7 +167,7 @@ const nuint BlockSize = 16
 One block, for every key length. AES is a 128-bit block cipher; it is
 Rijndael that had others, and no standard uses them.
 
-<sub>[stdlib/Security/Cryptography/Aes.sl:61](../../stdlib/Security/Cryptography/Aes.sl#L61)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:63](../../stdlib/Security/Cryptography/Aes.sl#L63)</sub>
 
 #### FromKey *method*
 
@@ -174,7 +182,7 @@ AES-192 or AES-256.
 
 - [CryptoError.KeyLength](#keylength-case) -- `key` is not 16, 24 or 32 bytes
 
-<sub>[stdlib/Security/Cryptography/Aes.sl:89](../../stdlib/Security/Cryptography/Aes.sl#L89)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:93](../../stdlib/Security/Cryptography/Aes.sl#L93)</sub>
 
 #### Create *method*
 
@@ -186,7 +194,7 @@ A cipher under a fresh 256-bit key from the platform, which is what
 .NET's `Aes.Create()` gives. Aborts if the machine will supply no
 entropy, which is a broken machine rather than an outcome to plan for.
 
-<sub>[stdlib/Security/Cryptography/Aes.sl:99](../../stdlib/Security/Cryptography/Aes.sl#L99)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:103](../../stdlib/Security/Cryptography/Aes.sl#L103)</sub>
 
 #### Rounds *property*
 
@@ -196,7 +204,7 @@ nuint Rounds { get; }
 
 How many rounds this key length runs: 10, 12 or 14.
 
-<sub>[stdlib/Security/Cryptography/Aes.sl:110](../../stdlib/Security/Cryptography/Aes.sl#L110)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:114](../../stdlib/Security/Cryptography/Aes.sl#L114)</sub>
 
 #### EncryptBlock *method*
 
@@ -212,7 +220,7 @@ implementing a mode this class does not have needs the same door.
 to the same input gives the same output, which is what a mode exists to
 fix. One block costs a pass that could have carried four.
 
-<sub>[stdlib/Security/Cryptography/Aes.sl:121](../../stdlib/Security/Cryptography/Aes.sl#L121)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:125](../../stdlib/Security/Cryptography/Aes.sl#L125)</sub>
 
 #### DecryptBlock *method*
 
@@ -222,7 +230,7 @@ void DecryptBlock(byte[] block, nuint offset)
 
 One block deciphered in place, at `offset` in `block`.
 
-<sub>[stdlib/Security/Cryptography/Aes.sl:124](../../stdlib/Security/Cryptography/Aes.sl#L124)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:128](../../stdlib/Security/Cryptography/Aes.sl#L128)</sub>
 
 #### EncryptEcb *method*
 
@@ -239,7 +247,7 @@ always the wrong answer.
 
 **See also** &nbsp; [CipherMode.Ecb](#ecb-case) &middot; [Aes.DecryptEcb](#decryptecb-method)
 
-<sub>[stdlib/Security/Cryptography/Aes.sl:135](../../stdlib/Security/Cryptography/Aes.sl#L135)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:139](../../stdlib/Security/Cryptography/Aes.sl#L139)</sub>
 
 #### DecryptEcb *method*
 
@@ -256,7 +264,7 @@ The inverse of `EncryptEcb`.
 
 **See also** &nbsp; [Aes.EncryptEcb](#encryptecb-method)
 
-<sub>[stdlib/Security/Cryptography/Aes.sl:152](../../stdlib/Security/Cryptography/Aes.sl#L152)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:156](../../stdlib/Security/Cryptography/Aes.sl#L156)</sub>
 
 #### EncryptCbc *method*
 
@@ -275,7 +283,7 @@ it is not secret -- send it alongside the ciphertext.
 
 **See also** &nbsp; [Aes.DecryptCbc](#decryptcbc-method) &middot; [RandomNumberGenerator.GetBytes](#getbytes-method)
 
-<sub>[stdlib/Security/Cryptography/Aes.sl:175](../../stdlib/Security/Cryptography/Aes.sl#L175)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:179](../../stdlib/Security/Cryptography/Aes.sl#L179)</sub>
 
 #### DecryptCbc *method*
 
@@ -297,7 +305,7 @@ is the whole reason to authenticate a ciphertext before decrypting it.
 
 **See also** &nbsp; [Aes.EncryptCbc](#encryptcbc-method)
 
-<sub>[stdlib/Security/Cryptography/Aes.sl:210](../../stdlib/Security/Cryptography/Aes.sl#L210)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:214](../../stdlib/Security/Cryptography/Aes.sl#L214)</sub>
 
 #### EncryptCfb *method*
 
@@ -314,7 +322,7 @@ with a feedback size of 128 bits. No padding: the mode is a stream.
 
 **See also** &nbsp; [Aes.DecryptCfb](#decryptcfb-method)
 
-<sub>[stdlib/Security/Cryptography/Aes.sl:239](../../stdlib/Security/Cryptography/Aes.sl#L239)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:243](../../stdlib/Security/Cryptography/Aes.sl#L243)</sub>
 
 #### DecryptCfb *method*
 
@@ -330,7 +338,7 @@ The inverse of `EncryptCfb`.
 
 **See also** &nbsp; [Aes.EncryptCfb](#encryptcfb-method)
 
-<sub>[stdlib/Security/Cryptography/Aes.sl:270](../../stdlib/Security/Cryptography/Aes.sl#L270)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:274](../../stdlib/Security/Cryptography/Aes.sl#L274)</sub>
 
 #### ApplyCtr *method*
 
@@ -350,7 +358,7 @@ is a random nonce in the high bytes and a block counter in the low.
 
 - [CryptoError.IvLength](#ivlength-case) -- `counter` is not one block
 
-<sub>[stdlib/Security/Cryptography/Aes.sl:303](../../stdlib/Security/Cryptography/Aes.sl#L303)</sub>
+<sub>[stdlib/Security/Cryptography/Aes.sl:307](../../stdlib/Security/Cryptography/Aes.sl#L307)</sub>
 
 ### AesGcm *class*
 
@@ -363,8 +371,8 @@ AES-GCM: encryption and authentication in one pass, as .NET's `AesGcm`.
 ```csharp
 var box = try AesGcm.FromKey(key);
 byte[] tag = new byte[16u];
-var sealed = try box.Encrypt(nonce, plaintext, associated, tag);
-var opened = try box.Decrypt(nonce, sealed, associated, tag);
+var encrypted = try box.Encrypt(nonce, plaintext, associated, tag);
+var opened = try box.Decrypt(nonce, encrypted, associated, tag);
 ```
 
 **The nonce must never repeat under one key.** GCM is CTR mode with a MAC
@@ -407,6 +415,33 @@ the nonce is used directly rather than hashed.
 
 <sub>[stdlib/Security/Cryptography/AesGcm.sl:61](../../stdlib/Security/Cryptography/AesGcm.sl#L61)</sub>
 
+#### MaxTextSize *constant*
+
+```
+const ulong MaxTextSize = 68719476704
+```
+
+The longest plaintext or ciphertext one call takes: 2^32 - 2 blocks,
+past which the 32-bit counter would wrap back to the block that masks
+the tag. SP 800-38D sets the same limit.
+
+**Value** &nbsp; 2^36 - 32 bytes.
+
+<sub>[stdlib/Security/Cryptography/AesGcm.sl:68](../../stdlib/Security/Cryptography/AesGcm.sl#L68)</sub>
+
+#### MaxAssociatedDataSize *constant*
+
+```
+const ulong MaxAssociatedDataSize = 2305843009213693951
+```
+
+The longest associated data one call takes, which SP 800-38D sets at
+2^64 - 1 bits.
+
+**Value** &nbsp; 2^61 - 1 bytes.
+
+<sub>[stdlib/Security/Cryptography/AesGcm.sl:74](../../stdlib/Security/Cryptography/AesGcm.sl#L74)</sub>
+
 #### FromKey *method*
 
 ```
@@ -419,7 +454,7 @@ A GCM box under `key`, which must be 16, 24 or 32 bytes.
 
 - [CryptoError.KeyLength](#keylength-case) -- `key` is not 16, 24 or 32 bytes
 
-<sub>[stdlib/Security/Cryptography/AesGcm.sl:83](../../stdlib/Security/Cryptography/AesGcm.sl#L83)</sub>
+<sub>[stdlib/Security/Cryptography/AesGcm.sl:102](../../stdlib/Security/Cryptography/AesGcm.sl#L102)</sub>
 
 #### Encrypt *method*
 
@@ -444,10 +479,11 @@ secret. Pass an empty array when there is none.
 
 - [CryptoError.NonceLength](#noncelength-case) -- `nonce` is empty
 - [CryptoError.TagLength](#taglength-case) -- `tag` is not `TagSize` long
+- [CryptoError.Parameter](#parameter-case) -- `plaintext` is longer than `MaxTextSize`, or `associatedData` longer than `MaxAssociatedDataSize`
 
 **See also** &nbsp; [AesGcm.Decrypt](#decrypt-method)
 
-<sub>[stdlib/Security/Cryptography/AesGcm.sl:105](../../stdlib/Security/Cryptography/AesGcm.sl#L105)</sub>
+<sub>[stdlib/Security/Cryptography/AesGcm.sl:126](../../stdlib/Security/Cryptography/AesGcm.sl#L126)</sub>
 
 #### Decrypt *method*
 
@@ -469,10 +505,11 @@ The plaintext, or `AuthenticationFailed` and nothing.
 - [CryptoError.NonceLength](#noncelength-case) -- `nonce` is empty
 - [CryptoError.TagLength](#taglength-case) -- `tag` is not `TagSize` long
 - [CryptoError.AuthenticationFailed](#authenticationfailed-case) -- the tag does not match, and no plaintext is returned
+- [CryptoError.Parameter](#parameter-case) -- `ciphertext` is longer than `MaxTextSize`, or `associatedData` longer than `MaxAssociatedDataSize`
 
 **See also** &nbsp; [AesGcm.Encrypt](#encrypt-method)
 
-<sub>[stdlib/Security/Cryptography/AesGcm.sl:142](../../stdlib/Security/Cryptography/AesGcm.sl#L142)</sub>
+<sub>[stdlib/Security/Cryptography/AesGcm.sl:168](../../stdlib/Security/Cryptography/AesGcm.sl#L168)</sub>
 
 ### Argon2id *class*
 
@@ -521,6 +558,36 @@ make a call allocate.
 
 <sub>[stdlib/Security/Cryptography/Argon2id.sl:61](../../stdlib/Security/Cryptography/Argon2id.sl#L61)</sub>
 
+#### MaxWorkKiB *constant*
+
+```
+const ulong MaxWorkKiB = 268435456
+```
+
+The most work a derivation may ask for, as `iterations` * `memoryKiB`:
+256 GiB of blocks filled, which is minutes. RFC 9106's two settings
+are 2^21 and 3 * 2^16. It bounds the time one stored hash can make a
+call take, as `MaxMemoryKiB` bounds the memory, and so bounds
+`iterations` too.
+
+**Value** &nbsp; 2^28 KiB.
+
+<sub>[stdlib/Security/Cryptography/Argon2id.sl:70](../../stdlib/Security/Cryptography/Argon2id.sl#L70)</sub>
+
+#### MaxLength *constant*
+
+```
+const nuint MaxLength = 1048576
+```
+
+The longest output. RFC 9106 allows 2^32 - 1 bytes, but a password hash
+or a key wants tens, and the whole output is held in memory; a caller
+that needs more expands this with `Hkdf`.
+
+**Value** &nbsp; 2^20 bytes.
+
+<sub>[stdlib/Security/Cryptography/Argon2id.sl:77](../../stdlib/Security/Cryptography/Argon2id.sl#L77)</sub>
+
 #### MinSaltSize *constant*
 
 ```
@@ -531,7 +598,7 @@ The shortest salt. RFC 9106 recommends sixteen random bytes.
 
 **Value** &nbsp; eight bytes.
 
-<sub>[stdlib/Security/Cryptography/Argon2id.sl:66](../../stdlib/Security/Cryptography/Argon2id.sl#L66)</sub>
+<sub>[stdlib/Security/Cryptography/Argon2id.sl:82](../../stdlib/Security/Cryptography/Argon2id.sl#L82)</sub>
 
 #### DeriveKey *method*
 
@@ -548,13 +615,13 @@ static Result<byte[], CryptoError> DeriveKey(ReadOnlySpan<byte> password, ReadOn
 - `iterations` -- t, how many passes over the memory
 - `memoryKiB` -- m, how many kibibytes to fill; at least eight per lane
 - `parallelism` -- p, how many lanes, computed one after another here
-- `length` -- how many bytes to derive, at least four
+- `length` -- how many bytes to derive, from four to `MaxLength`
 
 **Fails with**
 
-- [CryptoError.Parameter](#parameter-case) -- a parameter is outside RFC 9106 §3.1, `salt` is shorter than `MinSaltSize`, or `memoryKiB` is past `MaxMemoryKiB`
+- [CryptoError.Parameter](#parameter-case) -- a parameter is outside RFC 9106 §3.1, `salt` is shorter than `MinSaltSize`, `memoryKiB` is past `MaxMemoryKiB`, `iterations` * `memoryKiB` is past `MaxWorkKiB`, or `length` is past `MaxLength`
 
-<sub>[stdlib/Security/Cryptography/Argon2id.sl:80](../../stdlib/Security/Cryptography/Argon2id.sl#L80)</sub>
+<sub>[stdlib/Security/Cryptography/Argon2id.sl:97](../../stdlib/Security/Cryptography/Argon2id.sl#L97)</sub>
 
 #### DeriveKey *method*
 
@@ -575,15 +642,15 @@ that a stolen table of hashes cannot be attacked without it as well.
 - `iterations` -- t, how many passes over the memory
 - `memoryKiB` -- m, how many kibibytes to fill; at least eight per lane
 - `parallelism` -- p, how many lanes, computed one after another here
-- `length` -- how many bytes to derive, at least four
+- `length` -- how many bytes to derive, from four to `MaxLength`
 - `secret` -- K, a key held apart from the hashes; empty for none
 - `associatedData` -- X, bound into the result and not secret; empty for none
 
 **Fails with**
 
-- [CryptoError.Parameter](#parameter-case) -- a parameter is outside RFC 9106 §3.1, `salt` is shorter than `MinSaltSize`, or `memoryKiB` is past `MaxMemoryKiB`
+- [CryptoError.Parameter](#parameter-case) -- a parameter is outside RFC 9106 §3.1, `salt` is shorter than `MinSaltSize`, `memoryKiB` is past `MaxMemoryKiB`, `iterations` * `memoryKiB` is past `MaxWorkKiB`, or `length` is past `MaxLength`
 
-<sub>[stdlib/Security/Cryptography/Argon2id.sl:104](../../stdlib/Security/Cryptography/Argon2id.sl#L104)</sub>
+<sub>[stdlib/Security/Cryptography/Argon2id.sl:122](../../stdlib/Security/Cryptography/Argon2id.sl#L122)</sub>
 
 ### Blake2b *class*
 
@@ -659,7 +726,7 @@ unkeyed hash of that length.
 - [CryptoError.KeyLength](#keylength-case) -- `key` is longer than `MaxKeySize`
 - [CryptoError.Parameter](#parameter-case) -- `hashSize` is zero or past `MaxHashSize`
 
-<sub>[stdlib/Security/Cryptography/Blake2b.sl:112](../../stdlib/Security/Cryptography/Blake2b.sl#L112)</sub>
+<sub>[stdlib/Security/Cryptography/Blake2b.sl:120](../../stdlib/Security/Cryptography/Blake2b.sl#L120)</sub>
 
 #### HashData *method*
 
@@ -669,7 +736,7 @@ static byte[] HashData(ReadOnlySpan<byte> data)
 
 The BLAKE2b-512 digest of `data`, with no object to keep.
 
-<sub>[stdlib/Security/Cryptography/Blake2b.sl:122](../../stdlib/Security/Cryptography/Blake2b.sl#L122)</sub>
+<sub>[stdlib/Security/Cryptography/Blake2b.sl:130](../../stdlib/Security/Cryptography/Blake2b.sl#L130)</sub>
 
 #### Name *property*
 
@@ -679,7 +746,7 @@ String Name { get; }
 
 `BLAKE2b-512`, or the length this one was made with, in bits.
 
-<sub>[stdlib/Security/Cryptography/Blake2b.sl:125](../../stdlib/Security/Cryptography/Blake2b.sl#L125)</sub>
+<sub>[stdlib/Security/Cryptography/Blake2b.sl:133](../../stdlib/Security/Cryptography/Blake2b.sl#L133)</sub>
 
 #### HashSizeInBytes *property*
 
@@ -689,7 +756,7 @@ nuint HashSizeInBytes { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/Blake2b.sl:127](../../stdlib/Security/Cryptography/Blake2b.sl#L127)</sub>
+<sub>[stdlib/Security/Cryptography/Blake2b.sl:135](../../stdlib/Security/Cryptography/Blake2b.sl#L135)</sub>
 
 #### BlockSizeInBytes *property*
 
@@ -699,7 +766,7 @@ nuint BlockSizeInBytes { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/Blake2b.sl:129](../../stdlib/Security/Cryptography/Blake2b.sl#L129)</sub>
+<sub>[stdlib/Security/Cryptography/Blake2b.sl:137](../../stdlib/Security/Cryptography/Blake2b.sl#L137)</sub>
 
 #### AppendData *method*
 
@@ -709,7 +776,7 @@ void AppendData(ReadOnlySpan<byte> data)
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/Blake2b.sl:131](../../stdlib/Security/Cryptography/Blake2b.sl#L131)</sub>
+<sub>[stdlib/Security/Cryptography/Blake2b.sl:139](../../stdlib/Security/Cryptography/Blake2b.sl#L139)</sub>
 
 #### GetHashAndReset *method*
 
@@ -719,7 +786,7 @@ byte[] GetHashAndReset()
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/Blake2b.sl:156](../../stdlib/Security/Cryptography/Blake2b.sl#L156)</sub>
+<sub>[stdlib/Security/Cryptography/Blake2b.sl:164](../../stdlib/Security/Cryptography/Blake2b.sl#L164)</sub>
 
 #### Reset *method*
 
@@ -729,7 +796,7 @@ void Reset()
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/Blake2b.sl:174](../../stdlib/Security/Cryptography/Blake2b.sl#L174)</sub>
+<sub>[stdlib/Security/Cryptography/Blake2b.sl:182](../../stdlib/Security/Cryptography/Blake2b.sl#L182)</sub>
 
 #### ComputeHash *method*
 
@@ -740,7 +807,7 @@ byte[] ComputeHash(ReadOnlySpan<byte> data)
 The digest of `data` on its own. Resets first, so an object that has
 been appended to is still safe to ask.
 
-<sub>[stdlib/Security/Cryptography/Blake2b.sl:197](../../stdlib/Security/Cryptography/Blake2b.sl#L197)</sub>
+<sub>[stdlib/Security/Cryptography/Blake2b.sl:205](../../stdlib/Security/Cryptography/Blake2b.sl#L205)</sub>
 
 ### ChaCha20 *class*
 
@@ -753,8 +820,8 @@ a 32-bit block counter.
 
 ```csharp
 var cipher = try ChaCha20.FromKey(key);
-var sealed = try cipher.ApplyKeystream(nonce, 1u, plaintext);
-var opened = try cipher.ApplyKeystream(nonce, 1u, sealed);
+var encrypted = try cipher.ApplyKeystream(nonce, 1u, plaintext);
+var opened = try cipher.ApplyKeystream(nonce, 1u, encrypted);
 ```
 
 **This is encryption without authentication.** Anyone can flip a bit of
@@ -818,7 +885,7 @@ A cipher under `key`, which must be 32 bytes.
 
 - [CryptoError.KeyLength](#keylength-case) -- `key` is not 32 bytes
 
-<sub>[stdlib/Security/Cryptography/ChaCha20.sl:79](../../stdlib/Security/Cryptography/ChaCha20.sl#L79)</sub>
+<sub>[stdlib/Security/Cryptography/ChaCha20.sl:81](../../stdlib/Security/Cryptography/ChaCha20.sl#L81)</sub>
 
 #### ApplyKeystream *method*
 
@@ -843,7 +910,7 @@ the AEAD construction, and at zero otherwise.
 - [CryptoError.NonceLength](#noncelength-case) -- `nonce` is not twelve bytes
 - [CryptoError.Parameter](#parameter-case) -- `input` runs past block 2^32 - 1, where the counter would wrap
 
-<sub>[stdlib/Security/Cryptography/ChaCha20.sl:98](../../stdlib/Security/Cryptography/ChaCha20.sl#L98)</sub>
+<sub>[stdlib/Security/Cryptography/ChaCha20.sl:100](../../stdlib/Security/Cryptography/ChaCha20.sl#L100)</sub>
 
 ### ChaCha20Poly1305 *class*
 
@@ -857,8 +924,8 @@ ChaCha20-Poly1305: the AEAD of RFC 8439 §2.8, as .NET's
 ```csharp
 var box = try ChaCha20Poly1305.FromKey(key);
 byte[] tag = new byte[16u];
-var sealed = try box.Encrypt(nonce, plaintext, associated, tag);
-var opened = try box.Decrypt(nonce, sealed, associated, tag);
+var encrypted = try box.Encrypt(nonce, plaintext, associated, tag);
+var opened = try box.Decrypt(nonce, encrypted, associated, tag);
 ```
 
 **It is AES-GCM's alternative where there is no AES in hardware.** Every
@@ -1998,8 +2065,14 @@ Result<byte[], CryptoError> SignHash(ReadOnlySpan<byte> hash)
 
 The signature of a hash already computed, as `r` then `s`.
 
-The nonce's HMAC uses the hash whose length `hash` has — SHA-1,
-SHA-256, SHA-384 or SHA-512 — and the curve's own for any other length.
+**The nonce's HMAC is chosen by the digest's length**: SHA-1 for 20
+bytes, SHA-256 for 32, SHA-384 for 48, SHA-512 for 64, and the curve's
+own hash for any other. RFC 6979 makes the nonce with the hash that
+made the digest, so this matches it when the digest came from one of
+those four. A digest from another hash, or a truncated one, gets a
+nonce no other implementation would make: the signature verifies, but
+its bytes differ. Where they MUST match, use the overload that names
+the hash.
 
 **Parameters**
 
@@ -2011,7 +2084,7 @@ SHA-256, SHA-384 or SHA-512 — and the curve's own for any other length.
 
 **See also** &nbsp; [ECDsa.VerifyHash](#verifyhash-method)
 
-<sub>[stdlib/Security/Cryptography/ECDsa.sl:134](../../stdlib/Security/Cryptography/ECDsa.sl#L134)</sub>
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:140](../../stdlib/Security/Cryptography/ECDsa.sl#L140)</sub>
 
 #### SignHash *method*
 
@@ -2019,7 +2092,9 @@ SHA-256, SHA-384 or SHA-512 — and the curve's own for any other length.
 Result<byte[], CryptoError> SignHash(ReadOnlySpan<byte> hash, DsaSignatureFormat signatureFormat)
 ```
 
-The signature of a hash already computed, in `signatureFormat`.
+The signature of a hash already computed, in `signatureFormat`, with
+the nonce's HMAC chosen by the digest's length as the one-argument
+overload says.
 
 **Parameters**
 
@@ -2030,7 +2105,52 @@ The signature of a hash already computed, in `signatureFormat`.
 
 - [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key
 
-<sub>[stdlib/Security/Cryptography/ECDsa.sl:142](../../stdlib/Security/Cryptography/ECDsa.sl#L142)</sub>
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:150](../../stdlib/Security/Cryptography/ECDsa.sl#L150)</sub>
+
+#### SignHash *method*
+
+```
+Result<byte[], CryptoError> SignHash(ReadOnlySpan<byte> hash, HashAlgorithmName hashAlgorithm)
+```
+
+The signature of a hash `hashAlgorithm` computed, as `r` then `s`, with
+the nonce RFC 6979 derives through HMAC over `hashAlgorithm`.
+
+The overload to use for interoperable signatures: the same key, digest
+and hash give the same bytes as any other RFC 6979 implementation.
+
+**Parameters**
+
+- `hash` -- the digest of the message
+- `hashAlgorithm` -- the hash that made `hash`, which the nonce's HMAC uses too
+
+**Fails with**
+
+- [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key
+- [CryptoError.Unsupported](#unsupported-case) -- `hashAlgorithm` is the zero value
+
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:185](../../stdlib/Security/Cryptography/ECDsa.sl#L185)</sub>
+
+#### SignHash *method*
+
+```
+Result<byte[], CryptoError> SignHash(ReadOnlySpan<byte> hash, HashAlgorithmName hashAlgorithm, DsaSignatureFormat signatureFormat)
+```
+
+The signature of a hash `hashAlgorithm` computed, in `signatureFormat`.
+
+**Parameters**
+
+- `hash` -- the digest of the message
+- `hashAlgorithm` -- the hash that made `hash`, which the nonce's HMAC uses too
+- `signatureFormat` -- how to lay out `r` and `s`
+
+**Fails with**
+
+- [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key
+- [CryptoError.Unsupported](#unsupported-case) -- `hashAlgorithm` is the zero value
+
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:196](../../stdlib/Security/Cryptography/ECDsa.sl#L196)</sub>
 
 #### SignData *method*
 
@@ -2052,7 +2172,7 @@ The signature of `data` hashed with `hashAlgorithm`, as `r` then `s`.
 
 **See also** &nbsp; [ECDsa.VerifyData](#verifydata-method)
 
-<sub>[stdlib/Security/Cryptography/ECDsa.sl:174](../../stdlib/Security/Cryptography/ECDsa.sl#L174)</sub>
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:208](../../stdlib/Security/Cryptography/ECDsa.sl#L208)</sub>
 
 #### SignData *method*
 
@@ -2074,7 +2194,7 @@ The signature of `data` hashed with `hashAlgorithm`, in
 - [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key
 - [CryptoError.Unsupported](#unsupported-case) -- `hashAlgorithm` is the zero value
 
-<sub>[stdlib/Security/Cryptography/ECDsa.sl:186](../../stdlib/Security/Cryptography/ECDsa.sl#L186)</sub>
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:220](../../stdlib/Security/Cryptography/ECDsa.sl#L220)</sub>
 
 #### VerifyHash *method*
 
@@ -2089,7 +2209,7 @@ Whether `signature`, as `r` then `s`, signs `hash` under this key.
 - `hash` -- the digest of the message
 - `signature` -- `r` then `s`, each as wide as the order
 
-<sub>[stdlib/Security/Cryptography/ECDsa.sl:212](../../stdlib/Security/Cryptography/ECDsa.sl#L212)</sub>
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:246](../../stdlib/Security/Cryptography/ECDsa.sl#L246)</sub>
 
 #### VerifyHash *method*
 
@@ -2106,7 +2226,7 @@ under this key.
 - `signature` -- the signature
 - `signatureFormat` -- how `r` and `s` are laid out
 
-<sub>[stdlib/Security/Cryptography/ECDsa.sl:221](../../stdlib/Security/Cryptography/ECDsa.sl#L221)</sub>
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:255](../../stdlib/Security/Cryptography/ECDsa.sl#L255)</sub>
 
 #### VerifyData *method*
 
@@ -2123,7 +2243,7 @@ Whether `signature`, as `r` then `s`, signs `data` hashed with
 - `signature` -- `r` then `s`, each as wide as the order
 - `hashAlgorithm` -- the hash the signer used
 
-<sub>[stdlib/Security/Cryptography/ECDsa.sl:248](../../stdlib/Security/Cryptography/ECDsa.sl#L248)</sub>
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:282](../../stdlib/Security/Cryptography/ECDsa.sl#L282)</sub>
 
 #### VerifyData *method*
 
@@ -2141,7 +2261,7 @@ hashed with `hashAlgorithm`.
 - `hashAlgorithm` -- the hash the signer used
 - `signatureFormat` -- how `r` and `s` are laid out
 
-<sub>[stdlib/Security/Cryptography/ECDsa.sl:260](../../stdlib/Security/Cryptography/ECDsa.sl#L260)</sub>
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:294](../../stdlib/Security/Cryptography/ECDsa.sl#L294)</sub>
 
 #### GetMaxSignatureSize *method*
 
@@ -2156,7 +2276,7 @@ the fixed-width form, and 72 or 104 for DER.
 
 - `signatureFormat` -- the layout
 
-<sub>[stdlib/Security/Cryptography/ECDsa.sl:274](../../stdlib/Security/Cryptography/ECDsa.sl#L274)</sub>
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:308](../../stdlib/Security/Cryptography/ECDsa.sl#L308)</sub>
 
 #### ImportSubjectPublicKeyInfo *method*
 
@@ -2179,7 +2299,7 @@ Replaces the key with the public key in an RFC 5480
 - [CryptoError.Unsupported](#unsupported-case) -- a curve other than P-256 and P-384
 - [CryptoError.InvalidPoint](#invalidpoint-case) -- the point is not on the curve
 
-<sub>[stdlib/Security/Cryptography/ECDsa.sl:292](../../stdlib/Security/Cryptography/ECDsa.sl#L292)</sub>
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:326](../../stdlib/Security/Cryptography/ECDsa.sl#L326)</sub>
 
 #### ExportSubjectPublicKeyInfo *method*
 
@@ -2189,7 +2309,7 @@ byte[] ExportSubjectPublicKeyInfo()
 
 The public key as an RFC 5480 `SubjectPublicKeyInfo`, in DER.
 
-<sub>[stdlib/Security/Cryptography/ECDsa.sl:302](../../stdlib/Security/Cryptography/ECDsa.sl#L302)</sub>
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:336](../../stdlib/Security/Cryptography/ECDsa.sl#L336)</sub>
 
 #### ExportSubjectPublicKeyInfoPem *method*
 
@@ -2199,7 +2319,7 @@ String ExportSubjectPublicKeyInfoPem()
 
 The public key as a `PUBLIC KEY` PEM block.
 
-<sub>[stdlib/Security/Cryptography/ECDsa.sl:305](../../stdlib/Security/Cryptography/ECDsa.sl#L305)</sub>
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:339](../../stdlib/Security/Cryptography/ECDsa.sl#L339)</sub>
 
 #### ImportECPrivateKey *method*
 
@@ -2223,7 +2343,7 @@ which MUST name its curve. On failure the key is unchanged.
 - [CryptoError.InvalidKey](#invalidkey-case) -- the scalar is not in `[1, n - 1]`, or does not give the public point beside it
 - [CryptoError.InvalidPoint](#invalidpoint-case) -- the public point is not on the curve
 
-<sub>[stdlib/Security/Cryptography/ECDsa.sl:318](../../stdlib/Security/Cryptography/ECDsa.sl#L318)</sub>
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:352](../../stdlib/Security/Cryptography/ECDsa.sl#L352)</sub>
 
 #### ExportECPrivateKey *method*
 
@@ -2237,7 +2357,7 @@ The private key as an RFC 5915 `ECPrivateKey`, in DER.
 
 - [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key
 
-<sub>[stdlib/Security/Cryptography/ECDsa.sl:330](../../stdlib/Security/Cryptography/ECDsa.sl#L330)</sub>
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:364](../../stdlib/Security/Cryptography/ECDsa.sl#L364)</sub>
 
 #### ExportECPrivateKeyPem *method*
 
@@ -2251,7 +2371,7 @@ The private key as an `EC PRIVATE KEY` PEM block.
 
 - [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key
 
-<sub>[stdlib/Security/Cryptography/ECDsa.sl:335](../../stdlib/Security/Cryptography/ECDsa.sl#L335)</sub>
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:369](../../stdlib/Security/Cryptography/ECDsa.sl#L369)</sub>
 
 #### ImportPkcs8PrivateKey *method*
 
@@ -2275,7 +2395,7 @@ Replaces the key with the private key in an unencrypted PKCS #8
 - [CryptoError.InvalidKey](#invalidkey-case) -- the scalar is not in `[1, n - 1]`, or does not give the public point beside it
 - [CryptoError.InvalidPoint](#invalidpoint-case) -- the public point is not on the curve
 
-<sub>[stdlib/Security/Cryptography/ECDsa.sl:353](../../stdlib/Security/Cryptography/ECDsa.sl#L353)</sub>
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:387](../../stdlib/Security/Cryptography/ECDsa.sl#L387)</sub>
 
 #### ExportPkcs8PrivateKey *method*
 
@@ -2289,7 +2409,7 @@ The private key as an unencrypted PKCS #8 `PrivateKeyInfo`, in DER.
 
 - [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key
 
-<sub>[stdlib/Security/Cryptography/ECDsa.sl:365](../../stdlib/Security/Cryptography/ECDsa.sl#L365)</sub>
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:399](../../stdlib/Security/Cryptography/ECDsa.sl#L399)</sub>
 
 #### ExportPkcs8PrivateKeyPem *method*
 
@@ -2303,7 +2423,7 @@ The private key as a `PRIVATE KEY` PEM block.
 
 - [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key
 
-<sub>[stdlib/Security/Cryptography/ECDsa.sl:370](../../stdlib/Security/Cryptography/ECDsa.sl#L370)</sub>
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:404](../../stdlib/Security/Cryptography/ECDsa.sl#L404)</sub>
 
 #### ImportFromPem *method*
 
@@ -2325,7 +2445,7 @@ over. On failure the key is unchanged.
 - [CryptoError.Unsupported](#unsupported-case) -- an encrypted key, or a curve other than P-256 and P-384
 - [CryptoError.InvalidKey](#invalidkey-case) -- the key does not check
 
-<sub>[stdlib/Security/Cryptography/ECDsa.sl:388](../../stdlib/Security/Cryptography/ECDsa.sl#L388)</sub>
+<sub>[stdlib/Security/Cryptography/ECDsa.sl:422](../../stdlib/Security/Cryptography/ECDsa.sl#L422)</sub>
 
 ### ECParameters *struct*
 
@@ -2442,7 +2562,11 @@ signature and no randomness is needed to sign.
 
 **Verification is strict and cofactorless.** A signature whose S is not
 below the group order is refused, as is a public key that is not the one
-canonical encoding of a point on the curve. The check is
+canonical encoding of a point on the curve, and a public key of small
+order -- one of the eight points that eight times is the identity. Such a
+key has no secret behind it: under the identity, R = B and S = 1 sign
+every message. RFC 8032 does not ask for that refusal and libsodium makes
+it. The check is
 [S]B = R + [k]A, the equation RFC 8032 §5.1.7 names as sufficient, rather
 than the same multiplied through by the cofactor 8. The two differ only on
 a signature crafted with a component of small order, which no honest
@@ -2454,7 +2578,7 @@ secret scalar with a fixed window read by mask, and reduces and combines
 scalars with fixed loops. Verification touches nothing secret and uses a
 faster variable-time multiplication.
 
-<sub>[stdlib/Security/Cryptography/Ed25519.sl:57](../../stdlib/Security/Cryptography/Ed25519.sl#L57)</sub>
+<sub>[stdlib/Security/Cryptography/Ed25519.sl:61](../../stdlib/Security/Cryptography/Ed25519.sl#L61)</sub>
 
 #### PrivateKeySize *constant*
 
@@ -2466,7 +2590,7 @@ The length of a private key: the RFC's seed.
 
 **Value** &nbsp; thirty-two bytes.
 
-<sub>[stdlib/Security/Cryptography/Ed25519.sl:62](../../stdlib/Security/Cryptography/Ed25519.sl#L62)</sub>
+<sub>[stdlib/Security/Cryptography/Ed25519.sl:66](../../stdlib/Security/Cryptography/Ed25519.sl#L66)</sub>
 
 #### PublicKeySize *constant*
 
@@ -2478,7 +2602,7 @@ The length of a public key.
 
 **Value** &nbsp; thirty-two bytes.
 
-<sub>[stdlib/Security/Cryptography/Ed25519.sl:67](../../stdlib/Security/Cryptography/Ed25519.sl#L67)</sub>
+<sub>[stdlib/Security/Cryptography/Ed25519.sl:71](../../stdlib/Security/Cryptography/Ed25519.sl#L71)</sub>
 
 #### SignatureSize *constant*
 
@@ -2490,7 +2614,7 @@ The length of a signature: R, then S.
 
 **Value** &nbsp; sixty-four bytes.
 
-<sub>[stdlib/Security/Cryptography/Ed25519.sl:72](../../stdlib/Security/Cryptography/Ed25519.sl#L72)</sub>
+<sub>[stdlib/Security/Cryptography/Ed25519.sl:76](../../stdlib/Security/Cryptography/Ed25519.sl#L76)</sub>
 
 #### GeneratePrivateKey *method*
 
@@ -2503,7 +2627,7 @@ A new private key: 32 bytes from `RandomNumberGenerator`.
 Aborts if the platform supplies no entropy, as
 `RandomNumberGenerator.GetBytes` does.
 
-<sub>[stdlib/Security/Cryptography/Ed25519.sl:78](../../stdlib/Security/Cryptography/Ed25519.sl#L78)</sub>
+<sub>[stdlib/Security/Cryptography/Ed25519.sl:82](../../stdlib/Security/Cryptography/Ed25519.sl#L82)</sub>
 
 #### GetPublicKey *method*
 
@@ -2521,7 +2645,7 @@ The public key that goes with `privateKey`.
 
 - [CryptoError.KeyLength](#keylength-case) -- `privateKey` is not `PrivateKeySize` long
 
-<sub>[stdlib/Security/Cryptography/Ed25519.sl:84](../../stdlib/Security/Cryptography/Ed25519.sl#L84)</sub>
+<sub>[stdlib/Security/Cryptography/Ed25519.sl:88](../../stdlib/Security/Cryptography/Ed25519.sl#L88)</sub>
 
 #### Sign *method*
 
@@ -2542,7 +2666,7 @@ The 64-byte signature of `message` under `privateKey`.
 
 **See also** &nbsp; [Ed25519.Verify](#verify-method)
 
-<sub>[stdlib/Security/Cryptography/Ed25519.sl:104](../../stdlib/Security/Cryptography/Ed25519.sl#L104)</sub>
+<sub>[stdlib/Security/Cryptography/Ed25519.sl:108](../../stdlib/Security/Cryptography/Ed25519.sl#L108)</sub>
 
 #### Verify *method*
 
@@ -2553,8 +2677,8 @@ static bool Verify(ReadOnlySpan<byte> publicKey, ReadOnlySpan<byte> message, Rea
 Whether `signature` is `publicKey`'s signature of `message`.
 
 A key or signature of the wrong length answers false, as does a key
-that is not a canonical point encoding and a signature whose S is not
-below the group order. The equation checked is the cofactorless one;
+that is not a canonical point encoding, a key of small order and a
+signature whose S is not below the group order. The equation checked is the cofactorless one;
 the type's own documentation says what that means.
 
 **Parameters**
@@ -2567,7 +2691,7 @@ the type's own documentation says what that means.
 
 **See also** &nbsp; [Ed25519.Sign](#sign-method)
 
-<sub>[stdlib/Security/Cryptography/Ed25519.sl:154](../../stdlib/Security/Cryptography/Ed25519.sl#L154)</sub>
+<sub>[stdlib/Security/Cryptography/Ed25519.sl:158](../../stdlib/Security/Cryptography/Ed25519.sl#L158)</sub>
 
 ### HashAlgorithm *class*
 
@@ -2594,7 +2718,7 @@ String Name { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/HashAlgorithm.sl:64](../../stdlib/Security/Cryptography/HashAlgorithm.sl#L64)</sub>
+<sub>[stdlib/Security/Cryptography/HashAlgorithm.sl:67](../../stdlib/Security/Cryptography/HashAlgorithm.sl#L67)</sub>
 
 #### HashSizeInBytes *property*
 
@@ -2604,7 +2728,7 @@ nuint HashSizeInBytes { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/HashAlgorithm.sl:66](../../stdlib/Security/Cryptography/HashAlgorithm.sl#L66)</sub>
+<sub>[stdlib/Security/Cryptography/HashAlgorithm.sl:69](../../stdlib/Security/Cryptography/HashAlgorithm.sl#L69)</sub>
 
 #### BlockSizeInBytes *property*
 
@@ -2614,7 +2738,7 @@ nuint BlockSizeInBytes { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/HashAlgorithm.sl:68](../../stdlib/Security/Cryptography/HashAlgorithm.sl#L68)</sub>
+<sub>[stdlib/Security/Cryptography/HashAlgorithm.sl:71](../../stdlib/Security/Cryptography/HashAlgorithm.sl#L71)</sub>
 
 #### AppendData *method*
 
@@ -2624,7 +2748,7 @@ void AppendData(ReadOnlySpan<byte> data)
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/HashAlgorithm.sl:70](../../stdlib/Security/Cryptography/HashAlgorithm.sl#L70)</sub>
+<sub>[stdlib/Security/Cryptography/HashAlgorithm.sl:73](../../stdlib/Security/Cryptography/HashAlgorithm.sl#L73)</sub>
 
 #### GetHashAndReset *method*
 
@@ -2634,7 +2758,7 @@ byte[] GetHashAndReset()
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/HashAlgorithm.sl:94](../../stdlib/Security/Cryptography/HashAlgorithm.sl#L94)</sub>
+<sub>[stdlib/Security/Cryptography/HashAlgorithm.sl:97](../../stdlib/Security/Cryptography/HashAlgorithm.sl#L97)</sub>
 
 #### Reset *method*
 
@@ -2644,7 +2768,7 @@ void Reset()
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/HashAlgorithm.sl:101](../../stdlib/Security/Cryptography/HashAlgorithm.sl#L101)</sub>
+<sub>[stdlib/Security/Cryptography/HashAlgorithm.sl:104](../../stdlib/Security/Cryptography/HashAlgorithm.sl#L104)</sub>
 
 #### ComputeHash *method*
 
@@ -2655,7 +2779,7 @@ byte[] ComputeHash(ReadOnlySpan<byte> data)
 The digest of `data` on its own. Resets first, so an object that has
 been appended to is still safe to ask.
 
-<sub>[stdlib/Security/Cryptography/HashAlgorithm.sl:111](../../stdlib/Security/Cryptography/HashAlgorithm.sl#L111)</sub>
+<sub>[stdlib/Security/Cryptography/HashAlgorithm.sl:114](../../stdlib/Security/Cryptography/HashAlgorithm.sl#L114)</sub>
 
 ### HashAlgorithmName *struct*
 
@@ -2874,7 +2998,7 @@ Extract and expand together, which is how HKDF is nearly always used.
 
 **See also** &nbsp; [Hkdf.Extract](#extract-method) &middot; [Hkdf.Expand](#expand-method)
 
-<sub>[stdlib/Security/Cryptography/Hkdf.sl:107](../../stdlib/Security/Cryptography/Hkdf.sl#L107)</sub>
+<sub>[stdlib/Security/Cryptography/Hkdf.sl:110](../../stdlib/Security/Cryptography/Hkdf.sl#L110)</sub>
 
 ### Hmac *class*
 
@@ -2903,7 +3027,7 @@ String Name { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/Hmac.sl:80](../../stdlib/Security/Cryptography/Hmac.sl#L80)</sub>
+<sub>[stdlib/Security/Cryptography/Hmac.sl:87](../../stdlib/Security/Cryptography/Hmac.sl#L87)</sub>
 
 #### HashSizeInBytes *property*
 
@@ -2913,7 +3037,7 @@ nuint HashSizeInBytes { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/Hmac.sl:82](../../stdlib/Security/Cryptography/Hmac.sl#L82)</sub>
+<sub>[stdlib/Security/Cryptography/Hmac.sl:89](../../stdlib/Security/Cryptography/Hmac.sl#L89)</sub>
 
 #### BlockSizeInBytes *property*
 
@@ -2923,7 +3047,7 @@ nuint BlockSizeInBytes { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/Hmac.sl:84](../../stdlib/Security/Cryptography/Hmac.sl#L84)</sub>
+<sub>[stdlib/Security/Cryptography/Hmac.sl:91](../../stdlib/Security/Cryptography/Hmac.sl#L91)</sub>
 
 #### AppendData *method*
 
@@ -2933,7 +3057,7 @@ void AppendData(ReadOnlySpan<byte> data)
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/Hmac.sl:86](../../stdlib/Security/Cryptography/Hmac.sl#L86)</sub>
+<sub>[stdlib/Security/Cryptography/Hmac.sl:93](../../stdlib/Security/Cryptography/Hmac.sl#L93)</sub>
 
 #### GetHashAndReset *method*
 
@@ -2943,7 +3067,7 @@ byte[] GetHashAndReset()
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/Hmac.sl:88](../../stdlib/Security/Cryptography/Hmac.sl#L88)</sub>
+<sub>[stdlib/Security/Cryptography/Hmac.sl:95](../../stdlib/Security/Cryptography/Hmac.sl#L95)</sub>
 
 #### Reset *method*
 
@@ -2953,7 +3077,7 @@ void Reset()
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/Hmac.sl:98](../../stdlib/Security/Cryptography/Hmac.sl#L98)</sub>
+<sub>[stdlib/Security/Cryptography/Hmac.sl:106](../../stdlib/Security/Cryptography/Hmac.sl#L106)</sub>
 
 #### ComputeHash *method*
 
@@ -2963,7 +3087,7 @@ byte[] ComputeHash(ReadOnlySpan<byte> data)
 
 The MAC of `data` under `key`, with no object to keep.
 
-<sub>[stdlib/Security/Cryptography/Hmac.sl:105](../../stdlib/Security/Cryptography/Hmac.sl#L105)</sub>
+<sub>[stdlib/Security/Cryptography/Hmac.sl:113](../../stdlib/Security/Cryptography/Hmac.sl#L113)</sub>
 
 ### HmacMd5 *class*
 
@@ -3231,7 +3355,7 @@ String Name { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/Md5.sl:90](../../stdlib/Security/Cryptography/Md5.sl#L90)</sub>
+<sub>[stdlib/Security/Cryptography/Md5.sl:98](../../stdlib/Security/Cryptography/Md5.sl#L98)</sub>
 
 #### HashSizeInBytes *property*
 
@@ -3241,7 +3365,7 @@ nuint HashSizeInBytes { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/Md5.sl:92](../../stdlib/Security/Cryptography/Md5.sl#L92)</sub>
+<sub>[stdlib/Security/Cryptography/Md5.sl:100](../../stdlib/Security/Cryptography/Md5.sl#L100)</sub>
 
 #### HashData *method*
 
@@ -3251,7 +3375,7 @@ static byte[] HashData(ReadOnlySpan<byte> data)
 
 The digest of `data`, with no object to keep.
 
-<sub>[stdlib/Security/Cryptography/Md5.sl:95](../../stdlib/Security/Cryptography/Md5.sl#L95)</sub>
+<sub>[stdlib/Security/Cryptography/Md5.sl:103](../../stdlib/Security/Cryptography/Md5.sl#L103)</sub>
 
 ### PaddingMode *enum*
 
@@ -3329,9 +3453,10 @@ String pem = PemEncoding.Write("CERTIFICATE", der);
 As .NET's `PemEncoding`: a block may sit anywhere in surrounding text, the
 base64 may be wrapped at any width and with CRLF or LF, and a block whose
 `END` label is not its `BEGIN` label is not a block. `Find` passes over
-anything malformed and answers the first block that is whole.
+anything malformed and answers the first block that is whole, in one
+forward pass: its time is linear in the text it reads.
 
-<sub>[stdlib/Security/Cryptography/PemEncoding.sl:43](../../stdlib/Security/Cryptography/PemEncoding.sl#L43)</sub>
+<sub>[stdlib/Security/Cryptography/PemEncoding.sl:44](../../stdlib/Security/Cryptography/PemEncoding.sl#L44)</sub>
 
 #### Find *method*
 
@@ -3349,7 +3474,7 @@ The first well-formed block in `text`.
 
 **See also** &nbsp; [PemEncoding.Write](#write-method)
 
-<sub>[stdlib/Security/Cryptography/PemEncoding.sl:50](../../stdlib/Security/Cryptography/PemEncoding.sl#L50)</sub>
+<sub>[stdlib/Security/Cryptography/PemEncoding.sl:51](../../stdlib/Security/Cryptography/PemEncoding.sl#L51)</sub>
 
 #### Find *method*
 
@@ -3365,6 +3490,9 @@ A `BEGIN` boundary MUST start the text or follow whitespace, and an
 `END` boundary MUST end it or be followed by whitespace. Between them is
 base64 in the standard alphabet, padded, with whitespace anywhere.
 
+A caller walking one text SHOULD convert it once and call
+`FindUtf8`, since this converts `text` on every call.
+
 **Parameters**
 
 - `text` -- where to look
@@ -3372,7 +3500,46 @@ base64 in the standard alphabet, padded, with whitespace anywhere.
 
 **Returns** &nbsp; the block, or `None` when there is no well-formed one
 
-<sub>[stdlib/Security/Cryptography/PemEncoding.sl:63](../../stdlib/Security/Cryptography/PemEncoding.sl#L63)</sub>
+<sub>[stdlib/Security/Cryptography/PemEncoding.sl:67](../../stdlib/Security/Cryptography/PemEncoding.sl#L67)</sub>
+
+#### FindUtf8 *method*
+
+```
+static Optional<PemFields> FindUtf8(ReadOnlySpan<byte> utf8)
+```
+
+The first well-formed block in the UTF-8 text `utf8`: .NET's
+`FindUtf8`.
+
+**Parameters**
+
+- `utf8` -- where to look
+
+**Returns** &nbsp; the block, or `None` when there is no well-formed one
+
+<sub>[stdlib/Security/Cryptography/PemEncoding.sl:75](../../stdlib/Security/Cryptography/PemEncoding.sl#L75)</sub>
+
+#### FindUtf8 *method*
+
+```
+static Optional<PemFields> FindUtf8(ReadOnlySpan<byte> utf8, nuint start)
+```
+
+`Find` over UTF-8 text, at or after byte `start`.
+
+Base64 holds no `-`, so the `END` boundary of a block is the first
+`-` after its `BEGIN` boundary, and a block whose first `-` is
+anything else is not one. Each byte is looked at a bounded number of
+times.
+
+**Parameters**
+
+- `utf8` -- where to look
+- `start` -- the byte to look from; past the end finds nothing
+
+**Returns** &nbsp; the block, or `None` when there is no well-formed one
+
+<sub>[stdlib/Security/Cryptography/PemEncoding.sl:87](../../stdlib/Security/Cryptography/PemEncoding.sl#L87)</sub>
 
 #### Write *method*
 
@@ -3390,7 +3557,7 @@ separated by `\n`. No newline follows the `END` boundary.
 
 **See also** &nbsp; [PemEncoding.Find](#find-method)
 
-<sub>[stdlib/Security/Cryptography/PemEncoding.sl:129](../../stdlib/Security/Cryptography/PemEncoding.sl#L129)</sub>
+<sub>[stdlib/Security/Cryptography/PemEncoding.sl:150](../../stdlib/Security/Cryptography/PemEncoding.sl#L150)</sub>
 
 #### IsValidLabel *method*
 
@@ -3402,7 +3569,7 @@ Whether RFC 7468 allows `label`: printable ASCII other than `-`, with a
 single space or hyphen allowed between two such characters. Empty is
 allowed.
 
-<sub>[stdlib/Security/Cryptography/PemEncoding.sl:155](../../stdlib/Security/Cryptography/PemEncoding.sl#L155)</sub>
+<sub>[stdlib/Security/Cryptography/PemEncoding.sl:176](../../stdlib/Security/Cryptography/PemEncoding.sl#L176)</sub>
 
 ### PemFields *struct*
 
@@ -3529,7 +3696,7 @@ have been used before.
 
 - [CryptoError.KeyLength](#keylength-case) -- `key` is not 32 bytes
 
-<sub>[stdlib/Security/Cryptography/Poly1305.sl:89](../../stdlib/Security/Cryptography/Poly1305.sl#L89)</sub>
+<sub>[stdlib/Security/Cryptography/Poly1305.sl:91](../../stdlib/Security/Cryptography/Poly1305.sl#L91)</sub>
 
 #### ComputeTag *method*
 
@@ -3548,7 +3715,7 @@ The tag of `message` under `key`, with no object to keep.
 
 - [CryptoError.KeyLength](#keylength-case) -- `key` is not 32 bytes
 
-<sub>[stdlib/Security/Cryptography/Poly1305.sl:101](../../stdlib/Security/Cryptography/Poly1305.sl#L101)</sub>
+<sub>[stdlib/Security/Cryptography/Poly1305.sl:103](../../stdlib/Security/Cryptography/Poly1305.sl#L103)</sub>
 
 #### AppendData *method*
 
@@ -3558,7 +3725,7 @@ void AppendData(ReadOnlySpan<byte> data)
 
 Adds bytes to what is being authenticated.
 
-<sub>[stdlib/Security/Cryptography/Poly1305.sl:113](../../stdlib/Security/Cryptography/Poly1305.sl#L113)</sub>
+<sub>[stdlib/Security/Cryptography/Poly1305.sl:115](../../stdlib/Security/Cryptography/Poly1305.sl#L115)</sub>
 
 #### GetTag *method*
 
@@ -3569,7 +3736,7 @@ byte[] GetTag()
 The tag of everything appended. **The key is erased**, so the object
 MUST NOT be used afterwards: it has done the one thing it may do.
 
-<sub>[stdlib/Security/Cryptography/Poly1305.sl:129](../../stdlib/Security/Cryptography/Poly1305.sl#L129)</sub>
+<sub>[stdlib/Security/Cryptography/Poly1305.sl:131](../../stdlib/Security/Cryptography/Poly1305.sl#L131)</sub>
 
 ### RandomNumberGenerator *class*
 
@@ -3672,11 +3839,11 @@ job is to make one attack per password rather than one per database.
 
 **Fails with**
 
-- [CryptoError.Parameter](#parameter-case) -- `iterations` or `length` is zero
+- [CryptoError.Parameter](#parameter-case) -- `iterations` or `length` is zero, or `length` is past (2^32 - 1) digests, where the block index would wrap
 
 **See also** &nbsp; [Argon2id](#argon2id-class) &middot; [Scrypt](#scrypt-class)
 
-<sub>[stdlib/Security/Cryptography/Rfc2898DeriveBytes.sl:57](../../stdlib/Security/Cryptography/Rfc2898DeriveBytes.sl#L57)</sub>
+<sub>[stdlib/Security/Cryptography/Rfc2898DeriveBytes.sl:58](../../stdlib/Security/Cryptography/Rfc2898DeriveBytes.sl#L58)</sub>
 
 ### Rsa *class*
 
@@ -3719,10 +3886,15 @@ the caller chose, and its result is raised to `e` again and compared with
 the input before it is used, so a fault in the arithmetic cannot leak a
 prime through a wrong signature.
 
+**Sizes are bounded.** Every key read or built from numbers, public or
+private, has a modulus of 1024 to 8192 bits and a public exponent of at
+most 33 bits, as BoringSSL requires; `Create(int)` makes 2048 to 8192.
+The bounds keep one verification with a key from the network cheap.
+
 An `Rsa` is not changed by anything after it is made, so one MAY be used
 from several threads at once.
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:67](../../stdlib/Security/Cryptography/Rsa.sl#L67)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:72](../../stdlib/Security/Cryptography/Rsa.sl#L72)</sub>
 
 #### KeySize *property*
 
@@ -3732,7 +3904,7 @@ int KeySize { get; }
 
 The modulus's size in bits: 2048 for a 2048-bit key.
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:89](../../stdlib/Security/Cryptography/Rsa.sl#L89)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:96](../../stdlib/Security/Cryptography/Rsa.sl#L96)</sub>
 
 #### HasPrivateKey *property*
 
@@ -3742,7 +3914,7 @@ bool HasPrivateKey { get; }
 
 Whether this holds the private key as well as the public one.
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:92](../../stdlib/Security/Cryptography/Rsa.sl#L92)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:99](../../stdlib/Security/Cryptography/Rsa.sl#L99)</sub>
 
 #### Create *method*
 
@@ -3767,14 +3939,14 @@ time, `d` included.
 
 **Parameters**
 
-- `keySizeInBits` -- a multiple of 64 from 512 to 16384; 2048 or more for anything new
+- `keySizeInBits` -- a multiple of 64 from 2048 to 8192
 
 **Fails with**
 
 - [CryptoError.KeyLength](#keylength-case) -- `keySizeInBits` is not a size this makes
 - [CryptoError.NoEntropy](#noentropy-case) -- the platform would not supply randomness
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:115](../../stdlib/Security/Cryptography/Rsa.sl#L115)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:121](../../stdlib/Security/Cryptography/Rsa.sl#L121)</sub>
 
 #### Create *method*
 
@@ -3800,7 +3972,7 @@ signature from a CRT key is enough to factor its modulus.
 
 **See also** &nbsp; [Rsa.ExportParameters](#exportparameters-method)
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:143](../../stdlib/Security/Cryptography/Rsa.sl#L143)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:149](../../stdlib/Security/Cryptography/Rsa.sl#L149)</sub>
 
 #### ExportParameters *method*
 
@@ -3824,7 +3996,7 @@ zeros where the number is shorter. `Exponent` has none.
 
 **See also** &nbsp; [Rsa.Create](#create-method)
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:308](../../stdlib/Security/Cryptography/Rsa.sl#L308)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:315](../../stdlib/Security/Cryptography/Rsa.sl#L315)</sub>
 
 #### ExportRsaPublicKey *method*
 
@@ -3834,7 +4006,7 @@ byte[] ExportRsaPublicKey()
 
 The public key as a PKCS #1 `RSAPublicKey` (RFC 8017 §A.1.1), DER.
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:338](../../stdlib/Security/Cryptography/Rsa.sl#L338)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:345](../../stdlib/Security/Cryptography/Rsa.sl#L345)</sub>
 
 #### ExportRsaPrivateKey *method*
 
@@ -3848,7 +4020,7 @@ The private key as a PKCS #1 `RSAPrivateKey` (RFC 8017 §A.1.2), DER.
 
 - [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:348](../../stdlib/Security/Cryptography/Rsa.sl#L348)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:355](../../stdlib/Security/Cryptography/Rsa.sl#L355)</sub>
 
 #### ExportSubjectPublicKeyInfo *method*
 
@@ -3859,7 +4031,7 @@ byte[] ExportSubjectPublicKeyInfo()
 The public key as an X.509 `SubjectPublicKeyInfo` (RFC 5280 §4.1),
 DER: what a certificate carries and what `PUBLIC KEY` PEM holds.
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:360](../../stdlib/Security/Cryptography/Rsa.sl#L360)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:367](../../stdlib/Security/Cryptography/Rsa.sl#L367)</sub>
 
 #### ExportPkcs8PrivateKey *method*
 
@@ -3874,7 +4046,7 @@ DER: what `PRIVATE KEY` PEM holds.
 
 - [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:377](../../stdlib/Security/Cryptography/Rsa.sl#L377)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:384](../../stdlib/Security/Cryptography/Rsa.sl#L384)</sub>
 
 #### ImportRsaPublicKey *method*
 
@@ -3891,9 +4063,9 @@ A key from a PKCS #1 `RSAPublicKey`, DER.
 **Fails with**
 
 - [CryptoError.Encoding](#encoding-case) -- `source` is not one `RSAPublicKey`
-- [CryptoError.InvalidKey](#invalidkey-case) -- the numbers are not an RSA key
+- [CryptoError.InvalidKey](#invalidkey-case) -- the numbers are not an RSA key of a size this reads
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:401](../../stdlib/Security/Cryptography/Rsa.sl#L401)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:408](../../stdlib/Security/Cryptography/Rsa.sl#L408)</sub>
 
 #### ImportRsaPrivateKey *method*
 
@@ -3911,9 +4083,9 @@ A key from a PKCS #1 `RSAPrivateKey`, DER.
 
 - [CryptoError.Encoding](#encoding-case) -- `source` is not one `RSAPrivateKey`
 - [CryptoError.Unsupported](#unsupported-case) -- a multi-prime key, version 1
-- [CryptoError.InvalidKey](#invalidkey-case) -- the numbers are not a consistent RSA key
+- [CryptoError.InvalidKey](#invalidkey-case) -- the numbers are not a consistent RSA key of a size this reads
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:416](../../stdlib/Security/Cryptography/Rsa.sl#L416)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:424](../../stdlib/Security/Cryptography/Rsa.sl#L424)</sub>
 
 #### ImportSubjectPublicKeyInfo *method*
 
@@ -3930,9 +4102,9 @@ A key from an X.509 `SubjectPublicKeyInfo`, DER.
 **Fails with**
 
 - [CryptoError.Encoding](#encoding-case) -- `source` is not one `SubjectPublicKeyInfo` holding an RSA key
-- [CryptoError.InvalidKey](#invalidkey-case) -- the numbers are not an RSA key
+- [CryptoError.InvalidKey](#invalidkey-case) -- the numbers are not an RSA key of a size this reads
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:431](../../stdlib/Security/Cryptography/Rsa.sl#L431)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:439](../../stdlib/Security/Cryptography/Rsa.sl#L439)</sub>
 
 #### ImportPkcs8PrivateKey *method*
 
@@ -3951,9 +4123,9 @@ passed over.
 **Fails with**
 
 - [CryptoError.Encoding](#encoding-case) -- `source` is not one `PrivateKeyInfo` holding an RSA key
-- [CryptoError.InvalidKey](#invalidkey-case) -- the numbers are not a consistent RSA key
+- [CryptoError.InvalidKey](#invalidkey-case) -- the numbers are not a consistent RSA key of a size this reads
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:455](../../stdlib/Security/Cryptography/Rsa.sl#L455)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:464](../../stdlib/Security/Cryptography/Rsa.sl#L464)</sub>
 
 #### ExportRsaPublicKeyPem *method*
 
@@ -3963,7 +4135,7 @@ String ExportRsaPublicKeyPem()
 
 The public key as PKCS #1 in PEM: `-----BEGIN RSA PUBLIC KEY-----`.
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:601](../../stdlib/Security/Cryptography/Rsa.sl#L601)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:610](../../stdlib/Security/Cryptography/Rsa.sl#L610)</sub>
 
 #### ExportRsaPrivateKeyPem *method*
 
@@ -3977,7 +4149,7 @@ The private key as PKCS #1 in PEM: `-----BEGIN RSA PRIVATE KEY-----`.
 
 - [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:607](../../stdlib/Security/Cryptography/Rsa.sl#L607)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:616](../../stdlib/Security/Cryptography/Rsa.sl#L616)</sub>
 
 #### ExportSubjectPublicKeyInfoPem *method*
 
@@ -3987,7 +4159,7 @@ String ExportSubjectPublicKeyInfoPem()
 
 The public key as X.509 in PEM: `-----BEGIN PUBLIC KEY-----`.
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:616](../../stdlib/Security/Cryptography/Rsa.sl#L616)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:625](../../stdlib/Security/Cryptography/Rsa.sl#L625)</sub>
 
 #### ExportPkcs8PrivateKeyPem *method*
 
@@ -4001,7 +4173,7 @@ The private key as PKCS #8 in PEM: `-----BEGIN PRIVATE KEY-----`.
 
 - [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:622](../../stdlib/Security/Cryptography/Rsa.sl#L622)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:631](../../stdlib/Security/Cryptography/Rsa.sl#L631)</sub>
 
 #### ImportFromPem *method*
 
@@ -4021,9 +4193,9 @@ of other kinds: `RSA PUBLIC KEY`, `RSA PRIVATE KEY`, `PUBLIC KEY` or
 
 - [CryptoError.Encoding](#encoding-case) -- no key block, more than one, or one that does not parse
 - [CryptoError.Unsupported](#unsupported-case) -- the block is an `ENCRYPTED PRIVATE KEY`
-- [CryptoError.InvalidKey](#invalidkey-case) -- the numbers are not a consistent RSA key
+- [CryptoError.InvalidKey](#invalidkey-case) -- the numbers are not a consistent RSA key of a size this reads
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:639](../../stdlib/Security/Cryptography/Rsa.sl#L639)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:649](../../stdlib/Security/Cryptography/Rsa.sl#L649)</sub>
 
 #### SignData *method*
 
@@ -4048,7 +4220,7 @@ The signature of `data`'s hash.
 
 **See also** &nbsp; [Rsa.VerifyData](#verifydata-method)
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:736](../../stdlib/Security/Cryptography/Rsa.sl#L736)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:747](../../stdlib/Security/Cryptography/Rsa.sl#L747)</sub>
 
 #### SignHash *method*
 
@@ -4074,7 +4246,7 @@ The signature of a hash already computed.
 
 **See also** &nbsp; [Rsa.VerifyHash](#verifyhash-method)
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:756](../../stdlib/Security/Cryptography/Rsa.sl#L756)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:767](../../stdlib/Security/Cryptography/Rsa.sl#L767)</sub>
 
 #### VerifyData *method*
 
@@ -4096,7 +4268,7 @@ for another message is simply not valid, and an unknown hash is false.
 
 **See also** &nbsp; [Rsa.SignData](#signdata-method)
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:790](../../stdlib/Security/Cryptography/Rsa.sl#L790)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:801](../../stdlib/Security/Cryptography/Rsa.sl#L801)</sub>
 
 #### VerifyHash *method*
 
@@ -4114,7 +4286,7 @@ computed. Never fails, as `VerifyData` does not.
 - `hashAlgorithm` -- the hash that made the digest
 - `padding` -- the encoding the signer used
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:808](../../stdlib/Security/Cryptography/Rsa.sl#L808)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:819](../../stdlib/Security/Cryptography/Rsa.sl#L819)</sub>
 
 #### Encrypt *method*
 
@@ -4137,7 +4309,7 @@ Result<byte[], CryptoError> Encrypt(ReadOnlySpan<byte> data, RsaEncryptionPaddin
 
 **See also** &nbsp; [Rsa.Decrypt](#decrypt-method)
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:993](../../stdlib/Security/Cryptography/Rsa.sl#L993)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:1004](../../stdlib/Security/Cryptography/Rsa.sl#L1004)</sub>
 
 #### Decrypt *method*
 
@@ -4172,7 +4344,7 @@ treat what comes back as untrusted and check it by other means.
 
 **See also** &nbsp; [Rsa.Encrypt](#encrypt-method)
 
-<sub>[stdlib/Security/Cryptography/Rsa.sl:1074](../../stdlib/Security/Cryptography/Rsa.sl#L1074)</sub>
+<sub>[stdlib/Security/Cryptography/Rsa.sl:1085](../../stdlib/Security/Cryptography/Rsa.sl#L1085)</sub>
 
 ### RsaEncryptionPadding *struct*
 
@@ -4639,14 +4811,33 @@ core, as the RFC defines it.
 const ulong MaxMemoryBytes = 4294967296
 ```
 
-The most working memory a derivation may ask for: 4 GiB, which is
+The most working memory a derivation may ask for: 4 GiB, counting
+both the 128 * `blockSize` * `cost` bytes of V and the
+128 * `blockSize` * `parallelism` of B. That is just under
 `cost` = 2^22 at `blockSize` = 8. Parameters read from a stored hash
 are input like any other, and this bounds what one can make a call
 allocate.
 
 **Value** &nbsp; 2^32 bytes.
 
-<sub>[stdlib/Security/Cryptography/Scrypt.sl:63](../../stdlib/Security/Cryptography/Scrypt.sl#L63)</sub>
+<sub>[stdlib/Security/Cryptography/Scrypt.sl:65](../../stdlib/Security/Cryptography/Scrypt.sl#L65)</sub>
+
+#### MaxWork *constant*
+
+```
+const ulong MaxWork = 1073741824
+```
+
+The most work a derivation may ask for, as `cost` * `blockSize` *
+`parallelism`. Each unit is a 128-byte block written once and read
+once in each of the two passes, so the limit is 256 GiB of mixing:
+minutes, where 2^20 * 8 * 1, a strong interactive setting, is 2^23.
+It bounds the time one stored hash can make a call take, as
+`MaxMemoryBytes` bounds the memory.
+
+**Value** &nbsp; 2^30.
+
+<sub>[stdlib/Security/Cryptography/Scrypt.sl:75](../../stdlib/Security/Cryptography/Scrypt.sl#L75)</sub>
 
 #### DeriveKey *method*
 
@@ -4667,9 +4858,9 @@ static Result<byte[], CryptoError> DeriveKey(ReadOnlySpan<byte> password, ReadOn
 
 **Fails with**
 
-- [CryptoError.Parameter](#parameter-case) -- `cost` is not a power of two above one; `blockSize`, `parallelism` or `length` is zero; `blockSize` times `parallelism` reaches 2^30; `cost` reaches 2^(16 · `blockSize`); `length` is past (2^32 - 1) · 32; or the memory needed is past `MaxMemoryBytes`
+- [CryptoError.Parameter](#parameter-case) -- `cost` is not a power of two above one; `blockSize`, `parallelism` or `length` is zero; `blockSize` times `parallelism` reaches 2^30; `cost` reaches 2^(16 * `blockSize`); `length` is past (2^32 - 1) * 32; the memory needed is past `MaxMemoryBytes`; or the work is past `MaxWork`
 
-<sub>[stdlib/Security/Cryptography/Scrypt.sl:79](../../stdlib/Security/Cryptography/Scrypt.sl#L79)</sub>
+<sub>[stdlib/Security/Cryptography/Scrypt.sl:92](../../stdlib/Security/Cryptography/Scrypt.sl#L92)</sub>
 
 ### Sha1 *class*
 
@@ -4696,7 +4887,7 @@ String Name { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/Sha1.sl:48](../../stdlib/Security/Cryptography/Sha1.sl#L48)</sub>
+<sub>[stdlib/Security/Cryptography/Sha1.sl:50](../../stdlib/Security/Cryptography/Sha1.sl#L50)</sub>
 
 #### HashSizeInBytes *property*
 
@@ -4706,7 +4897,7 @@ nuint HashSizeInBytes { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/Sha1.sl:50](../../stdlib/Security/Cryptography/Sha1.sl#L50)</sub>
+<sub>[stdlib/Security/Cryptography/Sha1.sl:52](../../stdlib/Security/Cryptography/Sha1.sl#L52)</sub>
 
 #### HashData *method*
 
@@ -4716,7 +4907,7 @@ static byte[] HashData(ReadOnlySpan<byte> data)
 
 The digest of `data`, with no object to keep.
 
-<sub>[stdlib/Security/Cryptography/Sha1.sl:53](../../stdlib/Security/Cryptography/Sha1.sl#L53)</sub>
+<sub>[stdlib/Security/Cryptography/Sha1.sl:55](../../stdlib/Security/Cryptography/Sha1.sl#L55)</sub>
 
 ### Sha256 *class*
 
@@ -4736,7 +4927,7 @@ String Name { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/Sha256.sl:62](../../stdlib/Security/Cryptography/Sha256.sl#L62)</sub>
+<sub>[stdlib/Security/Cryptography/Sha256.sl:64](../../stdlib/Security/Cryptography/Sha256.sl#L64)</sub>
 
 #### HashSizeInBytes *property*
 
@@ -4746,7 +4937,7 @@ nuint HashSizeInBytes { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/Sha256.sl:64](../../stdlib/Security/Cryptography/Sha256.sl#L64)</sub>
+<sub>[stdlib/Security/Cryptography/Sha256.sl:66](../../stdlib/Security/Cryptography/Sha256.sl#L66)</sub>
 
 #### HashData *method*
 
@@ -4756,7 +4947,7 @@ static byte[] HashData(ReadOnlySpan<byte> data)
 
 The digest of `data`, with no object to keep.
 
-<sub>[stdlib/Security/Cryptography/Sha256.sl:67](../../stdlib/Security/Cryptography/Sha256.sl#L67)</sub>
+<sub>[stdlib/Security/Cryptography/Sha256.sl:69](../../stdlib/Security/Cryptography/Sha256.sl#L69)</sub>
 
 ### Sha2Wide *class*
 

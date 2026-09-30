@@ -53,6 +53,18 @@ class RsaPrivateKey
         Limbs.SubtractLimb(&_fermatQ[0u], 2ul, _fermatQ.Length);
     }
 
+    ~RsaPrivateKey()
+    {
+        Limbs.ZeroMemory(_exponent);
+        _primeP.EraseLimbs();
+        _primeQ.EraseLimbs();
+        Limbs.ZeroMemory(_exponentP);
+        Limbs.ZeroMemory(_exponentQ);
+        Limbs.ZeroMemory(_coefficient);
+        Limbs.ZeroMemory(_fermatP);
+        Limbs.ZeroMemory(_fermatQ);
+    }
+
     /// `d`.
     ulong[] Exponent => _exponent;
 

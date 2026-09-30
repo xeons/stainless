@@ -198,6 +198,22 @@ Result<bool, CryptoError> CheckRfc6979P256()
     Check("p256 sign hash", ToHex(hashed),
           "efd48b2aacb6a8fd1140dd9cd45e81d69d2c877b56aaf991c34d0ea84eaf3716" +
           "f7cb1c942d657c41d436c7a1b6e29f65f3e900dbb9aff4064dc4ab2f843acda8");
+
+    // Naming the hash gives RFC 6979's nonce whatever the digest's length.
+    byte[] named = try key.SignHash(Sha512.HashData(Bytes("sample")), HashAlgorithmName.Sha512);
+    Check("p256 sign hash named", ToHex(named),
+          "8496a60b5e9b47c825488827e0495b0e3fa109ec4568fd3f8d1097678eb97f00" +
+          "2362ab1adbe2b8adf9cb9edab740ea6049c028114f2460f96554f61fae3302fe");
+    byte[] namedDer = try key.SignHash(Sha512.HashData(Bytes("sample")), HashAlgorithmName.Sha512,
+                                       DsaSignatureFormat.Rfc3279DerSequence);
+    Check("p256 sign hash named der",
+          key.VerifyHash(Sha512.HashData(Bytes("sample")), namedDer,
+                         DsaSignatureFormat.Rfc3279DerSequence) ? "verified" : "refused",
+          "verified");
+    var unnamed = key.SignHash(Sha256.HashData(Bytes("sample")), default(HashAlgorithmName));
+    Check("p256 sign hash unnamed",
+          !unnamed.Ok && unnamed.Error == CryptoError.Unsupported ? "refused" : "signed",
+          "refused");
     return Ok(true);
 }
 

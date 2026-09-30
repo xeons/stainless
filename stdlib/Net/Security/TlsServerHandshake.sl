@@ -90,14 +90,19 @@ internal sealed class TlsServerHandshake
             return legacy.RunTls12ServerHandshake(first, AcceptsTls13);
         }
 
-        TlsError step = ReadTlsClientHello(first, key);
+        TlsError step = ReadTlsClientHello(parsed.Value, key);
         if (step != TlsError.None)
             return step;
 
+        // 0-RTT data is never accepted, and a client that offered it sends
+        // it anyway; RFC 8446 section 4.2.10 has the server skip it.
+        if (_hello._hasEarlyData)
+            _connection._records._earlyDataToSkip = TlsMaxSkippedEarlyData;
+
         byte[] peerShare = _hello.FindTlsKeyShare(_group);
-        if (peerShare.Length == 0u)
+        if (peerShare.Length == 0u || _options._retryWithCookieAlone)
         {
-            step = RequestTlsKeyShare(first, key);
+            step = RequestTlsKeyShare(first, key, peerShare.Length == 0u);
             if (step != TlsError.None)
                 return step;
             peerShare = _hello.FindTlsKeyShare(_group);
@@ -147,14 +152,11 @@ internal sealed class TlsServerHandshake
         return Fail(TlsError.ProtocolVersion);
     }
 
-    /// Reads a ClientHello and chooses the version, suite, group, signature
+    /// Takes a ClientHello and chooses the version, suite, group, signature
     /// scheme and application protocol, each by this server's preference.
-    private TlsError ReadTlsClientHello(byte[] message, TlsSigningKey key)
+    private TlsError ReadTlsClientHello(TlsClientHello hello, TlsSigningKey key)
     {
-        var parsed = TlsClientHello.ParseTlsClientHello(message);
-        if (!parsed.Ok)
-            return parsed.Error;
-        _hello = parsed.Value;
+        _hello = hello;
 
         if (!_hello._hasSupportedVersions || !_hello._supportedVersions.Contains(TlsVersion13))
             return TlsError.ProtocolVersion;
@@ -211,6 +213,8 @@ internal sealed class TlsServerHandshake
         if (!foundGroup)
             return TlsError.NoCommonGroup;
 
+        // Chosen afresh from each ClientHello, the second after a retry too.
+        _connection._applicationProtocol = null;
         List<String> protocols = _options.ApplicationProtocols;
         if (protocols.Count > 0u && _hello._hasApplicationProtocols)
         {
@@ -234,9 +238,10 @@ internal sealed class TlsServerHandshake
         return TlsError.None;
     }
 
-    /// Sends a HelloRetryRequest for the chosen group, with a cookie the
-    /// client MUST echo, and reads the second ClientHello (RFC 8446 §4.1.4).
-    private TlsError RequestTlsKeyShare(byte[] first, TlsSigningKey key)
+    /// Sends a HelloRetryRequest with a cookie the client MUST echo, asking
+    /// for a share in the chosen group when `askForShare`, and reads the
+    /// second ClientHello (RFC 8446 section 4.1.4).
+    private TlsError RequestTlsKeyShare(byte[] first, TlsSigningKey key, bool askForShare)
     {
         var schedule = new TlsKeySchedule(GetTlsSuiteHash(_suite));
         _schedule = schedule;
@@ -258,9 +263,12 @@ internal sealed class TlsServerHandshake
         nuint versionAt = BeginTlsExtension(retry, TlsExtensionType.SupportedVersions);
         retry.WriteUInt16(TlsVersion13);
         EndTlsExtension(retry, versionAt);
-        nuint shareAt = BeginTlsExtension(retry, TlsExtensionType.KeyShare);
-        retry.WriteUInt16((uint)_group);
-        EndTlsExtension(retry, shareAt);
+        if (askForShare)
+        {
+            nuint shareAt = BeginTlsExtension(retry, TlsExtensionType.KeyShare);
+            retry.WriteUInt16((uint)_group);
+            EndTlsExtension(retry, shareAt);
+        }
         nuint cookieAt = BeginTlsExtension(retry, TlsExtensionType.Cookie);
         nuint cookieBytesAt = retry.BeginVector(2u);
         retry.WriteBytes(_cookie);
@@ -286,22 +294,31 @@ internal sealed class TlsServerHandshake
         if ((TlsHandshakeType)second[0u] != TlsHandshakeType.ClientHello)
             return TlsError.UnexpectedMessage;
 
+        var parsed = TlsClientHello.ParseTlsClientHello(second);
+        if (!parsed.Ok)
+            return parsed.Error;
         TlsClientHello previous = _hello;
         TlsCipherSuite suite = _suite;
         TlsNamedGroup group = _group;
-        TlsError chosen = ReadTlsClientHello(second, key);
+        TlsError chosen = ReadTlsClientHello(parsed.Value, key);
         if (chosen != TlsError.None)
             return chosen;
 
-        // The second hello MUST be the first with one share, in the group
-        // asked for, and the cookie; so the same choices MUST fall out of it.
+        // The second hello MUST be the first with the cookie, and with one
+        // share in the group asked for if one was; so the same choices MUST
+        // fall out of it.
         if (!AreTlsBytesEqual(previous._random, _hello._random) ||
             !AreTlsBytesEqual(previous._sessionId, _hello._sessionId) ||
             suite != _suite || group != _group)
         {
             return TlsError.IllegalParameter;
         }
-        if (_hello._keyShareGroups.Count != 1u || _hello._keyShareGroups[0u] != (uint)_group)
+        if (askForShare &&
+            (_hello._keyShareGroups.Count != 1u || _hello._keyShareGroups[0u] != (uint)_group))
+        {
+            return TlsError.IllegalParameter;
+        }
+        if (_hello.FindTlsKeyShare(_group).Length == 0u)
             return TlsError.IllegalParameter;
         if (!_hello._hasCookie || !AreTlsBytesEqual(_hello._cookie, _cookie))
             return TlsError.IllegalParameter;
@@ -338,6 +355,7 @@ internal sealed class TlsServerHandshake
         if (!share.Ok)
             return share.Error;
         var shared = share.Value.DeriveTlsSharedSecret(peerShare);
+        share.Value.WipeTlsPrivateKey();
         if (!shared.Ok)
             return shared.Error;
 
@@ -379,6 +397,7 @@ internal sealed class TlsServerHandshake
 
         schedule.DeriveHandshakeSecrets(
             shared.Value, _transcript.ComputeTlsTranscriptHash(schedule));
+        CryptographicOperations.ZeroMemory(shared.Value);
         _connection._schedule = schedule;
 
         TlsError boundary = _connection.RequireTlsRecordBoundary();
@@ -483,7 +502,8 @@ internal sealed class TlsServerHandshake
     /// A client certificate that is missing or refused is reported only once
     /// the Finished is read. The client sent the flight in one go, and a
     /// server that closed with it unread would reset the connection and lose
-    /// its own alert.
+    /// its own alert. The CertificateVerify of a refused chain is read and
+    /// not checked.
     private TlsError ReadTlsClientFlight()
     {
         var schedule = _schedule;
@@ -514,9 +534,6 @@ internal sealed class TlsServerHandshake
             else
             {
                 refusal = _options.ClientCertificateValidator(chain.Value, "");
-                var key = TlsPeerKey.ReadTlsPeerKey(chain.Value[0u]);
-                if (!key.Ok)
-                    return key.Error;
                 _connection._remoteChain = chain.Value;
 
                 read = _connection.ReadTlsHandshakeMessage();
@@ -525,13 +542,22 @@ internal sealed class TlsServerHandshake
                 message = read.Value;
                 if ((TlsHandshakeType)message[0u] != TlsHandshakeType.CertificateVerify)
                     return TlsError.UnexpectedMessage;
-                var scheme = VerifyTlsCertificateVerify(
-                    message, key.Value, _transcript.ComputeTlsTranscriptHash(schedule), false,
-                    CreateDefaultTlsSignatureSchemes());
-                if (!scheme.Ok)
-                    return scheme.Error;
+
+                // A refused chain's key is never used: the signature is not
+                // checked, and the refusal is reported after the Finished.
+                if (refusal == TlsError.None)
+                {
+                    var key = TlsPeerKey.ReadTlsPeerKey(chain.Value[0u]);
+                    if (!key.Ok)
+                        return key.Error;
+                    var scheme = VerifyTlsCertificateVerify(
+                        message, key.Value, _transcript.ComputeTlsTranscriptHash(schedule),
+                        false, CreateDefaultTlsSignatureSchemes());
+                    if (!scheme.Ok)
+                        return scheme.Error;
+                    _connection._mutuallyAuthenticated = true;
+                }
                 _transcript.AddTlsMessage(message);
-                _connection._mutuallyAuthenticated = refusal == TlsError.None;
             }
 
             read = _connection.ReadTlsHandshakeMessage();
@@ -563,6 +589,7 @@ internal sealed class TlsServerHandshake
         _connection._records._plaintextAlertAllowed = false;
         _connection._readTrafficSecret = schedule._clientApplicationTrafficSecret;
         schedule.DeriveResumptionSecret(_transcript.ComputeTlsTranscriptHash(schedule));
+        schedule.WipeTlsHandshakeSecrets();
         _connection._handshakeComplete = true;
         return TlsError.None;
     }

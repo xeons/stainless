@@ -145,19 +145,36 @@ internal sealed class HttpChunkedWriter : IStream
     public IOError Error => _failed ? IOError.Closed : IOError.None;
 }
 
-/// A stream that counts what passes through it on the way to another.
+/// A stream that counts what passes through it on the way to another, and
+/// refuses, whole, any write that would take it past its limit.
+///
+/// A body longer than its `Content-Length` MUST NOT reach the wire: the
+/// excess would be read by the server as the start of another request.
 internal sealed class HttpCountingStream : IStream
 {
     private IStream _inner;
     private long _counted = 0;
+    private long _limit;
+    private bool _overflowed = false;
 
-    internal HttpCountingStream(IStream inner) => _inner = inner;
+    /// No limit.
+    internal HttpCountingStream(IStream inner) : this(inner, -1) { }
+
+    /// At most `limit` bytes; negative is no limit.
+    internal HttpCountingStream(IStream inner, long limit)
+    {
+        _inner = inner;
+        _limit = limit;
+    }
 
     internal long CountedBytes => _counted;
 
+    /// Whether a write was refused for going past the limit.
+    internal bool HasOverflowed => _overflowed;
+
     public bool CanRead => false;
 
-    public bool CanWrite => _inner.CanWrite;
+    public bool CanWrite => !_overflowed && _inner.CanWrite;
 
     public bool CanSeek => false;
 
@@ -165,6 +182,13 @@ internal sealed class HttpCountingStream : IStream
 
     public nuint Write(byte[] buffer, nuint offset, nuint count)
     {
+        if (_overflowed)
+            return 0u;
+        if (_limit >= 0 && count > (nuint)(_limit - _counted))
+        {
+            _overflowed = true;
+            return 0u;
+        }
         nuint wrote = _inner.Write(buffer, offset, count);
         _counted += (long)wrote;
         return wrote;
@@ -180,7 +204,7 @@ internal sealed class HttpCountingStream : IStream
 
     public void Close() { }
 
-    public IOError Error => _inner.Error;
+    public IOError Error => _overflowed ? IOError.InvalidData : _inner.Error;
 }
 
 /// A stream that answers bytes already read from another first, then the

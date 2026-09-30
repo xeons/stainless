@@ -45,6 +45,8 @@ public sealed class Sha1 : HashAlgorithm
         InitializeState();
     }
 
+    ~Sha1() => CryptographicOperations.ZeroMemory(_state);
+
     public override String Name => "SHA-1";
 
     public override nuint HashSizeInBytes => 20u;

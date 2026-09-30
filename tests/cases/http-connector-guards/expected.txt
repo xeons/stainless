@@ -1,0 +1,6 @@
+localhost within 10 s: ok
+localhost, no limit: ok
+TLS handshake trickled: Timeout, within the limit: true
+CONNECT answer trickled: Timeout, within the limit: true
+CR LF in the host: refused, proxy reached: false
+CR LF in the host: refused, proxy reached: false

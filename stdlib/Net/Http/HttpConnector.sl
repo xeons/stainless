@@ -85,8 +85,8 @@ internal String GetHttpBareHost(Uri uri)
 internal String FormatHttpBasicCredentials(NetworkCredential credentials) =>
     "Basic " + Convert.ToBase64String(credentials.UserName + ":" + credentials.Password);
 
-/// Opens a TCP connection within the deadline: resolves the name, then
-/// connects without blocking and waits for the connect to finish.
+/// Opens a TCP connection within the deadline, trying every address the name
+/// resolves to until one connects.
 ///
 /// @failure HttpError.NameResolutionFailure  the name did not resolve
 /// @failure HttpError.ConnectFailure         the connect was refused or failed
@@ -95,69 +95,60 @@ internal Result<TcpClient, HttpError> ConnectHttpSocket(String host, ushort port
 {
     HttpFailure failure = exchange.Failure;
     HttpDeadline deadline = exchange.Deadline;
-
-    var resolved = Net.ResolveHost(host);
-    if (!resolved.Ok)
-    {
-        failure.SocketErrorCode = resolved.Error;
-        return Fail(failure.RecordHttpFailure(HttpError.NameResolutionFailure,
-            "the name '" + host + "' did not resolve"));
-    }
-    String address = resolved.Value;
-    AddressFamily family = address.Contains(':') ? AddressFamily.IPv6 : AddressFamily.IPv4;
-
-    var opened = Socket.Open(family, SocketType.Stream);
-    if (!opened.Ok)
-    {
-        failure.SocketErrorCode = opened.Error;
-        return Fail(failure.RecordHttpFailure(HttpError.ConnectFailure, "no socket could be opened"));
-    }
-    Socket socket = opened.Value;
     String where = FormatHttpAuthority(host, port);
 
     if (deadline.HasExpired)
         return Fail(failure.RecordHttpFailure(HttpError.Timeout, "the request timed out before connecting"));
 
-    if (!deadline.IsBounded)
-    {
-        SocketError direct = socket.Connect(address, port);
-        if (direct != SocketError.None)
-        {
-            failure.SocketErrorCode = direct;
-            return Fail(failure.RecordHttpFailure(HttpError.ConnectFailure,
-                "connecting to " + where + " failed: " + DescribeSocketError(direct)));
-        }
-        return Ok(new TcpClient(socket));
-    }
+    var opened = Socket.OpenConnected(host, port, AddressFamily.Any, SocketType.Stream,
+                                      deadline.WaitMilliseconds);
+    if (opened.Ok)
+        return Ok(new TcpClient(opened.Value));
 
-    socket.SetBlocking(false);
-    SocketError started = socket.Connect(address, port);
-    if (started == SocketError.WouldBlock)
+    SocketError error = opened.Error;
+    failure.SocketErrorCode = error;
+    switch (error)
     {
-        if (!socket.WaitToWrite(deadline.WaitMilliseconds))
-        {
-            SocketError waited = socket.Error;
-            socket.Close();
-            if (waited == SocketError.None || waited == SocketError.TimedOut)
+        case SocketError.NoName:
+        case SocketError.TryAgain:
+            return Fail(failure.RecordHttpFailure(HttpError.NameResolutionFailure,
+                "the name '" + host + "' did not resolve"));
+
+        case SocketError.TimedOut:
+            if (deadline.IsBounded)
             {
-                failure.SocketErrorCode = SocketError.TimedOut;
                 return Fail(failure.RecordHttpFailure(HttpError.Timeout,
                     "connecting to " + where + " timed out"));
             }
-            failure.SocketErrorCode = waited;
-            return Fail(failure.RecordHttpFailure(HttpError.ConnectFailure,
-                "connecting to " + where + " failed: " + DescribeSocketError(waited)));
+            break;
+    }
+    return Fail(failure.RecordHttpFailure(HttpError.ConnectFailure,
+        "connecting to " + where + " failed: " + DescribeSocketError(error)));
+}
+
+/// Whether `host` can be written into a request line or a `CONNECT`
+/// authority as it is. A control byte, a space, or a delimiter of another URI
+/// part would end the host early or start a header.
+internal bool IsHttpHostWritable(String host)
+{
+    if (host.IsEmpty)
+        return false;
+    for (nuint i = 0u; i < host.ByteLength(); i++)
+    {
+        byte b = host.GetByteAt(i);
+        if (b <= 0x20 || b == 0x7F)
+            return false;
+        switch (b)
+        {
+            case 0x23:      // #
+            case 0x2F:      // /
+            case 0x3F:      // ?
+            case 0x40:      // @
+            case 0x5C:      // backslash
+                return false;
         }
     }
-    else if (started != SocketError.None)
-    {
-        socket.Close();
-        failure.SocketErrorCode = started;
-        return Fail(failure.RecordHttpFailure(HttpError.ConnectFailure,
-            "connecting to " + where + " failed: " + DescribeSocketError(started)));
-    }
-    socket.SetBlocking(true);
-    return Ok(new TcpClient(socket));
+    return true;
 }
 
 /// Opens a connection along `route`: TCP, a `CONNECT` tunnel through the
@@ -172,6 +163,12 @@ internal Result<IHttpConnection, HttpError> OpenHttpConnection(
     HttpExchange exchange, HttpConnectionPool pool)
 {
     HttpFailure failure = exchange.Failure;
+    if (!IsHttpHostWritable(route.Host))
+    {
+        return Fail(failure.RecordHttpFailure(HttpError.InvalidRequest,
+            "the host holds a byte that cannot be written into a request"));
+    }
+
     String connectHost = route.Host;
     ushort connectPort = route.Port;
     if (route.Proxy is Uri proxy)
@@ -210,7 +207,7 @@ internal Result<IHttpConnection, HttpError> OpenHttpConnection(
         return Ok(new Http11Connection(route.PoolKey, tcp, tcp, null, pool));
     }
 
-    ApplyHttpSocketDeadline(tcp, exchange.Deadline);
+    var bounded = new HttpDeadlineStream(tcp, exchange.Deadline);
     var options = new TlsClientOptions();
     options.TargetHost = route.Host;
     options.ApplicationProtocols = CreateHttpApplicationProtocols(choice);
@@ -218,7 +215,8 @@ internal Result<IHttpConnection, HttpError> OpenHttpConnection(
     options.ClientCertificateChain = handler.ClientCertificates;
     options.ClientPrivateKey = handler.ClientCertificateKey;
 
-    var secured = TlsStream.AuthenticateAsClient(tcp, options, out TlsAlertDescription alert);
+    var secured = TlsStream.AuthenticateAsClient(bounded, options, out TlsAlertDescription alert);
+    bounded.ReleaseHttpDeadline();
     if (!secured.Ok)
     {
         SocketError socketError = tcp.SocketErrorCode;
@@ -264,6 +262,79 @@ internal void ApplyHttpSocketDeadline(TcpClient tcp, HttpDeadline deadline)
     tcp.Underlying.SetSendTimeout(timeout);
 }
 
+/// A connection with the deadline applied before every read and write, so a
+/// peer trickling bytes cannot stretch an exchange past it: each call waits
+/// only for what the deadline has left, and none starts once it has expired.
+///
+/// It stays under a TLS stream for the connection's life, so
+/// `ReleaseHttpDeadline` MUST be called once the exchange that made it is
+/// done with it. After that it passes every call straight through.
+internal sealed class HttpDeadlineStream : IStream
+{
+    private TcpClient _inner;
+    private HttpDeadline? _deadline;
+    private bool _expired;
+
+    internal HttpDeadlineStream(TcpClient inner, HttpDeadline deadline)
+    {
+        _inner = inner;
+        _deadline = deadline.IsBounded ? deadline : null;
+        _expired = false;
+    }
+
+    /// Stops applying the deadline, for the exchanges that reuse the
+    /// connection with deadlines of their own.
+    internal void ReleaseHttpDeadline() => _deadline = null;
+
+    public bool CanRead => _inner.CanRead;
+
+    public bool CanWrite => _inner.CanWrite;
+
+    public bool CanSeek => false;
+
+    public nuint Read(byte[] buffer, nuint offset, nuint count)
+    {
+        if (_deadline is HttpDeadline deadline)
+        {
+            if (deadline.HasExpired)
+            {
+                _expired = true;
+                return 0u;
+            }
+            _inner.Underlying.SetReceiveTimeout(deadline.SocketTimeoutMilliseconds);
+        }
+        return _inner.Read(buffer, offset, count);
+    }
+
+    public nuint Write(byte[] buffer, nuint offset, nuint count)
+    {
+        if (_deadline is HttpDeadline deadline)
+        {
+            if (deadline.HasExpired)
+            {
+                _expired = true;
+                return 0u;
+            }
+            _inner.Underlying.SetSendTimeout(deadline.SocketTimeoutMilliseconds);
+        }
+        return _inner.Write(buffer, offset, count);
+    }
+
+    public long Position => -1;
+
+    public long Length => -1;
+
+    public bool Seek(long offset, SeekOrigin origin) => false;
+
+    public void Flush() => _inner.Flush();
+
+    public void Close() => _inner.Close();
+
+    /// `Unknown` once the deadline refused a call, so a reader does not take
+    /// the refusal for the peer finishing.
+    public IOError Error => _expired ? IOError.Unknown : _inner.Error;
+}
+
 /// Asks the proxy for a tunnel to the origin with `CONNECT`, and reads its
 /// answer: any 2xx opens the tunnel, and anything else is a refusal.
 ///
@@ -288,11 +359,11 @@ internal HttpError EstablishHttpTunnel(TcpClient tcp, HttpRoute route, HttpExcha
     }
     request.Append("\r\n");
 
-    ApplyHttpSocketDeadline(tcp, exchange.Deadline);
-    if (!WriteHttpText(tcp, request.ToText()))
+    var bounded = new HttpDeadlineStream(tcp, exchange.Deadline);
+    if (!WriteHttpText(bounded, request.ToText()))
         return FailHttpTunnel(tcp, exchange, "the proxy closed the connection");
 
-    var reader = new HttpBufferedReader(tcp, 4096u);
+    var reader = new HttpBufferedReader(bounded, 4096u);
     while (true)
     {
         HttpLineStatus status = reader.ReadHttpLine(HttpMaxLineLength, out String line);

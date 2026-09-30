@@ -57,13 +57,15 @@ internal sealed class TlsKeyShare
     }
 
     /// The X25519 share of a private key chosen elsewhere: a test's fixed
-    /// key, or a freshly generated one.
+    /// key, or a freshly generated one. The share keeps a copy, so that
+    /// wiping it leaves `privateKey` as it was.
     internal static Result<TlsKeyShare, TlsError> CreateTlsX25519KeyShare(byte[] privateKey)
     {
         var publicKey = X25519.GetPublicKey(privateKey);
         if (!publicKey.Ok)
             return Fail(TlsError.InternalError);
-        return Ok(new TlsKeyShare(TlsNamedGroup.X25519, privateKey, null, publicKey.Value));
+        byte[] copy = privateKey[0u:].ToArray();
+        return Ok(new TlsKeyShare(TlsNamedGroup.X25519, copy, null, publicKey.Value));
     }
 
     internal TlsNamedGroup Group => _group;
@@ -103,6 +105,15 @@ internal sealed class TlsKeyShare
         if (!agreed.Ok)
             return Fail(TlsError.IllegalParameter);
         return Ok(agreed.Value);
+    }
+
+    /// Overwrites the X25519 private key once the agreement is made. A NIST
+    /// curve's key is inside its `ECDiffieHellman`, which offers no way to
+    /// wipe it, and is dropped with the share.
+    internal void WipeTlsPrivateKey()
+    {
+        CryptographicOperations.ZeroMemory(_x25519PrivateKey);
+        _ecdh = null;
     }
 }
 

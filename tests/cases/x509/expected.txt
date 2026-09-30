@@ -184,3 +184,29 @@ request refuses a zero serial number ok
 request with an extension twice does not read back ok
 name builder refuses a three-letter country ok
 a twin of an anchor is an untrusted root ok
+chain twenty impostor anchors ok: NoError
+chain more impostor anchors than the budget ok: NotSignatureValid
+chain intermediate as the 64th extra ok: NoError
+chain intermediate as the 65th extra ok: PartialChain
+chain rsa-pss over sha-256 ok: NoError
+chain rsa-pss over sha-1 ok: HasWeakSignature
+chain rsa-pss with default parameters ok: HasWeakSignature
+chain rsa key of 1024 bits ok: HasWeakSignature
+chain names inside every constraint ok: NoError
+chain subject and e-mail outside ok: HasNotPermittedNameConstraint
+chain subject outside the directory ok: HasNotPermittedNameConstraint
+chain e-mail name outside ok: HasNotPermittedNameConstraint
+chain subject e-mail outside ok: HasNotPermittedNameConstraint
+chain directory name outside ok: HasNotPermittedNameConstraint
+chain uri constraint ok: InvalidExtension, HasNotSupportedCriticalExtension
+chain wildcard under a leading-dot subtree ok: NoError
+chain odd dns name with no dns constraint ok: NoError
+chain tls leaf without digital signature ok: NotValidForUsage
+chain tls leaf with digital signature ok: NoError
+host 'foo.co.uk' refused ok
+host 'www.example.co.uk' matches ok
+host 'pages.github.io' matches ok
+version 1 left out parses ok
+refuses version 1 written out ok
+policy time is each build's until it is set ok
+policy reset forgets the time ok

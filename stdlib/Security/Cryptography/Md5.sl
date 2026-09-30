@@ -87,6 +87,14 @@ public sealed class Md5 : HashAlgorithm
         InitializeState();
     }
 
+    ~Md5()
+    {
+        sl_zero_memory((byte*)&_a, 4u);
+        sl_zero_memory((byte*)&_b, 4u);
+        sl_zero_memory((byte*)&_c, 4u);
+        sl_zero_memory((byte*)&_d, 4u);
+    }
+
     public override String Name => "MD5";
 
     public override nuint HashSizeInBytes => 16u;

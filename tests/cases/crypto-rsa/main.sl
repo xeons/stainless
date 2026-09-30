@@ -12,6 +12,8 @@ void CheckKeyGeneration()
 {
     Check("key size 1000", DescribeKey(Rsa.Create(1000)), "KeyLength");
     Check("key size 256", DescribeKey(Rsa.Create(256)), "KeyLength");
+    Check("key size 1024", DescribeKey(Rsa.Create(1024)), "KeyLength");
+    Check("key size 8256", DescribeKey(Rsa.Create(8256)), "KeyLength");
 
     var created = Rsa.Create(2048);
     if (!created.Ok)

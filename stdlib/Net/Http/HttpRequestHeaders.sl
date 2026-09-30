@@ -84,7 +84,8 @@ public sealed class HttpRequestHeaders : HttpHeaders
         set => SetHttpListToken("Expect", "100-continue", value);
     }
 
-    /// `Host`, when it should differ from the request URI's authority.
+    /// `Host`, when it should differ from the request URI's authority. Sent
+    /// to the request's origin and dropped by a redirect to another.
     public String? Host
     {
         get => GetFirstHttpValue("host");

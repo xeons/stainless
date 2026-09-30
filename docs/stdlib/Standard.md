@@ -2519,10 +2519,14 @@ and a character that may not appear escaped. A Windows path or a UNC path
 reads as a `file:` URI, as in C#. A relative one is kept as written, and
 asking it for a part only an absolute URI has aborts, where C#'s throws.
 
+A host with a control byte, a space, DEL, or any of `/ ? # @ \ [ ]` in it
+is not one, and neither is a colon outside a bracketed IPv6 literal:
+a host is copied into request lines, where any of these would end one.
+
 `TryCreate` answers with a `Result`; the constructors abort on what is not a
 URI, as C#'s throw.
 
-<sub>[stdlib/Standard/Uri.sl:40](../../stdlib/Standard/Uri.sl#L40)</sub>
+<sub>[stdlib/Standard/Uri.sl:44](../../stdlib/Standard/Uri.sl#L44)</sub>
 
 #### TryCreate *method*
 
@@ -2532,7 +2536,7 @@ static Result<Uri, ParseError> TryCreate(String text, UriKind kind)
 
 `text` read as `kind` says, or why it could not be.
 
-<sub>[stdlib/Standard/Uri.sl:94](../../stdlib/Standard/Uri.sl#L94)</sub>
+<sub>[stdlib/Standard/Uri.sl:99](../../stdlib/Standard/Uri.sl#L99)</sub>
 
 #### TryCreate *method*
 
@@ -2542,7 +2546,7 @@ static Result<Uri, ParseError> TryCreate(Uri baseUri, String relative)
 
 `relative` resolved against `baseUri`, or why it could not be.
 
-<sub>[stdlib/Standard/Uri.sl:105](../../stdlib/Standard/Uri.sl#L105)</sub>
+<sub>[stdlib/Standard/Uri.sl:110](../../stdlib/Standard/Uri.sl#L110)</sub>
 
 #### IsWellFormedUriString *method*
 
@@ -2552,7 +2556,7 @@ static bool IsWellFormedUriString(String text, UriKind kind)
 
 Whether `text` reads as `kind` says.
 
-<sub>[stdlib/Standard/Uri.sl:115](../../stdlib/Standard/Uri.sl#L115)</sub>
+<sub>[stdlib/Standard/Uri.sl:122](../../stdlib/Standard/Uri.sl#L122)</sub>
 
 #### UriSchemeHttp *property*
 
@@ -2562,7 +2566,7 @@ static String UriSchemeHttp { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Standard/Uri.sl:132](../../stdlib/Standard/Uri.sl#L132)</sub>
+<sub>[stdlib/Standard/Uri.sl:139](../../stdlib/Standard/Uri.sl#L139)</sub>
 
 #### UriSchemeHttps *property*
 
@@ -2572,7 +2576,7 @@ static String UriSchemeHttps { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Standard/Uri.sl:133](../../stdlib/Standard/Uri.sl#L133)</sub>
+<sub>[stdlib/Standard/Uri.sl:140](../../stdlib/Standard/Uri.sl#L140)</sub>
 
 #### UriSchemeFile *property*
 
@@ -2582,7 +2586,7 @@ static String UriSchemeFile { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Standard/Uri.sl:134](../../stdlib/Standard/Uri.sl#L134)</sub>
+<sub>[stdlib/Standard/Uri.sl:141](../../stdlib/Standard/Uri.sl#L141)</sub>
 
 #### UriSchemeFtp *property*
 
@@ -2592,7 +2596,7 @@ static String UriSchemeFtp { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Standard/Uri.sl:135](../../stdlib/Standard/Uri.sl#L135)</sub>
+<sub>[stdlib/Standard/Uri.sl:142](../../stdlib/Standard/Uri.sl#L142)</sub>
 
 #### UriSchemeMailto *property*
 
@@ -2602,7 +2606,7 @@ static String UriSchemeMailto { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Standard/Uri.sl:136](../../stdlib/Standard/Uri.sl#L136)</sub>
+<sub>[stdlib/Standard/Uri.sl:143](../../stdlib/Standard/Uri.sl#L143)</sub>
 
 #### UriSchemeWs *property*
 
@@ -2612,7 +2616,7 @@ static String UriSchemeWs { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Standard/Uri.sl:137](../../stdlib/Standard/Uri.sl#L137)</sub>
+<sub>[stdlib/Standard/Uri.sl:144](../../stdlib/Standard/Uri.sl#L144)</sub>
 
 #### UriSchemeWss *property*
 
@@ -2622,7 +2626,7 @@ static String UriSchemeWss { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Standard/Uri.sl:138](../../stdlib/Standard/Uri.sl#L138)</sub>
+<sub>[stdlib/Standard/Uri.sl:145](../../stdlib/Standard/Uri.sl#L145)</sub>
 
 #### CheckSchemeName *method*
 
@@ -2632,7 +2636,7 @@ static bool CheckSchemeName(String name)
 
 Whether `name` is a scheme: a letter, then letters, digits, `+`, `-` and `.`.
 
-<sub>[stdlib/Standard/Uri.sl:157](../../stdlib/Standard/Uri.sl#L157)</sub>
+<sub>[stdlib/Standard/Uri.sl:164](../../stdlib/Standard/Uri.sl#L164)</sub>
 
 #### EscapeDataString *method*
 
@@ -2643,7 +2647,7 @@ static String EscapeDataString(String text)
 `text` with everything but letters, digits and `-._~` escaped, as a
 query value or a path segment needs.
 
-<sub>[stdlib/Standard/Uri.sl:426](../../stdlib/Standard/Uri.sl#L426)</sub>
+<sub>[stdlib/Standard/Uri.sl:459](../../stdlib/Standard/Uri.sl#L459)</sub>
 
 #### UnescapeDataString *method*
 
@@ -2653,7 +2657,7 @@ static String UnescapeDataString(String text)
 
 `text` with every `%XX` replaced by the byte it stands for.
 
-<sub>[stdlib/Standard/Uri.sl:441](../../stdlib/Standard/Uri.sl#L441)</sub>
+<sub>[stdlib/Standard/Uri.sl:474](../../stdlib/Standard/Uri.sl#L474)</sub>
 
 #### IsAbsoluteUri *property*
 
@@ -2663,7 +2667,7 @@ bool IsAbsoluteUri { get; }
 
 Whether it names a scheme.
 
-<sub>[stdlib/Standard/Uri.sl:493](../../stdlib/Standard/Uri.sl#L493)</sub>
+<sub>[stdlib/Standard/Uri.sl:526](../../stdlib/Standard/Uri.sl#L526)</sub>
 
 #### OriginalString *property*
 
@@ -2673,7 +2677,7 @@ String OriginalString { get; }
 
 What it was made from, unchanged.
 
-<sub>[stdlib/Standard/Uri.sl:496](../../stdlib/Standard/Uri.sl#L496)</sub>
+<sub>[stdlib/Standard/Uri.sl:529](../../stdlib/Standard/Uri.sl#L529)</sub>
 
 #### Scheme *property*
 
@@ -2683,7 +2687,7 @@ String Scheme { get; }
 
 `https`, in lower case.
 
-<sub>[stdlib/Standard/Uri.sl:499](../../stdlib/Standard/Uri.sl#L499)</sub>
+<sub>[stdlib/Standard/Uri.sl:532](../../stdlib/Standard/Uri.sl#L532)</sub>
 
 #### UserInfo *property*
 
@@ -2693,7 +2697,7 @@ String UserInfo { get; }
 
 What came before an `@` in the authority, or "".
 
-<sub>[stdlib/Standard/Uri.sl:509](../../stdlib/Standard/Uri.sl#L509)</sub>
+<sub>[stdlib/Standard/Uri.sl:542](../../stdlib/Standard/Uri.sl#L542)</sub>
 
 #### Host *property*
 
@@ -2703,7 +2707,7 @@ String Host { get; }
 
 The host, in lower case, bracketed when it is an IPv6 address.
 
-<sub>[stdlib/Standard/Uri.sl:519](../../stdlib/Standard/Uri.sl#L519)</sub>
+<sub>[stdlib/Standard/Uri.sl:552](../../stdlib/Standard/Uri.sl#L552)</sub>
 
 #### Port *property*
 
@@ -2714,7 +2718,7 @@ int Port { get; }
 The port, the scheme's default when none was written, and -1 when the
 scheme has none.
 
-<sub>[stdlib/Standard/Uri.sl:530](../../stdlib/Standard/Uri.sl#L530)</sub>
+<sub>[stdlib/Standard/Uri.sl:563](../../stdlib/Standard/Uri.sl#L563)</sub>
 
 #### IsDefaultPort *property*
 
@@ -2724,7 +2728,7 @@ bool IsDefaultPort { get; }
 
 Whether the port is the one the scheme means anyway.
 
-<sub>[stdlib/Standard/Uri.sl:540](../../stdlib/Standard/Uri.sl#L540)</sub>
+<sub>[stdlib/Standard/Uri.sl:573](../../stdlib/Standard/Uri.sl#L573)</sub>
 
 #### Authority *property*
 
@@ -2734,7 +2738,7 @@ String Authority { get; }
 
 The host, and the port when it is not the default.
 
-<sub>[stdlib/Standard/Uri.sl:550](../../stdlib/Standard/Uri.sl#L550)</sub>
+<sub>[stdlib/Standard/Uri.sl:583](../../stdlib/Standard/Uri.sl#L583)</sub>
 
 #### AbsolutePath *property*
 
@@ -2744,7 +2748,7 @@ String AbsolutePath { get; }
 
 The path, escaped, `/` when an authority was given with none.
 
-<sub>[stdlib/Standard/Uri.sl:560](../../stdlib/Standard/Uri.sl#L560)</sub>
+<sub>[stdlib/Standard/Uri.sl:593](../../stdlib/Standard/Uri.sl#L593)</sub>
 
 #### Query *property*
 
@@ -2754,7 +2758,7 @@ String Query { get; }
 
 `?` and what follows it up to the fragment, or "".
 
-<sub>[stdlib/Standard/Uri.sl:570](../../stdlib/Standard/Uri.sl#L570)</sub>
+<sub>[stdlib/Standard/Uri.sl:603](../../stdlib/Standard/Uri.sl#L603)</sub>
 
 #### Fragment *property*
 
@@ -2764,7 +2768,7 @@ String Fragment { get; }
 
 `#` and what follows it, or "".
 
-<sub>[stdlib/Standard/Uri.sl:580](../../stdlib/Standard/Uri.sl#L580)</sub>
+<sub>[stdlib/Standard/Uri.sl:613](../../stdlib/Standard/Uri.sl#L613)</sub>
 
 #### PathAndQuery *property*
 
@@ -2774,7 +2778,7 @@ String PathAndQuery { get; }
 
 The path and the query.
 
-<sub>[stdlib/Standard/Uri.sl:590](../../stdlib/Standard/Uri.sl#L590)</sub>
+<sub>[stdlib/Standard/Uri.sl:623](../../stdlib/Standard/Uri.sl#L623)</sub>
 
 #### AbsoluteUri *property*
 
@@ -2784,7 +2788,7 @@ String AbsoluteUri { get; }
 
 The whole of it, in normal form.
 
-<sub>[stdlib/Standard/Uri.sl:600](../../stdlib/Standard/Uri.sl#L600)</sub>
+<sub>[stdlib/Standard/Uri.sl:633](../../stdlib/Standard/Uri.sl#L633)</sub>
 
 #### Segments *property*
 
@@ -2795,7 +2799,7 @@ String[] Segments { get; }
 The path's segments, each with the `/` that ends it: `/a/b` is `/`,
 `a/` and `b`.
 
-<sub>[stdlib/Standard/Uri.sl:611](../../stdlib/Standard/Uri.sl#L611)</sub>
+<sub>[stdlib/Standard/Uri.sl:644](../../stdlib/Standard/Uri.sl#L644)</sub>
 
 #### IsFile *property*
 
@@ -2805,7 +2809,7 @@ bool IsFile { get; }
 
 Whether the scheme is `file`.
 
-<sub>[stdlib/Standard/Uri.sl:632](../../stdlib/Standard/Uri.sl#L632)</sub>
+<sub>[stdlib/Standard/Uri.sl:665](../../stdlib/Standard/Uri.sl#L665)</sub>
 
 #### IsUnc *property*
 
@@ -2815,7 +2819,7 @@ bool IsUnc { get; }
 
 Whether it is a `file:` URI naming a machine, as a UNC path does.
 
-<sub>[stdlib/Standard/Uri.sl:642](../../stdlib/Standard/Uri.sl#L642)</sub>
+<sub>[stdlib/Standard/Uri.sl:675](../../stdlib/Standard/Uri.sl#L675)</sub>
 
 #### IsLoopback *property*
 
@@ -2825,7 +2829,7 @@ bool IsLoopback { get; }
 
 Whether the host is this machine.
 
-<sub>[stdlib/Standard/Uri.sl:652](../../stdlib/Standard/Uri.sl#L652)</sub>
+<sub>[stdlib/Standard/Uri.sl:685](../../stdlib/Standard/Uri.sl#L685)</sub>
 
 #### LocalPath *property*
 
@@ -2836,7 +2840,7 @@ String LocalPath { get; }
 The path as the operating system writes it, unescaped: a Windows path
 or a UNC path for a `file:` URI there, and the path elsewhere.
 
-<sub>[stdlib/Standard/Uri.sl:664](../../stdlib/Standard/Uri.sl#L664)</sub>
+<sub>[stdlib/Standard/Uri.sl:697](../../stdlib/Standard/Uri.sl#L697)</sub>
 
 #### GetLeftPart *method*
 
@@ -2850,7 +2854,7 @@ As much of it as `part` says, from the left.
 
 - `part` -- up to the scheme, the authority, the path or the query
 
-<sub>[stdlib/Standard/Uri.sl:688](../../stdlib/Standard/Uri.sl#L688)</sub>
+<sub>[stdlib/Standard/Uri.sl:721](../../stdlib/Standard/Uri.sl#L721)</sub>
 
 #### IsBaseOf *method*
 
@@ -2865,7 +2869,7 @@ authority, and a path inside this one's directory.
 
 - `uri` -- the URI that may be below this one
 
-<sub>[stdlib/Standard/Uri.sl:710](../../stdlib/Standard/Uri.sl#L710)</sub>
+<sub>[stdlib/Standard/Uri.sl:743](../../stdlib/Standard/Uri.sl#L743)</sub>
 
 #### MakeRelativeUri *method*
 
@@ -2880,7 +2884,7 @@ not share a scheme and authority.
 
 - `uri` -- where the result leads, resolved against this
 
-<sub>[stdlib/Standard/Uri.sl:728](../../stdlib/Standard/Uri.sl#L728)</sub>
+<sub>[stdlib/Standard/Uri.sl:761](../../stdlib/Standard/Uri.sl#L761)</sub>
 
 #### ToString *method*
 
@@ -2890,7 +2894,7 @@ String ToString()
 
 The whole of it in normal form, or a relative one as it was written.
 
-<sub>[stdlib/Standard/Uri.sl:752](../../stdlib/Standard/Uri.sl#L752)</sub>
+<sub>[stdlib/Standard/Uri.sl:785](../../stdlib/Standard/Uri.sl#L785)</sub>
 
 #### Equals *method*
 
@@ -2901,7 +2905,7 @@ bool Equals(Uri other)
 Whether the two name the same resource: equal in everything but the
 fragment and the user, as C# compares them.
 
-<sub>[stdlib/Standard/Uri.sl:756](../../stdlib/Standard/Uri.sl#L756)</sub>
+<sub>[stdlib/Standard/Uri.sl:789](../../stdlib/Standard/Uri.sl#L789)</sub>
 
 #### GetHashCode *method*
 
@@ -2911,7 +2915,7 @@ nuint GetHashCode()
 
 *No documentation.*
 
-<sub>[stdlib/Standard/Uri.sl:766](../../stdlib/Standard/Uri.sl#L766)</sub>
+<sub>[stdlib/Standard/Uri.sl:799](../../stdlib/Standard/Uri.sl#L799)</sub>
 
 #### operator == *operator*
 
@@ -2921,7 +2925,7 @@ static bool operator ==(Uri left, Uri right)
 
 *No documentation.*
 
-<sub>[stdlib/Standard/Uri.sl:775](../../stdlib/Standard/Uri.sl#L775)</sub>
+<sub>[stdlib/Standard/Uri.sl:808](../../stdlib/Standard/Uri.sl#L808)</sub>
 
 #### operator != *operator*
 
@@ -2931,7 +2935,7 @@ static bool operator !=(Uri left, Uri right)
 
 *No documentation.*
 
-<sub>[stdlib/Standard/Uri.sl:776](../../stdlib/Standard/Uri.sl#L776)</sub>
+<sub>[stdlib/Standard/Uri.sl:809](../../stdlib/Standard/Uri.sl#L809)</sub>
 
 ### UriKind *enum*
 

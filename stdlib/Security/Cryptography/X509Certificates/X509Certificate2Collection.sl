@@ -38,10 +38,15 @@ public sealed class X509Certificate2Collection
 {
     private List<X509Certificate2> _items;
 
+    /// The SHA-256 of each certificate held, so a bundle of thousands is not
+    /// quadratic to import.
+    private HashSet<String> _held;
+
     /// An empty collection.
     public X509Certificate2Collection()
     {
         _items = new List<X509Certificate2>();
+        _held = new HashSet<String>();
     }
 
     /// How many certificates there are.
@@ -58,7 +63,7 @@ public sealed class X509Certificate2Collection
     /// @returns whether it was added
     public bool Add(X509Certificate2 certificate)
     {
-        if (Contains(certificate))
+        if (!_held.Add(KeyOf(certificate)))
             return false;
         _items.Add(certificate);
         return true;
@@ -72,21 +77,16 @@ public sealed class X509Certificate2Collection
     }
 
     /// Whether `certificate` is here, byte for byte.
-    public bool Contains(X509Certificate2 certificate)
-    {
-        foreach (X509Certificate2 held in _items)
-        {
-            if (held.Equals(certificate))
-                return true;
-        }
-        return false;
-    }
+    public bool Contains(X509Certificate2 certificate) => _held.Contains(KeyOf(certificate));
 
     /// Removes `certificate`, when it is here.
     ///
     /// @returns whether it was
     public bool Remove(X509Certificate2 certificate)
     {
+        if (!_held.Remove(KeyOf(certificate)))
+            return false;
+
         for (nuint i = 0u; i < _items.Count; i++)
         {
             if (_items[i].Equals(certificate))
@@ -97,6 +97,10 @@ public sealed class X509Certificate2Collection
         }
         return false;
     }
+
+    /// What equality compares: the certificate's SHA-256.
+    static String KeyOf(X509Certificate2 certificate) =>
+        FormatHexadecimalUpper(certificate._sha256);
 
     /// Every certificate in the `CERTIFICATE` blocks of `text`, as a PEM
     /// bundle holds them. Blocks with other labels are passed over.
@@ -111,7 +115,8 @@ public sealed class X509Certificate2Collection
     {
         var found = new List<X509Certificate2>();
         nuint at = 0u;
-        while (PemEncoding.Find(text, at) is Some block)
+        byte[] bytes = text.ToBytes();
+        while (PemEncoding.FindUtf8(bytes, at) is Some block)
         {
             at = block.Value.Location.End.Value;
             if (block.Value.Label == "CERTIFICATE")
@@ -133,7 +138,8 @@ public sealed class X509Certificate2Collection
     {
         nuint added = 0u;
         nuint at = 0u;
-        while (PemEncoding.Find(text, at) is Some block)
+        byte[] bytes = text.ToBytes();
+        while (PemEncoding.FindUtf8(bytes, at) is Some block)
         {
             at = block.Value.Location.End.Value;
             if (block.Value.Label != "CERTIFICATE")

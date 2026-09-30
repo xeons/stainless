@@ -1,0 +1,16 @@
+localhost, no limit: true
+localhost, within 10 s: true
+  read with nothing sent 0 it timed out
+within 0 ms: false it timed out
+udp after unreachable 5 no error
+accepted from a polled listener: true
+  read with nothing sent 0 it timed out
+  still readable: true
+connected datagram into 4 4 no error
+receive, own error 0 it timed out
+send, own error 1 no error
+  last error now 0 no error
+to the end, peer silent: it timed out
+  still readable: true
+to the end, peer finished: 5 bytes
+  still readable: false

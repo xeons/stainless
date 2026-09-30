@@ -43,7 +43,11 @@ import Standard.Bits;
 ///
 /// **Verification is strict and cofactorless.** A signature whose S is not
 /// below the group order is refused, as is a public key that is not the one
-/// canonical encoding of a point on the curve. The check is
+/// canonical encoding of a point on the curve, and a public key of small
+/// order -- one of the eight points that eight times is the identity. Such a
+/// key has no secret behind it: under the identity, R = B and S = 1 sign
+/// every message. RFC 8032 does not ask for that refusal and libsodium makes
+/// it. The check is
 /// [S]B = R + [k]A, the equation RFC 8032 §5.1.7 names as sufficient, rather
 /// than the same multiplied through by the cofactor 8. The two differ only on
 /// a signature crafted with a component of small order, which no honest
@@ -142,8 +146,8 @@ public static class Ed25519
     /// Whether `signature` is `publicKey`'s signature of `message`.
     ///
     /// A key or signature of the wrong length answers false, as does a key
-    /// that is not a canonical point encoding and a signature whose S is not
-    /// below the group order. The equation checked is the cofactorless one;
+    /// that is not a canonical point encoding, a key of small order and a
+    /// signature whose S is not below the group order. The equation checked is the cofactorless one;
     /// the type's own documentation says what that means.
     ///
     /// @param publicKey  the signer's 32-byte key
@@ -163,6 +167,8 @@ public static class Ed25519
             return false;
 
         if (!Edwards25519Point.TryDecode(publicKey, out Edwards25519Point signer))
+            return false;
+        if (signer.IsOfSmallOrder())
             return false;
 
         var hash = new Sha512();

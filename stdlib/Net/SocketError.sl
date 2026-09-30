@@ -74,4 +74,8 @@ public enum SocketError
     Invalid = 12,
     /// The platform said something this enum has no name for.
     Unknown = 13,
+
+    /// The resolver could not answer for now: a DNS server that timed out or
+    /// failed temporarily. Unlike `NoName`, retrying MAY work.
+    TryAgain = 14,
 }

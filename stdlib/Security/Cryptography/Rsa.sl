@@ -62,12 +62,19 @@ import Standard.Formats.Asn1;
 /// the input before it is used, so a fault in the arithmetic cannot leak a
 /// prime through a wrong signature.
 ///
+/// **Sizes are bounded.** Every key read or built from numbers, public or
+/// private, has a modulus of 1024 to 8192 bits and a public exponent of at
+/// most 33 bits, as BoringSSL requires; `Create(int)` makes 2048 to 8192.
+/// The bounds keep one verification with a key from the network cheap.
+///
 /// An `Rsa` is not changed by anything after it is made, so one MAY be used
 /// from several threads at once.
 public sealed class Rsa
 {
-    private const nuint MinimumKeySize = 512u;
-    private const nuint MaximumKeySize = 16384u;
+    private const nuint MinimumKeySize = 1024u;
+    private const nuint MinimumGeneratedKeySize = 2048u;
+    private const nuint MaximumKeySize = 8192u;
+    private const nuint MaximumExponentSize = 33u;
     private static readonly String RsaEncryptionIdentifier = "1.2.840.113549.1.1.1";
 
     private MontgomeryModulus _modulus;
@@ -108,13 +115,12 @@ public sealed class Rsa
     /// about numbers that are not kept. What is kept is handled in constant
     /// time, `d` included.
     ///
-    /// @param keySizeInBits  a multiple of 64 from 512 to 16384; 2048 or more
-    ///                       for anything new
+    /// @param keySizeInBits  a multiple of 64 from 2048 to 8192
     /// @failure CryptoError.KeyLength  `keySizeInBits` is not a size this makes
     /// @failure CryptoError.NoEntropy  the platform would not supply randomness
     public static Result<Rsa, CryptoError> Create(int keySizeInBits)
     {
-        if (keySizeInBits < (int)MinimumKeySize || keySizeInBits > (int)MaximumKeySize ||
+        if (keySizeInBits < (int)MinimumGeneratedKeySize || keySizeInBits > (int)MaximumKeySize ||
             keySizeInBits % 64 != 0)
         {
             return Fail(CryptoError.KeyLength);
@@ -160,7 +166,8 @@ public sealed class Rsa
 
     static nuint CountPresent(byte[] number) => number.Length > 0u ? 1u : 0u;
 
-    /// A public key from its numbers.
+    /// A public key from its numbers: a modulus of 1024 to 8192 bits and an
+    /// odd exponent of 2 to 33 bits. Every key this type holds passes here.
     static Result<Rsa, CryptoError> CreateFromNumbers(ReadOnlySpan<byte> modulus,
                                                       ReadOnlySpan<byte> exponent)
     {
@@ -170,16 +177,16 @@ public sealed class Rsa
             return Fail(CryptoError.InvalidKey);
 
         nuint exponentBits = Limbs.CountBits(exponent);
-        if (exponentBits < 2u || exponentBits > bits || (exponent[exponent.Length - 1u] & 1) == 0)
+        if (exponentBits < 2u || exponentBits > MaximumExponentSize ||
+            (exponent[exponent.Length - 1u] & 1) == 0)
+        {
             return Fail(CryptoError.InvalidKey);
+        }
 
+        // An exponent of 33 bits is always below a modulus of 1024.
         nuint count = Limbs.CountLimbsForBits(bits);
         ulong[] n = Limbs.FromBigEndian(modulus, count);
         ulong[] e = Limbs.FromBigEndian(exponent, Limbs.CountLimbsForBits(exponentBits));
-        ulong[] widened = Limbs.FromBigEndian(exponent, count);
-        if (Limbs.CompareVariableTime(&widened[0u], &n[0u], count) >= 0)
-            return Fail(CryptoError.InvalidKey);
-
         return Ok(new Rsa(new MontgomeryModulus(n), e, bits, null));
     }
 
@@ -397,7 +404,7 @@ public sealed class Rsa
     ///
     /// @param source  exactly one DER value
     /// @failure CryptoError.Encoding    `source` is not one `RSAPublicKey`
-    /// @failure CryptoError.InvalidKey  the numbers are not an RSA key
+    /// @failure CryptoError.InvalidKey  the numbers are not an RSA key of a size this reads
     public static Result<Rsa, CryptoError> ImportRsaPublicKey(ReadOnlySpan<byte> source)
     {
         var reader = new AsnReader(source, AsnEncodingRules.Der);
@@ -412,7 +419,8 @@ public sealed class Rsa
     /// @param source  exactly one DER value
     /// @failure CryptoError.Encoding     `source` is not one `RSAPrivateKey`
     /// @failure CryptoError.Unsupported  a multi-prime key, version 1
-    /// @failure CryptoError.InvalidKey   the numbers are not a consistent RSA key
+    /// @failure CryptoError.InvalidKey   the numbers are not a consistent RSA key of a
+    ///                                   size this reads
     public static Result<Rsa, CryptoError> ImportRsaPrivateKey(ReadOnlySpan<byte> source)
     {
         var reader = new AsnReader(source, AsnEncodingRules.Der);
@@ -427,7 +435,7 @@ public sealed class Rsa
     /// @param source  exactly one DER value
     /// @failure CryptoError.Encoding    `source` is not one `SubjectPublicKeyInfo` holding
     ///                                  an RSA key
-    /// @failure CryptoError.InvalidKey  the numbers are not an RSA key
+    /// @failure CryptoError.InvalidKey  the numbers are not an RSA key of a size this reads
     public static Result<Rsa, CryptoError> ImportSubjectPublicKeyInfo(ReadOnlySpan<byte> source)
     {
         var reader = new AsnReader(source, AsnEncodingRules.Der);
@@ -451,7 +459,8 @@ public sealed class Rsa
     /// @param source  exactly one DER value
     /// @failure CryptoError.Encoding    `source` is not one `PrivateKeyInfo` holding an
     ///                                  RSA key
-    /// @failure CryptoError.InvalidKey  the numbers are not a consistent RSA key
+    /// @failure CryptoError.InvalidKey  the numbers are not a consistent RSA key of a
+    ///                                  size this reads
     public static Result<Rsa, CryptoError> ImportPkcs8PrivateKey(ReadOnlySpan<byte> source)
     {
         var reader = new AsnReader(source, AsnEncodingRules.Der);
@@ -635,16 +644,18 @@ public sealed class Rsa
     /// @failure CryptoError.Encoding     no key block, more than one, or one that does
     ///                                   not parse
     /// @failure CryptoError.Unsupported  the block is an `ENCRYPTED PRIVATE KEY`
-    /// @failure CryptoError.InvalidKey   the numbers are not a consistent RSA key
+    /// @failure CryptoError.InvalidKey   the numbers are not a consistent RSA key of a
+    ///                                   size this reads
     public static Result<Rsa, CryptoError> ImportFromPem(String input)
     {
         nuint at = 0u;
         String label = "";
         byte[] data = new byte[0u];
         nuint found = 0u;
+        byte[] text = input.ToBytes();
         while (true)
         {
-            var next = PemEncoding.Find(input, at);
+            var next = PemEncoding.FindUtf8(text, at);
             if (!next.Some)
                 break;
             PemFields block = next.Value;

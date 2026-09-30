@@ -72,12 +72,20 @@ internal sealed class Tls12KeySchedule
 
     internal byte[] _masterSecret;
 
+    // Each direction's protection, made together from one key block.
+    private TlsRecordCipher? _clientCipher;
+    private TlsRecordCipher? _serverCipher;
+    private bool _ciphersMade;
+
     internal Tls12KeySchedule(HashAlgorithmName hash, byte[] clientRandom, byte[] serverRandom)
     {
         _hash = hash;
         _clientRandom = clientRandom;
         _serverRandom = serverRandom;
         _masterSecret = new byte[0u];
+        _clientCipher = null;
+        _serverCipher = null;
+        _ciphersMade = false;
     }
 
     internal HashAlgorithmName Hash => _hash;
@@ -98,8 +106,8 @@ internal sealed class Tls12KeySchedule
                                         sessionHash, Tls12MasterSecretLength);
     }
 
-    /// The key block (RFC 5246 §6.3): with an AEAD there are no MAC keys, so
-    /// it is the client's key, the server's, the client's IV and the
+    /// The key block (RFC 5246 section 6.3): with an AEAD there are no MAC
+    /// keys, so it is the client's key, the server's, the client's IV and the
     /// server's. The IV is 4 bytes of salt for AES-GCM and 12 for ChaCha20.
     internal byte[] ComputeTlsKeyBlock(TlsCipherSuite suite)
     {
@@ -112,18 +120,73 @@ internal sealed class Tls12KeySchedule
                                2u * keyLength + 2u * ivLength);
     }
 
-    /// The record protection one direction uses under `suite`.
+    /// The record protection one direction uses under `suite`, from a key
+    /// block of its own.
     internal Result<TlsRecordCipher, TlsError> CreateTls12RecordCipher(
         TlsCipherSuite suite, bool forClient)
     {
         nuint keyLength = GetTlsSuiteKeyLength(suite);
         nuint ivLength = GetTls12IvLength(suite);
         byte[] block = ComputeTlsKeyBlock(suite);
-        nuint keyAt = forClient ? 0u : keyLength;
-        nuint ivAt = 2u * keyLength + (forClient ? 0u : ivLength);
-        return TlsRecordCipher.CreateTls12(
-            suite, block[keyAt:][:keyLength].ToArray(), block[ivAt:][:ivLength].ToArray());
+        var cipher = forClient
+            ? CreateTls12RecordCipherFromBlock(suite, block, 0u, 2u * keyLength)
+            : CreateTls12RecordCipherFromBlock(suite, block, keyLength, 2u * keyLength + ivLength);
+        CryptographicOperations.ZeroMemory(block);
+        return cipher;
     }
+
+    /// The record protection one direction of a connection uses under
+    /// `suite`. The key block is computed once, on the first call, and both
+    /// directions are made from it before it is wiped; the second call takes
+    /// the one left over.
+    internal Result<TlsRecordCipher, TlsError> TakeTls12RecordCipher(
+        TlsCipherSuite suite, bool forClient)
+    {
+        if (!_ciphersMade)
+        {
+            _ciphersMade = true;
+            nuint keyLength = GetTlsSuiteKeyLength(suite);
+            nuint ivLength = GetTls12IvLength(suite);
+            byte[] block = ComputeTlsKeyBlock(suite);
+            var client = CreateTls12RecordCipherFromBlock(suite, block, 0u, 2u * keyLength);
+            var server = CreateTls12RecordCipherFromBlock(
+                suite, block, keyLength, 2u * keyLength + ivLength);
+            CryptographicOperations.ZeroMemory(block);
+            if (!client.Ok)
+                return client;
+            if (!server.Ok)
+                return server;
+            _clientCipher = client.Value;
+            _serverCipher = server.Value;
+        }
+
+        var taken = forClient ? _clientCipher : _serverCipher;
+        if (forClient)
+        {
+            _clientCipher = null;
+        }
+        else
+        {
+            _serverCipher = null;
+        }
+        if (taken == null)
+            return Fail(TlsError.InternalError);
+        return Ok(taken);
+    }
+
+    private Result<TlsRecordCipher, TlsError> CreateTls12RecordCipherFromBlock(
+        TlsCipherSuite suite, byte[] block, nuint keyAt, nuint ivAt)
+    {
+        byte[] key = block[keyAt:][:GetTlsSuiteKeyLength(suite)].ToArray();
+        byte[] iv = block[ivAt:][:GetTls12IvLength(suite)].ToArray();
+        var cipher = TlsRecordCipher.CreateTls12(suite, key, iv);
+        CryptographicOperations.ZeroMemory(key);
+        CryptographicOperations.ZeroMemory(iv);
+        return cipher;
+    }
+
+    /// Overwrites the master secret, for a connection that has ended.
+    internal void WipeTlsSecrets() => CryptographicOperations.ZeroMemory(_masterSecret);
 
     /// The `verify_data` of a Finished over the hash of the handshake so far.
     internal byte[] ComputeTls12Finished(bool byClient, ReadOnlySpan<byte> transcriptHash) =>
@@ -132,7 +195,10 @@ internal sealed class Tls12KeySchedule
 
     /// RFC 5705's exporter. An empty `context` is taken as no context, which
     /// is how the protocols above TLS 1.2 that use it ask.
-    internal byte[] ExportTlsKeyingMaterial(String label, ReadOnlySpan<byte> context, nuint length)
+    ///
+    /// @failure TlsError.InternalError  `context` is over 65535 bytes
+    internal Result<byte[], TlsError> ExportTlsKeyingMaterial(
+        String label, ReadOnlySpan<byte> context, nuint length)
     {
         var seed = new TlsBuffer(66u + context.Length);
         seed.WriteBytes(_clientRandom);
@@ -143,7 +209,9 @@ internal sealed class Tls12KeySchedule
             seed.WriteBytes(context);
             seed.EndVector(at, 2u);
         }
-        return ComputeTls12Prf(_hash, _masterSecret, label, seed.Written, length);
+        if (seed.HasOverflowed)
+            return Fail(TlsError.InternalError);
+        return Ok(ComputeTls12Prf(_hash, _masterSecret, label, seed.Written, length));
     }
 }
 

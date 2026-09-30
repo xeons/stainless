@@ -106,9 +106,10 @@ public sealed class TlsSigningKey
     public static Result<TlsSigningKey, CryptoError> ImportFromPem(String input)
     {
         nuint at = 0u;
+        byte[] bytes = input.ToBytes();
         while (true)
         {
-            var next = PemEncoding.Find(input, at);
+            var next = PemEncoding.FindUtf8(bytes, at);
             if (!next.Some)
                 return Fail(CryptoError.Encoding);
             PemFields block = next.Value;

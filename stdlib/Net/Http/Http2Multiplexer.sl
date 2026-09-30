@@ -35,28 +35,63 @@ internal const long Http2ConnectionReceiveWindow = 16777216;
 /// The most bytes a header block may reach across its CONTINUATION frames.
 internal const nuint Http2MaxHeaderBlockLength = 1048576u;
 
-/// How many streams this end remembers having reset, so that frames the
-/// peer sent before it saw the reset are dropped rather than refused.
-internal const nuint Http2RememberedResets = 128u;
+/// How many streams the peer ended that this end remembers, so that a frame
+/// after END_STREAM is still refused. A frame on any other stream this end
+/// opened and no longer has is dropped: the peer may have sent it before it
+/// saw this end's RST_STREAM.
+internal const nuint Http2RememberedEndedStreams = 128u;
 
-/// How long a connection error waits for the write lock to send its GOAWAY.
+/// How long a GOAWAY waits for the write turn, and then for its write.
 internal const int Http2GoAwayWaitMilliseconds = 1000;
+
+/// How long a write of queued control frames may take when no request's
+/// deadline is shorter. A peer that reads nothing for this long is gone.
+internal const int Http2ControlWriteMilliseconds = 5000;
+
+/// How long a request at or past its deadline still spends writing the
+/// control frames queued, its own RST_STREAM among them.
+internal const int Http2LateFlushMilliseconds = 100;
+
+/// How many SETTINGS and PING acknowledgements may wait to be written, and
+/// how many bytes of control frames in all. Past either the peer is sending
+/// faster than it reads, and the connection ends with ENHANCE_YOUR_CALM
+/// (RFC 9113 section 10.5).
+internal const nuint Http2MaxPendingAcks = 1000u;
+internal const nuint Http2MaxPendingControlBytes = 65536u;
+
+/// What became of a write.
+internal enum Http2WriteOutcome
+{
+    /// It reached the socket.
+    Written,
+    /// Its stream was reset or had failed, so it was not sent; the stream
+    /// says why.
+    Dropped,
+    /// The deadline ran out before anything was written.
+    Expired,
+    /// The connection had ended, or the write failed or timed out part-way.
+    Failed,
+}
 
 /// The frames and streams of one HTTP/2 connection (RFC 9113), shared by the
 /// thread that reads it and the threads that send requests on it.
 ///
-/// **Two locks, never taken the other way round.** `_writeLock` serialises
-/// what goes on the wire, and with it the HPACK encoder and the next stream
-/// identifier, since blocks MUST arrive in the order they were encoded and
-/// identifiers MUST rise. `_state` guards every stream and every window. A
-/// writer MAY take `_state` while it holds `_writeLock`; nothing takes
-/// `_writeLock` while it holds `_state`.
+/// **A write turn and a lock.** The write turn serialises what goes on the
+/// wire, and with it the HPACK encoder and the next stream identifier, since
+/// blocks MUST arrive in the order they were encoded and identifiers MUST
+/// rise. `_state` guards every stream and every window, and the turn itself:
+/// taking the turn is a wait on `_state` bounded by the caller's deadline,
+/// and the turn is held without `_state` while the write runs.
 ///
-/// **The reader thread never waits for `_writeLock`.** What it has to send —
-/// a SETTINGS ack, a PING ack, a WINDOW_UPDATE, a RST_STREAM — goes on a
-/// queue, and whichever thread next holds the lock writes it. Were the reader
-/// to wait, a writer stuck behind a peer that is itself waiting to write
-/// would never be relieved.
+/// **Every write is bounded.** The holder sets the socket's send timeout from
+/// its deadline before it writes. A write that fails or times out part-way
+/// ends the connection, since a partial frame corrupts it.
+///
+/// **The reader thread never waits for the turn.** What it has to send, a
+/// SETTINGS ack, a PING ack, a WINDOW_UPDATE, a RST_STREAM, goes on a queue,
+/// and whichever thread next holds the turn writes it. Were the reader to
+/// wait, a writer stuck behind a peer that is itself waiting to write would
+/// never be relieved. The queue is capped; see `Http2MaxPendingAcks`.
 internal sealed threadsafe class Http2Multiplexer
 {
     private String _key;
@@ -72,25 +107,33 @@ internal sealed threadsafe class Http2Multiplexer
     private Http2Buffer _headerBlock = new Http2Buffer(256u);
     private bool _headerEndStream = false;
 
-    // Under _writeLock.
-    private Mutex<int> _writeLock = new Mutex<int>(0);
+    // Under the write turn.
     private HpackEncoder _encoder = new HpackEncoder(HpackDefaultTableSize);
-    private uint _nextStreamId = 1u;
 
     // Under _state.
     private Monitor<int> _state = new Monitor<int>(0);
+    private bool _writing = false;
     private Dictionary<uint, Http2Stream> _streams = new Dictionary<uint, Http2Stream>();
-    private List<uint> _resetStreams = new List<uint>();
-    private List<byte[]> _control = new List<byte[]>();
+    private List<uint> _endedStreams = new List<uint>();
+    private Http2Buffer _control = new Http2Buffer(64u);
+    private Dictionary<uint, long> _windowUpdates = new Dictionary<uint, long>();
+    private nuint _pendingAcks = 0u;
+    private bool _controlOverflowed = false;
+    private bool _shutDownQueued = false;
     private uint _highestStreamId = 0u;
     private nuint _openedCount = 0u;
     private nuint _reserved = 0u;
+    private nuint _unopened = 0u;
     private bool _settingsReceived = false;
     private uint _peerMaxStreams = 4294967295u;
     private long _peerInitialWindow = Http2DefaultWindowSize;
     private nuint _peerMaxFrameSize = Http2DefaultMaxFrameSize;
     private bool _hasTableLimit = false;
     private nuint _tableLimit = HpackDefaultTableSize;
+    private nuint _tableMinimum = HpackDefaultTableSize;
+
+    // Under _state, and changed only under the write turn as well.
+    private uint _nextStreamId = 1u;
     private long _sendWindow = Http2DefaultWindowSize;
     private long _receiveWindow = Http2DefaultWindowSize;
     private long _connectionUnacknowledged = 0;
@@ -182,15 +225,20 @@ internal sealed threadsafe class Http2Multiplexer
 
     // ------------------------------------------------------------ the pool
 
-    /// Whether it still takes new streams.
+    /// Whether it still takes new streams: not closing, and with stream ids
+    /// left to give them.
     internal bool IsHttp2Open
     {
         get
         {
             var held = _state.Enter();
-            return !_ended && !_goingAway && !_closing;
+            return !_ended && !_goingAway && !_closing && RemainingHttp2StreamIds > 0u;
         }
     }
+
+    /// Stream ids not yet used. The caller holds `_state`.
+    private nuint RemainingHttp2StreamIds =>
+        _nextStreamId > Http2MaxStreamId ? 0u : (nuint)((Http2MaxStreamId - _nextStreamId) / 2u + 1u);
 
     /// Whether it has carried a stream before the last one opened.
     internal bool HasCarriedHttp2Stream
@@ -202,7 +250,8 @@ internal sealed threadsafe class Http2Multiplexer
         }
     }
 
-    /// Takes a place for one more stream, within the peer's limit.
+    /// Takes a place for one more stream, within the peer's limit and the
+    /// stream ids left.
     internal bool TryReserveHttp2Stream()
     {
         var held = _state.Enter();
@@ -210,7 +259,10 @@ internal sealed threadsafe class Http2Multiplexer
             return false;
         if ((ulong)_reserved >= (ulong)_peerMaxStreams)
             return false;
+        if (_unopened >= RemainingHttp2StreamIds)
+            return false;
         _reserved++;
+        _unopened++;
         return true;
     }
 
@@ -239,53 +291,121 @@ internal sealed threadsafe class Http2Multiplexer
     /// Opens `stream` with a HEADERS block of `fields`, pairs of name and
     /// value, ending the stream there when `endStream`. The place MUST have
     /// been reserved. A failure is recorded on the stream.
-    internal bool OpenHttp2Stream(Http2Stream stream, List<String> fields, bool endStream)
+    internal bool OpenHttp2Stream(Http2Stream stream, List<String> fields, bool endStream,
+                                  HttpDeadline deadline)
     {
-        bool written = false;
+        Http2WriteOutcome outcome = Http2WriteOutcome.Expired;
+        bool exhausted = false;
         {
-            var writing = _writeLock.Enter();
-            nuint maxFrameSize = Http2DefaultMaxFrameSize;
-            bool limitTable = false;
-            nuint tableLimit = 0u;
+            Http2WriteTurn? turn = TakeHttp2WriteTurn(deadline, out outcome);
+            if (turn != null)
+                outcome = OpenHttp2StreamLocked(stream, fields, endStream, deadline, out exhausted);
+        }
+        FlushHttp2ControlFrames(deadline);
+        if (exhausted)
+            BeginHttp2Shutdown();
+        if (outcome == Http2WriteOutcome.Written)
+            return true;
+        if (outcome == Http2WriteOutcome.Dropped)
+            return false;
+
+        bool opened = true;
+        {
+            var held = _state.Enter();
+            if (stream.Id == 0u && !stream.IsReleased)
             {
-                var held = _state.Enter();
-                if (_ended || _goingAway || _closing || _nextStreamId > Http2MaxStreamId)
+                opened = false;
+                _reserved--;
+                _unopened--;
+                NoteHttp2IdleLocked();
+                stream.IsReleased = true;
+                if (outcome == Http2WriteOutcome.Expired)
                 {
-                    _reserved--;
+                    stream.FailHttp2Stream(HttpError.Timeout,
+                                           "the request timed out before it was sent", 0u);
+                }
+                else
+                {
                     stream.IsUnprocessed = true;
-                    stream.IsReleased = true;
                     stream.FailHttp2Stream(HttpError.ConnectionClosed,
                         "the HTTP/2 connection closed before the request was sent", 0u);
-                    return false;
                 }
-                stream.Id = _nextStreamId;
-                _nextStreamId += 2u;
-                stream.SendWindow = _peerInitialWindow;
-                stream.ReceiveWindow = _streamWindow;
-                stream.LocalClosed = endStream;
-                _streams.SetValue(stream.Id, stream);
-                _highestStreamId = stream.Id;
-                _openedCount++;
-                maxFrameSize = _peerMaxFrameSize;
-                limitTable = _hasTableLimit;
-                tableLimit = _tableLimit;
-                _hasTableLimit = false;
             }
-
-            if (limitTable)
-                _encoder.LimitHpackTableSize(tableLimit);
-            var block = new Http2Buffer(256u);
-            _encoder.BeginHpackHeaderBlock(block);
-            for (nuint i = 0u; i + 1u < fields.Count; i += 2u)
-                _encoder.EncodeHpackField(block, fields[i], fields[i + 1u]);
-            var frames = new Http2Buffer(block.Length + 64u);
-            WriteHttp2HeaderBlock(frames, stream.Id, block, endStream, maxFrameSize);
-            written = WriteHttp2BufferLocked(frames);
         }
-        FlushHttp2ControlFrames();
-        if (!written)
-            FailHttp2Transport();
-        return written;
+        if (opened)
+            FailHttp2StreamWrite(stream, outcome, deadline, "the request timed out sending its head");
+        else if (outcome == Http2WriteOutcome.Failed)
+            FailHttp2Transport(deadline);
+        NotifyHttp2Pool();
+        return false;
+    }
+
+    /// Opens the stream and writes its head. The caller holds the write turn.
+    private Http2WriteOutcome OpenHttp2StreamLocked(Http2Stream stream, List<String> fields,
+                                                    bool endStream,
+                                                    HttpDeadline deadline,
+                                                    out bool exhausted)
+    {
+        exhausted = false;
+        // What is queued goes first, so that a SETTINGS ack never precedes a
+        // block encoded under the table size that SETTINGS replaced.
+        Http2WriteOutcome flushed = WriteHttp2FramesLocked(new Http2Buffer(0u), null, deadline);
+        if (flushed != Http2WriteOutcome.Written)
+            return flushed;
+
+        nuint maxFrameSize = Http2DefaultMaxFrameSize;
+        bool limitTable = false;
+        nuint tableLimit = 0u;
+        nuint tableMinimum = 0u;
+        {
+            var held = _state.Enter();
+            if (_ended || _goingAway || _closing || _nextStreamId > Http2MaxStreamId)
+            {
+                _reserved--;
+                _unopened--;
+                NoteHttp2IdleLocked();
+                stream.IsUnprocessed = true;
+                stream.IsReleased = true;
+                stream.FailHttp2Stream(HttpError.ConnectionClosed,
+                    "the HTTP/2 connection closed before the request was sent", 0u);
+                return Http2WriteOutcome.Dropped;
+            }
+            stream.Id = _nextStreamId;
+            _nextStreamId += 2u;
+            _unopened--;
+            exhausted = _nextStreamId > Http2MaxStreamId;
+            stream.SendWindow = _peerInitialWindow;
+            stream.ReceiveWindow = _streamWindow;
+            stream.LocalClosed = endStream;
+            _streams.SetValue(stream.Id, stream);
+            _highestStreamId = stream.Id;
+            _openedCount++;
+            maxFrameSize = _peerMaxFrameSize;
+            limitTable = _hasTableLimit;
+            tableLimit = _tableLimit;
+            tableMinimum = _tableMinimum;
+            _hasTableLimit = false;
+        }
+
+        if (limitTable)
+        {
+            // The smallest size since the last block first, so that the
+            // peer's decoder evicts what that size did (RFC 7541 section 4.2).
+            if (tableMinimum < tableLimit)
+                _encoder.LimitHpackTableSize(tableMinimum);
+            _encoder.LimitHpackTableSize(tableLimit);
+        }
+        var block = new Http2Buffer(256u);
+        _encoder.BeginHpackHeaderBlock(block);
+        for (nuint i = 0u; i + 1u < fields.Count; i += 2u)
+            _encoder.EncodeHpackField(block, fields[i], fields[i + 1u]);
+        var frames = new Http2Buffer(block.Length + 64u);
+        WriteHttp2HeaderBlock(frames, stream.Id, block, endStream, maxFrameSize);
+        // The block is encoded, so it MUST be written whatever the deadline
+        // says: a block not sent leaves the peer's table behind this one.
+        if (!WriteHttp2BytesLocked(frames, deadline))
+            return Http2WriteOutcome.Failed;
+        return Http2WriteOutcome.Written;
     }
 
     /// Sends `count` bytes of a request body as DATA, waiting for window
@@ -295,6 +415,7 @@ internal sealed threadsafe class Http2Multiplexer
                                  nuint offset,
                                  nuint count)
     {
+        HttpDeadline deadline = exchange.Deadline;
         nuint done = 0u;
         while (done < count)
         {
@@ -306,6 +427,11 @@ internal sealed threadsafe class Http2Multiplexer
                 {
                     if (stream.IsReset || stream.Error != HttpError.None || _ended)
                         return false;
+                    if (deadline.HasExpired)
+                    {
+                        timedOut = true;
+                        break;
+                    }
                     long window = stream.SendWindow < _sendWindow ? stream.SendWindow : _sendWindow;
                     if (window > 0)
                     {
@@ -318,33 +444,46 @@ internal sealed threadsafe class Http2Multiplexer
                         _sendWindow -= (long)part;
                         break;
                     }
-                    if (!WaitForHttp2Change(held, exchange.Deadline))
+                    if (!WaitForHttp2Change(held, deadline))
                     {
-                        ResetHttp2StreamLocked(stream, Http2ErrorCode.Cancel, HttpError.Timeout,
-                                               "the request timed out waiting to send its body");
                         timedOut = true;
                         break;
                     }
                 }
+                if (timedOut)
+                {
+                    ResetHttp2StreamLocked(stream, Http2ErrorCode.Cancel, HttpError.Timeout,
+                                           "the request timed out sending its body");
+                }
             }
             if (timedOut)
             {
-                FlushHttp2ControlFrames();
+                FlushHttp2ControlFrames(deadline);
                 NotifyHttp2Pool();
                 return false;
             }
 
             var frame = new Http2Buffer(part + Http2FrameHeaderLength);
             WriteHttp2Data(frame, stream.Id, buffer, offset + done, part, false);
-            if (!SendHttp2Buffer(frame))
+            Http2WriteOutcome outcome = SendHttp2Frames(frame, stream, deadline);
+            if (outcome != Http2WriteOutcome.Written)
+            {
+                if (outcome != Http2WriteOutcome.Failed)
+                {
+                    var held = _state.Enter();
+                    // Never sent, so the connection's window is not spent.
+                    _sendWindow += (long)part;
+                }
+                FailHttp2StreamWrite(stream, outcome, deadline, "the request timed out sending its body");
                 return false;
+            }
             done += part;
         }
         return true;
     }
 
     /// Ends the request's side of the stream with an empty DATA frame.
-    internal bool EndHttp2RequestBody(Http2Stream stream)
+    internal bool EndHttp2RequestBody(Http2Stream stream, HttpDeadline deadline)
     {
         {
             var held = _state.Enter();
@@ -353,8 +492,12 @@ internal sealed threadsafe class Http2Multiplexer
         }
         var frame = new Http2Buffer(Http2FrameHeaderLength);
         frame.WriteHttp2FrameHeader(0u, Http2FrameType.Data, Http2FlagEndStream, stream.Id);
-        if (!SendHttp2Buffer(frame))
+        Http2WriteOutcome outcome = SendHttp2Frames(frame, stream, deadline);
+        if (outcome != Http2WriteOutcome.Written)
+        {
+            FailHttp2StreamWrite(stream, outcome, deadline, "the request timed out ending its body");
             return false;
+        }
         {
             var held = _state.Enter();
             stream.LocalClosed = true;
@@ -364,6 +507,35 @@ internal sealed threadsafe class Http2Multiplexer
         NotifyHttp2Pool();
         return true;
     }
+
+    /// A write for `stream` did not happen. When the deadline ran out the
+    /// stream fails with Timeout: reset, if nothing was written, and with the
+    /// connection ended, if the write failed part-way. `Dropped` needs
+    /// nothing, since the stream already says why.
+    private void FailHttp2StreamWrite(Http2Stream stream, Http2WriteOutcome outcome,
+                                      HttpDeadline deadline,
+                                      String message)
+    {
+        if (outcome == Http2WriteOutcome.Dropped || outcome == Http2WriteOutcome.Written)
+            return;
+        {
+            var held = _state.Enter();
+            if (outcome == Http2WriteOutcome.Expired)
+                ResetHttp2StreamLocked(stream, Http2ErrorCode.Cancel, HttpError.Timeout, message);
+            else if (HasHttp2WriteTimedOut(deadline))
+                stream.FailHttp2Stream(HttpError.Timeout, message, 0u);
+            held.PulseAll();
+        }
+        if (outcome == Http2WriteOutcome.Failed)
+            FailHttp2Transport(deadline);
+        else
+            FlushHttp2ControlFrames(deadline);
+        NotifyHttp2Pool();
+    }
+
+    /// Whether a failed write failed because its time ran out.
+    private bool HasHttp2WriteTimedOut(HttpDeadline deadline) =>
+        deadline.HasExpired || _tcp.SocketErrorCode == SocketError.TimedOut;
 
     /// Waits for a 100 (Continue), a final head, or `milliseconds`, which
     /// ever is first.
@@ -411,7 +583,7 @@ internal sealed threadsafe class Http2Multiplexer
                     exchange.IsRetryable = true;
             }
         }
-        FlushHttp2ControlFrames();
+        FlushHttp2ControlFrames(exchange.Deadline);
         NotifyHttp2Pool();
         return error;
     }
@@ -455,7 +627,7 @@ internal sealed threadsafe class Http2Multiplexer
                 CreditHttp2WindowsLocked(stream, (long)got);
             }
         }
-        FlushHttp2ControlFrames();
+        FlushHttp2ControlFrames(exchange.Deadline);
         return got;
     }
 
@@ -486,7 +658,7 @@ internal sealed threadsafe class Http2Multiplexer
                                        "the request body was not sent");
             }
         }
-        FlushHttp2ControlFrames();
+        FlushHttp2ControlFrames(exchange.Deadline);
         NotifyHttp2Pool();
         return error;
     }
@@ -507,7 +679,7 @@ internal sealed threadsafe class Http2Multiplexer
                 CreditHttp2ConnectionLocked((long)stream.DiscardHttp2Bytes());
             }
         }
-        FlushHttp2ControlFrames();
+        FlushHttp2ControlFrames(null);
         NotifyHttp2Pool();
     }
 
@@ -518,6 +690,7 @@ internal sealed threadsafe class Http2Multiplexer
         {
             var held = _state.Enter();
             _reserved--;
+            _unopened--;
             NoteHttp2IdleLocked();
         }
         NotifyHttp2Pool();
@@ -546,7 +719,9 @@ internal sealed threadsafe class Http2Multiplexer
         {
             var frame = new Http2Buffer(32u);
             WriteHttp2GoAway(frame, 0u, (uint)Http2ErrorCode.NoError, "");
-            SendHttp2Buffer(frame);
+            var deadline = new HttpDeadline(TimeSpan.FromMilliseconds((long)Http2GoAwayWaitMilliseconds));
+            if (SendHttp2Frames(frame, null, deadline) == Http2WriteOutcome.Failed)
+                FailHttp2Transport(deadline);
         }
         if (endNow)
             ShutDownHttp2Transport();
@@ -607,7 +782,8 @@ internal sealed threadsafe class Http2Multiplexer
             var frame = (Http2Frame)read;
             if (!ProcessHttp2Frame(frame))
                 break;
-            FlushHttp2ControlFrames();
+            if (!FlushHttp2ControlFrames(null))
+                break;
             NotifyHttp2Pool();
         }
         NotifyHttp2Pool();
@@ -692,7 +868,6 @@ internal sealed threadsafe class Http2Multiplexer
     /// would have to open, or one this end has not yet.
     private bool IsHttp2StreamIdleLocked(uint id) => (id & 1u) == 0u || id > _highestStreamId;
 
-    private bool WasHttp2StreamResetLocked(uint id) => _resetStreams.Contains(id);
 
     /// The payload less padding, when the frame is PADDED; `start` is where
     /// the rest begins. False when the padding is as long as the payload.
@@ -713,8 +888,9 @@ internal sealed threadsafe class Http2Multiplexer
     }
 
     /// The stream a frame names, or null with `problem` set when the frame
-    /// is a connection error: one on a stream never opened, or one closed
-    /// by END_STREAM rather than by this end's reset.
+    /// is a connection error: one on a stream never opened, or on one the
+    /// peer recently ended. Null with no problem means the frame is dropped:
+    /// its stream was reset, or ended too long ago to be remembered.
     private Http2Stream? FindHttp2FrameStreamLocked(uint id, String what, out String problem,
                                                     out Http2ErrorCode code)
     {
@@ -728,7 +904,7 @@ internal sealed threadsafe class Http2Multiplexer
             problem = what + " on a stream never opened";
             code = Http2ErrorCode.ProtocolError;
         }
-        else if (!WasHttp2StreamResetLocked(id))
+        else if (_endedStreams.Contains(id))
         {
             problem = what + " on a closed stream";
             code = Http2ErrorCode.StreamClosed;
@@ -1089,6 +1265,8 @@ internal sealed threadsafe class Http2Multiplexer
             switch (setting)
             {
                 case 1u:
+                    if (!_hasTableLimit || (nuint)value < _tableMinimum)
+                        _tableMinimum = (nuint)value;
                     _hasTableLimit = true;
                     _tableLimit = (nuint)value;
                     break;
@@ -1136,7 +1314,7 @@ internal sealed threadsafe class Http2Multiplexer
         _settingsReceived = true;
         var ack = new Http2Buffer(Http2FrameHeaderLength);
         WriteHttp2SettingsAck(ack);
-        _control.Add(ack.ToArray());
+        QueueHttp2ControlLocked(ack, true);
         return "";
     }
 
@@ -1151,7 +1329,7 @@ internal sealed threadsafe class Http2Multiplexer
         var answer = new Http2Buffer(Http2FrameHeaderLength + 8u);
         WriteHttp2Ping(answer, frame.Payload, true);
         var held = _state.Enter();
-        _control.Add(answer.ToArray());
+        QueueHttp2ControlLocked(answer, true);
         _pingsAnswered++;
         return true;
     }
@@ -1253,8 +1431,8 @@ internal sealed threadsafe class Http2Multiplexer
 
     // ------------------------------------------------------------ failing
 
-    /// A connection error (RFC 9113 §5.4.1): GOAWAY with `code`, then the
-    /// end. Answers false, for the reader to stop.
+    /// A connection error (RFC 9113 section 5.4.1): GOAWAY with `code`, then
+    /// the end. Answers false, for the reader to stop.
     private bool FailHttp2Connection(Http2ErrorCode code, String message)
     {
         bool send = false;
@@ -1271,33 +1449,13 @@ internal sealed threadsafe class Http2Multiplexer
         {
             var frame = new Http2Buffer(64u);
             WriteHttp2GoAway(frame, lastStreamId, (uint)code, message);
-            SendHttp2GoAwayPatiently(frame);
+            var deadline = new HttpDeadline(TimeSpan.FromMilliseconds((long)Http2GoAwayWaitMilliseconds));
+            SendHttp2Frames(frame, null, deadline);
         }
         EndHttp2Connection(HttpError.ProtocolError, "HTTP/2 "
                            + DescribeHttp2ErrorCode((uint)code) + ": " + message,
                            (uint)code);
         return false;
-    }
-
-    /// Writes a GOAWAY from the reader thread, waiting a little for the
-    /// write lock rather than for ever.
-    private void SendHttp2GoAwayPatiently(Http2Buffer frame)
-    {
-        for (int waited = 0; waited <= Http2GoAwayWaitMilliseconds; waited += 10)
-        {
-            if (TryWriteHttp2Buffer(frame))
-                return;
-            Sleep(10u);
-        }
-    }
-
-    private bool TryWriteHttp2Buffer(Http2Buffer frame)
-    {
-        Guard<int>? writing = _writeLock.TryEnter();
-        if (writing == null)
-            return false;
-        WriteHttp2BufferLocked(frame);
-        return true;
     }
 
     /// Ends the connection: every stream not yet answered in full fails with
@@ -1325,7 +1483,8 @@ internal sealed threadsafe class Http2Multiplexer
                 stream.IsReset = true;
                 ReleaseHttp2StreamLocked(stream);
             }
-            _control.Clear();
+            ClearHttp2ControlLocked();
+            _shutDownQueued = false;
             held.PulseAll();
         }
         ShutDownHttp2Transport();
@@ -1342,9 +1501,13 @@ internal sealed threadsafe class Http2Multiplexer
     }
 
     /// A write failed: the socket goes, and the reader ends every stream.
-    private void FailHttp2Transport() =>
-        EndHttp2Connection(HttpError.ConnectionClosed,
-                           "the HTTP/2 connection failed while a request was sent", 0u);
+    private void FailHttp2Transport(HttpDeadline deadline)
+    {
+        String message = HasHttp2WriteTimedOut(deadline)
+                         ? "a write on the HTTP/2 connection timed out"
+                         : "a write on the HTTP/2 connection failed";
+        EndHttp2Connection(HttpError.ConnectionClosed, message, 0u);
+    }
 
     // ------------------------------------------------------------ streams
 
@@ -1367,10 +1530,7 @@ internal sealed threadsafe class Http2Multiplexer
         {
             var frame = new Http2Buffer(16u);
             WriteHttp2RstStream(frame, stream.Id, (uint)code);
-            _control.Add(frame.ToArray());
-            _resetStreams.Add(stream.Id);
-            if (_resetStreams.Count > Http2RememberedResets)
-                _resetStreams.RemoveAt(0u);
+            QueueHttp2ControlLocked(frame, false);
         }
         stream.IsReset = true;
         if (error != HttpError.None)
@@ -1378,18 +1538,31 @@ internal sealed threadsafe class Http2Multiplexer
         ReleaseHttp2StreamLocked(stream);
     }
 
-    /// Takes the stream out of the table and gives its place back.
+    /// Takes the stream out of the table and gives its place back. One the
+    /// peer ended, and neither end reset, is remembered for a while.
     private void ReleaseHttp2StreamLocked(Http2Stream stream)
     {
         if (stream.IsReleased)
             return;
         stream.IsReleased = true;
         if (stream.Id != 0u)
+        {
             _streams.Remove(stream.Id);
+            if (stream.IsReset)
+            {
+                _windowUpdates.Remove(stream.Id);
+            }
+            else
+            {
+                _endedStreams.Add(stream.Id);
+                if (_endedStreams.Count > Http2RememberedEndedStreams)
+                    _endedStreams.RemoveAt(0u);
+            }
+        }
         _reserved--;
         NoteHttp2IdleLocked();
         if ((_goingAway || _closing) && _streams.IsEmpty && !_shutDown)
-            _control.Add(new byte[0u]);
+            _shutDownQueued = true;
     }
 
     private void NoteHttp2IdleLocked()
@@ -1406,9 +1579,7 @@ internal sealed threadsafe class Http2Multiplexer
         if (!stream.RemoteClosed && !stream.IsReset
             && stream.UnacknowledgedBytes >= _streamWindow / 2)
         {
-            var frame = new Http2Buffer(16u);
-            WriteHttp2WindowUpdate(frame, stream.Id, (uint)stream.UnacknowledgedBytes);
-            _control.Add(frame.ToArray());
+            QueueHttp2WindowUpdateLocked(stream.Id, stream.UnacknowledgedBytes);
             stream.ReceiveWindow += stream.UnacknowledgedBytes;
             stream.UnacknowledgedBytes = 0;
         }
@@ -1422,89 +1593,222 @@ internal sealed threadsafe class Http2Multiplexer
         _connectionUnacknowledged += count;
         if (_connectionUnacknowledged >= Http2ConnectionReceiveWindow / 2)
         {
-            var frame = new Http2Buffer(16u);
-            WriteHttp2WindowUpdate(frame, 0u, (uint)_connectionUnacknowledged);
-            _control.Add(frame.ToArray());
+            QueueHttp2WindowUpdateLocked(0u, _connectionUnacknowledged);
             _receiveWindow += _connectionUnacknowledged;
             _connectionUnacknowledged = 0;
         }
     }
 
-    // ------------------------------------------------------------ writing
+    // ------------------------------------------------------------ the queue
 
-    /// Writes `frames` under the write lock, after anything queued.
-    private bool SendHttp2Buffer(Http2Buffer frames)
+    /// Queues a control frame for the next holder of the write turn. Past the
+    /// caps it is not queued, and the connection is marked to end with
+    /// ENHANCE_YOUR_CALM.
+    private void QueueHttp2ControlLocked(Http2Buffer frame, bool isAck)
     {
-        bool written = false;
+        if (_ended || _controlOverflowed)
+            return;
+        if (_control.Length + frame.Length > Http2MaxPendingControlBytes
+            || (isAck && _pendingAcks >= Http2MaxPendingAcks))
         {
-            var writing = _writeLock.Enter();
-            written = WriteHttp2BufferLocked(frames);
+            _controlOverflowed = true;
+            return;
         }
-        FlushHttp2ControlFrames();
-        if (!written)
-            FailHttp2Transport();
-        return written;
+        _control.WriteArray(frame.Storage, 0u, frame.Length);
+        if (isAck)
+            _pendingAcks++;
     }
 
-    /// Writes what is queued, then `frames`. The caller holds the write lock.
-    private bool WriteHttp2BufferLocked(Http2Buffer frames)
+    /// Queues a WINDOW_UPDATE, adding it to one already queued for the same
+    /// stream. Each is at most what the peer has sent, so a sum stays within
+    /// a window.
+    private void QueueHttp2WindowUpdateLocked(uint id, long increment)
     {
-        if (!WriteQueuedHttp2ControlFrames())
-            return false;
-        if (frames.Length == 0u)
+        if (_ended)
+            return;
+        _windowUpdates.SetValue(id, _windowUpdates.GetValueOrDefault(id, 0) + increment);
+    }
+
+    /// Whether anything waits to be written.
+    private bool HasQueuedHttp2ControlLocked =>
+        _control.Length > 0u || !_windowUpdates.IsEmpty || _shutDownQueued;
+
+    /// Moves what is queued into `output`, WINDOW_UPDATEs first so that none
+    /// follows a RST_STREAM on its stream.
+    private void TakeHttp2ControlLocked(Http2Buffer output)
+    {
+        foreach (var pair in _windowUpdates)
+            WriteHttp2WindowUpdate(output, pair.Key, (uint)pair.Value);
+        output.WriteArray(_control.Storage, 0u, _control.Length);
+        ClearHttp2ControlLocked();
+    }
+
+    private void ClearHttp2ControlLocked()
+    {
+        _windowUpdates.Clear();
+        _control.Clear();
+        _pendingAcks = 0u;
+    }
+
+    // ------------------------------------------------------------ writing
+
+    /// Takes the write turn, waiting no longer than `deadline`. Null when the
+    /// wait ran out, `outcome` `Expired`, or the connection ended, `Failed`.
+    private Http2WriteTurn? TakeHttp2WriteTurn(HttpDeadline deadline, out Http2WriteOutcome outcome)
+    {
+        var held = _state.Enter();
+        while (_writing && !_ended)
+        {
+            if (!WaitForHttp2Change(held, deadline))
+            {
+                outcome = Http2WriteOutcome.Expired;
+                return null;
+            }
+        }
+        if (_ended)
+        {
+            outcome = Http2WriteOutcome.Failed;
+            return null;
+        }
+        _writing = true;
+        outcome = Http2WriteOutcome.Written;
+        return new Http2WriteTurn(this);
+    }
+
+    /// Takes the write turn only if it is free.
+    private Http2WriteTurn? TryTakeHttp2WriteTurn()
+    {
+        var held = _state.Enter();
+        if (_writing || _ended)
+            return null;
+        _writing = true;
+        return new Http2WriteTurn(this);
+    }
+
+    /// Gives the write turn back. Only `Http2WriteTurn` calls it.
+    internal void ReturnHttp2WriteTurn()
+    {
+        var held = _state.Enter();
+        _writing = false;
+        held.PulseAll();
+    }
+
+    /// Writes `frames` in the write turn, after anything queued, and then
+    /// whatever was queued meanwhile if the turn is free.
+    private Http2WriteOutcome SendHttp2Frames(Http2Buffer frames, Http2Stream? stream,
+                                              HttpDeadline deadline)
+    {
+        Http2WriteOutcome outcome = Http2WriteOutcome.Expired;
+        {
+            Http2WriteTurn? turn = TakeHttp2WriteTurn(deadline, out outcome);
+            if (turn != null)
+                outcome = WriteHttp2FramesLocked(frames, stream, deadline);
+        }
+        FlushHttp2ControlFrames(deadline);
+        return outcome;
+    }
+
+    /// Writes what is queued, then `frames` unless `stream` has been reset or
+    /// has failed. The caller holds the write turn. Nothing is written once
+    /// the deadline has passed.
+    private Http2WriteOutcome WriteHttp2FramesLocked(Http2Buffer frames, Http2Stream? stream,
+                                                     HttpDeadline deadline)
+    {
+        if (deadline.HasExpired)
+            return Http2WriteOutcome.Expired;
+        var output = new Http2Buffer(64u);
+        bool shutDown = false;
+        bool dropped = false;
+        {
+            var held = _state.Enter();
+            if (_ended)
+                return Http2WriteOutcome.Failed;
+            TakeHttp2ControlLocked(output);
+            shutDown = _shutDownQueued;
+            _shutDownQueued = false;
+            if (stream != null && (stream.IsReset || stream.Error != HttpError.None))
+                dropped = true;
+        }
+        if (!WriteHttp2BytesLocked(output, deadline))
+            return Http2WriteOutcome.Failed;
+        if (!dropped && !WriteHttp2BytesLocked(frames, deadline))
+            return Http2WriteOutcome.Failed;
+        if (shutDown)
+            ShutDownHttp2Transport();
+        return dropped ? Http2WriteOutcome.Dropped : Http2WriteOutcome.Written;
+    }
+
+    /// Writes `bytes` alone, the socket's send timeout set from `deadline`.
+    /// The caller holds the write turn. False when the write failed, which
+    /// MUST end the connection.
+    private bool WriteHttp2BytesLocked(Http2Buffer bytes, HttpDeadline deadline)
+    {
+        if (bytes.Length == 0u)
             return true;
-        if (!WriteAllHttpBytes(_stream, frames.Storage, 0u, frames.Length))
+        _tcp.Underlying.SetSendTimeout(deadline.SocketTimeoutMilliseconds);
+        if (!WriteAllHttpBytes(_stream, bytes.Storage, 0u, bytes.Length))
             return false;
         _stream.Flush();
         return true;
     }
 
-    /// Writes every queued control frame. The caller holds the write lock.
-    private bool WriteQueuedHttp2ControlFrames()
+    /// Writes the queued control frames if the write turn is free. When it
+    /// is not, its holder writes them on its way out. The write is bounded by
+    /// `Http2ControlWriteMilliseconds`, or by `deadline` when that is sooner
+    /// but never below `Http2LateFlushMilliseconds`. False when the
+    /// connection has ended.
+    internal bool FlushHttp2ControlFrames(HttpDeadline? deadline)
     {
-        var output = new Http2Buffer(64u);
-        bool shutDown = false;
+        bool overflowed = false;
         {
             var held = _state.Enter();
             if (_ended)
-            {
-                _control.Clear();
                 return false;
-            }
-            foreach (var frame in _control)
+            overflowed = _controlOverflowed;
+            if (overflowed)
             {
-                if (frame.Length == 0u)
-                    shutDown = true;
-                else
-                    output.WriteArray(frame, 0u, frame.Length);
+                // The flood is not answered; the GOAWAY goes alone.
+                _controlOverflowed = false;
+                ClearHttp2ControlLocked();
             }
-            _control.Clear();
         }
-        bool written = true;
-        if (output.Length > 0u)
+        if (overflowed)
         {
-            written = WriteAllHttpBytes(_stream, output.Storage, 0u, output.Length);
-            if (written)
-                _stream.Flush();
+            return FailHttp2Connection(Http2ErrorCode.EnhanceYourCalm,
+                                       "the server sent control frames faster than it read the answers");
         }
-        if (shutDown)
-            ShutDownHttp2Transport();
-        return written;
-    }
 
-    /// Writes the queued control frames if the write lock is free. When it
-    /// is not, its holder writes them on its way out.
-    internal void FlushHttp2ControlFrames()
-    {
+        long bound = (long)Http2ControlWriteMilliseconds;
+        if (deadline != null && deadline.IsBounded)
+        {
+            long left = deadline.RemainingMilliseconds;
+            if (left < (long)Http2LateFlushMilliseconds)
+                left = (long)Http2LateFlushMilliseconds;
+            if (left < bound)
+                bound = left;
+        }
+        var control = new HttpDeadline(TimeSpan.FromMilliseconds(bound));
         while (true)
         {
             {
                 var held = _state.Enter();
-                if (_control.IsEmpty)
-                    return;
+                if (!HasQueuedHttp2ControlLocked)
+                    return !_ended;
             }
-            if (!TryWriteHttp2Buffer(new Http2Buffer(0u)))
-                return;
+            Http2WriteOutcome outcome = Http2WriteOutcome.Expired;
+            {
+                Http2WriteTurn? turn = TryTakeHttp2WriteTurn();
+                if (turn == null)
+                    return true;
+                outcome = WriteHttp2FramesLocked(new Http2Buffer(0u), null, control);
+            }
+            if (outcome == Http2WriteOutcome.Failed)
+            {
+                FailHttp2Transport(control);
+                return false;
+            }
+            if (outcome == Http2WriteOutcome.Expired)
+                return true;
         }
     }
 
@@ -1531,4 +1835,14 @@ internal bool WaitForHttp2Change(MonitorGuard<int> held, HttpDeadline deadline)
         return false;
     held.WaitFor((ulong)left);
     return true;
+}
+
+/// Holds a multiplexer's write turn, and gives it back when dropped.
+internal sealed class Http2WriteTurn
+{
+    private Http2Multiplexer _owner;
+
+    internal Http2WriteTurn(Http2Multiplexer owner) => _owner = owner;
+
+    ~Http2WriteTurn() { _owner.ReturnHttp2WriteTurn(); }
 }

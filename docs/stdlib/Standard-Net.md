@@ -188,6 +188,7 @@ open first.
 **Fails with**
 
 - [SocketError.NoName](#noname-case) -- the host did not resolve
+- [SocketError.TryAgain](#tryagain-case) -- the resolver could not answer for now
 - [SocketError.Refused](#refused-case) -- nothing is listening there
 - [SocketError.TimedOut](#timedout-case) -- no answer from any address the name resolved to
 - [SocketError.Unreachable](#unreachable-case) -- no route to any of them
@@ -195,7 +196,42 @@ open first.
 
 **See also** &nbsp; [Socket.Connect](#connect-method)
 
-<sub>[stdlib/Net/Socket.sl:81](../../stdlib/Net/Socket.sl#L81)</sub>
+<sub>[stdlib/Net/Socket.sl:82](../../stdlib/Net/Socket.sl#L82)</sub>
+
+#### OpenConnected *method*
+
+```
+static Result<Socket, SocketError> OpenConnected(String host, ushort port, AddressFamily family, SocketType kind, int timeoutMilliseconds)
+```
+
+A socket already connected to a host and port, within a time limit.
+
+Every address the name resolved to is tried in turn until one
+connects, and all of them together get `timeoutMilliseconds`. Each
+attempt is given an equal share of what is left, so an address that
+never answers cannot spend the time the next one needed. The socket
+that comes back blocks.
+
+Resolving the name is not bounded: the platform's resolver cannot be.
+
+**Parameters**
+
+- `host` -- the name or address to reach
+- `port` -- the port to reach it on
+- `family` -- which family to resolve the name in
+- `kind` -- stream or datagram
+- `timeoutMilliseconds` -- the limit for every attempt together; negative is none
+
+**Fails with**
+
+- [SocketError.NoName](#noname-case) -- the host did not resolve
+- [SocketError.TryAgain](#tryagain-case) -- the resolver could not answer for now
+- [SocketError.Refused](#refused-case) -- nothing is listening there
+- [SocketError.TimedOut](#timedout-case) -- the time ran out, or no answer from any address
+- [SocketError.Unreachable](#unreachable-case) -- no route to any of them
+- [SocketError.Unknown](#unknown-case) -- the last address failed for a reason with no case of its own
+
+<sub>[stdlib/Net/Socket.sl:112](../../stdlib/Net/Socket.sl#L112)</sub>
 
 #### IsOpen *property*
 
@@ -207,7 +243,7 @@ Whether the handle is still live. False before a failed open and after
 `Close`; it says nothing about whether the peer is still there, which
 only a read can find out.
 
-<sub>[stdlib/Net/Socket.sl:146](../../stdlib/Net/Socket.sl#L146)</sub>
+<sub>[stdlib/Net/Socket.sl:179](../../stdlib/Net/Socket.sl#L179)</sub>
 
 #### Error *property*
 
@@ -218,7 +254,11 @@ SocketError Error { get; }
 The last error, or `None`. Set by every call that failed, and cleared
 by the next one that did not.
 
-<sub>[stdlib/Net/Socket.sl:150](../../stdlib/Net/Socket.sl#L150)</sub>
+It is the last call's on any thread. A socket used from two threads
+at once, one sending while the other receives, MUST take each call's
+error from the `Send` and `Receive` forms that hand it back.
+
+<sub>[stdlib/Net/Socket.sl:187](../../stdlib/Net/Socket.sl#L187)</sub>
 
 #### Family *property*
 
@@ -228,7 +268,7 @@ AddressFamily Family { get; }
 
 Which family the socket was opened for. Fixed at open.
 
-<sub>[stdlib/Net/Socket.sl:153](../../stdlib/Net/Socket.sl#L153)</sub>
+<sub>[stdlib/Net/Socket.sl:190](../../stdlib/Net/Socket.sl#L190)</sub>
 
 #### Kind *property*
 
@@ -238,7 +278,7 @@ SocketType Kind { get; }
 
 Stream or datagram. Fixed at open.
 
-<sub>[stdlib/Net/Socket.sl:156](../../stdlib/Net/Socket.sl#L156)</sub>
+<sub>[stdlib/Net/Socket.sl:193](../../stdlib/Net/Socket.sl#L193)</sub>
 
 #### Handle *property*
 
@@ -249,7 +289,7 @@ nuint Handle { get; }
 The handle itself, for a platform call this wrapper does not make.
 A `SOCKET` on Windows and a file descriptor on everything else.
 
-<sub>[stdlib/Net/Socket.sl:160](../../stdlib/Net/Socket.sl#L160)</sub>
+<sub>[stdlib/Net/Socket.sl:197](../../stdlib/Net/Socket.sl#L197)</sub>
 
 #### Close *method*
 
@@ -264,7 +304,7 @@ Closing a stream socket without `Shutdown` first leaves what the peer
 sees up to the platform and to what is still unread; `TcpClient.Close`
 shuts both directions down first, which is what ends one politely.
 
-<sub>[stdlib/Net/Socket.sl:168](../../stdlib/Net/Socket.sl#L168)</sub>
+<sub>[stdlib/Net/Socket.sl:205](../../stdlib/Net/Socket.sl#L205)</sub>
 
 #### Bind *method*
 
@@ -285,7 +325,7 @@ which `LocalEndPoint` will then say.
 
 **See also** &nbsp; [Socket.Listen](#listen-method)
 
-<sub>[stdlib/Net/Socket.sl:190](../../stdlib/Net/Socket.sl#L190)</sub>
+<sub>[stdlib/Net/Socket.sl:227](../../stdlib/Net/Socket.sl#L227)</sub>
 
 #### BindAny *method*
 
@@ -305,7 +345,7 @@ and what an empty host means to the resolver.
 
 **See also** &nbsp; [Socket.Bind](#bind-method)
 
-<sub>[stdlib/Net/Socket.sl:209](../../stdlib/Net/Socket.sl#L209)</sub>
+<sub>[stdlib/Net/Socket.sl:246](../../stdlib/Net/Socket.sl#L246)</sub>
 
 #### Listen *method*
 
@@ -327,7 +367,7 @@ Bind first -- listening on a socket that was never bound fails.
 
 **See also** &nbsp; [Socket.Bind](#bind-method) &middot; [Socket.Accept](#accept-method)
 
-<sub>[stdlib/Net/Socket.sl:226](../../stdlib/Net/Socket.sl#L226)</sub>
+<sub>[stdlib/Net/Socket.sl:263](../../stdlib/Net/Socket.sl#L263)</sub>
 
 #### Accept *method*
 
@@ -338,7 +378,10 @@ Socket Accept()
 Waits for a connection. The socket that comes back is open, or is not
 and says why.
 
-<sub>[stdlib/Net/Socket.sl:238](../../stdlib/Net/Socket.sl#L238)</sub>
+The accepted socket blocks, whether or not this one does, and no child
+process inherits it.
+
+<sub>[stdlib/Net/Socket.sl:278](../../stdlib/Net/Socket.sl#L278)</sub>
 
 #### Connect *method*
 
@@ -365,7 +408,7 @@ them all, and the one a client should reach for.
 
 **See also** &nbsp; [Socket.OpenConnected](#openconnected-method)
 
-<sub>[stdlib/Net/Socket.sl:271](../../stdlib/Net/Socket.sl#L271)</sub>
+<sub>[stdlib/Net/Socket.sl:311](../../stdlib/Net/Socket.sl#L311)</sub>
 
 #### LocalEndPoint *property*
 
@@ -375,7 +418,7 @@ EndPoint LocalEndPoint { get; }
 
 This end of the connection.
 
-<sub>[stdlib/Net/Socket.sl:282](../../stdlib/Net/Socket.sl#L282)</sub>
+<sub>[stdlib/Net/Socket.sl:322](../../stdlib/Net/Socket.sl#L322)</sub>
 
 #### RemoteEndPoint *property*
 
@@ -385,7 +428,7 @@ EndPoint RemoteEndPoint { get; }
 
 The other end.
 
-<sub>[stdlib/Net/Socket.sl:285](../../stdlib/Net/Socket.sl#L285)</sub>
+<sub>[stdlib/Net/Socket.sl:325](../../stdlib/Net/Socket.sl#L325)</sub>
 
 #### Send *method*
 
@@ -407,7 +450,28 @@ in its buffer. A loop over what is left is the caller's job, or
 
 **See also** &nbsp; [Socket.SendAll](#sendall-method) &middot; [Socket.Receive](#receive-method)
 
-<sub>[stdlib/Net/Socket.sl:300](../../stdlib/Net/Socket.sl#L300)</sub>
+<sub>[stdlib/Net/Socket.sl:340](../../stdlib/Net/Socket.sl#L340)</sub>
+
+#### Send *method*
+
+```
+nuint Send(byte[] buffer, nuint offset, nuint count, out SocketError error)
+```
+
+Sends up to `count` bytes, and hands back this call's own error beside
+the count.
+
+`Error` is the last error of any call on the socket, so a thread
+sending while another receives MUST read this one instead.
+
+**Parameters**
+
+- `buffer` -- where the bytes come from
+- `offset` -- where in it to start
+- `count` -- how many to send from there
+- `error` -- this call's error, or `None`
+
+<sub>[stdlib/Net/Socket.sl:355](../../stdlib/Net/Socket.sl#L355)</sub>
 
 #### SendAll *method*
 
@@ -428,7 +492,7 @@ Sends all of it, or says why it could not.
 
 **See also** &nbsp; [Socket.Send](#send-method)
 
-<sub>[stdlib/Net/Socket.sl:333](../../stdlib/Net/Socket.sl#L333)</sub>
+<sub>[stdlib/Net/Socket.sl:389](../../stdlib/Net/Socket.sl#L389)</sub>
 
 #### SendText *method*
 
@@ -450,7 +514,7 @@ so nothing is converted or copied on the way.
 
 **See also** &nbsp; [Socket.SendAll](#sendall-method)
 
-<sub>[stdlib/Net/Socket.sl:359](../../stdlib/Net/Socket.sl#L359)</sub>
+<sub>[stdlib/Net/Socket.sl:415](../../stdlib/Net/Socket.sl#L415)</sub>
 
 #### Receive *method*
 
@@ -470,7 +534,30 @@ peer having finished, which is an ending rather than an error -- ask
 
 **See also** &nbsp; [Socket.Send](#send-method)
 
-<sub>[stdlib/Net/Socket.sl:388](../../stdlib/Net/Socket.sl#L388)</sub>
+<sub>[stdlib/Net/Socket.sl:444](../../stdlib/Net/Socket.sl#L444)</sub>
+
+#### Receive *method*
+
+```
+nuint Receive(byte[] buffer, nuint offset, nuint count, out SocketError error)
+```
+
+Reads up to `count` bytes, and hands back this call's own error beside
+the count. Zero with `None` is the peer having finished.
+
+`Error` is the last error of any call on the socket, so a thread
+receiving while another sends MUST read this one instead: a send that
+succeeded in between clears `Error`, and a read that failed would look
+like an ending.
+
+**Parameters**
+
+- `buffer` -- where the bytes go
+- `offset` -- where in it to start writing them
+- `count` -- how many to make room for
+- `error` -- this call's error, or `None`
+
+<sub>[stdlib/Net/Socket.sl:461](../../stdlib/Net/Socket.sl#L461)</sub>
 
 #### SendTo *method*
 
@@ -482,7 +569,7 @@ Sends one datagram. It arrives whole or not at all.
 
 **See also** &nbsp; [Socket.ReceiveFrom](#receivefrom-method)
 
-<sub>[stdlib/Net/Socket.sl:414](../../stdlib/Net/Socket.sl#L414)</sub>
+<sub>[stdlib/Net/Socket.sl:488](../../stdlib/Net/Socket.sl#L488)</sub>
 
 #### ReceiveFrom *method*
 
@@ -505,7 +592,7 @@ When the read fails, `from` is an empty host and port 0.
 
 **See also** &nbsp; [Socket.SendTo](#sendto-method)
 
-<sub>[stdlib/Net/Socket.sl:441](../../stdlib/Net/Socket.sl#L441)</sub>
+<sub>[stdlib/Net/Socket.sl:515](../../stdlib/Net/Socket.sl#L515)</sub>
 
 #### SetBlocking *method*
 
@@ -521,7 +608,7 @@ Whether a call waits. A socket that does not block answers
 - [SocketError.Closed](#closed-case) -- the socket was closed before the call
 - [SocketError.Unknown](#unknown-case) -- the platform refused the change
 
-<sub>[stdlib/Net/Socket.sl:470](../../stdlib/Net/Socket.sl#L470)</sub>
+<sub>[stdlib/Net/Socket.sl:544](../../stdlib/Net/Socket.sl#L544)</sub>
 
 #### SetNoDelay *method*
 
@@ -537,7 +624,7 @@ waiting to be joined by the next one.
 - [SocketError.Closed](#closed-case) -- the socket was closed before the call
 - [SocketError.Unknown](#unknown-case) -- the platform refused the option -- a datagram socket has no Nagle to turn off
 
-<sub>[stdlib/Net/Socket.sl:481](../../stdlib/Net/Socket.sl#L481)</sub>
+<sub>[stdlib/Net/Socket.sl:555](../../stdlib/Net/Socket.sl#L555)</sub>
 
 #### SetReuseAddress *method*
 
@@ -558,7 +645,7 @@ TIME_WAIT case without being asked.
 - [SocketError.Closed](#closed-case) -- the socket was closed before the call
 - [SocketError.Unknown](#unknown-case) -- the platform refused the option
 
-<sub>[stdlib/Net/Socket.sl:496](../../stdlib/Net/Socket.sl#L496)</sub>
+<sub>[stdlib/Net/Socket.sl:570](../../stdlib/Net/Socket.sl#L570)</sub>
 
 #### SetBroadcast *method*
 
@@ -574,7 +661,7 @@ and meaningless on a stream socket.
 - [SocketError.Closed](#closed-case) -- the socket was closed before the call
 - [SocketError.Unknown](#unknown-case) -- the platform refused the option, which is what a stream socket does with it
 
-<sub>[stdlib/Net/Socket.sl:507](../../stdlib/Net/Socket.sl#L507)</sub>
+<sub>[stdlib/Net/Socket.sl:581](../../stdlib/Net/Socket.sl#L581)</sub>
 
 #### SetKeepAlive *method*
 
@@ -592,7 +679,7 @@ than a slow one.
 - [SocketError.Closed](#closed-case) -- the socket was closed before the call
 - [SocketError.Unknown](#unknown-case) -- the platform refused the option
 
-<sub>[stdlib/Net/Socket.sl:519](../../stdlib/Net/Socket.sl#L519)</sub>
+<sub>[stdlib/Net/Socket.sl:593](../../stdlib/Net/Socket.sl#L593)</sub>
 
 #### SetReceiveTimeout *method*
 
@@ -609,7 +696,7 @@ How long a read waits before giving up. Zero is forever.
 
 **See also** &nbsp; [Socket.SetSendTimeout](#setsendtimeout-method)
 
-<sub>[stdlib/Net/Socket.sl:529](../../stdlib/Net/Socket.sl#L529)</sub>
+<sub>[stdlib/Net/Socket.sl:603](../../stdlib/Net/Socket.sl#L603)</sub>
 
 #### SetSendTimeout *method*
 
@@ -626,7 +713,7 @@ How long a send waits before giving up. Zero is forever.
 
 **See also** &nbsp; [Socket.SetReceiveTimeout](#setreceivetimeout-method)
 
-<sub>[stdlib/Net/Socket.sl:539](../../stdlib/Net/Socket.sl#L539)</sub>
+<sub>[stdlib/Net/Socket.sl:613](../../stdlib/Net/Socket.sl#L613)</sub>
 
 #### Shutdown *method*
 
@@ -645,7 +732,7 @@ than a reset, which is the difference between this and closing.
 
 **See also** &nbsp; [Socket.Close](#close-method)
 
-<sub>[stdlib/Net/Socket.sl:552](../../stdlib/Net/Socket.sl#L552)</sub>
+<sub>[stdlib/Net/Socket.sl:626](../../stdlib/Net/Socket.sl#L626)</sub>
 
 #### WaitToRead *method*
 
@@ -656,7 +743,7 @@ bool WaitToRead(int milliseconds)
 Waits until there is something to read, the time runs out, or it fails.
 A negative wait is forever.
 
-<sub>[stdlib/Net/Socket.sl:566](../../stdlib/Net/Socket.sl#L566)</sub>
+<sub>[stdlib/Net/Socket.sl:640](../../stdlib/Net/Socket.sl#L640)</sub>
 
 #### WaitToWrite *method*
 
@@ -668,7 +755,7 @@ Waits until there is room to write. On a socket that is connecting
 without blocking, this is also how the connection finishing is seen:
 a connect that failed answers false, and `Error` says why.
 
-<sub>[stdlib/Net/Socket.sl:571](../../stdlib/Net/Socket.sl#L571)</sub>
+<sub>[stdlib/Net/Socket.sl:645](../../stdlib/Net/Socket.sl#L645)</sub>
 
 ### SocketError *enum*
 
@@ -827,6 +914,17 @@ The platform said something this enum has no name for.
 
 <sub>[stdlib/Net/SocketError.sl:76](../../stdlib/Net/SocketError.sl#L76)</sub>
 
+#### TryAgain *case*
+
+```
+TryAgain = 14
+```
+
+The resolver could not answer for now: a DNS server that timed out or
+failed temporarily. Unlike `NoName`, retrying MAY work.
+
+<sub>[stdlib/Net/SocketError.sl:80](../../stdlib/Net/SocketError.sl#L80)</sub>
+
 ### SocketShutdown *enum*
 
 ```
@@ -967,6 +1065,38 @@ here, and the system's own is measured in tens of seconds.
 
 <sub>[stdlib/Net/TcpClient.sl:80](../../stdlib/Net/TcpClient.sl#L80)</sub>
 
+#### Connect *method*
+
+```
+static Result<TcpClient, SocketError> Connect(String host, ushort port, AddressFamily family, int timeoutMilliseconds)
+```
+
+Connects within a time limit.
+
+Every address the name resolved to is tried until one connects, and
+all the attempts together get `timeoutMilliseconds`. Resolving the name
+is not bounded.
+
+**Parameters**
+
+- `host` -- the name or address to reach
+- `port` -- the port to reach it on
+- `family` -- which family to resolve the name in
+- `timeoutMilliseconds` -- the limit for every attempt together; negative is none
+
+**Fails with**
+
+- [SocketError.NoName](#noname-case) -- the host did not resolve in that family
+- [SocketError.TryAgain](#tryagain-case) -- the resolver could not answer for now
+- [SocketError.Refused](#refused-case) -- nothing is listening there
+- [SocketError.TimedOut](#timedout-case) -- the time ran out, or no answer from any address
+- [SocketError.Unreachable](#unreachable-case) -- no route to any of them
+- [SocketError.Unknown](#unknown-case) -- the last address failed for a reason with no case of its own
+
+**See also** &nbsp; [Socket.OpenConnected](#openconnected-method)
+
+<sub>[stdlib/Net/TcpClient.sl:107](../../stdlib/Net/TcpClient.sl#L107)</sub>
+
 #### IsConnected *property*
 
 ```
@@ -976,7 +1106,7 @@ bool IsConnected { get; }
 Whether the connection is there. False after the peer finished, after
 `Close`, and if connecting never worked.
 
-<sub>[stdlib/Net/TcpClient.sl:100](../../stdlib/Net/TcpClient.sl#L100)</sub>
+<sub>[stdlib/Net/TcpClient.sl:128](../../stdlib/Net/TcpClient.sl#L128)</sub>
 
 #### SocketErrorCode *property*
 
@@ -986,7 +1116,7 @@ SocketError SocketErrorCode { get; }
 
 The exact reason, which `Error` rounds off to fit an `IStream`.
 
-<sub>[stdlib/Net/TcpClient.sl:109](../../stdlib/Net/TcpClient.sl#L109)</sub>
+<sub>[stdlib/Net/TcpClient.sl:137](../../stdlib/Net/TcpClient.sl#L137)</sub>
 
 #### LocalEndPoint *property*
 
@@ -997,7 +1127,7 @@ EndPoint LocalEndPoint { get; }
 This end of the connection -- the address and the port the system
 chose for it.
 
-<sub>[stdlib/Net/TcpClient.sl:113](../../stdlib/Net/TcpClient.sl#L113)</sub>
+<sub>[stdlib/Net/TcpClient.sl:141](../../stdlib/Net/TcpClient.sl#L141)</sub>
 
 #### RemoteEndPoint *property*
 
@@ -1008,7 +1138,7 @@ EndPoint RemoteEndPoint { get; }
 The other end: who is connected. What an accepted connection is asked
 to find out where it came from.
 
-<sub>[stdlib/Net/TcpClient.sl:117](../../stdlib/Net/TcpClient.sl#L117)</sub>
+<sub>[stdlib/Net/TcpClient.sl:145](../../stdlib/Net/TcpClient.sl#L145)</sub>
 
 #### Underlying *property*
 
@@ -1019,7 +1149,7 @@ Socket Underlying { get; }
 The socket underneath, for an option this does not expose. Closing it
 closes the connection.
 
-<sub>[stdlib/Net/TcpClient.sl:121](../../stdlib/Net/TcpClient.sl#L121)</sub>
+<sub>[stdlib/Net/TcpClient.sl:149](../../stdlib/Net/TcpClient.sl#L149)</sub>
 
 #### SendText *method*
 
@@ -1039,7 +1169,7 @@ Sends all of `text`, looping until it has gone.
 
 **See also** &nbsp; [TcpClient.SendAll](#sendall-method)
 
-<sub>[stdlib/Net/TcpClient.sl:134](../../stdlib/Net/TcpClient.sl#L134)</sub>
+<sub>[stdlib/Net/TcpClient.sl:162](../../stdlib/Net/TcpClient.sl#L162)</sub>
 
 #### SendAll *method*
 
@@ -1059,7 +1189,7 @@ Sends all of `data`.
 
 **See also** &nbsp; [TcpClient.SendText](#sendtext-method)
 
-<sub>[stdlib/Net/TcpClient.sl:147](../../stdlib/Net/TcpClient.sl#L147)</sub>
+<sub>[stdlib/Net/TcpClient.sl:175](../../stdlib/Net/TcpClient.sl#L175)</sub>
 
 #### ReceiveAll *method*
 
@@ -1073,7 +1203,34 @@ For a protocol that ends by closing -- HTTP/1.0, or anything behind
 `shutdown` -- this is the whole body. For one that does not, it never
 returns, which is the caller's to know.
 
-<sub>[stdlib/Net/TcpClient.sl:154](../../stdlib/Net/TcpClient.sl#L154)</sub>
+**A failure ends the read too**, and what arrived before it comes back
+looking complete. The caller MUST check `SocketErrorCode` afterwards,
+or use `ReceiveToEnd`, which says.
+
+**See also** &nbsp; [TcpClient.ReceiveToEnd](#receivetoend-method)
+
+<sub>[stdlib/Net/TcpClient.sl:188](../../stdlib/Net/TcpClient.sl#L188)</sub>
+
+#### ReceiveToEnd *method*
+
+```
+Result<byte[], SocketError> ReceiveToEnd()
+```
+
+Reads until the peer finishes, and gives back what arrived, or the
+error that stopped the read before the peer finished.
+
+**Fails with**
+
+- [SocketError.Reset](#reset-case) -- the peer went away without finishing
+- [SocketError.TimedOut](#timedout-case) -- a receive timeout ran out
+- [SocketError.Closed](#closed-case) -- the connection was closed
+- [SocketError.NotConnected](#notconnected-case) -- the connection was never made
+- [SocketError.Unknown](#unknown-case) -- the platform reported something with no case of its own
+
+**See also** &nbsp; [TcpClient.ReceiveAll](#receiveall-method)
+
+<sub>[stdlib/Net/TcpClient.sl:205](../../stdlib/Net/TcpClient.sl#L205)</sub>
 
 #### ReceiveText *method*
 
@@ -1081,10 +1238,14 @@ returns, which is the caller's to know.
 String ReceiveText()
 ```
 
-The same, read as UTF-8. Anything malformed becomes U+FFFD, because the
-result is a `String` and a `String` is valid UTF-8 by invariant.
+The same as `ReceiveAll`, read as UTF-8. Anything malformed becomes
+U+FFFD, because the result is a `String` and a `String` is valid UTF-8
+by invariant.
 
-<sub>[stdlib/Net/TcpClient.sl:176](../../stdlib/Net/TcpClient.sl#L176)</sub>
+A failure ends the read as it does `ReceiveAll`'s, so the caller MUST
+check `SocketErrorCode` afterwards.
+
+<sub>[stdlib/Net/TcpClient.sl:220](../../stdlib/Net/TcpClient.sl#L220)</sub>
 
 #### WaitToRead *method*
 
@@ -1096,7 +1257,7 @@ Waits up to `milliseconds` for something to read, answering whether
 there is. A peer that closed counts as readable -- the read that
 follows returns zero, which is how the ending is seen.
 
-<sub>[stdlib/Net/TcpClient.sl:187](../../stdlib/Net/TcpClient.sl#L187)</sub>
+<sub>[stdlib/Net/TcpClient.sl:231](../../stdlib/Net/TcpClient.sl#L231)</sub>
 
 #### WaitToWrite *method*
 
@@ -1107,7 +1268,7 @@ bool WaitToWrite(int milliseconds)
 Waits up to `milliseconds` for room to write, answering whether there
 is. Only interesting once a send has filled the kernel's buffer.
 
-<sub>[stdlib/Net/TcpClient.sl:191](../../stdlib/Net/TcpClient.sl#L191)</sub>
+<sub>[stdlib/Net/TcpClient.sl:235](../../stdlib/Net/TcpClient.sl#L235)</sub>
 
 #### CanRead *property*
 
@@ -1117,7 +1278,7 @@ bool CanRead { get; }
 
 True while the connection is open and the peer has not finished.
 
-<sub>[stdlib/Net/TcpClient.sl:196](../../stdlib/Net/TcpClient.sl#L196)</sub>
+<sub>[stdlib/Net/TcpClient.sl:240](../../stdlib/Net/TcpClient.sl#L240)</sub>
 
 #### CanWrite *property*
 
@@ -1128,7 +1289,7 @@ bool CanWrite { get; }
 True while the connection is open. A peer that finished sending can
 still be written to, until it closes for real.
 
-<sub>[stdlib/Net/TcpClient.sl:200](../../stdlib/Net/TcpClient.sl#L200)</sub>
+<sub>[stdlib/Net/TcpClient.sl:244](../../stdlib/Net/TcpClient.sl#L244)</sub>
 
 #### CanSeek *property*
 
@@ -1138,7 +1299,7 @@ bool CanSeek { get; }
 
 A connection has no position to move to.
 
-<sub>[stdlib/Net/TcpClient.sl:203](../../stdlib/Net/TcpClient.sl#L203)</sub>
+<sub>[stdlib/Net/TcpClient.sl:247](../../stdlib/Net/TcpClient.sl#L247)</sub>
 
 #### Read *method*
 
@@ -1153,7 +1314,7 @@ Fewer than asked for is normal and not an error: a stream delivers what
 has arrived. Zero means the peer finished, and `Error` distinguishes
 that from a failure.
 
-<sub>[stdlib/Net/TcpClient.sl:211](../../stdlib/Net/TcpClient.sl#L211)</sub>
+<sub>[stdlib/Net/TcpClient.sl:255](../../stdlib/Net/TcpClient.sl#L255)</sub>
 
 #### Write *method*
 
@@ -1164,7 +1325,7 @@ nuint Write(byte[] buffer, nuint offset, nuint count)
 Writes up to `count` bytes from `buffer` at `offset`, answering how
 many went. A short write is normal; `SendAll` is the one that loops.
 
-<sub>[stdlib/Net/TcpClient.sl:224](../../stdlib/Net/TcpClient.sl#L224)</sub>
+<sub>[stdlib/Net/TcpClient.sl:268](../../stdlib/Net/TcpClient.sl#L268)</sub>
 
 #### Position *property*
 
@@ -1174,7 +1335,7 @@ long Position { get; }
 
 Not a position, and not pretended to be one.
 
-<sub>[stdlib/Net/TcpClient.sl:230](../../stdlib/Net/TcpClient.sl#L230)</sub>
+<sub>[stdlib/Net/TcpClient.sl:274](../../stdlib/Net/TcpClient.sl#L274)</sub>
 
 #### Length *property*
 
@@ -1184,7 +1345,7 @@ long Length { get; }
 
 Not a length either. A connection does not know how much is coming.
 
-<sub>[stdlib/Net/TcpClient.sl:232](../../stdlib/Net/TcpClient.sl#L232)</sub>
+<sub>[stdlib/Net/TcpClient.sl:276](../../stdlib/Net/TcpClient.sl#L276)</sub>
 
 #### Seek *method*
 
@@ -1194,7 +1355,7 @@ bool Seek(long offset, SeekOrigin origin)
 
 Always false. There is nowhere to seek to on a connection.
 
-<sub>[stdlib/Net/TcpClient.sl:235](../../stdlib/Net/TcpClient.sl#L235)</sub>
+<sub>[stdlib/Net/TcpClient.sl:279](../../stdlib/Net/TcpClient.sl#L279)</sub>
 
 #### Flush *method*
 
@@ -1204,7 +1365,7 @@ void Flush()
 
 Nothing is buffered here; the kernel decides when bytes leave.
 
-<sub>[stdlib/Net/TcpClient.sl:238](../../stdlib/Net/TcpClient.sl#L238)</sub>
+<sub>[stdlib/Net/TcpClient.sl:282](../../stdlib/Net/TcpClient.sl#L282)</sub>
 
 #### Close *method*
 
@@ -1216,7 +1377,7 @@ Ends the connection politely: shuts both directions down first, so the
 peer sees an ending rather than a reset, then closes. Idempotent, and
 the destructor calls it.
 
-<sub>[stdlib/Net/TcpClient.sl:243](../../stdlib/Net/TcpClient.sl#L243)</sub>
+<sub>[stdlib/Net/TcpClient.sl:287](../../stdlib/Net/TcpClient.sl#L287)</sub>
 
 #### Error *property*
 
@@ -1227,7 +1388,7 @@ IOError Error { get; }
 The socket error as the nearest `IOError`, so that a reader which knows
 nothing about sockets still gets something it can act on.
 
-<sub>[stdlib/Net/TcpClient.sl:253](../../stdlib/Net/TcpClient.sl#L253)</sub>
+<sub>[stdlib/Net/TcpClient.sl:297](../../stdlib/Net/TcpClient.sl#L297)</sub>
 
 ### TcpListener *class*
 
@@ -1637,7 +1798,7 @@ What went wrong, in words.
 
 **See also** &nbsp; [SocketError](#socketerror-enum)
 
-<sub>[stdlib/Net/Net.sl:87](../../stdlib/Net/Net.sl#L87)</sub>
+<sub>[stdlib/Net/Net.sl:89](../../stdlib/Net/Net.sl#L89)</sub>
 
 ### ResolveHost *function*
 
@@ -1654,9 +1815,10 @@ runtime, where it can try each socket as well as each address.
 **Fails with**
 
 - [SocketError.NoName](#noname-case) -- the name did not resolve, or resolved to an address the platform would not write out
+- [SocketError.TryAgain](#tryagain-case) -- the resolver could not answer for now
 - [SocketError.Unknown](#unknown-case) -- the platform's networking could not be started
 
-<sub>[stdlib/Net/Net.sl:124](../../stdlib/Net/Net.sl#L124)</sub>
+<sub>[stdlib/Net/Net.sl:128](../../stdlib/Net/Net.sl#L128)</sub>
 
 ### ResolveHost *function*
 
@@ -1678,7 +1840,8 @@ an IPv6 address cannot be connected to from an IPv4 socket.
 **Fails with**
 
 - [SocketError.NoName](#noname-case) -- the name did not resolve in that family, or resolved to an address the platform would not write out
+- [SocketError.TryAgain](#tryagain-case) -- the resolver could not answer for now
 - [SocketError.Unknown](#unknown-case) -- the platform's networking could not be started
 
-<sub>[stdlib/Net/Net.sl:141](../../stdlib/Net/Net.sl#L141)</sub>
+<sub>[stdlib/Net/Net.sl:146](../../stdlib/Net/Net.sl#L146)</sub>
 

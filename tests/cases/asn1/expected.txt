@@ -190,3 +190,5 @@ label empty ok
 label double space ok
 label leading hyphen ok
 label trailing space ok
+pem many unclosed boundaries ok
+pem many blocks ok

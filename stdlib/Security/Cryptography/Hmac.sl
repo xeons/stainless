@@ -59,6 +59,7 @@ public sealed class Hmac : IHashAlgorithm
             hash.AppendData(key);
             byte[] digest = hash.GetHashAndReset();
             digest[:].CopyTo(shortened);
+            CryptographicOperations.ZeroMemory(digest);
         }
         else
         {
@@ -77,6 +78,12 @@ public sealed class Hmac : IHashAlgorithm
         Reset();
     }
 
+    ~Hmac()
+    {
+        CryptographicOperations.ZeroMemory(_innerPad);
+        CryptographicOperations.ZeroMemory(_outerPad);
+    }
+
     public String Name => _name;
 
     public nuint HashSizeInBytes => _inner.HashSizeInBytes;
@@ -90,6 +97,7 @@ public sealed class Hmac : IHashAlgorithm
         byte[] first = _inner.GetHashAndReset();
         _inner.AppendData(_outerPad);
         _inner.AppendData(first);
+        CryptographicOperations.ZeroMemory(first);
         byte[] mac = _inner.GetHashAndReset();
         Reset();
         return mac;

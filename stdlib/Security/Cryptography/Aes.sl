@@ -28,8 +28,8 @@ import Standard.Bits;
 ///
 /// ```csharp
 /// var cipher = try Aes.FromKey(key);          // 16, 24 or 32 bytes
-/// var sealed = try cipher.EncryptCbc(plaintext, iv, PaddingMode.Pkcs7);
-/// var opened = try cipher.DecryptCbc(sealed, iv, PaddingMode.Pkcs7);
+/// var encrypted = try cipher.EncryptCbc(plaintext, iv, PaddingMode.Pkcs7);
+/// var opened = try cipher.DecryptCbc(encrypted, iv, PaddingMode.Pkcs7);
 /// ```
 ///
 /// **None of these modes authenticates anything.** A ciphertext an attacker
@@ -45,7 +45,9 @@ import Standard.Bits;
 /// rather than a table. Nothing is indexed by, and nothing branches on, the
 /// key or the data. ECB, CTR and the decrypting half of CBC and CFB run four
 /// blocks in each pass. CBC and CFB encryption chain each block into the next,
-/// so they run one block per pass at the cost of four.
+/// so they run one block per pass at the cost of four. Removing padding is
+/// constant time as well: the whole last block is examined and there is one
+/// verdict.
 ///
 /// The one-shot methods are .NET 6's `EncryptCbc` and friends rather than its
 /// older `CreateEncryptor`/`ICryptoTransform` pair. A transform object exists
@@ -81,6 +83,8 @@ public sealed class Aes
 
         _schedule = ExpandKey(key, _rounds);
     }
+
+    ~Aes() => CryptographicOperations.ZeroMemory(_schedule);
 
     /// A cipher under `key`, which must be 16, 24 or 32 bytes -- AES-128,
     /// AES-192 or AES-256.
@@ -306,10 +310,10 @@ public sealed class Aes
     /// The same, stepping only the bytes from `from` onward.
     ///
     /// GCM increments the last four bytes and leaves the nonce in the first
-    /// twelve alone, so a message long enough to carry past 2^32 blocks wraps
-    /// within the counter rather than walking into the nonce. That is the one
-    /// difference between GCM's CTR and SP 800-38A's, and it is why this is a
-    /// parameter rather than two loops.
+    /// twelve alone. That is the one difference between GCM's CTR and
+    /// SP 800-38A's, and it is why this is a parameter rather than two loops.
+    /// The caller MUST keep the message short enough that the counter does
+    /// not wrap, which `AesGcm.MaxTextSize` does.
     Result<byte[], CryptoError> ApplyCounter(ReadOnlySpan<byte> data, ReadOnlySpan<byte> counter, nuint from)
     {
         if (counter.Length != BlockSize)
@@ -409,34 +413,43 @@ public sealed class Aes
         return Fail(CryptoError.Parameter);
     }
 
+    /// `data` without its padding. The length MUST be a whole, non-zero number
+    /// of blocks.
+    ///
+    /// Constant time: every byte of the last block is examined under a mask and
+    /// there is one verdict, so the time does not say which byte was wrong.
+    /// Only the length of good padding shows, in the length of the answer.
     Result<byte[], CryptoError> RemovePadding(byte[] data, PaddingMode padding)
     {
         if (padding == PaddingMode.None || padding == PaddingMode.Zeros)
             return Ok(data);
 
-        nuint added = (nuint)data[data.Length - 1u];
-        if (added == 0u || added > BlockSize || added > data.Length)
+        bool pkcs7 = padding == PaddingMode.Pkcs7;
+        uint added = (uint)data[data.Length - 1u];
+        uint good = MaskIfAtMost(1u, added) & MaskIfAtMost(added, (uint)BlockSize);
+
+        for (uint distance = 1u; distance <= (uint)BlockSize; distance++)
+        {
+            // ANSI X9.23's last byte is the count and nothing else.
+            if (!pkcs7 && distance == 1u)
+                continue;
+
+            uint octet = (uint)data[data.Length - (nuint)distance];
+            uint expected = pkcs7 ? added : 0u;
+            uint inside = MaskIfAtMost(distance, added);
+            uint equal = MaskIfAtMost(octet, expected) & MaskIfAtMost(expected, octet);
+            good &= ~inside | equal;
+        }
+
+        if (OpaqueCopy(good) != 0xFFFFFFFFu)
             return Fail(CryptoError.Padding);
 
-        if (padding == PaddingMode.Pkcs7)
-        {
-            for (nuint i = data.Length - added; i < data.Length; i++)
-            {
-                if ((nuint)data[i] != added)
-                    return Fail(CryptoError.Padding);
-            }
-        }
-        else
-        {
-            for (nuint i = data.Length - added; i < data.Length - 1u; i++)
-            {
-                if (data[i] != 0)
-                    return Fail(CryptoError.Padding);
-            }
-        }
-
-        return Ok(data[:data.Length - added].ToArray());
+        return Ok(data[:data.Length - (nuint)added].ToArray());
     }
+
+    /// All ones when `left` is at most `right`, and zero otherwise. Both MUST
+    /// be below 2^31.
+    static uint MaskIfAtMost(uint left, uint right) => OpaqueCopy(((right - left) >> 31) - 1u);
 
     // ------------------------------------------------------------ the cipher
     //
@@ -958,6 +971,8 @@ public sealed class Aes
                 expanded[round * 8u + i] = q[i];
         }
 
+        sl_zero_memory((byte*)&schedule[0u], 60u * 4u);
+        sl_zero_memory((byte*)&q[0u], 8u * 8u);
         return expanded;
     }
 

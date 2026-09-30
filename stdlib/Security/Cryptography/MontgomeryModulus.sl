@@ -88,6 +88,16 @@ class MontgomeryModulus
     /// A number of `LimbCount` limbs, zero.
     ulong[] CreateNumber() => new ulong[_count];
 
+    /// The modulus and everything derived from it overwritten, for a secret
+    /// prime. The object MUST NOT be used afterwards.
+    void EraseLimbs()
+    {
+        Limbs.ZeroMemory(_modulus);
+        Limbs.ZeroMemory(_one);
+        Limbs.ZeroMemory(_rSquared);
+        sl_zero_memory((byte*)&_inverse, 8u);
+    }
+
     /// `value * R mod m`, for any `value` below `R`.
     ulong[] ConvertToMontgomery(ulong[] value)
     {

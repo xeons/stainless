@@ -31,8 +31,8 @@ import Standard.Bits;
 /// ```csharp
 /// var box = try AesGcm.FromKey(key);
 /// byte[] tag = new byte[16u];
-/// var sealed = try box.Encrypt(nonce, plaintext, associated, tag);
-/// var opened = try box.Decrypt(nonce, sealed, associated, tag);
+/// var encrypted = try box.Encrypt(nonce, plaintext, associated, tag);
+/// var opened = try box.Decrypt(nonce, encrypted, associated, tag);
 /// ```
 ///
 /// **The nonce must never repeat under one key.** GCM is CTR mode with a MAC
@@ -60,6 +60,19 @@ public sealed class AesGcm
     /// @value twelve bytes.
     public const nuint NonceSize = 12u;
 
+    /// The longest plaintext or ciphertext one call takes: 2^32 - 2 blocks,
+    /// past which the 32-bit counter would wrap back to the block that masks
+    /// the tag. SP 800-38D sets the same limit.
+    ///
+    /// @value 2^36 - 32 bytes.
+    public const ulong MaxTextSize = 0xFFFFFFFE0u;
+
+    /// The longest associated data one call takes, which SP 800-38D sets at
+    /// 2^64 - 1 bits.
+    ///
+    /// @value 2^61 - 1 bytes.
+    public const ulong MaxAssociatedDataSize = 0x1FFFFFFFFFFFFFFFu;
+
     private Aes _cipher;
 
     /// The hash key H, as two big-endian halves.
@@ -75,6 +88,12 @@ public sealed class AesGcm
         _hashHigh = ReadBigDoubleWord(key, 0u);
         _hashLow = ReadBigDoubleWord(key, 8u);
         CryptographicOperations.ZeroMemory(key);
+    }
+
+    ~AesGcm()
+    {
+        sl_zero_memory((byte*)&_hashHigh, 8u);
+        sl_zero_memory((byte*)&_hashLow, 8u);
     }
 
     /// A GCM box under `key`, which must be 16, 24 or 32 bytes.
@@ -101,6 +120,8 @@ public sealed class AesGcm
     /// @param tag             a `TagSize` array the tag is written into
     /// @failure CryptoError.NonceLength  `nonce` is empty
     /// @failure CryptoError.TagLength    `tag` is not `TagSize` long
+    /// @failure CryptoError.Parameter    `plaintext` is longer than `MaxTextSize`, or
+    ///                                   `associatedData` longer than `MaxAssociatedDataSize`
     /// @see AesGcm.Decrypt
     public Result<byte[], CryptoError> Encrypt(ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> plaintext,
                                                ReadOnlySpan<byte> associatedData, byte[] tag)
@@ -109,6 +130,8 @@ public sealed class AesGcm
             return Fail(CryptoError.NonceLength);
         if (tag.Length != TagSize)
             return Fail(CryptoError.TagLength);
+        if (!AreLengthsAllowed((ulong)plaintext.Length, (ulong)associatedData.Length))
+            return Fail(CryptoError.Parameter);
 
         byte[] counter = ComputeInitialCounter(nonce);
         byte[] keystream = new byte[16u];
@@ -138,6 +161,9 @@ public sealed class AesGcm
     /// @failure CryptoError.TagLength             `tag` is not `TagSize` long
     /// @failure CryptoError.AuthenticationFailed  the tag does not match, and no plaintext is
     ///                                            returned
+    /// @failure CryptoError.Parameter             `ciphertext` is longer than `MaxTextSize`, or
+    ///                                            `associatedData` longer than
+    ///                                            `MaxAssociatedDataSize`
     /// @see AesGcm.Encrypt
     public Result<byte[], CryptoError> Decrypt(ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> ciphertext,
                                                ReadOnlySpan<byte> associatedData, ReadOnlySpan<byte> tag)
@@ -146,6 +172,8 @@ public sealed class AesGcm
             return Fail(CryptoError.NonceLength);
         if (tag.Length != TagSize)
             return Fail(CryptoError.TagLength);
+        if (!AreLengthsAllowed((ulong)ciphertext.Length, (ulong)associatedData.Length))
+            return Fail(CryptoError.Parameter);
 
         byte[] counter = ComputeInitialCounter(nonce);
         byte[] keystream = new byte[16u];
@@ -163,6 +191,12 @@ public sealed class AesGcm
 
         return Ok(deciphered.Value);
     }
+
+    /// Whether a text of `textLength` bytes and associated data of
+    /// `associatedLength` bytes are within `MaxTextSize` and
+    /// `MaxAssociatedDataSize`.
+    static bool AreLengthsAllowed(ulong textLength, ulong associatedLength) =>
+        textLength <= MaxTextSize && associatedLength <= MaxAssociatedDataSize;
 
     /// J0: the nonce and a one when the nonce is twelve bytes, and GHASH of
     /// the nonce otherwise -- which is the standard's rule and the reason

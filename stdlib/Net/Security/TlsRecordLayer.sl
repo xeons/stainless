@@ -68,6 +68,11 @@ internal sealed class TlsRecordLayer
     /// Whether the version negotiated is TLS 1.2.
     internal bool _isTls12;
 
+    /// How many more bytes of rejected 0-RTT data a TLS 1.3 server skips:
+    /// protected records before its read key, and records that fail to open
+    /// under it, until one opens (RFC 8446 section 4.2.10).
+    internal nuint _earlyDataToSkip;
+
     internal TlsRecordLayer(IStream inner)
     {
         _inner = inner;
@@ -80,6 +85,7 @@ internal sealed class TlsRecordLayer
         _changeCipherSpecAllowed = false;
         _plaintextAlertAllowed = true;
         _isTls12 = false;
+        _earlyDataToSkip = 0u;
     }
 
     internal IStream Inner => _inner;
@@ -160,6 +166,11 @@ internal sealed class TlsRecordLayer
                 if (cipher != null && !(type == TlsContentType.Alert && _plaintextAlertAllowed))
                     return Fail(TlsError.UnexpectedMessage);
 
+                // A second ClientHello: the client sends no 0-RTT data after
+                // a HelloRetryRequest.
+                if (type == TlsContentType.Handshake)
+                    _earlyDataToSkip = 0u;
+
                 TlsRecord plain;
                 plain.Type = type;
                 plain.Data = _input;
@@ -169,12 +180,31 @@ internal sealed class TlsRecordLayer
             }
 
             if (cipher == null)
+            {
+                if (SkipTlsEarlyData(length))
+                    continue;
                 return Fail(TlsError.UnexpectedMessage);
+            }
             var opened = cipher.OpenTlsRecord(_input, at, length);
             if (!opened.Ok)
+            {
+                if (SkipTlsEarlyData(length))
+                    continue;
                 return Fail(opened.Error);
+            }
+            _earlyDataToSkip = 0u;
             return UnwrapTlsInnerPlaintext(opened.Value);
         }
+    }
+
+    /// Whether a protected record of `length` bytes is rejected 0-RTT data
+    /// to pass over, and counts it if so. One past the allowance is not.
+    private bool SkipTlsEarlyData(nuint length)
+    {
+        if (length > _earlyDataToSkip)
+            return false;
+        _earlyDataToSkip -= length;
+        return true;
     }
 
     /// A TLS 1.2 record, opened when a read key is installed. A

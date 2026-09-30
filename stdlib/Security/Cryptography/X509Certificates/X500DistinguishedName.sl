@@ -52,13 +52,18 @@ public sealed class X500DistinguishedName
     private List<X500RelativeDistinguishedName> _names;
     private String _name;
     private String _canonical;
+    private String[] _canonicalSteps;
 
     private X500DistinguishedName(byte[] rawData, List<X500RelativeDistinguishedName> names)
     {
         _rawData = rawData;
         _names = names;
         _name = FormatDistinguishedName(names);
-        _canonical = FormatCanonicalName(names);
+        _canonicalSteps = Array.Create(names.Count, (i) => FormatCanonicalStep(names[i]));
+        var canonical = new StringBuilder();
+        foreach (String step in _canonicalSteps)
+            canonical.Append(step);
+        _canonical = canonical.ToText();
     }
 
     /// The name one `Name` value in DER encodes.
@@ -151,6 +156,38 @@ public sealed class X500DistinguishedName
         if (AreBytesEqual(_rawData, other._rawData))
             return true;
         return _canonical == other._canonical;
+    }
+
+    /// Whether this name is inside the directory subtree `subtree` names, as
+    /// RFC 5280 section 4.2.1.10 reads one: `subtree`'s relative
+    /// distinguished names are the first of this name's, each equal as
+    /// `Equals` compares.
+    internal bool IsInSubtree(X500DistinguishedName subtree)
+    {
+        if (subtree._canonicalSteps.Length > _canonicalSteps.Length)
+            return false;
+        for (nuint i = 0u; i < subtree._canonicalSteps.Length; i++)
+        {
+            if (subtree._canonicalSteps[i] != _canonicalSteps[i])
+                return false;
+        }
+        return true;
+    }
+
+    /// The text of every attribute of type `typeOid` that is a character
+    /// string, in encoded order.
+    internal List<String> FindAllValues(String typeOid)
+    {
+        var found = new List<String>();
+        foreach (X500RelativeDistinguishedName step in _names)
+        {
+            for (nuint j = 0u; j < step.Count; j++)
+            {
+                if (step.GetElementType(j) == typeOid && step.IsElementText(j))
+                    found.Add(step.GetElementValue(j));
+            }
+        }
+        return found;
     }
 
     // ------------------------------------------------------------ reading
@@ -275,23 +312,21 @@ public sealed class X500DistinguishedName
         return false;
     }
 
-    /// Each type and value, length-prefixed so that no value can pass for a
-    /// separator, with every text value in the form RFC 5280 §7.1 compares.
-    private static String FormatCanonicalName(List<X500RelativeDistinguishedName> names)
+    /// Each type and value of one step, length-prefixed so that no value can
+    /// pass for a separator, with every text value in the form RFC 5280
+    /// section 7.1 compares.
+    private static String FormatCanonicalStep(X500RelativeDistinguishedName step)
     {
         var built = new StringBuilder();
-        foreach (X500RelativeDistinguishedName step in names)
+        built.Append($"[{step.Count}");
+        for (nuint j = 0u; j < step.Count; j++)
         {
-            built.Append($"[{step.Count}");
-            for (nuint j = 0u; j < step.Count; j++)
-            {
-                String value = step.GetElementValue(j);
-                if (step.IsElementText(j))
-                    value = FoldAttributeValue(value);
-                built.Append($"|{step.GetElementType(j)}|{value.ByteLength()}:{value}");
-            }
-            built.Append("]");
+            String value = step.GetElementValue(j);
+            if (step.IsElementText(j))
+                value = FoldAttributeValue(value);
+            built.Append($"|{step.GetElementType(j)}|{value.ByteLength()}:{value}");
         }
+        built.Append("]");
         return built.ToText();
     }
 

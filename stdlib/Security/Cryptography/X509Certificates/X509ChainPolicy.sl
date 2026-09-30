@@ -39,9 +39,11 @@ public sealed class X509ChainPolicy
     private List<String> _applicationPolicy;
     private X509Certificate2Collection _extraStore;
     private X509Certificate2Collection _customTrustStore;
+    private long _verificationTime;
+    private bool _verificationTimeIgnored;
 
     /// The defaults: the system's roots, no extra certificates, no purpose
-    /// required, no revocation, and the time this was made.
+    /// required, no revocation, and the time of each `Build`.
     public X509ChainPolicy()
     {
         _applicationPolicy = new List<String>();
@@ -49,7 +51,8 @@ public sealed class X509ChainPolicy
         _customTrustStore = new X509Certificate2Collection();
         TrustMode = X509ChainTrustMode.System;
         RevocationMode = X509RevocationMode.NoCheck;
-        VerificationTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        _verificationTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        _verificationTimeIgnored = true;
     }
 
     /// Purposes the leaf MUST serve, as dotted extended key usages; an
@@ -58,7 +61,7 @@ public sealed class X509ChainPolicy
     public List<String> ApplicationPolicy => _applicationPolicy;
 
     /// Intermediates to build through, as a server sends them. Nothing here
-    /// is trusted for being here.
+    /// is trusted for being here, and only the first 64 are read.
     public X509Certificate2Collection ExtraStore => _extraStore;
 
     /// The trust anchors when `TrustMode` is `CustomRootTrust`. Any
@@ -72,10 +75,27 @@ public sealed class X509ChainPolicy
     public X509RevocationMode RevocationMode { get; set; }
 
     /// The moment every certificate MUST be valid at, in seconds since the
-    /// epoch.
-    public long VerificationTime { get; set; }
+    /// epoch, when `VerificationTimeIgnored` is false. Setting it clears
+    /// `VerificationTimeIgnored`, as in .NET.
+    public long VerificationTime
+    {
+        get => _verificationTime;
+        set
+        {
+            _verificationTime = value;
+            _verificationTimeIgnored = false;
+        }
+    }
 
-    /// Back to the defaults, with the time now.
+    /// Whether each `Build` validates at the moment it runs rather than at
+    /// `VerificationTime`. True until `VerificationTime` is set.
+    public bool VerificationTimeIgnored
+    {
+        get => _verificationTimeIgnored;
+        set => _verificationTimeIgnored = value;
+    }
+
+    /// Back to the defaults, with the time of each `Build`.
     public void Reset()
     {
         _applicationPolicy.Clear();
@@ -83,6 +103,11 @@ public sealed class X509ChainPolicy
         _customTrustStore = new X509Certificate2Collection();
         TrustMode = X509ChainTrustMode.System;
         RevocationMode = X509RevocationMode.NoCheck;
-        VerificationTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        _verificationTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        _verificationTimeIgnored = true;
     }
+
+    /// The moment a `Build` starting now validates at.
+    internal long FindEffectiveVerificationTime() =>
+        _verificationTimeIgnored ? DateTimeOffset.UtcNow.ToUnixTimeSeconds() : _verificationTime;
 }

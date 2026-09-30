@@ -88,6 +88,12 @@ void CheckScrypt()
     Check("scrypt-width", DeriveScryptKey("p", "s", 16u, 0x8000u, 0x8000u, 32u), "refused");
     Check("scrypt-cost-for-width", DeriveScryptKey("p", "s", 65536u, 1u, 1u, 32u), "refused");
     Check("scrypt-memory", DeriveScryptKey("p", "s", 8388608u, 8u, 1u, 32u), "refused");
+
+    // V alone is exactly MaxMemoryBytes; B on top takes it past.
+    Check("scrypt-memory-sum", DeriveScryptKey("p", "s", 16777216u, 2u, 1u, 32u), "refused");
+
+    // 2^31 bytes of V, and 2^23 * 2 * 65 = 2^30 + 2^24 units of work.
+    Check("scrypt-work", DeriveScryptKey("p", "s", 8388608u, 2u, 65u, 32u), "refused");
 }
 
 String HashKeyed(byte[] key, nuint hashSize, byte[] data)
@@ -182,6 +188,23 @@ void CheckArgon2id()
     Check("argon2id-short-tag", DeriveArgonKey(1u, 32u, 4u, 3u, salt), "refused");
     Check("argon2id-short-salt", DeriveArgonKey(1u, 32u, 4u, 32u, Repeat((byte)2, 7u)), "refused");
     Check("argon2id-memory", DeriveArgonKey(1u, 8388608u, 1u, 32u, salt), "refused");
+
+    // 65 passes over the most memory is past MaxWorkKiB, 2^28.
+    Check("argon2id-work", DeriveArgonKey(65u, 4194304u, 1u, 32u, salt), "refused");
+
+    Console.WriteLine(DeriveArgonKey(1u, 32u, 4u, 1048576u, salt).ByteLength() == 2097152u
+        ? "argon2id-longest-tag ok" : "argon2id-longest-tag WRONG");
+    Check("argon2id-long-tag-refused", DeriveArgonKey(1u, 32u, 4u, 1048577u, salt), "refused");
+}
+
+void CheckPbkdf2Limits()
+{
+    // One byte past (2^32 - 1) SHA-256 blocks, where the block index would
+    // wrap to zero. Refused before anything is allocated.
+    var wrapped = Rfc2898DeriveBytes.Pbkdf2(Bytes("p"), Bytes("salt"), 1u, new Sha256(),
+                                            0x1FFFFFFFE1u);
+    Console.WriteLine(!wrapped.Ok && wrapped.Error == CryptoError.Parameter
+        ? "pbkdf2-index-wraps refused" : "pbkdf2-index-wraps WRONG");
 }
 
 int Main()
@@ -189,5 +212,6 @@ int Main()
     CheckScrypt();
     CheckBlake2b();
     CheckArgon2id();
+    CheckPbkdf2Limits();
     return 0;
 }

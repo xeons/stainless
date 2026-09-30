@@ -125,8 +125,14 @@ public sealed class ECDsa
 
     /// The signature of a hash already computed, as `r` then `s`.
     ///
-    /// The nonce's HMAC uses the hash whose length `hash` has — SHA-1,
-    /// SHA-256, SHA-384 or SHA-512 — and the curve's own for any other length.
+    /// **The nonce's HMAC is chosen by the digest's length**: SHA-1 for 20
+    /// bytes, SHA-256 for 32, SHA-384 for 48, SHA-512 for 64, and the curve's
+    /// own hash for any other. RFC 6979 makes the nonce with the hash that
+    /// made the digest, so this matches it when the digest came from one of
+    /// those four. A digest from another hash, or a truncated one, gets a
+    /// nonce no other implementation would make: the signature verifies, but
+    /// its bytes differ. Where they MUST match, use the overload that names
+    /// the hash.
     ///
     /// @param hash  the digest of the message
     /// @failure CryptoError.InvalidKey  this is a public key
@@ -134,7 +140,9 @@ public sealed class ECDsa
     public Result<byte[], CryptoError> SignHash(ReadOnlySpan<byte> hash) =>
         SignHash(hash, DsaSignatureFormat.IeeeP1363FixedFieldConcatenation);
 
-    /// The signature of a hash already computed, in `signatureFormat`.
+    /// The signature of a hash already computed, in `signatureFormat`, with
+    /// the nonce's HMAC chosen by the digest's length as the one-argument
+    /// overload says.
     ///
     /// @param hash             the digest of the message
     /// @param signatureFormat  how to lay out `r` and `s`
@@ -163,6 +171,32 @@ public sealed class ECDsa
         }
         return SignHashWith(hash, nonceHash, signatureFormat);
     }
+
+    /// The signature of a hash `hashAlgorithm` computed, as `r` then `s`, with
+    /// the nonce RFC 6979 derives through HMAC over `hashAlgorithm`.
+    ///
+    /// The overload to use for interoperable signatures: the same key, digest
+    /// and hash give the same bytes as any other RFC 6979 implementation.
+    ///
+    /// @param hash           the digest of the message
+    /// @param hashAlgorithm  the hash that made `hash`, which the nonce's HMAC uses too
+    /// @failure CryptoError.InvalidKey   this is a public key
+    /// @failure CryptoError.Unsupported  `hashAlgorithm` is the zero value
+    public Result<byte[], CryptoError> SignHash(ReadOnlySpan<byte> hash,
+                                                HashAlgorithmName hashAlgorithm) =>
+        SignHashWith(hash, hashAlgorithm, DsaSignatureFormat.IeeeP1363FixedFieldConcatenation);
+
+    /// The signature of a hash `hashAlgorithm` computed, in `signatureFormat`.
+    ///
+    /// @param hash             the digest of the message
+    /// @param hashAlgorithm    the hash that made `hash`, which the nonce's HMAC uses too
+    /// @param signatureFormat  how to lay out `r` and `s`
+    /// @failure CryptoError.InvalidKey   this is a public key
+    /// @failure CryptoError.Unsupported  `hashAlgorithm` is the zero value
+    public Result<byte[], CryptoError> SignHash(ReadOnlySpan<byte> hash,
+                                                HashAlgorithmName hashAlgorithm,
+                                                DsaSignatureFormat signatureFormat) =>
+        SignHashWith(hash, hashAlgorithm, signatureFormat);
 
     /// The signature of `data` hashed with `hashAlgorithm`, as `r` then `s`.
     ///
@@ -556,11 +590,17 @@ sealed class EcNonceGenerator
         WriteEcElement(privateScalar, size, seed, 0u);
         WriteEcElement(digest, size, seed, size);
 
-        _key = ComputeMac(0x00, seed);
-        _value = ComputeMac(_value);
-        _key = ComputeMac(0x01, seed);
-        _value = ComputeMac(_value);
+        ReplaceKey(ComputeMac(0x00, seed));
+        ReplaceValue(ComputeMac(_value));
+        ReplaceKey(ComputeMac(0x01, seed));
+        ReplaceValue(ComputeMac(_value));
         CryptographicOperations.ZeroMemory(seed);
+    }
+
+    ~EcNonceGenerator()
+    {
+        CryptographicOperations.ZeroMemory(_key);
+        CryptographicOperations.ZeroMemory(_value);
     }
 
     /// The next nonce in `[1, n - 1]`.
@@ -571,15 +611,15 @@ sealed class EcNonceGenerator
         {
             if (_drawn)
             {
-                _key = ComputeMac(0x00, new byte[0u]);
-                _value = ComputeMac(_value);
+                ReplaceKey(ComputeMac(0x00, new byte[0u]));
+                ReplaceValue(ComputeMac(_value));
             }
             _drawn = true;
 
             nuint filled = 0u;
             while (filled < _size)
             {
-                _value = ComputeMac(_value);
+                ReplaceValue(ComputeMac(_value));
                 nuint take = _size - filled < _value.Length ? _size - filled : _value.Length;
                 _value[:take].CopyTo(candidate[filled:]);
                 filled += take;
@@ -594,6 +634,20 @@ sealed class EcNonceGenerator
                 return nonce;
             }
         }
+    }
+
+    /// `key` in place of K, with the old K overwritten.
+    void ReplaceKey(byte[] key)
+    {
+        CryptographicOperations.ZeroMemory(_key);
+        _key = key;
+    }
+
+    /// `value` in place of V, with the old V overwritten.
+    void ReplaceValue(byte[] value)
+    {
+        CryptographicOperations.ZeroMemory(_value);
+        _value = value;
     }
 
     /// `HMAC_K(V || separator || material)`.

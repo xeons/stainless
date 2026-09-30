@@ -31,8 +31,11 @@ ed25519-flipped-s refused
 ed25519-flipped-message refused
 ed25519-flipped-key refused
 ed25519-s-not-reduced refused
-ed25519-identity-key ok
+ed25519-identity-key refused
 ed25519-non-canonical-key refused
+ed25519-order-2-key refused
+ed25519-order-4-key refused
+ed25519-order-8-key refused
 ed25519-off-curve-key refused
 ed25519-short-signature refused
 ed25519-short-key refused

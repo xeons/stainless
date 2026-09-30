@@ -292,6 +292,75 @@ void CheckEdges()
     Check("ctr-empty", ToHex(cipher.ApplyCtr(new byte[0u], iv)), "");
 }
 
+// The last block written as plaintext and deciphered with padding, so each
+// malformed shape can be reached. The first block is 00 to 0f.
+void CheckPadding(String label, PaddingMode padding, String lastBlock, String expected)
+{
+    var cipher = Cipher(MakeBytes(16u, 5u, 1u));
+    byte[] plain = Hex("000102030405060708090a0b0c0d0e0f" + lastBlock);
+    byte[] enciphered = cipher.EncryptEcb(plain, PaddingMode.None).GetValueOrDefault(new byte[0u]);
+    Check(label, ToHex(cipher.DecryptEcb(enciphered, padding)), expected);
+
+    byte[] iv = MakeBytes(16u, 3u, 7u);
+    byte[] chained = cipher.EncryptCbc(plain, iv, PaddingMode.None).GetValueOrDefault(new byte[0u]);
+    Check(label + "-cbc", ToHex(cipher.DecryptCbc(chained, iv, padding)), expected);
+}
+
+void CheckPaddings()
+{
+    String first = "000102030405060708090a0b0c0d0e0f";
+    PaddingMode pkcs7 = PaddingMode.Pkcs7;
+    PaddingMode ansi = PaddingMode.AnsiX923;
+
+    CheckPadding("pkcs7-one", pkcs7, "101112131415161718191a1b1c1d1e01",
+                 first + "101112131415161718191a1b1c1d1e");
+    CheckPadding("pkcs7-four", pkcs7, "101112131415161718191a1b04040404",
+                 first + "101112131415161718191a1b");
+    CheckPadding("pkcs7-whole-block", pkcs7, "10101010101010101010101010101010", first);
+    CheckPadding("pkcs7-outside-unchecked", pkcs7, "10111213141516171819101104040404",
+                 first + "101112131415161718191011");
+    CheckPadding("pkcs7-zero", pkcs7, "101112131415161718191a1b1c1d1e00", "refused");
+    CheckPadding("pkcs7-seventeen", pkcs7, "11111111111111111111111111111111", "refused");
+    CheckPadding("pkcs7-large", pkcs7, "101112131415161718191a1b1c1d1eff", "refused");
+    CheckPadding("pkcs7-far-byte-wrong", pkcs7, "101112131415161718191a1b03040404", "refused");
+    CheckPadding("pkcs7-near-byte-wrong", pkcs7, "101112131415161718191a1b04040504", "refused");
+    CheckPadding("pkcs7-first-of-block-wrong", pkcs7, "0f101010101010101010101010101010",
+                 "refused");
+
+    CheckPadding("ansi-four", ansi, "101112131415161718191a1b00000004",
+                 first + "101112131415161718191a1b");
+    CheckPadding("ansi-whole-block", ansi, "00000000000000000000000000000010", first);
+    CheckPadding("ansi-nonzero", ansi, "101112131415161718191a1b00010004", "refused");
+    CheckPadding("ansi-zero", ansi, "101112131415161718191a1b1c1d1e00", "refused");
+    CheckPadding("ansi-seventeen", ansi, "00000000000000000000000000000011", "refused");
+}
+
+// GCM's length limits, through the module's own check, since a text of
+// 2^36 bytes is not something a test can allocate.
+void CheckGcmLimits()
+{
+    ulong most = AesGcm.MaxTextSize;
+    ulong associated = AesGcm.MaxAssociatedDataSize;
+    Console.WriteLine("gcm-max-text " + Convert.ToHexString(ToBigEndianBytes(most)));
+    Console.WriteLine("gcm-max-associated " + Convert.ToHexString(ToBigEndianBytes(associated)));
+    Check("gcm-text-at-limit", AreGcmTestLengthsAllowed(most, 0u) ? "allowed" : "refused",
+          "allowed");
+    Check("gcm-text-past-limit", AreGcmTestLengthsAllowed(most + 1u, 0u) ? "allowed" : "refused",
+          "refused");
+    Check("gcm-associated-at-limit",
+          AreGcmTestLengthsAllowed(0u, associated) ? "allowed" : "refused", "allowed");
+    Check("gcm-associated-past-limit",
+          AreGcmTestLengthsAllowed(0u, associated + 1u) ? "allowed" : "refused", "refused");
+}
+
+byte[] ToBigEndianBytes(ulong value)
+{
+    byte[] bytes = new byte[8u];
+    for (nuint i = 0u; i < 8u; i++)
+        bytes[i] = (byte)((value >> (int)(56u - 8u * i)) & 0xFFu);
+    return bytes;
+}
+
 int Main()
 {
     CheckBlocks();
@@ -346,5 +415,7 @@ int Main()
                "f50f596df81bb603655ab2a886c8da1288aaebc694f7db550dfd6754a8cc90ff");
 
     CheckEdges();
+    CheckPaddings();
+    CheckGcmLimits();
     return 0;
 }

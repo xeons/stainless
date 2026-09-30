@@ -106,7 +106,7 @@ public sealed class SubjectAlternativeNameBuilder
         writer.PopSequence();
         return new X509SubjectAlternativeNameExtension(
             writer.Encode(), critical, _dnsNames.ToArray(), _ipAddresses.ToArray(),
-            _uris.ToArray(), _emailAddresses.ToArray());
+            _uris.ToArray(), _emailAddresses.ToArray(), new X500DistinguishedName[0u]);
     }
 
     private void AddGeneralNameText(int number, String text)

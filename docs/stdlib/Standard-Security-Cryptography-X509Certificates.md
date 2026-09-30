@@ -34,7 +34,8 @@ where they can.
 **Parsing is RFC 5280's, strictly, with the leniencies browsers have.**
 The DER is held to the letter: minimal lengths and integers, a signature
 algorithm outside the signed part identical to the one inside it, a
-version of 1, 2 or 3, extensions only in version 3 and none twice. What
+version of 1, 2 or 3 with version 1 left out as DER leaves a DEFAULT,
+extensions only in version 3 and none twice. What
 is tolerated is what real certificates do: a serial number of up to 20
 octets that is zero or negative, a `GeneralizedTime` before 2050, an
 explicit `critical FALSE`, and a `PrintableString` holding `*` or `@`.
@@ -43,15 +44,20 @@ so a malformed one is a certificate that does not parse.
 
 **Signatures** are Ed25519, ECDSA over P-256 and P-384 with SHA-256, -384
 or -512, RSA PKCS #1 v1.5 with SHA-1, -256, -384 or -512, and RSASSA-PSS
-whose mask hash is its message hash. A chain refuses SHA-1 as
-`HasWeakSignature` though the signature is checked.
+whose mask hash is its message hash. A chain refuses SHA-1, RSASSA-PSS
+over SHA-1 included, and any RSA key under 2048 bits as
+`HasWeakSignature` though the signature is checked. An RSA key is read
+only at 1024 to 8192 bits with an exponent of at most 33 bits, and a
+key restricted to PSS holds its signatures to its own parameters.
 
 **Host names are matched as RFC 6125 and the CA/Browser Forum say**:
 against the DNS names in the subject alternative name and never the
 common name, whatever else the certificate holds; case-insensitively in
 ASCII; with a wildcard only as the whole of the left-most label, matching
 exactly one label, and only over at least two labels; an address only
-against the address entries, as bytes.
+against the address entries, as bytes. A wildcard over two labels that
+look like a registry's suffix under a country code, `*.co.uk`, matches
+nothing; there is no public suffix list, so `*.github.io` still does.
 
 **There is no revocation.** Nothing here fetches or reads a CRL or asks an
 OCSP responder, so `X509RevocationMode.NoCheck` is the default and the
@@ -676,7 +682,7 @@ The name one `Name` value in DER encodes.
 
 - [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) -- it is not one, or a string value is not valid for its type
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X500DistinguishedName.sl:69](../../stdlib/Security/Cryptography/X509Certificates/X500DistinguishedName.sl#L69)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X500DistinguishedName.sl:74](../../stdlib/Security/Cryptography/X509Certificates/X500DistinguishedName.sl#L74)</sub>
 
 #### RawData *property*
 
@@ -686,7 +692,7 @@ byte[] RawData { get; }
 
 The name as DER.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X500DistinguishedName.sl:106](../../stdlib/Security/Cryptography/X509Certificates/X500DistinguishedName.sl#L106)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X500DistinguishedName.sl:111](../../stdlib/Security/Cryptography/X509Certificates/X500DistinguishedName.sl#L111)</sub>
 
 #### Name *property*
 
@@ -696,7 +702,7 @@ String Name { get; }
 
 The name as .NET writes it: `CN=www.example.com, O=Example, C=US`.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X500DistinguishedName.sl:109](../../stdlib/Security/Cryptography/X509Certificates/X500DistinguishedName.sl#L109)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X500DistinguishedName.sl:114](../../stdlib/Security/Cryptography/X509Certificates/X500DistinguishedName.sl#L114)</sub>
 
 #### IsEmpty *property*
 
@@ -706,7 +712,7 @@ bool IsEmpty { get; }
 
 Whether the name has no relative distinguished names at all.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X500DistinguishedName.sl:112](../../stdlib/Security/Cryptography/X509Certificates/X500DistinguishedName.sl#L112)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X500DistinguishedName.sl:117](../../stdlib/Security/Cryptography/X509Certificates/X500DistinguishedName.sl#L117)</sub>
 
 #### EnumerateRelativeDistinguishedNames *method*
 
@@ -720,7 +726,7 @@ Each relative distinguished name.
 
 - `reversed` -- most specific first, as `Name` writes them, which is .NET's default; otherwise in the order they are encoded
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X500DistinguishedName.sl:118](../../stdlib/Security/Cryptography/X509Certificates/X500DistinguishedName.sl#L118)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X500DistinguishedName.sl:123](../../stdlib/Security/Cryptography/X509Certificates/X500DistinguishedName.sl#L123)</sub>
 
 #### GetFirstValue *method*
 
@@ -735,7 +741,7 @@ first, or `None` when there is none or it is not a character string.
 
 - `typeOid` -- the attribute type, as `2.5.4.3` for a common name
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X500DistinguishedName.sl:131](../../stdlib/Security/Cryptography/X509Certificates/X500DistinguishedName.sl#L131)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X500DistinguishedName.sl:136](../../stdlib/Security/Cryptography/X509Certificates/X500DistinguishedName.sl#L136)</sub>
 
 #### Equals *method*
 
@@ -745,7 +751,7 @@ bool Equals(X500DistinguishedName other)
 
 Whether `other` names the same thing, as RFC 5280 compares names.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X500DistinguishedName.sl:149](../../stdlib/Security/Cryptography/X509Certificates/X500DistinguishedName.sl#L149)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X500DistinguishedName.sl:154](../../stdlib/Security/Cryptography/X509Certificates/X500DistinguishedName.sl#L154)</sub>
 
 ### X500DistinguishedNameBuilder *class*
 
@@ -1175,7 +1181,7 @@ finds it. Blocks with other labels are passed over.
 
 - [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) -- there is no `CERTIFICATE` block, or the first one does not hold a certificate
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:227](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L227)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:228](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L228)</sub>
 
 #### RawData *property*
 
@@ -1186,7 +1192,7 @@ byte[] RawData { get; }
 The whole certificate, as DER: a copy, so that changing it changes
 nothing here.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:243](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L243)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:245](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L245)</sub>
 
 #### Version *property*
 
@@ -1196,7 +1202,7 @@ int Version { get; }
 
 1, 2 or 3.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:246](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L246)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:248](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L248)</sub>
 
 #### SerialNumber *property*
 
@@ -1207,7 +1213,7 @@ String SerialNumber { get; }
 The serial number in upper-case hexadecimal, as its DER contents are
 written: `00FF` for a positive number whose top bit is set.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:250](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L250)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:252](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L252)</sub>
 
 #### SerialNumberBytes *property*
 
@@ -1217,7 +1223,7 @@ byte[] SerialNumberBytes { get; }
 
 The serial number's DER contents, big-endian and two's complement.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:253](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L253)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:255](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L255)</sub>
 
 #### SignatureAlgorithm *property*
 
@@ -1228,7 +1234,7 @@ String SignatureAlgorithm { get; }
 The signature algorithm, dotted: `1.3.101.112` for Ed25519,
 `1.2.840.10045.4.3.2` for ECDSA with SHA-256.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:257](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L257)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:259](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L259)</sub>
 
 #### IssuerName *property*
 
@@ -1238,7 +1244,7 @@ X500DistinguishedName IssuerName { get; }
 
 Who issued it.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:260](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L260)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:262](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L262)</sub>
 
 #### SubjectName *property*
 
@@ -1248,7 +1254,7 @@ X500DistinguishedName SubjectName { get; }
 
 Who it is for.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:263](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L263)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:265](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L265)</sub>
 
 #### Issuer *property*
 
@@ -1258,7 +1264,7 @@ String Issuer { get; }
 
 `IssuerName.Name`.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:266](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L266)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:268](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L268)</sub>
 
 #### Subject *property*
 
@@ -1268,7 +1274,7 @@ String Subject { get; }
 
 `SubjectName.Name`.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:269](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L269)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:271](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L271)</sub>
 
 #### NotBefore *property*
 
@@ -1278,7 +1284,7 @@ long NotBefore { get; }
 
 The first moment it is valid, in seconds since the epoch.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:272](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L272)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:274](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L274)</sub>
 
 #### NotAfter *property*
 
@@ -1288,7 +1294,7 @@ long NotAfter { get; }
 
 The last moment it is valid, in seconds since the epoch.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:275](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L275)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:277](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L277)</sub>
 
 #### PublicKey *property*
 
@@ -1298,7 +1304,7 @@ PublicKey PublicKey { get; }
 
 The subject's key.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:278](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L278)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:280](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L280)</sub>
 
 #### Extensions *property*
 
@@ -1308,7 +1314,7 @@ X509ExtensionCollection Extensions { get; }
 
 Every extension.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:281](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L281)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:283](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L283)</sub>
 
 #### Thumbprint *property*
 
@@ -1319,7 +1325,7 @@ String Thumbprint { get; }
 The SHA-1 of the DER in upper-case hexadecimal: what .NET, Windows and
 `openssl x509 -fingerprint` show.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:285](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L285)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:287](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L287)</sub>
 
 #### Sha256Thumbprint *property*
 
@@ -1329,7 +1335,7 @@ String Sha256Thumbprint { get; }
 
 The SHA-256 of the DER in upper-case hexadecimal.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:288](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L288)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:290](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L290)</sub>
 
 #### IsSelfIssued *property*
 
@@ -1340,7 +1346,7 @@ bool IsSelfIssued { get; }
 Whether the issuer and the subject are the same name, which a root's
 are and a leaf's usually are not.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:292](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L292)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:294](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L294)</sub>
 
 #### BasicConstraints *property*
 
@@ -1350,7 +1356,7 @@ X509BasicConstraintsExtension? BasicConstraints { get; }
 
 The basic constraints extension, or null.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:295](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L295)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:297](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L297)</sub>
 
 #### KeyUsage *property*
 
@@ -1360,7 +1366,7 @@ X509KeyUsageExtension? KeyUsage { get; }
 
 The key usage extension, or null.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:298](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L298)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:300](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L300)</sub>
 
 #### EnhancedKeyUsage *property*
 
@@ -1370,7 +1376,7 @@ X509EnhancedKeyUsageExtension? EnhancedKeyUsage { get; }
 
 The extended key usage extension, or null.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:301](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L301)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:303](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L303)</sub>
 
 #### SubjectAlternativeName *property*
 
@@ -1380,7 +1386,7 @@ X509SubjectAlternativeNameExtension? SubjectAlternativeName { get; }
 
 The subject alternative name extension, or null.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:304](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L304)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:306](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L306)</sub>
 
 #### SubjectKeyIdentifier *property*
 
@@ -1390,7 +1396,7 @@ X509SubjectKeyIdentifierExtension? SubjectKeyIdentifier { get; }
 
 The subject key identifier extension, or null.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:307](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L307)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:309](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L309)</sub>
 
 #### AuthorityKeyIdentifier *property*
 
@@ -1400,7 +1406,7 @@ X509AuthorityKeyIdentifierExtension? AuthorityKeyIdentifier { get; }
 
 The authority key identifier extension, or null.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:310](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L310)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:312](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L312)</sub>
 
 #### NameConstraints *property*
 
@@ -1410,7 +1416,7 @@ X509NameConstraintsExtension? NameConstraints { get; }
 
 The name constraints extension, or null.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:313](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L313)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:315](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L315)</sub>
 
 #### GetNotBeforeDateTimeOffset *method*
 
@@ -1424,7 +1430,7 @@ Result<DateTimeOffset, CryptoError> GetNotBeforeDateTimeOffset()
 
 - [CryptoError.Parameter](Standard-Security-Cryptography.md#parameter-case) -- the moment is outside 1677 to 2262, which is what a `DateTimeOffset` holds
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:333](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L333)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:335](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L335)</sub>
 
 #### GetNotAfterDateTimeOffset *method*
 
@@ -1438,7 +1444,7 @@ Result<DateTimeOffset, CryptoError> GetNotAfterDateTimeOffset()
 
 - [CryptoError.Parameter](Standard-Security-Cryptography.md#parameter-case) -- the moment is outside 1677 to 2262, which is what a `DateTimeOffset` holds
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:340](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L340)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:342](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L342)</sub>
 
 #### GetCertHash *method*
 
@@ -1452,7 +1458,7 @@ The hash of the DER under `hashAlgorithm`.
 
 - [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) -- `hashAlgorithm` is not one this library has
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:354](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L354)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:356](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L356)</sub>
 
 #### GetCertHashString *method*
 
@@ -1466,7 +1472,7 @@ The same, in upper-case hexadecimal.
 
 - [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) -- `hashAlgorithm` is not one this library has
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:364](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L364)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:366](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L366)</sub>
 
 #### ExportCertificatePem *method*
 
@@ -1477,7 +1483,7 @@ String ExportCertificatePem()
 The certificate as PEM, with a `CERTIFICATE` label and no newline after
 the last line.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:369](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L369)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:371](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L371)</sub>
 
 #### Equals *method*
 
@@ -1487,7 +1493,7 @@ bool Equals(X509Certificate2 other)
 
 Whether `other` is this certificate, byte for byte.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:372](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L372)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:374](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L374)</sub>
 
 #### MatchesHostname *method*
 
@@ -1507,7 +1513,9 @@ Forum's rules.
   given as its `xn--` form.
 - A wildcard is only the whole left-most label, `*.example.com`; it
   stands for exactly one non-empty label, and is honoured only with at
-  least two labels after it, so `*.com` matches nothing.
+  least two labels after it, so `*.com` matches nothing. Nor does a
+  wildcard over a common second-level label under a country code,
+  `*.co.uk` or `*.com.au`; other public suffixes are not known.
 - An address — dotted IPv4, or IPv6 with or without brackets —
   matches only an `iPAddress` entry, compared as bytes, and never a DNS
   name that spells it.
@@ -1517,7 +1525,7 @@ Forum's rules.
 - `hostname` -- what the client asked to connect to
 - `allowWildcards` -- whether a wildcard entry may match
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:393](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L393)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:397](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L397)</sub>
 
 ### X509Certificate2Collection *class*
 
@@ -1546,7 +1554,7 @@ nuint Count { get; }
 
 How many certificates there are.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl:48](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl#L48)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl:53](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl#L53)</sub>
 
 #### this[] *indexer*
 
@@ -1556,7 +1564,7 @@ X509Certificate2 this[nuint index] { get; }
 
 Certificate `index`, in the order they were added; aborts past `Count`.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl:51](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl#L51)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl:56](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl#L56)</sub>
 
 #### GetEnumerator *method*
 
@@ -1566,7 +1574,7 @@ IEnumerator<X509Certificate2> GetEnumerator()
 
 Each certificate in turn.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl:54](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl#L54)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl:59](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl#L59)</sub>
 
 #### Add *method*
 
@@ -1578,7 +1586,7 @@ Adds `certificate` unless it is already here.
 
 **Returns** &nbsp; whether it was added
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl:59](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl#L59)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl:64](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl#L64)</sub>
 
 #### AddRange *method*
 
@@ -1588,7 +1596,7 @@ void AddRange(X509Certificate2Collection certificates)
 
 Adds each of `certificates` that is not already here.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl:68](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl#L68)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl:73](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl#L73)</sub>
 
 #### Contains *method*
 
@@ -1598,7 +1606,7 @@ bool Contains(X509Certificate2 certificate)
 
 Whether `certificate` is here, byte for byte.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl:75](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl#L75)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl:80](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl#L80)</sub>
 
 #### Remove *method*
 
@@ -1610,7 +1618,7 @@ Removes `certificate`, when it is here.
 
 **Returns** &nbsp; whether it was
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl:88](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl#L88)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl:85](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl#L85)</sub>
 
 #### ImportFromPem *method*
 
@@ -1634,7 +1642,7 @@ nothing is added.
 
 - [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) -- a `CERTIFICATE` block does not hold a certificate
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl:110](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl#L110)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl:114](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl#L114)</sub>
 
 #### ExportCertificatePems *method*
 
@@ -1645,7 +1653,7 @@ String ExportCertificatePems()
 Every certificate as PEM, one block after another, each followed by a
 newline: a bundle `ImportFromPem` reads back.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl:150](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl#L150)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl:156](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl#L156)</sub>
 
 ### X509Chain *class*
 
@@ -1671,30 +1679,42 @@ have one, is its authority key identifier. Anchors are tried first, then
 intermediates valid at the verification time, then the rest; every
 alternative is tried in turn, so a cross-signed intermediate or a second
 CA of the same name is found when the first does not lead anywhere. A
-path stops at any anchor, self-signed or not. A path holds at most eight
-certificates, and at most 128 candidates are tried in all.
+path stops at any anchor, self-signed or not.
+
+**The work is bounded**, so that certificates from the network cannot
+make a `Build` slow: a path holds at most eight certificates, at most 128
+candidates are tried in all, only the first 64 certificates of the extra
+store are read, and at most 100 signatures are verified. Each pair of
+certificate and issuer is verified once, whatever the number of paths it
+is on. A signature the budget leaves unverified does not verify. An RSA
+key is at most 8192 bits with an exponent of at most 33; see `Rsa`.
 
 **Validating** each path, the first that passes everything is kept, and
 otherwise the first that reached an anchor, and otherwise the longest:
 
-- every certificate valid at `VerificationTime`, the anchor included;
-- every signature verified, the anchor's own excepted, and none over
-  SHA-1;
-- every issuer a CA with basic constraints — an anchor may have none, as
-  a version 1 root does — and not more non-self-issued intermediates
+- every certificate valid at the verification time, the anchor included:
+  the moment `Build` runs, or `VerificationTime` when it was set;
+- every signature verified, the anchor's own excepted; none over SHA-1,
+  RSASSA-PSS included, and no RSA key under 2048 bits, both reported as
+  `HasWeakSignature`;
+- every issuer a CA with basic constraints (an anchor may have none, as
+  a version 1 root does) and not more non-self-issued intermediates
   below it than its path length allows;
 - every issuer's key usage, when it has one, allowing `KeyCertSign`;
 - the application policy allowed by the leaf's extended key usage and by
   that of every intermediate that has one; and for a TLS purpose the
-  leaf's key usage, when it has one, allowing a signature, key
-  encipherment or key agreement;
-- the leaf's DNS and IP subject alternative names inside the name
-  constraints of every issuer above it;
-- no critical extension this module does not understand.
+  leaf's key usage, when it has one, allowing a digital signature, which
+  every ECDHE handshake needs;
+- the name constraints of every issuer over each certificate below it,
+  self-issued intermediates excepted: the DNS names, addresses, e-mail
+  addresses and directory names of the subject alternative name, the
+  subject itself, and any `emailAddress` in the subject;
+- no critical extension this module does not understand, name
+  constraints holding a kind of subtree it does not enforce included.
 
 No revocation is checked; see `X509RevocationMode`.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Chain.sl:67](../../stdlib/Security/Cryptography/X509Certificates/X509Chain.sl#L67)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Chain.sl:79](../../stdlib/Security/Cryptography/X509Certificates/X509Chain.sl#L79)</sub>
 
 #### ChainPolicy *property*
 
@@ -1704,7 +1724,7 @@ X509ChainPolicy ChainPolicy { get; set; }
 
 What the next `Build` is held to.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Chain.sl:96](../../stdlib/Security/Cryptography/X509Certificates/X509Chain.sl#L96)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Chain.sl:118](../../stdlib/Security/Cryptography/X509Certificates/X509Chain.sl#L118)</sub>
 
 #### ChainElements *property*
 
@@ -1715,7 +1735,7 @@ X509ChainElement[] ChainElements { get; }
 The path the last `Build` chose, from the certificate to the anchor, or
 as far as it got.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Chain.sl:104](../../stdlib/Security/Cryptography/X509Certificates/X509Chain.sl#L104)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Chain.sl:126](../../stdlib/Security/Cryptography/X509Certificates/X509Chain.sl#L126)</sub>
 
 #### ChainStatus *property*
 
@@ -1726,7 +1746,7 @@ X509ChainStatus[] ChainStatus { get; }
 Everything wrong with the last `Build`, one flag each; empty when it
 passed.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Chain.sl:108](../../stdlib/Security/Cryptography/X509Certificates/X509Chain.sl#L108)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Chain.sl:130](../../stdlib/Security/Cryptography/X509Certificates/X509Chain.sl#L130)</sub>
 
 #### StatusFlags *property*
 
@@ -1736,7 +1756,7 @@ X509ChainStatusFlags StatusFlags { get; }
 
 Everything wrong with the last `Build`, as one set of flags.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Chain.sl:111](../../stdlib/Security/Cryptography/X509Certificates/X509Chain.sl#L111)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Chain.sl:133](../../stdlib/Security/Cryptography/X509Certificates/X509Chain.sl#L133)</sub>
 
 #### Reset *method*
 
@@ -1746,7 +1766,7 @@ void Reset()
 
 Forgets the last `Build`; the policy stays.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Chain.sl:114](../../stdlib/Security/Cryptography/X509Certificates/X509Chain.sl#L114)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Chain.sl:136](../../stdlib/Security/Cryptography/X509Certificates/X509Chain.sl#L136)</sub>
 
 #### Build *method*
 
@@ -1762,7 +1782,7 @@ Builds and validates a path from `certificate`.
 
 **Returns** &nbsp; whether a path reached an anchor and passed every check; `ChainElements` and `ChainStatus` say what was found either way
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Chain.sl:125](../../stdlib/Security/Cryptography/X509Certificates/X509Chain.sl#L125)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Chain.sl:147](../../stdlib/Security/Cryptography/X509Certificates/X509Chain.sl#L147)</sub>
 
 ### X509ChainElement *class*
 
@@ -1834,7 +1854,7 @@ Purposes the leaf MUST serve, as dotted extended key usages; an
 intermediate that lists extended key usages MUST allow them too.
 Empty asks nothing.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509ChainPolicy.sl:58](../../stdlib/Security/Cryptography/X509Certificates/X509ChainPolicy.sl#L58)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509ChainPolicy.sl:61](../../stdlib/Security/Cryptography/X509Certificates/X509ChainPolicy.sl#L61)</sub>
 
 #### ExtraStore *property*
 
@@ -1843,9 +1863,9 @@ X509Certificate2Collection ExtraStore { get; }
 ```
 
 Intermediates to build through, as a server sends them. Nothing here
-is trusted for being here.
+is trusted for being here, and only the first 64 are read.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509ChainPolicy.sl:62](../../stdlib/Security/Cryptography/X509Certificates/X509ChainPolicy.sl#L62)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509ChainPolicy.sl:65](../../stdlib/Security/Cryptography/X509Certificates/X509ChainPolicy.sl#L65)</sub>
 
 #### CustomTrustStore *property*
 
@@ -1856,7 +1876,7 @@ X509Certificate2Collection CustomTrustStore { get; }
 The trust anchors when `TrustMode` is `CustomRootTrust`. Any
 certificate here is an anchor, self-signed or not.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509ChainPolicy.sl:66](../../stdlib/Security/Cryptography/X509Certificates/X509ChainPolicy.sl#L66)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509ChainPolicy.sl:69](../../stdlib/Security/Cryptography/X509Certificates/X509ChainPolicy.sl#L69)</sub>
 
 #### TrustMode *property*
 
@@ -1866,7 +1886,7 @@ X509ChainTrustMode TrustMode { get; set; }
 
 Where the anchors come from.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509ChainPolicy.sl:69](../../stdlib/Security/Cryptography/X509Certificates/X509ChainPolicy.sl#L69)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509ChainPolicy.sl:72](../../stdlib/Security/Cryptography/X509Certificates/X509ChainPolicy.sl#L72)</sub>
 
 #### RevocationMode *property*
 
@@ -1876,7 +1896,7 @@ X509RevocationMode RevocationMode { get; set; }
 
 Whether revocation is asked about; see `X509RevocationMode`.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509ChainPolicy.sl:72](../../stdlib/Security/Cryptography/X509Certificates/X509ChainPolicy.sl#L72)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509ChainPolicy.sl:75](../../stdlib/Security/Cryptography/X509Certificates/X509ChainPolicy.sl#L75)</sub>
 
 #### VerificationTime *property*
 
@@ -1885,9 +1905,21 @@ long VerificationTime { get; set; }
 ```
 
 The moment every certificate MUST be valid at, in seconds since the
-epoch.
+epoch, when `VerificationTimeIgnored` is false. Setting it clears
+`VerificationTimeIgnored`, as in .NET.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509ChainPolicy.sl:76](../../stdlib/Security/Cryptography/X509Certificates/X509ChainPolicy.sl#L76)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509ChainPolicy.sl:80](../../stdlib/Security/Cryptography/X509Certificates/X509ChainPolicy.sl#L80)</sub>
+
+#### VerificationTimeIgnored *property*
+
+```
+bool VerificationTimeIgnored { get; set; }
+```
+
+Whether each `Build` validates at the moment it runs rather than at
+`VerificationTime`. True until `VerificationTime` is set.
+
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509ChainPolicy.sl:92](../../stdlib/Security/Cryptography/X509Certificates/X509ChainPolicy.sl#L92)</sub>
 
 #### Reset *method*
 
@@ -1895,9 +1927,9 @@ epoch.
 void Reset()
 ```
 
-Back to the defaults, with the time now.
+Back to the defaults, with the time of each `Build`.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509ChainPolicy.sl:79](../../stdlib/Security/Cryptography/X509Certificates/X509ChainPolicy.sl#L79)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509ChainPolicy.sl:99](../../stdlib/Security/Cryptography/X509Certificates/X509ChainPolicy.sl#L99)</sub>
 
 ### X509ChainStatus *struct*
 
@@ -2610,12 +2642,12 @@ sealed class X509NameConstraintsExtension : X509Extension
 Which names a CA may issue for: RFC 5280 §4.2.1.10, `2.5.29.30`. Not in
 .NET, which reads the extension only through the platform's chain.
 
-DNS names and IP address ranges are read out and enforced by
-`X509Chain` over the leaf's subject alternative names: a name is
-refused when it is inside an excluded subtree, or when there are
-permitted subtrees of its kind and it is inside none of them. Subtrees
-of the other kinds — directory names, e-mail addresses, URIs — are
-checked to be well-formed and are not enforced.
+DNS names, IP address ranges, directory names and e-mail addresses are
+read out and enforced by `X509Chain`: a name is refused when it is inside
+an excluded subtree, or when there are permitted subtrees of its kind and
+it is inside none of them. Subtrees of the other kinds, URIs among them,
+are checked to be well-formed and are not enforced, so a critical
+extension holding one is an extension this module does not support.
 
 A range is an address followed by a mask of the same length: eight bytes
 for IPv4, thirty-two for IPv6.
@@ -2630,7 +2662,7 @@ String[] PermittedDnsNames { get; }
 
 The permitted DNS subtrees.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509NameConstraintsExtension.sl:78](../../stdlib/Security/Cryptography/X509Certificates/X509NameConstraintsExtension.sl#L78)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509NameConstraintsExtension.sl:94](../../stdlib/Security/Cryptography/X509Certificates/X509NameConstraintsExtension.sl#L94)</sub>
 
 #### PermittedIPRanges *property*
 
@@ -2640,7 +2672,7 @@ byte[][] PermittedIPRanges { get; }
 
 The permitted address ranges.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509NameConstraintsExtension.sl:81](../../stdlib/Security/Cryptography/X509Certificates/X509NameConstraintsExtension.sl#L81)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509NameConstraintsExtension.sl:97](../../stdlib/Security/Cryptography/X509Certificates/X509NameConstraintsExtension.sl#L97)</sub>
 
 #### ExcludedDnsNames *property*
 
@@ -2650,7 +2682,7 @@ String[] ExcludedDnsNames { get; }
 
 The excluded DNS subtrees.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509NameConstraintsExtension.sl:84](../../stdlib/Security/Cryptography/X509Certificates/X509NameConstraintsExtension.sl#L84)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509NameConstraintsExtension.sl:100](../../stdlib/Security/Cryptography/X509Certificates/X509NameConstraintsExtension.sl#L100)</sub>
 
 #### ExcludedIPRanges *property*
 
@@ -2660,7 +2692,48 @@ byte[][] ExcludedIPRanges { get; }
 
 The excluded address ranges.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509NameConstraintsExtension.sl:87](../../stdlib/Security/Cryptography/X509Certificates/X509NameConstraintsExtension.sl#L87)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509NameConstraintsExtension.sl:103](../../stdlib/Security/Cryptography/X509Certificates/X509NameConstraintsExtension.sl#L103)</sub>
+
+#### PermittedDirectoryNames *property*
+
+```
+X500DistinguishedName[] PermittedDirectoryNames { get; }
+```
+
+The permitted directory subtrees.
+
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509NameConstraintsExtension.sl:106](../../stdlib/Security/Cryptography/X509Certificates/X509NameConstraintsExtension.sl#L106)</sub>
+
+#### ExcludedDirectoryNames *property*
+
+```
+X500DistinguishedName[] ExcludedDirectoryNames { get; }
+```
+
+The excluded directory subtrees.
+
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509NameConstraintsExtension.sl:109](../../stdlib/Security/Cryptography/X509Certificates/X509NameConstraintsExtension.sl#L109)</sub>
+
+#### PermittedEmailAddresses *property*
+
+```
+String[] PermittedEmailAddresses { get; }
+```
+
+The permitted e-mail subtrees: a mailbox, a host, or with a leading
+`.` every host under a domain.
+
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509NameConstraintsExtension.sl:113](../../stdlib/Security/Cryptography/X509Certificates/X509NameConstraintsExtension.sl#L113)</sub>
+
+#### ExcludedEmailAddresses *property*
+
+```
+String[] ExcludedEmailAddresses { get; }
+```
+
+The excluded e-mail subtrees.
+
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509NameConstraintsExtension.sl:116](../../stdlib/Security/Cryptography/X509Certificates/X509NameConstraintsExtension.sl#L116)</sub>
 
 ### X509RevocationMode *enum*
 
@@ -2833,7 +2906,8 @@ Console.WriteLine($"{roots.Certificates.Count} trusted roots");
 **On Windows** the system stores are read through crypt32 — `ROOT` for
 `Root` and `CA` for `CertificateAuthority` — which is loaded by name the
 first time a store is opened, so a program that never opens one does not
-link it. **Elsewhere** `Root` is the PEM bundle `SSL_CERT_FILE` names,
+link it. A certificate in the current user's or the machine's
+`Disallowed` store is left out of both. **Elsewhere** `Root` is the PEM bundle `SSL_CERT_FILE` names,
 or else the first of the usual places that exists —
 `/etc/ssl/certs/ca-certificates.crt`, `/etc/pki/tls/certs/ca-bundle.crt`,
 `/etc/ssl/ca-bundle.pem`, `/etc/pki/tls/cacert.pem`, `/etc/ssl/cert.pem`
@@ -2846,7 +2920,7 @@ passed over, and one found twice is kept once. A store that cannot be read
 at all is empty, which a chain reports as `UntrustedRoot` or
 `PartialChain` rather than as a failure of its own.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Store.sl:51](../../stdlib/Security/Cryptography/X509Certificates/X509Store.sl#L51)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Store.sl:52](../../stdlib/Security/Cryptography/X509Certificates/X509Store.sl#L52)</sub>
 
 #### Open *method*
 
@@ -2861,7 +2935,7 @@ The store `name` at `location`, read the first time it is asked for.
 - `name` -- which store
 - `location` -- whose; only Windows tells the two apart
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Store.sl:83](../../stdlib/Security/Cryptography/X509Certificates/X509Store.sl#L83)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Store.sl:84](../../stdlib/Security/Cryptography/X509Certificates/X509Store.sl#L84)</sub>
 
 #### Name *property*
 
@@ -2871,7 +2945,7 @@ StoreName Name { get; }
 
 Which store this is.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Store.sl:102](../../stdlib/Security/Cryptography/X509Certificates/X509Store.sl#L102)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Store.sl:103](../../stdlib/Security/Cryptography/X509Certificates/X509Store.sl#L103)</sub>
 
 #### Location *property*
 
@@ -2881,7 +2955,7 @@ StoreLocation Location { get; }
 
 Whose store this is.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Store.sl:105](../../stdlib/Security/Cryptography/X509Certificates/X509Store.sl#L105)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Store.sl:106](../../stdlib/Security/Cryptography/X509Certificates/X509Store.sl#L106)</sub>
 
 #### Certificates *property*
 
@@ -2891,7 +2965,7 @@ X509Certificate2Collection Certificates { get; }
 
 Its certificates: a copy, which the caller MAY change.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Store.sl:108](../../stdlib/Security/Cryptography/X509Certificates/X509Store.sl#L108)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Store.sl:109](../../stdlib/Security/Cryptography/X509Certificates/X509Store.sl#L109)</sub>
 
 ### X509SubjectAlternativeNameExtension *class*
 
@@ -2901,9 +2975,9 @@ sealed class X509SubjectAlternativeNameExtension : X509Extension
 
 The names the certificate is for: RFC 5280 §4.2.1.6, `2.5.29.17`.
 
-Four kinds of name are read out: DNS names, IP addresses as their four or
-sixteen bytes, URIs and e-mail addresses. The other kinds — a directory
-name, an `otherName`, a registered identifier — are checked to be
+Five kinds of name are read out: DNS names, IP addresses as their four or
+sixteen bytes, URIs, e-mail addresses and directory names. The other
+kinds, an `otherName` or a registered identifier, are checked to be
 well-formed and are otherwise left in `RawData`.
 
 **See also** &nbsp; [SubjectAlternativeNameBuilder](#subjectalternativenamebuilder-class) &middot; [X509Certificate2.MatchesHostname](#matcheshostname-method)
@@ -2918,7 +2992,7 @@ String[] DnsNames { get; }
 
 The `dNSName` entries, as written.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509SubjectAlternativeNameExtension.sl:56](../../stdlib/Security/Cryptography/X509Certificates/X509SubjectAlternativeNameExtension.sl#L56)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509SubjectAlternativeNameExtension.sl:59](../../stdlib/Security/Cryptography/X509Certificates/X509SubjectAlternativeNameExtension.sl#L59)</sub>
 
 #### IPAddresses *property*
 
@@ -2928,7 +3002,7 @@ byte[][] IPAddresses { get; }
 
 The `iPAddress` entries: four bytes for IPv4, sixteen for IPv6.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509SubjectAlternativeNameExtension.sl:59](../../stdlib/Security/Cryptography/X509Certificates/X509SubjectAlternativeNameExtension.sl#L59)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509SubjectAlternativeNameExtension.sl:62](../../stdlib/Security/Cryptography/X509Certificates/X509SubjectAlternativeNameExtension.sl#L62)</sub>
 
 #### Uris *property*
 
@@ -2938,7 +3012,7 @@ String[] Uris { get; }
 
 The `uniformResourceIdentifier` entries.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509SubjectAlternativeNameExtension.sl:62](../../stdlib/Security/Cryptography/X509Certificates/X509SubjectAlternativeNameExtension.sl#L62)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509SubjectAlternativeNameExtension.sl:65](../../stdlib/Security/Cryptography/X509Certificates/X509SubjectAlternativeNameExtension.sl#L65)</sub>
 
 #### EmailAddresses *property*
 
@@ -2948,7 +3022,17 @@ String[] EmailAddresses { get; }
 
 The `rfc822Name` entries.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509SubjectAlternativeNameExtension.sl:65](../../stdlib/Security/Cryptography/X509Certificates/X509SubjectAlternativeNameExtension.sl#L65)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509SubjectAlternativeNameExtension.sl:68](../../stdlib/Security/Cryptography/X509Certificates/X509SubjectAlternativeNameExtension.sl#L68)</sub>
+
+#### DirectoryNames *property*
+
+```
+X500DistinguishedName[] DirectoryNames { get; }
+```
+
+The `directoryName` entries.
+
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509SubjectAlternativeNameExtension.sl:71](../../stdlib/Security/Cryptography/X509Certificates/X509SubjectAlternativeNameExtension.sl#L71)</sub>
 
 ### X509SubjectKeyIdentifierExtension *class*
 

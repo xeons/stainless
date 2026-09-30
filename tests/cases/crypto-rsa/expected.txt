@@ -131,6 +131,16 @@ even modulus ok
 small modulus ok
 exponent of one ok
 even exponent ok
+exponent of 33 bits ok
+exponent of 34 bits ok
+exponent as long as the modulus ok
+modulus of 1024 bits ok
+modulus of 1023 bits ok
+modulus of 8192 bits ok
+modulus of 8193 bits ok
+oversized key from der ok
 key size 1000 ok
 key size 256 ok
+key size 1024 ok
+key size 8256 ok
 generated 2048 ok

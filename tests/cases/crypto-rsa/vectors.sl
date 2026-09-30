@@ -4,6 +4,7 @@ module RsaCase;
 import Standard.Console;
 import Standard.Convert;
 import Standard.Encoding;
+import Standard.Formats.Asn1;
 import Standard.Security.Cryptography;
 
 // key.pem was made by OpenSSL 3.5.5 with `openssl genpkey -algorithm RSA
@@ -434,6 +435,50 @@ void CheckRefusals(Rsa key)
     Check("exponent of one", DescribeKey(Rsa.Create(numbers)), "InvalidKey");
     numbers.Exponent = [0x01, 0x00];
     Check("even exponent", DescribeKey(Rsa.Create(numbers)), "InvalidKey");
+    CheckKeyBounds(good);
+}
+
+/// A key from the network is 1024 to 8192 bits with an exponent of at most
+/// 33 bits, so that verifying with one stays cheap.
+void CheckKeyBounds(RsaParameters good)
+{
+    var numbers = new RsaParameters { Modulus = good.Modulus, Exponent = [0x01, 0xFF, 0xFF,
+                                                                          0xFF, 0xFF] };
+    Check("exponent of 33 bits", DescribeKey(Rsa.Create(numbers)), "public");
+    numbers.Exponent = [0x03, 0xFF, 0xFF, 0xFF, 0xFF];
+    Check("exponent of 34 bits", DescribeKey(Rsa.Create(numbers)), "InvalidKey");
+    numbers.Exponent = CopyBytes(good.Modulus);
+    numbers.Exponent[0u] = 0x01;
+    Check("exponent as long as the modulus", DescribeKey(Rsa.Create(numbers)), "InvalidKey");
+
+    numbers.Exponent = good.Exponent;
+    numbers.Modulus = CreateOddModulus(128u, 0x80);
+    Check("modulus of 1024 bits", DescribeKey(Rsa.Create(numbers)), "public");
+    numbers.Modulus = CreateOddModulus(128u, 0x7F);
+    Check("modulus of 1023 bits", DescribeKey(Rsa.Create(numbers)), "InvalidKey");
+    numbers.Modulus = CreateOddModulus(1024u, 0xFF);
+    Check("modulus of 8192 bits", DescribeKey(Rsa.Create(numbers)), "public");
+    numbers.Modulus = CreateOddModulus(1025u, 0x01);
+    Check("modulus of 8193 bits", DescribeKey(Rsa.Create(numbers)), "InvalidKey");
+
+    var writer = new AsnWriter();
+    writer.PushSequence();
+    writer.WriteIntegerUnsigned(CreateOddModulus(2048u, 0xFF));
+    writer.WriteIntegerUnsigned(CreateOddModulus(2047u, 0xFF));
+    writer.PopSequence();
+    Check("oversized key from der", DescribeKey(Rsa.ImportRsaPublicKey(writer.Encode())),
+          "InvalidKey");
+}
+
+/// `length` bytes, the first `top` and the rest 0xFF: odd, and as many bits
+/// as `top` leaves.
+byte[] CreateOddModulus(nuint length, byte top)
+{
+    var modulus = new byte[length];
+    for (nuint i = 0u; i < length; i++)
+        modulus[i] = 0xFF;
+    modulus[0u] = top;
+    return modulus;
 }
 
 // ------------------------------------------------------------ the OpenSSL vectors

@@ -36,7 +36,8 @@ import Standard.Directory;
 /// **On Windows** the system stores are read through crypt32 — `ROOT` for
 /// `Root` and `CA` for `CertificateAuthority` — which is loaded by name the
 /// first time a store is opened, so a program that never opens one does not
-/// link it. **Elsewhere** `Root` is the PEM bundle `SSL_CERT_FILE` names,
+/// link it. A certificate in the current user's or the machine's
+/// `Disallowed` store is left out of both. **Elsewhere** `Root` is the PEM bundle `SSL_CERT_FILE` names,
 /// or else the first of the usual places that exists —
 /// `/etc/ssl/certs/ca-certificates.crt`, `/etc/pki/tls/certs/ca-bundle.crt`,
 /// `/etc/ssl/ca-bundle.pem`, `/etc/pki/tls/cacert.pem`, `/etc/ssl/cert.pem`
@@ -113,9 +114,17 @@ public sealed class X509Store
         var certificates = new X509Certificate2Collection();
 #if WINDOWS
         var crypt32 = new Crypt32();
-        if (crypt32.Ready)
-            crypt32.ReadSystemStore(name == StoreName.Root ? "ROOT" : "CA",
-                                    location == StoreLocation.LocalMachine, certificates);
+        if (!crypt32.Ready)
+            return certificates;
+        crypt32.ReadSystemStore(name == StoreName.Root ? "ROOT" : "CA",
+                                location == StoreLocation.LocalMachine, certificates);
+
+        // What either Disallowed store holds is distrusted wherever else it is.
+        var disallowed = new X509Certificate2Collection();
+        crypt32.ReadSystemStore("Disallowed", false, disallowed);
+        crypt32.ReadSystemStore("Disallowed", true, disallowed);
+        foreach (X509Certificate2 refused in disallowed)
+            certificates.Remove(refused);
 #else
         if (name == StoreName.Root)
             ReadCertificateBundles(certificates);

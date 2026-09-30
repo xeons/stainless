@@ -11,6 +11,8 @@ scrypt-length-zero ok
 scrypt-width ok
 scrypt-cost-for-width ok
 scrypt-memory ok
+scrypt-memory-sum ok
+scrypt-work ok
 blake2b-abc ok
 blake2b-empty ok
 blake2b-one-block ok
@@ -31,3 +33,7 @@ argon2id-no-lanes ok
 argon2id-short-tag ok
 argon2id-short-salt ok
 argon2id-memory ok
+argon2id-work ok
+argon2id-longest-tag ok
+argon2id-long-tag-refused ok
+pbkdf2-index-wraps refused

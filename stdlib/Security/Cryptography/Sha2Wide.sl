@@ -69,6 +69,8 @@ public abstract class Sha2Wide : HashAlgorithm
         ];
     }
 
+    ~Sha2Wide() => CryptographicOperations.ZeroMemory(_state);
+
     /// The schedule is an inline array and the block is read in place, so a
     /// block allocates nothing and passes no counted reference to a helper.
     protected override void CompressBlock(byte[] block)

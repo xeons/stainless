@@ -32,8 +32,8 @@ import Standard.Bits;
 /// ```csharp
 /// var box = try ChaCha20Poly1305.FromKey(key);
 /// byte[] tag = new byte[16u];
-/// var sealed = try box.Encrypt(nonce, plaintext, associated, tag);
-/// var opened = try box.Decrypt(nonce, sealed, associated, tag);
+/// var encrypted = try box.Encrypt(nonce, plaintext, associated, tag);
+/// var opened = try box.Decrypt(nonce, encrypted, associated, tag);
 /// ```
 ///
 /// **It is AES-GCM's alternative where there is no AES in hardware.** Every
@@ -133,6 +133,11 @@ public sealed class ChaCha20Poly1305
             return Fail(CryptoError.NonceLength);
         if (tag.Length != TagSize)
             return Fail(CryptoError.TagLength);
+
+        // Refused before the tag is computed over a text the keystream cannot
+        // cover: blocks 1 through 2^32 - 1.
+        if (((ulong)ciphertext.Length + 63u) / 64u > 0xFFFFFFFFu)
+            return Fail(CryptoError.Parameter);
 
         byte[] expected = ComputeTag(nonce, associatedData, ciphertext);
         if (!CryptographicOperations.FixedTimeEquals(expected, tag))

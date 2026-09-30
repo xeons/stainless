@@ -102,6 +102,14 @@ public sealed class Blake2b : IHashAlgorithm
         Reset();
     }
 
+    ~Blake2b()
+    {
+        CryptographicOperations.ZeroMemory(_key);
+        CryptographicOperations.ZeroMemory(_block);
+        CryptographicOperations.ZeroMemory(_state);
+        CryptographicOperations.ZeroMemory(_words);
+    }
+
     /// A BLAKE2b under `key` giving `hashSize` bytes. An empty key is the
     /// unkeyed hash of that length.
     ///

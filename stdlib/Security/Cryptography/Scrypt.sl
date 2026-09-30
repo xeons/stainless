@@ -54,13 +54,25 @@ import Standard.Bits;
 /// @see Rfc2898DeriveBytes
 public static class Scrypt
 {
-    /// The most working memory a derivation may ask for: 4 GiB, which is
+    /// The most working memory a derivation may ask for: 4 GiB, counting
+    /// both the 128 * `blockSize` * `cost` bytes of V and the
+    /// 128 * `blockSize` * `parallelism` of B. That is just under
     /// `cost` = 2^22 at `blockSize` = 8. Parameters read from a stored hash
     /// are input like any other, and this bounds what one can make a call
     /// allocate.
     ///
     /// @value 2^32 bytes.
     public const ulong MaxMemoryBytes = 0x100000000u;
+
+    /// The most work a derivation may ask for, as `cost` * `blockSize` *
+    /// `parallelism`. Each unit is a 128-byte block written once and read
+    /// once in each of the two passes, so the limit is 256 GiB of mixing:
+    /// minutes, where 2^20 * 8 * 1, a strong interactive setting, is 2^23.
+    /// It bounds the time one stored hash can make a call take, as
+    /// `MaxMemoryBytes` bounds the memory.
+    ///
+    /// @value 2^30.
+    public const ulong MaxWork = 0x40000000u;
 
     /// `length` bytes derived from `password` and `salt`.
     ///
@@ -73,9 +85,10 @@ public static class Scrypt
     /// @param length       how many bytes to derive
     /// @failure CryptoError.Parameter  `cost` is not a power of two above one; `blockSize`,
     ///                                 `parallelism` or `length` is zero; `blockSize` times
-    ///                                 `parallelism` reaches 2^30; `cost` reaches 2^(16 ·
-    ///                                 `blockSize`); `length` is past (2^32 - 1) · 32; or the
-    ///                                 memory needed is past `MaxMemoryBytes`
+    ///                                 `parallelism` reaches 2^30; `cost` reaches 2^(16 *
+    ///                                 `blockSize`); `length` is past (2^32 - 1) * 32; the
+    ///                                 memory needed is past `MaxMemoryBytes`; or the work is
+    ///                                 past `MaxWork`
     public static Result<byte[], CryptoError> DeriveKey(ReadOnlySpan<byte> password,
                                                         ReadOnlySpan<byte> salt, nuint cost,
                                                         nuint blockSize, nuint parallelism,
@@ -95,15 +108,14 @@ public static class Scrypt
         for (nuint i = 0u; i < parallelism; i++)
             MixMemory(blocks, i * chunk, cost, blockSize, memory);
 
-        for (nuint i = 0u; i < memory.Length; i++)
-            memory[i] = 0u;
+        CryptographicOperations.ZeroMemory(memory);
 
         var derived = Rfc2898DeriveBytes.Pbkdf2(password, blocks, 1u, new Sha256(), length);
         CryptographicOperations.ZeroMemory(blocks);
         return derived;
     }
 
-    /// The limits of RFC 7914 §2, and `MaxMemoryBytes`.
+    /// The limits of RFC 7914 section 2, `MaxMemoryBytes` and `MaxWork`.
     static bool AreParametersValid(nuint cost, nuint blockSize, nuint parallelism, nuint length)
     {
         if (cost < 2u || (cost & (cost - 1u)) != 0u)
@@ -119,15 +131,14 @@ public static class Scrypt
         if ((ulong)length > 0x1FFFFFFFE0u)
             return false;
 
-        // Both products are below 2^62 once the checks above have passed, so
-        // neither can wrap.
+        // V is `cost` chunks and B is `parallelism` chunks. Both are at most
+        // `most`, so `cost` * `width` is at most 2^25 and no product wraps.
         ulong chunk = 128u * width;
-        if ((ulong)cost > MaxMemoryBytes / chunk)
-            return false;
-        if (chunk * (ulong)parallelism > MaxMemoryBytes)
+        ulong most = MaxMemoryBytes / chunk;
+        if ((ulong)parallelism > most || (ulong)cost > most - (ulong)parallelism)
             return false;
 
-        return true;
+        return (ulong)cost * width * (ulong)parallelism <= MaxWork;
     }
 
     /// ROMix of RFC 7914 §5, on the `128 · blockSize` bytes of `blocks` at
@@ -169,11 +180,11 @@ public static class Scrypt
         }
 
         for (nuint i = 0u; i < words; i++)
-        {
             WriteLittleWord(blocks, at + i * 4u, current[i]);
-            current[i] = 0u;
-            next[i] = 0u;
-        }
+
+        CryptographicOperations.ZeroMemory(current);
+        CryptographicOperations.ZeroMemory(next);
+        CryptographicOperations.ZeroMemory(mixing);
     }
 
     /// BlockMix of RFC 7914 §4: `input` through Salsa20/8 a 64-byte block at a

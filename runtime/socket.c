@@ -66,7 +66,18 @@
 #  define WIN32_LEAN_AND_MEAN
 #  include <winsock2.h>
 #  include <ws2tcpip.h>
+#  include <mstcpip.h>
 #  pragma comment(lib, "ws2_32.lib")
+
+#  ifndef WSA_FLAG_NO_HANDLE_INHERIT
+#    define WSA_FLAG_NO_HANDLE_INHERIT 0x80
+#  endif
+#  ifndef SIO_UDP_CONNRESET
+#    define SIO_UDP_CONNRESET _WSAIOW(IOC_VENDOR, 12)
+#  endif
+#  ifndef SIO_UDP_NETRESET
+#    define SIO_UDP_NETRESET _WSAIOW(IOC_VENDOR, 15)
+#  endif
 
 typedef SOCKET SlNative;
 typedef int    SlLength;            /* Winsock's socklen_t is a plain int */
@@ -109,7 +120,8 @@ enum {
     SL_NET_ACCESS_DENIED = 10,
     SL_NET_NO_NAME = 11,
     SL_NET_INVALID = 12,
-    SL_NET_UNKNOWN = 13
+    SL_NET_UNKNOWN = 13,
+    SL_NET_TRY_AGAIN = 14
 };
 
 /* The families and kinds Standard.Net names, which are not the platform's. */
@@ -279,7 +291,10 @@ static int sl_net_start(int *error)
     }
 
     while (__atomic_load_n(&sl_net_started, __ATOMIC_ACQUIRE) == 1) { Sleep(0); }
-    return __atomic_load_n(&sl_net_started, __ATOMIC_ACQUIRE) == 2;
+    if (__atomic_load_n(&sl_net_started, __ATOMIC_ACQUIRE) == 2) return 1;
+
+    sl_net_report(error, SL_NET_UNKNOWN);
+    return 0;
 }
 #else
 static int sl_net_start(int *error) { (void)error; return 1; }
@@ -292,6 +307,29 @@ static int sl_net_family(int family)
     if (family == SL_NET_IPV6) return AF_INET6;
     if (family == SL_NET_IPV4) return AF_INET;
     return AF_UNSPEC;
+}
+
+/*
+ * A getaddrinfo failure, translated. A resolver that could not answer yet is
+ * not a name that does not exist, and a caller MAY retry it.
+ */
+static int sl_net_translate_lookup(int result)
+{
+    switch (result) {
+#ifdef EAI_AGAIN
+        case EAI_AGAIN:  return SL_NET_TRY_AGAIN;
+#endif
+#ifdef EAI_MEMORY
+        case EAI_MEMORY: return SL_NET_UNKNOWN;
+#endif
+#ifdef EAI_SYSTEM
+        case EAI_SYSTEM: {
+            int code = sl_net_translate(errno);
+            return code == SL_NET_OK ? SL_NET_UNKNOWN : code;
+        }
+#endif
+        default:         return SL_NET_NO_NAME;
+    }
 }
 
 /*
@@ -317,7 +355,7 @@ static int sl_net_lookup(const char *host, uint16_t port, int family, int kind,
 
     result = getaddrinfo(host, service, &hints, out);
     if (result != 0) {
-        sl_net_report(error, SL_NET_NO_NAME);
+        sl_net_report(error, sl_net_translate_lookup(result));
         return 0;
     }
     return 1;
@@ -341,22 +379,105 @@ static void sl_net_describe(const struct sockaddr *address, SlLength length,
 
 /* ------------------------------------------------------------------ opening */
 
+static int sl_net_set_blocking(SlNative handle, int blocking)
+{
+#ifdef _WIN32
+    u_long mode = blocking ? 0 : 1;
+    return ioctlsocket(handle, FIONBIO, &mode) == 0;
+#else
+    int flags = fcntl(handle, F_GETFL, 0);
+    if (flags < 0) return 0;
+
+    flags = blocking ? (flags & ~O_NONBLOCK) : (flags | O_NONBLOCK);
+    return fcntl(handle, F_SETFL, flags) == 0;
+#endif
+}
+
+/*
+ * A socket no child process inherits. A child holding a copy keeps a
+ * listener's port and a connection's peer alive after this process closes
+ * them, so every socket made here is marked as it is made.
+ */
+static SlNative sl_net_socket(int domain, int type, int protocol)
+{
+    SlNative handle;
+#ifdef _WIN32
+    handle = WSASocketW(domain, type, protocol, NULL, 0,
+                        WSA_FLAG_OVERLAPPED | WSA_FLAG_NO_HANDLE_INHERIT);
+    if (handle != INVALID_SOCKET || WSAGetLastError() != WSAEINVAL) return handle;
+
+    /* A Windows without the flag: mark the handle instead. */
+    handle = socket(domain, type, protocol);
+    if (handle != INVALID_SOCKET)
+        SetHandleInformation((HANDLE)handle, HANDLE_FLAG_INHERIT, 0);
+    return handle;
+#else
+#  ifdef SOCK_CLOEXEC
+    handle = socket(domain, type | SOCK_CLOEXEC, protocol);
+    if (handle != SL_BAD_SOCKET || errno != EINVAL) return handle;
+#  endif
+    handle = socket(domain, type, protocol);
+    if (handle != SL_BAD_SOCKET) fcntl(handle, F_SETFD, FD_CLOEXEC);
+    return handle;
+#endif
+}
+
+/* The same for accept, whose socket the kernel makes. */
+static SlNative sl_net_accept(SlNative listener)
+{
+    SlNative accepted;
+#ifdef _WIN32
+    accepted = accept(listener, NULL, NULL);
+    if (accepted != INVALID_SOCKET)
+        SetHandleInformation((HANDLE)accepted, HANDLE_FLAG_INHERIT, 0);
+    return accepted;
+#else
+#  if defined(__linux__) && defined(SOCK_CLOEXEC)
+    accepted = accept4(listener, NULL, NULL, SOCK_CLOEXEC);
+    if (accepted != SL_BAD_SOCKET || (errno != ENOSYS && errno != EINVAL)) return accepted;
+#  endif
+    accepted = accept(listener, NULL, NULL);
+    if (accepted != SL_BAD_SOCKET) fcntl(accepted, F_SETFD, FD_CLOEXEC);
+    return accepted;
+#endif
+}
+
+/*
+ * What every socket made here gets. On Windows a datagram socket otherwise
+ * fails its next receive with WSAECONNRESET after a send drew an ICMP port
+ * unreachable, so one vanished peer stops a server.
+ */
+static void sl_net_prepare(SlNative handle, int type)
+{
+    sl_net_no_sigpipe(handle);
+#ifdef _WIN32
+    if (type == SOCK_DGRAM) {
+        BOOL off = FALSE;
+        DWORD returned = 0;
+        WSAIoctl(handle, SIO_UDP_CONNRESET, &off, sizeof off, NULL, 0, &returned, NULL, NULL);
+        WSAIoctl(handle, SIO_UDP_NETRESET, &off, sizeof off, NULL, 0, &returned, NULL, NULL);
+    }
+#else
+    (void)type;
+#endif
+}
+
 size_t sl_socket_open(int family, int kind, int *error)
 {
     SlNative handle;
+    int type = kind == SL_NET_DATAGRAM ? SOCK_DGRAM : SOCK_STREAM;
 
     sl_net_report(error, SL_NET_OK);
     if (!sl_net_start(error)) return (size_t)-1;
 
-    handle = socket(sl_net_family(family),
-                    kind == SL_NET_DATAGRAM ? SOCK_DGRAM : SOCK_STREAM,
-                    kind == SL_NET_DATAGRAM ? IPPROTO_UDP : IPPROTO_TCP);
+    handle = sl_net_socket(sl_net_family(family), type,
+                           kind == SL_NET_DATAGRAM ? IPPROTO_UDP : IPPROTO_TCP);
 
     if (handle == SL_BAD_SOCKET) {
         sl_net_failed(error);
         return (size_t)-1;
     }
-    sl_net_no_sigpipe(handle);
+    sl_net_prepare(handle, type);
     return (size_t)handle;
 }
 
@@ -413,16 +534,26 @@ int sl_socket_listen(size_t handle, int backlog, int *error)
     return 1;
 }
 
+/*
+ * Accepts a connection. The accepted socket blocks whatever the listener
+ * does: Windows and the BSDs copy the listener's mode and Linux does not, and
+ * a server polling its listener has not asked for connections that poll.
+ */
 size_t sl_socket_accept(size_t handle, int *error)
 {
-    SlNative accepted = accept((SlNative)handle, NULL, NULL);
+    SlNative accepted = sl_net_accept((SlNative)handle);
 
     if (accepted == SL_BAD_SOCKET) {
         sl_net_transfer_failed((SlNative)handle, error);
         return (size_t)-1;
     }
+    if (!sl_net_set_blocking(accepted, 1)) {
+        sl_net_failed(error);
+        sl_close_native(accepted);
+        return (size_t)-1;
+    }
     sl_net_report(error, SL_NET_OK);
-    sl_net_no_sigpipe(accepted);
+    sl_net_prepare(accepted, SOCK_STREAM);
     return (size_t)accepted;
 }
 
@@ -451,6 +582,46 @@ int sl_socket_connect(size_t handle, const char *host, uint16_t port, int family
     return ok;
 }
 
+static int sl_net_pending(SlNative handle);
+
+/*
+ * Connects one candidate within `milliseconds`, or as long as the system
+ * takes when that is negative. Answers 1, or 0 with the error in *code.
+ */
+static int sl_net_connect_within(SlNative handle, const struct addrinfo *step,
+                                 int milliseconds, int *code)
+{
+    int ready;
+
+    if (milliseconds < 0) {
+        if (connect(handle, step->ai_addr, (SlLength)step->ai_addrlen) == 0) return 1;
+        sl_net_transfer_failed(handle, code);
+        return 0;
+    }
+
+    if (!sl_net_set_blocking(handle, 0)) {
+        sl_net_failed(code);
+        return 0;
+    }
+    if (connect(handle, step->ai_addr, (SlLength)step->ai_addrlen) != 0) {
+        *code = sl_net_last();
+        if (*code != SL_NET_WOULD_BLOCK) return 0;
+
+        ready = sl_socket_wait((size_t)handle, 1, milliseconds, code);
+        if (ready == 0) *code = SL_NET_TIMED_OUT;
+        if (ready != 1) return 0;
+
+        /* Writable is also how a failed connect ends on POSIX. */
+        *code = sl_net_pending(handle);
+        if (*code != SL_NET_OK) return 0;
+    }
+    if (!sl_net_set_blocking(handle, 1)) {
+        sl_net_failed(code);
+        return 0;
+    }
+    return 1;
+}
+
 /*
  * Opens a socket and connects it, trying every address the name resolved to.
  *
@@ -469,32 +640,62 @@ int sl_socket_connect(size_t handle, const char *host, uint16_t port, int family
 size_t sl_socket_open_connected(const char *host, uint16_t port, int family,
                                 int kind, int *error)
 {
+    return sl_socket_open_connected_within(host, port, family, kind, -1, error);
+}
+
+/*
+ * The same, bounded: every candidate is tried within `milliseconds` in all,
+ * each given an equal share of what is left, so an address that never answers
+ * cannot spend the time the next one needed. Negative is no bound. Name
+ * resolution is not bounded, because getaddrinfo cannot be.
+ */
+size_t sl_socket_open_connected_within(const char *host, uint16_t port, int family,
+                                       int kind, int milliseconds, int *error)
+{
     struct addrinfo *found = NULL;
     struct addrinfo *step;
+    long long deadline = 0;
+    int candidates = 0;
+    int code = SL_NET_OK;
 
     sl_net_report(error, SL_NET_OK);
     if (!sl_net_start(error)) return (size_t)-1;
+    if (milliseconds >= 0)
+        deadline = sl_time_monotonic() + (long long)milliseconds * 1000000LL;
     if (!sl_net_lookup(host, port, family, kind, 0, &found, error)) return (size_t)-1;
 
-    for (step = found; step != NULL; step = step->ai_next) {
-        SlNative handle = socket(step->ai_family, step->ai_socktype, step->ai_protocol);
+    for (step = found; step != NULL; step = step->ai_next) candidates++;
+
+    for (step = found; step != NULL; step = step->ai_next, candidates--) {
+        int share = -1;
+        SlNative handle;
+
+        if (milliseconds >= 0) {
+            long long left = (deadline - sl_time_monotonic()) / 1000000LL;
+            if (left <= 0) {
+                code = SL_NET_TIMED_OUT;
+                break;
+            }
+            share = (int)(left / candidates);
+            if (share < 1) share = 1;
+        }
+
+        handle = sl_net_socket(step->ai_family, step->ai_socktype, step->ai_protocol);
         if (handle == SL_BAD_SOCKET) {
-            sl_net_failed(error);
+            sl_net_failed(&code);
             continue;
         }
 
-        if (connect(handle, step->ai_addr, (SlLength)step->ai_addrlen) == 0) {
+        if (sl_net_connect_within(handle, step, share, &code)) {
             freeaddrinfo(found);
-            sl_net_report(error, SL_NET_OK);
-            sl_net_no_sigpipe(handle);
+            sl_net_prepare(handle, step->ai_socktype);
             return (size_t)handle;
         }
-
-        sl_net_transfer_failed(handle, error);
         sl_close_native(handle);
     }
 
     freeaddrinfo(found);
+    sl_net_report(error, code == SL_NET_OK ? SL_NET_UNKNOWN : code);
     return (size_t)-1;
 }
 
@@ -542,6 +743,10 @@ size_t sl_socket_receive(size_t handle, uint8_t *data, size_t count, int *error)
 
 #ifdef _WIN32
     moved = recv((SlNative)handle, (char *)data, sl_net_count(count), 0);
+
+    /* A connected datagram socket truncates as sl_socket_receive_from does. */
+    if (moved < 0 && WSAGetLastError() == WSAEMSGSIZE)
+        moved = sl_net_count(count);
 #else
     moved = recv((SlNative)handle, data, count, 0);
 #endif
@@ -625,27 +830,10 @@ size_t sl_socket_receive_from(size_t handle, uint8_t *data, size_t count,
 int sl_socket_set_blocking(size_t handle, int blocking, int *error)
 {
     sl_net_report(error, SL_NET_OK);
-
-#ifdef _WIN32
-    {
-        u_long mode = blocking ? 0 : 1;
-        if (ioctlsocket((SlNative)handle, FIONBIO, &mode) != 0) {
-            sl_net_failed(error);
-            return 0;
-        }
+    if (!sl_net_set_blocking((SlNative)handle, blocking)) {
+        sl_net_failed(error);
+        return 0;
     }
-#else
-    {
-        int flags = fcntl((SlNative)handle, F_GETFL, 0);
-        if (flags < 0) { sl_net_failed(error); return 0; }
-
-        flags = blocking ? (flags & ~O_NONBLOCK) : (flags | O_NONBLOCK);
-        if (fcntl((SlNative)handle, F_SETFL, flags) < 0) {
-            sl_net_failed(error);
-            return 0;
-        }
-    }
-#endif
     return 1;
 }
 

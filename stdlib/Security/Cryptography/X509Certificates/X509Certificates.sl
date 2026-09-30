@@ -51,7 +51,8 @@
 /// **Parsing is RFC 5280's, strictly, with the leniencies browsers have.**
 /// The DER is held to the letter: minimal lengths and integers, a signature
 /// algorithm outside the signed part identical to the one inside it, a
-/// version of 1, 2 or 3, extensions only in version 3 and none twice. What
+/// version of 1, 2 or 3 with version 1 left out as DER leaves a DEFAULT,
+/// extensions only in version 3 and none twice. What
 /// is tolerated is what real certificates do: a serial number of up to 20
 /// octets that is zero or negative, a `GeneralizedTime` before 2050, an
 /// explicit `critical FALSE`, and a `PrintableString` holding `*` or `@`.
@@ -60,15 +61,20 @@
 ///
 /// **Signatures** are Ed25519, ECDSA over P-256 and P-384 with SHA-256, -384
 /// or -512, RSA PKCS #1 v1.5 with SHA-1, -256, -384 or -512, and RSASSA-PSS
-/// whose mask hash is its message hash. A chain refuses SHA-1 as
-/// `HasWeakSignature` though the signature is checked.
+/// whose mask hash is its message hash. A chain refuses SHA-1, RSASSA-PSS
+/// over SHA-1 included, and any RSA key under 2048 bits as
+/// `HasWeakSignature` though the signature is checked. An RSA key is read
+/// only at 1024 to 8192 bits with an exponent of at most 33 bits, and a
+/// key restricted to PSS holds its signatures to its own parameters.
 ///
 /// **Host names are matched as RFC 6125 and the CA/Browser Forum say**:
 /// against the DNS names in the subject alternative name and never the
 /// common name, whatever else the certificate holds; case-insensitively in
 /// ASCII; with a wildcard only as the whole of the left-most label, matching
 /// exactly one label, and only over at least two labels; an address only
-/// against the address entries, as bytes.
+/// against the address entries, as bytes. A wildcard over two labels that
+/// look like a registry's suffix under a country code, `*.co.uk`, matches
+/// nothing; there is no public suffix list, so `*.github.io` still does.
 ///
 /// **There is no revocation.** Nothing here fetches or reads a CRL or asks an
 /// OCSP responder, so `X509RevocationMode.NoCheck` is the default and the
@@ -190,7 +196,8 @@ internal Optional<String> NormalizeDnsName(String name, bool allowAsterisk)
 
 /// Whether the normalized `host` matches the normalized `pattern`: equal, or
 /// under a wildcard that is the whole left-most label of a pattern with at
-/// least two labels after it, standing for exactly one label.
+/// least two labels after it, standing for exactly one label. A wildcard over
+/// what looks like a public suffix under a country code matches nothing.
 internal bool MatchDnsNamePattern(String host, String pattern, bool allowWildcards)
 {
     if (host == pattern)
@@ -199,13 +206,64 @@ internal bool MatchDnsNamePattern(String host, String pattern, bool allowWildcar
         return false;
 
     String stem = pattern.Substring(2u);
-    if (stem.Contains('*') || !stem.Contains('.'))
+    if (stem.Contains('*') || !stem.Contains('.') || IsLikelyCountryCodeSuffix(stem))
         return false;
 
     long dot = host.IndexOf('.');
     if (dot <= 0)
         return false;
     return host.Substring((nuint)dot + 1u) == stem;
+}
+
+/// Whether the normalized `name` is two labels that read as a registry's
+/// suffix under a country code: a two-letter last label under one of the
+/// second-level labels registries commonly reserve, as `co.uk`, `com.au`
+/// and `ac.jp`.
+///
+/// There is no public suffix list here; the whole list is some ten thousand
+/// rules and changes monthly. This catches the common shape and nothing
+/// else, so `*.github.io` and `*.appspot.com` still match. CAs MUST NOT issue
+/// such wildcards, which is the real defence.
+internal bool IsLikelyCountryCodeSuffix(String name)
+{
+    long dot = name.IndexOf('.');
+    if (dot <= 0 || name.LastIndexOf('.') != dot)
+        return false;
+    String last = name.Substring((nuint)dot + 1u);
+    if (last.ByteLength() != 2u)
+        return false;
+    byte[] code = last.ToBytes();
+    if (code[0u] < 97 || code[0u] > 122 || code[1u] < 97 || code[1u] > 122)
+        return false;
+
+    switch (name.Substring(0u, (nuint)dot))
+    {
+        case "ac":
+        case "co":
+        case "com":
+        case "edu":
+        case "gen":
+        case "go":
+        case "gob":
+        case "gov":
+        case "gv":
+        case "info":
+        case "int":
+        case "ltd":
+        case "me":
+        case "mil":
+        case "ne":
+        case "net":
+        case "nhs":
+        case "nic":
+        case "nom":
+        case "or":
+        case "org":
+        case "plc":
+        case "sch":
+            return true;
+    }
+    return false;
 }
 
 /// Whether the normalized DNS `name` is inside the subtree `constraint`

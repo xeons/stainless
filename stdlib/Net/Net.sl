@@ -60,6 +60,8 @@ extern "C"
                             int kind, int* error);
     nuint sl_socket_open_connected(byte* host, ushort port, int family, int kind,
                                    int* error);
+    nuint sl_socket_open_connected_within(byte* host, ushort port, int family, int kind,
+                                          int milliseconds, int* error);
 
     nuint sl_socket_send(nuint handle, byte* data, nuint count, int* error);
     nuint sl_socket_receive(nuint handle, byte* data, nuint count, int* error);
@@ -101,6 +103,7 @@ public String DescribeSocketError(SocketError error)
         case SocketError.AccessDenied: return "access denied";
         case SocketError.NoName:       return "that name did not resolve";
         case SocketError.Invalid:      return "that request made no sense";
+        case SocketError.TryAgain:     return "the resolver could not answer yet";
         default:                       return "it failed for an unknown reason";
     }
 }
@@ -120,6 +123,7 @@ const nuint NoSocket = 18446744073709551615u;
 ///
 /// @failure SocketError.NoName   the name did not resolve, or resolved to an
 ///                               address the platform would not write out
+/// @failure SocketError.TryAgain the resolver could not answer for now
 /// @failure SocketError.Unknown  the platform's networking could not be started
 public Result<String, SocketError> ResolveHost(String host)
 {
@@ -137,6 +141,7 @@ public Result<String, SocketError> ResolveHost(String host)
 /// @failure SocketError.NoName   the name did not resolve in that family, or
 ///                               resolved to an address the platform would not
 ///                               write out
+/// @failure SocketError.TryAgain the resolver could not answer for now
 /// @failure SocketError.Unknown  the platform's networking could not be started
 public Result<String, SocketError> ResolveHost(String host, AddressFamily family)
 {

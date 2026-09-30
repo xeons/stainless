@@ -78,10 +78,55 @@ internal static class SignatureVerifier
         return false;
     }
 
-    /// Whether the algorithm is one of the SHA-1 signatures a chain refuses as
-    /// weak.
-    internal static bool IsWeakAlgorithm(String algorithmOid) =>
-        algorithmOid == "1.2.840.113549.1.1.5" || algorithmOid == "1.2.840.10045.4.1";
+    /// Whether the algorithm, with its DER `parameters`, is a signature over
+    /// SHA-1, which a chain refuses as weak. RSASSA-PSS is weak when its
+    /// hash is SHA-1, which is also what absent fields default to, or when
+    /// its parameters do not parse.
+    internal static bool IsWeakAlgorithm(String algorithmOid, ReadOnlySpan<byte> parameters)
+    {
+        switch (algorithmOid)
+        {
+            case "1.2.840.113549.1.1.5":                            // sha1WithRSAEncryption
+            case "1.2.840.10045.4.1":                               // ecdsa-with-SHA1
+                return true;
+            case "1.2.840.113549.1.1.10":                           // id-RSASSA-PSS
+            {
+                var hash = DecodePssParameters(parameters, out int saltLength);
+                return !hash.Some || hash.Value == HashAlgorithmName.Sha1;
+            }
+        }
+        return false;
+    }
+
+    /// Whether `key` is an RSA key of fewer than 2048 bits, which a chain
+    /// refuses as weak.
+    internal static bool IsWeakKey(PublicKey key)
+    {
+        if (key.Oid != PublicKey.RsaOid && key.Oid != PublicKey.RsaPssOid)
+            return false;
+        var modulus = key.GetRsaModulus();
+        if (!modulus.Ok)
+            return false;
+        return CountBigEndianBits(modulus.Value) < 2048u;
+    }
+
+    private static nuint CountBigEndianBits(ReadOnlySpan<byte> number)
+    {
+        for (nuint i = 0u; i < number.Length; i++)
+        {
+            byte top = number[i];
+            if (top == 0)
+                continue;
+            nuint bits = (number.Length - i) * 8u;
+            while ((top & 0x80) == 0)
+            {
+                top = (byte)(top << 1);
+                bits--;
+            }
+            return bits;
+        }
+        return 0u;
+    }
 
     /// RFC 5758: the parameters are absent.
     private static bool VerifyECDsa(ReadOnlySpan<byte> parameters, PublicKey key,
@@ -111,12 +156,21 @@ internal static class SignatureVerifier
         return verifier.Value.VerifyData(signedData, signature, hash, RsaSignaturePadding.Pkcs1);
     }
 
+    /// RFC 4055 section 3.1: a key restricted to PSS by parameters of its
+    /// own MUST be used with the same hash and mask, and a salt at least as
+    /// long as the one it names.
     private static bool VerifyRsaPss(ReadOnlySpan<byte> parameters, PublicKey key,
                                      ReadOnlySpan<byte> signedData, ReadOnlySpan<byte> signature)
     {
         var decoded = DecodePssParameters(parameters, out int saltLength);
         if (!decoded.Some)
             return false;
+        if (key.Oid == PublicKey.RsaPssOid && key.EncodedParameters.Length != 0u)
+        {
+            var restricted = DecodePssParameters(key.EncodedParameters, out int minimumSalt);
+            if (!restricted.Some || restricted.Value != decoded.Value || saltLength < minimumSalt)
+                return false;
+        }
         var padding = RsaSignaturePadding.CreatePss(saltLength);
         var verifier = key.GetRsaPublicKey();
         if (!padding.Ok || !verifier.Ok)

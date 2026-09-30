@@ -60,6 +60,22 @@ public static class Argon2id
     /// @value 2^22 KiB.
     public const nuint MaxMemoryKiB = 4194304u;
 
+    /// The most work a derivation may ask for, as `iterations` * `memoryKiB`:
+    /// 256 GiB of blocks filled, which is minutes. RFC 9106's two settings
+    /// are 2^21 and 3 * 2^16. It bounds the time one stored hash can make a
+    /// call take, as `MaxMemoryKiB` bounds the memory, and so bounds
+    /// `iterations` too.
+    ///
+    /// @value 2^28 KiB.
+    public const ulong MaxWorkKiB = 0x10000000u;
+
+    /// The longest output. RFC 9106 allows 2^32 - 1 bytes, but a password hash
+    /// or a key wants tens, and the whole output is held in memory; a caller
+    /// that needs more expands this with `Hkdf`.
+    ///
+    /// @value 2^20 bytes.
+    public const nuint MaxLength = 1048576u;
+
     /// The shortest salt. RFC 9106 recommends sixteen random bytes.
     ///
     /// @value eight bytes.
@@ -73,10 +89,11 @@ public static class Argon2id
     /// @param iterations   t, how many passes over the memory
     /// @param memoryKiB    m, how many kibibytes to fill; at least eight per lane
     /// @param parallelism  p, how many lanes, computed one after another here
-    /// @param length       how many bytes to derive, at least four
+    /// @param length       how many bytes to derive, from four to `MaxLength`
     /// @failure CryptoError.Parameter  a parameter is outside RFC 9106 §3.1, `salt` is shorter
-    ///                                 than `MinSaltSize`, or `memoryKiB` is past
-    ///                                 `MaxMemoryKiB`
+    ///                                 than `MinSaltSize`, `memoryKiB` is past
+    ///                                 `MaxMemoryKiB`, `iterations` * `memoryKiB` is past
+    ///                                 `MaxWorkKiB`, or `length` is past `MaxLength`
     public static Result<byte[], CryptoError> DeriveKey(ReadOnlySpan<byte> password,
                                                         ReadOnlySpan<byte> salt, nuint iterations,
                                                         nuint memoryKiB, nuint parallelism,
@@ -95,12 +112,13 @@ public static class Argon2id
     /// @param iterations      t, how many passes over the memory
     /// @param memoryKiB       m, how many kibibytes to fill; at least eight per lane
     /// @param parallelism     p, how many lanes, computed one after another here
-    /// @param length          how many bytes to derive, at least four
+    /// @param length          how many bytes to derive, from four to `MaxLength`
     /// @param secret          K, a key held apart from the hashes; empty for none
     /// @param associatedData  X, bound into the result and not secret; empty for none
     /// @failure CryptoError.Parameter  a parameter is outside RFC 9106 §3.1, `salt` is shorter
-    ///                                 than `MinSaltSize`, or `memoryKiB` is past
-    ///                                 `MaxMemoryKiB`
+    ///                                 than `MinSaltSize`, `memoryKiB` is past
+    ///                                 `MaxMemoryKiB`, `iterations` * `memoryKiB` is past
+    ///                                 `MaxWorkKiB`, or `length` is past `MaxLength`
     public static Result<byte[], CryptoError> DeriveKey(ReadOnlySpan<byte> password,
                                                         ReadOnlySpan<byte> salt, nuint iterations,
                                                         nuint memoryKiB, nuint parallelism,
@@ -159,15 +177,15 @@ public static class Argon2id
             WriteLittleDoubleWord(final, k * 8u, word);
         }
 
-        for (nuint i = 0u; i < memory.Length; i++)
-            memory[i] = 0u;
+        CryptographicOperations.ZeroMemory(memory);
 
         byte[] tag = HashVariably(final, length);
         CryptographicOperations.ZeroMemory(final);
         return Ok(tag);
     }
 
-    /// The limits of RFC 9106 §3.1, `MinSaltSize` and `MaxMemoryKiB`.
+    /// The limits of RFC 9106 section 3.1, `MinSaltSize`, `MaxMemoryKiB`, `MaxWorkKiB`
+    /// and `MaxLength`.
     static bool AreParametersValid(ReadOnlySpan<byte> password, ReadOnlySpan<byte> salt,
                                    nuint iterations, nuint memoryKiB, nuint parallelism,
                                    nuint length, ReadOnlySpan<byte> secret,
@@ -175,11 +193,13 @@ public static class Argon2id
     {
         if (parallelism == 0u || (ulong)parallelism > 0xFFFFFFu)
             return false;
-        if (length < 4u || (ulong)length > 0xFFFFFFFFu)
+        if (length < 4u || length > MaxLength)
             return false;
         if (iterations == 0u || (ulong)iterations > 0xFFFFFFFFu)
             return false;
         if (memoryKiB > MaxMemoryKiB || (ulong)memoryKiB < 8u * (ulong)parallelism)
+            return false;
+        if ((ulong)iterations * (ulong)memoryKiB > MaxWorkKiB)
             return false;
         if (salt.Length < MinSaltSize)
             return false;
@@ -296,6 +316,12 @@ class Argon2Filler
         _input = new ulong[128u];
         _addresses = new ulong[128u];
         _zero = new ulong[128u];
+    }
+
+    ~Argon2Filler()
+    {
+        CryptographicOperations.ZeroMemory(_mixed);
+        CryptographicOperations.ZeroMemory(_kept);
     }
 
     /// One segment of RFC 9106 §3.4: a quarter of one lane in one pass.

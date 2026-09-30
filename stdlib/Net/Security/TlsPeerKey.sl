@@ -242,11 +242,36 @@ internal sealed class TlsPeerKey
             var rsa = Rsa.ImportRsaPublicKey(bits.Value);
             if (!rsa.Ok)
                 return Fail(TlsError.CertificateRefused);
+            if (!IsTlsRsaKeyWithinBounds(rsa.Value))
+                return Fail(TlsError.UnsupportedCertificate);
             var kind = oid == s_rsaPssIdentifier ? TlsKeyKind.RsaPss : TlsKeyKind.Rsa;
             return Ok(new TlsPeerKey(kind, new byte[0u], null, rsa.Value));
         }
 
         return Fail(TlsError.UnsupportedCertificate);
+    }
+
+    /// Whether an RSA key is one a peer may make this end verify with: a
+    /// modulus of at most `TlsMaxRsaModulusBits` and a public exponent of at
+    /// most `TlsMaxRsaExponentBits`. Verifying costs the product of the two,
+    /// and a peer MUST NOT be able to choose it without bound.
+    private static bool IsTlsRsaKeyWithinBounds(Rsa rsa)
+    {
+        if (rsa.KeySize <= 0 || (nuint)rsa.KeySize > TlsMaxRsaModulusBits)
+            return false;
+        var parameters = rsa.ExportParameters(false);
+        if (!parameters.Ok)
+            return false;
+        byte[] exponent = parameters.Value.Exponent;
+        nuint first = 0u;
+        while (first < exponent.Length && exponent[first] == 0)
+            first++;
+        if (first == exponent.Length)
+            return false;
+        nuint bits = 8u * (exponent.Length - first);
+        for (uint top = (uint)exponent[first]; top < 0x80u; top <<= 1)
+            bits--;
+        return bits <= TlsMaxRsaExponentBits;
     }
 
     /// Whether `signature` is this key's, under the TLS 1.3 `scheme`, of

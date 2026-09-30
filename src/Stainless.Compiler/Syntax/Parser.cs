@@ -1886,7 +1886,7 @@ public sealed class Parser
                 $"destructor name '{name}' does not match enclosing type '{enclosingType}'");
         Expect(TokenKind.OpenParen);
         Expect(TokenKind.CloseParen);
-        var body = ParseBlock();
+        var body = ParseArrowBodyOrNull(isGetter: false) ?? ParseBlock();
         return new DestructorDeclSyntax(SpanFrom(start), enclosingType, body);
     }
 

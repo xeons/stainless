@@ -65,4 +65,18 @@ public static class CryptographicOperations
         if (buffer.Length > 0u)
             sl_zero_memory(&buffer[0u], buffer.Length);
     }
+
+    /// Overwrites `words` with zeros, as the byte form does.
+    internal static void ZeroMemory(uint[] words)
+    {
+        if (words.Length > 0u)
+            sl_zero_memory((byte*)&words[0u], words.Length * 4u);
+    }
+
+    /// Overwrites `words` with zeros, as the byte form does.
+    internal static void ZeroMemory(ulong[] words)
+    {
+        if (words.Length > 0u)
+            sl_zero_memory((byte*)&words[0u], words.Length * 8u);
+    }
 }

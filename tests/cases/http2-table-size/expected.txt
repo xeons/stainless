@@ -1,0 +1,4 @@
+no change: 204; size updates: none; the peer decoded it: Decoded
+0: 204; size updates: 0; the peer decoded it: Decoded
+0 then 4096 in one frame: 204; size updates: 0, 4096; the peer decoded it: Decoded
+1024, then 256 then 2048: 204; size updates: 256, 2048; the peer decoded it: Decoded

@@ -84,6 +84,14 @@ struct Edwards25519Point
     public static Edwards25519Point operator -(Edwards25519Point value) =>
         new Edwards25519Point(-value._x, value._y, value._z, -value._t);
 
+    /// Whether this is the identity: X is zero and Y equals Z. Variable time,
+    /// for public points.
+    bool IsIdentity => _x.IsZero && (_y - _z).IsZero;
+
+    /// Whether eight times the point is the identity, which on a curve of
+    /// cofactor 8 is what small order means. Variable time, for public points.
+    bool IsOfSmallOrder() => Double().Double().Double().IsIdentity;
+
     /// The point added to itself, in four squarings and four products.
     Edwards25519Point Double()
     {

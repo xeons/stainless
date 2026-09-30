@@ -33,7 +33,9 @@ import Standard.Text;
 ///     parts.Add(new ByteArrayContent(image));
 ///
 /// The length is known when every part's is, and the whole can be sent again
-/// when every part can.
+/// when every part can. A part with a control character in one of its
+/// fields fails the request with `InvalidRequest`, before any of it is
+/// written.
 public class MultipartContent : HttpContent
 {
     private String _boundary;
@@ -66,6 +68,8 @@ public class MultipartContent : HttpContent
 
     protected override HttpError SerializeToStream(IStream stream)
     {
+        if (!ValidatePartFields())
+            return HttpError.InvalidRequest;
         bool first = true;
         foreach (var part in _parts)
         {
@@ -126,6 +130,23 @@ public class MultipartContent : HttpContent
     {
         foreach (var part in _parts)
             part.Dispose();
+    }
+
+    /// Whether every part's fields can be written as they are.
+    private bool ValidatePartFields()
+    {
+        foreach (var part in _parts)
+        {
+            foreach (var field in part.Headers.Fields)
+            {
+                foreach (var value in field.Values)
+                {
+                    if (!IsHttpFieldValue(value))
+                        return false;
+                }
+            }
+        }
+        return true;
     }
 
     /// The delimiter and fields that open `part`.

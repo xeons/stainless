@@ -23,16 +23,26 @@ module Standard.Net.Security;
 
 /// A growable run of bytes that TLS structures are written into, big-endian,
 /// with vectors whose length prefix is filled in once their contents are.
+///
+/// **A vector too long for its prefix is sticky, as `TlsReader`'s failure
+/// is.** `EndVector` sets `HasOverflowed` rather than write a length that
+/// wraps, and whoever builds a structure from peer-sized or caller-sized
+/// parts MUST check it before the bytes are used.
 internal sealed class TlsBuffer
 {
     private byte[] _bytes;
     private nuint _length;
+    private bool _overflowed;
 
     internal TlsBuffer(nuint capacity)
     {
         _bytes = new byte[capacity == 0u ? 16u : capacity];
         _length = 0u;
+        _overflowed = false;
     }
+
+    /// Whether a vector was longer than its length prefix can say.
+    internal bool HasOverflowed => _overflowed;
 
     /// How many bytes have been written.
     internal nuint Length => _length;
@@ -43,7 +53,11 @@ internal sealed class TlsBuffer
     /// The bytes written so far, as a view.
     internal ReadOnlySpan<byte> Written => _bytes[:_length];
 
-    internal void Clear() => _length = 0u;
+    internal void Clear()
+    {
+        _length = 0u;
+        _overflowed = false;
+    }
 
     internal void WriteByte(uint value)
     {
@@ -106,10 +120,16 @@ internal sealed class TlsBuffer
     }
 
     /// Fills in the prefix `BeginVector` reserved with the length of what
-    /// was written since.
+    /// was written since. A length the prefix cannot hold sets
+    /// `HasOverflowed` and leaves the prefix zero.
     internal void EndVector(nuint at, nuint prefixSize)
     {
         nuint size = _length - at - prefixSize;
+        if (prefixSize < 8u && size >> (8u * prefixSize) != 0u)
+        {
+            _overflowed = true;
+            return;
+        }
         for (nuint i = 0u; i < prefixSize; i++)
             _bytes[at + prefixSize - 1u - i] = (byte)((size >> (8u * i)) & 0xFFu);
     }

@@ -85,9 +85,28 @@ internal sealed class TlsKeySchedule
 
     /// HKDF-Expand-Label: HKDF-Expand with the label and context laid out as
     /// an `HkdfLabel`, whose label is prefixed with "tls13 ".
+    ///
+    /// For the schedule's own labels and lengths, which cannot fail. A
+    /// failure answers an empty array, which no cipher accepts as a key.
     internal byte[] ExpandTlsLabel(
         ReadOnlySpan<byte> secret, String label, ReadOnlySpan<byte> context, nuint length)
     {
+        var expanded = TryExpandTlsLabel(secret, label, context, length);
+        if (!expanded.Ok)
+            return new byte[0u];
+        return expanded.Value;
+    }
+
+    /// HKDF-Expand-Label for a label, context or length that MAY be out of
+    /// range: a label over 249 bytes, a context over 255, or more than 255
+    /// digests of output.
+    ///
+    /// @failure TlsError.InternalError  one of them is out of range
+    internal Result<byte[], TlsError> TryExpandTlsLabel(
+        ReadOnlySpan<byte> secret, String label, ReadOnlySpan<byte> context, nuint length)
+    {
+        if (length > 0xFFFFu)
+            return Fail(TlsError.InternalError);
         var info = new TlsBuffer(64u);
         info.WriteUInt16((uint)length);
         nuint labelAt = info.BeginVector(1u);
@@ -97,11 +116,13 @@ internal sealed class TlsKeySchedule
         nuint contextAt = info.BeginVector(1u);
         info.WriteBytes(context);
         info.EndVector(contextAt, 1u);
+        if (info.HasOverflowed)
+            return Fail(TlsError.InternalError);
 
         var expanded = Hkdf.Expand(CreateTlsHash(), secret, info.Written, length);
         if (!expanded.Ok)
-            return new byte[length];
-        return expanded.Value;
+            return Fail(TlsError.InternalError);
+        return Ok(expanded.Value);
     }
 
     /// Derive-Secret: the label expanded over a transcript hash, as long as
@@ -117,6 +138,7 @@ internal sealed class TlsKeySchedule
     {
         byte[] derived = DeriveTlsSecret(_earlySecret, "derived", HashTlsBytes(new byte[0u]));
         _handshakeSecret = Hkdf.Extract(CreateTlsHash(), sharedSecret, derived);
+        CryptographicOperations.ZeroMemory(derived);
         _clientHandshakeTrafficSecret = DeriveTlsSecret(
             _handshakeSecret, "c hs traffic", helloHash);
         _serverHandshakeTrafficSecret = DeriveTlsSecret(
@@ -129,6 +151,7 @@ internal sealed class TlsKeySchedule
     {
         byte[] derived = DeriveTlsSecret(_handshakeSecret, "derived", HashTlsBytes(new byte[0u]));
         _masterSecret = Hkdf.Extract(CreateTlsHash(), new byte[_hashLength], derived);
+        CryptographicOperations.ZeroMemory(derived);
         _clientApplicationTrafficSecret = DeriveTlsSecret(
             _masterSecret, "c ap traffic", serverFinishedHash);
         _serverApplicationTrafficSecret = DeriveTlsSecret(
@@ -143,6 +166,29 @@ internal sealed class TlsKeySchedule
         _resumptionMasterSecret = DeriveTlsSecret(_masterSecret, "res master", clientFinishedHash);
     }
 
+    /// Overwrites every secret the handshake alone needs. It MUST come after
+    /// `DeriveResumptionSecret` and after both Finished messages. The exporter
+    /// and resumption secrets stay, and the application traffic secrets are
+    /// the connection's from here on.
+    internal void WipeTlsHandshakeSecrets()
+    {
+        CryptographicOperations.ZeroMemory(_earlySecret);
+        CryptographicOperations.ZeroMemory(_handshakeSecret);
+        CryptographicOperations.ZeroMemory(_masterSecret);
+        CryptographicOperations.ZeroMemory(_clientHandshakeTrafficSecret);
+        CryptographicOperations.ZeroMemory(_serverHandshakeTrafficSecret);
+    }
+
+    /// Overwrites every secret, for a connection that has ended.
+    internal void WipeTlsSecrets()
+    {
+        WipeTlsHandshakeSecrets();
+        CryptographicOperations.ZeroMemory(_clientApplicationTrafficSecret);
+        CryptographicOperations.ZeroMemory(_serverApplicationTrafficSecret);
+        CryptographicOperations.ZeroMemory(_exporterMasterSecret);
+        CryptographicOperations.ZeroMemory(_resumptionMasterSecret);
+    }
+
     /// The record key and IV a traffic secret yields under `suite`.
     internal Result<TlsRecordCipher, TlsError> CreateTlsRecordCipher(
         TlsCipherSuite suite, ReadOnlySpan<byte> trafficSecret)
@@ -150,7 +196,9 @@ internal sealed class TlsKeySchedule
         byte[] key = ExpandTlsLabel(
             trafficSecret, "key", new byte[0u], GetTlsSuiteKeyLength(suite));
         byte[] iv = ExpandTlsLabel(trafficSecret, "iv", new byte[0u], 12u);
-        return TlsRecordCipher.Create(suite, key, iv);
+        var cipher = TlsRecordCipher.Create(suite, key, iv);
+        CryptographicOperations.ZeroMemory(key);
+        return cipher;
     }
 
     /// The next generation of a traffic secret, for a KeyUpdate.
@@ -163,7 +211,9 @@ internal sealed class TlsKeySchedule
         ReadOnlySpan<byte> baseSecret, ReadOnlySpan<byte> transcriptHash)
     {
         byte[] finishedKey = ExpandTlsLabel(baseSecret, "finished", new byte[0u], _hashLength);
-        return new Hmac(CreateTlsHash(), finishedKey).ComputeHash(transcriptHash);
+        byte[] verifyData = new Hmac(CreateTlsHash(), finishedKey).ComputeHash(transcriptHash);
+        CryptographicOperations.ZeroMemory(finishedKey);
+        return verifyData;
     }
 
     /// The pre-shared key a ticket's nonce yields from the resumption
@@ -171,10 +221,19 @@ internal sealed class TlsKeySchedule
     internal byte[] DeriveTlsResumptionKey(ReadOnlySpan<byte> ticketNonce) =>
         ExpandTlsLabel(_resumptionMasterSecret, "resumption", ticketNonce, _hashLength);
 
-    /// RFC 8446 §7.5's exporter.
-    internal byte[] ExportTlsKeyingMaterial(String label, ReadOnlySpan<byte> context, nuint length)
+    /// RFC 8446 section 7.5's exporter.
+    ///
+    /// @failure TlsError.InternalError  the label is over 249 bytes, or
+    ///                                  `length` over 255 digests
+    internal Result<byte[], TlsError> ExportTlsKeyingMaterial(
+        String label, ReadOnlySpan<byte> context, nuint length)
     {
-        byte[] secret = DeriveTlsSecret(_exporterMasterSecret, label, HashTlsBytes(new byte[0u]));
-        return ExpandTlsLabel(secret, "exporter", HashTlsBytes(context), length);
+        var secret = TryExpandTlsLabel(
+            _exporterMasterSecret, label, HashTlsBytes(new byte[0u]), _hashLength);
+        if (!secret.Ok)
+            return secret;
+        var exported = TryExpandTlsLabel(secret.Value, "exporter", HashTlsBytes(context), length);
+        CryptographicOperations.ZeroMemory(secret.Value);
+        return exported;
     }
 }

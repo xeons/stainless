@@ -45,7 +45,13 @@ import Standard.Time;
 ///
 /// **`Path` limits a cookie to part of a site**, `Secure` to https,
 /// and `Expires` or `Max-Age` to a time. A cookie set from http cannot be
-/// `Secure`. `HttpOnly` and `SameSite` are kept and not acted on.
+/// `Secure`. `HttpOnly` and `SameSite` are kept and not acted on. A
+/// `Max-Age` longer than 400 days is taken as 400 days, as RFC 6265bis
+/// has it.
+///
+/// **It holds at most `PerDomainCapacity` cookies for one domain and
+/// `Capacity` in all**, 50 and 3000 by default. A cookie past either limit
+/// makes room by removing what has expired, then the oldest.
 ///
 /// One container MAY be shared by several clients and threads.
 public sealed class CookieContainer
@@ -68,6 +74,13 @@ public sealed class CookieContainer
 
     /// The most bytes a cookie's name and value may take together.
     public nuint MaxCookieSize { get; set; } = 4096u;
+
+    /// The most cookies held in all. At least one is always kept.
+    public nuint Capacity { get; set; } = 3000u;
+
+    /// The most cookies held for one domain, or one host. At least one is
+    /// always kept.
+    public nuint PerDomainCapacity { get; set; } = 50u;
 
     /// Stores `cookie`, which MUST name its `Domain`, replacing one of the
     /// same name, domain and path. False when it names no domain or no name,
@@ -180,6 +193,8 @@ public sealed class CookieContainer
                     if (TryParseHttpCookieMaxAge(argument, out long seconds))
                     {
                         hasMaxAge = true;
+                        if (seconds > HttpCookieMaxAgeLimit)
+                            seconds = HttpCookieMaxAgeLimit;
                         cookie.Expires = seconds <= 0 ? DateTimeOffset.UnixEpoch
                                                       : now + TimeSpan.FromSeconds(seconds);
                     }
@@ -299,7 +314,49 @@ public sealed class CookieContainer
         if (expired)
             return false;
         _cookies.Add(cookie);
+        TrimHttpCookies(cookie.Domain, now);
         return true;
+    }
+
+    /// Brings the domain `domain` and the whole back within their limits:
+    /// what has expired first, then the oldest. The cookie just stored is
+    /// the newest, and is kept. The caller holds the lock.
+    private void TrimHttpCookies(String domain, DateTimeOffset now)
+    {
+        nuint perDomain = PerDomainCapacity == 0u ? 1u : PerDomainCapacity;
+        nuint total = Capacity == 0u ? 1u : Capacity;
+        nuint inDomain = CountHttpCookiesInDomain(domain);
+        if (inDomain <= perDomain && _cookies.Count <= total)
+            return;
+        RemoveExpiredHttpCookies(now);
+        inDomain = CountHttpCookiesInDomain(domain);
+        nuint i = 0u;
+        while (inDomain > perDomain && i < _cookies.Count)
+        {
+            if (_cookies[i].Domain == domain)
+            {
+                _cookies.RemoveAt(i);
+                inDomain--;
+            }
+            else
+            {
+                i++;
+            }
+        }
+        while (_cookies.Count > total)
+            _cookies.RemoveAt(0u);
+    }
+
+    /// The caller holds the lock.
+    private nuint CountHttpCookiesInDomain(String domain)
+    {
+        nuint count = 0u;
+        foreach (var cookie in _cookies)
+        {
+            if (cookie.Domain == domain)
+                count++;
+        }
+        return count;
     }
 
     /// The caller holds the lock.
@@ -314,6 +371,10 @@ public sealed class CookieContainer
         }
     }
 }
+
+/// The longest `Max-Age` honoured, in seconds: 400 days (RFC 6265bis
+/// section 5.6.2).
+internal const long HttpCookieMaxAgeLimit = 34560000;
 
 /// Longer paths first, and among equal paths the one stored first.
 internal void SortHttpCookiesForSending(List<Cookie> cookies)

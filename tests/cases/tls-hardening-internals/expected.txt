@@ -1,0 +1,26 @@
+HelloRetryRequest with a cookie alone:
+  client: connected
+  server: connected, ALPN h2
+rejected 0-RTT data, 20000 bytes:
+  client: no error
+  server: connected
+rejected 0-RTT data, 40000 bytes:
+  server: a record failed authentication
+second ClientHello echoing a cookie:
+  of 100 bytes: no error
+  of 65533 bytes: a message held a forbidden value
+length prefixes:
+  255 in one byte: true
+  256 in one byte: false
+  65535 in two bytes: true
+  65536 in two bytes: false
+sequence number at its end:
+  TLS 1.3: sealed, sealed, an internal error
+  TLS 1.2: sealed, sealed, an internal error
+TLS 1.3 secrets:
+  handshake secrets wiped once connected: true
+  all wiped before close: false
+  all wiped after close: true
+TLS 1.2 secrets:
+  all wiped before close: false
+  all wiped after close: true

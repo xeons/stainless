@@ -8,7 +8,7 @@ class Counter
     int _value;
 
     Counter(int start) => _value = start;
-    ~Counter() { printf("~Counter(%d)\n", _value); }
+    ~Counter() => printf("~Counter(%d)\n", _value);
 
     public int Get() => _value;
     public void Bump() => _value = _value + 1;

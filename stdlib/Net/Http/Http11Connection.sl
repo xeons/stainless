@@ -42,6 +42,7 @@ internal sealed class Http11Connection : IHttpConnection
     private HttpExchange? _exchange;
     private nuint _requestCount = 0u;
     private ulong _consumedAtStart = 0u;
+    private HttpDeadline? _continueWait;
     private bool _closed = false;
 
     internal Http11Connection(String key, TcpClient tcp, IStream stream, TlsStream? tls,
@@ -52,6 +53,7 @@ internal sealed class Http11Connection : IHttpConnection
         _stream = stream;
         _tls = tls;
         _reader = new HttpBufferedReader(stream, HttpMaxLineLength);
+        _reader.BindHttpDeadline(this);
         _pool = pool;
     }
 
@@ -110,15 +112,11 @@ internal sealed class Http11Connection : IHttpConnection
         {
             if (!writer.FlushHttpBuffer())
                 return Fail(FailHttpWrite());
-            if (_tcp.WaitToRead(ComputeHttpContinueMilliseconds(exchange.Deadline)))
-            {
-                var interim = ReadHttpResponseHead(exchange);
-                if (!interim.Ok)
-                    return Fail(interim.Error);
-                Http11Head early = interim.Value;
-                if (early.Status != 100)
-                    return FinishHttpResponse(request, early, true);
-            }
+            HttpError waited = AwaitHttpContinue(exchange, out Http11Head? early);
+            if (waited != HttpError.None)
+                return Fail(waited);
+            if (early != null)
+                return FinishHttpResponse(request, early, true);
         }
 
         if (content != null)
@@ -150,6 +148,75 @@ internal sealed class Http11Connection : IHttpConnection
         }
     }
 
+    /// Waits for 100 (Continue), within the continue time, and reads every
+    /// interim head that comes first. `final` is the final head when the
+    /// server answered without the body, and null when the body is to be
+    /// sent.
+    private HttpError AwaitHttpContinue(HttpExchange exchange, out Http11Head? final)
+    {
+        final = null;
+        HttpFailure failure = exchange.Failure;
+        int milliseconds = ComputeHttpContinueMilliseconds(exchange.Deadline);
+        if (exchange.SkipsContinueWait || milliseconds <= 0)
+            return HttpError.None;
+        var wait = new HttpDeadline(TimeSpan.FromMilliseconds((long)milliseconds));
+        nuint interimCount = 0u;
+        HttpError outcome = HttpError.None;
+        // A readable socket is not a response: TLS 1.3 sends tickets after the
+        // handshake. Each read is bounded by the continue time.
+        _continueWait = wait;
+        while (!wait.HasExpired && (_reader.BufferedCount > 0u || _tcp.WaitToRead(wait.WaitMilliseconds)))
+        {
+            ulong before = _reader.ConsumedCount;
+            var interim = ReadHttpResponseHead(exchange);
+            if (!interim.Ok)
+            {
+                outcome = interim.Error;
+                bool nothingArrived = _reader.ConsumedCount == before && _reader.BufferedCount == 0u;
+                bool waitEnded = wait.HasExpired || failure.SocketErrorCode == SocketError.TimedOut;
+                if (waitEnded && !exchange.Deadline.HasExpired && nothingArrived)
+                {
+                    // The body was never sent, so the request may go again, on
+                    // a new connection and without the wait.
+                    exchange.IsUnprocessed = true;
+                    exchange.SkipsContinueWait = true;
+                    outcome = failure.RecordHttpFailure(HttpError.ConnectionClosed,
+                        "nothing answered Expect: 100-continue on a connection that was readable");
+                }
+                break;
+            }
+            Http11Head head = interim.Value;
+            if (head.Status == 100)
+                break;
+            if (head.Status >= 200)
+            {
+                final = head;
+                break;
+            }
+            if (head.Status == 101)
+            {
+                CloseHttpConnection();
+                outcome = failure.RecordHttpFailure(HttpError.InvalidResponse,
+                    "the server switched protocols without being asked");
+                break;
+            }
+            interimCount++;
+            if (interimCount > 32u)
+            {
+                CloseHttpConnection();
+                outcome = failure.RecordHttpFailure(HttpError.InvalidResponse, "too many interim responses");
+                break;
+            }
+        }
+        _continueWait = null;
+        if (outcome == HttpError.None && !ApplyHttpDeadline())
+        {
+            CloseHttpConnection();
+            return failure.RecordHttpFailure(HttpError.Timeout, "the request timed out before its body was sent");
+        }
+        return outcome;
+    }
+
     private HttpError WriteHttpRequestBody(HttpBufferedWriter writer, HttpWireRequest request,
                                            HttpContent content)
     {
@@ -161,22 +228,36 @@ internal sealed class Http11Connection : IHttpConnection
             if (writer.HasFailed)
                 return FailHttpWrite();
             if (written != HttpError.None)
-                return failure.RecordHttpFailure(written, "the request content could not be read");
+            {
+                CloseHttpConnection();
+                return failure.RecordHttpFailure(written, DescribeHttpContentFailure(written));
+            }
             if (!chunks.FinishHttpChunks())
                 return FailHttpWrite();
             return HttpError.None;
         }
 
-        var counted = new HttpCountingStream(writer);
+        var counted = new HttpCountingStream(writer, request.DeclaredLength);
         HttpError copied = content.WriteHttpContent(counted);
         if (writer.HasFailed)
             return FailHttpWrite();
+        // What is gathered and not yet sent MUST NOT follow a body cut short.
+        if (counted.HasOverflowed)
+        {
+            CloseHttpConnection();
+            return failure.RecordHttpFailure(HttpError.ContentFailure,
+                "the request content was longer than the length it declared");
+        }
         if (copied != HttpError.None)
-            return failure.RecordHttpFailure(copied, "the request content could not be read");
+        {
+            CloseHttpConnection();
+            return failure.RecordHttpFailure(copied, DescribeHttpContentFailure(copied));
+        }
         if (request.DeclaredLength != counted.CountedBytes)
         {
+            CloseHttpConnection();
             return failure.RecordHttpFailure(HttpError.ContentFailure,
-                "the request content was not the length it declared");
+                "the request content was shorter than the length it declared");
         }
         return HttpError.None;
     }
@@ -385,8 +466,10 @@ internal sealed class Http11Connection : IHttpConnection
 
     internal HttpBufferedReader Reader => _reader;
 
-    /// Sets the socket's timeouts to what the exchange has left. False when
-    /// nothing is left.
+    /// Sets the socket's timeouts to what the exchange has left, or what the
+    /// wait for 100 (Continue) has left when that is less. False when nothing
+    /// is left. Called before every read of the socket, so that a server
+    /// sending a byte at a time cannot stretch the deadline.
     internal bool ApplyHttpDeadline()
     {
         var exchange = _exchange;
@@ -395,8 +478,16 @@ internal sealed class Http11Connection : IHttpConnection
         HttpDeadline deadline = exchange.Deadline;
         if (deadline.HasExpired)
             return false;
-        Socket socket = _tcp.Underlying;
         int timeout = deadline.SocketTimeoutMilliseconds;
+        if (_continueWait is HttpDeadline wait)
+        {
+            if (wait.HasExpired)
+                return false;
+            int bound = wait.SocketTimeoutMilliseconds;
+            if (timeout == 0 || bound < timeout)
+                timeout = bound;
+        }
+        Socket socket = _tcp.Underlying;
         socket.SetReceiveTimeout(timeout);
         socket.SetSendTimeout(timeout);
         return true;
@@ -503,6 +594,12 @@ internal bool ParseHttpStatusLine(String line, Http11Head head)
     head.Minor = (int)(minor - (byte)'0');
     return true;
 }
+
+/// Why a request's content failed to be written.
+internal String DescribeHttpContentFailure(HttpError error) =>
+    error == HttpError.InvalidRequest
+        ? "the request content has a control character in a part's field"
+        : "the request content could not be read";
 
 /// A line quoted for a message, cut short and with control bytes made
 /// visible.

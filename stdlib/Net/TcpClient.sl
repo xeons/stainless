@@ -80,7 +80,35 @@ public class TcpClient : IStream
     public static Result<TcpClient, SocketError> Connect(
             String host, ushort port, AddressFamily family)
     {
-        var opened = Socket.OpenConnected(host, port, family, SocketType.Stream);
+        return Connect(host, port, family, -1);
+    }
+
+    /// Connects within a time limit.
+    ///
+    /// Every address the name resolved to is tried until one connects, and
+    /// all the attempts together get `timeoutMilliseconds`. Resolving the name
+    /// is not bounded.
+    ///
+    /// @param host                 the name or address to reach
+    /// @param port                 the port to reach it on
+    /// @param family               which family to resolve the name in
+    /// @param timeoutMilliseconds  the limit for every attempt together;
+    ///                             negative is none
+    /// @failure SocketError.NoName       the host did not resolve in that
+    ///                                   family
+    /// @failure SocketError.TryAgain     the resolver could not answer for now
+    /// @failure SocketError.Refused      nothing is listening there
+    /// @failure SocketError.TimedOut     the time ran out, or no answer from
+    ///                                   any address
+    /// @failure SocketError.Unreachable  no route to any of them
+    /// @failure SocketError.Unknown      the last address failed for a reason
+    ///                                   with no case of its own
+    /// @see Socket.OpenConnected
+    public static Result<TcpClient, SocketError> Connect(
+            String host, ushort port, AddressFamily family, int timeoutMilliseconds)
+    {
+        var opened = Socket.OpenConnected(host, port, family, SocketType.Stream,
+                                          timeoutMilliseconds);
         if (!opened.Ok)
             return Fail(opened.Error);
         return Ok(new TcpClient(opened.Value));
@@ -151,28 +179,44 @@ public class TcpClient : IStream
     /// For a protocol that ends by closing -- HTTP/1.0, or anything behind
     /// `shutdown` -- this is the whole body. For one that does not, it never
     /// returns, which is the caller's to know.
+    ///
+    /// **A failure ends the read too**, and what arrived before it comes back
+    /// looking complete. The caller MUST check `SocketErrorCode` afterwards,
+    /// or use `ReceiveToEnd`, which says.
+    ///
+    /// @see TcpClient.ReceiveToEnd
     public byte[] ReceiveAll()
     {
         var built = new List<byte>();
-        var chunk = new byte[4096];
-
-        while (true)
-        {
-            nuint read = _socket.Receive(chunk, 0, chunk.Length);
-            if (read == 0)
-            {
-                _finished = true;
-                break;
-            }
-
-            built.AddRange(chunk[:read]);
-        }
-
+        ReceiveInto(built);
         return built.ToArray();
     }
 
-    /// The same, read as UTF-8. Anything malformed becomes U+FFFD, because the
-    /// result is a `String` and a `String` is valid UTF-8 by invariant.
+    /// Reads until the peer finishes, and gives back what arrived, or the
+    /// error that stopped the read before the peer finished.
+    ///
+    /// @failure SocketError.Reset         the peer went away without finishing
+    /// @failure SocketError.TimedOut      a receive timeout ran out
+    /// @failure SocketError.Closed        the connection was closed
+    /// @failure SocketError.NotConnected  the connection was never made
+    /// @failure SocketError.Unknown       the platform reported something with
+    ///                                    no case of its own
+    /// @see TcpClient.ReceiveAll
+    public Result<byte[], SocketError> ReceiveToEnd()
+    {
+        var built = new List<byte>();
+        SocketError error = ReceiveInto(built);
+        if (error != SocketError.None)
+            return Fail(error);
+        return Ok(built.ToArray());
+    }
+
+    /// The same as `ReceiveAll`, read as UTF-8. Anything malformed becomes
+    /// U+FFFD, because the result is a `String` and a `String` is valid UTF-8
+    /// by invariant.
+    ///
+    /// A failure ends the read as it does `ReceiveAll`'s, so the caller MUST
+    /// check `SocketErrorCode` afterwards.
     public String ReceiveText()
     {
         var all = ReceiveAll();
@@ -213,8 +257,8 @@ public class TcpClient : IStream
         if (count == 0u)
             return 0u;
 
-        nuint read = _socket.Receive(buffer, offset, count);
-        if (read == 0 && _socket.Error == SocketError.None)
+        nuint read = _socket.Receive(buffer, offset, count, out SocketError error);
+        if (read == 0 && error == SocketError.None)
             _finished = true;
         return read;
     }
@@ -266,6 +310,26 @@ public class TcpClient : IStream
                 case SocketError.Invalid:      return IOError.Invalid;
                 default:                       return IOError.Unknown;
             }
+        }
+    }
+
+    // ----------------------------------------------------------- private
+
+    /// Reads into `built` until the peer finishes or a read fails, answering
+    /// the failure or `None`.
+    SocketError ReceiveInto(List<byte> built)
+    {
+        var chunk = new byte[4096];
+        while (true)
+        {
+            nuint read = _socket.Receive(chunk, 0, chunk.Length, out SocketError error);
+            if (read == 0)
+            {
+                if (error == SocketError.None)
+                    _finished = true;
+                return error;
+            }
+            built.AddRange(chunk[:read]);
         }
     }
 }

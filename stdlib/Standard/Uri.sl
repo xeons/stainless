@@ -35,6 +35,10 @@ import Standard.Collections;
 /// reads as a `file:` URI, as in C#. A relative one is kept as written, and
 /// asking it for a part only an absolute URI has aborts, where C#'s throws.
 ///
+/// A host with a control byte, a space, DEL, or any of `/ ? # @ \ [ ]` in it
+/// is not one, and neither is a colon outside a bracketed IPv6 literal:
+/// a host is copied into request lines, where any of these would end one.
+///
 /// `TryCreate` answers with a `Result`; the constructors abort on what is not a
 /// URI, as C#'s throw.
 public sealed class Uri : IEquatable<Uri>, IHashable
@@ -87,7 +91,8 @@ public sealed class Uri : IEquatable<Uri>, IHashable
         _path = "";
         _query = "";
         _fragment = "";
-        Resolve(baseUri, relative);
+        if (!Resolve(baseUri, relative))
+            sl_fail(("Uri: '" + relative._original + "' does not resolve to a URI").ToPointer());
     }
 
     /// `text` read as `kind` says, or why it could not be.
@@ -108,7 +113,9 @@ public sealed class Uri : IEquatable<Uri>, IHashable
             return Fail(ParseError.Malformed);
         if (TryCreate(relative, UriKind.RelativeOrAbsolute) is not Ok parsed)
             return Fail(ParseError.Malformed);
-        return Ok(new Uri(baseUri, parsed.Value));
+        var made = new Uri();
+        made._original = relative;
+        return made.Resolve(baseUri, parsed.Value) ? Ok(made) : Fail(ParseError.Malformed);
     }
 
     /// Whether `text` reads as `kind` says.
@@ -261,7 +268,29 @@ public sealed class Uri : IEquatable<Uri>, IHashable
         _host = authority.ToLowerAscii();
         if (_port == DefaultPort(_scheme))
             _port = -1;
-        return !_host.Contains(' ');
+        return IsValidHost(_host);
+    }
+
+    /// Whether `host` can be one: no control byte, space or DEL, none of
+    /// `/ ? # @ \`, and brackets and colons only in an IPv6 literal that is
+    /// the whole of it. A host is copied into request lines and fields, where
+    /// any of these would end or split one.
+    static bool IsValidHost(String host)
+    {
+        nuint length = host.ByteLength();
+        bool bracketed = length >= 2u && host.GetByteAt(0u) == (byte)'[' &&
+                         host.GetByteAt(length - 1u) == (byte)']';
+        nuint start = bracketed ? 1u : 0u;
+        nuint end = bracketed ? length - 1u : length;
+        for (nuint i = start; i < end; i++)
+        {
+            byte c = host.GetByteAt(i);
+            if (c <= (byte)' ' || c == 0x7F || "/?#@\\[]".Contains((char)c))
+                return false;
+            if (c == (byte)':' && !bracketed)
+                return false;
+        }
+        return true;
     }
 
     /// `C:\dir\file.txt` and `\\server\share\file.txt` as the `file:` URIs they
@@ -292,8 +321,9 @@ public sealed class Uri : IEquatable<Uri>, IHashable
 
     // -------------------------------------------------------------- resolving
 
-    /// RFC 3986 section 5.2.2: `reference` read against `baseUri`.
-    void Resolve(Uri baseUri, Uri reference)
+    /// RFC 3986 section 5.2.2: `reference` read against `baseUri`. False
+    /// when the authority it names is not one.
+    bool Resolve(Uri baseUri, Uri reference)
     {
         _absolute = true;
 
@@ -301,7 +331,7 @@ public sealed class Uri : IEquatable<Uri>, IHashable
         {
             CopyFrom(reference);
             _path = RemoveDotSegments(reference._path);
-            return;
+            return true;
         }
 
         // A relative reference is read into its parts first.
@@ -326,9 +356,11 @@ public sealed class Uri : IEquatable<Uri>, IHashable
         _scheme = baseUri._scheme;
         if (rest.StartsWith("//"))
         {
-            var authority = new Uri(_scheme + ":" + rest + refQuery + refFragment, UriKind.Absolute);
+            var authority = new Uri();
+            if (!authority.Read(_scheme + ":" + rest + refQuery + refFragment, UriKind.Absolute))
+                return false;
             CopyFrom(authority);
-            return;
+            return true;
         }
 
         _hasAuthority = baseUri._hasAuthority;
@@ -341,20 +373,21 @@ public sealed class Uri : IEquatable<Uri>, IHashable
         {
             _path = baseUri._path;
             _query = hasQuery ? refQuery : baseUri._query;
-            return;
+            return true;
         }
 
         _query = refQuery;
         if (rest.StartsWith("/"))
         {
             _path = Escaped(RemoveDotSegments(rest));
-            return;
+            return true;
         }
 
         // RFC 3986 section 5.2.3: the base's directory, then the reference.
         long slash = baseUri._path.LastIndexOf('/');
         String directory = slash < 0 ? (_hasAuthority ? "/" : "") : baseUri._path.Substring(0u, (nuint)slash + 1u);
         _path = Escaped(RemoveDotSegments(directory + rest));
+        return true;
     }
 
     void CopyFrom(Uri other)

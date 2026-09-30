@@ -39,7 +39,9 @@ public closure String? HttpEnvironmentVariableReader(String name);
 /// `all_proxy` for either when its own is unset, and `no_proxy` for the
 /// exceptions. Upper-case `HTTP_PROXY` is ignored when `REQUEST_METHOD` is
 /// set, because a CGI program finds a request's `Proxy` header there
-/// ("httpoxy"). A value without a scheme is taken as `http://`; one naming any
+/// ("httpoxy"). Names are matched with their case exactly, on Windows too,
+/// where the environment itself would answer `http_proxy` with `HTTP_PROXY`.
+/// A value without a scheme is taken as `http://`; one naming any
 /// other scheme is ignored, since only HTTP proxies are spoken to.
 ///
 /// **`no_proxy`** is a comma-separated list: `*` for everything; a domain,
@@ -60,8 +62,11 @@ public sealed class HttpEnvironmentProxy : IWebProxy
 
     /// The proxy this process's environment names, or null when it names
     /// none.
-    public static IWebProxy? FromEnvironment() =>
-        FromEnvironment(Env.GetEnvironmentVariable);
+    public static IWebProxy? FromEnvironment()
+    {
+        String[] names = Env.GetEnvironmentVariableNames();
+        return FromEnvironment((name) => ReadHttpEnvironmentVariableExactly(names, name));
+    }
 
     /// The proxy the variables `read` answers name, or null when they name
     /// none.
@@ -144,6 +149,17 @@ internal String? ReadHttpProxyVariable(HttpEnvironmentVariableReader read, Strin
     return IsHttpVariableSet(fallback) ? fallback : null;
 }
 
+/// A variable's value when one is set under exactly `name`, case and all.
+internal String? ReadHttpEnvironmentVariableExactly(String[] names, String name)
+{
+    foreach (var each in names)
+    {
+        if (each == name)
+            return Env.GetEnvironmentVariable(name);
+    }
+    return null;
+}
+
 internal bool IsHttpVariableSet(String? value) => value != null && !value.Trim().IsEmpty;
 
 /// A proxy variable's value as a URI: `http://` assumed when no scheme is
@@ -184,6 +200,7 @@ internal sealed class HttpNoProxyRule
     private bool _isRange = false;
     private uint _network = 0u;
     private uint _mask = 0u;
+    private bool _isMalformed = false;
 
     internal HttpNoProxyRule(String entry)
     {
@@ -196,7 +213,16 @@ internal sealed class HttpNoProxyRule
         if (hasPort)
         {
             if (TryParseHttpDecimal(text.Substring((nuint)colon + 1u), out long port) && port <= 65535)
+            {
                 _port = (int)port;
+            }
+            else
+            {
+                // An entry for a port that cannot be read is no entry, not
+                // one for every port.
+                _isMalformed = true;
+                return;
+            }
             text = text.Substring(0u, (nuint)colon);
         }
         if (text.StartsWith("[") && text.EndsWith("]"))
@@ -222,7 +248,7 @@ internal sealed class HttpNoProxyRule
     /// Whether a lower-case bare host, on `port`, is this entry's.
     internal bool MatchesHttpHost(String host, int port)
     {
-        if (_port >= 0 && _port != port)
+        if (_isMalformed || (_port >= 0 && _port != port))
             return false;
         if (_isRange)
             return TryParseHttpIPv4(host, out uint address) && (address & _mask) == _network;

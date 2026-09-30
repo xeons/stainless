@@ -71,6 +71,7 @@ public class Socket
     /// open first.
     ///
     /// @failure SocketError.NoName       the host did not resolve
+    /// @failure SocketError.TryAgain     the resolver could not answer for now
     /// @failure SocketError.Refused      nothing is listening there
     /// @failure SocketError.TimedOut     no answer from any address the name
     ///                                   resolved to
@@ -81,7 +82,38 @@ public class Socket
     public static Result<Socket, SocketError> OpenConnected(
             String host, ushort port, AddressFamily family, SocketType kind)
     {
-        var made = new Socket(host, port, family, kind);
+        return OpenConnected(host, port, family, kind, -1);
+    }
+
+    /// A socket already connected to a host and port, within a time limit.
+    ///
+    /// Every address the name resolved to is tried in turn until one
+    /// connects, and all of them together get `timeoutMilliseconds`. Each
+    /// attempt is given an equal share of what is left, so an address that
+    /// never answers cannot spend the time the next one needed. The socket
+    /// that comes back blocks.
+    ///
+    /// Resolving the name is not bounded: the platform's resolver cannot be.
+    ///
+    /// @param host                 the name or address to reach
+    /// @param port                 the port to reach it on
+    /// @param family               which family to resolve the name in
+    /// @param kind                 stream or datagram
+    /// @param timeoutMilliseconds  the limit for every attempt together;
+    ///                             negative is none
+    /// @failure SocketError.NoName       the host did not resolve
+    /// @failure SocketError.TryAgain     the resolver could not answer for now
+    /// @failure SocketError.Refused      nothing is listening there
+    /// @failure SocketError.TimedOut     the time ran out, or no answer from
+    ///                                   any address
+    /// @failure SocketError.Unreachable  no route to any of them
+    /// @failure SocketError.Unknown      the last address failed for a reason
+    ///                                   with no case of its own
+    public static Result<Socket, SocketError> OpenConnected(
+            String host, ushort port, AddressFamily family, SocketType kind,
+            int timeoutMilliseconds)
+    {
+        var made = new Socket(host, port, family, kind, timeoutMilliseconds);
         if (!made.IsOpen)
             return Fail(made.Error);
         return Ok(made);
@@ -116,14 +148,15 @@ public class Socket
     /// a socket of its own family, and a socket whose connect failed is closed
     /// rather than retried -- which is the other reason this cannot be two
     /// steps.
-    Socket(String host, ushort port, AddressFamily family, SocketType kind)
+    Socket(String host, ushort port, AddressFamily family, SocketType kind,
+           int timeoutMilliseconds)
     {
         this._family = family;
         this._kind = kind;
 
         int code = 0;
-        _handle = sl_socket_open_connected(host.ToPointer(), port, (int)family,
-                                          (int)kind, &code);
+        _handle = sl_socket_open_connected_within(host.ToPointer(), port, (int)family,
+                                                 (int)kind, timeoutMilliseconds, &code);
         _error = (SocketError)code;
         _closed = _handle == NoSocket;
     }
@@ -147,6 +180,10 @@ public class Socket
 
     /// The last error, or `None`. Set by every call that failed, and cleared
     /// by the next one that did not.
+    ///
+    /// It is the last call's on any thread. A socket used from two threads
+    /// at once, one sending while the other receives, MUST take each call's
+    /// error from the `Send` and `Receive` forms that hand it back.
     public SocketError Error => _error;
 
     /// Which family the socket was opened for. Fixed at open.
@@ -235,6 +272,9 @@ public class Socket
 
     /// Waits for a connection. The socket that comes back is open, or is not
     /// and says why.
+    ///
+    /// The accepted socket blocks, whether or not this one does, and no child
+    /// process inherits it.
     public Socket Accept()
     {
         if (_closed)
@@ -299,22 +339,38 @@ public class Socket
     /// @seealso Socket.Receive
     public nuint Send(byte[] buffer, nuint offset, nuint count)
     {
+        return Send(buffer, offset, count, out SocketError ignored);
+    }
+
+    /// Sends up to `count` bytes, and hands back this call's own error beside
+    /// the count.
+    ///
+    /// `Error` is the last error of any call on the socket, so a thread
+    /// sending while another receives MUST read this one instead.
+    ///
+    /// @param buffer  where the bytes come from
+    /// @param offset  where in it to start
+    /// @param count   how many to send from there
+    /// @param error   this call's error, or `None`
+    public nuint Send(byte[] buffer, nuint offset, nuint count, out SocketError error)
+    {
         if (_closed)
         {
-            RecordError(SocketError.Closed);
+            error = RecordError(SocketError.Closed);
             return 0;
         }
         if (!RangeLiesWithin(buffer, offset, count))
         {
-            RecordError(SocketError.Invalid);
+            error = RecordError(SocketError.Invalid);
             return 0;
         }
+        error = SocketError.None;
         if (count == 0)
             return 0;
 
         int code = 0;
         nuint sent = sl_socket_send(_handle, &buffer[offset], count, &code);
-        RecordError((SocketError)code);
+        error = RecordError((SocketError)code);
         return sent;
     }
 
@@ -335,9 +391,9 @@ public class Socket
         nuint at = 0;
         while (at < buffer.Length)
         {
-            nuint sent = Send(buffer, at, buffer.Length - at);
+            nuint sent = Send(buffer, at, buffer.Length - at, out SocketError error);
             if (sent == 0)
-                return _error == SocketError.None ? SocketError.Closed : _error;
+                return error == SocketError.None ? SocketError.Closed : error;
             at = at + sent;
         }
         return SocketError.None;
@@ -368,10 +424,10 @@ public class Socket
         {
             int code = 0;
             nuint sent = sl_socket_send(_handle, text.ToPointer() + at, size - at, &code);
-            RecordError((SocketError)code);
+            SocketError error = RecordError((SocketError)code);
 
             if (sent == 0)
-                return _error == SocketError.None ? SocketError.Closed : _error;
+                return error == SocketError.None ? SocketError.Closed : error;
             at = at + sent;
         }
         return SocketError.None;
@@ -387,22 +443,40 @@ public class Socket
     /// @see Socket.Send
     public nuint Receive(byte[] buffer, nuint offset, nuint count)
     {
+        return Receive(buffer, offset, count, out SocketError ignored);
+    }
+
+    /// Reads up to `count` bytes, and hands back this call's own error beside
+    /// the count. Zero with `None` is the peer having finished.
+    ///
+    /// `Error` is the last error of any call on the socket, so a thread
+    /// receiving while another sends MUST read this one instead: a send that
+    /// succeeded in between clears `Error`, and a read that failed would look
+    /// like an ending.
+    ///
+    /// @param buffer  where the bytes go
+    /// @param offset  where in it to start writing them
+    /// @param count   how many to make room for
+    /// @param error   this call's error, or `None`
+    public nuint Receive(byte[] buffer, nuint offset, nuint count, out SocketError error)
+    {
         if (_closed)
         {
-            RecordError(SocketError.Closed);
+            error = RecordError(SocketError.Closed);
             return 0;
         }
         if (!RangeLiesWithin(buffer, offset, count))
         {
-            RecordError(SocketError.Invalid);
+            error = RecordError(SocketError.Invalid);
             return 0;
         }
+        error = SocketError.None;
         if (count == 0)
             return 0;
 
         int code = 0;
         nuint read = sl_socket_receive(_handle, &buffer[offset], count, &code);
-        RecordError((SocketError)code);
+        error = RecordError((SocketError)code);
         return read;
     }
 

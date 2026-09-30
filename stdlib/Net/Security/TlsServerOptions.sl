@@ -70,13 +70,18 @@ public sealed class TlsServerOptions
     /// Decides whether to trust a client's chain. The target host it is given
     /// is empty. The default trusts what the platform's root store does, for
     /// the client-authentication usage.
+    ///
+    /// @see ValidateTlsClientCertificateChainByDefault
     public TlsCertificateValidator ClientCertificateValidator { get; set; } =
-        ValidateTlsCertificateChainByDefault;
+        ValidateTlsClientCertificateChainByDefault;
 
     /// Whether `Close` leaves the stream underneath open.
     public bool LeaveInnerStreamOpen { get; set; } = false;
 
-    // Test hooks: a fixed random and a fixed X25519 share. Empty means unset.
+    // Test hooks: a fixed random and a fixed X25519 share, empty meaning
+    // unset; and a HelloRetryRequest with a cookie alone, sent to a client
+    // whose share would have done.
     internal byte[] _fixedRandom = new byte[0u];
     internal byte[] _fixedX25519PrivateKey = new byte[0u];
+    internal bool _retryWithCookieAlone = false;
 }
