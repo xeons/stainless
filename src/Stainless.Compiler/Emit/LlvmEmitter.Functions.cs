@@ -139,6 +139,7 @@ public sealed partial class LlvmEmitter
             if (parameter.IsByReference)
             {
                 _parameterSlots[parameter] = incoming;
+                _pointerParameters.Add(parameter);
                 continue;
             }
 
@@ -146,6 +147,7 @@ public sealed partial class LlvmEmitter
             {
                 // byval already points at a private copy owned by this call.
                 _parameterSlots[parameter] = incoming;
+                _pointerParameters.Add(parameter);
                 AdoptWrittenParameter(parameter, incoming);
                 continue;
             }
@@ -232,9 +234,24 @@ public sealed partial class LlvmEmitter
         {
             if (!_parameterSlots.TryGetValue(parameter, out string? slot)) { index++; continue; }
 
-            DeclareVariable(slot, debug.Parameter(
+            int variable = debug.Parameter(
                 parameter.IsThis ? "this" : parameter.Name,
-                parameter.Type, symbol.Span, scope, index++));
+                parameter.Type, symbol.Span, scope, index++);
+
+            // A `ref` or a byval parameter's slot is the incoming pointer, which
+            // lives in a register until something reuses it: Win64 passes byval
+            // that way, and every target passes a `ref` that way. The pointer is
+            // kept in a slot of its own so the variable is found for the whole
+            // body.
+            if (_pointerParameters.Contains(parameter))
+            {
+                string held = Alloca("ptr", parameter.Name + ".addr");
+                Line($"store ptr {slot}, ptr {held}");
+                DeclareVariable(held, variable, throughPointer: true);
+                continue;
+            }
+
+            DeclareVariable(slot, variable);
         }
     }
 }

@@ -402,6 +402,7 @@ public sealed partial class LlvmEmitter
         _currentBlock = "entry";
         _slots.Clear();
         _parameterSlots.Clear();
+        _pointerParameters.Clear();
         _currentScope = null;
         _scopes.Clear();
         _pendingReleases.Clear();

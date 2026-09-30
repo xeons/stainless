@@ -104,6 +104,15 @@ frame that cannot be walked.
 Unwinding is `PC(n+1) = [RBP(n)+8]`, `RBP(n+1) = [RBP(n)]`, and no CFI
 interpreter is needed to show a call stack at `-O0`.
 
+A parameter the caller passes by address -- a `ref`, or a struct Win64 passes
+as a pointer to a copy -- is `DW_OP_fbreg -N, DW_OP_deref`: the incoming
+pointer is stored to a slot of its own and the variable is found through it.
+Declared on the pointer itself, it would live in the register it arrived in,
+and LLVM describes it only until that register is reused -- a few
+instructions. A reader MUST run the operations after the first; one that
+stops at `DW_OP_fbreg` prints the pointer's bytes as the value. CodeView says
+the same thing as a reference type (`Pair&`) at a frame offset.
+
 ## 4. The unit is a range list, and most of it is at address zero
 
 Our compile unit describes its code as `DW_AT_ranges [DW_FORM_rnglistx]` on

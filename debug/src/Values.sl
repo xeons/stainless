@@ -62,6 +62,8 @@ const uint OpReg31        = 0x6Fu;
 const uint OpBreg0        = 0x70u;
 const uint OpBreg31       = 0x8Fu;
 const uint OpCallFrameCfa = 0x9Cu;
+const uint OpDeref        = 0x06u;
+const uint OpPlusUconst   = 0x23u;
 
 /// DWARF's numbering of the x86-64 registers, which is not the instruction
 /// encoding's: 6 is RBP and 7 is RSP.
@@ -97,7 +99,7 @@ public String ReadValue(Engine engine, ITarget target, Unit unit, Die variable,
                         Die owner, Registers frame)
 {
     nuint at = 0u;
-    if (!LocationOf(engine, unit, variable, owner, frame, &at))
+    if (!LocationOf(engine, target, unit, variable, owner, frame, &at))
         return "<no location>";
 
     var described = DescribeType(unit, variable);
@@ -109,7 +111,11 @@ public String ReadValue(Engine engine, ITarget target, Unit unit, Die variable,
 /// Only the operations a `-g -O0` build actually produces are implemented, and
 /// anything else answers false rather than a plausible address -- a local read
 /// from the wrong place is worse than one that says it could not be found.
-bool LocationOf(Engine engine, Unit unit, Die variable, Die owner,
+///
+/// The first operation names a place; the ones after it may follow a pointer
+/// from there, which is how a parameter the caller passed by address is
+/// described: its slot holds the address, and `DW_OP_deref` reads it.
+bool LocationOf(Engine engine, ITarget target, Unit unit, Die variable, Die owner,
                 Registers frame, nuint* address)
 {
     var location = variable.Find(AtLocation);
@@ -120,6 +126,38 @@ bool LocationOf(Engine engine, Unit unit, Die variable, Die owner,
         return false;
 
     var reader = new Cursor(program);
+    if (!FirstPlace(engine, unit, owner, frame, reader, address))
+        return false;
+
+    while (!reader.AtEnd)
+    {
+        switch ((uint)reader.U8())
+        {
+            case OpDeref:
+            {
+                byte[] cell = new byte[8];
+                if (unit.AddressSize > 8u || !target.ReadMemory(*address, cell, unit.AddressSize))
+                    return false;
+                *address = (nuint)LittleEndianWord(cell);
+                break;
+            }
+
+            case OpPlusUconst:
+                *address = *address + (nuint)reader.Leb();
+                break;
+
+            default:
+                return false;
+        }
+    }
+
+    return !reader.Overran;
+}
+
+/// The place a location expression starts from.
+bool FirstPlace(Engine engine, Unit unit, Die owner, Registers frame, Cursor reader,
+                nuint* address)
+{
     uint operation = (uint)reader.U8();
 
     switch (operation)

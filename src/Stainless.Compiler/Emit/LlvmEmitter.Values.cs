@@ -197,12 +197,15 @@ public sealed partial class LlvmEmitter
     /// Ties a stack slot to the name and type the source gave it, so a debugger
     /// can print the variable rather than the address.
     /// </summary>
-    private void DeclareVariable(string slot, int variable)
+    /// <param name="throughPointer">
+    /// The slot holds the variable's address rather than the variable.
+    /// </param>
+    private void DeclareVariable(string slot, int variable, bool throughPointer = false)
     {
         if (debug is null || _debugScope is null) return;
 
         Line($"call void @llvm.dbg.declare(metadata ptr {slot}, metadata !{variable}, " +
-             "metadata !DIExpression())");
+             $"metadata !DIExpression({(throughPointer ? "DW_OP_deref" : "")}))");
     }
 
     private void MemCopy(string destination, string source, int size)

@@ -167,6 +167,9 @@ public sealed partial class LlvmEmitter(
     private readonly Dictionary<LocalSymbol, string> _slots = [];
     private readonly Dictionary<ParameterSymbol, string> _parameterSlots = [];
 
+    /// <summary>Parameters whose slot is the incoming pointer rather than a copy.</summary>
+    private readonly HashSet<ParameterSymbol> _pointerParameters = [];
+
     private readonly StringBuilder _entryAllocas = new();
     private int _nextTemp;
     private int _nextLabel;

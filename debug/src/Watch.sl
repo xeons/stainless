@@ -692,7 +692,7 @@ class WatchReader
     Place? Located(Die variable)
     {
         nuint at = 0u;
-        if (!LocationOf(_engine, _unit, variable, _owner, _frame, &at))
+        if (!LocationOf(_engine, _target, _unit, variable, _owner, _frame, &at))
         {
             Refuse("'" + variable.Name + "' has no location a debugger can read");
             return null;

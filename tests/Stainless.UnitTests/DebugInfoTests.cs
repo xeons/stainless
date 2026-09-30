@@ -71,6 +71,32 @@ public class DebugInfoTests
         Assert.Contains("DW_TAG_pointer_type", node);
     }
 
+    /// <summary>
+    /// A parameter whose slot is the incoming pointer -- a `ref`, or a struct
+    /// passed by address -- is found through a copy of that pointer on the
+    /// stack, since the register it arrived in is reused.
+    /// </summary>
+    [Fact]
+    public void AParameterPassedByAddressIsFoundThroughAPointer()
+    {
+        string ir = Front.ModuleDebugIr("""
+            public struct Pair { public long A; public long B; public long C; }
+
+            public long Use(Pair pair, ref int count)
+            {
+                count = 1;
+                return pair.A;
+            }
+            """);
+
+        foreach (string name in new[] { "pair", "count" })
+        {
+            string declared = ir.Split('\n').Single(line =>
+                line.Contains("llvm.dbg.declare") && line.Contains($"%{name}.addr"));
+            Assert.Contains("DW_OP_deref", declared);
+        }
+    }
+
     /// <summary>A pointer is as wide as the target's, not as the host's.</summary>
     [Fact]
     public void APointerIsTheTargetsWidth()
