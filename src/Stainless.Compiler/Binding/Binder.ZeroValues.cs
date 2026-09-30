@@ -27,24 +27,18 @@ namespace Stainless.Binding;
 ///
 /// A generic body is judged per instantiation, as everything in a template
 /// is, so <c>default(T)</c> is an error in <c>Box&lt;String&gt;</c> and
-/// nothing in <c>Box&lt;int&gt;</c>. <c>Standard.Unchecked</c> is the one
-/// module the rule does not reach: its two functions are how a collection
-/// holds room for elements it does not have yet.
+/// nothing in <c>Box&lt;int&gt;</c>. Nothing is exempt: room for elements
+/// that are not there yet is a <c>Slot&lt;T&gt;[]</c>, whose zero is empty.
 /// </summary>
 public sealed partial class Binder
 {
-    private const string UncheckedModuleName = "Standard.Unchecked";
-
-    /// <summary>Whether the body being bound is one the rule does not reach.</summary>
-    private bool InUncheckedModule => _context.Function?.ModuleName == UncheckedModuleName;
-
     /// <summary>
     /// <c>default(T)</c>, or a bare <c>default</c> going to
     /// <paramref name="type"/>.
     /// </summary>
     private void CheckDefaultHasZero(SourceSpan span, TypeSymbol type)
     {
-        if (InUncheckedModule || ZeroValues.FindNullInZero(type) is not { } found)
+        if (ZeroValues.FindNullInZero(type) is not { } found)
             return;
 
         ReportNoZeroValue("SL0810", span,
@@ -61,7 +55,7 @@ public sealed partial class Binder
     private void CheckArrayElementHasZero(
         SourceSpan span, TypeSymbol element, BoundExpression length)
     {
-        if (InUncheckedModule || FoldSwitchLabel(length) == 0)
+        if (FoldSwitchLabel(length) == 0)
             return;
         if (ZeroValues.FindNullInZero(element) is not { } found)
             return;

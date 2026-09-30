@@ -1088,4 +1088,22 @@ public class EmitterTests
             .Select(m => int.Parse(m.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture))
             .ToList();
     }
+
+    /// <summary>
+    /// A foreign function declared to return a never-null reference is held
+    /// to it where it is called: a null stops the program there. One declared
+    /// to return an optional is not asked.
+    /// </summary>
+    [Theory]
+    [InlineData("String", true)]
+    [InlineData("int[]", true)]
+    [InlineData("String?", false)]
+    public void AForeignResultIsCheckedForNull(string type, bool isChecked)
+    {
+        string body = Front.TestFunction(Front.ModuleIr(
+            $"extern \"C\" {type} c_find(int wanted);\n" +
+            $"public {type} F() => c_find(1);"), "F");
+
+        Assert.Equal(isChecked, body.Contains("call void @sl_foreign_null(", StringComparison.Ordinal));
+    }
 }

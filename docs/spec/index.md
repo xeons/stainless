@@ -66,7 +66,7 @@ What a module is, how one spans files, and why nothing depends on declaration or
 
 ### [2. Types](02-types.md)
 
-Primitives, `struct`, `class`, pointers, `variant`, `union`, `Result`, `interface`, arrays, slices, `enum`, delegates, closures, events and lambdas.
+Primitives, `struct`, `class`, `record`, pointers, `variant`, `union`, `Result`, `interface`, arrays, slices, `enum`, delegates, closures, events and lambdas.
 
 - [2.1 Primitives](02-types.md#21-primitives)
 - [2.2 `struct` — value type, C layout](02-types.md#22-struct--value-type-c-layout)
@@ -76,12 +76,15 @@ Primitives, `struct`, `class`, pointers, `variant`, `union`, `Result`, `interfac
   - [2.2.4 `(int, String)` — a tuple](02-types.md#224-int-string--a-tuple)
   - [2.2.5 Taking a tuple apart](02-types.md#225-taking-a-tuple-apart)
 - [2.3 `[Packed]` and `[Align]`](02-types.md#23-packed-and-align)
+  - [2.3.1 Bit-fields](02-types.md#231-bit-fields)
 - [2.4 `class` — reference type, ARC managed](02-types.md#24-class--reference-type-arc-managed)
   - [2.4.1 A field with a value](02-types.md#241-a-field-with-a-value)
   - [2.4.2 Making one with its members written out](02-types.md#242-making-one-with-its-members-written-out)
   - [2.4.3 Inheritance](02-types.md#243-inheritance)
   - [2.4.4 `is`, `as`, and casting down](02-types.md#244-is-as-and-casting-down)
   - [2.4.5 A primary constructor](02-types.md#245-a-primary-constructor)
+  - [2.4.6 `record` -- a class written as its constructor](02-types.md#246-record--a-class-written-as-its-constructor)
+  - [2.4.7 `with` -- a record again, with some of it changed](02-types.md#247-with--a-record-again-with-some-of-it-changed)
 - [2.5 Pointers and nullability](02-types.md#25-pointers-and-nullability)
 - [2.6 `variant` — a value that is one of several things](02-types.md#26-variant--a-value-that-is-one-of-several-things)
 - [2.7 `union` — every member at offset zero](02-types.md#27-union--every-member-at-offset-zero)
@@ -96,6 +99,7 @@ Primitives, `struct`, `class`, pointers, `variant`, `union`, `Result`, `interfac
   - [2.11.2 `T[N]` — an inline array](02-types.md#2112-tn--an-inline-array)
   - [2.11.3 `[a, ..b]` — collection expressions](02-types.md#2113-a-b--collection-expressions)
 - [2.12 `Span<T>` and `ReadOnlySpan<T>` — part of an array](02-types.md#212-spant-and-readonlyspant--part-of-an-array)
+  - [2.12.1 `ReadOnlySpan<T>`](02-types.md#2121-readonlyspant)
 - [2.13 `enum` — a distinct type over an integer](02-types.md#213-enum--a-distinct-type-over-an-integer)
 - [2.14 `delegate` — a named function pointer](02-types.md#214-delegate--a-named-function-pointer)
   - [2.14.1 `closure` — a method and the object it belongs to](02-types.md#2141-closure--a-method-and-the-object-it-belongs-to)
@@ -141,7 +145,7 @@ Monomorphization, constraints, and what is and is not supported.
 
 ### [5. The standard library](05-standard-library.md)
 
-What ships and how: threading, collections, environment, math, concurrency, I/O, processes, JSON and XML, images, cryptography and sound.
+What ships and how: threading, collections, environment, math, concurrency, I/O, processes, compression, JSON and XML, images, cryptography, sound, ASN.1, certificates, TLS and HTTP.
 
 - [5.1 What ships, and how](05-standard-library.md#51-what-ships-and-how)
   - [5.1.1 What `Standard` holds](05-standard-library.md#511-what-standard-holds)
@@ -155,6 +159,7 @@ What ships and how: threading, collections, environment, math, concurrency, I/O,
 - [5.8 `Standard.Concurrent`](05-standard-library.md#58-standardconcurrent)
 - [5.9 `Standard.IO`, `File`, `Directory` and `Path`](05-standard-library.md#59-standardio-file-directory-and-path)
   - [5.9.1 `Standard.Process`](05-standard-library.md#591-standardprocess)
+  - [5.9.2 `Standard.IO.Compression`](05-standard-library.md#592-standardiocompression)
 - [5.10 `Standard.Json` and `Standard.Xml`](05-standard-library.md#510-standardjson-and-standardxml)
 - [5.11 Interfaces may extend interfaces](05-standard-library.md#511-interfaces-may-extend-interfaces)
 - [5.12 `Standard.Drawing`](05-standard-library.md#512-standarddrawing)
@@ -177,8 +182,10 @@ Attributes and their arguments, `[Reflect]`, `typeof`, the tables that get emitt
 - [6.4 A serializer, written once](06-attributes-reflection.md#64-a-serializer-written-once)
   - [6.4.1 Properties, which are not fields](06-attributes-reflection.md#641-properties-which-are-not-fields)
   - [6.4.2 Finding a type by name](06-attributes-reflection.md#642-finding-a-type-by-name)
+  - [6.4.3 Enums and events](06-attributes-reflection.md#643-enums-and-events)
 - [6.5 What is emitted](06-attributes-reflection.md#65-what-is-emitted)
 - [6.6 Writing a field](06-attributes-reflection.md#66-writing-a-field)
+  - [6.6.1 Making an object](06-attributes-reflection.md#661-making-an-object)
 - [6.7 What is not there yet](06-attributes-reflection.md#67-what-is-not-there-yet)
 
 ### [7. Functions and members](07-functions-members.md)

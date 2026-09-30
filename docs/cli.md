@@ -10,7 +10,7 @@ stainless build [paths...]     compile to a native executable
 stainless run   [paths...]     compile, then run it
 stainless emit-ir [paths...]   print the generated LLVM IR
 stainless doc [paths...]       write reference documentation from /// blocks
-stainless init [name]          write a stainless.json here
+stainless init [name]          write a stainless.json here (--library for a library)
 stainless restore              resolve dependencies and lock them
 
   -o, --out <path>       output file
@@ -33,6 +33,8 @@ stainless restore              resolve dependencies and lock them
                          copy in this binary. Shared where two Stainless
                          binaries meet, static everywhere else
   -O<0-3>                optimization level (default -O2)
+  --leak-check           count what the program allocates and never frees,
+                         and report it on stderr at exit
   -g, --debug            describe the program to a debugger
   --no-debug             do not, whatever the project file says
   --debug-format <dwarf|codeview|both>
@@ -44,15 +46,18 @@ stainless restore              resolve dependencies and lock them
                           '#pragma comment(lib, "user32")')
   --abi <microsoft|itanium>  which C and C++ ABI to agree with: names,
                          bit-fields and how a struct is passed
-  --target <name>        the machine to build for: x64 (the default), x86 or
-                         arm64, optionally with a system -- x86-windows,
-                         x86-linux, arm64-windows, arm64-linux
+  --target <name>        the machine to build for: x64, x86 or arm64,
+                         optionally with a system -- x64-linux, x86-windows,
+                         arm64-linux and so on. The default is the machine
+                         doing the building
   --keep                 keep the generated .ll
   --verify-ir            run LLVM's verifier over the generated IR first, and
                          report a fault as a compiler bug in the function it is
                          in. A linked build is verified by clang regardless;
                          this reaches 'emit-ir' too. STAINLESS_VERIFY_IR=1 asks
                          for it in every build
+  --diagnostics <text|json>
+                         'text' for a person, 'json' for a tool
   --obj <dir>            directory for intermediates (default ./obj)
   --                     (run) everything after this is passed to the program
   -h, --help  -v, --version
@@ -104,10 +109,8 @@ nothing else, and everything else reads **DWARF**.
 
 **The default follows the target, not the machine doing the building.** A
 Windows target gets CodeView, anything else gets DWARF, and a Linux binary
-cross-compiled from Windows gets DWARF like any other Linux binary. It asked
-which machine the *compiler* was running on until `--debug-format` existed,
-which put a CodeView flag on an ELF — a description in a format nothing on
-that platform reads.
+cross-compiled from Windows gets DWARF like any other Linux binary. CodeView
+on an ELF would be a description in a format nothing on that platform reads.
 
 Naming a format turns `-g` on, because a format with no description in it is
 never what was meant.
@@ -131,7 +134,7 @@ that can be switched on — see [docs/dwarf.md](dwarf.md), which measured it.
 instead of the rendered form, which is what an editor should read:
 
 ```
-{"severity":"error","code":"SL0265","message":"cannot convert 'String' to 'int',
+{"severity":"error","code":"SL0265","message":"cannot convert 'String' to 'int'",
  "file":"C:\\Code\\src\\main.sl","line":5,"column":13,"length":14}
 ```
 
@@ -148,12 +151,34 @@ One object per line rather than one array around the whole build, so a reader
 can act on each as it arrives and a build that dies part-way still leaves what
 it managed to say readable. Nothing else is written to the error stream in this
 mode — the "compilation failed with 3 errors" line is a sentence for a person,
-and a reader counting the objects it received already has it.
+and a reader counting the objects it received already has it. The rendered
+form is for a person and is not a format to parse.
 
-The IDE used to read the rendered form and take it apart again, deciding a line
-was an error because it began with `error` and finding the place by counting
-colons from the right so a drive letter would survive. That worked, and it was
-a parser for a format never meant to be parsed.
+## What a program never freed
+
+`--leak-check` builds the runtime with its allocation tracker on, and the
+program reports on stderr at exit what it still has allocated:
+
+```
+stainless-leak: live=0 bytes=0 allocated=0 untracked=0 retains=0 releases=0
+```
+
+and beneath that line, a line per type still alive, worst first. With counting
+rather than collecting that is an exact answer: what a mutable static holds is
+released before the report, and only a `readonly` static, made immortal as it
+is stored, is alive at exit on purpose. Without the flag the tracker is not
+compiled in and costs nothing.
+
+## Environment
+
+| | |
+|---|---|
+| `STAINLESS_CLANG` | the clang to use; it always wins over `PATH` and the install directories |
+| `STAINLESS_RC` | the `llvm-rc` to use; otherwise the one beside clang, then `PATH` |
+| `STAINLESS_VERIFY_IR` | anything but `0` is `--verify-ir` on every build |
+| `STAINLESS_HOME` | where fetched packages are cached, under `cache/` |
+| `STAINLESS_CPP_ABI` | `microsoft` or `itanium`: the host's C++ name mangling, for checking the other scheme against a real compiler |
+| `NO_COLOR` | set to anything, the rendered diagnostics carry no colour |
 
 ## Reference documentation
 
@@ -165,8 +190,10 @@ stainless doc src -o docs/api        # a project's own modules
 stainless doc --stdlib               # the standard library, into docs/stdlib
 ```
 
-[docs/stdlib](stdlib/index.md) is that output for the standard library, checked
-in so it can be read here. It is generated, so the source is what to edit.
+`-o` names a directory here rather than a file, and defaults to `docs/api`, or
+to `docs/stdlib` with `--stdlib`. [docs/stdlib](stdlib/index.md) is that output
+for the standard library, checked in so it can be read here. It is generated,
+so the source is what to edit.
 
 A block is Markdown and is carried through as it was written. The `@tags` in it
 become sections of the page — what it takes, what it answers, how it fails —
@@ -231,12 +258,12 @@ So a project is a document. `stainless.json` at the root of a package, and
 ```
 
 ```
-stainless init app      # writes exactly those four fields
+stainless init app      # writes name, version, kind and sources
 stainless run           # builds the project, and whatever it depends on
 ```
 
 JSON because both sides can already read it: the compiler has a parser in the
-framework it is written in, and [stdlib/Json.sl](../stdlib/Json.sl) is the other
+framework it is written in, and [stdlib/Json/](../stdlib/Json/) is the other
 one — so a program written in this language can read its own project file with
 nothing new written. A nicer syntax would cost two parsers for ever.
 
@@ -344,6 +371,12 @@ Name: Add
 modules may see this — and a library's surface should be stated once rather
 than falling out of visibility rules.
 
+A library is named by its file name wherever it is linked: on Linux it carries
+that name as its `SONAME`. A C consumer finds it the way Windows finds a DLL
+only if it is linked to look beside itself, so on Linux link one with
+`-Wl,-rpath,'$ORIGIN'` and keep the `.so` next to it, or install the library
+where the loader looks.
+
 Consuming it is ordinary C, because the header restates what the ABI already
 guarantees:
 
@@ -372,10 +405,14 @@ stainless build app.sl --reference build/shapes.slmod -o app.exe
 ```
 
 The metadata names its library, and **`--reference` links it** from beside the
-`.slmod` — the import library on Windows, the shared object elsewhere. It used
-to take the library as a second input, and leaving that off was a link error
-about a name nobody had declared. A library moved away from its metadata is
-still passed as an ordinary input.
+`.slmod` -- the import library on Windows, the shared object elsewhere. A
+library moved away from its metadata is passed as an ordinary input.
+
+The program names the library by its file name, never by where it was built,
+and the compiler copies the library beside the program, so the directory the
+program is built into holds everything it loads and can be moved as one. On
+Linux the library carries its file name as its `SONAME` and the program an
+rpath of `$ORIGIN`, which is what Windows does for a DLL without being asked.
 
 The `.slmod` is generated from the same bound program the library was compiled
 from, so it cannot drift from it. The consumer then writes ordinary Stainless
@@ -405,7 +442,14 @@ compiled for its layout, when the consumer drops the last reference.
 share an allocator and a C stdio buffer as well, so what a library prints
 interleaves with its consumer's output in the order the two of them wrote it.
 The compiler builds `stainless-rt` once and copies it beside each binary, so
-`build/` ends up holding it next to the library and the program.
+`build/` ends up holding it next to the library and the program. The runtime is
+named and found the same way as the library, so a program and the libraries it
+loads share the one copy the loader found first, wherever each was built.
+
+A `--debug` or `--leak-check` build links a runtime of another name
+(`stainless-rt-g`, `stainless-rt-leak`), which to the loader is another
+library. A library and its consumer MUST agree on both flags, and a consumer
+built otherwise is refused.
 
 Generics and classes implementing interfaces do not cross, and the compiler says
 so where the library is built rather than leaving the consumer to find a public

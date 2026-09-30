@@ -262,7 +262,7 @@ new value, as `Add` does.
 
 **Parameters**
 
-- `mask` — the bits to keep; every bit outside it is cleared
+- `mask` -- the bits to keep; every bit outside it is cleared
 
 <sub>[stdlib/Threading/AtomicLong.sl:89](../../stdlib/Threading/AtomicLong.sl#L89)</sub>
 
@@ -323,7 +323,7 @@ leaves the turnstile as it found it.
 
 **Parameters**
 
-- `milliseconds` — how long to wait at most, measured from the call rather than from the last wake
+- `milliseconds` -- how long to wait at most, measured from the call rather than from the last wake
 
 <sub>[stdlib/Threading/AutoResetEvent.sl:67](../../stdlib/Threading/AutoResetEvent.sl#L67)</sub>
 
@@ -445,7 +445,7 @@ The same with a deadline. Answers whether the count reached zero.
 
 **Parameters**
 
-- `milliseconds` — how long to wait at most, measured from the call rather than from the last wake
+- `milliseconds` -- how long to wait at most, measured from the call rather than from the last wake
 
 <sub>[stdlib/Threading/CountdownEvent.sl:115](../../stdlib/Threading/CountdownEvent.sl#L115)</sub>
 
@@ -498,7 +498,7 @@ it.
 
 **Type parameters**
 
-- `T` — what the body produces, and what every `GetResult` answers with
+- `T` -- what the body produces, and what every `GetResult` answers with
 
 <sub>[stdlib/Threading/Future.sl:55](../../stdlib/Threading/Future.sl#L55)</sub>
 
@@ -539,7 +539,7 @@ held. Releasing is the destructor's job; there is no `Exit` to forget.
 
 **Type parameters**
 
-- `T` — what the mutex guards, taken from the mutex rather than chosen here
+- `T` -- what the mutex guards, taken from the mutex rather than chosen here
 
 <sub>[stdlib/Threading/Guard.sl:30](../../stdlib/Threading/Guard.sl#L30)</sub>
 
@@ -581,7 +581,7 @@ cannot be generic -- and a lambda reaches it the same way.
 
 **Type parameters**
 
-- `T` — what the work is handed
+- `T` -- what the work is handed
 
 <sub>[stdlib/Threading/IConsumer.sl:31](../../stdlib/Threading/IConsumer.sl#L31)</sub>
 
@@ -609,7 +609,7 @@ same way it reaches `Action`.
 
 **Type parameters**
 
-- `T` — what the work produces
+- `T` -- what the work produces
 
 <sub>[stdlib/Threading/IProducer.sl:33](../../stdlib/Threading/IProducer.sl#L33)</sub>
 
@@ -670,7 +670,7 @@ false means the time ran out.
 
 **Parameters**
 
-- `milliseconds` — how long to wait at most, measured from the call rather than from the last wake
+- `milliseconds` -- how long to wait at most, measured from the call rather than from the last wake
 
 <sub>[stdlib/Threading/ManualResetEvent.sl:64](../../stdlib/Threading/ManualResetEvent.sl#L64)</sub>
 
@@ -733,7 +733,7 @@ pulse says only "the value changed", never "it changed the way you want":
 
 **Type parameters**
 
-- `T` — what the monitor guards, and what a waiter's condition is about
+- `T` -- what the monitor guards, and what a waiter's condition is about
 
 <sub>[stdlib/Threading/Monitor.sl:43](../../stdlib/Threading/Monitor.sl#L43)</sub>
 
@@ -758,7 +758,7 @@ Proof that a monitor is held, and the only route to what it guards.
 
 **Type parameters**
 
-- `T` — what the monitor guards, taken from the monitor rather than chosen here
+- `T` -- what the monitor guards, taken from the monitor rather than chosen here
 
 <sub>[stdlib/Threading/MonitorGuard.sl:27](../../stdlib/Threading/MonitorGuard.sl#L27)</sub>
 
@@ -809,7 +809,7 @@ is checked in a loop rather than read once.
 
 **Parameters**
 
-- `milliseconds` — how long to wait for, from now
+- `milliseconds` -- how long to wait for, from now
 
 <sub>[stdlib/Threading/MonitorGuard.sl:54](../../stdlib/Threading/MonitorGuard.sl#L54)</sub>
 
@@ -870,7 +870,7 @@ which is about how long a borrowed thing lives rather than about counting.
 
 **Type parameters**
 
-- `T` — what the lock guards. Nothing is required of it: safety comes from the lock rather than from the type, and a `T` reached any other way is unguarded.
+- `T` -- what the lock guards. Nothing is required of it: safety comes from the lock rather than from the type, and a `T` reached any other way is unguarded.
 
 <sub>[stdlib/Threading/Mutex.sl:58](../../stdlib/Threading/Mutex.sl#L58)</sub>
 
@@ -912,7 +912,7 @@ Shared access. There is no `SetValue`, which is the point.
 
 **Type parameters**
 
-- `T` — what the lock guards, taken from the lock rather than chosen here
+- `T` -- what the lock guards, taken from the lock rather than chosen here
 
 <sub>[stdlib/Threading/ReadGuard.sl:27](../../stdlib/Threading/ReadGuard.sl#L27)</sub>
 
@@ -948,7 +948,7 @@ you read -- it may have changed in between.
 
 **Type parameters**
 
-- `T` — what the lock guards. Nothing is required of it, and nothing stops a reader mutating one through `ReadGuard.Value`; see the note there.
+- `T` -- what the lock guards. Nothing is required of it, and nothing stops a reader mutating one through `ReadGuard.Value`; see the note there.
 
 <sub>[stdlib/Threading/ReaderWriterLock.sl:40](../../stdlib/Threading/ReaderWriterLock.sl#L40)</sub>
 
@@ -1042,7 +1042,7 @@ Blocks for at most `milliseconds`. Returns whether it got a permit.
 
 **Parameters**
 
-- `milliseconds` — how long to wait at most. The deadline is taken once, so a wake that finds no permit does not start the wait again.
+- `milliseconds` -- how long to wait at most. The deadline is taken once, so a wake that finds no permit does not start the wait again.
 
 <sub>[stdlib/Threading/Semaphore.sl:82](../../stdlib/Threading/Semaphore.sl#L82)</sub>
 
@@ -1159,8 +1159,8 @@ Queues a job. It may already be running when this returns.
 
 **Parameters**
 
-- `job` — the work a pool thread runs
-- `argument` — what it is handed, uninterpreted. It is not owned and not counted, so it MUST outlive the join.
+- `job` -- the work a pool thread runs
+- `argument` -- what it is handed, uninterpreted. It is not owned and not counted, so it MUST outlive the join.
 
 **See also** &nbsp; [TaskScope.Join](#join-method)
 
@@ -1254,7 +1254,7 @@ Exclusive access.
 
 **Type parameters**
 
-- `T` — what the lock guards, taken from the lock rather than chosen here
+- `T` -- what the lock guards, taken from the lock rather than chosen here
 
 <sub>[stdlib/Threading/WriteGuard.sl:27](../../stdlib/Threading/WriteGuard.sl#L27)</sub>
 

@@ -171,7 +171,7 @@ than meaning the zero value. A struct with no constructor is written
 on a struct with constructors and another on a struct without.
 
 `: this(...)` delegates to another of the struct's own constructors, on the
-same terms as a class's ([§2.3.4](#234-constructors)). `base(...)` is SL0515:
+same terms as a class's ([section 2.4.3](#243-inheritance)). `base(...)` is SL0515:
 only a class derives from another. A union has no constructor at all (SL0207),
 because which of its members is live is exactly what it does not record, and a
 variant is made by naming one of its cases.
@@ -396,7 +396,7 @@ var (low, high) = range;
 
 A value that has neither a tuple's shape nor a `Deconstruct` for that many
 names cannot be taken apart (SL0608). A record has one generated
-([§2.4.1](#241-record--a-class-written-as-its-constructor)), and
+([section 2.4.6](#246-record--a-class-written-as-its-constructor)), and
 `KeyValuePair` has one, so `foreach (var (key, value) in dictionary)` names
 both halves.
 
@@ -460,7 +460,7 @@ struct, and `__declspec(align(n))` or `__attribute__((aligned(n)))` behind a
 macro for an aligned one — and a test compares every size, alignment and field
 offset against what the target's C compiler makes of it.
 
-### Bit-fields
+### 2.3.1 Bit-fields
 
 A field may be some of the bits of its type rather than all of them.
 
@@ -552,8 +552,8 @@ An automatic property's `= value` is the same thing: the storage it owns is a
 field, and this is that field's initializer.
 
 **A class that declares no constructor gets one**, taking no arguments, so that
-there is a head for the initializers to be at. `new Counter()` meant that
-already; what is new is that something runs.
+there is a head for the initializers to be at. `new Counter()` calls it, and
+the initializers run there.
 
 **A field with no initializer is written by every constructor** when its type
 has no zero value: a `String` field that no path writes would be read as a
@@ -808,10 +808,12 @@ using — which makes adding one to a public, non-sealed class a breaking change
 enforced by the ABI digest rather than by convention (see
 [§5 of packages.md](../packages.md#5-the-digest)).
 
-A `com class` from a referenced library still cannot be derived from (SL0513):
-its tear-offs are laid out after its fields by the compilation that built it, so
-a derived class's own fields would land on top of them. Neither can a class the
-runtime provides, such as `String`.
+Three kinds of class are not in a library's metadata at all, so none of them is
+there to derive from: a `com class` (SL0544), whose tear-offs are laid out after
+its fields by the compilation that built it; a class that implements an
+interface (SL0420), whose dispatch tables are indexed by ids assigned across one
+whole program; and a class with a generic virtual method (SL0799). A class the
+runtime provides, such as `String`, cannot be derived from either (SL0513).
 
 ### 2.4.4 `is`, `as`, and casting down
 
@@ -989,7 +991,8 @@ public class Circle(double radius) : Shape("circle")
 
 A parameter list after a class or struct's name is its constructor, and the
 parameters are in scope through the whole body. They are parameters, not
-properties — a record is the form that makes them properties (§2.4.1).
+properties -- a record is the form that makes them properties
+([section 2.4.6](#246-record--a-class-written-as-its-constructor)).
 
 **Where a parameter is read decides what it costs.** A field initializer and
 the base's arguments run inside the constructor, so there the parameter is the
@@ -1022,7 +1025,7 @@ A `ref`, `in` or `out` parameter names the caller's storage, which does not
 outlive the call, so a member body may not name one (SL0787). A static member
 has no instance to read a kept parameter from (SL0576).
 
-## 2.4.1 `record` — a class written as its constructor
+### 2.4.6 `record` — a class written as its constructor
 
 ```csharp
 public record Point(int X, int Y);
@@ -1067,7 +1070,7 @@ public class Point : IEquatable<Point>, IHashable
 in C#. A `Deconstruct` written in the body with as many parameters takes the
 generated one's place.
 
-**`Equals` and `GetHashCode`, not `Equals` and `GetHashCode`.** Those are the
+**`Equals` and `GetHashCode` are not new names.** Those are the
 names [`IEquatable<T>` and `IHashable`](05-standard-library.md) declare, and
 the pair a `Dictionary` probes a key with — so a record is a key, and a set
 element, without saying anything. That is most of what the form is for.
@@ -1138,7 +1141,7 @@ error[SL0804]: 'Shape' is a record, and only a record may derive from one
 keyword only where a type declaration can begin and the next word is `class`,
 `struct`, or the type's name. `int record = 7;` stays legal.
 
-### 2.4.2 `with` — a record again, with some of it changed
+### 2.4.7 `with` — a record again, with some of it changed
 
 ```csharp
 var point = new Point(3, 4);
@@ -1351,6 +1354,14 @@ It is a **value type**, laid out as a tag followed by enough storage for the
 widest case ([§2 of the ABI notes](../abi.md#2-object-header-class-instances)). Nothing allocates, and the payloads overlap,
 so `Shape` above is 24 bytes — a tag, seven bytes of padding and two doubles —
 rather than the 32 that keeping every case's fields side by side would cost.
+
+**A variant of two cases, the first carrying nothing and the second a
+reference that is never null, has no tag.** That reference being null is the
+first case, so `Optional<String>` is one pointer wide, and an `Optional` of a
+struct holding a `String` is the struct's own size. The empty case has to come
+first, because it is what zero bytes are ([section 2.16](#216-zero-values)): a
+variant with its cases the other way round keeps its tag. Nothing about using
+one changes, and only `sizeof` shows it ([the ABI notes](../abi.md#23-variant-layout)).
 
 **Building one.** A case may be named through its variant, or on its own where
 the surrounding code already says which variant is meant:
@@ -1748,7 +1759,7 @@ in one — `Ok(try P(a) + try P(b))` — and each returns on its own failure.
 
 `C?` is a nullable reference: the null is the pointer, so it costs nothing and
 the compiler narrows it ([§2.5](#25-pointers-and-nullability)), and so is `T[]?`. A **value type has no spare bit to be null
-with**, so `nuint?` is refused (SL0271), and what used to stand in was a magic
+with**, so `nuint?` is refused (SL0271), and the usual stand-in is a magic
 number — a lookup answering with the largest `nuint` there is, and every caller
 agreeing to read that as "not there".
 
@@ -1762,9 +1773,12 @@ public variant Optional<T>
 }
 ```
 
-So it costs a tag beside the value and nothing else, the payload is readable
-only where the case has been established, and every rule it appears to have is
-a rule variants have:
+So it costs a tag beside the value and nothing else -- and not even that when
+the value holds a reference that is never null, whose null is then the `None`
+([section 2.6](#26-variant--a-value-that-is-one-of-several-things)):
+`Optional<String>` is a pointer wide. The payload is readable only where the
+case has been established, and every rule it appears to have is a rule
+variants have:
 
 ```csharp
 if (found.Some)
@@ -1857,12 +1871,14 @@ var listener = try TcpListener.Listen("0.0.0.0", 80u);
 ```
 
 The constructor is private, and that is what makes this the way in rather than
-merely the recommended way. A static method is inside the type, so it may use a
-constructor nothing outside it can — which is why the failing shape is gone
-rather than discouraged. There is no way left to obtain a listener that exists
+merely the recommended way. Private means the library's own module
+([section 1.3](01-modules.md#13-the-module-is-the-unit-of-visibility)), and the static method is in it, so it
+may use a constructor no program outside can -- which is why the failing shape
+is gone rather than discouraged. There is no way left to obtain a listener that exists
 and is not listening.
 
-`FileStream.Open`, `Socket.Open`, `TcpListener.Listen`, `TcpClient.Connect`,
+`FileStream.Open` and its `OpenRead`, `Create` and `OpenAppend`, `Socket.Open`
+and `Socket.OpenConnected`, `TcpListener.Listen`, `TcpClient.Connect`,
 `UdpClient.Bind` and `UdpClient.Create` are the ones that can fail. Each
 returns a `Result`, whose failure cannot be walked past because it has no value
 to read until its case has been named.
@@ -1885,7 +1901,7 @@ public class Circle : IShape
 {
     double radius;
 
-    public Circle(double r) { radius = r; }
+    public Circle(double r) { radius = r; Name = "round"; }
 
     public double Area() => 3.14159 * radius * radius;
     public String Describe() => "circle";
@@ -2132,7 +2148,7 @@ public struct FindData
     public uint            Attributes;
     public ushort[260]     FileName;
     public ushort[14]      AlternateName;
-}                                       // sizeof is 592, as it is in C
+}                                       // sizeof is 552, as it is in C
 ```
 
 **This is C's array, and C# has nothing like it.** A `T[]` is a reference to a
@@ -2577,7 +2593,7 @@ itself, so a 32-bit call through a delegate that did not say so returns to a
 stack pointer several words adrift — and the program does not fail at that
 call, it fails later, somewhere else.
 
-A `closure` may not name one (SL0621). It is a pointer *and* a receiver, passed
+A `closure` may not name one (SL0827). It is a pointer *and* a receiver, passed
 by machinery this language emits at both ends, so there is no foreign function
 for a convention to describe.
 
@@ -2693,11 +2709,10 @@ so an instantiation resolves that signature under the substitution and stops;
 there are no members to declare, no interfaces to satisfy, and no layout to
 compute, a delegate being one pointer and a closure always the same two.
 
-This is what `Standard.Collections` is built on. Before it, the only generic
-thing a lambda could become was an interface with one method, and an interface
-needs an *object* that implements it — so `ForEach(lines, report.Note)` was
-unwritable, and the library declared `IFunc`, `IPredicate`, `IAction`, `IFold`
-and `IComparer` to stand in for the five shapes it wanted.
+This is what `Standard.Collections` is built on: `Func`, `Predicate`, `Action`,
+`Fold` and `Comparison` are generic closures in `Standard`, so
+`ForEach(lines, report.Note)` passes a bound method where an interface with one
+method would have needed an *object* that implements it.
 
 `closure` is a **contextual** keyword, as `event` is ([§2.14.2](#2142-event--several-subscribers-behind-one-name)): it means
 something at the head of a declaration and is an ordinary name everywhere else.
@@ -2723,8 +2738,8 @@ subscriber **in the order they subscribed**, each with the arguments the raise
 was written with.
 
 **Only `+=` and `-=` cross the boundary.** From outside the declaring type,
-those two operators are all there is: an event cannot be read (SL0555), assigned
-(SL0556) or raised (SL0554). That is the difference between an event and a
+those two operators are all there is: an event cannot be read (SL0824), assigned
+(SL0825) or raised (SL0823). That is the difference between an event and a
 public field of closure type, and the whole reason the word exists — one
 subscriber must not be able to see the others, replace them all, or fire the
 event on the publisher's behalf.
@@ -2744,12 +2759,12 @@ That is deliberately not C#, where an unsubscribed event is null and raising it
 throws — which is why almost every C# codebase writes `Changed?.Invoke(...)` at
 every raise site.
 
-**A handler must return `void`** (SL0549). Raising calls every subscriber, so
+**A handler must return `void`** (SL0819). Raising calls every subscriber, so
 there is no single value to return; C# keeps the last one's and discards the
 rest. A handler that needs to report something takes an argument to report
 through.
 
-**The type must be a `closure`** (SL0548), not a `delegate`: a subscriber is
+**The type must be a `closure`** (SL0818), not a `delegate`: a subscriber is
 almost always a method on an object, and a delegate is one pointer with nowhere
 to keep the object. A plain function subscribes by way of a lambda, which is
 what gives it one.
@@ -2784,7 +2799,7 @@ public Editor()
     _save = new Button(this);
     _save.Click += this.OnSave;                 // weak: the editor is `this`
     _save.Click += (sender) => { Save(); };     // weak: the lambda's `this`
-    _save.Click += _log.OnClick;                // strong, as before
+    _save.Click += _log.OnClick;                // strong
 }
 ```
 
@@ -2802,7 +2817,7 @@ a subscriber that could clear the list could throw away everybody else's. A
 publisher that is being taken apart is the one that knows its subscribers are
 no longer wanted.
 
-**Events are not static** (SL0550): the subscribers would outlive every object
+**Events are not static** (SL0820): the subscribers would outlive every object
 that added one, and nothing would ever take them off.
 
 An event lowers to a hidden array of subscribers and four methods —
@@ -2820,7 +2835,7 @@ type, the two methods, and the storage; `raise_Name` is private and does not —
 so "only the declaring type may raise it" holds across the boundary by
 construction rather than by a check on the far side. `addweak_Name` crosses as
 one more public method; a library built without it gets strong subscriptions
-from `+=`, as it always did.
+from `+=`.
 
 ## 2.15 Lambdas and closures
 
@@ -2947,6 +2962,41 @@ ITransform MakeAdder(int amount)
 }
 ```
 
+**The copy is the closure's, and it lasts as long as the closure.** A captured
+variable is a field of the generated object, so the lambda may write it, and
+the next call of that same closure sees the write. That is a counter the
+closure keeps for itself, and it is legitimate. What a write never does is
+reach the variable the copy was taken from:
+
+```csharp
+int count = 0;
+ForEach(lines, (l) => count++);         // SL0829: `count` is still 0
+
+int n = 0;
+var next = () => { n++; return n; };    // 1, 2, 3...; `n` is still 0
+```
+
+**A write to a copy that nothing reads again is a warning** (SL0829), because
+its effect can never be seen. A write is `=`, a compound assignment, `++` or
+`--`, an `out` argument or a deconstruction, into the copy or into part of a
+struct it holds. The lambda reading the copy anywhere else in its body, or
+using the value of the `++` itself, is the closure keeping state, and is not
+reported. A `ref` argument and `&` count as reads, since the callee may only
+read through them. A write through a captured reference -- `box.Value = 3`,
+`cells[1] = 4`, `this.count++` on a class -- lands in the one object and is
+not a copy at all.
+
+**A member named without `this` is reported whether read or not.** It is a
+copy under the member's name, and a write to it means the field: the fix is
+`this.count`. In a struct there is no such fix, because `this` is the value and
+is copied too; return the new value instead. A local function is stricter
+still: it is given its captures at each call, so it may not write one at all
+(SL0769, [section 7.1.4](07-functions-members.md#714-local-functions)).
+
+To have a lambda change a variable around it, keep the state in an object the
+lambda holds -- a field of `this`, or a small class -- or have the lambda
+return the new value.
+
 **A lambda written in a method can reach its object.** A field, a property,
 `this` itself, and a method called without a receiver all resolve — and *what*
 is captured differs between them, which is the one part of this section to read
@@ -3072,11 +3122,12 @@ none. Build the value with a constructor, or make the reference nullable
 | `C?`, `String?`, `T[]?`, `Notify?`, `weak C?` | yes: null is one of its values |
 | a class, an interface, a com interface, `String`, `T[]` | no: never null |
 | a `closure` | no: its function word would be null, and a call does not ask |
-| a struct, a tuple, a record struct | when every field has one |
+| a struct, a tuple | when every field has one |
 | `T[N]` | when `T` has one, which it always does, since an inline array holds no counted reference (SL0486) |
 | a `union` | yes: it holds no counted reference |
 | a `variant` | when its first case, whose tag is zero, has one: `Optional<String>`'s zero is `None`, and `Result<String, TError>` has none |
 | `Span<T>`, `ReadOnlySpan<T>` | yes: the empty span, whose array is a `T[]?` |
+| `Slot<T>` | yes: an empty slot ([section 2.16.3](#2163-arrays)) |
 
 Everything `unmanaged` has one, so nothing the rule refuses crosses to C, and
 a type's answer follows from its fields' types, so a library's consumer knows
@@ -3186,25 +3237,40 @@ int[] sevens = Array.Repeat(7, 4u);
 ```
 
 `Array` is a static class in `Standard`, so both are in reach everywhere.
+`Array.Create` is filled where it is called -- the array is allocated and each
+element stored in turn, before anything can read it -- and it is how every
+array of a type with no zero value is made in the end.
 
 **Room for elements that are not yet values** is the one thing none of these
-make, and it is what a collection keeps. `Standard.Unchecked` has exactly that
-and nothing else:
+make, and it is what a collection keeps. That is an array of `Slot<T>`:
+storage for a `T` that may not be there yet, whose zero is empty, so
+`new Slot<T>[n]` is legal for every `T`.
 
 ```csharp
-import Standard.Unchecked;
-
-T[] storage = NewUninitializedArray<T>(capacity);   // every slot zero bytes
-ClearElement(storage, index);                        // released, and zero again
+Slot<String>[] room = new Slot<String>[capacity];   // every slot empty
+room[0] = "first";                                  // a value writes a slot
+String held = room[0].Value;                        // stops the program if empty
+room[0].Clear();                                    // released, and empty again
 ```
 
-Each compiles to what `new T[n]` and `default(T)` compile to, so `List<int>`
-pays nothing per element, and the rule does not reach inside the module. The
-obligation moves to whoever imports it: **a slot MUST be written before it is
-read, and SHOULD be cleared when it is vacated.** Nothing checks either. It is
-the collections' storage — `List<T>`, `Dictionary`, `HashSet`, `Queue`,
-`Stack`, `SortedList`, `LinkedList`, and the sort's scratch — and not a way
-round the rule for anything else.
+A slot costs nothing beside what it holds. When `T` has a zero value a slot is
+laid out as a `T`, an empty one reads as that zero, and `Value` is one load.
+When `T` has none, a slot is an `Optional<T>`, which is the size of `T`
+([section 2.6](#26-variant--a-value-that-is-one-of-several-things)), and
+`Value` compares its reference with null before reading it: an empty slot
+stops the program rather than hand out the null. `Slot<T>.ToArray(filled)`
+makes the `T[]` a collection hands out, and `Slot<T>.Copy(values, slots)` fills
+slots from a span.
+
+There is no `HasValue`. For a `T` with a zero value an empty slot and a slot
+holding that zero are the same bytes, so the answer would mean nothing. A
+collection knows which of its slots are full -- a count, a flag per bucket --
+and keeps that itself, as `List<T>`, `Dictionary`, `HashSet`, `Queue`,
+`Stack`, `SortedList`, `LinkedList` and the sort's scratch all do.
+
+A slot does not cross `extern "C"` (SL0284): whether it is laid out as its
+element or as an optional of it depends on the element, which is not a
+promise C can be held to.
 
 **Reflection holds to the rule too**
 ([§6.6.1](06-attributes-reflection.md#661-making-an-object)). It makes an

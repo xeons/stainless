@@ -43,9 +43,12 @@ on from where it was rather than restarting, so `0.2.500` may follow `0.1.499`.
 ## Publishing
 
 ```
-.\tools\publish.ps1                  # Windows, win-x64 unless -Runtime says
-tools/publish.sh                     # Linux, linux-x64 unless an argument says
+.\tools\publish.ps1                  # Windows, this machine's rid unless -Runtime says
+tools/publish.sh                     # Linux, this machine's rid unless an argument says
 ```
+
+`-NoArchive`, or `--no-archive` to the Linux script, publishes and smoke-tests
+and stops before packaging.
 
 Each publishes the compiler single-file, self-contained and ReadyToRun into
 `artifacts/<rid>/publish`, then runs it: `--version` MUST answer the version

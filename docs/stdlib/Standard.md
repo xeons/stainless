@@ -7,7 +7,7 @@ than library features, and so need no import to reach.
 
 ## Contents
 
-**Types** &nbsp; [Action](#action-closure) &middot; [Action&lt;T1, T2, T3, T4&gt;](#actiont1-t2-t3-t4-closure) &middot; [Action&lt;T1, T2, T3&gt;](#actiont1-t2-t3-closure) &middot; [Action&lt;T1, T2&gt;](#actiont1-t2-closure) &middot; [Action&lt;T&gt;](#actiont-closure) &middot; [Array](#array-class) &middot; [Comparison&lt;T&gt;](#comparisont-closure) &middot; [Fold&lt;TAccumulate, TSource&gt;](#foldtaccumulate-tsource-closure) &middot; [Func&lt;T, TResult&gt;](#funct-tresult-closure) &middot; [Func&lt;T1, T2, T3, T4, TResult&gt;](#funct1-t2-t3-t4-tresult-closure) &middot; [Func&lt;T1, T2, T3, TResult&gt;](#funct1-t2-t3-tresult-closure) &middot; [Func&lt;T1, T2, TResult&gt;](#funct1-t2-tresult-closure) &middot; [Func&lt;TResult&gt;](#functresult-closure) &middot; [Guid](#guid-struct) &middot; [Index](#index-struct) &middot; [Lazy&lt;T&gt;](#lazyt-class) &middot; [LazyThreadSafetyMode](#lazythreadsafetymode-enum) &middot; [Optional&lt;T&gt;](#optionalt-variant) &middot; [ParseError](#parseerror-enum) &middot; [Predicate&lt;T&gt;](#predicatet-closure) &middot; [Range](#range-struct) &middot; [ReadOnlySpan&lt;T&gt;](#readonlyspant-struct) &middot; [Result&lt;T, TError&gt;](#resultt-terror-variant) &middot; [RuntimeHelpers](#runtimehelpers-class) &middot; [Span&lt;T&gt;](#spant-struct) &middot; [Uri](#uri-class) &middot; [UriKind](#urikind-enum) &middot; [UriPartial](#uripartial-enum) &middot; [Version](#version-struct)
+**Types** &nbsp; [Action](#action-closure) &middot; [Action&lt;T1, T2, T3, T4&gt;](#actiont1-t2-t3-t4-closure) &middot; [Action&lt;T1, T2, T3&gt;](#actiont1-t2-t3-closure) &middot; [Action&lt;T1, T2&gt;](#actiont1-t2-closure) &middot; [Action&lt;T&gt;](#actiont-closure) &middot; [Array](#array-class) &middot; [Buffer](#buffer-class) &middot; [Comparison&lt;T&gt;](#comparisont-closure) &middot; [Fold&lt;TAccumulate, TSource&gt;](#foldtaccumulate-tsource-closure) &middot; [Func&lt;T, TResult&gt;](#funct-tresult-closure) &middot; [Func&lt;T1, T2, T3, T4, TResult&gt;](#funct1-t2-t3-t4-tresult-closure) &middot; [Func&lt;T1, T2, T3, TResult&gt;](#funct1-t2-t3-tresult-closure) &middot; [Func&lt;T1, T2, TResult&gt;](#funct1-t2-tresult-closure) &middot; [Func&lt;TResult&gt;](#functresult-closure) &middot; [Guid](#guid-struct) &middot; [Index](#index-struct) &middot; [Lazy&lt;T&gt;](#lazyt-class) &middot; [LazyThreadSafetyMode](#lazythreadsafetymode-enum) &middot; [Optional&lt;T&gt;](#optionalt-variant) &middot; [ParseError](#parseerror-enum) &middot; [Predicate&lt;T&gt;](#predicatet-closure) &middot; [Range](#range-struct) &middot; [ReadOnlySpan&lt;T&gt;](#readonlyspant-struct) &middot; [Result&lt;T, TError&gt;](#resultt-terror-variant) &middot; [RuntimeHelpers](#runtimehelpers-class) &middot; [Slot&lt;T&gt;](#slott-struct) &middot; [Span&lt;T&gt;](#spant-struct) &middot; [Uri](#uri-class) &middot; [UriKind](#urikind-enum) &middot; [UriPartial](#uripartial-enum) &middot; [Version](#version-struct)
 
 ## Types
 
@@ -31,10 +31,10 @@ Does something with four values and returns nothing.
 
 **Type parameters**
 
-- `T1` — the first thing handed to it
-- `T2` — the second
-- `T3` — the third
-- `T4` — the fourth
+- `T1` -- the first thing handed to it
+- `T2` -- the second
+- `T3` -- the third
+- `T4` -- the fourth
 
 <sub>[stdlib/Standard/Standard.sl:101](../../stdlib/Standard/Standard.sl#L101)</sub>
 
@@ -48,9 +48,9 @@ Does something with three values and returns nothing.
 
 **Type parameters**
 
-- `T1` — the first thing handed to it
-- `T2` — the second
-- `T3` — the third
+- `T1` -- the first thing handed to it
+- `T2` -- the second
+- `T3` -- the third
 
 <sub>[stdlib/Standard/Standard.sl:93](../../stdlib/Standard/Standard.sl#L93)</sub>
 
@@ -64,8 +64,8 @@ Does something with two values and returns nothing.
 
 **Type parameters**
 
-- `T1` — the first thing handed to it
-- `T2` — the second
+- `T1` -- the first thing handed to it
+- `T2` -- the second
 
 <sub>[stdlib/Standard/Standard.sl:86](../../stdlib/Standard/Standard.sl#L86)</sub>
 
@@ -79,7 +79,7 @@ Does something with a T and returns nothing.
 
 **Type parameters**
 
-- `T` — what is handed to it
+- `T` -- what is handed to it
 
 <sub>[stdlib/Standard/Standard.sl:77](../../stdlib/Standard/Standard.sl#L77)</sub>
 
@@ -89,18 +89,29 @@ Does something with a T and returns nothing.
 class Array
 ```
 
-Arrays made whole: every element given its value as the array is made.
+Making, copying, searching and ordering arrays. C#'s `System.Array`.
 
     String[] names = Array.Create(count, (i) => $"item {i}");
     int[] zeros = Array.Repeat(0, 16);
+    Array.Sort(names);
 
 `new T[n]` starts every element as the zero of `T`, and a `T` holding a
-reference that is never null has no zero (§2.11.1). These are what such an
-array is made with instead; an array literal, `[a, b, c]`, is the other
-way, and a `List<T>` and its `ToArray` the way for a count not known in
-advance.
+reference that is never null has no zero (section 2.16). `Create` and
+`Repeat` are what such an array is made with instead; an array literal,
+`[a, b, c]`, is the other way, and a `List<T>` and its `ToArray` the way for
+a count not known in advance.
 
-<sub>[stdlib/Standard/Array.sl:36](../../stdlib/Standard/Array.sl#L36)</sub>
+**Where .NET differs.** Indices and counts are `nuint`. A search answers
+with an `Optional` rather than -1, and `BinarySearch` rather than a negative
+complement. `Sort` is stable. A range that runs past the array aborts, as an
+index out of range does. `Clear` and the growing `Resize` need a `T` with a
+zero value, and are absent for any other.
+
+Most of these are the span functions of `Standard.Collections` under
+.NET's names: an array converts to a span, so `Sort(numbers)` and
+`Array.Sort(numbers)` are the same call.
+
+<sub>[stdlib/Standard/Array.sl:47](../../stdlib/Standard/Array.sl#L47)</sub>
 
 #### Create *method*
 
@@ -113,16 +124,16 @@ from zero. No element is ever seen before it has its value.
 
 **Parameters**
 
-- `count` — how many elements
-- `make` — the element at an index
+- `count` -- how many elements
+- `make` -- the element at an index
 
 **Type parameters**
 
-- `T` — the element type; nothing is asked of it
+- `T` -- the element type; nothing is asked of it
 
 **Returns** &nbsp; the array
 
-<sub>[stdlib/Standard/Array.sl:45](../../stdlib/Standard/Array.sl#L45)</sub>
+<sub>[stdlib/Standard/Array.sl:58](../../stdlib/Standard/Array.sl#L58)</sub>
 
 #### Repeat *method*
 
@@ -134,16 +145,987 @@ static T[] Repeat<T>(T value, nuint count)
 
 **Parameters**
 
-- `value` — what each element is
-- `count` — how many elements
+- `value` -- what each element is
+- `count` -- how many elements
 
 **Type parameters**
 
-- `T` — the element type; nothing is asked of it
+- `T` -- the element type; nothing is asked of it
 
 **Returns** &nbsp; the array
 
-<sub>[stdlib/Standard/Array.sl:59](../../stdlib/Standard/Array.sl#L59)</sub>
+<sub>[stdlib/Standard/Array.sl:66](../../stdlib/Standard/Array.sl#L66)</sub>
+
+#### Empty *method*
+
+```
+static T[] Empty<T>()
+```
+
+An array of no elements. A new one each call: there is no per-type
+static to cache it in, and it costs one small allocation.
+
+**Type parameters**
+
+- `T` -- the element type; nothing is asked of it
+
+<sub>[stdlib/Standard/Array.sl:72](../../stdlib/Standard/Array.sl#L72)</sub>
+
+#### AsReadOnly *method*
+
+```
+static ReadOnlySpan<T> AsReadOnly<T>(T[] array)
+```
+
+The array as a view that cannot be written through. .NET answers with a
+`ReadOnlyCollection<T>`; a `ReadOnlySpan<T>` holds the array it views,
+so it may be stored and returned the same way.
+
+**Parameters**
+
+- `array` -- the array to view
+
+**Type parameters**
+
+- `T` -- the element type; nothing is asked of it
+
+<sub>[stdlib/Standard/Array.sl:80](../../stdlib/Standard/Array.sl#L80)</sub>
+
+#### ConvertAll *method*
+
+```
+static TOutput[] ConvertAll<TInput, TOutput>(TInput[] array, Func<TInput, TOutput> converter)
+```
+
+A new array of each element of `array` passed through `converter`.
+
+**Parameters**
+
+- `array` -- the elements to convert
+- `converter` -- what each element becomes
+
+**Type parameters**
+
+- `TInput` -- the element type of `array`
+- `TOutput` -- the element type of the result
+
+**Returns** &nbsp; the array, as long as `array`
+
+<sub>[stdlib/Standard/Array.sl:89](../../stdlib/Standard/Array.sl#L89)</sub>
+
+#### Resize *method*
+
+```
+static void Resize<T>(ref T[] array, nuint newSize)
+    where T : zeroable
+```
+
+Gives `array` a new length, keeping the elements that fit. The elements
+past the old length are the zero of `T`. The same length leaves the
+array as it is; any other puts a new array in `array`, and whoever holds
+the old one still holds it unchanged.
+
+**Parameters**
+
+- `array` -- the array, replaced by the resized one
+- `newSize` -- the length it is to have
+
+**Type parameters**
+
+- `T` -- the element type, which must have a zero value
+
+<sub>[stdlib/Standard/Array.sl:101](../../stdlib/Standard/Array.sl#L101)</sub>
+
+#### Resize *method*
+
+```
+static void Resize<T>(ref T[] array, nuint newSize, T fill)
+```
+
+The same, with the elements past the old length set to `fill`. This is
+the one for a `T` with no zero value, such as `String`.
+
+**Parameters**
+
+- `array` -- the array, replaced by the resized one
+- `newSize` -- the length it is to have
+- `fill` -- what each new element is
+
+**Type parameters**
+
+- `T` -- the element type; nothing is asked of it
+
+<sub>[stdlib/Standard/Array.sl:119](../../stdlib/Standard/Array.sl#L119)</sub>
+
+#### Copy *method*
+
+```
+static void Copy<T>(T[] sourceArray, T[] destinationArray, nuint length)
+```
+
+Copies the first `length` elements of `sourceArray` to the start of
+`destinationArray`. Aborts, before anything is written, when either is
+shorter than `length`.
+
+**Parameters**
+
+- `sourceArray` -- where the elements come from
+- `destinationArray` -- where they go
+- `length` -- how many to copy
+
+**Type parameters**
+
+- `T` -- the element type; nothing is asked of it
+
+<sub>[stdlib/Standard/Array.sl:140](../../stdlib/Standard/Array.sl#L140)</sub>
+
+#### Copy *method*
+
+```
+static void Copy<T>(T[] sourceArray, nuint sourceIndex, T[] destinationArray, nuint destinationIndex, nuint length)
+```
+
+Copies `length` elements from `sourceIndex` in `sourceArray` to
+`destinationIndex` in `destinationArray`. The two may be the same array
+and the ranges may overlap: the elements land as they were before the
+copy began. Aborts, before anything is written, when either range runs
+past its array. .NET's `ConstrainedCopy` promises no more than this.
+
+**Parameters**
+
+- `sourceArray` -- where the elements come from
+- `sourceIndex` -- the first element copied
+- `destinationArray` -- where they go
+- `destinationIndex` -- where the first lands
+- `length` -- how many to copy
+
+**Type parameters**
+
+- `T` -- the element type; nothing is asked of it
+
+<sub>[stdlib/Standard/Array.sl:155](../../stdlib/Standard/Array.sl#L155)</sub>
+
+#### Clear *method*
+
+```
+static void Clear<T>(T[] array)
+    where T : zeroable
+```
+
+Sets every element to the zero of `T`, releasing whatever they held.
+
+Only for a `T` with a zero value: an array of `String` has no `Clear`,
+since there is nothing its elements could be set to. `Fill` is the one
+for that.
+
+**Parameters**
+
+- `array` -- the array to clear
+
+**Type parameters**
+
+- `T` -- the element type, which must have a zero value
+
+<sub>[stdlib/Standard/Array.sl:167](../../stdlib/Standard/Array.sl#L167)</sub>
+
+#### Clear *method*
+
+```
+static void Clear<T>(T[] array, nuint index, nuint length)
+    where T : zeroable
+```
+
+Sets `length` elements from `index` to the zero of `T`. Aborts when they
+run past the end.
+
+**Parameters**
+
+- `array` -- the array to clear part of
+- `index` -- the first element cleared
+- `length` -- how many to clear
+
+**Type parameters**
+
+- `T` -- the element type, which must have a zero value
+
+<sub>[stdlib/Standard/Array.sl:180](../../stdlib/Standard/Array.sl#L180)</sub>
+
+#### Fill *method*
+
+```
+static void Fill<T>(T[] array, T value)
+```
+
+Sets every element to `value`.
+
+**Parameters**
+
+- `array` -- the array to fill
+- `value` -- what each element becomes
+
+**Type parameters**
+
+- `T` -- the element type; nothing is asked of it
+
+<sub>[stdlib/Standard/Array.sl:188](../../stdlib/Standard/Array.sl#L188)</sub>
+
+#### Fill *method*
+
+```
+static void Fill<T>(T[] array, T value, nuint startIndex, nuint count)
+```
+
+Sets `count` elements from `startIndex` to `value`. Aborts when they run
+past the end.
+
+**Parameters**
+
+- `array` -- the array to fill part of
+- `value` -- what each element becomes
+- `startIndex` -- the first element set
+- `count` -- how many to set
+
+**Type parameters**
+
+- `T` -- the element type; nothing is asked of it
+
+<sub>[stdlib/Standard/Array.sl:202](../../stdlib/Standard/Array.sl#L202)</sub>
+
+#### Reverse *method*
+
+```
+static void Reverse<T>(T[] array)
+```
+
+Reverses the order of the elements in place.
+
+**Parameters**
+
+- `array` -- the array to reverse
+
+**Type parameters**
+
+- `T` -- the element type; nothing is asked of it
+
+<sub>[stdlib/Standard/Array.sl:209](../../stdlib/Standard/Array.sl#L209)</sub>
+
+#### Reverse *method*
+
+```
+static void Reverse<T>(T[] array, nuint index, nuint length)
+```
+
+Reverses `length` elements from `index` in place. Aborts when they run
+past the end.
+
+**Parameters**
+
+- `array` -- the array to reverse part of
+- `index` -- the first element of the part
+- `length` -- how many elements it covers
+
+**Type parameters**
+
+- `T` -- the element type; nothing is asked of it
+
+<sub>[stdlib/Standard/Array.sl:218](../../stdlib/Standard/Array.sl#L218)</sub>
+
+#### Sort *method*
+
+```
+static void Sort<T>(T[] array)
+    where T : IComparable<T>
+```
+
+Orders the elements in place, smallest first. Stable, where .NET's is
+not: equal elements keep the order they had.
+
+**Parameters**
+
+- `array` -- the array to order
+
+**Type parameters**
+
+- `T` -- the element type, which must order itself
+
+**See also** &nbsp; [Collections.Sort](Standard-Collections.md#sort-function)
+
+<sub>[stdlib/Standard/Array.sl:229](../../stdlib/Standard/Array.sl#L229)</sub>
+
+#### Sort *method*
+
+```
+static void Sort<T>(T[] array, Comparison<T> comparison)
+```
+
+Orders the elements in place by `comparison`. Stable.
+
+**Parameters**
+
+- `array` -- the array to order
+- `comparison` -- negative when its first argument comes first
+
+**Type parameters**
+
+- `T` -- the element type; nothing is asked of it
+
+<sub>[stdlib/Standard/Array.sl:237](../../stdlib/Standard/Array.sl#L237)</sub>
+
+#### Sort *method*
+
+```
+static void Sort<T>(T[] array, nuint index, nuint length)
+    where T : IComparable<T>
+```
+
+Orders `length` elements from `index` in place, smallest first, and
+leaves the rest alone. Stable. Aborts when they run past the end.
+
+**Parameters**
+
+- `array` -- the array to order part of
+- `index` -- the first element of the part
+- `length` -- how many elements it covers
+
+**Type parameters**
+
+- `T` -- the element type, which must order itself
+
+<sub>[stdlib/Standard/Array.sl:247](../../stdlib/Standard/Array.sl#L247)</sub>
+
+#### Sort *method*
+
+```
+static void Sort<T>(T[] array, nuint index, nuint length, Comparison<T> comparison)
+```
+
+Orders `length` elements from `index` in place by `comparison`. Stable.
+Aborts when they run past the end.
+
+**Parameters**
+
+- `array` -- the array to order part of
+- `index` -- the first element of the part
+- `length` -- how many elements it covers
+- `comparison` -- negative when its first argument comes first
+
+**Type parameters**
+
+- `T` -- the element type; nothing is asked of it
+
+<sub>[stdlib/Standard/Array.sl:258](../../stdlib/Standard/Array.sl#L258)</sub>
+
+#### Sort *method*
+
+```
+static void Sort<TKey, TValue>(TKey[] keys, TValue[] items)
+    where TKey : IComparable<TKey>
+```
+
+Orders `keys` in place, smallest first, and moves each element of
+`items` to where its key went. Stable. The two MUST be the same length;
+the call aborts otherwise, where .NET allows `items` to be longer.
+
+**Parameters**
+
+- `keys` -- the keys to order by
+- `items` -- the elements that go with them
+
+**Type parameters**
+
+- `TKey` -- the key type, which must order itself
+- `TValue` -- the item type; nothing is asked of it
+
+<sub>[stdlib/Standard/Array.sl:269](../../stdlib/Standard/Array.sl#L269)</sub>
+
+#### Sort *method*
+
+```
+static void Sort<TKey, TValue>(TKey[] keys, TValue[] items, Comparison<TKey> comparison)
+```
+
+The same, with the keys ordered by `comparison`.
+
+**Parameters**
+
+- `keys` -- the keys to order by
+- `items` -- the elements that go with them
+- `comparison` -- negative when its first argument comes first
+
+**Type parameters**
+
+- `TKey` -- the key type; the comparison orders it
+- `TValue` -- the item type; nothing is asked of it
+
+<sub>[stdlib/Standard/Array.sl:280](../../stdlib/Standard/Array.sl#L280)</sub>
+
+#### BinarySearch *method*
+
+```
+static Optional<nuint> BinarySearch<T>(T[] array, T value)
+    where T : IComparable<T>
+```
+
+Where `value` is in an array already ordered smallest first, if it is
+there. `Collections.FindLowerBound` answers where it would go instead,
+which .NET folds into a negative result.
+
+**Parameters**
+
+- `array` -- the ordered array
+- `value` -- what to look for
+
+**Type parameters**
+
+- `T` -- the element type, which must order itself
+
+**Returns** &nbsp; the index of an equal element, or `None`
+
+**See also** &nbsp; [Collections.FindLowerBound](Standard-Collections.md#findlowerbound-function)
+
+<sub>[stdlib/Standard/Array.sl:293](../../stdlib/Standard/Array.sl#L293)</sub>
+
+#### BinarySearch *method*
+
+```
+static Optional<nuint> BinarySearch<T>(T[] array, nuint index, nuint length, T value)
+    where T : IComparable<T>
+```
+
+Where `value` is among `length` ordered elements from `index`, if it is
+there. The answer counts from the start of the array. Aborts when the
+range runs past the end.
+
+**Parameters**
+
+- `array` -- the array
+- `index` -- the first element searched
+- `length` -- how many elements are searched
+- `value` -- what to look for
+
+**Type parameters**
+
+- `T` -- the element type, which must order itself
+
+**Returns** &nbsp; the index of an equal element, or `None`
+
+<sub>[stdlib/Standard/Array.sl:306](../../stdlib/Standard/Array.sl#L306)</sub>
+
+#### IndexOf *method*
+
+```
+static Optional<nuint> IndexOf<T>(T[] array, T value)
+    where T : IEquatable<T>
+```
+
+Where the first element equal to `value` is, if there is one.
+
+**Parameters**
+
+- `array` -- the array to search
+- `value` -- what to look for
+
+**Type parameters**
+
+- `T` -- the element type, which must answer whether it equals another
+
+<sub>[stdlib/Standard/Array.sl:317](../../stdlib/Standard/Array.sl#L317)</sub>
+
+#### IndexOf *method*
+
+```
+static Optional<nuint> IndexOf<T>(T[] array, T value, nuint startIndex)
+    where T : IEquatable<T>
+```
+
+Where the first element equal to `value` is, searching from
+`startIndex` to the end. Aborts when `startIndex` is past the end.
+
+**Parameters**
+
+- `array` -- the array to search
+- `value` -- what to look for
+- `startIndex` -- the first element searched
+
+**Type parameters**
+
+- `T` -- the element type, which must answer whether it equals another
+
+<sub>[stdlib/Standard/Array.sl:327](../../stdlib/Standard/Array.sl#L327)</sub>
+
+#### IndexOf *method*
+
+```
+static Optional<nuint> IndexOf<T>(T[] array, T value, nuint startIndex, nuint count)
+    where T : IEquatable<T>
+```
+
+Where the first element equal to `value` is among `count` elements from
+`startIndex`. Aborts when they run past the end.
+
+**Parameters**
+
+- `array` -- the array to search
+- `value` -- what to look for
+- `startIndex` -- the first element searched
+- `count` -- how many elements are searched
+
+**Type parameters**
+
+- `T` -- the element type, which must answer whether it equals another
+
+<sub>[stdlib/Standard/Array.sl:339](../../stdlib/Standard/Array.sl#L339)</sub>
+
+#### LastIndexOf *method*
+
+```
+static Optional<nuint> LastIndexOf<T>(T[] array, T value)
+    where T : IEquatable<T>
+```
+
+Where the last element equal to `value` is, if there is one.
+
+**Parameters**
+
+- `array` -- the array to search
+- `value` -- what to look for
+
+**Type parameters**
+
+- `T` -- the element type, which must answer whether it equals another
+
+<sub>[stdlib/Standard/Array.sl:348](../../stdlib/Standard/Array.sl#L348)</sub>
+
+#### LastIndexOf *method*
+
+```
+static Optional<nuint> LastIndexOf<T>(T[] array, T value, nuint startIndex)
+    where T : IEquatable<T>
+```
+
+Where the last element equal to `value` is, searching backward from
+`startIndex` to the start. Aborts when `startIndex` is past the end.
+
+**Parameters**
+
+- `array` -- the array to search
+- `value` -- what to look for
+- `startIndex` -- the last element searched, where the search begins
+
+**Type parameters**
+
+- `T` -- the element type, which must answer whether it equals another
+
+<sub>[stdlib/Standard/Array.sl:358](../../stdlib/Standard/Array.sl#L358)</sub>
+
+#### LastIndexOf *method*
+
+```
+static Optional<nuint> LastIndexOf<T>(T[] array, T value, nuint startIndex, nuint count)
+    where T : IEquatable<T>
+```
+
+Where the last element equal to `value` is among the `count` elements
+that end at `startIndex`, searching backward. Aborts when they run past
+either end.
+
+**Parameters**
+
+- `array` -- the array to search
+- `value` -- what to look for
+- `startIndex` -- the last element searched, where the search begins
+- `count` -- how many elements are searched
+
+**Type parameters**
+
+- `T` -- the element type, which must answer whether it equals another
+
+<sub>[stdlib/Standard/Array.sl:371](../../stdlib/Standard/Array.sl#L371)</sub>
+
+#### Exists *method*
+
+```
+static bool Exists<T>(T[] array, Predicate<T> match)
+```
+
+Whether any element satisfies `match`.
+
+**Parameters**
+
+- `array` -- the array to search
+- `match` -- what an element must satisfy
+
+**Type parameters**
+
+- `T` -- the element type; nothing is asked of it
+
+<sub>[stdlib/Standard/Array.sl:383](../../stdlib/Standard/Array.sl#L383)</sub>
+
+#### TrueForAll *method*
+
+```
+static bool TrueForAll<T>(T[] array, Predicate<T> match)
+```
+
+Whether every element satisfies `match`. True for an empty array.
+
+**Parameters**
+
+- `array` -- the array to test
+- `match` -- what each element must satisfy
+
+**Type parameters**
+
+- `T` -- the element type; nothing is asked of it
+
+<sub>[stdlib/Standard/Array.sl:391](../../stdlib/Standard/Array.sl#L391)</sub>
+
+#### Find *method*
+
+```
+static Optional<T> Find<T>(T[] array, Predicate<T> match)
+```
+
+The first element satisfying `match`, if there is one. An `Optional`
+where .NET answers `default(T)`, which a `T` that is never null does not
+have.
+
+**Parameters**
+
+- `array` -- the array to search
+- `match` -- what the element must satisfy
+
+**Type parameters**
+
+- `T` -- the element type; nothing is asked of it
+
+<sub>[stdlib/Standard/Array.sl:401](../../stdlib/Standard/Array.sl#L401)</sub>
+
+#### FindLast *method*
+
+```
+static Optional<T> FindLast<T>(T[] array, Predicate<T> match)
+```
+
+The last element satisfying `match`, if there is one.
+
+**Parameters**
+
+- `array` -- the array to search
+- `match` -- what the element must satisfy
+
+**Type parameters**
+
+- `T` -- the element type; nothing is asked of it
+
+<sub>[stdlib/Standard/Array.sl:409](../../stdlib/Standard/Array.sl#L409)</sub>
+
+#### FindAll *method*
+
+```
+static T[] FindAll<T>(T[] array, Predicate<T> match)
+```
+
+Every element satisfying `match`, in order, as a new array.
+
+**Parameters**
+
+- `array` -- the array to search
+- `match` -- what an element must satisfy
+
+**Type parameters**
+
+- `T` -- the element type; nothing is asked of it
+
+<sub>[stdlib/Standard/Array.sl:424](../../stdlib/Standard/Array.sl#L424)</sub>
+
+#### FindIndex *method*
+
+```
+static Optional<nuint> FindIndex<T>(T[] array, Predicate<T> match)
+```
+
+Where the first element satisfying `match` is, if there is one.
+
+**Parameters**
+
+- `array` -- the array to search
+- `match` -- what the element must satisfy
+
+**Type parameters**
+
+- `T` -- the element type; nothing is asked of it
+
+<sub>[stdlib/Standard/Array.sl:432](../../stdlib/Standard/Array.sl#L432)</sub>
+
+#### FindIndex *method*
+
+```
+static Optional<nuint> FindIndex<T>(T[] array, nuint startIndex, Predicate<T> match)
+```
+
+Where the first element satisfying `match` is, searching from
+`startIndex` to the end. Aborts when `startIndex` is past the end.
+
+**Parameters**
+
+- `array` -- the array to search
+- `startIndex` -- the first element searched
+- `match` -- what the element must satisfy
+
+**Type parameters**
+
+- `T` -- the element type; nothing is asked of it
+
+<sub>[stdlib/Standard/Array.sl:442](../../stdlib/Standard/Array.sl#L442)</sub>
+
+#### FindIndex *method*
+
+```
+static Optional<nuint> FindIndex<T>(T[] array, nuint startIndex, nuint count, Predicate<T> match)
+```
+
+Where the first element satisfying `match` is among `count` elements
+from `startIndex`. Aborts when they run past the end.
+
+**Parameters**
+
+- `array` -- the array to search
+- `startIndex` -- the first element searched
+- `count` -- how many elements are searched
+- `match` -- what the element must satisfy
+
+**Type parameters**
+
+- `T` -- the element type; nothing is asked of it
+
+<sub>[stdlib/Standard/Array.sl:453](../../stdlib/Standard/Array.sl#L453)</sub>
+
+#### FindLastIndex *method*
+
+```
+static Optional<nuint> FindLastIndex<T>(T[] array, Predicate<T> match)
+```
+
+Where the last element satisfying `match` is, if there is one.
+
+**Parameters**
+
+- `array` -- the array to search
+- `match` -- what the element must satisfy
+
+**Type parameters**
+
+- `T` -- the element type; nothing is asked of it
+
+<sub>[stdlib/Standard/Array.sl:462](../../stdlib/Standard/Array.sl#L462)</sub>
+
+#### FindLastIndex *method*
+
+```
+static Optional<nuint> FindLastIndex<T>(T[] array, nuint startIndex, Predicate<T> match)
+```
+
+Where the last element satisfying `match` is, searching backward from
+`startIndex` to the start. Aborts when `startIndex` is past the end.
+
+**Parameters**
+
+- `array` -- the array to search
+- `startIndex` -- the last element searched, where the search begins
+- `match` -- what the element must satisfy
+
+**Type parameters**
+
+- `T` -- the element type; nothing is asked of it
+
+<sub>[stdlib/Standard/Array.sl:472](../../stdlib/Standard/Array.sl#L472)</sub>
+
+#### FindLastIndex *method*
+
+```
+static Optional<nuint> FindLastIndex<T>(T[] array, nuint startIndex, nuint count, Predicate<T> match)
+```
+
+Where the last element satisfying `match` is among the `count` elements
+that end at `startIndex`, searching backward. Aborts when they run past
+either end.
+
+**Parameters**
+
+- `array` -- the array to search
+- `startIndex` -- the last element searched, where the search begins
+- `count` -- how many elements are searched
+- `match` -- what the element must satisfy
+
+**Type parameters**
+
+- `T` -- the element type; nothing is asked of it
+
+<sub>[stdlib/Standard/Array.sl:485](../../stdlib/Standard/Array.sl#L485)</sub>
+
+#### ForEach *method*
+
+```
+static void ForEach<T>(T[] array, Action<T> action)
+```
+
+Runs `action` over every element, in order.
+
+**Parameters**
+
+- `array` -- the array to walk
+- `action` -- what to do with each element
+
+**Type parameters**
+
+- `T` -- the element type; nothing is asked of it
+
+<sub>[stdlib/Standard/Array.sl:502](../../stdlib/Standard/Array.sl#L502)</sub>
+
+### Buffer *class*
+
+```
+class Buffer
+```
+
+Arrays of plain data as bytes. C#'s `System.Buffer`.
+
+    short[] samples = [1, -1];
+    var bytes = new byte[Buffer.ByteLength(samples)];
+    Buffer.BlockCopy(samples, 0u, bytes, 0u, bytes.Length);
+
+Every element type is `unmanaged` (section 4.3): a value with no counted
+reference anywhere in it, so moving its bytes cannot put a count out of
+step. .NET asks for an array of primitives and checks it as the program
+runs; the constraint checks it as the program is compiled, and also admits
+a struct of primitives.
+
+Offsets and counts are in bytes and are `nuint`. Every range is checked
+against the array before a byte moves, and one that runs past the end
+aborts, as an index out of range does. The bytes are in the machine's own
+order.
+
+<sub>[stdlib/Standard/Buffer.sl:40](../../stdlib/Standard/Buffer.sl#L40)</sub>
+
+#### BlockCopy *method*
+
+```
+static void BlockCopy<TSource, TDestination>(TSource[] src, nuint srcOffset, TDestination[] dst, nuint dstOffset, nuint count)
+    where TSource : unmanaged
+    where TDestination : unmanaged
+```
+
+Copies `count` bytes from `srcOffset` bytes into `src` to `dstOffset`
+bytes into `dst`. The two arrays may be of different types, and may be
+the same array with overlapping ranges: the bytes land as they were
+before the copy began.
+
+A byte copied into a `bool`, an enum or a pointer need not be one of its
+values; the element types SHOULD be numbers or structs of them.
+
+**Parameters**
+
+- `src` -- where the bytes come from
+- `srcOffset` -- the first byte copied, counted from the start of `src`
+- `dst` -- where they go
+- `dstOffset` -- where the first lands, counted from the start of `dst`
+- `count` -- how many bytes to copy
+
+**Type parameters**
+
+- `TSource` -- the element type of `src`, which must be plain data
+- `TDestination` -- the element type of `dst`, which must be plain data
+
+<sub>[stdlib/Standard/Buffer.sl:57](../../stdlib/Standard/Buffer.sl#L57)</sub>
+
+#### ByteLength *method*
+
+```
+static nuint ByteLength<T>(T[] array)
+    where T : unmanaged
+```
+
+How many bytes the elements of `array` take.
+
+**Parameters**
+
+- `array` -- the array to measure
+
+**Type parameters**
+
+- `T` -- the element type, which must be plain data
+
+**Returns** &nbsp; the length times the size of one element
+
+<sub>[stdlib/Standard/Buffer.sl:79](../../stdlib/Standard/Buffer.sl#L79)</sub>
+
+#### GetByte *method*
+
+```
+static byte GetByte<T>(T[] array, nuint index)
+    where T : unmanaged
+```
+
+The byte at `index` bytes into `array`. Aborts when it is past the end.
+
+**Parameters**
+
+- `array` -- the array to read
+- `index` -- which byte, counted from the start
+
+**Type parameters**
+
+- `T` -- the element type, which must be plain data
+
+<sub>[stdlib/Standard/Buffer.sl:87](../../stdlib/Standard/Buffer.sl#L87)</sub>
+
+#### SetByte *method*
+
+```
+static void SetByte<T>(T[] array, nuint index, byte value)
+    where T : unmanaged
+```
+
+Sets the byte at `index` bytes into `array`. Aborts when it is past the
+end.
+
+A byte written into a `bool`, an enum or a pointer need not leave one of
+its values; the element type SHOULD be a number or a struct of them.
+
+**Parameters**
+
+- `array` -- the array to write
+- `index` -- which byte, counted from the start
+- `value` -- what it becomes
+
+**Type parameters**
+
+- `T` -- the element type, which must be plain data
+
+<sub>[stdlib/Standard/Buffer.sl:104](../../stdlib/Standard/Buffer.sl#L104)</sub>
+
+#### MemoryCopy *method*
+
+```
+static void MemoryCopy(void* source, void* destination, nuint destinationSizeInBytes, nuint sourceBytesToCopy)
+```
+
+Copies `sourceBytesToCopy` bytes from `source` to `destination`, which
+may overlap. Aborts when that is more than `destinationSizeInBytes`.
+
+Nothing else is checked, as nothing can be: both pointers MUST be valid
+for the bytes named, and the destination MUST NOT hold a counted
+reference.
+
+**Parameters**
+
+- `source` -- where the bytes come from
+- `destination` -- where they go
+- `destinationSizeInBytes` -- how many bytes `destination` has room for
+- `sourceBytesToCopy` -- how many bytes to copy
+
+<sub>[stdlib/Standard/Buffer.sl:122](../../stdlib/Standard/Buffer.sl#L122)</sub>
 
 ### Comparison&lt;T&gt; *closure*
 
@@ -159,7 +1141,7 @@ that implements no interface be sorted at all.
 
 **Type parameters**
 
-- `T` — what is being ordered
+- `T` -- what is being ordered
 
 <sub>[stdlib/Standard/Standard.sl:119](../../stdlib/Standard/Standard.sl#L119)</sub>
 
@@ -174,13 +1156,13 @@ because a fold is the one shape that carries something along with it.
 
 **Parameters**
 
-- `total` — what has been accumulated so far
-- `value` — the next element to fold in
+- `total` -- what has been accumulated so far
+- `value` -- the next element to fold in
 
 **Type parameters**
 
-- `TAccumulate` — what is carried along, and what the fold answers with
-- `TSource` — what is folded over
+- `TAccumulate` -- what is carried along, and what the fold answers with
+- `TSource` -- what is folded over
 
 <sub>[stdlib/Standard/Standard.sl:110](../../stdlib/Standard/Standard.sl#L110)</sub>
 
@@ -194,8 +1176,8 @@ Turns a T into a TResult. The transform half of `Select`.
 
 **Type parameters**
 
-- `T` — what goes in
-- `TResult` — what comes out
+- `T` -- what goes in
+- `TResult` -- what comes out
 
 <sub>[stdlib/Standard/Standard.sl:38](../../stdlib/Standard/Standard.sl#L38)</sub>
 
@@ -209,11 +1191,11 @@ Turns four values into a TResult.
 
 **Type parameters**
 
-- `T1` — the first thing that goes in
-- `T2` — the second
-- `T3` — the third
-- `T4` — the fourth
-- `TResult` — what comes out
+- `T1` -- the first thing that goes in
+- `T2` -- the second
+- `T3` -- the third
+- `T4` -- the fourth
+- `TResult` -- what comes out
 
 <sub>[stdlib/Standard/Standard.sl:67](../../stdlib/Standard/Standard.sl#L67)</sub>
 
@@ -227,10 +1209,10 @@ Turns three values into a TResult.
 
 **Type parameters**
 
-- `T1` — the first thing that goes in
-- `T2` — the second
-- `T3` — the third
-- `TResult` — what comes out
+- `T1` -- the first thing that goes in
+- `T2` -- the second
+- `T3` -- the third
+- `TResult` -- what comes out
 
 <sub>[stdlib/Standard/Standard.sl:58](../../stdlib/Standard/Standard.sl#L58)</sub>
 
@@ -244,9 +1226,9 @@ Turns two values into a TResult. The combining half of `Zip`.
 
 **Type parameters**
 
-- `T1` — the first thing that goes in
-- `T2` — the second
-- `TResult` — what comes out
+- `T1` -- the first thing that goes in
+- `T2` -- the second
+- `TResult` -- what comes out
 
 <sub>[stdlib/Standard/Standard.sl:50](../../stdlib/Standard/Standard.sl#L50)</sub>
 
@@ -260,7 +1242,7 @@ Produces a TResult from nothing.
 
 **Type parameters**
 
-- `TResult` — what comes out
+- `TResult` -- what comes out
 
 <sub>[stdlib/Standard/Standard.sl:43](../../stdlib/Standard/Standard.sl#L43)</sub>
 
@@ -388,7 +1370,7 @@ groups, `B` for that in braces, `P` in parentheses. Aborts on any other.
 
 **Parameters**
 
-- `format` — "N", "D", "B" or "P", in either case
+- `format` -- "N", "D", "B" or "P", in either case
 
 <sub>[stdlib/Standard/Guid.sl:193](../../stdlib/Standard/Guid.sl#L193)</sub>
 
@@ -402,7 +1384,7 @@ Reads any of the formats `ToString` writes, in either case.
 
 **Parameters**
 
-- `text` — 32 hex digits, with or without hyphens, braces or parentheses
+- `text` -- 32 hex digits, with or without hyphens, braces or parentheses
 
 <sub>[stdlib/Standard/Guid.sl:226](../../stdlib/Standard/Guid.sl#L226)</sub>
 
@@ -593,7 +1575,7 @@ reads the `Value` it is making aborts, where C#'s throws.
 
 **Type parameters**
 
-- `T` — what is made; nothing is asked of it
+- `T` -- what is made; nothing is asked of it
 
 <sub>[stdlib/Standard/Lazy.sl:43](../../stdlib/Standard/Lazy.sl#L43)</sub>
 
@@ -687,7 +1669,7 @@ is what the spec calls `C?`.
 
 **Type parameters**
 
-- `T` — what it may hold -- a value type, usually, since a reference already has `C?`
+- `T` -- what it may hold -- a value type, usually, since a reference already has `C?`
 
 <sub>[stdlib/Standard/Optional.sl:46](../../stdlib/Standard/Optional.sl#L46)</sub>
 
@@ -765,7 +1747,7 @@ bargain `Result.GetValueOrDefault` makes.
 
 **Parameters**
 
-- `fallback` — what to answer when there is nothing held
+- `fallback` -- what to answer when there is nothing held
 
 **See also** &nbsp; [Optional.GetValue](#getvalue-method)
 
@@ -800,7 +1782,7 @@ the point: it is the `if` that would otherwise be written by hand.
 
 **Type parameters**
 
-- `TResult` — what `transform` produces
+- `TResult` -- what `transform` produces
 
 <sub>[stdlib/Standard/Optional.sl:130](../../stdlib/Standard/Optional.sl#L130)</sub>
 
@@ -815,7 +1797,7 @@ would otherwise nest one inside the other.
 
 **Type parameters**
 
-- `TResult` — what the transform's own optional holds
+- `TResult` -- what the transform's own optional holds
 
 <sub>[stdlib/Standard/Optional.sl:141](../../stdlib/Standard/Optional.sl#L141)</sub>
 
@@ -890,7 +1872,7 @@ Answers a question about a T.
 
 **Type parameters**
 
-- `T` — what the question is about
+- `T` -- what the question is about
 
 <sub>[stdlib/Standard/Standard.sl:72](../../stdlib/Standard/Standard.sl#L72)</sub>
 
@@ -972,11 +1954,11 @@ them, and this sees the change.
 
 **Type parameters**
 
-- `T` — the element type; nothing is asked of it
+- `T` -- the element type; nothing is asked of it
 
 **See also** &nbsp; [Span](#spant-struct)
 
-<sub>[stdlib/Standard/ReadOnlySpan.sl:39](../../stdlib/Standard/ReadOnlySpan.sl#L39)</sub>
+<sub>[stdlib/Standard/ReadOnlySpan.sl:37](../../stdlib/Standard/ReadOnlySpan.sl#L37)</sub>
 
 #### Empty *property*
 
@@ -986,7 +1968,7 @@ static ReadOnlySpan<T> Empty { get; }
 
 A span of nothing.
 
-<sub>[stdlib/Standard/ReadOnlySpan.sl:72](../../stdlib/Standard/ReadOnlySpan.sl#L72)</sub>
+<sub>[stdlib/Standard/ReadOnlySpan.sl:70](../../stdlib/Standard/ReadOnlySpan.sl#L70)</sub>
 
 #### IsEmpty *property*
 
@@ -996,7 +1978,7 @@ bool IsEmpty { get; }
 
 Whether it has no elements.
 
-<sub>[stdlib/Standard/ReadOnlySpan.sl:75](../../stdlib/Standard/ReadOnlySpan.sl#L75)</sub>
+<sub>[stdlib/Standard/ReadOnlySpan.sl:73](../../stdlib/Standard/ReadOnlySpan.sl#L73)</sub>
 
 #### CopyTo *method*
 
@@ -1013,11 +1995,11 @@ the rest are copied one at a time, so every count stays right.
 
 **Parameters**
 
-- `destination` — where the elements go
+- `destination` -- where the elements go
 
 **See also** &nbsp; [ReadOnlySpan.TryCopyTo](#trycopyto-method)
 
-<sub>[stdlib/Standard/ReadOnlySpan.sl:86](../../stdlib/Standard/ReadOnlySpan.sl#L86)</sub>
+<sub>[stdlib/Standard/ReadOnlySpan.sl:84](../../stdlib/Standard/ReadOnlySpan.sl#L84)</sub>
 
 #### TryCopyTo *method*
 
@@ -1030,11 +2012,11 @@ enough, and answers whether it was.
 
 **Parameters**
 
-- `destination` — where the elements go
+- `destination` -- where the elements go
 
 **Returns** &nbsp; true when the elements were copied
 
-<sub>[stdlib/Standard/ReadOnlySpan.sl:116](../../stdlib/Standard/ReadOnlySpan.sl#L116)</sub>
+<sub>[stdlib/Standard/ReadOnlySpan.sl:114](../../stdlib/Standard/ReadOnlySpan.sl#L114)</sub>
 
 #### Slice *method*
 
@@ -1046,9 +2028,9 @@ The elements from `start` to the end, aborting when `start` is past it.
 
 **Parameters**
 
-- `start` — the first element of the result
+- `start` -- the first element of the result
 
-<sub>[stdlib/Standard/ReadOnlySpan.sl:127](../../stdlib/Standard/ReadOnlySpan.sl#L127)</sub>
+<sub>[stdlib/Standard/ReadOnlySpan.sl:125](../../stdlib/Standard/ReadOnlySpan.sl#L125)</sub>
 
 #### Slice *method*
 
@@ -1060,10 +2042,10 @@ ReadOnlySpan<T> Slice(nuint start, nuint length)
 
 **Parameters**
 
-- `start` — the first element of the result
-- `length` — how many elements it covers
+- `start` -- the first element of the result
+- `length` -- how many elements it covers
 
-<sub>[stdlib/Standard/ReadOnlySpan.sl:133](../../stdlib/Standard/ReadOnlySpan.sl#L133)</sub>
+<sub>[stdlib/Standard/ReadOnlySpan.sl:131](../../stdlib/Standard/ReadOnlySpan.sl#L131)</sub>
 
 #### ToArray *method*
 
@@ -1073,7 +2055,7 @@ T[] ToArray()
 
 A new array holding a copy of the elements.
 
-<sub>[stdlib/Standard/ReadOnlySpan.sl:136](../../stdlib/Standard/ReadOnlySpan.sl#L136)</sub>
+<sub>[stdlib/Standard/ReadOnlySpan.sl:134](../../stdlib/Standard/ReadOnlySpan.sl#L134)</sub>
 
 #### Overlaps *method*
 
@@ -1085,9 +2067,9 @@ Whether the two view any element in common.
 
 **Parameters**
 
-- `other` — the span to compare with
+- `other` -- the span to compare with
 
-<sub>[stdlib/Standard/ReadOnlySpan.sl:146](../../stdlib/Standard/ReadOnlySpan.sl#L146)</sub>
+<sub>[stdlib/Standard/ReadOnlySpan.sl:143](../../stdlib/Standard/ReadOnlySpan.sl#L143)</sub>
 
 #### Overlaps *method*
 
@@ -1100,10 +2082,10 @@ relative to this, in elements -- negative when it starts before.
 
 **Parameters**
 
-- `other` — the span to compare with
-- `elementOffset` — where `other` starts, counted from this one's start
+- `other` -- the span to compare with
+- `elementOffset` -- where `other` starts, counted from this one's start
 
-<sub>[stdlib/Standard/ReadOnlySpan.sl:155](../../stdlib/Standard/ReadOnlySpan.sl#L155)</sub>
+<sub>[stdlib/Standard/ReadOnlySpan.sl:152](../../stdlib/Standard/ReadOnlySpan.sl#L152)</sub>
 
 #### operator == *operator*
 
@@ -1114,7 +2096,7 @@ static bool operator ==(ReadOnlySpan<T> left, ReadOnlySpan<T> right)
 Whether the two are the same elements of the same array: C#'s rule,
 which compares where they are rather than what they hold.
 
-<sub>[stdlib/Standard/ReadOnlySpan.sl:169](../../stdlib/Standard/ReadOnlySpan.sl#L169)</sub>
+<sub>[stdlib/Standard/ReadOnlySpan.sl:166](../../stdlib/Standard/ReadOnlySpan.sl#L166)</sub>
 
 #### operator != *operator*
 
@@ -1124,7 +2106,7 @@ static bool operator !=(ReadOnlySpan<T> left, ReadOnlySpan<T> right)
 
 Whether the two are not the same elements of the same array.
 
-<sub>[stdlib/Standard/ReadOnlySpan.sl:174](../../stdlib/Standard/ReadOnlySpan.sl#L174)</sub>
+<sub>[stdlib/Standard/ReadOnlySpan.sl:171](../../stdlib/Standard/ReadOnlySpan.sl#L171)</sub>
 
 ### Result&lt;T, TError&gt; *variant*
 
@@ -1160,8 +2142,8 @@ pointer, not a flag and both halves. Nothing allocates either way.
 
 **Type parameters**
 
-- `T` — what the call produces when it worked
-- `TError` — why it did not, usually an enum so that a failure has a name rather than a number
+- `T` -- what the call produces when it worked
+- `TError` -- why it did not, usually an enum so that a failure has a name rather than a number
 
 <sub>[stdlib/Standard/Result.sl:53](../../stdlib/Standard/Result.sl#L53)</sub>
 
@@ -1233,11 +2215,87 @@ count every reference it copies.
 
 **Type parameters**
 
-- `T` — the type asked about
+- `T` -- the type asked about
 
 **Returns** &nbsp; false when a `T` is all of what it holds, so its bytes may be copied, compared or cleared with no count to keep
 
 <sub>[stdlib/Standard/RuntimeHelpers.sl:46](../../stdlib/Standard/RuntimeHelpers.sl#L46)</sub>
+
+### Slot&lt;T&gt; *struct*
+
+```
+struct Slot<T>
+```
+
+Storage for a value that may not be there yet, at no cost beside it.
+
+    Slot<String>[] room = new Slot<String>[8];
+    room[0] = "first";
+    String held = room[0].Value;
+    room[0].Clear();
+
+`new String[n]` is refused, because its elements would start as nulls
+where a `String` has none. A slot's zero is empty, so an array of them may
+be made at any length; it is what a collection keeps spare capacity in.
+
+When `T` has a zero value a slot is laid out as a `T`, and an empty one
+reads as that zero. When `T` has none a slot is an `Optional<T>`, which is
+as wide as `T` because a never-null reference leaves its null spare, and
+reading an empty one stops the program.
+
+<sub>[stdlib/Standard/Slot.sl:39](../../stdlib/Standard/Slot.sl#L39)</sub>
+
+#### Value *property*
+
+```
+T Value { get; }
+```
+
+What the slot holds. When `T` has no zero value an empty slot aborts;
+otherwise it reads as the zero of `T`.
+
+<sub>[stdlib/Standard/Slot.sl:47](../../stdlib/Standard/Slot.sl#L47)</sub>
+
+#### Clear *method*
+
+```
+void Clear()
+```
+
+Empties the slot, releasing what it held.
+
+<sub>[stdlib/Standard/Slot.sl:50](../../stdlib/Standard/Slot.sl#L50)</sub>
+
+#### ToArray *method*
+
+```
+static T[] ToArray(ReadOnlySpan<Slot<T>> filled)
+```
+
+The values of slots that are all full, as a new array of that many.
+
+**Parameters**
+
+- `filled` -- the slots; each MUST hold a value when `T` has no zero value
+
+**Returns** &nbsp; the array
+
+<sub>[stdlib/Standard/Slot.sl:59](../../stdlib/Standard/Slot.sl#L59)</sub>
+
+#### Copy *method*
+
+```
+static void Copy(ReadOnlySpan<T> source, Span<Slot<T>> destination)
+```
+
+Fills slots from values, in order from the start of `destination`.
+
+**Parameters**
+
+- `source` -- the values
+- `destination` -- where they go; aborts when it is shorter than `source`
+
+<sub>[stdlib/Standard/Slot.sl:66](../../stdlib/Standard/Slot.sl#L66)</sub>
 
 ### Span&lt;T&gt; *struct*
 
@@ -1264,7 +2322,7 @@ on a span reaches them.
 
 **Type parameters**
 
-- `T` — the element type; nothing is asked of it
+- `T` -- the element type; nothing is asked of it
 
 **See also** &nbsp; [ReadOnlySpan](#readonlyspant-struct)
 
@@ -1314,7 +2372,7 @@ Sets every element to `value`.
 
 **Parameters**
 
-- `value` — what each element becomes
+- `value` -- what each element becomes
 
 <sub>[stdlib/Standard/Span.sl:104](../../stdlib/Standard/Span.sl#L104)</sub>
 
@@ -1330,7 +2388,7 @@ the copy began.
 
 **Parameters**
 
-- `destination` — where the elements go
+- `destination` -- where the elements go
 
 **See also** &nbsp; [Span.TryCopyTo](#trycopyto-method)
 
@@ -1347,7 +2405,7 @@ enough, and answers whether it was.
 
 **Parameters**
 
-- `destination` — where the elements go
+- `destination` -- where the elements go
 
 **Returns** &nbsp; true when the elements were copied
 
@@ -1363,7 +2421,7 @@ The elements from `start` to the end, aborting when `start` is past it.
 
 **Parameters**
 
-- `start` — the first element of the result
+- `start` -- the first element of the result
 
 <sub>[stdlib/Standard/Span.sl:162](../../stdlib/Standard/Span.sl#L162)</sub>
 
@@ -1377,8 +2435,8 @@ Span<T> Slice(nuint start, nuint length)
 
 **Parameters**
 
-- `start` — the first element of the result
-- `length` — how many elements it covers
+- `start` -- the first element of the result
+- `length` -- how many elements it covers
 
 <sub>[stdlib/Standard/Span.sl:168](../../stdlib/Standard/Span.sl#L168)</sub>
 
@@ -1402,7 +2460,7 @@ Whether the two view any element in common.
 
 **Parameters**
 
-- `other` — the span to compare with
+- `other` -- the span to compare with
 
 <sub>[stdlib/Standard/Span.sl:180](../../stdlib/Standard/Span.sl#L180)</sub>
 
@@ -1417,8 +2475,8 @@ relative to this, in elements -- negative when it starts before.
 
 **Parameters**
 
-- `other` — the span to compare with
-- `elementOffset` — where `other` starts, counted from this one's start
+- `other` -- the span to compare with
+- `elementOffset` -- where `other` starts, counted from this one's start
 
 <sub>[stdlib/Standard/Span.sl:191](../../stdlib/Standard/Span.sl#L191)</sub>
 
@@ -1790,7 +2848,7 @@ As much of it as `part` says, from the left.
 
 **Parameters**
 
-- `part` — up to the scheme, the authority, the path or the query
+- `part` -- up to the scheme, the authority, the path or the query
 
 <sub>[stdlib/Standard/Uri.sl:688](../../stdlib/Standard/Uri.sl#L688)</sub>
 
@@ -1805,7 +2863,7 @@ authority, and a path inside this one's directory.
 
 **Parameters**
 
-- `uri` — the URI that may be below this one
+- `uri` -- the URI that may be below this one
 
 <sub>[stdlib/Standard/Uri.sl:710](../../stdlib/Standard/Uri.sl#L710)</sub>
 
@@ -1820,7 +2878,7 @@ not share a scheme and authority.
 
 **Parameters**
 
-- `uri` — where the result leads, resolved against this
+- `uri` -- where the result leads, resolved against this
 
 <sub>[stdlib/Standard/Uri.sl:728](../../stdlib/Standard/Uri.sl#L728)</sub>
 
@@ -2051,7 +3109,7 @@ Reads two to four parts separated by dots.
 
 **Parameters**
 
-- `text` — the version, as `ToString` writes it
+- `text` -- the version, as `ToString` writes it
 
 <sub>[stdlib/Standard/Version.sl:76](../../stdlib/Standard/Version.sl#L76)</sub>
 
@@ -2076,7 +3134,7 @@ parts than there are.
 
 **Parameters**
 
-- `fieldCount` — from 0 to 4
+- `fieldCount` -- from 0 to 4
 
 <sub>[stdlib/Standard/Version.sl:104](../../stdlib/Standard/Version.sl#L104)</sub>
 

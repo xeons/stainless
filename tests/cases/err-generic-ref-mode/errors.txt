@@ -1,0 +1,4 @@
+# A missing 'ref', 'ref' where 'out' is declared, and a variable of another type.
+SL0445
+SL0597
+SL0447

@@ -9,20 +9,19 @@ module Indexers;
 import Standard.Console;
 import Standard.Text;
 import Standard.Collections;
-import Standard.Unchecked;
 
 String N(long v) => Text.FromInteger(v);
 
 // A generic class: the accessors are instantiated with everything else.
 public class Box<T>
 {
-    T[] _cells;
+    Slot<T>[] _cells;
 
-    public Box(nuint size) => _cells = NewUninitializedArray<T>(size);
+    public Box(nuint size) => _cells = new Slot<T>[size];
 
     public T this[nuint at]
     {
-        get => _cells[at];
+        get => _cells[at].Value;
         set => _cells[at] = value;
     }
 

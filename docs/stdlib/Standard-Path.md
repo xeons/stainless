@@ -36,8 +36,8 @@ its leading dot. Nothing before the last part is touched.
 
 **Parameters**
 
-- `path` — the path whose last part is rewritten
-- `with` — the extension to put there, empty to take the extension off
+- `path` -- the path whose last part is rewritten
+- `with` -- the extension to put there, empty to take the extension off
 
 **See also** &nbsp; [Path.GetExtension](#getextension-function)
 
@@ -148,8 +148,8 @@ starts. An empty part contributes nothing.
 
 **Parameters**
 
-- `left` — the part that comes first
-- `right` — the part added to the end of it
+- `left` -- the part that comes first
+- `right` -- the part added to the end of it
 
 <sub>[stdlib/Path.sl:88](../../stdlib/Path.sl#L88)</sub>
 

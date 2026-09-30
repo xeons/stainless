@@ -21,8 +21,6 @@
 
 module Standard.Collections;
 
-import Standard.Unchecked;
-
 // ------------------------------------------------------------- sorted list
 
 /// A map kept in key order, over two parallel arrays.
@@ -39,15 +37,15 @@ import Standard.Unchecked;
 public class SortedList<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
     where TKey : IComparable<TKey>
 {
-    TKey[] _keys;
-    TValue[] _values;
+    Slot<TKey>[] _keys;
+    Slot<TValue>[] _values;
     nuint _count;
 
     /// An empty map with room for a few entries before it first grows.
     public SortedList()
     {
-        _keys = NewUninitializedArray<TKey>(8);
-        _values = NewUninitializedArray<TValue>(8);
+        _keys = new Slot<TKey>[8];
+        _values = new Slot<TValue>[8];
         _count = 0;
     }
 
@@ -70,7 +68,7 @@ public class SortedList<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
         while (low < high)
         {
             nuint middle = low + (high - low) / 2;
-            int order = _keys[middle].CompareTo(key);
+            int order = _keys[middle].Value.CompareTo(key);
 
             if (order == 0)
                 return (nint)middle;
@@ -100,7 +98,7 @@ public class SortedList<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
     {
         if (index >= _count)
             sl_array_bounds_fail(index, _count);
-        return _keys[index];
+        return _keys[index].Value;
     }
 
     /// The value at a position in the ordering, paired with `GetKeyAt` at the
@@ -111,7 +109,7 @@ public class SortedList<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
     {
         if (index >= _count)
             sl_array_bounds_fail(index, _count);
-        return _values[index];
+        return _values[index].Value;
     }
 
     /// The value for `key`, or `None` when there is none. The one to reach
@@ -125,7 +123,7 @@ public class SortedList<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
         nint at = IndexOfKey(key);
         if (at < 0)
             return None;
-        return Some(_values[(nuint)at]);
+        return Some(_values[(nuint)at].Value);
     }
 
     /// The value for `key`, aborting when there is none.
@@ -140,7 +138,7 @@ public class SortedList<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
         nint at = IndexOfKey(key);
         if (at < 0)
             sl_fail("SortedList.GetValue: no such key");
-        return _values[(nuint)at];
+        return _values[(nuint)at].Value;
     }
 
     /// The value for `key`, or `fallback` when there is none.
@@ -155,7 +153,7 @@ public class SortedList<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
         nint at = IndexOfKey(key);
         if (at < 0)
             return fallback;
-        return _values[(nuint)at];
+        return _values[(nuint)at].Value;
     }
 
     /// Sets the value of a key, adding it in order if it is new.
@@ -211,8 +209,8 @@ public class SortedList<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
 
         // The vacated slot still refers to the last entry; blanking it releases
         // that reference now rather than at the next insertion.
-        ClearElement(_keys, _count);
-        ClearElement(_values, _count);
+        _keys[_count].Clear();
+        _values[_count].Clear();
         return true;
     }
 
@@ -220,8 +218,8 @@ public class SortedList<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
     /// anything they held is released now.
     public void Clear()
     {
-        _keys = NewUninitializedArray<TKey>(8);
-        _values = NewUninitializedArray<TValue>(8);
+        _keys = new Slot<TKey>[8];
+        _values = new Slot<TValue>[8];
         _count = 0;
     }
 
@@ -232,7 +230,7 @@ public class SortedList<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
     {
         var result = new List<TKey>();
         for (nuint i = 0; i < _count; i++)
-            result.Add(_keys[i]);
+            result.Add(_keys[i].Value);
         return result;
     }
 
@@ -243,13 +241,13 @@ public class SortedList<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
     {
         var result = new List<TValue>();
         for (nuint i = 0; i < _count; i++)
-            result.Add(_values[i]);
+            result.Add(_values[i].Value);
         return result;
     }
 
     /// The entry at a position, in key order. What the cursor walks.
     KeyValuePair<TKey, TValue> GetPairAt(nuint index) =>
-        new KeyValuePair<TKey, TValue>(_keys[index], _values[index]);
+        new KeyValuePair<TKey, TValue>(_keys[index].Value, _values[index].Value);
 
     /// A cursor over the entries in key order, for `foreach` -- the ordering
     /// a `Dictionary` cannot give. One `KeyValuePair` is built per step. Writing to
@@ -263,8 +261,8 @@ public class SortedList<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
 
     void GrowStorage()
     {
-        var biggerKeys = NewUninitializedArray<TKey>(_keys.Length * 2);
-        var biggerValues = NewUninitializedArray<TValue>(_values.Length * 2);
+        var biggerKeys = new Slot<TKey>[_keys.Length * 2];
+        var biggerValues = new Slot<TValue>[_values.Length * 2];
 
         for (nuint i = 0; i < _count; i++)
         {

@@ -122,6 +122,10 @@ public sealed partial class Binder
             return BindVariantConstruction(
                 (VariantTypeSymbol)target, some, [expression], span);
 
+        // A value becomes the slot holding it, which is how a slot is written.
+        if (FillsSlot(expression, target) is { } slot)
+            return new BoundSlotFill(span, slot, BindConversion(expression, slot.Element, span));
+
         // **A folded literal is already what it is going to be.**
         //
         // A negative constant is stored as its two's complement and the type
@@ -655,6 +659,20 @@ public sealed partial class Binder
         // this every mismatched assignment to an Optional would report the
         // payload's complaint rather than its own.
         return IsImplicitlyConvertible(expression, some.Fields[0].Type) ? some : null;
+    }
+
+    /// <summary>
+    /// The slot an expression would be stored into to become
+    /// <paramref name="target"/>, or null when it is not a value of that
+    /// slot's element. Something already a slot is left alone.
+    /// </summary>
+    private SlotTypeSymbol? FillsSlot(BoundExpression expression, TypeSymbol target)
+    {
+        if (target is not SlotTypeSymbol slot) return null;
+        if (expression.Type.Equals(target) || expression.Type.IsError() || expression.Type.IsVoid())
+            return null;
+
+        return IsImplicitlyConvertible(expression, slot.Element) ? slot : null;
     }
 
     /// <summary>

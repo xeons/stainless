@@ -2,25 +2,24 @@
 // samples/shop/src/Shop/Inventory.sl  ->  module Shop.Inventory
 module Shop.Inventory;
 
-import Standard.Unchecked;
 import Shop.Catalog;
 import Shop.Pricing;
 
 // A generic declared here, instantiated from another module entirely.
 public class Register<T>
 {
-    // Written before read, past `_count`: see Standard.Unchecked.
-    T[] _items;
+    // Empty past `_count`.
+    Slot<T>[] _items;
     nuint _count;
 
     public Register(nuint capacity)
     {
-        _items = NewUninitializedArray<T>(capacity);
+        _items = new Slot<T>[capacity];
         _count = 0;
     }
 
     public nuint Count => _count;
-    public T At(nuint index) => _items[index];
+    public T At(nuint index) => _items[index].Value;
 
     public void Add(T item)
     {

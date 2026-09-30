@@ -1441,7 +1441,7 @@ An Ed25519 key from its 32-byte seed, RFC 8032's private key.
 
 **Fails with**
 
-- [CryptoError.KeyLength](Standard-Security-Cryptography.md#keylength-case) — `privateKey` is not 32 bytes
+- [CryptoError.KeyLength](Standard-Security-Cryptography.md#keylength-case) -- `privateKey` is not 32 bytes
 
 <sub>[stdlib/Net/Security/TlsSigningKey.sl:55](../../stdlib/Net/Security/TlsSigningKey.sl#L55)</sub>
 
@@ -1456,7 +1456,7 @@ P-384.
 
 **Fails with**
 
-- [CryptoError.InvalidKey](Standard-Security-Cryptography.md#invalidkey-case) — `key` is a public key
+- [CryptoError.InvalidKey](Standard-Security-Cryptography.md#invalidkey-case) -- `key` is a public key
 
 <sub>[stdlib/Net/Security/TlsSigningKey.sl:67](../../stdlib/Net/Security/TlsSigningKey.sl#L67)</sub>
 
@@ -1471,7 +1471,7 @@ An RSA key published as `rsaEncryption`, which signs with the
 
 **Fails with**
 
-- [CryptoError.InvalidKey](Standard-Security-Cryptography.md#invalidkey-case) — `key` is a public key
+- [CryptoError.InvalidKey](Standard-Security-Cryptography.md#invalidkey-case) -- `key` is a public key
 
 <sub>[stdlib/Net/Security/TlsSigningKey.sl:80](../../stdlib/Net/Security/TlsSigningKey.sl#L80)</sub>
 
@@ -1486,7 +1486,7 @@ An RSA key published as `RSASSA-PSS`, which signs with the
 
 **Fails with**
 
-- [CryptoError.InvalidKey](Standard-Security-Cryptography.md#invalidkey-case) — `key` is a public key
+- [CryptoError.InvalidKey](Standard-Security-Cryptography.md#invalidkey-case) -- `key` is a public key
 
 <sub>[stdlib/Net/Security/TlsSigningKey.sl:91](../../stdlib/Net/Security/TlsSigningKey.sl#L91)</sub>
 
@@ -1502,9 +1502,9 @@ used; certificates beside it are passed over.
 
 **Fails with**
 
-- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) — no key block, or one that does not parse
-- [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) — a key of another algorithm, or an encrypted one
-- [CryptoError.InvalidKey](Standard-Security-Cryptography.md#invalidkey-case) — the numbers are not a consistent key
+- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) -- no key block, or one that does not parse
+- [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) -- a key of another algorithm, or an encrypted one
+- [CryptoError.InvalidKey](Standard-Security-Cryptography.md#invalidkey-case) -- the numbers are not a consistent key
 
 <sub>[stdlib/Net/Security/TlsSigningKey.sl:106](../../stdlib/Net/Security/TlsSigningKey.sl#L106)</sub>
 
@@ -1518,9 +1518,9 @@ The key in an unencrypted PKCS #8 `PrivateKeyInfo`, DER.
 
 **Fails with**
 
-- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) — not a `PrivateKeyInfo`
-- [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) — a key of another algorithm
-- [CryptoError.InvalidKey](Standard-Security-Cryptography.md#invalidkey-case) — the numbers are not a consistent key
+- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) -- not a `PrivateKeyInfo`
+- [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) -- a key of another algorithm
+- [CryptoError.InvalidKey](Standard-Security-Cryptography.md#invalidkey-case) -- the numbers are not a consistent key
 
 <sub>[stdlib/Net/Security/TlsSigningKey.sl:140](../../stdlib/Net/Security/TlsSigningKey.sl#L140)</sub>
 
@@ -1553,15 +1553,15 @@ Connects to `host` and runs the client's handshake. An empty
 
 **Parameters**
 
-- `host` — the name or address to reach
-- `port` — the port to reach it on
-- `options` — what to offer, and how to judge the certificate
+- `host` -- the name or address to reach
+- `port` -- the port to reach it on
+- `options` -- what to offer, and how to judge the certificate
 
 **Fails with**
 
-- [TlsError.Io](#io-case) — the TCP connection could not be made
-- [TlsError.CertificateRefused](#certificaterefused-case) — the validator refused the chain
-- [TlsError.AlertReceived](#alertreceived-case) — the server refused
+- [TlsError.Io](#io-case) -- the TCP connection could not be made
+- [TlsError.CertificateRefused](#certificaterefused-case) -- the validator refused the chain
+- [TlsError.AlertReceived](#alertreceived-case) -- the server refused
 
 <sub>[stdlib/Net/Security/TlsSocket.sl:59](../../stdlib/Net/Security/TlsSocket.sl#L59)</sub>
 
@@ -1576,14 +1576,14 @@ server sent when it refused.
 
 **Parameters**
 
-- `host` — the name or address to reach
-- `port` — the port to reach it on
-- `options` — what to offer, and how to judge the certificate
-- `alertReceived` — the server's alert when the failure is `AlertReceived`, and `CloseNotify` otherwise
+- `host` -- the name or address to reach
+- `port` -- the port to reach it on
+- `options` -- what to offer, and how to judge the certificate
+- `alertReceived` -- the server's alert when the failure is `AlertReceived`, and `CloseNotify` otherwise
 
 **Fails with**
 
-- [TlsError.AlertReceived](#alertreceived-case) — the server refused, and `alertReceived` says why
+- [TlsError.AlertReceived](#alertreceived-case) -- the server refused, and `alertReceived` says why
 
 <sub>[stdlib/Net/Security/TlsSocket.sl:73](../../stdlib/Net/Security/TlsSocket.sl#L73)</sub>
 
@@ -1597,14 +1597,14 @@ Accepts a connection from `listener` and runs the server's handshake.
 
 **Parameters**
 
-- `listener` — where connections arrive
-- `options` — the certificate, the key, and what to accept
+- `listener` -- where connections arrive
+- `options` -- the certificate, the key, and what to accept
 
 **Fails with**
 
-- [TlsError.Io](#io-case) — the accept failed
-- [TlsError.NoCommonCipherSuite](#nocommonciphersuite-case) — no suite on both lists
-- [TlsError.NoApplicationProtocol](#noapplicationprotocol-case) — no ALPN name on both lists
+- [TlsError.Io](#io-case) -- the accept failed
+- [TlsError.NoCommonCipherSuite](#nocommonciphersuite-case) -- no suite on both lists
+- [TlsError.NoApplicationProtocol](#noapplicationprotocol-case) -- no ALPN name on both lists
 
 <sub>[stdlib/Net/Security/TlsSocket.sl:102](../../stdlib/Net/Security/TlsSocket.sl#L102)</sub>
 
@@ -1619,13 +1619,13 @@ alert the client sent when it refused.
 
 **Parameters**
 
-- `listener` — where connections arrive
-- `options` — the certificate, the key, and what to accept
-- `alertReceived` — the client's alert when the failure is `AlertReceived`, and `CloseNotify` otherwise
+- `listener` -- where connections arrive
+- `options` -- the certificate, the key, and what to accept
+- `alertReceived` -- the client's alert when the failure is `AlertReceived`, and `CloseNotify` otherwise
 
 **Fails with**
 
-- [TlsError.AlertReceived](#alertreceived-case) — the client refused, and `alertReceived` says why
+- [TlsError.AlertReceived](#alertreceived-case) -- the client refused, and `alertReceived` says why
 
 <sub>[stdlib/Net/Security/TlsSocket.sl:115](../../stdlib/Net/Security/TlsSocket.sl#L115)</sub>
 
@@ -1913,15 +1913,15 @@ On failure the alert has been sent and `inner` closed, unless
 
 **Parameters**
 
-- `inner` — the connection to the server
-- `options` — what to offer, and how to judge the certificate
+- `inner` -- the connection to the server
+- `options` -- what to offer, and how to judge the certificate
 
 **Fails with**
 
-- [TlsError.CertificateRefused](#certificaterefused-case) — the validator refused the chain
-- [TlsError.ProtocolVersion](#protocolversion-case) — the server speaks no version `EnabledProtocols` holds
-- [TlsError.AlertReceived](#alertreceived-case) — the server refused, and said why in an alert
-- [TlsError.Io](#io-case) — the stream underneath failed
+- [TlsError.CertificateRefused](#certificaterefused-case) -- the validator refused the chain
+- [TlsError.ProtocolVersion](#protocolversion-case) -- the server speaks no version `EnabledProtocols` holds
+- [TlsError.AlertReceived](#alertreceived-case) -- the server refused, and said why in an alert
+- [TlsError.Io](#io-case) -- the stream underneath failed
 
 <sub>[stdlib/Net/Security/TlsStream.sl:75](../../stdlib/Net/Security/TlsStream.sl#L75)</sub>
 
@@ -1936,13 +1936,13 @@ when it refused.
 
 **Parameters**
 
-- `inner` — the connection to the server
-- `options` — what to offer, and how to judge the certificate
-- `alertReceived` — the server's alert when the failure is `AlertReceived`, and `CloseNotify` otherwise
+- `inner` -- the connection to the server
+- `options` -- what to offer, and how to judge the certificate
+- `alertReceived` -- the server's alert when the failure is `AlertReceived`, and `CloseNotify` otherwise
 
 **Fails with**
 
-- [TlsError.AlertReceived](#alertreceived-case) — the server refused, and `alertReceived` says why
+- [TlsError.AlertReceived](#alertreceived-case) -- the server refused, and `alertReceived` says why
 
 <sub>[stdlib/Net/Security/TlsStream.sl:90](../../stdlib/Net/Security/TlsStream.sl#L90)</sub>
 
@@ -1959,16 +1959,16 @@ On failure the alert has been sent and `inner` closed, unless
 
 **Parameters**
 
-- `inner` — the connection from the client
-- `options` — the certificate, the key, and what to accept
+- `inner` -- the connection from the client
+- `options` -- the certificate, the key, and what to accept
 
 **Fails with**
 
-- [TlsError.NoCommonCipherSuite](#nocommonciphersuite-case) — no suite on both lists
-- [TlsError.NoCommonGroup](#nocommongroup-case) — no group on both lists
-- [TlsError.NoApplicationProtocol](#noapplicationprotocol-case) — no ALPN name on both lists
-- [TlsError.CertificateRequired](#certificaterequired-case) — a client certificate was required and none came
-- [TlsError.InternalError](#internalerror-case) — no certificate or no key is configured
+- [TlsError.NoCommonCipherSuite](#nocommonciphersuite-case) -- no suite on both lists
+- [TlsError.NoCommonGroup](#nocommongroup-case) -- no group on both lists
+- [TlsError.NoApplicationProtocol](#noapplicationprotocol-case) -- no ALPN name on both lists
+- [TlsError.CertificateRequired](#certificaterequired-case) -- a client certificate was required and none came
+- [TlsError.InternalError](#internalerror-case) -- no certificate or no key is configured
 
 <sub>[stdlib/Net/Security/TlsStream.sl:119](../../stdlib/Net/Security/TlsStream.sl#L119)</sub>
 
@@ -1983,13 +1983,13 @@ when it refused.
 
 **Parameters**
 
-- `inner` — the connection from the client
-- `options` — the certificate, the key, and what to accept
-- `alertReceived` — the client's alert when the failure is `AlertReceived`, and `CloseNotify` otherwise
+- `inner` -- the connection from the client
+- `options` -- the certificate, the key, and what to accept
+- `alertReceived` -- the client's alert when the failure is `AlertReceived`, and `CloseNotify` otherwise
 
 **Fails with**
 
-- [TlsError.AlertReceived](#alertreceived-case) — the client refused, and `alertReceived` says why
+- [TlsError.AlertReceived](#alertreceived-case) -- the client refused, and `alertReceived` says why
 
 <sub>[stdlib/Net/Security/TlsStream.sl:134](../../stdlib/Net/Security/TlsStream.sl#L134)</sub>
 
@@ -2139,13 +2139,13 @@ context, and no use to anyone else.
 
 **Parameters**
 
-- `label` — names the use, as the protocol that wants it defines
-- `context` — bound into the result; empty when the protocol has none, which in TLS 1.2 is RFC 5705's "no context"
-- `length` — how many bytes, at most 255 digests' worth in TLS 1.3
+- `label` -- names the use, as the protocol that wants it defines
+- `context` -- bound into the result; empty when the protocol has none, which in TLS 1.2 is RFC 5705's "no context"
+- `length` -- how many bytes, at most 255 digests' worth in TLS 1.3
 
 **Fails with**
 
-- [TlsError.Closed](#closed-case) — the stream is closed
+- [TlsError.Closed](#closed-case) -- the stream is closed
 
 <sub>[stdlib/Net/Security/TlsStream.sl:213](../../stdlib/Net/Security/TlsStream.sl#L213)</sub>
 
@@ -2161,9 +2161,9 @@ without being asked, before one has protected 2^24 records.
 
 **Fails with**
 
-- [TlsError.Closed](#closed-case) — the stream is closed or failed
-- [TlsError.ProtocolVersion](#protocolversion-case) — the connection is TLS 1.2, which has no KeyUpdate
-- [TlsError.Io](#io-case) — the stream underneath failed
+- [TlsError.Closed](#closed-case) -- the stream is closed or failed
+- [TlsError.ProtocolVersion](#protocolversion-case) -- the connection is TLS 1.2, which has no KeyUpdate
+- [TlsError.Io](#io-case) -- the stream underneath failed
 
 <sub>[stdlib/Net/Security/TlsStream.sl:235](../../stdlib/Net/Security/TlsStream.sl#L235)</sub>
 
@@ -2322,8 +2322,8 @@ Revocation is not checked; `X509Chain` says why.
 
 **Parameters**
 
-- `chain` — the peer's certificates, DER, leaf first
-- `targetHost` — the name the certificate must be valid for, or empty when a server is judging a client
+- `chain` -- the peer's certificates, DER, leaf first
+- `targetHost` -- the name the certificate must be valid for, or empty when a server is judging a client
 
 <sub>[stdlib/Net/Security/TlsCertificateValidator.sl:53](../../stdlib/Net/Security/TlsCertificateValidator.sl#L53)</sub>
 

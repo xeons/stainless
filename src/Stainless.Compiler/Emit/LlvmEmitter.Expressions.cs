@@ -130,6 +130,7 @@ public sealed partial class LlvmEmitter
             case BoundStructNew filled: return EmitStructNew(filled);
             case BoundClosure closure: return EmitClosure(closure);
             case BoundNewArray newArray: return EmitNewArray(newArray);
+            case BoundArrayFill fill: return EmitArrayFill(fill);
             case BoundArrayLiteral literalArray: return EmitArrayLiteral(literalArray);
             case BoundArrayLength length: return EmitArrayLength(length);
             case BoundSlice slice: return EmitSlice(slice);
@@ -143,6 +144,8 @@ public sealed partial class LlvmEmitter
             case BoundVariantConstruction built: return EmitVariantConstruction(built);
             case BoundVariantTest test: return EmitVariantTest(test);
             case BoundVariantPayload payload: return EmitVariantPayload(payload);
+            case BoundSlotValue read: return EmitSlotValue(read);
+            case BoundSlotFill fill: return EmitSlotFill(fill);
             case BoundTry attempt: return EmitTry(attempt);
 
             default:

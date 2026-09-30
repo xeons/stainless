@@ -131,16 +131,6 @@ public sealed partial class Binder
         }
 
         _context.File = null;
-
-        // Every type declared in source now has its members, so an instantiation
-        // made during this pass can finally be laid out. Until this moment it
-        // could not: laying `Result<Color, E>` out reaches `Color`, and a
-        // `Color` this pass had not got to yet has no fields, so it settles at
-        // one byte -- and `LayoutComputed` means nothing ever looks again. The
-        // same trap the generic-to-generic case documents, reached through an
-        // ordinary struct instead of a second template.
-        _membersDeclared = true;
-        SettleDeferredLayouts();
     }
 
     /// <summary>
@@ -988,7 +978,7 @@ public sealed partial class Binder
         if (declared is not ClosureTypeSymbol closure)
         {
             if (!declared.IsError())
-                diagnostics.Error("SL0548", declaration.Span,
+                diagnostics.Error("SL0818", declaration.Span,
                     $"'{type.Name}.{declaration.Name}' is an event of type " +
                     $"'{declared.Name}', and an event is a list of closures: its type has to be " +
                     "a 'closure', which is a method and the object it belongs to. A 'delegate' " +
@@ -1003,7 +993,7 @@ public sealed partial class Binder
         // than a feature.
         if (!closure.ReturnType.IsVoid())
         {
-            diagnostics.Error("SL0549", declaration.Span,
+            diagnostics.Error("SL0819", declaration.Span,
                 $"'{type.Name}.{declaration.Name}' is an event whose handlers return " +
                 $"'{closure.ReturnType.Name}', and raising one calls every subscriber -- so " +
                 "there is no single value for it to return. Declare the closure 'void', and " +
@@ -1014,7 +1004,7 @@ public sealed partial class Binder
 
         if (declaration.Modifiers.HasFlag(Modifiers.Static))
         {
-            diagnostics.Error("SL0550", declaration.Span,
+            diagnostics.Error("SL0820", declaration.Span,
                 $"'{type.Name}.{declaration.Name}' is a static event, which is not supported: " +
                 "its subscribers would outlive every object that added one, and nothing would " +
                 "ever take them off",
@@ -1071,7 +1061,7 @@ public sealed partial class Binder
 
         if (type.Methods.Any(m => m.Name == name && m.Accepts([symbol.Type])))
         {
-            diagnostics.Error("SL0552", symbol.Span,
+            diagnostics.Error("SL0821", symbol.Span,
                 $"'{type.Name}' already declares a method named '{name}' taking one " +
                 $"'{symbol.Type.Name}', which is what the event '{symbol.Name}' has to use",
                 type, symbol.Type);
@@ -1194,7 +1184,7 @@ public sealed partial class Binder
 
         if (type.Methods.Any(m => m.Name == name && m.Accepts(parameters)))
         {
-            diagnostics.Error("SL0552", symbol.Span,
+            diagnostics.Error("SL0821", symbol.Span,
                 $"'{type.Name}' already declares a method named '{name}' taking these " +
                 $"parameters, which is what raising the event '{symbol.Name}' has to use",
                 type);

@@ -1065,6 +1065,24 @@ WatchMember? MemberNamed(Unit unit, Die structure, String name, nuint from,
                                    from + (nuint)one.NumberOf(AtDataMemberLoc, 0u));
     }
 
+    // A case of a variant with no tag is a variant part down, at the same offset.
+    for (nuint i = 0u; i < members.Count; i++)
+    {
+        if (members[i].Tag != TagVariantPart)
+            continue;
+
+        var variants = ChildrenOf(unit, members[i]);
+        for (nuint j = 0u; j < variants.Count; j++)
+        {
+            if (variants[j].Tag != TagVariant)
+                continue;
+
+            var inCase = MemberNamed(unit, variants[j], name, from, depth + 1);
+            if (inCase != null)
+                return inCase;
+        }
+    }
+
     for (nuint i = 0u; i < members.Count; i++)
     {
         var one = members[i];

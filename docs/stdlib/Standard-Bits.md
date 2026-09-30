@@ -13,7 +13,7 @@ way -- `(value << by) | (value >> (64 - by))` -- is worse than slow for a
 count of zero: shifting by the width is undefined, so the answer is zero
 rather than `value`. What is below is defined for every count.
 
-The compiler declares the instructions ([Builtins](../src/Stainless.Compiler/Binding/Builtins.cs))
+The compiler declares the instructions ([Builtins](../../src/Stainless.Compiler/Binding/Builtins.cs))
 and this file declares the same module again to put names on them, which is
 the ordinary second declaration of §1.2.1 rather than anything special.
 

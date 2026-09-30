@@ -172,7 +172,7 @@ AES-192 or AES-256.
 
 **Fails with**
 
-- [CryptoError.KeyLength](#keylength-case) — `key` is not 16, 24 or 32 bytes
+- [CryptoError.KeyLength](#keylength-case) -- `key` is not 16, 24 or 32 bytes
 
 <sub>[stdlib/Security/Cryptography/Aes.sl:89](../../stdlib/Security/Cryptography/Aes.sl#L89)</sub>
 
@@ -235,7 +235,7 @@ always the wrong answer.
 
 **Fails with**
 
-- [CryptoError.BlockLength](#blocklength-case) — `padding` is `None` and the input is not a whole number of blocks
+- [CryptoError.BlockLength](#blocklength-case) -- `padding` is `None` and the input is not a whole number of blocks
 
 **See also** &nbsp; [CipherMode.Ecb](#ecb-case) &middot; [Aes.DecryptEcb](#decryptecb-method)
 
@@ -251,8 +251,8 @@ The inverse of `EncryptEcb`.
 
 **Fails with**
 
-- [CryptoError.BlockLength](#blocklength-case) — the input is empty or not a whole number of blocks
-- [CryptoError.Padding](#padding-case) — the padding does not describe itself, which is usually the wrong key
+- [CryptoError.BlockLength](#blocklength-case) -- the input is empty or not a whole number of blocks
+- [CryptoError.Padding](#padding-case) -- the padding does not describe itself, which is usually the wrong key
 
 **See also** &nbsp; [Aes.EncryptEcb](#encryptecb-method)
 
@@ -270,8 +270,8 @@ it is not secret -- send it alongside the ciphertext.
 
 **Fails with**
 
-- [CryptoError.IvLength](#ivlength-case) — `iv` is not one block
-- [CryptoError.BlockLength](#blocklength-case) — `padding` is `None` and the input is not a whole number of blocks
+- [CryptoError.IvLength](#ivlength-case) -- `iv` is not one block
+- [CryptoError.BlockLength](#blocklength-case) -- `padding` is `None` and the input is not a whole number of blocks
 
 **See also** &nbsp; [Aes.DecryptCbc](#decryptcbc-method) &middot; [RandomNumberGenerator.GetBytes](#getbytes-method)
 
@@ -291,9 +291,9 @@ is the whole reason to authenticate a ciphertext before decrypting it.
 
 **Fails with**
 
-- [CryptoError.IvLength](#ivlength-case) — `iv` is not one block
-- [CryptoError.BlockLength](#blocklength-case) — the input is empty or not a whole number of blocks
-- [CryptoError.Padding](#padding-case) — the padding does not describe itself
+- [CryptoError.IvLength](#ivlength-case) -- `iv` is not one block
+- [CryptoError.BlockLength](#blocklength-case) -- the input is empty or not a whole number of blocks
+- [CryptoError.Padding](#padding-case) -- the padding does not describe itself
 
 **See also** &nbsp; [Aes.EncryptCbc](#encryptcbc-method)
 
@@ -310,7 +310,7 @@ with a feedback size of 128 bits. No padding: the mode is a stream.
 
 **Fails with**
 
-- [CryptoError.IvLength](#ivlength-case) — `iv` is not one block
+- [CryptoError.IvLength](#ivlength-case) -- `iv` is not one block
 
 **See also** &nbsp; [Aes.DecryptCfb](#decryptcfb-method)
 
@@ -326,7 +326,7 @@ The inverse of `EncryptCfb`.
 
 **Fails with**
 
-- [CryptoError.IvLength](#ivlength-case) — `iv` is not one block
+- [CryptoError.IvLength](#ivlength-case) -- `iv` is not one block
 
 **See also** &nbsp; [Aes.EncryptCfb](#encryptcfb-method)
 
@@ -348,7 +348,7 @@ is a random nonce in the high bytes and a block counter in the low.
 
 **Fails with**
 
-- [CryptoError.IvLength](#ivlength-case) — `counter` is not one block
+- [CryptoError.IvLength](#ivlength-case) -- `counter` is not one block
 
 <sub>[stdlib/Security/Cryptography/Aes.sl:303](../../stdlib/Security/Cryptography/Aes.sl#L303)</sub>
 
@@ -417,7 +417,7 @@ A GCM box under `key`, which must be 16, 24 or 32 bytes.
 
 **Fails with**
 
-- [CryptoError.KeyLength](#keylength-case) — `key` is not 16, 24 or 32 bytes
+- [CryptoError.KeyLength](#keylength-case) -- `key` is not 16, 24 or 32 bytes
 
 <sub>[stdlib/Security/Cryptography/AesGcm.sl:83](../../stdlib/Security/Cryptography/AesGcm.sl#L83)</sub>
 
@@ -435,15 +435,15 @@ secret. Pass an empty array when there is none.
 
 **Parameters**
 
-- `nonce` — never to repeat under this key; twelve bytes is what every protocol uses
-- `plaintext` — the message to encipher
-- `associatedData` — authenticated and not encrypted; empty when there is none
-- `tag` — a `TagSize` array the tag is written into
+- `nonce` -- never to repeat under this key; twelve bytes is what every protocol uses
+- `plaintext` -- the message to encipher
+- `associatedData` -- authenticated and not encrypted; empty when there is none
+- `tag` -- a `TagSize` array the tag is written into
 
 **Fails with**
 
-- [CryptoError.NonceLength](#noncelength-case) — `nonce` is empty
-- [CryptoError.TagLength](#taglength-case) — `tag` is not `TagSize` long
+- [CryptoError.NonceLength](#noncelength-case) -- `nonce` is empty
+- [CryptoError.TagLength](#taglength-case) -- `tag` is not `TagSize` long
 
 **See also** &nbsp; [AesGcm.Decrypt](#decrypt-method)
 
@@ -459,16 +459,16 @@ The plaintext, or `AuthenticationFailed` and nothing.
 
 **Parameters**
 
-- `nonce` — the one the message was enciphered under
-- `ciphertext` — the message to open
-- `associatedData` — the same bytes the sender authenticated
-- `tag` — the tag the sender sent
+- `nonce` -- the one the message was enciphered under
+- `ciphertext` -- the message to open
+- `associatedData` -- the same bytes the sender authenticated
+- `tag` -- the tag the sender sent
 
 **Fails with**
 
-- [CryptoError.NonceLength](#noncelength-case) — `nonce` is empty
-- [CryptoError.TagLength](#taglength-case) — `tag` is not `TagSize` long
-- [CryptoError.AuthenticationFailed](#authenticationfailed-case) — the tag does not match, and no plaintext is returned
+- [CryptoError.NonceLength](#noncelength-case) -- `nonce` is empty
+- [CryptoError.TagLength](#taglength-case) -- `tag` is not `TagSize` long
+- [CryptoError.AuthenticationFailed](#authenticationfailed-case) -- the tag does not match, and no plaintext is returned
 
 **See also** &nbsp; [AesGcm.Encrypt](#encrypt-method)
 
@@ -543,16 +543,16 @@ static Result<byte[], CryptoError> DeriveKey(ReadOnlySpan<byte> password, ReadOn
 
 **Parameters**
 
-- `password` — the secret to stretch
-- `salt` — at least `MinSaltSize` random bytes, sixteen recommended, stored beside the result
-- `iterations` — t, how many passes over the memory
-- `memoryKiB` — m, how many kibibytes to fill; at least eight per lane
-- `parallelism` — p, how many lanes, computed one after another here
-- `length` — how many bytes to derive, at least four
+- `password` -- the secret to stretch
+- `salt` -- at least `MinSaltSize` random bytes, sixteen recommended, stored beside the result
+- `iterations` -- t, how many passes over the memory
+- `memoryKiB` -- m, how many kibibytes to fill; at least eight per lane
+- `parallelism` -- p, how many lanes, computed one after another here
+- `length` -- how many bytes to derive, at least four
 
 **Fails with**
 
-- [CryptoError.Parameter](#parameter-case) — a parameter is outside RFC 9106 §3.1, `salt` is shorter than `MinSaltSize`, or `memoryKiB` is past `MaxMemoryKiB`
+- [CryptoError.Parameter](#parameter-case) -- a parameter is outside RFC 9106 §3.1, `salt` is shorter than `MinSaltSize`, or `memoryKiB` is past `MaxMemoryKiB`
 
 <sub>[stdlib/Security/Cryptography/Argon2id.sl:80](../../stdlib/Security/Cryptography/Argon2id.sl#L80)</sub>
 
@@ -570,18 +570,18 @@ that a stolen table of hashes cannot be attacked without it as well.
 
 **Parameters**
 
-- `password` — the secret to stretch
-- `salt` — at least `MinSaltSize` random bytes, stored beside the result
-- `iterations` — t, how many passes over the memory
-- `memoryKiB` — m, how many kibibytes to fill; at least eight per lane
-- `parallelism` — p, how many lanes, computed one after another here
-- `length` — how many bytes to derive, at least four
-- `secret` — K, a key held apart from the hashes; empty for none
-- `associatedData` — X, bound into the result and not secret; empty for none
+- `password` -- the secret to stretch
+- `salt` -- at least `MinSaltSize` random bytes, stored beside the result
+- `iterations` -- t, how many passes over the memory
+- `memoryKiB` -- m, how many kibibytes to fill; at least eight per lane
+- `parallelism` -- p, how many lanes, computed one after another here
+- `length` -- how many bytes to derive, at least four
+- `secret` -- K, a key held apart from the hashes; empty for none
+- `associatedData` -- X, bound into the result and not secret; empty for none
 
 **Fails with**
 
-- [CryptoError.Parameter](#parameter-case) — a parameter is outside RFC 9106 §3.1, `salt` is shorter than `MinSaltSize`, or `memoryKiB` is past `MaxMemoryKiB`
+- [CryptoError.Parameter](#parameter-case) -- a parameter is outside RFC 9106 §3.1, `salt` is shorter than `MinSaltSize`, or `memoryKiB` is past `MaxMemoryKiB`
 
 <sub>[stdlib/Security/Cryptography/Argon2id.sl:104](../../stdlib/Security/Cryptography/Argon2id.sl#L104)</sub>
 
@@ -651,13 +651,13 @@ unkeyed hash of that length.
 
 **Parameters**
 
-- `key` — at most `MaxKeySize` bytes; empty for none
-- `hashSize` — one to `MaxHashSize` bytes of digest
+- `key` -- at most `MaxKeySize` bytes; empty for none
+- `hashSize` -- one to `MaxHashSize` bytes of digest
 
 **Fails with**
 
-- [CryptoError.KeyLength](#keylength-case) — `key` is longer than `MaxKeySize`
-- [CryptoError.Parameter](#parameter-case) — `hashSize` is zero or past `MaxHashSize`
+- [CryptoError.KeyLength](#keylength-case) -- `key` is longer than `MaxKeySize`
+- [CryptoError.Parameter](#parameter-case) -- `hashSize` is zero or past `MaxHashSize`
 
 <sub>[stdlib/Security/Cryptography/Blake2b.sl:112](../../stdlib/Security/Cryptography/Blake2b.sl#L112)</sub>
 
@@ -816,7 +816,7 @@ A cipher under `key`, which must be 32 bytes.
 
 **Fails with**
 
-- [CryptoError.KeyLength](#keylength-case) — `key` is not 32 bytes
+- [CryptoError.KeyLength](#keylength-case) -- `key` is not 32 bytes
 
 <sub>[stdlib/Security/Cryptography/ChaCha20.sl:79](../../stdlib/Security/Cryptography/ChaCha20.sl#L79)</sub>
 
@@ -834,14 +834,14 @@ the AEAD construction, and at zero otherwise.
 
 **Parameters**
 
-- `nonce` — twelve bytes, never to repeat under this key
-- `counter` — the block the keystream starts at
-- `input` — the plaintext or the ciphertext
+- `nonce` -- twelve bytes, never to repeat under this key
+- `counter` -- the block the keystream starts at
+- `input` -- the plaintext or the ciphertext
 
 **Fails with**
 
-- [CryptoError.NonceLength](#noncelength-case) — `nonce` is not twelve bytes
-- [CryptoError.Parameter](#parameter-case) — `input` runs past block 2^32 - 1, where the counter would wrap
+- [CryptoError.NonceLength](#noncelength-case) -- `nonce` is not twelve bytes
+- [CryptoError.Parameter](#parameter-case) -- `input` runs past block 2^32 - 1, where the counter would wrap
 
 <sub>[stdlib/Security/Cryptography/ChaCha20.sl:98](../../stdlib/Security/Cryptography/ChaCha20.sl#L98)</sub>
 
@@ -911,7 +911,7 @@ A box under `key`, which must be 32 bytes.
 
 **Fails with**
 
-- [CryptoError.KeyLength](#keylength-case) — `key` is not 32 bytes
+- [CryptoError.KeyLength](#keylength-case) -- `key` is not 32 bytes
 
 <sub>[stdlib/Security/Cryptography/ChaCha20Poly1305.sl:74](../../stdlib/Security/Cryptography/ChaCha20Poly1305.sl#L74)</sub>
 
@@ -929,16 +929,16 @@ secret. Pass an empty array when there is none.
 
 **Parameters**
 
-- `nonce` — twelve bytes, never to repeat under this key
-- `plaintext` — the message to encipher
-- `associatedData` — authenticated and not encrypted; empty when there is none
-- `tag` — a `TagSize` array the tag is written into
+- `nonce` -- twelve bytes, never to repeat under this key
+- `plaintext` -- the message to encipher
+- `associatedData` -- authenticated and not encrypted; empty when there is none
+- `tag` -- a `TagSize` array the tag is written into
 
 **Fails with**
 
-- [CryptoError.NonceLength](#noncelength-case) — `nonce` is not twelve bytes
-- [CryptoError.TagLength](#taglength-case) — `tag` is not `TagSize` long
-- [CryptoError.Parameter](#parameter-case) — `plaintext` is longer than the 256 GiB the counter covers
+- [CryptoError.NonceLength](#noncelength-case) -- `nonce` is not twelve bytes
+- [CryptoError.TagLength](#taglength-case) -- `tag` is not `TagSize` long
+- [CryptoError.Parameter](#parameter-case) -- `plaintext` is longer than the 256 GiB the counter covers
 
 **See also** &nbsp; [ChaCha20Poly1305.Decrypt](#decrypt-method)
 
@@ -954,17 +954,17 @@ The plaintext, or `AuthenticationFailed` and nothing.
 
 **Parameters**
 
-- `nonce` — the one the message was enciphered under
-- `ciphertext` — the message to open
-- `associatedData` — the same bytes the sender authenticated
-- `tag` — the tag the sender sent
+- `nonce` -- the one the message was enciphered under
+- `ciphertext` -- the message to open
+- `associatedData` -- the same bytes the sender authenticated
+- `tag` -- the tag the sender sent
 
 **Fails with**
 
-- [CryptoError.NonceLength](#noncelength-case) — `nonce` is not twelve bytes
-- [CryptoError.TagLength](#taglength-case) — `tag` is not `TagSize` long
-- [CryptoError.Parameter](#parameter-case) — `ciphertext` is longer than the counter covers
-- [CryptoError.AuthenticationFailed](#authenticationfailed-case) — the tag does not match, and no plaintext is returned
+- [CryptoError.NonceLength](#noncelength-case) -- `nonce` is not twelve bytes
+- [CryptoError.TagLength](#taglength-case) -- `tag` is not `TagSize` long
+- [CryptoError.Parameter](#parameter-case) -- `ciphertext` is longer than the counter covers
+- [CryptoError.AuthenticationFailed](#authenticationfailed-case) -- the tag does not match, and no plaintext is returned
 
 **See also** &nbsp; [ChaCha20Poly1305.Encrypt](#encrypt-method)
 
@@ -1357,7 +1357,7 @@ The curve named by `oidValue`, supported or not.
 
 **Parameters**
 
-- `oidValue` — a dotted object identifier, as a certificate carries it
+- `oidValue` -- a dotted object identifier, as a certificate carries it
 
 **See also** &nbsp; [ECCurve.CreateFromFriendlyName](#createfromfriendlyname-method)
 
@@ -1375,7 +1375,7 @@ the zero value, which names no curve.
 
 **Parameters**
 
-- `friendlyName` — what the curve is called, with its case as written here
+- `friendlyName` -- what the curve is called, with its case as written here
 
 **See also** &nbsp; [ECCurve.CreateFromValue](#createfromvalue-method)
 
@@ -1462,7 +1462,7 @@ A new key on P-256.
 
 **Fails with**
 
-- [CryptoError.NoEntropy](#noentropy-case) — the platform supplied no random bytes
+- [CryptoError.NoEntropy](#noentropy-case) -- the platform supplied no random bytes
 
 <sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:57](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L57)</sub>
 
@@ -1476,12 +1476,12 @@ A new key on `curve`.
 
 **Parameters**
 
-- `curve` — P-256 or P-384
+- `curve` -- P-256 or P-384
 
 **Fails with**
 
-- [CryptoError.Unsupported](#unsupported-case) — `curve` is another curve
-- [CryptoError.NoEntropy](#noentropy-case) — the platform supplied no random bytes
+- [CryptoError.Unsupported](#unsupported-case) -- `curve` is another curve
+- [CryptoError.NoEntropy](#noentropy-case) -- the platform supplied no random bytes
 
 <sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:65](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L65)</sub>
 
@@ -1496,13 +1496,13 @@ otherwise.
 
 **Parameters**
 
-- `parameters` — the curve, the point and perhaps the scalar
+- `parameters` -- the curve, the point and perhaps the scalar
 
 **Fails with**
 
-- [CryptoError.Unsupported](#unsupported-case) — the curve is not P-256 or P-384
-- [CryptoError.InvalidPoint](#invalidpoint-case) — the point is not on the curve
-- [CryptoError.InvalidKey](#invalidkey-case) — the scalar is not in `[1, n - 1]` or does not give the point
+- [CryptoError.Unsupported](#unsupported-case) -- the curve is not P-256 or P-384
+- [CryptoError.InvalidPoint](#invalidpoint-case) -- the point is not on the curve
+- [CryptoError.InvalidKey](#invalidkey-case) -- the scalar is not in `[1, n - 1]` or does not give the point
 
 <sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:81](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L81)</sub>
 
@@ -1538,13 +1538,13 @@ key is unchanged.
 
 **Parameters**
 
-- `parameters` — the curve, the point and perhaps the scalar
+- `parameters` -- the curve, the point and perhaps the scalar
 
 **Fails with**
 
-- [CryptoError.Unsupported](#unsupported-case) — the curve is not P-256 or P-384
-- [CryptoError.InvalidPoint](#invalidpoint-case) — the point is not on the curve
-- [CryptoError.InvalidKey](#invalidkey-case) — the scalar is not in `[1, n - 1]` or does not give the point
+- [CryptoError.Unsupported](#unsupported-case) -- the curve is not P-256 or P-384
+- [CryptoError.InvalidPoint](#invalidpoint-case) -- the point is not on the curve
+- [CryptoError.InvalidKey](#invalidkey-case) -- the scalar is not in `[1, n - 1]` or does not give the point
 
 <sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:104](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L104)</sub>
 
@@ -1558,11 +1558,11 @@ The key's numbers.
 
 **Parameters**
 
-- `includePrivateParameters` — whether to include `D`
+- `includePrivateParameters` -- whether to include `D`
 
 **Fails with**
 
-- [CryptoError.InvalidKey](#invalidkey-case) — `D` was asked for and this is a public key
+- [CryptoError.InvalidKey](#invalidkey-case) -- `D` was asked for and this is a public key
 
 <sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:117](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L117)</sub>
 
@@ -1577,12 +1577,12 @@ coordinate of `d * Q`, as wide as the field.
 
 **Parameters**
 
-- `otherPartyPublicKey` — the other party's point in SEC 1 form, on this key's curve
+- `otherPartyPublicKey` -- the other party's point in SEC 1 form, on this key's curve
 
 **Fails with**
 
-- [CryptoError.InvalidPoint](#invalidpoint-case) — the point is malformed, on another curve, or not on the curve at all
-- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key, or the result is the point at infinity
+- [CryptoError.InvalidPoint](#invalidpoint-case) -- the point is malformed, on another curve, or not on the curve at all
+- [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key, or the result is the point at infinity
 
 **See also** &nbsp; [ECDiffieHellman.PublicKey](#publickey-property)
 
@@ -1599,14 +1599,14 @@ nothing before or after it.
 
 **Parameters**
 
-- `otherPartyPublicKey` — the other party's point in SEC 1 form
-- `hashAlgorithm` — the hash
+- `otherPartyPublicKey` -- the other party's point in SEC 1 form
+- `hashAlgorithm` -- the hash
 
 **Fails with**
 
-- [CryptoError.InvalidPoint](#invalidpoint-case) — the point does not check
-- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key, or the result is infinity
-- [CryptoError.Unsupported](#unsupported-case) — `hashAlgorithm` is the zero value
+- [CryptoError.InvalidPoint](#invalidpoint-case) -- the point does not check
+- [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key, or the result is infinity
+- [CryptoError.Unsupported](#unsupported-case) -- `hashAlgorithm` is the zero value
 
 <sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:143](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L143)</sub>
 
@@ -1621,16 +1621,16 @@ Result<byte[], CryptoError> DeriveKeyFromHash(ReadOnlySpan<byte> otherPartyPubli
 
 **Parameters**
 
-- `otherPartyPublicKey` — the other party's point in SEC 1 form
-- `hashAlgorithm` — the hash
-- `secretPrepend` — what to hash before the secret
-- `secretAppend` — what to hash after it
+- `otherPartyPublicKey` -- the other party's point in SEC 1 form
+- `hashAlgorithm` -- the hash
+- `secretPrepend` -- what to hash before the secret
+- `secretAppend` -- what to hash after it
 
 **Fails with**
 
-- [CryptoError.InvalidPoint](#invalidpoint-case) — the point does not check
-- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key, or the result is infinity
-- [CryptoError.Unsupported](#unsupported-case) — `hashAlgorithm` is the zero value
+- [CryptoError.InvalidPoint](#invalidpoint-case) -- the point does not check
+- [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key, or the result is infinity
+- [CryptoError.Unsupported](#unsupported-case) -- `hashAlgorithm` is the zero value
 
 <sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:157](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L157)</sub>
 
@@ -1644,15 +1644,15 @@ HMAC under `hmacKey` over the shared secret.
 
 **Parameters**
 
-- `otherPartyPublicKey` — the other party's point in SEC 1 form
-- `hashAlgorithm` — the hash under the HMAC
-- `hmacKey` — the HMAC key
+- `otherPartyPublicKey` -- the other party's point in SEC 1 form
+- `hashAlgorithm` -- the hash under the HMAC
+- `hmacKey` -- the HMAC key
 
 **Fails with**
 
-- [CryptoError.InvalidPoint](#invalidpoint-case) — the point does not check
-- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key, or the result is infinity
-- [CryptoError.Unsupported](#unsupported-case) — `hashAlgorithm` is the zero value
+- [CryptoError.InvalidPoint](#invalidpoint-case) -- the point does not check
+- [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key, or the result is infinity
+- [CryptoError.Unsupported](#unsupported-case) -- `hashAlgorithm` is the zero value
 
 <sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:184](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L184)</sub>
 
@@ -1667,17 +1667,17 @@ HMAC under `hmacKey` over `secretPrepend`, the shared secret and
 
 **Parameters**
 
-- `otherPartyPublicKey` — the other party's point in SEC 1 form
-- `hashAlgorithm` — the hash under the HMAC
-- `hmacKey` — the HMAC key
-- `secretPrepend` — what to authenticate before the secret
-- `secretAppend` — what to authenticate after it
+- `otherPartyPublicKey` -- the other party's point in SEC 1 form
+- `hashAlgorithm` -- the hash under the HMAC
+- `hmacKey` -- the HMAC key
+- `secretPrepend` -- what to authenticate before the secret
+- `secretAppend` -- what to authenticate after it
 
 **Fails with**
 
-- [CryptoError.InvalidPoint](#invalidpoint-case) — the point does not check
-- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key, or the result is infinity
-- [CryptoError.Unsupported](#unsupported-case) — `hashAlgorithm` is the zero value
+- [CryptoError.InvalidPoint](#invalidpoint-case) -- the point does not check
+- [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key, or the result is infinity
+- [CryptoError.Unsupported](#unsupported-case) -- `hashAlgorithm` is the zero value
 
 <sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:200](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L200)</sub>
 
@@ -1692,15 +1692,15 @@ Replaces the key with the public key in an RFC 5480
 
 **Parameters**
 
-- `source` — the DER, perhaps with more after it
+- `source` -- the DER, perhaps with more after it
 
 **Returns** &nbsp; how many bytes of `source` the structure took
 
 **Fails with**
 
-- [CryptoError.Encoding](#encoding-case) — not a `SubjectPublicKeyInfo` for an EC key
-- [CryptoError.Unsupported](#unsupported-case) — a curve other than P-256 and P-384
-- [CryptoError.InvalidPoint](#invalidpoint-case) — the point is not on the curve
+- [CryptoError.Encoding](#encoding-case) -- not a `SubjectPublicKeyInfo` for an EC key
+- [CryptoError.Unsupported](#unsupported-case) -- a curve other than P-256 and P-384
+- [CryptoError.InvalidPoint](#invalidpoint-case) -- the point is not on the curve
 
 <sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:231](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L231)</sub>
 
@@ -1735,16 +1735,16 @@ which MUST name its curve. On failure the key is unchanged.
 
 **Parameters**
 
-- `source` — the DER, perhaps with more after it
+- `source` -- the DER, perhaps with more after it
 
 **Returns** &nbsp; how many bytes of `source` the structure took
 
 **Fails with**
 
-- [CryptoError.Encoding](#encoding-case) — not an `ECPrivateKey`, or one with no curve
-- [CryptoError.Unsupported](#unsupported-case) — a curve other than P-256 and P-384
-- [CryptoError.InvalidKey](#invalidkey-case) — the scalar is not in `[1, n - 1]`, or does not give the public point beside it
-- [CryptoError.InvalidPoint](#invalidpoint-case) — the public point is not on the curve
+- [CryptoError.Encoding](#encoding-case) -- not an `ECPrivateKey`, or one with no curve
+- [CryptoError.Unsupported](#unsupported-case) -- a curve other than P-256 and P-384
+- [CryptoError.InvalidKey](#invalidkey-case) -- the scalar is not in `[1, n - 1]`, or does not give the public point beside it
+- [CryptoError.InvalidPoint](#invalidpoint-case) -- the public point is not on the curve
 
 <sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:257](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L257)</sub>
 
@@ -1758,7 +1758,7 @@ The private key as an RFC 5915 `ECPrivateKey`, in DER.
 
 **Fails with**
 
-- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
+- [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key
 
 <sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:269](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L269)</sub>
 
@@ -1772,7 +1772,7 @@ The private key as an `EC PRIVATE KEY` PEM block.
 
 **Fails with**
 
-- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
+- [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key
 
 <sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:274](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L274)</sub>
 
@@ -1787,16 +1787,16 @@ Replaces the key with the private key in an unencrypted PKCS #8
 
 **Parameters**
 
-- `source` — the DER, perhaps with more after it
+- `source` -- the DER, perhaps with more after it
 
 **Returns** &nbsp; how many bytes of `source` the structure took
 
 **Fails with**
 
-- [CryptoError.Encoding](#encoding-case) — not a `PrivateKeyInfo` for an EC key
-- [CryptoError.Unsupported](#unsupported-case) — a curve other than P-256 and P-384
-- [CryptoError.InvalidKey](#invalidkey-case) — the scalar is not in `[1, n - 1]`, or does not give the public point beside it
-- [CryptoError.InvalidPoint](#invalidpoint-case) — the public point is not on the curve
+- [CryptoError.Encoding](#encoding-case) -- not a `PrivateKeyInfo` for an EC key
+- [CryptoError.Unsupported](#unsupported-case) -- a curve other than P-256 and P-384
+- [CryptoError.InvalidKey](#invalidkey-case) -- the scalar is not in `[1, n - 1]`, or does not give the public point beside it
+- [CryptoError.InvalidPoint](#invalidpoint-case) -- the public point is not on the curve
 
 <sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:292](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L292)</sub>
 
@@ -1810,7 +1810,7 @@ The private key as an unencrypted PKCS #8 `PrivateKeyInfo`, in DER.
 
 **Fails with**
 
-- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
+- [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key
 
 <sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:304](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L304)</sub>
 
@@ -1824,7 +1824,7 @@ The private key as a `PRIVATE KEY` PEM block.
 
 **Fails with**
 
-- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
+- [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key
 
 <sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:309](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L309)</sub>
 
@@ -1840,13 +1840,13 @@ over. On failure the key is unchanged.
 
 **Parameters**
 
-- `input` — PEM text
+- `input` -- PEM text
 
 **Fails with**
 
-- [CryptoError.Encoding](#encoding-case) — no such block, or one whose contents are not what its label says
-- [CryptoError.Unsupported](#unsupported-case) — an encrypted key, or a curve other than P-256 and P-384
-- [CryptoError.InvalidKey](#invalidkey-case) — the key does not check
+- [CryptoError.Encoding](#encoding-case) -- no such block, or one whose contents are not what its label says
+- [CryptoError.Unsupported](#unsupported-case) -- an encrypted key, or a curve other than P-256 and P-384
+- [CryptoError.InvalidKey](#invalidkey-case) -- the key does not check
 
 <sub>[stdlib/Security/Cryptography/ECDiffieHellman.sl:327](../../stdlib/Security/Cryptography/ECDiffieHellman.sl#L327)</sub>
 
@@ -1897,7 +1897,7 @@ A new key on P-256.
 
 **Fails with**
 
-- [CryptoError.NoEntropy](#noentropy-case) — the platform supplied no random bytes
+- [CryptoError.NoEntropy](#noentropy-case) -- the platform supplied no random bytes
 
 <sub>[stdlib/Security/Cryptography/ECDsa.sl:66](../../stdlib/Security/Cryptography/ECDsa.sl#L66)</sub>
 
@@ -1911,12 +1911,12 @@ A new key on `curve`.
 
 **Parameters**
 
-- `curve` — P-256 or P-384
+- `curve` -- P-256 or P-384
 
 **Fails with**
 
-- [CryptoError.Unsupported](#unsupported-case) — `curve` is another curve
-- [CryptoError.NoEntropy](#noentropy-case) — the platform supplied no random bytes
+- [CryptoError.Unsupported](#unsupported-case) -- `curve` is another curve
+- [CryptoError.NoEntropy](#noentropy-case) -- the platform supplied no random bytes
 
 <sub>[stdlib/Security/Cryptography/ECDsa.sl:73](../../stdlib/Security/Cryptography/ECDsa.sl#L73)</sub>
 
@@ -1931,13 +1931,13 @@ otherwise.
 
 **Parameters**
 
-- `parameters` — the curve, the point and perhaps the scalar
+- `parameters` -- the curve, the point and perhaps the scalar
 
 **Fails with**
 
-- [CryptoError.Unsupported](#unsupported-case) — the curve is not P-256 or P-384
-- [CryptoError.InvalidPoint](#invalidpoint-case) — the point is not on the curve
-- [CryptoError.InvalidKey](#invalidkey-case) — the scalar is not in `[1, n - 1]` or does not give the point
+- [CryptoError.Unsupported](#unsupported-case) -- the curve is not P-256 or P-384
+- [CryptoError.InvalidPoint](#invalidpoint-case) -- the point is not on the curve
+- [CryptoError.InvalidKey](#invalidkey-case) -- the scalar is not in `[1, n - 1]` or does not give the point
 
 <sub>[stdlib/Security/Cryptography/ECDsa.sl:89](../../stdlib/Security/Cryptography/ECDsa.sl#L89)</sub>
 
@@ -1962,13 +1962,13 @@ key is unchanged.
 
 **Parameters**
 
-- `parameters` — the curve, the point and perhaps the scalar
+- `parameters` -- the curve, the point and perhaps the scalar
 
 **Fails with**
 
-- [CryptoError.Unsupported](#unsupported-case) — the curve is not P-256 or P-384
-- [CryptoError.InvalidPoint](#invalidpoint-case) — the point is not on the curve
-- [CryptoError.InvalidKey](#invalidkey-case) — the scalar is not in `[1, n - 1]` or does not give the point
+- [CryptoError.Unsupported](#unsupported-case) -- the curve is not P-256 or P-384
+- [CryptoError.InvalidPoint](#invalidpoint-case) -- the point is not on the curve
+- [CryptoError.InvalidKey](#invalidkey-case) -- the scalar is not in `[1, n - 1]` or does not give the point
 
 <sub>[stdlib/Security/Cryptography/ECDsa.sl:108](../../stdlib/Security/Cryptography/ECDsa.sl#L108)</sub>
 
@@ -1982,11 +1982,11 @@ The key's numbers.
 
 **Parameters**
 
-- `includePrivateParameters` — whether to include `D`
+- `includePrivateParameters` -- whether to include `D`
 
 **Fails with**
 
-- [CryptoError.InvalidKey](#invalidkey-case) — `D` was asked for and this is a public key
+- [CryptoError.InvalidKey](#invalidkey-case) -- `D` was asked for and this is a public key
 
 <sub>[stdlib/Security/Cryptography/ECDsa.sl:121](../../stdlib/Security/Cryptography/ECDsa.sl#L121)</sub>
 
@@ -2003,11 +2003,11 @@ SHA-256, SHA-384 or SHA-512 — and the curve's own for any other length.
 
 **Parameters**
 
-- `hash` — the digest of the message
+- `hash` -- the digest of the message
 
 **Fails with**
 
-- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
+- [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key
 
 **See also** &nbsp; [ECDsa.VerifyHash](#verifyhash-method)
 
@@ -2023,12 +2023,12 @@ The signature of a hash already computed, in `signatureFormat`.
 
 **Parameters**
 
-- `hash` — the digest of the message
-- `signatureFormat` — how to lay out `r` and `s`
+- `hash` -- the digest of the message
+- `signatureFormat` -- how to lay out `r` and `s`
 
 **Fails with**
 
-- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
+- [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key
 
 <sub>[stdlib/Security/Cryptography/ECDsa.sl:142](../../stdlib/Security/Cryptography/ECDsa.sl#L142)</sub>
 
@@ -2042,13 +2042,13 @@ The signature of `data` hashed with `hashAlgorithm`, as `r` then `s`.
 
 **Parameters**
 
-- `data` — the message
-- `hashAlgorithm` — the hash, which the nonce's HMAC uses too
+- `data` -- the message
+- `hashAlgorithm` -- the hash, which the nonce's HMAC uses too
 
 **Fails with**
 
-- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
-- [CryptoError.Unsupported](#unsupported-case) — `hashAlgorithm` is the zero value
+- [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key
+- [CryptoError.Unsupported](#unsupported-case) -- `hashAlgorithm` is the zero value
 
 **See also** &nbsp; [ECDsa.VerifyData](#verifydata-method)
 
@@ -2065,14 +2065,14 @@ The signature of `data` hashed with `hashAlgorithm`, in
 
 **Parameters**
 
-- `data` — the message
-- `hashAlgorithm` — the hash, which the nonce's HMAC uses too
-- `signatureFormat` — how to lay out `r` and `s`
+- `data` -- the message
+- `hashAlgorithm` -- the hash, which the nonce's HMAC uses too
+- `signatureFormat` -- how to lay out `r` and `s`
 
 **Fails with**
 
-- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
-- [CryptoError.Unsupported](#unsupported-case) — `hashAlgorithm` is the zero value
+- [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key
+- [CryptoError.Unsupported](#unsupported-case) -- `hashAlgorithm` is the zero value
 
 <sub>[stdlib/Security/Cryptography/ECDsa.sl:186](../../stdlib/Security/Cryptography/ECDsa.sl#L186)</sub>
 
@@ -2086,8 +2086,8 @@ Whether `signature`, as `r` then `s`, signs `hash` under this key.
 
 **Parameters**
 
-- `hash` — the digest of the message
-- `signature` — `r` then `s`, each as wide as the order
+- `hash` -- the digest of the message
+- `signature` -- `r` then `s`, each as wide as the order
 
 <sub>[stdlib/Security/Cryptography/ECDsa.sl:212](../../stdlib/Security/Cryptography/ECDsa.sl#L212)</sub>
 
@@ -2102,9 +2102,9 @@ under this key.
 
 **Parameters**
 
-- `hash` — the digest of the message
-- `signature` — the signature
-- `signatureFormat` — how `r` and `s` are laid out
+- `hash` -- the digest of the message
+- `signature` -- the signature
+- `signatureFormat` -- how `r` and `s` are laid out
 
 <sub>[stdlib/Security/Cryptography/ECDsa.sl:221](../../stdlib/Security/Cryptography/ECDsa.sl#L221)</sub>
 
@@ -2119,9 +2119,9 @@ Whether `signature`, as `r` then `s`, signs `data` hashed with
 
 **Parameters**
 
-- `data` — the message
-- `signature` — `r` then `s`, each as wide as the order
-- `hashAlgorithm` — the hash the signer used
+- `data` -- the message
+- `signature` -- `r` then `s`, each as wide as the order
+- `hashAlgorithm` -- the hash the signer used
 
 <sub>[stdlib/Security/Cryptography/ECDsa.sl:248](../../stdlib/Security/Cryptography/ECDsa.sl#L248)</sub>
 
@@ -2136,10 +2136,10 @@ hashed with `hashAlgorithm`.
 
 **Parameters**
 
-- `data` — the message
-- `signature` — the signature
-- `hashAlgorithm` — the hash the signer used
-- `signatureFormat` — how `r` and `s` are laid out
+- `data` -- the message
+- `signature` -- the signature
+- `hashAlgorithm` -- the hash the signer used
+- `signatureFormat` -- how `r` and `s` are laid out
 
 <sub>[stdlib/Security/Cryptography/ECDsa.sl:260](../../stdlib/Security/Cryptography/ECDsa.sl#L260)</sub>
 
@@ -2154,7 +2154,7 @@ the fixed-width form, and 72 or 104 for DER.
 
 **Parameters**
 
-- `signatureFormat` — the layout
+- `signatureFormat` -- the layout
 
 <sub>[stdlib/Security/Cryptography/ECDsa.sl:274](../../stdlib/Security/Cryptography/ECDsa.sl#L274)</sub>
 
@@ -2169,15 +2169,15 @@ Replaces the key with the public key in an RFC 5480
 
 **Parameters**
 
-- `source` — the DER, perhaps with more after it
+- `source` -- the DER, perhaps with more after it
 
 **Returns** &nbsp; how many bytes of `source` the structure took
 
 **Fails with**
 
-- [CryptoError.Encoding](#encoding-case) — not a `SubjectPublicKeyInfo` for an EC key
-- [CryptoError.Unsupported](#unsupported-case) — a curve other than P-256 and P-384
-- [CryptoError.InvalidPoint](#invalidpoint-case) — the point is not on the curve
+- [CryptoError.Encoding](#encoding-case) -- not a `SubjectPublicKeyInfo` for an EC key
+- [CryptoError.Unsupported](#unsupported-case) -- a curve other than P-256 and P-384
+- [CryptoError.InvalidPoint](#invalidpoint-case) -- the point is not on the curve
 
 <sub>[stdlib/Security/Cryptography/ECDsa.sl:292](../../stdlib/Security/Cryptography/ECDsa.sl#L292)</sub>
 
@@ -2212,16 +2212,16 @@ which MUST name its curve. On failure the key is unchanged.
 
 **Parameters**
 
-- `source` — the DER, perhaps with more after it
+- `source` -- the DER, perhaps with more after it
 
 **Returns** &nbsp; how many bytes of `source` the structure took
 
 **Fails with**
 
-- [CryptoError.Encoding](#encoding-case) — not an `ECPrivateKey`, or one with no curve
-- [CryptoError.Unsupported](#unsupported-case) — a curve other than P-256 and P-384
-- [CryptoError.InvalidKey](#invalidkey-case) — the scalar is not in `[1, n - 1]`, or does not give the public point beside it
-- [CryptoError.InvalidPoint](#invalidpoint-case) — the public point is not on the curve
+- [CryptoError.Encoding](#encoding-case) -- not an `ECPrivateKey`, or one with no curve
+- [CryptoError.Unsupported](#unsupported-case) -- a curve other than P-256 and P-384
+- [CryptoError.InvalidKey](#invalidkey-case) -- the scalar is not in `[1, n - 1]`, or does not give the public point beside it
+- [CryptoError.InvalidPoint](#invalidpoint-case) -- the public point is not on the curve
 
 <sub>[stdlib/Security/Cryptography/ECDsa.sl:318](../../stdlib/Security/Cryptography/ECDsa.sl#L318)</sub>
 
@@ -2235,7 +2235,7 @@ The private key as an RFC 5915 `ECPrivateKey`, in DER.
 
 **Fails with**
 
-- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
+- [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key
 
 <sub>[stdlib/Security/Cryptography/ECDsa.sl:330](../../stdlib/Security/Cryptography/ECDsa.sl#L330)</sub>
 
@@ -2249,7 +2249,7 @@ The private key as an `EC PRIVATE KEY` PEM block.
 
 **Fails with**
 
-- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
+- [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key
 
 <sub>[stdlib/Security/Cryptography/ECDsa.sl:335](../../stdlib/Security/Cryptography/ECDsa.sl#L335)</sub>
 
@@ -2264,16 +2264,16 @@ Replaces the key with the private key in an unencrypted PKCS #8
 
 **Parameters**
 
-- `source` — the DER, perhaps with more after it
+- `source` -- the DER, perhaps with more after it
 
 **Returns** &nbsp; how many bytes of `source` the structure took
 
 **Fails with**
 
-- [CryptoError.Encoding](#encoding-case) — not a `PrivateKeyInfo` for an EC key
-- [CryptoError.Unsupported](#unsupported-case) — a curve other than P-256 and P-384
-- [CryptoError.InvalidKey](#invalidkey-case) — the scalar is not in `[1, n - 1]`, or does not give the public point beside it
-- [CryptoError.InvalidPoint](#invalidpoint-case) — the public point is not on the curve
+- [CryptoError.Encoding](#encoding-case) -- not a `PrivateKeyInfo` for an EC key
+- [CryptoError.Unsupported](#unsupported-case) -- a curve other than P-256 and P-384
+- [CryptoError.InvalidKey](#invalidkey-case) -- the scalar is not in `[1, n - 1]`, or does not give the public point beside it
+- [CryptoError.InvalidPoint](#invalidpoint-case) -- the public point is not on the curve
 
 <sub>[stdlib/Security/Cryptography/ECDsa.sl:353](../../stdlib/Security/Cryptography/ECDsa.sl#L353)</sub>
 
@@ -2287,7 +2287,7 @@ The private key as an unencrypted PKCS #8 `PrivateKeyInfo`, in DER.
 
 **Fails with**
 
-- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
+- [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key
 
 <sub>[stdlib/Security/Cryptography/ECDsa.sl:365](../../stdlib/Security/Cryptography/ECDsa.sl#L365)</sub>
 
@@ -2301,7 +2301,7 @@ The private key as a `PRIVATE KEY` PEM block.
 
 **Fails with**
 
-- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
+- [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key
 
 <sub>[stdlib/Security/Cryptography/ECDsa.sl:370](../../stdlib/Security/Cryptography/ECDsa.sl#L370)</sub>
 
@@ -2317,13 +2317,13 @@ over. On failure the key is unchanged.
 
 **Parameters**
 
-- `input` — PEM text
+- `input` -- PEM text
 
 **Fails with**
 
-- [CryptoError.Encoding](#encoding-case) — no such block, or one whose contents are not what its label says
-- [CryptoError.Unsupported](#unsupported-case) — an encrypted key, or a curve other than P-256 and P-384
-- [CryptoError.InvalidKey](#invalidkey-case) — the key does not check
+- [CryptoError.Encoding](#encoding-case) -- no such block, or one whose contents are not what its label says
+- [CryptoError.Unsupported](#unsupported-case) -- an encrypted key, or a curve other than P-256 and P-384
+- [CryptoError.InvalidKey](#invalidkey-case) -- the key does not check
 
 <sub>[stdlib/Security/Cryptography/ECDsa.sl:388](../../stdlib/Security/Cryptography/ECDsa.sl#L388)</sub>
 
@@ -2515,11 +2515,11 @@ The public key that goes with `privateKey`.
 
 **Parameters**
 
-- `privateKey` — the 32-byte seed
+- `privateKey` -- the 32-byte seed
 
 **Fails with**
 
-- [CryptoError.KeyLength](#keylength-case) — `privateKey` is not `PrivateKeySize` long
+- [CryptoError.KeyLength](#keylength-case) -- `privateKey` is not `PrivateKeySize` long
 
 <sub>[stdlib/Security/Cryptography/Ed25519.sl:84](../../stdlib/Security/Cryptography/Ed25519.sl#L84)</sub>
 
@@ -2533,12 +2533,12 @@ The 64-byte signature of `message` under `privateKey`.
 
 **Parameters**
 
-- `privateKey` — the 32-byte seed
-- `message` — the bytes to sign, of any length
+- `privateKey` -- the 32-byte seed
+- `message` -- the bytes to sign, of any length
 
 **Fails with**
 
-- [CryptoError.KeyLength](#keylength-case) — `privateKey` is not `PrivateKeySize` long
+- [CryptoError.KeyLength](#keylength-case) -- `privateKey` is not `PrivateKeySize` long
 
 **See also** &nbsp; [Ed25519.Verify](#verify-method)
 
@@ -2559,9 +2559,9 @@ the type's own documentation says what that means.
 
 **Parameters**
 
-- `publicKey` — the signer's 32-byte key
-- `message` — the bytes that were signed
-- `signature` — the 64 bytes `Sign` produced
+- `publicKey` -- the signer's 32-byte key
+- `message` -- the bytes that were signed
+- `signature` -- the 64 bytes `Sign` produced
 
 **Returns** &nbsp; true only for a valid signature
 
@@ -2746,7 +2746,7 @@ A fresh hash of this kind, to append to or to key an `Hmac` with.
 
 **Fails with**
 
-- [CryptoError.Unsupported](#unsupported-case) — this is the zero value
+- [CryptoError.Unsupported](#unsupported-case) -- this is the zero value
 
 <sub>[stdlib/Security/Cryptography/HashAlgorithmName.sl:116](../../stdlib/Security/Cryptography/HashAlgorithmName.sl#L116)</sub>
 
@@ -2817,9 +2817,9 @@ not uniform. `salt` may be empty, and then a block of zeros is used.
 
 **Parameters**
 
-- `hash` — the HMAC's inner hash
-- `inputKey` — the secret that is random but not uniform
-- `salt` — a non-secret value, or empty for a block of zeros
+- `hash` -- the HMAC's inner hash
+- `inputKey` -- the secret that is random but not uniform
+- `salt` -- a non-secret value, or empty for a block of zeros
 
 **See also** &nbsp; [Hkdf.Expand](#expand-method)
 
@@ -2839,14 +2839,14 @@ makes this worth using over a bare hash.
 
 **Parameters**
 
-- `hash` — the HMAC's inner hash, the same one `Extract` used
-- `pseudoKey` — what `Extract` answered
-- `info` — what separates one derived key from another
-- `length` — how many bytes to derive, at most 255 digests' worth
+- `hash` -- the HMAC's inner hash, the same one `Extract` used
+- `pseudoKey` -- what `Extract` answered
+- `info` -- what separates one derived key from another
+- `length` -- how many bytes to derive, at most 255 digests' worth
 
 **Fails with**
 
-- [CryptoError.Parameter](#parameter-case) — `length` is zero, or past 255 times the digest size
+- [CryptoError.Parameter](#parameter-case) -- `length` is zero, or past 255 times the digest size
 
 **See also** &nbsp; [Hkdf.Extract](#extract-method)
 
@@ -2862,15 +2862,15 @@ Extract and expand together, which is how HKDF is nearly always used.
 
 **Parameters**
 
-- `hash` — the HMAC's inner hash
-- `inputKey` — the secret that is random but not uniform
-- `salt` — a non-secret value, or empty for a block of zeros
-- `info` — what separates one derived key from another
-- `length` — how many bytes to derive, at most 255 digests' worth
+- `hash` -- the HMAC's inner hash
+- `inputKey` -- the secret that is random but not uniform
+- `salt` -- a non-secret value, or empty for a block of zeros
+- `info` -- what separates one derived key from another
+- `length` -- how many bytes to derive, at most 255 digests' worth
 
 **Fails with**
 
-- [CryptoError.Parameter](#parameter-case) — `length` is zero, or past 255 times the digest size
+- [CryptoError.Parameter](#parameter-case) -- `length` is zero, or past 255 times the digest size
 
 **See also** &nbsp; [Hkdf.Extract](#extract-method) &middot; [Hkdf.Expand](#expand-method)
 
@@ -3343,7 +3343,7 @@ The first well-formed block in `text`.
 
 **Parameters**
 
-- `text` — where to look
+- `text` -- where to look
 
 **Returns** &nbsp; the block, or `None` when there is no well-formed one
 
@@ -3367,8 +3367,8 @@ base64 in the standard alphabet, padded, with whitespace anywhere.
 
 **Parameters**
 
-- `text` — where to look
-- `start` — the byte to look from; past the end finds nothing
+- `text` -- where to look
+- `start` -- the byte to look from; past the end finds nothing
 
 **Returns** &nbsp; the block, or `None` when there is no well-formed one
 
@@ -3385,8 +3385,8 @@ separated by `\n`. No newline follows the `END` boundary.
 
 **Parameters**
 
-- `label` — what the data is; MUST be valid, which `IsValidLabel` answers, and aborts when it is not
-- `data` — the bytes to encode, usually DER
+- `label` -- what the data is; MUST be valid, which `IsValidLabel` answers, and aborts when it is not
+- `data` -- the bytes to encode, usually DER
 
 **See also** &nbsp; [PemEncoding.Find](#find-method)
 
@@ -3527,7 +3527,7 @@ have been used before.
 
 **Fails with**
 
-- [CryptoError.KeyLength](#keylength-case) — `key` is not 32 bytes
+- [CryptoError.KeyLength](#keylength-case) -- `key` is not 32 bytes
 
 <sub>[stdlib/Security/Cryptography/Poly1305.sl:89](../../stdlib/Security/Cryptography/Poly1305.sl#L89)</sub>
 
@@ -3541,12 +3541,12 @@ The tag of `message` under `key`, with no object to keep.
 
 **Parameters**
 
-- `key` — thirty-two bytes, used for this message only
-- `message` — what to authenticate
+- `key` -- thirty-two bytes, used for this message only
+- `message` -- what to authenticate
 
 **Fails with**
 
-- [CryptoError.KeyLength](#keylength-case) — `key` is not 32 bytes
+- [CryptoError.KeyLength](#keylength-case) -- `key` is not 32 bytes
 
 <sub>[stdlib/Security/Cryptography/Poly1305.sl:101](../../stdlib/Security/Cryptography/Poly1305.sl#L101)</sub>
 
@@ -3664,15 +3664,15 @@ job is to make one attack per password rather than one per database.
 
 **Parameters**
 
-- `password` — the secret to stretch
-- `salt` — at least sixteen random bytes, stored beside the result
-- `iterations` — how many HMAC passes; the whole security argument
-- `hash` — the HMAC's inner hash, `new Sha256()` for the usual answer
-- `length` — how many bytes to derive
+- `password` -- the secret to stretch
+- `salt` -- at least sixteen random bytes, stored beside the result
+- `iterations` -- how many HMAC passes; the whole security argument
+- `hash` -- the HMAC's inner hash, `new Sha256()` for the usual answer
+- `length` -- how many bytes to derive
 
 **Fails with**
 
-- [CryptoError.Parameter](#parameter-case) — `iterations` or `length` is zero
+- [CryptoError.Parameter](#parameter-case) -- `iterations` or `length` is zero
 
 **See also** &nbsp; [Argon2id](#argon2id-class) &middot; [Scrypt](#scrypt-class)
 
@@ -3767,12 +3767,12 @@ time, `d` included.
 
 **Parameters**
 
-- `keySizeInBits` — a multiple of 64 from 512 to 16384; 2048 or more for anything new
+- `keySizeInBits` -- a multiple of 64 from 512 to 16384; 2048 or more for anything new
 
 **Fails with**
 
-- [CryptoError.KeyLength](#keylength-case) — `keySizeInBits` is not a size this makes
-- [CryptoError.NoEntropy](#noentropy-case) — the platform would not supply randomness
+- [CryptoError.KeyLength](#keylength-case) -- `keySizeInBits` is not a size this makes
+- [CryptoError.NoEntropy](#noentropy-case) -- the platform would not supply randomness
 
 <sub>[stdlib/Security/Cryptography/Rsa.sl:115](../../stdlib/Security/Cryptography/Rsa.sl#L115)</sub>
 
@@ -3792,11 +3792,11 @@ signature from a CRT key is enough to factor its modulus.
 
 **Parameters**
 
-- `parameters` — the numbers, big-endian; leading zeros are ignored
+- `parameters` -- the numbers, big-endian; leading zeros are ignored
 
 **Fails with**
 
-- [CryptoError.InvalidKey](#invalidkey-case) — a number is missing, out of range or inconsistent with the others
+- [CryptoError.InvalidKey](#invalidkey-case) -- a number is missing, out of range or inconsistent with the others
 
 **See also** &nbsp; [Rsa.ExportParameters](#exportparameters-method)
 
@@ -3816,11 +3816,11 @@ zeros where the number is shorter. `Exponent` has none.
 
 **Parameters**
 
-- `includePrivateParameters` — whether to include the six private numbers
+- `includePrivateParameters` -- whether to include the six private numbers
 
 **Fails with**
 
-- [CryptoError.InvalidKey](#invalidkey-case) — the private numbers were asked for, and this is a public key
+- [CryptoError.InvalidKey](#invalidkey-case) -- the private numbers were asked for, and this is a public key
 
 **See also** &nbsp; [Rsa.Create](#create-method)
 
@@ -3846,7 +3846,7 @@ The private key as a PKCS #1 `RSAPrivateKey` (RFC 8017 §A.1.2), DER.
 
 **Fails with**
 
-- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
+- [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key
 
 <sub>[stdlib/Security/Cryptography/Rsa.sl:348](../../stdlib/Security/Cryptography/Rsa.sl#L348)</sub>
 
@@ -3872,7 +3872,7 @@ DER: what `PRIVATE KEY` PEM holds.
 
 **Fails with**
 
-- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
+- [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key
 
 <sub>[stdlib/Security/Cryptography/Rsa.sl:377](../../stdlib/Security/Cryptography/Rsa.sl#L377)</sub>
 
@@ -3886,12 +3886,12 @@ A key from a PKCS #1 `RSAPublicKey`, DER.
 
 **Parameters**
 
-- `source` — exactly one DER value
+- `source` -- exactly one DER value
 
 **Fails with**
 
-- [CryptoError.Encoding](#encoding-case) — `source` is not one `RSAPublicKey`
-- [CryptoError.InvalidKey](#invalidkey-case) — the numbers are not an RSA key
+- [CryptoError.Encoding](#encoding-case) -- `source` is not one `RSAPublicKey`
+- [CryptoError.InvalidKey](#invalidkey-case) -- the numbers are not an RSA key
 
 <sub>[stdlib/Security/Cryptography/Rsa.sl:401](../../stdlib/Security/Cryptography/Rsa.sl#L401)</sub>
 
@@ -3905,13 +3905,13 @@ A key from a PKCS #1 `RSAPrivateKey`, DER.
 
 **Parameters**
 
-- `source` — exactly one DER value
+- `source` -- exactly one DER value
 
 **Fails with**
 
-- [CryptoError.Encoding](#encoding-case) — `source` is not one `RSAPrivateKey`
-- [CryptoError.Unsupported](#unsupported-case) — a multi-prime key, version 1
-- [CryptoError.InvalidKey](#invalidkey-case) — the numbers are not a consistent RSA key
+- [CryptoError.Encoding](#encoding-case) -- `source` is not one `RSAPrivateKey`
+- [CryptoError.Unsupported](#unsupported-case) -- a multi-prime key, version 1
+- [CryptoError.InvalidKey](#invalidkey-case) -- the numbers are not a consistent RSA key
 
 <sub>[stdlib/Security/Cryptography/Rsa.sl:416](../../stdlib/Security/Cryptography/Rsa.sl#L416)</sub>
 
@@ -3925,12 +3925,12 @@ A key from an X.509 `SubjectPublicKeyInfo`, DER.
 
 **Parameters**
 
-- `source` — exactly one DER value
+- `source` -- exactly one DER value
 
 **Fails with**
 
-- [CryptoError.Encoding](#encoding-case) — `source` is not one `SubjectPublicKeyInfo` holding an RSA key
-- [CryptoError.InvalidKey](#invalidkey-case) — the numbers are not an RSA key
+- [CryptoError.Encoding](#encoding-case) -- `source` is not one `SubjectPublicKeyInfo` holding an RSA key
+- [CryptoError.InvalidKey](#invalidkey-case) -- the numbers are not an RSA key
 
 <sub>[stdlib/Security/Cryptography/Rsa.sl:431](../../stdlib/Security/Cryptography/Rsa.sl#L431)</sub>
 
@@ -3946,12 +3946,12 @@ passed over.
 
 **Parameters**
 
-- `source` — exactly one DER value
+- `source` -- exactly one DER value
 
 **Fails with**
 
-- [CryptoError.Encoding](#encoding-case) — `source` is not one `PrivateKeyInfo` holding an RSA key
-- [CryptoError.InvalidKey](#invalidkey-case) — the numbers are not a consistent RSA key
+- [CryptoError.Encoding](#encoding-case) -- `source` is not one `PrivateKeyInfo` holding an RSA key
+- [CryptoError.InvalidKey](#invalidkey-case) -- the numbers are not a consistent RSA key
 
 <sub>[stdlib/Security/Cryptography/Rsa.sl:455](../../stdlib/Security/Cryptography/Rsa.sl#L455)</sub>
 
@@ -3975,7 +3975,7 @@ The private key as PKCS #1 in PEM: `-----BEGIN RSA PRIVATE KEY-----`.
 
 **Fails with**
 
-- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
+- [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key
 
 <sub>[stdlib/Security/Cryptography/Rsa.sl:607](../../stdlib/Security/Cryptography/Rsa.sl#L607)</sub>
 
@@ -3999,7 +3999,7 @@ The private key as PKCS #8 in PEM: `-----BEGIN PRIVATE KEY-----`.
 
 **Fails with**
 
-- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
+- [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key
 
 <sub>[stdlib/Security/Cryptography/Rsa.sl:622](../../stdlib/Security/Cryptography/Rsa.sl#L622)</sub>
 
@@ -4015,13 +4015,13 @@ of other kinds: `RSA PUBLIC KEY`, `RSA PRIVATE KEY`, `PUBLIC KEY` or
 
 **Parameters**
 
-- `input` — text holding exactly one key block
+- `input` -- text holding exactly one key block
 
 **Fails with**
 
-- [CryptoError.Encoding](#encoding-case) — no key block, more than one, or one that does not parse
-- [CryptoError.Unsupported](#unsupported-case) — the block is an `ENCRYPTED PRIVATE KEY`
-- [CryptoError.InvalidKey](#invalidkey-case) — the numbers are not a consistent RSA key
+- [CryptoError.Encoding](#encoding-case) -- no key block, more than one, or one that does not parse
+- [CryptoError.Unsupported](#unsupported-case) -- the block is an `ENCRYPTED PRIVATE KEY`
+- [CryptoError.InvalidKey](#invalidkey-case) -- the numbers are not a consistent RSA key
 
 <sub>[stdlib/Security/Cryptography/Rsa.sl:639](../../stdlib/Security/Cryptography/Rsa.sl#L639)</sub>
 
@@ -4035,16 +4035,16 @@ The signature of `data`'s hash.
 
 **Parameters**
 
-- `data` — what to sign; it is hashed here
-- `hashAlgorithm` — the hash, which the verifier MUST use too
-- `padding` — PKCS #1 v1.5, or PSS with its salt length
+- `data` -- what to sign; it is hashed here
+- `hashAlgorithm` -- the hash, which the verifier MUST use too
+- `padding` -- PKCS #1 v1.5, or PSS with its salt length
 
 **Fails with**
 
-- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
-- [CryptoError.Unsupported](#unsupported-case) — the hash is not one this module has
-- [CryptoError.MessageLength](#messagelength-case) — the key is too small for the hash and padding
-- [CryptoError.NoEntropy](#noentropy-case) — the platform would not supply randomness
+- [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key
+- [CryptoError.Unsupported](#unsupported-case) -- the hash is not one this module has
+- [CryptoError.MessageLength](#messagelength-case) -- the key is too small for the hash and padding
+- [CryptoError.NoEntropy](#noentropy-case) -- the platform would not supply randomness
 
 **See also** &nbsp; [Rsa.VerifyData](#verifydata-method)
 
@@ -4060,17 +4060,17 @@ The signature of a hash already computed.
 
 **Parameters**
 
-- `hash` — the digest, exactly as long as `hashAlgorithm`'s
-- `hashAlgorithm` — the hash that made it
-- `padding` — PKCS #1 v1.5, or PSS with its salt length
+- `hash` -- the digest, exactly as long as `hashAlgorithm`'s
+- `hashAlgorithm` -- the hash that made it
+- `padding` -- PKCS #1 v1.5, or PSS with its salt length
 
 **Fails with**
 
-- [CryptoError.Parameter](#parameter-case) — `hash` is not the digest's length
-- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
-- [CryptoError.Unsupported](#unsupported-case) — the hash is not one this module has
-- [CryptoError.MessageLength](#messagelength-case) — the key is too small for the hash and padding
-- [CryptoError.NoEntropy](#noentropy-case) — the platform would not supply randomness
+- [CryptoError.Parameter](#parameter-case) -- `hash` is not the digest's length
+- [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key
+- [CryptoError.Unsupported](#unsupported-case) -- the hash is not one this module has
+- [CryptoError.MessageLength](#messagelength-case) -- the key is too small for the hash and padding
+- [CryptoError.NoEntropy](#noentropy-case) -- the platform would not supply randomness
 
 **See also** &nbsp; [Rsa.VerifyHash](#verifyhash-method)
 
@@ -4089,10 +4089,10 @@ for another message is simply not valid, and an unknown hash is false.
 
 **Parameters**
 
-- `data` — what was signed
-- `signature` — the signature, as long as the modulus
-- `hashAlgorithm` — the hash the signer used
-- `padding` — the encoding the signer used
+- `data` -- what was signed
+- `signature` -- the signature, as long as the modulus
+- `hashAlgorithm` -- the hash the signer used
+- `padding` -- the encoding the signer used
 
 **See also** &nbsp; [Rsa.SignData](#signdata-method)
 
@@ -4109,10 +4109,10 @@ computed. Never fails, as `VerifyData` does not.
 
 **Parameters**
 
-- `hash` — the digest
-- `signature` — the signature, as long as the modulus
-- `hashAlgorithm` — the hash that made the digest
-- `padding` — the encoding the signer used
+- `hash` -- the digest
+- `signature` -- the signature, as long as the modulus
+- `hashAlgorithm` -- the hash that made the digest
+- `padding` -- the encoding the signer used
 
 <sub>[stdlib/Security/Cryptography/Rsa.sl:808](../../stdlib/Security/Cryptography/Rsa.sl#L808)</sub>
 
@@ -4126,14 +4126,14 @@ Result<byte[], CryptoError> Encrypt(ReadOnlySpan<byte> data, RsaEncryptionPaddin
 
 **Parameters**
 
-- `data` — at most the modulus's length less 11 bytes under PKCS #1 v1.5, or less twice the digest and 2 under OAEP
-- `padding` — OAEP with its hash and label, or PKCS #1 v1.5
+- `data` -- at most the modulus's length less 11 bytes under PKCS #1 v1.5, or less twice the digest and 2 under OAEP
+- `padding` -- OAEP with its hash and label, or PKCS #1 v1.5
 
 **Fails with**
 
-- [CryptoError.MessageLength](#messagelength-case) — `data` is too long for the key and padding
-- [CryptoError.Unsupported](#unsupported-case) — OAEP's hash is not one this module has
-- [CryptoError.NoEntropy](#noentropy-case) — the platform would not supply randomness
+- [CryptoError.MessageLength](#messagelength-case) -- `data` is too long for the key and padding
+- [CryptoError.Unsupported](#unsupported-case) -- OAEP's hash is not one this module has
+- [CryptoError.NoEntropy](#noentropy-case) -- the platform would not supply randomness
 
 **See also** &nbsp; [Rsa.Decrypt](#decrypt-method)
 
@@ -4159,16 +4159,16 @@ treat what comes back as untrusted and check it by other means.
 
 **Parameters**
 
-- `data` — the ciphertext, exactly as long as the modulus
-- `padding` — what it was encrypted with
+- `data` -- the ciphertext, exactly as long as the modulus
+- `padding` -- what it was encrypted with
 
 **Fails with**
 
-- [CryptoError.InvalidKey](#invalidkey-case) — this is a public key
-- [CryptoError.MessageLength](#messagelength-case) — `data` is not the modulus's length, or not below it
-- [CryptoError.Padding](#padding-case) — OAEP only: the ciphertext is not a valid encoding under this key and label
-- [CryptoError.Unsupported](#unsupported-case) — OAEP's hash is not one this module has
-- [CryptoError.NoEntropy](#noentropy-case) — the platform would not supply randomness
+- [CryptoError.InvalidKey](#invalidkey-case) -- this is a public key
+- [CryptoError.MessageLength](#messagelength-case) -- `data` is not the modulus's length, or not below it
+- [CryptoError.Padding](#padding-case) -- OAEP only: the ciphertext is not a valid encoding under this key and label
+- [CryptoError.Unsupported](#unsupported-case) -- OAEP's hash is not one this module has
+- [CryptoError.NoEntropy](#noentropy-case) -- the platform would not supply randomness
 
 **See also** &nbsp; [Rsa.Encrypt](#encrypt-method)
 
@@ -4295,8 +4295,8 @@ carried in the ciphertext.
 
 **Parameters**
 
-- `hashAlgorithm` — the hash for the label and for MGF1
-- `label` — any bytes, copied
+- `hashAlgorithm` -- the hash for the label and for MGF1
+- `label` -- any bytes, copied
 
 <sub>[stdlib/Security/Cryptography/RsaEncryptionPadding.sl:83](../../stdlib/Security/Cryptography/RsaEncryptionPadding.sl#L83)</sub>
 
@@ -4529,11 +4529,11 @@ PSS with a salt of `saltLength` bytes.
 
 **Parameters**
 
-- `saltLength` — bytes of salt, or `PssSaltLengthIsHashLength`, or `PssSaltLengthMax`
+- `saltLength` -- bytes of salt, or `PssSaltLengthIsHashLength`, or `PssSaltLengthMax`
 
 **Fails with**
 
-- [CryptoError.Parameter](#parameter-case) — `saltLength` is negative and neither constant
+- [CryptoError.Parameter](#parameter-case) -- `saltLength` is negative and neither constant
 
 <sub>[stdlib/Security/Cryptography/RsaSignaturePadding.sl:69](../../stdlib/Security/Cryptography/RsaSignaturePadding.sl#L69)</sub>
 
@@ -4658,16 +4658,16 @@ static Result<byte[], CryptoError> DeriveKey(ReadOnlySpan<byte> password, ReadOn
 
 **Parameters**
 
-- `password` — the secret to stretch
-- `salt` — at least sixteen random bytes, stored beside the result
-- `cost` — N, the number of blocks the memory holds; a power of two greater than one
-- `blockSize` — r, the width of a block in 128-byte units; 8 is the usual answer
-- `parallelism` — p, how many independent passes to run, one after another here
-- `length` — how many bytes to derive
+- `password` -- the secret to stretch
+- `salt` -- at least sixteen random bytes, stored beside the result
+- `cost` -- N, the number of blocks the memory holds; a power of two greater than one
+- `blockSize` -- r, the width of a block in 128-byte units; 8 is the usual answer
+- `parallelism` -- p, how many independent passes to run, one after another here
+- `length` -- how many bytes to derive
 
 **Fails with**
 
-- [CryptoError.Parameter](#parameter-case) — `cost` is not a power of two above one; `blockSize`, `parallelism` or `length` is zero; `blockSize` times `parallelism` reaches 2^30; `cost` reaches 2^(16 · `blockSize`); `length` is past (2^32 - 1) · 32; or the memory needed is past `MaxMemoryBytes`
+- [CryptoError.Parameter](#parameter-case) -- `cost` is not a power of two above one; `blockSize`, `parallelism` or `length` is zero; `blockSize` times `parallelism` reaches 2^30; `cost` reaches 2^(16 · `blockSize`); `length` is past (2^32 - 1) · 32; or the memory needed is past `MaxMemoryBytes`
 
 <sub>[stdlib/Security/Cryptography/Scrypt.sl:79](../../stdlib/Security/Cryptography/Scrypt.sl#L79)</sub>
 
@@ -4948,11 +4948,11 @@ base point, whose u-coordinate is 9.
 
 **Parameters**
 
-- `privateKey` — thirty-two bytes, clamped as they are used
+- `privateKey` -- thirty-two bytes, clamped as they are used
 
 **Fails with**
 
-- [CryptoError.KeyLength](#keylength-case) — `privateKey` is not `PrivateKeySize` long
+- [CryptoError.KeyLength](#keylength-case) -- `privateKey` is not `PrivateKeySize` long
 
 <sub>[stdlib/Security/Cryptography/X25519.sl:77](../../stdlib/Security/Cryptography/X25519.sl#L77)</sub>
 
@@ -4971,13 +4971,13 @@ and it is refused here.
 
 **Parameters**
 
-- `privateKey` — this side's key
-- `publicKey` — the peer's key; its top bit is ignored, as the RFC requires
+- `privateKey` -- this side's key
+- `publicKey` -- the peer's key; its top bit is ignored, as the RFC requires
 
 **Fails with**
 
-- [CryptoError.KeyLength](#keylength-case) — either key is not 32 bytes
-- [CryptoError.InvalidKey](#invalidkey-case) — `publicKey` is of small order, and the secret came out zero
+- [CryptoError.KeyLength](#keylength-case) -- either key is not 32 bytes
+- [CryptoError.InvalidKey](#invalidkey-case) -- `publicKey` is of small order, and the secret came out zero
 
 <sub>[stdlib/Security/Cryptography/X25519.sl:100](../../stdlib/Security/Cryptography/X25519.sl#L100)</sub>
 

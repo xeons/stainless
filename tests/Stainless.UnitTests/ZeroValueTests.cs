@@ -146,15 +146,44 @@ public class ZeroValueTests
             void Use() { int n = Blank<int>(); String s = Blank<String>(); }
             """));
 
+    /// <summary>
+    /// No module is exempt. The standard library's own collections hold
+    /// their spare capacity in slots, so a program that uses every one of
+    /// them binds with nothing reported.
+    /// </summary>
     [Fact]
-    public void TheUncheckedPairIsExempt() =>
+    public void TheCollectionsNeedNoExemption() =>
         Assert.Empty(Front.ModuleCodes("""
-            import Standard.Unchecked;
+            import Standard.Collections;
             void Use()
             {
-                String[] slots = NewUninitializedArray<String>(2u);
-                slots[0] = "a";
-                ClearElement(slots, 0u);
+                var list = new List<String>();
+                list.Add("a");
+                list.RemoveAt(0u);
+                var map = new Dictionary<String, String>();
+                map.SetValue("k", "v");
+                map.Remove("k");
+                var set = new HashSet<String>();
+                set.Add("a");
+                var queue = new Queue<String>();
+                queue.Enqueue("a");
+                queue.Dequeue();
+                var stack = new Stack<String>();
+                stack.Push("a");
+                stack.Pop();
+                var sorted = new SortedList<String, String>();
+                sorted.SetValue("k", "v");
+                var linked = new LinkedList<String>();
+                linked.AddLast("a");
+                String[] made = ["x", ..list];
+                Sort(made);
             }
+            """));
+
+    [Fact]
+    public void TheUncheckedModuleIsGone() =>
+        Assert.NotEmpty(Front.ModuleCodes("""
+            import Standard.Unchecked;
+            void Use() { }
             """));
 }

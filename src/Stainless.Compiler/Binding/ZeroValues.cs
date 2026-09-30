@@ -64,6 +64,10 @@ internal static class ZeroValues
             case FixedArrayTypeSymbol inline:
                 return FindNullInZero(inline.Element, walked, path + "[0]");
 
+            // An empty slot is its zero.
+            case SlotTypeSymbol:
+                return null;
+
             // A zero tag is the first case, with its payload zeroed.
             case VariantTypeSymbol variant:
             {

@@ -65,7 +65,9 @@ public static class Digest
     ///
     /// The library's *file name* is deliberately not in it. Renaming shapes.dll
     /// changes nothing about how the code inside it is called, and a digest that
-    /// moved when a file was renamed would cry wolf.
+    /// moved when a file was renamed would cry wolf. Nor is which build of the
+    /// shared runtime it links: a debug build and a release one describe the
+    /// same surface, and the lock file records this digest.
     /// </summary>
     public static string OfMetadata(ModuleMetadata metadata)
     {

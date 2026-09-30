@@ -15,13 +15,11 @@ dotnet build Stainless.slnx      # the compiler, which the IDE drives
 stainless build --project ide    # the IDE, on either system
 ```
 
-**The same line on both**, which it was not until
-[ide/stainless.json](stainless.json) existed. What each system needs — the
-Win32 bindings and seven libraries here, the GTK bindings and six there — is a
-platform section in the project file rather than two command lines in a page
-nobody re-reads ([packages.md §2.1](../docs/packages.md#21-what-one-platform-adds)).
-What used to be printed here for Linux was four lines of `-l` flags, and it
-drifted.
+**The same line on both**, because of [ide/stainless.json](stainless.json).
+What each system needs -- the Win32 bindings and seven libraries here, the GTK
+and Linux bindings and six libraries there -- is a platform section in the
+project file rather than two command lines in a page nobody re-reads
+([packages.md section 2.1](../docs/packages.md#21-what-one-platform-adds)).
 
 `build.ps1` is still there for what a project file does not cover, which is
 running the tests afterwards:
@@ -34,9 +32,8 @@ running the tests afterwards:
 It is a native binary with no VM, no GC and no web view — the same as anything
 else this compiler produces. The window is [forms/](../forms/README.md), the
 text is drawn by the program itself, and the whole of it is Stainless. Both
-backends render it: the Win32 one from the start, and the GTK one since the
-six faults in [forms/README.md](../forms/README.md)'s *What running it found*
-were fixed — the IDE is what found every one of them.
+backends render it. The IDE is what found the faults listed in
+[forms/README.md](../forms/README.md)'s *What running it found*.
 
 ---
 
@@ -63,12 +60,9 @@ were fixed — the IDE is what found every one of them.
   three runs rather than two, so `//` and `=>` come out whole.
 - **Build and run**, which builds the *project* when there is one, on a thread
   that is not the one drawing the window. Double-click a diagnostic and the
-  caret goes to it — which is newer than it looks, because `Control.DoubleClick`
-  was declared in `forms/` and raised by nothing until this was chased down, so
-  the click had never worked on any pane. The diagnostic is read from the
-  compiler's own JSON
+  caret goes to it. The diagnostic is read from the compiler's own JSON
   (`--diagnostics json`) rather than parsed back out of the message meant for a
-  person, which is what it used to be.
+  person.
 - **Undo and redo**, with Ctrl+Z and Ctrl+Y. Typing a word is one undo rather
   than seven: consecutive insertions merge while the caret keeps moving
   forward, and a newline, a click or a paste each start a new one. Undoing back
@@ -133,10 +127,13 @@ were fixed — the IDE is what found every one of them.
   compiler halfway through an object file has nothing to tidy that Clean will
   not do better.
 
-- **A debugger.** F9 sets a breakpoint, F5 starts, F10 and F11 step, Shift+F5
-  stops. The margin draws a disc beside each breakpoint and an arrow beside the
-  line the program is stopped on; Locals, Watch, Call Stack, Breakpoints and
-  Debug Output are five more panes in the bottom well.
+- **A debugger.** F9 sets a breakpoint, F5 starts or continues, F10, F11 and
+  Shift+F11 step over, into and out, Shift+F5 stops; a second toolbar carries
+  the same commands and Break. The margin draws a disc beside each breakpoint
+  and an arrow beside the line the program is stopped on; Locals, Watch, Call
+  Stack, Threads, Breakpoints and Debug Output are six more panes in the bottom
+  well. Double-clicking a thread goes to where it is; Locals and the Call Stack
+  stay on the thread the stop was reported on.
 
   **A breakpoint that binds elsewhere says so.** A line with no code on it --
   a blank, a comment, a brace -- resolves to the first statement at or after
@@ -148,7 +145,7 @@ were fixed — the IDE is what found every one of them.
   set before anything has been compiled.
 
   **A hover says what a local is worth.** Point at one while the program is
-  stopped and its value is on the status line. It is answered out of the stop
+  stopped and its value is in a tip and on the status line. It is answered out of the stop
   the window is already holding — the thread that may read a debuggee is the
   session's, and it is busy — so it costs nothing and cannot be asked for
   anything the Locals pane does not have.
@@ -231,12 +228,8 @@ Named honestly, since the point of the page is to say where the edges are.
   `--diagnostics json` is the first stone of it and already carries what a
   squiggle needs — a code, a place, and a length to underline — which is why
   the editor does not have to guess at any of that any more.
-- **A hover reads the status line, not a tooltip.** Pointing at a local while
-  the program is stopped shows its value in the status bar's last panel.
-  `forms/` has no tooltip control, and one is a control on two backends rather
-  than a debugger feature. It answers a local and nothing else: a field or an
-  element is an expression, and the pointer has not selected one — put it in
-  Watch.
+- **A hover answers a local and nothing else.** A field or an element is an
+  expression, and the pointer has not selected one -- put it in Watch.
 - **The debugger needs a project.** A loose file is compiled to a path the
   compiler chooses and this window never learns, so F5 asks for a project to be
   opened first.
@@ -248,11 +241,9 @@ Named honestly, since the point of the page is to say where the edges are.
   program's own unwind information, which covers the program and not `libc` or
   `kernel32`; above those the frame pointer is what there is, and a frame
   recovered that way is marked in `sldb unwind` and not in the pane.
-- **No Threads pane.** The target seam does not enumerate threads, and a
-  Stainless program has one unless it starts more.
-- **The function keys need an editor to have the focus.** `forms/` has no menu
-  shortcuts, so F5 and F9 are handled by the editor and passed up. The Debug
-  menu works from anywhere.
+- **The function keys need an editor or the designer to have the focus.**
+  `forms/` has no menu shortcuts, so F5 and F9 are handled by the control with
+  the focus and passed up. The Debug menu works from anywhere.
 - **A divider drags, imprecisely, and shows no cursor.** The well does not
   land where the pointer is, and the pointer does not change shape over a
   divider to say it can be dragged. Both are in `forms/`, where a splitter
@@ -309,6 +300,7 @@ ide/src/Build/Diagnostics.sl what the compiler said, out of its JSON
 ide/src/Shell/Layout.sl     which pane is where, and how wide -- no controls
 ide/src/Shell/DockHost.sl   the wells, the splitters and the auto-hide strips
 ide/src/App/Shell.sl        the window: menu, panes, editors, status
+ide/src/App/Icons.sl        the toolbar pictures, embedded from App/icons/
 ide/src/App/FindDialog.sl   find and replace, over whichever tab is in front
 ide/src/App/ProjectDialog.sl stainless.json, edited in four pages
 ide/src/Debug/Breakpoints.sl where to stop, as files and lines -- no controls
@@ -334,8 +326,8 @@ ide/tests/fixture/          a two-file project, which is the smallest thing
 **Several of those are modules rather than parts of the window**, and the reason is
 the same each time: `Ide.Project`, `Ide.Build`, `Ide.Designer`, `Ide.Shell`'s
 `Layout.sl` and `Ide.Debugging`'s `Breakpoints.sl` mention no control, so a console harness can
-test them without linking a widget set or opening a display. `BuildMessage` was a struct at the bottom of
-`Shell.sl` and moving it is what made `buildtest.sl` possible at all.
+test them without linking a widget set or opening a display. That is why
+`BuildMessage` lives in `Ide.Build` rather than beside the window in `Shell.sl`.
 
 `Ide.Shell` is deliberately split down that line rather than by subject: a
 layout is a list of placements and three sizes, and *that* can be checked
@@ -370,17 +362,16 @@ editor uses `GetText`, `SetText` and `HasText`. The same class carries HTML,
 pictures, files and a program's own formats, several at once through
 `ClipboardData`.
 
-**A way to close a tab.** `TabControl` could add pages and never remove one, so
-`RemovePage` is new. The interesting part is that every page after the removed
-one is renumbered — a `TabPage` remembers which tab it is behind, and leaving
-that stale would have shown up much later as renaming the wrong tab.
+**A way to close a tab.** `TabControl.RemovePage` renumbers every page after
+the removed one -- a `TabPage` remembers which tab it is behind, and leaving
+that stale would show up much later as renaming the wrong tab.
 
-`CustomControl` — a control that draws every pixel of itself and takes the
-keyboard — did not exist and now does, in
+**`CustomControl`** -- a control that draws every pixel of itself and takes the
+keyboard -- in
 [forms/src/Controls/Containers.sl](../forms/src/Controls/Containers.sl). A
 `PaintBox` draws but has no window, so nothing can give it the focus and no
 keystroke reaches it; a `Panel` has a window and gives up the focus on purpose.
-The new control has a registered window class on Win32 and a windowed
+It has a registered window class on Win32 and a windowed
 `GtkFixed` on GTK, answers `WM_GETDLGCODE` so the arrow keys and Tab reach it
 rather than moving the focus, paints through an off-screen buffer on Windows,
 and carries a caret — the system's on Win32, drawn and blinked by the peer on

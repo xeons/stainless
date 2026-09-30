@@ -387,9 +387,10 @@ writes through one is its own affair.
 
 ## 6.7 What is not there yet
 
-- **No method or interface metadata** — fields and their elements only. It is
-  what stops a reader filling a `List<T>`: the storage is private and the way
-  in is `Add`, which nothing here can call.
+- **No method or interface metadata** -- fields, properties, events and the
+  enums they name, and nothing else. It is what stops a reader filling a
+  `List<T>`: the storage is private and the way in is `Add`, which nothing here
+  can call.
 - **No enumeration of types**: `FindType` answers for a name, but nothing lists
   the types a binary holds.
 - **No slice element metadata**, for the reason above: a slice is not a reference to

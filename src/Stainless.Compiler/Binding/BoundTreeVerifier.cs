@@ -185,6 +185,11 @@ public static class BoundTreeVerifier
                     Declare(held.Local, held.Span);
                     break;
 
+                case BoundArrayFill fill:
+                    Declare(fill.MakeLocal, fill.Span);
+                    Declare(fill.AtLocal, fill.Span);
+                    break;
+
                 case BoundSwitchExpression chosen:
                     foreach (var arm in chosen.Arms)
                         if (!SameType(arm.Value.Type, chosen.Type))

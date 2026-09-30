@@ -409,6 +409,18 @@ SL_API int   sl_implements(const void *object, size_t interfaceId);
  */
 SL_API SL_NORETURN void sl_cast_failed(const void *object, const char *wanted);
 
+/*
+ * A Slot<T> read while empty, for a T with no zero value to stand in. `slot`
+ * is the type's name. Never returns.
+ */
+SL_API SL_NORETURN void sl_slot_empty(const char *slot);
+
+/*
+ * A foreign function returned null where its declaration promised a reference
+ * that is never null. Names the function and the type. Never returns.
+ */
+SL_API SL_NORETURN void sl_foreign_null(const char *function, const char *type);
+
 /* -------------------------------------------------------------------- COM */
 
 /*

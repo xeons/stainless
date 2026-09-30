@@ -31,8 +31,6 @@
 /// fill up with markers that only a rehash can clear.
 module Standard.Collections;
 
-import Standard.Unchecked;
-
 /// Aborts with a message. Used where a container is asked for something it does
 /// not have, which is a mistake in the caller rather than a value to return.
 [DoesNotReturn]
@@ -53,8 +51,8 @@ extern "C" void sl_fail(byte* message);
 public class Dictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
     where TKey : IEquatable<TKey>, IHashable
 {
-    TKey[] _keys;
-    TValue[] _values;
+    Slot<TKey>[] _keys;
+    Slot<TValue>[] _values;
     bool[] _filled;
 
     nuint _count;
@@ -62,8 +60,8 @@ public class Dictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
     /// An empty dictionary with room for a few entries before it first grows.
     public Dictionary()
     {
-        _keys = NewUninitializedArray<TKey>(8);
-        _values = NewUninitializedArray<TValue>(8);
+        _keys = new Slot<TKey>[8];
+        _values = new Slot<TValue>[8];
         _filled = new bool[8];
         _count = 0;
     }
@@ -87,7 +85,7 @@ public class Dictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
 
         while (_filled[i])
         {
-            if (_keys[i].Equals(key))
+            if (_keys[i].Value.Equals(key))
                 return i;
             i = (i + 1) & mask;
         }
@@ -122,7 +120,7 @@ public class Dictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
         nuint i = FindSlot(key);
         if (!_filled[i])
             return None;
-        return Some(_values[i]);
+        return Some(_values[i].Value);
     }
 
     /// The value for `key`, aborting when there is none.
@@ -140,7 +138,7 @@ public class Dictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
         nuint i = FindSlot(key);
         if (!_filled[i])
             sl_fail("Dictionary.GetValue: no such key");
-        return _values[i];
+        return _values[i].Value;
     }
 
     /// The value for `key`, or `fallback` when there is none.
@@ -151,7 +149,7 @@ public class Dictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
         nuint i = FindSlot(key);
         if (!_filled[i])
             return fallback;
-        return _values[i];
+        return _values[i].Value;
     }
 
     /// `map[key]`, which answers `Optional<TValue>` and never stops the program.
@@ -258,7 +256,7 @@ public class Dictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
             if (!_filled[j])
                 break;
 
-            nuint home = _keys[j].GetHashCode() & mask;
+            nuint home = _keys[j].Value.GetHashCode() & mask;
 
             // Leave it where it is when its home lies cyclically in (i, j].
             bool settled = i <= j ? i < home && home <= j : i < home || home <= j;
@@ -272,8 +270,8 @@ public class Dictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
 
         // Cleared rather than merely abandoned: a slot still holding its old
         // reference keeps that object alive for as long as the table lives.
-        ClearElement(_keys, i);
-        ClearElement(_values, i);
+        _keys[i].Clear();
+        _values[i].Clear();
         _filled[i] = false;
         _count--;
         return true;
@@ -283,8 +281,8 @@ public class Dictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
     /// anything they held is released now.
     public void Clear()
     {
-        _keys = NewUninitializedArray<TKey>(8);
-        _values = NewUninitializedArray<TValue>(8);
+        _keys = new Slot<TKey>[8];
+        _values = new Slot<TValue>[8];
         _filled = new bool[8];
         _count = 0;
     }
@@ -303,7 +301,7 @@ public class Dictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
         for (nuint i = 0; i < _filled.Length; i++)
         {
             if (_filled[i])
-                result.Add(_keys[i]);
+                result.Add(_keys[i].Value);
         }
         return result;
     }
@@ -319,7 +317,7 @@ public class Dictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
         for (nuint i = 0; i < _filled.Length; i++)
         {
             if (_filled[i])
-                result.Add(_values[i]);
+                result.Add(_values[i].Value);
         }
         return result;
     }
@@ -344,7 +342,7 @@ public class Dictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
     bool IsOccupied(nuint slot) => _filled[slot];
 
     KeyValuePair<TKey, TValue> GetPairAt(nuint slot) =>
-        new KeyValuePair<TKey, TValue>(_keys[slot], _values[slot]);
+        new KeyValuePair<TKey, TValue>(_keys[slot].Value, _values[slot].Value);
 
     void GrowTable()
     {
@@ -352,8 +350,8 @@ public class Dictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
         var oldValues = _values;
         var oldFilled = _filled;
 
-        _keys = NewUninitializedArray<TKey>(oldKeys.Length * 2);
-        _values = NewUninitializedArray<TValue>(oldValues.Length * 2);
+        _keys = new Slot<TKey>[oldKeys.Length * 2];
+        _values = new Slot<TValue>[oldValues.Length * 2];
         _filled = new bool[oldFilled.Length * 2];
         _count = 0;
 
@@ -362,7 +360,7 @@ public class Dictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
             if (!oldFilled[i])
                 continue;
 
-            nuint j = FindSlot(oldKeys[i]);
+            nuint j = FindSlot(oldKeys[i].Value);
             _keys[j] = oldKeys[i];
             _values[j] = oldValues[i];
             _filled[j] = true;

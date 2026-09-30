@@ -224,6 +224,13 @@ public sealed class DiagnosticBag
     private readonly List<Diagnostic> _items = [];
     public IReadOnlyList<Diagnostic> Items => _items;
 
+    /// <summary>
+    /// What <see cref="Items"/> already holds. A generic body is bound once per
+    /// instantiation, and a report that does not name the instantiation is the
+    /// same report each time; it is said once.
+    /// </summary>
+    private readonly HashSet<Diagnostic> _said = [];
+
     /// <summary>How many of <see cref="Items"/> are errors, counted as they come and go.</summary>
     private int _errors;
 
@@ -252,8 +259,11 @@ public sealed class DiagnosticBag
     public void RewindTo(int count)
     {
         for (int i = count; i < _items.Count; i++)
+        {
+            _said.Remove(_items[i]);
             if (_items[i].Severity == Severity.Error)
                 _errors--;
+        }
 
         _items.RemoveRange(count, _items.Count - count);
     }
@@ -359,6 +369,8 @@ public sealed class DiagnosticBag
             return;
         }
 
+        if (!_said.Add(diagnostic)) return;
+
         _items.Add(diagnostic);
         if (diagnostic.Severity == Severity.Error) _errors++;
     }
@@ -397,8 +409,13 @@ public sealed class DiagnosticBag
 
     public void AddRange(DiagnosticBag other)
     {
-        _items.AddRange(other._items);
-        _errors += other._errors;
+        foreach (var diagnostic in other._items)
+        {
+            if (!_said.Add(diagnostic)) continue;
+
+            _items.Add(diagnostic);
+            if (diagnostic.Severity == Severity.Error) _errors++;
+        }
     }
 
     /// <summary>

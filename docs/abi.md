@@ -150,11 +150,10 @@ register the caller never reads.
 Both systems are built *and run*:
 [tests/cases/x86-abi](../tests/cases/x86-abi), `x86-conventions`, `x86-runtime`
 and `x86-com` are 32-bit binaries that the suite executes, on Windows and on
-Linux. The Linux half had been written off clang and never executed, and
-running it the first time found two things a reading could not have: the
-runtime's lock storage was counted in pointers where a `pthread_cond_t` is 48
-bytes on a four-byte-pointer machine, and the name decoration below was being
-applied to ELF.
+Linux. Running them is what checks what a reading cannot: that the runtime's
+lock storage is sized for a `pthread_cond_t`, which is 48 bytes on a
+four-byte-pointer machine rather than a count of pointers, and that the name
+decoration below stays off ELF.
 
 ### 1.6 Calling conventions
 
@@ -196,9 +195,8 @@ passed over rather than spending a register.
 gcc has always done and what clang writes for `i686-unknown-linux-gnu`. It is
 the one part of a convention that is the object format's question rather than
 the architecture's, and getting it wrong is a link error rather than a wrong
-answer: the first 32-bit Linux build went looking for `_add_stdcall@8` and
-there was no such symbol. The same applies to `__vectorcall` on x86-64, which
-is decorated on Windows and not on Linux.
+answer: an ELF object has no `_add_stdcall@8` to find. The same applies to
+`__vectorcall` on x86-64, which is decorated on Windows and not on Linux.
 
 ### 1.7 ARM64
 
@@ -207,7 +205,7 @@ bytes, so nothing about the layout differs from x86-64 — what differs is how a
 struct crosses a call, which is §3.4's AAPCS64 rules.
 
 `--abi` still chooses the C++ name mangling and the bit-field packing here, as
-it does everywhere, and it no longer chooses the struct convention: there is
+it does everywhere, but not the struct convention: there is
 one on this architecture and both systems use it.
 
 **One convention for both systems**, which is not true of either x86 target:
@@ -374,10 +372,9 @@ nothing could supply and the second has no instance.
 inserted, so every offset the compiler hard-codes — `interfaces` at 24, above
 all — goes on meaning what it meant. `base` sits at offset 64, `vtable` at 72,
 `com` at 80, `propertyCount` at 88, `properties` at 96, `enumeration` at 104,
-`eventCount` at 112, `events` at 120 and `create` at 128. A library built
-before `create` was appended has a shorter record, which is why the metadata
-version moved with it and such a library is refused rather than read past its
-end.
+`eventCount` at 112, `events` at 120 and `create` at 128 -- halve each on a
+32-bit target. A library whose record is shorter than this one carries an
+older metadata version, and is refused rather than read past its end.
 
 Because a class reference is a plain pointer, it can cross the C boundary as
 `void*` — but C code must call `sl_retain` / `sl_release` to participate in
@@ -554,6 +551,39 @@ language spec): the bytes are real for exactly one case at a time.
 **The tag is one byte, so a variant is capped at 255 cases** (SL0432). A variant
 no case of which carries anything is therefore one byte, and reads like an enum.
 
+**A variant can have no tag at all.** When it has exactly two cases, the first
+carrying nothing and the second carrying fields among which is a reference that
+is never null -- a class, an interface, `String`, `T[]`, or a closure's
+function word, directly or inside a struct or a tuple of them -- that
+reference's null is the first case:
+
+```
+  offset 0    payload    the second case's fields, as a struct of them
+  offset N    niche      the first never-null reference among them
+```
+
+`N` is found in field order and is often zero. The first case is the niche
+being null and the second is it being anything else, so a case test is one
+pointer load and one comparison with null, a switch widens that comparison to
+the case number 0 or 1, and a construction of the first case is zero bytes. The
+first case has to be the empty one: zero bytes are the zero of a variant
+(section 2.16 of the language spec), and with the cases the other way round
+they would be the second case holding a null. A tag value is never borrowed as
+a niche, since none is zero bytes.
+
+So `Optional<String>` is one pointer wide and a struct holding a `String` is
+its own size as an `Optional`, and the ABI classifiers see the payload struct
+alone: an `Optional<String>` travels in one integer register. An optional of a
+type with no such reference keeps its tag -- `Optional<int>` is eight bytes,
+`Optional<Optional<String>>` two words, since the inner one's null is already
+spoken for. A slot and a variant are not looked into for a niche: an empty
+slot, a tagged variant's other cases and a tagless variant's first case all
+hold a null or zero bytes in any word.
+
+**`Slot<T>`** is laid out as `T` when `T` has a zero value and as
+`Optional<T>` when it has none, which by the rule above is the size of `T`
+whenever `T` holds a never-null reference. It does not cross `extern "C"`.
+
 **In C**, a variant appears in a generated header as its shape rather than its
 cases, because C has no way to state that the payloads overlap in a checked way:
 
@@ -578,7 +608,8 @@ boundary like any other struct that does (SL0284).
 
 **Reference counting consults the tag.** For a variant some case of which holds
 a counted reference, the compiler emits two functions — one to retain and one to
-release — each a `switch` on the tag that touches only the case actually there.
+release — each a `switch` on the tag, or on the niche for a variant with none, that
+touches only the case actually there.
 They are what a copy and a drop of such a variant call, in place of the field
 walk a struct gets, and they are why the payloads may overlap: nothing ever
 counts through the bytes of a case that is not present. A variant holding no
@@ -690,8 +721,8 @@ object ──+16──▶ TypeInfo ──+24──▶ interfaces ──[id]─�
 
 Interface ids are assigned across the whole program, so `interfaces` is a flat
 array indexed directly: a dispatch is four constant-offset loads and an
-indirect call, with no search and no branch. It is one load more than a C++
-virtual call and one more than a Stainless virtual call §2.0.1, which is the
+indirect call, with no search and no branch. It is two loads more than a C++
+virtual call and one more than a Stainless virtual call (section 2.0.1), which is the
 price of leaving the object header at 24 bytes and letting a class implement any
 number of interfaces at no per-object cost.
 
@@ -825,15 +856,15 @@ slot). This is `com class Greeter : ILoudGreeter` from
      ptr @sl_com_object_release,
      ptr @_SLadj_Com_Greeter_Com_IGreeter_3]
 
-define internal i32 @_SLadj_Com_Greeter_Com_ILoudGreeter_3(ptr %self, i32 %a1) {
+define internal i32 @_SLadj_Com_Greeter_Com_ILoudGreeter_3(ptr %self, i32 %a1_0) {
   %obj = getelementptr inbounds i8, ptr %self, i64 -32
-  %r = call i32 @_SL3Com7Greeter5GreetiEi(ptr %obj, i32 %a1)
+  %r = call i32 @_SL3Com7Greeter5GreetiEi(ptr %obj, i32 %a1_0)
   ret i32 %r
 }
 
-define internal i32 @_SLadj_Com_Greeter_Com_IGreeter_3(ptr %self, i32 %a1) {
+define internal i32 @_SLadj_Com_Greeter_Com_IGreeter_3(ptr %self, i32 %a1_0) {
   %obj = getelementptr inbounds i8, ptr %self, i64 -48
-  %r = call i32 @_SL3Com7Greeter5GreetiEi(ptr %obj, i32 %a1)
+  %r = call i32 @_SL3Com7Greeter5GreetiEi(ptr %obj, i32 %a1_0)
   ret i32 %r
 }
 ```
@@ -858,8 +889,7 @@ typedef struct SlComLayout { size_t count; const SlComEntry *entries; } SlComLay
 
 `size_t`, so on a 32-bit target the count and the offsets are `i32` and the
 entry array's stride is eight rather than sixteen. Written as `i64` there, the
-runtime read the second entry out of the middle of the first and
-QueryInterface answered with whatever that happened to be.
+runtime would read the second entry out of the middle of the first.
 
 A linear scan, because QueryInterface is called when a reference changes hands
 rather than in a loop. `IUnknown` is answered by the first entry's tear-off
@@ -868,9 +898,8 @@ COM requires and which object identity is built on.
 
 **Nothing in any of this is Windows-specific**, and `runtime/com.c` has no
 `#ifdef` in it. The Windows part of COM is activation, and activation is not in
-the language. That was a claim when it was written and is now a measurement:
-[tests/cases/com](../tests/cases/com) is not marked windows-only and passes on
-Linux, tear-offs, adjustor thunks, QueryInterface and all.
+the language. [tests/cases/com](../tests/cases/com) is not marked windows-only
+and passes on Linux, tear-offs, adjustor thunks, QueryInterface and all.
 
 ## 3. Calling convention
 
@@ -921,7 +950,13 @@ constructor is named `4ctor`, a static constructor `5cctor` and a destructor
 `4dtor`. A variadic function has `z` before the terminator. A member written under an
 interface's name, `void IShape.Draw()`, has `X` and the interface's qualified
 name before its own, where no length could begin, so it never meets a member
-of the same name written plainly.
+of the same name written plainly. A function declared inside a block is named
+by where it was declared -- `Main.Square` -- and keeps the `.`.
+
+A type in a signature is named by its qualified name, `C20Standard_Text_String`.
+A variant, a slice and a tuple are structs here and take `S`. The text an
+enum's values format to is one generated function per enum, named `_SLtext`
+and the enum's type code: `_SLtextE9App_Color`.
 
 `E` is both the enum prefix and the terminator before the return type, and the
 two never collide: an enum is always followed by a decimal length, and the
@@ -1033,9 +1068,9 @@ what has to cross:
   { uint:3; double; uint:5; }   ->  memory  the double does not fit beside them
 ```
 
-Marking only the bits a field uses is the mistake to avoid, and it was made:
-the first shape above travelled as an `i8`, so a caller sent the low eight bits
-and the other twenty-four arrived as zero. Win64 never showed it, because Win64
+Marking only the bits a field uses is the mistake to avoid: the first shape
+above would travel as an `i8`, a caller would send the low eight bits, and the
+other twenty-four would arrive as zero. Win64 cannot show it, because Win64
 asks only how big a struct is and four bytes is four bytes.
 
 Two further rules, both of which follow from not reading past the object:
@@ -1060,10 +1095,9 @@ holds the signatures, and its `ir.txt` is what fails if the two ever disagree.
 Running the program proves only that the two halves of a call agree with each
 other, which they would even if both were wrong.
 
-The case now also *runs* on Linux, where a wrong classification is a wrong
-answer rather than a wrong text — which is how the bit-field mistake above was
-found, by `bitfield-interop` handing a struct to a C function that read it back
-as zero.
+The case also *runs* on Linux, where a wrong classification is a wrong answer
+rather than a wrong text, and `bitfield-interop` hands such structs to C
+functions that read them back.
 
 **AAPCS64** asks a different first question: whether every member is the same
 floating-point type. Four or fewer of them and no padding makes a *homogeneous
@@ -1137,10 +1171,15 @@ inline assembly call it emits; ARM64's are `~{nzcv}`.
 
 ## 4. Static storage
 
-A static becomes one zeroed global per declaration. A single generated
-function, `_SLstatics`, runs every initializer in dependency order and is called
-from `main` before anything else. A static whose value is a literal — a number,
-`null`, `default` — needs no code at all: the global is emitted holding it. So
+A static becomes one zeroed global per declaration, `_SLstatic_` and its
+qualified name. A single generated function, `_SLstatics`, runs every
+initializer in dependency order and is called from `main` before `Main`, after
+the runtime has the console and the arguments. Its last act is to register
+`_SLstaticsdown` with `sl_run_at_exit`, which empties every mutable static that
+holds a reference, in reverse order of initialization, and releases what it
+held. A program with no statics gets neither function. A static whose value is
+a literal -- a number, `null`, `default` -- needs no code at all: the global is
+emitted holding it. So
 does one carrying an `[Embed]`, whose object the linker placed: the global is born
 holding its address, and that relocation is in writable data, where every
 loader applies one.
@@ -1167,7 +1206,7 @@ and a compare-exchange loop in `sl_weak_load`. That is the same choice Swift
 makes, and for the same reason: an object reachable from two threads has its
 count touched by both, and no rule about what may be *shared* prevents a
 reference escaping a lock. An atomic pair costs more than a plain one, which
-makes removing the redundant ones worth more than it used to be.
+makes removing the redundant ones worth more.
 
 Stainless follows a **borrowed-parameter / owned-return** convention, the same
 choice Swift makes, because it eliminates most retain/release traffic:
@@ -1254,7 +1293,9 @@ Both are reported where the library is built, as SL0419 and SL0420. A class
 with a generic virtual method is left out for the second reason in another
 form (SL0799): its instantiations' slots are numbered after the table the
 metadata would describe, so a class derived from it elsewhere would put its own
-methods in them. A
+methods in them. A **com class** stays behind too (SL0544): its vtables and
+adjustor thunks are internal symbols a consumer's `new` would have to name, so
+it crosses as a com interface instead. A
 **variant** stays behind as well (SL0441), because the metadata carries layouts
 and a variant is its cases; and anything described that reaches an undescribed
 type through a field or a signature is reported too (SL0477). A slice or a tuple
@@ -1266,6 +1307,15 @@ Where two Stainless binaries meet, the runtime is **one shared library** that
 both link: `stainless-rt.dll`, `libstainless-rt.so` or `libstainless-rt.dylib`,
 built once and copied beside what uses it.
 
+Each binary MUST name it by file name and not by the path it was linked from,
+or the loader maps one copy per build directory. Windows matches a DLL by name
+already. On Linux the library records its name as `DT_SONAME`, so a binary's
+`DT_NEEDED` is that name, and the binary carries `DT_RUNPATH` `$ORIGIN` to find
+it beside itself; a second binary asking for the same name gets the copy
+already loaded. Every `--shared` Stainless library is named the same way, and a
+`--reference` build copies the library it links beside the program with the
+runtime, so the program's directory holds everything it loads.
+
 That is what makes the boundary work at all. With a copy compiled into each
 side there are two allocators and two sets of reference counts, so an object
 made on one side and released on the other is counted twice; and two C stdio
@@ -1276,7 +1326,11 @@ It is chosen by the shape of the build rather than by a flag: a `--metadata`
 build and a `--reference` one share, and everything else keeps the copy compiled
 in and stays a single file. `--runtime shared|static` overrides that, and the
 metadata records which was used — a library and a consumer that disagree are
-refused rather than left to misbehave.
+refused rather than left to misbehave. It records which build of the runtime
+too: `--debug` and `--leak-check` each link one of another name
+(`stainless-rt-g`, `stainless-rt-leak`, `stainless-rt-g-leak`), which is a
+second runtime to the loader, so a consumer on a different build is refused as
+well.
 
 The runtime's exported surface is stated in `stainless.h` with `SL_API`:
 `__declspec(dllexport)` when building it, `__declspec(dllimport)` when a
@@ -1302,20 +1356,23 @@ description is metadata attached to it, and a build without `-g` emits none of
 it at all.
 
 It is written as ordinary LLVM debug metadata, so the format is whatever the
-target uses: CodeView and a `.pdb` on Windows, DWARF elsewhere. The compiler
-emits a `DICompileUnit` per program and, hanging off it:
+target uses: CodeView and a `.pdb` on Windows, DWARF 5 elsewhere.
+`--debug-format dwarf|codeview|both` overrides it
+([docs/cli.md](cli.md#which-debugger-reads-it)). The compiler emits a
+`DICompileUnit` per program and, hanging off it:
 
 | Node | What it describes |
 |---|---|
 | `DISubprogram` | one function, by source name and by linker name |
+| `DILexicalBlock` | a `{ }` or a `for` inside one |
 | `DILocation` | one point in the source, attached to every instruction |
 | `DILocalVariable` | a local or a parameter, with its type and its stack slot |
 | `DIBasicType` | a primitive, with the signedness a debugger prints it by |
-| `DICompositeType` | a struct, a class body, or an enum with its members |
-| `DIDerivedType` | a field at its offset, or a pointer to something |
+| `DICompositeType` | a struct, a class body, a variant, an enum with its members, or an inline array with its count |
+| `DIDerivedType` | a field at its offset, a class's base, or a pointer to something |
 
 A function's name is what the source called it — `Circle.Area`, not
-`_SL6Circle4AreavEd` — and its `linkageName` is the mangled symbol, so a
+`_SL3App6Circle4AreavEd` -- and its `linkageName` is the mangled symbol, so a
 debugger can match a frame to a source line either way. Locations sit at
 statement granularity: an expression spread over four lines belongs to the
 statement a debugger stops on.
@@ -1330,11 +1387,27 @@ not a block of its own: the subprogram scopes it, as it does in C.
 gave it. Nothing else maps a tag to a case: DWARF gets a member only for a case
 that carries a payload, so the k-th member is not tag k.
 
+**A variant with no tag is a variant part** (section 2.3). Its structure holds
+one `DW_TAG_variant_part`, whose `DW_AT_discr` is an artificial member named
+`__niche`: the word at the niche's offset, described as a `nuint`. The empty
+case is a `DW_TAG_variant` with `DW_AT_discr_value` 0 holding a member of an
+empty structure named for the case, and the other case is the variant with no
+value, which DWARF reads as every value the others do not claim. CodeView has no
+variant part, so there the structure's one member is the second case's payload
+at offset zero: a debugger shows it whichever case is there, and the null in it
+is what says it is the first.
+
 **A class body includes its header.** A field's offset is measured from the
 start of the fields area (§2), and DWARF wants it measured from the start of the
 allocation, so the 24 bytes in front are described as a member named `__header`
 and every field offset is shifted past it. Without it a debugger reads every
-field of every object 24 bytes early.
+field of every object 24 bytes early. A derived class's body names its base's
+with a `DW_TAG_inheritance` member at offset zero instead, so the header and the
+inherited fields are described once, in the root.
+
+An interface reference is a pointer to a structure declared and never defined
+-- a debugger has no fields to show through one, and the object's `TypeInfo`
+is what says what it is. A delegate is a pointer to its subroutine type.
 
 **Optional, weak and strong references share one description.** `C`, `C?` and
 `weak C?` are the same machine value; what separates them is what the compiler
@@ -1354,7 +1427,14 @@ the element type and its stride, which is what indexing one needs.
 `String` and `Utf16String` are the same shape, under the names
 `runtime/stainless.h` gives them: `byteLength` and `bytes`, `unitCount` and
 `units` (§2.6). They declare no fields here — the storage is the runtime's — so
-without this the description stopped at the header.
+without this the description would stop at the header.
+
+**Every function carries `"frame-pointer"="all"` under `-g`**, one attribute
+group on every definition. LLVM omits the frame pointer at every optimisation
+level unless asked, `-O0` included, and a frame with none describes itself
+against the stack pointer, which is correct and cannot be unwound by the
+two-load walk a debugger falls back on. A build without `-g` puts no
+attributes on its definitions at all.
 
 **The standard library is written out to be stepped into.** It is compiled from
 inside the compiler's own assembly, so with `-g` the driver writes its sources to
@@ -1369,7 +1449,7 @@ locations with it — and `-O2` inlines `Main` into the shim, so without a
 subprogram there the program's own code ends up described by nothing at all.
 It is marked `DIFlagArtificial` and positioned at the entry point it calls.
 
-**`-O2` is still the default.** Debug information survives optimization, but the
+**`-O2` stays the default.** Debug information survives optimization, but the
 code it describes has been rearranged, and stepping through it is confusing in
 the ordinary way. The driver says so once and builds what was asked for; `-O0`
 is the flag for stepping through code as it was written.

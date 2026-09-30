@@ -1,6 +1,6 @@
 # Stainless Concurrency (v0.1 draft)
 
-> **A design record.** All seven steps of the plan below are now built. The
+> **A design record.** All eight steps of the plan below are now built. The
 > file exists so the decisions survive between sessions, and so the reasons
 > survive with them — including the ones that turned out to be wrong, which are
 > marked where they were corrected rather than quietly rewritten. Section 10
@@ -107,9 +107,10 @@ Checked, as of step 6, at the three places a value can reach another thread: a
 | `T[]` where `T` is plain data | a job borrows it without retaining it |
 
 Everything else **warns**, and the warning names all three ways out. A `struct`
-that holds a reference warns with everything else: copying one retains what it
-holds, and a retain two threads can both perform is the race this rule exists to
-notice.
+is judged by its fields rather than its kind: one of primitives and Strings
+crosses as freely as its parts, and one holding a `List<T>` warns with
+everything else. An optional, a variant and an inline array `T[N]` are judged
+by what they hold.
 
 The fourth row is the pragmatic one, and worth being honest about: borrowing
 without retaining is sound as far as it goes, but nothing yet stops a job from
@@ -297,13 +298,20 @@ no atomics, and a **compile error** on a cycle instead of a runtime mystery.
 
 ### 3.2 Teardown
 
-There is none. A `readonly` static's reference is made immortal as it is stored,
-so it is never destroyed and the process exit reclaims the memory. A mutable one
-is counted like any other slot, and what it holds at exit is simply never
-released -- which is the same outcome by a different route. This sidesteps C++'s
-static *destruction* order problem entirely, and is exactly how string literals
-already behave — which is also why `sl_make_immortal` reads before it writes: a
-literal lives in read-only storage, and storing the marker again would fault.
+A `readonly` static's reference is made immortal as it is stored, so it is
+never destroyed and the process exit reclaims the memory. That is exactly how
+string literals already behave -- which is also why `sl_make_immortal` reads
+before it writes: a literal lives in read-only storage, and storing the marker
+again would fault.
+
+A mutable one is counted like any other slot, and what it holds is released
+when the program ends, in the reverse of initialization order, from a hook
+registered with `atexit` so that a program calling `exit()` is torn down too.
+That is what makes a leak check's "still allocated" exact. Reverse order covers
+what an initializer read and nothing else, so C++'s static *destruction* order
+problem survives in one form: **a destructor that runs at exit MUST NOT reach a
+mutable static**
+([section 9.3 of the spec](spec/09-statements-expressions.md#93-const-and-static)).
 
 ### 3.3 Libraries
 
@@ -320,7 +328,7 @@ as it is unloaded, by an `atexit` hook registered from the library itself.
 A lock is the escape hatch for everything the rules above reject. It should
 look like a deliberate act, not like a keyword you sprinkle.
 
-This is **implemented**, in [stdlib/Threading.sl](../stdlib/Threading.sl).
+This is **implemented**, in [stdlib/Threading/](../stdlib/Threading/).
 
 ### 4.1 The rejected design: `lock (obj) { }`
 
@@ -353,9 +361,9 @@ is a destructor, so ARC already does it — including on an early `return`.
 > which is about how long the borrow lives, is untouched by that.
 
 The notable thing about this design is that **it needs no new language surface**.
-Generic classes, destructors and interfaces all exist. Only the runtime
-primitives in §5 are missing. Locking can therefore ship before closures, before
-`spawn`, and before any sendability analysis.
+Generic classes, destructors and interfaces were enough; only the runtime
+primitives in section 5 were needed. Locking could therefore ship before closures,
+before `spawn`, and before any sendability analysis.
 
 **Still open after step 6.** Sendability is a rule about *types*, and this is a
 rule about *lifetimes*, so the analysis that landed does not touch it.
@@ -366,7 +374,7 @@ has the same hole and worse; Rust closes it with lifetimes. Stainless closes it
 later, when the move and sendability analysis of §1 lands, and not before. It is
 written down here so it is a known gap rather than a discovered one.
 
-**A second hole, smaller and sharper:** `registry.Enter();` as a statement locks
+**A second hole, smaller and sharper:** `Registry.Enter();` as a statement locks
 and immediately unlocks, because the guard is a temporary that dies at the end
 of the statement. The result has to be kept in a variable. A warning for a
 discarded `Guard` would catch it, and is worth adding.
@@ -447,11 +455,11 @@ more instead of waiting on the slowest chunk.
 
 ## 7. Interoperability
 
-Two obligations the C ABI imposes, neither yet met:
-
-- **`export "C"` re-entrancy.** C may call into Stainless on a thread the
-  runtime never created. That thread must be adopted before it touches any
-  managed object, or its reference counting has no owner.
+- **`export "C"` re-entrancy needs no adoption.** C may call into Stainless on
+  a thread the runtime never created. Counts are atomic, so no thread owns
+  one, and a thread-local slot is a Windows FLS index or a pthread key, both
+  of which serve every thread and release what a slot holds when that thread
+  ends, whoever created it.
 - **Blocking C calls are fine.** This is a feature of choosing OS threads over
   green threads: an `extern "C"` call that blocks stalls one worker, not a
   scheduler. It is also the argument against fibers in §8.
@@ -460,8 +468,8 @@ Two obligations the C ABI imposes, neither yet met:
 
 ## 8. Deliberately deferred
 
-- **Atomically counted shared classes.** The freeable counterpart to freezing.
-  Needs a per-class atomic count and a way to spell it.
+- ~~**Atomically counted shared classes.**~~ -- superseded: every count is
+  atomic (section 10).
 - **Async I/O.** The isolation model does not foreclose it. The colour-free
   option is stackful fibers, not stackless coroutines -- but fibers fight the C
   ABI, since a blocking `extern "C"` call stalls the carrier thread. That is the
@@ -471,10 +479,8 @@ Two obligations the C ABI imposes, neither yet met:
   (§11). Recursive locks and lock-free collections are still deferred, the first
   deliberately.
 - **Cancellation and failure.** Cancellation works as a shared flag today (§9);
-  what is missing is a reason. `Result<T, TError>` now exists, so the sentence that
-  used to sit here -- that a reason wants an error type the language does not
-  have -- is no longer the obstacle. What is left is plumbing a scope handle
-  into a job.
+  what is missing is a reason. `Result<T, TError>` exists, so an error type is
+  not the obstacle. What is left is plumbing a scope handle into a job.
 
 ---
 
@@ -487,7 +493,7 @@ result-passing choice in §2 neither helps nor hinders it.
 
 ### 9.1 What works now
 
-Cooperative cancellation, with the `AtomicBool` from §4:
+Cooperative cancellation, with `AtomicBool` from `Standard.Threading`:
 
 ```csharp
 var stop = new AtomicBool(false);
@@ -528,7 +534,7 @@ either a `Cancel()` on a scope value or a `cancel;` statement valid inside
 `parallel` would express it.
 
 **Saying why.** A cancelled operation usually wants to report a reason. That
-needs an error type, and `Result<T, TError>` is now one -- so this is a question of
+needs an error type, and `Result<T, TError>` is one -- so this is a question of
 plumbing rather than of a missing feature. Today a cancelled job returns
 whatever it would have returned, and the flag is the only signal.
 
@@ -537,14 +543,15 @@ whatever it would have returned, and the flag is the only signal.
 ## 10. What exists today
 
 `parallel`, `spawn` and `for parallel` are in the language, over the runtime of
-§5 and the library of [stdlib/Threading.sl](../stdlib/Threading.sl).
+section 5 and the library of [stdlib/Threading/](../stdlib/Threading/).
 
-`static readonly` gives it module-level storage, initialized in dependency order
-before `Main`, and §1.3's sendability rule is checked wherever a value can reach
+`static` gives it storage at module level or in a type, initialized in dependency
+order before `Main`, and section 1.3's sendability rule is checked wherever a value can reach
 a second thread. An unsynchronized class crossing a thread boundary is warned
 about (SL0377) rather than refused, for the reason §1.3 gives.
 
-All seven steps are done. Three things are still open.
+All eight steps are done. Three things were left open, and the first of them is
+closed.
 
 **The one that matters most, found while building Standard.Concurrent:**
 `Mutex<T>` is unsound when `T` is a class and the mutex is used from more than
@@ -595,8 +602,7 @@ Order of work, each step useful on its own:
 3. ~~`spawn` / `parallel` with a lexical join (§2).~~ Done. Results land in the
    parent's locals; the closing brace is the synchronization.
 4. ~~`for parallel` over plain data (§6).~~ Done, and it scales.
-5. ~~Statics, tiers 1 and 2, with topological initialization (§3).~~ Done, as
-   `static readonly`.
+5. ~~Statics, tiers 1 and 2, with topological initialization (section 3).~~ Done.
 6. ~~The sendability analysis (§1.3).~~ Done at the three boundaries. It did
    **not** close §4.2's hole, which is about lifetimes rather than types.
 7. ~~Closures (§2.3).~~ Done, though not as sugar over step 3: `spawn` never
@@ -610,8 +616,11 @@ Order of work, each step useful on its own:
 What is still open, in the order it is worth doing:
 
 1. **The +0/+1 dataflow pass.** A retain/release pair around a borrow is
-   redundant, and an atomic pair is dearer than the plain one it replaced. This
-   was a nicety and is now the obvious next piece of work.
+   redundant, and an atomic pair is dearer than the plain one it replaced. Per
+   value, the emitter already knows whether it holds +0 or +1, and moves an
+   owned value rather than retaining it
+   ([internals](internals.md#why-ownership-works-the-way-it-does)); what is left
+   is a pass across statements, for a borrowed value kept in a local.
 
    Two things narrow the target, and both are worth knowing before anyone
    estimates the payoff. **Reading through a reference already borrows** — a

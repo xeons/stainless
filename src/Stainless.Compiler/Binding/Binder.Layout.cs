@@ -42,8 +42,9 @@ public sealed partial class Binder
         // bytes wide with nothing reported. Every other struct the binder makes
         // for itself is already laid out by now, and a second call returns at
         // once, so this costs the walk and nothing else.
-        foreach (var structType in _structs)
-            ComputeLayout(structType, inProgress);
+        // Indexed, because laying out a slot can instantiate an optional.
+        for (int i = 0; i < _structs.Count; i++)
+            ComputeLayout(_structs[i], inProgress);
 
         // A body may name a tuple no signature did, and bodies are bound two
         // passes after this one. From here a tuple is laid out where it is
@@ -79,7 +80,13 @@ public sealed partial class Binder
 
         // A variant's payload field has no size until every case has one, so
         // the filler is built here, immediately before the fields are walked.
-        if (type is VariantTypeSymbol variant) SizePayloadStorage(variant, inProgress);
+        if (type is SlotTypeSymbol slot) ChooseSlotStorage(slot);
+
+        if (type is VariantTypeSymbol variant)
+        {
+            SizePayloadStorage(variant, inProgress);
+            DropTagForNiche(variant);
+        }
 
         // Every member of a union starts where the union does; its size is the
         // widest of them. That is the whole of the layout, and it is why a union
@@ -354,6 +361,53 @@ public sealed partial class Binder
         }
 
         return offset;
+    }
+
+    /// <summary>
+    /// Gives a slot whose element has no zero value an <c>Optional</c> to hold
+    /// it in, since zero bytes would be a null where the element has none. The
+    /// optional is laid out as the slot's field is walked, cycle check and all.
+    /// </summary>
+    private void ChooseSlotStorage(SlotTypeSymbol slot)
+    {
+        if (slot.Fields is not [var field] || ZeroValues.HasZeroValue(slot.Element))
+            return;
+        if (_builtins.Standard.FindGenericType("Optional", 1) is not { } template)
+            return;
+
+        // Not settled here: this is inside a layout already.
+        _instantiationDepth++;
+        try
+        {
+            field.Type = Instantiate(template, [slot.Element], slot.Span ?? default);
+        }
+        finally
+        {
+            _instantiationDepth--;
+        }
+
+        slot.IsChecked = true;
+    }
+
+    /// <summary>
+    /// Takes the tag away from a variant that can say which case it holds
+    /// without one: two cases, the first carrying nothing and the second a
+    /// never-null reference. The first case is then that reference being null,
+    /// so a zero value is still the first case. Its payloads MUST be laid out.
+    /// </summary>
+    private static void DropTagForNiche(VariantTypeSymbol variant)
+    {
+        if (variant.Cases is not [{ Payload: null }, { Payload: { } held }])
+            return;
+        if (Niches.FindNiche(held) is not { } offset || variant.PayloadField is not { } payload)
+            return;
+
+        variant.Fields.Clear();
+        variant.Fields.Add(new FieldSymbol(VariantTypeSymbol.PayloadFieldName, payload.Type, variant, 0)
+        {
+            IsBackingField = true,
+        });
+        variant.NicheOffset = offset;
     }
 
     /// <summary>

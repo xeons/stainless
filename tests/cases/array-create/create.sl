@@ -1,9 +1,8 @@
 // `Array.Create` and `Array.Repeat`, which make an array whole, and the
-// `Standard.Unchecked` pair a collection keeps spare capacity with.
+// `Slot<T>` array a collection keeps spare capacity in.
 module ArrayCreate;
 
 import Standard.Console;
-import Standard.Unchecked;
 
 public class Item
 {
@@ -29,11 +28,11 @@ int Main()
     String[] none = Array.Create(0u, (i) => "never");
     Console.WriteLine($"{none.Length}");
 
-    String[] slots = NewUninitializedArray<String>(2u);
+    Slot<String>[] slots = new Slot<String>[2u];
     slots[0] = "a";
     slots[1] = "b";
-    ClearElement(slots, 1u);
+    slots[1].Clear();
     slots[1] = "c";
-    Console.WriteLine(slots[0] + slots[1]);
+    Console.WriteLine(slots[0].Value + slots[1].Value);
     return 0;
 }

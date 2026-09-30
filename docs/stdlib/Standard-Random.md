@@ -5,9 +5,9 @@
 Pseudo-random numbers.
 
 A class rather than a set of free functions, and deliberately: the state has
-to live somewhere, the language has no mutable global to put it in, and a
-hidden one shared by every caller is what makes a program impossible to
-reproduce. A `Random` you made is a `Random` you can seed and replay.
+to live somewhere, and a hidden static shared by every caller is what makes
+a program impossible to reproduce. A `Random` you made is a `Random` you can
+seed and replay.
 
 **This is not cryptographic.** xoshiro256** is fast and well-distributed,
 and its entire future is computable from 256 bits of state -- which is what

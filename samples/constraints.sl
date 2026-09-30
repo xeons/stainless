@@ -3,7 +3,6 @@ module Constraints;
 
 import Standard.Console;
 import Standard.Collections;    // IComparable<T> lives here
-import Standard.Unchecked;
 
 public interface IDescribable
 {
@@ -44,14 +43,13 @@ T FindLargest<T>(T[] values) where T : IComparable<T>
 // Two constraints on one parameter.
 public class Ranked<T> where T : IComparable<T>, IDescribable
 {
-    // Slots past `_count` are not items yet, and are written before they are
-    // read: the promise `Standard.Unchecked` asks for.
-    T[] _items;
+    // Slots past `_count` are empty until they are written.
+    Slot<T>[] _items;
     nuint _count;
 
     public Ranked(nuint capacity)
     {
-        _items = NewUninitializedArray<T>(capacity);
+        _items = new Slot<T>[capacity];
         _count = 0;
     }
 
@@ -63,11 +61,11 @@ public class Ranked<T> where T : IComparable<T>, IDescribable
 
     public String FindBestDescription()
     {
-        var best = _items[0];
+        var best = _items[0].Value;
         for (nuint i = 1; i < _count; i++)
         {
-            if (_items[i].CompareTo(best) > 0)
-                best = _items[i];
+            if (_items[i].Value.CompareTo(best) > 0)
+                best = _items[i].Value;
         }
         return best.Description;
     }

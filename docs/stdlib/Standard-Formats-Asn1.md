@@ -550,9 +550,9 @@ The tag of the next value, without moving.
 
 **Fails with**
 
-- [AsnError.Truncated](#truncated-case) — the input ends inside the tag
-- [AsnError.NonMinimalEncoding](#nonminimalencoding-case) — a tag number in more octets than it needs
-- [AsnError.OutOfRange](#outofrange-case) — a tag number past the largest `int`
+- [AsnError.Truncated](#truncated-case) -- the input ends inside the tag
+- [AsnError.NonMinimalEncoding](#nonminimalencoding-case) -- a tag number in more octets than it needs
+- [AsnError.OutOfRange](#outofrange-case) -- a tag number past the largest `int`
 
 <sub>[stdlib/Formats/Asn1/AsnReader.sl:90](../../stdlib/Formats/Asn1/AsnReader.sl#L90)</sub>
 
@@ -567,8 +567,8 @@ moving.
 
 **Fails with**
 
-- [AsnError.Truncated](#truncated-case) — the input ends inside the value
-- [AsnError.BadLength](#badlength-case) — the length octets are malformed
+- [AsnError.Truncated](#truncated-case) -- the input ends inside the value
+- [AsnError.BadLength](#badlength-case) -- the length octets are malformed
 
 **See also** &nbsp; [AsnReader.ReadEncodedValue](#readencodedvalue-method)
 
@@ -587,9 +587,9 @@ This is how to keep the exact bytes a signature covers.
 
 **Fails with**
 
-- [AsnError.Truncated](#truncated-case) — the input ends inside the value
-- [AsnError.BadLength](#badlength-case) — the length octets are malformed
-- [AsnError.Unsupported](#unsupported-case) — an indefinite length
+- [AsnError.Truncated](#truncated-case) -- the input ends inside the value
+- [AsnError.BadLength](#badlength-case) -- the length octets are malformed
+- [AsnError.Unsupported](#unsupported-case) -- an indefinite length
 
 <sub>[stdlib/Formats/Asn1/AsnReader.sl:120](../../stdlib/Formats/Asn1/AsnReader.sl#L120)</sub>
 
@@ -603,12 +603,12 @@ A reader over the contents of the next `SEQUENCE`, and past it.
 
 **Parameters**
 
-- `expectedTag` — the tag in place of `SEQUENCE`, for implicit or explicit tagging
+- `expectedTag` -- the tag in place of `SEQUENCE`, for implicit or explicit tagging
 
 **Fails with**
 
-- [AsnError.UnexpectedTag](#unexpectedtag-case) — the next value is not a constructed value with that tag
-- [AsnError.Truncated](#truncated-case) — the input ends inside the value
+- [AsnError.UnexpectedTag](#unexpectedtag-case) -- the next value is not a constructed value with that tag
+- [AsnError.Truncated](#truncated-case) -- the input ends inside the value
 
 **See also** &nbsp; [AsnReader.ReadSetOf](#readsetof-method)
 
@@ -627,12 +627,12 @@ them sorted; see the module's summary.
 
 **Parameters**
 
-- `expectedTag` — the tag in place of `SET`
+- `expectedTag` -- the tag in place of `SET`
 
 **Fails with**
 
-- [AsnError.UnexpectedTag](#unexpectedtag-case) — the next value is not a constructed value with that tag
-- [AsnError.Truncated](#truncated-case) — the input ends inside the value
+- [AsnError.UnexpectedTag](#unexpectedtag-case) -- the next value is not a constructed value with that tag
+- [AsnError.Truncated](#truncated-case) -- the input ends inside the value
 
 **See also** &nbsp; [AsnReader.ReadSequence](#readsequence-method)
 
@@ -662,13 +662,13 @@ The next `BOOLEAN`.
 
 **Parameters**
 
-- `expectedTag` — the tag in place of `BOOLEAN`
+- `expectedTag` -- the tag in place of `BOOLEAN`
 
 **Fails with**
 
-- [AsnError.UnexpectedTag](#unexpectedtag-case) — the next value has another tag
-- [AsnError.BadLength](#badlength-case) — the contents are not one octet
-- [AsnError.NonMinimalEncoding](#nonminimalencoding-case) — under DER, an octet other than `0x00` or `0xFF`
+- [AsnError.UnexpectedTag](#unexpectedtag-case) -- the next value has another tag
+- [AsnError.BadLength](#badlength-case) -- the contents are not one octet
+- [AsnError.NonMinimalEncoding](#nonminimalencoding-case) -- under DER, an octet other than `0x00` or `0xFF`
 
 <sub>[stdlib/Formats/Asn1/AsnReader.sl:178](../../stdlib/Formats/Asn1/AsnReader.sl#L178)</sub>
 
@@ -682,7 +682,7 @@ The next `NULL`.
 
 **Parameters**
 
-- `expectedTag` — the tag in place of `NULL`
+- `expectedTag` -- the tag in place of `NULL`
 
 **Returns** &nbsp; `AsnError.None`, or why the next value is not a `NULL`
 
@@ -702,13 +702,13 @@ since neither fits a `long`.
 
 **Parameters**
 
-- `expectedTag` — the tag in place of `INTEGER`
+- `expectedTag` -- the tag in place of `INTEGER`
 
 **Fails with**
 
-- [AsnError.UnexpectedTag](#unexpectedtag-case) — the next value has another tag
-- [AsnError.BadLength](#badlength-case) — there are no contents
-- [AsnError.NonMinimalEncoding](#nonminimalencoding-case) — a leading `0x00` or `0xFF` that says nothing
+- [AsnError.UnexpectedTag](#unexpectedtag-case) -- the next value has another tag
+- [AsnError.BadLength](#badlength-case) -- there are no contents
+- [AsnError.NonMinimalEncoding](#nonminimalencoding-case) -- a leading `0x00` or `0xFF` that says nothing
 
 **See also** &nbsp; [AsnReader.ReadInt64](#readint64-method)
 
@@ -724,14 +724,14 @@ The next `INTEGER`, as a `long`.
 
 **Parameters**
 
-- `expectedTag` — the tag in place of `INTEGER`
+- `expectedTag` -- the tag in place of `INTEGER`
 
 **Fails with**
 
-- [AsnError.UnexpectedTag](#unexpectedtag-case) — the next value has another tag
-- [AsnError.BadLength](#badlength-case) — there are no contents
-- [AsnError.NonMinimalEncoding](#nonminimalencoding-case) — a leading `0x00` or `0xFF` that says nothing
-- [AsnError.OutOfRange](#outofrange-case) — the value does not fit a `long`
+- [AsnError.UnexpectedTag](#unexpectedtag-case) -- the next value has another tag
+- [AsnError.BadLength](#badlength-case) -- there are no contents
+- [AsnError.NonMinimalEncoding](#nonminimalencoding-case) -- a leading `0x00` or `0xFF` that says nothing
+- [AsnError.OutOfRange](#outofrange-case) -- the value does not fit a `long`
 
 **See also** &nbsp; [AsnReader.ReadUInt64](#readuint64-method)
 
@@ -747,14 +747,14 @@ The next `INTEGER`, as a `ulong`.
 
 **Parameters**
 
-- `expectedTag` — the tag in place of `INTEGER`
+- `expectedTag` -- the tag in place of `INTEGER`
 
 **Fails with**
 
-- [AsnError.UnexpectedTag](#unexpectedtag-case) — the next value has another tag
-- [AsnError.BadLength](#badlength-case) — there are no contents
-- [AsnError.NonMinimalEncoding](#nonminimalencoding-case) — a leading `0x00` or `0xFF` that says nothing
-- [AsnError.OutOfRange](#outofrange-case) — the value is negative or does not fit a `ulong`
+- [AsnError.UnexpectedTag](#unexpectedtag-case) -- the next value has another tag
+- [AsnError.BadLength](#badlength-case) -- there are no contents
+- [AsnError.NonMinimalEncoding](#nonminimalencoding-case) -- a leading `0x00` or `0xFF` that says nothing
+- [AsnError.OutOfRange](#outofrange-case) -- the value is negative or does not fit a `ulong`
 
 **See also** &nbsp; [AsnReader.ReadInt64](#readint64-method)
 
@@ -770,14 +770,14 @@ The next `ENUMERATED`, as a `long`.
 
 **Parameters**
 
-- `expectedTag` — the tag in place of `ENUMERATED`
+- `expectedTag` -- the tag in place of `ENUMERATED`
 
 **Fails with**
 
-- [AsnError.UnexpectedTag](#unexpectedtag-case) — the next value has another tag
-- [AsnError.BadLength](#badlength-case) — there are no contents
-- [AsnError.NonMinimalEncoding](#nonminimalencoding-case) — a leading `0x00` or `0xFF` that says nothing
-- [AsnError.OutOfRange](#outofrange-case) — the value does not fit a `long`
+- [AsnError.UnexpectedTag](#unexpectedtag-case) -- the next value has another tag
+- [AsnError.BadLength](#badlength-case) -- there are no contents
+- [AsnError.NonMinimalEncoding](#nonminimalencoding-case) -- a leading `0x00` or `0xFF` that says nothing
+- [AsnError.OutOfRange](#outofrange-case) -- the value does not fit a `long`
 
 <sub>[stdlib/Formats/Asn1/AsnReader.sl:281](../../stdlib/Formats/Asn1/AsnReader.sl#L281)</sub>
 
@@ -791,15 +791,15 @@ The next `OBJECT IDENTIFIER`, dotted: `1.2.840.113549`.
 
 **Parameters**
 
-- `expectedTag` — the tag in place of `OBJECT IDENTIFIER`
+- `expectedTag` -- the tag in place of `OBJECT IDENTIFIER`
 
 **Fails with**
 
-- [AsnError.UnexpectedTag](#unexpectedtag-case) — the next value has another tag
-- [AsnError.BadLength](#badlength-case) — there are no contents
-- [AsnError.NonMinimalEncoding](#nonminimalencoding-case) — an arc padded with a leading `0x80`
-- [AsnError.Malformed](#malformed-case) — the last arc does not end
-- [AsnError.OutOfRange](#outofrange-case) — an arc does not fit a `ulong`
+- [AsnError.UnexpectedTag](#unexpectedtag-case) -- the next value has another tag
+- [AsnError.BadLength](#badlength-case) -- there are no contents
+- [AsnError.NonMinimalEncoding](#nonminimalencoding-case) -- an arc padded with a leading `0x80`
+- [AsnError.Malformed](#malformed-case) -- the last arc does not end
+- [AsnError.OutOfRange](#outofrange-case) -- an arc does not fit a `ulong`
 
 **See also** &nbsp; [Oid.ToDottedString](#todottedstring-method)
 
@@ -816,16 +816,16 @@ bits at the end of the last one are not part of the value.
 
 **Parameters**
 
-- `unusedBitCount` — zero to seven; zero when the read fails
-- `expectedTag` — the tag in place of `BIT STRING`
+- `unusedBitCount` -- zero to seven; zero when the read fails
+- `expectedTag` -- the tag in place of `BIT STRING`
 
 **Fails with**
 
-- [AsnError.UnexpectedTag](#unexpectedtag-case) — the next value has another tag
-- [AsnError.BadLength](#badlength-case) — there are no contents at all
-- [AsnError.Malformed](#malformed-case) — more than seven unused bits, or unused bits with no octet to hold them
-- [AsnError.NonMinimalEncoding](#nonminimalencoding-case) — under DER, an unused bit that is not zero, or the constructed form
-- [AsnError.Unsupported](#unsupported-case) — under BER, the constructed form
+- [AsnError.UnexpectedTag](#unexpectedtag-case) -- the next value has another tag
+- [AsnError.BadLength](#badlength-case) -- there are no contents at all
+- [AsnError.Malformed](#malformed-case) -- more than seven unused bits, or unused bits with no octet to hold them
+- [AsnError.NonMinimalEncoding](#nonminimalencoding-case) -- under DER, an unused bit that is not zero, or the constructed form
+- [AsnError.Unsupported](#unsupported-case) -- under BER, the constructed form
 
 <sub>[stdlib/Formats/Asn1/AsnReader.sl:323](../../stdlib/Formats/Asn1/AsnReader.sl#L323)</sub>
 
@@ -839,13 +839,13 @@ The contents of the next `OCTET STRING`.
 
 **Parameters**
 
-- `expectedTag` — the tag in place of `OCTET STRING`
+- `expectedTag` -- the tag in place of `OCTET STRING`
 
 **Fails with**
 
-- [AsnError.UnexpectedTag](#unexpectedtag-case) — the next value has another tag
-- [AsnError.NonMinimalEncoding](#nonminimalencoding-case) — under DER, the constructed form
-- [AsnError.Unsupported](#unsupported-case) — under BER, the constructed form
+- [AsnError.UnexpectedTag](#unexpectedtag-case) -- the next value has another tag
+- [AsnError.NonMinimalEncoding](#nonminimalencoding-case) -- under DER, the constructed form
+- [AsnError.Unsupported](#unsupported-case) -- under BER, the constructed form
 
 <sub>[stdlib/Formats/Asn1/AsnReader.sl:356](../../stdlib/Formats/Asn1/AsnReader.sl#L356)</sub>
 
@@ -870,15 +870,15 @@ The next character string of type `encodingType`, as text.
 
 **Parameters**
 
-- `encodingType` — which of the types above
-- `expectedTag` — the tag in place of `encodingType`'s own
+- `encodingType` -- which of the types above
+- `expectedTag` -- the tag in place of `encodingType`'s own
 
 **Fails with**
 
-- [AsnError.UnexpectedTag](#unexpectedtag-case) — the next value has another tag
-- [AsnError.BadStringContent](#badstringcontent-case) — a character the type does not allow
-- [AsnError.NonMinimalEncoding](#nonminimalencoding-case) — under DER, the constructed form
-- [AsnError.Unsupported](#unsupported-case) — `encodingType` is not in the table, or under BER the constructed form
+- [AsnError.UnexpectedTag](#unexpectedtag-case) -- the next value has another tag
+- [AsnError.BadStringContent](#badstringcontent-case) -- a character the type does not allow
+- [AsnError.NonMinimalEncoding](#nonminimalencoding-case) -- under DER, the constructed form
+- [AsnError.Unsupported](#unsupported-case) -- `encodingType` is not in the table, or under BER the constructed form
 
 <sub>[stdlib/Formats/Asn1/AsnReader.sl:387](../../stdlib/Formats/Asn1/AsnReader.sl#L387)</sub>
 
@@ -897,12 +897,12 @@ are 1950 to 1999, and `00` to `49` are 2000 to 2049. DER requires
 
 **Parameters**
 
-- `expectedTag` — the tag in place of `UTCTime`
+- `expectedTag` -- the tag in place of `UTCTime`
 
 **Fails with**
 
-- [AsnError.UnexpectedTag](#unexpectedtag-case) — the next value has another tag
-- [AsnError.BadTime](#badtime-case) — not the form the rules require, or not a real moment
+- [AsnError.UnexpectedTag](#unexpectedtag-case) -- the next value has another tag
+- [AsnError.BadTime](#badtime-case) -- not the form the rules require, or not a real moment
 
 **See also** &nbsp; [ConvertAsnTimeToDateTimeOffset](#convertasntimetodatetimeoffset-function)
 
@@ -924,13 +924,13 @@ seconds; RFC 5280 forbids one in a certificate anyway.
 
 **Parameters**
 
-- `expectedTag` — the tag in place of `GeneralizedTime`
+- `expectedTag` -- the tag in place of `GeneralizedTime`
 
 **Fails with**
 
-- [AsnError.UnexpectedTag](#unexpectedtag-case) — the next value has another tag
-- [AsnError.BadTime](#badtime-case) — not the form the rules require, or not a real moment
-- [AsnError.Unsupported](#unsupported-case) — under BER, a local time with no zone, or a fraction of an hour or a minute
+- [AsnError.UnexpectedTag](#unexpectedtag-case) -- the next value has another tag
+- [AsnError.BadTime](#badtime-case) -- not the form the rules require, or not a real moment
+- [AsnError.Unsupported](#unsupported-case) -- under BER, a local time with no zone, or a fraction of an hour or a minute
 
 **See also** &nbsp; [ConvertAsnTimeToDateTimeOffset](#convertasntimetodatetimeoffset-function)
 
@@ -1003,7 +1003,7 @@ Opens a `SEQUENCE`, which lasts until the matching `PopSequence`.
 
 **Parameters**
 
-- `tag` — the tag in place of `SEQUENCE`; a context tag here is explicit tagging
+- `tag` -- the tag in place of `SEQUENCE`; a context tag here is explicit tagging
 
 **See also** &nbsp; [AsnWriter.PopSequence](#popsequence-method)
 
@@ -1029,7 +1029,7 @@ Opens a `SET OF`, which lasts until the matching `PopSetOf`.
 
 **Parameters**
 
-- `tag` — the tag in place of `SET`
+- `tag` -- the tag in place of `SET`
 
 **See also** &nbsp; [AsnWriter.PopSetOf](#popsetof-method)
 
@@ -1058,7 +1058,7 @@ Its tag and length are checked; its contents are not.
 
 **Parameters**
 
-- `encoded` — exactly one whole value
+- `encoded` -- exactly one whole value
 
 **Returns** &nbsp; `AsnError.None`, or why `encoded` is not one DER value
 
@@ -1074,8 +1074,8 @@ A `BOOLEAN`: `0xFF` for true, as DER requires.
 
 **Parameters**
 
-- `value` — what to write
-- `tag` — the tag in place of `BOOLEAN`
+- `value` -- what to write
+- `tag` -- the tag in place of `BOOLEAN`
 
 <sub>[stdlib/Formats/Asn1/AsnWriter.sl:136](../../stdlib/Formats/Asn1/AsnWriter.sl#L136)</sub>
 
@@ -1089,7 +1089,7 @@ A `NULL`.
 
 **Parameters**
 
-- `tag` — the tag in place of `NULL`
+- `tag` -- the tag in place of `NULL`
 
 <sub>[stdlib/Formats/Asn1/AsnWriter.sl:145](../../stdlib/Formats/Asn1/AsnWriter.sl#L145)</sub>
 
@@ -1103,8 +1103,8 @@ An `INTEGER`, in the fewest octets that hold it.
 
 **Parameters**
 
-- `value` — what to write
-- `tag` — the tag in place of `INTEGER`
+- `value` -- what to write
+- `tag` -- the tag in place of `INTEGER`
 
 <sub>[stdlib/Formats/Asn1/AsnWriter.sl:154](../../stdlib/Formats/Asn1/AsnWriter.sl#L154)</sub>
 
@@ -1119,8 +1119,8 @@ its top bit is set.
 
 **Parameters**
 
-- `value` — what to write
-- `tag` — the tag in place of `INTEGER`
+- `value` -- what to write
+- `tag` -- the tag in place of `INTEGER`
 
 <sub>[stdlib/Formats/Asn1/AsnWriter.sl:164](../../stdlib/Formats/Asn1/AsnWriter.sl#L164)</sub>
 
@@ -1135,8 +1135,8 @@ already minimal.
 
 **Parameters**
 
-- `value` — the contents octets
-- `tag` — the tag in place of `INTEGER`
+- `value` -- the contents octets
+- `tag` -- the tag in place of `INTEGER`
 
 **Returns** &nbsp; `AsnError.BadLength` when `value` is empty, `AsnError.NonMinimalEncoding` when it starts with a redundant octet
 
@@ -1157,8 +1157,8 @@ read as negative.
 
 **Parameters**
 
-- `magnitude` — the value's octets; empty is zero
-- `tag` — the tag in place of `INTEGER`
+- `magnitude` -- the value's octets; empty is zero
+- `tag` -- the tag in place of `INTEGER`
 
 **See also** &nbsp; [AsnWriter.WriteIntegerBytes](#writeintegerbytes-method)
 
@@ -1174,8 +1174,8 @@ An `ENUMERATED`.
 
 **Parameters**
 
-- `value` — what to write
-- `tag` — the tag in place of `ENUMERATED`
+- `value` -- what to write
+- `tag` -- the tag in place of `ENUMERATED`
 
 <sub>[stdlib/Formats/Asn1/AsnWriter.sl:222](../../stdlib/Formats/Asn1/AsnWriter.sl#L222)</sub>
 
@@ -1189,8 +1189,8 @@ An `OBJECT IDENTIFIER`, from its dotted form.
 
 **Parameters**
 
-- `dotted` — the identifier, as `1.2.840.113549`
-- `tag` — the tag in place of `OBJECT IDENTIFIER`
+- `dotted` -- the identifier, as `1.2.840.113549`
+- `tag` -- the tag in place of `OBJECT IDENTIFIER`
 
 **Returns** &nbsp; `AsnError.None`, or why `dotted` is not an identifier
 
@@ -1209,9 +1209,9 @@ not part of it.
 
 **Parameters**
 
-- `value` — the octets
-- `unusedBitCount` — zero to seven
-- `tag` — the tag in place of `BIT STRING`
+- `value` -- the octets
+- `unusedBitCount` -- zero to seven
+- `tag` -- the tag in place of `BIT STRING`
 
 **Returns** &nbsp; `AsnError.OutOfRange` for more than seven unused bits, `AsnError.Malformed` for unused bits and no octet, and `AsnError.NonMinimalEncoding` when an unused bit is not zero
 
@@ -1227,8 +1227,8 @@ An `OCTET STRING`.
 
 **Parameters**
 
-- `value` — the octets
-- `tag` — the tag in place of `OCTET STRING`
+- `value` -- the octets
+- `tag` -- the tag in place of `OCTET STRING`
 
 <sub>[stdlib/Formats/Asn1/AsnWriter.sl:279](../../stdlib/Formats/Asn1/AsnWriter.sl#L279)</sub>
 
@@ -1244,9 +1244,9 @@ The types and what each may hold are `AsnReader.ReadCharacterString`'s.
 
 **Parameters**
 
-- `encodingType` — which character string type
-- `text` — what to write
-- `tag` — the tag in place of `encodingType`'s own
+- `encodingType` -- which character string type
+- `text` -- what to write
+- `tag` -- the tag in place of `encodingType`'s own
 
 **Returns** &nbsp; `AsnError.BadStringContent` for a character the type cannot hold, `AsnError.Unsupported` for a type that is not a character string
 
@@ -1262,8 +1262,8 @@ A `UTCTime`, as `YYMMDDhhmmssZ`.
 
 **Parameters**
 
-- `seconds` — seconds since 1970-01-01 UTC
-- `tag` — the tag in place of `UTCTime`
+- `seconds` -- seconds since 1970-01-01 UTC
+- `tag` -- the tag in place of `UTCTime`
 
 **Returns** &nbsp; `AsnError.OutOfRange` when the year is outside 1950 to 2049
 
@@ -1281,8 +1281,8 @@ A `GeneralizedTime`, as `YYYYMMDDhhmmssZ`.
 
 **Parameters**
 
-- `seconds` — seconds since 1970-01-01 UTC
-- `tag` — the tag in place of `GeneralizedTime`
+- `seconds` -- seconds since 1970-01-01 UTC
+- `tag` -- the tag in place of `GeneralizedTime`
 
 **Returns** &nbsp; `AsnError.OutOfRange` when the year is outside 0000 to 9999
 
@@ -1323,14 +1323,14 @@ is `0.n`, under 80 is `1.n`, and the rest is `2.n`.
 
 **Parameters**
 
-- `contents` — the octets after the tag and the length
+- `contents` -- the octets after the tag and the length
 
 **Fails with**
 
-- [AsnError.BadLength](#badlength-case) — there are no octets
-- [AsnError.NonMinimalEncoding](#nonminimalencoding-case) — an arc starts with the padding octet `0x80`
-- [AsnError.Malformed](#malformed-case) — the last arc does not end
-- [AsnError.OutOfRange](#outofrange-case) — an arc does not fit a `ulong`
+- [AsnError.BadLength](#badlength-case) -- there are no octets
+- [AsnError.NonMinimalEncoding](#nonminimalencoding-case) -- an arc starts with the padding octet `0x80`
+- [AsnError.Malformed](#malformed-case) -- the last arc does not end
+- [AsnError.OutOfRange](#outofrange-case) -- an arc does not fit a `ulong`
 
 **See also** &nbsp; [Oid.FromDottedString](#fromdottedstring-method)
 
@@ -1350,12 +1350,12 @@ one dot between each pair. The first arc is 0, 1 or 2, and under 0 and
 
 **Parameters**
 
-- `dotted` — the identifier, as `1.2.840.113549`
+- `dotted` -- the identifier, as `1.2.840.113549`
 
 **Fails with**
 
-- [AsnError.Malformed](#malformed-case) — the text is not in that form
-- [AsnError.OutOfRange](#outofrange-case) — an arc does not fit a `ulong`
+- [AsnError.Malformed](#malformed-case) -- the text is not in that form
+- [AsnError.OutOfRange](#outofrange-case) -- an arc does not fit a `ulong`
 
 **See also** &nbsp; [Oid.ToDottedString](#todottedstring-method)
 
@@ -1782,11 +1782,11 @@ An ASN.1 time as a `DateTimeOffset`, where one can hold it.
 
 **Parameters**
 
-- `seconds` — seconds since 1970-01-01 UTC, as `AsnReader.ReadUtcTime` answers
+- `seconds` -- seconds since 1970-01-01 UTC, as `AsnReader.ReadUtcTime` answers
 
 **Fails with**
 
-- [AsnError.OutOfRange](#outofrange-case) — the moment is before 1677-09-21 or after 2262-04-11, where a count of nanoseconds in a `long` ends
+- [AsnError.OutOfRange](#outofrange-case) -- the moment is before 1677-09-21 or after 2262-04-11, where a count of nanoseconds in a `long` ends
 
 **See also** &nbsp; [AsnReader.ReadGeneralizedTime](#readgeneralizedtime-method)
 

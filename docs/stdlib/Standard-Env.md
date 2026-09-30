@@ -97,8 +97,8 @@ A variable's value, or `fallback` when it is not set.
 
 **Parameters**
 
-- `name` — the variable to read
-- `fallback` — what to answer when there is no such variable
+- `name` -- the variable to read
+- `fallback` -- what to answer when there is no such variable
 
 **See also** &nbsp; [Env.GetEnvironmentVariable](#getenvironmentvariable-function)
 
@@ -169,8 +169,8 @@ An empty value leaves the variable set and empty, on both platforms, and
 
 **Parameters**
 
-- `name` — the variable to set
-- `value` — what to set it to
+- `name` -- the variable to set
+- `value` -- what to set it to
 
 **See also** &nbsp; [Env.RemoveEnvironmentVariable](#removeenvironmentvariable-function)
 

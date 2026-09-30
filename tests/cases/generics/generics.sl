@@ -2,7 +2,6 @@
 module Generics;
 
 import Standard.Console;
-import Standard.Unchecked;
 
 public class Box<T>
 {
@@ -25,12 +24,12 @@ public class Node<T>
 
 public class List<T>
 {
-    T[] _items;
+    Slot<T>[] _items;
     nuint _count;
 
     public List()
     {
-        _items = NewUninitializedArray<T>(2u);
+        _items = new Slot<T>[2u];
         _count = 0;
     }
 
@@ -40,7 +39,7 @@ public class List<T>
     {
         if (_count == _items.Length)
         {
-            var bigger = NewUninitializedArray<T>(_count * 2);
+            var bigger = new Slot<T>[_count * 2];
             for (nuint i = 0; i < _count; i = i + 1)
                 bigger[i] = _items[i];
             _items = bigger;
@@ -49,7 +48,7 @@ public class List<T>
         _count = _count + 1;
     }
 
-    public T At(nuint index) => _items[index];
+    public T At(nuint index) => _items[index].Value;
 }
 
 T Pick<T>(T a, T b, bool first)

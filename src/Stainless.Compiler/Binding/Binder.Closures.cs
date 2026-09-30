@@ -46,6 +46,13 @@ public sealed partial class Binder
         public List<(FieldSymbol Field, BoundExpression Value)> Captures { get; } = [];
 
         /// <summary>
+        /// The captures that copy a member of the object around the lambda,
+        /// with that object's type and where the member was first named.
+        /// </summary>
+        public Dictionary<FieldSymbol, (NamedTypeSymbol Owner, SourceSpan Span)> Members { get; } =
+            [];
+
+        /// <summary>
         /// Whether a captured <c>this</c> is held weakly: true for a lambda
         /// that is the handler of a <c>+=</c>, so that it cannot keep alive
         /// the object that subscribed it.
@@ -105,6 +112,9 @@ public sealed partial class Binder
     /// </summary>
     private readonly List<(object Member, string Name, NamedTypeSymbol Owner, SourceSpan Span)>
         _memberCaptures = [];
+
+    /// <summary>Member captures already reported by SL0829, which SL0610 leaves alone.</summary>
+    private readonly HashSet<SourceSpan> _lostMemberWrites = [];
 
     /// <summary>
     /// Every field and property assigned outside a constructor.
@@ -225,6 +235,7 @@ public sealed partial class Binder
     {
         foreach (var (member, name, owner, span) in _memberCaptures)
         {
+            if (_lostMemberWrites.Contains(span)) continue;
             if (!IsChanged(member, out string? through)) continue;
 
             // **The fix differs by what `this` is.** A class reference copied
@@ -293,7 +304,10 @@ public sealed partial class Binder
         var field = new FieldSymbol(name, outer.Type, closure.Type, closure.Type.Fields.Count);
         AddCapture(closure, name, field, outer);
 
-        if (VariableOf(outer) is { } origin) Remember(_captureOrigins, field, origin);
+        if (VariableOf(outer) is { } origin)
+            Remember(_captureOrigins, field, origin);
+        else if (EnclosingThis(_context.Closures[0], span)?.Type is NamedTypeSymbol owner)
+            closure.Members[field] = (owner, span);
 
         return new BoundFieldAccess(span, new BoundThis(span, closure.Type, closure.This!), field);
     }
@@ -1178,12 +1192,66 @@ public sealed partial class Binder
         PopScope();
         CheckJumps("this lambda");
 
+        if (context.Type is { } closureType)
+            ReportLostCapturedWrites(body, closureType, context);
+
         if (!symbol.ReturnType.IsVoid() && EndIsReachable(body))
             diagnostics.Error("SL0217", syntax.Span,
                 $"not all paths through this lambda return a value of type '{symbol.ReturnType.Name}'",
                 symbol.ReturnType);
 
         return body;
+    }
+
+    /// <summary>
+    /// Warns about each write to a captured copy that cannot be seen.
+    ///
+    /// A capture is a field of the closure, so a write persists from one call
+    /// of that closure to the next, and a lambda that reads its copy again is
+    /// keeping state of its own, which is legitimate. A copy only written never
+    /// is: the variable around the lambda does not change. A bare member is
+    /// reported whether read or not, because a field's name promises the field.
+    /// </summary>
+    private void ReportLostCapturedWrites(
+        BoundBlock body, ClassTypeSymbol closureType, ClosureContext context)
+    {
+        var uses = new ClosureFieldUseFinder(closureType);
+        uses.Visit(body);
+
+        foreach (var (field, span) in uses.Writes)
+        {
+            string name = field.Name;
+
+            if (context.Members.TryGetValue(field, out var member))
+            {
+                var owner = member.Owner;
+
+                string advice = owner is ClassTypeSymbol
+                    ? $"Write 'this.{name}' to change it"
+                    : $"'{owner.Name}' is a struct, so the lambda holds a copy of the whole " +
+                      "value; return the new value instead, or make it a class";
+
+                diagnostics.Warning("SL0829", span,
+                    $"this writes the lambda's own copy of '{name}', so '{owner.Name}.{name}' " +
+                    "does not change: a lambda captures a member it names without 'this' by " +
+                    "value. " + advice);
+
+                // SL0610 would point at the same capture with the same fix.
+                Remember(_lostMemberWrites, member.Span);
+                continue;
+            }
+
+            if (uses.Reads.Contains(field)) continue;
+
+            string what = name == ThisCaptureName
+                ? $"'this', a '{field.Type.Name}', so the struct the method was called on"
+                : $"'{name}', so the '{name}' outside the lambda";
+
+            diagnostics.Warning("SL0829", span,
+                $"this writes the lambda's own copy of {what} does not change, and nothing " +
+                "reads the copy again: a lambda captures by value. Keep the state in an " +
+                "object the lambda holds, or return the new value");
+        }
     }
 
     /// <summary>

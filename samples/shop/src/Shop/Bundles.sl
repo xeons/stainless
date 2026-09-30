@@ -2,7 +2,6 @@
 // samples/shop/src/Shop/Bundles.sl  ->  module Shop.Bundles
 module Shop.Bundles;
 
-import Standard.Unchecked;
 import Shop.Catalog;
 import Shop.Pricing;
 
@@ -11,15 +10,14 @@ import Shop.Pricing;
 public class Bundle : IPriced
 {
     String _name;
-    // An array of interface references. The slots past `_count` are not
-    // items yet, and are written before they are read.
-    IPriced[] _items;
+    // Interface references, in slots: the ones past `_count` are empty.
+    Slot<IPriced>[] _items;
     nuint _count;
 
     public Bundle(String label, nuint capacity)
     {
         _name = label;
-        _items = NewUninitializedArray<IPriced>(capacity);
+        _items = new Slot<IPriced>[capacity];
         _count = 0;
     }
 
@@ -38,7 +36,7 @@ public class Bundle : IPriced
             {
                 // Dynamic dispatch: each element may be a Book, a Subscription,
                 // or another Bundle.
-                total = AddMoney(total, _items[i].Price);
+                total = AddMoney(total, _items[i].Value.Price);
             }
             return total;
         }

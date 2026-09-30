@@ -1021,6 +1021,27 @@ public sealed class BoundVariantTest(
 }
 
 /// <summary>
+/// <c>slot.Value</c>: what a <c>Slot&lt;T&gt;</c> holds, read in place. When
+/// the slot is checked the emitter aborts on an empty one.
+/// </summary>
+public sealed class BoundSlotValue(SourceSpan span, SlotTypeSymbol slot, BoundExpression receiver)
+    : BoundExpression(span, slot.Element)
+{
+    public SlotTypeSymbol Slot { get; } = slot;
+    public BoundExpression Receiver { get; } = receiver;
+}
+
+/// <summary>A value made into the <c>Slot&lt;T&gt;</c> holding it; yields +1.</summary>
+public sealed class BoundSlotFill(SourceSpan span, SlotTypeSymbol slot, BoundExpression value)
+    : BoundExpression(span, slot)
+{
+    public SlotTypeSymbol Slot { get; } = slot;
+
+    /// <summary>The value, already converted to the slot's element type.</summary>
+    public BoundExpression Value { get; } = value;
+}
+
+/// <summary>
 /// One field of a variant's payload, reached through the case it belongs to.
 ///
 /// The binder only ever produces this where it has already established that the
@@ -1380,6 +1401,41 @@ public sealed class BoundNewArray(SourceSpan span, ArrayTypeSymbol type, BoundEx
 {
     public ArrayTypeSymbol ArrayType { get; } = type;
     public BoundExpression Length { get; } = length;
+}
+
+/// <summary>
+/// <c>Array.Create(count, make)</c>: an array of <c>count</c> elements, the one
+/// at <c>i</c> being <c>make(i)</c>, made in order from zero. Every element is
+/// written before the array can be seen, which is what lets it be made for a
+/// type with no zero value. Lowered to <see cref="BoundArrayFill"/>.
+/// </summary>
+public sealed class BoundArrayCreate(
+    SourceSpan span, ArrayTypeSymbol type, BoundExpression count, BoundExpression make)
+    : BoundSemanticExpression(span, type)
+{
+    public ArrayTypeSymbol ArrayType { get; } = type;
+    public BoundExpression Count { get; } = count;
+
+    /// <summary>A <c>Func&lt;nuint, T&gt;</c>, evaluated once.</summary>
+    public BoundExpression Make { get; } = make;
+}
+
+/// <summary>
+/// <see cref="BoundArrayCreate"/> lowered: <see cref="Make"/> held in one
+/// local, the index in another, and <see cref="Element"/> the call over them
+/// whose result is stored at each index in turn; yields +1.
+/// </summary>
+public sealed class BoundArrayFill(
+    SourceSpan span, ArrayTypeSymbol type, BoundExpression count, BoundExpression make,
+    LocalSymbol makeLocal, LocalSymbol atLocal, BoundExpression element)
+    : BoundExpression(span, type)
+{
+    public ArrayTypeSymbol ArrayType { get; } = type;
+    public BoundExpression Count { get; } = count;
+    public BoundExpression Make { get; } = make;
+    public LocalSymbol MakeLocal { get; } = makeLocal;
+    public LocalSymbol AtLocal { get; } = atLocal;
+    public BoundExpression Element { get; } = element;
 }
 
 /// <summary><c>array.Length</c>, read straight out of the object header.</summary>

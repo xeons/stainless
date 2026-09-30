@@ -1364,11 +1364,15 @@ public sealed partial class Binder
     /// type, a range, a <c>when</c>, a value taken apart -- which the checks
     /// the constant and variant forms make do not cover.
     /// </summary>
-    private static bool NeedsPatterns(SwitchSyntax syntax, TypeSymbol subject) =>
+    private bool NeedsPatterns(SwitchSyntax syntax, TypeSymbol subject) =>
         syntax.Sections.Any(section =>
             section.Guards.Any(guard => guard is not null) ||
             section.Patterns.Any(pattern => pattern switch
             {
+                // `case Owner:` names a class, which is a type test however
+                // it was written, and over a value is refused as one.
+                ConstantPatternSyntax { Value: NameSyntax name } =>
+                    subject is not VariantTypeSymbol && LooksLikeType(name),
                 ConstantPatternSyntax => false,
 
                 // Over a variant this is `case Circle c:`, which the variant

@@ -297,6 +297,82 @@ public class DigestTests
 
         Assert.False(edited.DigestMatches());
     }
+
+    /// <summary>
+    /// A debug build and a release one describe one surface. The lock file
+    /// records the digest, so it MUST NOT move between them.
+    /// </summary>
+    [Fact]
+    public void HoldsStillWhenOnlyTheRuntimeBuildDiffers()
+    {
+        var one = (Metadata(Point(Field("X", 0))) with
+        {
+            SharedRuntime = true,
+            Runtime = Toolchain.SharedRuntimeName(debug: false, leakCheck: false),
+        }).Sealed();
+        var two = (one with { Runtime = Toolchain.SharedRuntimeName(debug: true, leakCheck: false) })
+            .Sealed();
+
+        Assert.Equal(one.AbiDigest, two.AbiDigest);
+    }
+}
+
+/// <summary>
+/// A library and its consumer MUST link one build of the shared runtime. Each
+/// build is a library of its own name, so two builds are two runtimes in one
+/// process.
+/// </summary>
+public class SharedRuntimeTests
+{
+    private static CompilationResult Consume(string runtime, bool debug, bool leakCheck)
+    {
+        string directory = Path.Combine(Path.GetTempPath(), "stainless-shared-runtime",
+            Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(directory);
+
+        string metadata = Path.Combine(directory, "library.slmod");
+        File.WriteAllText(metadata, new ModuleMetadata
+        {
+            Library = "library.dll",
+            SharedRuntime = true,
+            Runtime = runtime,
+            Types = [],
+            Functions = [],
+        }.Sealed().ToJson());
+
+        string source = Path.Combine(directory, "app.sl");
+        File.WriteAllText(source, "module App; int Main() { return 0; }");
+
+        return new Compilation().Compile(new CompilationOptions
+        {
+            SourcePaths = [source],
+            References = [metadata],
+            OutputPath = Path.Combine(directory, "app.ll"),
+            IntermediateDirectory = directory,
+            Debug = debug,
+            LeakCheck = leakCheck,
+            EmitIrOnly = true,
+        });
+    }
+
+    [Theory]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    public void RefusesALibraryOnAnotherBuild(bool debug, bool leakCheck)
+    {
+        var result = Consume(Toolchain.SharedRuntimeName(false, false), debug, leakCheck);
+
+        Assert.False(result.Success);
+        Assert.Contains("two runtimes in one process", result.DriverError);
+    }
+
+    [Fact]
+    public void AcceptsALibraryOnTheSameBuild()
+    {
+        var result = Consume(Toolchain.SharedRuntimeName(false, true), debug: false, leakCheck: true);
+
+        Assert.True(result.Success, result.DriverError);
+    }
 }
 
 /// <summary>

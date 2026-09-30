@@ -71,7 +71,8 @@ public sealed partial class Lowerer
 
     /// <summary>
     /// <c>let array = new T[n] in let at = 0 in (array[at] = a, at = at + 1, at = Copy(array, at, b), ..., array)</c>:
-    /// the array made once at its size and filled from the front.
+    /// the array made once at its size and filled from the front, and checked full when a
+    /// length came from a property.
     /// </summary>
     private BoundExpression FillCollection(BoundCollection collection, List<CollectionPart> parts)
     {
@@ -99,8 +100,12 @@ public sealed partial class Lowerer
                 new BoundBinary(span, PrimitiveTypeSymbol.NUInt, atRead, BoundBinaryOp.Add, Word(span, 1))));
         }
 
+        BoundExpression finished = collection.Finish is { } finish
+            ? new BoundCall(span, finish, null, [madeRead, atRead])
+            : madeRead;
+
         return new BoundLet(span, made, new BoundNewArray(span, arrayType, TotalOf(parts, span)),
-            new BoundLet(span, at, Word(span, 0), new BoundSequence(span, writes, madeRead)));
+            new BoundLet(span, at, Word(span, 0), new BoundSequence(span, writes, finished)));
     }
 
     /// <summary>
@@ -163,6 +168,23 @@ public sealed partial class Lowerer
         return gathered.Type is SliceTypeSymbol slice
             ? new BoundConversion(gathered.Span, slice, literal, ConversionKind.ArrayToSlice)
             : literal;
+    }
+
+    /// <summary>
+    /// <c>Array.Create</c>, given the two locals its loop runs over and the
+    /// call that makes each element.
+    /// </summary>
+    private BoundExpression LowerArrayCreate(BoundArrayCreate created)
+    {
+        var span = created.Span;
+        var closure = (ClosureTypeSymbol)created.Make.Type;
+        var make = Synthetic("make", closure);
+        var at = Synthetic("at", PrimitiveTypeSymbol.NUInt);
+
+        return new BoundArrayFill(span, created.ArrayType, Rewrite(created.Count), Rewrite(created.Make),
+            make, at,
+            new BoundClosureCall(span, closure, new BoundLocalAccess(span, make),
+                [new BoundLocalAccess(span, at)]));
     }
 
     private static BoundLiteral Word(SourceSpan span, int value) =>

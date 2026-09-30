@@ -9,6 +9,7 @@ samples/constraints	0
 samples/counter	0
 samples/generics	0
 samples/hello	0
+samples/http-get	0
 samples/interfaces	0
 samples/json	0
 samples/shapes	0

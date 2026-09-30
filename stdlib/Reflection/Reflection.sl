@@ -464,7 +464,8 @@ public Type FindType(String name)
 /// too. The overload taking `fill` is the one for that.
 ///
 /// The caller owns the answer's reference, and nothing here takes it back:
-/// store it with `WriteAggregate`, or prefer `CreateInstanceInto`.
+/// `WriteAggregate` takes a reference of its own and leaves this one owed.
+/// `CreateInstanceInto` is the form that leaves nothing to release.
 ///
 ///     var type = FindType("App.Button");
 ///     byte* made = CreateInstance(type);

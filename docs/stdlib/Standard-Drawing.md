@@ -65,9 +65,9 @@ An empty picture, every pixel transparent.
 
 **Fails with**
 
-- [ImageError.NoBackend](#nobackend-case) — there is no imaging library on this machine
-- [ImageError.OutOfMemory](#outofmemory-case) — the backend would not make a picture that big
-- [ImageError.Invalid](#invalid-case) — a width or a height that is not positive
+- [ImageError.NoBackend](#nobackend-case) -- there is no imaging library on this machine
+- [ImageError.OutOfMemory](#outofmemory-case) -- the backend would not make a picture that big
+- [ImageError.Invalid](#invalid-case) -- a width or a height that is not positive
 
 <sub>[stdlib/Drawing/Image.sl:71](../../stdlib/Drawing/Image.sl#L71)</sub>
 
@@ -81,10 +81,10 @@ A picture decoded from bytes, whatever of the four formats they hold.
 
 **Fails with**
 
-- [ImageError.NoBackend](#nobackend-case) — there is no imaging library on this machine
-- [ImageError.Unreadable](#unreadable-case) — the format was recognised and the decoder would not have the bytes
-- [ImageError.Unsupported](#unsupported-case) — the first bytes are none of the four, or name a format this backend was built without
-- [ImageError.Invalid](#invalid-case) — there are no bytes
+- [ImageError.NoBackend](#nobackend-case) -- there is no imaging library on this machine
+- [ImageError.Unreadable](#unreadable-case) -- the format was recognised and the decoder would not have the bytes
+- [ImageError.Unsupported](#unsupported-case) -- the first bytes are none of the four, or name a format this backend was built without
+- [ImageError.Invalid](#invalid-case) -- there are no bytes
 
 **See also** &nbsp; [Image.FromFile](#fromfile-method)
 
@@ -104,11 +104,11 @@ library says about one it could not open.
 
 **Fails with**
 
-- [ImageError.NoBackend](#nobackend-case) — there is no imaging library on this machine
-- [ImageError.NotFound](#notfound-case) — there is no file at that path
-- [ImageError.Unreadable](#unreadable-case) — the file could not be read, or the decoder would not have it
-- [ImageError.Unsupported](#unsupported-case) — the first bytes are none of the four, or name a format this backend was built without
-- [ImageError.Invalid](#invalid-case) — the file is empty
+- [ImageError.NoBackend](#nobackend-case) -- there is no imaging library on this machine
+- [ImageError.NotFound](#notfound-case) -- there is no file at that path
+- [ImageError.Unreadable](#unreadable-case) -- the file could not be read, or the decoder would not have it
+- [ImageError.Unsupported](#unsupported-case) -- the first bytes are none of the four, or name a format this backend was built without
+- [ImageError.Invalid](#invalid-case) -- the file is empty
 
 **See also** &nbsp; [Image.Save](#save-method)
 
@@ -128,9 +128,9 @@ array may change afterwards without changing the picture.
 
 **Fails with**
 
-- [ImageError.NoBackend](#nobackend-case) — there is no imaging library on this machine
-- [ImageError.OutOfMemory](#outofmemory-case) — the backend would not make a picture that big, or refused the pixels
-- [ImageError.Invalid](#invalid-case) — a width or a height that is not positive, or fewer than `width * height * 4` bytes
+- [ImageError.NoBackend](#nobackend-case) -- there is no imaging library on this machine
+- [ImageError.OutOfMemory](#outofmemory-case) -- the backend would not make a picture that big, or refused the pixels
+- [ImageError.Invalid](#invalid-case) -- a width or a height that is not positive, or fewer than `width * height * 4` bytes
 
 **See also** &nbsp; [Image.CopyPixels](#copypixels-method)
 
@@ -378,9 +378,9 @@ A copy at another size, resampled.
 
 **Fails with**
 
-- [ImageError.NoBackend](#nobackend-case) — there is no imaging library on this machine
-- [ImageError.OutOfMemory](#outofmemory-case) — the backend would not make a picture that big
-- [ImageError.Invalid](#invalid-case) — a width or a height that is not positive
+- [ImageError.NoBackend](#nobackend-case) -- there is no imaging library on this machine
+- [ImageError.OutOfMemory](#outofmemory-case) -- the backend would not make a picture that big
+- [ImageError.Invalid](#invalid-case) -- a width or a height that is not positive
 
 **See also** &nbsp; [Image.DrawImageScaled](#drawimagescaled-method)
 
@@ -401,8 +401,8 @@ and its default of 75 is the same number libgd uses.
 
 **Fails with**
 
-- [ImageError.NoBackend](#nobackend-case) — there is no imaging library on this machine
-- [ImageError.Unsupported](#unsupported-case) — the backend cannot write that format -- a BMP on a libgd built without one -- or the encode failed, which it reports no other way
+- [ImageError.NoBackend](#nobackend-case) -- there is no imaging library on this machine
+- [ImageError.Unsupported](#unsupported-case) -- the backend cannot write that format -- a BMP on a libgd built without one -- or the encode failed, which it reports no other way
 
 **See also** &nbsp; [Image.FromBytes](#frombytes-method)
 
@@ -418,9 +418,9 @@ Encodes and writes to a file. `ImageError.None` when it worked.
 
 **Fails with**
 
-- [ImageError.NoBackend](#nobackend-case) — there is no imaging library on this machine
-- [ImageError.Unsupported](#unsupported-case) — the backend cannot write that format, or the encode failed
-- [ImageError.WriteFailed](#writefailed-case) — the picture encoded and the file would not be written
+- [ImageError.NoBackend](#nobackend-case) -- there is no imaging library on this machine
+- [ImageError.Unsupported](#unsupported-case) -- the backend cannot write that format, or the encode failed
+- [ImageError.WriteFailed](#writefailed-case) -- the picture encoded and the file would not be written
 
 **See also** &nbsp; [Image.FromFile](#fromfile-method)
 
@@ -684,9 +684,9 @@ An opaque colour.
 
 **Parameters**
 
-- `red` — 0 to 255
-- `green` — 0 to 255
-- `blue` — 0 to 255
+- `red` -- 0 to 255
+- `green` -- 0 to 255
+- `blue` -- 0 to 255
 
 **See also** &nbsp; [Rgba.FromArgb](#fromargb-method)
 
@@ -702,10 +702,10 @@ A colour with an alpha, where 0 is invisible and 255 is opaque.
 
 **Parameters**
 
-- `alpha` — 0 to 255, and it comes first
-- `red` — 0 to 255
-- `green` — 0 to 255
-- `blue` — 0 to 255
+- `alpha` -- 0 to 255, and it comes first
+- `red` -- 0 to 255
+- `green` -- 0 to 255
+- `blue` -- 0 to 255
 
 **See also** &nbsp; [Rgba.FromRgb](#fromrgb-method)
 

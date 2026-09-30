@@ -259,8 +259,9 @@ public sealed partial class Binder
         if (element is null)
         {
             diagnostics.Error("SL0452", span,
-                $"cannot slice '{target.Type.Name}'; slicing takes part of an array or of " +
-                "another slice, or calls a type's own 'Slice(start, length)'",
+                $"cannot slice '{target.Type.Name}' with ':'; that takes part of an array or " +
+                "of another slice, and a type's own 'Slice(start, length)' is reached with a " +
+                "range, as 'a[i..j]'",
                 target.Type);
             return new BoundErrorExpression(span);
         }

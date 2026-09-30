@@ -2623,7 +2623,9 @@ public class Shell : Form
         {
             case Key.F5:
             {
-                if (args.Control)
+                if (args.Control && args.Shift)
+                    RestartDebugging();
+                else if (args.Control)
                     BuildProgram(true);
                 else if (args.Shift)
                     StopDebugging();

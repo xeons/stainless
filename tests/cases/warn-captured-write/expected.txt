@@ -1,0 +1,10 @@
+count 0
+total 0
+parsed 0
+next 3 n 0
+take 11
+box 3
+cells 4
+lost 0
+kept 1
+point 1

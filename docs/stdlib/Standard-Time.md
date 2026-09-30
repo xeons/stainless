@@ -215,8 +215,8 @@ Reads `yyyy-MM-dd`.
 
 **Fails with**
 
-- [TimeError.Malformed](#malformed-case) — not that shape
-- [TimeError.OutOfRange](#outofrange-case) — that shape and no real date
+- [TimeError.Malformed](#malformed-case) -- not that shape
+- [TimeError.OutOfRange](#outofrange-case) -- that shape and no real date
 
 <sub>[stdlib/Time/DateOnly.sl:166](../../stdlib/Time/DateOnly.sl#L166)</sub>
 
@@ -613,8 +613,8 @@ trip is exact and anything else is refused rather than half-read.
 
 **Fails with**
 
-- [TimeError.Malformed](#malformed-case) — not that shape: the wrong length, a separator out of place, or something that is not a digit where one belongs
-- [TimeError.OutOfRange](#outofrange-case) — that shape, and no real moment -- the 31st of February, a month of 13, an hour of 24
+- [TimeError.Malformed](#malformed-case) -- not that shape: the wrong length, a separator out of place, or something that is not a digit where one belongs
+- [TimeError.OutOfRange](#outofrange-case) -- that shape, and no real moment -- the 31st of February, a month of 13, an hour of 24
 
 **See also** &nbsp; [DateTimeOffset.FormatIso](#formatiso-method)
 
@@ -650,8 +650,8 @@ name is checked for being one, not for being the right one.
 
 **Fails with**
 
-- [TimeError.Malformed](#malformed-case) — none of the three shapes
-- [TimeError.OutOfRange](#outofrange-case) — the right shape, and no real moment
+- [TimeError.Malformed](#malformed-case) -- none of the three shapes
+- [TimeError.OutOfRange](#outofrange-case) -- the right shape, and no real moment
 
 **See also** &nbsp; [DateTimeOffset.FormatHttpDate](#formathttpdate-method)
 
@@ -1100,8 +1100,8 @@ Reads `HH:mm`, `HH:mm:ss` or `HH:mm:ss.fffffffff`.
 
 **Fails with**
 
-- [TimeError.Malformed](#malformed-case) — not one of those shapes
-- [TimeError.OutOfRange](#outofrange-case) — that shape and no real time
+- [TimeError.Malformed](#malformed-case) -- not one of those shapes
+- [TimeError.OutOfRange](#outofrange-case) -- that shape and no real time
 
 <sub>[stdlib/Time/TimeOnly.sl:171](../../stdlib/Time/TimeOnly.sl#L171)</sub>
 
@@ -1578,7 +1578,7 @@ name on Windows, and an IANA name there too where Windows can map it.
 
 **Fails with**
 
-- [TimeError.NotFound](#notfound-case) — no zone of that name
+- [TimeError.NotFound](#notfound-case) -- no zone of that name
 
 <sub>[stdlib/Time/TimeZoneInfo.sl:178](../../stdlib/Time/TimeZoneInfo.sl#L178)</sub>
 
@@ -1645,7 +1645,7 @@ What the clocks in `destination` read when those in `source` read
 
 **Fails with**
 
-- [TimeError.Invalid](#invalid-case) — `source` skips that time
+- [TimeError.Invalid](#invalid-case) -- `source` skips that time
 
 <sub>[stdlib/Time/TimeZoneInfo.sl:275](../../stdlib/Time/TimeZoneInfo.sl#L275)</sub>
 
@@ -1659,7 +1659,7 @@ The instant at which the clocks in `source` read `wallClock`.
 
 **Fails with**
 
-- [TimeError.Invalid](#invalid-case) — `source` skips that time
+- [TimeError.Invalid](#invalid-case) -- `source` skips that time
 
 <sub>[stdlib/Time/TimeZoneInfo.sl:286](../../stdlib/Time/TimeZoneInfo.sl#L286)</sub>
 
@@ -1683,7 +1683,7 @@ What the clocks in the zone named `id` read at `instant`.
 
 **Fails with**
 
-- [TimeError.NotFound](#notfound-case) — no zone of that name
+- [TimeError.NotFound](#notfound-case) -- no zone of that name
 
 <sub>[stdlib/Time/TimeZoneInfo.sl:308](../../stdlib/Time/TimeZoneInfo.sl#L308)</sub>
 
@@ -1863,8 +1863,8 @@ How many days a month has, which for February depends on the year.
 
 **Parameters**
 
-- `year` — the year the month is in, in full
-- `month` — the month, 1 to 12; anything else has no days
+- `year` -- the year the month is in, in full
+- `month` -- the month, 1 to 12; anything else has no days
 
 **See also** &nbsp; [Time.IsLeapYear](#isleapyear-function)
 

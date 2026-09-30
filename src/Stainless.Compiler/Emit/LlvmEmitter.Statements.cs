@@ -479,9 +479,7 @@ public sealed partial class LlvmEmitter
 
         if (value.Type is VariantTypeSymbol variant)
         {
-            string tag = Emit("i8",
-                $"load i8, ptr {Emit("ptr", $"getelementptr inbounds {StructName(variant)}, " +
-                                           $"ptr {value.Ref}, i32 0, i32 0")}");
+            string tag = LoadCaseNumber(value.Ref, variant);
 
             var caseArms = dispatch.Arms.Select(arm => $"i8 {arm.Case!.Tag}, label %{Jump(arm.Target)}");
             Terminator($"switch i8 {tag}, label %{otherwise} [ {string.Join(" ", caseArms)} ]");

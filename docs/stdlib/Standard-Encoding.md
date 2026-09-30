@@ -227,8 +227,8 @@ The same, but saying what went wrong instead of papering over it.
 
 **Fails with**
 
-- [EncodingError.Incomplete](#incomplete-case) — the bytes end part-way through a character
-- [EncodingError.Invalid](#invalid-case) — a byte or a sequence this encoding cannot produce
+- [EncodingError.Incomplete](#incomplete-case) -- the bytes end part-way through a character
+- [EncodingError.Invalid](#invalid-case) -- a byte or a sequence this encoding cannot produce
 
 **See also** &nbsp; [IEncoding.GetString](#getstring-method)
 
@@ -526,8 +526,8 @@ surrogate at the end, `Invalid` for a surrogate that is not paired.
 
 **Fails with**
 
-- [EncodingError.Incomplete](#incomplete-case) — an odd number of bytes, or a high surrogate with no unit after it
-- [EncodingError.Invalid](#invalid-case) — a low surrogate first, or a high one followed by something that is not a low one
+- [EncodingError.Incomplete](#incomplete-case) -- an odd number of bytes, or a high surrogate with no unit after it
+- [EncodingError.Invalid](#invalid-case) -- a low surrogate first, or a high one followed by something that is not a low one
 
 **See also** &nbsp; [Utf16Encoding.GetString](#getstring-method)
 
@@ -629,8 +629,8 @@ four, `Invalid` for a value that is not a scalar.
 
 **Fails with**
 
-- [EncodingError.Incomplete](#incomplete-case) — the length is not a multiple of four
-- [EncodingError.Invalid](#invalid-case) — a surrogate, or a value past U+10FFFF
+- [EncodingError.Incomplete](#incomplete-case) -- the length is not a multiple of four
+- [EncodingError.Invalid](#invalid-case) -- a surrogate, or a value past U+10FFFF
 
 **See also** &nbsp; [Utf32Encoding.GetString](#getstring-method)
 
@@ -742,8 +742,8 @@ security hole in a decoder that accepted it.
 
 **Fails with**
 
-- [EncodingError.Incomplete](#incomplete-case) — a sequence the bytes ran out during
-- [EncodingError.Invalid](#invalid-case) — a byte that starts nothing, a missing continuation byte, an overlong form, a surrogate, or a value past U+10FFFF
+- [EncodingError.Incomplete](#incomplete-case) -- a sequence the bytes ran out during
+- [EncodingError.Invalid](#invalid-case) -- a byte that starts nothing, a missing continuation byte, an overlong form, a surrogate, or a value past U+10FFFF
 
 **See also** &nbsp; [Utf8Encoding.GetString](#getstring-method)
 

@@ -1,0 +1,4 @@
+# A write to a captured copy that nothing reads again never reaches the
+# variable around the lambda. A copy the lambda reads again, a write through
+# a captured reference and one through `this` are not reported.
+SL0829

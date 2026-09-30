@@ -1,0 +1,21 @@
+Optional<String> is a word: yes
+Optional<Entry> is an Entry: yes
+Optional<Squeezed> is a Squeezed: yes
+Optional<Optional<String>> is two words: yes
+Optional<Func<int, int>> is a Func: yes
+Labelled is a word: yes
+Backwards is two words: yes
+Optional<int> keeps its tag: yes
+none, some promoted, none
+has: yes no fallback: fallback
+none, some none, some some promoted
+entry 7 seven, no entry
+squeezed 3 three, no squeezed
+labelled: yes yes
+named label
+backwards blank: yes
+func: 42 absent: yes
+after removing a copied one: 0
+after dropping the copy: 1
+map: some uno none
+after clearing: 2

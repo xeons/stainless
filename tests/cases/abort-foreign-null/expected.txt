@@ -1,0 +1,2 @@
+maybe: none
+stainless: 'c_find_name' returned null, and a Standard.Text.String is never null

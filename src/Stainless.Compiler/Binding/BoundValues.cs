@@ -47,6 +47,7 @@ internal static class BoundValues
         BoundConversion { Kind: ConversionKind.NarrowOptional or ConversionKind.AssertPresent } narrowed
             => IsSteadyRead(narrowed.Operand),
         BoundVariantPayload payload => IsSteadyRead(payload.Receiver),
+        BoundSlotValue read => IsSteadyRead(read.Receiver),
         BoundFieldAccess { Receiver: { } receiver } field =>
             receiver.Type is StructTypeSymbol && IsSteadyRead(receiver) && !field.Field.IsBitField,
         BoundArrayLength length => IsSteadyRead(length.Array),
@@ -63,7 +64,8 @@ internal static class BoundValues
     public static bool IsMade(BoundExpression value) => value switch
     {
         BoundCall or BoundNew or BoundIndirectCall or BoundClosureCall => true,
-        BoundTupleCreate or BoundStructNew or BoundVariantConstruction => true,
+        BoundTupleCreate or BoundStructNew or BoundVariantConstruction or BoundSlotFill => true,
+        BoundArrayCreate or BoundArrayFill => true,
         BoundLet held => IsMade(held.Body),
         BoundSequence sequence => IsMade(sequence.Value),
         BoundDeconstruction taken => taken.IsValue,

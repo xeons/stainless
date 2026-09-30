@@ -29,8 +29,6 @@
 /// Interfaces are named with a leading I, as in C#.
 module Standard.Collections;
 
-import Standard.Unchecked;
-
 /// Aborts with an index and a bound. Shared with the array bounds check, so a
 /// list overrun reads the same as an array overrun.
 [DoesNotReturn]
@@ -198,7 +196,7 @@ public void Sort<T>(Span<T> items) where T : IComparable<T>
     if (items.Length < 2u)
         return;
 
-    var scratch = NewUninitializedArray<T>(items.Length);
+    var scratch = new Slot<T>[items.Length];
 
     for (nuint start = 0u; start < items.Length; start += SmallRun)
     {
@@ -244,7 +242,7 @@ void SortRunByInsertion<T>(Span<T> items, nuint start, nuint stop) where T : ICo
 /// `>` rather than `>=` when choosing the right half is what makes this
 /// stable: on a tie the left element goes first, and the left element is the
 /// one that was there first.
-void MergeRuns<T>(Span<T> items, Span<T> scratch, nuint low, nuint middle, nuint high)
+void MergeRuns<T>(Span<T> items, Span<Slot<T>> scratch, nuint low, nuint middle, nuint high)
         where T : IComparable<T>
 {
     nuint left = low;
@@ -264,7 +262,8 @@ void MergeRuns<T>(Span<T> items, Span<T> scratch, nuint low, nuint middle, nuint
         }
     }
 
-    scratch[low:high].CopyTo(items[low:]);
+    for (nuint at = low; at < high; at++)
+        items[at] = scratch[at].Value;
 }
 
 /// The same, ordered by a comparer rather than by the type itself.
@@ -282,7 +281,7 @@ public void Sort<T>(Span<T> items, Comparison<T> order)
     if (items.Length < 2u)
         return;
 
-    var scratch = NewUninitializedArray<T>(items.Length);
+    var scratch = new Slot<T>[items.Length];
 
     for (nuint start = 0u; start < items.Length; start += SmallRun)
     {
@@ -322,7 +321,7 @@ void SortRunByInsertion<T>(Span<T> items, nuint start, nuint stop, Comparison<T>
     }
 }
 
-void MergeRuns<T>(Span<T> items, Span<T> scratch, nuint low, nuint middle, nuint high,
+void MergeRuns<T>(Span<T> items, Span<Slot<T>> scratch, nuint low, nuint middle, nuint high,
                 Comparison<T> order)
 {
     nuint left = low;
@@ -342,7 +341,8 @@ void MergeRuns<T>(Span<T> items, Span<T> scratch, nuint low, nuint middle, nuint
         }
     }
 
-    scratch[low:high].CopyTo(items[low:]);
+    for (nuint at = low; at < high; at++)
+        items[at] = scratch[at].Value;
 }
 
 /// Where `wanted` is in an already-ordered slice, if it is there at all.

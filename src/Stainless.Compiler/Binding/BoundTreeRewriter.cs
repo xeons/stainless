@@ -819,6 +819,22 @@ public abstract class BoundTreeRewriter
                     : new BoundVariantTest(test.Span, test.Type, value, test.Case);
             }
 
+            case BoundSlotValue read:
+            {
+                var receiver = Rewrite(read.Receiver);
+                return Same(read.Receiver, receiver)
+                    ? read
+                    : new BoundSlotValue(read.Span, read.Slot, receiver);
+            }
+
+            case BoundSlotFill fill:
+            {
+                var value = Rewrite(fill.Value);
+                return Same(fill.Value, value)
+                    ? fill
+                    : new BoundSlotFill(fill.Span, fill.Slot, value);
+            }
+
             case BoundVariantPayload payload:
             {
                 var receiver = Rewrite(payload.Receiver);
@@ -967,6 +983,26 @@ public abstract class BoundTreeRewriter
                 return Same(dereference.Operand, operand)
                     ? dereference
                     : new BoundDereference(dereference.Span, dereference.Type, operand);
+            }
+
+            case BoundArrayCreate created:
+            {
+                var count = Rewrite(created.Count);
+                var make = Rewrite(created.Make);
+                return Same(created.Count, count) && Same(created.Make, make)
+                    ? created
+                    : new BoundArrayCreate(created.Span, created.ArrayType, count, make);
+            }
+
+            case BoundArrayFill fill:
+            {
+                var count = Rewrite(fill.Count);
+                var make = Rewrite(fill.Make);
+                var element = Rewrite(fill.Element);
+                return Same(fill.Count, count) && Same(fill.Make, make) && Same(fill.Element, element)
+                    ? fill
+                    : new BoundArrayFill(fill.Span, fill.ArrayType, count, make,
+                        fill.MakeLocal, fill.AtLocal, element);
             }
 
             case BoundNewArray array:

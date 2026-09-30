@@ -1,6 +1,7 @@
 # Linux bindings
 
-The Linux system call interface, declared and nothing else.
+The Linux system call interface, declared and nothing else -- and one
+convenience module over it, for the terminal.
 
 ```
 bindings/linux/api/
@@ -52,9 +53,10 @@ and both orders give a struct of exactly the same size — so a header copied
 from the wrong platform passes every size check and then dereferences a string
 as a pointer.
 
-The same case was found to be worth having immediately: the Windows one caught
-`FIONBIO` declared with the signed reading of its bit pattern rather than the
-unsigned one the header produces.
+Its Windows counterpart,
+[tests/cases/win32-sockets](../../tests/cases/win32-sockets), is what holds
+`FIONBIO` to the unsigned reading of its bit pattern that the header produces
+rather than the signed one.
 
 ## What this is not
 
@@ -113,6 +115,21 @@ becomes readable when somebody writes to it; a file change is a descriptor that
 becomes readable when the file changes. So one `epoll_wait` covers sockets,
 files, timers and other threads together, which is why a Linux program needs no
 separate mechanism for each.
+
+## The debugger's half
+
+```
+bindings/linux/api/
+  Ptrace.sl      module Linux.Ptrace;     ptrace, fork, execv, waitpid, kill,
+                                          user_regs_struct, and pread64 and
+                                          pwrite64 for /proc/<pid>/mem
+```
+
+What `debug/`'s Linux target is built on. **Every request MUST come from the
+thread that attached**: the tracing relationship belongs to a thread, not to a
+process, and a request from any other fails with `ESRCH`, which reads as "no
+such process" and is not. `UserRegisters` is in the kernel's order -- `r15`
+first, `rip` two thirds of the way in -- which is not the architecture's.
 
 ## Checked against the headers, not the documentation
 

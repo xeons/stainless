@@ -9,6 +9,9 @@ stainless build --project debug
 .\debug\build\sldb sections <binary>
 ```
 
+`sldb` with no arguments lists every command, `units`, `lines` and `threads`
+among them.
+
 **A binary to debug MUST carry DWARF.** On Windows an ordinary `-g` build
 writes CodeView into a `.pdb`, which this reads none of, so build with
 `--debug-format dwarf -O0`. Without it `sldb` says so rather than quietly
@@ -117,9 +120,9 @@ differing         0            0
 ```
 
 -- every entry offset and tag, and every line row's address, line, column, file
-and flags, across seventeen compilation units and every form the compiler
-emits. That is the check to repeat after any change here, and it is worth more
-than any number of assertions about individual fields.
+and flags, across every compilation unit and every form the compiler emits.
+That is the check to repeat after any change here, and it is worth more than
+any number of assertions about individual fields.
 
 Three things it does not cover, and which the self test does instead.
 
@@ -315,7 +318,11 @@ to read. Twelve members are shown and the rest are `...`, for the same reason.
 enumeration naming each case at its real value, which is the only thing that
 maps a tag to a case: DWARF gets a member only for a case that carries a
 payload, so the k-th member is not tag k. The same enumeration says which of
-the overlapping members is the live one.
+the overlapping members is the live one. A variant with no tag, such as an
+`Optional<String>`, is a `DW_TAG_variant_part` instead: its discriminator is
+read, and the case is the `DW_TAG_variant` whose `DW_AT_discr_value` matches
+it, or the one with no value. A watch expression reaches that case's fields
+the same way, as `held.Some.Value`.
 
 **A bit field is a run of bits inside the word it shares**, so it is loaded,
 shifted and masked rather than read from a byte of its own -- which it does not
@@ -325,7 +332,8 @@ bits is -7 and not 57.
 
 **A pointer is only read as an object when it points at one**, decided by the
 `__header` the compiler puts in front of a class body, an array body and the
-two text classes and nothing else (docs/abi.md §2). A `Point*` and a `void*`
+two text classes and nothing else ([docs/abi.md section 7](../docs/abi.md#7-debug-information)).
+A `Point*` and a `void*`
 point at memory with no header, and reading a strong count out of one answers
 somebody's field.
 
@@ -336,11 +344,11 @@ turn a variable declared as a base class into one that shows what it actually
 is. `strong` at +0 being zero means the object is dead, which turns the stale
 weak reference `docs/abi.md` warns about from a lie into `(dead)`.
 
-**An array and a `String` are described as far as their length and no
-further**, because DWARF can only express an array whose bound it knows
-statically. `length` is at offset 24 and the elements at **32** -- the length
-is a word of its own, and a reader that puts them at 24 gets the length as its
-first element.
+**An array and a `String` are described up to their length, and their elements
+as a run with no bound**, because DWARF can only express an array whose bound
+it knows statically. `length` is at offset 24 and the elements at **32** -- the
+length is a word of its own, and a reader that puts them at 24 gets the length
+as its first element.
 
 **What is listed is what is in scope**, which is not what the function
 declares: a `{ }` and a `for` are each a `DW_TAG_lexical_block` with its own
@@ -354,15 +362,12 @@ A block described by `DW_AT_ranges` rather than a low and a high address is
 entered anyway. That happens at `-O2`, and showing a variable that might not
 be in scope is a smaller fault than hiding one that is.
 
-**A compiler bug came out of this, and it is the kind that hides.** A class
-reference is described as a pointer to the class body -- except that building
-the body registered *itself* under the class's own entry in the type map,
-overwriting the pointer its caller had just put there. So the first reference
-to any class got the pointer and every one after it got the 40-byte structure,
-sitting in a slot holding an 8-byte reference. It verified, it ran, and only a
-debugger reading a local ever noticed. `DebugInfoTests` now follows the node
-number from a variable to what it points at, with two locals of one type
-because one would have passed.
+**A class reference is a pointer to the class body, every time.** Describing
+a local as the body instead puts a 40-byte structure in a slot holding an
+8-byte reference; it verifies, it runs, and only a debugger reading the local
+notices. `DebugInfoTests` follows the node number from a variable to what it
+points at, with two locals of one type, because a fault that only the second
+reference to a class shows would pass with one.
 
 ## Watch expressions
 
@@ -480,19 +485,17 @@ differences were real:
   the kernel raises when `execv` completes under a tracer, and that one *is*
   the start of the session.
 
-**The seam had one real hole, and only the second platform could find it: it
-never said who consumes the first stop.** `Engine.Start` called `Continue`,
-which resumes before waiting -- harmless on Windows, where nothing has been
-reported and the resume finds no event outstanding. On Linux the launch has
-already reaped the exec's `SIGTRAP`, so the same call let the program run
-before its image base had been read, and a slide nobody learned is every
-breakpoint unplanted. Nothing resumes before the first event is read now.
+**The seam says who consumes the first stop: the engine.** `Engine.Start`
+waits for the first event rather than calling `Continue`, which resumes before
+waiting. On Windows the difference is invisible, since nothing has been
+reported yet. On Linux the launch has already reaped the exec's `SIGTRAP`, so
+a resume there would let the program run before its image base had been read,
+and a slide nobody learned is every breakpoint unplanted.
 
-**A stdlib bug came with it.** `Standard.File.ReadAllBytes` trusted the size a
-file reports, and `/proc` reports zero and then hands over kilobytes -- so
-`/proc/<pid>/maps` came back empty and the loader base with it. It reads to the
-end now, which is what "all bytes" has to mean on Linux;
-`tests/cases/proc-files` pins it and fails without it.
+**`/proc` reports a size of zero and then hands over kilobytes.**
+`Standard.File.ReadAllBytes` reads to the end rather than to the reported size,
+which is what makes `/proc/<pid>/maps`, and the loader base in it, readable at
+all; `tests/cases/proc-files` pins it.
 
 **`Attach` is not implemented and would ship untested if it were.** Under
 Linux's default `ptrace_scope` a process may trace its own child and nothing

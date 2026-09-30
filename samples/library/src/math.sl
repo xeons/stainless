@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: 0BSD
 module Library.Math;
 
+import Standard.Math;
+
 public struct Point
 {
     public double X;
@@ -26,7 +28,7 @@ export "C" Point Scale(Point p, double by)
 
 export "C" int SumPair(Pair p) => p.A + p.B;
 
-export "C" double Hypotenuse(double x, double y) => x * x + y * y;
+export "C" double Hypotenuse(double x, double y) => Standard.Math.Sqrt(x * x + y * y);
 
 // Visible to other Stainless modules, but not exported from the library.
 public int GetHelperValue() => 1;

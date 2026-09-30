@@ -221,7 +221,7 @@ Which library each wants:
 | `Win32.Com` | `ole32` |
 | `Win32.Shell` | `shell32` (and `user32`, `ole32`) |
 | `Win32.Dialogs` | `comdlg32` (and `user32`, `ole32`) |
-| `Win32.Resources` | `user32` |
+| `Win32.Resources` | `user32` (and `version`, through `Win32.Version`) |
 | `Win32.Gamepad` | `xinput` |
 | `Win32.Sound` | `xaudio2` (and `ole32`) |
 | `Windows.DirectX` | `dxgi`, `d3dcompiler` |
@@ -411,5 +411,6 @@ out of an executable this program did not build.
   process ask for one.
 - **GDI+**, Direct3D 12, WMI, the event log.
 - **32-bit Windows.** The types and structures are the right width on both,
-  but the declarations name no calling convention, and every Win32 function
-  on x86 is `__stdcall` — so a 32-bit program links against none of them.
+  but only the DirectX, XInput and XAudio2 modules say `extern "C" __stdcall`.
+  The rest name no calling convention, and every Win32 function on x86 is
+  `__stdcall` -- so a 32-bit program links against none of them.

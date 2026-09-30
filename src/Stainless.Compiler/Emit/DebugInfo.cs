@@ -302,12 +302,9 @@ public sealed class DebugInfo
                 int id = Reserve();
                 _types[type] = id;
                 Fill(id, pointer.Element.IsVoid()
-                    // DWARF spells void* as a pointer with no base type -- but
-                    // LLVM's textual IR wants the field written all the same,
-                    // and rejects the node outright without it.
-                    ? "!DIDerivedType(tag: DW_TAG_pointer_type, baseType: null, size: 64)"
+                    ? VoidPointer
                     : $"!DIDerivedType(tag: DW_TAG_pointer_type, baseType: !{Type(pointer.Element)}, " +
-                      "size: 64)");
+                      $"size: {PointerBits})");
                 return id;
             }
 
@@ -325,7 +322,7 @@ public sealed class DebugInfo
                 int id = Reserve();
                 _types[type] = id;
                 Fill(id, $"!DIDerivedType(tag: DW_TAG_pointer_type, baseType: !{ArrayBody(array)}, " +
-                         "size: 64)");
+                         $"size: {PointerBits})");
                 return id;
             }
 
@@ -365,7 +362,7 @@ public sealed class DebugInfo
                 _types[type] = id;
                 Fill(id,
                     $"!DIDerivedType(tag: DW_TAG_pointer_type, baseType: !{Body(classType)}, " +
-                    "size: 64)");
+                    $"size: {PointerBits})");
                 return id;
             }
 
@@ -376,7 +373,7 @@ public sealed class DebugInfo
                 int body = Add(
                     $"!DICompositeType(tag: DW_TAG_structure_type, name: " +
                     $"{Quote(interfaceType.QualifiedName)}, size: 0, flags: DIFlagFwdDecl)");
-                Fill(id, $"!DIDerivedType(tag: DW_TAG_pointer_type, baseType: !{body}, size: 64)");
+                Fill(id, $"!DIDerivedType(tag: DW_TAG_pointer_type, baseType: !{body}, size: {PointerBits})");
                 return id;
             }
 
@@ -384,14 +381,23 @@ public sealed class DebugInfo
                 // An error type, or something added later that has no description
                 // yet. A pointer-shaped unknown is wrong in less visible ways
                 // than a missing node, which would not verify at all.
-                return _types[type] = Add("!DIDerivedType(tag: DW_TAG_pointer_type, baseType: null, size: 64)");
+                return _types[type] = Add(VoidPointer);
         }
     }
+
+    private static int PointerBits => TargetPlatform.Current.PointerWidth * 8;
+
+    /// <summary>
+    /// DWARF spells void* as a pointer with no base type, and LLVM's textual IR
+    /// rejects the node unless that is written out.
+    /// </summary>
+    private static string VoidPointer =>
+        $"!DIDerivedType(tag: DW_TAG_pointer_type, baseType: null, size: {PointerBits})";
 
     private int BasicType(PrimitiveTypeSymbol primitive)
     {
         if (primitive.IsVoid())
-            return Add("!DIDerivedType(tag: DW_TAG_pointer_type, baseType: null, size: 64)");
+            return Add(VoidPointer);
 
         if (_basicTypes.TryGetValue(primitive.Name, out int existing)) return existing;
 
@@ -632,11 +638,12 @@ public sealed class DebugInfo
     /// A variant: the tag, then every case's payload described at the one offset
     /// they share.
     ///
-    /// DWARF 5 has a variant part for exactly this, and LLVM will emit one, but
-    /// what reads it is thin on the ground and there is none at all in CodeView.
-    /// Overlapping members are understood everywhere: a debugger shows all the
-    /// cases, the tag says which of them is real, and nothing has to be taught
-    /// a new shape to get that far.
+    /// DWARF 5 has a variant part for exactly this, but what reads it is thin
+    /// on the ground and there is none at all in CodeView. Overlapping members
+    /// are understood everywhere: a debugger shows all the cases, the tag says
+    /// which of them is real, and nothing has to be taught a new shape to get
+    /// that far. A variant with no tag has nothing to name the case with, so
+    /// in DWARF it is the one that gets a variant part.
     /// </summary>
     private int VariantType(VariantTypeSymbol variant)
     {
@@ -644,11 +651,21 @@ public sealed class DebugInfo
         _types[variant] = id;
 
         string where = Position(variant.Span);
-        var members = new List<int>
+        if (variant.NicheOffset is { } niche && _format == DebugFormat.Dwarf)
         {
-            Add($"!DIDerivedType(tag: DW_TAG_member, name: \"tag\", {where}" +
-                $"baseType: !{CaseNumbering(variant)}, size: 8, offset: 0)"),
-        };
+            Fill(id,
+                $"!DICompositeType(tag: DW_TAG_structure_type, name: {Quote(variant.QualifiedName)}, " +
+                $"{where}size: {variant.Size * 8}, align: {variant.Alignment * 8}, " +
+                $"elements: !{Tuple([VariantPart(variant, id, niche)])})");
+            return id;
+        }
+
+        // In CodeView a variant with no tag is its one payload, which a
+        // debugger shows as that case whether or not it is the one there.
+        var members = new List<int>();
+        if (variant.HasTag)
+            members.Add(Add($"!DIDerivedType(tag: DW_TAG_member, name: \"tag\", {where}" +
+                            $"baseType: !{CaseNumbering(variant)}, size: 8, offset: 0)"));
 
         if (variant.PayloadField is { } payload)
         {
@@ -671,6 +688,47 @@ public sealed class DebugInfo
             $"elements: !{Tuple(members)})");
 
         return id;
+    }
+
+    /// <summary>
+    /// The inside of a variant with no tag: a variant part whose discriminator
+    /// is the word at the niche. The empty case is that word being zero, and
+    /// the case holding a value is every other.
+    /// </summary>
+    private int VariantPart(VariantTypeSymbol variant, int scope, int niche)
+    {
+        int word = TargetPlatform.Current.PointerWidth * 8;
+        string where = Position(variant.Span);
+
+        int discriminator = Add(
+            $"!DIDerivedType(tag: DW_TAG_member, name: \"__niche\", scope: !{scope}, {where}" +
+            $"baseType: !{Type(PrimitiveTypeSymbol.NUInt)}, size: {word}, offset: {niche * 8}, " +
+            "flags: DIFlagArtificial)");
+
+        int part = Reserve();
+        var cases = new List<int>();
+        foreach (var variantCase in variant.Cases)
+        {
+            // The empty case still needs a member for its variant to hold,
+            // so it gets a structure of nothing, named for the case.
+            int body = variantCase.Payload is { } payload
+                ? Type(payload)
+                : Add($"!DICompositeType(tag: DW_TAG_structure_type, name: {Quote(variantCase.Name)}, " +
+                      $"scope: !{scope}, {Position(variantCase.Span)}size: 0, elements: !{{}})");
+            int size = variantCase.Payload?.Size * 8 ?? 0;
+            string value = variantCase.Payload is null ? ", extraData: i64 0" : "";
+
+            cases.Add(Add(
+                $"!DIDerivedType(tag: DW_TAG_member, name: {Quote(variantCase.Name)}, scope: !{part}, " +
+                $"{Position(variantCase.Span)}baseType: !{body}, size: {size}, offset: 0{value})"));
+        }
+
+        Fill(part,
+            $"!DICompositeType(tag: DW_TAG_variant_part, scope: !{scope}, {where}" +
+            $"size: {variant.Size * 8}, align: {variant.Alignment * 8}, " +
+            $"discriminator: !{discriminator}, elements: !{Tuple(cases)})");
+
+        return part;
     }
 
     /// <summary>
@@ -743,7 +801,7 @@ public sealed class DebugInfo
         int types = Add("!{" + string.Join(", ", parts) + "}");
         int signature = Add($"!DISubroutineType(types: !{types})");
 
-        Fill(id, $"!DIDerivedType(tag: DW_TAG_pointer_type, baseType: !{signature}, size: 64)");
+        Fill(id, $"!DIDerivedType(tag: DW_TAG_pointer_type, baseType: !{signature}, size: {PointerBits})");
         return id;
     }
 

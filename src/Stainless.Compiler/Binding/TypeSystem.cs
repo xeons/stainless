@@ -1203,6 +1203,30 @@ public sealed class SliceTypeSymbol : StructTypeSymbol
 }
 
 /// <summary>
+/// <c>Slot&lt;T&gt;</c>: storage for a <c>T</c> that may not be there yet.
+///
+/// One field. When <c>T</c> has a zero value it is a <c>T</c>, and an empty
+/// slot is that zero. When it has none it is an <c>Optional&lt;T&gt;</c>,
+/// which a niche makes as wide as <c>T</c>, and a read of an empty one
+/// aborts. Either way its zero is empty, so <c>new Slot&lt;T&gt;[n]</c> is
+/// always allowed. The members are the standard library's; the binder reads
+/// <c>Value</c> and makes a slot from a <c>T</c> itself.
+/// </summary>
+public sealed class SlotTypeSymbol : StructTypeSymbol
+{
+    public required TypeSymbol Element { get; init; }
+
+    /// <summary>The one field: the value, or the optional holding it.</summary>
+    public FieldSymbol ValueField => Fields[0];
+
+    /// <summary>
+    /// Set by layout when the field is an <c>Optional&lt;T&gt;</c>, because
+    /// <c>T</c> has no zero value; a read then checks that it is there.
+    /// </summary>
+    public bool IsChecked { get; set; }
+}
+
+/// <summary>
 /// One case of a <c>variant</c>: a name, a tag, and the fields it carries.
 ///
 /// The fields live in a struct of their own rather than on the case, so
@@ -1241,7 +1265,9 @@ public sealed class VariantCaseSymbol
 ///
 /// It is a struct — literally, in the type system — because that is what it is
 /// at runtime: a tag, then enough storage for the largest case, laid out by the
-/// same C rules as everything else. Nothing allocates, and a variant crosses
+/// same C rules as everything else -- or, for a variant shaped like
+/// <c>Optional</c>, the payload alone, with a null saying which case
+/// (<see cref="NicheOffset"/>). Nothing allocates, and a variant crosses
 /// <c>extern "C"</c> on the same terms as any other struct: freely if no case
 /// holds a reference, and not at all if one does.
 ///
@@ -1268,7 +1294,20 @@ public sealed class VariantTypeSymbol : StructTypeSymbol
     public StructTypeSymbol? PayloadStorage { get; set; }
 
     /// <summary>The payload field, or null when no case carries anything.</summary>
-    public FieldSymbol? PayloadField => PayloadStorage is null ? null : Fields[1];
+    public FieldSymbol? PayloadField => Fields.FirstOrDefault(f => f.Name == PayloadFieldName);
+
+    /// <summary>The tag field, or null when the variant has none.</summary>
+    public FieldSymbol? TagField => Fields.FirstOrDefault(f => f.Name == TagFieldName);
+
+    /// <summary>
+    /// Set by layout when the variant has no tag: its first case carries
+    /// nothing, its second carries a never-null reference at this offset, and
+    /// the first case is that reference being null. The payload then starts
+    /// at offset zero.
+    /// </summary>
+    public int? NicheOffset { get; set; }
+
+    public bool HasTag => NicheOffset is null;
 
     public VariantCaseSymbol? FindCase(string name) =>
         Cases.FirstOrDefault(c => c.Name == name);

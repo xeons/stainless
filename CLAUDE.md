@@ -73,8 +73,9 @@ samples and the fuzzer verify every module they emit. See [docs/internals.md](do
 
 **A crash is not a diagnostic, and the fuzzer finds them.** `dotnet run --project
 tests/Stainless.Fuzz -- fuzz --minutes 10` mutates the tree's own programs and
-keeps every input that makes the compiler throw, overflow, hang or report a span
-outside its file; `-- replay` re-runs the findings against the current build.
+keeps every input that makes the compiler throw, overflow, hang, report a span
+outside its file or emit IR LLVM refuses; `-- replay` re-runs the findings
+against the current build.
 A finding that is fixed gets a case in `tests/cases/` or a unit test like any
 other bug — the findings directory is not a suite. See
 [docs/internals.md](docs/internals.md#building-and-testing).
@@ -122,7 +123,8 @@ them off does not fail cleanly (see below).
 ## Layout
 
 `src/Stainless.Compiler` (front end, binder, emitter, driver) and
-`src/Stainless.Cli` are the only C#. Everything else is Stainless or C:
+`src/Stainless.Cli` are the only C# outside the three test projects under
+`tests/`. Everything else is Stainless or C:
 
 | | |
 |---|---|
@@ -131,6 +133,7 @@ them off does not fail cleanly (see below).
 | `bindings/win32`, `bindings/gtk`, `bindings/linux` | platform APIs, compiled only by a program that asks |
 | `forms/` | a GUI framework, one control layer over a Win32 and a GTK backend |
 | `ide/` | an editor for Stainless, written in Stainless, on `forms/` |
+| `debug/` | `sldb`, a debugger written in Stainless; `stainless build --project debug` |
 | `tests/cases/` | one directory per end-to-end case |
 
 **A test case is a directory**, holding the `.sl` files of one program plus
@@ -198,8 +201,10 @@ more than once. Backticks inside a double-quoted shell string are command
 substitution and will eat the text. Use the Write or Edit tool, or a Python
 script written to a file, for anything containing escapes or backticks.
 
-**The prose uses em dashes, not `--`.** A patch script matching on `--` will
-fail its own assertion against text that uses `—`. Check which is there before
+**Documentation and comments are ASCII.** No em dashes, section signs, arrows
+or curly quotes in anything written from here on: `--` for a dash, "section" for
+the sign. Older text still has them, so a patch script matching on `--` can
+fail against a line that uses the Unicode dash; check which is there before
 writing the pattern.
 
 **A patch script should assert what it expects to match**, and read before it

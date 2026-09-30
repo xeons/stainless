@@ -184,6 +184,9 @@ public sealed partial class Binder
     private readonly struct OwedScope(Binder binder, Trial? trial, DiagnosticBag.Hold hold)
         : IDisposable
     {
+        /// <summary>How many errors are held so far.</summary>
+        public int ErrorCount => hold.Items.Count(d => d.Severity == Severity.Error);
+
         public void Dispose()
         {
             hold.Dispose();

@@ -110,10 +110,11 @@ clang. Startup cost is a C program's startup cost.
 
 **3. ARC, not GC.** `class` types are reference counted and destroyed
 deterministically. No collector, no pauses, no tracing thread — the entire
-runtime is [fourteen small C files](runtime/): reference counting, text, UTF-16,
+runtime is [sixteen small C files](runtime/): reference counting, text, UTF-16,
 arrays, reflection metadata, console output, threads, files, sockets,
-processes, the program's arguments, time, random numbers and COM. Everything
-else the standard library does is written in Stainless.
+processes, the program's arguments, time, time zones, random numbers, COM and
+the leak counter behind `--leak-check`. Everything else the standard library
+does is written in Stainless.
 
 **4. C and C++ ABI compatible.** A `struct` of plain data *is* a C struct, byte
 for byte. `extern "C"` calls into C and `export "C"` exposes functions back,
@@ -222,8 +223,8 @@ Windows and x64 Linux.
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 367 end-to-end tests
-dotnet test tests/Stainless.UnitTests           # 1,374 compiler unit tests
+dotnet run --project tests/Stainless.Tests      # 619 end-to-end tests
+dotnet test tests/Stainless.UnitTests           # over 2,000 compiler unit tests
 ```
 
 Then run something:
@@ -267,6 +268,7 @@ Beyond the language itself:
 |---|---|
 | **[forms/](forms/README.md)** | A GUI framework: the LCL's architecture, C#'s names, on Win32 and GTK 3. |
 | **[ide/](ide/README.md)** | An IDE for Stainless, written in Stainless: a syntax-highlighting editor on `forms/`. |
+| **[debug/](debug/README.md)** | A debugger for Stainless, written in Stainless, with a console front end: `sldb`. |
 | **[Form files](docs/slfm.md)** | `.slfm`, the designer's format, and the code generated from it. |
 | **[bindings/win32/](bindings/win32/README.md)** | The Windows API, in two layers. |
 | **[bindings/gtk/](bindings/gtk/README.md)** | GTK 3, and a widget class hierarchy over it. |
@@ -290,7 +292,9 @@ bindings/gtk/          GTK 3, and a widget layer over it
 forms/                 a GUI framework: the LCL's architecture, C#'s names,
                        on Win32 and GTK 3 behind one seam
 ide/                   an IDE for Stainless, written in Stainless
+debug/                 a debugger for Stainless, written in Stainless
 samples/               example programs
+tools/                 the publish, leak-check and retain-count scripts
 src/Stainless.Compiler front end, binder, emitter, driver
 src/Stainless.Cli      the `stainless` command
 tests/cases/           one directory per end-to-end test

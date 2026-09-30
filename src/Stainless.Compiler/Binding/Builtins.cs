@@ -236,6 +236,20 @@ public sealed class Builtins
         } &&
         function.TypeArguments.Count == 1;
 
+    /// <summary>
+    /// True for an instantiation of <c>Standard.Array.Create&lt;T&gt;</c>, which
+    /// the binder makes into an array filled in place.
+    /// </summary>
+    public bool IsArrayCreate(FunctionSymbol function) =>
+        function.Template is
+        {
+            Name: "Create",
+            ContainingType: { SimpleName: "Array", ModuleName: StandardModuleName },
+        } &&
+        function.TypeArguments.Count == 1 &&
+        function.ReturnType is ArrayTypeSymbol &&
+        function.Parameters.Count(p => !p.IsThis) == 2;
+
     // The runtime's weak subscription cell, which the accessors and thunks
     // written for every event call. See runtime/arc.c.
 

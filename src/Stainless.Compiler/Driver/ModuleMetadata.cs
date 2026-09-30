@@ -48,12 +48,21 @@ public sealed record ModuleMetadata
     public bool SharedRuntime { get; init; }
 
     /// <summary>
+    /// Which build of the shared runtime the library links, as
+    /// <see cref="Toolchain.SharedRuntimeName"/> names it. Null with a static
+    /// runtime. A debug or leak-checking runtime is a different library to the
+    /// loader, so a consumer linking another build would load a second
+    /// runtime; it checks this and refuses.
+    /// </summary>
+    public string? Runtime { get; init; }
+
+    /// <summary>
     /// Bumped whenever the shape below changes, or the shape of the runtime
     /// tables the library's binary holds: a TypeInfo read past its end is a
     /// pointer nobody wrote. A consumer refuses a version it does not know
     /// rather than reading fields that have moved.
     /// </summary>
-    public const int CurrentVersion = 5;
+    public const int CurrentVersion = 6;
 
     public int Version { get; init; } = CurrentVersion;
 

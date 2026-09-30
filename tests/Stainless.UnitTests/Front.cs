@@ -95,6 +95,10 @@ public static class Front
         return new Parser(Text(source), diagnostics, Symbols).ParseCompilationUnit();
     }
 
+    /// <summary>Parses a source as though it were read from <paramref name="path"/>.</summary>
+    public static CompilationUnitSyntax ParseAt(string path, string source) =>
+        new Parser(new SourceText(path, source), new DiagnosticBag(), Symbols).ParseCompilationUnit();
+
     /// <summary>The one declaration a module body parses to.</summary>
     public static Declaration Declaration(string body) =>
         Parse("module Test;\n" + body).Declarations.Single();

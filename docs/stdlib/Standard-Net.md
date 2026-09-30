@@ -166,8 +166,8 @@ A socket of a given family and kind, unbound and unconnected.
 
 **Fails with**
 
-- [SocketError.Invalid](#invalid-case) — `AddressFamily.Any`, which is a question for a resolver rather than a family a socket can have
-- [SocketError.Unknown](#unknown-case) — the platform refused a socket -- out of descriptors, among others
+- [SocketError.Invalid](#invalid-case) -- `AddressFamily.Any`, which is a question for a resolver rather than a family a socket can have
+- [SocketError.Unknown](#unknown-case) -- the platform refused a socket -- out of descriptors, among others
 
 **See also** &nbsp; [Socket.OpenConnected](#openconnected-method)
 
@@ -187,11 +187,11 @@ open first.
 
 **Fails with**
 
-- [SocketError.NoName](#noname-case) — the host did not resolve
-- [SocketError.Refused](#refused-case) — nothing is listening there
-- [SocketError.TimedOut](#timedout-case) — no answer from any address the name resolved to
-- [SocketError.Unreachable](#unreachable-case) — no route to any of them
-- [SocketError.Unknown](#unknown-case) — the last address failed for a reason with no case of its own
+- [SocketError.NoName](#noname-case) -- the host did not resolve
+- [SocketError.Refused](#refused-case) -- nothing is listening there
+- [SocketError.TimedOut](#timedout-case) -- no answer from any address the name resolved to
+- [SocketError.Unreachable](#unreachable-case) -- no route to any of them
+- [SocketError.Unknown](#unknown-case) -- the last address failed for a reason with no case of its own
 
 **See also** &nbsp; [Socket.Connect](#connect-method)
 
@@ -277,11 +277,11 @@ which `LocalEndPoint` will then say.
 
 **Fails with**
 
-- [SocketError.Closed](#closed-case) — the socket was closed before the call
-- [SocketError.NoName](#noname-case) — the host did not resolve
-- [SocketError.AddressInUse](#addressinuse-case) — something else holds that port, or this machine has no such address
-- [SocketError.AccessDenied](#accessdenied-case) — a port this process may not take
-- [SocketError.Unknown](#unknown-case) — the platform reported something with no case of its own
+- [SocketError.Closed](#closed-case) -- the socket was closed before the call
+- [SocketError.NoName](#noname-case) -- the host did not resolve
+- [SocketError.AddressInUse](#addressinuse-case) -- something else holds that port, or this machine has no such address
+- [SocketError.AccessDenied](#accessdenied-case) -- a port this process may not take
+- [SocketError.Unknown](#unknown-case) -- the platform reported something with no case of its own
 
 **See also** &nbsp; [Socket.Listen](#listen-method)
 
@@ -298,10 +298,10 @@ and what an empty host means to the resolver.
 
 **Fails with**
 
-- [SocketError.Closed](#closed-case) — the socket was closed before the call
-- [SocketError.AddressInUse](#addressinuse-case) — something else holds that port
-- [SocketError.AccessDenied](#accessdenied-case) — a port this process may not take
-- [SocketError.Unknown](#unknown-case) — the platform reported something with no case of its own
+- [SocketError.Closed](#closed-case) -- the socket was closed before the call
+- [SocketError.AddressInUse](#addressinuse-case) -- something else holds that port
+- [SocketError.AccessDenied](#accessdenied-case) -- a port this process may not take
+- [SocketError.Unknown](#unknown-case) -- the platform reported something with no case of its own
 
 **See also** &nbsp; [Socket.Bind](#bind-method)
 
@@ -320,10 +320,10 @@ Bind first -- listening on a socket that was never bound fails.
 
 **Fails with**
 
-- [SocketError.Closed](#closed-case) — the socket was closed before the call
-- [SocketError.Invalid](#invalid-case) — the socket was never bound, or is a datagram socket, which has nothing to listen for
-- [SocketError.AddressInUse](#addressinuse-case) — another socket is already listening on that address
-- [SocketError.Unknown](#unknown-case) — the platform reported something with no case of its own
+- [SocketError.Closed](#closed-case) -- the socket was closed before the call
+- [SocketError.Invalid](#invalid-case) -- the socket was never bound, or is a datagram socket, which has nothing to listen for
+- [SocketError.AddressInUse](#addressinuse-case) -- another socket is already listening on that address
+- [SocketError.Unknown](#unknown-case) -- the platform reported something with no case of its own
 
 **See also** &nbsp; [Socket.Bind](#bind-method) &middot; [Socket.Accept](#accept-method)
 
@@ -355,13 +355,13 @@ them all, and the one a client should reach for.
 
 **Fails with**
 
-- [SocketError.Closed](#closed-case) — the socket was closed before the call
-- [SocketError.NoName](#noname-case) — the host did not resolve in this socket's family
-- [SocketError.WouldBlock](#wouldblock-case) — a socket that does not block, where the connection is still being made; `WaitToWrite` is how it finishes
-- [SocketError.Refused](#refused-case) — nothing is listening there
-- [SocketError.TimedOut](#timedout-case) — no answer from that address
-- [SocketError.Unreachable](#unreachable-case) — no route to it
-- [SocketError.Unknown](#unknown-case) — the platform reported something with no case of its own
+- [SocketError.Closed](#closed-case) -- the socket was closed before the call
+- [SocketError.NoName](#noname-case) -- the host did not resolve in this socket's family
+- [SocketError.WouldBlock](#wouldblock-case) -- a socket that does not block, where the connection is still being made; `WaitToWrite` is how it finishes
+- [SocketError.Refused](#refused-case) -- nothing is listening there
+- [SocketError.TimedOut](#timedout-case) -- no answer from that address
+- [SocketError.Unreachable](#unreachable-case) -- no route to it
+- [SocketError.Unknown](#unknown-case) -- the platform reported something with no case of its own
 
 **See also** &nbsp; [Socket.OpenConnected](#openconnected-method)
 
@@ -401,9 +401,9 @@ in its buffer. A loop over what is left is the caller's job, or
 
 **Parameters**
 
-- `buffer` — where the bytes come from
-- `offset` — where in it to start
-- `count` — how many to send from there
+- `buffer` -- where the bytes come from
+- `offset` -- where in it to start
+- `count` -- how many to send from there
 
 **See also** &nbsp; [Socket.SendAll](#sendall-method) &middot; [Socket.Receive](#receive-method)
 
@@ -419,12 +419,12 @@ Sends all of it, or says why it could not.
 
 **Fails with**
 
-- [SocketError.Closed](#closed-case) — the socket was closed, or the peer took nothing and reported nothing
-- [SocketError.NotConnected](#notconnected-case) — the socket has no peer to send to
-- [SocketError.Reset](#reset-case) — the peer went away mid-send
-- [SocketError.TimedOut](#timedout-case) — a send timeout ran out
-- [SocketError.WouldBlock](#wouldblock-case) — a socket that does not block, with no room left for the rest
-- [SocketError.Unknown](#unknown-case) — the platform reported something with no case of its own
+- [SocketError.Closed](#closed-case) -- the socket was closed, or the peer took nothing and reported nothing
+- [SocketError.NotConnected](#notconnected-case) -- the socket has no peer to send to
+- [SocketError.Reset](#reset-case) -- the peer went away mid-send
+- [SocketError.TimedOut](#timedout-case) -- a send timeout ran out
+- [SocketError.WouldBlock](#wouldblock-case) -- a socket that does not block, with no room left for the rest
+- [SocketError.Unknown](#unknown-case) -- the platform reported something with no case of its own
 
 **See also** &nbsp; [Socket.Send](#send-method)
 
@@ -441,12 +441,12 @@ so nothing is converted or copied on the way.
 
 **Fails with**
 
-- [SocketError.Closed](#closed-case) — the socket was closed, or the peer took nothing and reported nothing
-- [SocketError.NotConnected](#notconnected-case) — the socket has no peer to send to
-- [SocketError.Reset](#reset-case) — the peer went away mid-send
-- [SocketError.TimedOut](#timedout-case) — a send timeout ran out
-- [SocketError.WouldBlock](#wouldblock-case) — a socket that does not block, with no room left for the rest
-- [SocketError.Unknown](#unknown-case) — the platform reported something with no case of its own
+- [SocketError.Closed](#closed-case) -- the socket was closed, or the peer took nothing and reported nothing
+- [SocketError.NotConnected](#notconnected-case) -- the socket has no peer to send to
+- [SocketError.Reset](#reset-case) -- the peer went away mid-send
+- [SocketError.TimedOut](#timedout-case) -- a send timeout ran out
+- [SocketError.WouldBlock](#wouldblock-case) -- a socket that does not block, with no room left for the rest
+- [SocketError.Unknown](#unknown-case) -- the platform reported something with no case of its own
 
 **See also** &nbsp; [Socket.SendAll](#sendall-method)
 
@@ -464,9 +464,9 @@ peer having finished, which is an ending rather than an error -- ask
 
 **Parameters**
 
-- `buffer` — where the bytes go
-- `offset` — where in it to start writing them
-- `count` — how many to make room for
+- `buffer` -- where the bytes go
+- `offset` -- where in it to start writing them
+- `count` -- how many to make room for
 
 **See also** &nbsp; [Socket.Send](#send-method)
 
@@ -500,8 +500,8 @@ When the read fails, `from` is an empty host and port 0.
 
 **Parameters**
 
-- `buffer` — where the datagram goes, from its first byte
-- `from` — filled in with where it came from
+- `buffer` -- where the datagram goes, from its first byte
+- `from` -- filled in with where it came from
 
 **See also** &nbsp; [Socket.SendTo](#sendto-method)
 
@@ -518,8 +518,8 @@ Whether a call waits. A socket that does not block answers
 
 **Fails with**
 
-- [SocketError.Closed](#closed-case) — the socket was closed before the call
-- [SocketError.Unknown](#unknown-case) — the platform refused the change
+- [SocketError.Closed](#closed-case) -- the socket was closed before the call
+- [SocketError.Unknown](#unknown-case) -- the platform refused the change
 
 <sub>[stdlib/Net/Socket.sl:470](../../stdlib/Net/Socket.sl#L470)</sub>
 
@@ -534,8 +534,8 @@ waiting to be joined by the next one.
 
 **Fails with**
 
-- [SocketError.Closed](#closed-case) — the socket was closed before the call
-- [SocketError.Unknown](#unknown-case) — the platform refused the option -- a datagram socket has no Nagle to turn off
+- [SocketError.Closed](#closed-case) -- the socket was closed before the call
+- [SocketError.Unknown](#unknown-case) -- the platform refused the option -- a datagram socket has no Nagle to turn off
 
 <sub>[stdlib/Net/Socket.sl:481](../../stdlib/Net/Socket.sl#L481)</sub>
 
@@ -555,8 +555,8 @@ TIME_WAIT case without being asked.
 
 **Fails with**
 
-- [SocketError.Closed](#closed-case) — the socket was closed before the call
-- [SocketError.Unknown](#unknown-case) — the platform refused the option
+- [SocketError.Closed](#closed-case) -- the socket was closed before the call
+- [SocketError.Unknown](#unknown-case) -- the platform refused the option
 
 <sub>[stdlib/Net/Socket.sl:496](../../stdlib/Net/Socket.sl#L496)</sub>
 
@@ -571,8 +571,8 @@ and meaningless on a stream socket.
 
 **Fails with**
 
-- [SocketError.Closed](#closed-case) — the socket was closed before the call
-- [SocketError.Unknown](#unknown-case) — the platform refused the option, which is what a stream socket does with it
+- [SocketError.Closed](#closed-case) -- the socket was closed before the call
+- [SocketError.Unknown](#unknown-case) -- the platform refused the option, which is what a stream socket does with it
 
 <sub>[stdlib/Net/Socket.sl:507](../../stdlib/Net/Socket.sl#L507)</sub>
 
@@ -589,8 +589,8 @@ than a slow one.
 
 **Fails with**
 
-- [SocketError.Closed](#closed-case) — the socket was closed before the call
-- [SocketError.Unknown](#unknown-case) — the platform refused the option
+- [SocketError.Closed](#closed-case) -- the socket was closed before the call
+- [SocketError.Unknown](#unknown-case) -- the platform refused the option
 
 <sub>[stdlib/Net/Socket.sl:519](../../stdlib/Net/Socket.sl#L519)</sub>
 
@@ -604,8 +604,8 @@ How long a read waits before giving up. Zero is forever.
 
 **Fails with**
 
-- [SocketError.Closed](#closed-case) — the socket was closed before the call
-- [SocketError.Unknown](#unknown-case) — the platform refused the option
+- [SocketError.Closed](#closed-case) -- the socket was closed before the call
+- [SocketError.Unknown](#unknown-case) -- the platform refused the option
 
 **See also** &nbsp; [Socket.SetSendTimeout](#setsendtimeout-method)
 
@@ -621,8 +621,8 @@ How long a send waits before giving up. Zero is forever.
 
 **Fails with**
 
-- [SocketError.Closed](#closed-case) — the socket was closed before the call
-- [SocketError.Unknown](#unknown-case) — the platform refused the option
+- [SocketError.Closed](#closed-case) -- the socket was closed before the call
+- [SocketError.Unknown](#unknown-case) -- the platform refused the option
 
 **See also** &nbsp; [Socket.SetReceiveTimeout](#setreceivetimeout-method)
 
@@ -639,9 +639,9 @@ than a reset, which is the difference between this and closing.
 
 **Fails with**
 
-- [SocketError.Closed](#closed-case) — the socket was closed before the call
-- [SocketError.NotConnected](#notconnected-case) — there is no connection to finish
-- [SocketError.Unknown](#unknown-case) — the platform reported something with no case of its own
+- [SocketError.Closed](#closed-case) -- the socket was closed before the call
+- [SocketError.NotConnected](#notconnected-case) -- there is no connection to finish
+- [SocketError.Unknown](#unknown-case) -- the platform reported something with no case of its own
 
 **See also** &nbsp; [Socket.Close](#close-method)
 
@@ -930,11 +930,11 @@ Connects to a host and port.
 
 **Fails with**
 
-- [SocketError.NoName](#noname-case) — the host did not resolve
-- [SocketError.Refused](#refused-case) — nothing is listening there
-- [SocketError.TimedOut](#timedout-case) — no answer from any address the name resolved to
-- [SocketError.Unreachable](#unreachable-case) — no route to any of them
-- [SocketError.Unknown](#unknown-case) — the last address failed for a reason with no case of its own
+- [SocketError.NoName](#noname-case) -- the host did not resolve
+- [SocketError.Refused](#refused-case) -- nothing is listening there
+- [SocketError.TimedOut](#timedout-case) -- no answer from any address the name resolved to
+- [SocketError.Unreachable](#unreachable-case) -- no route to any of them
+- [SocketError.Unknown](#unknown-case) -- the last address failed for a reason with no case of its own
 
 **See also** &nbsp; [TcpListener.Accept](#accept-method)
 
@@ -953,17 +953,17 @@ here, and the system's own is measured in tens of seconds.
 
 **Parameters**
 
-- `host` — the name or address to reach
-- `port` — the port to reach it on
-- `family` — which family to resolve the name in
+- `host` -- the name or address to reach
+- `port` -- the port to reach it on
+- `family` -- which family to resolve the name in
 
 **Fails with**
 
-- [SocketError.NoName](#noname-case) — the host did not resolve in that family
-- [SocketError.Refused](#refused-case) — nothing is listening there
-- [SocketError.TimedOut](#timedout-case) — no answer from any address the name resolved to
-- [SocketError.Unreachable](#unreachable-case) — no route to any of them
-- [SocketError.Unknown](#unknown-case) — the last address failed for a reason with no case of its own
+- [SocketError.NoName](#noname-case) -- the host did not resolve in that family
+- [SocketError.Refused](#refused-case) -- nothing is listening there
+- [SocketError.TimedOut](#timedout-case) -- no answer from any address the name resolved to
+- [SocketError.Unreachable](#unreachable-case) -- no route to any of them
+- [SocketError.Unknown](#unknown-case) -- the last address failed for a reason with no case of its own
 
 <sub>[stdlib/Net/TcpClient.sl:80](../../stdlib/Net/TcpClient.sl#L80)</sub>
 
@@ -1031,11 +1031,11 @@ Sends all of `text`, looping until it has gone.
 
 **Fails with**
 
-- [SocketError.Closed](#closed-case) — the connection was closed, or the peer took nothing and reported nothing
-- [SocketError.NotConnected](#notconnected-case) — the connection was never made
-- [SocketError.Reset](#reset-case) — the peer went away mid-send
-- [SocketError.TimedOut](#timedout-case) — a send timeout ran out
-- [SocketError.Unknown](#unknown-case) — the platform reported something with no case of its own
+- [SocketError.Closed](#closed-case) -- the connection was closed, or the peer took nothing and reported nothing
+- [SocketError.NotConnected](#notconnected-case) -- the connection was never made
+- [SocketError.Reset](#reset-case) -- the peer went away mid-send
+- [SocketError.TimedOut](#timedout-case) -- a send timeout ran out
+- [SocketError.Unknown](#unknown-case) -- the platform reported something with no case of its own
 
 **See also** &nbsp; [TcpClient.SendAll](#sendall-method)
 
@@ -1051,11 +1051,11 @@ Sends all of `data`.
 
 **Fails with**
 
-- [SocketError.Closed](#closed-case) — the connection was closed, or the peer took nothing and reported nothing
-- [SocketError.NotConnected](#notconnected-case) — the connection was never made
-- [SocketError.Reset](#reset-case) — the peer went away mid-send
-- [SocketError.TimedOut](#timedout-case) — a send timeout ran out
-- [SocketError.Unknown](#unknown-case) — the platform reported something with no case of its own
+- [SocketError.Closed](#closed-case) -- the connection was closed, or the peer took nothing and reported nothing
+- [SocketError.NotConnected](#notconnected-case) -- the connection was never made
+- [SocketError.Reset](#reset-case) -- the peer went away mid-send
+- [SocketError.TimedOut](#timedout-case) -- a send timeout ran out
+- [SocketError.Unknown](#unknown-case) -- the platform reported something with no case of its own
 
 **See also** &nbsp; [TcpClient.SendText](#sendtext-method)
 
@@ -1259,9 +1259,9 @@ Listens on every address this machine has.
 
 **Fails with**
 
-- [SocketError.AddressInUse](#addressinuse-case) — something else holds that port
-- [SocketError.AccessDenied](#accessdenied-case) — a port this process may not take
-- [SocketError.Unknown](#unknown-case) — the open, the bind or the listen failed for a reason with no case of its own
+- [SocketError.AddressInUse](#addressinuse-case) -- something else holds that port
+- [SocketError.AccessDenied](#accessdenied-case) -- a port this process may not take
+- [SocketError.Unknown](#unknown-case) -- the open, the bind or the listen failed for a reason with no case of its own
 
 <sub>[stdlib/Net/TcpListener.sl:53](../../stdlib/Net/TcpListener.sl#L53)</sub>
 
@@ -1277,10 +1277,10 @@ firewall.
 
 **Fails with**
 
-- [SocketError.NoName](#noname-case) — the host did not resolve, or is not an address this machine has
-- [SocketError.AddressInUse](#addressinuse-case) — something else holds that port
-- [SocketError.AccessDenied](#accessdenied-case) — a port this process may not take
-- [SocketError.Unknown](#unknown-case) — the open, the bind or the listen failed for a reason with no case of its own
+- [SocketError.NoName](#noname-case) -- the host did not resolve, or is not an address this machine has
+- [SocketError.AddressInUse](#addressinuse-case) -- something else holds that port
+- [SocketError.AccessDenied](#accessdenied-case) -- a port this process may not take
+- [SocketError.Unknown](#unknown-case) -- the open, the bind or the listen failed for a reason with no case of its own
 
 <sub>[stdlib/Net/TcpListener.sl:69](../../stdlib/Net/TcpListener.sl#L69)</sub>
 
@@ -1297,18 +1297,18 @@ The other two overloads are this one with IPv4 and a backlog of 16.
 
 **Parameters**
 
-- `host` — which address to take, empty for every one of them
-- `port` — which port to take, 0 to be given one
-- `family` — which family to listen in
-- `backlog` — how many connections may queue before the system refuses more
+- `host` -- which address to take, empty for every one of them
+- `port` -- which port to take, 0 to be given one
+- `family` -- which family to listen in
+- `backlog` -- how many connections may queue before the system refuses more
 
 **Fails with**
 
-- [SocketError.Invalid](#invalid-case) — `AddressFamily.Any`, which no socket can be opened in
-- [SocketError.NoName](#noname-case) — the host did not resolve in that family
-- [SocketError.AddressInUse](#addressinuse-case) — something else holds that port
-- [SocketError.AccessDenied](#accessdenied-case) — a port this process may not take
-- [SocketError.Unknown](#unknown-case) — the open, the bind or the listen failed for a reason with no case of its own
+- [SocketError.Invalid](#invalid-case) -- `AddressFamily.Any`, which no socket can be opened in
+- [SocketError.NoName](#noname-case) -- the host did not resolve in that family
+- [SocketError.AddressInUse](#addressinuse-case) -- something else holds that port
+- [SocketError.AccessDenied](#accessdenied-case) -- a port this process may not take
+- [SocketError.Unknown](#unknown-case) -- the open, the bind or the listen failed for a reason with no case of its own
 
 <sub>[stdlib/Net/TcpListener.sl:93](../../stdlib/Net/TcpListener.sl#L93)</sub>
 
@@ -1416,7 +1416,7 @@ A socket that can send and not receive, because nothing bound it.
 
 **Fails with**
 
-- [SocketError.Unknown](#unknown-case) — the platform refused a socket -- out of descriptors, among others
+- [SocketError.Unknown](#unknown-case) -- the platform refused a socket -- out of descriptors, among others
 
 **See also** &nbsp; [UdpClient.Bind](#bind-method)
 
@@ -1432,8 +1432,8 @@ The same, in a named family.
 
 **Fails with**
 
-- [SocketError.Invalid](#invalid-case) — `AddressFamily.Any`, which no socket can be opened in
-- [SocketError.Unknown](#unknown-case) — the platform refused a socket
+- [SocketError.Invalid](#invalid-case) -- `AddressFamily.Any`, which no socket can be opened in
+- [SocketError.Unknown](#unknown-case) -- the platform refused a socket
 
 <sub>[stdlib/Net/UdpClient.sl:61](../../stdlib/Net/UdpClient.sl#L61)</sub>
 
@@ -1448,9 +1448,9 @@ choose one, which `LocalEndPoint` will say.
 
 **Fails with**
 
-- [SocketError.AddressInUse](#addressinuse-case) — something else holds that port
-- [SocketError.AccessDenied](#accessdenied-case) — a port this process may not take
-- [SocketError.Unknown](#unknown-case) — the open or the bind failed for a reason with no case of its own
+- [SocketError.AddressInUse](#addressinuse-case) -- something else holds that port
+- [SocketError.AccessDenied](#accessdenied-case) -- a port this process may not take
+- [SocketError.Unknown](#unknown-case) -- the open or the bind failed for a reason with no case of its own
 
 **See also** &nbsp; [UdpClient.Create](#create-method)
 
@@ -1466,10 +1466,10 @@ The same, on one address rather than all of them.
 
 **Fails with**
 
-- [SocketError.NoName](#noname-case) — the host did not resolve, or is not an address this machine has
-- [SocketError.AddressInUse](#addressinuse-case) — something else holds that port
-- [SocketError.AccessDenied](#accessdenied-case) — a port this process may not take
-- [SocketError.Unknown](#unknown-case) — the open or the bind failed for a reason with no case of its own
+- [SocketError.NoName](#noname-case) -- the host did not resolve, or is not an address this machine has
+- [SocketError.AddressInUse](#addressinuse-case) -- something else holds that port
+- [SocketError.AccessDenied](#accessdenied-case) -- a port this process may not take
+- [SocketError.Unknown](#unknown-case) -- the open or the bind failed for a reason with no case of its own
 
 <sub>[stdlib/Net/UdpClient.sl:90](../../stdlib/Net/UdpClient.sl#L90)</sub>
 
@@ -1483,17 +1483,17 @@ Binds with everything named: the address, the port and the family.
 
 **Parameters**
 
-- `host` — which address to take, empty for every one of them
-- `port` — which port to take, 0 to be given one
-- `family` — which family to bind in
+- `host` -- which address to take, empty for every one of them
+- `port` -- which port to take, 0 to be given one
+- `family` -- which family to bind in
 
 **Fails with**
 
-- [SocketError.Invalid](#invalid-case) — `AddressFamily.Any`, which no socket can be opened in
-- [SocketError.NoName](#noname-case) — the host did not resolve in that family
-- [SocketError.AddressInUse](#addressinuse-case) — something else holds that port
-- [SocketError.AccessDenied](#accessdenied-case) — a port this process may not take
-- [SocketError.Unknown](#unknown-case) — the open or the bind failed for a reason with no case of its own
+- [SocketError.Invalid](#invalid-case) -- `AddressFamily.Any`, which no socket can be opened in
+- [SocketError.NoName](#noname-case) -- the host did not resolve in that family
+- [SocketError.AddressInUse](#addressinuse-case) -- something else holds that port
+- [SocketError.AccessDenied](#accessdenied-case) -- a port this process may not take
+- [SocketError.Unknown](#unknown-case) -- the open or the bind failed for a reason with no case of its own
 
 <sub>[stdlib/Net/UdpClient.sl:108](../../stdlib/Net/UdpClient.sl#L108)</sub>
 
@@ -1595,8 +1595,8 @@ Lets this socket send to a broadcast address.
 
 **Fails with**
 
-- [SocketError.Closed](#closed-case) — the socket was closed before the call
-- [SocketError.Unknown](#unknown-case) — the platform refused the option
+- [SocketError.Closed](#closed-case) -- the socket was closed before the call
+- [SocketError.Unknown](#unknown-case) -- the platform refused the option
 
 <sub>[stdlib/Net/UdpClient.sl:176](../../stdlib/Net/UdpClient.sl#L176)</sub>
 
@@ -1610,8 +1610,8 @@ How long `Receive` waits before giving up. Zero is forever.
 
 **Fails with**
 
-- [SocketError.Closed](#closed-case) — the socket was closed before the call
-- [SocketError.Unknown](#unknown-case) — the platform refused the option
+- [SocketError.Closed](#closed-case) -- the socket was closed before the call
+- [SocketError.Unknown](#unknown-case) -- the platform refused the option
 
 <sub>[stdlib/Net/UdpClient.sl:182](../../stdlib/Net/UdpClient.sl#L182)</sub>
 
@@ -1653,8 +1653,8 @@ runtime, where it can try each socket as well as each address.
 
 **Fails with**
 
-- [SocketError.NoName](#noname-case) — the name did not resolve, or resolved to an address the platform would not write out
-- [SocketError.Unknown](#unknown-case) — the platform's networking could not be started
+- [SocketError.NoName](#noname-case) -- the name did not resolve, or resolved to an address the platform would not write out
+- [SocketError.Unknown](#unknown-case) -- the platform's networking could not be started
 
 <sub>[stdlib/Net/Net.sl:124](../../stdlib/Net/Net.sl#L124)</sub>
 
@@ -1672,13 +1672,13 @@ an IPv6 address cannot be connected to from an IPv4 socket.
 
 **Parameters**
 
-- `host` — the name or literal address to look up
-- `family` — which family to take an address from
+- `host` -- the name or literal address to look up
+- `family` -- which family to take an address from
 
 **Fails with**
 
-- [SocketError.NoName](#noname-case) — the name did not resolve in that family, or resolved to an address the platform would not write out
-- [SocketError.Unknown](#unknown-case) — the platform's networking could not be started
+- [SocketError.NoName](#noname-case) -- the name did not resolve in that family, or resolved to an address the platform would not write out
+- [SocketError.Unknown](#unknown-case) -- the platform's networking could not be started
 
 <sub>[stdlib/Net/Net.sl:141](../../stdlib/Net/Net.sl#L141)</sub>
 

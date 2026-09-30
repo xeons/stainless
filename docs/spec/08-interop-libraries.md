@@ -34,6 +34,20 @@ extern "C"
 }
 ```
 
+**A reference C returns is checked where the signature says it is never
+null.** A declaration returning `String`, a class, an interface or `T[]` is a
+promise the C side never made, so the call compares what came back with null
+and stops the program on one, naming the function:
+
+```
+stainless: 'c_find_name' returned null, and a Standard.Text.String is never null
+```
+
+Declare the result as `String?` or `C?` where C may answer with nothing; that is
+not checked, and the compiler then asks every reader to handle the null. The
+check is one comparison, and nothing on the Stainless side of an
+`export "C"` is asked, since there the promise is this compiler's own.
+
 **A declaration joins the module it was written in**, as an ordinary member,
 and so is private to that module unless it says `public`. That is what a binding
 library is made of: a module of `public extern "C"` declarations is one another
@@ -135,10 +149,11 @@ error[SL0702]: 'already_there' is declared 'extern "C"', so it is defined
 elsewhere and cannot be given a value here
 ```
 
-This is the *only* variable allowed at module scope. An ordinary one is still
+Beside a `static` ([section 9.3](09-statements-expressions.md#93-const-and-static)),
+this is the only variable allowed at module scope. One that is neither is
 refused (SL0204), because a mutable global with no boundary to justify it is
-state every thread reaches and nothing declares — what `static` inside a type
-is for, with the thread-safety question SL0377 asks of it.
+state every thread reaches and nothing declares -- what `static` is for, with
+the thread-safety question SL0377 asks of it.
 
 **Two things to get right, and the compiler can check neither**, because it
 never sees the C declaration:
@@ -246,6 +261,11 @@ stainless build src --shared -o build/math.dll --header build/math.h
 produces `math.dll`, the import library `math.lib`, and a C header. A
 `--shared` build needs no `Main`.
 
+A library is named by its file name, never by the path it was built at: on
+Linux it carries that name as its `SONAME`. Windows finds a DLL beside the
+program that loads it; a Linux C consumer does the same when linked with
+`-Wl,-rpath,'$ORIGIN'`.
+
 **The export table is exactly the `export "C"` functions.** Nothing else is
 reachable from outside, and that is the only control there is:
 
@@ -335,10 +355,10 @@ because it is written from the same bound program. It describes the public
 surface: layouts, field offsets, signatures, and the linker names to call.
 
 The metadata names its library, and **`--reference` links it** from beside the
-`.slmod` — the import library on Windows, the shared object elsewhere. It used
-to take the library as a second input, and leaving that off was a link error
-about a name nobody had declared. A library moved away from its metadata is
-still passed as an ordinary input.
+`.slmod` -- the import library on Windows, the shared object elsewhere. A
+library moved away from its metadata is passed as an ordinary input. The
+compiler copies the library beside the program, which is where the program
+looks for it on every platform.
 
 ```csharp
 import Library.Shapes;                  // a module this compilation has no source for
@@ -404,7 +424,8 @@ written. The compiler puts the runtime beside what it built.
 
 A program with no library boundary keeps the copy compiled into it and stays a
 single file, which is the default. `--runtime shared|static` says so explicitly,
-and a library and a consumer that disagree are refused — two runtimes is exactly
+and a library and a consumer that disagree are refused, as are two that link
+different builds of it (`--debug`, `--leak-check`). Two runtimes is exactly
 the failure this closes, and it would otherwise be a silent one. See
 [§6.1 of abi.md](../abi.md#61-one-runtime).
 
@@ -640,7 +661,7 @@ registration call, and the factory is not written by hand.
 
 Activation passes no arguments and writes no initializer, so an activatable
 class needs a constructor taking none, and nothing `required` left for the
-maker to set. A class with no constructor at all is fine — §2.16 has already
+maker to set. A class with no constructor at all is fine -- [section 2.16](02-types.md#216-zero-values) has already
 held its fields to initializers — but one that has constructors and no empty
 one, or a `required` member its empty one is not `[SetsRequiredMembers]` for,
 is refused where it is declared (SL0611) rather than activated with a null
@@ -752,10 +773,10 @@ an array object holding the file, and the static is born holding its address.
 This is what C does with `xxd -i` and a generated header, and what C23 does
 with `#embed`. It is an attribute here, rather than a function or an
 expression, because what it says is a property of the declaration: this static
-is that file. An earlier version of this was `embed("logo.png")`, an expression
-with `section:` and `access:` as named arguments, and it read as a call —
-something that happens — when nothing happens at all, and it put two words
-about where bytes go in the binary in the middle of an argument list. **An
+is that file. An expression, `embed("logo.png")` with `section:` and `access:`
+as named arguments, was rejected: it reads as a call -- something that happens --
+when nothing happens at all, and it puts two words about where bytes go in the
+binary in the middle of an argument list. **An
 embed is a static and nothing else**: there are no embedded locals, no embed
 as an argument, and no embed in the middle of an expression, because the object
 exists for the life of the program and a static is the declaration that says
@@ -964,7 +985,7 @@ changing that digest. Keep what a package embeds inside the package.
 
 ### `[Embed]` or a resource
 
-[Resources](../packages.md#22-resources) are the other way to carry bytes, and
+[Resources](../packages.md#23-resources) are the other way to carry bytes, and
 the two answer different questions.
 
 A **resource** is found at run time, by a type and a number, through
@@ -1037,8 +1058,8 @@ asm (in rcx = count, in rsi = &buffer[0], inout rax = total, out rdx = carry)
 
 `in` is the keyword it already was; `out` and `inout` are words, as `out` is at
 a call ([§7.2.1](07-functions-members.md#721-out)), and stay names everywhere
-else. An operand with no direction is SL0715, and the rest of it is still
-checked. The value after `=` is read as an expression without assignment,
+else. An operand with no direction is SL0715, and is read on as though it
+said `in`. The value after `=` is read as an expression without assignment,
 because the `=` is the operand's.
 
 **Every operand is evaluated once, in the order written, before the block** —

@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+using Stainless.Binding;
 using Stainless.Emit;
 using Xunit;
 
@@ -68,6 +69,33 @@ public class DebugInfoTests
 
         string node = Front.MetadataNode(ir, type);
         Assert.Contains("DW_TAG_pointer_type", node);
+    }
+
+    /// <summary>A pointer is as wide as the target's, not as the host's.</summary>
+    [Fact]
+    public void APointerIsTheTargetsWidth()
+    {
+        var before = TargetPlatform.Current;
+        TargetPlatform.Current = TargetPlatform.X86Windows;
+        string ir;
+        try
+        {
+            ir = Front.ModuleDebugIr("""
+                public class Node { public int Value; }
+
+                public void Use(int* raw)
+                {
+                    Node node = new Node();
+                    node.Value = *raw;
+                }
+                """);
+        }
+        finally { TargetPlatform.Current = before; }
+
+        var pointers = ir.Split('\n').Where(line => line.Contains("DW_TAG_pointer_type")).ToList();
+
+        Assert.NotEmpty(pointers);
+        Assert.All(pointers, line => Assert.Contains("size: 32", line));
     }
 
     /// <summary>

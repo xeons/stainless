@@ -21,8 +21,6 @@
 
 module Standard;
 
-import Standard.Unchecked;
-
 /// Part of an array, as a value, which refuses a write through it. C#'s
 /// `System.ReadOnlySpan<T>`, and what a function that only reads takes: an
 /// array and a `Span<T>` both convert to one.
@@ -135,9 +133,8 @@ public struct ReadOnlySpan<T>
     /// A new array holding a copy of the elements.
     public T[] ToArray()
     {
-        var copy = NewUninitializedArray<T>(_length);
-        CopyTo(copy);
-        return copy;
+        ReadOnlySpan<T> source = this;
+        return Array.Create<T>(_length, (i) => source[i]);
     }
 
     /// Whether the two view any element in common.

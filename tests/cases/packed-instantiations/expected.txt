@@ -1,0 +1,6 @@
+Squeezed 9
+Box<Squeezed> 9
+Wide 16
+Box<Wide> 16
+PackedBox<long> 9
+Holder 48

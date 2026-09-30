@@ -903,8 +903,8 @@ byte[] CompressDeflate(ReadOnlySpan<byte> data, CompressionLevel level)
 
 **Parameters**
 
-- `data` — what to compress
-- `level` — how hard to work at it
+- `data` -- what to compress
+- `level` -- how hard to work at it
 
 <sub>[stdlib/IO/Compression/Compression.sl:85](../../stdlib/IO/Compression/Compression.sl#L85)</sub>
 
@@ -930,8 +930,8 @@ byte[] CompressGZip(ReadOnlySpan<byte> data, CompressionLevel level)
 
 **Parameters**
 
-- `data` — what to compress
-- `level` — how hard to work at it
+- `data` -- what to compress
+- `level` -- how hard to work at it
 
 <sub>[stdlib/IO/Compression/Compression.sl:98](../../stdlib/IO/Compression/Compression.sl#L98)</sub>
 
@@ -957,8 +957,8 @@ byte[] CompressZLib(ReadOnlySpan<byte> data, CompressionLevel level)
 
 **Parameters**
 
-- `data` — what to compress
-- `level` — how hard to work at it
+- `data` -- what to compress
+- `level` -- how hard to work at it
 
 <sub>[stdlib/IO/Compression/Compression.sl:111](../../stdlib/IO/Compression/Compression.sl#L111)</sub>
 
@@ -973,12 +973,12 @@ ignored.
 
 **Fails with**
 
-- [CompressionError.Truncated](#truncated-case) — the data ends inside a block
-- [CompressionError.InvalidBlockType](#invalidblocktype-case) — a block of the reserved type
-- [CompressionError.StoredLengthMismatch](#storedlengthmismatch-case) — a stored block's length and complement disagree
-- [CompressionError.InvalidCodeLengths](#invalidcodelengths-case) — a dynamic block's code is unusable
-- [CompressionError.InvalidCode](#invalidcode-case) — a pattern no code stands for
-- [CompressionError.InvalidDistance](#invaliddistance-case) — a match before the start
+- [CompressionError.Truncated](#truncated-case) -- the data ends inside a block
+- [CompressionError.InvalidBlockType](#invalidblocktype-case) -- a block of the reserved type
+- [CompressionError.StoredLengthMismatch](#storedlengthmismatch-case) -- a stored block's length and complement disagree
+- [CompressionError.InvalidCodeLengths](#invalidcodelengths-case) -- a dynamic block's code is unusable
+- [CompressionError.InvalidCode](#invalidcode-case) -- a pattern no code stands for
+- [CompressionError.InvalidDistance](#invaliddistance-case) -- a match before the start
 
 <sub>[stdlib/IO/Compression/Compression.sl:125](../../stdlib/IO/Compression/Compression.sl#L125)</sub>
 
@@ -992,15 +992,15 @@ What gzip `data` expands to, every member of it in order.
 
 **Fails with**
 
-- [CompressionError.Truncated](#truncated-case) — the data ends inside a member
-- [CompressionError.InvalidHeader](#invalidheader-case) — not a gzip header, or its CRC does not match
-- [CompressionError.InvalidBlockType](#invalidblocktype-case) — a block of the reserved type
-- [CompressionError.StoredLengthMismatch](#storedlengthmismatch-case) — a stored block's length and complement disagree
-- [CompressionError.InvalidCodeLengths](#invalidcodelengths-case) — a dynamic block's code is unusable
-- [CompressionError.InvalidCode](#invalidcode-case) — a pattern no code stands for
-- [CompressionError.InvalidDistance](#invaliddistance-case) — a match before the start
-- [CompressionError.ChecksumMismatch](#checksummismatch-case) — the CRC-32 does not match
-- [CompressionError.LengthMismatch](#lengthmismatch-case) — the length does not match
+- [CompressionError.Truncated](#truncated-case) -- the data ends inside a member
+- [CompressionError.InvalidHeader](#invalidheader-case) -- not a gzip header, or its CRC does not match
+- [CompressionError.InvalidBlockType](#invalidblocktype-case) -- a block of the reserved type
+- [CompressionError.StoredLengthMismatch](#storedlengthmismatch-case) -- a stored block's length and complement disagree
+- [CompressionError.InvalidCodeLengths](#invalidcodelengths-case) -- a dynamic block's code is unusable
+- [CompressionError.InvalidCode](#invalidcode-case) -- a pattern no code stands for
+- [CompressionError.InvalidDistance](#invaliddistance-case) -- a match before the start
+- [CompressionError.ChecksumMismatch](#checksummismatch-case) -- the CRC-32 does not match
+- [CompressionError.LengthMismatch](#lengthmismatch-case) -- the length does not match
 
 <sub>[stdlib/IO/Compression/Compression.sl:143](../../stdlib/IO/Compression/Compression.sl#L143)</sub>
 
@@ -1014,15 +1014,15 @@ What zlib `data` expands to. Bytes after the trailer are ignored.
 
 **Fails with**
 
-- [CompressionError.Truncated](#truncated-case) — the data ends early
-- [CompressionError.InvalidHeader](#invalidheader-case) — not a zlib header
-- [CompressionError.DictionaryRequired](#dictionaryrequired-case) — it needs a preset dictionary
-- [CompressionError.InvalidBlockType](#invalidblocktype-case) — a block of the reserved type
-- [CompressionError.StoredLengthMismatch](#storedlengthmismatch-case) — a stored block's length and complement disagree
-- [CompressionError.InvalidCodeLengths](#invalidcodelengths-case) — a dynamic block's code is unusable
-- [CompressionError.InvalidCode](#invalidcode-case) — a pattern no code stands for
-- [CompressionError.InvalidDistance](#invaliddistance-case) — a match before the start
-- [CompressionError.ChecksumMismatch](#checksummismatch-case) — the Adler-32 does not match
+- [CompressionError.Truncated](#truncated-case) -- the data ends early
+- [CompressionError.InvalidHeader](#invalidheader-case) -- not a zlib header
+- [CompressionError.DictionaryRequired](#dictionaryrequired-case) -- it needs a preset dictionary
+- [CompressionError.InvalidBlockType](#invalidblocktype-case) -- a block of the reserved type
+- [CompressionError.StoredLengthMismatch](#storedlengthmismatch-case) -- a stored block's length and complement disagree
+- [CompressionError.InvalidCodeLengths](#invalidcodelengths-case) -- a dynamic block's code is unusable
+- [CompressionError.InvalidCode](#invalidcode-case) -- a pattern no code stands for
+- [CompressionError.InvalidDistance](#invaliddistance-case) -- a match before the start
+- [CompressionError.ChecksumMismatch](#checksummismatch-case) -- the Adler-32 does not match
 
 <sub>[stdlib/IO/Compression/Compression.sl:159](../../stdlib/IO/Compression/Compression.sl#L159)</sub>
 

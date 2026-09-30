@@ -78,5 +78,11 @@ int Main()
     Console.WriteLine("subscript " + N((long)settings["port"].GetValueOrDefault(-1)) + " " +
         N((long)settings["absent"].GetValueOrDefault(-1)));
 
+    // A cast gives a case its variant as a declared type does.
+    var cast = (Optional<nuint>)Some((nuint)3);
+    Func<int, Optional<nuint>> inLambda = (x) => (Optional<nuint>)Some((nuint)x);
+    Console.WriteLine("cast " + N((long)cast.GetValueOrDefault(0u)) + " " +
+        N((long)inLambda(4).GetValueOrDefault(0u)));
+
     return 0;
 }

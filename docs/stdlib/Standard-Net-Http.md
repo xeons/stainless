@@ -532,10 +532,10 @@ Sends `request` and reads the whole response.
 
 **Fails with**
 
-- [HttpError.Timeout](#timeout-case) — `Timeout` ran out
-- [HttpError.ConnectFailure](#connectfailure-case) — no connection could be made
-- [HttpError.InvalidResponse](#invalidresponse-case) — the response was malformed
-- [HttpError.InvalidRequest](#invalidrequest-case) — the request has no absolute URI and there is no `BaseAddress`
+- [HttpError.Timeout](#timeout-case) -- `Timeout` ran out
+- [HttpError.ConnectFailure](#connectfailure-case) -- no connection could be made
+- [HttpError.InvalidResponse](#invalidresponse-case) -- the response was malformed
+- [HttpError.InvalidRequest](#invalidrequest-case) -- the request has no absolute URI and there is no `BaseAddress`
 
 <sub>[stdlib/Net/Http/HttpClient.sl:123](../../stdlib/Net/Http/HttpClient.sl#L123)</sub>
 
@@ -549,7 +549,7 @@ Sends `request`, returning when `completionOption` says.
 
 **Fails with**
 
-- [HttpError.Timeout](#timeout-case) — `Timeout` ran out
+- [HttpError.Timeout](#timeout-case) -- `Timeout` ran out
 
 <sub>[stdlib/Net/Http/HttpClient.sl:129](../../stdlib/Net/Http/HttpClient.sl#L129)</sub>
 
@@ -564,16 +564,16 @@ went wrong in `failure` when it fails.
 
 **Parameters**
 
-- `request` — what to send; a followed redirect changes it
-- `completionOption` — whether to read the body before returning
-- `failure` — the detail of a failure, or `None`
+- `request` -- what to send; a followed redirect changes it
+- `completionOption` -- whether to read the body before returning
+- `failure` -- the detail of a failure, or `None`
 
 **Fails with**
 
-- [HttpError.Timeout](#timeout-case) — `Timeout` ran out
-- [HttpError.TlsFailure](#tlsfailure-case) — the TLS handshake failed
-- [HttpError.TooManyRedirects](#toomanyredirects-case) — more than the handler allows
-- [HttpError.ResponseTooLarge](#responsetoolarge-case) — past `MaxResponseContentBufferSize`
+- [HttpError.Timeout](#timeout-case) -- `Timeout` ran out
+- [HttpError.TlsFailure](#tlsfailure-case) -- the TLS handshake failed
+- [HttpError.TooManyRedirects](#toomanyredirects-case) -- more than the handler allows
+- [HttpError.ResponseTooLarge](#responsetoolarge-case) -- past `MaxResponseContentBufferSize`
 
 <sub>[stdlib/Net/Http/HttpClient.sl:143](../../stdlib/Net/Http/HttpClient.sl#L143)</sub>
 
@@ -627,7 +627,7 @@ The body of a `GET` as text.
 
 **Fails with**
 
-- [HttpError.UnsuccessfulStatusCode](#unsuccessfulstatuscode-case) — the status was not 2xx
+- [HttpError.UnsuccessfulStatusCode](#unsuccessfulstatuscode-case) -- the status was not 2xx
 
 <sub>[stdlib/Net/Http/HttpClient.sl:201](../../stdlib/Net/Http/HttpClient.sl#L201)</sub>
 
@@ -641,7 +641,7 @@ The body of a `GET` as text.
 
 **Fails with**
 
-- [HttpError.UnsuccessfulStatusCode](#unsuccessfulstatuscode-case) — the status was not 2xx
+- [HttpError.UnsuccessfulStatusCode](#unsuccessfulstatuscode-case) -- the status was not 2xx
 
 <sub>[stdlib/Net/Http/HttpClient.sl:207](../../stdlib/Net/Http/HttpClient.sl#L207)</sub>
 
@@ -655,7 +655,7 @@ The body of a `GET` as bytes.
 
 **Fails with**
 
-- [HttpError.UnsuccessfulStatusCode](#unsuccessfulstatuscode-case) — the status was not 2xx
+- [HttpError.UnsuccessfulStatusCode](#unsuccessfulstatuscode-case) -- the status was not 2xx
 
 <sub>[stdlib/Net/Http/HttpClient.sl:213](../../stdlib/Net/Http/HttpClient.sl#L213)</sub>
 
@@ -669,7 +669,7 @@ The body of a `GET` as bytes.
 
 **Fails with**
 
-- [HttpError.UnsuccessfulStatusCode](#unsuccessfulstatuscode-case) — the status was not 2xx
+- [HttpError.UnsuccessfulStatusCode](#unsuccessfulstatuscode-case) -- the status was not 2xx
 
 <sub>[stdlib/Net/Http/HttpClient.sl:219](../../stdlib/Net/Http/HttpClient.sl#L219)</sub>
 
@@ -684,7 +684,7 @@ arrives.
 
 **Fails with**
 
-- [HttpError.UnsuccessfulStatusCode](#unsuccessfulstatuscode-case) — the status was not 2xx
+- [HttpError.UnsuccessfulStatusCode](#unsuccessfulstatuscode-case) -- the status was not 2xx
 
 <sub>[stdlib/Net/Http/HttpClient.sl:226](../../stdlib/Net/Http/HttpClient.sl#L226)</sub>
 
@@ -699,7 +699,7 @@ arrives.
 
 **Fails with**
 
-- [HttpError.UnsuccessfulStatusCode](#unsuccessfulstatuscode-case) — the status was not 2xx
+- [HttpError.UnsuccessfulStatusCode](#unsuccessfulstatuscode-case) -- the status was not 2xx
 
 <sub>[stdlib/Net/Http/HttpClient.sl:233](../../stdlib/Net/Http/HttpClient.sl#L233)</sub>
 
@@ -1076,9 +1076,9 @@ The whole body.
 
 **Fails with**
 
-- [HttpError.ConnectionClosed](#connectionclosed-case) — the connection ended mid-body
-- [HttpError.Timeout](#timeout-case) — the request's timeout ran out
-- [HttpError.ContentFailure](#contentfailure-case) — the body could not be read
+- [HttpError.ConnectionClosed](#connectionclosed-case) -- the connection ended mid-body
+- [HttpError.Timeout](#timeout-case) -- the request's timeout ran out
+- [HttpError.ContentFailure](#contentfailure-case) -- the body could not be read
 
 <sub>[stdlib/Net/Http/HttpContent.sl:73](../../stdlib/Net/Http/HttpContent.sl#L73)</sub>
 
@@ -1094,8 +1094,8 @@ and as UTF-8 otherwise. Malformed input becomes U+FFFD.
 
 **Fails with**
 
-- [HttpError.ConnectionClosed](#connectionclosed-case) — the connection ended mid-body
-- [HttpError.Timeout](#timeout-case) — the request's timeout ran out
+- [HttpError.ConnectionClosed](#connectionclosed-case) -- the connection ended mid-body
+- [HttpError.Timeout](#timeout-case) -- the request's timeout ran out
 
 <sub>[stdlib/Net/Http/HttpContent.sl:87](../../stdlib/Net/Http/HttpContent.sl#L87)</sub>
 
@@ -1110,7 +1110,7 @@ this is the connection itself, and reads once.
 
 **Fails with**
 
-- [HttpError.ContentFailure](#contentfailure-case) — the body could not be buffered
+- [HttpError.ContentFailure](#contentfailure-case) -- the body could not be buffered
 
 <sub>[stdlib/Net/Http/HttpContent.sl:116](../../stdlib/Net/Http/HttpContent.sl#L116)</sub>
 
@@ -1124,7 +1124,7 @@ Writes the body to `destination`.
 
 **Fails with**
 
-- [HttpError.ContentFailure](#contentfailure-case) — `destination` would not take it, or the body could not be read
+- [HttpError.ContentFailure](#contentfailure-case) -- `destination` would not take it, or the body could not be read
 
 <sub>[stdlib/Net/Http/HttpContent.sl:133](../../stdlib/Net/Http/HttpContent.sl#L133)</sub>
 
@@ -1138,7 +1138,7 @@ Reads the whole body into memory, so that it can be read again.
 
 **Fails with**
 
-- [HttpError.ContentFailure](#contentfailure-case) — the body could not be read
+- [HttpError.ContentFailure](#contentfailure-case) -- the body could not be read
 
 <sub>[stdlib/Net/Http/HttpContent.sl:147](../../stdlib/Net/Http/HttpContent.sl#L147)</sub>
 
@@ -1152,11 +1152,11 @@ Reads the whole body into memory, refusing one over `maxBufferSize`.
 
 **Parameters**
 
-- `maxBufferSize` — the most bytes to hold
+- `maxBufferSize` -- the most bytes to hold
 
 **Fails with**
 
-- [HttpError.ResponseTooLarge](#responsetoolarge-case) — the body is longer than that
+- [HttpError.ResponseTooLarge](#responsetoolarge-case) -- the body is longer than that
 
 <sub>[stdlib/Net/Http/HttpContent.sl:153](../../stdlib/Net/Http/HttpContent.sl#L153)</sub>
 
@@ -1730,8 +1730,8 @@ Adds `value` to the field `name`, after its existing values.
 
 **Parameters**
 
-- `name` — the field name, which MUST be a token
-- `value` — the value, which MUST NOT hold a control character but HTAB
+- `name` -- the field name, which MUST be a token
+- `value` -- the value, which MUST NOT hold a control character but HTAB
 
 **Returns** &nbsp; false when either is malformed, or `name` belongs to another collection — a `Content-Type` belongs on the content
 
@@ -2446,7 +2446,7 @@ This response when `IsSuccessStatusCode`, and a failure otherwise.
 
 **Fails with**
 
-- [HttpError.UnsuccessfulStatusCode](#unsuccessfulstatuscode-case) — the status is outside 200–299
+- [HttpError.UnsuccessfulStatusCode](#unsuccessfulstatuscode-case) -- the status is outside 200–299
 
 <sub>[stdlib/Net/Http/HttpResponseMessage.sl:84](../../stdlib/Net/Http/HttpResponseMessage.sl#L84)</sub>
 
@@ -2460,11 +2460,11 @@ The same, saying which status it was.
 
 **Parameters**
 
-- `failure` — the status and a message when it fails
+- `failure` -- the status and a message when it fails
 
 **Fails with**
 
-- [HttpError.UnsuccessfulStatusCode](#unsuccessfulstatuscode-case) — the status is outside 200–299
+- [HttpError.UnsuccessfulStatusCode](#unsuccessfulstatuscode-case) -- the status is outside 200–299
 
 <sub>[stdlib/Net/Http/HttpResponseMessage.sl:91](../../stdlib/Net/Http/HttpResponseMessage.sl#L91)</sub>
 
@@ -3320,8 +3320,8 @@ or a quoted string.
 
 **Fails with**
 
-- [ParseError.Empty](Standard.md#empty-case) — there is nothing but whitespace
-- [ParseError.Malformed](Standard.md#malformed-case) — it is not that shape
+- [ParseError.Empty](Standard.md#empty-case) -- there is nothing but whitespace
+- [ParseError.Malformed](Standard.md#malformed-case) -- it is not that shape
 
 <sub>[stdlib/Net/Http/MediaTypeHeaderValue.sl:98](../../stdlib/Net/Http/MediaTypeHeaderValue.sl#L98)</sub>
 

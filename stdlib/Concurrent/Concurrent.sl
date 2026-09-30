@@ -31,11 +31,6 @@
 /// collection in a field avoids that entirely: reading a field to call a method
 /// on it borrows, and a borrow that never leaves cannot outlive anything.
 ///
-/// This began as a stronger argument still, because reference counts were not
-/// atomic and handing an object out of a lock corrupted its count. Counts are
-/// atomic now, so that half is closed; the lifetime half is not, and it is the
-/// half this design was already the answer to.
-///
 /// So these types lock a raw mutex directly rather than using `Mutex<T>` from
 /// Standard.Threading, whose `Guard.Value` is exactly the hand-out that
 /// cannot be made safe this way. See the note there.

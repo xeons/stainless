@@ -544,13 +544,13 @@ something else by.
 
 **Fails with**
 
-- [JsonError.Unexpected](#unexpected-case) — a character that cannot start what is expected, or an unescaped control character in a string
-- [JsonError.UnterminatedText](#unterminatedtext-case) — a string with no closing quote
-- [JsonError.BadEscape](#badescape-case) — a backslash followed by something that is not an escape
-- [JsonError.BadNumber](#badnumber-case) — digits that are not a JSON number, or one too large for a double
-- [JsonError.BadLiteral](#badliteral-case) — something that started like `true`, `false` or `null` and was not
-- [JsonError.TooDeep](#toodeep-case) — nesting past `MaxDepth`
-- [JsonError.TrailingContent](#trailingcontent-case) — a second value after the first
+- [JsonError.Unexpected](#unexpected-case) -- a character that cannot start what is expected, or an unescaped control character in a string
+- [JsonError.UnterminatedText](#unterminatedtext-case) -- a string with no closing quote
+- [JsonError.BadEscape](#badescape-case) -- a backslash followed by something that is not an escape
+- [JsonError.BadNumber](#badnumber-case) -- digits that are not a JSON number, or one too large for a double
+- [JsonError.BadLiteral](#badliteral-case) -- something that started like `true`, `false` or `null` and was not
+- [JsonError.TooDeep](#toodeep-case) -- nesting past `MaxDepth`
+- [JsonError.TrailingContent](#trailingcontent-case) -- a second value after the first
 
 **See also** &nbsp; [Json.ToJsonText](#tojsontext-function)
 
@@ -582,21 +582,21 @@ reachable from it.
 
 **Type parameters**
 
-- `T` — a `[Reflect]` type, whose field tables say what there is to fill
+- `T` -- a `[Reflect]` type, whose field tables say what there is to fill
 
 **Fails with**
 
-- [JsonError.Unexpected](#unexpected-case) — a character that cannot start what is expected, or an unescaped control character in a string
-- [JsonError.UnterminatedText](#unterminatedtext-case) — a string with no closing quote
-- [JsonError.BadEscape](#badescape-case) — a backslash followed by something that is not an escape
-- [JsonError.BadNumber](#badnumber-case) — digits that are not a JSON number, or one too large for a double
-- [JsonError.BadLiteral](#badliteral-case) — something that started like `true`, `false` or `null` and was not
-- [JsonError.TooDeep](#toodeep-case) — nesting past `MaxDepth`
-- [JsonError.TrailingContent](#trailingcontent-case) — a second value after the first
-- [JsonError.NotAnObject](#notanobject-case) — the document is not an object
-- [JsonError.NotReflected](#notreflected-case) — `T` carries no field tables
-- [JsonError.MissingMember](#missingmember-case) — something made here lacks a value its type needs
-- [JsonError.NotCreatable](#notcreatable-case) — the document needs an object of a type with no public parameterless constructor
+- [JsonError.Unexpected](#unexpected-case) -- a character that cannot start what is expected, or an unescaped control character in a string
+- [JsonError.UnterminatedText](#unterminatedtext-case) -- a string with no closing quote
+- [JsonError.BadEscape](#badescape-case) -- a backslash followed by something that is not an escape
+- [JsonError.BadNumber](#badnumber-case) -- digits that are not a JSON number, or one too large for a double
+- [JsonError.BadLiteral](#badliteral-case) -- something that started like `true`, `false` or `null` and was not
+- [JsonError.TooDeep](#toodeep-case) -- nesting past `MaxDepth`
+- [JsonError.TrailingContent](#trailingcontent-case) -- a second value after the first
+- [JsonError.NotAnObject](#notanobject-case) -- the document is not an object
+- [JsonError.NotReflected](#notreflected-case) -- `T` carries no field tables
+- [JsonError.MissingMember](#missingmember-case) -- something made here lacks a value its type needs
+- [JsonError.NotCreatable](#notcreatable-case) -- the document needs an object of a type with no public parameterless constructor
 
 **See also** &nbsp; [Json.Serialize](#serialize-function)
 
@@ -615,14 +615,14 @@ made it was refused unless it gave them values.
 
 **Type parameters**
 
-- `T` — a `[Reflect]` type, whose field tables say what there is to fill
+- `T` -- a `[Reflect]` type, whose field tables say what there is to fill
 
 **Fails with**
 
-- [JsonError.NotAnObject](#notanobject-case) — the document is not an object
-- [JsonError.NotReflected](#notreflected-case) — `T` carries no field tables
-- [JsonError.MissingMember](#missingmember-case) — something made here lacks a value its type needs
-- [JsonError.NotCreatable](#notcreatable-case) — the document needs an object of a type with no public parameterless constructor
+- [JsonError.NotAnObject](#notanobject-case) -- the document is not an object
+- [JsonError.NotReflected](#notreflected-case) -- `T` carries no field tables
+- [JsonError.MissingMember](#missingmember-case) -- something made here lacks a value its type needs
+- [JsonError.NotCreatable](#notcreatable-case) -- the document needs an object of a type with no public parameterless constructor
 
 **See also** &nbsp; [Json.Serialize](#serialize-function)
 
@@ -638,7 +638,7 @@ The document as text.
 
 **Type parameters**
 
-- `T` — a `[Reflect]` type
+- `T` -- a `[Reflect]` type
 
 **See also** &nbsp; [Json.PopulateObject](#populateobject-function)
 
@@ -654,7 +654,7 @@ The same, indented.
 
 **Type parameters**
 
-- `T` — a `[Reflect]` type
+- `T` -- a `[Reflect]` type
 
 **See also** &nbsp; [Json.Serialize](#serialize-function)
 
@@ -702,7 +702,7 @@ struct rather than stopping at it. A field of a kind with no JSON spelling
 
 **Type parameters**
 
-- `T` — a `[Reflect]` type, whose field tables say what there is to write
+- `T` -- a `[Reflect]` type, whose field tables say what there is to write
 
 **See also** &nbsp; [Json.Serialize](#serialize-function)
 

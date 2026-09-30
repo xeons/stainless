@@ -303,7 +303,7 @@ static readonly int Doubled = Base * 2;
 static readonly int Base    = 20;
 
 
-// --- tour "Inheritance" / spec 2.4.1 and 2.4.2 ---------------------------
+// --- tour "Inheritance" / spec 2.4.3 and 2.4.4 ---------------------------
 public abstract class DocShape
 {
     protected int sides;
@@ -586,7 +586,7 @@ String Numbers()
     return built.ToText();
 }
 
-// --- spec 2.4.1 record, 2.4.2 with ---------------------------------------
+// --- spec 2.4.6 record, 2.4.7 with ---------------------------------------
 
 public record Point(int X, int Y);
 

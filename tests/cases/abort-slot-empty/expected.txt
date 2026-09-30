@@ -1,0 +1,2 @@
+full held
+stainless: a Standard.Slot<String> was read while it was empty

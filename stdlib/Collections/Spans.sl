@@ -33,8 +33,6 @@
 /// except where it writes. A position is an `Optional<nuint>` rather than -1.
 module Standard.Collections;
 
-import Standard.Unchecked;
-
 // ------------------------------------------------------------------ one value
 
 /// Where the first element equal to `value` is, if there is one.
@@ -523,12 +521,9 @@ public void Sort<TKey, TValue>(Span<TKey> keys, Span<TValue> items, Comparison<T
 
     Sort(positions, (a, b) => order(sortedKeys[a], sortedKeys[b]));
 
-    TValue[] sortedItems = NewUninitializedArray<TValue>(items.Length);
     for (nuint i = 0u; i < positions.Length; i++)
-    {
         keys[i] = sortedKeys[positions[i]];
-        sortedItems[i] = items[positions[i]];
-    }
+    TValue[] sortedItems = Array.Create(items.Length, (i) => items[positions[i]]);
 
     ReadOnlySpan<TValue> moved = sortedItems;
     moved.CopyTo(items);

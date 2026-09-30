@@ -344,6 +344,10 @@ public sealed class ProjectBuilder(
             (overrides.OptimizationLevel ?? root.Optimize).ToString(),
             (overrides.Debug ?? root.Debug) ? "debug" : "",
 
+            // A leak-checking build links a different runtime, and a
+            // dependency left on the other one is a second runtime.
+            overrides.LeakCheck ? "leak" : "",
+
             // Two builds differing only in the format produce different
             // objects and MUST NOT look alike to a stamp.
             overrides.DebugFormat?.ToString() ?? "target",

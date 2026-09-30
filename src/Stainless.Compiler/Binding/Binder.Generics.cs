@@ -147,13 +147,27 @@ public sealed partial class Binder
     /// they were made.
     /// </summary>
     /// <summary>
-    /// False until pass 4 has given every source type its members.
+    /// False until every source type has its members and its <c>[Packed]</c>
+    /// and <c>[Align]</c>, which is after pass 6.
     ///
     /// An instantiation made before then waits, because a layout computed while
-    /// a struct it reaches is still empty settles on the wrong size and caches
-    /// it.
+    /// a struct it reaches is still empty, or not yet packed, settles on the
+    /// wrong size and caches it: laying <c>Result&lt;Color, E&gt;</c> out
+    /// reaches <c>Color</c>, and <c>LayoutComputed</c> means nothing looks again.
     /// </summary>
-    private bool _membersDeclared;
+    private bool _layoutsMaySettle;
+
+    /// <summary>Whether a template is the standard library's <c>Slot&lt;T&gt;</c>.</summary>
+    private static bool IsSlotTemplate(GenericTypeTemplate template) =>
+        template is { Name: "Slot", Parameters.Count: 1 } &&
+        template.Module.Name == Builtins.StandardModuleName;
+
+    /// <summary>Lays out every instantiation made before its layout could be trusted.</summary>
+    private void SettleLayoutsWaitingForAttributes()
+    {
+        _layoutsMaySettle = true;
+        SettleDeferredLayouts();
+    }
 
     private void SettleDeferredLayouts()
     {
@@ -220,7 +234,14 @@ public sealed partial class Binder
 
         if (filling is not null) filling.Template = template;
 
-        NamedTypeSymbol type = filling as NamedTypeSymbol ?? declaration.Kind switch
+        NamedTypeSymbol type = filling as NamedTypeSymbol ?? (IsSlotTemplate(template)
+            ? new SlotTypeSymbol
+            {
+                SimpleName = displayName, ModuleName = template.Module.Name, IsPublic = isPublic,
+                Template = template, TypeArguments = arguments, Span = declaration.Span,
+                Element = arguments[0],
+            }
+            : declaration.Kind switch
         {
             TypeDeclKind.Class => new ClassTypeSymbol
             {
@@ -248,7 +269,7 @@ public sealed partial class Binder
                 SimpleName = displayName, ModuleName = template.Module.Name, IsPublic = isPublic,
                 Template = template, TypeArguments = arguments, Span = declaration.Span,
             },
-        };
+        });
 
         // Registered before its members are declared, so a self-referential
         // template such as `class Node<T> { Node<T>? next; }` terminates.
@@ -275,6 +296,7 @@ public sealed partial class Binder
         // this a [Shared] or [Reflect] on a generic would be silently dropped
         // from every instantiation of it.
         BindAttributes(declaration.Attributes, type.Attributes, template.Scope, type.Name);
+        ReadLayoutAttributes(type, declaration.Span);
 
         if (ReflectAttribute is { } reflect && type.Attributes.Any(a => a.Type == reflect) &&
             type is ClassTypeSymbol or StructTypeSymbol && type is not VariantTypeSymbol)
@@ -308,11 +330,8 @@ public sealed partial class Binder
             _instantiationDepth--;
         }
 
-        // Not while pass 4 is still running: see the note at the end of
-        // `DeclareMembers`. An instantiation made before every source type has
-        // its members cannot be laid out, because laying it out would settle a
-        // wrong size on whatever it reaches that is not ready.
-        if (_instantiationDepth == 0 && _membersDeclared) SettleDeferredLayouts();
+        // Not before pass 6 has finished: see `_layoutsMaySettle`.
+        if (_instantiationDepth == 0 && _layoutsMaySettle) SettleDeferredLayouts();
 
         // Every body this instantiation owns is bound later, under this same
         // substitution.
@@ -436,8 +455,13 @@ public sealed partial class Binder
         {
             var declaration = template.Declaration;
 
+            int errorsBefore = owed.ErrorCount;
             VerifyConstraintsOnceSettled(declaration.Constraints, template.Parameters, substitution,
                 template.Scope, $"'{template.Name}'", span);
+
+            // Arguments that fail a constraint have been reported at the call.
+            // The body was not written for them, so it is not checked against them.
+            bool constraintsMet = owed.ErrorCount == errorsBefore;
 
             bool dispatchedByClass =
                 template.IsDispatched && template.ContainingType is ClassTypeSymbol;
@@ -487,7 +511,7 @@ public sealed partial class Binder
 
             // An interface's with no body is a slot to fill, and an abstract one
             // is the same: neither has anything to bind.
-            if (symbol.Body is not null) _pending.Add((symbol, substitution));
+            if (symbol.Body is not null && constraintsMet) _pending.Add((symbol, substitution));
         }
 
         if (template.IsDispatched) RegisterDispatched(template, symbol, span);

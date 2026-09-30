@@ -6,3 +6,4 @@ class 11
 idempotent 5
 nested 5
 subscript 8080 -1
+cast 3 4

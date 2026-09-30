@@ -101,8 +101,8 @@ Note the argument order, which is the C library's: y first.
 
 **Parameters**
 
-- `y` — the point's y coordinate, which comes first
-- `x` — the point's x coordinate
+- `y` -- the point's y coordinate, which comes first
+- `x` -- the point's x coordinate
 
 **See also** &nbsp; [Math.Atan](#atan-function)
 
@@ -138,9 +138,9 @@ The high 64 bits of the 128-bit product, with the low 64 in `low`.
 
 **Parameters**
 
-- `a` — one factor
-- `b` — the other
-- `low` — receives the low 64 bits, which is what `a * b` alone answers
+- `a` -- one factor
+- `b` -- the other
+- `low` -- receives the low 64 bits, which is what `a * b` alone answers
 
 <sub>[stdlib/Math.sl:393](../../stdlib/Math.sl#L393)</sub>
 
@@ -154,9 +154,9 @@ The high 64 bits of the signed 128-bit product, with the low 64 in `low`.
 
 **Parameters**
 
-- `a` — one factor
-- `b` — the other
-- `low` — receives the low 64 bits, which is what `a * b` alone answers
+- `a` -- one factor
+- `b` -- the other
+- `low` -- receives the low 64 bits, which is what `a * b` alone answers
 
 <sub>[stdlib/Math.sl:404](../../stdlib/Math.sl#L404)</sub>
 

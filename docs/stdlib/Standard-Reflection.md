@@ -928,7 +928,7 @@ build recorded nothing for.
 
 **See also** &nbsp; [CreateInstanceInto](#createinstanceinto-function) &middot; [WriteAggregate](#writeaggregate-function)
 
-<sub>[stdlib/Reflection/Reflection.sl:637](../../stdlib/Reflection/Reflection.sl#L637)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:638](../../stdlib/Reflection/Reflection.sl#L638)</sub>
 
 ### CreateArrayInto *function*
 
@@ -948,16 +948,16 @@ field keeps what it had. `fill` MUST NOT keep the address it is given.
 
 **Parameters**
 
-- `instance` — the object holding the field
-- `field` — an array field
-- `count` — how many elements
-- `fill` — writes every element, and answers whether it could
+- `instance` -- the object holding the field
+- `field` -- an array field
+- `count` -- how many elements
+- `fill` -- writes every element, and answers whether it could
 
 **Returns** &nbsp; the array, now owned by the field, or null
 
 **See also** &nbsp; [CreateElementAt](#createelementat-function)
 
-<sub>[stdlib/Reflection/Reflection.sl:661](../../stdlib/Reflection/Reflection.sl#L661)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:662](../../stdlib/Reflection/Reflection.sl#L662)</sub>
 
 ### CreateElementAt *function*
 
@@ -970,15 +970,15 @@ does, and stores it at `address`, releasing what the element held.
 
 **Parameters**
 
-- `address` — where the element sits, from `GetElementAddress`
-- `field` — the array field, whose element type is what is made
-- `fill` — writes what the constructor left, and answers whether it could
+- `address` -- where the element sits, from `GetElementAddress`
+- `field` -- the array field, whose element type is what is made
+- `fill` -- writes what the constructor left, and answers whether it could
 
 **Returns** &nbsp; the object, now owned by the array, or null with the element untouched
 
 **See also** &nbsp; [CreateArrayInto](#createarrayinto-function)
 
-<sub>[stdlib/Reflection/Reflection.sl:588](../../stdlib/Reflection/Reflection.sl#L588)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:589](../../stdlib/Reflection/Reflection.sl#L589)</sub>
 
 ### CreateInstance *function*
 
@@ -995,14 +995,15 @@ MUST supply, since `new T()` with nothing to supply it would be refused
 too. The overload taking `fill` is the one for that.
 
 The caller owns the answer's reference, and nothing here takes it back:
-store it with `WriteAggregate`, or prefer `CreateInstanceInto`.
+`WriteAggregate` takes a reference of its own and leaves this one owed.
+`CreateInstanceInto` is the form that leaves nothing to release.
 
     var type = FindType("App.Button");
     byte* made = CreateInstance(type);
 
 **See also** &nbsp; [Type.CanCreateInstance](#cancreateinstance-property) &middot; [CreateInstanceInto](#createinstanceinto-function)
 
-<sub>[stdlib/Reflection/Reflection.sl:474](../../stdlib/Reflection/Reflection.sl#L474)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:475](../../stdlib/Reflection/Reflection.sl#L475)</sub>
 
 ### CreateInstance *function*
 
@@ -1023,14 +1024,14 @@ out complete is gone when this returns.
 
 **Parameters**
 
-- `type` — the class to make
-- `fill` — writes what the constructor left, and answers whether it could
+- `type` -- the class to make
+- `fill` -- writes what the constructor left, and answers whether it could
 
 **Returns** &nbsp; the object, which the caller owns, or null
 
 **See also** &nbsp; [CreateInstanceInto](#createinstanceinto-function)
 
-<sub>[stdlib/Reflection/Reflection.sl:496](../../stdlib/Reflection/Reflection.sl#L496)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:497](../../stdlib/Reflection/Reflection.sl#L497)</sub>
 
 ### CreateInstanceInto *function*
 
@@ -1046,7 +1047,7 @@ The field owns the object; the caller has nothing to release.
 
 **See also** &nbsp; [CreateInstance](#createinstance-function)
 
-<sub>[stdlib/Reflection/Reflection.sl:541](../../stdlib/Reflection/Reflection.sl#L541)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:542](../../stdlib/Reflection/Reflection.sl#L542)</sub>
 
 ### CreateInstanceInto *function*
 
@@ -1060,15 +1061,15 @@ that is complete, so a failed fill leaves it as it was.
 
 **Parameters**
 
-- `instance` — the object holding the field
-- `field` — a class field, whose type is what is made
-- `fill` — writes what the constructor left, and answers whether it could
+- `instance` -- the object holding the field
+- `field` -- a class field, whose type is what is made
+- `fill` -- writes what the constructor left, and answers whether it could
 
 **Returns** &nbsp; the object, now owned by the field, or null
 
 **See also** &nbsp; [CreateInstance](#createinstance-function)
 
-<sub>[stdlib/Reflection/Reflection.sl:559](../../stdlib/Reflection/Reflection.sl#L559)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:560](../../stdlib/Reflection/Reflection.sl#L560)</sub>
 
 ### FindType *function*
 
@@ -1120,7 +1121,7 @@ nuint GetArrayLength(byte* array)
 
 How many elements an array has. Zero for null.
 
-<sub>[stdlib/Reflection/Reflection.sl:695](../../stdlib/Reflection/Reflection.sl#L695)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:696](../../stdlib/Reflection/Reflection.sl#L696)</sub>
 
 ### GetBool *function*
 
@@ -1157,11 +1158,11 @@ and an index that came from a document is not the program's.
 
 **Parameters**
 
-- `array` — the array itself, as `ReadArray` answers it
-- `field` — the array field, which supplies the stride between elements
-- `index` — which element, counted from zero
+- `array` -- the array itself, as `ReadArray` answers it
+- `field` -- the array field, which supplies the stride between elements
+- `index` -- which element, counted from zero
 
-<sub>[stdlib/Reflection/Reflection.sl:709](../../stdlib/Reflection/Reflection.sl#L709)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:710](../../stdlib/Reflection/Reflection.sl#L710)</sub>
 
 ### GetInteger *function*
 
@@ -1196,10 +1197,10 @@ nullable type can. `ReadTextAt` answers `""` for such a String.
 
 **Parameters**
 
-- `address` — where the element sits, from `GetElementAddress`
-- `field` — the array field, which supplies the element kind
+- `address` -- where the element sits, from `GetElementAddress`
+- `field` -- the array field, which supplies the element kind
 
-<sub>[stdlib/Reflection/Reflection.sl:745](../../stdlib/Reflection/Reflection.sl#L745)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:746](../../stdlib/Reflection/Reflection.sl#L746)</sub>
 
 ### IsFieldNull *function*
 
@@ -1237,7 +1238,7 @@ byte* ReadAggregateAt(byte* address, Field field)
 The address of an aggregate element: what a class element points at, or
 where a struct element sits.
 
-<sub>[stdlib/Reflection/Reflection.sl:770](../../stdlib/Reflection/Reflection.sl#L770)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:771](../../stdlib/Reflection/Reflection.sl#L771)</sub>
 
 ### ReadArray *function*
 
@@ -1247,7 +1248,7 @@ byte* ReadArray(byte* instance, Field field)
 
 The array a field holds, or null. The instance still owns it.
 
-<sub>[stdlib/Reflection/Reflection.sl:611](../../stdlib/Reflection/Reflection.sl#L611)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:612](../../stdlib/Reflection/Reflection.sl#L612)</sub>
 
 ### ReadBool *function*
 
@@ -1271,7 +1272,7 @@ bool ReadBoolAt(byte* address)
 Reads an element of a `bool` array. Takes no field, a `bool` being one byte
 whatever array it is in.
 
-<sub>[stdlib/Reflection/Reflection.sl:738](../../stdlib/Reflection/Reflection.sl#L738)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:739](../../stdlib/Reflection/Reflection.sl#L739)</sub>
 
 ### ReadDouble *function*
 
@@ -1296,7 +1297,7 @@ Reads an element of a floating array. `field` supplies the element kind,
 which is what says whether the four or the eight bytes at `address` are the
 value.
 
-<sub>[stdlib/Reflection/Reflection.sl:731](../../stdlib/Reflection/Reflection.sl#L731)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:732](../../stdlib/Reflection/Reflection.sl#L732)</sub>
 
 ### ReadInteger *function*
 
@@ -1322,12 +1323,12 @@ Reads an element of a whole-number array.
 
 **Parameters**
 
-- `address` — where the element sits, from `GetElementAddress`
-- `field` — the array field, which supplies the element kind
+- `address` -- where the element sits, from `GetElementAddress`
+- `field` -- the array field, which supplies the element kind
 
 **See also** &nbsp; [WriteIntegerAt](#writeintegerat-function)
 
-<sub>[stdlib/Reflection/Reflection.sl:723](../../stdlib/Reflection/Reflection.sl#L723)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:724](../../stdlib/Reflection/Reflection.sl#L724)</sub>
 
 ### ReadText *function*
 
@@ -1350,7 +1351,7 @@ String ReadTextAt(byte* address)
 
 Reads a String element, as a copy of all its bytes.
 
-<sub>[stdlib/Reflection/Reflection.sl:760](../../stdlib/Reflection/Reflection.sl#L760)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:761](../../stdlib/Reflection/Reflection.sl#L761)</sub>
 
 ### SetAggregate *function*
 
@@ -1422,7 +1423,7 @@ what it had: `Field.HasZeroValue` says which those are.
 
 **See also** &nbsp; [CreateInstance](#createinstance-function) &middot; [ReadAggregate](#readaggregate-function)
 
-<sub>[stdlib/Reflection/Reflection.sl:529](../../stdlib/Reflection/Reflection.sl#L529)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:530](../../stdlib/Reflection/Reflection.sl#L530)</sub>
 
 ### WriteBool *function*
 
@@ -1444,7 +1445,7 @@ void WriteBoolAt(byte* address, bool value)
 
 Writes an element of a `bool` array.
 
-<sub>[stdlib/Reflection/Reflection.sl:796](../../stdlib/Reflection/Reflection.sl#L796)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:797](../../stdlib/Reflection/Reflection.sl#L797)</sub>
 
 ### WriteDouble *function*
 
@@ -1466,7 +1467,7 @@ void WriteDoubleAt(byte* address, Field field, double value)
 
 Writes an element of a floating array, narrowed to the element's width.
 
-<sub>[stdlib/Reflection/Reflection.sl:790](../../stdlib/Reflection/Reflection.sl#L790)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:791](../../stdlib/Reflection/Reflection.sl#L791)</sub>
 
 ### WriteInteger *function*
 
@@ -1490,7 +1491,7 @@ Writes an element of a whole-number array, narrowed to its width.
 
 **See also** &nbsp; [ReadIntegerAt](#readintegerat-function)
 
-<sub>[stdlib/Reflection/Reflection.sl:784](../../stdlib/Reflection/Reflection.sl#L784)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:785](../../stdlib/Reflection/Reflection.sl#L785)</sub>
 
 ### WriteText *function*
 
@@ -1516,7 +1517,7 @@ void WriteTextAt(byte* address, String value)
 
 Writes a String element, releasing whatever it held.
 
-<sub>[stdlib/Reflection/Reflection.sl:799](../../stdlib/Reflection/Reflection.sl#L799)</sub>
+<sub>[stdlib/Reflection/Reflection.sl:800](../../stdlib/Reflection/Reflection.sl#L800)</sub>
 
 ## Constants
 

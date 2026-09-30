@@ -17,9 +17,9 @@ public class Publisher
 {
     public event Notify Fired;
 
-    public event Asked Question;                  // SL0549: handlers cannot return a value
-    public event Plain Direct;                    // SL0548: a delegate has no object
-    public static event Notify Global;            // SL0550: nothing would unsubscribe
+    public event Asked Question;                  // SL0819: handlers cannot return a value
+    public event Plain Direct;                    // SL0818: a delegate has no object
+    public static event Notify Global;            // SL0820: nothing would unsubscribe
 
     public void RaiseIt() => Fired(1); // fine: its own event, by name
 }
@@ -37,10 +37,10 @@ int Main()
     p.Fired += s.On;                              // fine
     p.Fired -= s.On;                              // fine
 
-    p.Fired(1);                                   // SL0554: only Publisher may raise it
-    Notify held = p.Fired;                        // SL0555: an event has no value to read
-    p.Fired = s.On;                               // SL0556: '=' would replace the whole list
-    p.Fired.Clear();                              // SL0555: only Publisher may clear it
+    p.Fired(1);                                   // SL0823: only Publisher may raise it
+    Notify held = p.Fired;                        // SL0824: an event has no value to read
+    p.Fired = s.On;                               // SL0825: '=' would replace the whole list
+    p.Fired.Clear();                              // SL0824: only Publisher may clear it
 
     return 0;
 }

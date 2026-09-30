@@ -1,0 +1,2 @@
+kept 1 one
+stainless: a collection expression's spread yielded fewer elements than its Count

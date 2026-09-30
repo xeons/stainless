@@ -384,6 +384,36 @@ public class DocumentationTests
     }
 
     /// <summary>
+    /// A block's relative link is written relative to its own file and read from
+    /// the page, which is somewhere else. A URL and an anchor are left alone.
+    /// </summary>
+    [Fact]
+    public void ARelativeLinkIsRebasedOntoThePage()
+    {
+        string root = Directory.CreateTempSubdirectory("stainless-doc").FullName;
+        try
+        {
+            string output = Path.Combine(root, "docs", "reference");
+            var unit = Front.ParseAt(Path.Combine(root, "lib", "M.sl"), """
+                /// See [the guide](../docs/guide.md#start).
+                module M;
+                /// Also [the site](https://example.com/x.md) and [below](#g-function).
+                public int F() { return 0; }
+                """);
+
+            string page = File.ReadAllText(DocWriter.Write([unit], output, sourceRoot: root)[0]);
+
+            Assert.Contains("[the guide](../guide.md#start)", page);
+            Assert.Contains("[the site](https://example.com/x.md)", page);
+            Assert.Contains("[below](#g-function)", page);
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
+    /// <summary>
     /// Every contents link lands on a heading that is actually on the page.
     ///
     /// The anchor was once taken over the entry's name alone while the heading

@@ -38,8 +38,8 @@ public sealed record CompilationOptions
     /// Windows resource scripts to compile and fold into the binary.
     ///
     /// Apart from the other native inputs because these are not handed to the
-    /// linker as they stand: each is compiled to a .res first, and on a target
-    /// that has no resource section there is nothing useful to do with one.
+    /// linker as they stand: each is compiled to a .res first. A target with no
+    /// resource section carries the compiled blob for Standard.Resources to read.
     /// </summary>
     public IReadOnlyList<string> ResourceScripts { get; init; } = [];
 
@@ -118,6 +118,9 @@ public sealed record CompilationOptions
     /// </summary>
     public bool NeedsSharedRuntime =>
         SharedRuntime ?? (MetadataPath is not null || References.Count > 0);
+
+    /// <summary>Which build of the shared runtime this build links, when it links one.</summary>
+    public string SharedRuntimeName => Toolchain.SharedRuntimeName(Debug, LeakCheck);
 
     public bool KeepIntermediates { get; init; }
     public bool EmitIrOnly { get; init; }
@@ -702,6 +705,7 @@ public sealed class Compilation
         // --- bind --------------------------------------------------------
         var references = new List<ModuleMetadata>();
         var referenceLinkInputs = new List<string>();
+        var referenceLibraries = new List<string>();
         var unlinkedReferences = new List<string>();
         foreach (string path in options.References)
         {
@@ -721,6 +725,16 @@ public sealed class Compilation
                     "an object could not cross between them; build both with the same " +
                     "'--runtime'.");
 
+            // A debug or leak-checking runtime is a library of another name, so
+            // agreeing on "shared" is not enough.
+            if (options.NeedsSharedRuntime && metadata.Runtime != options.SharedRuntimeName)
+                return Failure(
+                    $"'{metadata.Library}' links the shared runtime " +
+                    $"'{metadata.Runtime ?? "unknown"}' and this program would link " +
+                    $"'{options.SharedRuntimeName}'. Those are two runtimes in one process, so " +
+                    "an object could not cross between them; build both with the same " +
+                    "'--debug' and '--leak-check'.");
+
             references.Add(metadata);
 
             // The metadata names the library it describes, and a library built
@@ -733,6 +747,9 @@ public sealed class Compilation
             string linkInput = ReferencedLinkInput(path, metadata, target);
             if (File.Exists(linkInput)) referenceLinkInputs.Add(linkInput);
             else unlinkedReferences.Add(metadata.Library);
+
+            string library = ReferencedLibrary(path, metadata);
+            if (File.Exists(library)) referenceLibraries.Add(library);
         }
 
         // Documenting is reading, not building: there is nothing to run, so
@@ -968,7 +985,8 @@ public sealed class Compilation
 
         var link = toolchain.Link(
             irPath, runtimeObjects, nativeInputs, output, options.OptimizationLevel,
-            options.Shared, options.Debug, libraries, sharedRuntime, moduleDefinition);
+            options.Shared, options.Debug, libraries, sharedRuntime, moduleDefinition,
+            loadsLibrariesBeside: referenceLibraries.Count > 0);
         if (!link.Success)
         {
             // An 'asm' block is the one part of the IR whose text the program
@@ -992,12 +1010,16 @@ public sealed class Compilation
         if (IrFault.StrippedDebugInfo(link.StandardError))
             return Failure(IrFault.FromVerifier(link.StandardError, ir).Explain(irPath));
 
-        // The loader looks beside the binary, so that is where the runtime goes.
-        // Both a program and a Stainless library need it there, and they are
-        // usually the same directory -- copying twice is copying the same file.
-        if (sharedRuntime is not null &&
-            CopyRuntimeBeside(sharedRuntime.Library, output) is { } copyError)
-            return Failure(copyError);
+        // The loader looks beside the binary, so that is where the runtime and
+        // every referenced library go. Both a program and a Stainless library
+        // need them there, and they are usually the same directory -- copying
+        // twice is copying the same file.
+        var loaded = new List<string>(referenceLibraries);
+        if (sharedRuntime is not null) loaded.Add(sharedRuntime.Library);
+
+        foreach (string library in loaded)
+            if (CopyBeside(library, output) is { } copyError)
+                return Failure(copyError);
 
         // Debug info points at the .ll only for the runtime's C, but a build that
         // asked to be debuggable should keep what it described either way.
@@ -1019,7 +1041,8 @@ public sealed class Compilation
             File.WriteAllText(metadataPath,
                 MetadataWriter.Write(
                         program, Path.GetFileName(output), ownModules, diagnostics,
-                        options.NeedsSharedRuntime, options.PackageName, options.PackageVersion)
+                        options.NeedsSharedRuntime ? options.SharedRuntimeName : null,
+                        options.PackageName, options.PackageVersion)
                     .ToJson());
         }
 
@@ -1303,10 +1326,10 @@ public sealed class Compilation
     }
 
     /// <summary>
-    /// Puts the runtime shared library next to what was just built, unless it
-    /// is already there. Returns null on success, or what went wrong.
+    /// Puts a shared library the output loads next to it, unless it is already
+    /// there. Returns null on success, or what went wrong.
     /// </summary>
-    private static string? CopyRuntimeBeside(string library, string output)
+    private static string? CopyBeside(string library, string output)
     {
         try
         {
@@ -1327,7 +1350,7 @@ public sealed class Compilation
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
-            return $"could not put the Stainless runtime beside the output: {e.Message}";
+            return $"could not put '{Path.GetFileName(library)}' beside the output: {e.Message}";
         }
     }
 
@@ -1346,10 +1369,13 @@ public sealed class Compilation
     /// </summary>
     private static string ReferencedLinkInput(string metadataPath, ModuleMetadata metadata, TargetPlatform target)
     {
-        string library = Path.Combine(
-            Path.GetDirectoryName(Path.GetFullPath(metadataPath)) ?? ".", metadata.Library);
+        string library = ReferencedLibrary(metadataPath, metadata);
         return target.IsWindows ? Path.ChangeExtension(library, ".lib") : library;
     }
+
+    /// <summary>The library a <c>--reference</c> describes, which the loader opens.</summary>
+    private static string ReferencedLibrary(string metadataPath, ModuleMetadata metadata) =>
+        Path.Combine(Path.GetDirectoryName(Path.GetFullPath(metadataPath)) ?? ".", metadata.Library);
 
     private static bool SamePath(string left, string right) =>
         string.Equals(

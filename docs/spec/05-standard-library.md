@@ -4,9 +4,9 @@
 
 ## 5.1 What ships, and how
 
-`Standard.Text` is built into the compiler, because `String` and
-`StringBuilder` need runtime support. Everything else is ordinary Stainless
-compiled alongside your program.
+`String` is built into the compiler, because the runtime owns its layout and
+its allocation. Everything else -- the rest of `String`, `StringBuilder`, and
+every other module -- is ordinary Stainless compiled alongside your program.
 
 **A generic that nobody instantiates costs nothing**, because there is nothing
 to emit until it is instantiated. That covers `List<T>`, `Dictionary<TKey, TValue>`,
@@ -14,9 +14,9 @@ to emit until it is instantiated. That covers `List<T>`, `Dictionary<TKey, TValu
 
 **A module is compiled only if the program reaches it**: by an `import`, or by
 a qualified name such as `Standard.Json.Parse` that spells it, from the program
-or from a module that was itself reached. `Standard`, `Standard.Text` and
-`Standard.Collections` are always reached, because the compiler relies on them
-without an import. Every file of the library is lexed, which is what finding
+or from a module that was itself reached. `Standard`, `Standard.Text`,
+`Standard.Collections` and `Standard.Bits` are always reached, because the
+compiler relies on them without an import. Every file of the library is lexed, which is what finding
 the qualified names costs; nothing else of an unreached module is paid for.
 
 **Within a reached module, a non-generic function or class is emitted whether or
@@ -29,7 +29,7 @@ own for the linker to drop.
 | Module | Contents | Imported |
 |---|---|---|
 | `Standard.Text` | `String`, `StringBuilder`, `Utf16String`, conversions | automatically |
-| `Standard.Console` | `Write`, `WriteLine`, `WriteError` | on request |
+| `Standard.Console` | `Write`, `WriteLine`, `WriteError`, `ReadLine`, `ReadToEnd` | on request |
 | `Standard.Collections` | the interfaces below, and every container | on request |
 | `Standard.Concurrent` | the containers several threads may share | on request |
 | `Standard.Threading` | `Mutex<T>`, atomics, the job pool | on request |
@@ -48,7 +48,7 @@ own for the linker to drop.
 | `Standard.Process` | running another program, and signals ([§5.9.1](#591-standardprocess)) | on request |
 | `Standard.Json` | JSON, as a document or onto a type ([§5.10](#510-standardjson-and-standardxml)) | on request |
 | `Standard.Xml` | XML, in the same two layers ([§5.10](#510-standardjson-and-standardxml)) | on request |
-| `Standard.Resources` | what a `.rc` folded into the binary, read back on every platform ([§2.2 of packages.md](../packages.md#22-resources)) | on request |
+| `Standard.Resources` | what a `.rc` folded into the binary, read back on every platform ([section 2.3 of packages.md](../packages.md#23-resources)) | on request |
 | `Standard.Net` | TCP and UDP sockets, the same on every platform | on request |
 | `Standard.Net.Security` | TLS 1.3 and 1.2, client and server, over any stream ([§5.17](#517-standardnetsecurity)) | on request |
 | `Standard.Net.Http` | an HTTP/1.1 and HTTP/2 client: pooled and multiplexed connections, redirects, cookies, decompression, proxies ([§5.18](#518-standardnethttp)) | on request |
@@ -60,8 +60,7 @@ own for the linker to drop.
 | `Standard.Security.Cryptography.X509Certificates` | certificates, host names, chains, the root store, making certificates ([§5.16](#516-standardsecuritycryptographyx509certificates)) | on request |
 | `Standard.Formats.Asn1` | ASN.1 in BER and DER, read and written ([§5.15](#515-standardformatsasn1)) | on request |
 | `Standard.Media.Audio` | playing and recording sound ([§5.14](#514-standardmediaaudio)) | on request |
-| `Standard.Com` | `Guid` and `IUnknown`, for `com interface` ([§8.5](08-interop-libraries.md#85-com)) | on request |
-| `Standard.Unchecked` | storage whose slots are not values yet, for a collection ([§2.16.3](02-types.md#2163-arrays)) | on request |
+| `Standard.Com` | `IUnknown`, the HRESULTs a com method returns, and `GetClassObject` and `CanUnloadNow` for a server ([section 8.5](08-interop-libraries.md#85-com)) | on request |
 | `Standard` | `Result<T, TError>`, `[Flags]`, and the rest of what the language itself reads | automatically |
 
 ### 5.1.1 What `Standard` holds
@@ -78,8 +77,10 @@ everyday values:
 | `Version` | two to four parts, `Parse`, ordered part by part with a missing part first |
 | `Uri` | RFC 3986: kept normal, resolved against a base, escaped and unescaped; `Host`, `Port`, `AbsolutePath`, `Segments`, `MakeRelativeUri`, `IsBaseOf`; a Windows or UNC path reads as a `file:` URI |
 | `Lazy<T>` | made on first ask, once, with C#'s three `LazyThreadSafetyMode`s |
-| `Array` | `Create(count, (i) => ...)` and `Repeat(value, count)`, which make an array whole ([§2.16.3](02-types.md#2163-arrays)) |
+| `Array` | .NET's `System.Array`: `Create(count, (i) => ...)` and `Repeat(value, count)`, which make an array whole ([section 2.16.3](02-types.md#2163-arrays)); `Empty`, `Copy`, `Fill`, `Reverse`, `Resize`, `ConvertAll`, `AsReadOnly` as a `ReadOnlySpan`; `IndexOf`, `LastIndexOf`, `BinarySearch`, `Exists`, `Find`, `FindIndex`, `FindLast`, `FindLastIndex`, `FindAll`, `TrueForAll`, `ForEach` and a stable `Sort`, the searches and sorts with .NET's index-and-count ranges. A search answers with an `Optional`, and `Clear` and `Resize` without a fill need `where T : zeroable` |
+| `Buffer` | .NET's `System.Buffer`: `BlockCopy`, `ByteLength`, `GetByte`, `SetByte` over arrays of an `unmanaged` type ([section 4.3](04-generics.md#43-what-a-constraint-does-and-does-not-do)), in bytes and bounds-checked, and `MemoryCopy` between pointers |
 | `RuntimeHelpers` | `IsReferenceOrContainsReferences<T>()`, a constant per instantiation ([§4.3](04-generics.md#43-what-a-constraint-does-and-does-not-do)) |
+| `Slot<T>` | storage for a `T` that may not be there yet, empty at zero, so `new Slot<T>[n]` is legal for every `T`: written by assigning a `T`, read through `Value`, emptied by `Clear`; `ToArray` and `Copy` move values in and out. The size of `T`, and a read of an empty one aborts when `T` has no zero value ([section 2.16.3](02-types.md#2163-arrays)) |
 
 Each parses into a `Result` with a `ParseError` rather than throwing, and a
 constructor given what cannot be one aborts, as C#'s throws.
@@ -114,12 +115,11 @@ and nothing stops the caller keeping it after the guard has gone. That is a
 lifetime question, and Stainless does not answer it yet; C# has the same hole
 and Rust closes it with lifetimes.
 
-It used to be worse than a discipline. `Value` retains what it returns and the
-caller releases it, usually outside the lock, so two threads performed an
-unsynchronized read-modify-write on the count — it drifted down and the object
-was freed while the mutex still held it. Reference counts are atomic now, which
-closes that half; see [§10 of concurrency.md](../concurrency.md#10-what-exists-today) for why the narrower
-fix of "atomic counts for `threadsafe` types" would not have.
+**The count is safe.** `Value` retains what it returns and the
+caller releases it, usually outside the lock, and reference counts are atomic,
+so two threads doing that do not race on the count; see
+[section 10 of concurrency.md](../concurrency.md#10-what-exists-today) for why the
+narrower rule of "atomic counts for `threadsafe` types" would not do.
 
 `AtomicInt`, `AtomicLong` and `AtomicBool` are sequentially consistent counters
 and flags. They are concrete rather than `Atomic<T>` because atomics are not
@@ -174,11 +174,16 @@ enforces.
 ## 5.4 `Standard.Collections`
 
 ```csharp
-public interface IEquatable<T>     { bool Equals(T other); }
-public interface IComparable<T>    { int CompareTo(T other); }
+public interface IEquatable<in T>  { bool Equals(T other); }
+public interface IComparable<in T> { int CompareTo(T other); }
 public interface IHashable         { nuint GetHashCode(); }
 
-public interface IReadOnlyList<T>  { nuint Count { get; } T this[nuint index] { get; } }
+public interface IReadOnlyList<out T> : IEnumerable<T>
+{
+    nuint Count { get; }
+    bool IsEmpty { get; }
+    T this[nuint index] { get; }
+}
 
 public interface IList<T> : IReadOnlyList<T>
 {
@@ -224,7 +229,7 @@ the built-in one.
 | Type | Backed by | Notes |
 |---|---|---|
 | `List<T>` | one array, doubling | `IList<T>`, `IEnumerable<T>`; `list[i]` |
-| `Dictionary<TKey, TValue>` | open addressing | `TKey : IEquatable<TKey>, IHashable`; iterates `Pair<TKey, TValue>`; `map[k]` → `Optional<TValue>` |
+| `Dictionary<TKey, TValue>` | open addressing | `TKey : IEquatable<TKey>, IHashable`; iterates `KeyValuePair<TKey, TValue>`; `map[k]` -> `Optional<TValue>` |
 | `HashSet<T>` | open addressing | `UnionWith`, `IntersectWith`, `ExceptWith` |
 | `Queue<T>` | circular buffer | `Enqueue`, `Dequeue`, `Peek` |
 | `Stack<T>` | one array | `Push`, `Pop`, `Peek` |
@@ -233,6 +238,7 @@ the built-in one.
 
 `List<T>` carries an indexer ([§7.5](07-functions-members.md#75-indexers)), so `list[i] += 1` reads and writes the
 way an array does, and `IReadOnlyList<T>` and `IList<T>` declare the same
+indexer.
 
 **A dictionary's indexer answers `Optional<TValue>`**, which is Swift's design and
 right for the same reason. An index is a position the caller worked out, so
@@ -267,20 +273,18 @@ The named forms remain, each saying which question it asks:
 
 | | |
 |---|---|
-| `map[key]`, `Find(key)` | `Optional<TValue>`, and **what to reach for** |
+| `map[key]`, `TryGetValue(key)` | `Optional<TValue>`, and **what to reach for** |
 | `GetValueOrDefault(key, fallback)` | the value or a default |
 | `ContainsKey(key)` | whether it is there |
 | `GetValue(key)` | the value, **aborting** when there is none |
 
-`Find` costs one probe where `ContainsKey` then `GetValue` costs two, and it has no
+`TryGetValue` costs one probe where `ContainsKey` then `GetValue` costs two, and it has no
 sentinel to collide with a real value the way `GetValueOrDefault` does. `GetValue` is the
 asserting form and it asserts: use it where the key is there by construction.
 `SortedList<TKey, TValue>` answers the same ways, minus the indexer.
 
-Every one of them is **walked in place when iterated**. That is worth saying
-because it was not always so: several used to build a whole `List<T>` before
-the first step, which made iterating a queue allocate as much again as the
-queue held.
+Every one of them is **walked in place when iterated**, so iterating a queue
+allocates nothing rather than a whole `List<T>` built before the first step.
 
 Every one of them is array-backed, which for the last two is not the usual
 choice. It is the right one here: ARC cannot collect a cycle, so a doubly
@@ -356,25 +360,26 @@ A lambda becomes a `closure` ([§2.15](02-types.md#215-lambdas-and-closures)), s
 combinators need no special case in the compiler — they are ordinary generic functions over ordinary generic closures.
 
 ```csharp
-public closure R    Func<T, R>(T value);
-public closure bool Predicate<T>(T value);
-public closure void Action<T>(T value);
-public closure A    Fold<A, T>(A total, T value);
-public closure int  Comparison<T>(T left, T right);
+public closure TResult     Func<in T, out TResult>(T value);
+public closure bool        Predicate<in T>(T value);
+public closure void        Action<in T>(T value);
+public closure TAccumulate Fold<TAccumulate, in TSource>(TAccumulate total, TSource value);
+public closure int         Comparison<in T>(T left, T right);
 ```
 
-These five are declared in `Standard` rather than here, so they need no import:
+These five, with `Func` and `Action` of up to four parameters, are declared in
+`Standard` rather than here, so they need no import:
 they are what [§2.15](02-types.md#215-lambdas-and-closures) says a lambda may become, rather than anything a collection
 owns, and `Optional.Select` ([§2.8.1](02-types.md#281-optionalt--a-value-or-none)) wants them too.
 
-**They were one-method interfaces until a closure could be generic**, and the
-difference is not cosmetic. An interface needs an object that implements it, so
-passing a method that already existed meant writing a class whose only purpose
-was to carry it:
+**They are closures rather than one-method interfaces**, and the difference is
+not cosmetic. An interface needs an object that implements it, so
+passing a method that already existed would mean writing a class whose only purpose
+would be to carry it:
 
 ```csharp
 ForEach(lines, report.Note);        // a method bound to an object
-ForEach(lines, (l) => count++);     // or a lambda that captures
+ForEach(lines, (l) => log.Add(l));  // or a lambda that captures
 ```
 
 Both are the same two words ([§2.14.1](02-types.md#2141-closure--a-method-and-the-object-it-belongs-to)), and neither needs a declaration to hold
@@ -395,7 +400,7 @@ them, so a reader arriving from C# has nothing to translate:
 | | |
 |---|---|
 | filtering and shaping | `Where`, `Select`, `SelectMany`, `Distinct`, `DistinctBy` |
-| one element | `First`, `Last`, `Single` and their `OrDefault` forms, `ElementAt`, `ElementAtOrDefault`, `Find`, `FindIndex` |
+| one element | `First`, `Last`, `Single` and their `OrDefault` forms, `ElementAt`, `ElementAtOrDefault`, and over a span only `Find` and `FindIndex` |
 | asking | `Any`, `All`, `Count`, `Contains`, `SequenceEqual` |
 | reducing | `Sum`, `Average`, `Min`, `Max`, `MinBy`, `MaxBy`, `Aggregate` |
 | ordering | `OrderBy`, `OrderByDescending`, `Order`, `OrderDescending`, then `ThenBy` and `ThenByDescending` |
@@ -427,7 +432,7 @@ answer with ([§2.16](02-types.md#216-zero-values)).
 `RemoveWhere(list, predicate)` removes every item the predicate accepts.
 A predicate rather than a value, which is what makes it work for a `T` that
 implements nothing: a `closure` is not `IEquatable`, so a list of callbacks
-could not be removed from at all before this. `RemoveFirst(list, value)` is the
+could not be removed from by value at all. `RemoveFirst(list, value)` is the
 `IEquatable` version beside it.
 
 **Eager, not lazy.** Every one walks its input to the end and returns a
@@ -472,10 +477,11 @@ invites. `Standard.Env` reaches the same list from anywhere, which is for code
 that is nowhere near `Main`; taking the array as a parameter is better where it
 is possible.
 
-`Env` also has variables and the working directory. **An empty value is not
-portable**: Windows defines setting one as removal, so `SetEnvironmentVariable(name, "")` deletes
-the variable there and keeps an empty one on Unix. Treat empty and unset alike,
-which is what `GetEnvironmentVariableOrDefault` does.
+`Env` also has variables and the working directory. **An empty value is a
+value**: `SetEnvironmentVariable(name, "")` leaves the variable set and empty on
+both platforms, `GetEnvironmentVariable` then answers `""` rather than null,
+and `GetEnvironmentVariableOrDefault` answers its fallback only for a variable
+that is not set. `RemoveEnvironmentVariable` is how one is unset.
 
 **`Standard.Time` keeps two kinds of time apart, because confusing them is the
 usual bug.** A `DateTimeOffset` is a point on the wall clock and can jump — a
@@ -505,15 +511,15 @@ which way it wanted the remainder to go.
 
 The UTC calendar is computed rather than delegated to `gmtime`, because the
 platforms disagree about the past: Windows refuses a negative `time_t`, so
-every date before 1970 came back empty. Local time still asks the platform,
+it has no answer for a date before 1970. Local time still asks the platform,
 which is the only thing that knows the zone rules.
 
 **`Standard.Random` is a class, not a set of functions.** The state has to live
 somewhere, and a hidden one shared by every caller is what makes a program
 impossible to replay — so it lives in an object the caller holds. A
 `Random(seed)` repeats exactly, on any machine; a `Random()` is seeded by the
-operating system and does not. (The language does now have a mutable static to
-put such a thing in, and that is the reason not to.)
+operating system and does not. (The language has a mutable static to put such
+a thing in, and that is the reason not to.)
 
 It is **not cryptographic** — xoshiro256** is fast and its whole future
 follows from its state, which is what makes a seeded run reproducible and what
@@ -566,15 +572,16 @@ is a module-qualified call. The floating-point functions are the C library's,
 declared and called directly — there is no wrapper layer and no conversion,
 because a Stainless `double` *is* a C `double`.
 
-`Abs`, `Min`, `Max`, `Clamp` and `Sign` are overloaded across `int`, `long`,
-`nuint` and `double`, resolved by argument type. Alongside them are the usual
+`Min`, `Max` and `Clamp` are overloaded across `int`, `long`, `nuint` and
+`double`, and `Abs` and `Sign` across `int`, `long` and `double`, resolved by
+argument type. Alongside them are the usual
 transcendentals, `Floor`/`Ceiling`/`Round`/`Truncate`, `IsNaN`/`IsInfinity`/
 `IsFinite`, `Lerp` and `IsNear`, `RadiansToDegrees` and `DegreesToRadians`, the integer
 `GreatestCommonDivisor`, `LeastCommonMultiple` and `DivideCeiling`, `BigMul` for
 the whole product of two integers (a 64-bit one from two 32-bit ones, and the
-high half of a 128-bit one with the low half in an `out`), and the bit
-functions `PopCount`, `LeadingZeroCount`, `TrailingZeroCount`, `IsPowerOfTwo` and
-`RoundUpToPowerOfTwo`.
+high half of a 128-bit one with the low half in an `out`). The bit functions --
+`PopCount`, `LeadingZeroCount`, `TrailingZeroCount`, `IsPowerOfTwo`,
+`RoundUpToPowerOfTwo` and the rotates -- are `Standard.Bits`'.
 
 `Round` takes halves away from zero, which is C's rule rather than the banker's
 rounding C# uses by default.
@@ -592,31 +599,31 @@ parallel
 }
 
 var got = work.TryDequeue();
-if (got.Ok)
-    Console.WriteLine(Text.FromInteger(got.Value));
+if (got is Some held)
+    Console.WriteLine(Text.FromInteger(held.Value));
 ```
 
 `ConcurrentQueue<T>`, `ConcurrentStack<T>`, `ConcurrentDictionary<TKey, TValue>` and
 `Channel<T>`, each `threadsafe` and each safe for several threads at once.
 
-Every operation that can fail returns a `Taken<T>` — whether there was
+Every operation that takes something out returns an `Optional<T>`
+([section 2.8.1](02-types.md#281-optionalt--a-value-or-none)) -- whether there was
 anything, and what it was — rather than answering in two calls. There is no
 `Peek` and then `Dequeue`, because between the two another thread may have
-taken it. `DequeueOrDefault(fallback)` is the same answer without the allocation.
+taken it. `DequeueOrDefault(fallback)` and `PopOrDefault(fallback)` answer the
+fallback instead, for a caller that need not tell an empty container from a
+stored fallback.
 
 `Channel<T>` is the producer-consumer hand-off: `Take` **blocks** until
 something arrives or the channel is closed, and `Close` wakes every waiter.
 What was already sent is still delivered; once it is drained, every `Take`
-returns at once with `Ok` false.
+returns `None` at once.
 
 **Each of these owns an ordinary collection in a field and never hands out a
-reference to it.** That began as a correctness requirement: reference counts
-were not atomic, so an object returned out of a lock was retained and released
-by several threads at once and its count drifted down until it was freed while
-still in use. Counts are atomic now and the hazard is gone, but the shape is
-still the right one — reading a field to call a method on it borrows, and a
-container that never hands its collection out cannot be used wrongly by a caller
-who keeps what it lent.
+reference to it.** Reference counts are atomic, so this is not what keeps a
+count right; it is still the right shape -- reading a field to call a method on
+it borrows, and a container that never hands its collection out cannot be used
+wrongly by a caller who keeps what it lent.
 
 ## 5.9 `Standard.IO`, `File`, `Directory` and `Path`
 
@@ -629,8 +636,8 @@ if (read.Ok) { Console.WriteLine(read.Value); }
 else         { Console.WriteError(IO.DescribeIOError(read.Error)); }
 ```
 
-Stainless has no static classes, so what C# spells `File.ReadAllText` is a
-module-qualified call to a module-level function. That is the mapping
+A module is what C# uses a static class for, so what C# spells
+`File.ReadAllText` is a module-qualified call to a module-level function. That is the mapping
 throughout: a module is the static class. What lives on a type instead is what
 *makes* one: `FileStream.Open` and its shorthands ([§7.6](07-functions-members.md#76-static-members)), because a constructor
 cannot report why an open failed.
@@ -661,23 +668,24 @@ file.Close();
 
 `FileStream.Open` and its three shorthands are the way to make one, and the
 constructor is private ([§2.9](02-types.md#29-how-the-library-reports-failure)): a constructor cannot say why an open failed, and
-the best it could do was hand back a stream holding nothing. `IsOpen` and
+the best it could do would be to hand back a stream holding nothing. `IsOpen` and
 `Error` remain for what happens *after* it is open. Closing is the
 destructor's job, so a stream that goes out of scope releases its handle
 whether or not `Close` was called.
 
 Opening takes a `FileMode` (`Open`, `Create`, `Append`) and a `[Flags]`
-`FileAccess` (`Read`, `Write`, `ReadWrite`).
+`FileAccess` (`None`, `Read`, `Write`, `ReadWrite`).
 
 **`File`** has `Exists`, `GetSize`, `GetLastWriteTime`, `Delete`, `Move`, `Copy`,
-the openers, and the whole-file pairs `ReadAllText`/`WriteAllText`,
+and the whole-file pairs `ReadAllText`/`WriteAllText`,
 `ReadAllBytes`/`WriteAllBytes`, `ReadAllLines`/`WriteAllLines`, and
-`AppendAllText`.
+`AppendAllText`. The openers are `FileStream`'s.
 
 **`Directory`** has `Exists`, `CreateDirectory`, `CreateDirectoryTree`, `Delete`,
 and the listings `GetEntries`, `GetFiles`, `GetDirectories` and `GetAllFiles`.
-Listings return full paths
-rather than bare names, in the platform's order.
+Listings return full paths rather than bare names, in the platform's order;
+`GetEntries` answers an `Entry` for each, with its `Path`, `Name` and
+`IsDirectory`.
 
 **`Path`** is purely textual and touches no disk: `Join`, `GetFileName`,
 `GetDirectoryName`, `GetExtension`, `GetFileNameWithoutExtension`,
@@ -695,7 +703,7 @@ else.
 ```csharp
 var done = try RunProcess("git", ["rev-parse", "HEAD"]);
 if (done.Succeeded)
-    Console.WriteLine(done.Output.Trim());
+    Console.WriteLine(done.StandardOutput.Trim());
 ```
 
 Running another program, on both platforms, with the same answers.
@@ -707,8 +715,9 @@ acts on. That is the whole of shell injection, designed out rather than warned
 about.
 
 **A failure to start and a failure of the program are different things.**
-`ProcessError` is only about starting — `NotFound`, `Denied`, `NoResource` —
-and a program that ran and returned 1 is a `Completed` with `ExitCode` 1, which
+`ProcessError` is only about starting -- `NotFound`, `Denied`, `NoResource`,
+`Failed` -- and a program that ran and returned 1 is a `ProcessResult` with
+`ExitCode` 1, which
 is an outcome rather than a fault. `grep` answering 1 for "no match" is the
 ordinary case.
 
@@ -717,7 +726,7 @@ cannot report a failed exec through its exit code: 127 is the shell's
 convention for "could not run it" and is also a perfectly ordinary code a real
 program might return. So the child is given a close-on-exec pipe and writes
 `errno` into it; a successful exec closes it and the parent reads end-of-file.
-One pipe, one read, and `RunProcess("/no/such/thing")` says `NotFound` while
+One pipe, one read, and `RunProcess("/no/such/thing", [])` says `NotFound` while
 `RunProcess("sh", ["-c", "exit 127"])` says the program ran and answered 127.
 
 **Both streams are drained while the child runs.** A pipe holds about 64KB, so
@@ -733,7 +742,7 @@ from the same `poll`; Windows, which cannot poll an anonymous pipe for room,
 from a thread. Without input the child reads end of input at once rather than
 the parent's own.
 
-`Output` and `Errors` are kept apart, so a program that prints progress to one
+`StandardOutput` and `StandardError` are kept apart, so a program that prints progress to one
 does not corrupt what was captured from the other.
 
 **`Start` hands back a `Process`** for a program to be waited on later, or
@@ -816,7 +825,7 @@ var parsed = try Json.Parse(text);
 
 switch (parsed)
 {
-    case Object held: Console.WriteLine(Json.GetTextOrDefault(held.Members.Find("name"), "?")); break;
+    case Object held: Console.WriteLine(Json.GetTextOrDefault(held.Members.GetValueOrNull("name"), "?")); break;
     default: break;
 }
 ```
@@ -1169,7 +1178,8 @@ var tls = try TlsSocket.Connect("example.com", 443u, options);
 
 var server = new TlsServerOptions();
 server.CertificateChain.Add(leafDer);
-server.PrivateKey = try TlsSigningKey.ImportFromPem(keyPem);
+if (TlsSigningKey.ImportFromPem(keyPem) is Ok key)    // a CryptoError, not a TlsError
+    server.PrivateKey = key.Value;
 var accepted = try TlsStream.AuthenticateAsServer(tcpClient, server);
 ```
 

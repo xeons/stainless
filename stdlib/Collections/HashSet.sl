@@ -21,8 +21,6 @@
 
 module Standard.Collections;
 
-import Standard.Unchecked;
-
 // ----------------------------------------------------------------- hash set
 
 /// A set of distinct values, with membership in constant time.
@@ -33,14 +31,14 @@ import Standard.Unchecked;
 ///               agree, since membership is a hash to a slot and a comparison
 public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable
 {
-    T[] _items;
+    Slot<T>[] _items;
     bool[] _filled;
     nuint _count;
 
     /// An empty set with room for a few items before it first grows.
     public HashSet()
     {
-        _items = NewUninitializedArray<T>(8);
+        _items = new Slot<T>[8];
         _filled = new bool[8];
         _count = 0;
     }
@@ -62,7 +60,7 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable
 
         while (_filled[i])
         {
-            if (_items[i].Equals(item))
+            if (_items[i].Value.Equals(item))
                 return i;
             i = (i + 1) & mask;
         }
@@ -115,7 +113,7 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable
             if (!_filled[j])
                 break;
 
-            nuint home = _items[j].GetHashCode() & mask;
+            nuint home = _items[j].Value.GetHashCode() & mask;
             bool settled = i <= j ? i < home && home <= j : i < home || home <= j;
             if (settled)
                 continue;
@@ -124,7 +122,7 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable
             i = j;
         }
 
-        ClearElement(_items, i);
+        _items[i].Clear();
         _filled[i] = false;
         _count--;
         return true;
@@ -134,7 +132,7 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable
     /// anything they held is released now.
     public void Clear()
     {
-        _items = NewUninitializedArray<T>(8);
+        _items = new Slot<T>[8];
         _filled = new bool[8];
         _count = 0;
     }
@@ -168,8 +166,8 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable
         var doomed = new List<T>();
         for (nuint i = 0; i < _filled.Length; i++)
         {
-            if (_filled[i] && !other.Contains(_items[i]))
-                doomed.Add(_items[i]);
+            if (_filled[i] && !other.Contains(_items[i].Value))
+                doomed.Add(_items[i].Value);
         }
         for (nuint i = 0; i < doomed.Count; i++)
             Remove(doomed[i]);
@@ -188,7 +186,7 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable
         for (nuint i = 0; i < _filled.Length; i++)
         {
             if (_filled[i])
-                result.Add(_items[i]);
+                result.Add(_items[i].Value);
         }
         return result;
     }
@@ -197,7 +195,7 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable
     /// what is in one. A set has no index of its own, so neither is public.
     nuint SlotCount => _filled.Length;
     bool IsSlotFilled(nuint slot) => _filled[slot];
-    T GetSlotValue(nuint slot) => _items[slot];
+    T GetSlotValue(nuint slot) => _items[slot].Value;
 
     /// A cursor over the items, for `foreach`. Allocates nothing beyond the
     /// cursor itself, unlike `ToList`. Adding or removing during a walk
@@ -212,7 +210,7 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable
         var oldItems = _items;
         var oldFilled = _filled;
 
-        _items = NewUninitializedArray<T>(oldItems.Length * 2);
+        _items = new Slot<T>[oldItems.Length * 2];
         _filled = new bool[oldFilled.Length * 2];
         _count = 0;
 
@@ -221,7 +219,7 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable
             if (!oldFilled[i])
                 continue;
 
-            nuint j = FindSlot(oldItems[i]);
+            nuint j = FindSlot(oldItems[i].Value);
             _items[j] = oldItems[i];
             _filled[j] = true;
             _count++;

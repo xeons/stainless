@@ -785,12 +785,20 @@ public sealed partial class Binder
 
         // An array literal says nothing of its own type, but its elements agree
         // on one, and `ToList([1, 2])` is a list of int for that reason.
+        // A `ref` or `out` argument is the variable's address, and the
+        // parameter is written as the variable's type.
         for (int i = 0; i < arguments.Count; i++)
             if (WrittenParameterType(candidate.Declaration.Parameters, arguments, i) is { } wanted)
                 Infer(wanted,
-                    arguments[i] is BoundArrayDraft draft && AgreedElementType(draft) is { } element
-                        ? ArrayOf(element)
-                        : arguments[i].Type,
+                    arguments[i] switch
+                    {
+                        BoundArrayDraft draft when AgreedElementType(draft) is { } element =>
+                            ArrayOf(element),
+                        BoundAddressOf { FromRefKeyword: true } or
+                        BoundAddressOf { FromOutKeyword: true } =>
+                            ((BoundAddressOf)arguments[i]).Operand.Type,
+                        _ => arguments[i].Type,
+                    },
                     names, inferred, candidate.Scope);
 
         // A lambda has no type of its own, so the loop above learned nothing
@@ -1178,9 +1186,19 @@ public sealed partial class Binder
 
                 var wanted = ResolveType(written, template.Scope);
                 if (wanted.IsError()) return false;
-                if (IsImplicitlyConvertible(arguments[i], wanted)) continue;
 
-                if (report is not null) ReportArgumentMismatch(report, i, arguments[i], wanted);
+                // Past the last declared parameter only a gathered `params`
+                // element lands, and that is passed by value.
+                var declared = template.Declaration.Parameters;
+                var mode = i < declared.Count ? declared[i].Mode : ParameterMode.Value;
+                var parameter = new ParameterSymbol(
+                    i < declared.Count ? declared[i].Name : declared[^1].Name, wanted, i)
+                {
+                    Mode = mode,
+                };
+                if (ArgumentFits(arguments[i], parameter)) continue;
+
+                if (report is not null) ReportArgumentMode(report, i, arguments[i], parameter);
                 return false;
             }
 

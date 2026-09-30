@@ -38,5 +38,4 @@ One page per module. Each lists every public type, function, property, case and 
 | [Standard.Text](Standard-Text.md) | The rest of `String`. |
 | [Standard.Threading](Standard-Threading.md) | Locks, atomics and the job pool. |
 | [Standard.Time](Standard-Time.md) | Time, of the two kinds that must not be confused. |
-| [Standard.Unchecked](Standard-Unchecked.md) | Storage whose slots are not values yet: the one way to hold room for a |
 | [Standard.Xml](Standard-Xml.md) | XML, in the two layers `Standard.Json` has: a document that needs no type, |

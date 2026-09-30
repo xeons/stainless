@@ -93,9 +93,13 @@ last person to edit it -- the suite is the authority.
   methods are followed, so `InitializeComponent()` counts; an initializer,
   `: this(...)`, `required` and a primary constructor discharge a field, and so
   does storage a property only fills with `field ??=`. Generic bodies are judged
-  per instantiation. `Array.Create` and `Array.Repeat` make an array whole, and
-  `Standard.Unchecked`'s `NewUninitializedArray` and `ClearElement` are the
-  collections' storage, compiling to what `new T[n]` and `default(T)` did.
+  per instantiation. `Array.Create` and `Array.Repeat` make an array whole,
+  `Array.Create` filled in place where it is called, and a `Slot<T>[]` is room
+  for elements not there yet: empty at zero, the size of `T`, and a read of an
+  empty one aborts when `T` has no zero value. Every collection keeps its
+  spare capacity in one, and no module is exempt from the rule. A foreign
+  function declared to return a never-null reference is checked at the call,
+  and a null it returns stops the program.
   Reflection holds to it: `CreateInstance` runs the constructor `new T()`
   would, a `required` member or a new array's elements are filled through a
   `fill` that is checked before anything is handed out, and a writer refuses a
@@ -124,9 +128,13 @@ last person to edit it -- the suite is the authority.
   values, binds a payload with `case Circle c:`, needs no `default` once every
   case is covered, and counts as a way out of the function when it is.
   Reference counting consults the tag, so a case may hold a `String`, a class
-  or an array and only what is really there is ever counted. Generic variants
-  monomorphize like anything else
-- `Result<T, TError>`: the language's answer to an exception, and now an ordinary
+  or an array and only what is really there is ever counted. A variant of two
+  cases, the first empty and the second holding a never-null reference, has no
+  tag: that reference's null is the first case, so `Optional<String>` is a
+  pointer wide and passed in a register. Under DWARF such a variant is a
+  variant part discriminated by that word. Generic variants monomorphize like
+  anything else
+- `Result<T, TError>`: the language's answer to an exception, and an ordinary
   variant — `Ok(T Value)` and `Fail(TError Error)` — with no machinery of its own.
   A call that succeeds allocates nothing; `Ok(x)` and `Fail(e)` are written
   without type arguments and take their type from what they are returned or
@@ -552,7 +560,8 @@ last person to edit it -- the suite is the authority.
   and output interleaves in the order it was written. It is a shared library
   built once and copied beside what uses it; a program with no such boundary
   keeps the copy compiled into it and stays a single file. `--runtime` overrides
-  the choice, and a mismatch across a boundary is refused rather than left to
+  the choice, and a mismatch across a boundary -- shared against static, or one
+  build of the runtime against another -- is refused rather than left to
   misbehave
 - Interfaces: several per class, dynamic dispatch, checked at compile time,
   inherited by a derived class along with everything else, and extending one
@@ -611,10 +620,10 @@ last person to edit it -- the suite is the authority.
   Sort(people, (a, b) => a.Age - b.Age);
   ```
 
-  These were one-method interfaces until a closure could be generic, and the
-  bound-method line is what that bought: an interface needs an object that
-  implements it, so passing an existing method meant declaring a class whose
-  only purpose was to carry it.
+  The bound-method line is why these are closures and not one-method
+  interfaces: an interface needs an object that implements it, so passing an
+  existing method would mean declaring a class whose only purpose was to carry
+  it.
 
   Eager, not lazy: each returns a `List<T>`, because lazy chaining wants
   generators and the language has no `yield`
@@ -808,7 +817,9 @@ last person to edit it -- the suite is the authority.
   type has no spare bit to be null with — so `nuint?` is refused and this is
   what `IndexOf` answers with instead of a magic number. Not a second meaning
   for `?`: a pointer for a class and a tagged pair for a value would have been
-  two representations behind one spelling. It reads like Java's — `HasValue`,
+  two representations behind one spelling. Holding a never-null reference it
+  costs no tag, since that reference's null says `None`.
+  It reads like Java's — `HasValue`,
   `IsEmpty`, `GetValue`, `GetValueOrDefault`, `Coalesce`, `Select`, `SelectMany`, `Where`, `InvokeIfPresent` —
   over machinery that is all variant: `if (found is Some at)` is what every one
   of them is written in terms of
@@ -1075,9 +1086,14 @@ Being straight about the edges, roughly in the order they are worth adding:
   references before the expensive ones see it; a debug build keeps it all, and
   there every function's own section lets the linker discard it. A reachability
   pass from `Main` is what would prune below the module.
-- **Unoptimized ARC.** Retain/release traffic is correct but redundant, and a
-  redundant pair costs more since the counts became atomic. The +0/+1 dataflow
-  pass that removes the pair around a borrow is the fix.
+- **ARC is not optimized across statements.** Each value the emitter makes
+  says whether it is owned or borrowed, and an owned one is moved into a
+  local, a return or an aggregate rather than retained and released
+  ([internals](internals.md#why-ownership-works-the-way-it-does)). What is left
+  is a borrowed value kept in a local -- `Node local = parameter;` retains, and
+  the end of the scope releases, what the caller already holds. Removing that
+  pair is a dataflow pass across statements, and it matters more because every
+  count is atomic.
 
   Worth knowing how much is actually at stake, because the obvious measurement
   overstates it. Counting `sl_retain` and `sl_release` in a module is not
@@ -1085,11 +1101,11 @@ Being straight about the edges, roughly in the order they are worth adding:
   never calls, so that number is really about the missing reachability pass
   above. **A read through a reference already borrows** — `cells[i].Value` in a
   loop emits no reference counting at all — so what is left to remove is
-  narrower than it looks. The runtime declarations now tell LLVM what is true
+  narrower than it looks. The runtime declarations tell LLVM what is true
   of each entry point (`sl_retain` touches only the object's header;
   `sl_release` may run any destructor and so promises nothing; the failure
   paths do not return), which is worth having for its own sake and measurably
-  changes nothing. Only the +0/+1 pass will.
+  changes nothing. Only the pass across statements will.
 - **Thread safety is advice, not a proof.** What crosses a thread is checked
   by type and warned about, and `threadsafe` is an assertion -- the same bargain
   as Rust's `unsafe impl Sync`. What is unchecked entirely is how long a

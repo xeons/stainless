@@ -56,7 +56,7 @@ copied as raw bytes, which is what keeps it C-compatible.
 ## 3.2 Members
 
 Eight of these are intrinsic — the runtime implements them and the compiler
-declares them. The rest are ordinary Stainless, written in `stdlib/Text.sl` as
+declares them. The rest are ordinary Stainless, written in `stdlib/Text/String.sl` as
 a second declaration of the type ([§1.2.1](01-modules.md#121-and-so-may-a-type)), which is why they can return a
 `String[]` where a C function could not.
 
@@ -144,11 +144,11 @@ is a difference nobody looks for.
 bytes are a growable allocation that moves, so a `byte*` into it would dangle at
 the next append. Reading is a call per byte instead.
 
-`StringBuilder` is itself written in Stainless, in `stdlib/Text.sl`: three
+`StringBuilder` is itself written in Stainless, in `stdlib/Text/StringBuilder.sl`: three
 fields and a destructor over a buffer it grows by doubling.
 
-`Standard.Console` is *not* automatic and provides `Write`, `WriteLine` and
-`WriteError`.
+`Standard.Console` is *not* automatic and provides `Write`, `WriteLine`,
+`WriteError`, `ReadLine` and `ReadToEnd`.
 
 ## 3.3 Reaching C
 
@@ -255,9 +255,9 @@ Console.WriteLine(builder.ToText());       // 0,1,2,3,4,
 | `ToText()` | `String`, a snapshot; the builder stays usable |
 
 There is deliberately no `Append(long)` or `Append(double)`. An integer literal
-converts to both, and although `Append(42)` would now choose `long`
-([§7.1](07-functions-members.md#71-functions)), a name that says what is written is still
-the clearer call — which is why the two were spelled out in the first place.
+converts to both, and although `Append(42)` would choose `long`
+([section 7.1](07-functions-members.md#71-functions)), a name that says what is written is
+the clearer call.
 
 Unlike `String`, its bytes are a separate growable allocation, so it is not
 NUL-terminated and has no `ToPointer()`. Call `ToText().ToPointer()` to reach C.
@@ -273,8 +273,7 @@ written by a Windows editor, a protocol header older than Unicode, a registry
 value in UTF-16. `Standard.Encoding` is the crossing, and every crossing is
 explicit.
 
-The shape is .NET's, with the static instances replaced by functions: a static
-needs an initializer, and `--shared` has nowhere to run one ([§9.3](09-statements-expressions.md#93-const-and-static)), so
+The shape is .NET's, with the static instances replaced by functions, so
 `Encoding.CreateUtf8()` is a call. Everything is behind an interface, so a
 program may add an encoding of its own.
 
@@ -361,7 +360,7 @@ Console.WriteLine($"clicks: {clicks}  at {x}, {y}");
 ```
 
 `$"..."` writes the pieces between the braces into the text around them. It is
-sugar over the `Text.From*` conversions that were already there, with one
+sugar over the `Text.From*` conversions that are already there, with one
 difference that is not cosmetic: the whole string is **joined in a single
 allocation**. The `+` chain it replaces calls `sl_string_concat` once per
 operator and throws every result but the last away — the line above emits five

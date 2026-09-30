@@ -17,9 +17,11 @@ and not only whether it still builds.
 ```csharp
 module App.Shapes;
 
-import App.Math;
+import Standard.Math;
 
 extern "C" int printf(byte* format, ...);
+extern "C" byte* malloc(nuint size);
+extern "C" void free(byte* block);
 
 // A value type. Copied by assignment, laid out exactly like the C struct.
 public struct Point
@@ -33,18 +35,18 @@ public struct Point
 // A reference type. Heap allocated, reference counted, destroyed at zero.
 public class Buffer
 {
-    byte* data;
-    nuint length;
+    byte* _data;
+    nuint _length;
 
     public Buffer(nuint n)
     {
-        data = Allocate(n);
-        length = n;
+        _data = malloc(n);
+        _length = n;
     }
 
-    ~Buffer() { Free(data); }
+    ~Buffer() { free(_data); }
 
-    public nuint Length => length;
+    public nuint Length => _length;
 }
 
 // Callable from C as plain `sl_scale`.
@@ -92,8 +94,8 @@ answer for it. Add the case, or a 'default'
 ```
 
 Outside a switch, `shape.Circle` asks the tag and reading a payload needs the
-answer first — the same proof a `Result` has always needed, because that is now
-the same machinery:
+answer first -- the same proof a `Result` needs, because it is the same
+machinery:
 
 ```csharp
 if (shape.Circle) { return shape.Radius; }   // fine
@@ -221,14 +223,16 @@ valid UTF-8 no matter what the filesystem or the clipboard held.
 Console.WriteLine($"clicks: {clicks}  at {x}, {y}");
 ```
 
-`$"..."` is sugar over the conversions that were already there, and one thing
-that is not sugar: the whole string is joined in **one allocation**, where the
-`+` chain it replaces allocates once per operator and discards all but the
-last. That line emits five `sl_string_concat` calls written the old way and one
-`sl_string_join` written this way.
+`$"..."` is sugar over the conversions `Text` has, and one thing that is not
+sugar: the whole string is joined in **one allocation**, where the `+` chain it
+replaces allocates once per operator and discards all but the last. That line
+emits five `sl_string_concat` calls written with `+` and one `sl_string_join`
+written this way.
 
-A hole takes a `String`, a number, a `bool` or a `char32`. Anything else is
-refused rather than given a default — there is no `ToString` every type owes.
+A hole takes a `String`, a number, a `bool`, a `char32`, an enum, or a value
+that implements `IFormattable`, with .NET's alignment and format after it:
+`{price,10:N2}`. Anything else is refused rather than given a default -- there
+is no `ToString` every type owes.
 A `char` is one UTF-8 *code unit* and not a character, so it has to say which it
 means: `(char32)c` for the character, `(long)c` for the number.
 
@@ -419,7 +423,7 @@ public attribute JsonIgnore { }
 [Reflect]
 public class Person
 {
-    [JsonName("full_name")] public String Name;
+    [JsonName("full_name")] public required String Name;
     [JsonName("age")]       public int    Years;
                             public bool   Active;
                             public double Rating;
@@ -656,7 +660,7 @@ public class Circle : IShape
     public Circle(double r) { radius = r; }
     public double Area() => 3.14159 * radius * radius;
     public String Describe() => "circle";
-    public String Name { get; set; }
+    public String Name => "circle";
 }
 
 double TotalArea(IShape a, IShape b) => a.Area() + b.Area();
@@ -861,6 +865,7 @@ It comes in two layers, and the module name says which is which. **A DLL name is
 the declarations**, spelled as Windows spells them:
 
 ```csharp
+import Win32.Handles;
 import Win32.User32;
 
 nint HandleWindowMessage(HWND window, uint message, nuint wParam, nint lParam)

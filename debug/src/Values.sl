@@ -468,6 +468,12 @@ String FormatStructure(Engine engine, ITarget target, Unit unit,
 
     var members = ChildrenOf(unit, (Die)definition);
 
+    for (nuint i = 0u; i < members.Count; i++)
+    {
+        if (members[i].Tag == TagVariantPart)
+            return FormatVariantPart(engine, target, unit, members[i], at, depth);
+    }
+
     var live = LiveCaseOf(target, unit, members, at);
     if (live != null)
         return FormatCase(engine, target, unit, members, (VariantCase)live, at,
@@ -545,6 +551,66 @@ String FormatCase(Engine engine, ITarget target, Unit unit, List<Die> members,
 
     // No member of that name: the case carries nothing, which is most of them.
     return live.Name;
+}
+
+/// A variant with no tag: a variant part whose discriminator is a word of
+/// the payload, and a variant per case saying which value of that word names
+/// it. The variant with no value is every value the others do not claim.
+String FormatVariantPart(Engine engine, ITarget target, Unit unit, Die part,
+                         nuint at, int depth)
+{
+    var reference = part.Find(AtDiscr);
+    if (reference == null)
+        return "<variant with no discriminator>";
+
+    var found = unit.At((nuint)((Attribute)reference).Value);
+    if (found == null)
+        return "<variant with no discriminator>";
+
+    var discriminator = (Die)found;
+    var width = DescribeType(unit, discriminator);
+    ulong raw = 0u;
+    if (!ReadNumber(target, at + (nuint)discriminator.NumberOf(AtDataMemberLoc, 0u),
+                    width.Size, &raw))
+        return "<unreadable>";
+
+    Die? chosen = null;
+    Die? otherwise = null;
+    var variants = ChildrenOf(unit, part);
+    for (nuint i = 0u; i < variants.Count; i++)
+    {
+        var one = variants[i];
+        if (one.Tag != TagVariant)
+            continue;
+        if (!one.Has(AtDiscrValue))
+            otherwise = one;
+        else if (one.NumberOf(AtDiscrValue, 0u) == raw)
+            chosen = one;
+    }
+
+    if (chosen == null)
+        chosen = otherwise;
+    if (chosen == null)
+        return "<no case claims " + Standard.Text.FromInteger((long)raw) + ">";
+
+    var inside = ChildrenOf(unit, (Die)chosen);
+    for (nuint i = 0u; i < inside.Count; i++)
+    {
+        var one = inside[i];
+        if (one.Tag != TagMember)
+            continue;
+
+        var described = DescribeType(unit, one);
+
+        // The empty case is a member of no size, and says nothing but its name.
+        if (described.Size == 0u)
+            return one.Name;
+
+        nuint where = at + (nuint)one.NumberOf(AtDataMemberLoc, 0u);
+        return one.Name + " " + FormatValueAt(engine, target, unit, described, where, depth);
+    }
+
+    return "<variant with no member>";
 }
 
 /// `{ X = 1, Y = 2 }`, for however many members are worth showing.

@@ -293,10 +293,10 @@ public class ErrorTypeTests
         {
         }
         """)]
-    [InlineData("SL0549", """
+    [InlineData("SL0819", """
 
         module Bad; closure partial Notify(int value); class Publisher
-        { event Notify Global;            // SL0550: nothing would unsubscribe
+        { event Notify Global;            // SL0820: nothing would unsubscribe
         }
         """)]
     [InlineData("SL0565", """

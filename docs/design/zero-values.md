@@ -58,17 +58,17 @@ so the diagnostic can say *which* field is the problem:
 | `variant` | if the case with tag 0 has one | a zero tag is the first case, its payload zeroed: `Optional<String>`'s zero is `None`, `Result<String, E>`'s is `Ok(null)` |
 | `Span<T>`, `ReadOnlySpan<T>` | yes | the empty span; its length is zero so its array word is never read |
 
-Two things this table needs that the language lacks:
+Two things this table needs that the language lacked, both built with the rule:
 
-- **`T[]?`.** Today `byte[]?` is SL0271, so a struct or class field holding an
-  array that is sometimes absent has no honest type. `T[]?` has to exist before
-  the rule is on, with the same representation as `T[]` and the same narrowing
-  as `C?`. `Span<T>`'s own `_array` field becomes `T[]?`, which is what makes
-  the empty span a value rather than an exemption.
+- **`T[]?`.** Without it `byte[]?` was SL0271, so a struct or class field
+  holding an array that is sometimes absent had no honest type. `T[]?` has the
+  same representation as `T[]` and the same narrowing as `C?`. `Span<T>`'s own
+  `_array` field is `T[]?`, which is what makes the empty span a value rather
+  than an exemption.
 - **`closure?`.** A closure field that starts empty (`SearchBox._onSearch` in
-  the GTK sample) has no type today. `Notify?` is a closure whose function word
-  may be null, asked by `?.`/`!= null` like any other optional. Its
-  representation is the closure's own two words.
+  the GTK sample) needs one. `Notify?` is a closure whose function word may be
+  null, asked by `?.`/`!= null` like any other optional. Its representation is
+  the closure's own two words.
 
 A variant whose tag 0 case holds a reference is the one that surprises:
 `Result<T, E>` declares `Ok` first. It has no zero value, and it does not need
@@ -76,7 +76,7 @@ one — nothing builds a `Result` other than by naming a case.
 
 ## 4. Definite assignment
 
-The language has one definite-assignment analysis today, for `out` parameters
+The language had one definite-assignment analysis, for `out` parameters
 (SL0600, `Binder.Assigns`). The prototype generalises it from "this parameter"
 to any `AssignedPlace`, and the rule runs every question below through that one
 walk, with its existing stand-down for `goto`.
@@ -221,34 +221,36 @@ unused slots are not values yet, and blank a vacated slot with `default(T)` so
 it releases what it held. None of them may cost `List<int>` anything per
 element. Three mechanisms were compared.
 
-**A. An uninitialised-array primitive** (recommended).
+**A. An uninitialised-array primitive.**
 
 ```csharp
-// Standard.Unchecked — the whole surface
+// the whole surface
 public T[] NewUninitializedArray<T>(nuint length);   // every slot zero bytes, not yet a T
 public void ClearElement<T>(T[] array, nuint index);  // release, then zero bytes again
 ```
 
-The array is an ordinary `T[]` whose slots may hold zero bytes that are not a
-`T`. The invariant is the library's: **a slot is written before it is read, and
-cleared when it is vacated.** It is what `new T[n]` and `default(T)` already
-compile to — the same allocation and the same store — so it costs nothing
-per element and changes no layout. ARC is already safe with it: releasing a
-zero slot is a no-op, which the runtime relies on today.
+An ordinary `T[]` whose slots may hold zero bytes that are not a `T`, with the
+obligation -- write before read, clear when vacated -- on the library that
+imports it. It costs nothing and changes no layout. Rejected, because it is
+unsound in the way Rust's `MaybeUninit` is: reading a slot never written hands
+out a null where the type says there is none, and the rule that exists to stop
+exactly that does not reach inside the module that holds the exemption.
 
-It is unsound in the way Rust's `MaybeUninit` and `Vec`'s raw buffer are: a
-contained, named obligation on a few hundred lines of library, instead of an
-invisible one on every program. The names say what they are, the module says it
-again, and a program that imports `Standard.Unchecked` has written that it is
-taking the obligation on. Migration is mechanical: `new T[n]` → 
-`NewUninitializedArray<T>(n)` and `a[i] = default(T)` → `ClearElement(a, i)`,
-about 46 and 30 sites in the collections, with no change to any algorithm.
+**B. Storage of an optional wrapper** (taken) -- `Slot<T>`, compiler-known.
+Sound by construction: its zero is empty, and a read of an empty slot of a
+`T` with no zero value stops the program. And it costs nothing:
 
-**B. Storage of an optional wrapper** — `Optional<T>[]`, or a `Slot<T>` variant.
-Sound by construction. Rejected: the tag is per element, so `List<int>` goes from
-4 bytes a slot to 8 and `List<long>` from 8 to 16, and every read pays a tag
-test. There is no free `T?` for a generic `T`: `C?` is free because a reference
-has a spare bit pattern, and `int` has none.
+- when `T` has a zero value a slot is laid out as `T`, empty is that zero, and
+  a read is one load, so `List<int>` is four bytes a slot as it always was;
+- when `T` has none it holds a never-null reference, whose null is spare, so
+  `Optional<T>` needs no tag (a niche, as Rust lays out `Option<&T>`) and a
+  slot of it is the size of `T`. A read is one comparison with null more than
+  a plain load.
+
+There is still no free `T?` for a generic `T`; what makes this free is that
+the only `T` that needs a representation of "not there" is one that already
+has a spare bit pattern. `Array.Create` fills a `T[]` in place where it is
+called, which is how an array of such a `T` is made without a slot.
 
 **C. A runtime buffer that knows its live prefix** — a counted object with a
 capacity and a count, bounds-checked against the count, released only up to
@@ -256,10 +258,11 @@ it. Sound and free, and a good fit for `List`, `Stack` and `ArrayBuilder`.
 Rejected as the primitive because the rest do not keep a prefix: a hash table's
 live slots are scattered and a ring buffer's wrap. It would need B or A beside it
 for those, so it adds a mechanism without removing one. It remains a sensible
-later refinement of `List<T>` on top of A.
+later refinement of `List<T>` on top of B.
 
-A also covers the compiler's own growable buffer behind collection expressions
-with spreads, and event storage, which the compiler already fills slot by slot.
+B also covers the compiler's own growable buffer behind collection expressions
+with spreads; event storage the compiler fills slot by slot, as it does an
+array literal.
 
 ## 8. Migration
 
@@ -321,10 +324,10 @@ counts for constructors include the fields §4.2 accepts through a helper, and a
 local is categorised by what first touches it rather than by every path. The compiler side
 is `T[]?`, `closure?`, `zeroable`, member `where` clauses, the definite
 assignment of §4 built on the prototype's walk, `[DoesNotReturn]`,
-`Array.Create`/`Array.Repeat` and the `Standard.Unchecked` pair.
+`Array.Create`/`Array.Repeat` and `Slot<T>`.
 
 The order that keeps the tree building: the new types and constraints first,
-then `Standard.Unchecked` and the collections, then the diagnostics as warnings,
+then `Slot<T>` and the collections, then the diagnostics as warnings,
 then the call sites tree by tree, then warnings become errors.
 
 ## 9. Diagnostics

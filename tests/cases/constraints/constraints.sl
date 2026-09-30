@@ -4,7 +4,6 @@ module Constraints;
 import Standard.Console;
 import Standard.Collections;    // IComparable<T> lives here
 import Standard.Threading;
-import Standard.Unchecked;
 
 public interface IDescribable
 {
@@ -62,12 +61,12 @@ T Largest<T>(T[] values) where T : IComparable<T>
 // Two constraints on one parameter, on a generic class.
 public class Ranked<T> where T : IComparable<T>, IDescribable
 {
-    T[] _items;
+    Slot<T>[] _items;
     nuint _count;
 
     public Ranked(nuint capacity)
     {
-        _items = NewUninitializedArray<T>(capacity);
+        _items = new Slot<T>[capacity];
         _count = 0;
     }
 
@@ -79,11 +78,11 @@ public class Ranked<T> where T : IComparable<T>, IDescribable
 
     public String BestDescription()
     {
-        var best = _items[0];
+        var best = _items[0].Value;
         for (nuint i = 1; i < _count; i = i + 1)
         {
-            if (_items[i].CompareTo(best) > 0)
-                best = _items[i];
+            if (_items[i].Value.CompareTo(best) > 0)
+                best = _items[i].Value;
         }
         return best.Describe();
     }

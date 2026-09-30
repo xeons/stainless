@@ -22,7 +22,6 @@
 module Standard.Collections;
 
 import Standard.Limits;
-import Standard.Unchecked;
 
 /// A growable list backed by a single array, doubling when it fills.
 ///
@@ -34,7 +33,7 @@ import Standard.Unchecked;
 ///
 /// - **`IsEmpty` is a property and .NET has no such member at all.** It reads
 ///   better than `Count == 0` at the point of use, and
-///   [docs/style.md](docs/style.md) is the reason it is a property and not a
+///   [docs/style.md](../../docs/style.md) is the reason it is a property and not a
 ///   method: a zero-argument side-effect-free getter is a property here.
 /// - **The members that compare two `T`s are free functions below**, not
 ///   methods. `Contains`, `IndexOf`, `RemoveFirst`, `Sort` and `BinarySearch` all
@@ -51,16 +50,15 @@ import Standard.Unchecked;
 ///               `List<Control>` stays possible
 public class List<T> : IList<T>, IEnumerable<T>
 {
-    // Slots from `_count` on are zero bytes and not yet items: written before
-    // they are read, and cleared as they are vacated.
-    T[] _items;
+    // Slots from `_count` on are empty, and are cleared as they are vacated.
+    Slot<T>[] _items;
     nuint _count;
 
     /// An empty list. It allocates a small backing array up front, so the
     /// first few `Add`s do not grow it.
     public List()
     {
-        _items = NewUninitializedArray<T>(4u);
+        _items = new Slot<T>[4u];
         _count = 0;
     }
 
@@ -68,7 +66,7 @@ public class List<T> : IList<T>, IEnumerable<T>
     /// the size is known and the doubling would be waste.
     public List(nuint capacity)
     {
-        _items = NewUninitializedArray<T>(capacity < 1u ? 1u : capacity);
+        _items = new Slot<T>[capacity < 1u ? 1u : capacity];
         _count = 0;
     }
 
@@ -110,7 +108,7 @@ public class List<T> : IList<T>, IEnumerable<T>
         {
             if (index >= _count)
                 sl_array_bounds_fail(index, _count);
-            return _items[index];
+            return _items[index].Value;
         }
         set
         {
@@ -180,7 +178,7 @@ public class List<T> : IList<T>, IEnumerable<T>
 
         _items[index + 1u:_count].CopyTo(_items[index:]);
         _count--;
-        ClearElement(_items, _count);
+        _items[_count].Clear();
     }
 
     /// Removes `count` items from `index` onwards.
@@ -195,7 +193,7 @@ public class List<T> : IList<T>, IEnumerable<T>
 
         _items[index + count:_count].CopyTo(_items[index:]);
         for (nuint i = _count - count; i < _count; i++)
-            ClearElement(_items, i);
+            _items[i].Clear();
         _count = _count - count;
     }
 
@@ -208,7 +206,7 @@ public class List<T> : IList<T>, IEnumerable<T>
         nuint kept = 0;
         for (nuint i = 0; i < _count; i++)
         {
-            if (!matches(_items[i]))
+            if (!matches(_items[i].Value))
             {
                 _items[kept] = _items[i];
                 kept++;
@@ -217,7 +215,7 @@ public class List<T> : IList<T>, IEnumerable<T>
 
         nuint removed = _count - kept;
         for (nuint i = kept; i < _count; i++)
-            ClearElement(_items, i);
+            _items[i].Clear();
         _count = kept;
         return removed;
     }
@@ -236,7 +234,7 @@ public class List<T> : IList<T>, IEnumerable<T>
     /// The items as a new array, which the caller owns.
     ///
     /// @see List.CopyTo
-    public T[] ToArray() => _items[:_count].ToArray();
+    public T[] ToArray() => Slot<T>.ToArray(_items[:_count]);
 
     /// Copies the items into `into`, starting at `at`.
     ///
@@ -245,7 +243,8 @@ public class List<T> : IList<T>, IEnumerable<T>
     {
         if (at > into.Length || _count > into.Length - at)
             sl_array_bounds_fail(RangeEnd(at, _count), into.Length);
-        _items[:_count].CopyTo(into[at:]);
+        for (nuint i = 0u; i < _count; i++)
+            into[at + i] = _items[i].Value;
     }
 
     /// A new list holding `count` items from `index` onwards.
@@ -274,8 +273,8 @@ public class List<T> : IList<T>, IEnumerable<T>
     {
         for (nuint i = 0; i < _count; i++)
         {
-            if (matches(_items[i]))
-                return _items[i];
+            if (matches(_items[i].Value))
+                return _items[i].Value;
         }
         return None;
     }
@@ -287,8 +286,8 @@ public class List<T> : IList<T>, IEnumerable<T>
     {
         for (nuint i = _count; i > 0u; i--)
         {
-            if (matches(_items[i - 1u]))
-                return _items[i - 1u];
+            if (matches(_items[i - 1u].Value))
+                return _items[i - 1u].Value;
         }
         return None;
     }
@@ -301,8 +300,8 @@ public class List<T> : IList<T>, IEnumerable<T>
         var answer = new List<T>();
         for (nuint i = 0; i < _count; i++)
         {
-            if (matches(_items[i]))
-                answer.Add(_items[i]);
+            if (matches(_items[i].Value))
+                answer.Add(_items[i].Value);
         }
         return answer;
     }
@@ -321,7 +320,7 @@ public class List<T> : IList<T>, IEnumerable<T>
     {
         for (nuint i = 0; i < _count; i++)
         {
-            if (matches(_items[i]))
+            if (matches(_items[i].Value))
                 return Some(i);
         }
         return None;
@@ -334,7 +333,7 @@ public class List<T> : IList<T>, IEnumerable<T>
     {
         for (nuint i = _count; i > 0u; i--)
         {
-            if (matches(_items[i - 1u]))
+            if (matches(_items[i - 1u].Value))
                 return Some(i - 1u);
         }
         return None;
@@ -352,7 +351,7 @@ public class List<T> : IList<T>, IEnumerable<T>
     {
         for (nuint i = 0; i < _count; i++)
         {
-            if (!matches(_items[i]))
+            if (!matches(_items[i].Value))
                 return false;
         }
         return true;
@@ -367,7 +366,7 @@ public class List<T> : IList<T>, IEnumerable<T>
     {
         for (nuint i = 0; i < _count; i++)
         {
-            action(_items[i]);
+            action(_items[i].Value);
         }
     }
 
@@ -412,14 +411,14 @@ public class List<T> : IList<T>, IEnumerable<T>
 
         if (items is List<T> list)
         {
-            InsertRange(index, list._items[:list._count]);
+            InsertSlots(index, list._items[:list._count]);
             return;
         }
 
         var added = new List<T>();
         foreach (var item in items)
             added.Add(item);
-        InsertRange(index, added._items[:added._count]);
+        InsertSlots(index, added._items[:added._count]);
     }
 
     /// Inserts every element of a span at `index`, in its order. A span over
@@ -431,19 +430,34 @@ public class List<T> : IList<T>, IEnumerable<T>
         if (index > _count)
             sl_array_bounds_fail(index, _count);
 
-        nuint count = items.Length;
-        if (count == 0u)
+        if (items.Length == 0u)
+            return;
+
+        OpenGap(index, items.Length);
+        Slot<T>.Copy(items, _items[index:]);
+    }
+
+    // The same, from a list's storage, which may be this one's.
+    void InsertSlots(nuint index, ReadOnlySpan<Slot<T>> items)
+    {
+        if (items.Length == 0u)
             return;
         if (items.Overlaps(_items))
             items = items.ToArray();
 
-        // Doubling, as `Add` grows, so a loop of small ranges stays linear.
+        OpenGap(index, items.Length);
+        items.CopyTo(_items[index:]);
+    }
+
+    // Moves the items from `index` on up by `count`. Grows by doubling, as
+    // `Add` does, so a loop of small ranges stays linear.
+    void OpenGap(nuint index, nuint count)
+    {
         nuint needed = _count + count;
         if (needed > _items.Length)
             ResizeStorage(needed > _items.Length * 2u ? needed : _items.Length * 2u);
 
         _items[index:_count].CopyTo(_items[index + count:]);
-        items.CopyTo(_items[index:]);
         _count = needed;
     }
 
@@ -467,7 +481,7 @@ public class List<T> : IList<T>, IEnumerable<T>
     /// lingering until the slots are overwritten.
     public void Clear()
     {
-        _items = NewUninitializedArray<T>(4u);
+        _items = new Slot<T>[4u];
         _count = 0;
     }
 
@@ -475,7 +489,7 @@ public class List<T> : IList<T>, IEnumerable<T>
 
     void ResizeStorage(nuint room)
     {
-        var bigger = NewUninitializedArray<T>(room);
+        var bigger = new Slot<T>[room];
         _items[:_count].CopyTo(bigger);
         _items = bigger;
     }

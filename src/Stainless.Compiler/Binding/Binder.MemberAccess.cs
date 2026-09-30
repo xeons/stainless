@@ -470,7 +470,7 @@ public sealed partial class Binder
         // it is not there would send the reader looking for a spelling mistake.
         if (namedType.FindEvent(syntax.Member) is { } subscribed)
         {
-            diagnostics.Error("SL0555", syntax.Span,
+            diagnostics.Error("SL0824", syntax.Span,
                 $"'{namedType.Name}.{syntax.Member}' is an event, and an event has no value to " +
                 "read: what it holds is a list of subscribers, and only " +
                 $"'{subscribed.ContainingType.Name}' can see it. Subscribe with '+=' and " +

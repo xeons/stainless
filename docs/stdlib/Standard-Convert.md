@@ -80,7 +80,7 @@ thing it is most often pointed at.
 
 **Fails with**
 
-- [ConvertError.Malformed](#malformed-case) — a character outside both alphabets, or padding that is not a whole tail of the last group
+- [ConvertError.Malformed](#malformed-case) -- a character outside both alphabets, or padding that is not a whole tail of the last group
 
 **See also** &nbsp; [Convert.ToBase64String](#tobase64string-function) &middot; [Convert.ToBase64Url](#tobase64url-function)
 
@@ -98,7 +98,7 @@ missing half belonged to.
 
 **Fails with**
 
-- [ConvertError.Malformed](#malformed-case) — an odd number of digits, or a character that is not one
+- [ConvertError.Malformed](#malformed-case) -- an odd number of digits, or a character that is not one
 
 **See also** &nbsp; [Convert.ToHexString](#tohexstring-function)
 
@@ -122,8 +122,8 @@ is what says so. `ToLong` reports the same mistake as
 
 **Parameters**
 
-- `value` — the number to write, negative or not
-- `radix` — the base to write it in, from 2 to 36
+- `value` -- the number to write, negative or not
+- `radix` -- the base to write it in, from 2 to 36
 
 **See also** &nbsp; [Convert.ToLong](#tolong-function) &middot; [Text.FromInteger](Standard-Text.md#frominteger-function)
 
@@ -183,9 +183,9 @@ smallest rounds to zero, which is the nearest double and not a failure.
 
 **Fails with**
 
-- [ConvertError.Empty](#empty-case) — the text is empty
-- [ConvertError.Malformed](#malformed-case) — the text is not one of the forms above
-- [ConvertError.OutOfRange](#outofrange-case) — the magnitude is past the largest double
+- [ConvertError.Empty](#empty-case) -- the text is empty
+- [ConvertError.Malformed](#malformed-case) -- the text is not one of the forms above
+- [ConvertError.OutOfRange](#outofrange-case) -- the magnitude is past the largest double
 
 <sub>[stdlib/Convert/Convert.sl:266](../../stdlib/Convert/Convert.sl#L266)</sub>
 
@@ -211,8 +211,8 @@ The same, in the case asked for.
 
 **Parameters**
 
-- `data` — the bytes to write out
-- `upper` — true for `A`-`F`, false for `a`-`f`
+- `data` -- the bytes to write out
+- `upper` -- true for `A`-`F`, false for `a`-`f`
 
 **See also** &nbsp; [Convert.FromHexString](#fromhexstring-function)
 
@@ -228,9 +228,9 @@ Result<int, ConvertError> ToInt(String text)
 
 **Fails with**
 
-- [ConvertError.Empty](#empty-case) — the text is empty, or is a sign and nothing else
-- [ConvertError.Malformed](#malformed-case) — a character is not a digit
-- [ConvertError.OutOfRange](#outofrange-case) — the digits do not fit an `int`
+- [ConvertError.Empty](#empty-case) -- the text is empty, or is a sign and nothing else
+- [ConvertError.Malformed](#malformed-case) -- a character is not a digit
+- [ConvertError.OutOfRange](#outofrange-case) -- the digits do not fit an `int`
 
 **See also** &nbsp; [Convert.ToLong](#tolong-function)
 
@@ -249,9 +249,9 @@ A number that parses as a `long` and does not fit an `int` is
 
 **Fails with**
 
-- [ConvertError.Empty](#empty-case) — the text is empty, or is a sign and nothing else
-- [ConvertError.Malformed](#malformed-case) — `radix` is outside 2 to 36, or a character is not a digit in it
-- [ConvertError.OutOfRange](#outofrange-case) — the digits do not fit an `int`
+- [ConvertError.Empty](#empty-case) -- the text is empty, or is a sign and nothing else
+- [ConvertError.Malformed](#malformed-case) -- `radix` is outside 2 to 36, or a character is not a digit in it
+- [ConvertError.OutOfRange](#outofrange-case) -- the digits do not fit an `int`
 
 **See also** &nbsp; [Convert.ToLong](#tolong-function)
 
@@ -270,9 +270,9 @@ separators, no trailing units. Trim first if the input might have any.
 
 **Fails with**
 
-- [ConvertError.Empty](#empty-case) — the text is empty, or is a sign and nothing else
-- [ConvertError.Malformed](#malformed-case) — a character is not a digit
-- [ConvertError.OutOfRange](#outofrange-case) — the digits do not fit a `long`
+- [ConvertError.Empty](#empty-case) -- the text is empty, or is a sign and nothing else
+- [ConvertError.Malformed](#malformed-case) -- a character is not a digit
+- [ConvertError.OutOfRange](#outofrange-case) -- the digits do not fit a `long`
 
 **See also** &nbsp; [Convert.FromLong](#fromlong-function)
 
@@ -291,9 +291,9 @@ alike, and base 36 goes to `z`.
 
 **Fails with**
 
-- [ConvertError.Empty](#empty-case) — the text is empty, or is a sign and nothing else
-- [ConvertError.Malformed](#malformed-case) — `radix` is outside 2 to 36, or a character is not a digit in it
-- [ConvertError.OutOfRange](#outofrange-case) — the digits do not fit a `long`
+- [ConvertError.Empty](#empty-case) -- the text is empty, or is a sign and nothing else
+- [ConvertError.Malformed](#malformed-case) -- `radix` is outside 2 to 36, or a character is not a digit in it
+- [ConvertError.OutOfRange](#outofrange-case) -- the digits do not fit a `long`
 
 **See also** &nbsp; [Convert.FromLong](#fromlong-function)
 
@@ -310,9 +310,9 @@ wrapping, which is the whole point of asking for an unsigned one.
 
 **Fails with**
 
-- [ConvertError.Empty](#empty-case) — the text is empty, or is a `+` and nothing else
-- [ConvertError.Malformed](#malformed-case) — a character is not a digit, a leading `-` among them
-- [ConvertError.OutOfRange](#outofrange-case) — the digits do not fit a `ulong`
+- [ConvertError.Empty](#empty-case) -- the text is empty, or is a `+` and nothing else
+- [ConvertError.Malformed](#malformed-case) -- a character is not a digit, a leading `-` among them
+- [ConvertError.OutOfRange](#outofrange-case) -- the digits do not fit a `ulong`
 
 <sub>[stdlib/Convert/Convert.sl:158](../../stdlib/Convert/Convert.sl#L158)</sub>
 
@@ -329,9 +329,9 @@ leading `-` is `Malformed`.
 
 **Fails with**
 
-- [ConvertError.Empty](#empty-case) — the text is empty, or is a `+` and nothing else
-- [ConvertError.Malformed](#malformed-case) — `radix` is outside 2 to 36, a character is not a digit in it, or the number carries a leading `-`
-- [ConvertError.OutOfRange](#outofrange-case) — the digits do not fit a `ulong`
+- [ConvertError.Empty](#empty-case) -- the text is empty, or is a `+` and nothing else
+- [ConvertError.Malformed](#malformed-case) -- `radix` is outside 2 to 36, a character is not a digit in it, or the number carries a leading `-`
+- [ConvertError.OutOfRange](#outofrange-case) -- the digits do not fit a `ulong`
 
 <sub>[stdlib/Convert/Convert.sl:172](../../stdlib/Convert/Convert.sl#L172)</sub>
 

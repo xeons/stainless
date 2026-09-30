@@ -438,7 +438,12 @@ internal static class Program
         // module metadata, and the case's own sources are then compiled against
         // it. That is the two-compilation shape the metadata exists for, and the
         // only way to test it is to actually perform both.
+        //
+        // It is built in a directory of its own, which is removed before the
+        // program runs: a program MUST run from what the compiler put beside
+        // it, not from where its library was built.
         string? referencePath = null;
+        string libraryBuild = Path.Combine(caseWork, "library");
 
         // A warning about what a library's metadata leaves out is reported where
         // the library is built, so that build's diagnostics have to be kept for
@@ -452,8 +457,8 @@ internal static class Program
                 .OrderBy(p => p, StringComparer.Ordinal).ToList();
 
             string libraryOutput =
-                Path.Combine(caseWork, name + "-library" + Toolchain.SharedLibraryExtension);
-            referencePath = Path.Combine(caseWork, name + ".slmod");
+                Path.Combine(libraryBuild, name + "-library" + Toolchain.SharedLibraryExtension);
+            referencePath = Path.Combine(libraryBuild, name + ".slmod");
 
             var libraryResult = new Compilation().Compile(new CompilationOptions
             {
@@ -618,6 +623,9 @@ internal static class Program
             return (true, $"assembled for {(target ?? Binding.TargetPlatform.Host).Triple}");
         }
 
+        if (referencePath is not null && Directory.Exists(libraryBuild))
+            Directory.Delete(libraryBuild, recursive: true);
+
         // A library is exercised through a C consumer, not run directly.
         string executable = result.OutputPath!;
         if (shared)
@@ -687,6 +695,9 @@ internal static class Program
         arguments.Add(File.Exists(importLibrary) ? importLibrary : libraryPath);
         arguments.AddRange(["-O1", "-o", consumer]);
 
+        // The library is found beside the consumer, as a DLL is on Windows.
+        if (!OperatingSystem.IsWindows()) arguments.Add("-Wl,-rpath,$ORIGIN");
+
         var result = Toolchain.Run(toolchain.ClangPath, arguments);
         return result.Success
             ? (consumer, null)
@@ -749,9 +760,7 @@ internal static class Program
         // states what it prints, and what the runtime says about it is a
         // different question with a different answer file.
         //
-        // **The first one in stderr, not the last one anywhere.** A program
-        // that links a Stainless shared library loads two copies of the
-        // runtime and prints a report from each (see TODO.md), and a case that
+        // **The first one in stderr, not the last one anywhere.** A case that
         // runs a Stainless child forwards the child's on its own stdout. Only
         // a report at or past the stderr boundary is this program's own.
         string? leaks = null;
@@ -775,10 +784,9 @@ internal static class Program
     /// immortal -- or where a cycle is a known bug whose number should stop
     /// moving while it waits to be fixed.
     ///
-    /// <b>Every report is added up.</b> A program that links a Stainless
-    /// shared library loads two copies of the runtime and each counts its own
-    /// allocations, so the live total is the sum and reading one report would
-    /// miss what leaked on the other side. See TODO.md.
+    /// <b>More than one report is a failure.</b> Each copy of the runtime
+    /// reports at exit, so two mean a program and a library it links each
+    /// loaded their own.
     /// </summary>
     private static string? LeakFailure(string directory, string? report)
     {
@@ -790,6 +798,8 @@ internal static class Program
 
         var counts = Regex.Matches(report, @"live=(\d+)");
         if (counts.Count == 0) return "could not read the allocation report:\n" + report;
+        if (counts.Count > 1)
+            return "two copies of the runtime reported, so this process loaded two:\n" + report;
 
         int alive = counts.Sum(m => int.Parse(m.Groups[1].Value));
         s_retains += Regex.Matches(report, @"retains=(\d+)").Sum(m => long.Parse(m.Groups[1].Value));

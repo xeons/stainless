@@ -81,7 +81,7 @@ internal static class Program
               stainless run   [paths...] [options]   compile, then run it
               stainless emit-ir [paths...]           print the generated LLVM IR
               stainless doc [paths...] [options]     write reference documentation
-              stainless init [name]                  write a {ProjectFile.FileName} here
+              stainless init [name] [--library]      write a {ProjectFile.FileName} here
               stainless restore [options]            resolve dependencies and lock them
 
             PATHS
@@ -96,8 +96,9 @@ internal static class Program
               A Windows resource script (.rc) is compiled and folded into
               the binary. That is how an icon, a string table, a menu, a
               dialog template or an application manifest gets there.
-              Building for a system that has no resource section leaves
-              it out and says so.
+              A system with no resource section carries it all the same, for
+              Standard.Resources to read; what only Windows acts on is inert
+              there, and SL0700 names it.
 
               A library the linker can find for itself is named with '-l'
               instead of by path: '-l user32' rather than the full path into
@@ -118,9 +119,10 @@ internal static class Program
             OPTIONS
               -o, --out <path>     output file (default: after the first source)
               --shared             build a shared library instead of an executable
-              --target <name>      the machine to build for: x64 (the default),
-                                   x86, arm64, or one of those with a system
-                                   after it -- x86-linux, arm64-windows. A
+              --target <name>      the machine to build for: x64, x86, arm64,
+                                   or one of those with a system after it --
+                                   x86-linux, arm64-windows. The default is
+                                   the machine building it. A
                                    32-bit target is where a calling convention
                                    starts to mean something; arm64 is the one
                                    whose two systems agree about structs

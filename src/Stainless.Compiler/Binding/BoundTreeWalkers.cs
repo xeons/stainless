@@ -328,6 +328,8 @@ public abstract class BoundTreeWalker
 
             case BoundVariantTest test: Visit(test.Value); break;
             case BoundVariantPayload payload: Visit(payload.Receiver); break;
+            case BoundSlotValue read: Visit(read.Receiver); break;
+            case BoundSlotFill fill: Visit(fill.Value); break;
 
             case BoundClosure closure:
                 foreach (var (_, value) in closure.Captures)
@@ -372,6 +374,15 @@ public abstract class BoundTreeWalker
             case BoundDereference dereference: Visit(dereference.Operand); break;
             case BoundAddressOf address: Visit(address.Operand); break;
             case BoundNewArray array: Visit(array.Length); break;
+            case BoundArrayCreate created:
+                Visit(created.Count);
+                Visit(created.Make);
+                break;
+            case BoundArrayFill fill:
+                Visit(fill.Count);
+                Visit(fill.Make);
+                Visit(fill.Element);
+                break;
 
             case BoundSlice slice:
                 Visit(slice.Target);
@@ -907,4 +918,108 @@ internal sealed class LocalUseCounter(LocalSymbol local) : BoundTreeWalker
 
         base.Visit(expression);
     }
+}
+
+/// <summary>
+/// What a lambda body does with the fields of its own closure: which it
+/// writes, where, and which it reads.
+///
+/// A write is an assignment, a compound assignment, a <c>++</c> or <c>--</c>,
+/// an <c>out</c> argument, or a deconstruction into the field or into part of
+/// a struct it holds. A compound assignment or a step whose value is used also
+/// reads. A <c>ref</c> or an address is taken as a read, because the callee
+/// may only read through it.
+/// </summary>
+internal sealed class ClosureFieldUseFinder(ClassTypeSymbol closure) : BoundTreeWalker
+{
+    private readonly HashSet<BoundExpression> _writeSites = new(ReferenceEqualityComparer.Instance);
+    private readonly HashSet<BoundExpression> _discarded = new(ReferenceEqualityComparer.Instance);
+
+    public HashSet<FieldSymbol> Reads { get; } = [];
+
+    public List<(FieldSymbol Field, SourceSpan Span)> Writes { get; } = [];
+
+    public override void Visit(BoundStatement? statement)
+    {
+        switch (statement)
+        {
+            case BoundExpressionStatement { Expression: { } expression }:
+                _discarded.Add(expression);
+                break;
+
+            case BoundFor { Step: { } step }:
+                _discarded.Add(step);
+                break;
+        }
+
+        base.Visit(statement);
+    }
+
+    public override void Visit(BoundExpression? expression)
+    {
+        switch (expression)
+        {
+            case BoundAssignment assignment:
+                Written(assignment.Target, assignment.Target.Span, reads: false);
+                break;
+
+            case BoundMemberAssignment assignment:
+                Written(assignment.Target, assignment.Target.Span, reads: false);
+                break;
+
+            case BoundCompoundAssignment { Property: null } compound:
+                Written(compound.Target, compound.Span, !_discarded.Contains(compound));
+                break;
+
+            case BoundIncrement stepped:
+                Written(stepped.Target, stepped.Span, !_discarded.Contains(stepped));
+                break;
+
+            case BoundAddressOf { FromOutKeyword: true } passed:
+                Written(passed.Operand, passed.Span, reads: false);
+                break;
+
+            case BoundDeconstruction taken:
+                foreach (var place in taken.Target.WrittenPlaces)
+                    Written(place, place.Span, reads: false);
+                break;
+
+            case BoundFieldAccess { Receiver: BoundThis self } field
+                when ReferenceEquals(self.Type, closure) && !_writeSites.Contains(field):
+                Reads.Add(field.Field);
+                break;
+        }
+
+        base.Visit(expression);
+    }
+
+    private void Written(BoundExpression target, SourceSpan span, bool reads)
+    {
+        if (RootOf(target) is not BoundFieldAccess { Receiver: BoundThis self } root ||
+            !ReferenceEquals(self.Type, closure))
+            return;
+
+        Writes.Add((root.Field, span));
+        if (reads)
+        {
+            Reads.Add(root.Field);
+        }
+        else
+        {
+            _writeSites.Add(root);
+        }
+    }
+
+    /// <summary>
+    /// The storage a write lands in: through struct fields and inline array
+    /// elements, to what holds them.
+    /// </summary>
+    private static BoundExpression RootOf(BoundExpression place) => place switch
+    {
+        BoundFieldAccess { Receiver: { } receiver } when receiver.Type is StructTypeSymbol =>
+            RootOf(receiver),
+        BoundIndex index when index.Target.Type is FixedArrayTypeSymbol => RootOf(index.Target),
+        BoundConversion conversion => RootOf(conversion.Operand),
+        _ => place,
+    };
 }

@@ -615,7 +615,13 @@ public sealed partial class Binder
                 _ => "export \"C++\"",
             };
 
-            if (symbol.ReturnType is StructTypeSymbol { } returned && returned.CarriesReferences())
+            if (FindSlot(symbol.ReturnType) is { } returnedSlot)
+                diagnostics.Error("SL0284", symbol.Span,
+                    $"'{symbol.ReturnType.Name}' is or holds '{returnedSlot.Name}', whose layout " +
+                    $"depends on whether its element has a zero value, so it cannot be returned " +
+                    $"across {how}. Return the element, or a raw pointer",
+                    returnedSlot);
+            else if (symbol.ReturnType is StructTypeSymbol { } returned && returned.CarriesReferences())
                 diagnostics.Error("SL0284", symbol.Span,
                     $"'{returned.Name}' holds a reference, so it cannot be returned across " +
                     $"{how}; C would copy its bytes and leave the count behind. Return a " +
@@ -624,6 +630,16 @@ public sealed partial class Binder
 
             foreach (var parameter in symbol.Parameters)
             {
+                if (FindSlot(parameter.Type) is { } passedSlot)
+                {
+                    diagnostics.Error("SL0284", symbol.Span,
+                        $"'{parameter.Type.Name}' is or holds '{passedSlot.Name}', whose layout " +
+                        $"depends on whether its element has a zero value, so parameter " +
+                        $"'{parameter.Name}' cannot cross {how}. Pass the element, or a raw pointer",
+                        passedSlot);
+                    continue;
+                }
+
                 if (parameter.Type is not StructTypeSymbol { } passed ||
                     !passed.CarriesReferences())
                     continue;
@@ -636,6 +652,18 @@ public sealed partial class Binder
             }
         }
     }
+
+    /// <summary>A slot a value holds in place, through structs and inline arrays, or null.</summary>
+    private static SlotTypeSymbol? FindSlot(TypeSymbol type) => FindSlot(type, []);
+
+    private static SlotTypeSymbol? FindSlot(TypeSymbol type, HashSet<TypeSymbol> walked) => type switch
+    {
+        SlotTypeSymbol slot => slot,
+        FixedArrayTypeSymbol inline => FindSlot(inline.Element, walked),
+        StructTypeSymbol structType when walked.Add(structType) =>
+            structType.Fields.Select(f => FindSlot(f.Type, walked)).FirstOrDefault(s => s is not null),
+        _ => null,
+    };
 
     /// <summary>
     /// Reports a function that is neither imported nor abstract and has no

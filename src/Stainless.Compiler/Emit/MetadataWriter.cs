@@ -55,13 +55,16 @@ public static class MetadataWriter
     /// The standard library is compiled into every program, so describing it
     /// here would hand the consumer a second declaration of everything it
     /// already has.
+    ///
+    /// <paramref name="runtime"/> names the shared runtime the library links,
+    /// and is null when the runtime is compiled into it.
     /// </summary>
     public static ModuleMetadata Write(
         BoundProgram program,
         string library,
         IReadOnlySet<string> ownModules,
         DiagnosticBag? diagnostics = null,
-        bool sharedRuntime = false,
+        string? runtime = null,
         string? package = null,
         string? packageVersion = null)
     {
@@ -208,7 +211,8 @@ public static class MetadataWriter
             Library = library,
             Package = package,
             PackageVersion = packageVersion,
-            SharedRuntime = sharedRuntime,
+            SharedRuntime = runtime is not null,
+            Runtime = runtime,
             Types = types,
             Functions = functions,
         }.Sealed();

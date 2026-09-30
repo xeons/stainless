@@ -32,16 +32,17 @@ stainless run app.sl bindings/gtk \
     -l :libglib-2.0.so.0 -l :libcairo.so.2
 ```
 
-### GTK 2 was here and is gone
+**`forms/` needs one more**, because its GTK backend reads and writes pictures
+through GdkPixbuf: add `-l gdk_pixbuf-2.0`, or `-l :libgdk_pixbuf-2.0.so.0`
+without the development packages. A program that also compiles
+`bindings/linux`, as the IDE does, needs nothing further -- that is libc.
 
-It was bound beside GTK 3 for a while, behind `-D GTK2`, and `Gtk.Api2` held
-the half the two spelled differently. It was removed the day this binding
-stopped being something a program merely calls and became the thing `forms/`
-is built on: two toolkits behind one seam is two backends to keep honest, and
-the second of them is one no current distribution ships and that Lazarus
-itself no longer supports.
+### Not GTK 2
 
-What survives the removal is the method, and it is the thing to keep doing.
+GTK 2 is not bound. `forms/` is built on this binding, and two toolkits behind
+one seam is two backends to keep honest -- the second of them one no current
+distribution ships and that Lazarus itself no longer supports.
+
 Every declaration here was checked against the library rather than against a
 header:
 
@@ -109,9 +110,9 @@ runs after the last emission — whether the handler was disconnected or the
 widget died holding it. That is the whole ownership story and it is about
 twenty lines in `Signals.sl`.
 
-There are **no single-method interfaces** anywhere in this binding. The
-adapters that used to sit between a widget's events and the raw dispatchers are
-now lambdas that capture the handler, which is what they always were.
+There are **no single-method interfaces** anywhere in this binding. What sits
+between a widget's events and the raw dispatchers is a lambda that captures the
+handler.
 
 **A wrapper owns one reference to its widget.** The constructor sinks the
 floating reference GTK hands back and the destructor drops it, so a `Window`
@@ -125,7 +126,7 @@ simply add a reference to.
 
 ## What is not here
 
-- **Pango.** The one that matters now, and the reason it does is `forms/`: its
+- **Pango.** The one that matters most, and the reason it does is `forms/`: its
   GTK backend draws text with cairo's toy API, so there is no shaping, no
   bidirectional text and no font fallback.
 - **GTK 4**, which is a separate backend rather than a third `#if` branch.
@@ -141,8 +142,7 @@ simply add a reference to.
 - **Windows and macOS.** These files say `#if UNIX` and mean it: the `g*`
   typedefs in `GLib.sl` are Linux LP64, and `gulong` is 32 bits on a Windows GTK.
 
-`GtkTreeView` and the model classes *were* the biggest gap and are here now —
-`gtk_list_store_set` is variadic and `gtk_list_store_set_value` is not, which
+`GtkTreeView` and the model classes are here -- `gtk_list_store_set` is variadic and `gtk_list_store_set_value` is not, which
 is what `Gtk.GObject`'s `GValue` exists for. So is `GtkFileChooser`: its
 constructor is variadic over button-and-response pairs, and passing null for
 the first button ends that list so `gtk_dialog_add_button` can add them one at
@@ -166,11 +166,13 @@ The ownership plumbing can be checked without a display at all, because a
 handler whose destructor prints, drop the buffer, and watch it release.
 Fifty thousand connect-emit-destroy cycles hold steady at 14 MB.
 
-**And run `forms/`'s samples**, which are the real exercise now: between
-them they build a hundred and sixteen checks' worth of widgets and drive them.
+**And run `forms/`'s samples**, which are the real exercise: each one's
+`--selftest` builds its widgets and drives them.
 
 ```sh
-stainless build samples/forms/common.sl forms/src bindings/gtk -o /tmp/common     -l :libgtk-3.so.0 -l :libgdk-3.so.0 -l :libgobject-2.0.so.0     -l :libglib-2.0.so.0 -l :libcairo.so.2 -l :libgdk_pixbuf-2.0.so.0
+stainless build samples/forms/common.sl forms/src bindings/gtk -o /tmp/common \
+    -l :libgtk-3.so.0 -l :libgdk-3.so.0 -l :libgobject-2.0.so.0 \
+    -l :libglib-2.0.so.0 -l :libcairo.so.2 -l :libgdk_pixbuf-2.0.so.0
 GDK_BACKEND=broadway BROADWAY_DISPLAY=:5 /tmp/common --selftest
 ```
 

@@ -39,7 +39,8 @@ form GreeterForm : Form
 }
 ```
 
-[samples/forms/designed](../samples/forms/designed) is that form, whole.
+[samples/forms/designed](../samples/forms/designed) is that form with a prompt
+and a text box added, beside its generated half and the half a person writes.
 
 ## 1. The file
 
@@ -79,8 +80,9 @@ also how an enum member would be written if one were ever allowed unqualified.
 
 Comments are `//` to the end of a line. One above a member belongs to that
 member and moves with it; one after a member's `;` stays on its line; one before
-a `}` stays at the end of the block. A comment between two imports has nowhere
-to go and is refused, rather than dropped.
+a `}` stays at the end of the block. A comment among the imports, or between
+`module` and the first of them, has nowhere to go and is refused rather than
+dropped.
 
 ## 2. The generated half
 
@@ -183,7 +185,7 @@ The generated half being checked in is what makes one reader enough.
 **Generating the whole class.** The person's half would then be a derived
 class, every handler an `override`, and the class a program shows would not be
 the class it wrote. Two declarations of one class is what Visual Studio does
-with `partial`, and Stainless now allows it for a class.
+with `partial`, and Stainless allows it for a class.
 
 ## 6. What is not there yet
 

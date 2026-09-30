@@ -127,6 +127,26 @@ int sl_implements(const void *object, size_t interfaceId)
     return header->type->interfaces[interfaceId] != NULL;
 }
 
+void sl_slot_empty(const char *slot)
+{
+    fflush(NULL);
+
+    fprintf(stderr, "stainless: a %s was read while it was empty\n", slot);
+    fflush(stderr);
+
+    abort();
+}
+
+void sl_foreign_null(const char *function, const char *type)
+{
+    fflush(NULL);
+
+    fprintf(stderr, "stainless: '%s' returned null, and a %s is never null\n", function, type);
+    fflush(stderr);
+
+    abort();
+}
+
 void sl_cast_failed(const void *object, const char *wanted)
 {
     const SlObject *header = (const SlObject *)object;

@@ -1,0 +1,12 @@
+Slot<String> is a String: yes
+Slot<int> is an int: yes
+Slot<Entry> is an Entry: yes
+Slot<Optional<int>> is an Optional<int>: yes
+first second
+moved: second
+numbers: 0 5
+entry: 7 seven
+after clearing one: 1
+after overwriting one: 2
+after the array went: 4
+back: one two three of 3

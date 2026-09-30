@@ -1,0 +1,2 @@
+# Built to an object file for Linux and not run: the point is the description,
+# which is DWARF there.

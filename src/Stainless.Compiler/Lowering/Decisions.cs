@@ -543,6 +543,9 @@ internal sealed class ExpressionKey : IEquatable<ExpressionKey>
                     ? new ExpressionKey("payload", payload.Case, payload.Field, of)
                     : null;
 
+            case BoundSlotValue read:
+                return Of(read.Receiver) is { } slot ? new ExpressionKey("slot", read.Slot, slot) : null;
+
             case BoundConversion conversion:
                 return Of(conversion.Operand) is { } operand
                     ? new ExpressionKey("conversion", conversion.Kind, conversion.Type, operand)

@@ -215,7 +215,7 @@ public sealed class MetadataLoader(
                 continue;
             }
 
-            diagnostics.Error("SL0546", ReferencedSpan,
+            diagnostics.Error("SL0826", ReferencedSpan,
                 $"'{classType.QualifiedName}' has a dispatch slot filled by '{slot}', which its " +
                 "metadata does not describe. The library and its metadata were written by the " +
                 "same compilation, so this file has been edited or is not the one that library " +
@@ -334,7 +334,7 @@ public sealed class MetadataLoader(
     /// Looked up by name because that is what the writer guarantees: the
     /// storage is named after the event and the methods are <c>add_</c> and
     /// <c>remove_</c> in front of it, which is the same rule that keeps them
-    /// apart from a hand-written method of the same name (SL0552).
+    /// apart from a hand-written method of the same name (SL0821).
     /// </summary>
     private void LoadEvents(MetadataType described, NamedTypeSymbol symbol)
     {
@@ -360,7 +360,7 @@ public sealed class MetadataLoader(
 
             if (backing is null || add is null || remove is null)
             {
-                diagnostics.Error("SL0557", ReferencedSpan,
+                diagnostics.Error("SL0826", ReferencedSpan,
                     $"the event '{symbol.QualifiedName}.{described_.Name}' is described without " +
                     "the storage and methods it is made of. Metadata is generated from the " +
                     "library it describes; rebuild the library rather than editing the file");

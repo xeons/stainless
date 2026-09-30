@@ -61,7 +61,7 @@ Asking twice is harmless and answers the same both times.
 
 **Fails with**
 
-- [ProcessError.Failed](#failed-case) — the wait itself failed, so there is no code to report
+- [ProcessError.Failed](#failed-case) -- the wait itself failed, so there is no code to report
 
 <sub>[stdlib/Process/Process.sl:194](../../stdlib/Process/Process.sl#L194)</sub>
 
@@ -110,15 +110,15 @@ Starts a program without waiting for it.
 
 **Parameters**
 
-- `program` — what to run, looked up on the PATH when it has no separator in it
-- `arguments` — what to hand it, without the program's own name in front
+- `program` -- what to run, looked up on the PATH when it has no separator in it
+- `arguments` -- what to hand it, without the program's own name in front
 
 **Fails with**
 
-- [ProcessError.NotFound](#notfound-case) — no such program, on the PATH or at the path given
-- [ProcessError.Denied](#denied-case) — it is there and may not be run
-- [ProcessError.NoResource](#noresource-case) — out of processes, descriptors or memory
-- [ProcessError.Failed](#failed-case) — it did not start, for a reason none of the others names
+- [ProcessError.NotFound](#notfound-case) -- no such program, on the PATH or at the path given
+- [ProcessError.Denied](#denied-case) -- it is there and may not be run
+- [ProcessError.NoResource](#noresource-case) -- out of processes, descriptors or memory
+- [ProcessError.Failed](#failed-case) -- it did not start, for a reason none of the others names
 
 **See also** &nbsp; [RunProcess](#runprocess-function)
 
@@ -345,7 +345,7 @@ same both times.
 
 **Fails with**
 
-- [ProcessError.Failed](#failed-case) — the wait itself failed, so there is no code to report
+- [ProcessError.Failed](#failed-case) -- the wait itself failed, so there is no code to report
 
 **See also** &nbsp; [RunningProcess.ReadAvailableOutput](#readavailableoutput-method)
 
@@ -438,10 +438,10 @@ the same bargain `RunProcess` makes.
 
 **Fails with**
 
-- [ProcessError.NotFound](#notfound-case) — no such program, on the PATH or at the path given
-- [ProcessError.Denied](#denied-case) — it is there and may not be run
-- [ProcessError.NoResource](#noresource-case) — out of processes, descriptors, pipes or memory
-- [ProcessError.Failed](#failed-case) — it did not start, for a reason none of the others names
+- [ProcessError.NotFound](#notfound-case) -- no such program, on the PATH or at the path given
+- [ProcessError.Denied](#denied-case) -- it is there and may not be run
+- [ProcessError.NoResource](#noresource-case) -- out of processes, descriptors, pipes or memory
+- [ProcessError.Failed](#failed-case) -- it did not start, for a reason none of the others names
 
 **See also** &nbsp; [RunProcess](#runprocess-function)
 
@@ -465,10 +465,10 @@ program's own.
 
 **Fails with**
 
-- [ProcessError.NotFound](#notfound-case) — no such program, on the PATH or at the path given
-- [ProcessError.Denied](#denied-case) — it is there and may not be run
-- [ProcessError.NoResource](#noresource-case) — out of processes, descriptors, pipes or memory
-- [ProcessError.Failed](#failed-case) — it did not start, for a reason none of the others names
+- [ProcessError.NotFound](#notfound-case) -- no such program, on the PATH or at the path given
+- [ProcessError.Denied](#denied-case) -- it is there and may not be run
+- [ProcessError.NoResource](#noresource-case) -- out of processes, descriptors, pipes or memory
+- [ProcessError.Failed](#failed-case) -- it did not start, for a reason none of the others names
 
 <sub>[stdlib/Process/Process.sl:287](../../stdlib/Process/Process.sl#L287)</sub>
 
@@ -488,10 +488,10 @@ and it is what a PATH lookup is done on when it has no separator in it.
 
 **Fails with**
 
-- [ProcessError.NotFound](#notfound-case) — no such program, on the PATH or at the path given
-- [ProcessError.Denied](#denied-case) — it is there and may not be run
-- [ProcessError.NoResource](#noresource-case) — out of processes, descriptors or memory
-- [ProcessError.Failed](#failed-case) — it did not start, for a reason none of the others names
+- [ProcessError.NotFound](#notfound-case) -- no such program, on the PATH or at the path given
+- [ProcessError.Denied](#denied-case) -- it is there and may not be run
+- [ProcessError.NoResource](#noresource-case) -- out of processes, descriptors or memory
+- [ProcessError.Failed](#failed-case) -- it did not start, for a reason none of the others names
 
 **See also** &nbsp; [OpenProcess](#openprocess-function) &middot; [Process.Start](#start-method)
 
@@ -516,10 +516,10 @@ program's own.
 
 **Fails with**
 
-- [ProcessError.NotFound](#notfound-case) — no such program, on the PATH or at the path given
-- [ProcessError.Denied](#denied-case) — it is there and may not be run
-- [ProcessError.NoResource](#noresource-case) — out of processes, descriptors or memory
-- [ProcessError.Failed](#failed-case) — it did not start, for a reason none of the others names
+- [ProcessError.NotFound](#notfound-case) -- no such program, on the PATH or at the path given
+- [ProcessError.Denied](#denied-case) -- it is there and may not be run
+- [ProcessError.NoResource](#noresource-case) -- out of processes, descriptors or memory
+- [ProcessError.Failed](#failed-case) -- it did not start, for a reason none of the others names
 
 <sub>[stdlib/Process/Process.sl:144](../../stdlib/Process/Process.sl#L144)</sub>
 

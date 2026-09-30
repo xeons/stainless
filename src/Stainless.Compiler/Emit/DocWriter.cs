@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 using System.Text;
+using System.Text.RegularExpressions;
 using Stainless.Syntax;
 
 namespace Stainless.Emit;
@@ -138,6 +139,7 @@ public static class DocWriter
     private sealed record Module(string Name)
     {
         public string? Documentation { get; set; }
+        public string? DocumentationFile { get; set; }
         public List<Entry> Types { get; } = [];
         public List<Entry> Functions { get; } = [];
         public List<Entry> Constants { get; } = [];
@@ -181,7 +183,11 @@ public static class DocWriter
             // wins rather than the longest or the concatenation: a module's
             // overview is written once, in whichever file is its centre, and
             // joining two would read as one argument that changes subject.
-            module.Documentation ??= unit.Documentation;
+            if (module.Documentation is null && unit.Documentation is not null)
+            {
+                module.Documentation = unit.Documentation;
+                module.DocumentationFile = unit.File.Path;
+            }
 
             foreach (var declaration in unit.Declarations)
                 Add(module, declaration, unit);
@@ -533,14 +539,14 @@ public static class DocWriter
     {
         LiteralSyntax { Value: string text } => "\"" + text + "\"",
         LiteralSyntax { Value: bool flag } => flag ? "true" : "false",
-        LiteralSyntax { Value: { } value } => value.ToString() ?? "…",
+        LiteralSyntax { Value: { } value } => value.ToString() ?? "...",
         NameSyntax name => string.Join(".", name.Name.Parts),
         MemberAccessSyntax access => Render(access.Target) + "." + access.Member,
         UnarySyntax unary => Spell(unary.Operator) + Render(unary.Operand),
         BinarySyntax binary =>
             Render(binary.Left) + " " + Spell(binary.Operator) + " " + Render(binary.Right),
         CastSyntax cast => "(" + Render(cast.Type) + ")" + Render(cast.Operand),
-        _ => "…",
+        _ => "...",
     };
 
     /// <summary>
@@ -583,7 +589,8 @@ public static class DocWriter
         page.Append("# ").Append(module.Name).Append("\n\n");
         page.Append(Generated()).Append("\n\n");
 
-        if (module.Documentation is not null) WriteBlock(page, module.Documentation);
+        if (module.Documentation is not null)
+            WriteBlock(page, module.Documentation, module.DocumentationFile);
 
         // A contents list, because these pages are long and a module's shape is
         // the first thing to want. Left out where there is nothing to list.
@@ -630,7 +637,7 @@ public static class DocWriter
         page.Append("```\n").Append(entry.Signature).Append("\n```\n\n");
 
         if (entry.Documentation is not null)
-            WriteBlock(page, entry.Documentation, owner: owner, member: entry.Name);
+            WriteBlock(page, entry.Documentation, entry.Where?.File, owner: owner, member: entry.Name);
         else
             // Said rather than left blank. A page that is silent about a member
             // looks the same whether the member needs no explanation or nobody
@@ -648,14 +655,7 @@ public static class DocWriter
     {
         if (sourceRoot is null) return null;
 
-        // The standard library is compiled from the compiler's own resources,
-        // so its files carry a label where a path would be. Rewriting it to
-        // where those files really live is what makes the link point at
-        // something.
-        string file = where.File;
-        if (_rewrite is { } rewrite && file.StartsWith(rewrite.From, StringComparison.Ordinal))
-            file = Path.Combine(sourceRoot, rewrite.To + file[rewrite.From.Length..]);
-
+        string file = OnDisk(where.File, sourceRoot);
         string shown, href;
         try
         {
@@ -676,6 +676,48 @@ public static class DocWriter
         if (shown.StartsWith("..", StringComparison.Ordinal)) return null;
 
         return $"<sub>[{shown}:{where.Line}]({href}#L{where.Line})</sub>";
+    }
+
+    /// <summary>
+    /// Where a source file really lives. The standard library is compiled from
+    /// the compiler's own resources, so its files carry a label where a path
+    /// would be.
+    /// </summary>
+    private static string OnDisk(string file, string sourceRoot)
+    {
+        if (_rewrite is { } rewrite && file.StartsWith(rewrite.From, StringComparison.Ordinal))
+            return Path.Combine(sourceRoot, rewrite.To + file[rewrite.From.Length..]);
+        return file;
+    }
+
+    /// <summary>A Markdown link whose target is a path, not a URL or an anchor.</summary>
+    private static readonly Regex s_relativeLink =
+        new(@"\]\((?<path>[^)\s#:]+)(?<rest>#[^)\s]*)?\)", RegexOptions.Compiled);
+
+    /// <summary>
+    /// A block's relative links, made relative to the page. A block writes them
+    /// relative to its own file, which is where its author reads it. A target
+    /// outside the source root is left as written.
+    /// </summary>
+    private static string Rebase(string documentation, string? file)
+    {
+        if (file is null || _sourceRoot is null) return documentation;
+
+        string from = Path.GetDirectoryName(Path.GetFullPath(OnDisk(file, _sourceRoot)))!;
+        string root = Path.GetFullPath(_sourceRoot);
+
+        return s_relativeLink.Replace(documentation, match =>
+        {
+            string path = match.Groups["path"].Value;
+            if (path.StartsWith('/')) return match.Value;
+
+            string target = Path.GetFullPath(Path.Combine(from, path));
+            if (Path.GetRelativePath(root, target).StartsWith("..", StringComparison.Ordinal))
+                return match.Value;
+
+            string href = Path.GetRelativePath(_output, target).Replace('\\', '/');
+            return $"]({href}{match.Groups["rest"].Value})";
+        });
     }
 
     private static string Index(IReadOnlyList<Module> modules)
@@ -887,18 +929,18 @@ public static class DocWriter
     /// </para>
     /// </summary>
     private static void WriteBlock(
-        StringBuilder page, string documentation, int depth = 0,
+        StringBuilder page, string documentation, string? file, int depth = 0,
         Entry? owner = null, string? member = null)
     {
-        var read = DocComment.Parse(documentation);
+        var read = DocComment.Parse(Rebase(documentation, file));
 
         // `@inheritdoc` is the block it points at, written here. Following one
         // that itself inherits is fine and a ring is cut: the page has to be
         // written either way.
         if (read.FirstOfKind(DocTagKind.InheritDoc) is { } inherit && depth < 4 &&
-            Inherited(inherit.Name, owner, member) is { } borrowed)
+            Inherited(inherit.Name, owner, member) is { Documentation: { } borrowed } source)
         {
-            WriteBlock(page, borrowed, depth + 1);
+            WriteBlock(page, borrowed, source.Where?.File, depth + 1);
 
             // What the overriding member adds is written after what it
             // inherited, which is the order a reader needs: the general first,
@@ -948,17 +990,17 @@ public static class DocWriter
     /// where an override's documentation lives, and the case the tag exists
     /// for.
     /// </summary>
-    private static string? Inherited(string? cref, Entry? owner, string? member)
+    private static Entry? Inherited(string? cref, Entry? owner, string? member)
     {
         if (cref is not null)
-            return s_entries.TryGetValue(cref, out var named) ? named.Documentation : null;
+            return s_entries.GetValueOrDefault(cref);
 
         if (owner is null || member is null) return null;
 
         foreach (string above in owner.Inherits)
             if (s_entries.TryGetValue(above + "." + member, out var found) &&
-                found.Documentation is { } block)
-                return block;
+                found.Documentation is not null)
+                return found;
 
         return null;
     }
@@ -985,7 +1027,7 @@ public static class DocWriter
             if (tag.Name is not null)
                 page.Append(tag.Kind == DocTagKind.Failure
                     ? Pointer(tag.Name)
-                    : "`" + tag.Name + "`").Append(" — ");
+                    : "`" + tag.Name + "`").Append(" -- ");
 
             page.Append(OneLine(tag.Text)).Append('\n');
         }

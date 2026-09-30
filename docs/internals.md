@@ -21,7 +21,8 @@ dotnet test tests/Stainless.UnitTests           # the compiler's unit tests
 ```
 
 `--shard=1/2` and `--shard=2/2` run alternate halves of the end-to-end cases,
-for a caller whose command has to finish inside a fixed time.
+and `--shard=i/n` every nth case from the ith, for a caller whose command has
+to finish inside a fixed time.
 
 [.github/workflows/ci.yml](../.github/workflows/ci.yml) runs both suites on
 Linux and Windows for every push and pull request to `master`, the end-to-end
@@ -43,6 +44,7 @@ compiler all day. [tests/Stainless.Fuzz](../tests/Stainless.Fuzz) makes those:
 dotnet run --project tests/Stainless.Fuzz -- fuzz --minutes 10
 dotnet run --project tests/Stainless.Fuzz -- replay     # which findings still fail
 dotnet run --project tests/Stainless.Fuzz -- repro file.sl
+dotnet run --project tests/Stainless.Fuzz -- min file.sl smaller.sl
 ```
 
 It mutates every test case, sample and standard library file a token at a time
@@ -143,10 +145,10 @@ different separator, and `\x` is rooted on one and an ordinary name on the
 other — carries an `expected.linux.txt` beside its `expected.txt` rather than
 having the difference argued away.
 
-Eleven of those cases are real 32-bit binaries, built and run on both systems, and
-six are built for ARM64 and not run: there is no ARM64 machine here, so they
-stop at an object file LLVM verified and lowered, with their signatures pinned
-against clang's. Building 32-bit on Linux needs the development half of the
+Twenty-two of those cases are real 32-bit binaries, built and run on both
+systems but for one that is Windows-only, and six are built for ARM64 and not
+run: there is no ARM64 machine here, so they stop at an object file LLVM
+verified and lowered, with their signatures pinned against clang's. Building 32-bit on Linux needs the development half of the
 multilib packages, which is what
 [tests/linux-x86.Dockerfile](../tests/linux-x86.Dockerfile) is for.
 
@@ -158,8 +160,9 @@ stated where they are.
 `STAINLESS_CLANG` names the clang to use and always wins. Failing that the
 compiler takes the first on `PATH`, then tries `C:\Program Files\LLVM\bin` and
 its `(x86)` sibling on Windows, or `/usr/bin/clang` and `/usr/local/bin/clang`
-elsewhere. `llvm-rc` is looked for beside whichever clang was found, because it
-ships in the same directory.
+elsewhere. `STAINLESS_RC` names `llvm-rc` the same way; failing that it is
+looked for beside whichever clang was found, because it ships in the same
+directory, and then on `PATH`.
 
 ---
 
@@ -232,7 +235,9 @@ ships in the same directory.
 | [Driver/ModuleMetadata.cs](../src/Stainless.Compiler/Driver/ModuleMetadata.cs) | what that metadata contains, and how it is read back |
 | [Driver/ProjectFile.cs](../src/Stainless.Compiler/Driver/ProjectFile.cs) | `stainless.json`, and refusing a field it does not know |
 | [Driver/PackageResolver.cs](../src/Stainless.Compiler/Driver/PackageResolver.cs) | resolving dependencies, with [PackageLock.cs](../src/Stainless.Compiler/Driver/PackageLock.cs) and [Digest.cs](../src/Stainless.Compiler/Driver/Digest.cs) for the lock and the layout fingerprint |
-| [Driver/Toolchain.cs](../src/Stainless.Compiler/Driver/Toolchain.cs) | finding clang and `llvm-rc` |
+| [Driver/Compilation.cs](../src/Stainless.Compiler/Driver/Compilation.cs) | the pipeline itself: sources in, IR, objects and the linked binary out |
+| [Driver/ProjectBuilder.cs](../src/Stainless.Compiler/Driver/ProjectBuilder.cs) | a project and its dependencies, each compiled in or built as a shared library |
+| [Driver/Toolchain.cs](../src/Stainless.Compiler/Driver/Toolchain.cs) | finding clang and `llvm-rc`, and driving them; building the runtime, compiled in or as the shared library every binary in a process loads by name from beside itself |
 | [runtime/](../runtime/) | the whole runtime, split by feature |
 | [stdlib/](../stdlib/) | the standard library, written in Stainless: a folder per module, a file per public type |
 
@@ -261,8 +266,8 @@ A quiet trial mutes what it reports, because a guess that fails is not the
 program's error. What an instantiation made inside one reports is not muted.
 It is held until the outermost trial ends, and reported if that trial is kept,
 because the cache would otherwise hand the instantiation to the real bind
-with its complaint lost. A constraint broken by a call written `n.Count()`
-went unreported that way.
+with its complaint lost, and a constraint broken by a call written
+`n.Count()` would go unreported.
 
 ## The error type
 
@@ -287,15 +292,15 @@ about. [Lowerer](../src/Stainless.Compiler/Lowering/Lowerer.cs) rewrites that
 into the core the emitter handles, as a new program: the semantic one is left
 whole, for whatever reads a program rather than running it.
 
-Each lowering makes exactly the core the binder used to make in place, so the
-emitter and its ownership rules see the same shapes: `foreach` becomes the
+Each lowering makes a core shape the emitter already has a case for, so the
+emitter and its ownership rules see only those shapes: `foreach` becomes the
 indexed `for` or the enumerator's `while`; `?.` and `??` the receiver held in a
 `let` and a conditional on it; `as` the value held, tested and converted;
 `x op= y`, `x ??= y` and the same on a property the place held where naming it
 again could differ, then read and written back; a store whose value runs code
 the object or array it lands in held while that code runs; `with` the clone
 and its writes; an object initializer the object held in a `let` and its
-entries in order; a collection expression the array literal it always was, or
+entries in order; a collection expression an array literal, or
 with a spread every part held in order and then the storage made, sized when
 every spread can say its count, and filled or added to; a deconstruction the
 targets' receivers and indices held, then the values, then the stores;
@@ -370,10 +375,9 @@ compare-and-exchange.
 
 Whether a struct carries a counted reference is asked everywhere a value is
 copied, and is kept on the struct once its layout is settled. Binding the IDE
-takes about 530 ms in a Release build and 155 ms once the JIT has warmed.
-Indexing each module's functions by name, and reading each file's imports once
-rather than at every lookup, took 90 ms off the first and a third off the
-second.
+takes about 530 ms in a Release build and 155 ms once the JIT has warmed,
+with each module's functions indexed by name and each file's imports read once
+rather than at every lookup.
 
 ## Why textual IR
 

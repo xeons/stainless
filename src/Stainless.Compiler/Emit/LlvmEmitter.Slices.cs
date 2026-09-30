@@ -493,7 +493,37 @@ public sealed partial class LlvmEmitter
             return Val.Void;
         }
 
-        return Landed(Emit(returnInfo.LlvmType, invocation), returnInfo, function.ReturnType);
+        string result = Emit(returnInfo.LlvmType, invocation);
+        if (function.Linkage.IsImport() && IsNeverNullReference(function.ReturnType))
+            RequireForeignResult(result, function);
+
+        return Landed(result, returnInfo, function.ReturnType);
+    }
+
+    /// <summary>A reference the type system promises is never null.</summary>
+    private static bool IsNeverNullReference(TypeSymbol type) =>
+        type is not StructTypeSymbol && ZeroValues.FindNullInZero(type) is not null;
+
+    /// <summary>
+    /// What C handed back where the signature promises a reference that is
+    /// never null. C promised nothing, so a null stops the program here rather
+    /// than be trusted by every reader after it.
+    /// </summary>
+    private void RequireForeignResult(string result, FunctionSymbol function)
+    {
+        string present = Emit("i1", $"icmp ne ptr {result}, null");
+        string good = NextLabel("foreign.ok");
+        string bad = NextLabel("foreign.null");
+        Terminator($"br i1 {present}, label %{good}, label %{bad}");
+
+        Label(bad);
+        string type = function.ReturnType is NamedTypeSymbol named
+            ? named.QualifiedName
+            : function.ReturnType.Name;
+        Line($"call void @sl_foreign_null(ptr {InternBytes(function.Name)}, ptr {InternBytes(type)})");
+        Terminator("unreachable");
+
+        Label(good);
     }
 
     /// <summary>
@@ -541,7 +571,8 @@ public sealed partial class LlvmEmitter
         string slot = Alloca(StructName(variant), expression.Case.Name);
         Line($"store {StructName(variant)} zeroinitializer, ptr {slot}");
 
-        Line($"store i8 {expression.Case.Tag}, ptr {TagAddress(slot, variant)}");
+        if (variant.HasTag)
+            Line($"store i8 {expression.Case.Tag}, ptr {TagAddress(slot, variant)}");
         var made = Building(new Val(slot, "ptr", variant));
 
         if (expression.Case.Payload is { } payload)
@@ -627,6 +658,13 @@ public sealed partial class LlvmEmitter
         var variant = expression.Case.DeclaringVariant;
         var value = EmitExpression(expression.Value);
 
+        if (variant.NicheOffset is { } niche)
+        {
+            string held = LoadNiche(value.Ref, variant, niche);
+            string comparison = expression.Case.Tag == 0 ? "eq" : "ne";
+            return new Val(Emit("i1", $"icmp {comparison} ptr {held}, null"), "i1", PrimitiveTypeSymbol.Bool);
+        }
+
         string tag = Emit("i8", $"load i8, ptr {TagAddress(value.Ref, variant)}");
         return new Val(
             Emit("i1", $"icmp eq i8 {tag}, {expression.Case.Tag}"),
@@ -659,18 +697,125 @@ public sealed partial class LlvmEmitter
                 $"load {LlvmTypeOf(field.Type)}, ptr {slot}"), LlvmTypeOf(field.Type), field.Type);
     }
 
-    /// <summary>Where the tag sits: the first field, and so the value's own address.</summary>
-    private string TagAddress(string value, VariantTypeSymbol variant) =>
-        Emit("ptr", $"getelementptr inbounds {StructName(variant)}, ptr {value}, i32 0, i32 0");
+    /// <summary>
+    /// <c>slot.Value</c>, read in place. A checked slot holds an
+    /// <c>Optional&lt;T&gt;</c>, and an empty one stops the program here
+    /// rather than hand out the null it would read.
+    /// </summary>
+    private Val EmitSlotValue(BoundSlotValue expression)
+    {
+        var slot = expression.Slot;
+        var receiver = EmitExpression(expression.Receiver);
+        string address = Emit("ptr",
+            $"getelementptr inbounds {StructName(slot)}, ptr {receiver.Ref}, " +
+            $"i32 0, i32 {FieldSlot(slot, slot.ValueField)}");
+
+        if (slot.IsChecked)
+        {
+            var optional = (VariantTypeSymbol)slot.ValueField.Type;
+            var some = optional.Cases[1];
+            var payload = some.Payload!;
+
+            string present = optional.NicheOffset is { } niche
+                ? Emit("i1", $"icmp ne ptr {LoadNiche(address, optional, niche)}, null")
+                : Emit("i1", $"icmp eq i8 {LoadCaseNumber(address, optional)}, {some.Tag}");
+
+            string full = NextLabel("slot.full");
+            string empty = NextLabel("slot.empty");
+            Terminator($"br i1 {present}, label %{full}, label %{empty}");
+
+            Label(empty);
+            Line($"call void @sl_slot_empty(ptr {InternBytes(slot.QualifiedName)})");
+            Terminator("unreachable");
+
+            Label(full);
+            address = Emit("ptr",
+                $"getelementptr inbounds {StructName(payload)}, ptr {PayloadAddress(address, optional)}, " +
+                $"i32 0, i32 {FieldSlot(payload, payload.Fields[0])}");
+        }
+
+        var element = slot.Element;
+        if (element is StructTypeSymbol)
+            return new Val(address, "ptr", element);
+
+        string type = LlvmTypeOf(element);
+        return new Val(Emit(type, $"load {type}, ptr {address}"), type, element);
+    }
 
     /// <summary>
-    /// Where a variant's payload starts. The tag is the first field and the
-    /// payload the second, so this is a constant offset the C layout already
-    /// decided; every case's fields are then read from it through that case's
-    /// own struct, which is what overlapping them means.
+    /// A value made into a slot: a zeroed slot with the value stored into it,
+    /// through the <c>Some</c> case when the slot holds an optional.
+    /// </summary>
+    private Val EmitSlotFill(BoundSlotFill expression)
+    {
+        var slot = expression.Slot;
+        string made = Alloca(StructName(slot), "slot");
+        Line($"store {StructName(slot)} zeroinitializer, ptr {made}");
+        var building = Building(new Val(made, "ptr", slot));
+
+        string address = Emit("ptr",
+            $"getelementptr inbounds {StructName(slot)}, ptr {made}, " +
+            $"i32 0, i32 {FieldSlot(slot, slot.ValueField)}");
+
+        if (slot.IsChecked)
+        {
+            var optional = (VariantTypeSymbol)slot.ValueField.Type;
+            var some = optional.Cases[1];
+            var payload = some.Payload!;
+
+            if (optional.HasTag)
+                Line($"store i8 {some.Tag}, ptr {TagAddress(address, optional)}");
+
+            address = Emit("ptr",
+                $"getelementptr inbounds {StructName(payload)}, ptr {PayloadAddress(address, optional)}, " +
+                $"i32 0, i32 {FieldSlot(payload, payload.Fields[0])}");
+        }
+
+        InitializeWith(address, EmitOwned(expression.Value), slot.Element);
+        return Built(building);
+    }
+
+    /// <summary>Where the tag sits. A variant with no tag MUST NOT ask.</summary>
+    private string TagAddress(string value, VariantTypeSymbol variant) =>
+        Emit("ptr", $"getelementptr inbounds {StructName(variant)}, ptr {value}, " +
+                    $"i32 0, i32 {FieldSlot(variant, variant.TagField!)}");
+
+    /// <summary>
+    /// The number of the case a variant holds, as an i8: its tag, or for a
+    /// variant with none, whether its niche is set -- the first case is the
+    /// null, so that is 0 or 1 as the tag would be.
+    /// </summary>
+    private string LoadCaseNumber(string value, VariantTypeSymbol variant)
+    {
+        if (variant.NicheOffset is not { } niche)
+            return Emit("i8", $"load i8, ptr {TagAddress(value, variant)}");
+
+        string held = Emit("i1", $"icmp ne ptr {LoadNiche(value, variant, niche)}, null");
+        return Emit("i8", $"zext i1 {held} to i8");
+    }
+
+    /// <summary>
+    /// The reference whose null is a tagless variant's first case. Aligned as
+    /// a pointer unless a packed payload put it somewhere that is not.
+    /// </summary>
+    private string LoadNiche(string value, VariantTypeSymbol variant, int niche)
+    {
+        int word = TargetPlatform.Current.PointerWidth;
+        int alignment = variant.Alignment >= word && niche % word == 0 ? word : 1;
+        string address = niche == 0
+            ? value
+            : Emit("ptr", $"getelementptr inbounds i8, ptr {value}, i32 {niche}");
+        return Emit("ptr", $"load ptr, ptr {address}, align {alignment}");
+    }
+
+    /// <summary>
+    /// Where a variant's payload starts: a constant offset the C layout
+    /// decided. Every case's fields are read from it through that case's own
+    /// struct, which is what overlapping them means.
     /// </summary>
     private string PayloadAddress(string value, VariantTypeSymbol variant) =>
-        Emit("ptr", $"getelementptr inbounds {StructName(variant)}, ptr {value}, i32 0, i32 1");
+        Emit("ptr", $"getelementptr inbounds {StructName(variant)}, ptr {value}, " +
+                    $"i32 0, i32 {FieldSlot(variant, variant.PayloadField!)}");
 
     private string VariadicSignature(FunctionSymbol function)
     {

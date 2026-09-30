@@ -128,7 +128,10 @@ It does **not** cause the template body to be checked once against the
 constraint, the way Rust and Swift do. Because Stainless monomorphizes, bodies
 are still checked per instantiation, so a template nobody uses is never checked
 at all, and a mistake inside one is reported against the instantiation rather
-than the declaration.
+than the declaration. An instantiation whose arguments fail a constraint is
+reported at the use and its body is not checked for them, since it was not
+written for them: `Array.Clear` on a `String[]` is one SL0815, not that and
+every error its body would then have.
 
 The reason is that definition-site checking is all or nothing. It would require
 that an unconstrained `T` support *nothing* — no `+`, no `<`, no indexing — and
@@ -229,9 +232,10 @@ there rather than at the first use (SL0329). What needs an argument to answer
 still waits for one.
 
 **`new()` means a class, unlike C#.** There, `new T()` on a value type is
-default-initialization, so a struct satisfies the constraint. Here `new`
-allocates and a struct is declared where it is used (SL0244), so a struct would
-satisfy a constraint whose only purpose it then failed.
+default-initialization, so a struct satisfies the constraint. Here `new T()`
+allocates, and a struct is made where it stands rather than on the heap, so a
+struct would satisfy a constraint whose only purpose it then failed; one given
+for such a parameter is SL0328.
 
 **`threadsafe` is the one constraint that is stricter than the rule it names.**
 Handing an unsynchronized object to a thread is a warning (SL0377), because the
@@ -444,7 +448,7 @@ pair.KeepLeft<long>(7);     // or written, and 7 widens to it
 ### 4.4.1 Writing type arguments at a call
 
 **A type argument list may be written on any call to a generic function or
-method**: `Pick<int>(a, b)`, `list.ConvertAll<String>(f)`,
+method**: `Pick<int>(a, b)`, `Enumerable.Repeat<long>(0, 4u)`,
 `Helper.Take<T>(x)`, `Box<int>.Echo<long>(9)`. Written, the arguments are the
 type arguments and nothing is inferred, which is what makes a function whose
 only mention of `T` is its return type callable at all:
@@ -498,8 +502,8 @@ It repeats while it is still learning, so one lambda's result may settle
 another's parameter.
 
 The signature it reads may be a generic closure's — `closure R Func<T, R>(T)`
-— or a generic interface's single method, which is where this started. They
-differ only in where the signature is written down.
+-- or a generic interface's single method. They differ only in where the
+signature is written down.
 
 A **function passed by name** is read the same way, off its declaration
 instead of a body: in `Select(names, Upper)`, `T` is `String` from `names`, so
@@ -517,10 +521,11 @@ ternary's arms do ([§2.15](02-types.md#215-lambdas-and-closures)). A result
 written in front of the parameters, `int (n) => ...`, is read without binding
 anything.
 
-Two limits, both reported as SL0327 rather than guessed at: returns that agree
-on no one type, and a signature that does not mention its type parameters
-plainly — `R Func<T, R>(T)` is read, `List<R> Func<T, R>(T)` is left alone.
-Writing the type arguments at the call settles either.
+A result that carries its parameter inside another type -- `Optional<R>
+Func<T, R>(T)`, or `List<R>` -- is matched part by part, so a lambda producing
+an `Optional<nuint>` says `R` is `nuint`. Returns that agree on no one type are
+SL0327 rather than guessed at; writing the type arguments at the call settles
+it.
 
 ### 4.4.3 A generic method that is dispatched
 
@@ -575,7 +580,7 @@ does.
   C# makes the next one when the call happens, if it ever does; a compiler that
   makes them all in advance has no last one, and a type argument nested more
   than 48 deep is SL0798. The same limit stops a plain generic function
-  recursing the same way, which used to run the compiler out of memory.
+  recursing the same way.
 - **Another binary.** A library's slots are numbered without its consumer's
   instantiations, so a class with a generic virtual method is left out of a
   library's metadata (SL0799), as a class implementing an interface already is
@@ -588,16 +593,14 @@ instantiation can fill.
 ## 4.5 A worked example
 
 ```csharp
-import Standard.Unchecked;
-
 public class List<T>
 {
-    T[] items;                          // past `count`, not items yet
+    Slot<T>[] items;                    // past `count`, empty
     nuint count;
 
     public List()
     {
-        items = NewUninitializedArray<T>(2u);
+        items = new Slot<T>[2u];
         count = 0;
     }
 
@@ -607,7 +610,7 @@ public class List<T>
     {
         if (count == items.Length)
         {
-            var bigger = NewUninitializedArray<T>(count * 2);
+            var bigger = new Slot<T>[count * 2];
             for (nuint i = 0; i < count; i++)
                 bigger[i] = items[i];
             items = bigger;
@@ -616,14 +619,16 @@ public class List<T>
         count++;
     }
 
-    public T At(nuint index) => items[index];
+    public T At(nuint index) => items[index].Value;
 }
 ```
 
 `new T[2]` would be refused for a `List<String>`, whose elements have no zero
 to start as ([§2.16](02-types.md#216-zero-values)). The storage past `count`
-holds no items, so it comes from `Standard.Unchecked`, and the class keeps the
-promise that module asks for: a slot is written before it is read.
+holds no items, so it is an array of `Slot<T>`, whose zero is empty
+([section 2.16.3](02-types.md#2163-arrays)). For a `List<int>` a slot is an
+`int` and costs nothing; for a `List<String>` it is a pointer, and reading one
+nothing wrote stops the program rather than hand out a null.
 
 ---
 

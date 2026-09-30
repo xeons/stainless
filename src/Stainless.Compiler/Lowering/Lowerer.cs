@@ -106,6 +106,7 @@ public sealed partial class Lowerer : BoundTreeRewriter
         BoundDeconstruction taken => LowerDeconstruction(taken, discarded: false),
         BoundRangeSlice sliced => LowerRangeSlice(sliced),
         BoundNamedValue named => LowerNamedValue(named),
+        BoundArrayCreate created => LowerArrayCreate(created),
         _ => throw new Source.InternalCompilerError(
             $"lowering has no case for {expression.GetType().Name}", expression.Span),
     };

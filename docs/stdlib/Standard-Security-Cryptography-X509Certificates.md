@@ -142,14 +142,14 @@ number of sixteen bytes.
 
 **Parameters**
 
-- `notBefore` — the first moment it is valid, in seconds since the epoch
-- `notAfter` — the last, no earlier than `notBefore`
+- `notBefore` -- the first moment it is valid, in seconds since the epoch
+- `notAfter` -- the last, no earlier than `notBefore`
 
 **Fails with**
 
-- [CryptoError.InvalidKey](Standard-Security-Cryptography.md#invalidkey-case) — the request was made with a public key only
-- [CryptoError.Parameter](Standard-Security-Cryptography.md#parameter-case) — `notAfter` is before `notBefore`, or either is outside the years 0 to 9999
-- [CryptoError.NoEntropy](Standard-Security-Cryptography.md#noentropy-case) — the platform would not supply a serial number
+- [CryptoError.InvalidKey](Standard-Security-Cryptography.md#invalidkey-case) -- the request was made with a public key only
+- [CryptoError.Parameter](Standard-Security-Cryptography.md#parameter-case) -- `notAfter` is before `notBefore`, or either is outside the years 0 to 9999
+- [CryptoError.NoEntropy](Standard-Security-Cryptography.md#noentropy-case) -- the platform would not supply a serial number
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/CertificateRequest.sl:107](../../stdlib/Security/Cryptography/X509Certificates/CertificateRequest.sl#L107)</sub>
 
@@ -167,16 +167,16 @@ certificate's validity MUST lie within the issuer's.
 
 **Parameters**
 
-- `issuerCertificate` — the CA
-- `issuerKey` — its private key
-- `notBefore` — the first moment it is valid
-- `notAfter` — the last
-- `serialNumber` — big-endian and unsigned, 1 to 20 bytes once leading zeros are gone, and not zero
+- `issuerCertificate` -- the CA
+- `issuerKey` -- its private key
+- `notBefore` -- the first moment it is valid
+- `notAfter` -- the last
+- `serialNumber` -- big-endian and unsigned, 1 to 20 bytes once leading zeros are gone, and not zero
 
 **Fails with**
 
-- [CryptoError.InvalidKey](Standard-Security-Cryptography.md#invalidkey-case) — `issuerKey` is not the issuer's key
-- [CryptoError.Parameter](Standard-Security-Cryptography.md#parameter-case) — the issuer is not a CA, the validity is not within its, or the serial number is not one RFC 5280 allows
+- [CryptoError.InvalidKey](Standard-Security-Cryptography.md#invalidkey-case) -- `issuerKey` is not the issuer's key
+- [CryptoError.Parameter](Standard-Security-Cryptography.md#parameter-case) -- the issuer is not a CA, the validity is not within its, or the serial number is not one RFC 5280 allows
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/CertificateRequest.sl:135](../../stdlib/Security/Cryptography/X509Certificates/CertificateRequest.sl#L135)</sub>
 
@@ -191,15 +191,15 @@ check that the two belong together.
 
 **Parameters**
 
-- `issuerName` — the issuer's name, exactly as its own certificate has it
-- `generator` — the issuer's private key
-- `notBefore` — the first moment it is valid
-- `notAfter` — the last
-- `serialNumber` — big-endian and unsigned, 1 to 20 bytes once leading zeros are gone, and not zero
+- `issuerName` -- the issuer's name, exactly as its own certificate has it
+- `generator` -- the issuer's private key
+- `notBefore` -- the first moment it is valid
+- `notAfter` -- the last
+- `serialNumber` -- big-endian and unsigned, 1 to 20 bytes once leading zeros are gone, and not zero
 
 **Fails with**
 
-- [CryptoError.Parameter](Standard-Security-Cryptography.md#parameter-case) — the validity or the serial number is not one RFC 5280 allows
+- [CryptoError.Parameter](Standard-Security-Cryptography.md#parameter-case) -- the validity or the serial number is not one RFC 5280 allows
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/CertificateRequest.sl:160](../../stdlib/Security/Cryptography/X509Certificates/CertificateRequest.sl#L160)</sub>
 
@@ -276,12 +276,12 @@ The key a `SubjectPublicKeyInfo` holds.
 
 **Parameters**
 
-- `source` — the DER, perhaps with more after it
-- `bytesRead` — how many bytes of `source` the structure took; zero on failure
+- `source` -- the DER, perhaps with more after it
+- `bytesRead` -- how many bytes of `source` the structure took; zero on failure
 
 **Fails with**
 
-- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) — it is not a `SubjectPublicKeyInfo`
+- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) -- it is not a `SubjectPublicKeyInfo`
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/PublicKey.sl:75](../../stdlib/Security/Cryptography/X509Certificates/PublicKey.sl#L75)</sub>
 
@@ -295,11 +295,11 @@ An Ed25519 key.
 
 **Parameters**
 
-- `publicKey` — the 32 bytes RFC 8032 encodes a point as
+- `publicKey` -- the 32 bytes RFC 8032 encodes a point as
 
 **Fails with**
 
-- [CryptoError.KeyLength](Standard-Security-Cryptography.md#keylength-case) — `publicKey` is not 32 bytes
+- [CryptoError.KeyLength](Standard-Security-Cryptography.md#keylength-case) -- `publicKey` is not 32 bytes
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/PublicKey.sl:90](../../stdlib/Security/Cryptography/X509Certificates/PublicKey.sl#L90)</sub>
 
@@ -313,7 +313,7 @@ static Result<PublicKey, CryptoError> CreateFromECDsa(ECDsa key)
 
 **Fails with**
 
-- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) — never, in practice: the key writes its own
+- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) -- never, in practice: the key writes its own
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/PublicKey.sl:108](../../stdlib/Security/Cryptography/X509Certificates/PublicKey.sl#L108)</sub>
 
@@ -327,7 +327,7 @@ static Result<PublicKey, CryptoError> CreateFromRsa(Rsa key)
 
 **Fails with**
 
-- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) — never, in practice: the key writes its own
+- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) -- never, in practice: the key writes its own
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/PublicKey.sl:114](../../stdlib/Security/Cryptography/X509Certificates/PublicKey.sl#L114)</sub>
 
@@ -392,8 +392,8 @@ The 32 bytes of an Ed25519 key.
 
 **Fails with**
 
-- [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) — the key is not Ed25519
-- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) — it has parameters, which RFC 8410 forbids, or is not 32 bytes
+- [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) -- the key is not Ed25519
+- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) -- it has parameters, which RFC 8410 forbids, or is not 32 bytes
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/PublicKey.sl:164](../../stdlib/Security/Cryptography/X509Certificates/PublicKey.sl#L164)</sub>
 
@@ -407,9 +407,9 @@ The RSA key, for verifying or encrypting.
 
 **Fails with**
 
-- [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) — the key is not RSA
-- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) — it is not a PKCS #1 `RSAPublicKey`
-- [CryptoError.InvalidKey](Standard-Security-Cryptography.md#invalidkey-case) — the modulus or exponent is not usable
+- [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) -- the key is not RSA
+- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) -- it is not a PKCS #1 `RSAPublicKey`
+- [CryptoError.InvalidKey](Standard-Security-Cryptography.md#invalidkey-case) -- the modulus or exponent is not usable
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/PublicKey.sl:178](../../stdlib/Security/Cryptography/X509Certificates/PublicKey.sl#L178)</sub>
 
@@ -423,8 +423,8 @@ The RSA modulus, big-endian and without a sign octet.
 
 **Fails with**
 
-- [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) — the key is not RSA
-- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) — it is not a PKCS #1 `RSAPublicKey`
+- [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) -- the key is not RSA
+- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) -- it is not a PKCS #1 `RSAPublicKey`
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/PublicKey.sl:189](../../stdlib/Security/Cryptography/X509Certificates/PublicKey.sl#L189)</sub>
 
@@ -438,8 +438,8 @@ The RSA public exponent, big-endian and without a sign octet.
 
 **Fails with**
 
-- [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) — the key is not RSA
-- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) — it is not a PKCS #1 `RSAPublicKey`
+- [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) -- the key is not RSA
+- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) -- it is not a PKCS #1 `RSAPublicKey`
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/PublicKey.sl:195](../../stdlib/Security/Cryptography/X509Certificates/PublicKey.sl#L195)</sub>
 
@@ -453,8 +453,8 @@ The curve an elliptic-curve key is on.
 
 **Fails with**
 
-- [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) — the key is not an elliptic-curve key, or its curve is given by explicit parameters
-- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) — the parameters are not a curve's identifier
+- [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) -- the key is not an elliptic-curve key, or its curve is given by explicit parameters
+- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) -- the parameters are not a curve's identifier
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/PublicKey.sl:225](../../stdlib/Security/Cryptography/X509Certificates/PublicKey.sl#L225)</sub>
 
@@ -469,7 +469,7 @@ The point of an elliptic-curve key as SEC 1 encodes it: `04`, then
 
 **Fails with**
 
-- [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) — the key is not an elliptic-curve key
+- [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) -- the key is not an elliptic-curve key
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/PublicKey.sl:243](../../stdlib/Security/Cryptography/X509Certificates/PublicKey.sl#L243)</sub>
 
@@ -483,9 +483,9 @@ The elliptic-curve key, for verifying.
 
 **Fails with**
 
-- [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) — the key is not on P-256 or P-384, or its point is compressed
-- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) — the point is not the curve's size
-- [CryptoError.InvalidPoint](Standard-Security-Cryptography.md#invalidpoint-case) — the point is not on the curve
+- [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) -- the key is not on P-256 or P-384, or its point is compressed
+- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) -- the point is not the curve's size
+- [CryptoError.InvalidPoint](Standard-Security-Cryptography.md#invalidpoint-case) -- the point is not on the curve
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/PublicKey.sl:256](../../stdlib/Security/Cryptography/X509Certificates/PublicKey.sl#L256)</sub>
 
@@ -626,7 +626,7 @@ have been; this aborts otherwise.
 
 **Parameters**
 
-- `critical` — whether it is critical, which RFC 5280 requires only when the subject name is empty
+- `critical` -- whether it is critical, which RFC 5280 requires only when the subject name is empty
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/SubjectAlternativeNameBuilder.sl:98](../../stdlib/Security/Cryptography/X509Certificates/SubjectAlternativeNameBuilder.sl#L98)</sub>
 
@@ -670,11 +670,11 @@ The name one `Name` value in DER encodes.
 
 **Parameters**
 
-- `encoded` — exactly one `SEQUENCE` of relative distinguished names
+- `encoded` -- exactly one `SEQUENCE` of relative distinguished names
 
 **Fails with**
 
-- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) — it is not one, or a string value is not valid for its type
+- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) -- it is not one, or a string value is not valid for its type
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/X500DistinguishedName.sl:69](../../stdlib/Security/Cryptography/X509Certificates/X500DistinguishedName.sl#L69)</sub>
 
@@ -718,7 +718,7 @@ Each relative distinguished name.
 
 **Parameters**
 
-- `reversed` — most specific first, as `Name` writes them, which is .NET's default; otherwise in the order they are encoded
+- `reversed` -- most specific first, as `Name` writes them, which is .NET's default; otherwise in the order they are encoded
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/X500DistinguishedName.sl:118](../../stdlib/Security/Cryptography/X509Certificates/X500DistinguishedName.sl#L118)</sub>
 
@@ -733,7 +733,7 @@ first, or `None` when there is none or it is not a character string.
 
 **Parameters**
 
-- `typeOid` — the attribute type, as `2.5.4.3` for a common name
+- `typeOid` -- the attribute type, as `2.5.4.3` for a common name
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/X500DistinguishedName.sl:131](../../stdlib/Security/Cryptography/X509Certificates/X500DistinguishedName.sl#L131)</sub>
 
@@ -785,9 +785,9 @@ identifier, is reported by `Build` rather than here.
 
 **Parameters**
 
-- `typeOid` — the attribute type, dotted
-- `value` — its text
-- `encodingType` — the string type to write it as
+- `typeOid` -- the attribute type, dotted
+- `value` -- its text
+- `encodingType` -- the string type to write it as
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/X500DistinguishedNameBuilder.sl:64](../../stdlib/Security/Cryptography/X509Certificates/X500DistinguishedNameBuilder.sl#L64)</sub>
 
@@ -882,7 +882,7 @@ The name, in the order the attributes were added.
 
 **Fails with**
 
-- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) — an attribute type was not an identifier, or a value was not valid for its string type
+- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) -- an attribute type was not an identifier, or a value was not valid for its string type
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/X500DistinguishedNameBuilder.sl:117](../../stdlib/Security/Cryptography/X509Certificates/X500DistinguishedNameBuilder.sl#L117)</sub>
 
@@ -943,7 +943,7 @@ The type of attribute `index`: `2.5.4.3` for a common name.
 
 **Parameters**
 
-- `index` — below `Count`; aborts otherwise
+- `index` -- below `Count`; aborts otherwise
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/X500RelativeDistinguishedName.sl:60](../../stdlib/Security/Cryptography/X509Certificates/X500RelativeDistinguishedName.sl#L60)</sub>
 
@@ -957,7 +957,7 @@ The value of attribute `index`, as text or as `#` and hexadecimal.
 
 **Parameters**
 
-- `index` — below `Count`; aborts otherwise
+- `index` -- below `Count`; aborts otherwise
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/X500RelativeDistinguishedName.sl:65](../../stdlib/Security/Cryptography/X509Certificates/X500RelativeDistinguishedName.sl#L65)</sub>
 
@@ -971,7 +971,7 @@ Whether the value of attribute `index` is a character string.
 
 **Parameters**
 
-- `index` — below `Count`; aborts otherwise
+- `index` -- below `Count`; aborts otherwise
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/X500RelativeDistinguishedName.sl:70](../../stdlib/Security/Cryptography/X509Certificates/X500RelativeDistinguishedName.sl#L70)</sub>
 
@@ -1062,9 +1062,9 @@ The extension a certificate issued by `certificateAuthority` carries.
 
 **Parameters**
 
-- `certificateAuthority` — the issuer
-- `includeKeyIdentifier` — whether to name its key: its subject key identifier, or one made from its key when it has none
-- `includeIssuerAndSerial` — whether to name it by its own issuer and serial number as well
+- `certificateAuthority` -- the issuer
+- `includeKeyIdentifier` -- whether to name its key: its subject key identifier, or one made from its key when it has none
+- `includeIssuerAndSerial` -- whether to name it by its own issuer and serial number as well
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/X509AuthorityKeyIdentifierExtension.sl:79](../../stdlib/Security/Cryptography/X509Certificates/X509AuthorityKeyIdentifierExtension.sl#L79)</sub>
 
@@ -1150,11 +1150,11 @@ The certificate `data` holds, as DER.
 
 **Parameters**
 
-- `data` — exactly one `Certificate`, with nothing after it
+- `data` -- exactly one `Certificate`, with nothing after it
 
 **Fails with**
 
-- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) — it is not one, as the module's summary reads RFC 5280
+- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) -- it is not one, as the module's summary reads RFC 5280
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:133](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L133)</sub>
 
@@ -1169,11 +1169,11 @@ finds it. Blocks with other labels are passed over.
 
 **Parameters**
 
-- `text` — PEM, perhaps among other text
+- `text` -- PEM, perhaps among other text
 
 **Fails with**
 
-- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) — there is no `CERTIFICATE` block, or the first one does not hold a certificate
+- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) -- there is no `CERTIFICATE` block, or the first one does not hold a certificate
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:227](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L227)</sub>
 
@@ -1422,7 +1422,7 @@ Result<DateTimeOffset, CryptoError> GetNotBeforeDateTimeOffset()
 
 **Fails with**
 
-- [CryptoError.Parameter](Standard-Security-Cryptography.md#parameter-case) — the moment is outside 1677 to 2262, which is what a `DateTimeOffset` holds
+- [CryptoError.Parameter](Standard-Security-Cryptography.md#parameter-case) -- the moment is outside 1677 to 2262, which is what a `DateTimeOffset` holds
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:333](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L333)</sub>
 
@@ -1436,7 +1436,7 @@ Result<DateTimeOffset, CryptoError> GetNotAfterDateTimeOffset()
 
 **Fails with**
 
-- [CryptoError.Parameter](Standard-Security-Cryptography.md#parameter-case) — the moment is outside 1677 to 2262, which is what a `DateTimeOffset` holds
+- [CryptoError.Parameter](Standard-Security-Cryptography.md#parameter-case) -- the moment is outside 1677 to 2262, which is what a `DateTimeOffset` holds
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:340](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L340)</sub>
 
@@ -1450,7 +1450,7 @@ The hash of the DER under `hashAlgorithm`.
 
 **Fails with**
 
-- [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) — `hashAlgorithm` is not one this library has
+- [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) -- `hashAlgorithm` is not one this library has
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:354](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L354)</sub>
 
@@ -1464,7 +1464,7 @@ The same, in upper-case hexadecimal.
 
 **Fails with**
 
-- [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) — `hashAlgorithm` is not one this library has
+- [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) -- `hashAlgorithm` is not one this library has
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:364](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L364)</sub>
 
@@ -1514,8 +1514,8 @@ Forum's rules.
 
 **Parameters**
 
-- `hostname` — what the client asked to connect to
-- `allowWildcards` — whether a wildcard entry may match
+- `hostname` -- what the client asked to connect to
+- `allowWildcards` -- whether a wildcard entry may match
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl:393](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2.sl#L393)</sub>
 
@@ -1626,13 +1626,13 @@ nothing is added.
 
 **Parameters**
 
-- `text` — PEM, perhaps among other text
+- `text` -- PEM, perhaps among other text
 
 **Returns** &nbsp; how many were added, not counting any already here
 
 **Fails with**
 
-- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) — a `CERTIFICATE` block does not hold a certificate
+- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) -- a `CERTIFICATE` block does not hold a certificate
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl:110](../../stdlib/Security/Cryptography/X509Certificates/X509Certificate2Collection.sl#L110)</sub>
 
@@ -1758,7 +1758,7 @@ Builds and validates a path from `certificate`.
 
 **Parameters**
 
-- `certificate` — the leaf, usually a server's
+- `certificate` -- the leaf, usually a server's
 
 **Returns** &nbsp; whether a path reached an anchor and passed every check; `ChainElements` and `ChainStatus` say what was found either way
 
@@ -2739,11 +2739,11 @@ A generator signing with the Ed25519 key `privateKey`.
 
 **Parameters**
 
-- `privateKey` — the 32-byte seed RFC 8032 calls the private key
+- `privateKey` -- the 32-byte seed RFC 8032 calls the private key
 
 **Fails with**
 
-- [CryptoError.KeyLength](Standard-Security-Cryptography.md#keylength-case) — it is not 32 bytes
+- [CryptoError.KeyLength](Standard-Security-Cryptography.md#keylength-case) -- it is not 32 bytes
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl:71](../../stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl#L71)</sub>
 
@@ -2758,7 +2758,7 @@ signing to succeed.
 
 **Fails with**
 
-- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) — never, in practice: the key writes its own
+- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) -- never, in practice: the key writes its own
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl:84](../../stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl#L84)</sub>
 
@@ -2773,7 +2773,7 @@ private half for signing to succeed.
 
 **Fails with**
 
-- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) — never, in practice: the key writes its own
+- [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) -- never, in practice: the key writes its own
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl:95](../../stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl#L95)</sub>
 
@@ -2798,7 +2798,7 @@ names, as DER.
 
 **Fails with**
 
-- [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) — the hash is not SHA-256, -384 or -512 for ECDSA, or SHA-1, -256, -384 or -512 for RSA
+- [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) -- the hash is not SHA-256, -384 or -512 for ECDSA, or SHA-1, -256, -384 or -512 for RSA
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl:111](../../stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl#L111)</sub>
 
@@ -2812,8 +2812,8 @@ The signature of `data`, in the form a certificate carries it.
 
 **Fails with**
 
-- [CryptoError.InvalidKey](Standard-Security-Cryptography.md#invalidkey-case) — the key has no private half
-- [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) — the hash is not one the key signs with
+- [CryptoError.InvalidKey](Standard-Security-Cryptography.md#invalidkey-case) -- the key has no private half
+- [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) -- the hash is not one the key signs with
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl:148](../../stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl#L148)</sub>
 
@@ -2858,8 +2858,8 @@ The store `name` at `location`, read the first time it is asked for.
 
 **Parameters**
 
-- `name` — which store
-- `location` — whose; only Windows tells the two apart
+- `name` -- which store
+- `location` -- whose; only Windows tells the two apart
 
 <sub>[stdlib/Security/Cryptography/X509Certificates/X509Store.sl:83](../../stdlib/Security/Cryptography/X509Certificates/X509Store.sl#L83)</sub>
 

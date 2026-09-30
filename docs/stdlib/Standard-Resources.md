@@ -211,8 +211,8 @@ Whether a resource of this type and number is there.
 
 **Parameters**
 
-- `type` — which `RT_` kind it was filed as
-- `id` — the number the script filed the resource under
+- `type` -- which `RT_` kind it was filed as
+- `id` -- the number the script filed the resource under
 
 <sub>[stdlib/Resources/Resources.sl:296](../../stdlib/Resources/Resources.sl#L296)</sub>
 
@@ -226,8 +226,8 @@ Whether one named by text, of a type named by text, is there.
 
 **Parameters**
 
-- `type` — the type name the script invented
-- `name` — the resource name, matched without regard to ASCII case
+- `type` -- the type name the script invented
+- `name` -- the resource name, matched without regard to ASCII case
 
 <sub>[stdlib/Resources/Resources.sl:303](../../stdlib/Resources/Resources.sl#L303)</sub>
 
@@ -268,8 +268,8 @@ gives -- ask `Exists` where the difference matters.
 
 **Parameters**
 
-- `type` — an `RT_` number
-- `id` — the number the script filed the resource under
+- `type` -- an `RT_` number
+- `id` -- the number the script filed the resource under
 
 **See also** &nbsp; [Resources.Exists](#exists-function)
 
@@ -285,8 +285,8 @@ The same, for a resource named by text.
 
 **Parameters**
 
-- `type` — the type name the script invented
-- `name` — the resource name, matched without regard to ASCII case
+- `type` -- the type name the script invented
+- `name` -- the resource name, matched without regard to ASCII case
 
 **See also** &nbsp; [Resources.Exists](#exists-function)
 
@@ -306,9 +306,9 @@ outlives the call.
 
 **Parameters**
 
-- `type` — an `RT_` number
-- `id` — the number the script filed the resource under
-- `byteCount` — where the size is written, or null to skip it
+- `type` -- an `RT_` number
+- `id` -- the number the script filed the resource under
+- `byteCount` -- where the size is written, or null to skip it
 
 **See also** &nbsp; [Resources.GetBytes](#getbytes-function)
 
@@ -324,8 +324,8 @@ How many bytes a resource holds, or zero when there is none.
 
 **Parameters**
 
-- `type` — an `RT_` number
-- `id` — the number the script filed the resource under
+- `type` -- an `RT_` number
+- `id` -- the number the script filed the resource under
 
 <sub>[stdlib/Resources/Resources.sl:312](../../stdlib/Resources/Resources.sl#L312)</sub>
 

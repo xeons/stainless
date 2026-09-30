@@ -61,6 +61,8 @@ int n = 1;
 }
 ```
 
+A local named after a parameter is SL0219.
+
 That is C#'s rule rather than C's, and for C#'s reason: where two readings of a
 name are possible, the likelier cause is a mistake rather than an intention,
 and saying so costs one rename.
@@ -267,7 +269,8 @@ it would be a pattern of bytes that looked like something else.
 **A type is asked only of a reference.** An object is asked what class it is
 and a variant which case it holds; any other value is exactly what it was
 declared to be, so the one type it matches is its own — `(int count, _)` over
-an `(int, String)` names the first element — and any other is SL0438.
+an `(int, String)` names the first element -- and any other is SL0438, or
+SL0518 after `is`.
 
 **A pattern is a question, and every one of them is asked by a `bool`** — a
 comparison, a tag test, `is`, a member read, a length. There is no matching
@@ -455,7 +458,7 @@ Three rules are enforced, each for the same reason:
 
 *What* may cross into a job is checked separately, by type, and is the rule in
 [§9.5](#95-what-may-cross-a-thread-boundary): plain data, a `String`, a `threadsafe` class, or an array of plain data.
-What is still unchecked is how long a borrowed thing lives — see
+What is unchecked is how long a borrowed thing lives -- see
 [concurrency.md](../concurrency.md) for the model being aimed at and which parts
 of it the compiler enforces today.
 
@@ -530,12 +533,10 @@ value could arrive — so `static int Counter;` is an error (SL0376).
 
 What a static holds is *warned* about rather than refused ([§9.5](#95-what-may-cross-a-thread-boundary)): it outlives
 every thread, so a `List<int>` in one is reachable from all of them and the
-warning points at `Mutex<T>`. That is a change from an earlier design in which a
-static had to be `readonly` and of a shareable type. The rule it replaced was
-Swift 6's and Rust 2024's; this is C#'s, and it is chosen for the reason those
-two are worth having and this one is worth having anyway: whether sharing is a
-race is a fact about what the program does with the value, and a program with
-one thread has no race to have.
+warning points at `Mutex<T>`. Refusing -- requiring every static to be
+`readonly` and of a shareable type, as Swift 6 and Rust 2024 do -- was rejected
+for C#'s rule: whether sharing is a race is a fact about what the program does
+with the value, and a program with one thread has no race to have.
 
 **Order is computed, not guessed.** An initializer may read another static, and
 the compiler sorts them so nothing runs before what it reads:
@@ -640,7 +641,7 @@ receiver, a `for parallel` capture, and a static.
 | `T[]` where `T` is plain data | a job borrows it without retaining it |
 
 Everything else **warns** (SL0377). Counting is not what the rule protects:
-reference counts are atomic, so sharing an object no longer corrupts its count.
+reference counts are atomic, so sharing an object cannot corrupt its count.
 What nothing synchronizes is the object's *contents*, and two threads writing
 one field is a race no counting scheme could have saved.
 
@@ -680,9 +681,9 @@ own, so the word on one would promise nothing.
 
 Two gaps remain, and both are about lifetimes rather than types: a `Guard` can
 outlive the lock it proves, and a job could store an array it was only lent.
-A third — `Mutex<T>` racing on the reference count of what it guarded — is
-closed, because counts are atomic now ([§5.2](05-standard-library.md#52-standardthreading) and [§5 of the ABI notes](../abi.md#5-ownership-convention)). See
-[concurrency.md](../concurrency.md) for the two that are left.
+`Mutex<T>` does not race on the reference count of what it guards, because
+counts are atomic ([section 5.2](05-standard-library.md#52-standardthreading) and [section 5 of the ABI notes](../abi.md#5-ownership-convention)). See
+[concurrency.md](../concurrency.md) for the two gaps.
 
 ## 9.6 Stepping by one
 
@@ -739,10 +740,11 @@ zero that a caller cannot tell from a real one.
 `??` and `??=` alike. `here?.Name` on a plain `Node` is a question with one
 answer, and writing it suggests a doubt the type does not have.
 
-**`a?[i]` asks the same question before an element.** The receiver is a `C?`
-whose class declares an indexer ([§7.5](07-functions-members.md#75-indexers)) — an array is never null, so there is
-nothing to ask of one — and the element follows the table above: a reference
-answers null, and a value needs `??`. `a?[i:j]` slices the same way.
+**`a?[i]` asks the same question before an element.** The receiver is a `T[]?`,
+or a `C?` whose class declares an indexer ([section 7.5](07-functions-members.md#75-indexers)) -- a plain `T[]` is never null, so
+there is nothing to ask of one -- and the element follows the table above: a
+reference answers null, and a value needs `??`. `a?[i..j]` slices the same way
+([section 9.17](#917--and-)).
 
 **`?[` is read as C# reads it.** `c ? [1] : [2]` is a conditional with an array
 literal in its arm, and `a?[i]` is an element: after `?[` the parser looks for
@@ -887,7 +889,7 @@ reached when a jump that is itself reached names it.
 ## 9.11 `nameof`
 
 ```csharp
-FindType(nameof(Button));
+FindType($"App.{nameof(Button)}");
 Console.WriteLine($"{nameof(Width)} = {Width}");
 ```
 
@@ -928,9 +930,9 @@ wrapping.
 A user-defined conversion or operator is a call, and `checked` does not reach
 into it.
 
-Both are **contextual keywords**, as `closure` is: a test in this repository
-had a parameter named `checked` before this existed. So is `out`, which the
-standard library uses as a local.
+Both are **contextual keywords**, as `closure` is, so a parameter or a local
+may still be named `checked`. So is `out`, which the standard library uses as a
+local.
 
 The conditional `a ? b : c` evaluates only the arm it selects, and groups to
 the right, so `a ? b : c ? d : e` reads as `a ? b : (c ? d : e)`. Its arms must
@@ -997,7 +999,7 @@ the suffix; silently rounding a double is what the rule exists to stop. A
 `const float` may be initialized with either spelling, since the constant's
 declared type says what it holds.
 
-A string literal has type `String`; see section 3.
+A string literal has type `String`; see [section 3](03-text.md).
 
 **The arithmetic C leaves undefined.** C compiles these to whatever falls out,
 and an optimiser is entitled to assume they never happen — which is worse than
@@ -1062,7 +1064,7 @@ Advance();                  // a call, and the result may be dropped
 count++;
 count = Next();
 thing?.Method();            // effective: the call is
-ready ? Start() : Stop();   // effective: both arms are calls
+count > 0 ? Start() : Stop(); // effective: both arms are calls
 
 count + 1;                  // SL0222 -- computed and thrown away
 count;                      // SL0222
@@ -1176,7 +1178,7 @@ letter or `_` is not a name (SL0001).
 ## 9.16 `new(...)` with the type left off
 
 ```csharp
-Point origin = new();                       // a declared local
+Point origin = new(0, 0);                   // a declared local
 private List<int> _seen = new() { 1, 2 };   // a field, with an initializer
 Point Corner() => new(1, 1);                // a return
 Plot(new(3, 4));                            // an argument
@@ -1206,14 +1208,14 @@ so `Id(new())` is SL0327 until the type argument is written: `Id<Point>(new())`.
 ## 9.17 `^` and `..`
 
 ```csharp
-int last = numbers[^1];                 // the last element
+int last = numbers[^1];                    // the last element
 Span<int> inner = numbers[1..^1];          // all but the first and the last
 Span<int> tail = numbers[^3..];            // the last three
 Span<int> all = numbers[..];
 
-Index at = ^2;                          // kept, as C#'s System.Index
-Range middle = 1..^1;                   // and System.Range
-Console.WriteLine(numbers[at] + numbers[middle].Length);
+Index at = ^2;                             // kept, as C#'s System.Index
+Range middle = 1..^1;                      // and System.Range
+Console.WriteLine($"{numbers[at]} {numbers[middle].Length}");
 ```
 
 **`^n` counts back from the end**, so `^1` is the last element and `^0` is one

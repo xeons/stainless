@@ -14,11 +14,6 @@ the object it was handed and using it after the guard is gone. Keeping the
 collection in a field avoids that entirely: reading a field to call a method
 on it borrows, and a borrow that never leaves cannot outlive anything.
 
-This began as a stronger argument still, because reference counts were not
-atomic and handing an object out of a lock corrupted its count. Counts are
-atomic now, so that half is closed; the lifetime half is not, and it is the
-half this design was already the answer to.
-
 So these types lock a raw mutex directly rather than using `Mutex<T>` from
 Standard.Threading, whose `Guard.Value` is exactly the hand-out that
 cannot be made safe this way. See the note there.
@@ -56,7 +51,7 @@ still delivered, and once it is drained every `Take` returns at once with
 
 **Type parameters**
 
-- `T` — what is sent through it; nothing is required of it, and nothing yet checks that the sender is done with what it sent
+- `T` -- what is sent through it; nothing is required of it, and nothing yet checks that the sender is done with what it sent
 
 <sub>[stdlib/Concurrent/Channel.sl:44](../../stdlib/Concurrent/Channel.sl#L44)</sub>
 
@@ -136,8 +131,8 @@ A map several threads may use at once.
 
 **Type parameters**
 
-- `TKey` — what entries are found by. It is compared and hashed on every lookup, so it must implement both `IEquatable<TKey>` and `IHashable`.
-- `TValue` — what is stored against a key; nothing is required of it
+- `TKey` -- what entries are found by. It is compared and hashed on every lookup, so it must implement both `IEquatable<TKey>` and `IHashable`.
+- `TValue` -- what is stored against a key; nothing is required of it
 
 <sub>[stdlib/Concurrent/ConcurrentDictionary.sl:34](../../stdlib/Concurrent/ConcurrentDictionary.sl#L34)</sub>
 
@@ -275,7 +270,7 @@ A first-in, first-out queue several threads may use at once.
 
 **Type parameters**
 
-- `T` — what the queue holds; nothing is required of it, and nothing yet checks that two threads may safely hold one at once
+- `T` -- what the queue holds; nothing is required of it, and nothing yet checks that two threads may safely hold one at once
 
 <sub>[stdlib/Concurrent/ConcurrentQueue.sl:33](../../stdlib/Concurrent/ConcurrentQueue.sl#L33)</sub>
 
@@ -357,7 +352,7 @@ A last-in, first-out stack several threads may use at once.
 
 **Type parameters**
 
-- `T` — what the stack holds; nothing is required of it, and nothing yet checks that two threads may safely hold one at once
+- `T` -- what the stack holds; nothing is required of it, and nothing yet checks that two threads may safely hold one at once
 
 <sub>[stdlib/Concurrent/ConcurrentStack.sl:33](../../stdlib/Concurrent/ConcurrentStack.sl#L33)</sub>
 

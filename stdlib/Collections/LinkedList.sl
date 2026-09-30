@@ -21,8 +21,6 @@
 
 module Standard.Collections;
 
-import Standard.Unchecked;
-
 // ------------------------------------------------------------- linked list
 
 /// A doubly linked list whose links are indices into a pool rather than
@@ -51,7 +49,7 @@ import Standard.Unchecked;
 ///               named by its handle rather than by its value
 public class LinkedList<T> : IEnumerable<T>
 {
-    T[] _items;
+    Slot<T>[] _items;
     nint[] _next;
     nint[] _previous;
 
@@ -64,7 +62,7 @@ public class LinkedList<T> : IEnumerable<T>
     /// An empty list with a small pool, grown as nodes are needed.
     public LinkedList()
     {
-        _items = NewUninitializedArray<T>(8);
+        _items = new Slot<T>[8];
         _next = new nint[8];
         _previous = new nint[8];
         _head = -1;
@@ -108,7 +106,7 @@ public class LinkedList<T> : IEnumerable<T>
     /// whatever the pool slot now holds, so test `at >= 0` before walking.
     ///
     /// @see LinkedList.SetValueAt
-    public T GetValueAt(nint handle) => _items[(nuint)handle];
+    public T GetValueAt(nint handle) => _items[(nuint)handle].Value;
 
     /// Replaces the value in a node, leaving the links alone. Same
     /// requirement on `handle` as `GetValueAt`.
@@ -227,7 +225,7 @@ public class LinkedList<T> : IEnumerable<T>
             _tail = before;
         }
 
-        ClearElement(_items, at);
+        _items[at].Clear();
         _previous[at] = -1;
         _next[at] = _free;
         _free = handle;
@@ -243,7 +241,7 @@ public class LinkedList<T> : IEnumerable<T>
         if (_head < 0)
             sl_fail("LinkedList.RemoveFirst: the list is empty");
 
-        var item = _items[(nuint)_head];
+        var item = _items[(nuint)_head].Value;
         RemoveAt(_head);
         return item;
     }
@@ -256,7 +254,7 @@ public class LinkedList<T> : IEnumerable<T>
         if (_tail < 0)
             sl_fail("LinkedList.RemoveLast: the list is empty");
 
-        var item = _items[(nuint)_tail];
+        var item = _items[(nuint)_tail].Value;
         RemoveAt(_tail);
         return item;
     }
@@ -265,7 +263,7 @@ public class LinkedList<T> : IEnumerable<T>
     /// out is dead afterwards.
     public void Clear()
     {
-        _items = NewUninitializedArray<T>(8);
+        _items = new Slot<T>[8];
         _next = new nint[8];
         _previous = new nint[8];
         _head = -1;
@@ -282,7 +280,7 @@ public class LinkedList<T> : IEnumerable<T>
     {
         var result = new List<T>();
         for (nint at = _head; at >= 0; at = _next[(nuint)at])
-            result.Add(_items[(nuint)at]);
+            result.Add(_items[(nuint)at].Value);
         return result;
     }
 
@@ -290,7 +288,7 @@ public class LinkedList<T> : IEnumerable<T>
     /// pool, and -1 is the end -- which is why these are nint and not nuint.
     nint FirstNode => _head;
     nint GetNodeAfter(nint node) => _next[(nuint)node];
-    T GetNodeValue(nint node) => _items[(nuint)node];
+    T GetNodeValue(nint node) => _items[(nuint)node].Value;
 
     /// A cursor over the values, head first, for `foreach`. Follows the links
     /// and keeps its place, so a whole walk is O(n). Adding or removing during
@@ -324,7 +322,7 @@ public class LinkedList<T> : IEnumerable<T>
     {
         nuint size = _items.Length * 2;
 
-        var biggerItems = NewUninitializedArray<T>(size);
+        var biggerItems = new Slot<T>[size];
         var biggerNext = new nint[size];
         var biggerPrevious = new nint[size];
 

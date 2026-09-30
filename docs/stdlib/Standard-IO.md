@@ -160,16 +160,16 @@ Opens a file, or says why it could not be opened.
 
 **Parameters**
 
-- `path` — the file to open
-- `mode` — what to do about whether it is already there
-- `access` — what may be done with it once it is open
+- `path` -- the file to open
+- `mode` -- what to do about whether it is already there
+- `access` -- what may be done with it once it is open
 
 **Fails with**
 
-- [IOError.NotFound](#notfound-case) — `FileMode.Open` and there is no file there, or a directory along the path is missing
-- [IOError.AccessDenied](#accessdenied-case) — the file or its directory refuses it
-- [IOError.IsADirectory](#isadirectory-case) — a writing mode on a path that names a directory
-- [IOError.Unknown](#unknown-case) — the platform reported something with no case of its own -- too many open files among them
+- [IOError.NotFound](#notfound-case) -- `FileMode.Open` and there is no file there, or a directory along the path is missing
+- [IOError.AccessDenied](#accessdenied-case) -- the file or its directory refuses it
+- [IOError.IsADirectory](#isadirectory-case) -- a writing mode on a path that names a directory
+- [IOError.Unknown](#unknown-case) -- the platform reported something with no case of its own -- too many open files among them
 
 <sub>[stdlib/IO/FileStream.sl:85](../../stdlib/IO/FileStream.sl#L85)</sub>
 
@@ -183,9 +183,9 @@ Opens an existing file for reading.
 
 **Fails with**
 
-- [IOError.NotFound](#notfound-case) — there is no file at that path
-- [IOError.AccessDenied](#accessdenied-case) — the file refuses to be read
-- [IOError.Unknown](#unknown-case) — the platform reported something with no case of its own
+- [IOError.NotFound](#notfound-case) -- there is no file at that path
+- [IOError.AccessDenied](#accessdenied-case) -- the file refuses to be read
+- [IOError.Unknown](#unknown-case) -- the platform reported something with no case of its own
 
 **See also** &nbsp; [FileStream.Open](#open-method)
 
@@ -201,10 +201,10 @@ Creates the file, or replaces what is there.
 
 **Fails with**
 
-- [IOError.NotFound](#notfound-case) — a directory along the path is missing
-- [IOError.AccessDenied](#accessdenied-case) — the file or its directory refuses it
-- [IOError.IsADirectory](#isadirectory-case) — the path names a directory
-- [IOError.Unknown](#unknown-case) — the platform reported something with no case of its own
+- [IOError.NotFound](#notfound-case) -- a directory along the path is missing
+- [IOError.AccessDenied](#accessdenied-case) -- the file or its directory refuses it
+- [IOError.IsADirectory](#isadirectory-case) -- the path names a directory
+- [IOError.Unknown](#unknown-case) -- the platform reported something with no case of its own
 
 **See also** &nbsp; [FileStream.Open](#open-method)
 
@@ -220,10 +220,10 @@ Opens for writing at the end, creating the file if it is not there.
 
 **Fails with**
 
-- [IOError.NotFound](#notfound-case) — a directory along the path is missing
-- [IOError.AccessDenied](#accessdenied-case) — the file or its directory refuses it
-- [IOError.IsADirectory](#isadirectory-case) — the path names a directory
-- [IOError.Unknown](#unknown-case) — the platform reported something with no case of its own
+- [IOError.NotFound](#notfound-case) -- a directory along the path is missing
+- [IOError.AccessDenied](#accessdenied-case) -- the file or its directory refuses it
+- [IOError.IsADirectory](#isadirectory-case) -- the path names a directory
+- [IOError.Unknown](#unknown-case) -- the platform reported something with no case of its own
 
 **See also** &nbsp; [FileStream.Open](#open-method)
 
@@ -1254,9 +1254,9 @@ Reads a stream to its end and reads the bytes as UTF-8.
 
 **Fails with**
 
-- [IOError.Closed](#closed-case) — the stream was closed before the read finished
-- [IOError.AccessDenied](#accessdenied-case) — the stream refused to be read
-- [IOError.Unknown](#unknown-case) — the stream failed for a reason with no case of its own
+- [IOError.Closed](#closed-case) -- the stream was closed before the read finished
+- [IOError.AccessDenied](#accessdenied-case) -- the stream refused to be read
+- [IOError.Unknown](#unknown-case) -- the stream failed for a reason with no case of its own
 
 **See also** &nbsp; [IO.ReadToEnd](#readtoend-function)
 
@@ -1272,9 +1272,9 @@ Reads a stream to its end.
 
 **Fails with**
 
-- [IOError.Closed](#closed-case) — the stream was closed before the read finished
-- [IOError.AccessDenied](#accessdenied-case) — the stream refused to be read
-- [IOError.Unknown](#unknown-case) — the stream failed for a reason with no case of its own
+- [IOError.Closed](#closed-case) -- the stream was closed before the read finished
+- [IOError.AccessDenied](#accessdenied-case) -- the stream refused to be read
+- [IOError.Unknown](#unknown-case) -- the stream failed for a reason with no case of its own
 
 **See also** &nbsp; [IO.ReadTextToEnd](#readtexttoend-function)
 

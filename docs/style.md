@@ -42,11 +42,11 @@ counter-example.
 
 **Constants are `PascalCase`, not `SCREAMING_CASE`.** This is C#'s rule and not
 C's, and the tree already follows it — `Math.Pi`, `Math.MachineEpsilon`,
-`Path.Separator`. A `const` is part of the surface a caller reads, and there is
+`Path.DirectorySeparatorChar`. A `const` is part of the surface a caller reads, and there is
 no reason for it to shout.
 
 **A `const` that mirrors a foreign one keeps the foreign spelling.** In
-`bindings/`, `GTK_RESPONSE_CANCEL` and `PixelFormat32bppArgb` are named as the
+`bindings/`, `GTK_RESPONSE_CANCEL` and `D3D11_MAP_WRITE_DISCARD` are named as the
 platform names them, because the value of a binding is that a reader can search
 the vendor's documentation for the identifier in front of them. This is the one
 place `SCREAMING_CASE` is correct, and it stops at the binding's edge: what
@@ -608,7 +608,7 @@ public Result<String, IOError> ReadAllText(String path)
 The tags are `@param`, `@typeparam`, `@returns`, `@value`, `@remarks`,
 `@example`, `@failure`, `@see`, `@seealso` and `@inheritdoc` — .NET's set,
 with `@failure` in place of `<exception>` because nothing is thrown here.
-[§1.7 of the specification](spec/01-modules.md#17--documentation-blocks) is the
+[section 1.8 of the specification](spec/01-modules.md#18--documentation-blocks) is the
 whole of it.
 
 **A tag is checked.** A `@param` naming no parameter, a `@failure` naming a
@@ -622,9 +622,10 @@ none** — half of them is SL0741, for the same reason C# reports CS1573.
 `// ====== the colour` and `// ------ bounds` forms are both in use; keep
 whichever the file already uses rather than mixing them.
 
-**Prose uses em dashes, not `--`.** A patch script that matches on `--` will
-fail against text that uses `—`; check which is there before writing the
-pattern.
+**Documentation and comments are ASCII.** No em dashes, section signs, arrows
+or curly quotes: `--` for a dash, "section" for the sign. Older text still has
+them, so a patch script that matches on `--` can fail against a line that uses
+the Unicode dash; check which is there before writing the pattern.
 
 ### 4.6 Commit messages
 
@@ -641,7 +642,7 @@ need no body.
 
 ## 5. Files
 
-- **One module per file**, named for what it holds. `stdlib/Collections.sl`
+- **One module per file**, named for what it holds. `stdlib/Collections/List.sl`
   declares `module Standard.Collections`.
 - **Every source file carries its licence header** — the GPL-with-runtime-
   exception block for `stdlib/`, `runtime/` and `forms/`, the

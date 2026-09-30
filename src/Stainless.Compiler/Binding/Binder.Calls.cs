@@ -192,6 +192,21 @@ public sealed partial class Binder
                 }
             }
 
+            // A generic method of the enclosing type, for the same reason.
+            if (callee.Name.Parts.Count == 1 && _context.Function?.ContainingType is { } enclosing &&
+                GenericMethodsNamed(enclosing, callee.Name.Text) is { Count: > 0 } generics)
+            {
+                var instantiated = InferAndInstantiate(generics, syntax, arguments);
+                if (instantiated is null) return new BoundErrorExpression(syntax.Span);
+
+                if (instantiated.IsStatic)
+                    return BuildCall(syntax, instantiated, receiver: null, arguments);
+
+                var receiver = BindImplicitThis(callee.Span);
+                if (receiver is not null)
+                    return BuildCall(syntax, instantiated, receiver, arguments);
+            }
+
             var candidates = ResolveFunctionCandidates(callee.Name);
 
             // An instantiation of a generic is an ordinary function with an
@@ -206,20 +221,6 @@ public sealed partial class Binder
 
             if (candidates.Count > 0)
                 return BindFunctionCall(syntax, candidates, callee.Name.Text, arguments);
-
-            if (callee.Name.Parts.Count == 1 && _context.Function?.ContainingType is { } enclosing)
-            {
-                var generics = GenericMethodsNamed(enclosing, callee.Name.Text);
-                if (generics.Count > 0)
-                {
-                    var instantiated = InferAndInstantiate(generics, syntax, arguments);
-                    if (instantiated is null) return new BoundErrorExpression(syntax.Span);
-
-                    var receiver = BindImplicitThis(callee.Span);
-                    if (receiver is not null)
-                        return BuildCall(syntax, instantiated, receiver, arguments);
-                }
-            }
 
             // Inside a lambda, a bare name may be a method of the object the
             // lambda was written in. That object is captured, and the call then
@@ -257,7 +258,7 @@ public sealed partial class Binder
             {
                 if (raised.ContainingType != _context.Function.ContainingType)
                 {
-                    diagnostics.Error("SL0554", callee.Span,
+                    diagnostics.Error("SL0823", callee.Span,
                         $"'{raised.Name}' is declared by '{raised.ContainingType.Name}', and only " +
                         "the type that declares an event may raise it. A derived class raises " +
                         "one through a protected method its base provides for that",
@@ -270,7 +271,7 @@ public sealed partial class Binder
                 var self = BindImplicitThis(callee.Span);
                 if (self is null)
                 {
-                    diagnostics.Error("SL0553", callee.Span,
+                    diagnostics.Error("SL0822", callee.Span,
                         $"'{raised.Name}' is an event and belongs to an instance, so it cannot " +
                         "be raised from a static method");
                     return new BoundErrorExpression(syntax.Span);
@@ -1045,7 +1046,7 @@ public sealed partial class Binder
             // which is the one thing having a word for it prevents.
             if (namedType.FindEvent(member.Member) is { } raised)
             {
-                diagnostics.Error("SL0554", member.Span,
+                diagnostics.Error("SL0823", member.Span,
                     $"'{namedType.Name}.{member.Member}' is an event, and only " +
                     $"'{raised.ContainingType.Name}' may raise it -- from inside, by writing " +
                     $"'{member.Member}(...)'. From out here an event can only be subscribed to " +
@@ -1202,7 +1203,7 @@ public sealed partial class Binder
 
         if (BindImplicitThis(syntax.Span) is not { } receiver)
         {
-            diagnostics.Error("SL0553", syntax.Span,
+            diagnostics.Error("SL0822", syntax.Span,
                 $"'{cleared.Name}' is an event and belongs to an instance, so it cannot be " +
                 "reached from a static method");
             return new BoundErrorExpression(syntax.Span);
@@ -1380,8 +1381,14 @@ public sealed partial class Binder
                 function.TypeArguments[0].IsReferenceOrContainsReferences());
 
         var converted = ConvertArguments(function, ordered, spans);
+        var order = WrittenOrder(map, converted.Count);
+
+        if (_builtins.IsArrayCreate(function) && order is null &&
+            converted is [var count, { Type: ClosureTypeSymbol } make])
+            return new BoundArrayCreate(syntax.Span, (ArrayTypeSymbol)function.ReturnType, count, make);
+
         return new BoundCall(syntax.Span, function, receiver, converted)
-            { IsNonVirtual = nonVirtual, EvaluationOrder = WrittenOrder(map, converted.Count) };
+            { IsNonVirtual = nonVirtual, EvaluationOrder = order };
     }
 
     /// <summary><c>base.M()</c> where the base only declares <c>M</c>: there is no body to call.</summary>
@@ -1652,6 +1659,7 @@ public sealed partial class Binder
         // BindConversion so that overload resolution and the conversion itself
         // agree about what is possible.
         if (PromotedToOptional(argument, target) is not null) return true;
+        if (FillsSlot(argument, target) is not null) return true;
 
         if (ClassifyConversion(argument.Type, target, explicitCast: false) is not null) return true;
 

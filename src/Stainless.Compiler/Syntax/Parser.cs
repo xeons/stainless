@@ -988,7 +988,7 @@ public sealed class Parser
         if (declaration is FunctionDeclSyntax function)
             return function with { CallingConvention = convention };
 
-        _diagnostics.Error("SL0592", declaration.Span,
+        _diagnostics.Error("SL0827", declaration.Span,
             "a calling convention says how a function is called, so it can only be written on " +
             "one; this declares a value");
 
@@ -1519,7 +1519,7 @@ public sealed class Parser
         // is no foreign function on the other end of one, so a convention would
         // describe nothing.
         if (carriesReceiver && convention != CallingConvention.Default)
-            _diagnostics.Error("SL0621", SpanFrom(start),
+            _diagnostics.Error("SL0827", SpanFrom(start),
                 $"closure '{name}' cannot name a calling convention; only a delegate can, "
                 + "because only a delegate is a C function pointer");
 
@@ -1672,7 +1672,7 @@ public sealed class Parser
         // event exists to refuse. Said here rather than at the binder, because
         // the parser is where the reader is still looking at the '='.
         if (At(TokenKind.Equals))
-            _diagnostics.Error("SL0547", SpanFrom(start),
+            _diagnostics.Error("SL0817", SpanFrom(start),
                 $"'{name}' is an event, so it cannot be given a value: an event is the " +
                 "subscribers it has, and it starts with none. Subscribe with '+='");
 
@@ -1746,7 +1746,9 @@ public sealed class Parser
         {
             Expect(TokenKind.Semicolon);
             if (!modifiers.HasFlag(Modifiers.Abstract))
-                _diagnostics.Error("SL0559", SpanFrom(start), "an operator needs a body");
+                _diagnostics.Error("SL0559", SpanFrom(start),
+                    "an operator needs a body; one an interface requires of each type that " +
+                    "implements it is declared 'static abstract'");
         }
 
         return new FunctionDeclSyntax(
@@ -1851,7 +1853,7 @@ public sealed class Parser
             RejectAttributes(attributes, "a function");
 
             if (isReadonly)
-                _diagnostics.Error("SL0376", SpanFrom(start),
+                _diagnostics.Error("SL0828", SpanFrom(start),
                     $"'{function.Name}' is a method, and 'readonly' is about storage");
             return member;
         }
@@ -1862,7 +1864,7 @@ public sealed class Parser
 
         if (member is not FieldDeclSyntax field)
         {
-            _diagnostics.Error("SL0376", SpanFrom(start),
+            _diagnostics.Error("SL0828", SpanFrom(start),
                 $"'static' cannot be written on this");
             return member;
         }
@@ -3040,7 +3042,22 @@ public sealed class Parser
         Advance();
 
         if (At(TokenKind.Less)) ParseTypeParameterList([], "a function's");
-        return At(TokenKind.OpenParen) && !_diagnostics.HasErrors;
+        if (!At(TokenKind.OpenParen) || _diagnostics.HasErrors) return false;
+
+        // `ready ? Start() : Stop();` reads as far as here like a function
+        // `ready? Start()`. A colon after the parenthesis is a conditional's,
+        // and nothing follows a function's parameters with one.
+        int depth = 0;
+        do
+        {
+            if (At(TokenKind.OpenParen)) depth++;
+            else if (At(TokenKind.CloseParen)) depth--;
+            else if (At(TokenKind.EndOfFile)) return false;
+            Advance();
+        }
+        while (depth > 0);
+
+        return !At(TokenKind.Colon);
     }
 
     /// <summary>

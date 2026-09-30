@@ -143,8 +143,8 @@ end at the end, and that is not a mistake in it.
 
 **Parameters**
 
-- `frame` — which frame, counting from zero
-- `channel` — which channel of it, 0 or 1
+- `frame` -- which frame, counting from zero
+- `channel` -- which channel of it, 0 or 1
 
 **See also** &nbsp; [AudioClip.SetSample](#setsample-method)
 
@@ -162,9 +162,9 @@ set and the bits below them cleared. Out of range does nothing.
 
 **Parameters**
 
-- `frame` — which frame, counting from zero
-- `channel` — which channel of it, 0 or 1
-- `value` — the sample, -32768 to 32767, clamped to that
+- `frame` -- which frame, counting from zero
+- `channel` -- which channel of it, 0 or 1
+- `value` -- the sample, -32768 to 32767, clamped to that
 
 **See also** &nbsp; [AudioClip.GetSample](#getsample-method)
 
@@ -314,9 +314,9 @@ A format written out.
 
 **Parameters**
 
-- `sampleRate` — frames per second: 44100 for a CD, 8000 for a telephone
-- `channels` — 1 for mono, 2 for stereo, and nothing else
-- `bits` — 8 or 16, the width of one sample
+- `sampleRate` -- frames per second: 44100 for a CD, 8000 for a telephone
+- `channels` -- 1 for mono, 2 for stereo, and nothing else
+- `bits` -- 8 or 16, the width of one sample
 
 <sub>[stdlib/Media/Audio/AudioFormat.sl:61](../../stdlib/Media/Audio/AudioFormat.sl#L61)</sub>
 
@@ -443,10 +443,10 @@ to the last one is to resample rather than to give up.
 
 **Fails with**
 
-- [AudioError.NoBackend](#nobackend-case) — there is no audio library on this machine
-- [AudioError.Format](#format-case) — the format is not one this module handles, or not one the engine would take
-- [AudioError.Device](#device-case) — there is nothing to play through, or the stream would not open
-- [AudioError.Busy](#busy-case) — something else has the device in exclusive mode
+- [AudioError.NoBackend](#nobackend-case) -- there is no audio library on this machine
+- [AudioError.Format](#format-case) -- the format is not one this module handles, or not one the engine would take
+- [AudioError.Device](#device-case) -- there is nothing to play through, or the stream would not open
+- [AudioError.Busy](#busy-case) -- something else has the device in exclusive mode
 
 <sub>[stdlib/Media/Audio/AudioPlayer.sl:129](../../stdlib/Media/Audio/AudioPlayer.sl#L129)</sub>
 
@@ -485,9 +485,9 @@ truncating swaps the channels for the rest of the stream.
 
 **Fails with**
 
-- [AudioError.Format](#format-case) — the length is not a whole number of frames
-- [AudioError.Device](#device-case) — the device failed or went away while this was writing to it
-- [AudioError.Closed](#closed-case) — `Close` has already been called
+- [AudioError.Format](#format-case) -- the length is not a whole number of frames
+- [AudioError.Device](#device-case) -- the device failed or went away while this was writing to it
+- [AudioError.Closed](#closed-case) -- `Close` has already been called
 
 **See also** &nbsp; [AudioPlayer.DrainBuffer](#drainbuffer-method)
 
@@ -566,10 +566,10 @@ A device open for this format. Fails as `AudioPlayer.Open` does.
 
 **Fails with**
 
-- [AudioError.NoBackend](#nobackend-case) — there is no audio library on this machine
-- [AudioError.Format](#format-case) — the format is not one this module handles, or not one the engine would take
-- [AudioError.Device](#device-case) — there is nothing to record from, or the stream would not open
-- [AudioError.Busy](#busy-case) — something else has the device in exclusive mode
+- [AudioError.NoBackend](#nobackend-case) -- there is no audio library on this machine
+- [AudioError.Format](#format-case) -- the format is not one this module handles, or not one the engine would take
+- [AudioError.Device](#device-case) -- there is nothing to record from, or the stream would not open
+- [AudioError.Busy](#busy-case) -- something else has the device in exclusive mode
 
 **See also** &nbsp; [AudioPlayer.Open](#open-method)
 
@@ -616,8 +616,8 @@ buffered, up to about a fifth of a second of it, and dropped after that.
 
 **Fails with**
 
-- [AudioError.Device](#device-case) — the device would not start
-- [AudioError.Closed](#closed-case) — `Close` has already been called
+- [AudioError.Device](#device-case) -- the device would not start
+- [AudioError.Closed](#closed-case) -- `Close` has already been called
 
 **See also** &nbsp; [AudioRecorder.Read](#read-method)
 
@@ -694,10 +694,10 @@ what a beep traditionally is.
 
 **Parameters**
 
-- `format` — what the samples are to be
-- `frequency` — in hertz
-- `seconds` — how long it lasts
-- `amplitude` — 0.0 to 1.0, where 1.0 is as loud as the format goes
+- `format` -- what the samples are to be
+- `frequency` -- in hertz
+- `seconds` -- how long it lasts
+- `amplitude` -- 0.0 to 1.0, where 1.0 is as loud as the format goes
 
 **See also** &nbsp; [Tone.CreateSine](#createsine-method)
 
@@ -740,8 +740,8 @@ The bytes of a `.wav` file, read.
 
 **Fails with**
 
-- [AudioError.Format](#format-case) — a WAVE that is not uncompressed PCM, or whose rate, channel count or width is not one this module handles
-- [AudioError.Malformed](#malformed-case) — not a RIFF/WAVE at all, or one with no `fmt ` chunk before its `data`
+- [AudioError.Format](#format-case) -- a WAVE that is not uncompressed PCM, or whose rate, channel count or width is not one this module handles
+- [AudioError.Malformed](#malformed-case) -- not a RIFF/WAVE at all, or one with no `fmt ` chunk before its `data`
 
 **See also** &nbsp; [Wav.Encode](#encode-method)
 
@@ -770,9 +770,9 @@ A `.wav` on disk, read.
 
 **Fails with**
 
-- [AudioError.Format](#format-case) — a WAVE that is not uncompressed PCM, or one shaped in a way this module does not handle
-- [AudioError.Malformed](#malformed-case) — not a RIFF/WAVE at all
-- [AudioError.IO](#io-case) — the file could not be read; the `IOError` behind it is not carried
+- [AudioError.Format](#format-case) -- a WAVE that is not uncompressed PCM, or one shaped in a way this module does not handle
+- [AudioError.Malformed](#malformed-case) -- not a RIFF/WAVE at all
+- [AudioError.IO](#io-case) -- the file could not be read; the `IOError` behind it is not carried
 
 **See also** &nbsp; [Wav.Save](#save-method)
 
@@ -788,7 +788,7 @@ A clip written to a `.wav` on disk.
 
 **Fails with**
 
-- [AudioError.IO](#io-case) — the file could not be written; the `IOError` behind it is not carried
+- [AudioError.IO](#io-case) -- the file could not be written; the `IOError` behind it is not carried
 
 **See also** &nbsp; [Wav.FromFile](#fromfile-method)
 
@@ -857,10 +857,10 @@ tens of milliseconds and this does it every time.
 
 **Fails with**
 
-- [AudioError.NoBackend](#nobackend-case) — there is no audio library on this machine
-- [AudioError.Format](#format-case) — the clip's format is not one this module handles, the device would not take it, or its samples are not whole frames
-- [AudioError.Device](#device-case) — there is nothing to play through, or the device failed part way
-- [AudioError.Busy](#busy-case) — something else has the device and will not share it
+- [AudioError.NoBackend](#nobackend-case) -- there is no audio library on this machine
+- [AudioError.Format](#format-case) -- the clip's format is not one this module handles, the device would not take it, or its samples are not whole frames
+- [AudioError.Device](#device-case) -- there is nothing to play through, or the device failed part way
+- [AudioError.Busy](#busy-case) -- something else has the device and will not share it
 
 **See also** &nbsp; [AudioPlayer](#audioplayer-class)
 
@@ -879,10 +879,10 @@ sound as it arrives, wants an `AudioRecorder`.
 
 **Fails with**
 
-- [AudioError.NoBackend](#nobackend-case) — there is no audio library on this machine
-- [AudioError.Format](#format-case) — the format is not one this module handles, or not one the device would take
-- [AudioError.Device](#device-case) — there is nothing to record from, or the device refused to start
-- [AudioError.Busy](#busy-case) — something else has the device and will not share it
+- [AudioError.NoBackend](#nobackend-case) -- there is no audio library on this machine
+- [AudioError.Format](#format-case) -- the format is not one this module handles, or not one the device would take
+- [AudioError.Device](#device-case) -- there is nothing to record from, or the device refused to start
+- [AudioError.Busy](#busy-case) -- something else has the device and will not share it
 
 **See also** &nbsp; [AudioRecorder](#audiorecorder-class)
 

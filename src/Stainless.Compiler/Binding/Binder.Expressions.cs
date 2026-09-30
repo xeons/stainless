@@ -1208,6 +1208,14 @@ public sealed partial class Binder
                 return new BoundErrorExpression(syntax.Span);
             }
 
+            if (target is BoundFieldAccess { Field.IsBitField: true })
+            {
+                diagnostics.Error("SL0443", syntax.Span,
+                    "a bit-field is some of the bits of its storage unit and has no address " +
+                    "of its own; copy it into a local first");
+                return new BoundErrorExpression(syntax.Span);
+            }
+
             // What a pointer is used for is not followed, so taking one is a write.
             NoteWriteTo(target);
             return new BoundAddressOf(syntax.Span, target.Type.MakePointerType(), target);
@@ -2511,7 +2519,7 @@ public sealed partial class Binder
         // everybody else's.
         if (syntax.Operator is not (TokenKind.PlusEquals or TokenKind.MinusEquals))
         {
-            diagnostics.Error("SL0556", span,
+            diagnostics.Error("SL0825", span,
                 $"'{subscribed.ContainingType.Name}.{subscribed.Name}' is an event, so it takes " +
                 $"'+=' and '-=' and nothing else. '{syntax.Operator.FixedText()}' would " +
                 "replace the whole list of subscribers, which is not one subscriber's to do",
@@ -2521,7 +2529,7 @@ public sealed partial class Binder
 
         if (receiver is null)
         {
-            diagnostics.Error("SL0553", span,
+            diagnostics.Error("SL0822", span,
                 $"'{subscribed.Name}' is an event and belongs to an instance, so it cannot be " +
                 "reached from a static method");
             return new BoundErrorExpression(syntax.Span);
@@ -2746,6 +2754,10 @@ public sealed partial class Binder
                 NotVisible(property.ContainingType, property.Name, getter.IsProtected));
             return new BoundErrorExpression(span);
         }
+
+        // What a slot holds is read in place, and its layout is the compiler's.
+        if (receiver is not null && property is { ContainingType: SlotTypeSymbol slot, Name: "Value" })
+            return new BoundSlotValue(span, slot, receiver);
 
         // A struct accessor takes its receiver by pointer, exactly as a struct
         // method does. A static one has none at all.

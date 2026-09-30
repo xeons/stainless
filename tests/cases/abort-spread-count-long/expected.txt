@@ -1,0 +1,2 @@
+kept 2 two
+stainless: index 2 is outside the bounds of an array of length 2

@@ -79,8 +79,9 @@ public sealed partial class LlvmEmitter
         BoundClosureCreate { Receiver: null } => Hold.Uncounted,
 
         BoundCall or BoundIndirectCall or BoundClosureCall or BoundNew or BoundStructNew
-            or BoundClosure or BoundClosureCreate or BoundNewArray or BoundTupleCreate
-            or BoundVariantConstruction or BoundInterpolatedString or BoundSlice => Hold.Owned,
+            or BoundClosure or BoundClosureCreate or BoundNewArray or BoundArrayFill or BoundTupleCreate
+            or BoundVariantConstruction or BoundInterpolatedString or BoundSlice
+            or BoundSlotFill => Hold.Owned,
 
         // One in the frame ends with its statement, so nothing may keep it.
         BoundArrayLiteral literal => literal.OnStack ? Hold.Borrowed : Hold.Owned,
@@ -567,9 +568,7 @@ public sealed partial class LlvmEmitter
             _body.Clear();
             _blockTerminated = false;
 
-            string tag = Emit("i8",
-                $"load i8, ptr {Emit("ptr", $"getelementptr inbounds {StructName(variant)}, " +
-                                           "ptr %value, i32 0, i32 0")}");
+            string tag = LoadCaseNumber("%value", variant);
 
             string endLabel = NextLabel("variant.done");
             var arms = new List<(VariantCaseSymbol Case, string Label)>();
@@ -590,8 +589,7 @@ public sealed partial class LlvmEmitter
             {
                 Label(label);
 
-                string address = Emit("ptr",
-                    $"getelementptr inbounds {StructName(variant)}, ptr %value, i32 0, i32 1");
+                string address = PayloadAddress("%value", variant);
 
                 if (retaining) RetainFieldsAt(address, variantCase.Payload!);
                 else ReleaseFieldsAt(address, variantCase.Payload!);

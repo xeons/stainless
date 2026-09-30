@@ -15,6 +15,9 @@ class Tag
 int Max(int a, int b) => a > b ? a : b;
 
 // Nested, to prove the false arm groups to the right.
+int Start() { printf("start\n"); return 1; }
+int Stop() { printf("stop\n"); return 0; }
+
 String Band(int score)
 {
     return score >= 90 ? "high" : score >= 50 ? "middle" : "low";
@@ -42,6 +45,12 @@ int Main()
     var b = new Tag("second");
     Console.WriteLine((1 < 2 ? a : b).Name);
     Console.WriteLine((1 > 2 ? a : new Tag("fresh")).Name);
+
+    // A statement of its own, on a bare name: not a function `ready? Start()`.
+    bool ready = true;
+    ready ? Start() : Stop();
+    ready = false;
+    ready ? Start() : Stop();
 
     printf("done\n");
     return 0;

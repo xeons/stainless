@@ -21,8 +21,6 @@
 
 module Standard.Collections;
 
-import Standard.Unchecked;
-
 // ------------------------------------------------------------------- queue
 
 /// First in, first out, over a circular buffer.
@@ -34,14 +32,14 @@ import Standard.Unchecked;
 /// @typeparam T  what the queue holds; nothing is asked of it
 public class Queue<T> : IEnumerable<T>
 {
-    T[] _items;
+    Slot<T>[] _items;
     nuint _head;
     nuint _count;
 
     /// An empty queue with room for a few items before it first grows.
     public Queue()
     {
-        _items = NewUninitializedArray<T>(8);
+        _items = new Slot<T>[8];
         _head = 0;
         _count = 0;
     }
@@ -83,11 +81,11 @@ public class Queue<T> : IEnumerable<T>
         if (_count == 0)
             sl_fail("Queue.Dequeue: the queue is empty");
 
-        var item = _items[_head];
+        var item = _items[_head].Value;
 
         // Blanked rather than left behind, so a reference is released now and
         // not when the slot is eventually written over.
-        ClearElement(_items, _head);
+        _items[_head].Clear();
         _head = (_head + 1) & (_items.Length - 1);
         _count--;
         return item;
@@ -100,14 +98,14 @@ public class Queue<T> : IEnumerable<T>
     {
         if (_count == 0)
             sl_fail("Queue.Peek: the queue is empty");
-        return _items[_head];
+        return _items[_head].Value;
     }
 
     /// Drops everything. The ring is replaced rather than blanked, so
     /// anything it held is released now.
     public void Clear()
     {
-        _items = NewUninitializedArray<T>(8);
+        _items = new Slot<T>[8];
         _head = 0;
         _count = 0;
     }
@@ -118,15 +116,14 @@ public class Queue<T> : IEnumerable<T>
     public List<T> ToList()
     {
         var result = new List<T>(_count);
-        nuint first = FirstRunLength;
-        result.AddRange(_items[_head:_head + first]);
-        result.AddRange(_items[:_count - first]);
+        for (nuint i = 0u; i < _count; i++)
+            result.Add(GetItemAt(i));
         return result;
     }
 
     /// The item `index` places behind the front, counting from zero. Used by
     /// the cursor; a queue is not an indexable thing in its own right.
-    T GetItemAt(nuint index) => _items[(_head + index) & (_items.Length - 1)];
+    T GetItemAt(nuint index) => _items[(_head + index) & (_items.Length - 1)].Value;
 
     /// A cursor over the items, oldest first, for `foreach`. Walks the ring
     /// in place rather than copying, unlike `ToList`. Enqueueing or dequeueing
@@ -138,7 +135,7 @@ public class Queue<T> : IEnumerable<T>
 
     void GrowStorage()
     {
-        var bigger = NewUninitializedArray<T>(_items.Length * 2);
+        var bigger = new Slot<T>[_items.Length * 2];
         nuint first = FirstRunLength;
         _items[_head:_head + first].CopyTo(bigger);
         _items[:_count - first].CopyTo(bigger[first:]);

@@ -234,7 +234,8 @@ A dependency says which versions will do:
 | `1.2.0`, `^1.2.0` | ≥ 1.2.0 and < 2.0.0 |
 | `^0.2.3` | ≥ 0.2.3 and < 0.3.0 |
 | `^0.0.3` | 0.0.3 only |
-| `~1.2.3`, `~1.2` | ≥ 1.2.3 and < 1.3.0 |
+| `~1.2.3` | >= 1.2.3 and < 1.3.0 |
+| `~1.2` | >= 1.2.0 and < 1.3.0 |
 | `~1` | ≥ 1.0.0 and < 2.0.0 |
 | `=1.2.0` | 1.2.0 exactly |
 | `>=1.2, <2.0` | both bounds |
@@ -459,7 +460,8 @@ nothing. What counts as an input:
   once the package has been bound
 - every package compiled *into* it, on the same terms
 - every library it was bound against, by the surface that library described
-- the optimisation level, debug flag, ABI, runtime and defines
+- the optimisation level, debug flag, debug format, ABI, runtime and defines
+- the target
 - where the output goes
 
 Timestamps are deliberately not among them. A file restored from an archive, a

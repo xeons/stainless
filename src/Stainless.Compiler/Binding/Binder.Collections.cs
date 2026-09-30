@@ -290,8 +290,26 @@ public sealed partial class Binder
             filled.Add(Walking(spread, copy));
         }
 
-        return new BoundCollection(span, arrayType, element, CollectionForm.Filled, filled);
+        // A length read from a property is the type's word, not a fact. The
+        // array is checked full before anything can read it; an overrun is
+        // already stopped by the index check in CopySpreadElements.
+        FunctionSymbol? finish = null;
+        if (parts.Any(p => IsWalked(p) && IsCountedByProperty(((BoundCollectionSpread)p).Source.Type)))
+        {
+            finish = SpreadHelper("FinishSpreadElements", [element], span);
+            if (finish is null)
+                return new BoundErrorExpression(span);
+        }
+
+        return new BoundCollection(span, arrayType, element, CollectionForm.Filled, filled)
+        {
+            Finish = finish,
+        };
     }
+
+    /// <summary>Whether a counted spread's length comes from a <c>Count</c> or <c>Length</c> property.</summary>
+    private static bool IsCountedByProperty(TypeSymbol type) =>
+        type is not (ArrayTypeSymbol or SliceTypeSymbol or FixedArrayTypeSymbol);
 
     /// <summary>
     /// An array from spreads not all of which can say how long they are:

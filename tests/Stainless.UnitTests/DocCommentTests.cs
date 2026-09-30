@@ -232,8 +232,8 @@ public class DocCommentTests
             """);
 
         Assert.Contains("**Parameters**", page);
-        Assert.Contains("- `path` — where to read from", page);
-        Assert.Contains("- `trim` — whether to strip whitespace", page);
+        Assert.Contains("- `path` -- where to read from", page);
+        Assert.Contains("- `trim` -- whether to strip whitespace", page);
         Assert.Contains("**Returns** &nbsp; the contents", page);
     }
 
@@ -258,7 +258,7 @@ public class DocCommentTests
             """);
 
         Assert.Contains("**Fails with**", page);
-        Assert.Contains("[E.Missing](#missing-case) — there is no file", page);
+        Assert.Contains("[E.Missing](#missing-case) -- there is no file", page);
     }
 
     [Fact]
@@ -366,7 +366,7 @@ public class DocCommentTests
             }
             """);
 
-        Assert.Contains("- `surface` — where to draw", page);
+        Assert.Contains("- `surface` -- where to draw", page);
         Assert.Contains("One stroke, and no corners.", page);
     }
 

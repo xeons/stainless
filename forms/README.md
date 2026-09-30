@@ -2,7 +2,7 @@
 
 A GUI framework for Stainless: **the LCL's architecture, C#'s names.**
 
-> An extreme rough draft, like everything else here. Two backends now --
+> An extreme rough draft, like everything else here. Two backends --
 > Win32 and GTK 3 -- and the control set is everything the seam declares.
 
 ```csharp
@@ -117,6 +117,8 @@ src/Controls/Menus.sl       MainMenu, PopupMenu, MenuItem      (lcl/menus.pp)
 src/Controls/Common.sl      ToolBar, StatusBar, ProgressBar, TrackBar,
                             TabControl, TreeView, ListView, ImageList,
                             CoolBar, CoolBand            (lcl/comctrls.pp)
+src/Controls/Chrome.sl      ChromeRenderer, SystemChromeRenderer,
+                            OfficeXpRenderer
 src/Controls/Drawn.sl       PaintBox, Shape, Bevel, Splitter (lcl/extctrls.pp)
 src/Controls/Dialogs.sl     OpenDialog, SaveDialog, FolderDialog, ColorDialog,
                             FontDialog, InputDialog, Timer
@@ -129,9 +131,9 @@ src/Platform/Win32/*.sl     the Windows backend       (lcl/interfaces/win32/)
 src/Platform/Gtk/*.sl       the GTK 3 backend           (lcl/interfaces/gtk3/)
 ```
 
-Roughly 9,500 lines of portable code against the LCL's 276,000 — which is the
-scope difference, not a compression ratio — plus about 5,500 per backend. See
-*What is not here* below.
+Roughly 12,900 lines of portable code against the LCL's 276,000 -- which is the
+scope difference, not a compression ratio -- plus about 7,700 per backend. See
+*What is ported, and what is left* below.
 
 ---
 
@@ -166,7 +168,7 @@ where that choice is made, and it is a four-line `#if`.
 
 Every sample takes `--selftest`, which builds the same window, pumps the
 message queue, checks what can be checked without a person in front of it, and
-quits. `demo` makes 21 such checks, `common` 44 and `buttons` 51 — docking,
+quits. `demo` makes 26 such checks, `common` 50 and `buttons` 53 -- docking,
 anchoring, native handles, text round-tripping through the platform, a click
 reaching its handler, a menu item resolving from its id, a cool bar's bands
 wrapping onto a second row when the window narrows. That is what makes a GUI
@@ -174,7 +176,7 @@ something a build can run, and it is how every bug listed under *Decisions
 worth knowing about* was found.
 
 **And a self-test is not a screenshot, which is the lesson this library keeps
-being taught.** `buttons` passed all 51 of its checks on GTK while its three
+being taught.** `buttons` passed every one of its checks on GTK while its three
 speed buttons and its button strip's bevel were drawn nowhere at all — because
 a windowless control is drawn by its parent, and no GTK container but
 `CustomControl` was passing the cairo context down. The same fix made the
@@ -202,7 +204,7 @@ handler ran.
 On Windows there is a script for it, [screenshot.ps1](screenshot.ps1):
 
 ```powershell
-.\forms\screenshot.ps1 -Program .\samples\forms\build\buttons.exe -Arguments 1
+.\forms\screenshot.ps1 -Program .\samples\forms\build\buttons.exe -Arguments "--page","1"
 .\forms\screenshot.ps1 -Program .\ide\build\stainless-ide.exe -Out shots\ide.png
 .\forms\screenshot.ps1 -ProcessId 1234 -Shots 3 -Every 1500 -Keep
 .\forms\screenshot.ps1 -Program .\ide\build\stainless-ide.exe -List
@@ -217,7 +219,7 @@ belong in a bug report. Asking the window means it works with nothing visible,
 works with another window in front of it, and collects nothing but the program
 under test.
 
-Three switches earn their place:
+Five switches earn their place:
 
 - `-Popups` adds the menus, drop-downs and dialogs the window *owns*. They are
   top-level windows of their own and are not part of the main window's picture,
@@ -228,6 +230,12 @@ Three switches earn their place:
   filling its output pane while it ran.
 - `-List` prints the windows it can see and captures nothing, which is how the
   console in the picture was found in the first place.
+- `-Hover x,y` rests the pointer on a point of the client area for `-Rest`
+  milliseconds before capturing, which is the only way to photograph a
+  tooltip. Pair it with `-Popups`: a tip is a window of its own.
+- `-Drag x,y -DragTo x,y` presses the left button, drags and releases, then
+  captures. A splitter or a thumb is proved by dragging it, not by calling the
+  handler that would have run.
 
 It waits for the window rather than sleeping a fixed time, and then waits a
 further beat on purpose: a toolbar renders its buttons lazily and a capture
@@ -290,9 +298,8 @@ dialog can be shown before the main window. A quit asked for during the dialog
 ends its loop and then the program's: the Win32 loop posts `WM_QUIT` back rather
 than consuming it, and `Application` remembers the quit either way.
 
-**The modal loop also does the keyboard pre-processing the main loop always
-did**, and `ShowModal` never called it — so a dialog, the one window where that
-matters most, had none of it.
+**The modal loop does the same keyboard pre-processing as the main loop**,
+because a dialog is the one window where that matters most.
 
 **`FORMS_REFLECT` marks the controls `[Reflect]`.** A form designer finds a
 control's properties by name, sets them through their setters and lists its
@@ -308,19 +315,16 @@ order from that same stacking, so the form takes them before
 depth first — the LCL's default tab order — and an arrow key a control does
 not want moves among its siblings, carrying a radio button's tick with it.
 `IsDialogMessageW` keeps Enter and the access keys. A `SpinEdit` names its
-buddy rather than taking the window before it in the stacking, which after
-the change was somebody else's text box. Escape is handled just above it
+buddy rather than taking the window before it in the stacking, which with
+every peer raised is somebody else's text box. Escape is handled just above it
 rather than through it: `IsDialogMessageW` turns Escape into a `WM_COMMAND`
 carrying `IDCANCEL`, which means something only to a real dialog box with a
 control of that id, and these are ordinary windows. Claiming id 2 in `WM_COMMAND`
 was the alternative and could not be told apart from a menu item numbered 2.
 
-**`Control.DoubleClick` is raised, which it was not for a long time.** The event
-was declared and `OnDoubleClick` existed, and nothing on either backend ever
-called it — so every handler attached to it anywhere was dead, silently, and the
-only symptom was a double-click doing nothing at all. It is raised from
-`WM_LBUTTONDBLCLK` on Win32 and `GDK_2BUTTON_PRESS` on GTK, in `ControlPeer` and
-`GtkPeer` rather than per control, so it works for everything at once.
+**`Control.DoubleClick` is raised by the peer, not by each control.** It comes
+from `WM_LBUTTONDBLCLK` on Win32 and `GDK_2BUTTON_PRESS` on GTK, in
+`ControlPeer` and `GtkPeer`, so it works for everything at once.
 
 The two platforms disagree about the second press and the backends reconcile it
 here rather than leaving it to controls. Windows sends `WM_LBUTTONDBLCLK`
@@ -440,7 +444,7 @@ parent pushes a layer first: `SaveDC`, `IntersectClipRect`,
 
 **And its parent must ask it to.** Only a form handled `WM_PAINT` at first, so a
 `PaintBox` on a tab page was simply never drawn -- no error, no warning, an
-empty rectangle. Every container now draws the windowless children on it, after
+empty rectangle. Every container draws the windowless children on it, after
 letting the platform control paint itself.
 
 **And on GTK, its parent is the only thing that ever holds the brush.** A
@@ -449,7 +453,7 @@ is the one its parent's `draw` handler is given. Only `CustomControl` connected
 that signal, so a `PaintBox` on a `Panel`, a `Bevel` on a tab page and a
 `SpeedButton` anywhere were laid out, hit-tested, clickable and invisible --
 for months, with every self-test passing. `GtkContainerPeer.ConnectPaintReports` is
-now called by the panel, the group box and the window, and answers false so
+called by the panel, the group box and the window, and answers false so
 that GTK still draws the real children over what the program painted.
 
 **A transparent child's `WM_ERASEBKGND` is not the parent's own.** A
@@ -459,7 +463,7 @@ coordinates and forwards the erase, meaning "paint yours here". A `Panel` is a
 erase on purpose because it double-buffers — so both handed the toolbar back a
 DC exactly as they found it, which is black, and hovering a button repainted
 more of it black. The two looked like different bugs and were one. Every peer
-now tells the two messages apart with `WindowFromDC` and fills the DC's clip
+tells the two messages apart with `WindowFromDC` and fills the DC's clip
 box, which is the only rectangle that is right whatever origin the child chose.
 
 **The mouse reaches a windowless control by hit-testing.** The pointer never
@@ -569,7 +573,7 @@ Every one of these is either a composite of what already exists or a call that
 is already bound.
 
 - **`TTabControl`** — the LCL distinguishes a tabbed control that owns pages
-  from one that only shows tabs. Only the first is here; `Notebook` is now the
+  from one that only shows tabs. Only the first is here; `Notebook` is the
   other half of that family, the one with pages and no tabs at all.
 - **`ScrollBox`** (`forms.pp`) — a container with the platform's own scroll
   bars, which is a different thing from the standalone `ScrollBar` that is
@@ -638,7 +642,7 @@ not turned back into them.
   is why the dialogs come first.
 - **`ColorBox`, `ColorListBox`** (`colorbox.pas`) — owner-drawn lists.
 - **Owner drawing** across list, combo and button. Menus and toolbars have it
-  now -- see *Chrome* below -- and the rest want the same two messages.
+  -- see *Chrome* above -- and the rest want the same two messages.
 - **A tip on a windowless control.** `Control.ToolTip` is the platform's own
   tip, and a tool is a *window* -- so a graphic control, which has none,
   cannot have one and says nothing rather than covering its parent. Both
@@ -657,14 +661,13 @@ not turned back into them.
   this is scrolling, selection, in-place editing and painting, all by hand. It
   is the single biggest thing missing and the one most often wanted.
 - **The rest of `Graphics`** — `TIcon` and `TRegion` (`intfgraphics.pas`,
-  6,698 lines). The rest of the entries that were here are done, and are done
-  *below* this library rather than in it: `Standard.Drawing` reads and writes
-  PNG, JPEG, BMP and GIF, draws onto a picture and reads its pixels, on both
-  platforms — and `Bitmap.FromImage` now hands one of its images to the widget
-  set, so `Bitmap.FromFile` reads all four formats on both backends.
-  `IWidgetSet.CreateBitmap` is the seam that made that possible, and it takes
-  pixels rather than a path precisely so that every decoder question stays on
-  the other side of it.
+  6,698 lines). Pictures themselves are handled *below* this library rather
+  than in it: `Standard.Drawing` reads and writes PNG, JPEG, BMP and GIF, draws
+  onto a picture and reads its pixels, on both platforms -- and
+  `Bitmap.FromImage` hands one of its images to the widget set, so
+  `Bitmap.FromFile` reads all four formats on both backends.
+  `IWidgetSet.CreateBitmap` is the seam for that, and it takes pixels rather
+  than a path so that every decoder question stays on the other side of it.
 - **Printing** (`printers.pas`, `postscriptcanvas.pas`) — a `Canvas` that is a
   printer, plus the dialogs.
 - **Form streaming** (`lresources.pp`, `propertystorage.pas`) — the `.lfm` tier.
@@ -715,8 +718,8 @@ What looking found is below, under *What running it found*. The lesson is the
 general one: a widgetset's tests prove the model, and only a picture proves the
 view.
 
-**Not one interface changed.** Thirty of them, `IWidgetSet`'s forty-five
-methods, and the answer came back that the seam is about controls. The
+**Not one interface changed.** Thirty-nine of them, `IWidgetSet`'s fifty-four
+members, and the answer came back that the seam is about controls. The
 sharpest evidence is `Lists.sl`: a list box, a checked list, a column header, a
 tree and a details list are five window classes on Windows and five interfaces
 in the seam, and GTK answers all five with one `GtkTreeView` over a model.
@@ -767,8 +770,8 @@ What the exercise cost, and it is worth knowing before the next backend:
   user's has to name its receiver -- `this.busy`, or a method that reads it.
   Written bare it compiles, runs, and guards nothing: a checked menu item set
   from its own handler recursed until the stack ran out. The compiler warns
-  about it now (SL0610), which it did not while this was being written, and
-  the comment on `GtkPeer.Echoing` is the long version.
+  about it (SL0610), and the comment on `GtkMenuItemPeer.Echoing` is the long
+  version.
 - **A signal's arity has to match the connector's.** `switch-page` carries a
   page *and* a page number, so a handler connected as if it carried one reads
   the boxed closure out of the wrong register. That is a segfault at the first
@@ -806,7 +809,7 @@ here because the *shape* of it recurs.
 
   **Two of it are not fixed.** A divider drags, and it drags imprecisely --
   the well does not land where the pointer is -- and the pointer still does
-  not change shape over one. Neither is understood: `RefreshCursor` now
+  not change shape over one. Neither is understood: `RefreshCursor`
   pushes the hovered child's cursor to the peer, the peer answers
   `WM_SETCURSOR` with it, `LoadCursorFor` maps `SizeWestEast`, and none of that
   is enough. Whatever is wrong is in the routing between the panel's window
@@ -831,7 +834,7 @@ here because the *shape* of it recurs.
   it -- so a bar on a form worked and a bar on anything else did nothing. The
   IDE's editor is a `CustomControl` and owns both of its bars, so its thumb,
   its arrows and its trough had never moved the text by a line. The routing is
-  on `ControlPeer` now, because every peer is some bar's parent.
+  on `ControlPeer`, because every peer is some bar's parent.
 
   **Nothing could see it, and a reading would have agreed with itself.** The
   bar was drawn, its thumb was sized from the document, and Windows tracked
@@ -876,7 +879,7 @@ here because the *shape* of it recurs.
 ### Before several of the above
 
 - **DPI awareness.** Not a control, but every control is wrong without it on a
-  scaled display -- and now on two platforms, since both backends turn points
+  scaled display -- on both platforms, since both backends turn points
   into pixels at a hard-coded 96.
 
 ## Known rough edges
@@ -897,13 +900,13 @@ here at all. Where one is a backend's rather than the library's, it says so.
   construction**, because on Windows they are creation-time style bits.
 - **`InvalidateRegion` repaints the whole control**, since no peer interface
   takes a region yet.
-- **Visual styles need a manifest**, and it is now inside the binary. The
+- **Visual styles need a manifest**, and it is inside the binary. The
   themed common controls are version 6 of `comctl32`, reachable only through a
   side-by-side manifest naming it; without one Windows loads version 5 and the
   tabs, toolbar and progress bar look like Windows 2000. They work either way,
   which is what makes it easy to miss. `samples/forms/forms.rc` files that
   manifest as `RT_MANIFEST`, and the build compiles it in -- so there is no
-  longer a loose `.exe.manifest` to copy beside each program and lose.
+  loose `.exe.manifest` to copy beside each program and lose.
 - **A `ListView` row is an index, not an object.** `TListItem` is a
   `TPersistent` with a `TStrings` hanging off it, so a thousand rows is two
   thousand objects before any text. Cells are set and read through the list,
@@ -912,8 +915,7 @@ here at all. Where one is a backend's rather than the library's, it says so.
   `Bitmap.FromFile` decodes through `Standard.Drawing` and hands the pixels to
   the widget set through `IWidgetSet.CreateBitmap`. The platform's own loader is
   the fallback for a machine with no imaging library, and on Windows that is
-  `LoadImageW`, which reads `.bmp` and nothing else — which is what this note
-  used to say was the whole story. The two backends differ in one place and it
+  `LoadImageW`, which reads `.bmp` and nothing else. The two backends differ in one place and it
   is written down in the seam: pixels cross as blue, green, red, alpha, so the
   Win32 side copies them straight into a DIB and premultiplies for
   `AlphaBlend`, while the GTK side swaps two bytes per pixel and leaves the
@@ -934,13 +936,11 @@ here at all. Where one is a backend's rather than the library's, it says so.
 
 ### GTK's own
 
-- **Resources work here now, and the note that used to be here was wrong.** It
-  argued that `Bitmap.FromResource` could never work because an ELF binary has
-  no resource section. The premise was right and the conclusion was not: the
+- **Resources work here too.** An ELF binary has no resource section, but the
   compiler carries the compiled `.res` in a section of its own and
-  `Standard.Resources` walks it, so a bitmap compiled into the program is read
-  the same way on both backends. What is genuinely different is
-  `Form.SetIconResource`, which still answers false: an `RT_GROUP_ICON` becomes
+  `Standard.Resources` walks it, so `Bitmap.FromResource` reads a bitmap
+  compiled into the program the same way on both backends. What is genuinely
+  different is `Form.SetIconResource`, which answers false: an `RT_GROUP_ICON` becomes
   a window's icon because *Windows* reads it, and a GTK program's icon comes
   from the desktop's icon theme, keyed by the name in its `.desktop` file.
 - **A size request is a minimum.** A control in a `GtkFixed` is given its
@@ -948,7 +948,7 @@ here at all. Where one is a backend's rather than the library's, it says so.
   overflows rather than clipping. A label ellipsizes and an entry scrolls; a
   button with more text than room does not. What the layout is told is the
   size the widget settled on, so a container can make room for it -- `CoolBar`
-  does, which is why a combo box in a band no longer hangs out of it.
+  does, which is why a combo box in a band stays inside it.
 - **A window manager is part of the test.** Under `Xvfb` there is none, so
   nothing decorates, nothing takes the focus from one, and nothing obliges a
   window that asks to grow. Every one of those hides a real fault: the runaway
@@ -958,10 +958,10 @@ here at all. Where one is a backend's rather than the library's, it says so.
   back so that a fault which is a *ratchet* rather than a snapshot can be seen
   at all.
 - **Text measurement is the platform's, and a layout pass has no surface.**
-  `CoolBar` estimated a caption at seven pixels a byte, which is near enough
-  for the Windows UI font and too narrow for GTK's -- the band's control was
-  placed over the last letter of its caption. The measurement is taken where
-  the caption is drawn and used by the pass after it, which is the same
+  An estimate of a caption's width that is near enough for the Windows UI
+  font is too narrow for GTK's, and puts a band's control over the last letter
+  of its caption. So `CoolBar` takes the measurement where the caption is
+  drawn and uses it in the pass after it, which is the same
   arrangement `CodeEditor` uses for its character cell.
 - **Text is cairo's toy API**, so there is no shaping, no bidirectional text
   and no font fallback -- a label in Arabic is drawn wrong. Pango is the fix

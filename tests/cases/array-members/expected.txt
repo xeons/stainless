@@ -1,0 +1,39 @@
+empty 0 0
+view 2 a
+convert 3,5
+grow 1,2,3,0,0
+shrink 1,2
+fill x,pad,pad old x
+cut x
+copy 1,2,3,0,0
+overlap 1,1,2,3,4
+words b,c,d
+clear part 1,0,0,3,4
+clear 0,0,0,0,0
+fill 7,7,7,9,9
+fill words b,z,d
+reverse d,c,b,a
+reverse part d,b,c,a
+sort apple,fig,kiwi,pear
+by length fig,kiwi,pear,apple
+sort part 9,1,3,5,0
+descending part 9,5,3,1,0
+keys 1,2,3 a,b,c
+keys down 3,2,1 c,b,a
+binary 3 none 2 none
+index 0 2 none none
+last 4 2 3 none
+last empty none none
+exists true false
+all true false
+find pear plum none
+find all pear,plum,kiwi
+find index 1 3 none
+find last index 2 0 none
+for each FIG,PEAR,PLUM,KIWI
+bytes 8 1 5 8
+overlap 2 3 4 4
+get 6
+set true
+structs 8 3 4
+memory true

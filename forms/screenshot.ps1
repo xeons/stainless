@@ -1,7 +1,7 @@
 # Captures what a window actually drew, on Windows.
 #
 #   .\forms\screenshot.ps1 -Program .\ide\build\stainless-ide.exe -Out shots\ide.png
-#   .\forms\screenshot.ps1 -Program .\samples\forms\build\buttons.exe -Arguments 1
+#   .\forms\screenshot.ps1 -Program .\samples\forms\build\buttons.exe -Arguments "--page","1"
 #   .\forms\screenshot.ps1 -ProcessId 1234 -Out shots\now.png -Keep
 #   .\forms\screenshot.ps1 -Program .\ide\build\stainless-ide.exe -Shots 3 -Every 1500
 #   .\forms\screenshot.ps1 -ProcessId 1234 -Hover 400,260 -Popups

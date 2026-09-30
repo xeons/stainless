@@ -141,7 +141,8 @@ running at the caller, once per call site:
 ```
 error[SL0613]: the default for 'n' is not a constant, and a default is written
 into every call that leaves it out -- so a call would be running this rather
-than passing it
+than passing it. A literal, 'null', a 'const', an enum member or 'default(T)'
+is what it may be; anything else belongs in the body
 ```
 
 **The ones that may be left out are the tail of the list** (SL0614). A default
@@ -223,7 +224,8 @@ items)` called as `First("x", "y")` is `First<String>`. Given no elements there
 is nothing to read, and the call is SL0327 unless the argument is written.
 
 What may not be `params` (SL0763): a parameter that is not the last, one passed
-by `ref`, `in` or `out`, one with a default, anything but a `T[]` or a `Span<T>`,
+by `ref`, `in` or `out`, one with a default, anything but a `T[]`, a `Span<T>`
+or a `ReadOnlySpan<T>`,
 a delegate's or closure's parameter — a call through one passes exactly what the
 signature says — and a C function's, since C has nothing to gather with.
 
@@ -268,12 +270,13 @@ and one that reads nothing is an ordinary function, which becomes a `delegate`
 like any other.
 
 **It is capture by value, and so it may not assign what it captured**
-(SL0769). A copy per call is the model every closure here has
+(SL0769). Capture by value is the model every closure here has
 ([§2.15](02-types.md#215-lambdas-and-closures)); an assignment would change the
 copy and nothing else, and saying so beats a write that silently goes nowhere.
-Return the value, or keep it in a field. The object of the method is the one
-thing reached by reference, as it is from a method: `this` is passed, and a
-field written through it is written.
+A lambda's copy lasts as long as its closure, so writing it is legal there, and
+a write nothing reads again is SL0829. Return the value, or keep it in a field.
+The object of the method is the one thing reached by reference, as it is from a
+method: `this` is passed, and a field written through it is written.
 
 **A call has to be able to see what the function reads** (SL0768). One made
 before a variable the function reads is declared has no value to pass —
@@ -405,16 +408,15 @@ somebody else's `out` counts as writing it — that callee is held to the same
 promise. A `try` whose failure returns before the write is such a path, and so
 is a `break` that leaves a loop or a switch early; what runs only sometimes —
 the right of `&&` or `||`, an arm of a conditional — writes nothing certain,
-and a loop's first test, which always runs, does. This is the only
-definite-assignment analysis in the language, and it
-is here because this is the one place it is load-bearing: an ordinary local
-read before it is written is still nobody's business but the author's, which is
-a gap, but a consistent one. A function containing a `goto` stands the check
-down, because a label can be arrived at from anywhere and the question stops
-being answerable.
+and a loop's first test, which always runs, does. The same analysis holds a
+local whose type has no zero value
+([section 2.16.1](02-types.md#2161-locals)); any other local read before it is written
+reads the zero it was declared holding. A function containing a `goto` stands
+the check down, because a label can be arrived at from anywhere and the
+question stops being answerable.
 
 **The caller's storage is cleared before the call.** That is the safety net
-under the gap: a hole in the analysis produces a zero rather than whatever the
+under the analysis: a hole in it produces a zero rather than whatever the
 stack held, which is the same promise a new array and an owned local already
 make.
 
@@ -479,9 +481,11 @@ constructor rather than a declaration, so there is nothing for a name to match.
 ```csharp
 public class Person
 {
-    public String Name { get; set; }         // automatic: the compiler owns the storage
+    public String Name { get; set; } = "";   // automatic: the compiler owns the storage
     public int Visits { get; private set; }  // read anywhere, write in this module
     public int Id { get; }                   // set by a constructor, then fixed
+
+    public Person(int id) { Id = id; }
 
     public String Label => Name + "#" + Text.FromInteger(Id);   // computed
 }
@@ -548,7 +552,7 @@ property has nothing to assign to at all, and the error says so.
 public class Account
 {
     public int Id { get; init; }
-    public String Handle { get => field; init => field = "@" + value; }
+    public String Handle { get => field; init => field = "@" + value; } = "";
 }
 
 var account = new Account { Id = 7, Handle = "ada" };
@@ -556,7 +560,7 @@ account.Id = 8;                          // SL0781
 ```
 
 `init` is `set` with a narrower list of callers: an object initializer, a
-`with` ([§2.4.2](02-types.md#242-with--a-record-again-with-some-of-it-changed)),
+`with` ([section 2.4.7](02-types.md#247-with--a-record-again-with-some-of-it-changed)),
 and — on `this`, and nowhere else — a constructor or another `init` accessor of
 the declaring class or a class deriving from it. After that the object is made
 and the property reads as get-only. It lowers to the same `set_Name` method a
@@ -618,7 +622,7 @@ anywhere must be able to set it (SL0783).
 ```csharp
 public class Person
 {
-    public String Name { get; set => field = value.Trim(); }
+    public String Name { get; set => field = value.Trim(); } = "";
     public Node Badge { get => field ??= MakeBadge(); }
 }
 ```
@@ -911,12 +915,14 @@ It may be named without a call, `Type.Name`, and become a delegate. And it may
 use a private constructor, which is what lets a fallible factory close off the
 shape it replaces ([§2.9](02-types.md#29-how-the-library-reports-failure)) rather than merely discourage it.
 
-This is also how a **struct** gets a maker at all: a struct has no
-constructors, so before this there was no way to build one in a single
-expression.
+A **struct** takes one on the same terms: it has constructors of its own
+([section 2.2.1](02-types.md#221-a-structs-constructor)), and a static method is how
+one is made by something that can fail.
 
-A static method cannot implement an interface method: dispatch arrives on an
-object, and a static method has nowhere to put one.
+A static method cannot implement an instance method of an interface: dispatch
+arrives on an object, and a static method has nowhere to put one. What it can
+fill is a `static abstract` requirement
+([section 4.3.1](04-generics.md#431-static-abstract--a-promise-about-the-type)).
 
 **A `const`** belongs to the type in the same way and is not storage at all: it
 is inlined at every use ([§9.3](09-statements-expressions.md#93-const-and-static)),

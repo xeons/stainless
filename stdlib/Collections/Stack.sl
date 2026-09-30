@@ -21,8 +21,6 @@
 
 module Standard.Collections;
 
-import Standard.Unchecked;
-
 // ------------------------------------------------------------------- stack
 
 /// Last in, first out. The top is the end of the array, so nothing moves.
@@ -30,13 +28,13 @@ import Standard.Unchecked;
 /// @typeparam T  what the stack holds; nothing is asked of it
 public class Stack<T> : IEnumerable<T>
 {
-    T[] _items;
+    Slot<T>[] _items;
     nuint _count;
 
     /// An empty stack with room for a few items before it first grows.
     public Stack()
     {
-        _items = NewUninitializedArray<T>(8);
+        _items = new Slot<T>[8];
         _count = 0;
     }
 
@@ -74,8 +72,8 @@ public class Stack<T> : IEnumerable<T>
             sl_fail("Stack.Pop: the stack is empty");
 
         _count--;
-        var item = _items[_count];
-        ClearElement(_items, _count);
+        var item = _items[_count].Value;
+        _items[_count].Clear();
         return item;
     }
 
@@ -86,14 +84,14 @@ public class Stack<T> : IEnumerable<T>
     {
         if (_count == 0)
             sl_fail("Stack.Peek: the stack is empty");
-        return _items[_count - 1];
+        return _items[_count - 1].Value;
     }
 
     /// Drops everything. The array is replaced rather than blanked, so
     /// anything it held is released now.
     public void Clear()
     {
-        _items = NewUninitializedArray<T>(8);
+        _items = new Slot<T>[8];
         _count = 0;
     }
 
@@ -104,12 +102,12 @@ public class Stack<T> : IEnumerable<T>
     {
         var result = new List<T>();
         for (nuint i = 0; i < _count; i++)
-            result.Add(_items[_count - 1 - i]);
+            result.Add(_items[_count - 1 - i].Value);
         return result;
     }
 
     /// The item `depth` places below the top, counting from zero.
-    T GetItemFromTop(nuint depth) => _items[_count - 1 - depth];
+    T GetItemFromTop(nuint depth) => _items[_count - 1 - depth].Value;
 
     /// A cursor over the items, top first -- the order `Pop` would give them
     /// back in. Pushing or popping during a walk invalidates it.
@@ -120,7 +118,7 @@ public class Stack<T> : IEnumerable<T>
 
     void GrowStorage()
     {
-        var bigger = NewUninitializedArray<T>(_items.Length * 2);
+        var bigger = new Slot<T>[_items.Length * 2];
         _items[:_count].CopyTo(bigger);
         _items = bigger;
     }

@@ -104,13 +104,12 @@ At most one declaration writes the base list, because two would be two answers
 to one question.
 
 No `partial` keyword marks either one. There is nothing for it to prevent: a
-second declaration of a name in the same module used to be an error and is now
-this, and a name from *another* module was never reachable to redeclare.
+second declaration of a name in the same module is this, and a name from
+*another* module is not reachable to redeclare.
 
 The standard library's use of it is `String`. It is intrinsic — the runtime owns its layout
 and its allocation, and the compiler creates the symbol before any source is
-read — and until this rule existed, every method it had was a C function
-declared in the compiler. Now `Standard.Text` declares `String` a second time
+read -- so `Standard.Text` declares `String` a second time
 and writes the rest in Stainless ([§3.2](03-text.md#32-members)). The same door is open to any module for
 its own types, which is why the rule is stated in general terms rather than as a
 concession to the standard library.
@@ -286,7 +285,7 @@ read as markup.
 ///              directory
 /// @returns the contents, decoded as UTF-8
 /// @failure IOError.NotFound  there is no file at that path
-/// @failure IOError.NoSpace   the disk filled up while reading
+/// @failure IOError.AccessDenied  the path or its directory refuses it
 /// @see File.WriteAllText
 public Result<String, IOError> ReadAllText(String path)
 ```
@@ -323,7 +322,8 @@ warning[SL0742]: 'Add' has no type parameter named 'T'; it takes none
 warning[SL0743]: '@value' says nothing about 'ReadAllText'; it belongs on a
 property or a field
 warning[SL0744]: 'IOError' has no case named 'Vanished'; it has 'None',
-'NotFound' and 'NoSpace'
+'NotFound', 'AccessDenied', 'AlreadyExists', 'NotADirectory', 'IsADirectory',
+'Invalid', 'EndOfFile', 'Closed', 'Unknown' and 'InvalidData'
 warning[SL0745]: 'Standard.NoSuchModule' is not a type, a member or a module
 this file can see
 ```

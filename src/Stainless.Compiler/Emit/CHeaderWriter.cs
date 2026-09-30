@@ -105,6 +105,10 @@ public static class CHeaderWriter
                 // the cases overlap in a way a C struct cannot state, so the
                 // shape is written out rather than the fields copied across.
                 case VariantTypeSymbol variant:
+                    // A variant with no tag holds a reference, which C is never given.
+                    if (!variant.HasTag)
+                        throw new Source.InternalCompilerError(
+                            $"'{variant.QualifiedName}' has no tag and reached a C header");
                     sb.AppendLine($"/* variant {variant.QualifiedName}:");
                     foreach (var variantCase in variant.Cases)
                         sb.AppendLine($"     {variantCase.Tag} = {variantCase.Signature}");

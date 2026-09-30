@@ -384,6 +384,65 @@ public sealed partial class LlvmEmitter
     }
 
     /// <summary>
+    /// <c>Array.Create</c>: the array allocated, then every element stored in
+    /// order from zero by an owning store, so none is read before it is set.
+    /// </summary>
+    private Val EmitArrayFill(BoundArrayFill fill)
+    {
+        var makeLocal = fill.MakeLocal;
+        var atLocal = fill.AtLocal;
+        var element = fill.Element;
+
+        var arrayType = fill.ArrayType;
+        var count = EmitExpression(fill.Count);
+
+        // The function is held for the whole statement, as a `try` holds its operand.
+        string makeType = LlvmTypeOf(makeLocal.Type);
+        string make = Alloca(makeType, "fill.make");
+        Line($"store {makeType} zeroinitializer, ptr {make}");
+        InitializeWith(make, EmitOwned(fill.Make), makeLocal.Type);
+        if (makeLocal.Type.CarriesReferences()) TrackTemporary(make, makeLocal.Type);
+        _slots[makeLocal] = make;
+
+        string at = Alloca(Word, "fill.at");
+        Line($"store {Word} 0, ptr {at}");
+        _slots[atLocal] = at;
+
+        string array = Emit("ptr",
+            $"call ptr @sl_array_alloc(ptr @{ArrayTypeInfoName(arrayType)}, " +
+            $"{Word} {count.Ref}, {Word} {arrayType.Element.Size})");
+        string data = Emit("ptr",
+            $"getelementptr inbounds i8, ptr {array}, i64 {ArrayTypeSymbol.HeaderSize}");
+
+        string head = NextLabel("fill.head");
+        string body = NextLabel("fill.body");
+        string done = NextLabel("fill.done");
+        Terminator($"br label %{head}");
+
+        Label(head);
+        string index = Emit(Word, $"load {Word}, ptr {at}");
+        string more = Emit("i1", $"icmp ult {Word} {index}, {count.Ref}");
+        Terminator($"br i1 {more}, label %{body}, label %{done}");
+
+        Label(body);
+        int pending = _pendingReleases.Count;
+        var made = EmitOwned(element);
+        string slot = Emit("ptr",
+            $"getelementptr inbounds {LlvmTypeOf(arrayType.Element)}, ptr {data}, {Word} {index}");
+        InitializeWith(slot, made, arrayType.Element);
+
+        // A temporary made here would be released once, after the loop.
+        if (_pendingReleases.Count != pending)
+            throw new Source.InternalCompilerError("an array fill's element left a temporary", fill.Span);
+
+        Line($"store {Word} {Emit(Word, $"add {Word} {index}, 1")}, ptr {at}");
+        Terminator($"br label %{head}");
+
+        Label(done);
+        return Fresh(new Val(array, "ptr", arrayType));
+    }
+
+    /// <summary>
     /// A type handle is a one-pointer struct, so this is a constant stored into
     /// a slot: no lookup, no allocation, nothing at run time.
     /// </summary>

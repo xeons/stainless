@@ -412,6 +412,16 @@ public sealed class Toolchain
     public const string RuntimeName = "stainless-rt";
 
     /// <summary>
+    /// The name of one build of the shared runtime, without prefix or extension.
+    ///
+    /// Each variant is a different library to the loader. Two binaries in one
+    /// process MUST agree on it, or each loads its own and there are two
+    /// runtimes again; the metadata records it so a consumer can check.
+    /// </summary>
+    public static string SharedRuntimeName(bool debug, bool leakCheck) =>
+        RuntimeName + (debug ? "-g" : "") + (leakCheck ? "-leak" : "");
+
+    /// <summary>
     /// Builds the runtime as one shared library, and returns what a link line
     /// should name to use it.
     ///
@@ -426,17 +436,13 @@ public sealed class Toolchain
         var objects = BuildRuntime(objectDirectory, debug, shared: true, leakCheck: leakCheck);
 
         string library = Path.Combine(objectDirectory,
-            (OperatingSystem.IsWindows() ? "" : "lib") + RuntimeName +
-            (debug ? "-g" : "") + (leakCheck ? "-leak" : "") + SharedLibraryExtension);
+            SharedLibraryFileName(SharedRuntimeName(debug, leakCheck)));
 
         // The import library is what a Windows link line names, and the linker
         // writes it beside the DLL rather than being told where to put it.
         string linkInput = OperatingSystem.IsWindows()
             ? Path.ChangeExtension(library, ".lib")
             : library;
-
-        if (IsUpToDate(library, objects) && File.Exists(linkInput))
-            return new SharedRuntime(library, linkInput);
 
         List<string> arguments = [.. objects, "-shared", "-o", library];
         if (debug) arguments.Add("-g");
@@ -447,11 +453,32 @@ public sealed class Toolchain
         if (!OperatingSystem.IsWindows() && !OperatingSystem.IsMacOS())
             arguments.Add("-Wl,--no-undefined");
 
+        // A binary records the name a library gives itself, or the path it was
+        // linked by when it gives none. Each build links the copy in its own
+        // intermediate directory, so without a name a program and its library
+        // record two paths and the loader maps two runtimes. By name, the copy
+        // beside the binary is found through the rpath Link writes, and a
+        // second binary asking for the same name gets the one already loaded.
+        // Windows matches a DLL by its file name already.
+        if (OperatingSystem.IsMacOS())
+            arguments.Add("-Wl,-install_name,@rpath/" + Path.GetFileName(library));
+        else if (!OperatingSystem.IsWindows())
+            arguments.Add("-Wl,-soname," + Path.GetFileName(library));
+
+        // The link line is part of what the library is, so one linked by a
+        // different line is out of date however new it is.
+        string stamp = library + ".link";
+        string line = string.Join("\n", arguments);
+        if (IsUpToDate(library, objects) && File.Exists(linkInput) &&
+            File.Exists(stamp) && File.ReadAllText(stamp) == line)
+            return new SharedRuntime(library, linkInput);
+
         var result = Run(ClangPath, arguments);
         if (!result.Success)
             throw new InvalidOperationException(
                 $"failed to link the Stainless runtime:\n{result.StandardError}");
 
+        File.WriteAllText(stamp, line);
         return new SharedRuntime(library, linkInput);
     }
 
@@ -506,7 +533,8 @@ public sealed class Toolchain
         bool debug = false,
         IReadOnlyList<string>? libraries = null,
         SharedRuntime? sharedRuntime = null,
-        string? moduleDefinition = null)
+        string? moduleDefinition = null,
+        bool loadsLibrariesBeside = false)
     {
         List<string> arguments = [.. TargetArguments, irPath];
 
@@ -565,13 +593,22 @@ public sealed class Toolchain
         // the linker for the .pdb the debugger actually reads.
         if (debug) arguments.Add("-g");
 
-        // The runtime sits beside whatever loaded it, so that is where a
-        // binary is told to look. Windows searches its own directory already;
-        // ELF and Mach-O have to be asked, and each spells it differently.
-        if (sharedRuntime is not null && !OperatingSystem.IsWindows())
+        // The runtime and any Stainless library sit beside whatever loaded
+        // them, so that is where a binary is told to look. Windows searches its
+        // own directory already; ELF and Mach-O have to be asked, and each
+        // spells it differently.
+        if ((sharedRuntime is not null || loadsLibrariesBeside) && !OperatingSystem.IsWindows())
             arguments.Add(OperatingSystem.IsMacOS()
                 ? "-Wl,-rpath,@loader_path"
                 : "-Wl,-rpath,$ORIGIN");
+
+        // A library named by its file name rather than by the path it was
+        // linked from, so a consumer finds it wherever the two are put
+        // together, as a DLL is found on Windows.
+        if (shared && OperatingSystem.IsMacOS())
+            arguments.Add("-Wl,-install_name,@rpath/" + Path.GetFileName(outputPath));
+        else if (shared && !OperatingSystem.IsWindows())
+            arguments.Add("-Wl,-soname," + Path.GetFileName(outputPath));
 
         arguments.AddRange([
             $"-O{optimizationLevel}",

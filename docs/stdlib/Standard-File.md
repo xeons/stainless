@@ -25,9 +25,9 @@ Adds `text` to the end, creating the file if it is not there.
 
 **Fails with**
 
-- [IOError.AccessDenied](Standard-IO.md#accessdenied-case) — the path or its directory refuses it
-- [IOError.IsADirectory](Standard-IO.md#isadirectory-case) — the path names a directory
-- [IOError.Unknown](Standard-IO.md#unknown-case) — the write or the close failed for a reason with no case of its own, a full disk among them
+- [IOError.AccessDenied](Standard-IO.md#accessdenied-case) -- the path or its directory refuses it
+- [IOError.IsADirectory](Standard-IO.md#isadirectory-case) -- the path names a directory
+- [IOError.Unknown](Standard-IO.md#unknown-case) -- the write or the close failed for a reason with no case of its own, a full disk among them
 
 <sub>[stdlib/File.sl:274](../../stdlib/File.sl#L274)</sub>
 
@@ -42,15 +42,15 @@ for something that will not fit in memory.
 
 **Parameters**
 
-- `from` — the file to read, which must be there
-- `to` — the file to replace or create
+- `from` -- the file to read, which must be there
+- `to` -- the file to replace or create
 
 **Fails with**
 
-- [IOError.NotFound](Standard-IO.md#notfound-case) — `from` is not there
-- [IOError.AccessDenied](Standard-IO.md#accessdenied-case) — either path refuses it
-- [IOError.IsADirectory](Standard-IO.md#isadirectory-case) — either path names a directory
-- [IOError.Unknown](Standard-IO.md#unknown-case) — the read or the write failed for a reason with no case of its own
+- [IOError.NotFound](Standard-IO.md#notfound-case) -- `from` is not there
+- [IOError.AccessDenied](Standard-IO.md#accessdenied-case) -- either path refuses it
+- [IOError.IsADirectory](Standard-IO.md#isadirectory-case) -- either path names a directory
+- [IOError.Unknown](Standard-IO.md#unknown-case) -- the read or the write failed for a reason with no case of its own
 
 <sub>[stdlib/File.sl:295](../../stdlib/File.sl#L295)</sub>
 
@@ -64,9 +64,9 @@ Removes the file. `IOError.None` on success.
 
 **Fails with**
 
-- [IOError.NotFound](Standard-IO.md#notfound-case) — there is nothing at that path
-- [IOError.AccessDenied](Standard-IO.md#accessdenied-case) — the file or its directory refuses it
-- [IOError.IsADirectory](Standard-IO.md#isadirectory-case) — the path names a directory; use `Directory`
+- [IOError.NotFound](Standard-IO.md#notfound-case) -- there is nothing at that path
+- [IOError.AccessDenied](Standard-IO.md#accessdenied-case) -- the file or its directory refuses it
+- [IOError.IsADirectory](Standard-IO.md#isadirectory-case) -- the path names a directory; use `Directory`
 
 <sub>[stdlib/File.sl:61](../../stdlib/File.sl#L61)</sub>
 
@@ -112,14 +112,14 @@ platform's decision, not this one's.
 
 **Parameters**
 
-- `from` — the file to move, which must be there
-- `to` — where it is to end up, directories and all
+- `from` -- the file to move, which must be there
+- `to` -- where it is to end up, directories and all
 
 **Fails with**
 
-- [IOError.NotFound](Standard-IO.md#notfound-case) — `from` is not there
-- [IOError.AccessDenied](Standard-IO.md#accessdenied-case) — either path refuses it
-- [IOError.AlreadyExists](Standard-IO.md#alreadyexists-case) — `to` is taken and this platform will not replace it
+- [IOError.NotFound](Standard-IO.md#notfound-case) -- `from` is not there
+- [IOError.AccessDenied](Standard-IO.md#accessdenied-case) -- either path refuses it
+- [IOError.AlreadyExists](Standard-IO.md#alreadyexists-case) -- `to` is taken and this platform will not replace it
 
 <sub>[stdlib/File.sl:72](../../stdlib/File.sl#L72)</sub>
 
@@ -141,10 +141,10 @@ where a program was loaded.
 
 **Fails with**
 
-- [IOError.NotFound](Standard-IO.md#notfound-case) — there is no file at that path
-- [IOError.AccessDenied](Standard-IO.md#accessdenied-case) — the file refuses to be read
-- [IOError.IsADirectory](Standard-IO.md#isadirectory-case) — the path names a directory
-- [IOError.Unknown](Standard-IO.md#unknown-case) — the file is there and its length could not be had, or the platform reported something with no case of its own -- a full disk among them
+- [IOError.NotFound](Standard-IO.md#notfound-case) -- there is no file at that path
+- [IOError.AccessDenied](Standard-IO.md#accessdenied-case) -- the file refuses to be read
+- [IOError.IsADirectory](Standard-IO.md#isadirectory-case) -- the path names a directory
+- [IOError.Unknown](Standard-IO.md#unknown-case) -- the file is there and its length could not be had, or the platform reported something with no case of its own -- a full disk among them
 
 **See also** &nbsp; [File.ReadAllText](#readalltext-function)
 
@@ -161,10 +161,10 @@ producing no final empty line.
 
 **Fails with**
 
-- [IOError.NotFound](Standard-IO.md#notfound-case) — there is no file at that path
-- [IOError.AccessDenied](Standard-IO.md#accessdenied-case) — the file refuses to be read
-- [IOError.IsADirectory](Standard-IO.md#isadirectory-case) — the path names a directory
-- [IOError.Unknown](Standard-IO.md#unknown-case) — the platform reported something with no case of its own
+- [IOError.NotFound](Standard-IO.md#notfound-case) -- there is no file at that path
+- [IOError.AccessDenied](Standard-IO.md#accessdenied-case) -- the file refuses to be read
+- [IOError.IsADirectory](Standard-IO.md#isadirectory-case) -- the path names a directory
+- [IOError.Unknown](Standard-IO.md#unknown-case) -- the platform reported something with no case of its own
 
 **See also** &nbsp; [File.WriteAllLines](#writealllines-function)
 
@@ -181,10 +181,10 @@ dropped: it says how the text is stored and is not part of it.
 
 **Fails with**
 
-- [IOError.NotFound](Standard-IO.md#notfound-case) — there is no file at that path
-- [IOError.AccessDenied](Standard-IO.md#accessdenied-case) — the file refuses to be read
-- [IOError.IsADirectory](Standard-IO.md#isadirectory-case) — the path names a directory
-- [IOError.Unknown](Standard-IO.md#unknown-case) — the platform reported something with no case of its own
+- [IOError.NotFound](Standard-IO.md#notfound-case) -- there is no file at that path
+- [IOError.AccessDenied](Standard-IO.md#accessdenied-case) -- the file refuses to be read
+- [IOError.IsADirectory](Standard-IO.md#isadirectory-case) -- the path names a directory
+- [IOError.Unknown](Standard-IO.md#unknown-case) -- the platform reported something with no case of its own
 
 **See also** &nbsp; [File.WriteAllText](#writealltext-function)
 
@@ -200,9 +200,9 @@ Replaces the file with `data`, creating it if needed.
 
 **Fails with**
 
-- [IOError.AccessDenied](Standard-IO.md#accessdenied-case) — the path or its directory refuses it
-- [IOError.IsADirectory](Standard-IO.md#isadirectory-case) — the path names a directory
-- [IOError.Unknown](Standard-IO.md#unknown-case) — the write or the close failed for a reason with no case of its own, a full disk among them
+- [IOError.AccessDenied](Standard-IO.md#accessdenied-case) -- the path or its directory refuses it
+- [IOError.IsADirectory](Standard-IO.md#isadirectory-case) -- the path names a directory
+- [IOError.Unknown](Standard-IO.md#unknown-case) -- the write or the close failed for a reason with no case of its own, a full disk among them
 
 <sub>[stdlib/File.sl:209](../../stdlib/File.sl#L209)</sub>
 
@@ -217,9 +217,9 @@ fails.
 
 **Fails with**
 
-- [IOError.AccessDenied](Standard-IO.md#accessdenied-case) — the path or its directory refuses it
-- [IOError.IsADirectory](Standard-IO.md#isadirectory-case) — the path names a directory
-- [IOError.Unknown](Standard-IO.md#unknown-case) — a write or the close failed for a reason with no case of its own, a full disk among them
+- [IOError.AccessDenied](Standard-IO.md#accessdenied-case) -- the path or its directory refuses it
+- [IOError.IsADirectory](Standard-IO.md#isadirectory-case) -- the path names a directory
+- [IOError.Unknown](Standard-IO.md#unknown-case) -- a write or the close failed for a reason with no case of its own, a full disk among them
 
 <sub>[stdlib/File.sl:247](../../stdlib/File.sl#L247)</sub>
 
@@ -233,9 +233,9 @@ Replaces the file with `text`, written as UTF-8.
 
 **Fails with**
 
-- [IOError.AccessDenied](Standard-IO.md#accessdenied-case) — the path or its directory refuses it
-- [IOError.IsADirectory](Standard-IO.md#isadirectory-case) — the path names a directory
-- [IOError.Unknown](Standard-IO.md#unknown-case) — the write or the close failed for a reason with no case of its own, a full disk among them
+- [IOError.AccessDenied](Standard-IO.md#accessdenied-case) -- the path or its directory refuses it
+- [IOError.IsADirectory](Standard-IO.md#isadirectory-case) -- the path names a directory
+- [IOError.Unknown](Standard-IO.md#unknown-case) -- the write or the close failed for a reason with no case of its own, a full disk among them
 
 **See also** &nbsp; [File.ReadAllText](#readalltext-function)
 

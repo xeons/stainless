@@ -95,6 +95,31 @@ public partial class DiagnosticTests
     public void TheCompilerHasCodesToReport() => Assert.NotEmpty(Emitted);
 
     /// <summary>
+    /// A generic body is bound once per instantiation, and a report that does
+    /// not depend on the type arguments is said once, not once for each.
+    /// </summary>
+    [Fact]
+    public void AReportInAGenericBodyIsSaidOnce()
+    {
+        string[] codes = Front.ModuleCodes("""
+            void Touch<T>(T value)
+            {
+                int n = 1;
+                n + 1;
+            }
+
+            public void Use()
+            {
+                Touch(1);
+                Touch("a");
+                Touch(2.0);
+            }
+            """);
+
+        Assert.Single(codes, code => code == "SL0222");
+    }
+
+    /// <summary>
     /// Everything the documentation promises still exists.
     ///
     /// A code that was renamed while the prose kept the old number is a

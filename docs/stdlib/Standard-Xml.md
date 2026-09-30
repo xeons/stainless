@@ -95,8 +95,8 @@ document cannot reach here with a repeat -- that is
 
 **Parameters**
 
-- `name` — the attribute name
-- `value` — the text it carries, unescaped
+- `name` -- the attribute name
+- `value` -- the text it carries, unescaped
 
 **See also** &nbsp; [XmlError.DuplicateAttribute](#duplicateattribute-case)
 
@@ -113,8 +113,8 @@ the position it had.
 
 **Parameters**
 
-- `name` — the attribute name
-- `value` — the text it is to carry, unescaped
+- `name` -- the attribute name
+- `value` -- the text it is to carry, unescaped
 
 <sub>[stdlib/Xml/XmlAttributes.sl:68](../../stdlib/Xml/XmlAttributes.sl#L68)</sub>
 
@@ -148,8 +148,8 @@ The value of an attribute, or the fallback when it is not there.
 
 **Parameters**
 
-- `name` — the attribute to look for
-- `fallback` — what to answer when there is no such attribute
+- `name` -- the attribute to look for
+- `fallback` -- what to answer when there is no such attribute
 
 <sub>[stdlib/Xml/XmlAttributes.sl:80](../../stdlib/Xml/XmlAttributes.sl#L80)</sub>
 
@@ -432,8 +432,8 @@ The text of the first child of that name, or the fallback.
 
 **Parameters**
 
-- `name` — the child element to look for
-- `fallback` — what to answer when there is no such child
+- `name` -- the child element to look for
+- `fallback` -- what to answer when there is no such child
 
 <sub>[stdlib/Xml/XmlNode.sl:100](../../stdlib/Xml/XmlNode.sl#L100)</sub>
 
@@ -474,17 +474,17 @@ is refused wherever it is. A UTF-8 byte order mark at the start is skipped.
 
 **Fails with**
 
-- [XmlError.Unexpected](#unexpected-case) — a character that cannot appear where it is
-- [XmlError.UnclosedTag](#unclosedtag-case) — a `<` with no `>`
-- [XmlError.UnclosedText](#unclosedtext-case) — a quoted value with no closing quote
-- [XmlError.MismatchedEnd](#mismatchedend-case) — an end tag naming another element
-- [XmlError.UnexpectedEnd](#unexpectedend-case) — the document stopped inside an element
-- [XmlError.BadName](#badname-case) — a tag or attribute name that is not one
-- [XmlError.BadEntity](#badentity-case) — an `&` that is not one of the five predefines or a character reference XML allows
-- [XmlError.NoRoot](#noroot-case) — nothing but whitespace and comments
-- [XmlError.TrailingContent](#trailingcontent-case) — a second root element
-- [XmlError.TooDeep](#toodeep-case) — nesting past `MaxDepth`
-- [XmlError.DuplicateAttribute](#duplicateattribute-case) — one element names an attribute twice
+- [XmlError.Unexpected](#unexpected-case) -- a character that cannot appear where it is
+- [XmlError.UnclosedTag](#unclosedtag-case) -- a `<` with no `>`
+- [XmlError.UnclosedText](#unclosedtext-case) -- a quoted value with no closing quote
+- [XmlError.MismatchedEnd](#mismatchedend-case) -- an end tag naming another element
+- [XmlError.UnexpectedEnd](#unexpectedend-case) -- the document stopped inside an element
+- [XmlError.BadName](#badname-case) -- a tag or attribute name that is not one
+- [XmlError.BadEntity](#badentity-case) -- an `&` that is not one of the five predefines or a character reference XML allows
+- [XmlError.NoRoot](#noroot-case) -- nothing but whitespace and comments
+- [XmlError.TrailingContent](#trailingcontent-case) -- a second root element
+- [XmlError.TooDeep](#toodeep-case) -- nesting past `MaxDepth`
+- [XmlError.DuplicateAttribute](#duplicateattribute-case) -- one element names an attribute twice
 
 **See also** &nbsp; [Xml.ToXmlText](#toxmltext-function)
 
@@ -504,22 +504,22 @@ value the type promised rather than a zero.
 
 **Type parameters**
 
-- `T` — a `[Reflect]` type, whose field tables say what there is to fill
+- `T` -- a `[Reflect]` type, whose field tables say what there is to fill
 
 **Fails with**
 
-- [XmlError.Unexpected](#unexpected-case) — a character that cannot appear where it is
-- [XmlError.UnclosedTag](#unclosedtag-case) — a `<` with no `>`
-- [XmlError.UnclosedText](#unclosedtext-case) — a quoted value with no closing quote
-- [XmlError.MismatchedEnd](#mismatchedend-case) — an end tag naming another element
-- [XmlError.UnexpectedEnd](#unexpectedend-case) — the document stopped inside an element
-- [XmlError.BadName](#badname-case) — a tag or attribute name that is not one
-- [XmlError.BadEntity](#badentity-case) — an `&` that is not one of the five predefines or a character reference XML allows
-- [XmlError.NoRoot](#noroot-case) — nothing but whitespace and comments
-- [XmlError.TrailingContent](#trailingcontent-case) — a second root element
-- [XmlError.TooDeep](#toodeep-case) — nesting past `MaxDepth`
-- [XmlError.DuplicateAttribute](#duplicateattribute-case) — one element names an attribute twice
-- [XmlError.NotReflected](#notreflected-case) — `T` carries no field tables
+- [XmlError.Unexpected](#unexpected-case) -- a character that cannot appear where it is
+- [XmlError.UnclosedTag](#unclosedtag-case) -- a `<` with no `>`
+- [XmlError.UnclosedText](#unclosedtext-case) -- a quoted value with no closing quote
+- [XmlError.MismatchedEnd](#mismatchedend-case) -- an end tag naming another element
+- [XmlError.UnexpectedEnd](#unexpectedend-case) -- the document stopped inside an element
+- [XmlError.BadName](#badname-case) -- a tag or attribute name that is not one
+- [XmlError.BadEntity](#badentity-case) -- an `&` that is not one of the five predefines or a character reference XML allows
+- [XmlError.NoRoot](#noroot-case) -- nothing but whitespace and comments
+- [XmlError.TrailingContent](#trailingcontent-case) -- a second root element
+- [XmlError.TooDeep](#toodeep-case) -- nesting past `MaxDepth`
+- [XmlError.DuplicateAttribute](#duplicateattribute-case) -- one element names an attribute twice
+- [XmlError.NotReflected](#notreflected-case) -- `T` carries no field tables
 
 **See also** &nbsp; [Xml.Serialize](#serialize-function)
 
@@ -535,11 +535,11 @@ The same, from an element already parsed.
 
 **Type parameters**
 
-- `T` — a `[Reflect]` type, whose field tables say what there is to fill
+- `T` -- a `[Reflect]` type, whose field tables say what there is to fill
 
 **Fails with**
 
-- [XmlError.NotReflected](#notreflected-case) — `T` carries no field tables
+- [XmlError.NotReflected](#notreflected-case) -- `T` carries no field tables
 
 **See also** &nbsp; [Xml.Serialize](#serialize-function)
 
@@ -555,12 +555,12 @@ The element as text.
 
 **Parameters**
 
-- `value` — the object to read the fields of
-- `name` — the tag name of the root element
+- `value` -- the object to read the fields of
+- `name` -- the tag name of the root element
 
 **Type parameters**
 
-- `T` — a `[Reflect]` type
+- `T` -- a `[Reflect]` type
 
 **See also** &nbsp; [Xml.PopulateObject](#populateobject-function)
 
@@ -576,12 +576,12 @@ The same, with a declaration and indentation.
 
 **Parameters**
 
-- `value` — the object to read the fields of
-- `name` — the tag name of the root element
+- `value` -- the object to read the fields of
+- `name` -- the tag name of the root element
 
 **Type parameters**
 
-- `T` — a `[Reflect]` type
+- `T` -- a `[Reflect]` type
 
 **See also** &nbsp; [Xml.Serialize](#serialize-function)
 
@@ -613,12 +613,12 @@ JSON document with angle brackets.
 
 **Parameters**
 
-- `value` — the object to read the fields of
-- `name` — the tag name of the element they go under
+- `value` -- the object to read the fields of
+- `name` -- the tag name of the element they go under
 
 **Type parameters**
 
-- `T` — a `[Reflect]` type, whose field tables say what there is to write
+- `T` -- a `[Reflect]` type, whose field tables say what there is to write
 
 **See also** &nbsp; [Xml.Serialize](#serialize-function)
 

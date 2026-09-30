@@ -21,25 +21,23 @@
 
 module Standard;
 
-import Standard.Unchecked;
-
 // What a collection expression lowers to when it has a `..` in it. Nothing
 // here is public: the compiler calls these, and a program writes `[..a, b]`.
 
 /// The elements of a collection expression whose length is not known until
-/// its spreads have been walked. It grows by doubling and hands over its own
-/// array when that is exactly full.
+/// its spreads have been walked. It grows by doubling, and copies what it
+/// holds out into an array of exactly that length when it is done.
 ///
 /// @typeparam T  the element type of the array being built
 class ArrayBuilder<T>
 {
-    private T[] _items;
+    private Slot<T>[] _items;
     private nuint _count;
 
     /// @param capacity  the elements already known to be coming
     public ArrayBuilder(nuint capacity)
     {
-        _items = NewUninitializedArray<T>(capacity < 4u ? 4u : capacity);
+        _items = new Slot<T>[capacity < 4u ? 4u : capacity];
         _count = 0u;
     }
 
@@ -48,7 +46,7 @@ class ArrayBuilder<T>
     {
         if (_count == _items.Length)
         {
-            var grown = NewUninitializedArray<T>(_items.Length * 2u);
+            var grown = new Slot<T>[_items.Length * 2u];
             _items[:_count].CopyTo(grown);
             _items = grown;
         }
@@ -58,13 +56,7 @@ class ArrayBuilder<T>
     }
 
     /// The elements added, as an array of exactly that many.
-    public T[] ToArray()
-    {
-        if (_count == _items.Length)
-            return _items;
-
-        return _items[:_count].ToArray();
-    }
+    public T[] ToArray() => Slot<T>.ToArray(_items[:_count]);
 }
 
 /// `..source` into anything with `Add`: each element, in order.
@@ -85,4 +77,14 @@ nuint CopySpreadElements<T, TSource>(T[] into, nuint at, TSource source)
     }
 
     return at;
+}
+
+/// The array `CopySpreadElements` filled, checked full. A `Count` that
+/// promised more than its spread yielded would leave elements nothing wrote,
+/// and a `T` with no zero value would hand out a null from one.
+T[] FinishSpreadElements<T>(T[] made, nuint at)
+{
+    if (at != made.Length)
+        sl_fail("a collection expression's spread yielded fewer elements than its Count");
+    return made;
 }
