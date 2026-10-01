@@ -101,6 +101,32 @@ else
     echo "  --version and samples/hello.sl both answered"
 fi
 
+# ---- the IDE
+
+# Built by the published compiler, which is a harder test of it than hello.sl,
+# and shipped beside it: the IDE looks for `stainless` next to itself first.
+# Its debugger is written for Windows and Linux, so macOS ships without it.
+ide="$publish/stainless-ide"
+if [ "$runtime" != "$native" ]; then
+    echo "warning: $runtime is not this machine, so the archive carries no IDE" >&2
+elif [ "$system" = osx ]; then
+    echo "warning: the IDE does not build for macOS yet, so the archive carries none" >&2
+else
+    echo "building the IDE with the published compiler"
+    "$compiler" build --project "$repository/ide" -o "$ide"
+
+    # The self test opens a window, so it needs a display; Xvfb stands in.
+    if [ -n "${DISPLAY:-}${WAYLAND_DISPLAY:-}" ]; then
+        "$ide" --selftest
+    elif command -v xvfb-run >/dev/null; then
+        xvfb-run -a "$ide" --selftest
+    else
+        echo "error: the IDE's self test needs a display or xvfb-run" >&2
+        exit 1
+    fi
+    echo "  the IDE built and passed its self test"
+fi
+
 [ "$archive" = 1 ] || exit 0
 
 # ---- package
@@ -111,6 +137,7 @@ rm -rf "$stage"
 mkdir -p "$stage"
 
 cp "$compiler" "$stage/"
+[ -f "$ide" ] && cp "$ide" "$stage/"
 cp "$repository/tools/release-install.txt" "$stage/INSTALL.txt"
 
 # A tar pipe keeps each file's directory, which BSD cp has no flag for.

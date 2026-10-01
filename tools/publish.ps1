@@ -29,9 +29,12 @@
     run with nothing but the published file. A binary for another machine is
     packaged untested, with a warning.
 
-    The archive holds the binary, the licences, README.md, INSTALL.txt, and the
-    tracked files of docs/, samples/, bindings/ and forms/, under one directory
-    named stainless-<version>-<rid>. It is written to artifacts/.
+    The published compiler then builds the IDE, which must pass its self test,
+    and it ships beside the compiler as stainless-ide.exe.
+
+    The archive holds the binary, the IDE, the licences, README.md, INSTALL.txt,
+    and the tracked files of docs/, samples/, bindings/ and forms/, under one
+    directory named stainless-<version>-<rid>. It is written to artifacts/.
 
     tools/publish.sh is the same on Linux. docs/releasing.md is the whole
     process.
@@ -111,6 +114,39 @@ else {
     Write-Host "  --version and samples/hello.sl both answered" -ForegroundColor Cyan
 }
 
+# ---- the IDE
+
+# A native program's stderr arrives as error records; this prints the line it
+# carried, blank ones included, rather than the record's type name.
+function Write-NativeLine($line) {
+    if ($line -is [System.Management.Automation.ErrorRecord]) { "$($line.TargetObject)" } else { "$line" }
+}
+
+# Built by the published compiler, which is a harder test of it than hello.sl,
+# and shipped beside it: the IDE looks for `stainless` next to itself first.
+# A compiler for another machine cannot run here to build it.
+$ide = Join-Path $publish "stainless-ide.exe"
+if ($Runtime -ne $native) {
+    Write-Warning "$Runtime is not this machine, so the archive carries no IDE"
+}
+else {
+    Write-Host "building the IDE with the published compiler" -ForegroundColor Cyan
+
+    # Windows PowerShell turns a native program's stderr into an error under
+    # "Stop", and the compiler writes its warnings there; the exit code is the
+    # verdict.
+    $ErrorActionPreference = "Continue"
+    & $compiler build --project (Join-Path $repository "ide") -o $ide 2>&1 | ForEach-Object { Write-NativeLine $_ }
+    $built = $LASTEXITCODE
+    & $ide --selftest 2>&1 | ForEach-Object { Write-NativeLine $_ }
+    $tested = $LASTEXITCODE
+    $ErrorActionPreference = "Stop"
+
+    if ($built -ne 0) { throw "the published compiler could not build the IDE" }
+    if ($tested -ne 0) { throw "the published IDE failed its self test" }
+    Write-Host "  the IDE built and passed its self test" -ForegroundColor Cyan
+}
+
 if ($NoArchive) { exit 0 }
 
 # ---- package
@@ -121,6 +157,7 @@ if (Test-Path $stage) { Remove-Item $stage -Recurse -Force }
 New-Item -ItemType Directory -Force -Path $stage | Out-Null
 
 Copy-Item $compiler $stage
+if (Test-Path $ide) { Copy-Item $ide $stage }
 Copy-Item (Join-Path $PSScriptRoot "release-install.txt") (Join-Path $stage "INSTALL.txt")
 
 $tracked = & git -C $repository ls-files -- README.md LICENSE LICENSE.RUNTIME docs samples bindings forms

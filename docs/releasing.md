@@ -76,6 +76,7 @@ install directories.
 | | |
 |---|---|
 | `stainless`, `stainless.exe` | the compiler, with the runtime and standard library inside |
+| `stainless-ide`, `stainless-ide.exe` | the IDE, built by the published compiler; Windows and Linux only |
 | `INSTALL.txt` | clang, and where the compiler looks for it |
 | `README.md`, `LICENSE`, `LICENSE.RUNTIME` | |
 | `docs/`, `samples/` | as in the repository |
@@ -83,10 +84,15 @@ install directories.
 
 Only tracked files go in, so a publish needs a git checkout.
 
-**Only x64 is published.** The compiler targets ARM64, but the ARM64 cases stop
-at an object file because there is no ARM64 machine to run them, and macOS is
-not tested at all. Either is a matrix entry in the release workflow once
-something runs its cases.
+**The IDE is built during the publish**, by the compiler just published, and
+must pass `--selftest` before it is packaged; on Linux the self test runs
+under `xvfb-run` when there is no display. It finds the compiler beside
+itself. A publish for another machine, or for macOS, whose debugger target
+does not exist yet, ships without it and says so.
+
+**Only x64 is published.** The compiler targets ARM64, and macOS arm64 runs its
+whole suite on the Mac mini, but no CI runner runs those cases yet. Either is a
+matrix entry in the release workflow once one does.
 
 ## Cutting a release
 

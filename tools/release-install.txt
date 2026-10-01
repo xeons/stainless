@@ -22,6 +22,17 @@ Then:
     stainless run samples/tour
     stainless --help
 
+stainless-ide (stainless-ide.exe on Windows) is an editor for Stainless,
+written in Stainless: syntax colouring, building and running, the compiler's
+diagnostics in place, a debugger and a form designer. It finds the compiler
+beside itself, so keep the two in the same directory. Open a project or a
+file with it:
+
+    stainless-ide samples/tour
+
+On Linux it needs GTK 3, which a desktop already has (libgtk-3-0 on Debian
+and Ubuntu). The macOS archive carries no IDE yet.
+
 bindings/ and forms/ are source, compiled into a program that names them.
 A GTK program on Linux needs the GTK 3 development packages and the libraries
 named on the command line; bindings/gtk/README.md has the list.
