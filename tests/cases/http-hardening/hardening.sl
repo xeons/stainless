@@ -237,12 +237,15 @@ void TestHosts()
 void TestMultipartFields()
 {
     Console.WriteLine("-- a multipart part with CR LF in a field");
-    var log = new RawLog();
+    // The client refuses before it sends a body, so whether the server even
+    // accepts the connection is a race; the verdict is only ever set to yes.
+    var injected = new AtomicBool(false);
     RawServer server = RawServer.StartRawServer((connection, index) =>
     {
         String head = ReadRawHead(connection);
         String rest = ReadRawBytes(connection, 100000u);
-        log.AddLine("  server saw the injected field: " + (rest.Contains("Injected:") ? "yes" : "no"));
+        if (rest.Contains("Injected:"))
+            injected.Write(true);
         connection.Close();
     })!;
     var client = new HttpClient();
@@ -257,8 +260,7 @@ void TestMultipartFields()
     Console.WriteLine("client: " + DescribeSent(sent, failure));
     client.Dispose();
     server.StopRawServer();
-    foreach (var line in log.CopyLines())
-        Console.WriteLine(line);
+    Console.WriteLine("  server saw the injected field: " + (injected.Read() ? "yes" : "no"));
 }
 
 void TestEnvironment()
