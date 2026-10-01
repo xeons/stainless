@@ -838,12 +838,17 @@ section makes another object, because those are different memory.
 `Access` is some of the letters `r`, `w` and `x`, each at most once, in any
 order, and always including `r` (SL0707). The default is `"r"`.
 
-| Access | Default section, PE | Default section, ELF | What it is for |
-|---|---|---|---|
-| `"r"` | `.rdata` | `.rodata` | data the program reads — the usual case |
-| `"rw"` | `.data` | `.data` | a table the program also updates |
-| `"rx"` | `.text` | `.text` | machine code to call |
-| `"rwx"` | none | none | code written at run time; name a section |
+| Access | Default section, PE | Default section, ELF | Default section, Mach-O | What it is for |
+|---|---|---|---|---|
+| `"r"` | `.rdata` | `.rodata` | `__DATA_CONST,__const` | data the program reads: the usual case |
+| `"rw"` | `.data` | `.data` | `__DATA,__data` | a table the program also updates |
+| `"rx"` | `.text` | `.text` | `__TEXT,__text` | machine code to call |
+| `"rwx"` | none | none | none | code written at run time; name a section |
+
+Mach-O's read-only default is not `__TEXT,__const`, where clang puts a `const`
+array, because the `__TEXT` segment is executable. `__DATA_CONST` is made
+read-only by dyld once the image is bound, and an embed has no relocation for
+it to bind.
 
 **Writing to a read-only embed faults**, as writing to a string literal does in
 C. Nothing checks it when the program is compiled — an element store looks the
@@ -863,6 +868,8 @@ it is asked for by name:
 [Embed("trampoline.bin", Section = ".jit", Access = "rwx")]
 public static byte[] Scratch;
 ```
+
+On Mach-O no segment an embed can use is both, so there it cannot be had at all.
 
 `"rx"` is how an embed becomes code. The first element is the first byte of the
 file, and a pointer to it converts to a `delegate`
@@ -899,6 +906,23 @@ rather than left for the assembler to reject or, on PE, to ignore.
 error[SL0711]: '.text' is always "rx" on x86_64-pc-linux-gnu, and the assembler
 would keep that whatever an embed asked for, so "r" cannot be placed there; name
 a section of its own
+```
+
+**On Mach-O a section is named `segment,section`**, as in `__DATA,__blob`, with
+exactly one comma, and each name from one to sixteen bytes of letters, digits,
+`_` and `.`, because the header has a fixed sixteen-byte field for each and no
+string table. The directive states no permissions there: a section has its
+segment's. So the segment has to be one whose permissions an object file can
+count on: `__TEXT` for `"rx"`, `__DATA` for `"rw"` and `__DATA_CONST` for
+`"r"`. Anything else is refused (SL0830), as is a name without a segment.
+A segment of another name gets whatever the linker gives it. The access rule
+above applies to the segment: `__TEXT,__const` asked for as `"r"` would still be
+executable, and `__DATA,__bss` holds no bytes. The comma is Mach-O's alone; on
+the other formats it is refused with the rest (SL0709).
+
+```
+error[SL0830]: '.rodata' cannot name a section on arm64-apple-macosx13.0: a
+Mach-O section is named 'segment,section', with exactly one comma
 ```
 
 **A PE image keeps eight bytes of a section name.** An object file can hold a
@@ -1126,8 +1150,8 @@ them.
 `esp`, `sp` and every width of them), because a block that moved it would leave
 every local at the wrong address; the frame pointer (`rbp`, `ebp`, `x29`,
 `fp`), which a function may address its locals through; and on Windows ARM64
-`x18`, which holds the thread environment block. Linux leaves `x18` to be used,
-so there it is an ordinary register.
+`x18`, which holds the thread environment block, and on macOS, which reserves
+it. Linux leaves `x18` to be used, so there it is an ordinary register.
 
 **A register holds one value going in and one coming out**, so it may be named
 by one `in` and one `out` — `in rcx = count, out rcx = left` puts `count` in and

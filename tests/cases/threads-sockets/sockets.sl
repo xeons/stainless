@@ -103,7 +103,8 @@ void CheckStream()
 
 void CheckFailedConnect()
 {
-    // A port that is bound and not listening refuses a connection.
+    // A port nothing holds refuses a connection. One bound and not listening
+    // would not do: Linux and Windows refuse it, and XNU drops the SYN.
     var holder = Socket.Open(AddressFamily.IPv4, SocketType.Stream);
     var socket = Socket.Open(AddressFamily.IPv4, SocketType.Stream);
     if (!holder.Ok || !socket.Ok)
@@ -115,6 +116,7 @@ void CheckFailedConnect()
     var held = holder.Value;
     held.Bind("127.0.0.1", 0u);
     ushort port = held.LocalEndPoint.Port;
+    held.Close();
 
     var connecting = socket.Value;
     connecting.SetBlocking(false);

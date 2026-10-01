@@ -997,6 +997,8 @@ public class BinderTests
     [InlineData("Arm64Linux", "fp")]
     [InlineData("Arm64Windows", "x18")]
     [InlineData("Arm64Windows", "w18")]
+    [InlineData("Arm64MacOS", "x18")]
+    [InlineData("Arm64MacOS", "w18")]
     public void AStackFrameOrReservedRegisterIsNotAnOperand(string target, string register)
     {
         var platform = (TargetPlatform)typeof(TargetPlatform).GetField(target)!.GetValue(null)!;

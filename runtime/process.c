@@ -562,9 +562,16 @@ static int privatePipe(int ends[2])
  * by default ends this process. Ignoring the signal process-wide would change
  * it for every other thread; blocking it here and consuming the one this write
  * raised changes nothing anyone else can see. One already pending is left.
+ *
+ * macOS has no sigtimedwait to consume it with. There the descriptor carries
+ * F_SETNOSIGPIPE from the moment it is made, and the write fails with EPIPE
+ * and raises nothing.
  */
 static ssize_t writeQuietly(int fd, const uint8_t *bytes, size_t length)
 {
+#ifdef __APPLE__
+    return write(fd, bytes, length);
+#else
     sigset_t pipeSignal, previous, pending;
     sigemptyset(&pipeSignal);
     sigaddset(&pipeSignal, SIGPIPE);
@@ -585,6 +592,7 @@ static ssize_t writeQuietly(int fd, const uint8_t *bytes, size_t length)
     pthread_sigmask(SIG_SETMASK, &previous, NULL);
     errno = number;
     return sent;
+#endif
 }
 
 /*
@@ -870,6 +878,15 @@ void *sl_process_open(void *args, void *input, int *error)
             *error = classify(errno);
             return NULL;
         }
+#ifdef __APPLE__
+        /* writeQuietly relies on it; see there. */
+        if (fcntl(inPipe[1], F_SETNOSIGPIPE, 1) != 0) {
+            *error = classify(errno);
+            close(inPipe[0]);
+            close(inPipe[1]);
+            return NULL;
+        }
+#endif
     } else {
         inPipe[0] = lifted(open("/dev/null", O_RDONLY | O_CLOEXEC));
         if (inPipe[0] < 0) {

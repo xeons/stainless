@@ -125,13 +125,25 @@ public sealed class EmbeddedFile(
     /// array, and a function. Writable and executable at once has no such
     /// section on any target, and quietly making one would be the wrong way to
     /// get memory that is both: it is something to ask for by name.
+    ///
+    /// <para>
+    /// Mach-O differs for read-only data. clang puts a <c>const</c> array in
+    /// <c>__TEXT,__const</c>, but the <c>__TEXT</c> segment is executable, so
+    /// an embed asking for <c>"r"</c> goes to <c>__DATA_CONST</c>, which dyld
+    /// makes read-only once the image is bound. The header has no relocation,
+    /// so there is nothing for dyld to write there.
+    /// </para>
     /// </summary>
     public static string? DefaultSection(EmbedAccess access, TargetPlatform target) =>
-        Spell(access) switch
+        (Spell(access), target.Format) switch
         {
-            "r" => target.IsWindows ? ".rdata" : ".rodata",
-            "rw" => ".data",
-            "rx" => ".text",
+            ("r", ObjectFormat.Coff) => ".rdata",
+            ("r", ObjectFormat.Elf) => ".rodata",
+            ("r", ObjectFormat.MachO) => "__DATA_CONST,__const",
+            ("rw", ObjectFormat.MachO) => "__DATA,__data",
+            ("rw", _) => ".data",
+            ("rx", ObjectFormat.MachO) => "__TEXT,__text",
+            ("rx", _) => ".text",
             _ => null,
         };
 
@@ -144,9 +156,10 @@ public sealed class EmbeddedFile(
     /// quoting settles: an empty name, a quote or a backslash, which would end
     /// or escape the quoting, and a comma, whitespace or a control character,
     /// which a linker script or a <c>/SECTION:</c> option could not name
-    /// afterwards.
+    /// afterwards. On Mach-O the comma is the separator between segment and
+    /// section, and <see cref="MachOSectionProblem"/> holds the rest.
     /// </summary>
-    public static string? SectionProblem(string name)
+    public static string? SectionProblem(string name, TargetPlatform target)
     {
         if (name.Length == 0)
             return "a section name cannot be empty";
@@ -155,13 +168,73 @@ public sealed class EmbeddedFile(
         {
             if (c is '"' or '\\')
                 return $"a section name cannot contain '{c}'";
-            if (c == ',')
-                return "a section name cannot contain a comma";
+            if (c == ',' && !target.IsMachO)
+                return "a section name cannot contain a comma; 'segment,section' is how " +
+                       $"Mach-O names one, and {target.Triple} is not a Mach-O target";
             if (char.IsWhiteSpace(c))
                 return "a section name cannot contain whitespace";
             if (char.IsControl(c))
                 return "a section name cannot contain a control character";
         }
+
+        return null;
+    }
+
+    /// <summary>
+    /// The longest segment or section name a Mach-O header keeps: each is a
+    /// fixed sixteen-byte field, with no string table to hold a longer one.
+    /// </summary>
+    public const int MachONameLimit = 16;
+
+    /// <summary>
+    /// The segments an embed can be placed in on Mach-O, with the access each
+    /// has. A section directive states no permissions there: they are the
+    /// segment's, and the linker sets those of any other segment.
+    /// </summary>
+    private static readonly (string Segment, EmbedAccess Access)[] MachOSegments =
+    [
+        ("__TEXT", EmbedAccess.Read | EmbedAccess.Execute),
+        ("__DATA", EmbedAccess.Read | EmbedAccess.Write),
+        ("__DATA_CONST", EmbedAccess.Read),
+    ];
+
+    /// <summary>
+    /// Why a name that passed <see cref="SectionProblem"/> is not a Mach-O
+    /// section, or null when it is one.
+    ///
+    /// Exactly one comma between a segment and a section, each one to sixteen
+    /// bytes. The directive is written unquoted, because Darwin's assembler
+    /// takes the whole specifier as one string, so each part is held to
+    /// letters, digits, underscores and dots. And the segment is one of
+    /// <see cref="MachOSegments"/>, because nothing in an object file can give
+    /// another the permissions an embed asked for.
+    /// </summary>
+    public static string? MachOSectionProblem(string name)
+    {
+        string[] parts = name.Split(',');
+        if (parts.Length != 2)
+            return "a Mach-O section is named 'segment,section', with exactly one comma";
+
+        foreach (string part in parts)
+        {
+            if (part.Length == 0)
+                return "neither the segment nor the section can be empty";
+
+            foreach (char c in part)
+                if (!char.IsAsciiLetterOrDigit(c) && c is not '_' and not '.')
+                    return $"'{c}' cannot appear in a Mach-O segment or section name; use " +
+                           "letters, digits, '_' and '.'";
+
+            // ASCII by now, so a character is a byte.
+            if (part.Length > MachONameLimit)
+                return $"'{part}' is longer than the {MachONameLimit} bytes a Mach-O header " +
+                       "keeps for a segment or section name";
+        }
+
+        if (!MachOSegments.Any(s => s.Segment == parts[0]))
+            return $"'{parts[0]}' is not a segment an embed can use: its permissions are set " +
+                   "when the program is linked, not by the object file; use __TEXT for " +
+                   "\"rx\", __DATA for \"rw\" or __DATA_CONST for \"r\"";
 
         return null;
     }
@@ -185,9 +258,16 @@ public sealed class EmbeddedFile(
     /// So a name after a dot (ELF) or a dollar sign (COFF) is held to the
     /// section it extends. <see cref="EmbedAccess"/> 0 marks a section that
     /// holds no bytes at all.
+    ///
+    /// On Mach-O every section has the access of its segment, so a name that
+    /// passed <see cref="MachOSectionProblem"/> always has one; the zero-fill
+    /// and thread-local sections are the exceptions, and hold no bytes.
     /// </summary>
     public static EmbedAccess? KnownSectionAccess(string name, TargetPlatform target)
     {
+        if (target.IsMachO)
+            return MachOSectionAccess(name);
+
         (string Name, EmbedAccess Access)[] known = target.IsWindows
             ?
             [
@@ -210,6 +290,29 @@ public sealed class EmbeddedFile(
 
         foreach (var (section, access) in known)
             if (name == section || name.StartsWith(section + separator, StringComparison.Ordinal))
+                return access;
+
+        return null;
+    }
+
+    /// <summary>The Mach-O half of <see cref="KnownSectionAccess"/>.</summary>
+    private static EmbedAccess? MachOSectionAccess(string name)
+    {
+        switch (name)
+        {
+            case "__DATA,__bss":
+            case "__DATA,__common":
+            case "__DATA,__thread_bss":
+            case "__DATA,__thread_data":
+            case "__DATA,__thread_vars":
+                return 0;
+        }
+
+        int comma = name.IndexOf(',', StringComparison.Ordinal);
+        string segment = comma < 0 ? name : name[..comma];
+
+        foreach (var (known, access) in MachOSegments)
+            if (segment == known)
                 return access;
 
         return null;
@@ -293,11 +396,23 @@ public sealed class EmbeddedFile(
     /// not interchangeable: each is an assembler error on the other format.
     /// ELF's type is spelled <c>%progbits</c> rather than <c>@progbits</c>,
     /// because <c>@</c> starts a comment in some ARM assemblers.
+    ///
+    /// Mach-O states no permissions in the directive; the segment has them.
+    /// The name is unquoted, which <see cref="MachOSectionProblem"/> makes
+    /// safe, and code is marked <c>pure_instructions</c> as clang marks
+    /// <c>__TEXT,__text</c>, so that a disassembler and the linker treat it as
+    /// code.
     /// </summary>
     public string SectionDirective(TargetPlatform target)
     {
         bool write = Access.HasFlag(EmbedAccess.Write);
         bool execute = Access.HasFlag(EmbedAccess.Execute);
+
+        if (target.IsMachO)
+            return execute
+                ? $".section {Section},regular,pure_instructions"
+                : $".section {Section}";
+
         string name = AssemblerString(Section);
 
         if (target.IsWindows)

@@ -15,7 +15,9 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 using System.Diagnostics;
+using System.Globalization;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace Stainless.Driver;
 
@@ -46,58 +48,49 @@ public sealed class Toolchain
     private Toolchain(string clangPath) => ClangPath = clangPath;
 
     /// <summary>
-    /// <c>--target=</c> for a cross build, and nothing at all for a native one.
+    /// <c>--target=</c> where the build names a triple, and nothing otherwise.
     ///
-    /// Nothing rather than the host triple on purpose: naming one makes clang
-    /// pick a target rather than its default, and its default is the one whose
-    /// headers and libraries are certainly installed. A cross build has to name
-    /// one and takes what comes; a native build should not have to.
+    /// A native build names none: clang's default is the target whose headers
+    /// and libraries are certainly installed. A build is cross when either the
+    /// architecture or the operating system differs from the host.
     ///
-    /// <para>
-    /// **Cross means either half being different, not just the architecture.**
-    /// This tested the architecture alone, so <c>--target x64-linux</c> on an
-    /// x64 Windows box named no triple at all: clang used its own default,
-    /// which is MSVC, and the build got as far as <c>lld-link</c> asking for
-    /// <c>:libgtk-3.so.0.lib</c>. The architecture was the only half that had
-    /// ever differed, which is why it read as the whole question.
-    /// </para>
+    /// Darwin always names one. Its triple carries the deployment version, and
+    /// the program and the runtime MUST agree on it.
     /// </summary>
-    private static IEnumerable<string> TargetArguments
+    public static IReadOnlyList<string> TargetArgumentsFor(
+        Binding.TargetPlatform target, Binding.TargetPlatform host)
     {
-        get
-        {
-            var target = Binding.TargetPlatform.Current;
-            var host = Binding.TargetPlatform.Host;
+        List<string> arguments = [];
+        if (NamesTriple(target, host))
+            arguments.Add("--target=" + target.Triple);
 
-            if (target.Architecture != host.Architecture || target.IsWindows != host.IsWindows)
-                yield return "--target=" + target.Triple;
+        if (target.Cpu is { } cpu)
+            arguments.Add("-march=" + cpu);
 
-            if (target.Cpu is { } cpu)
-                yield return "-march=" + cpu;
-        }
+        return arguments;
     }
+
+    private static bool NamesTriple(Binding.TargetPlatform target, Binding.TargetPlatform host) =>
+        target.IsDarwin || target.Architecture != host.Architecture || target.Os != host.Os;
+
+    private static IReadOnlyList<string> TargetArguments =>
+        TargetArgumentsFor(Binding.TargetPlatform.Current, Binding.TargetPlatform.Host);
 
     /// <summary>
     /// The triple this build actually uses: the one named on the command line
-    /// when it is a cross build, and clang's own default when it is not.
-    ///
-    /// The difference matters to <see cref="DeadStripArgument"/>, which chooses
-    /// between three spellings of one idea by what the linker will be. Asking
-    /// clang for its default answers about the host, which is the wrong machine
-    /// whenever <c>--target</c> named another.
+    /// when there is one, and clang's own default when there is not.
     /// </summary>
     private string EffectiveTriple =>
-        TargetArguments.FirstOrDefault(a => a.StartsWith("--target=", StringComparison.Ordinal))
-            is { } named
-            ? named["--target=".Length..]
+        NamesTriple(Binding.TargetPlatform.Current, Binding.TargetPlatform.Host)
+            ? Binding.TargetPlatform.Current.Triple
             : TargetTriple;
 
     private string? _targetTriple;
 
     /// <summary>
-    /// The triple clang builds for, asked once and remembered. It decides which
-    /// spelling of "discard unreferenced sections" the linker understands, and
-    /// clang is the only thing that actually knows.
+    /// The triple clang builds for by default, asked once and remembered. It
+    /// says which Windows linker flavour is in use, and clang is the only thing
+    /// that actually knows.
     /// </summary>
     private string TargetTriple =>
         _targetTriple ??= Run(ClangPath, ["-print-target-triple"]) is { Success: true } probe
@@ -112,9 +105,8 @@ public sealed class Toolchain
     /// them all, and a section per function lets the linker drop them instead.
     /// </summary>
     private string DeadStripArgument =>
-        EffectiveTriple.Contains("windows-msvc", StringComparison.Ordinal) ? "-Wl,/OPT:REF"
-        : EffectiveTriple.Contains("apple", StringComparison.Ordinal) ||
-          EffectiveTriple.Contains("darwin", StringComparison.Ordinal) ? "-Wl,-dead_strip"
+        Binding.TargetPlatform.Current.IsDarwin ? "-Wl,-dead_strip"
+        : EffectiveTriple.Contains("windows-msvc", StringComparison.Ordinal) ? "-Wl,/OPT:REF"
         : "-Wl,--gc-sections";
 
     /// <summary>Returns the toolchain, or null with an explanation if clang is missing.</summary>
@@ -127,20 +119,79 @@ public sealed class Toolchain
         if (!string.IsNullOrWhiteSpace(configured) && File.Exists(configured))
             return new Toolchain(configured);
 
+        string? tooOld = null;
         foreach (string candidate in CandidatePaths())
-            if (File.Exists(candidate))
-                return new Toolchain(candidate);
+        {
+            if (!File.Exists(candidate))
+                continue;
 
-        error = "could not find 'clang'. Stainless emits LLVM IR and needs clang to " +
-                "produce a native binary.\n" +
-                "  Install it with:  winget install LLVM.LLVM\n" +
-                "  Or point Stainless at an existing copy:  set STAINLESS_CLANG=C:\\path\\to\\clang.exe";
+            // Only a Mac is checked: /usr/bin/clang there is Apple's, and it
+            // can be older than the IR this compiler writes.
+            if (OperatingSystem.IsMacOS() &&
+                !(Run(candidate, ["--version"]) is { Success: true } version &&
+                  IsSupportedClangVersion(version.StandardOutput)))
+            {
+                tooOld ??= candidate;
+                continue;
+            }
+
+            return new Toolchain(candidate);
+        }
+
+        error = MissingClang(tooOld);
         return null;
+    }
+
+    /// <summary>The toolchain for a clang already found, without looking for one.</summary>
+    public static Toolchain FromClang(string clangPath) => new(clangPath);
+
+    /// <summary>
+    /// Whether <c>clang --version</c> describes LLVM 16 or later. Apple numbers
+    /// its clang apart from LLVM, and its 15 is LLVM's 16.
+    /// </summary>
+    public static bool IsSupportedClangVersion(string versionOutput)
+    {
+        var match = Regex.Match(
+            versionOutput, @"(Apple )?clang version (\d+)");
+        if (!match.Success)
+            return false;
+
+        int major = int.Parse(match.Groups[2].Value, CultureInfo.InvariantCulture);
+        return major >= (match.Groups[1].Success ? 15 : 16);
+    }
+
+    /// <summary>What to tell someone whose machine has no usable clang.</summary>
+    private static string MissingClang(string? tooOld)
+    {
+        const string why = "Stainless emits LLVM IR and needs clang to produce a native binary.\n";
+
+        if (OperatingSystem.IsMacOS())
+            return "could not find a clang from LLVM 16 or later. " + why +
+                   (tooOld is null ? "" : $"  '{tooOld}' is older than that.\n") +
+                   "  Install Homebrew's with:  brew install llvm\n" +
+                   "  Or point Stainless at an existing copy:  " +
+                   "export STAINLESS_CLANG=/opt/homebrew/opt/llvm/bin/clang";
+
+        if (OperatingSystem.IsWindows())
+            return "could not find 'clang'. " + why +
+                   "  Install it with:  winget install LLVM.LLVM\n" +
+                   "  Or point Stainless at an existing copy:  set STAINLESS_CLANG=C:\\path\\to\\clang.exe";
+
+        return "could not find 'clang'. " + why +
+               "  On Debian and Ubuntu install it with:  sudo apt install clang\n" +
+               "  Or point Stainless at an existing copy:  export STAINLESS_CLANG=/path/to/clang";
     }
 
     private static IEnumerable<string> CandidatePaths()
     {
         string executable = OperatingSystem.IsWindows() ? "clang.exe" : "clang";
+
+        // Homebrew's LLVM before PATH, which always holds Apple's clang.
+        if (OperatingSystem.IsMacOS())
+        {
+            yield return "/opt/homebrew/opt/llvm/bin/clang";
+            yield return "/usr/local/opt/llvm/bin/clang";
+        }
 
         foreach (string directory in (Environment.GetEnvironmentVariable("PATH") ?? "")
                      .Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries))
@@ -158,6 +209,24 @@ public sealed class Toolchain
         {
             yield return "/usr/bin/clang";
             yield return "/usr/local/bin/clang";
+        }
+
+        if (OperatingSystem.IsMacOS() && FindWithXcrun("clang") is { } apple)
+            yield return apple;
+    }
+
+    /// <summary>Where the Xcode tools say <paramref name="tool"/> is, or null.</summary>
+    private static string? FindWithXcrun(string tool)
+    {
+        try
+        {
+            return Run("/usr/bin/xcrun", ["-f", tool]) is { Success: true } found
+                ? found.StandardOutput.Trim()
+                : null;
+        }
+        catch (System.ComponentModel.Win32Exception)
+        {
+            return null;
         }
     }
 
@@ -283,12 +352,31 @@ public sealed class Toolchain
         // What the Windows headers call this target, for a script that asks.
         arguments.Add(target.PointerWidth == 8 ? "-D_WIN64" : "-D_WIN32");
 
-        arguments.AddRange(["-fo", outputPath, scriptPath]);
+        // llvm-rc reads an argument starting with '/' as an option on every
+        // host, so without the `--` a script under /Users is `/U` with a value.
+        arguments.AddRange(["-fo", outputPath, "--", scriptPath]);
 
         return Run(ResourceCompilerPath!, arguments);
     }
 
     private const string RuntimeResourcePrefix = "Stainless.Runtime.";
+
+    /// <summary>
+    /// What a runtime object's name ends in, so that each build of it has its
+    /// own file beside the one shared source.
+    ///
+    /// A debug, shared or leak-checking object is a different object. So is
+    /// one for another target, and it is named by the whole target: an object
+    /// for x64 Windows and one for x64 Linux differ, and a linker handed the
+    /// wrong one reports an unknown file type. Any build that names a triple
+    /// names it here, Darwin's included, so an object compiled without its
+    /// deployment version is never reused.
+    /// </summary>
+    public static string RuntimeObjectSuffix(
+        Binding.TargetPlatform target, Binding.TargetPlatform host,
+        bool shared, bool debug, bool leakCheck) =>
+        (NamesTriple(target, host) ? "." + target.Name : "")
+        + (shared ? ".so" : "") + (debug ? ".g" : "") + (leakCheck ? ".leak" : "") + ".o";
 
     /// <summary>
     /// Writes the runtime out of the compiler's own resources and compiles each
@@ -326,32 +414,9 @@ public sealed class Toolchain
         {
             string source = Path.Combine(objectDirectory, name);
 
-            // A debug object is a different object, so it gets a different name.
-            // Sharing one would hand whichever build ran second the other's.
-            // A shared one differs again: it is compiled position-independent
-            // and with its exports marked, and neither is true of the other.
-            // The target goes in the name for the reason debug and shared do:
-            // an object built for x86 is a different object, and handing a
-            // 64-bit link one of them fails in the linker rather than here.
-            //
-            // **The operating system is half of that and was missing**, so an
-            // x64 Windows object and an x64 Linux one were both `arc.o` and the
-            // second build silently linked the first's. The linker said
-            // "unknown file type" about a COFF object it was handed on an ELF
-            // link, which names the symptom and nothing about the cause.
             var target = Binding.TargetPlatform.Current;
-            var host = Binding.TargetPlatform.Host;
-
-            bool native = target.Architecture == host.Architecture
-                       && target.IsWindows == host.IsWindows;
-
-            string platform = native
-                ? ""
-                : "." + target.Architecture.ToString().ToLowerInvariant()
-                      + (target.IsWindows ? "-windows" : "-linux");
-
-            string suffix = platform + (shared ? ".so" : "") + (debug ? ".g" : "")
-                          + (leakCheck ? ".leak" : "") + ".o";
+            string suffix = RuntimeObjectSuffix(
+                target, Binding.TargetPlatform.Host, shared, debug, leakCheck);
             string objectFile = Path.ChangeExtension(source, suffix);
             objectFiles.Add(objectFile);
 
@@ -435,35 +500,12 @@ public sealed class Toolchain
     {
         var objects = BuildRuntime(objectDirectory, debug, shared: true, leakCheck: leakCheck);
 
+        var target = Binding.TargetPlatform.Current;
         string library = Path.Combine(objectDirectory,
-            SharedLibraryFileName(SharedRuntimeName(debug, leakCheck)));
+            SharedLibraryFileName(SharedRuntimeName(debug, leakCheck), target));
+        string linkInput = LinkInputFor(library, target);
 
-        // The import library is what a Windows link line names, and the linker
-        // writes it beside the DLL rather than being told where to put it.
-        string linkInput = OperatingSystem.IsWindows()
-            ? Path.ChangeExtension(library, ".lib")
-            : library;
-
-        List<string> arguments = [.. objects, "-shared", "-o", library];
-        if (debug) arguments.Add("-g");
-
-        // A shared library resolves everything it needs at link time on Windows
-        // and would happily leave a hole elsewhere; saying so keeps a mistake in
-        // the runtime from turning into a missing symbol in someone's program.
-        if (!OperatingSystem.IsWindows() && !OperatingSystem.IsMacOS())
-            arguments.Add("-Wl,--no-undefined");
-
-        // A binary records the name a library gives itself, or the path it was
-        // linked by when it gives none. Each build links the copy in its own
-        // intermediate directory, so without a name a program and its library
-        // record two paths and the loader maps two runtimes. By name, the copy
-        // beside the binary is found through the rpath Link writes, and a
-        // second binary asking for the same name gets the one already loaded.
-        // Windows matches a DLL by its file name already.
-        if (OperatingSystem.IsMacOS())
-            arguments.Add("-Wl,-install_name,@rpath/" + Path.GetFileName(library));
-        else if (!OperatingSystem.IsWindows())
-            arguments.Add("-Wl,-soname," + Path.GetFileName(library));
+        var arguments = SharedRuntimeLinkArguments(objects, library, debug);
 
         // The link line is part of what the library is, so one linked by a
         // different line is out of date however new it is.
@@ -481,6 +523,56 @@ public sealed class Toolchain
         File.WriteAllText(stamp, line);
         return new SharedRuntime(library, linkInput);
     }
+
+    /// <summary>
+    /// The clang command line that links the shared runtime from its objects,
+    /// for the current target.
+    /// </summary>
+    public IReadOnlyList<string> SharedRuntimeLinkArguments(
+        IReadOnlyList<string> objects, string library, bool debug)
+    {
+        var target = Binding.TargetPlatform.Current;
+
+        List<string> arguments =
+            [.. TargetArguments, .. objects, SharedLibraryFlag(target), "-o", library];
+        if (debug) arguments.Add("-g");
+
+        // A shared library resolves everything it needs at link time on Windows
+        // and Darwin, and would happily leave a hole on Linux; saying so keeps a
+        // mistake in the runtime from turning into a missing symbol in someone's
+        // program.
+        if (target.IsLinux)
+            arguments.Add("-Wl,--no-undefined");
+
+        // A binary records the name a library gives itself, or the path it was
+        // linked by when it gives none. Each build links the copy in its own
+        // intermediate directory, so without a name a program and its library
+        // record two paths and the loader maps two runtimes. By name, the copy
+        // beside the binary is found through the rpath Link writes, and a
+        // second binary asking for the same name gets the one already loaded.
+        // Windows matches a DLL by its file name already.
+        if (LibraryNameArgument(target, library) is { } name)
+            arguments.Add(name);
+
+        return arguments;
+    }
+
+    /// <summary>What tells clang to link a shared library rather than a program.</summary>
+    private static string SharedLibraryFlag(Binding.TargetPlatform target) =>
+        target.IsDarwin ? "-dynamiclib" : "-shared";
+
+    /// <summary>
+    /// The name a shared library records for itself, so that a consumer finds
+    /// it by name wherever the two are put together; null on Windows, where a
+    /// DLL is found by its file name.
+    /// </summary>
+    private static string? LibraryNameArgument(Binding.TargetPlatform target, string library) =>
+        target.Os switch
+        {
+            Binding.TargetOS.MacOS => "-Wl,-install_name,@rpath/" + Path.GetFileName(library),
+            Binding.TargetOS.Linux => "-Wl,-soname," + Path.GetFileName(library),
+            _ => null,
+        };
 
     /// <summary>True when <paramref name="output"/> is newer than every input.</summary>
     private static bool IsUpToDate(string output, IEnumerable<string> inputs)
@@ -534,8 +626,30 @@ public sealed class Toolchain
         IReadOnlyList<string>? libraries = null,
         SharedRuntime? sharedRuntime = null,
         string? moduleDefinition = null,
+        bool loadsLibrariesBeside = false) =>
+        Run(ClangPath, LinkArguments(
+            irPath, runtimeObjects, nativeInputs, outputPath, optimizationLevel, shared,
+            debug, libraries, sharedRuntime, moduleDefinition, loadsLibrariesBeside));
+
+    /// <summary>The clang command line <see cref="Link"/> runs, for the current target.</summary>
+    public IReadOnlyList<string> LinkArguments(
+        string irPath,
+        IReadOnlyList<string> runtimeObjects,
+        IReadOnlyList<string> nativeInputs,
+        string outputPath,
+        int optimizationLevel,
+        bool shared = false,
+        bool debug = false,
+        IReadOnlyList<string>? libraries = null,
+        SharedRuntime? sharedRuntime = null,
+        string? moduleDefinition = null,
         bool loadsLibrariesBeside = false)
     {
+        var target = Binding.TargetPlatform.Current;
+
+        // The IR is compiled in this same invocation, which is what makes
+        // clang's Darwin driver run dsymutil after a -g link. Without that the
+        // DWARF would stay in a temporary object clang deletes.
         List<string> arguments = [.. TargetArguments, irPath];
 
         // The lld-link beside clang rather than whichever linker clang would
@@ -543,7 +657,8 @@ public sealed class Toolchain
         // Visual Studio is installed. The two disagree: link.exe drops a
         // resource that holds no bytes, so the same program found it or not by
         // what else was on the machine.
-        if (EffectiveTriple.Contains("windows-msvc", StringComparison.Ordinal) && HasLldLinkBesideClang)
+        if (target.IsWindows && EffectiveTriple.Contains("windows-msvc", StringComparison.Ordinal) &&
+            HasLldLinkBesideClang)
             arguments.Add("-fuse-ld=lld");
 
         // 32-bit Windows keeps the printf family inline in <stdio.h>, so a
@@ -551,7 +666,6 @@ public sealed class Toolchain
         // import library exports `printf` for x64 and `_printf` for nothing.
         // This is the compatibility library that defines them out of line, and
         // it is what a C program built for the same target gets too.
-        var target = Binding.TargetPlatform.Current;
         if (target.Architecture == Binding.TargetArch.X86 && target.IsWindows)
             arguments.Add("-llegacy_stdio_definitions");
 
@@ -575,40 +689,39 @@ public sealed class Toolchain
         // glibc 2.34. `Standard.Math` declares sqrt and the rest `extern "C"`,
         // so a program that touches any of them fails to link without this --
         // and `--as-needed`, which is the default on every distribution that
-        // matters, drops whichever of the two nothing reached.
-        if (!OperatingSystem.IsWindows()) arguments.AddRange(["-lm", "-lpthread"]);
+        // matters, drops whichever of the two nothing reached. Darwin's SDK
+        // has both as stubs over libSystem.
+        if (!target.IsWindows) arguments.AddRange(["-lm", "-lpthread"]);
 
         // A shared library has no entry point; the linker also emits the import
         // library beside the DLL on Windows.
-        if (shared) arguments.Add("-shared");
+        if (shared) arguments.Add(SharedLibraryFlag(target));
 
         // A module definition file, which names exports independently of what
         // the symbols are called. Only ever written where the two differ; see
-        // ModuleDefinition.
-        if (moduleDefinition is not null)
+        // ModuleDefinition. Only a PE linker reads one.
+        if (moduleDefinition is not null && target.Format == Binding.ObjectFormat.Coff)
             arguments.Add("-Wl,/DEF:" + moduleDefinition);
 
         // -g here is not about the IR, which already carries its own description.
-        // It tells clang to keep it through to the binary, and on Windows to ask
-        // the linker for the .pdb the debugger actually reads.
+        // It tells clang to keep it through to the binary: on Windows by asking
+        // the linker for the .pdb, and on Darwin by running dsymutil.
         if (debug) arguments.Add("-g");
 
         // The runtime and any Stainless library sit beside whatever loaded
         // them, so that is where a binary is told to look. Windows searches its
         // own directory already; ELF and Mach-O have to be asked, and each
         // spells it differently.
-        if ((sharedRuntime is not null || loadsLibrariesBeside) && !OperatingSystem.IsWindows())
-            arguments.Add(OperatingSystem.IsMacOS()
+        if ((sharedRuntime is not null || loadsLibrariesBeside) && !target.IsWindows)
+            arguments.Add(target.IsDarwin
                 ? "-Wl,-rpath,@loader_path"
                 : "-Wl,-rpath,$ORIGIN");
 
         // A library named by its file name rather than by the path it was
         // linked from, so a consumer finds it wherever the two are put
         // together, as a DLL is found on Windows.
-        if (shared && OperatingSystem.IsMacOS())
-            arguments.Add("-Wl,-install_name,@rpath/" + Path.GetFileName(outputPath));
-        else if (shared && !OperatingSystem.IsWindows())
-            arguments.Add("-Wl,-soname," + Path.GetFileName(outputPath));
+        if (shared && LibraryNameArgument(target, outputPath) is { } name)
+            arguments.Add(name);
 
         arguments.AddRange([
             $"-O{optimizationLevel}",
@@ -623,7 +736,7 @@ public sealed class Toolchain
             DeadStripArgument,
         ]);
 
-        return Run(ClangPath, arguments);
+        return arguments;
     }
 
     /// <summary>
@@ -716,7 +829,8 @@ public sealed class Toolchain
     }
 
     /// <summary>
-    /// What a shared library built from a package of this name is called.
+    /// What a shared library built from a package of this name is called, for
+    /// <paramref name="target"/>.
     ///
     /// The <c>lib</c> prefix is not decoration: outside Windows it is what makes
     /// a library findable as <c>-lshapes</c> rather than only by its full path,
@@ -724,24 +838,45 @@ public sealed class Toolchain
     /// be the platform's, the same reason an executable is not called
     /// <c>app.exe</c> on Linux.
     /// </summary>
-    public static string SharedLibraryFileName(string name) =>
-        (OperatingSystem.IsWindows() ? "" : "lib") + name + SharedLibraryExtension;
-
-    /// <summary>The conventional shared-library extension for this platform.</summary>
-    public static string SharedLibraryExtension =>
-        OperatingSystem.IsWindows() ? ".dll" : OperatingSystem.IsMacOS() ? ".dylib" : ".so";
+    public static string SharedLibraryFileName(string name, Binding.TargetPlatform target) =>
+        (target.IsWindows ? "" : "lib") + name + SharedLibraryExtensionFor(target);
 
     /// <summary>
-    /// The conventional executable extension for this platform, which is
-    /// nothing at all outside Windows.
-    ///
-    /// Here rather than spelled out at each site, because it was spelled out at
-    /// each site and one of them said ".exe" unconditionally -- so every binary
-    /// the test suite built on Linux was called `something.exe`, which runs and
-    /// is still wrong.
+    /// <see cref="SharedLibraryFileName(string, Binding.TargetPlatform)"/> for
+    /// the current target.
     /// </summary>
+    public static string SharedLibraryFileName(string name) =>
+        SharedLibraryFileName(name, Binding.TargetPlatform.Current);
+
+    /// <summary>The conventional shared-library extension for a target.</summary>
+    public static string SharedLibraryExtensionFor(Binding.TargetPlatform target) => target.Os switch
+    {
+        Binding.TargetOS.Windows => ".dll",
+        Binding.TargetOS.MacOS => ".dylib",
+        _ => ".so",
+    };
+
+    /// <summary>The shared-library extension for the current target.</summary>
+    public static string SharedLibraryExtension =>
+        SharedLibraryExtensionFor(Binding.TargetPlatform.Current);
+
+    /// <summary>
+    /// The conventional executable extension for a target, which is nothing at
+    /// all outside Windows.
+    /// </summary>
+    public static string ExecutableExtensionFor(Binding.TargetPlatform target) =>
+        target.IsWindows ? ".exe" : "";
+
+    /// <summary>The executable extension for the current target.</summary>
     public static string ExecutableExtension =>
-        OperatingSystem.IsWindows() ? ".exe" : "";
+        ExecutableExtensionFor(Binding.TargetPlatform.Current);
+
+    /// <summary>
+    /// What a link line names for a shared library: the import library beside
+    /// it on Windows, and the library itself everywhere else.
+    /// </summary>
+    public static string LinkInputFor(string library, Binding.TargetPlatform target) =>
+        target.IsWindows ? Path.ChangeExtension(library, ".lib") : library;
 
     /// <summary>
     /// Runs a tool to completion. <paramref name="input"/>, when given, is its

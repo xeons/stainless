@@ -10,7 +10,13 @@ module EmbedCase;
 
 import Standard.Console;
 
-/// What a pointer to the stub is called as: no arguments, an int in eax.
+#if ARM64
+const nuint StubLength = 8u;
+#else
+const nuint StubLength = 6u;
+#endif
+
+/// What a pointer to the stub is called as: no arguments, an int in eax or w0.
 public delegate int Answer();
 
 /// A module-level static takes the attribute exactly as a type's field does,
@@ -32,13 +38,25 @@ public static class Blobs
     [Embed("data/table.bin", Access = "rw")]
     public static byte[] Scratch;
 
-    /// `mov eax, 42; ret`, which means the same thing on x86 and on x86-64.
+    /// `mov eax, 42; ret`, which means the same thing on x86 and on x86-64,
+    /// or `mov w0, #42; ret` on ARM64. Mach-O names a section after its
+    /// segment, and only __TEXT is executable.
+#if ARM64 && MACOS
+    [Embed("stub-arm64.bin", Section = "__TEXT,__stub", Access = "rx")]
+#elif ARM64
+    [Embed("stub-arm64.bin", Section = ".stub", Access = "rx")]
+#else
     [Embed("stub.bin", Section = ".stub", Access = "rx")]
+#endif
     public static readonly byte[] Stub;
 
     /// The path, the section and the access written positionally, in the order
     /// the attribute declares its fields — the same object as `Scratch`.
+#if MACOS
+    [Embed("data/table.bin", "__DATA,__data", "rw")]
+#else
     [Embed("data/table.bin", ".data", "rw")]
+#endif
     public static byte[] Positional;
 
     [Embed("data/empty.bin")]
@@ -83,7 +101,7 @@ int Main()
     // allocator: copied into a local, dropped, and still there.
     {
         byte[] held = Blobs.Stub;
-        Console.WriteLine($"stub length {held.Length}");
+        Console.WriteLine($"stub length {held.Length == StubLength}");
     }
 
     var answer = (Answer)(void*)&Blobs.Stub[0];

@@ -728,8 +728,12 @@ extern "C"
 
 /// `RTLD_LAZY | RTLD_LOCAL`: resolve as called, and do not put libgd's symbols
 /// in the global namespace where they could satisfy somebody else's undefined
-/// reference.
+/// reference. Darwin spells `RTLD_LOCAL` as 4; glibc's is 0.
+#if MACOS
+const int RtldLazyLocal = 0x00005;
+#else
 const int RtldLazyLocal = 0x00001;
+#endif
 
 /// libgd, resolved once.
 threadsafe sealed class Backend
@@ -771,18 +775,30 @@ threadsafe sealed class Backend
     {
         Ready = false;
 
+#if MACOS
+        // dyld searches /usr/local/lib for a bare name but not Homebrew's
+        // prefix on Apple silicon, so both prefixes are named.
+        void* library = OpenLibrary("libgd.3.dylib");
+        if (library == null)
+            library = OpenLibrary("libgd.dylib");
+        if (library == null)
+            library = OpenLibrary("/opt/homebrew/lib/libgd.3.dylib");
+        if (library == null)
+            library = OpenLibrary("/opt/homebrew/lib/libgd.dylib");
+        if (library == null)
+            library = OpenLibrary("/usr/local/lib/libgd.3.dylib");
+        if (library == null)
+            library = OpenLibrary("/usr/local/lib/libgd.dylib");
+#else
         // The versioned runtime library first, which is what a machine with the
         // package installed has; then the development symlink; then the older
-        // soname, and the macOS spellings of both.
+        // soname.
         void* library = OpenLibrary("libgd.so.3");
         if (library == null)
             library = OpenLibrary("libgd.so");
         if (library == null)
             library = OpenLibrary("libgd.so.2");
-        if (library == null)
-            library = OpenLibrary("libgd.3.dylib");
-        if (library == null)
-            library = OpenLibrary("libgd.dylib");
+#endif
         if (library == null)
             return;
 

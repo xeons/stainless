@@ -690,6 +690,104 @@ public class EmitterTests
         Assert.DoesNotContain("\ntarget datalayout", ir);
     }
 
+    /// <summary>The module for one target, emitted with a resource blob.</summary>
+    private static string ModuleIrFor(TargetPlatform target, string body, byte[]? resourceBlob = null)
+    {
+        var before = TargetPlatform.Current;
+        TargetPlatform.Current = target;
+        try
+        {
+            var program = Front.BindModule(body, out var diagnostics);
+            Assert.False(diagnostics.HasErrors);
+
+            return Front.Verified(
+                new Emit.LlvmEmitter(forSharedLibrary: true, resourceBlob: resourceBlob)
+                    .Emit(Lowering.Lowerer.Lower(program))
+                    .ReplaceLineEndings("\n"));
+        }
+        finally
+        {
+            TargetPlatform.Current = before;
+        }
+    }
+
+    /// <summary>
+    /// The compiled resources go in a section of their own, named the way each
+    /// format names one. A PE keeps them in its resource directory instead,
+    /// and has none.
+    /// </summary>
+    [Theory]
+    [InlineData("x64-windows", null)]
+    [InlineData("x64-linux", ".rsrc")]
+    [InlineData("arm64-linux", ".rsrc")]
+    [InlineData("arm64-macos", "__DATA_CONST,__sl_rsrc")]
+    [InlineData("x64-macos", "__DATA_CONST,__sl_rsrc")]
+    public void TheResourceSectionFollowsTheObjectFormat(string target, string? section) =>
+        Assert.Equal(section, Emit.LlvmEmitter.ResourceSection(TargetPlatform.Parse(target)!));
+
+    [Fact]
+    public void AResourceBlobIsPlacedInTheFormatsSection()
+    {
+        string ir = ModuleIrFor(TargetPlatform.Arm64MacOS, "public int F() => 0;", [1, 2, 3]);
+
+        Assert.Contains(
+            "@sl_resource_blob = constant [3 x i8] c\"\\01\\02\\03\", section \"__DATA_CONST,__sl_rsrc\"\n",
+            ir);
+        Assert.Contains("@sl_resource_blob_size = constant i64 3\n", ir);
+    }
+
+    /// <summary>
+    /// An empty blob still defines the symbol, so that `Standard.Resources`
+    /// links, and is given no section to make an empty one of.
+    /// </summary>
+    [Fact]
+    public void AnEmptyResourceBlobHasTheSymbolAndNoSection()
+    {
+        string ir = ModuleIrFor(TargetPlatform.X64Linux, "public int F() => 0;", []);
+
+        Assert.Contains("@sl_resource_blob = constant [0 x i8] c\"\"\n", ir);
+        Assert.Contains("@sl_resource_blob_size = constant i64 0\n", ir);
+    }
+
+    /// <summary>
+    /// Apple's arm64 ABI requires a frame record in x29, so every definition
+    /// keeps a frame pointer on that target, as clang's do, at every level.
+    /// Elsewhere a release build keeps none.
+    /// </summary>
+    [Fact]
+    public void ArmMacOSKeepsAFramePointerInEveryFunctionThatCalls()
+    {
+        const string body = "public int G() => 1;\npublic int F() => G() + 1;";
+
+        string mac = ModuleIrFor(TargetPlatform.Arm64MacOS, body);
+        Assert.Contains("attributes #0 = { \"frame-pointer\"=\"non-leaf\" }", mac);
+        Assert.Contains(" #0 {", Front.TestFunction(mac, "F").Split('\n')[0]);
+
+        Assert.DoesNotContain("frame-pointer", ModuleIrFor(TargetPlatform.Arm64Linux, body));
+        Assert.DoesNotContain("frame-pointer", ModuleIrFor(TargetPlatform.X64MacOS, body));
+    }
+
+    /// <summary>
+    /// A library's statics are initialized from a constructor, which Mach-O
+    /// does not order after the runtime's. The initializer asks the runtime to
+    /// start before anything else it does.
+    /// </summary>
+    [Fact]
+    public void ALibrarysInitializerStartsTheRuntimeFirst()
+    {
+        string ir = Front.ModuleIr("public static class Held { public static int[] Values = new int[4]; }");
+
+        var initializer = ir[ir.IndexOf("define internal void @_SLstatics()", StringComparison.Ordinal)..]
+            .Split('\n')
+            .Skip(1)
+            .SkipWhile(l => !l.StartsWith("  ", StringComparison.Ordinal) || l.Contains(" = alloca "))
+            .First();
+
+        Assert.Equal("  call void @sl_runtime_init()", initializer);
+        Assert.Single(Declarations(ir, "sl_runtime_init"));
+        Assert.Contains("i32 65535, ptr @_SLstatics", ir);
+    }
+
     /// <summary>How many times a fragment appears in the whole module.</summary>
     private static int Occurrences(string ir, string fragment)
     {
@@ -769,13 +867,18 @@ public class EmitterTests
 
     /// <summary>
     /// ARM64 has one syntax, so no dialect. x18 is clobbered on Linux and not
-    /// on Windows, and the link register is spelled the one way LLVM acts on.
+    /// on Windows or macOS, and the link register is spelled the one way LLVM
+    /// acts on.
     /// </summary>
     [Fact]
     public void AnArm64BlockClobbersByItsSystem()
     {
         string linux = AsmFunction(TargetPlatform.Arm64Linux, "asm { nop }");
         string windows = AsmFunction(TargetPlatform.Arm64Windows, "asm { nop }");
+        string macos = AsmFunction(TargetPlatform.Arm64MacOS, "asm { nop }");
+
+        Assert.Contains("~{x17},~{lr},~{v0},", macos);
+        Assert.DoesNotContain("x18", macos);
 
         Assert.Contains("call void asm \" nop \", \"~{x0},", linux);
         Assert.Contains("~{x17},~{x18},~{lr},~{v0},", linux);

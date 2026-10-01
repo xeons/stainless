@@ -29,8 +29,9 @@ import Standard.IO;
 /// Why a sound did not happen.
 public enum AudioError
 {
-    /// There is no audio library on this machine: no winmm, or no
-    /// libasound. `Audio.IsAvailable` is how to ask before trying.
+    /// There is no audio library on this machine: no WASAPI, no libasound,
+    /// or macOS, which has no backend yet. `Audio.IsAvailable` is how to ask
+    /// before trying.
     NoBackend,
 
     /// The format is not one this module handles, or not one the device

@@ -487,7 +487,7 @@ public sealed partial class LlvmEmitter
         if (target is null) return;
 
         var returnInfo = ClassifyResult(target.ReturnType);
-        string returnType = returnInfo.Style == PassStyle.Indirect ? "void" : returnInfo.LlvmType;
+        string returnType = ResultSpelling(returnInfo);
 
         var declared = new List<string>();
         var forwarded = new List<string>();
@@ -544,7 +544,7 @@ public sealed partial class LlvmEmitter
         else
         {
             _module.AppendLine($"  %r = {call}");
-            _module.AppendLine($"  ret {returnType} %r");
+            _module.AppendLine($"  ret {returnInfo.LlvmType} %r");
         }
 
         _module.AppendLine("}");

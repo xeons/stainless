@@ -47,7 +47,8 @@ every reference-counted allocation and reports what was never freed, which with
 counting rather than collecting is an exact answer. `dotnet run --project
 tests/Stainless.Tests -- --leak-check` runs every case that way and refuses one
 that ends with more alive than its `leaks.txt` allows; `tools/leakcheck.ps1`
-does the same for every sample and application against
+(and `tools/leakcheck.sh` on Linux and macOS) does the same for every sample
+and application against
 `tools/leaks.baseline.txt`. Both are off by default and cost nothing when off.
 
 What a mutable static holds is released at exit, in reverse order of
@@ -318,3 +319,30 @@ a snapshot is invisible in a screenshot and obvious in two numbers.
 nowhere else, so a clean stderr is most of what a headless run is worth. And a
 program killed with `SIGKILL` loses whatever it had buffered on stdout, so
 redirect to a file or use `stdbuf -o0` when a run is going to be terminated.
+
+## The Mac mini
+
+`ssh brandon@brandons-mini` -- an M4 on macOS 15, with the Xcode command-line
+tools, Homebrew, Homebrew LLVM and the .NET SDK in `~/.dotnet`. It is where the
+macOS target is run; the plan for that target is phased, and until it lands a
+build there fails compiling the runtime.
+
+`~/.zshenv` sets the environment for every shell, a non-interactive ssh
+command included: Homebrew's paths, `DOTNET_ROOT` and `PATH` for `~/.dotnet`,
+and `STAINLESS_CLANG=/opt/homebrew/opt/llvm/bin/clang`. Homebrew's clang is the
+supported one, not Apple's. The compiler's apphost needs `DOTNET_ROOT` as well
+as `PATH`; without it `stainless` reports that .NET is not installed.
+
+Sync the same way as the Linux box, into `~/sl-sync`:
+
+```sh
+tar -czf - $(git ls-files -c -o --exclude-standard) | ssh brandon@brandons-mini "mkdir -p ~/sl-sync && tar -xzf - -C ~/sl-sync"
+```
+
+Take a screenshot of one window with `screencapture -l <windowid>`; the window
+id comes from the program or from `osascript`.
+
+The `drawing` case needs libgd (`brew install gd`) and fails without it, as it
+does on Linux; the Forms samples need `brew install gtk+3`. Both are installed.
+`lldb` cannot launch a process over ssh, which has no way to grant debugging
+permission; it reads a `.dSYM` and sets breakpoints there all the same.

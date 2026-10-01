@@ -33,10 +33,11 @@
 ///
 /// **The same answers on both platforms, by two different routes.** A PE has a
 /// resource directory and the loader indexes it, so a Windows build asks
-/// `FindResourceW` and gets a pointer into the mapped image. ELF has no such
-/// section, so the compiler puts the compiled `.res` in ordinary constant data
-/// and this walks it. Both were checked against each other on the same script,
-/// entry by entry, which is the only reason the claim is worth making.
+/// `FindResourceW` and gets a pointer into the mapped image. ELF and Mach-O
+/// have no such section, so the compiler puts the compiled `.res` in ordinary
+/// constant data and this walks it. Both were checked against each other on the
+/// same script, entry by entry, which is the only reason the claim is worth
+/// making.
 ///
 /// **What travels and what does not.** Bytes travel: `RT_RCDATA`, `RT_BITMAP`,
 /// `RT_STRING`, `RT_HTML` and a type a script invents are all readable
@@ -128,8 +129,9 @@ byte* FindNamedBytes(String type, String name, uint* byteCount)
 #else
 
 // The compiled `.res`, emitted by the compiler as ordinary constant data
-// because an ELF binary has nowhere else to put it. The symbols' *addresses*
-// are the blob, which is why the declaration is a `byte` and the use is `&`.
+// because an ELF or Mach-O binary has nowhere else to put it. The symbols'
+// *addresses* are the blob, which is why the declaration is a `byte` and the
+// use is `&`.
 //
 // Always emitted, empty when the program has no resources, so that this links
 // whether or not anything was compiled in.

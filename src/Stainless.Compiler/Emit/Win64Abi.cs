@@ -33,6 +33,25 @@ public enum PassStyle
     Coerce,
     /// <summary>A large struct passed as a pointer to a caller-allocated copy.</summary>
     Indirect,
+    /// <summary>
+    /// An empty struct that takes no register and no stack: it is left out of
+    /// the parameters, and a result of it is <c>void</c>.
+    /// </summary>
+    Ignore,
+}
+
+/// <summary>
+/// How a narrow integer is widened to the register it travels in. The caller
+/// widens an argument and the callee a result, and the other side MAY rely on
+/// it.
+/// </summary>
+public enum ArgExtension
+{
+    None,
+    /// <summary>LLVM's <c>signext</c>.</summary>
+    Sign,
+    /// <summary>LLVM's <c>zeroext</c>.</summary>
+    Zero,
 }
 
 /// <summary>
@@ -77,6 +96,61 @@ public sealed record ArgInfo(PassStyle Style, string LlvmType, TypeSymbol Type)
     /// A return is unaffected: <c>sret</c> is a hidden pointer everywhere.
     /// </summary>
     public bool IndirectAsPointer { get; init; }
+
+    /// <summary>
+    /// The widening a <see cref="PassStyle.Direct"/> narrow integer carries.
+    /// Every declaration, definition and call MUST agree about it: a callee
+    /// told that the caller widened reads the whole register.
+    /// </summary>
+    public ArgExtension Extension { get; init; }
+
+    /// <summary>
+    /// How C widens a value of <paramref name="type"/> where its convention
+    /// widens at all: what clang writes for the C type the value is.
+    ///
+    /// <c>char</c> is C's <c>char</c>, which is signed on every target that
+    /// widens, although Stainless reads it as unsigned. The attribute decides
+    /// only the register's upper bits, so the two readings never meet.
+    /// </summary>
+    public static ArgExtension ExtensionOf(TypeSymbol type) => type switch
+    {
+        EnumTypeSymbol enumType => ExtensionOf(enumType.UnderlyingType),
+        PrimitiveTypeSymbol primitive => primitive.Kind switch
+        {
+            PrimitiveKind.SByte or PrimitiveKind.Short or PrimitiveKind.Char => ArgExtension.Sign,
+            PrimitiveKind.Bool or PrimitiveKind.Byte or PrimitiveKind.UShort
+                or PrimitiveKind.Char16 => ArgExtension.Zero,
+            _ => ArgExtension.None,
+        },
+        _ => ArgExtension.None,
+    };
+
+    /// <summary>
+    /// A value that is not a struct, in its own type, widened as C widens it
+    /// when <paramref name="widened"/> says the convention widens.
+    /// </summary>
+    public static ArgInfo Scalar(TypeSymbol type, Func<TypeSymbol, string> llvmTypeOf, bool widened) =>
+        new(PassStyle.Direct, llvmTypeOf(type), type)
+        {
+            Extension = widened ? ExtensionOf(type) : ArgExtension.None,
+        };
+
+    /// <summary>
+    /// True for a struct with nothing in it: no fields, or only fields that are
+    /// themselves empty. Stainless gives one a byte, as C++ does, so C++ is
+    /// what clang is asked about it.
+    /// </summary>
+    public static bool IsEmpty(TypeSymbol type) => type switch
+    {
+        VariantTypeSymbol => false,
+        StructTypeSymbol structType =>
+            structType.Fields.All(f => !f.IsBitField && IsEmpty(f.Type)),
+        FixedArrayTypeSymbol inline => IsEmpty(inline.Element),
+        _ => false,
+    };
+
+    /// <summary>An empty struct left out, as a parameter or as a result.</summary>
+    public static ArgInfo Ignored(TypeSymbol type) => new(PassStyle.Ignore, "void", type);
 }
 
 /// <summary>
@@ -88,6 +162,11 @@ public sealed record ArgInfo(PassStyle Style, string LlvmType, TypeSymbol Type)
 /// a register as an integer of that width; every other struct travels as a
 /// pointer to a copy the caller owns. Returns follow the same split, with large
 /// results written through a hidden first pointer argument.
+///
+/// <para>
+/// Of the narrow integers only <c>bool</c> is widened, which is what clang
+/// writes for this target. An empty struct is one byte and travels as one.
+/// </para>
 /// </summary>
 public static class Win64Abi
 {
@@ -97,7 +176,10 @@ public static class Win64Abi
     public static ArgInfo ClassifyArgument(TypeSymbol type, Func<TypeSymbol, string> llvmTypeOf)
     {
         if (type is not StructTypeSymbol)
-            return new ArgInfo(PassStyle.Direct, llvmTypeOf(type), type);
+        {
+            return ArgInfo.Scalar(
+                type, llvmTypeOf, widened: type is PrimitiveTypeSymbol { Kind: PrimitiveKind.Bool });
+        }
 
         if (!IsRegisterSizedStruct(type))
             return new ArgInfo(PassStyle.Indirect, "ptr", type);

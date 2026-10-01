@@ -16,10 +16,11 @@ byte[] icon  = Resources.GetBytes(ResourceType.Bitmap, 101);
 
 **The same answers on both platforms, by two different routes.** A PE has a
 resource directory and the loader indexes it, so a Windows build asks
-`FindResourceW` and gets a pointer into the mapped image. ELF has no such
-section, so the compiler puts the compiled `.res` in ordinary constant data
-and this walks it. Both were checked against each other on the same script,
-entry by entry, which is the only reason the claim is worth making.
+`FindResourceW` and gets a pointer into the mapped image. ELF and Mach-O
+have no such section, so the compiler puts the compiled `.res` in ordinary
+constant data and this walks it. Both were checked against each other on the
+same script, entry by entry, which is the only reason the claim is worth
+making.
 
 **What travels and what does not.** Bytes travel: `RT_RCDATA`, `RT_BITMAP`,
 `RT_STRING`, `RT_HTML` and a type a script invents are all readable
@@ -214,7 +215,7 @@ Whether a resource of this type and number is there.
 - `type` -- which `RT_` kind it was filed as
 - `id` -- the number the script filed the resource under
 
-<sub>[stdlib/Resources/Resources.sl:296](../../stdlib/Resources/Resources.sl#L296)</sub>
+<sub>[stdlib/Resources/Resources.sl:298](../../stdlib/Resources/Resources.sl#L298)</sub>
 
 ### Exists *function*
 
@@ -229,7 +230,7 @@ Whether one named by text, of a type named by text, is there.
 - `type` -- the type name the script invented
 - `name` -- the resource name, matched without regard to ASCII case
 
-<sub>[stdlib/Resources/Resources.sl:303](../../stdlib/Resources/Resources.sl#L303)</sub>
+<sub>[stdlib/Resources/Resources.sl:305](../../stdlib/Resources/Resources.sl#L305)</sub>
 
 ### GetBitmapFile *function*
 
@@ -253,7 +254,7 @@ entries are three bytes each.
 
 Empty when there is no such bitmap.
 
-<sub>[stdlib/Resources/Resources.sl:433](../../stdlib/Resources/Resources.sl#L433)</sub>
+<sub>[stdlib/Resources/Resources.sl:435](../../stdlib/Resources/Resources.sl#L435)</sub>
 
 ### GetBytes *function*
 
@@ -273,7 +274,7 @@ gives -- ask `Exists` where the difference matters.
 
 **See also** &nbsp; [Resources.Exists](#exists-function)
 
-<sub>[stdlib/Resources/Resources.sl:342](../../stdlib/Resources/Resources.sl#L342)</sub>
+<sub>[stdlib/Resources/Resources.sl:344](../../stdlib/Resources/Resources.sl#L344)</sub>
 
 ### GetBytes *function*
 
@@ -290,7 +291,7 @@ The same, for a resource named by text.
 
 **See also** &nbsp; [Resources.Exists](#exists-function)
 
-<sub>[stdlib/Resources/Resources.sl:354](../../stdlib/Resources/Resources.sl#L354)</sub>
+<sub>[stdlib/Resources/Resources.sl:356](../../stdlib/Resources/Resources.sl#L356)</sub>
 
 ### GetPointer *function*
 
@@ -312,7 +313,7 @@ outlives the call.
 
 **See also** &nbsp; [Resources.GetBytes](#getbytes-function)
 
-<sub>[stdlib/Resources/Resources.sl:329](../../stdlib/Resources/Resources.sl#L329)</sub>
+<sub>[stdlib/Resources/Resources.sl:331](../../stdlib/Resources/Resources.sl#L331)</sub>
 
 ### GetSize *function*
 
@@ -327,7 +328,7 @@ How many bytes a resource holds, or zero when there is none.
 - `type` -- an `RT_` number
 - `id` -- the number the script filed the resource under
 
-<sub>[stdlib/Resources/Resources.sl:312](../../stdlib/Resources/Resources.sl#L312)</sub>
+<sub>[stdlib/Resources/Resources.sl:314](../../stdlib/Resources/Resources.sl#L314)</sub>
 
 ### GetText *function*
 
@@ -346,7 +347,7 @@ platforms answer identically and so that Windows needs no user32.
 
 Empty for a number with no string, which is what `LoadStringW` answers too.
 
-<sub>[stdlib/Resources/Resources.sl:384](../../stdlib/Resources/Resources.sl#L384)</sub>
+<sub>[stdlib/Resources/Resources.sl:386](../../stdlib/Resources/Resources.sl#L386)</sub>
 
 ## Constants
 
@@ -359,5 +360,5 @@ const int ManifestId = 1
 `CREATEPROCESS_MANIFEST_RESOURCE_ID`: the name an executable's own manifest
 is filed under.
 
-<sub>[stdlib/Resources/Resources.sl:59](../../stdlib/Resources/Resources.sl#L59)</sub>
+<sub>[stdlib/Resources/Resources.sl:60](../../stdlib/Resources/Resources.sl#L60)</sub>
 

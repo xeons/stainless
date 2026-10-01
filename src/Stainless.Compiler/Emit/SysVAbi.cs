@@ -34,6 +34,11 @@ namespace Stainless.Emit;
 /// what tests/cases/sysv-abi holds: the two have to agree signature for
 /// signature, because disagreeing by one register is a program that links and
 /// then reads an argument that was never passed.
+///
+/// <para>
+/// Every narrow integer is widened by whoever produces it, and an empty struct
+/// is left out entirely, as clang does for both.
+/// </para>
 /// </summary>
 public static class SysVAbi
 {
@@ -90,7 +95,10 @@ public static class SysVAbi
     public static ArgInfo ClassifyArgument(TypeSymbol type, Func<TypeSymbol, string> llvmTypeOf)
     {
         if (type is not StructTypeSymbol structType)
-            return new ArgInfo(PassStyle.Direct, llvmTypeOf(type), type);
+            return ArgInfo.Scalar(type, llvmTypeOf, widened: true);
+
+        if (ArgInfo.IsEmpty(structType))
+            return ArgInfo.Ignored(type);
 
         if (Pieces(structType, llvmTypeOf) is not { } pieces)
             return new ArgInfo(PassStyle.Indirect, "ptr", type);

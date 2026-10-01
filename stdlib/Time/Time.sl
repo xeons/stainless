@@ -30,6 +30,11 @@
 /// counter that only ever goes forward. That pair is what a measurement
 /// wants.
 ///
+/// **On Linux and macOS the monotonic counter stops while the machine
+/// sleeps**, so a span measured across a suspend leaves the suspend out. That
+/// is the clock a timed wait and a sleep are measured on, so a `Stopwatch`
+/// around one agrees with it.
+///
 /// Both are structs over a single `long` of nanoseconds, so they cost nothing,
 /// travel in a register, and compare and subtract as the numbers they are.
 /// Sixty-four bits of nanoseconds reaches 292 years either side of 1970, which

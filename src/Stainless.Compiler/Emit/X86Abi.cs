@@ -51,6 +51,12 @@ namespace Stainless.Emit;
 /// <c>i686-pc-linux-gnu</c> and looking at what came out. tests/cases/x86-abi is
 /// the same question asked of a running program.
 /// </para>
+///
+/// <para>
+/// Every narrow integer is widened, on both systems. An empty struct is left
+/// out of a Linux parameter list and out of a Windows result, and is otherwise
+/// a one-byte struct like any other.
+/// </para>
 /// </summary>
 public static class X86Abi
 {
@@ -61,10 +67,16 @@ public static class X86Abi
     public static bool ReturnsInRegisters(TypeSymbol type, bool windows) =>
         windows && type is StructTypeSymbol && type.Size is 1 or 2 or 4 or 8;
 
-    public static ArgInfo ClassifyArgument(TypeSymbol type, Func<TypeSymbol, string> llvmTypeOf) =>
-        type is StructTypeSymbol
-            ? new ArgInfo(PassStyle.Indirect, "ptr", type)
-            : new ArgInfo(PassStyle.Direct, llvmTypeOf(type), type);
+    public static ArgInfo ClassifyArgument(
+        TypeSymbol type, Func<TypeSymbol, string> llvmTypeOf, bool windows)
+    {
+        if (type is not StructTypeSymbol)
+            return ArgInfo.Scalar(type, llvmTypeOf, widened: true);
+
+        return !windows && ArgInfo.IsEmpty(type)
+            ? ArgInfo.Ignored(type)
+            : new ArgInfo(PassStyle.Indirect, "ptr", type);
+    }
 
     public static ArgInfo ClassifyReturn(
         TypeSymbol type, Func<TypeSymbol, string> llvmTypeOf, bool windows)
@@ -72,7 +84,10 @@ public static class X86Abi
         if (type.IsVoid()) return new ArgInfo(PassStyle.Direct, "void", type);
 
         if (type is not StructTypeSymbol)
-            return new ArgInfo(PassStyle.Direct, llvmTypeOf(type), type);
+            return ArgInfo.Scalar(type, llvmTypeOf, widened: true);
+
+        if (windows && ArgInfo.IsEmpty(type))
+            return ArgInfo.Ignored(type);
 
         if (!ReturnsInRegisters(type, windows))
             return new ArgInfo(PassStyle.Indirect, "ptr", type);

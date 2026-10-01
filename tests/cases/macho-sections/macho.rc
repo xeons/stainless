@@ -1,0 +1,5 @@
+// A string table, carried as data in a Mach-O binary.
+STRINGTABLE
+BEGIN
+    201 "carried in __DATA_CONST,__sl_rsrc"
+END

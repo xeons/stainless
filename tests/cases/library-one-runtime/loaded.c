@@ -24,6 +24,22 @@ int runtimes_loaded(void)
     }
     return count;
 }
+#elif defined(__APPLE__)
+#include <mach-o/dyld.h>
+#include <string.h>
+
+int runtimes_loaded(void)
+{
+    int count = 0;
+    uint32_t images = _dyld_image_count();
+    for (uint32_t i = 0; i < images; i++)
+    {
+        const char *name = _dyld_get_image_name(i);
+        if (name && strstr(name, "stainless-rt"))
+            count++;
+    }
+    return count;
+}
 #else
 #define _GNU_SOURCE
 #include <link.h>

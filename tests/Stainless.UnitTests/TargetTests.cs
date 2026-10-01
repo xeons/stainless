@@ -17,6 +17,7 @@
 using Stainless.Binding;
 using Stainless.Driver;
 using Xunit;
+using ProcessArchitecture = System.Runtime.InteropServices.Architecture;
 
 namespace Stainless.UnitTests;
 
@@ -238,7 +239,9 @@ public class TargetTests
     [InlineData("x64-linux", 8)]
     public void NamedTargetsParse(string name, int pointerWidth)
     {
-        var target = TargetPlatform.Parse(name);
+        // A bare name takes the host's system, and a Mac has no 32-bit one, so
+        // the host is fixed here; the per-host answers are tested on their own.
+        var target = TargetPlatform.Parse(name, TargetOS.Linux);
 
         Assert.NotNull(target);
         Assert.Equal(pointerWidth, target!.PointerWidth);
@@ -249,7 +252,141 @@ public class TargetTests
     {
         Assert.Null(TargetPlatform.Parse("sparc"));
         Assert.Null(TargetPlatform.Parse(""));
+        Assert.Null(TargetPlatform.RefusalFor("sparc", TargetOS.MacOS));
     }
+
+    [Theory]
+    [InlineData("arm64-macos", "Arm64MacOS")]
+    [InlineData("aarch64-macos", "Arm64MacOS")]
+    [InlineData("arm64-darwin", "Arm64MacOS")]
+    [InlineData("aarch64-darwin", "Arm64MacOS")]
+    [InlineData("ARM64-MacOS", "Arm64MacOS")]
+    [InlineData("x64-macos", "X64MacOS")]
+    [InlineData("x86_64-macos", "X64MacOS")]
+    [InlineData("x64-darwin", "X64MacOS")]
+    [InlineData("x86_64-darwin", "X64MacOS")]
+    [InlineData("x64-windows", "X64Windows")]
+    [InlineData("arm64-linux", "Arm64Linux")]
+    public void ASystemNamedIsTheSystemWhateverTheHost(string name, string expected)
+    {
+        foreach (var host in Enum.GetValues<TargetOS>())
+            Assert.Same(Instance(expected), TargetPlatform.Parse(name, host));
+    }
+
+    /// <summary>A bare architecture takes the host's system.</summary>
+    [Theory]
+    [InlineData("x64", TargetOS.Windows, "X64Windows")]
+    [InlineData("x64", TargetOS.Linux, "X64Linux")]
+    [InlineData("x64", TargetOS.MacOS, "X64MacOS")]
+    [InlineData("amd64", TargetOS.MacOS, "X64MacOS")]
+    [InlineData("arm64", TargetOS.Windows, "Arm64Windows")]
+    [InlineData("arm64", TargetOS.Linux, "Arm64Linux")]
+    [InlineData("arm64", TargetOS.MacOS, "Arm64MacOS")]
+    [InlineData("aarch64", TargetOS.MacOS, "Arm64MacOS")]
+    [InlineData("x86", TargetOS.Windows, "X86Windows")]
+    [InlineData("x86", TargetOS.Linux, "X86Linux")]
+    public void ABareArchitectureTakesTheHostSystem(string name, TargetOS host, string expected)
+    {
+        Assert.Same(Instance(expected), TargetPlatform.Parse(name, host));
+        Assert.Null(TargetPlatform.RefusalFor(name, host));
+    }
+
+    /// <summary>Darwin has no 32-bit target, and saying so beats "unknown".</summary>
+    [Theory]
+    [InlineData("x86", TargetOS.MacOS)]
+    [InlineData("i686", TargetOS.MacOS)]
+    [InlineData("i386", TargetOS.MacOS)]
+    [InlineData("x86-macos", TargetOS.Windows)]
+    [InlineData("i686-darwin", TargetOS.Linux)]
+    public void A32BitMacIsRefusedWithAReason(string name, TargetOS host)
+    {
+        Assert.Null(TargetPlatform.Parse(name, host));
+        Assert.Contains("macOS has no 32-bit target", TargetPlatform.RefusalFor(name, host));
+    }
+
+    [Fact]
+    public void AnX86NamedWithItsSystemStillParsesOnAMac()
+    {
+        Assert.Same(TargetPlatform.X86Linux, TargetPlatform.Parse("x86-linux", TargetOS.MacOS));
+        Assert.Same(TargetPlatform.X86Windows, TargetPlatform.Parse("x86-windows", TargetOS.MacOS));
+    }
+
+    [Theory]
+    [InlineData(TargetOS.Windows, ProcessArchitecture.X64, "X64Windows")]
+    [InlineData(TargetOS.Windows, ProcessArchitecture.Arm64, "Arm64Windows")]
+    [InlineData(TargetOS.Linux, ProcessArchitecture.X64, "X64Linux")]
+    [InlineData(TargetOS.Linux, ProcessArchitecture.Arm64, "Arm64Linux")]
+    [InlineData(TargetOS.MacOS, ProcessArchitecture.X64, "X64MacOS")]
+    [InlineData(TargetOS.MacOS, ProcessArchitecture.Arm64, "Arm64MacOS")]
+    public void TheHostMapsToItsOwnSystem(
+        TargetOS os, ProcessArchitecture architecture, string expected)
+    {
+        Assert.Same(Instance(expected), TargetPlatform.HostFor(os, architecture));
+    }
+
+    [Fact]
+    public void TheHostIsThisMachine()
+    {
+        var host = TargetPlatform.Host;
+
+        Assert.Equal(TargetPlatform.HostOS, host.Os);
+        Assert.Equal(OperatingSystem.IsWindows(), host.IsWindows);
+        Assert.Equal(OperatingSystem.IsMacOS(), host.IsDarwin);
+        Assert.Equal(8, host.PointerWidth);
+    }
+
+    /// <summary>Every name round-trips, and every instance has one.</summary>
+    [Theory]
+    [InlineData("X64Windows", "x64-windows", TargetOS.Windows, ObjectFormat.Coff)]
+    [InlineData("X86Windows", "x86-windows", TargetOS.Windows, ObjectFormat.Coff)]
+    [InlineData("Arm64Windows", "arm64-windows", TargetOS.Windows, ObjectFormat.Coff)]
+    [InlineData("X64Linux", "x64-linux", TargetOS.Linux, ObjectFormat.Elf)]
+    [InlineData("X86Linux", "x86-linux", TargetOS.Linux, ObjectFormat.Elf)]
+    [InlineData("Arm64Linux", "arm64-linux", TargetOS.Linux, ObjectFormat.Elf)]
+    [InlineData("X64MacOS", "x64-macos", TargetOS.MacOS, ObjectFormat.MachO)]
+    [InlineData("Arm64MacOS", "arm64-macos", TargetOS.MacOS, ObjectFormat.MachO)]
+    public void EachTargetKnowsItsSystemAndFormat(
+        string instance, string name, TargetOS os, ObjectFormat format)
+    {
+        var target = Instance(instance);
+
+        Assert.Equal(name, target.Name);
+        Assert.Same(target, TargetPlatform.Parse(name, TargetOS.Windows));
+        Assert.Contains(name, TargetPlatform.Names);
+        Assert.Equal(os, target.Os);
+        Assert.Equal(format, target.Format);
+        Assert.Equal(os == TargetOS.Windows, target.IsWindows);
+        Assert.Equal(os == TargetOS.Linux, target.IsLinux);
+        Assert.Equal(os == TargetOS.MacOS, target.IsDarwin);
+        Assert.Equal(format == ObjectFormat.MachO, target.IsMachO);
+    }
+
+    /// <summary>What clang says for these triples: LP64, Itanium names, its
+    /// own CPU, eight-byte doubles and one calling convention.</summary>
+    [Fact]
+    public void TheMacTargetsAreDarwin()
+    {
+        Assert.Equal("arm64-apple-macosx13.0", TargetPlatform.Arm64MacOS.Triple);
+        Assert.Equal("x86_64-apple-macosx13.0", TargetPlatform.X64MacOS.Triple);
+
+        foreach (var mac in new[] { TargetPlatform.Arm64MacOS, TargetPlatform.X64MacOS })
+        {
+            Assert.Equal(8, mac.PointerWidth);
+            Assert.Equal(CppAbi.Itanium, mac.Abi);
+            Assert.Null(mac.Cpu);
+            Assert.False(mac.HasCallingConventions);
+            Assert.Equal(8, mac.WideScalarAlignment);
+            Assert.Equal("i64", mac.NativeIntType);
+            Assert.Equal(24, mac.ObjectHeaderSize);
+            Assert.Equal(32, mac.ArrayHeaderSize);
+        }
+
+        Assert.Equal(TargetArch.Arm64, TargetPlatform.Arm64MacOS.Architecture);
+        Assert.Equal(TargetArch.X64, TargetPlatform.X64MacOS.Architecture);
+    }
+
+    private static TargetPlatform Instance(string name) =>
+        (TargetPlatform)typeof(TargetPlatform).GetField(name)!.GetValue(null)!;
 
     /// <summary>The system decides the C++ scheme, which decides the mangling.</summary>
     [Fact]

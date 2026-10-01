@@ -19,16 +19,33 @@ using Stainless.Binding;
 namespace Stainless.Emit;
 
 /// <summary>
-/// AAPCS64 parameter and return classification: 64-bit ARM, on Windows and on
-/// everything else alike.
+/// AAPCS64 parameter and return classification: 64-bit ARM, on Windows, on
+/// Apple's systems and on everything else.
 ///
 /// <para>
-/// <b>One class for both systems, which is not true of x86 or of x86-64.</b>
-/// Microsoft's ARM64 ABI and the ARM one agree about every shape below --
-/// checked by compiling the same C for <c>aarch64-pc-windows-msvc</c> and
+/// <b>One class for all three, which is not true of x86 or of x86-64.</b>
+/// Microsoft's ARM64 ABI, Apple's DarwinPCS and the ARM one agree about every
+/// struct below -- checked by compiling the same C for
+/// <c>aarch64-pc-windows-msvc</c>, <c>arm64-apple-macosx13.0</c> and
 /// <c>aarch64-unknown-linux-gnu</c> and diffing the declarations. What differs
-/// between those two is how wide a C <c>long</c> is, and Stainless has no type
-/// whose width depends on the system.
+/// is short enough to be flags:
+/// </para>
+///
+/// <list type="bullet">
+/// <item>Darwin widens a narrow integer to 32 bits, the caller an argument and
+/// the callee a result, and the other side reads the whole register. The other
+/// two leave the upper bits undefined and so carry no attribute.</item>
+/// <item>Darwin leaves an empty struct out of the parameters. The other two
+/// pass its one byte in a register. All three return one as nothing.</item>
+/// <item>Windows does not expand a homogeneous aggregate for a variadic
+/// function, named arguments included: it travels as any other struct of its
+/// size, in general registers or behind a pointer.</item>
+/// </list>
+///
+/// <para>
+/// Darwin also puts every variadic argument on the stack. That is the back
+/// end's work, keyed on the triple, and the IR is the same as for a named
+/// argument.
 /// </para>
 ///
 /// <para>
@@ -73,14 +90,24 @@ public static class Aapcs64Abi
     /// </summary>
     private const int MaxHomogeneousMembers = 4;
 
-    public static ArgInfo ClassifyArgument(TypeSymbol type, Func<TypeSymbol, string> llvmTypeOf)
+    /// <param name="darwin">The target is Apple's.</param>
+    /// <param name="windowsVariadic">
+    /// The target is Windows and the function is variadic, which turns off the
+    /// homogeneous rule for every argument it takes.
+    /// </param>
+    public static ArgInfo ClassifyArgument(
+        TypeSymbol type, Func<TypeSymbol, string> llvmTypeOf,
+        bool darwin = false, bool windowsVariadic = false)
     {
         if (type is not StructTypeSymbol structType)
-            return new ArgInfo(PassStyle.Direct, llvmTypeOf(type), type);
+            return ArgInfo.Scalar(type, llvmTypeOf, widened: darwin);
+
+        if (darwin && ArgInfo.IsEmpty(structType))
+            return ArgInfo.Ignored(type);
 
         // A register per member, spelled as an array of them. Size does not
         // come into it: four doubles is thirty-two bytes and travels in v0-v3.
-        if (Homogeneous(structType) is { } homogeneous)
+        if (!windowsVariadic && Homogeneous(structType) is { } homogeneous)
         {
             string spelling = $"[{homogeneous.Count} x {llvmTypeOf(homogeneous.Element)}]";
             return new ArgInfo(PassStyle.Coerce, spelling, type) { Pieces = [spelling] };
@@ -100,12 +127,16 @@ public static class Aapcs64Abi
         return Covered(structType, unit, register, type);
     }
 
-    public static ArgInfo ClassifyReturn(TypeSymbol type, Func<TypeSymbol, string> llvmTypeOf)
+    public static ArgInfo ClassifyReturn(
+        TypeSymbol type, Func<TypeSymbol, string> llvmTypeOf, bool darwin = false)
     {
         if (type.IsVoid()) return new ArgInfo(PassStyle.Direct, "void", type);
 
         if (type is not StructTypeSymbol structType)
-            return new ArgInfo(PassStyle.Direct, llvmTypeOf(type), type);
+            return ArgInfo.Scalar(type, llvmTypeOf, widened: darwin);
+
+        if (ArgInfo.IsEmpty(structType))
+            return ArgInfo.Ignored(type);
 
         // A homogeneous aggregate comes back in the same registers it goes out
         // in, and is spelled as itself rather than as an array of its members.

@@ -85,7 +85,9 @@ public static class AsmRegisters
         {
             TargetArch.X64 => X64,
             TargetArch.X86 => X86,
-            _ => target.IsWindows ? Arm64Windows : Arm64Linux,
+            _ => target.IsWindows ? Arm64Windows
+                : target.IsDarwin ? Arm64Darwin
+                : Arm64Linux,
         };
 
         return table.TryGetValue(name.ToLowerInvariant(), out var register) ? register : null;
@@ -99,7 +101,7 @@ public static class AsmRegisters
     {
         TargetArch.X64 => target.IsWindows ? Win64Volatile : SysVVolatile,
         TargetArch.X86 => X86Volatile,
-        _ => target.IsWindows ? Arm64WindowsVolatile : Arm64LinuxVolatile,
+        _ => target.IsWindows || target.IsDarwin ? Arm64ReservedX18Volatile : Arm64LinuxVolatile,
     };
 
     /// <summary>
@@ -248,10 +250,21 @@ public static class AsmRegisters
 
     // ------------------------------------------------------------- ARM64
 
-    private static readonly Dictionary<string, AsmRegister> Arm64Linux = BuildArm64(windows: false);
-    private static readonly Dictionary<string, AsmRegister> Arm64Windows = BuildArm64(windows: true);
+    private static readonly Dictionary<string, AsmRegister> Arm64Linux = BuildArm64(x18: null);
 
-    private static Dictionary<string, AsmRegister> BuildArm64(bool windows)
+    private static readonly Dictionary<string, AsmRegister> Arm64Windows = BuildArm64(
+        x18: "reserved by Windows, which keeps the current thread's environment block " +
+             "in it; nothing but the system may change it");
+
+    private static readonly Dictionary<string, AsmRegister> Arm64Darwin = BuildArm64(
+        x18: "reserved by macOS, which may change it at any moment and gives it no meaning " +
+             "a program can rely on");
+
+    /// <summary>
+    /// The ARM64 table, with <paramref name="x18"/> as why the platform register
+    /// is refused, or null where the system leaves it to be used.
+    /// </summary>
+    private static Dictionary<string, AsmRegister> BuildArm64(string? x18)
     {
         var table = new Dictionary<string, AsmRegister>(StringComparer.Ordinal);
 
@@ -264,9 +277,7 @@ public static class AsmRegisters
             string? refusal = i switch
             {
                 29 => FramePointer,
-                18 when windows =>
-                    "reserved by Windows, which keeps the current thread's environment block " +
-                    "in it; nothing but the system may change it",
+                18 => x18,
                 _ => null,
             };
 
@@ -337,11 +348,11 @@ public static class AsmRegisters
     ];
 
     /// <summary>
-    /// The same, less <c>x18</c>: Windows keeps the thread environment block in
-    /// it, so it is not something a block may change, let alone something to
-    /// declare changed.
+    /// The same, less <c>x18</c>. Windows keeps the thread environment block in
+    /// it and macOS reserves it, so a block MUST NOT change it, and declaring it
+    /// changed would make the function save and restore it.
     /// </summary>
-    private static readonly string[] Arm64WindowsVolatile =
+    private static readonly string[] Arm64ReservedX18Volatile =
     [
         .. Enumerable.Range(0, 18).Select(i => $"x{i}"),
         "lr",

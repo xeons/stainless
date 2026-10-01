@@ -42,6 +42,9 @@
  *
  * Off unless SL_LEAK_CHECK is defined, and the calls compile to nothing when
  * it is not, so a release build is byte for byte what it was.
+ *
+ * sl_runtime_init is defined here in every build, because starting the
+ * tracker is all the runtime does at startup.
  */
 
 #include "stainless.h"
@@ -130,24 +133,31 @@ static void sl_live_grow(void)
 static void sl_leak_report(void);
 
 /*
- * Registered before main rather than at the first allocation, for two reasons.
+ * Started before main rather than at the first allocation, for two reasons.
  *
  * A program that allocates nothing would otherwise print nothing, and "clean"
  * would be indistinguishable from "the tracker was never compiled in" -- which
  * is exactly the confusion a checking build exists to remove.
  *
- * And the lazy form had a race: two threads reaching their first allocation
+ * And a lazy start would race: two threads reaching their first allocation
  * together would both see a null gate and both make one.
  *
- * At the first priority a program may use, so that it runs before a library's
- * statics, which are initialized from a constructor at the last. They
- * allocate, and they register a teardown that has to run before the report.
+ * A library's statics allocate, and register a teardown that has to run
+ * before the report, so this MUST run before them. They are initialized from
+ * a constructor at the last priority, which orders them after this one on PE
+ * and ELF; Mach-O ignores priorities across objects, so the initializer calls
+ * sl_runtime_init itself, and whichever runs first starts the tracker.
  */
-__attribute__((constructor(101)))
 static void sl_leak_start(void)
 {
     sl_live_gate = (SlMutex *)sl_mutex_new();
     atexit(sl_leak_report);
+}
+
+__attribute__((constructor(101)))
+static void sl_leak_construct(void)
+{
+    sl_runtime_init();
 }
 
 void sl_leak_record(void *object, size_t bytes)
@@ -308,3 +318,18 @@ static void sl_leak_report(void)
 }
 
 #endif /* SL_LEAK_CHECK */
+
+/*
+ * Constructors run under the loader's lock, one at a time, so the exchange
+ * is all the guard the flag needs.
+ */
+static int sl_runtime_started;
+
+void sl_runtime_init(void)
+{
+    if (__atomic_exchange_n(&sl_runtime_started, 1, __ATOMIC_ACQ_REL)) return;
+
+#ifdef SL_LEAK_CHECK
+    sl_leak_start();
+#endif
+}

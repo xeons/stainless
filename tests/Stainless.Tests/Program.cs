@@ -48,8 +48,11 @@ namespace Stainless.Tests;
 /// say -- and then run. Running it is the point rather than a bonus: a 32-bit
 /// binary that links proves the symbols matched, and only running one proves the
 /// compiler and the runtime agree about how wide a pointer is. A host that
-/// cannot run what it built would need this skipped, and Windows and Linux both
-/// run x86 binaries on x86-64.
+/// cannot run what it built skips the case and says why: any target for
+/// another system, x86 on macOS, which has no 32-bit target, and x64 on
+/// Apple silicon. Windows and Linux both run x86 binaries on x86-64. A
+/// target.txt case that stops at a diagnostic or at an object file runs
+/// everywhere. CaseSelection holds the rule.
 ///
 /// A case containing assemble.txt is compiled to IR and then to an object file
 /// for its target, and is never run. That is for a target no machine here can
@@ -110,7 +113,10 @@ namespace Stainless.Tests;
 /// applies. That is for a case whose subject really does differ -- `Path.Join`
 /// answers differently because a backslash is a separator on one platform and a
 /// filename character on another -- and not for one that merely came out
-/// differently and was easier to accept than to explain.
+/// differently and was easier to accept than to explain. A Mac without
+/// expected.macos.txt takes expected.linux.txt before expected.txt: what
+/// separates Linux from Windows in every such case is POSIX, which macOS
+/// shares.
 ///
 /// Testing through the real driver rather than through unit seams means every
 /// pass -- lexer, binder, emitter, LLVM and the linker -- is covered by every case.
@@ -197,7 +203,7 @@ internal static class Program
         {
             string name = Path.GetFileName(directory);
 
-            if (SkipReason(directory) is { } reason)
+            if (CaseSelection.FindSkipReason(directory, Binding.TargetPlatform.Host) is { } reason)
             {
                 skipped++;
                 Console.WriteLine($"  \u001b[33mskip\u001b[0m  {name}  ({reason})");
@@ -238,47 +244,6 @@ internal static class Program
             Console.WriteLine($"{s_retains} retains and {s_releases} releases, over every case that finished");
 
         return failures.Count == 0 ? 0 : 1;
-    }
-
-    /// <summary>Why this case is not being run here, or null when it is.</summary>
-    /// <summary>
-    /// The expectation to measure against, which may be this platform's.
-    ///
-    /// A case that tests a platform difference cannot have one expectation.
-    /// `Path.Join` really does answer differently on Windows and on Linux --
-    /// a backslash is a separator on one and an ordinary character in a
-    /// filename on the other -- so `expected.linux.txt` beside `expected.txt`
-    /// is the honest way to say so. Neutralising the assertions would delete
-    /// the thing being tested.
-    /// </summary>
-    private static string ExpectedOutputPath(string directory)
-    {
-        string specific = Path.Combine(directory, $"expected.{ThisPlatform}.txt");
-        return File.Exists(specific) ? specific : Path.Combine(directory, "expected.txt");
-    }
-
-    /// <summary>What this platform is called in a file name.</summary>
-    private static string ThisPlatform =>
-        OperatingSystem.IsWindows() ? "windows"
-        : OperatingSystem.IsMacOS() ? "macos"
-        : OperatingSystem.IsLinux() ? "linux"
-        : "unknown";
-
-    private static string? SkipReason(string directory)
-    {
-        string path = Path.Combine(directory, "platform.txt");
-        if (!File.Exists(path)) return null;
-
-        string wanted = File.ReadAllText(path).Trim().ToLowerInvariant();
-        bool here = wanted switch
-        {
-            "windows" => OperatingSystem.IsWindows(),
-            "linux" => OperatingSystem.IsLinux(),
-            "macos" => OperatingSystem.IsMacOS(),
-            var other => throw new InvalidOperationException($"unknown platform '{other}'"),
-        };
-
-        return here ? null : $"{wanted} only";
     }
 
     private static string Skipped(int count) => count == 0 ? "" : $", {count} skipped";
@@ -391,7 +356,8 @@ internal static class Program
 
         var libraries = Lines(directory, "libraries.txt");
 
-        string expectedOutputPath = ExpectedOutputPath(directory);
+        string expectedOutputPath =
+            CaseSelection.FindExpectedOutputPath(directory, Binding.TargetPlatform.HostOS);
         string expectedErrorsPath = Path.Combine(directory, "errors.txt");
 
         // A case built for a target nothing here can run says so, and is then
@@ -696,7 +662,8 @@ internal static class Program
         arguments.AddRange(["-O1", "-o", consumer]);
 
         // The library is found beside the consumer, as a DLL is on Windows.
-        if (!OperatingSystem.IsWindows()) arguments.Add("-Wl,-rpath,$ORIGIN");
+        if (CaseSelection.FormatConsumerRunPath(Binding.TargetPlatform.HostOS) is { } runPath)
+            arguments.Add(runPath);
 
         var result = Toolchain.Run(toolchain.ClangPath, arguments);
         return result.Success

@@ -233,6 +233,16 @@ static void sl_net_transfer_failed(SlNative handle, int *error)
     sl_net_report(error, code);
 }
 
+#ifndef _WIN32
+/* Whether the socket carries datagrams, whose boundaries a read keeps. */
+static int sl_net_is_datagram(SlNative handle)
+{
+    int type = 0;
+    SlLength length = (SlLength)sizeof type;
+    return getsockopt(handle, SOL_SOCKET, SO_TYPE, &type, &length) == 0 && type == SOCK_DGRAM;
+}
+#endif
+
 /* Winsock counts in int. A longer transfer moves INT_MAX, and callers loop. */
 #ifdef _WIN32
 static int sl_net_count(size_t count)
@@ -244,11 +254,13 @@ static int sl_net_count(size_t count)
 /*
  * Writing to a closed peer is an error to return, not a signal that kills the
  * process. MSG_NOSIGNAL says so per call where it exists; where it does not,
- * SO_NOSIGPIPE says so once, on every socket made here.
+ * SO_NOSIGPIPE says so once, on every socket made here. macOS gets both: a
+ * recent SDK names MSG_NOSIGNAL, and SO_NOSIGPIPE also covers a write that
+ * does not pass it.
  */
 static void sl_net_no_sigpipe(SlNative handle)
 {
-#if !defined(_WIN32) && !defined(MSG_NOSIGNAL) && defined(SO_NOSIGPIPE)
+#if !defined(_WIN32) && defined(SO_NOSIGPIPE) && (!defined(MSG_NOSIGNAL) || defined(__APPLE__))
     int on = 1;
     setsockopt(handle, SOL_SOCKET, SO_NOSIGPIPE, &on, sizeof on);
 #else
@@ -812,8 +824,18 @@ size_t sl_socket_receive_from(size_t handle, uint8_t *data, size_t count,
     if (moved < 0 && WSAGetLastError() == WSAEMSGSIZE)
         moved = sl_net_count(count);
 #else
-    moved = recvfrom((SlNative)handle, data, count, 0,
-                     (struct sockaddr *)&from, &length);
+    if (count == 0 && sl_net_is_datagram((SlNative)handle)) {
+        /* XNU answers a read of nothing at once and leaves the datagram
+           queued, where Linux and Windows wait for one and drop it. A byte
+           of scratch makes every platform take it, truncated to nothing. */
+        uint8_t scratch;
+        moved = recvfrom((SlNative)handle, &scratch, 1, 0,
+                         (struct sockaddr *)&from, &length);
+        if (moved > 0) moved = 0;
+    } else {
+        moved = recvfrom((SlNative)handle, data, count, 0,
+                         (struct sockaddr *)&from, &length);
+    }
 #endif
 
     if (moved < 0) {

@@ -1,0 +1,21 @@
+C gave sbyte -100
+C gave byte 200
+C gave short -30000
+C gave ushort 60000
+C gave bool true
+C gave char16 9786
+C saw sbyte -128
+C saw byte 240
+C saw short -32767
+C saw ushort 61453
+C saw bool 1
+C saw char16 48879
+C saw sbyte from memory -128
+C saw short from memory -32767
+Stainless saw sbyte -77
+Stainless saw byte 250
+Stainless saw short -12345
+Stainless saw ushort 54321
+Stainless saw bool 1
+Stainless saw char16 9731
+Stainless saw mixed -4930021

@@ -53,7 +53,7 @@ public sealed partial class LlvmEmitter
         const string name = "_SLbind_bases";
 
         _module.AppendLine();
-        _module.AppendLine($"define internal void @{name}() {{");
+        _module.AppendLine($"define internal void @{name}(){FrameAttributes} {{");
         _module.AppendLine("entry:");
 
         int slot = 0;
@@ -255,7 +255,7 @@ public sealed partial class LlvmEmitter
         const string name = "_SLregister_types";
 
         _module.AppendLine();
-        _module.AppendLine($"define internal void @{name}() {{");
+        _module.AppendLine($"define internal void @{name}(){FrameAttributes} {{");
         _module.AppendLine("entry:");
         _module.AppendLine($"  call void @sl_types_register(ptr {block})");
         _module.AppendLine("  ret void");

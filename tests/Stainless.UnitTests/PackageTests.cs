@@ -569,20 +569,54 @@ public class ProjectFileTests
         Assert.Contains("X64", windows);
 
         var linux = Compilation.PlatformSymbols([], TargetPlatform.X64Linux);
+        Assert.True(TargetPlatform.X64Linux.IsLinux);
         Assert.Contains("LINUX", linux);
         Assert.Contains("UNIX", linux);
         Assert.DoesNotContain("WINDOWS", linux);
+        Assert.DoesNotContain("MACOS", linux);
 
         var small = Compilation.PlatformSymbols([], TargetPlatform.X86Linux);
+        Assert.True(TargetPlatform.X86Linux.IsLinux);
+        Assert.Contains("LINUX", small);
         Assert.Contains("X86", small);
         Assert.Contains("UNIX", small);
         Assert.DoesNotContain("X64", small);
+
+        var mac = Compilation.PlatformSymbols([], TargetPlatform.Arm64MacOS);
+        Assert.Contains("MACOS", mac);
+        Assert.Contains("UNIX", mac);
+        Assert.Contains("ARM64", mac);
+        Assert.DoesNotContain("LINUX", mac);
+        Assert.DoesNotContain("WINDOWS", mac);
+    }
+
+    /// <summary>
+    /// Each system's overlay is chosen for that system: Linux's for Linux, not
+    /// for "not Windows", and macOS's for macOS.
+    /// </summary>
+    [Fact]
+    public void TheOverlayFollowsTheTargetSystem()
+    {
+        var project = ProjectFile.Read(Write("""
+            {
+              "name": "app", "version": "1.0.0",
+              "windows": { "defines": ["WIN"] },
+              "linux": { "defines": ["GTK"] },
+              "macos": { "defines": ["COCOA"] }
+            }
+            """), out string error)!;
+
+        Assert.Equal("", error);
+        Assert.Same(project.Windows, project.OverlayFor(TargetPlatform.X86Windows));
+        Assert.Same(project.Linux, project.OverlayFor(TargetPlatform.Arm64Linux));
+        Assert.Same(project.Macos, project.OverlayFor(TargetPlatform.Arm64MacOS));
+        Assert.Equal(["COCOA"], project.DefinesFor(TargetPlatform.X64MacOS));
     }
 
     /// <summary>
     /// With no target named the host still answers, and it has to: there is no
-    /// macOS or FreeBSD triple, so deriving the symbols from
-    /// <see cref="TargetPlatform.Host"/> would take <c>MACOS</c> away from a
+    /// FreeBSD triple, so deriving the symbols from
+    /// <see cref="TargetPlatform.Host"/> would take <c>FREEBSD</c> away from a
     /// machine that has it.
     /// </summary>
     [Fact]
@@ -750,6 +784,22 @@ public class ProjectFileTests
         Assert.Equal(
             OperatingSystem.IsWindows() ? "shapes.dll" : "libshapes" + Toolchain.SharedLibraryExtension,
             Path.GetFileName(project.OutputPath()));
+    }
+
+    /// <summary>A library built for macOS is a dylib, wherever it is built.</summary>
+    [Fact]
+    public void NamesALibraryForTheTargetNotTheHost()
+    {
+        string path = Write("""
+            { "name": "shapes", "version": "1.0.0", "kind": "library" }
+            """);
+
+        var project = ProjectFile.Read(path, out _)!;
+
+        Assert.Equal("libshapes.dylib",
+            Path.GetFileName(project.OutputPath(TargetPlatform.Arm64MacOS)));
+        Assert.Equal("shapes.dll",
+            Path.GetFileName(project.OutputPath(TargetPlatform.X64Windows)));
     }
 
     /// <summary>Metadata follows the binary when '-o' moves it.</summary>

@@ -27,6 +27,9 @@ nothing, and a machine with no ALSA answers `AudioError.NoBackend` -- a
 value to print, rather than a link error. `Audio.IsAvailable` asks before
 anything is tried.
 
+**macOS has no backend yet.** Every call there answers
+`AudioError.NoBackend` and `Audio.IsAvailable` is false.
+
 **WASAPI rather than waveOut.** `winmm`'s `waveOut` is four calls and is
 still present on Windows 11, which makes it tempting and makes it the wrong
 answer: since Vista it has been an emulation on top of WASAPI, so it adds a
@@ -186,10 +189,11 @@ Why a sound did not happen.
 NoBackend
 ```
 
-There is no audio library on this machine: no winmm, or no
-libasound. `Audio.IsAvailable` is how to ask before trying.
+There is no audio library on this machine: no WASAPI, no libasound,
+or macOS, which has no backend yet. `Audio.IsAvailable` is how to ask
+before trying.
 
-<sub>[stdlib/Media/Audio/AudioError.sl:34](../../stdlib/Media/Audio/AudioError.sl#L34)</sub>
+<sub>[stdlib/Media/Audio/AudioError.sl:35](../../stdlib/Media/Audio/AudioError.sl#L35)</sub>
 
 #### Format *case*
 
@@ -200,7 +204,7 @@ Format
 The format is not one this module handles, or not one the device
 would take.
 
-<sub>[stdlib/Media/Audio/AudioError.sl:38](../../stdlib/Media/Audio/AudioError.sl#L38)</sub>
+<sub>[stdlib/Media/Audio/AudioError.sl:39](../../stdlib/Media/Audio/AudioError.sl#L39)</sub>
 
 #### Device *case*
 
@@ -210,7 +214,7 @@ Device
 
 There is no sound device, or the one there is refused to open.
 
-<sub>[stdlib/Media/Audio/AudioError.sl:41](../../stdlib/Media/Audio/AudioError.sl#L41)</sub>
+<sub>[stdlib/Media/Audio/AudioError.sl:42](../../stdlib/Media/Audio/AudioError.sl#L42)</sub>
 
 #### Busy *case*
 
@@ -220,7 +224,7 @@ Busy
 
 Something else has the device and will not share it.
 
-<sub>[stdlib/Media/Audio/AudioError.sl:44](../../stdlib/Media/Audio/AudioError.sl#L44)</sub>
+<sub>[stdlib/Media/Audio/AudioError.sl:45](../../stdlib/Media/Audio/AudioError.sl#L45)</sub>
 
 #### Closed *case*
 
@@ -230,7 +234,7 @@ Closed
 
 The player or recorder has been closed.
 
-<sub>[stdlib/Media/Audio/AudioError.sl:47](../../stdlib/Media/Audio/AudioError.sl#L47)</sub>
+<sub>[stdlib/Media/Audio/AudioError.sl:48](../../stdlib/Media/Audio/AudioError.sl#L48)</sub>
 
 #### Malformed *case*
 
@@ -240,7 +244,7 @@ Malformed
 
 The file was not a WAV, or was one this module does not read.
 
-<sub>[stdlib/Media/Audio/AudioError.sl:50](../../stdlib/Media/Audio/AudioError.sl#L50)</sub>
+<sub>[stdlib/Media/Audio/AudioError.sl:51](../../stdlib/Media/Audio/AudioError.sl#L51)</sub>
 
 #### IO *case*
 
@@ -250,7 +254,7 @@ IO
 
 The file could not be read or written; `Standard.IO` has the detail.
 
-<sub>[stdlib/Media/Audio/AudioError.sl:53](../../stdlib/Media/Audio/AudioError.sl#L53)</sub>
+<sub>[stdlib/Media/Audio/AudioError.sl:54](../../stdlib/Media/Audio/AudioError.sl#L54)</sub>
 
 ### AudioFormat *struct*
 
@@ -805,7 +809,7 @@ String BackendName()
 What is behind it, for a program that reports what it found. `""` when
 there is nothing.
 
-<sub>[stdlib/Media/Audio/Audio.sl:639](../../stdlib/Media/Audio/Audio.sl#L639)</sub>
+<sub>[stdlib/Media/Audio/Audio.sl:650](../../stdlib/Media/Audio/Audio.sl#L650)</sub>
 
 ### CanPlay *function*
 
@@ -816,7 +820,7 @@ bool CanPlay()
 Whether anything can play. False on a machine that has the library and no
 device, which is what a headless server is.
 
-<sub>[stdlib/Media/Audio/Audio.sl:624](../../stdlib/Media/Audio/Audio.sl#L624)</sub>
+<sub>[stdlib/Media/Audio/Audio.sl:635](../../stdlib/Media/Audio/Audio.sl#L635)</sub>
 
 ### CanRecord *function*
 
@@ -826,7 +830,7 @@ bool CanRecord()
 
 Whether anything can record.
 
-<sub>[stdlib/Media/Audio/Audio.sl:631](../../stdlib/Media/Audio/Audio.sl#L631)</sub>
+<sub>[stdlib/Media/Audio/Audio.sl:642](../../stdlib/Media/Audio/Audio.sl#L642)</sub>
 
 ### IsAvailable *function*
 
@@ -840,7 +844,7 @@ call is where the cost is.
 **Ask before trying.** A game wants to say "no audio device" at startup
 rather than in the middle of a level, and this is how it finds out.
 
-<sub>[stdlib/Media/Audio/Audio.sl:620](../../stdlib/Media/Audio/Audio.sl#L620)</sub>
+<sub>[stdlib/Media/Audio/Audio.sl:631](../../stdlib/Media/Audio/Audio.sl#L631)</sub>
 
 ### PlayClip *function*
 
@@ -864,7 +868,7 @@ tens of milliseconds and this does it every time.
 
 **See also** &nbsp; [AudioPlayer](#audioplayer-class)
 
-<sub>[stdlib/Media/Audio/Audio.sl:666](../../stdlib/Media/Audio/Audio.sl#L666)</sub>
+<sub>[stdlib/Media/Audio/Audio.sl:677](../../stdlib/Media/Audio/Audio.sl#L677)</sub>
 
 ### RecordClip *function*
 
@@ -886,5 +890,5 @@ sound as it arrives, wants an `AudioRecorder`.
 
 **See also** &nbsp; [AudioRecorder](#audiorecorder-class)
 
-<sub>[stdlib/Media/Audio/Audio.sl:698](../../stdlib/Media/Audio/Audio.sl#L698)</sub>
+<sub>[stdlib/Media/Audio/Audio.sl:709](../../stdlib/Media/Audio/Audio.sl#L709)</sub>
 

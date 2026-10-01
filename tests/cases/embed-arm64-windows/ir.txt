@@ -20,7 +20,7 @@ module asm ".quad -1"
 module asm ".quad 0"
 module asm ".quad 13"
 data/table.bin\22,0,13"
-stub.bin\22,0,6"
+stub-arm64.bin\22,0,8"
 module asm ".text"
 
 # Declared as the whole object, hidden, and not constant.

@@ -50,6 +50,8 @@
 #  include <sys/types.h>
 #  if defined(__linux__)
 #    include <sys/random.h>
+#  elif defined(__APPLE__)
+#    include <stdlib.h>
 #  endif
 #endif
 
@@ -107,6 +109,10 @@ _Bool sl_random_bytes(void *buffer, size_t length)
     size_t read = fread(at, 1, left, source);
     fclose(source);
     return read == left;
+#elif defined(__APPLE__)
+    /* Never fails and never blocks; the kernel's generator is always seeded. */
+    arc4random_buf(buffer, length);
+    return 1;
 #else
     FILE *source = fopen("/dev/urandom", "rb");
     if (source == NULL) return 0;

@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+using Stainless.Binding;
 using Stainless.Emit;
 using Stainless.Lowering;
 using Stainless.Source;
@@ -54,8 +55,14 @@ public class SampleTests
         /// <summary>Windows-only, because of what it is written against.</summary>
         public bool WindowsOnly { get; init; }
 
-        /// <summary>Unix-only, for the same reason: the GTK bindings are `#if UNIX`.</summary>
+        /// <summary>Unix-only, for the same reason: the GTK bindings are `#if UNIX`,
+        /// and macOS is Unix.</summary>
         public bool UnixOnly { get; init; }
+
+        /// <summary>Linux-only: written against <c>bindings/linux</c>, whose
+        /// epoll, termios and ptrace are <c>#if LINUX</c> and have no macOS
+        /// counterpart.</summary>
+        public bool LinuxOnly { get; init; }
 
         /// <summary>
         /// Written against the Forms library, so it needs those sources too --
@@ -190,14 +197,16 @@ public class SampleTests
     {
         var sample = Samples.First(s => s.Name == name);
 
-        // A Windows sample is written against `#if WINDOWS`, so on any other
-        // platform it is a file of skipped text and binding it proves nothing.
-        if (sample.WindowsOnly && !OperatingSystem.IsWindows()) return;
-        if (sample.UnixOnly && OperatingSystem.IsWindows()) return;
+        if (!BindsOn(sample, TargetPlatform.HostOS))
+            return;
 
         var paths = sample.Paths.Select(p => Path.Combine(Repository.Root, p)).ToList();
-        if (sample.WindowsOnly) paths.AddRange(Win32Bindings());
-        if (sample.UnixOnly) paths.AddRange(GtkBindings());
+        if (sample.WindowsOnly)
+            paths.AddRange(Win32Bindings());
+        if (sample.UnixOnly)
+            paths.AddRange(GtkBindings());
+        if (sample.LinuxOnly)
+            paths.AddRange(BindingsUnder("linux"));
 
         // A Forms program needs the backend for the machine it is being bound
         // on, because that is the half of `forms/src` the preprocessor will
@@ -244,6 +253,32 @@ public class SampleTests
         // programs in the tree, and the only ones no end-to-end case builds.
         if (!diagnostics.HasErrors)
             Front.Verified(new LlvmEmitter(forSharedLibrary: sample.Shared).Emit(Lowerer.Lower(program)));
+    }
+
+    /// <summary>
+    /// Whether binding a sample on <paramref name="host"/> proves anything. A
+    /// sample written against another platform's <c>#if</c> is a file of
+    /// skipped text there.
+    /// </summary>
+    private static bool BindsOn(Sample sample, TargetOS host) =>
+        !(sample.WindowsOnly && host != TargetOS.Windows)
+        && !(sample.UnixOnly && host == TargetOS.Windows)
+        && !(sample.LinuxOnly && host != TargetOS.Linux);
+
+    [Fact]
+    public void AMacBindsTheUnixSamplesAndNotTheLinuxOnes()
+    {
+        var gtk = new Sample("gtk", []) { UnixOnly = true };
+        var linux = new Sample("linux", []) { LinuxOnly = true };
+        var win32 = new Sample("win32", []) { WindowsOnly = true };
+
+        Assert.True(BindsOn(gtk, TargetOS.MacOS));
+        Assert.True(BindsOn(gtk, TargetOS.Linux));
+        Assert.False(BindsOn(gtk, TargetOS.Windows));
+        Assert.False(BindsOn(linux, TargetOS.MacOS));
+        Assert.True(BindsOn(linux, TargetOS.Linux));
+        Assert.False(BindsOn(linux, TargetOS.Windows));
+        Assert.False(BindsOn(win32, TargetOS.MacOS));
     }
 
     /// <summary>

@@ -38,11 +38,12 @@ public sealed partial class LlvmEmitter
 
         var returnInfo = ClassifyResult(symbol.ReturnType);
         var parameterInfos = symbol.Parameters
-            .Select(p => (Parameter: p, Info: ClassifyParameter(p)))
+            .Select(p => (Parameter: p, Info: ClassifyParameter(p, symbol.IsVariadic)))
             .ToList();
 
         var declaredParameters = new List<string>();
         var incomingNames = new Dictionary<ParameterSymbol, string>();
+        int? declaredFirst = null;
 
         if (returnInfo.Style == PassStyle.Indirect)
         {
@@ -55,6 +56,8 @@ public sealed partial class LlvmEmitter
         {
             string name = ArgumentName(parameter);
             incomingNames[parameter] = name;
+
+            if (!parameter.IsThis) declaredFirst ??= declaredParameters.Count;
 
             var spellings = Declared(info).ToList();
             if (spellings.Count == 1)
@@ -71,7 +74,7 @@ public sealed partial class LlvmEmitter
         _returnInfo = returnInfo;
         _nextTemp = 0;
 
-        string returnType = returnInfo.Style == PassStyle.Indirect ? "void" : returnInfo.LlvmType;
+        string returnType = ResultSpelling(returnInfo);
         // `public` deliberately does not export: it says which modules may see
         // this, and a C library's surface is stated once with `export "C"`.
         // Asking for module metadata says something different — that another
@@ -115,7 +118,7 @@ public sealed partial class LlvmEmitter
             ? debug.Location(symbol.Span, opening)
             : null;
 
-        MarkRegisters(symbol, declaredParameters, declaredParameters.Count - parameterInfos.Count);
+        MarkRegisters(symbol, declaredParameters, declaredFirst ?? declaredParameters.Count);
 
         _module.AppendLine(
             $"define {linkage}{storage}{Convention(symbol)}{returnType} {Symbol(symbol)}" +
@@ -140,6 +143,15 @@ public sealed partial class LlvmEmitter
             {
                 _parameterSlots[parameter] = incoming;
                 _pointerParameters.Add(parameter);
+                continue;
+            }
+
+            // Nothing arrived, and there is nothing in it to have arrived.
+            if (info.Style == PassStyle.Ignore)
+            {
+                string empty = Alloca(LlvmTypeOf(parameter.Type), parameter.Name);
+                Line($"store {LlvmTypeOf(parameter.Type)} zeroinitializer, ptr {empty}");
+                _parameterSlots[parameter] = empty;
                 continue;
             }
 
@@ -195,7 +207,7 @@ public sealed partial class LlvmEmitter
             ReleaseScopes(0);
             Terminator(returnInfo.Style switch
             {
-                PassStyle.Indirect => "ret void",
+                PassStyle.Indirect or PassStyle.Ignore => "ret void",
                 _ when symbol.ReturnType.IsVoid() => "ret void",
                 _ => $"ret {returnInfo.LlvmType} {ZeroOf(returnInfo.LlvmType)}",
             });

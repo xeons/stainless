@@ -22,12 +22,13 @@
  */
 
 /*
- * The arguments the program was started with.
+ * The arguments the program was started with, and the POSIX environment block.
  *
- * Only the arguments. Variables and the working directory are Stainless, in
- * stdlib/Env.sl, which calls the platform for itself. These stay because the
- * entry point hands them over before any Stainless code could run, and there
- * is nowhere earlier for a Stainless function to stand.
+ * Variables and the working directory are Stainless, in stdlib/Env.sl, which
+ * calls the platform for itself. The arguments stay because the entry point
+ * hands them over before any Stainless code could run, and there is nowhere
+ * earlier for a Stainless function to stand. The environment block stays
+ * because macOS reaches it through a function rather than a symbol.
  */
 
 #include "stainless.h"
@@ -40,6 +41,10 @@
 #  include <windows.h>
 #  include <shellapi.h>
 #  pragma comment(lib, "shell32")
+#elif defined(__APPLE__)
+#  include <crt_externs.h>
+#else
+extern char **environ;
 #endif
 
 /* --------------------------------------------------------------- arguments */
@@ -128,7 +133,8 @@ void *sl_args_array(const SlTypeInfo *arrayType)
 
     /* Each String arrives +1 and the array takes that reference over; nothing
      * is retained again and nothing released here. */
-    for (size_t i = 0; i < count; i += 1) elements[i] = sl_args_at(i);
+    for (size_t i = 0; i < count; i++)
+        elements[i] = sl_args_at(i);
 
     return array;
 }
@@ -140,3 +146,16 @@ void *sl_args_program(void)
 
     return sl_string_from_null_terminated(argumentValues[0]);
 }
+
+/* ------------------------------------------------------------- environment */
+
+#ifndef _WIN32
+char **sl_environ(void)
+{
+#  ifdef __APPLE__
+    return *_NSGetEnviron();
+#  else
+    return environ;
+#  endif
+}
+#endif

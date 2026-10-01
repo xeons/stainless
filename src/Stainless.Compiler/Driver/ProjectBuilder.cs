@@ -180,7 +180,7 @@ public sealed class ProjectBuilder(
                 if (BuildDependency(package, overrides) is { } failure) return failure;
             }
 
-        var options = OptionsFor(root, overrides, output: overrides.OutputPath ?? root.OutputPath());
+        var options = OptionsFor(root, overrides, output: overrides.OutputPath ?? root.OutputPath(_target));
         if (options is null) return ProjectBuildResult.Failed(_error!);
 
         var result = new Compilation().Compile(options);
@@ -207,10 +207,10 @@ public sealed class ProjectBuilder(
     private ProjectBuildResult? BuildDependency(ResolvedPackage package, BuildOverrides overrides)
     {
         string output = Path.Combine(
-            BuildDirectory(overrides), Toolchain.SharedLibraryFileName(package.Name));
+            BuildDirectory(overrides), Toolchain.SharedLibraryFileName(package.Name, _target));
 
         string metadata = ProjectFile.MetadataBeside(output, package.Name);
-        string linkInput = LinkInput(output);
+        string linkInput = Toolchain.LinkInputFor(output, _target);
 
         string intermediate = Path.Combine(IntermediateDirectory(overrides), package.Name);
         string stampPath = Path.Combine(intermediate, BuildStamp.FileName);
@@ -701,14 +701,6 @@ public sealed class ProjectBuilder(
                 CollectShared(package.Project, references, linkInputs, seen);
         }
     }
-
-    /// <summary>
-    /// What a link line names for a shared library: the import library beside it
-    /// on Windows, and the shared object itself everywhere else. The same rule
-    /// the runtime is linked by, for the same reason.
-    /// </summary>
-    private static string LinkInput(string library) =>
-        OperatingSystem.IsWindows() ? Path.ChangeExtension(library, ".lib") : library;
 
     private string BuildDirectory(BuildOverrides overrides) =>
         overrides.OutputPath is not null

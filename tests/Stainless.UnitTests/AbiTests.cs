@@ -81,6 +81,9 @@ public class AbiTests
     private static ArgInfo Arm64Return(string name) =>
         Aapcs64Abi.ClassifyReturn(Front.Struct(Shapes, name), LlvmEmitter.LlvmTypeOf);
 
+    private static PrimitiveTypeSymbol Primitive(string name) =>
+        PrimitiveTypeSymbol.All.First(p => p.Name == name);
+
     /// <summary>
     /// What each shape actually measures.
     ///
@@ -447,23 +450,131 @@ public class AbiTests
 
     /// <summary>
     /// An empty struct is one byte, following C++ rather than the GNU
-    /// zero-size extension -- and the two conventions then disagree about it.
-    /// Win64 sees a one-byte struct and gives it a register; System V finds no
-    /// field in the eightbyte and sends the whole thing to memory.
-    ///
-    /// This is recorded, not blessed. clang passes an empty struct in no
-    /// register at all under System V, so the memory answer is a divergence
-    /// rather than agreement; it is the one shape here that was not checked
-    /// against clang, because an empty struct crossing a real call is not
-    /// something any Stainless program does yet. If this test starts failing
-    /// because someone fixed it, the fix is probably right.
+    /// zero-size extension, and each convention treats it as clang++ does.
+    /// Win64 passes the byte. System V, and Darwin on ARM64, leave it out. The
+    /// other ARM64 systems pass it in a register and, like Darwin, return it
+    /// as nothing. 32-bit x86 leaves it out of a Linux parameter list and out
+    /// of a Windows result.
     /// </summary>
     [Fact]
-    public void TheTwoConventionsDisagreeAboutAnEmptyStruct()
+    public void EachConventionTreatsAnEmptyStructAsClangDoes()
     {
-        Assert.Equal(1, Front.Struct(Shapes, "Empty").Size);
+        var empty = Front.Struct(Shapes, "Empty");
+        Assert.Equal(1, empty.Size);
+
         Assert.Equal(PassStyle.Coerce, Win64Arg("Empty").Style);
-        Assert.Equal(PassStyle.Indirect, SysVArg("Empty").Style);
+        Assert.Equal(PassStyle.Coerce, Win64Return("Empty").Style);
+
+        Assert.Equal(PassStyle.Ignore, SysVArg("Empty").Style);
+        Assert.Equal(PassStyle.Ignore, SysVReturn("Empty").Style);
+
+        Assert.Equal(PassStyle.Coerce, Arm64Arg("Empty").Style);
+        Assert.Equal(PassStyle.Ignore, Arm64Return("Empty").Style);
+        Assert.Equal(PassStyle.Ignore,
+            Aapcs64Abi.ClassifyArgument(empty, LlvmEmitter.LlvmTypeOf, darwin: true).Style);
+        Assert.Equal(PassStyle.Ignore,
+            Aapcs64Abi.ClassifyReturn(empty, LlvmEmitter.LlvmTypeOf, darwin: true).Style);
+
+        Assert.Equal(PassStyle.Ignore,
+            X86Abi.ClassifyArgument(empty, LlvmEmitter.LlvmTypeOf, windows: false).Style);
+        Assert.Equal(PassStyle.Indirect,
+            X86Abi.ClassifyArgument(empty, LlvmEmitter.LlvmTypeOf, windows: true).Style);
+        Assert.Equal(PassStyle.Indirect,
+            X86Abi.ClassifyReturn(empty, LlvmEmitter.LlvmTypeOf, windows: false).Style);
+        Assert.Equal(PassStyle.Ignore,
+            X86Abi.ClassifyReturn(empty, LlvmEmitter.LlvmTypeOf, windows: true).Style);
+    }
+
+    // ------------------------------------------------------ narrow integers
+
+    /// <summary>
+    /// How C widens each narrow type, which is what every convention that
+    /// widens at all writes. <c>char</c> is C's, and so signed.
+    /// </summary>
+    [Theory]
+    [InlineData("sbyte", ArgExtension.Sign)]
+    [InlineData("short", ArgExtension.Sign)]
+    [InlineData("char", ArgExtension.Sign)]
+    [InlineData("byte", ArgExtension.Zero)]
+    [InlineData("ushort", ArgExtension.Zero)]
+    [InlineData("bool", ArgExtension.Zero)]
+    [InlineData("char16", ArgExtension.Zero)]
+    [InlineData("int", ArgExtension.None)]
+    [InlineData("uint", ArgExtension.None)]
+    [InlineData("char32", ArgExtension.None)]
+    [InlineData("long", ArgExtension.None)]
+    [InlineData("float", ArgExtension.None)]
+    public void ANarrowIntegerIsWidenedAsCWidensIt(string name, ArgExtension expected) =>
+        Assert.Equal(expected, ArgInfo.ExtensionOf(Primitive(name)));
+
+    /// <summary>An enum is widened as its underlying type is.</summary>
+    [Fact]
+    public void AnEnumIsWidenedByItsUnderlyingType()
+    {
+        var program = Front.BindModule("""
+            public enum Small : sbyte { A = -1 }
+            public enum Wide : ushort { B = 1 }
+            public enum Plain { C }
+            public void F(Small s, Wide w, Plain p) { }
+            """, out _);
+
+        var parameters = program.Functions.First(f => f.Symbol.Name == "F").Symbol.Parameters;
+
+        Assert.Equal(ArgExtension.Sign, ArgInfo.ExtensionOf(parameters[0].Type));
+        Assert.Equal(ArgExtension.Zero, ArgInfo.ExtensionOf(parameters[1].Type));
+        Assert.Equal(ArgExtension.None, ArgInfo.ExtensionOf(parameters[2].Type));
+    }
+
+    /// <summary>
+    /// Which conventions widen, read off clang for each target: every narrow
+    /// type on Darwin ARM64, x86-64 System V and 32-bit x86; only <c>bool</c>
+    /// on Win64; nothing on ARM64 Linux or Windows. A result follows the same
+    /// rule as a parameter.
+    /// </summary>
+    [Fact]
+    public void OnlySomeConventionsWiden()
+    {
+        var narrow = PrimitiveTypeSymbol.Short;
+        var flag = PrimitiveTypeSymbol.Bool;
+        Func<TypeSymbol, string> spell = LlvmEmitter.LlvmTypeOf;
+
+        Assert.Equal(ArgExtension.Sign, Aapcs64Abi.ClassifyArgument(narrow, spell, darwin: true).Extension);
+        Assert.Equal(ArgExtension.Sign, Aapcs64Abi.ClassifyReturn(narrow, spell, darwin: true).Extension);
+        Assert.Equal(ArgExtension.None, Aapcs64Abi.ClassifyArgument(narrow, spell).Extension);
+        Assert.Equal(ArgExtension.None, Aapcs64Abi.ClassifyReturn(flag, spell).Extension);
+
+        Assert.Equal(ArgExtension.Sign, SysVAbi.ClassifyArgument(narrow, spell).Extension);
+        Assert.Equal(ArgExtension.Sign, SysVAbi.ClassifyReturn(narrow, spell).Extension);
+        Assert.Equal(ArgExtension.Sign, X86Abi.ClassifyArgument(narrow, spell, windows: true).Extension);
+        Assert.Equal(ArgExtension.Sign, X86Abi.ClassifyReturn(narrow, spell, windows: false).Extension);
+
+        Assert.Equal(ArgExtension.None, Win64Abi.ClassifyArgument(narrow, spell).Extension);
+        Assert.Equal(ArgExtension.Zero, Win64Abi.ClassifyArgument(flag, spell).Extension);
+        Assert.Equal(ArgExtension.Zero, Win64Abi.ClassifyReturn(flag, spell).Extension);
+    }
+
+    /// <summary>
+    /// A variadic function on Windows ARM64 takes a homogeneous aggregate as
+    /// any other struct of its size, named arguments included: clang passes
+    /// <c>{ float x3 }</c> as <c>[2 x i64]</c> and four doubles behind a
+    /// pointer. Darwin and Linux keep the SIMD registers.
+    /// </summary>
+    [Fact]
+    public void WindowsArm64DoesNotExpandAnAggregateForAVariadicFunction()
+    {
+        var three = Front.Struct(Shapes, "F3");
+        var four = Front.Struct(Shapes, "D4");
+        Func<TypeSymbol, string> spell = LlvmEmitter.LlvmTypeOf;
+
+        var packed = Aapcs64Abi.ClassifyArgument(three, spell, windowsVariadic: true);
+        Assert.Equal(PassStyle.Coerce, packed.Style);
+        Assert.Equal("[2 x i64]", packed.LlvmType);
+
+        var large = Aapcs64Abi.ClassifyArgument(four, spell, windowsVariadic: true);
+        Assert.Equal(PassStyle.Indirect, large.Style);
+        Assert.True(large.IndirectAsPointer);
+
+        Assert.Equal("[3 x float]", Aapcs64Abi.ClassifyArgument(three, spell, darwin: true).LlvmType);
     }
 
     /// <summary>
@@ -505,16 +616,26 @@ public class AbiTests
             public double Take(Pair v) { return v.A; }
             """;
 
+        // Both ABIs are x64's, whatever this machine is.
+        var before = TargetPlatform.Current;
+        TargetPlatform.Current = TargetPlatform.X64Windows;
+        string itanium;
+        string microsoft;
+        try
+        {
+            itanium = Front.ModuleIr(source, CppAbi.Itanium);
+            microsoft = Front.ModuleIr(source, CppAbi.Microsoft);
+        }
+        finally
+        {
+            TargetPlatform.Current = before;
+        }
+
         // Qualified by the module, because a fragment alone finds whatever
         // the standard library happens to call something: `Standard.Xml` has
         // a `Take` of its own, and it was matching first.
-        Assert.Contains(
-            "double %arg.v.0, i32 %arg.v.1",
-            Front.Function(Front.ModuleIr(source, CppAbi.Itanium), "4Test4Take"));
-
-        Assert.Contains(
-            "ptr byval(%struct.Test_Pair) %arg.v",
-            Front.Function(Front.ModuleIr(source, CppAbi.Microsoft), "4Test4Take"));
+        Assert.Contains("double %arg.v.0, i32 %arg.v.1", Front.Function(itanium, "4Test4Take"));
+        Assert.Contains("ptr byval(%struct.Test_Pair) %arg.v", Front.Function(microsoft, "4Test4Take"));
     }
 
     /// <summary>
@@ -558,5 +679,78 @@ public class AbiTests
         string large = Front.Function(ir, "4Test5Large");
         Assert.Contains("ptr %arg.v", large);
         Assert.DoesNotContain("byval", large);
+    }
+
+    /// <summary>
+    /// Darwin's widening reaches every place a signature is written: a
+    /// definition, an export, a C declaration, a direct call, a call through a
+    /// delegate and one through a closure. A callee told the caller widened
+    /// reads the whole register, so a site that forgot would hand it garbage
+    /// in the upper bits.
+    /// </summary>
+    [Fact]
+    public void DarwinWideningReachesEverySignature()
+    {
+        const string source = """
+            public delegate short Narrow(byte b);
+            public struct Empty { }
+            extern "C" bool flag(sbyte a, char c);
+            extern "C" int report(byte* format, ...);
+            export "C" ushort widen(short a) => (ushort)a;
+            public short Half(byte b) => (short)(b / 2);
+            public int Skip(int a, Empty e, int b) => a + b;
+            public int Use(Narrow through)
+            {
+                Empty e;
+                Func<sbyte, bool> closure = (sbyte v) => v > 0;
+                bool f = flag(1, 'a');
+                short s = through(3);
+                bool c = closure(-1);
+                report("x", (byte)1);
+                return Skip(1, e, 2) + Half(4) + (int)widen(5);
+            }
+            """;
+
+        var before = TargetPlatform.Current;
+        TargetPlatform.Current = TargetPlatform.Arm64MacOS;
+        string ir;
+        try { ir = Front.ModuleIr(source); }
+        finally { TargetPlatform.Current = before; }
+
+        Assert.Contains("declare zeroext i1 @flag(i8 signext, i8 signext)", ir);
+        Assert.Contains("define zeroext i16 @widen(i16 signext %arg.a)", ir);
+        Assert.Contains("signext i16 @_SL4Test4HalfhEs(i8 zeroext %arg.b)", ir);
+        Assert.Contains("i32 @_SL4Test4Skip", ir);
+        Assert.Contains("(i32 %arg.a, i32 %arg.b)", Front.Function(ir, "4Test4Skip"));
+
+        string use = Front.Function(ir, "4Test3Use");
+        Assert.Contains("call zeroext i1 @flag(i8 signext 1, i8 signext 97)", use);
+        Assert.Contains("call signext i16 %", use);
+        Assert.Contains("(i8 zeroext 3)", use);
+        Assert.Contains("call zeroext i1 %", use);
+        Assert.Contains("i8 signext -1)", use);
+        Assert.Contains("call i32 (ptr, ...) @report(ptr ", use);
+        Assert.Contains("call i32 @_SL4Test4Skip", use);
+        Assert.Contains("(i32 1, i32 2)", use);
+        Assert.Contains("call signext i16 @_SL4Test4HalfhEs(i8 zeroext 4)", use);
+        Assert.Contains("call zeroext i16 @widen(i16 signext 5)", use);
+    }
+
+    /// <summary>
+    /// ARM64 Linux widens nothing, as clang does not, so the same source keeps
+    /// its bare types there.
+    /// </summary>
+    [Fact]
+    public void Arm64LinuxWidensNothing()
+    {
+        const string source = "export \"C\" ushort widen(short a) => (ushort)a;";
+
+        var before = TargetPlatform.Current;
+        TargetPlatform.Current = TargetPlatform.Arm64Linux;
+        string ir;
+        try { ir = Front.ModuleIr(source); }
+        finally { TargetPlatform.Current = before; }
+
+        Assert.Contains("define i16 @widen(i16 %arg.a)", ir);
     }
 }

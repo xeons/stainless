@@ -1,0 +1,79 @@
+# One line per DarwinPCS rule, each the one clang writes for shapes.c with
+# --target=arm64-apple-macosx13.0. clang's own line follows each group; it adds
+# noundef, dead_on_return and an sret alignment, which say nothing about where
+# a value travels.
+
+# The structs travel as on every ARM64 system.
+# clang: i32 @sum_tri([2 x i64]), float @sum_trio([3 x float]),
+#        i64 @sum_big(ptr dead_on_return noundef), i64 @count_twins([2 x ptr]),
+#        i32 @sum_small(i64), i24 @make_small(), %struct.Trio @make_trio(),
+#        void @make_big(ptr ... sret(%struct.Big) align 8)
+declare i32 @sum_tri([2 x i64])
+declare float @sum_trio([3 x float])
+declare double @sum_quad([4 x double])
+declare i64 @sum_big(ptr)
+declare i64 @count_twins([2 x ptr])
+declare i32 @sum_small(i64)
+declare i24 @make_small()
+declare [2 x i64] @make_tri()
+declare %struct.ArmMacProbe_Trio @make_trio()
+declare void @make_big(ptr sret(%struct.ArmMacProbe_Big))
+declare [2 x i64] @make_twins()
+
+# A narrow integer is widened as C widens its type, parameter and result alike.
+# char is C's char, signed on Darwin; char16 is an unsigned short. An int is
+# already the width of the register and carries nothing.
+# clang: signext i8 @take_sbyte(i8 noundef signext), and so on
+declare signext i8 @take_sbyte(i8 signext)
+declare zeroext i8 @take_byte(i8 zeroext)
+declare signext i16 @take_short(i16 signext)
+declare zeroext i16 @take_ushort(i16 zeroext)
+declare zeroext i1 @take_bool(i1 zeroext)
+declare signext i8 @take_char(i8 signext)
+declare zeroext i16 @take_char16(i16 zeroext)
+declare i32 @take_int(i32)
+
+# And at every call, which is where the caller does the widening.
+# clang: call signext i8 @take_sbyte(i8 noundef signext -1)
+call signext i8 @take_sbyte(i8 signext -1)
+call zeroext i8 @take_byte(i8 zeroext 200)
+call signext i16 @take_short(i16 signext -2)
+call zeroext i16 @take_ushort(i16 zeroext 60000)
+call zeroext i1 @take_bool(i1 zeroext true)
+call signext i8 @take_char(i8 signext 97)
+call zeroext i16 @take_char16(i16 zeroext 98)
+call i32 @take_int(i32 3)
+
+# A definition a C caller reaches says the same, so it relies on what the
+# caller did and widens what it returns.
+# clang: define signext i16 @widen_byte(i8 noundef zeroext %0),
+#        define zeroext i1 @is_negative(i8 noundef signext %0)
+define signext i16 @widen_byte(i8 zeroext %arg.v)
+define zeroext i1 @is_negative(i8 signext %arg.v)
+call signext i16 @widen_byte(i8 zeroext 7)
+call zeroext i1 @is_negative(i8 signext -3)
+
+# A call through a pointer has only the type to go on, and says it too.
+# clang: call zeroext i16 %52(i8 noundef signext -4)
+define internal zeroext i16 @_SL11ArmMacProbe5twiceaEt(i8 signext %arg.v)
+(i8 signext -4)
+
+# An empty struct takes no register and comes back as nothing.
+# clang: i32 @skip_empty(i32 noundef, i32 noundef), void @make_empty(),
+#        define i32 @between(i32 noundef %0, i32 noundef %1)
+declare i32 @skip_empty(i32, i32)
+declare void @make_empty()
+define i32 @between(i32 %arg.a, i32 %arg.b)
+call i32 @skip_empty(i32 1, i32 2)
+call void @make_empty()
+
+# Variadic: C's promotions make char, bool and sbyte an i32 and float a double,
+# and the structs travel as they would if named. The empty one is left out. The
+# stack placement Darwin gives every variadic argument is the back end's, keyed
+# on the triple.
+# clang: call i32 (ptr, ...) @report(ptr noundef @.str, [3 x float] %54, i64 %55,
+#        ptr dead_on_return noundef %21, i32 noundef 99, double noundef 1.5,
+#        i32 noundef 1, i32 noundef -5, i32 noundef 0)
+declare i32 @report(ptr, ...)
+call i32 (ptr, ...) @report(ptr @.bytes.
+, [3 x float] %69, i64 %71, ptr %arg.copy.s18, i32 %72, double %73, i32 %74, i32 %77, i32 %78)

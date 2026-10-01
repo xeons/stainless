@@ -1,0 +1,3 @@
+# Built to a Mach-O object file and not run. Assembling one needs no SDK, so
+# this runs on every host. What it proves is that LLVM accepts every section
+# this program names for Mach-O, where a name without a segment is an error.

@@ -143,7 +143,13 @@ the replacements and everything else the old one held.
 Linux-only says so in `platform.txt`, and each platform skips the other's. A case whose *subject* differs by platform — `Path.Join` writes a
 different separator, and `\x` is rooted on one and an ordinary name on the
 other — carries an `expected.linux.txt` beside its `expected.txt` rather than
-having the difference argued away.
+having the difference argued away. A Mac reads `expected.macos.txt`, then
+`expected.linux.txt`, then `expected.txt`, because what separates Linux from
+Windows in those cases is POSIX. A `target.txt` case that has to run what it
+built is skipped, with the reason, on a host that cannot: another system's
+target, x86 on a Mac, x64 on Apple silicon. One that stops at a diagnostic or
+an object file runs everywhere. `tests/Stainless.Tests/CaseSelection.cs` is
+the rule, and the unit tests ask it as each host.
 
 Twenty-two of those cases are real 32-bit binaries, built and run on both
 systems but for one that is Windows-only, and six are built for ARM64 and not
@@ -152,15 +158,34 @@ verified and lowered, with their signatures pinned against clang's. Building 32-
 multilib packages, which is what
 [tests/linux-x86.Dockerfile](../tests/linux-x86.Dockerfile) is for.
 
-macOS is not tested. Nothing in the compiler is Windows-only and the runtime's
-`#ifdef`s have a POSIX branch that Linux exercises, so it is likely close; the
-constants in `bindings/linux` are Linux's and would not port, and that is
-stated where they are.
+macOS is not tested, and support for it is in progress. The target model
+knows it: `arm64-macos` (`arm64-apple-macosx13.0`) and `x64-macos`
+(`x86_64-apple-macosx13.0`) can be named, a Mac host defaults to one of them,
+and each target carries its operating system and object format (COFF, ELF or
+Mach-O) rather than having them read out of the triple, and the toolchain
+follows it. The Mach-O sections and the Darwin calling convention are not done
+yet, so building for macOS does not work yet. There is no 32-bit macOS target, and a bare `x86`
+on a Mac is refused. The constants in `bindings/linux` are Linux's and would
+not port, and that is stated where they are.
 
 `STAINLESS_CLANG` names the clang to use and always wins. Failing that the
 compiler takes the first on `PATH`, then tries `C:\Program Files\LLVM\bin` and
 its `(x86)` sibling on Windows, or `/usr/bin/clang` and `/usr/local/bin/clang`
-elsewhere. `STAINLESS_RC` names `llvm-rc` the same way; failing that it is
+elsewhere. On a Mac, Homebrew's LLVM (`/opt/homebrew/opt/llvm/bin`, then
+`/usr/local/opt/llvm/bin`) comes before `PATH`, because `PATH` always holds
+Apple's clang; `xcrun -f clang` is the last resort, and a clang older than
+LLVM 16 is passed over. Homebrew's clang finds the SDK through its own
+configuration file, so no `-isysroot` is passed.
+
+What the toolchain produces follows the target and not the host: the
+extension and `lib` prefix of a library, the import library, the rpath and the
+library's own name. A Darwin build always names its triple, because the triple
+carries the macOS 13 deployment floor and the program and the runtime MUST
+agree on it; its libraries are `-dynamiclib` with an install name of
+`@rpath/<name>.dylib`, and a consumer looks in `@loader_path`. A `-g` build on
+Darwin gets a `.dSYM` from clang's own driver, which runs `dsymutil` after any
+link that also compiled something, and the IR is compiled in the link's
+invocation for that reason. `STAINLESS_RC` names `llvm-rc` the same way; failing that it is
 looked for beside whichever clang was found, because it ships in the same
 directory, and then on `PATH`.
 
@@ -225,7 +250,7 @@ directory, and then on `PATH`.
 | [Emit/Win64Abi.cs](../src/Stainless.Compiler/Emit/Win64Abi.cs) | struct passing on Win64: register, `byval`, or `sret` — it asks only how big a struct is |
 | [Emit/SysVAbi.cs](../src/Stainless.Compiler/Emit/SysVAbi.cs) | System V AMD64, which asks what is *in* a struct and cuts it into eightbytes |
 | [Emit/X86Abi.cs](../src/Stainless.Compiler/Emit/X86Abi.cs) | 32-bit x86, where every struct travels on the stack and the two systems differ on returns |
-| [Emit/Aapcs64Abi.cs](../src/Stainless.Compiler/Emit/Aapcs64Abi.cs) | ARM64 — one classifier, because Microsoft's ABI and ARM's agree about every shape asked |
+| [Emit/Aapcs64Abi.cs](../src/Stainless.Compiler/Emit/Aapcs64Abi.cs) | ARM64 -- one classifier, because Microsoft's, Apple's and ARM's agree about every struct; Darwin's widening and empty structs are a flag |
 | [Emit/LlvmEmitter.cs](../src/Stainless.Compiler/Emit/LlvmEmitter.cs) | IR, metadata tables; partial over `LlvmEmitter.*.cs`, and where the four classifiers above are chosen between |
 | [Emit/LlvmEmitter.Arc.cs](../src/Stainless.Compiler/Emit/LlvmEmitter.Arc.cs) | every retain and release: what each value owes, where it is moved, and what a scope drops |
 | [Emit/DebugInfo.cs](../src/Stainless.Compiler/Emit/DebugInfo.cs) | what `-g` writes for a debugger |

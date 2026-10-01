@@ -518,7 +518,13 @@ public sealed partial class LlvmEmitter
 
         if (value.Type is StructTypeSymbol structType)
         {
-            if (_sretSlot is not null)
+            if (returnInfo.Style == PassStyle.Ignore)
+            {
+                FlushTemporaries();
+                ReleaseScopes(0, handedOver);
+                Terminator("ret void");
+            }
+            else if (_sretSlot is not null)
             {
                 MemCopy(_sretSlot, value.Ref, structType.Size);
                 FlushTemporaries();

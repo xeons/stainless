@@ -50,6 +50,9 @@ only.
 | `X64`, `ARM64`, `X86` | the architecture being built for, which `--target` does change |
 | `STAINLESS` | always |
 
+So a Windows target defines `WINDOWS`, a Linux target `LINUX` and `UNIX`, and a
+macOS target `MACOS` and `UNIX` -- never `LINUX`, whichever machine builds it.
+
 Everything else comes from `-D` on the command line:
 
 ```

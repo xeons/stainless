@@ -48,8 +48,10 @@ stainless restore              resolve dependencies and lock them
                          bit-fields and how a struct is passed
   --target <name>        the machine to build for: x64, x86 or arm64,
                          optionally with a system -- x64-linux, x86-windows,
-                         arm64-linux and so on. The default is the machine
-                         doing the building
+                         arm64-macos and so on. A bare name takes the
+                         system doing the building, and the default is that
+                         machine. macOS has no 32-bit target, and its
+                         support is in progress
   --keep                 keep the generated .ll
   --verify-ir            run LLVM's verifier over the generated IR first, and
                          report a fault as a compiler bug in the function it is
@@ -92,7 +94,8 @@ stainless run samples/win32/resources.sl samples/win32/resources.rc \
 
 **It works on every target**, by two routes: a PE has a resource directory and
 the linker fills it, and everything else carries the same compiled script in a
-section called `.rsrc` that `Standard.Resources` walks. The two were checked
+section that `Standard.Resources` walks: `.rsrc` on ELF and
+`__DATA_CONST,__sl_rsrc` on Mach-O. The two were checked
 against each other entry by entry and answer identically, so
 [tests/cases/resources-portable](../tests/cases/resources-portable) has one
 expected output and no `#if` in it. What does not travel is the *operating
@@ -168,6 +171,12 @@ rather than collecting that is an exact answer: what a mutable static holds is
 released before the report, and only a `readonly` static, made immortal as it
 is stored, is alive at exit on purpose. Without the flag the tracker is not
 compiled in and costs nothing.
+
+`tools/leakcheck.ps1` on Windows and `tools/leakcheck.sh` on Linux and macOS
+build every sample and application this way, run each, and fail when one ends
+with more alive than `tools/leaks.baseline.txt` allows. The shell script skips,
+with the reason, what a Mac cannot build: the IDE and `sldb`, which use
+`bindings/linux`.
 
 ## Environment
 

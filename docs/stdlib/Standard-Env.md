@@ -34,7 +34,7 @@ The directory relative paths are resolved against.
 
 **See also** &nbsp; [Env.SetCurrentDirectory](#setcurrentdirectory-function)
 
-<sub>[stdlib/Env.sl:292](../../stdlib/Env.sl#L292)</sub>
+<sub>[stdlib/Env.sl:293](../../stdlib/Env.sl#L293)</sub>
 
 ### GetArgument *function*
 
@@ -150,7 +150,7 @@ path is not a directory, or is not reachable.
 
 **See also** &nbsp; [Env.CurrentDirectory](#currentdirectory-function)
 
-<sub>[stdlib/Env.sl:312](../../stdlib/Env.sl#L312)</sub>
+<sub>[stdlib/Env.sl:313](../../stdlib/Env.sl#L313)</sub>
 
 ### SetEnvironmentVariable *function*
 

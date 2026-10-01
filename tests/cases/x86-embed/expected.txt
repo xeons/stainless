@@ -7,6 +7,6 @@ writable is another true
 positional is the same true
 through a pointer 83 76
 written 200 201, read-only still 83 65
-stub length 6
+stub length true
 called 42
 empty 0

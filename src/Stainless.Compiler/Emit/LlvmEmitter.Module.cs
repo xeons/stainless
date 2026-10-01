@@ -369,7 +369,11 @@ public sealed partial class LlvmEmitter
         // library's module and runs when that module is unloaded. Through a
         // shared runtime it would belong to the runtime's instead.
         if (forSharedLibrary)
+        {
             Declare("atexit", "declare i32 @atexit(ptr) nounwind");
+            Declare("sl_runtime_init", "declare void @sl_runtime_init() nounwind");
+        }
+
         Declare("sl_weak_retain", $"declare void @sl_weak_retain(ptr) {HeaderOnly}");
 
         // free() touches the allocator's own bookkeeping, which is reachable
@@ -501,18 +505,9 @@ public sealed partial class LlvmEmitter
     }
 
     /// <summary>
-    /// How one parameter is passed.
-    ///
-    /// A <c>ref</c> or <c>in</c> parameter is the caller's storage, so it is a
-    /// pointer and the classifier is not consulted: there is nothing to
-    /// classify, and a struct that would have gone <c>byval</c> must not be
-    /// copied on the way in. That is the whole of the ABI change, and it makes
-    /// such a parameter exactly a <c>T*</c> — which is why one crosses
-    /// <c>extern "C"</c> with nothing in between.
-    /// </summary>
-    /// <summary>
     /// How one parameter is spelled in a declaration: its own type, a pointer
-    /// it is passed behind, or one entry per register it travels in.
+    /// it is passed behind, one entry per register it travels in, or nothing
+    /// for a value that is left out. Attributes included.
     /// </summary>
     private IEnumerable<string> Declared(ArgInfo info) =>
         info.Style switch
@@ -522,8 +517,43 @@ public sealed partial class LlvmEmitter
                     ? "ptr"
                     : $"ptr byval({StructName((StructTypeSymbol)info.Type)})"],
             PassStyle.Coerce => info.Pieces,
+            PassStyle.Ignore => [],
+            _ => [info.LlvmType + Widening(info)],
+        };
+
+    /// <summary>
+    /// The same without attributes, for a function type: LLVM refuses an
+    /// attribute there, so a variadic call's type is written with this.
+    /// </summary>
+    private static IEnumerable<string> DeclaredTypes(ArgInfo info) =>
+        info.Style switch
+        {
+            PassStyle.Indirect => ["ptr"],
+            PassStyle.Coerce => info.Pieces,
+            PassStyle.Ignore => [],
             _ => [info.LlvmType],
         };
+
+    /// <summary>
+    /// The attribute that says a value was widened, with its leading space, or
+    /// nothing. It follows the type in a parameter and precedes it in a result.
+    /// </summary>
+    private static string Widening(ArgInfo info) => info.Extension switch
+    {
+        ArgExtension.Sign => " signext",
+        ArgExtension.Zero => " zeroext",
+        _ => "",
+    };
+
+    /// <summary>
+    /// A result as a definition, a declaration or a call spells it:
+    /// <c>void</c> when it comes back through a pointer or not at all, and the
+    /// type with any widening ahead of it otherwise.
+    /// </summary>
+    private static string ResultSpelling(ArgInfo info) =>
+        info.Style is PassStyle.Indirect or PassStyle.Ignore ? "void"
+        : info.Extension == ArgExtension.None ? info.LlvmType
+        : $"{Widening(info)[1..]} {info.LlvmType}";
 
     /// <summary>
     /// Where a coerced value is read from, and where one is written before
@@ -612,10 +642,20 @@ public sealed partial class LlvmEmitter
             ? address
             : Emit("ptr", $"getelementptr inbounds i8, ptr {address}, i64 {index * 8}");
 
-    private ArgInfo ClassifyParameter(ParameterSymbol parameter) =>
+    /// <summary>
+    /// How one parameter is passed. <paramref name="variadic"/> says its
+    /// function is a C variadic one.
+    ///
+    /// A <c>ref</c> or <c>in</c> parameter is the caller's storage, so it is a
+    /// pointer and the classifier is not consulted: there is nothing to
+    /// classify, and a struct that would have gone <c>byval</c> MUST NOT be
+    /// copied on the way in. That makes such a parameter exactly a <c>T*</c>,
+    /// which is why one crosses <c>extern "C"</c> with nothing in between.
+    /// </summary>
+    private ArgInfo ClassifyParameter(ParameterSymbol parameter, bool variadic = false) =>
         parameter.IsByReference
             ? new ArgInfo(PassStyle.Direct, "ptr", parameter.Type)
-            : ClassifyValue(parameter.Type);
+            : ClassifyValue(parameter.Type, variadic);
 
     private void ExternalDeclarations(BoundProgram program)
     {
@@ -640,15 +680,14 @@ public sealed partial class LlvmEmitter
 
             int declaredFirst = parts.Count;
             foreach (var parameter in function.Parameters)
-                parts.AddRange(Declared(ClassifyParameter(parameter)));
+                parts.AddRange(Declared(ClassifyParameter(parameter, function.IsVariadic)));
 
             MarkRegisters(function, parts, declaredFirst);
 
             if (function.IsVariadic) parts.Add("...");
 
-            string returnType = returnInfo.Style == PassStyle.Indirect ? "void" : returnInfo.LlvmType;
             Declare(function.MangledName,
-                $"declare {Convention(function)}{returnType} {Symbol(function)}" +
+                $"declare {Convention(function)}{ResultSpelling(returnInfo)} {Symbol(function)}" +
                 $"({string.Join(", ", parts)})");
         }
 

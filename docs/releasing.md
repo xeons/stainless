@@ -44,11 +44,12 @@ on from where it was rather than restarting, so `0.2.500` may follow `0.1.499`.
 
 ```
 .\tools\publish.ps1                  # Windows, this machine's rid unless -Runtime says
-tools/publish.sh                     # Linux, this machine's rid unless an argument says
+tools/publish.sh                     # Linux or macOS, this machine's rid unless an argument says
 ```
 
-`-NoArchive`, or `--no-archive` to the Linux script, publishes and smoke-tests
-and stops before packaging.
+`-NoArchive`, or `--no-archive` to the shell script, publishes and smoke-tests
+and stops before packaging. The shell script takes `linux-*` and `osx-*`
+runtime identifiers and needs nothing GNU-specific.
 
 Each publishes the compiler single-file, self-contained and ReadyToRun into
 `artifacts/<rid>/publish`, then runs it: `--version` MUST answer the version
@@ -70,7 +71,7 @@ from a development build: `STAINLESS_CLANG`, then `PATH`, then the usual
 install directories.
 
 **The archive** is `artifacts/stainless-<version>-<rid>.zip` on Windows and
-`.tar.gz` on Linux, unpacking to one directory of the same name:
+`.tar.gz` on Linux and macOS, unpacking to one directory of the same name:
 
 | | |
 |---|---|

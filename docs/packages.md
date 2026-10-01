@@ -112,9 +112,8 @@ is actually asked.
 program that comes out rather than the machine it came out of — and `#if
 WINDOWS` follows the target for the same reason, so the two always agree.
 
-`macos` is accepted and selected by nothing, there being no macOS target yet. A
-project that already describes its macOS build should not have to be edited on
-the day one can be run.
+`macos` is selected by a macOS target, `arm64-macos` or `x64-macos`, and
+`#if MACOS` holds there too.
 
 **A field a section does not have is refused too**, and says which kind of
 thing it was talking about:
@@ -181,19 +180,22 @@ and it is the better rule: it is what makes a project relocatable.
 
 **It works on every target, by two routes.** A PE has a resource directory and
 the linker fills it from the `.res`, so a Windows build reads the real thing
-through `FindResourceW`. ELF has no such section, so the compiler puts the same
-`.res` in a section called `.rsrc` as ordinary data and `Standard.Resources`
-walks it. The two were checked against each other on the same script, entry by
+through `FindResourceW`. ELF and Mach-O have no such section, so the compiler
+puts the same `.res` in a section of its own as ordinary data and
+`Standard.Resources` walks it: `.rsrc` on ELF, and `__DATA_CONST,__sl_rsrc` on
+Mach-O, which dyld makes read-only once the image is bound. A program with no
+resources gets the symbol and no section. The two were checked against each other on the same script, entry by
 entry, and answer identically — which is why
 [tests/cases/resources-portable](../tests/cases/resources-portable) has one
 `expected.txt` and no `#if` in its source.
 
 Because the section holds the `.res` unchanged, the ordinary tools still work on
-a Linux binary:
+a Linux or macOS binary:
 
 ```
 readelf -x .rsrc app
 llvm-objcopy --dump-section .rsrc=out.res app     # byte-identical to llvm-rc's
+otool -s __DATA_CONST __sl_rsrc app
 ```
 
 **What does not travel is the operating system.** Bytes travel; an OS that acts

@@ -109,16 +109,25 @@ public sealed partial class Binder
         string placed;
         if (section is { } writtenSection)
         {
-            if (EmbeddedFile.SectionProblem(writtenSection.Text) is { } problem)
+            if (EmbeddedFile.SectionProblem(writtenSection.Text, target) is { } problem)
             {
                 diagnostics.Error("SL0709", writtenSection.Span,
                     $"'{Printable(writtenSection.Text)}' cannot name a section: {problem}");
                 return null;
             }
 
+            if (target.IsMachO &&
+                EmbeddedFile.MachOSectionProblem(writtenSection.Text) is { } machOProblem)
+            {
+                diagnostics.Error("SL0830", writtenSection.Span,
+                    $"'{Printable(writtenSection.Text)}' cannot name a section on " +
+                    $"{target.Triple}: {machOProblem}");
+                return null;
+            }
+
             placed = writtenSection.Text;
 
-            if (target.IsWindows &&
+            if (target.Format == ObjectFormat.Coff &&
                 Encoding.UTF8.GetByteCount(placed) > EmbeddedFile.ImageSectionNameLimit)
                 diagnostics.Warning("SL0710", writtenSection.Span,
                     $"'{placed}' is longer than the {EmbeddedFile.ImageSectionNameLimit} bytes a " +
@@ -130,6 +139,14 @@ public sealed partial class Binder
         else if (EmbeddedFile.DefaultSection(granted, target) is { } fallback)
         {
             placed = fallback;
+        }
+        else if (target.IsMachO)
+        {
+            diagnostics.Error("SL0708", access!.Value.Span,
+                $"memory both writable and executable has no section on {target.Triple}: a " +
+                "Mach-O section has its segment's permissions, and no segment an embed can " +
+                "use is both");
+            return null;
         }
         else
         {

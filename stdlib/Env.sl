@@ -75,9 +75,9 @@ extern "C"
     int   chdir(byte* path);
 }
 
-/// Every variable, as `name=value` pointers ending in a null one. POSIX gives
-/// the block a name rather than a function.
-extern "C" byte** environ;
+/// Every variable, as `name=value` pointers ending in a null one. Read through
+/// the runtime, because a macOS dylib cannot link `environ` itself.
+extern "C" byte** sl_environ();
 
 #endif
 
@@ -256,18 +256,19 @@ bool StoreEnvironmentVariable(String name, String? value)
 
 /// The name of every variable, in whatever order the platform keeps them.
 ///
-/// `environ` is a null-terminated run of `name=value`, and an entry without an
-/// `=` is not one the C library put there.
+/// The environment is a null-terminated run of `name=value`, and an entry
+/// without an `=` is not one the C library put there.
 public String[] GetEnvironmentVariableNames()
 {
     var found = new List<String>();
 
-    if (environ == null)
+    byte** block = sl_environ();
+    if (block == null)
         return found.ToArray();
 
-    for (nuint i = 0u; environ[i] != null; i++)
+    for (nuint i = 0u; block[i] != null; i++)
     {
-        byte* entry = environ[i];
+        byte* entry = block[i];
 
         nuint length = 0u;
         while (entry[length] != 0 && entry[length] != 0x3D)

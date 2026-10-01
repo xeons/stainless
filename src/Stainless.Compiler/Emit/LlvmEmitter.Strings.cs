@@ -33,13 +33,14 @@ public sealed partial class LlvmEmitter
     /// **Only where the binary format has nowhere else to put them.** A PE has
     /// a resource directory and the linker fills it from the same `.res`, so a
     /// Windows build reads the real thing and this emits nothing -- carrying
-    /// both would be the same bytes twice. ELF has no such section, so the
-    /// bytes ride in ordinary constant data and `Standard.Resources` walks
-    /// them.
+    /// both would be the same bytes twice. ELF and Mach-O have no such
+    /// section, so the bytes ride in ordinary constant data and
+    /// `Standard.Resources` walks them.
     ///
-    /// Emitted even when empty, so that the symbol always resolves: a program
+    /// The symbol is defined even when the blob is empty, so that a program
     /// that never asks for a resource still links, and one that does gets an
-    /// empty answer rather than a missing symbol.
+    /// empty answer rather than a missing symbol. The section is given only to
+    /// a blob with something in it.
     /// </summary>
     private void ResourceBlob()
     {
@@ -53,25 +54,36 @@ public sealed partial class LlvmEmitter
         _definedGlobals.Add("sl_resource_blob");
         _definedGlobals.Add("sl_resource_blob_size");
 
+        string? section = ResourceSection(TargetPlatform.Current);
+        string placement = resourceBlob.Length > 0 && section is not null
+            ? $", section \"{section}\""
+            : "";
+
         _module.AppendLine();
-        // In a section of its own, named after the one a PE keeps resources in.
-        //
-        // The symbol is what the *program* uses -- a section has no address a
-        // program can ask for without reading its own ELF headers, which is
-        // more fragility than it is worth. What the section buys is everything
-        // outside the program: `readelf -x .rsrc` shows what a binary carries,
-        // and `llvm-objcopy --dump-section .rsrc=out.res` gets the original
-        // .res back out, so a resource editor or a translator's toolchain can
-        // work on a Linux binary the way it would on a Windows one.
-        //
-        // The name is spelled the PE way deliberately. Mach-O would need
-        // `__SEGMENT,__section` instead, and is not a target yet.
         _module.AppendLine(
             $"@sl_resource_blob = constant [{resourceBlob.Length} x i8] " +
-            $"c\"{RawBytes(resourceBlob)}\", section \".rsrc\"");
+            $"c\"{RawBytes(resourceBlob)}\"{placement}");
         _module.AppendLine(
             $"@sl_resource_blob_size = constant i64 {resourceBlob.Length}");
     }
+
+    /// <summary>
+    /// The section the resource blob is placed in, or null where the format
+    /// keeps resources itself.
+    ///
+    /// The symbol is what the *program* uses. The section is for everything
+    /// outside it: `readelf -x .rsrc` or `otool -s __DATA_CONST __sl_rsrc`
+    /// shows what a binary carries, and `llvm-objcopy --dump-section` gets the
+    /// original `.res` back out. ELF takes the name a PE keeps resources in.
+    /// Mach-O needs a segment, and `__DATA_CONST` is the one dyld makes
+    /// read-only once the image is bound.
+    /// </summary>
+    public static string? ResourceSection(TargetPlatform target) => target.Format switch
+    {
+        ObjectFormat.Elf => ".rsrc",
+        ObjectFormat.MachO => "__DATA_CONST,__sl_rsrc",
+        _ => null,
+    };
 
     private void StringConstants()
     {
@@ -140,19 +152,19 @@ public sealed partial class LlvmEmitter
     /// <summary>
     /// Emits the startup pass that gives every string literal its type.
     ///
-    /// It is registered in <c>llvm.global_ctors</c>, which both PE and ELF
-    /// honour, so it runs before <c>main</c> in a program and on load in a
-    /// library -- and before any static initializer, which may itself hold a
-    /// literal. There is one table for every literal in the module and it runs
-    /// once, so the cost is a store per literal at startup and nothing at all
-    /// afterwards.
+    /// It is registered in <c>llvm.global_ctors</c>, so it runs before
+    /// <c>main</c> in a program and on load in a library -- and before any
+    /// static initializer, which may itself hold a literal: the priorities
+    /// order a module's own entries on every format. There is one table for
+    /// every literal in the module and it runs once, so the cost is a store per
+    /// literal at startup and nothing at all afterwards.
     /// </summary>
     private void BindLiteralsAtStartup()
     {
         const string name = "_SLbind_literals";
 
         _module.AppendLine();
-        _module.AppendLine($"define internal void @{name}() {{");
+        _module.AppendLine($"define internal void @{name}(){FrameAttributes} {{");
         _module.AppendLine("entry:");
 
         int slot = 0;
@@ -170,7 +182,8 @@ public sealed partial class LlvmEmitter
         _module.AppendLine("}");
         _module.AppendLine();
 
-        // Priority 0: ahead of anything else that asked to run at startup.
+        // Priority 0: ahead of anything else in this module that asked to run
+        // at startup.
         // The table itself is emitted once, at the end, because a module may
         // define `llvm.global_ctors` only once however many things want in.
         _startup.Add((0, name));
@@ -276,7 +289,8 @@ public sealed partial class LlvmEmitter
             string parameter = Declared(ClassifyParameter(function.Parameters[0])).Single();
 
             _module.AppendLine();
-            _module.AppendLine($"define private ptr {Symbol(function)}({parameter} %value) {{");
+            _module.AppendLine(
+                $"define private ptr {Symbol(function)}({parameter} %value){FrameAttributes} {{");
             _module.AppendLine("entry:");
             _module.AppendLine($"  switch {type} %value, label %unnamed [");
             for (int i = 0; i < named.Count; i++)

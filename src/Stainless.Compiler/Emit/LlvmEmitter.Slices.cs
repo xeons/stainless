@@ -329,13 +329,19 @@ public sealed partial class LlvmEmitter
         arguments.Add($"ptr {receiver}");
         AppendArguments(call.Arguments, arguments, call.EvaluationOrder);
 
-        string signature = returnInfo.Style == PassStyle.Indirect ? "void" : returnInfo.LlvmType;
-        string invocation = $"call {signature} {function}({string.Join(", ", arguments)})";
+        string invocation =
+            $"call {ResultSpelling(returnInfo)} {function}({string.Join(", ", arguments)})";
 
         if (returnInfo.Style == PassStyle.Indirect)
         {
             Line(invocation);
             return Fresh(new Val(sretSlot!, "ptr", type.ReturnType));
+        }
+
+        if (returnInfo.Style == PassStyle.Ignore)
+        {
+            Line(invocation);
+            return EmptyResult(type.ReturnType);
         }
 
         if (type.ReturnType.IsVoid())
@@ -362,6 +368,18 @@ public sealed partial class LlvmEmitter
     /// taking a closure rather than an interface -- an interface call is a
     /// direct call through a vtable slot, so it went the other way.
     /// </summary>
+    /// <summary>
+    /// What a call that answers with an empty struct leaves behind: a slot of
+    /// its own, because nothing came back.
+    /// </summary>
+    private Val EmptyResult(TypeSymbol returnType)
+    {
+        string type = LlvmTypeOf(returnType);
+        string slot = Alloca(type, "call.empty");
+        Line($"store {type} zeroinitializer, ptr {slot}");
+        return Fresh(new Val(slot, "ptr", returnType));
+    }
+
     private Val Landed(string result, ArgInfo returnInfo, TypeSymbol returnType)
     {
         if (returnInfo.Style == PassStyle.Coerce)
@@ -397,7 +415,7 @@ public sealed partial class LlvmEmitter
 
         AppendArguments(call.Arguments, arguments, call.EvaluationOrder);
 
-        string signature = returnInfo.Style == PassStyle.Indirect ? "void" : returnInfo.LlvmType;
+        string signature = ResultSpelling(returnInfo);
 
         // **The convention is the delegate's, and there is nothing else to ask.**
         // A direct call reads it off the function it names; a call through a
@@ -414,13 +432,19 @@ public sealed partial class LlvmEmitter
             return Fresh(new Val(sretSlot!, "ptr", delegateType.ReturnType));
         }
 
+        if (returnInfo.Style == PassStyle.Ignore)
+        {
+            Line(invocation);
+            return EmptyResult(delegateType.ReturnType);
+        }
+
         if (delegateType.ReturnType.IsVoid())
         {
             Line(invocation);
             return Val.Void;
         }
 
-        return Landed(Emit(signature, invocation), returnInfo, delegateType.ReturnType);
+        return Landed(Emit(returnInfo.LlvmType, invocation), returnInfo, delegateType.ReturnType);
     }
 
     private Val EmitCall(BoundCall call)
@@ -462,13 +486,12 @@ public sealed partial class LlvmEmitter
         }
 
         int declaredFirst = arguments.Count;
-        AppendArguments(call.Arguments, arguments, call.EvaluationOrder);
+        AppendArguments(call.Arguments, arguments, call.EvaluationOrder, function.IsVariadic);
         MarkRegisters(function, arguments, declaredFirst);
 
         string signature = function.IsVariadic
-            ? $"{(returnInfo.Style == PassStyle.Indirect ? "void" : returnInfo.LlvmType)} " +
-              $"({VariadicSignature(function)})"
-            : returnInfo.Style == PassStyle.Indirect ? "void" : returnInfo.LlvmType;
+            ? $"{ResultSpelling(returnInfo)} ({VariadicSignature(function)})"
+            : ResultSpelling(returnInfo);
 
         // An interface method is reached through the object; everything else is
         // a direct call to a known symbol.
@@ -485,6 +508,12 @@ public sealed partial class LlvmEmitter
         {
             Line(invocation);
             return Fresh(new Val(sretSlot!, "ptr", function.ReturnType));
+        }
+
+        if (returnInfo.Style == PassStyle.Ignore)
+        {
+            Line(invocation);
+            return EmptyResult(function.ReturnType);
         }
 
         if (function.ReturnType.IsVoid())
@@ -817,10 +846,14 @@ public sealed partial class LlvmEmitter
         Emit("ptr", $"getelementptr inbounds {StructName(variant)}, ptr {value}, " +
                     $"i32 0, i32 {FieldSlot(variant, variant.PayloadField!)}");
 
+    /// <summary>
+    /// A variadic callee's parameter types, as its call writes them: types and
+    /// nothing else, because LLVM refuses an attribute in a function type.
+    /// </summary>
     private string VariadicSignature(FunctionSymbol function)
     {
         var parts = function.Parameters
-            .SelectMany(p => Declared(ClassifyParameter(p)))
+            .SelectMany(p => DeclaredTypes(ClassifyParameter(p, variadic: true)))
             .ToList();
         parts.Add("...");
         return string.Join(", ", parts);
@@ -830,15 +863,19 @@ public sealed partial class LlvmEmitter
     /// Lowers each argument to its ABI form. The callee is not needed: every
     /// argument was already converted to the parameter's type during binding, so
     /// the expression's own type is the one the ABI classifies.
+    /// <paramref name="variadic"/> says the callee is a C variadic function.
     /// </summary>
     private void AppendArguments(
         IReadOnlyList<BoundExpression> expressions, List<string> arguments,
-        IReadOnlyList<int>? order = null)
+        IReadOnlyList<int>? order = null, bool variadic = false)
     {
         if (order is null)
         {
             for (int i = 0; i < expressions.Count; i++)
-                AppendArgument(EmitExpression(expressions[i]), expressions[i].Type, arguments);
+            {
+                AppendArgument(
+                    EmitExpression(expressions[i]), expressions[i].Type, arguments, variadic);
+            }
             return;
         }
 
@@ -849,18 +886,22 @@ public sealed partial class LlvmEmitter
         foreach (int i in order)
         {
             lowered[i] = [];
-            AppendArgument(EmitExpression(expressions[i]), expressions[i].Type, lowered[i]);
+            AppendArgument(
+                EmitExpression(expressions[i]), expressions[i].Type, lowered[i], variadic);
         }
 
         foreach (var pieces in lowered) arguments.AddRange(pieces);
     }
 
     /// <summary>Lowers one already-emitted value to its ABI form.</summary>
-    private void AppendArgument(Val value, TypeSymbol type, List<string> arguments)
+    private void AppendArgument(Val value, TypeSymbol type, List<string> arguments, bool variadic)
     {
         if (type is StructTypeSymbol structType)
         {
-            var info = ClassifyValue(structType);
+            var info = ClassifyValue(structType, variadic);
+            if (info.Style == PassStyle.Ignore)
+                return;
+
             if (info.Style == PassStyle.Indirect)
             {
                 // Win64 passes a pointer to a copy the caller owns, and so does
@@ -895,6 +936,6 @@ public sealed partial class LlvmEmitter
             return;
         }
 
-        arguments.Add($"{value.LlvmType} {value.Ref}");
+        arguments.Add($"{value.LlvmType}{Widening(ClassifyValue(type, variadic))} {value.Ref}");
     }
 }

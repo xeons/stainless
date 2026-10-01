@@ -62,6 +62,32 @@ public class LinkDiagnosisTests
         Assert.DoesNotContain("'_SL'", text);
     }
 
+    /// <summary>
+    /// A C input is compiled in the same clang run as the IR, so its compile
+    /// error arrives where the toolchain's objections to the IR do, and it is
+    /// the C file's author who has to fix it.
+    /// </summary>
+    [Theory]
+    [InlineData("/home/me/case/loaded.c:29:10: fatal error: 'link.h' file not found\n" +
+                "   29 | #include <link.h>\n1 error generated.", "/home/me/case/loaded.c")]
+    [InlineData(@"E:\case\shim.cpp:4:1: error: unknown type name 'widget'", @"E:\case\shim.cpp")]
+    [InlineData("In file included from app.c:2:\ninclude/api.h:7:3: error: expected ';'", "include/api.h")]
+    public void ACSourceErrorIsTheSourcesNotTheCompilers(string output, string file)
+    {
+        string text = LinkDiagnosis.Explain(output, "app.ll");
+
+        Assert.StartsWith($"'{file}' did not compile:", text);
+        Assert.DoesNotContain("compiler bug", text);
+    }
+
+    [Fact]
+    public void AnErrorInTheIrIsStillTheCompilers()
+    {
+        string text = LinkDiagnosis.Explain("obj/app.ll:12:3: error: expected type", "obj/app.ll");
+
+        Assert.Contains("compiler bug", text);
+    }
+
     [Theory]
     // i686 Windows puts the target's own underscore in front of the mangled one.
     [InlineData("lld-link: error: undefined symbol: __SL3Lib5TotalS15Standard_int___Ei")]
@@ -69,6 +95,36 @@ public class LinkDiagnosisTests
     [InlineData("error LNK2019: unresolved external symbol _SL3Lib5TotalS15Standard_int___Ei referenced in function main")]
     public void EveryLinkerSpellingIsRead(string output) =>
         Assert.DoesNotContain("extern \"C\"", LinkDiagnosis.Explain(output, "app.ll"));
+
+    /// <summary>
+    /// ld64 quotes the Mach-O symbol, which carries an underscore the source
+    /// never wrote. Taken off, a Stainless name is still one and a C name is
+    /// the one declared.
+    /// </summary>
+    [Fact]
+    public void Ld64IsReadWithoutTheMachOUnderscore()
+    {
+        const string output =
+            "Undefined symbols for architecture arm64:\n" +
+            "  \"__SL3Lib5TotalS15Standard_int___Ei\", referenced from:\n" +
+            "      _main in app-5c1a2e.o\n" +
+            "ld: symbol(s) not found for architecture arm64\n" +
+            "clang: error: linker command failed with exit code 1 (use -v to see invocation)";
+
+        string text = LinkDiagnosis.Explain(output, "app.ll");
+
+        Assert.Contains("'_SL'", text);
+        Assert.DoesNotContain("extern \"C\"", text);
+        Assert.DoesNotContain("compiler bug", text);
+
+        string c = LinkDiagnosis.Explain(
+            "Undefined symbols for architecture arm64:\n" +
+            "  \"_sqlite3_open\", referenced from:\n" +
+            "      _main in app-5c1a2e.o\n", "app.ll");
+
+        Assert.Contains("extern \"C\"", c);
+        Assert.DoesNotContain("'_SL'", c);
+    }
 
     [Fact]
     public void BothAreExplainedWhenBothAreMissing()

@@ -20,7 +20,8 @@
 #
 #   tools/publish.sh [rid] [--no-archive]
 #
-# The rid defaults to this machine's. tools/publish.ps1 is the same on Windows,
+# The rid defaults to this machine's: linux-x64, linux-arm64, osx-arm64 or
+# osx-x64. tools/publish.ps1 is the same on Windows,
 # and says what the binary and the archive are; docs/releasing.md is the whole
 # process.
 
@@ -38,16 +39,20 @@ for argument in "$@"; do
     esac
 done
 
+case "$(uname -s)" in
+    Darwin) system="osx" ;;
+    *) system="linux" ;;
+esac
 case "$(uname -m)" in
-    x86_64) native="linux-x64" ;;
-    aarch64 | arm64) native="linux-arm64" ;;
-    *) native="linux-$(uname -m)" ;;
+    x86_64) native="$system-x64" ;;
+    aarch64 | arm64) native="$system-arm64" ;;
+    *) native="$system-$(uname -m)" ;;
 esac
 runtime="${runtime:-$native}"
 
 case "$runtime" in
-    linux-*) ;;
-    *) echo "error: this publishes for Linux; tools/publish.ps1 is the one for Windows" >&2; exit 2 ;;
+    linux-* | osx-*) ;;
+    *) echo "error: this publishes for Linux and macOS; tools/publish.ps1 is the one for Windows" >&2; exit 2 ;;
 esac
 
 artifacts="$repository/artifacts"
@@ -108,8 +113,10 @@ mkdir -p "$stage"
 cp "$compiler" "$stage/"
 cp "$repository/tools/release-install.txt" "$stage/INSTALL.txt"
 
-(cd "$repository" && git ls-files -z -- README.md LICENSE LICENSE.RUNTIME docs samples bindings forms) |
-    (cd "$repository" && xargs -0 cp --parents -t "$stage")
+# A tar pipe keeps each file's directory, which BSD cp has no flag for.
+(cd "$repository" && git ls-files -z -- README.md LICENSE LICENSE.RUNTIME docs samples bindings forms |
+    tar -cf - --null -T -) |
+    tar -xf - -C "$stage"
 
 tarball="$artifacts/$name.tar.gz"
 tar -czf "$tarball" -C "$artifacts/$runtime" "$name"

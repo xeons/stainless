@@ -200,9 +200,10 @@ answer: an ELF object has no `_add_stdcall@8` to find. The same applies to
 
 ### 1.7 ARM64
 
-`--target arm64` builds for 64-bit ARM, on Windows or Linux. A pointer is eight
-bytes, so nothing about the layout differs from x86-64 — what differs is how a
-struct crosses a call, which is §3.4's AAPCS64 rules.
+`--target arm64` builds for 64-bit ARM, on Windows or Linux, and
+`--target arm64-macos` for Apple's. A pointer is eight bytes, so nothing about
+the layout differs from x86-64 -- what differs is how a struct crosses a call,
+which is section 3.4's AAPCS64 rules.
 
 `--abi` still chooses the C++ name mangling and the bit-field packing here, as
 it does everywhere, but not the struct convention: there is
@@ -215,11 +216,16 @@ same C for `aarch64-pc-windows-msvc` and `aarch64-unknown-linux-gnu` and
 diffing the declarations. What differs between those two is how wide a C
 `long` is, and Stainless has no type whose width depends on the system.
 
+Apple's DarwinPCS agrees about every struct too, and differs in three smaller
+things: it widens a narrow integer, it leaves an empty struct out, and it puts
+every variadic argument on the stack. Section 3.4 has all three, and
+[tests/cases/arm64-abi-macos](../tests/cases/arm64-abi-macos) pins them.
+
 There is also one *calling* convention, so `__stdcall` and its relatives are
 accepted and mean nothing, and nothing is decorated.
 
 **Nothing here has executed an ARM64 binary.** There is no ARM64 machine in
-this project and no ARM64 C library to link against, so the two cases stop at
+this project and no ARM64 C library to link against, so the cases stop at
 an object file: clang reads the module, LLVM's verifier goes over it, and the
 back end lowers every instruction in it for aarch64. `ir.txt` then pins each
 signature against the one clang writes for the same C. That is weaker than
@@ -1134,6 +1140,51 @@ guess is wrong:
   and nothing diagnoses the difference. So the pointer is spelled out and the
   copy is made by the emitter.
 
+**Windows does not expand a homogeneous aggregate for a variadic function.**
+Every argument of one, named or not, travels as a struct of its size would:
+`{ float x3 }` as `[2 x i64]`, four doubles behind a pointer. Linux and Darwin
+keep the SIMD registers. Darwin puts every variadic argument on the stack, but
+that is the back end's work, keyed on the triple; the IR is the same as for a
+named argument.
+
+**A narrow integer is widened where clang widens it.** On some targets the
+caller widens an argument to 32 bits, and the callee a result, and the other
+side reads the whole register without looking. Every declaration, definition
+and call then carries `signext` or `zeroext`: a call through a delegate or a
+closure, an `export "C"` function and the thunk that makes a closure C-callable
+included. One site that forgot hands over garbage in the upper bits, and it
+works until the register happens to hold some.
+
+| Target | widened |
+|---|---|
+| ARM64 macOS | every narrow type |
+| x64 System V | every narrow type |
+| x86, both systems | every narrow type |
+| x64 Windows | `bool` only |
+| ARM64 Linux, ARM64 Windows | nothing |
+
+The widening is C's for the type: `sbyte`, `short` and `char` are `signext`;
+`byte`, `ushort`, `char16` and `bool` are `zeroext`; an enum takes its
+underlying type's. `char` is signed here because it is C's `char`, which is
+signed on every target that widens, although Stainless reads it as unsigned.
+The attribute decides only the register's upper bits, so the two readings never
+meet. A narrow field inside a coerced struct is not widened: the struct is the
+value, and clang leaves it alone too.
+
+**An empty struct is one byte**, as in C++, and is passed as clang++ passes one:
+
+| Target | argument | result |
+|---|---|---|
+| x64 Windows | `i8` | `i8` |
+| x64 System V | left out | `void` |
+| x86 Windows | `byval` | `void` |
+| x86 Linux | left out | `sret` |
+| ARM64 Linux, ARM64 Windows | `i64` | `void` |
+| ARM64 macOS | left out | `void` |
+
+Left out means no register and no stack: `f(int a, Empty e, int b)` takes `b`
+in the second register.
+
 ### 3.5 What a call may change
 
 Which registers a C call leaves the caller to preserve, by target. It matters
@@ -1147,7 +1198,7 @@ call, and it is exactly what an `asm` block is declared to clobber
 | x64 System V | `rax` `rcx` `rdx` `rsi` `rdi` `r8`–`r11` | `xmm0`–`xmm15` |
 | x86, both systems | `eax` `ecx` `edx` | `xmm0`–`xmm7` |
 | ARM64 Linux | `x0`–`x18`, `x30` | `v0`–`v7`, `v16`–`v31` |
-| ARM64 Windows | `x0`–`x17`, `x30` | `v0`–`v7`, `v16`–`v31` |
+| ARM64 Windows, ARM64 macOS | `x0`-`x17`, `x30` | `v0`-`v7`, `v16`-`v31` |
 
 Everything else is the callee's to restore: `rbx`, `rbp` and `r12`–`r15`
 everywhere on x64, and on Windows `rsi`, `rdi` and `xmm6`–`xmm15` too; `ebx`,
@@ -1157,10 +1208,10 @@ again when control comes back.
 
 **`x18` is the one register whose answer is the system's rather than the
 architecture's.** AAPCS64 calls it the platform register and leaves it to the
-platform: Windows keeps the current thread's environment block in it, so
-nothing else may change it, and Linux leaves it free as a temporary. So a block
-may name it and is declared to clobber it on Linux, and may do neither on
-Windows.
+platform: Windows keeps the current thread's environment block in it, macOS
+reserves it outright, and Linux leaves it free as a temporary. So a block may
+name it and is declared to clobber it on Linux, and may do neither on Windows
+or macOS.
 
 How LLVM is told is not always the spelling above. A clobber of the link
 register has to be written `~{lr}`: `~{x30}` parses and is silently ignored, and
@@ -1192,8 +1243,13 @@ destroyed. A mutable one is counted like any other slot, since replacing what it
 holds has to release the old value.
 
 A `--shared` library has no entry point, so `_SLstatics` is the last entry in
-its `llvm.global_ctors` and runs as the library is loaded, after the runtime's
-own constructors. It registers `_SLstaticsdown` with the C library's `atexit`
+its `llvm.global_ctors` and runs as the library is loaded. Its first act is to
+call `sl_runtime_init`, which is idempotent: PE and ELF already run it after the
+runtime's own constructor, by priority, but Mach-O ignores priorities across
+objects and runs each object's initializers in link order. Without the call a
+leak-checking library could allocate before the tracker started, and register
+its teardown before the report, which would then run first and count every
+static as a leak. It registers `_SLstaticsdown` with the C library's `atexit`
 directly rather than through `sl_run_at_exit`, so that the hook belongs to the
 library's module and runs when that is unloaded. A `const`, in a module or in
 a type, has no storage and is inlined wherever it is used, so it is not a
@@ -1434,7 +1490,9 @@ group on every definition. LLVM omits the frame pointer at every optimisation
 level unless asked, `-O0` included, and a frame with none describes itself
 against the stack pointer, which is correct and cannot be unwound by the
 two-load walk a debugger falls back on. A build without `-g` puts no
-attributes on its definitions at all.
+attributes on its definitions, except on arm64 macOS: Apple's ABI requires x29
+to address a valid frame record, so there every definition carries
+`"frame-pointer"="non-leaf"` at every level, as clang's do.
 
 **The standard library is written out to be stepped into.** It is compiled from
 inside the compiler's own assembly, so with `-g` the driver writes its sources to

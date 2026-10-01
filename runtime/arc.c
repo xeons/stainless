@@ -329,7 +329,7 @@ static void sl_weak_cell_destroy(void *pointer)
 }
 
 static const SlTypeInfo sl_weak_cell_type = {
-    sizeof(SlWeakCell), sl_weak_cell_destroy, "WeakSubscription",
+    .size = sizeof(SlWeakCell), .destroy = sl_weak_cell_destroy, .name = "WeakSubscription",
 };
 
 void *sl_weak_cell_new(void *function, void *target)

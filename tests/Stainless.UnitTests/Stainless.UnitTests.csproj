@@ -16,6 +16,11 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
   </ItemGroup>
 
+  <!-- The end-to-end harness's case selection, so it can be asked as another host. -->
+  <ItemGroup>
+    <Compile Include="../Stainless.Tests/CaseSelection.cs" Link="Harness/CaseSelection.cs" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="../../src/Stainless.Compiler/Stainless.Compiler.csproj" />
   </ItemGroup>

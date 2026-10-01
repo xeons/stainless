@@ -44,6 +44,9 @@
 /// value to print, rather than a link error. `Audio.IsAvailable` asks before
 /// anything is tried.
 ///
+/// **macOS has no backend yet.** Every call there answers
+/// `AudioError.NoBackend` and `Audio.IsAvailable` is false.
+///
 /// **WASAPI rather than waveOut.** `winmm`'s `waveOut` is four calls and is
 /// still present on Windows 11, which makes it tempting and makes it the wrong
 /// answer: since Vista it has been an emulation on top of WASAPI, so it adds a
@@ -452,8 +455,12 @@ const int FormatSigned16 = 2;
 /// by side, which is the layout `AudioClip` already holds.
 const int AccessInterleaved = 3;
 
-/// `RTLD_LAZY | RTLD_LOCAL`.
+/// `RTLD_LAZY | RTLD_LOCAL`. Darwin spells `RTLD_LOCAL` as 4; glibc's is 0.
+#if MACOS
+const int RtldLazyLocal = 0x00005;
+#else
 const int RtldLazyLocal = 0x00001;
+#endif
 
 /// `-EBUSY`: something else has the device.
 const int Busy = -16;
@@ -492,6 +499,9 @@ threadsafe sealed class Backend
     {
         Ready = false;
 
+#if MACOS
+        // macOS has no ALSA, and its own audio is not bound yet.
+#else
         // The versioned name first: a machine with the runtime package has
         // `libasound.so.2`, and only one with the development package has the
         // unversioned link -- and it is the runtime a program needs.
@@ -515,6 +525,7 @@ threadsafe sealed class Backend
         _recover = (PcmRecoverFn)FindSymbol(alsa, "snd_pcm_recover", &complete);
 
         Ready = complete;
+#endif
     }
 
     void* FindSymbol(void* library, String name, bool* complete)

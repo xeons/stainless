@@ -164,14 +164,13 @@ void sl_mutex_unlock(SlMutex *mutex)
 }
 
 /*
- * A timed wait measures its deadline on the monotonic clock where the platform
- * lets a condition say so, so setting the wall clock neither cuts a wait short
- * nor stretches it. macOS has no pthread_condattr_setclock.
+ * A timed wait measures its deadline on the monotonic clock, so setting the
+ * wall clock neither cuts a wait short nor stretches it. macOS has no
+ * pthread_condattr_setclock; it waits for a relative span instead, which its
+ * kernel measures on a clock the wall time does not move.
  */
 #if !defined(_WIN32) && !defined(__APPLE__)
 #  define SL_CONDITION_CLOCK CLOCK_MONOTONIC
-#elif !defined(_WIN32)
-#  define SL_CONDITION_CLOCK CLOCK_REALTIME
 #endif
 
 void sl_condition_init(SlCondition *condition)
@@ -242,6 +241,17 @@ _Bool sl_condition_wait_for(SlCondition *condition, SlMutex *mutex,
      * saying "signalled" for it keeps the caller in its re-check loop.
      */
     return GetLastError() != ERROR_TIMEOUT;
+#elif defined(__APPLE__)
+    /* The kernel takes the seconds as 32 bits, so a longer span is clamped. */
+    const unsigned long long longest = 0x7FFFFFFFULL;
+    unsigned long long seconds = milliseconds / 1000ULL;
+
+    struct timespec span;
+    span.tv_sec  = (time_t)(seconds > longest ? longest : seconds);
+    span.tv_nsec = (long)((milliseconds % 1000ULL) * 1000000ULL);
+
+    return pthread_cond_timedwait_relative_np(AS_CONDITION(condition), AS_MUTEX(mutex),
+                                              &span) != ETIMEDOUT;
 #else
     /*
      * An absolute deadline on the clock sl_condition_init chose. A deadline past
@@ -543,6 +553,10 @@ _Bool sl_atomic_compare_exchange_pointer(void **cell, void **expected, void *des
 
 /* --------------------------------------------------------------- threads */
 
+#ifndef _WIN32
+#  define SL_THREAD_STACK_SIZE ((size_t)8 * 1024 * 1024)
+#endif
+
 struct SlThread {
     void (*entry)(void *);
     void  *argument;
@@ -581,7 +595,20 @@ SlThread *sl_thread_start(void (*entry)(void *), void *argument)
     thread->handle = CreateThread(NULL, 0, thread_trampoline, thread, 0, NULL);
     if (thread->handle == NULL) sl_fail("could not start a thread");
 #else
-    if (pthread_create(&thread->handle, NULL, thread_trampoline, thread) != 0)
+    /*
+     * The stack is set rather than inherited: glibc takes the default from
+     * RLIMIT_STACK, usually 8 MB, and macOS gives a secondary thread 512 KB.
+     * One size on every POSIX target means recursion depth does not change
+     * with the platform or the shell's ulimit.
+     */
+    pthread_attr_t attributes;
+    if (pthread_attr_init(&attributes) != 0)
+        sl_fail("could not start a thread");
+    pthread_attr_setstacksize(&attributes, SL_THREAD_STACK_SIZE);
+
+    int failed = pthread_create(&thread->handle, &attributes, thread_trampoline, thread);
+    pthread_attr_destroy(&attributes);
+    if (failed != 0)
         sl_fail("could not start a thread");
 #endif
 

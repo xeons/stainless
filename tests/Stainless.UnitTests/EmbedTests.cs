@@ -83,6 +83,13 @@ public class EmbedTests
         }
     }
 
+    /// <summary>
+    /// Under this machine's target, or Linux's on a Mac: section names like
+    /// `.text` are ELF's and COFF's, and Mach-O spells every name otherwise.
+    /// </summary>
+    private static void UnderElfOrCoff(Action body) =>
+        Under(TargetPlatform.Current.IsMachO ? TargetPlatform.X64Linux : TargetPlatform.Current, body);
+
     // ------------------------------------------------------------- syntax
 
     /// <summary>
@@ -159,11 +166,14 @@ public class EmbedTests
     public void ThePathSectionAndAccessMayBePositional()
     {
         var scratch = new Scratch();
-        scratch.Bind(
-            """[Embed("stub.bin", ".stub", "rx")] public static readonly byte[] Stub;""",
-            out var diagnostics);
+        UnderElfOrCoff(() =>
+        {
+            scratch.Bind(
+                """[Embed("stub.bin", ".stub", "rx")] public static readonly byte[] Stub;""",
+                out var diagnostics);
 
-        Assert.False(diagnostics.HasErrors);
+            Assert.False(diagnostics.HasErrors);
+        });
     }
 
     /// <summary>
@@ -173,7 +183,7 @@ public class EmbedTests
     /// they go rather than what names them.
     /// </summary>
     [Fact]
-    public void IdenticalEmbedsAreOneObject()
+    public void IdenticalEmbedsAreOneObject() => UnderElfOrCoff(() =>
     {
         var scratch = new Scratch();
         var program = scratch.Bind("""
@@ -195,7 +205,7 @@ public class EmbedTests
             program.Statics.Single(s => s.ModuleName == "Test" && s.Name == name).Initializer);
 
         Assert.Same(Held("A").File, Held("D").File);
-    }
+    });
 
     /// <summary>
     /// What makes a static legal in a <c>--shared</c> library, and what lets the
@@ -265,9 +275,9 @@ public class EmbedTests
     {
         var scratch = new Scratch();
 
-        Assert.Equal([code], scratch.Codes(
+        UnderElfOrCoff(() => Assert.Equal([code], scratch.Codes(
             $"static readonly String Path = \"stub.bin\";\n" +
-            $"[{attribute}] static readonly byte[] Blob;"));
+            $"[{attribute}] static readonly byte[] Blob;")));
     }
 
     /// <summary>
@@ -313,8 +323,8 @@ public class EmbedTests
     {
         var scratch = new Scratch();
 
-        Assert.Empty(scratch.Codes(
-            """[Embed("stub.bin", Section = ".jit", Access = "rwx")] static byte[] S;"""));
+        UnderElfOrCoff(() => Assert.Empty(scratch.Codes(
+            """[Embed("stub.bin", Section = ".jit", Access = "rwx")] static byte[] S;""")));
     }
 
     [Fact]
@@ -322,12 +332,12 @@ public class EmbedTests
     {
         var scratch = new Scratch();
 
-        Assert.Empty(scratch.Codes(
-            """[Embed("stub.bin", Section = ".text", Access = "rx")] static readonly byte[] S;"""));
+        UnderElfOrCoff(() => Assert.Empty(scratch.Codes(
+            """[Embed("stub.bin", Section = ".text", Access = "rx")] static readonly byte[] S;""")));
     }
 
     [Fact]
-    public void TwoEmbedsCannotGiveOneSectionTwoAccesses()
+    public void TwoEmbedsCannotGiveOneSectionTwoAccesses() => UnderElfOrCoff(() =>
     {
         var scratch = new Scratch();
         var codes = scratch.Codes("""
@@ -337,7 +347,7 @@ public class EmbedTests
             """);
 
         Assert.Equal(["SL0711"], codes);
-    }
+    });
 
     /// <summary>
     /// The names each format already owns are its own: `.rdata` is a section
@@ -393,6 +403,110 @@ public class EmbedTests
             EmbedAccess.Read | EmbedAccess.Execute, TargetPlatform.Arm64Linux));
         Assert.Null(EmbeddedFile.DefaultSection(
             EmbedAccess.Read | EmbedAccess.Write | EmbedAccess.Execute, TargetPlatform.X64Linux));
+    }
+
+    // ------------------------------------------------------------- Mach-O
+
+    /// <summary>
+    /// Mach-O's permissions are the segment's, so each default is a section of
+    /// the segment with that access. Read-only data is not clang's
+    /// <c>__TEXT,__const</c>, because <c>__TEXT</c> is executable.
+    /// </summary>
+    [Theory]
+    [InlineData(EmbedAccess.Read, "__DATA_CONST,__const")]
+    [InlineData(EmbedAccess.Read | EmbedAccess.Write, "__DATA,__data")]
+    [InlineData(EmbedAccess.Read | EmbedAccess.Execute, "__TEXT,__text")]
+    [InlineData(EmbedAccess.Read | EmbedAccess.Write | EmbedAccess.Execute, null)]
+    public void TheMachODefaultIsASegmentWithTheAccess(EmbedAccess access, string? section) =>
+        Assert.Equal(section, EmbeddedFile.DefaultSection(access, TargetPlatform.Arm64MacOS));
+
+    [Theory]
+    [InlineData("__DATA,__blob")]
+    [InlineData("__TEXT,__stub.arm64")]
+    [InlineData("__DATA_CONST,__sixteen_bytes_")]
+    public void AMachONameIsASegmentAndASection(string name) =>
+        Assert.Null(EmbeddedFile.MachOSectionProblem(name));
+
+    [Theory]
+    [InlineData(".rodata", "exactly one comma")]
+    [InlineData("__DATA,__blob,regular", "exactly one comma")]
+    [InlineData(",__blob", "can be empty")]
+    [InlineData("__DATA,", "can be empty")]
+    [InlineData("__DATA,__seventeen_bytes", "16 bytes")]
+    [InlineData("__DATA,__a-b", "'-'")]
+    [InlineData("__DATA,__a;b", "';'")]
+    [InlineData("__BLOBS,__blob", "not a segment an embed can use")]
+    public void AnythingElseIsNotAMachOName(string name, string because) =>
+        Assert.Contains(because, EmbeddedFile.MachOSectionProblem(name));
+
+    [Fact]
+    public void AMachOSectionHasItsSegmentsAccess()
+    {
+        var mac = TargetPlatform.Arm64MacOS;
+
+        Assert.Equal(EmbedAccess.Read | EmbedAccess.Execute,
+            EmbeddedFile.KnownSectionAccess("__TEXT,__const", mac));
+        Assert.Equal(EmbedAccess.Read | EmbedAccess.Write,
+            EmbeddedFile.KnownSectionAccess("__DATA,__mine", mac));
+        Assert.Equal(EmbedAccess.Read, EmbeddedFile.KnownSectionAccess("__DATA_CONST,__x", mac));
+        Assert.Equal((EmbedAccess)0, EmbeddedFile.KnownSectionAccess("__DATA,__bss", mac));
+        Assert.Equal((EmbedAccess)0, EmbeddedFile.KnownSectionAccess("__DATA,__thread_bss", mac));
+    }
+
+    /// <summary>
+    /// No flags and no quotes: Darwin's assembler reads the whole specifier as
+    /// one string. Code is marked as clang marks <c>__TEXT,__text</c>.
+    /// </summary>
+    [Theory]
+    [InlineData(EmbedAccess.Read, "__DATA_CONST,__blob", ".section __DATA_CONST,__blob")]
+    [InlineData(EmbedAccess.Read | EmbedAccess.Write, "__DATA,__blob", ".section __DATA,__blob")]
+    [InlineData(EmbedAccess.Read | EmbedAccess.Execute, "__TEXT,__stub",
+        ".section __TEXT,__stub,regular,pure_instructions")]
+    public void TheMachODirectiveNamesTheSegment(EmbedAccess access, string section, string directive) =>
+        Assert.Equal(directive, File_(section, access).SectionDirective(TargetPlatform.Arm64MacOS));
+
+    [Fact]
+    public void TheBinderHoldsAMachONameToMachOsRules()
+    {
+        var scratch = new Scratch();
+
+        Under(TargetPlatform.Arm64MacOS, () =>
+        {
+            Assert.Empty(scratch.Codes(
+                """[Embed("stub.bin", Section = "__DATA,__blob", Access = "rw")] static byte[] S;"""));
+            Assert.Empty(scratch.Codes(
+                """[Embed("stub.bin", Section = "__DATA_CONST,__a_sixteen_byte")] static readonly byte[] S;"""));
+
+            Assert.Equal(["SL0830"], scratch.Codes(
+                """[Embed("stub.bin", Section = ".stub", Access = "rx")] static readonly byte[] S;"""));
+            Assert.Equal(["SL0830"], scratch.Codes(
+                """[Embed("stub.bin", Section = "__DATA,__seventeen_bytes")] static readonly byte[] S;"""));
+
+            // A known segment with the wrong access, a zero-fill section, and
+            // memory no segment allows.
+            Assert.Equal(["SL0711"], scratch.Codes(
+                """[Embed("stub.bin", Section = "__TEXT,__const")] static readonly byte[] S;"""));
+            Assert.Equal(["SL0711"], scratch.Codes(
+                """[Embed("stub.bin", Section = "__DATA,__bss", Access = "rw")] static byte[] S;"""));
+            Assert.Equal(["SL0708"], scratch.Codes(
+                """[Embed("stub.bin", Access = "rwx")] static byte[] S;"""));
+        });
+    }
+
+    /// <summary>A comma is Mach-O's and nobody else's.</summary>
+    [Fact]
+    public void ASegmentAndSectionIsRefusedOffMachO()
+    {
+        var scratch = new Scratch();
+        const string body =
+            """[Embed("stub.bin", Section = "__DATA,__blob", Access = "rw")] static byte[] S;""";
+
+        Under(TargetPlatform.X64Linux, () =>
+        {
+            scratch.Bind(body, out var diagnostics);
+            var error = Assert.Single(diagnostics.Items, d => d.Code == "SL0709");
+            Assert.Contains("Mach-O", error.Message);
+        });
     }
 
     // ------------------------------------------------------------ emitting
@@ -505,6 +619,26 @@ public class EmbedTests
             Assert.Contains(
                 "@_SLstatic_Test_Held_Stub = internal global ptr @\"\\01_SLembed0\", align 8", ir);
             Assert.DoesNotContain("store ptr @\"\\01_SLembed0\", ptr @_SLstatic_Test_Held_Stub", ir);
+        });
+    }
+
+    [Fact]
+    public void AMachOModuleCarriesTheObjectInItsSegment()
+    {
+        var scratch = new Scratch();
+
+        Under(TargetPlatform.Arm64MacOS, () =>
+        {
+            var program = scratch.Bind(
+                """public static class Held { [Embed("stub.bin")] public static readonly byte[] Stub; }""",
+                out var diagnostics);
+            Assert.False(diagnostics.HasErrors);
+
+            string ir = Front.Verified(
+                new LlvmEmitter(forSharedLibrary: true).Emit(Lowerer.Lower(program)).ReplaceLineEndings("\n"));
+
+            Assert.Contains("module asm \".section __DATA_CONST,__const\"\n", ir);
+            Assert.Contains("module asm \"_SLembed0:\"\n", ir);
         });
     }
 }

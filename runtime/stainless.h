@@ -328,6 +328,13 @@ SL_API int32_t sl_weak_cell_is_dead(void *cell);
 /* Runs `hook` when the program ends, however it ends. */
 SL_API void sl_run_at_exit(void (*hook)(void));
 
+/*
+ * The runtime's own startup. Idempotent: a constructor calls it, and so does
+ * a library's static initializer, which Mach-O does not order after that
+ * constructor.
+ */
+SL_API void sl_runtime_init(void);
+
 /* Initialises a header the runtime allocated itself, outside sl_alloc. */
 SL_API void  sl_object_init(void *pointer, const SlTypeInfo *type);
 
@@ -1043,13 +1050,15 @@ SL_API void  *sl_args_at(size_t index);
 SL_API void  *sl_args_array(const SlTypeInfo *arrayType);
 SL_API void  *sl_args_program(void);
 
-/* NULL for a variable that is not set, which is not the same as one set to
- * nothing. Windows goes through the wide API, so a value outside the active
- * code page survives. */
-
-/* Every name, newline-separated, as one String -- the runtime has no tidy way
- * to build an array of references, and splitting is one line of Stainless. */
-
+#ifndef _WIN32
+/*
+ * The process's `name=value` strings, ending in a null pointer. A function
+ * rather than `environ` itself, because a macOS dylib cannot link that symbol.
+ * The block is the C library's: setenv may move it, so it MUST be read afresh
+ * rather than kept.
+ */
+SL_API char **sl_environ(void);
+#endif
 
 /* --------------------------------------------------------- other programs */
 
@@ -1153,8 +1162,8 @@ SL_API long long sl_tz_map_id(const char *id, _Bool toWindows, char *buffer, siz
 /* ------------------------------------------------------------- entropy */
 
 /*
- * The platform's cryptographic source: BCryptGenRandom, or getrandom with
- * /dev/urandom behind it. Reports failure rather than falling back to a clock,
+ * The platform's cryptographic source: BCryptGenRandom, getrandom with
+ * /dev/urandom behind it, or arc4random_buf on macOS. Reports failure rather than falling back to a clock,
  * because a caller that wanted unpredictability and silently got the time is
  * worse off than one told it cannot have any.
  *
@@ -1181,9 +1190,10 @@ SL_API void      sl_zero_memory(void *buffer, size_t length);
  * is whether an object may be reached by two threads at all, which is a
  * question about races on its contents.
  *
- * The lock and condition types are opaque storage sized for the largest
- * platform primitive (glibc's pthread_mutex_t at 40 bytes, pthread_cond_t at
- * 48); Windows uses 8 bytes for each. thread.c asserts the sizes fit.
+ * The lock and condition types are opaque storage sized for the platform
+ * primitive: glibc's pthread_mutex_t is 40 bytes and pthread_cond_t 48,
+ * Darwin's are 64 and 48, and Windows uses 8 for each. thread.c asserts the
+ * sizes fit.
  *
  * Counted in `long long` rather than in pointers, because a pthread primitive
  * is not a row of pointers and does not shrink with one. glibc's i386
@@ -1192,7 +1202,11 @@ SL_API void      sl_zero_memory(void *buffer, size_t length);
  * thread.c's assertions caught the first time a 32-bit Linux build ran.
  */
 
+#ifdef __APPLE__
+typedef struct SlMutex     { long long opaque[8]; } SlMutex;     /* 64 bytes */
+#else
 typedef struct SlMutex     { long long opaque[5]; } SlMutex;     /* 40 bytes */
+#endif
 typedef struct SlCondition { long long opaque[6]; } SlCondition; /* 48 bytes */
 
 SL_API void  sl_mutex_init(SlMutex *mutex);
@@ -1233,8 +1247,14 @@ SL_API _Bool sl_condition_wait_for(SlCondition *condition, SlMutex *mutex,
  * Neither platform's primitive is upgradeable and neither is recursive, so a
  * reader that wants to write must let go first. That is the behaviour to want;
  * an upgrade path is a deadlock waiting for two threads to take it at once.
+ *
+ * Darwin's pthread_rwlock_t is 200 bytes; glibc's is 56, or 32 on i386.
  */
+#ifdef __APPLE__
+typedef struct SlRwLock { long long opaque[25]; } SlRwLock;
+#else
 typedef struct SlRwLock { void *opaque[8]; } SlRwLock;
+#endif
 
 SL_API void *sl_rwlock_new(void);
 SL_API void  sl_rwlock_free(void *lock);

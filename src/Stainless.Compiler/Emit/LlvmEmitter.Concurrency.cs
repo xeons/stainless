@@ -531,27 +531,34 @@ public sealed partial class LlvmEmitter
     /// Puts <c>inreg</c> on the arguments a register convention places in
     /// registers. <paramref name="first"/> is where the declared parameters
     /// begin, past any hidden result pointer and receiver.
+    ///
+    /// A parameter is not always one entry: an empty struct may be none. Each
+    /// is stepped over by as many as it was declared as.
     /// </summary>
-    private static void MarkRegisters(
-        FunctionSymbol function, List<string> arguments, int first)
+    private void MarkRegisters(FunctionSymbol function, List<string> arguments, int first)
     {
         var marks = RegisterParameters(function);
+        var parameters = function.Parameters.Where(p => !p.IsThis).ToList();
 
+        int at = first;
         for (int i = 0; i < marks.Length; i++)
         {
-            int at = first + i;
-            if (!marks[i] || at >= arguments.Count) continue;
+            int entries = Declared(ClassifyParameter(parameters[i], function.IsVariadic)).Count();
+            if (marks[i] && entries == 1 && at < arguments.Count)
+            {
+                // The attribute follows the type rather than preceding it: LLVM
+                // reads `i32 inreg %a`, and a declaration with no name is `i32
+                // inreg`. Only a simple type is ever marked -- a struct is
+                // never in a register -- so the type is the first word.
+                string argument = arguments[at];
+                int space = argument.IndexOf(' ');
 
-            // The attribute follows the type rather than preceding it: LLVM
-            // reads `i32 inreg %a`, and a declaration with no name is `i32
-            // inreg`. Only a simple type is ever marked -- a struct is never in
-            // a register -- so the type is the first word and nothing else.
-            string argument = arguments[at];
-            int space = argument.IndexOf(' ');
+                arguments[at] = space < 0
+                    ? argument + " inreg"
+                    : argument[..space] + " inreg" + argument[space..];
+            }
 
-            arguments[at] = space < 0
-                ? argument + " inreg"
-                : argument[..space] + " inreg" + argument[space..];
+            at += entries;
         }
     }
 

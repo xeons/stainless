@@ -281,6 +281,11 @@ public static class LinkDiagnosis
     public static string Explain(
         string linkerOutput, string irPath, IReadOnlyList<string>? unlinkedReferences = null)
     {
+        // A C or C++ input is compiled in the same clang run as the IR, and
+        // its errors are its author's, not the compiler's.
+        if (FindNativeSourceError(linkerOutput) is string source)
+            return $"'{source}' did not compile:\n" + linkerOutput;
+
         if (!Undefined(linkerOutput))
             return "the native toolchain rejected the generated IR:\n" + linkerOutput +
                    $"\nThe IR is at {irPath}; this is a compiler bug, not a bug in your program.";
@@ -319,10 +324,26 @@ public static class LinkDiagnosis
         return text.ToString();
     }
 
+    /// <summary>
+    /// The first C or C++ file clang reports an error in, as clang names it,
+    /// or null. A header counts: an error there is the including file's.
+    /// </summary>
+    private static string? FindNativeSourceError(string output)
+    {
+        var match = Regex.Match(
+            output,
+            @"^(.+?\.(?:c|cc|cpp|cxx|h|hh|hpp|hxx)):\d+:\d+: (?:fatal )?error:",
+            RegexOptions.Multiline | RegexOptions.IgnoreCase);
+        return match.Success ? match.Groups[1].Value : null;
+    }
+
     private static string Listed(IReadOnlyList<string> libraries) =>
         string.Join(", ", libraries.Select(l => $"'{l}'"));
 
-    /// <summary>How the three linkers Stainless drives each spell it.</summary>
+    /// <summary>
+    /// How the linkers Stainless drives each spell it. ld64's
+    /// <c>Undefined symbols for architecture arm64:</c> is the first of these.
+    /// </summary>
     private static bool Undefined(string output) =>
         output.Contains("undefined symbol", StringComparison.OrdinalIgnoreCase) ||
         output.Contains("undefined reference", StringComparison.OrdinalIgnoreCase) ||
@@ -330,8 +351,12 @@ public static class LinkDiagnosis
 
     /// <summary>
     /// The missing names, as lld-link (<c>undefined symbol: name</c>), GNU ld and
-    /// lld (<c>undefined reference to `name'</c> and <c>undefined symbol: name</c>)
-    /// and link.exe (<c>unresolved external symbol name</c>) write them.
+    /// lld (<c>undefined reference to `name'</c> and <c>undefined symbol: name</c>),
+    /// link.exe (<c>unresolved external symbol name</c>) and ld64
+    /// (<c>"_name", referenced from:</c>) write them.
+    ///
+    /// ld64 writes the symbol, and Mach-O puts an underscore in front of every
+    /// C name, so one is taken off to give the name the source wrote.
     /// </summary>
     private static IEnumerable<string> UndefinedNames(string output) =>
         Regex.Matches(
@@ -339,7 +364,9 @@ public static class LinkDiagnosis
                 @"(?:undefined symbol:\s*|undefined reference to [`']|unresolved external symbol\s+)" +
                 @"([^\s`'""()]+)",
                 RegexOptions.IgnoreCase)
-            .Select(m => m.Groups[1].Value);
+            .Select(m => m.Groups[1].Value)
+            .Concat(Regex.Matches(output, @"^\s*""_([^""]+)"", referenced from:", RegexOptions.Multiline)
+                .Select(m => m.Groups[1].Value));
 
     /// <summary>
     /// A mangled Stainless name. On 32-bit Windows the target's own underscore
@@ -845,10 +872,10 @@ public sealed class Compilation
         }
 
         // A PE has somewhere to put these and the linker fills it from the same
-        // .res, so a Windows build carries them once, in the resource
-        // directory. Everything else carries them as data. The empty blob is
-        // deliberate: the symbol resolves whether or not a program has any.
-        if (!target.IsWindows)
+        // .res, so a COFF build carries them once, in the resource directory.
+        // ELF and Mach-O carry them as data. The empty blob is deliberate: the
+        // symbol resolves whether or not a program has any.
+        if (target.Format != Binding.ObjectFormat.Coff)
         {
             resourceBlob = ReadResourceBlob(compiledResources);
             WarnAboutUnreadTypes(resourceBlob, target, diagnostics);
@@ -1269,11 +1296,10 @@ public sealed class Compilation
     /// </para>
     ///
     /// <para>
-    /// **A build with no <c>--target</c> answers exactly as it did**, from the
-    /// host. That is not only for compatibility: <see
-    /// cref="Binding.TargetPlatform"/> has no macOS or FreeBSD triple, so
-    /// <see cref="Binding.TargetPlatform.Host"/> on either answers with a Linux
-    /// one -- and deriving the symbols from that would take <c>MACOS</c> away
+    /// **A build with no <c>--target</c> answers from the host.** <see
+    /// cref="Binding.TargetPlatform"/> has no FreeBSD triple, so
+    /// <see cref="Binding.TargetPlatform.Host"/> there answers with a Linux
+    /// one, and deriving the symbols from that would take <c>FREEBSD</c> away
     /// from a machine that has it. What a target cannot yet name, the host is
     /// still asked about.
     /// </para>
@@ -1304,14 +1330,24 @@ public sealed class Compilation
             if (OperatingSystem.IsMacOS()) { symbols.Add("MACOS"); symbols.Add("UNIX"); }
             if (OperatingSystem.IsFreeBSD()) { symbols.Add("FREEBSD"); symbols.Add("UNIX"); }
         }
-        else if (target.IsWindows)
-        {
-            symbols.Add("WINDOWS");
-        }
         else
         {
-            symbols.Add("LINUX");
-            symbols.Add("UNIX");
+            switch (target.Os)
+            {
+                case Binding.TargetOS.Windows:
+                    symbols.Add("WINDOWS");
+                    break;
+
+                case Binding.TargetOS.Linux:
+                    symbols.Add("LINUX");
+                    symbols.Add("UNIX");
+                    break;
+
+                case Binding.TargetOS.MacOS:
+                    symbols.Add("MACOS");
+                    symbols.Add("UNIX");
+                    break;
+            }
         }
 
         symbols.Add((target ?? Binding.TargetPlatform.Host).Architecture switch
@@ -1369,8 +1405,7 @@ public sealed class Compilation
     /// </summary>
     private static string ReferencedLinkInput(string metadataPath, ModuleMetadata metadata, TargetPlatform target)
     {
-        string library = ReferencedLibrary(metadataPath, metadata);
-        return target.IsWindows ? Path.ChangeExtension(library, ".lib") : library;
+        return Toolchain.LinkInputFor(ReferencedLibrary(metadataPath, metadata), target);
     }
 
     /// <summary>The library a <c>--reference</c> describes, which the loader opens.</summary>

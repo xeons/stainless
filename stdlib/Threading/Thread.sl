@@ -42,6 +42,9 @@ module Standard.Threading;
 /// there until its thread finishes, which is C++'s `jthread` and is the safe
 /// default: the alternative is a thread still running against storage that has
 /// gone. Say `Detach()` when you mean to let it run loose.
+///
+/// **The stack is 8 MB on Linux and macOS**, whatever the shell's `ulimit`
+/// says. On Windows it is the executable's default, normally 1 MB.
 public class Thread
 {
     byte* _handle;

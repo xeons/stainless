@@ -316,8 +316,8 @@ mutable static**
 ### 3.3 Libraries
 
 A `--shared` build has no entry point, so its initializers run as it is
-loaded: from the C runtime's `DllMain` on Windows and from `.init_array`
-elsewhere. On Windows that is under the loader lock, and an initializer that
+loaded: from the C runtime's `DllMain` on Windows, from `.init_array` on
+Linux and from `__mod_init_func` on macOS. On Windows that is under the loader lock, and an initializer that
 starts a thread and waits for it deadlocks. A library's statics are torn down
 as it is unloaded, by an `atexit` hook registered from the library itself.
 

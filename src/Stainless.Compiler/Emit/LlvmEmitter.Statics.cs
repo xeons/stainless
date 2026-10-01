@@ -153,6 +153,13 @@ public sealed partial class LlvmEmitter
 
         PushScope();
 
+        // A library initializes from a constructor, and on Mach-O nothing
+        // orders that after the runtime's own: the runtime is asked first, so
+        // that the leak tracker sees these allocations and its report is
+        // registered before this teardown, and so runs after it.
+        if (forSharedLibrary)
+            Line("call void @sl_runtime_init()");
+
         foreach (var step in program.Initialization)
         {
             if (step.Constructor is { } setup)
@@ -219,9 +226,11 @@ public sealed partial class LlvmEmitter
         _module.AppendLine();
 
         // A library has no entry point, so it initializes as it is loaded: from
-        // the C runtime's DllMain on Windows and from .init_array elsewhere.
-        // Last, after the runtime's own constructors. On Windows this runs
-        // under the loader lock, so an initializer MUST NOT wait on a thread.
+        // the C runtime's DllMain on Windows, .init_array on ELF and
+        // __mod_init_func on Mach-O. Last in this module; across objects the
+        // priority holds only on PE and ELF, which is why the body begins with
+        // sl_runtime_init. On Windows this runs under the loader lock, so an
+        // initializer MUST NOT wait on a thread.
         if (forSharedLibrary)
             _startup.Add((65535, StaticInitializerName));
     }

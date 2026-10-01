@@ -162,11 +162,6 @@ public sealed record ProjectFile
     /// <summary>
     /// The overlay for a target, or null when the file names none for it.
     ///
-    /// Only the two platforms this compiler targets can be reached; macOS is
-    /// accepted in a file and selected by nothing, because a project that
-    /// already describes its macOS build should not have to be edited on the
-    /// day one can be run.
-    ///
     /// <para>
     /// This follows the target's operating system, and so does <c>#if
     /// WINDOWS</c> -- see <see cref="Compilation.PlatformSymbols"/>. The two
@@ -176,8 +171,13 @@ public sealed record ProjectFile
     /// unresolved names rather than anything a reader could trace back here.
     /// </para>
     /// </summary>
-    public PlatformOverlay? OverlayFor(Binding.TargetPlatform target) =>
-        target.IsWindows ? Windows : Linux;
+    public PlatformOverlay? OverlayFor(Binding.TargetPlatform target) => target.Os switch
+    {
+        Binding.TargetOS.Windows => Windows,
+        Binding.TargetOS.Linux => Linux,
+        Binding.TargetOS.MacOS => Macos,
+        _ => null,
+    };
 
     /// <summary>What to compile for a target: the base list, then the overlay's.</summary>
     public IReadOnlyList<string> SourcesFor(Binding.TargetPlatform target) =>
@@ -205,18 +205,21 @@ public sealed record ProjectFile
 
     /// <summary>
     /// Where this package's binary lands: what <c>output</c> said, or the
-    /// package name under the build directory with the platform's extension.
+    /// package name under the build directory with the target's extension.
     /// </summary>
-    public string OutputPath()
+    public string OutputPath(Binding.TargetPlatform target)
     {
         if (Output is not null) return Resolve(Output);
 
         return System.IO.Path.Combine(
             Resolve(BuildDirectory),
             IsLibrary
-                ? Toolchain.SharedLibraryFileName(Name)
-                : Name + Toolchain.ExecutableExtension);
+                ? Toolchain.SharedLibraryFileName(Name, target)
+                : Name + Toolchain.ExecutableExtensionFor(target));
     }
+
+    /// <summary><see cref="OutputPath(Binding.TargetPlatform)"/> for this machine.</summary>
+    public string OutputPath() => OutputPath(Binding.TargetPlatform.Host);
 
     /// <summary>
     /// Where a library's metadata lands: beside the binary, named after the

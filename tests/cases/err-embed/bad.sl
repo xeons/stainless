@@ -58,7 +58,13 @@ static readonly byte[] Comma;
 static readonly byte[] Quoted;
 
 // SL0711: a section whose permissions are already decided — by the target, or
-// by the first embed placed in it.
+// by the first embed placed in it. Mach-O names a section after its segment,
+// and err-embed-macho has the rest of what it refuses.
+#if MACOS
+[Embed("ok.bin", Section = "__TEXT,__const")]
+static readonly byte[] MachOCode;
+#endif
+
 [Embed("ok.bin", Section = ".text")]
 static readonly byte[] Code;
 

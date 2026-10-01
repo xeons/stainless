@@ -121,11 +121,13 @@ internal static class Program
               --shared             build a shared library instead of an executable
               --target <name>      the machine to build for: x64, x86, arm64,
                                    or one of those with a system after it --
-                                   x86-linux, arm64-windows. The default is
-                                   the machine building it. A
+                                   x86-linux, arm64-windows, arm64-macos. A
+                                   bare name takes the system building it,
+                                   and the default is that machine. A
                                    32-bit target is where a calling convention
-                                   starts to mean something; arm64 is the one
-                                   whose two systems agree about structs
+                                   starts to mean something; macOS has none.
+                                   The macOS targets are named but not yet
+                                   complete
               --header <path>      write a C header for the exported surface
               --def <path>         a module definition file for the linker, to
                                    name exports the declarations do not. The
@@ -971,6 +973,12 @@ internal static class Program
                     arguments.Target = Stainless.Binding.TargetPlatform.Parse(args[i]);
                     if (arguments.Target is null)
                     {
+                        if (Stainless.Binding.TargetPlatform.RefusalFor(args[i]) is { } refusal)
+                        {
+                            Error(refusal);
+                            return false;
+                        }
+
                         Error($"'{args[i]}' is not a target this compiler knows");
                         Console.Error.WriteLine(
                             "  It is one of: " + Stainless.Binding.TargetPlatform.Names);

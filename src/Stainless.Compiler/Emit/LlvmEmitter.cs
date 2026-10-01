@@ -108,23 +108,32 @@ public sealed partial class LlvmEmitter(
     /// disagree about returns; ARM64 asks what is in the struct, the way System
     /// V does, and gets different answers. Only on x86-64 is the C++ ABI what
     /// picks, and there it picks between the two that exist.
+    ///
+    /// <paramref name="variadic"/> says the value is an argument of a C
+    /// variadic function, named or not, which only Windows on ARM64 treats
+    /// differently.
     /// </summary>
-    private ArgInfo ClassifyValue(TypeSymbol type) =>
-        Binding.TargetPlatform.Current.Architecture switch
+    private ArgInfo ClassifyValue(TypeSymbol type, bool variadic = false)
+    {
+        var target = Binding.TargetPlatform.Current;
+        return target.Architecture switch
         {
-            Binding.TargetArch.X86 => X86Abi.ClassifyArgument(type, LlvmTypeOf),
-            Binding.TargetArch.Arm64 => Aapcs64Abi.ClassifyArgument(type, LlvmTypeOf),
+            Binding.TargetArch.X86 => X86Abi.ClassifyArgument(type, LlvmTypeOf, target.IsWindows),
+            Binding.TargetArch.Arm64 => Aapcs64Abi.ClassifyArgument(
+                type, LlvmTypeOf, target.IsDarwin, target.IsWindows && variadic),
             _ => abi == CppAbi.Itanium
                 ? SysVAbi.ClassifyArgument(type, LlvmTypeOf)
                 : Win64Abi.ClassifyArgument(type, LlvmTypeOf),
         };
+    }
 
     private ArgInfo ClassifyResult(TypeSymbol type) =>
         Binding.TargetPlatform.Current.Architecture switch
         {
             Binding.TargetArch.X86 => X86Abi.ClassifyReturn(
                 type, LlvmTypeOf, Binding.TargetPlatform.Current.IsWindows),
-            Binding.TargetArch.Arm64 => Aapcs64Abi.ClassifyReturn(type, LlvmTypeOf),
+            Binding.TargetArch.Arm64 => Aapcs64Abi.ClassifyReturn(
+                type, LlvmTypeOf, Binding.TargetPlatform.Current.IsDarwin),
             _ => abi == CppAbi.Itanium
                 ? SysVAbi.ClassifyReturn(type, LlvmTypeOf)
                 : Win64Abi.ClassifyReturn(type, LlvmTypeOf),
@@ -348,12 +357,12 @@ public sealed partial class LlvmEmitter(
 
         _module.Append(_makers);
 
-        // The one attribute group, and only under -g. See FrameAttributes.
-        if (debug is not null)
+        // The one attribute group. See FrameAttributes.
+        if (FramePointer is { } framePointer)
         {
             _module.AppendLine();
             _module.AppendLine($"attributes #{FrameAttributeGroup} = " +
-                               "{ \"frame-pointer\"=\"all\" }");
+                               $"{{ \"frame-pointer\"=\"{framePointer}\" }}");
         }
 
         // Last, because a node is created the first time something refers to it
@@ -368,13 +377,23 @@ public sealed partial class LlvmEmitter(
     }
 
     /// <summary>
-    /// The attribute group number every definition carries under <c>-g</c>.
+    /// The attribute group number every definition carries when it has one.
     /// </summary>
     private const int FrameAttributeGroup = 0;
 
     /// <summary>
-    /// <c>" #0"</c> under <c>-g</c>, and nothing otherwise: the frame pointer,
-    /// which a debugger cannot walk a stack without.
+    /// <c>" #0"</c> when the module asks for a frame pointer, and nothing
+    /// otherwise. See <see cref="FramePointer"/>.
+    /// </summary>
+    private string FrameAttributes => FramePointer is not null
+        ? $" #{FrameAttributeGroup}"
+        : "";
+
+    /// <summary>
+    /// Which functions keep a frame pointer, as LLVM's <c>"frame-pointer"</c>
+    /// spells it, or null for none: every one under <c>-g</c>, which a
+    /// debugger cannot walk a stack without, and every one that calls another
+    /// on arm64 macOS, whose ABI requires a valid frame record in x29.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -397,14 +416,26 @@ public sealed partial class LlvmEmitter(
     /// pay. It also makes <c>perf</c> and WPA produce usable stacks for any
     /// Stainless binary built for debugging, which is worth having on its own.
     /// </para>
+    /// <para>
+    /// Apple's arm64 ABI is the exception: x29 MUST always address a frame
+    /// record, and clang emits <c>"non-leaf"</c> for that target at every
+    /// level. A leaf function's caller has the record, so the stack still walks.
+    /// </para>
     /// </remarks>
-    private string FrameAttributes => debug is not null
-        ? $" #{FrameAttributeGroup}"
-        : "";
+    private string? FramePointer =>
+        debug is not null ? "all"
+        : TargetPlatform.Current is { IsDarwin: true, Architecture: TargetArch.Arm64 } ? "non-leaf"
+        : null;
 
     /// <summary>
-    /// The one <c>llvm.global_ctors</c>, which both PE and ELF honour: what it
-    /// names runs before <c>main</c> in a program and on load in a library.
+    /// The one <c>llvm.global_ctors</c>: what it names runs before <c>main</c>
+    /// in a program and on load in a library.
+    ///
+    /// The priorities order the entries within this module on every format.
+    /// Across objects only PE and ELF honour them; Mach-O runs each object's
+    /// initializers in link order. So nothing here MAY rely on running before
+    /// or after the runtime's own constructor: what a library's initializer
+    /// needs of the runtime it asks for with <c>sl_runtime_init</c>.
     /// </summary>
     private void StartupTable()
     {

@@ -1,0 +1,19 @@
+# The compiled .res, in a section of its own in __DATA_CONST, which dyld makes
+# read-only once the image is bound.
+section "__DATA_CONST,__sl_rsrc"
+@sl_resource_blob_size = constant i64
+
+# Each embed in a segment with the access it asked for: read-only data in
+# __DATA_CONST, writable data in __DATA, code in __TEXT. Mach-O states no flags
+# in a section directive; the segment decides the permissions.
+module asm ".section __DATA_CONST,__const"
+module asm ".section __DATA,__data"
+module asm ".section __TEXT,__text,regular,pure_instructions"
+
+# And in a section named by the program.
+module asm ".section __DATA,__sl_table"
+module asm ".section __TEXT,__sl_stub,regular,pure_instructions"
+
+# A frame record in every function that calls another, as Apple's arm64 ABI
+# requires and clang emits for this target.
+"frame-pointer"="non-leaf"

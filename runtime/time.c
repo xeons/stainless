@@ -57,6 +57,18 @@
 /* ------------------------------------------------------------- the clocks */
 
 /*
+ * The monotonic clock stops while the machine sleeps, as Linux's
+ * CLOCK_MONOTONIC does. On macOS that is CLOCK_UPTIME_RAW, which is
+ * mach_absolute_time, the clock a timed condition wait is measured on there.
+ * macOS's own CLOCK_MONOTONIC counts through sleep.
+ */
+#if defined(__APPLE__)
+#  define SL_MONOTONIC_CLOCK CLOCK_UPTIME_RAW
+#elif !defined(_WIN32)
+#  define SL_MONOTONIC_CLOCK CLOCK_MONOTONIC
+#endif
+
+/*
  * Nanoseconds since 1970-01-01 UTC.
  *
  * Windows counts 100-nanosecond ticks from 1601, so the epoch is shifted and
@@ -107,7 +119,7 @@ long long sl_time_monotonic(void)
     return whole * 1000000000LL + (part * 1000000000LL) / frequency.QuadPart;
 #else
     struct timespec now;
-    if (clock_gettime(CLOCK_MONOTONIC, &now) != 0) return 0;
+    if (clock_gettime(SL_MONOTONIC_CLOCK, &now) != 0) return 0;
     return (long long)now.tv_sec * 1000000000LL + now.tv_nsec;
 #endif
 }

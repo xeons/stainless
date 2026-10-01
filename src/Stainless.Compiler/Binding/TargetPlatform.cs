@@ -14,6 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+using System.Runtime.InteropServices;
+using ProcessArchitecture = System.Runtime.InteropServices.Architecture;
+
 namespace Stainless.Binding;
 
 /// <summary>The instruction set a program is being built for.</summary>
@@ -28,6 +31,28 @@ public enum TargetArch
 
     /// <summary>64-bit ARM.</summary>
     Arm64,
+}
+
+/// <summary>The operating system a program is being built for.</summary>
+public enum TargetOS
+{
+    Windows,
+    Linux,
+
+    /// <summary>Apple's, reached through a Darwin triple.</summary>
+    MacOS,
+}
+
+/// <summary>The object file format the target's linker reads.</summary>
+public enum ObjectFormat
+{
+    /// <summary>PE/COFF, Windows'.</summary>
+    Coff,
+
+    Elf,
+
+    /// <summary>Apple's. A section is named <c>segment,section</c>.</summary>
+    MachO,
 }
 
 /// <summary>
@@ -63,6 +88,12 @@ public sealed record TargetPlatform
 {
     public required TargetArch Architecture { get; init; }
 
+    /// <summary>The operating system the output runs on.</summary>
+    public required TargetOS Os { get; init; }
+
+    /// <summary>What the object files and the linked output are.</summary>
+    public required ObjectFormat Format { get; init; }
+
     /// <summary>How many bytes a pointer occupies.</summary>
     public required int PointerWidth { get; init; }
 
@@ -83,7 +114,36 @@ public sealed record TargetPlatform
 
     /// <summary>True for a Microsoft target, which differs in more than names:
     /// the x86 struct-return rule and the decorated symbol are both Windows'.</summary>
-    public bool IsWindows => Triple.Contains("windows", StringComparison.Ordinal);
+    public bool IsWindows => Os == TargetOS.Windows;
+
+    public bool IsLinux => Os == TargetOS.Linux;
+
+    /// <summary>True for an Apple target: macOS today.</summary>
+    public bool IsDarwin => Os == TargetOS.MacOS;
+
+    public bool IsMachO => Format == ObjectFormat.MachO;
+
+    /// <summary>
+    /// A short stable name, <c>arm64-macos</c>, for a cache key or a message.
+    /// It is one of the names <see cref="Parse(string)"/> accepts.
+    /// </summary>
+    public string Name => ArchitectureName + "-" + OsName;
+
+    private string ArchitectureName => Architecture switch
+    {
+        TargetArch.X64 => "x64",
+        TargetArch.X86 => "x86",
+        TargetArch.Arm64 => "arm64",
+        _ => throw new InvalidOperationException($"no name for {Architecture}"),
+    };
+
+    private string OsName => Os switch
+    {
+        TargetOS.Windows => "windows",
+        TargetOS.Linux => "linux",
+        TargetOS.MacOS => "macos",
+        _ => throw new InvalidOperationException($"no name for {Os}"),
+    };
 
     /// <summary>True where a declaration may name a calling convention and have
     /// it mean something. There is one convention on every 64-bit target.</summary>
@@ -121,6 +181,8 @@ public sealed record TargetPlatform
     public static readonly TargetPlatform X64Windows = new()
     {
         Architecture = TargetArch.X64,
+        Os = TargetOS.Windows,
+        Format = ObjectFormat.Coff,
         PointerWidth = 8,
         Abi = CppAbi.Microsoft,
         Triple = "x86_64-pc-windows-msvc",
@@ -129,6 +191,8 @@ public sealed record TargetPlatform
     public static readonly TargetPlatform X64Linux = new()
     {
         Architecture = TargetArch.X64,
+        Os = TargetOS.Linux,
+        Format = ObjectFormat.Elf,
         PointerWidth = 8,
         Abi = CppAbi.Itanium,
         Triple = "x86_64-pc-linux-gnu",
@@ -137,6 +201,8 @@ public sealed record TargetPlatform
     public static readonly TargetPlatform X86Windows = new()
     {
         Architecture = TargetArch.X86,
+        Os = TargetOS.Windows,
+        Format = ObjectFormat.Coff,
         PointerWidth = 4,
         Abi = CppAbi.Microsoft,
         Triple = "i686-pc-windows-msvc",
@@ -145,6 +211,8 @@ public sealed record TargetPlatform
     public static readonly TargetPlatform X86Linux = new()
     {
         Architecture = TargetArch.X86,
+        Os = TargetOS.Linux,
+        Format = ObjectFormat.Elf,
         PointerWidth = 4,
         Abi = CppAbi.Itanium,
         Triple = "i686-pc-linux-gnu",
@@ -158,6 +226,8 @@ public sealed record TargetPlatform
     public static readonly TargetPlatform Arm64Windows = new()
     {
         Architecture = TargetArch.Arm64,
+        Os = TargetOS.Windows,
+        Format = ObjectFormat.Coff,
         PointerWidth = 8,
         Abi = CppAbi.Microsoft,
         Triple = "aarch64-pc-windows-msvc",
@@ -166,9 +236,36 @@ public sealed record TargetPlatform
     public static readonly TargetPlatform Arm64Linux = new()
     {
         Architecture = TargetArch.Arm64,
+        Os = TargetOS.Linux,
+        Format = ObjectFormat.Elf,
         PointerWidth = 8,
         Abi = CppAbi.Itanium,
         Triple = "aarch64-unknown-linux-gnu",
+    };
+
+    /// <summary>
+    /// Apple silicon. The deployment floor is macOS 13, and it is in the
+    /// triple so that the program and the runtime agree on it.
+    /// </summary>
+    public static readonly TargetPlatform Arm64MacOS = new()
+    {
+        Architecture = TargetArch.Arm64,
+        Os = TargetOS.MacOS,
+        Format = ObjectFormat.MachO,
+        PointerWidth = 8,
+        Abi = CppAbi.Itanium,
+        Triple = "arm64-apple-macosx13.0",
+    };
+
+    /// <summary>An Intel Mac, on the same macOS 13 floor.</summary>
+    public static readonly TargetPlatform X64MacOS = new()
+    {
+        Architecture = TargetArch.X64,
+        Os = TargetOS.MacOS,
+        Format = ObjectFormat.MachO,
+        PointerWidth = 8,
+        Abi = CppAbi.Itanium,
+        Triple = "x86_64-apple-macosx13.0",
     };
 
     /// <summary>
@@ -181,49 +278,114 @@ public sealed record TargetPlatform
     /// <c>STAINLESS_CPP_ABI</c> still overrides the name mangling, which is how
     /// the scheme a host does not use gets exercised against a real compiler.
     /// </summary>
-    public static TargetPlatform Host
-    {
-        get
+    public static TargetPlatform Host =>
+        HostFor(HostOS, RuntimeInformation.ProcessArchitecture) with
         {
-            bool windows = OperatingSystem.IsWindows();
-            var native =
-                System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture ==
-                System.Runtime.InteropServices.Architecture.Arm64
-                    ? windows ? Arm64Windows : Arm64Linux
-                    : windows ? X64Windows : X64Linux;
+            Abi = CppMangler.HostAbi,
+        };
 
-            return native with { Abi = CppMangler.HostAbi };
-        }
+    /// <summary>The operating system this process runs on. Anything that is
+    /// neither Windows nor macOS is taken as Linux.</summary>
+    public static TargetOS HostOS =>
+        OperatingSystem.IsWindows() ? TargetOS.Windows
+        : OperatingSystem.IsMacOS() ? TargetOS.MacOS
+        : TargetOS.Linux;
+
+    /// <summary>
+    /// The native 64-bit target of a machine running <paramref name="os"/> on
+    /// <paramref name="architecture"/>, with the system's own C++ scheme.
+    /// Anything that is not ARM64 is taken as x86-64.
+    /// </summary>
+    public static TargetPlatform HostFor(TargetOS os, ProcessArchitecture architecture)
+    {
+        bool arm = architecture == ProcessArchitecture.Arm64;
+        return os switch
+        {
+            TargetOS.Windows => arm ? Arm64Windows : X64Windows,
+            TargetOS.Linux => arm ? Arm64Linux : X64Linux,
+            TargetOS.MacOS => arm ? Arm64MacOS : X64MacOS,
+            _ => throw new ArgumentOutOfRangeException(nameof(os)),
+        };
     }
 
     /// <summary>
     /// The target named on a command line, or null when the name is not one.
     /// Short names rather than triples, because a triple has four fields and
     /// three of them are never the interesting one.
+    ///
+    /// A bare architecture takes the host's operating system. When this
+    /// answers null, <see cref="RefusalFor(string)"/> says whether the name
+    /// was known and refused.
     /// </summary>
-    public static TargetPlatform? Parse(string name) => name.ToLowerInvariant() switch
-    {
-        "x64" or "x86_64" or "amd64" =>
-            OperatingSystem.IsWindows() ? X64Windows : X64Linux,
-        "x86" or "i686" or "i386" or "win32" =>
-            OperatingSystem.IsWindows() ? X86Windows : X86Linux,
-        "arm64" or "aarch64" =>
-            OperatingSystem.IsWindows() ? Arm64Windows : Arm64Linux,
+    public static TargetPlatform? Parse(string name) => Parse(name, HostOS);
 
-        "x64-windows" or "x86_64-windows" => X64Windows,
-        "x64-linux" or "x86_64-linux" => X64Linux,
-        "x86-windows" or "i686-windows" => X86Windows,
-        "x86-linux" or "i686-linux" => X86Linux,
-        "arm64-windows" or "aarch64-windows" => Arm64Windows,
-        "arm64-linux" or "aarch64-linux" => Arm64Linux,
+    /// <summary>
+    /// <see cref="Parse(string)"/> as it would answer on a host running
+    /// <paramref name="hostOS"/>.
+    /// </summary>
+    public static TargetPlatform? Parse(string name, TargetOS hostOS) =>
+        name.ToLowerInvariant() switch
+        {
+            "x64" or "x86_64" or "amd64" => hostOS switch
+            {
+                TargetOS.Windows => X64Windows,
+                TargetOS.Linux => X64Linux,
+                TargetOS.MacOS => X64MacOS,
+                _ => null,
+            },
+            "x86" or "i686" or "i386" or "win32" => hostOS switch
+            {
+                TargetOS.Windows => X86Windows,
+                TargetOS.Linux => X86Linux,
+                _ => null,
+            },
+            "arm64" or "aarch64" => hostOS switch
+            {
+                TargetOS.Windows => Arm64Windows,
+                TargetOS.Linux => Arm64Linux,
+                TargetOS.MacOS => Arm64MacOS,
+                _ => null,
+            },
 
-        _ => null,
-    };
+            "x64-windows" or "x86_64-windows" => X64Windows,
+            "x64-linux" or "x86_64-linux" => X64Linux,
+            "x86-windows" or "i686-windows" => X86Windows,
+            "x86-linux" or "i686-linux" => X86Linux,
+            "arm64-windows" or "aarch64-windows" => Arm64Windows,
+            "arm64-linux" or "aarch64-linux" => Arm64Linux,
+            "arm64-macos" or "aarch64-macos" or "arm64-darwin" or "aarch64-darwin" => Arm64MacOS,
+            "x64-macos" or "x86_64-macos" or "x64-darwin" or "x86_64-darwin" => X64MacOS,
 
-    /// <summary>Every name <see cref="Parse"/> accepts, for a diagnostic.</summary>
+            _ => null,
+        };
+
+    /// <summary>
+    /// Why a name <see cref="Parse(string)"/> answered null for is known and
+    /// refused, or null when it is simply not a name.
+    /// </summary>
+    public static string? RefusalFor(string name) => RefusalFor(name, HostOS);
+
+    /// <summary>
+    /// <see cref="RefusalFor(string)"/> as it would answer on a host running
+    /// <paramref name="hostOS"/>.
+    /// </summary>
+    public static string? RefusalFor(string name, TargetOS hostOS) =>
+        name.ToLowerInvariant() switch
+        {
+            "x86" or "i686" or "i386" or "win32" when hostOS == TargetOS.MacOS =>
+                $"'{name}' means 32-bit x86 for this machine's system, and macOS has " +
+                "no 32-bit target; name x64 or arm64, or x86-windows or x86-linux to " +
+                "build for another system",
+            "x86-macos" or "i686-macos" or "i386-macos" or "x86-darwin" or "i686-darwin" =>
+                $"'{name}' is not a target: macOS has no 32-bit target; name x64-macos " +
+                "or arm64-macos",
+            _ => null,
+        };
+
+    /// <summary>Every name <see cref="Parse(string)"/> accepts, for a diagnostic.</summary>
     public static string Names =>
-        "x64, x86, arm64, x64-windows, x64-linux, x86-windows, x86-linux, " +
-        "arm64-windows, arm64-linux";
+        "x64, x86, arm64, x64-windows, x64-linux, x64-macos, x86-windows, x86-linux, " +
+        "arm64-windows, arm64-linux, arm64-macos";
 
     // ------------------------------------------------------------- ambient
 

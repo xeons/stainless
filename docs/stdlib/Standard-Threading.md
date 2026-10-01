@@ -1205,7 +1205,10 @@ there until its thread finishes, which is C++'s `jthread` and is the safe
 default: the alternative is a thread still running against storage that has
 gone. Say `Detach()` when you mean to let it run loose.
 
-<sub>[stdlib/Threading/Thread.sl:45](../../stdlib/Threading/Thread.sl#L45)</sub>
+**The stack is 8 MB on Linux and macOS**, whatever the shell's `ulimit`
+says. On Windows it is the executable's default, normally 1 MB.
+
+<sub>[stdlib/Threading/Thread.sl:48](../../stdlib/Threading/Thread.sl#L48)</sub>
 
 #### Join *method*
 
@@ -1218,7 +1221,7 @@ the destructor be a backstop.
 
 **See also** &nbsp; [Thread.Detach](#detach-method)
 
-<sub>[stdlib/Threading/Thread.sl:80](../../stdlib/Threading/Thread.sl#L80)</sub>
+<sub>[stdlib/Threading/Thread.sl:83](../../stdlib/Threading/Thread.sl#L83)</sub>
 
 #### Detach *method*
 
@@ -1231,7 +1234,7 @@ after itself; nothing can join it afterwards.
 
 **See also** &nbsp; [Thread.Join](#join-method)
 
-<sub>[stdlib/Threading/Thread.sl:93](../../stdlib/Threading/Thread.sl#L93)</sub>
+<sub>[stdlib/Threading/Thread.sl:96](../../stdlib/Threading/Thread.sl#L96)</sub>
 
 #### IsJoinable *property*
 
@@ -1242,7 +1245,7 @@ bool IsJoinable { get; }
 Whether this handle still refers to a thread -- false after `Join` or
 `Detach`. It does not say whether the thread is still running.
 
-<sub>[stdlib/Threading/Thread.sl:104](../../stdlib/Threading/Thread.sl#L104)</sub>
+<sub>[stdlib/Threading/Thread.sl:107](../../stdlib/Threading/Thread.sl#L107)</sub>
 
 ### WriteGuard&lt;T&gt; *class*
 
