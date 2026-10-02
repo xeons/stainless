@@ -957,6 +957,10 @@ last person to edit it -- the suite is the authority.
   three. Both bindings are checked against the real headers by a C file
   compiled beside the test, which is how a constant in a binding stops being
   somebody's recollection
+- [bindings/macos](../bindings/macos): the terminal and the event loop on
+  Darwin -- `termios`, whose flag words are eight bytes there, and kqueue, which
+  is epoll, eventfd, timerfd and inotify in one call. `MacOS.Terminal` has the
+  functions `Linux.Terminal` has. Checked against the headers the same way
 - Conditional compilation: `#if`, `#elif`, `#else`, `#endif`, `#define`,
   `#undef`, `#error`, `#warning`, `#region` and `#endregion`, with C#'s
   condition grammar, plus `#pragma comment(lib, "...")` so a file can name the

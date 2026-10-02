@@ -273,6 +273,7 @@ Beyond the language itself:
 | **[bindings/win32/](bindings/win32/README.md)** | The Windows API, in two layers. |
 | **[bindings/gtk/](bindings/gtk/README.md)** | GTK 3, and a widget class hierarchy over it. |
 | **[bindings/linux/](bindings/linux/README.md)** | The Linux system calls, declared and nothing else. |
+| **[bindings/macos/](bindings/macos/README.md)** | The Darwin terminal and kqueue, on the same terms. |
 | **[samples/](samples/)** | Example programs, including [the tour](samples/tour), [a package](samples/packages) and [a COM server called from C++](samples/com). |
 
 ---
@@ -288,6 +289,7 @@ runtime/               the runtime, split by feature, embedded in the compiler
 stdlib/                the standard library written in Stainless, also embedded
 bindings/win32/        the Windows API, compiled only by a program that asks
 bindings/linux/        the Linux system calls, on the same terms
+bindings/macos/        the Darwin terminal and kqueue, likewise
 bindings/gtk/          GTK 3, and a widget layer over it
 forms/                 a GUI framework: the LCL's architecture, C#'s names,
                        on Win32 and GTK 3 behind one seam

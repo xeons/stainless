@@ -163,15 +163,13 @@ verified and lowered, with their signatures pinned against clang's. Building 32-
 multilib packages, which is what
 [tests/linux-x86.Dockerfile](../tests/linux-x86.Dockerfile) is for.
 
-macOS is not tested, and support for it is in progress. The target model
-knows it: `arm64-macos` (`arm64-apple-macosx13.0`) and `x64-macos`
-(`x86_64-apple-macosx13.0`) can be named, a Mac host defaults to one of them,
-and each target carries its operating system and object format (COFF, ELF or
-Mach-O) rather than having them read out of the triple, and the toolchain
-follows it. The Mach-O sections and the Darwin calling convention are not done
-yet, so building for macOS does not work yet. There is no 32-bit macOS target, and a bare `x86`
-on a Mac is refused. The constants in `bindings/linux` are Linux's and would
-not port, and that is stated where they are.
+macOS is `arm64-macos` (`arm64-apple-macosx13.0`) and `x64-macos`
+(`x86_64-apple-macosx13.0`), and a Mac host defaults to the one it is. Each
+target carries its operating system and object format (COFF, ELF or Mach-O)
+rather than having them read out of the triple, and the toolchain follows it.
+There is no 32-bit macOS target, and a bare `x86` on a Mac is refused. The
+constants in `bindings/linux` are Linux's and would not port; Darwin's are in
+`bindings/macos`.
 
 `STAINLESS_CLANG` names the clang to use and always wins. Failing that the
 compiler takes the first on `PATH`, then tries `C:\Program Files\LLVM\bin` and

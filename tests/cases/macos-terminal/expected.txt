@@ -1,0 +1,11 @@
+constants and layouts that disagree with the headers: 0
+tty      false
+raw      refused true
+size     0 0
+made     true
+added    true
+quiet    true
+woken    true ident 42 user true
+fired    true timer true
+watching true true
+changed  true written true

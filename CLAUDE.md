@@ -131,7 +131,7 @@ them off does not fail cleanly (see below).
 |---|---|
 | `runtime/` | sixteen C files, embedded in the compiler as resources |
 | `stdlib/` | the standard library, in Stainless, also embedded: a folder per module, a file per public type |
-| `bindings/win32`, `bindings/gtk`, `bindings/linux` | platform APIs, compiled only by a program that asks |
+| `bindings/win32`, `bindings/gtk`, `bindings/linux`, `bindings/macos` | platform APIs, compiled only by a program that asks |
 | `forms/` | a GUI framework, one control layer over a Win32 and a GTK backend |
 | `ide/` | an editor for Stainless, written in Stainless, on `forms/` |
 | `debug/` | `sldb`, a debugger written in Stainless; `stainless build --project debug` |
