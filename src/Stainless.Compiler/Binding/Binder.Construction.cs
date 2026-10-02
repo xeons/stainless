@@ -737,6 +737,10 @@ public sealed partial class Binder
 
         string name = string.Join('.', parts);
         if (_context.File!.Imports.TryGetValue(name, out var module)) return module;
+
+        // A module this file did not import is further away than a type it can
+        // see, so a program's `module Store;` leaves a library's `Store` alone.
+        if (TypeNamed(parts) is not null) return null;
         return _modules.TryGetValue(name, out module) ? module : null;
     }
 
