@@ -81,20 +81,14 @@ jobs:
 
       - uses: ./.github/actions/setup
 
-      # The drawing case loads libgd, and an Intel process cannot load the
-      # arm64 one; Intel Homebrew lives in /usr/local beside the other.
-      - name: Install Intel Homebrew's libgd
-        shell: bash
-        run: |
-          NONINTERACTIVE=1 arch -x86_64 /bin/bash -c \
-            "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-          arch -x86_64 /usr/local/bin/brew install gd
-
       - run: dotnet build Stainless.slnx
 
+      # The drawing case loads libgd, and an Intel process cannot load the
+      # arm64 one. Homebrew no longer installs on Intel macOS, so there is no
+      # Intel libgd to give it; the arm64 lanes run it.
       - name: Run the suite as x64-macos
         shell: bash
         run: |
           dotnet run --project tests/Stainless.Tests --no-build -- \
-            --target=x64-macos --shard=${{ matrix.shard }}/2 | tee e2e.log
+            --target=x64-macos --exclude=drawing --shard=${{ matrix.shard }}/2 | tee e2e.log
           grep -Eq 'all [1-9][0-9]* tests passed' e2e.log

@@ -179,9 +179,18 @@ internal static class Program
             }
         }
 
+        // `--exclude=drawing` leaves out every case whose name contains it, for
+        // a run that knows a case cannot pass where it is: one needing a
+        // library the machine has not got for the target, say.
+        var excluded = args
+            .Where(a => a.StartsWith("--exclude=", StringComparison.Ordinal))
+            .Select(a => a["--exclude=".Length..])
+            .ToList();
+
         var cases = Directory.EnumerateDirectories(root)
             .Where(d => filter is null ||
                         Path.GetFileName(d).Contains(filter, StringComparison.OrdinalIgnoreCase))
+            .Where(d => !excluded.Any(e => Path.GetFileName(d).Contains(e, StringComparison.OrdinalIgnoreCase)))
             .OrderBy(d => d, StringComparer.Ordinal)
             .ToList();
 

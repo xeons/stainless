@@ -101,7 +101,7 @@ public class ToolchainTests
         int search = arguments.IndexOf("-L/opt/homebrew/lib");
         Assert.InRange(search, 0, arguments.IndexOf("-lgtk-3") - 1);
         Assert.DoesNotContain("-L/opt/homebrew/lib", Link(TargetPlatform.Arm64MacOS, []));
-        Assert.DoesNotContain("-L/opt/homebrew/lib", Link(TargetPlatform.X64Linux, ["gtk-3"]));
+        Assert.DoesNotContain("-L/opt/homebrew/lib", Link(TargetPlatform.X86Linux, ["gtk-3"]));
         Assert.DoesNotContain(LinkFor(TargetPlatform.Arm64MacOS), a => a.StartsWith("-L", StringComparison.Ordinal));
     }
 

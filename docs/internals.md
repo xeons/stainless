@@ -25,6 +25,7 @@ and `--shard=i/n` every nth case from the ith, for a caller whose command has
 to finish inside a fixed time. `--target=x64-macos` builds every case that has
 no `target.txt` of its own for that target, and skips one the host cannot run;
 on Apple silicon with Rosetta it is the whole suite as Intel code.
+`--exclude=name` leaves out every case whose name contains `name`.
 
 [.github/workflows/ci.yml](../.github/workflows/ci.yml) runs both suites on
 Linux, Windows and macOS for every push and pull request to `master`, the
