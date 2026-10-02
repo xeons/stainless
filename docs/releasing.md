@@ -93,11 +93,16 @@ itself. A publish for another machine ships without it and says so, and so
 does one for macOS: the IDE builds there, but its self test does not pass
 under GTK's Quartz backend.
 
-**Four runtimes are published**: `win-x64`, `linux-x64`, `osx-arm64` and
-`osx-x64`. Both Mac archives are built on an Apple silicon runner, the Intel
-one smoke-tested under Rosetta. ARM64 Windows and Linux are targets the
-compiler builds for, but no runner runs those cases yet; either is a matrix
-entry once one does.
+**Three runtimes are published**: `win-x64`, `linux-x64` and `osx-arm64`.
+ARM64 Windows and Linux are targets the compiler builds for, but no runner
+runs those cases yet; either is a matrix entry once one does.
+
+**An Intel Mac is a target and not a release.** The compiler builds for
+`x64-macos`, and the cases that hold its IR against clang's run in every
+lane, but no archive is published for one: Homebrew no longer installs on
+Intel macOS, so the toolchain an Intel user would need has no supported way
+in. `tools/publish.sh osx-x64` still works by hand, and smoke-tests under
+Rosetta on Apple silicon.
 
 **A Mac binary is signed ad hoc**, which the .NET SDK does as it publishes,
 and is not notarized. An archive downloaded through a browser is quarantined,
@@ -126,8 +131,7 @@ commit building as a different number, fails before anything is built, and
 says which.
 
 The workflow then runs [ci.yml](../.github/workflows/ci.yml) in full -- both
-suites, on Linux, Windows and macOS, and the suite again as Intel code under
-Rosetta -- as its gate. It publishes each runtime on its
+suites, on Linux, Windows and macOS -- as its gate. It publishes each runtime on its
 own platform, and creates the GitHub release: `Stainless <version>`, notes
 generated from the commits and pull requests since the last one, and the
 archives with a `SHA256SUMS` beside them.

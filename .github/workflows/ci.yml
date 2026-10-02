@@ -66,7 +66,13 @@ jobs:
   # Every case built as Intel code and run under Rosetta on Apple silicon. A
   # case the target cannot run is skipped by the harness, so the step after
   # it checks that the lane ran something rather than skipping everything.
+  #
+  # Off: Intel Macs are a target the compiler builds for and not one that is
+  # shipped, and Homebrew no longer installs on them. The x64-macos cases
+  # that check the IR against clang's still run in every lane. Delete the
+  # `if` to run the whole suite this way again.
   intel-mac:
+    if: false
     name: End-to-end ${{ matrix.shard }}/2 (x64-macos under Rosetta)
     strategy:
       fail-fast: false

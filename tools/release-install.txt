@@ -42,8 +42,8 @@ flag once, after unpacking:
 
     xattr -dr com.apple.quarantine stainless-*
 
-The osx-x64 archive is for an Intel Mac. It also runs on Apple silicon under
-Rosetta, but osx-arm64 is the one to use there.
+There is no archive for an Intel Mac. The compiler can build Intel code with
+--target x64-macos, from an Apple silicon Mac or from source on an Intel one.
 
 bindings/ and forms/ are source, compiled into a program that names them.
 A GTK program on Linux needs the GTK 3 development packages and the libraries

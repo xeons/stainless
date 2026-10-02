@@ -29,8 +29,9 @@ on Apple silicon with Rosetta it is the whole suite as Intel code.
 
 [.github/workflows/ci.yml](../.github/workflows/ci.yml) runs both suites on
 Linux, Windows and macOS for every push and pull request to `master`, the
-end-to-end one in those two shards, and the end-to-end suite once more as
-`x64-macos` under Rosetta. How a build is numbered, published and released is
+end-to-end one in those two shards. A lane that runs the end-to-end suite
+again as `x64-macos` under Rosetta is there and switched off, because Intel
+Macs are built for and not shipped. How a build is numbered, published and released is
 [Releasing](releasing.md).
 
 The two suites ask different questions. An end-to-end case compiles, links and
