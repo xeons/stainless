@@ -246,16 +246,21 @@ public bool IsPathRooted(String path)
 ///
 /// It settles the two differences the platform itself creates: Windows accepts
 /// `/` and `\` interchangeably and matches names without regard to case,
-/// Linux does neither. A compiler joining a directory to a file name writes
-/// `C:\src\obj/Text.sl`, one separator from each half, and `==` says that is
-/// a different file from `C:\src\obj\Text.sl`.
+/// macOS matches them without regard to case, and Linux does neither. A
+/// compiler joining a directory to a file name writes `C:\src\obj/Text.sl`,
+/// one separator from each half, and `==` says that is a different file from
+/// `C:\src\obj\Text.sl`.
 ///
 /// Nothing is opened, followed or resolved. A caller that needs `..` or a
 /// relative path resolved MUST do that first.
 ///
 /// Only ASCII letters are case-folded. Windows folds more, with a table that
-/// has changed between releases, so two paths differing only in the case of a
-/// non-ASCII letter are reported as different.
+/// has changed between releases, and so does APFS, which also treats the
+/// composed and decomposed spellings of an accented letter as one name; two
+/// paths differing in either way are reported as different.
+///
+/// On macOS the answer is for the default volume, which ignores case. A volume
+/// formatted case-sensitive is the exception, and nothing here asks which.
 public bool IsSamePath(String left, String right)
 {
     if (left.ByteLength() != right.ByteLength())
@@ -283,6 +288,13 @@ bool IsSameByteInAPath(byte left, byte right)
     return (IsSeparator(left) && IsSeparator(right))
         || ToLowerAscii(left) == ToLowerAscii(right);
 }
+
+byte ToLowerAscii(byte value) => value >= 65 && value <= 90 ? (byte)(value + 32) : value;
+
+#elif MACOS
+
+/// APFS ignores case by default; `\` is a filename character, as on Linux.
+bool IsSameByteInAPath(byte left, byte right) => ToLowerAscii(left) == ToLowerAscii(right);
 
 byte ToLowerAscii(byte value) => value >= 65 && value <= 90 ? (byte)(value + 32) : value;
 

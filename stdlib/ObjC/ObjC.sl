@@ -19,11 +19,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+/// Objective-C's runtime, for a program built for macOS.
+///
+/// The compiler declares `AnyObject`, `Selector` and `Class`, because a
+/// declaration of Objective-C's own types names them; this module adds what a
+/// program does with them. Everything here is macOS's alone, so a page
+/// generated on another host lists none of it.
 module Standard.ObjC;
 
-// The compiler declares `AnyObject`, `Selector` and `Class`, because a
-// declaration of Objective-C's own types names them. This adds what a
-// program does with them. Objective-C is Apple's, so all of it is too.
 #if MACOS
 extern "C"
 {

@@ -19,7 +19,7 @@ int Main()
     Say("mixed separators",
         Standard.Path.IsSamePath("src\\obj/Text.sl", "src\\obj\\Text.sl"));
 
-    // Case, which Windows ignores and Linux does not.
+    // Case, which Windows and macOS ignore and Linux does not.
     Say("case", Standard.Path.IsSamePath("src/Text.sl", "src/text.sl"));
 
     // Neither platform says these are one file.
