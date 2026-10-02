@@ -2907,7 +2907,19 @@ Console.WriteLine($"{roots.Certificates.Count} trusted roots");
 `Root` and `CA` for `CertificateAuthority` — which is loaded by name the
 first time a store is opened, so a program that never opens one does not
 link it. A certificate in the current user's or the machine's
-`Disallowed` store is left out of both. **Elsewhere** `Root` is the PEM bundle `SSL_CERT_FILE` names,
+`Disallowed` store is left out of both.
+
+**On macOS** `Root` is Apple's TLS roots, from `/etc/ssl/cert.pem` as
+below, with the trust settings applied over them, read through
+Security.framework, which is linked: every certificate an
+administrator -- and for `CurrentUser`, the user -- has marked trusted is
+added, and every one either has marked to deny is left out. A setting
+limited to one policy is read as though it applied to all. The system's own
+trust settings are not read for its roots, because they also trust Apple's
+S/MIME and time-stamping roots, which the bundle leaves out. Nothing is
+applied when `SSL_CERT_FILE` or `SSL_CERT_DIR` is set.
+
+**Elsewhere** `Root` is the PEM bundle `SSL_CERT_FILE` names,
 or else the first of the usual places that exists —
 `/etc/ssl/certs/ca-certificates.crt`, `/etc/pki/tls/certs/ca-bundle.crt`,
 `/etc/ssl/ca-bundle.pem`, `/etc/pki/tls/cacert.pem`, `/etc/ssl/cert.pem`
@@ -2920,7 +2932,7 @@ passed over, and one found twice is kept once. A store that cannot be read
 at all is empty, which a chain reports as `UntrustedRoot` or
 `PartialChain` rather than as a failure of its own.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Store.sl:52](../../stdlib/Security/Cryptography/X509Certificates/X509Store.sl#L52)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Store.sl:65](../../stdlib/Security/Cryptography/X509Certificates/X509Store.sl#L65)</sub>
 
 #### Open *method*
 
@@ -2935,7 +2947,7 @@ The store `name` at `location`, read the first time it is asked for.
 - `name` -- which store
 - `location` -- whose; only Windows tells the two apart
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Store.sl:84](../../stdlib/Security/Cryptography/X509Certificates/X509Store.sl#L84)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Store.sl:97](../../stdlib/Security/Cryptography/X509Certificates/X509Store.sl#L97)</sub>
 
 #### Name *property*
 
@@ -2945,7 +2957,7 @@ StoreName Name { get; }
 
 Which store this is.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Store.sl:103](../../stdlib/Security/Cryptography/X509Certificates/X509Store.sl#L103)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Store.sl:116](../../stdlib/Security/Cryptography/X509Certificates/X509Store.sl#L116)</sub>
 
 #### Location *property*
 
@@ -2955,7 +2967,7 @@ StoreLocation Location { get; }
 
 Whose store this is.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Store.sl:106](../../stdlib/Security/Cryptography/X509Certificates/X509Store.sl#L106)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Store.sl:119](../../stdlib/Security/Cryptography/X509Certificates/X509Store.sl#L119)</sub>
 
 #### Certificates *property*
 
@@ -2965,7 +2977,7 @@ X509Certificate2Collection Certificates { get; }
 
 Its certificates: a copy, which the caller MAY change.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Store.sl:109](../../stdlib/Security/Cryptography/X509Certificates/X509Store.sl#L109)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Store.sl:122](../../stdlib/Security/Cryptography/X509Certificates/X509Store.sl#L122)</sub>
 
 ### X509SubjectAlternativeNameExtension *class*
 

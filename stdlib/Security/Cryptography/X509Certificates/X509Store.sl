@@ -25,6 +25,7 @@ import Standard.Collections;
 import Standard.Env;
 import Standard.File;
 import Standard.Directory;
+import Standard.Security.Cryptography;
 
 /// The platform's certificates: .NET's `X509Store`, read-only.
 ///
@@ -37,7 +38,19 @@ import Standard.Directory;
 /// `Root` and `CA` for `CertificateAuthority` — which is loaded by name the
 /// first time a store is opened, so a program that never opens one does not
 /// link it. A certificate in the current user's or the machine's
-/// `Disallowed` store is left out of both. **Elsewhere** `Root` is the PEM bundle `SSL_CERT_FILE` names,
+/// `Disallowed` store is left out of both.
+///
+/// **On macOS** `Root` is Apple's TLS roots, from `/etc/ssl/cert.pem` as
+/// below, with the trust settings applied over them, read through
+/// Security.framework, which is linked: every certificate an
+/// administrator -- and for `CurrentUser`, the user -- has marked trusted is
+/// added, and every one either has marked to deny is left out. A setting
+/// limited to one policy is read as though it applied to all. The system's own
+/// trust settings are not read for its roots, because they also trust Apple's
+/// S/MIME and time-stamping roots, which the bundle leaves out. Nothing is
+/// applied when `SSL_CERT_FILE` or `SSL_CERT_DIR` is set.
+///
+/// **Elsewhere** `Root` is the PEM bundle `SSL_CERT_FILE` names,
 /// or else the first of the usual places that exists —
 /// `/etc/ssl/certs/ca-certificates.crt`, `/etc/pki/tls/certs/ca-bundle.crt`,
 /// `/etc/ssl/ca-bundle.pem`, `/etc/pki/tls/cacert.pem`, `/etc/ssl/cert.pem`
@@ -125,6 +138,17 @@ public sealed class X509Store
         crypt32.ReadSystemStore("Disallowed", true, disallowed);
         foreach (X509Certificate2 refused in disallowed)
             certificates.Remove(refused);
+#elif MACOS
+        if (name == StoreName.Root)
+        {
+            ReadCertificateBundles(certificates);
+
+            bool named = GetEnvironmentVariable("SSL_CERT_FILE") != null ||
+                         GetEnvironmentVariable("SSL_CERT_DIR") != null;
+            var settings = new TrustSettings();
+            if (!named && settings.Ready)
+                settings.Apply(location == StoreLocation.CurrentUser, certificates);
+        }
 #else
         if (name == StoreName.Root)
             ReadCertificateBundles(certificates);
@@ -285,6 +309,156 @@ internal threadsafe sealed class Crypt32
             context = _enumerate(store, context);
         }
         _close(store, 0u);
+    }
+}
+
+#endif
+
+#if MACOS
+
+// Every Mac has both, so they are linked rather than loaded by name; only a
+// program that compiles this module gets them.
+#pragma comment(framework, "Security")
+#pragma comment(framework, "CoreFoundation")
+
+extern "C"
+{
+    int SecTrustSettingsCopyCertificates(int domain, void** certificates);
+    int SecTrustSettingsCopyTrustSettings(void* certificate, int domain, void** settings);
+    void* SecCertificateCopyData(void* certificate);
+    long CFArrayGetCount(void* array);
+    void* CFArrayGetValueAtIndex(void* array, long index);
+    long CFDataGetLength(void* data);
+    byte* CFDataGetBytePtr(void* data);
+    void CFRelease(void* value);
+    void* CFDictionaryGetValue(void* dictionary, void* key);
+    byte CFNumberGetValue(void* number, long type, void* value);
+    void* CFStringCreateWithCString(void* allocator, byte* text, uint encoding);
+}
+
+/// `kSecTrustSettingsDomainUser` and `kSecTrustSettingsDomainAdmin`.
+internal const int TrustDomainUser = 0;
+internal const int TrustDomainAdmin = 1;
+
+/// `kSecTrustSettingsResult`'s values.
+internal const int TrustResultRoot = 1;
+internal const int TrustResultAsRoot = 2;
+internal const int TrustResultDeny = 3;
+internal const int TrustResultUnspecified = 4;
+
+/// `kCFNumberSInt32Type`.
+internal const long NumberSInt32 = 3;
+
+/// `kCFStringEncodingUTF8`.
+internal const uint StringEncodingUtf8 = 0x08000100u;
+
+/// The trust settings an administrator and a user have made, read through
+/// Security.framework.
+internal sealed class TrustSettings
+{
+    private void* _resultKey;
+
+    internal TrustSettings()
+    {
+        // The header's key is a macro, CFSTR("kSecTrustSettingsResult"), and
+        // not a symbol, so the string is made here; a dictionary compares
+        // keys by value.
+        _resultKey = CFStringCreateWithCString(
+            null, "kSecTrustSettingsResult".ToPointer(), StringEncodingUtf8);
+    }
+
+    ~TrustSettings()
+    {
+        if (_resultKey != null)
+            CFRelease(_resultKey);
+    }
+
+    /// Whether the key could be made, without which nothing can be read.
+    internal bool Ready => _resultKey != null;
+
+    /// What an administrator, and for the current user the user, has said:
+    /// a certificate either marked trusted is added to `certificates`, and
+    /// one either marked to deny is taken out of it.
+    internal void Apply(bool currentUser, X509Certificate2Collection certificates)
+    {
+        var denied = new X509Certificate2Collection();
+
+        ReadDomain(TrustDomainAdmin, certificates, denied);
+        if (currentUser)
+            ReadDomain(TrustDomainUser, certificates, denied);
+
+        foreach (X509Certificate2 refused in denied)
+            certificates.Remove(refused);
+    }
+
+    /// Every certificate one domain has settings for, sorted by what they say.
+    private void ReadDomain(int domain, X509Certificate2Collection trusted,
+                            X509Certificate2Collection denied)
+    {
+        void* list = null;
+        if (SecTrustSettingsCopyCertificates(domain, &list) != 0 || list == null)
+            return;
+
+        long count = CFArrayGetCount(list);
+        for (long i = 0; i < count; i++)
+        {
+            void* certificate = CFArrayGetValueAtIndex(list, i);
+            var parsed = Parse(certificate);
+            if (!parsed.Ok)
+                continue;
+
+            int result = Result(certificate, domain);
+            if (result == TrustResultRoot || result == TrustResultAsRoot)
+                trusted.Add(parsed.Value);
+            else if (result == TrustResultDeny)
+                denied.Add(parsed.Value);
+        }
+        CFRelease(list);
+    }
+
+    /// What one domain's settings say of a certificate. An empty list of
+    /// settings is trust as a root, and so is a setting with no result; a
+    /// deny anywhere in the list wins.
+    private int Result(void* certificate, int domain)
+    {
+        void* settings = null;
+        if (SecTrustSettingsCopyTrustSettings(certificate, domain, &settings) != 0 || settings == null)
+            return TrustResultUnspecified;
+
+        long count = CFArrayGetCount(settings);
+        int result = count == 0 ? TrustResultRoot : TrustResultUnspecified;
+        for (long i = 0; i < count; i++)
+        {
+            int said = TrustResultRoot;
+            void* value = CFDictionaryGetValue(CFArrayGetValueAtIndex(settings, i), _resultKey);
+            if (value != null)
+                CFNumberGetValue(value, NumberSInt32, (void*)&said);
+
+            if (said == TrustResultDeny)
+            {
+                result = TrustResultDeny;
+                break;
+            }
+            if (said == TrustResultRoot || said == TrustResultAsRoot)
+                result = said;
+        }
+        CFRelease(settings);
+        return result;
+    }
+
+    private static Result<X509Certificate2, CryptoError> Parse(void* certificate)
+    {
+        void* data = SecCertificateCopyData(certificate);
+        if (data == null)
+            return Fail(CryptoError.Encoding);
+
+        long length = CFDataGetLength(data);
+        byte* bytes = CFDataGetBytePtr(data);
+        var encoded = new byte[(nuint)length];
+        for (nuint i = 0u; i < encoded.Length; i++)
+            encoded[i] = bytes[i];
+        CFRelease(data);
+        return X509Certificate2.FromDer(encoded);
     }
 }
 
