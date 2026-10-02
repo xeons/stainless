@@ -37,15 +37,13 @@
 /// compressed format is a separate piece of work and saying so is better than
 /// half of it.
 ///
-/// **WASAPI on Windows, ALSA everywhere else, and neither is linked.** Both
-/// are reached by name the first time a device is opened, which is what lets
-/// this live in the standard library: a program that makes no sound pays
-/// nothing, and a machine with no ALSA answers `AudioError.NoBackend` -- a
-/// value to print, rather than a link error. `Audio.IsAvailable` asks before
-/// anything is tried.
-///
-/// **macOS has no backend yet.** Every call there answers
-/// `AudioError.NoBackend` and `Audio.IsAvailable` is false.
+/// **WASAPI on Windows, AudioToolbox on macOS and ALSA elsewhere.** WASAPI
+/// and ALSA are reached by name the first time a device is opened, which is
+/// what lets this live in the standard library: a program that makes no sound
+/// pays nothing, and a machine with no ALSA answers `AudioError.NoBackend` --
+/// a value to print, rather than a link error. Every Mac has AudioToolbox, so
+/// there it is linked, into the programs that compile this module.
+/// `Audio.IsAvailable` asks before anything is tried.
 ///
 /// **WASAPI rather than waveOut.** `winmm`'s `waveOut` is four calls and is
 /// still present on Windows 11, which makes it tempting and makes it the wrong
@@ -437,6 +435,410 @@ Result<IAudioClient, AudioError> OpenStream(Backend found, AudioFormat format, i
     return Ok(client);
 }
 
+#elif MACOS
+
+// Every Mac has AudioToolbox, so it is linked rather than loaded by name; only
+// a program that compiles this module gets it.
+#pragma comment(framework, "AudioToolbox")
+#pragma comment(framework, "CoreAudio")
+
+/// `kAudioFormatLinearPCM`, `'lpcm'`.
+const uint FormatLinearPcm = 0x6C70636Du;
+
+/// `kLinearPCMFormatFlagIsSignedInteger` and `kLinearPCMFormatFlagIsPacked`.
+const uint FlagSignedInteger = 4u;
+const uint FlagPacked = 8u;
+
+/// `kAudioObjectSystemObject`, and `kAudioObjectUnknown`: no device.
+const uint SystemObject = 1u;
+const uint UnknownObject = 0u;
+
+/// `kAudioHardwarePropertyDefaultOutputDevice` and `...DefaultInputDevice`,
+/// `'dOut'` and `'dIn '`; `kAudioObjectPropertyScopeGlobal`, `'glob'`.
+const uint DefaultOutputDevice = 0x644F7574u;
+const uint DefaultInputDevice = 0x64496E20u;
+const uint ScopeGlobal = 0x676C6F62u;
+
+/// `AudioObjectPropertyAddress`.
+struct PropertyAddress
+{
+    public uint Selector;
+    public uint Scope;
+    public uint Element;
+}
+
+/// Buffers in flight: one playing, one queued behind it, one being filled.
+const int QueueBuffers = 3;
+
+/// The code the player and the recorder take for a device someone else has.
+/// AudioQueue shares the device, so nothing here returns it.
+const int Busy = -16;
+
+/// `AudioStreamBasicDescription`.
+struct StreamDescription
+{
+    public double SampleRate;
+    public uint FormatId;
+    public uint FormatFlags;
+    public uint BytesPerPacket;
+    public uint FramesPerPacket;
+    public uint BytesPerFrame;
+    public uint ChannelsPerFrame;
+    public uint BitsPerChannel;
+    public uint Reserved;
+}
+
+/// `AudioQueueBuffer`. `UserData` points at the buffer's flag in its queue's
+/// state, which is all a callback touches.
+struct QueueBuffer
+{
+    public uint Capacity;
+    public byte* Data;
+    public uint Size;
+    public void* UserData;
+    public uint PacketDescriptionCapacity;
+    public void* PacketDescriptions;
+    public uint PacketDescriptionCount;
+}
+
+/// One open queue. Each flag is 1 while AudioQueue has handed its buffer back
+/// -- played, so free to fill; or recorded, so holding sound -- and 0 while
+/// the queue has it. A callback stores 1 and nothing else, from AudioQueue's
+/// own thread; everything else happens on the thread that opened the queue.
+struct QueueState
+{
+    public void* Queue;
+    public bool Started;
+    public uint FrameSize;
+    public uint BufferBytes;
+    public int Next;
+    public uint ReadAt;
+    public QueueBuffer* First;
+    public QueueBuffer* Second;
+    public QueueBuffer* Third;
+    public int FirstBack;
+    public int SecondBack;
+    public int ThirdBack;
+}
+
+delegate void QueueOutputFn(void* user, void* queue, QueueBuffer* buffer);
+delegate void QueueInputFn(void* user, void* queue, QueueBuffer* buffer, void* start,
+                           uint packets, void* descriptions);
+
+extern "C"
+{
+    int AudioQueueNewOutput(StreamDescription* format, QueueOutputFn callback, void* user,
+                            void* runLoop, void* mode, uint flags, void** queue);
+    int AudioQueueNewInput(StreamDescription* format, QueueInputFn callback, void* user,
+                           void* runLoop, void* mode, uint flags, void** queue);
+    int AudioQueueAllocateBuffer(void* queue, uint capacity, QueueBuffer** buffer);
+    int AudioQueueEnqueueBuffer(void* queue, QueueBuffer* buffer, uint descriptions, void* list);
+    int AudioQueueStart(void* queue, void* when);
+    int AudioQueueStop(void* queue, byte immediate);
+    int AudioQueueDispose(void* queue, byte immediate);
+    int AudioObjectGetPropertyData(uint id, PropertyAddress* address, uint qualifierSize,
+                                   void* qualifier, uint* size, void* data);
+
+    int sl_atomic_load32(int* cell);
+    void sl_atomic_store32(int* cell, int value);
+    byte* calloc(nuint count, nuint size);
+    void free(byte* block);
+}
+
+/// A played buffer, handed back. Called on AudioQueue's thread.
+void MarkBufferPlayed(void* user, void* queue, QueueBuffer* buffer) =>
+    sl_atomic_store32((int*)(*buffer).UserData, 1);
+
+/// A recorded buffer, handed back full. Called on AudioQueue's thread.
+void MarkBufferRecorded(void* user, void* queue, QueueBuffer* buffer, void* start,
+                        uint packets, void* descriptions) =>
+    sl_atomic_store32((int*)(*buffer).UserData, 1);
+
+/// Whether the system has a default device of this kind. A Mac mini has no
+/// input until one is plugged in.
+bool HasDefaultDevice(uint selector)
+{
+    PropertyAddress address;
+    address.Selector = selector;
+    address.Scope = ScopeGlobal;
+    address.Element = 0u;
+    uint device = UnknownObject;
+    uint size = (uint)sizeof(uint);
+    int status = AudioObjectGetPropertyData(SystemObject, &address, 0u, null, &size, (void*)&device);
+    return status == 0 && device != UnknownObject;
+}
+
+QueueBuffer* QueueBufferAt(QueueState* state, int index) => index switch
+{
+    0 => (*state).First,
+    1 => (*state).Second,
+    _ => (*state).Third,
+};
+
+int* QueueFlagAt(QueueState* state, int index) => index switch
+{
+    0 => &(*state).FirstBack,
+    1 => &(*state).SecondBack,
+    _ => &(*state).ThirdBack,
+};
+
+/// AudioQueue, behind the calls the ALSA backend answers, so the player and the
+/// recorder are the same code on both. A write blocks until a buffer is free
+/// and a read until one is full, each polling as the Windows path does.
+threadsafe sealed class Backend
+{
+    /// Linked, so always there.
+    public bool Ready;
+
+    public Backend()
+    {
+        Ready = true;
+    }
+
+    public bool CanPlay => HasDefaultDevice(DefaultOutputDevice);
+
+    public bool CanRecord => HasDefaultDevice(DefaultInputDevice);
+
+    /// A queue for this format, its buffers allocated; a recording queue's
+    /// are handed to it at once, so sound starts filling them on `Start`.
+    public int Open(void** pcm, AudioFormat format, bool capture)
+    {
+        StreamDescription described;
+        described.SampleRate = (double)format.SampleRate;
+        described.FormatId = FormatLinearPcm;
+        described.FormatFlags = FlagPacked | (format.BitsPerSample == 16u ? FlagSignedInteger : 0u);
+        described.BytesPerPacket = (uint)format.BytesPerFrame;
+        described.FramesPerPacket = 1u;
+        described.BytesPerFrame = (uint)format.BytesPerFrame;
+        described.ChannelsPerFrame = (uint)format.Channels;
+        described.BitsPerChannel = (uint)format.BitsPerSample;
+        described.Reserved = 0u;
+
+        var state = (QueueState*)calloc(1u, sizeof(QueueState));
+        if (state == null)
+            return -1;
+
+        int status = capture
+            ? AudioQueueNewInput(&described, MarkBufferRecorded, null, null, null, 0u, &(*state).Queue)
+            : AudioQueueNewOutput(&described, MarkBufferPlayed, null, null, null, 0u, &(*state).Queue);
+        if (status != 0)
+        {
+            free((byte*)state);
+            return -1;
+        }
+
+        nuint frame = format.BytesPerFrame;
+        nuint bytes = (nuint)format.BytesPerSecond * (nuint)BufferMilliseconds / 1000u / (nuint)QueueBuffers;
+        (*state).FrameSize = (uint)frame;
+        (*state).BufferBytes = (uint)(bytes - bytes % frame);
+
+        for (int i = 0; i < QueueBuffers; i++)
+        {
+            QueueBuffer* buffer = null;
+            if (AudioQueueAllocateBuffer((*state).Queue, (*state).BufferBytes, &buffer) != 0)
+            {
+                AudioQueueDispose((*state).Queue, 1);
+                free((byte*)state);
+                return -1;
+            }
+
+            (*buffer).UserData = (void*)QueueFlagAt(state, i);
+            switch (i)
+            {
+                case 0:
+                    (*state).First = buffer;
+                    break;
+                case 1:
+                    (*state).Second = buffer;
+                    break;
+                default:
+                    (*state).Third = buffer;
+                    break;
+            }
+
+            *QueueFlagAt(state, i) = capture ? 0 : 1;
+            if (capture)
+                AudioQueueEnqueueBuffer((*state).Queue, buffer, 0u, null);
+        }
+
+        *pcm = (void*)state;
+        return 0;
+    }
+
+    /// Frames played, blocking until a buffer is free for each piece; the
+    /// queue starts once all three are full, so it never starts on a gap.
+    public nint WriteFrames(void* pcm, byte* samples, nuint frames)
+    {
+        var state = (QueueState*)pcm;
+        nuint total = frames * (nuint)(*state).FrameSize;
+        nuint done = 0u;
+
+        while (done < total)
+        {
+            int index = (*state).Next;
+            int* back = QueueFlagAt(state, index);
+            if (sl_atomic_load32(back) == 0)
+            {
+                if (!(*state).Started)
+                {
+                    if (AudioQueueStart((*state).Queue, null) != 0)
+                        return -1;
+                    (*state).Started = true;
+                }
+                sl_thread_sleep(PollMilliseconds);
+                continue;
+            }
+
+            QueueBuffer* buffer = QueueBufferAt(state, index);
+            nuint take = total - done;
+            if (take > (nuint)(*state).BufferBytes)
+                take = (nuint)(*state).BufferBytes;
+
+            memcpy((*buffer).Data, samples + done, take);
+            (*buffer).Size = (uint)take;
+            sl_atomic_store32(back, 0);
+            if (AudioQueueEnqueueBuffer((*state).Queue, buffer, 0u, null) != 0)
+            {
+                sl_atomic_store32(back, 1);
+                return -1;
+            }
+
+            (*state).Next = (index + 1) % QueueBuffers;
+            done += take;
+        }
+
+        return (nint)frames;
+    }
+
+    /// Frames of what was heard, blocking until a buffer holds some; none once
+    /// the queue has been stopped and every buffer read.
+    public nint ReadFrames(void* pcm, byte* samples, nuint frames)
+    {
+        var state = (QueueState*)pcm;
+        nuint frame = (nuint)(*state).FrameSize;
+
+        while (true)
+        {
+            int index = (*state).Next;
+            int* back = QueueFlagAt(state, index);
+            if (sl_atomic_load32(back) == 0)
+            {
+                if (!(*state).Started)
+                    return 0;
+                sl_thread_sleep(PollMilliseconds);
+                continue;
+            }
+
+            QueueBuffer* buffer = QueueBufferAt(state, index);
+            nuint left = (nuint)(*buffer).Size - (nuint)(*state).ReadAt;
+            nuint take = frames * frame;
+            if (take > left)
+                take = left - left % frame;
+
+            if (take > 0u)
+                memcpy(samples, (*buffer).Data + (nuint)(*state).ReadAt, take);
+            (*state).ReadAt += (uint)take;
+
+            // Read to its end: given back to the queue to fill again.
+            if ((nuint)(*state).ReadAt + frame > (nuint)(*buffer).Size)
+            {
+                (*state).ReadAt = 0u;
+                (*buffer).Size = 0u;
+                sl_atomic_store32(back, 0);
+                AudioQueueEnqueueBuffer((*state).Queue, buffer, 0u, null);
+                (*state).Next = (index + 1) % QueueBuffers;
+            }
+
+            if (take > 0u)
+                return (nint)(take / frame);
+        }
+    }
+
+    /// Returns once every buffer written has been played.
+    public int Drain(void* pcm)
+    {
+        var state = (QueueState*)pcm;
+        bool waiting = false;
+        for (int i = 0; i < QueueBuffers; i++)
+            if (sl_atomic_load32(QueueFlagAt(state, i)) == 0)
+                waiting = true;
+        if (!waiting)
+            return 0;
+
+        if (!(*state).Started)
+        {
+            if (AudioQueueStart((*state).Queue, null) != 0)
+                return -1;
+            (*state).Started = true;
+        }
+
+        for (int i = 0; i < QueueBuffers; i++)
+            while (sl_atomic_load32(QueueFlagAt(state, i)) == 0)
+                sl_thread_sleep(PollMilliseconds);
+
+        AudioQueueStop((*state).Queue, 1);
+        (*state).Started = false;
+        return 0;
+    }
+
+    /// Stops at once. Every buffer is AudioQueue's no longer, so a player's
+    /// are free and a recorder's are given back by `Prepare`.
+    public int Drop(void* pcm)
+    {
+        var state = (QueueState*)pcm;
+        AudioQueueStop((*state).Queue, 1);
+        (*state).Started = false;
+        for (int i = 0; i < QueueBuffers; i++)
+            sl_atomic_store32(QueueFlagAt(state, i), 1);
+        (*state).Next = 0;
+        (*state).ReadAt = 0u;
+        return 0;
+    }
+
+    /// Hands a recorder's buffers back to its queue, so `Start` has somewhere
+    /// to put sound. A player's need nothing.
+    public int Prepare(void* pcm)
+    {
+        var state = (QueueState*)pcm;
+        for (int i = 0; i < QueueBuffers; i++)
+        {
+            int* back = QueueFlagAt(state, i);
+            if (sl_atomic_load32(back) == 0)
+                continue;
+
+            QueueBuffer* buffer = QueueBufferAt(state, i);
+            (*buffer).Size = 0u;
+            sl_atomic_store32(back, 0);
+            AudioQueueEnqueueBuffer((*state).Queue, buffer, 0u, null);
+        }
+        (*state).Next = 0;
+        (*state).ReadAt = 0u;
+        return 0;
+    }
+
+    public int Start(void* pcm)
+    {
+        var state = (QueueState*)pcm;
+        if (AudioQueueStart((*state).Queue, null) != 0)
+            return -1;
+        (*state).Started = true;
+        return 0;
+    }
+
+    /// Disposed at once, which waits for any callback in progress, so the
+    /// state it writes into can go.
+    public int Close(void* pcm)
+    {
+        var state = (QueueState*)pcm;
+        AudioQueueDispose((*state).Queue, 1);
+        free((byte*)state);
+        return 0;
+    }
+
+    /// Nothing AudioQueue reports can be recovered from by asking again.
+    public int Recover(void* pcm, int error) => -1;
+}
+
 #else
 
 /// `SND_PCM_STREAM_PLAYBACK`.
@@ -455,12 +857,8 @@ const int FormatSigned16 = 2;
 /// by side, which is the layout `AudioClip` already holds.
 const int AccessInterleaved = 3;
 
-/// `RTLD_LAZY | RTLD_LOCAL`. Darwin spells `RTLD_LOCAL` as 4; glibc's is 0.
-#if MACOS
-const int RtldLazyLocal = 0x00005;
-#else
+/// `RTLD_LAZY | RTLD_LOCAL`.
 const int RtldLazyLocal = 0x00001;
-#endif
 
 /// `-EBUSY`: something else has the device.
 const int Busy = -16;
@@ -499,9 +897,6 @@ threadsafe sealed class Backend
     {
         Ready = false;
 
-#if MACOS
-        // macOS has no ALSA, and its own audio is not bound yet.
-#else
         // The versioned name first: a machine with the runtime package has
         // `libasound.so.2`, and only one with the development package has the
         // unversioned link -- and it is the runtime a program needs.
@@ -525,7 +920,6 @@ threadsafe sealed class Backend
         _recover = (PcmRecoverFn)FindSymbol(alsa, "snd_pcm_recover", &complete);
 
         Ready = complete;
-#endif
     }
 
     void* FindSymbol(void* library, String name, bool* complete)
@@ -653,6 +1047,8 @@ public String BackendName()
         return "";
 #if WINDOWS
     return "WASAPI";
+#elif MACOS
+    return "AudioToolbox";
 #else
     return "ALSA";
 #endif

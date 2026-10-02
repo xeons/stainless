@@ -805,10 +805,12 @@ last person to edit it -- the suite is the authority.
   unless set; not authentication beyond Basic to a proxy; and no timeout on
   name resolution
 - `Standard.Media.Audio`: playing and recording interleaved PCM, and reading and
-  writing WAV. WASAPI on Windows and ALSA elsewhere, both reached by name at the
+  writing WAV. WASAPI on Windows and ALSA on Linux, both reached by name at the
   first device rather than linked, so a machine with neither answers
-  `AudioError.NoBackend`. The Windows half has played and recorded; the ALSA
-  half has compiled and never opened a device
+  `AudioError.NoBackend`; AudioToolbox on macOS, linked, since every Mac has
+  it. The Windows half has played and recorded and the macOS half has played,
+  its recording untried on a Mac with no input; the ALSA half has compiled and
+  never opened a device
 - `Standard.Json` and `Standard.Xml`: each in two layers. A document that needs
   no type -- `Json.Parse` gives a `JsonValue`, a variant that is exactly one of
   the six things JSON has, and `Xml.Parse` gives an `XmlNode` -- and a mapping

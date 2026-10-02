@@ -1118,11 +1118,12 @@ or two. That is what every platform agrees about and what a WAV file holds.
 `AudioPlayer` and `AudioRecorder` are the streaming halves, `Wav` is the
 container, and `Tone` makes a sound to check a device with.
 
-**WASAPI on Windows, ALSA everywhere else, and neither is linked.** Both are
-reached by name the first time a device is opened, exactly as `Standard.Drawing`
-reaches GDI+ and libgd — so a program that makes no sound pays nothing, and a
+**WASAPI on Windows, AudioToolbox on macOS, ALSA everywhere else.** WASAPI and
+ALSA are not linked: both are reached by name the first time a device is
+opened, exactly as `Standard.Drawing` reaches GDI+ and libgd — so a program that makes no sound pays nothing, and a
 machine with no audio library answers `AudioError.NoBackend`, which is a value
-to print rather than a link error.
+to print rather than a link error. AudioToolbox is linked, because every Mac
+has it, and only a program that compiles this module links it.
 
 WASAPI rather than `winmm`'s `waveOut`: the latter still exists on Windows 11
 and has been an emulation on top of WASAPI since Vista, so it adds a buffer of
