@@ -22,11 +22,14 @@ dotnet test tests/Stainless.UnitTests           # the compiler's unit tests
 
 `--shard=1/2` and `--shard=2/2` run alternate halves of the end-to-end cases,
 and `--shard=i/n` every nth case from the ith, for a caller whose command has
-to finish inside a fixed time.
+to finish inside a fixed time. `--target=x64-macos` builds every case that has
+no `target.txt` of its own for that target, and skips one the host cannot run;
+on Apple silicon with Rosetta it is the whole suite as Intel code.
 
 [.github/workflows/ci.yml](../.github/workflows/ci.yml) runs both suites on
-Linux and Windows for every push and pull request to `master`, the end-to-end
-one in those two shards. How a build is numbered, published and released is
+Linux, Windows and macOS for every push and pull request to `master`, the
+end-to-end one in those two shards, and the end-to-end suite once more as
+`x64-macos` under Rosetta. How a build is numbered, published and released is
 [Releasing](releasing.md).
 
 The two suites ask different questions. An end-to-end case compiles, links and

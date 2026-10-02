@@ -1,0 +1,54 @@
+# One line per rule, each the one clang writes for shapes.c with
+# --target=x86_64-apple-macosx13.0. clang adds noundef, alignments and
+# dead_on_unwind, which say nothing about where a value travels.
+
+# An Intel Mac is System V: the structs travel as on x64 Linux.
+# clang: i32 @sum_tri(i64, i32), float @sum_trio(<2 x float>, float),
+#        double @sum_quad(ptr byval(%struct.Quad) align 8), i32 @sum_small(i24)
+declare i32 @sum_tri(i64, i32)
+declare float @sum_trio(<2 x float>, float)
+declare double @sum_quad(ptr byval(%struct.X64MacProbe_Quad))
+declare i64 @sum_big(ptr byval(%struct.X64MacProbe_Big))
+declare i64 @count_twins(ptr, ptr)
+declare i32 @sum_small(i24)
+declare i24 @make_small()
+declare { i64, i32 } @make_tri()
+declare { <2 x float>, float } @make_trio()
+declare void @make_big(ptr sret(%struct.X64MacProbe_Big))
+declare { ptr, ptr } @make_twins()
+
+# A narrow integer is widened by whoever produces it, as on x64 Linux.
+# clang: signext i8 @take_sbyte(i8 noundef signext), and so on
+declare signext i8 @take_sbyte(i8 signext)
+declare zeroext i8 @take_byte(i8 zeroext)
+declare signext i16 @take_short(i16 signext)
+declare zeroext i16 @take_ushort(i16 zeroext)
+declare zeroext i1 @take_bool(i1 zeroext)
+declare signext i8 @take_char(i8 signext)
+declare zeroext i16 @take_char16(i16 zeroext)
+declare i32 @take_int(i32)
+call signext i8 @take_sbyte(i8 signext -1)
+define signext i16 @widen_byte(i8 zeroext %arg.v)
+define zeroext i1 @is_negative(i8 signext %arg.v)
+define internal zeroext i16 @_SL11X64MacProbe5twiceaEt(i8 signext %arg.v)
+
+# An empty struct takes no register and comes back as nothing.
+declare i32 @skip_empty(i32, i32)
+declare void @make_empty()
+define i32 @between(i32 %arg.a, i32 %arg.b)
+call i32 @skip_empty(i32 1, i32 2)
+
+# Variadic: the structs travel as if named, the empty one not at all.
+# clang: call i32 (ptr, ...) @report(ptr noundef nonnull @.str, <2 x float> undef,
+#        float undef, i24 undef, ptr noundef nonnull byval(%struct.Big) align 8 %3,
+#        i32 noundef 99, double noundef 1.5, i32 noundef 1, i32 noundef -5, i32 noundef 0)
+declare i32 @report(ptr, ...)
+call i32 (ptr, ...) @report(ptr @.bytes.
+float %
+i24 %
+ptr byval(%struct.X64MacProbe_Big) %arg.copy.
+
+# What differs from Linux: every function keeps its frame pointer, as
+# clang's do for this triple at every optimisation level.
+# clang: attributes #0 = { ... "frame-pointer"="all" ... }
+attributes #0 = { "frame-pointer"="all" }

@@ -1,0 +1,3 @@
+# Built to a Mach-O x86-64 object file and not run. Windows clang assembles
+# Darwin IR with no SDK, so this runs everywhere; what it proves is that LLVM
+# verifies the module and lowers every call for an Intel Mac.

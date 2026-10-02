@@ -50,9 +50,14 @@ namespace Stainless.Tests;
 /// compiler and the runtime agree about how wide a pointer is. A host that
 /// cannot run what it built skips the case and says why: any target for
 /// another system, x86 on macOS, which has no 32-bit target, and x64 on
-/// Apple silicon. Windows and Linux both run x86 binaries on x86-64. A
+/// Apple silicon without Rosetta. Windows and Linux both run x86 binaries on
+/// x86-64. A
 /// target.txt case that stops at a diagnostic or at an object file runs
 /// everywhere. CaseSelection holds the rule.
+///
+/// `--target=x64-macos`, say, builds every case without a target.txt for that
+/// target rather than the host's, and skips it where the host cannot run the
+/// result. It is how the whole suite is run as Intel code under Rosetta.
 ///
 /// A case containing assemble.txt is compiled to IR and then to an object file
 /// for its target, and is never run. That is for a target no machine here can
@@ -163,6 +168,17 @@ internal static class Program
         bool verbose = args.Contains("-v") || args.Contains("--verbose");
         s_leakCheck = args.Contains("--leak-check");
 
+        if (args.FirstOrDefault(a => a.StartsWith("--target=", StringComparison.Ordinal)) is { } targetArgument)
+        {
+            string named = targetArgument["--target=".Length..];
+            s_defaultTarget = Binding.TargetPlatform.Parse(named);
+            if (s_defaultTarget is null)
+            {
+                Console.Error.WriteLine($"error: '{named}' is not a target; one of {Binding.TargetPlatform.Names}");
+                return 2;
+            }
+        }
+
         var cases = Directory.EnumerateDirectories(root)
             .Where(d => filter is null ||
                         Path.GetFileName(d).Contains(filter, StringComparison.OrdinalIgnoreCase))
@@ -203,7 +219,8 @@ internal static class Program
         {
             string name = Path.GetFileName(directory);
 
-            if (CaseSelection.FindSkipReason(directory, Binding.TargetPlatform.Host) is { } reason)
+            if (CaseSelection.FindSkipReason(
+                    directory, Binding.TargetPlatform.Host, s_defaultTarget, CaseSelection.HasRosetta) is { } reason)
             {
                 skipped++;
                 Console.WriteLine($"  \u001b[33mskip\u001b[0m  {name}  ({reason})");
@@ -274,6 +291,9 @@ internal static class Program
     /// case that may not answer zero says so with a leaks.txt of its own.
     /// </summary>
     private static bool s_leakCheck;
+
+    /// <summary>What a case without a target.txt is built for: null is the host.</summary>
+    private static Binding.TargetPlatform? s_defaultTarget;
 
     /// <summary>
     /// The calls to sl_retain and sl_release every report counted, summed, which
@@ -389,7 +409,7 @@ internal static class Program
             : null;
 
         string targetPath = Path.Combine(directory, "target.txt");
-        Binding.TargetPlatform? target = null;
+        Binding.TargetPlatform? target = s_defaultTarget;
 
         if (File.Exists(targetPath))
         {
@@ -431,6 +451,7 @@ internal static class Program
                 SourcePaths = librarySources,
                 OutputPath = libraryOutput,
                 IntermediateDirectory = Path.Combine(caseWork, "obj-library"),
+                Target = target,
                 OptimizationLevel = 1,
                 Shared = true,
 
@@ -596,7 +617,8 @@ internal static class Program
         string executable = result.OutputPath!;
         if (shared)
         {
-            var built = BuildConsumer(caseWork, name, result.OutputPath!, natives);
+            var built = BuildConsumer(
+                caseWork, name, result.OutputPath!, natives, target ?? Binding.TargetPlatform.Host);
             if (built.Error is not null) return (false, built.Error);
             executable = built.Path!;
         }
@@ -644,7 +666,8 @@ internal static class Program
     /// import library on the link line.
     /// </summary>
     private static (string? Path, string? Error) BuildConsumer(
-        string caseWork, string name, string libraryPath, IReadOnlyList<string> natives)
+        string caseWork, string name, string libraryPath, IReadOnlyList<string> natives,
+        Binding.TargetPlatform target)
     {
         if (natives.Count == 0)
             return (null, "a shared case needs a .c consumer to exercise the library");
@@ -654,7 +677,8 @@ internal static class Program
 
         string consumer = Path.Combine(
             caseWork, name + "-consumer" + Toolchain.ExecutableExtension);
-        List<string> arguments = [.. natives, "-I", caseWork];
+        List<string> arguments =
+            [.. Toolchain.TargetArgumentsFor(target, Binding.TargetPlatform.Host), .. natives, "-I", caseWork];
 
         // On Windows the linker wants the import library beside the DLL.
         string importLibrary = Path.ChangeExtension(libraryPath, ".lib");

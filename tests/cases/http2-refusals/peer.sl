@@ -259,6 +259,11 @@ public String RunHttp2RefusalScenario(String scenario)
         else
             error = body.Error;
     }
+    // The late DATA arrives after the response is complete, on the
+    // connection's reader thread. A client disposed before that thread reads
+    // it says NO_ERROR, which is also correct, so it is given time to.
+    if (scenario == "DATA on a stream already ended")
+        Sleep(300u);
     if (error != HttpError.None)
     {
         outcome = $"{error}";

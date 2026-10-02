@@ -89,6 +89,31 @@ public class HarnessTests
     }
 
     [Fact]
+    public void RosettaRunsIntelOnAppleSiliconAndNothingElse()
+    {
+        Assert.True(CaseSelection.CanRun(TargetPlatform.Arm64MacOS, TargetPlatform.X64MacOS, rosetta: true));
+        Assert.False(CaseSelection.CanRun(TargetPlatform.Arm64MacOS, TargetPlatform.X64Linux, rosetta: true));
+        Assert.False(CaseSelection.CanRun(TargetPlatform.X64MacOS, TargetPlatform.Arm64MacOS, rosetta: true));
+        Assert.False(CaseSelection.CanRun(TargetPlatform.Arm64Linux, TargetPlatform.X64Linux, rosetta: true));
+    }
+
+    [Fact]
+    public void ADefaultTargetDecidesACaseWithoutItsOwn()
+    {
+        Assert.Null(CaseSelection.FindSkipReason(Case("hello"), TargetPlatform.Arm64MacOS));
+        Assert.Equal("x64-macos cannot run on arm64-macos",
+                     CaseSelection.FindSkipReason(Case("hello"), TargetPlatform.Arm64MacOS, TargetPlatform.X64MacOS));
+        Assert.Null(CaseSelection.FindSkipReason(
+            Case("hello"), TargetPlatform.Arm64MacOS, TargetPlatform.X64MacOS, rosetta: true));
+
+        // A case's own target.txt still wins.
+        Assert.Null(CaseSelection.FindSkipReason(
+            Case("arm64-abi-macos"), TargetPlatform.Arm64MacOS, TargetPlatform.X64MacOS));
+        Assert.Equal("no x86 target on macos", CaseSelection.FindSkipReason(
+            Case("x86-abi"), TargetPlatform.Arm64MacOS, TargetPlatform.X64MacOS, rosetta: true));
+    }
+
+    [Fact]
     public void ARunCaseForAnotherSystemIsSkipped()
     {
         string directory = Directory.CreateTempSubdirectory("stainless-harness-").FullName;

@@ -55,7 +55,9 @@ Each publishes the compiler single-file, self-contained and ReadyToRun into
 `artifacts/<rid>/publish`, then runs it: `--version` MUST answer the version
 Version.proj computed, and `samples/hello.sl` MUST build in an empty directory
 and print its line. Then it packages. A runtime identifier for another machine
-is published and packaged untested, with a warning.
+is published and packaged untested, with a warning; the exception is
+`osx-x64` on Apple silicon with Rosetta installed, which is smoke-tested under
+translation like a native one.
 
 **The binary needs no .NET install**, and is about 90 MB. ReadyToRun is most of
 that, and is what makes a compile start warm: `emit-ir` of the IDE takes
@@ -87,12 +89,20 @@ Only tracked files go in, so a publish needs a git checkout.
 **The IDE is built during the publish**, by the compiler just published, and
 must pass `--selftest` before it is packaged; on Linux the self test runs
 under `xvfb-run` when there is no display. It finds the compiler beside
-itself. A publish for another machine, or for macOS, whose debugger target
-does not exist yet, ships without it and says so.
+itself. A publish for another machine ships without it and says so, and so
+does one for macOS: the IDE builds there, but its self test does not pass
+under GTK's Quartz backend.
 
-**Only x64 is published.** The compiler targets ARM64, and macOS arm64 runs its
-whole suite on the Mac mini, but no CI runner runs those cases yet. Either is a
-matrix entry in the release workflow once one does.
+**Four runtimes are published**: `win-x64`, `linux-x64`, `osx-arm64` and
+`osx-x64`. Both Mac archives are built on an Apple silicon runner, the Intel
+one smoke-tested under Rosetta. ARM64 Windows and Linux are targets the
+compiler builds for, but no runner runs those cases yet; either is a matrix
+entry once one does.
+
+**A Mac binary is signed ad hoc**, which the .NET SDK does as it publishes,
+and is not notarized. An archive downloaded through a browser is quarantined,
+and INSTALL.txt says how to clear that. Notarizing needs an Apple developer
+identity, which the project does not have.
 
 ## Cutting a release
 
@@ -115,8 +125,9 @@ A tag whose major and minor disagree with `VersionPrefix`, or that sits on a
 commit building as a different number, fails before anything is built, and
 says which.
 
-The workflow then runs [ci.yml](../.github/workflows/ci.yml) in full — both
-suites, on Linux and Windows — as its gate. It publishes each runtime on its
+The workflow then runs [ci.yml](../.github/workflows/ci.yml) in full -- both
+suites, on Linux, Windows and macOS, and the suite again as Intel code under
+Rosetta -- as its gate. It publishes each runtime on its
 own platform, and creates the GitHub release: `Stainless <version>`, notes
 generated from the commits and pull requests since the last one, and the
 archives with a `SHA256SUMS` beside them.

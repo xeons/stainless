@@ -77,7 +77,17 @@ dotnet publish "$repository/src/Stainless.Cli/Stainless.Cli.csproj" \
 
 # ---- smoke test
 
-if [ "$runtime" != "$native" ]; then
+# Whether this machine runs what was published: its own rid, or an Intel Mac's
+# on Apple silicon with Rosetta installed.
+runnable=0
+if [ "$runtime" = "$native" ]; then
+    runnable=1
+elif [ "$runtime:$native" = "osx-x64:osx-arm64" ] &&
+     [ -f /Library/Apple/usr/libexec/oah/libRosettaRuntime ]; then
+    runnable=1
+fi
+
+if [ "$runnable" = 0 ]; then
     echo "warning: $runtime is not this machine, so the binary is packaged untested" >&2
 else
     said="$("$compiler" --version)"
@@ -105,12 +115,13 @@ fi
 
 # Built by the published compiler, which is a harder test of it than hello.sl,
 # and shipped beside it: the IDE looks for `stainless` next to itself first.
-# Its debugger is written for Windows and Linux, so macOS ships without it.
+# On macOS it builds, but its self test does not pass under GTK's Quartz
+# backend, so macOS ships without it.
 ide="$publish/stainless-ide"
 if [ "$runtime" != "$native" ]; then
     echo "warning: $runtime is not this machine, so the archive carries no IDE" >&2
 elif [ "$system" = osx ]; then
-    echo "warning: the IDE does not build for macOS yet, so the archive carries none" >&2
+    echo "warning: the IDE's self test does not pass on macOS yet, so the archive carries none" >&2
 else
     echo "building the IDE with the published compiler"
     "$compiler" build --project "$repository/ide" -o "$ide"

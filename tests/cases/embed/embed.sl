@@ -43,6 +43,8 @@ public static class Blobs
     /// segment, and only __TEXT is executable.
 #if ARM64 && MACOS
     [Embed("stub-arm64.bin", Section = "__TEXT,__stub", Access = "rx")]
+#elif MACOS
+    [Embed("stub.bin", Section = "__TEXT,__stub", Access = "rx")]
 #elif ARM64
     [Embed("stub-arm64.bin", Section = ".stub", Access = "rx")]
 #else

@@ -73,18 +73,9 @@ done
 programs+=("ide|1|$repository/ide")
 programs+=("sldb|0|$repository/debug")
 
-# Why a program is not built on this system, or nothing when it is.
-find_skip_reason() {
-    case "$system:$1" in
-        Darwin:ide | Darwin:sldb) echo "Linux only: bindings/linux" ;;
-    esac
-}
-
 if [ "$list" = 1 ]; then
     for entry in "${programs[@]}"; do
-        name="${entry%%|*}"
-        reason="$(find_skip_reason "$name")"
-        printf '  %-34s %s\n' "$name" "${reason:-is built}"
+        printf '  %s\n' "${entry%%|*}"
     done
     exit 0
 fi
@@ -106,12 +97,6 @@ for entry in "${programs[@]}"; do
     sources="${rest#*|}"
 
     case "$name" in *"$filter"*) ;; *) continue ;; esac
-
-    reason="$(find_skip_reason "$name")"
-    if [ -n "$reason" ]; then
-        printf '  %-34s skipped: %s\n' "$name" "$reason"
-        continue
-    fi
 
     executable="$work/$(echo "$name" | tr '/' '-')"
     rm -f "$executable"

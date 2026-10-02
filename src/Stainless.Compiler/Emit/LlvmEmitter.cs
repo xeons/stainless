@@ -417,14 +417,17 @@ public sealed partial class LlvmEmitter(
     /// Stainless binary built for debugging, which is worth having on its own.
     /// </para>
     /// <para>
-    /// Apple's arm64 ABI is the exception: x29 MUST always address a frame
-    /// record, and clang emits <c>"non-leaf"</c> for that target at every
-    /// level. A leaf function's caller has the record, so the stack still walks.
+    /// Apple is the exception. Its arm64 ABI says x29 MUST always address a
+    /// frame record, and clang emits <c>"non-leaf"</c> for that target at every
+    /// level; a leaf function's caller has the record, so the stack still
+    /// walks. On x86-64 clang keeps every frame pointer, at every level, and
+    /// so does this: Apple's tools walk the stack by them.
     /// </para>
     /// </remarks>
     private string? FramePointer =>
         debug is not null ? "all"
-        : TargetPlatform.Current is { IsDarwin: true, Architecture: TargetArch.Arm64 } ? "non-leaf"
+        : TargetPlatform.Current is { IsDarwin: true } darwin
+            ? darwin.Architecture == TargetArch.Arm64 ? "non-leaf" : "all"
         : null;
 
     /// <summary>

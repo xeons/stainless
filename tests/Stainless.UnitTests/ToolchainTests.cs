@@ -91,6 +91,21 @@ public class ToolchainTests
     }
 
     [Fact]
+    public void AMacSearchesHomebrewForANamedLibrary()
+    {
+        var brewed = Toolchain.FromClang("clang-that-is-never-run", "/opt/homebrew/lib");
+        IReadOnlyList<string> Link(TargetPlatform target, IReadOnlyList<string> libraries) =>
+            Under(target, () => brewed.LinkArguments("app.ll", ["arc.o"], [], "app", 0, libraries: libraries));
+
+        var arguments = Link(TargetPlatform.Arm64MacOS, ["gtk-3"]).ToList();
+        int search = arguments.IndexOf("-L/opt/homebrew/lib");
+        Assert.InRange(search, 0, arguments.IndexOf("-lgtk-3") - 1);
+        Assert.DoesNotContain("-L/opt/homebrew/lib", Link(TargetPlatform.Arm64MacOS, []));
+        Assert.DoesNotContain("-L/opt/homebrew/lib", Link(TargetPlatform.X64Linux, ["gtk-3"]));
+        Assert.DoesNotContain(LinkFor(TargetPlatform.Arm64MacOS), a => a.StartsWith("-L", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void AMacLibraryIsADylibNamedThroughTheRpath()
     {
         var runtime = new SharedRuntime("libstainless-rt.dylib", "libstainless-rt.dylib");

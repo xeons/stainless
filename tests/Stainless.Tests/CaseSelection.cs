@@ -34,8 +34,14 @@ internal static class CaseSelection
         _ => throw new ArgumentOutOfRangeException(nameof(os)),
     };
 
-    /// <summary>Why this case is not run on <paramref name="host"/>, or null when it is.</summary>
-    public static string? FindSkipReason(string directory, TargetPlatform host)
+    /// <summary>
+    /// Why this case is not run on <paramref name="host"/>, or null when it is.
+    /// A case without a target.txt is built for <paramref name="defaultTarget"/>,
+    /// or for the host when that is null. <paramref name="rosetta"/> says an
+    /// Apple silicon host can run Intel binaries.
+    /// </summary>
+    public static string? FindSkipReason(
+        string directory, TargetPlatform host, TargetPlatform? defaultTarget = null, bool rosetta = false)
     {
         string platformPath = Path.Combine(directory, "platform.txt");
         if (File.Exists(platformPath))
@@ -48,16 +54,25 @@ internal static class CaseSelection
         }
 
         string targetPath = Path.Combine(directory, "target.txt");
-        if (!File.Exists(targetPath))
-            return null;
-
-        string named = File.ReadAllText(targetPath).Trim();
-        var target = TargetPlatform.Parse(named, host.Os);
-        if (target is null)
+        TargetPlatform target;
+        if (File.Exists(targetPath))
         {
-            if (TargetPlatform.RefusalFor(named, host.Os) is null)
-                throw new InvalidOperationException($"unknown target '{named}'");
-            return $"no {named} target on {FormatPlatformName(host.Os)}";
+            string named = File.ReadAllText(targetPath).Trim();
+            if (TargetPlatform.Parse(named, host.Os) is not { } parsed)
+            {
+                if (TargetPlatform.RefusalFor(named, host.Os) is null)
+                    throw new InvalidOperationException($"unknown target '{named}'");
+                return $"no {named} target on {FormatPlatformName(host.Os)}";
+            }
+            target = parsed;
+        }
+        else if (defaultTarget is null)
+        {
+            return null;
+        }
+        else
+        {
+            target = defaultTarget;
         }
 
         // Only a case that runs what it built needs a machine for the target.
@@ -66,16 +81,17 @@ internal static class CaseSelection
         bool runs = !File.Exists(Path.Combine(directory, "assemble.txt"))
                     && !File.Exists(Path.Combine(directory, "errors.txt"));
 
-        return runs && !CanRun(host, target) ? $"{target.Name} cannot run on {host.Name}" : null;
+        return runs && !CanRun(host, target, rosetta) ? $"{target.Name} cannot run on {host.Name}" : null;
     }
 
     /// <summary>
     /// Whether a program built for <paramref name="target"/> runs on
     /// <paramref name="host"/>. Another system never does. WOW64 and Linux run
-    /// x86 on x86-64, and Windows on ARM emulates both. An Intel binary on
-    /// Apple silicon would need Rosetta, which this does not assume.
+    /// x86 on x86-64, and Windows on ARM emulates both. Apple silicon runs an
+    /// Intel binary only through Rosetta, which is installed separately and is
+    /// what <paramref name="rosetta"/> says.
     /// </summary>
-    public static bool CanRun(TargetPlatform host, TargetPlatform target)
+    public static bool CanRun(TargetPlatform host, TargetPlatform target, bool rosetta = false)
     {
         if (target.Os != host.Os)
             return false;
@@ -86,6 +102,7 @@ internal static class CaseSelection
         {
             (TargetOS.Windows or TargetOS.Linux, TargetArch.X64, TargetArch.X86) => true,
             (TargetOS.Windows, TargetArch.Arm64, TargetArch.X64 or TargetArch.X86) => true,
+            (TargetOS.MacOS, TargetArch.Arm64, TargetArch.X64) => rosetta,
             _ => false,
         };
     }
@@ -109,6 +126,13 @@ internal static class CaseSelection
 
         return Path.Combine(directory, "expected.txt");
     }
+
+    /// <summary>
+    /// Whether this Mac has Rosetta. The runtime it installs is what an Intel
+    /// binary is translated by, and it is absent until someone installs it.
+    /// </summary>
+    public static bool HasRosetta =>
+        OperatingSystem.IsMacOS() && File.Exists("/Library/Apple/usr/libexec/oah/libRosettaRuntime");
 
     /// <summary>
     /// The flag that lets a C consumer find the library beside it, or null

@@ -752,19 +752,24 @@ public class EmitterTests
     /// <summary>
     /// Apple's arm64 ABI requires a frame record in x29, so every definition
     /// keeps a frame pointer on that target, as clang's do, at every level.
-    /// Elsewhere a release build keeps none.
+    /// On an Intel Mac clang keeps every one, leaves included. Elsewhere a
+    /// release build keeps none.
     /// </summary>
     [Fact]
-    public void ArmMacOSKeepsAFramePointerInEveryFunctionThatCalls()
+    public void MacOSKeepsAFramePointerAsClangDoes()
     {
         const string body = "public int G() => 1;\npublic int F() => G() + 1;";
 
-        string mac = ModuleIrFor(TargetPlatform.Arm64MacOS, body);
-        Assert.Contains("attributes #0 = { \"frame-pointer\"=\"non-leaf\" }", mac);
-        Assert.Contains(" #0 {", Front.TestFunction(mac, "F").Split('\n')[0]);
+        string arm = ModuleIrFor(TargetPlatform.Arm64MacOS, body);
+        Assert.Contains("attributes #0 = { \"frame-pointer\"=\"non-leaf\" }", arm);
+        Assert.Contains(" #0 {", Front.TestFunction(arm, "F").Split('\n')[0]);
+
+        string intel = ModuleIrFor(TargetPlatform.X64MacOS, body);
+        Assert.Contains("attributes #0 = { \"frame-pointer\"=\"all\" }", intel);
+        Assert.Contains(" #0 {", Front.TestFunction(intel, "G").Split('\n')[0]);
 
         Assert.DoesNotContain("frame-pointer", ModuleIrFor(TargetPlatform.Arm64Linux, body));
-        Assert.DoesNotContain("frame-pointer", ModuleIrFor(TargetPlatform.X64MacOS, body));
+        Assert.DoesNotContain("frame-pointer", ModuleIrFor(TargetPlatform.X64Linux, body));
     }
 
     /// <summary>

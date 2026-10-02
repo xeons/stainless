@@ -2,7 +2,9 @@ name: Set up the toolchain
 description: >
   The .NET SDK, a NuGet cache, and clang. On Linux also the GTK 3 development
   packages, the 32-bit libc the x86 cases link against, and Xvfb for the
-  IDE's self test when a release is published.
+  IDE's self test when a release is published. On macOS Homebrew's LLVM,
+  which is the supported clang there, libgd for the drawing case, and
+  Rosetta for the Intel lane.
 
 runs:
   using: composite
@@ -28,12 +30,26 @@ runs:
         sudo apt-get install -y --no-install-recommends \
           clang libgtk-3-dev gcc-multilib libc6-dev:i386 xvfb
 
+    # Apple's clang is on PATH and is not the one the compiler supports, so
+    # STAINLESS_CLANG names Homebrew's for every later step.
+    - name: Install LLVM, libgd and Rosetta
+      if: runner.os == 'macOS'
+      shell: bash
+      run: |
+        brew install llvm gd
+        echo "STAINLESS_CLANG=$(brew --prefix llvm)/bin/clang" >> "$GITHUB_ENV"
+        if [ ! -f /Library/Apple/usr/libexec/oah/libRosettaRuntime ]; then
+          sudo softwareupdate --install-rosetta --agree-to-license
+        fi
+
     # The Windows image ships LLVM in C:\Program Files\LLVM, which the compiler
     # searches after PATH.
     - name: Report clang
       shell: bash
       run: |
-        if command -v clang >/dev/null; then
+        if [ -n "${STAINLESS_CLANG:-}" ]; then
+          "$STAINLESS_CLANG" --version
+        elif command -v clang >/dev/null; then
           clang --version
         else
           "/c/Program Files/LLVM/bin/clang" --version

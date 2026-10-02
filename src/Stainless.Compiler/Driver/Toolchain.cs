@@ -45,7 +45,19 @@ public sealed class Toolchain
 {
     public string ClangPath { get; }
 
-    private Toolchain(string clangPath) => ClangPath = clangPath;
+    /// <summary>
+    /// Homebrew's <c>lib</c>, which a Darwin link searches for a named library,
+    /// or null. ld64 searches <c>/usr/local/lib</c> on its own, which covers an
+    /// Intel Mac; Apple silicon's Homebrew is in <c>/opt/homebrew</c>, which it
+    /// does not.
+    /// </summary>
+    public string? HomebrewLibraryDirectory { get; }
+
+    private Toolchain(string clangPath, string? homebrewLibraryDirectory = null)
+    {
+        ClangPath = clangPath;
+        HomebrewLibraryDirectory = homebrewLibraryDirectory;
+    }
 
     /// <summary>
     /// <c>--target=</c> where the build names a triple, and nothing otherwise.
@@ -117,7 +129,7 @@ public sealed class Toolchain
         // An explicit override always wins.
         string? configured = Environment.GetEnvironmentVariable("STAINLESS_CLANG");
         if (!string.IsNullOrWhiteSpace(configured) && File.Exists(configured))
-            return new Toolchain(configured);
+            return new Toolchain(configured, FindHomebrewLibraryDirectory());
 
         string? tooOld = null;
         foreach (string candidate in CandidatePaths())
@@ -135,7 +147,7 @@ public sealed class Toolchain
                 continue;
             }
 
-            return new Toolchain(candidate);
+            return new Toolchain(candidate, FindHomebrewLibraryDirectory());
         }
 
         error = MissingClang(tooOld);
@@ -143,7 +155,23 @@ public sealed class Toolchain
     }
 
     /// <summary>The toolchain for a clang already found, without looking for one.</summary>
-    public static Toolchain FromClang(string clangPath) => new(clangPath);
+    public static Toolchain FromClang(string clangPath, string? homebrewLibraryDirectory = null) =>
+        new(clangPath, homebrewLibraryDirectory);
+
+    /// <summary>
+    /// <c>$HOMEBREW_PREFIX/lib</c>, else <c>/opt/homebrew/lib</c>, where it
+    /// exists on a Mac; null anywhere else.
+    /// </summary>
+    private static string? FindHomebrewLibraryDirectory()
+    {
+        if (!OperatingSystem.IsMacOS())
+            return null;
+
+        string? prefix = Environment.GetEnvironmentVariable("HOMEBREW_PREFIX");
+        string directory = Path.Combine(
+            string.IsNullOrWhiteSpace(prefix) ? "/opt/homebrew" : prefix, "lib");
+        return Directory.Exists(directory) ? directory : null;
+    }
 
     /// <summary>
     /// Whether <c>clang --version</c> describes LLVM 16 or later. Apple numbers
@@ -682,6 +710,8 @@ public sealed class Toolchain
         // static archive is searched once, in order, on every platform that
         // matters. clang spells this the same way on Windows, where -luser32
         // reaches the Windows SDK's user32.lib through the linker's own paths.
+        if (target.IsDarwin && HomebrewLibraryDirectory is { } homebrew && libraries is { Count: > 0 })
+            arguments.Add("-L" + homebrew);
         foreach (string library in libraries ?? []) arguments.Add("-l" + library);
 
         // Windows puts the maths and the threads in the C runtime; ELF systems

@@ -9,10 +9,13 @@ It does need clang, because it hands its LLVM IR to clang to compile and link.
 
     Windows         winget install LLVM.LLVM
     Debian, Ubuntu  sudo apt install clang
+    macOS           brew install llvm
 
-STAINLESS_CLANG names the clang to use and always wins. Otherwise the first
-clang on PATH is used, then C:\Program Files\LLVM\bin on Windows, or
-/usr/bin/clang and /usr/local/bin/clang elsewhere. On Windows, clang also
+STAINLESS_CLANG names the clang to use and always wins. Otherwise, on macOS,
+Homebrew's LLVM comes first, because Apple's clang is on PATH and is not the
+supported one. Then the first clang on PATH is used, then
+C:\Program Files\LLVM\bin on Windows, or /usr/bin/clang and
+/usr/local/bin/clang elsewhere. On Windows, clang also
 needs the Windows SDK and the MSVC libraries, which Visual Studio or its
 Build Tools install.
 
@@ -32,6 +35,15 @@ file with it:
 
 On Linux it needs GTK 3, which a desktop already has (libgtk-3-0 on Debian
 and Ubuntu). The macOS archive carries no IDE yet.
+
+On macOS the binary is signed ad hoc and not notarized, so an archive a
+browser downloaded is quarantined and Gatekeeper refuses to run it. Clear the
+flag once, after unpacking:
+
+    xattr -dr com.apple.quarantine stainless-*
+
+The osx-x64 archive is for an Intel Mac. It also runs on Apple silicon under
+Rosetta, but osx-arm64 is the one to use there.
 
 bindings/ and forms/ are source, compiled into a program that names them.
 A GTK program on Linux needs the GTK 3 development packages and the libraries
