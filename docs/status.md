@@ -719,9 +719,11 @@ last person to edit it -- the suite is the authority.
   PNG, JPEG, BMP and GIF by sniffing the first bytes rather than the name;
   `Create` makes an empty one; lines, rectangles, ellipses, polygons, blits and
   pixels draw on it; `Encode` and `Save` write it back. GDI+ on Windows and
-  libgd elsewhere, both loaded by name at the first call and neither linked, so
+  libgd on Linux, both loaded by name at the first call and neither linked, so
   a program that makes no image pays nothing and a machine with no imaging
-  library answers `ImageError.NoBackend` rather than failing to link. Written
+  library answers `ImageError.NoBackend` rather than failing to link. On macOS
+  ImageIO, linked, reads and writes the files, and the drawing is done in the
+  module itself to the same pixel rules. Written
   in Stainless like the rest of the library: `delegate __stdcall` and the
   pointer-to-delegate cast are what a resolved symbol is called through. No
   text -- a font is where the two backends stop agreeing

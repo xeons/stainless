@@ -342,15 +342,12 @@ tar -czf - $(git ls-files -c -o --exclude-standard) | ssh brandon@brandons-mini 
 Take a screenshot of one window with `screencapture -l <windowid>`; the window
 id comes from the program or from `osascript`.
 
-The `drawing` case needs libgd (`brew install gd`) and fails without it, as it
-does on Linux; the Forms samples need `brew install gtk+3`. Both are installed.
+The Forms samples need `brew install gtk+3`, which is installed. Drawing on a
+Mac is ImageIO's, which every Mac has, so no libgd is needed there.
 
 Rosetta is installed too, and `-- --target=x64-macos` runs the whole
 end-to-end suite as Intel code under it: every case without a `target.txt` of
-its own is built for that target. An Intel process cannot load Homebrew's
-arm64 libgd, and Homebrew no longer installs on Intel macOS, so `drawing`
-fails there; `--exclude=drawing` leaves it out. Intel Macs are built for and
-not shipped, so the CI lane that runs this is switched off and nothing
-publishes `osx-x64`.
+its own is built for that target. Intel Macs are built for and not shipped,
+so the CI lane that runs this is switched off and nothing publishes `osx-x64`.
 `lldb` cannot launch a process over ssh, which has no way to grant debugging
 permission; it reads a `.dSYM` and sets breakpoints there all the same.

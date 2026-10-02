@@ -14,14 +14,16 @@ logo.DrawLine(Rgba.Black, 0, 0, logo.Width, logo.Height, 2);
 logo.Save("out.png", ImageFormat.Png);
 ```
 
-**GDI+ on Windows, libgd everywhere else, and neither is linked.** Both are
-loaded by name the first time an image is made. That is what lets this live
-in the standard library at all: a `#pragma comment(lib, "gdiplus")` would
-put an import in every Stainless binary on Windows including the ones that
-never make an image, and `-lgd` needs libgd's *development* package where
-what a machine actually has is the runtime one. So a program that makes no
-image pays nothing, and a machine with no imaging library answers
-`ImageError.NoBackend` -- a value to print, rather than a link error.
+**GDI+ on Windows, ImageIO on macOS and libgd elsewhere.** GDI+ and libgd
+are loaded by name the first time an image is made. That is what lets this
+live in the standard library at all: a `#pragma comment(lib, "gdiplus")`
+would put an import in every Stainless binary on Windows including the
+ones that never make an image, and `-lgd` needs libgd's *development*
+package where what a machine actually has is the runtime one. So a program
+that makes no image pays nothing, and a machine with no imaging library
+answers `ImageError.NoBackend` -- a value to print, rather than a link
+error. Every Mac has ImageIO, so there it is linked, into the programs that
+compile this module, and the drawing is done here.
 
 **There is no text.** Drawing a string needs a font, and the two backends
 disagree about everything to do with one: GDI+ takes a family name and a

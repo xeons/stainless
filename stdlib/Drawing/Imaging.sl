@@ -83,6 +83,8 @@ public static class Imaging
                 return "";
 #if WINDOWS
             return "GDI+";
+#elif MACOS
+            return "ImageIO";
 #else
             return "libgd";
 #endif

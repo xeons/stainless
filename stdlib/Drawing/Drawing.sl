@@ -31,14 +31,16 @@
 /// logo.Save("out.png", ImageFormat.Png);
 /// ```
 ///
-/// **GDI+ on Windows, libgd everywhere else, and neither is linked.** Both are
-/// loaded by name the first time an image is made. That is what lets this live
-/// in the standard library at all: a `#pragma comment(lib, "gdiplus")` would
-/// put an import in every Stainless binary on Windows including the ones that
-/// never make an image, and `-lgd` needs libgd's *development* package where
-/// what a machine actually has is the runtime one. So a program that makes no
-/// image pays nothing, and a machine with no imaging library answers
-/// `ImageError.NoBackend` -- a value to print, rather than a link error.
+/// **GDI+ on Windows, ImageIO on macOS and libgd elsewhere.** GDI+ and libgd
+/// are loaded by name the first time an image is made. That is what lets this
+/// live in the standard library at all: a `#pragma comment(lib, "gdiplus")`
+/// would put an import in every Stainless binary on Windows including the
+/// ones that never make an image, and `-lgd` needs libgd's *development*
+/// package where what a machine actually has is the runtime one. So a program
+/// that makes no image pays nothing, and a machine with no imaging library
+/// answers `ImageError.NoBackend` -- a value to print, rather than a link
+/// error. Every Mac has ImageIO, so there it is linked, into the programs that
+/// compile this module, and the drawing is done here.
 ///
 /// **There is no text.** Drawing a string needs a font, and the two backends
 /// disagree about everything to do with one: GDI+ takes a family name and a
@@ -683,6 +685,822 @@ threadsafe sealed class Backend
     }
 }
 
+#elif MACOS
+
+// ========================================================== the macOS backend
+
+// Every Mac has all three, so they are linked rather than loaded by name; only
+// a program that compiles this module gets them.
+#pragma comment(framework, "ImageIO")
+#pragma comment(framework, "CoreGraphics")
+#pragma comment(framework, "CoreFoundation")
+
+extern "C"
+{
+    byte* calloc(nuint count, nuint size);
+    void free(void* block);
+
+    void* CFDataCreate(void* allocator, byte* bytes, long length);
+    void* CFDataCreateMutable(void* allocator, long capacity);
+    long CFDataGetLength(void* data);
+    byte* CFDataGetBytePtr(void* data);
+    void* CFStringCreateWithCString(void* allocator, byte* text, uint encoding);
+    void* CFNumberCreate(void* allocator, long type, void* value);
+    void* CFDictionaryCreate(void* allocator, void** keys, void** values, long count,
+                             void* keyCallBacks, void* valueCallBacks);
+    void CFRelease(void* value);
+
+    void* CGImageSourceCreateWithData(void* data, void* options);
+    void* CGImageSourceCreateImageAtIndex(void* source, nuint index, void* options);
+    void* CGImageDestinationCreateWithData(void* data, void* type, nuint count, void* options);
+    void CGImageDestinationAddImage(void* destination, void* image, void* properties);
+    byte CGImageDestinationFinalize(void* destination);
+
+    nuint CGImageGetWidth(void* image);
+    nuint CGImageGetHeight(void* image);
+    nuint CGImageGetBitsPerComponent(void* image);
+    nuint CGImageGetBitsPerPixel(void* image);
+    nuint CGImageGetBytesPerRow(void* image);
+    uint CGImageGetBitmapInfo(void* image);
+    void* CGImageGetColorSpace(void* image);
+    void* CGImageGetDataProvider(void* image);
+    void* CGImageCreate(nuint width, nuint height, nuint bitsPerComponent, nuint bitsPerPixel,
+                        nuint bytesPerRow, void* space, uint bitmapInfo, void* provider,
+                        void* decode, byte shouldInterpolate, int intent);
+    void CGImageRelease(void* image);
+
+    void* CGDataProviderCopyData(void* provider);
+    void* CGDataProviderCreateWithData(void* info, void* data, nuint size, void* release);
+    void CGDataProviderRelease(void* provider);
+
+    int CGColorSpaceGetModel(void* space);
+    nuint CGColorSpaceGetColorTableCount(void* space);
+    void CGColorSpaceGetColorTable(void* space, byte* table);
+    void* CGColorSpaceGetBaseColorSpace(void* space);
+    void* CGColorSpaceCreateDeviceRGB();
+    void CGColorSpaceRelease(void* space);
+
+    void* CGBitmapContextCreate(void* data, nuint width, nuint height, nuint bitsPerComponent,
+                                nuint bytesPerRow, void* space, uint bitmapInfo);
+    void CGContextDrawImage(void* context, ImageRect rect, void* image);
+    void CGContextRelease(void* context);
+}
+
+extern "C" byte kCFTypeDictionaryKeyCallBacks;
+extern "C" byte kCFTypeDictionaryValueCallBacks;
+extern "C" void* kCGImageDestinationLossyCompressionQuality;
+
+/// `CGRect`.
+struct ImageRect
+{
+    public double X;
+    public double Y;
+    public double Width;
+    public double Height;
+}
+
+/// A picture: its size and its pixels, packed `0xAARRGGBB` and not
+/// premultiplied, row after row from the top.
+struct Canvas
+{
+    public int Width;
+    public int Height;
+    public uint* Pixels;
+}
+
+/// `kCGColorSpaceModelMonochrome`, `...RGB` and `...Indexed`.
+const int ModelMonochrome = 0;
+const int ModelRgb = 1;
+const int ModelIndexed = 5;
+
+/// `CGImageAlphaInfo`: where the alpha is, and whether the colour is
+/// multiplied by it.
+const uint AlphaNone = 0u;
+const uint AlphaPremultipliedLast = 1u;
+const uint AlphaPremultipliedFirst = 2u;
+const uint AlphaLast = 3u;
+const uint AlphaFirst = 4u;
+const uint AlphaNoneSkipLast = 5u;
+const uint AlphaNoneSkipFirst = 6u;
+
+/// `kCGBitmapByteOrder32Little`.
+const uint ByteOrder32Little = 0x2000u;
+
+/// `kCFStringEncodingUTF8` and `kCFNumberDoubleType`.
+const uint EncodingUtf8 = 0x08000100u;
+const long NumberDouble = 13;
+
+/// ImageIO to read and write a picture, and drawing done here on a buffer this
+/// module owns.
+///
+/// **The drawing is not CoreGraphics'.** CoreGraphics antialiases, keeps
+/// premultiplied alpha and has its own idea of which pixels a one-pixel edge
+/// touches; the module's promises -- a fill covers exactly the pixels it was
+/// given, a written pixel reads back -- are what GDI+ and libgd keep, and a
+/// rasteriser of a hundred lines keeps them too. Each shape is marked in a
+/// coverage mask and composed once, so a translucent shape does not darken
+/// where its strokes overlap.
+///
+/// **Pixels are read as stored.** A decoded picture's bytes are copied out of
+/// its data provider, so no colour is converted on the way in or out and a
+/// grey of 128 reads as 128; only a layout this does not know is drawn
+/// through CoreGraphics instead.
+threadsafe sealed class Backend
+{
+    /// Linked, so always there.
+    public bool Ready;
+
+    public Backend()
+    {
+        Ready = true;
+    }
+
+    // ------------------------------------------------------------- lifetime
+
+    public void* CreateImage(int width, int height)
+    {
+        var canvas = (Canvas*)calloc(1u, sizeof(Canvas));
+        if (canvas == null)
+            return null;
+
+        (*canvas).Pixels = (uint*)calloc((nuint)width * (nuint)height, 4u);
+        if ((*canvas).Pixels == null)
+        {
+            free((void*)canvas);
+            return null;
+        }
+
+        (*canvas).Width = width;
+        (*canvas).Height = height;
+        return (void*)canvas;
+    }
+
+    public void DestroyImage(void* image)
+    {
+        var canvas = (Canvas*)image;
+        free((void*)(*canvas).Pixels);
+        free(image);
+    }
+
+    public int GetWidth(void* image) => (*(Canvas*)image).Width;
+
+    public int GetHeight(void* image) => (*(Canvas*)image).Height;
+
+    // --------------------------------------------------------------- pixels
+
+    public uint GetPixel(void* image, int x, int y)
+    {
+        var canvas = (Canvas*)image;
+        if (x < 0 || y < 0 || x >= (*canvas).Width || y >= (*canvas).Height)
+            return 0u;
+        return (*canvas).Pixels[(nuint)y * (nuint)(*canvas).Width + (nuint)x];
+    }
+
+    /// Replaced rather than blended: a caller writing a pixel means that pixel.
+    public void SetPixel(void* image, int x, int y, uint colour)
+    {
+        var canvas = (Canvas*)image;
+        if (x < 0 || y < 0 || x >= (*canvas).Width || y >= (*canvas).Height)
+            return;
+        (*canvas).Pixels[(nuint)y * (nuint)(*canvas).Width + (nuint)x] = colour;
+    }
+
+    /// Blue, green, red, alpha: the order the other backends answer.
+    public bool CopyPixels(void* image, int width, int height, byte* into)
+    {
+        var canvas = (Canvas*)image;
+        nuint count = (nuint)width * (nuint)height;
+        for (nuint i = 0u; i < count; i++)
+        {
+            uint colour = (*canvas).Pixels[i];
+            into[i * 4u] = (byte)(colour & 0xFFu);
+            into[i * 4u + 1u] = (byte)((colour >> 8) & 0xFFu);
+            into[i * 4u + 2u] = (byte)((colour >> 16) & 0xFFu);
+            into[i * 4u + 3u] = (byte)(colour >> 24);
+        }
+        return true;
+    }
+
+    public bool WritePixels(void* image, int width, int height, byte* from)
+    {
+        var canvas = (Canvas*)image;
+        nuint count = (nuint)width * (nuint)height;
+        for (nuint i = 0u; i < count; i++)
+            (*canvas).Pixels[i] = (uint)from[i * 4u] | ((uint)from[i * 4u + 1u] << 8)
+                                  | ((uint)from[i * 4u + 2u] << 16) | ((uint)from[i * 4u + 3u] << 24);
+        return true;
+    }
+
+    // -------------------------------------------------------------- drawing
+
+    public void ClearImage(void* image, uint colour)
+    {
+        var canvas = (Canvas*)image;
+        nuint count = (nuint)(*canvas).Width * (nuint)(*canvas).Height;
+        for (nuint i = 0u; i < count; i++)
+            (*canvas).Pixels[i] = colour;
+    }
+
+    public void DrawLine(void* image, int x1, int y1, int x2, int y2, uint colour, int width)
+    {
+        var canvas = (Canvas*)image;
+        byte* mask = NewMask(canvas);
+        if (mask == null)
+            return;
+        MarkLine(canvas, mask, x1, y1, x2, y2, width < 1 ? 1 : width);
+        ApplyMask(canvas, mask, colour);
+    }
+
+    /// The bounding box `x, y, width, height`, as everywhere else here. An
+    /// ellipse is centred on the box's middle pixel, or a pixel short of the
+    /// middle when the size is even, and spans the size less one: so an odd
+    /// one reaches every side and an even one stops a pixel short of one,
+    /// which is where libgd puts it.
+    public void DrawShape(void* image, bool isEllipse, int x, int y, int width, int height,
+                          uint colour, int stroke, bool filled)
+    {
+        var canvas = (Canvas*)image;
+        byte* mask = NewMask(canvas);
+        if (mask == null)
+            return;
+
+        int thickness = stroke < 1 ? 1 : stroke;
+        if (!isEllipse)
+        {
+            if (filled)
+            {
+                MarkBox(canvas, mask, x, y, width, height);
+            }
+            else
+            {
+                int right = x + width - 1;
+                int bottom = y + height - 1;
+                MarkLine(canvas, mask, x, y, right, y, thickness);
+                MarkLine(canvas, mask, right, y, right, bottom, thickness);
+                MarkLine(canvas, mask, right, bottom, x, bottom, thickness);
+                MarkLine(canvas, mask, x, bottom, x, y, thickness);
+            }
+        }
+        else
+        {
+            double cx = (double)(x + width / 2);
+            double cy = (double)(y + height / 2);
+            double rx = (double)(width - 1) / 2.0;
+            double ry = (double)(height - 1) / 2.0;
+            for (int py = y; py < y + height; py++)
+            {
+                for (int px = x; px < x + width; px++)
+                {
+                    bool inside = InsideEllipse(px, py, cx, cy, rx, ry);
+                    if (inside && (filled ||
+                                   !InsideEllipse(px, py, cx, cy, rx - (double)thickness,
+                                                  ry - (double)thickness)))
+                        MarkPixel(canvas, mask, px, py);
+                }
+            }
+        }
+
+        ApplyMask(canvas, mask, colour);
+    }
+
+    public void DrawPolygon(void* image, int[] points, uint colour, int stroke, bool filled)
+    {
+        var canvas = (Canvas*)image;
+        int count = (int)(points.Length / 2u);
+        if (count < 3)
+            return;
+
+        byte* mask = NewMask(canvas);
+        if (mask == null)
+            return;
+
+        if (filled)
+        {
+            MarkPolygon(canvas, mask, points, count);
+        }
+        else
+        {
+            int thickness = stroke < 1 ? 1 : stroke;
+            for (int i = 0; i < count; i++)
+            {
+                int j = (i + 1) % count;
+                MarkLine(canvas, mask, points[(nuint)(2 * i)], points[(nuint)(2 * i + 1)],
+                         points[(nuint)(2 * j)], points[(nuint)(2 * j + 1)], thickness);
+            }
+        }
+        ApplyMask(canvas, mask, colour);
+    }
+
+    /// `source`'s rectangle drawn into `destination`'s and composed over it.
+    /// The same size is a copy; another is sampled between the four nearest
+    /// pixels, with each edge pixel taken from the source's edge rather than
+    /// blended with what lies past it.
+    public void BlitImage(void* destination, void* source,
+                          int dx, int dy, int dw, int dh, int sx, int sy, int sw, int sh)
+    {
+        var target = (Canvas*)destination;
+        var from = (Canvas*)source;
+        bool same = dw == sw && dh == sh;
+
+        for (int j = 0; j < dh; j++)
+        {
+            int ty = dy + j;
+            if (ty < 0 || ty >= (*target).Height)
+                continue;
+            for (int i = 0; i < dw; i++)
+            {
+                int tx = dx + i;
+                if (tx < 0 || tx >= (*target).Width)
+                    continue;
+
+                uint colour = same
+                    ? GetPixel(source, sx + i, sy + j)
+                    : SamplePixel(from, sx, sy, sw, sh,
+                                  (double)sx + ((double)i + 0.5) * (double)sw / (double)dw - 0.5,
+                                  (double)sy + ((double)j + 0.5) * (double)sh / (double)dh - 0.5);
+
+                nuint at = (nuint)ty * (nuint)(*target).Width + (nuint)tx;
+                (*target).Pixels[at] = BlendColour((*target).Pixels[at], colour);
+            }
+        }
+    }
+
+    // -------------------------------------------------------------- codecs
+
+    /// ImageIO reads all four, whichever its version.
+    public bool CanDecode(ImageFormat format) => true;
+
+    public void* DecodeImage(byte[] data)
+    {
+        void* bytes = CFDataCreate(null, &data[0u], (long)data.Length);
+        if (bytes == null)
+            return null;
+
+        void* source = CGImageSourceCreateWithData(bytes, null);
+        CFRelease(bytes);
+        if (source == null)
+            return null;
+
+        void* decoded = CGImageSourceCreateImageAtIndex(source, 0u, null);
+        CFRelease(source);
+        if (decoded == null)
+            return null;
+
+        int width = (int)CGImageGetWidth(decoded);
+        int height = (int)CGImageGetHeight(decoded);
+        void* image = width > 0 && height > 0 ? CreateImage(width, height) : null;
+        if (image != null && !CopyStored(decoded, (Canvas*)image) && !CopyDrawn(decoded, (Canvas*)image))
+        {
+            DestroyImage(image);
+            image = null;
+        }
+
+        CGImageRelease(decoded);
+        return image;
+    }
+
+    /// The encoded bytes, or an empty array for a failure, as the other
+    /// backends answer.
+    public byte[] EncodeImage(void* image, ImageFormat format, int quality)
+    {
+        var canvas = (Canvas*)image;
+        nuint width = (nuint)(*canvas).Width;
+        nuint height = (nuint)(*canvas).Height;
+
+        // Red, green, blue, alpha, unmultiplied: what CGImageCreate takes as
+        // `kCGImageAlphaLast`.
+        byte* rgba = calloc(width * height, 4u);
+        if (rgba == null)
+            return new byte[0u];
+        for (nuint i = 0u; i < width * height; i++)
+        {
+            uint colour = (*canvas).Pixels[i];
+            rgba[i * 4u] = (byte)((colour >> 16) & 0xFFu);
+            rgba[i * 4u + 1u] = (byte)((colour >> 8) & 0xFFu);
+            rgba[i * 4u + 2u] = (byte)(colour & 0xFFu);
+            rgba[i * 4u + 3u] = (byte)(colour >> 24);
+        }
+
+        byte[] result = new byte[0u];
+        void* provider = CGDataProviderCreateWithData(null, (void*)rgba, width * height * 4u, null);
+        void* space = CGColorSpaceCreateDeviceRGB();
+        void* picture = provider != null && space != null
+            ? CGImageCreate(width, height, 8u, 32u, width * 4u, space, AlphaLast, provider, null, 0, 0)
+            : null;
+
+        if (picture != null)
+        {
+            void* type = CFStringCreateWithCString(null, TypeIdentifier(format).ToPointer(), EncodingUtf8);
+            void* output = CFDataCreateMutable(null, 0);
+            void* destination = type != null && output != null
+                ? CGImageDestinationCreateWithData(output, type, 1u, null)
+                : null;
+
+            if (destination != null)
+            {
+                void* properties = null;
+                if (format == ImageFormat.Jpeg)
+                {
+                    double fraction = (double)(quality < 0 ? 75 : quality) / 100.0;
+                    void* number = CFNumberCreate(null, NumberDouble, (void*)&fraction);
+                    void* key = kCGImageDestinationLossyCompressionQuality;
+                    properties = CFDictionaryCreate(null, &key, &number, 1,
+                                                    (void*)&kCFTypeDictionaryKeyCallBacks,
+                                                    (void*)&kCFTypeDictionaryValueCallBacks);
+                    CFRelease(number);
+                }
+
+                CGImageDestinationAddImage(destination, picture, properties);
+                if (CGImageDestinationFinalize(destination) != 0)
+                {
+                    long length = CFDataGetLength(output);
+                    result = new byte[(nuint)length];
+                    if (length > 0)
+                        memcpy((void*)&result[0u], (void*)CFDataGetBytePtr(output), (nuint)length);
+                }
+
+                if (properties != null)
+                    CFRelease(properties);
+                CFRelease(destination);
+            }
+
+            if (output != null)
+                CFRelease(output);
+            if (type != null)
+                CFRelease(type);
+            CGImageRelease(picture);
+        }
+
+        if (space != null)
+            CGColorSpaceRelease(space);
+        if (provider != null)
+            CGDataProviderRelease(provider);
+        free((void*)rgba);
+        return result;
+    }
+
+    static String TypeIdentifier(ImageFormat format) => format switch
+    {
+        ImageFormat.Jpeg => "public.jpeg",
+        ImageFormat.Gif => "com.compuserve.gif",
+        ImageFormat.Bmp => "com.microsoft.bmp",
+        _ => "public.png",
+    };
+
+    /// A decoded picture's own bytes, for an 8-bit grey, indexed or RGB layout;
+    /// false for any other, which `CopyDrawn` takes instead.
+    bool CopyStored(void* decoded, Canvas* canvas)
+    {
+        if (CGImageGetBitsPerComponent(decoded) != 8u)
+            return false;
+
+        void* space = CGImageGetColorSpace(decoded);
+        int model = space != null ? CGColorSpaceGetModel(space) : -1;
+        nuint bits = CGImageGetBitsPerPixel(decoded);
+        uint info = CGImageGetBitmapInfo(decoded);
+        uint alpha = info & 0x1Fu;
+        bool little = (info & 0x7000u) == ByteOrder32Little;
+
+        // Which byte of a pixel is red, green, blue and alpha; -1 for none.
+        int red = -1; int green = -1; int blue = -1; int opacity = -1;
+        byte[] table = new byte[0u];
+
+        if (model == ModelIndexed && bits == 8u)
+        {
+            void* basis = CGColorSpaceGetBaseColorSpace(space);
+            if (basis == null || CGColorSpaceGetModel(basis) != ModelRgb)
+                return false;
+            nuint entries = CGColorSpaceGetColorTableCount(space);
+            table = new byte[entries * 3u + 3u];
+            CGColorSpaceGetColorTable(space, &table[0u]);
+        }
+        else if (model == ModelMonochrome && bits == 8u && alpha == AlphaNone)
+        {
+            red = 0; green = 0; blue = 0;
+        }
+        else if (model == ModelMonochrome && bits == 16u)
+        {
+            bool first = alpha == AlphaFirst || alpha == AlphaPremultipliedFirst;
+            red = first ? 1 : 0; green = red; blue = red;
+            opacity = first ? 0 : 1;
+        }
+        else if (model == ModelRgb && bits == 24u && alpha == AlphaNone)
+        {
+            red = 0; green = 1; blue = 2;
+        }
+        else if (model == ModelRgb && bits == 32u)
+        {
+            bool first = alpha == AlphaFirst || alpha == AlphaPremultipliedFirst ||
+                         alpha == AlphaNoneSkipFirst;
+            int start = first ? 1 : 0;
+            red = start; green = start + 1; blue = start + 2;
+            if (alpha != AlphaNoneSkipFirst && alpha != AlphaNoneSkipLast && alpha != AlphaNone)
+                opacity = first ? 0 : 3;
+            if (little)
+            {
+                red = 3 - red; green = 3 - green; blue = 3 - blue;
+                if (opacity >= 0)
+                    opacity = 3 - opacity;
+            }
+        }
+        else
+        {
+            return false;
+        }
+
+        void* provider = CGImageGetDataProvider(decoded);
+        void* copied = provider != null ? CGDataProviderCopyData(provider) : null;
+        if (copied == null)
+            return false;
+
+        byte* stored = CFDataGetBytePtr(copied);
+        nuint row = CGImageGetBytesPerRow(decoded);
+        nuint step = bits / 8u;
+        bool premultiplied = alpha == AlphaPremultipliedFirst || alpha == AlphaPremultipliedLast;
+        int width = (*canvas).Width;
+
+        for (int y = 0; y < (*canvas).Height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                byte* pixel = stored + (nuint)y * row + (nuint)x * step;
+                uint r; uint g; uint b; uint a = 255u;
+                if (red < 0)
+                {
+                    nuint entry = (nuint)pixel[0] * 3u;
+                    r = (uint)table[entry]; g = (uint)table[entry + 1u]; b = (uint)table[entry + 2u];
+                }
+                else
+                {
+                    r = (uint)pixel[red]; g = (uint)pixel[green]; b = (uint)pixel[blue];
+                    if (opacity >= 0)
+                        a = (uint)pixel[opacity];
+                }
+
+                if (premultiplied && a != 0u && a != 255u)
+                {
+                    r = (r * 255u + a / 2u) / a; if (r > 255u) r = 255u;
+                    g = (g * 255u + a / 2u) / a; if (g > 255u) g = 255u;
+                    b = (b * 255u + a / 2u) / a; if (b > 255u) b = 255u;
+                }
+
+                (*canvas).Pixels[(nuint)y * (nuint)width + (nuint)x] = (a << 24) | (r << 16) | (g << 8) | b;
+            }
+        }
+
+        CFRelease(copied);
+        return true;
+    }
+
+    /// Any other layout, drawn into an RGBA context by CoreGraphics and read
+    /// back. The colour is converted on the way, which is what a 16-bit or a
+    /// CMYK picture needs anyway.
+    bool CopyDrawn(void* decoded, Canvas* canvas)
+    {
+        nuint width = (nuint)(*canvas).Width;
+        nuint height = (nuint)(*canvas).Height;
+        byte* rgba = calloc(width * height, 4u);
+        void* space = CGColorSpaceCreateDeviceRGB();
+        void* context = rgba != null && space != null
+            ? CGBitmapContextCreate((void*)rgba, width, height, 8u, width * 4u, space, AlphaPremultipliedLast)
+            : null;
+
+        bool drawn = context != null;
+        if (drawn)
+        {
+            ImageRect whole;
+            whole.X = 0.0;
+            whole.Y = 0.0;
+            whole.Width = (double)width;
+            whole.Height = (double)height;
+            CGContextDrawImage(context, whole, decoded);
+
+            for (nuint i = 0u; i < width * height; i++)
+            {
+                uint r = (uint)rgba[i * 4u]; uint g = (uint)rgba[i * 4u + 1u];
+                uint b = (uint)rgba[i * 4u + 2u]; uint a = (uint)rgba[i * 4u + 3u];
+                if (a != 0u && a != 255u)
+                {
+                    r = (r * 255u + a / 2u) / a; if (r > 255u) r = 255u;
+                    g = (g * 255u + a / 2u) / a; if (g > 255u) g = 255u;
+                    b = (b * 255u + a / 2u) / a; if (b > 255u) b = 255u;
+                }
+                (*canvas).Pixels[i] = (a << 24) | (r << 16) | (g << 8) | b;
+            }
+            CGContextRelease(context);
+        }
+
+        if (space != null)
+            CGColorSpaceRelease(space);
+        if (rgba != null)
+            free((void*)rgba);
+        return drawn;
+    }
+
+    // ----------------------------------------------------------- rasterising
+
+    /// A mask the size of the picture, one byte a pixel, all clear; null when
+    /// it cannot be had.
+    static byte* NewMask(Canvas* canvas) =>
+        calloc((nuint)(*canvas).Width * (nuint)(*canvas).Height, 1u);
+
+    static void MarkPixel(Canvas* canvas, byte* mask, int x, int y)
+    {
+        if (x < 0 || y < 0 || x >= (*canvas).Width || y >= (*canvas).Height)
+            return;
+        mask[(nuint)y * (nuint)(*canvas).Width + (nuint)x] = 1;
+    }
+
+    static void MarkBox(Canvas* canvas, byte* mask, int x, int y, int width, int height)
+    {
+        for (int py = y; py < y + height; py++)
+            for (int px = x; px < x + width; px++)
+                MarkPixel(canvas, mask, px, py);
+    }
+
+    /// Bresenham's line, each point a square `thickness` across centred on it.
+    static void MarkLine(Canvas* canvas, byte* mask, int x1, int y1, int x2, int y2, int thickness)
+    {
+        int dx = x2 > x1 ? x2 - x1 : x1 - x2;
+        int dy = y2 > y1 ? y1 - y2 : y2 - y1;
+        int stepX = x1 < x2 ? 1 : -1;
+        int stepY = y1 < y2 ? 1 : -1;
+        int error = dx + dy;
+        int back = (thickness - 1) / 2;
+        int x = x1;
+        int y = y1;
+
+        while (true)
+        {
+            MarkBox(canvas, mask, x - back, y - back, thickness, thickness);
+            if (x == x2 && y == y2)
+                break;
+            int twice = 2 * error;
+            if (twice >= dy)
+            {
+                error += dy;
+                x += stepX;
+            }
+            if (twice <= dx)
+            {
+                error += dx;
+                y += stepY;
+            }
+        }
+    }
+
+    /// A pixel is inside when its centre is, by the even-odd rule.
+    static void MarkPolygon(Canvas* canvas, byte* mask, int[] points, int count)
+    {
+        var crossings = new double[(nuint)count];
+        for (int py = 0; py < (*canvas).Height; py++)
+        {
+            double centre = (double)py + 0.5;
+            int found = 0;
+            for (int i = 0; i < count; i++)
+            {
+                int j = (i + 1) % count;
+                double ax = (double)points[(nuint)(2 * i)];
+                double ay = (double)points[(nuint)(2 * i + 1)] + 0.5;
+                double bx = (double)points[(nuint)(2 * j)];
+                double by = (double)points[(nuint)(2 * j + 1)] + 0.5;
+                if ((ay <= centre && by > centre) || (by <= centre && ay > centre))
+                {
+                    crossings[(nuint)found] = ax + (centre - ay) * (bx - ax) / (by - ay);
+                    found++;
+                }
+            }
+
+            for (int i = 1; i < found; i++)
+            {
+                double held = crossings[(nuint)i];
+                int k = i - 1;
+                while (k >= 0 && crossings[(nuint)k] > held)
+                {
+                    crossings[(nuint)(k + 1)] = crossings[(nuint)k];
+                    k--;
+                }
+                crossings[(nuint)(k + 1)] = held;
+            }
+
+            for (int i = 0; i + 1 < found; i += 2)
+            {
+                int from = (int)Ceiling(crossings[(nuint)i]);
+                int to = (int)Floor(crossings[(nuint)(i + 1)]);
+                for (int px = from; px <= to; px++)
+                    MarkPixel(canvas, mask, px, py);
+            }
+        }
+    }
+
+    static double Floor(double value)
+    {
+        double whole = (double)(long)value;
+        return whole > value ? whole - 1.0 : whole;
+    }
+
+    static double Ceiling(double value)
+    {
+        double whole = (double)(long)value;
+        return whole < value ? whole + 1.0 : whole;
+    }
+
+    static bool InsideEllipse(int px, int py, double cx, double cy, double rx, double ry)
+    {
+        if (rx < 0.0 || ry < 0.0)
+            return false;
+        double ox = (double)px - cx;
+        double oy = (double)py - cy;
+        if (rx == 0.0 || ry == 0.0)
+            return (rx == 0.0 ? ox == 0.0 : ox * ox <= rx * rx) &&
+                   (ry == 0.0 ? oy == 0.0 : oy * oy <= ry * ry);
+        return ox * ox / (rx * rx) + oy * oy / (ry * ry) <= 1.0 + 1e-9;
+    }
+
+    /// Every marked pixel composed with `colour`, and the mask freed.
+    static void ApplyMask(Canvas* canvas, byte* mask, uint colour)
+    {
+        nuint count = (nuint)(*canvas).Width * (nuint)(*canvas).Height;
+        for (nuint i = 0u; i < count; i++)
+            if (mask[i] != 0)
+                (*canvas).Pixels[i] = BlendColour((*canvas).Pixels[i], colour);
+        free((void*)mask);
+    }
+
+    /// `over` composed over `under`, neither premultiplied.
+    static uint BlendColour(uint under, uint over)
+    {
+        uint sa = over >> 24;
+        if (sa == 255u)
+            return over;
+        if (sa == 0u)
+            return under;
+
+        uint da = under >> 24;
+        uint kept = da * (255u - sa);
+        uint oa = sa + (kept + 127u) / 255u;
+        if (oa == 0u)
+            return 0u;
+
+        uint whole = oa * 255u;
+        uint r = (((over >> 16) & 0xFFu) * sa * 255u + ((under >> 16) & 0xFFu) * kept + whole / 2u) / whole;
+        uint g = (((over >> 8) & 0xFFu) * sa * 255u + ((under >> 8) & 0xFFu) * kept + whole / 2u) / whole;
+        uint b = ((over & 0xFFu) * sa * 255u + (under & 0xFFu) * kept + whole / 2u) / whole;
+        return (oa << 24) | (r << 16) | (g << 8) | b;
+    }
+
+    /// The colour at a point between pixels, from the four nearest, with the
+    /// point held inside the source rectangle so an edge takes the edge.
+    static uint SamplePixel(Canvas* source, int sx, int sy, int sw, int sh, double x, double y)
+    {
+        double left = (double)sx;
+        double top = (double)sy;
+        double right = (double)(sx + sw - 1);
+        double bottom = (double)(sy + sh - 1);
+        if (x < left) x = left;
+        if (x > right) x = right;
+        if (y < top) y = top;
+        if (y > bottom) y = bottom;
+
+        int x0 = (int)Floor(x);
+        int y0 = (int)Floor(y);
+        int x1 = x0 + 1 > sx + sw - 1 ? x0 : x0 + 1;
+        int y1 = y0 + 1 > sy + sh - 1 ? y0 : y0 + 1;
+        double fx = x - (double)x0;
+        double fy = y - (double)y0;
+
+        // Premultiplied while they are mixed, so a transparent neighbour does
+        // not darken the edge.
+        double a = 0.0; double r = 0.0; double g = 0.0; double b = 0.0;
+        for (int k = 0; k < 4; k++)
+        {
+            int px = (k & 1) == 0 ? x0 : x1;
+            int py = (k & 2) == 0 ? y0 : y1;
+            double weight = ((k & 1) == 0 ? 1.0 - fx : fx) * ((k & 2) == 0 ? 1.0 - fy : fy);
+            uint colour = 0u;
+            if (px >= 0 && py >= 0 && px < (*source).Width && py < (*source).Height)
+                colour = (*source).Pixels[(nuint)py * (nuint)(*source).Width + (nuint)px];
+            double alpha = (double)(colour >> 24) * weight;
+            a += alpha;
+            r += (double)((colour >> 16) & 0xFFu) * alpha;
+            g += (double)((colour >> 8) & 0xFFu) * alpha;
+            b += (double)(colour & 0xFFu) * alpha;
+        }
+
+        if (a <= 0.0)
+            return 0u;
+        uint oa = (uint)(a + 0.5);
+        if (oa > 255u) oa = 255u;
+        uint mixedRed = (uint)(r / a + 0.5);
+        uint mixedGreen = (uint)(g / a + 0.5);
+        uint mixedBlue = (uint)(b / a + 0.5);
+        if (mixedRed > 255u) mixedRed = 255u;
+        if (mixedGreen > 255u) mixedGreen = 255u;
+        if (mixedBlue > 255u) mixedBlue = 255u;
+        return (oa << 24) | (mixedRed << 16) | (mixedGreen << 8) | mixedBlue;
+    }
+}
+
 #else
 
 // ========================================================== the Unix backend
@@ -728,12 +1546,8 @@ extern "C"
 
 /// `RTLD_LAZY | RTLD_LOCAL`: resolve as called, and do not put libgd's symbols
 /// in the global namespace where they could satisfy somebody else's undefined
-/// reference. Darwin spells `RTLD_LOCAL` as 4; glibc's is 0.
-#if MACOS
-const int RtldLazyLocal = 0x00005;
-#else
+/// reference.
 const int RtldLazyLocal = 0x00001;
-#endif
 
 /// libgd, resolved once.
 threadsafe sealed class Backend
@@ -775,21 +1589,6 @@ threadsafe sealed class Backend
     {
         Ready = false;
 
-#if MACOS
-        // dyld searches /usr/local/lib for a bare name but not Homebrew's
-        // prefix on Apple silicon, so both prefixes are named.
-        void* library = OpenLibrary("libgd.3.dylib");
-        if (library == null)
-            library = OpenLibrary("libgd.dylib");
-        if (library == null)
-            library = OpenLibrary("/opt/homebrew/lib/libgd.3.dylib");
-        if (library == null)
-            library = OpenLibrary("/opt/homebrew/lib/libgd.dylib");
-        if (library == null)
-            library = OpenLibrary("/usr/local/lib/libgd.3.dylib");
-        if (library == null)
-            library = OpenLibrary("/usr/local/lib/libgd.dylib");
-#else
         // The versioned runtime library first, which is what a machine with the
         // package installed has; then the development symlink; then the older
         // soname.
@@ -798,7 +1597,6 @@ threadsafe sealed class Backend
             library = OpenLibrary("libgd.so");
         if (library == null)
             library = OpenLibrary("libgd.so.2");
-#endif
         if (library == null)
             return;
 

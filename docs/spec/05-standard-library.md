@@ -932,14 +932,22 @@ logo.Save("out.png", ImageFormat.Png);
 ```
 
 **Written in Stainless, with the platform library loaded by name.** GDI+ on
-Windows and libgd elsewhere, both reached through `delegate`s resolved by
+Windows and libgd on Linux, both reached through `delegate`s resolved by
 `GetProcAddress` or `dlsym` at the first call. Nothing is linked, and that is
 what lets this ship in the standard library at all: a `#pragma comment(lib,
 "gdiplus")` would put an import in every Stainless binary including the ones
 that never make an image, and `-lgd` wants libgd's *development* package where
 what a machine has is the runtime one. A program that makes no image pays
 nothing, and a machine with no imaging library answers `ImageError.NoBackend`
-— a value to print, rather than a link error to decipher.
+-- a value to print, rather than a link error to decipher.
+
+**macOS is the exception, because every Mac has what it needs.** ImageIO
+reads and writes the four formats, and is linked, into the programs that
+compile this module. The drawing is done in the module itself, on its own
+buffer: CoreGraphics antialiases and keeps premultiplied alpha, and a fill
+here covers exactly the pixels it was given, as GDI+'s and libgd's do. A
+decoded picture's bytes are copied as stored, so no colour is converted on the
+way in or out.
 
 It is the one module here that reaches an operating system directly rather than
 through `runtime/`, because what it needs from the platform is a whole library
