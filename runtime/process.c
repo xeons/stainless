@@ -41,7 +41,8 @@
  * between fork and exec, because another thread may have held the malloc lock
  * at the moment of the fork and no thread exists in the child to release it.
  * So the child's half allocates nothing: the argv is built before the fork,
- * and what follows is dup2 and execvp.
+ * and what follows is dup2 and execvp. macOS does not fork at all; it has
+ * posix_spawn, with every descriptor closed in the child unless named.
  *
  * **Input is fed while output is drained.** A child that writes while it
  * reads -- any filter -- stops reading once its output pipe is full, so a
@@ -72,6 +73,10 @@
 #  include <sys/wait.h>
 #  include <time.h>
 #  include <unistd.h>
+#endif
+
+#ifdef __APPLE__
+#  include <spawn.h>
 #endif
 
 /* Reported to the caller as `ProcessError` in Standard.Process. */
@@ -675,6 +680,59 @@ static void reapLater(pid_t child)
  * -1 for "leave it alone". They MUST be close-on-exec and above 2, as
  * privatePipe makes them: the child then keeps only the copies dup2 gives it.
  */
+#ifdef __APPLE__
+/*
+ * posix_spawnp, with POSIX_SPAWN_CLOEXEC_DEFAULT: the child receives the
+ * three descriptors named here and nothing else.
+ *
+ * That is the guarantee privatePipe and the sockets cannot give on their own
+ * here. macOS has no pipe2, no SOCK_CLOEXEC and no accept4, so each is made
+ * and then marked close-on-exec, and a child started between the two would
+ * inherit it. With every descriptor closed by default the window does not
+ * matter. It also keeps fork out of a threaded process, and out of one the
+ * Objective-C runtime is loaded into, which macOS handles badly.
+ *
+ * A failed exec is reported by posix_spawnp itself, so there is no report
+ * pipe to read.
+ */
+static pid_t spawn(char **argv, const int redirect[3], int *why)
+{
+    posix_spawn_file_actions_t actions;
+    posix_spawnattr_t attributes;
+    pid_t child = -1;
+
+    *why = 0;
+
+    int failed = posix_spawn_file_actions_init(&actions);
+    if (failed == 0) {
+        failed = posix_spawnattr_init(&attributes);
+        if (failed != 0) posix_spawn_file_actions_destroy(&actions);
+    }
+
+    if (failed == 0) {
+        for (int i = 0; i < 3 && failed == 0; i++)
+            failed = redirect[i] >= 0
+                ? posix_spawn_file_actions_adddup2(&actions, redirect[i], i)
+                : posix_spawn_file_actions_addinherit_np(&actions, i);
+
+        if (failed == 0)
+            failed = posix_spawnattr_setflags(&attributes, POSIX_SPAWN_CLOEXEC_DEFAULT);
+        if (failed == 0)
+            failed = posix_spawnp(&child, argv[0], &actions, &attributes, argv, sl_environ());
+
+        posix_spawnattr_destroy(&attributes);
+        posix_spawn_file_actions_destroy(&actions);
+    }
+
+    if (failed != 0) {
+        *why = classify(failed);
+        errno = failed;
+        return -1;
+    }
+
+    return child;
+}
+#else
 static pid_t spawn(char **argv, const int redirect[3], int *why)
 {
     int report[2];
@@ -731,6 +789,7 @@ static pid_t spawn(char **argv, const int redirect[3], int *why)
 
     return child;
 }
+#endif
 
 #endif
 /*

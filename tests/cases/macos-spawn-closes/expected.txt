@@ -1,0 +1,3 @@
+opened: true
+the child holds it: 0
+a child that opens it holds it: 1
