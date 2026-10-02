@@ -410,6 +410,37 @@ public sealed class FunctionSymbol
     /// <summary>A record's <c>$Clone</c>, whose body is generated as bound nodes.</summary>
     public bool IsRecordClone { get; init; }
 
+    // ------------------------------------------------------------- Objective-C
+
+    /// <summary>
+    /// The selector a call to this sends, for a member of an objc type that
+    /// names one; null for everything else, which is called directly.
+    /// </summary>
+    public string? Selector { get; set; }
+
+    /// <summary>True for a member reached by sending its selector.</summary>
+    public bool IsMessage => Selector is not null;
+
+    /// <summary>
+    /// Declared to return <c>Self</c>, Objective-C's <c>instancetype</c>: at a
+    /// call the result has the receiver's static type.
+    /// </summary>
+    public bool ReturnsSelf { get; set; }
+
+    /// <summary><c>[Optional]</c> on a protocol member: an object may not answer it.</summary>
+    public bool IsObjCOptional { get; set; }
+
+    /// <summary>
+    /// An object result arrives retained: the selector is in the <c>alloc</c>,
+    /// <c>new</c>, <c>copy</c>, <c>mutableCopy</c> or <c>init</c> family, or
+    /// <c>[ReturnsRetained]</c> says so. Otherwise it arrives +0 and the caller
+    /// claims it.
+    /// </summary>
+    public bool ReturnsRetained { get; set; }
+
+    /// <summary>An <c>init</c> method: a call consumes its receiver.</summary>
+    public bool ConsumesSelf { get; set; }
+
     public override string ToString() =>
         $"{ReturnType.Name} {(ContainingType is null ? "" : ContainingType.Name + ".")}{Name}" +
         $"({string.Join(", ", Parameters.Where(p => !p.IsThis))})";

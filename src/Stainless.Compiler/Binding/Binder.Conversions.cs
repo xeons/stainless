@@ -376,6 +376,9 @@ public sealed partial class Binder
             return new BoundErrorExpression(span);
         }
 
+        if (RefuseObjCReference(matches[0], receiver: null, span))
+            return new BoundErrorExpression(span);
+
         return new BoundFunctionReference(span, wanted, matches[0]);
     }
 
@@ -419,6 +422,9 @@ public sealed partial class Binder
         }
 
         var chosen = matches[0];
+
+        if (RefuseObjCReference(chosen, group.Receiver, span))
+            return new BoundErrorExpression(span);
 
         // A closure calls what it holds with the object first, which is where a
         // method already takes its own. A plain function has no such parameter,
@@ -841,6 +847,11 @@ public sealed partial class Binder
         if (from is SliceTypeSymbol { IsReadOnly: false } writable &&
             to is SliceTypeSymbol { IsReadOnly: true } readOnly)
             return writable.Element.Equals(readOnly.Element) ? ConversionKind.Identity : null;
+
+        // Objective-C's references convert among themselves alone, and are
+        // asked first so that an objc class is never taken for a Stainless one.
+        if (ClassifiesObjC(from, to, explicitCast, out var objc))
+            return objc;
 
         // A derived class is a base class. With single inheritance the base
         // subobject starts where the object does, so this is the same pointer

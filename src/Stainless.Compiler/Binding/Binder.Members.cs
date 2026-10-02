@@ -560,6 +560,17 @@ public sealed partial class Binder
                 continue;
             }
 
+            if (type is ClassTypeSymbol { ObjC: ObjCClassKind.Imported } &&
+                ImportedClassRefuses(member) is { } refused)
+            {
+                diagnostics.Error("SL0909", member.Span,
+                    $"'{type.Name}' is an 'extern objc class', which only describes a class that " +
+                    $"already exists, so it cannot declare {refused}; it declares the messages " +
+                    "it answers, and Stainless helpers with bodies",
+                    type);
+                continue;
+            }
+
             if (type.IsContract && member is not (FunctionDeclSyntax or PropertyDeclSyntax))
             {
                 diagnostics.Error("SL0300", member.Span,
@@ -691,6 +702,13 @@ public sealed partial class Binder
 
                 case ConstructorDeclSyntax constructor:
                 {
+                    if (constructor.Attributes.Count > 0 && !IsObjCType(type))
+                        diagnostics.Error("SL0728", constructor.Attributes[0].Span,
+                            $"'[{constructor.Attributes[0].Name.Last}]' cannot be written on a " +
+                            "constructor; the one a constructor takes is '[SetsRequiredMembers]', " +
+                            "and an objc class's may take '[Selector]'",
+                            type);
+
                     if (!CanBeConstructed(type))
                     {
                         diagnostics.Error("SL0207", constructor.Span,
@@ -1361,6 +1379,10 @@ public sealed partial class Binder
         bool isAbstract = declaration.Modifiers.HasFlag(Modifiers.Abstract);
         bool wantsStorage = false;
 
+        // An imported class's property is a pair of messages to an object made
+        // somewhere else: it has no storage here, as an interface's has none.
+        bool describedOnly = IsDescribedOnly(type);
+
         if (isAbstract)
         {
             foreach (var accessor in declaration.Accessors.Where(a => a.Body is not null))
@@ -1370,7 +1392,7 @@ public sealed partial class Binder
                     "a derived class supplies one",
                     type);
         }
-        else if (isInterface)
+        else if (isInterface || describedOnly)
         {
             // An accessor with a body is a default and one without is the
             // contract, and neither owns anything: an interface has no state.
@@ -1534,7 +1556,25 @@ public sealed partial class Binder
                 scope, type, property, setter, true, accessorModifiers, declaration.Indices);
 
         if (explicitInterface is null) type.Properties.Add(property);
+
+        ReadPropertySelectors(property, type, declaration);
     }
+
+    /// <summary>
+    /// What a member of an <c>extern objc class</c> cannot be, or null: it has
+    /// no storage, no constructor and no destructor of its own, because the
+    /// class is laid out, made and taken apart by code compiled elsewhere.
+    /// </summary>
+    private static string? ImportedClassRefuses(Declaration member) => member switch
+    {
+        FieldDeclSyntax field => $"the field '{field.Name}'",
+        StaticDeclSyntax shared => $"the static '{shared.Name}'",
+        ConstructorDeclSyntax => "a constructor",
+        DestructorDeclSyntax => "a destructor",
+        EventDeclSyntax declared => $"the event '{declared.Name}'",
+        PropertyDeclSyntax { Initializer: not null } property => $"a value for '{property.Name}'",
+        _ => null,
+    };
 
     /// <summary>
     /// A required member is named by every <c>new</c> of its type, so it has
@@ -1625,13 +1665,14 @@ public sealed partial class Binder
             Accessor = property,
             IsAutoAccessor = accessor.Body is null
                              && !type.IsContract
+                             && !IsDescribedOnly(type)
                              && !modifiers.HasFlag(Modifiers.Abstract),
             IsInitAccessor = accessor.IsInit,
         };
 
         if (!symbol.IsStatic)
         {
-            TypeSymbol thisType = type is ClassTypeSymbol or InterfaceTypeSymbol
+            TypeSymbol thisType = type is ClassTypeSymbol or InterfaceTypeSymbol or ObjCProtocolTypeSymbol
                 ? type
                 : type.MakePointerType();
             symbol.Parameters.Add(new ParameterSymbol("this", thisType, 0) { IsThis = true });

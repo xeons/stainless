@@ -61,6 +61,7 @@ own for the linker to drop.
 | `Standard.Formats.Asn1` | ASN.1 in BER and DER, read and written ([§5.15](#515-standardformatsasn1)) | on request |
 | `Standard.Media.Audio` | playing and recording sound ([§5.14](#514-standardmediaaudio)) | on request |
 | `Standard.Com` | `IUnknown`, the HRESULTs a com method returns, and `GetClassObject` and `CanUnloadNow` for a server ([section 8.5](08-interop-libraries.md#85-com)) | on request |
+| `Standard.ObjC` | `AnyObject`, `Selector` and `Class`, and `WithAutoreleasePool`, for Objective-C on macOS ([section 8.6](08-interop-libraries.md#86-objective-c)) | on request |
 | `Standard` | `Result<T, TError>`, `[Flags]`, and the rest of what the language itself reads | automatically |
 
 ### 5.1.1 What `Standard` holds

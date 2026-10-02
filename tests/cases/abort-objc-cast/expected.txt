@@ -1,0 +1,2 @@
+an SLOne is an SLOne
+stainless: cast failed: a SLOne is not a ObjCCast.SLTwo

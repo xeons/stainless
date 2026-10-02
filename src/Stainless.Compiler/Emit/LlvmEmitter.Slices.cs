@@ -450,6 +450,7 @@ public sealed partial class LlvmEmitter
     private Val EmitCall(BoundCall call)
     {
         if (TryEmitInlineIntrinsic(call, out var inline)) return inline;
+        if (call.Function.IsMessage) return EmitMessage(call);
 
         var function = call.Function;
         if (function.TextOfEnum is not null && _enumTextsAsked.Add(function))

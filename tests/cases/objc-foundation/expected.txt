@@ -1,0 +1,15 @@
+hello, world has 12 characters
+equal: true
+a copy: hello
+count 3
+the first is a string of 5
+the first is a number: false
+the second is 42
+the third is true
+values 7 -3 10
+positive true false
+greater true false
+spread 7.5 8.5 9.5 10.5
+twin 107
+maybe true true
+alive at the end: 0

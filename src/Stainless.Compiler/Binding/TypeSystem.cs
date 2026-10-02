@@ -1511,8 +1511,104 @@ public sealed class ComInterfaceTypeSymbol : NamedTypeSymbol
             .FirstOrDefault(p => p is not null);
 }
 
+/// <summary>
+/// <c>objc interface NSCopying</c>: an Objective-C protocol.
+///
+/// A reference to one is an Objective-C object pointer, as a class reference
+/// is, counted with <c>objc_retain</c>. Nothing is dispatched through a table:
+/// every member names a selector and a call sends it, so a protocol has many
+/// bases where a com interface has one, and costs nothing to convert to.
+/// </summary>
+public sealed class ObjCProtocolTypeSymbol : NamedTypeSymbol
+{
+    public override bool IsContract => true;
+    public override int Size => TargetPlatform.Current.PointerWidth;
+    public override int Alignment => TargetPlatform.Current.PointerWidth;
+    public override bool IsManaged => true;
+    public override bool IsReferenceType => true;
+
+    /// <summary>The name the Objective-C runtime knows, from <c>[ObjCName]</c> or the declaration.</summary>
+    public string? RuntimeName { get; set; }
+
+    /// <summary>The protocols this one adopts, in the order written.</summary>
+    public List<ObjCProtocolTypeSymbol> Bases { get; } = [];
+
+    /// <summary>This protocol, then everything it adopts, each once.</summary>
+    public IEnumerable<ObjCProtocolTypeSymbol> SelfAndBases()
+    {
+        var seen = new HashSet<ObjCProtocolTypeSymbol>();
+        var pending = new Stack<ObjCProtocolTypeSymbol>();
+        pending.Push(this);
+        while (pending.Count > 0)
+        {
+            var current = pending.Pop();
+            if (!seen.Add(current)) continue;
+            yield return current;
+            for (int i = current.Bases.Count - 1; i >= 0; i--)
+                pending.Push(current.Bases[i]);
+        }
+    }
+
+    /// <summary>True when <paramref name="other"/> is this protocol or one it adopts.</summary>
+    public bool Adopts(ObjCProtocolTypeSymbol other) => SelfAndBases().Contains(other);
+
+    public override FunctionSymbol? FindMethod(string name) =>
+        SelfAndBases().Select(p => p.Methods.FirstOrDefault(m => m.Name == name))
+            .FirstOrDefault(m => m is not null);
+
+    public override IEnumerable<FunctionSymbol> FindMethods(string name) =>
+        SelfAndBases().SelectMany(p => p.Methods.Where(m => m.Name == name));
+
+    public override PropertySymbol? FindProperty(string name) =>
+        SelfAndBases().Select(p => p.Properties.FirstOrDefault(q => q.Name == name))
+            .FirstOrDefault(q => q is not null);
+}
+
+/// <summary>What the Objective-C runtime has to do with a class.</summary>
+public enum ObjCClassKind
+{
+    /// <summary>An ordinary Stainless class.</summary>
+    None,
+
+    /// <summary><c>extern objc class</c>: one that already exists, only described here.</summary>
+    Imported,
+
+    /// <summary><c>objc class</c> with bodies: one this program defines and registers.</summary>
+    Defined,
+}
+
 public sealed class ClassTypeSymbol : NamedTypeSymbol
 {
+    /// <summary>
+    /// Whether this is an Objective-C class, and if so whether it is defined
+    /// here. An objc class has no Stainless object header: the reference
+    /// points at an Objective-C object, whose first word is its <c>isa</c>.
+    /// </summary>
+    public ObjCClassKind ObjC { get; set; }
+
+    /// <summary>True for an imported or a defined Objective-C class.</summary>
+    public bool IsObjC => ObjC != ObjCClassKind.None;
+
+    /// <summary>The name the Objective-C runtime knows, from <c>[ObjCName]</c> or the declaration.</summary>
+    public string? ObjCRuntimeName { get; set; }
+
+    /// <summary>
+    /// <c>[ObjCRoot]</c>: a class with no superclass, such as <c>NSObject</c>.
+    /// A class's metaclass points at its root's metaclass, so every imported
+    /// chain MUST end at one.
+    /// </summary>
+    public bool IsObjCRoot { get; set; }
+
+    /// <summary>The protocols an objc class adopts, in the order written.</summary>
+    public List<ObjCProtocolTypeSymbol> ObjCProtocols { get; } = [];
+
+    /// <summary>
+    /// True when this objc class, or a class it derives from, adopts
+    /// <paramref name="protocol"/>.
+    /// </summary>
+    public bool AdoptsObjC(ObjCProtocolTypeSymbol protocol) =>
+        SelfAndBases().Any(c => c.ObjCProtocols.Any(p => p.Adopts(protocol)));
+
     /// <summary>
     /// A record's positional parameters, in order; empty for a class that was
     /// written out. It is what <c>with</c> reads to know that this type's

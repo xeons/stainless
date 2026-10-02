@@ -2764,6 +2764,9 @@ public sealed partial class Binder
         if (receiver is not null && property.ContainingType is StructTypeSymbol structType)
             receiver = new BoundAddressOf(span, structType.MakePointerType(), receiver);
 
+        if (getter.IsMessage)
+            return SendMessage(span, getter, receiver, [], null, nonVirtual, named: null);
+
         return new BoundCall(span, getter, receiver, []) { IsNonVirtual = nonVirtual };
     }
 

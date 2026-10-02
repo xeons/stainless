@@ -51,6 +51,15 @@ public sealed partial class Binder
         var owner = ResolveType(syntax.Type, _context.File!);
         if (owner.IsError()) return new BoundErrorExpression(syntax.Span);
 
+        if (IsObjCType(owner))
+        {
+            diagnostics.Error("SL0480", syntax.Type.Span,
+                $"'{owner.Name}' is an Objective-C type, which the Objective-C runtime lays out " +
+                "and may move at load time, so a field of it has no offset to be known here",
+                owner);
+            return new BoundErrorExpression(syntax.Span);
+        }
+
         if (owner is not NamedTypeSymbol named || owner is InterfaceTypeSymbol)
         {
             diagnostics.Error("SL0480", syntax.Type.Span,
@@ -249,6 +258,16 @@ public sealed partial class Binder
                     _ => "Use a pointer and an allocator for raw memory.",
                 },
                 type);
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        if (classType.ObjC == ObjCClassKind.Imported)
+        {
+            diagnostics.Error("SL0914", syntax.Span,
+                $"'{classType.Name}' is an 'extern objc class', made by Objective-C rather than " +
+                "by 'new': send it the messages its headers make one with, as " +
+                $"'{classType.Name}.Alloc().Init()'",
+                classType);
             return new BoundErrorExpression(syntax.Span);
         }
 

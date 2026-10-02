@@ -1,0 +1,2 @@
+asking
+stainless: '+[SLNothing nothing]' answered nil, and a ObjCNil.SLNothing is never nil

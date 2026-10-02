@@ -576,6 +576,9 @@ public sealed partial class Binder
             return null;
         }
 
+        if (IsObjCType(wanted) || IsObjCType(reference))
+            return BindObjCTypeTest(code, span, subject, reference, wanted);
+
         if (wanted is ComInterfaceTypeSymbol || reference is ComInterfaceTypeSymbol)
         {
             if (!CanAskCom(code, span, reference, wanted))
@@ -636,6 +639,47 @@ public sealed partial class Binder
             downcast = new BoundConversion(span, wanted, subject, kind);
 
         return new TypeMatch(test, downcast, null, new TypeKey(wanted));
+    }
+
+    /// <summary>
+    /// An Objective-C reference asked whether it is a class or adopts a
+    /// protocol. The object answers, through <c>isKindOfClass:</c> or
+    /// <c>conformsToProtocol:</c>; nil answers no. What the arm sees is the
+    /// same pointer, which the test has proved.
+    /// </summary>
+    private TypeMatch? BindObjCTypeTest(
+        string code, SourceSpan span, BoundPlaceholder subject,
+        NamedTypeSymbol reference, NamedTypeSymbol wanted)
+    {
+        if (!IsObjCType(wanted) || !IsObjCType(reference))
+        {
+            diagnostics.Error(code, span,
+                $"'{reference.Name}' and '{wanted.Name}' are not both Objective-C types, and only " +
+                "an Objective-C object can be asked what it is by Objective-C's runtime",
+                reference, wanted);
+            return null;
+        }
+
+        if (wanted == _builtins.AnyObject)
+        {
+            diagnostics.Error(code, span,
+                "every Objective-C object is an 'AnyObject', so there is nothing to ask",
+                wanted);
+            return null;
+        }
+
+        RequireDarwin(span);
+
+        var test = new BoundTestPattern(span, subject,
+            new BoundTypeTest(span, PrimitiveTypeSymbol.Bool, subject, wanted),
+            new PatternTestKey(PatternTestKind.Type, wanted));
+
+        BoundExpression held = subject.Type is OptionalTypeSymbol
+            ? new BoundConversion(span, reference, subject, ConversionKind.NarrowOptional)
+            : subject;
+
+        return new TypeMatch(test, new BoundConversion(span, wanted, held, ConversionKind.TestedReference),
+            null, new TypeKey(wanted));
     }
 
     /// <summary>Whether a variant holds a case.</summary>

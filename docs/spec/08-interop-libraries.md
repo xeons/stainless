@@ -705,7 +705,195 @@ between the host's `Release()` and its next line.
   file for exactly this ([§8.2](#82-building-a-shared-library)). Every COM
   *slot* is already `__stdcall` there, stamped on when the table is numbered.
 
-## 8.6 Linking a platform library
+## 8.6 Objective-C
+
+```csharp
+import Standard.ObjC;
+
+#pragma comment(framework, "Foundation")
+
+[ObjCName("NSObject")]
+public objc interface NSObjectProtocol
+{
+    [Selector("isEqual:")] bool IsEqual(AnyObject? other);
+}
+
+[ObjCRoot]
+public extern objc class NSObject : NSObjectProtocol
+{
+    [Selector("alloc")] public static Self Alloc();
+    [Selector("init")] public Self Init();
+}
+
+public extern objc class NSString : NSObject
+{
+    [Selector("stringWithUTF8String:")] public static Self FromUtf8(byte* text);
+    [Selector("length")] public nuint Length { get; }
+}
+
+nuint Measure() => NSString.FromUtf8("hello").Length;     // 5
+```
+
+`objc interface` declares a protocol, and `extern objc class` a class that
+already exists. A reference to either is an Objective-C object pointer, and
+ARC counts it with `objc_retain` and `objc_release` exactly as it counts a
+Stainless object with `sl_retain`. Objective-C is Apple's, so a program that
+sends a message is built for `arm64-macos` or `x64-macos` (SL0915); the
+declarations bind anywhere, so a binding compiles on every host.
+
+`objc` is a modifier, like `com`, and goes before `interface` or `class`
+(SL0900); `extern` goes before `objc class` and nowhere else (SL0901). Neither
+may be generic.
+
+### Every member names its message
+
+A member of an objc type is reached by sending a message, and
+`[Selector("...")]` says which. Nothing is derived from the Stainless name, so
+the name is free to read well and the selector is exactly what the headers
+say. A property names both of its messages, or the getter's alone when it has
+no setter:
+
+```csharp
+[Selector("frame", "setFrame:")] public CGRect Frame { get; set; }
+[Selector("window")] public NSWindow? Window { get; }
+```
+
+A selector carries one argument after each colon, so the colons and the
+parameters MUST agree (SL0905), and one that is not a selector at all is
+refused (SL0904). On a protocol or an `extern objc class` a member without a
+selector has nothing to send (SL0902). A member of an `extern objc class`
+with a body is a Stainless helper instead: it takes no selector (SL0903), it
+is called directly, and `this` inside it is the object. A protocol member has
+no body, because Objective-C has no default implementations.
+
+**A static member is a class message**, sent to the class the call names:
+`NSString.Alloc()` sends `alloc` to NSString, though NSObject declares it.
+
+**`Self` is Objective-C's `instancetype`.** A method of an objc type declared
+to return `Self` returns the type of whatever it was sent to, so
+`NSString.Alloc().Init()` is an `NSString` with no cast.
+
+### Who owns what a message returns
+
+The selector says, by Cocoa's rule. A selector in the `alloc`, `new`, `copy`,
+`mutableCopy` or `init` family -- one that begins with the word, after any
+underscores, and does not go on with a lower-case letter -- hands back an
+object the caller owns. Any other hands back one it does not, and the call
+claims it at once with `objc_retainAutoreleasedReturnValue`, so either way
+the value is ARC's like any other. `[ReturnsRetained]` and
+`[ReturnsNotRetained]` say so where a method breaks the rule.
+
+**An `init` consumes its receiver**, as Objective-C's does: what
+`NSString.Alloc()` made is handed to `Init` and what comes back is the new
+owner, with no retain or release between them.
+
+**Nil stops the program where it was not promised.** A message declared to
+return an object hands back nil only if the declaration said `T?`; one that
+says `T` and answers nil stops the program, naming the message, rather than
+let a nil into code that trusts it:
+
+```
+stainless: '+[SLNothing nothing]' answered nil, and a Demo.SLNothing is never nil
+```
+
+**`[Optional]` marks a protocol member an object may not answer.** A call to
+one asks `respondsToSelector:` first and stops the program, naming the
+message, if the answer is no -- rather than let Objective-C raise its
+unrecognized-selector exception. It means nothing on a class's member
+(SL0906).
+
+### What crosses a message
+
+What C can spell crosses as it would to C, and so do Objective-C objects,
+`Selector` and `Class`. A `String`, a Stainless object, a struct holding a
+reference and a pointer to an Objective-C reference do not (SL0907); an
+`NSString` is the string Objective-C takes.
+
+**`bool` is `BOOL`**, which is `signed char` on Intel and `bool` on Apple
+silicon. A message carries whichever the target has, and the compiler
+converts at the call.
+
+**An `out` or `ref` object is written back.** `out NSError? error` passes the
+address of an empty slot the program does not own, and once the message
+returns, what the callee left there is retained into the variable. That is
+what Objective-C's `NSError**` means: the callee does not hand over what it
+stores.
+
+### Conversions
+
+An object converts to its superclass, to any protocol it adopts, and to
+`AnyObject` -- Objective-C's `id` -- for nothing, because it is the same
+pointer seen another way. The other direction is a cast, or `is` or a type
+pattern, and asks the object: `isKindOfClass:` for a class and
+`conformsToProtocol:` for a protocol. A cast the object says no to stops the
+program, naming what it really was:
+
+```
+stainless: cast failed: a SLOne is not a Demo.SLTwo
+```
+
+A pointer becomes an object only by a cast, which retains it, because a
+pointer owns nothing and the reference it becomes does. The other way is a
+cast too, and owns nothing.
+
+### Classes and their roots
+
+`[ObjCRoot]` marks a class with no superclass, such as `NSObject`, and every
+`extern objc class` MUST reach one through its superclasses (SL0911): a class
+object's metaclass points at its root's, so a chain that stops short would
+name the wrong one. A class's superclass is the first name in its list and
+the rest are protocols; an objc type derives from objc types only (SL0910).
+
+`[ObjCName]` is the name the Objective-C runtime knows, where it differs
+from the declaration's -- Objective-C's `NSObject` is a class and a protocol
+both, and Stainless needs two names. Either attribute on anything but an
+objc type is refused (SL0908).
+
+An `extern objc class` describes a class that is laid out, made and taken
+apart by code compiled somewhere else, so it declares no field, no static
+storage, no constructor, no destructor and no event (SL0909), and `new`
+cannot make one (SL0914): send it the messages its headers make one with.
+
+### Autorelease pools
+
+An object a message hands back at +0 lives until the autorelease pool
+holding it drains. `Main` and every thread and every pool job run inside a
+pool of their own, so a program never has to make one to be correct.
+`WithAutoreleasePool(() => ...)` drains one each time round a loop that makes
+many such objects and should not hold them all until it ends.
+
+### Linking
+
+A program that names an Objective-C type is linked with libobjc. A framework
+is named as a library is, in the source or on the command line
+([section 8.7](#87-linking-a-platform-library)):
+
+```csharp
+#pragma comment(framework, "AppKit")
+```
+
+A case or a program may also include `.m` files, compiled with
+`-fobjc-arc` beside the Stainless code.
+
+### What is not there yet
+
+- **A class defined in Stainless.** `objc class` with bodies, which
+  Objective-C could subclass and call, is refused (SL0900).
+- **Blocks.** `objc closure` is refused (SL0900).
+- **A weak reference to an Objective-C object** (SL0912). A Stainless weak
+  reference is counted in the object's header, which an Objective-C object
+  has not got.
+- **A message held without being sent**, in a closure or a delegate
+  (SL0913). A message has no function to point at; write a lambda that sends
+  it.
+- **An Objective-C object returned through `extern "C"`** (SL0916). C does not
+  say whether the caller owns it; declare a pointer, and take the object with
+  a cast.
+- **An Objective-C exception** is not caught by anything a Stainless program
+  can write. One that reaches the top ends the program with Objective-C's own
+  message.
+
+## 8.7 Linking a platform library
 
 Object files, static archives and import libraries can be listed among the
 source paths, and are handed to the linker as they are. A library the linker can
@@ -727,7 +915,9 @@ stops every program that compiles it from repeating the name.
 #pragma comment(lib, "user32")
 ```
 
-This is MSVC's spelling, and it is the only pragma Stainless has. Both
+This is MSVC's spelling, and it is the only pragma Stainless has; on macOS
+`#pragma comment(framework, "AppKit")` and `--framework AppKit` name an Apple
+framework the same way. Both
 `"user32"` and `"user32.lib"` are accepted — the linker wants the first and a C
 programmer will type the second. A pragma inside a branch `#if` did not take
 means nothing, as a declaration there would. The names are gathered from every
@@ -753,7 +943,7 @@ A name declared 'extern "C"' has to come from somewhere. Link what defines it:
 ordinary input.
 ```
 
-## 8.7 Embedding a file
+## 8.8 Embedding a file
 
 ```csharp
 [Embed("logo.png")]                                  // read-only data
@@ -1026,7 +1216,7 @@ default configuration, a stub of machine code — and the only one of the two
 that can be writable or executable. What it cannot do is be enumerated,
 replaced after linking, or read by the operating system.
 
-## 8.8 Inline assembly
+## 8.9 Inline assembly
 
 ```csharp
 long Cycles()
@@ -1065,7 +1255,7 @@ constraints. Nothing is called at run time — the instructions are placed in th
 function, and the optimiser moves values into and out of the named registers
 around them.
 
-### 8.8.1 Operands
+### 8.9.1 Operands
 
 ```csharp
 asm (in rcx = count, in rsi = &buffer[0], inout rax = total, out rdx = carry)
@@ -1131,7 +1321,7 @@ already.
 declaration's: `in al = 200` is a byte, and `in al = 256` is SL0720. An integer
 literal given to a vector register is the floating-point number it names.
 
-### 8.8.2 Registers
+### 8.9.2 Registers
 
 | Target | General | Vector |
 |---|---|---|
@@ -1167,7 +1357,7 @@ double on the way in, and `{x30}` is refused as an operand and ignored as a
 clobber. `d` names a register holding a double, so a `float` in it is the
 narrower case above; `s` names one holding a float, so a `double` is too wide.
 
-### 8.8.3 What a block may change
+### 8.9.3 What a block may change
 
 **A block may change every register a C call may change**, and every one of
 them is declared changed to LLVM — the caller-saved set of the target, listed in
@@ -1211,7 +1401,7 @@ different number, and with the general ones left out it prints another; it runs
 on Windows and on Linux, whose sets differ, and
 [x86-asm](../../tests/cases/x86-asm) does the same for 32-bit x86.
 
-### 8.8.4 The text
+### 8.9.4 The text
 
 **Everything between the braces is the target assembler's**, handed to it as
 written, line for line, less any carriage return. The compiler does not read
@@ -1272,7 +1462,7 @@ before anything is parsed, and the lexer cannot see whether a word begins a
 statement: `void asm(int x) { ... }` has exactly the shape of a block. Nothing
 in this repository used the word as a name.
 
-### 8.8.5 What is undefined
+### 8.9.5 What is undefined
 
 The compiler cannot see inside a block, so these are the programmer's to keep,
 and breaking any of them is undefined behaviour rather than a diagnostic:
@@ -1288,7 +1478,7 @@ and breaking any of them is undefined behaviour rather than a diagnostic:
   `String`'s bytes, an array past its length — which a pointer already allows
   and a block allows no more carefully.
 
-### 8.8.6 Examples
+### 8.9.6 Examples
 
 ```csharp
 // Counts a buffer's set bits, whichever machine this is.

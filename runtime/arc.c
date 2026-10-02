@@ -147,6 +147,38 @@ void sl_foreign_null(const char *function, const char *type)
     abort();
 }
 
+void sl_objc_nil(const char *message, const char *type)
+{
+    fflush(NULL);
+
+    fprintf(stderr, "stainless: '%s' answered nil, and a %s is never nil\n", message, type);
+    fflush(stderr);
+
+    abort();
+}
+
+void sl_objc_unanswered(const char *message)
+{
+    fflush(NULL);
+
+    fprintf(stderr, "stainless: '%s' is optional, and this object does not answer it\n", message);
+    fflush(stderr);
+
+    abort();
+}
+
+/* The class name is asked of the Objective-C runtime by the program, so the
+   runtime here needs nothing of libobjc. */
+void sl_objc_cast_failed(const char *actual, const char *wanted)
+{
+    fflush(NULL);
+
+    fprintf(stderr, "stainless: cast failed: a %s is not a %s\n", actual, wanted);
+    fflush(stderr);
+
+    abort();
+}
+
 void sl_cast_failed(const void *object, const char *wanted)
 {
     const SlObject *header = (const SlObject *)object;

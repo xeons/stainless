@@ -156,6 +156,34 @@ public enum ConversionKind
     /// offset the layout fixed.
     /// </summary>
     ComTearOff,
+
+    /// <summary>
+    /// An Objective-C reference to its superclass, to a protocol it adopts, or
+    /// to <c>AnyObject</c>. Emits nothing: an Objective-C object is the same
+    /// pointer whatever it is seen as, and every member is reached by message.
+    /// </summary>
+    ObjCUpcast,
+
+    /// <summary>
+    /// The result of a <c>Self</c> method, as the type of the receiver it was
+    /// sent to. Emits nothing; it is what <c>instancetype</c> promises.
+    /// </summary>
+    ObjCSelf,
+
+    /// <summary>
+    /// An Objective-C reference to a class that derives from its type, or to
+    /// a protocol, explicit and checked: <c>isKindOfClass:</c> or
+    /// <c>conformsToProtocol:</c>, and a program that ends if the object says
+    /// no.
+    /// </summary>
+    ObjCDowncast,
+
+    /// <summary>
+    /// <c>byte*</c> -> an Objective-C reference, explicit. The object is
+    /// retained, because a pointer owns nothing and the reference it becomes
+    /// does.
+    /// </summary>
+    ObjCAdopt,
 }
 
 // ---------------------------------------------------------------- expressions
@@ -325,6 +353,14 @@ public sealed class BoundCall(
     /// when the two agree.
     /// </summary>
     public IReadOnlyList<int>? EvaluationOrder { get; init; }
+
+    /// <summary>
+    /// For a class message, the class it is sent to: the one the call named,
+    /// which may derive from the one that declares the method.
+    /// <c>NSString.Alloc()</c> sends <c>alloc</c> to NSString, not to the
+    /// NSObject that declares it. Null for every other call.
+    /// </summary>
+    public ClassTypeSymbol? ClassReceiver { get; init; }
 }
 
 public sealed class BoundUnary(

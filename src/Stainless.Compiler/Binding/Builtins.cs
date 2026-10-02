@@ -48,6 +48,13 @@ public sealed class Builtins
     public const string ComModuleName = "Standard.Com";
 
     /// <summary>
+    /// Where <c>AnyObject</c>, <c>Selector</c> and <c>Class</c> live, which a
+    /// declaration of Objective-C's own types needs. Not auto-imported, for
+    /// the reason <see cref="ComModuleName"/> is not.
+    /// </summary>
+    public const string ObjCModuleName = "Standard.ObjC";
+
+    /// <summary>
     /// Where the instructions that are not operators live: counting bits, and
     /// rotating them.
     ///
@@ -70,7 +77,21 @@ public sealed class Builtins
     public ModuleSymbol Text { get; }
     public ModuleSymbol Standard { get; }
     public ModuleSymbol Com { get; }
+    public ModuleSymbol ObjC { get; }
     public ModuleSymbol Bits { get; }
+
+    /// <summary>
+    /// <c>AnyObject</c>: Objective-C's <c>id</c>, which every objc reference
+    /// converts to. It names no protocol the runtime knows, so nothing is ever
+    /// asked of an object about it.
+    /// </summary>
+    public ObjCProtocolTypeSymbol AnyObject { get; }
+
+    /// <summary><c>Selector</c>: Objective-C's <c>SEL</c>, one pointer the runtime interned.</summary>
+    public StructTypeSymbol Selector { get; }
+
+    /// <summary><c>Class</c>: Objective-C's <c>Class</c>, one pointer to a class object.</summary>
+    public StructTypeSymbol ObjCClassHandle { get; }
 
     /// <summary>
     /// <c>Standard.Guid</c>: 16 bytes, laid out as every existing COM header
@@ -302,7 +323,19 @@ public sealed class Builtins
         Text = new ModuleSymbol(TextModuleName);
         Standard = new ModuleSymbol(StandardModuleName);
         Com = new ModuleSymbol(ComModuleName);
+        ObjC = new ModuleSymbol(ObjCModuleName);
         Bits = new ModuleSymbol(BitsModuleName);
+
+        AnyObject = new ObjCProtocolTypeSymbol
+        {
+            SimpleName = "AnyObject",
+            ModuleName = ObjCModuleName,
+            IsPublic = true,
+        };
+        ObjC.Types[AnyObject.SimpleName] = AnyObject;
+
+        Selector = Handle("Selector");
+        ObjCClassHandle = Handle("Class");
 
         Flags = new AttributeTypeSymbol
         {
@@ -575,7 +608,28 @@ public sealed class Builtins
         modules[Text.Name] = Text;
         modules[Standard.Name] = Standard;
         modules[Com.Name] = Com;
+        modules[ObjC.Name] = ObjC;
         modules[Bits.Name] = Bits;
+    }
+
+    /// <summary>
+    /// A struct of one pointer the Objective-C runtime hands out, in
+    /// <c>Standard.ObjC</c>. A struct rather than a pointer, so that a
+    /// selector cannot be passed where a class is wanted.
+    /// </summary>
+    private StructTypeSymbol Handle(string name)
+    {
+        var handle = new StructTypeSymbol
+        {
+            SimpleName = name,
+            ModuleName = ObjCModuleName,
+            IsPublic = true,
+        };
+        handle.Fields.Add(new FieldSymbol("_handle", BytePointer, handle, 0) { Offset = 0 });
+        int word = TargetPlatform.Current.PointerWidth;
+        handle.SetLayout(word, word);
+        ObjC.Types[name] = handle;
+        return handle;
     }
 
     /// <summary>

@@ -1,0 +1,12 @@
+# 'objc' on something that is not an interface, a class or a closure
+SL0900
+# 'extern' on a protocol
+SL0901
+# '[ObjCName]' on a Stainless type
+SL0908
+# a field in an 'extern objc class'
+SL0909
+# an Objective-C class deriving from a Stainless one
+SL0910
+# an imported class whose superclasses reach no '[ObjCRoot]'
+SL0911

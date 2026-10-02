@@ -1,0 +1,12 @@
+# a member of an 'extern objc class' with no selector and no body
+SL0902
+# a selector on a member that has a body
+SL0903
+# a selector that is not one
+SL0904
+# a selector whose colons do not match the parameters
+SL0905
+# '[Optional]' on a class's member
+SL0906
+# a 'String' in a message's signature
+SL0907

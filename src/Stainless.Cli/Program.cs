@@ -165,6 +165,7 @@ internal static class Program
                                    them, at roughly double the debug data
               -D, --define <name>  define a symbol for '#if' to test
               -l, --library <name> link a library the linker finds by name
+              --framework <name>   link an Apple framework, such as AppKit (macOS)
               --abi <microsoft|itanium>
                                    which C and C++ ABI to agree with: name
                                    mangling, bit-field layout and how a struct
@@ -999,6 +1000,11 @@ internal static class Program
                 case "-l" or "--library":
                     if (++i >= args.Length) { Error("'-l' needs a library name"); return false; }
                     arguments.Libraries.Add(args[i]);
+                    continue;
+
+                case "--framework":
+                    if (++i >= args.Length) { Error("'--framework' needs a framework name"); return false; }
+                    arguments.Libraries.Add(Toolchain.FrameworkPrefix + args[i]);
                     continue;
 
                 case "--keep":

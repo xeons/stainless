@@ -334,8 +334,8 @@ internal static class Program
             .OrderBy(p => p, StringComparer.Ordinal).ToList();
 
         var sources = Within("*.sl");
-        // C and C++ both, so a case can link against either language.
-        var natives = Within("*.c", "*.cpp");
+        // C, C++ and Objective-C, so a case can link against any of them.
+        var natives = Within("*.c", "*.cpp", "*.m");
 
         // A Windows resource script, for a case whose subject is what ends up
         // in the binary rather than what the code says.

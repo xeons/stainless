@@ -331,6 +331,7 @@ public sealed partial class LlvmEmitter(
         InterfaceTables(program);
         ComTables(program);
         ComFactoryTable(program);
+        ObjCTables();
 
         if (program.EntryPoint is not null && !forSharedLibrary)
             EmitEntryPoint(program.EntryPoint);
@@ -370,7 +371,16 @@ public sealed partial class LlvmEmitter(
         if (debug is not null)
         {
             _module.AppendLine();
-            _module.Append(debug.Render());
+            _module.Append(debug.Render(ObjCModuleFlags()));
+        }
+        else if (ObjCModuleFlags() is { Count: > 0 } flags)
+        {
+            // The only metadata a module without debug information has.
+            _module.AppendLine();
+            _module.AppendLine("!llvm.module.flags = !{" +
+                               string.Join(", ", flags.Select((_, i) => "!" + i)) + "}");
+            for (int i = 0; i < flags.Count; i++)
+                _module.AppendLine($"!{i} = {flags[i]}");
         }
 
         return _module.ToString();

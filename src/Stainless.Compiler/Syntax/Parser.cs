@@ -440,6 +440,13 @@ public sealed class Parser
         var declarations = ParseDeclarationCore(enclosingType);
 
         foreach (var declaration in declarations)
+            if ((declaration.Modifiers & (Modifiers.Objc | Modifiers.Extern)) != Modifiers.None &&
+                declaration is not (TypeDeclSyntax or DelegateDeclSyntax))
+                _diagnostics.Error("SL0900", declaration.Span,
+                    "'objc' goes before 'interface', 'class' or 'closure'; a member of an objc " +
+                    "type is Objective-C's because its type is");
+
+        foreach (var declaration in declarations)
             if (declaration.Modifiers.HasFlag(Modifiers.Required) &&
                 declaration is not (FieldDeclSyntax or PropertyDeclSyntax))
                 _diagnostics.Error("SL0783", declaration.Span,
@@ -476,6 +483,15 @@ public sealed class Parser
                 $"its type rather than to an object of it, and {article} {what} has neither. " +
                 "Only a class may be static, and a module is usually the better answer");
             modifiers &= ~Modifiers.Static;
+        }
+
+        // `extern objc class NSWindow`: a class that already exists. The word
+        // means what it means on a function, and is a modifier here because
+        // what follows is a type rather than a linkage string.
+        if (At(TokenKind.ExternKeyword) && Peek(1).Kind == TokenKind.ObjcKeyword)
+        {
+            Advance();
+            modifiers |= Modifiers.Extern | ParseModifiers();
         }
 
         if (At(TokenKind.ExternKeyword) || At(TokenKind.ExportKeyword))
@@ -561,8 +577,6 @@ public sealed class Parser
             // The one attribute a constructor takes is a rule for the
             // compiler, so it is read here rather than kept.
             bool setsRequired = attributes.Any(IsSetsRequiredMembers);
-            RejectAttributes(
-                attributes.Where(a => !IsSetsRequiredMembers(a)).ToList(), "a constructor");
             Advance();
             var ctorParams = ParseParameterList(out bool ctorVariadic);
 
@@ -608,17 +622,24 @@ public sealed class Parser
                     SpanFrom(start), modifiers, enclosingType, ctorParams, ctorBody)
                 {
                     SetsRequiredMembers = setsRequired,
+                    Attributes = attributes.Where(a => !IsSetsRequiredMembers(a)).ToList(),
                 },
             ];
         }
 
         var member = ParseFunctionOrField(start, modifiers, LinkageKind.Stainless, attributes);
 
-        // A field and a property both keep what was written on them; a function
-        // has no metadata table for one to be read back from, so an attribute
-        // there would be a line of source with nowhere to go.
-        if (member is FunctionDeclSyntax)
-            RejectAttributes(attributes, "a function");
+        // A field and a property both keep what was written on them. A method
+        // keeps its attributes for the binder, which accepts `[Selector]` on a
+        // member of an objc type and refuses the rest; a function at module
+        // level has no type to make that true.
+        if (member is FunctionDeclSyntax function)
+        {
+            if (enclosingType is null)
+                RejectAttributes(attributes, "a function");
+            else
+                return [function with { Attributes = attributes }];
+        }
 
         return [member];
     }
@@ -798,10 +819,10 @@ public sealed class Parser
         TokenKind.StaticKeyword => Modifiers.Static,
         TokenKind.ThreadsafeKeyword => Modifiers.Threadsafe,
 
-        // `com` reads as a modifier and means a different kind of
-        // declaration; only `interface` and `class` may follow it, which
-        // ParseTypeDeclaration checks.
+        // `com` and `objc` read as modifiers and mean a different kind of
+        // declaration; the binder checks what may follow each.
         TokenKind.ComKeyword => Modifiers.Com,
+        TokenKind.ObjcKeyword => Modifiers.Objc,
 
         TokenKind.Identifier when AtRequiredModifier() => Modifiers.Required,
         _ => Modifiers.None,
@@ -1850,12 +1871,13 @@ public sealed class Parser
 
         if (member is FunctionDeclSyntax function)
         {
-            RejectAttributes(attributes, "a function");
+            if (enclosingType is null)
+                RejectAttributes(attributes, "a function");
 
             if (isReadonly)
                 _diagnostics.Error("SL0828", SpanFrom(start),
                     $"'{function.Name}' is a method, and 'readonly' is about storage");
-            return member;
+            return enclosingType is null ? member : function with { Attributes = attributes };
         }
 
         // A property is the third thing, and its accessors carry the word for

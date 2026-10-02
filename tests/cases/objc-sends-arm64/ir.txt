@@ -1,0 +1,48 @@
+# Each send against what clang writes for the same call in Objective-C, with
+# --target=arm64-apple-macosx13.0 -fobjc-arc -fno-objc-msgsend-selector-stubs
+# -O0. clang adds noundef, and sends alloc through objc_alloc, which is the
+# same message by a shorter road.
+
+# The selector and the class are loaded from references the loader fills in.
+# clang: @OBJC_SELECTOR_REFERENCES_ = internal externally_initialized global ptr
+#        @OBJC_METH_VAR_NAME_, section "__DATA,__objc_selrefs,literal_pointers,no_dead_strip"
+internal externally_initialized global ptr @sl.objc.methname.0, section "__DATA,__objc_selrefs,literal_pointers,no_dead_strip", align 8
+section "__TEXT,__objc_methname,cstring_literals"
+# clang: @"OBJC_CLASSLIST_REFERENCES_$_" = internal global ptr @"OBJC_CLASS_$_SLShapes",
+#        section "__DATA,__objc_classrefs,regular,no_dead_strip"
+internal global ptr @"OBJC_CLASS_$_SLShapes", section "__DATA,__objc_classrefs,regular,no_dead_strip", align 8
+@llvm.compiler.used = appending global
+declare ptr @objc_msgSend(ptr, ptr, ...)
+
+# An argument travels as it would to C, after the receiver and the selector.
+# clang: call ptr @objc_msgSend(ptr noundef %9, ptr noundef %10, i64 noundef 5)
+, i64 5)
+, i64 3)
+
+# An object handed back at +0 is claimed straight away, after the marker the
+# runtime looks for. A copy is +1 and is not.
+# clang: call void asm sideeffect "mov\09fp, fp\09\09// marker for objc_retainAutoreleaseReturnValue", ""()
+#        call ptr @llvm.objc.retainAutoreleasedReturnValue(ptr %14)
+call void asm sideeffect "mov\09fp, fp\09\09// marker for objc_retainAutoreleaseReturnValue", ""()
+call ptr @objc_retainAutoreleasedReturnValue(ptr
+
+# A struct comes back in registers, through objc_msgSend itself.
+# clang: call %struct.SLWide @objc_msgSend(ptr noundef %19, ptr noundef %20)
+call %struct.ObjCSends_Wide @objc_msgSend(ptr
+
+# BOOL is bool on Apple silicon.
+# clang: call zeroext i1 @objc_msgSend(ptr noundef %30, ptr noundef %31, i64 noundef 6, i1 noundef zeroext true)
+call zeroext i1 @objc_msgSend(ptr
+, i64 6, i1 zeroext true)
+
+# An out object goes through a temporary the call writes back from.
+# clang: call zeroext i1 @objc_msgSend(ptr noundef %34, ptr noundef %36, ptr noundef %7)
+ptr %send.writeback.
+
+# What the image info says, which the linker writes and the runtime reads.
+# clang: !1 = !{i32 1, !"Objective-C Version", i32 2} and the four after it
+!{i32 1, !"Objective-C Version", i32 2}
+!{i32 1, !"Objective-C Image Info Version", i32 0}
+!{i32 1, !"Objective-C Image Info Section", !"__DATA,__objc_imageinfo,regular,no_dead_strip"}
+!{i32 1, !"Objective-C Garbage Collection", i8 0}
+!{i32 1, !"Objective-C Class Properties", i32 64}

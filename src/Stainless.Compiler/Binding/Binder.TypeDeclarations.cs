@@ -65,6 +65,8 @@ public sealed partial class Binder
 
                 bool isPublic = declaration.Modifiers.HasFlag(Modifiers.Public);
                 bool isCom = declaration.Modifiers.HasFlag(Modifiers.Com);
+                bool isObjC = declaration.Modifiers.HasFlag(Modifiers.Objc);
+                CheckObjCModifiers(declaration);
 
                 NamedTypeSymbol type = declaration.Kind switch
                 {
@@ -82,6 +84,14 @@ public sealed partial class Binder
                     // the ordinary one: the two are different things in memory,
                     // and sharing a symbol would mean every dispatch, every
                     // conversion and every retain asking which it was.
+                    TypeDeclKind.Interface when isObjC => new ObjCProtocolTypeSymbol
+                    {
+                        SimpleName = declaration.Name,
+                        ModuleName = module.Name,
+                        IsPublic = isPublic,
+                        Span = declaration.Span,
+                        Documentation = declaration.Documentation,
+                    },
                     TypeDeclKind.Interface when isCom => new ComInterfaceTypeSymbol
                     {
                         SimpleName = declaration.Name,
@@ -132,6 +142,11 @@ public sealed partial class Binder
                     },
                 };
 
+                if (isObjC && type is ClassTypeSymbol objcClass)
+                    objcClass.ObjC = declaration.Modifiers.HasFlag(Modifiers.Extern)
+                        ? ObjCClassKind.Imported
+                        : ObjCClassKind.Defined;
+
                 ReadInheritanceModifiers(type, declaration);
 
                 if (declaration.IsOpaque) DeclareOpaque(type, declaration);
@@ -140,9 +155,13 @@ public sealed partial class Binder
                 _typeSyntax[type] = (declaration, scope);
                 _declaredTypes[declaration] = type;
 
-                if (type is ClassTypeSymbol { IsIntrinsic: false } classType) _classes.Add(classType);
+                // An objc class has no Stainless header, so it MUST NOT reach
+                // anything that emits a TypeInfo, a destroy hook or a vtable.
+                if (type is ClassTypeSymbol { IsIntrinsic: false, IsObjC: false } classType) _classes.Add(classType);
+                if (type is ClassTypeSymbol { IsObjC: true } objcType) _objcClasses.Add(objcType);
                 if (type is InterfaceTypeSymbol interfaceType) _interfaces.Add(interfaceType);
                 if (type is ComInterfaceTypeSymbol comInterface) _comInterfaces.Add(comInterface);
+                if (type is ObjCProtocolTypeSymbol protocol) _objcProtocols.Add(protocol);
             }
 
             foreach (var declaration in unit.Declarations.OfType<AliasDeclSyntax>())
@@ -173,6 +192,14 @@ public sealed partial class Binder
                         new GenericDelegateTemplate(declaration.Name, scope, declaration);
                     continue;
                 }
+
+                if (declaration.Modifiers.HasFlag(Modifiers.Objc))
+                    diagnostics.Error("SL0900", declaration.Span,
+                        declaration.CarriesReceiver
+                            ? $"'{declaration.Name}' is an 'objc closure', a block, and blocks " +
+                              "are not supported yet"
+                            : $"'objc' goes before 'interface', 'class' or 'closure', and " +
+                              $"'{declaration.Name}' is a delegate, which is a C function pointer");
 
                 // Declared before the loop body reads it, so the local below
                 // keeps the name the rest of this block already uses.
@@ -439,7 +466,10 @@ public sealed partial class Binder
         // a delegate.
         if (existing is EnumTypeSymbol or DelegateTypeSymbol or ClosureTypeSymbol ||
             KindOf(existing) != declaration.Kind ||
-            (existing is ComInterfaceTypeSymbol) != declaration.Modifiers.HasFlag(Modifiers.Com))
+            (existing is ComInterfaceTypeSymbol) != declaration.Modifiers.HasFlag(Modifiers.Com) ||
+            IsObjCType(existing) != declaration.Modifiers.HasFlag(Modifiers.Objc) ||
+            (existing is ClassTypeSymbol { ObjC: ObjCClassKind.Imported }) !=
+                declaration.Modifiers.HasFlag(Modifiers.Extern))
         {
             diagnostics.Error("SL0550", declaration.Span,
                 $"'{declaration.Name}' is already declared in this module as a " +
@@ -484,12 +514,13 @@ public sealed partial class Binder
     /// layout is its own; a struct's is C's and an intrinsic's the runtime's.
     /// </summary>
     private static bool SpansDeclarations(NamedTypeSymbol type) =>
-        type is ClassTypeSymbol { IsIntrinsic: false, IsCom: false };
+        type is ClassTypeSymbol { IsIntrinsic: false, IsCom: false, ObjC: ObjCClassKind.None };
 
     /// <summary>The kind of declaration a symbol came from, for comparing two.</summary>
     private static TypeDeclKind KindOf(NamedTypeSymbol type) => type switch
     {
         ComInterfaceTypeSymbol => TypeDeclKind.Interface,
+        ObjCProtocolTypeSymbol => TypeDeclKind.Interface,
         InterfaceTypeSymbol => TypeDeclKind.Interface,
         AttributeTypeSymbol => TypeDeclKind.Attribute,
         VariantTypeSymbol => TypeDeclKind.Variant,
@@ -501,6 +532,9 @@ public sealed partial class Binder
     private static string Described(NamedTypeSymbol type) => type switch
     {
         ComInterfaceTypeSymbol => "com interface",
+        ObjCProtocolTypeSymbol => "objc interface",
+        ClassTypeSymbol { ObjC: ObjCClassKind.Imported } => "extern objc class",
+        ClassTypeSymbol { ObjC: ObjCClassKind.Defined } => "objc class",
         InterfaceTypeSymbol => "interface",
         AttributeTypeSymbol => "attribute",
         VariantTypeSymbol => "variant",

@@ -21,7 +21,7 @@ asm (out rax = low, out rdx = high) { rdtsc }
 Every one of those means what it means in C#, and the sections below are where
 that is not the whole story. The last is not C#'s at all: it is instructions for
 the target's assembler, with registers paired to values, and it is in
-[§8.8](08-interop-libraries.md#88-inline-assembly) beside the rest of what
+[§8.9](08-interop-libraries.md#89-inline-assembly) beside the rest of what
 reaches below the language rather than here. Four rules about the shape of the list itself are
 worth stating, because each is a question a reader asks exactly once:
 
@@ -100,7 +100,7 @@ type from where they are going ([§9.8](#98-defaultt), [§9.16](#916-new-with-th
 A cast takes a unary operand, which is why `(T)a * b` is `((T)a) * b`.
 
 Carrying a file's bytes is not among them: that is `[Embed]`, an attribute on a
-static ([§8.7](08-interop-libraries.md#87-embedding-a-file)), because what it
+static ([§8.8](08-interop-libraries.md#88-embedding-a-file)), because what it
 produces is a declaration's storage rather than the value of an expression.
 
 `?.`, `??` and `??=` are left out of that list deliberately and are in

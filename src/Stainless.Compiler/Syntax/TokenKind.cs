@@ -35,7 +35,7 @@ public enum TokenKind
     ProtectedKeyword,
     PublicKeyword, PrivateKeyword, InternalKeyword,
     ClassKeyword, StructKeyword, InterfaceKeyword, AttributeKeyword, EnumKeyword,
-    ComKeyword,
+    ComKeyword, ObjcKeyword,
     VariantKeyword, UnionKeyword, DelegateKeyword,
     ExternKeyword, ExportKeyword,
 
@@ -103,6 +103,7 @@ public static class TokenKindExtensions
         TokenKind.StructKeyword => "struct",
         TokenKind.InterfaceKeyword => "interface",
         TokenKind.ComKeyword => "com",
+        TokenKind.ObjcKeyword => "objc",
         TokenKind.AttributeKeyword => "attribute",
         TokenKind.EnumKeyword => "enum",
         TokenKind.VariantKeyword => "variant",

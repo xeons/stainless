@@ -61,7 +61,7 @@ field that was left out from one written as `0`.
 On a type, an enum, a field, a property, an event, and a `static`. Anywhere
 else is an error (SL0728) rather than a line the compiler drops: an attribute
 may decide something — `[Embed]`
-([§8.7](08-interop-libraries.md#87-embedding-a-file)) decides what a static
+([§8.8](08-interop-libraries.md#88-embedding-a-file)) decides what a static
 holds — and a declaration that quietly ignored one would compile to a
 declaration that does not have it, with nothing in the output to say which had
 happened.

@@ -588,22 +588,26 @@ public sealed class Lexer(
     /// <c>#pragma comment(lib, "user32")</c>: the file names a library it needs,
     /// rather than every program that compiles it repeating <c>-l user32</c>.
     /// This is MSVC's spelling, and it is the only pragma there is.
+    /// <c>#pragma comment(framework, "AppKit")</c> names an Apple framework the
+    /// same way, and reaches the library list as <c>framework:AppKit</c>.
     /// </summary>
     private void Pragma(string argument, SourceSpan span)
     {
         const string Prefix = "comment(lib,";
+        const string FrameworkPrefix = "comment(framework,";
 
         string text = argument.Replace(" ", "").Replace("\t", "");
-        if (!text.StartsWith(Prefix, StringComparison.Ordinal) ||
+        bool framework = text.StartsWith(FrameworkPrefix, StringComparison.Ordinal);
+        if (!(text.StartsWith(Prefix, StringComparison.Ordinal) || framework) ||
             !text.EndsWith(")", StringComparison.Ordinal))
         {
             diagnostics.Error("SL0483", span,
                 "the only pragma is '#pragma comment(lib, \"name\")', which names a " +
-                "library to link");
+                "library to link, or 'comment(framework, \"name\")' for an Apple framework");
             return;
         }
 
-        string name = text[Prefix.Length..^1];
+        string name = text[(framework ? FrameworkPrefix : Prefix).Length..^1];
         if (name.Length < 2 || name[0] != '"' || name[^1] != '"')
         {
             diagnostics.Error("SL0484", span,
@@ -624,6 +628,7 @@ public sealed class Lexer(
             return;
         }
 
+        if (framework) name = Driver.Toolchain.FrameworkPrefix + name;
         if (!Libraries.Contains(name, StringComparer.Ordinal)) Libraries.Add(name);
     }
 

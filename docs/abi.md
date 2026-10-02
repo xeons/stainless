@@ -471,7 +471,7 @@ statically allocated instance costs neither an allocation nor any reference
 traffic. String literals are emitted this way.
 
 So is the array an `[Embed]` static holds
-([§8.7 of the specification](spec/08-interop-libraries.md#87-embedding-a-file)),
+([§8.8 of the specification](spec/08-interop-libraries.md#88-embedding-a-file)),
 with one difference: its type word is **zero**. The object is written as
 assembly into a section whose permissions the program chose — read-only data,
 writable data or code — and a pointer there would be a relocation, which in a
@@ -907,6 +907,56 @@ COM requires and which object identity is built on.
 the language. [tests/cases/com](../tests/cases/com) is not marked windows-only
 and passes on Linux, tear-offs, adjustor thunks, QueryInterface and all.
 
+### 2.10 Objective-C
+
+An Objective-C reference is the object's own pointer, whose first word is its
+`isa`; there is no Stainless header, and nothing a Stainless header holds is
+asked of one. An objc class is kept out of the program's class list, so no
+TypeInfo, destroy hook or vtable is ever emitted for it.
+
+**A message is clang's classic send.** The selector is loaded from a
+reference in `__DATA,__objc_selrefs`, which the loader fills in from the name
+in `__TEXT,__objc_methname`, and the call is to `objc_msgSend` under the
+method's own signature -- receiver, selector, then the arguments as they would
+go to C. A class message loads its class from `__DATA,__objc_classrefs`,
+which points at `OBJC_CLASS_$_Name` and is never bypassed. Every one of these
+is in `llvm.compiler.used`, and the five image-info module flags clang writes
+are written, so the linker emits `__objc_imageinfo`:
+
+```llvm
+%sel = load ptr, ptr @sl.objc.selref.0
+%len = call i64 @objc_msgSend(ptr %string, ptr %sel)
+```
+
+| | Apple silicon | Intel |
+|---|---|---|
+| `BOOL` | `i1 zeroext` | `i8 signext`, converted with `!= 0` |
+| A struct returned in memory | `objc_msgSend`, the pointer in x8 | `objc_msgSend_stret` |
+| Claiming a +0 result | the `mov fp, fp` marker, then `objc_retainAutoreleasedReturnValue` | `notail call objc_retainAutoreleasedReturnValue` |
+
+**Ownership.** ARC's retain and release for an objc reference are
+`objc_retain` and `objc_release`. A message's object result is +1 when the
+selector is in the `alloc`, `new`, `copy`, `mutableCopy` or `init` family and
++0 otherwise; a +0 one is claimed straight after the send, so what the
+emitter holds is +1 either way, as every other call result is (section 5). An
+`init` takes its receiver at +1 and does not release it.
+
+**Writeback.** An `out` or `ref` object argument is passed as the address of
+a temporary holding null, or the current value for `ref`. After the send the
+temporary's value is retained into the target and the target's old value
+released.
+
+**Pools.** The entry point pushes an autorelease pool before the statics are
+made and pops it after `Main` returns, when the program sends any message.
+`runtime/thread.c` does the same around each thread and each pool job, with
+`objc_autoreleasePoolPush` found by `dlsym`, so the runtime links nothing of
+libobjc and a program that never loads it pays one lookup.
+
+**Statics.** A `static readonly` objc reference is held to exit and never made
+immortal -- `sl_make_immortal` writes the first word of the object, which is
+the `isa` -- and a mutable one is left out of exit teardown, by which time
+its framework may already be gone.
+
 ## 3. Calling convention
 
 | Declaration | Symbol name | Convention |
@@ -1190,7 +1240,7 @@ in the second register.
 Which registers a C call leaves the caller to preserve, by target. It matters
 twice here: it is what every function the compiler writes relies on across a
 call, and it is exactly what an `asm` block is declared to clobber
-([§8.8.3](spec/08-interop-libraries.md#883-what-a-block-may-change)).
+([§8.9.3](spec/08-interop-libraries.md#893-what-a-block-may-change)).
 
 | Target | General | Vector |
 |---|---|---|

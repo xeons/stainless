@@ -427,6 +427,9 @@ SL_API SL_NORETURN void sl_slot_empty(const char *slot);
  * that is never null. Names the function and the type. Never returns.
  */
 SL_API SL_NORETURN void sl_foreign_null(const char *function, const char *type);
+SL_API SL_NORETURN void sl_objc_nil(const char *message, const char *type);
+SL_API SL_NORETURN void sl_objc_unanswered(const char *message);
+SL_API SL_NORETURN void sl_objc_cast_failed(const char *actual, const char *wanted);
 
 /* -------------------------------------------------------------------- COM */
 

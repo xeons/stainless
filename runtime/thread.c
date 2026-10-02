@@ -557,6 +557,44 @@ _Bool sl_atomic_compare_exchange_pointer(void **cell, void **expected, void *des
 #  define SL_THREAD_STACK_SIZE ((size_t)8 * 1024 * 1024)
 #endif
 
+#if defined(__APPLE__)
+#  include <dlfcn.h>
+
+/*
+ * An Objective-C object a message hands back at +0 is held by the calling
+ * thread's autorelease pool until the pool drains. A program that sends
+ * messages has libobjc loaded, and then each thread and each job runs inside
+ * a pool of its own. The functions are looked up rather than linked, so the
+ * runtime asks nothing of libobjc and a program that never loads it pays one
+ * lookup.
+ */
+static void *(*objc_pool_push)(void);
+static void (*objc_pool_pop)(void *);
+static int objc_pool_found;
+
+static void *autorelease_pool_push(void)
+{
+    if (!__atomic_load_n(&objc_pool_found, __ATOMIC_ACQUIRE)) {
+        __atomic_store_n(&objc_pool_push,
+            (void *(*)(void))dlsym(RTLD_DEFAULT, "objc_autoreleasePoolPush"), __ATOMIC_RELAXED);
+        __atomic_store_n(&objc_pool_pop,
+            (void (*)(void *))dlsym(RTLD_DEFAULT, "objc_autoreleasePoolPop"), __ATOMIC_RELAXED);
+        __atomic_store_n(&objc_pool_found, 1, __ATOMIC_RELEASE);
+    }
+
+    void *(*push)(void) = __atomic_load_n(&objc_pool_push, __ATOMIC_RELAXED);
+    return push != NULL ? push() : NULL;
+}
+
+static void autorelease_pool_pop(void *pool)
+{
+    if (pool != NULL) __atomic_load_n(&objc_pool_pop, __ATOMIC_RELAXED)(pool);
+}
+#else
+static void *autorelease_pool_push(void) { return NULL; }
+static void autorelease_pool_pop(void *pool) { (void)pool; }
+#endif
+
 struct SlThread {
     void (*entry)(void *);
     void  *argument;
@@ -578,7 +616,9 @@ static DWORD WINAPI thread_trampoline(LPVOID parameter)
 static void *thread_trampoline(void *parameter)
 {
     SlThread *thread = (SlThread *)parameter;
+    void *pool = autorelease_pool_push();
     thread->entry(thread->argument);
+    autorelease_pool_pop(pool);
     return NULL;
 }
 #endif
@@ -801,7 +841,11 @@ static _Bool queue_pop(SlTask *task)
 
 static void run_task(SlTask task)
 {
+    /* A worker lives as long as the program, so its own pool would never
+       drain; each job gets one. */
+    void *pool = autorelease_pool_push();
     task.job(task.argument);
+    autorelease_pool_pop(pool);
 
     /*
      * Completing under the scope lock is what publishes the job's writes to

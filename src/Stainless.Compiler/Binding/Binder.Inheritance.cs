@@ -114,6 +114,14 @@ public sealed partial class Binder
                 var resolved = ResolveType(written, listedScope);
                 if (resolved.IsError()) continue;
 
+                // Objective-C's two kinds take part only with each other: a
+                // superclass and protocols, both reached by sending messages.
+                if (IsObjCType(type) || IsObjCType(resolved))
+                {
+                    BindObjCBase(type, resolved, written.Span, isFirst: i == 0);
+                    continue;
+                }
+
                 // A class in the list is the base class, and only the first name
                 // may be one -- which is what makes `: Base, IShape` read the way
                 // it does in C# without any lookahead at all.
@@ -184,7 +192,7 @@ public sealed partial class Binder
 
         // Every class gets a table, base or no base: a class may declare the
         // first `virtual` in its own family.
-        if (classType is not null) ResolveVirtuals(classType, declaration);
+        if (classType is { IsObjC: false }) ResolveVirtuals(classType, declaration);
 
         if (type is ComInterfaceTypeSymbol comType) ResolveComSlots(comType, declaration);
         if (classType is { IsCom: true }) ResolveComClass(classType, declaration);
@@ -816,7 +824,8 @@ public sealed partial class Binder
 
         foreach (var (type, entry) in _typeSyntax)
         {
-            var written = BindGuid(type, entry.Declaration);
+            var written = BindObjCTypeAttributes(
+                type, entry.Declaration, BindGuid(type, entry.Declaration));
             BindAttributes(written, type.Attributes, entry.Scope, type.Name);
 
             if (reflect is not null && type.Attributes.Any(a => a.Type == reflect))
@@ -836,6 +845,11 @@ public sealed partial class Binder
                         $"'[Reflect]' describes a field by its byte offset, and '{type.Name}' " +
                         "has bit-fields, which have not got one. Reflecting them means saying " +
                         "where in a byte they start, and the tables do not",
+                        type);
+                else if (IsObjCType(type))
+                    diagnostics.Error("SL0341", entry.Declaration.Span,
+                        $"'[Reflect]' describes what a Stainless type holds, and '{type.Name}' is " +
+                        "an Objective-C type, which the Objective-C runtime describes",
                         type);
                 else if (type is ClassTypeSymbol or StructTypeSymbol) type.IsReflected = true;
                 else
@@ -863,7 +877,11 @@ public sealed partial class Binder
                 if (member.Attributes.Count == 0) continue;
                 if (type.FindProperty(member.Name) is not { } property) continue;
 
-                BindAttributes(member.Attributes, property.Attributes, entry.Scope,
+                // An objc type's selectors were read in pass 4.
+                var kept = IsObjCType(type)
+                    ? member.Attributes.Where(a => !IsObjCMemberAttribute(a)).ToList()
+                    : member.Attributes;
+                BindAttributes(kept, property.Attributes, entry.Scope,
                     type.Name + "." + property.Name);
                 property.BackingField?.Attributes.AddRange(property.Attributes);
             }

@@ -64,7 +64,7 @@ the programmer's business, and inferring it from an optimisation level would be
 a rule nobody asked for.
 
 `#pragma` is the one directive that is not about choosing a branch; it is
-covered in [§8.6](08-interop-libraries.md#86-linking-a-platform-library).
+covered in [§8.7](08-interop-libraries.md#87-linking-a-platform-library).
 
 A whole file may be guarded, which is how a platform binding is written:
 [bindings/win32](../../bindings/win32) declares its `module` and then wraps

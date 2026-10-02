@@ -898,7 +898,7 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
-        return BuildCall(syntax, method, receiver: null, arguments);
+        return BuildCall(syntax, method, receiver: null, arguments, named: type);
     }
 
     private BoundExpression BindMethodCall(
@@ -1345,9 +1345,10 @@ public sealed partial class Binder
         return BuildCall(syntax, function, receiver: null, arguments);
     }
 
+    /// <param name="named">The type a static call was written through, which a class message is sent to.</param>
     private BoundExpression BuildCall(
         CallSyntax syntax, FunctionSymbol function, BoundExpression? receiver,
-        List<BoundExpression> arguments, bool nonVirtual = false)
+        List<BoundExpression> arguments, bool nonVirtual = false, NamedTypeSymbol? named = null)
     {
         if (nonVirtual && function.IsAbstract)
             return RefuseAbstractBase(function.Name, syntax.Span);
@@ -1386,6 +1387,9 @@ public sealed partial class Binder
         if (_builtins.IsArrayCreate(function) && order is null &&
             converted is [var count, { Type: ClosureTypeSymbol } make])
             return new BoundArrayCreate(syntax.Span, (ArrayTypeSymbol)function.ReturnType, count, make);
+
+        if (function.IsMessage)
+            return SendMessage(syntax.Span, function, receiver, converted, order, nonVirtual, named);
 
         return new BoundCall(syntax.Span, function, receiver, converted)
             { IsNonVirtual = nonVirtual, EvaluationOrder = order };

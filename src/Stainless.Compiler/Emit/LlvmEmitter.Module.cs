@@ -439,6 +439,9 @@ public sealed partial class LlvmEmitter
         Declare("sl_cast_failed", "declare void @sl_cast_failed(ptr, ptr) noreturn nounwind");
         Declare("sl_slot_empty", "declare void @sl_slot_empty(ptr) noreturn nounwind");
         Declare("sl_foreign_null", "declare void @sl_foreign_null(ptr, ptr) noreturn nounwind");
+        Declare("sl_objc_nil", "declare void @sl_objc_nil(ptr, ptr) noreturn nounwind");
+        Declare("sl_objc_unanswered", "declare void @sl_objc_unanswered(ptr) noreturn nounwind");
+        Declare("sl_objc_cast_failed", "declare void @sl_objc_cast_failed(ptr, ptr) noreturn nounwind");
         Declare("sl_switch_unmatched", "declare void @sl_switch_unmatched(ptr) noreturn nounwind");
         Declare("sl_com_retain", "declare void @sl_com_retain(ptr)");
         Declare("sl_com_release", "declare void @sl_com_release(ptr)");

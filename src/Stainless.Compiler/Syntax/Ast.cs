@@ -149,6 +149,21 @@ public enum Modifiers
     /// same union C# means, which is what <c>protected</c> alone already is.
     /// </summary>
     Internal = 1 << 12,
+
+    /// <summary>
+    /// On an interface, a class or a closure, one that is Objective-C's: a
+    /// protocol, a class the Objective-C runtime knows, or a block. The
+    /// reference is an Objective-C object pointer, counted with
+    /// <c>objc_retain</c> rather than <c>sl_retain</c>.
+    /// </summary>
+    Objc = 1 << 13,
+
+    /// <summary>
+    /// <c>extern objc class NSWindow</c>: a class that already exists in
+    /// Objective-C and is only described here, as <c>extern</c> describes a
+    /// function defined somewhere else.
+    /// </summary>
+    Extern = 1 << 14,
 }
 
 /// <summary>
@@ -386,6 +401,13 @@ public sealed record FunctionDeclSyntax(
     /// <see cref="CallingConvention.Default"/>.
     /// </summary>
     public CallingConvention CallingConvention { get; init; }
+
+    /// <summary>
+    /// What was written above a method of a type. Only a member of an objc
+    /// type may carry one -- <c>[Selector]</c> -- and the binder refuses the
+    /// rest; a function at module level is refused by the parser.
+    /// </summary>
+    public IReadOnlyList<AttributeSyntax> Attributes { get; init; } = [];
 }
 
 public sealed record FieldDeclSyntax(
@@ -535,6 +557,13 @@ public sealed record ConstructorDeclSyntax(
     /// constructor of the type MUST chain to it.
     /// </summary>
     public bool IsPrimary { get; init; }
+
+    /// <summary>
+    /// What was written above it, less <c>[SetsRequiredMembers]</c>. Only an
+    /// objc class's constructor may carry one, <c>[Selector]</c>, which makes
+    /// it an init method Objective-C can call too.
+    /// </summary>
+    public IReadOnlyList<AttributeSyntax> Attributes { get; init; } = [];
 }
 
 public sealed record DestructorDeclSyntax(

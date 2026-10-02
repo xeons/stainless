@@ -811,7 +811,8 @@ public sealed class DebugInfo
     /// The whole graph, plus the named metadata that anchors it. Emitted last,
     /// because a node is created the first time something refers to it.
     /// </summary>
-    public string Render()
+    /// <param name="moreFlags">Module flags of the program's own, such as Objective-C's image info.</param>
+    public string Render(IReadOnlyList<string>? moreFlags = null)
     {
         var text = new StringBuilder();
 
@@ -819,6 +820,9 @@ public sealed class DebugInfo
         {
             Add("!{i32 2, !\"Debug Info Version\", i32 3}"),
         };
+
+        foreach (string flag in moreFlags ?? [])
+            flags.Add(Add(flag));
 
         // Clang emits each only when the module asks. Asking for both is
         // legitimate: the two go into different sections.

@@ -396,6 +396,7 @@ public abstract class BoundTreeRewriter
                     {
                         IsNonVirtual = call.IsNonVirtual,
                         EvaluationOrder = call.EvaluationOrder,
+                        ClassReceiver = call.ClassReceiver,
                     };
             }
 

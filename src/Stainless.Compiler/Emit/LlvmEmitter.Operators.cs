@@ -116,6 +116,21 @@ public sealed partial class LlvmEmitter
                 return Same();
             }
 
+            // An Objective-C object is the same pointer whatever it is seen
+            // as, and every member is reached by message.
+            case ConversionKind.ObjCUpcast:
+            case ConversionKind.ObjCSelf:
+                return Same();
+
+            // A pointer owns nothing; the reference it becomes does.
+            case ConversionKind.ObjCAdopt:
+                Retain(operand.Ref, conversion.Type);
+                return Fresh(new Val(operand.Ref, to, conversion.Type));
+
+            case ConversionKind.ObjCDowncast:
+                EmitObjCCheck(operand.Ref, conversion.Type);
+                return Same();
+
             // The pointer is unchanged; what changes is that ARC now owns
             // it, and the +1 COM handed over is this value's.
             case ConversionKind.ComAdopt:

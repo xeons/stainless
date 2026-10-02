@@ -1,0 +1,29 @@
+# Each send against what clang writes for the same call in Objective-C, with
+# --target=x86_64-apple-macosx13.0 -fobjc-arc -fno-objc-msgsend-selector-stubs
+# -O0. What differs from Apple silicon is the two things this pins: BOOL, and
+# a struct returned in memory.
+
+internal externally_initialized global ptr @sl.objc.methname.0, section "__DATA,__objc_selrefs,literal_pointers,no_dead_strip", align 8
+internal global ptr @"OBJC_CLASS_$_SLShapes", section "__DATA,__objc_classrefs,regular,no_dead_strip", align 8
+declare ptr @objc_msgSend(ptr, ptr, ...)
+declare void @objc_msgSend_stret(ptr, ptr, ...)
+
+# Claimed with no marker: Intel's runtime reads the call that follows instead,
+# so the claim MUST NOT become a tail call.
+# clang: notail call ptr @llvm.objc.retainAutoreleasedReturnValue(ptr %14)
+notail call ptr @objc_retainAutoreleasedReturnValue(ptr
+
+# A 32-byte struct is returned in memory, through the stret entry point.
+# clang: call void @objc_msgSend_stret(ptr dead_on_unwind writable sret(%struct.SLWide) align 8 %4, ptr noundef %19, ptr noundef %22)
+call void @objc_msgSend_stret(ptr sret(%struct.ObjCSends_Wide) %send.sret.
+
+# BOOL is signed char on Intel, both ways.
+# clang: call signext i8 @objc_msgSend(ptr noundef %25, ptr noundef %26, i64 noundef 6, i8 noundef signext 1)
+call signext i8 @objc_msgSend(ptr
+, i64 6, i8 signext %
+
+# clang: call signext i8 @objc_msgSend(ptr noundef %28, ptr noundef %30, ptr noundef %7)
+ptr %send.writeback.
+
+!{i32 1, !"Objective-C Version", i32 2}
+!{i32 1, !"Objective-C Image Info Section", !"__DATA,__objc_imageinfo,regular,no_dead_strip"}

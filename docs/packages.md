@@ -221,7 +221,7 @@ needs to find an icon and what lets a tool enumerate or replace one; an
 start, with no
 lookup and no API, and it can be writable or executable. What it cannot do is
 be read by the operating system. The trade is set out in
-[§8.7 of the specification](spec/08-interop-libraries.md#embed-or-a-resource).
+[§8.8 of the specification](spec/08-interop-libraries.md#embed-or-a-resource).
 
 ## 3. Versions
 

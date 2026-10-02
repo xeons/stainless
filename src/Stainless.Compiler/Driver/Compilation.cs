@@ -443,7 +443,7 @@ public sealed class Compilation
 
     /// <summary>File kinds handed straight to the native toolchain rather than parsed.</summary>
     private static readonly string[] NativeExtensions =
-        [".c", ".cc", ".cpp", ".cxx", ".o", ".obj", ".lib", ".a"];
+        [".c", ".cc", ".cpp", ".cxx", ".m", ".mm", ".o", ".obj", ".lib", ".a"];
 
     public static bool IsNativeInput(string path) =>
         NativeExtensions.Contains(Path.GetExtension(path), StringComparer.OrdinalIgnoreCase);
@@ -992,6 +992,12 @@ public sealed class Compilation
             foreach (string library in unit.Libraries)
                 if (!libraries.Contains(library, StringComparer.Ordinal))
                     libraries.Add(library);
+
+        // A program that names an Objective-C type sends messages through
+        // libobjc, which no framework is guaranteed to bring in.
+        if ((program.ObjCClasses.Count > 0 || program.ObjCProtocols.Count > 0) &&
+            !libraries.Contains("objc", StringComparer.Ordinal))
+            libraries.Add("objc");
 
         // The .res files were compiled before emission. Only a PE linker takes
         // one; elsewhere the bytes are already in the IR as constant data.

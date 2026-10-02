@@ -186,7 +186,12 @@ public sealed partial class LlvmEmitter
             // for the rest of the program: a value that lives to process exit
             // has no reference traffic, and therefore none to race over. What
             // it owed is what making it immortal consumes.
-            if (symbol.Type.NeedsArc() && symbol.IsReadonly)
+            //
+            // Only an object with a Stainless header can be made immortal: the
+            // count sl_make_immortal writes is the first word of the object,
+            // which on a COM object is its vtable and on an Objective-C one its
+            // isa. Those are stored and held to exit, and never let go of.
+            if (symbol.Type.NeedsArc() && symbol.IsReadonly && RetainOf(symbol.Type) == "sl_retain")
             {
                 var kept = EmitOwnable(initializer);
                 Consume(kept);
@@ -289,8 +294,10 @@ public sealed partial class LlvmEmitter
     /// </summary>
     private void EmitStaticTeardown(BoundProgram program)
     {
+        // An Objective-C object is left alone: by the time the C runtime runs
+        // this, the frameworks it belongs to may be tearing themselves down.
         var releasable = program.Statics
-            .Where(s => s.Type.NeedsArc() && !s.IsReadonly
+            .Where(s => s.Type.NeedsArc() && !s.IsReadonly && !IsObjCReference(s.Type)
                         || s.Type is WeakTypeSymbol
                         || s.Type is StructTypeSymbol structType && structType.CarriesReferences())
             .Reverse()
@@ -371,6 +378,14 @@ public sealed partial class LlvmEmitter
         _module.AppendLine($"  call void @sl_console_start(){at}");
         _module.AppendLine($"  call void @sl_args_set(i32 %argc, ptr %argv){at}");
 
+        // An object a message hands back at +0 is held by a pool until it
+        // drains, and the main thread has none of its own until AppKit's run
+        // loop makes one. This one holds what Main and the statics leave.
+        bool pool = UsesObjC;
+        if (pool)
+            _module.AppendLine($"  %pool = call ptr @objc_autoreleasePoolPush(){at}");
+        string drain = pool ? $"  call void @objc_autoreleasePoolPop(ptr %pool){at}" : "";
+
         // Statics first, in dependency order, before any user code runs. After
         // the arguments, so that a static initializer may read them.
         if (_hasStatics)
@@ -395,6 +410,7 @@ public sealed partial class LlvmEmitter
             _module.AppendLine($"  call void {Symbol(entry)}({arguments}){at}");
             if (arguments.Length > 0)
                 _module.AppendLine($"  call void @sl_release(ptr %args){at}");
+            if (pool) _module.AppendLine(drain);
             _module.AppendLine($"  ret i32 0{at}");
         }
         else
@@ -402,6 +418,7 @@ public sealed partial class LlvmEmitter
             _module.AppendLine($"  %code = call i32 {Symbol(entry)}({arguments}){at}");
             if (arguments.Length > 0)
                 _module.AppendLine($"  call void @sl_release(ptr %args){at}");
+            if (pool) _module.AppendLine(drain);
             _module.AppendLine($"  ret i32 %code{at}");
         }
 

@@ -104,7 +104,8 @@ public sealed partial class LlvmEmitter
 
     private static Hold HoldOfConversion(BoundConversion conversion) => conversion.Kind switch
     {
-        ConversionKind.ArrayToSlice or ConversionKind.ComAdopt or ConversionKind.ComQuery => Hold.Owned,
+        ConversionKind.ArrayToSlice or ConversionKind.ComAdopt or ConversionKind.ComQuery
+            or ConversionKind.ObjCAdopt => Hold.Owned,
 
         // A strong reference out of a weak one is a new +1, or null.
         ConversionKind.ReferenceToOptional when conversion.Operand.Type is WeakTypeSymbol => Hold.Owned,
@@ -126,6 +127,7 @@ public sealed partial class LlvmEmitter
             or ConversionKind.NarrowOptional or ConversionKind.AssertPresent or ConversionKind.Upcast
             or ConversionKind.TestedReference or ConversionKind.Downcast
             or ConversionKind.ComUpcast or ConversionKind.ReferenceToOptional
+            or ConversionKind.ObjCUpcast or ConversionKind.ObjCSelf or ConversionKind.ObjCDowncast
         && !(conversion.Kind == ConversionKind.ReferenceToOptional
              && conversion.Operand.Type is WeakTypeSymbol)
         && CountedAlike(conversion.Operand.Type, conversion.Type);
@@ -680,15 +682,26 @@ public sealed partial class LlvmEmitter
     private static string RetainOf(TypeSymbol type) =>
         type is WeakTypeSymbol ? "sl_weak_retain"
         : IsComReference(type) ? "sl_com_retain"
+        : IsObjCReference(type) ? "objc_retain"
         : "sl_retain";
 
     private static string ReleaseOf(TypeSymbol type) =>
         type is WeakTypeSymbol ? "sl_weak_release"
         : IsComReference(type) ? "sl_com_release"
+        : IsObjCReference(type) ? "objc_release"
         : "sl_release";
 
-    private void Retain(string value, TypeSymbol type) =>
-        Line($"call void @{RetainOf(type)}(ptr {value})");
+    /// <summary>
+    /// Adds a reference. <c>objc_retain</c> answers with its argument and is
+    /// called as what it is; the answer is the same pointer, and unused.
+    /// </summary>
+    private void Retain(string value, TypeSymbol type)
+    {
+        if (IsObjCReference(type))
+            Emit("ptr", $"call ptr @objc_retain(ptr {value})");
+        else
+            Line($"call void @{RetainOf(type)}(ptr {value})");
+    }
 
     private void Release(string value, TypeSymbol type) =>
         Line($"call void @{ReleaseOf(type)}(ptr {value})");

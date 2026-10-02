@@ -872,6 +872,9 @@ public sealed partial class LlvmEmitter
     {
         var value = EmitExpression(test.Value);
 
+        if (Binder.IsObjCType(test.Tested))
+            return new Val(EmitObjCTest(value.Ref, test.Tested), "i1", test.Type);
+
         string answer = test.Tested switch
         {
             // The object is asked, and it answers at +1 -- which sl_com_is

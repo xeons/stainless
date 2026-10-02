@@ -189,7 +189,7 @@ public class Scanner
             "class", "com", "const", "continue", "default", "delegate", "do",
             "else", "enum", "export", "extern", "false", "for", "foreach",
             "goto", "if", "iidof", "import", "in", "interface", "internal", "is",
-            "module", "nameof", "new", "null", "offsetof", "operator", "override",
+            "module", "nameof", "new", "null", "objc", "offsetof", "operator", "override",
             "parallel", "private", "protected", "public", "readonly", "ref",
             "return", "sealed", "sizeof", "spawn", "static", "struct",
             "switch", "this", "threadsafe", "true", "try", "typeof", "union",

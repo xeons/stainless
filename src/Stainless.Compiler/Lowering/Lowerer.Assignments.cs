@@ -71,7 +71,8 @@ public sealed partial class Lowerer
             indices = indices.Select(index => Holds.HoldValue(index, held, everything: true)).ToList();
         }
 
-        var reread = new BoundCall(read.Span, read.Function, receiver, indices) { IsNonVirtual = read.IsNonVirtual };
+        var reread = new BoundCall(read.Span, read.Function, receiver, indices)
+            { IsNonVirtual = read.IsNonVirtual, ClassReceiver = read.ClassReceiver };
 
         if (!compound.IsFallback)
         {

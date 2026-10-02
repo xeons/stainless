@@ -37,6 +37,16 @@ public sealed record BoundProgram
     public required IReadOnlyList<ComInterfaceTypeSymbol> ComInterfaces { get; init; }
 
     /// <summary>
+    /// Every Objective-C class the program declares, imported or defined. None
+    /// of them is in <see cref="Classes"/>: an objc object has no Stainless
+    /// header, so nothing emitted for those may be emitted for these.
+    /// </summary>
+    public IReadOnlyList<ClassTypeSymbol> ObjCClasses { get; init; } = [];
+
+    /// <summary>Every Objective-C protocol the program declares.</summary>
+    public IReadOnlyList<ObjCProtocolTypeSymbol> ObjCProtocols { get; init; } = [];
+
+    /// <summary>
     /// Every struct type the program uses: those declared in a module, and the
     /// instantiations of a generic one. An instantiation belongs to no module's
     /// type table, so without this the IR would name a type nothing defined.
@@ -286,6 +296,7 @@ public sealed partial class Binder(
         CheckVarianceDeclarations();
                                     //         and every 'where' clause could be met
         ResolveAttributes();        // pass 6: attributes fold to constants
+        CheckObjCClasses();         //         and every objc class is one the runtime can find
         SettleLayoutsWaitingForAttributes();
         CheckActivatableClasses();  //         and a CLSID says who can be made
         ComputeLayouts();           // pass 7: every value type has a size
@@ -334,6 +345,8 @@ public sealed partial class Binder(
             Classes = _classes,
             Interfaces = _interfaces,
             ComInterfaces = _comInterfaces,
+            ObjCClasses = _objcClasses,
+            ObjCProtocols = _objcProtocols,
             Structs = _modules.Values
                 .SelectMany(m => m.Types.Values)
                 .OfType<StructTypeSymbol>()

@@ -46,6 +46,13 @@ public sealed class Toolchain
     public string ClangPath { get; }
 
     /// <summary>
+    /// What marks an Apple framework in a library list: <c>framework:AppKit</c>
+    /// links with <c>-framework AppKit</c>. One list for both keeps a
+    /// project's overlay, a pragma and the command line saying it one way.
+    /// </summary>
+    public const string FrameworkPrefix = "framework:";
+
+    /// <summary>
     /// Homebrew's <c>lib</c>, which a Darwin link searches for a named library,
     /// or null. ld64 searches <c>/usr/local/lib</c> on its own, which covers an
     /// Intel Mac; Apple silicon's Homebrew is in <c>/opt/homebrew</c>, which it
@@ -704,6 +711,12 @@ public sealed class Toolchain
         if (sharedRuntime is not null) arguments.Add(sharedRuntime.LinkInput);
         else arguments.AddRange(runtimeObjects);
 
+        // Objective-C beside a Stainless program is counted as Stainless is,
+        // so its objects and the program's agree about who owns what.
+        if (nativeInputs.Any(i => i.EndsWith(".m", StringComparison.OrdinalIgnoreCase) ||
+                                  i.EndsWith(".mm", StringComparison.OrdinalIgnoreCase)))
+            arguments.Add("-fobjc-arc");
+
         arguments.AddRange(nativeInputs);
 
         // Named libraries come after the objects that reference them, because a
@@ -712,7 +725,13 @@ public sealed class Toolchain
         // reaches the Windows SDK's user32.lib through the linker's own paths.
         if (target.IsDarwin && HomebrewLibraryDirectory is { } homebrew && libraries is { Count: > 0 })
             arguments.Add("-L" + homebrew);
-        foreach (string library in libraries ?? []) arguments.Add("-l" + library);
+        foreach (string library in libraries ?? [])
+        {
+            if (library.StartsWith(FrameworkPrefix, StringComparison.Ordinal))
+                arguments.AddRange(["-framework", library[FrameworkPrefix.Length..]]);
+            else
+                arguments.Add("-l" + library);
+        }
 
         // Windows puts the maths and the threads in the C runtime; ELF systems
         // keep libm separate to this day, and kept libpthread separate until

@@ -31,7 +31,17 @@ public sealed partial class Binder
     private void DeclareFunction(FileScope scope, NamedTypeSymbol? containingType, FunctionDeclSyntax declaration)
     {
         var module = scope.Module;
-        var returnType = ResolveType(declaration.ReturnType, scope, allowVoid: true);
+
+        // `Self` is Objective-C's instancetype: on a member of an objc type it
+        // is that type here, and the receiver's at a call.
+        bool returnsSelf = IsObjCType(containingType) &&
+                           declaration.ReturnType is NamedTypeSyntax
+                           {
+                               Name.Parts: ["Self"], TypeArguments.Count: 0,
+                           };
+        var returnType = returnsSelf
+            ? containingType!
+            : ResolveType(declaration.ReturnType, scope, allowVoid: true);
 
         // Static is a statement about a member. On a module-level function the
         // word is refused below (SL0573) and the function is an ordinary one:
@@ -69,6 +79,7 @@ public sealed partial class Binder
             Scope = scope,
             MemberConstraints = declaration.TypeParameters.Count == 0 ? declaration.Constraints : [],
             DoesNotReturn = declaration.DoesNotReturn,
+            ReturnsSelf = returnsSelf,
         };
 
         // An operator has no receiver: it is static, and every operand is
@@ -81,13 +92,17 @@ public sealed partial class Binder
             // A method receives its instance: classes and interfaces by
             // reference, structs by pointer. An interface's is the object a
             // default body runs on, seen as the interface.
-            TypeSymbol thisType = containingType is ClassTypeSymbol or InterfaceTypeSymbol
+            TypeSymbol thisType = containingType is ClassTypeSymbol or InterfaceTypeSymbol or ObjCProtocolTypeSymbol
                 ? containingType
                 : containingType.MakePointerType();
             symbol.Parameters.Add(new ParameterSymbol("this", thisType, 0) { IsThis = true });
         }
 
         AddParameters(symbol, declaration.Parameters, scope);
+
+        if (containingType is not null)
+            ReadMethodAttributes(symbol, containingType, declaration.Attributes,
+                declaration.Body is not null, declaration.Span);
 
         if (declaration.ExplicitInterface is { } named)
         {
@@ -155,7 +170,10 @@ public sealed partial class Binder
         // An interface method may have a body or not: one with a body is a
         // default, what an implementing class that supplies none gets in its
         // slot.
-        if (containingType is not { IsContract: true })
+        // A message to a protocol or an imported class has no body here; one
+        // without a selector has already been refused for having nothing to send.
+        if (containingType is not { IsContract: true } &&
+            !(IsDescribedOnly(containingType) && declaration.Body is null))
         {
             if (symbol.IsAbstract)
             {
@@ -614,6 +632,20 @@ public sealed partial class Binder
                 LinkageKind.ExternCpp => "extern \"C++\"",
                 _ => "export \"C++\"",
             };
+
+            // A C function handing back an Objective-C object says nothing about
+            // who owns it, and the answer decides a release; an exported one
+            // would need a C header able to name the class.
+            if (IsObjCReference(symbol.ReturnType) ||
+                (!symbol.Linkage.IsImport() && symbol.Parameters.Any(p => IsObjCReference(p.Type))))
+                diagnostics.Error("SL0916", symbol.Span,
+                    symbol.Linkage.IsImport()
+                        ? $"'{symbol.Name}' returns an Objective-C object across {how}, and C " +
+                          "does not say whether the caller owns it. Declare it to return a " +
+                          "pointer, and take the object with a cast, which retains it"
+                        : $"'{symbol.Name}' crosses {how} with an Objective-C object, and the C " +
+                          "header written for it has no way to name the class. Pass a pointer",
+                    symbol.ReturnType);
 
             if (FindSlot(symbol.ReturnType) is { } returnedSlot)
                 diagnostics.Error("SL0284", symbol.Span,
