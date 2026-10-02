@@ -46,11 +46,17 @@ internal static class CaseSelection
         string platformPath = Path.Combine(directory, "platform.txt");
         if (File.Exists(platformPath))
         {
-            string wanted = File.ReadAllText(platformPath).Trim().ToLowerInvariant();
-            if (wanted is not ("windows" or "linux" or "macos"))
-                throw new InvalidOperationException($"unknown platform '{wanted}'");
-            if (wanted != FormatPlatformName(host.Os))
-                return $"{wanted} only";
+            // One platform a line, for a case that is true of several but
+            // not of all: what POSIX promises and Windows does not, say.
+            var wanted = File.ReadAllLines(platformPath)
+                .Select(l => l.Trim().ToLowerInvariant())
+                .Where(l => l.Length > 0 && !l.StartsWith('#'))
+                .ToList();
+            foreach (string named in wanted)
+                if (named is not ("windows" or "linux" or "macos"))
+                    throw new InvalidOperationException($"unknown platform '{named}'");
+            if (!wanted.Contains(FormatPlatformName(host.Os)))
+                return $"{string.Join(" and ", wanted)} only";
         }
 
         string targetPath = Path.Combine(directory, "target.txt");

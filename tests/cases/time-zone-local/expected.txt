@@ -1,0 +1,5 @@
+machine zone named: yes
+machine zone found again: yes
+TZ=Europe/Berlin: Europe/Berlin winter 1h00m00.000s summer 2h00m00.000s
+TZ=:America/New_York: America/New_York winter -5h00m00.000s summer -4h00m00.000s
+TZ=Asia/Tokyo: Asia/Tokyo winter 9h00m00.000s summer 9h00m00.000s

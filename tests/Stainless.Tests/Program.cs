@@ -109,9 +109,9 @@ namespace Stainless.Tests;
 /// that is a known bug should stop getting worse while it waits to be fixed.
 /// The comment in each says which of those it is.
 ///
-/// A case containing platform.txt runs only on the platform it names -- windows,
-/// linux or macos -- and is reported as skipped elsewhere. Only a case that
-/// cannot mean anything on another platform should have one.
+/// A case containing platform.txt runs only on the platforms it names, one a
+/// line -- windows, linux or macos -- and is reported as skipped elsewhere.
+/// Only a case that cannot mean anything on another platform should have one.
 ///
 /// A case containing expected.windows.txt, expected.linux.txt or
 /// expected.macos.txt is measured against that instead of expected.txt where it
