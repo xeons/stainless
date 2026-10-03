@@ -75,24 +75,7 @@ public sealed partial class LlvmEmitter
         _nextTemp = 0;
 
         string returnType = ResultSpelling(returnInfo);
-        // `public` deliberately does not export: it says which modules may see
-        // this, and a C library's surface is stated once with `export "C"`.
-        // Asking for module metadata says something different — that another
-        // Stainless compilation will bind against this — and that surface is
-        // exactly the public declarations the metadata describes.
-        // Protected is exported alongside public, and only from a public type: a
-        // dispatched method must be public or protected (SL0506), so a protected
-        // one can be filling a slot that a class derived in another binary has
-        // to copy into its own table or replace. A consumer that is not deriving
-        // still cannot reach it -- what keeps it protected is the binder, and
-        // the export only means the linker can find it.
-        bool exported = symbol.Linkage is LinkageKind.ExportC or LinkageKind.ExportCpp
-            || (DescribedToConsumers(symbol.ModuleName) && symbol.Linkage == LinkageKind.Stainless
-                && !symbol.IsExternal
-                && (symbol.IsPublic || symbol.IsProtected
-                    || symbol.Kind == FunctionKind.Constructor)
-                && symbol.ContainingType is null or { IsPublic: true }
-                && symbol.TypeArguments.Count == 0);
+        bool exported = IsExported(symbol);
         // Everything else is internal, which is what lets LLVM delete what
         // nothing references before optimizing it rather than after.
         string linkage = exported ? "" : "internal ";

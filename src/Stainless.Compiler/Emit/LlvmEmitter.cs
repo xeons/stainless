@@ -91,7 +91,8 @@ public enum Hold
 public sealed partial class LlvmEmitter(
     bool forSharedLibrary = false, IReadOnlySet<string>? consumerModules = null,
     DebugInfo? debug = null, bool sharedRuntime = false,
-    CppAbi abi = CppAbi.Microsoft, byte[]? resourceBlob = null)
+    CppAbi abi = CppAbi.Microsoft, byte[]? resourceBlob = null,
+    IReadOnlySet<string>? prunedModules = null)
 {
     /// <summary>
     /// How a struct crosses a call, which is a property of the target and not
@@ -287,6 +288,10 @@ public sealed partial class LlvmEmitter(
         if (!program.IsLowered)
             throw new InternalCompilerError("the emitter was handed a program that was not lowered");
 
+        // First, because the tables below name functions, and a name is what
+        // queues a body.
+        QueueRoots(program);
+
         Header();
         StructTypes(program);
         RuntimeDeclarations();
@@ -305,18 +310,13 @@ public sealed partial class LlvmEmitter(
         ResourceBlob();
         StaticStorage(program);
 
-        foreach (var function in program.Functions)
-            EmitFunction(function);
+        EmitReached();
 
         // Before the initializer, which registers it: whether there is
         // anything to tear down is what decides whether it does.
         EmitStaticTeardown(program);
         EmitStaticInitializer(program);
-
-        // After the functions, because a thunk clobbers the per-function state
-        // the one that asked for it is still using.
-        EmitThunks();
-        EmitEnumTexts();
+        EmitReached();
 
         foreach (var classType in program.Classes)
             EmitDestroyThunk(classType);
@@ -331,10 +331,14 @@ public sealed partial class LlvmEmitter(
         InterfaceTables(program);
         ComTables(program);
         ComFactoryTable(program);
-        ObjCTables();
 
         if (program.EntryPoint is not null && !forSharedLibrary)
             EmitEntryPoint(program.EntryPoint);
+
+        // The last function is emitted here, so after this nothing new can be
+        // named; what follows reads what the functions collected.
+        EmitReached();
+        ObjCTables();
 
         StringConstants();
         EmbeddedData(program);

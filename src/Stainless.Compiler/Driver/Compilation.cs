@@ -907,7 +907,8 @@ public sealed class Compilation
             debug: debug,
             sharedRuntime: options.NeedsSharedRuntime,
             abi: target.Abi,
-            resourceBlob: resourceBlob);
+            resourceBlob: resourceBlob,
+            prunedModules: libraryFiles.Select(f => f.ModuleName).ToHashSet(StringComparer.Ordinal));
         phase.Restart();
         string ir = emitter.Emit(program);
         ReportPhase("emit", phase);

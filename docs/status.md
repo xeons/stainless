@@ -1094,16 +1094,18 @@ Being straight about the edges, roughly in the order they are worth adding:
   and does round-trip.
 - **An indexer has no automatic form.** `{ get; set; }` would have nothing to
   find storage for.
-- **The compiler prunes modules, not functions.** A standard-library module is
-  compiled only if the program reaches it, by an import or by a qualified name,
-  directly or through a module it reached; every file of the library is still
-  lexed. `Standard`, `Standard.Text` and `Standard.Collections` are always
-  reached, and are most of what a hello-world compiles. Within a reached module
-  every non-generic function is emitted. Everything not exported has internal
-  linkage, so an optimised build's first LLVM passes delete what nothing
-  references before the expensive ones see it; a debug build keeps it all, and
-  there every function's own section lets the linker discard it. A reachability
-  pass from `Main` is what would prune below the module.
+- **The program's own functions are all compiled, called or not.** A
+  standard-library module is parsed only if the program reaches it, by an
+  import or by a qualified name, directly or through a module it reached; every
+  file of the library is still lexed. Within a reached library module a
+  function is emitted only when something emitted names it -- a call, a
+  dispatch table, the static initializers -- which takes a hello-world's IR
+  from 1.3 MB to 100 KB and the IDE's from 28.6 MB to 14 MB. The program's own
+  are emitted whether or not anything calls them, so a mistake in one, an
+  `asm` block the assembler refuses included, is reported when it is written.
+  Everything not exported has internal linkage, so an optimised build's first
+  LLVM passes delete what nothing references, and in a debug build every
+  function's own section lets the linker discard it.
 - **ARC is not optimized across statements.** Each value the emitter makes
   says whether it is owned or borrowed, and an owned one is moved into a
   local, a return or an aggregate rather than retained and released
@@ -1115,9 +1117,9 @@ Being straight about the edges, roughly in the order they are worth adding:
 
   Worth knowing how much is actually at stake, because the obvious measurement
   overstates it. Counting `sl_retain` and `sl_release` in a module is not
-  counting what runs: nearly all of them are in library functions the program
-  never calls, so that number is really about the missing reachability pass
-  above. **A read through a reference already borrows** — `cells[i].Value` in a
+  counting what runs: a library function is in the IR because something names
+  it, not because it runs, and the program's own are there whether or not
+  anything calls them. **A read through a reference already borrows** — `cells[i].Value` in a
   loop emits no reference counting at all — so what is left to remove is
   narrower than it looks. The runtime declarations tell LLVM what is true
   of each entry point (`sl_retain` touches only the object's header;

@@ -258,6 +258,7 @@ directory, and then on `PATH`.
 | [Emit/Aapcs64Abi.cs](../src/Stainless.Compiler/Emit/Aapcs64Abi.cs) | ARM64 -- one classifier, because Microsoft's, Apple's and ARM's agree about every struct; Darwin's widening and empty structs are a flag |
 | [Emit/LlvmEmitter.cs](../src/Stainless.Compiler/Emit/LlvmEmitter.cs) | IR, metadata tables; partial over `LlvmEmitter.*.cs`, and where the four classifiers above are chosen between |
 | [Emit/LlvmEmitter.Arc.cs](../src/Stainless.Compiler/Emit/LlvmEmitter.Arc.cs) | every retain and release: what each value owes, where it is moved, and what a scope drops |
+| [Emit/LlvmEmitter.Reach.cs](../src/Stainless.Compiler/Emit/LlvmEmitter.Reach.cs) | which functions are emitted: the program's own, and a library function only once something emitted names it |
 | [Emit/DebugInfo.cs](../src/Stainless.Compiler/Emit/DebugInfo.cs) | what `-g` writes for a debugger |
 | [Emit/CHeaderWriter.cs](../src/Stainless.Compiler/Emit/CHeaderWriter.cs) | the C header for a shared library |
 | [Emit/MetadataWriter.cs](../src/Stainless.Compiler/Emit/MetadataWriter.cs) | the module metadata a Stainless consumer binds against |
@@ -419,12 +420,12 @@ and diff. `stainless emit-ir hello.sl` prints it.
 ## One module, or several
 
 clang optimizes and lowers a module on one thread, and for a large program
-that is most of the build: the IDE's IR is 28 MB, and clang spent 4.7 s of a
-6.0 s build compiling it. So a program with more than about 1 MB of reachable
-IR is divided into parts, at most one per processor, compiled at once and
-linked together. The IDE's parts take 1.3 s, and `samples/http-get.sl` builds
-in 2.8 s rather than 5.8 s. A small program is not divided, because one clang
-is faster there than several.
+that is most of the build: compiled as one module, the IDE's took 4.7 s of a
+6.0 s build. So a program with more than about 1 MB of reachable IR is divided
+into parts, at most one per processor, compiled at once and linked together.
+The IDE's nine parts take 0.8 s, and the whole build 2.3 s;
+`samples/http-get.sl` builds in 1.6 s rather than 5.8 s. A small program is
+not divided, because one clang is faster there than several.
 
 The parts are cut from the emitted text rather than by the emitter, because
 the text is a flat list of definitions and the cut is the same whatever
@@ -432,8 +433,9 @@ emitted it:
 
 - **What nothing reaches is dropped first.** One module loses it to LLVM in
   its first pass; divided, a definition one part names has to stay visible,
-  and would be compiled for nothing. Most of what a program emits from the
-  standard library is never called.
+  and would be compiled for nothing. The emitter leaves out the standard
+  library's unreached functions itself, so what is dropped here is the
+  program's own, which are emitted called or not.
 - **Functions go in runs of equal size**, in emitted order, so a module's
   code mostly stays together.
 - **A string's bytes are copied** into every part that reads them. Anything

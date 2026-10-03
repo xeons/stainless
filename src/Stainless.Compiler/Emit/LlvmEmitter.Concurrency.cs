@@ -377,15 +377,18 @@ public sealed partial class LlvmEmitter
         _module.AppendLine();
     }
 
+    /// <summary>How many of <see cref="_thunks"/> have been emitted.</summary>
+    private int _thunksEmitted;
+
     /// <summary>
-    /// Emits every thunk the program asked for. A thunk body may spawn again, so
-    /// this drains rather than iterates.
+    /// Emits every thunk asked for since the last call. A thunk body may spawn
+    /// again, so this drains rather than iterates.
     /// </summary>
     private void EmitThunks()
     {
-        for (int i = 0; i < _thunks.Count; i++)
+        for (; _thunksEmitted < _thunks.Count; _thunksEmitted++)
         {
-            switch (_thunks[i])
+            switch (_thunks[_thunksEmitted])
             {
                 case SpawnThunk spawn: EmitSpawnThunk(spawn); break;
                 case RangeThunk range: EmitRangeThunk(range); break;
@@ -455,7 +458,13 @@ public sealed partial class LlvmEmitter
     /// <c>__stdcall</c>'s <c>_f@8</c> would be looked for as <c>__f@8</c>.
     /// clang writes the same prefix for the same reason.
     /// </summary>
-    private static string Symbol(FunctionSymbol function) =>
+    private string Symbol(FunctionSymbol function)
+    {
+        Reach(function);
+        return SymbolSpelling(function);
+    }
+
+    private static string SymbolSpelling(FunctionSymbol function) =>
         Mangler.IsDecorated(function)
             ? "@\"\\01" + function.MangledName + "\""
             : Symbol(function.MangledName);

@@ -262,6 +262,9 @@ public sealed partial class LlvmEmitter
     }
 
     private readonly List<FunctionSymbol> _enumTexts = [];
+
+    /// <summary>How many of <see cref="_enumTexts"/> have been emitted.</summary>
+    private int _enumTextsEmitted;
     private readonly HashSet<FunctionSymbol> _enumTextsAsked = [];
 
     /// <summary>
@@ -272,8 +275,9 @@ public sealed partial class LlvmEmitter
     /// </summary>
     private void EmitEnumTexts()
     {
-        foreach (var function in _enumTexts)
+        for (; _enumTextsEmitted < _enumTexts.Count; _enumTextsEmitted++)
         {
+            var function = _enumTexts[_enumTextsEmitted];
             var enumType = function.TextOfEnum!;
             var underlying = enumType.UnderlyingType;
             string type = LlvmTypeOf(underlying);
