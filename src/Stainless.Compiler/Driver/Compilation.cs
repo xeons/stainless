@@ -1016,8 +1016,27 @@ public sealed class Compilation
         string? moduleDefinition = ModuleDefinition.Resolve(
             program, options.ModuleDefinitionPath, options.Shared, intermediate, output);
 
+        IReadOnlyList<string> programInputs = [irPath];
+        var partFiles = new List<string>();
+        if (DivisionOf(options, program, emitter) is var (mostParts, bytesPerPart))
+        {
+            phase.Restart();
+            var parts = IrPartitioner.Split(ir, mostParts, bytesPerPart);
+            ReportPhase("divide", phase);
+            if (parts.Count > 1)
+            {
+                phase.Restart();
+                var compiled = CompileParts(
+                    toolchain, parts, irPath, options.OptimizationLevel, partFiles, unlinkedReferences);
+                ReportPhase($"compile {parts.Count} parts", phase);
+                if (compiled.Failure is { } partFailure)
+                    return partFailure;
+                programInputs = compiled.Objects;
+            }
+        }
+
         var link = toolchain.Link(
-            irPath, runtimeObjects, nativeInputs, output, options.OptimizationLevel,
+            programInputs, runtimeObjects, nativeInputs, output, options.OptimizationLevel,
             options.Shared, options.Debug, libraries, sharedRuntime, moduleDefinition,
             loadsLibrariesBeside: referenceLibraries.Count > 0);
         if (!link.Success)
@@ -1061,6 +1080,8 @@ public sealed class Compilation
             // The runtime object is worth caching; the IR is not, unless asked for.
             TryDelete(irPath);
             irPath = "";
+            foreach (string file in partFiles)
+                TryDelete(file);
         }
 
         // The header restates what the ABI already guarantees, so it is written
@@ -1263,6 +1284,68 @@ public sealed class Compilation
             $"this program's resources include {string.Join(", ", present)}, which only Windows " +
             $"acts on: {target.Triple} carries them and 'Standard.Resources' can read them, but " +
             "nothing here turns one into a window icon, a menu or a manifest");
+    }
+
+    /// <summary>How much reachable IR one part should hold, so a small program is not divided.</summary>
+    private const long BytesPerPart = 1_000_000;
+
+    /// <summary>
+    /// How the program may be divided to compile at once: at most a part per
+    /// processor, each about <see cref="BytesPerPart"/>. Null for what
+    /// <see cref="IrPartitioner"/> cannot divide. <c>STAINLESS_PARTS</c> asks
+    /// for exactly that many, which is how the suites divide programs too small
+    /// to be divided otherwise.
+    /// </summary>
+    private static (int MostParts, long BytesPerPart)? DivisionOf(
+        CompilationOptions options, Binding.BoundProgram program, LlvmEmitter emitter)
+    {
+        if (options.Debug || emitter.AsmBlocks.Count > 0 ||
+            program.ObjCClasses.Count > 0 || program.ObjCProtocols.Count > 0)
+            return null;
+
+        if (Environment.GetEnvironmentVariable("STAINLESS_PARTS") is { Length: > 0 } given &&
+            int.TryParse(given, out int forced))
+            return forced > 1 ? (forced, 0) : null;
+
+        return (Environment.ProcessorCount, BytesPerPart);
+    }
+
+    /// <summary>
+    /// Each part written beside the IR and compiled to an object, all at once.
+    /// Every file written is added to <paramref name="written"/>, for removal
+    /// with the IR.
+    /// </summary>
+    private static (IReadOnlyList<string> Objects, CompilationResult? Failure) CompileParts(
+        Toolchain toolchain, IReadOnlyList<string> parts, string irPath, int optimizationLevel,
+        List<string> written, IReadOnlyList<string> unlinkedReferences)
+    {
+        string stem = Path.Combine(
+            Path.GetDirectoryName(irPath) ?? ".", Path.GetFileNameWithoutExtension(irPath));
+        var sources = new string[parts.Count];
+        var objects = new string[parts.Count];
+        for (int i = 0; i < parts.Count; i++)
+        {
+            sources[i] = $"{stem}.part{i}.ll";
+            objects[i] = $"{stem}.part{i}.o";
+            File.WriteAllText(sources[i], parts[i]);
+            written.Add(sources[i]);
+            written.Add(objects[i]);
+        }
+
+        var results = new ToolResult[parts.Count];
+        Parallel.For(0, parts.Count, i =>
+            results[i] = toolchain.CompilePart(sources[i], objects[i], optimizationLevel));
+
+        for (int i = 0; i < parts.Count; i++)
+        {
+            if (results[i].Success)
+                continue;
+            string error = results[i].StandardError;
+            return ([], IrFault.RejectedByClang(error)
+                ? Failure(IrFault.FromVerifier(error, parts[i]).Explain(sources[i]))
+                : Failure(LinkDiagnosis.Explain(error.TrimEnd(), sources[i], unlinkedReferences)));
+        }
+        return (objects, null);
     }
 
     private static void TryDelete(string path)
@@ -1479,7 +1562,7 @@ public sealed class Compilation
     private static CompilationResult Failed(DiagnosticBag diagnostics) =>
         new() { Success = false, Diagnostics = diagnostics.Sorted().ToList() };
 
-    private static readonly bool s_reportsPhases =
+    internal static readonly bool s_reportsPhases =
         Environment.GetEnvironmentVariable("STAINLESS_PHASE_TIMES") is { Length: > 0 } value && value != "0";
 
     /// <summary>

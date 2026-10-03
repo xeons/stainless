@@ -54,7 +54,7 @@ public class ToolchainTests
         TargetPlatform target, bool shared = false, bool debug = false,
         SharedRuntime? sharedRuntime = null, string? moduleDefinition = null) =>
         Under(target, () => Tools.LinkArguments(
-            "app.ll", ["arc.o"], [], shared ? Toolchain.SharedLibraryFileName("shapes", target) : "app", 0,
+            ["app.ll"], ["arc.o"], [], shared ? Toolchain.SharedLibraryFileName("shapes", target) : "app", 0,
             shared: shared, debug: debug, sharedRuntime: sharedRuntime,
             moduleDefinition: moduleDefinition));
 
@@ -95,7 +95,7 @@ public class ToolchainTests
     {
         var brewed = Toolchain.FromClang("clang-that-is-never-run", "/opt/homebrew/lib");
         IReadOnlyList<string> Link(TargetPlatform target, IReadOnlyList<string> libraries) =>
-            Under(target, () => brewed.LinkArguments("app.ll", ["arc.o"], [], "app", 0, libraries: libraries));
+            Under(target, () => brewed.LinkArguments(["app.ll"], ["arc.o"], [], "app", 0, libraries: libraries));
 
         var arguments = Link(TargetPlatform.Arm64MacOS, ["gtk-3"]).ToList();
         int search = arguments.IndexOf("-L/opt/homebrew/lib");

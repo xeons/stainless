@@ -185,6 +185,8 @@ with the reason, what a Mac cannot build: the IDE and `sldb`, which use
 | `STAINLESS_CLANG` | the clang to use; it always wins over `PATH` and the install directories |
 | `STAINLESS_RC` | the `llvm-rc` to use; otherwise the one beside clang, then `PATH` |
 | `STAINLESS_VERIFY_IR` | anything but `0` is `--verify-ir` on every build |
+| `STAINLESS_PARTS` | divide every program into exactly this many parts to compile at once; `1` divides none. See [internals](internals.md#one-module-or-several) |
+| `STAINLESS_PHASE_TIMES` | anything but `0` prints how long each phase and each run of clang took, on stderr |
 | `STAINLESS_HOME` | where fetched packages are cached, under `cache/` |
 | `STAINLESS_CPP_ABI` | `microsoft` or `itanium`: the host's C++ name mangling, for checking the other scheme against a real compiler |
 | `NO_COLOR` | set to anything, the rendered diagnostics carry no colour |

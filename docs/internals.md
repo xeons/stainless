@@ -228,7 +228,8 @@ directory, and then on `PATH`.
       v   LlvmEmitter, with the classifier for the target's ABI
    textual LLVM IR
       |
-      v   clang
+      v   IrPartitioner, for a large program: parts that compile at once
+      v   clang, once per part, then once to link
    native .exe
 ```
 
@@ -265,6 +266,7 @@ directory, and then on `PATH`.
 | [Driver/ProjectFile.cs](../src/Stainless.Compiler/Driver/ProjectFile.cs) | `stainless.json`, and refusing a field it does not know |
 | [Driver/PackageResolver.cs](../src/Stainless.Compiler/Driver/PackageResolver.cs) | resolving dependencies, with [PackageLock.cs](../src/Stainless.Compiler/Driver/PackageLock.cs) and [Digest.cs](../src/Stainless.Compiler/Driver/Digest.cs) for the lock and the layout fingerprint |
 | [Driver/Compilation.cs](../src/Stainless.Compiler/Driver/Compilation.cs) | the pipeline itself: sources in, IR, objects and the linked binary out |
+| [Driver/IrPartitioner.cs](../src/Stainless.Compiler/Driver/IrPartitioner.cs) | one module divided into several that compile at once |
 | [Driver/ProjectBuilder.cs](../src/Stainless.Compiler/Driver/ProjectBuilder.cs) | a project and its dependencies, each compiled in or built as a shared library |
 | [Driver/Toolchain.cs](../src/Stainless.Compiler/Driver/Toolchain.cs) | finding clang and `llvm-rc`, and driving them; building the runtime, compiled in or as the shared library every binary in a process loads by name from beside itself |
 | [runtime/](../runtime/) | the whole runtime, split by feature |
@@ -413,6 +415,41 @@ rather than at every lookup.
 Emitting `.ll` text rather than calling the LLVM C API means the compiler has no
 native dependency, builds anywhere .NET does, and produces output you can read
 and diff. `stainless emit-ir hello.sl` prints it.
+
+## One module, or several
+
+clang optimizes and lowers a module on one thread, and for a large program
+that is most of the build: the IDE's IR is 28 MB, and clang spent 4.7 s of a
+6.0 s build compiling it. So a program with more than about 1 MB of reachable
+IR is divided into parts, at most one per processor, compiled at once and
+linked together. The IDE's parts take 1.3 s, and `samples/http-get.sl` builds
+in 2.8 s rather than 5.8 s. A small program is not divided, because one clang
+is faster there than several.
+
+The parts are cut from the emitted text rather than by the emitter, because
+the text is a flat list of definitions and the cut is the same whatever
+emitted it:
+
+- **What nothing reaches is dropped first.** One module loses it to LLVM in
+  its first pass; divided, a definition one part names has to stay visible,
+  and would be compiled for nothing. Most of what a program emits from the
+  standard library is never called.
+- **Functions go in runs of equal size**, in emitted order, so a module's
+  code mostly stays together.
+- **A string's bytes are copied** into every part that reads them. Anything
+  with an address that matters -- a TypeInfo, a static -- lives in one part.
+- **What another part reaches is promoted** from `internal` to `hidden`, so it
+  links between the parts and is still not exported from a library.
+- **A function of up to 16 lines is copied** into each part that calls it as
+  `available_externally`, so it can still be inlined there. A larger one is
+  not, and that is the cost: a call across the cut to a larger function is a
+  call, where one module might have inlined it.
+
+A debug build is not divided, because each part would need its own copy of the
+compile unit's description. Nor is a program with an `asm` block of its own,
+or one that uses Objective-C, whose selector and class references belong to
+the object that names them. `STAINLESS_PARTS` asks for an exact number of
+parts, and running both suites with `STAINLESS_PARTS=4` divides every case.
 
 ## Why ownership works the way it does
 

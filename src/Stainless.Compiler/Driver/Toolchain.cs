@@ -646,12 +646,28 @@ public sealed class Toolchain
     }
 
     /// <summary>
-    /// Compiles the emitted IR and links it against the runtime, any C sources,
-    /// object files or libraries the program named by path, and any it named by
-    /// name for the linker to find.
+    /// Compiles one part of a divided program to an object file, for
+    /// <see cref="Link"/> to take in place of the IR.
+    /// </summary>
+    public ToolResult CompilePart(string irPath, string objectPath, int optimizationLevel) =>
+        Run(ClangPath, [
+            .. TargetArguments,
+            "-c", irPath,
+            $"-O{optimizationLevel}",
+            "-o", objectPath,
+            "-Wno-override-module",
+            "-ffunction-sections",
+            "-fdata-sections",
+        ]);
+
+    /// <summary>
+    /// Compiles the emitted IR -- or takes the objects its parts were compiled
+    /// to -- and links it against the runtime, any C sources, object files or
+    /// libraries the program named by path, and any it named by name for the
+    /// linker to find.
     /// </summary>
     public ToolResult Link(
-        string irPath,
+        IReadOnlyList<string> program,
         IReadOnlyList<string> runtimeObjects,
         IReadOnlyList<string> nativeInputs,
         string outputPath,
@@ -663,12 +679,12 @@ public sealed class Toolchain
         string? moduleDefinition = null,
         bool loadsLibrariesBeside = false) =>
         Run(ClangPath, LinkArguments(
-            irPath, runtimeObjects, nativeInputs, outputPath, optimizationLevel, shared,
+            program, runtimeObjects, nativeInputs, outputPath, optimizationLevel, shared,
             debug, libraries, sharedRuntime, moduleDefinition, loadsLibrariesBeside));
 
     /// <summary>The clang command line <see cref="Link"/> runs, for the current target.</summary>
     public IReadOnlyList<string> LinkArguments(
-        string irPath,
+        IReadOnlyList<string> program,
         IReadOnlyList<string> runtimeObjects,
         IReadOnlyList<string> nativeInputs,
         string outputPath,
@@ -685,7 +701,7 @@ public sealed class Toolchain
         // The IR is compiled in this same invocation, which is what makes
         // clang's Darwin driver run dsymutil after a -g link. Without that the
         // DWARF would stay in a temporary object clang deletes.
-        List<string> arguments = [.. TargetArguments, irPath];
+        List<string> arguments = [.. TargetArguments, .. program];
 
         // The lld-link beside clang rather than whichever linker clang would
         // pick, which before clang 22 is Visual Studio's link.exe wherever
@@ -947,6 +963,7 @@ public sealed class Toolchain
             startInfo.StandardInputEncoding = new System.Text.UTF8Encoding(false);
         foreach (string argument in arguments) startInfo.ArgumentList.Add(argument);
 
+        var clock = Stopwatch.StartNew();
         using var process = Process.Start(startInfo)
             ?? throw new InvalidOperationException($"could not start '{executable}'");
 
@@ -969,6 +986,19 @@ public sealed class Toolchain
         }
 
         process.WaitForExit();
+        if (Compilation.s_reportsPhases)
+            Console.Error.WriteLine(
+                $"tool {Path.GetFileNameWithoutExtension(executable)} {DescribeToolOutput(arguments)}: " +
+                $"{clock.Elapsed.TotalMilliseconds:F1} ms");
         return new ToolResult(process.ExitCode, output.Result, error.Result);
+    }
+
+    /// <summary>What a tool run wrote, by the name after its <c>-o</c>.</summary>
+    private static string DescribeToolOutput(IReadOnlyList<string> arguments)
+    {
+        for (int i = 0; i + 1 < arguments.Count; i++)
+            if (arguments[i] == "-o")
+                return Path.GetFileName(arguments[i + 1]);
+        return "";
     }
 }
