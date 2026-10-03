@@ -35,9 +35,9 @@ public sealed partial class Binder
     /// <summary>Every protocol in the program.</summary>
     private readonly List<ObjCProtocolTypeSymbol> _objcProtocols = [];
 
-    /// <summary>A protocol or an objc class, imported or defined.</summary>
+    /// <summary>A protocol, an objc class, imported or defined, or a block.</summary>
     internal static bool IsObjCType(TypeSymbol? type) =>
-        type is ObjCProtocolTypeSymbol or ClassTypeSymbol { IsObjC: true };
+        type is ObjCProtocolTypeSymbol or ClassTypeSymbol { IsObjC: true } or ObjCBlockTypeSymbol;
 
     /// <summary>An Objective-C reference, optional or not.</summary>
     internal static bool IsObjCReference(TypeSymbol? type) =>
@@ -400,6 +400,12 @@ public sealed partial class Binder
     private bool ClassifiesObjC(TypeSymbol from, TypeSymbol to, bool explicitCast, out ConversionKind? kind)
     {
         kind = null;
+
+        if (to is ObjCBlockTypeSymbol block && from is ClosureTypeSymbol closure)
+        {
+            kind = BecomesBlock(closure, block) ? ConversionKind.ClosureToBlock : null;
+            return true;
+        }
 
         if (from is PointerTypeSymbol && IsObjCType(to))
         {

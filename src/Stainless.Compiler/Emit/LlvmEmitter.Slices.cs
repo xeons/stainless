@@ -304,6 +304,8 @@ public sealed partial class LlvmEmitter
     /// </summary>
     private Val EmitClosureCall(BoundClosureCall call)
     {
+        if (call.Target.Type is ObjCBlockTypeSymbol block) return EmitBlockCall(call, block);
+
         var type = call.ClosureType;
         var returnInfo = ClassifyResult(type.ReturnType);
 

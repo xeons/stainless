@@ -433,4 +433,94 @@ public class ObjCTests
         string ir = new LlvmEmitter(forSharedLibrary: true).Emit(Lowerer.Lower(program));
         Assert.Contains("call ptr @sl_weak_load(ptr", Front.TestFunction(ir, "Gone"));
     }
+
+    // ------------------------------------------------------------ blocks
+
+    private const string BlockDeclarations = """
+        public objc closure void Seen(AnyObject item, bool flag);
+
+        public extern objc class Taker : NSObject
+        {
+            [Selector("take:")] public static void Take(Seen seen);
+        }
+
+        public class Counter
+        {
+            public long Count;
+        }
+
+        """;
+
+    [Fact]
+    public void ALambdaBecomesABlockCopiedToTheHeap()
+    {
+        string ir = IrFor(TargetPlatform.Arm64MacOS, BlockDeclarations + """
+            public void Use(Counter counter) => Taker.Take((AnyObject item, bool flag) => counter.Count++);
+            """);
+
+        string use = Front.TestFunction(ir, "Use");
+        Assert.Contains("store ptr @_NSConcreteStackBlock, ptr", use);
+        Assert.Contains("store i32 1107296256, ptr", use);
+        Assert.Contains("call ptr @_Block_copy(ptr", use);
+        Assert.Contains("i64 0, i64 48, ptr @sl.block.copy, ptr @sl.block.dispose", ir);
+        Assert.Contains("call void @sl_retain(ptr %receiver)", Definition(ir, "@sl.block.copy"));
+    }
+
+    [Fact]
+    public void ABlocksSignatureIsEncodedAsClangEncodesIt()
+    {
+        string arm = IrFor(TargetPlatform.Arm64MacOS, BlockDeclarations + """
+            public void Use() => Taker.Take((AnyObject item, bool flag) => { });
+            """);
+        Assert.Contains("c\"v20@?0@8B16\\00\"", arm);
+        Assert.Contains("c\"v24@0:8@?16\\00\"", IrFor(TargetPlatform.Arm64MacOS, BlockDeclarations + """
+            public objc class Keeper : NSObject
+            {
+                [Selector("keep:")] public void Keep(Seen seen) { }
+            }
+            """));
+
+        string intel = IrFor(TargetPlatform.X64MacOS, BlockDeclarations + """
+            public void Use() => Taker.Take((AnyObject item, bool flag) => { });
+            """);
+        Assert.Contains("c\"v20@?0@8c16\\00\"", intel);
+        Assert.Contains("(ptr %block, ptr %arg.item, i8 signext %arg.flag)", intel);
+    }
+
+    [Fact]
+    public void ACallThroughABlockGoesThroughItsInvokeFunction()
+    {
+        string ir = IrFor(TargetPlatform.Arm64MacOS, BlockDeclarations + """
+            public void Call(Seen seen, AnyObject item) => seen(item, true);
+            """);
+
+        string call = Front.TestFunction(ir, "Call");
+        Assert.Contains("getelementptr inbounds { ptr, i32, i32, ptr, ptr, ptr, ptr }, ptr %", call);
+        Assert.Contains("i32 0, i32 3", call);
+        Assert.Contains("i1 zeroext true)", call);
+    }
+
+    [Fact]
+    public void ABlockAMethodIsHandedIsCopiedFirst()
+    {
+        string ir = IrFor(TargetPlatform.Arm64MacOS, BlockDeclarations + """
+            public objc class Keeper : NSObject
+            {
+                Seen? _held;
+                [Selector("keep:")] public void Keep(Seen seen) => _held = seen;
+            }
+            """);
+
+        string imp = Definition(ir, "-[Test.Keeper keep:]");
+        Assert.Contains("call ptr @objc_retainBlock(ptr %arg.seen)", imp);
+        Assert.Contains("call void @objc_release(ptr", imp);
+    }
+
+    [Fact]
+    public void WhatABlockCarriesCrossesAsAMessagesArgumentsDo()
+    {
+        Assert.Contains("SL0907", CodesFor("public objc closure void Writes(out long result);"));
+        Assert.Contains("SL0907", CodesFor("public objc closure void Named(String name);"));
+        Assert.Empty(CodesFor("public objc closure NSString? Named(NSString name, bool* stop);"));
+    }
 }

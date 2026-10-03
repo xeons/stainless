@@ -1,0 +1,6 @@
+# an 'out' parameter, a String and a Stainless object in a block's signature
+SL0907
+# an object asked whether it is a block
+SL0518
+# a closure of another signature converted to a block
+SL0265

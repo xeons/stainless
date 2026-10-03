@@ -1564,6 +1564,32 @@ public sealed class ObjCProtocolTypeSymbol : NamedTypeSymbol
             .FirstOrDefault(q => q is not null);
 }
 
+/// <summary>
+/// <c>objc closure void Done(NSError? error)</c>: an Objective-C block.
+///
+/// A reference to one is a heap block, counted with <c>objc_retain</c> as
+/// every Objective-C object is. Stainless never holds a block on the stack: a
+/// lambda or a closure becomes one by being copied to the heap, and a block
+/// that arrives from Objective-C is copied before anything keeps it.
+/// </summary>
+public sealed class ObjCBlockTypeSymbol : NamedTypeSymbol
+{
+    public override int Size => TargetPlatform.Current.PointerWidth;
+    public override int Alignment => TargetPlatform.Current.PointerWidth;
+    public override bool IsManaged => true;
+    public override bool IsReferenceType => true;
+
+    /// <summary>
+    /// The closure type with the same signature, which a lambda is bound as
+    /// before it becomes a block, and which a block holds and calls.
+    /// </summary>
+    public required ClosureTypeSymbol Closure { get; init; }
+
+    public TypeSymbol ReturnType => Closure.ReturnType;
+
+    public List<ParameterSymbol> Signature => Closure.Signature;
+}
+
 /// <summary>What the Objective-C runtime has to do with a class.</summary>
 public enum ObjCClassKind
 {

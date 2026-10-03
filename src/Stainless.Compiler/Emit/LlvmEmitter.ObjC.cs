@@ -59,7 +59,8 @@ public sealed partial class LlvmEmitter
     private bool _countsObjC;
 
     private bool UsesObjC =>
-        _selectors.Count > 0 || _classReferences.Count > 0 || _definedObjCClasses.Count > 0 || _countsObjC;
+        _selectors.Count > 0 || _classReferences.Count > 0 || _definedObjCClasses.Count > 0 || _countsObjC ||
+        _blockTypes.Count > 0;
 
     /// <summary>
     /// Sends the message a call to a member of an objc type stands for.
@@ -448,6 +449,17 @@ public sealed partial class LlvmEmitter
         Declare("objc_retainAutoreleasedReturnValue",
             "declare ptr @objc_retainAutoreleasedReturnValue(ptr) nounwind");
         Declare("objc_getProtocol", "declare ptr @objc_getProtocol(ptr) nounwind");
+        if (_blockTypes.Count > 0 || _definedObjCClasses.Count > 0)
+        {
+            Declare("objc_autoreleaseReturnValue", "declare ptr @objc_autoreleaseReturnValue(ptr) nounwind");
+            Declare("objc_retainBlock", "declare ptr @objc_retainBlock(ptr) nounwind");
+            Declare("__objc_personality_v0", "declare i32 @__objc_personality_v0(...)");
+        }
+        if (_blockTypes.Count > 0)
+        {
+            Declare("_Block_copy", "declare ptr @_Block_copy(ptr) nounwind");
+            Declare("_NSConcreteStackBlock", "@_NSConcreteStackBlock = external global ptr");
+        }
         Declare("objc_autoreleasePoolPush", "declare ptr @objc_autoreleasePoolPush() nounwind");
         Declare("objc_autoreleasePoolPop", "declare void @objc_autoreleasePoolPop(ptr) nounwind");
         Declare("object_getClassName", "declare ptr @object_getClassName(ptr) nounwind");

@@ -735,7 +735,8 @@ nuint Measure() => NSString.FromUtf8("hello").Length;     // 5
 ```
 
 `objc interface` declares a protocol, `extern objc class` a class that
-already exists, and `objc class` a class this program defines. A reference to either is an Objective-C object pointer, and
+already exists, `objc class` a class this program defines, and `objc
+closure` a block. A reference to either is an Objective-C object pointer, and
 ARC counts it with `objc_retain` and `objc_release` exactly as it counts a
 Stainless object with `sl_retain`. Objective-C is Apple's, so a program that
 sends a message is built for `arm64-macos` or `x64-macos` (SL0915); the
@@ -935,6 +936,33 @@ is not a record, not `static`, takes no primary constructor, has no
 bit-fields, and answers no generic message; `typeof` does not describe it
 (SL0923). It implements no Stainless interface (SL0910).
 
+### Blocks
+
+`objc closure` declares a block type, Objective-C's closure:
+
+```csharp
+public objc closure void EachObject(AnyObject item, nuint index, bool* stop);
+
+array.EnumerateObjects((AnyObject item, nuint index, bool* stop) => count++);
+```
+
+A lambda, a method, or a `closure` of the same signature becomes one where a
+block is wanted, and the block holds it: what the closure captured lives as
+long as the block does, and is released with it. A block is an Objective-C
+object, counted as one, so it may be kept in a field, handed to Objective-C
+to keep, and called later from either side. One Objective-C made is called
+as a closure is, `transform(2)`.
+
+What a block takes and gives back crosses as a message's arguments do, and
+an `out` or `ref` has nothing to be written back through (SL0907). An object
+a block hands back arrives at +0, as a message's does, and is claimed; one
+declared non-optional that is nil stops the program. A block is not asked
+what it is (SL0518): the runtime knows only that it is one.
+
+**Objective-C may build a block on its stack** and hand it over. A block a
+method of a class defined here is given is copied before the method sees it,
+so the method may keep it, as it would keep anything else.
+
 ### Weak references
 
 `weak T?` to an Objective-C object is the runtime's own weak reference, held
@@ -966,7 +994,6 @@ A case or a program may also include `.m` files, compiled with
 
 ### What is not there yet
 
-- **Blocks.** `objc closure` is refused (SL0900).
 - **A message held without being sent**, in a closure or a delegate
   (SL0913). A message has no function to point at; write a lambda that sends
   it.

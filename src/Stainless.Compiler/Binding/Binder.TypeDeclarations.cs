@@ -193,17 +193,17 @@ public sealed partial class Binder
                     continue;
                 }
 
-                if (declaration.Modifiers.HasFlag(Modifiers.Objc))
+                bool block = declaration.Modifiers.HasFlag(Modifiers.Objc);
+                if (block && !declaration.CarriesReceiver)
                     diagnostics.Error("SL0900", declaration.Span,
-                        declaration.CarriesReceiver
-                            ? $"'{declaration.Name}' is an 'objc closure', a block, and blocks " +
-                              "are not supported yet"
-                            : $"'objc' goes before 'interface', 'class' or 'closure', and " +
-                              $"'{declaration.Name}' is a delegate, which is a C function pointer");
+                        $"'objc' goes before 'interface', 'class' or 'closure', and " +
+                        $"'{declaration.Name}' is a delegate, which is a C function pointer");
 
                 // Declared before the loop body reads it, so the local below
                 // keeps the name the rest of this block already uses.
-                NamedTypeSymbol delegateType = declaration.CarriesReceiver
+                NamedTypeSymbol delegateType = block && declaration.CarriesReceiver
+                    ? NewBlockType(declaration, module)
+                    : declaration.CarriesReceiver
                     ? NewClosureType(declaration, module)
                     : new DelegateTypeSymbol
                     {

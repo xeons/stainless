@@ -339,6 +339,7 @@ public sealed partial class LlvmEmitter(
         // The last function is emitted here, so after this nothing new can be
         // named; what follows reads what the functions collected.
         EmitReached();
+        BlockTables();
         ObjCTables();
 
         StringConstants();

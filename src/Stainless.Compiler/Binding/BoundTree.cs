@@ -184,6 +184,12 @@ public enum ConversionKind
     /// does.
     /// </summary>
     ObjCAdopt,
+
+    /// <summary>
+    /// A closure -> an Objective-C block of the same signature. A block
+    /// literal holding the closure is built and copied to the heap, owned.
+    /// </summary>
+    ClosureToBlock,
 }
 
 // ---------------------------------------------------------------- expressions

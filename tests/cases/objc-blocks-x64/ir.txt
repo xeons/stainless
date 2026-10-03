@@ -1,0 +1,17 @@
+# Blocks against what clang writes for the same blocks in Objective-C, with
+# --target=x86_64-apple-macosx13.0 -fobjc-arc -O0. What differs from arm64
+# is BOOL and a struct returned in memory.
+
+# BLOCK_USE_STRET for the block whose invoke returns through a pointer.
+# clang: store i32 -503316480, ptr %14, align 8      (0xE2000000)
+store i32 1644167168, ptr
+store i32 1107296256, ptr
+
+# clang: define internal void @__keep_block_invoke(ptr noundef %0, ptr noundef %1, i8 noundef signext %2)
+#        define internal void @__keep_block_invoke.1(ptr ... sret(%struct.W) align 8 %0, ptr noundef %1, i64 noundef %2)
+define internal void @"sl.block.invoke.ObjCBlockIr_Seen"(ptr %block, ptr %arg.item, i8 signext %arg.flag)
+define internal void @"sl.block.invoke.ObjCBlockIr_Spread"(ptr sret(%struct.ObjCBlockIr_Wide) %sret, ptr %block, i64 %arg.value)
+
+# clang: c"v20@?0@8c16\00"
+c"v20@?0@8c16\00"
+{ i64 0, i64 48, ptr @sl.block.copy, ptr @sl.block.dispose, ptr

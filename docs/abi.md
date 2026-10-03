@@ -1034,6 +1034,38 @@ object holding one `__weak` slot, made by `sl_objc_weak_new`
 destroyed by `objc_destroyWeak`. Copying the reference shares the box. The
 three functions are found by `dlsym`, as the pools are.
 
+#### Blocks
+
+A block made here is clang's literal, written on the stack and copied to the
+heap with `_Block_copy` at once, so a Stainless value is never a stack
+block:
+
+```
+isa         _NSConcreteStackBlock
+flags       BLOCK_HAS_COPY_DISPOSE | BLOCK_HAS_SIGNATURE (0x42000000),
+            and BLOCK_USE_STRET (1 << 29) when the invoke function returns
+            through a hidden pointer on Intel
+reserved    0
+invoke      sl.block.invoke.<type>, one per block type
+descriptor  { 0, 48, sl.block.copy, sl.block.dispose, signature }
+function    the closure's two words
+object
+```
+
+The copy helper retains the closure's object with `sl_retain` and the
+dispose helper releases it; the object is all a block captures. clang adds
+`BLOCK_HAS_EXTENDED_LAYOUT` and a layout word to describe its captures to
+the runtime, which has none to manage here. The signature counts the block
+as `@?0`: `v20@?0@8B16` takes an object and a BOOL.
+
+The invoke function takes the block and then the arguments as C passes them,
+a hidden result pointer first on Intel. It calls the closure with its object
+first, as a closure call does, converting a BOOL and handing an object back
+through `objc_autoreleaseReturnValue`. A block passed to it, or to an IMP,
+may be on its sender's stack and is copied with `objc_retainBlock` before
+the body sees it, and released after. Calling a block loads its `invoke` and
+passes the block first; an object result is claimed as a message's is.
+
 ## 3. Calling convention
 
 | Declaration | Symbol name | Convention |

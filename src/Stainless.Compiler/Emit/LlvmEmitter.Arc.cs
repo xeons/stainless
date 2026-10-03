@@ -110,6 +110,9 @@ public sealed partial class LlvmEmitter
         // A strong reference out of a weak one is a new +1, or null.
         ConversionKind.ReferenceToOptional when conversion.Operand.Type is WeakTypeSymbol => Hold.Owned,
 
+        // A block made of a closure is a heap copy, owned.
+        ConversionKind.ClosureToBlock => Hold.Owned,
+
         // A weak reference to an Objective-C object is a box made for it.
         ConversionKind.ReferenceToWeak when IsObjCWeak(conversion.Type) => Hold.Owned,
 

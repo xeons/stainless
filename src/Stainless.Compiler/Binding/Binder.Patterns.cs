@@ -668,6 +668,30 @@ public sealed partial class Binder
             return null;
         }
 
+        // Upwards the answer is in the type, and through an optional it is
+        // only 'and not null'; nothing is asked of the object.
+        if (IsObjCKindOf(reference, wanted))
+        {
+            bool optional = subject.Type is OptionalTypeSymbol;
+            BoundPattern present = optional ? PresentTest(span, subject) : Anything(span);
+            BoundExpression unwrapped = optional
+                ? new BoundConversion(span, reference, subject, ConversionKind.NarrowOptional)
+                : subject;
+            var viewed = wanted.Equals(reference)
+                ? unwrapped
+                : new BoundConversion(span, wanted, unwrapped, ConversionKind.ObjCUpcast);
+            return new TypeMatch(present, viewed, null, InstanceKey.Instance);
+        }
+
+        if (wanted is ObjCBlockTypeSymbol)
+        {
+            diagnostics.Error(code, span,
+                $"'{wanted.Name}' is a block, and a block cannot be asked what it takes: the " +
+                "runtime knows only that it is one",
+                wanted);
+            return null;
+        }
+
         RequireDarwin(span);
 
         var test = new BoundTestPattern(span, subject,

@@ -106,6 +106,7 @@ public sealed partial class LlvmEmitter
             "section \"__DATA,__objc_classlist,regular,no_dead_strip\", align 8");
         _objcCompilerUsed.Add("@\"OBJC_LABEL_CLASS_$\"");
         _module.Append(_objcStringData);
+        _objcStringData.Clear();
         _module.AppendLine();
     }
 
@@ -173,10 +174,24 @@ public sealed partial class LlvmEmitter
         string description = $"{(method.IsStatic ? "+" : "-")}[{classType.ObjCRuntimeName} {SelectorOf(method)}]";
         var checks = new List<(string Value, ParameterSymbol Parameter)>();
 
+        // A block Objective-C hands over may be on its stack, so the body is
+        // given a heap copy, let go of once it returns.
+        var copied = new List<string>();
+
         foreach (var parameter in method.Parameters.Where(p => !p.IsThis))
         {
             var info = ClassifyParameter(parameter);
             string name = ArgumentName(parameter);
+
+            if (IsBlock(parameter.Type) && !parameter.IsByReference)
+            {
+                declared.Add($"ptr {name}");
+                string copy = Emit("ptr", $"call ptr @objc_retainBlock(ptr {name})");
+                copied.Add(copy);
+                forwarded.Add($"ptr {copy}");
+                if (IsNeverNullReference(parameter.Type)) checks.Add((name, parameter));
+                continue;
+            }
 
             if (BoolIsByte && IsBool(parameter.Type) && !parameter.IsByReference)
             {
@@ -227,6 +242,9 @@ public sealed partial class LlvmEmitter
         }
 
         Label(ok);
+
+        foreach (string copy in copied)
+            Line($"call void @objc_release(ptr {copy})");
 
         // The IMP of an init was handed the receiver at +1, and the body only
         // borrowed it.
@@ -736,6 +754,7 @@ public sealed partial class LlvmEmitter
     /// </summary>
     internal static string TypeEncoding(TypeSymbol type, bool topLevel)
     {
+        if ((type.AsReference() ?? type) is ObjCBlockTypeSymbol) return "@?";
         if (Binder.IsObjCReference(type)) return "@";
 
         var element = type.AsReference() ?? type;

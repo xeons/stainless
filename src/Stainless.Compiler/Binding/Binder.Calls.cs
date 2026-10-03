@@ -708,7 +708,7 @@ public sealed partial class Binder
 
     /// <summary>A value that is called rather than dispatched to.</summary>
     private static bool IsCallableValue(TypeSymbol type) =>
-        type is DelegateTypeSymbol or ClosureTypeSymbol;
+        type is DelegateTypeSymbol or ClosureTypeSymbol or ObjCBlockTypeSymbol;
 
     private BoundExpression BuildIndirectCall(
         CallSyntax syntax, BoundExpression target, List<BoundExpression> arguments)
@@ -724,6 +724,9 @@ public sealed partial class Binder
 
         if (target.Type is ClosureTypeSymbol closure)
             return BuildClosureCall(syntax, closure, target, arguments);
+
+        if (target.Type is ObjCBlockTypeSymbol block)
+            return BuildBlockCall(syntax, block, target, arguments);
 
         var delegateType = (DelegateTypeSymbol)target.Type;
 

@@ -1,0 +1,37 @@
+# Blocks against what clang writes for the same blocks in Objective-C, with
+# --target=arm64-apple-macosx13.0 -fobjc-arc -O0.
+
+# The literal is written on the stack, then copied to the heap at once.
+# clang: store ptr @_NSConcreteStackBlock, ptr %5, align 8
+#        store i32 -1040187392, ptr %6, align 8      (0xC2000000)
+#        store i32 0, ptr %7, align 4
+# clang's flags add BLOCK_HAS_EXTENDED_LAYOUT (1 << 31), describing its
+# captures to the runtime; the one capture here belongs to the copy and
+# dispose helpers, so the flags are BLOCK_HAS_COPY_DISPOSE and
+# BLOCK_HAS_SIGNATURE: 0x42000000.
+store ptr @_NSConcreteStackBlock, ptr
+store i32 1107296256, ptr
+store i32 0, ptr
+store ptr @"sl.block.invoke.ObjCBlockIr_Seen", ptr
+store ptr @"sl.block.descriptor.ObjCBlockIr_Seen", ptr
+call ptr @_Block_copy(ptr %block.
+
+# The descriptor: reserved, the literal's size, the helpers, the signature.
+# Five pointer-sized words and two 32-bit ones make 48 bytes.
+# clang: { i64 0, i64 40, ptr @__copy_helper_block_e8_32s, ptr @__destroy_helper_block_e8_32s, ptr @.str, i64 ... }
+@"sl.block.descriptor.ObjCBlockIr_Seen" = internal constant { i64, i64, ptr, ptr, ptr } { i64 0, i64 48, ptr @sl.block.copy, ptr @sl.block.dispose, ptr
+
+# The signature counts the block itself as @?0, and BOOL is B here.
+# clang: c"v20@?0@8B16\00"    c"{?=dddd}16@?0q8\00"
+c"v20@?0@8B16\00"
+c"{Wide=dddd}16@?0q8\00"
+
+# The invoke function takes the block first; an HFA comes back in registers.
+# clang: define internal void @__keep_block_invoke(ptr noundef %0, ptr noundef %1, i1 noundef zeroext %2)
+#        define internal %struct.W @__keep_block_invoke.1(ptr noundef %0, i64 noundef %1)
+define internal void @"sl.block.invoke.ObjCBlockIr_Seen"(ptr %block, ptr %arg.item, i1 zeroext %arg.flag)
+define internal %struct.ObjCBlockIr_Wide @"sl.block.invoke.ObjCBlockIr_Spread"(ptr %block, i64 %arg.value)
+
+# A block a method is handed may be on its sender's stack, so it is copied.
+call ptr @objc_retainBlock(ptr %arg.seen)
+c"v24@0:8@?16\00"

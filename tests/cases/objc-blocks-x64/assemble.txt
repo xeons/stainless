@@ -1,0 +1,2 @@
+# Built to a Mach-O object file and not run. Windows clang assembles Darwin IR
+# with no SDK, so this runs everywhere.

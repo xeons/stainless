@@ -182,7 +182,12 @@ public sealed partial class Binder
         NamedTypeSymbol type, DelegateDeclSyntax declaration, FileScope scope)
     {
         var returnType = ResolveType(declaration.ReturnType, scope, allowVoid: true);
-        string kind = type is ClosureTypeSymbol ? "closure" : "delegate";
+        string kind = type switch
+        {
+            ObjCBlockTypeSymbol => "block",
+            ClosureTypeSymbol => "closure",
+            _ => "delegate",
+        };
 
         var signature = new List<ParameterSymbol>();
 
@@ -209,6 +214,14 @@ public sealed partial class Binder
             {
                 Mode = parameter.Mode,
             });
+        }
+
+        if (type is ObjCBlockTypeSymbol block)
+        {
+            block.Closure.ReturnType = returnType;
+            block.Closure.Signature.AddRange(signature);
+            CheckBlockSignature(block, declaration);
+            return;
         }
 
         if (type is ClosureTypeSymbol closure)

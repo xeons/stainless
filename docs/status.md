@@ -208,8 +208,10 @@ last person to edit it -- the suite is the authority.
   object is written back. `objc class` defines a class the runtime registers:
   its methods are IMPs, its fields share one ivar the runtime slides past the
   superclass, constructors are inits, `~C()` is `dealloc`, and a weak
-  reference to an Objective-C object is a box over the runtime's own. Blocks
-  are not there yet ([section 8.6](spec/08-interop-libraries.md#86-objective-c))
+  reference to an Objective-C object is a box over the runtime's own.
+  `objc closure` is a block: a lambda becomes one by being copied to the heap
+  as clang lays one out, and a block Objective-C made is called as a closure
+  is ([section 8.6](spec/08-interop-libraries.md#86-objective-c))
 - **A COM server.** `[Guid("...")]` on a `com class` is a CLSID, the compiler
   gathers every class carrying one into a factory table, and
   `Com.GetClassObject` answers it with an `IClassFactory` — so a `--shared`

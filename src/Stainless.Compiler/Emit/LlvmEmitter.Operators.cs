@@ -127,6 +127,10 @@ public sealed partial class LlvmEmitter
                 Retain(operand.Ref, conversion.Type);
                 return Fresh(new Val(operand.Ref, to, conversion.Type));
 
+            case ConversionKind.ClosureToBlock:
+                return EmitBlockFromClosure(
+                    operand, (ClosureTypeSymbol)conversion.Operand.Type, (ObjCBlockTypeSymbol)conversion.Type);
+
             case ConversionKind.ObjCDowncast:
                 EmitObjCCheck(operand.Ref, conversion.Type);
                 return Same();

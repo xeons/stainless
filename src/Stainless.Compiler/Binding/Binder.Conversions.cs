@@ -59,6 +59,9 @@ public sealed partial class Binder
         if (expression is BoundStringLiteral literal && IsBytePointer(target))
             return new BoundConversion(span, target, literal, ConversionKind.StringLiteralToPointer);
 
+        if (BindAsBlock(expression, target, span) is { } block)
+            return block;
+
         // A method or a lambda becomes the closure a `Notify?` may hold, and
         // that closure becomes the nullable one for nothing.
         if (target is ClosureTypeSymbol { NonNullable: { } held } &&
