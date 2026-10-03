@@ -33,35 +33,6 @@ extern "C"
     long sl_tz_map_id(byte* id, bool toWindows, byte* buffer, nuint size);
 }
 
-/// A day on which a zone's clocks change, as a yearly rule states it.
-struct RulePoint
-{
-    /// 0: `Week` `Weekday` of `Month`, the fifth being the last. 1: day `Day`
-    /// of 1 to 365, never counting 29 February. 2: day `Day` of 0 to 365,
-    /// counting it. 3: `Day` of `Month`.
-    public int Kind;
-    public int Month;
-    public int Week;
-    public int Weekday;
-    public int Day;
-
-    /// The time of day, in the local time in force before the change.
-    public long Seconds;
-}
-
-/// A zone's clocks for a year: standard time, and daylight time between two
-/// days of it. What a POSIX `TZ` string says, and what Windows keeps.
-struct ZoneRule
-{
-    public long StandardOffset;
-    public long DaylightOffset;
-    public bool HasDaylight;
-    public RulePoint Start;
-    public RulePoint End;
-    public String StandardName;
-    public String DaylightName;
-}
-
 /// `numerator / denominator`, rounded down rather than towards zero.
 long FloorDivide(long numerator, long denominator)
 {

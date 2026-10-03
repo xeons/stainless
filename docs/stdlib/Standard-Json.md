@@ -56,7 +56,7 @@ made as `new T()` would make it and then filled, so its type needs a
 public parameterless constructor. A `required` field needs no mark: the
 document MUST supply it, so it is always made.
 
-<sub>[stdlib/Json/Json.sl:970](../../stdlib/Json/Json.sl#L970)</sub>
+<sub>[stdlib/Json/JsonCreate.sl:32](../../stdlib/Json/JsonCreate.sl#L32)</sub>
 
 ### JsonError *enum*
 
@@ -203,7 +203,7 @@ attribute JsonIgnore
 
 Leaves the field out of the document entirely, in both directions.
 
-<sub>[stdlib/Json/Json.sl:960](../../stdlib/Json/Json.sl#L960)</sub>
+<sub>[stdlib/Json/JsonIgnore.sl:25](../../stdlib/Json/JsonIgnore.sl#L25)</sub>
 
 ### JsonName *attribute*
 
@@ -213,7 +213,7 @@ attribute JsonName
 
 The name this field has in the document, when it differs from the field's.
 
-<sub>[stdlib/Json/Json.sl:957](../../stdlib/Json/Json.sl#L957)</sub>
+<sub>[stdlib/Json/JsonName.sl:25](../../stdlib/Json/JsonName.sl#L25)</sub>
 
 ### JsonObject *class*
 
@@ -554,7 +554,7 @@ something else by.
 
 **See also** &nbsp; [Json.ToJsonText](#tojsontext-function)
 
-<sub>[stdlib/Json/Json.sl:734](../../stdlib/Json/Json.sl#L734)</sub>
+<sub>[stdlib/Json/Json.sl:692](../../stdlib/Json/Json.sl#L692)</sub>
 
 ### PopulateObject *function*
 
@@ -600,7 +600,7 @@ reachable from it.
 
 **See also** &nbsp; [Json.Serialize](#serialize-function)
 
-<sub>[stdlib/Json/Json.sl:1187](../../stdlib/Json/Json.sl#L1187)</sub>
+<sub>[stdlib/Json/Json.sl:1129](../../stdlib/Json/Json.sl#L1129)</sub>
 
 ### PopulateObject *function*
 
@@ -626,7 +626,7 @@ made it was refused unless it gave them values.
 
 **See also** &nbsp; [Json.Serialize](#serialize-function)
 
-<sub>[stdlib/Json/Json.sl:1208](../../stdlib/Json/Json.sl#L1208)</sub>
+<sub>[stdlib/Json/Json.sl:1150](../../stdlib/Json/Json.sl#L1150)</sub>
 
 ### Serialize *function*
 
@@ -642,7 +642,7 @@ The document as text.
 
 **See also** &nbsp; [Json.PopulateObject](#populateobject-function)
 
-<sub>[stdlib/Json/Json.sl:989](../../stdlib/Json/Json.sl#L989)</sub>
+<sub>[stdlib/Json/Json.sl:931](../../stdlib/Json/Json.sl#L931)</sub>
 
 ### SerializeIndented *function*
 
@@ -658,7 +658,7 @@ The same, indented.
 
 **See also** &nbsp; [Json.Serialize](#serialize-function)
 
-<sub>[stdlib/Json/Json.sl:995](../../stdlib/Json/Json.sl#L995)</sub>
+<sub>[stdlib/Json/Json.sl:937](../../stdlib/Json/Json.sl#L937)</sub>
 
 ### ToJsonText *function*
 
@@ -674,7 +674,7 @@ value absent rather than as some other number.
 
 **See also** &nbsp; [Json.Parse](#parse-function) &middot; [Json.ToJsonTextIndented](#tojsontextindented-function)
 
-<sub>[stdlib/Json/Json.sl:760](../../stdlib/Json/Json.sl#L760)</sub>
+<sub>[stdlib/Json/Json.sl:718](../../stdlib/Json/Json.sl#L718)</sub>
 
 ### ToJsonTextIndented *function*
 
@@ -686,7 +686,7 @@ The document as text, indented two spaces a level.
 
 **See also** &nbsp; [Json.ToJsonText](#tojsontext-function)
 
-<sub>[stdlib/Json/Json.sl:770](../../stdlib/Json/Json.sl#L770)</sub>
+<sub>[stdlib/Json/Json.sl:728](../../stdlib/Json/Json.sl#L728)</sub>
 
 ### ToJsonValue *function*
 
@@ -706,7 +706,7 @@ struct rather than stopping at it. A field of a kind with no JSON spelling
 
 **See also** &nbsp; [Json.Serialize](#serialize-function)
 
-<sub>[stdlib/Json/Json.sl:980](../../stdlib/Json/Json.sl#L980)</sub>
+<sub>[stdlib/Json/Json.sl:922](../../stdlib/Json/Json.sl#L922)</sub>
 
 ## Constants
 

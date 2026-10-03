@@ -518,7 +518,7 @@ long version = try wrapper.ReadInt64();
 The reader holds a view of the caller's array, not a copy. What it hands
 back as a `ReadOnlySpan<byte>` is a view of the same array.
 
-<sub>[stdlib/Formats/Asn1/AsnReader.sl:62](../../stdlib/Formats/Asn1/AsnReader.sl#L62)</sub>
+<sub>[stdlib/Formats/Asn1/AsnReader.sl:52](../../stdlib/Formats/Asn1/AsnReader.sl#L52)</sub>
 
 #### RuleSet *property*
 
@@ -528,7 +528,7 @@ AsnEncodingRules RuleSet { get; }
 
 The rules every value is held to.
 
-<sub>[stdlib/Formats/Asn1/AsnReader.sl:78](../../stdlib/Formats/Asn1/AsnReader.sl#L78)</sub>
+<sub>[stdlib/Formats/Asn1/AsnReader.sl:68](../../stdlib/Formats/Asn1/AsnReader.sl#L68)</sub>
 
 #### HasData *property*
 
@@ -538,7 +538,7 @@ bool HasData { get; }
 
 Whether anything is left to read.
 
-<sub>[stdlib/Formats/Asn1/AsnReader.sl:81](../../stdlib/Formats/Asn1/AsnReader.sl#L81)</sub>
+<sub>[stdlib/Formats/Asn1/AsnReader.sl:71](../../stdlib/Formats/Asn1/AsnReader.sl#L71)</sub>
 
 #### PeekTag *method*
 
@@ -554,7 +554,7 @@ The tag of the next value, without moving.
 - [AsnError.NonMinimalEncoding](#nonminimalencoding-case) -- a tag number in more octets than it needs
 - [AsnError.OutOfRange](#outofrange-case) -- a tag number past the largest `int`
 
-<sub>[stdlib/Formats/Asn1/AsnReader.sl:90](../../stdlib/Formats/Asn1/AsnReader.sl#L90)</sub>
+<sub>[stdlib/Formats/Asn1/AsnReader.sl:80](../../stdlib/Formats/Asn1/AsnReader.sl#L80)</sub>
 
 #### PeekEncodedValue *method*
 
@@ -572,7 +572,7 @@ moving.
 
 **See also** &nbsp; [AsnReader.ReadEncodedValue](#readencodedvalue-method)
 
-<sub>[stdlib/Formats/Asn1/AsnReader.sl:104](../../stdlib/Formats/Asn1/AsnReader.sl#L104)</sub>
+<sub>[stdlib/Formats/Asn1/AsnReader.sl:94](../../stdlib/Formats/Asn1/AsnReader.sl#L94)</sub>
 
 #### ReadEncodedValue *method*
 
@@ -591,7 +591,7 @@ This is how to keep the exact bytes a signature covers.
 - [AsnError.BadLength](#badlength-case) -- the length octets are malformed
 - [AsnError.Unsupported](#unsupported-case) -- an indefinite length
 
-<sub>[stdlib/Formats/Asn1/AsnReader.sl:120](../../stdlib/Formats/Asn1/AsnReader.sl#L120)</sub>
+<sub>[stdlib/Formats/Asn1/AsnReader.sl:110](../../stdlib/Formats/Asn1/AsnReader.sl#L110)</sub>
 
 #### ReadSequence *method*
 
@@ -612,7 +612,7 @@ A reader over the contents of the next `SEQUENCE`, and past it.
 
 **See also** &nbsp; [AsnReader.ReadSetOf](#readsetof-method)
 
-<sub>[stdlib/Formats/Asn1/AsnReader.sl:137](../../stdlib/Formats/Asn1/AsnReader.sl#L137)</sub>
+<sub>[stdlib/Formats/Asn1/AsnReader.sl:127](../../stdlib/Formats/Asn1/AsnReader.sl#L127)</sub>
 
 #### ReadSetOf *method*
 
@@ -636,7 +636,7 @@ them sorted; see the module's summary.
 
 **See also** &nbsp; [AsnReader.ReadSequence](#readsequence-method)
 
-<sub>[stdlib/Formats/Asn1/AsnReader.sl:152](../../stdlib/Formats/Asn1/AsnReader.sl#L152)</sub>
+<sub>[stdlib/Formats/Asn1/AsnReader.sl:142](../../stdlib/Formats/Asn1/AsnReader.sl#L142)</sub>
 
 #### VerifyEndOfData *method*
 
@@ -650,7 +650,7 @@ AsnError VerifyEndOfData()
 A format MUST call this on each reader it has finished with; a value
 with something after it is not the value that was signed.
 
-<sub>[stdlib/Formats/Asn1/AsnReader.sl:163](../../stdlib/Formats/Asn1/AsnReader.sl#L163)</sub>
+<sub>[stdlib/Formats/Asn1/AsnReader.sl:153](../../stdlib/Formats/Asn1/AsnReader.sl#L153)</sub>
 
 #### ReadBoolean *method*
 
@@ -670,7 +670,7 @@ The next `BOOLEAN`.
 - [AsnError.BadLength](#badlength-case) -- the contents are not one octet
 - [AsnError.NonMinimalEncoding](#nonminimalencoding-case) -- under DER, an octet other than `0x00` or `0xFF`
 
-<sub>[stdlib/Formats/Asn1/AsnReader.sl:178](../../stdlib/Formats/Asn1/AsnReader.sl#L178)</sub>
+<sub>[stdlib/Formats/Asn1/AsnReader.sl:168](../../stdlib/Formats/Asn1/AsnReader.sl#L168)</sub>
 
 #### ReadNull *method*
 
@@ -686,7 +686,7 @@ The next `NULL`.
 
 **Returns** &nbsp; `AsnError.None`, or why the next value is not a `NULL`
 
-<sub>[stdlib/Formats/Asn1/AsnReader.sl:200](../../stdlib/Formats/Asn1/AsnReader.sl#L200)</sub>
+<sub>[stdlib/Formats/Asn1/AsnReader.sl:190](../../stdlib/Formats/Asn1/AsnReader.sl#L190)</sub>
 
 #### ReadIntegerBytes *method*
 
@@ -712,7 +712,7 @@ since neither fits a `long`.
 
 **See also** &nbsp; [AsnReader.ReadInt64](#readint64-method)
 
-<sub>[stdlib/Formats/Asn1/AsnReader.sl:222](../../stdlib/Formats/Asn1/AsnReader.sl#L222)</sub>
+<sub>[stdlib/Formats/Asn1/AsnReader.sl:212](../../stdlib/Formats/Asn1/AsnReader.sl#L212)</sub>
 
 #### ReadInt64 *method*
 
@@ -735,7 +735,7 @@ The next `INTEGER`, as a `long`.
 
 **See also** &nbsp; [AsnReader.ReadUInt64](#readuint64-method)
 
-<sub>[stdlib/Formats/Asn1/AsnReader.sl:236](../../stdlib/Formats/Asn1/AsnReader.sl#L236)</sub>
+<sub>[stdlib/Formats/Asn1/AsnReader.sl:226](../../stdlib/Formats/Asn1/AsnReader.sl#L226)</sub>
 
 #### ReadUInt64 *method*
 
@@ -758,7 +758,7 @@ The next `INTEGER`, as a `ulong`.
 
 **See also** &nbsp; [AsnReader.ReadInt64](#readint64-method)
 
-<sub>[stdlib/Formats/Asn1/AsnReader.sl:250](../../stdlib/Formats/Asn1/AsnReader.sl#L250)</sub>
+<sub>[stdlib/Formats/Asn1/AsnReader.sl:240](../../stdlib/Formats/Asn1/AsnReader.sl#L240)</sub>
 
 #### ReadEnumeratedValue *method*
 
@@ -779,7 +779,7 @@ The next `ENUMERATED`, as a `long`.
 - [AsnError.NonMinimalEncoding](#nonminimalencoding-case) -- a leading `0x00` or `0xFF` that says nothing
 - [AsnError.OutOfRange](#outofrange-case) -- the value does not fit a `long`
 
-<sub>[stdlib/Formats/Asn1/AsnReader.sl:281](../../stdlib/Formats/Asn1/AsnReader.sl#L281)</sub>
+<sub>[stdlib/Formats/Asn1/AsnReader.sl:271](../../stdlib/Formats/Asn1/AsnReader.sl#L271)</sub>
 
 #### ReadObjectIdentifier *method*
 
@@ -803,7 +803,7 @@ The next `OBJECT IDENTIFIER`, dotted: `1.2.840.113549`.
 
 **See also** &nbsp; [Oid.ToDottedString](#todottedstring-method)
 
-<sub>[stdlib/Formats/Asn1/AsnReader.sl:296](../../stdlib/Formats/Asn1/AsnReader.sl#L296)</sub>
+<sub>[stdlib/Formats/Asn1/AsnReader.sl:286](../../stdlib/Formats/Asn1/AsnReader.sl#L286)</sub>
 
 #### ReadBitString *method*
 
@@ -827,7 +827,7 @@ bits at the end of the last one are not part of the value.
 - [AsnError.NonMinimalEncoding](#nonminimalencoding-case) -- under DER, an unused bit that is not zero, or the constructed form
 - [AsnError.Unsupported](#unsupported-case) -- under BER, the constructed form
 
-<sub>[stdlib/Formats/Asn1/AsnReader.sl:323](../../stdlib/Formats/Asn1/AsnReader.sl#L323)</sub>
+<sub>[stdlib/Formats/Asn1/AsnReader.sl:313](../../stdlib/Formats/Asn1/AsnReader.sl#L313)</sub>
 
 #### ReadOctetString *method*
 
@@ -847,7 +847,7 @@ The contents of the next `OCTET STRING`.
 - [AsnError.NonMinimalEncoding](#nonminimalencoding-case) -- under DER, the constructed form
 - [AsnError.Unsupported](#unsupported-case) -- under BER, the constructed form
 
-<sub>[stdlib/Formats/Asn1/AsnReader.sl:356](../../stdlib/Formats/Asn1/AsnReader.sl#L356)</sub>
+<sub>[stdlib/Formats/Asn1/AsnReader.sl:346](../../stdlib/Formats/Asn1/AsnReader.sl#L346)</sub>
 
 #### ReadCharacterString *method*
 
@@ -880,7 +880,7 @@ The next character string of type `encodingType`, as text.
 - [AsnError.NonMinimalEncoding](#nonminimalencoding-case) -- under DER, the constructed form
 - [AsnError.Unsupported](#unsupported-case) -- `encodingType` is not in the table, or under BER the constructed form
 
-<sub>[stdlib/Formats/Asn1/AsnReader.sl:387](../../stdlib/Formats/Asn1/AsnReader.sl#L387)</sub>
+<sub>[stdlib/Formats/Asn1/AsnReader.sl:377](../../stdlib/Formats/Asn1/AsnReader.sl#L377)</sub>
 
 #### ReadUtcTime *method*
 
@@ -906,7 +906,7 @@ are 1950 to 1999, and `00` to `49` are 2000 to 2049. DER requires
 
 **See also** &nbsp; [ConvertAsnTimeToDateTimeOffset](#convertasntimetodatetimeoffset-function)
 
-<sub>[stdlib/Formats/Asn1/AsnReader.sl:417](../../stdlib/Formats/Asn1/AsnReader.sl#L417)</sub>
+<sub>[stdlib/Formats/Asn1/AsnReader.sl:407](../../stdlib/Formats/Asn1/AsnReader.sl#L407)</sub>
 
 #### ReadGeneralizedTime *method*
 
@@ -934,7 +934,7 @@ seconds; RFC 5280 forbids one in a certificate anyway.
 
 **See also** &nbsp; [ConvertAsnTimeToDateTimeOffset](#convertasntimetodatetimeoffset-function)
 
-<sub>[stdlib/Formats/Asn1/AsnReader.sl:444](../../stdlib/Formats/Asn1/AsnReader.sl#L444)</sub>
+<sub>[stdlib/Formats/Asn1/AsnReader.sl:434](../../stdlib/Formats/Asn1/AsnReader.sl#L434)</sub>
 
 ### AsnWriter *class*
 

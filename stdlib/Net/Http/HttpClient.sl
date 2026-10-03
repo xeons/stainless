@@ -297,14 +297,6 @@ public class HttpClient : IDisposable
     }
 }
 
-/// Where `HttpClient.DefaultProxy` keeps its answer once it has one.
-internal sealed class HttpDefaultProxySlot
-{
-    internal IWebProxy? Proxy = null;
-
-    internal HttpDefaultProxySlot() { }
-}
-
 internal Result<String, HttpError> ReadHttpSuccessString(Result<HttpResponseMessage, HttpError> sent)
 {
     if (!sent.Ok)

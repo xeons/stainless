@@ -23,28 +23,6 @@ module Standard.Net.Http;
 
 import Standard.IO;
 
-/// How a line read ended.
-internal enum HttpLineStatus
-{
-    /// A whole line, without its terminator.
-    Line,
-
-    /// The stream ended before any byte of the line.
-    EndOfStream,
-
-    /// The stream ended part-way through the line.
-    Truncated,
-
-    /// The line ran past its limit.
-    TooLong,
-
-    /// A CR not followed by LF, which RFC 9112 §2.2 lets a recipient refuse.
-    Malformed,
-
-    /// The stream failed.
-    Failed,
-}
-
 /// Bytes from a stream, a block at a time, so that a head can be read a line
 /// at a time and a body after it without either losing what the other read.
 ///

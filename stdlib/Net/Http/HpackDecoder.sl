@@ -23,20 +23,6 @@ module Standard.Net.Http;
 
 import Standard.Collections;
 
-/// How decoding a header block ended.
-internal enum HpackStatus
-{
-    /// Every field was decoded.
-    Decoded,
-
-    /// The block broke RFC 7541, which HTTP/2 makes a COMPRESSION_ERROR.
-    Malformed,
-
-    /// The block was well formed, and its fields came to more than the
-    /// header list limit. The table was still updated.
-    TooLarge,
-}
-
 /// Turns HPACK header blocks back into fields, mirroring the peer encoder's
 /// dynamic table.
 ///

@@ -59,20 +59,6 @@ internal const int Http2LateFlushMilliseconds = 100;
 internal const nuint Http2MaxPendingAcks = 1000u;
 internal const nuint Http2MaxPendingControlBytes = 65536u;
 
-/// What became of a write.
-internal enum Http2WriteOutcome
-{
-    /// It reached the socket.
-    Written,
-    /// Its stream was reset or had failed, so it was not sent; the stream
-    /// says why.
-    Dropped,
-    /// The deadline ran out before anything was written.
-    Expired,
-    /// The connection had ended, or the write failed or timed out part-way.
-    Failed,
-}
-
 /// The frames and streams of one HTTP/2 connection (RFC 9113), shared by the
 /// thread that reads it and the threads that send requests on it.
 ///
@@ -1835,14 +1821,4 @@ internal bool WaitForHttp2Change(MonitorGuard<int> held, HttpDeadline deadline)
         return false;
     held.WaitFor((ulong)left);
     return true;
-}
-
-/// Holds a multiplexer's write turn, and gives it back when dropped.
-internal sealed class Http2WriteTurn
-{
-    private Http2Multiplexer _owner;
-
-    internal Http2WriteTurn(Http2Multiplexer owner) => _owner = owner;
-
-    ~Http2WriteTurn() { _owner.ReturnHttp2WriteTurn(); }
 }

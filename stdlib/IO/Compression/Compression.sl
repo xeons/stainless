@@ -203,38 +203,3 @@ Result<byte[], CompressionError> DecompressWithFormat(ReadOnlySpan<byte> data,
         memcpy(&exact[0], &output[0], length);
     return Ok(exact);
 }
-
-// A read-only stream over a span, for the one-shot calls to decompress from.
-class SpanSource : IStream
-{
-    ReadOnlySpan<byte> _data;
-    nuint _at;
-
-    SpanSource(ReadOnlySpan<byte> data)
-    {
-        _data = data;
-        _at = 0;
-    }
-
-    public bool CanRead => true;
-    public bool CanWrite => false;
-    public bool CanSeek => false;
-
-    public nuint Read(byte[] buffer, nuint offset, nuint count)
-    {
-        nuint available = _data.Length - _at;
-        nuint taking = count < available ? count : available;
-        if (taking != 0u)
-            _data[_at:_at + taking].CopyTo(buffer[offset:]);
-        _at += taking;
-        return taking;
-    }
-
-    public nuint Write(byte[] buffer, nuint offset, nuint count) => 0;
-    public long Position => -1;
-    public long Length => -1;
-    public bool Seek(long offset, SeekOrigin origin) => false;
-    public void Flush() { }
-    public void Close() { }
-    public IOError Error => IOError.None;
-}

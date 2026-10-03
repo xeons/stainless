@@ -2313,7 +2313,7 @@ A sentence describing a TLS error, for a message a person will read.
 
 **See also** &nbsp; [TlsError](#tlserror-enum)
 
-<sub>[stdlib/Net/Security/Security.sl:241](../../stdlib/Net/Security/Security.sl#L241)</sub>
+<sub>[stdlib/Net/Security/Security.sl:180](../../stdlib/Net/Security/Security.sl#L180)</sub>
 
 ### DiscardTlsSessionTicket *function*
 

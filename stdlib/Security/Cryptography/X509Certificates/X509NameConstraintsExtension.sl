@@ -390,22 +390,3 @@ public sealed class X509NameConstraintsExtension : X509Extension
         return Ok(true);
     }
 }
-
-/// The subtrees of one side of a name constraints extension, as they are read.
-internal sealed class GeneralSubtrees
-{
-    internal List<String> DnsNames;
-    internal List<byte[]> IPRanges;
-    internal List<X500DistinguishedName> DirectoryNames;
-    internal List<String> EmailAddresses;
-    internal bool HasUnenforced;
-
-    internal GeneralSubtrees()
-    {
-        DnsNames = new List<String>();
-        IPRanges = new List<byte[]>();
-        DirectoryNames = new List<X500DistinguishedName>();
-        EmailAddresses = new List<String>();
-        HasUnenforced = false;
-    }
-}

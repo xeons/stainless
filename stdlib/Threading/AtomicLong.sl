@@ -23,14 +23,6 @@ module Standard.Threading;
 
 // ------------------------------------------------------------------ atomics
 
-/// What an `AtomicLong` or `AtomicBool` holds. A `long` is only four-aligned on
-/// i386 System V, and an eight-byte atomic MUST be eight-aligned to be one.
-[Align(8)]
-struct AtomicCell
-{
-    public long Value;
-}
-
 /// A 64-bit counter that several threads may touch at once.
 ///
 /// Every operation is sequentially consistent. Weaker orderings are worth

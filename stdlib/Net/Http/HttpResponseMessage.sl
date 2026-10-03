@@ -21,7 +21,6 @@
 
 module Standard.Net.Http;
 
-import Standard.IO;
 import Standard.Text;
 
 /// A response: a status, fields, a body, and the request it answered.
@@ -108,18 +107,4 @@ public class HttpResponseMessage : IDisposable
     /// The status line.
     public String ToString() =>
         "HTTP/" + Version.ToString(2) + " " + Text.FromInteger((long)(int)StatusCode) + " " + ReasonPhrase;
-}
-
-/// The body of a response that has none.
-internal sealed class HttpEmptyContent : HttpContent
-{
-    internal HttpEmptyContent() { }
-
-    protected override HttpError SerializeToStream(IStream stream) => HttpError.None;
-
-    protected override bool TryComputeLength(out long length)
-    {
-        length = 0;
-        return true;
-    }
 }

@@ -37,34 +37,6 @@ extern "C"
     byte* class_getName(byte* type);
 }
 
-/// Objective-C's `SEL`: a message's name, interned by the runtime, so two
-/// selectors of the same name are the same pointer.
-///
-///     var length = Selector.Named("length");
-///
-/// A member of an objc type names its own with `[Selector("...")]`; this is
-/// for asking about one, as `respondsToSelector:` does.
-public struct Selector
-{
-    /// The selector called `name`, registered with the runtime if it was not.
-    public static Selector Named(String name)
-    {
-        Selector made;
-        made._handle = sel_registerName(name.ToPointer());
-        return made;
-    }
-
-    /// What the selector is called: `initWithFrame:`, colons and all.
-    public String Name => FromCString(sel_getName(_handle));
-}
-
-/// Objective-C's `Class`: the object a class message is sent to.
-public struct Class
-{
-    /// What the runtime calls the class.
-    public String Name => FromCString(class_getName(_handle));
-}
-
 /// Runs `body` inside an autorelease pool of its own, which drains when it
 /// returns.
 ///

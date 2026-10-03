@@ -23,18 +23,6 @@ module Standard.Net.Security;
 
 import Standard.IO;
 
-/// One record as read: its content type and where its content is.
-///
-/// A plaintext record's content is a view of the layer's input buffer, and
-/// is valid only until the next read.
-internal struct TlsRecord
-{
-    public TlsContentType Type;
-    public byte[] Data;
-    public nuint Offset;
-    public nuint Length;
-}
-
 /// The record layer of RFC 8446 §5 over a stream: framing, the limits, and
 /// protection in each direction once a key is installed.
 ///

@@ -320,11 +320,3 @@ internal HttpCopyOutcome CopyHttpStream(IStream source, IStream destination)
             return HttpCopyOutcome.WriteFailed;
     }
 }
-
-/// How a copy ended.
-internal enum HttpCopyOutcome
-{
-    Done,
-    ReadFailed,
-    WriteFailed,
-}

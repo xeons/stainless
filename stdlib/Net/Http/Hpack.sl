@@ -21,8 +21,6 @@
 
 module Standard.Net.Http;
 
-import Standard.Collections;
-
 // HPACK (RFC 7541): the static table, the dynamic table, and the integer and
 // string representations the encoder and decoder share.
 
@@ -34,35 +32,6 @@ internal const nuint HpackDefaultTableSize = 4096u;
 
 /// What an entry costs beyond its name and value (RFC 7541 §4.1).
 internal const nuint HpackEntryOverhead = 32u;
-
-/// One field: a name and a value, both as octets.
-internal sealed class HpackField
-{
-    internal String Name;
-    internal String Value;
-
-    internal HpackField(String name, String value)
-    {
-        Name = name;
-        Value = value;
-    }
-
-    /// What the field costs in a table, and against a header list's limit.
-    internal nuint Size => Name.ByteLength() + Value.ByteLength() + HpackEntryOverhead;
-}
-
-/// How a literal field is to be represented (RFC 7541 §6.2).
-internal enum HpackIndexing
-{
-    /// Added to the dynamic table.
-    Incremental,
-
-    /// Not added, and an intermediary MAY add it when it re-encodes.
-    WithoutIndexing,
-
-    /// Not added, and an intermediary MUST NOT add it either.
-    NeverIndexed,
-}
 
 // ------------------------------------------------------------ static table
 
@@ -234,86 +203,6 @@ internal nuint FindHpackStaticField(String name, String value)
             return index;
     }
     return 0u;
-}
-
-// ----------------------------------------------------------- dynamic table
-
-/// The dynamic table: newest entry first, evicted from the oldest end as
-/// it outgrows its size (RFC 7541 §4).
-internal sealed class HpackDynamicTable
-{
-    private List<HpackField> _entries = new List<HpackField>();
-    private nuint _size = 0u;
-    private nuint _maxSize;
-
-    internal HpackDynamicTable(nuint maxSize) => _maxSize = maxSize;
-
-    internal nuint Count => _entries.Count;
-
-    /// The sum of the entries' sizes.
-    internal nuint Size => _size;
-
-    internal nuint MaxSize => _maxSize;
-
-    /// Entry `index`, counting the newest as 1.
-    internal HpackField GetHpackEntry(nuint index) => _entries[index - 1u];
-
-    /// Changes the size limit, evicting what no longer fits.
-    internal void ResizeHpackTable(nuint maxSize)
-    {
-        _maxSize = maxSize;
-        EvictHpackEntries(0u);
-    }
-
-    /// Adds `field` as the newest entry. One larger than the whole table
-    /// empties it and is not added (RFC 7541 §4.4).
-    internal void AddHpackEntry(HpackField field)
-    {
-        nuint size = field.Size;
-        if (size > _maxSize)
-        {
-            _entries.Clear();
-            _size = 0u;
-            return;
-        }
-        EvictHpackEntries(size);
-        _entries.Insert(0u, field);
-        _size += size;
-    }
-
-    /// The newest entry that is exactly `name: value`, counting from 1, or
-    /// zero.
-    internal nuint FindHpackEntry(String name, String value)
-    {
-        for (nuint i = 0u; i < _entries.Count; i++)
-        {
-            HpackField entry = _entries[i];
-            if (entry.Name == name && entry.Value == value)
-                return i + 1u;
-        }
-        return 0u;
-    }
-
-    /// The newest entry named `name`, counting from 1, or zero.
-    internal nuint FindHpackEntryName(String name)
-    {
-        for (nuint i = 0u; i < _entries.Count; i++)
-        {
-            if (_entries[i].Name == name)
-                return i + 1u;
-        }
-        return 0u;
-    }
-
-    private void EvictHpackEntries(nuint room)
-    {
-        while (_entries.Count > 0u && _size + room > _maxSize)
-        {
-            nuint last = _entries.Count - 1u;
-            _size -= _entries[last].Size;
-            _entries.RemoveAt(last);
-        }
-    }
 }
 
 // ------------------------------------------------------ primitive encoding

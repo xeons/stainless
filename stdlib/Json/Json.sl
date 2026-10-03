@@ -171,48 +171,6 @@ public List<JsonValue> GetItems(JsonValue value)
 
 // ------------------------------------------------------------------ parsing
 
-/// Where a parser is, which is a byte offset and a reason it stopped.
-///
-/// A class rather than a struct so that every function below shares the one
-/// cursor without `ref` at each call: a recursive descent that has to say
-/// `ref` twenty times reads like plumbing rather than like the grammar it is.
-class Cursor
-{
-    public String Text;
-    public nuint At;
-    public nuint Depth;
-    public JsonError Failure;
-
-    public Cursor(String text)
-    {
-        Text = text;
-        At = 0u;
-        Depth = 0u;
-        Failure = JsonError.None;
-    }
-
-    public bool Failed => Failure != JsonError.None;
-
-    /// The first reason wins: everything after a failure is noise about the
-    /// same mistake, and the first one is where it was made.
-    public void RecordFailure(JsonError why)
-    {
-        if (Failure == JsonError.None)
-            Failure = why;
-    }
-
-    public bool AtEnd => At >= Text.ByteLength();
-
-    public byte Peek()
-    {
-        if (AtEnd)
-            return (byte)0;
-        return Text.GetByteAt(At);
-    }
-
-    public void Skip() => At = At + 1u;
-}
-
 /// Steps over a leading UTF-8 byte order mark, `EF BB BF`.
 ///
 /// **RFC 8259 says a parser must not add one and may ignore one**, and ignoring
@@ -953,22 +911,6 @@ String FormatHexNibble(byte value)
 // The two attributes a field may carry. They are declared here so that a
 // program writing `[JsonName("id")]` needs nothing but this import.
 
-/// The name this field has in the document, when it differs from the field's.
-public attribute JsonName { String Name; }
-
-/// Leaves the field out of the document entirely, in both directions.
-public attribute JsonIgnore { }
-
-/// Lets a reader make this field's object when the document has one and the
-/// field is null.
-///
-/// Off by default, and opt-in per field rather than per call, because the type
-/// is what knows whether the document may decide the object is there. It is
-/// made as `new T()` would make it and then filled, so its type needs a
-/// public parameterless constructor. A `required` field needs no mark: the
-/// document MUST supply it, so it is always made.
-public attribute JsonCreate { }
-
 /// The document a value would produce, as a `JsonValue`.
 ///
 /// Reads the field tables of `[Reflect] T`, walking into a nested class or
@@ -1217,24 +1159,6 @@ public JsonError PopulateObject<T>(T value, JsonValue document)
     var filling = new Filling();
     FillInstance((byte*)value, type, document.Members, false, filling);
     return filling.Failure;
-}
-
-/// Why a fill stopped, shared by every level of it and by the closures
-/// reflection calls back into.
-class Filling
-{
-    public JsonError Failure;
-
-    public Filling() => Failure = JsonError.None;
-
-    public bool Failed => Failure != JsonError.None;
-
-    /// The first reason wins, as the parser's does.
-    public void RecordFailure(JsonError why)
-    {
-        if (Failure == JsonError.None)
-            Failure = why;
-    }
 }
 
 /// Fills an instance from a document's members, and answers whether it could.

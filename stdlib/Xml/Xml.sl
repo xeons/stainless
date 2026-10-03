@@ -71,76 +71,6 @@ public const nuint MaxDepth = 128u;
 
 // ------------------------------------------------------------------ parsing
 
-class Cursor
-{
-    public String Source;
-    public nuint At;
-    public nuint Depth;
-    public XmlError Failure;
-
-    public Cursor(String source)
-    {
-        Source = source;
-        At = 0u;
-        Depth = 0u;
-        Failure = XmlError.None;
-    }
-
-    public bool Failed => Failure != XmlError.None;
-
-    public void RecordFailure(XmlError why)
-    {
-        if (Failure == XmlError.None)
-            Failure = why;
-    }
-
-    public bool AtEnd => At >= Source.ByteLength();
-
-    public byte Peek()
-    {
-        if (AtEnd)
-            return (byte)0;
-        return Source.GetByteAt(At);
-    }
-
-    public byte PeekAt(nuint ahead)
-    {
-        if (At + ahead >= Source.ByteLength())
-            return (byte)0;
-        return Source.GetByteAt(At + ahead);
-    }
-
-    public void Skip() => At = At + 1u;
-
-    /// Consumes `word` when it is next, and answers whether it was.
-    public bool TryConsume(String word)
-    {
-        if (At + word.ByteLength() > Source.ByteLength())
-            return false;
-
-        for (nuint i = 0u; i < word.ByteLength(); i++)
-        {
-            if (Source.GetByteAt(At + i) != word.GetByteAt(i))
-                return false;
-        }
-
-        At = At + word.ByteLength();
-        return true;
-    }
-
-    /// Moves past `word`, or to the end when it is not there.
-    public bool SkipPast(String word)
-    {
-        while (!AtEnd)
-        {
-            if (TryConsume(word))
-                return true;
-            Skip();
-        }
-        return false;
-    }
-}
-
 bool IsSpace(byte c)
 {
     return c == (byte)' ' || c == (byte)'\t' || c == (byte)'\n' || c == (byte)'\r';
@@ -1004,19 +934,6 @@ void WriteEscaped(StringBuilder text, String value, bool inAttribute)
 }
 
 // ------------------------------------------------------- mapping onto a type
-
-/// The element name a field is written as, when it differs from the field's.
-public attribute XmlName { String Name; }
-
-/// Writes the field as an attribute of its element rather than as a child.
-public attribute XmlAttribute { }
-
-/// Leaves the field out entirely, in both directions.
-public attribute XmlIgnore { }
-
-/// Lets a reader make this field's object when the element is there and the
-/// field is null. The same opt-in, and the same hazard, as `[JsonCreate]`.
-public attribute XmlCreate { }
 
 /// A value as an element, with each field a child element under it.
 ///

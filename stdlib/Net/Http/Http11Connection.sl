@@ -543,25 +543,6 @@ internal sealed class Http11Connection : IHttpConnection
     }
 }
 
-/// A response head as read: the status line, and every field.
-internal sealed class Http11Head
-{
-    internal int Status = 0;
-    internal int Minor = 1;
-    internal String Reason = "";
-    internal HttpWireHeaders Fields = new HttpWireHeaders();
-
-    internal Http11Head() { }
-}
-
-/// How a response body ends.
-internal enum Http11Framing
-{
-    Length,
-    Chunked,
-    UntilClose,
-}
-
 /// `HTTP/1.x NNN reason`, or `HTTP/1.x NNN` with nothing after the code.
 internal bool ParseHttpStatusLine(String line, Http11Head head)
 {

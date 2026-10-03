@@ -804,7 +804,7 @@ IEncoding CreateAscii()
 
 US-ASCII: seven bits, and nothing above them.
 
-<sub>[stdlib/Encoding/Encoding.sl:215](../../stdlib/Encoding/Encoding.sl#L215)</sub>
+<sub>[stdlib/Encoding/Encoding.sl:61](../../stdlib/Encoding/Encoding.sl#L61)</sub>
 
 ### CreateLatin1 *function*
 
@@ -816,7 +816,7 @@ ISO-8859-1, in which every byte is the code point of the same number. That
 makes it the one encoding that can carry any byte sequence without failing,
 which is why it is what a protocol reaches for when it does not know.
 
-<sub>[stdlib/Encoding/Encoding.sl:220](../../stdlib/Encoding/Encoding.sl#L220)</sub>
+<sub>[stdlib/Encoding/Encoding.sl:66](../../stdlib/Encoding/Encoding.sl#L66)</sub>
 
 ### CreateUtf16 *function*
 
@@ -826,7 +826,7 @@ IEncoding CreateUtf16()
 
 UTF-16, little-endian -- the one Windows means by "Unicode".
 
-<sub>[stdlib/Encoding/Encoding.sl:203](../../stdlib/Encoding/Encoding.sl#L203)</sub>
+<sub>[stdlib/Encoding/Encoding.sl:49](../../stdlib/Encoding/Encoding.sl#L49)</sub>
 
 ### CreateUtf16BigEndian *function*
 
@@ -836,7 +836,7 @@ IEncoding CreateUtf16BigEndian()
 
 UTF-16, big-endian.
 
-<sub>[stdlib/Encoding/Encoding.sl:206](../../stdlib/Encoding/Encoding.sl#L206)</sub>
+<sub>[stdlib/Encoding/Encoding.sl:52](../../stdlib/Encoding/Encoding.sl#L52)</sub>
 
 ### CreateUtf32 *function*
 
@@ -846,7 +846,7 @@ IEncoding CreateUtf32()
 
 UTF-32, little-endian: one scalar per four bytes, no surrogates.
 
-<sub>[stdlib/Encoding/Encoding.sl:209](../../stdlib/Encoding/Encoding.sl#L209)</sub>
+<sub>[stdlib/Encoding/Encoding.sl:55](../../stdlib/Encoding/Encoding.sl#L55)</sub>
 
 ### CreateUtf32BigEndian *function*
 
@@ -856,7 +856,7 @@ IEncoding CreateUtf32BigEndian()
 
 UTF-32, big-endian.
 
-<sub>[stdlib/Encoding/Encoding.sl:212](../../stdlib/Encoding/Encoding.sl#L212)</sub>
+<sub>[stdlib/Encoding/Encoding.sl:58](../../stdlib/Encoding/Encoding.sl#L58)</sub>
 
 ### CreateUtf8 *function*
 
@@ -866,7 +866,7 @@ IEncoding CreateUtf8()
 
 UTF-8: what a `String` already is, so both directions are a copy.
 
-<sub>[stdlib/Encoding/Encoding.sl:200](../../stdlib/Encoding/Encoding.sl#L200)</sub>
+<sub>[stdlib/Encoding/Encoding.sl:46](../../stdlib/Encoding/Encoding.sl#L46)</sub>
 
 ### CreateWindows1252 *function*
 
@@ -878,7 +878,7 @@ Windows-1252: Latin-1 with the C1 control range replaced by punctuation --
 curly quotes, the dash, the euro. Most text labelled ISO-8859-1 is really
 this, because that is what a Windows editor wrote.
 
-<sub>[stdlib/Encoding/Encoding.sl:225](../../stdlib/Encoding/Encoding.sl#L225)</sub>
+<sub>[stdlib/Encoding/Encoding.sl:71](../../stdlib/Encoding/Encoding.sl#L71)</sub>
 
 ### DetectEncoding *function*
 
@@ -894,7 +894,7 @@ every UTF-32 file reads as UTF-16 whose first character is NUL.
 
 **See also** &nbsp; [Encoding.StripPreamble](#strippreamble-function)
 
-<sub>[stdlib/Encoding/Encoding.sl:234](../../stdlib/Encoding/Encoding.sl#L234)</sub>
+<sub>[stdlib/Encoding/Encoding.sl:80](../../stdlib/Encoding/Encoding.sl#L80)</sub>
 
 ### StripPreamble *function*
 
@@ -904,5 +904,5 @@ byte[] StripPreamble(IEncoding encoding, byte[] bytes)
 
 `bytes` without the byte order mark `encoding` writes, if it is there.
 
-<sub>[stdlib/Encoding/Encoding.sl:250](../../stdlib/Encoding/Encoding.sl#L250)</sub>
+<sub>[stdlib/Encoding/Encoding.sl:96](../../stdlib/Encoding/Encoding.sl#L96)</sub>
 

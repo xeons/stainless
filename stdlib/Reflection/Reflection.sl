@@ -43,9 +43,6 @@
 /// its own affair: a pointer can be cast to anything.
 module Standard.Reflection;
 
-/// Marks a class or struct to carry field metadata in the binary.
-public attribute Reflect { }
-
 // The runtime accessors. Handles are raw pointers into static tables, which is
 // why they are never freed and never counted.
 extern "C"

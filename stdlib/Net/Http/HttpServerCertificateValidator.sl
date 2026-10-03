@@ -46,28 +46,3 @@ internal bool AcceptHttpCertificateByDefault(HttpRequestMessage request, X509Cer
 /// Trusts every chain.
 internal bool AcceptAnyHttpCertificate(HttpRequestMessage request, X509Certificate2? certificate,
                                        List<byte[]> chain, TlsError defaultVerdict) => true;
-
-/// The request a TLS validation is for, and the callback that judges it: what
-/// turns the handler's callback into the TLS module's validator.
-internal sealed class HttpCertificateCheck
-{
-    private HttpRequestMessage _request;
-    private HttpServerCertificateValidator _callback;
-
-    internal HttpCertificateCheck(HttpRequestMessage request, HttpServerCertificateValidator callback)
-    {
-        _request = request;
-        _callback = callback;
-    }
-
-    internal TlsError ValidateHttpCertificateChain(List<byte[]> chain, String targetHost)
-    {
-        TlsError verdict = ValidateTlsCertificateChainByDefault(chain, targetHost);
-        X509Certificate2? leaf = null;
-        if (chain.Count > 0u && X509Certificate2.FromDer(chain[0u]) is Ok parsed)
-            leaf = parsed.Value;
-        if (_callback(_request, leaf, chain, verdict))
-            return TlsError.None;
-        return verdict == TlsError.None ? TlsError.CertificateRefused : verdict;
-    }
-}

@@ -172,67 +172,6 @@ internal const nuint Tls12ExplicitNonceLength = 8u;
 /// TLS_EMPTY_RENEGOTIATION_INFO_SCSV, RFC 5746 §3.3.
 internal const uint TlsRenegotiationInfoScsv = 0x00FFu;
 
-// ------------------------------------------------------------------ wire enums
-
-internal enum TlsContentType : byte
-{
-    Invalid = 0,
-    ChangeCipherSpec = 20,
-    Alert = 21,
-    Handshake = 22,
-    ApplicationData = 23,
-}
-
-internal enum TlsHandshakeType : byte
-{
-    HelloRequest = 0,
-    ClientHello = 1,
-    ServerHello = 2,
-    NewSessionTicket = 4,
-    EndOfEarlyData = 5,
-    EncryptedExtensions = 8,
-    Certificate = 11,
-    ServerKeyExchange = 12,
-    CertificateRequest = 13,
-    ServerHelloDone = 14,
-    CertificateVerify = 15,
-    ClientKeyExchange = 16,
-    Finished = 20,
-    KeyUpdate = 24,
-    MessageHash = 254,
-}
-
-internal enum TlsExtensionType : ushort
-{
-    ServerName = 0,
-    MaxFragmentLength = 1,
-    StatusRequest = 5,
-    SupportedGroups = 10,
-    EcPointFormats = 11,
-    SignatureAlgorithms = 13,
-    UseSrtp = 14,
-    Heartbeat = 15,
-    ApplicationLayerProtocolNegotiation = 16,
-    SignedCertificateTimestamp = 18,
-    ClientCertificateType = 19,
-    ServerCertificateType = 20,
-    Padding = 21,
-    EncryptThenMac = 22,
-    ExtendedMasterSecret = 23,
-    SessionTicket = 35,
-    PreSharedKey = 41,
-    EarlyData = 42,
-    SupportedVersions = 43,
-    Cookie = 44,
-    PskKeyExchangeModes = 45,
-    CertificateAuthorities = 47,
-    OidFilters = 48,
-    PostHandshakeAuth = 49,
-    SignatureAlgorithmsCert = 50,
-    KeyShare = 51,
-    RenegotiationInfo = 65281,
-}
-
 // ------------------------------------------------------------------ errors
 
 /// A sentence describing a TLS error, for a message a person will read.

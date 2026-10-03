@@ -2800,7 +2800,7 @@ ECDSA signs with the hash, as `ecdsa-with-SHA256` and its siblings; RSA
 signs with PKCS #1 v1.5 or PSS as its padding says, PSS with MGF1 over
 the same hash and the salt length written into the parameters.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl:47](../../stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl#L47)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl:39](../../stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl#L39)</sub>
 
 #### CreateForEd25519 *method*
 
@@ -2818,7 +2818,7 @@ A generator signing with the Ed25519 key `privateKey`.
 
 - [CryptoError.KeyLength](Standard-Security-Cryptography.md#keylength-case) -- it is not 32 bytes
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl:71](../../stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl#L71)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl:63](../../stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl#L63)</sub>
 
 #### CreateForECDsa *method*
 
@@ -2833,7 +2833,7 @@ signing to succeed.
 
 - [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) -- never, in practice: the key writes its own
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl:84](../../stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl#L84)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl:76](../../stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl#L76)</sub>
 
 #### CreateForRsa *method*
 
@@ -2848,7 +2848,7 @@ private half for signing to succeed.
 
 - [CryptoError.Encoding](Standard-Security-Cryptography.md#encoding-case) -- never, in practice: the key writes its own
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl:95](../../stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl#L95)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl:87](../../stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl#L87)</sub>
 
 #### PublicKey *property*
 
@@ -2858,7 +2858,7 @@ PublicKey PublicKey { get; }
 
 The public half, for a self-signed certificate's subject key.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl:104](../../stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl#L104)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl:96](../../stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl#L96)</sub>
 
 #### GetSignatureAlgorithmIdentifier *method*
 
@@ -2873,7 +2873,7 @@ names, as DER.
 
 - [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) -- the hash is not SHA-256, -384 or -512 for ECDSA, or SHA-1, -256, -384 or -512 for RSA
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl:111](../../stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl#L111)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl:103](../../stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl#L103)</sub>
 
 #### SignData *method*
 
@@ -2888,7 +2888,7 @@ The signature of `data`, in the form a certificate carries it.
 - [CryptoError.InvalidKey](Standard-Security-Cryptography.md#invalidkey-case) -- the key has no private half
 - [CryptoError.Unsupported](Standard-Security-Cryptography.md#unsupported-case) -- the hash is not one the key signs with
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl:148](../../stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl#L148)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl:140](../../stdlib/Security/Cryptography/X509Certificates/X509SignatureGenerator.sl#L140)</sub>
 
 ### X509Store *class*
 
@@ -2932,7 +2932,7 @@ passed over, and one found twice is kept once. A store that cannot be read
 at all is empty, which a chain reports as `UntrustedRoot` or
 `PartialChain` rather than as a failure of its own.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Store.sl:65](../../stdlib/Security/Cryptography/X509Certificates/X509Store.sl#L65)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Store.sl:64](../../stdlib/Security/Cryptography/X509Certificates/X509Store.sl#L64)</sub>
 
 #### Open *method*
 
@@ -2947,7 +2947,7 @@ The store `name` at `location`, read the first time it is asked for.
 - `name` -- which store
 - `location` -- whose; only Windows tells the two apart
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Store.sl:97](../../stdlib/Security/Cryptography/X509Certificates/X509Store.sl#L97)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Store.sl:96](../../stdlib/Security/Cryptography/X509Certificates/X509Store.sl#L96)</sub>
 
 #### Name *property*
 
@@ -2957,7 +2957,7 @@ StoreName Name { get; }
 
 Which store this is.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Store.sl:116](../../stdlib/Security/Cryptography/X509Certificates/X509Store.sl#L116)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Store.sl:115](../../stdlib/Security/Cryptography/X509Certificates/X509Store.sl#L115)</sub>
 
 #### Location *property*
 
@@ -2967,7 +2967,7 @@ StoreLocation Location { get; }
 
 Whose store this is.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Store.sl:119](../../stdlib/Security/Cryptography/X509Certificates/X509Store.sl#L119)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Store.sl:118](../../stdlib/Security/Cryptography/X509Certificates/X509Store.sl#L118)</sub>
 
 #### Certificates *property*
 
@@ -2977,7 +2977,7 @@ X509Certificate2Collection Certificates { get; }
 
 Its certificates: a copy, which the caller MAY change.
 
-<sub>[stdlib/Security/Cryptography/X509Certificates/X509Store.sl:122](../../stdlib/Security/Cryptography/X509Certificates/X509Store.sl#L122)</sub>
+<sub>[stdlib/Security/Cryptography/X509Certificates/X509Store.sl:121](../../stdlib/Security/Cryptography/X509Certificates/X509Store.sl#L121)</sub>
 
 ### X509SubjectAlternativeNameExtension *class*
 

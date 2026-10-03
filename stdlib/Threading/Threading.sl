@@ -140,31 +140,6 @@ public delegate void Job(byte* argument);
 // because it carries what it captured, and capture is by value, so it may
 // outlive the scope that built it.
 
-/// A closure with an address.
-///
-/// The runtime starts a thread from a `Job` and a `byte*`, which is C's shape
-/// and cannot hold a receiver. Boxing the closure in an object gives it one,
-/// and the object's address is the `byte*`. One non-generic base serves both
-/// `Thread` and `Future<T>`, so there is one trampoline rather than one per
-/// instantiation.
-///
-/// **The box owns a reference, and the trampoline drops it.** The starter
-/// retains the box and hands that count to the thread; `RunBoxed` releases it
-/// when the body returns. Nothing else keeps it alive -- which is what makes
-/// `Detach` safe, since the box outlives the `Thread` object rather than
-/// belonging to it.
-class Boxed
-{
-    public virtual void Run() { }
-}
-
-class Running : Boxed
-{
-    Action _body;
-    public Running(Action body) => _body = body;
-    public override void Run() => _body();
-}
-
 void RunBoxed(byte* argument)
 {
     var boxed = (Boxed)argument;
@@ -189,20 +164,6 @@ public void Yield() => sl_thread_yield();
 /// An identifier for the calling thread, unique among those running. It is the
 /// OS's number and means nothing across a restart.
 public nuint CurrentId() => sl_thread_current_id();
-
-class Pending<T> : Boxed
-{
-    IProducer<T> _body;
-    Future<T> _target;
-
-    public Pending(IProducer<T> body, Future<T> target)
-    {
-        _body = body;
-        _target = target;
-    }
-
-    public override void Run() => _target.SetResult(_body.Invoke());
-}
 
 // -------------------------------------------------------------------- pool
 

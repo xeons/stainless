@@ -169,7 +169,7 @@ It is `long` rather than generic because atomics are not: `Atomic<T>` would
 need a constraint saying T is an integer, and Stainless constrains by
 interface only. A shared counter wants 64 bits anyway.
 
-<sub>[stdlib/Threading/AtomicLong.sl:43](../../stdlib/Threading/AtomicLong.sl#L43)</sub>
+<sub>[stdlib/Threading/AtomicLong.sl:35](../../stdlib/Threading/AtomicLong.sl#L35)</sub>
 
 #### Read *method*
 
@@ -183,7 +183,7 @@ what a decision is built on.
 
 **See also** &nbsp; [AtomicLong.CompareExchange](#compareexchange-method)
 
-<sub>[stdlib/Threading/AtomicLong.sl:55](../../stdlib/Threading/AtomicLong.sl#L55)</sub>
+<sub>[stdlib/Threading/AtomicLong.sl:47](../../stdlib/Threading/AtomicLong.sl#L47)</sub>
 
 #### Write *method*
 
@@ -196,7 +196,7 @@ that tells you what it replaced.
 
 **See also** &nbsp; [AtomicLong.Exchange](#exchange-method)
 
-<sub>[stdlib/Threading/AtomicLong.sl:61](../../stdlib/Threading/AtomicLong.sl#L61)</sub>
+<sub>[stdlib/Threading/AtomicLong.sl:53](../../stdlib/Threading/AtomicLong.sl#L53)</sub>
 
 #### Add *method*
 
@@ -206,7 +206,7 @@ long Add(long delta)
 
 Adds and returns the new value, so two threads never see the same result.
 
-<sub>[stdlib/Threading/AtomicLong.sl:64](../../stdlib/Threading/AtomicLong.sl#L64)</sub>
+<sub>[stdlib/Threading/AtomicLong.sl:56](../../stdlib/Threading/AtomicLong.sl#L56)</sub>
 
 #### Increment *method*
 
@@ -217,7 +217,7 @@ long Increment()
 Adds one and returns the new value, so two threads never see the same
 number. Note that this is not C's `++`, which answers the old one.
 
-<sub>[stdlib/Threading/AtomicLong.sl:68](../../stdlib/Threading/AtomicLong.sl#L68)</sub>
+<sub>[stdlib/Threading/AtomicLong.sl:60](../../stdlib/Threading/AtomicLong.sl#L60)</sub>
 
 #### Decrement *method*
 
@@ -228,7 +228,7 @@ long Decrement()
 Subtracts one and returns the new value. A reference count reaching
 zero is exactly one thread's result.
 
-<sub>[stdlib/Threading/AtomicLong.sl:72](../../stdlib/Threading/AtomicLong.sl#L72)</sub>
+<sub>[stdlib/Threading/AtomicLong.sl:64](../../stdlib/Threading/AtomicLong.sl#L64)</sub>
 
 #### Exchange *method*
 
@@ -238,7 +238,7 @@ long Exchange(long value)
 
 Stores `value` and returns what was there before.
 
-<sub>[stdlib/Threading/AtomicLong.sl:75](../../stdlib/Threading/AtomicLong.sl#L75)</sub>
+<sub>[stdlib/Threading/AtomicLong.sl:67](../../stdlib/Threading/AtomicLong.sl#L67)</sub>
 
 #### CompareExchange *method*
 
@@ -249,7 +249,7 @@ bool CompareExchange(long expected, long desired)
 Stores `desired` only if the current value is `expected`, and reports
 whether it did. The building block for anything lock-free.
 
-<sub>[stdlib/Threading/AtomicLong.sl:79](../../stdlib/Threading/AtomicLong.sl#L79)</sub>
+<sub>[stdlib/Threading/AtomicLong.sl:71](../../stdlib/Threading/AtomicLong.sl#L71)</sub>
 
 #### And *method*
 
@@ -264,7 +264,7 @@ new value, as `Add` does.
 
 - `mask` -- the bits to keep; every bit outside it is cleared
 
-<sub>[stdlib/Threading/AtomicLong.sl:89](../../stdlib/Threading/AtomicLong.sl#L89)</sub>
+<sub>[stdlib/Threading/AtomicLong.sl:81](../../stdlib/Threading/AtomicLong.sl#L81)</sub>
 
 #### Or *method*
 
@@ -274,7 +274,7 @@ long Or(long mask)
 
 Sets the bits in `mask`, returning the new value.
 
-<sub>[stdlib/Threading/AtomicLong.sl:92](../../stdlib/Threading/AtomicLong.sl#L92)</sub>
+<sub>[stdlib/Threading/AtomicLong.sl:84](../../stdlib/Threading/AtomicLong.sl#L84)</sub>
 
 #### Xor *method*
 
@@ -284,7 +284,7 @@ long Xor(long mask)
 
 Flips the bits in `mask`, returning the new value.
 
-<sub>[stdlib/Threading/AtomicLong.sl:95](../../stdlib/Threading/AtomicLong.sl#L95)</sub>
+<sub>[stdlib/Threading/AtomicLong.sl:87](../../stdlib/Threading/AtomicLong.sl#L87)</sub>
 
 ### AutoResetEvent *class*
 
@@ -1497,7 +1497,7 @@ nuint CurrentId()
 An identifier for the calling thread, unique among those running. It is the
 OS's number and means nothing across a restart.
 
-<sub>[stdlib/Threading/Threading.sl:191](../../stdlib/Threading/Threading.sl#L191)</sub>
+<sub>[stdlib/Threading/Threading.sl:166](../../stdlib/Threading/Threading.sl#L166)</sub>
 
 ### ProcessorCount *function*
 
@@ -1507,7 +1507,7 @@ nuint ProcessorCount()
 
 How many hardware threads the machine reports.
 
-<sub>[stdlib/Threading/Threading.sl:215](../../stdlib/Threading/Threading.sl#L215)</sub>
+<sub>[stdlib/Threading/Threading.sl:176](../../stdlib/Threading/Threading.sl#L176)</sub>
 
 ### Sleep *function*
 
@@ -1518,7 +1518,7 @@ void Sleep(ulong milliseconds)
 Stops the calling thread for at least this long. It may be longer: this is
 the scheduler's floor, not a timer.
 
-<sub>[stdlib/Threading/Threading.sl:184](../../stdlib/Threading/Threading.sl#L184)</sub>
+<sub>[stdlib/Threading/Threading.sl:159](../../stdlib/Threading/Threading.sl#L159)</sub>
 
 ### StartPool *function*
 
@@ -1531,7 +1531,7 @@ automatically. Passing zero sizes it from the processor count.
 
 **See also** &nbsp; [Threading.ProcessorCount](#processorcount-function)
 
-<sub>[stdlib/Threading/Threading.sl:221](../../stdlib/Threading/Threading.sl#L221)</sub>
+<sub>[stdlib/Threading/Threading.sl:182](../../stdlib/Threading/Threading.sl#L182)</sub>
 
 ### WorkerCount *function*
 
@@ -1543,7 +1543,7 @@ How many threads the pool is running. Zero until the first scope starts it.
 
 **See also** &nbsp; [Threading.StartPool](#startpool-function)
 
-<sub>[stdlib/Threading/Threading.sl:212](../../stdlib/Threading/Threading.sl#L212)</sub>
+<sub>[stdlib/Threading/Threading.sl:173](../../stdlib/Threading/Threading.sl#L173)</sub>
 
 ### Yield *function*
 
@@ -1553,5 +1553,5 @@ void Yield()
 
 Offers the rest of this thread's slice to anything else that is ready.
 
-<sub>[stdlib/Threading/Threading.sl:187](../../stdlib/Threading/Threading.sl#L187)</sub>
+<sub>[stdlib/Threading/Threading.sl:162](../../stdlib/Threading/Threading.sl#L162)</sub>
 

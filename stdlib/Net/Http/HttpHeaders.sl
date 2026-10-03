@@ -265,21 +265,6 @@ public class HttpHeaders
     }
 }
 
-/// One field: its name as first written, and every value it was given.
-internal sealed class HttpHeaderField
-{
-    internal String Name;
-    internal String Key;
-    internal List<String> Values;
-
-    internal HttpHeaderField(String name)
-    {
-        Name = name;
-        Key = name.ToLowerAscii();
-        Values = new List<String>();
-    }
-}
-
 /// Whether a lower-case field name describes the content rather than the
 /// message, and so belongs in `HttpContentHeaders`.
 internal bool IsHttpContentHeaderKey(String key)

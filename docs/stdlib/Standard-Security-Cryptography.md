@@ -542,7 +542,7 @@ it, but here it buys no speed.
 
 **See also** &nbsp; [Blake2b](#blake2b-class) &middot; [Scrypt](#scrypt-class)
 
-<sub>[stdlib/Security/Cryptography/Argon2id.sl:54](../../stdlib/Security/Cryptography/Argon2id.sl#L54)</sub>
+<sub>[stdlib/Security/Cryptography/Argon2id.sl:53](../../stdlib/Security/Cryptography/Argon2id.sl#L53)</sub>
 
 #### MaxMemoryKiB *constant*
 
@@ -556,7 +556,7 @@ make a call allocate.
 
 **Value** &nbsp; 2^22 KiB.
 
-<sub>[stdlib/Security/Cryptography/Argon2id.sl:61](../../stdlib/Security/Cryptography/Argon2id.sl#L61)</sub>
+<sub>[stdlib/Security/Cryptography/Argon2id.sl:60](../../stdlib/Security/Cryptography/Argon2id.sl#L60)</sub>
 
 #### MaxWorkKiB *constant*
 
@@ -572,7 +572,7 @@ call take, as `MaxMemoryKiB` bounds the memory, and so bounds
 
 **Value** &nbsp; 2^28 KiB.
 
-<sub>[stdlib/Security/Cryptography/Argon2id.sl:70](../../stdlib/Security/Cryptography/Argon2id.sl#L70)</sub>
+<sub>[stdlib/Security/Cryptography/Argon2id.sl:69](../../stdlib/Security/Cryptography/Argon2id.sl#L69)</sub>
 
 #### MaxLength *constant*
 
@@ -586,7 +586,7 @@ that needs more expands this with `Hkdf`.
 
 **Value** &nbsp; 2^20 bytes.
 
-<sub>[stdlib/Security/Cryptography/Argon2id.sl:77](../../stdlib/Security/Cryptography/Argon2id.sl#L77)</sub>
+<sub>[stdlib/Security/Cryptography/Argon2id.sl:76](../../stdlib/Security/Cryptography/Argon2id.sl#L76)</sub>
 
 #### MinSaltSize *constant*
 
@@ -598,7 +598,7 @@ The shortest salt. RFC 9106 recommends sixteen random bytes.
 
 **Value** &nbsp; eight bytes.
 
-<sub>[stdlib/Security/Cryptography/Argon2id.sl:82](../../stdlib/Security/Cryptography/Argon2id.sl#L82)</sub>
+<sub>[stdlib/Security/Cryptography/Argon2id.sl:81](../../stdlib/Security/Cryptography/Argon2id.sl#L81)</sub>
 
 #### DeriveKey *method*
 
@@ -621,7 +621,7 @@ static Result<byte[], CryptoError> DeriveKey(ReadOnlySpan<byte> password, ReadOn
 
 - [CryptoError.Parameter](#parameter-case) -- a parameter is outside RFC 9106 §3.1, `salt` is shorter than `MinSaltSize`, `memoryKiB` is past `MaxMemoryKiB`, `iterations` * `memoryKiB` is past `MaxWorkKiB`, or `length` is past `MaxLength`
 
-<sub>[stdlib/Security/Cryptography/Argon2id.sl:97](../../stdlib/Security/Cryptography/Argon2id.sl#L97)</sub>
+<sub>[stdlib/Security/Cryptography/Argon2id.sl:96](../../stdlib/Security/Cryptography/Argon2id.sl#L96)</sub>
 
 #### DeriveKey *method*
 
@@ -650,7 +650,7 @@ that a stolen table of hashes cannot be attacked without it as well.
 
 - [CryptoError.Parameter](#parameter-case) -- a parameter is outside RFC 9106 §3.1, `salt` is shorter than `MinSaltSize`, `memoryKiB` is past `MaxMemoryKiB`, `iterations` * `memoryKiB` is past `MaxWorkKiB`, or `length` is past `MaxLength`
 
-<sub>[stdlib/Security/Cryptography/Argon2id.sl:122](../../stdlib/Security/Cryptography/Argon2id.sl#L122)</sub>
+<sub>[stdlib/Security/Cryptography/Argon2id.sl:121](../../stdlib/Security/Cryptography/Argon2id.sl#L121)</sub>
 
 ### Blake2b *class*
 

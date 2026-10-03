@@ -35,7 +35,7 @@ attribute XmlAttribute
 
 Writes the field as an attribute of its element rather than as a child.
 
-<sub>[stdlib/Xml/Xml.sl:1012](../../stdlib/Xml/Xml.sl#L1012)</sub>
+<sub>[stdlib/Xml/XmlAttribute.sl:25](../../stdlib/Xml/XmlAttribute.sl#L25)</sub>
 
 ### XmlAttributes *class*
 
@@ -172,7 +172,7 @@ attribute XmlCreate
 Lets a reader make this field's object when the element is there and the
 field is null. The same opt-in, and the same hazard, as `[JsonCreate]`.
 
-<sub>[stdlib/Xml/Xml.sl:1019](../../stdlib/Xml/Xml.sl#L1019)</sub>
+<sub>[stdlib/Xml/XmlCreate.sl:26](../../stdlib/Xml/XmlCreate.sl#L26)</sub>
 
 ### XmlError *enum*
 
@@ -324,7 +324,7 @@ attribute XmlIgnore
 
 Leaves the field out entirely, in both directions.
 
-<sub>[stdlib/Xml/Xml.sl:1015](../../stdlib/Xml/Xml.sl#L1015)</sub>
+<sub>[stdlib/Xml/XmlIgnore.sl:25](../../stdlib/Xml/XmlIgnore.sl#L25)</sub>
 
 ### XmlName *attribute*
 
@@ -334,7 +334,7 @@ attribute XmlName
 
 The element name a field is written as, when it differs from the field's.
 
-<sub>[stdlib/Xml/Xml.sl:1009](../../stdlib/Xml/Xml.sl#L1009)</sub>
+<sub>[stdlib/Xml/XmlName.sl:25](../../stdlib/Xml/XmlName.sl#L25)</sub>
 
 ### XmlNode *class*
 
@@ -488,7 +488,7 @@ is refused wherever it is. A UTF-8 byte order mark at the start is skipped.
 
 **See also** &nbsp; [Xml.ToXmlText](#toxmltext-function)
 
-<sub>[stdlib/Xml/Xml.sl:780](../../stdlib/Xml/Xml.sl#L780)</sub>
+<sub>[stdlib/Xml/Xml.sl:710](../../stdlib/Xml/Xml.sl#L710)</sub>
 
 ### PopulateObject *function*
 
@@ -523,7 +523,7 @@ value the type promised rather than a zero.
 
 **See also** &nbsp; [Xml.Serialize](#serialize-function)
 
-<sub>[stdlib/Xml/Xml.sl:1222](../../stdlib/Xml/Xml.sl#L1222)</sub>
+<sub>[stdlib/Xml/Xml.sl:1139](../../stdlib/Xml/Xml.sl#L1139)</sub>
 
 ### PopulateObject *function*
 
@@ -543,7 +543,7 @@ The same, from an element already parsed.
 
 **See also** &nbsp; [Xml.Serialize](#serialize-function)
 
-<sub>[stdlib/Xml/Xml.sl:1236](../../stdlib/Xml/Xml.sl#L1236)</sub>
+<sub>[stdlib/Xml/Xml.sl:1153](../../stdlib/Xml/Xml.sl#L1153)</sub>
 
 ### Serialize *function*
 
@@ -564,7 +564,7 @@ The element as text.
 
 **See also** &nbsp; [Xml.PopulateObject](#populateobject-function)
 
-<sub>[stdlib/Xml/Xml.sl:1042](../../stdlib/Xml/Xml.sl#L1042)</sub>
+<sub>[stdlib/Xml/Xml.sl:959](../../stdlib/Xml/Xml.sl#L959)</sub>
 
 ### SerializeDocument *function*
 
@@ -585,7 +585,7 @@ The same, with a declaration and indentation.
 
 **See also** &nbsp; [Xml.Serialize](#serialize-function)
 
-<sub>[stdlib/Xml/Xml.sl:1050](../../stdlib/Xml/Xml.sl#L1050)</sub>
+<sub>[stdlib/Xml/Xml.sl:967](../../stdlib/Xml/Xml.sl#L967)</sub>
 
 ### ToXmlDocumentText *function*
 
@@ -597,7 +597,7 @@ The declaration and the element under it, which is what a whole file wants.
 
 **See also** &nbsp; [Xml.ToXmlTextIndented](#toxmltextindented-function)
 
-<sub>[stdlib/Xml/Xml.sl:887](../../stdlib/Xml/Xml.sl#L887)</sub>
+<sub>[stdlib/Xml/Xml.sl:817](../../stdlib/Xml/Xml.sl#L817)</sub>
 
 ### ToXmlNode *function*
 
@@ -622,7 +622,7 @@ JSON document with angle brackets.
 
 **See also** &nbsp; [Xml.Serialize](#serialize-function)
 
-<sub>[stdlib/Xml/Xml.sl:1031](../../stdlib/Xml/Xml.sl#L1031)</sub>
+<sub>[stdlib/Xml/Xml.sl:948](../../stdlib/Xml/Xml.sl#L948)</sub>
 
 ### ToXmlText *function*
 
@@ -634,7 +634,7 @@ The element as text, on one line.
 
 **See also** &nbsp; [Xml.Parse](#parse-function) &middot; [Xml.ToXmlTextIndented](#toxmltextindented-function)
 
-<sub>[stdlib/Xml/Xml.sl:862](../../stdlib/Xml/Xml.sl#L862)</sub>
+<sub>[stdlib/Xml/Xml.sl:792](../../stdlib/Xml/Xml.sl#L792)</sub>
 
 ### ToXmlTextIndented *function*
 
@@ -650,7 +650,7 @@ the note on XmlNode -- so writing what was read back gives the same text.
 
 **See also** &nbsp; [Xml.ToXmlText](#toxmltext-function) &middot; [XmlNode](#xmlnode-class)
 
-<sub>[stdlib/Xml/Xml.sl:877](../../stdlib/Xml/Xml.sl#L877)</sub>
+<sub>[stdlib/Xml/Xml.sl:807](../../stdlib/Xml/Xml.sl#L807)</sub>
 
 ## Constants
 

@@ -25,35 +25,6 @@ import Standard.Bits;
 
 // ================================================== the group of an EC curve
 
-/// A point as `(X : Y : Z)`, each coordinate in Montgomery form. The affine
-/// point is `(X/Z, Y/Z)`, and `Z = 0` is the point at infinity.
-struct EcProjectivePoint
-{
-    public EcElement X;
-    public EcElement Y;
-    public EcElement Z;
-}
-
-/// A curve `y^2 = x^3 - 3x + b` of prime order over a prime field: P-256 or
-/// P-384, which are the curves FIPS 186-5 and TLS name.
-struct EcDomain
-{
-    /// The prime `p` the coordinates are taken modulo.
-    public EcModulus Field;
-
-    /// The group order `n` the scalars are taken modulo.
-    public EcModulus Order;
-
-    /// `b`, in Montgomery form modulo `p`.
-    public EcElement B;
-
-    /// The base point, with `Z` one.
-    public EcProjectivePoint Generator;
-
-    /// How many bytes a coordinate or a scalar takes: 32 or 48.
-    public nuint Size;
-}
-
 /// P-256, from FIPS 186-5 and SEC 2 §2.4.2.
 EcDomain CreateP256Domain() => CreateEcDomain(
     "FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFF",

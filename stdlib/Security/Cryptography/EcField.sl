@@ -26,37 +26,6 @@ import Standard.Convert;
 
 // ================================================== arithmetic modulo a prime
 
-/// A number below a modulus of at most 384 bits, in 64-bit limbs, least
-/// significant first. Limbs at or past the modulus's `Count` are zero.
-///
-/// It is held inline rather than on the heap, so passing one costs a copy and
-/// no reference count.
-struct EcElement
-{
-    public ulong[6] Limbs;
-}
-
-/// An odd modulus, and what Montgomery multiplication by it needs.
-///
-/// A number `a` is held in Montgomery form as `a * R mod m`, where `R` is
-/// `2^(64 * Count)`.
-struct EcModulus
-{
-    public EcElement Value;
-
-    /// `R mod m`, which is one in Montgomery form.
-    public EcElement One;
-
-    /// `R^2 mod m`. Multiplying by it takes a number into Montgomery form.
-    public EcElement RSquared;
-
-    /// `-m^-1 mod 2^64`.
-    public ulong Inverse;
-
-    /// How many limbs a number takes: four or six.
-    public nuint Count;
-}
-
 /// The modulus written in `hexadecimal`, big-endian, and its constants.
 EcModulus CreateEcModulus(String hexadecimal)
 {

@@ -242,16 +242,6 @@ internal sealed class Http11BodyStream : IHttpBodyStream
     }
 }
 
-/// A body stream that can say why it stopped in HTTP's terms.
-internal interface IHttpBodyStream : IStream
-{
-    /// Why the body failed, or `None`.
-    HttpError HttpErrorCode { get; }
-
-    /// Whether the body was read to its end without a failure.
-    bool IsHttpBodyComplete { get; }
-}
-
 /// `1*HEXDIG [ BWS ; chunk-ext ]`, the size of the chunk that follows.
 internal bool TryParseHttpChunkSize(String line, out long size)
 {

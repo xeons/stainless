@@ -1550,7 +1550,7 @@ with a `DateTimeOffset` carrying the offset. A wall-clock time the zone
 skips is `TimeError.Invalid`, where C# throws; one it passes twice is read
 as standard time, as C# reads it.
 
-<sub>[stdlib/Time/TimeZoneInfo.sl:87](../../stdlib/Time/TimeZoneInfo.sl#L87)</sub>
+<sub>[stdlib/Time/TimeZoneInfo.sl:58](../../stdlib/Time/TimeZoneInfo.sl#L58)</sub>
 
 #### Utc *property*
 
@@ -1560,7 +1560,7 @@ static TimeZoneInfo Utc { get; }
 
 Coordinated Universal Time.
 
-<sub>[stdlib/Time/TimeZoneInfo.sl:125](../../stdlib/Time/TimeZoneInfo.sl#L125)</sub>
+<sub>[stdlib/Time/TimeZoneInfo.sl:96](../../stdlib/Time/TimeZoneInfo.sl#L96)</sub>
 
 #### Local *property*
 
@@ -1570,7 +1570,7 @@ static TimeZoneInfo Local { get; }
 
 The zone this machine is set to, or UTC when it cannot say.
 
-<sub>[stdlib/Time/TimeZoneInfo.sl:139](../../stdlib/Time/TimeZoneInfo.sl#L139)</sub>
+<sub>[stdlib/Time/TimeZoneInfo.sl:110](../../stdlib/Time/TimeZoneInfo.sl#L110)</sub>
 
 #### FindSystemTimeZoneById *method*
 
@@ -1585,7 +1585,7 @@ name on Windows, and an IANA name there too where Windows can map it.
 
 - [TimeError.NotFound](#notfound-case) -- no zone of that name
 
-<sub>[stdlib/Time/TimeZoneInfo.sl:178](../../stdlib/Time/TimeZoneInfo.sl#L178)</sub>
+<sub>[stdlib/Time/TimeZoneInfo.sl:149](../../stdlib/Time/TimeZoneInfo.sl#L149)</sub>
 
 #### GetSystemTimeZones *method*
 
@@ -1595,7 +1595,7 @@ static List<TimeZoneInfo> GetSystemTimeZones()
 
 Every zone the system knows, by offset and then by name.
 
-<sub>[stdlib/Time/TimeZoneInfo.sl:203](../../stdlib/Time/TimeZoneInfo.sl#L203)</sub>
+<sub>[stdlib/Time/TimeZoneInfo.sl:174](../../stdlib/Time/TimeZoneInfo.sl#L174)</sub>
 
 #### CreateCustomTimeZone *method*
 
@@ -1605,7 +1605,7 @@ static TimeZoneInfo CreateCustomTimeZone(String id, TimeSpan baseUtcOffset, Stri
 
 A zone of one offset and no daylight time.
 
-<sub>[stdlib/Time/TimeZoneInfo.sl:236](../../stdlib/Time/TimeZoneInfo.sl#L236)</sub>
+<sub>[stdlib/Time/TimeZoneInfo.sl:207](../../stdlib/Time/TimeZoneInfo.sl#L207)</sub>
 
 #### TryConvertIanaIdToWindowsId *method*
 
@@ -1616,7 +1616,7 @@ static bool TryConvertIanaIdToWindowsId(String ianaId, out String windowsId)
 The Windows key name an IANA name maps to, where Windows carries ICU
 to ask. Never, elsewhere.
 
-<sub>[stdlib/Time/TimeZoneInfo.sl:249](../../stdlib/Time/TimeZoneInfo.sl#L249)</sub>
+<sub>[stdlib/Time/TimeZoneInfo.sl:220](../../stdlib/Time/TimeZoneInfo.sl#L220)</sub>
 
 #### TryConvertWindowsIdToIanaId *method*
 
@@ -1627,7 +1627,7 @@ static bool TryConvertWindowsIdToIanaId(String windowsId, out String ianaId)
 The IANA name a Windows key name maps to, where Windows carries ICU to
 ask. Never, elsewhere.
 
-<sub>[stdlib/Time/TimeZoneInfo.sl:254](../../stdlib/Time/TimeZoneInfo.sl#L254)</sub>
+<sub>[stdlib/Time/TimeZoneInfo.sl:225](../../stdlib/Time/TimeZoneInfo.sl#L225)</sub>
 
 #### ConvertTime *method*
 
@@ -1637,7 +1637,7 @@ static DateTime ConvertTime(DateTimeOffset instant, TimeZoneInfo destination)
 
 What the clocks in `destination` read at `instant`.
 
-<sub>[stdlib/Time/TimeZoneInfo.sl:268](../../stdlib/Time/TimeZoneInfo.sl#L268)</sub>
+<sub>[stdlib/Time/TimeZoneInfo.sl:239](../../stdlib/Time/TimeZoneInfo.sl#L239)</sub>
 
 #### ConvertTime *method*
 
@@ -1652,7 +1652,7 @@ What the clocks in `destination` read when those in `source` read
 
 - [TimeError.Invalid](#invalid-case) -- `source` skips that time
 
-<sub>[stdlib/Time/TimeZoneInfo.sl:275](../../stdlib/Time/TimeZoneInfo.sl#L275)</sub>
+<sub>[stdlib/Time/TimeZoneInfo.sl:246](../../stdlib/Time/TimeZoneInfo.sl#L246)</sub>
 
 #### ConvertTimeToUtc *method*
 
@@ -1666,7 +1666,7 @@ The instant at which the clocks in `source` read `wallClock`.
 
 - [TimeError.Invalid](#invalid-case) -- `source` skips that time
 
-<sub>[stdlib/Time/TimeZoneInfo.sl:286](../../stdlib/Time/TimeZoneInfo.sl#L286)</sub>
+<sub>[stdlib/Time/TimeZoneInfo.sl:257](../../stdlib/Time/TimeZoneInfo.sl#L257)</sub>
 
 #### ConvertTimeFromUtc *method*
 
@@ -1676,7 +1676,7 @@ static DateTime ConvertTimeFromUtc(DateTime utc, TimeZoneInfo destination)
 
 What the clocks in `destination` read when UTC reads `utc`.
 
-<sub>[stdlib/Time/TimeZoneInfo.sl:298](../../stdlib/Time/TimeZoneInfo.sl#L298)</sub>
+<sub>[stdlib/Time/TimeZoneInfo.sl:269](../../stdlib/Time/TimeZoneInfo.sl#L269)</sub>
 
 #### ConvertTimeBySystemTimeZoneId *method*
 
@@ -1690,7 +1690,7 @@ What the clocks in the zone named `id` read at `instant`.
 
 - [TimeError.NotFound](#notfound-case) -- no zone of that name
 
-<sub>[stdlib/Time/TimeZoneInfo.sl:308](../../stdlib/Time/TimeZoneInfo.sl#L308)</sub>
+<sub>[stdlib/Time/TimeZoneInfo.sl:279](../../stdlib/Time/TimeZoneInfo.sl#L279)</sub>
 
 #### Id *property*
 
@@ -1700,7 +1700,7 @@ String Id { get; }
 
 What it is called: an IANA name or a Windows key name.
 
-<sub>[stdlib/Time/TimeZoneInfo.sl:318](../../stdlib/Time/TimeZoneInfo.sl#L318)</sub>
+<sub>[stdlib/Time/TimeZoneInfo.sl:289](../../stdlib/Time/TimeZoneInfo.sl#L289)</sub>
 
 #### DisplayName *property*
 
@@ -1710,7 +1710,7 @@ String DisplayName { get; }
 
 How a person would recognise it, with its offset.
 
-<sub>[stdlib/Time/TimeZoneInfo.sl:321](../../stdlib/Time/TimeZoneInfo.sl#L321)</sub>
+<sub>[stdlib/Time/TimeZoneInfo.sl:292](../../stdlib/Time/TimeZoneInfo.sl#L292)</sub>
 
 #### StandardName *property*
 
@@ -1720,7 +1720,7 @@ String StandardName { get; }
 
 What standard time there is called.
 
-<sub>[stdlib/Time/TimeZoneInfo.sl:324](../../stdlib/Time/TimeZoneInfo.sl#L324)</sub>
+<sub>[stdlib/Time/TimeZoneInfo.sl:295](../../stdlib/Time/TimeZoneInfo.sl#L295)</sub>
 
 #### DaylightName *property*
 
@@ -1730,7 +1730,7 @@ String DaylightName { get; }
 
 What daylight time there is called.
 
-<sub>[stdlib/Time/TimeZoneInfo.sl:327](../../stdlib/Time/TimeZoneInfo.sl#L327)</sub>
+<sub>[stdlib/Time/TimeZoneInfo.sl:298](../../stdlib/Time/TimeZoneInfo.sl#L298)</sub>
 
 #### HasIanaId *property*
 
@@ -1740,7 +1740,7 @@ bool HasIanaId { get; }
 
 Whether `Id` is an IANA name.
 
-<sub>[stdlib/Time/TimeZoneInfo.sl:330](../../stdlib/Time/TimeZoneInfo.sl#L330)</sub>
+<sub>[stdlib/Time/TimeZoneInfo.sl:301](../../stdlib/Time/TimeZoneInfo.sl#L301)</sub>
 
 #### BaseUtcOffset *property*
 
@@ -1750,7 +1750,7 @@ TimeSpan BaseUtcOffset { get; }
 
 How far ahead of UTC standard time is, as the zone keeps it now.
 
-<sub>[stdlib/Time/TimeZoneInfo.sl:333](../../stdlib/Time/TimeZoneInfo.sl#L333)</sub>
+<sub>[stdlib/Time/TimeZoneInfo.sl:304](../../stdlib/Time/TimeZoneInfo.sl#L304)</sub>
 
 #### SupportsDaylightSavingTime *property*
 
@@ -1762,7 +1762,7 @@ Whether its clocks have changed for daylight time since 1970, which
 is as far back as every platform's data reaches: India's clocks did
 in the 1940s, and India's zone is still one that does not.
 
-<sub>[stdlib/Time/TimeZoneInfo.sl:351](../../stdlib/Time/TimeZoneInfo.sl#L351)</sub>
+<sub>[stdlib/Time/TimeZoneInfo.sl:322](../../stdlib/Time/TimeZoneInfo.sl#L322)</sub>
 
 #### GetUtcOffset *method*
 
@@ -1772,7 +1772,7 @@ TimeSpan GetUtcOffset(DateTimeOffset instant)
 
 How far ahead of UTC the clocks are at `instant`.
 
-<sub>[stdlib/Time/TimeZoneInfo.sl:367](../../stdlib/Time/TimeZoneInfo.sl#L367)</sub>
+<sub>[stdlib/Time/TimeZoneInfo.sl:338](../../stdlib/Time/TimeZoneInfo.sl#L338)</sub>
 
 #### GetUtcOffset *method*
 
@@ -1784,7 +1784,7 @@ How far ahead of UTC the clocks are when they read `wallClock`:
 standard time where they read it twice, and the offset before the
 change where they skip it.
 
-<sub>[stdlib/Time/TimeZoneInfo.sl:373](../../stdlib/Time/TimeZoneInfo.sl#L373)</sub>
+<sub>[stdlib/Time/TimeZoneInfo.sl:344](../../stdlib/Time/TimeZoneInfo.sl#L344)</sub>
 
 #### IsDaylightSavingTime *method*
 
@@ -1794,7 +1794,7 @@ bool IsDaylightSavingTime(DateTimeOffset instant)
 
 Whether the clocks keep daylight time at `instant`.
 
-<sub>[stdlib/Time/TimeZoneInfo.sl:382](../../stdlib/Time/TimeZoneInfo.sl#L382)</sub>
+<sub>[stdlib/Time/TimeZoneInfo.sl:353](../../stdlib/Time/TimeZoneInfo.sl#L353)</sub>
 
 #### IsDaylightSavingTime *method*
 
@@ -1804,7 +1804,7 @@ bool IsDaylightSavingTime(DateTime wallClock)
 
 Whether the clocks keep daylight time when they read `wallClock`.
 
-<sub>[stdlib/Time/TimeZoneInfo.sl:385](../../stdlib/Time/TimeZoneInfo.sl#L385)</sub>
+<sub>[stdlib/Time/TimeZoneInfo.sl:356](../../stdlib/Time/TimeZoneInfo.sl#L356)</sub>
 
 #### IsAmbiguousTime *method*
 
@@ -1814,7 +1814,7 @@ bool IsAmbiguousTime(DateTime wallClock)
 
 Whether the clocks read `wallClock` twice, as they do when they go back.
 
-<sub>[stdlib/Time/TimeZoneInfo.sl:392](../../stdlib/Time/TimeZoneInfo.sl#L392)</sub>
+<sub>[stdlib/Time/TimeZoneInfo.sl:363](../../stdlib/Time/TimeZoneInfo.sl#L363)</sub>
 
 #### IsInvalidTime *method*
 
@@ -1824,7 +1824,7 @@ bool IsInvalidTime(DateTime wallClock)
 
 Whether the clocks never read `wallClock`, as when they go forward.
 
-<sub>[stdlib/Time/TimeZoneInfo.sl:395](../../stdlib/Time/TimeZoneInfo.sl#L395)</sub>
+<sub>[stdlib/Time/TimeZoneInfo.sl:366](../../stdlib/Time/TimeZoneInfo.sl#L366)</sub>
 
 #### ToString *method*
 
@@ -1834,7 +1834,7 @@ String ToString()
 
 The display name.
 
-<sub>[stdlib/Time/TimeZoneInfo.sl:398](../../stdlib/Time/TimeZoneInfo.sl#L398)</sub>
+<sub>[stdlib/Time/TimeZoneInfo.sl:369](../../stdlib/Time/TimeZoneInfo.sl#L369)</sub>
 
 #### Equals *method*
 
@@ -1844,7 +1844,7 @@ bool Equals(TimeZoneInfo other)
 
 *No documentation.*
 
-<sub>[stdlib/Time/TimeZoneInfo.sl:400](../../stdlib/Time/TimeZoneInfo.sl#L400)</sub>
+<sub>[stdlib/Time/TimeZoneInfo.sl:371](../../stdlib/Time/TimeZoneInfo.sl#L371)</sub>
 
 #### GetHashCode *method*
 
@@ -1854,7 +1854,7 @@ nuint GetHashCode()
 
 *No documentation.*
 
-<sub>[stdlib/Time/TimeZoneInfo.sl:402](../../stdlib/Time/TimeZoneInfo.sl#L402)</sub>
+<sub>[stdlib/Time/TimeZoneInfo.sl:373](../../stdlib/Time/TimeZoneInfo.sl#L373)</sub>
 
 ## Functions
 

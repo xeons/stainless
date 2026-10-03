@@ -315,16 +315,3 @@ internal sealed class HttpConnectionPool
             _open.SetValue(key, open - 1u);
     }
 }
-
-/// An idle connection and when it became idle.
-internal sealed class HttpIdleConnection
-{
-    internal IHttpConnection Connection;
-    internal TimeSpan Since;
-
-    internal HttpIdleConnection(IHttpConnection connection, TimeSpan since)
-    {
-        Connection = connection;
-        Since = since;
-    }
-}

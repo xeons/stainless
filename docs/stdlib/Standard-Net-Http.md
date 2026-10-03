@@ -2396,7 +2396,7 @@ A response: a status, fields, a body, and the request it answered.
 A response holds its connection until its body has been read to the end,
 and closes it when disposed or released before then.
 
-<sub>[stdlib/Net/Http/HttpResponseMessage.sl:35](../../stdlib/Net/Http/HttpResponseMessage.sl#L35)</sub>
+<sub>[stdlib/Net/Http/HttpResponseMessage.sl:34](../../stdlib/Net/Http/HttpResponseMessage.sl#L34)</sub>
 
 #### StatusCode *property*
 
@@ -2406,7 +2406,7 @@ HttpStatusCode StatusCode { get; set; }
 
 The status.
 
-<sub>[stdlib/Net/Http/HttpResponseMessage.sl:48](../../stdlib/Net/Http/HttpResponseMessage.sl#L48)</sub>
+<sub>[stdlib/Net/Http/HttpResponseMessage.sl:47](../../stdlib/Net/Http/HttpResponseMessage.sl#L47)</sub>
 
 #### ReasonPhrase *property*
 
@@ -2417,7 +2417,7 @@ String ReasonPhrase { get; set; }
 The reason phrase the server sent, or RFC 9110's for the status when
 none was set.
 
-<sub>[stdlib/Net/Http/HttpResponseMessage.sl:52](../../stdlib/Net/Http/HttpResponseMessage.sl#L52)</sub>
+<sub>[stdlib/Net/Http/HttpResponseMessage.sl:51](../../stdlib/Net/Http/HttpResponseMessage.sl#L51)</sub>
 
 #### Headers *property*
 
@@ -2427,7 +2427,7 @@ HttpResponseHeaders Headers { get; }
 
 The response's fields, less the content's.
 
-<sub>[stdlib/Net/Http/HttpResponseMessage.sl:63](../../stdlib/Net/Http/HttpResponseMessage.sl#L63)</sub>
+<sub>[stdlib/Net/Http/HttpResponseMessage.sl:62](../../stdlib/Net/Http/HttpResponseMessage.sl#L62)</sub>
 
 #### TrailingHeaders *property*
 
@@ -2438,7 +2438,7 @@ HttpResponseHeaders TrailingHeaders { get; }
 The trailer of a chunked body. Filled in once the body has been read
 to its end, and empty until then.
 
-<sub>[stdlib/Net/Http/HttpResponseMessage.sl:67](../../stdlib/Net/Http/HttpResponseMessage.sl#L67)</sub>
+<sub>[stdlib/Net/Http/HttpResponseMessage.sl:66](../../stdlib/Net/Http/HttpResponseMessage.sl#L66)</sub>
 
 #### Content *property*
 
@@ -2448,7 +2448,7 @@ HttpContent Content { get; set; }
 
 The body. A response with none has empty content rather than null.
 
-<sub>[stdlib/Net/Http/HttpResponseMessage.sl:70](../../stdlib/Net/Http/HttpResponseMessage.sl#L70)</sub>
+<sub>[stdlib/Net/Http/HttpResponseMessage.sl:69](../../stdlib/Net/Http/HttpResponseMessage.sl#L69)</sub>
 
 #### Version *property*
 
@@ -2458,7 +2458,7 @@ Version Version { get; set; }
 
 The version the server answered in.
 
-<sub>[stdlib/Net/Http/HttpResponseMessage.sl:73](../../stdlib/Net/Http/HttpResponseMessage.sl#L73)</sub>
+<sub>[stdlib/Net/Http/HttpResponseMessage.sl:72](../../stdlib/Net/Http/HttpResponseMessage.sl#L72)</sub>
 
 #### RequestMessage *property*
 
@@ -2468,7 +2468,7 @@ HttpRequestMessage? RequestMessage { get; set; }
 
 The request this answered: after redirects, the last one sent.
 
-<sub>[stdlib/Net/Http/HttpResponseMessage.sl:76](../../stdlib/Net/Http/HttpResponseMessage.sl#L76)</sub>
+<sub>[stdlib/Net/Http/HttpResponseMessage.sl:75](../../stdlib/Net/Http/HttpResponseMessage.sl#L75)</sub>
 
 #### IsSuccessStatusCode *property*
 
@@ -2478,7 +2478,7 @@ bool IsSuccessStatusCode { get; }
 
 Whether the status is in 200–299.
 
-<sub>[stdlib/Net/Http/HttpResponseMessage.sl:79](../../stdlib/Net/Http/HttpResponseMessage.sl#L79)</sub>
+<sub>[stdlib/Net/Http/HttpResponseMessage.sl:78](../../stdlib/Net/Http/HttpResponseMessage.sl#L78)</sub>
 
 #### EnsureSuccessStatusCode *method*
 
@@ -2492,7 +2492,7 @@ This response when `IsSuccessStatusCode`, and a failure otherwise.
 
 - [HttpError.UnsuccessfulStatusCode](#unsuccessfulstatuscode-case) -- the status is outside 200–299
 
-<sub>[stdlib/Net/Http/HttpResponseMessage.sl:84](../../stdlib/Net/Http/HttpResponseMessage.sl#L84)</sub>
+<sub>[stdlib/Net/Http/HttpResponseMessage.sl:83](../../stdlib/Net/Http/HttpResponseMessage.sl#L83)</sub>
 
 #### EnsureSuccessStatusCode *method*
 
@@ -2510,7 +2510,7 @@ The same, saying which status it was.
 
 - [HttpError.UnsuccessfulStatusCode](#unsuccessfulstatuscode-case) -- the status is outside 200–299
 
-<sub>[stdlib/Net/Http/HttpResponseMessage.sl:91](../../stdlib/Net/Http/HttpResponseMessage.sl#L91)</sub>
+<sub>[stdlib/Net/Http/HttpResponseMessage.sl:90](../../stdlib/Net/Http/HttpResponseMessage.sl#L90)</sub>
 
 #### Dispose *method*
 
@@ -2521,7 +2521,7 @@ void Dispose()
 Releases the body, closing the connection if it was not read to its
 end.
 
-<sub>[stdlib/Net/Http/HttpResponseMessage.sl:106](../../stdlib/Net/Http/HttpResponseMessage.sl#L106)</sub>
+<sub>[stdlib/Net/Http/HttpResponseMessage.sl:105](../../stdlib/Net/Http/HttpResponseMessage.sl#L105)</sub>
 
 #### ToString *method*
 
@@ -2531,7 +2531,7 @@ String ToString()
 
 The status line.
 
-<sub>[stdlib/Net/Http/HttpResponseMessage.sl:109](../../stdlib/Net/Http/HttpResponseMessage.sl#L109)</sub>
+<sub>[stdlib/Net/Http/HttpResponseMessage.sl:108](../../stdlib/Net/Http/HttpResponseMessage.sl#L108)</sub>
 
 ### HttpServerCertificateValidator *closure*
 

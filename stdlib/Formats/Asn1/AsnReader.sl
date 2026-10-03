@@ -23,16 +23,6 @@ module Standard.Formats.Asn1;
 
 import Standard.Time;
 
-/// Where one encoded value's parts are, relative to the start of its tag.
-struct AsnHeader
-{
-    public Asn1Tag Tag;
-    public nuint HeaderLength;
-    public nuint ContentLength;
-
-    public nuint TotalLength => HeaderLength + ContentLength;
-}
-
 /// Reads encoded values one after another from a run of bytes.
 ///
 /// ```csharp

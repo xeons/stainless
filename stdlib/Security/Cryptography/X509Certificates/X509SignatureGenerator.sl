@@ -24,14 +24,6 @@ module Standard.Security.Cryptography.X509Certificates;
 import Standard.Formats.Asn1;
 import Standard.Security.Cryptography;
 
-/// Which kind of key a generator holds.
-internal enum SignatureKeyKind
-{
-    Ed25519,
-    ECDsa,
-    Rsa,
-}
-
 /// A private key that signs certificates: .NET's `X509SignatureGenerator`.
 ///
 /// ```csharp

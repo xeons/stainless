@@ -25,19 +25,6 @@ import Standard.IO;
 
 // ---------------------------------------------------------------- inflate
 
-// Where the decoder is between calls. Decoding stops only at a symbol
-// boundary, so nothing else has to survive a return.
-enum InflateStage
-{
-    Header = 0,
-    BlockHeader = 1,
-    Stored = 2,
-    Huffman = 3,
-    Trailer = 4,
-    Done = 5,
-    Failed = 6,
-}
-
 // RFC 1951 decoding, pulled: bits are read from the source only when a
 // symbol needs them, and output goes into a ring the caller drains.
 //

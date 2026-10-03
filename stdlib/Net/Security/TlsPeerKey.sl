@@ -25,17 +25,6 @@ import Standard.Collections;
 import Standard.Formats.Asn1;
 import Standard.Security.Cryptography;
 
-/// Which kind of key a certificate or a signing key holds, as far as the
-/// signature schemes care.
-internal enum TlsKeyKind
-{
-    Ed25519,
-    EcdsaP256,
-    EcdsaP384,
-    Rsa,
-    RsaPss,
-}
-
 internal static readonly String s_ed25519Identifier = "1.3.101.112";
 internal static readonly String s_ecPublicKeyIdentifier = "1.2.840.10045.2.1";
 internal static readonly String s_rsaEncryptionIdentifier = "1.2.840.113549.1.1.1";
