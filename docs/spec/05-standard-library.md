@@ -692,6 +692,8 @@ Listings return full paths rather than bare names, in the platform's order;
 `GetDirectoryName`, `GetExtension`, `GetFileNameWithoutExtension`,
 `ChangeExtension`, `IsPathRooted`, `IsSamePath` and `SplitPath`. Both `/` and `\` are accepted when reading a path apart, because
 Windows accepts both and a path from a config file may use either.
+`IsSamePath` ignores the case of ASCII letters on Windows and macOS, whose
+default volumes do, and compares bytes on Linux.
 
 **Paths are UTF-8, and stay correct.** A Stainless `String` is already UTF-8,
 and on Windows the runtime widens every path to UTF-16 before it reaches the
@@ -1227,7 +1229,11 @@ about half a second.
 `X509Store.Open(StoreName.Root)` is crypt32's store on Windows, loaded by
 name so that no program links it, less whatever the user's or the machine's
 `Disallowed` store holds, and the system PEM bundle elsewhere; each is read
-once per process. `CertificateRequest` makes certificates signed by
+once per process. On macOS the bundle is the roots, and the trust settings an
+administrator or the user made in Keychain Access are applied over it: a root
+they distrusted is dropped and one they added is kept. The system domain is
+not read, because it also holds roots trusted only for mail and time-stamping.
+Neither is consulted when `SSL_CERT_FILE` or `SSL_CERT_DIR` names a bundle. `CertificateRequest` makes certificates signed by
 Ed25519, ECDSA or RSA through an `X509SignatureGenerator`.
 `tests/cases/x509` pins every field, thumbprint and host name against
 OpenSSL's reading of a small PKI and of Let's Encrypt's roots and

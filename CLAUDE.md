@@ -142,8 +142,9 @@ exactly one expectation: `expected.txt` (it must compile, run, and print this)
 or `errors.txt` (it must fail, and every `SL####` the file names must be
 reported). Optional beside them: `args.txt`, `stdin.txt`, `warnings.txt`,
 `defines.txt`, `abi.txt`, `target.txt`, `platform.txt`, `sources.txt`,
-`libraries.txt`, and `expected.linux.txt` for a case whose subject genuinely
-differs by platform. The comment at the top of
+`libraries.txt`, and `expected.linux.txt` or `expected.macos.txt` for a case
+whose subject genuinely differs by platform. A `platform.txt` names one
+platform per line. The comment at the top of
 `tests/Stainless.Tests/Program.cs` is the full list, including the cases that
 stop at an object file and so have `ir.txt` in place of `expected.txt`.
 
@@ -324,8 +325,7 @@ redirect to a file or use `stdbuf -o0` when a run is going to be terminated.
 
 `ssh brandon@brandons-mini` -- an M4 on macOS 15, with the Xcode command-line
 tools, Homebrew, Homebrew LLVM and the .NET SDK in `~/.dotnet`. It is where the
-macOS target is run; the plan for that target is phased, and until it lands a
-build there fails compiling the runtime.
+macOS target is run, and the whole end-to-end suite passes there.
 
 `~/.zshenv` sets the environment for every shell, a non-interactive ssh
 command included: Homebrew's paths, `DOTNET_ROOT` and `PATH` for `~/.dotnet`,

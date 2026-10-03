@@ -70,8 +70,8 @@ they are in the same room.
   read, and often expensive. A function that can fail says so in its return
   type instead, and the compiler will not let the answer be read before the
   question is asked.
-- **Cross-platform and modular.** Windows and Linux are both built and tested;
-  x64, 32-bit x86 and ARM64 are all targets. The platform bindings are source
+- **Cross-platform and modular.** Windows, Linux and macOS are all built and
+  tested; x64, 32-bit x86 and ARM64 are all targets. The platform bindings are source
   you opt into rather than something every program carries, and what a binary
   never reaches the linker throws away — hello-world links no standard library
   function at all.

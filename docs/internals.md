@@ -144,10 +144,11 @@ The same kind of reflection test fills every child of every node type with a
 fresh node, has each replaced, and requires the rebuilt node to hold exactly
 the replacements and everything else the old one held.
 
-**Both Windows and Linux are tested.** A case that is Windows-only or
-Linux-only says so in `platform.txt`, and each platform skips the other's. A case whose *subject* differs by platform — `Path.Join` writes a
+**Windows, Linux and macOS are all tested.** A case that runs on only some of
+them names each, one per line, in `platform.txt`, and every other platform
+skips it. A case whose *subject* differs by platform -- `Path.Join` writes a
 different separator, and `\x` is rooted on one and an ordinary name on the
-other — carries an `expected.linux.txt` beside its `expected.txt` rather than
+other -- carries an `expected.linux.txt` beside its `expected.txt` rather than
 having the difference argued away. A Mac reads `expected.macos.txt`, then
 `expected.linux.txt`, then `expected.txt`, because what separates Linux from
 Windows in those cases is POSIX. A `target.txt` case that has to run what it

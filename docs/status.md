@@ -755,7 +755,8 @@ last person to edit it -- the suite is the authority.
   alternatives and cross-signs and checks validity, signatures (Ed25519,
   ECDSA, RSA PKCS #1 v1.5 and PSS), basic constraints and path length, key
   usages and name constraints. `X509Store` reads crypt32's stores on Windows,
-  loaded by name, and the system bundle elsewhere. `CertificateRequest` makes
+  loaded by name, and the system bundle elsewhere; on macOS the admin and user
+  trust settings are applied over the bundle, through linked Security. `CertificateRequest` makes
   certificates OpenSSL accepts. No revocation.
   `PemEncoding` finds RFC 7468 blocks in surrounding text and writes them
 - `Standard.Formats.Asn1`: BER and DER in `System.Formats.Asn1`'s shape, with
