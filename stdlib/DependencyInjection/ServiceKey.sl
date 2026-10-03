@@ -19,30 +19,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-module Standard.Hosting;
+module Standard.DependencyInjection;
 
-import Standard.Threading;
-
-/// The lifetime a host registers.
-public sealed threadsafe class HostApplicationLifetime : IHostApplicationLifetime
+/// The number a service type is known by. Each instantiation has its own,
+/// handed out before `Main` runs, so a type is a key with no reflection.
+public sealed class ServiceKey<T>
 {
-    CancellationTokenSource _started = new CancellationTokenSource();
-    CancellationTokenSource _stopping = new CancellationTokenSource();
-    CancellationTokenSource _stopped = new CancellationTokenSource();
-    AtomicInt _exitCode = new AtomicInt(0);
+    ServiceKey() { }
 
-    public CancellationToken ApplicationStarted => _started.Token;
-    public CancellationToken ApplicationStopping => _stopping.Token;
-    public CancellationToken ApplicationStopped => _stopped.Token;
-
-    public void StopApplication() => _stopping.Cancel();
-
-    public int ExitCode
-    {
-        get => _exitCode.Read();
-        set => _exitCode.Write(value);
-    }
-
-    internal void NotifyStarted() => _started.Cancel();
-    internal void NotifyStopped() => _stopped.Cancel();
+    /// This type's number, the same for the life of the program.
+    public static readonly int Id = TakeServiceKey();
 }

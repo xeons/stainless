@@ -21,39 +21,16 @@
 
 module Standard.Logging;
 
-import Standard.Console;
-
-internal sealed class ConsoleLogger : ILogger
+/// How much a message matters, least first. .NET's `LogLevel`.
+public enum LogLevel
 {
-    String _category;
-    bool _colors;
+    Trace,
+    Debug,
+    Information,
+    Warning,
+    Error,
+    Critical,
 
-    public ConsoleLogger(String category, bool colors)
-    {
-        _category = category;
-        _colors = colors;
-    }
-
-    public bool IsEnabled(LogLevel level) => level != LogLevel.None;
-
-    public void Log(LogLevel level, String message)
-    {
-        String label = GetLogLevelLabel(level);
-        if (_colors)
-            label = GetConsoleLogColor(level) + label + "\u001b[0m";
-        Write(label + ": " + _category + "[0]\n      " + message.Replace("\n", "\n      ") + "\n");
-    }
-}
-
-/// The escape that colours a level as .NET's console logger does.
-String GetConsoleLogColor(LogLevel level)
-{
-    switch (level)
-    {
-        case LogLevel.Information: return "\u001b[32m";
-        case LogLevel.Warning: return "\u001b[33m";
-        case LogLevel.Error: return "\u001b[31m";
-        case LogLevel.Critical: return "\u001b[37;41m";
-        default: return "\u001b[90m";
-    }
+    /// Above every message: a minimum of `None` writes nothing.
+    None,
 }

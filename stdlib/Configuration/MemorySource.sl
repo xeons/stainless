@@ -19,41 +19,24 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-module Standard.Logging;
+module Standard.Configuration;
 
-import Standard.Console;
+import Standard.Collections;
 
-internal sealed class ConsoleLogger : ILogger
+internal sealed class MemorySource : IConfigurationSource
 {
-    String _category;
-    bool _colors;
+    Dictionary<String, String> _values;
 
-    public ConsoleLogger(String category, bool colors)
+    public MemorySource(Dictionary<String, String> values)
     {
-        _category = category;
-        _colors = colors;
+        _values = values;
     }
 
-    public bool IsEnabled(LogLevel level) => level != LogLevel.None;
-
-    public void Log(LogLevel level, String message)
+    public ConfigurationError? Load(ConfigurationData data)
     {
-        String label = GetLogLevelLabel(level);
-        if (_colors)
-            label = GetConsoleLogColor(level) + label + "\u001b[0m";
-        Write(label + ": " + _category + "[0]\n      " + message.Replace("\n", "\n      ") + "\n");
-    }
-}
-
-/// The escape that colours a level as .NET's console logger does.
-String GetConsoleLogColor(LogLevel level)
-{
-    switch (level)
-    {
-        case LogLevel.Information: return "\u001b[32m";
-        case LogLevel.Warning: return "\u001b[33m";
-        case LogLevel.Error: return "\u001b[31m";
-        case LogLevel.Critical: return "\u001b[37;41m";
-        default: return "\u001b[90m";
+        var keys = _values.GetKeys();
+        for (nuint i = 0u; i < keys.Count; i++)
+            data.SetValue(keys[i], _values.GetValue(keys[i]));
+        return null;
     }
 }

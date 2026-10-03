@@ -19,30 +19,23 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-module Standard.Hosting;
+module Standard.DependencyInjection;
 
-import Standard.Threading;
-
-/// The lifetime a host registers.
-public sealed threadsafe class HostApplicationLifetime : IHostApplicationLifetime
+/// One constructor parameter of a registered implementation: the service it
+/// asks for, and whether the provider must have one.
+public struct ServiceDependency
 {
-    CancellationTokenSource _started = new CancellationTokenSource();
-    CancellationTokenSource _stopping = new CancellationTokenSource();
-    CancellationTokenSource _stopped = new CancellationTokenSource();
-    AtomicInt _exitCode = new AtomicInt(0);
+    /// The service's `ServiceKey<T>.Id`.
+    public int Key;
 
-    public CancellationToken ApplicationStarted => _started.Token;
-    public CancellationToken ApplicationStopping => _stopping.Token;
-    public CancellationToken ApplicationStopped => _stopped.Token;
+    /// The service type's name, for messages.
+    public String Name;
 
-    public void StopApplication() => _stopping.Cancel();
+    /// True for a `T` parameter, false for a `T?` or a `T[]`, which can be
+    /// answered with null or nothing.
+    public bool IsRequired;
 
-    public int ExitCode
-    {
-        get => _exitCode.Read();
-        set => _exitCode.Write(value);
-    }
-
-    internal void NotifyStarted() => _started.Cancel();
-    internal void NotifyStopped() => _stopped.Cancel();
+    /// Whether `GetService` makes one even unregistered, as it does for an
+    /// interface marked `[DefaultImplementation]`.
+    public bool HasDefault;
 }

@@ -38,7 +38,7 @@ interface IOptions<T>
 
 A `T` made from configuration. .NET's `IOptions<T>`.
 
-<sub>[stdlib/Options/Options.sl:51](../../stdlib/Options/Options.sl#L51)</sub>
+<sub>[stdlib/Options/IOptions.sl:25](../../stdlib/Options/IOptions.sl#L25)</sub>
 
 #### Value *property*
 
@@ -48,7 +48,7 @@ T Value { get; }
 
 The settings, made the first time any service asked for them.
 
-<sub>[stdlib/Options/Options.sl:54](../../stdlib/Options/Options.sl#L54)</sub>
+<sub>[stdlib/Options/IOptions.sl:28](../../stdlib/Options/IOptions.sl#L28)</sub>
 
 ### Options&lt;T&gt; *class*
 
@@ -59,7 +59,7 @@ sealed class Options<T> : IOptions<T>
 
 The `IOptions<T>` a provider makes.
 
-<sub>[stdlib/Options/Options.sl:58](../../stdlib/Options/Options.sl#L58)</sub>
+<sub>[stdlib/Options/Options.sl:50](../../stdlib/Options/Options.sl#L50)</sub>
 
 #### Value *property*
 
@@ -69,7 +69,7 @@ T Value { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Options/Options.sl:68](../../stdlib/Options/Options.sl#L68)</sub>
+<sub>[stdlib/Options/Options.sl:60](../../stdlib/Options/Options.sl#L60)</sub>
 
 ### OptionsBuilder&lt;T&gt; *class*
 
@@ -81,7 +81,7 @@ sealed class OptionsBuilder<T> : IServiceCollectionState
 How a `T` is made: the sections to bind, the actions to run, the checks to
 make, in the order they were given. .NET's `OptionsBuilder<T>`.
 
-<sub>[stdlib/Options/Options.sl:73](../../stdlib/Options/Options.sl#L73)</sub>
+<sub>[stdlib/Options/OptionsBuilder.sl:30](../../stdlib/Options/OptionsBuilder.sl#L30)</sub>
 
 #### Bind *method*
 
@@ -91,7 +91,7 @@ OptionsBuilder<T> Bind(IConfiguration section)
 
 Binds `section` onto the object, after any earlier step.
 
-<sub>[stdlib/Options/Options.sl:82](../../stdlib/Options/Options.sl#L82)</sub>
+<sub>[stdlib/Options/OptionsBuilder.sl:39](../../stdlib/Options/OptionsBuilder.sl#L39)</sub>
 
 #### Configure *method*
 
@@ -101,7 +101,7 @@ OptionsBuilder<T> Configure(Action<T> configure)
 
 Runs `configure` on the object, after any earlier step.
 
-<sub>[stdlib/Options/Options.sl:90](../../stdlib/Options/Options.sl#L90)</sub>
+<sub>[stdlib/Options/OptionsBuilder.sl:47](../../stdlib/Options/OptionsBuilder.sl#L47)</sub>
 
 #### Validate *method*
 
@@ -112,7 +112,7 @@ OptionsBuilder<T> Validate(Predicate<T> check, String message)
 Stops the program with `message` when `check` is false of the made
 object.
 
-<sub>[stdlib/Options/Options.sl:98](../../stdlib/Options/Options.sl#L98)</sub>
+<sub>[stdlib/Options/OptionsBuilder.sl:55](../../stdlib/Options/OptionsBuilder.sl#L55)</sub>
 
 ## Functions
 
@@ -131,7 +131,7 @@ builder, so every step for a type adds to one.
 
 - `T` -- a `[Reflect]` class with a parameterless constructor
 
-<sub>[stdlib/Options/Options.sl:138](../../stdlib/Options/Options.sl#L138)</sub>
+<sub>[stdlib/Options/Options.sl:77](../../stdlib/Options/Options.sl#L77)</sub>
 
 ### Configure *function*
 
@@ -146,7 +146,7 @@ ServiceCollection Configure<T>(ServiceCollection services, IConfiguration sectio
 
 - `T` -- a `[Reflect]` class with a parameterless constructor
 
-<sub>[stdlib/Options/Options.sl:156](../../stdlib/Options/Options.sl#L156)</sub>
+<sub>[stdlib/Options/Options.sl:95](../../stdlib/Options/Options.sl#L95)</sub>
 
 ### Configure *function*
 
@@ -161,5 +161,5 @@ ServiceCollection Configure<T>(ServiceCollection services, Action<T> configure)
 
 - `T` -- a class with a parameterless constructor
 
-<sub>[stdlib/Options/Options.sl:166](../../stdlib/Options/Options.sl#L166)</sub>
+<sub>[stdlib/Options/Options.sl:105](../../stdlib/Options/Options.sl#L105)</sub>
 

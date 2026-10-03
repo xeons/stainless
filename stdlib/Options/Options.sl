@@ -40,19 +40,11 @@
 /// with the message, as .NET's `OptionsValidationException` would end it.
 module Standard.Options;
 
-import Standard.Collections;
 import Standard.Configuration;
 import Standard.DependencyInjection;
 
 [DoesNotReturn]
 extern "C" void sl_fail(byte* message);
-
-/// A `T` made from configuration. .NET's `IOptions<T>`.
-public interface IOptions<T>
-{
-    /// The settings, made the first time any service asked for them.
-    T Value { get; }
-}
 
 /// The `IOptions<T>` a provider makes.
 public sealed class Options<T> : IOptions<T>
@@ -66,59 +58,6 @@ public sealed class Options<T> : IOptions<T>
     }
 
     public T Value => _value;
-}
-
-/// How a `T` is made: the sections to bind, the actions to run, the checks to
-/// make, in the order they were given. .NET's `OptionsBuilder<T>`.
-public sealed class OptionsBuilder<T> : IServiceCollectionState
-    where T : new()
-{
-    List<IConfiguration> _sections = new List<IConfiguration>();
-    List<Action<T>> _actions = new List<Action<T>>();
-    List<Predicate<T>> _checks = new List<Predicate<T>>();
-    List<String> _messages = new List<String>();
-
-    /// Binds `section` onto the object, after any earlier step.
-    public OptionsBuilder<T> Bind(IConfiguration section)
-    {
-        _sections.Add(section);
-        _actions.Add((T value) => BindOptionsSection<T>(section, value));
-        return this;
-    }
-
-    /// Runs `configure` on the object, after any earlier step.
-    public OptionsBuilder<T> Configure(Action<T> configure)
-    {
-        _actions.Add(configure);
-        return this;
-    }
-
-    /// Stops the program with `message` when `check` is false of the made
-    /// object.
-    public OptionsBuilder<T> Validate(Predicate<T> check, String message)
-    {
-        _checks.Add(check);
-        _messages.Add(message);
-        return this;
-    }
-
-    internal T MakeOptions()
-    {
-        var value = new T();
-        for (nuint i = 0u; i < _actions.Count; i++)
-        {
-            var action = _actions[i];
-            action(value);
-        }
-        for (nuint i = 0u; i < _checks.Count; i++)
-        {
-            var check = _checks[i];
-            if (!check(value))
-                sl_fail(("options '" + RuntimeHelpers.GetTypeName<T>() + "' are not valid: " +
-                         _messages[i]).ToPointer());
-        }
-        return value;
-    }
 }
 
 void BindOptionsSection<T>(IConfiguration section, T value)

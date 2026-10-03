@@ -644,6 +644,12 @@ need no body.
 
 - **One module per file**, named for what it holds. `stdlib/Collections/List.sl`
   declares `module Standard.Collections`.
+- **One class, interface, struct or enum per file**, internal ones included,
+  the file named for it: `List<T>` is `List.sl`. A generic that shares its
+  name with a non-generic type takes the suffix .NET's own sources use:
+  `ILogger<T>` is `ILoggerOfT.sl` beside `ILogger.sl`. A module's overview
+  comment and the free functions that belong to no one type go in the file
+  named for the module, `DependencyInjection.sl`.
 - **Every source file carries its licence header** — the GPL-with-runtime-
   exception block for `stdlib/`, `runtime/` and `forms/`, the
   `// SPDX-License-Identifier: 0BSD` line for `samples/`. Copy the header from a

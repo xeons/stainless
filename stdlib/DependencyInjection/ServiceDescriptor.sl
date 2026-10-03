@@ -23,45 +23,6 @@ module Standard.DependencyInjection;
 
 import Standard.Collections;
 
-/// One constructor parameter of a registered implementation: the service it
-/// asks for, and whether the provider must have one.
-public struct ServiceDependency
-{
-    /// The service's `ServiceKey<T>.Id`.
-    public int Key;
-
-    /// The service type's name, for messages.
-    public String Name;
-
-    /// True for a `T` parameter, false for a `T?` or a `T[]`, which can be
-    /// answered with null or nothing.
-    public bool IsRequired;
-
-    /// Whether `GetService` makes one even unregistered, as it does for an
-    /// interface marked `[DefaultImplementation]`.
-    public bool HasDefault;
-}
-
-/// What a `ServiceCollection` holds for each registration, whatever its type.
-public interface IServiceDescriptor
-{
-    /// The registered service type's `ServiceKey<T>.Id`.
-    int Key { get; }
-
-    /// The registered service type's name.
-    String ServiceName { get; }
-
-    /// What is made, for messages: the implementation type, or the service
-    /// type itself for a factory or an instance.
-    String ImplementationName { get; }
-
-    ServiceLifetime Lifetime { get; }
-
-    /// What the implementation's constructor asks for. Empty for a factory,
-    /// whose needs are not known until it runs.
-    List<ServiceDependency> Dependencies { get; }
-}
-
 /// A registration of a `T`: made by a factory, or given as an instance.
 public sealed class ServiceDescriptor<T> : IServiceDescriptor
     where T : class
@@ -111,28 +72,5 @@ public sealed class ServiceDescriptor<T> : IServiceDescriptor
         if (factory != null)
             return factory(provider);
         sl_fail("a service registration has neither a factory nor an instance");
-    }
-}
-
-/// Collects what a constructor asks for, through `ActivatorUtilities.VisitDependencies`.
-public sealed class ServiceDependencyVisitor
-{
-    /// What has been visited, in parameter order.
-    public List<ServiceDependency> Found = new List<ServiceDependency>();
-
-    /// Records a parameter of type `T`: required for a `T`, not for a `T?` or
-    /// a `T[]`.
-    ///
-    /// @typeparam T  the service the parameter asks for
-    /// @param required  whether the provider must have one
-    public void Visit<T>(bool required)
-        where T : class
-    {
-        ServiceDependency dependency;
-        dependency.Key = ServiceKey<T>.Id;
-        dependency.Name = RuntimeHelpers.GetTypeName<T>();
-        dependency.IsRequired = required;
-        dependency.HasDefault = ActivatorUtilities.HasDefault<T>();
-        Found.Add(dependency);
     }
 }

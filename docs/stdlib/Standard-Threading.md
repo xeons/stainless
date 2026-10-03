@@ -477,7 +477,7 @@ threadsafe sealed class CancellationTokenRegistration : IDisposable
 
 A callback registered with a token, withdrawn by `Dispose`.
 
-<sub>[stdlib/Threading/CancellationToken.sl:97](../../stdlib/Threading/CancellationToken.sl#L97)</sub>
+<sub>[stdlib/Threading/CancellationTokenRegistration.sl:25](../../stdlib/Threading/CancellationTokenRegistration.sl#L25)</sub>
 
 #### Dispose *method*
 
@@ -487,7 +487,7 @@ void Dispose()
 
 Withdraws the callback, if it has not run. A second call does nothing.
 
-<sub>[stdlib/Threading/CancellationToken.sl:109](../../stdlib/Threading/CancellationToken.sl#L109)</sub>
+<sub>[stdlib/Threading/CancellationTokenRegistration.sl:37](../../stdlib/Threading/CancellationTokenRegistration.sl#L37)</sub>
 
 ### CancellationTokenSource *class*
 

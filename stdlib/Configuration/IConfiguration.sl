@@ -19,30 +19,25 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-module Standard.Hosting;
+module Standard.Configuration;
 
-import Standard.Threading;
+import Standard.Collections;
 
-/// The lifetime a host registers.
-public sealed threadsafe class HostApplicationLifetime : IHostApplicationLifetime
+/// What both a whole configuration and a section of it answer.
+/// .NET's `IConfiguration`.
+public interface IConfiguration
 {
-    CancellationTokenSource _started = new CancellationTokenSource();
-    CancellationTokenSource _stopping = new CancellationTokenSource();
-    CancellationTokenSource _stopped = new CancellationTokenSource();
-    AtomicInt _exitCode = new AtomicInt(0);
+    /// The value at `key`, below this one, or null.
+    ///
+    /// @param key  a path, its parts joined with `:`
+    String? GetValue(String key);
 
-    public CancellationToken ApplicationStarted => _started.Token;
-    public CancellationToken ApplicationStopping => _stopping.Token;
-    public CancellationToken ApplicationStopped => _stopped.Token;
+    /// The section at `key`, below this one. A section nothing is under exists
+    /// all the same, and answers null for every value.
+    ///
+    /// @param key  a path, its parts joined with `:`
+    ConfigurationSection GetSection(String key);
 
-    public void StopApplication() => _stopping.Cancel();
-
-    public int ExitCode
-    {
-        get => _exitCode.Read();
-        set => _exitCode.Write(value);
-    }
-
-    internal void NotifyStarted() => _started.Cancel();
-    internal void NotifyStopped() => _stopped.Cancel();
+    /// The sections directly below this one, in the order first written.
+    List<ConfigurationSection> GetChildren();
 }

@@ -92,25 +92,3 @@ public struct CancellationToken
         return source.RegisterCancellation(callback);
     }
 }
-
-/// A callback registered with a token, withdrawn by `Dispose`.
-public sealed threadsafe class CancellationTokenRegistration : IDisposable
-{
-    weak CancellationTokenSource? _source;
-    long _id;
-
-    internal CancellationTokenRegistration(CancellationTokenSource? source, long id)
-    {
-        _source = source;
-        _id = id;
-    }
-
-    /// Withdraws the callback, if it has not run. A second call does nothing.
-    public void Dispose()
-    {
-        CancellationTokenSource? source = _source;
-        if (source != null && _id != 0)
-            source.UnregisterCancellation(_id);
-        _id = 0;
-    }
-}

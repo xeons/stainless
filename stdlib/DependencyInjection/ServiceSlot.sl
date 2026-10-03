@@ -19,30 +19,19 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-module Standard.Hosting;
+module Standard.DependencyInjection;
 
-import Standard.Threading;
-
-/// The lifetime a host registers.
-public sealed threadsafe class HostApplicationLifetime : IHostApplicationLifetime
+internal sealed class ServiceSlot<T> : IServiceSlot
+    where T : class
 {
-    CancellationTokenSource _started = new CancellationTokenSource();
-    CancellationTokenSource _stopping = new CancellationTokenSource();
-    CancellationTokenSource _stopped = new CancellationTokenSource();
-    AtomicInt _exitCode = new AtomicInt(0);
+    /// Null while it is being made.
+    public T? Value;
 
-    public CancellationToken ApplicationStarted => _started.Token;
-    public CancellationToken ApplicationStopping => _stopping.Token;
-    public CancellationToken ApplicationStopped => _stopped.Token;
+    /// The thread making it, so that thread asking again is a cycle.
+    public nuint Maker;
 
-    public void StopApplication() => _stopping.Cancel();
-
-    public int ExitCode
+    public ServiceSlot(nuint maker)
     {
-        get => _exitCode.Read();
-        set => _exitCode.Write(value);
+        Maker = maker;
     }
-
-    internal void NotifyStarted() => _started.Cancel();
-    internal void NotifyStopped() => _stopped.Cancel();
 }

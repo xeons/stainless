@@ -19,30 +19,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-module Standard.Hosting;
+module Standard.Configuration;
 
-import Standard.Threading;
-
-/// The lifetime a host registers.
-public sealed threadsafe class HostApplicationLifetime : IHostApplicationLifetime
+/// Why a configuration could not be built or bound.
+public sealed class ConfigurationError
 {
-    CancellationTokenSource _started = new CancellationTokenSource();
-    CancellationTokenSource _stopping = new CancellationTokenSource();
-    CancellationTokenSource _stopped = new CancellationTokenSource();
-    AtomicInt _exitCode = new AtomicInt(0);
+    /// What went wrong, naming the file or the key.
+    public String Message;
 
-    public CancellationToken ApplicationStarted => _started.Token;
-    public CancellationToken ApplicationStopping => _stopping.Token;
-    public CancellationToken ApplicationStopped => _stopped.Token;
-
-    public void StopApplication() => _stopping.Cancel();
-
-    public int ExitCode
+    internal ConfigurationError(String message)
     {
-        get => _exitCode.Read();
-        set => _exitCode.Write(value);
+        Message = message;
     }
-
-    internal void NotifyStarted() => _started.Cancel();
-    internal void NotifyStopped() => _stopped.Cancel();
 }

@@ -19,30 +19,29 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-module Standard.Hosting;
+module Standard.DependencyInjection;
 
-import Standard.Threading;
+import Standard.Collections;
 
-/// The lifetime a host registers.
-public sealed threadsafe class HostApplicationLifetime : IHostApplicationLifetime
+/// Collects what a constructor asks for, through `ActivatorUtilities.VisitDependencies`.
+public sealed class ServiceDependencyVisitor
 {
-    CancellationTokenSource _started = new CancellationTokenSource();
-    CancellationTokenSource _stopping = new CancellationTokenSource();
-    CancellationTokenSource _stopped = new CancellationTokenSource();
-    AtomicInt _exitCode = new AtomicInt(0);
+    /// What has been visited, in parameter order.
+    public List<ServiceDependency> Found = new List<ServiceDependency>();
 
-    public CancellationToken ApplicationStarted => _started.Token;
-    public CancellationToken ApplicationStopping => _stopping.Token;
-    public CancellationToken ApplicationStopped => _stopped.Token;
-
-    public void StopApplication() => _stopping.Cancel();
-
-    public int ExitCode
+    /// Records a parameter of type `T`: required for a `T`, not for a `T?` or
+    /// a `T[]`.
+    ///
+    /// @typeparam T  the service the parameter asks for
+    /// @param required  whether the provider must have one
+    public void Visit<T>(bool required)
+        where T : class
     {
-        get => _exitCode.Read();
-        set => _exitCode.Write(value);
+        ServiceDependency dependency;
+        dependency.Key = ServiceKey<T>.Id;
+        dependency.Name = RuntimeHelpers.GetTypeName<T>();
+        dependency.IsRequired = required;
+        dependency.HasDefault = ActivatorUtilities.HasDefault<T>();
+        Found.Add(dependency);
     }
-
-    internal void NotifyStarted() => _started.Cancel();
-    internal void NotifyStopped() => _stopped.Cancel();
 }

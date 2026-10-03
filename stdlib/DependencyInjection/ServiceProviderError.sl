@@ -19,30 +19,21 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-module Standard.Hosting;
+module Standard.DependencyInjection;
 
-import Standard.Threading;
+import Standard.Collections;
 
-/// The lifetime a host registers.
-public sealed threadsafe class HostApplicationLifetime : IHostApplicationLifetime
+/// What `BuildServiceProvider` found wrong, every problem at once.
+public sealed class ServiceProviderError
 {
-    CancellationTokenSource _started = new CancellationTokenSource();
-    CancellationTokenSource _stopping = new CancellationTokenSource();
-    CancellationTokenSource _stopped = new CancellationTokenSource();
-    AtomicInt _exitCode = new AtomicInt(0);
+    /// One sentence per problem.
+    public List<String> Problems;
 
-    public CancellationToken ApplicationStarted => _started.Token;
-    public CancellationToken ApplicationStopping => _stopping.Token;
-    public CancellationToken ApplicationStopped => _stopped.Token;
-
-    public void StopApplication() => _stopping.Cancel();
-
-    public int ExitCode
+    internal ServiceProviderError(List<String> problems)
     {
-        get => _exitCode.Read();
-        set => _exitCode.Write(value);
+        Problems = problems;
     }
 
-    internal void NotifyStarted() => _started.Cancel();
-    internal void NotifyStopped() => _stopped.Cancel();
+    /// Every problem, one per line.
+    public String Message => "\n".Join(Problems.ToArray());
 }

@@ -19,30 +19,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-module Standard.Hosting;
+module Standard.DependencyInjection;
 
-import Standard.Threading;
-
-/// The lifetime a host registers.
-public sealed threadsafe class HostApplicationLifetime : IHostApplicationLifetime
+/// Says which class `GetService` makes for an instantiation of a generic
+/// interface that nothing registered: `[DefaultImplementation("App.Logger")]`
+/// on `ILogger<T>` makes `App.Logger<T>` for any `T`. The class MUST take the
+/// interface's type parameters in the same order.
+///
+/// It is how one declaration serves every instantiation, which .NET does by
+/// registering an open generic -- impossible here, where an instantiation is
+/// made by the compiler.
+public attribute DefaultImplementation
 {
-    CancellationTokenSource _started = new CancellationTokenSource();
-    CancellationTokenSource _stopping = new CancellationTokenSource();
-    CancellationTokenSource _stopped = new CancellationTokenSource();
-    AtomicInt _exitCode = new AtomicInt(0);
-
-    public CancellationToken ApplicationStarted => _started.Token;
-    public CancellationToken ApplicationStopping => _stopping.Token;
-    public CancellationToken ApplicationStopped => _stopped.Token;
-
-    public void StopApplication() => _stopping.Cancel();
-
-    public int ExitCode
-    {
-        get => _exitCode.Read();
-        set => _exitCode.Write(value);
-    }
-
-    internal void NotifyStarted() => _started.Cancel();
-    internal void NotifyStopped() => _stopped.Cancel();
+    String TypeName;
 }

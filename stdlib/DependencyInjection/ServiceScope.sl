@@ -19,30 +19,21 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-module Standard.Hosting;
+module Standard.DependencyInjection;
 
-import Standard.Threading;
-
-/// The lifetime a host registers.
-public sealed threadsafe class HostApplicationLifetime : IHostApplicationLifetime
+/// A scope's provider, and the end of it. .NET's `IServiceScope`.
+public sealed class ServiceScope : IDisposable
 {
-    CancellationTokenSource _started = new CancellationTokenSource();
-    CancellationTokenSource _stopping = new CancellationTokenSource();
-    CancellationTokenSource _stopped = new CancellationTokenSource();
-    AtomicInt _exitCode = new AtomicInt(0);
+    ServiceProvider _provider;
 
-    public CancellationToken ApplicationStarted => _started.Token;
-    public CancellationToken ApplicationStopping => _stopping.Token;
-    public CancellationToken ApplicationStopped => _stopped.Token;
-
-    public void StopApplication() => _stopping.Cancel();
-
-    public int ExitCode
+    internal ServiceScope(ServiceProvider provider)
     {
-        get => _exitCode.Read();
-        set => _exitCode.Write(value);
+        _provider = provider;
     }
 
-    internal void NotifyStarted() => _started.Cancel();
-    internal void NotifyStopped() => _stopped.Cancel();
+    /// What to ask for this scope's services.
+    public ServiceProvider ServiceProvider => _provider;
+
+    /// Ends the scope: what it made is disposed and let go.
+    public void Dispose() => _provider.Dispose();
 }

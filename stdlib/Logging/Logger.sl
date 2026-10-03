@@ -21,39 +21,18 @@
 
 module Standard.Logging;
 
-import Standard.Console;
-
-internal sealed class ConsoleLogger : ILogger
+/// The `ILogger<T>` a provider makes: a logger from the factory, under `T`'s
+/// name.
+public sealed class Logger<T> : ILogger<T>
 {
-    String _category;
-    bool _colors;
+    ILogger _logger;
 
-    public ConsoleLogger(String category, bool colors)
+    public Logger(ILoggerFactory factory)
     {
-        _category = category;
-        _colors = colors;
+        _logger = factory.CreateLogger(RuntimeHelpers.GetTypeName<T>());
     }
 
-    public bool IsEnabled(LogLevel level) => level != LogLevel.None;
+    public void Log(LogLevel level, String message) => _logger.Log(level, message);
 
-    public void Log(LogLevel level, String message)
-    {
-        String label = GetLogLevelLabel(level);
-        if (_colors)
-            label = GetConsoleLogColor(level) + label + "\u001b[0m";
-        Write(label + ": " + _category + "[0]\n      " + message.Replace("\n", "\n      ") + "\n");
-    }
-}
-
-/// The escape that colours a level as .NET's console logger does.
-String GetConsoleLogColor(LogLevel level)
-{
-    switch (level)
-    {
-        case LogLevel.Information: return "\u001b[32m";
-        case LogLevel.Warning: return "\u001b[33m";
-        case LogLevel.Error: return "\u001b[31m";
-        case LogLevel.Critical: return "\u001b[37;41m";
-        default: return "\u001b[90m";
-    }
+    public bool IsEnabled(LogLevel level) => _logger.IsEnabled(level);
 }

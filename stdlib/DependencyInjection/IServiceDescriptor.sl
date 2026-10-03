@@ -19,30 +19,26 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-module Standard.Hosting;
+module Standard.DependencyInjection;
 
-import Standard.Threading;
+import Standard.Collections;
 
-/// The lifetime a host registers.
-public sealed threadsafe class HostApplicationLifetime : IHostApplicationLifetime
+/// What a `ServiceCollection` holds for each registration, whatever its type.
+public interface IServiceDescriptor
 {
-    CancellationTokenSource _started = new CancellationTokenSource();
-    CancellationTokenSource _stopping = new CancellationTokenSource();
-    CancellationTokenSource _stopped = new CancellationTokenSource();
-    AtomicInt _exitCode = new AtomicInt(0);
+    /// The registered service type's `ServiceKey<T>.Id`.
+    int Key { get; }
 
-    public CancellationToken ApplicationStarted => _started.Token;
-    public CancellationToken ApplicationStopping => _stopping.Token;
-    public CancellationToken ApplicationStopped => _stopped.Token;
+    /// The registered service type's name.
+    String ServiceName { get; }
 
-    public void StopApplication() => _stopping.Cancel();
+    /// What is made, for messages: the implementation type, or the service
+    /// type itself for a factory or an instance.
+    String ImplementationName { get; }
 
-    public int ExitCode
-    {
-        get => _exitCode.Read();
-        set => _exitCode.Write(value);
-    }
+    ServiceLifetime Lifetime { get; }
 
-    internal void NotifyStarted() => _started.Cancel();
-    internal void NotifyStopped() => _stopped.Cancel();
+    /// What the implementation's constructor asks for. Empty for a factory,
+    /// whose needs are not known until it runs.
+    List<ServiceDependency> Dependencies { get; }
 }

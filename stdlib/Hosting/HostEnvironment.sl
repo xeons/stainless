@@ -21,28 +21,27 @@
 
 module Standard.Hosting;
 
-import Standard.Threading;
-
-/// The lifetime a host registers.
-public sealed threadsafe class HostApplicationLifetime : IHostApplicationLifetime
+/// The environment a host registers.
+public sealed class HostEnvironment : IHostEnvironment
 {
-    CancellationTokenSource _started = new CancellationTokenSource();
-    CancellationTokenSource _stopping = new CancellationTokenSource();
-    CancellationTokenSource _stopped = new CancellationTokenSource();
-    AtomicInt _exitCode = new AtomicInt(0);
+    String _environmentName;
+    String _contentRootPath;
+    String _applicationName;
 
-    public CancellationToken ApplicationStarted => _started.Token;
-    public CancellationToken ApplicationStopping => _stopping.Token;
-    public CancellationToken ApplicationStopped => _stopped.Token;
-
-    public void StopApplication() => _stopping.Cancel();
-
-    public int ExitCode
+    public HostEnvironment(String environmentName, String contentRootPath, String applicationName)
     {
-        get => _exitCode.Read();
-        set => _exitCode.Write(value);
+        _environmentName = environmentName;
+        _contentRootPath = contentRootPath;
+        _applicationName = applicationName;
     }
 
-    internal void NotifyStarted() => _started.Cancel();
-    internal void NotifyStopped() => _stopped.Cancel();
+    public String EnvironmentName => _environmentName;
+    public String ContentRootPath => _contentRootPath;
+    public String ApplicationName => _applicationName;
+
+    /// Whether this is the `Development` environment.
+    public bool IsDevelopment => _environmentName.EqualsIgnoreCaseAscii("Development");
+
+    /// Whether this is the `Production` environment.
+    public bool IsProduction => _environmentName.EqualsIgnoreCaseAscii("Production");
 }

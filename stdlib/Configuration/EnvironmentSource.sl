@@ -19,41 +19,32 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-module Standard.Logging;
+module Standard.Configuration;
 
-import Standard.Console;
+import Standard.Env;
 
-internal sealed class ConsoleLogger : ILogger
+internal sealed class EnvironmentSource : IConfigurationSource
 {
-    String _category;
-    bool _colors;
+    String _prefix;
 
-    public ConsoleLogger(String category, bool colors)
+    public EnvironmentSource(String prefix)
     {
-        _category = category;
-        _colors = colors;
+        _prefix = prefix;
     }
 
-    public bool IsEnabled(LogLevel level) => level != LogLevel.None;
-
-    public void Log(LogLevel level, String message)
+    public ConfigurationError? Load(ConfigurationData data)
     {
-        String label = GetLogLevelLabel(level);
-        if (_colors)
-            label = GetConsoleLogColor(level) + label + "\u001b[0m";
-        Write(label + ": " + _category + "[0]\n      " + message.Replace("\n", "\n      ") + "\n");
-    }
-}
-
-/// The escape that colours a level as .NET's console logger does.
-String GetConsoleLogColor(LogLevel level)
-{
-    switch (level)
-    {
-        case LogLevel.Information: return "\u001b[32m";
-        case LogLevel.Warning: return "\u001b[33m";
-        case LogLevel.Error: return "\u001b[31m";
-        case LogLevel.Critical: return "\u001b[37;41m";
-        default: return "\u001b[90m";
+        String[] names = GetEnvironmentVariableNames();
+        nuint skip = _prefix.ByteLength();
+        for (nuint i = 0u; i < names.Length; i++)
+        {
+            String name = names[i];
+            if (name.ByteLength() <= skip || !name.Substring(0u, skip).EqualsIgnoreCaseAscii(_prefix))
+                continue;
+            String? value = GetEnvironmentVariable(name);
+            if (value != null)
+                data.SetValue(name.Substring(skip).Replace("__", ":"), value);
+        }
+        return null;
     }
 }

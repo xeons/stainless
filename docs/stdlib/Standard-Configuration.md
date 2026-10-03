@@ -37,7 +37,7 @@ sealed class Configuration : IConfiguration
 A built configuration: every source's keys and values, the later winning.
 .NET's `IConfigurationRoot`.
 
-<sub>[stdlib/Configuration/Configuration.sl:121](../../stdlib/Configuration/Configuration.sl#L121)</sub>
+<sub>[stdlib/Configuration/Configuration.sl:47](../../stdlib/Configuration/Configuration.sl#L47)</sub>
 
 #### GetValue *method*
 
@@ -47,7 +47,7 @@ String? GetValue(String key)
 
 *No documentation.*
 
-<sub>[stdlib/Configuration/Configuration.sl:136](../../stdlib/Configuration/Configuration.sl#L136)</sub>
+<sub>[stdlib/Configuration/Configuration.sl:62](../../stdlib/Configuration/Configuration.sl#L62)</sub>
 
 #### GetValueOrDefault *method*
 
@@ -62,7 +62,7 @@ The value at `key`, or `fallback` when there is none.
 - `key` -- a path, its parts joined with `:`
 - `fallback` -- what to answer instead
 
-<sub>[stdlib/Configuration/Configuration.sl:142](../../stdlib/Configuration/Configuration.sl#L142)</sub>
+<sub>[stdlib/Configuration/Configuration.sl:68](../../stdlib/Configuration/Configuration.sl#L68)</sub>
 
 #### GetSection *method*
 
@@ -72,7 +72,7 @@ ConfigurationSection GetSection(String key)
 
 *No documentation.*
 
-<sub>[stdlib/Configuration/Configuration.sl:150](../../stdlib/Configuration/Configuration.sl#L150)</sub>
+<sub>[stdlib/Configuration/Configuration.sl:76](../../stdlib/Configuration/Configuration.sl#L76)</sub>
 
 #### GetChildren *method*
 
@@ -82,7 +82,7 @@ List<ConfigurationSection> GetChildren()
 
 *No documentation.*
 
-<sub>[stdlib/Configuration/Configuration.sl:152](../../stdlib/Configuration/Configuration.sl#L152)</sub>
+<sub>[stdlib/Configuration/Configuration.sl:78](../../stdlib/Configuration/Configuration.sl#L78)</sub>
 
 #### GetKeys *method*
 
@@ -92,7 +92,7 @@ List<String> GetKeys()
 
 Every key with a value, as first spelled, in the order first written.
 
-<sub>[stdlib/Configuration/Configuration.sl:162](../../stdlib/Configuration/Configuration.sl#L162)</sub>
+<sub>[stdlib/Configuration/Configuration.sl:88](../../stdlib/Configuration/Configuration.sl#L88)</sub>
 
 ### ConfigurationBinder *class*
 
@@ -141,7 +141,7 @@ sealed class ConfigurationBuilder
 Where a configuration is read from, in the order added: a later source's
 value for a key replaces an earlier one's. .NET's `ConfigurationBuilder`.
 
-<sub>[stdlib/Configuration/ConfigurationBuilder.sl:31](../../stdlib/Configuration/ConfigurationBuilder.sl#L31)</sub>
+<sub>[stdlib/Configuration/ConfigurationBuilder.sl:28](../../stdlib/Configuration/ConfigurationBuilder.sl#L28)</sub>
 
 #### AddJsonFile *method*
 
@@ -158,7 +158,7 @@ array's elements are `Items:0`, `Items:1`.
 - `path` -- the file, relative to the working directory
 - `optional` -- whether a missing file is skipped rather than an error
 
-<sub>[stdlib/Configuration/ConfigurationBuilder.sl:41](../../stdlib/Configuration/ConfigurationBuilder.sl#L41)</sub>
+<sub>[stdlib/Configuration/ConfigurationBuilder.sl:38](../../stdlib/Configuration/ConfigurationBuilder.sl#L38)</sub>
 
 #### AddEnvironmentVariables *method*
 
@@ -173,7 +173,7 @@ it, `__` in a name standing for `:`. With no prefix, every variable.
 
 - `prefix` -- what a name MUST start with, compared without regard to ASCII case
 
-<sub>[stdlib/Configuration/ConfigurationBuilder.sl:51](../../stdlib/Configuration/ConfigurationBuilder.sl#L51)</sub>
+<sub>[stdlib/Configuration/ConfigurationBuilder.sl:48](../../stdlib/Configuration/ConfigurationBuilder.sl#L48)</sub>
 
 #### AddCommandLine *method*
 
@@ -189,7 +189,7 @@ shapes is skipped.
 
 - `arguments` -- the program's arguments, without its own name
 
-<sub>[stdlib/Configuration/ConfigurationBuilder.sl:62](../../stdlib/Configuration/ConfigurationBuilder.sl#L62)</sub>
+<sub>[stdlib/Configuration/ConfigurationBuilder.sl:59](../../stdlib/Configuration/ConfigurationBuilder.sl#L59)</sub>
 
 #### AddInMemoryCollection *method*
 
@@ -203,7 +203,7 @@ The keys and values of `values`, as they are.
 
 - `values` -- keys joined with `:`, and their values
 
-<sub>[stdlib/Configuration/ConfigurationBuilder.sl:71](../../stdlib/Configuration/ConfigurationBuilder.sl#L71)</sub>
+<sub>[stdlib/Configuration/ConfigurationBuilder.sl:68](../../stdlib/Configuration/ConfigurationBuilder.sl#L68)</sub>
 
 #### Build *method*
 
@@ -215,7 +215,7 @@ Reads every source, in order.
 
 **Returns** &nbsp; the configuration, or the first source that could not be read: a required file that is missing or is not a JSON object
 
-<sub>[stdlib/Configuration/ConfigurationBuilder.sl:81](../../stdlib/Configuration/ConfigurationBuilder.sl#L81)</sub>
+<sub>[stdlib/Configuration/ConfigurationBuilder.sl:78](../../stdlib/Configuration/ConfigurationBuilder.sl#L78)</sub>
 
 ### ConfigurationError *class*
 
@@ -225,7 +225,7 @@ sealed class ConfigurationError
 
 Why a configuration could not be built or bound.
 
-<sub>[stdlib/Configuration/Configuration.sl:217](../../stdlib/Configuration/Configuration.sl#L217)</sub>
+<sub>[stdlib/Configuration/ConfigurationError.sl:25](../../stdlib/Configuration/ConfigurationError.sl#L25)</sub>
 
 #### Message *field*
 
@@ -235,7 +235,7 @@ String Message
 
 What went wrong, naming the file or the key.
 
-<sub>[stdlib/Configuration/Configuration.sl:220](../../stdlib/Configuration/Configuration.sl#L220)</sub>
+<sub>[stdlib/Configuration/ConfigurationError.sl:28](../../stdlib/Configuration/ConfigurationError.sl#L28)</sub>
 
 ### ConfigurationSection *class*
 
@@ -245,7 +245,7 @@ sealed class ConfigurationSection : IConfiguration
 
 The part of a configuration below one key. .NET's `IConfigurationSection`.
 
-<sub>[stdlib/Configuration/Configuration.sl:172](../../stdlib/Configuration/Configuration.sl#L172)</sub>
+<sub>[stdlib/Configuration/ConfigurationSection.sl:27](../../stdlib/Configuration/ConfigurationSection.sl#L27)</sub>
 
 #### Path *property*
 
@@ -255,7 +255,7 @@ String Path { get; }
 
 The whole path from the root: `Logging:LogLevel`.
 
-<sub>[stdlib/Configuration/Configuration.sl:184](../../stdlib/Configuration/Configuration.sl#L184)</sub>
+<sub>[stdlib/Configuration/ConfigurationSection.sl:39](../../stdlib/Configuration/ConfigurationSection.sl#L39)</sub>
 
 #### Key *property*
 
@@ -265,7 +265,7 @@ String Key { get; }
 
 The last part of the path: `LogLevel`.
 
-<sub>[stdlib/Configuration/Configuration.sl:187](../../stdlib/Configuration/Configuration.sl#L187)</sub>
+<sub>[stdlib/Configuration/ConfigurationSection.sl:42](../../stdlib/Configuration/ConfigurationSection.sl#L42)</sub>
 
 #### Value *property*
 
@@ -275,7 +275,7 @@ String? Value { get; }
 
 The value at this section's own key, or null.
 
-<sub>[stdlib/Configuration/Configuration.sl:197](../../stdlib/Configuration/Configuration.sl#L197)</sub>
+<sub>[stdlib/Configuration/ConfigurationSection.sl:52](../../stdlib/Configuration/ConfigurationSection.sl#L52)</sub>
 
 #### Exists *property*
 
@@ -285,7 +285,7 @@ bool Exists { get; }
 
 Whether this section has a value or anything below it.
 
-<sub>[stdlib/Configuration/Configuration.sl:200](../../stdlib/Configuration/Configuration.sl#L200)</sub>
+<sub>[stdlib/Configuration/ConfigurationSection.sl:55](../../stdlib/Configuration/ConfigurationSection.sl#L55)</sub>
 
 #### GetValue *method*
 
@@ -295,7 +295,7 @@ String? GetValue(String key)
 
 *No documentation.*
 
-<sub>[stdlib/Configuration/Configuration.sl:202](../../stdlib/Configuration/Configuration.sl#L202)</sub>
+<sub>[stdlib/Configuration/ConfigurationSection.sl:57](../../stdlib/Configuration/ConfigurationSection.sl#L57)</sub>
 
 #### GetSection *method*
 
@@ -305,7 +305,7 @@ ConfigurationSection GetSection(String key)
 
 *No documentation.*
 
-<sub>[stdlib/Configuration/Configuration.sl:204](../../stdlib/Configuration/Configuration.sl#L204)</sub>
+<sub>[stdlib/Configuration/ConfigurationSection.sl:59](../../stdlib/Configuration/ConfigurationSection.sl#L59)</sub>
 
 #### GetChildren *method*
 
@@ -315,7 +315,7 @@ List<ConfigurationSection> GetChildren()
 
 *No documentation.*
 
-<sub>[stdlib/Configuration/Configuration.sl:206](../../stdlib/Configuration/Configuration.sl#L206)</sub>
+<sub>[stdlib/Configuration/ConfigurationSection.sl:61](../../stdlib/Configuration/ConfigurationSection.sl#L61)</sub>
 
 ### IConfiguration *interface*
 
@@ -326,7 +326,7 @@ interface IConfiguration
 What both a whole configuration and a section of it answer.
 .NET's `IConfiguration`.
 
-<sub>[stdlib/Configuration/Configuration.sl:102](../../stdlib/Configuration/Configuration.sl#L102)</sub>
+<sub>[stdlib/Configuration/IConfiguration.sl:28](../../stdlib/Configuration/IConfiguration.sl#L28)</sub>
 
 #### GetValue *method*
 
@@ -340,7 +340,7 @@ The value at `key`, below this one, or null.
 
 - `key` -- a path, its parts joined with `:`
 
-<sub>[stdlib/Configuration/Configuration.sl:107](../../stdlib/Configuration/Configuration.sl#L107)</sub>
+<sub>[stdlib/Configuration/IConfiguration.sl:33](../../stdlib/Configuration/IConfiguration.sl#L33)</sub>
 
 #### GetSection *method*
 
@@ -355,7 +355,7 @@ all the same, and answers null for every value.
 
 - `key` -- a path, its parts joined with `:`
 
-<sub>[stdlib/Configuration/Configuration.sl:113](../../stdlib/Configuration/Configuration.sl#L113)</sub>
+<sub>[stdlib/Configuration/IConfiguration.sl:39](../../stdlib/Configuration/IConfiguration.sl#L39)</sub>
 
 #### GetChildren *method*
 
@@ -365,5 +365,5 @@ List<ConfigurationSection> GetChildren()
 
 The sections directly below this one, in the order first written.
 
-<sub>[stdlib/Configuration/Configuration.sl:116](../../stdlib/Configuration/Configuration.sl#L116)</sub>
+<sub>[stdlib/Configuration/IConfiguration.sl:42](../../stdlib/Configuration/IConfiguration.sl#L42)</sub>
 

@@ -218,23 +218,3 @@ public sealed class ServiceCollection
         return this;
     }
 }
-
-/// Something a library keeps in `ServiceCollection.State`.
-public interface IServiceCollectionState
-{
-}
-
-/// What `BuildServiceProvider` found wrong, every problem at once.
-public sealed class ServiceProviderError
-{
-    /// One sentence per problem.
-    public List<String> Problems;
-
-    internal ServiceProviderError(List<String> problems)
-    {
-        Problems = problems;
-    }
-
-    /// Every problem, one per line.
-    public String Message => "\n".Join(Problems.ToArray());
-}

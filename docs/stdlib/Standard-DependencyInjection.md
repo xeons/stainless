@@ -146,7 +146,7 @@ It is how one declaration serves every instantiation, which .NET does by
 registering an open generic -- impossible here, where an instantiation is
 made by the compiler.
 
-<sub>[stdlib/DependencyInjection/DependencyInjection.sl:80](../../stdlib/DependencyInjection/DependencyInjection.sl#L80)</sub>
+<sub>[stdlib/DependencyInjection/DefaultImplementation.sl:32](../../stdlib/DependencyInjection/DefaultImplementation.sl#L32)</sub>
 
 ### IServiceCollectionState *interface*
 
@@ -156,7 +156,7 @@ interface IServiceCollectionState
 
 Something a library keeps in `ServiceCollection.State`.
 
-<sub>[stdlib/DependencyInjection/ServiceCollection.sl:223](../../stdlib/DependencyInjection/ServiceCollection.sl#L223)</sub>
+<sub>[stdlib/DependencyInjection/IServiceCollectionState.sl:25](../../stdlib/DependencyInjection/IServiceCollectionState.sl#L25)</sub>
 
 ### IServiceDescriptor *interface*
 
@@ -166,7 +166,7 @@ interface IServiceDescriptor
 
 What a `ServiceCollection` holds for each registration, whatever its type.
 
-<sub>[stdlib/DependencyInjection/ServiceDescriptor.sl:46](../../stdlib/DependencyInjection/ServiceDescriptor.sl#L46)</sub>
+<sub>[stdlib/DependencyInjection/IServiceDescriptor.sl:27](../../stdlib/DependencyInjection/IServiceDescriptor.sl#L27)</sub>
 
 #### Key *property*
 
@@ -176,7 +176,7 @@ int Key { get; }
 
 The registered service type's `ServiceKey<T>.Id`.
 
-<sub>[stdlib/DependencyInjection/ServiceDescriptor.sl:49](../../stdlib/DependencyInjection/ServiceDescriptor.sl#L49)</sub>
+<sub>[stdlib/DependencyInjection/IServiceDescriptor.sl:30](../../stdlib/DependencyInjection/IServiceDescriptor.sl#L30)</sub>
 
 #### ServiceName *property*
 
@@ -186,7 +186,7 @@ String ServiceName { get; }
 
 The registered service type's name.
 
-<sub>[stdlib/DependencyInjection/ServiceDescriptor.sl:52](../../stdlib/DependencyInjection/ServiceDescriptor.sl#L52)</sub>
+<sub>[stdlib/DependencyInjection/IServiceDescriptor.sl:33](../../stdlib/DependencyInjection/IServiceDescriptor.sl#L33)</sub>
 
 #### ImplementationName *property*
 
@@ -197,7 +197,7 @@ String ImplementationName { get; }
 What is made, for messages: the implementation type, or the service
 type itself for a factory or an instance.
 
-<sub>[stdlib/DependencyInjection/ServiceDescriptor.sl:56](../../stdlib/DependencyInjection/ServiceDescriptor.sl#L56)</sub>
+<sub>[stdlib/DependencyInjection/IServiceDescriptor.sl:37](../../stdlib/DependencyInjection/IServiceDescriptor.sl#L37)</sub>
 
 #### Lifetime *property*
 
@@ -207,7 +207,7 @@ ServiceLifetime Lifetime { get; }
 
 *No documentation.*
 
-<sub>[stdlib/DependencyInjection/ServiceDescriptor.sl:58](../../stdlib/DependencyInjection/ServiceDescriptor.sl#L58)</sub>
+<sub>[stdlib/DependencyInjection/IServiceDescriptor.sl:39](../../stdlib/DependencyInjection/IServiceDescriptor.sl#L39)</sub>
 
 #### Dependencies *property*
 
@@ -218,7 +218,7 @@ List<ServiceDependency> Dependencies { get; }
 What the implementation's constructor asks for. Empty for a factory,
 whose needs are not known until it runs.
 
-<sub>[stdlib/DependencyInjection/ServiceDescriptor.sl:62](../../stdlib/DependencyInjection/ServiceDescriptor.sl#L62)</sub>
+<sub>[stdlib/DependencyInjection/IServiceDescriptor.sl:43](../../stdlib/DependencyInjection/IServiceDescriptor.sl#L43)</sub>
 
 ### ServiceCollection *class*
 
@@ -472,7 +472,7 @@ struct ServiceDependency
 One constructor parameter of a registered implementation: the service it
 asks for, and whether the provider must have one.
 
-<sub>[stdlib/DependencyInjection/ServiceDescriptor.sl:28](../../stdlib/DependencyInjection/ServiceDescriptor.sl#L28)</sub>
+<sub>[stdlib/DependencyInjection/ServiceDependency.sl:26](../../stdlib/DependencyInjection/ServiceDependency.sl#L26)</sub>
 
 #### Key *field*
 
@@ -482,7 +482,7 @@ int Key
 
 The service's `ServiceKey<T>.Id`.
 
-<sub>[stdlib/DependencyInjection/ServiceDescriptor.sl:31](../../stdlib/DependencyInjection/ServiceDescriptor.sl#L31)</sub>
+<sub>[stdlib/DependencyInjection/ServiceDependency.sl:29](../../stdlib/DependencyInjection/ServiceDependency.sl#L29)</sub>
 
 #### Name *field*
 
@@ -492,7 +492,7 @@ String Name
 
 The service type's name, for messages.
 
-<sub>[stdlib/DependencyInjection/ServiceDescriptor.sl:34](../../stdlib/DependencyInjection/ServiceDescriptor.sl#L34)</sub>
+<sub>[stdlib/DependencyInjection/ServiceDependency.sl:32](../../stdlib/DependencyInjection/ServiceDependency.sl#L32)</sub>
 
 #### IsRequired *field*
 
@@ -503,7 +503,7 @@ bool IsRequired
 True for a `T` parameter, false for a `T?` or a `T[]`, which can be
 answered with null or nothing.
 
-<sub>[stdlib/DependencyInjection/ServiceDescriptor.sl:38](../../stdlib/DependencyInjection/ServiceDescriptor.sl#L38)</sub>
+<sub>[stdlib/DependencyInjection/ServiceDependency.sl:36](../../stdlib/DependencyInjection/ServiceDependency.sl#L36)</sub>
 
 #### HasDefault *field*
 
@@ -514,7 +514,7 @@ bool HasDefault
 Whether `GetService` makes one even unregistered, as it does for an
 interface marked `[DefaultImplementation]`.
 
-<sub>[stdlib/DependencyInjection/ServiceDescriptor.sl:42](../../stdlib/DependencyInjection/ServiceDescriptor.sl#L42)</sub>
+<sub>[stdlib/DependencyInjection/ServiceDependency.sl:40](../../stdlib/DependencyInjection/ServiceDependency.sl#L40)</sub>
 
 ### ServiceDependencyVisitor *class*
 
@@ -524,7 +524,7 @@ sealed class ServiceDependencyVisitor
 
 Collects what a constructor asks for, through `ActivatorUtilities.VisitDependencies`.
 
-<sub>[stdlib/DependencyInjection/ServiceDescriptor.sl:118](../../stdlib/DependencyInjection/ServiceDescriptor.sl#L118)</sub>
+<sub>[stdlib/DependencyInjection/ServiceDependencyVisitor.sl:27](../../stdlib/DependencyInjection/ServiceDependencyVisitor.sl#L27)</sub>
 
 #### Found *field*
 
@@ -534,7 +534,7 @@ List<ServiceDependency> Found
 
 What has been visited, in parameter order.
 
-<sub>[stdlib/DependencyInjection/ServiceDescriptor.sl:121](../../stdlib/DependencyInjection/ServiceDescriptor.sl#L121)</sub>
+<sub>[stdlib/DependencyInjection/ServiceDependencyVisitor.sl:30](../../stdlib/DependencyInjection/ServiceDependencyVisitor.sl#L30)</sub>
 
 #### Visit *method*
 
@@ -554,7 +554,7 @@ a `T[]`.
 
 - `T` -- the service the parameter asks for
 
-<sub>[stdlib/DependencyInjection/ServiceDescriptor.sl:128](../../stdlib/DependencyInjection/ServiceDescriptor.sl#L128)</sub>
+<sub>[stdlib/DependencyInjection/ServiceDependencyVisitor.sl:37](../../stdlib/DependencyInjection/ServiceDependencyVisitor.sl#L37)</sub>
 
 ### ServiceDescriptor&lt;T&gt; *class*
 
@@ -565,7 +565,7 @@ sealed class ServiceDescriptor<T> : IServiceDescriptor
 
 A registration of a `T`: made by a factory, or given as an instance.
 
-<sub>[stdlib/DependencyInjection/ServiceDescriptor.sl:66](../../stdlib/DependencyInjection/ServiceDescriptor.sl#L66)</sub>
+<sub>[stdlib/DependencyInjection/ServiceDescriptor.sl:27](../../stdlib/DependencyInjection/ServiceDescriptor.sl#L27)</sub>
 
 #### Key *property*
 
@@ -575,7 +575,7 @@ int Key { get; }
 
 *No documentation.*
 
-<sub>[stdlib/DependencyInjection/ServiceDescriptor.sl:90](../../stdlib/DependencyInjection/ServiceDescriptor.sl#L90)</sub>
+<sub>[stdlib/DependencyInjection/ServiceDescriptor.sl:51](../../stdlib/DependencyInjection/ServiceDescriptor.sl#L51)</sub>
 
 #### ServiceName *property*
 
@@ -585,7 +585,7 @@ String ServiceName { get; }
 
 *No documentation.*
 
-<sub>[stdlib/DependencyInjection/ServiceDescriptor.sl:92](../../stdlib/DependencyInjection/ServiceDescriptor.sl#L92)</sub>
+<sub>[stdlib/DependencyInjection/ServiceDescriptor.sl:53](../../stdlib/DependencyInjection/ServiceDescriptor.sl#L53)</sub>
 
 #### ImplementationName *property*
 
@@ -595,7 +595,7 @@ String ImplementationName { get; }
 
 *No documentation.*
 
-<sub>[stdlib/DependencyInjection/ServiceDescriptor.sl:94](../../stdlib/DependencyInjection/ServiceDescriptor.sl#L94)</sub>
+<sub>[stdlib/DependencyInjection/ServiceDescriptor.sl:55](../../stdlib/DependencyInjection/ServiceDescriptor.sl#L55)</sub>
 
 #### Lifetime *property*
 
@@ -605,7 +605,7 @@ ServiceLifetime Lifetime { get; }
 
 *No documentation.*
 
-<sub>[stdlib/DependencyInjection/ServiceDescriptor.sl:96](../../stdlib/DependencyInjection/ServiceDescriptor.sl#L96)</sub>
+<sub>[stdlib/DependencyInjection/ServiceDescriptor.sl:57](../../stdlib/DependencyInjection/ServiceDescriptor.sl#L57)</sub>
 
 #### Dependencies *property*
 
@@ -615,7 +615,7 @@ List<ServiceDependency> Dependencies { get; }
 
 *No documentation.*
 
-<sub>[stdlib/DependencyInjection/ServiceDescriptor.sl:98](../../stdlib/DependencyInjection/ServiceDescriptor.sl#L98)</sub>
+<sub>[stdlib/DependencyInjection/ServiceDescriptor.sl:59](../../stdlib/DependencyInjection/ServiceDescriptor.sl#L59)</sub>
 
 ### ServiceKey&lt;T&gt; *class*
 
@@ -626,7 +626,7 @@ sealed class ServiceKey<T>
 The number a service type is known by. Each instantiation has its own,
 handed out before `Main` runs, so a type is a key with no reflection.
 
-<sub>[stdlib/DependencyInjection/DependencyInjection.sl:64](../../stdlib/DependencyInjection/DependencyInjection.sl#L64)</sub>
+<sub>[stdlib/DependencyInjection/ServiceKey.sl:26](../../stdlib/DependencyInjection/ServiceKey.sl#L26)</sub>
 
 ### ServiceLifetime *enum*
 
@@ -763,7 +763,7 @@ sealed class ServiceProviderError
 
 What `BuildServiceProvider` found wrong, every problem at once.
 
-<sub>[stdlib/DependencyInjection/ServiceCollection.sl:228](../../stdlib/DependencyInjection/ServiceCollection.sl#L228)</sub>
+<sub>[stdlib/DependencyInjection/ServiceProviderError.sl:27](../../stdlib/DependencyInjection/ServiceProviderError.sl#L27)</sub>
 
 #### Problems *field*
 
@@ -773,7 +773,7 @@ List<String> Problems
 
 One sentence per problem.
 
-<sub>[stdlib/DependencyInjection/ServiceCollection.sl:231](../../stdlib/DependencyInjection/ServiceCollection.sl#L231)</sub>
+<sub>[stdlib/DependencyInjection/ServiceProviderError.sl:30](../../stdlib/DependencyInjection/ServiceProviderError.sl#L30)</sub>
 
 #### Message *property*
 
@@ -783,7 +783,7 @@ String Message { get; }
 
 Every problem, one per line.
 
-<sub>[stdlib/DependencyInjection/ServiceCollection.sl:239](../../stdlib/DependencyInjection/ServiceCollection.sl#L239)</sub>
+<sub>[stdlib/DependencyInjection/ServiceProviderError.sl:38](../../stdlib/DependencyInjection/ServiceProviderError.sl#L38)</sub>
 
 ### ServiceScope *class*
 
@@ -793,7 +793,7 @@ sealed class ServiceScope : IDisposable
 
 A scope's provider, and the end of it. .NET's `IServiceScope`.
 
-<sub>[stdlib/DependencyInjection/ServiceProvider.sl:204](../../stdlib/DependencyInjection/ServiceProvider.sl#L204)</sub>
+<sub>[stdlib/DependencyInjection/ServiceScope.sl:25](../../stdlib/DependencyInjection/ServiceScope.sl#L25)</sub>
 
 #### ServiceProvider *property*
 
@@ -803,7 +803,7 @@ ServiceProvider ServiceProvider { get; }
 
 What to ask for this scope's services.
 
-<sub>[stdlib/DependencyInjection/ServiceProvider.sl:214](../../stdlib/DependencyInjection/ServiceProvider.sl#L214)</sub>
+<sub>[stdlib/DependencyInjection/ServiceScope.sl:35](../../stdlib/DependencyInjection/ServiceScope.sl#L35)</sub>
 
 #### Dispose *method*
 
@@ -813,5 +813,5 @@ void Dispose()
 
 Ends the scope: what it made is disposed and let go.
 
-<sub>[stdlib/DependencyInjection/ServiceProvider.sl:217](../../stdlib/DependencyInjection/ServiceProvider.sl#L217)</sub>
+<sub>[stdlib/DependencyInjection/ServiceScope.sl:38](../../stdlib/DependencyInjection/ServiceScope.sl#L38)</sub>
 

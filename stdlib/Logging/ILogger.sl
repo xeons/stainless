@@ -21,39 +21,20 @@
 
 module Standard.Logging;
 
-import Standard.Console;
-
-internal sealed class ConsoleLogger : ILogger
+/// Writes messages for one category. .NET's `ILogger`, with its extension
+/// methods as default members.
+public interface ILogger
 {
-    String _category;
-    bool _colors;
+    /// Writes `message` if `level` is enabled.
+    void Log(LogLevel level, String message);
 
-    public ConsoleLogger(String category, bool colors)
-    {
-        _category = category;
-        _colors = colors;
-    }
+    /// Whether a message at `level` would be written.
+    bool IsEnabled(LogLevel level);
 
-    public bool IsEnabled(LogLevel level) => level != LogLevel.None;
-
-    public void Log(LogLevel level, String message)
-    {
-        String label = GetLogLevelLabel(level);
-        if (_colors)
-            label = GetConsoleLogColor(level) + label + "\u001b[0m";
-        Write(label + ": " + _category + "[0]\n      " + message.Replace("\n", "\n      ") + "\n");
-    }
-}
-
-/// The escape that colours a level as .NET's console logger does.
-String GetConsoleLogColor(LogLevel level)
-{
-    switch (level)
-    {
-        case LogLevel.Information: return "\u001b[32m";
-        case LogLevel.Warning: return "\u001b[33m";
-        case LogLevel.Error: return "\u001b[31m";
-        case LogLevel.Critical: return "\u001b[37;41m";
-        default: return "\u001b[90m";
-    }
+    void LogTrace(String message) => Log(LogLevel.Trace, message);
+    void LogDebug(String message) => Log(LogLevel.Debug, message);
+    void LogInformation(String message) => Log(LogLevel.Information, message);
+    void LogWarning(String message) => Log(LogLevel.Warning, message);
+    void LogError(String message) => Log(LogLevel.Error, message);
+    void LogCritical(String message) => Log(LogLevel.Critical, message);
 }

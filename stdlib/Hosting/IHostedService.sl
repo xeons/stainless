@@ -23,26 +23,14 @@ module Standard.Hosting;
 
 import Standard.Threading;
 
-/// The lifetime a host registers.
-public sealed threadsafe class HostApplicationLifetime : IHostApplicationLifetime
+/// Something the host starts and stops. .NET's `IHostedService`.
+public interface IHostedService
 {
-    CancellationTokenSource _started = new CancellationTokenSource();
-    CancellationTokenSource _stopping = new CancellationTokenSource();
-    CancellationTokenSource _stopped = new CancellationTokenSource();
-    AtomicInt _exitCode = new AtomicInt(0);
+    /// Starts the service, and returns once it has: the host starts the next
+    /// one when this returns. `token` is cancelled if starting is abandoned.
+    void Start(CancellationToken token);
 
-    public CancellationToken ApplicationStarted => _started.Token;
-    public CancellationToken ApplicationStopping => _stopping.Token;
-    public CancellationToken ApplicationStopped => _stopped.Token;
-
-    public void StopApplication() => _stopping.Cancel();
-
-    public int ExitCode
-    {
-        get => _exitCode.Read();
-        set => _exitCode.Write(value);
-    }
-
-    internal void NotifyStarted() => _started.Cancel();
-    internal void NotifyStopped() => _stopped.Cancel();
+    /// Stops the service, and returns once it has, or once `token` is
+    /// cancelled because the shutdown timeout ran out.
+    void Stop(CancellationToken token);
 }

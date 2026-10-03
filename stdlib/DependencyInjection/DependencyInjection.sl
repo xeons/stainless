@@ -58,26 +58,3 @@ extern "C" void sl_fail(byte* message);
 static AtomicInt s_lastServiceKey = new AtomicInt(0);
 
 int TakeServiceKey() => s_lastServiceKey.Increment();
-
-/// The number a service type is known by. Each instantiation has its own,
-/// handed out before `Main` runs, so a type is a key with no reflection.
-public sealed class ServiceKey<T>
-{
-    ServiceKey() { }
-
-    /// This type's number, the same for the life of the program.
-    public static readonly int Id = TakeServiceKey();
-}
-
-/// Says which class `GetService` makes for an instantiation of a generic
-/// interface that nothing registered: `[DefaultImplementation("App.Logger")]`
-/// on `ILogger<T>` makes `App.Logger<T>` for any `T`. The class MUST take the
-/// interface's type parameters in the same order.
-///
-/// It is how one declaration serves every instantiation, which .NET does by
-/// registering an open generic -- impossible here, where an instantiation is
-/// made by the compiler.
-public attribute DefaultImplementation
-{
-    String TypeName;
-}

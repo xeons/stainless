@@ -210,21 +210,3 @@ public threadsafe class CancellationTokenSource
         _links.Add(token.Register(() => follower.CancelFollowed()));
     }
 }
-
-/// The weak hold a linked source's callback has on it.
-sealed threadsafe class CancellationFollower
-{
-    weak CancellationTokenSource? _followed;
-
-    public CancellationFollower(CancellationTokenSource followed)
-    {
-        _followed = followed;
-    }
-
-    public void CancelFollowed()
-    {
-        CancellationTokenSource? followed = _followed;
-        if (followed != null)
-            followed.Cancel();
-    }
-}

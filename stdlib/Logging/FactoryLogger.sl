@@ -21,39 +21,27 @@
 
 module Standard.Logging;
 
-import Standard.Console;
+import Standard.Collections;
 
-internal sealed class ConsoleLogger : ILogger
+/// One category's logger: every provider's, below one minimum.
+internal sealed class FactoryLogger : ILogger
 {
-    String _category;
-    bool _colors;
+    List<ILogger> _loggers;
+    LogLevel _minimum;
 
-    public ConsoleLogger(String category, bool colors)
+    public FactoryLogger(List<ILogger> loggers, LogLevel minimum)
     {
-        _category = category;
-        _colors = colors;
+        _loggers = loggers;
+        _minimum = minimum;
     }
 
-    public bool IsEnabled(LogLevel level) => level != LogLevel.None;
+    public bool IsEnabled(LogLevel level) => level != LogLevel.None && level >= _minimum;
 
     public void Log(LogLevel level, String message)
     {
-        String label = GetLogLevelLabel(level);
-        if (_colors)
-            label = GetConsoleLogColor(level) + label + "\u001b[0m";
-        Write(label + ": " + _category + "[0]\n      " + message.Replace("\n", "\n      ") + "\n");
-    }
-}
-
-/// The escape that colours a level as .NET's console logger does.
-String GetConsoleLogColor(LogLevel level)
-{
-    switch (level)
-    {
-        case LogLevel.Information: return "\u001b[32m";
-        case LogLevel.Warning: return "\u001b[33m";
-        case LogLevel.Error: return "\u001b[31m";
-        case LogLevel.Critical: return "\u001b[37;41m";
-        default: return "\u001b[90m";
+        if (!IsEnabled(level))
+            return;
+        for (nuint i = 0u; i < _loggers.Count; i++)
+            _loggers[i].Log(level, message);
     }
 }

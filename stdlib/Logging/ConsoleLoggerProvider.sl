@@ -23,37 +23,21 @@ module Standard.Logging;
 
 import Standard.Console;
 
-internal sealed class ConsoleLogger : ILogger
+/// Writes to standard output in .NET's simple console format:
+///
+///     info: App.Worker[0]
+///           Started.
+///
+/// The level is coloured at a terminal and plain in a file or a pipe. Each
+/// message is one write, so two threads' messages never interleave.
+public sealed threadsafe class ConsoleLoggerProvider : ILoggerProvider
 {
-    String _category;
     bool _colors;
 
-    public ConsoleLogger(String category, bool colors)
+    public ConsoleLoggerProvider()
     {
-        _category = category;
-        _colors = colors;
+        _colors = EnableTerminalColors();
     }
 
-    public bool IsEnabled(LogLevel level) => level != LogLevel.None;
-
-    public void Log(LogLevel level, String message)
-    {
-        String label = GetLogLevelLabel(level);
-        if (_colors)
-            label = GetConsoleLogColor(level) + label + "\u001b[0m";
-        Write(label + ": " + _category + "[0]\n      " + message.Replace("\n", "\n      ") + "\n");
-    }
-}
-
-/// The escape that colours a level as .NET's console logger does.
-String GetConsoleLogColor(LogLevel level)
-{
-    switch (level)
-    {
-        case LogLevel.Information: return "\u001b[32m";
-        case LogLevel.Warning: return "\u001b[33m";
-        case LogLevel.Error: return "\u001b[31m";
-        case LogLevel.Critical: return "\u001b[37;41m";
-        default: return "\u001b[90m";
-    }
+    public ILogger CreateLogger(String category) => new ConsoleLogger(category, _colors);
 }

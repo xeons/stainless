@@ -21,28 +21,17 @@
 
 module Standard.Hosting;
 
-import Standard.Threading;
-
-/// The lifetime a host registers.
-public sealed threadsafe class HostApplicationLifetime : IHostApplicationLifetime
+/// Where the host runs. .NET's `IHostEnvironment`.
+public interface IHostEnvironment
 {
-    CancellationTokenSource _started = new CancellationTokenSource();
-    CancellationTokenSource _stopping = new CancellationTokenSource();
-    CancellationTokenSource _stopped = new CancellationTokenSource();
-    AtomicInt _exitCode = new AtomicInt(0);
+    /// `Production` unless `STAINLESS_ENVIRONMENT` says otherwise:
+    /// `Development` and `Staging` are the other names in use.
+    String EnvironmentName { get; }
 
-    public CancellationToken ApplicationStarted => _started.Token;
-    public CancellationToken ApplicationStopping => _stopping.Token;
-    public CancellationToken ApplicationStopped => _stopped.Token;
+    /// The directory configuration files are read from: the working
+    /// directory when the host was built.
+    String ContentRootPath { get; }
 
-    public void StopApplication() => _stopping.Cancel();
-
-    public int ExitCode
-    {
-        get => _exitCode.Read();
-        set => _exitCode.Write(value);
-    }
-
-    internal void NotifyStarted() => _started.Cancel();
-    internal void NotifyStopped() => _stopped.Cancel();
+    /// The program's name, from its path.
+    String ApplicationName { get; }
 }

@@ -19,41 +19,22 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-module Standard.Logging;
+module Standard.Threading;
 
-import Standard.Console;
-
-internal sealed class ConsoleLogger : ILogger
+/// The weak hold a linked source's callback has on it.
+sealed threadsafe class CancellationFollower
 {
-    String _category;
-    bool _colors;
+    weak CancellationTokenSource? _followed;
 
-    public ConsoleLogger(String category, bool colors)
+    public CancellationFollower(CancellationTokenSource followed)
     {
-        _category = category;
-        _colors = colors;
+        _followed = followed;
     }
 
-    public bool IsEnabled(LogLevel level) => level != LogLevel.None;
-
-    public void Log(LogLevel level, String message)
+    public void CancelFollowed()
     {
-        String label = GetLogLevelLabel(level);
-        if (_colors)
-            label = GetConsoleLogColor(level) + label + "\u001b[0m";
-        Write(label + ": " + _category + "[0]\n      " + message.Replace("\n", "\n      ") + "\n");
-    }
-}
-
-/// The escape that colours a level as .NET's console logger does.
-String GetConsoleLogColor(LogLevel level)
-{
-    switch (level)
-    {
-        case LogLevel.Information: return "\u001b[32m";
-        case LogLevel.Warning: return "\u001b[33m";
-        case LogLevel.Error: return "\u001b[31m";
-        case LogLevel.Critical: return "\u001b[37;41m";
-        default: return "\u001b[90m";
+        CancellationTokenSource? followed = _followed;
+        if (followed != null)
+            followed.Cancel();
     }
 }
