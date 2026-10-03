@@ -1,0 +1,7 @@
+Names.IGreeter
+Names.Point
+int
+Standard.Text.String
+Standard.Collections.List<Names.Point>
+Names.IGreeter
+Box of Names.Point

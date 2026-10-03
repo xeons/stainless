@@ -210,6 +210,13 @@ else
 }
 ```
 
+`RuntimeHelpers.GetTypeName<T>()` is answered the same way, with `T`'s name
+qualified by its module as a string constant -- `App.Worker`, or
+`Standard.Collections.List<App.Point>` for an instantiation. It needs no
+`[Reflect]`, so it names an interface, a struct or a primitive as readily as a
+class; `typeof(T).Name` reads the same name at run time from the metadata
+only a `[Reflect]` type has.
+
 Both arms are still bound for every `T`, so each MUST be valid for any type.
 A function that holds a label keeps both arms, since the one not taken could
 still be jumped into.

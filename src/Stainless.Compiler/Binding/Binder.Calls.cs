@@ -1381,6 +1381,10 @@ public sealed partial class Binder
             return new BoundLiteral(syntax.Span, PrimitiveTypeSymbol.Bool,
                 function.TypeArguments[0].IsReferenceOrContainsReferences());
 
+        if (_builtins.IsTypeNameQuery(function))
+            return new BoundStringLiteral(syntax.Span, _builtins.String,
+                FullTypeName(function.TypeArguments[0]));
+
         var converted = ConvertArguments(function, ordered, spans);
         var order = WrittenOrder(map, converted.Count);
 
@@ -1394,6 +1398,22 @@ public sealed partial class Binder
         return new BoundCall(syntax.Span, function, receiver, converted)
             { IsNonVirtual = nonVirtual, EvaluationOrder = order };
     }
+
+    /// <summary>
+    /// A type's name with every named type in it qualified, its type arguments
+    /// included: <c>Standard.Collections.List&lt;App.Point&gt;</c>.
+    /// </summary>
+    private static string FullTypeName(TypeSymbol type) => type switch
+    {
+        NamedTypeSymbol { Template: { } template, TypeArguments.Count: > 0 } named =>
+            (string.IsNullOrEmpty(named.ModuleName) ? "" : named.ModuleName + ".") + template.Name +
+            "<" + string.Join(", ", named.TypeArguments.Select(FullTypeName)) + ">",
+        NamedTypeSymbol named => named.QualifiedName,
+        ArrayTypeSymbol array => FullTypeName(array.Element) + "[]",
+        OptionalTypeSymbol optional => FullTypeName(optional.Element) + "?",
+        PointerTypeSymbol pointer => FullTypeName(pointer.Element) + "*",
+        _ => type.Name,
+    };
 
     /// <summary><c>base.M()</c> where the base only declares <c>M</c>: there is no body to call.</summary>
     private BoundErrorExpression RefuseAbstractBase(string name, SourceSpan span)

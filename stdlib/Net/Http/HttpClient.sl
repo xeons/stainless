@@ -37,7 +37,7 @@ import Standard.Time;
 /// its handler's connections are reused. `Timeout` covers each request
 /// whole: connecting, TLS, sending, redirects, and reading the body unless
 /// the body is streamed, each read of the socket given what is left of it.
-public class HttpClient
+public class HttpClient : IDisposable
 {
     // Mutable rather than readonly, so that what it holds is released at exit.
     private static Mutex<HttpDefaultProxySlot> s_defaultProxy =

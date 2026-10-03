@@ -47,4 +47,23 @@ public static class Signals
 
     /// Forgets the one that arrived, for a program that means to carry on.
     public static void ClearInterrupt() => sl_signals_clear();
+
+    /// Blocks until an interrupt arrives, and returns at once if one already
+    /// has. What a program that only waits to be told to stop calls, rather
+    /// than asking `Interrupted` in a loop. Before `StartWatching` it returns
+    /// at once.
+    ///
+    /// Closing the console window on Windows counts, and the program then has
+    /// about four seconds to finish before Windows ends it.
+    public static void WaitForInterrupt()
+    {
+        sl_signals_wait(18446744073709551615u);
+    }
+
+    /// The same with a limit. Answers whether an interrupt arrived, so a false
+    /// means the time ran out. Before `StartWatching` nothing can arrive, so
+    /// this answers false at once rather than block.
+    ///
+    /// @param milliseconds  how long to wait at most
+    public static bool WaitForInterrupt(ulong milliseconds) => sl_signals_wait(milliseconds);
 }

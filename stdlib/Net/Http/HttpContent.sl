@@ -39,7 +39,7 @@ import Standard.Text;
 /// unless the request asked for `ResponseHeadersRead`. `LoadIntoBuffer` reads
 /// the rest of it into memory, after which every read starts again from the
 /// beginning.
-public abstract class HttpContent
+public abstract class HttpContent : IDisposable
 {
     private HttpContentHeaders _headers;
     private byte[] _buffer = new byte[0u];

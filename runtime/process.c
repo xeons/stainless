@@ -1381,18 +1381,65 @@ void sl_process_release(void *handle)
 #ifndef _WIN32
 static volatile sig_atomic_t interrupted;
 
+/* A byte written here wakes sl_signals_wait. write() is one of the few calls a
+ * handler may make, which a condition variable's signal is not.
+ */
+static int wakeup[2] = { -1, -1 };
+
 static void note(int number)
 {
+    int saved = errno;
     (void)number;
     interrupted = 1;
+    if (wakeup[1] >= 0) {
+        ssize_t ignored = write(wakeup[1], "x", 1);
+        (void)ignored;
+    }
+    errno = saved;
+}
+
+/* Both ends non-blocking: the handler MUST NOT block on a full pipe, and
+ * draining reads until there is nothing left.
+ */
+static _Bool open_wakeup(void)
+{
+    int i;
+    if (wakeup[0] >= 0) return 1;
+    if (pipe(wakeup) != 0) return 0;
+    for (i = 0; i < 2; i++) {
+        fcntl(wakeup[i], F_SETFL, fcntl(wakeup[i], F_GETFL) | O_NONBLOCK);
+        fcntl(wakeup[i], F_SETFD, FD_CLOEXEC);
+    }
+    return 1;
 }
 #else
 static volatile long interrupted;
+
+/* Set by the handler, which Windows runs on a thread of its own, so an event
+ * is legal where a POSIX handler could only write to a pipe.
+ */
+static HANDLE arrived;
+
+/* Set as the program ends. Closing the console window ends the process once
+ * the handler returns, so the handler waits for this, briefly, to give the
+ * program the shutdown Ctrl-C would have.
+ */
+static HANDLE finished;
+
+static void note_finished(void)
+{
+    if (finished != NULL) SetEvent(finished);
+}
 
 static BOOL WINAPI note(DWORD kind)
 {
     if (kind == CTRL_C_EVENT || kind == CTRL_BREAK_EVENT || kind == CTRL_CLOSE_EVENT) {
         interrupted = 1;
+        if (arrived != NULL) SetEvent(arrived);
+
+        /* Windows allows about five seconds before it ends the process anyway. */
+        if (kind == CTRL_CLOSE_EVENT && finished != NULL)
+            WaitForSingleObject(finished, 4500);
         return TRUE;
     }
     return FALSE;
@@ -1402,9 +1449,16 @@ static BOOL WINAPI note(DWORD kind)
 _Bool sl_signals_watch(void)
 {
 #ifdef _WIN32
+    if (arrived == NULL) {
+        arrived = CreateEventW(NULL, TRUE, FALSE, NULL);
+        finished = CreateEventW(NULL, TRUE, FALSE, NULL);
+        if (arrived == NULL || finished == NULL) return 0;
+        atexit(note_finished);
+    }
     return SetConsoleCtrlHandler(note, TRUE) != 0;
 #else
     struct sigaction action;
+    if (!open_wakeup()) return 0;
     memset(&action, 0, sizeof action);
     action.sa_handler = note;
 
@@ -1425,4 +1479,57 @@ _Bool sl_signals_interrupted(void)
 void sl_signals_clear(void)
 {
     interrupted = 0;
+#ifdef _WIN32
+    if (arrived != NULL) ResetEvent(arrived);
+#else
+    if (wakeup[0] >= 0) {
+        char drained[64];
+        while (read(wakeup[0], drained, sizeof drained) > 0) {}
+    }
+#endif
+}
+
+_Bool sl_signals_wait(unsigned long long milliseconds)
+{
+    long long deadline = 0;
+    _Bool forever = milliseconds == ~0ULL;
+
+    if (interrupted) return 1;
+    if (!forever) {
+        long long limit = (0x7fffffffffffffffLL - sl_time_monotonic()) / 1000000LL;
+        if (milliseconds >= (unsigned long long)limit) forever = 1;
+        else deadline = sl_time_monotonic() + (long long)milliseconds * 1000000LL;
+    }
+
+#ifdef _WIN32
+    if (arrived == NULL) return 0;
+    for (;;) {
+        DWORD wait = INFINITE;
+        if (!forever) {
+            long long left = (deadline - sl_time_monotonic() + 999999LL) / 1000000LL;
+            if (left <= 0) return interrupted != 0;
+            wait = left >= (long long)INFINITE ? INFINITE - 1 : (DWORD)left;
+        }
+        if (WaitForSingleObject(arrived, wait) == WAIT_OBJECT_0) return interrupted != 0;
+        if (!forever && sl_time_monotonic() >= deadline) return interrupted != 0;
+    }
+#else
+    if (wakeup[0] < 0) return 0;
+    for (;;) {
+        struct pollfd watched;
+        int wait = -1;
+        if (interrupted) return 1;
+        if (!forever) {
+            long long left = (deadline - sl_time_monotonic() + 999999LL) / 1000000LL;
+            if (left <= 0) return 0;
+            wait = left > 0x7fffffffLL ? 0x7fffffff : (int)left;
+        }
+        watched.fd = wakeup[0];
+        watched.events = POLLIN;
+        watched.revents = 0;
+
+        /* EINTR is the handler having run, and the flag says so on the next pass. */
+        if (poll(&watched, 1, wait) > 0) return interrupted != 0;
+    }
+#endif
 }

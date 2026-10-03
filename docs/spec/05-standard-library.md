@@ -19,12 +19,14 @@ or from a module that was itself reached. `Standard`, `Standard.Text`,
 compiler relies on them without an import. Every file of the library is lexed, which is what finding
 the qualified names costs; nothing else of an unreached module is paid for.
 
-**Within a reached module, a non-generic function or class is emitted whether or
-not it is used.** Nothing prunes below the module: there is no reachability pass
-from `Main`. What saves the binary is LLVM and the linker. Everything not
-exported has internal linkage, so an optimised build deletes what nothing
-references before optimising it, and every function goes in a section of its
-own for the linker to drop.
+**Within a reached module, a function is emitted only when something emitted
+names it** -- a call, a dispatch table, a static initializer -- so a module
+used for one function costs that function and what it calls. A class is still
+laid out and its dispatch tables written, which is what names its virtual
+methods. The program's own functions are emitted whether or not anything calls
+them, so a mistake in one is reported when it is written. Everything not
+exported has internal linkage, and every function goes in a section of its own,
+so LLVM and the linker drop what the program's own code leaves unused.
 
 | Module | Contents | Imported |
 |---|---|---|
@@ -80,7 +82,8 @@ everyday values:
 | `Lazy<T>` | made on first ask, once, with C#'s three `LazyThreadSafetyMode`s |
 | `Array` | .NET's `System.Array`: `Create(count, (i) => ...)` and `Repeat(value, count)`, which make an array whole ([section 2.16.3](02-types.md#2163-arrays)); `Empty`, `Copy`, `Fill`, `Reverse`, `Resize`, `ConvertAll`, `AsReadOnly` as a `ReadOnlySpan`; `IndexOf`, `LastIndexOf`, `BinarySearch`, `Exists`, `Find`, `FindIndex`, `FindLast`, `FindLastIndex`, `FindAll`, `TrueForAll`, `ForEach` and a stable `Sort`, the searches and sorts with .NET's index-and-count ranges. A search answers with an `Optional`, and `Clear` and `Resize` without a fill need `where T : zeroable` |
 | `Buffer` | .NET's `System.Buffer`: `BlockCopy`, `ByteLength`, `GetByte`, `SetByte` over arrays of an `unmanaged` type ([section 4.3](04-generics.md#43-what-a-constraint-does-and-does-not-do)), in bytes and bounds-checked, and `MemoryCopy` between pointers |
-| `RuntimeHelpers` | `IsReferenceOrContainsReferences<T>()`, a constant per instantiation ([§4.3](04-generics.md#43-what-a-constraint-does-and-does-not-do)) |
+| `RuntimeHelpers` | `IsReferenceOrContainsReferences<T>()` and `GetTypeName<T>()`, constants per instantiation ([§4.3](04-generics.md#43-what-a-constraint-does-and-does-not-do)); the second names any `T`, `[Reflect]` or not |
+| `IDisposable` | `Dispose()`, for releasing before the last reference goes: a destructor already frees what an object holds, so this is for the earlier moment -- a pooled connection returned while its response is still held. The `Net.Http` types implement it |
 | `Slot<T>` | storage for a `T` that may not be there yet, empty at zero, so `new Slot<T>[n]` is legal for every `T`: written by assigning a `T`, read through `Value`, emptied by `Clear`; `ToArray` and `Copy` move values in and out. The size of `T`, and a read of an empty one aborts when `T` has no zero value ([section 2.16.3](02-types.md#2163-arrays)) |
 
 Each parses into a `Result` with a `ParseError` rather than throwing, and a
@@ -161,10 +164,29 @@ so nothing checks what crosses that particular boundary — unlike `spawn`, wher
 [§9.5](09-statements-expressions.md#95-what-may-cross-a-thread-boundary) applies; and keeping a `Guard` alive is a discipline, not a guarantee. See [concurrency.md](../concurrency.md) for the model these are aiming
 at and which parts of it the compiler does not yet enforce.
 
-This module is not free when unused: `AtomicLong`, `AtomicBool`, `TaskScope` and the rest
-are ordinary classes rather than templates, so their code is emitted whether or
-not a program mentions them. That is true of every non-generic declaration in
-the standard library, and [§5.1](#51-what-ships-and-how) says what it costs and why nothing prunes it.
+**Cancellation is a token.** `CancellationTokenSource` says when work should
+stop and `CancellationToken` is the half the work holds, as in .NET. A request
+is not an interruption -- nothing stops a thread, because nothing could unwind
+one -- so the work asks between pieces, or sleeps in `WaitFor`, which wakes the
+moment the request arrives:
+
+```csharp
+var stopping = new CancellationTokenSource();
+var token = stopping.Token;
+var worker = new Thread(() =>
+{
+    while (!token.WaitFor(1000u))       // true once cancelled
+        PollForWork();
+});
+stopping.Cancel();                      // wakes the wait, runs Register'd callbacks
+worker.Join();
+```
+
+`CancelAfter` cancels from a timer thread, and `CreateLinkedTokenSource`
+follows two tokens at once. A callback given to `Register` runs on the thread
+that cancels, the latest first, and stays until then unless its registration's
+`Dispose` withdraws it -- letting the registration go does not, because
+`token.Register(callback);` is how a callback is usually registered.
 
 ## 5.3 Interfaces are named with a leading I
 
@@ -770,6 +792,14 @@ Signals.StartWatching();
 while (!Signals.Interrupted)
     DoAPieceOfWork();
 ```
+
+A program with nothing to do until it is told to stop waits instead:
+`Signals.WaitForInterrupt()` blocks until one arrives, and
+`WaitForInterrupt(milliseconds)` says whether one did. The handler wakes it
+through a pipe on Linux and macOS, since a write is legal in a handler and a
+lock is not, and through an event on Windows, whose handler runs on a thread
+of its own. Closing the console window counts as an interrupt there, and the
+program then has about four seconds to finish before Windows ends it.
 
 ### 5.9.2 `Standard.IO.Compression`
 

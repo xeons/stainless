@@ -258,6 +258,18 @@ public sealed class Builtins
         function.TypeArguments.Count == 1;
 
     /// <summary>
+    /// True for an instantiation of <c>Standard.RuntimeHelpers.GetTypeName&lt;T&gt;</c>,
+    /// which the binder answers with the type argument's name.
+    /// </summary>
+    public bool IsTypeNameQuery(FunctionSymbol function) =>
+        function.Template is
+        {
+            Name: "GetTypeName",
+            ContainingType: { SimpleName: "RuntimeHelpers", ModuleName: StandardModuleName },
+        } &&
+        function.TypeArguments.Count == 1;
+
+    /// <summary>
     /// True for an instantiation of <c>Standard.Array.Create&lt;T&gt;</c>, which
     /// the binder makes into an array filled in place.
     /// </summary>

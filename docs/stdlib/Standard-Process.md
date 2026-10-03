@@ -37,7 +37,7 @@ A program that was started and has not been waited for.
 Its streams are this process's own, so what it prints goes where this
 program's output goes. `RunProcess` is the one that captures.
 
-<sub>[stdlib/Process/Process.sl:172](../../stdlib/Process/Process.sl#L172)</sub>
+<sub>[stdlib/Process/Process.sl:173](../../stdlib/Process/Process.sl#L173)</sub>
 
 #### Id *property*
 
@@ -47,7 +47,7 @@ long Id { get; }
 
 What the operating system calls it.
 
-<sub>[stdlib/Process/Process.sl:186](../../stdlib/Process/Process.sl#L186)</sub>
+<sub>[stdlib/Process/Process.sl:187](../../stdlib/Process/Process.sl#L187)</sub>
 
 #### WaitForExit *method*
 
@@ -63,7 +63,7 @@ Asking twice is harmless and answers the same both times.
 
 - [ProcessError.Failed](#failed-case) -- the wait itself failed, so there is no code to report
 
-<sub>[stdlib/Process/Process.sl:194](../../stdlib/Process/Process.sl#L194)</sub>
+<sub>[stdlib/Process/Process.sl:195](../../stdlib/Process/Process.sl#L195)</sub>
 
 #### TryGetExitCode *method*
 
@@ -78,7 +78,7 @@ exited, which is not what a property may do.
 
     while (child.TryGetExitCode().IsEmpty) { DoSomethingElse(); }
 
-<sub>[stdlib/Process/Process.sl:208](../../stdlib/Process/Process.sl#L208)</sub>
+<sub>[stdlib/Process/Process.sl:209](../../stdlib/Process/Process.sl#L209)</sub>
 
 #### Stop *method*
 
@@ -88,7 +88,7 @@ bool Stop()
 
 Asks it to stop, the way Ctrl-C would. It may decline.
 
-<sub>[stdlib/Process/Process.sl:217](../../stdlib/Process/Process.sl#L217)</sub>
+<sub>[stdlib/Process/Process.sl:218](../../stdlib/Process/Process.sl#L218)</sub>
 
 #### Kill *method*
 
@@ -98,7 +98,7 @@ bool Kill()
 
 Makes it stop. It cannot decline, and gets no chance to tidy up.
 
-<sub>[stdlib/Process/Process.sl:220](../../stdlib/Process/Process.sl#L220)</sub>
+<sub>[stdlib/Process/Process.sl:221](../../stdlib/Process/Process.sl#L221)</sub>
 
 #### Start *method*
 
@@ -122,7 +122,7 @@ Starts a program without waiting for it.
 
 **See also** &nbsp; [RunProcess](#runprocess-function)
 
-<sub>[stdlib/Process/Process.sl:236](../../stdlib/Process/Process.sl#L236)</sub>
+<sub>[stdlib/Process/Process.sl:237](../../stdlib/Process/Process.sl#L237)</sub>
 
 ### ProcessError *enum*
 
@@ -422,6 +422,38 @@ Forgets the one that arrived, for a program that means to carry on.
 
 <sub>[stdlib/Process/Signals.sl:49](../../stdlib/Process/Signals.sl#L49)</sub>
 
+#### WaitForInterrupt *method*
+
+```
+static void WaitForInterrupt()
+```
+
+Blocks until an interrupt arrives, and returns at once if one already
+has. What a program that only waits to be told to stop calls, rather
+than asking `Interrupted` in a loop. Before `StartWatching` it returns
+at once.
+
+Closing the console window on Windows counts, and the program then has
+about four seconds to finish before Windows ends it.
+
+<sub>[stdlib/Process/Signals.sl:58](../../stdlib/Process/Signals.sl#L58)</sub>
+
+#### WaitForInterrupt *method*
+
+```
+static bool WaitForInterrupt(ulong milliseconds)
+```
+
+The same with a limit. Answers whether an interrupt arrived, so a false
+means the time ran out. Before `StartWatching` nothing can arrive, so
+this answers false at once rather than block.
+
+**Parameters**
+
+- `milliseconds` -- how long to wait at most
+
+<sub>[stdlib/Process/Signals.sl:68](../../stdlib/Process/Signals.sl#L68)</sub>
+
 ## Functions
 
 ### OpenProcess *function*
@@ -445,7 +477,7 @@ the same bargain `RunProcess` makes.
 
 **See also** &nbsp; [RunProcess](#runprocess-function)
 
-<sub>[stdlib/Process/Process.sl:265](../../stdlib/Process/Process.sl#L265)</sub>
+<sub>[stdlib/Process/Process.sl:266](../../stdlib/Process/Process.sl#L266)</sub>
 
 ### OpenProcess *function*
 
@@ -470,7 +502,7 @@ program's own.
 - [ProcessError.NoResource](#noresource-case) -- out of processes, descriptors, pipes or memory
 - [ProcessError.Failed](#failed-case) -- it did not start, for a reason none of the others names
 
-<sub>[stdlib/Process/Process.sl:287](../../stdlib/Process/Process.sl#L287)</sub>
+<sub>[stdlib/Process/Process.sl:288](../../stdlib/Process/Process.sl#L288)</sub>
 
 ### RunProcess *function*
 
@@ -495,7 +527,7 @@ and it is what a PATH lookup is done on when it has no separator in it.
 
 **See also** &nbsp; [OpenProcess](#openprocess-function) &middot; [Process.Start](#start-method)
 
-<sub>[stdlib/Process/Process.sl:122](../../stdlib/Process/Process.sl#L122)</sub>
+<sub>[stdlib/Process/Process.sl:123](../../stdlib/Process/Process.sl#L123)</sub>
 
 ### RunProcess *function*
 
@@ -521,5 +553,5 @@ program's own.
 - [ProcessError.NoResource](#noresource-case) -- out of processes, descriptors or memory
 - [ProcessError.Failed](#failed-case) -- it did not start, for a reason none of the others names
 
-<sub>[stdlib/Process/Process.sl:144](../../stdlib/Process/Process.sl#L144)</sub>
+<sub>[stdlib/Process/Process.sl:145](../../stdlib/Process/Process.sl#L145)</sub>
 

@@ -674,7 +674,8 @@ last person to edit it -- the suite is the authority.
   program that ran and returned 1 is a `ProcessResult`, which is an outcome.
   Both streams are drained while it runs, because a pipe holds about 64KB and
   a parent that waits first would wait forever. `Signals.StartWatching()` notices Ctrl-C
-  as a flag to read rather than a handler to run in
+  as a flag to read, or to wait on with `WaitForInterrupt`, rather than a
+  handler to run in
 - `Standard.Env`: the command line, environment variables and the working
   directory. `Main(String[] args)` is the better way to read the arguments --
   a function that takes what it needs beats one that goes looking -- and
@@ -1132,9 +1133,10 @@ Being straight about the edges, roughly in the order they are worth adding:
   borrowed thing lives: a `Guard` can outlive the lock it proves, and a job
   could store an array it was only lent. See
   [docs/concurrency.md](concurrency.md).
-- **No cancellation beyond a shared flag.** An `AtomicBool` a job polls is the
-  whole story; a `parallel` block always joins, and always will. See §9 of the
-  concurrency notes for what is worth adding and what never will be.
+- **Cancellation is cooperative.** `CancellationToken` asks work to stop and
+  wakes it from `WaitFor`; nothing stops a thread where it stands, and a
+  `parallel` block always joins, and always will. See §9 of the concurrency
+  notes for what is worth adding and what never will be.
 - **Debug information describes data, not sequences.** `-g` covers functions,
   locations, locals, parameters, structs, class bodies and enums, each local in
   the block it was declared in, and an array's or a `String`'s elements as a

@@ -17,7 +17,7 @@ the object's *contents*, which nothing synchronizes on its behalf.
 
 ## Contents
 
-**Types** &nbsp; [AtomicBool](#atomicbool-class) &middot; [AtomicInt](#atomicint-class) &middot; [AtomicLong](#atomiclong-class) &middot; [AutoResetEvent](#autoresetevent-class) &middot; [Barrier](#barrier-class) &middot; [CountdownEvent](#countdownevent-class) &middot; [Future&lt;T&gt;](#futuret-class) &middot; [Guard&lt;T&gt;](#guardt-class) &middot; [IConsumer&lt;T&gt;](#iconsumert-interface) &middot; [IProducer&lt;T&gt;](#iproducert-interface) &middot; [Job](#job-delegate) &middot; [ManualResetEvent](#manualresetevent-class) &middot; [Monitor&lt;T&gt;](#monitort-class) &middot; [MonitorGuard&lt;T&gt;](#monitorguardt-class) &middot; [Mutex&lt;T&gt;](#mutext-class) &middot; [ReadGuard&lt;T&gt;](#readguardt-class) &middot; [ReaderWriterLock&lt;T&gt;](#readerwriterlockt-class) &middot; [Semaphore](#semaphore-class) &middot; [SpinWait](#spinwait-class) &middot; [TaskScope](#taskscope-class) &middot; [Thread](#thread-class) &middot; [WriteGuard&lt;T&gt;](#writeguardt-class)
+**Types** &nbsp; [AtomicBool](#atomicbool-class) &middot; [AtomicInt](#atomicint-class) &middot; [AtomicLong](#atomiclong-class) &middot; [AutoResetEvent](#autoresetevent-class) &middot; [Barrier](#barrier-class) &middot; [CancellationToken](#cancellationtoken-struct) &middot; [CancellationTokenRegistration](#cancellationtokenregistration-class) &middot; [CancellationTokenSource](#cancellationtokensource-class) &middot; [CountdownEvent](#countdownevent-class) &middot; [Future&lt;T&gt;](#futuret-class) &middot; [Guard&lt;T&gt;](#guardt-class) &middot; [IConsumer&lt;T&gt;](#iconsumert-interface) &middot; [IProducer&lt;T&gt;](#iproducert-interface) &middot; [Job](#job-delegate) &middot; [ManualResetEvent](#manualresetevent-class) &middot; [Monitor&lt;T&gt;](#monitort-class) &middot; [MonitorGuard&lt;T&gt;](#monitorguardt-class) &middot; [Mutex&lt;T&gt;](#mutext-class) &middot; [ReadGuard&lt;T&gt;](#readguardt-class) &middot; [ReaderWriterLock&lt;T&gt;](#readerwriterlockt-class) &middot; [Semaphore](#semaphore-class) &middot; [SpinWait](#spinwait-class) &middot; [TaskScope](#taskscope-class) &middot; [Thread](#thread-class) &middot; [WriteGuard&lt;T&gt;](#writeguardt-class)
 
 **Functions** &nbsp; [CurrentId](#currentid-function) &middot; [ProcessorCount](#processorcount-function) &middot; [Sleep](#sleep-function) &middot; [StartPool](#startpool-function) &middot; [WorkerCount](#workercount-function) &middot; [Yield](#yield-function)
 
@@ -377,6 +377,211 @@ How many participants the barrier was made for. Fixed, so unlike most
 readings here it cannot be stale.
 
 <sub>[stdlib/Threading/Barrier.sl:89](../../stdlib/Threading/Barrier.sl#L89)</sub>
+
+### CancellationToken *struct*
+
+```
+struct CancellationToken
+```
+
+The half of a `CancellationTokenSource` the work holds: it can be asked
+whether to stop, and waited on, but not cancelled. .NET's
+`System.Threading.CancellationToken`.
+
+A token copies freely and crosses threads; every copy follows the one
+source. The zero value is `CancellationToken.None`, which nothing cancels.
+
+<sub>[stdlib/Threading/CancellationToken.sl:30](../../stdlib/Threading/CancellationToken.sl#L30)</sub>
+
+#### None *property*
+
+```
+static CancellationToken None { get; }
+```
+
+A token nothing cancels, for work that is never asked to stop.
+
+<sub>[stdlib/Threading/CancellationToken.sl:40](../../stdlib/Threading/CancellationToken.sl#L40)</sub>
+
+#### IsCancellationRequested *property*
+
+```
+bool IsCancellationRequested { get; }
+```
+
+Whether this token's source has been cancelled.
+
+<sub>[stdlib/Threading/CancellationToken.sl:43](../../stdlib/Threading/CancellationToken.sl#L43)</sub>
+
+#### CanBeCanceled *property*
+
+```
+bool CanBeCanceled { get; }
+```
+
+Whether anything can cancel this token: false for `None`.
+
+<sub>[stdlib/Threading/CancellationToken.sl:53](../../stdlib/Threading/CancellationToken.sl#L53)</sub>
+
+#### WaitFor *method*
+
+```
+bool WaitFor(ulong milliseconds)
+```
+
+Sleeps for `milliseconds`, waking the moment cancellation is requested.
+Answers whether it was: the shape of a worker's loop,
+`while (!token.WaitFor(1000u)) DoWork();`.
+
+**Parameters**
+
+- `milliseconds` -- how long to sleep at most
+
+**Returns** &nbsp; true when cancelled, false when the time ran out
+
+<sub>[stdlib/Threading/CancellationToken.sl:61](../../stdlib/Threading/CancellationToken.sl#L61)</sub>
+
+#### Wait *method*
+
+```
+void Wait()
+```
+
+Blocks until cancellation is requested. On `None` that is never, so it
+returns at once rather than blocking for ever.
+
+<sub>[stdlib/Threading/CancellationToken.sl:74](../../stdlib/Threading/CancellationToken.sl#L74)</sub>
+
+#### Register *method*
+
+```
+CancellationTokenRegistration Register(Action callback)
+```
+
+Runs `callback` when cancellation is requested, on the thread that asks
+for it -- or now, on this thread, if it already has been.
+
+**Parameters**
+
+- `callback` -- what to run; it MUST NOT wait for the work being cancelled
+
+**Returns** &nbsp; a registration whose `Dispose` withdraws the callback. Letting it go does not: the callback stays until the source is cancelled
+
+<sub>[stdlib/Threading/CancellationToken.sl:87](../../stdlib/Threading/CancellationToken.sl#L87)</sub>
+
+### CancellationTokenRegistration *class*
+
+```
+threadsafe sealed class CancellationTokenRegistration : IDisposable
+```
+
+A callback registered with a token, withdrawn by `Dispose`.
+
+<sub>[stdlib/Threading/CancellationToken.sl:97](../../stdlib/Threading/CancellationToken.sl#L97)</sub>
+
+#### Dispose *method*
+
+```
+void Dispose()
+```
+
+Withdraws the callback, if it has not run. A second call does nothing.
+
+<sub>[stdlib/Threading/CancellationToken.sl:109](../../stdlib/Threading/CancellationToken.sl#L109)</sub>
+
+### CancellationTokenSource *class*
+
+```
+threadsafe class CancellationTokenSource
+```
+
+Says when work should stop, to everything holding one of its tokens.
+.NET's `System.Threading.CancellationTokenSource`.
+
+**Cancellation is a request, not an interruption.** Nothing stops a thread:
+the work asks `IsCancellationRequested` between pieces, or sleeps in
+`CancellationToken.WaitFor`, which wakes the moment the request arrives.
+That is the only kind there is, because there is no exception to unwind a
+thread with.
+
+    var stopping = new CancellationTokenSource();
+    var token = stopping.Token;
+    var worker = new Thread(() =>
+    {
+        while (!token.WaitFor(1000u))
+            PollForWork();
+    });
+    stopping.Cancel();
+    worker.Join();
+
+A source is cancelled once, and stays cancelled.
+
+<sub>[stdlib/Threading/CancellationTokenSource.sl:46](../../stdlib/Threading/CancellationTokenSource.sl#L46)</sub>
+
+#### Token *property*
+
+```
+CancellationToken Token { get; }
+```
+
+A token to hand to the work this source may stop.
+
+<sub>[stdlib/Threading/CancellationTokenSource.sl:74](../../stdlib/Threading/CancellationTokenSource.sl#L74)</sub>
+
+#### IsCancellationRequested *property*
+
+```
+bool IsCancellationRequested { get; }
+```
+
+Whether `Cancel` has been called.
+
+<sub>[stdlib/Threading/CancellationTokenSource.sl:77](../../stdlib/Threading/CancellationTokenSource.sl#L77)</sub>
+
+#### Cancel *method*
+
+```
+void Cancel()
+```
+
+Asks everything holding a token to stop: wakes every `WaitFor`, then runs
+the registered callbacks on this thread, the latest first. A second call
+does nothing.
+
+<sub>[stdlib/Threading/CancellationTokenSource.sl:91](../../stdlib/Threading/CancellationTokenSource.sl#L91)</sub>
+
+#### CancelAfter *method*
+
+```
+void CancelAfter(ulong milliseconds)
+```
+
+Cancels once `milliseconds` have passed, from a thread of its own, unless
+something cancels first.
+
+**Parameters**
+
+- `milliseconds` -- how long until the cancellation
+
+<sub>[stdlib/Threading/CancellationTokenSource.sl:118](../../stdlib/Threading/CancellationTokenSource.sl#L118)</sub>
+
+#### CreateLinkedTokenSource *method*
+
+```
+static CancellationTokenSource CreateLinkedTokenSource(CancellationToken first, CancellationToken second)
+```
+
+A source cancelled when either of two tokens is, or when it is
+cancelled itself: a request's own deadline beside the host's shutdown.
+
+**Parameters**
+
+- `first` -- one token to follow
+- `second` -- the other
+
+**Returns** &nbsp; a new source, which stops following both when it goes
+
+<sub>[stdlib/Threading/CancellationTokenSource.sl:135](../../stdlib/Threading/CancellationTokenSource.sl#L135)</sub>
 
 ### CountdownEvent *class*
 

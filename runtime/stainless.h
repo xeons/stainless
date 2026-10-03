@@ -1125,6 +1125,12 @@ SL_API _Bool  sl_signals_watch(void);
 SL_API _Bool  sl_signals_interrupted(void);
 SL_API void   sl_signals_clear(void);
 
+/* Blocks until an interrupt arrives or `milliseconds` pass, and says whether
+ * one has. ~0 waits for ever. Without sl_signals_watch nothing can arrive, so
+ * it answers false at once rather than block for ever.
+ */
+SL_API _Bool  sl_signals_wait(unsigned long long milliseconds);
+
 /* ------------------------------------------------------------- the clocks */
 
 /*

@@ -32,7 +32,7 @@ import Standard.Text;
 ///
 /// A response holds its connection until its body has been read to the end,
 /// and closes it when disposed or released before then.
-public class HttpResponseMessage
+public class HttpResponseMessage : IDisposable
 {
     private HttpResponseHeaders _headers = new HttpResponseHeaders();
     private HttpResponseHeaders _trailingHeaders = new HttpResponseHeaders();

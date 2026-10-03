@@ -1,0 +1,8 @@
+woken true, early true, requested true
+timed out true, waited true
+callbacks last, first
+late ran at once
+cancel after true, bounded true
+linked before false
+linked after true, outer false
+none can be canceled false, cancelled false

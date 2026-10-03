@@ -62,6 +62,7 @@ extern "C"
     bool  sl_signals_watch();
     bool  sl_signals_interrupted();
     void  sl_signals_clear();
+    bool  sl_signals_wait(ulong milliseconds);
 }
 
 /// The argument list a call needs, built once and freed however it ends.

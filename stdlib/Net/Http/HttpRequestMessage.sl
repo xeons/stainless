@@ -33,7 +33,7 @@ import Standard.Text;
 /// A redirect that is followed changes `RequestUri`, and a `303` changes
 /// `Method` to `GET` and drops `Content`, as .NET does; afterwards the
 /// message describes the request that was answered last.
-public class HttpRequestMessage
+public class HttpRequestMessage : IDisposable
 {
     private HttpRequestHeaders _headers = new HttpRequestHeaders();
 

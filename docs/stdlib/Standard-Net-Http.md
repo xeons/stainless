@@ -455,7 +455,7 @@ form posts.
 ### HttpClient *class*
 
 ```
-class HttpClient
+class HttpClient : IDisposable
 ```
 
 Sends requests and receives responses: .NET's `HttpClient`, blocking.
@@ -834,7 +834,7 @@ to be shared.
 ### HttpClientHandler *class*
 
 ```
-class HttpClientHandler
+class HttpClientHandler : IDisposable
 ```
 
 What a client does between a request and the wire: connections and their
@@ -1078,7 +1078,7 @@ before then closes it. `HttpClient.Timeout` does not cover the body.
 ### HttpContent *class*
 
 ```
-abstract class HttpContent
+abstract class HttpContent : IDisposable
 ```
 
 A body and the fields that describe it.
@@ -2166,7 +2166,7 @@ String? UserAgent { get; set; }
 ### HttpRequestMessage *class*
 
 ```
-class HttpRequestMessage
+class HttpRequestMessage : IDisposable
 ```
 
 A request: a method, a URI, fields and perhaps a body.
@@ -2384,7 +2384,7 @@ String? WwwAuthenticate { get; }
 ### HttpResponseMessage *class*
 
 ```
-class HttpResponseMessage
+class HttpResponseMessage : IDisposable
 ```
 
 A response: a status, fields, a body, and the request it answered.

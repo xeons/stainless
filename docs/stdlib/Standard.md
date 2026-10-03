@@ -7,7 +7,7 @@ than library features, and so need no import to reach.
 
 ## Contents
 
-**Types** &nbsp; [Action](#action-closure) &middot; [Action&lt;T1, T2, T3, T4&gt;](#actiont1-t2-t3-t4-closure) &middot; [Action&lt;T1, T2, T3&gt;](#actiont1-t2-t3-closure) &middot; [Action&lt;T1, T2&gt;](#actiont1-t2-closure) &middot; [Action&lt;T&gt;](#actiont-closure) &middot; [Array](#array-class) &middot; [Buffer](#buffer-class) &middot; [Comparison&lt;T&gt;](#comparisont-closure) &middot; [Fold&lt;TAccumulate, TSource&gt;](#foldtaccumulate-tsource-closure) &middot; [Func&lt;T, TResult&gt;](#funct-tresult-closure) &middot; [Func&lt;T1, T2, T3, T4, TResult&gt;](#funct1-t2-t3-t4-tresult-closure) &middot; [Func&lt;T1, T2, T3, TResult&gt;](#funct1-t2-t3-tresult-closure) &middot; [Func&lt;T1, T2, TResult&gt;](#funct1-t2-tresult-closure) &middot; [Func&lt;TResult&gt;](#functresult-closure) &middot; [Guid](#guid-struct) &middot; [Index](#index-struct) &middot; [Lazy&lt;T&gt;](#lazyt-class) &middot; [LazyThreadSafetyMode](#lazythreadsafetymode-enum) &middot; [Optional&lt;T&gt;](#optionalt-variant) &middot; [ParseError](#parseerror-enum) &middot; [Predicate&lt;T&gt;](#predicatet-closure) &middot; [Range](#range-struct) &middot; [ReadOnlySpan&lt;T&gt;](#readonlyspant-struct) &middot; [Result&lt;T, TError&gt;](#resultt-terror-variant) &middot; [RuntimeHelpers](#runtimehelpers-class) &middot; [Slot&lt;T&gt;](#slott-struct) &middot; [Span&lt;T&gt;](#spant-struct) &middot; [Uri](#uri-class) &middot; [UriKind](#urikind-enum) &middot; [UriPartial](#uripartial-enum) &middot; [Version](#version-struct)
+**Types** &nbsp; [Action](#action-closure) &middot; [Action&lt;T1, T2, T3, T4&gt;](#actiont1-t2-t3-t4-closure) &middot; [Action&lt;T1, T2, T3&gt;](#actiont1-t2-t3-closure) &middot; [Action&lt;T1, T2&gt;](#actiont1-t2-closure) &middot; [Action&lt;T&gt;](#actiont-closure) &middot; [Array](#array-class) &middot; [Buffer](#buffer-class) &middot; [Comparison&lt;T&gt;](#comparisont-closure) &middot; [Fold&lt;TAccumulate, TSource&gt;](#foldtaccumulate-tsource-closure) &middot; [Func&lt;T, TResult&gt;](#funct-tresult-closure) &middot; [Func&lt;T1, T2, T3, T4, TResult&gt;](#funct1-t2-t3-t4-tresult-closure) &middot; [Func&lt;T1, T2, T3, TResult&gt;](#funct1-t2-t3-tresult-closure) &middot; [Func&lt;T1, T2, TResult&gt;](#funct1-t2-tresult-closure) &middot; [Func&lt;TResult&gt;](#functresult-closure) &middot; [Guid](#guid-struct) &middot; [IDisposable](#idisposable-interface) &middot; [Index](#index-struct) &middot; [Lazy&lt;T&gt;](#lazyt-class) &middot; [LazyThreadSafetyMode](#lazythreadsafetymode-enum) &middot; [Optional&lt;T&gt;](#optionalt-variant) &middot; [ParseError](#parseerror-enum) &middot; [Predicate&lt;T&gt;](#predicatet-closure) &middot; [Range](#range-struct) &middot; [ReadOnlySpan&lt;T&gt;](#readonlyspant-struct) &middot; [Result&lt;T, TError&gt;](#resultt-terror-variant) &middot; [RuntimeHelpers](#runtimehelpers-class) &middot; [Slot&lt;T&gt;](#slott-struct) &middot; [Span&lt;T&gt;](#spant-struct) &middot; [Uri](#uri-class) &middot; [UriKind](#urikind-enum) &middot; [UriPartial](#uripartial-enum) &middot; [Version](#version-struct)
 
 ## Types
 
@@ -1478,6 +1478,36 @@ static bool operator >=(Guid left, Guid right)
 
 <sub>[stdlib/Standard/Guid.sl:304](../../stdlib/Standard/Guid.sl#L304)</sub>
 
+### IDisposable *interface*
+
+```
+interface IDisposable
+```
+
+Something that can be finished with before its last reference goes.
+.NET's `System.IDisposable`.
+
+**A destructor already frees what an object holds** when the last
+reference to it goes, so most types need neither this nor a call to it.
+`Dispose` is for the moment that comes earlier: a response whose
+connection should go back to its pool while the response is still held, a
+client others share that should refuse further work, a registration to
+undo while its owner lives on. A type that has one SHOULD let it be called
+more than once, and SHOULD do it from its destructor too, so that
+forgetting it costs nothing but promptness.
+
+<sub>[stdlib/Standard/IDisposable.sl:35](../../stdlib/Standard/IDisposable.sl#L35)</sub>
+
+#### Dispose *method*
+
+```
+void Dispose()
+```
+
+Releases now what would otherwise be released at the last reference.
+
+<sub>[stdlib/Standard/IDisposable.sl:38](../../stdlib/Standard/IDisposable.sl#L38)</sub>
+
 ### Index *struct*
 
 ```
@@ -2220,6 +2250,28 @@ count every reference it copies.
 **Returns** &nbsp; false when a `T` is all of what it holds, so its bytes may be copied, compared or cleared with no count to keep
 
 <sub>[stdlib/Standard/RuntimeHelpers.sl:46](../../stdlib/Standard/RuntimeHelpers.sl#L46)</sub>
+
+#### GetTypeName *method*
+
+```
+static String GetTypeName<T>()
+```
+
+A `T`'s name, qualified by its module: `App.Worker`, `Standard.Text.String`,
+or `Standard.Collections.List<App.Point>` for an instantiation.
+
+**Each call is a constant**, as the question above is, and needs no
+`[Reflect]`: it names an interface, a struct or a primitive as readily as
+a class. It is what a logger's category and a message about a missing
+service are written from.
+
+**Type parameters**
+
+- `T` -- the type named
+
+**Returns** &nbsp; the name the compiler knows `T` by
+
+<sub>[stdlib/Standard/RuntimeHelpers.sl:58](../../stdlib/Standard/RuntimeHelpers.sl#L58)</sub>
 
 ### Slot&lt;T&gt; *struct*
 

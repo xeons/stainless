@@ -1,0 +1,4 @@
+before watching false
+watching
+interrupted true
+stopped true, exit true

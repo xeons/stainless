@@ -41,7 +41,7 @@ import Standard.Time;
 /// .NET's `HttpClientHandler`, and its defaults. Its settings are read when
 /// a request is sent; the pool is made with the ones in force at the first
 /// request and keeps them.
-public class HttpClientHandler
+public class HttpClientHandler : IDisposable
 {
     private HttpConnectionPool? _pool;
     private Mutex<int> _poolLock = new Mutex<int>(0);

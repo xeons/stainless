@@ -44,4 +44,16 @@ public static class RuntimeHelpers
     /// @returns false when a `T` is all of what it holds, so its bytes may be
     ///          copied, compared or cleared with no count to keep
     public static bool IsReferenceOrContainsReferences<T>() => IsReferenceOrContainsReferences<T>();
+
+    /// A `T`'s name, qualified by its module: `App.Worker`, `Standard.Text.String`,
+    /// or `Standard.Collections.List<App.Point>` for an instantiation.
+    ///
+    /// **Each call is a constant**, as the question above is, and needs no
+    /// `[Reflect]`: it names an interface, a struct or a primitive as readily as
+    /// a class. It is what a logger's category and a message about a missing
+    /// service are written from.
+    ///
+    /// @typeparam T  the type named
+    /// @returns the name the compiler knows `T` by
+    public static String GetTypeName<T>() => GetTypeName<T>();
 }

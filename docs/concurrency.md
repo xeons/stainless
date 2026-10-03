@@ -493,7 +493,9 @@ result-passing choice in §2 neither helps nor hinders it.
 
 ### 9.1 What works now
 
-Cooperative cancellation, with `AtomicBool` from `Standard.Threading`:
+Cooperative cancellation. `CancellationToken` from `Standard.Threading` is the
+.NET shape, and wakes a sleeping `WaitFor` the moment it is cancelled; for jobs
+in a `parallel` block, an `AtomicBool` is all it takes:
 
 ```csharp
 var stop = new AtomicBool(false);
