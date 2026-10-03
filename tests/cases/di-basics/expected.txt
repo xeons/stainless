@@ -1,0 +1,15 @@
+registered 6
+singleton same true
+scoped same true, other scope differs true
+transient differs true, last wins B
+singleton from a scope is the root's true
+hello at 42, traced false, plugins AB
+unregistered true
+plugins 2, AB
+itself true
+DiBasics.Greeter at 42
+disposed second, disposed first
+built false
+'DiBasics.NeedsMissing' needs 'DiBasics.ITracer', and nothing is registered as one
+'DiBasics.SingletonNeedsScoped' is a singleton and needs 'DiBasics.Counter', which is scoped: it would keep one scope's for the life of the program
+a cycle: DiBasics.LoopA -> DiBasics.LoopB -> DiBasics.LoopA

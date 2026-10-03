@@ -13,6 +13,7 @@ One page per module. Each lists every public type, function, property, case and 
 | [Standard.Concurrent](Standard-Concurrent.md) | Collections more than one thread may hold at once. |
 | [Standard.Console](Standard-Console.md) | Standard input and output, as text. |
 | [Standard.Convert](Standard-Convert.md) | Turning things into other things: bytes into text, text into numbers. |
+| [Standard.DependencyInjection](Standard-DependencyInjection.md) | A container that makes a program's services and hands each what its |
 | [Standard.Directory](Standard-Directory.md) | Directories: making them, removing them, and looking inside. |
 | [Standard.Drawing](Standard-Drawing.md) | Raster images: reading them, drawing on them, and writing them back. |
 | [Standard.Encoding](Standard-Encoding.md) | Text as bytes, in whichever encoding somebody else chose. |

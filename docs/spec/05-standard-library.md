@@ -54,6 +54,7 @@ so LLVM and the linker drop what the program's own code leaves unused.
 | `Standard.Net` | TCP and UDP sockets, the same on every platform: a connect tries every address a name resolves to, within a limit if given; an accepted socket blocks whatever its listener does; no socket is inherited by a child process; a UDP receive is not failed by an earlier send to a closed port | on request |
 | `Standard.Net.Security` | TLS 1.3 and 1.2, client and server, over any stream ([§5.17](#517-standardnetsecurity)) | on request |
 | `Standard.Net.Http` | an HTTP/1.1 and HTTP/2 client: pooled and multiplexed connections, redirects, cookies, decompression, proxies ([§5.18](#518-standardnethttp)) | on request |
+| `Standard.DependencyInjection` | a service container, its constructor calls written by the compiler ([§5.19](#519-standarddependencyinjection)) | on request |
 | `Standard.Env` | the command line, the environment, the working directory | on request |
 | `Standard.Time` | `DateTimeOffset`, `TimeSpan`, `DateTime` and the monotonic `Stopwatch` | on request |
 | `Standard.Random` | xoshiro256**, seeded by you or by the operating system | on request |
@@ -1519,6 +1520,73 @@ GOAWAY and closes once the last of them is done.
 scripted servers on the loopback, a small proxy among them; `hpack` checks
 every example of RFC 7541 Appendix C byte for byte. Nothing in the suite
 reaches the network.
+
+## 5.19 `Standard.DependencyInjection`
+
+```csharp
+import Standard.DependencyInjection;
+
+var services = new ServiceCollection();
+services.AddSingleton<IClock, SystemClock>();
+services.AddScoped<IRepository, SqlRepository>();    // SqlRepository(IClock clock)
+services.AddTransient<IPlugin, Spelling>();
+services.AddTransient<IPlugin, Grammar>();           // both, for an IPlugin[] parameter
+
+var provider = try services.BuildServiceProvider();
+var scope = provider.CreateScope();
+var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
+```
+
+.NET's `Microsoft.Extensions.DependencyInjection`, with one difference that
+decides the rest: **the compiler writes the constructor calls.** .NET finds a
+constructor by reflection when a service is first asked for. Here a generic is
+compiled once per type argument, so the constructor is known where the
+registration is bound: `ActivatorUtilities.CreateInstance<SqlRepository>(provider)`
+becomes `new SqlRepository(provider.GetRequiredService<IClock>())`. A `T`
+parameter is asked for with `GetRequiredService`, a `T?` with `GetService`, a
+`T[]` with `GetServices`. The constructor used is the public one with most
+parameters. A class with no usable constructor, two widest ones, or a
+parameter no provider can be asked for -- a number, a struct, `ref`,
+`params`, a default -- is a compile error at the registration (SL0917, SL0918,
+SL0919); a factory, `AddSingleton<T>((ServiceProvider p) => ...)`, is the way
+around any of them.
+
+**What is missing is found when the provider is built.** Each registration
+records what its constructor asks for, and `BuildServiceProvider` returns a
+`ServiceProviderError` listing every dependency nothing registered, every
+singleton holding a scoped service, and every cycle -- where .NET finds the
+first of them at first use. A factory's needs are not known until it runs; a
+cycle among factories stops the program when it is first walked, naming the
+service.
+
+**A type is a key without reflection.** `ServiceKey<T>.Id` is a static of a
+generic class, and each instantiation has its own, handed out before `Main` --
+an interface, a struct or a closure type as readily as a class.
+
+**There are no exceptions.** `GetRequiredService` for what nothing registered
+stops the program with the type's name; `GetService` answers null. A scoped
+service asked of the root provider stops it too: the root would keep one for
+ever, which is what a scope exists to prevent.
+
+**One declaration serves every instantiation of a generic service.** .NET
+registers an open generic, `typeof(ILogger<>)`, and makes `Logger<T>` for a
+`T` it meets at run time; here every instantiation is made by the compiler, so
+the interface names its implementation instead.
+`[DefaultImplementation("Standard.Logging.Logger")]` on `ILogger<T>` makes
+`GetService<ILogger<App.Worker>>()` answer a `Logger<App.Worker>` with nothing
+registered (SL0920 when the name is not a generic class of the same arity).
+
+**Lifetimes are .NET's.** A singleton is made once, the first time it is asked
+for, and kept by the root; a scoped service once per scope; a transient every
+time. A provider may be used from several threads, and two asking for one
+singleton at once get one.
+
+**Disposal is the scope's end.** `ServiceScope.Dispose`, or the last reference
+to the scope going, lets go of what it made, calling `Dispose` first on those
+that are `IDisposable`, the latest made first; the root does the same for
+singletons. An instance given to `AddSingletonInstance` is the caller's, and
+is not disposed. A singleton that keeps the provider that made it would keep
+both alive for ever under reference counting, and `Dispose` is what breaks it.
 
 ---
 

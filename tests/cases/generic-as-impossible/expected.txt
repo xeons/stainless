@@ -1,0 +1,4 @@
+closed
+door true
+plain false
+evaluated 2

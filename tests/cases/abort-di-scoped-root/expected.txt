@@ -1,0 +1,2 @@
+from a scope true
+stainless: 'AbortDiScopedRoot.Unit' is scoped, and was asked of the root provider; ask a scope from CreateScope instead

@@ -813,6 +813,13 @@ last person to edit it -- the suite is the authority.
   it. The Windows half has played and recorded and the macOS half has played,
   its recording untried on a Mac with no input; the ALSA half has compiled and
   never opened a device
+- `Standard.DependencyInjection`: .NET's service container -- singleton, scoped
+  and transient lifetimes, factories, `GetServices`, scopes that dispose what
+  they made. The constructor calls are written by the compiler for each
+  registration, so a class a container cannot make is a compile error, and
+  `BuildServiceProvider` reports every missing dependency, singleton holding a
+  scoped service, and cycle at once. No open generics: a generic interface names
+  its implementation with `[DefaultImplementation]` instead
 - `Standard.Json` and `Standard.Xml`: each in two layers. A document that needs
   no type -- `Json.Parse` gives a `JsonValue`, a variant that is exactly one of
   the six things JSON has, and `Xml.Parse` gives an `XmlNode` -- and a mapping

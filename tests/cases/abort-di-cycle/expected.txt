@@ -1,0 +1,2 @@
+built true
+stainless: 'AbortDiCycle.Egg' depends on itself: making it asked for 'AbortDiCycle.Egg' again

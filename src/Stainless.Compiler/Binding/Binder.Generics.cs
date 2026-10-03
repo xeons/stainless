@@ -486,6 +486,8 @@ public sealed partial class Binder
                 TypeArguments = arguments.ToList(),
                 Scope = template.Scope,
                 Template = template,
+                InstantiatedAt = span,
+                InstantiatedBy = _context.Closures.Count > 0 ? _context.Closures[0].OuterFunction : _context.Function,
                 IsVirtual = dispatchedByClass,
                 IsOverride = dispatchedByClass && declaration.Modifiers.HasFlag(Modifiers.Override),
                 IsAbstract = dispatchedByClass && declaration.Modifiers.HasFlag(Modifiers.Abstract),

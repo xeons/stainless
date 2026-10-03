@@ -1388,6 +1388,9 @@ public sealed partial class Binder
         var converted = ConvertArguments(function, ordered, spans);
         var order = WrittenOrder(map, converted.Count);
 
+        if (ExpandActivatorCall(syntax, function, converted) is { } expanded)
+            return expanded;
+
         if (_builtins.IsArrayCreate(function) && order is null &&
             converted is [var count, { Type: ClosureTypeSymbol } make])
             return new BoundArrayCreate(syntax.Span, (ArrayTypeSymbol)function.ReturnType, count, make);

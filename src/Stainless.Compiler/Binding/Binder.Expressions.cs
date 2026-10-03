@@ -1002,9 +1002,17 @@ public sealed partial class Binder
             return BindConversion(value, result, syntax.Span);
 
         // And nothing to ask the other way either: no object is ever both.
+        // In a generic, asking is what the code was written to do for every
+        // type argument: one that can never be the answer is answered null, as
+        // C# answers it, rather than refusing an instantiation the template
+        // could not have been written against.
+        bool generic = _context.Substitution.Count > 0;
+
         if (subject is ClassTypeSymbol subjectClass && wanted is ClassTypeSymbol wantedClass &&
             !wantedClass.DerivesFrom(subjectClass))
         {
+            if (generic)
+                return new BoundSequence(syntax.Span, [value], new BoundNullLiteral(syntax.Span, result));
             diagnostics.Error("SL0612", syntax.Span,
                 $"no object is both a '{subjectClass.Name}' and a '{wantedClass.Name}': " +
                 "neither derives from the other, so this would always be null",
@@ -1015,6 +1023,8 @@ public sealed partial class Binder
         if (subject is ClassTypeSymbol sealedSubject && wanted is InterfaceTypeSymbol contract &&
             !CouldImplement(sealedSubject, contract))
         {
+            if (generic)
+                return new BoundSequence(syntax.Span, [value], new BoundNullLiteral(syntax.Span, result));
             diagnostics.Error("SL0612", syntax.Span,
                 $"'{sealedSubject.Name}' is sealed and does not implement '{contract.Name}', " +
                 "so this would always be null",

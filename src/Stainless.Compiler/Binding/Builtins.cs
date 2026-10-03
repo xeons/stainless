@@ -270,6 +270,22 @@ public sealed class Builtins
         function.TypeArguments.Count == 1;
 
     /// <summary>
+    /// The name of a <c>Standard.DependencyInjection.ActivatorUtilities</c>
+    /// call the binder writes the code for, or null for any other function.
+    /// </summary>
+    public string? ActivatorCallName(FunctionSymbol function) =>
+        function.Template is
+        {
+            Name: "CreateInstance" or "VisitDependencies" or "CreateDefault" or "HasDefault",
+            ContainingType: { SimpleName: "ActivatorUtilities", ModuleName: DependencyInjectionModuleName },
+        } &&
+        function.TypeArguments.Count == 1
+            ? function.Template.Name
+            : null;
+
+    public const string DependencyInjectionModuleName = "Standard.DependencyInjection";
+
+    /// <summary>
     /// True for an instantiation of <c>Standard.Array.Create&lt;T&gt;</c>, which
     /// the binder makes into an array filled in place.
     /// </summary>

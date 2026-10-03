@@ -965,6 +965,13 @@ error[SL0612]: 'as' answers with an optional already, so the '?' says it twice;
 write 'as Alpha'
 ```
 
+**Inside a generic it is null instead.** A template asks the question for every
+type argument it is given, and `service as IDisposable` is what it was written
+to ask: for a sealed class that does not implement the interface the answer is
+known, and it is null, as C# answers it, rather than an error about an
+instantiation the template could not have been written against. The value is
+still evaluated.
+
 A COM interface is the other refusal, and it is not about the answer being
 known: `QueryInterface` is a call the object answers, and answers again, so a
 test followed by a conversion would ask twice and could be told two different

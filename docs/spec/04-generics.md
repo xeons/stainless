@@ -210,6 +210,16 @@ else
 }
 ```
 
+`Standard.DependencyInjection.ActivatorUtilities` is answered the same way,
+with code rather than a constant: `CreateInstance<T>(provider)` becomes
+`new T(...)` with an argument asked of the provider for each parameter of
+`T`'s widest public constructor, which is how a container makes a class
+without reflecting over its constructors
+([§5.19](05-standard-library.md#519-standarddependencyinjection)). A
+diagnostic about the `T` is reported at the program's own call that
+instantiated the library's generic, followed out of the library through each
+instantiation's first caller.
+
 `RuntimeHelpers.GetTypeName<T>()` is answered the same way, with `T`'s name
 qualified by its module as a string constant -- `App.Worker`, or
 `Standard.Collections.List<App.Point>` for an instantiation. It needs no

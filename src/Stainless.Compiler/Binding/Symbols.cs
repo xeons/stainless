@@ -323,6 +323,15 @@ public sealed class FunctionSymbol
     public GenericFunctionTemplate? Template { get; init; }
 
     /// <summary>
+    /// For an instantiation, the call that first asked for it, and the function
+    /// that call was in. A diagnostic about a type argument follows these out of
+    /// the standard library to the program's own call.
+    /// </summary>
+    public SourceSpan? InstantiatedAt { get; init; }
+
+    public FunctionSymbol? InstantiatedBy { get; init; }
+
+    /// <summary>
     /// The file this was declared in. A module may span files with different
     /// imports, so a body must be bound against its own file's view.
     /// </summary>
