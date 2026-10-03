@@ -139,6 +139,30 @@ internal static class Pipeline
                 if (Verifier?.VerifyIr(ir) is { } fault)
                     throw new InvalidIrException(fault);
 
+                // What a build does to the same program: the library's
+                // unreached functions left out, and the rest divided into
+                // parts. Each MUST stand on its own as the whole did.
+                stage = "prune";
+                if (trace)
+                    Console.Error.WriteLine(stage);
+
+                var libraryModules = units
+                    .Where(u => u.ModuleName is not null && s_library.ContainsValue(u))
+                    .Select(u => u.ModuleName!.Text)
+                    .ToHashSet(StringComparer.Ordinal);
+                string pruned = new LlvmEmitter(forSharedLibrary: shared, prunedModules: libraryModules)
+                    .Emit(program);
+                if (Verifier?.VerifyIr(pruned) is { } prunedFault)
+                    throw new InvalidIrException(prunedFault);
+
+                stage = "divide";
+                if (trace)
+                    Console.Error.WriteLine(stage);
+
+                foreach (string part in IrPartitioner.Split(pruned, 3, bytesPerPart: 0))
+                    if (Verifier?.VerifyIr(part) is { } partFault)
+                        throw new InvalidIrException(partFault);
+
                 return Stopped("done", diagnostics);
             });
         }
