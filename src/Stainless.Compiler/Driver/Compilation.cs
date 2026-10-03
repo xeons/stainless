@@ -281,7 +281,7 @@ public static class LinkDiagnosis
     public static string Explain(
         string linkerOutput, string irPath, IReadOnlyList<string>? unlinkedReferences = null)
     {
-        // A C or C++ input is compiled in the same clang run as the IR, and
+        // A C, C++ or Objective-C input is compiled in the same clang run as the IR, and
         // its errors are its author's, not the compiler's.
         if (FindNativeSourceError(linkerOutput) is string source)
             return $"'{source}' did not compile:\n" + linkerOutput;
@@ -332,7 +332,7 @@ public static class LinkDiagnosis
     {
         var match = Regex.Match(
             output,
-            @"^(.+?\.(?:c|cc|cpp|cxx|h|hh|hpp|hxx)):\d+:\d+: (?:fatal )?error:",
+            @"^(.+?\.(?:c|cc|cpp|cxx|m|mm|h|hh|hpp|hxx)):\d+:\d+: (?:fatal )?error:",
             RegexOptions.Multiline | RegexOptions.IgnoreCase);
         return match.Success ? match.Groups[1].Value : null;
     }

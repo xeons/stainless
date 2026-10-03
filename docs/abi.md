@@ -957,6 +957,83 @@ immortal -- `sl_make_immortal` writes the first word of the object, which is
 the `isa` -- and a mutable one is left out of exit teardown, by which time
 its framework may already be gone.
 
+#### A class defined here
+
+`objc class Canvas : NSView` is written out as clang writes a class: a
+`class_t` named `OBJC_CLASS_$_Module.Canvas` and its metaclass
+`OBJC_METACLASS_$_Module.Canvas` in `__DATA,__objc_data`, each pointing at a
+`class_ro_t` in `__DATA,__objc_const`, and the class in
+`__DATA,__objc_classlist`, which is what the runtime registers classes from.
+The metaclass's `isa` is the root's metaclass and its superclass is the
+superclass's metaclass. The runtime name is module-qualified; `[ObjCName]`
+replaces it.
+
+```
+class_t     isa, superclass, cache (_objc_empty_cache), vtable (null), data
+class_ro_t  flags, instanceStart, instanceSize, ivarLayout, name,
+            methods, protocols, ivars, weakIvarLayout, properties
+method      name, type encoding, IMP          (a list: entsize 24, count)
+ivar        offset global, name, type, log2 alignment, size  (entsize 32)
+```
+
+**Each selector has an IMP**, named as clang names one --
+`-[Module.Canvas drawRect:]` -- taking the receiver and `_cmd` and then the
+arguments as C passes them. It calls the Stainless body, which takes `this`
+and the arguments: an argument arrives at +0 and the body borrows it, so it
+passes through. On Intel a `BOOL` is converted each way, and a struct
+returned in memory has its pointer first. An object result outside the
+owning families is handed back through `objc_autoreleaseReturnValue`. An
+object parameter declared non-optional is checked for nil on entry
+(`sl_objc_nil_argument`). The body is reached with `invoke`, under
+`__objc_personality_v0`, so an Objective-C exception that unwinds out of
+Stainless code stops the program in a catch-all landing pad
+(`sl_objc_exception`) rather than going on past frames that released
+nothing.
+
+**Fields share one ivar.** The class's own fields are laid out from offset
+zero, continuing nothing, as one blob named `_sl` and typed `[nC]`. Its
+offset is a writable global, `OBJC_IVAR_$_Module.Canvas._sl` in
+`__DATA,__objc_ivar` -- `i32` on Apple silicon, `i64` on Intel -- and every
+field access loads it. `instanceStart` is the blob's offset after the `isa`
+and `instanceSize` its end: the runtime slides both, and rewrites the global,
+past whatever its superclass's instance turns out to be at load. A class
+derived from another defined here has a blob of its own after its base's.
+
+**Lifetime.** `.cxx_construct` runs the field initializers and makes each
+event's empty list; the runtime calls it from `alloc`, so an object Cocoa
+makes through any init has them. `.cxx_destruct` releases every counted
+field; the runtime calls it as the object is freed. Both set
+`RO_HAS_CXX_STRUCTORS` (4), and `.cxx_destruct` alone adds
+`RO_HAS_CXX_DTOR_ONLY` (0x100). `~Canvas()` is `dealloc`: the destructor's
+body, then `objc_msgSendSuper` with `dealloc`. clang also sets `RO_IS_ARC`
+(0x80), which asks the runtime to manage ivars by their layout; the runtime
+has no part in what `_sl` holds, so it is left off.
+
+**Construction.** `new Canvas(args)` is `objc_alloc` and then the
+constructor, called directly over the object `alloc` made. A constructor
+with `[Selector]`, or one taking nothing, also has an IMP for its init
+selector, which runs it and hands back `self` at +1. The constructor begins
+by sending its superclass's init through `objc_msgSendSuper`, or by calling
+a defined base's constructor directly; the init MUST answer with the same
+object, and anything else stops the program (`sl_objc_init_replaced`).
+`new` on a class that declares no constructor sends `init` to the new object
+instead, and keeps whatever answers.
+
+**A send to the superclass** is `objc_msgSendSuper` with an `objc_super`
+naming the receiver and its superclass, loaded through `__objc_classrefs`.
+clang sends `objc_msgSendSuper2` naming the class itself; the search starts
+in the same place.
+
+**Protocols** a defined class adopts are written as `protocol_t`, weak and
+hidden, with a label in `__DATA,__objc_protolist`: every image may carry one,
+and the runtime keeps the first of each name it sees.
+
+**A weak reference** to an Objective-C object is a box: a counted Stainless
+object holding one `__weak` slot, made by `sl_objc_weak_new`
+(`objc_initWeak`), read by `sl_objc_weak_load` (`objc_loadWeakRetained`) and
+destroyed by `objc_destroyWeak`. Copying the reference shares the box. The
+three functions are found by `dlsym`, as the pools are.
+
 ## 3. Calling convention
 
 | Declaration | Symbol name | Convention |

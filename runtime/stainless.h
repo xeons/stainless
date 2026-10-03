@@ -430,6 +430,11 @@ SL_API SL_NORETURN void sl_foreign_null(const char *function, const char *type);
 SL_API SL_NORETURN void sl_objc_nil(const char *message, const char *type);
 SL_API SL_NORETURN void sl_objc_unanswered(const char *message);
 SL_API SL_NORETURN void sl_objc_cast_failed(const char *actual, const char *wanted);
+SL_API SL_NORETURN void sl_objc_nil_argument(const char *message, const char *parameter, const char *type);
+SL_API SL_NORETURN void sl_objc_exception(const char *message);
+SL_API SL_NORETURN void sl_objc_init_replaced(const char *message, const void *answered);
+SL_API void *sl_objc_weak_new(void *object);
+SL_API void *sl_objc_weak_load(void *box);
 
 /* -------------------------------------------------------------------- COM */
 

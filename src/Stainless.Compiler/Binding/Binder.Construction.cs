@@ -106,6 +106,15 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
+        if (IsObjCType(measured))
+        {
+            diagnostics.Error("SL0923", syntax.Span,
+                $"'{measured.Name}' is an Objective-C type, which the Objective-C runtime " +
+                "describes; ask it for the class instead",
+                measured);
+            return new BoundErrorExpression(syntax.Span);
+        }
+
         if (measured is not NamedTypeSymbol { IsReflected: true } reflected)
         {
             diagnostics.Error("SL0346", syntax.Span,
@@ -288,6 +297,19 @@ public sealed partial class Binder
                     $"'new {classType.Name}()' takes no arguments",
                     classType);
             return new BoundNew(syntax.Span, classType, constructor: null, []);
+        }
+
+        if (classType.ObjC == ObjCClassKind.Defined && classType.Constructors.Count == 0)
+        {
+            if (arguments.Count > 0)
+                diagnostics.Error("SL0245", syntax.Span,
+                    $"'{classType.Name}' has no constructor, so 'new {classType.Name}()' takes no arguments",
+                    classType);
+
+            RequireDarwin(syntax.Span);
+            return ObjCInitMessage(classType, syntax.Span) is { } init
+                ? WithObjectInitializer(syntax, classType, new BoundNew(syntax.Span, classType, init, []))
+                : new BoundErrorExpression(syntax.Span);
         }
 
         if (classType.Constructors.Count == 0)

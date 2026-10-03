@@ -273,4 +273,164 @@ public class ObjCTests
         Assert.True(stored > 0);
         Assert.DoesNotContain("sl_make_immortal", lines[stored + 1]);
     }
+
+    // ------------------------------------------------------------ defined classes
+
+    /// <summary>The definition whose line names <paramref name="fragment"/>, through its closing brace.</summary>
+    private static string Definition(string ir, string fragment)
+    {
+        int start = ir.IndexOf("define ", ir.IndexOf(fragment, StringComparison.Ordinal) is var at && at < 0
+            ? throw new InvalidOperationException($"'{fragment}' is not in the IR")
+            : ir.LastIndexOf('\n', at) + 1, StringComparison.Ordinal);
+        int end = ir.IndexOf("\n}\n", start, StringComparison.Ordinal);
+        return ir[start..end];
+    }
+
+    [Fact]
+    public void AProtocolMemberIsAnsweredByName()
+    {
+        string ir = IrFor(TargetPlatform.Arm64MacOS, """
+            public objc interface Shape
+            {
+                [Selector("area")] double Area();
+            }
+
+            public objc class Square : NSObject, Shape
+            {
+                public double Area() => 4.0;
+            }
+            """);
+
+        Assert.Contains("define internal double @\"\\01-[Test.Square area]\"(ptr %self, ptr %_cmd)", ir);
+        Assert.Contains("c\"d16@0:8\\00\"", ir);
+    }
+
+    [Fact]
+    public void AnOverrideTakesItsBasesSelectorAndOwnership()
+    {
+        string ir = IrFor(TargetPlatform.Arm64MacOS, """
+            public objc class Mine : NSString
+            {
+                public override NSString Copy() => NSString.FromUtf8("x");
+                public override nuint Length => 3u;
+            }
+            """);
+
+        // copy is in the copy family, so the IMP hands its +1 straight back.
+        Assert.DoesNotContain("objc_autoreleaseReturnValue", Definition(ir, "-[Test.Mine copy]"));
+        Assert.Contains("define internal i64 @\"\\01-[Test.Mine length]\"", ir);
+    }
+
+    [Fact]
+    public void AnOverrideOfNothingAndAnUnmarkedReplacementAreRefused()
+    {
+        Assert.Contains("SL0921", CodesFor("""
+            public objc class Mine : NSObject
+            {
+                public override long Missing() => 1;
+            }
+            """));
+        Assert.Contains("SL0921", CodesFor("""
+            public objc class Mine : NSString
+            {
+                [Selector("length")] public nuint Size => 3u;
+            }
+            """));
+    }
+
+    [Fact]
+    public void AFieldIsReadThroughTheIvarOffset()
+    {
+        string ir = IrFor(TargetPlatform.Arm64MacOS, """
+            public objc class Counter : NSObject
+            {
+                long _count = 3;
+                [Selector("count")] public long Count => _count;
+            }
+            """);
+
+        Assert.Contains("@\"OBJC_IVAR_$_Test.Counter._sl\" = hidden global i32 8, section \"__DATA, __objc_ivar\"", ir);
+        Assert.Contains("load i32, ptr @\"OBJC_IVAR_$_Test.Counter._sl\"", ir);
+        Assert.Contains("@\"\\01-[Test.Counter .cxx_construct]\"", ir);
+    }
+
+    [Fact]
+    public void AConstructorIsAnInitThatChecksItsSuperclassAnswer()
+    {
+        string ir = IrFor(TargetPlatform.Arm64MacOS, """
+            public objc class Made : NSObject
+            {
+                [Selector("initWithValue:")] public Made(long value) { }
+            }
+
+            public Made Make() => new Made(2);
+            """);
+
+        Assert.Contains("define internal ptr @\"\\01-[Test.Made initWithValue:]\"(ptr %self, ptr %_cmd, i64 %arg.value)", ir);
+        Assert.Contains("call ptr @objc_alloc(ptr", ir);
+        Assert.Contains("@objc_msgSendSuper(ptr", ir);
+        Assert.Contains("call void @sl_objc_init_replaced(", ir);
+    }
+
+    [Fact]
+    public void AFieldWithNoZeroValueNeedsAnInitializer() =>
+        Assert.Contains("SL0925", CodesFor("""
+            public objc class Unset : NSObject
+            {
+                String _name;
+            }
+            """));
+
+    [Theory]
+    [InlineData("[Selector(\"take:b:c:\")] public long Take(long a, double b, bool c) => a;", "q36@0:8q16d24B32")]
+    [InlineData("[Selector(\"take:\")] public void Take(Wide wide) { }", "v48@0:8{Wide=dddd}16")]
+    [InlineData("[Selector(\"take:\")] public void Take(Wide* wide) { }", "v24@0:8^{Wide=dddd}16")]
+    [InlineData("[Selector(\"take:s:c:\")] public void Take(byte* text, Selector sel, Class cls) { }", "v40@0:8*16:24#32")]
+    [InlineData("[Selector(\"take:b:\")] public NSString Take(short a, byte b) => NSString.FromUtf8(\"x\");", "@24@0:8s16C20")]
+    public void ATypeIsEncodedAsClangEncodesIt(string member, string encoding)
+    {
+        string ir = IrFor(TargetPlatform.Arm64MacOS, $$"""
+            public objc class Encoded : NSObject
+            {
+                {{member}}
+            }
+            """);
+
+        Assert.Contains($"c\"{encoding}\\00\", section \"__TEXT,__objc_methtype,cstring_literals\"", ir);
+    }
+
+    [Fact]
+    public void AWeakReferenceToAnObjectIsABox()
+    {
+        string ir = IrFor(TargetPlatform.Arm64MacOS, """
+            public class Holder
+            {
+                public weak NSString? Held;
+            }
+
+            public bool Gone(Holder holder, NSString text)
+            {
+                holder.Held = text;
+                return holder.Held == null;
+            }
+            """);
+
+        string gone = Front.TestFunction(ir, "Gone");
+        Assert.Contains("call ptr @sl_objc_weak_new(ptr", gone);
+        Assert.Contains("call ptr @sl_objc_weak_load(ptr", gone);
+        Assert.DoesNotContain("sl_weak_retain", gone);
+    }
+
+    [Fact]
+    public void AWeakReferenceIsComparedAsWhatItReadsAs()
+    {
+        var program = Front.BindModule("""
+            public class Thing { }
+            public bool Gone(weak Thing? loose) => loose == null;
+            """, out var diagnostics);
+        Assert.Empty(Front.Codes(diagnostics));
+
+        string ir = new LlvmEmitter(forSharedLibrary: true).Emit(Lowerer.Lower(program));
+        Assert.Contains("call ptr @sl_weak_load(ptr", Front.TestFunction(ir, "Gone"));
+    }
 }

@@ -120,6 +120,9 @@ public sealed partial class Binder
 
         CheckJumps($"'{function.Name}'");
 
+        if (function.IsObjCFieldInitializer)
+            body = WithFieldInitializers(function, body);
+
         if (function.Kind == FunctionKind.Constructor)
         {
             CheckChainsToPrimary(function);
@@ -167,6 +170,11 @@ public sealed partial class Binder
 
         // Written out; BindBaseConstruction already put it first.
         if (explicitChain) return body;
+
+        if (classType.ObjC == ObjCClassKind.Defined)
+            return _delegated.ContainsKey(constructor)
+                ? body
+                : WithObjCBaseConstruction(constructor, classType, body);
 
         if (!TryImplicitBaseConstructor(classType, out var chained))
         {
@@ -222,6 +230,11 @@ public sealed partial class Binder
     {
         if (constructor.ContainingType is not { } classType) return body;
         if (_delegated.ContainsKey(constructor)) return body;
+
+        // A class defined for Objective-C has run them already, in
+        // .cxx_construct.
+        if (classType is ClassTypeSymbol { IsObjC: true } && !constructor.IsObjCFieldInitializer)
+            return body;
 
         var initialized = classType.Fields
             .Where(f => f.InitializerSyntax is not null)
@@ -300,6 +313,9 @@ public sealed partial class Binder
                 classType);
             return new BoundErrorExpression(syntax.Span);
         }
+
+        if (classType.ObjC == ObjCClassKind.Defined)
+            return BindObjCBaseConstruction(syntax, classType, arguments);
 
         // Past any class that declares no constructor: there is nothing there
         // to run, and what is above it still has to be built.

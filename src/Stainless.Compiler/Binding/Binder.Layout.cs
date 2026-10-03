@@ -125,14 +125,17 @@ public sealed partial class Binder
         // header is three words, which is not a multiple of eight on a 32-bit
         // target or of sixteen on a 64-bit one. Offsets are still stored from
         // the end of the header.
-        int start = type is ClassTypeSymbol ? ClassTypeSymbol.HeaderSize : 0;
+        // An Objective-C class defined here keeps its own fields in one ivar,
+        // which the runtime places past its superclass's at load; they are
+        // laid out from zero and continue nothing.
+        int start = type is ClassTypeSymbol { IsObjC: false } ? ClassTypeSymbol.HeaderSize : 0;
         int offset = start, alignment = 1;
 
         // A derived class's fields begin where its base's end, so the base
         // subobject is a prefix of the derived one and starts at the same
         // address. That is what makes an upcast free, and what makes every
         // inherited method's field offsets right without recomputing them.
-        if (type is ClassTypeSymbol { BaseClass: { } inheritedFrom })
+        if (type is ClassTypeSymbol { BaseClass: { } inheritedFrom, IsObjC: false })
         {
             ComputeLayout(inheritedFrom, inProgress);
             offset = start + inheritedFrom.FieldsSize;

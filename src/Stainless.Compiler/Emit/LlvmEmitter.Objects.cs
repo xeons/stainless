@@ -32,6 +32,8 @@ public sealed partial class LlvmEmitter
     {
         var classType = expression.ClassType;
 
+        if (classType.ObjC == ObjCClassKind.Defined) return EmitObjCNew(expression);
+
         // A runtime-provided class builds itself; sl_alloc knows nothing of its
         // variable-sized or externally managed storage.
         if (classType.RuntimeFactory is not null)
@@ -123,9 +125,9 @@ public sealed partial class LlvmEmitter
     /// included, for the same reason -- the base's constructor may not exist
     /// either, and the fields are in this object.
     /// </summary>
-    private void InitializeEvents(string instance, ClassTypeSymbol classType)
+    private void InitializeEvents(string instance, ClassTypeSymbol classType, bool inherited = true)
     {
-        for (var current = classType; current is not null; current = current.BaseClass)
+        for (var current = classType; current is not null; current = inherited ? current.BaseClass : null)
             foreach (var declared in current.Events)
             {
                 if (declared.BackingField is not { } field) continue;

@@ -708,8 +708,10 @@ public sealed partial class LlvmEmitter
     private static long MaskAll(int bits) => bits >= 64 ? -1L : (1L << bits) - 1;
 
     private string ClassFieldAddress(string objectRef, FieldSymbol field) =>
-        Emit("ptr",
-            $"getelementptr inbounds i8, ptr {objectRef}, i64 {ClassTypeSymbol.HeaderSize + field.Offset}");
+        field.ContainingType is ClassTypeSymbol { ObjC: ObjCClassKind.Defined } objc
+            ? ObjCFieldAddress(objectRef, objc, field)
+            : Emit("ptr",
+                $"getelementptr inbounds i8, ptr {objectRef}, i64 {ClassTypeSymbol.HeaderSize + field.Offset}");
 
     private Val LoadFrom(BoundExpression expression)
     {

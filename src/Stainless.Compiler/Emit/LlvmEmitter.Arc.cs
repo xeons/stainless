@@ -110,6 +110,9 @@ public sealed partial class LlvmEmitter
         // A strong reference out of a weak one is a new +1, or null.
         ConversionKind.ReferenceToOptional when conversion.Operand.Type is WeakTypeSymbol => Hold.Owned,
 
+        // A weak reference to an Objective-C object is a box made for it.
+        ConversionKind.ReferenceToWeak when IsObjCWeak(conversion.Type) => Hold.Owned,
+
         _ when PassesOwnership(conversion) => HoldOf(conversion.Operand),
         _ => Hold.Borrowed,
     };
@@ -680,13 +683,15 @@ public sealed partial class LlvmEmitter
     /// in one place rather than emitted at every site.
     /// </summary>
     private static string RetainOf(TypeSymbol type) =>
-        type is WeakTypeSymbol ? "sl_weak_retain"
+        IsObjCWeak(type) ? "sl_retain"
+        : type is WeakTypeSymbol ? "sl_weak_retain"
         : IsComReference(type) ? "sl_com_retain"
         : IsObjCReference(type) ? "objc_retain"
         : "sl_retain";
 
     private static string ReleaseOf(TypeSymbol type) =>
-        type is WeakTypeSymbol ? "sl_weak_release"
+        IsObjCWeak(type) ? "sl_release"
+        : type is WeakTypeSymbol ? "sl_weak_release"
         : IsComReference(type) ? "sl_com_release"
         : IsObjCReference(type) ? "objc_release"
         : "sl_release";
@@ -698,11 +703,19 @@ public sealed partial class LlvmEmitter
     private void Retain(string value, TypeSymbol type)
     {
         if (IsObjCReference(type))
+        {
+            _countsObjC = true;
             Emit("ptr", $"call ptr @objc_retain(ptr {value})");
+        }
         else
+        {
             Line($"call void @{RetainOf(type)}(ptr {value})");
+        }
     }
 
-    private void Release(string value, TypeSymbol type) =>
+    private void Release(string value, TypeSymbol type)
+    {
+        if (IsObjCReference(type)) _countsObjC = true;
         Line($"call void @{ReleaseOf(type)}(ptr {value})");
+    }
 }

@@ -734,8 +734,8 @@ public extern objc class NSString : NSObject
 nuint Measure() => NSString.FromUtf8("hello").Length;     // 5
 ```
 
-`objc interface` declares a protocol, and `extern objc class` a class that
-already exists. A reference to either is an Objective-C object pointer, and
+`objc interface` declares a protocol, `extern objc class` a class that
+already exists, and `objc class` a class this program defines. A reference to either is an Objective-C object pointer, and
 ARC counts it with `objc_retain` and `objc_release` exactly as it counts a
 Stainless object with `sl_retain`. Objective-C is Apple's, so a program that
 sends a message is built for `arm64-macos` or `x64-macos` (SL0915); the
@@ -854,6 +854,95 @@ apart by code compiled somewhere else, so it declares no field, no static
 storage, no constructor, no destructor and no event (SL0909), and `new`
 cannot make one (SL0914): send it the messages its headers make one with.
 
+### A class defined here
+
+`objc class` with bodies is a class this program defines and the Objective-C
+runtime registers as it loads, so Cocoa can make one, subclass it and send it
+messages as it would a class written in Objective-C:
+
+```csharp
+public objc class Canvas : NSView, NSAccessibility
+{
+    List<Shape> _shapes = new List<Shape>();       // Stainless fields
+
+    [Selector("initWithFrame:")]
+    public Canvas(CGRect frame) : base(frame) { }  // [super initWithFrame:]
+
+    public override void DrawRect(CGRect dirty) { ... }   // drawRect:, inherited
+    public NSString AccessibilityLabel() => ...;          // the protocol's selector
+
+    void Add(Shape shape) => _shapes.Add(shape);   // no selector: a helper
+    ~Canvas() { ... }                              // dealloc
+}
+```
+
+It derives from an `extern objc class` or from another class defined here,
+and so reaches a root (SL0911). Its runtime name is its module's and its own,
+`Example.Canvas`, unless `[ObjCName]` gives another; a class it derives from
+or a protocol it adopts keeps the name its headers give it.
+
+**A member answers a selector** in one of three ways. `[Selector]` names one.
+An `override` answers the selector of the superclass's member of the same
+name and parameters, and takes the ownership that member declared; it writes
+no selector of its own. A member with the name and parameters of a member of
+a protocol the class adopts answers that protocol's selector. A member that
+answers none is a Stainless helper, called directly. Every message is
+overridable already, so `virtual` and `abstract` mean nothing here; an
+`override` of nothing, a selector the superclass answers without `override`,
+and a selector answered twice are refused (SL0921). Every required member of
+a protocol the class adopts MUST be answered, by the class or by a class it
+derives from (SL0922).
+
+A message to an object of the class goes through `objc_msgSend`, whoever
+sends it, so a subclass written in Objective-C overrides it; a helper is
+called directly. A static member is a class method, sent to whichever class
+the call names. `base.Member` sends to the superclass.
+
+**Fields** may be anything a Stainless class holds. Objective-C may make the
+object through an init that runs none of the constructors -- a nib, or a
+superclass's designated initializer -- so the field initializers run as the
+runtime allocates the object, whatever init follows, and a field with no zero
+value MUST have one (SL0925). An event's list is made there too. Every field
+is released as the object is freed, after `~Canvas()`, which is the class's
+`dealloc` and runs before its superclass's.
+
+**A constructor is an init.** `new Canvas(frame)` allocates the object and
+runs the constructor over it. A constructor marked `[Selector]` -- which MUST
+be in the init family (SL0924) -- or one that takes nothing, which answers
+`init`, is also an init Objective-C can send. It begins with `base(...)`,
+which runs a constructor of a class defined here or sends an init message the
+class it is built on declares, chosen by overload; without one it is the init
+that takes nothing. In Objective-C an init may answer with another object; a
+constructor's `this` is the object that was allocated, so a superclass init
+that answers nil or another object stops the program, naming the message. A
+class that declares no constructor is made by `new` with `init`, sent to the
+new object.
+
+```
+stainless: '-[NSObject init]' answered nil, so the object could not be made
+```
+
+**An argument that promised an object** is checked as the message arrives:
+Objective-C promised nothing, so a nil sent for a parameter declared `T` and
+not `T?` stops the program, naming the message and the parameter.
+
+**An Objective-C exception that reaches a method the class answers** stops
+the program, naming the method. It has unwound through Stainless frames that
+released nothing they held, and nothing after that could be trusted.
+
+What a defined class cannot be is what the runtime has no way to give it: it
+is not a record, not `static`, takes no primary constructor, has no
+bit-fields, and answers no generic message; `typeof` does not describe it
+(SL0923). It implements no Stainless interface (SL0910).
+
+### Weak references
+
+`weak T?` to an Objective-C object is the runtime's own weak reference, held
+in a box the program counts: it reads as null once the object has gone, as a
+Stainless one does. A lambda subscribed to an event inside an objc class
+holds `this` this way, so an object that subscribes to something it does not
+own is not kept alive by it.
+
 ### Autorelease pools
 
 An object a message hands back at +0 lives until the autorelease pool
@@ -877,12 +966,7 @@ A case or a program may also include `.m` files, compiled with
 
 ### What is not there yet
 
-- **A class defined in Stainless.** `objc class` with bodies, which
-  Objective-C could subclass and call, is refused (SL0900).
 - **Blocks.** `objc closure` is refused (SL0900).
-- **A weak reference to an Objective-C object** (SL0912). A Stainless weak
-  reference is counted in the object's header, which an Objective-C object
-  has not got.
 - **A message held without being sent**, in a closure or a delegate
   (SL0913). A message has no function to point at; write a lambda that sends
   it.
@@ -890,8 +974,12 @@ A case or a program may also include `.m` files, compiled with
   say whether the caller owns it; declare a pointer, and take the object with
   a cast.
 - **An Objective-C exception** is not caught by anything a Stainless program
-  can write. One that reaches the top ends the program with Objective-C's own
+  can write. One that reaches a method a defined class answers stops the
+  program there; one that reaches the top ends it with Objective-C's own
   message.
+- **A class method that knows its class.** A static member's body runs
+  whichever class the message was sent to, and cannot ask which: `+make` sent
+  to a subclass runs the same body as it does for the class that declared it.
 
 ## 8.7 Linking a platform library
 

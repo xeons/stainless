@@ -1603,6 +1603,12 @@ public sealed class ClassTypeSymbol : NamedTypeSymbol
     public List<ObjCProtocolTypeSymbol> ObjCProtocols { get; } = [];
 
     /// <summary>
+    /// For a class defined here with field initializers, the method that runs
+    /// them; null otherwise.
+    /// </summary>
+    public FunctionSymbol? ObjCFieldInitializer { get; set; }
+
+    /// <summary>
     /// True when this objc class, or a class it derives from, adopts
     /// <paramref name="protocol"/>.
     /// </summary>

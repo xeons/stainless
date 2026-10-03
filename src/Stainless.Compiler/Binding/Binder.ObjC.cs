@@ -413,6 +413,14 @@ public sealed partial class Binder
             return true;
         }
 
+        // Into a weak reference, which is a box made for the object.
+        if (IsObjCReference(from) && to is WeakTypeSymbol { Element: var weakElement } &&
+            IsObjCType(weakElement))
+        {
+            kind = IsObjCKindOf(from.AsReference() ?? from, weakElement) ? ConversionKind.ReferenceToWeak : null;
+            return true;
+        }
+
         if (IsObjCType(from) && to is OptionalTypeSymbol { Element: var optional })
         {
             kind = IsObjCType(optional) && IsObjCKindOf(from, optional)
@@ -708,15 +716,6 @@ public sealed partial class Binder
         {
             var span = classType.Span ?? default;
 
-            if (classType.ObjC == ObjCClassKind.Defined)
-            {
-                diagnostics.Error("SL0900", span,
-                    $"'{classType.Name}' is an 'objc class' with bodies, which is not supported " +
-                    "yet; an 'extern objc class' describes one that already exists",
-                    classType);
-                continue;
-            }
-
             if (classType.IsObjCRoot)
             {
                 if (classType.BaseClass is not null)
@@ -731,10 +730,200 @@ public sealed partial class Binder
             // short of the root would name the wrong one.
             if (!classType.SelfAndBases().Any(c => c.IsObjCRoot || _objcBaseRefused.Contains(c)))
                 diagnostics.Error("SL0911", span,
-                    $"'{classType.Name}' does not reach a root class: follow its superclasses and " +
-                    "one of them MUST be an 'extern objc class' marked '[ObjCRoot]', as 'NSObject' " +
-                    "is. Name the superclass it really has",
+                    classType.ObjC == ObjCClassKind.Defined && classType.BaseClass is null
+                        ? $"'{classType.Name}' has no superclass, and a class defined here is built " +
+                          "on one the runtime already has; derive it from 'NSObject'"
+                        : $"'{classType.Name}' does not reach a root class: follow its superclasses " +
+                          "and one of them MUST be an 'extern objc class' marked '[ObjCRoot]', as " +
+                          "'NSObject' is. Name the superclass it really has",
                     classType);
+        }
+
+        // A base's selectors are settled before a class deriving from it
+        // inherits them.
+        foreach (var defined in _objcClasses
+                     .Where(c => c.ObjC == ObjCClassKind.Defined)
+                     .OrderBy(c => c.SelfAndBases().Count()))
+        {
+            RequireDarwin(defined.Span ?? default);
+            if (_typeSyntax.TryGetValue(defined, out var entry))
+                CheckDefinedClassShape(defined, entry.Declaration);
+            ResolveObjCMembers(defined);
+            CheckProtocolsAnswered(defined);
+            CheckObjCFields(defined);
+        }
+    }
+
+    /// <summary>
+    /// What a class defined here cannot be. The runtime makes one object of
+    /// it per <c>alloc</c> and asks it for messages by name, so each of these
+    /// would need something the runtime has no way to give.
+    /// </summary>
+    private void CheckDefinedClassShape(ClassTypeSymbol defined, TypeDeclSyntax declaration)
+    {
+        string? why =
+            declaration.Modifiers.HasFlag(Modifiers.Static) ? "static: the runtime registers a class to make instances of it"
+            : declaration.PrimaryParameters.Count > 0 ? "given a primary constructor: Objective-C makes an object with 'alloc' and an init message, and a constructor is written as one"
+            : null;
+
+        if (why is not null)
+            diagnostics.Error("SL0923", declaration.Span,
+                $"'{defined.Name}' is an Objective-C class, which cannot be {why}",
+                defined);
+
+        foreach (var function in declaration.Members.OfType<FunctionDeclSyntax>())
+            if (function.TypeParameters.Count > 0 &&
+                (function.Attributes.Any(a => a.Name.Last == "Selector") || function.Modifiers.HasFlag(Modifiers.Override)))
+                diagnostics.Error("SL0923", function.Span,
+                    $"'{defined.Name}.{function.Name}' is generic, and a message is one method the " +
+                    "runtime finds by its selector, with no type arguments to choose between; a " +
+                    "generic helper without a selector is called directly and may be",
+                    defined);
+    }
+
+    /// <summary>How a member is named in a diagnostic: a property by its own name, not its accessor's.</summary>
+    private static string MemberName(FunctionSymbol method) => method.Accessor?.Name ?? method.Name;
+
+    /// <summary>
+    /// Gives each member of a class defined here the selector it answers: its
+    /// own, the one it overrides, or the one a protocol it adopts names for a
+    /// member of the same name and parameters.
+    /// </summary>
+    private void ResolveObjCMembers(ClassTypeSymbol defined)
+    {
+        foreach (var method in defined.Methods)
+        {
+            if (method.IsVirtual && !method.IsOverride)
+            {
+                diagnostics.Error("SL0921", method.Span,
+                    $"'{defined.Name}.{MemberName(method)}' is '{(method.IsAbstract ? "abstract" : "virtual")}', " +
+                    "which an Objective-C class does not need: every message it answers can be " +
+                    "overridden already. Drop the word",
+                    defined);
+                continue;
+            }
+
+            if (method.IsOverride)
+            {
+                ResolveObjCOverride(defined, method);
+                continue;
+            }
+
+            if (method.Selector is null &&
+                FindObjCMessage(defined.ObjCProtocols.SelectMany(p => p.SelfAndBases()), method) is { } required)
+                TakeSelector(method, required);
+
+            if (method.Selector is null) continue;
+
+            if (defined.BaseClass is { } baseClass &&
+                SelfAndProtocols(baseClass).SelectMany(t => t.Methods)
+                    .Any(m => m.Selector == method.Selector && m.IsStatic == method.IsStatic))
+                diagnostics.Error("SL0921", method.Span,
+                    $"'{defined.Name}.{MemberName(method)}' answers '{method.Selector}', which " +
+                    $"'{baseClass.Name}' already answers; write 'override' to replace it",
+                    defined, baseClass);
+        }
+    }
+
+    /// <summary>
+    /// An <c>override</c> in a class defined here: it finds the superclass's
+    /// message of the same name and parameters, and answers that selector with
+    /// the ownership the superclass declared.
+    /// </summary>
+    private void ResolveObjCOverride(ClassTypeSymbol defined, FunctionSymbol method)
+    {
+        var inherited = defined.BaseClass is { } baseClass
+            ? FindObjCMessage(SelfAndProtocols(baseClass), method)
+            : null;
+
+        if (inherited is null)
+        {
+            diagnostics.Error("SL0921", method.Span,
+                $"'{defined.Name}.{MemberName(method)}' is an 'override', and no superclass of " +
+                $"'{defined.Name}' has a message named '{MemberName(method)}' taking these parameters " +
+                $"to replace{(method.Selector is null ? "" : $"; to answer '{method.Selector}' afresh, drop 'override'")}",
+                defined);
+            return;
+        }
+
+        if (method.Selector is not null && method.Selector != inherited.Selector)
+        {
+            diagnostics.Error("SL0921", method.Span,
+                $"'{defined.Name}.{MemberName(method)}' overrides '{inherited.Selector}', so it answers " +
+                $"that selector and not '{method.Selector}'; an override inherits its selector, " +
+                "so leave '[Selector]' off",
+                defined);
+            return;
+        }
+
+        bool returnFits = method.ReturnType == inherited.ReturnType ||
+                          (IsObjCReference(method.ReturnType) && IsObjCReference(inherited.ReturnType) &&
+                           IsObjCKindOf(method.ReturnType.AsReference() ?? method.ReturnType,
+                                        inherited.ReturnType.AsReference() ?? inherited.ReturnType) &&
+                           (method.ReturnType is not OptionalTypeSymbol ||
+                            inherited.ReturnType is OptionalTypeSymbol));
+        if (!returnFits)
+            diagnostics.Error("SL0921", method.Span,
+                $"'{defined.Name}.{MemberName(method)}' returns '{method.ReturnType.Name}', and the " +
+                $"'{inherited.Selector}' it overrides returns '{inherited.ReturnType.Name}'; an " +
+                "override returns the same, or a class derived from it",
+                defined);
+
+        method.Overridden = inherited;
+        method.Selector = inherited.Selector;
+        method.ConsumesSelf = inherited.ConsumesSelf;
+        method.ReturnsRetained = inherited.ReturnsRetained;
+        CheckObjCSignature(method, method.Span);
+    }
+
+    /// <summary>A member's selector taken from the protocol member it implements.</summary>
+    private void TakeSelector(FunctionSymbol method, FunctionSymbol from)
+    {
+        method.Selector = from.Selector;
+        method.ConsumesSelf = from.ConsumesSelf;
+        method.ReturnsRetained = from.ReturnsRetained;
+        CheckObjCSignature(method, method.Span);
+    }
+
+    /// <summary>A class and its superclasses, each followed by the protocols it adopts.</summary>
+    private static IEnumerable<NamedTypeSymbol> SelfAndProtocols(ClassTypeSymbol start) =>
+        start.SelfAndBases().SelectMany(c =>
+            ((IEnumerable<NamedTypeSymbol>)[c]).Concat(c.ObjCProtocols.SelectMany(p => p.SelfAndBases())));
+
+    /// <summary>
+    /// The message among <paramref name="owners"/>' members with the name,
+    /// parameters and kind of <paramref name="method"/>, nearest first.
+    /// </summary>
+    private static FunctionSymbol? FindObjCMessage(IEnumerable<NamedTypeSymbol> owners, FunctionSymbol method) =>
+        owners.SelectMany(t => t.Methods).FirstOrDefault(m =>
+            m.IsMessage && m.Name == method.Name && m.IsStatic == method.IsStatic &&
+            m.ParameterTypes.SequenceEqual(method.ParameterTypes));
+
+    /// <summary>
+    /// Every required member of every protocol a class defined here adopts
+    /// MUST be answered: by the class, by a class it derives from, or by a
+    /// superclass that already exists and says it adopts the protocol.
+    /// </summary>
+    private void CheckProtocolsAnswered(ClassTypeSymbol defined)
+    {
+        foreach (var protocol in defined.ObjCProtocols.SelectMany(p => p.SelfAndBases()).Distinct())
+        {
+            if (defined.SelfAndBases().Any(c => c.ObjC == ObjCClassKind.Imported && c.AdoptsObjC(protocol)))
+                continue;
+
+            foreach (var required in protocol.Methods.Where(m => m.IsMessage && !m.IsObjCOptional))
+            {
+                bool answered = defined.SelfAndBases().Any(c => c.Methods.Any(m =>
+                    m.Selector == required.Selector && m.IsStatic == required.IsStatic));
+                if (answered) continue;
+
+                diagnostics.Error("SL0922", defined.Span ?? default,
+                    $"'{defined.Name}' adopts '{protocol.Name}' and does not answer " +
+                    $"'{required.Selector}', which it requires: declare " +
+                    $"'{MemberName(required)}' " +
+                    "with the same parameters, or mark the protocol's member '[Optional]'",
+                    defined, protocol);
+            }
         }
     }
 

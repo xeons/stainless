@@ -1,0 +1,8 @@
+while held: true true, alive 1
+once released: true true, alive 0
+field holds it: true
+field after the last strong reference went: true, alive 1
+heard while alive: 10
+heard after it went: 10, alive 0
+an Objective-C class's event: 202
+alive at the end: 0

@@ -331,6 +331,7 @@ public sealed partial class LlvmEmitter(
         InterfaceTables(program);
         ComTables(program);
         ComFactoryTable(program);
+        ObjCClassMetadata(program);
 
         if (program.EntryPoint is not null && !forSharedLibrary)
             EmitEntryPoint(program.EntryPoint);

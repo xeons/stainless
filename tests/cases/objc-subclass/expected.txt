@@ -1,0 +1,15 @@
+stainless: area 4 24
+stainless: sides 4 6 12
+stainless: scaled 15
+stainless: a shape true true
+stainless: through the protocol 24
+stainless: described true
+objc: area 4 24
+objc: sides 4 6
+objc: scaled 21
+objc: conforms true answers grow false
+objc: larger true false
+objc: spread 1 4 4321
+objc: named big square
+objc: by name 7 7
+objc: superclass ObjCSubclass.Square NSObject

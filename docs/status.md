@@ -198,15 +198,18 @@ last person to edit it -- the suite is the authority.
   C library hands out that is not COM — XAudio2's voices — so its first method
   is slot 0 and ARC counts nothing through it; the cost is no `[Guid]`, no
   `QueryInterface` and no cast (SL0622, SL0623, SL0624)
-- **Objective-C, as a client.** `objc interface` is a protocol and
+- **Objective-C.** `objc interface` is a protocol and
   `extern objc class` a class that already exists; every member names its
   selector, a call is clang's `objc_msgSend` through `__objc_selrefs`, and ARC
   counts the object with `objc_retain` and `objc_release`. Ownership follows
   the selector's method family, `init` consumes its receiver, `Self` is
   `instancetype`, a nil where an object was promised stops the program,
   `BOOL` and a struct returned in memory are each target's own, and an `out`
-  object is written back. Defining a class Objective-C can call, blocks and
-  weak references are not there yet ([section 8.6](spec/08-interop-libraries.md#86-objective-c))
+  object is written back. `objc class` defines a class the runtime registers:
+  its methods are IMPs, its fields share one ivar the runtime slides past the
+  superclass, constructors are inits, `~C()` is `dealloc`, and a weak
+  reference to an Objective-C object is a box over the runtime's own. Blocks
+  are not there yet ([section 8.6](spec/08-interop-libraries.md#86-objective-c))
 - **A COM server.** `[Guid("...")]` on a `com class` is a CLSID, the compiler
   gathers every class carrying one into a factory table, and
   `Com.GetClassObject` answers it with an `IClassFactory` — so a `--shared`

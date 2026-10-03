@@ -63,7 +63,7 @@ public sealed partial class LlvmEmitter
             // Storing is what makes a reference weak: the slot's type sends the
             // store through sl_weak_retain instead of sl_retain. The value
             // itself is the same pointer either way.
-            case ConversionKind.ReferenceToWeak:
+            case ConversionKind.ReferenceToWeak when !IsObjCWeak(conversion.Type):
 
             // `x as C`, in the arm where the test said yes. The pointer is the
             // one that went in, and what the test bought is the type.
@@ -217,6 +217,14 @@ public sealed partial class LlvmEmitter
                 return Fresh(new Val(slot, "ptr", type));
             }
 
+            // An Objective-C object has no header to count a weak reference
+            // in, so the reference is a box holding the runtime's own.
+            case ConversionKind.ReferenceToWeak:
+            {
+                string box = Emit("ptr", $"call ptr @sl_objc_weak_new(ptr {operand.Ref})");
+                return Fresh(new Val(box, "ptr", conversion.Type));
+            }
+
             case ConversionKind.StringLiteralToPointer:
                 // Point at a plain byte array rather than into the object, so no
                 // offset arithmetic is needed and the constant stays shareable.
@@ -227,7 +235,8 @@ public sealed partial class LlvmEmitter
                 // A weak reference must be proven live before it can be used strongly.
                 if (conversion.Operand.Type is WeakTypeSymbol)
                 {
-                    string loaded = Emit("ptr", $"call ptr @sl_weak_load(ptr {operand.Ref})");
+                    string load = IsObjCWeak(conversion.Operand.Type) ? "sl_objc_weak_load" : "sl_weak_load";
+                    string loaded = Emit("ptr", $"call ptr @{load}(ptr {operand.Ref})");
                     return Fresh(new Val(loaded, "ptr", conversion.Type));
                 }
                 return Same();

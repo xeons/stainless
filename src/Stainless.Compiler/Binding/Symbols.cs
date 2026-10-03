@@ -450,6 +450,23 @@ public sealed class FunctionSymbol
     /// <summary>An <c>init</c> method: a call consumes its receiver.</summary>
     public bool ConsumesSelf { get; set; }
 
+    /// <summary>
+    /// For a constructor of a class defined here, the init message
+    /// Objective-C makes the object with: its <c>[Selector]</c>, or
+    /// <c>init</c> for one that takes nothing. Null for one that only
+    /// <c>new</c> reaches.
+    ///
+    /// Kept apart from <see cref="Selector"/>: a constructor is called
+    /// directly from Stainless, and only its IMP answers the message.
+    /// </summary>
+    public string? InitSelector { get; set; }
+
+    /// <summary>
+    /// The method a class defined here runs its field initializers in, which
+    /// the runtime calls through <c>.cxx_construct</c> as it allocates.
+    /// </summary>
+    public bool IsObjCFieldInitializer { get; init; }
+
     public override string ToString() =>
         $"{ReturnType.Name} {(ContainingType is null ? "" : ContainingType.Name + ".")}{Name}" +
         $"({string.Join(", ", Parameters.Where(p => !p.IsThis))})";

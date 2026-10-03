@@ -1,0 +1,10 @@
+made: count 10 base 7 note -1
+counted: count 5 base 300 seen 2 label 15 note 5
+wider: count 5 base 400 extra 13 seen 1
+init: count 10 base 7 note -1
+initWithCount: count 6 base 600
+initWithExtra: extra 23
+Counter's ivar is past SLBase: true
+Wider's ivar is past Counter: true
+Wider ends past its ivar: true
+made 9, destroyed 9

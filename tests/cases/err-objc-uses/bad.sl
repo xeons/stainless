@@ -17,9 +17,6 @@ extern "C" NSObject? NSClassFromString(byte* name);
 
 void Uses(NSObject held)
 {
-    // A weak reference to one.
-    weak NSObject? loose = held;
-
     // A message held without being sent.
     Hasher later = held.Hash;
 

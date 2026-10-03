@@ -770,6 +770,7 @@ public sealed partial class Binder
 
                     type.Constructors.Add(symbol);
                     if (constructor.IsPrimary) type.PrimaryConstructor = symbol;
+                    ReadInitSelector(symbol, type, constructor.Attributes);
                     break;
                 }
 
@@ -874,6 +875,15 @@ public sealed partial class Binder
     /// </summary>
     private static void SynthesizeInitializerConstructor(ClassTypeSymbol type)
     {
+        // A class defined for Objective-C runs its initializers as the
+        // runtime allocates, whichever init makes it.
+        if (type.ObjC == ObjCClassKind.Defined)
+        {
+            SynthesizeObjCFieldInitializer(type);
+            return;
+        }
+
+        if (type.IsObjC) return;
         if (type.Constructors.Count > 0) return;
         if (type.Fields.FirstOrDefault(f => f.InitializerSyntax is not null) is not { } first)
             return;

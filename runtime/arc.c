@@ -167,6 +167,118 @@ void sl_objc_unanswered(const char *message)
     abort();
 }
 
+void sl_objc_nil_argument(const char *message, const char *parameter, const char *type)
+{
+    fflush(NULL);
+
+    fprintf(stderr, "stainless: '%s' was sent nil for '%s', and a %s is never nil\n",
+            message, parameter, type);
+    fflush(stderr);
+
+    abort();
+}
+
+/*
+ * A weak reference to an Objective-C object. A Stainless weak reference is a
+ * count in the object's header, which an Objective-C object has not got, so
+ * it is a box instead: a counted Stainless object holding one __weak slot,
+ * which the Objective-C runtime clears when the object goes. Copying the
+ * reference shares the box, and the last release of it destroys the slot.
+ *
+ * libobjc is looked up rather than linked, as the autorelease pools are, so
+ * the runtime asks nothing of it; a program that makes a box sends messages,
+ * and so has it loaded.
+ */
+typedef struct SlObjCWeakBox {
+    SlObject header;
+    void    *slot;
+} SlObjCWeakBox;
+
+#if defined(__APPLE__)
+#  include <dlfcn.h>
+
+static void *(*objc_init_weak)(void **, void *);
+static void *(*objc_load_weak_retained)(void **);
+static void (*objc_destroy_weak)(void **);
+
+static void sl_objc_weak_resolve(void)
+{
+    if (objc_destroy_weak != NULL) return;
+    objc_init_weak = (void *(*)(void **, void *))dlsym(RTLD_DEFAULT, "objc_initWeak");
+    objc_load_weak_retained = (void *(*)(void **))dlsym(RTLD_DEFAULT, "objc_loadWeakRetained");
+    __atomic_store_n(&objc_destroy_weak,
+        (void (*)(void **))dlsym(RTLD_DEFAULT, "objc_destroyWeak"), __ATOMIC_RELEASE);
+}
+
+static void sl_objc_weak_box_destroy(void *pointer)
+{
+    objc_destroy_weak(&((SlObjCWeakBox *)pointer)->slot);
+}
+
+static const SlTypeInfo sl_objc_weak_box_type = {
+    .size = sizeof(SlObjCWeakBox), .destroy = sl_objc_weak_box_destroy, .name = "ObjCWeakReference",
+};
+
+/* A +1 box holding `object` weakly, or NULL for a nil object. */
+void *sl_objc_weak_new(void *object)
+{
+    if (object == NULL) return NULL;
+
+    sl_objc_weak_resolve();
+    SlObjCWeakBox *box = (SlObjCWeakBox *)sl_alloc(&sl_objc_weak_box_type);
+    objc_init_weak(&box->slot, object);
+    return box;
+}
+
+/* A +1 reference to the object, or NULL once it has gone. */
+void *sl_objc_weak_load(void *pointer)
+{
+    if (pointer == NULL) return NULL;
+    return objc_load_weak_retained(&((SlObjCWeakBox *)pointer)->slot);
+}
+#else
+void *sl_objc_weak_new(void *object)
+{
+    (void)object;
+    sl_fail("an Objective-C weak reference exists only on Apple's systems");
+}
+
+void *sl_objc_weak_load(void *pointer)
+{
+    (void)pointer;
+    sl_fail("an Objective-C weak reference exists only on Apple's systems");
+}
+#endif
+
+/* A constructor's superclass init answered with something other than the
+   object alloc made, which the constructor holds as `this`. */
+void sl_objc_init_replaced(const char *message, const void *answered)
+{
+    fflush(NULL);
+
+    if (answered == NULL)
+        fprintf(stderr, "stainless: '%s' answered nil, so the object could not be made\n", message);
+    else
+        fprintf(stderr, "stainless: '%s' answered with another object, and a constructor "
+                        "goes on with the one it was given\n", message);
+    fflush(stderr);
+
+    abort();
+}
+
+/* Called from the landing pad of a method a class defined in Stainless
+   answers. An exception that got this far unwound through Stainless frames
+   without releasing what they held, so nothing after it can be trusted. */
+void sl_objc_exception(const char *message)
+{
+    fflush(NULL);
+
+    fprintf(stderr, "stainless: an Objective-C exception reached '%s'\n", message);
+    fflush(stderr);
+
+    abort();
+}
+
 /* The class name is asked of the Objective-C runtime by the program, so the
    runtime here needs nothing of libobjc. */
 void sl_objc_cast_failed(const char *actual, const char *wanted)

@@ -1,5 +1,3 @@
-# a weak reference to an Objective-C object
-SL0912
 # a message held in a closure without being sent
 SL0913
 # 'new' on an 'extern objc class'

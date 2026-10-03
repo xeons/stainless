@@ -1060,6 +1060,14 @@ public sealed class Parser
         int start, Modifiers modifiers, IReadOnlyList<AttributeSyntax> attributes,
         List<Declaration> hoisted)
     {
+        if ((modifiers & Modifiers.Objc) != 0)
+        {
+            _diagnostics.Error("SL0923", SpanFrom(start),
+                "a record cannot be 'objc': 'with' copies an object field by field, and the " +
+                "Objective-C runtime makes one by 'alloc'");
+            modifiers &= ~(Modifiers.Objc | Modifiers.Extern);
+        }
+
         Advance();
 
         var kind = TypeDeclKind.Class;

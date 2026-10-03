@@ -71,6 +71,7 @@ public class LinkDiagnosisTests
     [InlineData("/home/me/case/loaded.c:29:10: fatal error: 'link.h' file not found\n" +
                 "   29 | #include <link.h>\n1 error generated.", "/home/me/case/loaded.c")]
     [InlineData(@"E:\case\shim.cpp:4:1: error: unknown type name 'widget'", @"E:\case\shim.cpp")]
+    [InlineData("/tmp/case/probe.m:81:12: error: call to undeclared function 'class_getName'", "/tmp/case/probe.m")]
     [InlineData("In file included from app.c:2:\ninclude/api.h:7:3: error: expected ';'", "include/api.h")]
     public void ACSourceErrorIsTheSourcesNotTheCompilers(string output, string file)
     {

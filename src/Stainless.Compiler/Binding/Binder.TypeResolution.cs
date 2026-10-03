@@ -301,19 +301,6 @@ public sealed partial class Binder
                     return ErrorTypeSymbol.Instance;
                 }
 
-                // A Stainless weak reference is a count in the object's header,
-                // which an Objective-C object has not got.
-                if (IsObjCType(referenced))
-                {
-                    diagnostics.Error("SL0912", syntax.Span,
-                        $"'{referenced.Name}' is an Objective-C object, and a weak reference to " +
-                        "one is not supported yet: a Stainless weak reference is counted in the " +
-                        "object's header, and an Objective-C object has none. Hold it strongly, " +
-                        "or hold something of your own that refers to it",
-                        referenced);
-                    return ErrorTypeSymbol.Instance;
-                }
-
                 return referenced.MakeWeakType();
             }
 

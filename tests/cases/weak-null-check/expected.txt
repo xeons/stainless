@@ -1,0 +1,3 @@
+held: false false true true
+gone: true true false false
+not another: false

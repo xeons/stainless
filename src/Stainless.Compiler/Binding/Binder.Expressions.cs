@@ -1795,6 +1795,13 @@ public sealed partial class Binder
     private (BoundExpression, BoundExpression) UnifyReferences(
         BoundExpression left, BoundExpression right, SourceSpan span)
     {
+        // A weak reference is compared as what it reads as: a dead one is
+        // null, though the slot still holds where the object was.
+        if (left.Type is WeakTypeSymbol leftWeak)
+            left = BindConversion(left, leftWeak.Element.MakeOptionalType(), span);
+        if (right.Type is WeakTypeSymbol rightWeak)
+            right = BindConversion(right, rightWeak.Element.MakeOptionalType(), span);
+
         if (left.Type is NullType) left = new BoundNullLiteral(span, right.Type);
         if (right.Type is NullType) right = new BoundNullLiteral(span, left.Type);
         return (left, right);

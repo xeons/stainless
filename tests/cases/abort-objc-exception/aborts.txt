@@ -1,0 +1,1 @@
+an Objective-C exception that reaches a method a Stainless class answers stops the program

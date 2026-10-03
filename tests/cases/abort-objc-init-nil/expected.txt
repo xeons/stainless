@@ -1,0 +1,2 @@
+making one
+stainless: '-[NSObject init]' answered nil, so the object could not be made

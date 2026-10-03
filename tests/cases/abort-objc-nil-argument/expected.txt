@@ -1,0 +1,2 @@
+sending nil
+stainless: '-[ObjCNilArgument.Greeter greet:]' was sent nil for 'other', and a ObjCNilArgument.NSObject is never nil

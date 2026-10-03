@@ -442,6 +442,11 @@ public sealed partial class LlvmEmitter
         Declare("sl_objc_nil", "declare void @sl_objc_nil(ptr, ptr) noreturn nounwind");
         Declare("sl_objc_unanswered", "declare void @sl_objc_unanswered(ptr) noreturn nounwind");
         Declare("sl_objc_cast_failed", "declare void @sl_objc_cast_failed(ptr, ptr) noreturn nounwind");
+        Declare("sl_objc_nil_argument", "declare void @sl_objc_nil_argument(ptr, ptr, ptr) noreturn nounwind");
+        Declare("sl_objc_exception", "declare void @sl_objc_exception(ptr) noreturn nounwind");
+        Declare("sl_objc_weak_new", "declare noalias ptr @sl_objc_weak_new(ptr) nounwind");
+        Declare("sl_objc_weak_load", "declare ptr @sl_objc_weak_load(ptr) nounwind");
+        Declare("sl_objc_init_replaced", "declare void @sl_objc_init_replaced(ptr, ptr) noreturn nounwind");
         Declare("sl_switch_unmatched", "declare void @sl_switch_unmatched(ptr) noreturn nounwind");
         Declare("sl_com_retain", "declare void @sl_com_retain(ptr)");
         Declare("sl_com_release", "declare void @sl_com_release(ptr)");

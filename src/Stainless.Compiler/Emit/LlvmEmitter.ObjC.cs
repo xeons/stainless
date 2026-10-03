@@ -38,7 +38,13 @@ public sealed partial class LlvmEmitter
     private readonly Dictionary<string, int> _classReferences = new(StringComparer.Ordinal);
 
     /// <summary>True for a reference counted by the Objective-C runtime, optional or not.</summary>
-    private static bool IsObjCReference(TypeSymbol type) => Binder.IsObjCType(type.AsReference() ?? type);
+    /// <remarks>Not a weak reference to one, which is a box counted by Stainless.</remarks>
+    private static bool IsObjCReference(TypeSymbol type) =>
+        type is not WeakTypeSymbol && Binder.IsObjCType(type.AsReference() ?? type);
+
+    /// <summary>A weak reference to an Objective-C object, which is a box rather than the object's pointer.</summary>
+    private static bool IsObjCWeak(TypeSymbol type) =>
+        type is WeakTypeSymbol { Element: var element } && Binder.IsObjCType(element.AsReference() ?? element);
 
     /// <summary>
     /// <c>BOOL</c> is <c>signed char</c> on Intel and <c>bool</c> on Apple
@@ -46,7 +52,14 @@ public sealed partial class LlvmEmitter
     /// </summary>
     private static bool BoolIsByte => TargetPlatform.Current.Architecture == TargetArch.X64;
 
-    private bool UsesObjC => _selectors.Count > 0 || _classReferences.Count > 0;
+    /// <summary>True once a message has been sent to a superclass.</summary>
+    private bool _sendsToSuper;
+
+    /// <summary>True once anything has been retained or released with libobjc's counting.</summary>
+    private bool _countsObjC;
+
+    private bool UsesObjC =>
+        _selectors.Count > 0 || _classReferences.Count > 0 || _definedObjCClasses.Count > 0 || _countsObjC;
 
     /// <summary>
     /// Sends the message a call to a member of an objc type stands for.
@@ -85,7 +98,23 @@ public sealed partial class LlvmEmitter
             receiver = EmitExpression(call.Receiver!).Ref;
         }
 
-        arguments.Add($"ptr {receiver}");
+        // `base.M()`: the search starts at the superclass, which objc_super
+        // names beside the receiver.
+        bool super = call.IsNonVirtual && !function.IsStatic;
+        if (super)
+        {
+            var superclass = (ClassTypeSymbol)(call.Receiver!.Type.AsReference() ?? call.Receiver.Type);
+            string frame = Alloca("{ ptr, ptr }", "send.super");
+            Line($"store ptr {receiver}, ptr {frame}");
+            string classSlot = Emit("ptr", $"getelementptr inbounds {{ ptr, ptr }}, ptr {frame}, i32 0, i32 1");
+            Line($"store ptr {Emit("ptr", $"load ptr, ptr {ClassReference(superclass)}")}, ptr {classSlot}");
+            arguments.Add($"ptr {frame}");
+        }
+        else
+        {
+            arguments.Add($"ptr {receiver}");
+        }
+
         string selector = Emit("ptr", $"load ptr, ptr {SelectorReference(function.Selector!)}");
         arguments.Add($"ptr {selector}");
 
@@ -96,7 +125,14 @@ public sealed partial class LlvmEmitter
 
         bool boolResult = BoolIsByte && IsBool(function.ReturnType);
         string spelling = boolResult ? "signext i8" : ResultSpelling(returnInfo);
-        string callee = stret ? "@objc_msgSend_stret" : "@objc_msgSend";
+        string callee = (super, stret) switch
+        {
+            (true, true) => "@objc_msgSendSuper_stret",
+            (true, false) => "@objc_msgSendSuper",
+            (false, true) => "@objc_msgSend_stret",
+            _ => "@objc_msgSend",
+        };
+        if (super) _sendsToSuper = true;
         string invocation = $"call {spelling} {callee}({string.Join(", ", arguments)})";
 
         string? result = null;
@@ -104,6 +140,11 @@ public sealed partial class LlvmEmitter
             Line(invocation);
         else
             result = Emit(boolResult ? "i8" : returnInfo.LlvmType, invocation);
+
+        // A constructor's `this` is the object alloc made, so the superclass's
+        // init MUST answer with it.
+        if (super && function.ConsumesSelf && _inObjCConstructor && result is not null)
+            RequireSameObject(result, receiver, function);
 
         // Straight after the send, before anything else can run: an object
         // handed back at +0 is only alive until the pool drains.
@@ -371,20 +412,37 @@ public sealed partial class LlvmEmitter
         foreach (var (name, index) in _classReferences)
         {
             string symbol = $"@\"OBJC_CLASS_$_{name}\"";
-            Declare(symbol, $"{symbol} = external global ptr");
+            if (!_definedObjCClasses.Contains(name))
+                Declare($"OBJC_CLASS_$_{name}", $"{symbol} = external global ptr");
             _module.AppendLine(
                 $"@sl.objc.classref.{index} = internal global ptr {symbol}, " +
                 "section \"__DATA,__objc_classrefs,regular,no_dead_strip\", align 8");
             used.Add($"@sl.objc.classref.{index}");
         }
 
-        _module.AppendLine(
-            $"@llvm.compiler.used = appending global [{used.Count} x ptr] " +
-            $"[{string.Join(", ", used.Select(u => "ptr " + u))}], section \"llvm.metadata\"");
+        used.AddRange(_objcCompilerUsed);
+        if (_objcUsed.Count > 0)
+            _module.AppendLine(
+                $"@llvm.used = appending global [{_objcUsed.Count} x ptr] " +
+                $"[{string.Join(", ", _objcUsed.Select(u => "ptr " + u))}], section \"llvm.metadata\"");
+
+        // Empty when the module only counts objects, which LLVM refuses.
+        if (used.Count > 0)
+            _module.AppendLine(
+                $"@llvm.compiler.used = appending global [{used.Count} x ptr] " +
+                $"[{string.Join(", ", used.Select(u => "ptr " + u))}], section \"llvm.metadata\"");
 
         Declare("objc_msgSend", "declare ptr @objc_msgSend(ptr, ptr, ...)");
         if (TargetPlatform.Current.Architecture == TargetArch.X64)
             Declare("objc_msgSend_stret", "declare void @objc_msgSend_stret(ptr, ptr, ...)");
+        if (_allocatesObjC)
+            Declare("objc_alloc", "declare ptr @objc_alloc(ptr) nounwind");
+        if (_sendsToSuper)
+        {
+            Declare("objc_msgSendSuper", "declare ptr @objc_msgSendSuper(ptr, ptr, ...)");
+            if (TargetPlatform.Current.Architecture == TargetArch.X64)
+                Declare("objc_msgSendSuper_stret", "declare void @objc_msgSendSuper_stret(ptr, ptr, ...)");
+        }
         Declare("objc_retain", "declare ptr @objc_retain(ptr) nounwind");
         Declare("objc_release", "declare void @objc_release(ptr) nounwind");
         Declare("objc_retainAutoreleasedReturnValue",

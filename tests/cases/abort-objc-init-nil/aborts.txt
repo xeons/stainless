@@ -1,0 +1,1 @@
+a superclass init that answers nil inside a constructor stops the program
