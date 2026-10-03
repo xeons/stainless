@@ -81,4 +81,44 @@ public static class Recursion
         failure?.Throw();
         return result;
     }
+
+    /// <summary>
+    /// Runs <paramref name="work"/> for every index below
+    /// <paramref name="count"/>, on up to a thread per processor, each with
+    /// the stack <see cref="OnADeepStack"/> gives. The pool's threads would do
+    /// the same work on a stack too shallow for <see cref="MaxDepth"/>.
+    ///
+    /// What one index threw is rethrown after all have run: the lowest index's,
+    /// so the same input fails the same way however the threads were scheduled.
+    /// </summary>
+    public static void ForEachOnDeepStacks(int count, Action<int> work)
+    {
+        var failures = new System.Runtime.ExceptionServices.ExceptionDispatchInfo?[count];
+        int next = -1;
+
+        void Drain()
+        {
+            int index;
+            while ((index = Interlocked.Increment(ref next)) < count)
+            {
+                try { work(index); }
+                catch (Exception e)
+                {
+                    failures[index] = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(e);
+                }
+            }
+        }
+
+        var threads = new Thread[Math.Min(count, Environment.ProcessorCount)];
+        for (int i = 0; i < threads.Length; i++)
+        {
+            threads[i] = new Thread(Drain, StackBytes);
+            threads[i].Start();
+        }
+        foreach (var thread in threads)
+            thread.Join();
+
+        foreach (var failure in failures)
+            failure?.Throw();
+    }
 }

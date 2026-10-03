@@ -658,7 +658,7 @@ public sealed class Compilation
 
         // Every file is lexed, and a library file is parsed only if the program
         // reaches its module. See LibraryClosure.
-        var libraryFiles = new List<LexedSource>();
+        var libraryTexts = new List<SourceText>();
         foreach (var (name, text) in StandardLibrary.Sources())
         {
             string path = name;
@@ -685,24 +685,24 @@ public sealed class Compilation
                 }
             }
 
-            libraryFiles.Add(LexedSource.Of(new SourceText(path, text), diagnostics, symbols));
+            libraryTexts.Add(new SourceText(path, text));
         }
 
-        var own = new List<LexedSource>();
+        var ownTexts = new List<SourceText>();
         foreach (string path in options.SourcePaths)
         {
-            SourceText source;
             try
             {
-                source = SourceText.FromFile(path);
+                ownTexts.Add(SourceText.FromFile(path));
             }
             catch (IOException e)
             {
                 return Failure($"could not read '{path}': {e.Message}");
             }
-
-            own.Add(LexedSource.Of(source, diagnostics, symbols));
         }
+
+        var libraryFiles = LexEach(libraryTexts, diagnostics, symbols);
+        var own = LexEach(ownTexts, diagnostics, symbols);
 
         // Documentation of the library wants all of it, and a referenced
         // library's metadata can name a standard type its consumer never
@@ -716,15 +716,13 @@ public sealed class Compilation
             libraryFiles = reachedFiles;
         }
 
-        foreach (var file in libraryFiles)
-            units.Add(file.Parse(diagnostics));
+        units.AddRange(ParseEach(libraryFiles, diagnostics));
 
         // Everything after this point is the program's own, which is what a
         // library's metadata describes.
         int standardUnits = units.Count;
 
-        foreach (var file in own)
-            units.Add(file.Parse(diagnostics));
+        units.AddRange(ParseEach(own, diagnostics));
 
         ReportPhase("parse", parsing);
         if (diagnostics.HasErrors) return Failed(diagnostics);
@@ -1362,6 +1360,42 @@ public sealed class Compilation
     /// programmer's business, and guessing it from an optimisation level would
     /// be a rule nobody asked for.
     /// </summary>
+    /// <summary>
+    /// Every source lexed at once. Each file reports into a bag of its own and
+    /// the bags are added in the order the files came, so what is reported,
+    /// and in what order, does not depend on which thread finished first.
+    /// </summary>
+    private static List<LexedSource> LexEach(
+        List<SourceText> sources, DiagnosticBag diagnostics, IReadOnlyCollection<string> symbols)
+    {
+        var lexed = new LexedSource[sources.Count];
+        var bags = new DiagnosticBag[sources.Count];
+        Source.Recursion.ForEachOnDeepStacks(sources.Count, i =>
+        {
+            bags[i] = new DiagnosticBag();
+            lexed[i] = LexedSource.Of(sources[i], bags[i], symbols);
+        });
+        foreach (var bag in bags)
+            diagnostics.AddRange(bag);
+        return [.. lexed];
+    }
+
+    /// <summary>Every lexed file parsed at once, reporting as <see cref="LexEach"/> does.</summary>
+    private static List<CompilationUnitSyntax> ParseEach(
+        List<LexedSource> files, DiagnosticBag diagnostics)
+    {
+        var parsed = new CompilationUnitSyntax[files.Count];
+        var bags = new DiagnosticBag[files.Count];
+        Source.Recursion.ForEachOnDeepStacks(files.Count, i =>
+        {
+            bags[i] = new DiagnosticBag();
+            parsed[i] = files[i].Parse(bags[i]);
+        });
+        foreach (var bag in bags)
+            diagnostics.AddRange(bag);
+        return [.. parsed];
+    }
+
     private static HashSet<string> BuildSymbols(CompilationOptions options) =>
         PlatformSymbols(options.Defines, options.Target);
 

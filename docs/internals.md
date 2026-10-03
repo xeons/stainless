@@ -200,7 +200,7 @@ directory, and then on `PATH`.
 ```
   .sl sources
       |
-      v   Lexer -> Parser                       one file at a time, no #include
+      v   Lexer -> Parser                       each file alone, all at once; no #include
    syntax trees
       |
       v   Binder, in eleven whole-program passes:

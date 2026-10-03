@@ -39,6 +39,9 @@ public sealed class Lexer(
     private readonly string _text = source.Text;
     private int _pos;
 
+    /// <summary>One string per distinct name in the file, rather than one per occurrence.</summary>
+    private readonly HashSet<string> _names = new(StringComparer.Ordinal);
+
     /// <summary>Symbols <c>#if</c> tests: the build's, plus any <c>#define</c>d here.</summary>
     private readonly HashSet<string> _symbols =
         new(symbols ?? [], StringComparer.Ordinal);
@@ -329,7 +332,7 @@ public sealed class Lexer(
         _pos++;                                             // the '@'
         int nameStart = _pos;
         while (_pos < _text.Length && (char.IsLetterOrDigit(Current) || Current == '_')) _pos++;
-        return new Token(TokenKind.Identifier, SpanFrom(start), _text[nameStart.._pos])
+        return new Token(TokenKind.Identifier, SpanFrom(start), NameAt(nameStart))
         {
             IsVerbatim = true,
         };
@@ -757,10 +760,11 @@ public sealed class Lexer(
     private Token LexIdentifierOrKeyword(int start)
     {
         while (_pos < _text.Length && (char.IsLetterOrDigit(Current) || Current == '_')) _pos++;
-        string text = _text[start.._pos];
-        var kind = TokenKindExtensions.Keywords.TryGetValue(text, out var kw)
-            ? kw
-            : TokenKind.Identifier;
+        if (!KeywordsBySpelling.TryGetValue(_text.AsSpan(start, _pos - start), out string? text, out var kind))
+        {
+            text = NameAt(start);
+            kind = TokenKind.Identifier;
+        }
         object? value = kind switch
         {
             TokenKind.TrueKeyword => true,
@@ -1602,16 +1606,28 @@ public sealed class Lexer(
     private static int HexValue(char c) =>
         c <= '9' ? c - '0' : (char.ToLowerInvariant(c) - 'a' + 10);
 
+    /// <summary>The name from <paramref name="start"/> to here, the same string each time it recurs.</summary>
+    private string NameAt(int start)
+    {
+        var spelled = _names.GetAlternateLookup<ReadOnlySpan<char>>();
+        var name = _text.AsSpan(start, _pos - start);
+        if (spelled.TryGetValue(name, out string? known))
+            return known;
+        string made = name.ToString();
+        _names.Add(made);
+        return made;
+    }
+
     private Token LexPunctuation(int start)
     {
         // Longest match wins, so '<<=' beats '<<' beats '<'.
         for (int len = MaxPunctuationLength; len >= 1; len--)
         {
             if (start + len > _text.Length) continue;
-            if (Punctuation.TryGetValue(_text.Substring(start, len), out var kind))
+            if (PunctuationBySpelling.TryGetValue(_text.AsSpan(start, len), out string? spelling, out var kind))
             {
                 _pos = start + len;
-                return new Token(kind, SpanFrom(start), _text[start.._pos]);
+                return new Token(kind, SpanFrom(start), spelling);
             }
         }
 
@@ -1627,4 +1643,13 @@ public sealed class Lexer(
             .ToDictionary(p => p.Text!, p => p.Kind, StringComparer.Ordinal);
 
     private static readonly int MaxPunctuationLength = Punctuation.Keys.Max(k => k.Length);
+
+    // Looked up by span, so finding a token's kind allocates nothing, and the
+    // table's own string becomes the token's text.
+    private static readonly Dictionary<string, TokenKind>.AlternateLookup<ReadOnlySpan<char>> PunctuationBySpelling =
+        Punctuation.GetAlternateLookup<ReadOnlySpan<char>>();
+
+    private static readonly Dictionary<string, TokenKind>.AlternateLookup<ReadOnlySpan<char>> KeywordsBySpelling =
+        new Dictionary<string, TokenKind>(TokenKindExtensions.Keywords, StringComparer.Ordinal)
+            .GetAlternateLookup<ReadOnlySpan<char>>();
 }
