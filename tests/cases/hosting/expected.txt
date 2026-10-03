@@ -1,0 +1,12 @@
+info: HostingCase.Greeter[0]
+      greeter started
+lifetime: started
+info: HostingCase.Ticker[0]
+      three ticks; stopping the host
+lifetime: stopping
+info: HostingCase.Ticker[0]
+      ticker finished
+info: HostingCase.Greeter[0]
+      greeter stopped
+lifetime: stopped
+exit 7

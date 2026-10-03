@@ -32,6 +32,11 @@ public sealed class ServiceCollection
 {
     List<IServiceDescriptor> _descriptors = new List<IServiceDescriptor>();
 
+    /// What a library keeps beside these registrations while they are made,
+    /// by a key of its choosing -- `Standard.Options` keeps each type's
+    /// builder here, so configuring a type twice adds to one.
+    public Dictionary<int, IServiceCollectionState> State = new Dictionary<int, IServiceCollectionState>();
+
     /// How many registrations there are.
     public nuint Count => _descriptors.Count;
 
@@ -212,6 +217,11 @@ public sealed class ServiceCollection
         _descriptors.Add(descriptor);
         return this;
     }
+}
+
+/// Something a library keeps in `ServiceCollection.State`.
+public interface IServiceCollectionState
+{
 }
 
 /// What `BuildServiceProvider` found wrong, every problem at once.

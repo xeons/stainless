@@ -32,7 +32,7 @@ the latest made first. Singletons go with the root provider.
 
 ## Contents
 
-**Types** &nbsp; [ActivatorUtilities](#activatorutilities-class) &middot; [DefaultImplementation](#defaultimplementation-attribute) &middot; [IServiceDescriptor](#iservicedescriptor-interface) &middot; [ServiceCollection](#servicecollection-class) &middot; [ServiceDependency](#servicedependency-struct) &middot; [ServiceDependencyVisitor](#servicedependencyvisitor-class) &middot; [ServiceDescriptor&lt;T&gt;](#servicedescriptort-class) &middot; [ServiceKey&lt;T&gt;](#servicekeyt-class) &middot; [ServiceLifetime](#servicelifetime-enum) &middot; [ServiceProvider](#serviceprovider-class) &middot; [ServiceProviderError](#serviceprovidererror-class) &middot; [ServiceScope](#servicescope-class)
+**Types** &nbsp; [ActivatorUtilities](#activatorutilities-class) &middot; [DefaultImplementation](#defaultimplementation-attribute) &middot; [IServiceCollectionState](#iservicecollectionstate-interface) &middot; [IServiceDescriptor](#iservicedescriptor-interface) &middot; [ServiceCollection](#servicecollection-class) &middot; [ServiceDependency](#servicedependency-struct) &middot; [ServiceDependencyVisitor](#servicedependencyvisitor-class) &middot; [ServiceDescriptor&lt;T&gt;](#servicedescriptort-class) &middot; [ServiceKey&lt;T&gt;](#servicekeyt-class) &middot; [ServiceLifetime](#servicelifetime-enum) &middot; [ServiceProvider](#serviceprovider-class) &middot; [ServiceProviderError](#serviceprovidererror-class) &middot; [ServiceScope](#servicescope-class)
 
 ## Types
 
@@ -148,6 +148,16 @@ made by the compiler.
 
 <sub>[stdlib/DependencyInjection/DependencyInjection.sl:80](../../stdlib/DependencyInjection/DependencyInjection.sl#L80)</sub>
 
+### IServiceCollectionState *interface*
+
+```
+interface IServiceCollectionState
+```
+
+Something a library keeps in `ServiceCollection.State`.
+
+<sub>[stdlib/DependencyInjection/ServiceCollection.sl:223](../../stdlib/DependencyInjection/ServiceCollection.sl#L223)</sub>
+
 ### IServiceDescriptor *interface*
 
 ```
@@ -224,6 +234,18 @@ type nothing has registered yet.
 
 <sub>[stdlib/DependencyInjection/ServiceCollection.sl:31](../../stdlib/DependencyInjection/ServiceCollection.sl#L31)</sub>
 
+#### State *field*
+
+```
+Dictionary<int, IServiceCollectionState> State
+```
+
+What a library keeps beside these registrations while they are made,
+by a key of its choosing -- `Standard.Options` keeps each type's
+builder here, so configuring a type twice adds to one.
+
+<sub>[stdlib/DependencyInjection/ServiceCollection.sl:38](../../stdlib/DependencyInjection/ServiceCollection.sl#L38)</sub>
+
 #### Count *property*
 
 ```
@@ -232,7 +254,7 @@ nuint Count { get; }
 
 How many registrations there are.
 
-<sub>[stdlib/DependencyInjection/ServiceCollection.sl:36](../../stdlib/DependencyInjection/ServiceCollection.sl#L36)</sub>
+<sub>[stdlib/DependencyInjection/ServiceCollection.sl:41](../../stdlib/DependencyInjection/ServiceCollection.sl#L41)</sub>
 
 #### Descriptors *property*
 
@@ -242,7 +264,7 @@ List<IServiceDescriptor> Descriptors { get; }
 
 The registrations, in the order they were added.
 
-<sub>[stdlib/DependencyInjection/ServiceCollection.sl:39](../../stdlib/DependencyInjection/ServiceCollection.sl#L39)</sub>
+<sub>[stdlib/DependencyInjection/ServiceCollection.sl:44](../../stdlib/DependencyInjection/ServiceCollection.sl#L44)</sub>
 
 #### Contains *method*
 
@@ -253,7 +275,7 @@ bool Contains<TService>()
 
 Whether anything is registered as a `TService`.
 
-<sub>[stdlib/DependencyInjection/ServiceCollection.sl:42](../../stdlib/DependencyInjection/ServiceCollection.sl#L42)</sub>
+<sub>[stdlib/DependencyInjection/ServiceCollection.sl:47](../../stdlib/DependencyInjection/ServiceCollection.sl#L47)</sub>
 
 #### AddSingleton *method*
 
@@ -265,7 +287,7 @@ ServiceCollection AddSingleton<TService, TImplementation>()
 
 One `TImplementation` for the provider's life, answered for `TService`.
 
-<sub>[stdlib/DependencyInjection/ServiceCollection.sl:57](../../stdlib/DependencyInjection/ServiceCollection.sl#L57)</sub>
+<sub>[stdlib/DependencyInjection/ServiceCollection.sl:62](../../stdlib/DependencyInjection/ServiceCollection.sl#L62)</sub>
 
 #### AddSingleton *method*
 
@@ -276,7 +298,7 @@ ServiceCollection AddSingleton<TService>()
 
 One `TService` for the provider's life: a class registered as itself.
 
-<sub>[stdlib/DependencyInjection/ServiceCollection.sl:63](../../stdlib/DependencyInjection/ServiceCollection.sl#L63)</sub>
+<sub>[stdlib/DependencyInjection/ServiceCollection.sl:68](../../stdlib/DependencyInjection/ServiceCollection.sl#L68)</sub>
 
 #### AddSingleton *method*
 
@@ -288,7 +310,7 @@ ServiceCollection AddSingleton<TService>(Func<ServiceProvider, TService> factory
 One `TService` for the provider's life, made by `factory` the first
 time it is asked for.
 
-<sub>[stdlib/DependencyInjection/ServiceCollection.sl:69](../../stdlib/DependencyInjection/ServiceCollection.sl#L69)</sub>
+<sub>[stdlib/DependencyInjection/ServiceCollection.sl:74](../../stdlib/DependencyInjection/ServiceCollection.sl#L74)</sub>
 
 #### AddSingletonInstance *method*
 
@@ -300,7 +322,7 @@ ServiceCollection AddSingletonInstance<TService>(TService instance)
 `instance`, answered for `TService`. A provider does not dispose what it
 was given.
 
-<sub>[stdlib/DependencyInjection/ServiceCollection.sl:75](../../stdlib/DependencyInjection/ServiceCollection.sl#L75)</sub>
+<sub>[stdlib/DependencyInjection/ServiceCollection.sl:80](../../stdlib/DependencyInjection/ServiceCollection.sl#L80)</sub>
 
 #### AddScoped *method*
 
@@ -312,7 +334,7 @@ ServiceCollection AddScoped<TService, TImplementation>()
 
 One `TImplementation` per scope, answered for `TService`.
 
-<sub>[stdlib/DependencyInjection/ServiceCollection.sl:87](../../stdlib/DependencyInjection/ServiceCollection.sl#L87)</sub>
+<sub>[stdlib/DependencyInjection/ServiceCollection.sl:92](../../stdlib/DependencyInjection/ServiceCollection.sl#L92)</sub>
 
 #### AddScoped *method*
 
@@ -323,7 +345,7 @@ ServiceCollection AddScoped<TService>()
 
 One `TService` per scope.
 
-<sub>[stdlib/DependencyInjection/ServiceCollection.sl:93](../../stdlib/DependencyInjection/ServiceCollection.sl#L93)</sub>
+<sub>[stdlib/DependencyInjection/ServiceCollection.sl:98](../../stdlib/DependencyInjection/ServiceCollection.sl#L98)</sub>
 
 #### AddScoped *method*
 
@@ -334,7 +356,7 @@ ServiceCollection AddScoped<TService>(Func<ServiceProvider, TService> factory)
 
 One `TService` per scope, made by `factory`.
 
-<sub>[stdlib/DependencyInjection/ServiceCollection.sl:98](../../stdlib/DependencyInjection/ServiceCollection.sl#L98)</sub>
+<sub>[stdlib/DependencyInjection/ServiceCollection.sl:103](../../stdlib/DependencyInjection/ServiceCollection.sl#L103)</sub>
 
 #### AddTransient *method*
 
@@ -346,7 +368,7 @@ ServiceCollection AddTransient<TService, TImplementation>()
 
 A new `TImplementation` each time a `TService` is asked for.
 
-<sub>[stdlib/DependencyInjection/ServiceCollection.sl:105](../../stdlib/DependencyInjection/ServiceCollection.sl#L105)</sub>
+<sub>[stdlib/DependencyInjection/ServiceCollection.sl:110](../../stdlib/DependencyInjection/ServiceCollection.sl#L110)</sub>
 
 #### AddTransient *method*
 
@@ -357,7 +379,7 @@ ServiceCollection AddTransient<TService>()
 
 A new `TService` each time.
 
-<sub>[stdlib/DependencyInjection/ServiceCollection.sl:111](../../stdlib/DependencyInjection/ServiceCollection.sl#L111)</sub>
+<sub>[stdlib/DependencyInjection/ServiceCollection.sl:116](../../stdlib/DependencyInjection/ServiceCollection.sl#L116)</sub>
 
 #### AddTransient *method*
 
@@ -368,7 +390,7 @@ ServiceCollection AddTransient<TService>(Func<ServiceProvider, TService> factory
 
 A new `TService` from `factory` each time.
 
-<sub>[stdlib/DependencyInjection/ServiceCollection.sl:116](../../stdlib/DependencyInjection/ServiceCollection.sl#L116)</sub>
+<sub>[stdlib/DependencyInjection/ServiceCollection.sl:121](../../stdlib/DependencyInjection/ServiceCollection.sl#L121)</sub>
 
 #### TryAddSingleton *method*
 
@@ -380,7 +402,7 @@ ServiceCollection TryAddSingleton<TService, TImplementation>()
 
 `AddSingleton<TService, TImplementation>`, unless a `TService` is registered.
 
-<sub>[stdlib/DependencyInjection/ServiceCollection.sl:123](../../stdlib/DependencyInjection/ServiceCollection.sl#L123)</sub>
+<sub>[stdlib/DependencyInjection/ServiceCollection.sl:128](../../stdlib/DependencyInjection/ServiceCollection.sl#L128)</sub>
 
 #### TryAddScoped *method*
 
@@ -392,7 +414,7 @@ ServiceCollection TryAddScoped<TService, TImplementation>()
 
 `AddScoped<TService, TImplementation>`, unless a `TService` is registered.
 
-<sub>[stdlib/DependencyInjection/ServiceCollection.sl:133](../../stdlib/DependencyInjection/ServiceCollection.sl#L133)</sub>
+<sub>[stdlib/DependencyInjection/ServiceCollection.sl:138](../../stdlib/DependencyInjection/ServiceCollection.sl#L138)</sub>
 
 #### TryAddTransient *method*
 
@@ -404,7 +426,7 @@ ServiceCollection TryAddTransient<TService, TImplementation>()
 
 `AddTransient<TService, TImplementation>`, unless a `TService` is registered.
 
-<sub>[stdlib/DependencyInjection/ServiceCollection.sl:143](../../stdlib/DependencyInjection/ServiceCollection.sl#L143)</sub>
+<sub>[stdlib/DependencyInjection/ServiceCollection.sl:148](../../stdlib/DependencyInjection/ServiceCollection.sl#L148)</sub>
 
 #### TryAddSingleton *method*
 
@@ -415,7 +437,7 @@ ServiceCollection TryAddSingleton<TService>(Func<ServiceProvider, TService> fact
 
 `AddSingleton<TService>(factory)`, unless a `TService` is registered.
 
-<sub>[stdlib/DependencyInjection/ServiceCollection.sl:153](../../stdlib/DependencyInjection/ServiceCollection.sl#L153)</sub>
+<sub>[stdlib/DependencyInjection/ServiceCollection.sl:158](../../stdlib/DependencyInjection/ServiceCollection.sl#L158)</sub>
 
 #### BuildServiceProvider *method*
 
@@ -428,7 +450,7 @@ constructor's needs are registered, that no singleton depends on a
 scoped service, and that nothing depends on itself. What fails is a
 `ServiceProviderError` listing every problem found.
 
-<sub>[stdlib/DependencyInjection/ServiceCollection.sl:167](../../stdlib/DependencyInjection/ServiceCollection.sl#L167)</sub>
+<sub>[stdlib/DependencyInjection/ServiceCollection.sl:172](../../stdlib/DependencyInjection/ServiceCollection.sl#L172)</sub>
 
 #### BuildServiceProvider *method*
 
@@ -439,7 +461,7 @@ Result<ServiceProvider, ServiceProviderError> BuildServiceProvider(bool validate
 The same, with the checks skipped when `validateOnBuild` is false, as
 .NET's option of that name does.
 
-<sub>[stdlib/DependencyInjection/ServiceCollection.sl:172](../../stdlib/DependencyInjection/ServiceCollection.sl#L172)</sub>
+<sub>[stdlib/DependencyInjection/ServiceCollection.sl:177](../../stdlib/DependencyInjection/ServiceCollection.sl#L177)</sub>
 
 ### ServiceDependency *struct*
 
@@ -741,7 +763,7 @@ sealed class ServiceProviderError
 
 What `BuildServiceProvider` found wrong, every problem at once.
 
-<sub>[stdlib/DependencyInjection/ServiceCollection.sl:218](../../stdlib/DependencyInjection/ServiceCollection.sl#L218)</sub>
+<sub>[stdlib/DependencyInjection/ServiceCollection.sl:228](../../stdlib/DependencyInjection/ServiceCollection.sl#L228)</sub>
 
 #### Problems *field*
 
@@ -751,7 +773,7 @@ List<String> Problems
 
 One sentence per problem.
 
-<sub>[stdlib/DependencyInjection/ServiceCollection.sl:221](../../stdlib/DependencyInjection/ServiceCollection.sl#L221)</sub>
+<sub>[stdlib/DependencyInjection/ServiceCollection.sl:231](../../stdlib/DependencyInjection/ServiceCollection.sl#L231)</sub>
 
 #### Message *property*
 
@@ -761,7 +783,7 @@ String Message { get; }
 
 Every problem, one per line.
 
-<sub>[stdlib/DependencyInjection/ServiceCollection.sl:229](../../stdlib/DependencyInjection/ServiceCollection.sl#L229)</sub>
+<sub>[stdlib/DependencyInjection/ServiceCollection.sl:239](../../stdlib/DependencyInjection/ServiceCollection.sl#L239)</sub>
 
 ### ServiceScope *class*
 

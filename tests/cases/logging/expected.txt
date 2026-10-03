@@ -1,0 +1,19 @@
+dbug: LoggingCase.Worker[0]
+      debugging
+info: LoggingCase.Worker[0]
+      working
+      on two lines
+warn: LoggingCase.Worker[0]
+      careful
+fail: LoggingCase.Noisy[0]
+      let through
+noisy warning enabled false
+crit: Direct[0]
+      from the factory
+captured:
+  Debug LoggingCase.Worker: debugging
+  Information LoggingCase.Worker: working
+on two lines
+  Warning LoggingCase.Worker: careful
+  Error LoggingCase.Noisy: let through
+  Critical Direct: from the factory

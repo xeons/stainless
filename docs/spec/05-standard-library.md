@@ -31,7 +31,7 @@ so LLVM and the linker drop what the program's own code leaves unused.
 | Module | Contents | Imported |
 |---|---|---|
 | `Standard.Text` | `String`, `StringBuilder`, `Utf16String`, conversions | automatically |
-| `Standard.Console` | `Write`, `WriteLine`, `WriteError`, `ReadLine`, `ReadToEnd` | on request |
+| `Standard.Console` | `Write`, `WriteLine`, `WriteError`, `ReadLine`, `ReadToEnd`, `IsOutputRedirected`, `EnableTerminalColors` | on request |
 | `Standard.Collections` | the interfaces below, and every container | on request |
 | `Standard.Concurrent` | the containers several threads may share | on request |
 | `Standard.Threading` | `Mutex<T>`, atomics, the job pool | on request |
@@ -54,7 +54,11 @@ so LLVM and the linker drop what the program's own code leaves unused.
 | `Standard.Net` | TCP and UDP sockets, the same on every platform: a connect tries every address a name resolves to, within a limit if given; an accepted socket blocks whatever its listener does; no socket is inherited by a child process; a UDP receive is not failed by an earlier send to a closed port | on request |
 | `Standard.Net.Security` | TLS 1.3 and 1.2, client and server, over any stream ([§5.17](#517-standardnetsecurity)) | on request |
 | `Standard.Net.Http` | an HTTP/1.1 and HTTP/2 client: pooled and multiplexed connections, redirects, cookies, decompression, proxies ([§5.18](#518-standardnethttp)) | on request |
-| `Standard.DependencyInjection` | a service container, its constructor calls written by the compiler ([§5.19](#519-standarddependencyinjection)) | on request |
+| `Standard.DependencyInjection` | a service container, its constructor calls written by the compiler ([section 5.19](#519-standarddependencyinjection)) | on request |
+| `Standard.Configuration` | settings from JSON files, the environment and the command line, bound onto a type ([section 5.20](#520-standardconfiguration-and-standardoptions)) | on request |
+| `Standard.Options` | settings as a typed service, `IOptions<T>` ([section 5.20](#520-standardconfiguration-and-standardoptions)) | on request |
+| `Standard.Logging` | `ILogger<T>`, levels and categories, a console provider ([section 5.21](#521-standardlogging)) | on request |
+| `Standard.Hosting` | a host that runs services until Ctrl-C ([section 5.22](#522-standardhosting)) | on request |
 | `Standard.Env` | the command line, the environment, the working directory | on request |
 | `Standard.Time` | `DateTimeOffset`, `TimeSpan`, `DateTime` and the monotonic `Stopwatch` | on request |
 | `Standard.Random` | xoshiro256**, seeded by you or by the operating system | on request |
@@ -1587,6 +1591,103 @@ that are `IDisposable`, the latest made first; the root does the same for
 singletons. An instance given to `AddSingletonInstance` is the caller's, and
 is not disposed. A singleton that keeps the provider that made it would keep
 both alive for ever under reference counting, and `Dispose` is what breaks it.
+
+## 5.20 `Standard.Configuration` and `Standard.Options`
+
+```csharp
+var configuration = try new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json", optional: true)
+    .AddEnvironmentVariables("APP_")            // APP_Mail__Port=2525 is Mail:Port
+    .AddCommandLine(args)                       // --Mail:Port=2525, /Mail:Port 2525
+    .Build();
+
+String? host = configuration.GetValue("Mail:Host");
+services.Configure<MailOptions>(configuration.GetSection("Mail"));
+```
+
+.NET's configuration: **a tree of text, keyed by paths** joined with `:`,
+built from sources in order, a later one's value replacing an earlier one's.
+A JSON object's members and an array's indexes become parts of the path. Keys
+are compared without regard to ASCII case, and keep the spelling they were
+first written with.
+
+**Binding is reflection.** `ConfigurationBinder.Bind<T>(section, target)`
+sets each writable property of a `[Reflect]` class that a key names, parsing
+the text for the property's type -- an integer, a floating number, `true` or
+`false`, a `String`, or an enum's member name. A nested `[Reflect]` class is
+bound in place, so its object MUST already exist; a list cannot be bound,
+because nothing in the metadata can call `Add`. A value that does not parse is
+a `ConfigurationError` naming its key: `'Mail:Port' is 'eighty', which is not
+an integer`.
+
+**Options are settings as a service.** `services.Configure<T>(section)`
+registers `IOptions<T>`, whose `Value` is made the first time a service asks:
+the parameterless constructor sets the defaults, then each bound section and
+`Configure` action in turn, then each `Validate` check, any of which failing
+stops the program with its message. `services.AddOptions<T>()` answers the
+builder those steps are added to, and configuring a type twice adds to it.
+Both are free functions written as methods, by
+[section 7.1.1](07-functions-members.md#711-xfy-is-fx-y).
+
+## 5.21 `Standard.Logging`
+
+```csharp
+services.AddLogging((LoggingBuilder logging) =>
+    logging.AddConsole()
+           .SetMinimumLevel(LogLevel.Debug)
+           .AddFilter("App.Noisy", LogLevel.Warning));
+
+public Worker(ILogger<Worker> logger) => logger.LogInformation("started");
+```
+
+.NET's logging, without message templates or scopes: **a message is text**,
+built by interpolation where it is written. `ILogger<T>` writes under `T`'s
+qualified name, and nothing registers it: the interface is marked
+`[DefaultImplementation("Standard.Logging.Logger")]`, so `GetService` makes a
+`Logger<T>` for whatever `T` a constructor names
+([section 5.19](#519-standarddependencyinjection)). A category's minimum level is the
+longest matching prefix rule's, or the builder's minimum, `Information` unless
+set; `AddConfiguration` reads both from a `LogLevel` section as .NET does.
+
+The console provider writes .NET's simple format, `info: App.Worker[0]` and
+then the message indented on the next line, as one write, so messages from two
+threads never interleave. The level is coloured only where
+`Console.EnableTerminalColors()` says escapes will show -- a terminal, with a
+Windows console asked to interpret them -- and is plain in a file or a pipe.
+
+## 5.22 `Standard.Hosting`
+
+```csharp
+public int Main(String[] args)
+{
+    var builder = Host.CreateApplicationBuilder(args);
+    builder.Services.Configure<WorkerOptions>(builder.Configuration.GetSection("Worker"));
+    builder.Services.AddHostedService<Worker>();
+    var host = try builder.Build();
+    return host.Run();
+}
+```
+
+.NET's Generic Host. `CreateApplicationBuilder` reads `appsettings.json`,
+then `appsettings.{Environment}.json` -- the environment is
+`STAINLESS_ENVIRONMENT`, `Production` unless set -- then environment
+variables, then the command line, and sets up console logging from the
+`Logging` section. `Build` registers the configuration, the environment, the
+`IHostApplicationLifetime` and the logger factory, and checks the
+registrations as `BuildServiceProvider` does.
+
+`Run` starts every `IHostedService` in the order registered, waits for Ctrl-C,
+`SIGTERM` or `StopApplication` ([section 5.9.1](#591-standardprocess)), stops them in
+the reverse order within `ShutdownTimeout` -- five seconds unless set -- lets
+go of every service, and **answers the exit code** for `Main` to return: 0,
+or what a service set on the lifetime. There is no process-exit call to make
+instead, so a host ends the way every program does.
+
+**There is no `async`.** A `BackgroundService` runs `Execute` on a thread of
+its own, and `stopping.WaitFor(milliseconds)` is its loop: it sleeps, and
+wakes the moment the host stops. A service that does not return within the
+timeout is let go of rather than waited for. `samples/hosting` is a worker
+service to start from.
 
 ---
 

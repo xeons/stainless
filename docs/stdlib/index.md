@@ -11,6 +11,7 @@ One page per module. Each lists every public type, function, property, case and 
 | [Standard.Bits](Standard-Bits.md) | Counting bits and rotating them. |
 | [Standard.Collections](Standard-Collections.md) | Reducing a sequence to one value: LINQ's `Sum`, `Average`, `Min`, `Max`, |
 | [Standard.Concurrent](Standard-Concurrent.md) | Collections more than one thread may hold at once. |
+| [Standard.Configuration](Standard-Configuration.md) | Settings gathered from files, the environment and the command line into one |
 | [Standard.Console](Standard-Console.md) | Standard input and output, as text. |
 | [Standard.Convert](Standard-Convert.md) | Turning things into other things: bytes into text, text into numbers. |
 | [Standard.DependencyInjection](Standard-DependencyInjection.md) | A container that makes a program's services and hands each what its |
@@ -20,16 +21,19 @@ One page per module. Each lists every public type, function, property, case and 
 | [Standard.Env](Standard-Env.md) | What the program was started with and what surrounds it. |
 | [Standard.File](Standard-File.md) | Whole-file operations. |
 | [Standard.Formats.Asn1](Standard-Formats-Asn1.md) | ASN.1 values in BER and DER, as X.509, PKCS and TLS carry them. |
+| [Standard.Hosting](Standard-Hosting.md) | A program that runs services until it is told to stop. .NET's Generic |
 | [Standard.IO](Standard-IO.md) | Streams, and the vocabulary the rest of the I/O modules share. |
 | [Standard.IO.Compression](Standard-IO-Compression.md) | Deflate, gzip and zlib: RFC 1951, 1952 and 1950, as streams and as |
 | [Standard.Json](Standard-Json.md) | JSON, in two layers. |
 | [Standard.Limits](Standard-Limits.md) | What each number type holds. |
+| [Standard.Logging](Standard-Logging.md) | Messages from a program's parts, filtered by level and category and |
 | [Standard.Math](Standard-Math.md) | Arithmetic that is not an operator. |
 | [Standard.Media.Audio](Standard-Media-Audio.md) | Sound out of the machine, and sound into it. |
 | [Standard.Net](Standard-Net.md) | Sockets, the same on every platform. |
 | [Standard.Net.Http](Standard-Net-Http.md) | An HTTP/1.1 and HTTP/2 client, over TCP or TLS, as `System.Net.Http`. |
 | [Standard.Net.Security](Standard-Net-Security.md) | TLS 1.3 and TLS 1.2, client and server, in Stainless and over any stream. |
 | [Standard.ObjC](Standard-ObjC.md) | Objective-C's runtime, for a program built for macOS. |
+| [Standard.Options](Standard-Options.md) | Settings as a typed object a service asks for. .NET's |
 | [Standard.Path](Standard-Path.md) | Taking paths apart and putting them together. |
 | [Standard.Process](Standard-Process.md) | Running another program. |
 | [Standard.Random](Standard-Random.md) | Pseudo-random numbers. |

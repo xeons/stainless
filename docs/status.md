@@ -820,6 +820,19 @@ last person to edit it -- the suite is the authority.
   `BuildServiceProvider` reports every missing dependency, singleton holding a
   scoped service, and cycle at once. No open generics: a generic interface names
   its implementation with `[DefaultImplementation]` instead
+- `Standard.Configuration` and `Standard.Options`: settings from JSON files,
+  environment variables and the command line, the later winning, keys without
+  regard to ASCII case; bound by reflection onto a `[Reflect]` class, enums by
+  name; `IOptions<T>` with `Configure`, `Bind` and `Validate`. Not reloaded
+  when a file changes, and a list cannot be bound
+- `Standard.Logging`: `ILogger<T>` under its type's name with nothing
+  registered, levels by category prefix from code or configuration, and a
+  console provider in .NET's format, coloured at a terminal. No message
+  templates, scopes or event ids
+- `Standard.Hosting`: .NET's Generic Host -- hosted services and
+  `BackgroundService` on threads of their own, the application lifetime, a
+  shutdown on Ctrl-C or `SIGTERM` within a timeout, and the exit code returned
+  from `Run`. `samples/hosting` is a worker service
 - `Standard.Json` and `Standard.Xml`: each in two layers. A document that needs
   no type -- `Json.Parse` gives a `JsonValue`, a variant that is exactly one of
   the six things JSON has, and `Xml.Parse` gives an `XmlNode` -- and a mapping

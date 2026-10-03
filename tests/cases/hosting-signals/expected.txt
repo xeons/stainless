@@ -1,0 +1,3 @@
+worker running
+worker stopped
+stopped true, exit true

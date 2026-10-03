@@ -18,9 +18,21 @@ program that never prints has no reason to carry `Write` in scope.
 
 ## Contents
 
-**Functions** &nbsp; [Flush](#flush-function) &middot; [IsInputAtEnd](#isinputatend-function) &middot; [ReadLine](#readline-function) &middot; [ReadToEnd](#readtoend-function) &middot; [Write](#write-function) &middot; [WriteError](#writeerror-function) &middot; [WriteLine](#writeline-function)
+**Functions** &nbsp; [EnableTerminalColors](#enableterminalcolors-function) &middot; [Flush](#flush-function) &middot; [IsInputAtEnd](#isinputatend-function) &middot; [IsOutputRedirected](#isoutputredirected-function) &middot; [ReadLine](#readline-function) &middot; [ReadToEnd](#readtoend-function) &middot; [Write](#write-function) &middot; [WriteError](#writeerror-function) &middot; [WriteLine](#writeline-function)
 
 ## Functions
+
+### EnableTerminalColors *function*
+
+```
+bool EnableTerminalColors()
+```
+
+Whether ANSI escape sequences written to standard output show as colour,
+turning their processing on in a Windows console first. False when the
+output is redirected, where they would only be bytes in the way.
+
+<sub>[stdlib/Console.sl:84](../../stdlib/Console.sl#L84)</sub>
 
 ### Flush *function*
 
@@ -35,7 +47,7 @@ program whose output another program is reading may so far have written
 nothing the reader can see. A process killed rather than returned from
 loses whatever is still held.
 
-<sub>[stdlib/Console.sl:73](../../stdlib/Console.sl#L73)</sub>
+<sub>[stdlib/Console.sl:75](../../stdlib/Console.sl#L75)</sub>
 
 ### IsInputAtEnd *function*
 
@@ -48,7 +60,18 @@ Whether stdin has reached its end.
 It reads a byte to find out and pushes it back, so it answers only when
 the stream has something to say: on one that is open and idle it waits.
 
-<sub>[stdlib/Console.sl:91](../../stdlib/Console.sl#L91)</sub>
+<sub>[stdlib/Console.sl:102](../../stdlib/Console.sl#L102)</sub>
+
+### IsOutputRedirected *function*
+
+```
+bool IsOutputRedirected()
+```
+
+Whether standard output goes to a file or a pipe rather than a terminal.
+.NET's `Console.IsOutputRedirected`.
+
+<sub>[stdlib/Console.sl:79](../../stdlib/Console.sl#L79)</sub>
 
 ### ReadLine *function*
 
@@ -62,7 +85,7 @@ Null rather than empty, because a blank line and no line at all are
 different answers and a loop reading until there is nothing left has to
 tell them apart.
 
-<sub>[stdlib/Console.sl:82](../../stdlib/Console.sl#L82)</sub>
+<sub>[stdlib/Console.sl:93](../../stdlib/Console.sl#L93)</sub>
 
 ### ReadToEnd *function*
 
@@ -72,7 +95,7 @@ String ReadToEnd()
 
 Everything left on stdin, as one string.
 
-<sub>[stdlib/Console.sl:85](../../stdlib/Console.sl#L85)</sub>
+<sub>[stdlib/Console.sl:96](../../stdlib/Console.sl#L96)</sub>
 
 ### Write *function*
 
@@ -82,7 +105,7 @@ void Write(String text)
 
 Text, with nothing after it.
 
-<sub>[stdlib/Console.sl:55](../../stdlib/Console.sl#L55)</sub>
+<sub>[stdlib/Console.sl:57](../../stdlib/Console.sl#L57)</sub>
 
 ### WriteError *function*
 
@@ -96,7 +119,7 @@ The newline is not optional here as it is for stdout. A diagnostic is a
 whole line by the time anything reads it, and stderr is unbuffered, so a
 partial one would interleave with whatever wrote next.
 
-<sub>[stdlib/Console.sl:65](../../stdlib/Console.sl#L65)</sub>
+<sub>[stdlib/Console.sl:67](../../stdlib/Console.sl#L67)</sub>
 
 ### WriteLine *function*
 
@@ -106,5 +129,5 @@ void WriteLine(String text)
 
 Text and a newline.
 
-<sub>[stdlib/Console.sl:58](../../stdlib/Console.sl#L58)</sub>
+<sub>[stdlib/Console.sl:60](../../stdlib/Console.sl#L60)</sub>
 

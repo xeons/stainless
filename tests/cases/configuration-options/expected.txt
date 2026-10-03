@@ -1,0 +1,10 @@
+port 9090
+name from-environment
+host b
+extra value
+children Name Port Debug Mode Ratio Hosts Limits 
+bound true
+options: from-environment 9090 true Fast 0.25 16
+'Server:Port' is 'eighty', which is not an integer
+service: from-environment! 9090 true Fast 0.25 16
+same true

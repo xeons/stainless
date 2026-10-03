@@ -88,10 +88,13 @@ public class EmitterTests
             public String F(Level level) => $"{level} {Level.High}" + level.ToText();
             """);
 
-        Assert.Equal(1, Occurrences(ir, "define private ptr @_SLtextE"));
-        Assert.Equal(3, Occurrences(Front.TestFunction(ir, "F"), "call ptr @_SLtextE"));
-        Assert.Contains("switch i32 %value, label %unnamed [", ir);
-        Assert.Equal(2, Occurrences(ir, ", label %named."));
+        // Counted by name: the library's own enums have text functions too.
+        Assert.Equal(1, Occurrences(ir, "define private ptr @_SLtextE10Test_Level("));
+        Assert.Equal(3, Occurrences(Front.TestFunction(ir, "F"), "call ptr @_SLtextE10Test_Level("));
+        int start = ir.IndexOf("define private ptr @_SLtextE10Test_Level(", StringComparison.Ordinal);
+        string text = ir[start..ir.IndexOf("\n}\n", start, StringComparison.Ordinal)];
+        Assert.Contains("switch i32 %value, label %unnamed [", text);
+        Assert.Equal(2, Occurrences(text, ", label %named."));
         Assert.DoesNotContain("Unused", ir);
     }
 

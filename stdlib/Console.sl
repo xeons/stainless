@@ -43,6 +43,8 @@ extern "C"
     void sl_console_write_line(String text);
     void sl_console_write_error(String text);
     void sl_console_flush();
+    bool sl_console_output_is_terminal();
+    bool sl_console_enable_colors();
 
     String? sl_console_read_line();
     String  sl_console_read_all();
@@ -71,6 +73,15 @@ public void WriteError(String text) => sl_console_write_error(text);
 /// nothing the reader can see. A process killed rather than returned from
 /// loses whatever is still held.
 public void Flush() => sl_console_flush();
+
+/// Whether standard output goes to a file or a pipe rather than a terminal.
+/// .NET's `Console.IsOutputRedirected`.
+public bool IsOutputRedirected() => !sl_console_output_is_terminal();
+
+/// Whether ANSI escape sequences written to standard output show as colour,
+/// turning their processing on in a Windows console first. False when the
+/// output is redirected, where they would only be bytes in the way.
+public bool EnableTerminalColors() => sl_console_enable_colors();
 
 // ------------------------------------------------------------------ reading
 

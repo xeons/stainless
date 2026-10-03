@@ -1027,6 +1027,12 @@ SL_API void sl_console_write_error(void *pointer);
    buffer, so without this its lines arrive when the module detaches. */
 SL_API void sl_console_flush(void);
 
+/* Whether standard output is a terminal; and whether escape sequences written
+ * to it show as colour, asking a Windows console to interpret them.
+ */
+SL_API _Bool sl_console_output_is_terminal(void);
+SL_API _Bool sl_console_enable_colors(void);
+
 /*
  * One line without its terminator, or NULL at end of input -- a blank line and
  * no line at all are different answers. Bytes are taken to be UTF-8.

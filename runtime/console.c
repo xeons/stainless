@@ -45,6 +45,8 @@
 #  include <windows.h>
 #  include <fcntl.h>
 #  include <io.h>
+#else
+#  include <unistd.h>
 #endif
 
 /*
@@ -105,6 +107,39 @@ void sl_console_write_error(void *pointer)
 void sl_console_flush(void)
 {
     fflush(stdout);
+}
+
+/*
+ * Whether standard output is a terminal rather than a file or a pipe. On
+ * Windows a console is the handle GetConsoleMode accepts.
+ */
+_Bool sl_console_output_is_terminal(void)
+{
+#ifdef _WIN32
+    DWORD mode;
+    HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
+    return handle != NULL && handle != INVALID_HANDLE_VALUE && GetConsoleMode(handle, &mode) != 0;
+#else
+    return isatty(1) != 0;
+#endif
+}
+
+/*
+ * Whether escape sequences written to standard output are shown as colour.
+ * A Windows console interprets them only once asked to, so this asks; a
+ * terminal elsewhere always does. False for a file or a pipe, where they
+ * would only be bytes in the way.
+ */
+_Bool sl_console_enable_colors(void)
+{
+#ifdef _WIN32
+    DWORD mode;
+    HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (handle == NULL || handle == INVALID_HANDLE_VALUE || !GetConsoleMode(handle, &mode)) return 0;
+    return SetConsoleMode(handle, mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING) != 0;
+#else
+    return isatty(1) != 0;
+#endif
 }
 
 /* ----------------------------------------------------------------- input */

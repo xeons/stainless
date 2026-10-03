@@ -100,6 +100,7 @@ public class SampleTests
         new("wc", ["samples/wc.sl"]),
         new("http-get", ["samples/http-get.sl"]),
         new("audio", ["samples/audio/audio.sl"]),
+        new("hosting", ["samples/hosting/worker.sl"]),
         new("interop", ["samples/interop/interop.sl"]),
 
         new("modules", ["samples/modules/App.sl", "samples/modules/Geometry.sl"]),
