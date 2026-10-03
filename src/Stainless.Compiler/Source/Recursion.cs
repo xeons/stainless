@@ -84,9 +84,13 @@ public static class Recursion
 
     /// <summary>
     /// Runs <paramref name="work"/> for every index below
-    /// <paramref name="count"/>, on up to a thread per processor, each with
-    /// the stack <see cref="OnADeepStack"/> gives. The pool's threads would do
-    /// the same work on a stack too shallow for <see cref="MaxDepth"/>.
+    /// <paramref name="count"/>: on the calling thread, and on whichever of
+    /// <see cref="s_helpers"/> are free to help. The caller MUST itself be on a
+    /// deep stack, as a compilation is; the pool's own threads would do the
+    /// work on a stack too shallow for <see cref="MaxDepth"/>.
+    ///
+    /// The caller takes indexes too, so this finishes even when every helper is
+    /// busy with another compilation, as each test case's is in the suites.
     ///
     /// What one index threw is rethrown after all have run: the lowest index's,
     /// so the same input fails the same way however the threads were scheduled.
@@ -95,6 +99,7 @@ public static class Recursion
     {
         var failures = new System.Runtime.ExceptionServices.ExceptionDispatchInfo?[count];
         int next = -1;
+        using var finished = new CountdownEvent(count);
 
         void Drain()
         {
@@ -106,19 +111,50 @@ public static class Recursion
                 {
                     failures[index] = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(e);
                 }
+                finally { finished.Signal(); }
             }
         }
 
-        var threads = new Thread[Math.Min(count, Environment.ProcessorCount)];
-        for (int i = 0; i < threads.Length; i++)
-        {
-            threads[i] = new Thread(Drain, StackBytes);
-            threads[i].Start();
-        }
-        foreach (var thread in threads)
-            thread.Join();
+        if (count == 0)
+            return;
+
+        for (int i = 1; i < Math.Min(count, s_helpers.Value.Count + 1); i++)
+            s_work.Add(Drain);
+        Drain();
+        finished.Wait();
 
         foreach (var failure in failures)
             failure?.Throw();
     }
+
+    /// <summary>Work for <see cref="s_helpers"/>, which any of them may take.</summary>
+    private static readonly System.Collections.Concurrent.BlockingCollection<Action> s_work = [];
+
+    /// <summary>
+    /// A thread per processor but one, each with a deep stack, made the first
+    /// time they are needed and kept. Making a thread with a stack this size
+    /// is slow on macOS -- slower than the lexing it would do -- so it is done
+    /// once per process rather than once per compilation.
+    /// </summary>
+    private static readonly Lazy<IReadOnlyList<Thread>> s_helpers = new(() =>
+    {
+        var threads = new List<Thread>();
+        for (int i = 1; i < Environment.ProcessorCount; i++)
+        {
+            var thread = new Thread(
+                () =>
+                {
+                    foreach (var job in s_work.GetConsumingEnumerable())
+                        job();
+                },
+                StackBytes)
+            {
+                IsBackground = true,
+                Name = "Stainless deep stack",
+            };
+            thread.Start();
+            threads.Add(thread);
+        }
+        return threads;
+    });
 }
