@@ -2,3 +2,5 @@ SL0465
 SL0466
 SL0463
 SL0464
+# [Pack] that is no power of two, beside [Packed], or on a class
+SL0421

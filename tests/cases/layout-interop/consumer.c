@@ -18,6 +18,7 @@ int main(void)
     SAME("Wire size",  WireSize(),  sizeof(Library_Layout_Wire));
     SAME("Wide size",  WideSize(),  sizeof(Library_Layout_Wide));
     SAME("Both size",  BothSize(),  sizeof(Library_Layout_Both));
+    SAME("Carbon size", CarbonSize(), sizeof(Library_Layout_Carbon));
 
     printf("sizes=%d %d %d %d\n",
            (int)sizeof(Library_Layout_Plain), (int)sizeof(Library_Layout_Wire),
@@ -37,6 +38,11 @@ int main(void)
            (int)offsetof(Library_Layout_Wire, Value),
            (int)offsetof(Library_Layout_Wire, Trailer));
 
+    printf("carbon=%d %d %d %d %d %d\n",
+           (int)sizeof(Library_Layout_Carbon), (int)_Alignof(Library_Layout_Carbon),
+           (int)offsetof(Library_Layout_Carbon, A), (int)offsetof(Library_Layout_Carbon, B),
+           (int)offsetof(Library_Layout_Carbon, C), (int)offsetof(Library_Layout_Carbon, D));
+
     /* And a value built here, read there: the offsets have to agree in both
        directions or these come back wrong. */
     Library_Layout_Wire wire;
@@ -49,7 +55,11 @@ int main(void)
     wide.X = 1.0;
     wide.Y = 2.5;
 
-    printf("read=%d %d %g\n", WireValue(wire), (int)WireTrailer(wire), WideY(wide));
+    Library_Layout_Carbon carbon;
+    memset(&carbon, 0, sizeof carbon);
+    carbon.C = 6.25;
+
+    printf("read=%d %d %g %g\n", WireValue(wire), (int)WireTrailer(wire), WideY(wide), CarbonC(carbon));
     printf("agree=%s\n", ok ? "yes" : "no");
     return 0;
 }

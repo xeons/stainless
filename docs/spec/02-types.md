@@ -22,7 +22,8 @@ Names and sizes match C# exactly.
 place it can be written is what a function returns (SL0309). There is no
 variable, field, parameter or type argument of it, and no array or slice of one
 (SL0310, SL0451). `void*` is not a value of it but a pointer, and means what
-C's does.
+C's does: any pointer converts to `void*` without a cast, as it does to
+`byte*`, and between any two other pointer types it takes one.
 
 The three code unit types are **three encodings, not three widths of one
 type**, and none of them converts to another without a cast:
@@ -406,11 +407,11 @@ pairs)`. The loop only declares: a name that already exists is SL0772,
 because the loop variable belongs to one iteration and a place outside the
 loop does not.
 
-## 2.3 `[Packed]` and `[Align]`
+## 2.3 `[Packed]`, `[Pack]` and `[Align]`
 
-A struct is laid out by the platform C rules, and two markers change them. Both
-are rules about layout rather than library features, so neither needs an import,
-exactly as `[Flags]` does not.
+A struct is laid out by the platform C rules, and three markers change them.
+They are rules about layout rather than library features, so none needs an
+import, exactly as `[Flags]` does not.
 
 ```csharp
 public struct Plain {          // 12 bytes: 1, three of padding, 4, 1, three more
@@ -440,8 +441,25 @@ It is what an on-disk header or a wire format looks like.
 **`[Align(N)]`** raises the alignment and never lowers it, the way C's `alignas`
 does. N must be a power of two.
 
-The two combine: `[Packed] [Align(4)]` means nothing padded inside, and the
-whole of it on a four-byte boundary.
+**`[Pack(N)]`** aligns each field to the lesser of its own alignment and N, and
+the type to the most any field then asks for: C's `#pragma pack(N)`. It lowers
+and never raises, so it is the other half of `[Align]`, and N must be a power of
+two. Headers written for the classic Mac OS are inside `#pragma pack(push, 2)`,
+and a struct from one is `[Pack(2)]`:
+
+```csharp
+[Pack(2)]
+public struct ProcessSerialNumber {    // 8 bytes, on a two-byte boundary
+    public uint HighLongOfPSN;
+    public uint LowLongOfPSN;
+}
+```
+
+`[Packed]` is `[Pack(1)]`, and the two together say nothing one of them does
+not (SL0421).
+
+`[Align]` combines with either: `[Packed] [Align(4)]` means nothing padded
+inside, and the whole of it on a four-byte boundary.
 
 **N is capped at 16.** That is `max_align_t` — what `malloc` guarantees — and a
 class holding a more-aligned field would be handed memory that does not honour
@@ -450,13 +468,13 @@ runtime allocates by a type's alignment as well as by its size; until then a
 stated limit is better than a rule that holds in some places and not others
 (SL0466).
 
-Both apply to a `struct` and to nothing else. A class's fields sit behind an
+They apply to a `struct`, and `[Pack]` to a `union` as well, and to nothing else. A class's fields sit behind an
 object header the compiler owns, and a variant's payload area is not a field the
 source arranged, so neither is a layout the programmer is choosing (SL0463,
 SL0464).
 
-A generated C header states both — `#pragma pack(push, 1)` around a packed
-struct, and `__declspec(align(n))` or `__attribute__((aligned(n)))` behind a
+A generated C header states each -- `#pragma pack(push, 1)` around a packed
+struct, `#pragma pack(push, N)` around one with `[Pack(N)]`, and `__declspec(align(n))` or `__attribute__((aligned(n)))` behind a
 macro for an aligned one — and a test compares every size, alignment and field
 offset against what the target's C compiler makes of it.
 

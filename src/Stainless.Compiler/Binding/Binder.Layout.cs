@@ -106,6 +106,7 @@ public sealed partial class Binder
             }
 
             if (union.IsPacked) strictest = 1;
+            if (union.PackAlignment is { } unionPack) strictest = Math.Min(strictest, unionPack);
             if (union.RequestedAlignment is { } wanted) strictest = Math.Max(strictest, wanted);
 
             union.SetLayout(Math.Max(1, TypeExtensions.AlignTo(widest, strictest)), strictest);
@@ -149,6 +150,7 @@ public sealed partial class Binder
             // Packed means no padding anywhere: a field lands where the one
             // before it ended, and the type asks nothing of its own address.
             int fieldAlignment = type.IsPacked ? 1 : Math.Max(1, field.Type.Alignment);
+            if (type.PackAlignment is { } pack) fieldAlignment = Math.Min(fieldAlignment, pack);
             offset = TypeExtensions.AlignTo(offset, fieldAlignment);
             field.Offset = offset - start;
             offset += field.Type.Size;
@@ -247,9 +249,9 @@ public sealed partial class Binder
     {
         // Checked here rather than where the width was read, because [Packed] is
         // not known until attributes have been folded and that is a pass later.
-        if (type.IsPacked)
+        if (type.IsPacked || type.PackAlignment is not null)
             diagnostics.Error("SL0470", type.Span ?? default,
-                $"'{type.Name}' is '[Packed]' and has bit-fields, and the two together mean " +
+                $"'{type.Name}' is '[{(type.IsPacked ? "Packed" : "Pack")}]' and has bit-fields, and the two together mean " +
                 "different things to different C compilers -- gcc packs the bits and MSVC keeps " +
                 "the storage unit. Until one of them is chosen and checked against it, this is " +
                 "refused rather than guessed",

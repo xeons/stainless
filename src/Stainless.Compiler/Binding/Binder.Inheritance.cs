@@ -1553,6 +1553,8 @@ public sealed partial class Binder
                     type);
         }
 
+        ReadPackAttribute(type, span, MaxAlignment);
+
         if (type.Attributes.FirstOrDefault(a => a.Type == _builtins.Align) is not { } align) return;
 
         if (type is not StructTypeSymbol || type is VariantTypeSymbol)
@@ -1585,6 +1587,36 @@ public sealed partial class Binder
         }
 
         type.RequestedAlignment = requested;
+    }
+
+    /// <summary>
+    /// <c>[Pack(N)]</c>: the most any field is aligned to, a power of two no
+    /// greater than what <c>[Align]</c> may ask for, on a struct or a union.
+    /// <c>[Packed]</c> is <c>[Pack(1)]</c> already, so the two together say
+    /// nothing one of them does not.
+    /// </summary>
+    private void ReadPackAttribute(NamedTypeSymbol type, SourceSpan span, int maxAlignment)
+    {
+        if (type.Attributes.FirstOrDefault(a => a.Type == _builtins.Pack) is not { } pack) return;
+
+        int bytes = pack.Values.Count > 0 && pack.Values[0] is { } value
+            ? Convert.ToInt32(value, System.Globalization.CultureInfo.InvariantCulture)
+            : 0;
+
+        string? why =
+            type is not StructTypeSymbol || type is VariantTypeSymbol ? $"'{type.Name}' is not a struct or a union"
+            : type.IsPacked ? $"'{type.Name}' is '[Packed]', which is '[Pack(1)]' already"
+            : bytes <= 0 || (bytes & (bytes - 1)) != 0 ? $"{bytes} is not an alignment; it must be a power of two"
+            : bytes > maxAlignment ? $"{bytes} is more than the {maxAlignment} bytes any alignment here may be"
+            : null;
+
+        if (why is not null)
+        {
+            diagnostics.Error("SL0421", span, $"'[Pack({bytes})]' cannot be written here: {why}", type);
+            return;
+        }
+
+        type.PackAlignment = bytes;
     }
 
     /// <summary>

@@ -1017,9 +1017,13 @@ public sealed partial class Binder
 
         if (from is PointerTypeSymbol && to is PointerTypeSymbol)
         {
-            // Any pointer converts to byte* implicitly, mirroring C's void*.
-            bool toBytePointer = to is PointerTypeSymbol { Element: PrimitiveTypeSymbol { Kind: PrimitiveKind.Byte } };
-            return explicitCast || toBytePointer ? ConversionKind.PointerCast : null;
+            // Any pointer converts to void* and byte* implicitly, as C's does
+            // to void*; between any two others it takes a cast.
+            bool toUntyped = to is PointerTypeSymbol
+            {
+                Element: PrimitiveTypeSymbol { Kind: PrimitiveKind.Byte or PrimitiveKind.Void },
+            };
+            return explicitCast || toUntyped ? ConversionKind.PointerCast : null;
         }
 
         // A pointer and a delegate, explicitly, in either direction.

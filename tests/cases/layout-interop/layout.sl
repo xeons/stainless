@@ -39,7 +39,19 @@ public struct Both
     public byte C;
 }
 
+// No field aligned to more than two: what a header inside
+// `#pragma pack(push, 2)` lays out, as the Carbon-era ones on macOS are.
+[Pack(2)]
+public struct Carbon
+{
+    public short A;
+    public int B;
+    public double C;
+    public byte D;
+}
+
 export "C" nuint PlainSize() => sizeof(Plain);
+export "C" nuint CarbonSize() => sizeof(Carbon);
 export "C" nuint WireSize() => sizeof(Wire);
 export "C" nuint WideSize() => sizeof(Wide);
 export "C" nuint BothSize() => sizeof(Both);
@@ -52,3 +64,4 @@ export "C" int BothB(Both both) => both.B;
 export "C" int WireValue(Wire wire) => wire.Value;
 export "C" byte WireTrailer(Wire wire) => wire.Trailer;
 export "C" double WideY(Wide wide) => wide.Y;
+export "C" double CarbonC(Carbon carbon) => carbon.C;

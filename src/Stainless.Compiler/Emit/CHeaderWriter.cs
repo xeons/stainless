@@ -133,6 +133,7 @@ public static class CHeaderWriter
                 case UnionTypeSymbol union:
                 {
                     if (union.IsPacked) sb.AppendLine("#pragma pack(push, 1)");
+                    if (union.PackAlignment is { } unionPack) sb.AppendLine($"#pragma pack(push, {unionPack})");
 
                     string unionAlign = union.RequestedAlignment is { } unionBytes
                         ? $"SL_ALIGN({unionBytes}) "
@@ -142,7 +143,7 @@ public static class CHeaderWriter
                     WriteFields(sb, union, "    ");
                     sb.AppendLine($"}} {CName(union)};");
 
-                    if (union.IsPacked) sb.AppendLine("#pragma pack(pop)");
+                    if (union.IsPacked || union.PackAlignment is not null) sb.AppendLine("#pragma pack(pop)");
                     break;
                 }
 
@@ -160,6 +161,7 @@ public static class CHeaderWriter
                     // spelling MSVC, gcc and clang all take, and it says the
                     // same thing to each of them.
                     if (structType.IsPacked) sb.AppendLine("#pragma pack(push, 1)");
+                    if (structType.PackAlignment is { } pack) sb.AppendLine($"#pragma pack(push, {pack})");
 
                     string aligned = structType.RequestedAlignment is { } bytes
                         ? $"SL_ALIGN({bytes}) "
@@ -169,7 +171,7 @@ public static class CHeaderWriter
                     WriteFields(sb, structType, "    ");
                     sb.AppendLine($"}} {CName(structType)};");
 
-                    if (structType.IsPacked) sb.AppendLine("#pragma pack(pop)");
+                    if (structType.IsPacked || structType.PackAlignment is not null) sb.AppendLine("#pragma pack(pop)");
                     break;
                 }
 

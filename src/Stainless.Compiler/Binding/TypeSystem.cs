@@ -623,6 +623,13 @@ public abstract class NamedTypeSymbol : TypeSymbol
     public int? RequestedAlignment { get; set; }
 
     /// <summary>
+    /// The most <c>[Pack(N)]</c> lets any field be aligned to, or null: C's
+    /// <c>#pragma pack(N)</c>. Each field is aligned to the lesser of its own
+    /// alignment and this, and so is the type, unless <c>[Align]</c> raises it.
+    /// </summary>
+    public int? PackAlignment { get; set; }
+
+    /// <summary>
     /// True when the type was marked [Reflect] and so carries field metadata in
     /// the binary. Nothing else does, which is why reflection costs nothing
     /// unless it is asked for.

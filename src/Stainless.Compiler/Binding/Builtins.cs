@@ -134,6 +134,12 @@ public sealed class Builtins
     public AttributeTypeSymbol Align { get; }
 
     /// <summary>
+    /// <c>[Pack(N)]</c>: align each field to at most N, as C's
+    /// <c>#pragma pack(N)</c> does. It lowers and never raises.
+    /// </summary>
+    public AttributeTypeSymbol Pack { get; }
+
+    /// <summary>
     /// <c>[Embed("logo.png", Section = ".logo", Access = "r")]</c>: the static
     /// this is written on holds that file's bytes, placed by the linker.
     ///
@@ -395,6 +401,19 @@ public sealed class Builtins
         });
         Align.SetLayout(4, 4);
         Standard.Types[Align.SimpleName] = Align;
+
+        Pack = new AttributeTypeSymbol
+        {
+            SimpleName = "Pack",
+            ModuleName = StandardModuleName,
+            IsPublic = true,
+        };
+        Pack.Fields.Add(new FieldSymbol("Bytes", PrimitiveTypeSymbol.Int, Pack, 0)
+        {
+            IsPublic = true,
+        });
+        Pack.SetLayout(4, 4);
+        Standard.Types[Pack.SimpleName] = Pack;
 
         // The static type of a closure's receiver, and nothing else.
         //

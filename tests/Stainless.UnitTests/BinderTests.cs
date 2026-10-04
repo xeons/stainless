@@ -1281,4 +1281,13 @@ public class BinderTests
     public void ALabelNamedOutsideAsciiIsABlockLlvmReads() =>
         Assert.Contains("label.caf_u00E9", Front.ModuleIr(
             "void F(int n) { café: n++; if (n < 3) goto café; }"));
+
+    [Fact]
+    public void AnyPointerConvertsToVoidAndBytePointersAndNoOtherWithoutACast()
+    {
+        Assert.Empty(Front.ModuleCodes("public void Take(void* p) { }\npublic void Use(int* x) => Take(x);"));
+        Assert.Empty(Front.ModuleCodes("public void Take(byte* p) { }\npublic void Use(int* x) => Take(x);"));
+        Assert.NotEmpty(Front.ModuleCodes("public void Take(long* p) { }\npublic void Use(int* x) => Take(x);"));
+        Assert.Empty(Front.ModuleCodes("public void Take(long* p) { }\npublic void Use(int* x) => Take((long*)x);"));
+    }
 }
