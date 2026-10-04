@@ -109,6 +109,10 @@ public static class SysVAbi
         if (type is not StructTypeSymbol structType)
             return ArgInfo.Scalar(type, llvmTypeOf, widened: true);
 
+        // C's va_list is an array here, so a parameter of it is a pointer.
+        if (structType.IsVaList)
+            return new ArgInfo(PassStyle.Indirect, "ptr", type) { IndirectAsPointer = true };
+
         if (ArgInfo.IsEmpty(structType))
             return ArgInfo.Ignored(type);
 

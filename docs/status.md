@@ -265,6 +265,8 @@ last person to edit it -- the suite is the authority.
   property's own storage, so `set => field = value.Trim()` needs no field
   written beside it. A static property may be automatic, over a static that
   starts at its type's zero
+- Variadic functions defined at module level, read with a `VaList` that is C's
+  `va_list` on each target and may be handed to `vsnprintf` and the like
 - `extern "C"` and `export "C"`, including variadics and structs by value in
   both directions
 - `extern "C++"` and `export "C++"` for free functions, in both directions and

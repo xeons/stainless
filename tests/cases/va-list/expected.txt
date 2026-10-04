@@ -1,0 +1,5 @@
+twelve from C: 123456789012
+mixed from C: 1151.375
+handed on to va_arg: 600
+promoted here: 0.25 1.5 2
+vsnprintf: 20 '42 and 3.14 and text'

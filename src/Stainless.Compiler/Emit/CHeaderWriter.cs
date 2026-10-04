@@ -61,6 +61,7 @@ public static class CHeaderWriter
         sb.AppendLine($"#ifndef {guard}");
         sb.AppendLine($"#define {guard}");
         sb.AppendLine();
+        sb.AppendLine("#include <stdarg.h>");
         sb.AppendLine("#include <stdbool.h>");
         sb.AppendLine("#include <stddef.h>");
         sb.AppendLine("#include <stdint.h>");
@@ -337,6 +338,10 @@ public static class CHeaderWriter
                 ordered.Add(union);
                 break;
 
+            // <stdarg.h>'s, and not this header's to declare.
+            case StructTypeSymbol { IsVaList: true }:
+                break;
+
             case StructTypeSymbol { IsOpaque: true } opaque when seen.Add(opaque):
                 ordered.Add(opaque);
                 break;
@@ -458,6 +463,7 @@ public static class CHeaderWriter
 
         // No typedef exists for an incomplete type, so it is named by its tag.
         StructTypeSymbol { IsOpaque: true } opaque => "struct " + CName(opaque),
+        StructTypeSymbol { IsVaList: true } => "va_list",
 
         VariantTypeSymbol variant => CName(variant),
         UnionTypeSymbol union => CName(union),
@@ -470,6 +476,7 @@ public static class CHeaderWriter
 
         // Typedef'd above as clang's ext_vector_type.
         VectorTypeSymbol vector => vector.Name,
+
 
         // A managed reference has no C spelling. It crosses as an opaque handle,
         // which the caller must not free or dereference.

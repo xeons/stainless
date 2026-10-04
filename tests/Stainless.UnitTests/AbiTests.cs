@@ -754,6 +754,41 @@ public class AbiTests
         Assert.Contains("define i16 @widen(i16 %arg.a)", ir);
     }
 
+    /// <summary>
+    /// AArch64 Linux reads an extra argument as clang 21 does, which nothing
+    /// here can run: the general registers from <c>gr_top</c> back by
+    /// <c>gr_offs</c>, the SIMD ones from <c>vr_top</c> by <c>vr_offs</c> in
+    /// sixteens, and the stack once an offset reaches zero.
+    /// </summary>
+    [Fact]
+    public void Arm64LinuxReadsAVaListAsClangDoes()
+    {
+        const string source = """
+            export "C" long first_int(int count, ...) { VaList args = VaList.Start(); return args.Next<int>(); }
+            export "C" double first_double(int count, ...) { VaList args = VaList.Start(); return args.Next<double>(); }
+            """;
+
+        var before = TargetPlatform.Current;
+        TargetPlatform.Current = TargetPlatform.Arm64Linux;
+        string ir;
+        try { ir = Front.ModuleIr(source, CppAbi.Itanium); }
+        finally { TargetPlatform.Current = before; }
+
+        string integers = ir[ir.IndexOf("@first_int(", StringComparison.Ordinal)..ir.IndexOf("@first_double(", StringComparison.Ordinal)];
+        string reals = ir[ir.IndexOf("@first_double(", StringComparison.Ordinal)..];
+
+        Assert.Contains("alloca %struct.Standard_VaList", integers);
+        foreach (var (body, offsets, top, step) in new[] { (integers, 24, 8, 8), (reals, 28, 16, 16) })
+        {
+            Assert.Matches($@"getelementptr inbounds i8, ptr %args\.s\d+, i64 {offsets}\b", body);
+            Assert.Matches(@"icmp sge i32 %\d+, 0", body);
+            Assert.Matches($@"add i32 %\d+, {step}\b", body);
+            Assert.Matches(@"icmp sgt i32 %\d+, 0", body);
+            Assert.Matches($@"getelementptr inbounds i8, ptr %args\.s\d+, i64 {top}\b", body);
+            Assert.Matches(@"sext i32 %\d+ to i64", body);
+        }
+    }
+
     private static readonly string[] s_vectorShapes =
         ["vbyte2", "vbyte3", "vshort3", "vbyte8", "vint2", "vfloat2", "vfloat3", "vint4", "vdouble3", "vbyte64"];
 

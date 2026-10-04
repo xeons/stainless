@@ -791,6 +791,11 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
             case CBlock block:
                 return Synthesize(context, Suffixed(hint, "Block"), n => WriteBlock(n, block.Function, context));
 
+            // System V's va_list is an array of this, so a parameter of it has
+            // decayed to a pointer by the time clang prints it.
+            case CPointer { Pointee: CTag { Kind: CTagKind.Struct, Name: "__va_list_tag" } }:
+                return "VaList";
+
             case CPointer pointer:
                 return Spell(pointer.Pointee, context, hint) + "*";
 
@@ -881,7 +886,7 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
         if (context.TypeParameters.Contains(name)) return "void*";
         if (Primitives.TryGetValue(name, out string? primitive)) return primitive;
         if (name is "va_list" or "__builtin_va_list" or "__darwin_va_list" or "__gnuc_va_list")
-            throw new Unsupported("a va_list, which Stainless cannot make");
+            return "VaList";
 
         if (!translation.Typedefs.TryGetValue(name, out var typedef))
             throw new Unsupported($"the type '{name}', which no header declares");

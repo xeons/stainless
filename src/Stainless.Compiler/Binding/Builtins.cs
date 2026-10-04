@@ -94,6 +94,13 @@ public sealed class Builtins
     public StructTypeSymbol ObjCClassHandle { get; }
 
     /// <summary>
+    /// <c>Standard.VaList</c>, C's va_list on this target: a pointer on
+    /// Windows, on i386 and on Apple's ARM64, twenty-four bytes on System V
+    /// x86-64, and thirty-two on other ARM64.
+    /// </summary>
+    public StructTypeSymbol VaList { get; }
+
+    /// <summary>
     /// <c>Standard.Guid</c>: 16 bytes, laid out as every existing COM header
     /// lays one out, so a <c>Guid*</c> passed to a C function is the
     /// <c>GUID*</c> it expects. Its layout is declared here, because a COM
@@ -382,6 +389,7 @@ public sealed class Builtins
 
         Selector = Handle("Selector");
         ObjCClassHandle = Handle("Class");
+        VaList = MakeVaList();
 
         Flags = new AttributeTypeSymbol
         {
@@ -689,6 +697,29 @@ public sealed class Builtins
         handle.SetLayout(word, word);
         ObjC.Types[name] = handle;
         return handle;
+    }
+
+    private StructTypeSymbol MakeVaList()
+    {
+        var target = TargetPlatform.Current;
+        int size = target switch
+        {
+            { Architecture: TargetArch.X64, IsWindows: false } => 24,
+            { Architecture: TargetArch.Arm64, IsLinux: true } => 32,
+            _ => target.PointerWidth,
+        };
+
+        var list = new StructTypeSymbol
+        {
+            SimpleName = "VaList",
+            ModuleName = StandardModuleName,
+            IsPublic = true,
+            IsVaList = true,
+        };
+        list.Fields.Add(new FieldSymbol("_state", PrimitiveTypeSymbol.Byte.MakeFixedArrayType(size), list, 0) { Offset = 0 });
+        list.SetLayout(size, target.PointerWidth);
+        Standard.Types[list.SimpleName] = list;
+        return list;
     }
 
     /// <summary>

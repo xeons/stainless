@@ -776,6 +776,15 @@ public abstract class BoundTreeRewriter
                 return Same(made.Parts, parts) ? made : new BoundVectorNew(made.Span, made.Vector, parts);
             }
 
+            case BoundVaStart started:
+                return started;
+
+            case BoundVaArg read:
+            {
+                var list = Rewrite(read.List);
+                return Same(read.List, list) ? read : new BoundVaArg(read.Span, read.Type, list);
+            }
+
             case BoundVectorFunction called:
             {
                 var arguments = RewriteAll(called.Arguments);

@@ -929,6 +929,19 @@ public sealed class BoundVectorShuffle(
     public IReadOnlyList<int> Lanes { get; } = lanes;
 }
 
+/// <summary>
+/// <c>VaList.Start()</c>: the extra arguments of the variadic function it is
+/// written in, from the first.
+/// </summary>
+public sealed class BoundVaStart(SourceSpan span, TypeSymbol type) : BoundExpression(span, type);
+
+/// <summary><c>args.Next&lt;T&gt;()</c>: the next extra argument, read as a <c>T</c>.</summary>
+public sealed class BoundVaArg(SourceSpan span, TypeSymbol type, BoundExpression list)
+    : BoundExpression(span, type)
+{
+    public BoundExpression List { get; } = list;
+}
+
 /// <summary>A vector's built-in function: <c>vfloat4.Dot(a, b)</c>, and <c>v.Length</c>.</summary>
 public enum VectorFunction
 {

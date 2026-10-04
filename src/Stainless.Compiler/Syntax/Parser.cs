@@ -610,8 +610,7 @@ public sealed class Parser
             if (ctorVariadic)
                 _diagnostics.Error("SL0493", SpanFrom(start),
                     $"'{enclosingType}' cannot have a variadic constructor; '...' may only " +
-                    "be written on an 'extern \"C\"' declaration, because there is no " +
-                    "'va_list' to read the extra arguments with");
+                    "be written on a function at module level, which reads them with a 'VaList'");
 
             return
             [
@@ -1181,8 +1180,7 @@ public sealed class Parser
             {
                 _diagnostics.Error("SL0493", SpanFrom(at),
                     $"'{name}' cannot have a variadic constructor; '...' may only be written " +
-                    "on an 'extern \"C\"' declaration, because there is no 'va_list' to read " +
-                    "the extra arguments with");
+                    "on a function at module level, which reads them with a 'VaList'");
             }
         }
 
@@ -2037,19 +2035,12 @@ public sealed class Parser
                     $"have a body; use 'export \"{how}\"' to define one");
             }
 
-            // Calling a C variadic is fine; being one is not. Nothing in the
-            // language can read the extra arguments -- there is no 'va_list' --
-            // so the definition would ignore them, while the header written for
-            // it promises the variadic convention and a caller obeying that
-            // leaves its floating-point arguments where the callee never looks.
-            // Refusing the declaration is the only honest answer available. A
-            // member of a type may be an Objective-C message, which is the
-            // binder's to know.
-            if (isVariadic && !linkage.IsImport() && _typeIsGeneric.Count == 0)
+            // A generic is a template rather than one function, and a template
+            // nobody instantiates is never bound, so it is refused here.
+            if (isVariadic && typeParameters.Count > 0)
                 _diagnostics.Error("SL0493", SpanFrom(start),
-                    $"'{name}' cannot be variadic; '...' may only be written on an " +
-                    "'extern \"C\"' declaration, because there is no 'va_list' to read " +
-                    "the extra arguments with. Take an array, a slice, or a count and a pointer");
+                    $"'{name}' cannot be variadic; a generic is not one function, and '...' may only " +
+                    "be written on a function at module level, which reads them with a 'VaList'");
 
             return new FunctionDeclSyntax(
                 SpanFrom(start), modifiers, linkage, returnType, name, typeParameters,

@@ -74,6 +74,9 @@ public sealed partial class LlvmEmitter
                 declaredParameters.Add($"{spellings[piece]} {name}.{piece}");
         }
 
+        // What follows is read with a VaList.
+        if (symbol.IsVariadic) declaredParameters.Add("...");
+
         _returnInfo = returnInfo;
         _nextTemp = 0;
 

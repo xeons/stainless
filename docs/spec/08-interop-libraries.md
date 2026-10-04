@@ -86,21 +86,47 @@ it a second time; C has one function per name, so give this one a name of its
 own
 ```
 
-**A `...` may be called and not written.** `printf` is bound with one and works;
-a function this program *defines* may not have one, whatever its linkage; nor
-may a method, except an Objective-C message (section 8.6). Nothing
-in the language reads the extra arguments — there is no `va_list` — so the
-definition would ignore them while the generated header promised the variadic
-convention, which on Win64 wants floating-point arguments duplicated into the
-integer registers and on SysV wants `al` to carry a vector-register count. The
-integer arguments would survive and the floating-point ones would not, silently.
+**A function at module level may be variadic, and reads what follows with a
+`VaList`**, which is C's `va_list` on each target:
 
+```csharp
+export "C" long Sum(int count, ...)
+{
+    VaList args = VaList.Start();
+    long total = 0;
+    for (int i = 0; i < count; i++)
+        total += args.Next<int>();
+    return total;
+}
+
+extern "C" int vsnprintf(byte* buffer, nuint size, byte* format, VaList args);
+
+int Format(byte* buffer, nuint size, byte* format, ...)
+{
+    VaList args = VaList.Start();
+    return vsnprintf(buffer, size, format, args);
+}
 ```
-error[SL0493]: 'log_line' cannot be variadic; '...' may only be written on an
-'extern "C"' declaration or a message an Objective-C class that already exists
-answers, because there is no 'va_list' to read the extra arguments with. Take
-an array, a slice, or a count and a pointer
-```
+
+`VaList.Start()` begins at the first argument after the function's own, and
+only a variadic function may call it (SL0935). `Next<T>()` reads one, on a
+local or a parameter that is a `VaList`, and only as what C actually passes
+there -- an `int` or wider integer, a `double`, a pointer, a function pointer:
+a `float` arrives as a `double` and a `byte` as an `int`, so asking for either
+is refused rather than read wrongly (SL0935). Reading as the wrong one of
+those, or past the last, is what it is in C, which says nothing about it. A
+list needs no ending: `va_end` does nothing on any target here.
+
+A `VaList` is a value, so passing one to `vsnprintf` passes what C passes:
+the pointer on Windows, on i386 and on Apple's ARM64; a pointer to the list on
+System V x86-64, where `va_list` is an array; the list itself, behind a
+pointer to a copy, on other ARM64. Every read is lowered as clang lowers it
+rather than with LLVM's `va_arg`, which reads the wrong slots on Win64 and on
+AArch64 Linux.
+
+A method, a constructor and a generic may not be variadic (SL0493): none is
+one C function. An Objective-C message an existing class answers may be
+(section 8.6).
 
 **What a `...` takes has a type of its own.** A lambda, a function's name, an
 array literal and a case constructor each take their type from the parameter

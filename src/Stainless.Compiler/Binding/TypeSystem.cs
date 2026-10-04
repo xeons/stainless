@@ -1234,6 +1234,12 @@ public class StructTypeSymbol : NamedTypeSymbol
     /// type is ever laid out, emitted, or present at run time.
     /// </summary>
     public bool IsOpaque { get; set; }
+
+    /// <summary>
+    /// The one <c>VaList</c>: C's va_list, which System V x86-64 passes as a
+    /// pointer to it because there it is an array.
+    /// </summary>
+    public bool IsVaList { get; init; }
 }
 
 /// <summary>

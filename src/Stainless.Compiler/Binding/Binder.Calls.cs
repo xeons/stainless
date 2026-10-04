@@ -60,6 +60,8 @@ public sealed partial class Binder
             VectorPrefix(vectorCall.Target) is { } vectorType)
             return BindVectorFunction(syntax, vectorCall.Member, vectorType, arguments);
 
+        if (TryBindVaList(syntax, arguments) is { } varargs) return varargs;
+
         // `Shape.Circle(2.0)` names the variant as well as the case, so it
         // needs nothing from the surrounding expression to settle it.
         if (syntax.Callee is MemberAccessSyntax { TypeArguments: null } named &&
