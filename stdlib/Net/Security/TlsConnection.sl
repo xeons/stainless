@@ -23,6 +23,7 @@ module Standard.Net.Security;
 
 import Standard.Collections;
 import Standard.IO;
+import Standard.Net;
 import Standard.Security.Cryptography;
 import Standard.Threading;
 
@@ -757,7 +758,15 @@ internal sealed class TlsConnection
     {
         FailTls(error);
         WipeTlsConnectionSecrets();
-        if (!_leaveInnerStreamOpen)
+        if (_leaveInnerStreamOpen)
+            return;
+
+        // The peer is owed the alert just sent, and a TLS 1.3 client that has
+        // sent its Finished is already writing: closing over its bytes would
+        // reset the connection ahead of the alert.
+        if (_records.Inner is TcpClient connection)
+            connection.CloseAfterDraining(500);
+        else
             _records.Inner.Close();
     }
 

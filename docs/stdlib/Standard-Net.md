@@ -1379,6 +1379,24 @@ the destructor calls it.
 
 <sub>[stdlib/Net/TcpClient.sl:287](../../stdlib/Net/TcpClient.sl#L287)</sub>
 
+#### CloseAfterDraining *method*
+
+```
+void CloseAfterDraining(int milliseconds)
+```
+
+Closes once the peer has seen everything written: finishes sending,
+then reads and throws away what the peer still sends until it ends the
+connection, waiting at most `milliseconds` for each read, then closes.
+
+A close with unread bytes waiting makes the kernel answer with a
+reset, and a reset can overtake the last bytes written and take them
+with it -- a TLS alert, most often. Waiting for the peer's own ending
+is what lets it read them. At most 64 KiB is read, so a peer that
+keeps sending cannot hold the close open.
+
+<sub>[stdlib/Net/TcpClient.sl:304](../../stdlib/Net/TcpClient.sl#L304)</sub>
+
 #### Error *property*
 
 ```
@@ -1388,7 +1406,7 @@ IOError Error { get; }
 The socket error as the nearest `IOError`, so that a reader which knows
 nothing about sockets still gets something it can act on.
 
-<sub>[stdlib/Net/TcpClient.sl:297](../../stdlib/Net/TcpClient.sl#L297)</sub>
+<sub>[stdlib/Net/TcpClient.sl:320](../../stdlib/Net/TcpClient.sl#L320)</sub>
 
 ### TcpListener *class*
 

@@ -292,6 +292,29 @@ public class TcpClient : IStream
         _finished = true;
     }
 
+    /// Closes once the peer has seen everything written: finishes sending,
+    /// then reads and throws away what the peer still sends until it ends the
+    /// connection, waiting at most `milliseconds` for each read, then closes.
+    ///
+    /// A close with unread bytes waiting makes the kernel answer with a
+    /// reset, and a reset can overtake the last bytes written and take them
+    /// with it -- a TLS alert, most often. Waiting for the peer's own ending
+    /// is what lets it read them. At most 64 KiB is read, so a peer that
+    /// keeps sending cannot hold the close open.
+    public void CloseAfterDraining(int milliseconds)
+    {
+        if (_socket.IsOpen && _socket.Shutdown(SocketShutdown.Send) == SocketError.None)
+        {
+            var discarded = new byte[4096u];
+            for (int i = 0; i < 16 && _socket.WaitToRead(milliseconds); i++)
+            {
+                if (_socket.Receive(discarded, 0u, discarded.Length) == 0u)
+                    break;
+            }
+        }
+        Close();
+    }
+
     /// The socket error as the nearest `IOError`, so that a reader which knows
     /// nothing about sockets still gets something it can act on.
     public IOError Error
