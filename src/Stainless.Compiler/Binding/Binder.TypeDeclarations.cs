@@ -32,18 +32,33 @@ public sealed partial class Binder
 
     private void DeclareTypes()
     {
-        var homes = ObjCClassHomes();
-        var reopened = new List<(TypeDeclSyntax, FileScope, List<string>)>();
+        var objcClassNames = ObjCClassNames();
+        var homes = ObjCClassHomes(objcClassNames);
+        var categories = new List<(TypeDeclSyntax, FileScope, CompilationUnitSyntax)>();
 
         foreach (var (scope, unit) in _units)
         {
             var module = scope.Module;
             foreach (var declaration in unit.Declarations.OfType<TypeDeclSyntax>())
             {
-                if (ReopenedFrom(declaration, scope, unit, homes) is { Count: > 0 } from)
+                if (IsImportedObjCClassDeclaration(declaration))
                 {
-                    reopened.Add((declaration, scope, from));
-                    continue;
+                    if (!IsObjCClassItself(declaration, objcClassNames))
+                    {
+                        // A category waits for every class to exist.
+                        if (homes.ContainsKey(declaration.Name))
+                        {
+                            categories.Add((declaration, scope, unit));
+                            continue;
+                        }
+                    }
+                    else if (ImportedHomeOf(declaration, scope, unit, homes) is { } other)
+                    {
+                        diagnostics.Error("SL0551", declaration.Span,
+                            $"'{declaration.Name}' already names its superclass in '{other}', which " +
+                            "this file imports; a category adds members and protocols, and names no superclass");
+                        continue;
+                    }
                 }
 
                 if (module.Types.TryGetValue(declaration.Name, out var already) &&
@@ -252,20 +267,38 @@ public sealed partial class Binder
             }
         }
 
-        DeclareObjCCategories(reopened);
+        DeclareObjCCategories(categories);
     }
 
+    private static bool IsImportedObjCClassDeclaration(TypeDeclSyntax declaration) =>
+        declaration is { Kind: TypeDeclKind.Class, TypeParameters.Count: 0 } &&
+        declaration.Modifiers.HasFlag(Modifiers.Objc) && declaration.Modifiers.HasFlag(Modifiers.Extern);
+
+    /// <summary>The name of every Objective-C class any declaration names, read from the syntax.</summary>
+    private HashSet<string> ObjCClassNames() =>
+        _units.SelectMany(u => u.Unit.Declarations.OfType<TypeDeclSyntax>())
+            .Where(d => d.Kind == TypeDeclKind.Class && d.Modifiers.HasFlag(Modifiers.Objc))
+            .Select(d => d.Name)
+            .ToHashSet(StringComparer.Ordinal);
+
     /// <summary>
-    /// The modules that declare an <c>extern objc class</c> of each name, read
-    /// from the syntax: a declaration in a module importing one of them adds
-    /// to that class rather than declaring another.
+    /// Whether a declaration of an <c>extern objc class</c> is the class
+    /// itself rather than a category of it: it is the root, or the first name
+    /// in its list is a class, its superclass. A category names protocols
+    /// alone. Read from the syntax, because which is which decides what each
+    /// name means.
     /// </summary>
-    private Dictionary<string, HashSet<string>> ObjCClassHomes()
+    private static bool IsObjCClassItself(TypeDeclSyntax declaration, HashSet<string> objcClassNames) =>
+        declaration.Attributes.Any(a => a.Name.Last == "ObjCRoot") ||
+        (declaration.Implements is [NamedTypeSyntax first, ..] && objcClassNames.Contains(first.Name.Last));
+
+    /// <summary>The modules declaring each <c>extern objc class</c> itself, by its name.</summary>
+    private Dictionary<string, HashSet<string>> ObjCClassHomes(HashSet<string> objcClassNames)
     {
         var homes = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
         foreach (var (scope, unit) in _units)
             foreach (var declaration in unit.Declarations.OfType<TypeDeclSyntax>())
-                if (IsImportedObjCClassDeclaration(declaration))
+                if (IsImportedObjCClassDeclaration(declaration) && IsObjCClassItself(declaration, objcClassNames))
                 {
                     if (!homes.TryGetValue(declaration.Name, out var modules))
                         homes[declaration.Name] = modules = new HashSet<string>(StringComparer.Ordinal);
@@ -275,80 +308,54 @@ public sealed partial class Binder
         return homes;
     }
 
-    private static bool IsImportedObjCClassDeclaration(TypeDeclSyntax declaration) =>
-        declaration is { Kind: TypeDeclKind.Class, TypeParameters.Count: 0 } &&
-        declaration.Modifiers.HasFlag(Modifiers.Objc) && declaration.Modifiers.HasFlag(Modifiers.Extern);
-
-    /// <summary>
-    /// The modules a file imports that declare an <c>extern objc class</c>
-    /// named as <paramref name="declaration"/> is, when it is one.
-    /// </summary>
-    private List<string> ReopenedFrom(
+    /// <summary>A module this file imports that declares the same class itself, if one does.</summary>
+    private static string? ImportedHomeOf(
         TypeDeclSyntax declaration, FileScope scope, CompilationUnitSyntax unit,
-        Dictionary<string, HashSet<string>> homes)
-    {
-        if (!IsImportedObjCClassDeclaration(declaration) || !homes.TryGetValue(declaration.Name, out var modules))
-            return [];
-
-        return unit.Imports.Select(i => i.Name.Text)
-            .Where(name => name != scope.Module.Name && modules.Contains(name))
-            .Distinct(StringComparer.Ordinal)
-            .ToList();
-    }
+        Dictionary<string, HashSet<string>> homes) =>
+        homes.TryGetValue(declaration.Name, out var modules)
+            ? unit.Imports.Select(i => i.Name.Text).FirstOrDefault(name => name != scope.Module.Name && modules.Contains(name))
+            : null;
 
     /// <summary>
-    /// An Objective-C category: an <c>extern objc class</c> declared in a
-    /// module that imports the one declaring it. It is more of that class, as
-    /// a category in Objective-C is, and every module that can see the class
-    /// sees what it adds. A category of a category is settled after the one it
-    /// adds to, so they are taken in rounds.
+    /// An Objective-C category: an <c>extern objc class</c> that names no
+    /// superclass, declared in the class's own module or in one a file of
+    /// which imports it. It is more of that class, as a category in
+    /// Objective-C is, and every module that can see the class sees what it
+    /// adds.
     /// </summary>
-    private void DeclareObjCCategories(
-        List<(TypeDeclSyntax Declaration, FileScope Scope, List<string> From)> waiting)
+    private void DeclareObjCCategories(List<(TypeDeclSyntax Declaration, FileScope Scope, CompilationUnitSyntax Unit)> categories)
     {
-        while (waiting.Count > 0)
+        foreach (var (declaration, scope, unit) in categories)
         {
-            var still = new List<(TypeDeclSyntax, FileScope, List<string>)>();
-            foreach (var (declaration, scope, from) in waiting)
+            var found = unit.Imports.Select(i => i.Name.Text)
+                .Where(_modules.ContainsKey)
+                .Select(name => _modules[name])
+                .Prepend(scope.Module)
+                .Select(module => module.Types.GetValueOrDefault(declaration.Name))
+                .OfType<ClassTypeSymbol>()
+                .Where(c => c.ObjC == ObjCClassKind.Imported)
+                .Distinct()
+                .ToList();
+
+            switch (found.Count)
             {
-                var found = from
-                    .Select(name => _modules[name].Types.GetValueOrDefault(declaration.Name))
-                    .OfType<ClassTypeSymbol>()
-                    .Where(c => c.ObjC == ObjCClassKind.Imported)
-                    .Distinct()
-                    .ToList();
-
-                switch (found.Count)
-                {
-                    case 0:
-                        still.Add((declaration, scope, from));
-                        break;
-
-                    case 1:
-                        DeclareAdditionalPart(declaration, found[0], scope);
-                        break;
-
-                    default:
-                        diagnostics.Error("SL0550", declaration.Span,
-                            $"'{declaration.Name}' is an Objective-C class in both " +
-                            $"'{found[0].ModuleName}' and '{found[1].ModuleName}', which this file " +
-                            "imports, so there is no telling which this adds to; one of them MUST " +
-                            "import the other");
-                        break;
-                }
-            }
-
-            // Two modules adding to each other's class, and neither declaring it.
-            if (still.Count == waiting.Count)
-            {
-                foreach (var (declaration, _, from) in still)
+                case 0:
                     diagnostics.Error("SL0550", declaration.Span,
-                        $"'{declaration.Name}' adds to the Objective-C class '{from[0]}' declares, " +
-                        "and that module adds to this one's; one of them MUST declare it");
-                return;
-            }
+                        $"'{declaration.Name}' names no superclass, so it adds to an Objective-C class " +
+                        "declared elsewhere, and neither this module nor any this file imports declares one");
+                    break;
 
-            waiting = still;
+                case 1:
+                    DeclareAdditionalPart(declaration, found[0], scope);
+                    break;
+
+                default:
+                    diagnostics.Error("SL0550", declaration.Span,
+                        $"'{declaration.Name}' is an Objective-C class in both " +
+                        $"'{found[0].ModuleName}' and '{found[1].ModuleName}', which this file " +
+                        "imports, so there is no telling which this adds to");
+                    break;
+            }
         }
     }
 

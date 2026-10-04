@@ -12,4 +12,5 @@ greater true false
 spread 7.5 8.5 9.5 10.5
 twin 107
 maybe true true
+an init that may fail: 4 true
 alive at the end: 0

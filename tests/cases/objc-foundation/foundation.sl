@@ -66,6 +66,7 @@ public extern objc class SLTracked : NSObject
     [Selector("copyDoubled")] public SLTracked CopyDoubled();
     [Selector("makeTwin:")] public bool MakeTwin(out SLTracked? twin);
     [Selector("maybe:")] public SLTracked? Maybe(bool give);
+    [Selector("initIfPositive:")] public Self? InitIfPositive(long value);
 }
 
 String Text(NSString text) => Standard.Text.FromBytes(text.Utf8, text.Length);
@@ -116,6 +117,10 @@ void Tracked()
         Console.WriteLine($"twin {twin!.Value}");
 
     Console.WriteLine($"maybe {made.Maybe(true) is not null} {made.Maybe(false) is null}");
+
+    SLTracked? positive = SLTracked.Alloc().InitIfPositive(4);
+    SLTracked? refused = SLTracked.Alloc().InitIfPositive(-4);
+    Console.WriteLine($"an init that may fail: {positive?.Value ?? 0} {refused is null}");
 }
 
 // Each part runs inside a pool of its own, so that what it was handed at +0

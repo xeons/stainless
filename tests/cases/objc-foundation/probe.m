@@ -35,9 +35,13 @@ static int s_alive = 0;
 - (SLTracked *)copyDoubled;
 - (BOOL)makeTwin:(SLTracked **)twin;
 - (SLTracked *)maybe:(BOOL)give;
+- (nullable instancetype)initIfPositive:(long)value;
 @end
 
 @implementation SLTracked
+{
+    BOOL _counted;
+}
 
 + (int)alive { return s_alive; }
 
@@ -51,12 +55,17 @@ static int s_alive = 0;
     self = [super init];
     if (self != nil) {
         _value = value;
+        _counted = YES;
         s_alive++;
     }
     return self;
 }
 
-- (void)dealloc { s_alive--; }
+- (void)dealloc
+{
+    // An object its init refused was never counted.
+    if (_counted) s_alive--;
+}
 
 - (SLWide)spread
 {
@@ -77,6 +86,12 @@ static int s_alive = 0;
 {
     *twin = [SLTracked trackedWithValue:_value + 100];
     return YES;
+}
+
+- (nullable instancetype)initIfPositive:(long)value
+{
+    if (value <= 0) return nil;
+    return [self initWithValue:value];
 }
 
 - (SLTracked *)maybe:(BOOL)give

@@ -563,6 +563,7 @@ public sealed partial class Binder
         if (!function.ReturnsSelf) return call;
 
         TypeSymbol? actual = function.IsStatic ? classReceiver : receiver?.Type;
+        if (function.ReturnType is OptionalTypeSymbol) actual = actual?.MakeOptionalType();
         if (actual is null || actual == function.ReturnType) return call;
 
         return new BoundConversion(span, actual, call, ConversionKind.ObjCSelf);

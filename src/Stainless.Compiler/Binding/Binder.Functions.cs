@@ -28,19 +28,20 @@ namespace Stainless.Binding;
 /// </summary>
 public sealed partial class Binder
 {
+    private static bool IsSelf(TypeSyntax type) =>
+        type is NamedTypeSyntax { Name.Parts: ["Self"], TypeArguments.Count: 0 };
+
     private void DeclareFunction(FileScope scope, NamedTypeSymbol? containingType, FunctionDeclSyntax declaration)
     {
         var module = scope.Module;
 
         // `Self` is Objective-C's instancetype: on a member of an objc type it
         // is that type here, and the receiver's at a call.
-        bool returnsSelf = IsObjCType(containingType) &&
-                           declaration.ReturnType is NamedTypeSyntax
-                           {
-                               Name.Parts: ["Self"], TypeArguments.Count: 0,
-                           };
+        // `Self?` is an instancetype that may be nil, as an init that can fail is.
+        bool optionalSelf = declaration.ReturnType is NullableTypeSyntax { Element: var element } && IsSelf(element);
+        bool returnsSelf = IsObjCType(containingType) && (IsSelf(declaration.ReturnType) || optionalSelf);
         var returnType = returnsSelf
-            ? containingType!
+            ? optionalSelf ? containingType!.MakeOptionalType() : containingType!
             : ResolveType(declaration.ReturnType, scope, allowVoid: true);
 
         // Static is a statement about a member. On a module-level function the

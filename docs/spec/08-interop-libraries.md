@@ -772,7 +772,8 @@ no body, because Objective-C has no default implementations.
 
 **`Self` is Objective-C's `instancetype`.** A method of an objc type declared
 to return `Self` returns the type of whatever it was sent to, so
-`NSString.Alloc().Init()` is an `NSString` with no cast.
+`NSString.Alloc().Init()` is an `NSString` with no cast. `Self?` is one that
+may be nil, as an init that can fail returns.
 
 ### Who owns what a message returns
 
@@ -876,10 +877,12 @@ public extern objc class NSString : NSPasteboardWriting
 ```
 
 Every declaration is the one class: what each adds is a member wherever the
-class is seen. Each may adopt protocols; exactly one names the superclass,
-and a category that names one is refused (SL0551). A file importing two
-modules that each declare a class of the name, neither importing the other,
-cannot say which it adds to (SL0550).
+class is seen. The declaration that is the class itself names a superclass,
+or is `[ObjCRoot]`; any other is a category, and adds to the class its own
+module or a module its file imports declares. Each may adopt protocols. A
+second declaration naming a superclass, in a file that imports the class's
+module, is refused (SL0551); so is a category whose file sees no such class,
+or two of them, and cannot say which it adds to (SL0550).
 
 ### Core Foundation
 
