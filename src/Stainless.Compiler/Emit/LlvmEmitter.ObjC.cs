@@ -31,6 +31,15 @@ namespace Stainless.Emit;
 /// </summary>
 public sealed partial class LlvmEmitter
 {
+    /// <summary>
+    /// The modules the program reaches something of: a function it calls, a
+    /// variable it reads, a class it names, a message a member of it
+    /// declares. A framework a module names with <c>#pragma comment</c> is
+    /// linked when the module is reached, so naming every binding costs a
+    /// program nothing it does not use, and links nothing its macOS lacks.
+    /// </summary>
+    public HashSet<string> ReachedModules { get; } = new(StringComparer.Ordinal);
+
     /// <summary>Each selector sent, and the reference a send loads it from.</summary>
     private readonly Dictionary<string, int> _selectors = new(StringComparer.Ordinal);
 
@@ -134,7 +143,11 @@ public sealed partial class LlvmEmitter
             _ => "@objc_msgSend",
         };
         if (super) _sendsToSuper = true;
-        string invocation = $"call {spelling} {callee}({string.Join(", ", arguments)})";
+        // A variadic message is called as the C variadic it is: the extra
+        // arguments go where the convention puts them, on the stack on Apple
+        // silicon, and the call says so.
+        string calleeType = function.IsVariadic ? $"{spelling} ({MessageVariadicSignature(function, stret)})" : spelling;
+        string invocation = $"call {calleeType} {callee}({string.Join(", ", arguments)})";
 
         string? result = null;
         if (stret || returnInfo.Style == PassStyle.Ignore || function.ReturnType.IsVoid())
@@ -210,7 +223,7 @@ public sealed partial class LlvmEmitter
             if (BoolIsByte && IsBool(expression.Type))
                 lowered[i].Add($"i8 signext {Emit("i8", $"zext i1 {value.Ref} to i8")}");
             else
-                AppendArgument(value, expression.Type, lowered[i], variadic: false);
+                AppendArgument(value, expression.Type, lowered[i], variadic: i >= parameters.Count);
         }
 
         foreach (var pieces in lowered) arguments.AddRange(pieces);
@@ -232,6 +245,27 @@ public sealed partial class LlvmEmitter
     }
 
     private static bool IsBool(TypeSymbol type) => type == PrimitiveTypeSymbol.Bool;
+
+    /// <summary>The fixed parameters of a variadic message, as the call lowers them, and then <c>...</c>.</summary>
+    private string MessageVariadicSignature(FunctionSymbol function, bool stret)
+    {
+        var parts = new List<string>();
+        if (stret) parts.Add("ptr");
+        parts.Add("ptr");
+        parts.Add("ptr");
+        foreach (var parameter in function.Parameters.Where(p => !p.IsThis))
+        {
+            if (parameter.Mode is Syntax.ParameterMode.Out or Syntax.ParameterMode.Ref && IsObjCReference(parameter.Type))
+                parts.Add("ptr");
+            else if (BoolIsByte && IsBool(parameter.Type))
+                parts.Add("i8");
+            else
+                parts.AddRange(DeclaredTypes(ClassifyParameter(parameter, variadic: true)));
+        }
+
+        parts.Add("...");
+        return string.Join(", ", parts);
+    }
 
     /// <summary>
     /// Takes ownership of an object a message handed back at +0. On Apple
@@ -320,6 +354,7 @@ public sealed partial class LlvmEmitter
         string argument;
         string selector;
 
+        ReachedModules.Add(((NamedTypeSymbol)target).ModuleName);
         if (target is ClassTypeSymbol { IsCoreFoundation: true } cf)
             return EmitCFTest(value, cf);
 
@@ -408,6 +443,7 @@ public sealed partial class LlvmEmitter
     /// <summary>The class reference a class message to <paramref name="classType"/> loads.</summary>
     private string ClassReference(ClassTypeSymbol classType)
     {
+        ReachedModules.Add(classType.ModuleName);
         string name = classType.ObjCRuntimeName ?? classType.SimpleName;
         if (!_classReferences.TryGetValue(name, out int index))
         {

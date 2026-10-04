@@ -85,6 +85,7 @@ public sealed partial class LlvmEmitter
         foreach (var external in classType.SelfAndBases().Skip(1).Where(c => c.ObjC == ObjCClassKind.Imported))
         {
             string name = external.ObjCRuntimeName!;
+            ReachedModules.Add(external.ModuleName);
             Declare($"OBJC_CLASS_$_{name}", $"@\"OBJC_CLASS_$_{name}\" = external global ptr");
             Declare($"OBJC_METACLASS_$_{name}", $"@\"OBJC_METACLASS_$_{name}\" = external global ptr");
         }

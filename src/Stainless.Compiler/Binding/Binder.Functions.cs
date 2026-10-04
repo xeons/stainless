@@ -107,6 +107,16 @@ public sealed partial class Binder
         else if (declaration.Attributes.Count > 0)
             ReadForeignOwnership(symbol, declaration.Attributes);
 
+        // A message Objective-C answers reads its own extra arguments; nothing
+        // written here could.
+        if (containingType is not null && symbol.IsVariadic &&
+            !(symbol.IsMessage && IsDescribedOnly(containingType) && declaration.Body is null))
+            diagnostics.Error("SL0493", declaration.Span,
+                $"'{symbol.Name}' cannot be variadic; '...' may only be written on an " +
+                "'extern \"C\"' declaration or a message an Objective-C class that already exists " +
+                "answers, because there is no 'va_list' to read the extra arguments with. Take an " +
+                "array, a slice, or a count and a pointer");
+
         if (declaration.ExplicitInterface is { } named)
         {
             DeclareExplicitMember(symbol, containingType, declaration, named, scope);

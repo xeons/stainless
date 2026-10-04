@@ -10,6 +10,11 @@ public extern objc class NSObject
     [Selector("hash")] public nuint Hash();
 }
 
+public objc interface Coding
+{
+    [Selector("supportsCoding")] static abstract bool SupportsCoding { get; }
+}
+
 public closure nuint Hasher();
 
 // A C++ function handing back an Objective-C object: C++ has no rule for who owns it.
@@ -30,6 +35,9 @@ void Uses(NSObject held)
     var made = new NSObject();
 
     NSApp = held;
+
+    // A protocol's class member, sent to no class.
+    bool coding = Coding.SupportsCoding;
 }
 
 int Main() => 0;

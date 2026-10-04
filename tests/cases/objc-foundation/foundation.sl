@@ -14,14 +14,20 @@ public objc interface NSObjectProtocol
     [Selector("isEqual:")] bool IsEqual(AnyObject? other);
 }
 
+public objc interface NSSecureCoding
+{
+    [Selector("supportsSecureCoding")] static abstract bool SupportsSecureCoding { get; }
+}
+
 [ObjCRoot]
 public extern objc class NSObject : NSObjectProtocol
 {
+    [Selector("description")] public static NSString ClassDescription { get; }
     [Selector("alloc")] public static Self Alloc();
     [Selector("init")] public Self Init();
 }
 
-public extern objc class NSString : NSObject
+public extern objc class NSString : NSObject, NSSecureCoding
 {
     [Selector("stringWithUTF8String:")] public static Self FromUtf8(byte* text);
     [Selector("UTF8String")] public byte* Utf8 { get; }
@@ -29,6 +35,7 @@ public extern objc class NSString : NSObject
     [Selector("isEqualToString:")] public bool IsEqualToString(NSString other);
     [Selector("stringByAppendingString:")] public NSString Append(NSString other);
     [Selector("copy")] public NSString Copy();
+    [Selector("stringWithFormat:")] public static NSString WithFormat(NSString format, ...);
 }
 
 public extern objc class NSMutableArray : NSObject
@@ -78,6 +85,10 @@ void Strings()
     Console.WriteLine($"{Text(both)} has {both.Length} characters");
     Console.WriteLine($"equal: {hello.IsEqualToString(NSString.FromUtf8("hello"))}");
     Console.WriteLine($"a copy: {Text(hello.Copy())}");
+
+    // A variadic message: an int, an object, a float that widens and a C string.
+    var formatted = NSString.WithFormat(NSString.FromUtf8("%d %@ %.2f %s"), 42, hello, 2.5f, "bytes");
+    Console.WriteLine($"formatted: {Text(formatted)}");
 }
 
 void Collections()
@@ -117,6 +128,10 @@ void Tracked()
         Console.WriteLine($"twin {twin!.Value}");
 
     Console.WriteLine($"maybe {made.Maybe(true) is not null} {made.Maybe(false) is null}");
+
+    // A class message goes to the class named, though a superclass declares it.
+    Console.WriteLine($"class description: {Text(SLTracked.ClassDescription)}");
+    Console.WriteLine($"a protocol's class member: {NSString.SupportsSecureCoding}");
 
     SLTracked? positive = SLTracked.Alloc().InitIfPositive(4);
     SLTracked? refused = SLTracked.Alloc().InitIfPositive(-4);

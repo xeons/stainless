@@ -102,7 +102,7 @@ public sealed partial class Binder
                 member.Offset = 0;
                 member.BitOffset = 0;
                 widest = Math.Max(widest, member.Type.Size);
-                strictest = Math.Max(strictest, Math.Max(1, member.Type.Alignment));
+                strictest = Math.Max(strictest, member.IsPacked ? 1 : Math.Max(1, member.Type.Alignment));
             }
 
             if (union.IsPacked) strictest = 1;
@@ -149,7 +149,7 @@ public sealed partial class Binder
 
             // Packed means no padding anywhere: a field lands where the one
             // before it ended, and the type asks nothing of its own address.
-            int fieldAlignment = type.IsPacked ? 1 : Math.Max(1, field.Type.Alignment);
+            int fieldAlignment = type.IsPacked || field.IsPacked ? 1 : Math.Max(1, field.Type.Alignment);
             if (type.PackAlignment is { } pack) fieldAlignment = Math.Min(fieldAlignment, pack);
             offset = TypeExtensions.AlignTo(offset, fieldAlignment);
             field.Offset = offset - start;

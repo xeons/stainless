@@ -1073,7 +1073,7 @@ public sealed partial class Binder
                 return new BoundStaticAccess(syntax.Span, ownStatic);
 
             if (EnclosingType?.FindProperty(name) is { Getter.IsStatic: true } ownStaticProperty)
-                return BindPropertyRead(syntax.Span, receiver: null, ownStaticProperty);
+                return BindPropertyRead(syntax.Span, receiver: null, ownStaticProperty, named: EnclosingType);
 
             // An unqualified member name inside a method means `this.member`.
             // A static method has no `this`, and saying so here is worth more
@@ -2767,9 +2767,10 @@ public sealed partial class Binder
     /// with nothing to say. A method has always been non-virtual through
     /// <c>base</c>; a property accessor is a method and had been missed.
     /// </summary>
+    /// <param name="named">The type a static read was written through, which a class message is sent to.</param>
     private BoundExpression BindPropertyRead(
         SourceSpan span, BoundExpression? receiver, PropertySymbol property,
-        bool nonVirtual = false)
+        bool nonVirtual = false, NamedTypeSymbol? named = null)
     {
         if (property.Getter is not { } getter) return new BoundErrorExpression(span);
 
@@ -2793,7 +2794,7 @@ public sealed partial class Binder
             receiver = new BoundAddressOf(span, structType.MakePointerType(), receiver);
 
         if (getter.IsMessage)
-            return SendMessage(span, getter, receiver, [], null, nonVirtual, named: null);
+            return SendMessage(span, getter, receiver, [], null, nonVirtual, named);
 
         return new BoundCall(span, getter, receiver, []) { IsNonVirtual = nonVirtual };
     }

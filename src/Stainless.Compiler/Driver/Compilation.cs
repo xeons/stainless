@@ -1014,10 +1014,15 @@ public sealed class Compilation
         // What the command line asked for, plus what the sources asked for with
         // '#pragma comment(lib, ...)'. A binding knows which library it needs;
         // repeating that on every command line is the thing the pragma removes.
+        // A framework named by a module the program reaches nothing of is not
+        // linked: the binding of every framework would otherwise link them
+        // all, and one newer than the running macOS stops the program loading.
         var libraries = new List<string>(options.Libraries);
         foreach (var unit in units)
             foreach (string library in unit.Libraries)
-                if (!libraries.Contains(library, StringComparer.Ordinal))
+                if (!libraries.Contains(library, StringComparer.Ordinal) &&
+                    (!library.StartsWith(Toolchain.FrameworkPrefix, StringComparison.Ordinal) ||
+                     emitter.ReachedModules.Contains(unit.ModuleName?.Text ?? "")))
                     libraries.Add(library);
 
         // A program that names an Objective-C type sends messages through

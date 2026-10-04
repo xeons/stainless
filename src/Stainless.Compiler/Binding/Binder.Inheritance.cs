@@ -880,6 +880,7 @@ public sealed partial class Binder
 
                 BindAttributes(member.Attributes, field.Attributes, entry.Scope,
                     type.Name + "." + field.Name);
+                ReadPackedField(type, field, member.Span);
             }
 
             // An attribute on an automatic property lands on its backing field
@@ -1550,6 +1551,29 @@ public sealed partial class Binder
     /// runtime allocates by a type's alignment rather than by its size -- but
     /// half a rule is worse than a stated limit.
     /// </summary>
+    /// <summary>
+    /// <c>[Packed]</c> on one field of a struct or union: that field alone is
+    /// laid out with no padding before it, and asks nothing of the alignment
+    /// of what holds it.
+    /// </summary>
+    private void ReadPackedField(NamedTypeSymbol type, FieldSymbol field, SourceSpan span)
+    {
+        if (!field.Attributes.Any(a => a.Type == _builtins.Packed)) return;
+
+        string? why = type is not StructTypeSymbol || type is VariantTypeSymbol
+            ? $"'{type.Name}' is not a struct or a union, and only C's layout has a field to pack"
+            : field.IsBitField
+                ? "it is a bit-field, which is already where its bits fall"
+                : null;
+
+        if (why is null) field.IsPacked = true;
+        else
+            diagnostics.Error("SL0463", span,
+                $"'[Packed]' on '{type.Name}.{field.Name}' lays the field out with no padding before " +
+                $"it, and {why}",
+                type);
+    }
+
     private void ReadLayoutAttributes(NamedTypeSymbol type, SourceSpan span)
     {
         const int MaxAlignment = 16;

@@ -272,7 +272,7 @@ public sealed partial class Binder
             if (RefuseStaticRequirement(onTheType.Getter!, propertyOwner, syntax.Span))
                 return new BoundErrorExpression(syntax.Span);
 
-            return BindPropertyRead(syntax.Span, receiver: null, onTheType);
+            return BindPropertyRead(syntax.Span, receiver: null, onTheType, named: propertyOwner);
         }
 
         if (!syntax.ThroughPointer && ResolveTypePrefix(syntax.Target, syntax.Member) is { } staticOwner &&

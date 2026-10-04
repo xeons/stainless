@@ -436,6 +436,13 @@ public sealed class FieldSymbol(string name, TypeSymbol type, NamedTypeSymbol co
 
     public bool IsBitField => BitWidth is not null;
 
+    /// <summary>
+    /// <c>[Packed]</c> on the field: it is aligned to one byte wherever the
+    /// struct around it puts it, as C's <c>__attribute__((packed))</c> on a
+    /// field is.
+    /// </summary>
+    public bool IsPacked { get; set; }
+
     public override string ToString() => $"{ContainingType.Name}.{Name}";
 }
 

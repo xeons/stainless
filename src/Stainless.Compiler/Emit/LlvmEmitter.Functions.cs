@@ -33,6 +33,7 @@ public sealed partial class LlvmEmitter
     private void EmitFunction(BoundFunction function)
     {
         var symbol = function.Symbol;
+        ReachedModules.Add(symbol.ModuleName);
         ResetFunctionState();
         _inObjCConstructor = symbol is
             { Kind: FunctionKind.Constructor, ContainingType: ClassTypeSymbol { ObjC: ObjCClassKind.Defined } };

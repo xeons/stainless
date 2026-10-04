@@ -461,6 +461,23 @@ not (SL0421).
 `[Align]` combines with either: `[Packed] [Align(4)]` means nothing padded
 inside, and the whole of it on a four-byte boundary.
 
+**`[Packed]` on a field** packs that field alone, as C's
+`__attribute__((packed))` on a field does: it starts where the field before it
+ended, and asks nothing of the alignment of the struct or union holding it.
+IOKit's event record packs its 64-bit time this way:
+
+```csharp
+public struct Event {        // 16 bytes, on a four-byte boundary
+    public int Type;         // at 0
+    [Packed] public long Time;   // at 4, not 8
+    public int Flags;        // at 12
+}
+```
+
+Only a struct's or a union's field may be packed, and not a bit-field (SL0463).
+A header written for a library carrying one cannot be compiled by MSVC, which
+has no way to say it, and says so.
+
 **N is capped at 16.** That is `max_align_t` — what `malloc` guarantees — and a
 class holding a more-aligned field would be handed memory that does not honour
 it. A local could be aligned further and a heap object could too, once the

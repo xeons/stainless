@@ -31,6 +31,12 @@ public class Bag
     {
         Count = count;
     }
+
+    // Only a message an Objective-C class answers reads its own extra arguments.
+    public int Total(int first, ...) // SL0493
+    {
+        return first;
+    }
 }
 
 int Main()

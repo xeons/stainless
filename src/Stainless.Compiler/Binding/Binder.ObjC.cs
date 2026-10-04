@@ -547,11 +547,23 @@ public sealed partial class Binder
         IReadOnlyList<BoundExpression> arguments, IReadOnlyList<int>? order,
         bool nonVirtual, NamedTypeSymbol? named)
     {
-        RequireDarwin(span);
-
         var classReceiver = function.IsStatic
             ? named as ClassTypeSymbol ?? function.ContainingType as ClassTypeSymbol
             : null;
+
+        // A protocol's class member is answered by a class that adopts it,
+        // and a protocol is no class to send it to.
+        if (function.IsStatic && classReceiver is null)
+        {
+            diagnostics.Error("SL0928", span,
+                $"'{function.ContainingType?.Name}.{MemberName(function)}' is a class member of a " +
+                "protocol, which a class adopting the protocol answers; send it to that class, " +
+                $"as in 'NSString.{MemberName(function)}'",
+                function.ContainingType);
+            return new BoundErrorExpression(span);
+        }
+
+        RequireDarwin(span);
 
         var call = new BoundCall(span, function, receiver, arguments)
         {

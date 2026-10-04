@@ -452,6 +452,7 @@ public sealed partial class LlvmEmitter
     private Val EmitCall(BoundCall call)
     {
         if (TryEmitInlineIntrinsic(call, out var inline)) return inline;
+        ReachedModules.Add(call.Function.ModuleName);
         if (call.Function.IsMessage) return EmitMessage(call);
 
         var function = call.Function;

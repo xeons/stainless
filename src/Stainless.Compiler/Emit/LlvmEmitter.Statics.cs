@@ -120,6 +120,7 @@ public sealed partial class LlvmEmitter
 
     private Val EmitStaticAccess(BoundStaticAccess access)
     {
+        ReachedModules.Add(access.Static.ModuleName);
         // A struct is handled by address everywhere else, so it is here too.
         if (access.Type is StructTypeSymbol)
             return new Val("@" + StaticName(access.Static), "ptr", access.Type);

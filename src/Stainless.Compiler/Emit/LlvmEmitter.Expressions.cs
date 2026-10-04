@@ -118,6 +118,7 @@ public sealed partial class LlvmEmitter
             case BoundConditional conditional: return EmitConditional(conditional, movesTrueArm: false);
             case BoundLet held: return EmitLet(held);
             case BoundFunctionReference reference:
+                ReachedModules.Add(reference.Function.ModuleName);
                 return new Val(Symbol(reference.Function), "ptr", reference.Type);
             case BoundIndirectCall indirect: return EmitIndirectCall(indirect);
             case BoundClosureCreate closure: return EmitClosureCreate(closure);
@@ -426,6 +427,7 @@ public sealed partial class LlvmEmitter
         switch (expression)
         {
             case BoundStaticAccess shared:
+                ReachedModules.Add(shared.Static.ModuleName);
                 return "@" + StaticName(shared.Static);
 
             case BoundLocalAccess local:

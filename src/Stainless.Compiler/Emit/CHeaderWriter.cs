@@ -92,6 +92,18 @@ public static class CHeaderWriter
             sb.AppendLine();
         }
 
+        // A packed field has gcc's and clang's spelling and no MSVC one; a
+        // header that would lay the struct out wrongly there refuses instead.
+        if (named.Any(t => t is StructTypeSymbol && t.Fields.Any(f => f.IsPacked)))
+        {
+            sb.AppendLine("#if defined(_MSC_VER) && !defined(__clang__)");
+            sb.AppendLine("#error \"a struct here has a packed field, which MSVC has no way to declare\"");
+            sb.AppendLine("#else");
+            sb.AppendLine("#define SL_PACKED_FIELD __attribute__((packed))");
+            sb.AppendLine("#endif");
+            sb.AppendLine();
+        }
+
         foreach (var type in named)
         {
             // The type a nameless member became is written inside its parent,
@@ -363,7 +375,8 @@ public static class CHeaderWriter
             }
 
             sb.AppendLine($"{indent}{Declarator(field.Type, field.Name)}" +
-                          (field.BitWidth is { } bits ? $" : {bits}" : "") + ";");
+                          (field.BitWidth is { } bits ? $" : {bits}" : "") +
+                          (field.IsPacked ? " SL_PACKED_FIELD" : "") + ";");
         }
     }
 

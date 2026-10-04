@@ -50,7 +50,17 @@ public struct Carbon
     public byte D;
 }
 
+// One field packed, as IOKit's NXEvent packs its 64-bit time: it lands where
+// the field before it ended, and the struct asks only what the rest ask.
+public struct Event
+{
+    public int Type;
+    [Packed] public long Time;
+    public int Flags;
+}
+
 export "C" nuint PlainSize() => sizeof(Plain);
+export "C" nuint EventSize() => sizeof(Event);
 export "C" nuint CarbonSize() => sizeof(Carbon);
 export "C" nuint WireSize() => sizeof(Wire);
 export "C" nuint WideSize() => sizeof(Wide);
@@ -65,3 +75,4 @@ export "C" int WireValue(Wire wire) => wire.Value;
 export "C" byte WireTrailer(Wire wire) => wire.Trailer;
 export "C" double WideY(Wide wide) => wide.Y;
 export "C" double CarbonC(Carbon carbon) => carbon.C;
+export "C" long EventTime(Event value) => value.Time;

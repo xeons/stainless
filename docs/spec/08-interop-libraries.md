@@ -87,7 +87,8 @@ own
 ```
 
 **A `...` may be called and not written.** `printf` is bound with one and works;
-a function this program *defines* may not have one, whatever its linkage. Nothing
+a function this program *defines* may not have one, whatever its linkage; nor
+may a method, except an Objective-C message (section 8.6). Nothing
 in the language reads the extra arguments — there is no `va_list` — so the
 definition would ignore them while the generated header promised the variadic
 convention, which on Win64 wants floating-point arguments duplicated into the
@@ -96,8 +97,9 @@ integer arguments would survive and the floating-point ones would not, silently.
 
 ```
 error[SL0493]: 'log_line' cannot be variadic; '...' may only be written on an
-'extern "C"' declaration, because there is no 'va_list' to read the extra
-arguments with. Take an array, a slice, or a count and a pointer
+'extern "C"' declaration or a message an Objective-C class that already exists
+answers, because there is no 'va_list' to read the extra arguments with. Take
+an array, a slice, or a count and a pointer
 ```
 
 **What a `...` takes has a type of its own.** A lambda, a function's name, an
@@ -768,7 +770,16 @@ is called directly, and `this` inside it is the object. A protocol member has
 no body, because Objective-C has no default implementations.
 
 **A static member is a class message**, sent to the class the call names:
-`NSString.Alloc()` sends `alloc` to NSString, though NSObject declares it.
+`NSString.Alloc()` sends `alloc` to NSString, though NSObject declares it. A
+protocol's class member is `static abstract`, a requirement each adopting
+class answers, and is sent to such a class: `NSString.SupportsSecureCoding`.
+Sent to the protocol itself it has no class to go to (SL0928).
+
+**A message MAY be variadic**, as `stringWithFormat:` is: `...` after its
+parameters, on a member of a protocol or an `extern objc class` with no body.
+Objective-C reads the extra arguments, so it is sent with C's variadic
+convention and C's promotions -- a `float` widens to `double`, a small integer
+to `int` -- and an object passes as itself.
 
 **`Self` is Objective-C's `instancetype`.** A method of an objc type declared
 to return `Self` returns the type of whatever it was sent to, so

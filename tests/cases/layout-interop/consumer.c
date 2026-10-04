@@ -19,6 +19,7 @@ int main(void)
     SAME("Wide size",  WideSize(),  sizeof(Library_Layout_Wide));
     SAME("Both size",  BothSize(),  sizeof(Library_Layout_Both));
     SAME("Carbon size", CarbonSize(), sizeof(Library_Layout_Carbon));
+    SAME("Event size", EventSize(), sizeof(Library_Layout_Event));
 
     printf("sizes=%d %d %d %d\n",
            (int)sizeof(Library_Layout_Plain), (int)sizeof(Library_Layout_Wire),
@@ -42,6 +43,16 @@ int main(void)
            (int)sizeof(Library_Layout_Carbon), (int)_Alignof(Library_Layout_Carbon),
            (int)offsetof(Library_Layout_Carbon, A), (int)offsetof(Library_Layout_Carbon, B),
            (int)offsetof(Library_Layout_Carbon, C), (int)offsetof(Library_Layout_Carbon, D));
+
+    printf("event=%d %d %d %d %d\n",
+           (int)sizeof(Library_Layout_Event), (int)_Alignof(Library_Layout_Event),
+           (int)offsetof(Library_Layout_Event, Type), (int)offsetof(Library_Layout_Event, Time),
+           (int)offsetof(Library_Layout_Event, Flags));
+
+    Library_Layout_Event event;
+    memset(&event, 0, sizeof event);
+    event.Time = 1234567890123LL;
+    printf("event time=%lld\n", (long long)EventTime(event));
 
     /* And a value built here, read there: the offsets have to agree in both
        directions or these come back wrong. */

@@ -32,4 +32,16 @@ public struct TwicePacked { public int A; }
 [Pack(2)]
 public class PackedClass { public int A; public PackedClass() { A = 0; } }
 
+// [Packed] on one field: a struct's or a union's, and not a bit-field.
+public class PackedFieldOwner
+{
+    [Packed] public long Time;
+    public PackedFieldOwner() { Time = 0; }
+}
+
+public struct PackedBits
+{
+    [Packed] public uint Flags : 3;
+}
+
 int Main() => 0;

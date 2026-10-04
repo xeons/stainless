@@ -1,6 +1,7 @@
 hello, world has 12 characters
 equal: true
 a copy: hello
+formatted: 42 hello 2.50 bytes
 count 3
 the first is a string of 5
 the first is a number: false
@@ -12,5 +13,7 @@ greater true false
 spread 7.5 8.5 9.5 10.5
 twin 107
 maybe true true
+class description: SLTracked
+a protocol's class member: true
 an init that may fail: 4 true
 alive at the end: 0

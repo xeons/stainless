@@ -8,3 +8,5 @@ SL0916
 SL0906
 # a store to an Objective-C object C holds
 SL0926
+# a protocol's class member sent to the protocol
+SL0928

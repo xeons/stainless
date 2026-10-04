@@ -71,6 +71,7 @@ last person to edit it -- the suite is the authority.
   plain name, which is what gcc has always done
 - `[Packed]`, `[Pack(N)]` and `[Align(N)]`: no padding at all, each field
   aligned to at most N as C's `#pragma pack(N)` does, and a raised alignment.
+  `[Packed]` on one field packs that field alone.
   They are rules about layout rather than library features, so none needs an
   import; they combine, N is a power of two capped at 16, and both apply to a
   `struct` and nothing else. The generated C header states them with
@@ -212,10 +213,15 @@ last person to edit it -- the suite is the authority.
   reference to an Objective-C object is a box over the runtime's own.
   `objc closure` is a block: a lambda becomes one by being copied to the heap
   as clang lays one out, and a block Objective-C made is called as a closure
-  is. A class declared again in a module importing it is a category;
+  is. A class declared again, naming no superclass, is a category;
   `[CFType]` makes a Core Foundation type an object ARC counts, cast by its
-  `CFTypeID`; and a C function or variable carries objects by ARC's rule for
-  C ([section 8.6](spec/08-interop-libraries.md#86-objective-c))
+  `CFTypeID`; a C function or variable carries objects by ARC's rule for C; a
+  message may be variadic; and a protocol's class member is `static abstract`
+  ([section 8.6](spec/08-interop-libraries.md#86-objective-c))
+- **Frameworks linked by use.** A `#pragma comment(framework, ...)` links its
+  framework only when the program reaches something its module declares, so a
+  program naming every generated macOS binding links what it uses and runs on
+  a macOS lacking the rest ([bindings/macos](../bindings/macos/README.md))
 - **A COM server.** `[Guid("...")]` on a `com class` is a CLSID, the compiler
   gathers every class carrying one into a factory table, and
   `Com.GetClassObject` answers it with an `IClassFactory` — so a `--shared`

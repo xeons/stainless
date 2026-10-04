@@ -2042,8 +2042,10 @@ public sealed class Parser
             // so the definition would ignore them, while the header written for
             // it promises the variadic convention and a caller obeying that
             // leaves its floating-point arguments where the callee never looks.
-            // Refusing the declaration is the only honest answer available.
-            if (isVariadic && !linkage.IsImport())
+            // Refusing the declaration is the only honest answer available. A
+            // member of a type may be an Objective-C message, which is the
+            // binder's to know.
+            if (isVariadic && !linkage.IsImport() && _typeIsGeneric.Count == 0)
                 _diagnostics.Error("SL0493", SpanFrom(start),
                     $"'{name}' cannot be variadic; '...' may only be written on an " +
                     "'extern \"C\"' declaration, because there is no 'va_list' to read " +
