@@ -516,7 +516,7 @@ public sealed partial class LlvmEmitter
         string voidType = $"v{2 * pointer}@0:{pointer}";
 
         var instance = ObjCMethodsOf(classType).Where(m => !m.IsStatic)
-            .Select(m => (SelectorOf(m), MethodTypeEncoding(m), ImpSymbol(classType, m)))
+            .Select(m => (SelectorOf(m), MethodTypeEncoding(m), (string?)ImpSymbol(classType, m)))
             .ToList();
         bool construct = HasCxxConstruct(classType);
         bool destruct = HasCxxDestruct(classType);
@@ -531,7 +531,7 @@ public sealed partial class LlvmEmitter
         string classMethods = MethodList(
             $"_OBJC_$_CLASS_METHODS_{name}",
             ObjCMethodsOf(classType).Where(m => m.IsStatic)
-                .Select(m => (SelectorOf(m), MethodTypeEncoding(m), ImpSymbol(classType, m))));
+                .Select(m => (SelectorOf(m), MethodTypeEncoding(m), (string?)ImpSymbol(classType, m))));
 
         // RO_HAS_CXX_STRUCTORS, and RO_HAS_CXX_DTOR_ONLY beside it when there
         // is nothing to construct. RO_IS_ARC is left off: the runtime has no
