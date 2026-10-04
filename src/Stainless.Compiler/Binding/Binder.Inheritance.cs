@@ -184,6 +184,13 @@ public sealed partial class Binder
                 if (!type.IsContract) toVerify.Add((interfaceType, written.Span));
             }
 
+            // The rest of an Objective-C class's parts: its categories.
+            if (classType is not null && _objcParts.TryGetValue(classType, out var parts))
+                foreach (var (part, partScope) in parts)
+                    for (int i = 0; i < part.Implements.Count; i++)
+                        if (ResolveType(part.Implements[i], partScope) is { } resolved && !resolved.IsError())
+                            BindObjCBase(type, resolved, part.Implements[i].Span, isFirst: i == 0);
+
             ResolveExplicitMembers(type);
 
             foreach (var (contract, span) in toVerify)
@@ -827,6 +834,12 @@ public sealed partial class Binder
             var written = BindObjCTypeAttributes(
                 type, entry.Declaration, BindGuid(type, entry.Declaration));
             BindAttributes(written, type.Attributes, entry.Scope, type.Name);
+
+            // The part that is the class itself, not a category, may come later.
+            if (type is ClassTypeSymbol partsOf && _objcParts.TryGetValue(partsOf, out var parts))
+                foreach (var (part, partScope) in parts)
+                    BindAttributes(BindObjCTypeAttributes(type, part, part.Attributes),
+                        type.Attributes, partScope, type.Name);
 
             if (reflect is not null && type.Attributes.Any(a => a.Type == reflect))
             {

@@ -637,6 +637,8 @@ public sealed partial class Binder
             $"'{copied.Parameter.Name}' is a local function's copy of a variable around it",
         BoundStaticAccess { Static.IsReadonly: true } held =>
             $"'{held.Static.Name}' is a 'static readonly'",
+        BoundStaticAccess { Static.IsImported: true } foreign when IsObjCReference(foreign.Type) =>
+            $"'{foreign.Static.Name}' is an Objective-C object a C library holds, and only reads",
         _ => null,
     };
 

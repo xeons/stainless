@@ -2386,6 +2386,15 @@ public sealed partial class Binder
     {
         if (RefusedThroughReadOnlySlice(target, span)) return false;
 
+        if (BaseOf(target) is BoundStaticAccess { Static: { IsImported: true } foreign } &&
+            IsObjCReference(foreign.Type))
+        {
+            diagnostics.Error("SL0926", span,
+                $"'{foreign.Name}' is an Objective-C object a C library holds, and a store would " +
+                "release it out from under the library, which owns it; it is read and never written");
+            return false;
+        }
+
         if (BaseOf(target) is BoundStaticAccess { Static.IsReadonly: true } owner)
         {
             diagnostics.Error("SL0379", span,

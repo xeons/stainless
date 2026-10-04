@@ -1,0 +1,4 @@
+# a CF type with a message, a class on a CF type, [CFType] on a protocol or with a bad name
+SL0927
+# a mutable CF type, which shares its base's CFTypeID, asked of an object
+SL0518

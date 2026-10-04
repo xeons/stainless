@@ -32,11 +32,20 @@ public sealed partial class Binder
 
     private void DeclareTypes()
     {
+        var homes = ObjCClassHomes();
+        var reopened = new List<(TypeDeclSyntax, FileScope, List<string>)>();
+
         foreach (var (scope, unit) in _units)
         {
             var module = scope.Module;
             foreach (var declaration in unit.Declarations.OfType<TypeDeclSyntax>())
             {
+                if (ReopenedFrom(declaration, scope, unit, homes) is { Count: > 0 } from)
+                {
+                    reopened.Add((declaration, scope, from));
+                    continue;
+                }
+
                 if (module.Types.TryGetValue(declaration.Name, out var already) &&
                     declaration.TypeParameters.Count == 0)
                 {
@@ -241,6 +250,105 @@ public sealed partial class Binder
                 _enumSyntax[enumType] = (declaration, scope);
                 _declaredTypes[declaration] = enumType;
             }
+        }
+
+        DeclareObjCCategories(reopened);
+    }
+
+    /// <summary>
+    /// The modules that declare an <c>extern objc class</c> of each name, read
+    /// from the syntax: a declaration in a module importing one of them adds
+    /// to that class rather than declaring another.
+    /// </summary>
+    private Dictionary<string, HashSet<string>> ObjCClassHomes()
+    {
+        var homes = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
+        foreach (var (scope, unit) in _units)
+            foreach (var declaration in unit.Declarations.OfType<TypeDeclSyntax>())
+                if (IsImportedObjCClassDeclaration(declaration))
+                {
+                    if (!homes.TryGetValue(declaration.Name, out var modules))
+                        homes[declaration.Name] = modules = new HashSet<string>(StringComparer.Ordinal);
+                    modules.Add(scope.Module.Name);
+                }
+
+        return homes;
+    }
+
+    private static bool IsImportedObjCClassDeclaration(TypeDeclSyntax declaration) =>
+        declaration is { Kind: TypeDeclKind.Class, TypeParameters.Count: 0 } &&
+        declaration.Modifiers.HasFlag(Modifiers.Objc) && declaration.Modifiers.HasFlag(Modifiers.Extern);
+
+    /// <summary>
+    /// The modules a file imports that declare an <c>extern objc class</c>
+    /// named as <paramref name="declaration"/> is, when it is one.
+    /// </summary>
+    private List<string> ReopenedFrom(
+        TypeDeclSyntax declaration, FileScope scope, CompilationUnitSyntax unit,
+        Dictionary<string, HashSet<string>> homes)
+    {
+        if (!IsImportedObjCClassDeclaration(declaration) || !homes.TryGetValue(declaration.Name, out var modules))
+            return [];
+
+        return unit.Imports.Select(i => i.Name.Text)
+            .Where(name => name != scope.Module.Name && modules.Contains(name))
+            .Distinct(StringComparer.Ordinal)
+            .ToList();
+    }
+
+    /// <summary>
+    /// An Objective-C category: an <c>extern objc class</c> declared in a
+    /// module that imports the one declaring it. It is more of that class, as
+    /// a category in Objective-C is, and every module that can see the class
+    /// sees what it adds. A category of a category is settled after the one it
+    /// adds to, so they are taken in rounds.
+    /// </summary>
+    private void DeclareObjCCategories(
+        List<(TypeDeclSyntax Declaration, FileScope Scope, List<string> From)> waiting)
+    {
+        while (waiting.Count > 0)
+        {
+            var still = new List<(TypeDeclSyntax, FileScope, List<string>)>();
+            foreach (var (declaration, scope, from) in waiting)
+            {
+                var found = from
+                    .Select(name => _modules[name].Types.GetValueOrDefault(declaration.Name))
+                    .OfType<ClassTypeSymbol>()
+                    .Where(c => c.ObjC == ObjCClassKind.Imported)
+                    .Distinct()
+                    .ToList();
+
+                switch (found.Count)
+                {
+                    case 0:
+                        still.Add((declaration, scope, from));
+                        break;
+
+                    case 1:
+                        DeclareAdditionalPart(declaration, found[0], scope);
+                        break;
+
+                    default:
+                        diagnostics.Error("SL0550", declaration.Span,
+                            $"'{declaration.Name}' is an Objective-C class in both " +
+                            $"'{found[0].ModuleName}' and '{found[1].ModuleName}', which this file " +
+                            "imports, so there is no telling which this adds to; one of them MUST " +
+                            "import the other");
+                        break;
+                }
+            }
+
+            // Two modules adding to each other's class, and neither declaring it.
+            if (still.Count == waiting.Count)
+            {
+                foreach (var (declaration, _, from) in still)
+                    diagnostics.Error("SL0550", declaration.Span,
+                        $"'{declaration.Name}' adds to the Objective-C class '{from[0]}' declares, " +
+                        "and that module adds to this one's; one of them MUST declare it");
+                return;
+            }
+
+            waiting = still;
         }
     }
 
@@ -479,7 +587,15 @@ public sealed partial class Binder
             return;
         }
 
-        if (declaration.Implements.Count > 0)
+        // A category adopts protocols, and the part naming the superclass need
+        // not be the first: each part's list is read with the class's.
+        if (existing is ClassTypeSymbol { ObjC: ObjCClassKind.Imported } objcClass)
+        {
+            if (!_objcParts.TryGetValue(objcClass, out var parts))
+                _objcParts[objcClass] = parts = [];
+            parts.Add((declaration, scope));
+        }
+        else if (declaration.Implements.Count > 0)
         {
             // A struct's interfaces say nothing about its layout, so a later
             // declaration may carry them as a class's may carry its base list.

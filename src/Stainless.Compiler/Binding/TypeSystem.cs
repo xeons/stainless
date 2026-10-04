@@ -1632,6 +1632,23 @@ public sealed class ClassTypeSymbol : NamedTypeSymbol
     /// </summary>
     public bool IsObjCRoot { get; set; }
 
+    /// <summary>
+    /// <c>[CFType]</c>: a Core Foundation type. Its objects are Objective-C
+    /// objects, counted as any is, but it answers no message and has no class
+    /// object; what one is, is asked of its <c>CFTypeID</c>.
+    /// </summary>
+    public bool IsCoreFoundation { get; set; }
+
+    /// <summary>The C function that answers the type's <c>CFTypeID</c>, from <c>[CFType("...")]</c>.</summary>
+    public string? CFTypeIDFunction { get; set; }
+
+    /// <summary>
+    /// The function answering this type's <c>CFTypeID</c>, its own or the
+    /// nearest base's: a mutable type shares its immutable base's.
+    /// </summary>
+    public string? CFTypeIDOf =>
+        SelfAndBases().TakeWhile(c => c.IsCoreFoundation).Select(c => c.CFTypeIDFunction).FirstOrDefault(f => f is not null);
+
     /// <summary>The protocols an objc class adopts, in the order written.</summary>
     public List<ObjCProtocolTypeSymbol> ObjCProtocols { get; } = [];
 
@@ -1844,12 +1861,23 @@ public sealed class ClassTypeSymbol : NamedTypeSymbol
             .FirstOrDefault(f => f is not null);
 
     public override PropertySymbol? FindProperty(string name) =>
-        SelfAndBases().Select(c => c.Properties.FirstOrDefault(p => p.Name == name))
+        MemberOwners().Select(c => c.Properties.FirstOrDefault(p => p.Name == name))
             .FirstOrDefault(p => p is not null);
 
     public override FunctionSymbol? FindMethod(string name) =>
-        SelfAndBases().Select(c => c.Methods.FirstOrDefault(m => m.Name == name))
+        MemberOwners().Select(c => c.Methods.FirstOrDefault(m => m.Name == name))
             .FirstOrDefault(m => m is not null);
+
+    /// <summary>
+    /// Where a member is looked for: the class and its bases, and for an
+    /// Objective-C class then the protocols they adopt, whose messages an
+    /// object of it answers though its headers do not repeat them.
+    /// </summary>
+    private IEnumerable<NamedTypeSymbol> MemberOwners() =>
+        !IsObjC
+            ? SelfAndBases()
+            : SelfAndBases().Concat<NamedTypeSymbol>(
+                SelfAndBases().SelectMany(c => c.ObjCProtocols).SelectMany(p => p.SelfAndBases()).Distinct());
 
     /// <summary>
     /// Every method of this name, nearest first, with an inherited one dropped
@@ -1860,7 +1888,7 @@ public sealed class ClassTypeSymbol : NamedTypeSymbol
     {
         var seen = new List<FunctionSymbol>();
 
-        foreach (var candidate in SelfAndBases().SelectMany(c => c.Methods.Where(m => m.Name == name)))
+        foreach (var candidate in MemberOwners().SelectMany(c => c.Methods.Where(m => m.Name == name)))
         {
             // The first has nothing to be hidden by, and is almost always the only one.
             if (seen.Count > 0)

@@ -1,0 +1,9 @@
+length 19, owned 1 time(s)
+mutable, seen as immutable: 5
+a string is a string: true, a number: false
+a number is a string: false
+cast back: 19
+as an NSString: 19
+an object is a CFTypeRef: true
+nil is no string: false
+the last owned 1 time(s)

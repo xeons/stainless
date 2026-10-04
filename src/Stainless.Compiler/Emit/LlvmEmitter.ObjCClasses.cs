@@ -755,6 +755,7 @@ public sealed partial class LlvmEmitter
     internal static string TypeEncoding(TypeSymbol type, bool topLevel)
     {
         if ((type.AsReference() ?? type) is ObjCBlockTypeSymbol) return "@?";
+        if ((type.AsReference() ?? type) is ClassTypeSymbol { IsCoreFoundation: true }) return "^v";
         if (Binder.IsObjCReference(type)) return "@";
 
         var element = type.AsReference() ?? type;

@@ -855,6 +855,77 @@ apart by code compiled somewhere else, so it declares no field, no static
 storage, no constructor, no destructor and no event (SL0909), and `new`
 cannot make one (SL0914): send it the messages its headers make one with.
 
+A member is looked for on the class, then its superclasses, then the
+protocols any of them adopts: an object answers its protocols' messages,
+and Objective-C's headers do not repeat them on the class.
+
+### Categories
+
+An `extern objc class` may be declared more than once, in its own module or
+in any module that imports it, as Objective-C adds methods to a class from
+any header with a category:
+
+```csharp
+module AppKitStrings;
+import FoundationStrings;           // declares NSString : NSObject
+
+public extern objc class NSString : NSPasteboardWriting
+{
+    [Selector("sizeWithAttributes:")] public CGSize SizeWithAttributes(NSDictionary? attributes);
+}
+```
+
+Every declaration is the one class: what each adds is a member wherever the
+class is seen. Each may adopt protocols; exactly one names the superclass,
+and a category that names one is refused (SL0551). A file importing two
+modules that each declare a class of the name, neither importing the other,
+cannot say which it adds to (SL0550).
+
+### Core Foundation
+
+`[CFType]` on an `extern objc class` marks a Core Foundation type. Every Core
+Foundation object is an Objective-C object on Apple's systems, so ARC counts
+one with `objc_retain` and `objc_release` as it counts any other, and one
+converts to `AnyObject` for nothing:
+
+```csharp
+[CFType]                       public extern objc class CFTypeRef { }
+[CFType("CFStringGetTypeID")]  public extern objc class CFStringRef : CFTypeRef { }
+[CFType]                       public extern objc class CFMutableStringRef : CFStringRef { }
+
+[ReturnsRetained] extern "C" CFStringRef CFStringCreateWithCString(
+    CFAllocatorRef? allocator, byte* text, uint encoding);
+```
+
+A Core Foundation type derives from Core Foundation types alone, ending at
+one with no base; it adopts no protocol, answers no message and is no
+Objective-C class's superclass (SL0927). A cast down to one asks the
+object's `CFTypeID` against the function the attribute names, and nil
+answers no. Any object is a `CFTypeRef`, as Core Foundation's own functions
+take it, so a cast to the root asks nothing. A mutable type has no
+`CFTypeID` of its own -- it shares its base's -- so an object cannot be asked
+whether it is one (SL0518). A weak reference to one is refused: the runtime
+keeps weak references to objects of its own classes.
+
+### Objects across `extern "C"`
+
+A C function MAY take and return an Objective-C object. What it returns
+arrives at +0, which is ARC's rule for a C function, and is claimed at once;
+`[ReturnsRetained]` says it is handed over instead -- Core Foundation's
+Create rule -- and `[ReturnsNotRetained]` says the rule again. Either on a
+function returning no object is refused (SL0906). One declared `T` that
+returns nil stops the program, naming the function.
+
+A C variable holding an object is read at +0 and retained, and is never
+written (SL0926): a store would release what the library owns.
+
+```csharp
+extern "C" NSString NSDefaultRunLoopMode;
+```
+
+A C++ function returning an object is refused (SL0916): C++ has no rule for
+who owns it.
+
 ### A class defined here
 
 `objc class` with bodies is a class this program defines and the Objective-C
@@ -997,9 +1068,6 @@ A case or a program may also include `.m` files, compiled with
 - **A message held without being sent**, in a closure or a delegate
   (SL0913). A message has no function to point at; write a lambda that sends
   it.
-- **An Objective-C object returned through `extern "C"`** (SL0916). C does not
-  say whether the caller owns it; declare a pointer, and take the object with
-  a cast.
 - **An Objective-C exception** is not caught by anything a Stainless program
   can write. One that reaches a method a defined class answers stops the
   program there; one that reaches the top ends it with Objective-C's own

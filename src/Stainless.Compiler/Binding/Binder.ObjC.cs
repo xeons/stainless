@@ -271,6 +271,27 @@ public sealed partial class Binder
     }
 
     /// <summary>
+    /// <c>[ReturnsRetained]</c> or <c>[ReturnsNotRetained]</c> on an
+    /// <c>extern "C"</c> function. Without either, a C function hands back an
+    /// object at +0, which is ARC's rule for one.
+    /// </summary>
+    private void ReadForeignOwnership(FunctionSymbol symbol, IReadOnlyList<AttributeSyntax> attributes)
+    {
+        foreach (var attribute in attributes)
+        {
+            if (!IsObjCReference(symbol.ReturnType))
+            {
+                diagnostics.Error("SL0906", attribute.Span,
+                    $"'[{attribute.Name.Last}]' says who owns the object a call hands back, and " +
+                    $"'{symbol.Name}' returns '{symbol.ReturnType.Name}', which is not one");
+                return;
+            }
+
+            symbol.ReturnsRetained = attribute.Name.Last == "ReturnsRetained";
+        }
+    }
+
+    /// <summary>
     /// Ownership from the selector's method family, as clang reads it, and
     /// then from <c>[ReturnsRetained]</c> or <c>[ReturnsNotRetained]</c>.
     /// </summary>
@@ -423,7 +444,12 @@ public sealed partial class Binder
         if (IsObjCReference(from) && to is WeakTypeSymbol { Element: var weakElement } &&
             IsObjCType(weakElement))
         {
-            kind = IsObjCKindOf(from.AsReference() ?? from, weakElement) ? ConversionKind.ReferenceToWeak : null;
+            // The runtime keeps weak references to objects of its own classes,
+            // and a Core Foundation object may be of none.
+            kind = IsObjCKindOf(from.AsReference() ?? from, weakElement) &&
+                   weakElement is not ClassTypeSymbol { IsCoreFoundation: true }
+                ? ConversionKind.ReferenceToWeak
+                : null;
             return true;
         }
 
@@ -456,6 +482,26 @@ public sealed partial class Binder
             return true;
         }
 
+        // Down to a Core Foundation type asks the object's CFTypeID. Any object
+        // is a CFTypeRef, as CF's own functions take it, so the root is asked
+        // nothing; and a mutable type shares its base's id, so it cannot be
+        // asked at all.
+        if (to is ClassTypeSymbol { IsCoreFoundation: true } cf)
+        {
+            kind = !explicitCast ? null
+                : cf.BaseClass is null ? ConversionKind.ObjCUpcast
+                : IsAskableCFType(cf, from) ? ConversionKind.ObjCDowncast
+                : null;
+            return true;
+        }
+
+        // A Core Foundation object is asked what class it is like any other.
+        if (from is ClassTypeSymbol { IsCoreFoundation: true } && to is ClassTypeSymbol)
+        {
+            kind = explicitCast ? ConversionKind.ObjCDowncast : null;
+            return true;
+        }
+
         // Down to a class asks isKindOfClass:, and to a protocol asks
         // conformsToProtocol:. A class can always be asked, since a subclass
         // may adopt a protocol its superclass does not.
@@ -467,6 +513,14 @@ public sealed partial class Binder
         kind = explicitCast && couldBe && to != _builtins.AnyObject ? ConversionKind.ObjCDowncast : null;
         return true;
     }
+
+    /// <summary>
+    /// Whether an object seen as <paramref name="from"/> can be asked if it is
+    /// a <paramref name="cf"/>: the type has a <c>CFTypeID</c> of its own, and
+    /// one that <paramref name="from"/> does not already have.
+    /// </summary>
+    private static bool IsAskableCFType(ClassTypeSymbol cf, TypeSymbol from) =>
+        cf.CFTypeIDFunction is { } id && (from as ClassTypeSymbol)?.CFTypeIDOf != id;
 
     /// <summary>
     /// True when every <paramref name="from"/> is a <paramref name="to"/>:
@@ -587,7 +641,7 @@ public sealed partial class Binder
     private IReadOnlyList<AttributeSyntax> BindObjCTypeAttributes(
         NamedTypeSymbol type, TypeDeclSyntax declaration, IReadOnlyList<AttributeSyntax> written)
     {
-        var mine = written.Where(a => a.Name.Last is "ObjCName" or "ObjCRoot").ToList();
+        var mine = written.Where(a => a.Name.Last is "ObjCName" or "ObjCRoot" or "CFType").ToList();
         if (mine.Count == 0) return written;
 
         foreach (var attribute in mine)
@@ -598,6 +652,12 @@ public sealed partial class Binder
                     $"'[{attribute.Name.Last}]' is about an Objective-C class or protocol, and " +
                     $"'{type.Name}' is neither",
                     type);
+                continue;
+            }
+
+            if (attribute.Name.Last == "CFType")
+            {
+                ReadCFType(type, attribute);
                 continue;
             }
 
@@ -631,6 +691,58 @@ public sealed partial class Binder
         }
 
         return written.Except(mine).ToList();
+    }
+
+    /// <summary>
+    /// <c>[CFType]</c> or <c>[CFType("CFStringGetTypeID")]</c>, naming the C
+    /// function a cast asks. Only an <c>extern objc class</c> is one: Core
+    /// Foundation's types exist already, and have no protocols.
+    /// </summary>
+    private void ReadCFType(NamedTypeSymbol type, AttributeSyntax attribute)
+    {
+        if (type is not ClassTypeSymbol { ObjC: ObjCClassKind.Imported } classType)
+        {
+            diagnostics.Error("SL0927", attribute.Span,
+                $"'[CFType]' marks a Core Foundation type, which exists already, and '{type.Name}' " +
+                "is not an 'extern objc class'",
+                type);
+            return;
+        }
+
+        if (attribute.Arguments.Count > 1 ||
+            (attribute.Arguments.Count == 1 &&
+             (ConstantValue(attribute.Arguments[0], _builtins.String) is not string function ||
+              function.Length == 0 || !function.All(c => char.IsAsciiLetterOrDigit(c) || c == '_'))))
+        {
+            diagnostics.Error("SL0927", attribute.Span,
+                "'[CFType]' takes nothing, or the name of the C function that answers the type's " +
+                "CFTypeID: '[CFType(\"CFStringGetTypeID\")]'",
+                type);
+            return;
+        }
+
+        classType.IsCoreFoundation = true;
+        if (attribute.Arguments.Count == 1)
+            classType.CFTypeIDFunction = (string)ConstantValue(attribute.Arguments[0], _builtins.String)!;
+    }
+
+    /// <summary>
+    /// What a Core Foundation type cannot be: it derives from Core Foundation
+    /// types alone, ending at one with no base, adopts no protocol and answers
+    /// no message. A class derived from it would have no class object to name.
+    /// </summary>
+    private void CheckCoreFoundation(ClassTypeSymbol classType)
+    {
+        var span = classType.Span ?? default;
+        string? why =
+            classType.IsObjCRoot ? "'[ObjCRoot]': a Core Foundation type has no class object, so it is no class's root"
+            : classType.BaseClass is { IsCoreFoundation: false } objcBase ? $"derived from '{objcBase.Name}', which is not a Core Foundation type"
+            : classType.ObjCProtocols.Count > 0 ? $"adopting '{classType.ObjCProtocols[0].Name}': a Core Foundation type answers no message"
+            : classType.Methods.FirstOrDefault(m => m.IsMessage) is { } message ? $"sent '{message.Selector}': a Core Foundation type answers no message"
+            : null;
+
+        if (why is not null)
+            diagnostics.Error("SL0927", span, $"'{classType.Name}' is '[CFType]', and cannot be {why}", classType);
     }
 
     /// <summary>
@@ -668,6 +780,11 @@ public sealed partial class Binder
                 else if (superclass == classType || superclass.DerivesFrom(classType))
                     diagnostics.Error("SL0910", span,
                         $"'{classType.Name}' and '{superclass.Name}' derive from each other",
+                        classType, superclass);
+                else if (classType.BaseClass is { } named)
+                    diagnostics.Error("SL0551", span,
+                        $"'{classType.Name}' already derives from '{named.Name}' in another " +
+                        "declaration; a category adds members and protocols, and names no superclass",
                         classType, superclass);
                 else
                     classType.BaseClass = superclass;
@@ -721,6 +838,22 @@ public sealed partial class Binder
         foreach (var classType in _objcClasses)
         {
             var span = classType.Span ?? default;
+
+            if (classType.IsCoreFoundation)
+            {
+                CheckCoreFoundation(classType);
+                continue;
+            }
+
+            if (classType.BaseClass is { IsCoreFoundation: true } cfBase)
+            {
+                diagnostics.Error("SL0927", span,
+                    $"'{classType.Name}' derives from '{cfBase.Name}', a Core Foundation type, which " +
+                    "has no class object for an Objective-C class to be built on; mark it '[CFType]' " +
+                    "if it is one too",
+                    classType, cfBase);
+                continue;
+            }
 
             if (classType.IsObjCRoot)
             {

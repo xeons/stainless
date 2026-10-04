@@ -240,6 +240,7 @@ public sealed partial class LlvmEmitter
     /// </summary>
     private string ClaimReturned(string result)
     {
+        _countsObjC = true;
         if (TargetPlatform.Current.Architecture == TargetArch.Arm64)
             Line("call void asm sideeffect \"mov\\09fp, fp\\09\\09// marker for " +
                  "objc_retainAutoreleaseReturnValue\", \"\"()");
@@ -319,6 +320,9 @@ public sealed partial class LlvmEmitter
         string argument;
         string selector;
 
+        if (target is ClassTypeSymbol { IsCoreFoundation: true } cf)
+            return EmitCFTest(value, cf);
+
         if (target is ClassTypeSymbol classType)
         {
             argument = Emit("ptr", $"load ptr, ptr {ClassReference(classType)}");
@@ -337,6 +341,36 @@ public sealed partial class LlvmEmitter
 
         string answer = Emit("i8", $"call signext i8 @objc_msgSend(ptr {value}, ptr {sel}, ptr {argument})");
         return Emit("i1", $"icmp ne i8 {answer}, 0");
+    }
+
+    /// <summary>The functions answering a Core Foundation type's CFTypeID that a cast has asked.</summary>
+    private readonly SortedSet<string> _cfTypeIDs = new(StringComparer.Ordinal);
+
+    /// <summary>
+    /// Whether the object at <paramref name="value"/> is a <paramref name="cf"/>:
+    /// its <c>CFTypeID</c> against the type's. <c>CFGetTypeID</c> does not
+    /// take nil, so nil is answered here, no.
+    /// </summary>
+    private string EmitCFTest(string value, ClassTypeSymbol cf)
+    {
+        string function = cf.CFTypeIDFunction!;
+        _cfTypeIDs.Add(function);
+        _countsObjC = true;
+
+        string entry = CurrentBlockLabel();
+        string ask = NextLabel("cf.ask");
+        string done = NextLabel("cf.done");
+        Terminator($"br i1 {Emit("i1", $"icmp eq ptr {value}, null")}, label %{done}, label %{ask}");
+
+        Label(ask);
+        string actual = Emit("i64", $"call i64 @CFGetTypeID(ptr {value})");
+        string expected = Emit("i64", $"call i64 @{function}()");
+        string same = Emit("i1", $"icmp eq i64 {actual}, {expected}");
+        string asked = CurrentBlockLabel();
+        Terminator($"br label %{done}");
+
+        Label(done);
+        return Emit("i1", $"phi i1 [ false, %{entry} ], [ {same}, %{asked} ]");
     }
 
     /// <summary>
@@ -463,6 +497,13 @@ public sealed partial class LlvmEmitter
         Declare("objc_autoreleasePoolPush", "declare ptr @objc_autoreleasePoolPush() nounwind");
         Declare("objc_autoreleasePoolPop", "declare void @objc_autoreleasePoolPop(ptr) nounwind");
         Declare("object_getClassName", "declare ptr @object_getClassName(ptr) nounwind");
+
+        if (_cfTypeIDs.Count > 0)
+        {
+            Declare("CFGetTypeID", "declare i64 @CFGetTypeID(ptr) nounwind");
+            foreach (string function in _cfTypeIDs)
+                Declare(function, $"declare i64 @{function}() nounwind");
+        }
     }
 
     /// <summary>

@@ -1,0 +1,5 @@
+alive after: 0
+maybe: 7, -1
+read a thousand times: 42000
+shared: 42, again: 42
+run loop mode: 21 characters

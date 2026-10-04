@@ -1,0 +1,4 @@
+# a category naming a superclass
+SL0551
+# a class two imported modules declare
+SL0550

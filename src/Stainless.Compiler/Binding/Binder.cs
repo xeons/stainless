@@ -178,6 +178,9 @@ public sealed partial class Binder(
     /// </summary>
     private readonly HashSet<TypeDeclSyntax> _additionalParts = [];
 
+    /// <summary>The declarations after the first of each <c>extern objc class</c>: its categories.</summary>
+    private readonly Dictionary<ClassTypeSymbol, List<(TypeDeclSyntax Declaration, FileScope Scope)>> _objcParts = [];
+
     /// <summary>
     /// The declaration a class takes its base list from, where that is not
     /// its first. At most one declaration of a type may write one.

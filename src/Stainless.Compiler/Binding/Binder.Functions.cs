@@ -103,6 +103,8 @@ public sealed partial class Binder
         if (containingType is not null)
             ReadMethodAttributes(symbol, containingType, declaration.Attributes,
                 declaration.Body is not null, declaration.Span);
+        else if (declaration.Attributes.Count > 0)
+            ReadForeignOwnership(symbol, declaration.Attributes);
 
         if (declaration.ExplicitInterface is { } named)
         {
@@ -633,19 +635,17 @@ public sealed partial class Binder
                 _ => "export \"C++\"",
             };
 
-            // A C function handing back an Objective-C object says nothing about
-            // who owns it, and the answer decides a release; an exported one
-            // would need a C header able to name the class.
-            if (IsObjCReference(symbol.ReturnType) ||
+            // An exported one would need a C header able to name the class. An
+            // imported C++ one has no ARC rule to say who owns what it returns.
+            if ((symbol.Linkage != LinkageKind.ExternC && IsObjCReference(symbol.ReturnType)) ||
                 (!symbol.Linkage.IsImport() && symbol.Parameters.Any(p => IsObjCReference(p.Type))))
                 diagnostics.Error("SL0916", symbol.Span,
                     symbol.Linkage.IsImport()
-                        ? $"'{symbol.Name}' returns an Objective-C object across {how}, and C " +
-                          "does not say whether the caller owns it. Declare it to return a " +
-                          "pointer, and take the object with a cast, which retains it"
+                        ? $"'{symbol.Name}' returns an Objective-C object across {how}, and C++ " +
+                          "has no rule for who owns one. Declare it 'extern \"C\"', or return a pointer"
                         : $"'{symbol.Name}' crosses {how} with an Objective-C object, and the C " +
                           "header written for it has no way to name the class. Pass a pointer",
-                    symbol.ReturnType);
+                    IsObjCReference(symbol.ReturnType) ? symbol.ReturnType : null);
 
             if (FindSlot(symbol.ReturnType) is { } returnedSlot)
                 diagnostics.Error("SL0284", symbol.Span,

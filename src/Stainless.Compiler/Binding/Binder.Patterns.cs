@@ -683,6 +683,17 @@ public sealed partial class Binder
             return new TypeMatch(present, viewed, null, InstanceKey.Instance);
         }
 
+        if (wanted is ClassTypeSymbol { IsCoreFoundation: true } cf && !IsAskableCFType(cf, reference))
+        {
+            diagnostics.Error(code, span,
+                cf.BaseClass is null
+                    ? $"every Objective-C object is a '{cf.Name}', so there is nothing to ask"
+                    : $"'{cf.Name}' has no CFTypeID of its own, so an object cannot be asked whether " +
+                      $"it is one: a mutable Core Foundation type shares its base's",
+                wanted);
+            return null;
+        }
+
         if (wanted is ObjCBlockTypeSymbol)
         {
             diagnostics.Error(code, span,

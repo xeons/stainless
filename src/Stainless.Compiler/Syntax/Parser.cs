@@ -497,13 +497,10 @@ public sealed class Parser
         if (At(TokenKind.ExternKeyword) || At(TokenKind.ExportKeyword))
         {
             // `[DoesNotReturn] extern "C" void abort();` says something the C
-            // declaration cannot, and is read here rather than kept.
-            bool doesNotReturn = At(TokenKind.ExternKeyword) && attributes.Any(IsDoesNotReturn);
-            RejectAttributes(attributes.Where(a => !(doesNotReturn && IsDoesNotReturn(a))).ToList(),
-                "an 'extern' or 'export' declaration, whose shape belongs to the other language");
-
+            // declaration cannot, and so does `[ReturnsRetained]`.
+            var kept = KeepExternAttributes(attributes, At(TokenKind.ExternKeyword));
             var declared = ParseLinkageDeclaration(start, modifiers);
-            return doesNotReturn ? declared.Select(MarkDoesNotReturn).ToList() : declared;
+            return kept.Count > 0 ? declared.Select(d => MarkExtern(d, kept)).ToList() : declared;
         }
 
         if (AtRecord())
@@ -648,14 +645,34 @@ public sealed class Parser
     private static bool IsDoesNotReturn(AttributeSyntax attribute) =>
         attribute.Name.Last == "DoesNotReturn" && attribute.Arguments.Count == 0;
 
-    /// <summary>Puts <c>[DoesNotReturn]</c> on the function it was written above.</summary>
-    private Declaration MarkDoesNotReturn(Declaration declaration)
+    /// <summary>
+    /// What an <c>extern</c> declaration may carry: <c>[DoesNotReturn]</c>,
+    /// and <c>[ReturnsRetained]</c> or <c>[ReturnsNotRetained]</c>, which the
+    /// binder reads. Everything else is refused here.
+    /// </summary>
+    private List<AttributeSyntax> KeepExternAttributes(IReadOnlyList<AttributeSyntax> attributes, bool isExtern)
+    {
+        var kept = isExtern
+            ? attributes.Where(a => IsDoesNotReturn(a) ||
+                                    a.Name.Last is "ReturnsRetained" or "ReturnsNotRetained").ToList()
+            : [];
+        RejectAttributes(attributes.Except(kept).ToList(),
+            "an 'extern' or 'export' declaration, whose shape belongs to the other language");
+        return kept;
+    }
+
+    /// <summary>Puts what <see cref="KeepExternAttributes"/> kept on the function it was written above.</summary>
+    private Declaration MarkExtern(Declaration declaration, List<AttributeSyntax> kept)
     {
         if (declaration is FunctionDeclSyntax function)
-            return function with { DoesNotReturn = true };
+            return function with
+            {
+                DoesNotReturn = kept.Any(IsDoesNotReturn),
+                Attributes = kept.Where(a => !IsDoesNotReturn(a)).ToList(),
+            };
 
         _diagnostics.Error("SL0728", declaration.Span,
-            "'[DoesNotReturn]' says a call never comes back, so it can only be written on an " +
+            $"'[{kept[0].Name.Last}]' is about a call, so it can only be written on an " +
             "'extern' function; this declares a value");
         return declaration;
     }
@@ -968,11 +985,7 @@ public sealed class Parser
                 int before = _pos;
                 int memberStart = _pos;
                 var memberAttributes = ParseAttributeLists();
-                bool doesNotReturn = isExtern && memberAttributes.Any(IsDoesNotReturn);
-                RejectAttributes(
-                    memberAttributes.Where(a => !(doesNotReturn && IsDoesNotReturn(a))).ToList(),
-                    "an 'extern' or 'export' declaration, whose shape belongs to the other " +
-                    "language");
+                var kept = KeepExternAttributes(memberAttributes, isExtern);
 
                 var memberModifiers = InsideBlock(modifiers, ParseModifiers());
                 var memberConvention = ParseCallingConvention();
@@ -981,7 +994,7 @@ public sealed class Parser
 
                 var member = WithConvention(
                     ParseFunctionOrField(memberStart, memberModifiers, linkage), memberConvention);
-                members.Add(doesNotReturn ? MarkDoesNotReturn(member) : member);
+                members.Add(kept.Count > 0 ? MarkExtern(member, kept) : member);
                 if (_pos == before) Advance();
             }
             Expect(TokenKind.CloseBrace);

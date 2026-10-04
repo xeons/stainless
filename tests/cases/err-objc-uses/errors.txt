@@ -2,5 +2,9 @@
 SL0913
 # 'new' on an 'extern objc class'
 SL0914
-# an Objective-C object returned from 'extern "C"'
+# an Objective-C object returned from 'extern "C++"'
 SL0916
+# ownership said of a C function returning no object
+SL0906
+# a store to an Objective-C object C holds
+SL0926

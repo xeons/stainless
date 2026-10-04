@@ -304,7 +304,7 @@ public sealed class BoundStaticAccess(SourceSpan span, StaticSymbol symbol)
 {
     public StaticSymbol Static { get; } = symbol;
 
-    public override bool IsLValue => !Static.IsReadonly;
+    public override bool IsLValue => !Static.IsReadonly && !(Static.IsImported && Binder.IsObjCReference(Static.Type));
 }
 
 public sealed class BoundConstantAccess(SourceSpan span, ConstantSymbol constant)

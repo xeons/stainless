@@ -12,8 +12,14 @@ public extern objc class NSObject
 
 public closure nuint Hasher();
 
-// A C function handing back an Objective-C object, owned by nobody knows whom.
-extern "C" NSObject? NSClassFromString(byte* name);
+// A C++ function handing back an Objective-C object: C++ has no rule for who owns it.
+extern "C++" NSObject? MakeObject();
+
+// An object C holds, which is read and never written.
+extern "C" NSObject NSApp;
+
+// Ownership said of a call that hands back no object.
+[ReturnsRetained] extern "C" int CountObjects();
 
 void Uses(NSObject held)
 {
@@ -22,6 +28,8 @@ void Uses(NSObject held)
 
     // One made with 'new'.
     var made = new NSObject();
+
+    NSApp = held;
 }
 
 int Main() => 0;

@@ -526,6 +526,12 @@ public sealed partial class LlvmEmitter
         }
 
         string result = Emit(returnInfo.LlvmType, invocation);
+
+        // ARC's rule for a C function: an object handed back at +0 unless it
+        // was declared to hand one over.
+        if (function.Linkage.IsImport() && IsObjCReference(function.ReturnType) && !function.ReturnsRetained)
+            result = ClaimReturned(result);
+
         if (function.Linkage.IsImport() && IsNeverNullReference(function.ReturnType))
             RequireForeignResult(result, function);
 
