@@ -116,6 +116,13 @@ public sealed class Toolchain
 
     private string? _targetTriple;
 
+    private bool? _acceptsNoClassSelectorStubs;
+
+    /// <summary>Whether this clang knows the class-message stubs, and so can be told not to use them.</summary>
+    private bool AcceptsNoClassSelectorStubs =>
+        _acceptsNoClassSelectorStubs ??= Run(ClangPath,
+            ["-fno-objc-msgsend-class-selector-stubs", "-fsyntax-only", "-x", "objective-c", "-"], "").Success;
+
     /// <summary>
     /// The triple clang builds for by default, asked once and remembered. It
     /// says which Windows linker flavour is in use, and clang is the only thing
@@ -750,7 +757,19 @@ public sealed class Toolchain
         // so its objects and the program's agree about who owns what.
         if (nativeInputs.Any(i => i.EndsWith(".m", StringComparison.OrdinalIgnoreCase) ||
                                   i.EndsWith(".mm", StringComparison.OrdinalIgnoreCase)))
+        {
             arguments.Add("-fobjc-arc");
+
+            // clang 23 sends a class message through an `objc_msgSendClass$`
+            // stub whenever the ld it asks reports version 1250 or later, and
+            // relies on the ld that links to make it. On a runner whose
+            // Command Line Tools are newer than the Xcode selected, the two
+            // are different linkers and the stub is left undefined. A plain
+            // objc_msgSend links everywhere; a clang that predates the stubs
+            // refuses the flag, so it is asked first.
+            if (target.IsDarwin && AcceptsNoClassSelectorStubs)
+                arguments.Add("-fno-objc-msgsend-class-selector-stubs");
+        }
 
         arguments.AddRange(nativeInputs);
 
