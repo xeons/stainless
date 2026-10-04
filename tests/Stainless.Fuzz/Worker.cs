@@ -39,10 +39,10 @@ internal static class Worker
     /// <summary>A mutant larger than this is not compiled at all.</summary>
     private const int MaxMutantLength = 2_000_000;
 
-    public static int Run(string repository, string output, int id, int seed)
+    public static int Run(string repository, string output, int id, int seed, string? cases)
     {
         var random = new Random(seed);
-        var corpus = Corpus.Load(repository);
+        var corpus = Corpus.Load(repository, cases);
         var mutator = new Mutator(random, corpus.SelectMany(p => p.Select(f => f.Text)).ToList());
         var behaviours = new HashSet<string>();
         var signatures = new HashSet<string>();
@@ -89,6 +89,7 @@ internal static class Worker
 
         Directory.CreateDirectory(directory);
         File.WriteAllText(Path.Combine(directory, "signature.txt"), outcome.Signature + "\n\n" + outcome.Failure);
+        Corpus.RecordTarget(directory);
         for (int i = 0; i < files.Count; i++)
             File.WriteAllText(Path.Combine(directory, $"{i}-{Path.GetFileName(files[i].Path)}"), files[i].Text);
 
@@ -116,10 +117,11 @@ internal static class Worker
 internal static class Corpus
 {
     /// <summary>
-    /// Every program in the tree, as its files. A test case directory is one
-    /// program, because half of what the binder does is between files.
+    /// Every program in the tree, as its files, or those whose path contains
+    /// <paramref name="only"/>. A test case directory is one program, because
+    /// half of what the binder does is between files.
     /// </summary>
-    public static List<List<SourceFile>> Load(string repository)
+    public static List<List<SourceFile>> Load(string repository, string? only = null)
     {
         var programs = new List<List<SourceFile>>();
 
@@ -133,10 +135,22 @@ internal static class Corpus
         foreach (string file in Directory.GetFiles(Path.Combine(repository, "samples"), "*.sl", SearchOption.AllDirectories))
             programs.Add([Read(file)]);
 
-        foreach (string file in Directory.GetFiles(Path.Combine(repository, "stdlib"), "*.sl"))
+        foreach (string file in Directory.GetFiles(Path.Combine(repository, "stdlib"), "*.sl", SearchOption.AllDirectories))
             programs.Add([Read(file)]);
 
+        if (only is not null)
+            programs.RemoveAll(p => !p.Any(f => f.Path.Contains(only, StringComparison.Ordinal)));
+        if (programs.Count == 0)
+            throw new InvalidOperationException($"no program's path contains '{only}'");
+
         return programs;
+    }
+
+    /// <summary>A finding made for another target says which, for replay.</summary>
+    public static void RecordTarget(string directory)
+    {
+        if (Pipeline.Target is { } target)
+            File.WriteAllText(Path.Combine(directory, "target.txt"), target.Name + "\n");
     }
 
     private static SourceFile Read(string path) => new(path.Replace('\\', '/'), File.ReadAllText(path));

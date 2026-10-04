@@ -50,7 +50,13 @@ dotnet run --project tests/Stainless.Fuzz -- fuzz --minutes 10
 dotnet run --project tests/Stainless.Fuzz -- replay     # which findings still fail
 dotnet run --project tests/Stainless.Fuzz -- repro file.sl
 dotnet run --project tests/Stainless.Fuzz -- min file.sl smaller.sl
+dotnet run --project tests/Stainless.Fuzz -- fuzz --target arm64-macos --cases objc
 ```
+
+`--target` compiles for another target, as the compiler's own does, so the
+Objective-C and Darwin-only paths are fuzzed from any host; a finding records
+it in `target.txt` and replay compiles it for that target again. `--cases`
+keeps only the programs whose path contains the text given.
 
 It mutates every test case, sample and standard library file a token at a time
 — deleting, repeating, swapping, nesting seven hundred deep — and compiles each

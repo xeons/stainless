@@ -122,7 +122,7 @@ public sealed partial class Binder
     {
         RequireDarwin(syntax.Span);
         if (ArrangeThroughSignature(syntax, block.Name, block.Closure.SignatureText,
-                block.Signature, arguments, out var order) is not { } converted)
+                block.ReturnType, block.Signature, arguments, out var order) is not { } converted)
             return new BoundErrorExpression(syntax.Span);
 
         return new BoundClosureCall(syntax.Span, block.Closure, target, converted)

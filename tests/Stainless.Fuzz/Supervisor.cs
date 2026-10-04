@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 using System.Diagnostics;
+using Stainless.Binding;
 
 namespace Stainless.Fuzz;
 
@@ -39,10 +40,12 @@ internal static class Supervisor
         public DateTime Heard;
     }
 
-    public static int Run(string repository, string output, int workers, double minutes)
+    public static int Run(string repository, string output, int workers, double minutes, string? cases)
     {
         Directory.CreateDirectory(Path.Combine(output, "crashes"));
-        Console.WriteLine($"fuzzing with {workers} workers for {minutes} minutes; findings in {output}");
+        Console.WriteLine($"fuzzing {Corpus.Load(repository, cases).Count} programs for " +
+                          $"{(Pipeline.Target ?? TargetPlatform.Host).Name} with {workers} workers for " +
+                          $"{minutes} minutes; findings in {output}");
         if (Pipeline.Verifier is null)
             Console.WriteLine("no clang was found, so emitted IR is not verified");
 
@@ -53,8 +56,13 @@ internal static class Supervisor
 
         void Start(int id)
         {
-            var info = new ProcessStartInfo(Environment.ProcessPath!,
-                ["worker", output, id.ToString(), Random.Shared.Next().ToString()])
+            List<string> arguments = ["worker", output, id.ToString(), Random.Shared.Next().ToString()];
+            if (Pipeline.Target is { } target)
+                arguments.AddRange(["--target", target.Name]);
+            if (cases is not null)
+                arguments.AddRange(["--cases", cases]);
+
+            var info = new ProcessStartInfo(Environment.ProcessPath!, arguments)
             {
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
@@ -153,6 +161,7 @@ internal static class Supervisor
         {
             Directory.CreateDirectory(directory);
             File.WriteAllText(Path.Combine(directory, "signature.txt"), signature + "\n\n" + stderr);
+            Corpus.RecordTarget(directory);
             if (File.Exists(input))
                 File.Copy(input, Path.Combine(directory, "0-input.sl"), overwrite: true);
         }

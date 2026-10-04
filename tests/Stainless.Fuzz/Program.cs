@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 using System.Globalization;
+using Stainless.Binding;
 
 namespace Stainless.Fuzz;
 
@@ -41,35 +42,74 @@ internal static class Program
         if (args.Length == 0)
             return Usage();
 
+        string? targetName = Option(args, "--target");
+        TargetPlatform? target = null;
+        if (targetName is not null)
+        {
+            target = TargetPlatform.Parse(targetName);
+            if (target is null)
+            {
+                Console.Error.WriteLine($"'{targetName}' is not a target; the targets are {TargetPlatform.Names}");
+                return 2;
+            }
+        }
+
+        Pipeline.Configure(target);
+
         string repository = Repository.Root();
         string defaultOutput = Path.Combine(Path.GetTempPath(), "stainless-fuzz");
+        string? cases = Option(args, "--cases");
+        string[] positional = Positional(args);
 
-        return args[0] switch
+        return positional[0] switch
         {
             "fuzz" => Supervisor.Run(
                 repository,
                 Option(args, "--out") ?? defaultOutput,
                 int.Parse(Option(args, "--workers") ?? Math.Max(1, Environment.ProcessorCount / 2).ToString()),
-                double.Parse(Option(args, "--minutes") ?? "10", CultureInfo.InvariantCulture)),
-            "worker" => Worker.Run(repository, args[1], int.Parse(args[2]), int.Parse(args[3])),
-            "repro" when args.Length > 1 => Repro(args[1..]),
-            "min" when args.Length > 2 => Minimise(args[1], args[2]),
-            "replay" => Replay.Run(args.Length > 1 ? args[1] : defaultOutput),
+                double.Parse(Option(args, "--minutes") ?? "10", CultureInfo.InvariantCulture),
+                cases),
+            "worker" => Worker.Run(repository, positional[1], int.Parse(positional[2]), int.Parse(positional[3]), cases),
+            "repro" when positional.Length > 1 => Repro(positional[1..]),
+            "min" when positional.Length > 2 => Minimise(positional[1], positional[2]),
+            "replay" => Replay.Run(positional.Length > 1 ? positional[1] : defaultOutput),
             _ => Usage(),
         };
+    }
+
+    /// <summary>Every option takes a value.</summary>
+    private static readonly string[] s_options = ["--out", "--workers", "--minutes", "--target", "--cases"];
+
+    private static string[] Positional(string[] args)
+    {
+        var positional = new List<string>();
+        for (int i = 0; i < args.Length; i++)
+        {
+            if (s_options.Contains(args[i]))
+                i++;
+            else
+                positional.Add(args[i]);
+        }
+
+        return [.. positional];
     }
 
     private static int Usage()
     {
         Console.Error.WriteLine(
             """
-            usage: stainless-fuzz fuzz [--minutes N] [--workers N] [--out DIR]
+            usage: stainless-fuzz fuzz [--minutes N] [--workers N] [--out DIR] [--cases TEXT]
                    stainless-fuzz repro FILE.sl...      compile one program, say what happened
                    stainless-fuzz min FILE.sl OUT.sl    shrink a failing file, keeping its failure
                    stainless-fuzz replay [DIR]          re-run every finding, report which still fail
 
+            Every command takes --target NAME, compiling for that target as
+            stainless's own --target does; the default is this machine. --cases
+            keeps only the programs whose path contains TEXT.
+
             Findings go to DIR/crashes, one directory per distinct failure; DIR defaults
-            to %TEMP%/stainless-fuzz.
+            to %TEMP%/stainless-fuzz. A finding made for another target records it in
+            target.txt, and replay compiles it for that target.
             """);
         return 2;
     }

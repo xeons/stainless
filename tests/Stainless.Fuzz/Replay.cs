@@ -51,7 +51,10 @@ internal static class Replay
                     files[which] = minimal;
             }
 
-            string verdict = Check(files);
+            string targetFile = Path.Combine(directory, "target.txt");
+            string? target = File.Exists(targetFile) ? File.ReadAllText(targetFile).Trim() : null;
+
+            string verdict = Check(files, target);
             if (verdict != "fixed")
                 failing++;
 
@@ -63,9 +66,13 @@ internal static class Replay
         return failing == 0 ? 0 : 1;
     }
 
-    private static string Check(List<string> files)
+    private static string Check(List<string> files, string? target)
     {
-        var info = new ProcessStartInfo(Environment.ProcessPath!, ["repro", .. files])
+        List<string> arguments = ["repro", .. files];
+        if (target is not null)
+            arguments.AddRange(["--target", target]);
+
+        var info = new ProcessStartInfo(Environment.ProcessPath!, arguments)
         {
             RedirectStandardOutput = true,
             RedirectStandardError = true,

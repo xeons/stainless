@@ -739,7 +739,7 @@ public sealed partial class Binder
         var delegateType = (DelegateTypeSymbol)target.Type;
 
         if (ArrangeThroughSignature(syntax, delegateType.Name, delegateType.SignatureText,
-                delegateType.Signature, arguments, out var order) is not { } converted)
+                delegateType.ReturnType, delegateType.Signature, arguments, out var order) is not { } converted)
             return new BoundErrorExpression(syntax.Span);
 
         return new BoundIndirectCall(syntax.Span, delegateType, target, converted)
@@ -756,7 +756,7 @@ public sealed partial class Binder
         BoundExpression target, List<BoundExpression> arguments)
     {
         if (ArrangeThroughSignature(syntax, closure.Name, closure.SignatureText,
-                closure.Signature, arguments, out var order) is not { } converted)
+                closure.ReturnType, closure.Signature, arguments, out var order) is not { } converted)
             return new BoundErrorExpression(syntax.Span);
 
         return new BoundClosureCall(syntax.Span, closure, target, converted)
@@ -770,8 +770,8 @@ public sealed partial class Binder
     /// lambda's own type has one (<c>var f = (int x = 1) =&gt; x;</c>).
     /// </summary>
     private List<BoundExpression>? ArrangeThroughSignature(
-        CallSyntax syntax, string name, string shape, IReadOnlyList<ParameterSymbol> signature,
-        List<BoundExpression> arguments, out int[]? order)
+        CallSyntax syntax, string name, string shape, TypeSymbol returnType,
+        IReadOnlyList<ParameterSymbol> signature, List<BoundExpression> arguments, out int[]? order)
     {
         order = null;
         int required = signature.Count(p => !p.IsOptional);
@@ -783,7 +783,8 @@ public sealed partial class Binder
                 (required == signature.Count
                     ? Counted(signature.Count, "argument")
                     : $"{required} to {signature.Count} arguments") +
-                $", but {Given(arguments.Count)}");
+                $", but {Given(arguments.Count)}",
+                [returnType, .. signature.Select(p => p.Type)]);
             return null;
         }
 

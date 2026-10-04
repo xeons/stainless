@@ -54,7 +54,10 @@ internal sealed class InvalidIrException(IrFault fault) : Exception(fault.Explai
 /// </summary>
 internal static class Pipeline
 {
-    private static readonly HashSet<string> s_symbols = Compilation.PlatformSymbols([]);
+    /// <summary>What every compilation in this process builds for; null is the host.</summary>
+    public static TargetPlatform? Target { get; private set; }
+
+    private static HashSet<string> s_symbols = null!;
 
     /// <summary>
     /// What checks a module that emitted cleanly, or null with no clang. A
@@ -67,20 +70,32 @@ internal static class Pipeline
     /// for the reason <c>Front</c> in the unit tests gives: a syntax tree is
     /// immutable, and each binder builds its own symbols over it.
     /// </summary>
-    private static readonly Dictionary<string, CompilationUnitSyntax> s_library = ParseLibrary();
+    private static Dictionary<string, CompilationUnitSyntax> s_library = null!;
+
+    /// <summary>
+    /// Fixes the target and parses the library for it. MUST be called once,
+    /// before <see cref="Run"/>: the library's <c>#if</c> blocks answer for it.
+    /// </summary>
+    public static void Configure(TargetPlatform? target)
+    {
+        Target = target;
+        TargetPlatform.Current = target ?? TargetPlatform.Host;
+        s_symbols = Compilation.PlatformSymbols([], target);
+        s_library = ParseLibrary();
+    }
 
     private static Dictionary<string, CompilationUnitSyntax> ParseLibrary()
     {
         var diagnostics = new DiagnosticBag();
         return StandardLibrary.Sources().ToDictionary(
-            s => Path.GetFileName(s.Name),
+            s => s.Name[(s.Name.IndexOf('/') + 1)..],
             s => new Parser(new SourceText(s.Name, s.Text), diagnostics, s_symbols).ParseCompilationUnit());
     }
 
     /// <summary>
     /// Compiles the files as one program. A file under a <c>stdlib</c> directory
-    /// replaces the standard library file of that name rather than joining it,
-    /// so the library's own source can be mutated too.
+    /// replaces the standard library file at that path inside it rather than
+    /// joining it, so the library's own source can be mutated too.
     /// </summary>
     public static Outcome Run(IReadOnlyList<SourceFile> files)
     {
@@ -92,9 +107,12 @@ internal static class Pipeline
         {
             return Recursion.OnADeepStack(() =>
             {
+                TargetPlatform.Current = Target ?? TargetPlatform.Host;
+
                 var replaced = files
-                    .Where(f => f.Path.Replace('\\', '/').Contains("stdlib/"))
-                    .Select(f => Path.GetFileName(f.Path))
+                    .Select(f => f.Path.Replace('\\', '/'))
+                    .Where(p => p.Contains("stdlib/"))
+                    .Select(p => p[(p.LastIndexOf("stdlib/", StringComparison.Ordinal) + "stdlib/".Length)..])
                     .ToHashSet();
 
                 var units = s_library

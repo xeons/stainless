@@ -283,7 +283,8 @@ public sealed partial class Binder
             {
                 diagnostics.Error("SL0906", attribute.Span,
                     $"'[{attribute.Name.Last}]' says who owns the object a call hands back, and " +
-                    $"'{symbol.Name}' returns '{symbol.ReturnType.Name}', which is not one");
+                    $"'{symbol.Name}' returns '{symbol.ReturnType.Name}', which is not one",
+                    symbol.ReturnType);
                 return;
             }
 
@@ -1019,7 +1020,7 @@ public sealed partial class Binder
                 $"'{defined.Name}.{MemberName(method)}' returns '{method.ReturnType.Name}', and the " +
                 $"'{inherited.Selector}' it overrides returns '{inherited.ReturnType.Name}'; an " +
                 "override returns the same, or a class derived from it",
-                defined);
+                defined, method.ReturnType, inherited.ReturnType);
 
         method.Overridden = inherited;
         method.Selector = inherited.Selector;
